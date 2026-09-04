@@ -1,0 +1,116 @@
+'use client';
+
+import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { Search } from 'lucide-react';
+
+import { HeroLayout } from '@/components/HeroLayout';
+import type { BreadcrumbItem } from '@/components/PageBreadcrumbs';
+import { cityToPrepositional } from '@/lib/city-declension';
+
+type BlogListHeroProps = {
+  breadcrumbs: BreadcrumbItem[];
+  /**
+   * Optional geo copy. Blog index is cross-city by default - do not pass header CityPicker
+   * city here; in-page materials filter owns city scoping.
+   */
+  cityName?: string | null;
+};
+
+/** Catalog-style header (same shell as /events and /cities). Search lives below H1. */
+export function BlogListHero({ breadcrumbs, cityName = null }: BlogListHeroProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const query = String(searchParams.get('q') || '').trim();
+  const [searchDraft, setSearchDraft] = useState(query);
+
+  useEffect(() => {
+    setSearchDraft(query);
+  }, [query]);
+
+  const scrollToFeed = useCallback(() => {
+    requestAnimationFrame(() => {
+      document.getElementById('blog-feed')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    });
+  }, []);
+
+  useEffect(() => {
+    const trimmed = searchDraft.trim();
+    if (trimmed === query) return;
+    const handle = window.setTimeout(() => {
+      const next = new URLSearchParams(searchParams.toString());
+      next.delete('type');
+      if (!trimmed) next.delete('q');
+      else next.set('q', trimmed);
+      const qs = next.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    }, 280);
+    return () => window.clearTimeout(handle);
+  }, [searchDraft, query, pathname, router, searchParams]);
+
+  const submitSearch = useCallback(
+    (event?: FormEvent<HTMLFormElement>) => {
+      event?.preventDefault();
+      const trimmed = searchDraft.trim();
+      const next = new URLSearchParams(searchParams.toString());
+      next.delete('type');
+      if (!trimmed) next.delete('q');
+      else next.set('q', trimmed);
+      const qs = next.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+      scrollToFeed();
+    },
+    [pathname, router, searchDraft, searchParams, scrollToFeed],
+  );
+
+  const cityPrep = cityName ? cityToPrepositional(cityName) : null;
+
+  const title = query
+    ? `Результаты поиска: «${query}»`
+    : cityPrep
+      ? `Статьи и советы в ${cityPrep}`
+      : 'Блог Дайбилет';
+
+  const description = query
+    ? cityPrep
+      ? `Материалы по запросу в ${cityPrep}`
+      : 'Материалы по вашему запросу'
+    : cityPrep
+      ? `Обзоры, маршруты и лайфхаки по событиям в ${cityPrep}`
+      : 'Обзоры, маршруты и лайфхаки по событиям в городах России';
+
+  return (
+    <HeroLayout
+      variant="minimal"
+      dense
+      tone="light"
+      className="border-slate-100 bg-white"
+      breadcrumbs={breadcrumbs}
+      title={title}
+      description={description}
+    >
+      <form className="relative mt-4 w-full max-w-xl sm:mt-5" onSubmit={submitSearch} role="search">
+        <label className="relative block">
+          <span className="sr-only">Поиск по статьям</span>
+          <Search
+            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+            aria-hidden
+          />
+          <input
+            type="search"
+            value={searchDraft}
+            onChange={(event) => setSearchDraft(event.target.value)}
+            placeholder="Найти статью: стендап, маршрут, концерт…"
+            className="h-11 w-full rounded-2xl border border-slate-200 bg-[#F5F5F7] py-2.5 pl-10 pr-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-primary-400 focus:bg-white focus:ring-2 focus:ring-primary-100"
+            aria-label="Поиск по статьям блога"
+          />
+        </label>
+      </form>
+    </HeroLayout>
+  );
+}

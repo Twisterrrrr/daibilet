@@ -7,6 +7,7 @@ import {
   formatBusLocationDisplayName,
   formatPierLocationDisplayName,
   findVenueOverride,
+  formatPublicVenueTitle,
 } from './venue-normalize.js';
 import {
   resolveCityTimeZone,
@@ -16,15 +17,197 @@ import {
   localHourFromInstant,
   DEFAULT_CITY_TIME_ZONE,
 } from './city-timezone.js';
+import { loadCityRoutingConfig } from './city-routing-config.js';
+import { resolveProjectRoot } from './project-root.js';
 import {
   resolveContextInstitutionForEvent,
   resolveContextInstitutionFromTitle,
   shouldResolveInstitutionFromTitle,
 } from './event-venue-context.js';
+import { formatPublicEventTitle } from './event-title-normalize.ts';
+import { toPublicCatalogListItem, toPublicHomeCardSession } from './public-catalog-list-item.ts';
+import { enrichBuyerOrdersWithEventLinks } from './buyer-order-event-links.js';
+import {
+  blogCityDisplayName,
+  blogCitySlugAliases,
+  canonicalBlogCitySlug,
+  isBroadBlogCitySlug,
+} from './blog-city-slug.js';
+import {
+  buildAdminEventGroupKey,
+  invalidateAdminEventsSqlReadModelCache,
+  queryAdminEventGroupsPage,
+  queryAdminLaunchMetricsSql,
+} from './admin-events-sql-read-model.js';
+import {
+  applyVenueEventFacetCounts,
+  fetchLeanPublicVenueRows,
+  fetchVenueEventFacetCounts,
+  fetchVenueHeroImageFallbacks,
+} from './public-venue-lean.ts';
+import { pickRelatedSessions } from './event-related.js';
+import {
+  isContentPlaceHubEligible,
+  isContentPlaceKind,
+} from './public-venue-hub-gate.js';
+import {
+  ACTIVE_SESSION_SQL,
+  MIN_DISPLAY_PRICE_RUB,
+  PUBLIC_SALES_BLOCKED_STATUS_SQL,
+  hasDisplayPrice,
+  hasUpcomingOrOpenSchedule,
+  isOpenDateCatalogRow,
+  isSaleableEventForPublic,
+  isWideLifetimeSession,
+} from './catalog-availability.ts';
+import {
+  SITE_TIME_ZONE,
+  formatDate,
+  formatTime,
+  normalizeStartsAt,
+  parseSessionStartsAt,
+  timeBucket,
+} from './public-datetime.ts';
+import { dedupePublicOffers, preferNamedTicketOffers } from './public-offers.ts';
 
-const MIN_DISPLAY_PRICE_RUB = 100;
+import {
+  LANDING_RULES,
+  LANDING_SLUG_ALIASES,
+  explainLandingRuleMatch,
+  matchesLandingRule,
+  buildOffSeasonLandingSlugs,
+  resolveLandingRuleBySlug,
+  sessionMatchesLandingSlug,
+} from './landing-rules.ts';
+import { pickCatalogSubcategories } from './public-catalog.mapper.ts';
+import { buildPublicLandings as buildPublicLandingsFromSessions } from './public-city-landings.ts';
+import {
+  LANDING_PAGE_SESSION_LIMIT,
+  scopePublicCatalogSessions,
+  selectLandingPageSessions,
+} from './public-landing-page-sessions.ts';
+import {
+  canonicalSessionPierKey,
+  dedupeCrossSourceCatalogSessions,
+  isPublicSessionPurchaseBlocked,
+  maxNullableNumber,
+  minNullableNumber,
+  normalizeGroupPart,
+  regroupMappedPublicCatalogSessions,
+  resolveCatalogDisplayTitle,
+  sessionHasCoverImage,
+  shouldPromoteGroupedRepresentative,
+  sumNullableNumbers,
+  uniqueSlots,
+  uniqueValues,
+  sessionGroupIds,
+} from './public-catalog-grouping.ts';
+import { mapGroupedPublicSession, collectSeparateCityHubNames } from './public-catalog.mapper.ts';
+import {
+  buildCityHubSeoTitle,
+  buildPublicDestinationRowsFromSessions,
+  countDistinctSessionVenues,
+  destinationPrepositional,
+  isFoldingRegionalTown,
+  isSubjectCapitalCity,
+  isVisibleOnCitiesCatalog,
+  lookupDestinationCatalogSessions,
+  matchStandaloneCityBySlug,
+  publicDestinationFromSession,
+} from './public-destination.ts';
+import { dedupePublicVenueLinkedEvents } from './public-venue-linked-events.ts';
+
+import {
+  haversineMeters,
+  buildPublicVenuePage,
+  buildPublicVenuesCatalog,
+  publicVenueHubRows,
+  resolvePublicVenuesForSessions,
+  publicPublishedVenuesByCityId,
+  mergeCityPageVenues,
+  publicVenues,
+  publicVenuesForHome,
+  publicVenuesForSessionsFromHub,
+  publicVenueRowMatchesCityFilter,
+  isPublicVenueHub,
+  publicVenuePageTemplate,
+  publicVenueSlug,
+  resolvePublicVenueCoordinates,
+  isPierVenueKind,
+  clearPublicVenueReadCache,
+  warmPublicVenueCatalogCache,
+  loadPublicEventVenueStops,
+  canonicalPierLocationKey,
+  resolvePublicVenueCity,
+  applyPublicVenueNormalization,
+  normalizeVenueKindValue,
+  INSTITUTION_VENUE_KINDS,
+} from './public-venue-read.js';
+
+export {
+  haversineMeters,
+  buildPublicVenuePage,
+  buildPublicVenuesCatalog,
+  publicVenueHubRows,
+  resolvePublicVenuesForSessions,
+  publicPublishedVenuesByCityId,
+  mergeCityPageVenues,
+  publicVenues,
+  publicVenuesForHome,
+  publicVenuesForSessionsFromHub,
+  publicVenueRowMatchesCityFilter,
+  isPublicVenueHub,
+  publicVenuePageTemplate,
+  publicVenueSlug,
+  resolvePublicVenueCoordinates,
+  isPierVenueKind,
+  clearPublicVenueReadCache,
+  warmPublicVenueCatalogCache,
+  loadPublicEventVenueStops,
+  canonicalPierLocationKey,
+};
+
+
+export { pickCatalogSubcategories };
+export {
+  dedupeCrossSourceCatalogSessions,
+  mapGroupedPublicSession,
+  regroupMappedPublicCatalogSessions,
+  sessionHasCoverImage,
+  buildCityHubSeoTitle,
+  buildPublicDestinationRowsFromSessions,
+  countDistinctSessionVenues,
+  destinationPrepositional,
+  isVisibleOnCitiesCatalog,
+  lookupDestinationCatalogSessions,
+  publicDestinationFromSession,
+};
+
+export {
+  hasDisplayPrice,
+  isSaleableEventForPublic,
+  preferNamedTicketOffers,
+  dedupePublicOffers,
+  normalizeStartsAt,
+  formatDate,
+  formatTime,
+  timeBucket,
+  SITE_TIME_ZONE,
+};
+
 const PUBLIC_DESTINATION_MIN_EVENTS = 1;
 const PUBLIC_CATALOG_CACHE_MS = 5 * 60 * 1000;
+/** Stale-while-revalidate window: serve expired catalog instantly, rebuild in background. */
+const PUBLIC_CATALOG_STALE_MS = Number(process.env.PUBLIC_CATALOG_STALE_MS || 30 * 60 * 1000);
+/**
+ * INC.504.5 seam: emergency dto.js SQL must not re-enter under load.
+ * Alert P1 on log line containing `legacy inline SQL fallback`.
+ */
+const LEGACY_CATALOG_SQL_COOLDOWN_MS = Math.max(
+  60_000,
+  Number(process.env.DAIBILET_LEGACY_CATALOG_SQL_COOLDOWN_MS || 45 * 60 * 1000),
+);
+let lastLegacyCatalogSqlFallbackAt = 0;
 const CATALOG_TAG_DISPLAY_LIMIT = 4;
 
 function orderedEventTagsSql(eventIdSql = 'e.id') {
@@ -98,17 +281,33 @@ const CITY_CARD_IMAGE_SLUGS = new Set([
   'penza',
   'volgograd',
   'sortavala',
+  'surgut',
+  'tolyatti',
+  'novokuzneck',
+  'novokuznetsk',
+  'hanty-mansiysk',
+  'khanty-mansiysk',
+  'vladikavkaz',
 ]);
-const PROJECT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
-const CITY_ROUTING = loadCityRouting();
+const PROJECT_ROOT = resolveProjectRoot(import.meta.url);
+const CITY_ROUTING = loadCityRoutingConfig(import.meta.url);
 const STANDALONE_CITY_NAMES = new Set(CITY_ROUTING.standaloneCities || []);
 const CITY_TO_REGION = new Map(Object.entries(CITY_ROUTING.cityToRegion || {}));
+const FOREIGN_CITY_NAMES = new Set(CITY_ROUTING.foreignCities || []);
+
+function isForeignPublicCity(name) {
+  const clean = cleanDisplayName(name);
+  return Boolean(clean && FOREIGN_CITY_NAMES.has(clean));
+}
 
 function isPublicRegionName(name) {
   const clean = cleanDisplayName(name);
   if (!clean || clean === 'Не указан') return false;
   if (STANDALONE_CITY_NAMES.has(clean)) return false;
-  return /(?:область|край|республика|округ)$/iu.test(clean);
+  if (FOREIGN_CITY_NAMES.has(clean)) return false;
+  // «Республика Татарстан» — префикс (\b с кириллицей в JS ненадёжен).
+  // «Чувашская Республика» / «… область|край|округ» — суффикс.
+  return /^республика(?:\s|$)/iu.test(clean) || /(?:область|край|республика|округ)$/iu.test(clean);
 }
 
 const PUBLIC_REGION_NAMES = new Set([
@@ -124,193 +323,6 @@ let publicCatalogCache = null;
 let publicStatsCache = null;
 let publicEventRowsBuildPromise = null;
 let publicCatalogBuildPromise = null;
-let publicVenueHubCache = null;
-let publicVenueCatalogLists = null;
-
-const LANDING_SLUG_ALIASES = {
-  'river-cruises': ['river-walks', 'river-cruise', 'river'],
-  'river-party': ['party-boat', 'river-disco', 'boat-party'],
-  'bridges-night': ['razvodnye-mosty', 'bridges', 'spb-bridges-night', 'bridges_night', 'night-bridges'],
-  'bus-tours': ['bus-sightseeing', 'bus'],
-  'spb-yards': ['spb-paradnye', 'yards-spb', 'dory-paradnye'],
-  'family-kids': ['kids-family', 'detyam'],
-  'concerts-genre': ['concerts', 'concerts-genres'],
-  'moscow-museums': ['moscow-museums-workshops'],
-  'active-sport': ['active-extreme', 'autosport'],
-};
-
-const LANDING_RULES = [
-  {
-    slug: 'river-cruises',
-    title: 'Речные прогулки',
-    subtitle: 'Теплоходы, катера, реки и каналы',
-    chips: ['теплоход', 'катер', 'причалы'],
-    tags: ['Водные экскурсии', 'Реки и каналы', 'На теплоходе', 'Водная экскурсия', 'На катере', 'Теплоходные экскурсии', 'Речные прогулки'],
-    keywords: ['теплоход', 'катер', 'река', 'речн', 'канал', 'причал', 'прогулк'],
-    keywordScope: 'content',
-    requiredAnySubcategories: ['Водные экскурсии', 'Речные прогулки'],
-    excludeKeywords: ['автобус', 'пешеход', 'парадн', 'двор', 'коммунал', 'мастер-класс', 'квест', 'концерт', 'вечеринк', 'дискотек', 'церк', 'храм', 'кирх', 'орган', 'музыкальн', 'аренда', 'чартер'],
-  },
-  {
-    slug: 'river-party',
-    title: 'Вечеринки и дискотеки на теплоходе',
-    subtitle: 'DJ, живая музыка и ночные речные круизы',
-    chips: ['дискотека', 'DJ', 'вечеринка', 'ночь'],
-    tags: ['Дискотека', 'Живая музыка', 'Вечеринка'],
-    keywords: ['дискотек', 'вечеринк', 'ди-джей', 'dj', 'музыкальн', 'круиз', 'теплоход', 'речн', 'катере', 'нева'],
-    keywordScope: 'content',
-    requiredTitleKeywordGroups: [
-      ['дискотек', 'вечеринк', 'ди-джей', 'dj', 'концерт', 'музыкальн'],
-    ],
-    requiredKeywordGroups: [
-      ['теплоход', 'теплоходн', 'речн', 'катере', 'катера', 'корабл', 'яхт', 'причал', 'канал', 'нева', 'круиз'],
-    ],
-    excludeKeywords: ['автобус', 'автобусн', 'пешеход'],
-    excludeKeywordFields: ['title', 'category', 'sourceCategory', 'venue', 'subcategory'],
-  },
-  {
-    slug: 'bridges-night',
-    title: 'Разводные мосты',
-    subtitle: 'Ночные прогулки к разводке мостов по Неве и каналам',
-    chips: ['ночные', 'мосты', 'теплоход'],
-    city: 'Санкт-Петербург',
-    tags: ['Разводные мосты', 'Ночные'],
-    keywords: ['мост', 'развод', 'ночн', 'нева', 'теплоход', 'катер'],
-    keywordScope: 'content',
-    requiredAnyKeywords: ['мост', 'развод'],
-    excludeKeywords: ['автобус', 'пешеход', 'парадн', 'двор', 'коммунал'],
-    minStartsAtHour: 22,
-    includeStartsAtHourUntil: 6,
-  },
-  {
-    slug: 'new-year',
-    title: 'Отмечаем Новый год',
-    subtitle: 'Елки, шоу, концерты и праздничные программы',
-    chips: ['декабрь', 'детям', 'шоу'],
-    keywords: ['новогод', 'новый год', 'елка', 'ёлка', 'рождество'],
-  },
-  {
-    slug: 'moscow-dinner-boat',
-    title: 'Ужин на теплоходе в Москве',
-    subtitle: 'Вечерние речные программы с ужином',
-    city: 'Москва',
-    chips: ['ужин', 'Москва-река', 'вечер'],
-    tags: ['На теплоходе', 'Водная экскурсия'],
-    keywords: ['ужин', 'обед', 'ланч', 'бранч', 'завтрак', 'фуршет', 'банкет', 'ресторан', 'теплоход', 'москва-река', 'речн', 'корабл', 'яхт', 'судн'],
-    keywordScope: 'content',
-    requiredTitleKeywordGroups: [
-      ['ужин', 'обед', 'ланч', 'бранч', 'завтрак', 'фуршет', 'банкет', 'ресторан'],
-    ],
-    requiredKeywordGroups: [
-      ['теплоход', 'москва-река', 'речн', 'корабл', 'яхт', 'судн'],
-    ],
-    excludeKeywords: ['автобус', 'пешеход', 'мастер-класс'],
-  },
-  {
-    slug: 'salute-9-may',
-    title: 'Салют 9 мая',
-    subtitle: 'Лучшие точки обзора и экскурсии к Дню Победы',
-    chips: ['9 мая', 'салют', 'праздник'],
-    keywords: ['салют', 'фейерверк', 'день победы', 'праздничн', 'побед'],
-    requiredAnyKeywords: ['салют', 'фейерверк'],
-    keywordScope: 'content',
-    excludeKeywords: ['новогод', 'ёлка', 'елка', 'рождеств'],
-  },
-  {
-    slug: 'bus-tours',
-    title: 'Автобусные обзорные экскурсии',
-    subtitle: 'Городские маршруты и обзорные программы',
-    chips: ['автобус', 'обзорная', 'город'],
-    tags: ['Автобусные туры', 'Автобусные экскурсии'],
-    keywords: ['автобус', 'автобусн', 'обзорн', 'сити тур', 'city tour'],
-    requiredAnySubcategories: ['Автобусные туры', 'Автобусные экскурсии'],
-    requiredAnyVenueKeywords: ['туристическ', 'city sightseeing', 'hop on', 'hop-off', 'hop off'],
-    requiredTitleKeywordGroups: [
-      ['обзорн', 'экскурс', 'двухэтажн', 'hop on', 'city tour', 'сити тур'],
-    ],
-    requiredKeywordGroups: [
-      ['автобус', 'автобусн', 'двухэтажн', 'hop on', 'city tour', 'сити тур'],
-      ['обзорн', 'экскурс', 'hop on', 'city tour', 'сити тур'],
-    ],
-    excludeTags: ['Водные экскурсии', 'На теплоходе', 'На катере', 'Реки и каналы'],
-    excludeKeywords: ['теплоход', 'катер', 'лодк', 'корабл', 'причал', 'река', 'канал', 'нева', 'мост', 'пешеход', 'пешком', 'фест', 'фестиваль'],
-    excludeKeywordFields: ['title', 'category', 'sourceCategory', 'venue', 'subcategory'],
-  },
-  {
-    slug: 'standup',
-    title: 'Стендап и юмор',
-    subtitle: 'Комедийные шоу в барах и клубах',
-    chips: ['stand up', 'юмор', 'вечер'],
-    tags: ['Юмор', 'Stand up', 'Комедия', 'Импровизация'],
-    keywords: ['стендап', 'stand up', 'юмор', 'комеди'],
-  },
-  {
-    slug: 'planetarium',
-    title: 'Планетарий 1',
-    subtitle: 'Мультимедийные шоу и концерты',
-    chips: ['шоу', 'концерты', 'СПб'],
-    venue: 'Планетарий 1',
-  },
-  {
-    slug: 'spb-yards',
-    title: 'Дворы, парадные и коммуналки',
-    subtitle: 'Авторские прогулки по скрытому Петербургу',
-    city: 'Санкт-Петербург',
-    chips: ['парадные', 'коммуналки', 'дворы'],
-    tags: ['Дворы и парадные', 'Экскурсия по парадным', 'Экскурсия по коммуналкам', 'Экскурсия по дворам', 'Интерьерная'],
-    requiredAnySubcategories: ['Дворы и парадные', 'Экскурсия по парадным', 'Экскурсия по коммуналкам', 'Экскурсия по дворам', 'Интерьерная'],
-    excludeTags: ['Водные экскурсии', 'На теплоходе', 'На катере', 'Реки и каналы'],
-    excludeKeywords: ['автобус', 'автобусн', 'теплоход', 'катер', 'речн', 'нева', 'канал', 'причал'],
-    excludeKeywordFields: ['title', 'category', 'sourceCategory', 'venue', 'subcategory'],
-  },
-  {
-    slug: 'family-kids',
-    title: 'Детям и семьям',
-    subtitle: 'Ёлки, цирк, шоу и анимация для детей',
-    chips: ['детям', 'семья', 'цирк'],
-    tags: ['Детям', 'Детская анимация', 'Шоу для детей', 'Цирк', 'Детское шоу'],
-    requiredAnySubcategories: ['Детям', 'Детская анимация', 'Шоу для детей'],
-    keywords: ['детск', 'семейн', 'цирк', 'анимац', 'для детей', 'ёлк', 'елк'],
-    keywordScope: 'content',
-    excludeKeywords: ['18+', 'stand up', 'стендап', 'комеди', 'юмор'],
-    excludeKeywordFields: ['title', 'category', 'sourceCategory'],
-  },
-  {
-    slug: 'concerts-genre',
-    title: 'Концерты',
-    subtitle: 'Рок, джаз, классика, эстрада и живые выступления',
-    chips: ['рок', 'джаз', 'классика'],
-    tags: ['Рок', 'Джаз', 'Классика', 'Поп', 'Эстрада', 'Металл', 'Альтернатива', 'Электронная музыка', 'Хип-хоп', 'Орган', 'Симфоническая музыка', 'Инди'],
-    keywords: ['концерт', 'live', 'симфон', 'оркестр', 'филармон'],
-    keywordScope: 'content',
-    excludeTags: ['Юмор', 'Stand up', 'Комедия', 'Импровизация', 'TV комики'],
-    excludeKeywords: ['стендап', 'stand up', 'комеди', 'юмор', 'импров'],
-    excludeKeywordFields: ['title', 'category', 'sourceCategory', 'subcategory'],
-  },
-  {
-    slug: 'moscow-museums',
-    title: 'Музеи и мастер-классы в Москве',
-    subtitle: 'Выставки, экскурсии и творческие занятия',
-    city: 'Москва',
-    chips: ['музеи', 'мастер-класс', 'творчество'],
-    tags: ['Музеи', 'Мастер-класс', 'Мастер-классы', 'Выставки', 'Искусство', 'Творчество'],
-    requiredAnySubcategories: ['Музеи', 'Мастер-класс', 'Мастер-классы', 'Выставки'],
-    keywords: ['мастер-класс', 'музе', 'выставк', 'эмаль'],
-    keywordScope: 'content',
-    excludeKeywords: ['автобус', 'автобусн', 'теплоход', 'речн'],
-    excludeKeywordFields: ['title', 'venue', 'subcategory'],
-  },
-  {
-    slug: 'active-sport',
-    title: 'Активный отдых и автоспорт',
-    subtitle: 'Дрифт, гонки и активные развлечения',
-    chips: ['дрифт', 'автоспорт', 'активный'],
-    tags: ['Автоспорт', 'Дрифт', 'Активный отдых'],
-    requiredAnySubcategories: ['Автоспорт', 'Дрифт', 'Активный отдых'],
-    keywords: ['дрифт', 'автоспорт', 'картинг', 'гонк', 'формул'],
-    keywordScope: 'content',
-  },
-];
 
 const CATEGORY_SUBTITLE = new Map([
   ['Экскурсии', ['экскурсии', 'уточнять по тегам', 'review']],
@@ -325,96 +337,63 @@ export function clearPublicDataCaches() {
   publicDestinationsCache = null;
   publicHomePreviewCache = null;
   publicEventRowsCache = null;
-  publicCatalogCache = null;
+  // Soft-invalidate catalog: keep last sessions for SWR while rebuild runs.
+  if (publicCatalogCache?.sessions) {
+    publicCatalogCache = { ...publicCatalogCache, expiresAt: 0 };
+  } else {
+    publicCatalogCache = null;
+  }
   publicStatsCache = null;
   publicEventRowsBuildPromise = null;
-  publicCatalogBuildPromise = null;
-  publicVenueHubCache = null;
-  publicVenueCatalogLists = null;
+  clearPublicVenueReadCache();
 }
 
 /** Прогрев тяжёлого каталога и индекса городов (вызывается при старте API). */
 export async function warmPublicCatalogCache(db) {
   await publicCatalogSessions(db);
-  const rows = await publicVenueHubRows(db, 500);
-  publicVenueCatalogLists = {
-    expiresAt: Date.now() + PUBLIC_CATALOG_CACHE_MS,
-    institution: [],
-    location: [],
-  };
-  for (const row of rows) {
-    const item = mapPublicVenueListItem(row);
-    if (item.template === 'institution') publicVenueCatalogLists.institution.push(item);
-    else publicVenueCatalogLists.location.push(item);
-  }
+  await warmPublicVenueCatalogCache(db);
 }
 
-function warmVenueCatalogList(family) {
-  if (!publicVenueCatalogLists || publicVenueCatalogLists.expiresAt <= Date.now()) return null;
-  if (family === 'institution') return publicVenueCatalogLists.institution;
-  if (family === 'location') return publicVenueCatalogLists.location;
-  return null;
-}
-
-function loadCityRouting() {
-  try {
-    return JSON.parse(readFileSync(path.join(PROJECT_ROOT, 'data', 'geo', 'city-routing.ru.json'), 'utf8'));
-  } catch {
-    return { standaloneCities: [], cityToRegion: {} };
-  }
-}
 
 export async function buildAdminDashboard(db) {
-  const [stats, categories, events, venues, destinations] = await Promise.all([
+  const [stats, categoryCountResult, destinationCountResult, launchSql] = await Promise.all([
     db.stats(),
-    categoryRows(db),
-    eventRows(db, 10000),
-    venueRows(db, 90),
-    destinationRows(db),
+    db.query('select count(*)::int as total from "Category"'),
+    db.query('select count(*)::int as total from "City" where coalesce("isDestination", false) = true'),
+    // SQL group metrics — no full catalog materialization in Node RAM.
+    queryAdminLaunchMetricsSql(db),
   ]);
 
-  const landingRows = buildLandingRows(events);
-  const groupedEvents = groupAdminEventRows(events);
-  const readyEvents = groupedEvents.filter((event) => event.readiness === 'ready').length;
-  const launchMetrics = buildLaunchMetrics(groupedEvents);
+  const launch = {
+    ...launchSql,
+    source: 'admin_event_groups_sql',
+  };
+  const destinations = Number(destinationCountResult.rows[0]?.total || 0);
+  const readyEvents = Number(launch.readyForSeo || 0);
 
+  // Compact contract only: generatedAt + metrics (no multi-MB row payloads).
   return {
     generatedAt: new Date().toISOString(),
-    importJob: {
-      source: 'Ticketscloud',
-      status: 'success',
-      mode: 'Postgres seed from TC full sync',
-      events: stats.events || 0,
-      categories: categories.length,
+    metrics: {
+      events: launch.groupedEvents,
+      readyEvents,
+      reviewEvents: Math.max(0, launch.groupedEvents - readyEvents),
       venues: stats.venues || 0,
+      categories: Number(categoryCountResult.rows[0]?.total || 0),
       cities: stats.cities || 0,
       tags: stats.tags || 0,
-      metaEvents: 0,
+      landingRules: LANDING_RULES.length,
+      destinations,
+      launch,
     },
-    metrics: {
-      events: groupedEvents.length,
-      readyEvents,
-      reviewEvents: Math.max(0, groupedEvents.length - readyEvents),
-      venues: stats.venues || 0,
-      landingRules: landingRows.length,
-      destinations: destinations.length,
-      launch: launchMetrics,
-    },
-    eventRows: events,
-    mappingRows: categories.map((row) => {
-      const mapping = CATEGORY_SUBTITLE.get(row.source) || ['мероприятия', 'уточнить', 'review'];
-      return {
-        source: row.source,
-        target: mapping[0],
-        subcategory: mapping[1],
-        mode: mapping[2],
-        events: row.events,
-      };
-    }),
-    venueRows: venues,
-    duplicateCandidates: [],
-    destinationRows: destinations,
-    landingRows,
+  };
+}
+
+/** Kept for compatibility; SQL metrics (same source as Events list). */
+async function buildAdminLaunchMetricsCompact(db) {
+  return {
+    ...(await queryAdminLaunchMetricsSql(db)),
+    source: 'admin_event_groups_sql',
   };
 }
 
@@ -422,37 +401,268 @@ function buildLaunchMetrics(events) {
   return {
     groupedEvents: events.length,
     readyForSales: events.filter(isSaleableEventForPublic).length,
-    readyForSeo: events.filter((event) => event.readiness === 'ready').length,
-    needsAttention: events.filter((event) => event.status === 'needs_review').length,
-    priceBlocked: events.filter((event) => event.priceFrom == null).length,
+    readyForSeo: events.filter((event) => event.readiness === 'ready' && event.canPublish !== false).length,
+    needsAttention: events.filter(
+      (event) => event.status === 'needs_review' || event.readiness === 'review' || event.readiness === 'blocked',
+    ).length,
+    priceBlocked: events.filter((event) => event.priceFrom == null).length, // display-price gap (<100/null), not public sale block
     purchaseBlocked: events.filter((event) => !event.purchaseReady).length,
     noImage: events.filter((event) => !event.hasImage).length,
     landingMatched: events.filter((event) => (event.landingHits || []).length > 0).length,
   };
 }
 
-export function isSaleableEventForPublic(event) {
-  return Boolean(hasUpcomingOrOpenSchedule(event) && event.purchaseReady && Number.isFinite(event.priceFrom) && event.priceFrom >= MIN_DISPLAY_PRICE_RUB);
-}
-
-export async function buildAdminCitiesList(db) {
-  const rows = await destinationRows(db);
+export async function buildAdminCitiesList(db, searchParams = new URLSearchParams()) {
+  const limit = clampNumber(searchParams.get('limit'), 1, 200, 80);
+  const page = clampNumber(searchParams.get('page'), 1, 100000, 1);
+  const query = String(searchParams.get('q') || '').trim().toLowerCase();
+  // Lightweight city/region rollup (no full publicCatalogSessions payload).
+  const allRows = await destinationSummaryRowsFast(db);
+  const filtered = query
+    ? allRows.filter((row) =>
+        [row.slug, row.sourceSlug, row.name, row.type].filter(Boolean).join(' ').toLowerCase().includes(query),
+      )
+    : allRows;
+  const total = filtered.length;
+  const pages = Math.max(1, Math.ceil(total / Math.max(1, limit)));
+  const safePage = Math.min(Math.max(1, page), pages);
+  const rows = filtered.slice((safePage - 1) * limit, safePage * limit);
 
   return {
     generatedAt: new Date().toISOString(),
-    total: rows.length,
+    page: safePage,
+    pages,
+    limit,
+    total,
     rows,
     metrics: {
-      destinations: rows.length,
-      cities: rows.filter((row) => row.type === 'city').length,
-      regions: rows.filter((row) => row.type === 'region').length,
-      events: rows.reduce((sum, row) => sum + (row.events || 0), 0),
-      venues: rows.reduce((sum, row) => sum + (row.venues || 0), 0),
+      destinations: allRows.length,
+      cities: allRows.filter((row) => row.type === 'city').length,
+      regions: allRows.filter((row) => row.type === 'region').length,
+      events: allRows.reduce((sum, row) => sum + (row.events || 0), 0),
+      venues: allRows.reduce((sum, row) => sum + (row.venues || 0), 0),
     },
   };
 }
 
+function mapAdminCityRow(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    slug: row.slug,
+    title: row.title,
+    sourceTitle: row.sourceTitle || null,
+    introTitle: row.introTitle || null,
+    introText: row.introText || null,
+    heroImageUrl: row.heroImageUrl || null,
+    seoH1: row.seoH1 || null,
+    seoTitle: row.seoTitle || null,
+    seoDescription: row.seoDescription || null,
+    canonicalPath: row.canonicalPath || null,
+    isDestination: row.isDestination === true,
+    regionId: row.regionId || null,
+    editable: true,
+  };
+}
+
+function normalizeCitySlug(value) {
+  return (
+    String(value || '')
+      .trim()
+      .toLowerCase()
+      .replace(/ё/g, 'e')
+      .replace(/[^a-z0-9а-я-]+/gi, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 120) || ''
+  );
+}
+
+function normalizeCityPayload(payload) {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    throw Object.assign(new Error('city_payload_invalid'), { statusCode: 400 });
+  }
+
+  const normalized = {};
+  for (const key of [
+    'title',
+    'sourceTitle',
+    'introTitle',
+    'introText',
+    'heroImageUrl',
+    'seoH1',
+    'seoTitle',
+    'seoDescription',
+    'canonicalPath',
+  ]) {
+    if (!Object.prototype.hasOwnProperty.call(payload, key)) continue;
+    normalized[key] = normalizeNullableString(payload[key]);
+  }
+
+  if (Object.prototype.hasOwnProperty.call(payload, 'slug')) {
+    const slug = normalizeCitySlug(payload.slug);
+    if (!slug) throw Object.assign(new Error('slug_required'), { statusCode: 400 });
+    normalized.slug = slug;
+  }
+
+  if (Object.prototype.hasOwnProperty.call(payload, 'isDestination')) {
+    normalized.isDestination = payload.isDestination == null ? null : Boolean(payload.isDestination);
+  }
+
+  if (Object.prototype.hasOwnProperty.call(payload, 'name') && !Object.prototype.hasOwnProperty.call(payload, 'title')) {
+    normalized.title = normalizeNullableString(payload.name);
+  }
+
+  return normalized;
+}
+
+export async function buildAdminCityDetail(db, cityIdOrSlug) {
+  const key = String(cityIdOrSlug || '').trim();
+  if (!key) return null;
+  const slugHint = key.startsWith('city_') ? key.slice(5) : key;
+  const { rows } = await db.query(
+    `
+      select *
+      from "City"
+      where id = $1 or slug = $1 or slug = $2
+      order by case when id = $1 then 0 when slug = $1 then 1 else 2 end
+      limit 1
+    `,
+    [key, slugHint],
+  );
+  return mapAdminCityRow(rows[0]);
+}
+
+export async function updateAdminCity(db, cityIdOrSlug, payload = {}) {
+  const current = await buildAdminCityDetail(db, cityIdOrSlug);
+  if (!current) {
+    throw Object.assign(new Error('city_not_found'), { statusCode: 404 });
+  }
+
+  const normalized = normalizeCityPayload(payload);
+  const next = {
+    ...current,
+    ...Object.fromEntries(Object.entries(normalized).filter(([, value]) => value !== undefined)),
+  };
+
+  const title = String(next.title || '').trim();
+  if (!title) throw Object.assign(new Error('title_required'), { statusCode: 400 });
+
+  const slug = normalizeCitySlug(next.slug || current.slug);
+  if (!slug) throw Object.assign(new Error('slug_required'), { statusCode: 400 });
+
+  if (slug !== current.slug) {
+    const { rows: conflicts } = await db.query(
+      `select id from "City" where slug = $1 and id <> $2 limit 1`,
+      [slug, current.id],
+    );
+    if (conflicts[0]) {
+      throw Object.assign(new Error('slug_not_unique'), { statusCode: 409 });
+    }
+  }
+
+  const canonicalPath =
+    next.canonicalPath ||
+    current.canonicalPath ||
+    `/cities/${slug}`;
+
+  try {
+    const { rows } = await db.query(
+      `
+        update "City"
+        set
+          slug = $2,
+          title = $3,
+          "sourceTitle" = $4,
+          "introTitle" = $5,
+          "introText" = $6,
+          "heroImageUrl" = $7,
+          "seoH1" = $8,
+          "seoTitle" = $9,
+          "seoDescription" = $10,
+          "canonicalPath" = $11,
+          "isDestination" = $12
+        where id = $1
+        returning id
+      `,
+      [
+        current.id,
+        slug,
+        title,
+        next.sourceTitle ?? null,
+        next.introTitle ?? null,
+        next.introText ?? null,
+        next.heroImageUrl ?? null,
+        next.seoH1 ?? null,
+        next.seoTitle ?? null,
+        next.seoDescription ?? null,
+        canonicalPath,
+        next.isDestination === true,
+      ],
+    );
+    if (!rows[0]) throw Object.assign(new Error('city_not_found'), { statusCode: 404 });
+  } catch (error) {
+    if (error?.code === '23505') {
+      throw Object.assign(new Error('slug_not_unique'), { statusCode: 409 });
+    }
+    throw error;
+  }
+
+  return buildAdminCityDetail(db, current.id);
+}
+
+let adminSourcesCache = { expiresAt: 0, staleUntil: 0, payload: null };
+let adminSourcesBuildPromise = null;
+const ADMIN_SOURCES_TTL_MS = Number(process.env.ADMIN_SOURCES_TTL_MS || 2 * 60_000);
+const ADMIN_SOURCES_STALE_MS = Number(process.env.ADMIN_SOURCES_STALE_MS || 10 * 60_000);
+
+export function invalidateAdminSourcesCache() {
+  if (adminSourcesCache.payload) {
+    adminSourcesCache = { ...adminSourcesCache, expiresAt: 0 };
+  } else {
+    adminSourcesCache = { expiresAt: 0, staleUntil: 0, payload: null };
+  }
+}
+
+function scheduleAdminSourcesRebuild(db, reason = 'refresh') {
+  if (adminSourcesBuildPromise) return adminSourcesBuildPromise;
+  adminSourcesBuildPromise = (async () => {
+    const startedAt = Date.now();
+    try {
+      const payload = await loadAdminSourcesUncached(db);
+      const now = Date.now();
+      adminSourcesCache = {
+        expiresAt: now + Math.max(15_000, ADMIN_SOURCES_TTL_MS),
+        staleUntil: now + Math.max(30_000, ADMIN_SOURCES_STALE_MS),
+        payload,
+      };
+      console.log(`Admin sources cache rebuilt (${reason}) in ${now - startedAt}ms`);
+      return payload;
+    } finally {
+      adminSourcesBuildPromise = null;
+    }
+  })().catch((error) => {
+    adminSourcesBuildPromise = null;
+    console.warn(`Admin sources cache rebuild failed (${reason}): ${error instanceof Error ? error.message : String(error)}`);
+    throw error;
+  });
+  return adminSourcesBuildPromise;
+}
+
 export async function buildAdminSources(db) {
+  const now = Date.now();
+  const cached = adminSourcesCache;
+  if (cached.payload && now < cached.expiresAt) {
+    return cached.payload;
+  }
+  if (cached.payload && now < cached.staleUntil) {
+    void scheduleAdminSourcesRebuild(db, 'swr');
+    return cached.payload;
+  }
+  return scheduleAdminSourcesRebuild(db, cached.payload ? 'hard-expire' : 'cold');
+}
+
+async function loadAdminSourcesUncached(db) {
   const result = await db.query(`
     with grouped_events as (
       select
@@ -624,6 +834,7 @@ export async function buildAdminSources(db) {
   };
 }
 
+
 function sourceHealthIssues(source) {
   const issues = [];
   const lastSuccessAt = source.lastSuccessAt ? new Date(source.lastSuccessAt) : null;
@@ -653,6 +864,76 @@ function sourceHealthStatus(status, issues) {
   return 'ok';
 }
 
+async function queryAdminOrdersLean(db, { includeArchived }) {
+  const result = await db.query(
+    `
+      select
+        ext_order.id,
+        ext_order."externalOrderId",
+        ext_order."publicCode",
+        ext_order.status,
+        ext_order."buyerSnapshot",
+        ext_order."purchasedAt",
+        ext_order."archivedAt",
+        ext_order."updatedAt",
+        source.code::text as "sourceCode",
+        source.name as "sourceName",
+        coalesce(ticket_stats."ticketCount", 0)::int as "ticketCount",
+        coalesce(ticket_stats."unlinkedTickets", 0)::int as "unlinkedTickets",
+        coalesce(ticket_stats."eventTitles", '{}'::text[]) as "eventTitles",
+        ticket_stats."firstStartsAt",
+        '[]'::jsonb as tickets
+      from "ExternalOrder" ext_order
+      join "Source" source on source.id = ext_order."sourceId"
+      left join lateral (
+        select
+          count(*)::int as "ticketCount",
+          count(*) filter (where ticket."eventId" is null)::int as "unlinkedTickets",
+          coalesce(array_remove(array_agg(distinct event.title), null), '{}') as "eventTitles",
+          min(session."startsAt") as "firstStartsAt"
+        from "ExternalTicket" ticket
+        left join "Event" event on event.id = ticket."eventId"
+        left join "EventSession" session on session.id = ticket."sessionId"
+        where ticket."externalOrderId" = ext_order.id
+      ) ticket_stats on true
+      where ($1::boolean and ext_order."archivedAt" is not null)
+         or (not $1::boolean and ext_order."archivedAt" is null)
+      order by coalesce(ext_order."purchasedAt", ext_order."updatedAt") desc
+    `,
+    [includeArchived],
+  );
+  return result.rows.map(mapAdminOrderRow);
+}
+
+function matchesAdminOrderListFilters(order, { view, provider, status, q }) {
+  if (view === 'attention' && !order.needsAttention) return false;
+  if (view === 'missing_artifact' && order.artifactStatus !== 'missing') return false;
+  if (view === 'failed_integration' && !isProblemOrderStatus(order.status)) return false;
+  if (view === 'unlinked' && !(order.unlinkedTickets > 0)) return false;
+  if (view === 'pending_refunds' && !isRefundStatus(order.status)) return false;
+  if (view === 'archivable' && !order.canArchive) return false;
+  if (provider !== 'ALL' && order.sourceCode !== provider) return false;
+  if (status !== 'all' && String(order.status || '').toLowerCase() !== status) return false;
+  if (!q) return true;
+  const haystack = [
+    order.externalOrderId,
+    order.publicCode,
+    order.status,
+    order.sourceName,
+    order.sourceCode,
+    order.buyer.name,
+    order.buyer.phone,
+    order.buyer.email,
+    order.buyer.notes,
+    ...(order.eventTitles || []),
+    order.eventTitle,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+  return haystack.includes(q);
+}
+
 export async function buildAdminOrdersList(db, searchParams = new URLSearchParams()) {
   const q = String(searchParams.get('q') || '').trim().toLowerCase();
   const view = String(searchParams.get('view') || 'all');
@@ -660,76 +941,24 @@ export async function buildAdminOrdersList(db, searchParams = new URLSearchParam
   const status = String(searchParams.get('status') || 'all').toLowerCase();
   const limit = clampNumber(searchParams.get('limit'), 1, 100, 50);
   const page = clampNumber(searchParams.get('page'), 1, 100000, 1);
+  const includeArchived = view === 'archive';
 
-  const result = await db.query(`
-    select
-      ext_order.id,
-      ext_order."externalOrderId",
-      ext_order."publicCode",
-      ext_order.status,
-      ext_order."buyerSnapshot",
-      ext_order."purchasedAt",
-      ext_order."updatedAt",
-      source.code::text as "sourceCode",
-      source.name as "sourceName",
-      count(ticket.id)::int as "ticketCount",
-      count(ticket.id) filter (where ticket."eventId" is null)::int as "unlinkedTickets",
-      coalesce(
-        jsonb_agg(
-          jsonb_build_object(
-            'id', ticket.id,
-            'externalTicketId', ticket."externalTicketId",
-            'status', ticket.status,
-            'origin', ticket.origin,
-            'eventId', ticket."eventId",
-            'sessionId', ticket."sessionId",
-            'eventTitle', event.title,
-            'eventSlug', event.slug,
-            'startsAt', session."startsAt"
-          )
-        ) filter (where ticket.id is not null),
-        '[]'::jsonb
-      ) as tickets
-    from "ExternalOrder" ext_order
-    join "Source" source on source.id = ext_order."sourceId"
-    left join "ExternalTicket" ticket on ticket."externalOrderId" = ext_order.id
-    left join "Event" event on event.id = ticket."eventId"
-    left join "EventSession" session on session.id = ticket."sessionId"
-    group by ext_order.id, source.id
-    order by coalesce(ext_order."purchasedAt", ext_order."updatedAt") desc
-  `);
+  await archiveStaleCancelledOrders(db).catch(() => undefined);
 
-  const allRows = result.rows.map(mapAdminOrderRow);
-  const rows = allRows.filter((order) => {
-    if (view === 'attention' && !order.needsAttention) return false;
-    if (view === 'missing_artifact' && order.artifactStatus !== 'missing') return false;
-    if (view === 'failed_integration' && !isProblemOrderStatus(order.status)) return false;
-    if (view === 'unlinked' && !order.tickets.some((ticket) => !ticket.eventId)) return false;
-    if (view === 'pending_refunds' && !isRefundStatus(order.status)) return false;
-    if (provider !== 'ALL' && order.sourceCode !== provider) return false;
-    if (status !== 'all' && String(order.status || '').toLowerCase() !== status) return false;
-    if (!q) return true;
-    const haystack = [
-      order.externalOrderId,
-      order.publicCode,
-      order.status,
-      order.sourceName,
-      order.sourceCode,
-      order.buyer.name,
-      order.buyer.phone,
-      order.buyer.email,
-      order.buyer.notes,
-      ...order.tickets.flatMap((ticket) => [ticket.externalTicketId, ticket.status, ticket.eventTitle, ticket.eventId, ticket.sessionId]),
-    ]
-      .filter(Boolean)
-      .join(' ')
-      .toLowerCase();
-    return haystack.includes(q);
-  });
+  const [allRows, archiveCountResult, activeCountResult] = await Promise.all([
+    queryAdminOrdersLean(db, { includeArchived }),
+    db.query(`select count(*)::int as total from "ExternalOrder" where "archivedAt" is not null`),
+    db.query(`select count(*)::int as total from "ExternalOrder" where "archivedAt" is null`),
+  ]);
+
+  const rows = allRows.filter((order) => matchesAdminOrderListFilters(order, { view, provider, status, q }));
   const total = rows.length;
   const pages = Math.max(1, Math.ceil(total / limit));
   const safePage = Math.min(page, pages);
   const windowRows = rows.slice((safePage - 1) * limit, safePage * limit);
+
+  const archiveCount = Number(archiveCountResult.rows[0]?.total || 0);
+  const activeCount = Number(activeCountResult.rows[0]?.total || 0);
 
   return {
     generatedAt: new Date().toISOString(),
@@ -741,24 +970,120 @@ export async function buildAdminOrdersList(db, searchParams = new URLSearchParam
     sources: Array.from(new Set(allRows.map((order) => order.sourceCode).filter(Boolean))).sort(),
     statuses: Array.from(new Set(allRows.map((order) => order.status).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'ru')),
     quickFilters: [
-      { id: 'all', count: allRows.length },
+      { id: 'all', count: includeArchived ? activeCount : allRows.length },
       { id: 'attention', count: allRows.filter((order) => order.needsAttention).length },
       { id: 'pending_refunds', count: allRows.filter((order) => isRefundStatus(order.status)).length },
       { id: 'missing_artifact', count: allRows.filter((order) => order.artifactStatus === 'missing').length },
       { id: 'failed_integration', count: allRows.filter((order) => isProblemOrderStatus(order.status)).length },
-      { id: 'unlinked', count: allRows.filter((order) => order.tickets.some((ticket) => !ticket.eventId)).length },
+      { id: 'unlinked', count: allRows.filter((order) => order.unlinkedTickets > 0).length },
+      { id: 'archivable', count: allRows.filter((order) => order.canArchive).length },
+      { id: 'archive', count: archiveCount },
     ],
     metrics: {
-      imported: allRows.length,
+      imported: includeArchived ? archiveCount : activeCount,
       confirmed: allRows.filter((order) => isConfirmedOrderStatus(order.status)).length,
       processing: allRows.filter((order) => isProcessingOrderStatus(order.status)).length,
       canceled: allRows.filter((order) => isCanceledOrderStatus(order.status)).length,
-      tickets: allRows.reduce((sum, order) => sum + order.tickets.length, 0),
+      archived: archiveCount,
+      tickets: allRows.reduce((sum, order) => sum + (order.ticketCount || 0), 0),
       missingArtifacts: allRows.filter((order) => order.artifactStatus === 'missing').length,
       failedIntegration: allRows.filter((order) => isProblemOrderStatus(order.status)).length,
       needsAttention: allRows.filter((order) => order.needsAttention).length,
     },
   };
+}
+
+export async function archiveAdminOrder(db, orderKey) {
+  const order = await findExternalOrderRow(db, orderKey);
+  if (!order) {
+    const error = new Error('order_not_found');
+    error.statusCode = 404;
+    throw error;
+  }
+  if (order.archivedAt) return buildAdminOrderDetail(db, order.id);
+  if (!isArchivableOrderStatus(order.status)) {
+    const error = new Error('order_not_archivable');
+    error.statusCode = 400;
+    throw error;
+  }
+  await db.query('update "ExternalOrder" set "archivedAt" = now(), "updatedAt" = now() where id = $1', [order.id]);
+  return buildAdminOrderDetail(db, order.id);
+}
+
+export async function unarchiveAdminOrder(db, orderKey) {
+  const order = await findExternalOrderRow(db, orderKey);
+  if (!order) {
+    const error = new Error('order_not_found');
+    error.statusCode = 404;
+    throw error;
+  }
+  await db.query('update "ExternalOrder" set "archivedAt" = null, "updatedAt" = now() where id = $1', [order.id]);
+  return buildAdminOrderDetail(db, order.id);
+}
+
+const STALE_CANCELLED_ARCHIVE_DAYS = 30;
+
+export async function archiveAdminOrdersBulk(db, body = {}) {
+  const statuses = Array.isArray(body.statuses) && body.statuses.length
+    ? body.statuses.map((item) => String(item || '').toLowerCase()).filter(Boolean)
+    : ['cancelled', 'canceled', 'expired', 'deleted', 'rejected', 'refunded'];
+  const olderThanDays = clampNumber(body.olderThanDays, 0, 3650, 0);
+  const result = await db.query(
+    `
+      update "ExternalOrder"
+      set "archivedAt" = now(), "updatedAt" = now()
+      where "archivedAt" is null
+        and lower(status) = any($1::text[])
+        and (
+          $2::int <= 0
+          or coalesce("purchasedAt", "updatedAt") <= now() - make_interval(days => $2)
+        )
+      returning id
+    `,
+    [statuses, olderThanDays],
+  );
+  return {
+    archived: result.rows.length,
+    olderThanDays: olderThanDays || null,
+    ids: result.rows.map((row) => row.id),
+  };
+}
+
+/** Archive cancelled/deleted/expired orders older than N days (default 30). */
+export async function archiveStaleCancelledOrders(db, options = {}) {
+  const olderThanDays = clampNumber(options.olderThanDays, 1, 3650, STALE_CANCELLED_ARCHIVE_DAYS);
+  return archiveAdminOrdersBulk(db, {
+    olderThanDays,
+    statuses: options.statuses || ['cancelled', 'canceled', 'expired', 'deleted', 'rejected', 'refunded'],
+  });
+}
+
+export async function deleteAdminOrder(db, orderKey) {
+  const order = await findExternalOrderRow(db, orderKey);
+  if (!order) {
+    const error = new Error('order_not_found');
+    error.statusCode = 404;
+    throw error;
+  }
+  await db.query('update "CheckoutOrder" set "externalOrderId" = null where "externalOrderId" = $1', [order.id]).catch(() => undefined);
+  await db.query('delete from "ExternalTicket" where "externalOrderId" = $1', [order.id]);
+  await db.query('delete from "ExternalOrder" where id = $1', [order.id]);
+  return { ok: true, deletedId: order.id };
+}
+
+async function findExternalOrderRow(db, orderKey) {
+  const key = String(orderKey || '').trim();
+  if (!key) return null;
+  const result = await db.query(
+    `
+      select id, status, "archivedAt"
+      from "ExternalOrder"
+      where id = $1 or "externalOrderId" = $1 or "publicCode" = $1
+      limit 1
+    `,
+    [key],
+  );
+  return result.rows[0] || null;
 }
 
 export async function buildPublicBuyerOrders(db, searchParams = new URLSearchParams()) {
@@ -832,26 +1157,31 @@ export async function buildPublicBuyerOrders(db, searchParams = new URLSearchPar
     .filter((order) => matchesPublicOrderLookup(order, lookup))
     .slice(0, 20)
     .map(mapPublicBuyerOrder);
+  const rows = await enrichBuyerOrdersWithEventLinks(db, matched);
 
   return {
     generatedAt: new Date().toISOString(),
     lookupRequired: false,
     minLookupLength,
-    total: matched.length,
-    rows: matched,
+    total: rows.length,
+    rows,
     metrics: {
-      orders: matched.length,
-      tickets: matched.reduce((sum, order) => sum + order.ticketCount, 0),
-      active: matched.filter((order) => !order.isFinal).length,
+      orders: rows.length,
+      tickets: rows.reduce((sum, order) => sum + order.ticketCount, 0),
+      active: rows.filter((order) => !order.isFinal).length,
     },
   };
 }
 
 const ACCOUNT_ORDER_EMAIL_FILTER = `
-  lower(trim(coalesce(ext_order."buyerSnapshot"->>'email', ''))) = $1
-  or lower(trim(coalesce(ext_order."buyerSnapshot"->>'customerEmail', ''))) = $1
-  or lower(trim(coalesce(ext_order."buyerSnapshot"->'buyer'->>'email', ''))) = $1
-  or lower(trim(coalesce(ext_order."buyerSnapshot"->'customer'->>'email', ''))) = $1
+  (
+    lower(trim(coalesce(ext_order."buyerEmailNormalized", ''))) = $1
+    or lower(trim(coalesce(ext_order."buyerSnapshot"->>'email', ''))) = $1
+    or lower(trim(coalesce(ext_order."buyerSnapshot"->>'customerEmail', ''))) = $1
+    or lower(trim(coalesce(ext_order."buyerSnapshot"->'buyer'->>'email', ''))) = $1
+    or lower(trim(coalesce(ext_order."buyerSnapshot"->'customer'->>'email', ''))) = $1
+  )
+  and ext_order."archivedAt" is null
 `;
 
 const ACCOUNT_ORDER_SELECT = `
@@ -946,7 +1276,8 @@ export async function buildAccountPurchases(db, userEmail, searchParams = new UR
     [email, limit, offset],
   );
 
-  const rows = result.rows.map(mapAdminOrderRow).filter((order) => orderMatchesAccountEmail(order, email)).map(mapAccountBuyerOrder);
+  const mapped = result.rows.map(mapAdminOrderRow).filter((order) => orderMatchesAccountEmail(order, email)).map(mapAccountBuyerOrder);
+  const rows = await enrichBuyerOrdersWithEventLinks(db, mapped);
 
   return {
     generatedAt: new Date().toISOString(),
@@ -968,53 +1299,22 @@ export async function buildAccountOrderDetail(db, userEmail, orderId) {
   const order = await buildAdminOrderDetail(db, orderId);
   if (!order) return null;
   if (!orderMatchesAccountEmail(order, email)) return null;
-  return mapAccountBuyerOrder(order);
+  const [enriched] = await enrichBuyerOrdersWithEventLinks(db, [mapAccountBuyerOrder(order)]);
+  return enriched;
 }
 
 export async function buildAdminBuyersList(db, searchParams = new URLSearchParams()) {
   const q = String(searchParams.get('q') || '').trim().toLowerCase();
-  const limit = clampNumber(searchParams.get('limit'), 1, 300, 120);
+  const view = String(searchParams.get('view') || 'active').toLowerCase();
+  const includeArchived = view === 'archive';
+  const limit = clampNumber(searchParams.get('limit'), 1, 300, 80);
+  const page = clampNumber(searchParams.get('page'), 1, 100000, 1);
 
-  const result = await db.query(`
-    select
-      ext_order.id,
-      ext_order."externalOrderId",
-      ext_order."publicCode",
-      ext_order.status,
-      ext_order."buyerSnapshot",
-      ext_order."purchasedAt",
-      ext_order."updatedAt",
-      source.code::text as "sourceCode",
-      source.name as "sourceName",
-      count(ticket.id)::int as "ticketCount",
-      count(ticket.id) filter (where ticket."eventId" is null)::int as "unlinkedTickets",
-      coalesce(
-        jsonb_agg(
-          jsonb_build_object(
-            'id', ticket.id,
-            'externalTicketId', ticket."externalTicketId",
-            'status', ticket.status,
-            'origin', ticket.origin,
-            'eventId', ticket."eventId",
-            'sessionId', ticket."sessionId",
-            'eventTitle', event.title,
-            'eventSlug', event.slug,
-            'startsAt', session."startsAt"
-          )
-        ) filter (where ticket.id is not null),
-        '[]'::jsonb
-      ) as tickets
-    from "ExternalOrder" ext_order
-    join "Source" source on source.id = ext_order."sourceId"
-    left join "ExternalTicket" ticket on ticket."externalOrderId" = ext_order.id
-    left join "Event" event on event.id = ticket."eventId"
-    left join "EventSession" session on session.id = ticket."sessionId"
-    group by ext_order.id, source.id
-    order by coalesce(ext_order."purchasedAt", ext_order."updatedAt") desc
-  `);
+  // Keep buyers list tidy: auto-archive cancelled/deleted orders older than 30 days.
+  await archiveStaleCancelledOrders(db).catch(() => undefined);
 
   const groups = new Map();
-  for (const order of result.rows.map(mapAdminOrderRow)) {
+  for (const order of await queryAdminOrdersLean(db, { includeArchived })) {
     const buyerKey = adminBuyerKey(order);
     const current =
       groups.get(buyerKey) ||
@@ -1072,11 +1372,23 @@ export async function buildAdminBuyersList(db, searchParams = new URLSearchParam
     amountRub: row.amountRub || null,
     displayName: row.name || row.email || row.phone || `Покупатель ${row.lastOrderNumber || ''}`.trim(),
     hasContact: Boolean(row.email || row.phone),
-    statusTone: row.needsAttention ? 'error' : row.activeOrders > 0 ? 'live' : 'archived',
-    statusLabel: row.needsAttention ? 'требует внимания' : row.activeOrders > 0 ? 'есть активные заказы' : 'только завершенные',
+    statusTone: includeArchived
+      ? 'archived'
+      : row.needsAttention
+        ? 'error'
+        : row.activeOrders > 0
+          ? 'live'
+          : 'archived',
+    statusLabel: includeArchived
+      ? 'в архиве'
+      : row.needsAttention
+        ? 'требует внимания'
+        : row.activeOrders > 0
+          ? 'есть активные заказы'
+          : 'только отменённые',
   }));
 
-  const rows = allRows
+  const filtered = allRows
     .filter((buyer) => {
       if (!q) return true;
       return [
@@ -1100,12 +1412,30 @@ export async function buildAdminBuyersList(db, searchParams = new URLSearchParam
       const aTime = a.lastOrderAt ? new Date(a.lastOrderAt).getTime() : 0;
       const bTime = b.lastOrderAt ? new Date(b.lastOrderAt).getTime() : 0;
       return bTime - aTime || String(a.displayName).localeCompare(String(b.displayName), 'ru');
-    })
-    .slice(0, limit);
+    });
+
+  const total = filtered.length;
+  const pages = Math.max(1, Math.ceil(total / limit));
+  const safePage = Math.min(page, pages);
+  const rows = filtered.slice((safePage - 1) * limit, safePage * limit);
+
+  const archivedBuyersCountResult = await db.query(`
+    select count(distinct coalesce(
+      nullif(lower(trim(coalesce("buyerEmailNormalized", "buyerSnapshot"->'buyer'->>'email', "buyerSnapshot"->>'email', ''))), ''),
+      nullif(regexp_replace(coalesce("buyerPhoneNormalized", "buyerSnapshot"->'buyer'->>'phone', ''), '\\D', '', 'g'), ''),
+      id
+    ))::int as total
+    from "ExternalOrder"
+    where "archivedAt" is not null
+  `).catch(() => ({ rows: [{ total: 0 }] }));
 
   return {
     generatedAt: new Date().toISOString(),
-    total: allRows.length,
+    view: includeArchived ? 'archive' : 'active',
+    page: safePage,
+    pages,
+    limit,
+    total,
     rows,
     metrics: {
       buyers: allRows.length,
@@ -1113,6 +1443,8 @@ export async function buildAdminBuyersList(db, searchParams = new URLSearchParam
       orders: allRows.reduce((sum, buyer) => sum + buyer.orders, 0),
       tickets: allRows.reduce((sum, buyer) => sum + buyer.tickets, 0),
       needsAttention: allRows.filter((buyer) => buyer.needsAttention > 0).length,
+      archivedBuyers: Number(archivedBuyersCountResult.rows[0]?.total || 0),
+      archiveAfterDays: STALE_CANCELLED_ARCHIVE_DAYS,
     },
   };
 }
@@ -1138,7 +1470,7 @@ export async function buildAdminOrderEventCandidates(db, searchParams = new URLS
           source.code::text as "sourceCode",
           source.name as "sourceName",
           category.title as category,
-          min(session."startsAt") filter (where coalesce(session."endsAt", session."startsAt") >= now()) as "upcomingStartsAt",
+          min(session."startsAt") filter (where ${ACTIVE_SESSION_SQL}) as "upcomingStartsAt",
           min(session."startsAt") as "firstStartsAt",
           count(distinct session.id)::int as "sessionCount",
           min(session."priceFromRub") filter (where session."priceFromRub" >= $3)::int as "sessionPriceFrom",
@@ -1338,6 +1670,7 @@ export async function buildAdminOrderDetail(db, orderId) {
         ext_order.status,
         ext_order."buyerSnapshot",
         ext_order."purchasedAt",
+        ext_order."archivedAt",
         ext_order."updatedAt",
         source.code::text as "sourceCode",
         source.name as "sourceName",
@@ -1376,21 +1709,61 @@ export async function buildAdminOrderDetail(db, orderId) {
 
 function mapAdminOrderRow(row) {
   const buyer = normalizeBuyerSnapshot(row.buyerSnapshot);
-  const tickets = Array.isArray(row.tickets) ? row.tickets.map(mapAdminOrderTicket) : [];
+  const tickets = Array.isArray(row.tickets)
+    ? row.tickets.map((ticket) => mapAdminOrderTicket(ticket, row.status, row.buyerSnapshot))
+    : [];
+  const ticketCount = Number(row.ticketCount || tickets.length || 0);
+  const unlinkedTickets = Number(row.unlinkedTickets || 0);
   const problemStatus = isProblemOrderStatus(row.status);
   const shouldExpectTicket = shouldExpectOrderTicket(row.status);
-  const hasUnlinkedTickets = shouldExpectTicket && tickets.some((ticket) => !ticket.eventId || !ticket.eventTitle);
-  const missingArtifact = shouldExpectTicket && tickets.length === 0;
+  const hasUnlinkedTickets =
+    shouldExpectTicket &&
+    (unlinkedTickets > 0 || tickets.some((ticket) => !ticket.eventId || !ticket.eventTitle));
+  // TC set/admission products often have empty tickets[] but paid sets_values - not a mirror gap.
+  const setProducts = listSetProductsFromSnapshot(row.buyerSnapshot);
+  const hasSetFulfillment = setProducts.length > 0;
+  const missingArtifact = shouldExpectTicket && ticketCount === 0 && !hasSetFulfillment;
   const sourceCode = String(row.sourceCode || '').toUpperCase();
-  const eventTitles = Array.from(new Set(tickets.map((ticket) => ticket.eventTitle).filter(Boolean)));
+  const eventTitlesFromRow = Array.isArray(row.eventTitles) ? row.eventTitles.filter(Boolean) : [];
+  const eventTitles = Array.from(
+    new Set(eventTitlesFromRow.length ? eventTitlesFromRow : tickets.map((ticket) => ticket.eventTitle).filter(Boolean)),
+  );
   const snapshotEventTitle = firstString(row.buyerSnapshot?.sourceEventTitle, row.buyerSnapshot?.eventTitle);
   const eventTitle = eventTitles[0] || snapshotEventTitle || null;
   const sessionDates = tickets.map((ticket) => ticket.startsAt).filter(Boolean).sort();
+  const eventDateLabel = row.firstStartsAt || sessionDates[0] || null;
+  const displayTickets =
+    tickets.length > 0
+      ? tickets
+      : setProducts.map((set, index) =>
+          mapAdminOrderTicket(
+            {
+              id: `set:${set.id || index + 1}`,
+              externalTicketId: firstString(set.name, set.id, `Набор ${index + 1}`),
+              status: row.status || 'done',
+              origin: 'set',
+              eventId: null,
+              sessionId: null,
+              eventTitle: snapshotEventTitle || firstString(set.name) || null,
+              eventSlug: null,
+              startsAt: null,
+            },
+            row.status,
+            row.buyerSnapshot,
+          ),
+        );
+  const displayTicketCount = ticketCount > 0 ? ticketCount : displayTickets.length;
 
   return {
     id: row.id,
     externalOrderId: row.externalOrderId,
-    publicCode: row.publicCode || publicOrderCode(row.sourceCode || row.sourceName, row.externalOrderId || row.id),
+    publicCode: resolveBuyerFacingOrderNumber({
+      buyerSnapshot: row.buyerSnapshot,
+      buyer,
+      publicCode: row.publicCode || publicOrderCode(row.sourceCode || row.sourceName, row.externalOrderId || row.id),
+      externalOrderId: row.externalOrderId,
+    }),
+    buyerSnapshot: row.buyerSnapshot || null,
     status: row.status || 'unknown',
     displayStatus: orderStatusLabel(row.status),
     statusTone: orderStatusTone(row.status),
@@ -1399,15 +1772,18 @@ function mapAdminOrderRow(row) {
     sourceLabel: sourceLabel(sourceCode),
     buyer,
     purchasedAt: row.purchasedAt || row.updatedAt || null,
+    archivedAt: row.archivedAt || null,
+    isArchived: Boolean(row.archivedAt),
+    canArchive: !row.archivedAt && isArchivableOrderStatus(row.status),
     updatedAt: row.updatedAt || null,
-    ticketCount: Number(row.ticketCount || tickets.length || 0),
-    unlinkedTickets: Number(row.unlinkedTickets || 0),
+    ticketCount: displayTicketCount,
+    unlinkedTickets,
     eventTitle,
     eventTitles: eventTitles.length ? eventTitles : eventTitle ? [eventTitle] : [],
-    eventDateLabel: sessionDates[0] || null,
-    tickets,
+    eventDateLabel,
+    tickets: displayTickets,
     amountRub: extractOrderAmountRub(row.buyerSnapshot),
-    artifactStatus: missingArtifact ? 'missing' : tickets.length > 0 ? 'tickets' : 'not_required',
+    artifactStatus: missingArtifact ? 'missing' : displayTicketCount > 0 || hasSetFulfillment ? 'tickets' : 'not_required',
     refundRequestsCount: 0,
     hasPendingRefundRequests: isRefundStatus(row.status),
     needsAttention: problemStatus || missingArtifact || hasUnlinkedTickets,
@@ -1419,12 +1795,25 @@ function mapAdminOrderRow(row) {
   };
 }
 
-function mapAdminOrderTicket(ticket) {
+/** TicketsCloud set/admission lines live in values.sets_values when seats tickets[] is empty. */
+function listSetProductsFromSnapshot(snapshot) {
+  const payload = snapshot && typeof snapshot === 'object' ? snapshot : {};
+  const values =
+    (payload.values && typeof payload.values === 'object' && payload.values) ||
+    (payload.sourcePayload?.values && typeof payload.sourcePayload.values === 'object' && payload.sourcePayload.values) ||
+    {};
+  const sets = values.sets_values;
+  if (!sets || typeof sets !== 'object' || Array.isArray(sets)) return [];
+  return Object.values(sets).filter((item) => item && typeof item === 'object');
+}
+
+function mapAdminOrderTicket(ticket, orderStatus = null, buyerSnapshot = null) {
+  const effectiveStatus = resolveTicketStatusForDisplay(ticket.status, orderStatus);
   return {
     id: ticket.id,
-    externalTicketId: ticket.externalTicketId,
+    externalTicketId: resolveTicketDisplayNumber(ticket, buyerSnapshot),
     status: ticket.status || 'unknown',
-    displayStatus: orderStatusLabel(ticket.status),
+    displayStatus: orderStatusLabel(effectiveStatus),
     origin: ticket.origin || 'source',
     eventId: ticket.eventId || null,
     sessionId: ticket.sessionId || null,
@@ -1432,6 +1821,32 @@ function mapAdminOrderTicket(ticket) {
     eventSlug: ticket.eventSlug || null,
     startsAt: ticket.startsAt || null,
   };
+}
+
+/** Ticketscloud often keeps paid seat tickets as "reserved"; for done orders show as issued. */
+function resolveTicketStatusForDisplay(ticketStatus, orderStatus) {
+  const ticket = String(ticketStatus || '').toLowerCase();
+  if (
+    isConfirmedOrderStatus(orderStatus) &&
+    ['reserved', 'hold', 'pending', 'open', 'new', 'created', 'processing'].some((token) => ticket.includes(token))
+  ) {
+    return 'issued';
+  }
+  return ticketStatus;
+}
+
+function resolveTicketDisplayNumber(ticket, buyerSnapshot) {
+  const payloadTickets =
+    (buyerSnapshot && (buyerSnapshot.sourcePayload?.tickets || buyerSnapshot.tickets)) || [];
+  const match = Array.isArray(payloadTickets)
+    ? payloadTickets.find((item) => String(item?.id || '') === String(ticket.externalTicketId || ''))
+    : null;
+  if (match) {
+    if (match.serial != null && match.number != null) return `${match.serial}-${match.number}`;
+    if (match.number != null) return String(match.number);
+    if (match.barcode) return String(match.barcode);
+  }
+  return ticket.externalTicketId || ticket.id;
 }
 
 function matchesPublicOrderLookup(order, lookup) {
@@ -1468,7 +1883,7 @@ function mapPublicBuyerOrder(order) {
   const isFinal = isCanceledOrderStatus(order.status) || isConfirmedOrderStatus(order.status);
   return {
     id: order.id,
-    number: order.publicCode,
+    number: resolveBuyerFacingOrderNumber(order),
     sourceOrderId: order.externalOrderId,
     status: order.status,
     displayStatus: order.displayStatus,
@@ -1480,6 +1895,7 @@ function mapPublicBuyerOrder(order) {
       email: maskEmail(order.buyer.email),
       phone: maskPhone(order.buyer.phone),
     },
+    eventId: primaryTicket?.eventId || null,
     eventTitle: order.eventTitle,
     eventUrl,
     purchasedAt: order.purchasedAt,
@@ -1492,12 +1908,27 @@ function mapPublicBuyerOrder(order) {
       id: ticket.id,
       number: ticket.externalTicketId,
       status: ticket.status || 'unknown',
-      displayStatus: ticket.displayStatus || orderStatusLabel(ticket.status),
+      displayStatus: ticket.displayStatus || orderStatusLabel(resolveTicketStatusForDisplay(ticket.status, order.status)),
+      eventId: ticket.eventId || null,
       eventTitle: ticket.eventTitle,
       eventUrl: ticket.eventSlug ? `/events/${publicEventSlug(ticket.eventSlug)}` : ticket.eventId ? `/events/${encodeURIComponent(ticket.eventId)}` : null,
       startsAt: ticket.startsAt,
     })),
   };
+}
+
+/** For external purchases show provider order number; hashed publicCode only as fallback. */
+function resolveBuyerFacingOrderNumber(order) {
+  const snap = order.buyerSnapshot && typeof order.buyerSnapshot === 'object' ? order.buyerSnapshot : {};
+  const notes = firstString(order.buyer?.notes, snap.buyer?.notes);
+  const fromNotes = notes && /^#?\d{4,}$/.test(String(notes).trim()) ? String(notes).trim().replace(/^#/, '') : null;
+  return firstString(
+    snap.number != null ? String(snap.number) : null,
+    snap.code,
+    fromNotes,
+    order.publicCode,
+    order.externalOrderId,
+  );
 }
 
 function publicOrderCode(source, externalOrderId) {
@@ -1518,12 +1949,45 @@ function normalizeBuyerSnapshot(snapshot) {
   const payload = snapshot && typeof snapshot === 'object' ? snapshot : {};
   const customer = payload.customer && typeof payload.customer === 'object' ? payload.customer : {};
   const buyer = payload.buyer && typeof payload.buyer === 'object' ? payload.buyer : {};
+  const sourcePayload = payload.sourcePayload && typeof payload.sourcePayload === 'object' ? payload.sourcePayload : {};
+  const settingsCustomer =
+    (payload.settings && typeof payload.settings.customer === 'object' && payload.settings.customer) ||
+    (sourcePayload.settings && typeof sourcePayload.settings.customer === 'object' && sourcePayload.settings.customer) ||
+    {};
+  const rawPhone = firstString(
+    payload.phone,
+    payload.customerPhone,
+    buyer.phone,
+    customer.phone,
+    settingsCustomer.phone,
+    settingsCustomer.phone_number,
+  );
   return {
-    name: firstString(payload.name, payload.fullName, payload.customerName, buyer.name, customer.name, customer.fullName),
-    email: firstString(payload.email, payload.customerEmail, buyer.email, customer.email),
-    phone: firstString(payload.phone, payload.customerPhone, buyer.phone, customer.phone),
+    name: firstString(
+      payload.name,
+      payload.fullName,
+      payload.customerName,
+      buyer.name,
+      customer.name,
+      customer.fullName,
+      settingsCustomer.name,
+      settingsCustomer.full_name,
+    ),
+    email: firstString(
+      payload.email,
+      payload.customerEmail,
+      buyer.email,
+      customer.email,
+      settingsCustomer.email,
+    ),
+    phone: looksLikeDateTime(rawPhone) ? null : rawPhone,
     notes: firstString(payload.notes, payload.comment, buyer.notes, payload.code, payload.number, payload.source, payload.rawStatus),
   };
+}
+
+function looksLikeDateTime(value) {
+  const text = String(value || '').trim();
+  return /^\d{4}-\d{2}-\d{2}([ T]\d{2}:\d{2}(:\d{2})?)?/.test(text);
 }
 
 function normalizeLookup(value) {
@@ -1598,7 +2062,11 @@ function isProcessingOrderStatus(status) {
 
 function isCanceledOrderStatus(status) {
   const value = String(status || '').toLowerCase();
-  return ['cancel', 'return', 'refund', 'reject', 'expired'].some((token) => value.includes(token));
+  return ['cancel', 'return', 'refund', 'reject', 'expired', 'deleted'].some((token) => value.includes(token));
+}
+
+function isArchivableOrderStatus(status) {
+  return isCanceledOrderStatus(status) || isRefundStatus(status) || String(status || '').toLowerCase().includes('deleted');
 }
 
 function isRefundStatus(status) {
@@ -1639,75 +2107,194 @@ function orderStatusLabel(status) {
   return status || 'неизвестно';
 }
 
-export async function buildAdminEventsList(db, searchParams) {
-  const limit = clampNumber(searchParams.get('limit'), 1, 500, 80);
-  const page = clampNumber(searchParams.get('page'), 1, 100000, 1);
-  const query = String(searchParams.get('q') || '').trim().toLowerCase();
-  const view = searchParams.get('view') || 'all';
-  const sourceCategory = searchParams.get('category') || 'all';
-  const sourceFilter = String(searchParams.get('source') || 'all').toUpperCase();
-  const readiness = searchParams.get('readiness') || 'all';
+let adminLandingsBaseCache = { catalogBuiltAt: -1, fingerprint: '', allRows: null, matchedEventIdsSize: 0 };
 
-  const sourceEvents = await eventRows(db, 10000);
-  const events = groupAdminEventRows(sourceEvents);
-  const quickFilters = ['all', 'needs_attention', 'ready_publish', 'purchase_blocked', 'no_image', 'landing_match'].map((id) => ({
-    id,
-    count: events.filter((event) => matchesAdminQuickFilter(event, id)).length,
-  }));
+function landingSavedFingerprint(rows) {
+  return rows
+    .map((row) =>
+      [
+        row.slug,
+        row.status,
+        row.title,
+        row.subtitle,
+        row.description,
+        row.pinnedEvents,
+        row.excludedEvents,
+        row.reviewEventsManual,
+        row.isIndexable,
+        row.seoH1,
+        row.seoTitle,
+        row.seoDescription,
+        row.canonicalUrl,
+      ].join(':'),
+    )
+    .join('|');
+}
 
-  const rows = events.filter((event) => {
-    if (!matchesAdminQuickFilter(event, view)) return false;
-    if (sourceFilter !== 'ALL' && String(event.sourceCode || event.source || '').toUpperCase() !== sourceFilter) return false;
-    if (sourceCategory !== 'all' && event.proposedCategory !== sourceCategory) return false;
-    if (readiness !== 'all' && event.readiness !== readiness) return false;
-    if (!query) return true;
+export function invalidateAdminLandingsBaseCache() {
+  adminLandingsBaseCache = { catalogBuiltAt: -1, fingerprint: '', allRows: null, matchedEventIdsSize: 0 };
+}
 
-    return [
-      event.title,
-      event.id,
-      event.city,
-      event.destination,
-      event.venue,
-      event.sourceCategory,
-      event.proposedCategory,
-      event.offerStatus,
-      ...(event.tags || []),
-      ...(event.landingHits || []),
-    ]
-      .filter(Boolean)
-      .join(' ')
-      .toLowerCase()
-      .includes(query);
+let adminGroupedEventsCache = { expiresAt: 0, staleUntil: 0, items: null, launch: null, sourceCount: 0, builtAt: 0 };
+let adminGroupedEventsBuildPromise = null;
+const ADMIN_GROUPED_EVENTS_TTL_MS = Number(process.env.ADMIN_GROUPED_EVENTS_TTL_MS || 5 * 60_000);
+const ADMIN_GROUPED_EVENTS_STALE_MS = Number(process.env.ADMIN_GROUPED_EVENTS_STALE_MS || 30 * 60_000);
+
+function scheduleAdminGroupedEventsRebuild(db, reason = 'refresh') {
+  if (adminGroupedEventsBuildPromise) return adminGroupedEventsBuildPromise;
+
+  adminGroupedEventsBuildPromise = (async () => {
+    const startedAt = Date.now();
+    try {
+      const sourceEvents = await eventRows(db, null, { lean: true });
+      const items = groupAdminEventRows(sourceEvents);
+      const now = Date.now();
+      adminGroupedEventsCache = {
+        expiresAt: now + Math.max(30_000, ADMIN_GROUPED_EVENTS_TTL_MS),
+        staleUntil: now + Math.max(60_000, ADMIN_GROUPED_EVENTS_STALE_MS),
+        items,
+        launch: buildLaunchMetrics(items),
+        sourceCount: sourceEvents.length,
+        builtAt: now,
+      };
+      console.log(
+        `Admin grouped events cache rebuilt (${reason}): ${sourceEvents.length} raw → ${items.length} groups in ${now - startedAt}ms`,
+      );
+      return adminGroupedEventsCache;
+    } finally {
+      adminGroupedEventsBuildPromise = null;
+    }
+  })().catch((error) => {
+    adminGroupedEventsBuildPromise = null;
+    console.warn(
+      `Admin grouped events cache rebuild failed (${reason}): ${error instanceof Error ? error.message : String(error)}`,
+    );
+    throw error;
   });
 
-  const total = rows.length;
-  const pages = Math.max(1, Math.ceil(total / limit));
-  const safePage = Math.min(page, pages);
+  return adminGroupedEventsBuildPromise;
+}
+
+async function getCachedAdminGroupedEvents(db) {
+  const now = Date.now();
+  const cached = adminGroupedEventsCache;
+
+  // Fresh hit — switching Events/Dashboard/Landings stays in-memory.
+  if (cached.items && now < cached.expiresAt) {
+    return cached;
+  }
+
+  // Stale-while-revalidate: serve previous catalog immediately, refresh in background.
+  if (cached.items && now < cached.staleUntil) {
+    void scheduleAdminGroupedEventsRebuild(db, 'swr');
+    return cached;
+  }
+
+  return scheduleAdminGroupedEventsRebuild(db, cached.items ? 'hard-expire' : 'cold');
+}
+
+/** Soft-invalidate: keep last payload for instant SWR responses while rebuild runs. */
+export function invalidateAdminGroupedEventsCache(db = null, reason = 'invalidate') {
+  if (adminGroupedEventsCache.items) {
+    adminGroupedEventsCache = {
+      ...adminGroupedEventsCache,
+      expiresAt: 0,
+    };
+  } else {
+    adminGroupedEventsCache = { expiresAt: 0, staleUntil: 0, items: null, launch: null, sourceCount: 0, builtAt: 0 };
+  }
+  invalidateAdminEventsSqlReadModelCache();
+  if (db) {
+    void scheduleAdminGroupedEventsRebuild(db, reason);
+  }
+  invalidateAdminLandingsBaseCache();
+  invalidateAdminSourcesCache();
+}
+
+export async function warmAdminGroupedEventsCache(db, reason = 'warmup') {
+  const now = Date.now();
+  if (adminGroupedEventsCache.items && now < adminGroupedEventsCache.expiresAt) {
+    return adminGroupedEventsCache;
+  }
+  return scheduleAdminGroupedEventsRebuild(db, reason);
+}
+
+export async function buildAdminEventsList(db, searchParams) {
+  const startedAt = Date.now();
+  // SQL pages groups in DB; hydrate only sibling rows for the current page.
+  const sqlPage = await queryAdminEventGroupsPage(db, searchParams);
+  const sourceEvents = sqlPage.eventIds.length
+    ? await eventRowsByIds(db, sqlPage.eventIds, { maxIds: 2500 })
+    : [];
+  const groupedPage = groupAdminEventRows(sourceEvents);
+  // Preserve SQL page order (startsAt, title).
+  const order = new Map(sqlPage.pageGroups.map((group, index) => [group.groupKey, index]));
+  const rows = groupedPage.sort((a, b) => {
+    const ai = order.has(a.groupKey) ? order.get(a.groupKey) : Number.MAX_SAFE_INTEGER;
+    const bi = order.has(b.groupKey) ? order.get(b.groupKey) : Number.MAX_SAFE_INTEGER;
+    return ai - bi;
+  });
+
+  const launch = sqlPage.launch;
+  const quickFilters = ['all', 'needs_attention', 'ready_publish', 'purchase_blocked', 'no_image', 'landing_match'].map(
+    (id) => ({
+      id,
+      count:
+        id === 'all'
+          ? launch.groupedEvents
+          : id === 'needs_attention'
+            ? launch.needsAttention
+            : id === 'ready_publish'
+              ? launch.readyForSeo
+              : id === 'purchase_blocked'
+                ? launch.purchaseBlocked
+                : id === 'no_image'
+                  ? launch.noImage
+                  : id === 'landing_match'
+                    ? launch.landingMatched
+                    : 0,
+    }),
+  );
+
+  console.log(
+    `Admin events SQL read-model: loaded ${sourceEvents.length} raw rows → ${rows.length} groups ` +
+      `(page ${sqlPage.page}/${sqlPage.pages}, totalGroups=${sqlPage.total}) in ${Date.now() - startedAt}ms`,
+  );
 
   return {
     generatedAt: new Date().toISOString(),
-    page: safePage,
-    pages,
-    limit,
-    total,
-    rows: rows.slice((safePage - 1) * limit, safePage * limit),
-    categories: Array.from(new Set(events.map((event) => event.proposedCategory))).sort((a, b) => a.localeCompare(b, 'ru')),
-    sources: Array.from(new Set(events.map((event) => event.sourceCode).filter(Boolean))).sort(),
+    page: sqlPage.page,
+    pages: sqlPage.pages,
+    limit: sqlPage.limit,
+    total: sqlPage.total,
+    rows,
+    categories: Array.from(sqlPage.categories || []).sort((a, b) => String(a).localeCompare(String(b), 'ru')),
+    sources: Array.from(sqlPage.sources || []).sort(),
     quickFilters,
     metrics: {
-      events: events.length,
-      readyEvents: events.filter((event) => event.readiness === 'ready').length,
-      reviewEvents: events.filter((event) => event.readiness !== 'ready').length,
+      events: launch.groupedEvents,
+      readyEvents: launch.readyForSeo,
+      reviewEvents: Math.max(0, launch.groupedEvents - launch.readyForSeo),
       landingRules: LANDING_RULES.length,
-      sourceEvents: sourceEvents.length,
-      groupedEvents: events.length,
+      sourceEvents: sqlPage.sourceCount,
+      groupedEvents: launch.groupedEvents,
+      rowsLoaded: sourceEvents.length,
+      readModel: 'sql_group_page',
+      launch: {
+        ...launch,
+        source: 'admin_event_groups_sql',
+      },
     },
   };
 }
 
-export async function buildAdminLandingsList(db) {
-  const [events, savedResult] = await Promise.all([
-    eventRows(db, 10000),
+export async function buildAdminLandingsList(db, searchParams = new URLSearchParams()) {
+  const limit = clampNumber(searchParams.get("limit"), 1, 200, 80);
+  const page = clampNumber(searchParams.get("page"), 1, 100000, 1);
+  const query = String(searchParams.get("q") || "").trim().toLowerCase();
+  const statusFilter = String(searchParams.get("status") || "all").trim().toLowerCase();
+  const [cached, savedResult] = await Promise.all([
+    getCachedAdminGroupedEvents(db),
     db.query(
       `
         select
@@ -1735,84 +2322,128 @@ export async function buildAdminLandingsList(db) {
       [LANDING_RULES.map((rule) => rule.slug)],
     ),
   ]);
-  const savedBySlug = new Map(savedResult.rows.map((row) => [row.slug, row]));
-  const matchedEventIds = new Set();
-  const rows = LANDING_RULES.map((rule) => {
-    const saved = savedBySlug.get(rule.slug);
-    const matched = events.filter((event) => matchesRule(event, rule));
-    matched.forEach((event) => matchedEventIds.add(event.id));
-    const prices = matched.map((event) => event.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
-    const readyEvents = matched.filter((event) => event.readiness === 'ready').length;
-    const blockedEvents = matched.filter((event) => event.readiness === 'blocked').length;
-    const venues = new Set(matched.map((event) => event.venue).filter(Boolean));
-    const cities = new Set(matched.map((event) => event.city).filter(Boolean));
 
-    return {
-      id: saved?.id || null,
-      slug: rule.slug,
-      title: saved?.title || rule.title,
-      subtitle: saved?.subtitle || rule.subtitle,
-      description: saved?.description || null,
-      chips: rule.chips || [],
-      status: saved ? String(saved.status || '').toLowerCase() : matched.length >= 20 ? 'ready' : matched.length > 0 ? 'seed' : 'empty',
-      events: matched.length,
-      readyEvents,
-      reviewEvents: Math.max(0, matched.length - readyEvents),
-      blockedEvents,
-      pinnedEvents: saved?.pinnedEvents || 0,
-      excludedEvents: saved?.excludedEvents || 0,
-      reviewEventsManual: saved?.reviewEventsManual || 0,
-      venues: venues.size,
-      cities: cities.size,
-      city: rule.city || null,
-      venue: rule.venue || null,
-      keywords: rule.keywords || [],
-      keywordScope: rule.keywordScope || 'full',
-      requiredAnyKeywords: rule.requiredAnyKeywords || [],
-      requiredKeywordGroups: rule.requiredKeywordGroups || [],
-      requiredTags: rule.tags || [],
-      excludedTags: rule.excludeTags || [],
-      excludedKeywords: rule.excludeKeywords || [],
-      priceFrom: prices.length ? Math.min(...prices) : null,
-      seo: {
-        h1: saved?.seoH1 || null,
-        title: saved?.seoTitle || null,
-        description: saved?.seoDescription || null,
-        canonicalUrl: saved?.canonicalUrl || null,
-        isIndexable: saved?.isIndexable ?? false,
-      },
-      sampleEvents: matched.slice(0, 6).map((event) => ({
-        id: event.id,
-        slug: event.slug,
-        title: event.title,
-        city: event.city,
-        venue: event.venue,
-        startsAt: event.startsAt,
-        priceFrom: event.priceFrom,
-        readiness: event.readiness,
-      })),
+  const fingerprint = landingSavedFingerprint(savedResult.rows);
+  let allRows = adminLandingsBaseCache.allRows;
+  let matchedEventIdsSize = adminLandingsBaseCache.matchedEventIdsSize || 0;
+  if (
+    !allRows ||
+    adminLandingsBaseCache.catalogBuiltAt !== cached.builtAt ||
+    adminLandingsBaseCache.fingerprint !== fingerprint
+  ) {
+    const events = cached.items;
+    const savedBySlug = new Map(savedResult.rows.map((row) => [row.slug, row]));
+    const matchedEventIds = new Set();
+    allRows = LANDING_RULES.map((rule) => {
+      const saved = savedBySlug.get(rule.slug);
+      const matched = events.filter((event) => matchesLandingRule(event, rule));
+      matched.forEach((event) => matchedEventIds.add(event.id));
+      const prices = matched.map((event) => event.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
+      const readyEvents = matched.filter((event) => event.readiness === 'ready').length;
+      const blockedEvents = matched.filter((event) => event.readiness === 'blocked').length;
+      const venues = new Set(matched.map((event) => event.venue).filter(Boolean));
+      const cities = new Set(matched.map((event) => event.city).filter(Boolean));
+
+      return {
+        id: saved?.id || null,
+        slug: rule.slug,
+        title: saved?.title || rule.title,
+        subtitle: saved?.subtitle || rule.subtitle,
+        description: saved?.description || null,
+        chips: rule.chips || [],
+        status: saved ? String(saved.status || '').toLowerCase() : matched.length >= 20 ? 'ready' : matched.length > 0 ? 'seed' : 'empty',
+        events: matched.length,
+        readyEvents,
+        reviewEvents: Math.max(0, matched.length - readyEvents),
+        blockedEvents,
+        pinnedEvents: saved?.pinnedEvents || 0,
+        excludedEvents: saved?.excludedEvents || 0,
+        reviewEventsManual: saved?.reviewEventsManual || 0,
+        venues: venues.size,
+        cities: cities.size,
+        city: rule.city || null,
+        venue: rule.venue || null,
+        keywords: rule.keywords || [],
+        keywordScope: rule.keywordScope || 'full',
+        requiredAnyKeywords: rule.requiredAnyKeywords || [],
+        requiredKeywordGroups: rule.requiredKeywordGroups || [],
+        requiredTags: rule.tags || [],
+        excludedTags: rule.excludeTags || [],
+        excludedKeywords: rule.excludeKeywords || [],
+        priceFrom: prices.length ? Math.min(...prices) : null,
+        seo: {
+          h1: saved?.seoH1 || null,
+          title: saved?.seoTitle || null,
+          description: saved?.seoDescription || null,
+          canonicalUrl: saved?.canonicalUrl || null,
+          isIndexable: saved?.isIndexable ?? false,
+        },
+        sampleEvents: matched.slice(0, 6).map((event) => ({
+          id: event.id,
+          slug: event.slug,
+          title: event.title,
+          city: event.city,
+          venue: event.venue,
+          startsAt: event.startsAt,
+          priceFrom: event.priceFrom,
+          readiness: event.readiness,
+        })),
+      };
+    });
+    matchedEventIdsSize = matchedEventIds.size;
+    adminLandingsBaseCache = {
+      catalogBuiltAt: cached.builtAt || 0,
+      fingerprint,
+      allRows,
+      matchedEventIdsSize,
     };
+  }
+
+  const filtered = allRows.filter((row) => {
+    if (statusFilter !== 'all' && row.status !== statusFilter) return false;
+    if (!query) return true;
+    return [row.slug, row.title, row.subtitle, row.city, row.venue, ...(row.chips || []), ...(row.keywords || []), ...(row.requiredTags || [])]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase()
+      .includes(query);
   });
+  const total = filtered.length;
+  const pages = Math.max(1, Math.ceil(total / Math.max(1, limit)));
+  const safePage = Math.min(Math.max(1, page), pages);
+  const rows = filtered.slice((safePage - 1) * limit, safePage * limit);
 
   return {
     generatedAt: new Date().toISOString(),
-    total: rows.length,
+    page: safePage,
+    pages,
+    limit,
+    total,
     rows,
     metrics: {
-      ready: rows.filter((row) => row.status === 'ready').length,
-      seed: rows.filter((row) => row.status === 'seed').length,
-      empty: rows.filter((row) => row.status === 'empty').length,
-      matchedEvents: matchedEventIds.size,
+      ready: allRows.filter((row) => row.status === 'ready').length,
+      seed: allRows.filter((row) => row.status === 'seed').length,
+      empty: allRows.filter((row) => row.status === 'empty').length,
+      matchedEvents: matchedEventIdsSize,
+      landingRules: LANDING_RULES.length,
+      sourceEvents: cached.sourceCount,
     },
   };
 }
 
-export async function buildAdminLandingDetail(db, landingSlug) {
+export async function buildAdminLandingDetail(db, landingSlug, searchParams = new URLSearchParams()) {
   const rule = LANDING_RULES.find((item) => item.slug === landingSlug);
   if (!rule) return null;
 
-  const [events, landingResult] = await Promise.all([
-    eventRows(db, 10000),
+  const eventsLimit = clampNumber(searchParams.get('limit'), 1, 200, 80);
+  const eventsPage = clampNumber(searchParams.get('page'), 1, 100000, 1);
+  const eventsQuery = String(searchParams.get('q') || '').trim().toLowerCase();
+  const excludedLimit = clampNumber(searchParams.get('excludedLimit'), 1, 200, 40);
+  const excludedPage = clampNumber(searchParams.get('excludedPage'), 1, 100000, 1);
+
+  // Perf note: still builds full grouped catalog then filters (same blocker as admin events list).
+  const [cached, landingResult] = await Promise.all([
+    getCachedAdminGroupedEvents(db),
     db.query(
       `
         select
@@ -1838,19 +2469,18 @@ export async function buildAdminLandingDetail(db, landingSlug) {
     ? (await db.query('select "eventId", score, reasons from "LandingMatch" where "landingId" = $1', [landing.id])).rows
     : [];
   const manualByEventId = new Map(manualRows.map((row) => [row.eventId, row]));
-  const autoMatches = events.filter((event) => matchesRule(event, rule));
-  const autoIds = new Set(autoMatches.map((event) => event.id));
+  const groupedEvents = cached.items;
+  const groupIdsFor = (event) => (event.groupEventIds?.length ? event.groupEventIds : [event.id]);
+  const autoMatchedGroups = groupedEvents.filter((event) => matchesLandingRule(event, rule));
+  const autoIds = new Set(autoMatchedGroups.flatMap((event) => groupIdsFor(event)));
   const pinnedIds = new Set(manualRows.filter((row) => row.reasons?.manualStatus === 'PINNED').map((row) => row.eventId));
   const excludedIds = new Set(manualRows.filter((row) => row.reasons?.manualStatus === 'EXCLUDED').map((row) => row.eventId));
   const reviewIds = new Set(manualRows.filter((row) => row.reasons?.manualStatus === 'REVIEW').map((row) => row.eventId));
-  const groupedEvents = groupAdminEventRows(events);
-  const groupIdsFor = (event) => (event.groupEventIds?.length ? event.groupEventIds : [event.id]);
   const manualRowFor = (event) => groupIdsFor(event).map((id) => manualByEventId.get(id)).find(Boolean) || null;
   const isAutoGroup = (event) => groupIdsFor(event).some((id) => autoIds.has(id));
   const isPinnedGroup = (event) => groupIdsFor(event).some((id) => pinnedIds.has(id));
   const isExcludedGroup = (event) => groupIdsFor(event).some((id) => excludedIds.has(id));
   const isReviewGroup = (event) => groupIdsFor(event).some((id) => reviewIds.has(id));
-  const autoMatchedGroups = groupedEvents.filter(isAutoGroup);
   const matched = groupedEvents.filter((event) => (isAutoGroup(event) || isPinnedGroup(event)) && !isExcludedGroup(event));
   const excluded = groupedEvents.filter(isExcludedGroup);
   const prices = matched.map((event) => event.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
@@ -1868,6 +2498,25 @@ export async function buildAdminLandingDetail(db, landingSlug) {
       )).rows
     : [];
   const blocks = blockRows.length ? blockRows.map(mapLandingBlock) : buildDefaultLandingBlocks(rule, matched);
+
+  const filteredMatched = eventsQuery
+    ? matched.filter((event) =>
+        [event.title, event.city, event.venue, event.category, event.sourceCategory, ...(event.tags || [])]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase()
+          .includes(eventsQuery),
+      )
+    : matched;
+  const eventsTotal = filteredMatched.length;
+  const eventsPages = Math.max(1, Math.ceil(eventsTotal / Math.max(1, eventsLimit)));
+  const safeEventsPage = Math.min(Math.max(1, eventsPage), eventsPages);
+  const eventRowsPage = filteredMatched.slice((safeEventsPage - 1) * eventsLimit, safeEventsPage * eventsLimit);
+
+  const excludedTotal = excluded.length;
+  const excludedPages = Math.max(1, Math.ceil(excludedTotal / Math.max(1, excludedLimit)));
+  const safeExcludedPage = Math.min(Math.max(1, excludedPage), excludedPages);
+  const excludedRowsPage = excluded.slice((safeExcludedPage - 1) * excludedLimit, safeExcludedPage * excludedLimit);
 
   return {
     generatedAt: new Date().toISOString(),
@@ -1900,10 +2549,16 @@ export async function buildAdminLandingDetail(db, landingSlug) {
       cities: new Set(matched.map((event) => event.city).filter(Boolean)).size,
       priceFrom: prices.length ? Math.min(...prices) : null,
     },
-    events: matched.slice(0, 160).map((event) => mapLandingAdminEvent(event, manualRowFor(event), isAutoGroup(event), rule)),
-    excludedEvents: excluded
-      .slice(0, 40)
-      .map((event) => mapLandingAdminEvent(event, manualRowFor(event), isAutoGroup(event), rule)),
+    page: safeEventsPage,
+    pages: eventsPages,
+    limit: eventsLimit,
+    total: eventsTotal,
+    events: eventRowsPage.map((event) => mapLandingAdminEvent(event, manualRowFor(event), isAutoGroup(event), rule)),
+    excludedPage: safeExcludedPage,
+    excludedPages,
+    excludedLimit,
+    excludedTotal,
+    excludedEvents: excludedRowsPage.map((event) => mapLandingAdminEvent(event, manualRowFor(event), isAutoGroup(event), rule)),
   };
 }
 
@@ -1913,8 +2568,8 @@ export async function buildAdminLandingEventCandidates(db, landingSlug, searchPa
 
   const query = String(searchParams.get('q') || '').trim().toLowerCase();
   const limit = clampNumber(searchParams.get('limit'), 1, 50, 12);
-  const [events, landingResult] = await Promise.all([
-    eventRows(db, 10000),
+  const [cached, landingResult] = await Promise.all([
+    getCachedAdminGroupedEvents(db),
     db.query('select id from "Landing" where slug = $1 limit 1', [landingSlug]),
   ]);
   const landing = landingResult.rows[0] || null;
@@ -1922,8 +2577,12 @@ export async function buildAdminLandingEventCandidates(db, landingSlug, searchPa
     ? (await db.query('select "eventId", score, reasons from "LandingMatch" where "landingId" = $1', [landing.id])).rows
     : [];
   const manualByEventId = new Map(manualRows.map((row) => [row.eventId, row]));
-  const autoIds = new Set(events.filter((event) => matchesRule(event, rule)).map((event) => event.id));
-  const groupedEvents = groupAdminEventRows(events);
+  const groupedEvents = cached.items;
+  const autoIds = new Set(
+    groupedEvents
+      .filter((event) => matchesLandingRule(event, rule))
+      .flatMap((event) => (event.groupEventIds?.length ? event.groupEventIds : [event.id])),
+  );
   const filtered = groupedEvents.filter((event) => {
     if (!query) return false;
     return landingEventSearchText(event).includes(query);
@@ -2013,6 +2672,7 @@ export async function updateAdminLanding(db, landingSlug, payload) {
     ogDescription: seoDescription,
   });
 
+  invalidateAdminLandingsBaseCache();
   return buildAdminLandingDetail(db, landingSlug);
 }
 
@@ -2046,6 +2706,7 @@ export async function updateAdminLandingMatch(db, landingSlug, eventId, payload)
       ],
     );
   }
+  invalidateAdminLandingsBaseCache();
   return buildAdminLandingDetail(db, landingSlug);
 }
 
@@ -2064,18 +2725,21 @@ export async function buildAdminTaxonomy(db) {
 }
 
 export async function buildAdminVenuesList(db, searchParams) {
-  const limit = clampNumber(searchParams.get('limit'), 1, 500, 120);
-  const query = String(searchParams.get('q') || '').trim().toLowerCase();
+  const limit = clampNumber(searchParams.get('limit'), 1, 200, 80);
+  const page = clampNumber(searchParams.get('page'), 1, 100000, 1);
+  const query = String(searchParams.get('q') || '').trim();
   const familyFilter = String(searchParams.get('family') || '').trim().toLowerCase();
-  const rows = await venueRows(db, 500);
-  const filtered = rows.filter((venue) => {
-    if (query) {
-      const haystack = [venue.name, venue.city, venue.address, venue.proposedKind, venue.pageStatus]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase();
-      if (!haystack.includes(query)) return false;
-    }
+  const rows = await fetchLeanPublicVenueRows(2000, { leanText: true, q: query || undefined });
+  const facets = await fetchVenueEventFacetCounts(rows.map((row) => row.id));
+  const enriched = applyVenueEventFacetCounts(rows, facets).map((row) => {
+    const mapped = {
+      ...row,
+      name: formatPublicVenueTitle(row.name || row.title),
+    };
+    mapped.city = resolvePublicVenueCity(mapped);
+    return applyPublicVenueNormalization(mapped);
+  });
+  const filtered = enriched.filter((venue) => {
     if (!familyFilter) return true;
     const kind = normalizeVenueKindValue(venue.kind || venue.proposedKind);
     const isInstitution = INSTITUTION_VENUE_KINDS.has(kind);
@@ -2084,15 +2748,22 @@ export async function buildAdminVenuesList(db, searchParams) {
     return true;
   });
 
+  const total = filtered.length;
+  const pages = Math.max(1, Math.ceil(total / limit));
+  const safePage = Math.min(page, pages);
+
   return {
     generatedAt: new Date().toISOString(),
-    total: filtered.length,
-    rows: filtered.slice(0, limit),
+    page: safePage,
+    pages,
+    limit,
+    total,
+    rows: filtered.slice((safePage - 1) * limit, safePage * limit),
     metrics: {
-      venues: rows.length,
-      candidates: rows.filter((venue) => venue.pageStatus === 'candidate').length,
-      published: rows.filter((venue) => venue.pageStatus === 'published').length,
-      withEvents: rows.filter((venue) => venue.events > 0).length,
+      venues: enriched.length,
+      candidates: enriched.filter((venue) => venue.pageStatus === 'candidate').length,
+      published: enriched.filter((venue) => venue.pageStatus === 'published').length,
+      withEvents: enriched.filter((venue) => venue.events > 0).length,
     },
   };
 }
@@ -2116,6 +2787,10 @@ export async function buildAdminVenueDetail(db, venueId) {
           venue.address,
           venue.latitude,
           venue.longitude,
+          venue."metroStation",
+          venue."wayToFind",
+          venue."parkingInfo",
+          venue."hookFact",
           venue.kind,
           venue."pageStatus",
           city.title as city
@@ -2178,6 +2853,10 @@ export async function updateAdminVenue(db, venueId, payload) {
         "isIndexable" = $10,
         kind = $11::"VenueKind",
         "pageStatus" = $12::"VenuePageStatus",
+        "metroStation" = $13,
+        "wayToFind" = $14,
+        "parkingInfo" = $15,
+        "hookFact" = $16,
         "updatedAt" = now()
       where id = $1
       returning id
@@ -2195,6 +2874,10 @@ export async function updateAdminVenue(db, venueId, payload) {
       Boolean(next.isIndexable),
       next.kind || 'OTHER',
       next.pageStatus || 'NONE',
+      next.metroStation ?? null,
+      next.wayToFind ?? null,
+      next.parkingInfo ?? null,
+      next.hookFact ?? null,
     ],
   );
 
@@ -2244,7 +2927,403 @@ export async function updateAdminEventTaxonomy(db, eventId, payload) {
   }
 
   const event = (await eventRowsByIds(db, [eventId]))[0] || null;
+  invalidateAdminGroupedEventsCache(db, 'event taxonomy');
   return { eventId, event };
+}
+
+/**
+ * Заменяет STOP-пункты EventVenueRouteItem. Event.venueId (точка старта) не трогаем.
+ * payload.links: [{ venueId|slug, role?: 'STOP', sortOrder?, label? }]
+ */
+export async function updateAdminEventVenueLinks(db, eventId, payload) {
+  const exists = await db.query(`select id from "Event" where id = $1 limit 1`, [eventId]);
+  if (!exists.rows[0]) return null;
+
+  const rawLinks = Array.isArray(payload?.links) ? payload.links : [];
+  const prepared = [];
+  const seenVenueIds = new Set();
+
+  for (let index = 0; index < rawLinks.length; index += 1) {
+    const item = rawLinks[index] && typeof rawLinks[index] === 'object' ? rawLinks[index] : {};
+    const role = String(item.role || 'STOP').trim().toUpperCase() || 'STOP';
+    if (role !== 'STOP') continue;
+    const locator = normalizeNullableString(item.venueId || item.slug);
+    if (!locator) continue;
+    const venueResult = await db.query(
+      `select id from "Venue" where id = $1 or slug = $1 limit 1`,
+      [locator],
+    );
+    const venueId = venueResult.rows[0]?.id;
+    if (!venueId || seenVenueIds.has(venueId)) continue;
+    seenVenueIds.add(venueId);
+    const sortOrder = Number.isFinite(Number(item.sortOrder)) ? Math.trunc(Number(item.sortOrder)) : index;
+    prepared.push({
+      venueId,
+      role: 'STOP',
+      sortOrder,
+      label: normalizeNullableString(item.label),
+    });
+  }
+
+  prepared.sort((a, b) => a.sortOrder - b.sortOrder || a.venueId.localeCompare(b.venueId));
+
+  await db.query(
+    `delete from "event_venue_route_items" where "eventId" = $1 and role = 'STOP'::"RouteItemRole"`,
+    [eventId],
+  );
+
+  for (let index = 0; index < prepared.length; index += 1) {
+    const link = prepared[index];
+    await db.query(
+      `
+        insert into "event_venue_route_items" (
+          id, "eventId", "venueId", role, "sortOrder", label, "createdAt", "updatedAt"
+        ) values (
+          $1, $2, $3, 'STOP'::"RouteItemRole", $4, $5, now(), now()
+        )
+      `,
+      [
+        `evri_${randomUUID().replace(/-/g, '').slice(0, 24)}`,
+        eventId,
+        link.venueId,
+        Number.isFinite(link.sortOrder) ? link.sortOrder : index,
+        link.label,
+      ],
+    );
+  }
+
+  const venueLinks = await loadAdminEventVenueLinks(db, eventId);
+  return { eventId, venueLinks };
+}
+
+/** Geo suggest thresholds (aligned with scripts/lib/venue-route-geo.js + public nearby 300m). */
+const SUGGEST_STOP_RADIUS_M = Number(process.env.SUGGEST_STOP_RADIUS_M || 150);
+const SUGGEST_NEARBY_RADIUS_M = Number(process.env.SUGGEST_NEARBY_RADIUS_M || 300);
+const SUGGEST_SOFT_RADIUS_M = Number(process.env.SUGGEST_SOFT_RADIUS_M || 500);
+const SUGGEST_BBOX_DEG = Number(process.env.SUGGEST_BBOX_DEG || 0.008);
+const SUGGEST_MAX_CANDIDATES = Number(process.env.MAX_CANDIDATES_PER_EVENT || 20);
+const SUGGEST_KIND_ALLOWLIST = new Set([
+  'MONUMENT',
+  'PARK',
+  'ATTRACTION',
+  'MUSEUM_ART_SPACE',
+  'OUTDOOR_LOCATION',
+  'MEETING_POINT',
+  'PIER',
+  'VENUE',
+]);
+const SUGGEST_KIND_SCORE = {
+  MONUMENT: 5,
+  PARK: 5,
+  ATTRACTION: 5,
+  OUTDOOR_LOCATION: 4,
+  MUSEUM_ART_SPACE: 3,
+  PIER: 3,
+  MEETING_POINT: 2,
+  VENUE: 2,
+};
+
+function suggestConfidenceForDistance(distanceMeters) {
+  const d = Number(distanceMeters);
+  if (!Number.isFinite(d) || d < 0) return null;
+  if (d <= SUGGEST_STOP_RADIUS_M) return 'high';
+  if (d <= SUGGEST_NEARBY_RADIUS_M) return 'medium';
+  if (d <= SUGGEST_SOFT_RADIUS_M) return 'low';
+  return null;
+}
+
+function suggestRankScore({ distanceMeters, sameCity, kind }) {
+  const kindScore = SUGGEST_KIND_SCORE[String(kind || '').toUpperCase()] || 0;
+  return (sameCity ? 10 : 0) + kindScore - Number(distanceMeters) / 1000;
+}
+
+/**
+ * Geo-кандидаты STOP от start venue события. Не пишет БД, не трогает Event.venueId.
+ * options.radiusM - cap поиска (default 300, max soft 500).
+ */
+export async function suggestAdminEventVenueLinks(db, eventId, options = {}) {
+  const radiusCap = Math.min(
+    SUGGEST_SOFT_RADIUS_M,
+    Math.max(1, Number(options.radiusM) || SUGGEST_NEARBY_RADIUS_M),
+  );
+
+  const eventResult = await db.query(
+    `
+      select
+        e.id,
+        e."venueId",
+        e."primaryCityId",
+        start_venue.latitude as "startLat",
+        start_venue.longitude as "startLng",
+        start_venue."cityId" as "startCityId"
+      from "Event" e
+      left join "Venue" start_venue on start_venue.id = e."venueId"
+      where e.id = $1
+      limit 1
+    `,
+    [eventId],
+  );
+  const event = eventResult.rows[0];
+  if (!event) return null;
+
+  const startLat = Number(event.startLat);
+  const startLng = Number(event.startLng);
+  if (!isValidVenueCoordinatePair(startLat, startLng)) {
+    return {
+      eventId,
+      startVenueId: event.venueId || null,
+      suggestions: [],
+      reason: 'start_venue_missing_coords',
+      thresholds: {
+        high: SUGGEST_STOP_RADIUS_M,
+        medium: SUGGEST_NEARBY_RADIUS_M,
+        soft: SUGGEST_SOFT_RADIUS_M,
+        radiusM: radiusCap,
+      },
+    };
+  }
+
+  const existingResult = await db.query(
+    `
+      select "venueId"
+      from "event_venue_route_items"
+      where "eventId" = $1 and role = 'STOP'::"RouteItemRole"
+    `,
+    [eventId],
+  );
+  const existingStops = new Set(existingResult.rows.map((row) => row.venueId));
+
+  const cityId = event.primaryCityId || event.startCityId;
+  const kinds = [...SUGGEST_KIND_ALLOWLIST];
+  const venueResult = await db.query(
+    `
+      select
+        v.id,
+        v.slug,
+        v.title,
+        v.kind::text as kind,
+        v."cityId",
+        v."pageStatus"::text as "pageStatus",
+        v.latitude,
+        v.longitude
+      from "Venue" v
+      where v.latitude is not null
+        and v.longitude is not null
+        and v.kind::text = any($1::text[])
+        and v.kind <> 'ONLINE'::"VenueKind"
+        and v."pageStatus" in ('PUBLISHED'::"VenuePageStatus", 'CANDIDATE'::"VenuePageStatus")
+        and abs(v.latitude - $2) <= $3
+        and abs(v.longitude - $4) <= $3
+        ${cityId ? 'and v."cityId" = $5' : ''}
+    `,
+    cityId
+      ? [kinds, startLat, SUGGEST_BBOX_DEG, startLng, cityId]
+      : [kinds, startLat, SUGGEST_BBOX_DEG, startLng],
+  );
+
+  const suggestions = [];
+  for (const row of venueResult.rows) {
+    if (row.id === event.venueId) continue;
+    if (existingStops.has(row.id)) continue;
+    const latitude = Number(row.latitude);
+    const longitude = Number(row.longitude);
+    if (!isValidVenueCoordinatePair(latitude, longitude)) continue;
+
+    const distanceMeters = haversineMeters(startLat, startLng, latitude, longitude);
+    if (distanceMeters > radiusCap) continue;
+    const confidence = suggestConfidenceForDistance(distanceMeters);
+    if (!confidence) continue;
+
+    const sameCity = Boolean(cityId && row.cityId === cityId);
+    suggestions.push({
+      venueId: row.id,
+      slug: row.slug,
+      title: row.title,
+      kind: row.kind,
+      pageStatus: row.pageStatus,
+      distanceMeters: Math.round(distanceMeters * 10) / 10,
+      confidence,
+      sameCity,
+      role: 'STOP',
+      action: confidence === 'high' && sameCity ? 'auto-apply-ok' : 'suggest-only',
+      rank: suggestRankScore({ distanceMeters, sameCity, kind: row.kind }),
+    });
+  }
+
+  suggestions.sort((a, b) => b.rank - a.rank || a.distanceMeters - b.distanceMeters);
+
+  return {
+    eventId,
+    startVenueId: event.venueId || null,
+    suggestions: suggestions.slice(0, SUGGEST_MAX_CANDIDATES).map(({ rank, ...rest }) => rest),
+    thresholds: {
+      high: SUGGEST_STOP_RADIUS_M,
+      medium: SUGGEST_NEARBY_RADIUS_M,
+      soft: SUGGEST_SOFT_RADIUS_M,
+      radiusM: radiusCap,
+      bboxDeg: SUGGEST_BBOX_DEG,
+    },
+  };
+}
+
+/**
+ * Merge-insert STOP links. Never wipe existing STOP. Never touches Event.venueId.
+ * payload: { mode?: 'merge', links: [{ venueId|slug, role?: 'STOP', sortOrder?, label? }] }
+ */
+export async function applyAdminEventVenueLinks(db, eventId, payload) {
+  const exists = await db.query(
+    `select id, "venueId" from "Event" where id = $1 limit 1`,
+    [eventId],
+  );
+  const event = exists.rows[0];
+  if (!event) return null;
+
+  const mode = String(payload?.mode || 'merge').trim().toLowerCase();
+  if (mode !== 'merge') {
+    return { error: 'unsupported_mode', message: 'Only mode=merge is allowed (no replace-all wipe).' };
+  }
+
+  const rawLinks = Array.isArray(payload?.links) ? payload.links : [];
+  const prepared = [];
+  const seenVenueIds = new Set();
+
+  for (let index = 0; index < rawLinks.length; index += 1) {
+    const item = rawLinks[index] && typeof rawLinks[index] === 'object' ? rawLinks[index] : {};
+    const role = String(item.role || 'STOP').trim().toUpperCase() || 'STOP';
+    if (role !== 'STOP') continue;
+    const locator = normalizeNullableString(item.venueId || item.slug);
+    if (!locator) continue;
+    const venueResult = await db.query(
+      `select id from "Venue" where id = $1 or slug = $1 limit 1`,
+      [locator],
+    );
+    const venueId = venueResult.rows[0]?.id;
+    if (!venueId || seenVenueIds.has(venueId)) continue;
+    if (venueId === event.venueId) continue;
+    seenVenueIds.add(venueId);
+    const sortOrder = Number.isFinite(Number(item.sortOrder))
+      ? Math.trunc(Number(item.sortOrder))
+      : 100 + index;
+    prepared.push({
+      venueId,
+      sortOrder,
+      label: normalizeNullableString(item.label),
+    });
+  }
+
+  const applied = [];
+  for (const link of prepared) {
+    const result = await db.query(
+      `
+        insert into "event_venue_route_items" (
+          id, "eventId", "venueId", role, "sortOrder", label, "createdAt", "updatedAt"
+        ) values (
+          $1, $2, $3, 'STOP'::"RouteItemRole", $4, $5, now(), now()
+        )
+        on conflict ("eventId", "venueId", role) do nothing
+        returning id, "eventId", "venueId", role, "sortOrder", label
+      `,
+      [
+        `evri_${randomUUID().replace(/-/g, '').slice(0, 24)}`,
+        eventId,
+        link.venueId,
+        link.sortOrder,
+        link.label,
+      ],
+    );
+    if (result.rows[0]) {
+      applied.push({
+        id: result.rows[0].id,
+        venueId: result.rows[0].venueId,
+        role: result.rows[0].role,
+        sortOrder: result.rows[0].sortOrder,
+        label: result.rows[0].label,
+      });
+    }
+  }
+
+  invalidateAdminGroupedEventsCache(db, 'event venue links merge');
+  const venueLinks = await loadAdminEventVenueLinks(db, eventId);
+  return { eventId, mode: 'merge', applied, venueLinks };
+}
+
+async function loadAdminEventVenueLinks(db, eventId) {
+  const result = await db.query(
+    `
+      select
+        link.id,
+        link."eventId",
+        link."venueId",
+        link.role,
+        link."sortOrder",
+        link.label,
+        venue.slug,
+        venue.title,
+        venue.kind,
+        venue."pageStatus"
+      from "event_venue_route_items" link
+      join "Venue" venue on venue.id = link."venueId"
+      where link."eventId" = $1
+      order by link."sortOrder", venue.title
+    `,
+    [eventId],
+  );
+  return result.rows.map((row) => ({
+    id: row.id,
+    eventId: row.eventId,
+    venueId: row.venueId,
+    role: row.role,
+    sortOrder: row.sortOrder,
+    label: row.label,
+    slug: row.slug,
+    title: row.title,
+    kind: row.kind,
+    pageStatus: row.pageStatus,
+  }));
+}
+
+function mergeReadinessIssues(left = [], right = []) {
+  const byCode = new Map();
+  for (const issue of [...(left || []), ...(right || [])]) {
+    if (!issue?.code || byCode.has(issue.code)) continue;
+    byCode.set(issue.code, issue);
+  }
+  return Array.from(byCode.values());
+}
+
+/**
+ * After sibling grouping: a future slot in the group clears NO_FUTURE_SESSIONS,
+ * so a past-only sibling cannot paint the whole card as blocked. Other high issues stay.
+ */
+export function finalizeGroupedAdminReadiness(group, groupHasFutureSession) {
+  const sourceIssues =
+    Array.isArray(group.readinessIssues) && group.readinessIssues.length
+      ? group.readinessIssues
+      : (group.readinessCodes || [])
+          .map((code) => {
+            const meta = READINESS_ISSUE_META[code];
+            return meta ? { code, label: meta.label, severity: meta.severity } : null;
+          })
+          .filter(Boolean);
+
+  const issues = groupHasFutureSession
+    ? sourceIssues.filter((issue) => issue.code !== 'NO_FUTURE_SESSIONS')
+    : sourceIssues.slice();
+
+  const reasons = issues.map((issue) => issue.label);
+  const severity = readinessSeverity(issues);
+  const readiness = issues.length ? (severity === 'high' ? 'blocked' : 'review') : 'ready';
+  const status = issues.length ? 'needs_review' : 'ready';
+
+  return {
+    ...group,
+    readinessIssues: issues,
+    readinessCodes: issues.map((issue) => issue.code),
+    reasons,
+    severity,
+    readiness,
+    status,
+  };
 }
 
 function groupAdminEventRows(events) {
@@ -2252,6 +3331,7 @@ function groupAdminEventRows(events) {
 
   for (const event of events) {
     const key = adminEventGroupKey(event);
+    const eventHasFuture = hasFutureSession(event);
     const current = groups.get(key);
     if (!current) {
       groups.set(key, {
@@ -2263,6 +3343,9 @@ function groupAdminEventRows(events) {
         landingHits: [...(event.landingHits || [])],
         tags: [...(event.tags || [])],
         reasons: [...(event.reasons || [])],
+        readinessCodes: [...(event.readinessCodes || [])],
+        readinessIssues: [...(event.readinessIssues || [])],
+        _groupHasFutureSession: eventHasFuture,
       });
       continue;
     }
@@ -2273,6 +3356,8 @@ function groupAdminEventRows(events) {
     current.landingHits = uniqueValues(current.landingHits.concat(event.landingHits || []));
     current.tags = uniqueValues(current.tags.concat(event.tags || []));
     current.reasons = uniqueValues(current.reasons.concat(event.reasons || []));
+    current.readinessCodes = uniqueValues((current.readinessCodes || []).concat(event.readinessCodes || []));
+    current.readinessIssues = mergeReadinessIssues(current.readinessIssues, event.readinessIssues);
     current.publishBlockers = uniqueValues((current.publishBlockers || []).concat(event.publishBlockers || []));
     current.publishWarnings = uniqueValues((current.publishWarnings || []).concat(event.publishWarnings || []));
     current.canPublish = Boolean(current.canPublish && event.canPublish);
@@ -2286,6 +3371,7 @@ function groupAdminEventRows(events) {
     current.vacant = sumNullableNumbers([current.vacant, event.vacant]);
     current.priceFrom = minNullableNumber([current.priceFrom, event.priceFrom]);
     current.offerPriceRub = minNullableNumber([current.offerPriceRub, event.offerPriceRub]);
+    current._groupHasFutureSession = Boolean(current._groupHasFutureSession || eventHasFuture);
 
     if (event.startsAt && (!current.startsAt || new Date(event.startsAt) < new Date(current.startsAt))) {
       current.startsAt = event.startsAt;
@@ -2311,11 +3397,16 @@ function groupAdminEventRows(events) {
     }
   }
 
-  return Array.from(groups.values()).sort((a, b) => {
-    const aTime = a.startsAt ? new Date(a.startsAt).getTime() : Number.POSITIVE_INFINITY;
-    const bTime = b.startsAt ? new Date(b.startsAt).getTime() : Number.POSITIVE_INFINITY;
-    return aTime - bTime || String(a.title).localeCompare(String(b.title), 'ru');
-  });
+  return Array.from(groups.values())
+    .map((group) => {
+      const { _groupHasFutureSession, ...rest } = group;
+      return finalizeGroupedAdminReadiness(rest, Boolean(_groupHasFutureSession));
+    })
+    .sort((a, b) => {
+      const aTime = a.startsAt ? new Date(a.startsAt).getTime() : Number.POSITIVE_INFINITY;
+      const bTime = b.startsAt ? new Date(b.startsAt).getTime() : Number.POSITIVE_INFINITY;
+      return aTime - bTime || String(a.title).localeCompare(String(b.title), 'ru');
+    });
 }
 
 function groupPublicEventRows(events) {
@@ -2330,7 +3421,7 @@ function groupPublicEventRows(events) {
           startsAt: event.startsAt,
           dateLabel: formatDate(event.startsAt, eventTimeZone),
           timeLabel: formatTime(event.startsAt, eventTimeZone),
-          purchaseUrl: event.offerWidgetUrl || event.offerDeeplinkUrl || buildProviderWidgetUrl(event),
+          purchaseUrl: purchaseInfo(event).url || buildProviderWidgetUrl(event),
           sourceStatus: event.sourceStatus || null,
           vacant: event.vacant ?? null,
         }
@@ -2389,12 +3480,12 @@ function groupPublicEventRows(events) {
 }
 
 function adminEventGroupKey(event) {
-  return [
-    normalizeGroupPart(event.source),
-    normalizeGroupPart(event.title),
-    normalizeGroupPart(event.city),
-    normalizeGroupPart(formatPublicVenueTitle(event.venue) || event.venue),
-  ].join('|');
+  return buildAdminEventGroupKey({
+    sourceName: event.source,
+    title: event.title,
+    city: event.city,
+    venue: event.venue,
+  });
 }
 
 function publicEventGroupKey(event) {
@@ -2415,261 +3506,6 @@ function publicEventGroupKey(event) {
   ].join('|');
 }
 
-export function regroupMappedPublicCatalogSessions(sessions) {
-  const groups = new Map();
-
-  for (const session of sessions) {
-    const key = session.groupKey;
-    if (!key) {
-      groups.set(`id:${session.id}`, session);
-      continue;
-    }
-
-    const slotFromSession = session.startsAt
-      ? {
-          eventId: session.id,
-          startsAt: session.startsAt,
-          dateLabel: session.dateLabel,
-          timeLabel: session.timeLabel,
-          purchaseUrl: session.purchaseUrl,
-          sourceStatus: session.sourceStatus || null,
-          purchaseReady: session.purchaseReady,
-          vacant: session.vacant ?? null,
-        }
-      : null;
-    const current = groups.get(key);
-
-    if (!current) {
-      groups.set(key, {
-        ...session,
-        groupEventIds: uniqueValues(session.groupEventIds || [session.id]),
-        groupedEventsCount: session.groupedEventsCount || 1,
-        sessionCount: session.sessionCount || (slotFromSession ? 1 : 0),
-        upcomingSlots: uniqueSlots(
-          (session.upcomingSlots || []).concat(slotFromSession ? [slotFromSession] : []),
-        ),
-      });
-      continue;
-    }
-
-    current.groupEventIds = uniqueValues(current.groupEventIds.concat(session.groupEventIds || [session.id]));
-    current.groupedEventsCount = current.groupEventIds.length;
-    current.sessionCount = (current.sessionCount || 0) + (session.sessionCount || (slotFromSession ? 1 : 0));
-    current.upcomingSlots = uniqueSlots(
-      (current.upcomingSlots || []).concat(session.upcomingSlots || []).concat(slotFromSession ? [slotFromSession] : []),
-    );
-    current.priceFrom = minNullableNumber([current.priceFrom, session.priceFrom]);
-    current.vacant = sumNullableNumbers([current.vacant, session.vacant]);
-    current.tags = uniqueValues((current.tags || []).concat(session.tags || []));
-    current.title = mergeCatalogDisplayTitle(current.title, session.title, current.venue || session.venue);
-    if (session.manualLandingStatus === 'PINNED') current.manualLandingStatus = 'PINNED';
-
-    if (shouldPromoteGroupedRepresentative(current, session)) {
-      const merged = {
-        groupKey: key,
-        groupEventIds: current.groupEventIds,
-        groupedEventsCount: current.groupedEventsCount,
-        sessionCount: current.sessionCount,
-        upcomingSlots: current.upcomingSlots,
-        priceFrom: current.priceFrom,
-        vacant: current.vacant,
-        tags: current.tags,
-        manualLandingStatus: current.manualLandingStatus,
-      };
-      Object.assign(current, session, merged);
-    }
-  }
-
-  return Array.from(groups.values())
-    .map((session) => ({
-      ...session,
-      title: resolveCatalogDisplayTitle(session.title, session.venue),
-      groupedEventsCount: session.groupEventIds?.length || session.groupedEventsCount || 1,
-      sessionCount: session.sessionCount || session.upcomingSlots?.length || 1,
-      upcomingSlots: uniqueSlots(session.upcomingSlots || []).sort(
-        (a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime(),
-      ),
-    }))
-    .sort((a, b) => {
-      const aTime = a.startsAt ? new Date(a.startsAt).getTime() : Number.POSITIVE_INFINITY;
-      const bTime = b.startsAt ? new Date(b.startsAt).getTime() : Number.POSITIVE_INFINITY;
-      return aTime - bTime || String(a.title).localeCompare(String(b.title), 'ru');
-    });
-}
-
-const KNOWN_PIER_ADDRESS_PATTERNS = [
-  { key: 'sinopskaya-10', test: (text) => /синопск/.test(text) && /\b10\b/.test(text) },
-  { key: 'fontanka-53', test: (text) => /фонтанк/.test(text) && /\b53\b/.test(text) },
-];
-
-function sessionWidgetProvider(session) {
-  const code = String(session.offerSourceCode || session.purchaseProvider || session.sourceCode || '').toUpperCase();
-  if (code.includes('TEPLOHOD')) return 'TEPLOHOD';
-  if (code.includes('TICKETSCLOUD') || code === 'TC') return 'TICKETSCLOUD';
-  const url = String(session.purchaseUrl || '').toLowerCase();
-  if (url.includes('teplohod.info')) return 'TEPLOHOD';
-  if (url.includes('ticketscloud')) return 'TICKETSCLOUD';
-  const groupKey = String(session.groupKey || '').toLowerCase();
-  if (groupKey.startsWith('teplohod')) return 'TEPLOHOD';
-  if (groupKey.startsWith('ticketscloud')) return 'TICKETSCLOUD';
-  return null;
-}
-
-function isWidgetProviderSession(session) {
-  return sessionWidgetProvider(session) != null;
-}
-
-function canonicalPierLocationKey(name, address) {
-  const text = normalizeVenueTextKey(`${name || ''} ${address || ''}`);
-  if (!text) return null;
-
-  for (const pattern of KNOWN_PIER_ADDRESS_PATTERNS) {
-    if (pattern.test(text)) return pattern.key;
-  }
-
-  if (/причал|набереж/.test(text)) {
-    const addressKey = canonicalVenueAddressKey(name, address);
-    if (addressKey.length >= 8) return `pier|${addressKey}`;
-  }
-
-  return null;
-}
-
-function canonicalSessionPierKey(session) {
-  return canonicalPierLocationKey(session.venue, session.venueAddress);
-}
-
-function normalizeCrossSourceTourTitle(title) {
-  let text = String(title || '')
-    .toLowerCase()
-    .replace(/[«»"'“”]/g, ' ')
-    .replace(
-      /^(?:(?:обзорная|ночная|утренняя|авторская|детская|вечерняя)\s+)?(?:экскурсия|развлекательно\s*-\s*познавательная\s+программа)\s+/i,
-      '',
-    )
-    .replace(/\s+с\s+гидом\b/g, '')
-    .replace(/,\s*или\s+.+/g, '')
-    .replace(/\s+\d+\+\s*$/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-
-  return normalizeVenueTextKey(text);
-}
-
-function crossSourceTitlesMatch(leftTitle, rightTitle) {
-  const left = normalizeCrossSourceTourTitle(leftTitle);
-  const right = normalizeCrossSourceTourTitle(rightTitle);
-  if (!left || !right) return false;
-  if (left === right) return true;
-  if (left.includes(right) || right.includes(left)) return true;
-
-  const leftTokens = new Set(left.split(' ').filter((token) => token.length > 3));
-  const rightTokens = new Set(right.split(' ').filter((token) => token.length > 3));
-  if (!leftTokens.size || !rightTokens.size) return false;
-
-  let overlap = 0;
-  for (const token of leftTokens) {
-    if (rightTokens.has(token)) overlap += 1;
-  }
-
-  const minSize = Math.min(leftTokens.size, rightTokens.size);
-  return overlap >= 2 && overlap / minSize >= 0.6;
-}
-
-function crossSourceProviderScore(session) {
-  let score = 0;
-  if (sessionWidgetProvider(session) === 'TEPLOHOD') score += 100;
-  if (sessionWidgetProvider(session) === 'TICKETSCLOUD') score += 10;
-  if (session.purchaseReady !== false) score += 50;
-  if ((session.upcomingSlots || []).length > 0) score += 5;
-  if (session.imageUrl) score += 3;
-  if (session.manualLandingStatus === 'PINNED') score += 1000;
-  if (!isPublicSessionPurchaseBlocked(session)) score += 20;
-  return score;
-}
-
-function preferCrossSourceRepresentative(current, candidate) {
-  return crossSourceProviderScore(candidate) > crossSourceProviderScore(current);
-}
-
-function publicCrossSourceCatalogKey(session) {
-  const city = normalizeGroupPart(resolvePublicSessionCity(session));
-  const pier = canonicalSessionPierKey(session) || normalizeGroupPart(session.venue);
-  const title = normalizeCrossSourceTourTitle(session.title);
-  return `${city}|${pier}|${title}`;
-}
-
-function mergeCrossSourceSessions(current, candidate) {
-  const winner = preferCrossSourceRepresentative(current, candidate) ? candidate : current;
-  const mergedGroupEventIds = uniqueValues(
-    sessionGroupIds(current).concat(sessionGroupIds(candidate)),
-  );
-
-  return {
-    ...winner,
-    groupKey: publicCrossSourceCatalogKey(winner),
-    groupEventIds: mergedGroupEventIds,
-    groupedEventsCount: mergedGroupEventIds.length,
-    priceFrom: minNullableNumber([current.priceFrom, candidate.priceFrom]),
-    vacant: sumNullableNumbers([current.vacant, candidate.vacant]),
-    manualLandingStatus:
-      current.manualLandingStatus === 'PINNED' || candidate.manualLandingStatus === 'PINNED' ? 'PINNED' : null,
-  };
-}
-
-export function dedupeCrossSourceCatalogSessions(sessions) {
-  const passthrough = [];
-  const pierSessions = [];
-
-  for (const session of sessions || []) {
-    if (isWidgetProviderSession(session) && canonicalSessionPierKey(session)) {
-      pierSessions.push(session);
-    } else {
-      passthrough.push(session);
-    }
-  }
-
-  const used = new Set();
-  const merged = [];
-
-  for (let index = 0; index < pierSessions.length; index += 1) {
-    if (used.has(index)) continue;
-
-    let current = pierSessions[index];
-    used.add(index);
-    const pierKey = canonicalSessionPierKey(current);
-
-    for (let otherIndex = index + 1; otherIndex < pierSessions.length; otherIndex += 1) {
-      if (used.has(otherIndex)) continue;
-      const other = pierSessions[otherIndex];
-      if (canonicalSessionPierKey(other) !== pierKey) continue;
-      if (sessionWidgetProvider(current) === sessionWidgetProvider(other)) continue;
-      if (!crossSourceTitlesMatch(current.title, other.title)) continue;
-      current = mergeCrossSourceSessions(current, other);
-      used.add(otherIndex);
-    }
-
-    merged.push(current);
-  }
-
-  return passthrough.concat(merged);
-}
-
-function uniqueSlots(slots) {
-  const seen = new Set();
-  const result = [];
-  for (const slot of slots || []) {
-    const key = `${slot.startsAt || ''}|${slot.eventId || ''}`;
-    if (!slot.startsAt || seen.has(key)) continue;
-    seen.add(key);
-    result.push(slot);
-  }
-  return result;
-}
-
-function sessionGroupIds(session) {
-  return uniqueValues([session?.id, ...(session?.groupEventIds || [])]);
-}
 
 function primaryOfferMap(offers) {
   const map = new Map();
@@ -2685,13 +3521,6 @@ function primaryOfferMap(offers) {
   }
 
   return map;
-}
-
-function normalizeGroupPart(value) {
-  return String(value || '')
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, ' ');
 }
 
 function isDateLikeCatalogTitle(title) {
@@ -2719,32 +3548,9 @@ function normalizeCatalogGroupTitle(rawTitle) {
   return text;
 }
 
-function resolveCatalogDisplayTitle(rawTitle, venue) {
-  const normalized = normalizeCatalogGroupTitle(rawTitle);
-  if (normalized.length >= 3 && !isDateLikeCatalogTitle(normalized)) return normalized;
+const CATALOG_GROUP_TITLE_SOURCE_SQL = `coalesce(nullif(trim("overrideTitle"), ''), title)`;
 
-  const cleanRaw = String(rawTitle || '').replace(/\s+/g, ' ').trim();
-  if (cleanRaw && !isDateLikeCatalogTitle(cleanRaw)) return cleanRaw;
-
-  const venueTitle = formatPublicVenueTitle(venue) || String(venue || '').trim();
-  if (venueTitle && venueTitle !== 'Не указано') return venueTitle;
-
-  return cleanRaw || 'Событие';
-}
-
-function mergeCatalogDisplayTitle(currentTitle, candidateTitle, venue) {
-  const candidates = [currentTitle, candidateTitle].filter(Boolean);
-  for (const raw of candidates) {
-    const normalized = normalizeCatalogGroupTitle(raw);
-    if (normalized.length >= 3 && !isDateLikeCatalogTitle(normalized)) return normalized;
-  }
-  for (const raw of candidates) {
-    if (raw && !isDateLikeCatalogTitle(raw)) return String(raw).trim();
-  }
-  return resolveCatalogDisplayTitle(candidates[0], venue);
-}
-
-function catalogGroupTitleSqlExpression(column = 'title') {
+function catalogGroupTitleSqlExpression(column = CATALOG_GROUP_TITLE_SOURCE_SQL) {
   return `regexp_replace(
     regexp_replace(
       regexp_replace(
@@ -2761,22 +3567,8 @@ function catalogGroupTitleSqlExpression(column = 'title') {
   )`;
 }
 
-function uniqueValues(values) {
-  return Array.from(new Set(values.filter(Boolean)));
-}
-
-function minNullableNumber(values) {
-  const numbers = values.filter((value) => Number.isFinite(value) && value >= MIN_DISPLAY_PRICE_RUB);
-  return numbers.length ? Math.min(...numbers) : null;
-}
-
 function displayPriceFrom(...values) {
   return minNullableNumber(values);
-}
-
-function sumNullableNumbers(values) {
-  const numbers = values.filter((value) => Number.isFinite(value));
-  return numbers.length ? numbers.reduce((sum, value) => sum + value, 0) : null;
 }
 
 function maxSeverity(left, right) {
@@ -2830,6 +3622,8 @@ export async function buildAdminEventDetail(db, eventId) {
     return {
       eventId,
       eventIds: [],
+      event: null,
+      override: null,
       summary: {
         slots: 0,
         offers: 0,
@@ -2845,10 +3639,13 @@ export async function buildAdminEventDetail(db, eventId) {
         orders: 0,
         ticketStatuses: [],
       },
+      venueLinks: [],
     };
   }
 
-  const [sessionsResult, offersResult, salesResult, orderStatusResult] = await Promise.all([
+  const primaryEventId = eventIds.includes(eventId) ? eventId : eventIds[0];
+
+  const [sessionsResult, offersResult, salesResult, orderStatusResult, contentResult, venueLinks] = await Promise.all([
     db.query(
       `
         select
@@ -2906,6 +3703,37 @@ export async function buildAdminEventDetail(db, eventId) {
       `,
       [eventIds],
     ),
+    db.query(
+      `
+        select
+          e.id,
+          e.title,
+          e.description,
+          e."imageUrl",
+          e."seoH1",
+          e."seoTitle",
+          e."seoDescription",
+          e."canonicalPath",
+          e."isIndexable",
+          override.title as "overrideTitle",
+          override.description as "overrideDescription",
+          override."shortDescription" as "overrideShortDescription",
+          override."imageUrl" as "overrideImageUrl",
+          override."seoH1" as "overrideSeoH1",
+          override."seoTitle" as "overrideSeoTitle",
+          override."seoDescription" as "overrideSeoDescription",
+          override."canonicalPath" as "overrideCanonicalPath",
+          override."isIndexable" as "overrideIsIndexable",
+          override."editorStatus" as "overrideEditorStatus",
+          override."mergeGroupKey" as "overrideMergeGroupKey"
+        from "Event" e
+        left join "EventOverride" override on override."eventId" = e.id
+        where e.id = $1
+        limit 1
+      `,
+      [primaryEventId],
+    ),
+    loadAdminEventVenueLinks(db, primaryEventId),
   ]);
 
   const sessions = sessionsResult.rows.map((row) => ({
@@ -2935,10 +3763,41 @@ export async function buildAdminEventDetail(db, eventId) {
     .map((session) => session.priceFrom)
     .concat(offers.map((offer) => offer.priceRub))
     .filter((value) => Number.isFinite(value) && value >= MIN_DISPLAY_PRICE_RUB);
+  const contentRow = contentResult.rows[0] || null;
+  const event = contentRow
+    ? {
+        id: contentRow.id,
+        title: contentRow.title,
+        description: contentRow.description,
+        imageUrl: contentRow.imageUrl,
+        seoH1: contentRow.seoH1,
+        seoTitle: contentRow.seoTitle,
+        seoDescription: contentRow.seoDescription,
+        canonicalPath: contentRow.canonicalPath,
+        isIndexable: contentRow.isIndexable,
+      }
+    : null;
+  const override = contentRow
+    ? {
+        title: contentRow.overrideTitle,
+        description: contentRow.overrideDescription,
+        shortDescription: contentRow.overrideShortDescription,
+        imageUrl: contentRow.overrideImageUrl,
+        seoH1: contentRow.overrideSeoH1,
+        seoTitle: contentRow.overrideSeoTitle,
+        seoDescription: contentRow.overrideSeoDescription,
+        canonicalPath: contentRow.overrideCanonicalPath,
+        isIndexable: contentRow.overrideIsIndexable,
+        editorStatus: contentRow.overrideEditorStatus,
+        mergeGroupKey: contentRow.overrideMergeGroupKey,
+      }
+    : null;
 
   return {
     eventId,
     eventIds,
+    event,
+    override,
     summary: {
       slots: sessions.length,
       offers: offers.length,
@@ -2954,6 +3813,7 @@ export async function buildAdminEventDetail(db, eventId) {
       orders,
       ticketStatuses: orderStatusResult.rows,
     },
+    venueLinks,
   };
 }
 
@@ -2971,7 +3831,8 @@ export async function updateAdminEventOverride(db, eventId, payload) {
         "seoDescription",
         "canonicalPath",
         "isIndexable",
-        "editorStatus"
+        "editorStatus",
+        "mergeGroupKey"
       from "EventOverride"
       where "eventId" = $1
     `,
@@ -2989,6 +3850,7 @@ export async function updateAdminEventOverride(db, eventId, payload) {
     canonicalPath: current.canonicalPath ?? null,
     isIndexable: current.isIndexable ?? null,
     editorStatus: current.editorStatus ?? null,
+    mergeGroupKey: current.mergeGroupKey ?? null,
     ...normalized,
   };
 
@@ -3007,9 +3869,10 @@ export async function updateAdminEventOverride(db, eventId, payload) {
         "canonicalPath",
         "isIndexable",
         "editorStatus",
+        "mergeGroupKey",
         "updatedAt"
       )
-      values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, now())
+      values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, now())
       on conflict ("eventId") do update set
         title = excluded.title,
         description = excluded.description,
@@ -3021,6 +3884,7 @@ export async function updateAdminEventOverride(db, eventId, payload) {
         "canonicalPath" = excluded."canonicalPath",
         "isIndexable" = excluded."isIndexable",
         "editorStatus" = excluded."editorStatus",
+        "mergeGroupKey" = excluded."mergeGroupKey",
         "updatedAt" = now()
       returning
         title,
@@ -3032,7 +3896,8 @@ export async function updateAdminEventOverride(db, eventId, payload) {
         "seoDescription",
         "canonicalPath",
         "isIndexable",
-        "editorStatus"
+        "editorStatus",
+        "mergeGroupKey"
     `,
     [
       randomUUID(),
@@ -3047,8 +3912,11 @@ export async function updateAdminEventOverride(db, eventId, payload) {
       next.canonicalPath,
       next.isIndexable,
       next.editorStatus,
+      next.mergeGroupKey,
     ],
   );
+
+  invalidateAdminGroupedEventsCache(db, 'event override');
 
   return {
     eventId,
@@ -3062,14 +3930,19 @@ export async function buildPublicHome(db) {
     return publicHomeCache.payload;
   }
 
-  const [stats, destinations, catalogSessions, venues] = await Promise.all([
-    db.stats(),
-    destinationRows(db),
-    publicCatalogSessions(db),
-    publicVenues(db, 36),
-  ]);
-  const sessions = catalogSessions.slice(0, 180);
-  const landings = buildPublicLandings(catalogSessions);
+  const t0 = Date.now();
+  // Catalog first (destinations/landings/venues derive from it) - avoid parallel hub SQL.
+  const [stats, catalogSessions] = await Promise.all([db.stats(), publicCatalogSessions(db)]);
+  // Soft hub or top-N from sessions - never await full publicVenueHubRows cold rebuild (~5s).
+  const venues = await publicVenuesForHome(db, catalogSessions, 36);
+  const destinations = buildPublicDestinationRowsFromSessions(catalogSessions);
+  // Compact card DTO only - full session blobs made /api/public/home ~1.2MB.
+  const sessions = catalogSessions
+    .filter(sessionHasCoverImage)
+    .slice(0, 180)
+    .map((session) => toPublicHomeCardSession(session));
+  // Prefer catalog landingSlugs - rematch of 3k sessions was ~1.5s CPU on MSK.
+  const landings = buildPublicLandings(catalogSessions, { preferCachedSlugs: true });
 
   const payload = {
     generatedAt: new Date().toISOString(),
@@ -3089,6 +3962,10 @@ export async function buildPublicHome(db) {
     expiresAt: now + PUBLIC_CATALOG_CACHE_MS,
     payload,
   };
+
+  console.log(
+    `buildPublicHome: ${catalogSessions.length} sessions, ${venues.length} venues in ${Date.now() - t0}ms`,
+  );
 
   return payload;
 }
@@ -3148,7 +4025,10 @@ export async function buildPublicHomePreview(db) {
   const catalogSessions = await publicCatalogSessions(db);
   const payload = {
     generatedAt: new Date().toISOString(),
-    sessions: catalogSessions.filter(sessionHasCoverImage).slice(0, PUBLIC_HOME_PREVIEW_LIMIT),
+    sessions: catalogSessions
+      .filter(sessionHasCoverImage)
+      .slice(0, PUBLIC_HOME_PREVIEW_LIMIT)
+      .map((session) => toPublicHomeCardSession(session)),
     landings: buildPublicLandings(catalogSessions),
   };
 
@@ -3267,7 +4147,9 @@ export async function buildPublicSearch(db, searchParams) {
   }
 
   if (items.length < 8) {
-    const landings = buildPublicLandings(sessions).filter((landing) => landing.events > 0);
+    const landings = buildPublicLandings(sessions).filter(
+      (landing) => landing.events > 0 && !buildOffSeasonLandingSlugs().has(landing.slug),
+    );
     for (const landing of landings) {
       if (items.length >= 8) break;
       const label = `${landing.title} ${landing.subtitle}`.toLowerCase();
@@ -3291,11 +4173,10 @@ export async function buildPublicSearch(db, searchParams) {
 const PROMO_LANDING_ORDER = [
   'spb-yards',
   'bridges-night',
+  'moscow-city-day',
   'moscow-dinner-boat',
-  'moscow-museums',
   'river-party',
   'concerts-genre',
-  'salute-9-may',
   'family-kids',
   'new-year',
   'bus-tours',
@@ -3303,6 +4184,7 @@ const PROMO_LANDING_ORDER = [
   'standup',
   'planetarium',
   'active-sport',
+  'moscow-museums',
 ];
 
 const PUBLIC_LANDING_CATEGORY_PATH = new Map([
@@ -3322,6 +4204,7 @@ const PUBLIC_CITY_LANDING_PATH = new Map([
   ['spb-yards', 'spb-yards'],
   ['moscow-dinner-boat', 'dinner-boat'],
   ['moscow-museums', 'moscow-museums'],
+  ['moscow-city-day', 'den-goroda'],
   ['planetarium', 'planetarium'],
 ]);
 
@@ -3332,6 +4215,7 @@ const PUBLIC_DEFAULT_CITY_BY_LANDING = new Map([
   ['spb-yards', 'saint-petersburg'],
   ['moscow-dinner-boat', 'moscow'],
   ['moscow-museums', 'moscow'],
+  ['moscow-city-day', 'moscow'],
   ['planetarium', 'saint-petersburg'],
 ]);
 
@@ -3400,25 +4284,19 @@ const PROMO_CITY_LANDING_BOOSTS = {
   'saint-petersburg': ['spb-yards', 'bridges-night'],
   'санкт-петербург': ['spb-yards', 'bridges-night'],
   'spb': ['spb-yards', 'bridges-night'],
-  'moscow': ['moscow-dinner-boat', 'moscow-museums'],
-  'moskva': ['moscow-dinner-boat', 'moscow-museums'],
-  'москва': ['moscow-dinner-boat', 'moscow-museums'],
+  // City Day first; museums/workshops deliberately not boosted into Moscow top.
+  'moscow': ['moscow-city-day', 'moscow-dinner-boat', 'river-cruises', 'concerts-genre'],
+  'moskva': ['moscow-city-day', 'moscow-dinner-boat', 'river-cruises', 'concerts-genre'],
+  'москва': ['moscow-city-day', 'moscow-dinner-boat', 'river-cruises', 'concerts-genre'],
 };
 
-function scopePublicCatalogSessions(sessions, cityFilter) {
-  const key = String(cityFilter || '').trim().toLowerCase();
-  if (!key || key === 'all') return sessions;
-  return sessions.filter((session) => {
-    const cityName = String(session.city || '').toLowerCase();
-    const destination = String(session.destination || '').toLowerCase();
-    const citySlug = String(session.citySlug || session.sourceCitySlug || '').toLowerCase();
-    return cityName === key || destination === key || citySlug === key;
-  });
-}
+export { LANDING_PAGE_SESSION_LIMIT, scopePublicCatalogSessions, selectLandingPageSessions };
 
 function buildSortedPublicLandings(sessions, cityFilter = '') {
   return sortPromoLandings(
-    buildPublicLandings(sessions).filter((landing) => landing.events > 0),
+    buildPublicLandings(sessions).filter(
+      (landing) => landing.events > 0 && !buildOffSeasonLandingSlugs().has(landing.slug),
+    ),
     cityFilter,
   );
 }
@@ -3467,8 +4345,15 @@ function resolveCityCardImageFromSlug(slug) {
 }
 
 export async function buildCatalogSessions(db, searchParams) {
-  const limit = clampNumber(searchParams.get('limit'), 1, 240, 120);
-  const offset = clampNumber(searchParams.get('offset'), 0, 100000, 0);
+  const limit = clampNumber(searchParams.get('limit'), 1, 300, 100);
+  const page = clampNumber(searchParams.get('page'), 1, 100000, 1);
+  const offsetRaw = searchParams.get('offset');
+  const offset =
+    offsetRaw != null && String(offsetRaw).trim() !== ''
+      ? clampNumber(offsetRaw, 0, 100000, 0)
+      : page > 1
+        ? (page - 1) * limit
+        : 0;
   const query = String(searchParams.get('q') || '').trim().toLowerCase();
   const destination = searchParams.get('destination');
   const city = searchParams.get('city');
@@ -3511,7 +4396,14 @@ export async function buildCatalogSessions(db, searchParams) {
     });
 
   const sorted = sortCatalogSessions(rows, sort);
-  const arranged = sort === 'price' || sort === 'time' ? sorted : spreadCatalogSessionsByCoverImage(sorted);
+  const arranged =
+    sort === 'price' ||
+    sort === 'price_asc' ||
+    sort === 'price_desc' ||
+    sort === 'time' ||
+    sort === 'departing_soon'
+      ? sorted
+      : spreadCatalogSessionsByCoverImage(sorted);
   return { total: arranged.length, offset, limit, items: arranged.slice(offset, offset + limit), facets };
 }
 
@@ -3535,37 +4427,74 @@ function buildCatalogFacets(sessions) {
   };
 }
 
-export function sessionHasCoverImage(session) {
-  const url = String(session?.imageUrl || '').trim();
-  if (!url) return false;
-  if (url.startsWith('/images/cities/')) return false;
-  return true;
-}
-
 function normalizePublicSessionImageKey(imageUrl) {
   const raw = String(imageUrl || '').trim();
   if (!raw) return null;
 
+  if (raw.includes('/_next/image') && /[?&]url=/.test(raw)) {
+    try {
+      const proxy = new URL(raw.replace(/&amp;/g, '&'), 'https://daibilet.ru');
+      const inner = proxy.searchParams.get('url');
+      if (inner) return normalizePublicSessionImageKey(inner);
+    } catch {
+      // fall through
+    }
+  }
+
   let pathname = raw;
-  let hostname = '';
+  let search = '';
   try {
-    const parsed = new URL(raw, 'https://daibilet.ru');
+    const parsed = new URL(raw.replace(/&amp;/g, '&'), 'https://daibilet.ru');
+    if (parsed.port === '443' || parsed.port === '80') parsed.port = '';
     pathname = parsed.pathname;
-    hostname = parsed.hostname.toLowerCase();
+    search = parsed.search || '';
   } catch {
-    pathname = raw.split('?')[0]?.split('#')[0] || raw;
+    const bare = raw.split('#')[0] || raw;
+    const q = bare.indexOf('?');
+    pathname = q >= 0 ? bare.slice(0, q) : bare;
+    search = q >= 0 ? bare.slice(q) : '';
   }
 
   const normalizedPath = pathname.replace(/\/$/, '').toLowerCase();
-  const file = normalizedPath.split('/').filter(Boolean).pop() || '';
-  if (file && /\.(jpe?g|png|webp|gif|avif|bmp|svg)$/i.test(file)) {
-    if (/^[a-f0-9-]{16,}$/i.test(file.replace(/\.[^.]+$/, '')) || file.length >= 16) {
-      return `img:${file}`;
+  const file = decodeURIComponent(normalizedPath.split('/').filter(Boolean).pop() || '').toLowerCase();
+  const sizeSuffixRe =
+    /(?:[-_](?:\d{2,4}x\d{2,4}|w\d{2,4}|h\d{2,4}|q\d{2,3}|thumb|small|medium|large|cover|card|preview|resized?))+(?=\.[a-z0-9]+$)/i;
+
+  if (search) {
+    try {
+      const params = new URLSearchParams(search.startsWith('?') ? search.slice(1) : search);
+      const dirtyAlias = params.get('dirtyAlias') || params.get('dirty_alias');
+      if (dirtyAlias && dirtyAlias.trim()) {
+        const aliasFile = decodeURIComponent(dirtyAlias.trim()).toLowerCase().split('/').pop() || '';
+        if (aliasFile) {
+          const stripped = aliasFile.replace(sizeSuffixRe, '');
+          return `img:${stripped}`;
+        }
+      }
+    } catch {
+      // fall through
     }
-    if (hostname) return `img:${hostname}/${file}`;
   }
 
-  if (hostname) return `${hostname}${normalizedPath}`;
+  if (file && /\.(jpe?g|png|webp|gif|avif|bmp|svg)$/i.test(file)) {
+    const stripped = file.replace(sizeSuffixRe, '');
+    const oid = stripped.match(/^([a-f0-9]{24})\.(jpe?g|png|webp|gif|avif)$/i);
+    if (oid) return `tc-asset:${oid[1].toLowerCase()}`;
+    const teploVariant = stripped.match(/^([a-f0-9]{8,})-\d+\.(jpe?g|png|webp|gif|avif|bmp|svg)$/i);
+    if (teploVariant) return `stem:${teploVariant[1].toLowerCase()}`;
+    return `img:${stripped}`;
+  }
+
+  if (search) {
+    try {
+      const params = new URLSearchParams(search.startsWith('?') ? search.slice(1) : search);
+      const item = params.get('item') || params.get('id') || params.get('key');
+      if (item && item.trim()) return `img:q:${item.trim().toLowerCase()}`;
+    } catch {
+      // fall through
+    }
+  }
+
   return normalizedPath || null;
 }
 
@@ -3598,11 +4527,18 @@ export function spreadCatalogSessionsByCoverImage(sessions) {
 
 function sortCatalogSessions(sessions, sort) {
   const sorted = [...sessions];
-  if (sort === 'price') {
+  if (sort === 'price' || sort === 'price_asc') {
     return sorted.sort((a, b) => {
       const aPrice = Number.isFinite(a.priceFrom) ? a.priceFrom : Number.POSITIVE_INFINITY;
       const bPrice = Number.isFinite(b.priceFrom) ? b.priceFrom : Number.POSITIVE_INFINITY;
       return aPrice - bPrice || compareSessionTime(a, b);
+    });
+  }
+  if (sort === 'price_desc') {
+    return sorted.sort((a, b) => {
+      const aPrice = Number.isFinite(a.priceFrom) ? a.priceFrom : Number.POSITIVE_INFINITY;
+      const bPrice = Number.isFinite(b.priceFrom) ? b.priceFrom : Number.POSITIVE_INFINITY;
+      return bPrice - aPrice || compareSessionTime(a, b);
     });
   }
   if (sort === 'popular') {
@@ -3646,143 +4582,7 @@ function humanizeSlug(slug) {
     .join(' ');
 }
 
-export async function buildPublicVenuePage(db, venueSlugOrId) {
-  const venue = await resolvePublicVenueRow(db, venueSlugOrId);
-  if (!venue || venue.pageStatus === 'HIDDEN') return null;
-
-  const [catalogSessions, hubRows] = await Promise.all([
-    publicCatalogSessions(db),
-    publicVenueHubRows(db, 500, { requireEvents: false }),
-  ]);
-  const venueHeroImageFallbacks = buildActiveVenueEventCounts(catalogSessions).heroImageFallbacks;
-  const mergedGroup = findMergedVenueGroup(hubRows, venue.id);
-  const venueIds = mergedGroup?.mergedVenueIds || [venue.id];
-  const venueContexts = collectVenueSessionLookupContexts(venue, mergedGroup);
-  const sessions = lookupVenueCatalogSessions(venueIds, catalogSessions, venueContexts).slice(0, 120);
-  if (!sessions.length) {
-    const hasProfile =
-      Boolean(String(venue.address || '').trim()) &&
-      Boolean(String(venue.description || venue.shortDescription || '').trim());
-    const status = String(venue.pageStatus || '').toUpperCase();
-    const isLocationPage = publicVenuePageTemplate(resolvePublicVenueKindFromRow(venue)) === 'location';
-    if (!(isLocationPage && hasProfile && status !== 'NONE' && status !== 'HIDDEN')) {
-      return null;
-    }
-  }
-  const waterEvents = sessions.filter(isWaterCatalogSession).length;
-  const busEvents = sessions.filter(isBusCatalogSession).length;
-  const canonicalVenue =
-    mergedGroup && mergedGroup.id !== venue.id ? (await resolvePublicVenueRow(db, mergedGroup.id)) || venue : venue;
-  const relatedVenues = await publicRelatedVenues(db, venue.id, venue.city, 6, hubRows);
-  const hubGateRow = {
-    title: canonicalVenue.title,
-    name: canonicalVenue.title,
-    kind: canonicalVenue.kind,
-    pageStatus: canonicalVenue.pageStatus,
-    address: canonicalVenue.address,
-    description: canonicalVenue.description,
-    shortDescription: canonicalVenue.shortDescription,
-    events: sessions.length,
-    busEvents,
-    waterEvents,
-    totalEvents: sessions.length,
-  };
-  const inPublicHub = isPublicVenueHub(hubGateRow, { requireEvents: false });
-  const curatedMeetingPointPage =
-    !inPublicHub &&
-    resolvePublicVenueKindFromRow(hubGateRow) === 'meeting_point' &&
-    Boolean(String(canonicalVenue.address || '').trim()) &&
-    Boolean(String(canonicalVenue.description || canonicalVenue.shortDescription || '').trim()) &&
-    sessions.length > 0 &&
-    !['NONE', 'HIDDEN'].includes(String(canonicalVenue.pageStatus || '').toUpperCase());
-  if (!inPublicHub && !curatedMeetingPointPage) {
-    return null;
-  }
-  const prices = sessions.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
-  const categories = countBy(sessions.map((event) => event.category).filter(Boolean));
-  const routeCount = new Set(sessions.map((session) => session.groupKey || session.id).filter(Boolean)).size || sessions.length;
-  const resolvedType = resolvePublicVenueKind(canonicalVenue.kind, canonicalVenue.title, canonicalVenue.address, {
-    shortDescription: mergedGroup?.shortDescription || canonicalVenue.shortDescription,
-    description: canonicalVenue.description,
-    waterEvents,
-    busEvents,
-    totalEvents: sessions.length,
-  });
-  const displayName = applyPublicVenueDisplayName(
-    {
-      name: formatPublicVenueTitle(canonicalVenue.title),
-      address: mergedGroup?.address || canonicalVenue.address,
-      city: canonicalVenue.city || 'Не указан',
-    },
-    resolvedType,
-  );
-  const normalizedVenue = applyPublicVenueNormalization({
-    name: displayName,
-    title: displayName,
-    address: mergedGroup?.address || canonicalVenue.address,
-    city: canonicalVenue.city || 'Не указан',
-  });
-  const hasDescription = Boolean(String(canonicalVenue.description || mergedGroup?.shortDescription || canonicalVenue.shortDescription || '').trim());
-  const hasAddress = Boolean(String(normalizedVenue.address || '').trim());
-  const hasHeroImage = Boolean(resolveVenueHeroImageUrl(
-    {
-      id: canonicalVenue.id,
-      heroImageUrl: mergedGroup?.heroImageUrl || canonicalVenue.heroImageUrl,
-      mergedVenueIds: venueIds,
-    },
-    venueHeroImageFallbacks,
-  ));
-  const pageTemplate = publicVenuePageTemplate(resolvedType);
-  const sessionCount = sessions.length;
-  const weakVenuePage =
-    pageTemplate === 'location'
-      ? !hasAddress || (!hasDescription && !hasHeroImage) || sessionCount < 1
-      : routeCount < 3 || (!hasDescription && !hasHeroImage) || !hasAddress;
-  const isIndexable = canonicalVenue.isIndexable !== false && !weakVenuePage;
-
-  const venueCoordinates = resolvePublicVenueCoordinates(canonicalVenue, { resolvedType });
-
-  return {
-    generatedAt: new Date().toISOString(),
-    venue: {
-      id: canonicalVenue.id,
-      slug: publicVenueSlug(canonicalVenue.slug, normalizedVenue.name, canonicalVenue.id),
-      name: normalizedVenue.name,
-      title: normalizedVenue.name,
-      city: normalizedVenue.city || 'Не указан',
-      address: normalizedVenue.address,
-      latitude: venueCoordinates?.latitude ?? null,
-      longitude: venueCoordinates?.longitude ?? null,
-      type: resolvedType,
-      template: publicVenuePageTemplate(resolvedType),
-      pageStatus: canonicalVenue.pageStatus,
-      description: pickPublicVenueDescriptionText(canonicalVenue.shortDescription, canonicalVenue.description),
-      shortDescription: pickPublicVenueLeadText(canonicalVenue.shortDescription, canonicalVenue.description),
-      heroImageUrl: resolveVenueHeroImageUrl(
-        {
-          id: canonicalVenue.id,
-          heroImageUrl: mergedGroup?.heroImageUrl || canonicalVenue.heroImageUrl,
-          mergedVenueIds: venueIds,
-        },
-        venueHeroImageFallbacks,
-      ),
-      seoH1: canonicalVenue.seoH1,
-      seoTitle: canonicalVenue.seoTitle,
-      seoDescription: canonicalVenue.seoDescription,
-      canonicalPath: canonicalVenue.canonicalPath || `/${publicVenuePageTemplate(resolvedType) === 'location' ? 'locations' : 'venues'}/${publicVenueSlug(canonicalVenue.slug, normalizedVenue.name, canonicalVenue.id)}`,
-      isIndexable,
-      events: routeCount,
-      categories,
-    },
-    sessions,
-    relatedVenues,
-    stats: {
-      events: routeCount,
-      categories: Object.keys(categories).length,
-      priceFrom: prices.length ? Math.min(...prices) : null,
-    },
-  };
-}
+/** Расстояние между двумя WGS84 точками в метрах. */
 
 export async function buildPublicCityPage(db, citySlugOrId) {
   const requestedSlug = String(citySlugOrId || '').toLowerCase();
@@ -3791,14 +4591,63 @@ export async function buildPublicCityPage(db, citySlugOrId) {
     publicVenueHubRows(db, 500),
   ]);
   const matchedSessions = lookupDestinationCatalogSessions(citySlugOrId, requestedSlug, catalogSessions);
-  if (!matchedSessions.length) return null;
+  if (!matchedSessions.length) {
+    const standaloneName = matchStandaloneCityBySlug(requestedSlug) || matchStandaloneCityBySlug(citySlugOrId);
+    if (!standaloneName) return null;
+    const destination = publicDestinationFromSession({
+      destination: standaloneName,
+      destinationType: 'city',
+      city: standaloneName,
+    });
+    let cityVenues = [];
+    try {
+      const found = await db.query('select id from "City" where title = $1 limit 1', [standaloneName]);
+      const cityId = found?.rows?.[0]?.id;
+      if (cityId) cityVenues = await publicPublishedVenuesByCityId(db, cityId, 250);
+    } catch {
+      cityVenues = [];
+    }
+    const entityLabel = destinationPrepositional(destination);
+    return {
+      generatedAt: new Date().toISOString(),
+      city: {
+        id: destination.id,
+        slug: destination.slug,
+        sourceSlug: destination.sourceSlug,
+        name: destination.name,
+        title: destination.name,
+        type: 'city',
+        isDestination: true,
+        events: 0,
+        venues: cityVenues.length,
+        categories: {},
+        seoTitle: buildCityHubSeoTitle(destination.name),
+        seoDescription: `Афиша событий, экскурсий, музеев и активностей ${entityLabel}. Быстрый выбор по датам, площадкам и категориям.`,
+      },
+      sessions: [],
+      venues: cityVenues,
+      landings: [],
+      stats: {
+        events: 0,
+        venues: cityVenues.length,
+        categories: 0,
+        priceFrom: null,
+      },
+    };
+  }
 
   const destination = publicDestinationFromSession(matchedSessions[0]);
   const sessions = matchedSessions.slice(0, 160);
-  const cityVenues = publicVenuesForSessionsFromHub(sessions, venueHubRows, 24);
+  const sessionVenues = await resolvePublicVenuesForSessions(db, matchedSessions, venueHubRows, 24);
+  const cityId = matchedSessions[0]?.cityId || null;
+  const contentVenues = cityId ? await publicPublishedVenuesByCityId(db, cityId, 250) : [];
+  const cityVenues = mergeCityPageVenues(sessionVenues, contentVenues, 250);
+  const venueCount = countDistinctSessionVenues(matchedSessions);
   const prices = sessions.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
   const categories = countBy(sessions.map((event) => event.category).filter(Boolean));
-  const landings = buildPublicLandings(sessions).filter((landing) => landing.events > 0);
+  const landings = buildPublicLandings(sessions).filter(
+    (landing) => landing.events > 0 && !buildOffSeasonLandingSlugs().has(landing.slug),
+  );
   const entityLabel = destinationPrepositional(destination);
 
   return {
@@ -3811,34 +4660,41 @@ export async function buildPublicCityPage(db, citySlugOrId) {
       title: destination.name,
       type: destination.type === 'region' ? 'region' : 'city',
       isDestination: true,
-      events: sessions.length,
-      venues: cityVenues.length,
+      events: matchedSessions.length,
+      venues: venueCount,
       categories,
-      seoTitle: `${destination.name}: афиша, экскурсии и билеты | Дайбилет`,
+      seoTitle: buildCityHubSeoTitle(destination.name),
       seoDescription: `Афиша событий, экскурсий, музеев и активностей ${entityLabel}. Быстрый выбор по датам, площадкам и категориям.`,
     },
     sessions,
     venues: cityVenues,
     landings,
     stats: {
-      events: sessions.length,
-      venues: cityVenues.length,
+      events: matchedSessions.length,
+      venues: venueCount,
       categories: Object.keys(categories).length,
       priceFrom: prices.length ? Math.min(...prices) : null,
     },
   };
 }
 
-export async function buildPublicLandingPage(db, landingSlug) {
-  const rule = resolveLandingRule(landingSlug);
+export async function buildPublicLandingPage(db, landingSlug, cityFilter = '') {
+  const rule = resolveLandingRuleBySlug(landingSlug);
   if (!rule) return null;
 
   const catalogSessions = await publicCatalogSessions(db);
-  const sessions = filterSessionsForLandingRule(catalogSessions, rule);
-  const prices = sessions.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
-  const cities = countBy(sessions.map((event) => event.destination || event.city).filter(Boolean));
-  const categories = countBy(sessions.map((event) => event.category).filter(Boolean));
-  const venues = countBy(sessions.map((event) => event.venue).filter(Boolean));
+  const { matchedSessions, pageSessions, matchCount } = selectLandingPageSessions(
+    filterSessionsForLandingRule(catalogSessions, rule),
+    cityFilter,
+  );
+  // Lean SSR: city-scoped first, then card budget - avoid national top-N starving city URLs.
+  const sessions = pageSessions.map((session) => toPublicCatalogListItem(session));
+  const prices = matchedSessions
+    .flatMap((session) => [session.priceFrom, session.priceTo])
+    .filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
+  const cities = countBy(matchedSessions.map((event) => event.destination || event.city).filter(Boolean));
+  const categories = countBy(matchedSessions.map((event) => event.category).filter(Boolean));
+  const venues = countBy(matchedSessions.map((event) => event.venue).filter(Boolean));
 
   return {
     generatedAt: new Date().toISOString(),
@@ -3848,11 +4704,11 @@ export async function buildPublicLandingPage(db, landingSlug) {
       subtitle: rule.subtitle,
       city: rule.city || null,
       chips: rule.chips || [],
-      events: sessions.length,
+      events: matchCount,
       venues: Object.keys(venues).length,
       priceFrom: prices.length ? Math.min(...prices) : null,
       imageUrl: null,
-      strength: sessions.length >= 20 ? 'ready' : sessions.length > 0 ? 'seed' : 'empty',
+      strength: matchCount >= 20 ? 'ready' : matchCount > 0 ? 'seed' : 'empty',
       seoTitle: `${rule.title}: афиша, расписание и билеты | Дайбилет`,
       seoDescription: `${rule.subtitle}. Табличный выбор по датам, городам, площадкам и цене.`,
     },
@@ -3860,18 +4716,19 @@ export async function buildPublicLandingPage(db, landingSlug) {
     relatedLandings: buildPublicLandings(sessions).filter((landing) => landing.slug !== rule.slug && landing.events > 0),
     blocks: buildDefaultLandingBlocks(rule, sessions),
     stats: {
-      events: sessions.length,
-      sessions: sessions.length,
+      events: matchCount,
+      sessions: matchCount,
       cities,
       categories,
       venues,
       priceFrom: prices.length ? Math.min(...prices) : null,
+      priceTo: prices.length ? Math.max(...prices) : null,
     },
   };
 }
 
-export async function buildPublicLandingPageManaged(db, landingSlug) {
-  const rule = resolveLandingRule(landingSlug);
+export async function buildPublicLandingPageManaged(db, landingSlug, cityFilter = '') {
+  const rule = resolveLandingRuleBySlug(landingSlug);
   if (!rule) return null;
 
   const [catalogSessions, landingResult] = await Promise.all([
@@ -3916,27 +4773,35 @@ export async function buildPublicLandingPageManaged(db, landingSlug) {
   const pinnedIds = new Set(manualRows.filter((row) => row.reasons?.manualStatus === 'PINNED').map((row) => row.eventId));
   const excludedIds = new Set(manualRows.filter((row) => row.reasons?.manualStatus === 'EXCLUDED').map((row) => row.eventId));
   const manualByEventId = new Map(manualRows.map((row) => [row.eventId, row]));
-  const sessions = catalogSessions
+  const ruleMatchedSessions = catalogSessions
     .filter((session) => {
       const ids = sessionGroupIds(session);
       if (ids.some((id) => excludedIds.has(id))) return false;
       if (ids.some((id) => pinnedIds.has(id))) return true;
-      return sessionMatchesLandingSlug(session, rule.slug) && sessionMatchesLandingSchedule(session, rule);
+      return matchesLandingRule(session, rule) && sessionMatchesLandingSchedule(session, rule);
     })
-    .slice(0, 240)
     .map((session) => {
       const pinned = sessionGroupIds(session).some((id) => pinnedIds.has(id));
-      const scheduled = pinned ? session : applyLandingScheduleToSession(session, rule);
-      return {
-        ...(scheduled || session),
+      return pinned ? session : applyLandingScheduleToSession(session, rule) || session;
+    });
+  const { matchedSessions, pageSessions, matchCount } = selectLandingPageSessions(ruleMatchedSessions, cityFilter);
+  const sessions = pageSessions.map((session) => {
+      const base = {
+        ...session,
         manualLandingStatus: sessionGroupIds(session).map((id) => manualByEventId.get(id)?.reasons?.manualStatus).find(Boolean) || null,
       };
-    })
-    .filter((session) => sessionMatchesLandingSlug(session, rule.slug) || session.manualLandingStatus === 'PINNED');
-  const prices = sessions.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
-  const cities = countBy(sessions.map((event) => event.destination || event.city).filter(Boolean));
-  const categories = countBy(sessions.map((event) => event.category).filter(Boolean));
-  const venues = countBy(sessions.map((event) => event.venue).filter(Boolean));
+      // Lean SSR card for landing grids (keeps purchase URLs for CTA; truncates slots/description).
+      return {
+        ...toPublicCatalogListItem(base),
+        manualLandingStatus: base.manualLandingStatus,
+      };
+    });
+  const prices = matchedSessions
+    .flatMap((session) => [session.priceFrom, session.priceTo])
+    .filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
+  const cities = countBy(matchedSessions.map((event) => event.destination || event.city).filter(Boolean));
+  const categories = countBy(matchedSessions.map((event) => event.category).filter(Boolean));
+  const venues = countBy(matchedSessions.map((event) => event.venue).filter(Boolean));
   const landing = mapLandingRecord(landingRecord, rule);
   const seo = mapLandingSeo(landingRecord, rule);
 
@@ -3949,11 +4814,11 @@ export async function buildPublicLandingPageManaged(db, landingSlug) {
       subtitle: landing.subtitle,
       city: rule.city || null,
       chips: rule.chips || [],
-      events: sessions.length,
+      events: matchCount,
       venues: Object.keys(venues).length,
       priceFrom: prices.length ? Math.min(...prices) : null,
       imageUrl: null,
-      strength: sessions.length >= 20 ? 'ready' : sessions.length > 0 ? 'seed' : 'empty',
+      strength: matchCount >= 20 ? 'ready' : matchCount > 0 ? 'seed' : 'empty',
       seoH1: seo.h1,
       seoTitle: seo.title,
       seoDescription: seo.description,
@@ -3964,12 +4829,13 @@ export async function buildPublicLandingPageManaged(db, landingSlug) {
     relatedLandings: buildPublicLandings(sessions).filter((landingItem) => landingItem.slug !== rule.slug && landingItem.events > 0),
     blocks: blockRows.length ? blockRows.map(mapLandingBlock) : buildDefaultLandingBlocks(rule, sessions),
     stats: {
-      events: sessions.length,
-      sessions: sessions.length,
+      events: matchCount,
+      sessions: matchCount,
       cities,
       categories,
       venues,
       priceFrom: prices.length ? Math.min(...prices) : null,
+      priceTo: prices.length ? Math.max(...prices) : null,
     },
   };
 }
@@ -4012,6 +4878,11 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
         venue.title as venue,
         venue.address as "venueAddress",
         venue.kind as "venueKind",
+        venue.latitude as "venueLatitude",
+        venue.longitude as "venueLongitude",
+        venue."metroStation" as "venueMetroStation",
+        venue."wayToFind" as "venueWayToFind",
+        venue."parkingInfo" as "venueParkingInfo",
         source.code as "sourceCode",
         source.name as "sourceName",
         source_link."externalId",
@@ -4031,7 +4902,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
       left join "Source" source on source.id = source_link."sourceId"
       left join "EventOverride" override on override."eventId" = e.id
       where e.id = $1 or e.slug = $1
-      group by e.id, cat.title, city.id, city.title, city.slug, city."isDestination", region.id, region.slug, region.title, venue.id, venue.slug, venue.title, venue.address, venue.kind, source.code, source.name, source_link."externalId", override.id
+      group by e.id, cat.title, city.id, city.title, city.slug, city."isDestination", region.id, region.slug, region.title, venue.id, venue.slug, venue.title, venue.address, venue.kind, venue.latitude, venue.longitude, venue."metroStation", venue."wayToFind", venue."parkingInfo", source.code, source.name, source_link."externalId", override.id
       limit 1
     `,
       [eventLocator],
@@ -4054,7 +4925,9 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
   if (!catalogSessions) {
     catalogSessions = await publicCatalogSessions(db);
   }
-  const eventDestination = publicDestinationForCity(event);
+  const eventCity = cleanDisplayName(event.city);
+  const eventHubs = STANDALONE_CITY_NAMES.has(eventCity) ? new Set([eventCity]) : undefined;
+  const eventDestination = publicDestinationForCity(event, eventHubs);
 
   const requestedSlug = publicEventSlug(eventSlugOrId);
   if (!targetPublicSession && catalogSessions?.length) {
@@ -4080,8 +4953,38 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
     venue: event.venue,
   };
   const targetGroupKey = targetPublicSession?.groupKey || publicEventGroupKey(fallbackPublicRow);
-  const groupEventIds = targetPublicSession?.groupEventIds?.length ? targetPublicSession.groupEventIds : [event.id];
+  let groupEventIds = targetPublicSession?.groupEventIds?.length ? targetPublicSession.groupEventIds : [event.id];
   const representativeRow = targetPublicSession || fallbackPublicRow;
+
+  // Expand TicketsCloud meta siblings so a past dated slug still shows future slots.
+  const metaResult = await db.query(
+    `
+      select distinct sibling."eventId" as id
+      from "EventSourceLink" requested
+      join "EventSourceLink" sibling
+        on sibling."metaExternalId" = requested."metaExternalId"
+       and sibling."eventId" <> requested."eventId"
+      where requested."eventId" = $1
+        and requested."metaExternalId" is not null
+        and nullif(trim(requested."metaExternalId"), '') is not null
+      limit 200
+    `,
+    [event.id],
+  );
+  if (metaResult.rows.length) {
+    groupEventIds = uniqueValues([
+      ...groupEventIds,
+      ...metaResult.rows.map((row) => row.id),
+    ]);
+  }
+
+  // Ticket tariffs must be loaded from the page event (and merge peers), not from
+  // the entire dated TC sibling group. price ASC + limit 32 across hundreds of
+  // slots only returns child tariffs and hides adult/other categories.
+  const tariffOfferEventIds = uniqueValues([
+    event.id,
+    representativeRow.id || event.id,
+  ]);
 
   const [sessionsResult, offersResult] = await Promise.all([
     db.query(
@@ -4122,7 +5025,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
           limit 1
         ) session_offer on true
         where session."eventId" = any($1)
-          and coalesce(session."endsAt", session."startsAt") >= now()
+          and ${ACTIVE_SESSION_SQL}
         order by session."startsAt" asc nulls last
         limit 5
       `,
@@ -4139,6 +5042,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
           offer."widgetUrl",
           offer."deeplinkUrl",
           offer.active,
+          offer.payload,
           (offer.payload->>'sortOrder')::int as "sortOrder"
         from "EventOffer" offer
         where offer."eventId" = any($1)
@@ -4148,9 +5052,9 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
           coalesce((offer.payload->>'sortOrder')::int, 9999),
           offer."priceRub" asc nulls last,
           offer.id asc
-        limit 32
+        limit 64
       `,
-      [groupEventIds, MIN_DISPLAY_PRICE_RUB],
+      [tariffOfferEventIds, MIN_DISPLAY_PRICE_RUB],
     ),
   ]);
 
@@ -4204,28 +5108,33 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
     groupKey: targetGroupKey,
     groupEventIds,
     sessionCount: totalSessionCount,
-    title: event.overrideTitle || event.title,
+    title: formatPublicEventTitle(event.overrideTitle || event.title),
     description: cleanImportedDescription(event.overrideDescription || event.description),
     imageUrl: event.overrideImageUrl || event.imageUrl || null,
     category: event.category || 'События',
     tags,
     city: event.city || 'Не указан',
     cityId: event.cityId,
-    citySlug: eventDestination.slug,
+    citySlug: eventDestination?.slug || publicCitySlug(event.city || 'Не указан'),
     sourceCitySlug: event.citySourceSlug,
-    destination: eventDestination.name,
-    destinationType: eventDestination.type,
-    timeZone: resolveCityTimeZone(event.city, eventDestination.name),
+    destination: eventDestination?.name || cleanDisplayName(event.city) || 'Не указан',
+    destinationType: eventDestination?.type || 'city',
+    timeZone: resolveCityTimeZone(event.city, eventDestination?.name || event.city),
     venueId: event.venueId,
     venueSlug: event.venueSlug,
     venue: event.venue || 'Не указано',
     venueAddress: event.venueAddress,
     venueKind: event.venueKind || 'OTHER',
+    venueLatitude: event.venueLatitude == null || !Number.isFinite(Number(event.venueLatitude)) ? null : Number(event.venueLatitude),
+    venueLongitude: event.venueLongitude == null || !Number.isFinite(Number(event.venueLongitude)) ? null : Number(event.venueLongitude),
+    venueMetroStation: normalizeNullableString(event.venueMetroStation),
+    venueWayToFind: normalizeNullableString(event.venueWayToFind),
+    venueParkingInfo: normalizeNullableString(event.venueParkingInfo),
     ageLimit: event.ageLimit,
     priceFrom: eventPriceFrom,
     vacant: targetPublicSession?.vacant ?? event.ticketsVacant,
     eventType: String(event.kind || '').toLowerCase(),
-    landingSlugs: targetPublicSession?.landingSlugs || LANDING_RULES.filter((rule) => matchesRule({ ...event, title: event.title, venue: event.venue, city: event.city, tags, sourceCategory: event.category }, rule)).map((rule) => rule.slug),
+    landingSlugs: targetPublicSession?.landingSlugs || LANDING_RULES.filter((rule) => matchesLandingRule({ ...event, title: event.title, venue: event.venue, city: event.city, tags, sourceCategory: event.category }, rule)).map((rule) => rule.slug),
     purchaseUrl,
     widgetUrl: primaryOffer?.widgetUrl || fallbackWidgetUrl,
     deeplinkUrl: primaryOffer?.deeplinkUrl || null,
@@ -4250,6 +5159,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
     baseEvent.institutionVenueId = institutionContext.id;
     baseEvent.institutionVenueSlug = institutionContext.slug;
   }
+  baseEvent.venueStops = await loadPublicEventVenueStops(db, event.id);
   const sessions = sessionsResult.rows.map((session) => {
     const sessionOffer = primaryOfferByEventId.get(session.eventId) || primaryOffer;
     const sourceRow = targetPublicSession && sessionGroupIds(targetPublicSession).includes(session.eventId) ? targetPublicSession : null;
@@ -4311,30 +5221,26 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
       }]
     : [];
   const publicSessions = sessions.length ? sessions : widgetOnlySessions;
+  if (!event.overrideSeoTitle && !event.seoTitle) {
+    const nearest = publicSessions[0];
+    const dateBit = [nearest?.dateLabel, nearest?.timeLabel].filter(Boolean).join(', ');
+    if (dateBit && nearest?.dateLabel && !String(event.title || '').includes(String(nearest.dateLabel))) {
+      baseEvent.seoTitle = `${event.title} (${dateBit}): билеты и расписание | Дайбилет`;
+    }
+  }
   applyEventPrimaryPurchase(baseEvent, publicSessions, event.sourceCode || primaryOffer?.sourceCode);
   const ticketPrices = buildPublicTicketPrices(publicOffers, publicSessions, baseEvent);
-  const relatedCandidates = catalogSessions.filter((session) => {
-    if (sessionGroupIds(session).some((id) => groupEventIds.includes(id))) return false;
-    if (event.cityId && session.cityId) return session.cityId === event.cityId;
-    return normalizeGroupPart(session.city) === normalizeGroupPart(event.city);
-  });
-  relatedCandidates.sort((left, right) => {
-    const score = (session) => {
-      let value = 0;
-      if (session.category === event.category) value += 2;
-      if (session.venueKind && session.venueKind === event.venueKind) value += 1;
-      if (session.venueId && session.venueId === event.venueId) value += 3;
-      return value;
-    };
-    const byScore = score(right) - score(left);
-    if (byScore !== 0) return byScore;
-    return String(left.startsAt || '').localeCompare(String(right.startsAt || ''));
-  });
-  const related = relatedCandidates.slice(0, 12);
+  const related = pickRelatedSessions(
+    event,
+    catalogSessions,
+    groupEventIds,
+    sessionGroupIds,
+    12,
+  );
   const priceValues = [baseEvent.priceFrom, ...publicSessions.map((session) => session.priceFrom)].filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
   const vacantValues = publicSessions.map((session) => session.vacant).filter((value) => Number.isFinite(value));
 
-  if (!isSaleableEventForPublic({ ...baseEvent, kind: event.kind, sourceStatus: event.sourceStatus, startsAt: publicSessions.find((session) => session.startsAt)?.startsAt || null,
+  if (!isSaleableEventForPublic({ ...baseEvent, kind: event.kind, sourceStatus: publicSessions.find((session) => session.sourceStatus === 'widget')?.sourceStatus || event.sourceStatus, startsAt: publicSessions.find((session) => session.startsAt)?.startsAt || null,
       endsAt: publicSessions.find((session) => session.endsAt)?.endsAt || null })) {
     return null;
   }
@@ -4374,53 +5280,19 @@ function readOfferSortOrder(value) {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
-export function preferNamedTicketOffers(rows) {
-  const list = rows || [];
-  const named = list.filter((row) => !isGenericTcOfferTitle(row.title));
-  return named.length ? named : list;
-}
-
-function isGenericTcOfferTitle(title) {
-  const key = normalizeGroupPart(title);
-  return !key || key === 'widget' || key.includes('ticketscloud widget');
-}
-
-export function dedupePublicOffers(rows) {
-  const unique = new Map();
-  for (const row of rows || []) {
-    const key = `${String(row.sourceCode || '')}|${normalizeGroupPart(row.title)}|${row.priceRub}`;
-    const sortOrder = readOfferSortOrder(row.sortOrder);
-    const existing = unique.get(key);
-    if (!existing) {
-      unique.set(key, row);
-      continue;
-    }
-    const existingOrder = readOfferSortOrder(existing.sortOrder) ?? 9999;
-    const nextOrder = sortOrder ?? 9999;
-    if (nextOrder < existingOrder) unique.set(key, row);
-  }
-
-  return Array.from(unique.values()).sort((a, b) => {
-    const aOrder = readOfferSortOrder(a.sortOrder) ?? 9999;
-    const bOrder = readOfferSortOrder(b.sortOrder) ?? 9999;
-    return aOrder - bOrder || Number(a.priceRub || 0) - Number(b.priceRub || 0) || String(a.title || '').localeCompare(String(b.title || ''), 'ru');
-  });
-}
-
 function buildPublicTicketPrices(offers, sessions, event) {
   const rows = [];
   const eventTitleKey = normalizeGroupPart(event.title);
-  const isTeplohod = String(event.sourceCode || event.offerSourceCode || '').toUpperCase().includes('TEPLOHOD');
 
   for (const offer of preferNamedTicketOffers(offers || [])) {
     if (offer.active === false || !Number.isFinite(offer.priceRub) || offer.priceRub < MIN_DISPLAY_PRICE_RUB) continue;
     const title = normalizePublicTicketTitle(offer.title, eventTitleKey);
     rows.push({
-      key: `offer:${offer.id || offer.eventId}:${title}:${offer.priceRub}`,
+      key: `offer:${offer.id || offer.eventId}:${normalizeGroupPart(title)}:${offer.priceRub}`,
       title,
       priceRub: offer.priceRub,
       source: publicSourceLabel(offer.sourceCode),
-      description: 'Покупка открывается в виджете билетной системы.',
+      description: resolvePublicOfferTicketDescription(offer, title),
       purchaseUrl: offer.widgetUrl || offer.deeplinkUrl || event.purchaseUrl || null,
       kind: 'offer',
       sortOrder: readOfferSortOrder(offer.sortOrder),
@@ -4432,11 +5304,11 @@ function buildPublicTicketPrices(offers, sessions, event) {
     if (!Number.isFinite(session.priceFrom) || session.priceFrom < MIN_DISPLAY_PRICE_RUB) continue;
     if (offerPrices.has(session.priceFrom)) continue;
     rows.push({
-      key: `session:${session.priceFrom}`,
+      key: `session:${session.id || session.priceFrom}:${session.priceFrom}`,
       title: 'Билет на отдельные сеансы',
       priceRub: session.priceFrom,
       source: null,
-      description: 'Минимальная доступная цена среди ближайших дат.',
+      description: null,
       purchaseUrl: session.purchaseUrl || event.purchaseUrl || null,
       kind: 'session',
     });
@@ -4448,7 +5320,7 @@ function buildPublicTicketPrices(offers, sessions, event) {
       title: 'Билет',
       priceRub: event.priceFrom,
       source: null,
-      description: 'Точная категория билета уточняется в виджете поставщика.',
+      description: null,
       purchaseUrl: event.purchaseUrl || null,
       kind: 'fallback',
     });
@@ -4456,9 +5328,10 @@ function buildPublicTicketPrices(offers, sessions, event) {
 
   const unique = new Map();
   for (const row of rows) {
-    const key = `${normalizeGroupPart(row.title)}:${row.priceRub}`;
-    const existing = unique.get(key);
-    if (!existing || (row.kind === 'offer' && existing.kind !== 'offer')) unique.set(key, row);
+    const labelKey = normalizeGroupPart(normalizeTicketCategoryLabel(row.title));
+    const mergeKey = `${labelKey}:${row.priceRub}`;
+    const existing = unique.get(mergeKey);
+    if (!existing || (row.kind === 'offer' && existing.kind !== 'offer')) unique.set(mergeKey, row);
   }
 
   return Array.from(unique.values())
@@ -4470,12 +5343,104 @@ function buildPublicTicketPrices(offers, sessions, event) {
     .slice(0, 32);
 }
 
+function splitTitlePartsWithoutWeekdays(title) {
+  const parts = String(title || '').split(',').map((part) => part.trim()).filter(Boolean);
+  const weekdayToken = /^(?:ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС)$/iu;
+  const weekdayRange = /^(?:ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС)(?:\s*[,—–\-]\s*(?:ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС))+$/iu;
+
+  while (parts.length > 1) {
+    const last = parts[parts.length - 1];
+    if (weekdayToken.test(last) || weekdayRange.test(last)) {
+      parts.pop();
+      continue;
+    }
+    break;
+  }
+
+  return parts;
+}
+
+function isGenericPublicTicketDescription(value) {
+  const text = String(cleanImportedDescription(value) || '').toLowerCase();
+  if (!text) return true;
+  if (text.includes('покупка открывается в виджете')) return true;
+  if (text.includes('уточняется в виджете')) return true;
+  if (text.includes('минимальная доступная цена')) return true;
+  return false;
+}
+
+function isTransportBoilerplate(value) {
+  const text = cleanImportedDescription(value);
+  if (!text) return false;
+  return /перевозка\s+пас[-.\s]?в/i.test(text) && /\bТС\s*\d+/i.test(text);
+}
+
+function normalizeTicketCategoryLabel(raw) {
+  let text = cleanImportedDescription(raw);
+  if (!text) return 'Билет';
+
+  const dashSplit = text.split(/\s[-–—]\s/);
+  if (dashSplit.length > 1) {
+    const head = String(dashSplit[0] || '').trim();
+    const tail = dashSplit.slice(1).join(' - ').trim();
+    if (head && (!tail || isTransportBoilerplate(tail))) return head;
+  }
+
+  text = text
+    .replace(/\s*[-–—]?\s*перевозка\s+пас[-.\s]?в\s+.+?\s+ТС\s*\d+\s*$/iu, '')
+    .trim();
+
+  const parts = splitTitlePartsWithoutWeekdays(text);
+  if (parts.length > 1) {
+    const tail = parts.slice(1).join(', ').trim();
+    if (!tail || isTransportBoilerplate(tail)) return parts[0] || 'Билет';
+  }
+
+  return text || 'Билет';
+}
+
+function extractPublicOfferPayloadDescription(payload) {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return null;
+  for (const key of ['description', 'comment', 'text']) {
+    const direct = cleanImportedDescription(payload[key]);
+    if (direct && !isGenericPublicTicketDescription(direct) && !isTransportBoilerplate(direct)) return direct;
+  }
+  const ticket = payload.ticket;
+  if (ticket && typeof ticket === 'object' && !Array.isArray(ticket)) {
+    for (const key of ['description', 'comment', 'text']) {
+      const nested = cleanImportedDescription(ticket[key]);
+      if (nested && !isGenericPublicTicketDescription(nested) && !isTransportBoilerplate(nested)) return nested;
+    }
+  }
+  return null;
+}
+
+function parsePublicTitleSupplement(rawTitle, normalizedTitle) {
+  const clean = cleanImportedDescription(rawTitle);
+  if (!clean) return null;
+  const parts = splitTitlePartsWithoutWeekdays(clean);
+  if (parts.length <= 1) return null;
+  const supplement = parts.slice(1).join(', ').trim();
+  if (!supplement || isGenericPublicTicketDescription(supplement) || isTransportBoilerplate(supplement)) return null;
+  if (normalizeGroupPart(parts[0]) === normalizeGroupPart(normalizedTitle)) return supplement;
+  if (normalizeGroupPart(clean) === normalizeGroupPart(normalizedTitle)) return supplement;
+  return supplement;
+}
+
+function resolvePublicOfferTicketDescription(offer, normalizedTitle) {
+  const fromPayload = extractPublicOfferPayloadDescription(offer.payload);
+  if (fromPayload) return fromPayload;
+  const fromTitle = parsePublicTitleSupplement(offer.title, normalizedTitle);
+  if (fromTitle) return fromTitle;
+  return null;
+}
+
 function normalizePublicTicketTitle(rawTitle, eventTitleKey) {
   const cleanTitle = cleanImportedDescription(rawTitle);
   const titleKey = normalizeGroupPart(cleanTitle);
   if (!titleKey || titleKey === eventTitleKey) return 'Билет';
   if (titleKey === 'widget' || titleKey.includes('ticketscloud widget')) return 'Билет';
-  return cleanTitle;
+  return normalizeTicketCategoryLabel(cleanTitle);
 }
 
 function publicSourceLabel(sourceCode) {
@@ -4487,8 +5452,25 @@ function publicSourceLabel(sourceCode) {
 
 function buildProviderWidgetUrl(row) {
   const sourceCode = String(row?.sourceCode || row?.offerSourceCode || '').toUpperCase();
-  if (sourceCode.includes('TEPLOHOD')) return row?.offerDeeplinkUrl || row?.deeplinkUrl || (row?.externalId ? buildTeplohodUrl(row.externalId) : null);
+  if (sourceCode.includes('TEPLOHOD')) {
+    const eventId =
+      normalizeTeplohodExternalId(row?.externalId) ||
+      extractTeplohodEventIdFromUrl(row?.offerDeeplinkUrl || row?.deeplinkUrl || row?.offerWidgetUrl);
+    return eventId ? buildTeplohodUrl(eventId) : null;
+  }
   return buildTicketscloudWidgetUrl(row?.externalId);
+}
+
+function normalizeTeplohodExternalId(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return null;
+  const match = raw.match(/(?:^tep-)?(\d+)$/i);
+  return match ? match[1] : null;
+}
+
+function extractTeplohodEventIdFromUrl(url) {
+  const match = String(url || '').match(/(?:teplohod\.info\/event\/|event_id=)(\d+)/i);
+  return match ? match[1] : null;
 }
 
 function providerWidgetProvider(sourceCode) {
@@ -4502,36 +5484,6 @@ function extractTcExternalIdFromPurchaseUrl(url) {
   if (!url) return null;
   const match = String(url).match(/[?&]event=([^&]+)/);
   return match ? decodeURIComponent(match[1]) : null;
-}
-
-function isPublicSessionPurchaseBlocked(session) {
-  const statuses = [session.sourceStatus, session.eventSourceStatus].map((value) => String(value || '').toLowerCase());
-  if (!session.startsAt && !isOpenDateCatalogRow(session)) return true;
-  if (statuses.some((status) => ['paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden'].includes(status))) {
-    return true;
-  }
-  if (session.purchaseReady === false) return true;
-  const purchaseUrl = session.purchaseUrl || session.widgetUrl || session.offerWidgetUrl || null;
-  const provider = String(session.purchaseProvider || session.offerSourceCode || session.sourceCode || '').toUpperCase();
-  if (
-    (provider.includes('TEPLOHOD') || provider.includes('TEP') || String(purchaseUrl).includes('teplohod.info')) &&
-    session.purchaseReady !== false &&
-    purchaseUrl
-  ) {
-    return false;
-  }
-  if (session.vacant === 0) return true;
-  return false;
-}
-
-function shouldPromoteGroupedRepresentative(current, candidate) {
-  if (!candidate?.startsAt) return false;
-  const currentBlocked = isPublicSessionPurchaseBlocked(current);
-  const candidateBlocked = isPublicSessionPurchaseBlocked(candidate);
-  if (currentBlocked && !candidateBlocked) return true;
-  if (!currentBlocked && candidateBlocked) return false;
-  if (!current.startsAt) return true;
-  return new Date(candidate.startsAt) < new Date(current.startsAt);
 }
 
 function pickPrimaryPurchasableSession(sessions) {
@@ -4603,7 +5555,21 @@ async function categoryRows(db) {
   return result.rows;
 }
 
-async function eventRows(db, limit) {
+async function eventRows(db, limit, options = {}) {
+  const lean = Boolean(options.lean);
+  const ids = Array.isArray(options.ids) ? options.ids.filter(Boolean) : null;
+  const params = [];
+  let whereSql = '';
+  if (ids?.length) {
+    params.push(ids);
+    whereSql = `where e.id = any($${params.length}::text[])`;
+  }
+  let limitSql = '';
+  if (Number.isFinite(limit) && limit > 0) {
+    params.push(Math.floor(limit));
+    limitSql = `limit $${params.length}`;
+  }
+
   const result = await db.query(
     `
       select
@@ -4613,15 +5579,16 @@ async function eventRows(db, limit) {
         source.code as "sourceCode",
         source.name as "sourceName",
         e.title,
-        e.description,
+        ${lean ? "left(e.description, 4000) as description," : 'e.description,'}
+        length(trim(coalesce(e.description, '')))::int as "descriptionLength",
         e.kind,
         e.status,
         e."sourceStatus",
         e."ageLimit",
         e."imageUrl",
-        e."seoH1",
-        e."seoTitle",
-        e."seoDescription",
+        ${lean ? 'null::text as "seoH1",' : 'e."seoH1",'}
+        ${lean ? 'null::text as "seoTitle",' : 'e."seoTitle",'}
+        ${lean ? 'null::text as "seoDescription",' : 'e."seoDescription",'}
         e."canonicalPath",
         e."isIndexable",
         e."priceFromRub",
@@ -4638,6 +5605,7 @@ async function eventRows(db, limit) {
         override."canonicalPath" as "overrideCanonicalPath",
         override."isIndexable" as "overrideIsIndexable",
         override."editorStatus" as "overrideEditorStatus",
+        override."mergeGroupKey" as "overrideMergeGroupKey",
         cat.title as category,
         city.title as city,
         city."isDestination" as "cityIsDestination",
@@ -4655,7 +5623,7 @@ async function eventRows(db, limit) {
         offer."deeplinkUrl" as "offerDeeplinkUrl",
         city.id as "cityId",
         city.slug as "citySlug",
-        min(session."startsAt") filter (where coalesce(session."endsAt", session."startsAt") >= now()) as "nextStartsAt",
+        min(session."startsAt") filter (where ${ACTIVE_SESSION_SQL}) as "nextStartsAt",
         min(session."startsAt") as "startsAt",
         min(session."priceFromRub") filter (where session."priceFromRub" >= ${MIN_DISPLAY_PRICE_RUB}) as "sessionPriceFromRub",
         count(distinct session.id)::int as "slotCount",
@@ -4689,6 +5657,7 @@ async function eventRows(db, limit) {
         limit 1
       ) offer on true
       left join "EventSubcategory" event_subcategory on event_subcategory."eventId" = e.id
+      ${whereSql}
       group by
         e.id,
         source_link."externalId",
@@ -4713,20 +5682,22 @@ async function eventRows(db, limit) {
         offer."widgetUrl",
         offer."deeplinkUrl"
       order by e.status asc, min(session."startsAt") asc nulls last
-      limit $1
+      ${limitSql}
     `,
-    [limit],
+    params,
   );
 
+  const separateCityHubs = collectSeparateCityHubNames(result.rows);
   return result.rows.map((row) => {
     const tags = row.tags || [];
-    const destination = publicDestinationForCity(row);
+    const destination = publicDestinationForCity(row, separateCityHubs);
+    const fallbackDestinationName = cleanDisplayName(row.city) || 'Не указан';
     const priceFrom = displayPriceFrom(row.priceFromRub, row.sessionPriceFromRub, row.offerPriceRub);
     const purchase = purchaseInfo(row);
     const normalizedRow = { ...row, startsAt: row.nextStartsAt || row.startsAt, priceFrom, purchaseReady: purchase.ready, hasImage: Boolean(row.overrideImageUrl || row.imageUrl) };
     const readinessIssues = buildReadinessIssues(normalizedRow);
     const reasons = readinessIssues.map((issue) => issue.label);
-    const gate = publishGate(normalizedRow, reasons);
+    const gate = publishGate(normalizedRow, reasons, readinessIssues);
     const moderationStatus = row.overrideEditorStatus || row.status || 'REVIEW';
     const offerStatus = purchase.status;
     const severity = readinessSeverity(readinessIssues);
@@ -4748,10 +5719,10 @@ async function eventRows(db, limit) {
       proposedCategory: row.category || 'не определено',
       city: row.city || 'Не указан',
       cityId: row.cityId,
-      citySlug: destination.slug,
+      citySlug: destination?.slug || publicCitySlug(fallbackDestinationName),
       sourceCitySlug: row.citySlug,
-      destination: destination.name,
-      destinationType: destination.type,
+      destination: destination?.name || fallbackDestinationName,
+      destinationType: destination?.type || 'city',
       venue: formatPublicVenueTitle(row.venue) || 'Не указано',
       venueId: row.venueId,
       venueSlug: row.venueSlug,
@@ -4789,9 +5760,10 @@ async function eventRows(db, limit) {
         canonicalPath: row.overrideCanonicalPath,
         isIndexable: row.overrideIsIndexable,
         editorStatus: row.overrideEditorStatus,
+        mergeGroupKey: row.overrideMergeGroupKey,
       },
       tags,
-      landingHits: LANDING_RULES.filter((rule) => matchesRule({ ...row, tags }, rule)).map((rule) => rule.title).slice(0, 3),
+      landingHits: LANDING_RULES.filter((rule) => matchesLandingRule({ ...row, tags }, rule)).map((rule) => rule.title).slice(0, 3),
       reasons,
       readinessCodes: readinessIssues.map((issue) => issue.code),
       readinessIssues,
@@ -4807,11 +5779,31 @@ async function eventRows(db, limit) {
   });
 }
 
+/** TicketsCloud widget page rejects `token=r:…` with HTTPForbidden/bad token. */
+function sanitizeTicketscloudPurchaseUrl(url) {
+  const raw = String(url || '').trim();
+  if (!raw) return null;
+  if (!/ticketscloud/i.test(raw)) return raw;
+  try {
+    const parsed = new URL(raw);
+    const token = parsed.searchParams.get('token');
+    if (token && token.startsWith('r:')) parsed.searchParams.set('token', token.slice(2));
+    if (parsed.hostname === 'ticketscloud.org') parsed.hostname = 'ticketscloud.com';
+    return parsed.toString();
+  } catch {
+    return raw;
+  }
+}
+
 function purchaseInfo(row = {}) {
   const sourceCode = row.sourceCode || row.offerSourceCode;
   const provider = providerWidgetProvider(sourceCode);
-  const explicitUrl = row.offerWidgetUrl || row.offerDeeplinkUrl || null;
-  const fallbackUrl = buildProviderWidgetUrl({ ...row, offerSourceCode: sourceCode });
+  const fallbackUrl = sanitizeTicketscloudPurchaseUrl(
+    buildProviderWidgetUrl({ ...row, offerSourceCode: sourceCode }),
+  );
+  // Prefer rebuilt TEP checkout: stored teplohod.info/event/* deeplinks currently 404.
+  const explicitRaw = provider === 'TEPLOHOD' ? null : row.offerWidgetUrl || row.offerDeeplinkUrl || null;
+  const explicitUrl = sanitizeTicketscloudPurchaseUrl(explicitRaw);
   const url = explicitUrl || fallbackUrl || null;
   const mode = provider === 'TEPLOHOD' || provider === 'TICKETSCLOUD' ? 'widget' : url ? 'redirect' : null;
   const urlSource = explicitUrl ? 'offer' : fallbackUrl ? 'fallback' : null;
@@ -4837,23 +5829,25 @@ function adminOfferStatus(row) {
   return purchaseInfo(row).status;
 }
 
-async function eventRowsByIds(db, ids) {
+async function eventRowsByIds(db, ids, options = {}) {
   if (!ids.length) return [];
-  const rows = await eventRows(db, 10000);
-  const expected = new Set(ids);
-  return rows.filter((row) => expected.has(row.id));
+  const maxIds = Number.isFinite(options.maxIds) ? Math.max(1, Math.floor(options.maxIds)) : 500;
+  const unique = Array.from(new Set(ids.filter(Boolean))).slice(0, maxIds);
+  return eventRows(db, null, { lean: true, ids: unique });
 }
 
 function matchesAdminQuickFilter(event, view) {
-  if (view === 'needs_attention') return event.status === 'needs_review';
-  if (view === 'ready_publish') return event.readiness === 'ready';
+  if (view === 'needs_attention') {
+    return event.status === 'needs_review' || event.readiness === 'review' || event.readiness === 'blocked';
+  }
+  if (view === 'ready_publish') return event.readiness === 'ready' && event.canPublish !== false;
   if (view === 'purchase_blocked') return !event.purchaseReady;
   if (view === 'no_image') return !event.hasImage;
-  if (view === 'landing_match') return event.landingHits.length > 0;
+  if (view === 'landing_match') return (event.landingHits || []).length > 0;
   return true;
 }
 
-function publishGate(event, reasons) {
+export function publishGate(event, reasons, readinessIssues = []) {
   const blockers = [];
   const warnings = [];
 
@@ -4862,6 +5856,13 @@ function publishGate(event, reasons) {
   if (!event.startsAt && event.kind !== 'OPEN_DATE') blockers.push('нет даты');
   if (!event.venue) blockers.push('нет площадки');
   if (!event.city) blockers.push('нет города');
+
+  for (const issue of readinessIssues || []) {
+    if (issue?.severity === 'high') {
+      const label = issue.label || issue.code;
+      if (label) blockers.push(label);
+    }
+  }
 
   for (const reason of reasons || []) {
     if (reason.includes('изображ')) warnings.push(reason);
@@ -4896,6 +5897,19 @@ function normalizeOverridePayload(payload) {
     normalized.editorStatus = value && allowed.has(value) ? value : null;
   }
 
+  if (Object.prototype.hasOwnProperty.call(payload, 'mergeGroupKey')) {
+    const value = normalizeNullableString(payload.mergeGroupKey);
+    if (!value) {
+      normalized.mergeGroupKey = null;
+    } else {
+      const normalizedKey = value.trim().toLowerCase().replace(/[^a-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '');
+      if (!normalizedKey || normalizedKey.length > 64) {
+        throw new Error('mergeGroupKey must be 1-64 chars: a-z, 0-9, _ and -');
+      }
+      normalized.mergeGroupKey = normalizedKey;
+    }
+  }
+
   return normalized;
 }
 
@@ -4905,7 +5919,20 @@ function normalizeVenuePayload(payload) {
   }
 
   const normalized = {};
-  for (const key of ['title', 'description', 'shortDescription', 'heroImageUrl', 'seoH1', 'seoTitle', 'seoDescription', 'canonicalPath']) {
+  for (const key of [
+    'title',
+    'description',
+    'shortDescription',
+    'heroImageUrl',
+    'seoH1',
+    'seoTitle',
+    'seoDescription',
+    'canonicalPath',
+    'metroStation',
+    'wayToFind',
+    'parkingInfo',
+    'hookFact',
+  ]) {
     if (!Object.prototype.hasOwnProperty.call(payload, key)) continue;
     normalized[key] = normalizeNullableString(payload[key]);
   }
@@ -4916,7 +5943,7 @@ function normalizeVenuePayload(payload) {
 
   if (Object.prototype.hasOwnProperty.call(payload, 'kind')) {
     const value = normalizeNullableString(payload.kind);
-    const allowed = new Set(['VENUE', 'MUSEUM_ART_SPACE', 'THEATER', 'CONCERT_HALL', 'CLUB_BAR_RESTAURANT', 'PIER', 'MEETING_POINT', 'OUTDOOR_LOCATION', 'SPORT_ACTIVITY_SPACE', 'ATTRACTION', 'ONLINE', 'OTHER']);
+    const allowed = new Set(['VENUE', 'MUSEUM_ART_SPACE', 'THEATER', 'CONCERT_HALL', 'CLUB_BAR_RESTAURANT', 'PIER', 'MEETING_POINT', 'OUTDOOR_LOCATION', 'SPORT_ACTIVITY_SPACE', 'ATTRACTION', 'PARK', 'MONUMENT', 'GASTRO', 'ONLINE', 'OTHER']);
     normalized.kind = value && allowed.has(value) ? value : null;
   }
 
@@ -4935,246 +5962,6 @@ function normalizeNullableString(value) {
   return text ? text : null;
 }
 
-function formatPublicVenueTitle(value) {
-  if (value == null) return value;
-  return String(value)
-    .replace(/\s*\(\s*-?\d+(?:\.\d+)?\s*,\s*-?\d+(?:\.\d+)?\s*\)\s*$/u, '')
-    .trim();
-}
-
-function isValidVenueCoordinatePair(latitude, longitude) {
-  return Number.isFinite(latitude) && Number.isFinite(longitude) && Math.abs(latitude) <= 90 && Math.abs(longitude) <= 180;
-}
-
-function extractEmbeddedVenueCoordinates(...parts) {
-  const text = parts.filter(Boolean).join(' ');
-
-  const parenMatch = text.match(/\(\s*(-?\d{1,2}(?:\.\d+)?)\s*,\s*(-?\d{1,3}(?:\.\d+)?)\s*\)/u);
-  if (parenMatch) {
-    const latitude = Number(parenMatch[1]);
-    const longitude = Number(parenMatch[2]);
-    if (isValidVenueCoordinatePair(latitude, longitude)) return { latitude, longitude };
-  }
-
-  const decimalSlugMatch = text.match(/(?:^|[-_/])(-?\d{1,2}\.\d{3,})[-_/](-?\d{1,3}\.\d{3,})(?:[-_/]|$)/u);
-  if (decimalSlugMatch) {
-    const latitude = Number(decimalSlugMatch[1]);
-    const longitude = Number(decimalSlugMatch[2]);
-    if (isValidVenueCoordinatePair(latitude, longitude)) return { latitude, longitude };
-  }
-
-  const dashedSlugMatch = text.match(/(?:^|[-_/])(\d{1,2})-(\d{4,7})-(\d{1,3})-(\d{4,7})(?:[-_/]|$)/u);
-  if (dashedSlugMatch) {
-    const latitude = Number(`${dashedSlugMatch[1]}.${dashedSlugMatch[2]}`);
-    const longitude = Number(`${dashedSlugMatch[3]}.${dashedSlugMatch[4]}`);
-    if (isValidVenueCoordinatePair(latitude, longitude)) return { latitude, longitude };
-  }
-
-  return null;
-}
-
-export function resolvePublicVenueCoordinates(venue = {}, options = {}) {
-  const embedded = extractEmbeddedVenueCoordinates(venue.title, venue.name, venue.slug, venue.address);
-  if (embedded) return embedded;
-
-  const kind = options.resolvedType || venue.type || venue.kind;
-  const override = lookupLocationDescriptionCoordinates(
-    venue.slug,
-    venue.title || venue.name,
-    venue.id,
-  );
-  let latitude = override?.latitude ?? Number(venue.latitude);
-  let longitude = override?.longitude ?? Number(venue.longitude);
-  if (!isValidVenueCoordinatePair(latitude, longitude)) return null;
-
-  if (isPierVenueKind(kind) && !override) {
-    return adjustPierCoordinatesToWater(latitude, longitude, venue);
-  }
-
-  return { latitude, longitude };
-}
-
-let locationDescriptionCoordinatesCache = null;
-
-function getLocationDescriptionCoordinatesMap() {
-  if (locationDescriptionCoordinatesCache) return locationDescriptionCoordinatesCache;
-  const map = new Map();
-  try {
-    const filePath = path.resolve(
-      path.dirname(fileURLToPath(import.meta.url)),
-      '../../../scripts/data/location-descriptions.json',
-    );
-    const items = JSON.parse(readFileSync(filePath, 'utf8'));
-    for (const item of items) {
-      if (typeof item.latitude !== 'number' || typeof item.longitude !== 'number') continue;
-      const slug = String(item.slug || '').trim().toLowerCase();
-      if (!slug) continue;
-      const coords = { latitude: item.latitude, longitude: item.longitude };
-      map.set(slug, coords);
-      const shortSlug = slug.replace(/-[a-f0-9]{20,}$/i, '');
-      if (shortSlug !== slug) map.set(shortSlug, coords);
-    }
-  } catch {
-    // optional curated overrides
-  }
-  locationDescriptionCoordinatesCache = map;
-  return map;
-}
-
-function lookupLocationDescriptionCoordinates(slug, title, id) {
-  const candidates = [];
-  const add = (value) => {
-    const key = String(value || '').trim().toLowerCase();
-    if (!key) return;
-    candidates.push(key);
-    const transliterated = publicCitySlug(key);
-    if (transliterated && transliterated !== key) candidates.push(transliterated);
-    const deduped = dedupeVenueSlugSuffix(transliterated || key);
-    if (deduped && !candidates.includes(deduped)) candidates.push(deduped);
-  };
-
-  add(slug);
-  add(publicVenueSlug(slug, title, id));
-
-  const map = getLocationDescriptionCoordinatesMap();
-  for (const value of candidates) {
-    if (map.has(value)) return map.get(value);
-    const withoutHash = value.replace(/-[a-f0-9]{20,}$/i, '');
-    if (map.has(withoutHash)) return map.get(withoutHash);
-    for (const [key, coords] of map) {
-      if (value.startsWith(`${key}-`) || key.startsWith(`${value}-`)) return coords;
-    }
-  }
-  return null;
-}
-
-export function isPierVenueKind(kindOrType) {
-  const key = String(kindOrType || '')
-    .trim()
-    .toLowerCase()
-    .replace(/-/g, '_');
-  return key === 'pier' || key === 'pier_water';
-}
-
-function detectPierWaterOffset(venue = {}) {
-  const city = String(venue.city || '').toLowerCase();
-  const text = `${venue.address || ''} ${venue.title || ''} ${venue.name || ''}`.toLowerCase();
-  if (city.includes('петербург') || text.includes('санкт-петербург') || text.includes('спб')) {
-    return { dLat: -0.00094, dLng: 0.00116 };
-  }
-  if (city.includes('москва') || text.includes('москва')) {
-    return { dLat: -0.00072, dLng: 0.00042 };
-  }
-  if (city.includes('казан') || text.includes('казань')) {
-    return { dLat: -0.00055, dLng: 0.00035 };
-  }
-  if (/наб(?:ережн)?|причал|речн/i.test(text)) {
-    return { dLat: -0.00065, dLng: 0.0005 };
-  }
-  return null;
-}
-
-function adjustPierCoordinatesToWater(latitude, longitude, venue = {}) {
-  const offset = detectPierWaterOffset(venue);
-  if (!offset) return { latitude, longitude };
-  return {
-    latitude: latitude + offset.dLat,
-    longitude: longitude + offset.dLng,
-  };
-}
-
-function isVenueHallSuffix(suffix) {
-  const key = normalizeVenueTextKey(suffix);
-  if (!key) return true;
-  if (
-    /^(основной|малый|большой|маленький|верхний|нижний|концертный|выставочный|камерный|банкетный|театральный|красный|черный|белый|синий|зеленый|vip)(\s+зал)?$/.test(
-      key,
-    )
-  ) {
-    return true;
-  }
-  if (/^зал(\s+[a-zа-яё0-9\-]+)?$/i.test(key)) return true;
-  return false;
-}
-
-function canonicalVenueMergeTitle(name) {
-  let title = String(formatPublicVenueTitle(name) || '').trim();
-  if (!title) return title;
-
-  const segments = title.split(/\s*\|\s*/).map((part) => part.trim()).filter(Boolean);
-  if (segments.length <= 1) return title;
-  if (segments.slice(1).every((part) => isVenueHallSuffix(part))) return segments[0];
-  return title;
-}
-
-function applyPublicVenueNormalization(row = {}) {
-  const normalized = normalizePublicVenueRecord({
-    id: row.id,
-    title: row.name || row.title,
-    name: row.name || row.title,
-    address: row.address,
-    city: row.city,
-  });
-  return {
-    ...row,
-    name: normalized.title,
-    title: normalized.title,
-    address: normalized.address,
-    city: normalized.city || row.city,
-  };
-}
-
-function normalizeVenueTextKey(value) {
-  return String(value || '')
-    .toLowerCase()
-    .replace(/ё/g, 'е')
-    .replace(/[^a-z0-9а-я]+/gi, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-function venueTitleLooksLikeAddress(name) {
-  const text = String(name || '').toLowerCase();
-  return /(?:\bul\.|\bпр\.|\bпер\.|наб\.|,\s*с\.|,\s*д\.|,\s*дом\b|район,|область,|республик)/i.test(text);
-}
-
-function canonicalVenueAddressKey(name, address) {
-  let text = normalizeVenueTextKey(`${canonicalVenueMergeTitle(name) || formatPublicVenueTitle(name) || ''} ${address || ''}`);
-  text = text
-    .replace(/(?:^|\s)причал(?:\s|$)/g, ' ')
-    .replace(/(?:^|\s)наб(?:\s|$)/g, ' набережная ')
-    .replace(/(?:^|\s)ул(?:\s|$)/g, ' улица ')
-    .replace(/\s+/g, ' ')
-    .trim();
-  return text;
-}
-
-function normalizePublicVenueMergeKey(name, city, address) {
-  const title = normalizeVenueTextKey(canonicalVenueMergeTitle(name));
-  const cityKey = normalizeVenueTextKey(city || 'не указан');
-
-  if (/причал|набереж/i.test(`${name || ''} ${address || ''}`)) {
-    const pierKey = canonicalPierLocationKey(name, address);
-    if (pierKey) return `pier|${cityKey}|${pierKey}`;
-    return `pier|${cityKey}|${title}`;
-  }
-
-  if (hasBusLikeText(name, address)) {
-    return `bus|${cityKey}|${title}`;
-  }
-
-  if (venueTitleLooksLikeAddress(name)) {
-    return `geo|${title}`;
-  }
-
-  const addressKey = canonicalVenueAddressKey(name, address);
-  if (addressKey.length >= 10) {
-    return `addr|${cityKey}|${addressKey}`;
-  }
-
-  return `city|${cityKey}|${title}`;
-}
-
 function capitalizeLocality(value) {
   const text = String(value || '').trim();
   if (!text) return text;
@@ -5184,6 +5971,7 @@ function capitalizeLocality(value) {
 function routeCityToPublicDisplayName(cityName) {
   const clean = canonicalizePublicCityName(cityName) || cleanDisplayName(cityName);
   if (!clean || clean === 'Не указан') return clean;
+  if (isForeignPublicCity(clean)) return null;
   if (STANDALONE_CITY_NAMES.has(clean)) return clean;
   const mapped = CITY_TO_REGION.get(clean);
   if (mapped) return mapped;
@@ -5192,6 +5980,7 @@ function routeCityToPublicDisplayName(cityName) {
 
 function isAllowedPublicDestination(destination) {
   if (!destination?.name || destination.name === 'Не указан') return false;
+  if (isForeignPublicCity(destination.name)) return false;
   if (destination.type === 'city') return STANDALONE_CITY_NAMES.has(destination.name);
   if (destination.type === 'region') return PUBLIC_REGION_NAMES.has(destination.name) || isPublicRegionName(destination.name);
   return false;
@@ -5243,6 +6032,16 @@ const CITY_BOGUS_ALIASES = new Map([
   ['троение', 'Тольятти'],
 ]);
 
+
+function normalizeVenueTextKey(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/ё/g, 'е')
+    .replace(/[^a-z0-9а-я]+/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function canonicalizePublicCityName(value) {
   const raw = cleanDisplayName(value);
   if (!raw || raw === 'Не указан') return null;
@@ -5287,258 +6086,8 @@ function venueLocationContradictsCity(name, address, dbCity) {
   return false;
 }
 
-function resolvePublicVenueCity(row) {
-  const dbCity = cleanDisplayName(row.city);
-  const name = row.name || row.title || '';
-  const address = row.address || '';
-  const inferred = inferCityNameFromText(name, address);
-  const canonicalDb = canonicalizePublicCityName(dbCity);
 
-  if (inferred) return routeCityToPublicDisplayName(inferred);
-  if (canonicalDb) return routeCityToPublicDisplayName(canonicalDb);
-  if (dbCity && dbCity !== 'Не указан') return routeCityToPublicDisplayName(dbCity);
-  const locality = inferVenueLocalityLabel(name, address);
-  return locality ? routeCityToPublicDisplayName(locality) : 'Не указан';
-}
 
-function venueRowMergeScore(row) {
-  let score = (Number(row.events) || 0) * 1000;
-  if (row.heroImageUrl) score += 500;
-  if (String(row.pageStatus || '').toUpperCase() === 'PUBLISHED') score += 200;
-  if (row.address) score += 50;
-  if (row.shortDescription) score += 25;
-  return score;
-}
-
-function mergePublicVenueHubRows(rows) {
-  const groups = new Map();
-
-  for (const row of rows) {
-    const key = normalizePublicVenueMergeKey(row.name || row.title, row.city, row.address);
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key).push(row);
-  }
-
-  const merged = [];
-  for (const items of groups.values()) {
-    if (items.length === 1) {
-      const only = items[0];
-      const canonicalName = canonicalVenueMergeTitle(only.name || only.title) || only.name;
-      merged.push({ ...only, name: canonicalName, title: canonicalName, mergedVenueIds: [only.id] });
-      continue;
-    }
-
-    const sorted = [...items].sort((a, b) => venueRowMergeScore(b) - venueRowMergeScore(a));
-    const primary = sorted[0];
-    const canonicalName = canonicalVenueMergeTitle(primary.name || primary.title) || primary.name;
-    merged.push({
-      ...primary,
-      name: canonicalName,
-      title: canonicalName,
-      city: resolvePublicVenueCity(primary),
-      events: items.reduce((sum, item) => sum + (Number(item.events) || 0), 0),
-      waterEvents: items.reduce((sum, item) => sum + (Number(item.waterEvents) || 0), 0),
-      busEvents: items.reduce((sum, item) => sum + (Number(item.busEvents) || 0), 0),
-      heroImageUrl: sorted.find((item) => item.heroImageUrl)?.heroImageUrl || primary.heroImageUrl,
-      shortDescription: sorted.find((item) => item.shortDescription)?.shortDescription || primary.shortDescription,
-      description: sorted.find((item) => item.description)?.description || primary.description,
-      address: sorted.find((item) => item.address)?.address || primary.address,
-      mergedVenueIds: items.map((item) => item.id),
-    });
-  }
-
-  return merged.sort((a, b) => (b.events - a.events) || String(a.name || '').localeCompare(String(b.name || ''), 'ru'));
-}
-
-function findMergedVenueGroup(rows, venueId) {
-  if (!venueId) return null;
-  return rows.find((row) => row.id === venueId || (row.mergedVenueIds || []).includes(venueId)) || null;
-}
-
-function venueGroupsOverlap(a, b) {
-  const left = new Set(a?.mergedVenueIds || (a?.id ? [a.id] : []));
-  return (b?.mergedVenueIds || (b?.id ? [b.id] : [])).some((id) => left.has(id));
-}
-
-export async function publicVenueHubRows(db, limit = 500, options = {}) {
-  const now = Date.now();
-  const cacheKey = `${limit}:${options.requireEvents === false ? 'all' : 'hub'}`;
-  if (publicVenueHubCache?.cacheKey === cacheKey && publicVenueHubCache.expiresAt > now) {
-    return publicVenueHubCache.rows;
-  }
-
-  const [rows, sessions] = await Promise.all([venueRows(db, limit), publicCatalogSessions(db)]);
-  const { activeCounts, waterCounts, busCounts, heroImageFallbacks, nextSessionStartsAt } = buildActiveVenueEventCounts(sessions);
-  const enriched = rows.map((row) => ({
-    ...row,
-    events: activeCounts.get(row.id) || 0,
-    waterEvents: waterCounts.get(row.id) || 0,
-    busEvents: busCounts.get(row.id) || 0,
-    heroImageUrl: resolveVenueHeroImageUrl(row, heroImageFallbacks),
-    nextSessionStartsAt: nextSessionStartsAt.get(row.id) || null,
-  }));
-  const merged = mergePublicVenueHubRows(enriched.filter((row) => isPublicVenueHub(row, options)));
-  publicVenueHubCache = {
-    cacheKey,
-    expiresAt: now + PUBLIC_CATALOG_CACHE_MS,
-    rows: merged,
-  };
-  if (!publicVenueCatalogLists || publicVenueCatalogLists.expiresAt <= now) {
-    if (options.requireEvents !== false) {
-      publicVenueCatalogLists = {
-        expiresAt: now + PUBLIC_CATALOG_CACHE_MS,
-        institution: [],
-        location: [],
-      };
-      for (const row of merged) {
-        const item = mapPublicVenueListItem(row);
-        if (item.template === 'institution') publicVenueCatalogLists.institution.push(item);
-        else publicVenueCatalogLists.location.push(item);
-      }
-    }
-  }
-  return merged;
-}
-
-const PUBLIC_VENUE_ROW_SELECT = `
-  select
-    venue.id,
-    venue.slug,
-    venue.title,
-    venue.description,
-    venue."shortDescription",
-    venue."heroImageUrl",
-    venue."seoH1",
-    venue."seoTitle",
-    venue."seoDescription",
-    venue."canonicalPath",
-    venue."isIndexable",
-    venue.address,
-    venue.latitude,
-    venue.longitude,
-    venue.kind,
-    venue."pageStatus",
-    city.title as city
-  from "Venue" venue
-  left join "City" city on city.id = venue."cityId"
-`;
-
-async function resolvePublicVenueRow(db, venueSlugOrId) {
-  const value = String(venueSlugOrId || '').trim();
-  if (!value) return null;
-
-  const candidates = new Set([value]);
-  try {
-    candidates.add(decodeURIComponent(value));
-  } catch {
-    // ignore malformed URI sequences
-  }
-  candidates.add(publicCitySlug(value));
-  candidates.add(stripOpaqueVenueIdSuffix(publicCitySlug(value)));
-  for (const candidate of [...candidates]) {
-    const result = await db.query(`${PUBLIC_VENUE_ROW_SELECT} where venue.slug = $1 or venue.id = $1 limit 1`, [candidate]);
-    if (result.rows[0]) return result.rows[0];
-  }
-
-  const suffix = extractOpaqueIdSuffix(value);
-  if (suffix) {
-    const suffixResult = await db.query(`${PUBLIC_VENUE_ROW_SELECT} where venue.id = $1 or venue.id = $2 limit 1`, [`venue_${suffix}`, suffix]);
-    if (suffixResult.rows[0]) return suffixResult.rows[0];
-  }
-
-  return resolvePublicVenueRowByComputedSlug(db, value);
-}
-
-function normalizePublicVenueSlugKey(value) {
-  return dedupeVenueSlugSuffix(stripOpaqueVenueIdSuffix(publicCitySlug(value) || value));
-}
-
-async function resolvePublicVenueRowByComputedSlug(db, requestedSlug) {
-  const normalized = normalizePublicVenueSlugKey(requestedSlug);
-  if (!normalized) return null;
-
-  const numericSuffix = normalized.match(/-(\d+)$/);
-  if (numericSuffix) {
-    for (const venueId of [`venue_tep_${numericSuffix[1]}`, `venue_${numericSuffix[1]}`]) {
-      const result = await db.query(`${PUBLIC_VENUE_ROW_SELECT} where venue.id = $1 limit 1`, [venueId]);
-      const row = result.rows[0];
-      if (row && publicVenueSlug(row.slug, row.title, row.id) === normalized) return row;
-    }
-  }
-
-  const prefixResult = await db.query(
-    `${PUBLIC_VENUE_ROW_SELECT}
-     where venue.slug = $1
-        or venue.slug like $2
-     order by length(venue.slug) asc
-     limit 24`,
-    [normalized, `${normalized}-%`],
-  );
-  for (const row of prefixResult.rows) {
-    if (publicVenueSlug(row.slug, row.title, row.id) === normalized) return row;
-  }
-
-  const cyrillicResult = await db.query(
-    `${PUBLIC_VENUE_ROW_SELECT} where venue.slug ~ '[А-Яа-яЁё]' order by venue."updatedAt" desc nulls last limit 1200`,
-  );
-  for (const row of cyrillicResult.rows) {
-    if (publicVenueSlug(row.slug, row.title, row.id) === normalized) return row;
-  }
-
-  return null;
-}
-
-function cleanImportedDescription(value) {
-  if (value == null) return null;
-  const text = String(value)
-    .replace(/<\s*br\s*\/?>/gi, '\n')
-    .replace(/<\/\s*(p|div|li|h[1-6])\s*>/gi, '\n')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/&nbsp;/gi, ' ')
-    .replace(/&amp;/gi, '&')
-    .replace(/&quot;/gi, '"')
-    .replace(/&#39;|&apos;/gi, "'")
-    .replace(/&lt;/gi, '<')
-    .replace(/&gt;/gi, '>')
-    .replace(/[ \t]+\n/g, '\n')
-    .replace(/\n{3,}/g, '\n\n')
-    .replace(/[ \t]{2,}/g, ' ')
-    .trim();
-  return text ? text : null;
-}
-
-function isWeakVenueLeadText(value) {
-  const text = String(cleanImportedDescription(value) || '').trim();
-  if (!text) return true;
-  if (text.length < 24) return true;
-  if (/^(легенда|описание|текст|n\/a|нет|—|-)$/i.test(text)) return true;
-  return false;
-}
-
-function pickPublicVenueDescriptionText(shortDescription, description) {
-  const full = cleanImportedDescription(description);
-  if (full) return full;
-  const short = cleanImportedDescription(shortDescription);
-  if (short && !isWeakVenueLeadText(short)) return short;
-  return null;
-}
-
-function truncateVenueLeadText(text, maxLength = 220) {
-  const value = String(text || '').trim();
-  if (value.length <= maxLength) return value;
-  const slice = value.slice(0, maxLength - 1).trimEnd();
-  const lastSpace = slice.lastIndexOf(' ');
-  const clipped = lastSpace > Math.floor(maxLength * 0.55) ? slice.slice(0, lastSpace) : slice;
-  return `${clipped}...`;
-}
-
-function pickPublicVenueLeadText(shortDescription, description) {
-  const full = cleanImportedDescription(description);
-  const short = cleanImportedDescription(shortDescription);
-  if (short && !isWeakVenueLeadText(short)) return short;
-  if (!full) return null;
-  return truncateVenueLeadText(full);
-}
 
 function normalizePublishStatus(value, fallback = 'REVIEW') {
   const normalized = normalizeNullableString(value);
@@ -5718,7 +6267,7 @@ function buildDefaultLandingBlocks(rule, matchedEvents) {
       title: rule.title,
       subtitle: rule.subtitle || null,
       body: landingType === 'CITY'
-        ? `Подборка собирает предложения в городе ${rule.city}: ближайшие даты, площадки, цены и ссылку на покупку у билетного оператора.`
+        ? `Подборка собирает предложения ${destinationPrepositional({ slug: '', name: rule.city, type: 'city' })}: ближайшие даты, площадки, цены и ссылку на покупку у билетного оператора.`
         : `Это тематическая витрина по направлению «${rule.title}». На верхнем уровне важнее быстро показать города и форматы, а покупочную таблицу оставляем как удобный модуль ниже.`,
       sortOrder: 30,
     },
@@ -5755,7 +6304,7 @@ function buildDefaultLandingBlocks(rule, matchedEvents) {
 
 function mapLandingAdminEvent(event, manualRow, isAutoMatch, rule = null) {
   const manual = manualRow?.reasons || null;
-  const ruleExplanation = rule ? explainRuleMatch(event, rule) : { reasons: [], blockers: [] };
+  const ruleExplanation = rule ? explainLandingRuleMatch(event, rule) : { reasons: [], blockers: [] };
   const manualStatus = manual?.manualStatus || null;
   return {
     id: event.id,
@@ -5812,557 +6361,62 @@ function mapOverrideRow(row) {
     canonicalPath: row.canonicalPath,
     isIndexable: row.isIndexable,
     editorStatus: row.editorStatus,
+    mergeGroupKey: row.mergeGroupKey,
   };
 }
 
-async function venueRows(db, limit) {
-  const result = await db.query(
-    `
-      select
-        venue.id,
-        venue.slug,
-        venue.title as name,
-        venue."shortDescription",
-        venue.description,
-        venue."heroImageUrl",
-        city.title as city,
-        venue.address,
-        venue.kind,
-        venue."pageStatus",
-        count(event.id)::int as events,
-        count(event.id) filter (where ${PUBLIC_WATER_EVENT_SQL})::int as "waterEvents"
-      from "Venue" venue
-      left join "City" city on city.id = venue."cityId"
-      left join "Event" event on event."venueId" = venue.id
-      left join "Category" cat on cat.id = event."categoryId"
-      left join "Subcategory" sub on sub.id = event."primarySubcategoryId"
-      group by venue.id, city.title
-      order by events desc, venue.title asc
-      limit $1
-    `,
-    [limit],
-  );
 
-  return result.rows.map((row) => {
-    const name = formatPublicVenueTitle(row.name);
-    const mapped = {
-      id: row.id,
-      slug: row.slug,
-      name,
-      city: row.city || 'Не указан',
-      address: row.address,
-      shortDescription: row.shortDescription,
-      heroImageUrl: row.heroImageUrl,
-      proposedKind: String(row.kind || 'OTHER').toLowerCase(),
-      kind: String(row.kind || 'OTHER').toUpperCase(),
-      pageStatus: String(row.pageStatus || 'NONE').toLowerCase(),
-      reason: row.pageStatus === 'CANDIDATE' ? 'кандидат на public-страницу' : 'пока только локация',
-      events: row.events,
-      waterEvents: row.waterEvents,
-    };
-    mapped.city = resolvePublicVenueCity(mapped);
-    return applyPublicVenueNormalization(mapped);
-  });
-}
 
-const PUBLIC_VENUE_HUB_EXCLUDED_KINDS = new Set(['MEETING_POINT', 'ONLINE']);
+/** Short hub chips on `/cities` cards (CHPU landings). */
+const CITY_HUB_LANDING_SHORT = {
+  'river-cruises': 'Речные',
+  'bus-tours': 'Автобусные',
+  'river-party': 'Вечеринки',
+  'bridges-night': 'Мосты',
+  'moscow-dinner-boat': 'Ужин',
+  'moscow-museums': 'Музеи',
+  'moscow-city-day': 'День города',
+  'spb-yards': 'Дворы',
+  standup: 'Стендап',
+  'family-kids': 'Семьям',
+  'concerts-genre': 'Концерты',
+  'walking-tours': 'Пешие',
+  'country-tours': 'Загород',
+  exhibitions: 'Выставки',
+  'active-sport': 'Активный',
+  rooftops: 'Смотровые',
+  planetarium: 'Планетарий',
+  excursions: 'Экскурсии',
+  'unusual-theatres': 'Театр',
+  'new-year': 'Новый год',
+  'salute-9-may': 'Салют',
+};
 
-const INSTITUTION_VENUE_KINDS = new Set(['MUSEUM_ART_SPACE', 'THEATER', 'CONCERT_HALL', 'CLUB_BAR_RESTAURANT', 'BAR']);
-
-function normalizeVenueKindValue(value) {
-  return String(value || 'OTHER')
-    .trim()
-    .toUpperCase()
-    .replace(/-/g, '_');
-}
-
-export function publicVenuePageTemplate(kind) {
-  const normalized = normalizeVenueKindValue(kind);
-  return INSTITUTION_VENUE_KINDS.has(normalized) ? 'institution' : 'location';
-}
-
-const MEETING_POINT_TEXT_RE =
-  /место сбора|место встречи|точка сбора|точка встречи|площадка:|^метро\b|^м\.(?:\s|«|"|')|\bм\.\s*(?:«|[а-яё])|\bу метро\b|около метро|у памятник|памятник|\bпам\.|\bу пам\b|пл\.\s*у\s*пам/iu;
-
-function hasMeetingPointSignals(name, address, shortDescription, description) {
-  const text = `${venueNameAddressText(name, address)} ${shortDescription || ''} ${description || ''}`.toLowerCase();
-  return MEETING_POINT_TEXT_RE.test(text);
-}
-
-function isMeetingPointLikeRow(row) {
-  const resolved = resolvePublicVenueKindFromRow(row);
-  if (resolved === 'bus') return false;
-  if (resolved === 'meeting_point') return true;
-  const name = `${row.name || row.title || ''} ${row.address || ''}`.toLowerCase();
-  return MEETING_POINT_TEXT_RE.test(name);
-}
-
-function venueNameAddressText(name, address) {
-  return `${name || ''} ${address || ''}`.toLowerCase();
-}
-
-const PUBLIC_WATER_EVENT_TEXT_RE =
-  /водн|речн|теплоход|катер|яхт|корабл|судн|лодк|канал|круиз|развод.*мост|мост.*развод|прогулк/i;
-
-const PUBLIC_WATER_EVENT_SQL = `
-  (
-    coalesce(cat.title, '') ~* 'водн|речн|теплоход|катер'
-    or coalesce(sub.title, '') ~* 'водн|речн|теплоход|катер'
-    or coalesce(event.title, '') ~* 'теплоход|катер|яхт|корабл|судн|лодк|речн|река|канал|круиз|развод.*мост|мост.*развод|прогулк'
-    or exists (
-      select 1
-      from "EventTag" event_tag
-      join "Tag" tag on tag.id = event_tag."tagId"
-      where event_tag."eventId" = event.id
-        and tag.title ~* 'водн|речн|теплоход|катер|яхт|корабл'
-    )
-    or exists (
-      select 1
-      from "EventOffer" event_offer
-      where event_offer."eventId" = event.id
-        and event_offer.active = true
-        and event_offer."sourceCode"::text = 'TEPLOHOD'
-    )
-  )
-`;
-
-function isWaterCatalogSession(session) {
-  if (!session) return false;
-  if (String(session.sourceCode || '').toUpperCase().includes('TEPLOHOD')) return true;
-  const text = [session.category, session.title, ...(session.tags || []), session.sourceCode].filter(Boolean).join(' ').toLowerCase();
-  return PUBLIC_WATER_EVENT_TEXT_RE.test(text);
-}
-
-function hasWaterOnlyEvents(waterEvents, totalEvents) {
-  const water = Number(waterEvents || 0);
-  const total = Number(totalEvents || 0);
-  return total > 0 && water >= total;
-}
-
-const PUBLIC_BUS_EVENT_TEXT_RE =
-  /автобус|автобусн|hop[\s-]?on|hop[\s-]?off|city[\s-]?sightseeing|city[\s-]?tour|сити[\s-]?тур|двухэтажн|садись[\s-]?руляй/i;
-
-function isBusCatalogSession(session) {
-  if (!session) return false;
-  const text = [session.category, session.title, ...(session.tags || []), ...(session.subcategories || [])]
+function buildCityHubTags(bucket) {
+  const landingTags = Array.from(bucket.landings.entries())
+    .map(([slug, events]) => {
+      const rule = LANDING_RULES.find((item) => item.slug === slug);
+      const label = CITY_HUB_LANDING_SHORT[slug] || rule?.chips?.[0] || rule?.title || null;
+      if (!label) return null;
+      return { slug, label, events, kind: 'landing' };
+    })
     .filter(Boolean)
-    .join(' ')
-    .toLowerCase();
-  return PUBLIC_BUS_EVENT_TEXT_RE.test(text);
-}
+    .sort((a, b) => b.events - a.events || a.label.localeCompare(b.label, 'ru'))
+    .slice(0, 3);
 
-function hasBusOnlyEvents(busEvents, totalEvents) {
-  const bus = Number(busEvents || 0);
-  const total = Number(totalEvents || 0);
-  return total > 0 && bus >= total;
-}
+  if (landingTags.length >= 2) return landingTags;
 
-function hasActiveBusCatalogEvents(busEvents) {
-  return Number(busEvents || 0) > 0;
-}
-
-function hasBusLikeText(name, address) {
-  const text = venueNameAddressText(name, address);
-  if (
-    /автобус|bus[\s-]?stop|авт\.?\s*остан|автобусн(?:ая|ой)?\s+останов|остановк.*автобус|hop[\s-]?on|hop[\s-]?off|city[\s-]?sightseeing|city[\s-]?tour|сити[\s-]?тур|двухэтажн|маршрут.*автобус|садись[\s-]?руляй|^автобус$/i.test(
-      text,
-    )
-  ) {
-    return true;
-  }
-  if (/\bсектор\s*[«"'][A-ZBCАВСЕ]/i.test(text)) {
-    if (/причал|пристань|набереж|речн|канал|фонтанк|мойк|нев|мост|устьин|китай/i.test(text)) return false;
-    return true;
-  }
-  return false;
-}
-
-function isTransportVehicleVenueName(name) {
-  const text = String(name || '').trim();
-  if (!text) return false;
-  if (/^yutong\b|^маз\b|^паз\b|^hyundai\b|^mercedes\b|^volvo\b|^man\b|^ikarus\b/i.test(text)) return true;
-  if (/^[a-zа-яё][a-zа-яё\s-]{0,20}\d{3,5}$/i.test(text) && text.length <= 28) return true;
-  return false;
-}
-
-function isJunkPublicVenueRow(row) {
-  const name = String(row?.name || row?.title || '').trim();
-  const address = String(row?.address || '').trim();
-  const text = venueNameAddressText(name, address);
-
-  if (isTransportVehicleVenueName(name)) return true;
-  if (/^на парковке\b|парковк.*турист|турист.*транспорт|парковка.*(?:трц|торгов|молл)/i.test(text)) {
-    if (Number(row?.busEvents || 0) <= 0) return true;
-  }
-  if (/^wc\b|^туалет\b|^кондиционер\b/i.test(name)) return true;
-
-  const resolved = resolvePublicVenueKindFromRow(row);
-  if (resolved === 'meeting_point' && !hasActiveBusCatalogEvents(row?.busEvents)) return true;
-
-  return false;
-}
-
-function buildActiveVenueEventCounts(sessions) {
-  const activeCounts = new Map();
-  const waterCounts = new Map();
-  const busCounts = new Map();
-  const heroImageFallbacks = new Map();
-  const nextSessionStartsAt = new Map();
-  const seen = new Map();
-  const now = Date.now();
-
-  for (const session of sessions || []) {
-    if (!session?.venueId) continue;
-    if (!seen.has(session.venueId)) seen.set(session.venueId, new Set());
-    const keys = seen.get(session.venueId);
-    const key = session.groupKey || session.id;
-    if (!key || keys.has(key)) continue;
-    keys.add(key);
-    activeCounts.set(session.venueId, (activeCounts.get(session.venueId) || 0) + 1);
-    if (isWaterCatalogSession(session)) {
-      waterCounts.set(session.venueId, (waterCounts.get(session.venueId) || 0) + 1);
-    }
-    if (isBusCatalogSession(session)) {
-      busCounts.set(session.venueId, (busCounts.get(session.venueId) || 0) + 1);
-    }
-    if (!heroImageFallbacks.has(session.venueId)) {
-      const imageUrl = pickRealPublicImageUrl(session.imageUrl);
-      if (imageUrl) heroImageFallbacks.set(session.venueId, imageUrl);
-    }
-    if (session.startsAt) {
-      const at = parseSessionStartsAt(session.startsAt).getTime();
-      if (Number.isFinite(at) && at >= now - 30 * 60 * 1000) {
-        const previous = nextSessionStartsAt.get(session.venueId);
-        if (!previous || at < previous) nextSessionStartsAt.set(session.venueId, session.startsAt);
-      }
-    }
-  }
-
-  return { activeCounts, waterCounts, busCounts, heroImageFallbacks, nextSessionStartsAt };
-}
-
-function pickRealPublicImageUrl(value) {
-  const url = String(value || '').trim();
-  if (!url) return null;
-  if (url.startsWith('/images/cities/')) return null;
-  return /^https?:\/\//i.test(url) ? url : null;
-}
-
-function resolveVenueHeroImageUrl(row, heroImageFallbacks = null) {
-  const stored = pickRealPublicImageUrl(row?.heroImageUrl);
-  if (stored) return stored;
-
-  const venueIds = row?.mergedVenueIds || (row?.id ? [row.id] : []);
-  for (const venueId of venueIds) {
-    const fallback = heroImageFallbacks?.get(venueId);
-    if (fallback) return fallback;
-  }
-
-  return row?.heroImageUrl || null;
-}
-
-function hasStrongPierLocationText(name, address) {
-  const text = venueNameAddressText(name, address);
-  if (/смотров(?:ая|ой|ую|ые)\s+площадк/i.test(text)) return false;
-  if (/пассажирск(?:ий|ого|ая|ые)\s+терминал/i.test(text)) return true;
-  if (/морск(?:ой|ого|ая|ые)\s+вокзал/i.test(text)) return true;
-  if (/речн(?:ой|ая|ого|ые)?\s+(?:вокзал|порт)/i.test(text)) return true;
-  if (/причал|пристань/i.test(text)) return true;
-  if (/набереж/i.test(text) && /(?:терминал|вокзал|порт)/i.test(text)) return true;
-  return false;
-}
-
-function hasPierLikeText(name, address) {
-  return hasStrongPierLocationText(name, address);
-}
-
-function isViewingPlatformLikeVenue(name, address, shortDescription, description) {
-  const text = [name, address, shortDescription, description].filter(Boolean).join(' ');
-  return /смотров(?:ая|ой|ую|ые)\s+площадк|smotrovaya|viewing platform|observation deck/i.test(text);
-}
-
-function isBarLikeFromText(text) {
-  const t = String(text || '').trim().toLowerCase();
-  if (!t) return false;
-  if (/(?:^|[\s«"'(\[]|-)(?:бар|паб)(?:[\s"'»)\],!.]|$)/u.test(t)) return true;
-  if (/\bpub\b|(?:^|[\s-])bar(?:[\s.-]|$)|-bar\b|\bbar\b|barrock|music\s*bar|lounge[\s-]?bar|bar$/iu.test(t)) return true;
-  if (/концертный бар|рок-бар|коктейльн(?:ый|ого) бар|музыкальн(?:ый|ого) бар|ночной бар/iu.test(t)) return true;
-  return false;
-}
-
-function isClubRestaurantLikeFromText(text) {
-  const t = String(text || '').trim().toLowerCase();
-  if (!t || isBarLikeFromText(t)) return false;
-  if (
-    /ресторан|кафе|гастроном|пивной ресторан|ресторан-клуб|музыкальн(?:ый|ого) ресторан|баварск|грузинск|хачапури|хинкали|гостеприимств|oktoberfest|пивоварен/iu.test(
-      t,
-    )
-  ) {
-    return true;
-  }
-  if (
-    /ночной клуб|музыкальн(?:ый|ого) клуб|концертный клуб|клубный ресторан|арт-пространств[^\n]{0,48}клуб|клуб[^\n]{0,24}арт-пространств|(?:^|[\s«"'(\[]|-)(?:клуб)(?:[\s"'»)\],!.]|$)/u.test(
-      t,
-    )
-  ) {
-    return true;
-  }
-  return /\bclub\b/i.test(t) && !/concert hall|concert-hall/i.test(t);
-}
-
-function inferBarOrClubFromContent(name, address, shortDescription, description) {
-  const content = [name, address, shortDescription, description].filter(Boolean).join(' ');
-  if (isBarLikeVenue(name, address) || isBarLikeFromText(content)) return 'bar';
-  if (isClubRestaurantLikeFromText(content)) return 'club_bar_restaurant';
-  return null;
-}
-
-function isBarLikeVenue(name, address) {
-  const nameText = String(name || '').trim().toLowerCase();
-  if (!nameText) return false;
-  if (/(?:^|[\s«"'(\[]|-)(?:бар|паб)(?:[\s"'»)\],!.]|$)/u.test(nameText)) return true;
-  return /\bpub\b|(?:^|[\s-])bar(?:[\s.-]|$)|-bar\b|\bbar\b|barrock|music\s*bar|lounge[\s-]?bar|bar$/iu.test(nameText);
-}
-
-function inferPublicVenueKindFromName(name, address) {
-  const text = venueNameAddressText(name, address);
-  if (MEETING_POINT_TEXT_RE.test(text)) return 'meeting_point';
-  if (/смотров(?:ая|ой|ую|ые)\s+площадк/i.test(text)) return 'museum_art_space';
-  if (hasBusLikeText(name, address)) return 'bus';
-  if (hasStrongPierLocationText(name, address)) return 'pier';
-  if (/турбаз|база отдыха|глэмпинг/i.test(text)) return 'outdoor_location';
-  if (/театр|teatr/i.test(text)) return 'theater';
-  if (/музей|галере|выстав/i.test(text)) return 'museum_art_space';
-  if (isBarLikeVenue(name, address)) return 'bar';
-  if (/банкет|\bзал\b|hall|концерт|филармони|дворец/i.test(text)) return 'concert_hall';
-  if (/клуб|\bclub\b|ресторан|кафе/i.test(text)) return 'club_bar_restaurant';
-  if (/стадион|арена|спорт|каток/i.test(text)) return 'sport_activity_space';
-  if (/\bпарк\b|сквер/i.test(text)) return 'outdoor_location';
-  return 'venue';
-}
-
-function canonicalStoredVenueKind(storedKind) {
-  const stored = normalizeVenueKindValue(storedKind).toLowerCase();
-  if (stored === 'pier_water' || stored === 'pier') return 'pier';
-  return stored;
-}
-
-function resolvePublicVenueKind(storedKind, name, address, options = {}) {
-  const stored = canonicalStoredVenueKind(storedKind);
-  const inferred = inferPublicVenueKindFromName(name, address);
-  const { shortDescription, description, waterEvents = 0, busEvents = 0, totalEvents = 0 } = options;
-  const text = venueNameAddressText(name, address);
-  const busByAllEvents =
-    hasBusOnlyEvents(busEvents, totalEvents) && !/teplohod|теплоход|причал|пристань/i.test(text);
-  const busByCatalogEvents = hasActiveBusCatalogEvents(busEvents);
-
-  if (inferred === 'bus' || hasBusLikeText(name, address) || busByAllEvents || busByCatalogEvents) {
-    return 'bus';
-  }
-
-  if (
-    inferred === 'meeting_point' ||
-    stored === 'meeting_point' ||
-    hasMeetingPointSignals(name, address, shortDescription, description)
-  ) {
-    return 'meeting_point';
-  }
-
-  const barOrClub = inferBarOrClubFromContent(name, address, shortDescription, description);
-  if (barOrClub) return barOrClub;
-
-  if (isViewingPlatformLikeVenue(name, address, shortDescription, description)) {
-    return 'museum_art_space';
-  }
-
-  if (
-    stored === 'pier' ||
-    hasStrongPierLocationText(name, address) ||
-    hasPierLikeText(name, address) ||
-    inferred === 'pier' ||
-    (hasWaterOnlyEvents(waterEvents, totalEvents) && !isViewingPlatformLikeVenue(name, address, shortDescription, description))
-  ) {
-    return 'pier';
-  }
-
-  if (INSTITUTION_VENUE_KINDS.has(normalizeVenueKindValue(storedKind))) {
-    return stored;
-  }
-
-  if (stored === 'other' || stored === 'venue') {
-    return inferred;
-  }
-
-  if (stored === 'theater' && inferred !== 'theater') {
-    return inferred;
-  }
-
-  return stored;
-}
-
-function resolvePublicVenueKindFromRow(row) {
-  const override = findVenueOverride({
-    id: row.id,
-    title: row.name || row.title,
-    name: row.name || row.title,
-  });
-  const storedKind = override?.kind || row.kind || row.proposedKind;
-  return resolvePublicVenueKind(storedKind, row.name || row.title, row.address, {
-    shortDescription: row.shortDescription,
-    description: row.description,
-    waterEvents: Number(row.waterEvents || 0),
-    busEvents: Number(row.busEvents || 0),
-    totalEvents: Number(row.events || 0),
-  });
-}
-
-function isPublicVenueHub(row, options = {}) {
-  const requireEvents = options.requireEvents !== false;
-  if (!row) return false;
-  const kind = normalizeVenueKindValue(row.kind || row.proposedKind);
-  if (PUBLIC_VENUE_HUB_EXCLUDED_KINDS.has(kind)) {
-    if (!(kind === 'MEETING_POINT' && hasActiveBusCatalogEvents(row.busEvents))) return false;
-  }
-  if (isMeetingPointLikeRow(row)) return false;
-  if (isJunkPublicVenueRow(row)) return false;
-  if (String(row.pageStatus || '').toUpperCase() === 'HIDDEN') return false;
-  if (requireEvents && Number(row.events) <= 0) return false;
-  return true;
-}
-
-function applyPublicVenueDisplayName(row, type) {
-  const name = row.name || row.title;
-  if (type === 'bus') return formatBusLocationDisplayName(name, row.address, row.city);
-  if (type === 'pier') return formatPierLocationDisplayName(name, row.address, row.city);
-  return name;
-}
-
-function mapPublicVenueListItem(row) {
-  const normalized = applyPublicVenueNormalization(row);
-  const type = resolvePublicVenueKindFromRow(normalized);
-  const name = applyPublicVenueDisplayName(normalized, type);
-  const shortDescription = pickPublicVenueLeadText(normalized.shortDescription, normalized.description);
-  return {
-    id: normalized.id,
-    slug: publicVenueSlug(normalized.slug, name, normalized.id),
-    name,
-    city: normalized.city,
-    address: normalized.address,
-    type,
-    template: publicVenuePageTemplate(type),
-    pageStatus: normalized.pageStatus,
-    shortDescription,
-    heroImageUrl: normalized.heroImageUrl,
-    events: normalized.events,
-    categories: {},
-    nextSlot: normalized.nextSessionStartsAt ? formatTime(normalized.nextSessionStartsAt) : null,
-  };
-}
-
-export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchParams()) {
-  const limit = clampNumber(searchParams.get('limit'), 1, 500, 240);
-  const query = String(searchParams.get('q') || '').trim().toLowerCase();
-  const cityFilter = String(searchParams.get('city') || '').trim().toLowerCase();
-  const typeFilter = String(searchParams.get('type') || '').trim().toLowerCase();
-  const familyFilter = String(searchParams.get('family') || '').trim().toLowerCase();
-
-  if (!query && !cityFilter && !typeFilter && familyFilter) {
-    const warmList = warmVenueCatalogList(familyFilter);
-    if (warmList) {
-      const venues = warmList.slice(0, limit);
-      const cities = countBy(venues.map((venue) => venue.city).filter(Boolean));
-      const types = countBy(venues.map((venue) => venue.type).filter(Boolean));
-      return {
-        generatedAt: new Date().toISOString(),
-        total: venues.length,
-        venues,
-        stats: {
-          venues: venues.length,
-          cities,
-          types,
-        },
-      };
-    }
-  }
-
-  const rows = await publicVenueHubRows(db, 500);
-  const venues = rows
-    .filter((row) => {
-      if (!query) return true;
-      return [row.name, row.city, row.address, row.proposedKind].filter(Boolean).join(' ').toLowerCase().includes(query);
-    })
-    .filter((row) => {
-      if (!cityFilter) return true;
-      const citySlug = publicCitySlug(row.city || '');
-      return citySlug === cityFilter || String(row.city || '').toLowerCase().includes(cityFilter);
-    })
-    .filter((row) => {
-      if (!typeFilter) return true;
-      return resolvePublicVenueKindFromRow(row) === typeFilter;
-    })
-    .filter((row) => {
-      if (!familyFilter) return true;
-      const template = publicVenuePageTemplate(resolvePublicVenueKindFromRow(row));
-      return template === familyFilter;
-    })
-    .slice(0, limit)
-    .map(mapPublicVenueListItem);
-
-  const cities = countBy(venues.map((venue) => venue.city).filter(Boolean));
-  const types = countBy(venues.map((venue) => venue.type).filter(Boolean));
-  return {
-    generatedAt: new Date().toISOString(),
-    total: venues.length,
-    venues,
-    stats: {
-      venues: venues.length,
-      cities,
-      types,
-    },
-  };
-}
-
-export function buildPublicDestinationRowsFromSessions(sessions) {
-  const buckets = new Map();
-
-  for (const session of sessions) {
-    const destination = publicDestinationFromSession(session);
-    if (!destination.name || destination.name === 'Не указан') continue;
-    if (!buckets.has(destination.name)) {
-      buckets.set(destination.name, {
-        id: destination.id,
-        slug: destination.slug,
-        sourceSlug: destination.sourceSlug,
-        name: destination.name,
-        type: destination.type,
-        events: 0,
-        venueIds: new Set(),
-        categories: new Map(),
-      });
-    }
-
-    const bucket = buckets.get(destination.name);
-    bucket.events += 1;
-    if (session.venueId) bucket.venueIds.add(session.venueId);
-    if (session.category) bucket.categories.set(session.category, (bucket.categories.get(session.category) || 0) + 1);
-  }
-
-  return Array.from(buckets.values())
-    .map((bucket) => ({
-      id: bucket.id,
-      slug: bucket.slug,
-      sourceSlug: bucket.sourceSlug,
-      name: bucket.name,
-      type: bucket.type,
-      events: bucket.events,
-      venues: bucket.venueIds.size,
-      categories: Array.from(bucket.categories.entries())
-        .map(([name, events]) => ({ name, events }))
-        .sort((a, b) => b.events - a.events || a.name.localeCompare(b.name, 'ru')),
+  const categoryTags = Array.from(bucket.categories.entries())
+    .map(([name, events]) => ({
+      slug: null,
+      label: name,
+      events,
+      kind: 'category',
     }))
-    .filter((bucket) => bucket.events >= PUBLIC_DESTINATION_MIN_EVENTS)
-    .filter(isAllowedPublicDestination)
-    .sort(destinationSort);
+    .sort((a, b) => b.events - a.events || a.label.localeCompare(b.label, 'ru'))
+    .slice(0, 3 - landingTags.length);
+
+  return [...landingTags, ...categoryTags].slice(0, 3);
 }
 
 async function destinationRows(db) {
@@ -6390,6 +6444,7 @@ async function destinationSummaryRowsFast(db) {
           source.code as "sourceCode",
           coalesce(source.name, source.code::text, primary_offer."sourceCode"::text, '') as "sourceLabel",
           e.title,
+          override.title as "overrideTitle",
           e.kind,
           e."sourceStatus",
           city.id as "cityId",
@@ -6401,10 +6456,10 @@ async function destinationSummaryRowsFast(db) {
           region.title as "regionTitle",
           venue.id as "venueId",
           venue.title as venue,
-          min(session."startsAt") filter (where coalesce(session."endsAt", session."startsAt") >= now()) as "startsAt",
-          count(distinct session.id) filter (where coalesce(session."endsAt", session."startsAt") >= now())::int as "slotCount",
+          min(session."startsAt") filter (where ${ACTIVE_SESSION_SQL}) as "startsAt",
+          count(distinct session.id) filter (where ${ACTIVE_SESSION_SQL})::int as "slotCount",
           min(e."priceFromRub") filter (where e."priceFromRub" >= $1) as "eventPriceFromRub",
-          min(session."priceFromRub") filter (where coalesce(session."endsAt", session."startsAt") >= now() and session."priceFromRub" >= $1) as "sessionPriceFromRub",
+          min(session."priceFromRub") filter (where ${ACTIVE_SESSION_SQL} and session."priceFromRub" >= $1) as "sessionPriceFromRub",
           min(primary_offer."priceRub") filter (where primary_offer."priceRub" >= $1) as "offerPriceRub",
           bool_or(
             primary_offer."widgetUrl" is not null
@@ -6418,6 +6473,7 @@ async function destinationSummaryRowsFast(db) {
         left join "City" city on city.id = e."primaryCityId"
         left join "Region" region on region.id = city."regionId"
         left join "Venue" venue on venue.id = e."venueId"
+        left join "EventOverride" override on override."eventId" = e.id
         left join "EventSourceLink" source_link on source_link."eventId" = e.id
         left join "Source" source on source.id = source_link."sourceId"
         left join "EventSession" session on session."eventId" = e.id
@@ -6429,6 +6485,7 @@ async function destinationSummaryRowsFast(db) {
           source.code,
           source_link."externalId",
           primary_offer."sourceCode",
+          override.id,
           city.id,
           city.title,
           city.slug,
@@ -6464,16 +6521,15 @@ async function destinationSummaryRowsFast(db) {
             '|',
             lower(regexp_replace(trim(coalesce("sourceLabel", '')), '\\s+', ' ', 'g')),
             lower(regexp_replace(trim(coalesce(
-              nullif(trim(${catalogGroupTitleSqlExpression('title')}), ''),
+              nullif(trim(${catalogGroupTitleSqlExpression()}), ''),
               trim(coalesce(venue, ''))
             )), '\\s+', ' ', 'g')),
             lower(regexp_replace(trim(coalesce(city, '')), '\\s+', ' ', 'g')),
             lower(regexp_replace(trim(coalesce(venue, '')), '\\s+', ' ', 'g'))
           ) as "groupKey"
         from normalized
-        where "priceFrom" >= $1
-          and "purchaseReady" = true
-          and lower(coalesce("sourceStatus", '')) not in ('widget_blocked', 'paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden')
+        where "purchaseReady" = true
+          and lower(coalesce("sourceStatus", '')) not in (${PUBLIC_SALES_BLOCKED_STATUS_SQL})
           and (
             "startsAt" is not null
             or kind = 'OPEN_DATE'
@@ -6503,9 +6559,11 @@ async function destinationSummaryRowsFast(db) {
   );
 
   const buckets = new Map();
+  const separateCityHubs = collectSeparateCityHubNames(result.rows);
   for (const row of result.rows) {
-    const destination = publicDestinationForCity(row);
-    if (!destination.name || destination.name === 'Не указан') continue;
+    const destination = publicDestinationForCity(row, separateCityHubs);
+    // Foreign / unroutable cities return null — skip without crashing /api/public/stats.
+    if (!destination?.name || destination.name === 'Не указан') continue;
     if (!buckets.has(destination.name)) {
       buckets.set(destination.name, {
         id: destination.id,
@@ -6533,15 +6591,25 @@ async function destinationSummaryRowsFast(db) {
       events: bucket.events,
       venues: bucket.venueIds.size,
     }))
-    .filter((bucket) => bucket.events >= PUBLIC_DESTINATION_MIN_EVENTS)
+    .filter(isVisibleOnCitiesCatalog)
     .filter(isAllowedPublicDestination)
     .sort(destinationSort);
 }
 
-function publicDestinationForCity(row) {
+function publicDestinationForCity(row, separateCityHubs) {
   const cityName = cleanDisplayName(row.city) || 'Не указан';
 
-  if (STANDALONE_CITY_NAMES.has(cityName)) {
+  if (isForeignPublicCity(cityName)) {
+    return null;
+  }
+
+  const mappedRegion = CITY_TO_REGION.get(cityName);
+  const keepAsSeparateCity =
+    isSubjectCapitalCity(cityName) ||
+    (isFoldingRegionalTown(cityName) && separateCityHubs && separateCityHubs.has(cityName)) ||
+    (STANDALONE_CITY_NAMES.has(cityName) && !mappedRegion);
+
+  if (keepAsSeparateCity) {
     return buildPublicDestinationRecord(row, cityName);
   }
 
@@ -6549,7 +6617,6 @@ function publicDestinationForCity(row) {
     return buildPublicDestinationRecord(row, cityName);
   }
 
-  const mappedRegion = CITY_TO_REGION.get(cityName);
   if (mappedRegion) {
     return buildPublicDestinationRecord(row, mappedRegion);
   }
@@ -6559,22 +6626,8 @@ function publicDestinationForCity(row) {
   }
 
   const routed = routeCityToPublicDisplayName(cityName);
+  if (!routed) return null;
   return buildPublicDestinationRecord(row, routed);
-}
-
-export function publicDestinationFromSession(session) {
-  const name = cleanDisplayName(session.destination) || cleanDisplayName(session.city) || 'Не указан';
-  let type = session.destinationType === 'region' ? 'region' : 'city';
-  if (type === 'city' && isPublicRegionName(name)) type = 'region';
-  if (type === 'region' && STANDALONE_CITY_NAMES.has(name)) type = 'city';
-  const slug = publicCitySlug(name);
-  return {
-    id: type === 'region' ? `region_${slug}` : session.cityId || `city_${slug}`,
-    slug,
-    sourceSlug: type === 'region' ? slug : session.sourceCitySlug || slug,
-    name,
-    type,
-  };
 }
 
 const CITY_SLUG_CANONICAL = {
@@ -6582,13 +6635,19 @@ const CITY_SLUG_CANONICAL = {
   moskva: 'moskva',
   'saint-petersburg': 'sankt-peterburg',
   'sankt-peterburg': 'sankt-peterburg',
+  // latin SEO slug, destination slug, and Cyrillic DB slug (и→i → nizhnii-…)
   'nizhny-novgorod': 'nizhniy-novgorod',
   'nizhniy-novgorod': 'nizhniy-novgorod',
+  'nizhnii-novgorod': 'nizhniy-novgorod',
   'veliky-novgorod': 'velikiy-novgorod',
   'velikiy-novgorod': 'velikiy-novgorod',
   rostov: 'rostov-na-donu',
   'rostov-on-don': 'rostov-na-donu',
   'rostov-na-donu': 'rostov-na-donu',
+  'hanty-mansiysk': 'hanty-mansiysk',
+  'khanty-mansiysk': 'hanty-mansiysk',
+  novokuzneck: 'novokuzneck',
+  novokuznetsk: 'novokuzneck',
 };
 
 function canonicalCitySlug(value) {
@@ -6669,70 +6728,6 @@ function buildCatalogSlugIndex(sessions) {
   return index;
 }
 
-function collectVenueSessionLookupContexts(venue, mergedGroup) {
-  const contexts = [];
-  const seen = new Set();
-  const add = (row) => {
-    if (!row) return;
-    const key = `${row.name || row.title || ''}|${row.address || ''}`;
-    if (seen.has(key)) return;
-    seen.add(key);
-    contexts.push(row);
-  };
-
-  add(venue);
-  add(mergedGroup);
-  return contexts;
-}
-
-function pierKeysForVenueContexts(venueContexts = []) {
-  const keys = new Set();
-  for (const context of venueContexts) {
-    const pierKey = canonicalPierLocationKey(context.name || context.title, context.address);
-    if (pierKey) keys.add(pierKey);
-  }
-  return keys;
-}
-
-function sortVenueCatalogSessions(sessions) {
-  return sessions.sort((a, b) => {
-    const aTime = Date.parse(a.startsAt || '') || Number.POSITIVE_INFINITY;
-    const bTime = Date.parse(b.startsAt || '') || Number.POSITIVE_INFINITY;
-    return aTime - bTime || String(a.title || '').localeCompare(String(b.title || ''), 'ru');
-  });
-}
-
-function lookupVenueCatalogSessions(venueIds, catalogSessions, venueContexts = []) {
-  if (!venueIds?.length && !venueContexts.length) return [];
-
-  const pierKeys = pierKeysForVenueContexts(venueContexts);
-  const index = publicCatalogCache?.venueIndex;
-  if (index) {
-    const seen = new Set();
-    const result = [];
-    const collect = (session) => {
-      if (!session || seen.has(session.id)) return;
-      seen.add(session.id);
-      result.push(session);
-    };
-
-    for (const venueId of venueIds || []) {
-      for (const session of index.get(String(venueId).toLowerCase()) || []) collect(session);
-    }
-    for (const pierKey of pierKeys) {
-      for (const session of index.get(`pier:${pierKey}`) || []) collect(session);
-    }
-    if (result.length) return sortVenueCatalogSessions(result);
-  }
-
-  const idSet = new Set(venueIds || []);
-  const matched = catalogSessions.filter((session) => {
-    if (idSet.has(session.venueId)) return true;
-    const pierKey = canonicalSessionPierKey(session);
-    return pierKey && pierKeys.has(pierKey);
-  });
-  return sortVenueCatalogSessions(matched);
-}
 
 function lookupCatalogSessionBySlug(slugOrId, catalogSessions = null) {
   const value = String(slugOrId || '').trim();
@@ -6761,26 +6756,6 @@ function lookupCatalogSessionBySlug(slugOrId, catalogSessions = null) {
   );
 }
 
-export function lookupDestinationCatalogSessions(citySlugOrId, requestedSlug, catalogSessions) {
-  const index = publicCatalogCache?.destinationIndex;
-  if (index) {
-    for (const key of [requestedSlug, String(citySlugOrId || '').toLowerCase(), canonicalCitySlug(citySlugOrId)].filter(Boolean)) {
-      const hit = index.get(String(key).toLowerCase());
-      if (hit?.length) return hit;
-    }
-  }
-
-  return catalogSessions.filter((session) => matchesPublicDestinationPage(session, citySlugOrId, requestedSlug));
-}
-
-export function publicVenuesForSessionsFromHub(sessions, hubRows, limit) {
-  const venueIds = new Set(sessions.map((session) => session.venueId).filter(Boolean));
-  if (!venueIds.size) return [];
-  return hubRows
-    .filter((row) => (row.mergedVenueIds || [row.id]).some((id) => venueIds.has(id)))
-    .slice(0, limit)
-    .map(mapPublicVenueListItem);
-}
 
 function matchesPublicDestinationPage(session, citySlugOrId, requestedSlug) {
   const destination = publicDestinationFromSession(session);
@@ -6831,34 +6806,20 @@ function destinationSortGroup(name, type) {
     'Республика Хакасия': '06-khakasia',
     'Ульяновск': '07-ulyanovsk',
     'Ульяновская область': '07-ulyanovsk',
+    'Владивосток': '08-vladivostok',
+    'Приморский край': '08-vladivostok',
+    'Хабаровск': '09-khabarovsk',
+    'Хабаровский край': '09-khabarovsk',
+    'Самара': '10-samara',
+    'Самарская область': '10-samara',
+    'Челябинск': '11-chelyabinsk',
+    'Челябинская область': '11-chelyabinsk',
+    'Уфа': '12-ufa',
+    'Республика Башкортостан': '12-ufa',
+    'Барнаул': '13-barnaul',
+    'Алтайский край': '13-barnaul',
   };
   return groups[name] || `90-${type}-${name}`;
-}
-
-export function destinationPrepositional(destination) {
-  const bySlug = {
-    'sankt-peterburg': 'в Санкт-Петербурге',
-    'saint-petersburg': 'в Санкт-Петербурге',
-    moscow: 'в Москве',
-    moskva: 'в Москве',
-    'moskovskaya-oblast': 'в Московской области',
-    'leningradskaya-oblast': 'в Ленинградской области',
-    'krasnodarskiy-kray': 'в Краснодарском крае',
-    'krasnoyarskiy-kray': 'в Красноярском крае',
-    'respublika-tatarstan': 'в Республике Татарстан',
-    'respublika-hakasiya': 'в Республике Хакасии',
-    'ulyanovskaya-oblast': 'в Ульяновской области',
-    'habarovskiy-kray': 'в Хабаровском крае',
-  };
-  if (bySlug[destination.slug]) return bySlug[destination.slug];
-
-  const name = cleanDisplayName(destination.name);
-  if (!name) return 'в выбранном направлении';
-  if (name === 'Москва') return 'в Москве';
-  if (name === 'Санкт-Петербург') return 'в Санкт-Петербурге';
-  if (destination.type === 'region') return `в регионе ${name}`;
-  if (name.endsWith('а')) return `в ${name.slice(0, -1)}е`;
-  return `в городе ${name}`;
 }
 
 async function publicSessions(db, limit) {
@@ -6868,41 +6829,225 @@ async function publicSessions(db, limit) {
 
 export async function publicCatalogSessions(db, forceRefresh = false) {
   const now = Date.now();
-  if (!forceRefresh && publicCatalogCache && publicCatalogCache.expiresAt > now) {
-    return publicCatalogCache.sessions;
-  }
-  if (!forceRefresh && publicCatalogBuildPromise) {
-    return publicCatalogBuildPromise;
-  }
+  const cached = publicCatalogCache;
 
   if (forceRefresh) {
-    publicCatalogCache = null;
-    publicCatalogBuildPromise = null;
+    if (cached?.sessions) {
+      publicCatalogCache = { ...cached, expiresAt: 0, staleUntil: 0 };
+    }
+    return schedulePublicCatalogRebuild(db, 'force-refresh');
   }
 
-  const buildPromise = (async () => {
-    const rows = await publicCatalogSessionsFast(db);
+  // Fresh hit.
+  if (cached?.sessions && now < cached.expiresAt) {
+    return cached.sessions;
+  }
 
-    publicCatalogCache = {
-      expiresAt: Date.now() + PUBLIC_CATALOG_CACHE_MS,
-      sessions: rows,
-      destinationIndex: buildDestinationSessionIndex(rows),
-      venueIndex: buildVenueSessionIndex(rows),
-      slugIndex: buildCatalogSlugIndex(rows),
-      catalogFacets: buildCatalogFacets(rows.filter(sessionHasCoverImage)),
-    };
+  // INC.504.4 / INC.504.5: serve ANY previous sessions immediately; refresh only via
+  // canonical public-catalog.dto (child/disk/single-flight) - never a second SQL rebuild.
+  if (cached?.sessions?.length) {
+    void schedulePublicCatalogRebuild(db, now < (cached.staleUntil || 0) ? 'swr' : 'soft-expire');
+    return cached.sessions;
+  }
 
-    return rows;
-  })();
+  return schedulePublicCatalogRebuild(db, 'cold');
+}
 
-  publicCatalogBuildPromise = buildPromise;
+/**
+ * INC.504.5: legacy dto.js catalog is an adopt/index layer over public-catalog.dto.ts.
+ * Heavy rebuild (SQL + map) lives only in the DTO path / child process.
+ */
+function schedulePublicCatalogRebuild(db, reason = 'refresh') {
+  if (publicCatalogBuildPromise) return publicCatalogBuildPromise;
+
+  publicCatalogBuildPromise = (async () => {
+    const startedAt = Date.now();
+    try {
+      const rows = await loadCanonicalPublicCatalogSessions(db, reason);
+      await adoptCanonicalCatalogSessions(rows, reason);
+      console.log(
+        `Public catalog legacy cache adopted from DTO (${reason}): ${rows.length} sessions in ${Date.now() - startedAt}ms`,
+      );
+      return rows;
+    } finally {
+      publicCatalogBuildPromise = null;
+    }
+  })().catch((error) => {
+    publicCatalogBuildPromise = null;
+    console.warn(
+      `Public catalog legacy cache adopt failed (${reason}): ${error instanceof Error ? error.message : String(error)}`,
+    );
+    throw error;
+  });
+
+  return publicCatalogBuildPromise;
+}
+
+async function loadCanonicalPublicCatalogSessions(db, reason) {
+  const forceRefresh = reason === 'force-refresh';
   try {
-    return await buildPromise;
-  } finally {
-    if (publicCatalogBuildPromise === buildPromise) publicCatalogBuildPromise = null;
+    const { getPublicCatalogSessions } = await import('./public-catalog.dto.js');
+    return await getPublicCatalogSessions(forceRefresh, { hydrateSlots: false });
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    const stale = publicCatalogCache?.sessions;
+    // Prefer forever-stale over uncontrolled SQL on the API event loop.
+    if (stale?.length) {
+      console.warn(
+        `Canonical catalog load failed (${reason}), serving stale legacy cache (${stale.length} sessions): ${detail}`,
+      );
+      return stale;
+    }
+
+    const now = Date.now();
+    const since = now - lastLegacyCatalogSqlFallbackAt;
+    if (lastLegacyCatalogSqlFallbackAt && since < LEGACY_CATALOG_SQL_COOLDOWN_MS) {
+      const waitSec = Math.ceil((LEGACY_CATALOG_SQL_COOLDOWN_MS - since) / 1000);
+      console.error(
+        `CRITICAL P1: legacy inline SQL fallback SKIPPED (rate-limited ${waitSec}s left) after canonical failure (${reason}): ${detail}`,
+      );
+      throw error;
+    }
+
+    lastLegacyCatalogSqlFallbackAt = now;
+    // Alert string (P1): keep "legacy inline SQL fallback" verbatim for log monitors.
+    console.error(
+      `CRITICAL P1: Canonical catalog load failed (${reason}), legacy inline SQL fallback: ${detail}`,
+    );
+    return publicCatalogSessionsFast(db);
   }
 }
 
+function yieldEventLoop() {
+  return new Promise((resolve) => setImmediate(resolve));
+}
+
+function mapIndexListsToIds(index) {
+  const out = Object.create(null);
+  for (const [key, list] of index.entries()) {
+    out[key] = (list || []).map((session) => session?.id).filter(Boolean);
+  }
+  return out;
+}
+
+function mapIndexOneToId(index) {
+  const out = Object.create(null);
+  for (const [key, session] of index.entries()) {
+    if (session?.id) out[key] = session.id;
+  }
+  return out;
+}
+
+/** INC.504.5c: serialize Maps → id pointers for disk artifact v2 (built in Catalog Worker). */
+export function serializePublicCatalogLegacyIndexes(sessions) {
+  const destinationIndex = buildDestinationSessionIndex(sessions);
+  const venueIndex = buildVenueSessionIndex(sessions);
+  const slugIndex = buildCatalogSlugIndex(sessions);
+  const catalogFacets = buildCatalogFacets(sessions.filter(sessionHasCoverImage));
+  return {
+    destinationIndex: mapIndexListsToIds(destinationIndex),
+    venueIndex: mapIndexListsToIds(venueIndex),
+    slugIndex: mapIndexOneToId(slugIndex),
+    catalogFacets,
+  };
+}
+
+/** Hydrate id-pointer indexes back to Maps of session object refs. */
+export function hydratePublicCatalogLegacyIndexes(sessions, serialized) {
+  if (!serialized || typeof serialized !== 'object') return null;
+  const byId = new Map((sessions || []).map((session) => [String(session.id), session]));
+  const hydrateList = (record) => {
+    const map = new Map();
+    for (const [key, ids] of Object.entries(record || {})) {
+      const list = (Array.isArray(ids) ? ids : [])
+        .map((id) => byId.get(String(id)))
+        .filter(Boolean);
+      if (list.length) map.set(key, list);
+    }
+    return map;
+  };
+  const hydrateOne = (record) => {
+    const map = new Map();
+    for (const [key, id] of Object.entries(record || {})) {
+      const session = byId.get(String(id));
+      if (session) map.set(key, session);
+    }
+    return map;
+  };
+  return {
+    destinationIndex: hydrateList(serialized.destinationIndex),
+    venueIndex: hydrateList(serialized.venueIndex),
+    slugIndex: hydrateOne(serialized.slugIndex),
+    catalogFacets: serialized.catalogFacets || buildCatalogFacets(sessions.filter(sessionHasCoverImage)),
+  };
+}
+
+async function adoptCanonicalCatalogSessions(rows, _reason) {
+  const now = Date.now();
+  const prev = publicCatalogCache;
+  const sameBlob = Boolean(prev?.sessions && rows === prev.sessions);
+
+  let destinationIndex;
+  let venueIndex;
+  let slugIndex;
+  let catalogFacets;
+  let builtAt;
+
+  if (sameBlob && prev?.destinationIndex && prev?.venueIndex && prev?.slugIndex && prev?.catalogFacets) {
+    destinationIndex = prev.destinationIndex;
+    venueIndex = prev.venueIndex;
+    slugIndex = prev.slugIndex;
+    catalogFacets = prev.catalogFacets;
+    builtAt = prev.builtAt || now;
+  } else {
+    // Prefer prebuilt indexes from disk v2 (Catalog Worker) - no Map rebuild on API.
+    let hydrated = null;
+    try {
+      const { loadPublicCatalogDiskCache } = await import('./public-catalog-disk-cache.js');
+      const disk = loadPublicCatalogDiskCache();
+      if (disk?.version === 2 && disk.indexes && (disk.sessions === rows || disk.sessions?.length === rows.length)) {
+        hydrated = hydratePublicCatalogLegacyIndexes(rows, disk.indexes);
+      }
+    } catch {
+      hydrated = null;
+    }
+
+    if (hydrated?.destinationIndex && hydrated?.venueIndex && hydrated?.slugIndex) {
+      destinationIndex = hydrated.destinationIndex;
+      venueIndex = hydrated.venueIndex;
+      slugIndex = hydrated.slugIndex;
+      catalogFacets = hydrated.catalogFacets;
+      builtAt = now;
+      console.log(
+        `Public catalog legacy indexes hydrated from disk v2 (${rows.length} sessions)`,
+      );
+    } else {
+      // Yield between heavy index maps so health/HTTP can run mid-adopt.
+      await yieldEventLoop();
+      destinationIndex = buildDestinationSessionIndex(rows);
+      await yieldEventLoop();
+      venueIndex = buildVenueSessionIndex(rows);
+      await yieldEventLoop();
+      slugIndex = buildCatalogSlugIndex(rows);
+      await yieldEventLoop();
+      catalogFacets = buildCatalogFacets(rows.filter(sessionHasCoverImage));
+      builtAt = now;
+    }
+  }
+
+  publicCatalogCache = {
+    expiresAt: now + Math.max(30_000, PUBLIC_CATALOG_CACHE_MS),
+    staleUntil: now + Math.max(60_000, PUBLIC_CATALOG_STALE_MS),
+    sessions: rows,
+    destinationIndex,
+    venueIndex,
+    slugIndex,
+    catalogFacets,
+    builtAt,
+  };
+}
+
+/** Emergency fallback only (INC.504.5): prefer public-catalog.dto / child / disk. */
 async function publicCatalogSessionsFast(db) {
   const [result, pinnedResult] = await Promise.all([
     db.query(
@@ -6990,9 +7135,17 @@ async function publicCatalogSessionsFast(db) {
           primary_offer."priceRub" as "offerPriceRub",
           primary_offer."widgetUrl" as "offerWidgetUrl",
           primary_offer."deeplinkUrl" as "offerDeeplinkUrl",
-          min(session."startsAt") filter (where coalesce(session."endsAt", session."startsAt") >= now()) as "startsAt",
-          min(session."priceFromRub") filter (where coalesce(session."endsAt", session."startsAt") >= now() and session."priceFromRub" >= $1) as "sessionPriceFromRub",
-          count(distinct session.id) filter (where coalesce(session."endsAt", session."startsAt") >= now())::int as "slotCount",
+          min(session."startsAt") filter (where ${ACTIVE_SESSION_SQL}) as "startsAt",
+          min(session."priceFromRub") filter (where ${ACTIVE_SESSION_SQL} and session."priceFromRub" >= $1) as "sessionPriceFromRub",
+          max(session."priceFromRub") filter (where ${ACTIVE_SESSION_SQL} and session."priceFromRub" >= $1) as "sessionPriceToRub",
+          (
+            select max(offer."priceRub")
+            from "EventOffer" offer
+            where offer."eventId" = e.id
+              and offer.active = true
+              and offer."priceRub" >= $1
+          ) as "offerPriceMaxRub",
+          count(distinct session.id) filter (where ${ACTIVE_SESSION_SQL})::int as "slotCount",
           ${orderedEventTagsSql('e.id')} as tags,
           (
             select coalesce(array_agg(distinct title), '{}')
@@ -7054,6 +7207,13 @@ async function publicCatalogSessionsFast(db) {
             where price is not null and price >= $1
           ) as "priceFrom",
           (
+            select max(price)
+            from (
+              values ("priceFromRub"), ("sessionPriceFromRub"), ("sessionPriceToRub"), ("offerPriceRub"), ("offerPriceMaxRub")
+            ) as prices(price)
+            where price is not null and price >= $1
+          ) as "priceTo",
+          (
             (
               "offerWidgetUrl" is not null
               or "offerDeeplinkUrl" is not null
@@ -7077,16 +7237,15 @@ async function publicCatalogSessionsFast(db) {
             '|',
             lower(regexp_replace(trim(coalesce("sourceLabel", '')), '\\s+', ' ', 'g')),
             lower(regexp_replace(trim(coalesce(
-              nullif(trim(${catalogGroupTitleSqlExpression('title')}), ''),
+              nullif(trim(${catalogGroupTitleSqlExpression()}), ''),
               trim(coalesce(venue, ''))
             )), '\\s+', ' ', 'g')),
             lower(regexp_replace(trim(coalesce(city, '')), '\\s+', ' ', 'g')),
             lower(regexp_replace(trim(coalesce(venue, '')), '\\s+', ' ', 'g'))
           ) as "groupKey"
         from normalized
-        where "priceFrom" >= $1
-          and "purchaseReady" = true
-          and lower(coalesce("sourceStatus", '')) not in ('widget_blocked', 'paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden')
+        where "purchaseReady" = true
+          and lower(coalesce("sourceStatus", '')) not in (${PUBLIC_SALES_BLOCKED_STATUS_SQL})
           and (
             "startsAt" is not null
             or kind = 'OPEN_DATE'
@@ -7098,7 +7257,7 @@ async function publicCatalogSessionsFast(db) {
           *,
           row_number() over (
             partition by "groupKey"
-            order by case when lower(coalesce("sourceStatus", '')) in ('paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden') then 1 else 0 end,
+            order by case when lower(coalesce("sourceStatus", '')) in (${PUBLIC_SALES_BLOCKED_STATUS_SQL}) then 1 else 0 end,
               case when kind = 'OPEN_DATE' or "sourceStatus" = 'open_date' then 1 else 0 end desc,
               "startsAt" asc nulls last,
               title asc
@@ -7112,6 +7271,7 @@ async function publicCatalogSessionsFast(db) {
           count(*)::int as "groupedEventsCount",
           sum(coalesce("slotCount", 0))::int as "sessionCount",
           min("priceFrom")::int as "priceFrom",
+          max("priceTo")::int as "priceTo",
           nullif(sum(coalesce("ticketsVacant", 0)), 0)::int as vacant,
           jsonb_agg(
             jsonb_build_object(
@@ -7125,7 +7285,7 @@ async function publicCatalogSessionsFast(db) {
               'offerDeeplinkUrl', "offerDeeplinkUrl",
               'vacant', "ticketsVacant"
             )
-            order by case when lower(coalesce("sourceStatus", '')) in ('paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden') then 1 else 0 end,
+            order by case when lower(coalesce("sourceStatus", '')) in (${PUBLIC_SALES_BLOCKED_STATUS_SQL}) then 1 else 0 end,
               "startsAt" asc nulls last
           ) as "upcomingSlots"
         from ranked
@@ -7177,6 +7337,7 @@ async function publicCatalogSessionsFast(db) {
         grouped."groupedEventsCount",
         grouped."sessionCount",
         grouped."priceFrom",
+        grouped."priceTo",
         rep."ticketsVacant" as vacant,
         grouped."upcomingSlots"
       from grouped
@@ -7193,7 +7354,10 @@ async function publicCatalogSessionsFast(db) {
   ]);
 
   const pinnedEventIds = new Set(pinnedResult.rows.map((row) => row.eventId));
-  const sessions = result.rows.map((row) => mapGroupedPublicSession(row, pinnedEventIds));
+  const separateCityHubs = collectSeparateCityHubNames(result.rows);
+  const sessions = result.rows
+    .map((row) => mapGroupedPublicSession(row, pinnedEventIds, { separateCityHubs }))
+    .filter(Boolean);
   return dedupeCrossSourceCatalogSessions(regroupMappedPublicCatalogSessions(sessions));
 }
 
@@ -7202,33 +7366,6 @@ function publicListDescription(row) {
     cleanImportedDescription(row.overrideDescription || row.description) ||
     cleanImportedDescription(row.overrideShortDescription)
   );
-}
-
-function isOpenDateCatalogRow(row) {
-  const kind = String(row?.kind || '').toUpperCase();
-  const sourceStatus = String(row?.sourceStatus || '').toLowerCase();
-  return kind === 'OPEN_DATE' || sourceStatus === 'open_date';
-}
-
-function hasUpcomingOrOpenSchedule(row = {}) {
-  if (isOpenDateCatalogRow(row)) return true;
-  const endsAt = row?.endsAt;
-  if (endsAt) {
-    const endMs = Date.parse(String(endsAt));
-    if (Number.isFinite(endMs) && endMs >= Date.now()) return true;
-  }
-  const startsAt = row?.startsAt;
-  if (!startsAt) return false;
-  const startMs = Date.parse(String(startsAt));
-  return Number.isFinite(startMs) && startMs >= Date.now();
-}
-
-function isWideLifetimeSession(startsAt, endsAt) {
-  if (!startsAt || !endsAt) return false;
-  const startMs = Date.parse(String(startsAt));
-  const endMs = Date.parse(String(endsAt));
-  if (!Number.isFinite(startMs) || !Number.isFinite(endMs) || endMs <= startMs) return false;
-  return endMs - startMs >= 36 * 60 * 60 * 1000;
 }
 
 function publicSessionScheduleLabels(row) {
@@ -7280,10 +7417,13 @@ function buildLandingRuleEvent(row, tags, destination, category) {
 }
 
 function resolvePublicSessionImageUrl(row) {
-  if (row.overrideImageUrl) return row.overrideImageUrl;
-  if (row.imageUrl) return row.imageUrl;
-  if (row.venueHeroImageUrl) return row.venueHeroImageUrl;
-  if (row.cityHeroImageUrl) return row.cityHeroImageUrl;
+  const direct = pickFirstUsableEventImageUrl(
+    row.overrideImageUrl,
+    row.imageUrl,
+    row.venueHeroImageUrl,
+    row.cityHeroImageUrl,
+  );
+  if (direct) return direct;
 
   const slug = row.citySlug || row.sourceCitySlug;
   if (!slug) return null;
@@ -7291,6 +7431,59 @@ function resolvePublicSessionImageUrl(row) {
   const imageSlug = CITY_CARD_IMAGE_ALIASES[slug] || slug;
   if (!CITY_CARD_IMAGE_SLUGS.has(imageSlug)) return null;
   return `/images/cities/${imageSlug}.png`;
+}
+
+function isPlaceholderEventImageUrl(imageUrl) {
+  const raw = String(imageUrl || '').trim();
+  if (!raw) return true;
+  const lower = raw.toLowerCase();
+  if (lower.includes('placeholder.gif')) return true;
+  if (/api\.teplohod\.info\/v1\/image\?item=&/i.test(raw)) return true;
+  // Without dirtyAlias upstream returns HTML 400; next/image then fails.
+  if (/api\.teplohod\.info\/v1\/image\?/i.test(raw) && !/dirtyAlias=/i.test(raw)) return true;
+  return false;
+}
+
+function isEphemeralAutoGeneratedCoverUrl(imageUrl) {
+  const raw = String(imageUrl || '').trim();
+  return /\/images\/(?:events|venues)\/generated\/(?:evt|venue)-auto-/i.test(raw);
+}
+
+function isUsableCatalogImageUrl(imageUrl) {
+  const raw = String(imageUrl || '').trim();
+  if (!raw || isPlaceholderEventImageUrl(raw)) return false;
+  if (raw.startsWith('/images/cities/')) return false;
+  if (/^https?:\/\//i.test(raw)) return true;
+  if (/^\/images\/(events|venues)\//i.test(raw)) return true;
+  return false;
+}
+
+/** Pre-signed Teplohod S3 URLs expire (~6h); keep stable api.teplohod.info proxy. */
+function stabilizeTeplohodImageUrl(imageUrl) {
+  const raw = String(imageUrl || '').trim();
+  if (!raw) return null;
+  const signedMatch = raw.match(
+    /teplohod-(?:private|public)\/images\/cache\/Events\/(Event\d+)\/([^/?#]+)/i,
+  );
+  if (signedMatch) {
+    const item = signedMatch[1];
+    const dirtyAlias = signedMatch[2];
+    return `https://api.teplohod.info/v1/image?item=${encodeURIComponent(item)}&dirtyAlias=${encodeURIComponent(dirtyAlias)}`;
+  }
+  return raw;
+}
+
+function pickFirstUsableEventImageUrl(...candidates) {
+  const durable = [];
+  const ephemeral = [];
+  for (const candidate of candidates) {
+    if (!candidate || !isUsableCatalogImageUrl(candidate)) continue;
+    const stabilized = stabilizeTeplohodImageUrl(candidate);
+    if (!stabilized || !isUsableCatalogImageUrl(stabilized)) continue;
+    if (isEphemeralAutoGeneratedCoverUrl(stabilized)) ephemeral.push(stabilized);
+    else durable.push(stabilized);
+  }
+  return durable[0] || ephemeral[0] || null;
 }
 
 const KNOWN_SESSION_CITIES = [
@@ -7325,6 +7518,10 @@ function inferCityNameFromText(...parts) {
     .filter(Boolean)
     .join(' ')
     .toLowerCase()
+    // Ship hull titles like «Теплоход «Москва-99»» must not imply city Москва.
+    .replace(/(?:теплоход|катер|яхт[аы]?|судно|пароход|корабль)\s*[«"'][^»"']+[»"']/giu, ' ')
+    .replace(/(?:теплоход|катер|яхт[аы]?|судно|пароход|корабль)\s+[а-яёa-z][\p{L}\d.\s-]*[-–—]\s*\d{1,4}/giu, ' ')
+    .replace(/\b[а-яёa-z]+[-–—]\d{1,4}\b/giu, ' ')
     .replace(/\s+/g, ' ');
   if (!haystack) return null;
 
@@ -7332,7 +7529,9 @@ function inferCityNameFromText(...parts) {
     const needle = city.toLowerCase();
     if (haystack.includes(needle)) return city;
     const stem = cityNameStem(city);
-    if (stem.length >= 4 && haystack.includes(stem)) return city;
+    // Word-boundary stem only: bare includes(«казан») false-positives
+    // «Казанский собор» / «Казанская площадь» in Saint Petersburg.
+    if (stem.length >= 4 && haystackIncludesCityToken(haystack, stem)) return city;
   }
 
   const match = haystack.match(/(?:^|\s)г\.?\s*([а-яё][а-яё\s-]{2,40})/i);
@@ -7370,103 +7569,8 @@ function resolvePublicSessionCity(row) {
   return routeCityToPublicDisplayName(inferred || raw || 'Не указан');
 }
 
-export function mapGroupedPublicSession(row, pinnedEventIds = new Set()) {
-  const tags = row.tags || [];
-  const displayCity = resolvePublicSessionDisplayCity(row);
-  const groupCity = resolvePublicSessionCity(row);
-  const destination = publicDestinationForCity({ ...row, city: row.city || displayCity });
-  const fallbackWidgetUrl = buildProviderWidgetUrl(row);
-  const purchase = purchaseInfo(row);
-  const purchaseUrl = purchase.url || fallbackWidgetUrl;
-  const groupEventIds = (row.groupEventIds || [row.id]).slice(0, 12);
-  const manualLandingStatus = groupEventIds.some((id) => pinnedEventIds.has(id)) ? 'PINNED' : null;
-  const schedule = publicSessionScheduleLabels(row);
-  const timeZone = schedule.timeZone || resolveCityTimeZone(displayCity, destination?.name);
-  const upcomingSlots = (Array.isArray(row.upcomingSlots) ? row.upcomingSlots : [])
-    .filter((slot) => slot?.startsAt)
-    .slice(0, 12)
-    .map((slot) => {
-      const slotPurchase = purchaseInfo({
-        sourceCode: slot.sourceCode || row.sourceCode,
-        offerSourceCode: slot.offerSourceCode || row.offerSourceCode || row.sourceCode,
-        offerWidgetUrl: slot.offerWidgetUrl,
-        offerDeeplinkUrl: slot.offerDeeplinkUrl,
-        externalId: slot.externalId || row.externalId,
-      });
-      return {
-        eventId: slot.eventId,
-        startsAt: normalizeStartsAt(slot.startsAt),
-        dateLabel: formatDate(slot.startsAt, timeZone),
-        timeLabel: formatTime(slot.startsAt, timeZone),
-        purchaseUrl: slotPurchase.url || purchaseUrl,
-        sourceStatus: slot.sourceStatus || row.sourceStatus || null,
-        purchaseReady: slotPurchase.ready,
-        vacant: slot.vacant ?? row.vacant ?? null,
-      };
-    });
-
-  const ruleEvent = buildLandingRuleEvent({ ...row, city: displayCity }, tags, destination, row.category || 'unknown');
-  const institutionContext = shouldResolveInstitutionFromTitle({ venueKind: row.venueKind, venue: row.venue })
-    ? resolveContextInstitutionFromTitle(row.overrideTitle || row.title)
-    : null;
-  const session = {
-    id: row.id,
-    slug: publicEventSlug(row.slug),
-    sourceSlug: row.slug,
-    groupKey: publicEventGroupKey({ ...row, city: groupCity }),
-    groupEventIds,
-    groupedEventsCount: row.groupedEventsCount || 1,
-    sessionCount: row.sessionCount || upcomingSlots.length || 1,
-    upcomingSlots,
-    title: resolveCatalogDisplayTitle(row.overrideTitle || row.title, row.venue),
-    cityId: row.cityId,
-    citySlug: destination.slug,
-    sourceCitySlug: row.citySlug,
-    city: displayCity,
-    destination: destination.name,
-    destinationType: destination.type,
-    venueId: row.venueId,
-    venueSlug: row.venueId ? publicVenueSlug(row.venueSlug, row.venue, row.venueId) : row.venueSlug,
-    venue: formatPublicVenueTitle(row.venue) || 'Не указано',
-    venueAddress: row.venueAddress || null,
-    venueKind: row.venueKind || 'OTHER',
-    institutionVenue: institutionContext?.displayName || null,
-    offerTitle: row.offerTitle,
-    offerSourceCode: row.offerSourceCode,
-    purchaseUrl,
-    widgetUrl: row.offerWidgetUrl || fallbackWidgetUrl,
-    deeplinkUrl: row.offerDeeplinkUrl || null,
-    purchaseReady: purchase.ready,
-    purchaseMode: purchase.mode,
-    purchaseProvider: purchase.provider,
-    purchaseUrlSource: purchase.urlSource,
-    category: row.category || 'unknown',
-    sourceCategory: row.category || 'unknown',
-    kind: row.kind || null,
-    sourceStatus: row.sourceStatus || null,
-    subcategories: ruleEvent.subcategories,
-    tags: sliceCatalogTags(tags),
-    startsAt: schedule.startsAt || '',
-    dateLabel: schedule.dateLabel,
-    timeLabel: schedule.timeLabel,
-    timeBucket: schedule.timeBucket,
-    timeZone,
-    priceFrom: row.priceFrom,
-    vacant: row.vacant,
-    ageLimit: row.ageLimit ?? null,
-    imageUrl: resolvePublicSessionImageUrl(row),
-    description: publicListDescription(row),
-  };
-
-  return {
-    ...session,
-    landingSlugs: resolveLandingSlugsForSession(ruleEvent, { startsAt: row.startsAt, upcomingSlots }),
-    manualLandingStatus,
-  };
-}
-
 function isSaleablePublicSession(session) {
-  return Boolean(session.purchaseReady && Number.isFinite(session.priceFrom) && session.priceFrom >= MIN_DISPLAY_PRICE_RUB);
+  return Boolean(session.purchaseReady);
 }
 
 async function publicEventRows(db, forceRefresh = false) {
@@ -7481,7 +7585,11 @@ async function publicEventRows(db, forceRefresh = false) {
   if (forceRefresh) {
     publicEventRowsCache = null;
     publicEventRowsBuildPromise = null;
-    publicCatalogCache = null;
+    if (publicCatalogCache?.sessions) {
+      publicCatalogCache = { ...publicCatalogCache, expiresAt: 0 };
+    } else {
+      publicCatalogCache = null;
+    }
     publicHomeCache = null;
   }
 
@@ -7585,7 +7693,7 @@ async function publicEventRowsLean(db, limit) {
         offer."widgetUrl",
         offer."deeplinkUrl"
       having (
-        min(session."startsAt") filter (where coalesce(session."endsAt", session."startsAt") >= now()) is not null
+        min(session."startsAt") filter (where ${ACTIVE_SESSION_SQL}) is not null
         or e.kind = 'OPEN_DATE'
         or e."sourceStatus" = 'open_date'
       )
@@ -7595,10 +7703,12 @@ async function publicEventRowsLean(db, limit) {
     [limit],
   );
 
+  const separateCityHubs = collectSeparateCityHubNames(result.rows);
   return result.rows
     .map((row) => {
       const tags = row.tags || [];
-      const destination = publicDestinationForCity(row);
+      const destination = publicDestinationForCity(row, separateCityHubs);
+      const fallbackDestinationName = cleanDisplayName(row.city) || 'Не указан';
       const priceFrom = displayPriceFrom(row.priceFromRub, row.sessionPriceFromRub, row.offerPriceRub);
       const purchase = purchaseInfo(row);
 
@@ -7613,10 +7723,10 @@ async function publicEventRowsLean(db, limit) {
         sourceCategory: row.category || 'unknown',
         city: row.city || 'Не указан',
         cityId: row.cityId,
-        citySlug: destination.slug,
+        citySlug: destination?.slug || publicCitySlug(fallbackDestinationName),
         sourceCitySlug: row.citySlug,
-        destination: destination.name,
-        destinationType: destination.type,
+        destination: destination?.name || fallbackDestinationName,
+        destinationType: destination?.type || 'city',
         venue: formatPublicVenueTitle(row.venue) || 'Не указано',
         venueId: row.venueId,
         venueSlug: row.venueSlug,
@@ -7646,7 +7756,7 @@ async function publicEventRowsLean(db, limit) {
         tags,
       };
     })
-    .filter((row) => hasUpcomingOrOpenSchedule(row) && row.purchaseReady && Number.isFinite(row.priceFrom) && row.priceFrom >= MIN_DISPLAY_PRICE_RUB);
+    .filter((row) => hasUpcomingOrOpenSchedule(row) && row.purchaseReady);
 }
 
 function parseCatalogAgeLimit(value) {
@@ -7791,6 +7901,7 @@ function mapPublicSession(row) {
     timeBucket: schedule.timeBucket,
     timeZone,
     priceFrom: row.priceFrom,
+    priceTo: row.priceTo ?? row.priceFrom,
     vacant: row.vacant,
     imageUrl: resolvePublicSessionImageUrl(row),
   };
@@ -7809,42 +7920,17 @@ function buildTicketscloudWidgetUrl(eventExternalId) {
 
 function buildTeplohodUrl(eventExternalId) {
   if (!eventExternalId) return null;
-  const baseUrl = process.env.TEP_WIDGET_BASE_URL || 'https://teplohod.info';
-  return `${baseUrl.replace(/\/+$/, '')}/event/${encodeURIComponent(eventExternalId)}`;
+  const eventId = String(eventExternalId).replace(/^tep-/i, '').trim();
+  if (!/^\d+$/.test(eventId)) return null;
+  const widgetId = String(process.env.TEP_WIDGET_ID || '14208').trim() || '14208';
+  // teplohod.info/event/{id} currently returns "Ошибка!"; working checkout is account.teplohod.info.
+  const checkoutBase = (process.env.TEP_CHECKOUT_BASE_URL || 'https://account.teplohod.info').replace(/\/+$/, '');
+  const url = new URL(`${checkoutBase}/order/event-order`);
+  url.searchParams.set('widget_id', widgetId);
+  url.searchParams.set('event_id', eventId);
+  return url.toString();
 }
 
-async function publicVenues(db, limit) {
-  return (await publicVenueHubRows(db, 500)).slice(0, limit).map(mapPublicVenueListItem);
-}
-
-async function publicRelatedVenues(db, venueId, city, limit, hubRows = null) {
-  if (!city) return [];
-  const rows = hubRows || (await publicVenueHubRows(db, 500));
-  const current = findMergedVenueGroup(rows, venueId);
-  const currentTemplate = publicVenuePageTemplate(resolvePublicVenueKindFromRow(current || {}));
-  return rows
-    .filter((row) => row.city === city && isPublicVenueHub(row) && !venueGroupsOverlap(current, row))
-    .filter((row) => publicVenuePageTemplate(resolvePublicVenueKindFromRow(row)) === currentTemplate)
-    .slice(0, limit)
-    .map(mapPublicVenueListItem);
-}
-
-async function publicVenuesForCity(db, city, limit) {
-  if (!city) return [];
-  return (await publicVenueHubRows(db, 500))
-    .filter((row) => row.city === city)
-    .slice(0, limit)
-    .map(mapPublicVenueListItem);
-}
-
-async function publicVenuesForSessions(db, sessions, limit) {
-  const venueIds = new Set(sessions.map((session) => session.venueId).filter(Boolean));
-  if (!venueIds.size) return [];
-  return (await publicVenueHubRows(db, 500))
-    .filter((row) => (row.mergedVenueIds || [row.id]).some((id) => venueIds.has(id)))
-    .slice(0, limit)
-    .map(mapPublicVenueListItem);
-}
 
 async function resolvePublicEventId(db, eventSlugOrId, catalogSessions = null) {
   const value = String(eventSlugOrId || '').trim();
@@ -7884,47 +7970,6 @@ function publicEventSlug(value) {
   return publicCitySlug(value);
 }
 
-function extractOpaqueIdSuffix(value) {
-  const match = String(value || '').match(/(?:^|[-_])([a-f0-9]{20,})$/i);
-  return match ? match[1].toLowerCase() : null;
-}
-
-function stripOpaqueVenueIdSuffix(slug) {
-  const suffix = extractOpaqueIdSuffix(slug);
-  if (!suffix) return slug;
-  const trimmed = String(slug || '').replace(new RegExp(`[-_]${suffix}$`, 'i'), '');
-  return trimmed || slug;
-}
-
-function dedupeVenueSlugSuffix(slug) {
-  const parts = String(slug || '')
-    .split('-')
-    .filter(Boolean);
-  if (parts.length < 2) return slug;
-  if (parts[parts.length - 1] === parts[parts.length - 2]) {
-    return parts.slice(0, -1).join('-');
-  }
-  return slug;
-}
-
-function buildPublicVenueSlug(title, id) {
-  const titleSlug = publicCitySlug(title) || 'venue';
-  const rawId = String(id || '').replace(/^venue_/, '');
-  const idSlug = publicCitySlug(rawId) || rawId;
-  if (!idSlug) return dedupeVenueSlugSuffix(titleSlug);
-  if (titleSlug.endsWith(`-${idSlug}`)) return dedupeVenueSlugSuffix(titleSlug);
-  return dedupeVenueSlugSuffix(`${titleSlug}-${idSlug}`);
-}
-
-export function publicVenueSlug(slug, title, id) {
-  const raw = String(slug || '').trim();
-  const normalized = publicCitySlug(raw);
-  if (normalized && !/^[a-f0-9]{20,}$/i.test(normalized)) {
-    return dedupeVenueSlugSuffix(stripOpaqueVenueIdSuffix(normalized));
-  }
-  if (title && id) return buildPublicVenueSlug(title, id);
-  return dedupeVenueSlugSuffix(stripOpaqueVenueIdSuffix(normalized || raw));
-}
 
 function publicCitySlug(value) {
   const letters = {
@@ -7976,7 +8021,7 @@ function publicCitySlug(value) {
 
 function buildLandingRows(events) {
   return LANDING_RULES.map((rule) => {
-    const matched = events.filter((event) => matchesRule(event, rule));
+    const matched = events.filter((event) => matchesLandingRule(event, rule));
     const prices = matched.map((event) => event.priceFrom).filter((price) => Number.isFinite(price) && price > 0);
     return {
       slug: rule.slug,
@@ -7989,37 +8034,7 @@ function buildLandingRows(events) {
   });
 }
 
-export function buildPublicLandings(sessions) {
-  return LANDING_RULES.map((rule) => {
-    const matched = sessions.filter((session) => sessionMatchesLandingSlug(session, rule.slug));
-    const prices = matched.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
-    return {
-      slug: rule.slug,
-      title: rule.title,
-      subtitle: rule.subtitle,
-      chips: rule.chips,
-      events: matched.length,
-      venues: new Set(matched.map((session) => session.venue).filter(Boolean)).size,
-      priceFrom: prices.length ? Math.min(...prices) : null,
-      imageUrl: null,
-      strength: matched.length >= 20 ? 'ready' : matched.length > 0 ? 'seed' : 'empty',
-    };
-  });
-}
-
-function resolveLandingRule(landingSlug) {
-  const key = String(landingSlug || '').trim().toLowerCase().replace(/_/g, '-');
-  const direct = LANDING_RULES.find((item) => item.slug === key);
-  if (direct) return direct;
-  return (
-    LANDING_RULES.find((item) => (LANDING_SLUG_ALIASES[item.slug] || []).includes(key)) || null
-  );
-}
-
-function sessionMatchesLandingSlug(session, canonicalSlug) {
-  const slugs = new Set([canonicalSlug, ...(LANDING_SLUG_ALIASES[canonicalSlug] || [])]);
-  return (session.landingSlugs || []).some((value) => slugs.has(String(value || '').toLowerCase()));
-}
+export const buildPublicLandings = buildPublicLandingsFromSessions;
 
 function sortPromoLandings(landings, cityFilter = '') {
   const cityKey = String(cityFilter || '').trim().toLowerCase();
@@ -8106,221 +8121,15 @@ function applyLandingScheduleToSession(session, rule) {
 
 function filterSessionsForLandingRule(sessions, rule) {
   return sessions
-    .filter((session) => sessionMatchesLandingSlug(session, rule.slug) && sessionMatchesLandingSchedule(session, rule))
+    .filter((session) => matchesLandingRule(session, rule) && sessionMatchesLandingSchedule(session, rule))
     .map((session) => applyLandingScheduleToSession(session, rule))
-    .filter(Boolean)
-    .slice(0, 240);
+    .filter(Boolean);
 }
 
 function resolveLandingSlugsForSession(ruleEvent, sessionDraft, rules = LANDING_RULES) {
   return rules
-    .filter((rule) => matchesRule(ruleEvent, rule) && sessionMatchesLandingSchedule(sessionDraft, rule))
+    .filter((rule) => matchesLandingRule(ruleEvent, rule) && sessionMatchesLandingSchedule(sessionDraft, rule))
     .map((rule) => rule.slug);
-}
-
-function matchesRule(event, rule) {
-  return explainRuleMatch(event, rule).matches;
-}
-
-function landingRequiredSignalsSatisfied(rule, keywordFields) {
-  if (rule.requiredAnyKeywords?.length && !firstKeywordMatch(keywordFields, rule.requiredAnyKeywords)) return false;
-
-  const titleKeywordFields = keywordFields.filter((field) => field.field === 'title');
-  for (const group of rule.requiredTitleKeywordGroups || []) {
-    if (!firstKeywordMatch(titleKeywordFields, group)) return false;
-  }
-
-  for (const group of rule.requiredKeywordGroups || []) {
-    if (!firstKeywordMatch(keywordFields, group)) return false;
-  }
-
-  return true;
-}
-
-function explainRuleMatch(event, rule) {
-  const tags = event.tags || [];
-  const keywordFields = keywordFieldsForEvent(event, tags, rule.keywordScope || 'full');
-  const fullKeywordFields = keywordFieldsForEvent(event, tags, 'full');
-  const excludeKeywordFields = rule.excludeKeywordFields?.length
-    ? fullKeywordFields.filter((field) => rule.excludeKeywordFields.includes(field.field))
-    : fullKeywordFields;
-
-  const reasons = [];
-  const blockers = [];
-  if (rule.city) {
-    if (matchesRuleCity(event, rule.city)) reasons.push(`город: ${rule.city}`);
-    else blockers.push(`другой город: ${event.city || event.destination || 'не указан'}`);
-  }
-  if (rule.venue) {
-    if (event.venue === rule.venue) reasons.push(`площадка: ${rule.venue}`);
-    else blockers.push(`другая площадка: ${event.venue || 'не указана'}`);
-  }
-
-  const excludedTag = rule.excludeTags?.find((tag) => tags.includes(tag));
-  if (excludedTag) blockers.push(`исключающий тег: ${excludedTag}`);
-  const excludedKeyword = firstKeywordMatch(excludeKeywordFields, rule.excludeKeywords || []);
-  if (excludedKeyword) blockers.push(`исключающее слово(${excludedKeyword.field}): ${excludedKeyword.keyword}`);
-
-  if (rule.requiredAnySubcategories?.length) {
-    const subcategories = eventSubcategoriesForLanding(event, tags);
-    const hit = rule.requiredAnySubcategories.find((label) => subcategories.includes(label));
-    if (hit) reasons.push(`подкатегория: ${hit}`);
-    else blockers.push(`нет подкатегории: ${rule.requiredAnySubcategories.join(' / ')}`);
-  }
-
-  if (!blockers.length) {
-    const fastMatchReasons = collectFastLandingMatchReasons(event, rule, tags);
-    if (fastMatchReasons.length && landingRequiredSignalsSatisfied(rule, keywordFields)) {
-      return { matches: true, reasons: uniqueValues([...reasons, ...fastMatchReasons]).slice(0, 10), blockers: [] };
-    }
-  }
-
-  const requiredAnyTag = rule.requiredAnyTags?.find((tag) => tags.includes(tag));
-  if (rule.requiredAnyTags?.length) {
-    if (requiredAnyTag) reasons.push(`обязательный тег: ${requiredAnyTag}`);
-    else blockers.push(`нет обязательного тега: ${rule.requiredAnyTags.join(' / ')}`);
-  }
-
-  const requiredAnyKeyword = firstKeywordMatch(keywordFields, rule.requiredAnyKeywords || []);
-  if (rule.requiredAnyKeywords?.length) {
-    if (requiredAnyKeyword) reasons.push(`обязательное слово(${requiredAnyKeyword.field}): ${requiredAnyKeyword.keyword}`);
-    else blockers.push(`нет обязательного слова: ${rule.requiredAnyKeywords.join(' / ')}`);
-  }
-
-  for (const keyword of rule.requiredKeywords || []) {
-    const found = firstKeywordMatch(keywordFields, [keyword]);
-    if (found) reasons.push(`обязательное слово(${found.field}): ${keyword}`);
-    else blockers.push(`нет обязательного слова: ${keyword}`);
-  }
-
-  const titleKeywordFields = keywordFields.filter((field) => field.field === 'title');
-  for (const group of rule.requiredTitleKeywordGroups || []) {
-    const found = firstKeywordMatch(titleKeywordFields, group);
-    if (found) reasons.push(`группа(title): ${found.keyword}`);
-    else blockers.push(`нет слова в названии: ${group.join(' / ')}`);
-  }
-
-  for (const group of rule.requiredKeywordGroups || []) {
-    const found = firstKeywordMatch(keywordFields, group);
-    if (found) reasons.push(`группа(${found.field}): ${found.keyword}`);
-    else blockers.push(`нет слова из группы: ${group.join(' / ')}`);
-  }
-
-  if (blockers.length) {
-    return { matches: false, reasons: uniqueValues(reasons).slice(0, 10), blockers: uniqueValues(blockers).slice(0, 10) };
-  }
-
-  const tagSignals = (rule.tags || []).filter((tag) => tags.includes(tag));
-  const keywordSignals = matchingKeywordMatches(keywordFields, rule.keywords || []);
-  for (const tag of tagSignals.slice(0, 4)) reasons.push(`тег: ${tag}`);
-  for (const match of keywordSignals.slice(0, 4)) reasons.push(`слово(${match.field}): ${match.keyword}`);
-
-  const hasTagSignal = tagSignals.length > 0;
-  const hasKeywordSignal = keywordSignals.length > 0;
-  const hasRequiredSignal = Boolean(rule.requiredAnyTags || rule.requiredAnyKeywords || rule.requiredKeywords || rule.requiredTitleKeywordGroups || rule.requiredKeywordGroups);
-  const venueMatched = rule.venue ? event.venue === rule.venue : false;
-  const matches = Boolean(hasTagSignal || hasKeywordSignal || hasRequiredSignal || venueMatched);
-  return { matches, reasons: uniqueValues(reasons).slice(0, 10), blockers: [] };
-}
-
-function eventSubcategoriesForLanding(event, tags) {
-  return uniqueValues([
-    ...(event.subcategories || []),
-    ...pickCatalogSubcategories({
-      subcategories: event.subcategories || [],
-      tags,
-      category: event.category || event.sourceCategory || '',
-    }),
-  ]);
-}
-
-function collectFastLandingMatchReasons(event, rule, tags) {
-  const reasons = [];
-
-  if (rule.requiredAnySubcategories?.length) {
-    const subcategories = eventSubcategoriesForLanding(event, tags);
-    const hit = rule.requiredAnySubcategories.find((label) => subcategories.includes(label));
-    if (hit) reasons.push(`подкатегория: ${hit}`);
-  }
-
-  if (!reasons.length && rule.requiredAnyVenueKeywords?.length && event.venue) {
-    const venue = String(event.venue).toLowerCase();
-    const hit = rule.requiredAnyVenueKeywords.find((keyword) => venue.includes(String(keyword).toLowerCase()));
-    if (hit) reasons.push(`площадка: ${hit}`);
-  }
-
-  if (!reasons.length && rule.tags?.length) {
-    const hit = rule.tags.find((tag) => tags.includes(tag));
-    if (hit) reasons.push(`тег: ${hit}`);
-  }
-
-  return reasons;
-}
-
-function matchesRuleCity(event, expectedCity) {
-  const candidates = [event.city, event.destination].filter(Boolean).map((value) => String(value).toLowerCase());
-  return candidates.includes(String(expectedCity).toLowerCase());
-}
-
-function keywordFieldsForEvent(event, tags, scope = 'full') {
-  const fields = [
-    { field: 'title', value: event.title },
-    { field: 'category', value: event.category },
-    { field: 'sourceCategory', value: event.sourceCategory },
-    { field: 'tag', value: tags.join(' ') },
-  ];
-  if (scope !== 'content') {
-    fields.push(
-      { field: 'venue', value: event.venue },
-      { field: 'city', value: event.city },
-      { field: 'destination', value: event.destination },
-      { field: 'subcategory', value: (event.subcategories || []).join(' ') },
-    );
-  }
-  return fields
-    .filter((item) => item.value)
-    .map((item) => ({ ...item, text: String(item.value).toLowerCase() }));
-}
-
-const CYRILLIC_WORD_CHAR = /[a-z0-9а-яё]/i;
-
-/** Подстрока с границей слова слева — «катер» не матчится внутри «екатеринбург». */
-function keywordOccursInText(text, keyword) {
-  const haystack = String(text || '').toLowerCase();
-  const needle = String(keyword || '').toLowerCase();
-  if (!haystack || !needle) return false;
-
-  let from = 0;
-  while (from <= haystack.length - needle.length) {
-    const index = haystack.indexOf(needle, from);
-    if (index === -1) return false;
-    const before = index === 0 ? '' : haystack[index - 1];
-    if (!before || !CYRILLIC_WORD_CHAR.test(before)) return true;
-    from = index + 1;
-  }
-  return false;
-}
-
-function firstKeywordMatch(fields, keywords) {
-  for (const keyword of keywords) {
-    const field = fields.find((item) => keywordOccursInText(item.text, keyword));
-    if (field) return { keyword, field: field.field };
-  }
-  return null;
-}
-
-function matchingKeywordMatches(fields, keywords) {
-  const matches = [];
-  const seen = new Set();
-  for (const keyword of keywords) {
-    const field = fields.find((item) => keywordOccursInText(item.text, keyword));
-    if (!field) continue;
-    const key = `${field.field}:${keyword}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    matches.push({ keyword, field: field.field });
-  }
-  return matches;
 }
 
 const READINESS_ISSUE_META = {
@@ -8346,6 +8155,7 @@ function buildReadinessIssues(event) {
   const rawPriceValues = [event.priceFromRub, event.offerPriceRub].filter((value) => Number.isFinite(value) && value > 0);
   const hasOnlyLowPrice = event.priceFrom == null && rawPriceValues.some((value) => value < MIN_DISPLAY_PRICE_RUB);
   const description = plainReadinessText(event.overrideDescription || event.description || event.overrideShortDescription || '');
+  const descriptionLength = Math.max(description.length, Number(event.descriptionLength) || 0);
   const venue = plainReadinessText(event.venue || '');
   const hasVenue = Boolean(event.venueId || (venue && !['не указано', 'не указан', 'unknown'].includes(venue.toLowerCase())));
 
@@ -8356,7 +8166,7 @@ function buildReadinessIssues(event) {
   if (!event.categoryId && !event.category) add('MISSING_CATEGORY');
   if (!event.primarySubcategoryId && !(event.subcategoryIds || []).length) add('MISSING_SUBCATEGORY');
   if (!hasVenue) add('MISSING_VENUE');
-  if (description.length < 120) add('WEAK_DESCRIPTION');
+  if (descriptionLength < 120) add('WEAK_DESCRIPTION');
   if (!event.hasImage && !event.imageUrl && !event.overrideImageUrl) add('MISSING_IMAGE');
 
   return issues;
@@ -8387,8 +8197,6 @@ function plainReadinessText(value) {
     .trim();
 }
 
-const SITE_TIME_ZONE = 'Europe/Moscow';
-
 const PUBLIC_CATALOG_CATEGORIES = new Set([
   'экскурсии',
   'музеи и арт',
@@ -8396,6 +8204,34 @@ const PUBLIC_CATALOG_CATEGORIES = new Set([
   'активный отдых',
   'развлечения',
 ]);
+
+const WATER_CATALOG_HINT_RE =
+  /(водн(?:ые|ая)?\s+экскурси|речн(?:ая|ые)?|реч(?:ной|ная)\s+порт|теплоход|катер|яхт|лодк|причал|речные\s+прогулки)/i;
+const BUS_CATALOG_LABEL_RE = /автобус/i;
+
+function resolveCatalogTransportHint(session = {}) {
+  const haystack = [
+    session.title,
+    session.venue,
+    ...(session.subcategories || []),
+    ...(session.tags || []),
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+
+  if (WATER_CATALOG_HINT_RE.test(haystack)) return 'water';
+  if (BUS_CATALOG_LABEL_RE.test(haystack)) return 'bus';
+  return null;
+}
+
+function isConflictingTransportCatalogLabel(label, transport) {
+  if (!transport) return false;
+  const lower = String(label || '').toLowerCase();
+  if (transport === 'water') return BUS_CATALOG_LABEL_RE.test(lower);
+  if (transport === 'bus') return WATER_CATALOG_HINT_RE.test(lower);
+  return false;
+}
 
 function isCrossCategoryCatalogTag(tag, category) {
   const tagNorm = String(tag || '').trim().toLowerCase();
@@ -8458,80 +8294,6 @@ function isCatalogSubcategoryLabel(label, category) {
   return true;
 }
 
-export function pickCatalogSubcategories(session, limit = 4) {
-  const category = session.category || session.sourceCategory || '';
-  const labels = [];
-  const seen = new Set();
-
-  for (const label of session.subcategories || []) {
-    const value = String(label || '').trim();
-    if (!isCatalogSubcategoryLabel(value, category) || seen.has(value)) continue;
-    seen.add(value);
-    labels.push(value);
-    if (labels.length >= limit) return labels;
-  }
-
-  for (const tag of session.tags || []) {
-    const value = String(tag || '').trim();
-    if (!isCatalogSubcategoryLabel(value, category) || seen.has(value)) continue;
-    seen.add(value);
-    labels.push(value);
-    if (labels.length >= limit) break;
-  }
-
-  return labels;
-}
-
-function parseSessionStartsAt(value) {
-  if (value instanceof Date) return value;
-  const raw = String(value || '').trim();
-  if (!raw) return new Date(NaN);
-  if (/[zZ]$/.test(raw) || /[+-]\d{2}(:\d{2}|\d{2})$/.test(raw)) {
-    return new Date(raw.replace(/([+-]\d{2})(\d{2})$/, '$1:$2'));
-  }
-  if (/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}/.test(raw)) {
-    return new Date(`${raw.replace(' ', 'T')}Z`);
-  }
-  return new Date(raw);
-}
-
-export function normalizeStartsAt(value) {
-  const date = parseSessionStartsAt(value);
-  if (!Number.isFinite(date.getTime())) return null;
-  return date.toISOString();
-}
-
-export function formatDate(value, timeZone = SITE_TIME_ZONE) {
-  const date = parseSessionStartsAt(value);
-  if (!Number.isFinite(date.getTime())) return '';
-  return new Intl.DateTimeFormat('ru-RU', {
-    day: 'numeric',
-    month: 'short',
-    weekday: 'short',
-    timeZone,
-  }).format(date);
-}
-
-export function formatTime(value, timeZone = SITE_TIME_ZONE) {
-  const date = parseSessionStartsAt(value);
-  if (!Number.isFinite(date.getTime())) return '';
-  return new Intl.DateTimeFormat('ru-RU', {
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone,
-  }).format(date);
-}
-
-export function timeBucket(value, timeZone = SITE_TIME_ZONE) {
-  const date = parseSessionStartsAt(value);
-  if (!Number.isFinite(date.getTime())) return 'night';
-  const hour = localHourFromInstant(date, timeZone);
-  if (hour >= 6 && hour < 12) return 'morning';
-  if (hour >= 12 && hour < 17) return 'day';
-  if (hour >= 17 && hour < 23) return 'evening';
-  return 'night';
-}
-
 function clampNumber(value, min, max, fallback) {
   const parsed = Number(value);
   if (!Number.isFinite(parsed)) return fallback;
@@ -8588,7 +8350,7 @@ export async function runLandingAudit(db, rootDir = path.resolve(path.dirname(fi
             }),
           }
         : null;
-      const ruleMatch = matchEvent ? explainRuleMatch(matchEvent, rule) : { matches: false, reasons: [], blockers: ['событие не найдено в БД'] };
+      const ruleMatch = matchEvent ? explainLandingRuleMatch(matchEvent, rule) : { matches: false, reasons: [], blockers: ['событие не найдено в БД'] };
       const inCatalog = Boolean(catalogSession);
       const onLanding = catalogSession?.landingSlugs?.includes(landingSlug) || false;
       const futureSessions = Number(auditRow?.futureSessionCount || 0);
@@ -8641,8 +8403,8 @@ async function fetchLandingAuditEventRow(db, eventId) {
         cat.title as category,
         city.title as city,
         venue.title as venue,
-        count(session.id) filter (where coalesce(session."endsAt", session."startsAt") >= now())::int as "futureSessionCount",
-        min(session."startsAt") filter (where coalesce(session."endsAt", session."startsAt") >= now()) as "nextStartsAt",
+        count(session.id) filter (where ${ACTIVE_SESSION_SQL})::int as "futureSessionCount",
+        min(session."startsAt") filter (where ${ACTIVE_SESSION_SQL}) as "nextStartsAt",
         ${orderedEventTagsSql('e.id')} as tags,
         (
           select coalesce(array_agg(distinct title), '{}')
@@ -8671,16 +8433,21 @@ async function fetchLandingAuditEventRow(db, eventId) {
 }
 
 function mapPublicArticleRow(row) {
+  const citySlug = canonicalBlogCitySlug(row.citySlug) || row.citySlug || null;
   return {
     id: row.id,
     slug: row.slug,
     title: row.title,
     excerpt: row.excerpt || null,
     coverImageUrl: row.coverImageUrl || null,
-    city: row.city || null,
-    citySlug: row.citySlug || null,
+    city: blogCityDisplayName(citySlug, row.city),
+    citySlug,
+    authorId: row.authorId || null,
+    authorName: row.authorName || null,
+    articleType: row.articleType || null,
     publishedAt: row.publishedAt ? new Date(row.publishedAt).toISOString() : null,
     isIndexable: row.isIndexable !== false,
+    isFeatured: row.isFeatured === true,
     seoTitle: row.seoTitle || row.title,
     seoDescription: row.seoDescription || row.excerpt || null,
   };
@@ -8695,8 +8462,34 @@ function mapPublicArticleDetail(row) {
   };
 }
 
-export async function buildPublicArticlesList(db) {
-  const { rows } = await db.query(`
+export async function buildPublicArticlesList(db, options = {}) {
+  const citySlugFilter = canonicalBlogCitySlug(options.citySlug);
+  const rankCitySlug = canonicalBlogCitySlug(options.rankCitySlug);
+  const includeBroad = options.includeBroad === true;
+  const excludeFeatured = options.excludeFeatured === true;
+  const pageLimit = Math.min(Math.max(Number(options.limit) || 100, 1), 200);
+  const cursorRaw = String(options.cursor || '').trim();
+  const aliases = citySlugFilter && !isBroadBlogCitySlug(citySlugFilter)
+    ? blogCitySlugAliases(citySlugFilter)
+    : [];
+
+  const params = [];
+  let whereExtra = '';
+  if (aliases.length) {
+    params.push(aliases);
+    const aliasIdx = params.length;
+    whereExtra += ` and (
+      coalesce(nullif(a."citySlug", ''), c.slug) = any($${aliasIdx}::text[])
+      ${includeBroad ? ` or coalesce(nullif(a."citySlug", ''), '') in ('multi', 'regions')` : ''}
+    )`;
+  }
+  // Wider window for in-memory rank/cursor (blog corpus is small).
+  const fetchLimit = Math.min(200, Math.max(pageLimit * 4, pageLimit + 20));
+  params.push(fetchLimit);
+  const limitIdx = params.length;
+
+  const { rows } = await db.query(
+    `
     select
       a.id,
       a.slug,
@@ -8705,20 +8498,91 @@ export async function buildPublicArticlesList(db) {
       a."coverImageUrl",
       a."publishedAt",
       a."isIndexable",
+      a."isFeatured",
       a."seoTitle",
       a."seoDescription",
-      c.title as city,
-      c.slug as "citySlug"
+      a."authorId",
+      a."authorName",
+      a."articleType",
+      case
+        when a.slug = 'afisha-regionalnye-goroda' then 'Екатеринбург, Нижний Новгород и Уфа'
+        when coalesce(nullif(a."citySlug", ''), '') = 'regions' then 'Регионы'
+        when coalesce(nullif(a."citySlug", ''), '') = 'multi' then 'Несколько городов'
+        else coalesce(c.title, null)
+      end as city,
+      case
+        when a.slug = 'afisha-regionalnye-goroda' then 'multi'
+        else coalesce(
+          nullif(a."citySlug", ''),
+          case
+            when a.slug = 'myuzikly-teatr-novichok-msk-spb' then 'multi'
+            else c.slug
+          end
+        )
+      end as "citySlug"
     from "Article" a
     left join "City" c on c.id = a."cityId"
     where a.status = 'PUBLISHED'
       and coalesce(a."isIndexable", true) = true
-    order by a."publishedAt" desc nulls last, a."updatedAt" desc
-  `);
+      and (a."publishedAt" is null or a."publishedAt" <= now())
+      ${whereExtra}
+    order by a."isFeatured" desc, a."publishedAt" desc nulls last, a."updatedAt" desc
+    limit $${limitIdx}
+  `,
+    params,
+  );
+
+  let articles = rows.map(mapPublicArticleRow);
+  if (excludeFeatured) {
+    articles = articles.filter((article) => article.isFeatured !== true);
+  }
+
+  if (rankCitySlug && !isBroadBlogCitySlug(rankCitySlug) && !aliases.length) {
+    const target = rankCitySlug;
+    const score = (slug) => {
+      const value = String(slug || '').trim().toLowerCase();
+      if (value === target) return 100;
+      if (value === 'multi' || value === 'regions') return 40;
+      return 0;
+    };
+    articles = [...articles].sort((a, b) => {
+      const diff = score(b.citySlug) - score(a.citySlug);
+      if (diff !== 0) return diff;
+      const ta = Date.parse(String(a.publishedAt || '')) || 0;
+      const tb = Date.parse(String(b.publishedAt || '')) || 0;
+      if (tb !== ta) return tb - ta;
+      return String(a.title || '').localeCompare(String(b.title || ''), 'ru');
+    });
+  }
+
+  let start = 0;
+  if (cursorRaw) {
+    try {
+      const json = Buffer.from(cursorRaw, 'base64url').toString('utf8');
+      const parsed = JSON.parse(json);
+      const cursorSlug = String(parsed.s || '').trim();
+      if (cursorSlug) {
+        const idx = articles.findIndex((article) => article.slug === cursorSlug);
+        start = idx >= 0 ? idx + 1 : articles.length;
+      }
+    } catch {
+      start = 0;
+    }
+  }
+
+  const page = articles.slice(start, start + pageLimit);
+  const last = page[page.length - 1];
+  const hasMore = start + page.length < articles.length;
+  const nextCursor =
+    hasMore && last
+      ? Buffer.from(JSON.stringify({ p: last.publishedAt || null, s: last.slug }), 'utf8').toString('base64url')
+      : null;
+
   return {
     generatedAt: new Date().toISOString(),
-    total: rows.length,
-    articles: rows.map(mapPublicArticleRow),
+    total: articles.length,
+    nextCursor,
+    articles: page,
   };
 }
 
@@ -8738,21 +8602,57 @@ export async function buildPublicArticlePage(db, slug) {
         a."seoTitle",
         a."seoDescription",
         a."canonicalPath",
-        c.title as city,
-        c.slug as "citySlug"
+        a."authorId",
+        a."authorName",
+        a."articleType",
+        case
+          when a.slug = 'afisha-regionalnye-goroda' then 'Екатеринбург, Нижний Новгород и Уфа'
+          when coalesce(nullif(a."citySlug", ''), '') = 'regions' then 'Регионы'
+          when coalesce(nullif(a."citySlug", ''), '') = 'multi' then 'Несколько городов'
+          else coalesce(c.title, null)
+        end as city,
+        case
+          when a.slug = 'afisha-regionalnye-goroda' then 'multi'
+          else coalesce(
+            nullif(a."citySlug", ''),
+            case
+              when a.slug = 'myuzikly-teatr-novichok-msk-spb' then 'multi'
+              else c.slug
+            end
+          )
+        end as "citySlug"
       from "Article" a
       left join "City" c on c.id = a."cityId"
       where a.slug = $1
         and a.status = 'PUBLISHED'
+        and (a."publishedAt" is null or a."publishedAt" <= now())
       limit 1
     `,
     [slug],
   );
-  if (!rows[0]) return null;
-  return {
-    generatedAt: new Date().toISOString(),
-    article: mapPublicArticleDetail(rows[0]),
-  };
+  if (rows[0]) {
+    return {
+      generatedAt: new Date().toISOString(),
+      article: mapPublicArticleDetail(rows[0]),
+      cmsOwned: true,
+    };
+  }
+
+  // Article exists in CMS but is not public (draft/review/archive) - do not fall back to static body.
+  const { rows: ownedRows } = await db.query(
+    `select status::text as status from "Article" where slug = $1 limit 1`,
+    [slug],
+  );
+  if (ownedRows[0]) {
+    return {
+      generatedAt: new Date().toISOString(),
+      article: null,
+      cmsOwned: true,
+      cmsStatus: String(ownedRows[0].status || '').toLowerCase(),
+    };
+  }
+
+  return null;
 }
 
 export async function buildAdminArticlesList(db) {
@@ -8766,11 +8666,16 @@ export async function buildAdminArticlesList(db) {
       a."coverImageUrl",
       a."publishedAt",
       a."isIndexable",
+      a."isFeatured",
       a."updatedAt",
+      a."citySlug",
+      a."authorId",
+      a."authorName",
+      a."articleType",
       c.title as city
     from "Article" a
     left join "City" c on c.id = a."cityId"
-    order by a."updatedAt" desc
+    order by a."isFeatured" desc, a."updatedAt" desc
   `);
   return {
     generatedAt: new Date().toISOString(),
@@ -8783,8 +8688,13 @@ export async function buildAdminArticlesList(db) {
       excerpt: row.excerpt || '',
       coverImageUrl: row.coverImageUrl || null,
       city: row.city || null,
+      citySlug: canonicalBlogCitySlug(row.citySlug) || row.citySlug || null,
+      authorId: row.authorId || null,
+      authorName: row.authorName || null,
+      articleType: row.articleType || null,
       publishedAt: row.publishedAt ? new Date(row.publishedAt).toISOString() : null,
       isIndexable: row.isIndexable !== false,
+      isFeatured: row.isFeatured === true,
       updatedAt: row.updatedAt ? new Date(row.updatedAt).toISOString() : null,
     })),
   };
@@ -8796,7 +8706,7 @@ export async function buildAdminArticleDetail(db, articleId) {
       select
         a.*,
         c.title as city,
-        c.slug as "citySlug"
+        c.slug as "joinedCitySlug"
       from "Article" a
       left join "City" c on c.id = a."cityId"
       where a.id = $1
@@ -8806,6 +8716,12 @@ export async function buildAdminArticleDetail(db, articleId) {
   );
   const row = rows[0];
   if (!row) return null;
+  const citySlug =
+    canonicalBlogCitySlug(row.citySlug) ||
+    canonicalBlogCitySlug(row.joinedCitySlug) ||
+    row.citySlug ||
+    row.joinedCitySlug ||
+    null;
   return {
     id: row.id,
     slug: row.slug,
@@ -8816,15 +8732,26 @@ export async function buildAdminArticleDetail(db, articleId) {
     coverImageUrl: row.coverImageUrl || null,
     cityId: row.cityId || null,
     city: row.city || null,
-    citySlug: row.citySlug || null,
+    citySlug,
+    authorId: row.authorId || null,
+    authorName: row.authorName || null,
+    articleType: row.articleType || null,
     seoH1: row.seoH1 || null,
     seoTitle: row.seoTitle || null,
     seoDescription: row.seoDescription || null,
     canonicalPath: row.canonicalPath || null,
     isIndexable: row.isIndexable !== false,
+    isFeatured: row.isFeatured === true,
     publishedAt: row.publishedAt ? new Date(row.publishedAt).toISOString() : null,
     updatedAt: row.updatedAt ? new Date(row.updatedAt).toISOString() : null,
   };
+}
+
+async function resolveArticleCityId(db, citySlug) {
+  const aliases = blogCitySlugAliases(citySlug);
+  if (!aliases.length) return null;
+  const { rows } = await db.query(`select id from "City" where slug = any($1::text[]) limit 1`, [aliases]);
+  return rows[0]?.id || null;
 }
 
 function normalizeArticleStatus(value) {
@@ -8851,18 +8778,42 @@ export async function upsertAdminArticle(db, articleId, payload = {}) {
   const excerpt = payload.excerpt ?? current?.excerpt ?? null;
   const content = payload.content ?? current?.content ?? null;
   const coverImageUrl = payload.coverImageUrl ?? current?.coverImageUrl ?? null;
-  const cityId = payload.cityId ?? current?.cityId ?? null;
+  const finalCitySlug =
+    payload.citySlug !== undefined
+      ? canonicalBlogCitySlug(payload.citySlug)
+      : canonicalBlogCitySlug(current?.citySlug) || current?.citySlug || null;
+  let cityId = current?.cityId ?? null;
+  if (payload.cityId !== undefined) {
+    cityId = payload.cityId || null;
+  } else if (payload.citySlug !== undefined) {
+    cityId = finalCitySlug ? await resolveArticleCityId(db, finalCitySlug) : null;
+  } else if (!cityId && finalCitySlug) {
+    cityId = await resolveArticleCityId(db, finalCitySlug);
+  }
+  const authorId = payload.authorId ?? current?.authorId ?? null;
+  const authorName = payload.authorName ?? current?.authorName ?? null;
+  const articleType = payload.articleType ?? current?.articleType ?? null;
   const seoH1 = payload.seoH1 ?? current?.seoH1 ?? null;
   const seoTitle = payload.seoTitle ?? current?.seoTitle ?? title;
   const seoDescription = payload.seoDescription ?? current?.seoDescription ?? excerpt;
   const canonicalPath = payload.canonicalPath ?? current?.canonicalPath ?? `/blog/${slug}`;
   const isIndexable = payload.isIndexable ?? current?.isIndexable ?? status === 'PUBLISHED';
+  const isFeatured =
+    payload.isFeatured !== undefined
+      ? Boolean(payload.isFeatured)
+      : Boolean(current?.isFeatured);
   const publishedAt =
     status === 'PUBLISHED'
       ? payload.publishedAt || current?.publishedAt || new Date().toISOString()
       : payload.publishedAt ?? current?.publishedAt ?? null;
 
   if (current) {
+    if (isFeatured) {
+      await db.query(
+        `update "Article" set "isFeatured" = false where "isFeatured" = true and id <> $1`,
+        [current.id],
+      );
+    }
     const { rows } = await db.query(
       `
         update "Article"
@@ -8874,12 +8825,17 @@ export async function upsertAdminArticle(db, articleId, payload = {}) {
           content = $6,
           "coverImageUrl" = $7,
           "cityId" = $8,
-          "seoH1" = $9,
-          "seoTitle" = $10,
-          "seoDescription" = $11,
-          "canonicalPath" = $12,
-          "isIndexable" = $13,
-          "publishedAt" = $14,
+          "citySlug" = $9,
+          "authorId" = $10,
+          "authorName" = $11,
+          "articleType" = $12,
+          "seoH1" = $13,
+          "seoTitle" = $14,
+          "seoDescription" = $15,
+          "canonicalPath" = $16,
+          "isIndexable" = $17,
+          "isFeatured" = $18,
+          "publishedAt" = $19,
           "updatedAt" = now()
         where id = $1
         returning id
@@ -8893,11 +8849,16 @@ export async function upsertAdminArticle(db, articleId, payload = {}) {
         content,
         coverImageUrl,
         cityId,
+        finalCitySlug,
+        authorId,
+        authorName,
+        articleType,
         seoH1,
         seoTitle,
         seoDescription,
         canonicalPath,
         isIndexable,
+        isFeatured,
         publishedAt,
       ],
     );
@@ -8905,17 +8866,22 @@ export async function upsertAdminArticle(db, articleId, payload = {}) {
   }
 
   const id = `article_${randomUUID().replace(/-/g, '').slice(0, 24)}`;
+  if (isFeatured) {
+    await db.query(`update "Article" set "isFeatured" = false where "isFeatured" = true`);
+  }
   await db.query(
     `
       insert into "Article" (
-        id, slug, status, title, excerpt, content, "coverImageUrl", "cityId",
-        "seoH1", "seoTitle", "seoDescription", "canonicalPath", "isIndexable",
+        id, slug, status, title, excerpt, content, "coverImageUrl", "cityId", "citySlug",
+        "authorId", "authorName", "articleType",
+        "seoH1", "seoTitle", "seoDescription", "canonicalPath", "isIndexable", "isFeatured",
         "publishedAt", "createdAt", "updatedAt"
       )
       values (
-        $1, $2, $3::"ArticleStatus", $4, $5, $6, $7, $8,
-        $9, $10, $11, $12, $13,
-        $14, now(), now()
+        $1, $2, $3::"ArticleStatus", $4, $5, $6, $7, $8, $9,
+        $10, $11, $12,
+        $13, $14, $15, $16, $17, $18,
+        $19, now(), now()
       )
     `,
     [
@@ -8927,13 +8893,25 @@ export async function upsertAdminArticle(db, articleId, payload = {}) {
       content,
       coverImageUrl,
       cityId,
+      finalCitySlug,
+      authorId,
+      authorName,
+      articleType,
       seoH1,
       seoTitle,
       seoDescription,
       canonicalPath,
       isIndexable,
+      isFeatured,
       publishedAt,
     ],
   );
   return buildAdminArticleDetail(db, id);
+}
+
+export async function deleteAdminArticle(db, articleId) {
+  const current = await buildAdminArticleDetail(db, articleId);
+  if (!current) return null;
+  await db.query(`delete from "Article" where id = $1`, [articleId]);
+  return current;
 }

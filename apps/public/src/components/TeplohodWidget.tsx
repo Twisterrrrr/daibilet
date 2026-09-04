@@ -98,7 +98,6 @@ export function TeplohodWidgetEmbed({
         data-id={String(tepWidgetId || DEFAULT_TEP_WIDGET_ID)}
         data-event-id={eventId}
       />
-      <p className="mt-2 text-xs leading-5 text-slate-500">Выберите дату и категорию билета в виджете Teplohod.info.</p>
     </div>
   );
 }
@@ -106,15 +105,20 @@ export function TeplohodWidgetEmbed({
 export function getTeplohodWidgetIds(event: {
   externalId?: string | number | null;
   widgetProvider?: string | null;
+  purchaseProvider?: string | null;
+  offerSourceCode?: string | null;
   purchaseUrl?: string | null;
+  widgetUrl?: string | null;
   widgetPayload?: {
     provider?: string | null;
     tepEventId?: string | number | null;
     tepWidgetId?: string | number | null;
   } | null;
 }) {
-  const provider = String(event.widgetProvider || event.widgetPayload?.provider || '').toUpperCase();
-  const purchaseUrl = String(event.purchaseUrl || '').toLowerCase();
+  const provider = String(
+    event.widgetProvider || event.purchaseProvider || event.offerSourceCode || event.widgetPayload?.provider || '',
+  ).toUpperCase();
+  const purchaseUrl = String(event.purchaseUrl || event.widgetUrl || '').toLowerCase();
   const isTeplohod = provider.includes('TEPLOHOD') || provider.includes('TEP') || purchaseUrl.includes('teplohod.info');
   if (!isTeplohod) return null;
 
@@ -141,7 +145,10 @@ export function getTeplohodWidgetIdsFromSession(session: {
   return getTeplohodWidgetIds({
     externalId: fromId,
     widgetProvider: session.purchaseProvider || session.offerSourceCode,
+    purchaseProvider: session.purchaseProvider,
+    offerSourceCode: session.offerSourceCode,
     purchaseUrl,
+    widgetUrl: session.widgetUrl,
   });
 }
 

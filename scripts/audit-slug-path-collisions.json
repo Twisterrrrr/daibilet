@@ -1,0 +1,14 @@
+{
+  "generatedAt": "2026-08-22T14:07:32.209Z",
+  "cityFilter": "voronezh",
+  "totalSlugs": 87,
+  "collisionGroups": 0,
+  "collisionSlugs": 0,
+  "crossCityGroups": 0,
+  "crossCitySlugs": 0,
+  "identityGroups": 0,
+  "identitySlugs": 0,
+  "collisions": [],
+  "crossCity": [],
+  "identity": []
+}

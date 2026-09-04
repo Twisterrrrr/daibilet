@@ -10,6 +10,8 @@ import {
   buildAdminDashboard,
   buildAdminBuyersList,
   buildAdminCitiesList,
+  buildAdminCityDetail,
+  updateAdminCity,
   buildAdminEventDetail,
   buildAdminEventsList,
   buildAdminLandingDetail,
@@ -17,6 +19,11 @@ import {
   buildAdminOrderEventCandidates,
   buildAdminOrderDetail,
   buildAdminOrdersList,
+  archiveAdminOrder,
+  unarchiveAdminOrder,
+  archiveAdminOrdersBulk,
+  archiveStaleCancelledOrders,
+  deleteAdminOrder,
   buildAdminLandingsList,
   buildAdminSources,
   buildAdminTaxonomy,
@@ -38,7 +45,6 @@ import {
   buildPublicHomePreview,
   buildPublicDestinations,
   buildPublicStats,
-  buildPublicSearch,
   buildPublicPromoBlocks,
   buildPublicLandingsCatalog,
   buildPublicArticlesList,
@@ -46,6 +52,7 @@ import {
   buildAdminArticlesList,
   buildAdminArticleDetail,
   upsertAdminArticle,
+  deleteAdminArticle,
   publicVenueSlug,
   publicVenuePageTemplate,
   clearPublicDataCaches,
@@ -53,16 +60,25 @@ import {
   runLandingAudit,
   updateAdminEventOverride,
   updateAdminEventTaxonomy,
+  updateAdminEventVenueLinks,
+  suggestAdminEventVenueLinks,
+  applyAdminEventVenueLinks,
   upsertAdminOrderTicket,
   updateAdminLanding,
   updateAdminLandingMatch,
   updateAdminVenue,
+  warmAdminGroupedEventsCache,
+  invalidateAdminGroupedEventsCache,
 } from './dto.js';
+import { buildPublicSearchDto } from './public-search.dto.ts';
+import { loadVenueMapTip } from './public-venue-map-tip.ts';
 import {
   buildSocialPreviewForPath,
   isSocialPreviewAgent,
   renderSocialPreviewHtml,
 } from './social-preview.js';
+import { clearPublicArticlesDtoCache } from './public-articles.dto.js';
+import { revalidateNextBlogArticle } from './revalidate-next-blog.js';
 import {
   assertAuthRateLimit,
   authenticateAccessToken,
@@ -89,14 +105,35 @@ const adminAuth = {
   realm: process.env.ADMIN_AUTH_REALM || 'Daibilet admin',
 };
 
-const TEP_AUTO_SYNC_INTERVAL_MS = Number(process.env.TEP_AUTO_SYNC_INTERVAL_MS || 6 * 60 * 60 * 1000);
+// Default 12h (was 6h) to reduce CPU/RAM peaks on 3.8Gi hosts; override via env.
+// Prefer out-of-process worker (apps/worker + deploy/cron/*-sync.sh) on small hosts: set TEP_AUTO_SYNC_ENABLED=0.
+// Admin Sources POST still spawns the same root scripts/* as worker jobs (compatible pipeline).
+const TEP_AUTO_SYNC_ENABLED = !['0', 'false', 'off', 'no'].includes(
+  String(process.env.TEP_AUTO_SYNC_ENABLED ?? '1').trim().toLowerCase(),
+);
+const TEP_AUTO_SYNC_INTERVAL_MS = Number(process.env.TEP_AUTO_SYNC_INTERVAL_MS || 12 * 60 * 60 * 1000);
+const TEP_AUTO_SYNC_WARM_DELAY_MS = Number(process.env.TEP_AUTO_SYNC_WARM_DELAY_MS || 15 * 60 * 1000);
+// Default 45min startup delay; skip startup sync when last SUCCESS catalog sync is fresher than SKIP_IF_FRESH.
+const TEP_AUTO_SYNC_STARTUP_DELAY_MS = Number(
+  process.env.TEP_AUTO_SYNC_STARTUP_DELAY_MS || Math.min(45 * 60 * 1000, TEP_AUTO_SYNC_INTERVAL_MS),
+);
+const TEP_AUTO_SYNC_SKIP_IF_FRESH_MS = Number(
+  process.env.TEP_AUTO_SYNC_SKIP_IF_FRESH_MS || 6 * 60 * 60 * 1000,
+);
+// Full public warm on every API restart + post-sync warm stacks CPU; default off (post-sync delayed warm only).
+const DAIBILET_PUBLIC_STARTUP_WARM = ['1', 'true', 'yes', 'on'].includes(
+  String(process.env.DAIBILET_PUBLIC_STARTUP_WARM ?? '0').trim().toLowerCase(),
+);
 let tepAutoSyncInFlight = false;
+let tepAutoSyncWarmTimer = null;
 
 const jsonCache = new Map();
 const PUBLIC_RESPONSE_CACHE_MS = 5 * 60 * 1000;
-const PUBLIC_HTTP_CACHE_CONTROL = 'public, max-age=60, stale-while-revalidate=300';
+const PUBLIC_HTTP_CACHE_CONTROL = 'public, max-age=60, s-maxage=300, stale-while-revalidate=600';
 const MAX_PUBLIC_RESPONSE_CACHE_ENTRIES = 80;
 const publicResponseCache = new Map();
+/** @type {Map<string, Promise<unknown>>} */
+const publicResponseCacheBuilds = new Map();
 const publicCacheInvalidators = new Set();
 const publicCacheWarmers = new Set();
 let activeCorsRequest = null;
@@ -104,7 +141,7 @@ let activeCorsRequest = null;
 function getAllowedOrigins() {
   const raw =
     process.env.PUBLIC_CORS_ORIGINS ||
-    'https://daibilet.ru,https://www.daibilet.ru,http://localhost:5173,http://127.0.0.1:5173';
+    'https://daibilet.ru,https://www.daibilet.ru,https://admin.daibilet.ru,http://localhost:5173,http://127.0.0.1:5173,http://localhost:5176,http://127.0.0.1:5176';
   return raw
     .split(',')
     .map((value) => value.trim())
@@ -117,9 +154,21 @@ function routeNeedsCredentials(request) {
   return pathname.startsWith('/api/auth/') || pathname.startsWith('/api/account/') || pathname.startsWith('/api/user/auth/');
 }
 
+function isCorsProtectedPath(pathname) {
+  return (
+    pathname.startsWith('/api/admin') ||
+    pathname.startsWith('/api/v1/tc') ||
+    pathname.startsWith('/api/v1/tep') ||
+    pathname === '/api/db/stats' ||
+    pathname === '/api/db/events'
+  );
+}
+
 function buildCorsHeaders(request, { credentials = false } = {}) {
   const origin = String(request?.headers?.origin || '').trim();
   const allowed = getAllowedOrigins();
+  const pathname = request?.url ? new URL(request.url, 'http://127.0.0.1').pathname : '';
+  const protectedPath = isCorsProtectedPath(pathname);
   const base = {
     'access-control-allow-methods': 'GET, PATCH, POST, OPTIONS',
     'access-control-allow-headers': 'content-type, authorization',
@@ -138,6 +187,14 @@ function buildCorsHeaders(request, { credentials = false } = {}) {
     return {
       ...base,
       'access-control-allow-origin': origin,
+      vary: 'Origin',
+    };
+  }
+
+  // Never reflect * for admin/sync/db: cross-origin callers must be allowlisted.
+  if (protectedPath) {
+    return {
+      ...base,
       vary: 'Origin',
     };
   }
@@ -182,6 +239,12 @@ export async function handleRequest(request, response) {
     }
 
     if (route === 'GET /api/health') {
+      try {
+        const { logCatalogDiskStalenessIfNeeded } = await import('./public-catalog-disk-cache.js');
+        logCatalogDiskStalenessIfNeeded();
+      } catch {
+        /* ignore health side-checks */
+      }
       sendJson(response, {
         ok: true,
         service: 'daibilet-backend',
@@ -189,6 +252,27 @@ export async function handleRequest(request, response) {
         db: 'configured',
         generatedAt: new Date().toISOString(),
       });
+      return;
+    }
+
+    if (route === 'POST /api/internal/public-cache') {
+      const secret = String(process.env.DAIBILET_NEXT_REVALIDATE_SECRET || '').trim();
+      const auth = String(request.headers.authorization || '');
+      const token = auth.startsWith('Bearer ') ? auth.slice(7).trim() : '';
+      if (!secret || token !== secret) {
+        sendJson(response, { error: 'unauthorized' }, 401);
+        return;
+      }
+      const body = await readJsonBody(request).catch(() => ({}));
+      const warmRaw = String(body?.warm ?? body?.mode ?? 'light').toLowerCase();
+      const warm = warmRaw === 'full' || warmRaw === 'true' || warmRaw === '1'
+        ? 'full'
+        : warmRaw === 'false' || warmRaw === '0' || warmRaw === 'none'
+          ? false
+          : 'light';
+      const reason = String(body?.reason || 'internal public-cache').slice(0, 120);
+      invalidatePublicCaches(reason, { warm });
+      sendJson(response, { ok: true, warm: warm || 'none', reason });
       return;
     }
 
@@ -205,8 +289,20 @@ export async function handleRequest(request, response) {
     }
 
     if (route === 'GET /api/public/home') {
-      if (url.searchParams.get('refresh') === '1') invalidatePublicCaches('public home refresh');
-      sendJson(response, await withDataFallback(() => buildPublicHome(db), 'apps/public/data.js', 'PUBLIC_DATA'));
+      if (url.searchParams.get('refresh') === '1') {
+        invalidatePublicCaches('public home refresh');
+        sendPublicJson(
+          response,
+          await withDataFallback(() => buildPublicHome(db), 'apps/public/data.js', 'PUBLIC_DATA'),
+        );
+        return;
+      }
+      sendPublicJson(
+        response,
+        await withPublicResponseCache('home', () =>
+          withDataFallback(() => buildPublicHome(db), 'apps/public/data.js', 'PUBLIC_DATA'),
+        ),
+      );
       return;
     }
 
@@ -239,7 +335,20 @@ export async function handleRequest(request, response) {
     }
 
     if (route === 'GET /api/public/articles') {
-      sendPublicJson(response, await withPublicResponseCache('articles:list', () => buildPublicArticlesList(db)));
+      const citySlug = url.searchParams.get('citySlug') || undefined;
+      const includeBroad = url.searchParams.get('includeBroad') === '1';
+      const limitRaw = Number(url.searchParams.get('limit') || 0);
+      const cacheKey = `articles:list:${citySlug || 'all'}:${includeBroad ? 1 : 0}:${limitRaw || 100}`;
+      sendPublicJson(
+        response,
+        await withPublicResponseCache(cacheKey, () =>
+          buildPublicArticlesList(db, {
+            citySlug,
+            includeBroad,
+            limit: limitRaw > 0 ? limitRaw : undefined,
+          }),
+        ),
+      );
       return;
     }
 
@@ -290,7 +399,12 @@ export async function handleRequest(request, response) {
     }
 
     if (route === 'GET /api/public/search') {
-      sendPublicJson(response, await withPublicResponseCache(`search:${canonicalSearchParams(url.searchParams)}`, () => buildPublicSearch(db, url.searchParams)));
+      sendPublicJson(
+        response,
+        await withPublicResponseCache(`search-trgm:${canonicalSearchParams(url.searchParams)}`, () =>
+          buildPublicSearchDto(url.searchParams),
+        ),
+      );
       return;
     }
 
@@ -403,6 +517,17 @@ export async function handleRequest(request, response) {
       return;
     }
 
+    if (route === 'GET /api/public/venues/map-tip') {
+      const tipId = String(url.searchParams.get('id') || url.searchParams.get('slug') || '').trim();
+      const tip = await loadVenueMapTip(tipId);
+      if (!tip) {
+        sendPublicJson(response, { error: 'not_found' }, { statusCode: 404 });
+        return;
+      }
+      sendPublicJson(response, { tip });
+      return;
+    }
+
     const publicVenueMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/public\/venues\/([^/]+)$/) : null;
     if (publicVenueMatch) {
       const venueSlug = decodeURIComponent(publicVenueMatch[1]);
@@ -414,21 +539,30 @@ export async function handleRequest(request, response) {
     const publicCityMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/public\/cities\/([^/]+)$/) : null;
     if (publicCityMatch) {
       const citySlug = decodeURIComponent(publicCityMatch[1]);
-      sendPublicJson(response, await withPublicResponseCache(`city:${citySlug}`, () => buildPublicCityPage(db, citySlug)));
+      const payload = await withPublicResponseCache(`city:${citySlug}`, () => buildPublicCityPage(db, citySlug));
+      // Never 200+null: web generateMetadata treats miss as HTTP 500.
+      sendPublicJson(response, payload || { error: 'city_not_found' }, payload ? 200 : 404);
       return;
     }
 
     const publicLandingMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/public\/landings\/([^/]+)$/) : null;
     if (publicLandingMatch) {
       const landingSlug = decodeURIComponent(publicLandingMatch[1]);
-      sendPublicJson(response, await withPublicResponseCache(`landing:${landingSlug}`, () => buildPublicLandingPageWithFallback(db, landingSlug)));
+      const cityFilter = String(url.searchParams.get('city') || '').trim().toLowerCase();
+      const cacheKey = cityFilter && cityFilter !== 'all' ? `landing:${landingSlug}:${cityFilter}` : `landing:${landingSlug}`;
+      sendPublicJson(
+        response,
+        await withPublicResponseCache(cacheKey, () => buildPublicLandingPageWithFallback(db, landingSlug, cityFilter)),
+      );
       return;
     }
 
     const publicEventMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/public\/events\/([^/]+)$/) : null;
     if (publicEventMatch) {
       const eventSlug = decodeURIComponent(publicEventMatch[1]);
-      sendPublicJson(response, await withPublicResponseCache(`event:${eventSlug}`, () => buildPublicEventPage(db, eventSlug)));
+      const payload = await withPublicResponseCache(`event:${eventSlug}`, () => buildPublicEventPage(db, eventSlug));
+      // Never 200+null: web generateMetadata treats miss as HTTP 500.
+      sendPublicJson(response, payload || { error: 'event_not_found' }, payload ? 200 : 404);
       return;
     }
 
@@ -451,14 +585,24 @@ export async function handleRequest(request, response) {
     }
 
     if (route === 'POST /api/v1/tc/sync' || route === 'POST /api/admin/sources/ticketscloud/sync') {
-      const result = await runTicketscloudCatalogSync();
-      invalidatePublicCaches('ticketscloud catalog sync', { warm: true });
+      const result = await runTicketscloudCatalogSync(url.searchParams);
+      // Light warm by default — full warm stacks CPU with import; nightly cron can request full.
+      const warmMode = ['1', 'true', 'full'].includes(String(url.searchParams.get('fullWarm') || '').toLowerCase())
+        ? 'full'
+        : 'light';
+      invalidatePublicCaches('ticketscloud catalog sync', { warm: warmMode });
       sendJson(response, result);
       return;
     }
 
     if (route === 'POST /api/v1/tc/orders/sync' || route === 'POST /api/admin/orders/sync') {
       const result = await runTicketscloudOrdersSync(url.searchParams);
+      sendJson(response, result);
+      return;
+    }
+
+    if (route === 'POST /api/v1/tep/orders/sync' || route === 'POST /api/admin/orders/tep/sync') {
+      const result = await runTeplohodOrdersSync(url.searchParams);
       sendJson(response, result);
       return;
     }
@@ -475,6 +619,45 @@ export async function handleRequest(request, response) {
 
     if (route === 'GET /api/admin/orders' || route === 'GET /api/admin/external-orders') {
       sendJson(response, await buildAdminOrdersList(db, url.searchParams));
+      return;
+    }
+
+    if (route === 'POST /api/admin/orders/archive') {
+      try {
+        sendJson(response, await archiveAdminOrdersBulk(db, await readJsonBody(request)));
+      } catch (error) {
+        sendJson(response, { error: error.message || 'archive_failed' }, error.statusCode || 400);
+      }
+      return;
+    }
+
+    const orderArchiveMatch = request.method === 'POST' ? url.pathname.match(/^\/api\/admin\/orders\/([^/]+)\/archive$/) : null;
+    if (orderArchiveMatch) {
+      try {
+        sendJson(response, await archiveAdminOrder(db, decodeURIComponent(orderArchiveMatch[1])));
+      } catch (error) {
+        sendJson(response, { error: error.message || 'archive_failed' }, error.statusCode || 400);
+      }
+      return;
+    }
+
+    const orderUnarchiveMatch = request.method === 'POST' ? url.pathname.match(/^\/api\/admin\/orders\/([^/]+)\/unarchive$/) : null;
+    if (orderUnarchiveMatch) {
+      try {
+        sendJson(response, await unarchiveAdminOrder(db, decodeURIComponent(orderUnarchiveMatch[1])));
+      } catch (error) {
+        sendJson(response, { error: error.message || 'unarchive_failed' }, error.statusCode || 400);
+      }
+      return;
+    }
+
+    const orderDeleteMatch = request.method === 'DELETE' ? url.pathname.match(/^\/api\/admin\/orders\/([^/]+)$/) : null;
+    if (orderDeleteMatch) {
+      try {
+        sendJson(response, await deleteAdminOrder(db, decodeURIComponent(orderDeleteMatch[1])));
+      } catch (error) {
+        sendJson(response, { error: error.message || 'delete_failed' }, error.statusCode || 400);
+      }
       return;
     }
 
@@ -497,12 +680,31 @@ export async function handleRequest(request, response) {
     }
 
     if (route === 'GET /api/admin/landings') {
-      sendJson(response, await buildAdminLandingsList(db));
+      sendJson(response, await buildAdminLandingsList(db, url.searchParams));
       return;
     }
 
     if (route === 'GET /api/admin/cities') {
-      sendJson(response, await buildAdminCitiesList(db));
+      sendJson(response, await buildAdminCitiesList(db, url.searchParams));
+      return;
+    }
+
+    const cityDetailMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/admin\/cities\/([^/]+)$/) : null;
+    if (cityDetailMatch) {
+      const detail = await buildAdminCityDetail(db, decodeURIComponent(cityDetailMatch[1]));
+      sendJson(response, detail || { error: 'city_not_found' }, detail ? 200 : 404);
+      return;
+    }
+
+    const cityUpdateMatch = request.method === 'PATCH' ? url.pathname.match(/^\/api\/admin\/cities\/([^/]+)$/) : null;
+    if (cityUpdateMatch) {
+      try {
+        const result = await updateAdminCity(db, decodeURIComponent(cityUpdateMatch[1]), await readJsonBody(request));
+        invalidatePublicCaches('city update');
+        sendJson(response, result);
+      } catch (error) {
+        sendJson(response, { error: error.message || 'city_update_failed' }, error.statusCode || 500);
+      }
       return;
     }
 
@@ -514,7 +716,7 @@ export async function handleRequest(request, response) {
 
     const landingDetailMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/admin\/landings\/([^/]+)$/) : null;
     if (landingDetailMatch) {
-      sendJson(response, await buildAdminLandingDetail(db, decodeURIComponent(landingDetailMatch[1])));
+      sendJson(response, await buildAdminLandingDetail(db, decodeURIComponent(landingDetailMatch[1]), url.searchParams));
       return;
     }
 
@@ -571,6 +773,11 @@ export async function handleRequest(request, response) {
     if (route === 'POST /api/admin/articles') {
       const result = await upsertAdminArticle(db, null, await readJsonBody(request));
       invalidatePublicCaches('article create');
+      void revalidateNextBlogArticle({
+        slug: result?.slug,
+        citySlug: result?.citySlug,
+        reason: 'article create',
+      });
       sendJson(response, result, 201);
       return;
     }
@@ -584,9 +791,34 @@ export async function handleRequest(request, response) {
 
     const articleUpdateMatch = request.method === 'PATCH' ? url.pathname.match(/^\/api\/admin\/articles\/([^/]+)$/) : null;
     if (articleUpdateMatch) {
-      const result = await upsertAdminArticle(db, decodeURIComponent(articleUpdateMatch[1]), await readJsonBody(request));
+      const articleId = decodeURIComponent(articleUpdateMatch[1]);
+      const before = await buildAdminArticleDetail(db, articleId);
+      const result = await upsertAdminArticle(db, articleId, await readJsonBody(request));
       invalidatePublicCaches('article update');
+      void revalidateNextBlogArticle({
+        slug: result?.slug,
+        previousSlug: before?.slug,
+        citySlug: result?.citySlug || before?.citySlug,
+        reason: 'article update',
+      });
       sendJson(response, result);
+      return;
+    }
+
+    const articleDeleteMatch = request.method === 'DELETE' ? url.pathname.match(/^\/api\/admin\/articles\/([^/]+)$/) : null;
+    if (articleDeleteMatch) {
+      const deleted = await deleteAdminArticle(db, decodeURIComponent(articleDeleteMatch[1]));
+      if (!deleted) {
+        sendJson(response, { error: 'article_not_found' }, 404);
+        return;
+      }
+      invalidatePublicCaches('article delete');
+      void revalidateNextBlogArticle({
+        slug: deleted.slug,
+        citySlug: deleted.citySlug,
+        reason: 'article delete',
+      });
+      sendJson(response, { ok: true, deleted });
       return;
     }
 
@@ -598,25 +830,91 @@ export async function handleRequest(request, response) {
 
     const eventOverrideMatch = request.method === 'PATCH' ? url.pathname.match(/^\/api\/admin\/events\/([^/]+)\/override$/) : null;
     if (eventOverrideMatch) {
-      const result = await updateAdminEventOverride(db, decodeURIComponent(eventOverrideMatch[1]), await readJsonBody(request));
-      invalidatePublicCaches('event override update');
+      const eventId = decodeURIComponent(eventOverrideMatch[1]);
+      const result = await updateAdminEventOverride(db, eventId, await readJsonBody(request));
+      const slugRow = await db.query('select slug from "Event" where id = $1 limit 1', [eventId]).catch(() => null);
+      invalidatePublicCaches('event override update', { slug: slugRow?.rows?.[0]?.slug });
       sendJson(response, result);
       return;
     }
 
     const eventModerationMatch = request.method === 'PATCH' ? url.pathname.match(/^\/api\/admin\/events\/([^/]+)\/moderation$/) : null;
     if (eventModerationMatch) {
+      const eventId = decodeURIComponent(eventModerationMatch[1]);
       const body = await readJsonBody(request);
-      const result = await updateAdminEventOverride(db, decodeURIComponent(eventModerationMatch[1]), { editorStatus: body.editorStatus });
-      invalidatePublicCaches('event moderation update');
+      const result = await updateAdminEventOverride(db, eventId, { editorStatus: body.editorStatus });
+      const slugRow = await db.query('select slug from "Event" where id = $1 limit 1', [eventId]).catch(() => null);
+      invalidatePublicCaches('event moderation update', { slug: slugRow?.rows?.[0]?.slug });
       sendJson(response, result);
       return;
     }
 
     const eventTaxonomyMatch = request.method === 'PATCH' ? url.pathname.match(/^\/api\/admin\/events\/([^/]+)\/taxonomy$/) : null;
     if (eventTaxonomyMatch) {
-      const result = await updateAdminEventTaxonomy(db, decodeURIComponent(eventTaxonomyMatch[1]), await readJsonBody(request));
-      invalidatePublicCaches('event taxonomy update');
+      const eventId = decodeURIComponent(eventTaxonomyMatch[1]);
+      const result = await updateAdminEventTaxonomy(db, eventId, await readJsonBody(request));
+      const slugRow = await db.query('select slug from "Event" where id = $1 limit 1', [eventId]).catch(() => null);
+      invalidatePublicCaches('event taxonomy update', { slug: slugRow?.rows?.[0]?.slug });
+      sendJson(response, result);
+      return;
+    }
+
+    const eventVenueLinkSuggestionsMatch =
+      request.method === 'GET'
+        ? url.pathname.match(/^\/api\/admin\/events\/([^/]+)\/venue-link-suggestions$/)
+        : null;
+    if (eventVenueLinkSuggestionsMatch) {
+      const result = await suggestAdminEventVenueLinks(
+        db,
+        decodeURIComponent(eventVenueLinkSuggestionsMatch[1]),
+        { radiusM: url.searchParams.get('radiusM') },
+      );
+      if (!result) {
+        sendJson(response, { error: 'not_found' }, 404);
+        return;
+      }
+      sendJson(response, result);
+      return;
+    }
+
+    const eventVenueLinksApplyMatch =
+      request.method === 'POST'
+        ? url.pathname.match(/^\/api\/admin\/events\/([^/]+)\/venue-links:apply$/)
+        : null;
+    if (eventVenueLinksApplyMatch) {
+      const result = await applyAdminEventVenueLinks(
+        db,
+        decodeURIComponent(eventVenueLinksApplyMatch[1]),
+        await readJsonBody(request),
+      );
+      if (!result) {
+        sendJson(response, { error: 'not_found' }, 404);
+        return;
+      }
+      if (result.error) {
+        sendJson(response, result, 400);
+        return;
+      }
+      invalidatePublicCaches('event venue links merge apply');
+      sendJson(response, result);
+      return;
+    }
+
+    const eventVenueLinksMatch =
+      request.method === 'PATCH' || request.method === 'PUT'
+        ? url.pathname.match(/^\/api\/admin\/events\/([^/]+)\/venue-links$/)
+        : null;
+    if (eventVenueLinksMatch) {
+      const result = await updateAdminEventVenueLinks(
+        db,
+        decodeURIComponent(eventVenueLinksMatch[1]),
+        await readJsonBody(request),
+      );
+      if (!result) {
+        sendJson(response, { error: 'not_found' }, 404);
+        return;
+      }
+      invalidatePublicCaches('event venue links update');
       sendJson(response, result);
       return;
     }
@@ -653,13 +951,42 @@ export function startServer(options = {}) {
   const server = createServer(requestHandler);
   const listen = () => server.listen(serverPort, host, () => {
     console.log(`Daibilet backend listening on http://${host}:${serverPort}`);
-    if (!options.prewarmBeforeListen) void warmPublicCaches('startup');
+    // Avoid double full warm (startup + post-sync). Opt-in via DAIBILET_PUBLIC_STARTUP_WARM=1.
+    if (!options.prewarmBeforeListen && (options.warmPublicOnStartup ?? DAIBILET_PUBLIC_STARTUP_WARM)) {
+      void warmPublicCaches('startup');
+    }
+    // Admin Events/Dashboard use SQL read-model (no full catalog in RAM).
+    // Full grouped warm remains opt-in for Landings SWR: DAIBILET_ADMIN_STARTUP_WARM=1.
+    const adminStartupWarm =
+      options.warmAdminOnStartup ??
+      ['1', 'true', 'yes', 'on'].includes(String(process.env.DAIBILET_ADMIN_STARTUP_WARM || '').toLowerCase());
+    if (adminStartupWarm) {
+      void warmAdminGroupedEventsCache(db, 'startup')
+        .then(async () => {
+          await Promise.all([
+            buildAdminLandingsList(db, new URLSearchParams()),
+            buildAdminSources(db),
+          ]);
+        })
+        .catch((error) => {
+          console.warn(`Admin cache warm failed: ${error instanceof Error ? error.message : String(error)}`);
+        });
+    } else {
+      console.log('Admin full-catalog startup warm skipped (DAIBILET_ADMIN_STARTUP_WARM off; Events uses SQL read-model)');
+      void buildAdminSources(db).catch((error) => {
+        console.warn(`Admin sources warm failed: ${error instanceof Error ? error.message : String(error)}`);
+      });
+    }
     scheduleTeplohodAutoSync();
+    scheduleStaleOrderArchive();
   });
   if (options.prewarmBeforeListen) {
     console.log('Warming public caches before listen...');
     void warmPublicCaches('startup').finally(listen);
   } else {
+    if (!(options.warmPublicOnStartup ?? DAIBILET_PUBLIC_STARTUP_WARM)) {
+      console.log('Public startup warm skipped (DAIBILET_PUBLIC_STARTUP_WARM off; post-sync delayed warm remains)');
+    }
     listen();
   }
   return server;
@@ -674,7 +1001,38 @@ function isMainModule() {
   return Boolean(entry && import.meta.url === pathToFileURL(entry).href);
 }
 
+async function getTeplohodLastCatalogSuccessMs() {
+  try {
+    const result = await db.query(
+      `
+        select ssr."finishedAt", ssr."startedAt"
+        from "SourceSyncRun" ssr
+        join "Source" s on s.id = ssr."sourceId"
+        where s.code::text = 'TEPLOHOD'
+          and ssr.status::text = 'SUCCESS'
+          and coalesce(ssr.mode, '') !~* 'orders|order|polling'
+        order by coalesce(ssr."finishedAt", ssr."startedAt") desc
+        limit 1
+      `,
+    );
+    const row = result.rows?.[0];
+    if (!row) return null;
+    const at = row.finishedAt || row.startedAt;
+    const ms = at ? new Date(at).getTime() : NaN;
+    return Number.isFinite(ms) ? ms : null;
+  } catch (error) {
+    console.warn(
+      `Teplohod last-sync lookup failed: ${error instanceof Error ? error.message : String(error)}`,
+    );
+    return null;
+  }
+}
+
 function scheduleTeplohodAutoSync() {
+  if (!TEP_AUTO_SYNC_ENABLED) {
+    console.log('Teplohod in-process auto-sync disabled (TEP_AUTO_SYNC_ENABLED=0; use cron/systemd tep-catalog-sync)');
+    return;
+  }
   if (!Number.isFinite(TEP_AUTO_SYNC_INTERVAL_MS) || TEP_AUTO_SYNC_INTERVAL_MS < 60_000) {
     return;
   }
@@ -685,12 +1043,39 @@ function scheduleTeplohodAutoSync() {
       return;
     }
 
+    if (
+      reason === 'startup-delay' &&
+      Number.isFinite(TEP_AUTO_SYNC_SKIP_IF_FRESH_MS) &&
+      TEP_AUTO_SYNC_SKIP_IF_FRESH_MS > 0
+    ) {
+      const lastMs = await getTeplohodLastCatalogSuccessMs();
+      if (lastMs != null && Date.now() - lastMs < TEP_AUTO_SYNC_SKIP_IF_FRESH_MS) {
+        const ageMin = Math.round((Date.now() - lastMs) / 60000);
+        console.log(
+          `Teplohod auto-sync skipped (startup-delay): last SUCCESS ${ageMin} min ago (< ${Math.round(TEP_AUTO_SYNC_SKIP_IF_FRESH_MS / 60000)} min fresh window)`,
+        );
+        return;
+      }
+    }
+
     tepAutoSyncInFlight = true;
     const startedAt = Date.now();
     try {
       console.log(`Teplohod auto-sync started (${reason})`);
       const result = await runTeplohodSync();
-      invalidatePublicCaches('teplohod auto-sync', { warm: true });
+      // Invalidate immediately; defer warm/revalidate to avoid stacking with import peak.
+      invalidatePublicCaches('teplohod auto-sync', { warm: false });
+      if (tepAutoSyncWarmTimer) clearTimeout(tepAutoSyncWarmTimer);
+      const warmDelay = Number.isFinite(TEP_AUTO_SYNC_WARM_DELAY_MS) ? Math.max(0, TEP_AUTO_SYNC_WARM_DELAY_MS) : 0;
+      if (warmDelay > 0) {
+        console.log(`Teplohod cache warm scheduled in ${Math.round(warmDelay / 1000)}s`);
+        tepAutoSyncWarmTimer = setTimeout(() => {
+          tepAutoSyncWarmTimer = null;
+          invalidatePublicCaches('teplohod auto-sync delayed-warm', { warm: true });
+        }, warmDelay);
+      } else {
+        invalidatePublicCaches('teplohod auto-sync', { warm: true });
+      }
       const landingAudit = await runLandingAudit(db, rootDir);
       const elapsed = Date.now() - startedAt;
       console.log(
@@ -705,20 +1090,49 @@ function scheduleTeplohodAutoSync() {
     }
   };
 
-  const firstDelayMs = Math.min(120_000, TEP_AUTO_SYNC_INTERVAL_MS);
+  const firstDelayMs = Number.isFinite(TEP_AUTO_SYNC_STARTUP_DELAY_MS)
+    ? Math.max(60_000, TEP_AUTO_SYNC_STARTUP_DELAY_MS)
+    : Math.min(120_000, TEP_AUTO_SYNC_INTERVAL_MS);
   setTimeout(() => {
     void run('startup-delay');
   }, firstDelayMs);
   setInterval(() => {
     void run('interval');
   }, TEP_AUTO_SYNC_INTERVAL_MS);
-  console.log(`Teplohod auto-sync enabled: every ${Math.round(TEP_AUTO_SYNC_INTERVAL_MS / 60000)} min, first run in ${Math.round(firstDelayMs / 1000)}s`);
+  console.log(
+    `Teplohod auto-sync enabled: every ${Math.round(TEP_AUTO_SYNC_INTERVAL_MS / 60000)} min, first run in ${Math.round(firstDelayMs / 1000)}s, warm delay ${Math.round((Number.isFinite(TEP_AUTO_SYNC_WARM_DELAY_MS) ? TEP_AUTO_SYNC_WARM_DELAY_MS : 0) / 1000)}s, skip-if-fresh ${Math.round((Number.isFinite(TEP_AUTO_SYNC_SKIP_IF_FRESH_MS) ? TEP_AUTO_SYNC_SKIP_IF_FRESH_MS : 0) / 60000)} min`,
+  );
 }
 
-async function buildPublicLandingPageWithFallback(db, landingSlug) {
-  const managed = await buildPublicLandingPageManaged(db, landingSlug);
+const STALE_ORDER_ARCHIVE_INTERVAL_MS = 6 * 60 * 60 * 1000; // every 6 hours
+
+function scheduleStaleOrderArchive() {
+  const run = async (reason) => {
+    try {
+      const result = await archiveStaleCancelledOrders(db);
+      if (result.archived > 0) {
+        console.log(`Stale order archive (${reason}): moved ${result.archived} cancelled/deleted orders older than ${result.olderThanDays}d`);
+      }
+    } catch (error) {
+      console.warn(`Stale order archive failed (${reason}): ${error instanceof Error ? error.message : String(error)}`);
+    }
+  };
+
+  setTimeout(() => {
+    void run('startup');
+  }, 45_000);
+  setInterval(() => {
+    void run('interval');
+  }, STALE_ORDER_ARCHIVE_INTERVAL_MS);
+  console.log('Stale cancelled-order archive enabled: every 6h, threshold 30d');
+}
+
+async function buildPublicLandingPageWithFallback(db, landingSlug, cityFilter = '') {
+  const city = String(cityFilter || '').trim().toLowerCase();
+  const cityArg = city && city !== 'all' ? city : '';
+  const managed = await buildPublicLandingPageManaged(db, landingSlug, cityArg);
   if (managed) return managed;
-  return buildPublicLandingPage(db, landingSlug);
+  return buildPublicLandingPage(db, landingSlug, cityArg);
 }
 
 export async function warmPublicCaches(reason) {
@@ -734,11 +1148,19 @@ export async function warmPublicCaches(reason) {
       Promise.all([...publicCacheWarmers].map((warmer) => Promise.resolve().then(() => warmer(reason)))),
     ]);
     await Promise.all([
-      withPublicResponseCache('venues:family=institution&limit=500', () =>
-        buildPublicVenuesCatalog(db, new URLSearchParams({ family: 'institution', limit: '500' })),
+      withPublicResponseCache('venues:family=institution&limit=36', () =>
+        buildPublicVenuesCatalog(db, new URLSearchParams({ family: 'institution', limit: '36' })),
       ),
-      withPublicResponseCache('venues:family=location&limit=500', () =>
-        buildPublicVenuesCatalog(db, new URLSearchParams({ family: 'location', limit: '500' })),
+      withPublicResponseCache('venues:family=location&limit=36', () =>
+        buildPublicVenuesCatalog(db, new URLSearchParams({ family: 'location', limit: '36' })),
+      ),
+      // Key SSR routes: top cities + landings after deploy/sync.
+      withPublicResponseCache('city:sankt-peterburg', () => buildPublicCityPage(db, 'sankt-peterburg').catch(() => null)),
+      withPublicResponseCache('city:moscow', () => buildPublicCityPage(db, 'moscow').catch(() => null)),
+      withPublicResponseCache('landing:river-cruises', () => buildPublicLandingPageWithFallback(db, 'river-cruises').catch(() => null)),
+      withPublicResponseCache('landing:bus-tours', () => buildPublicLandingPageWithFallback(db, 'bus-tours').catch(() => null)),
+      withPublicResponseCache('events:limit=50', () =>
+        buildCatalogSessions(db, new URLSearchParams({ limit: '50', sort: 'time' })).catch(() => null),
       ),
     ]);
     const elapsed = Date.now() - startedAt;
@@ -747,9 +1169,37 @@ export async function warmPublicCaches(reason) {
     console.log(
       `Public cache warmed after ${reason}: ${stats?.stats?.events || preview?.sessions?.length || 0} events, ${destinations?.destinations?.length || 0} destinations in ${elapsed}ms${typedSummary ? `; ${typedSummary}` : ''}`,
     );
-    return { elapsedMs: elapsed, typed };
+    // Keep admin Events/Dashboard/Landings cold-start off the critical switch path.
+    void warmAdminGroupedEventsCache(db, `after:${reason}`).catch((error) => {
+      console.warn(`Admin cache warm failed after ${reason}: ${error instanceof Error ? error.message : String(error)}`);
+    });
+    return { elapsedMs: elapsed, typed, mode: 'full' };
   } catch (error) {
     console.warn(`Public cache warm failed after ${reason}: ${error instanceof Error ? error.message : String(error)}`);
+    return null;
+  }
+}
+
+/** Light warm after catalog sync: core home/catalog only (no venues/cities/landings/admin full rebuild). */
+export async function warmPublicCachesLight(reason) {
+  const startedAt = Date.now();
+  try {
+    const [destinations, preview, stats] = await Promise.all([
+      buildPublicDestinations(db),
+      buildPublicHomePreview(db),
+      buildPublicStats(db),
+    ]);
+    await warmPublicCatalogCache(db);
+    await withPublicResponseCache('events:limit=50', () =>
+      buildCatalogSessions(db, new URLSearchParams({ limit: '50', sort: 'time' })).catch(() => null),
+    );
+    const elapsed = Date.now() - startedAt;
+    console.log(
+      `Public cache light-warmed after ${reason}: ${stats?.stats?.events || preview?.sessions?.length || 0} events, ${destinations?.destinations?.length || 0} destinations in ${elapsed}ms`,
+    );
+    return { elapsedMs: elapsed, mode: 'light' };
+  } catch (error) {
+    console.warn(`Public cache light warm failed after ${reason}: ${error instanceof Error ? error.message : String(error)}`);
     return null;
   }
 }
@@ -764,7 +1214,20 @@ export function invalidatePublicCaches(reason, options = {}) {
       console.warn(`Public cache invalidator failed: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
-  if (options.warm) void warmPublicCaches(reason);
+  const warmMode = resolveWarmMode(options);
+  if (warmMode === 'full') {
+    invalidateAdminGroupedEventsCache(db, `public:${reason}`);
+    void warmPublicCaches(reason);
+  } else if (warmMode === 'light') {
+    void warmPublicCachesLight(reason);
+  }
+}
+
+function resolveWarmMode(options = {}) {
+  if (options.warm === 'light' || options.warmMode === 'light') return 'light';
+  if (options.warm === 'full' || options.warmMode === 'full') return 'full';
+  if (options.warm === true) return 'full';
+  return 'none';
 }
 
 export function registerPublicCacheInvalidator(invalidator) {
@@ -776,6 +1239,46 @@ export function registerPublicCacheWarmer(warmer) {
   publicCacheWarmers.add(warmer);
   return () => publicCacheWarmers.delete(warmer);
 }
+
+registerPublicCacheInvalidator((reason, options = {}) => {
+  clearPublicArticlesDtoCache();
+  const reasonText = String(reason || '');
+  const isEventUpdate = /event\s+(override|moderation|taxonomy|venue|change)/i.test(reasonText);
+  // Admin city PATCH: always bust Next destinations Data Cache (TTL 86400), not only on warm.
+  const isCityOrDestinationsUpdate =
+    /city\s+update|destinations?\s+refresh/i.test(reasonText);
+  // Catalog sync / warm: full home revalidate. Event admin edits: always bust Next event ISR
+  // (even without warm) so price/schedule changes are not stuck for EVENT_PAGE_REVALIDATE=7200.
+  if (isEventUpdate) {
+    const eventSlug = String(options?.slug || '').trim() || undefined;
+    import('./revalidate-next-blog.js')
+      .then(({ revalidateNextEventPage }) =>
+        revalidateNextEventPage({ slug: eventSlug, reason: reasonText }),
+      )
+      .catch((error) => {
+        console.warn(`Next event revalidate failed: ${error instanceof Error ? error.message : String(error)}`);
+      });
+    return;
+  }
+  if (isCityOrDestinationsUpdate) {
+    import('./revalidate-next-blog.js')
+      .then(({ revalidateNextDestinations }) =>
+        revalidateNextDestinations({ reason: reasonText }),
+      )
+      .catch((error) => {
+        console.warn(
+          `Next destinations revalidate failed: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      });
+    return;
+  }
+  if (!options?.warm) return;
+  import('./revalidate-next-home.js')
+    .then(({ revalidateNextHome }) => revalidateNextHome(reason))
+    .catch((error) => {
+      console.warn(`Next home revalidate failed: ${error instanceof Error ? error.message : String(error)}`);
+    });
+});
 
 async function readJson(relativePath) {
   const absolutePath = path.join(rootDir, relativePath);
@@ -817,13 +1320,25 @@ async function withPublicResponseCache(key, factory) {
   const cached = publicResponseCache.get(key);
   if (cached && cached.expiresAt > now) return cached.payload;
 
-  const payload = await factory();
-  publicResponseCache.set(key, {
-    expiresAt: now + PUBLIC_RESPONSE_CACHE_MS,
-    payload,
-  });
-  trimPublicResponseCache();
-  return payload;
+  const inflight = publicResponseCacheBuilds.get(key);
+  if (inflight) return inflight;
+
+  const build = Promise.resolve()
+    .then(() => factory())
+    .then((payload) => {
+      publicResponseCache.set(key, {
+        expiresAt: Date.now() + PUBLIC_RESPONSE_CACHE_MS,
+        payload,
+      });
+      trimPublicResponseCache();
+      return payload;
+    })
+    .finally(() => {
+      if (publicResponseCacheBuilds.get(key) === build) publicResponseCacheBuilds.delete(key);
+    });
+
+  publicResponseCacheBuilds.set(key, build);
+  return build;
 }
 
 function trimPublicResponseCache() {
@@ -844,7 +1359,7 @@ async function readJsonBody(request) {
 }
 
 function filterSessions(sessions, searchParams) {
-  const limit = clampNumber(searchParams.get('limit'), 1, 240, 120);
+  const limit = clampNumber(searchParams.get('limit'), 1, 300, 100);
   const offset = clampNumber(searchParams.get('offset'), 0, 100000, 0);
   const query = String(searchParams.get('q') || '').trim().toLowerCase();
   const destination = searchParams.get('destination');
@@ -887,7 +1402,14 @@ function filterSessions(sessions, searchParams) {
   });
 
   const sorted = sortPublicSessions(rows, sort);
-  const arranged = sort === 'price' || sort === 'time' ? sorted : spreadCatalogSessionsByCoverImage(sorted);
+  const arranged =
+    sort === 'price' ||
+    sort === 'price_asc' ||
+    sort === 'price_desc' ||
+    sort === 'time' ||
+    sort === 'departing_soon'
+      ? sorted
+      : spreadCatalogSessionsByCoverImage(sorted);
   return {
     total: arranged.length,
     offset,
@@ -913,11 +1435,18 @@ function buildFallbackFacets(sessions) {
 
 function sortPublicSessions(sessions, sort) {
   const sorted = [...sessions];
-  if (sort === 'price') {
+  if (sort === 'price' || sort === 'price_asc') {
     return sorted.sort((a, b) => {
       const aPrice = Number.isFinite(a.priceFrom) ? a.priceFrom : Number.POSITIVE_INFINITY;
       const bPrice = Number.isFinite(b.priceFrom) ? b.priceFrom : Number.POSITIVE_INFINITY;
       return aPrice - bPrice || comparePublicSessionTime(a, b);
+    });
+  }
+  if (sort === 'price_desc') {
+    return sorted.sort((a, b) => {
+      const aPrice = Number.isFinite(a.priceFrom) ? a.priceFrom : Number.POSITIVE_INFINITY;
+      const bPrice = Number.isFinite(b.priceFrom) ? b.priceFrom : Number.POSITIVE_INFINITY;
+      return bPrice - aPrice || comparePublicSessionTime(a, b);
     });
   }
   if (sort === 'popular') {
@@ -1034,7 +1563,13 @@ function canonicalSearchParams(searchParams, excludeKeys = []) {
 function runTeplohodSync() {
   return new Promise((resolve, reject) => {
     const startedAt = new Date().toISOString();
-    const child = spawn(process.execPath, [path.join(rootDir, 'scripts', 'tep-import-fixtures.js')], {
+    const tepScript = path.join(rootDir, 'scripts', 'tep-import-fixtures.js');
+    const niceN = Number(process.env.TEP_SYNC_NICE || 15);
+    const useNice = process.platform !== 'win32' && Number.isFinite(niceN) && niceN > 0;
+    const child = spawn(
+      useNice ? 'nice' : process.execPath,
+      useNice ? ['-n', String(niceN), process.execPath, tepScript] : [tepScript],
+      {
       cwd: rootDir,
       env: process.env,
       windowsHide: true,
@@ -1078,7 +1613,18 @@ function runTeplohodSync() {
   });
 }
 
-function runTicketscloudCatalogSync() {
+function runTicketscloudCatalogSync(searchParams = new URLSearchParams()) {
+  const idsRaw = searchParams.get('ids') || '';
+  const ids = idsRaw
+    .split(/[,;\s]+/)
+    .map((id) => id.trim())
+    .filter(Boolean);
+  const dryRun = searchParams.get('dryRun') === '1' || searchParams.get('dry-run') === '1';
+
+  if (ids.length) {
+    return runTicketscloudIdsSync(ids, { dryRun });
+  }
+
   return new Promise((resolve, reject) => {
     const startedAt = new Date().toISOString();
     const child = spawn(process.execPath, [path.join(rootDir, 'scripts', 'tc-full-sync.js')], {
@@ -1132,6 +1678,58 @@ function runTicketscloudCatalogSync() {
   });
 }
 
+function runTicketscloudIdsSync(ids, { dryRun = false } = {}) {
+  return new Promise((resolve, reject) => {
+    const startedAt = new Date().toISOString();
+    const args = [path.join(rootDir, 'scripts', 'tc-sync.js'), `--ids=${ids.join(',')}`];
+    if (dryRun) args.push('--dry-run');
+    args.push('--skip-revalidate');
+
+    const child = spawn(process.execPath, args, {
+      cwd: rootDir,
+      env: process.env,
+      windowsHide: true,
+    });
+    let stdout = '';
+    let stderr = '';
+
+    child.stdout.on('data', (chunk) => {
+      stdout += chunk.toString();
+    });
+    child.stderr.on('data', (chunk) => {
+      stderr += chunk.toString();
+    });
+    child.on('error', reject);
+    child.on('close', (code) => {
+      if (code !== 0) {
+        const error = new Error(stderr || stdout || `Ticketscloud ids sync failed with exit code ${code}`);
+        error.statusCode = 500;
+        reject(error);
+        return;
+      }
+
+      let stats = null;
+      try {
+        stats = parseLastJsonObject(stdout);
+      } catch {
+        stats = null;
+      }
+
+      resolve({
+        ok: true,
+        source: 'TICKETSCLOUD',
+        mode: dryRun ? 'ids-dry-run' : 'ids-upsert',
+        startedAt,
+        finishedAt: new Date().toISOString(),
+        ids,
+        dryRun,
+        stats,
+        output: stdout.trim(),
+      });
+    });
+  });
+}
+
 function runTicketscloudCatalogImport() {
   return new Promise((resolve, reject) => {
     const child = spawn(process.execPath, [path.join(rootDir, 'scripts', 'tc-import-catalog.js')], {
@@ -1168,6 +1766,63 @@ function runTicketscloudCatalogImport() {
         ok: true,
         stats,
         output: stdout.trim(),
+      });
+    });
+  });
+}
+
+function runTeplohodOrdersSync(searchParams = new URLSearchParams()) {
+  return new Promise((resolve, reject) => {
+    const startedAt = new Date().toISOString();
+    const args = [path.join(rootDir, 'scripts', 'tep-sync-orders.js')];
+    appendCliArg(args, 'from', searchParams.get('from'));
+    appendCliArg(args, 'to', searchParams.get('to'));
+    appendCliArg(args, 'page-size', searchParams.get('pageSize'));
+    appendCliArg(args, 'max-pages', searchParams.get('maxPages'));
+    if (searchParams.get('dryRun') === '1' || searchParams.get('dry-run') === '1') {
+      args.push('--dry-run');
+    }
+    if (searchParams.get('probe') === '1') {
+      args.push('--probe');
+    }
+
+    const child = spawn(process.execPath, args, {
+      cwd: rootDir,
+      env: process.env,
+      windowsHide: true,
+    });
+    let stdout = '';
+    let stderr = '';
+
+    child.stdout.on('data', (chunk) => {
+      stdout += chunk.toString();
+    });
+    child.stderr.on('data', (chunk) => {
+      stderr += chunk.toString();
+    });
+    child.on('error', reject);
+    child.on('close', (code) => {
+      // Exit 0 with status=BLOCKED is expected until partner token is issued.
+      let stats = null;
+      try {
+        stats = parseLastJsonObject(stdout);
+      } catch {
+        stats = null;
+      }
+      if (code !== 0) {
+        const error = new Error(stderr || stdout || `Teplohod orders sync failed with exit code ${code}`);
+        error.statusCode = 500;
+        error.stats = stats;
+        reject(error);
+        return;
+      }
+      resolve({
+        ok: true,
+        blocked: stats?.status === 'BLOCKED',
+        stats,
+        output: stdout.trim(),
+        startedAt,
+        finishedAt: new Date().toISOString(),
       });
     });
   });

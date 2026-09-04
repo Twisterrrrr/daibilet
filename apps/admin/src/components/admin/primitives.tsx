@@ -117,17 +117,26 @@ const statusStyles: Record<Status, string> = {
   error: 'bg-destructive/10 text-destructive border border-destructive/20',
 };
 export function StatusBadge({ status, label }: { status: Status; label?: string }) {
+  const defaultLabels: Record<Status, string> = {
+    draft: 'черновик',
+    ready: 'готово',
+    live: 'в работе',
+    paused: 'пауза',
+    archived: 'архив',
+    incomplete: 'неполно',
+    error: 'ошибка',
+  };
   return (
-    <span className={cn('inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium capitalize', statusStyles[status])}>
+    <span className={cn('inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium', statusStyles[status])}>
       <span className="h-1.5 w-1.5 rounded-full bg-current opacity-70" />
-      {label ?? status}
+      {label ?? defaultLabels[status]}
     </span>
   );
 }
 
 /* ---------- SourceBadge ---------- */
 type Source = 'ticketscloud' | 'teplohod' | 'manual';
-const sourceLabel: Record<Source, string> = { ticketscloud: 'Ticketscloud', teplohod: 'Teplohod.info', manual: 'Manual' };
+const sourceLabel: Record<Source, string> = { ticketscloud: 'Ticketscloud', teplohod: 'Teplohod.info', manual: 'Вручную' };
 export function SourceBadge({ source }: { source: Source }) {
   return (
     <Badge variant="outline" className="gap-1 border-border font-normal text-muted-foreground">
@@ -139,7 +148,7 @@ export function SourceBadge({ source }: { source: Source }) {
 
 /* ---------- ReadinessChecklist ---------- */
 export type ChecklistItem = { id: string; label: string; done: boolean; hint?: string };
-export function ReadinessChecklist({ title = 'Readiness', items }: { title?: string; items: ChecklistItem[] }) {
+export function ReadinessChecklist({ title = 'Готовность', items }: { title?: string; items: ChecklistItem[] }) {
   const done = items.filter((i) => i.done).length;
   return (
     <Card className="border-border p-4">
@@ -169,7 +178,7 @@ export function SeoChecklist({ items }: { items: ChecklistItem[] }) {
 }
 
 /* ---------- ActionPanel ---------- */
-export function ActionPanel({ title = 'Actions', children }: { title?: string; children: ReactNode }) {
+export function ActionPanel({ title = 'Действия', children }: { title?: string; children: ReactNode }) {
   return (
     <Card className="border-border p-4">
       <h3 className="mb-3 text-sm font-semibold">{title}</h3>
@@ -271,7 +280,7 @@ export function ManagedBySource({ source, children }: { source: Source; children
     <div className="relative rounded-lg border border-dashed border-border bg-surface-locked p-4">
       <div className="mb-2 flex items-center gap-1.5 text-xs text-muted-foreground">
         <Lock className="h-3 w-3" />
-        Managed by source · {sourceLabel[source]}
+        Управляется источником · {sourceLabel[source]}
       </div>
       <div className="pointer-events-none select-text text-sm text-foreground">{children}</div>
     </div>

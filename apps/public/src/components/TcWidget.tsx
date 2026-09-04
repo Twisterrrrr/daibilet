@@ -247,7 +247,8 @@ async function openTcWidgetWithFallback(targets: TcPurchaseTarget[]) {
 function createTcWidgetTrigger(target: TcPurchaseTarget) {
   const trigger = document.createElement('button');
   trigger.type = 'button';
-  trigger.className = 'tc-widget-trigger';
+  trigger.className =
+    'tc-widget-trigger pointer-events-none fixed -left-[9999px] top-0 h-px w-px overflow-hidden opacity-0';
   trigger.setAttribute('data-tc-event', target.tcEventId);
   const widgetToken = resolveTcWidgetToken(target.purchaseUrl);
   if (widgetToken) trigger.setAttribute('data-tc-token', widgetToken);
@@ -343,7 +344,7 @@ export function isSessionPurchaseBlocked(session: {
   offerSourceCode?: string | null;
 }): boolean {
   const statuses = [session.sourceStatus, session.eventSourceStatus].map((value) => String(value || '').toLowerCase());
-  if (statuses.some((status) => ['paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden'].includes(status))) {
+  if (statuses.some((status) => ['paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden', 'stand_by', 'closed', 'sales_closed', 'sale_closed', 'not_for_sale', 'widget_blocked'].includes(status))) {
     return true;
   }
   if (session.purchaseReady === false) return true;
@@ -678,7 +679,7 @@ export function TcSessionSlot({
         type="button"
         data-tc-event={eventId}
         data-tc-token={widgetToken}
-        className="tc-widget-trigger"
+        className="tc-widget-trigger pointer-events-none fixed -left-[9999px] top-0 h-px w-px overflow-hidden opacity-0"
         aria-hidden="true"
         tabIndex={-1}
       >
@@ -841,7 +842,7 @@ export function TcWidgetButton({
         type="button"
         data-tc-event={eventId}
         data-tc-token={widgetToken}
-        className="tc-widget-trigger"
+        className="tc-widget-trigger pointer-events-none fixed -left-[9999px] top-0 h-px w-px overflow-hidden opacity-0"
         aria-hidden="true"
         tabIndex={-1}
       >

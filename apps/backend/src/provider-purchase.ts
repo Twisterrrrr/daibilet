@@ -30,8 +30,15 @@ export function providerForSource(sourceCode?: string | null): PurchaseProvider 
 export function purchaseInfo(input: ProviderPurchaseInput): ProviderPurchaseInfo {
   const sourceCode = input.sourceCode || input.offerSourceCode;
   const provider = providerForSource(sourceCode);
-  const explicitUrl = input.offerWidgetUrl || input.offerDeeplinkUrl || null;
-  const fallbackUrl = buildProviderWidgetUrl({ ...input, offerSourceCode: sourceCode });
+  const fallbackUrl = sanitizeTicketscloudPurchaseUrl(
+    buildProviderWidgetUrl({ ...input, offerSourceCode: sourceCode }),
+  );
+  // Prefer rebuilt TEP checkout URL: stored offer deeplinks to teplohod.info/event/* currently 404.
+  const explicitRaw =
+    provider === 'TEPLOHOD'
+      ? null
+      : input.offerWidgetUrl || input.offerDeeplinkUrl || null;
+  const explicitUrl = sanitizeTicketscloudPurchaseUrl(explicitRaw);
   const url = explicitUrl || fallbackUrl || null;
   return {
     ready: Boolean(url),
@@ -45,7 +52,10 @@ export function purchaseInfo(input: ProviderPurchaseInput): ProviderPurchaseInfo
 export function buildProviderWidgetUrl(input: ProviderPurchaseInput): string | null {
   const provider = providerForSource(input.sourceCode || input.offerSourceCode);
   if (provider === 'TEPLOHOD') {
-    return input.offerDeeplinkUrl || buildTeplohodUrl(input.externalId);
+    const eventId =
+      normalizeTeplohodEventId(input.externalId) ||
+      extractTeplohodEventIdFromUrl(input.offerDeeplinkUrl || input.offerWidgetUrl);
+    return buildTeplohodUrl(eventId);
   }
   if (provider === 'TICKETSCLOUD') return buildTicketscloudWidgetUrl(input.externalId);
   return null;
@@ -77,11 +87,32 @@ export function resolveSessionPurchaseExternalId(input: {
     : input.providerSessionId || input.providerEventId || input.fallbackEventId || null;
 }
 
+/**
+ * TicketsCloud widget *page* rejects `token=r:…` with HTTPForbidden/bad token.
+ * The `r:` prefix is only for JS widget `data-tc-token`; URLs must use bare JWT.
+ * Also prefer ticketscloud.com over .org (same widget, fewer redirects).
+ */
+export function sanitizeTicketscloudPurchaseUrl(url?: string | null): string | null {
+  const raw = String(url || '').trim();
+  if (!raw) return null;
+  if (!/ticketscloud/i.test(raw)) return raw;
+  try {
+    const parsed = new URL(raw);
+    const token = parsed.searchParams.get('token');
+    if (token?.startsWith('r:')) parsed.searchParams.set('token', token.slice(2));
+    if (parsed.hostname === 'ticketscloud.org') parsed.hostname = 'ticketscloud.com';
+    return parsed.toString();
+  } catch {
+    return raw;
+  }
+}
+
 function buildTicketscloudWidgetUrl(eventExternalId?: string | null): string | null {
   const token = process.env.TICKETSCLOUD_WIDGET_TOKEN || process.env.TC_WIDGET_TOKEN;
   if (!token || !eventExternalId) return null;
-  const normalizedToken = token.startsWith('r:') ? token : `r:${token}`;
-  const url = new URL(process.env.TICKETSCLOUD_WIDGET_BASE_URL || 'https://ticketscloud.org/v1/widgets/common');
+  // Bare JWT in query - `r:` prefix → HTTP 403 {"error":"HTTPForbidden","reason":"bad token"}.
+  const normalizedToken = token.startsWith('r:') ? token.slice(2) : token;
+  const url = new URL(process.env.TICKETSCLOUD_WIDGET_BASE_URL || 'https://ticketscloud.com/v1/widgets/common');
   url.searchParams.set('token', normalizedToken);
   url.searchParams.set('event', eventExternalId);
   return url.toString();
@@ -89,13 +120,25 @@ function buildTicketscloudWidgetUrl(eventExternalId?: string | null): string | n
 
 function buildTeplohodUrl(eventExternalId?: string | null): string | null {
   if (!eventExternalId) return null;
-  const baseUrl = process.env.TEP_WIDGET_BASE_URL || 'https://teplohod.info';
-  return `${baseUrl.replace(/\/+$/, '')}/event/${encodeURIComponent(eventExternalId)}`;
+  const eventId = String(eventExternalId).replace(/^tep-/i, '').trim();
+  if (!/^\d+$/.test(eventId)) return null;
+  const widgetId = String(process.env.TEP_WIDGET_ID || '14208').trim() || '14208';
+  // teplohod.info/event/{id} currently returns "Ошибка!"; working checkout is account.teplohod.info.
+  const checkoutBase = (process.env.TEP_CHECKOUT_BASE_URL || 'https://account.teplohod.info').replace(/\/+$/, '');
+  const url = new URL(`${checkoutBase}/order/event-order`);
+  url.searchParams.set('widget_id', widgetId);
+  url.searchParams.set('event_id', eventId);
+  return url.toString();
 }
 
 function normalizeTeplohodEventId(value?: string | null): string | null {
   const raw = String(value || '').trim();
   if (!raw) return null;
   const match = raw.match(/(?:^tep-)?(\d+)$/i);
-  return match?.[1] || raw;
+  return match?.[1] || null;
+}
+
+function extractTeplohodEventIdFromUrl(url?: string | null): string | null {
+  const match = String(url || '').match(/(?:teplohod\.info\/event\/|event_id=)(\d+)/i);
+  return match?.[1] || null;
 }

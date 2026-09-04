@@ -10,6 +10,9 @@ const requireFromDbPackage = createRequire(path.join(rootDir, "packages", "db", 
 const { Pool } = requireFromDbPackage("pg");
 const { syncProviderLinksForSource } = require("./lib/provider-link-sync");
 const { EVENT_UPSERT_STATUS, EVENT_UPSERT_SLUG } = require("./lib/event-import-guard");
+const { normalizeImportEventTitle } = require("./lib/event-title-normalize");
+const { ENTERTAINMENT_DISCO_TAXONOMY, isDiscoOrPartyEvent } = require("./lib/event-taxonomy");
+const { applyVenueAddressCanon } = require("./lib/venue-address-overrides");
 
 const fixturesDir = path.resolve(process.env.TEP_FIXTURES_DIR || path.join(rootDir, "data", "teplohod", "fixtures"));
 const eventsPath = path.join(fixturesDir, "events-compact.json");
@@ -20,6 +23,13 @@ const pool = new Pool({ connectionString, max: 3 });
 
 const MIN_DISPLAY_PRICE_RUB = 100;
 const TEPL0HOD_SOURCE_ID = "src_teplohod";
+
+/** TEP place id → existing TicketsCloud / editorial Venue.id (hide twin, attach events to canon). */
+const TEP_PLACE_CANON_VENUE_IDS = new Map([
+  ["53", "venue_60b602fed94a1fa681b69c1d"], // Fontanka 51-53 pier (owner 2026-08-08)
+  ["65", "venue_681d44a7fc03029d63123730"], // Dvortsovaya nab. 18 pier №4 (owner 2026-08-09)
+  ["72", "venue_629f8f730fdb465f9b2c54d0"], // Sinopskaya nab. 10А pier (owner 2026-08-08)
+]);
 
 const CATEGORY_MAP = new Map([
   ["Речные прогулки", { categoryId: "cat_excursions", subcategoryId: "sub_excursions_water" }],
@@ -360,11 +370,21 @@ async function upsertCity(client, cityName, sourceCityId) {
 }
 
 async function upsertVenue(client, event, place, cityId) {
-  const venueTitle = cleanTitle(place.name) || cleanTitle(event.place) || "Место отправления Teplohod";
+  const rawTitle = cleanTitle(place.name) || cleanTitle(event.place) || "Место отправления Teplohod";
   const externalPlaceId = place.id || event.id;
-  const slug = slugify(`${venueTitle}-${externalPlaceId}`);
+  const slug = slugify(`${rawTitle}-${externalPlaceId}`);
   const latitude = floatOrNull(place.lat);
   const longitude = floatOrNull(place.lng);
+  const canonVenueId = TEP_PLACE_CANON_VENUE_IDS.get(String(externalPlaceId)) || null;
+  const canon = applyVenueAddressCanon({
+    id: canonVenueId || `venue_tep_${externalPlaceId}`,
+    title: rawTitle,
+    name: rawTitle,
+    address: place.address || null,
+    slug,
+  });
+  const venueTitle = canon.title || rawTitle;
+  const venueAddress = canon.address || place.address || null;
   const result = await client.query(
     `
       insert into "Venue" (id, slug, title, description, "shortDescription", "heroImageUrl", "cityId", address, latitude, longitude, kind, "pageStatus", "createdAt", "updatedAt")
@@ -379,7 +399,10 @@ async function upsertVenue(client, event, place, cityId) {
         latitude = excluded.latitude,
         longitude = excluded.longitude,
         kind = excluded.kind,
-        "pageStatus" = case when "Venue"."pageStatus" = 'PUBLISHED' then "Venue"."pageStatus" else excluded."pageStatus" end,
+        "pageStatus" = case
+          when "Venue"."pageStatus" in ('PUBLISHED', 'HIDDEN') then "Venue"."pageStatus"
+          else excluded."pageStatus"
+        end,
         "updatedAt" = now()
       returning id
     `,
@@ -391,13 +414,35 @@ async function upsertVenue(client, event, place, cityId) {
       cleanTitle(event.place) || null,
       firstImage(event.images),
       cityId,
-      place.address || null,
+      venueAddress,
       latitude,
       longitude,
     ],
   );
 
-  const venueId = result.rows[0].id;
+  const tepVenueId = result.rows[0].id;
+  const attachVenueId = canonVenueId || tepVenueId;
+
+  if (canonVenueId && canonVenueId !== tepVenueId) {
+    await client.query(
+      `
+        update "Venue"
+        set "pageStatus" = 'HIDDEN', "isIndexable" = false, "updatedAt" = now()
+        where id = $1
+      `,
+      [tepVenueId],
+    );
+    // Keep canon title/address on every TEP import (supplier may send bare house 10).
+    await client.query(
+      `
+        update "Venue"
+        set title = $2, address = $3, kind = 'PIER', "updatedAt" = now()
+        where id = $1
+      `,
+      [canonVenueId, venueTitle, venueAddress],
+    );
+  }
+
   await client.query(
     `
       insert into "VenueAlias" (id, "venueId", "sourceCode", "externalId", title, address)
@@ -407,9 +452,15 @@ async function upsertVenue(client, event, place, cityId) {
         title = excluded.title,
         address = excluded.address
     `,
-    [`venue_alias_tep_${externalPlaceId}`, venueId, String(externalPlaceId), venueTitle, place.address || null],
+    [
+      `venue_alias_tep_${externalPlaceId}`,
+      attachVenueId,
+      String(externalPlaceId),
+      venueTitle,
+      venueAddress,
+    ],
   );
-  return venueId;
+  return attachVenueId;
 }
 
 async function upsertEvent(client, event) {
@@ -467,6 +518,7 @@ async function upsertRawRecord(client, externalId, payload) {
         payload = excluded.payload,
         "payloadHash" = excluded."payloadHash",
         "importedAt" = excluded."importedAt"
+      where "RawImportRecord"."payloadHash" is distinct from excluded."payloadHash"
     `,
     [`raw_tep_event_${externalId}`, TEPL0HOD_SOURCE_ID, externalId, payloadText, sha256(payloadText)],
   );
@@ -513,6 +565,9 @@ async function upsertTag(client, title) {
 }
 
 function resolveTaxonomy(sourceEvent) {
+  if (isDiscoOrPartyEvent(sourceEvent)) {
+    return ENTERTAINMENT_DISCO_TAXONOMY;
+  }
   if (isBusTourEvent(sourceEvent)) {
     return { categoryId: "cat_excursions", subcategoryId: "sub_excursions_bus" };
   }
@@ -680,7 +735,36 @@ function loadRootEnv(projectRoot) {
 }
 
 function firstImage(images) {
-  return Array.isArray(images) && images.length ? images[0] : null;
+  if (!Array.isArray(images)) return null;
+  for (const url of images) {
+    if (!url || isTeplohodPlaceholderImage(url)) continue;
+    const stabilized = stabilizeTeplohodImageUrl(url);
+    if (stabilized && !isTeplohodPlaceholderImage(stabilized)) return stabilized;
+  }
+  return null;
+}
+
+function isTeplohodPlaceholderImage(imageUrl) {
+  const raw = String(imageUrl || '').trim().toLowerCase();
+  if (!raw) return true;
+  if (raw.includes('placeholder.gif')) return true;
+  if (/api\.teplohod\.info\/v1\/image\?item=&/.test(raw)) return true;
+  return false;
+}
+
+/** Live API returns pre-signed S3 URLs (TTL ~6h) — persist stable proxy instead. */
+function stabilizeTeplohodImageUrl(imageUrl) {
+  const raw = String(imageUrl || '').trim();
+  if (!raw) return null;
+  const signedMatch = raw.match(
+    /teplohod-(?:private|public)\/images\/cache\/Events\/(Event\d+)\/([^/?#]+)/i,
+  );
+  if (signedMatch) {
+    const item = signedMatch[1];
+    const dirtyAlias = signedMatch[2];
+    return `https://api.teplohod.info/v1/image?item=${encodeURIComponent(item)}&dirtyAlias=${encodeURIComponent(dirtyAlias)}`;
+  }
+  return raw;
 }
 
 function money(input) {
@@ -774,15 +858,23 @@ function cityFromText(value) {
 }
 
 function teplohodPurchaseUrl(eventId) {
-  const baseUrl = process.env.TEP_WIDGET_BASE_URL || "https://teplohod.info";
-  return `${baseUrl.replace(/\/+$/, "")}/event/${encodeURIComponent(eventId)}`;
+  const normalized = String(eventId || "").replace(/^tep-/i, "").trim();
+  if (!/^\d+$/.test(normalized)) return null;
+  const widgetId = String(process.env.TEP_WIDGET_ID || "14208").trim() || "14208";
+  const checkoutBase = (process.env.TEP_CHECKOUT_BASE_URL || "https://account.teplohod.info").replace(/\/+$/, "");
+  const url = new URL(`${checkoutBase}/order/event-order`);
+  url.searchParams.set("widget_id", widgetId);
+  url.searchParams.set("event_id", normalized);
+  return url.toString();
 }
 
 function cleanTitle(value) {
-  return String(value || "")
-    .replace(/\s+/g, " ")
-    .replace(/\s+([,.;:!?])/g, "$1")
-    .trim();
+  return normalizeImportEventTitle(
+    String(value || "")
+      .replace(/\s+/g, " ")
+      .replace(/\s+([,.;:!?])/g, "$1")
+      .trim(),
+  );
 }
 
 function slugify(input) {

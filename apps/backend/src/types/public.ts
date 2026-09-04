@@ -8,6 +8,7 @@ import type {
   SeoFields,
   TimeBucket,
 } from './common.js';
+import type { LandingContentBlockDto } from './landing.js';
 
 export interface PublicStatsDto extends ApiEnvelope {
   events: number;
@@ -53,7 +54,7 @@ export interface PublicSessionDto extends PurchaseFields {
   groupedEventsCount?: number;
   sessionCount?: number;
   upcomingSlots?: Array<DateTimeSlot & Pick<PurchaseFields, 'purchaseUrl'>>;
-  landingSlugs: string[];
+  landingSlugs?: string[];
   title: string;
   cityId?: string | null;
   citySlug?: string | null;
@@ -64,6 +65,7 @@ export interface PublicSessionDto extends PurchaseFields {
   venueId?: string | null;
   venueSlug?: string | null;
   venue: string;
+  venueAddress?: string | null;
   venueKind: string;
   offerTitle?: string | null;
   offerSourceCode?: string | null;
@@ -72,20 +74,57 @@ export interface PublicSessionDto extends PurchaseFields {
   tags: string[];
   kind?: string | null;
   sourceStatus?: string | null;
+  ageLimit?: string | null;
   description?: string | null;
   startsAt: string;
   dateLabel: string;
   timeLabel: string;
   timeBucket: TimeBucket;
+  timeZone?: string | null;
   priceFrom?: number | null;
+  priceTo?: number | null;
   vacant?: number | null;
   imageUrl?: string | null;
   manualLandingStatus?: string | null;
 }
 
+export interface PublicCatalogListItemDto extends PurchaseFields {
+  id: string;
+  slug?: string | null;
+  groupKey?: string | null;
+  groupedEventsCount?: number;
+  sessionCount?: number;
+  upcomingSlots?: Array<
+    Pick<DateTimeSlot, 'id' | 'eventId' | 'startsAt' | 'dateLabel' | 'timeLabel'> &
+      Pick<PurchaseFields, 'purchaseUrl'> & { vacant?: number | null }
+  >;
+  title: string;
+  citySlug?: string | null;
+  city: string;
+  destination: string;
+  destinationType: DestinationType;
+  venueSlug?: string | null;
+  venue: string;
+  venueKind: string;
+  category: string;
+  subcategories?: string[];
+  tags: string[];
+  kind?: string | null;
+  sourceStatus?: string | null;
+  ageLimit?: string | null;
+  startsAt: string;
+  dateLabel: string;
+  timeLabel: string;
+  timeBucket: TimeBucket;
+  priceFrom?: number | null;
+  priceTo?: number | null;
+  vacant?: number | null;
+  imageUrl?: string | null;
+}
+
 export interface PublicCatalogDto extends ApiEnvelope {
-  items: PublicSessionDto[];
-  sessions?: PublicSessionDto[];
+  items: PublicCatalogListItemDto[];
+  sessions?: PublicCatalogListItemDto[];
   total: number;
   limit: number;
   offset: number;
@@ -109,6 +148,9 @@ export interface PublicVenueDto extends SeoFields {
   address?: string | null;
   latitude?: number | null;
   longitude?: number | null;
+  metroStation?: string | null;
+  wayToFind?: string | null;
+  parkingInfo?: string | null;
   type: string;
   pageStatus?: string | null;
   description?: string | null;
@@ -153,9 +195,17 @@ export interface PublicEventDto extends SeoFields, PurchaseFields {
   venueSlug?: string | null;
   destination?: string | null;
   destinationType?: DestinationType | string | null;
+  /** IANA TZ of event city/region — labels formatted in this zone (widget local time). */
+  timeZone?: string | null;
   venue: string;
   venueAddress?: string | null;
   venueKind: string;
+  /** Slim logistics from linked Venue - event modal SSR (CV.9d), no fetch on click. */
+  venueLatitude?: number | null;
+  venueLongitude?: number | null;
+  venueMetroStation?: string | null;
+  venueWayToFind?: string | null;
+  venueParkingInfo?: string | null;
   ageLimit?: string | null;
   priceFrom?: number | null;
   vacant?: number | null;
@@ -166,18 +216,30 @@ export interface PublicEventDto extends SeoFields, PurchaseFields {
   sessionCount?: number;
 }
 
+export interface PublicPurchaseOptionDto extends PurchaseFields {
+  id: string;
+  slug: string;
+  title: string;
+  description?: string | null;
+  priceFrom?: number | null;
+  externalId?: string | null;
+  purchaseProvider?: import('./common.js').PurchaseProvider | null;
+}
+
 export interface PublicEventPageDto extends ApiEnvelope {
   event: PublicEventDto;
   sessions: Array<Omit<DateTimeSlot, 'startsAt'> & PurchaseFields & {
     id: string;
     eventId: string;
     startsAt: string | null;
+    timeZone?: string | null;
     priceFrom?: number | null;
     vacant?: number | null;
     sourceStatus?: string | null;
   }>;
   offers: PublicOfferDto[];
   ticketPrices?: PublicTicketPriceDto[];
+  purchaseOptions?: PublicPurchaseOptionDto[];
   related: PublicSessionDto[];
   landings: Array<Pick<PublicLandingDto, 'slug' | 'title' | 'subtitle' | 'chips'>>;
   stats: {
@@ -192,6 +254,7 @@ export interface PublicOfferDto extends PurchaseFields {
   sourceCode: string;
   title?: string | null;
   priceRub?: number | null;
+  oldPriceRub?: number | null;
   active: boolean;
 }
 
@@ -220,6 +283,46 @@ export interface PublicCityPageDto extends ApiEnvelope {
     categories: number;
     priceFrom?: number | null;
   };
+  centerCity?: {
+    slug: string;
+    name: string;
+    eventCount: number;
+  } | null;
+  childCities?: Array<{
+    slug: string;
+    name: string;
+    eventCount: number;
+  }>;
+  regionInfo?: {
+    brief?: string | null;
+    topPlaces?: Array<{
+      name: string;
+      desc: string;
+      cityNames?: string[] | null;
+      imageUrl?: string | null;
+    }> | null;
+    faq?: Array<{ q: string; a: string }> | null;
+  } | null;
+  regionTier?: 'A' | 'B' | 'C' | null;
+  regionInfoNeedsGeneration?: boolean;
+  regionNearby?: {
+    regionSlug: string;
+    regionName: string;
+    title: string;
+    subtitle: string;
+    tier: 'A' | 'B' | 'C';
+    events: Array<{
+      id: string;
+      slug: string;
+      title: string;
+      startsAt?: string | null;
+      dateLabel?: string | null;
+      city: string;
+      venue?: string | null;
+      priceFrom?: number | null;
+      url: string;
+    }>;
+  } | null;
 }
 
 export interface PublicVenuePageDto extends ApiEnvelope {
@@ -236,13 +339,37 @@ export interface PublicVenuePageDto extends ApiEnvelope {
 export interface PublicVenuesDto extends ApiEnvelope {
   total: number;
   venues: PublicVenueDto[];
+  /** 1-based page index when using ?page= pagination. */
+  page?: number;
+  nextCursor?: string | null;
+  hasMore?: boolean;
+  limit?: number;
+  /** Progressive /venues: shell omitted distinct product counts. */
+  countsPending?: boolean;
+  pins?: PublicVenueMapPinDto[];
+  stats?: {
+    venues: number;
+    cities: Record<string, number>;
+    types: Record<string, number>;
+    scales?: Record<string, number>;
+    logistics?: Record<string, number>;
+  };
+}
+
+export interface PublicVenueMapPinDto {
+  id: string;
+  slug?: string | null;
+  name: string;
+  latitude: number;
+  longitude: number;
+  kind: string;
 }
 
 export interface PublicLandingPageDto extends ApiEnvelope {
   landing: PublicLandingDto;
   sessions: PublicSessionDto[];
   relatedLandings: PublicLandingDto[];
-  blocks?: unknown[];
+  blocks?: LandingContentBlockDto[];
   stats: {
     events: number;
     sessions: number;

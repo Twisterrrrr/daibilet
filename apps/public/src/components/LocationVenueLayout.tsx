@@ -9,7 +9,6 @@ import {
   Navigation,
   Share2,
   Ticket,
-  Train,
   Waves,
 } from 'lucide-react';
 
@@ -23,6 +22,7 @@ import {
 } from '@/components/TcWidget';
 import { formatMoney, formatNumber } from '@/data';
 import { formatStreetAddress } from '@/lib/address';
+import { build2gisRouteUrl } from '@/lib/maps';
 import type { VenueEventGroup } from '@/lib/venue-program';
 import { normalizeVenueKind, resolveLocationVenueCopy, venueTypeIcon, venueTypeLabel } from '@/lib/venue-meta';
 import { eventHref, venueHref } from '@/routes';
@@ -46,7 +46,11 @@ export function LocationVenueLayout({
   const hasMap = Boolean(venue.latitude && venue.longitude);
   const isPier = normalizeVenueKind(venue.type) === 'pier' || normalizeVenueKind(venue.type) === 'pier_water';
   const isBus = normalizeVenueKind(venue.type) === 'bus';
-  const isPark = normalizeVenueKind(venue.type) === 'outdoor_location' || normalizeVenueKind(venue.type) === 'attraction';
+  const isParkLike =
+    normalizeVenueKind(venue.type) === 'park' ||
+    normalizeVenueKind(venue.type) === 'monument' ||
+    normalizeVenueKind(venue.type) === 'outdoor_location' ||
+    normalizeVenueKind(venue.type) === 'attraction';
   const todaySlots = React.useMemo(() => collectTodayTimeSlots(sessions), [sessions]);
   const TypeIcon = venueTypeIcon(venue.type);
   const typeLabel = venueTypeLabel(venue.type);
@@ -136,7 +140,7 @@ export function LocationVenueLayout({
             </div>
           </div>
         </section>
-      ) : isPark ? (
+      ) : isParkLike ? (
         <>
           <section className="relative overflow-hidden bg-emerald-900 text-white">
           <div className="absolute inset-0">
@@ -235,12 +239,12 @@ export function LocationVenueLayout({
                         <Navigation className="h-4 w-4" /> Открыть в Яндекс.Картах
                       </a>
                       <a
-                        href={`https://www.google.com/maps/dir/?api=1&destination=${venue.latitude},${venue.longitude}`}
+                        href={build2gisRouteUrl(venue.latitude!, venue.longitude!)}
                         target="_blank"
                         rel="noreferrer"
                         className="pointer-events-auto inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-slate-900 shadow-lg ring-1 ring-slate-200 hover:bg-slate-50"
                       >
-                        <Car className="h-4 w-4" /> Построить маршрут
+                        <Car className="h-4 w-4" /> Маршрут в 2ГИС
                       </a>
                     </div>
                   ) : null}
@@ -298,7 +302,9 @@ export function LocationVenueLayout({
 
           <section className="rounded-2xl border border-slate-200 bg-white p-6">
             <h2 className="text-xl font-bold text-slate-900">О локации</h2>
+            {fullDescription ? (
             <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-slate-600">{fullDescription}</p>
+            ) : null}
             {streetAddress ? (
               <div className="mt-5 flex items-start gap-3 rounded-xl border border-slate-100 bg-slate-50 p-3">
                 <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-600 text-xs font-bold text-white">
@@ -341,16 +347,18 @@ export function LocationVenueLayout({
                 <MapPin className="mt-0.5 h-5 w-5 text-primary-600" />
                 <div>
                   <div className="text-sm font-semibold text-slate-900">Адрес</div>
-                  <div className="text-sm text-slate-600">{streetAddress || `${venue.city} — уточняется`}</div>
+                  <div className="text-sm text-slate-600">{streetAddress || `${venue.city} - уточняется`}</div>
                 </div>
               </div>
-              <div className="flex items-start gap-3 rounded-xl border border-slate-100 p-3">
-                <Train className="mt-0.5 h-5 w-5 text-primary-600" />
-                <div>
-                  <div className="text-sm font-semibold text-slate-900">Город</div>
-                  <div className="text-sm text-slate-600">{venue.city}</div>
+              {venue.city ? (
+                <div className="flex items-start gap-3 rounded-xl border border-slate-100 p-3">
+                  <MapPin className="mt-0.5 h-5 w-5 text-primary-600" />
+                  <div>
+                    <div className="text-sm font-semibold text-slate-900">Город</div>
+                    <div className="text-sm text-slate-600">{venue.city}</div>
+                  </div>
                 </div>
-              </div>
+              ) : null}
             </div>
           </section>
 
@@ -463,12 +471,12 @@ function LocationMapStrip({ venue }: { venue: PublicVenue }) {
               <Navigation className="h-4 w-4" /> Яндекс.Карты
             </a>
             <a
-              href={`https://www.google.com/maps/dir/?api=1&destination=${venue.latitude},${venue.longitude}`}
+              href={build2gisRouteUrl(venue.latitude!, venue.longitude!)}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 ring-1 ring-slate-200 hover:bg-slate-50"
             >
-              <Car className="h-4 w-4" /> Построить маршрут
+              <Car className="h-4 w-4" /> Маршрут в 2ГИС
             </a>
           </div>
         </div>

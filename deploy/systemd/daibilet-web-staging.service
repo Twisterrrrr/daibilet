@@ -1,0 +1,16 @@
+[Unit]
+Description=Daibilet Next.js public (staging)
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/daibilet-staging
+EnvironmentFile=/opt/daibilet-staging/.env
+Environment=DAIBILET_WEB_PORT=3000
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/env bash deploy/scripts/start-web-prod.sh
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

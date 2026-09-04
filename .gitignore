@@ -12,6 +12,7 @@ dist/
 **/dist/
 .vite/
 **/.vite/
+apps/web/public/images/
 
 # Generated code
 packages/db/src/generated/
@@ -29,6 +30,14 @@ data/*.log
 .agents/
 .codex-screenshots/
 
+# One-off agent/deploy scratch (smoke scripts, patches) — never commit
+.deploy-tmp/
+tmp-*/
+tmp-*.json
+tmp-*.txt
+scripts/tmp-*
+scripts/analyze-seed-thin.*
+
 # Generated supplier snapshots and local SQL dumps
 data/ticketscloud/*.json
 data/db/*.sql
@@ -38,3 +47,8 @@ data/db/*.sql
 Thumbs.db
 .idea/
 .vscode/
+__pycache__/
+*.pyc
+
+# Runtime disk caches (INC.504.4 catalog DTO snapshot)
+var/cache/

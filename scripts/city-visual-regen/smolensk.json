@@ -1,0 +1,37 @@
+{
+  "city": "smolensk",
+  "mustSeeCount": 85,
+  "regen": [
+    {
+      "stem": "bolshaya-sovetskaya",
+      "name": "bolshaya sovetskaya",
+      "clusterSize": 6,
+      "keeper": "art-zavod-bahus"
+    },
+    {
+      "stem": "prostranstvo-smena",
+      "name": "prostranstvo smena",
+      "clusterSize": 6,
+      "keeper": "art-zavod-bahus"
+    },
+    {
+      "stem": "sheinov-val",
+      "name": "sheinov val",
+      "clusterSize": 6,
+      "keeper": "art-zavod-bahus"
+    },
+    {
+      "stem": "sobornyy-dvor",
+      "name": "sobornyy dvor",
+      "clusterSize": 6,
+      "keeper": "art-zavod-bahus"
+    },
+    {
+      "stem": "vokzal",
+      "name": "vokzal",
+      "clusterSize": 6,
+      "keeper": "art-zavod-bahus"
+    }
+  ],
+  "d0": 15
+}

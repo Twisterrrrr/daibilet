@@ -1,0 +1,1236 @@
+{
+  "generatedAt": "2026-08-23T16:11:05.489Z",
+  "counts": {
+    "tiny": 0,
+    "small": 227,
+    "badOrient": 0,
+    "badAspect": 0,
+    "missingCard": 20,
+    "missingThumb": 0
+  },
+  "issues": {
+    "tiny": [],
+    "small": [
+      {
+        "city": "chelyabinsk",
+        "stem": "arkaim-gora-shamanka-lysaya",
+        "bytes": 28512
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "arkaim-kurgan-temir",
+        "bytes": 25908
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "arkaim-muzey-prirody-i-cheloveka",
+        "bytes": 28836
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "arkaim-muzey-vosssozdanogo-poseleniya",
+        "bytes": 30342
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "arkaim-vetryanaya-melnitsa",
+        "bytes": 26496
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "bar-tortuga",
+        "bytes": 23888
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "belyy-rynok",
+        "bytes": 23175
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "brudershaft",
+        "bytes": 24001
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "chelyabinsk-siti",
+        "bytes": 23862
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "chtz",
+        "bytes": 21893
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "dom-holodova",
+        "bytes": 22953
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "dom-pechati",
+        "bytes": 25942
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "elevator",
+        "bytes": 23782
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "experimentus",
+        "bytes": 23063
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "gorodskoy-bor",
+        "bytes": 25715
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "gosbank",
+        "bytes": 23099
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "hram-aleksandra-nevskogo",
+        "bytes": 29115
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "hram-georgiya-pobedonostsa",
+        "bytes": 28572
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "hram-ioanna-voina",
+        "bytes": 23048
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "izumrudnyy-karer",
+        "bytes": 24247
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "kamernyy-teatr",
+        "bytes": 24274
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "kaslinskaya-64",
+        "bytes": 24599
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "katolicheskiy-hram",
+        "bytes": 24655
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "kofeynya-udobno",
+        "bytes": 23293
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "muzey-geologii-garmoniya",
+        "bytes": 26106
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "muzey-istorii-chtz",
+        "bytes": 27102
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "muzey-izobrazitelnyh-iskusstv",
+        "bytes": 26968
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "muzey-retro-avtomobiley",
+        "bytes": 26657
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "muzey-yuzhno-uralskoy-zheleznoy-dorogi",
+        "bytes": 30857
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "odigitrievskiy-monastyr",
+        "bytes": 30229
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "organnyy-zal-rodina",
+        "bytes": 27279
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "pamyatnik-leninu",
+        "bytes": 27616
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "pamyatnik-osnovatelyam",
+        "bytes": 24878
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "park-pushkina",
+        "bytes": 24309
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "ploschad-iskusstv",
+        "bytes": 24843
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "po-chesnoku",
+        "bytes": 21906
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "pochtovyy-muzey",
+        "bytes": 22628
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "restoran-kupecheskiy",
+        "bytes": 27754
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "sad-pobedy",
+        "bytes": 23338
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "simeonovskiy-sobor",
+        "bytes": 26184
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "sinagoga-chabad",
+        "bytes": 23863
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "sobornaya-mechet",
+        "bytes": 27689
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "staryy-kraevedcheskiy",
+        "bytes": 28503
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "svechka",
+        "bytes": 23698
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "taganay-belyy-klyuch",
+        "bytes": 26074
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "taganay-kamennaya-reka",
+        "bytes": 29622
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "taganay-lestnitsa",
+        "bytes": 23465
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "taganay-meteostantsiya",
+        "bytes": 29568
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "taganay-perya",
+        "bytes": 23898
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "taganay-teschin-yazyk",
+        "bytes": 24908
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "taganay-usadba",
+        "bytes": 24592
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "teatr-kukol-volkhovskiy",
+        "bytes": 28893
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "teatr-opery-glinki",
+        "bytes": 25942
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "troitskaya-tserkov",
+        "bytes": 22667
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "turgoyak-buhta-trimaranov",
+        "bytes": 29823
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "turgoyak-ekotropa",
+        "bytes": 24270
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "turgoyak-megalit-1",
+        "bytes": 24972
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "turgoyak-mengiry",
+        "bytes": 23714
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "turgoyak-plyazh",
+        "bytes": 25788
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "turgoyak-simvol-very",
+        "bytes": 26014
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "turgoyak-skit",
+        "bytes": 23637
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "tyuz",
+        "bytes": 22550
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "uvildy-lesnoe-ozero-maloe-uvildy",
+        "bytes": 29613
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "uvildy-mys-krasnyy",
+        "bytes": 27682
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "uvildy-ostrov-golodai",
+        "bytes": 27768
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "uvildy-ostrov-vyazovyy",
+        "bytes": 25918
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "uvildy-radonovyy-byuvet",
+        "bytes": 27383
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "uvildy-tsentralnyy-plyazh",
+        "bytes": 25953
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "vokzal-glavnyy",
+        "bytes": 23314
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "zyuratkul-ekotropa-na-hrebet",
+        "bytes": 30171
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "zyuratkul-gora-lukash",
+        "bytes": 24471
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "zyuratkul-kipyashchiy-klyuch",
+        "bytes": 30409
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "zyuratkul-maralovaya-ferma",
+        "bytes": 27309
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "zyuratkul-reka-bolshaya-satka",
+        "bytes": 27527
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "zyuratkul-skaly-medvedi",
+        "bytes": 27150
+      },
+      {
+        "city": "chelyabinsk",
+        "stem": "zyuratkul-vysokogornoe-ozero",
+        "bytes": 26201
+      },
+      {
+        "city": "kaliningrad",
+        "stem": "homlin-mama-varya",
+        "bytes": 37901
+      },
+      {
+        "city": "kaliningrad",
+        "stem": "malysh-homlin-unya",
+        "bytes": 35057
+      },
+      {
+        "city": "kaliningrad",
+        "stem": "memorial-1200-gvardeytsam",
+        "bytes": 35474
+      },
+      {
+        "city": "kaliningrad",
+        "stem": "monument-mat-rossiya",
+        "bytes": 32193
+      },
+      {
+        "city": "kaliningrad",
+        "stem": "skulptura-babushka-homlin-marta",
+        "bytes": 36137
+      },
+      {
+        "city": "kaliningrad",
+        "stem": "skulptura-dedushka-homlin-karl",
+        "bytes": 37466
+      },
+      {
+        "city": "moscow",
+        "stem": "monument-pokoritelyam-kosmosa",
+        "bytes": 34622
+      },
+      {
+        "city": "moscow",
+        "stem": "pamyatnik-aleksandru-pushkinu-na-pushkinskoy",
+        "bytes": 36898
+      },
+      {
+        "city": "moscow",
+        "stem": "pamyatnik-ho-shi-minu",
+        "bytes": 39182
+      },
+      {
+        "city": "moscow",
+        "stem": "pamyatnik-knyazyu-vladimiru",
+        "bytes": 39756
+      },
+      {
+        "city": "moscow",
+        "stem": "pamyatnik-muhtaru",
+        "bytes": 39783
+      },
+      {
+        "city": "moscow",
+        "stem": "pamyatnik-petru-i-raboty-tsereteli",
+        "bytes": 30911
+      },
+      {
+        "city": "moscow",
+        "stem": "pamyatnik-vladimiru-mayakovskomu",
+        "bytes": 39554
+      },
+      {
+        "city": "moscow",
+        "stem": "rabochiy-i-kolhoznitsa",
+        "bytes": 25640
+      },
+      {
+        "city": "nizhny-novgorod",
+        "stem": "pamyatnik-kuzme-mininu",
+        "bytes": 38649
+      },
+      {
+        "city": "nizhny-novgorod",
+        "stem": "pamyatnik-petru-i",
+        "bytes": 38805
+      },
+      {
+        "city": "perm",
+        "stem": "pamyatnik-u-tyulenya-bronekater-ak-454",
+        "bytes": 33899
+      },
+      {
+        "city": "perm",
+        "stem": "schaste-ne-za-gorami",
+        "bytes": 32788
+      },
+      {
+        "city": "ryazan",
+        "stem": "solotcha-chernoe-ozero",
+        "bytes": 15310
+      },
+      {
+        "city": "ryazan",
+        "stem": "solotcha-dom-pozhalostina",
+        "bytes": 17563
+      },
+      {
+        "city": "ryazan",
+        "stem": "solotcha-lysaya-gora",
+        "bytes": 15722
+      },
+      {
+        "city": "ryazan",
+        "stem": "solotcha-monastyr",
+        "bytes": 16077
+      },
+      {
+        "city": "ryazan",
+        "stem": "solotcha-studenyy-kolodets",
+        "bytes": 15269
+      },
+      {
+        "city": "ryazan",
+        "stem": "solotcha-svyatye-vorota",
+        "bytes": 16034
+      },
+      {
+        "city": "ryazan",
+        "stem": "solotcha-tropa-paustovskogo",
+        "bytes": 14958
+      },
+      {
+        "city": "saint-petersburg",
+        "stem": "mednyy-vsadnik",
+        "bytes": 31399
+      },
+      {
+        "city": "saint-petersburg",
+        "stem": "monument-geroicheskim-zaschitnikam-leningrada",
+        "bytes": 34296
+      },
+      {
+        "city": "saint-petersburg",
+        "stem": "pamyatnik-a-v-suvorovu",
+        "bytes": 38414
+      },
+      {
+        "city": "saint-petersburg",
+        "stem": "pamyatnik-aleksandru-nevskomu",
+        "bytes": 37736
+      },
+      {
+        "city": "saint-petersburg",
+        "stem": "pamyatnik-anne-ahmatovoy",
+        "bytes": 31944
+      },
+      {
+        "city": "saint-petersburg",
+        "stem": "pamyatnik-domeniko-trezini",
+        "bytes": 33639
+      },
+      {
+        "city": "saint-petersburg",
+        "stem": "pamyatnik-dvorniku",
+        "bytes": 37063
+      },
+      {
+        "city": "saint-petersburg",
+        "stem": "pamyatnik-nikolayu-i",
+        "bytes": 39550
+      },
+      {
+        "city": "saint-petersburg",
+        "stem": "pamyatnik-peterburgskomu-nosu",
+        "bytes": 32190
+      },
+      {
+        "city": "saint-petersburg",
+        "stem": "rostralnye-kolonny",
+        "bytes": 31619
+      },
+      {
+        "city": "saint-petersburg",
+        "stem": "sfinksy-na-universitetskoy-naberezhnoy",
+        "bytes": 34801
+      },
+      {
+        "city": "tula",
+        "stem": "art-gribnaya-polyana",
+        "bytes": 15250
+      },
+      {
+        "city": "tula",
+        "stem": "bashnya-odoevskih-vorot",
+        "bytes": 15777
+      },
+      {
+        "city": "tula",
+        "stem": "bashnya-pyatnitskih-vorot",
+        "bytes": 15987
+      },
+      {
+        "city": "tula",
+        "stem": "blagoveshchenskaya-tserkov",
+        "bytes": 15483
+      },
+      {
+        "city": "tula",
+        "stem": "dom-lisitsynyh",
+        "bytes": 13066
+      },
+      {
+        "city": "tula",
+        "stem": "dom-muzey-veresaeva",
+        "bytes": 13282
+      },
+      {
+        "city": "tula",
+        "stem": "hram-sergiya-radonezhskogo",
+        "bytes": 16593
+      },
+      {
+        "city": "tula",
+        "stem": "istoriko-memorialnyy-muzey-demidovyh",
+        "bytes": 17342
+      },
+      {
+        "city": "tula",
+        "stem": "ivanovskaya-bashnya",
+        "bytes": 17469
+      },
+      {
+        "city": "tula",
+        "stem": "kafe-pryanosti-i-radosti",
+        "bytes": 15464
+      },
+      {
+        "city": "tula",
+        "stem": "kreativnoe-prostranstvo-iskra",
+        "bytes": 15182
+      },
+      {
+        "city": "tula",
+        "stem": "kremlevskiy-skver",
+        "bytes": 12753
+      },
+      {
+        "city": "tula",
+        "stem": "kulikovo-pole-alleya-pamyati",
+        "bytes": 16404
+      },
+      {
+        "city": "tula",
+        "stem": "kulikovo-pole-hram-sergiya",
+        "bytes": 13087
+      },
+      {
+        "city": "tula",
+        "stem": "kulikovo-pole-kolonna-dmitriyu-donskomu",
+        "bytes": 15846
+      },
+      {
+        "city": "tula",
+        "stem": "kulikovo-pole-maket-bitvy",
+        "bytes": 13714
+      },
+      {
+        "city": "tula",
+        "stem": "kulikovo-pole-muzey-epifani",
+        "bytes": 16025
+      },
+      {
+        "city": "tula",
+        "stem": "kulikovo-pole-muzeynyy-kompleks",
+        "bytes": 15731
+      },
+      {
+        "city": "tula",
+        "stem": "kulikovo-pole-slianie-don-nepryadva",
+        "bytes": 17000
+      },
+      {
+        "city": "tula",
+        "stem": "kulikovo-pole",
+        "bytes": 16064
+      },
+      {
+        "city": "tula",
+        "stem": "muzey-dpi-tsentr-semeynoy-istorii",
+        "bytes": 17503
+      },
+      {
+        "city": "tula",
+        "stem": "muzey-garmoni-deda-filimona",
+        "bytes": 14780
+      },
+      {
+        "city": "tula",
+        "stem": "muzey-stanka-oktava",
+        "bytes": 13163
+      },
+      {
+        "city": "tula",
+        "stem": "muzey-tulskie-samovary",
+        "bytes": 15053
+      },
+      {
+        "city": "tula",
+        "stem": "nikolo-zaretskaya-tserkov",
+        "bytes": 13184
+      },
+      {
+        "city": "tula",
+        "stem": "oblastnoy-hudozhestvennyy-muzey",
+        "bytes": 15694
+      },
+      {
+        "city": "tula",
+        "stem": "osobnyak-belolipetskih",
+        "bytes": 15283
+      },
+      {
+        "city": "tula",
+        "stem": "pamyatnik-sotrudnikam-gosbezopasnosti",
+        "bytes": 15792
+      },
+      {
+        "city": "tula",
+        "stem": "pamyatnik-uchenomu-kotu",
+        "bytes": 16952
+      },
+      {
+        "city": "tula",
+        "stem": "park-belousova",
+        "bytes": 14401
+      },
+      {
+        "city": "tula",
+        "stem": "polenovo-abbatstvo",
+        "bytes": 15869
+      },
+      {
+        "city": "tula",
+        "stem": "polenovo-admiralteystvo",
+        "bytes": 13104
+      },
+      {
+        "city": "tula",
+        "stem": "polenovo-bolshoy-dom",
+        "bytes": 15790
+      },
+      {
+        "city": "tula",
+        "stem": "polenovo-fahverkovyy-saray",
+        "bytes": 15920
+      },
+      {
+        "city": "tula",
+        "stem": "polenovo-svyatoy-istochnik",
+        "bytes": 14149
+      },
+      {
+        "city": "tula",
+        "stem": "polenovo-troitskaya-tserkov-behovo",
+        "bytes": 16255
+      },
+      {
+        "city": "tula",
+        "stem": "polenovo-tropa-k-oke",
+        "bytes": 17361
+      },
+      {
+        "city": "tula",
+        "stem": "polenovo",
+        "bytes": 14482
+      },
+      {
+        "city": "tula",
+        "stem": "restoran-kultura",
+        "bytes": 16977
+      },
+      {
+        "city": "tula",
+        "stem": "rogozhinskiy-park",
+        "bytes": 17153
+      },
+      {
+        "city": "tula",
+        "stem": "smotrovaya-proletarskoy-naberezhnoy",
+        "bytes": 12388
+      },
+      {
+        "city": "tula",
+        "stem": "staraya-tulskaya-apteka",
+        "bytes": 16054
+      },
+      {
+        "city": "tula",
+        "stem": "teatr-dramy-gorkogo",
+        "bytes": 13330
+      },
+      {
+        "city": "tula",
+        "stem": "torgovye-ryady-kremlya",
+        "bytes": 17478
+      },
+      {
+        "city": "tula",
+        "stem": "usadba-ermolaeva-zvereva",
+        "bytes": 14497
+      },
+      {
+        "city": "tula",
+        "stem": "uspenskiy-sobor-kremlya",
+        "bytes": 16160
+      },
+      {
+        "city": "tula",
+        "stem": "vodyanye-vorota",
+        "bytes": 15534
+      },
+      {
+        "city": "tula",
+        "stem": "vsekhsvyatskiy-kafedralnyy-sobor",
+        "bytes": 16410
+      },
+      {
+        "city": "tula",
+        "stem": "yasnaya-polyana-dom-muzey",
+        "bytes": 13404
+      },
+      {
+        "city": "tula",
+        "stem": "yasnaya-polyana-fligel-kuzminskih",
+        "bytes": 16157
+      },
+      {
+        "city": "tula",
+        "stem": "yasnaya-polyana-mogila",
+        "bytes": 16986
+      },
+      {
+        "city": "tula",
+        "stem": "yasnaya-polyana-pashnya",
+        "bytes": 13401
+      },
+      {
+        "city": "tula",
+        "stem": "yasnaya-polyana-prespekt",
+        "bytes": 16080
+      },
+      {
+        "city": "tula",
+        "stem": "yasnaya-polyana-prud",
+        "bytes": 12824
+      },
+      {
+        "city": "tula",
+        "stem": "yasnaya-polyana-skameyka",
+        "bytes": 15325
+      },
+      {
+        "city": "tula",
+        "stem": "yasno-pole-dom-byk",
+        "bytes": 16104
+      },
+      {
+        "city": "tula",
+        "stem": "yasno-pole-eko-ferma",
+        "bytes": 16192
+      },
+      {
+        "city": "tula",
+        "stem": "yasno-pole-konnyy-kompleks",
+        "bytes": 12898
+      },
+      {
+        "city": "tula",
+        "stem": "yasno-pole-otel-kovcheg",
+        "bytes": 16284
+      },
+      {
+        "city": "tula",
+        "stem": "yasno-pole-portal-vremeni",
+        "bytes": 17059
+      },
+      {
+        "city": "tula",
+        "stem": "yasno-pole-prudy",
+        "bytes": 13523
+      },
+      {
+        "city": "tula",
+        "stem": "yasno-pole-syrovarnya",
+        "bytes": 16107
+      },
+      {
+        "city": "tula",
+        "stem": "yasno-pole",
+        "bytes": 17221
+      },
+      {
+        "city": "voronezh",
+        "stem": "admiralteyskaya-ploschad",
+        "bytes": 27224
+      },
+      {
+        "city": "voronezh",
+        "stem": "alekseevo-akatov-monastyr",
+        "bytes": 26906
+      },
+      {
+        "city": "voronezh",
+        "stem": "arsenal",
+        "bytes": 21178
+      },
+      {
+        "city": "voronezh",
+        "stem": "aviatsionnyy-zavod-vaso",
+        "bytes": 26959
+      },
+      {
+        "city": "voronezh",
+        "stem": "bar-hlam",
+        "bytes": 23564
+      },
+      {
+        "city": "voronezh",
+        "stem": "bar-tsenzura",
+        "bytes": 26029
+      },
+      {
+        "city": "voronezh",
+        "stem": "blagoveschenskiy-sobor",
+        "bytes": 25794
+      },
+      {
+        "city": "voronezh",
+        "stem": "chernavskaya-damba",
+        "bytes": 26534
+      },
+      {
+        "city": "voronezh",
+        "stem": "dom-kazennoy-palaty",
+        "bytes": 26225
+      },
+      {
+        "city": "voronezh",
+        "stem": "gastro-tsentralnyy-rynok",
+        "bytes": 25670
+      },
+      {
+        "city": "voronezh",
+        "stem": "gostinitsa-bristol",
+        "bytes": 23995
+      },
+      {
+        "city": "voronezh",
+        "stem": "hudozhestvennyy-muzey-kramskogo",
+        "bytes": 30997
+      },
+      {
+        "city": "voronezh",
+        "stem": "ilinskiy-hram",
+        "bytes": 22508
+      },
+      {
+        "city": "voronezh",
+        "stem": "kamennyy-most",
+        "bytes": 27286
+      },
+      {
+        "city": "voronezh",
+        "stem": "kamernyy-teatr",
+        "bytes": 24232
+      },
+      {
+        "city": "voronezh",
+        "stem": "kazanskiy-hram",
+        "bytes": 24439
+      },
+      {
+        "city": "voronezh",
+        "stem": "kirha-svyatoy-marii",
+        "bytes": 24549
+      },
+      {
+        "city": "voronezh",
+        "stem": "kofeynya-promka",
+        "bytes": 23753
+      },
+      {
+        "city": "voronezh",
+        "stem": "kostenki-ekspozitsiya-drevnih-orudiy-truda",
+        "bytes": 35532
+      },
+      {
+        "city": "voronezh",
+        "stem": "kostenki-interaktivnaya-arheologicheskaya-pesochnitsa",
+        "bytes": 30942
+      },
+      {
+        "city": "voronezh",
+        "stem": "kostenki-melovye-holmy",
+        "bytes": 29492
+      },
+      {
+        "city": "voronezh",
+        "stem": "kostenki-paleoliticheskie-veneri",
+        "bytes": 28936
+      },
+      {
+        "city": "voronezh",
+        "stem": "kostenki-podlinnoe-zhilishche-iz-kostey-mamont",
+        "bytes": 29732
+      },
+      {
+        "city": "voronezh",
+        "stem": "kostenki-skulptura-mamont-stepan",
+        "bytes": 28522
+      },
+      {
+        "city": "voronezh",
+        "stem": "kostenki-smotrovaya-izluchina-dona",
+        "bytes": 30279
+      },
+      {
+        "city": "voronezh",
+        "stem": "kraevedcheskiy-muzey",
+        "bytes": 27016
+      },
+      {
+        "city": "voronezh",
+        "stem": "literaturnyy-muzey-nikitina",
+        "bytes": 27082
+      },
+      {
+        "city": "voronezh",
+        "stem": "meshchanskaya-politseyskaya-chast",
+        "bytes": 28174
+      },
+      {
+        "city": "voronezh",
+        "stem": "muzey-diorama",
+        "bytes": 24428
+      },
+      {
+        "city": "voronezh",
+        "stem": "muzey-zabytoy-muzyki",
+        "bytes": 29270
+      },
+      {
+        "city": "voronezh",
+        "stem": "pamyatnik-frontovomu-pochtalonu",
+        "bytes": 27434
+      },
+      {
+        "city": "voronezh",
+        "stem": "pamyatnik-lechebnomu-stulu",
+        "bytes": 28031
+      },
+      {
+        "city": "voronezh",
+        "stem": "pamyatnik-yuriyu-hoyu",
+        "bytes": 26531
+      },
+      {
+        "city": "voronezh",
+        "stem": "petrovskaya-naberezhnaya",
+        "bytes": 25765
+      },
+      {
+        "city": "voronezh",
+        "stem": "pokrovskiy-sobor",
+        "bytes": 23081
+      },
+      {
+        "city": "voronezh",
+        "stem": "restoran-el-chico",
+        "bytes": 26125
+      },
+      {
+        "city": "voronezh",
+        "stem": "ryumochnaya-kulturno-korotko",
+        "bytes": 31554
+      },
+      {
+        "city": "voronezh",
+        "stem": "ryumochnaya-zyuzya",
+        "bytes": 28591
+      },
+      {
+        "city": "voronezh",
+        "stem": "smotrovaya-park-durova",
+        "bytes": 26533
+      },
+      {
+        "city": "voronezh",
+        "stem": "spikizi-bar-arhiv",
+        "bytes": 25428
+      },
+      {
+        "city": "voronezh",
+        "stem": "teatr-dramy-koltsova",
+        "bytes": 24528
+      },
+      {
+        "city": "voronezh",
+        "stem": "teatr-kukol-shut",
+        "bytes": 23006
+      },
+      {
+        "city": "voronezh",
+        "stem": "tsentralnyy-park-dinamo",
+        "bytes": 27574
+      },
+      {
+        "city": "voronezh",
+        "stem": "uspenskiy-admiralteyskiy-hram",
+        "bytes": 27200
+      },
+      {
+        "city": "voronezh",
+        "stem": "venevitinovy-ampirnaya-rotonda",
+        "bytes": 30738
+      },
+      {
+        "city": "voronezh",
+        "stem": "venevitinovy-derevyannyy-pirs",
+        "bytes": 28112
+      },
+      {
+        "city": "voronezh",
+        "stem": "venevitinovy-gospodskiy-dom",
+        "bytes": 29387
+      },
+      {
+        "city": "voronezh",
+        "stem": "venevitinovy-kuhonnyy-fligel",
+        "bytes": 29828
+      },
+      {
+        "city": "voronezh",
+        "stem": "venevitinovy-muzykalnaya-gostinaya",
+        "bytes": 29618
+      },
+      {
+        "city": "voronezh",
+        "stem": "venevitinovy-parternyy-usadebnyy-sad",
+        "bytes": 28242
+      },
+      {
+        "city": "voronezh",
+        "stem": "venevitinovy-poeziya-mysli",
+        "bytes": 30174
+      },
+      {
+        "city": "voronezh",
+        "stem": "zdanie-upravleniya-yuvzhd",
+        "bytes": 17644
+      }
+    ],
+    "badOrient": [],
+    "badAspect": [],
+    "missingCard": [
+      {
+        "city": "belgorod",
+        "stem": "pamyatnik-knyazyu-vladimiru-krestitelyu-rusi"
+      },
+      {
+        "city": "ekaterinburg",
+        "stem": "identity-street-art"
+      },
+      {
+        "city": "ekaterinburg",
+        "stem": "pamyatnik-vysotskomu"
+      },
+      {
+        "city": "ekaterinburg",
+        "stem": "pamyatnik-zhukovu"
+      },
+      {
+        "city": "murmansk",
+        "stem": "pamyatnik-zhduschaya"
+      },
+      {
+        "city": "perm",
+        "stem": "monument-geroyam-fronta-i-tyla"
+      },
+      {
+        "city": "perm",
+        "stem": "pamyatnik-aleksandru-popovu"
+      },
+      {
+        "city": "perm",
+        "stem": "pamyatnik-borisu-pasternaku"
+      },
+      {
+        "city": "perm",
+        "stem": "pamyatnik-doktoru-gralyu"
+      },
+      {
+        "city": "perm",
+        "stem": "pamyatnik-permskomu-tramvayu"
+      },
+      {
+        "city": "perm",
+        "stem": "pamyatnik-permskomu-vodoprovodchiku"
+      },
+      {
+        "city": "perm",
+        "stem": "pamyatnik-skorbyaschey-materi"
+      },
+      {
+        "city": "perm",
+        "stem": "pamyatnik-trus-balbes-i-byvalyy"
+      },
+      {
+        "city": "perm",
+        "stem": "pamyatnik-u-tyulenya-bronekater-ak-454"
+      },
+      {
+        "city": "perm",
+        "stem": "pamyatnik-vasiliyu-tatischevu"
+      },
+      {
+        "city": "perm",
+        "stem": "permskiy-medved"
+      },
+      {
+        "city": "perm",
+        "stem": "permsky-solenye-ushi"
+      },
+      {
+        "city": "perm",
+        "stem": "schaste-ne-za-gorami"
+      },
+      {
+        "city": "perm",
+        "stem": "skulptura-ikonki-permskogo-stilya"
+      },
+      {
+        "city": "perm",
+        "stem": "skulptura-kama-reka"
+      }
+    ],
+    "missingThumb": []
+  }
+}

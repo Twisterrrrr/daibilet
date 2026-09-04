@@ -73,6 +73,7 @@ export interface AdminEventOverrideDto extends SeoFields {
   shortDescription?: string | null;
   imageUrl?: string | null;
   editorStatus?: string | null;
+  mergeGroupKey?: string | null;
 }
 
 export interface AdminEventDetailDto extends AdminEventRowDto {
@@ -113,6 +114,9 @@ export interface AdminVenueRowDto extends SeoFields {
   address?: string | null;
   latitude?: number | null;
   longitude?: number | null;
+  metroStation?: string | null;
+  wayToFind?: string | null;
+  parkingInfo?: string | null;
   description?: string | null;
   shortDescription?: string | null;
   heroImageUrl?: string | null;

@@ -1,0 +1,68 @@
+{
+  "city": "nizhny-novgorod",
+  "done": [
+    "aleksandrovskiy-sad",
+    "arsenal-museum",
+    "bezuhov-cafe",
+    "blagoveshchenskiy-monastyr",
+    "domik-kashirina",
+    "domik-petra",
+    "fonoteca-bar",
+    "gaz-museum",
+    "gosbank-nnov",
+    "identity-architecture",
+    "identity-art",
+    "identity-gastro",
+    "identity-symbol",
+    "kater-geroy",
+    "mednye-truby-bar",
+    "mihailo-arhangelskiy-sobor",
+    "mitrich-restaurant",
+    "nizhne-volzhskaya-naberezhnaya",
+    "palaty-stroganovyh",
+    "park-shvejtsariya",
+    "pecherskiy-monastyr",
+    "photo-museum",
+    "ploshchad-lyadova",
+    "ploshchad-minina",
+    "pochainskiy-bulvar",
+    "pyatkin-traktir",
+    "rechnaya-progulka",
+    "red-wall-restaurant",
+    "romodanovskiy-vokzal",
+    "rozhdestvenskaya-street",
+    "seledka-i-kofe",
+    "shchelokovskiy-hutor",
+    "sormovskiy-park",
+    "staroyarmarochniy-sobor",
+    "street-art-kvartaly",
+    "stroganovskaya-church",
+    "technical-museum",
+    "usadba-rukavishnikovyh",
+    "verhne-volzhskaya-naberezhnaya",
+    "yula-pizza"
+  ],
+  "pending": [],
+  "excluded": [
+    {
+      "stem": "ribs-restaurant",
+      "reason": "already has unique non-label-card image on disk"
+    }
+  ],
+  "summary": {
+    "worklistTotal": 40,
+    "installed": 40,
+    "gateRetriesOnInstall": 29,
+    "imageRegenRounds": 4,
+    "remainingFailures": 0,
+    "mapFixes": [
+      "nizhny-novgorod-ribs-restaurant -> ribs-restaurant.jpg (was mitrich-restaurant.jpg)",
+      "nizhny-novgorod-street-art-kvartaly -> street-art-kvartaly.jpg (was arsenal-gtsisi.jpg)",
+      "nizhny-novgorod-rechnaya-progulka -> rechnaya-progulka.jpg (was nizhne-volzhskaya-naberezhnaya.jpg)",
+      "EDITORIAL: street-art-kvartaly-uniq/rechnaya-progulka-uniq -> canonical stems",
+      "LABEL_CARD_VENUE_STUB_BASENAMES cleared (34 NN stubs regen'd)",
+      "CITY_IDENTITY_FALLBACK: nizhny-novgorod -> identity-symbol.jpg"
+    ],
+    "completedAt": "2026-08-23T12:00:00+03:00"
+  }
+}

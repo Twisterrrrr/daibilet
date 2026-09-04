@@ -3,7 +3,7 @@ import { ChevronRight } from 'lucide-react';
 
 export type BreadcrumbItem = { label: string; href?: string };
 
-/** Белая полоска над hero — как в Lovable и на страницах площадок/локаций. */
+/** Белая полоска над hero - как в Lovable и на страницах площадок/локаций. */
 export function PageBreadcrumbBar({ items }: { items: BreadcrumbItem[] }) {
   if (!items.length) return null;
   return (
@@ -29,30 +29,45 @@ export function PageBreadcrumbBar({ items }: { items: BreadcrumbItem[] }) {
   );
 }
 
-/** Hero раздела: крошки снаружи, заголовок на градиенте. */
+/**
+ * Единый hero раздела: крошки + нейтральный strip (bg-slate-50), H1 + support.
+ * Без full-bleed фото и цветных градиентов.
+ */
 export function SectionPageHero({
   breadcrumbs,
-  gradientClass,
   eyebrow,
   title,
   description,
   children,
+  /** @deprecated Игнорируется: градиенты убраны в пользу нейтрального strip. */
+  gradientClass: _gradientClass,
 }: {
   breadcrumbs: BreadcrumbItem[];
-  gradientClass: string;
   eyebrow?: React.ReactNode;
   title: React.ReactNode;
   description?: React.ReactNode;
   children?: React.ReactNode;
+  gradientClass?: string;
 }) {
   return (
     <>
       <PageBreadcrumbBar items={breadcrumbs} />
-      <section className={`border-b border-slate-200 bg-gradient-to-br ${gradientClass} text-white`}>
-        <div className="container-page py-10 sm:py-14">
+      <section className="border-b border-slate-200 bg-slate-50">
+        <div className="container-page py-8 sm:py-10">
           {eyebrow}
-          <h1 className="font-display mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl">{title}</h1>
-          {description ? <p className="mt-3 max-w-2xl text-base text-white/85 sm:text-lg">{description}</p> : null}
+          <h1
+            className={[
+              'font-display text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl',
+              eyebrow ? 'mt-2' : '',
+            ]
+              .filter(Boolean)
+              .join(' ')}
+          >
+            {title}
+          </h1>
+          {description ? (
+            <p className="mt-3 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">{description}</p>
+          ) : null}
           {children}
         </div>
       </section>

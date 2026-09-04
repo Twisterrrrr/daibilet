@@ -1,0 +1,158 @@
+{
+  "auditedAt": "2026-08-22T14:05:52.920Z",
+  "totalBaseFiles": 2757,
+  "exactDuplicateGroups": 62,
+  "crossCityDuplicateGroups": 6,
+  "regenerateCount": 0,
+  "byPriorityCity": {},
+  "exactDuplicateFiles": [],
+  "crossCityDuplicates": [
+    {
+      "hash": "eb083d58b88f613b2aa13861118e5f8a",
+      "width": 1600,
+      "height": 1067,
+      "files": [
+        {
+          "url": "/images/venues/belgorod/sobornaya-ploschad.jpg",
+          "slug": "belgorod-sobornaya-ploschad",
+          "hubCity": "belgorod",
+          "routeName": "",
+          "name": "sobornaya-ploschad",
+          "folder": "belgorod"
+        },
+        {
+          "url": "/images/venues/perm/sobornaya-ploschad.jpg",
+          "slug": "perm-sobornaya-ploschad",
+          "hubCity": "perm",
+          "routeName": "",
+          "name": "sobornaya-ploschad",
+          "folder": "perm"
+        }
+      ]
+    },
+    {
+      "hash": "4c852f90d0642554160ffb9898585524",
+      "width": 1600,
+      "height": 1067,
+      "files": [
+        {
+          "url": "/images/venues/kaliningrad/brandenburgskie-vorota.jpg",
+          "slug": null,
+          "hubCity": "kaliningrad",
+          "routeName": "",
+          "name": "brandenburgskie-vorota",
+          "folder": "kaliningrad"
+        },
+        {
+          "url": "/images/venues/yaroslavl/rotonda-gostinogo-dvora.jpg",
+          "slug": "yaroslavl-rotonda-gostinogo-dvora",
+          "hubCity": "yaroslavl",
+          "routeName": "",
+          "name": "rotonda-gostinogo-dvora",
+          "folder": "yaroslavl"
+        }
+      ]
+    },
+    {
+      "hash": "661107dce61ba40781f2ab1300cbe612",
+      "width": 1600,
+      "height": 1067,
+      "files": [
+        {
+          "url": "/images/venues/kostroma/pozharnaya-kalancha-na-susaninskoy-ploschadi.jpg",
+          "slug": "kostroma-pozharnaya-kalancha-na-susaninskoy-ploschadi",
+          "hubCity": "kostroma",
+          "routeName": "",
+          "name": "pozharnaya-kalancha-na-susaninskoy-ploschadi",
+          "folder": "kostroma"
+        },
+        {
+          "url": "/images/venues/kurgan/pozharnaya-kalancha.jpg",
+          "slug": "kurgan-pozharnaya-kalancha",
+          "hubCity": "kurgan",
+          "routeName": "",
+          "name": "pozharnaya-kalancha",
+          "folder": "kurgan"
+        },
+        {
+          "url": "/images/venues/syktyvkar/pozharnaya-kalancha.jpg",
+          "slug": "syktyvkar-pozharnaya-kalancha",
+          "hubCity": "syktyvkar",
+          "routeName": "",
+          "name": "pozharnaya-kalancha",
+          "folder": "syktyvkar"
+        }
+      ]
+    },
+    {
+      "hash": "36195b3d23a69e657bdc629daa6324c4",
+      "width": 1600,
+      "height": 1067,
+      "files": [
+        {
+          "url": "/images/venues/nizhny-novgorod/ulitsa-sovetskaya.jpg",
+          "slug": "nizhny-novgorod-ulitsa-sovetskaya",
+          "hubCity": "nizhny-novgorod",
+          "routeName": "",
+          "name": "ulitsa-sovetskaya",
+          "folder": "nizhny-novgorod"
+        },
+        {
+          "url": "/images/venues/yaroslavl/vyatskoe-muzey-zabavnyh-veshchey.jpg",
+          "slug": "yaroslavl-vyatskoe-muzey-zabavnyh-veshchey",
+          "hubCity": "yaroslavl",
+          "routeName": "",
+          "name": "vyatskoe-muzey-zabavnyh-veshchey",
+          "folder": "yaroslavl"
+        }
+      ]
+    },
+    {
+      "hash": "e05288dffc25ac82dbe885c1516e849c",
+      "width": 1600,
+      "height": 1067,
+      "files": [
+        {
+          "url": "/images/venues/orel/ulitsa-lenina.jpg",
+          "slug": "orel-ulitsa-lenina",
+          "hubCity": "orel",
+          "routeName": "",
+          "name": "ulitsa-lenina",
+          "folder": "orel"
+        },
+        {
+          "url": "/images/venues/ulan-ude/ulitsa-lenina.jpg",
+          "slug": "ulan-ude-ulitsa-lenina",
+          "hubCity": "ulan-ude",
+          "routeName": "",
+          "name": "ulitsa-lenina",
+          "folder": "ulan-ude"
+        }
+      ]
+    },
+    {
+      "hash": "8efef1dc3cea1b320d65befb30973993",
+      "width": 1600,
+      "height": 1067,
+      "files": [
+        {
+          "url": "/images/venues/saint-petersburg/skalnyy-park-monrepo.jpg",
+          "slug": "saint-petersburg-skalnyy-park-monrepo",
+          "hubCity": "saint-petersburg",
+          "routeName": "",
+          "name": "skalnyy-park-monrepo",
+          "folder": "saint-petersburg"
+        },
+        {
+          "url": "/images/venues/vyborg/skalnyy-park-monrepo.jpg",
+          "slug": "vyborg-skalnyy-park-monrepo",
+          "hubCity": "vyborg",
+          "routeName": "",
+          "name": "skalnyy-park-monrepo",
+          "folder": "vyborg"
+        }
+      ]
+    }
+  ],
+  "regenerateWorklist": []
+}
