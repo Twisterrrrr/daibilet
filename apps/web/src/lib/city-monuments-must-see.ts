@@ -831,15 +831,6 @@ export const CITY_MONUMENTS_MUST_SEE: Record<string, MonumentMustSeeItem[]> = {
       longitude: 30.338319,
     },
     {
-      name: 'Памятник Петру I работы Шемякина',
-      desc: 'Гротескный Петр в Петропавловской крепости',
-      address: 'Заячий остров, Петропавловская крепость',
-      locationSlug: 'saint-petersburg-pamyatnik-petru-i-raboty-shemyakina',
-      mustSeeFilter: 'main',
-      latitude: 59.950139,
-      longitude: 30.316111,
-    },
-    {
       name: 'Сфинксы на Университетской набережной',
       desc: 'Древние египетские сфинксы из Фив',
       address: 'Университетская набережная, напротив Академии художеств',
