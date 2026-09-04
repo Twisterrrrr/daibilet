@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Venue PDP prototype - Дайбилет (Lovable + наши блоки)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./venue-pdp.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-row">
+      <a class="logo" href="/">Дайбилет</a>
+      <button type="button" class="city-chip">Санкт-Петербург</button>
+      <label class="search">
+        <span class="sr-only">Поиск</span>
+        <input type="search" placeholder="Событие, артист, площадка" />
+      </label>
+      <nav class="header-nav" aria-label="Разделы">
+        <a href="/events">События</a>
+        <a href="/places">Места</a>
+        <a href="/blog">Блог</a>
+      </nav>
+      <a class="btn btn-ghost" href="/login">Войти</a>
+    </div>
+  </header>
+
+  <div class="container crumbs">
+    <a href="/">Главная</a>
+    <span>/</span>
+    <a href="/places">Места</a>
+    <span>/</span>
+    <span>Джаз-клуб Игоря Бутмана</span>
+  </div>
+
+  <main>
+    <!-- 1. Hero: photo + facts + CTA (Lovable split) -->
+    <section class="container hero">
+      <div class="hero-media">
+        <img
+          src="https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=1200&q=80"
+          alt="Интерьер джаз-клуба: сцена и тёплый свет"
+        />
+        <span class="photo-badge">7 фото</span>
+      </div>
+      <div class="hero-copy">
+        <div class="badges">
+          <span class="badge badge-accent">Джаз-клуб</span>
+          <span class="badge">18+</span>
+        </div>
+        <p class="rating"><span aria-hidden="true">★</span> 4.9 · 120 отзывов</p>
+        <h1>Джаз-клуб Игоря Бутмана</h1>
+        <ul class="fact-list">
+          <li><span class="ico" aria-hidden="true">📍</span> наб. канала Грибоедова, 2Б, Санкт-Петербург</li>
+          <li><span class="ico" aria-hidden="true">🚇</span> Невский проспект</li>
+          <li><span class="ico" aria-hidden="true">☎</span> +7 (812) 570-00-00</li>
+          <li><span class="ico" aria-hidden="true">🌐</span> <a href="#">butmanclub.ru</a></li>
+        </ul>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#afisha">Купить билет - от 2 000 ₽</a>
+          <button type="button" class="icon-btn" aria-label="Поделиться">↗</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Affiche grid -->
+    <section class="container section" id="afisha">
+      <h2>Афиша в джаз-клубе Игоря Бутмана</h2>
+      <div class="date-chips" role="tablist" aria-label="Фильтр дат">
+        <button type="button" class="chip is-active">Сегодня</button>
+        <button type="button" class="chip">Завтра</button>
+        <button type="button" class="chip">Сентябрь</button>
+        <button type="button" class="chip">Октябрь</button>
+        <button type="button" class="chip">Выходные</button>
+        <button type="button" class="chip chip-calendar">Выбрать дату</button>
+      </div>
+      <div class="event-grid">
+        <article class="event-card">
+          <div class="event-poster">
+            <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=600&q=80" alt="" />
+            <span class="tag">Джаз</span>
+          </div>
+          <p class="event-date">5 сентября, пт · 20:00</p>
+          <h3>Oleg and Natalia Butman Band</h3>
+          <p class="event-price">от 2 500 ₽</p>
+          <a class="btn btn-primary btn-block" href="#">Купить</a>
+        </article>
+        <article class="event-card">
+          <div class="event-poster">
+            <img src="https://images.unsplash.com/photo-1514320291840-3092121ec284?auto=format&fit=crop&w=600&q=80" alt="" />
+            <span class="tag">Вокал</span>
+          </div>
+          <p class="event-date">6 сентября, сб · 19:30</p>
+          <h3>Вечер стандартов с квинтетом</h3>
+          <p class="event-price">от 2 000 ₽</p>
+          <a class="btn btn-primary btn-block" href="#">Купить</a>
+        </article>
+        <article class="event-card">
+          <div class="event-poster">
+            <img src="https://images.unsplash.com/photo-1415201364774-f6f0bb35bef6?auto=format&fit=crop&w=600&q=80" alt="" />
+            <span class="tag">Джаз</span>
+          </div>
+          <p class="event-date">7 сентября, вс · 18:00</p>
+          <h3>Sunday Jazz Brunch</h3>
+          <p class="event-price">от 1 800 ₽</p>
+          <a class="btn btn-primary btn-block" href="#">Купить</a>
+        </article>
+        <article class="event-card">
+          <div class="event-poster">
+            <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=600&q=80" alt="" />
+            <span class="tag">Инструментал</span>
+          </div>
+          <p class="event-date">12 сентября, пт · 20:00</p>
+          <h3>Саксофон и рояль: late set</h3>
+          <p class="event-price">от 2 200 ₽</p>
+          <a class="btn btn-primary btn-block" href="#">Купить</a>
+        </article>
+      </div>
+      <button type="button" class="btn btn-muted btn-block more-btn">Показать ещё</button>
+    </section>
+
+    <!-- 3. About + gallery -->
+    <section class="container section about" id="about">
+      <div class="about-copy">
+        <h2>О площадке</h2>
+        <p>
+          Один из главных джазовых адресов Петербурга у канала Грибоедова. Живой звук, ужин за столиками
+          и сцена, где играют и местные коллективы, и гости клуба.
+        </p>
+        <p>
+          Пространство в кирпичных сводах: бар, VIP-ложи и кухня, рассчитанная на вечер с концертом.
+          Билеты на Дайбилет ведут к покупке у организатора.
+        </p>
+        <div class="specs">
+          <div><strong>Вместимость</strong><span>до 200 гостей</span></div>
+          <div><strong>Кухня</strong><span>средиземноморская</span></div>
+          <div><strong>Формат</strong><span>столики, бар, VIP</span></div>
+          <div><strong>Возраст</strong><span>18+</span></div>
+        </div>
+      </div>
+      <div class="about-gallery" aria-label="Галерея">
+        <img class="g-wide" src="https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=900&q=80" alt="Зал клуба" />
+        <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=500&q=80" alt="Сервировка" />
+        <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=500&q=80" alt="Выступление" />
+      </div>
+    </section>
+
+    <!-- 4. Map + contacts (kept from our PDP) -->
+    <section class="container section map-block" id="map">
+      <div class="map-head">
+        <h2>Карта и как добраться</h2>
+        <p class="muted">Вход со стороны канала, ориентир - Казанский собор в 3 минутах пешком.</p>
+      </div>
+      <div class="map-grid">
+        <div class="map-frame">
+          <iframe
+            title="Карта: Джаз-клуб Игоря Бутмана"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            src="https://yandex.ru/map-widget/v1/?ll=30.3208%2C59.9345&z=16&pt=30.3208,59.9345,pm2rdm"
+          ></iframe>
+        </div>
+        <aside class="map-side">
+          <h3>Контакты</h3>
+          <ul class="fact-list">
+            <li>📍 наб. канала Грибоедова, 2Б</li>
+            <li>🚇 Невский проспект</li>
+            <li>🕒 Обычно открыто к запуску гостей за 30-45 минут до концерта</li>
+          </ul>
+          <div class="route-btns">
+            <a class="btn btn-dark" href="https://yandex.ru/maps/" target="_blank" rel="noreferrer">Яндекс.Карты</a>
+            <a class="btn btn-ghost" href="https://2gis.ru/" target="_blank" rel="noreferrer">2ГИС</a>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- 5. FAQ (kept) -->
+    <section class="container section" id="faq">
+      <h2>Частые вопросы</h2>
+      <div class="faq">
+        <details open>
+          <summary>Есть ли дресс-код?</summary>
+          <p>Строгого дресс-кода нет. Уместны smart casual и вечерний повседневный стиль.</p>
+        </details>
+        <details>
+          <summary>Во сколько пускают гостей?</summary>
+          <p>Обычно запуск за 30-45 минут до начала программы. Точное время смотрите в карточке события.</p>
+        </details>
+        <details>
+          <summary>Можно ли заказать еду во время концерта?</summary>
+          <p>Да, зал рассчитан на ужин со сценой. Меню и барная карта доступны на месте.</p>
+        </details>
+        <details>
+          <summary>Где проходит оплата билета?</summary>
+          <p>Покупка - в виджете билетной системы или на сайте организатора. Дайбилет помогает выбрать событие и хранит статус заказа.</p>
+        </details>
+      </div>
+    </section>
+
+    <!-- 6. Reviews (kept) -->
+    <section class="container section" id="reviews">
+      <div class="section-head">
+        <h2>Отзывы</h2>
+        <p class="rating big"><span aria-hidden="true">★</span> 4.9 · на основе 120 оценок</p>
+      </div>
+      <div class="review-grid">
+        <article class="review-card">
+          <p class="review-meta">Анна · ★★★★★</p>
+          <p>Звук отличный, столики близко к сцене. Ужин не мешал концерту - наоборот, задал ритм вечера.</p>
+        </article>
+        <article class="review-card">
+          <p class="review-meta">Игорь · ★★★★★</p>
+          <p>Брали билеты через Дайбилет, дошли по навигатору от Невского без сюрпризов. Вернёмся на late set.</p>
+        </article>
+        <article class="review-card">
+          <p class="review-meta">Мария · ★★★★☆</p>
+          <p>Атмосфера клуба тёплая, VIP-ложи реально тише. Лучше бронировать столик заранее в выходные.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- 7. Similar -->
+    <section class="container section" id="similar">
+      <div class="section-head">
+        <h2>Похожие места</h2>
+        <a class="text-link" href="/places">Все площадки</a>
+      </div>
+      <div class="similar-grid">
+        <a class="similar-card" href="#">
+          <img src="https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&w=200&q=80" alt="" />
+          <div>
+            <strong>JFC Jazz Club</strong>
+            <span>Джаз-клуб · СПб</span>
+          </div>
+        </a>
+        <a class="similar-card" href="#">
+          <img src="https://images.unsplash.com/photo-1483412033650-1015ddeb83d1?auto=format&fit=crop&w=200&q=80" alt="" />
+          <div>
+            <strong>Эссенция</strong>
+            <span>Клуб · СПб</span>
+          </div>
+        </a>
+        <a class="similar-card" href="#">
+          <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=200&q=80" alt="" />
+          <div>
+            <strong>The Place</strong>
+            <span>Концертная площадка</span>
+          </div>
+        </a>
+        <a class="similar-card" href="#">
+          <img src="https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=200&q=80" alt="" />
+          <div>
+            <strong>Dom Jazz</strong>
+            <span>Джаз · центр</span>
+          </div>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <div class="logo">Дайбилет</div>
+        <p class="muted">Research HTML. Не production. Карта, FAQ и отзывы сохранены рядом с Lovable-сеткой.</p>
+      </div>
+      <div>
+        <h3>События</h3>
+        <a href="/events">Афиша</a>
+        <a href="/podborki">Подборки</a>
+      </div>
+      <div>
+        <h3>Города</h3>
+        <a href="/cities/saint-petersburg">Санкт-Петербург</a>
+        <a href="/cities/moscow">Москва</a>
+      </div>
+      <div>
+        <h3>Помощь</h3>
+        <a href="#">Как купить</a>
+        <a href="#">Контакты</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
