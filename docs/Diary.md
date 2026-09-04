@@ -1,3 +1,21 @@
+## 2026-09-04 - CI: finance period close vs open refund
+
+### Наблюдения
+
+- CI run `33856349729` на `codex/stage0-admission-ticket-core` падал в `admin-finance.test.ts`: `blocks finance period close while refund request is open` → `Missing expected rejection`.
+- `closeAdminFinancePeriod` считал open refunds только с `createdAt` внутри закрываемого периода; тест создавал refund без даты (now вне августа) → close проходил.
+
+### Решения
+
+- Open refund (`CREATED|APPROVED|PROCESSING`) блокирует close для supplier без фильтра по `createdAt`.
+- Тест фиксирует refund с `createdAt` вне периода, чтобы контракт не разъехался снова.
+
+### Проблемы
+
+- Локально Docker Desktop недоступен, полный `backend:test:ts` не прогнан; проверка через CI после push.
+
+---
+
 ## 2026-09-04 - FIN.RETURN-1 on finance stage0
 
 ### Наблюдения
