@@ -1,14 +1,26 @@
-# Venue PDP - exact dbshablon port
+# Venue PDP - точная копия dbshablon
 
-Статический слепок Lovable-шаблона из [`Twisterrrrr/dbshablon`](https://github.com/Twisterrrrr/dbshablon) (`src/routes/index.tsx` + токены из `src/styles.css`).
+Исходник: [`Twisterrrrr/dbshablon`](https://github.com/Twisterrrrr/dbshablon) (`src/routes/index.tsx` + токены `src/styles.css`).
+Live Lovable: https://dbshablon.lovable.app
 
-- Брендинг как в исходнике: **Афиша Плюс** (не Дайбилет).
-- Ассеты: `assets/` скопированы из `dbshablon/src/assets`.
-- Секции как в React: header, breadcrumbs, hero, афиша, о площадке, похожие, footer.
-- Дополнение к слайду (наши PDP-блоки, тот же визуальный язык): **карта**, **FAQ**, **отзывы** - между «О площадке» и «Похожие места».
+## Файлы
 
-Открыть: `/research/venue-pdp-dbshablon/index.html`
+| Файл | Что внутри |
+|------|------------|
+| [`exact.html`](./exact.html) | **Точная копия слайда** - те же секции, сетки, копирайт, ассеты. Tailwind CDN + те же utility-классы, что в React. Без карты / FAQ / отзывов. |
+| [`with-extras.html`](./with-extras.html) | Та же копия + наши блоки: **карта**, **FAQ**, **отзывы** (между «О площадке» и «Похожие места»). |
+| [`index.html`](./index.html) | Старый ручной CSS-порт (legacy). Для ревью используй `exact.html`. |
+| `assets/` | JPG из `dbshablon/src/assets`. |
 
-Ранее адаптированный вариант (Дайбилет-брендинг): `/research/venue-pdp-lovable/`.
+## Открыть локально
 
-Работа только в `feat/next-monorepo`. CI run `33856349729` - ветка `codex/stage0-admission-ticket-core`, к этому HTML не относится.
+После `pnpm --filter @daibilet/web dev` (или любой static serve из `apps/web/public`):
+
+- `/research/venue-pdp-dbshablon/exact.html`
+- `/research/venue-pdp-dbshablon/with-extras.html`
+
+На live после web-deploy: `https://daibilet.ru/research/venue-pdp-dbshablon/exact.html`
+
+## Ветка
+
+Только `feat/next-monorepo`. К CI на `codex/*` этот research не относится.
