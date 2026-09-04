@@ -11,4 +11,4 @@ Open: `/research/venue-pdp-lovable/index.html` on local web static / Next public
 
 Next step (product): port blocks into `InstitutionVenueLayout.client.tsx` without dropping Yandex map / curated FAQ / reviews.
 
-**Не трогать** Codex finance-ветки (`codex/stage0-admission-ticket-core`) ради этого UI - работа только в `feat/next-monorepo`.
+**Не трогать** Codex finance-ветки (`codex/stage0-admission-ticket-core`) ради этого UI - работа только в `feat/next-monorepo`. CI run `33856349729` упал на Codex (`blocks finance period close…`) - к venue HTML не относится.
