@@ -3443,6 +3443,8 @@
 - Supplier and clean Next production builds passed.
 - Finance `.159` fast-forwarded to `f931c50f`; `daibilet-finance-api.service` restarted and both local and HTTPS health checks return 200.
 - Finance-local admission projection response is fast (about 29 ms direct, about 87 ms through nginx/TLS); slower remote readings are network/VPN path latency, not DTO work.
+- Live sandbox create-payment smoke produced order `3815847` in `PENDING_PAYMENT`: embedded token present, redirect URL absent, and no ticket number before payment.
+- Repeating the exact payload with the same idempotency key returned `3815847` again; admission stock remained at 77 after replay, so no second reservation was made.
 
 ### Remaining gate
 
