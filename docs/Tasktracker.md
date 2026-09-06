@@ -1,6 +1,6 @@
 # Tasktracker — Daibilet
 
-**Обновлено:** 2026-09-06
+**Обновлено:** 2026-09-07
 **Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md)
 
 **Легенда:** ✅ done · 🔄 in progress · ⏳ todo · 🚫 blocked · ⚠️ deferred
@@ -41,7 +41,7 @@
 | P.2n | City hub `#directions`: не рендерить landings/categories с count=0 (без пустых «Мероприятия»/«Развлечения») | Высокий | ✅ `044e441` prod proof rostov-na-donu |
 | P.2o | **City hub × blog phase 1** — editorial тизеры (about/affiche/sights/practice/more), sticky 5 tabs | Высокий | ✅ `bb65e4a` prod proof sankt-peterburg |
 | L.1 | Catalog API: public Cache-Control + Next `getCachedCatalog`; favorites `?ids=`; landing skip no-store; page sizes 50/100 | Критический | ✅ `bb65e4a` prod; nginx proxy_cache+limit_req ✅ |
-| P.3 | **Finance contour / ЛК поставщиков** — базовый контур | Высокий | ⏳ |
+| P.3 | **Finance contour / ЛК поставщиков** — базовый контур | Высокий | 🔄 closed-pilot hardening |
 | P.3a | **Venue admission products** — входные билеты площадок без фейкового события (`AdmissionProduct` / `AdmissionOffer`) | Высокий | ✅ schema + readiness + admin/supplier read API + venue UI |
 | P.3b | **Supplier integration modes** — импортные билетные системы / внутренние продажи / API-sync | Высокий | ✅ schema + DTO policy + capability matrix foundation |
 | P.3c | **Listing Health** для Event / Venue / AdmissionProduct | Высокий | ✅ backend rules + admin overview API |
@@ -53,6 +53,7 @@
 | P.3e4 | **Supplier LC UX/UI brief** — Figma handoff for B2B/fintech cabinet, then `apps/supplier` implementation | Высокий | ✅ UX brief |
 | P.3e5 | **Supplier LC shell v1** — legacy-v2 inspired light shell: grouped nav, readiness, admissions/events/orders, finance/docs/settings | Высокий | ✅ `apps/supplier` UI shell |
 | P.3e6 | **Supplier LC auth bridge** — `SiteUser` + active `SupplierUser`, login/me/logout, dev-only supplier query fallback | Высокий | ✅ auth API + supplier login UI |
+| P.3e6a | **Supplier LC pilot hardening** — refresh-cookie session recovery, single-flight retry, role-based writes, no engineering purchase actions in production UI | Критический | 🔄 code/tests/build green; deploy + browser smoke `.159` pending |
 | P.3e7 | **Supplier LC admission smoke** — тестовая продажа `AdmissionProduct` из ЛК поставщика → `CheckoutOrder`/ledger/orders projection | Высокий | ✅ supplier-scoped endpoint + UI action |
 | P.3e8 | **Stage 0 public buyer order DTO** - order-by-code + purchases-by-email expose issued ticket numbers and admission venue snapshot | High | 🔄 в PR `codex/stage0-admission-ticket-core` @ `d53cb1d` (code done); ждёт smoke `.159` |
 | P.3e9 | **Checkout result page** - `/checkout/result?order={publicCode}` reads finance public order projection, polls pending payments, shows ticketNumbers when confirmed | High | 🔄 code done; waits catalog/web deploy after finance smoke |

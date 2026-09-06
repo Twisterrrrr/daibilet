@@ -4,8 +4,6 @@ import { Link, NavLink, Navigate, Route, Routes, useSearchParams } from 'react-r
 import type {
   SupplierPortalDashboardDto,
   SupplierPortalAdmissionsListDto,
-  SupplierPortalAdmissionStubPurchaseResultDto,
-  SupplierPortalAdmissionYooKassaPurchaseResultDto,
   SupplierPortalBankAccountUpdateRequestDto,
   SupplierPortalAuthDto,
   SupplierPortalAdmissionChangeRequestCreateDto,
@@ -23,7 +21,14 @@ import type {
   SupplierPortalReviewsListDto,
   SupplierPortalSessionSupplierDto,
 } from '@daibilet/contracts/supplier';
-import { SUPPLIER_ACCESS_TOKEN_STORAGE_KEY, supplierGet, supplierPatch, supplierPost } from '@/lib/api';
+import {
+  SUPPLIER_ACCESS_TOKEN_STORAGE_KEY,
+  refreshSupplierAccessToken,
+  subscribeSupplierAccessToken,
+  supplierGet,
+  supplierPatch,
+  supplierPost,
+} from '@/lib/api';
 
 const STORAGE_KEY = 'daibilet_supplier_key';
 
@@ -67,7 +72,8 @@ export function App() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [accessToken, setAccessToken] = React.useState(() => window.localStorage.getItem(SUPPLIER_ACCESS_TOKEN_STORAGE_KEY) || '');
   const [authSession, setAuthSession] = React.useState<SupplierPortalMeDto | null>(null);
-  const [authLoading, setAuthLoading] = React.useState(Boolean(accessToken));
+  const [authLoading, setAuthLoading] = React.useState(true);
+  const bootstrapRefreshAttempted = React.useRef(false);
   const [supplierKey, setSupplierKeyState] = React.useState(() => {
     const fromUrl = searchParams.get('supplier') || searchParams.get('slug') || searchParams.get('supplierId');
     if (fromUrl) return fromUrl;
@@ -96,8 +102,21 @@ export function App() {
 
   React.useEffect(() => {
     if (!accessToken) {
-      setAuthLoading(false);
       setAuthSession(null);
+      if (!bootstrapRefreshAttempted.current) {
+        bootstrapRefreshAttempted.current = true;
+        setAuthLoading(true);
+        let disposed = false;
+        void refreshSupplierAccessToken().then((refreshedToken) => {
+          if (disposed) return;
+          if (refreshedToken) setAccessToken(refreshedToken);
+          else setAuthLoading(false);
+        });
+        return () => {
+          disposed = true;
+        };
+      }
+      setAuthLoading(false);
       return;
     }
 
@@ -145,6 +164,8 @@ export function App() {
   }, [accessToken, clearAuthSession, setSupplierKey]);
 
   const hasSupplierAccess = Boolean(accessToken && authSession && supplierKey.trim());
+
+  React.useEffect(() => subscribeSupplierAccessToken(setAccessToken), []);
 
   return (
     <div className="app-shell">
@@ -328,11 +349,13 @@ function LoginSetup({
         </form>
       </section>
 
-      <section className="dev-access-card">
-        <h3>Локальная проверка</h3>
-        <p>Для dev smoke можно открыть кабинет по коду поставщика. В production этот путь закрывается backend.</p>
-        <SupplierSelector value="" onChange={onDevSupplier} />
-      </section>
+      {import.meta.env.DEV ? (
+        <section className="dev-access-card">
+          <h3>Локальная проверка</h3>
+          <p>Для dev smoke можно открыть кабинет по коду поставщика.</p>
+          <SupplierSelector value="" onChange={onDevSupplier} />
+        </section>
+      ) : null}
     </div>
   );
 }
@@ -534,123 +557,10 @@ function EventsPage({ supplierKey }: { supplierKey: string }) {
 
 function AdmissionsPage({ supplierKey }: { supplierKey: string }) {
   const { data, loading, error, reload } = useSupplierResource<SupplierPortalAdmissionsListDto>('/api/supplier/admissions?limit=50', supplierKey);
-  const [smokeBusyProductId, setSmokeBusyProductId] = React.useState<string | null>(null);
-  const [smokeResult, setSmokeResult] = React.useState<SupplierPortalAdmissionStubPurchaseResultDto | null>(null);
-  const [smokeError, setSmokeError] = React.useState<string | null>(null);
-  const [yooKassaBusyProductId, setYooKassaBusyProductId] = React.useState<string | null>(null);
-  const [yooKassaResult, setYooKassaResult] = React.useState<SupplierPortalAdmissionYooKassaPurchaseResultDto | null>(null);
-  const [yooKassaError, setYooKassaError] = React.useState<string | null>(null);
-
-  async function createSmokePurchase(product: SupplierPortalAdmissionsListDto['items'][number]) {
-    const offer = product.offers.find((item) => item.active && item.priceRub != null && item.priceRub >= 100) ||
-      product.offers.find((item) => item.active) ||
-      product.offers[0] ||
-      null;
-    if (!offer) {
-      setSmokeError('У входного билета нет категории для тестовой продажи.');
-      return;
-    }
-
-    setSmokeBusyProductId(product.id);
-    setSmokeError(null);
-    setSmokeResult(null);
-    try {
-      const result = await supplierPost<SupplierPortalAdmissionStubPurchaseResultDto>(
-        `/api/supplier/admissions/${encodeURIComponent(product.id)}/stub-purchase`,
-        {
-          admissionOfferId: offer.id,
-          quantity: 1,
-          buyer: {
-            email: `smoke+${Date.now()}@daibilet.ru`,
-            name: 'Тестовый покупатель',
-            phone: null,
-          },
-          idempotencyKey: `slc-stub-${String(product.id).replace(/-/g, '').slice(0, 16)}-${Date.now().toString(36)}`,
-        },
-        undefined,
-        supplierKey,
-      );
-      setSmokeResult(result);
-      reload();
-    } catch (error) {
-      setSmokeError(error instanceof Error ? error.message : String(error));
-    } finally {
-      setSmokeBusyProductId(null);
-    }
-  }
-
-  async function createYooKassaSmokePurchase(product: SupplierPortalAdmissionsListDto['items'][number]) {
-    const offer = product.offers.find((item) => item.active && item.priceRub != null && item.priceRub >= 100) ||
-      product.offers.find((item) => item.active) ||
-      product.offers[0] ||
-      null;
-    if (!offer) {
-      setYooKassaError('У входного билета нет категории для проверки YooKassa.');
-      return;
-    }
-
-    setYooKassaBusyProductId(product.id);
-    setYooKassaError(null);
-    setYooKassaResult(null);
-    try {
-      const result = await supplierPost<SupplierPortalAdmissionYooKassaPurchaseResultDto>(
-        `/api/supplier/admissions/${encodeURIComponent(product.id)}/yookassa-purchase`,
-        {
-          admissionOfferId: offer.id,
-          quantity: 1,
-          buyer: {
-            email: `yookassa+${Date.now()}@daibilet.ru`,
-            name: 'Тестовый покупатель',
-            phone: null,
-          },
-          idempotencyKey: `slc-yk-${String(product.id).replace(/-/g, '').slice(0, 16)}-${Date.now().toString(36)}`,
-        },
-        undefined,
-        supplierKey,
-      );
-      setYooKassaResult(result);
-      reload();
-    } catch (error) {
-      setYooKassaError(error instanceof Error ? error.message : String(error));
-    } finally {
-      setYooKassaBusyProductId(null);
-    }
-  }
-
-  const yooKassaCheckoutUrl = yooKassaResult?.order.checkoutUrl || yooKassaResult?.order.payment.confirmationUrl || null;
 
   return (
     <div className="page-stack">
-      <PageTitle title="Входные билеты" description="Билеты с открытой датой и входные продукты площадок: музеи, арт-пространства, выставки, аттракционы. Можно проверить тестовую продажу без реальной оплаты." action={<RefreshButton onClick={reload} />} />
-      {smokeResult ? (
-        <div className="notice-panel success">
-          <strong>Тестовая продажа создана: заказ {smokeResult.order.publicCode}</strong>
-          <span>{smokeResult.order.subject.admissionProductTitle} · {smokeResult.order.item.ticketTitle || 'билет'} · {formatMoney(smokeResult.order.totals.totalKopecks)}</span>
-        </div>
-      ) : null}
-      {smokeError ? (
-        <div className="notice-panel error">
-          <strong>Не удалось создать тестовую продажу</strong>
-          <span>{smokeError}</span>
-        </div>
-      ) : null}
-      {yooKassaResult ? (
-        <div className="notice-panel success">
-          <strong>YooKassa sandbox-заказ создан: {yooKassaResult.order.publicCode}</strong>
-          <span>{yooKassaResult.order.subject.admissionProductTitle} · {formatMoney(yooKassaResult.order.totals.totalKopecks)}</span>
-          {yooKassaCheckoutUrl ? (
-            <div className="notice-actions">
-              <a className="link-button" href={yooKassaCheckoutUrl} target="_blank" rel="noreferrer">Открыть оплату</a>
-            </div>
-          ) : null}
-        </div>
-      ) : null}
-      {yooKassaError ? (
-        <div className="notice-panel error">
-          <strong>Не удалось создать YooKassa sandbox-заказ</strong>
-          <span>{yooKassaError}</span>
-        </div>
-      ) : null}
+      <PageTitle title="Входные билеты" description="Билеты с открытой датой и входные продукты площадок: музеи, арт-пространства, выставки и аттракционы." action={<RefreshButton onClick={reload} />} />
       {data ? (
         <div className="stats-grid">
           <StatCard label="Всего" value={data.metrics.total} hint={`${data.metrics.published} опубликовано`} />
@@ -661,7 +571,7 @@ function AdmissionsPage({ supplierKey }: { supplierKey: string }) {
       <DataState loading={loading} error={error} onRetry={reload} hasData={Boolean(data?.items.length)}>
         {data ? (
           <Table
-            columns={['Билет', 'Площадка', 'Срок действия', 'Категории', 'Цена', 'Готовность', 'Действия']}
+            columns={['Билет', 'Площадка', 'Срок действия', 'Категории', 'Цена', 'Готовность']}
             rows={data.items.map((product) => [
               <div key="product"><strong>{product.title}</strong><small>{product.purchaseFlow === 'PLATFORM' ? 'внутренние продажи' : 'витрина'}</small></div>,
               <div key="venue"><span>{product.venue.title}</span><small>{product.city.title || '-'}</small></div>,
@@ -669,26 +579,6 @@ function AdmissionsPage({ supplierKey }: { supplierKey: string }) {
               <div key="offers"><span>{product.offers.filter((offer) => offer.active).length} активных</span><small>{product.offers.map((offer) => offer.title || 'билет').join(', ') || '-'}</small></div>,
               formatRub(product.priceFromRub),
               <IssueList key="health" compact issues={[...product.health.blockers, ...product.health.warnings]} empty="готово" />,
-              <div key="action" className="table-actions">
-                <button
-                  type="button"
-                  className="table-action-button"
-                  disabled={!product.readiness.canSell || smokeBusyProductId === product.id}
-                  onClick={() => void createSmokePurchase(product)}
-                  title={product.readiness.canSell ? 'Создать STUB-заказ без реальной оплаты' : 'Сначала закройте блокеры готовности'}
-                >
-                  {smokeBusyProductId === product.id ? 'Создаем...' : 'STUB'}
-                </button>
-                <button
-                  type="button"
-                  className="table-action-button secondary"
-                  disabled={!product.readiness.canSell || yooKassaBusyProductId === product.id}
-                  onClick={() => void createYooKassaSmokePurchase(product)}
-                  title={product.readiness.canSell ? 'Создать sandbox-платеж YooKassa' : 'Сначала закройте блокеры готовности'}
-                >
-                  {yooKassaBusyProductId === product.id ? 'Создаем...' : 'YooKassa'}
-                </button>
-              </div>,
             ])}
           />
         ) : null}

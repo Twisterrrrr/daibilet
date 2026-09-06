@@ -152,6 +152,7 @@ jobs:
       - name: Supplier app
         run: |
           pnpm supplier:typecheck
+          pnpm --filter @daibilet/supplier test
           pnpm supplier:build
 
       - name: Checkout web typecheck, tests and build

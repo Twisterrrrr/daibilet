@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { createStubCheckoutOrder, isStubCheckoutError } from './checkout-stub.js';
 import { sendJson } from './http.js';
 import { matchPath, type RouteContext } from './routing.js';
+import { supplierCheckoutSmokeAllowed } from './supplier-auth-handler.js';
 import type { TypedRouteHandler } from './validated-handler.js';
 import { parseJsonBody } from './validation.js';
 
@@ -58,6 +59,7 @@ export function createSupplierAdmissionStubPurchaseRouteHandler(
     if (context.method !== 'POST') return false;
     const match = matchPath(context.pathname, /^\/api\/supplier\/admissions\/([^/]+)\/stub-purchase$/);
     if (!match) return false;
+    if (!supplierCheckoutSmokeAllowed()) throwHttpError('Маршрут недоступен.', 404);
 
     const searchParams = await deps.resolveSearchParams(context);
     const payload = await parseJsonBody(supplierAdmissionStubPurchaseSchema, context.request);

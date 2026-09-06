@@ -1,3 +1,32 @@
+## 2026-09-07 - Supplier LC closed-pilot hardening
+
+### Наблюдения
+
+- ЛК уже работает на живых supplier DTO: dashboard, admissions, events, orders, finance, documents, reviews, requisites and change requests are not frontend mocks.
+- Access token lives 15 minutes, while backend already issues an HttpOnly refresh cookie for 30 days. The supplier client did not call the refresh route, so a real operator would be logged out after access-token expiry.
+- Supplier membership was checked, but write routes did not enforce `SupplierUser.role`; a `VIEWER` could reach the same mutation handlers as an owner.
+- The Admissions table still exposed engineering STUB/YooKassa purchase buttons to the supplier.
+
+### Решения
+
+- Supplier API client now restores and rotates access tokens through `/api/user/auth/refresh`, retries one failed request and coalesces concurrent refresh attempts.
+- Local Vite proxies `/api` to the backend so the same-origin refresh-cookie contract works in development.
+- Supplier write authorization is centralized by role: full owner/admin access, scoped operator/accountant mutations and read-only viewer.
+- Engineering purchase controls were removed from the supplier Admissions UI. Their backend routes fail closed in production unless `DAIBILET_SUPPLIER_CHECKOUT_SMOKE=1` is enabled for a controlled QA window.
+- Added [supplier-pilot-readiness.md](./supplier-pilot-readiness.md) with an explicit closed-pilot gate and broad-access blockers.
+
+### Проверки
+
+- Backend TypeScript suite: 143 tests, 131 passed, 12 DB-dependent skipped, 0 failed.
+- Supplier API session tests: refresh/retry, concurrent refresh and failed-refresh cleanup.
+- Supplier typecheck and production build are green locally.
+
+### Дальше
+
+- Deploy to finance `.159`, run login/session/read/write browser smoke and only then issue the first manually provisioned supplier account.
+
+---
+
 ## 2026-09-06 - YooKassa Widget Checkout for admission tickets
 
 ### Наблюдения

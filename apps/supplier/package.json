@@ -7,7 +7,8 @@
     "dev": "node scripts/run-tool.cjs dev",
     "build": "node scripts/run-tool.cjs build",
     "preview": "node scripts/run-tool.cjs preview",
-    "typecheck": "node scripts/run-tool.cjs typecheck"
+    "typecheck": "node scripts/run-tool.cjs typecheck",
+    "test": "node --experimental-strip-types --test src/lib/api.test.mjs"
   },
   "dependencies": {
     "@daibilet/contracts": "workspace:*",

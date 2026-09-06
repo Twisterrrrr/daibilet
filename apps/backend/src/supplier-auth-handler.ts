@@ -104,6 +104,9 @@ export async function resolveSupplierPortalSearchParams(context: RouteContext): 
   const payload = token ? (authenticateAccessToken(token) as JwtPayload | null) : null;
   if (payload?.sub) {
     const session = await buildSupplierPortalMeDto(payload.sub, cleanString(context.searchParams.get('supplier')));
+    if (!supplierPortalRoleAllowsRequest(session.currentSupplier.role, context.method, context.pathname)) {
+      throwHttpError('Недостаточно прав для изменения данных поставщика.', 403);
+    }
     const next = new URLSearchParams(context.searchParams);
     next.set('supplierId', session.currentSupplier.id);
     next.delete('supplier');
@@ -124,6 +127,28 @@ export async function resolveSupplierPortalSearchParams(context: RouteContext): 
 export function supplierQueryFallbackAllowed(): boolean {
   if (process.env.DAIBILET_SUPPLIER_QUERY_FALLBACK === '1') return true;
   return process.env.NODE_ENV !== 'production';
+}
+
+export function supplierCheckoutSmokeAllowed(): boolean {
+  if (process.env.DAIBILET_SUPPLIER_CHECKOUT_SMOKE === '1') return true;
+  return process.env.NODE_ENV !== 'production';
+}
+
+export function supplierPortalRoleAllowsRequest(role: string, method: string, pathname: string): boolean {
+  if (method.toUpperCase() === 'GET') return true;
+
+  const normalizedRole = role.trim().toUpperCase();
+  if (normalizedRole === 'OWNER' || normalizedRole === 'ADMIN') return true;
+
+  if (normalizedRole === 'ACCOUNTANT') {
+    return pathname === '/api/supplier/profile/legal' || pathname === '/api/supplier/profile/bank-account';
+  }
+
+  if (normalizedRole === 'OPERATOR') {
+    return pathname.startsWith('/api/supplier/change-requests');
+  }
+
+  return false;
 }
 
 function requireSupplierSiteUserId(context: RouteContext): string {
