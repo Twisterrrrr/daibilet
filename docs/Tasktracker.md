@@ -492,7 +492,8 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | G.6 | YooKassa sandbox smoke on finance server | High | partial 2026-07-31: create-payment OK, confirmation page manual |
 | G.7 | Unified purchase projection for CheckoutOrder + ExternalOrder | High | done 2026-07-31: admin + supplier verified for checkout order |
 | G.8 | YooKassa webhook hardening: provider event id dedupe + payment id guard | High | done 2026-07-31, deployed on .159 |
-| G.9 | FIN.RETURN-1: YooKassa return_url goes to catalog result with `?order={publicCode}` | High | code done 2026-09-04; deploy + sandbox return smoke pending |
+| G.9 | FIN.RETURN-1: YooKassa return_url goes to catalog result with `?order={publicCode}` | High | done 2026-09-07: deployed on `.159`; redirect remains compatible |
+| G.10 | Embedded YooKassa widget + immediate catalog return by order projection | High | finance backend deployed at `f931c50f`; catalog port + sandbox browser smoke pending |
 
 Seed command: `pnpm backend:checkout:seed-stub-admission`.
 Smoke order command: `pnpm backend:checkout:seed-stub-admission -- --order`.

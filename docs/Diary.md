@@ -3421,3 +3421,30 @@
 ### Next
 
 - After owner completes YooKassa sandbox payment smoke, deploy catalog/web and verify `/checkout/result?order=...` moves from pending to ticket numbers without relying on return_url as confirmation.
+
+---
+
+## 2026-09-07 - Embedded YooKassa finance contract deployed
+
+### Changes
+
+- Added explicit YooKassa confirmation modes: backward-compatible `redirect` and opt-in `embedded`.
+- Embedded create-payment returns `confirmationToken`; finance keeps the canonical catalog result URL in payment/order audit snapshots.
+- Added an abortable sequential order watcher for immediate catalog navigation after webhook/reconcile confirmation instead of waiting for YooKassa's success-screen timeout.
+- Added web typecheck, checkout helper tests and web build to the finance branch CI gate.
+- Documented the current Cursor catalog port in `docs/catalog-embedded-yookassa-handoff.md`; the existing compact `AdmissionCheckoutForm` should be extended, not replaced by the stale finance-branch page.
+
+### Verification
+
+- Commit `f931c50f` is pushed to `codex/stage0-admission-ticket-core`; GitHub Actions run `34028327013` passed.
+- Contracts, backend, web and supplier typechecks passed.
+- Backend DB suite passed: 142 tests, 0 failures.
+- Checkout watcher tests passed: 4 tests, 0 failures.
+- Supplier and clean Next production builds passed.
+- Finance `.159` fast-forwarded to `f931c50f`; `daibilet-finance-api.service` restarted and both local and HTTPS health checks return 200.
+- Finance-local admission projection response is fast (about 29 ms direct, about 87 ms through nginx/TLS); slower remote readings are network/VPN path latency, not DTO work.
+
+### Remaining gate
+
+- Catalog `feat/next-monorepo` still requests redirect mode. Cursor must port the three-field protocol and widget behavior described in the handoff.
+- After catalog deploy, complete one browser sandbox payment and verify inline widget -> webhook/reconcile -> `CONFIRMED` + `ticketNumbers` -> `/checkout/result?order={publicCode}`.
