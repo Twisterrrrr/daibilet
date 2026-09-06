@@ -1376,15 +1376,17 @@ model SupplierBankAccount {
 }
 
 model SupplierUser {
-  id         String       @id @default(cuid())
-  supplierId String
-  siteUserId String
-  role       SupplierRole @default(OPERATOR)
-  isActive   Boolean      @default(true)
-  invitedAt  DateTime?
-  acceptedAt DateTime?
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
+  id               String       @id @default(cuid())
+  supplierId       String
+  siteUserId       String
+  role             SupplierRole @default(OPERATOR)
+  isActive         Boolean      @default(true)
+  invitedAt        DateTime?
+  acceptedAt       DateTime?
+  inviteTokenHash  String?      @unique
+  inviteExpiresAt  DateTime?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
 
   supplier Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
   siteUser SiteUser @relation(fields: [siteUserId], references: [id], onDelete: Cascade)
@@ -1392,6 +1394,7 @@ model SupplierUser {
   @@unique([supplierId, siteUserId])
   @@index([siteUserId])
   @@index([supplierId, isActive])
+  @@index([inviteExpiresAt])
 }
 
 model SupplierVenue {

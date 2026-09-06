@@ -90,6 +90,7 @@ export function App() {
       else next.delete('supplier');
       next.delete('slug');
       next.delete('supplierId');
+      next.delete('invite');
       return next;
     }, { replace: true });
   }, [setSearchParams]);
@@ -311,6 +312,7 @@ function LoginSetup({
   onLogin: (payload: SupplierPortalAuthDto) => void;
   onDevSupplier: (value: string) => void;
 }) {
+  const inviteToken = new URLSearchParams(window.location.search).get('invite')?.trim() || '';
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [loading, setLoading] = React.useState(false);
@@ -328,6 +330,10 @@ function LoginSetup({
       setLoading(false);
     }
   };
+
+  if (inviteToken) {
+    return <InviteSetup token={inviteToken} onAccepted={onLogin} />;
+  }
 
   return (
     <div className="login-layout">
@@ -356,6 +362,73 @@ function LoginSetup({
           <SupplierSelector value="" onChange={onDevSupplier} />
         </section>
       ) : null}
+    </div>
+  );
+}
+
+function InviteSetup({
+  token,
+  onAccepted,
+}: {
+  token: string;
+  onAccepted: (payload: SupplierPortalAuthDto) => void;
+}) {
+  const [password, setPassword] = React.useState('');
+  const [confirmation, setConfirmation] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (password !== confirmation) {
+      setError('Пароли не совпадают.');
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      onAccepted(await supplierPost<SupplierPortalAuthDto>('/api/supplier/auth/accept-invite', { token, password }));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Не удалось принять приглашение.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="login-layout">
+      <section className="login-card">
+        <div className="setup-mark">ЛК</div>
+        <h2>Создайте пароль</h2>
+        <p>После подтверждения вы сразу войдете в кабинет своей организации.</p>
+        <form className="login-form" onSubmit={(event) => void submit(event)}>
+          <label>
+            <span>Пароль</span>
+            <input
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              autoComplete="new-password"
+              type="password"
+              minLength={10}
+              required
+            />
+          </label>
+          <label>
+            <span>Повторите пароль</span>
+            <input
+              value={confirmation}
+              onChange={(event) => setConfirmation(event.target.value)}
+              autoComplete="new-password"
+              type="password"
+              minLength={10}
+              required
+            />
+          </label>
+          {error ? <div className="form-error">{error}</div> : null}
+          <button type="submit" disabled={loading}>{loading ? 'Подтверждаем...' : 'Принять приглашение'}</button>
+        </form>
+        <a href="/">Войти по email</a>
+      </section>
     </div>
   );
 }

@@ -54,6 +54,7 @@
 | P.3e5 | **Supplier LC shell v1** — legacy-v2 inspired light shell: grouped nav, readiness, admissions/events/orders, finance/docs/settings | Высокий | ✅ `apps/supplier` UI shell |
 | P.3e6 | **Supplier LC auth bridge** — `SiteUser` + active `SupplierUser`, login/me/logout, dev-only supplier query fallback | Высокий | ✅ auth API + supplier login UI |
 | P.3e6a | **Supplier LC pilot hardening** — refresh-cookie session recovery, single-flight retry, role-based writes, no engineering purchase actions in production UI | Критический | 🔄 code/tests/build green; deploy + browser smoke `.159` pending |
+| P.3e6b | **Supplier one-time invite** — admin creates role-scoped access, supplier sets initial password, token hash/expiry/single-use | Критический | 🔄 migration + DB integration test green; deploy + browser smoke `.159` pending |
 | P.3e7 | **Supplier LC admission smoke** — тестовая продажа `AdmissionProduct` из ЛК поставщика → `CheckoutOrder`/ledger/orders projection | Высокий | ✅ supplier-scoped endpoint + UI action |
 | P.3e8 | **Stage 0 public buyer order DTO** - order-by-code + purchases-by-email expose issued ticket numbers and admission venue snapshot | High | 🔄 в PR `codex/stage0-admission-ticket-core` @ `d53cb1d` (code done); ждёт smoke `.159` |
 | P.3e9 | **Checkout result page** - `/checkout/result?order={publicCode}` reads finance public order projection, polls pending payments, shows ticketNumbers when confirmed | High | 🔄 code done; waits catalog/web deploy after finance smoke |

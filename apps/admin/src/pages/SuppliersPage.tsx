@@ -1,8 +1,14 @@
 import * as React from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { AlertTriangle, Building2, CheckCircle2, RefreshCcw, Search, WalletCards, XCircle } from 'lucide-react';
+import { AlertTriangle, Building2, CheckCircle2, Copy, RefreshCcw, Search, UserPlus, WalletCards, XCircle } from 'lucide-react';
 
-import type { AdminSupplierDetailDto, AdminSupplierRowDto, AdminSuppliersListDto } from '@daibilet/contracts/admin';
+import type {
+  AdminSupplierDetailDto,
+  AdminSupplierInviteRequestDto,
+  AdminSupplierInviteResultDto,
+  AdminSupplierRowDto,
+  AdminSuppliersListDto,
+} from '@daibilet/contracts/admin';
 import { DataTableShell, EmptyState, PageHeader, QuickFilterBar, StatusBadge } from '@/components/admin/primitives';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -52,6 +58,9 @@ export function SuppliersPage() {
   const [detailLoading, setDetailLoading] = React.useState(false);
   const [legalActionBusy, setLegalActionBusy] = React.useState<'approve' | 'reject' | null>(null);
   const [legalActionError, setLegalActionError] = React.useState<string | null>(null);
+  const [inviteUserBusy, setInviteUserBusy] = React.useState(false);
+  const [inviteUserError, setInviteUserError] = React.useState<string | null>(null);
+  const [inviteAccess, setInviteAccess] = React.useState<AdminSupplierInviteResultDto['access'] | null>(null);
   const [reloadTick, setReloadTick] = React.useState(0);
 
   const q = params.get('q') ?? '';
@@ -115,6 +124,8 @@ export function SuppliersPage() {
 
   const openSupplier = React.useCallback((supplier: AdminSupplierRowDto) => {
     setDetailLoading(true);
+    setInviteAccess(null);
+    setInviteUserError(null);
     adminFetch(`/api/admin/suppliers/${encodeURIComponent(supplier.id)}`, { cache: 'no-store' })
       .then(async (response) => {
         const body = await response.json().catch(() => null);
@@ -129,6 +140,32 @@ export function SuppliersPage() {
         window.alert(error instanceof Error ? error.message : String(error));
       })
       .finally(() => setDetailLoading(false));
+  }, []);
+
+  const inviteSupplierUser = React.useCallback(async (
+    supplierId: string,
+    input: AdminSupplierInviteRequestDto,
+  ) => {
+    setInviteUserBusy(true);
+    setInviteUserError(null);
+    setInviteAccess(null);
+    try {
+      const response = await adminFetch(`/api/admin/suppliers/${encodeURIComponent(supplierId)}/users/invite`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(input),
+      });
+      const body = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(body?.message || body?.error || `HTTP ${response.status}`);
+      const result = body as AdminSupplierInviteResultDto;
+      setSelected(result.supplier);
+      setInviteAccess(result.access);
+      setReloadTick((value) => value + 1);
+    } catch (error) {
+      setInviteUserError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setInviteUserBusy(false);
+    }
   }, []);
 
   const reviewLegalProfile = React.useCallback(async (supplierId: string, action: 'approve' | 'reject') => {
@@ -293,8 +330,17 @@ export function SuppliersPage() {
         supplier={selected}
         legalActionBusy={legalActionBusy}
         legalActionError={legalActionError}
+        inviteUserBusy={inviteUserBusy}
+        inviteUserError={inviteUserError}
+        inviteAccess={inviteAccess}
         onLegalAction={reviewLegalProfile}
-        onOpenChange={(open) => !open && setSelected(null)}
+        onInviteUser={inviteSupplierUser}
+        onOpenChange={(open) => {
+          if (open) return;
+          setSelected(null);
+          setInviteAccess(null);
+          setInviteUserError(null);
+        }}
       />
     </div>
   );
@@ -304,13 +350,21 @@ function SupplierDetailSheet({
   supplier,
   legalActionBusy,
   legalActionError,
+  inviteUserBusy,
+  inviteUserError,
+  inviteAccess,
   onLegalAction,
+  onInviteUser,
   onOpenChange,
 }: {
   supplier: AdminSupplierDetailDto | null;
   legalActionBusy: 'approve' | 'reject' | null;
   legalActionError: string | null;
+  inviteUserBusy: boolean;
+  inviteUserError: string | null;
+  inviteAccess: AdminSupplierInviteResultDto['access'] | null;
   onLegalAction: (supplierId: string, action: 'approve' | 'reject') => void;
+  onInviteUser: (supplierId: string, input: AdminSupplierInviteRequestDto) => Promise<void>;
   onOpenChange: (open: boolean) => void;
 }) {
   const hasLegalProfile = Boolean(supplier?.legal.legalName || supplier?.legal.inn);
@@ -387,6 +441,13 @@ function SupplierDetailSheet({
                       <div className="text-sm text-muted-foreground">Пользователи не привязаны.</div>
                     )}
                   </div>
+                  <SupplierInviteForm
+                    supplierId={supplier.id}
+                    busy={inviteUserBusy}
+                    error={inviteUserError}
+                    access={inviteAccess}
+                    onInvite={onInviteUser}
+                  />
                 </Card>
 
                 <Card className="border-border p-4">
@@ -474,6 +535,117 @@ function SupplierDetailSheet({
       </SheetContent>
     </Sheet>
   );
+}
+
+function SupplierInviteForm({
+  supplierId,
+  busy,
+  error,
+  access,
+  onInvite,
+}: {
+  supplierId: string;
+  busy: boolean;
+  error: string | null;
+  access: AdminSupplierInviteResultDto['access'] | null;
+  onInvite: (supplierId: string, input: AdminSupplierInviteRequestDto) => Promise<void>;
+}) {
+  const [email, setEmail] = React.useState('');
+  const [name, setName] = React.useState('');
+  const [role, setRole] = React.useState<AdminSupplierInviteRequestDto['role']>('OWNER');
+  const [copied, setCopied] = React.useState(false);
+
+  React.useEffect(() => {
+    setEmail('');
+    setName('');
+    setRole('OWNER');
+    setCopied(false);
+  }, [supplierId]);
+
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    await onInvite(supplierId, {
+      email: email.trim(),
+      name: name.trim() || null,
+      role,
+    });
+  }
+
+  async function copyInviteUrl() {
+    if (!access?.inviteUrl) return;
+    await navigator.clipboard.writeText(access.inviteUrl);
+    setCopied(true);
+  }
+
+  return (
+    <div className="mt-4 border-t border-border pt-4">
+      <div className="flex items-center gap-2 text-sm font-semibold">
+        <UserPlus className="h-4 w-4" />
+        Выдать доступ
+      </div>
+      <form className="mt-3 grid gap-2" onSubmit={(event) => void submit(event)}>
+        <Input
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          type="email"
+          autoComplete="off"
+          placeholder="Email сотрудника"
+          required
+        />
+        <Input
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+          autoComplete="off"
+          placeholder="Имя, необязательно"
+        />
+        <select
+          value={role}
+          onChange={(event) => setRole(event.target.value as AdminSupplierInviteRequestDto['role'])}
+          className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+          aria-label="Роль в кабинете поставщика"
+        >
+          <option value="OWNER">Владелец</option>
+          <option value="ADMIN">Администратор</option>
+          <option value="OPERATOR">Оператор</option>
+          <option value="ACCOUNTANT">Бухгалтер</option>
+          <option value="VIEWER">Только просмотр</option>
+        </select>
+        <Button type="submit" size="sm" disabled={busy}>
+          <UserPlus className="h-4 w-4" />
+          {busy ? 'Создаем доступ...' : 'Создать приглашение'}
+        </Button>
+      </form>
+      {error ? <div className="mt-2 text-xs text-destructive">{error}</div> : null}
+      {access ? (
+        <div className="mt-3 rounded-md bg-secondary p-3 text-xs">
+          <div className="font-medium text-foreground">
+            {access.existingAccount ? 'Доступ подключен к существующему аккаунту.' : 'Одноразовая ссылка готова.'}
+          </div>
+          <div className="mt-1 text-muted-foreground">{access.email} · {adminSupplierRoleLabel(access.role)}</div>
+          {access.inviteUrl ? (
+            <div className="mt-2 flex gap-2">
+              <Input value={access.inviteUrl} readOnly aria-label="Ссылка приглашения" className="h-8 text-xs" />
+              <Button type="button" size="sm" variant="outline" onClick={() => void copyInviteUrl()} title="Скопировать ссылку">
+                <Copy className="h-4 w-4" />
+                {copied ? 'Готово' : 'Копировать'}
+              </Button>
+            </div>
+          ) : null}
+          {access.expiresAt ? <div className="mt-2 text-muted-foreground">Действует до {formatDateTime(access.expiresAt)}</div> : null}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function adminSupplierRoleLabel(role: string): string {
+  return ({
+    OWNER: 'владелец',
+    ADMIN: 'администратор',
+    OPERATOR: 'оператор',
+    ACCOUNTANT: 'бухгалтер',
+    VIEWER: 'только просмотр',
+  } as Record<string, string>)[role] || role;
 }
 
 function ReadinessPills({ supplier }: { supplier: AdminSupplierRowDto }) {

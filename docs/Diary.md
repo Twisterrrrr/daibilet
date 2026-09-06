@@ -13,6 +13,7 @@
 - Local Vite proxies `/api` to the backend so the same-origin refresh-cookie contract works in development.
 - Supplier write authorization is centralized by role: full owner/admin access, scoped operator/accountant mutations and read-only viewer.
 - Engineering purchase controls were removed from the supplier Admissions UI. Their backend routes fail closed in production unless `DAIBILET_SUPPLIER_CHECKOUT_SMOKE=1` is enabled for a controlled QA window.
+- Added a one-time supplier invite flow: admin assigns email and role, receives a 48-hour link, and the supplier sets the initial password without seed scripts. Only the token hash is stored and acceptance clears it.
 - Added [supplier-pilot-readiness.md](./supplier-pilot-readiness.md) with an explicit closed-pilot gate and broad-access blockers.
 
 ### Проверки
@@ -20,6 +21,7 @@
 - Backend TypeScript suite: 143 tests, 131 passed, 12 DB-dependent skipped, 0 failed.
 - Supplier API session tests: refresh/retry, concurrent refresh and failed-refresh cleanup.
 - Supplier typecheck and production build are green locally.
+- Supplier invite migration and DB-aware single-use acceptance test are green on local Postgres.
 
 ### Дальше
 

@@ -73,7 +73,7 @@ function requireJwtSecret() {
   return JWT_SECRET;
 }
 
-async function hashPassword(password) {
+export async function hashPassword(password) {
   const salt = randomBytes(16).toString('hex');
   const derived = await scryptAsync(String(password), salt, 64);
   return `scrypt:${salt}:${derived.toString('hex')}`;

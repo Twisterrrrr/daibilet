@@ -16,6 +16,7 @@ import {
   logoutSiteUser,
   parseBearerToken,
 } from './user-auth.js';
+import { acceptSupplierInvite } from './supplier-invite.js';
 import { readJsonBody } from './http.js';
 import type { TypedRouteHandler } from './validated-handler.js';
 
@@ -32,6 +33,11 @@ type LoginBody = {
   email?: string;
   password?: string;
   supplier?: string;
+};
+
+type AcceptInviteBody = {
+  token?: string;
+  password?: string;
 };
 
 type SupplierSessionRow = {
@@ -53,6 +59,25 @@ export function createSupplierAuthRouteHandler(
   deps: SupplierAuthRouteHandlerDependencies,
 ): TypedRouteHandler {
   return async (context: RouteContext) => {
+    if (context.pathname === '/api/supplier/auth/accept-invite' && context.method === 'POST') {
+      const clientIp = String(context.request.headers['x-real-ip'] || context.request.socket.remoteAddress || 'unknown');
+      assertAuthRateLimit(`supplier-invite:${clientIp}`, 10);
+
+      const body = await readJsonBody<AcceptInviteBody>(context.request);
+      const password = String(body?.password || '');
+      const accepted = await acceptSupplierInvite({
+        token: String(body?.token || ''),
+        password,
+      });
+      const tokens = await loginSiteUser(deps.db, accepted.email, password);
+      const authDto = await buildSupplierPortalAuthDto(accepted.siteUserId, tokens.accessToken, accepted.supplierId);
+      writeSupplierJson(context.response, authDto, {
+        statusCode: 200,
+        headers: { 'Set-Cookie': buildRefreshCookie(tokens.refreshToken) },
+      });
+      return true;
+    }
+
     if (context.pathname === '/api/supplier/auth/login' && context.method === 'POST') {
       const clientIp = String(context.request.headers['x-real-ip'] || context.request.socket.remoteAddress || 'unknown');
       assertAuthRateLimit(`supplier-login:${clientIp}`, 20);

@@ -563,6 +563,25 @@ export interface AdminSupplierDetailDto extends AdminSupplierRowDto {
   }>;
 }
 
+export type AdminSupplierInviteRole = 'OWNER' | 'ADMIN' | 'OPERATOR' | 'ACCOUNTANT' | 'VIEWER';
+
+export interface AdminSupplierInviteRequestDto {
+  email: string;
+  name?: string | null;
+  role: AdminSupplierInviteRole;
+}
+
+export interface AdminSupplierInviteResultDto {
+  supplier: AdminSupplierDetailDto;
+  access: {
+    email: string;
+    role: AdminSupplierInviteRole;
+    existingAccount: boolean;
+    inviteUrl: string | null;
+    expiresAt: string | null;
+  };
+}
+
 export interface AdminListingHealthOverviewDto {
   generatedAt: string;
   metrics: {
