@@ -3449,4 +3449,5 @@
 ### Remaining gate
 
 - Catalog `feat/next-monorepo` still requests redirect mode. Cursor must port the three-field protocol and widget behavior described in the handoff.
+- Current catalog `CheckoutResultPage` performs one order lookup; the handoff now requires pending-state polling to eliminate the return-vs-webhook race in embedded and redirect modes.
 - After catalog deploy, complete one browser sandbox payment and verify inline widget -> webhook/reconcile -> `CONFIRMED` + `ticketNumbers` -> `/checkout/result?order={publicCode}`.

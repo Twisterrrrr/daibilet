@@ -59,13 +59,18 @@ Current catalog reference: `feat/next-monorepo` at `c8e0c568`.
    - Mount `new window.YooMoneyCheckoutWidget({ confirmation_token, ... })` inside the current compact payment card.
    - Do not pass a widget `return_url`; navigation is controlled by catalog after verified order state.
    - Poll the existing `/checkout/actions/order?order={publicCode}` sequentially every 2 seconds. Each request must have an 8 second abort timeout; stop on unmount or after 30 minutes.
-   - Navigate to `/checkout/result?order={publicCode}` when the projection reaches a terminal state (`CONFIRMED`, `PAID`, `SUCCEEDED`, `CANCELLED`, `CANCELED`, `FAILED`, `EXPIRED`).
-   - Widget `success` may navigate immediately too, but order projection remains the source of truth.
+   - Navigate to `/checkout/result?order={publicCode}` when the projection reaches a terminal state (`CONFIRMED`, `FULFILLED`, `CANCELLED`, `CANCELED`, `FAILED`, `EXPIRED`, `REFUNDED`).
+   - Widget `success` should trigger an immediate projection read, not issue a ticket or mark the order paid locally. Finance order state remains the source of truth.
    - Keep the `publicCode` and a visible link to the result page when the script/widget fails.
-4. Tests
+4. `apps/web/src/components/CheckoutResultPage.client.tsx`
+   - The current component performs one lookup only. While the returned order is pending, repeat `/checkout/actions/order?order={publicCode}` with the same sequential/abortable polling policy.
+   - Stop on terminal state, unmount or deadline. A transport error must keep the pending UI and retry; it must not become a failed payment.
+   - This is required for redirect rollback too: YooKassa may return the buyer before its webhook is visible to the catalog projection.
+5. Tests
    - Same checkout payload reuses the same idempotency key after network ambiguity.
    - Polling is sequential, abortable and stops on terminal state.
    - Missing token falls back to provider redirect.
+   - A result page opened while the order is pending updates after a later `CONFIRMED` response.
 
 Reference implementation only (do not copy its UI):
 
@@ -80,7 +85,8 @@ Reference implementation only (do not copy its UI):
 3. Complete one sandbox payment.
 4. Catalog must move to `/checkout/result?order={publicCode}` as soon as the finance projection confirms the payment; no dependency on YooKassa's ten-second success screen.
 5. The result page must show `CONFIRMED` and `ticketNumbers`.
-6. The same order must be visible in admin and supplier purchase projections.
-7. Redirect mode must still work as rollback.
+6. Opening the result page before the webhook arrives must transition from pending to confirmed without a manual refresh.
+7. The same order must be visible in admin and supplier purchase projections.
+8. Redirect mode must still work as rollback.
 
 Do not enable a wide catalog CTA until this smoke is green. No production credentials belong in the repository or handoff logs.
