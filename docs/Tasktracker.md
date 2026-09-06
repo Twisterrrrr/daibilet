@@ -1,6 +1,6 @@
 # Tasktracker — Daibilet
 
-**Обновлено:** 2026-09-04
+**Обновлено:** 2026-09-06
 **Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md)
 
 **Легенда:** ✅ done · 🔄 in progress · ⏳ todo · 🚫 blocked · ⚠️ deferred
@@ -56,15 +56,16 @@
 | P.3e7 | **Supplier LC admission smoke** — тестовая продажа `AdmissionProduct` из ЛК поставщика → `CheckoutOrder`/ledger/orders projection | Высокий | ✅ supplier-scoped endpoint + UI action |
 | P.3e8 | **Stage 0 public buyer order DTO** - order-by-code + purchases-by-email expose issued ticket numbers and admission venue snapshot | High | 🔄 в PR `codex/stage0-admission-ticket-core` @ `d53cb1d` (code done); ждёт smoke `.159` |
 | P.3e9 | **Checkout result page** - `/checkout/result?order={publicCode}` reads finance public order projection, polls pending payments, shows ticketNumbers when confirmed | High | 🔄 code done; waits catalog/web deploy after finance smoke |
-| P.3e10 | **Admission buyer checkout page** - `/checkout/admissions/:slug` reads finance admission projection, creates YooKassa payment through web proxy, redirects to result page | High | 🔄 code done; pilot-only, wide catalog CTA still off |
+| P.3e10 | **Admission buyer checkout page** - `/checkout/admissions/:slug` reads finance admission projection, creates embedded YooKassa payment and opens result by `publicCode` | High | 🔄 code done; waits `.159` deploy + sandbox widget smoke; pilot-only |
 | P.3e11 | **Admin finance order detail foundation** - typed internal order detail with payments, fulfillment ticketNumbers, supplier ledger, refunds, fiscal receipts and operation blockers | High | 🔄 code done; backend/admin typecheck + projection test green |
 | P.3e12 | **Admin refund foundation** - create `RefundRequest` from order detail with hard payment/fulfillment/ledger blockers | High | 🔄 code done; projection test + admin build green |
-| P.3f | **YooKassa: venue admission** | Высокий | 🔄 FIN.RETURN-1 fixed on `codex/stage0-admission-ticket-core`; ждёт deploy/sandbox return smoke `.159` |
+| P.3f | **YooKassa: venue admission** | Высокий | 🔄 FIN.RETURN-1 + embedded confirmation code done on `codex/stage0-admission-ticket-core`; ждёт deploy/sandbox smoke `.159` |
 | P.3f1 | **Supplier onboarding write-flow** — юрпрофиль + основной счет из ЛК, статус реквизитов на проверку | Высокий | ✅ backend PATCH + supplier UI forms |
 | P.3f2 | **YooKassa webhook hardening** — provider event id, replay dedupe, payment id mismatch guard | Высокий | ✅ backend + DB tests |
 | P.3f3 | **Admin legal approve/reject + Supplier LC polish** — модерация реквизитов, readiness callout, лаконичные заказы | Высокий | ✅ backend route + admin/supplier UI + tests |
 | P.3f4 | **Supplier LC actionable readiness** — чеклист запуска продаж + CTA по readiness-кодам | Высокий | ✅ supplier UI + typecheck/build |
 | P.3f5 | **Supplier LC order operations** — фильтры заказов, очередь обработки, сумма к выплате без технических id | Высокий | ✅ supplier UI + typecheck/build |
+| P.3f6 | **YooKassa Widget Checkout** — embedded form, reusable idempotency key, backend status watcher and immediate result navigation | Высокий | 🔄 code/tests/build done; sandbox browser smoke pending |
 | P.3g | **Supplier write flows** — создание/редактирование admission и событий через заявки | Средний | ✅ admission create/update admin apply + DB smoke; event create apply deferred |
 | P.3h | **YooKassa reconcile ops** — service/timer на `.159`, runbook и ручной dry-run/apply | Высокий | ✅ live `.159` installed/enabled; scheduled tick green 2026-08-09 |
 | P.3i | **Finance E2E foundation roadmap** - admin finance contour, supplier LC money views, refunds, reports, settlements, closing docs and supplier reviews | High | 🔄 refund foundation + admin ledger/reconcile + supplier finance/docs read views |

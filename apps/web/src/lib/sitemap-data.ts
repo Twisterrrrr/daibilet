@@ -33,6 +33,11 @@ export type SitemapEntry = {
   priority?: number;
 };
 
+type SitemapArticle = {
+  slug?: string | null;
+  isIndexable?: boolean | null;
+};
+
 const MAX_EVENTS = 45_000;
 const MAX_VENUES = 10_000;
 
@@ -152,7 +157,8 @@ export function buildLandingsSitemapEntries(now = new Date()): SitemapEntry[] {
 
 export async function buildBlogSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
   const payload = await buildPublicArticlesListDto();
-  return (payload?.articles || [])
+  const articles = (payload?.articles || []) as SitemapArticle[];
+  return articles
     .filter((article) => article.slug && article.isIndexable !== false)
     .map((article) => entry(`/blog/${encodeURIComponent(String(article.slug))}`, now, 'weekly', 0.6));
 }

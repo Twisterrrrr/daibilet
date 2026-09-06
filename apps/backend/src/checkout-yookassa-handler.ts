@@ -40,6 +40,7 @@ const yookassaCheckoutCreatePayloadSchema = z.object({
   }).nullable().optional(),
   idempotencyKey: nullableString,
   returnUrl: nullableString,
+  confirmationMode: z.enum(['redirect', 'embedded']).nullable().optional(),
 }).refine((payload) => {
   if (
     payload.subjectType === 'VENUE_ADMISSION' ||

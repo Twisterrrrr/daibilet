@@ -1,5 +1,6 @@
 export type StubCheckoutMode = 'STUB';
 export type YooKassaCheckoutMode = 'YOOKASSA';
+export type YooKassaConfirmationMode = 'redirect' | 'embedded';
 export type CheckoutSubjectType = 'EVENT' | 'VENUE_ADMISSION';
 
 export type StubCheckoutIssueSeverity = 'low' | 'medium' | 'high';
@@ -70,6 +71,7 @@ export interface StubCheckoutCreateDto {
 
 export interface YooKassaCheckoutCreateDto extends StubCheckoutCreateDto {
   returnUrl?: string | null;
+  confirmationMode?: YooKassaConfirmationMode | null;
 }
 
 export interface StubCheckoutTotalsDto {
@@ -155,6 +157,8 @@ export interface YooKassaCheckoutOrderDto extends Omit<StubCheckoutOrderDto, 'pa
     amountKopecks: number;
     providerPaymentId: string | null;
     confirmationUrl: string | null;
+    confirmationToken: string | null;
+    confirmationMode: YooKassaConfirmationMode;
     paidAt: string | null;
   };
   fulfillment: {

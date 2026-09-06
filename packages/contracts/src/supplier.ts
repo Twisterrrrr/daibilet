@@ -1,6 +1,11 @@
 import type { Readiness, ReadinessIssue } from './common.js';
 import type { AdmissionProductsListDto } from './admission.js';
-import type { StubCheckoutBuyerDto, StubCheckoutResultDto, YooKassaCheckoutResultDto } from './checkout.js';
+import type {
+  StubCheckoutBuyerDto,
+  StubCheckoutResultDto,
+  YooKassaCheckoutResultDto,
+  YooKassaConfirmationMode,
+} from './checkout.js';
 
 export interface SupplierPortalIdentityDto {
   id: string;
@@ -180,6 +185,7 @@ export interface SupplierPortalAdmissionYooKassaPurchaseRequestDto {
   buyer?: Partial<StubCheckoutBuyerDto> | null;
   idempotencyKey?: string | null;
   returnUrl?: string | null;
+  confirmationMode?: YooKassaConfirmationMode | null;
 }
 
 export type SupplierPortalAdmissionYooKassaPurchaseResultDto = YooKassaCheckoutResultDto;

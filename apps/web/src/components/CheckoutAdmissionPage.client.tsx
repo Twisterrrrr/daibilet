@@ -3,15 +3,48 @@
 import type { PublicAdmissionOfferDto, PublicAdmissionProductDto } from '@daibilet/contracts/admission';
 import { AlertTriangle, ArrowRight, CheckCircle2, Loader2, MapPin, Minus, Plus, Ticket } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { formatNumber } from '@/lib/format';
+import { watchCheckoutPayment } from '@/lib/checkout-payment';
 import {
   createPublicYooKassaCheckout,
   fetchPublicAdmissionProduct,
+  fetchPublicCheckoutOrder,
 } from '@/lib/public-checkout-api';
 
 type LoadState = 'loading' | 'ready' | 'error';
+type WidgetSession = {
+  publicCode: string;
+  confirmationToken: string;
+};
+
+type YooKassaWidgetInstance = {
+  render: (containerId: string) => Promise<void> | void;
+  destroy: () => void;
+  on: (eventName: 'complete' | 'success' | 'fail' | 'modal_close', callback: () => void) => void;
+};
+
+type YooKassaWidgetConstructor = new (config: {
+  confirmation_token: string;
+  error_callback?: (error: unknown) => void;
+  customization?: {
+    colors?: {
+      control_primary?: string;
+      background?: string;
+    };
+  };
+}) => YooKassaWidgetInstance;
+
+declare global {
+  interface Window {
+    YooMoneyCheckoutWidget?: YooKassaWidgetConstructor;
+  }
+}
+
+const YOOKASSA_WIDGET_SCRIPT_URL = 'https://yookassa.ru/checkout-widget/v1/checkout-widget.js';
+const YOOKASSA_WIDGET_CONTAINER_ID = 'yookassa-payment-form';
+let yookassaWidgetScriptPromise: Promise<void> | null = null;
 
 export function CheckoutAdmissionPageView({ slug }: { slug: string }) {
   const [state, setState] = useState<LoadState>('loading');
@@ -23,6 +56,11 @@ export function CheckoutAdmissionPageView({ slug }: { slug: string }) {
   const [buyerPhone, setBuyerPhone] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [widgetSession, setWidgetSession] = useState<WidgetSession | null>(null);
+  const [paymentNotice, setPaymentNotice] = useState<string | null>(null);
+  const widgetRef = useRef<YooKassaWidgetInstance | null>(null);
+  const attemptRef = useRef<{ payload: string; key: string } | null>(null);
+  const [widgetAttempt, setWidgetAttempt] = useState(0);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -42,21 +80,97 @@ export function CheckoutAdmissionPageView({ slug }: { slug: string }) {
     return () => controller.abort();
   }, [slug]);
 
+  useEffect(() => {
+    if (!widgetSession) return undefined;
+    const session = widgetSession;
+
+    let disposed = false;
+    let stopPolling = () => {};
+
+    function redirectToResult() {
+      if (disposed) return;
+      disposed = true;
+      stopPolling();
+      setPaymentNotice('Открываем заказ...');
+      widgetRef.current?.destroy();
+      widgetRef.current = null;
+      window.location.assign(`/checkout/result?order=${encodeURIComponent(session.publicCode)}`);
+    }
+
+    function stopWidgetWithError(message: string) {
+      if (disposed) return;
+      widgetRef.current?.destroy();
+      widgetRef.current = null;
+      setPaymentNotice(null);
+      setSubmitting(false);
+      setError(message);
+    }
+
+    async function mountWidget() {
+      try {
+        await loadYooKassaWidgetScript();
+        if (disposed) return;
+        const Widget = window.YooMoneyCheckoutWidget;
+        if (!Widget) throw new Error('widget_constructor_missing');
+
+        const checkout = new Widget({
+          confirmation_token: session.confirmationToken,
+          error_callback: () => {
+            stopWidgetWithError('Не удалось открыть форму оплаты. Можно повторить загрузку или проверить заказ.');
+          },
+          customization: {
+            colors: {
+              control_primary: '#2563eb',
+              background: '#ffffff',
+            },
+          },
+        });
+        widgetRef.current = checkout;
+        checkout.on('success', redirectToResult);
+        checkout.on('fail', redirectToResult);
+        await checkout.render(YOOKASSA_WIDGET_CONTAINER_ID);
+        if (!disposed) setPaymentNotice('Оплата банковской картой или другим удобным способом');
+      } catch {
+        stopWidgetWithError('Не удалось загрузить форму оплаты. Можно повторить загрузку или проверить заказ.');
+      }
+    }
+
+    setPaymentNotice('Загружаем безопасную форму оплаты...');
+    void mountWidget();
+    stopPolling = watchCheckoutPayment({
+      read: (signal) => fetchPublicCheckoutOrder(session.publicCode, signal),
+      onSettled: redirectToResult,
+      onTimeout: () => {
+        if (!disposed) setPaymentNotice('Проверить оплату и получить билет можно на странице заказа.');
+      },
+    });
+
+    return () => {
+      disposed = true;
+      stopPolling();
+      widgetRef.current?.destroy();
+      widgetRef.current = null;
+    };
+  }, [widgetSession, widgetAttempt]);
+
   const selectedOffer = useMemo(
     () => product?.offers.find((offer) => offer.id === selectedOfferId) || pickDefaultOffer(product?.offers || []),
     [product, selectedOfferId],
   );
   const totalRub = Math.max(0, quantity) * Math.max(0, selectedOffer?.priceRub || product?.priceFromRub || 0);
-  const canSubmit = Boolean(product?.canSell && selectedOffer?.id && buyerEmail.trim() && quantity >= 1 && !submitting);
+  const canSubmit = Boolean(
+    product?.canSell && selectedOffer?.id && buyerEmail.trim() && quantity >= 1 && !submitting && !widgetSession,
+  );
 
   async function submit() {
-    if (!product || !selectedOffer) return;
+    if (!product || !selectedOffer || !canSubmit) return;
     setSubmitting(true);
     setError(null);
-    const idempotencyKey = createIdempotencyKey();
+    setPaymentNotice(null);
+    setWidgetSession(null);
     try {
-      const result = await createPublicYooKassaCheckout({
-        subjectType: 'VENUE_ADMISSION',
+      const payload = {
+        subjectType: 'VENUE_ADMISSION' as const,
         admissionProductSlug: product.slug,
         admissionOfferId: selectedOffer.id,
         quantity,
@@ -69,9 +183,24 @@ export function CheckoutAdmissionPageView({ slug }: { slug: string }) {
           name: cleanOptional(buyerName),
           phone: cleanOptional(buyerPhone),
         },
-        idempotencyKey,
         returnUrl: `${window.location.origin}/checkout/result`,
-      }, idempotencyKey);
+        confirmationMode: 'embedded' as const,
+      };
+      const fingerprint = JSON.stringify(payload);
+      if (attemptRef.current?.payload !== fingerprint) {
+        attemptRef.current = { payload: fingerprint, key: createIdempotencyKey() };
+      }
+      const idempotencyKey = attemptRef.current.key;
+      const result = await createPublicYooKassaCheckout({ ...payload, idempotencyKey }, idempotencyKey);
+
+      if (result.order.payment.confirmationToken) {
+        setWidgetSession({
+          publicCode: result.order.publicCode,
+          confirmationToken: result.order.payment.confirmationToken,
+        });
+        setSubmitting(false);
+        return;
+      }
 
       const confirmationUrl = result.order.payment.confirmationUrl || result.order.checkoutUrl;
       if (confirmationUrl) {
@@ -159,6 +288,7 @@ export function CheckoutAdmissionPageView({ slug }: { slug: string }) {
                   <select
                     value={selectedOfferId}
                     onChange={(event) => setSelectedOfferId(event.target.value)}
+                    disabled={Boolean(widgetSession)}
                     className="h-11 rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none focus:border-primary-500"
                   >
                     {product.offers.map((offer) => (
@@ -175,6 +305,7 @@ export function CheckoutAdmissionPageView({ slug }: { slug: string }) {
                     <button
                       type="button"
                       onClick={() => setQuantity((value) => Math.max(1, value - 1))}
+                      disabled={Boolean(widgetSession)}
                       className="flex h-full w-11 items-center justify-center text-slate-500 hover:text-slate-950"
                       aria-label="Уменьшить количество"
                     >
@@ -184,6 +315,7 @@ export function CheckoutAdmissionPageView({ slug }: { slug: string }) {
                     <button
                       type="button"
                       onClick={() => setQuantity((value) => Math.min(10, value + 1))}
+                      disabled={Boolean(widgetSession)}
                       className="flex h-full w-11 items-center justify-center text-slate-500 hover:text-slate-950"
                       aria-label="Увеличить количество"
                     >
@@ -197,6 +329,7 @@ export function CheckoutAdmissionPageView({ slug }: { slug: string }) {
                   <input
                     value={buyerName}
                     onChange={(event) => setBuyerName(event.target.value)}
+                    disabled={Boolean(widgetSession)}
                     autoComplete="name"
                     className="h-11 rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-primary-500"
                     placeholder="Как указать в заказе"
@@ -208,6 +341,7 @@ export function CheckoutAdmissionPageView({ slug }: { slug: string }) {
                   <input
                     value={buyerEmail}
                     onChange={(event) => setBuyerEmail(event.target.value)}
+                    disabled={Boolean(widgetSession)}
                     autoComplete="email"
                     inputMode="email"
                     className="h-11 rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-primary-500"
@@ -220,6 +354,7 @@ export function CheckoutAdmissionPageView({ slug }: { slug: string }) {
                   <input
                     value={buyerPhone}
                     onChange={(event) => setBuyerPhone(event.target.value)}
+                    disabled={Boolean(widgetSession)}
                     autoComplete="tel"
                     inputMode="tel"
                     className="h-11 rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-primary-500"
@@ -234,7 +369,26 @@ export function CheckoutAdmissionPageView({ slug }: { slug: string }) {
                   </div>
                 </div>
 
-                {error ? <ErrorPanel title="Не удалось создать платеж" message={error} compact /> : null}
+                {error ? <ErrorPanel title={widgetSession ? 'Форма оплаты недоступна' : 'Не удалось создать платеж'} message={error} compact /> : null}
+
+                {widgetSession ? (
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+                    <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-800">
+                      <Ticket className="h-4 w-4 shrink-0 text-primary-600" />
+                      <span role="status">{paymentNotice || 'Ваш заказ сохранен'}</span>
+                    </div>
+                    <div id={YOOKASSA_WIDGET_CONTAINER_ID} className="min-h-[430px] overflow-hidden rounded-xl bg-white" />
+                    {error ? (
+                      <button type="button" className="mt-3 text-sm font-semibold text-primary-700" onClick={() => {
+                        setError(null);
+                        setWidgetAttempt((value) => value + 1);
+                      }}>Повторить загрузку оплаты</button>
+                    ) : null}
+                    <Link className="mt-3 block text-sm font-semibold text-primary-700" href={`/checkout/result?order=${encodeURIComponent(widgetSession.publicCode)}`}>
+                      Перейти к заказу № {widgetSession.publicCode}
+                    </Link>
+                  </div>
+                ) : null}
 
                 <button
                   type="button"
@@ -243,12 +397,12 @@ export function CheckoutAdmissionPageView({ slug }: { slug: string }) {
                   className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-55"
                 >
                   {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
-                  Перейти к оплате
+                  {widgetSession ? 'Заказ создан' : 'Перейти к оплате'}
                 </button>
 
                 {!product.canSell ? (
                   <p className="rounded-xl bg-amber-50 p-4 text-sm leading-6 text-amber-900">
-                    Продажа этого входного билета пока закрыта. Проверьте статус в ЛК поставщика или админке.
+                    Продажа этого входного билета пока закрыта.
                   </p>
                 ) : null}
               </div>
@@ -270,7 +424,38 @@ function cleanOptional(value: string): string | null {
 }
 
 function createIdempotencyKey(): string {
-  return `wadm-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+  return `wadm-${crypto.randomUUID()}`;
+}
+
+function loadYooKassaWidgetScript(): Promise<void> {
+  if (typeof window === 'undefined') return Promise.reject(new Error('window_unavailable'));
+  if (window.YooMoneyCheckoutWidget) return Promise.resolve();
+  if (!yookassaWidgetScriptPromise) {
+    yookassaWidgetScriptPromise = new Promise<void>((resolve, reject) => {
+      document.querySelector<HTMLScriptElement>('script[data-yookassa-widget="true"]')?.remove();
+      const script = document.createElement('script');
+      script.src = YOOKASSA_WIDGET_SCRIPT_URL;
+      script.async = true;
+      script.dataset.yookassaWidget = 'true';
+      const fail = () => {
+        window.clearTimeout(timeout);
+        script.remove();
+        reject(new Error('widget_script_failed'));
+      };
+      const timeout = window.setTimeout(fail, 15_000);
+      script.addEventListener('load', () => {
+        window.clearTimeout(timeout);
+        if (window.YooMoneyCheckoutWidget) resolve();
+        else fail();
+      }, { once: true });
+      script.addEventListener('error', fail, { once: true });
+      document.head.appendChild(script);
+    }).catch((error) => {
+      yookassaWidgetScriptPromise = null;
+      throw error;
+    });
+  }
+  return yookassaWidgetScriptPromise;
 }
 
 function formatRub(value: number | null | undefined): string {

@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import type { PublicDestinationDto } from '@daibilet/contracts/public';
 
 import { buildCatalogHref, catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from './catalog-url.ts';
 import {
@@ -11,10 +12,10 @@ import {
   SELECTED_CITY_STORAGE_KEY,
 } from './selected-city.ts';
 
-const destinations = [
+const destinations: PublicDestinationDto[] = [
   { id: '1', name: 'Уфа', slug: 'ufa', type: 'city' as const, events: 10, venues: 2, categories: [] },
   { id: '2', name: 'Москва', slug: 'moscow', type: 'city' as const, events: 100, venues: 20, categories: [] },
-] as const;
+];
 
 test('catalogHrefWithSelectedCity adds header city when URL has none', () => {
   assert.equal(catalogHrefWithSelectedCity('Уфа'), '/events?city=%D0%A3%D1%84%D0%B0');

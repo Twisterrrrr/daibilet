@@ -7,6 +7,7 @@ import type {
   YooKassaCheckoutErrorDto,
   YooKassaCheckoutOrderDto,
   YooKassaCheckoutResultDto,
+  YooKassaConfirmationMode,
   YooKassaReconcileAction,
   YooKassaReconcileOrderDto,
   YooKassaReconcileResultDto,
@@ -57,6 +58,7 @@ export interface YooKassaRuntimeConfig {
   apiUrl: string;
   returnBaseUrl: string;
   verifyWebhook: boolean;
+  confirmationMode: YooKassaConfirmationMode;
 }
 
 export interface YooKassaPaymentObject {
@@ -70,6 +72,7 @@ export interface YooKassaPaymentObject {
   confirmation?: {
     type?: string;
     confirmation_url?: string;
+    confirmation_token?: string;
   };
   metadata?: Record<string, unknown>;
   cancellation_details?: Record<string, unknown>;
@@ -141,6 +144,9 @@ export function readYooKassaRuntimeConfig(env: NodeJS.ProcessEnv = process.env):
     apiUrl: (cleanString(env.YOOKASSA_API_URL) || DEFAULT_YOOKASSA_API_URL).replace(/\/+$/, ''),
     returnBaseUrl: (cleanString(env.YOOKASSA_RETURN_BASE_URL || env.PUBLIC_SITE_URL) || DEFAULT_RETURN_BASE_URL).replace(/\/+$/, ''),
     verifyWebhook: env.DAIBILET_YOOKASSA_VERIFY_WEBHOOK !== '0',
+    confirmationMode: normalizeYooKassaConfirmationMode(
+      env.DAIBILET_YOOKASSA_CONFIRMATION_MODE || env.YOOKASSA_CONFIRMATION_MODE,
+    ),
   };
 }
 
@@ -167,6 +173,7 @@ export async function createYooKassaCheckoutOrder(
   const normalizedPayload: YooKassaCheckoutCreateDto = {
     ...normalizeStubCheckoutPayload(payload),
     returnUrl: cleanString(payload.returnUrl),
+    confirmationMode: normalizeYooKassaConfirmationMode(payload.confirmationMode || config.confirmationMode),
   };
   if (isAdmissionCheckoutPayload(normalizedPayload)) {
     return createYooKassaAdmissionCheckoutOrder(normalizedPayload, {
@@ -255,6 +262,7 @@ export async function createYooKassaCheckoutOrder(
                 phone: normalizedPayload.buyer.phone,
               },
               subjectType,
+              confirmationMode: normalizedPayload.confirmationMode || 'redirect',
               requestedReturnUrl: cleanString(normalizedPayload.returnUrl),
               returnUrl,
             } satisfies Prisma.InputJsonObject,
@@ -287,6 +295,7 @@ export async function createYooKassaCheckoutOrder(
               admissionOfferId: null,
               offerId: offer.id,
               sessionId: session?.id || null,
+              confirmationMode: normalizedPayload.confirmationMode || 'redirect',
               returnUrl,
             },
           },
@@ -302,6 +311,7 @@ export async function createYooKassaCheckoutOrder(
             idempotenceKey: idempotencyKey,
             rawPayload: {
               mode: 'YOOKASSA',
+              confirmationMode: normalizedPayload.confirmationMode || 'redirect',
               requestedReturnUrl: cleanString(normalizedPayload.returnUrl),
               returnUrl,
             } satisfies Prisma.InputJsonObject,
@@ -322,6 +332,7 @@ export async function createYooKassaCheckoutOrder(
               mode: 'YOOKASSA',
               publicCode,
               subjectType,
+              confirmationMode: normalizedPayload.confirmationMode || 'redirect',
               returnUrl,
             },
           },
@@ -331,7 +342,7 @@ export async function createYooKassaCheckoutOrder(
       });
       await markYooKassaIdempotencyLocalRows(idempotencyKey, created.order.id, created.payment.id, payloadHash);
     }
-    if (created.payment.providerPaymentId && created.payment.confirmationUrl) {
+    if (created.payment.providerPaymentId && hasYooKassaPaymentConfirmation(created.payment)) {
       const result = mapYooKassaCheckoutResult({
         created,
         event,
@@ -360,6 +371,7 @@ export async function createYooKassaCheckoutOrder(
         session,
         totals,
         returnUrl,
+        confirmationMode: normalizedPayload.confirmationMode || 'redirect',
       }),
     });
     const persisted = await persistCreatedYooKassaPayment({
@@ -372,6 +384,7 @@ export async function createYooKassaCheckoutOrder(
       subjectType,
       totals,
       returnUrl,
+      confirmationMode: normalizedPayload.confirmationMode || 'redirect',
     });
     const result = mapYooKassaCheckoutResult({
       created: persisted,
@@ -470,6 +483,7 @@ async function createYooKassaAdmissionCheckoutOrder(
                 phone: normalizedPayload.buyer.phone,
               },
               subjectType: 'VENUE_ADMISSION',
+              confirmationMode: normalizedPayload.confirmationMode || 'redirect',
               requestedReturnUrl: cleanString(normalizedPayload.returnUrl),
               returnUrl,
             } satisfies Prisma.InputJsonObject,
@@ -499,6 +513,7 @@ async function createYooKassaAdmissionCheckoutOrder(
               admissionProductId: product.id,
               admissionProductSlug: product.slug,
               admissionOfferId: offer.id,
+              confirmationMode: normalizedPayload.confirmationMode || 'redirect',
               returnUrl,
             },
           },
@@ -514,6 +529,7 @@ async function createYooKassaAdmissionCheckoutOrder(
             idempotenceKey: idempotencyKey,
             rawPayload: {
               mode: 'YOOKASSA',
+              confirmationMode: normalizedPayload.confirmationMode || 'redirect',
               requestedReturnUrl: cleanString(normalizedPayload.returnUrl),
               returnUrl,
             } satisfies Prisma.InputJsonObject,
@@ -535,6 +551,7 @@ async function createYooKassaAdmissionCheckoutOrder(
               publicCode,
               subjectType: 'VENUE_ADMISSION',
               admissionProductId: product.id,
+              confirmationMode: normalizedPayload.confirmationMode || 'redirect',
               returnUrl,
             },
           },
@@ -544,7 +561,7 @@ async function createYooKassaAdmissionCheckoutOrder(
       });
       await markYooKassaIdempotencyLocalRows(idempotencyKey, created.order.id, created.payment.id, payloadHash);
     }
-    if (created.payment.providerPaymentId && created.payment.confirmationUrl) {
+    if (created.payment.providerPaymentId && hasYooKassaPaymentConfirmation(created.payment)) {
       const result = mapYooKassaAdmissionCheckoutResult({
         created,
         product,
@@ -570,6 +587,7 @@ async function createYooKassaAdmissionCheckoutOrder(
         offer,
         totals,
         returnUrl,
+        confirmationMode: normalizedPayload.confirmationMode || 'redirect',
       }),
     });
     const persisted = await persistCreatedYooKassaAdmissionPayment({
@@ -578,6 +596,7 @@ async function createYooKassaAdmissionCheckoutOrder(
       supplier,
       totals,
       returnUrl,
+      confirmationMode: normalizedPayload.confirmationMode || 'redirect',
     });
     const result = mapYooKassaAdmissionCheckoutResult({
       created: persisted,
@@ -655,17 +674,16 @@ export function buildYooKassaPaymentCreatePayload(input: {
   session: Pick<StubCheckoutSessionRow, 'id' | 'startsAt'> | null;
   totals: StubCheckoutTotalsDto;
   returnUrl: string;
+  confirmationMode?: YooKassaConfirmationMode | null;
 }): Record<string, unknown> {
+  const confirmationMode = normalizeYooKassaConfirmationMode(input.confirmationMode);
   return {
     amount: {
       value: formatKopecksForYooKassa(input.totals.totalKopecks),
       currency: 'RUB',
     },
     capture: true,
-    confirmation: {
-      type: 'redirect',
-      return_url: input.returnUrl,
-    },
+    confirmation: buildYooKassaPaymentConfirmationPayload(confirmationMode, input.returnUrl),
     description: trimForYooKassaDescription(`Daibilet order ${input.order.publicCode}`),
     metadata: {
       source: 'daibilet',
@@ -686,17 +704,16 @@ export function buildYooKassaAdmissionPaymentCreatePayload(input: {
   offer: Pick<StubCheckoutAdmissionOfferRow, 'id' | 'title'>;
   totals: StubCheckoutTotalsDto;
   returnUrl: string;
+  confirmationMode?: YooKassaConfirmationMode | null;
 }): Record<string, unknown> {
+  const confirmationMode = normalizeYooKassaConfirmationMode(input.confirmationMode);
   return {
     amount: {
       value: formatKopecksForYooKassa(input.totals.totalKopecks),
       currency: 'RUB',
     },
     capture: true,
-    confirmation: {
-      type: 'redirect',
-      return_url: input.returnUrl,
-    },
+    confirmation: buildYooKassaPaymentConfirmationPayload(confirmationMode, input.returnUrl),
     description: trimForYooKassaDescription(`Daibilet admission ${input.order.publicCode}`),
     metadata: {
       source: 'daibilet',
@@ -710,6 +727,19 @@ export function buildYooKassaAdmissionPaymentCreatePayload(input: {
       cityId: input.product.cityId,
     },
     merchant_customer_id: input.order.buyerEmail || input.order.buyerPhone || undefined,
+  };
+}
+
+function buildYooKassaPaymentConfirmationPayload(
+  confirmationMode: YooKassaConfirmationMode,
+  returnUrl: string,
+): Record<string, unknown> {
+  if (confirmationMode === 'embedded') {
+    return { type: 'embedded' };
+  }
+  return {
+    type: 'redirect',
+    return_url: returnUrl,
   };
 }
 
@@ -1203,6 +1233,7 @@ async function persistCreatedYooKassaPayment(input: {
   subjectType: CheckoutSubjectType;
   totals: StubCheckoutTotalsDto;
   returnUrl: string;
+  confirmationMode: YooKassaConfirmationMode;
 }): Promise<CreatedYooKassaCheckoutRows> {
   const providerStatus = mapYooKassaPaymentStatus(input.paymentObject.status);
   const confirmationUrl = input.paymentObject.confirmation?.confirmation_url || null;
@@ -1212,7 +1243,7 @@ async function persistCreatedYooKassaPayment(input: {
       status: providerStatus,
       providerPaymentId: input.paymentObject.id,
       confirmationUrl,
-      rawPayload: buildYooKassaPaymentRawPayload(input.paymentObject, input.returnUrl),
+      rawPayload: buildYooKassaPaymentRawPayload(input.paymentObject, input.returnUrl, input.confirmationMode),
       ...(providerStatus === 'SUCCEEDED'
         ? { paidAt: new Date(), capturedAt: new Date() }
         : {}),
@@ -1264,6 +1295,7 @@ async function persistCreatedYooKassaAdmissionPayment(input: {
   supplier: StubCheckoutSupplierRow;
   totals: StubCheckoutTotalsDto;
   returnUrl: string;
+  confirmationMode: YooKassaConfirmationMode;
 }): Promise<CreatedYooKassaCheckoutRows> {
   const providerStatus = mapYooKassaPaymentStatus(input.paymentObject.status);
   const confirmationUrl = input.paymentObject.confirmation?.confirmation_url || null;
@@ -1273,7 +1305,7 @@ async function persistCreatedYooKassaAdmissionPayment(input: {
       status: providerStatus,
       providerPaymentId: input.paymentObject.id,
       confirmationUrl,
-      rawPayload: buildYooKassaPaymentRawPayload(input.paymentObject, input.returnUrl),
+      rawPayload: buildYooKassaPaymentRawPayload(input.paymentObject, input.returnUrl, input.confirmationMode),
       ...(providerStatus === 'SUCCEEDED'
         ? { paidAt: new Date(), capturedAt: new Date() }
         : {}),
@@ -1709,6 +1741,7 @@ function mapYooKassaCheckoutResult(input: {
 }): YooKassaCheckoutResultDto {
   const publicCode = input.created.order.publicCode || input.created.order.id.slice(-7);
   const ticketNumbers = ticketNumbersFromFulfillment(input.created.fulfillment);
+  const paymentConfirmation = extractYooKassaPaymentConfirmation(input.created.payment);
   return {
     generatedAt: new Date().toISOString(),
     mode: 'YOOKASSA',
@@ -1764,7 +1797,9 @@ function mapYooKassaCheckoutResult(input: {
         status: input.created.payment.status,
         amountKopecks: input.created.payment.amountKopecks,
         providerPaymentId: input.created.payment.providerPaymentId,
-        confirmationUrl: input.created.payment.confirmationUrl,
+        confirmationUrl: paymentConfirmation.confirmationUrl,
+        confirmationToken: paymentConfirmation.confirmationToken,
+        confirmationMode: paymentConfirmation.confirmationMode,
         paidAt: toIso(input.created.payment.paidAt),
       },
       fulfillment: {
@@ -1789,6 +1824,7 @@ function mapYooKassaAdmissionCheckoutResult(input: {
   const publicCode = input.created.order.publicCode || input.created.order.id.slice(-7);
   const city = input.product.city || input.product.venue.city || null;
   const ticketNumbers = ticketNumbersFromFulfillment(input.created.fulfillment);
+  const paymentConfirmation = extractYooKassaPaymentConfirmation(input.created.payment);
   return {
     generatedAt: new Date().toISOString(),
     mode: 'YOOKASSA',
@@ -1844,7 +1880,9 @@ function mapYooKassaAdmissionCheckoutResult(input: {
         status: input.created.payment.status,
         amountKopecks: input.created.payment.amountKopecks,
         providerPaymentId: input.created.payment.providerPaymentId,
-        confirmationUrl: input.created.payment.confirmationUrl,
+        confirmationUrl: paymentConfirmation.confirmationUrl,
+        confirmationToken: paymentConfirmation.confirmationToken,
+        confirmationMode: paymentConfirmation.confirmationMode,
         paidAt: toIso(input.created.payment.paidAt),
       },
       fulfillment: {
@@ -1930,13 +1968,44 @@ export function buildYooKassaCatalogResultReturnUrl(
 function buildYooKassaPaymentRawPayload(
   paymentObject: YooKassaPaymentObject,
   returnUrl: string,
+  confirmationMode: YooKassaConfirmationMode,
 ): Prisma.InputJsonValue {
   return {
     ...(paymentObject as unknown as Record<string, unknown>),
     daibilet: {
+      confirmationMode,
       returnUrl,
     },
   } satisfies Prisma.InputJsonObject;
+}
+
+function hasYooKassaPaymentConfirmation(
+  payment: Pick<CreatedYooKassaCheckoutRows['payment'], 'confirmationUrl' | 'rawPayload'>,
+): boolean {
+  const confirmation = extractYooKassaPaymentConfirmation(payment);
+  return Boolean(confirmation.confirmationUrl || confirmation.confirmationToken);
+}
+
+function extractYooKassaPaymentConfirmation(
+  payment: Pick<CreatedYooKassaCheckoutRows['payment'], 'confirmationUrl' | 'rawPayload'>,
+): {
+  confirmationMode: YooKassaConfirmationMode;
+  confirmationUrl: string | null;
+  confirmationToken: string | null;
+} {
+  const rawPayload = asRecord(payment.rawPayload);
+  const confirmation = asRecord(rawPayload.confirmation);
+  const daibilet = asRecord(rawPayload.daibilet);
+  const confirmationToken = cleanString(confirmation.confirmation_token);
+  const confirmationUrl = payment.confirmationUrl || cleanString(confirmation.confirmation_url);
+  const confirmationMode = normalizeYooKassaConfirmationMode(
+    daibilet.confirmationMode || confirmation.type || (confirmationToken ? 'embedded' : 'redirect'),
+  );
+  return { confirmationMode, confirmationUrl, confirmationToken };
+}
+
+function normalizeYooKassaConfirmationMode(value: unknown): YooKassaConfirmationMode {
+  return cleanString(value)?.toLowerCase() === 'embedded' ? 'embedded' : 'redirect';
 }
 
 function buildInternalTicketNumbers(input: {
@@ -1994,6 +2063,8 @@ function hashYooKassaCheckoutPayload(payload: YooKassaCheckoutCreateDto): string
     attendeeName: cleanString(payload.attendee?.name),
     attendeePhone: cleanString(payload.attendee?.phone),
     returnUrl: cleanString(payload.returnUrl),
+    // Keep hashes compatible with redirect checkouts created before widget support.
+    ...(payload.confirmationMode === 'embedded' ? { confirmationMode: 'embedded' } : {}),
   };
   return createHash('sha256').update(JSON.stringify(stablePayload)).digest('hex');
 }
@@ -2307,6 +2378,7 @@ const yookassaItemResultSelect = {
 const yookassaPaymentResultSelect = {
   ...paymentResultSelect,
   confirmationUrl: true,
+  rawPayload: true,
 } satisfies Prisma.PaymentSelect;
 
 const yookassaFulfillmentResultSelect = {

@@ -27,6 +27,7 @@ test('YooKassa checkout requires explicit feature flag and credentials', () => {
     YOOKASSA_SECRET_KEY: 'test_secret',
   } as NodeJS.ProcessEnv);
   assert.equal(disabled.enabled, false);
+  assert.equal(disabled.confirmationMode, 'redirect');
   assert.equal(isYooKassaCheckoutReady(disabled), false);
 
   const enabled = readYooKassaRuntimeConfig({
@@ -38,7 +39,17 @@ test('YooKassa checkout requires explicit feature flag and credentials', () => {
   } as NodeJS.ProcessEnv);
   assert.equal(enabled.enabled, true);
   assert.equal(enabled.returnBaseUrl, 'https://daibilet.ru');
+  assert.equal(enabled.confirmationMode, 'redirect');
   assert.equal(isYooKassaCheckoutReady(enabled), true);
+
+  const embedded = readYooKassaRuntimeConfig({
+    NODE_ENV: 'production',
+    DAIBILET_YOOKASSA_CHECKOUT: '1',
+    YOOKASSA_SHOP_ID: 'shop_123',
+    YOOKASSA_SECRET_KEY: 'test_secret',
+    DAIBILET_YOOKASSA_CONFIRMATION_MODE: 'embedded',
+  } as NodeJS.ProcessEnv);
+  assert.equal(embedded.confirmationMode, 'embedded');
 });
 
 test('formats kopecks for YooKassa amount.value', () => {
@@ -148,6 +159,10 @@ test('builds admission redirect payment payload with venue admission metadata', 
   });
 
   assert.deepEqual(payload.amount, { value: '700.00', currency: 'RUB' });
+  assert.deepEqual(payload.confirmation, {
+    type: 'redirect',
+    return_url: 'https://daibilet.ru/checkout/result?order=7654321',
+  });
   assert.deepEqual(payload.metadata, {
     source: 'daibilet',
     subjectType: 'VENUE_ADMISSION',
@@ -159,6 +174,41 @@ test('builds admission redirect payment payload with venue admission metadata', 
     venueId: 'venue_1',
     cityId: 'city_1',
   });
+});
+
+test('builds admission embedded payment payload without provider return_url', () => {
+  const payload = buildYooKassaAdmissionPaymentCreatePayload({
+    order: {
+      id: 'order_1',
+      publicCode: '7654321',
+      buyerEmail: 'buyer@daibilet.ru',
+      buyerPhone: '+79990000000',
+    },
+    product: {
+      id: 'adp_1',
+      slug: 'museum-entry',
+      title: 'Museum entry',
+      venueId: 'venue_1',
+      cityId: 'city_1',
+    },
+    offer: {
+      id: 'ado_1',
+      title: 'Adult',
+    },
+    totals: {
+      currency: 'RUB',
+      unitPriceKopecks: 70000,
+      subtotalKopecks: 70000,
+      discountKopecks: 0,
+      totalKopecks: 70000,
+      commissionKopecks: 7000,
+      netKopecks: 63000,
+    },
+    returnUrl: 'https://daibilet.ru/checkout/result?order=7654321',
+    confirmationMode: 'embedded',
+  });
+
+  assert.deepEqual(payload.confirmation, { type: 'embedded' });
 });
 
 test('builds catalog result return_url with assigned publicCode', () => {
@@ -597,6 +647,164 @@ test('YooKassa admission checkout creates pending payment and preserves idempote
     await prisma.checkoutItem.deleteMany({ where: { admissionProductId: productId } });
     await prisma.checkoutOrder.deleteMany({
       where: { items: { none: {} }, buyerEmail: 'buyer@daibilet.ru' },
+    });
+    await prisma.idempotencyKey.deleteMany({ where: { key: idempotencyKey } });
+    await prisma.admissionOffer.deleteMany({ where: { admissionProductId: productId } });
+    await prisma.admissionProduct.deleteMany({ where: { id: productId } });
+    await prisma.supplier.deleteMany({ where: { id: supplierId } });
+    await prisma.venue.deleteMany({ where: { id: venueId } });
+    await prisma.city.deleteMany({ where: { id: cityId } });
+  }
+});
+
+test('YooKassa admission checkout returns embedded confirmation token', async (t) => {
+  if (!await canReachDatabase()) {
+    t.skip('database is not available');
+    return;
+  }
+
+  const suffix = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  const cityId = `city_yk_embedded_${suffix}`;
+  const venueId = `venue_yk_embedded_${suffix}`;
+  const supplierId = `sup_yk_embedded_${suffix}`;
+  const productId = `adp_yk_embedded_${suffix}`;
+  const offerId = `ado_yk_embedded_${suffix}`;
+  const idempotencyKey = `yk-embedded-${suffix}`;
+
+  try {
+    await prisma.city.create({
+      data: {
+        id: cityId,
+        slug: `yookassa-embedded-city-${suffix}`,
+        title: 'YooKassa embedded city',
+      },
+    });
+    await prisma.venue.create({
+      data: {
+        id: venueId,
+        slug: `yookassa-embedded-venue-${suffix}`,
+        title: 'YooKassa embedded venue',
+        cityId,
+        kind: 'MUSEUM_ART_SPACE',
+      },
+    });
+    await prisma.supplier.create({
+      data: {
+        id: supplierId,
+        slug: `yookassa-embedded-supplier-${suffix}`,
+        title: 'YooKassa embedded supplier',
+        status: 'ACTIVE',
+        integrationMode: 'INTERNAL_SALES',
+        defaultCatalogMode: 'INTERNAL_CHECKOUT',
+        defaultCommissionBps: 1000,
+      },
+    });
+    await prisma.admissionProduct.create({
+      data: {
+        id: productId,
+        slug: `yookassa-embedded-product-${suffix}`,
+        title: 'YooKassa embedded product',
+        type: 'MUSEUM_ENTRY',
+        status: 'PUBLISHED',
+        purchaseFlow: 'PLATFORM',
+        managementMode: 'DAIBILET_MANAGED',
+        sourceCode: 'MANUAL',
+        priceFromRub: 700,
+        ticketsVacant: 5,
+        validityMode: 'OPEN_DATE',
+        venueId,
+        cityId,
+        supplierId,
+      },
+    });
+    await prisma.admissionOffer.create({
+      data: {
+        id: offerId,
+        admissionProductId: productId,
+        sourceCode: 'MANUAL',
+        title: 'Adult',
+        priceRub: 700,
+        active: true,
+      },
+    });
+
+    let createPaymentRequestBody: Record<string, unknown> | null = null;
+    const fakeFetch = async (_input: string, init?: RequestInit) => {
+      createPaymentRequestBody = init?.body ? JSON.parse(String(init.body)) as Record<string, unknown> : null;
+      return new Response(JSON.stringify({
+        id: `pay_${suffix}`,
+        status: 'pending',
+        amount: { value: '700.00', currency: 'RUB' },
+        confirmation: {
+          type: 'embedded',
+          confirmation_token: `ct_${suffix}`,
+        },
+      }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      });
+    };
+
+    const result = await createYooKassaCheckoutOrder({
+      subjectType: 'VENUE_ADMISSION',
+      admissionProductId: productId,
+      admissionOfferId: offerId,
+      quantity: 1,
+      buyer: {
+        email: 'embedded-buyer@daibilet.ru',
+        name: 'Buyer',
+        phone: '+79990000000',
+      },
+      returnUrl: 'https://daibilet.ru/checkout/result',
+      confirmationMode: 'embedded',
+      idempotencyKey,
+    }, {
+      config: readYooKassaRuntimeConfig({
+        NODE_ENV: 'test',
+        DAIBILET_YOOKASSA_CHECKOUT: '1',
+        YOOKASSA_SHOP_ID: 'shop_123',
+        YOOKASSA_SECRET_KEY: 'test_secret',
+        PUBLIC_SITE_URL: 'https://daibilet.ru',
+      } as NodeJS.ProcessEnv),
+      fetchImpl: fakeFetch,
+      now,
+    });
+
+    assert.ok(createPaymentRequestBody);
+    assert.deepEqual((createPaymentRequestBody as Record<string, unknown>).confirmation, { type: 'embedded' });
+    assert.equal(result.order.payment.confirmationMode, 'embedded');
+    assert.equal(result.order.payment.confirmationToken, `ct_${suffix}`);
+    assert.equal(result.order.payment.confirmationUrl, null);
+
+    const expectedReturnUrl = `https://daibilet.ru/checkout/result?order=${result.order.publicCode}`;
+    const createdOrder = await prisma.checkoutOrder.findUnique({
+      where: { id: result.order.id },
+      select: { buyerSnapshot: true },
+    });
+    const buyerSnapshot = createdOrder?.buyerSnapshot as Record<string, unknown> | null;
+    assert.equal(buyerSnapshot?.returnUrl, expectedReturnUrl);
+    assert.equal(buyerSnapshot?.confirmationMode, 'embedded');
+
+    const createdPayment = await prisma.payment.findUnique({
+      where: { id: result.order.payment.id },
+      select: { rawPayload: true },
+    });
+    const rawPayload = createdPayment?.rawPayload as Record<string, unknown> | null;
+    const rawConfirmation = rawPayload?.confirmation as Record<string, unknown> | undefined;
+    const daibiletPayload = rawPayload?.daibilet as Record<string, unknown> | undefined;
+    assert.equal(rawConfirmation?.confirmation_token, `ct_${suffix}`);
+    assert.equal(daibiletPayload?.returnUrl, expectedReturnUrl);
+    assert.equal(daibiletPayload?.confirmationMode, 'embedded');
+  } finally {
+    await prisma.fulfillmentItem.deleteMany({
+      where: { order: { items: { some: { admissionProductId: productId } } } },
+    });
+    await prisma.payment.deleteMany({
+      where: { order: { items: { some: { admissionProductId: productId } } } },
+    });
+    await prisma.checkoutItem.deleteMany({ where: { admissionProductId: productId } });
+    await prisma.checkoutOrder.deleteMany({
+      where: { items: { none: {} }, buyerEmail: 'embedded-buyer@daibilet.ru' },
     });
     await prisma.idempotencyKey.deleteMany({ where: { key: idempotencyKey } });
     await prisma.admissionOffer.deleteMany({ where: { admissionProductId: productId } });

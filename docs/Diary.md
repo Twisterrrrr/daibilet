@@ -1,3 +1,32 @@
+## 2026-09-06 - YooKassa Widget Checkout for admission tickets
+
+### Наблюдения
+
+- Redirect checkout leaves the buyer on YooKassa until the result screen is closed manually or automatically.
+- The YooKassa `success`/`fail` widget events can also arrive after its result screen closes, so they are not sufficient for an immediate return.
+- The finance branch CI checked backend and supplier code, but did not build the Next admission checkout changed in this branch.
+
+### Решения
+
+- Admission checkout can request `confirmation.type=embedded`; finance returns and persists `confirmation_token` while redirect remains the default for existing callers.
+- The Next page mounts the official YooKassa widget without widget `return_url` and watches the public order projection every two seconds. A terminal backend status opens `/checkout/result?order={publicCode}` immediately after webhook/reconcile updates the order.
+- Poll requests are sequential, abort after eight seconds, and stop after 30 minutes. Loading errors preserve the order code and allow the widget script to be retried without creating another order.
+- The browser reuses the same payload-bound idempotency key after an ambiguous create-payment response.
+- Finance CI now typechecks, tests and builds the checkout web path on `codex/*` branches without duplicating the same build on the catalog branch.
+
+### Проверки
+
+- Contracts, backend, web and supplier typecheck - OK.
+- Backend DB suite - 142 tests passed.
+- Checkout status watcher - 4 tests passed.
+- Supplier and clean Next production builds - OK.
+
+### Дальше
+
+- Deploy the branch to finance `.159` and the compatible checkout page to catalog, then run one YooKassa sandbox card payment and verify the transition to the issued ticket.
+
+---
+
 ## 2026-09-04 - CI: finance period close vs open refund
 
 ### Наблюдения

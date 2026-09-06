@@ -35,6 +35,7 @@ const supplierAdmissionYooKassaPurchaseSchema = z.object({
   }).optional().nullable(),
   idempotencyKey: nullableString,
   returnUrl: nullableString,
+  confirmationMode: z.enum(['redirect', 'embedded']).nullable().optional(),
 });
 
 const supplierAdmissionYooKassaProductSelect = {
@@ -94,6 +95,7 @@ function normalizeSupplierAdmissionYooKassaPurchasePayload(
     ...(payload.admissionOfferId != null ? { admissionOfferId: payload.admissionOfferId } : {}),
     ...(payload.idempotencyKey != null ? { idempotencyKey: payload.idempotencyKey } : {}),
     ...(payload.returnUrl != null ? { returnUrl: payload.returnUrl } : {}),
+    ...(payload.confirmationMode != null ? { confirmationMode: payload.confirmationMode } : {}),
     ...(payload.buyer
       ? {
           buyer: {
@@ -145,6 +147,7 @@ export async function createSupplierAdmissionYooKassaPurchase(
     attendee: null,
     idempotencyKey,
     ...(payload.returnUrl != null ? { returnUrl: payload.returnUrl } : {}),
+    ...(payload.confirmationMode != null ? { confirmationMode: payload.confirmationMode } : {}),
   }, checkoutOptions);
 }
 
