@@ -61,6 +61,7 @@
 | P.3e10 | **Admission buyer checkout page** - `/checkout/admissions/:slug` reads finance admission projection, creates embedded YooKassa payment and opens result by `publicCode` | High | 🔄 code done; waits `.159` deploy + sandbox widget smoke; pilot-only |
 | P.3e11 | **Admin finance order detail foundation** - typed internal order detail with payments, fulfillment ticketNumbers, supplier ledger, refunds, fiscal receipts and operation blockers | High | 🔄 code done; backend/admin typecheck + projection test green |
 | P.3e12 | **Admin refund foundation** - create `RefundRequest` from order detail with hard payment/fulfillment/ledger blockers | High | 🔄 code done; projection test + admin build green |
+| P.3e13 | **Public order access proof** - keep 7-digit `publicCode` for UX, require high-entropy access token/authenticated buyer before exposing PII and ticket numbers | Критический | ⏳ blocks first real internal payment; contract change requires catalog coordination |
 | P.3f | **YooKassa: venue admission** | Высокий | 🔄 FIN.RETURN-1 + embedded confirmation code done on `codex/stage0-admission-ticket-core`; ждёт deploy/sandbox smoke `.159` |
 | P.3f1 | **Supplier onboarding write-flow** — юрпрофиль + основной счет из ЛК, статус реквизитов на проверку | Высокий | ✅ backend PATCH + supplier UI forms |
 | P.3f2 | **YooKassa webhook hardening** — provider event id, replay dedupe, payment id mismatch guard | Высокий | ✅ backend + DB tests |
@@ -72,6 +73,7 @@
 | P.3h | **YooKassa reconcile ops** — service/timer на `.159`, runbook и ручной dry-run/apply | Высокий | ✅ live `.159` installed/enabled; scheduled tick green 2026-08-09 |
 | P.3i | **Finance E2E foundation roadmap** - admin finance contour, supplier LC money views, refunds, reports, settlements, closing docs and supplier reviews | High | 🔄 refund foundation + admin ledger/reconcile + supplier finance/docs read views |
 | P.3j | **Reports/settlements/documents write flow** - draft `SupplierReport`, close `SupplierSettlement`, issue `SupplierDocument` from reconciled ledger | High | 🔄 code done; close-period mutation + admin UI + backend test green |
+| P.3k | **Finance + Supplier LC launch QA** - section/function matrix, security, cross-host, smoke and launch gates | Критический | ✅ 2026-09-07 `docs/finance-supplier-launch-qa.md`; live `.159` is 2 commits behind |
 | P.4 | **Реклама / paid acquisition** — до готовности витрины | — | ⚠️ deferred |
 | P.5 | **Allowlist городов** — адмцентры с saleable → standalone; остальные → cityToRegion (не «дыра») | Высокий | ✅ 2026-07-19 geo policy |
 

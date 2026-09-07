@@ -1639,7 +1639,7 @@ function TeamPage({ supplierKey }: { supplierKey: string }) {
     <div className="page-stack">
       <PageTitle
         title="Команда"
-        description="Пользователи поставщика и роли доступа. Приглашения появятся после включения сценария изменений."
+        description="Пользователи поставщика и роли доступа. Новый доступ выдает администратор по одноразовой ссылке."
         action={<RefreshButton onClick={reload} />}
       />
       <SettingsNav />
@@ -1656,7 +1656,7 @@ function TeamPage({ supplierKey }: { supplierKey: string }) {
             ])}
           />
         ) : (
-          <EmptyInline text="Команда еще не заведена. На старте доступ можно выдать вручную через администратора." />
+          <EmptyInline text="Команда еще не заведена. Обратитесь к администратору, чтобы выдать доступ." />
         )}
       </section>
     </div>

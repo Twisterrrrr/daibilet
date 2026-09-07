@@ -3482,3 +3482,27 @@
 - Catalog `feat/next-monorepo` still requests redirect mode. Cursor must port the three-field protocol and widget behavior described in the handoff.
 - Current catalog `CheckoutResultPage` performs one order lookup; the handoff now requires pending-state polling to eliminate the return-vs-webhook race in embedded and redirect modes.
 - After catalog deploy, complete one browser sandbox payment and verify inline widget -> webhook/reconcile -> `CONFIRMED` + `ticketNumbers` -> `/checkout/result?order={publicCode}`.
+
+## 2026-09-07 - Finance and supplier portal launch QA
+
+### Audit
+
+- Added `docs/finance-supplier-launch-qa.md`: full matrix for authentication, onboarding, admissions, events, orders, payments, ledger, documents, reviews, integrations, cross-host operations, security and UX.
+- Separated closed supplier pilot readiness from first real-payment readiness. The contour is backed by Prisma/API data, but several screens remain read-only and event CREATE cannot yet be applied by admin.
+- Found a critical real-payment gap: anonymous order lookup by seven-digit `publicCode` returns buyer contacts, ticket numbers, totals and payment details. Keep the short code for display, but add a separate high-entropy access proof before real customer data.
+- Corrected stale Team-page copy: invitations are already issued by an administrator through a one-time link.
+
+### Live verification
+
+- New workstation key successfully opens `deploy@85.193.80.159`.
+- Finance API, Nginx and reconcile timer are active. API listens on the intended port `4100`; anonymous supplier dashboard returns 401.
+- From `.159`, supplier/pay/finance-api TLS endpoints respond in about 80-100 ms. Admission projection responds in about 106 ms through the local API.
+- Server is on `f931c50`; origin is `55be2407`. Pilot hardening, invite code and invite migration are not deployed yet.
+- A manual Prisma status check initially used the fallback local URL because `pnpm --filter` changed cwd and root `.env` was not loaded. Repeat with `DOTENV_CONFIG_PATH` before applying migrations.
+
+### Next gate
+
+1. Verify migration status with the root finance env, then fast-forward `.159` to `55be2407` and apply migrations.
+2. Browser-smoke invite, login, refresh, logout and the role matrix.
+3. Agree the `.184` admin -> `.159` finance-admin bridge.
+4. Harden public order access before the first real internal payment.
