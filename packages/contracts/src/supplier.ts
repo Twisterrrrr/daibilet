@@ -219,6 +219,8 @@ export interface SupplierPortalOrderRowDto {
   sessionId: string | null;
   startsAt: string | null;
   ticketTitle: string | null;
+  ticketNumbers: string[];
+  fulfillmentStatus: string | null;
   quantity: number;
   unitPriceKopecks: number;
   totalKopecks: number;

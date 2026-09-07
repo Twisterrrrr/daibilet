@@ -53,7 +53,8 @@
 | P.3e4 | **Supplier LC UX/UI brief** — Figma handoff for B2B/fintech cabinet, then `apps/supplier` implementation | Высокий | ✅ UX brief |
 | P.3e5 | **Supplier LC shell v1** — legacy-v2 inspired light shell: grouped nav, readiness, admissions/events/orders, finance/docs/settings | Высокий | ✅ `apps/supplier` UI shell |
 | P.3e5a | **Supplier LC Replit UX pass** — dark operational shell, Lucide navigation, compact account control, four-KPI dashboard and real-data smoke | Высокий | ✅ deployed `.159` @ `b60fcc8`; live browser smoke 2026-09-07 |
-| P.3e5b | **Supplier LC role UX + pagination** — selected-organization role, hidden unauthorized writes, 20-row server paging | Высокий | 🔄 code/tests/build + real-data local smoke green; deploy pending |
+| P.3e5b | **Supplier LC role UX + pagination** — selected-organization role, hidden unauthorized writes, 20-row server paging | Высокий | ✅ code/tests/build + real-data browser smoke green; pushed `cf27f9a0`, deploy pending |
+| P.3e5c | **Supplier order workspace** — compact order drawer, buyer/payment summary and issued ticket numbers without technical ids | Высокий | 🔄 code/typecheck/build/projection tests + live-data browser smoke green; deploy pending |
 | P.3e6 | **Supplier LC auth bridge** — `SiteUser` + active `SupplierUser`, login/me/logout, dev-only supplier query fallback | Высокий | ✅ auth API + supplier login UI |
 | P.3e6a | **Supplier LC pilot hardening** — refresh-cookie session recovery, single-flight retry, role-based writes, no engineering purchase actions in production UI | Критический | ✅ deployed + browser auth/refresh/logout smoke `.159` 2026-09-07 |
 | P.3e6b | **Supplier one-time invite** — admin creates role-scoped access, supplier sets initial password, token hash/expiry/single-use | Критический | ✅ migration deployed `.159`; admin-issued invite flow ready |

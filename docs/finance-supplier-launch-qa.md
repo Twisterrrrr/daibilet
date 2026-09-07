@@ -64,7 +64,7 @@ First real internal payment readiness: **red until order lookup security, paid s
 | Admission request | `EventChangeRequest` with `ADMISSION_PRODUCT` payload | Supplier creates a museum/gallery/open-date product proposal | REAL narrow path | G1: edit-existing UX, multiple offers, richer validity/image/description fields |
 | Admission moderation | admin request API and applier | Approve/reject/apply CREATE and UPDATE, replace offers | REAL | G1: smoke from supplier form through admin apply to public projection |
 | Requests | `EventChangeRequest` | Supplier sees status, admin comment and timestamps | REAL read + create | G1: detail/diff; G3: withdraw, duplicate, correct-and-resubmit |
-| Orders | `CheckoutOrder` / `CheckoutItem` through PurchaseProjection | Supplier sees only its items, buyer, status, amount and expected payout | REAL | G1: 20-row pagination implemented; order detail and multi-supplier isolation/PII verification remain |
+| Orders | `CheckoutOrder` / `CheckoutItem` through PurchaseProjection | Supplier sees only its items, buyer, status, amount, expected payout and issued ticket numbers | REAL | G1: 20-row pagination and compact order drawer implemented; multi-supplier isolation/PII verification remains |
 | Ticket fulfillment | `FulfillmentItem` | Ticket numbers/status can reach order projections | PARTIAL | G2: paid E2E must show issued ticket consistently; define resend/support operation |
 | Ledger | `SupplierLedgerEntry` | Supplier reads sales, commission, refunds and balance | REAL read model | G2: reconcile totals against a paid order; immutable accounting invariants |
 | Refunds | `RefundRequest` | Admin can create a guarded request; supplier sees status | PARTIAL | G2/G3: actual YooKassa refund execution, fulfillment cancellation and ledger reversal are not closed |
@@ -275,7 +275,7 @@ Recommended fix for `ORD-07`: keep the human-friendly seven-digit `publicCode` a
 
 - Add admission edit-existing flow and multiple ticket categories.
 - Implement event CREATE apply and usable schedule/slot editor before onboarding an event-selling supplier.
-- Add order pagination/detail and support contact/action.
+- Add supplier support contact/action to the implemented paginated order workspace.
 - Add role change, deactivate and re-invite; add password change/reset.
 - Add operator alerting for failed webhook/reconcile/fulfillment.
 

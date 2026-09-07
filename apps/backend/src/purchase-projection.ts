@@ -681,6 +681,7 @@ export async function loadSupplierCheckoutPurchaseRows(
         offer: { select: { id: true, title: true } },
         admissionProduct: { select: { id: true, slug: true, title: true } },
         admissionOffer: { select: { id: true, title: true } },
+        fulfillmentItem: { select: { status: true, providerData: true } },
       },
     }),
     prisma.checkoutItem.count({ where }),
@@ -1243,6 +1244,7 @@ function mapSupplierCheckoutPurchaseItem(row: Prisma.CheckoutItemGetPayload<{
     offer: { select: { id: true; title: true } };
     admissionProduct: { select: { id: true; slug: true; title: true } };
     admissionOffer: { select: { id: true; title: true } };
+    fulfillmentItem: { select: { status: true; providerData: true } };
   };
 }>) {
   return {
@@ -1262,6 +1264,8 @@ function mapSupplierCheckoutPurchaseItem(row: Prisma.CheckoutItemGetPayload<{
     sessionId: row.session?.id || row.sessionId || null,
     startsAt: toIso(row.session?.startsAt),
     ticketTitle: row.ticketTitle || row.offer?.title || row.admissionOffer?.title || null,
+    ticketNumbers: ticketNumbersFromProviderData(row.fulfillmentItem?.providerData),
+    fulfillmentStatus: row.fulfillmentItem?.status ? String(row.fulfillmentItem.status) : null,
     quantity: row.quantity,
     unitPriceKopecks: row.unitPriceKopecks,
     totalKopecks: row.totalKopecks,
@@ -1479,7 +1483,7 @@ function normalizeEmail(value: string | null | undefined): string {
   return String(value || '').trim().toLowerCase();
 }
 
-function ticketNumbersFromProviderData(value: Prisma.JsonValue | null | undefined): string[] {
+export function ticketNumbersFromProviderData(value: Prisma.JsonValue | null | undefined): string[] {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return [];
   const payload = value as Record<string, unknown>;
   const rawList = Array.isArray(payload.ticketNumbers) ? payload.ticketNumbers : [];

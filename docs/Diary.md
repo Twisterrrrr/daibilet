@@ -3543,3 +3543,26 @@
 - Added an opt-in Vite API proxy target for local smoke against finance: `VITE_DAIBILET_API_PROXY_TARGET`. The default remains `http://127.0.0.1:4000`.
 - Kept the product term «Входные билеты» by owner decision. Admission remains a venue product; `OPEN_DATE` remains a schedule or validity mode rather than a separate navigation entity.
 - Real-data browser smoke passed for dashboard, readiness, admissions, requests, orders, finance and requisites through the local Vite proxy to `finance-api.daibilet.ru`.
+
+## 2026-09-07 - Supplier roles, pagination and order workspace
+
+### Changes
+
+- The supplier header now identifies the active role for the selected organization; write controls follow the same OWNER/ADMIN/OPERATOR/ACCOUNTANT/VIEWER policy as the backend.
+- Events, admissions, requests, orders and reviews use 20-row server pagination instead of silently stopping at the first result window.
+- Orders now open in a compact operational drawer from both the work queue and the table. It shows the buyer-facing order code, purchase, buyer, commission, supplier net amount and ticket fulfillment without exposing technical ids.
+- Supplier order projection now includes issued ticket numbers and fulfillment status from `FulfillmentItem.providerData`.
+- The frontend tolerates the old order DTO during a rolling deploy, so deploying supplier assets before the restarted API does not crash the drawer.
+
+### Verification
+
+- Prisma Client generated; backend and supplier typechecks passed.
+- Supplier auth/access tests: 5 passed.
+- Supplier portal and PurchaseProjection tests: 7 passed, 0 failed.
+- Supplier production build passed: 324.92 kB JS / 97.47 kB gzip.
+- Live-data browser smoke through the local proxy passed for page 1/2 navigation and opening a paid order drawer.
+
+### Next
+
+- Deploy the paired API + supplier build on finance `.159`, verify that a confirmed order exposes its issued ticket number, then complete the embedded YooKassa paid-browser smoke.
+- Before a real customer payment, replace anonymous seven-digit order lookup as an authorization factor with a high-entropy buyer access proof agreed with the catalog owner.

@@ -1003,11 +1003,111 @@ td div {
 
 .order-queue-item {
   display: grid;
+  width: 100%;
   gap: 6px;
   border: 1px solid rgba(215, 223, 235, 0.82);
   border-radius: var(--radius-control);
   background: rgba(255, 255, 255, 0.76);
+  color: inherit;
+  cursor: pointer;
   padding: 10px;
+  text-align: left;
+  font: inherit;
+}
+
+.order-queue-item:hover {
+  border-color: rgba(47, 111, 221, 0.32);
+  background: #ffffff;
+}
+
+.order-drawer-backdrop {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: flex;
+  justify-content: flex-end;
+  background: rgba(15, 23, 42, 0.42);
+}
+
+.order-drawer {
+  width: min(540px, 100%);
+  height: 100%;
+  overflow-y: auto;
+  background: var(--surface);
+  box-shadow: -16px 0 44px rgba(15, 23, 42, 0.18);
+}
+
+.order-drawer-header {
+  position: sticky;
+  z-index: 1;
+  top: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.96);
+  padding: 20px;
+}
+
+.order-drawer-header span {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.order-drawer-header h2 {
+  margin: 4px 0 0;
+  font-size: 20px;
+  line-height: 1.25;
+}
+
+.order-drawer-body {
+  display: grid;
+  gap: 0;
+  padding: 0 20px 28px;
+}
+
+.order-drawer-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 0;
+}
+
+.order-drawer-status > span:last-child {
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.order-detail-section {
+  border-top: 1px solid var(--border);
+  padding: 18px 0;
+}
+
+.order-detail-section h3 {
+  margin: 0 0 12px;
+  color: var(--text);
+  font-size: 14px;
+}
+
+.order-detail-section .definition-list {
+  gap: 9px;
+}
+
+.ticket-number-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ticket-number-list code {
+  border-radius: var(--radius-control);
+  background: var(--surface-alt);
+  color: var(--text);
+  padding: 7px 9px;
+  font-size: 12px;
+  font-weight: 800;
 }
 
 .order-queue-empty {

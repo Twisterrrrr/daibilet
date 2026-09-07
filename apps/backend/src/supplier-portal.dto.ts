@@ -16,7 +16,11 @@ import type {
 import { prisma, type Prisma } from '@daibilet/db';
 import { loadAdmissionProductsList } from './admission-products.dto.js';
 import { resolveSupplierCheckoutReadiness } from './admin-suppliers.dto.js';
-import { applySupplierCheckoutItemStatusFilter, loadSupplierCheckoutPurchaseRows } from './purchase-projection.js';
+import {
+  applySupplierCheckoutItemStatusFilter,
+  loadSupplierCheckoutPurchaseRows,
+  ticketNumbersFromProviderData,
+} from './purchase-projection.js';
 
 const DEFAULT_LIMIT = 50;
 const MAX_LIMIT = 100;
@@ -162,6 +166,7 @@ type SupplierOrderRow = Prisma.CheckoutItemGetPayload<{
     offer: { select: { id: true; title: true } };
     admissionProduct: { select: { id: true; slug: true; title: true } };
     admissionOffer: { select: { id: true; title: true } };
+    fulfillmentItem: { select: { status: true; providerData: true } };
   };
 }>;
 
@@ -674,6 +679,8 @@ export function mapSupplierPortalOrderRow(row: SupplierOrderRow): SupplierPortal
     sessionId: row.session?.id || row.sessionId || null,
     startsAt: toIso(row.session?.startsAt),
     ticketTitle: row.ticketTitle || row.offer?.title || row.admissionOffer?.title || null,
+    ticketNumbers: ticketNumbersFromProviderData(row.fulfillmentItem?.providerData),
+    fulfillmentStatus: row.fulfillmentItem?.status ? String(row.fulfillmentItem.status) : null,
     quantity: row.quantity,
     unitPriceKopecks: row.unitPriceKopecks,
     totalKopecks: row.totalKopecks,
@@ -860,6 +867,7 @@ async function loadSupplierOrderRows(
         offer: { select: { id: true, title: true } },
         admissionProduct: { select: { id: true, slug: true, title: true } },
         admissionOffer: { select: { id: true, title: true } },
+        fulfillmentItem: { select: { status: true, providerData: true } },
       },
     }),
     prisma.checkoutItem.count({ where }),

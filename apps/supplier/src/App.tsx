@@ -8,6 +8,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ClipboardCheck,
+  Eye,
   FileClock,
   FileText,
   Gauge,
@@ -22,6 +23,7 @@ import {
   Ticket,
   UsersRound,
   WalletCards,
+  X,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -1064,6 +1066,7 @@ function EventRequestForm({
 
 function OrdersPage({ supplierKey }: { supplierKey: string }) {
   const [statusFilter, setStatusFilter] = React.useState('ALL');
+  const [selectedOrder, setSelectedOrder] = React.useState<SupplierPortalOrderRowDto | null>(null);
   const [offset, setOffset] = useSupplierListOffset(supplierKey);
   const ordersPath = React.useMemo(() => {
     const params = new URLSearchParams({ limit: String(SUPPLIER_LIST_PAGE_SIZE), offset: String(offset) });
@@ -1091,9 +1094,9 @@ function OrdersPage({ supplierKey }: { supplierKey: string }) {
       <DataState loading={loading} error={error} onRetry={reload} hasData={Boolean(data?.items.length)}>
         {data ? (
           <>
-            <OrderWorkQueue orders={data.items} />
+            <OrderWorkQueue orders={data.items} onOpen={setSelectedOrder} />
             <Table
-              columns={['Заказ', 'Покупка', 'Покупатель', 'Статус / к выплате']}
+              columns={['Заказ', 'Покупка', 'Покупатель', 'Статус / к выплате', '']}
               rows={data.items.map((order) => [
                 <div key="order"><strong>№ {order.publicCode || compactCode(order.orderId || order.id)}</strong><small>{formatDateTime(order.createdAt)}</small></div>,
                 <div key="event">
@@ -1106,12 +1109,23 @@ function OrdersPage({ supplierKey }: { supplierKey: string }) {
                   <StatusPill tone={orderStatusTone(order.status)}>{orderStatusLabel(order.status)}</StatusPill>
                   <small>{orderSettlementLabel(order)}</small>
                 </div>,
+                <button
+                  key="open"
+                  type="button"
+                  className="icon-button"
+                  onClick={() => setSelectedOrder(order)}
+                  aria-label={`Открыть заказ ${order.publicCode || compactCode(order.orderId || order.id)}`}
+                  title="Открыть заказ"
+                >
+                  <Eye size={17} />
+                </button>,
               ])}
             />
           </>
         ) : null}
       </DataState>
       {data ? <PaginationBar {...data} onOffsetChange={setOffset} /> : null}
+      {selectedOrder ? <OrderDetailDrawer order={selectedOrder} onClose={() => setSelectedOrder(null)} /> : null}
     </div>
   );
 }
@@ -1142,7 +1156,7 @@ function OrderStatusFilters({ value, onChange }: { value: string; onChange: (val
   );
 }
 
-function OrderWorkQueue({ orders }: { orders: SupplierPortalOrderRowDto[] }) {
+function OrderWorkQueue({ orders, onOpen }: { orders: SupplierPortalOrderRowDto[]; onOpen: (order: SupplierPortalOrderRowDto) => void }) {
   const issueOrders = orders.filter((order) => ['FAILED', 'EXPIRED', 'CANCELLED', 'REFUNDED'].includes(order.status)).slice(0, 4);
   const pendingOrders = orders.filter((order) => ['RESERVED', 'PENDING_PAYMENT'].includes(order.status)).slice(0, 4);
   const fulfillmentOrders = orders.filter((order) => ['PAID', 'CONFIRMED'].includes(order.status)).slice(0, 4);
@@ -1156,9 +1170,9 @@ function OrderWorkQueue({ orders }: { orders: SupplierPortalOrderRowDto[] }) {
         </div>
       </div>
       <div className="order-work-grid">
-        <OrderQueueColumn title="К выдаче" hint="оплата есть, билет нужно обслужить" orders={fulfillmentOrders} empty="Нет новых оплаченных позиций" tone="success" />
-        <OrderQueueColumn title="Ожидают оплату" hint="резерв или незавершенный checkout" orders={pendingOrders} empty="Нет зависших оплат" tone="warning" />
-        <OrderQueueColumn title="Проверить" hint="отмена, ошибка, возврат" orders={issueOrders} empty="Проблемных покупок нет" tone="danger" />
+        <OrderQueueColumn title="К выдаче" hint="оплата есть, билет нужно обслужить" orders={fulfillmentOrders} empty="Нет новых оплаченных позиций" tone="success" onOpen={onOpen} />
+        <OrderQueueColumn title="Ожидают оплату" hint="резерв или незавершенный checkout" orders={pendingOrders} empty="Нет зависших оплат" tone="warning" onOpen={onOpen} />
+        <OrderQueueColumn title="Проверить" hint="отмена, ошибка, возврат" orders={issueOrders} empty="Проблемных покупок нет" tone="danger" onOpen={onOpen} />
       </div>
     </section>
   );
@@ -1170,12 +1184,14 @@ function OrderQueueColumn({
   orders,
   empty,
   tone,
+  onOpen,
 }: {
   title: string;
   hint: string;
   orders: SupplierPortalOrderRowDto[];
   empty: string;
   tone: 'success' | 'warning' | 'danger';
+  onOpen: (order: SupplierPortalOrderRowDto) => void;
 }) {
   return (
     <div className={`order-queue-column ${tone}`}>
@@ -1188,7 +1204,7 @@ function OrderQueueColumn({
       </div>
       {orders.length ? (
         <div className="order-queue-list">
-          {orders.map((order) => <OrderQueueItem key={order.id} order={order} />)}
+          {orders.map((order) => <OrderQueueItem key={order.id} order={order} onOpen={onOpen} />)}
         </div>
       ) : (
         <span className="order-queue-empty">{empty}</span>
@@ -1197,14 +1213,92 @@ function OrderQueueColumn({
   );
 }
 
-function OrderQueueItem({ order }: { order: SupplierPortalOrderRowDto }) {
+function OrderQueueItem({ order, onOpen }: { order: SupplierPortalOrderRowDto; onOpen: (order: SupplierPortalOrderRowDto) => void }) {
   return (
-    <div className="order-queue-item">
+    <button type="button" className="order-queue-item" onClick={() => onOpen(order)}>
       <div>
         <strong>№ {order.publicCode || compactCode(order.orderId || order.id)}</strong>
         <span>{orderSubjectTitle(order)}</span>
       </div>
       <small>{orderActionLabel(order)} · {formatMoney(Math.max(0, order.totalKopecks - order.commissionKopecks))}</small>
+    </button>
+  );
+}
+
+function OrderDetailDrawer({ order, onClose }: { order: SupplierPortalOrderRowDto; onClose: () => void }) {
+  const closeButtonRef = React.useRef<HTMLButtonElement | null>(null);
+  const ticketNumbers = order.ticketNumbers || [];
+  React.useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    closeButtonRef.current?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [onClose]);
+
+  const code = order.publicCode || compactCode(order.orderId || order.id);
+  const netKopecks = Math.max(0, order.totalKopecks - order.commissionKopecks);
+
+  return (
+    <div className="order-drawer-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
+      <aside className="order-drawer" role="dialog" aria-modal="true" aria-labelledby="supplier-order-title">
+        <header className="order-drawer-header">
+          <div>
+            <span>Заказ № {code}</span>
+            <h2 id="supplier-order-title">{orderSubjectTitle(order)}</h2>
+          </div>
+          <button ref={closeButtonRef} type="button" className="icon-button" onClick={onClose} aria-label="Закрыть заказ" title="Закрыть">
+            <X size={18} />
+          </button>
+        </header>
+
+        <div className="order-drawer-body">
+          <div className="order-drawer-status">
+            <StatusPill tone={orderStatusTone(order.status)}>{orderStatusLabel(order.status)}</StatusPill>
+            <span>{orderActionLabel(order)}</span>
+          </div>
+
+          <section className="order-detail-section">
+            <h3>Покупка</h3>
+            <DefinitionList rows={[
+              ['Создан', formatDateTime(order.createdAt)],
+              ['Дата посещения', orderScheduleLabel(order)],
+              ['Категория билета', order.ticketTitle || 'Билет'],
+              ['Количество', `${order.quantity} шт.`],
+              ['Цена за билет', formatMoney(order.unitPriceKopecks)],
+              ['Сумма заказа', formatMoney(order.totalKopecks)],
+              ['Комиссия Дайбилет', formatMoney(order.commissionKopecks)],
+              ['К выплате', formatMoney(netKopecks)],
+            ]} />
+          </section>
+
+          <section className="order-detail-section">
+            <h3>Покупатель</h3>
+            <DefinitionList rows={[
+              ['Имя', orderBuyerLabel(order)],
+              ['Email', order.buyerEmail || '-'],
+              ['Телефон', order.buyerPhone || '-'],
+            ]} />
+          </section>
+
+          <section className="order-detail-section">
+            <h3>Билеты</h3>
+            {ticketNumbers.length ? (
+              <div className="ticket-number-list">
+                {ticketNumbers.map((number) => <code key={number}>{number}</code>)}
+              </div>
+            ) : (
+              <EmptyInline text={order.fulfillmentStatus ? `Билет еще не выпущен · ${statusLabel(order.fulfillmentStatus)}` : 'Билет еще не выпущен.'} />
+            )}
+          </section>
+        </div>
+      </aside>
     </div>
   );
 }
