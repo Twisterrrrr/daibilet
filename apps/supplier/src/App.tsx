@@ -1,5 +1,27 @@
 import * as React from 'react';
-import { Link, NavLink, Navigate, Route, Routes, useSearchParams } from 'react-router-dom';
+import { Link, NavLink, Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
+import {
+  BadgeCheck,
+  Banknote,
+  Building2,
+  CalendarDays,
+  ClipboardCheck,
+  FileClock,
+  FileText,
+  Gauge,
+  Headphones,
+  LayoutDashboard,
+  LogOut,
+  MessageSquareText,
+  PackageCheck,
+  RefreshCw,
+  Settings2,
+  ShoppingCart,
+  Ticket,
+  UsersRound,
+  WalletCards,
+  type LucideIcon,
+} from 'lucide-react';
 
 import type {
   SupplierPortalDashboardDto,
@@ -36,31 +58,46 @@ const NAV_SECTIONS = [
   {
     title: 'Работа',
     items: [
-      { to: '/', label: 'Главная', icon: '⌂' },
-      { to: '/readiness', label: 'Готовность', icon: '✓' },
-      { to: '/admissions', label: 'Входные билеты', icon: 'Б' },
-      { to: '/events', label: 'События', icon: 'С' },
-      { to: '/requests', label: 'Заявки', icon: 'З' },
-      { to: '/orders', label: 'Заказы', icon: 'З' },
-      { to: '/reviews', label: 'Отзывы', icon: 'О' },
+      { to: '/', label: 'Главная', icon: LayoutDashboard },
+      { to: '/readiness', label: 'Готовность', icon: Gauge },
+      { to: '/admissions', label: 'Входные билеты', icon: Ticket },
+      { to: '/events', label: 'События', icon: CalendarDays },
+      { to: '/requests', label: 'Заявки', icon: FileClock },
+      { to: '/orders', label: 'Заказы', icon: ShoppingCart },
+      { to: '/reviews', label: 'Отзывы', icon: MessageSquareText },
     ],
   },
   {
     title: 'Деньги',
     items: [
-      { to: '/finance', label: 'Финансы', icon: '₽' },
-      { to: '/documents', label: 'Документы', icon: 'Д' },
+      { to: '/finance', label: 'Финансы', icon: WalletCards },
+      { to: '/documents', label: 'Документы', icon: FileText },
     ],
   },
   {
     title: 'Настройки',
     items: [
-      { to: '/profile', label: 'Реквизиты', icon: 'Р' },
-      { to: '/team', label: 'Команда', icon: 'К' },
-      { to: '/integrations', label: 'Интеграции', icon: 'И' },
+      { to: '/profile', label: 'Реквизиты', icon: Building2 },
+      { to: '/team', label: 'Команда', icon: UsersRound },
+      { to: '/integrations', label: 'Интеграции', icon: Settings2 },
     ],
   },
 ];
+
+const ROUTE_TITLES: Record<string, string> = {
+  '/': 'Обзор',
+  '/readiness': 'Готовность к продаже',
+  '/admissions': 'Входные билеты',
+  '/events': 'События',
+  '/requests': 'Заявки на изменения',
+  '/orders': 'Заказы',
+  '/reviews': 'Отзывы',
+  '/finance': 'Финансы',
+  '/documents': 'Документы',
+  '/profile': 'Компания и реквизиты',
+  '/team': 'Команда',
+  '/integrations': 'Интеграции',
+};
 
 type ResourceState<T> = {
   data: T | null;
@@ -69,6 +106,7 @@ type ResourceState<T> = {
 };
 
 export function App() {
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [accessToken, setAccessToken] = React.useState(() => window.localStorage.getItem(SUPPLIER_ACCESS_TOKEN_STORAGE_KEY) || '');
   const [authSession, setAuthSession] = React.useState<SupplierPortalMeDto | null>(null);
@@ -165,6 +203,7 @@ export function App() {
   }, [accessToken, clearAuthSession, setSupplierKey]);
 
   const hasSupplierAccess = Boolean(accessToken && authSession && supplierKey.trim());
+  const currentPageTitle = ROUTE_TITLES[location.pathname] || 'Кабинет поставщика';
 
   React.useEffect(() => subscribeSupplierAccessToken(setAccessToken), []);
 
@@ -173,7 +212,7 @@ export function App() {
       <aside className="sidebar">
         <div className="brand">
           <div className="brand-mark" aria-hidden>
-            <span />
+            <Ticket size={18} strokeWidth={2.2} />
           </div>
           <div className="brand-copy">
             <div className="brand-title">Дайбилет</div>
@@ -186,7 +225,7 @@ export function App() {
               <div className="nav-section-title">{section.title}</div>
               {section.items.map((item) => (
                 <NavLink key={item.to} to={item.to} end={item.to === '/'} className={({ isActive }) => `nav-item ${isActive ? 'is-active' : ''}`}>
-                  <span className="nav-index">{item.icon}</span>
+                  <span className="nav-index"><item.icon size={17} strokeWidth={1.8} /></span>
                   <span>{item.label}</span>
                 </NavLink>
               ))}
@@ -194,19 +233,18 @@ export function App() {
           ))}
         </nav>
         <div className="sidebar-note">
-          <span className="note-mark">i</span>
+          <span className="note-mark"><Headphones size={13} /></span>
           <span>На первом этапе изменения и выплаты подтверждаются через администратора.</span>
         </div>
       </aside>
 
       <div className="workspace">
         <header className="topbar">
-          <div>
-            <div className="eyebrow">Финконтур · Поставщик</div>
-            <h1>Личный кабинет поставщика</h1>
+          <div className="topbar-heading">
+            <div className="eyebrow">Кабинет поставщика</div>
+            <h1>{currentPageTitle}</h1>
           </div>
           <div className="topbar-actions">
-            <span className="session-pill">{authSession ? authSession.user.email : 'Сеанс'}</span>
             <SupplierAccessControl
               session={authSession}
               value={supplierKey}
@@ -286,20 +324,26 @@ function SupplierAccessControl({
 
   return (
     <div className="supplier-session-control">
-      <label htmlFor="supplier-session-select">Поставщик</label>
       <div className="session-control-row">
-        <select
-          id="supplier-session-select"
-          value={value || session.currentSupplier.id}
-          onChange={(event) => onChange(event.target.value)}
-        >
-          {session.suppliers.map((supplier) => (
-            <option key={supplier.id} value={supplier.id}>
-              {supplier.title}
-            </option>
-          ))}
-        </select>
-        <button type="button" className="ghost-button" onClick={onLogout}>Выйти</button>
+        <div className="account-control">
+          <span className="account-avatar" aria-hidden>{(session.user.name || session.user.email).slice(0, 1).toUpperCase()}</span>
+          <div className="account-copy">
+            <select
+              id="supplier-session-select"
+              aria-label="Организация"
+              value={value || session.currentSupplier.id}
+              onChange={(event) => onChange(event.target.value)}
+            >
+              {session.suppliers.map((supplier) => (
+                <option key={supplier.id} value={supplier.id}>
+                  {supplier.title}
+                </option>
+              ))}
+            </select>
+            <span>{session.user.email}</span>
+          </div>
+        </div>
+        <button type="button" className="icon-button" onClick={onLogout} title="Выйти" aria-label="Выйти"><LogOut size={17} /></button>
       </div>
     </div>
   );
@@ -444,7 +488,6 @@ function DashboardPage({ supplierKey }: { supplierKey: string }) {
   const events = data.summary.events;
   const admissions = data.summary.admissions;
   const orders = data.summary.orders;
-  const reviews = data.summary.reviews;
 
   return (
     <div className="page-stack">
@@ -459,7 +502,6 @@ function DashboardPage({ supplierKey }: { supplierKey: string }) {
         <StatCard label="Входных билетов" value={admissions.total} hint={`${admissions.canSell} готовы к продаже`} />
         <StatCard label="Позиции заказов" value={orders.totalItems} hint={formatMoney(orders.grossKopecks)} />
         <StatCard label="Баланс" value={formatMoney(finance.ledgerBalanceKopecks)} hint={`выплачено ${formatMoney(finance.paidPayoutsKopecks)}`} />
-        <StatCard label="Отзывы" value={reviews.total} hint={reviews.averageRating ? `рейтинг ${reviews.averageRating.toFixed(1)}` : 'рейтинга пока нет'} />
       </div>
 
       <div className="workflow-strip" aria-label="Путь поставщика к продажам">
@@ -633,7 +675,11 @@ function AdmissionsPage({ supplierKey }: { supplierKey: string }) {
 
   return (
     <div className="page-stack">
-      <PageTitle title="Входные билеты" description="Билеты с открытой датой и входные продукты площадок: музеи, арт-пространства, выставки и аттракционы." action={<RefreshButton onClick={reload} />} />
+      <PageTitle
+        title="Входные билеты"
+        description="Билеты для самостоятельного посещения музея, галереи или другой площадки без обязательной привязки к событию."
+        action={<div className="page-actions"><RefreshButton onClick={reload} /><Link className="primary-button" to="/requests">Добавить билет</Link></div>}
+      />
       {data ? (
         <div className="stats-grid">
           <StatCard label="Всего" value={data.metrics.total} hint={`${data.metrics.published} опубликовано`} />
@@ -1724,11 +1770,15 @@ function useSupplierResource<T>(path: string, supplierKey: string): ResourceStat
 }
 
 function PageTitle({ title, description, action }: { title: string; description: string; action?: React.ReactNode }) {
+  const Icon = pageTitleIcon(title);
   return (
     <div className="page-title">
-      <div>
-        <h2>{title}</h2>
-        <p>{description}</p>
+      <div className="page-title-copy">
+        <span className="page-glyph" aria-hidden><Icon size={19} strokeWidth={1.8} /></span>
+        <div>
+          <h2>{title}</h2>
+          <p>{description}</p>
+        </div>
       </div>
       {action}
     </div>
@@ -1738,7 +1788,7 @@ function PageTitle({ title, description, action }: { title: string; description:
 function RefreshButton({ onClick }: { onClick: () => void }) {
   return (
     <button type="button" className="ghost-button" onClick={onClick}>
-      <span className="refresh-mark">↻</span>
+      <RefreshCw size={15} />
       Обновить
     </button>
   );
@@ -1948,13 +1998,43 @@ function EmptyInline({ text }: { text: string }) {
 }
 
 function StatCard({ label, value, hint }: { label: string; value: React.ReactNode; hint: string }) {
+  const Icon = statIcon(label);
   return (
     <div className="stat-card">
-      <span>{label}</span>
+      <div className="stat-card-heading">
+        <span>{label}</span>
+        <span className="stat-icon" aria-hidden><Icon size={18} strokeWidth={1.8} /></span>
+      </div>
       <strong>{value}</strong>
       <small>{hint}</small>
     </div>
   );
+}
+
+function pageTitleIcon(title: string): LucideIcon {
+  if (/готовност/i.test(title)) return Gauge;
+  if (/входн|билет/i.test(title)) return Ticket;
+  if (/событ/i.test(title)) return CalendarDays;
+  if (/заяв/i.test(title)) return FileClock;
+  if (/заказ/i.test(title)) return ShoppingCart;
+  if (/отзыв/i.test(title)) return MessageSquareText;
+  if (/финанс|баланс/i.test(title)) return Banknote;
+  if (/документ|отч/i.test(title)) return FileText;
+  if (/реквизит|компан/i.test(title)) return Building2;
+  if (/команд/i.test(title)) return UsersRound;
+  if (/интеграц/i.test(title)) return Settings2;
+  return LayoutDashboard;
+}
+
+function statIcon(label: string): LucideIcon {
+  if (/входн|билет/i.test(label)) return Ticket;
+  if (/событ|сеанс/i.test(label)) return CalendarDays;
+  if (/заказ|позиц/i.test(label)) return ShoppingCart;
+  if (/баланс|выплат|оборот|выруч/i.test(label)) return Banknote;
+  if (/оплачен|готов/i.test(label)) return BadgeCheck;
+  if (/вниман|блок/i.test(label)) return ClipboardCheck;
+  if (/отзыв/i.test(label)) return MessageSquareText;
+  return PackageCheck;
 }
 
 function WorkflowStep({ label, value, tone }: { label: string; value: string; tone: 'success' | 'warning' | 'danger' | 'neutral' }) {

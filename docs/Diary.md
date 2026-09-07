@@ -3506,3 +3506,10 @@
 2. Browser-smoke invite, login, refresh, logout and the role matrix.
 3. Agree the `.184` admin -> `.159` finance-admin bridge.
 4. Harden public order access before the first real internal payment.
+## 2026-09-07 - Supplier portal Replit UX pass
+
+- Reworked the supplier shell toward the approved Replit B2B pattern: dark grouped navigation, compact top bar, organization/account control and Lucide action icons.
+- Strengthened the operational hierarchy on dashboard, readiness, admissions and orders without changing finance API contracts or using mock data.
+- Added an opt-in Vite API proxy target for local smoke against finance: `VITE_DAIBILET_API_PROXY_TARGET`. The default remains `http://127.0.0.1:4000`.
+- Kept the product term «Входные билеты» by owner decision. Admission remains a venue product; `OPEN_DATE` remains a schedule or validity mode rather than a separate navigation entity.
+- Real-data browser smoke passed for dashboard, readiness, admissions, requests, orders, finance and requisites through the local Vite proxy to `finance-api.daibilet.ru`.

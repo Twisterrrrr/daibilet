@@ -3,6 +3,8 @@
 Updated: 2026-09-07  
 Scope: finance host `.159`, `apps/backend`, `apps/supplier`, finance-owned parts of `apps/admin`, and the HTTP boundary with catalog `.184`.
 
+UX note: the supplier portal uses the approved Replit operational shell as a visual reference, while all counters, readiness states, orders and requests remain backed by the finance API. The shell must not introduce mock data or client-side substitutions for unavailable backend responses.
+
 ## 1. Purpose
 
 This document answers three separate questions:
@@ -36,22 +38,21 @@ The finance contour is not a UI mock. The database already contains separate sup
 
 It is nevertheless too early to call the supplier portal production-complete:
 
-- commits `1e53bf0b` and `55be2407` and migration `20260907120000_supplier_user_invites` still require confirmed deployment on `.159`;
-- finance SSH is not available from the current workstation and HTTPS checks to `supplier.daibilet.ru` / `finance-api.daibilet.ru` did not complete on 2026-09-07;
 - the main admin lives on catalog `.184`, while finance admin actions live in the finance branch; the operator path must be bridged or exposed as an explicitly protected finance-admin surface;
 - event creation requests can be submitted, but admin apply for `CREATE Event` returns `501`;
 - the public order lookup exposes buyer contacts and ticket numbers using only a seven-digit `publicCode`; this requires hardening before real customer data;
 - a completed embedded YooKassa sandbox browser payment remains unverified end to end.
 
-Closed pilot readiness: **yellow, close after deployment and browser QA**.  
+Closed pilot readiness: **yellow; authentication, invite migration and supplier read paths are live, while role/browser acceptance and operator access still need closure**.
+
 First real internal payment readiness: **red until order lookup security, paid sandbox E2E and receipt policy are closed**.
 
 ## 4. Product surface matrix
 
 | Area | Current source of truth | Current capability | Status | Gate / unresolved work |
 |---|---|---|---|---|
-| Login | `SiteUser`, `SupplierUser`, JWT + refresh cookie | Login, logout, session restore, supplier membership selection | REAL / UNVERIFIED_LIVE | G0: deploy and browser-smoke refresh/logout/expiry |
-| Initial access | `SupplierUser.inviteTokenHash`, `inviteExpiresAt` | Admin issues 48h single-use invite; supplier sets password | REAL / UNVERIFIED_LIVE | G0: deploy migration; verify expired/reused/concurrent token behavior in browser |
+| Login | `SiteUser`, `SupplierUser`, JWT + refresh cookie | Login, logout, session restore, supplier membership selection | REAL / LIVE | G0: expiry rotation is covered by client tests; repeat full 15-minute browser acceptance before external pilot |
+| Initial access | `SupplierUser.inviteTokenHash`, `inviteExpiresAt` | Admin issues 48h single-use invite; supplier sets password | REAL / LIVE FOUNDATION | G0: verify expired/reused/concurrent token behavior through the operator-facing invite path |
 | Roles | `SupplierRole` | OWNER/ADMIN full writes; ACCOUNTANT requisites; OPERATOR requests; VIEWER read-only | REAL | G1: verify every role through HTTP; UI should hide actions disallowed by role, not only return 403 |
 | Password lifecycle | `SiteUser.passwordHash`, refresh hash | Initial password through invite | PARTIAL | G1: change password; G3: forgot/reset email, forced session revoke, optional 2FA |
 | Dashboard | supplier portal DTO | Orders, sales, reviews, readiness, next operational steps | REAL | G1: live data/empty/error/mobile smoke |
@@ -335,13 +336,14 @@ Required additions:
 On 2026-09-07:
 
 - `daibilet-msk` SSH works as `deploy`; catalog branch `feat/next-monorepo` at `c8e0c568`; web/API/Nginx are active.
-- the new local `id_ed25519` key opens `deploy@85.193.80.159`; adding a `daibilet-finance` alias remains optional convenience work;
-- finance branch on `.159` is `codex/stage0-admission-ticket-core` at `f931c50`, while origin is `55be2407`;
+- the local `id_ed25519` key opens `deploy@85.193.80.159`; adding a `daibilet-finance` alias remains optional convenience work;
+- finance branch on `.159` was deployed to `f1f590ec`; migration `20260907120000_supplier_user_invites` is applied and all 22 migrations report up to date;
 - `daibilet-finance-api.service`, Nginx and `daibilet-finance-yookassa-reconcile.timer` are active;
 - finance API correctly listens on `127.0.0.1:4100`; local health is about 12 ms, admission projection about 106 ms;
 - from `.159`, `supplier.daibilet.ru`, `finance-api.daibilet.ru` and `pay.daibilet.ru` answer over TLS in about 80-100 ms;
 - anonymous supplier dashboard returns 401;
 - reconcile's latest scheduled run exited successfully;
-- root `.env` contains the production runtime flags and sandbox YooKassa credentials, but invite commits/migration are not deployed yet.
+- supplier login, dashboard, access-token refresh, logout and refresh-cookie clearing passed live browser smoke;
+- the Replit UX pass was checked locally against the live finance API on dashboard, readiness, admissions, requests, orders, finance and requisites without transport/fallback errors.
 
-The earlier Prisma `P1000` from the manual CLI probe was caused by launching Prisma from `packages/db` without loading the repository root `.env`; the running API and reconcile use the correct service `EnvironmentFile`. Migration status must be repeated with `DOTENV_CONFIG_PATH=/opt/daibilet-finance/app/.env` before deploy.
+The earlier Prisma `P1000` from the manual CLI probe was caused by launching Prisma from `packages/db` without loading the repository root `.env`; the running API, migrations and reconcile use the correct service `EnvironmentFile`.

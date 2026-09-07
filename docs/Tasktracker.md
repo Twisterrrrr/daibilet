@@ -52,9 +52,10 @@
 | P.3e3 | **Finance projection guardrails** — no public payment/provider/internal ids, CTA only when `canSell && checkoutPath` | Высокий | ✅ regression tests + `.159` smoke runbook |
 | P.3e4 | **Supplier LC UX/UI brief** — Figma handoff for B2B/fintech cabinet, then `apps/supplier` implementation | Высокий | ✅ UX brief |
 | P.3e5 | **Supplier LC shell v1** — legacy-v2 inspired light shell: grouped nav, readiness, admissions/events/orders, finance/docs/settings | Высокий | ✅ `apps/supplier` UI shell |
+| P.3e5a | **Supplier LC Replit UX pass** — dark operational shell, Lucide navigation, compact account control, four-KPI dashboard and real-data smoke | Высокий | 🔄 code/typecheck/build green; `.159` deploy pending |
 | P.3e6 | **Supplier LC auth bridge** — `SiteUser` + active `SupplierUser`, login/me/logout, dev-only supplier query fallback | Высокий | ✅ auth API + supplier login UI |
-| P.3e6a | **Supplier LC pilot hardening** — refresh-cookie session recovery, single-flight retry, role-based writes, no engineering purchase actions in production UI | Критический | 🔄 code/tests/build green; deploy + browser smoke `.159` pending |
-| P.3e6b | **Supplier one-time invite** — admin creates role-scoped access, supplier sets initial password, token hash/expiry/single-use | Критический | 🔄 migration + DB integration test green; deploy + browser smoke `.159` pending |
+| P.3e6a | **Supplier LC pilot hardening** — refresh-cookie session recovery, single-flight retry, role-based writes, no engineering purchase actions in production UI | Критический | ✅ deployed + browser auth/refresh/logout smoke `.159` 2026-09-07 |
+| P.3e6b | **Supplier one-time invite** — admin creates role-scoped access, supplier sets initial password, token hash/expiry/single-use | Критический | ✅ migration deployed `.159`; admin-issued invite flow ready |
 | P.3e7 | **Supplier LC admission smoke** — тестовая продажа `AdmissionProduct` из ЛК поставщика → `CheckoutOrder`/ledger/orders projection | Высокий | ✅ supplier-scoped endpoint + UI action |
 | P.3e8 | **Stage 0 public buyer order DTO** - order-by-code + purchases-by-email expose issued ticket numbers and admission venue snapshot | High | 🔄 в PR `codex/stage0-admission-ticket-core` @ `d53cb1d` (code done); ждёт smoke `.159` |
 | P.3e9 | **Checkout result page** - `/checkout/result?order={publicCode}` reads finance public order projection, polls pending payments, shows ticketNumbers when confirmed | High | 🔄 code done; waits catalog/web deploy after finance smoke |
@@ -73,7 +74,7 @@
 | P.3h | **YooKassa reconcile ops** — service/timer на `.159`, runbook и ручной dry-run/apply | Высокий | ✅ live `.159` installed/enabled; scheduled tick green 2026-08-09 |
 | P.3i | **Finance E2E foundation roadmap** - admin finance contour, supplier LC money views, refunds, reports, settlements, closing docs and supplier reviews | High | 🔄 refund foundation + admin ledger/reconcile + supplier finance/docs read views |
 | P.3j | **Reports/settlements/documents write flow** - draft `SupplierReport`, close `SupplierSettlement`, issue `SupplierDocument` from reconciled ledger | High | 🔄 code done; close-period mutation + admin UI + backend test green |
-| P.3k | **Finance + Supplier LC launch QA** - section/function matrix, security, cross-host, smoke and launch gates | Критический | ✅ 2026-09-07 `docs/finance-supplier-launch-qa.md`; live `.159` is 2 commits behind |
+| P.3k | **Finance + Supplier LC launch QA** - section/function matrix, security, cross-host, smoke and launch gates | Критический | ✅ 2026-09-07 `docs/finance-supplier-launch-qa.md`; deployed `.159` |
 | P.4 | **Реклама / paid acquisition** — до готовности витрины | — | ⚠️ deferred |
 | P.5 | **Allowlist городов** — адмцентры с saleable → standalone; остальные → cityToRegion (не «дыра») | Высокий | ✅ 2026-07-19 geo policy |
 
