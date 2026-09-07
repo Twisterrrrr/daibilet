@@ -23,10 +23,6 @@ export function CityRegionalEvents({ citySlug, editorial = false, nested = false
   const past = listCityRegionalPastEvents(citySlug);
   if (!events.length && !past.length) return null;
 
-  /** 3-col desktop grid when 2+ cards; single festival stays full-width. */
-  const eventsGridClass =
-    events.length >= 2 ? 'grid gap-3 sm:grid-cols-2 xl:grid-cols-3' : 'grid gap-3';
-
   return (
     <section
       id="festivals"
@@ -53,11 +49,19 @@ export function CityRegionalEvents({ citySlug, editorial = false, nested = false
         />
         <div className="mt-5 flex flex-col gap-5">
           {events.length ? (
-            <ul className={eventsGridClass}>
+            <ul
+              className={
+                events.length === 1
+                  ? 'flex flex-wrap gap-3'
+                  : 'grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3'
+              }
+            >
               {events.map((event) => (
                 <li
                   key={event.id}
                   className={`rounded-2xl border p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_28px_-10px_hsl(221_83%_53%_/_0.28)] ${
+                    events.length === 1 ? 'w-full max-w-md' : ''
+                  } ${
                     editorial
                       ? 'border-zinc-200 bg-white hover:border-zinc-400'
                       : 'border-slate-200 bg-white hover:border-primary/40'
