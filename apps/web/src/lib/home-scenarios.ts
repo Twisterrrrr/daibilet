@@ -24,6 +24,8 @@ export type HomeFormatTile = {
 export type HomeHeroChipHubTag = {
   slug?: string | null;
   label: string;
+  /** City-scoped count from destinations hubTags. */
+  events?: number;
   kind: 'landing' | 'category' | string;
 };
 
@@ -73,20 +75,66 @@ function pushChip(
   out.push({ label: chip.label, href: chip.href });
 }
 
-function baselineChipForCity(chip: BaselineChip, citySlug?: string | null): HomeQuickChip | null {
-  if (!chip.landingSlug) return { label: chip.label, href: chip.href };
-  const slug = chip.landingSlug;
-  if (citySlug) {
-    if (!isWaterLandingAllowedForCity(slug, citySlug)) return null;
-    if (!landingMatchesCatalogCity(slug, citySlug)) return null;
-    return { label: chip.label, href: landingCategoryHref(slug, citySlug) };
+function landingEventsBySlug(landings: LandingLike[], slug: string): number {
+  const needle = slug.trim().toLowerCase();
+  const row = landings.find((item) => item.slug.trim().toLowerCase() === needle);
+  return row ? Number(row.events) || 0 : 0;
+}
+
+function categoryEventsByName(categories: HomeHeroChipCategory[], name: string): number {
+  const needle = name.trim().toLowerCase();
+  const row = categories.find((item) => item.name.trim().toLowerCase() === needle);
+  return row ? Number(row.events) || 0 : 0;
+}
+
+function baselineChipForCity(
+  chip: BaselineChip,
+  citySlug: string | null | undefined,
+  landings: LandingLike[],
+  categories: HomeHeroChipCategory[],
+): HomeQuickChip | null {
+  if (chip.landingSlug) {
+    const slug = chip.landingSlug;
+    if (landingEventsBySlug(landings, slug) <= 0) return null;
+    if (citySlug) {
+      if (!isWaterLandingAllowedForCity(slug, citySlug)) return null;
+      if (!landingMatchesCatalogCity(slug, citySlug)) return null;
+      return { label: chip.label, href: landingCategoryHref(slug, citySlug) };
+    }
+    return { label: chip.label, href: landingCategoryHref(slug) };
   }
-  return { label: chip.label, href: landingCategoryHref(slug) };
+
+  // Category shortcuts: hide when the selected city has zero in that facet.
+  if (citySlug && chip.href.includes('category=')) {
+    try {
+      const params = new URLSearchParams(chip.href.slice(chip.href.indexOf('?') + 1));
+      const category = String(params.get('category') || '').replace(/\+/g, ' ').trim();
+      if (category && categories.length > 0 && categoryEventsByName(categories, category) <= 0) {
+        return null;
+      }
+    } catch {
+      /* keep chip */
+    }
+  }
+
+  return { label: chip.label, href: chip.href };
+}
+
+/** City-scoped landing rows from destination hubTags (not national catalog counts). */
+function cityLandingsFromHubTags(hubTags: HomeHeroChipHubTag[] | null | undefined): LandingLike[] {
+  return (hubTags || [])
+    .filter((tag) => tag.kind === 'landing' && tag.slug && Number(tag.events) > 0)
+    .map((tag) => ({
+      slug: String(tag.slug),
+      title: tag.label,
+      events: Number(tag.events) || 0,
+    }));
 }
 
 /**
  * Soft pill row under home search: city hub landings/подборки + category shortcuts.
  * One horizontal swipe; prefers curated hub directions when a city is selected.
+ * City mode never trusts national landing.events - only destination hubTags / categories.
  */
 export function buildHomeHeroQuickChips(input: {
   citySlug?: string | null;
@@ -97,22 +145,24 @@ export function buildHomeHeroQuickChips(input: {
 }): HomeQuickChip[] {
   const limit = Math.min(Math.max(input.limit ?? HERO_QUICK_CHIP_LIMIT, 8), 12);
   const citySlug = input.citySlug?.trim() || null;
-  const landings = input.landings || [];
+  const nationalLandings = input.landings || [];
+  const categories = (input.categories || []).filter((row) => Number(row.events) > 0);
   const out: HomeQuickChip[] = [];
   const used = new Set<string>();
 
   if (citySlug) {
+    // City-scoped inventory from hubTags (national catalog counts lie for empty city landings).
+    const cityLandings = cityLandingsFromHubTags(input.hubTags);
     const directions = resolveFeaturedDirections({
       config: resolveCityHubConfig(citySlug),
-      landings,
-      categories: (input.categories || [])
-        .filter((row) => row.events > 0)
-        .map((row) => [row.name, row.events] as [string, number]),
+      landings: cityLandings,
+      categories: categories.map((row) => [row.name, row.events] as [string, number]),
       citySlug,
       limit,
     });
 
     for (const row of directions) {
+      if (row.events <= 0) continue;
       if (row.slug && row.href) {
         pushChip(out, used, { label: row.label || row.title, href: row.href }, limit);
         continue;
@@ -132,6 +182,7 @@ export function buildHomeHeroQuickChips(input: {
 
     for (const tag of input.hubTags || []) {
       if (out.length >= limit) break;
+      if (Number(tag.events) <= 0) continue;
       if (tag.kind === 'landing' && tag.slug) {
         if (!isWaterLandingAllowedForCity(tag.slug, citySlug)) continue;
         if (!landingMatchesCatalogCity(tag.slug, citySlug)) continue;
@@ -154,7 +205,7 @@ export function buildHomeHeroQuickChips(input: {
       }
     }
 
-    for (const cat of (input.categories || []).filter((row) => row.events > 0)) {
+    for (const cat of categories) {
       if (out.length >= limit) break;
       pushChip(
         out,
@@ -166,8 +217,13 @@ export function buildHomeHeroQuickChips(input: {
         limit,
       );
     }
+
+    for (const chip of HERO_BASELINE_CHIPS) {
+      if (out.length >= limit) break;
+      pushChip(out, used, baselineChipForCity(chip, citySlug, cityLandings, categories), limit);
+    }
   } else {
-    for (const landing of landings.filter((item) => Number(item.events) > 0)) {
+    for (const landing of nationalLandings.filter((item) => Number(item.events) > 0)) {
       if (out.length >= Math.min(6, limit)) break;
       pushChip(
         out,
@@ -176,11 +232,11 @@ export function buildHomeHeroQuickChips(input: {
         limit,
       );
     }
-  }
 
-  for (const chip of HERO_BASELINE_CHIPS) {
-    if (out.length >= limit) break;
-    pushChip(out, used, baselineChipForCity(chip, citySlug), limit);
+    for (const chip of HERO_BASELINE_CHIPS) {
+      if (out.length >= limit) break;
+      pushChip(out, used, baselineChipForCity(chip, null, nationalLandings, categories), limit);
+    }
   }
 
   return out.slice(0, limit);

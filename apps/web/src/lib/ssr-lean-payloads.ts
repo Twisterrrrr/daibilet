@@ -157,21 +157,32 @@ export function leanCatalogForSsr(catalog: PublicCatalogDto): PublicCatalogDto {
   };
 }
 
+/** Top city categories for home hero chips (not the full facet tree). */
+const SLIM_CITY_CATEGORY_LIMIT = 10;
+
 /**
- * Chrome / city picker / lucky / popular rail: drop per-city category facet trees
- * (largest destination payload). Keep hubTags for CityCard + hero chips.
+ * Chrome / city picker / lucky / popular rail: drop heavy per-city facet trees.
+ * Keep hubTags + top categories with events>0 for CityCard + hero chips.
  */
 export function toSlimCityDestination(city: PublicDestinationDto): PublicDestinationDto {
+  const categories = (city.categories || [])
+    .filter((row) => Number(row.events) > 0)
+    .slice()
+    .sort((a, b) => Number(b.events) - Number(a.events) || a.name.localeCompare(b.name, 'ru'))
+    .slice(0, SLIM_CITY_CATEGORY_LIMIT)
+    .map((row) => ({ name: row.name, events: Number(row.events) || 0 }));
+
   return {
     name: city.name,
     type: city.type,
     events: city.events,
     venues: city.venues,
-    categories: [],
+    categories,
     ...(city.id != null ? { id: city.id } : {}),
     ...(city.slug != null ? { slug: city.slug } : {}),
     ...(city.sourceSlug != null ? { sourceSlug: city.sourceSlug } : {}),
-    ...(city.hubTags?.length ? { hubTags: city.hubTags.slice(0, 3) } : {}),
+    // Keep city-scoped landing inventory for home hero chips; CityCard slices to 3.
+    ...(city.hubTags?.length ? { hubTags: city.hubTags.slice(0, 12) } : {}),
   };
 }
 

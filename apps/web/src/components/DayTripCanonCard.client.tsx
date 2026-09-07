@@ -163,126 +163,121 @@ export function DayTripCanonCard({
         data-day-trip-has-cover={cover ? '1' : '0'}
         {...dataProps}
       >
-        {/* Header: cover + title only. Sights/CTA below use full card width. */}
-        <div
-          className={
-            cover
-              ? 'flex flex-col sm:grid sm:grid-cols-[minmax(9rem,32%)_minmax(0,1fr)] sm:items-start'
-              : undefined
-          }
-        >
-          {cover ? (
-            <div
-              className="relative h-36 w-full shrink-0 overflow-hidden rounded-t-2xl bg-[#F5F5F7] sm:h-full sm:min-h-[7.5rem] sm:max-h-[11rem] sm:rounded-l-2xl sm:rounded-tr-none"
-              data-day-trip-cover
-            >
-              <SafeImage
-                src={cover}
-                alt=""
-                fill
-                sizes="(max-width: 640px) 100vw, 240px"
-                className="object-cover object-[center_35%]"
-                unoptimized
-                fallback={<div className="h-full w-full bg-slate-200" />}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/35 via-transparent to-transparent sm:bg-gradient-to-r sm:from-transparent sm:via-transparent sm:to-slate-950/10" />
-              <span
-                className="absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-sm font-bold tabular-nums text-slate-900 shadow-sm"
-                data-day-trip-badge
+        {/*
+          One outer pad for cover + sights + CTA so left/right margins match.
+          Cover is inset (rounded), not flush to the card edge.
+        */}
+        <div className="p-4 sm:p-5">
+          <div
+            className={
+              cover
+                ? 'flex flex-col gap-4 sm:grid sm:grid-cols-[minmax(9rem,32%)_minmax(0,1fr)] sm:items-start sm:gap-5'
+                : undefined
+            }
+          >
+            {cover ? (
+              <div
+                className="relative h-36 w-full shrink-0 overflow-hidden rounded-2xl bg-[#F5F5F7] sm:h-full sm:min-h-[7.5rem] sm:max-h-[11rem]"
+                data-day-trip-cover
               >
-                {index + 1}
-              </span>
+                <SafeImage
+                  src={cover}
+                  alt=""
+                  fill
+                  sizes="(max-width: 640px) 100vw, 240px"
+                  className="object-cover object-[center_35%]"
+                  unoptimized
+                  fallback={<div className="h-full w-full bg-slate-200" />}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/35 via-transparent to-transparent sm:bg-gradient-to-r sm:from-transparent sm:via-transparent sm:to-slate-950/10" />
+                <span
+                  className="absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-sm font-bold tabular-nums text-slate-900 shadow-sm"
+                  data-day-trip-badge
+                >
+                  {index + 1}
+                </span>
+              </div>
+            ) : null}
+
+            <div className={cover ? 'min-w-0' : undefined}>
+              <header>
+                <div className="flex items-start gap-2.5">
+                  {!cover ? (
+                    <span
+                      className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold tabular-nums ${badgeClass}`}
+                      data-day-trip-badge
+                    >
+                      {index + 1}
+                    </span>
+                  ) : null}
+                  <div className="min-w-0 flex-1">
+                    <h3
+                      className={`text-xl font-semibold leading-snug tracking-tight sm:text-2xl ${titleClass}`}
+                      data-day-trip-title
+                    >
+                      {title}
+                    </h3>
+                    {subtitleText ? (
+                      <p className={`mt-1 text-sm leading-snug ${softClass}`} data-day-trip-subtitle>
+                        {subtitleText}
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
+                {leadDistinct ? (
+                  <p className={`mt-2 text-sm leading-relaxed ${softClass}`} data-day-trip-lead>
+                    {leadDistinct}
+                  </p>
+                ) : null}
+                {titleExtra ? <div className="mt-1.5">{titleExtra}</div> : null}
+                {logisticsOneLiner ? (
+                  <p className={`mt-1 text-xs leading-snug ${mutedClass}`} data-day-trip-logistics-line>
+                    {resolvedExitLabel}: {logisticsOneLiner}
+                  </p>
+                ) : null}
+              </header>
             </div>
+          </div>
+
+          {nested.length ? (
+            <section className={`mt-4 border-t pt-4 ${borderSoft}`} data-day-trip-sights>
+              <h4 className={`text-sm font-semibold ${inkClass}`}>Что посмотреть</h4>
+              <SuburbPlacesPhotoRail
+                className="mt-3"
+                ariaLabel="Что посмотреть"
+                fallbackImageUrl={cover}
+                places={nested.map((poi) => ({
+                  name: poi.name,
+                  desc: poi.desc,
+                  href: poi.href,
+                  imageSlug: poi.imageSlug,
+                  visitMinutes: poi.visitMinutes,
+                  transitTip: poi.transitTip,
+                  dayLabel: poi.dayLabel,
+                }))}
+              />
+            </section>
           ) : null}
 
-          <div className="px-4 py-4 sm:px-5 sm:py-5">
-            <header>
-              <div className="flex items-start gap-2.5">
-                {!cover ? (
-                  <span
-                    className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold tabular-nums ${badgeClass}`}
-                    data-day-trip-badge
-                  >
-                    {index + 1}
-                  </span>
-                ) : null}
-                <div className="min-w-0 flex-1">
-                  <h3
-                    className={`text-xl font-semibold leading-snug tracking-tight sm:text-2xl ${titleClass}`}
-                    data-day-trip-title
-                  >
-                    {title}
-                  </h3>
-                  {subtitleText ? (
-                    <p className={`mt-1 text-sm leading-snug ${softClass}`} data-day-trip-subtitle>
-                      {subtitleText}
-                    </p>
-                  ) : null}
-                </div>
-              </div>
-              {leadDistinct ? (
-                <p className={`mt-2 text-sm leading-relaxed ${softClass}`} data-day-trip-lead>
-                  {leadDistinct}
-                </p>
-              ) : null}
-              {titleExtra ? <div className="mt-1.5">{titleExtra}</div> : null}
-              {logisticsOneLiner ? (
-                <p className={`mt-1 text-xs leading-snug ${mutedClass}`} data-day-trip-logistics-line>
-                  {resolvedExitLabel}: {logisticsOneLiner}
-                </p>
-              ) : null}
-            </header>
-          </div>
+          {cta ? (
+            <div
+              className={`relative z-10 mt-4 overflow-visible border-t pt-4 ${borderSoft}`}
+              data-day-trip-cta
+            >
+              {cta}
+            </div>
+          ) : null}
         </div>
-
-        {nested.length ? (
-          <section
-            className={`border-t px-4 py-4 sm:px-5 sm:py-5 ${borderSoft}`}
-            data-day-trip-sights
-          >
-            <h4 className={`text-sm font-semibold ${inkClass}`}>Что посмотреть</h4>
-            <SuburbPlacesPhotoRail
-              className="mt-3"
-              ariaLabel="Что посмотреть"
-              fallbackImageUrl={cover}
-              places={nested.map((poi) => ({
-                name: poi.name,
-                desc: poi.desc,
-                href: poi.href,
-                imageSlug: poi.imageSlug,
-                visitMinutes: poi.visitMinutes,
-                transitTip: poi.transitTip,
-                dayLabel: poi.dayLabel,
-              }))}
-            />
-          </section>
-        ) : null}
-
-        {cta ? (
-          <div
-            className={`relative z-10 overflow-visible border-t px-4 py-4 sm:px-5 sm:py-4 ${borderSoft}`}
-            data-day-trip-cta
-          >
-            {cta}
-          </div>
-        ) : null}
       </article>
     );
   }
 
+  // Cover layout uses headAndMeta inside the text column - no badge gutter there.
+  // No-cover layout keeps GRID + gutter for numbered alignment with sights.
   const headAndMeta = (
     <>
-      <div
-        className={
-          cover
-            ? 'min-w-0 sm:grid sm:grid-cols-[2.25rem_minmax(0,1fr)] sm:gap-x-3'
-            : GRID
-        }
-        data-day-trip-head
-      >
-        {cover ? (
-          <div aria-hidden className="hidden sm:block" data-day-trip-gutter />
-        ) : (
+      <div className={cover ? 'min-w-0' : GRID} data-day-trip-head>
+        {cover ? null : (
           <div className={`${GUTTER} pt-0.5`} data-day-trip-gutter>
             <span
               className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold tabular-nums sm:h-9 sm:w-9 ${badgeClass}`}
@@ -312,10 +307,14 @@ export function DayTripCanonCard({
 
       {showMetaGrid ? (
         <div
-          className="mt-4 sm:mt-5 sm:grid sm:grid-cols-[2.25rem_minmax(0,1fr)] sm:gap-x-3"
+          className={
+            cover
+              ? 'mt-4 sm:mt-5'
+              : 'mt-4 sm:mt-5 sm:grid sm:grid-cols-[2.25rem_minmax(0,1fr)] sm:gap-x-3'
+          }
           data-day-trip-meta
         >
-          <div aria-hidden className="hidden sm:block" />
+          {cover ? null : <div aria-hidden className="hidden sm:block" />}
           <div
             className={`min-w-0 grid gap-3 sm:gap-4 ${
               hasLogistics && hasGastro ? 'sm:grid-cols-2' : 'grid-cols-1'
@@ -326,7 +325,9 @@ export function DayTripCanonCard({
                 {/* Same structure as gastro: label + panel; keep slate panel (no amber). */}
                 <h4 className={`text-sm font-semibold ${inkClass}`}>{resolvedExitLabel}</h4>
                 <div
-                  className={`mt-1 ${panelClass} px-2.5 py-2 sm:mt-1.5 sm:py-2.5 sm:pr-4 ${PANEL_INSET_SM} ${LOGISTICS_BG_EXTEND_SM}`}
+                  className={`mt-1 ${panelClass} px-2.5 py-2 sm:mt-1.5 sm:py-2.5 sm:pr-4 ${
+                    cover ? 'sm:pl-4' : `${PANEL_INSET_SM} ${LOGISTICS_BG_EXTEND_SM}`
+                  }`}
                 >
                   {exitHint ? (
                     <p
@@ -354,7 +355,9 @@ export function DayTripCanonCard({
               <section data-day-trip-gastro>
                 <h4 className={`text-sm font-semibold ${inkClass}`}>Гастро-остановка</h4>
                 <div
-                  className={`mt-1.5 rounded-xl border border-amber-100 bg-amber-50/80 px-2.5 py-2.5 sm:mt-2 sm:py-3.5 sm:pr-4 ${PANEL_INSET_SM}`}
+                  className={`mt-1.5 rounded-xl border border-amber-100 bg-amber-50/80 px-2.5 py-2.5 sm:mt-2 sm:py-3.5 sm:pr-4 ${
+                    cover ? 'sm:pl-4' : PANEL_INSET_SM
+                  }`}
                 >
                   <p className={`text-sm font-semibold leading-snug ${inkClass}`}>{gastro.name}</p>
                   {gastro.blurb ? (
@@ -369,6 +372,87 @@ export function DayTripCanonCard({
     </>
   );
 
+  // With cover: one outer pad so cover / sights / CTA share the same left+right inset.
+  // Without cover: keep badge gutter alignment on sights.
+  if (cover) {
+    return (
+      <article
+        id={id}
+        role={role}
+        aria-label={
+          ariaLabel ||
+          (total != null ? `${index + 1} из ${total}` : undefined)
+        }
+        className={`mt-4 w-full rounded-2xl border bg-white shadow-sm ${
+          editorial ? 'border-zinc-200' : 'border-slate-200'
+        } ${className}`}
+        data-day-trip-canon="1"
+        data-day-trip-align="inset-equal"
+        data-day-trip-has-cover="1"
+        {...dataProps}
+      >
+        <div className="p-3.5 sm:p-5 md:p-6">
+          <div className="flex flex-col gap-4 sm:grid sm:grid-cols-[minmax(15rem,40%)_minmax(0,1fr)] sm:items-stretch sm:gap-5">
+            <div
+              className="relative h-44 w-full overflow-hidden rounded-2xl bg-[#F5F5F7] sm:h-full sm:min-h-0"
+              data-day-trip-cover
+            >
+              <SafeImage
+                src={cover}
+                alt=""
+                fill
+                sizes="(max-width: 640px) 100vw, 40vw"
+                className="object-cover object-[center_35%]"
+                unoptimized
+                fallback={<div className="h-full w-full bg-slate-200" />}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/25 via-transparent to-transparent sm:bg-gradient-to-r sm:from-transparent sm:to-slate-950/10" />
+              <span
+                className="absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-sm font-bold tabular-nums text-slate-900 shadow-sm"
+                data-day-trip-badge
+              >
+                {index + 1}
+              </span>
+            </div>
+            <div className={`min-w-0 ${HUB_DETAIL_BODY}`} data-day-trip-body>
+              {headAndMeta}
+            </div>
+          </div>
+
+          {nested.length ? (
+            <section className={`mt-4 border-t pt-4 ${borderSoft}`} data-day-trip-sights>
+              <h4 className={`text-sm font-semibold ${inkClass}`}>Что посмотреть</h4>
+              <div className="mt-3" data-day-trip-places>
+                <SuburbPlacesPhotoRail
+                  ariaLabel="Что посмотреть"
+                  fallbackImageUrl={cover}
+                  places={nested.map((poi) => ({
+                    name: poi.name,
+                    desc: poi.desc,
+                    href: poi.href,
+                    imageSlug: poi.imageSlug,
+                    visitMinutes: poi.visitMinutes,
+                    transitTip: poi.transitTip,
+                    dayLabel: poi.dayLabel,
+                  }))}
+                />
+              </div>
+            </section>
+          ) : null}
+
+          {cta ? (
+            <div
+              className={`relative z-10 mt-4 overflow-visible border-t pt-4 ${borderSoft}`}
+              data-day-trip-cta
+            >
+              <div className="min-w-0">{cta}</div>
+            </div>
+          ) : null}
+        </div>
+      </article>
+    );
+  }
+
   return (
     <article
       id={id}
@@ -382,58 +466,16 @@ export function DayTripCanonCard({
       } ${className}`}
       data-day-trip-canon="1"
       data-day-trip-align="gutter-text"
-      data-day-trip-has-cover={cover ? '1' : '0'}
+      data-day-trip-has-cover="0"
       {...dataProps}
     >
-      {/*
-        Desktop: cover only as tall as title + logistics/gastro (owner crop line),
-        not stretched past «Что посмотреть».
-      */}
-      <div
-        className={
-          cover
-            ? 'flex flex-col sm:grid sm:grid-cols-[minmax(15rem,40%)_minmax(0,1fr)] sm:items-stretch'
-            : undefined
-        }
-      >
-        {cover ? (
-          <div
-            className="relative h-44 w-full overflow-hidden rounded-t-2xl bg-[#F5F5F7] sm:h-full sm:min-h-0 sm:rounded-l-2xl sm:rounded-tr-none"
-            data-day-trip-cover
-          >
-            <SafeImage
-              src={cover}
-              alt=""
-              fill
-              sizes="(max-width: 640px) 100vw, 40vw"
-              className="object-cover object-[center_35%]"
-              unoptimized
-              fallback={<div className="h-full w-full bg-slate-200" />}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/25 via-transparent to-transparent sm:bg-gradient-to-r sm:from-transparent sm:to-slate-950/10" />
-            <span
-              className="absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-sm font-bold tabular-nums text-slate-900 shadow-sm"
-              data-day-trip-badge
-            >
-              {index + 1}
-            </span>
-          </div>
-        ) : null}
-        <div
-          className={`px-3.5 py-4 sm:p-5 md:p-6 ${
-            cover ? (editorial ? 'bg-zinc-50' : 'bg-slate-50') : ''
-          } ${HUB_DETAIL_BODY}`}
-          data-day-trip-body
-        >
-          {headAndMeta}
-        </div>
+      <div className={`px-3.5 py-4 sm:p-5 md:p-6 ${HUB_DETAIL_BODY}`} data-day-trip-body>
+        {headAndMeta}
       </div>
 
       {nested.length ? (
         <section
-          className={`border-t px-3.5 py-3.5 sm:px-5 sm:py-4 md:px-6 ${borderSoft} ${
-            cover ? (editorial ? 'bg-zinc-50' : 'bg-slate-50') : ''
-          }`}
+          className={`border-t px-3.5 py-3.5 sm:px-5 sm:py-4 md:px-6 ${borderSoft}`}
           data-day-trip-sights
         >
           <div className="sm:grid sm:grid-cols-[2.25rem_minmax(0,1fr)] sm:gap-x-3">
@@ -461,9 +503,7 @@ export function DayTripCanonCard({
 
       {cta ? (
         <div
-          className={`relative z-10 overflow-visible border-t px-3.5 py-4 sm:px-5 md:px-6 ${borderSoft} ${
-            cover ? (editorial ? 'bg-zinc-50' : 'bg-slate-50') : ''
-          }`}
+          className={`relative z-10 overflow-visible border-t px-3.5 py-4 sm:px-5 md:px-6 ${borderSoft}`}
           data-day-trip-cta
         >
           <div className="sm:grid sm:grid-cols-[2.25rem_minmax(0,1fr)] sm:gap-x-3">

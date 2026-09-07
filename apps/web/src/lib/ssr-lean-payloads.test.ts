@@ -83,14 +83,18 @@ describe('ssr-lean-payloads', () => {
     assert.equal(catalog.facets.cities.length, 60);
   });
 
-  it('toSlimCityDestination clears category trees but keeps hubTags', () => {
+  it('toSlimCityDestination keeps top categories with events and hubTags', () => {
     const slim = toSlimCityDestination({
       name: 'Казань',
       type: 'city',
       events: 12,
       venues: 3,
       slug: 'kazan',
-      categories: [{ name: 'Музеи', events: 4 }],
+      categories: [
+        { name: 'Музеи', events: 4 },
+        { name: 'Пусто', events: 0 },
+        { name: 'Концерты', events: 9 },
+      ],
       hubTags: [
         { label: 'Музеи', kind: 'category', events: 4 },
         { label: 'Река', kind: 'landing', slug: 'river', events: 2 },
@@ -98,9 +102,12 @@ describe('ssr-lean-payloads', () => {
         { label: 'Drop', kind: 'category', events: 1 },
       ],
     });
-    assert.deepEqual(slim.categories, []);
+    assert.deepEqual(slim.categories, [
+      { name: 'Концерты', events: 9 },
+      { name: 'Музеи', events: 4 },
+    ]);
     assert.equal(slim.slug, 'kazan');
-    assert.equal(slim.hubTags?.length, 3);
+    assert.equal(slim.hubTags?.length, 4);
   });
 
   it('filterFingerprintsForSessions keeps only used urls', () => {

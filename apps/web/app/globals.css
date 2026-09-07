@@ -72,12 +72,12 @@ html[data-nav-pending='1'] {
     --font-md: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
       'Noto Sans', 'Liberation Sans', sans-serif;
     --site-header-height: 4rem;
-    /** Content column max width (header, footer, pages). */
-    --container-page-max: 112rem;
+    /** Content column: 1280px on ordinary 16:9 desktop; 1600px on 21:9 below. */
+    --container-page-max: 80rem;
     /* Compact equal gaps; ultrawide must not inflate menu into a sparse strip. */
     --header-menu-gap: 0.75rem;
     --header-icons-gap: 0.625rem;
-    --blog-layout-max: 112rem;
+    --blog-layout-max: 80rem;
     --bridges-gradient-hero: radial-gradient(ellipse 90% 70% at 70% 40%, oklch(0.38 0.14 265 / 0.9), transparent 70%),
       linear-gradient(135deg, oklch(0.22 0.10 265), oklch(0.30 0.13 262));
     --bridges-gradient-amber: linear-gradient(135deg, oklch(0.78 0.17 55), oklch(0.70 0.19 40));
@@ -120,6 +120,14 @@ html[data-nav-pending='1'] {
     --party-gradient-hero: radial-gradient(ellipse 85% 65% at 60% 25%, oklch(0.42 0.12 25 / 0.45), transparent 65%),
       linear-gradient(150deg, oklch(0.16 0.05 280), oklch(0.26 0.08 35));
     --party-hero-glow: oklch(0.72 0.14 40 / 0.1);
+  }
+
+  /* Ultrawide 21:9: give the column a bit more room without stretching 16:9 desktop. */
+  @media (min-aspect-ratio: 21/9) {
+    :root {
+      --container-page-max: 100rem; /* 1600px */
+      --blog-layout-max: 100rem;
+    }
   }
 
   @supports (color: color-mix(in lab, red, red)) {
@@ -297,7 +305,8 @@ html[data-nav-pending='1'] {
 
 @layer components {
   .container-page {
-    @apply mx-auto w-full max-w-[112rem] px-4 sm:px-6 lg:px-8 xl:px-10;
+    @apply mx-auto w-full px-4 sm:px-6 lg:px-8 xl:px-10;
+    max-width: var(--container-page-max);
   }
 
   .site-header-icon-link {

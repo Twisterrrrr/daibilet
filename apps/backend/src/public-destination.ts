@@ -356,9 +356,13 @@ function matchesPublicDestinationPage(
   );
 }
 
+/** Hero quick chips need city-scoped landing inventory; CityCard still slices to 3. */
+const CITY_HUB_TAG_LIMIT = 12;
+
 function buildCityHubTags(bucket: DestinationBucket) {
   const landingTags = Array.from(bucket.landings.entries())
     .map(([slug, events]) => {
+      if (Number(events) <= 0) return null;
       const rule = LANDING_RULES.find((item) => item.slug === slug);
       const label = CITY_HUB_LANDING_SHORT[slug] || rule?.chips?.[0] || rule?.title || null;
       if (!label) return null;
@@ -366,21 +370,25 @@ function buildCityHubTags(bucket: DestinationBucket) {
     })
     .filter((tag): tag is NonNullable<typeof tag> => Boolean(tag))
     .sort((left, right) => right.events - left.events || left.label.localeCompare(right.label, 'ru'))
-    .slice(0, 3);
+    .slice(0, CITY_HUB_TAG_LIMIT);
 
   if (landingTags.length >= 2) return landingTags;
 
   const categoryTags = Array.from(bucket.categories.entries())
-    .map(([name, events]) => ({
-      slug: null,
-      label: name,
-      events,
-      kind: 'category' as const,
-    }))
+    .map(([name, events]) => {
+      if (Number(events) <= 0) return null;
+      return {
+        slug: null,
+        label: name,
+        events,
+        kind: 'category' as const,
+      };
+    })
+    .filter((tag): tag is NonNullable<typeof tag> => Boolean(tag))
     .sort((left, right) => right.events - left.events || left.label.localeCompare(right.label, 'ru'))
-    .slice(0, 3 - landingTags.length);
+    .slice(0, CITY_HUB_TAG_LIMIT - landingTags.length);
 
-  return [...landingTags, ...categoryTags].slice(0, 3);
+  return [...landingTags, ...categoryTags].slice(0, CITY_HUB_TAG_LIMIT);
 }
 
 function isAllowedPublicDestination(destination: Pick<DestinationRecord, 'name' | 'type'>): boolean {

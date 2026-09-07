@@ -1,6 +1,7 @@
 import type { BlogSidebarPromoDto } from '@/lib/blog-sidebar-promo';
 
 export type BlogFeedPromoKind = 'city' | 'landing' | 'event';
+/** Feed break always renders as article-like strip (overlay/split kept for type compat only). */
 export type BlogFeedPromoLayout = 'strip' | 'strip-dense' | 'overlay' | 'split';
 
 export type BlogFeedPromoPlan = {
@@ -10,11 +11,9 @@ export type BlogFeedPromoPlan = {
   layout: BlogFeedPromoLayout;
 };
 
-const LAYOUTS: BlogFeedPromoLayout[] = ['strip', 'strip-dense', 'split'];
-
 function availableKinds(promo: BlogSidebarPromoDto, hasSidebar: boolean): BlogFeedPromoKind[] {
   const kinds: BlogFeedPromoKind[] = [];
-  // Bento break = event card (title or any live afisha signal), not city cover strip.
+  // Bento break = live afisha signal (event title / href / count), not a city cover banner.
   const hasEventTitle = promo.upcomingTitles?.some((title) => String(title || '').trim());
   if (hasEventTitle || promo.featuredEventHref || (promo.eventsCount || 0) > 0) {
     kinds.push('event');
@@ -26,8 +25,9 @@ function availableKinds(promo: BlogSidebarPromoDto, hasSidebar: boolean): BlogFe
 }
 
 /**
- * Sparse feed seeding: event banner in the bento break after the first block.
+ * Sparse feed seeding: article-like strip after the first bento block (all cities).
  * A second slot (after block 2) only when there are enough blocks and seed allows (~1/4).
+ * Never plans overlay/split - those read as event banners, not magazine cards.
  */
 export function planBlogFeedPromos(input: {
   blockCount: number;
@@ -44,19 +44,15 @@ export function planBlogFeedPromos(input: {
   if (!kinds.length) return [];
 
   const seed = Math.abs(Math.floor(input.seed)) || 1;
-  // First slot: always event when available (replaces old horizontal article lead banner).
   const kind = kinds.includes('event') ? 'event' : kinds[0]!;
-  const layout: BlogFeedPromoLayout =
-    kind === 'event' ? 'overlay' : LAYOUTS[seed % LAYOUTS.length]!;
 
   const plans: BlogFeedPromoPlan[] = [
-    { afterBlockIndex: 0, kind, layout },
+    { afterBlockIndex: 0, kind, layout: 'strip' },
   ];
 
   if (input.blockCount >= 3 && seed % 4 === 0) {
     const kind2 = kinds.find((item) => item !== kind) || kinds[(seed + 1) % kinds.length]!;
-    const layout2 = LAYOUTS[(seed + 2) % LAYOUTS.length]!;
-    plans.push({ afterBlockIndex: 2, kind: kind2, layout: layout2 });
+    plans.push({ afterBlockIndex: 2, kind: kind2, layout: 'strip' });
   }
 
   return plans;

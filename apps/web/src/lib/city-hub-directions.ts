@@ -139,17 +139,7 @@ function resolveDirectionFromConfig(
     if (categoryRow) return categoryRow;
   }
 
-  if (item.href) {
-    return {
-      id: item.id,
-      label: item.label,
-      title: item.label,
-      events: 0,
-      href: item.href,
-      emphasis: item.emphasis,
-    };
-  }
-
+  // Never surface a curated href without city inventory - empty landings stay hidden.
   return null;
 }
 
