@@ -53,18 +53,18 @@ First real internal payment readiness: **red until order lookup security, paid s
 |---|---|---|---|---|
 | Login | `SiteUser`, `SupplierUser`, JWT + refresh cookie | Login, logout, session restore, supplier membership selection | REAL / LIVE | G0: expiry rotation is covered by client tests; repeat full 15-minute browser acceptance before external pilot |
 | Initial access | `SupplierUser.inviteTokenHash`, `inviteExpiresAt` | Admin issues 48h single-use invite; supplier sets password | REAL / LIVE FOUNDATION | G0: verify expired/reused/concurrent token behavior through the operator-facing invite path |
-| Roles | `SupplierRole` | OWNER/ADMIN full writes; ACCOUNTANT requisites; OPERATOR requests; VIEWER read-only | REAL | G1: verify every role through HTTP; UI should hide actions disallowed by role, not only return 403 |
+| Roles | `SupplierRole` | OWNER/ADMIN full writes; ACCOUNTANT requisites; OPERATOR requests; VIEWER read-only | REAL | G1: role-aware UI implemented; verify every role through HTTP and browser before external pilot |
 | Password lifecycle | `SiteUser.passwordHash`, refresh hash | Initial password through invite | PARTIAL | G1: change password; G3: forgot/reset email, forced session revoke, optional 2FA |
 | Dashboard | supplier portal DTO | Orders, sales, reviews, readiness, next operational steps | REAL | G1: live data/empty/error/mobile smoke |
 | Readiness | listing health + legal/profile state | Actionable blockers and links to the relevant section | REAL | G1: verify `canSell` changes after legal approval and product correction |
-| Events list | `SupplierEvent`, `Event`, sessions/offers | Read supplier events, schedule summary, price and issues | READ_ONLY | G1 only if pilot supplier sells events; no visible pagination after 50 rows |
+| Events list | `SupplierEvent`, `Event`, sessions/offers | Read supplier events, schedule summary, price and issues | READ_ONLY | G1 only if pilot supplier sells events; 20-row server pagination implemented |
 | Event request | `EventChangeRequest` | Supplier can submit a basic new open-date event request | PARTIAL | G1 for event pilot: admin cannot apply CREATE; no full slot editor; no edit-existing form |
 | Event moderation | admin request API and applier | Approve/reject/apply updates, schedule, offers, content/SEO subsets | PARTIAL | G1: CREATE unsupported; gallery/content blocks unsupported; recurrence must be materialized as sessions |
-| Admissions list | `AdmissionProduct`, `AdmissionOffer` | Real list, validity, offers, price and listing health | REAL | G1: pagination/search/detail UX; role-aware actions |
+| Admissions list | `AdmissionProduct`, `AdmissionOffer` | Real list, validity, offers, price and listing health | REAL | G1: pagination and role-aware create action implemented; search/detail UX remains |
 | Admission request | `EventChangeRequest` with `ADMISSION_PRODUCT` payload | Supplier creates a museum/gallery/open-date product proposal | REAL narrow path | G1: edit-existing UX, multiple offers, richer validity/image/description fields |
 | Admission moderation | admin request API and applier | Approve/reject/apply CREATE and UPDATE, replace offers | REAL | G1: smoke from supplier form through admin apply to public projection |
 | Requests | `EventChangeRequest` | Supplier sees status, admin comment and timestamps | REAL read + create | G1: detail/diff; G3: withdraw, duplicate, correct-and-resubmit |
-| Orders | `CheckoutOrder` / `CheckoutItem` through PurchaseProjection | Supplier sees only its items, buyer, status, amount and expected payout | REAL | G1: order detail and pagination; verify multi-supplier isolation and PII minimization |
+| Orders | `CheckoutOrder` / `CheckoutItem` through PurchaseProjection | Supplier sees only its items, buyer, status, amount and expected payout | REAL | G1: 20-row pagination implemented; order detail and multi-supplier isolation/PII verification remain |
 | Ticket fulfillment | `FulfillmentItem` | Ticket numbers/status can reach order projections | PARTIAL | G2: paid E2E must show issued ticket consistently; define resend/support operation |
 | Ledger | `SupplierLedgerEntry` | Supplier reads sales, commission, refunds and balance | REAL read model | G2: reconcile totals against a paid order; immutable accounting invariants |
 | Refunds | `RefundRequest` | Admin can create a guarded request; supplier sees status | PARTIAL | G2/G3: actual YooKassa refund execution, fulfillment cancellation and ledger reversal are not closed |

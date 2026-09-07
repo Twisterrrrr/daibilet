@@ -1,3 +1,33 @@
+## 2026-09-07 - Supplier role UX, pagination and embedded checkout handoff
+
+### Наблюдения
+
+- Catalog Path A creates an embedded admission payment successfully: finance returns a seven-digit `publicCode` and a YooKassa `confirmationToken`; order lookup remains stable while the payment is pending.
+- The browser smoke failed before card entry because the operator workstation could not reach `yookassa.ru` / `static.yoomoney.ru`. The same endpoints answer from finance `.159` in 0.1-0.3 seconds, so this is a workstation VPN/DNS route rather than a finance API failure.
+- Supplier list endpoints already expose `limit`, `offset`, `total` and `hasMore`, but the UI requested 50 rows and had no navigation.
+- Backend role policy was enforced, while the UI still showed mutation controls to roles that would receive `403`.
+
+### Решения
+
+- Supplier role is resolved for the currently selected organization. The header displays it, request controls are shown only to OWNER/ADMIN/OPERATOR, and requisites remain editable only for OWNER/ADMIN/ACCOUNTANT.
+- VIEWER and other read-only contexts receive an explicit viewing-mode notice instead of controls that cannot work.
+- Events, admissions, change requests, orders and reviews now use server pagination with 20 rows per page.
+- Page-scoped order money counters are labeled explicitly so they are not mistaken for all-supplier totals.
+
+### Проверки
+
+- Supplier unit tests: 5 passed, including selected-membership role resolution and UI/backend capability parity.
+- Supplier TypeScript check and production build: passed.
+- Real-data browser smoke: owner role rendered; supplier dashboard loaded; orders `1-20 / 21-40` navigation worked without losing the session.
+- Finance `.159`: API health OK; YooKassa API returned `401` without credentials as expected; widget SDK followed to HTTP 200.
+
+### Осталось
+
+- Repeat the embedded browser payment with the workstation VPN/DNS path to YooKassa available, then verify `CONFIRMED`, ticket numbers and catalog result navigation.
+- Coordinate P.3e13 access proof before the first real internal payment; a short public code alone must not remain the authorization mechanism for PII and ticket data.
+
+---
+
 ## 2026-09-07 - Supplier LC closed-pilot hardening
 
 ### Наблюдения

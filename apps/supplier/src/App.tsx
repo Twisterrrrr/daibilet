@@ -5,6 +5,8 @@ import {
   Banknote,
   Building2,
   CalendarDays,
+  ChevronLeft,
+  ChevronRight,
   ClipboardCheck,
   FileClock,
   FileText,
@@ -51,6 +53,7 @@ import {
   supplierPatch,
   supplierPost,
 } from '@/lib/api';
+import { resolveSupplierPortalRole, supplierPortalPermissions } from '@/lib/access';
 
 const STORAGE_KEY = 'daibilet_supplier_key';
 
@@ -204,6 +207,8 @@ export function App() {
 
   const hasSupplierAccess = Boolean(accessToken && authSession && supplierKey.trim());
   const currentPageTitle = ROUTE_TITLES[location.pathname] || 'Кабинет поставщика';
+  const activeRole = resolveSupplierPortalRole(authSession, supplierKey);
+  const permissions = supplierPortalPermissions(activeRole);
 
   React.useEffect(() => subscribeSupplierAccessToken(setAccessToken), []);
 
@@ -250,6 +255,7 @@ export function App() {
               value={supplierKey}
               onChange={setSupplierKey}
               onLogout={handleLogout}
+              activeRole={activeRole}
             />
           </div>
         </header>
@@ -264,13 +270,13 @@ export function App() {
               <Route index element={<DashboardPage supplierKey={supplierKey} />} />
               <Route path="readiness" element={<ReadinessPage supplierKey={supplierKey} />} />
               <Route path="events" element={<EventsPage supplierKey={supplierKey} />} />
-              <Route path="admissions" element={<AdmissionsPage supplierKey={supplierKey} />} />
-              <Route path="requests" element={<RequestsPage supplierKey={supplierKey} />} />
+              <Route path="admissions" element={<AdmissionsPage supplierKey={supplierKey} canSubmitRequests={permissions.canSubmitRequests} />} />
+              <Route path="requests" element={<RequestsPage supplierKey={supplierKey} canSubmitRequests={permissions.canSubmitRequests} />} />
               <Route path="orders" element={<OrdersPage supplierKey={supplierKey} />} />
               <Route path="finance" element={<FinancePage supplierKey={supplierKey} />} />
               <Route path="documents" element={<DocumentsPage supplierKey={supplierKey} />} />
               <Route path="reviews" element={<ReviewsPage supplierKey={supplierKey} />} />
-              <Route path="profile" element={<ProfilePage supplierKey={supplierKey} />} />
+              <Route path="profile" element={<ProfilePage supplierKey={supplierKey} canEditRequisites={permissions.canEditRequisites} />} />
               <Route path="team" element={<TeamPage supplierKey={supplierKey} />} />
               <Route path="integrations" element={<IntegrationsPage supplierKey={supplierKey} />} />
               <Route path="*" element={<Navigate to="/" replace />} />
@@ -314,11 +320,13 @@ function SupplierAccessControl({
   value,
   onChange,
   onLogout,
+  activeRole,
 }: {
   session: SupplierPortalMeDto | null;
   value: string;
   onChange: (value: string) => void;
   onLogout: () => void;
+  activeRole: string;
 }) {
   if (!session) return value.trim() ? <SupplierSelector value={value} onChange={onChange} /> : null;
 
@@ -341,6 +349,7 @@ function SupplierAccessControl({
               ))}
             </select>
             <span>{session.user.email}</span>
+            <span className="account-role">{roleLabel(activeRole)}</span>
           </div>
         </div>
         <button type="button" className="icon-button" onClick={onLogout} title="Выйти" aria-label="Выйти"><LogOut size={17} /></button>
@@ -645,8 +654,15 @@ function ReadinessPage({ supplierKey }: { supplierKey: string }) {
   );
 }
 
+const SUPPLIER_LIST_PAGE_SIZE = 20;
+
 function EventsPage({ supplierKey }: { supplierKey: string }) {
-  const { data, loading, error, reload } = useSupplierResource<SupplierPortalEventsListDto>('/api/supplier/events?limit=50', supplierKey);
+  const [offset, setOffset] = useSupplierListOffset(supplierKey);
+  const eventsPath = React.useMemo(
+    () => `/api/supplier/events?limit=${SUPPLIER_LIST_PAGE_SIZE}&offset=${offset}`,
+    [offset],
+  );
+  const { data, loading, error, reload } = useSupplierResource<SupplierPortalEventsListDto>(eventsPath, supplierKey);
 
   return (
     <div className="page-stack">
@@ -666,19 +682,25 @@ function EventsPage({ supplierKey }: { supplierKey: string }) {
           />
         ) : null}
       </DataState>
+      {data ? <PaginationBar {...data} onOffsetChange={setOffset} /> : null}
     </div>
   );
 }
 
-function AdmissionsPage({ supplierKey }: { supplierKey: string }) {
-  const { data, loading, error, reload } = useSupplierResource<SupplierPortalAdmissionsListDto>('/api/supplier/admissions?limit=50', supplierKey);
+function AdmissionsPage({ supplierKey, canSubmitRequests }: { supplierKey: string; canSubmitRequests: boolean }) {
+  const [offset, setOffset] = useSupplierListOffset(supplierKey);
+  const admissionsPath = React.useMemo(
+    () => `/api/supplier/admissions?limit=${SUPPLIER_LIST_PAGE_SIZE}&offset=${offset}`,
+    [offset],
+  );
+  const { data, loading, error, reload } = useSupplierResource<SupplierPortalAdmissionsListDto>(admissionsPath, supplierKey);
 
   return (
     <div className="page-stack">
       <PageTitle
         title="Входные билеты"
         description="Билеты для самостоятельного посещения музея, галереи или другой площадки без обязательной привязки к событию."
-        action={<div className="page-actions"><RefreshButton onClick={reload} /><Link className="primary-button" to="/requests">Добавить билет</Link></div>}
+        action={<div className="page-actions"><RefreshButton onClick={reload} />{canSubmitRequests ? <Link className="primary-button" to="/requests">Добавить билет</Link> : null}</div>}
       />
       {data ? (
         <div className="stats-grid">
@@ -702,12 +724,18 @@ function AdmissionsPage({ supplierKey }: { supplierKey: string }) {
           />
         ) : null}
       </DataState>
+      {data ? <PaginationBar {...data} onOffsetChange={setOffset} /> : null}
     </div>
   );
 }
 
-function RequestsPage({ supplierKey }: { supplierKey: string }) {
-  const requests = useSupplierResource<SupplierPortalChangeRequestsListDto>('/api/supplier/change-requests?limit=50', supplierKey);
+function RequestsPage({ supplierKey, canSubmitRequests }: { supplierKey: string; canSubmitRequests: boolean }) {
+  const [offset, setOffset] = useSupplierListOffset(supplierKey);
+  const requestsPath = React.useMemo(
+    () => `/api/supplier/change-requests?limit=${SUPPLIER_LIST_PAGE_SIZE}&offset=${offset}`,
+    [offset],
+  );
+  const requests = useSupplierResource<SupplierPortalChangeRequestsListDto>(requestsPath, supplierKey);
   const profile = useSupplierResource<SupplierPortalProfileDto>('/api/supplier/profile', supplierKey);
   const [notice, setNotice] = React.useState<{ tone: 'success' | 'error'; title: string; text: string } | null>(null);
 
@@ -741,10 +769,14 @@ function RequestsPage({ supplierKey }: { supplierKey: string }) {
           <span>{notice.text}</span>
         </div>
       ) : null}
-      <div className="two-column">
-        <AdmissionRequestForm supplierKey={supplierKey} profile={profile.data} onCreated={handleCreated} onError={handleError} />
-        <EventRequestForm supplierKey={supplierKey} profile={profile.data} onCreated={handleCreated} onError={handleError} />
-      </div>
+      {canSubmitRequests ? (
+        <div className="two-column">
+          <AdmissionRequestForm supplierKey={supplierKey} profile={profile.data} onCreated={handleCreated} onError={handleError} />
+          <EventRequestForm supplierKey={supplierKey} profile={profile.data} onCreated={handleCreated} onError={handleError} />
+        </div>
+      ) : (
+        <ReadOnlyNotice text="Ваша роль позволяет просматривать заявки, но не отправлять изменения." />
+      )}
       <DataState loading={requests.loading} error={requests.error} onRetry={requests.reload} hasData={Boolean(requests.data?.items.length)}>
         {requests.data ? (
           <Table
@@ -761,6 +793,7 @@ function RequestsPage({ supplierKey }: { supplierKey: string }) {
           />
         ) : null}
       </DataState>
+      {requests.data ? <PaginationBar {...requests.data} onOffsetChange={setOffset} /> : null}
     </div>
   );
 }
@@ -1031,11 +1064,12 @@ function EventRequestForm({
 
 function OrdersPage({ supplierKey }: { supplierKey: string }) {
   const [statusFilter, setStatusFilter] = React.useState('ALL');
+  const [offset, setOffset] = useSupplierListOffset(supplierKey);
   const ordersPath = React.useMemo(() => {
-    const params = new URLSearchParams({ limit: '50' });
+    const params = new URLSearchParams({ limit: String(SUPPLIER_LIST_PAGE_SIZE), offset: String(offset) });
     if (statusFilter !== 'ALL') params.set('status', statusFilter);
     return `/api/supplier/orders?${params.toString()}`;
-  }, [statusFilter]);
+  }, [offset, statusFilter]);
   const { data, loading, error, reload } = useSupplierResource<SupplierPortalOrdersListDto>(ordersPath, supplierKey);
   const paidItems = data?.items.filter((order) => ['PAID', 'CONFIRMED', 'FULFILLED'].includes(order.status)).length ?? 0;
   const pendingItems = data?.items.filter((order) => ['PENDING_PAYMENT', 'RESERVED'].includes(order.status)).length ?? 0;
@@ -1048,12 +1082,12 @@ function OrdersPage({ supplierKey }: { supplierKey: string }) {
       {data ? (
         <div className="stats-grid">
           <StatCard label="Позиции" value={data.total} hint={`на странице ${data.items.length}`} />
-          <StatCard label="Оплачено" value={paidItems} hint="ожидают выдачи или уже выданы" />
-          <StatCard label="Ожидают оплату" value={pendingItems} hint="можно сверить позже" />
-          <StatCard label="К выплате" value={formatMoney(netKopecks)} hint={`оборот ${formatMoney(grossKopecks)}`} />
+          <StatCard label="Оплачено на странице" value={paidItems} hint="ожидают выдачи или уже выданы" />
+          <StatCard label="Ждут оплату на странице" value={pendingItems} hint="можно сверить позже" />
+          <StatCard label="К выплате на странице" value={formatMoney(netKopecks)} hint={`оборот ${formatMoney(grossKopecks)}`} />
         </div>
       ) : null}
-      <OrderStatusFilters value={statusFilter} onChange={setStatusFilter} />
+      <OrderStatusFilters value={statusFilter} onChange={(value) => { setStatusFilter(value); setOffset(0); }} />
       <DataState loading={loading} error={error} onRetry={reload} hasData={Boolean(data?.items.length)}>
         {data ? (
           <>
@@ -1077,6 +1111,7 @@ function OrdersPage({ supplierKey }: { supplierKey: string }) {
           </>
         ) : null}
       </DataState>
+      {data ? <PaginationBar {...data} onOffsetChange={setOffset} /> : null}
     </div>
   );
 }
@@ -1356,7 +1391,12 @@ function DocumentsPage({ supplierKey }: { supplierKey: string }) {
 }
 
 function ReviewsPage({ supplierKey }: { supplierKey: string }) {
-  const { data, loading, error, reload } = useSupplierResource<SupplierPortalReviewsListDto>('/api/supplier/reviews?limit=50', supplierKey);
+  const [offset, setOffset] = useSupplierListOffset(supplierKey);
+  const reviewsPath = React.useMemo(
+    () => `/api/supplier/reviews?limit=${SUPPLIER_LIST_PAGE_SIZE}&offset=${offset}`,
+    [offset],
+  );
+  const { data, loading, error, reload } = useSupplierResource<SupplierPortalReviewsListDto>(reviewsPath, supplierKey);
 
   return (
     <div className="page-stack">
@@ -1375,11 +1415,12 @@ function ReviewsPage({ supplierKey }: { supplierKey: string }) {
           />
         ) : null}
       </DataState>
+      {data ? <PaginationBar {...data} onOffsetChange={setOffset} /> : null}
     </div>
   );
 }
 
-function ProfilePage({ supplierKey }: { supplierKey: string }) {
+function ProfilePage({ supplierKey, canEditRequisites }: { supplierKey: string; canEditRequisites: boolean }) {
   const { data, loading, error, reload } = useSupplierResource<SupplierPortalProfileDto>('/api/supplier/profile', supplierKey);
 
   if (loading && !data) return <LoadingState label="Загружаем реквизиты..." />;
@@ -1391,17 +1432,18 @@ function ProfilePage({ supplierKey }: { supplierKey: string }) {
       <PageTitle title="Реквизиты" description="Юридический профиль, банковские счета, команда и площадки." action={<RefreshButton onClick={reload} />} />
       <SettingsNav />
       <LegalProfileNotice profile={data} />
+      {!canEditRequisites ? <ReadOnlyNotice text="Реквизиты доступны только для просмотра. Изменять их может владелец, администратор или бухгалтер." /> : null}
       <div className="two-column">
         <section className="panel">
           <div className="panel-header">
             <h2>Юридический профиль</h2>
             <StatusPill tone={legalStatusTone(data.legal.status)}>{legalStatusLabel(data.legal.status)}</StatusPill>
           </div>
-          <SupplierLegalProfileForm profile={data} supplierKey={supplierKey} onSaved={reload} />
+          <SupplierLegalProfileForm profile={data} supplierKey={supplierKey} onSaved={reload} canEdit={canEditRequisites} />
         </section>
         <section className="panel">
           <div className="panel-header"><h2>Основной счет</h2></div>
-          <SupplierBankAccountForm profile={data} supplierKey={supplierKey} onSaved={reload} />
+          <SupplierBankAccountForm profile={data} supplierKey={supplierKey} onSaved={reload} canEdit={canEditRequisites} />
         </section>
       </div>
       <section className="panel">
@@ -1433,10 +1475,12 @@ function SupplierLegalProfileForm({
   profile,
   supplierKey,
   onSaved,
+  canEdit,
 }: {
   profile: SupplierPortalProfileDto;
   supplierKey: string;
   onSaved: () => void;
+  canEdit: boolean;
 }) {
   const [form, setForm] = React.useState<LegalFormState>(() => legalFormFromProfile(profile));
   const [saving, setSaving] = React.useState(false);
@@ -1471,6 +1515,7 @@ function SupplierLegalProfileForm({
     <form className="settings-form" onSubmit={(event) => void save(event)}>
       {message ? <div className="form-note success">{message}</div> : null}
       {error ? <div className="form-note error">{error}</div> : null}
+      <fieldset className="settings-fieldset" disabled={!canEdit}>
       <label className="form-field span-2">
         <span>Юрлицо</span>
         <input value={form.legalName} onChange={(event) => update('legalName', event.target.value)} required />
@@ -1528,6 +1573,7 @@ function SupplierLegalProfileForm({
       <div className="form-actions span-2">
         <button type="submit" className="primary-button" disabled={saving}>{saving ? 'Сохраняем...' : 'Сохранить реквизиты'}</button>
       </div>
+      </fieldset>
     </form>
   );
 }
@@ -1543,10 +1589,12 @@ function SupplierBankAccountForm({
   profile,
   supplierKey,
   onSaved,
+  canEdit,
 }: {
   profile: SupplierPortalProfileDto;
   supplierKey: string;
   onSaved: () => void;
+  canEdit: boolean;
 }) {
   const primaryAccount = profile.bankAccounts.find((account) => account.isPrimary) || profile.bankAccounts[0] || null;
   const [form, setForm] = React.useState<BankFormState>(() => bankFormFromAccount(primaryAccount));
@@ -1582,6 +1630,7 @@ function SupplierBankAccountForm({
     <form className="settings-form" onSubmit={(event) => void save(event)}>
       {message ? <div className="form-note success">{message}</div> : null}
       {error ? <div className="form-note error">{error}</div> : null}
+      <fieldset className="settings-fieldset" disabled={!canEdit}>
       {primaryAccount ? (
         <div className="form-readonly span-2">
           <span>Сейчас в профиле</span>
@@ -1607,6 +1656,7 @@ function SupplierBankAccountForm({
       <div className="form-actions span-2">
         <button type="submit" className="primary-button" disabled={saving}>{saving ? 'Сохраняем...' : 'Сохранить счет'}</button>
       </div>
+      </fieldset>
     </form>
   );
 }
@@ -1767,6 +1817,70 @@ function useSupplierResource<T>(path: string, supplierKey: string): ResourceStat
   }, [path, supplierKey, tick]);
 
   return { ...state, reload: () => setTick((value) => value + 1) };
+}
+
+function useSupplierListOffset(supplierKey: string): [number, React.Dispatch<React.SetStateAction<number>>] {
+  const [offset, setOffset] = React.useState(0);
+  React.useEffect(() => setOffset(0), [supplierKey]);
+  return [offset, setOffset];
+}
+
+function ReadOnlyNotice({ text }: { text: string }) {
+  return (
+    <div className="notice-panel neutral read-only-notice" role="status">
+      <strong>Режим просмотра</strong>
+      <span>{text}</span>
+    </div>
+  );
+}
+
+function PaginationBar({
+  total,
+  limit,
+  offset,
+  hasMore,
+  onOffsetChange,
+}: {
+  total: number;
+  limit: number;
+  offset: number;
+  hasMore: boolean;
+  onOffsetChange: (offset: number) => void;
+}) {
+  const safeLimit = Math.max(1, limit);
+  const page = Math.floor(offset / safeLimit) + 1;
+  const pages = Math.max(1, Math.ceil(total / safeLimit));
+  const from = total ? offset + 1 : 0;
+  const to = Math.min(total, offset + safeLimit);
+  if (total <= safeLimit && offset === 0) return null;
+
+  return (
+    <nav className="pagination-bar" aria-label="Страницы списка">
+      <span aria-live="polite">{from}-{to} из {total} · страница {page} из {pages}</span>
+      <div className="pagination-actions">
+        <button
+          type="button"
+          className="icon-button"
+          disabled={offset <= 0}
+          onClick={() => onOffsetChange(Math.max(0, offset - safeLimit))}
+          aria-label="Предыдущая страница"
+          title="Предыдущая страница"
+        >
+          <ChevronLeft size={17} />
+        </button>
+        <button
+          type="button"
+          className="icon-button"
+          disabled={!hasMore || page >= pages}
+          onClick={() => onOffsetChange(offset + safeLimit)}
+          aria-label="Следующая страница"
+          title="Следующая страница"
+        >
+          <ChevronRight size={17} />
+        </button>
+      </div>
+    </nav>
+  );
 }
 
 function PageTitle({ title, description, action }: { title: string; description: string; action?: React.ReactNode }) {
