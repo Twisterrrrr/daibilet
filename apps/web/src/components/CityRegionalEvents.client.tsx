@@ -60,7 +60,7 @@ export function CityRegionalEvents({ citySlug, editorial = false, nested = false
                 <li
                   key={event.id}
                   className={`rounded-2xl border p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_28px_-10px_hsl(221_83%_53%_/_0.28)] ${
-                    events.length === 1 ? 'w-full max-w-md' : ''
+                    events.length === 1 ? 'w-full max-w-sm shrink-0' : ''
                   } ${
                     editorial
                       ? 'border-zinc-200 bg-white hover:border-zinc-400'
