@@ -27,6 +27,8 @@ type Body = {
   };
   returnUrl?: string;
   mode?: 'stub' | 'yookassa' | 'auto';
+  confirmationMode?: 'redirect' | 'embedded';
+  idempotencyKey?: string;
 };
 
 function composeBuyerName(buyer: Body['buyer']): string | null {
@@ -143,6 +145,8 @@ export async function POST(request: Request) {
     },
     returnUrl,
     mode: body.mode,
+    confirmationMode: body.confirmationMode,
+    idempotencyKey: body.idempotencyKey,
   });
 
   if (!result.ok) {
@@ -196,6 +200,8 @@ export async function POST(request: Request) {
       publicCode: result.publicCode,
       status: result.status,
       confirmationUrl: result.confirmationUrl,
+      confirmationToken: result.confirmationToken,
+      confirmationMode: result.confirmationMode,
       order,
       ticketUrl,
       catalogReturnWithOrder,

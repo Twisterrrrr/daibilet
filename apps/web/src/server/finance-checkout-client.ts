@@ -14,6 +14,10 @@ import {
   type BuyerTicketLineItem,
 } from '@/lib/buyer-checkout';
 import {
+  pickCheckoutConfirmation,
+  type CheckoutConfirmationMode,
+} from '@/lib/checkout-payment';
+import {
   resolveFinanceApiBaseUrl,
   resolveFinanceApiHost,
   resolveFinanceProjectionToken,
@@ -33,6 +37,9 @@ export type FinanceCheckoutSubmitInput = {
   };
   returnUrl?: string;
   mode?: BuyerCheckoutMode;
+  confirmationMode?: CheckoutConfirmationMode;
+  /** Caller-owned key; reused after ambiguous network for the same payload. */
+  idempotencyKey?: string;
 };
 
 export type FinanceCheckoutSubmitResult =
@@ -42,6 +49,8 @@ export type FinanceCheckoutSubmitResult =
       publicCode: string;
       status: string;
       confirmationUrl: string | null;
+      confirmationToken: string | null;
+      confirmationMode: CheckoutConfirmationMode;
       order: BuyerInternalOrderRecord;
       raw?: unknown;
     }
@@ -113,6 +122,50 @@ function pickConfirmationUrl(payload: Record<string, unknown>): string | null {
   const confirmation = asRecord(payload.confirmation);
   if (confirmation) return asString(confirmation.confirmation_url) || asString(confirmation.url);
   return null;
+}
+
+function pickConfirmationToken(payload: Record<string, unknown>): string | null {
+  const direct = asString(payload.confirmationToken) || asString(payload.confirmation_token);
+  if (direct) return direct;
+  const payment = asRecord(payload.payment);
+  if (payment) {
+    return asString(payment.confirmationToken) || asString(payment.confirmation_token);
+  }
+  const confirmation = asRecord(payload.confirmation);
+  if (confirmation) {
+    return asString(confirmation.confirmation_token) || asString(confirmation.token);
+  }
+  return null;
+}
+
+function pickConfirmationModeRaw(payload: Record<string, unknown>): string | null {
+  const direct = asString(payload.confirmationMode) || asString(payload.confirmation_mode);
+  if (direct) return direct;
+  const payment = asRecord(payload.payment);
+  if (payment) {
+    return asString(payment.confirmationMode) || asString(payment.confirmation_mode);
+  }
+  return null;
+}
+
+function resolvePaymentConfirmation(payload: unknown): {
+  confirmationMode: CheckoutConfirmationMode;
+  confirmationToken: string | null;
+  confirmationUrl: string | null;
+} {
+  const root = asRecord(payload) || {};
+  const order = asRecord(root.order) || root;
+  const payment = asRecord(order.payment) || asRecord(root.payment) || {};
+  return pickCheckoutConfirmation({
+    confirmationMode:
+      pickConfirmationModeRaw(payment) ||
+      pickConfirmationModeRaw(order) ||
+      pickConfirmationModeRaw(root),
+    confirmationToken:
+      pickConfirmationToken(payment) || pickConfirmationToken(order) || pickConfirmationToken(root),
+    confirmationUrl:
+      pickConfirmationUrl(payment) || pickConfirmationUrl(order) || pickConfirmationUrl(root),
+  });
 }
 
 function mapLineItem(raw: unknown): BuyerTicketLineItem | null {
@@ -311,6 +364,7 @@ function buildYookassaBody(input: FinanceCheckoutSubmitInput) {
     // Public /api/checkout/yookassa currently event-oriented; still send admission fields for Codex parity.
     offerId: input.admissionOfferId,
     returnUrl: input.returnUrl,
+    confirmationMode: input.confirmationMode || 'redirect',
   };
 }
 
@@ -348,8 +402,10 @@ export async function submitAdmissionCheckout(
     detail: 'Нет доступного режима оплаты',
   };
 
+  const idempotencyKey = String(input.idempotencyKey || '').trim() || undefined;
+
   for (const attempt of attempts) {
-    const result = await financePostJson(attempt.path, attempt.body, env);
+    const result = await financePostJson(attempt.path, attempt.body, env, { idempotencyKey });
     if (!result.ok) {
       lastFail = {
         ok: false,
@@ -372,13 +428,20 @@ export async function submitAdmissionCheckout(
       continue;
     }
 
+    const confirmation = resolvePaymentConfirmation(result.json);
+
     return {
       ok: true,
       mode: order.mode || attempt.label,
       publicCode: order.publicCode,
       status: order.status,
-      confirmationUrl: order.confirmationUrl || null,
-      order,
+      confirmationUrl: confirmation.confirmationUrl || order.confirmationUrl || null,
+      confirmationToken: confirmation.confirmationToken,
+      confirmationMode: confirmation.confirmationMode,
+      order: {
+        ...order,
+        confirmationUrl: confirmation.confirmationUrl || order.confirmationUrl || null,
+      },
       raw: result.json,
     };
   }

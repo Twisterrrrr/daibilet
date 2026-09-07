@@ -3,10 +3,17 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
-import { useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 
-import { upsertInternalOrderInStorage } from '@/lib/buyer-checkout';
+import { upsertInternalOrderInStorage, type BuyerInternalOrderRecord } from '@/lib/buyer-checkout';
 import { buyerResultPath } from '@/lib/buyer-ticket';
+import {
+  buildAdmissionCheckoutIdempotencyKey,
+  isTerminalCheckoutOrderStatus,
+  loadYooKassaCheckoutWidgetScript,
+  pollCheckoutOrderUntilTerminal,
+  type CheckoutConfirmationMode,
+} from '@/lib/checkout-payment';
 import { formatNumber } from '@/lib/format';
 import type { FinanceAdmissionProduct } from '@/lib/finance-projection';
 import { useUserAuth } from '@/hooks/useUserAuth';
@@ -21,47 +28,34 @@ type CheckoutApiOk = {
   publicCode: string;
   status: string;
   confirmationUrl: string | null;
+  confirmationToken?: string | null;
+  confirmationMode?: CheckoutConfirmationMode;
   ticketUrl?: string;
   catalogReturnWithOrder?: string;
   emailSent?: boolean;
   emailReason?: string | null;
-  order: {
-    publicCode: string;
-    status: string;
-    displayStatus: string;
-    statusTone: string;
-    title: string;
-    email: string;
-    purchasedAt: string | null;
-    amountRub: number | null;
-    mode: string;
-    confirmationUrl?: string | null;
-    buyerName?: string | null;
-    eventTitle?: string | null;
-    venueTitle?: string | null;
-    venueAddress?: string | null;
-    venueSlug?: string | null;
-    admissionProductSlug?: string | null;
-    sessionStartsAt?: string | null;
-    validUntil?: string | null;
-    validityMode?: string | null;
-    lineItems?: Array<{ ticketTitle: string; quantity: number }>;
-    supplierSupportPhone?: string | null;
-    source: 'internal';
-  };
+  order: BuyerInternalOrderRecord;
 };
 
+type OrderLookupResponse = {
+  ok: boolean;
+  found: boolean;
+  publicCode: string;
+  order: BuyerInternalOrderRecord | null;
+};
+
+const WIDGET_ROOT_ID = 'daibilet-yookassa-widget';
+
 /**
- * Thin museum / simple-admission path (owner 2026-08-07):
- * email (required by API) → create-payment → redirect confirmationUrl.
- * No multi-step calc here - complex pricing UI lives under /checkout/calc (future).
+ * Thin museum / simple-admission path:
+ * email → create-payment → embedded YooKassa widget (fallback: redirect confirmationUrl).
+ * Order state comes only from finance projection polling.
  */
 export function AdmissionCheckoutForm({ product }: Props) {
   const router = useRouter();
   const { user } = useUserAuth();
   const offers = product.offers;
 
-  // Silent default offer (cheapest) - not a buyer-facing calculator.
   const defaultOffer = useMemo(() => {
     if (!offers.length) return null;
     return [...offers].sort((a, b) => a.priceRub - b.priceRub)[0] || offers[0];
@@ -72,10 +66,124 @@ export function AdmissionCheckoutForm({ product }: Props) {
   const [lastName, setLastName] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [publicCode, setPublicCode] = useState<string | null>(null);
+  const [widgetActive, setWidgetActive] = useState(false);
+  const [widgetHint, setWidgetHint] = useState<string | null>(null);
+  const pollAbortRef = useRef<AbortController | null>(null);
+  const widgetRef = useRef<{ destroy?: () => void } | null>(null);
+  const idempotencyKeyRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      pollAbortRef.current?.abort();
+      try {
+        widgetRef.current?.destroy?.();
+      } catch {
+        // ignore
+      }
+    };
+  }, []);
+
+  function resultHref(code: string, mode?: string) {
+    return buyerResultPath(code, mode);
+  }
+
+  async function lookupOrder(code: string, signal: AbortSignal): Promise<{
+    found: boolean;
+    status: string | null;
+    order: BuyerInternalOrderRecord | null;
+  }> {
+    const response = await fetch(`/checkout/actions/order?order=${encodeURIComponent(code)}`, {
+      cache: 'no-store',
+      signal,
+    });
+    const payload = (await response.json().catch(() => null)) as OrderLookupResponse | null;
+    const order = payload?.found && payload.order ? payload.order : null;
+    return {
+      found: Boolean(order),
+      status: order?.status || null,
+      order,
+    };
+  }
+
+  function startOrderPolling(code: string, mode?: string) {
+    pollAbortRef.current?.abort();
+    const controller = new AbortController();
+    pollAbortRef.current = controller;
+
+    void pollCheckoutOrderUntilTerminal({
+      publicCode: code,
+      signal: controller.signal,
+      lookup: async (publicCodeValue, signal) => {
+        const row = await lookupOrder(publicCodeValue, signal);
+        if (row.order) upsertInternalOrderInStorage(row.order);
+        return row;
+      },
+      onUpdate: (lookup) => {
+        if (lookup.found && isTerminalCheckoutOrderStatus(lookup.status)) {
+          router.push(resultHref(code, mode));
+        }
+      },
+    }).then((result) => {
+      if (result.ok) {
+        router.push(resultHref(code, mode));
+      }
+    });
+  }
+
+  async function mountEmbeddedWidget(token: string, code: string, mode?: string) {
+    setWidgetActive(true);
+    setWidgetHint(null);
+    try {
+      await loadYooKassaCheckoutWidgetScript();
+      const Widget = window.YooMoneyCheckoutWidget;
+      if (!Widget) throw new Error('yookassa_widget_missing');
+
+      try {
+        widgetRef.current?.destroy?.();
+      } catch {
+        // ignore
+      }
+
+      const widget = new Widget({
+        confirmation_token: token,
+        error_callback: () => {
+          setWidgetHint(
+            'Не удалось показать форму оплаты. Сохраните код заказа и откройте страницу статуса.',
+          );
+        },
+      });
+      widgetRef.current = widget;
+
+      if (typeof widget.on === 'function') {
+        widget.on('success', () => {
+          // Immediate projection read - do not invent local paid state.
+          void lookupOrder(code, new AbortController().signal).then((row) => {
+            if (row.order) upsertInternalOrderInStorage(row.order);
+            if (row.found && isTerminalCheckoutOrderStatus(row.status)) {
+              router.push(resultHref(code, mode));
+            }
+          });
+        });
+        widget.on('fail', () => {
+          setWidgetHint('Оплата не завершена. Можно попробовать снова или открыть статус заказа.');
+        });
+      }
+
+      await Promise.resolve(widget.render(WIDGET_ROOT_ID));
+      startOrderPolling(code, mode);
+    } catch {
+      setWidgetHint(
+        'Виджет ЮKassa не загрузился. Код заказа сохранён - откройте страницу статуса или обновите страницу.',
+      );
+      startOrderPolling(code, mode);
+    }
+  }
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
     setError(null);
+    setWidgetHint(null);
 
     const trimmedEmail = email.trim().toLowerCase();
     if (!trimmedEmail.includes('@')) {
@@ -85,6 +193,18 @@ export function AdmissionCheckoutForm({ product }: Props) {
     if (!defaultOffer) {
       setError('Тариф временно недоступен');
       return;
+    }
+
+    const payloadKey = buildAdmissionCheckoutIdempotencyKey({
+      admissionProductSlug: product.slug,
+      admissionOfferId: defaultOffer.id,
+      quantity: 1,
+      email: trimmedEmail,
+      confirmationMode: 'embedded',
+    });
+    if (!idempotencyKeyRef.current || !idempotencyKeyRef.current.startsWith(payloadKey)) {
+      // Reuse the same key for ambiguous retries of this exact payload.
+      idempotencyKeyRef.current = payloadKey;
     }
 
     setSubmitting(true);
@@ -102,10 +222,10 @@ export function AdmissionCheckoutForm({ product }: Props) {
             lastName: lastName.trim() || undefined,
             name: [firstName.trim(), lastName.trim()].filter(Boolean).join(' ') || undefined,
           },
-          // Finance should append ?order={publicCode} to this base when creating YooKassa payment.
           returnUrl: `${window.location.origin}/checkout/result`,
-          // Prefer YooKassa confirmationUrl; stub only if finance admits no yookassa path yet.
           mode: 'auto',
+          confirmationMode: 'embedded',
+          idempotencyKey: idempotencyKeyRef.current,
         }),
       });
       const payload = (await response.json().catch(() => ({}))) as CheckoutApiOk & {
@@ -126,6 +246,7 @@ export function AdmissionCheckoutForm({ product }: Props) {
         ...payload.order,
         source: 'internal',
       });
+      setPublicCode(payload.publicCode);
 
       if (payload.emailSent) {
         try {
@@ -135,17 +256,19 @@ export function AdmissionCheckoutForm({ product }: Props) {
         }
       }
 
+      const token = String(payload.confirmationToken || '').trim();
+      if (token) {
+        await mountEmbeddedWidget(token, payload.publicCode, payload.mode);
+        return;
+      }
+
       if (payload.confirmationUrl) {
-        // After pay, buyer should land on catalog result/ticket (finance return_url handoff).
-        // localStorage keeps publicCode if return URL still lacks ?order=.
+        // Missing token → redirect rollback.
         window.location.href = payload.confirmationUrl;
         return;
       }
 
-      // Confirmed without redirect (STUB): thank-you + ticket card.
-      router.push(
-        `${buyerResultPath(payload.publicCode, payload.mode)}`,
-      );
+      router.push(resultHref(payload.publicCode, payload.mode));
     } catch {
       setError('Сеть недоступна. Проверьте соединение и попробуйте снова.');
     } finally {
@@ -154,6 +277,7 @@ export function AdmissionCheckoutForm({ product }: Props) {
   }
 
   const priceRub = defaultOffer?.priceRub;
+  const resultPath = publicCode ? resultHref(publicCode) : null;
 
   return (
     <form
@@ -162,7 +286,7 @@ export function AdmissionCheckoutForm({ product }: Props) {
     >
       <h2 className="text-xl font-bold text-slate-950">Оплата картой</h2>
       <p className="mt-1 text-sm text-slate-500">
-        Укажите email - сразу перейдём к оплате в ЮKassa.
+        Укажите email - форма ЮKassa откроется прямо на этой странице.
       </p>
 
       {priceRub != null ? (
@@ -175,60 +299,95 @@ export function AdmissionCheckoutForm({ product }: Props) {
         </p>
       ) : null}
 
-      <label className="mt-5 block text-sm font-semibold text-slate-800">
-        Email
-        <input
-          type="email"
-          required
-          autoComplete="email"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-base font-normal text-slate-900 outline-none ring-primary-500/30 focus:border-primary-500 focus:ring-4"
-          placeholder="you@example.com"
-        />
-      </label>
+      {!widgetActive ? (
+        <>
+          <label className="mt-5 block text-sm font-semibold text-slate-800">
+            Email
+            <input
+              type="email"
+              required
+              autoComplete="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-base font-normal text-slate-900 outline-none ring-primary-500/30 focus:border-primary-500 focus:ring-4"
+              placeholder="you@example.com"
+            />
+          </label>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <label className="block text-sm font-semibold text-slate-800">
-          Имя
-          <input
-            type="text"
-            autoComplete="given-name"
-            value={firstName}
-            onChange={(event) => setFirstName(event.target.value)}
-            className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-base font-normal text-slate-900 outline-none ring-primary-500/30 focus:border-primary-500 focus:ring-4"
-            placeholder="Иван"
-          />
-        </label>
-        <label className="block text-sm font-semibold text-slate-800">
-          Фамилия
-          <input
-            type="text"
-            autoComplete="family-name"
-            value={lastName}
-            onChange={(event) => setLastName(event.target.value)}
-            className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-base font-normal text-slate-900 outline-none ring-primary-500/30 focus:border-primary-500 focus:ring-4"
-            placeholder="Петров"
-          />
-        </label>
-      </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <label className="block text-sm font-semibold text-slate-800">
+              Имя
+              <input
+                type="text"
+                autoComplete="given-name"
+                value={firstName}
+                onChange={(event) => setFirstName(event.target.value)}
+                className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-base font-normal text-slate-900 outline-none ring-primary-500/30 focus:border-primary-500 focus:ring-4"
+                placeholder="Иван"
+              />
+            </label>
+            <label className="block text-sm font-semibold text-slate-800">
+              Фамилия
+              <input
+                type="text"
+                autoComplete="family-name"
+                value={lastName}
+                onChange={(event) => setLastName(event.target.value)}
+                className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-base font-normal text-slate-900 outline-none ring-primary-500/30 focus:border-primary-500 focus:ring-4"
+                placeholder="Петров"
+              />
+            </label>
+          </div>
+        </>
+      ) : null}
 
       {error ? (
         <div className="mt-4 rounded-xl bg-red-50 px-3 py-2.5 text-sm text-red-800">{error}</div>
       ) : null}
 
-      <button
-        type="submit"
-        disabled={submitting || !defaultOffer}
-        className="mt-6 inline-flex w-full min-h-12 items-center justify-center gap-2 rounded-full bg-primary-600 px-5 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-60"
-      >
-        {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-        {submitting
-          ? 'Переходим к оплате…'
-          : priceRub != null
-            ? `Оплатить ${formatNumber(priceRub)} ₽`
-            : 'Оплатить'}
-      </button>
+      {widgetActive ? (
+        <div className="mt-5">
+          <p className="text-sm font-semibold text-slate-800">Оплата ЮKassa</p>
+          <div
+            id={WIDGET_ROOT_ID}
+            className="mt-3 min-h-[220px] rounded-xl border border-slate-200 bg-slate-50 p-2"
+          />
+          {widgetHint ? (
+            <p className="mt-3 text-sm text-amber-800">{widgetHint}</p>
+          ) : (
+            <p className="mt-3 text-xs text-slate-500">
+              Статус заказа подтверждаем на стороне Дайбилет - не закрывайте страницу до перехода к билету.
+            </p>
+          )}
+        </div>
+      ) : (
+        <button
+          type="submit"
+          disabled={submitting || !defaultOffer}
+          className="mt-6 inline-flex w-full min-h-12 items-center justify-center gap-2 rounded-full bg-primary-600 px-5 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-60"
+        >
+          {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+          {submitting
+            ? 'Открываем оплату…'
+            : priceRub != null
+              ? `Оплатить ${formatNumber(priceRub)} ₽`
+              : 'Оплатить'}
+        </button>
+      )}
+
+      {publicCode ? (
+        <p className="mt-4 text-center text-sm text-slate-600">
+          Код заказа: <span className="font-semibold text-slate-900">{publicCode}</span>
+          {resultPath ? (
+            <>
+              {' · '}
+              <Link href={resultPath} className="font-semibold text-primary-700 hover:text-primary-800">
+                Страница статуса
+              </Link>
+            </>
+          ) : null}
+        </p>
+      ) : null}
 
       <p className="mt-3 text-center text-xs leading-5 text-slate-500">
         Нажимая кнопку, вы соглашаетесь с{' '}

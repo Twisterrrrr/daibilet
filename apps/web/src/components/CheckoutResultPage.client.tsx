@@ -15,6 +15,11 @@ import {
   type BuyerInternalOrderRecord,
 } from '@/lib/buyer-checkout';
 import { buyerTicketPath } from '@/lib/buyer-ticket';
+import {
+  isPendingCheckoutOrderStatus,
+  isTerminalCheckoutOrderStatus,
+  pollCheckoutOrderUntilTerminal,
+} from '@/lib/checkout-payment';
 import { useUserAuth } from '@/hooks/useUserAuth';
 
 type LookupResponse = {
@@ -35,6 +40,17 @@ function pickLatestStoredOrder(email?: string | null): BuyerInternalOrderRecord 
   })[0];
 }
 
+async function fetchOrderLookup(
+  code: string,
+  signal?: AbortSignal,
+): Promise<LookupResponse | null> {
+  const response = await fetch(`/checkout/actions/order?order=${encodeURIComponent(code)}`, {
+    cache: 'no-store',
+    signal,
+  });
+  return (await response.json().catch(() => null)) as LookupResponse | null;
+}
+
 export function CheckoutResultView() {
   const searchParams = useSearchParams();
   const publicCodeParam = (searchParams.get('order') || searchParams.get('publicCode') || '').trim();
@@ -50,6 +66,66 @@ export function CheckoutResultView() {
 
   useEffect(() => {
     let disposed = false;
+    const pollAbort = new AbortController();
+
+    const applyOrder = (next: BuyerInternalOrderRecord, cached: BuyerInternalOrderRecord | null) => {
+      const merged = mergeBuyerInternalOrders(next, cached);
+      setOrder(merged);
+      setPublicCode(merged.publicCode);
+      upsertInternalOrderInStorage(merged);
+      return merged;
+    };
+
+    const maybeNotify = async (code: string, cached: BuyerInternalOrderRecord | null) => {
+      const mailFlagKey = `daibilet.ticketMailSent.${code}`;
+      let already = false;
+      try {
+        already = window.sessionStorage.getItem(mailFlagKey) === '1';
+      } catch {
+        already = false;
+      }
+      if (already) {
+        if (!disposed) setEmailHint('sent');
+        return;
+      }
+      try {
+        const notify = await fetch('/checkout/actions/notify-ticket', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            publicCode: code,
+            email: cached?.email || user?.email || undefined,
+            title: cached?.title,
+            amountRub: cached?.amountRub,
+            mode: cached?.mode || modeHint || undefined,
+            status: cached?.status || (modeHint === 'STUB' ? 'CONFIRMED' : undefined),
+          }),
+        });
+        const notifyPayload = (await notify.json().catch(() => null)) as {
+          sent?: boolean;
+          reason?: string;
+        } | null;
+        if (!disposed) {
+          if (notifyPayload?.sent) {
+            setEmailHint('sent');
+            try {
+              window.sessionStorage.setItem(mailFlagKey, '1');
+            } catch {
+              // ignore
+            }
+          } else if (
+            notifyPayload?.reason === 'smtp_not_configured' ||
+            notifyPayload?.reason === 'nodemailer_missing' ||
+            notifyPayload?.reason === 'email_missing' ||
+            (notify.ok && notifyPayload && notifyPayload.sent === false)
+          ) {
+            setEmailHint('skipped');
+          }
+        }
+      } catch {
+        if (!disposed) setEmailHint('skipped');
+      }
+    };
 
     const run = async () => {
       let code = publicCodeParam;
@@ -71,24 +147,21 @@ export function CheckoutResultView() {
         return;
       }
 
-      const cached = readInternalOrdersFromStorage().find((row) => row.publicCode === code) || null;
+      let cached = readInternalOrdersFromStorage().find((row) => row.publicCode === code) || null;
       if (!disposed && cached) setOrder(cached);
 
+      let current: BuyerInternalOrderRecord | null = cached;
+
       try {
-        const response = await fetch(`/checkout/actions/order?order=${encodeURIComponent(code)}`, {
-          cache: 'no-store',
-        });
-        const payload = (await response.json().catch(() => null)) as LookupResponse | null;
+        const payload = await fetchOrderLookup(code);
         if (!disposed && payload?.found && payload.order) {
-          const merged = mergeBuyerInternalOrders(payload.order, cached);
-          setOrder(merged);
-          setPublicCode(merged.publicCode);
-          upsertInternalOrderInStorage(merged);
+          current = applyOrder(payload.order, cached);
+          cached = current;
         } else if (!disposed && !cached) {
           const mapped = mapFinanceOrderStatus(modeHint === 'STUB' ? 'CONFIRMED' : 'PENDING');
-          setOrder({
+          current = {
             publicCode: code,
-            status: modeHint === 'STUB' ? 'CONFIRMED' : fromYookassa || modeHint === 'YOOKASSA' ? 'PENDING' : 'PENDING',
+            status: modeHint === 'STUB' ? 'CONFIRMED' : 'PENDING',
             displayStatus: mapped.displayStatus,
             statusTone: mapped.statusTone,
             title: 'Входной билет',
@@ -97,71 +170,50 @@ export function CheckoutResultView() {
             amountRub: null,
             mode: modeHint || (fromYookassa ? 'YOOKASSA' : 'UNKNOWN'),
             source: 'internal',
-          });
+          };
+          setOrder(current);
         }
       } catch {
-        // keep cache / fallback
+        // keep cache / fallback - transport error must not become failed payment
       } finally {
         if (!disposed) setLoading(false);
       }
 
-      // Best-effort notify (SMTP may be absent - UI shows save-code copy).
-      // Skip if admission already mailed this code in this browser session.
-      if (code && !disposed) {
-        const mailFlagKey = `daibilet.ticketMailSent.${code}`;
-        let already = false;
-        try {
-          already = window.sessionStorage.getItem(mailFlagKey) === '1';
-        } catch {
-          already = false;
-        }
-        if (already) {
-          if (!disposed) setEmailHint('sent');
-        } else {
-          try {
-            const notify = await fetch('/checkout/actions/notify-ticket', {
-              method: 'POST',
-              headers: { 'content-type': 'application/json' },
-              body: JSON.stringify({
-                publicCode: code,
-                email: cached?.email || user?.email || undefined,
-                title: cached?.title,
-                amountRub: cached?.amountRub,
-                mode: cached?.mode || modeHint || undefined,
-                status: cached?.status || (modeHint === 'STUB' ? 'CONFIRMED' : undefined),
-              }),
-            });
-            const notifyPayload = (await notify.json().catch(() => null)) as {
-              sent?: boolean;
-              reason?: string;
-            } | null;
-            if (!disposed) {
-              if (notifyPayload?.sent) {
-                setEmailHint('sent');
-                try {
-                  window.sessionStorage.setItem(mailFlagKey, '1');
-                } catch {
-                  // ignore
-                }
-              } else if (
-                notifyPayload?.reason === 'smtp_not_configured' ||
-                notifyPayload?.reason === 'nodemailer_missing' ||
-                notifyPayload?.reason === 'email_missing' ||
-                (notify.ok && notifyPayload && notifyPayload.sent === false)
-              ) {
-                setEmailHint('skipped');
-              }
+      // YooKassa may land buyer before webhook is visible: keep polling while pending.
+      if (
+        code &&
+        !disposed &&
+        (!current || isPendingCheckoutOrderStatus(current.status)) &&
+        !isTerminalCheckoutOrderStatus(current?.status)
+      ) {
+        await pollCheckoutOrderUntilTerminal({
+          publicCode: code,
+          signal: pollAbort.signal,
+          lookup: async (publicCodeValue, signal) => {
+            const payload = await fetchOrderLookup(publicCodeValue, signal);
+            const row = payload?.found && payload.order ? payload.order : null;
+            if (row && !disposed) {
+              current = applyOrder(row, cached);
+              cached = current;
             }
-          } catch {
-            if (!disposed) setEmailHint('skipped');
-          }
-        }
+            return {
+              found: Boolean(row),
+              status: row?.status || null,
+              order: row,
+            };
+          },
+        });
+      }
+
+      if (code && !disposed) {
+        await maybeNotify(code, cached);
       }
     };
 
     void run();
     return () => {
       disposed = true;
+      pollAbort.abort();
     };
   }, [publicCodeParam, modeHint, fromYookassa, user?.email]);
 
