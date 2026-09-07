@@ -20,6 +20,7 @@ import {
   expandLargeListingCopy,
   hubBlogCardExcerpt,
   mergeBlogCards,
+  orderBlogCardsForVisit,
   resolveBlogCardDateLabel,
   splitBlogListingHero,
   staticBlogCards,
@@ -94,7 +95,7 @@ test('static cards expose date + topics + searchText', () => {
   assert.ok(moscow?.searchText?.includes('москв'));
 });
 
-test('splitBlogListingHero: first card is hero, isFeatured ignored', () => {
+test('splitBlogListingHero: isFeatured wins, else first card', () => {
   const cards = staticBlogCards();
   assert.ok(cards.length >= 3);
 
@@ -107,9 +108,27 @@ test('splitBlogListingHero: first card is hero, isFeatured ignored', () => {
   const flaggedSlug = cards[2]!.slug;
   const withFlag = cards.map((c, i) => ({ ...c, isFeatured: i === 2 }));
   const split = splitBlogListingHero(withFlag);
-  assert.equal(split.featured?.slug, withFlag[0]!.slug);
-  assert.notEqual(split.featured?.slug, flaggedSlug);
+  assert.equal(split.featured?.slug, flaggedSlug);
   assert.ok(!split.feed.some((p) => p.slug === split.featured?.slug));
+});
+
+test('orderBlogCardsForVisit: pin stays first, rest can shuffle', () => {
+  const cards = staticBlogCards().slice(0, 6);
+  assert.ok(cards.length >= 4);
+
+  const withFlag = cards.map((c, i) => ({ ...c, isFeatured: i === 2 }));
+  const pinSlug = withFlag[2]!.slug;
+  const ordered = orderBlogCardsForVisit(withFlag);
+  assert.equal(ordered[0]?.slug, pinSlug);
+  assert.equal(ordered.length, withFlag.length);
+  assert.deepEqual(
+    [...ordered.map((c) => c.slug)].sort(),
+    [...withFlag.map((c) => c.slug)].sort(),
+  );
+
+  // Without isFeatured - editorial first stays pinned (not a full reshuffle of hero).
+  const noFlag = orderBlogCardsForVisit(cards);
+  assert.equal(noFlag[0]?.slug, cards[0]?.slug);
 });
 
 test('stripColumnMetaPrefix removes author column labels', () => {

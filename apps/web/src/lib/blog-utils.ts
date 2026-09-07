@@ -445,8 +445,7 @@ export function splitBlogSeriesHeroTitle(
 
 /**
  * Hero / feed split for `/blog`:
- * - featured = first card in the given order (visit-shuffled on the client;
- *   isFeatured is ignored while we keep the hero randomized)
+ * - featured = first `isFeatured` card, else first in the given order
  * - feed = everything except featured (no duplicate in magazine first slot)
  * - hot = next 3 for «Свежее» sidebar
  */
@@ -460,7 +459,7 @@ export function splitBlogListingHero(
 } {
   if (!posts.length) return { featured: null, feed: [], hot: [] };
 
-  const featured = posts[0] || null;
+  const featured = posts.find((post) => post.isFeatured === true) || posts[0] || null;
   if (!featured) return { featured: null, feed: [], hot: [] };
 
   const feed = posts.filter((post) => post.slug !== featured.slug);
@@ -470,6 +469,17 @@ export function splitBlogListingHero(
     feed,
     hot: feed.slice(0, limit),
   };
+}
+
+/**
+ * Per-reload feed order: keep one pinned hero, shuffle the rest.
+ * Pin = first `isFeatured`, else editorial first card (SSR order).
+ */
+export function orderBlogCardsForVisit(posts: BlogCardDto[]): BlogCardDto[] {
+  if (posts.length <= 1) return [...posts];
+  const pin = posts.find((post) => post.isFeatured === true) || posts[0]!;
+  const rest = posts.filter((post) => post.slug !== pin.slug);
+  return [pin, ...shuffleBlogCards(rest)];
 }
 
 /** Fisher–Yates shuffle (new array). Per-visit blog feed order on the client. */

@@ -69,20 +69,24 @@ function resolveCopy(promo: BlogSidebarPromoDto, kind: BlogFeedPromoKind): Resol
     };
   }
 
-  if (kind === 'event' && eventTitle) {
+  if (kind === 'event') {
     return {
       eyebrow: 'Событие',
       cityTag: promo.cityName,
-      title: eventTitle,
-      excerpt: price
-        ? `${price} · живая дата в афише ${promo.cityName}.`
-        : `Живая дата в афише ${promo.cityName}.`,
+      title: eventTitle || `Афиша ${promo.cityName}`,
+      excerpt: eventTitle
+        ? price
+          ? `${price} · живая дата в афише ${promo.cityName}.`
+          : `Живая дата в афише ${promo.cityName}.`
+        : price
+          ? `${price} · концерты и прогулки без очереди в чатах.`
+          : `Живые даты в ${promo.cityName} без очереди в чатах.`,
       href: promo.featuredEventHref || promo.href,
       cta: 'К билетам →',
       foot: [price, 'афиша'].filter(Boolean) as string[],
       imageSrc: src,
       imageFallback: cityImageUrl,
-      probeEventCover,
+      probeEventCover: Boolean(eventTitle) && probeEventCover,
     };
   }
 

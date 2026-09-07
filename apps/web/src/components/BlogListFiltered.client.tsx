@@ -212,7 +212,7 @@ export function BlogListFiltered({
           <BlogMagazineGrid
             posts={displayPosts}
             editorialQuote={editorialQuote}
-            leadBanner={hasActive || !featuredSlot}
+            leadBanner={false}
             feedPromoSlots={feedPromoSlots}
           />
           {hasMore ? (
