@@ -7,12 +7,16 @@ const COLLAPSED_TRACK_MIN_PX = 16.5 * 16;
 const COLLAPSED_FILTERS_RAIL_PX = 3.25 * 16 + 12;
 const COLLAPSED_GRID_GAP_PX = 20;
 
+/**
+ * Mirrors `.catalog-card-grid`: 2 → lg:3 → 2xl:4.
+ * Tablet stays at 2 → layout flattens featured to equal tiles (badge only).
+ * Column count ≥3 unlocks magazine bento clusters on desktop.
+ */
 export function estimateCatalogGridColumns(
   viewportWidth: number,
   filtersCollapsed: boolean,
 ): number {
-  if (viewportWidth < 768) return 2;
-  if (viewportWidth < 1024) return 3;
+  if (viewportWidth < 1024) return 2;
   if (filtersCollapsed) {
     const contentWidth = Math.max(
       viewportWidth - 48 - COLLAPSED_FILTERS_RAIL_PX,
@@ -51,7 +55,9 @@ export function useCatalogGridColumnCount(
   itemCount: number,
 ): number {
   const [columns, setColumns] = useState(() => {
-    if (typeof window === 'undefined') return 4;
+    // SSR: 2-col flat (tablet-safe). Desktop upgrades to bento in useLayoutEffect
+    // before paint - avoids shipping a full-row magazine hole to phones/tablets.
+    if (typeof window === 'undefined') return 2;
     return estimateCatalogGridColumns(window.innerWidth, filtersCollapsed);
   });
 

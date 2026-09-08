@@ -141,7 +141,7 @@ const BASE_STARTS = Date.parse('2026-09-12T18:00:00+03:00');
 
 /**
  * 10 mock excursions for UX Catalog 2.0 grid smoke.
- * Every 4th card (4, 8, …) has `isFeatured: true` for col-span-2 + «Выбор редакции».
+ * Every 4th card (4, 8, …) has `isFeatured: true` for bento/badge «Выбор редакции».
  */
 export function buildPreviewCardsMock(): PreviewCardMock[] {
   return SEEDS.map((seed, index) => {

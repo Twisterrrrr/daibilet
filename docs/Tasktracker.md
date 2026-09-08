@@ -1,3 +1,9 @@
+## 2026-09-08 - AI rewrite event descriptions (admin MVP)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| SEO.AI-REWRITE-MVP | Admin AI-рерайт описаний → override (UI-only, OpenAI, без draft в БД) | Высокий | ✅ code |
+
 ## 2026-09-08 - UX Catalog 2.0 (High-End perception)
 
 Канон-бриф: [ux-catalog-v2-brief.md](./ux-catalog-v2-brief.md).  
@@ -9,7 +15,7 @@
 | UX2.BRIEF | Brief UX Catalog 2.0: CLS/fade, grid rhythm, type hierarchy, find, blog listing | Высокий | ✅ docs |
 | UX2.PERF-FADE | SafeImage/CardSafeImage: skeleton + opacity fade onLoad; LCP priority без мигания | Критический | ✅ |
 | UX2.PERF-CLS | Жёсткий aspect media на всех листинг-карточках (events/hub/blog card); без прыжка сетки | Критический | ✅ aspect уже был; fade закрывает pop-in |
-| UX2.GRID-FEATURED | Ритм сетки `/events`: featured col-span-2 + бейдж «Выбор редакции»; pin PINNED/recommend + 1/N hash | Высокий | ✅ |
+| UX2.GRID-FEATURED | Ритм `/events`: tablet/mobile = flat + бейдж; lg+ magazine bento full-row (без col-span / contents) | Высокий | ✅ rebuild |
 | UX2.TYPE-CARD | Иерархия EventCard: title > price > muted meta + воздух; без смены Manrope/`fonts.ts` | Высокий | ✅ |
 | UX2.FIND-SUGGEST | Typeahead city/category на FilterRail (после W1-W3) | Средний | ⏳ blocked smoke |
 | UX2.BLOG-LIST-IMG | `/blog` listing: sidecar chain card→thumb→og + BlogCardSafeImage везде + aspect/quality | Средний | ✅ |

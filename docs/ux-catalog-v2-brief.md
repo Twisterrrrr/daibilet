@@ -51,7 +51,7 @@
 | Wave | ID prefix | Фокус | Цель |
 |------|-----------|--------|------|
 | **W1** | `UX2.PERF` | Skeleton + fade-in + CLS=0 на media | Картинки «проявляются», сетка не дёргается |
-| **W2** | `UX2.GRID` | Featured rhythm в каталоге | Глазу есть якоря при скролле |
+| **W2** | `UX2.GRID` | Featured rhythm в каталоге | Глазу есть якоря при скролле; tablet = плоские плитки + бейдж; bento только lg+ |
 | **W3** | `UX2.TYPE` | Иерархия текста в карточке | Не прайс-лист |
 | **W4** | `UX2.FIND` | Search/filter suggest (после W1-W3) | Ощущение «умного» агрегатора |
 | **W5** | `UX2.BLOG` | Blog listing image budget | Меньше вязкости скролла |
@@ -83,7 +83,7 @@
 
 Задача:
 1) Определи правило featured без ручного поля на каждом оффере предпочтительно: существующие editorial/home flags, editors pick, топ popularScore, или 1 pin на N карточек (стабильный по slug hash, не random каждый reload).
-2) В CSS grid каталога featured занимает 2 колонки на md+ (col-span-2); на mobile остаётся 1 колонка.
+2) На tablet/mobile (<3 cols) flatten: равные плитки + бейдж «Выбор редакции». На lg+ (3+ cols) - magazine bento (hero + 2 stack) на полную ширину ряда, только с начала ряда; иначе demote в badge-only. Не использовать col-span-2 и не оставлять пустые ячейки.
 3) Визуал: бейдж «Рекомендуем» (или канон «Выбор редакции» если уже есть в UI) + лёгкий акцент рамки/тени. Без emoji и цветного пилл-зоопарка на фото.
 4) Не ломай infinite scroll / interstitials (CatalogInterstitial).
 5) Тест на стабильность порядка SSR vs hydrate (без CLS от смены span).

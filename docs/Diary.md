@@ -1,4 +1,50 @@
-## 2026-09-08 - UX Catalog 2.0 `/preview-cards` smoke harness
+## 2026-09-08 - AI rewrite event descriptions (admin MVP)
+
+### Наблюдения
+- Source-описания с Ticketscloud дублируются у конкурентов → риск пессимизации за duplicate content.
+- Нужен human-in-the-loop без draft-статуса в БД (соло-MVP).
+
+### Решения
+- `POST /api/admin/events/:id/rewrite-description` → OpenAI + «шестиугольник» SYSTEM_PROMPT → `{ text }` only.
+- Админка: Было/Стало + «Сгенерировать рерайт»; запись только через существующий «Сохранить контент» → `EventOverride.description`.
+- Doc: [event-description-ai-rewrite.md](./event-description-ai-rewrite.md). Env: `OPENAI_API_KEY` (+ optional `OPENAI_REWRITE_MODEL`).
+
+### Проблемы
+- Без ключа на backend кнопка вернёт 503/`missing_openai_key` — нужен секрет на хосте API перед live smoke.
+
+---
+
+## 2026-09-08 - UX Catalog 2.0: tablet = flatten, не display:contents
+
+### Наблюдения
+- CSS `display:contents` на кластере всё ещё давал ощущение «дырки» / рваного ритма на планшете; owner: пересобрать нормально.
+- Full-row bento в 2-колоночной сетке визуально ломает ленту афиши.
+
+### Решения
+- `layoutCatalogFeaturedUnits(cols < 3)`: всегда flatten → равные карточки + бейдж «Выбор редакции».
+- Bento (`CatalogFeaturedCluster`) только при 3+ cols и с начала ряда; CSS без `display:contents`.
+- SSR default columns = 2 (tablet-safe); desktop поднимает bento в `useLayoutEffect`.
+
+### Проблемы
+- Visual smoke `/preview-cards` на ~768 (flat) и ~1280 (bento) до W4 / MSK deploy.
+
+---
+
+## 2026-09-08 - UX Catalog 2.0: убрали tablet-дырки (bento вместо col-span-2)
+
+### Наблюдения
+- `md:col-span-2` в общей сетке давал orphan-ячейки на планшете (2 col) и при неровном старте ряда на 3 col.
+- Owner: «дырка событий для планшета» - пересобрать нормально.
+
+### Решения
+- `packCatalogFeaturedUnits` + `layoutCatalogFeaturedUnits`: на 2 col кластер flatten в равные плитки + бейдж; на 3+ col - full-row bento только с начала ряда (иначе demote).
+- `/preview-cards` и `/events` (`CatalogResults`) на `CatalogFeaturedCluster`, без `col-span-2`.
+
+### Проблемы
+- Нужен visual smoke `/preview-cards` на md/lg до W4 и MSK deploy.
+
+---
+
 
 ### Наблюдения
 - Live MSK ещё мог быть без W1–W3; для проверки ритма сетки нужен изолированный роут до прома.

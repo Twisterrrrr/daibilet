@@ -794,6 +794,8 @@ html[data-nav-pending='1'] {
   /**
    * Catalog cards: never drop below ~16.5rem.
    * With a 21rem sidebar at 1024px, 4 columns crush titles/categories (ЭКСК…).
+   * Breakpoints: 2 (mobile/tablet) → 3 (lg) → 4 (2xl).
+   * Featured: flat equal tiles below lg; magazine bento only at lg+ via cluster item.
    */
   .catalog-card-grid {
     display: grid;
@@ -811,7 +813,8 @@ html[data-nav-pending='1'] {
 
   @media (min-width: 768px) {
     .catalog-card-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.25rem;
     }
   }
 
@@ -833,6 +836,79 @@ html[data-nav-pending='1'] {
     .catalog-page-layout.is-filters-collapsed .catalog-card-grid {
       grid-template-columns: repeat(auto-fit, minmax(16.5rem, 1fr));
     }
+  }
+
+  /**
+   * Isolated `/preview-cards` grid: 1 → 2 (tablet) → 3 (desktop).
+   * Same rule as catalog: flat tiles below lg; bento cluster only when 3 cols.
+   */
+  .preview-cards-grid {
+    display: grid;
+    width: 100%;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  @media (min-width: 768px) {
+    .preview-cards-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.25rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .preview-cards-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  /**
+   * Featured editorial unit (hero + 2 stack) - desktop only.
+   * Mobile/tablet never mounts this wrapper (JS flattens to equal cards + badge).
+   * Full-row span avoids the classic col-span-2 empty-cell hole in a 3-col grid.
+   */
+  .catalog-featured-cluster-item {
+    grid-column: 1 / -1;
+    list-style: none;
+  }
+
+  .catalog-featured-cluster {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    grid-template-rows: 1fr 1fr;
+    align-items: stretch;
+    gap: 1.5rem 1.25rem;
+  }
+
+  .catalog-featured-cluster__hero {
+    grid-column: 1;
+    grid-row: 1 / -1;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .catalog-featured-cluster__stack {
+    display: grid;
+    grid-column: 2;
+    grid-row: 1 / -1;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 1fr 1fr;
+    min-width: 0;
+    min-height: 0;
+    gap: 1.5rem 1.25rem;
+  }
+
+  .catalog-featured-cluster__hero .event-card,
+  .catalog-featured-cluster__stack .event-card {
+    height: 100%;
+  }
+
+  .catalog-featured-cluster__stack > * {
+    min-width: 0;
+    min-height: 0;
   }
 
   /** Event PDP: related cards — up to 5 per row on ultrawide. */
