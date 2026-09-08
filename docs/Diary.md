@@ -10,7 +10,10 @@
 - Doc: [event-description-ai-rewrite.md](./event-description-ai-rewrite.md). Env: `OPENAI_API_KEY` (+ optional `OPENAI_REWRITE_MODEL`).
 
 ### Проблемы
-- Без ключа на backend кнопка вернёт 503/`missing_openai_key` — нужен секрет на хосте API перед live smoke.
+- Без ключа на backend кнопка вернёт 503/`missing_openai_key` — нужен секрет `OPENAI_API_KEY` на хосте API перед live smoke (код/UI выкатываем отдельно от секрета).
+
+### Ship
+- Commit + Deploy MSK web (swap тянет git + restart `daibilet-api`) — endpoint `rewrite-description` + админ UI Было/Стало.
 
 ---
 

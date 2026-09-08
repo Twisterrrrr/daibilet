@@ -178,6 +178,50 @@ export type VenueLinkSuggestion = {
   action: string;
 };
 
+export async function rewriteAdminEventDescriptionAction(eventId: string): Promise<{
+  ok: boolean;
+  text?: string;
+  error?: string;
+  truncatedInput?: boolean;
+  sourceUsed?: string;
+}> {
+  const id = String(eventId || '').trim();
+  if (!id) return { ok: false, error: 'missing event id' };
+
+  const response = await adminApiFetch(
+    `/api/admin/events/${encodeURIComponent(id)}/rewrite-description`,
+    { method: 'POST' },
+  );
+
+  const payload = (await response.json().catch(() => ({}))) as {
+    text?: string;
+    message?: string;
+    error?: string;
+    truncatedInput?: boolean;
+    sourceUsed?: string;
+  };
+
+  if (!response.ok) {
+    return {
+      ok: false,
+      error:
+        payload.message ||
+        payload.error ||
+        `rewrite failed HTTP ${response.status}`,
+    };
+  }
+
+  const text = String(payload.text || '').trim();
+  if (!text) return { ok: false, error: 'Модель вернула пустой текст' };
+
+  return {
+    ok: true,
+    text,
+    truncatedInput: payload.truncatedInput === true,
+    sourceUsed: payload.sourceUsed,
+  };
+}
+
 export async function fetchAdminVenueLinkSuggestionsAction(
   eventId: string,
   radiusM = 300,

@@ -2,7 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| SEO.AI-REWRITE-MVP | Admin AI-рерайт описаний → override (UI-only, OpenAI, без draft в БД) | Высокий | ✅ code |
+| SEO.AI-REWRITE-MVP | Admin AI-рерайт описаний → override (UI-only, OpenAI, без draft в БД) | Высокий | ✅ shipping |
 
 ## 2026-09-08 - UX Catalog 2.0 (High-End perception)
 

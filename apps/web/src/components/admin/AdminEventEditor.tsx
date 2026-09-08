@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
+import { AdminEventDescriptionRewrite } from '@/components/admin/AdminEventDescriptionRewrite.client';
 import { AdminEventTaxonomyForm } from '@/components/admin/AdminEventTaxonomyForm';
 import { AdminEventVenueLinksForm } from '@/components/admin/AdminEventVenueLinksForm';
 import { AdminEventOpsPanels } from '@/components/admin/AdminEventOpsPanels';
@@ -161,15 +162,11 @@ export function AdminEventEditor({ detail, taxonomy, notice }: Props) {
             className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
           />
         </Field>
-        <Field label="Описание">
-          <textarea
-            name="description"
-            rows={8}
-            defaultValue={override.description || ''}
-            className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
-            placeholder={detail.sourceDescription || ''}
-          />
-        </Field>
+        <AdminEventDescriptionRewrite
+          eventId={detail.id}
+          sourceDescription={detail.sourceDescription}
+          initialDescription={override.description || ''}
+        />
         <Field label="mergeGroupKey (опционально)">
           <input
             name="mergeGroupKey"
