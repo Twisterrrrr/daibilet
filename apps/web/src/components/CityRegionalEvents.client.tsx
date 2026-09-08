@@ -60,7 +60,7 @@ export function CityRegionalEvents({ citySlug, editorial = false, nested = false
                 <li
                   key={event.id}
                   className={`rounded-2xl border p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_28px_-10px_hsl(221_83%_53%_/_0.28)] ${
-                    events.length === 1 ? 'w-full max-w-sm shrink-0 sm:w-auto' : ''
+                    events.length === 1 ? 'w-fit max-w-sm' : ''
                   } ${
                     editorial
                       ? 'border-zinc-200 bg-white hover:border-zinc-400'
@@ -69,7 +69,7 @@ export function CityRegionalEvents({ citySlug, editorial = false, nested = false
                   data-city-regional-event={event.id}
                   data-status={event.status}
                 >
-                  <div className="flex items-start justify-between gap-3">
+                  <div className="flex flex-wrap items-start gap-x-2 gap-y-1">
                     <p className={`text-sm font-semibold leading-5 ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}>
                       {event.title}
                     </p>
