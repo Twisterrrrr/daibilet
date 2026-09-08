@@ -1,3 +1,21 @@
+## 2026-09-08 - UX Catalog 2.0 W1–W3 implemented
+
+### Наблюдения
+- Аудит live верный по ощущению, но точки правки - Next `SafeImage` / `CatalogResults` / `EventCard`, не Lovable ImageCard.
+- Manrope/Inter и aspect media уже были; не хватало fade-onLoad, ритма featured и иерархии meta.
+
+### Решения
+- **W1:** `SafeImage` - `opacity-0` → `opacity-100` на `onLoad`; `priority` стартует видимым (без LCP-мигания); parent skeleton `bg-surface-muted` + aspect без изменений.
+- **W2:** `pickCatalogFeaturedIds` (PINNED / recommend / 1 на 7 по hash slug) → `md:col-span-2` + бейдж «Выбор редакции» + `event-card--featured`; без ухода в Showcase layout.
+- **W3:** title semibold/bold graphite; meta/date muted; price якорь; чуть больше gap в body.
+- LOCK в qa: бейдж / pin / scope `/events` / W4 local typeahead.
+
+### Проблемы
+- Нужен visual smoke на preview (`/events`, `/cities/perm`) до W4/W5 и до MSK deploy.
+- Remote TC covers с `unoptimized` bypass всё ещё могут быть тяжёлыми - fade маскирует pop-in, не вес файла.
+
+---
+
 ## 2026-09-08 - Яндекс.Метрика: счётчик пропал с live
 
 ### Наблюдения

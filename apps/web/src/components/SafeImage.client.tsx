@@ -54,25 +54,41 @@ type SafeImageProps = Omit<ImageProps, 'src' | 'alt'> & {
   fallback?: React.ReactNode;
 };
 
+function mergeImageClassName(
+  className: string | undefined,
+  loaded: boolean,
+): string {
+  // Keep consumer transform hover; always own opacity so cards fade in without CLS.
+  return [className, 'transition-[opacity,transform] duration-300', loaded ? 'opacity-100' : 'opacity-0']
+    .filter(Boolean)
+    .join(' ');
+}
+
 /**
  * next/image wrapper: webp/avif via optimizer, graceful fallback on error/empty src.
  * Parent must be `position: relative` when using `fill`.
+ * Listing media: opacity fade onLoad (priority/LCP starts visible - no flash).
  */
 export function SafeImage({
   src,
   alt = '',
   fallback = null,
   onError,
+  onLoad,
   className,
   unoptimized,
+  priority,
   ...props
 }: SafeImageProps) {
   const [failed, setFailed] = React.useState(false);
   const normalized = typeof src === 'string' ? src.trim() : '';
+  // LCP / priority: visible immediately. Lazy cards: skeleton parent + fade in.
+  const [loaded, setLoaded] = React.useState(() => Boolean(priority));
 
   React.useEffect(() => {
     setFailed(false);
-  }, [normalized]);
+    setLoaded(Boolean(priority));
+  }, [normalized, priority]);
 
   if (!normalized || failed) {
     return <>{fallback}</>;
@@ -86,8 +102,13 @@ export function SafeImage({
     <Image
       src={normalized}
       alt={alt}
-      className={className}
+      className={mergeImageClassName(className, loaded)}
       unoptimized={bypassOptimizer || unoptimized}
+      priority={priority}
+      onLoad={(event) => {
+        setLoaded(true);
+        onLoad?.(event);
+      }}
       onError={(event) => {
         setFailed(true);
         onError?.(event);

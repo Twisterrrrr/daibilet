@@ -1559,10 +1559,18 @@ html[data-nav-pending='1'] {
     @apply relative flex h-full flex-col overflow-hidden rounded-[14px] border border-slate-100 bg-white shadow-sm transition-all duration-200;
   }
 
+  .event-card--featured {
+    @apply border-primary/25 shadow-[0_8px_24px_rgba(15,23,42,0.07)] ring-1 ring-primary/15;
+  }
+
   @media (hover: hover) {
     .event-card:hover {
       transform: translateY(-4px);
       @apply border-slate-200/80 shadow-[0_12px_30px_rgba(15,23,42,0.08)];
+    }
+
+    .event-card--featured:hover {
+      @apply border-primary/35 shadow-[0_12px_30px_rgba(15,23,42,0.1)] ring-primary/25;
     }
   }
 

@@ -7,13 +7,13 @@
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
 | UX2.BRIEF | Brief UX Catalog 2.0: CLS/fade, grid rhythm, type hierarchy, find, blog listing | Высокий | ✅ docs |
-| UX2.PERF-FADE | SafeImage/CardSafeImage: skeleton + opacity fade onLoad; LCP priority без мигания | Критический | ⏳ |
-| UX2.PERF-CLS | Жёсткий aspect media на всех листинг-карточках (events/hub/blog card); без прыжка сетки | Критический | ⏳ |
-| UX2.GRID-FEATURED | Ритм сетки `/events`: featured col-span-2 + бейдж «Рекомендуем»/editors; стабильный pin (не random hydrate) | Высокий | ⏳ |
-| UX2.TYPE-CARD | Иерархия EventCard: title > price > muted meta + воздух; без смены Manrope/`fonts.ts` | Высокий | ⏳ |
-| UX2.FIND-SUGGEST | Typeahead city/category на FilterRail (после W1-W3) | Средний | ⏳ blocked W1-W3 |
-| UX2.BLOG-LIST-IMG | `/blog` listing: sidecar/quality budget, меньше вязкости скролла | Средний | ⏳ after W1 |
-| UX2.SMOKE | Preview smoke: `/events`, `/cities/perm`, `/blog` + CLS/fade + TC/TEP CTA | Высокий | ⏳ |
+| UX2.PERF-FADE | SafeImage/CardSafeImage: skeleton + opacity fade onLoad; LCP priority без мигания | Критический | ✅ |
+| UX2.PERF-CLS | Жёсткий aspect media на всех листинг-карточках (events/hub/blog card); без прыжка сетки | Критический | ✅ aspect уже был; fade закрывает pop-in |
+| UX2.GRID-FEATURED | Ритм сетки `/events`: featured col-span-2 + бейдж «Выбор редакции»; pin PINNED/recommend + 1/N hash | Высокий | ✅ |
+| UX2.TYPE-CARD | Иерархия EventCard: title > price > muted meta + воздух; без смены Manrope/`fonts.ts` | Высокий | ✅ |
+| UX2.FIND-SUGGEST | Typeahead city/category на FilterRail (после W1-W3) | Средний | ⏳ blocked smoke |
+| UX2.BLOG-LIST-IMG | `/blog` listing: sidecar/quality budget, меньше вязкости скролла | Средний | ⏳ after smoke |
+| UX2.SMOKE | Preview smoke: `/events`, `/cities/perm`, `/blog` + CLS/fade + TC/TEP CTA | Высокий | ⏳ local/preview |
 
 ## 2026-09-03 - Live ISR 500 (SiteLayout cookies)
 

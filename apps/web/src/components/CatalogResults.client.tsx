@@ -26,6 +26,7 @@ import { useCatalogGridColumnCount } from '@/lib/catalog-grid-columns';
 import { collapseCatalogComboFamilies } from '@/lib/home-showcase-sections';
 import { CATALOG_IMAGE_QUALITY, IMAGE_SIZES, CardSafeImage } from '@/components/SafeImage.client';
 import { useCatalogFiltersLayout } from '@/components/CatalogSidebarLayout.client';
+import { pickCatalogFeaturedIds } from '@/lib/catalog-featured';
 
 /** First N catalog cards load images eagerly (LCP / perceived speed). */
 const CATALOG_IMAGE_PRIORITY_COUNT = 9;
@@ -241,6 +242,10 @@ export function CatalogResults({
     () => (viewMode === 'cards' ? buildCatalogGridEntries(listItems, city, columnsPerRow) : null),
     [viewMode, listItems, city, columnsPerRow],
   );
+  const featuredIds = useMemo(
+    () => (viewMode === 'cards' ? pickCatalogFeaturedIds(listItems) : new Set<string>()),
+    [viewMode, listItems],
+  );
 
   return (
     <>
@@ -278,9 +283,19 @@ export function CatalogResults({
               }
               const priority = eventOrdinal < CATALOG_IMAGE_PRIORITY_COUNT;
               eventOrdinal += 1;
+              const featured = featuredIds.has(entry.session.id);
               return (
-                <li key={`${entry.session.id}-${entry.session.startsAt}`}>
-                  <EventCard session={entry.session} compact catalogDense imagePriority={priority} />
+                <li
+                  key={`${entry.session.id}-${entry.session.startsAt}`}
+                  className={featured ? 'md:col-span-2' : undefined}
+                >
+                  <EventCard
+                    session={entry.session}
+                    compact
+                    catalogDense={!featured}
+                    catalogFeatured={featured}
+                    imagePriority={priority}
+                  />
                 </li>
               );
             });

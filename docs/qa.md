@@ -9,6 +9,21 @@ Finance PR-ветка `codex/stage0-admission-ticket-core` может держа
 
 ---
 
+## 2026-09-08 - UX Catalog 2.0 (открыто)
+
+Бриф: [ux-catalog-v2-brief.md](./ux-catalog-v2-brief.md).
+
+**LOCKED (старт W1–W3 2026-09-08):**
+1. Бейдж featured в каталоге = **«Выбор редакции»** (не плодить «Рекомендуем» как второй канон).
+2. Pin = editorial `PINNED` / recommend-score **или** стабильный **1 на N** по hash slug (`pickCatalogFeaturedIds`).
+3. Scope ритма: сначала `/events` (`CatalogResults`); city hub rails через общие media/card пути.
+4. W4: typeahead по локальным спискам, без нового search API.
+5. W1 стартовал сразу; W4/W5 после preview smoke.
+
+**Осталось:** owner smoke `/events` + `/cities/perm` на preview; затем W5 blog listing, W4 find.
+
+---
+
 ## 2026-08-15 - MCP Postgres (`user-postgres`) - LOCKED
 
 **Сломано было:** `~/.cursor/mcp.json` → `localhost:5433` + неверный пароль; порт не слушал → `query` = `-32603`. Auth Cursor при этом зелёный.
