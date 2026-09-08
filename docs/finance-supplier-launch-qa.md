@@ -264,7 +264,7 @@ Recommended fix for `ORD-07`: keep the human-friendly seven-digit `publicCode` a
 
 ### P0 before the first real internal payment
 
-- Harden public order lookup with a high-entropy access token/authenticated buyer proof and rate limiting.
+- Deploy the implemented finance order-access proof, add the catalog HttpOnly-cookie bridge, then enable enforcement and rate limiting.
 - Complete one embedded YooKassa sandbox card payment in a browser.
 - Verify webhook, missed-webhook reconcile, stock release, ticket numbers and PurchaseProjection in admin/supplier/buyer views.
 - Verify catalog result polling and failure states on `.184`.
@@ -345,5 +345,7 @@ On 2026-09-07:
 - reconcile's latest scheduled run exited successfully;
 - supplier login, dashboard, access-token refresh, logout and refresh-cookie clearing passed live browser smoke;
 - the Replit UX pass was checked locally against the live finance API on dashboard, readiness, admissions, requests, orders, finance and requisites without transport/fallback errors.
+- finance and supplier portal were fast-forwarded to `c0847c7`; role-aware controls, 20-row pagination and the order drawer are live;
+- production supplier smoke opened confirmed order `4717674` and displayed issued ticket `TKT-4717674-01` without technical ids.
 
 The earlier Prisma `P1000` from the manual CLI probe was caused by launching Prisma from `packages/db` without loading the repository root `.env`; the running API, migrations and reconcile use the correct service `EnvironmentFile`.

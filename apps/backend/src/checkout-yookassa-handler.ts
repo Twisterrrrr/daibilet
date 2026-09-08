@@ -6,6 +6,7 @@ import {
   isYooKassaCheckoutError,
 } from './checkout-yookassa.js';
 import { sendJson } from './http.js';
+import { createOrderAccessToken } from './order-access.js';
 import type { RouteContext } from './routing.js';
 import type { TypedRouteHandler } from './validated-handler.js';
 import { parseJsonBody } from './validation.js';
@@ -58,7 +59,9 @@ const yookassaCheckoutCreatePayloadSchema = z.object({
 
 const yookassaWebhookPayloadSchema = z.record(z.string(), z.unknown());
 
-export function createYooKassaCheckoutRouteHandler(): TypedRouteHandler {
+export function createYooKassaCheckoutRouteHandler(
+  deps: { orderAccessSecret?: string | null } = {},
+): TypedRouteHandler {
   return async (context: RouteContext) => {
     if (context.pathname === '/api/checkout/yookassa' && context.method === 'POST') {
       if (!isAllowedCheckoutOrigin(firstHeader(context.request.headers.origin))) {
@@ -76,7 +79,13 @@ export function createYooKassaCheckoutRouteHandler(): TypedRouteHandler {
       try {
         const idempotencyKey = firstHeader(context.request.headers['idempotency-key']) || payload.idempotencyKey || null;
         const result = await createYooKassaCheckoutOrder(payload, { idempotencyKey });
-        sendJson(context.response, result, { statusCode: 201 });
+        sendJson(context.response, {
+          ...result,
+          order: {
+            ...result.order,
+            orderAccessToken: createOrderAccessToken(deps.orderAccessSecret, result.order.publicCode),
+          },
+        }, { statusCode: 201 });
       } catch (error) {
         if (!isYooKassaCheckoutError(error)) throw error;
         sendJson(context.response, error.toDto(), { statusCode: error.statusCode });

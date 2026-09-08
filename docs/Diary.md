@@ -3566,3 +3566,31 @@
 
 - Deploy the paired API + supplier build on finance `.159`, verify that a confirmed order exposes its issued ticket number, then complete the embedded YooKassa paid-browser smoke.
 - Before a real customer payment, replace anonymous seven-digit order lookup as an authorization factor with a high-entropy buyer access proof agreed with the catalog owner.
+
+## 2026-09-08 - Supplier order workspace live and buyer access proof foundation
+
+### Live supplier verification
+
+- GitHub Actions run `34260899500` passed for `c0847c7c`.
+- Finance `.159` was fast-forwarded from `b60fcc8` to `c0847c7`; no database migration or Postgres restart was required.
+- API health remained green after restart, supplier assets were swapped with the previous build retained under `/home/deploy/daibilet-releases`.
+- Production login, OWNER role, 20+20 order pagination and a confirmed order drawer passed browser smoke.
+- Order `4717674` displayed issued ticket `TKT-4717674-01`, proving the supplier projection reaches fulfillment data.
+
+### Buyer access proof foundation
+
+- Added deterministic HMAC-SHA256 `orderAccessToken` issuance to public STUB/YooKassa create responses without changing `publicCode` or the canonical result URL.
+- Added optional `x-daibilet-order-access` verification to public order lookup. The enforcement flag defaults off to preserve the current catalog Path A until Cursor deploys the BFF bridge.
+- Added a startup guard: enforcement cannot be enabled with a missing or shorter-than-32-character secret.
+- Documented the catalog cookie/header handoff in `docs/catalog-order-access-handoff.md`; the token stays out of URLs and browser JavaScript.
+
+### Verification
+
+- Backend and contracts typechecks passed.
+- Order access and HTTP-boundary tests: 5 passed.
+- STUB/YooKassa checkout tests: 22 passed, 5 DB-dependent skipped, 0 failed.
+
+### Gate
+
+- Deploy token issuance with enforcement off, then ask Cursor to implement the HttpOnly cookie bridge and forwarding header.
+- Enable `DAIBILET_REQUIRE_ORDER_ACCESS=1` only after embedded + redirect reload smoke succeeds on catalog.

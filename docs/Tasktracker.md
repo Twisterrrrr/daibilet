@@ -53,8 +53,8 @@
 | P.3e4 | **Supplier LC UX/UI brief** — Figma handoff for B2B/fintech cabinet, then `apps/supplier` implementation | Высокий | ✅ UX brief |
 | P.3e5 | **Supplier LC shell v1** — legacy-v2 inspired light shell: grouped nav, readiness, admissions/events/orders, finance/docs/settings | Высокий | ✅ `apps/supplier` UI shell |
 | P.3e5a | **Supplier LC Replit UX pass** — dark operational shell, Lucide navigation, compact account control, four-KPI dashboard and real-data smoke | Высокий | ✅ deployed `.159` @ `b60fcc8`; live browser smoke 2026-09-07 |
-| P.3e5b | **Supplier LC role UX + pagination** — selected-organization role, hidden unauthorized writes, 20-row server paging | Высокий | ✅ code/tests/build + real-data browser smoke green; pushed `cf27f9a0`, deploy pending |
-| P.3e5c | **Supplier order workspace** — compact order drawer, buyer/payment summary and issued ticket numbers without technical ids | Высокий | 🔄 code/typecheck/build/projection tests + live-data browser smoke green; deploy pending |
+| P.3e5b | **Supplier LC role UX + pagination** — selected-organization role, hidden unauthorized writes, 20-row server paging | Высокий | ✅ deployed `.159` @ `c0847c7`; live 20+20 paging smoke 2026-09-08 |
+| P.3e5c | **Supplier order workspace** — compact order drawer, buyer/payment summary and issued ticket numbers without technical ids | Высокий | ✅ deployed `.159` @ `c0847c7`; live ticket `TKT-4717674-01` verified |
 | P.3e6 | **Supplier LC auth bridge** — `SiteUser` + active `SupplierUser`, login/me/logout, dev-only supplier query fallback | Высокий | ✅ auth API + supplier login UI |
 | P.3e6a | **Supplier LC pilot hardening** — refresh-cookie session recovery, single-flight retry, role-based writes, no engineering purchase actions in production UI | Критический | ✅ deployed + browser auth/refresh/logout smoke `.159` 2026-09-07 |
 | P.3e6b | **Supplier one-time invite** — admin creates role-scoped access, supplier sets initial password, token hash/expiry/single-use | Критический | ✅ migration deployed `.159`; admin-issued invite flow ready |
@@ -64,7 +64,7 @@
 | P.3e10 | **Admission buyer checkout page** - `/checkout/admissions/:slug` reads finance admission projection, creates embedded YooKassa payment and opens result by `publicCode` | High | 🔄 code done; waits `.159` deploy + sandbox widget smoke; pilot-only |
 | P.3e11 | **Admin finance order detail foundation** - typed internal order detail with payments, fulfillment ticketNumbers, supplier ledger, refunds, fiscal receipts and operation blockers | High | 🔄 code done; backend/admin typecheck + projection test green |
 | P.3e12 | **Admin refund foundation** - create `RefundRequest` from order detail with hard payment/fulfillment/ledger blockers | High | 🔄 code done; projection test + admin build green |
-| P.3e13 | **Public order access proof** - keep 7-digit `publicCode` for UX, require high-entropy access token/authenticated buyer before exposing PII and ticket numbers | Критический | ⏳ blocks first real internal payment; contract change requires catalog coordination |
+| P.3e13 | **Public order access proof** - keep 7-digit `publicCode` for UX, require high-entropy access token/authenticated buyer before exposing PII and ticket numbers | Критический | 🔄 finance HMAC/header foundation + tests done; catalog HttpOnly handoff and enforcement switch pending |
 | P.3f | **YooKassa: venue admission** | Высокий | 🔄 FIN.RETURN-1 + embedded confirmation code done on `codex/stage0-admission-ticket-core`; ждёт deploy/sandbox smoke `.159` |
 | P.3f1 | **Supplier onboarding write-flow** — юрпрофиль + основной счет из ЛК, статус реквизитов на проверку | Высокий | ✅ backend PATCH + supplier UI forms |
 | P.3f2 | **YooKassa webhook hardening** — provider event id, replay dedupe, payment id mismatch guard | Высокий | ✅ backend + DB tests |

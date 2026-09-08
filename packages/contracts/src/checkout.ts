@@ -87,6 +87,7 @@ export interface StubCheckoutTotalsDto {
 export interface StubCheckoutOrderDto {
   id: string;
   publicCode: string;
+  orderAccessToken?: string | null;
   status: string;
   createdAt: string;
   paidAt: string | null;

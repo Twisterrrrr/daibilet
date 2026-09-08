@@ -34,6 +34,7 @@ import { createPublicCatalogRouteHandler } from './public-catalog-handler.js';
 import { buildPublicCityDto, buildPublicDestinationsDto, clearPublicCityDtoCache } from './public-city.dto.js';
 import { createPublicCityRouteHandler } from './public-city-handler.js';
 import { createPublicCheckoutOrdersRouteHandler } from './public-checkout-orders-handler.js';
+import { isOrderAccessSecretUsable } from './order-access.js';
 import { buildPublicEventDto, clearPublicEventDtoCache } from './public-event.dto.js';
 import { createPublicEventRouteHandler } from './public-event-handler.js';
 import {
@@ -87,6 +88,11 @@ const adminFlags = {
   events: env.DAIBILET_TS_ADMIN_EVENTS === '1',
   orders: env.DAIBILET_TS_ADMIN_ORDERS === '1',
 };
+const orderAccessSecret = env.DAIBILET_ORDER_ACCESS_SECRET || env.USER_JWT_SECRET || null;
+const requireOrderAccess = env.DAIBILET_REQUIRE_ORDER_ACCESS === '1';
+if (requireOrderAccess && !isOrderAccessSecretUsable(orderAccessSecret)) {
+  throw new Error('DAIBILET_REQUIRE_ORDER_ACCESS requires a secret of at least 32 characters');
+}
 registerPublicCacheInvalidator(() => {
   clearPublicCatalogDtoCache();
   clearPublicCityDtoCache();
@@ -133,6 +139,8 @@ const server = startServer({
       }),
       createPublicCheckoutOrdersRouteHandler({
         projectionToken: env.DAIBILET_FINANCE_PROJECTION_TOKEN || env.FINANCE_PROJECTION_TOKEN || null,
+        orderAccessSecret,
+        requireOrderAccess,
         buildOrderByCode: buildPublicCheckoutOrderByCodeDto,
         buildPurchasesByEmail: buildPublicCheckoutPurchasesByEmailDto,
       }),
@@ -213,8 +221,8 @@ const server = startServer({
         buildReviewsList: buildSupplierPortalReviewsListDto,
       }),
       createAccountPurchasesRouteHandler({ db }),
-      createStubCheckoutRouteHandler(),
-      createYooKassaCheckoutRouteHandler(),
+      createStubCheckoutRouteHandler({ orderAccessSecret }),
+      createYooKassaCheckoutRouteHandler({ orderAccessSecret }),
       createPublicReviewsRouteHandler(),
       createAdminReviewsRouteHandler(),
     ],

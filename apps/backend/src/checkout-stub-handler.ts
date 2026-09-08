@@ -2,6 +2,7 @@ import type { StubCheckoutCreateDto } from '@daibilet/contracts/checkout';
 import { z } from 'zod';
 import { createStubCheckoutOrder, isStubCheckoutError } from './checkout-stub.js';
 import { sendJson } from './http.js';
+import { createOrderAccessToken } from './order-access.js';
 import type { RouteContext } from './routing.js';
 import type { TypedRouteHandler } from './validated-handler.js';
 import { parseJsonBody } from './validation.js';
@@ -44,7 +45,9 @@ const stubCheckoutCreatePayloadSchema = z.object({
   message: 'offerId is required for events, admissionOfferId is required for admission products',
 });
 
-export function createStubCheckoutRouteHandler(): TypedRouteHandler {
+export function createStubCheckoutRouteHandler(
+  deps: { orderAccessSecret?: string | null } = {},
+): TypedRouteHandler {
   return async (context: RouteContext) => {
     if (context.pathname !== '/api/checkout/stub') return false;
     if (context.method !== 'POST') return false;
@@ -53,7 +56,13 @@ export function createStubCheckoutRouteHandler(): TypedRouteHandler {
     try {
       const idempotencyKey = firstHeader(context.request.headers['idempotency-key']) || payload.idempotencyKey || null;
       const result = await createStubCheckoutOrder(payload, { idempotencyKey });
-      sendJson(context.response, result, { statusCode: 201 });
+      sendJson(context.response, {
+        ...result,
+        order: {
+          ...result.order,
+          orderAccessToken: createOrderAccessToken(deps.orderAccessSecret, result.order.publicCode),
+        },
+      }, { statusCode: 201 });
     } catch (error) {
       if (!isStubCheckoutError(error)) throw error;
       sendJson(context.response, error.toDto(), { statusCode: error.statusCode });
