@@ -23,9 +23,16 @@ export type MetrikaGoalId = (typeof METRIKA_GOALS)[keyof typeof METRIKA_GOALS];
 declare global {
   interface Window {
     dataLayer?: Array<Record<string, unknown>>;
-    ym?: (counterId: number, method: string, target: string, params?: Record<string, unknown>) => void;
+    ym?: (
+      counterId: number,
+      method: string,
+      target?: string,
+      params?: Record<string, unknown> | string,
+    ) => void;
   }
 }
+
+const METRIKA_DEFAULT_ID = 106786540;
 
 function resolveMetrikaCounterId(): number | null {
   if (typeof window === 'undefined') return null;
@@ -36,10 +43,12 @@ function resolveMetrikaCounterId(): number | null {
   try {
     const ya = (window as Window & { Ya?: { Metrika2?: { counters?: () => Array<{ id: number }> } } }).Ya;
     const id = ya?.Metrika2?.counters?.()?.[0]?.id;
-    return typeof id === 'number' && id > 0 ? id : null;
+    if (typeof id === 'number' && id > 0) return id;
   } catch {
-    return null;
+    // fall through to default
   }
+
+  return METRIKA_DEFAULT_ID;
 }
 
 function trackGoal(goal: MetrikaGoalId | string, params?: Record<string, unknown>): void {

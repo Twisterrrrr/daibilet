@@ -1,3 +1,38 @@
+## 2026-09-08 - Яндекс.Метрика: счётчик пропал с live
+
+### Наблюдения
+- В кабинете Метрики (ID `106786540`) трафик обрывается с середины июня: резкий ноль, не «сезонное падение».
+- В `apps/web` компонента `YandexMetrika` не было (docs/Diary от 2026-07-19 описывали код, которого в дереве нет). Root `layout.tsx` не грузил `mc.yandex.ru`. Goals в `catalog-analytics.ts` были, но без тега `ym` некуда слать hits.
+- Вероятная причина обрыва: cutover на Next monorepo без переноса счётчика со старого frontend.
+
+### Решения
+- Восстановлен `YandexMetrika.client.tsx` (`next/script` afterInteractive + noscript pixel), ID default `106786540` / `NEXT_PUBLIC_YANDEX_METRIKA_ID`.
+- Подключён в root `layout.tsx` (Suspense); `/admin` не трекаем. SPA hit на смене pathname.
+- `catalog-analytics` fallback на тот же default ID. Deploy MSK web по запросу owner.
+
+### Проблемы
+- Исторические данные июня-сентября в Метрике не восстановить. После выкладки проверить «Онлайн» / визиты за сутки.
+
+---
+
+## 2026-09-08 - UX audit → фаза Catalog 2.0
+
+### Наблюдения
+- Внешний аудит live (`/events`, `/cities/perm`, `/blog`): CLS/pop-in картинок, монотонная сетка, «прайс-лист» meta, слабый search UX. Вердикт: ок для витрины-MVP, слабо для High-End / return visits.
+- Аудит формулирует задачи в терминах Lovable (`ImageCard`, Google Fonts Inter) - это **устаревший каркас**. Канон UI уже Next `apps/web`: `EventCard` + `CardSafeImage`, aspect `16/10`, Manrope/Inter через `next/font`, catalog image budget, blog `isFeatured`, точечный `editorsPickBadge`.
+- Реальный пробел: нет fade-on-load; нет ритма featured в каталожной сетке; иерархия title/meta/price всё ещё плоская; suggest-фильтры - следующая волна.
+
+### Решения
+- Заведена фаза **UX Catalog 2.0**: бриф [ux-catalog-v2-brief.md](./ux-catalog-v2-brief.md) + задачи `UX2.*` в Tasktracker.
+- Волны: PERF (fade/CLS) → GRID featured → TYPE hierarchy → FIND suggest → BLOG listing images.
+- Paste-ready промпты в брифе уже адаптированы под репо (не копировать сырой Lovable-текст аудита в агента).
+
+### Проблемы
+- Owner ещё не выбрал канон бейджа («Рекомендуем» vs «Выбор редакции») и правило pin featured (editorial flag vs score vs hash-every-N).
+- Remote TC covers с bypass optimizer могут оставаться тяжёлыми даже после fade - отдельный perf follow-up.
+
+---
+
 ## 2026-09-04 - Security audit + ISR Cyrillic 500
 
 ### Наблюдения

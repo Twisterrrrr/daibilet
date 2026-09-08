@@ -4,6 +4,7 @@ import { Suspense } from 'react';
 import { ChunkLoadRecovery } from '@/components/ChunkLoadRecovery';
 import { NavigationProgress } from '@/components/NavigationProgress.client';
 import { PurchaseOpeningHost } from '@/components/PurchaseOpeningFeedback.client';
+import { YandexMetrika } from '@/components/YandexMetrika.client';
 import { fontVariableClassName } from '@/lib/fonts';
 import { DEFAULT_OG_IMAGE, HOME_SEO_DESCRIPTION_FALLBACK, HOME_SEO_TITLE, INDEX_FOLLOW_ROBOTS, getOpenGraphMediaTags } from '@/lib/seo-meta';
 
@@ -126,6 +127,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <PurchaseOpeningHost />
         <Suspense fallback={null}>
           <NavigationProgress />
+        </Suspense>
+        <Suspense fallback={null}>
+          <YandexMetrika />
         </Suspense>
         {children}
       </body>

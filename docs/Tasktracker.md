@@ -1,3 +1,20 @@
+## 2026-09-08 - UX Catalog 2.0 (High-End perception)
+
+Канон-бриф: [ux-catalog-v2-brief.md](./ux-catalog-v2-brief.md).  
+Стек: Next `apps/web` (`EventCard` / `SafeImage` / `CatalogResults`) - **не** Lovable ImageCard и не сырой Google Fonts CDN.  
+Порядок: W1 → W2 → W3; W4/W5 после стабилизации preview.
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| UX2.BRIEF | Brief UX Catalog 2.0: CLS/fade, grid rhythm, type hierarchy, find, blog listing | Высокий | ✅ docs |
+| UX2.PERF-FADE | SafeImage/CardSafeImage: skeleton + opacity fade onLoad; LCP priority без мигания | Критический | ⏳ |
+| UX2.PERF-CLS | Жёсткий aspect media на всех листинг-карточках (events/hub/blog card); без прыжка сетки | Критический | ⏳ |
+| UX2.GRID-FEATURED | Ритм сетки `/events`: featured col-span-2 + бейдж «Рекомендуем»/editors; стабильный pin (не random hydrate) | Высокий | ⏳ |
+| UX2.TYPE-CARD | Иерархия EventCard: title > price > muted meta + воздух; без смены Manrope/`fonts.ts` | Высокий | ⏳ |
+| UX2.FIND-SUGGEST | Typeahead city/category на FilterRail (после W1-W3) | Средний | ⏳ blocked W1-W3 |
+| UX2.BLOG-LIST-IMG | `/blog` listing: sidecar/quality budget, меньше вязкости скролла | Средний | ⏳ after W1 |
+| UX2.SMOKE | Preview smoke: `/events`, `/cities/perm`, `/blog` + CLS/fade + TC/TEP CTA | Высокий | ⏳ |
+
 ## 2026-09-03 - Live ISR 500 (SiteLayout cookies)
 
 | ID | Задача | Приоритет | Статус |
@@ -2749,7 +2766,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | 0.5.10 | Teplohod checkout fallback → account.teplohod.info (не teplohod.info/event 404) | Высокий | ✅ 2026-07-14 |
 | 0.5.11 | Post-deploy: clear `.next/cache` + revalidate; ChunkLoadError → one reload | Высокий | ✅ 2026-07-14 |
 | 0.5.12 | Teplohod: restore TI_Tickets bootstrap on event page + landing `evt_tep_*` buy | Критический | ✅ 2026-07-18 deploy |
-| 0.5.13 | Яндекс.Метрика на `apps/web` (ID 106786540, не admin) | Высокий | ✅ код 2026-07-19; deploy ⏳ |
+| 0.5.13 | Яндекс.Метрика на `apps/web` (ID 106786540, не admin) | Высокий | ✅ код+deploy 2026-09-08 (компонент потерян при Next; восстановлен) |
 
 ---
 
