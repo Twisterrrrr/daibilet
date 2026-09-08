@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { ArrowRight, BookOpen, Clock } from 'lucide-react';
 
-import { IMAGE_SIZES, BlogCardSafeImage, SafeImage } from '@/components/SafeImage.client';
+import { IMAGE_SIZES, BlogCardSafeImage, BLOG_LISTING_IMAGE_QUALITY } from '@/components/SafeImage.client';
 import { BLOG_POSTS } from '@/data/blog-posts';
 import type { BlogCardDto } from '@/lib/blog-utils';
 import { resolveBlogCardDateLabel } from '@/lib/blog-utils';
@@ -197,6 +197,7 @@ export function BlogPostCard({
               alt=""
               fill
               sizes={IMAGE_SIZES.blogFeatured}
+              quality={BLOG_LISTING_IMAGE_QUALITY}
               className="object-cover transition-transform duration-700 group-hover:scale-[1.02]"
               fallback={<CoverFallback large />}
             />
@@ -253,6 +254,7 @@ export function BlogPostCard({
                 alt=""
                 fill
                 sizes={IMAGE_SIZES.blogCard}
+                quality={BLOG_LISTING_IMAGE_QUALITY}
                 className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
                 fallback={<CoverFallback />}
               />
@@ -276,16 +278,19 @@ export function BlogPostCard({
     );
   }
 
-  // Tall column: photo grows to match the wide card; full text under it.
+  // Tall column: fixed aspect media + listing sidecars (not full cover JPG).
   return (
     <Link href={articleHref} className={cardShell}>
-      <div className="relative min-h-[11rem] flex-1 overflow-hidden bg-slate-100">
+      <div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden bg-surface-muted">
         {hasCover ? (
-          <SafeImage
-            src={post.coverImageUrl}
+          <BlogCardSafeImage
+            slug={post.slug}
+            coverImageUrl={post.coverImageUrl}
             alt=""
             fill
             sizes={IMAGE_SIZES.blogCard}
+            quality={BLOG_LISTING_IMAGE_QUALITY}
+            loading="lazy"
             className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
             fallback={<CoverFallback />}
           />

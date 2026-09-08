@@ -80,7 +80,9 @@ function blogOgPath(cover: string, slug: string): string {
 }
 
 /**
- * `/blog` + home + hub teasers: `*-og.jpg` → `-card` → `-thumb` → original cover.
+ * `/blog` + home + hub teasers (listing weight):
+ * `-card.jpg` → `-thumb` → `-og` → original cover.
+ * Prefer compress-card listing sidecars before social `-og` (1200×630).
  * Missing sidecars 404 into the next candidate instead of an empty placeholder.
  */
 export function blogListingImageFallbacks(input: {
@@ -92,14 +94,22 @@ export function blogListingImageFallbacks(input: {
   const original = cover ? blogOriginalPath(cover, slug) : slug ? `/images/blog/${slug}.jpg` : '';
   if (!original && !cover) return [];
   if (cover && !cover.startsWith('/images/')) {
+    const card = slug ? `/images/blog/${slug}-card.jpg` : '';
     const og = slug ? `/images/blog/${slug}-og.jpg` : '';
-    return [og, cover].filter(Boolean);
+    return [card, og, cover].filter(Boolean);
   }
   const listingSrc = original.startsWith('/images/blog/') ? original : cover;
   const listing = listingImageFallbacks(listingSrc);
   const og = blogOgPath(listingSrc || cover, slug);
+  // listingImageFallbacks is already card → thumb → original; insert og before original.
   const out: string[] = [];
-  for (const item of [og, ...listing, cover]) {
+  for (const item of listing) {
+    if (item === original || item === cover) {
+      if (og && !out.includes(og)) out.push(og);
+    }
+    if (item && !out.includes(item)) out.push(item);
+  }
+  for (const item of [og, cover, original]) {
     if (item && !out.includes(item)) out.push(item);
   }
   return out;

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Clock } from 'lucide-react';
 
-import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
+import { IMAGE_SIZES, BlogCardSafeImage, BLOG_LISTING_IMAGE_QUALITY } from '@/components/SafeImage.client';
 import type { BlogCardDto } from '@/lib/blog-utils';
 import { blogListingCityBadgeLabel, blogSurfaceMeta } from '@/lib/blog-meta';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
@@ -56,11 +56,13 @@ export function CityHubArticleTeaser({
             editorial ? 'bg-zinc-100' : 'bg-slate-100'
           }`}
         >
-          <SafeImage
-            src={article.coverImageUrl}
+          <BlogCardSafeImage
+            slug={article.slug}
+            coverImageUrl={article.coverImageUrl}
             alt=""
             fill
             sizes={isLarge ? IMAGE_SIZES.blogFeatured : IMAGE_SIZES.blogCard}
+            quality={BLOG_LISTING_IMAGE_QUALITY}
             className="object-cover object-center transition duration-300 group-hover:scale-[1.02]"
             fallback={
               <div

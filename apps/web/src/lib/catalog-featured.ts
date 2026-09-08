@@ -1,5 +1,5 @@
 import type { PublicCatalogListItemDto } from '@daibilet/contracts/public';
-import { isEditorsPickEvent, isRecommendBadgeEvent } from './home-showcase-sections';
+import { isEditorsPickEvent, isRecommendBadgeEvent } from './home-showcase-sections.ts';
 
 /** One visual anchor roughly every N cards in `/events` grid. */
 export const CATALOG_FEATURED_EVERY = 7;

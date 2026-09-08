@@ -5,6 +5,8 @@ import * as React from 'react';
 
 import { blogListingImageFallbacks, listingImageFallbacks } from '@/lib/card-image';
 import {
+  BLOG_LISTING_CARD_SIZES,
+  BLOG_LISTING_IMAGE_QUALITY,
   CARD_EVENT_SIZES,
   CARD_IMAGE_QUALITY,
   CATALOG_EVENT_CARD_HORIZONTAL_SIZES,
@@ -16,6 +18,7 @@ import { venueCardImageFallbacks } from '@/lib/venue-card-image';
 
 export {
   AFFICHE_IMAGE_QUALITY,
+  BLOG_LISTING_IMAGE_QUALITY,
   CARD_IMAGE_QUALITY,
   CATALOG_IMAGE_QUALITY,
 } from '@/lib/catalog-image-sizes';
@@ -34,7 +37,8 @@ export const IMAGE_SIZES = {
   landingCard: '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',
   /** Full-width city-hub / catalog landing banners */
   landingBanner: '100vw',
-  blogCard: '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',
+  /** Blog listing / home teaser - prefer with BLOG_LISTING_IMAGE_QUALITY. */
+  blogCard: BLOG_LISTING_CARD_SIZES,
   /** Inline body photo (float ~20–28rem or standalone max-w-2xl) */
   blogInline: '(max-width: 640px) 100vw, (max-width: 1024px) 28rem, 42rem',
   blogThumb: '5rem',

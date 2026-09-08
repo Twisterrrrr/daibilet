@@ -1,3 +1,20 @@
+## 2026-09-08 - UX Catalog 2.0 W5 blog listing weight
+
+### Наблюдения
+- W1–W3 уже на `feat/next-monorepo` (`96fdfe45`). Следующий дешёвый win по аудиту - вязкий скролл `/blog`.
+- Default `BlogPostCard` и home/hub teasers тянули полный cover через `SafeImage`, минуя sidecar-цепочку.
+- Fallback order `og → card` отдавал приоритет тяжёлому social 1200×630 вместо listing `-card`.
+
+### Решения
+- **W5:** `blogListingImageFallbacks` = `-card` → `-thumb` → `-og` → cover; `BlogCardSafeImage` + `BLOG_LISTING_IMAGE_QUALITY=70` на feed/home/hub/sidebar; tall card `aspect-[16/10]` + `bg-surface-muted`.
+- Docs: Project/Tasktracker/brief sync. Полный выигрыш по байтам - когда на диске есть `blog/*-card.jpg` (`node scripts/compress-card-images.mjs blog`).
+
+### Проблемы
+- Без sidecar на MSK цепочка всё ещё 404→original (fade есть, вес оригинала остаётся).
+- W4 typeahead и MSK web deploy - после preview smoke / по запросу owner.
+
+---
+
 ## 2026-09-08 - UX Catalog 2.0 W1–W3 implemented
 
 ### Наблюдения
@@ -11,7 +28,7 @@
 - LOCK в qa: бейдж / pin / scope `/events` / W4 local typeahead.
 
 ### Проблемы
-- Нужен visual smoke на preview (`/events`, `/cities/perm`) до W4/W5 и до MSK deploy.
+- Нужен visual smoke на preview (`/events`, `/cities/perm`) до W4 и до MSK deploy; W5 (blog listing) сделан в коде следом.
 - Remote TC covers с `unoptimized` bypass всё ещё могут быть тяжёлыми - fade маскирует pop-in, не вес файла.
 
 ---

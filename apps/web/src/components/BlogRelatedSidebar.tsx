@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { IMAGE_SIZES, BlogCardSafeImage } from '@/components/SafeImage.client';
+import { IMAGE_SIZES, BlogCardSafeImage, BLOG_LISTING_IMAGE_QUALITY } from '@/components/SafeImage.client';
 import { blogSurfaceMetaLine } from '@/lib/blog-meta';
 import type { BlogCardDto } from '@/lib/blog-utils';
 
@@ -72,6 +72,7 @@ export function BlogRelatedSidebar({
                       alt=""
                       fill
                       sizes={IMAGE_SIZES.blogThumb}
+                      quality={BLOG_LISTING_IMAGE_QUALITY}
                       className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                       fallback={<div className="h-full w-full bg-gradient-to-br from-slate-200 to-slate-300" />}
                     />

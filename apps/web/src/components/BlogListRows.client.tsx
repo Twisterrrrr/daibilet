@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ArrowRight, BookOpen, Clock } from 'lucide-react';
 
 import { BlogPostCard } from '@/components/BlogPostCard.client';
-import { BlogCardSafeImage } from '@/components/SafeImage.client';
+import { BlogCardSafeImage, BLOG_LISTING_IMAGE_QUALITY } from '@/components/SafeImage.client';
 import { BLOG_POSTS } from '@/data/blog-posts';
 import type { BlogCardDto } from '@/lib/blog-utils';
 import {
@@ -82,6 +82,7 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
             alt=""
             fill
             sizes="(max-width: 640px) 9rem, (max-width: 768px) 13rem, (max-width: 1024px) 16rem, 18rem"
+            quality={BLOG_LISTING_IMAGE_QUALITY}
             className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
             fallback={
               <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-sky-100 via-primary-50 to-amber-50 text-primary-300">

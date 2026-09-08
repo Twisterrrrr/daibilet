@@ -41,6 +41,15 @@ SPB `.16` **retired**.
 3. Blog conversion layer (chips + reading progress; schema/related уже были)
 4. **Next phase (не в этом ship):** cities hub / venues monetization / `/locations` IA - см. [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brief.md) и задачи `PH2.*` в Tasktracker
 
+### UX Catalog 2.0 (фаза 2026-09-08)
+
+После стабилизации витрины-MVP: поднять восприятие каталога до уровня премиум-агрегатора **без** полного redesign IA.
+
+Канон: [ux-catalog-v2-brief.md](./ux-catalog-v2-brief.md), задачи `UX2.*` в Tasktracker.
+
+Порядок волн: **PERF** (skeleton/fade/CLS) → **GRID** (featured rhythm) → **TYPE** (иерархия карточки) → **BLOG** listing images → **FIND** (suggest, после smoke).  
+Не копировать Lovable-промпты аудита буквально: целевые компоненты - `SafeImage` / `EventCard` / `CatalogResults`, шрифты уже через `apps/web/src/lib/fonts.ts`.
+
 **Allowlist городов (geo-политика 2026-07-19, доп. 2026-08-17):**
 
 | Правило | Действие |
@@ -288,7 +297,7 @@ Cherry-pick из **`codex/phase2-foundation`**: schema, event change requests, a
 
 - **Node** ≥22.13, **pnpm** 11.7 workspaces
 - **Next 15**, React 19, Tailwind 3
-- **Images:** `next/image` + `sharp` (WebP/AVIF), `SafeImage` wrapper, `remotePatterns` для TC/TEP/S3 CDN. Listing sidecars (nginx `/images`, unoptimized): `/events` `-card.jpg` → `-thumb` → original; `/places` `-thumb` → `-card` → original; `/blog` `*-og.jpg` → `-card` → `-thumb` → cover. Mass cut event covers: `pnpm images:cards:dry` locally, then owner on MSK `node scripts/compress-card-images.mjs events` (не коммитить тысячи sidecar). Missing sidecar = runtime fallback, не пустой placeholder.
+- **Images:** `next/image` + `sharp` (WebP/AVIF), `SafeImage` wrapper, `remotePatterns` для TC/TEP/S3 CDN. Listing sidecars (nginx `/images`, unoptimized): `/events` `-card.jpg` → `-thumb` → original; `/places` `-thumb` → `-card` → original; `/blog` listing `-card` → `-thumb` → `-og` → cover. Mass cut event covers: `pnpm images:cards:dry` locally, then owner on MSK `node scripts/compress-card-images.mjs events` (не коммитить тысячи sidecar). Blog listing sidecars: `node scripts/compress-card-images.mjs blog` (коммитить в apps/public). Missing sidecar = runtime fallback, не пустой placeholder.
 - **Catalog covers:** после TC/TEP import - `scripts/ensure-catalog-covers.js`: сначала CDN/event image на Venue, иначе unique generate (`/images/{events|venues}/generated/*`). City-placeholder не считается cover. Lean venue fallback принимает https и `/images/events|venues/*`.
 - **UI standards (sitewide minimalism; LOCKED 2026-08-10):**
   1. **One filter row on mobile** - категории / даты / теги = один горизонтальный swipe-rail (не стек selects + чипов).

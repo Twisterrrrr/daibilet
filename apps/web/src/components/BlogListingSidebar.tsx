@@ -4,15 +4,13 @@ import Link from 'next/link';
 import { Send } from 'lucide-react';
 
 import { BlogAfishaPromo } from '@/components/BlogAfishaPromo.client';
+import { BlogCardSafeImage, BLOG_LISTING_IMAGE_QUALITY, IMAGE_SIZES } from '@/components/SafeImage.client';
 import type { BlogSidebarPromoDto } from '@/lib/blog-sidebar-promo';
 import {
   authorLabel,
   blogSurfaceMetaLine,
 } from '@/lib/blog-meta';
 import type { BlogCardDto } from '@/lib/blog-utils';
-import Image from 'next/image';
-
-const HOT_THUMB_SIZES = '(max-width: 1024px) 112px, 80px';
 const TELEGRAM_HREF = 'https://t.me/daibilet';
 
 type BlogListingSidebarProps = {
@@ -86,16 +84,21 @@ export function BlogListingSidebar({
                   <div className="flex items-center gap-3 px-4 py-3 transition hover:bg-primary-50/40">
                     <Link
                       href={href}
-                      className="relative size-16 shrink-0 overflow-hidden rounded-lg bg-gradient-to-br from-sky-100 to-primary-100"
+                      className="relative size-16 shrink-0 overflow-hidden rounded-lg bg-surface-muted"
                       aria-hidden
                       tabIndex={-1}
                     >
-                      <Image
-                        src={post.coverImageUrl}
+                      <BlogCardSafeImage
+                        slug={post.slug}
+                        coverImageUrl={post.coverImageUrl}
                         alt=""
                         fill
-                        sizes={HOT_THUMB_SIZES}
+                        sizes={IMAGE_SIZES.blogThumb}
+                        quality={BLOG_LISTING_IMAGE_QUALITY}
                         className="object-cover"
+                        fallback={
+                          <div className="h-full w-full bg-gradient-to-br from-sky-100 to-primary-100" />
+                        }
                       />
                     </Link>
                     <div className="min-w-0 flex-1">

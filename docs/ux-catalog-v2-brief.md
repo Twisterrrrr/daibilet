@@ -112,10 +112,13 @@
 ### W5 - blog listing weight
 
 ```
-/blog cards: проверить BlogCardSafeImage sizes/quality и наличие sidecar *-og / -card / -thumb.
-Где cover = полный JPG без sidecar - сгенерировать/докатить card-размеры или снизить quality только для listing (не для article hero).
-Не менять magazine layout блога целиком.
+/blog cards: BlogCardSafeImage (не сырой cover) + aspect media + BLOG_LISTING_IMAGE_QUALITY.
+Fallback chain listing: -card → -thumb → -og → original.
+Где cover = полный JPG без sidecar - сгенерировать card через `node scripts/compress-card-images.mjs blog` (коммит в apps/public).
+Не менять magazine layout блога целиком; article hero без даунгрейда.
 ```
+
+Не начинать W4 до preview smoke W1–W3; W5 можно параллельно после W1 (общий fade/SafeImage).
 
 ---
 

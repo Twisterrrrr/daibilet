@@ -16,6 +16,12 @@ export const CARD_IMAGE_QUALITY = 85;
 export const AFFICHE_IMAGE_QUALITY = 88;
 
 /**
+ * `/blog` listing cards (feed / home rail). Local `/images/blog` is unoptimized
+ * (nginx alias) - quality mainly helps remote covers; still keep a lean budget.
+ */
+export const BLOG_LISTING_IMAGE_QUALITY = 70;
+
+/**
  * Match `.catalog-card-grid` (2 / 3 / 4 cols).
  * Never `100vw` on mobile: that pulled 640–750px for a ~50vw tile.
  */
@@ -28,3 +34,9 @@ export const CATALOG_EVENT_CARD_HORIZONTAL_SIZES = '(max-width: 639px) 100vw, 16
 /** Home / related / showcase cards: allow a larger decode than dense catalog. */
 export const CARD_EVENT_SIZES =
   '(max-width: 639px) 92vw, (max-width: 1023px) 45vw, (max-width: 1535px) 30vw, 420px';
+
+/**
+ * Blog feed / home teaser tiles (1 / 2 / 3 col). Never `100vw` on mobile.
+ */
+export const BLOG_LISTING_CARD_SIZES =
+  '(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 33vw';

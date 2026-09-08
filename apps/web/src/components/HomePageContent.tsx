@@ -13,7 +13,7 @@ import {
 import { HomeHero } from '@/components/HomeHero.client';
 import { HomePageSkeleton } from '@/components/HomePageSkeleton';
 import { HomePopularCitiesRail } from '@/components/HomePopularCitiesRail.client';
-import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
+import { IMAGE_SIZES, BlogCardSafeImage, BLOG_LISTING_IMAGE_QUALITY, SafeImage } from '@/components/SafeImage.client';
 import { ScrollRail } from '@/components/ScrollRail.client';
 import { blogSurfaceMeta, blogSurfaceMetaLine } from '@/lib/blog-meta';
 import { clipBlogFeaturedLead, hubBlogCardExcerpt, mergeBlogCards } from '@/lib/blog-utils';
@@ -309,11 +309,13 @@ async function HomePageBody() {
               className="group relative aspect-[16/11] overflow-hidden bg-slate-200 sm:aspect-[16/10] lg:aspect-auto lg:min-h-[22rem]"
               aria-label={featuredBlog.title}
             >
-              <SafeImage
-                src={featuredBlog.coverImageUrl}
+              <BlogCardSafeImage
+                slug={featuredBlog.slug}
+                coverImageUrl={featuredBlog.coverImageUrl}
                 alt=""
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
+                quality={BLOG_LISTING_IMAGE_QUALITY}
                 className="object-cover transition duration-700 group-hover:scale-[1.03]"
                 fallback={<div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-300" />}
               />
@@ -341,11 +343,13 @@ async function HomePageBody() {
                     >
                       <Link href={`/blog/${post.slug}`} aria-label={post.title} className="group flex h-full flex-col">
                         <span className="relative block aspect-[16/9] w-full shrink-0 overflow-hidden bg-slate-100">
-                          <SafeImage
-                            src={post.coverImageUrl}
+                          <BlogCardSafeImage
+                            slug={post.slug}
+                            coverImageUrl={post.coverImageUrl}
                             alt=""
                             fill
                             sizes={IMAGE_SIZES.blogCard}
+                            quality={BLOG_LISTING_IMAGE_QUALITY}
                             className="object-cover object-center transition duration-300 group-hover:scale-[1.02]"
                             fallback={
                               <div className="flex h-full w-full items-center justify-center bg-slate-200 text-sm text-slate-500">

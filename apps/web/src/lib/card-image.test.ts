@@ -35,17 +35,31 @@ test('listingImageFallbacks prefers -thumb first when src is already a thumb', (
   ]);
 });
 
-test('blogListingImageFallbacks tries -og then -card then -thumb then original', () => {
+test('blogListingImageFallbacks prefers -card then -thumb then -og then original', () => {
   assert.deepEqual(
     blogListingImageFallbacks({
       slug: 'novosibirsk-vykhodnye-chto-posmotret',
       coverImageUrl: '/images/blog/novosibirsk-vykhodnye-chto-posmotret.jpg',
     }),
     [
-      '/images/blog/novosibirsk-vykhodnye-chto-posmotret-og.jpg',
       '/images/blog/novosibirsk-vykhodnye-chto-posmotret-card.jpg',
       '/images/blog/novosibirsk-vykhodnye-chto-posmotret-thumb.jpg',
+      '/images/blog/novosibirsk-vykhodnye-chto-posmotret-og.jpg',
       '/images/blog/novosibirsk-vykhodnye-chto-posmotret.jpg',
+    ],
+  );
+});
+
+test('blogListingImageFallbacks for remote cover still prefers local listing sidecars', () => {
+  assert.deepEqual(
+    blogListingImageFallbacks({
+      slug: 'demo-post',
+      coverImageUrl: 'https://cdn.example/cover.jpg',
+    }),
+    [
+      '/images/blog/demo-post-card.jpg',
+      '/images/blog/demo-post-og.jpg',
+      'https://cdn.example/cover.jpg',
     ],
   );
 });
