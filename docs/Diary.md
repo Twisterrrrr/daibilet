@@ -1,3 +1,18 @@
+## 2026-09-08 - UX Catalog 2.0 `/preview-cards` smoke harness
+
+### Наблюдения
+- Live MSK ещё мог быть без W1–W3; для проверки ритма сетки нужен изолированный роут до прома.
+- Owner: мок 10 экскурсий, каждая 4-я `isFeatured`, явная сетка 1/2/3 cols.
+
+### Решения
+- Роут `/preview-cards`: `PREVIEW_CARDS_MOCK` + `EventCard` с `catalogFeatured` / `md:col-span-2`; `robots: noindex` + disallow в `robots.ts`.
+- W4 tip зафиксирован в qa: Fuse.js / локальный filter, без search API в волне.
+
+### Проблемы
+- Страница для visual QA, не замена smoke live `/events` после deploy.
+
+---
+
 ## 2026-09-08 - UX Catalog 2.0 W5 blog listing weight
 
 ### Наблюдения

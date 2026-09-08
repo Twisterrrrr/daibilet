@@ -20,7 +20,9 @@ Finance PR-ветка `codex/stage0-admission-ticket-core` может держа
 4. W4: typeahead по локальным спискам, без нового search API.
 5. W1 стартовал сразу; W4/W5 после preview smoke.
 
-**Осталось:** owner smoke `/events` + `/cities/perm` на preview; затем W5 blog listing, W4 find.
+**Осталось:** owner smoke сетки на `/preview-cards` (мок 10 карточек, каждая 4-я `isFeatured`) + затем live `/events` / `/cities/perm`; W4 find после smoke.
+
+**W4 search note (owner tip 2026-09-08):** для typeahead по ~98 городам/категориям на клиенте - Fuse.js (fuzzy) или локальный filter; отдельный search API / Postgres `tsvector` не нужен в этой волне.
 
 ---
 

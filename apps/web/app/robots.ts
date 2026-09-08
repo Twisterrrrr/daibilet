@@ -13,6 +13,7 @@ const CRAWL_DISALLOW = [
   '/login',
   '/admin/',
   '/reviews/write',
+  '/preview-cards',
 ] as const;
 
 export default function robots(): MetadataRoute.Robots {
