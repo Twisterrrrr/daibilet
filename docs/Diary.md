@@ -13,7 +13,7 @@
 - Без ключа на backend кнопка вернёт 503/`missing_openai_key` — нужен секрет `OPENAI_API_KEY` на хосте API перед live smoke (код/UI выкатываем отдельно от секрета).
 
 ### Ship
-- Commit + Deploy MSK web (swap тянет git + restart `daibilet-api`) — endpoint `rewrite-description` + админ UI Было/Стало.
+- Commit `af59670f` + Deploy MSK web success: https://github.com/Twisterrrrr/daibilet/actions/runs/34267150399 — endpoint `rewrite-description` + админ UI Было/Стало.
 
 ---
 

@@ -2,7 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| SEO.AI-REWRITE-MVP | Admin AI-рерайт описаний → override (UI-only, OpenAI, без draft в БД) | Высокий | ✅ shipping |
+| SEO.AI-REWRITE-MVP | Admin AI-рерайт описаний → override (UI-only, OpenAI, без draft в БД) | Высокий | ✅ `af59670f` + Deploy MSK [34267150399](https://github.com/Twisterrrrr/daibilet/actions/runs/34267150399) |
 
 ## 2026-09-08 - UX Catalog 2.0 (High-End perception)
 
