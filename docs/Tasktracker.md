@@ -22,7 +22,7 @@
 | UX2.SMOKE | Preview: `/preview-cards` = flat grid smoke | Средний | ✅ flat after rollback |
 | UX2.FEATURED-TEASER | Bento hero teaser | Высокий | ❌ rolled back с GRID |
 | UX2.HOME-BLOG-ROTATE | Home «Материал недели»: weekly rotate, не sticky isFeatured | Высокий | ✅ `c913c885` + Deploy MSK [34365835832](https://github.com/Twisterrrrr/daibilet/actions/runs/34365835832) |
-| UX2.GRID-ROLLBACK | `/events`: убрать featured cluster/bento/teaser; равные карточки как до UX2 GRID | Критический | 🔄 commit + Deploy MSK |
+| UX2.GRID-ROLLBACK | `/events`: убрать featured cluster/bento/teaser; равные карточки как до UX2 GRID | Критический | ✅ `1b18be04` live Deploy MSK [34371691667](https://github.com/Twisterrrrr/daibilet/actions/runs/34371691667) |
 
 ## 2026-09-03 - Live ISR 500 (SiteLayout cookies)
 

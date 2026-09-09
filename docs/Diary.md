@@ -9,7 +9,8 @@
 - `/preview-cards` - flat smoke без featured.
 
 ### Проблемы
-- Нужен Deploy MSK web, чтобы live `/events` совпал с веткой.
+- Commit `1b18be04` pushed. Deploy MSK [34371691667](https://github.com/Twisterrrrr/daibilet/actions/runs/34371691667) ✅ success - на live снова ровная сетка `/events`.
+- Узкий `--container-page-max: 80rem` (с `baaac844`) остаётся: на широком мониторе много полей и мелкие 4 колонки - отдельно от bento.
 
 ---
 
