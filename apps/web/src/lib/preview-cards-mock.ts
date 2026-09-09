@@ -14,6 +14,9 @@ type PreviewSeed = {
   priceFrom: number;
   priceTo?: number;
   ageLimit?: string;
+  /** Duration tag for card meta (`extractDurationLabel`). */
+  durationTag?: string;
+  /** Marketing teaser for featured hero (1–2 sentences). */
   description?: string;
   imageSlug: string;
 };
@@ -28,7 +31,9 @@ const SEEDS: PreviewSeed[] = [
     priceFrom: 890,
     priceTo: 1490,
     ageLimit: '0+',
-    description: '2 часа · 1.5–2 км',
+    durationTag: '2 часа',
+    description:
+      'Спокойный маршрут от Камы к театральной площади: набережная, купеческие фасады и короткие остановки для фото. Гид держит темп под спокойный ритм без гонки по точкам.',
     imageSlug: 'perm',
   },
   {
@@ -40,7 +45,9 @@ const SEEDS: PreviewSeed[] = [
     priceFrom: 1200,
     priceTo: 2800,
     ageLimit: '0+',
-    description: '1.5 часа',
+    durationTag: '2 часа',
+    description:
+      'Вечерний рейс под подсветкой набережных и Сити: палуба, ветер и вид на мосты без спешки. Удобный старт у Китай-города и короткий путь к посадке.',
     imageSlug: 'moscow',
   },
   {
@@ -51,7 +58,9 @@ const SEEDS: PreviewSeed[] = [
     category: 'Музеи',
     priceFrom: 1500,
     ageLimit: '6+',
-    description: '3 часа',
+    durationTag: '3 часа',
+    description:
+      'Ранний вход в залы до основного потока: меньше толпы у шедевров и понятный маршрут по ключевым залам. Подходит для первого знакомства с дворцом без выматывания.',
     imageSlug: 'saint-petersburg',
   },
   {
@@ -63,7 +72,9 @@ const SEEDS: PreviewSeed[] = [
     priceFrom: 750,
     priceTo: 1100,
     ageLimit: '12+',
-    description: '2 часа',
+    durationTag: '2 часа',
+    description:
+      'Пешком по знаковым стенам центра: от Плотинки к дворам с крупными росписями и удобными ракурсами для спокойной съёмки. Гид расскажет про авторов, безопасные точки для фото и как читать городской стрит-арт без туристического шума - чтобы маршрут ощущался как прогулка, а не чек-лист точек.',
     imageSlug: 'ekaterinburg',
   },
   {
@@ -74,7 +85,9 @@ const SEEDS: PreviewSeed[] = [
     category: 'Экскурсии',
     priceFrom: 990,
     ageLimit: '0+',
-    description: '2.5 часа',
+    durationTag: '3 часа',
+    description:
+      'Кремлёвские стены, смотровые и спуск к Чкаловской лестнице с видами на стрелку. Маршрут собран так, чтобы успеть главные кадры и не потеряться в подъемах.',
     imageSlug: 'nizhny-novgorod',
   },
   {
@@ -86,7 +99,9 @@ const SEEDS: PreviewSeed[] = [
     priceFrom: 1800,
     priceTo: 3500,
     ageLimit: '16+',
-    description: '2 часа',
+    durationTag: '2 часа',
+    description:
+      'Живой сет под открытым небом с видом на вечерний город. Формат для двоих или небольшой компании: приходите ближе к старту, чтобы выбрать удобные места.',
     imageSlug: 'ufa',
   },
   {
@@ -97,7 +112,9 @@ const SEEDS: PreviewSeed[] = [
     category: 'Экскурсии',
     priceFrom: 1100,
     ageLimit: '0+',
-    description: '2 часа',
+    durationTag: '2 часа',
+    description:
+      'Узкие улицы слободы, мечети и купеческие дома в одном спокойном кольце. Гид связывает историю квартала с понятными остановками для фото и короткого отдыха.',
     imageSlug: 'kazan',
   },
   {
@@ -109,7 +126,9 @@ const SEEDS: PreviewSeed[] = [
     priceFrom: 650,
     priceTo: 950,
     ageLimit: '0+',
-    description: '1.5 часа',
+    durationTag: '2 часа',
+    description:
+      'Зелёный парк Ривьера и выход на набережную без длинных переездов. Лёгкий темп для семьи: тень, короткие паузы и понятные ориентиры по пути.',
     imageSlug: 'sochi',
   },
   {
@@ -120,7 +139,9 @@ const SEEDS: PreviewSeed[] = [
     category: 'Экскурсии',
     priceFrom: 1300,
     ageLimit: '6+',
-    description: '3 часа',
+    durationTag: '3 часа',
+    description:
+      'Кафедральный собор, остров и прогулка к Рыбной деревне одним кольцом. Европейский силуэт города без суеты: короткие переходы, паузы у воды и места для спокойных кадров - удобный темп и для первого визита, и для повторного вечера в центре.',
     imageSlug: 'kaliningrad',
   },
   {
@@ -132,7 +153,9 @@ const SEEDS: PreviewSeed[] = [
     priceFrom: 1400,
     priceTo: 2100,
     ageLimit: '0+',
-    description: '2 часа',
+    durationTag: '2 часа',
+    description:
+      'Набережная и ракурс на Золотой мост в золотой час: ветер, бухта и городские огни. Маршрут короткий, чтобы успеть свет и не торопиться на смотровых.',
     imageSlug: 'vladivostok',
   },
 ];
@@ -163,7 +186,7 @@ export function buildPreviewCardsMock(): PreviewCardMock[] {
       venueAddress: seed.venue,
       venueKind: 'attraction',
       category: seed.category,
-      tags: [],
+      tags: seed.durationTag ? [seed.durationTag] : [],
       startsAt,
       dateLabel: `12 сен · ${timeLabel}`,
       timeLabel,

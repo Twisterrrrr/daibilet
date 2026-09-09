@@ -36,6 +36,11 @@ function getSnapshot() {
   return state;
 }
 
+/** Stable ref for useSyncExternalStore - never allocate a fresh IDLE object. */
+function getServerSnapshot() {
+  return IDLE;
+}
+
 const VENDOR_CHECKOUT_SELECTOR = [
   '.fancyboxtkt-container',
   '.fancyboxtkt-slide',
@@ -106,7 +111,7 @@ export function isPurchaseOpeningActive() {
  * Mount once in root layout.
  */
 export function PurchaseOpeningHost() {
-  const snap = React.useSyncExternalStore(subscribe, getSnapshot, () => IDLE);
+  const snap = React.useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => {

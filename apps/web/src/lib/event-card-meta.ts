@@ -384,6 +384,60 @@ export function extractAddressFromListDescription(value?: string | null): string
   return formatListDescription(value);
 }
 
+/**
+ * Featured bento hero: 1–2 marketing paragraphs under meta.
+ * Prefers catalog description; falls back to short structural blurb so the
+ * tall hero body is never a white void when TC text is missing/logistics.
+ */
+export function resolveFeaturedCardTeaserLines(
+  description?: string | null,
+  fallback?: { category?: string | null; city?: string | null; venue?: string | null; duration?: string | null },
+): string[] {
+  const category = String(fallback?.category || '').trim();
+  const city = String(fallback?.city || '').trim();
+  const venue = String(fallback?.venue || '').trim();
+  const duration = String(fallback?.duration || '').trim();
+
+  const structuralSecond = (): string | null => {
+    if (duration) {
+      return `Ориентир по длительности: ${duration}. Слоты, цена и детали площадки - на странице события.`;
+    }
+    if (venue && city) {
+      return `Старт у «${venue}» (${city}). Откройте карточку, чтобы выбрать время и оформить билет.`;
+    }
+    return 'На странице события - слоты, цена и детали площадки без лишних переходов.';
+  };
+
+  if (description && !isLogisticsListDescription(description)) {
+    const raw = formatListDescription(description);
+    if (raw.length >= 40) {
+      const lines = splitListDescriptionSentences(description, 2).filter((line) => line.length >= 12);
+      if (lines.length >= 2) return lines.slice(0, 2);
+      if (lines.length === 1) return [lines[0]!, structuralSecond()!];
+      return [raw, structuralSecond()!];
+    }
+    if (raw.length >= 20) return [raw, structuralSecond()!];
+  }
+
+  if (!category && !city) return [];
+
+  const lines: string[] = [];
+  if (category && city) {
+    lines.push(
+      venue
+        ? `${category} в ${city}: удобный старт у «${venue}», без лишней суеты вокруг площадки.`
+        : `${category} в ${city} - ближайшие слоты и цена собраны на одной карточке.`,
+    );
+  } else if (category) {
+    lines.push(`${category}: сравните время, площадку и стоимость до перехода к покупке.`);
+  } else if (city) {
+    lines.push(`Событие в ${city}: откройте карточку, чтобы выбрать слот и оформить билет.`);
+  }
+  const second = structuralSecond();
+  if (second) lines.push(second);
+  return lines.slice(0, 2);
+}
+
 /** Стабильный псевдорейтинг 4.5–5.0 до ≥10 реальных отзывов (только UI). */
 export function resolvePseudoRating(seed: string): number {
   let hash = 0;

@@ -5,6 +5,7 @@ import {
   extractAddressFromListDescription,
   formatListDescription,
   isLogisticsListDescription,
+  resolveFeaturedCardTeaserLines,
   splitListDescriptionSentences,
 } from './event-card-meta.ts';
 import { resolveEventCardLocationLabel } from './event-location.ts';
@@ -88,6 +89,37 @@ test('extractAddressFromListDescription only for logistics text', () => {
     'ул. Итальянская, 5',
   );
   assert.equal(extractAddressFromListDescription('Космическое путешествие под куполом'), '');
+});
+
+test('resolveFeaturedCardTeaserLines splits marketing copy into 1–2 paragraphs', () => {
+  const lines = resolveFeaturedCardTeaserLines(
+    'Пешком по стенам центра: дворы и крупные росписи. Гид расскажет про авторов и безопасные точки для фото.',
+  );
+  assert.equal(lines.length, 2);
+  assert.match(lines[0]!, /Пешком/);
+  assert.match(lines[1]!, /Гид/);
+});
+
+test('resolveFeaturedCardTeaserLines pads single sentence with structural second line', () => {
+  const lines = resolveFeaturedCardTeaserLines(
+    'Спокойный маршрут по набережной с короткими остановками для фото и видом на реку без гонки.',
+    { category: 'Экскурсии', city: 'Пермь', duration: '2 часа' },
+  );
+  assert.equal(lines.length, 2);
+  assert.match(lines[0]!, /набережной/);
+  assert.match(lines[1]!, /2 часа/);
+});
+
+test('resolveFeaturedCardTeaserLines falls back when description is logistics', () => {
+  const lines = resolveFeaturedCardTeaserLines('Место встречи: ул. Ленина, 1', {
+    category: 'Экскурсии',
+    city: 'Пермь',
+    venue: 'Набережная',
+    duration: '2 часа',
+  });
+  assert.equal(lines.length, 2);
+  assert.match(lines[0]!, /Экскурсии в Пермь/);
+  assert.match(lines[1]!, /2 часа/);
 });
 
 test('resolveEventCardLocationLabel prefers street address over venue name', () => {

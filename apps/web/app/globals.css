@@ -904,6 +904,32 @@ html[data-nav-pending='1'] {
   .catalog-featured-cluster__hero .event-card,
   .catalog-featured-cluster__stack .event-card {
     height: 100%;
+    min-height: 0;
+  }
+
+  /*
+   * Bento hero: do NOT lock 16/10 on the wide 2fr column - that inflates the
+   * cluster (~600px photo) and crushes the teaser to ~50px (looks empty).
+   * Height comes from the two stack cards; photo flex-fills leftover; copy keeps natural height.
+   */
+  .catalog-featured-cluster__hero .event-card--featured [data-card-media] {
+    flex: 1 1 0%;
+    aspect-ratio: auto;
+    min-height: 11rem;
+    max-height: none;
+  }
+
+  .catalog-featured-cluster__hero .event-card--featured > div:not([data-card-media]) {
+    flex: 0 0 auto;
+  }
+
+  .catalog-featured-cluster__hero .event-card--featured [data-featured-teaser] {
+    flex: 0 0 auto;
+    overflow: hidden;
+  }
+
+  .catalog-featured-cluster__hero .event-card--featured [data-featured-teaser] p {
+    overflow-wrap: break-word;
   }
 
   .catalog-featured-cluster__stack > * {

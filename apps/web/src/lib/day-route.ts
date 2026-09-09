@@ -510,6 +510,8 @@ type DayRouteRuntime = {
 };
 
 declare global {
+  // eslint-disable-next-line no-var
+  var __daibiletServerDayRouteSnapshot: DayRouteState | undefined;
   interface Window {
     __daibiletDayRouteRuntime?: DayRouteRuntime;
   }
@@ -592,10 +594,30 @@ export function subscribeDayRoute(listener: DayRouteListener): () => void {
   };
 }
 
+/**
+ * Stable empty snapshot for SSR / getServerSnapshot.
+ * useSyncExternalStore requires getServerSnapshot to return the same reference
+ * across calls; a fresh empty object each time causes an infinite loop.
+ * Stored on globalThis so multi-chunk copies of this module share one identity
+ * (same reason as window.__daibiletDayRouteRuntime).
+ */
+function getStableServerDayRouteSnapshot(): DayRouteState {
+  if (!globalThis.__daibiletServerDayRouteSnapshot) {
+    globalThis.__daibiletServerDayRouteSnapshot = Object.freeze({
+      cityId: null,
+      venues: Object.freeze([]) as DayRouteVenueItem[],
+    });
+  }
+  return globalThis.__daibiletServerDayRouteSnapshot;
+}
+
+const SERVER_DAY_ROUTE_SNAPSHOT: DayRouteState = getStableServerDayRouteSnapshot();
+
 /** Cached snapshot; identity stable until localStorage changes. */
 export function getDayRouteSnapshot(): DayRouteState {
   installDayRouteBrowserBridge();
-  if (typeof window === 'undefined') return emptyDayRoute();
+  const empty = getStableServerDayRouteSnapshot();
+  if (typeof window === 'undefined') return empty;
   const runtime = getDayRouteRuntime();
   let raw: string | null = null;
   try {
@@ -604,13 +626,19 @@ export function getDayRouteSnapshot(): DayRouteState {
     raw = null;
   }
   if (runtime.snapshotCache && runtime.snapshotCache.raw === raw) return runtime.snapshotCache.state;
-  const state = parseDayRouteRaw(raw);
+  // Empty route (missing key or `{"cityId":null,"venues":[]}`) → same frozen ref as
+  // getServerSnapshot so useSyncExternalStore does not churn on hydrate.
+  let state = !raw ? empty : parseDayRouteRaw(raw);
+  if (state.cityId == null && state.venues.length === 0) {
+    state = empty;
+  }
   runtime.snapshotCache = { raw, state };
   return state;
 }
 
 export function getServerDayRouteSnapshot(): DayRouteState {
-  return emptyDayRoute();
+  // Same frozen identity every call (React useSyncExternalStore contract).
+  return SERVER_DAY_ROUTE_SNAPSHOT;
 }
 
 /** Test-only: drop cached snapshot between mock localStorage installs. */
@@ -672,13 +700,13 @@ function parseDayRouteRaw(raw: string | null): DayRouteState {
 }
 
 export function readDayRoute(): DayRouteState {
-  if (typeof window === 'undefined') return emptyDayRoute();
+  if (typeof window === 'undefined') return getServerDayRouteSnapshot();
   return getDayRouteSnapshot();
 }
 
 /** Fresh LS read (ignore snapshot cache). Use before mutate + after failed write checks. */
 export function readDayRouteFresh(): DayRouteState {
-  if (typeof window === 'undefined') return emptyDayRoute();
+  if (typeof window === 'undefined') return getServerDayRouteSnapshot();
   resetDayRouteSnapshotCache();
   return getDayRouteSnapshot();
 }
@@ -793,10 +821,17 @@ export function writeDayRoute(state: DayRouteState): boolean {
     // Quota / private mode: do not update snapshot or UI - keeps badge/buttons honest.
     return false;
   }
+  const runtime = getDayRouteRuntime();
+  // Keep empty route on the same identity as getServerSnapshot (React useSyncExternalStore).
+  if (normalized.cityId == null && normalized.venues.length === 0) {
+    runtime.snapshotCache = { raw, state: SERVER_DAY_ROUTE_SNAPSHOT };
+    notifyDayRouteChanged();
+    notifyDayRouteSubscribers(cloneDayRouteState(SERVER_DAY_ROUTE_SNAPSHOT));
+    return true;
+  }
   const frozen = cloneDayRouteState(normalized);
   Object.freeze(frozen);
   for (const venue of frozen.venues) Object.freeze(venue);
-  const runtime = getDayRouteRuntime();
   runtime.snapshotCache = { raw, state: frozen };
   notifyDayRouteChanged();
   // Subscribers get a mutable clone so React trees cannot corrupt the cache identity.

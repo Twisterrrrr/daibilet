@@ -1,6 +1,6 @@
 'use client';
 
-import { useLayoutEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { CatalogFeaturedCluster } from '@/components/CatalogFeaturedCluster';
 import { EventCard } from '@/components/EventCard';
@@ -22,12 +22,17 @@ function estimatePreviewGridColumns(viewportWidth: number): number {
   return 1;
 }
 
-function usePreviewGridColumns(): number {
-  const [columns, setColumns] = useState(() =>
-    typeof window === 'undefined' ? 1 : estimatePreviewGridColumns(window.innerWidth),
-  );
+/**
+ * SSR + first client paint must share the same column count.
+ * Never read `window` in the useState initializer (that caused hydrate mismatch:
+ * server "mobile 1 col" vs client "desktop 3 col").
+ */
+const SERVER_PREVIEW_COLUMNS = 1;
 
-  useLayoutEffect(() => {
+function usePreviewGridColumns(): number {
+  const [columns, setColumns] = useState(SERVER_PREVIEW_COLUMNS);
+
+  useEffect(() => {
     const sync = () => setColumns(estimatePreviewGridColumns(window.innerWidth));
     sync();
     window.addEventListener('resize', sync);
@@ -43,6 +48,11 @@ function usePreviewGridColumns(): number {
  */
 export function PreviewCardsGrid({ items }: PreviewCardsGridProps) {
   const columns = usePreviewGridColumns();
+  // Mode string is viewport-derived; show after first paint so SSR text stays stable.
+  const [modeReady, setModeReady] = useState(false);
+  useEffect(() => {
+    setModeReady(true);
+  }, []);
   const featuredCount = items.filter((item) => item.isFeatured).length;
   const units = useMemo(() => {
     const featuredIds = featuredIdsFromPreviewFlags(items);
@@ -59,7 +69,8 @@ export function PreviewCardsGrid({ items }: PreviewCardsGridProps) {
   return (
     <div className="space-y-4">
       <p className="text-sm text-graphite-muted">
-        Featured pin: {featuredCount} из {items.length} (каждая 4-я). Режим: {modeLabel}.
+        Featured pin: {featuredCount} из {items.length} (каждая 4-я).
+        {modeReady ? ` Режим: ${modeLabel}.` : null}
       </p>
       <ul className="preview-cards-grid">
         {units.map((unit, index) => {

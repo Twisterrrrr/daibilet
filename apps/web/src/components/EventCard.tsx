@@ -31,6 +31,7 @@ import {
   getDepartingSoonMinutes,
   isOpenDate,
   MIN_DISPLAY_PRICE_RUB,
+  resolveFeaturedCardTeaserLines,
   WIDE_DISPLAY_SLOT_LIMIT,
 } from '@/lib/event-card-meta';
 import { resolveEventCardObjectPosition } from '@/lib/event-image-focus';
@@ -151,6 +152,19 @@ export function EventCard({
   const durationLabel = extractDurationLabel(session.tags);
   const ageLabel = formatAgeLimit(session.ageLimit);
   const showCategory = Boolean(session.category && !landingActions);
+  // Bento hero: 1–2 marketing paragraphs fill the tall body (not an empty white band).
+  const featuredTeaserLines = catalogFeatured
+    ? resolveFeaturedCardTeaserLines(session.description, {
+        category: session.category,
+        city: session.city || session.destination,
+        venue: session.venue,
+        duration: durationLabel,
+      })
+    : [];
+  const hasFeaturedTeaser = featuredTeaserLines.length > 0;
+  // Stack tiles (right column): photo absorbs leftover height.
+  // Featured hero: fixed 16/10 photo; body + teaser absorb height with copy.
+  const stretchMedia = catalogDense && !catalogFeatured;
   // Missing display price (<100 / null) is not "soon" - event can still be on sale.
   const showSoonBadge = false;
   const purchase = useCatalogPurchase(session);
@@ -179,7 +193,18 @@ export function EventCard({
 
   const cardBody = (
     <>
-      <div className="relative aspect-[16/10] w-full overflow-hidden bg-surface-muted">
+      {/*
+        Featured: aspect photo + teaser copy in flex body.
+        Dense stack: photo flex-1 so twin tiles fill their cells.
+      */}
+      <div
+        data-card-media
+        className={`relative w-full overflow-hidden bg-surface-muted ${
+          stretchMedia
+            ? 'min-h-[10.5rem] flex-1 basis-[42%] sm:min-h-[12rem]'
+            : 'aspect-[16/10] shrink-0'
+        }`}
+      >
         {landingActions ? (
           <Link
             href={href}
@@ -240,13 +265,15 @@ export function EventCard({
       </div>
 
       <div
-        className={`flex flex-1 flex-col ${
-          compact ? 'gap-2.5 p-3.5 sm:gap-3 sm:p-4' : 'gap-3 p-4 sm:gap-3.5'
+        className={`flex min-h-0 flex-col ${
+          stretchMedia ? 'shrink-0' : 'flex-1'
+        } ${compact ? 'gap-2.5 p-3.5 sm:gap-3 sm:p-4' : 'gap-3 p-4 sm:gap-3.5'}${
+          catalogFeatured ? ' sm:max-w-none' : ''
         }`}
       >
         {/* Category left, duration + age right — one row, no extra duration line. */}
         {showCategory || ageLabel || durationLabel ? (
-          <div className="flex w-full items-center justify-between gap-2">
+          <div className="flex w-full shrink-0 items-center justify-between gap-2">
             {showCategory ? (
               <p className="min-w-0 truncate text-[10px] font-medium uppercase tracking-[0.14em] text-graphite-muted sm:text-[11px]">
                 {session.category}
@@ -268,7 +295,7 @@ export function EventCard({
           </div>
         ) : null}
 
-        <h2>
+        <h2 className="shrink-0">
           <Link
             href={href}
             className={TITLE_LINK_CLASS}
@@ -287,7 +314,7 @@ export function EventCard({
         {landingBadges.length > 0 ? <LandingCardBadgeRow badges={landingBadges} /> : null}
 
         {/* Primary schedule line */}
-        <div className="flex flex-col gap-1.5">
+        <div className="flex shrink-0 flex-col gap-1.5">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-ui-xs sm:text-ui-sm">
             {openDate ? (
               <span className="font-medium text-success">Билет с открытой датой</span>
@@ -318,6 +345,22 @@ export function EventCard({
           ) : null}
         </div>
 
+        {hasFeaturedTeaser ? (
+          <div
+            className="relative z-[2] flex shrink-0 flex-col gap-2 border-t border-slate-100/90 pt-3 text-[13px] leading-[1.55] text-graphite-muted sm:gap-2.5 sm:pt-3.5 sm:text-[14px] sm:leading-[1.6]"
+            data-featured-teaser
+          >
+            {featuredTeaserLines.map((line, index) => (
+              <p
+                key={`${index}-${line.slice(0, 24)}`}
+                className="shrink-0 text-pretty line-clamp-3 sm:line-clamp-4"
+              >
+                {line}
+              </p>
+            ))}
+          </div>
+        ) : null}
+
         {/* Catalog cards: no alt slots (confusing). Landing purchase chips only. */}
         {showSlotPills && landingActions ? (
           <EventCardSlotChips
@@ -342,7 +385,12 @@ export function EventCard({
           />
         ) : null}
 
-        <div className="mt-auto flex items-center justify-between gap-2 pt-2">
+        <div
+          className={`flex shrink-0 items-center justify-between gap-2 pt-3 ${
+            // Featured: teaser flex-1 fills the band; footer stays at bottom.
+            catalogFeatured && hasFeaturedTeaser ? 'mt-auto' : catalogFeatured ? 'mt-1' : 'mt-auto'
+          }`}
+        >
           {landingActions ? (
             <LandingPurchaseButton
               session={session}

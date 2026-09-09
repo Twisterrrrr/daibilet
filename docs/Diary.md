@@ -1,3 +1,19 @@
+## 2026-09-09 - UX Catalog 2.0: featured teaser + hydrate snapshots
+
+### Наблюдения
+- Bento-hero после cluster оставлял белую дыру под meta: `aspect-[16/10]` на широкой 2fr-колонке раздувал фото (~600px), teaser сжимался до ~50px и текст выглядел «пустым».
+- React Dev Overlay: `getServerSnapshot should be cached` на day-route / purchase host + hydrate mismatch mode-label на `/preview-cards`.
+
+### Решения
+- `resolveFeaturedCardTeaserLines`: всегда 1–2 абзаца (description или structural fallback category/city/venue/duration).
+- Bento hero: фото `flex:1` + `aspect-ratio:auto` (высота от stack-соседей); teaser `shrink-0` с естественной высотой, без клипа.
+- Stable `getServerSnapshot` для day-route, PurchaseOpeningHost, catalog columns; preview mode label после mount.
+
+### Проблемы
+- На live у части TC-карточек description = logistics → сработает fallback-бларб; AI-rewrite override улучшит качество позже.
+
+---
+
 ## 2026-09-08 - AI rewrite event descriptions (admin MVP)
 
 ### Наблюдения

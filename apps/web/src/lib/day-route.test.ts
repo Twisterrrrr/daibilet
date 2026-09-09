@@ -55,6 +55,8 @@ import {
   resolveDayRouteTicketUrl,
   sameDayRouteVenue,
   sanitizeDayRouteTicketFields,
+  getDayRouteSnapshot,
+  getServerDayRouteSnapshot,
   subscribeDayRoute,
   toggleDayRoute,
   venueMatchesRouteSlug,
@@ -372,6 +374,20 @@ test('subscribeDayRoute fires once per successful write with matching length', (
   unsubscribe();
   assert.deepEqual(lengths, [1, 2, 3]);
   assert.equal(readDayRoute().venues.length, 3);
+});
+
+test('getServerDayRouteSnapshot returns stable identity (useSyncExternalStore)', () => {
+  const a = getServerDayRouteSnapshot();
+  const b = getServerDayRouteSnapshot();
+  assert.equal(a, b);
+  assert.equal(a.cityId, null);
+  assert.equal(a.venues.length, 0);
+
+  mockStorage();
+  clearDayRoute();
+  resetDayRouteSnapshotCache();
+  const clientEmpty = getDayRouteSnapshot();
+  assert.equal(clientEmpty, getServerDayRouteSnapshot());
 });
 
 test('readDayRoute drops blank ids and dedupes slug twins', () => {

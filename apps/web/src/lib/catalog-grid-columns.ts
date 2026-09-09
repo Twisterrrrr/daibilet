@@ -1,11 +1,14 @@
 'use client';
 
-import { useLayoutEffect, useState, type RefObject } from 'react';
+import { useLayoutEffect, useState, useSyncExternalStore, type RefObject } from 'react';
 
 /** Match `.catalog-card-grid` collapsed auto-fit track min (~16.5rem). */
 const COLLAPSED_TRACK_MIN_PX = 16.5 * 16;
 const COLLAPSED_FILTERS_RAIL_PX = 3.25 * 16 + 12;
 const COLLAPSED_GRID_GAP_PX = 20;
+
+/** SSR / hydrate snapshot: 2-col flat (tablet-safe). Desktop upgrades after hydrate. */
+const SERVER_CATALOG_COLUMNS = 2;
 
 /**
  * Mirrors `.catalog-card-grid`: 2 → lg:3 → 2xl:4.
@@ -49,21 +52,43 @@ export function readGridColumnCount(element: HTMLElement): number {
   return Math.max(1, cols);
 }
 
+function subscribeViewport(onStoreChange: () => void): () => void {
+  window.addEventListener('resize', onStoreChange);
+  return () => window.removeEventListener('resize', onStoreChange);
+}
+
+/** Last filtersCollapsed seen by the client snapshot (stable getSnapshot identity). */
+let clientFiltersCollapsed = false;
+
+function getClientCatalogColumnsSnapshot(): number {
+  return estimateCatalogGridColumns(window.innerWidth, clientFiltersCollapsed);
+}
+
+function getServerCatalogColumnsSnapshot(): number {
+  return SERVER_CATALOG_COLUMNS;
+}
+
+/**
+ * Column count for featured packing.
+ * Viewport estimate via useSyncExternalStore (SSR=2, no window in useState).
+ * After mount, ResizeObserver refines from the real CSS grid.
+ */
 export function useCatalogGridColumnCount(
   gridRef: RefObject<HTMLElement | null>,
   filtersCollapsed: boolean,
   itemCount: number,
 ): number {
-  const [columns, setColumns] = useState(() => {
-    // SSR: 2-col flat (tablet-safe). Desktop upgrades to bento in useLayoutEffect
-    // before paint - avoids shipping a full-row magazine hole to phones/tablets.
-    if (typeof window === 'undefined') return 2;
-    return estimateCatalogGridColumns(window.innerWidth, filtersCollapsed);
-  });
+  clientFiltersCollapsed = filtersCollapsed;
+  const viewportColumns = useSyncExternalStore(
+    subscribeViewport,
+    getClientCatalogColumnsSnapshot,
+    getServerCatalogColumnsSnapshot,
+  );
+
+  const [measuredColumns, setMeasuredColumns] = useState<number | null>(null);
 
   useLayoutEffect(() => {
-    if (typeof window === 'undefined') return;
-    setColumns(estimateCatalogGridColumns(window.innerWidth, filtersCollapsed));
+    setMeasuredColumns(null);
   }, [filtersCollapsed]);
 
   useLayoutEffect(() => {
@@ -72,7 +97,7 @@ export function useCatalogGridColumnCount(
 
     const measure = () => {
       const next = readGridColumnCount(node);
-      setColumns((prev) => (prev === next ? prev : next));
+      setMeasuredColumns((prev) => (prev === next ? prev : next));
     };
 
     measure();
@@ -81,5 +106,5 @@ export function useCatalogGridColumnCount(
     return () => observer.disconnect();
   }, [gridRef, filtersCollapsed, itemCount]);
 
-  return columns;
+  return measuredColumns ?? viewportColumns;
 }
