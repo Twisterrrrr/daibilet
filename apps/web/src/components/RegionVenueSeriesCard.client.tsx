@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { RegionEventCard } from '@/components/RegionEventCard.client';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 import { formatCoverDateBadge } from '@/lib/event-card-meta';
+import { formatPublicTitle } from '@/lib/format-public-title';
 import { eventHref, venueHref } from '@/lib/routes';
 
 export function RegionVenueSeriesCard({
@@ -73,7 +74,7 @@ export function RegionVenueSeriesCard({
               >
                 <span className="block text-xs font-semibold text-slate-900">{badge || 'Скоро'}</span>
                 <span className="mt-0.5 block max-w-[10rem] truncate text-xs text-slate-500">
-                  {session.title}
+                  {formatPublicTitle(session.title)}
                 </span>
               </Link>
             );

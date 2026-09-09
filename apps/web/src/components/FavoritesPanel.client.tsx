@@ -20,6 +20,7 @@ import {
   type PlaceFavoriteItem,
 } from '@/lib/place-favorites';
 import { formatPriceFrom } from '@/lib/format';
+import { formatPublicTitle } from '@/lib/format-public-title';
 import { eventHref } from '@/lib/routes';
 import { catalogHrefWithSelectedCity } from '@/lib/catalog-url';
 
@@ -107,7 +108,7 @@ export function FavoritesPanel({ onClose }: { onClose: () => void }) {
                 </Link>
                 <div className="min-w-0 flex-1">
                   <Link href={eventHref(session)} onClick={onClose} className="line-clamp-2 text-sm font-semibold text-slate-900 hover:text-primary-700">
-                    {session.title}
+                    {formatPublicTitle(session.title)}
                   </Link>
                   <p className="mt-1 truncate text-xs text-slate-500">{session.city || 'Город не указан'}</p>
                   <p className="mt-1 text-xs font-semibold text-slate-800">

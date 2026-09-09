@@ -12,6 +12,7 @@ import {
 } from '@/lib/event-card-meta';
 import { resolveEventCardFallbackImage, resolveEventCardPrimaryImage } from '@/lib/event-card-image';
 import { resolveEventCardObjectPosition } from '@/lib/event-image-focus';
+import { formatPublicTitle } from '@/lib/format-public-title';
 import { eventHref } from '@/lib/routes';
 
 const GENRE_PALETTE = [
@@ -108,7 +109,7 @@ export function RegionEventCard({
       <div className="flex flex-1 flex-col gap-2 p-3.5 sm:p-4">
         <h3 className="line-clamp-2 text-base font-semibold leading-snug text-slate-950">
           <Link href={href} className="hover:text-emerald-800">
-            {session.title}
+            {formatPublicTitle(session.title)}
           </Link>
         </h3>
         {placeLine ? (

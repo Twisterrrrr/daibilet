@@ -28,6 +28,7 @@ import {
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { resolveCityTimeZone } from '@/lib/city-timezone';
 import { resolveVenueHeroImage } from '@/lib/city-place-images';
+import { formatPublicTitle } from '@/lib/format-public-title';
 import { dedupeVenueLinkedEvents } from '@/lib/day-route-score';
 import { formatStreetAddress } from '@/lib/address';
 import type { FinanceAdmissionProduct } from '@/lib/finance-projection';
@@ -685,7 +686,7 @@ export function InstitutionVenueLayout({
                     href={`/events/${encodeURIComponent(event.slug)}`}
                     className="block truncate py-2.5 text-sm font-medium text-zinc-900 transition hover:text-primary-700"
                   >
-                    {event.title}
+                    {formatPublicTitle(event.title)}
                   </a>
                 </li>
               ))}

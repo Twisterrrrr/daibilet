@@ -21,6 +21,7 @@ import { VenueBreadcrumbsNav } from '@/components/VenueBreadcrumbsNav.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { expandSessionPurchaseVariants, isSessionPurchaseBlocked } from '@/lib/event-purchase';
 import { formatMoney, formatNumber } from '@/lib/format';
+import { formatPublicTitle } from '@/lib/format-public-title';
 import { formatStreetAddress } from '@/lib/address';
 import { build2gisRouteUrl } from '@/lib/maps';
 import { dedupeVenueLinkedEvents } from '@/lib/day-route-score';
@@ -570,7 +571,7 @@ export function LocationVenueLayout({
                       href={`/events/${encodeURIComponent(event.slug)}`}
                       className="block truncate py-2.5 text-sm font-medium text-slate-900 transition hover:text-primary-700"
                     >
-                      {event.title}
+                      {formatPublicTitle(event.title)}
                     </a>
                   </li>
                 ))}

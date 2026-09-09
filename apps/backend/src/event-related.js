@@ -191,7 +191,12 @@ export function pickRelatedSessions(event, catalogSessions, groupEventIds, sessi
     return String(left.session.startsAt || '').localeCompare(String(right.session.startsAt || ''));
   });
 
+  // Seed with the PDP product itself - twin events share a marketing title but
+  // different ids/groupKeys (common for recurring standup / club nights).
   const relatedSeen = new Set();
+  const selfKey = relatedProductKey(event);
+  if (selfKey) relatedSeen.add(selfKey);
+
   const related = [];
   for (const { session } of relatedScored) {
     const key = relatedProductKey(session);

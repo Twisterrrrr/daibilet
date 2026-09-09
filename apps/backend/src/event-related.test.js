@@ -119,3 +119,36 @@ test('pickRelatedSessions dedupes title and keeps city', () => {
   assert.equal(related.length, 1);
   assert.equal(related[0].id, '1');
 });
+
+test('pickRelatedSessions drops twin with same title as current PDP', () => {
+  const event = {
+    title: 'Пермский Stand-Up клуб',
+    category: 'Мероприятия',
+    city: 'Пермь',
+    cityId: 'city_perm',
+    tags: ['стендап'],
+  };
+  const catalog = [
+    {
+      id: 'twin-night',
+      title: 'Пермский Stand-Up клуб',
+      category: 'Мероприятия',
+      city: 'Пермь',
+      cityId: 'city_perm',
+      tags: ['стендап'],
+      startsAt: '2026-09-19T19:30:00+05:00',
+    },
+    {
+      id: 'peer',
+      title: 'Алексей Сапрыкин «Чтение»',
+      category: 'Мероприятия',
+      city: 'Пермь',
+      cityId: 'city_perm',
+      tags: ['стендап'],
+      startsAt: '2026-09-20T19:00:00+05:00',
+    },
+  ];
+  const related = pickRelatedSessions(event, catalog, [], () => [], 12);
+  assert.equal(related.length, 1);
+  assert.equal(related[0].id, 'peer');
+});

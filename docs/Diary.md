@@ -20,10 +20,12 @@
 - Три тикета из SEO-аудита 02.09 ещё висели как «code; Deploy», хотя related/map/CAPS уже в ветке с 02–03.09.
 - Пробелы TITLE-CAPS: сырой `session.title` в region cards, favorites drawer, region nearby, venue stop-lists.
 - Related live path = `public-event.dto.ts` → `loadRelatedSessionsFromDb` + `pickRelatedSessions` (нужен API restart на MSK).
+- Live smoke PDP стендапа в Перми: карта Yandex iframe OK; related первым отдавал twin «Пермский Stand-Up клуб» с другим event id (дедуп только внутри кандидатов, без seed текущего title).
 
 ### Решения
 - Добили `formatPublicTitle` в `RegionEventCard`, `RegionVenueSeriesCard`, `FavoritesPanel`, `RegionNearbyStrip`, venue stop-lists.
 - Карта PDP уже на `YandexMapEmbed` (`EventExpandableMap`, open by default).
+- `pickRelatedSessions`: seed `relatedSeen` ключом текущего PDP - twin nights с тем же marketing title не попадают в «Похожие».
 - Выкат: Deploy MSK web (artifact swap делает `git reset` + `systemctl restart daibilet-api`).
 
 ### Проблемы

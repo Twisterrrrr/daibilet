@@ -5,6 +5,7 @@ import { MapPin, Ticket } from 'lucide-react';
 
 import { cityToGenitive } from '@/lib/city-declension';
 import { formatPriceFrom } from '@/lib/format';
+import { formatPublicTitle } from '@/lib/format-public-title';
 import type { PublicRegionNearbyDto } from '@daibilet/contracts/public';
 
 /** «Рядом с городом: события Пермского края» - region in genitive. */
@@ -74,7 +75,9 @@ export function RegionNearbyStrip({
           {nearby.events.map((event) => (
             <li key={event.id}>
               <article className="flex h-full flex-col rounded-xl border border-emerald-200/80 bg-white p-4 shadow-sm">
-                <h3 className="text-base font-semibold leading-snug text-slate-950">{event.title}</h3>
+                <h3 className="text-base font-semibold leading-snug text-slate-950">
+                  {formatPublicTitle(event.title)}
+                </h3>
                 <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-slate-600">
                   {event.dateLabel || formatNearbyDate(event.startsAt) ? (
                     <span>{event.dateLabel || formatNearbyDate(event.startsAt)}</span>

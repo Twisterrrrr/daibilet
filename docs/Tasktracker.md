@@ -1,3 +1,10 @@
+## 2026-09-09 - Teplohod AI rewrite batch apply
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| SEO.TEP-REWRITE-48 | 48 TEP описаний → EventOverride.description (batches 1–4) | Высокий | ✅ apply на MSK 2026-09-09; script `ed41beca` |
+| OPS.MSK-SSH-DEPLOY | Owner SSH через `deploy` (root запрещён); diagnose/unban workflows | Высокий | ✅ pubkey + unban; config User=deploy |
+
 ## 2026-09-08 - AI rewrite event descriptions (admin MVP)
 
 | ID | Задача | Приоритет | Статус |
@@ -34,7 +41,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| FIX.RELATED-QUALITY | PDP related: same-city + score + title dedupe (`public-event.dto` → `pickRelatedSessions`) | Критический | 🔄 |
+| FIX.RELATED-QUALITY | PDP related: same-city + score + title dedupe + seed self-title (no twin night) | Критический | 🔄 commit → Deploy MSK web (+ API restart via swap) |
 | FIX.CATALOG-FILTER-SCROLL | Desktop sidebar: definite `height` + inner overflow | Высокий | 🔄 |
 | FIX.BLOG-HERO-FLASH | Убран client shuffle + stable promo seed | Высокий | 🔄 |
 | SEO.PODBORKI-PILOT-2 | NN+Perm в allowlist + маркер CHPU | Высокий | ✅ code |
@@ -46,9 +53,9 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| FIX.EVENT-MAP-YANDEX | PDP карта: Yandex iframe вместо blank Leaflet | Критический | 🔄 commit+Deploy MSK web |
+| FIX.EVENT-MAP-YANDEX | PDP карта: Yandex iframe вместо blank Leaflet | Критический | ✅ live smoke 2026-09-09 (Yandex widget); redeploy batch |
 | FIX.MYDAY-PIN-LABELS | CSS подписи пинов (`left:100%` клипал caption) | Высокий | 🔄 |
-| UX.TITLE-CAPS | `formatPublicTitle` на list/table/hub/affiche + map labels | Высокий | 🔄 |
+| UX.TITLE-CAPS | `formatPublicTitle` на list/table/hub/affiche + region/favorites/venue stop-lists | Высокий | 🔄 commit → Deploy MSK web |
 | SEO.AUDIT-0902 | `docs/seo-audit-2026-09-02.md` вердикт + чеклист | Высокий | ✅ docs |
 
 ## 2026-08-30 - Live smoke audit (batch «code vs live»)
