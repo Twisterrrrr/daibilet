@@ -47,6 +47,9 @@ export interface AdmissionProductDto {
   slug: string;
   title: string;
   shortTitle: string | null;
+  description: string | null;
+  shortDescription: string | null;
+  imageUrl: string | null;
   type: AdmissionProductType;
   status: string;
   purchaseFlow: string;

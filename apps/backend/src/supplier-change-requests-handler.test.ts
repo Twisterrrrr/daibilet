@@ -134,14 +134,65 @@ test('supplier change request write-flow creates admission and event requests', 
     assert.equal(product.priceFromRub, 500);
     assert.equal(product.offers.length, 1);
 
+    const admissionUpdate = await createSupplierAdmissionChangeRequest(searchParams, {
+      admissionProductId: product.id,
+      title: 'Обновить входной билет',
+      summary: 'Добавить льготную категорию',
+      admissionProduct: {
+        title: 'Билет в музей с двумя категориями',
+        shortDescription: 'Вход по открытому билету после проверки администратора.',
+        type: 'MUSEUM_ENTRY',
+        venueId,
+        validityMode: 'OPEN_DATE',
+        ticketsVacant: 80,
+      },
+      offers: [
+        { title: 'Льготный', priceRub: 300, capacityTotal: 30, active: true },
+        { title: 'Взрослый', priceRub: 650, oldPriceRub: 700, capacityTotal: 50, active: true },
+      ],
+    });
+
+    assert.equal(admissionUpdate.request.subject, 'ADMISSION_PRODUCT');
+    assert.equal(admissionUpdate.request.type, 'UPDATE');
+    assert.equal(admissionUpdate.request.admissionProduct?.id, product.id);
+
+    await reviewEventChangeRequest({
+      requestId: admissionUpdate.request.id,
+      action: 'approve',
+      adminComment: 'Smoke update approve',
+    });
+    const updateApplyResult = await applyApprovedEventChangeRequest({
+      requestId: admissionUpdate.request.id,
+      actorSiteUserId: null,
+    });
+    assert.equal(updateApplyResult.status, 'APPLIED');
+    assert.equal(updateApplyResult.admissionProductId, product.id);
+
+    const updatedProduct = await prisma.admissionProduct.findUnique({
+      where: { id: product.id },
+      include: { offers: { where: { active: true }, orderBy: { priceRub: 'asc' } } },
+    });
+    assert.ok(updatedProduct);
+    assert.equal(updatedProduct.title, 'Билет в музей с двумя категориями');
+    assert.equal(updatedProduct.shortDescription, 'Вход по открытому билету после проверки администратора.');
+    assert.equal(updatedProduct.priceFromRub, 300);
+    assert.equal(updatedProduct.ticketsVacant, 80);
+    assert.deepEqual(
+      updatedProduct.offers.map((offer) => ({ title: offer.title, priceRub: offer.priceRub, capacityTotal: offer.capacityTotal })),
+      [
+        { title: 'Льготный', priceRub: 300, capacityTotal: 30 },
+        { title: 'Взрослый', priceRub: 650, capacityTotal: 50 },
+      ],
+    );
+
     const previousStubFlag = process.env.DAIBILET_STUB_CHECKOUT;
     process.env.DAIBILET_STUB_CHECKOUT = '1';
     let checkout: Awaited<ReturnType<typeof createStubCheckoutOrder>>;
     try {
       checkout = await createStubCheckoutOrder({
         subjectType: 'VENUE_ADMISSION',
-        admissionProductId: product.id,
-        admissionOfferId: product.offers[0]?.id || null,
+        admissionProductId: updatedProduct.id,
+        admissionOfferId: updatedProduct.offers[0]?.id || null,
         quantity: 1,
         buyer: {
           email: 'buyer-change-smoke@example.test',
@@ -158,7 +209,7 @@ test('supplier change request write-flow creates admission and event requests', 
       }
     }
     assert.equal(checkout.order.subject.type, 'VENUE_ADMISSION');
-    assert.equal(checkout.order.subject.admissionProductId, product.id);
+    assert.equal(checkout.order.subject.admissionProductId, updatedProduct.id);
     checkoutOrderId = checkout.order.id;
 
     const orders = await buildSupplierPortalOrdersListDto(new URLSearchParams({
@@ -168,7 +219,7 @@ test('supplier change request write-flow creates admission and event requests', 
     }));
     assert.equal(orders.total, 1);
     assert.equal(orders.items[0]?.publicCode, checkout.order.publicCode);
-    assert.equal(orders.items[0]?.admissionProductId, product.id);
+    assert.equal(orders.items[0]?.admissionProductId, updatedProduct.id);
 
     const event = await createSupplierEventChangeRequest(searchParams, {
       title: 'Новое событие',
@@ -195,8 +246,8 @@ test('supplier change request write-flow creates admission and event requests', 
       limit: 10,
       offset: 0,
     });
-    assert.equal(admissionList.total, 1);
-    assert.equal(admissionList.items[0]?.title, 'Новый входной билет');
+    assert.equal(admissionList.total, 2);
+    assert.equal(admissionList.items[0]?.title, 'Обновить входной билет');
 
     await assert.rejects(
       () => createSupplierEventChangeRequest(searchParams, {

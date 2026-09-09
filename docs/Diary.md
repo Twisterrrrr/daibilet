@@ -3594,3 +3594,28 @@
 
 - Deploy token issuance with enforcement off, then ask Cursor to implement the HttpOnly cookie bridge and forwarding header.
 - Enable `DAIBILET_REQUIRE_ORDER_ACCESS=1` only after embedded + redirect reload smoke succeeds on catalog.
+
+## 2026-09-09 - Supplier admission editing through moderation
+
+### Changes
+
+- The supplier admission table now opens an existing product in a focused side editor for OWNER/ADMIN/OPERATOR roles.
+- Updates remain request-first: the published product and current sales stay unchanged until an administrator approves and applies the request.
+- Create and update forms now support multiple ticket categories, active/inactive sale state, old price, category capacity and the three admission validity modes.
+- Admission read DTO now carries the existing description, short description and image URL fields so an update request does not erase source content by omission.
+- Restored the local-only supplier-code shortcut after auth hardening; production builds still require a real supplier session.
+
+### Verification
+
+- Contracts, backend and supplier typechecks passed.
+- Supplier tests: 7 passed, including offer normalization and independent category rows.
+- Admission DTO and supplier change-request tests: 8 passed; the database-backed create -> approve -> apply -> STUB order -> supplier projection flow passed separately against local Postgres.
+- Supplier production build passed: 338.51 kB JS / 100.33 kB gzip.
+- Browser smoke passed for product prefill, two existing categories, adding a third category and closing the editor.
+- Repository-wide typecheck remains blocked only by pre-existing `apps/public` errors in `CitiesCatalogPage.tsx` and `cityRegionHub.ts`; the finance/supplier packages are green.
+
+### Next gate
+
+1. Push and wait for finance supplier CI.
+2. Deploy the API and supplier static build to `.159`, then verify login, product edit drawer and request creation without applying a destructive change to the live test product.
+3. Continue with admin review/apply UX for the richer admission payload and the embedded YooKassa paid browser smoke.

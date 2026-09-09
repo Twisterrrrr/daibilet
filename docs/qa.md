@@ -22,6 +22,16 @@
 - Product Q Museum-1 (54-FZ схема, ownership внешнего scanner code до договора) - см. catalog `docs/qa.md` на `feat/next-monorepo`.
 - Wide CTA, Path B calc, session/schedule supplier, TC/TEP secrets - out of Stage 0.
 
+## 2026-09-09 - Supplier admission change-request QA
+
+- [x] Existing admission opens with current title, short description, venue, validity, capacity and active offers.
+- [x] Supplier can add/remove ticket categories and set current price, old price and category capacity.
+- [x] At least one active category is required; active prices have a 100 RUB browser minimum and backend validation remains authoritative.
+- [x] Submit writes an `UPDATE` moderation request and does not mutate the live admission product.
+- [x] Local DB integration: create request -> admin approve/apply -> published admission -> STUB checkout -> supplier order projection.
+- [ ] Production `.159`: submit a harmless update request, inspect it in admin and reject it after smoke.
+- [ ] Embedded YooKassa: complete paid browser flow and verify `CONFIRMED`, ticket numbers and supplier order visibility.
+
 
 ## 2026-07-19 — Teplohod orders API — ЗАКРЫТО / отложено
 

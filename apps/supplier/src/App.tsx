@@ -17,6 +17,7 @@ import {
   LogOut,
   MessageSquareText,
   PackageCheck,
+  Pencil,
   RefreshCw,
   Settings2,
   ShoppingCart,
@@ -26,6 +27,8 @@ import {
   X,
   type LucideIcon,
 } from 'lucide-react';
+
+import type { AdmissionProductDto } from '@daibilet/contracts/admission';
 
 import type {
   SupplierPortalDashboardDto,
@@ -56,6 +59,15 @@ import {
   supplierPost,
 } from '@/lib/api';
 import { resolveSupplierPortalRole, supplierPortalPermissions } from '@/lib/access';
+import {
+  AdmissionChangeRequestDrawer,
+  AdmissionOffersEditor,
+} from '@/components/AdmissionChangeRequestDrawer';
+import {
+  admissionOffersToPayload,
+  createAdmissionOfferFormValue,
+  type AdmissionOfferFormValue,
+} from '@/lib/admission-offers';
 
 const STORAGE_KEY = 'daibilet_supplier_key';
 
@@ -207,9 +219,10 @@ export function App() {
     }
   }, [accessToken, clearAuthSession, setSupplierKey]);
 
-  const hasSupplierAccess = Boolean(accessToken && authSession && supplierKey.trim());
+  const hasDevSupplierAccess = import.meta.env.DEV && Boolean(supplierKey.trim());
+  const hasSupplierAccess = Boolean((accessToken && authSession && supplierKey.trim()) || hasDevSupplierAccess);
   const currentPageTitle = ROUTE_TITLES[location.pathname] || 'Кабинет поставщика';
-  const activeRole = resolveSupplierPortalRole(authSession, supplierKey);
+  const activeRole = resolveSupplierPortalRole(authSession, supplierKey) || (hasDevSupplierAccess ? 'OWNER' : null);
   const permissions = supplierPortalPermissions(activeRole);
 
   React.useEffect(() => subscribeSupplierAccessToken(setAccessToken), []);
@@ -257,7 +270,7 @@ export function App() {
               value={supplierKey}
               onChange={setSupplierKey}
               onLogout={handleLogout}
-              activeRole={activeRole}
+              activeRole={activeRole || ''}
             />
           </div>
         </header>
@@ -691,11 +704,19 @@ function EventsPage({ supplierKey }: { supplierKey: string }) {
 
 function AdmissionsPage({ supplierKey, canSubmitRequests }: { supplierKey: string; canSubmitRequests: boolean }) {
   const [offset, setOffset] = useSupplierListOffset(supplierKey);
+  const [editingProduct, setEditingProduct] = React.useState<AdmissionProductDto | null>(null);
+  const [notice, setNotice] = React.useState<string | null>(null);
   const admissionsPath = React.useMemo(
     () => `/api/supplier/admissions?limit=${SUPPLIER_LIST_PAGE_SIZE}&offset=${offset}`,
     [offset],
   );
   const { data, loading, error, reload } = useSupplierResource<SupplierPortalAdmissionsListDto>(admissionsPath, supplierKey);
+  const profile = useSupplierResource<SupplierPortalProfileDto>('/api/supplier/profile', supplierKey);
+
+  const handleRequestCreated = React.useCallback((result: SupplierPortalChangeRequestCreateResultDto) => {
+    setNotice(`Заявка ${result.request.id.slice(-7)} отправлена администратору.`);
+    reload();
+  }, [reload]);
 
   return (
     <div className="page-stack">
@@ -711,10 +732,11 @@ function AdmissionsPage({ supplierKey, canSubmitRequests }: { supplierKey: strin
           <StatCard label="Требуют внимания" value={data.metrics.needsAttention} hint={`${data.metrics.blocked} заблокированы`} />
         </div>
       ) : null}
+      {notice ? <div className="form-note success">{notice}</div> : null}
       <DataState loading={loading} error={error} onRetry={reload} hasData={Boolean(data?.items.length)}>
         {data ? (
           <Table
-            columns={['Билет', 'Площадка', 'Срок действия', 'Категории', 'Цена', 'Готовность']}
+            columns={['Билет', 'Площадка', 'Срок действия', 'Категории', 'Цена', 'Готовность', '']}
             rows={data.items.map((product) => [
               <div key="product"><strong>{product.title}</strong><small>{product.purchaseFlow === 'PLATFORM' ? 'внутренние продажи' : 'витрина'}</small></div>,
               <div key="venue"><span>{product.venue.title}</span><small>{product.city.title || '-'}</small></div>,
@@ -722,11 +744,32 @@ function AdmissionsPage({ supplierKey, canSubmitRequests }: { supplierKey: strin
               <div key="offers"><span>{product.offers.filter((offer) => offer.active).length} активных</span><small>{product.offers.map((offer) => offer.title || 'билет').join(', ') || '-'}</small></div>,
               formatRub(product.priceFromRub),
               <IssueList key="health" compact issues={[...product.health.blockers, ...product.health.warnings]} empty="готово" />,
+              canSubmitRequests ? (
+                <button
+                  key="edit"
+                  type="button"
+                  className="icon-button"
+                  onClick={() => setEditingProduct(product)}
+                  aria-label={`Изменить ${product.title}`}
+                  title="Изменить через заявку"
+                >
+                  <Pencil size={16} />
+                </button>
+              ) : <span key="empty-action" />,
             ])}
           />
         ) : null}
       </DataState>
       {data ? <PaginationBar {...data} onOffsetChange={setOffset} /> : null}
+      {editingProduct ? (
+        <AdmissionChangeRequestDrawer
+          product={editingProduct}
+          profile={profile.data}
+          supplierKey={supplierKey}
+          onClose={() => setEditingProduct(null)}
+          onCreated={handleRequestCreated}
+        />
+      ) : null}
     </div>
   );
 }
@@ -802,12 +845,13 @@ function RequestsPage({ supplierKey, canSubmitRequests }: { supplierKey: string;
 
 type AdmissionRequestFormState = {
   title: string;
+  shortDescription: string;
   venueId: string;
   type: string;
   validityMode: string;
+  validFrom: string;
+  validTo: string;
   validDaysAfterPurchase: string;
-  offerTitle: string;
-  priceRub: string;
   ticketsVacant: string;
   summary: string;
 };
@@ -826,15 +870,19 @@ function AdmissionRequestForm({
   const defaultVenueId = profile?.venues[0]?.id || '';
   const [form, setForm] = React.useState<AdmissionRequestFormState>({
     title: '',
+    shortDescription: '',
     venueId: defaultVenueId,
     type: 'MUSEUM_ENTRY',
     validityMode: 'OPEN_DATE',
+    validFrom: '',
+    validTo: '',
     validDaysAfterPurchase: '30',
-    offerTitle: 'Взрослый',
-    priceRub: '500',
     ticketsVacant: '',
     summary: '',
   });
+  const [offers, setOffers] = React.useState<AdmissionOfferFormValue[]>([
+    createAdmissionOfferFormValue(),
+  ]);
   const [busy, setBusy] = React.useState(false);
 
   React.useEffect(() => {
@@ -847,6 +895,10 @@ function AdmissionRequestForm({
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!offers.length || !offers.some((offer) => offer.active)) {
+      onError(new Error('Оставьте хотя бы одну активную категорию билета.'));
+      return;
+    }
     setBusy(true);
     try {
       const payload: SupplierPortalAdmissionChangeRequestCreateDto = {
@@ -854,20 +906,20 @@ function AdmissionRequestForm({
         summary: cleanFormString(form.summary),
         admissionProduct: {
           title: form.title,
+          shortDescription: cleanFormString(form.shortDescription),
           type: form.type,
           venueId: form.venueId,
           validityMode: form.validityMode,
-          validDaysAfterPurchase: form.validDaysAfterPurchase ? Number(form.validDaysAfterPurchase) : null,
+          validFrom: form.validityMode === 'FIXED_WINDOW' && form.validFrom ? new Date(form.validFrom).toISOString() : null,
+          validTo: form.validityMode === 'FIXED_WINDOW' && form.validTo ? new Date(form.validTo).toISOString() : null,
+          validDaysAfterPurchase: form.validityMode === 'VALID_DAYS_AFTER_PURCHASE' && form.validDaysAfterPurchase ? Number(form.validDaysAfterPurchase) : null,
           ticketsVacant: form.ticketsVacant ? Number(form.ticketsVacant) : null,
         },
-        offers: [{
-          title: form.offerTitle || 'Билет',
-          priceRub: Number(form.priceRub || 0),
-          active: true,
-        }],
+        offers: admissionOffersToPayload(offers),
       };
       const result = await supplierPost<SupplierPortalChangeRequestCreateResultDto>('/api/supplier/change-requests/admissions', payload, undefined, supplierKey);
-      setForm((current) => ({ ...current, title: '', summary: '' }));
+      setForm((current) => ({ ...current, title: '', shortDescription: '', summary: '' }));
+      setOffers([createAdmissionOfferFormValue()]);
       onCreated(result);
     } catch (error) {
       onError(error);
@@ -883,6 +935,10 @@ function AdmissionRequestForm({
         <label className="form-field span-2">
           <span>Название</span>
           <input value={form.title} onChange={(event) => update('title', event.target.value)} placeholder="Билет в музей" required />
+        </label>
+        <label className="form-field span-2">
+          <span>Короткое описание</span>
+          <textarea value={form.shortDescription} onChange={(event) => update('shortDescription', event.target.value)} rows={3} placeholder="Что входит и кому подходит билет" />
         </label>
         <label className="form-field">
           <span>Площадка</span>
@@ -900,31 +956,44 @@ function AdmissionRequestForm({
             <option value="GALLERY_ENTRY">Галерея</option>
             <option value="ART_SPACE_ENTRY">Арт-пространство</option>
             <option value="EXHIBITION_ENTRY">Выставка</option>
+            <option value="OBSERVATION_ENTRY">Смотровая площадка</option>
+            <option value="ATTRACTION_ENTRY">Аттракцион</option>
+            <option value="ZOO_ENTRY">Зоопарк</option>
+            <option value="AQUARIUM_ENTRY">Океанариум</option>
             <option value="OTHER">Другое</option>
           </select>
         </label>
-        <label className="form-field">
-          <span>Категория билета</span>
-          <input value={form.offerTitle} onChange={(event) => update('offerTitle', event.target.value)} required />
+        <label className="form-field span-2">
+          <span>Как действует билет</span>
+          <select value={form.validityMode} onChange={(event) => update('validityMode', event.target.value)}>
+            <option value="OPEN_DATE">Открытая дата</option>
+            <option value="VALID_DAYS_AFTER_PURCHASE">Несколько дней после покупки</option>
+            <option value="FIXED_WINDOW">Фиксированный период</option>
+          </select>
         </label>
-        <label className="form-field">
-          <span>Цена, ₽</span>
-          <input type="number" min="0" value={form.priceRub} onChange={(event) => update('priceRub', event.target.value)} required />
-        </label>
-        <label className="form-field">
-          <span>Действует дней</span>
-          <input type="number" min="1" value={form.validDaysAfterPurchase} onChange={(event) => update('validDaysAfterPurchase', event.target.value)} />
-        </label>
-        <label className="form-field">
+        {form.validityMode === 'VALID_DAYS_AFTER_PURCHASE' ? (
+          <label className="form-field span-2">
+            <span>Дней после покупки</span>
+            <input type="number" min="1" max="3660" value={form.validDaysAfterPurchase} onChange={(event) => update('validDaysAfterPurchase', event.target.value)} required />
+          </label>
+        ) : null}
+        {form.validityMode === 'FIXED_WINDOW' ? (
+          <>
+            <label className="form-field"><span>Действует с</span><input type="datetime-local" value={form.validFrom} onChange={(event) => update('validFrom', event.target.value)} required /></label>
+            <label className="form-field"><span>Действует до</span><input type="datetime-local" value={form.validTo} onChange={(event) => update('validTo', event.target.value)} required /></label>
+          </>
+        ) : null}
+        <label className="form-field span-2">
           <span>Лимит билетов</span>
           <input type="number" min="0" value={form.ticketsVacant} onChange={(event) => update('ticketsVacant', event.target.value)} placeholder="без лимита" />
         </label>
+        <AdmissionOffersEditor offers={offers} onChange={setOffers} disabled={busy} />
         <label className="form-field span-2">
           <span>Комментарий администратору</span>
           <input value={form.summary} onChange={(event) => update('summary', event.target.value)} placeholder="что проверить перед публикацией" />
         </label>
         <div className="form-actions span-2">
-          <button type="submit" className="primary-button" disabled={busy || !profile?.venues.length}>
+          <button type="submit" className="primary-button" disabled={busy || !profile?.venues.length || !offers.some((offer) => offer.active)}>
             {busy ? 'Отправляем...' : 'Отправить заявку'}
           </button>
         </div>
