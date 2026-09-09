@@ -168,3 +168,38 @@ test('TC-style headings, comma lists, label lines and attention', () => {
   assert.match(html, /р\. Фонтанка - Крюков канал/);
   assert.doesNotMatch(html, /[\u2013\u2014]/);
 });
+
+/** AI rewrite: bold section titles + lists (Kazan disco cruise sample). */
+const AI_MARKDOWN_REWRITE_SAMPLE = `Ночной танцевальный круиз по Волге в Казани (18+): речная прогулка с рассказом о местных достопримечательностях и культуре, кафе на борту и музыкой от ди-джеев.
+
+Репертуар охватывает композиции 80-90-х и современные треки. На теплоходе есть меню (см. карточку / блок «Меню на теплоходе»).
+
+**Организационные условия**
+
+- На причал нужно прибыть не менее чем за 10 минут до отправления; посадка заканчивается за 5 минут до времени, указанного в билете.
+- Свои продукты питания и напитки (включая алкоголь) на борт проносить запрещено.
+- Отправление и прибытие: Кремлёвская набережная.
+
+Карта маршрута - в карточке события.`;
+
+test('AI rewrite **heading** becomes h3 and raw asterisks do not leak', () => {
+  const blocks = parseEventDescriptionBlocks(AI_MARKDOWN_REWRITE_SAMPLE);
+  assert.equal(blocks[0]?.type, 'paragraph');
+  assert.equal(blocks[1]?.type, 'paragraph');
+  assert.equal(blocks[2]?.type, 'heading');
+  assert.equal((blocks[2] as { text: string }).text, 'Организационные условия');
+  assert.equal(blocks[3]?.type, 'list');
+  assert.equal((blocks[3] as { items: string[] }).items.length, 3);
+  assert.equal(blocks[4]?.type, 'paragraph');
+
+  const html = formatEventDescriptionHtml(AI_MARKDOWN_REWRITE_SAMPLE);
+  assert.match(html, /<h3>Организационные условия<\/h3>/);
+  assert.match(html, /<ul><li>На причал нужно прибыть/);
+  assert.doesNotMatch(html, /\*\*/);
+});
+
+test('inline **bold** and *italic* render as strong/em', () => {
+  const html = formatEventDescriptionHtml('**Возраст:** рекомендуется детям 6-14 лет. Также *важно* взять паспорт.');
+  assert.match(html, /<p><strong>Возраст:<\/strong> рекомендуется детям 6-14 лет\. Также <em>важно<\/em> взять паспорт\.<\/p>/);
+  assert.doesNotMatch(html, /\*\*/);
+});

@@ -111,12 +111,29 @@ export function escapeEventHtml(text: string): string {
     .replace(/'/g, '&#39;');
 }
 
+/** Whole-line AI markdown heading: `**Организационные условия**`. */
+const WHOLE_LINE_BOLD_RE = /^\*\*(.+?)\*\*$/u;
+
+/**
+ * If the line is only a bold-wrapped short title, return the inner text.
+ * Used by AI rewrite output (`**Внимание**`, `**На борту**`, …).
+ */
+export function unwrapMarkdownHeadingLine(line: string): string | null {
+  const text = String(line || '').trim();
+  const match = text.match(WHOLE_LINE_BOLD_RE);
+  if (!match) return null;
+  const inner = cleanDisplayText(match[1]).replace(/:$/u, '').trim();
+  if (!inner || inner.length > 72) return null;
+  if (/[.!?…]$/u.test(inner)) return null;
+  return inner;
+}
+
 export function isDescriptionSectionHeading(line: string): boolean {
   const text = cleanDisplayText(line);
   if (!text || text.length > 72) return false;
   if (/[.!?…]$/u.test(text)) return false;
   if (
-    /^(?:о маршруте|о событии|программа|включено|в стоимость входит|важно|маршрут|что вас ждёт|что вас ждет|условия|описание|подробнее|внимание|для кого|как добраться|расписание|основные достопримечательности|достопримечательности|организационные детали|что включено|что входит|продолжительность|продолжительность прогулки)$/iu.test(
+    /^(?:о маршруте|о событии|программа|включено|в стоимость входит|важно|маршрут|что вас ждёт|что вас ждет|условия|описание|подробнее|внимание|для кого|как добраться|расписание|основные достопримечательности|достопримечательности|организационные детали|организационные условия|что включено|что входит|продолжительность|продолжительность прогулки|особенности|правила на борту|на борту|в программе|формат|тайминг|памятка|посадка и отправление|что видно с воды|что видно по маршруту|что видно с борта)$/iu.test(
       text,
     )
   ) {
@@ -125,6 +142,17 @@ export function isDescriptionSectionHeading(line: string): boolean {
   const letters = text.replace(/[^a-zA-Zа-яА-ЯёЁ]/gu, '');
   if (letters.length >= 3 && letters === letters.toUpperCase() && text.length <= 60) return true;
   return false;
+}
+
+/**
+ * Escape + light inline markdown for AI/plain descriptions.
+ * Order: escape first, then **bold** / *italic* (safe tags only).
+ */
+export function formatInlineEventMarkdown(text: string): string {
+  const escaped = escapeEventHtml(normalizeUserFacingCopy(text));
+  return escaped
+    .replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/(?<!\*)\*([^*]+?)\*(?!\*)/g, '<em>$1</em>');
 }
 
 export function splitDescriptionParagraphs(text: string): string[] {
@@ -357,6 +385,13 @@ export function parseEventDescriptionBlocks(text: string): EventDescriptionBlock
       continue;
     }
 
+    const mdHeading = unwrapMarkdownHeadingLine(line);
+    if (mdHeading) {
+      blocks.push({ type: 'heading', text: mdHeading });
+      i += 1;
+      continue;
+    }
+
     pushParagraphOrHeading(blocks, line);
     i += 1;
   }
@@ -368,15 +403,15 @@ function renderBlocksToHtml(blocks: EventDescriptionBlock[]): string {
   return blocks
     .map((block) => {
       if (block.type === 'heading') {
-        return `<h3>${escapeEventHtml(normalizeUserFacingCopy(block.text))}</h3>`;
+        return `<h3>${formatInlineEventMarkdown(block.text)}</h3>`;
       }
       if (block.type === 'list') {
         const items = block.items
-          .map((item) => `<li>${escapeEventHtml(normalizeUserFacingCopy(item))}</li>`)
+          .map((item) => `<li>${formatInlineEventMarkdown(item)}</li>`)
           .join('');
         return `<ul>${items}</ul>`;
       }
-      return `<p>${escapeEventHtml(normalizeUserFacingCopy(block.text))}</p>`;
+      return `<p>${formatInlineEventMarkdown(block.text)}</p>`;
     })
     .join('');
 }

@@ -1,4 +1,38 @@
-## 2026-09-09 - `/events` date rail: Afisha arrows + calendar below
+## 2026-09-09 - AI rewrite markdown leak на PDP
+
+### Наблюдения
+- После batch AI-рерайта в блоке «О событии» сырые `**Организационные условия**` (списки `-` уже ок).
+- Промпт `ai-rewrite-description` требует Markdown; live `formatEventDescriptionHtml` только escape, без `**`/`*`.
+
+### Решения
+- `unwrapMarkdownHeadingLine`: целая строка `**…**` → `h3`.
+- `formatInlineEventMarkdown`: inline `**bold**` / `*italic*` → `<strong>`/`<em>` после escape.
+- Расширен allowlist секций (`организационные условия`, `на борту`, …).
+- Тест на kazan disco cruise sample: asterisks не leak.
+
+### Проблемы
+- На live до web deploy звёздочки ещё видны на уже применённых override.
+
+---
+
+## 2026-09-09 - TEP widget id: 14208 → 14460
+
+### Наблюдения
+- PDP `/events/nochnaya-ekskursiya-pyat-razvodnyh-mostov-s-gidom-925`: CheckoutModal крутил спиннер / «нет расписания».
+- Корневая причина не «событие мертвое»: `widget_id=14208` → «регистрация закрыта»; `widget_id=14460` → живое расписание (даты + 23:59).
+- В payload/purchaseUrl каталога был зашит legacy affiliate id `14208`.
+
+### Решения
+- Default `TEP_WIDGET_ID` / `NEXT_PUBLIC_TEP_WIDGET_ID` / `VITE_TEP_WIDGET_ID` → `14460`.
+- Web `getTeplohodWidgetIds`: всегда брать account-level default, не stale `widgetPayload.tepWidgetId`.
+- Backend `buildTeplohodUrl` / `buildProviderWidgetPayload` defaults обновлены.
+- На MSK обязательно выставить env `TEP_WIDGET_ID=14460` и `NEXT_PUBLIC_TEP_WIDGET_ID=14460` (если явно задан старый) + restart API / web batch.
+
+### Проблемы
+- Пока MSK env = 14208, live buy останется закрытым даже после code deploy.
+- Описание evt_tep_925 по-прежнему тонкое (отдельный контент-тикет).
+
+---
 
 ### Наблюдения
 - На десктопе лента дат «не листалась вправо»: fit-to-width обрезал число дней под `clientWidth`, overflow не было.
@@ -30,6 +64,7 @@
 
 ### Проблемы
 - Локальный SSH `deploy@MSK` с owner-ключа пока Permission denied - выкат через GHA secrets.
+- Batch Deploy MSK web [34378885906](https://github.com/Twisterrrrr/daibilet/actions/runs/34378885906) на `7ba0fb27` ✅ (swap + API restart).
 
 ---
 
