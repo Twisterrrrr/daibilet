@@ -617,8 +617,8 @@ export function EventHero({
     <div
       className={`relative isolate grid w-full min-w-0 overflow-hidden bg-slate-900 aspect-[3/4] md:aspect-auto ${
         longHeroTitle
-          ? 'md:min-h-[22rem] lg:min-h-[28rem]'
-          : 'md:min-h-80 lg:min-h-[420px]'
+          ? 'md:min-h-[26rem] lg:min-h-[28rem]'
+          : 'md:min-h-[24rem] lg:min-h-[420px]'
       }`}
     >
       <EventPageCitySync city={event.city} />
@@ -638,7 +638,8 @@ export function EventHero({
       />
       <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/45 to-slate-900/25" />
 
-      <div className="container-page absolute inset-0 z-10 flex min-w-0 flex-col justify-end pb-5 pt-20 md:pb-8 md:pt-24">
+      {/* Tablet+: taller hero + stronger top padding so copy sits lower (desktop-like), not vertically centered. */}
+      <div className="container-page absolute inset-0 z-10 flex min-w-0 flex-col justify-end pb-5 pt-20 md:pb-5 md:pt-28 lg:pb-8 lg:pt-24">
         {/* 1. Breadcrumbs without event title (last crumb sr-only for a11y; JSON-LD stays full). */}
         <nav aria-label="Хлебные крошки" className="mb-2 flex min-w-0 flex-wrap items-center gap-1.5 text-sm text-white/70">
           {trailCrumbs.map((crumb, index) => (
