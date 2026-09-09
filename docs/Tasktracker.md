@@ -19,7 +19,7 @@
 | UX2.TYPE-CARD | Иерархия EventCard: title > price > muted meta + воздух; без смены Manrope/`fonts.ts` | Высокий | ✅ |
 | UX2.FIND-SUGGEST | Typeahead city/category на FilterRail (после W1-W3) | Средний | ⏳ blocked smoke |
 | UX2.BLOG-LIST-IMG | `/blog` listing: sidecar chain card→thumb→og + BlogCardSafeImage везде + aspect/quality | Средний | ✅ |
-| UX2.SMOKE | Preview smoke: `/preview-cards` (мок featured) → `/events`, `/cities/perm`, `/blog` | Высокий | 🔄 featured teaser visible (bento photo flex-fill); hydrate snapshots; deploy MSK |
+| UX2.SMOKE | Preview smoke: `/preview-cards` (мок featured) → `/events`, `/cities/perm`, `/blog` | Высокий | ✅ `8d86eb91` + Deploy MSK [34324117163](https://github.com/Twisterrrrr/daibilet/actions/runs/34324117163) |
 
 ## 2026-09-03 - Live ISR 500 (SiteLayout cookies)
 
