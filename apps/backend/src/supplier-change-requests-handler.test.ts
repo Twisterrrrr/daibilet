@@ -155,6 +155,15 @@ test('supplier change request write-flow creates admission and event requests', 
     assert.equal(admissionUpdate.request.subject, 'ADMISSION_PRODUCT');
     assert.equal(admissionUpdate.request.type, 'UPDATE');
     assert.equal(admissionUpdate.request.admissionProduct?.id, product.id);
+    const persistedAdmissionUpdate = await prisma.eventChangeRequest.findUnique({
+      where: { id: admissionUpdate.request.id },
+      select: { payload: true },
+    });
+    const persistedPayload = persistedAdmissionUpdate?.payload as Record<string, any> | null;
+    assert.equal(
+      persistedPayload?.baseSnapshot?.admissionProductUpdatedAt,
+      product.updatedAt.toISOString(),
+    );
 
     await reviewEventChangeRequest({
       requestId: admissionUpdate.request.id,

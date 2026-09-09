@@ -1,6 +1,7 @@
 import type { EventChangeRequestStatus, EventChangeRequestType, Prisma } from '@daibilet/db';
 import { prisma } from '@daibilet/db';
 import type {
+  AdminEventChangeRequestAdmissionProductDto,
   AdminEventChangeRequestDetailDto,
   AdminEventChangeRequestDiffItemDto,
   AdminEventChangeRequestPayloadPreviewSectionDto,
@@ -138,6 +139,46 @@ type EventChangeRequestDetailRow = Prisma.EventChangeRequestGetPayload<{
 }>;
 type EventChangeRequestDetailEvent = NonNullable<EventChangeRequestDetailRow['event']>;
 
+const admissionProductDetailSelect = {
+  id: true,
+  slug: true,
+  title: true,
+  shortTitle: true,
+  description: true,
+  shortDescription: true,
+  type: true,
+  status: true,
+  imageUrl: true,
+  priceFromRub: true,
+  ticketsVacant: true,
+  validityMode: true,
+  validFrom: true,
+  validTo: true,
+  validDaysAfterPurchase: true,
+  venueId: true,
+  cityId: true,
+  updatedAt: true,
+  venue: { select: { id: true, title: true } },
+  city: { select: { id: true, title: true } },
+  offers: {
+    where: { active: true },
+    orderBy: [{ priceRub: 'asc' }, { title: 'asc' }],
+    select: {
+      id: true,
+      title: true,
+      priceRub: true,
+      oldPriceRub: true,
+      capacityTotal: true,
+      groupSize: true,
+      active: true,
+    },
+  },
+} as const satisfies Prisma.AdmissionProductSelect;
+
+type AdmissionProductDetailRow = Prisma.AdmissionProductGetPayload<{
+  select: typeof admissionProductDetailSelect;
+}>;
+
 export async function buildAdminEventChangeRequestsDto(
   query: AdminEventChangeRequestsQuery = {},
   now = new Date(),
@@ -197,16 +238,27 @@ export async function buildAdminEventChangeRequestDetailDto(
   });
   if (!row) return null;
 
-  return mapEventChangeRequestDetailRow(row);
+  const admissionProduct = await loadAdmissionProductDetail(row.payload, row.supplierId);
+  return mapEventChangeRequestDetailRow(row, admissionProduct);
 }
 
 export function mapEventChangeRequestDetailRow(
   row: EventChangeRequestDetailRow,
+  admissionProduct: AdmissionProductDetailRow | null = null,
 ): AdminEventChangeRequestDetailDto {
+  const mappedRow = mapEventChangeRequestRow(row);
+  const diff = buildDiff(row, admissionProduct);
   return {
-    ...mapEventChangeRequestRow(row),
+    ...mappedRow,
+    actions: {
+      ...mappedRow.actions,
+      canApply: mappedRow.actions.canApply
+        && !(mappedRow.subject === 'ADMISSION_PRODUCT' && row.type === 'UPDATE' && !admissionProduct)
+        && !isStaleAdmissionRequest(row.payload, admissionProduct),
+    },
+    admissionProduct: admissionProduct ? mapAdmissionProduct(admissionProduct) : null,
     payloadPreview: buildPayloadPreview(row.payload),
-    diff: buildDiff(row),
+    diff,
   };
 }
 
@@ -238,6 +290,8 @@ export function mapEventChangeRequestRow(row: EventChangeRequestRow): AdminEvent
   const applyableStatus = row.status === 'APPROVED' || row.status === 'APPLY_FAILED';
   return {
     id: row.id,
+    subject,
+    subjectId: subject === 'ADMISSION_PRODUCT' ? admissionProductId(row.payload) : row.eventId,
     eventId: row.eventId,
     supplierId: row.supplierId,
     type: row.type,
@@ -311,6 +365,50 @@ function payloadSubject(payload: unknown): 'EVENT' | 'ADMISSION_PRODUCT' {
   return record?.subject === 'ADMISSION_PRODUCT' ? 'ADMISSION_PRODUCT' : 'EVENT';
 }
 
+function admissionProductId(payload: unknown): string | null {
+  const value = asRecord(payload)?.admissionProductId;
+  return typeof value === 'string' && value.trim() ? value.trim() : null;
+}
+
+async function loadAdmissionProductDetail(
+  payload: unknown,
+  supplierId: string | null,
+): Promise<AdmissionProductDetailRow | null> {
+  if (payloadSubject(payload) !== 'ADMISSION_PRODUCT') return null;
+  const id = admissionProductId(payload);
+  if (!id) return null;
+  return prisma.admissionProduct.findFirst({
+    where: { id, ...(supplierId ? { supplierId } : {}) },
+    select: admissionProductDetailSelect,
+  });
+}
+
+function mapAdmissionProduct(row: AdmissionProductDetailRow): AdminEventChangeRequestAdmissionProductDto {
+  return {
+    id: row.id,
+    slug: row.slug,
+    title: row.title,
+    shortTitle: row.shortTitle,
+    description: row.description,
+    shortDescription: row.shortDescription,
+    type: row.type,
+    status: row.status,
+    imageUrl: row.imageUrl,
+    priceFromRub: row.priceFromRub,
+    ticketsVacant: row.ticketsVacant,
+    validityMode: row.validityMode,
+    validFrom: toIso(row.validFrom),
+    validTo: toIso(row.validTo),
+    validDaysAfterPurchase: row.validDaysAfterPurchase,
+    venueId: row.venueId,
+    cityId: row.cityId,
+    venue: row.venue,
+    city: row.city,
+    offers: row.offers,
+    updatedAt: row.updatedAt.toISOString(),
+  };
+}
+
 function toIso(value: Date | null): string | null {
   return value ? value.toISOString() : null;
 }
@@ -336,23 +434,36 @@ function buildPayloadPreview(payload: unknown): AdminEventChangeRequestDetailDto
   };
 }
 
-function buildDiff(row: EventChangeRequestDetailRow): AdminEventChangeRequestDetailDto['diff'] {
+function buildDiff(
+  row: EventChangeRequestDetailRow,
+  admissionProduct: AdmissionProductDetailRow | null,
+): AdminEventChangeRequestDetailDto['diff'] {
   const payload = asRecord(row.payload);
   const items: AdminEventChangeRequestDiffItemDto[] = [];
   const warnings: string[] = [];
   if (!payload) return { items, warnings: ['Payload is empty or not an object.'] };
 
-  const snapshot = asRecord(payload.baseSnapshot);
-  const snapshotUpdatedAt = typeof snapshot?.eventUpdatedAt === 'string' ? snapshot.eventUpdatedAt : null;
-  if (row.event && snapshotUpdatedAt && new Date(snapshotUpdatedAt).getTime() !== row.event.updatedAt.getTime()) {
-    warnings.push('Событие изменилось после создания заявки. Перед применением нужно обновить заявку или проверить конфликт.');
-  }
-  if (row.type === 'CREATE') {
-    pushCreateDiff(items, payload);
-  } else if (!row.event) {
-    warnings.push('Заявка не привязана к событию, поэтому сравнить текущие значения нельзя.');
+  if (payloadSubject(payload) === 'ADMISSION_PRODUCT') {
+    if (isStaleAdmissionRequest(payload, admissionProduct)) {
+      warnings.push('Входной билет изменился после создания заявки. Попросите поставщика обновить заявку перед применением.');
+    }
+    if (row.type === 'UPDATE' && !admissionProduct) {
+      warnings.push('Текущий входной билет не найден. Применение заявки заблокировано до проверки.');
+    }
+    pushAdmissionProductDiff(items, payload, admissionProduct);
   } else {
-    pushExistingEventDiff(items, row, payload);
+    const snapshot = asRecord(payload.baseSnapshot);
+    const snapshotUpdatedAt = typeof snapshot?.eventUpdatedAt === 'string' ? snapshot.eventUpdatedAt : null;
+    if (row.event && snapshotUpdatedAt && new Date(snapshotUpdatedAt).getTime() !== row.event.updatedAt.getTime()) {
+      warnings.push('Событие изменилось после создания заявки. Перед применением нужно обновить заявку или проверить конфликт.');
+    }
+    if (row.type === 'CREATE') {
+      pushCreateDiff(items, payload);
+    } else if (!row.event) {
+      warnings.push('Заявка не привязана к событию, поэтому сравнить текущие значения нельзя.');
+    } else {
+      pushExistingEventDiff(items, row, payload);
+    }
   }
 
   if (hasNonEmptyArray(payload.contentBlocks)) warnings.push('Content blocks пока не применяются transactional applier и требуют отдельного storage слоя.');
@@ -360,6 +471,66 @@ function buildDiff(row: EventChangeRequestDetailRow): AdminEventChangeRequestDet
   if (asRecord(payload.recurrenceRule)) warnings.push('Recurring rule отображается как preview; apply требует уже сгенерированные sessions.');
 
   return { items, warnings };
+}
+
+function isStaleAdmissionRequest(
+  payload: unknown,
+  admissionProduct: AdmissionProductDetailRow | null,
+): boolean {
+  if (payloadSubject(payload) !== 'ADMISSION_PRODUCT' || !admissionProduct) return false;
+  const snapshot = asRecord(asRecord(payload)?.baseSnapshot);
+  const value = typeof snapshot?.admissionProductUpdatedAt === 'string'
+    ? snapshot.admissionProductUpdatedAt
+    : null;
+  if (!value) return false;
+  const snapshotTime = Date.parse(value);
+  return !Number.isFinite(snapshotTime) || snapshotTime !== admissionProduct.updatedAt.getTime();
+}
+
+function pushAdmissionProductDiff(
+  items: AdminEventChangeRequestDiffItemDto[],
+  payload: Record<string, unknown>,
+  current: AdmissionProductDetailRow | null,
+): void {
+  const draft = asRecord(payload.admissionProduct) || {};
+  const currentRecord = current as unknown as Record<string, unknown> | null;
+  const fields = [
+    ['title', 'Название'],
+    ['shortTitle', 'Короткое название'],
+    ['description', 'Описание'],
+    ['shortDescription', 'Краткое описание'],
+    ['type', 'Тип входного билета'],
+    ['imageUrl', 'Изображение'],
+    ['validityMode', 'Срок действия'],
+    ['validFrom', 'Действует с'],
+    ['validTo', 'Действует до'],
+    ['validDaysAfterPurchase', 'Дней после покупки'],
+    ['ticketsVacant', 'Доступно билетов'],
+    ['venueId', 'Площадка'],
+  ] as const;
+  for (const [key, label] of fields) {
+    if (!Object.prototype.hasOwnProperty.call(draft, key)) continue;
+    const currentValue = key === 'venueId' && current?.venue
+      ? current.venue.title
+      : currentRecord?.[key] ?? null;
+    const proposedValue = key === 'venueId' && current?.venueId === draft[key] && current?.venue
+      ? current.venue.title
+      : draft[key];
+    pushDiff(items, `admissionProduct.${key}`, label, currentValue, proposedValue);
+  }
+
+  if (Array.isArray(payload.offers) && payload.offers.length > 0) {
+    const currentOffers = current?.offers.map((offer) => ({
+      title: offer.title,
+      priceRub: offer.priceRub,
+      oldPriceRub: offer.oldPriceRub,
+      capacityTotal: offer.capacityTotal,
+      groupSize: offer.groupSize,
+      active: offer.active,
+    })) || [];
+    pushDiff(items, 'offers.count', 'Билетные категории', currentOffers.length, payload.offers.length);
+    pushDiff(items, 'offers.priceFromRub', 'Цена от', current?.priceFromRub ?? null, minOfferPrice(payload.offers));
+  }
 }
 
 function pushCreateDiff(items: AdminEventChangeRequestDiffItemDto[], payload: Record<string, unknown>): void {
@@ -605,6 +776,9 @@ function hasNonEmptyArray(value: unknown): boolean {
 function payloadSectionTitle(key: string): string {
   const labels: Record<string, string> = {
     event: 'Событие',
+    subject: 'Тип объекта',
+    admissionProductId: 'Входной билет',
+    admissionProduct: 'Входной билет',
     content: 'Контент',
     media: 'Медиа',
     seo: 'SEO',

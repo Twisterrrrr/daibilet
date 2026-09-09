@@ -279,8 +279,46 @@ export interface AdminEventChangeRequestActionsDto {
   canApply: boolean;
 }
 
+export type AdminEventChangeRequestSubject = 'EVENT' | 'ADMISSION_PRODUCT';
+
+export interface AdminEventChangeRequestAdmissionOfferDto {
+  id: string;
+  title?: string | null;
+  priceRub?: number | null;
+  oldPriceRub?: number | null;
+  capacityTotal?: number | null;
+  groupSize: number;
+  active: boolean;
+}
+
+export interface AdminEventChangeRequestAdmissionProductDto {
+  id: string;
+  slug: string;
+  title: string;
+  shortTitle?: string | null;
+  description?: string | null;
+  shortDescription?: string | null;
+  type: string;
+  status: string;
+  imageUrl?: string | null;
+  priceFromRub?: number | null;
+  ticketsVacant?: number | null;
+  validityMode: string;
+  validFrom?: string | null;
+  validTo?: string | null;
+  validDaysAfterPurchase?: number | null;
+  venueId: string;
+  cityId?: string | null;
+  venue?: { id: string; title: string } | null;
+  city?: { id: string; title: string } | null;
+  offers: AdminEventChangeRequestAdmissionOfferDto[];
+  updatedAt: string;
+}
+
 export interface AdminEventChangeRequestRowDto {
   id: string;
+  subject: AdminEventChangeRequestSubject;
+  subjectId?: string | null;
   eventId?: string | null;
   supplierId?: string | null;
   type: string;
@@ -337,6 +375,7 @@ export interface AdminEventChangeRequestPayloadPreviewSectionDto {
 }
 
 export interface AdminEventChangeRequestDetailDto extends AdminEventChangeRequestRowDto {
+  admissionProduct?: AdminEventChangeRequestAdmissionProductDto | null;
   payloadPreview: {
     baseSnapshot?: Record<string, unknown> | null;
     sections: AdminEventChangeRequestPayloadPreviewSectionDto[];

@@ -155,6 +155,12 @@ jobs:
           pnpm --filter @daibilet/supplier test
           pnpm supplier:build
 
+      - name: Finance admin moderation app
+        env:
+          NODE_ENV: development
+          VITE_DAIBILET_API_URL: /api
+        run: pnpm admin:build
+
       - name: Checkout web typecheck, tests and build
         if: ${{ startsWith(github.ref_name, 'codex/') || startsWith(github.head_ref, 'codex/') || (github.event_name == 'workflow_dispatch' && inputs.suite == 'finance') }}
         run: |

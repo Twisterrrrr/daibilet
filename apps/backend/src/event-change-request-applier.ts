@@ -343,6 +343,7 @@ async function updateAdmissionProductFromRequest(
       404,
     );
   }
+  assertFreshAdmissionProductSnapshot(payload, existing.updatedAt);
 
   const draft = payload.admissionProduct || {};
   const nextVenueId = cleanText(draft.venueId);
@@ -716,14 +717,38 @@ function assertAdmissionProductPayload(payload: unknown): AdmissionProductChange
       422,
     );
   }
+  const baseSnapshot = asRecord(record.baseSnapshot);
+  const admissionProductUpdatedAt = cleanText(baseSnapshot?.admissionProductUpdatedAt);
   return {
     subject: 'ADMISSION_PRODUCT',
     admissionProductId: cleanText(record.admissionProductId),
+    ...(baseSnapshot ? {
+      baseSnapshot: {
+        ...(admissionProductUpdatedAt ? { admissionProductUpdatedAt } : {}),
+      },
+    } : {}),
     admissionProduct: asRecord(record.admissionProduct) || {},
     offers: Array.isArray(record.offers)
       ? record.offers.map((offer) => asRecord(offer)).filter((offer): offer is Record<string, unknown> => Boolean(offer))
       : [],
   };
+}
+
+function assertFreshAdmissionProductSnapshot(
+  payload: AdmissionProductChangeRequestPayload,
+  updatedAt: Date | string | undefined,
+): void {
+  const snapshotValue = cleanText(payload.baseSnapshot?.admissionProductUpdatedAt);
+  if (!snapshotValue || !updatedAt) return;
+  const snapshotTime = Date.parse(snapshotValue);
+  const currentTime = updatedAt instanceof Date ? updatedAt.getTime() : Date.parse(updatedAt);
+  if (!Number.isFinite(snapshotTime) || !Number.isFinite(currentTime) || snapshotTime !== currentTime) {
+    throw new EventChangeRequestApplyError(
+      'ADMISSION_PRODUCT_CHANGE_REQUEST_STALE',
+      'Admission product changed after this request was submitted.',
+      409,
+    );
+  }
 }
 
 function payloadSubject(payload: unknown): string | null {
@@ -846,6 +871,7 @@ type BasePayload = {
 type AdmissionProductChangeRequestPayload = {
   subject: 'ADMISSION_PRODUCT';
   admissionProductId?: string | null;
+  baseSnapshot?: { admissionProductUpdatedAt?: string } | null;
   admissionProduct: Record<string, unknown>;
   offers: Record<string, unknown>[];
 };

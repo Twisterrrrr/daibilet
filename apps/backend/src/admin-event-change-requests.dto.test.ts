@@ -104,6 +104,134 @@ test('allows apply action for approved admission product create requests', () =>
   assert.equal(row.actions.canApply, true);
 });
 
+test('builds admission product update diff with current ticket categories', () => {
+  const productUpdatedAt = new Date('2026-08-02T12:00:00.000Z');
+  const detail = mapEventChangeRequestDetailRow({
+    id: 'cr_adm_update',
+    eventId: null,
+    supplierId: 'sup_1',
+    type: 'UPDATE',
+    status: 'APPROVED',
+    title: 'Обновить входной билет: Билет в музей',
+    summary: 'Добавить льготную категорию',
+    payload: {
+      subject: 'ADMISSION_PRODUCT',
+      admissionProductId: 'adm_1',
+      baseSnapshot: { admissionProductUpdatedAt: productUpdatedAt.toISOString() },
+      admissionProduct: {
+        title: 'Билет в музей и галерею',
+        venueId: 'venue_1',
+        validityMode: 'OPEN_DATE',
+      },
+      offers: [
+        { title: 'Льготный', priceRub: 300, active: true },
+        { title: 'Взрослый', priceRub: 650, active: true },
+      ],
+    },
+    adminComment: null,
+    submittedAt: new Date('2026-08-02T13:00:00.000Z'),
+    reviewedAt: new Date('2026-08-02T14:00:00.000Z'),
+    appliedAt: null,
+    createdAt: new Date('2026-08-02T13:00:00.000Z'),
+    updatedAt: new Date('2026-08-02T14:00:00.000Z'),
+    event: null,
+    supplier: { id: 'sup_1', title: 'Музей', slug: 'museum', status: 'ACTIVE' },
+    createdBy: null,
+    reviewedBy: null,
+  } as any, {
+    id: 'adm_1',
+    slug: 'museum-ticket',
+    title: 'Билет в музей',
+    shortTitle: null,
+    description: null,
+    shortDescription: null,
+    type: 'MUSEUM_ENTRY',
+    status: 'PUBLISHED',
+    imageUrl: null,
+    priceFromRub: 500,
+    ticketsVacant: 50,
+    validityMode: 'OPEN_DATE',
+    validFrom: null,
+    validTo: null,
+    validDaysAfterPurchase: null,
+    venueId: 'venue_1',
+    cityId: 'city_1',
+    updatedAt: productUpdatedAt,
+    venue: { id: 'venue_1', title: 'Тестовый музей' },
+    city: { id: 'city_1', title: 'Москва' },
+    offers: [{
+      id: 'offer_1',
+      title: 'Взрослый',
+      priceRub: 500,
+      oldPriceRub: null,
+      capacityTotal: 50,
+      groupSize: 1,
+      active: true,
+    }],
+  } as any);
+
+  assert.equal(detail.subject, 'ADMISSION_PRODUCT');
+  assert.equal(detail.subjectId, 'adm_1');
+  assert.equal(detail.admissionProduct?.title, 'Билет в музей');
+  assert.equal(detail.diff.items.find((item) => item.path === 'admissionProduct.title')?.currentValue, 'Билет в музей');
+  assert.equal(detail.diff.items.find((item) => item.path === 'admissionProduct.title')?.proposedValue, 'Билет в музей и галерею');
+  assert.equal(detail.diff.items.find((item) => item.path === 'offers.count')?.currentValue, 1);
+  assert.equal(detail.diff.items.find((item) => item.path === 'offers.count')?.proposedValue, 2);
+  assert.equal(detail.diff.items.find((item) => item.path === 'offers.priceFromRub')?.proposedValue, 300);
+  assert.deepEqual(detail.diff.warnings, []);
+  assert.equal(detail.actions.canApply, true);
+});
+
+test('blocks stale admission product request in admin detail', () => {
+  const detail = mapEventChangeRequestDetailRow({
+    id: 'cr_adm_stale',
+    eventId: null,
+    supplierId: 'sup_1',
+    type: 'UPDATE',
+    status: 'APPROVED',
+    title: 'Обновить входной билет',
+    summary: null,
+    payload: {
+      subject: 'ADMISSION_PRODUCT',
+      admissionProductId: 'adm_1',
+      baseSnapshot: { admissionProductUpdatedAt: '2026-08-01T12:00:00.000Z' },
+      admissionProduct: { title: 'Старая правка' },
+      offers: [],
+    },
+    adminComment: null,
+    submittedAt: null,
+    reviewedAt: null,
+    appliedAt: null,
+    createdAt: new Date('2026-08-02T13:00:00.000Z'),
+    updatedAt: new Date('2026-08-02T14:00:00.000Z'),
+    event: null,
+    supplier: null,
+    createdBy: null,
+    reviewedBy: null,
+  } as any, {
+    id: 'adm_1',
+    slug: 'museum-ticket',
+    title: 'Билет в музей',
+    type: 'MUSEUM_ENTRY',
+    status: 'PUBLISHED',
+    priceFromRub: 500,
+    ticketsVacant: 50,
+    validityMode: 'OPEN_DATE',
+    validFrom: null,
+    validTo: null,
+    validDaysAfterPurchase: null,
+    venueId: 'venue_1',
+    cityId: 'city_1',
+    updatedAt: new Date('2026-08-02T12:00:00.000Z'),
+    venue: { id: 'venue_1', title: 'Тестовый музей' },
+    city: null,
+    offers: [],
+  } as any);
+
+  assert.equal(detail.actions.canApply, false);
+  assert.match(detail.diff.warnings[0] || '', /изменился после создания заявки/i);
+});
+
 test('builds detail diff from current override and proposed payload', () => {
   const detail = mapEventChangeRequestDetailRow({
     id: 'cr_1',

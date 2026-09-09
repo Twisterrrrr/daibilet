@@ -3627,3 +3627,29 @@
 - Supplier assets were built into a separate directory and swapped atomically; the previous build remains under `/home/deploy/daibilet-releases`.
 - API restart recovered normally, local health is green and the server worktree is clean.
 - Production browser smoke passed: supplier login/session, admission list, two-category prefill and edit drawer rendering. No live request was submitted, so the moderation queue and published test product were not changed.
+
+## 2026-09-09 - Admin admission moderation workspace
+
+### Changes
+
+- The admin change-request contract now identifies the subject as `EVENT` or `ADMISSION_PRODUCT`; the table says «Объект» and «Входной билет» instead of presenting every request as an event.
+- Admission detail loads the current product and active offers, then shows a structured before/after diff for content, validity, venue, ticket categories and the minimum price.
+- The list no longer exposes raw payload keys or full technical request ids. Reject uses an inline comment dialog and apply requires explicit confirmation.
+- Supplier admission update requests now capture `baseSnapshot.admissionProductUpdatedAt`. The applier rejects stale requests with `ADMISSION_PRODUCT_CHANGE_REQUEST_STALE` (`409`) before writing the product or replacing offers.
+- Older admission requests without a snapshot remain apply-compatible; new requests receive optimistic-concurrency protection automatically.
+
+### Verification
+
+- Contracts, backend and admin typechecks passed.
+- Admin production build passed: 600.26 kB JS / 171.04 kB gzip; the existing chunk-size warning remains non-fatal.
+- Admin DTO/handler and applier regression suite: 20 passed, 0 failed.
+- Database supplier flow: 2 passed, including create -> approve/apply -> admission update with snapshot -> STUB order -> supplier projection.
+- Full `backend:test:ts` suite against local Postgres: 171 passed, 0 failed, 0 skipped.
+- The admission moderation DTO/handler/applier regressions are now part of the standard backend CI command; the finance branch CI also builds the admin app.
+- The suite still emits an existing `pg` deprecation warning about concurrent `client.query()` use; it does not fail tests, but should be removed before the next `pg` major upgrade.
+
+### Next gate
+
+1. Push and deploy the paired finance API change on `.159`.
+2. Hand the admin asset change to the catalog/admin deployment owner; do not deploy catalog `.184` from the finance lane.
+3. Submit one harmless supplier update, inspect the structured admin diff and reject it; then repeat with an approved disposable change before the YooKassa paid-browser smoke.

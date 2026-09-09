@@ -189,6 +189,34 @@ test('applies admission product create request with manual offers', async () => 
   assert.equal(calls.logs.length, 0);
 });
 
+test('rejects stale admission product update before writing', async () => {
+  const { client, calls } = createMockClient({
+    id: 'cr_adm_stale',
+    eventId: null,
+    supplierId: 'sup_1',
+    type: 'UPDATE',
+    status: 'APPROVED',
+    payload: {
+      subject: 'ADMISSION_PRODUCT',
+      admissionProductId: 'adm_existing',
+      baseSnapshot: { admissionProductUpdatedAt: '2026-08-01T11:59:00.000Z' },
+      admissionProduct: { title: 'Outdated title' },
+      offers: [{ title: 'Adult', priceRub: 600 }],
+    },
+    event: null,
+  });
+
+  await assert.rejects(
+    () => applyApprovedEventChangeRequest({ requestId: 'cr_adm_stale' }, client),
+    (error) => error instanceof EventChangeRequestApplyError
+      && error.code === 'ADMISSION_PRODUCT_CHANGE_REQUEST_STALE'
+      && error.statusCode === 409,
+  );
+  assert.equal(calls.admissionProductUpdates.length, 0);
+  assert.equal(calls.admissionOfferUpdateMany.length, 0);
+  assert.equal(calls.requestUpdates.length, 0);
+});
+
 test('blocks source-managed schedule apply through state rules', async () => {
   const { client } = createMockClient({
     id: 'cr_1',

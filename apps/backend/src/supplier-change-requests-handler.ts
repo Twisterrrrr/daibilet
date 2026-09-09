@@ -278,7 +278,7 @@ export async function createSupplierAdmissionChangeRequest(
   const existingProduct = input.admissionProductId
     ? await prisma.admissionProduct.findFirst({
         where: { id: input.admissionProductId, supplierId },
-        select: { id: true, slug: true, title: true, status: true },
+        select: { id: true, slug: true, title: true, status: true, updatedAt: true },
       })
     : null;
   if (input.admissionProductId && !existingProduct) throwHttpError('Входной билет не найден у этого поставщика.', 404);
@@ -289,6 +289,9 @@ export async function createSupplierAdmissionChangeRequest(
   const payload = stripUndefined({
     subject: 'ADMISSION_PRODUCT',
     admissionProductId: existingProduct?.id ?? input.admissionProductId ?? null,
+    baseSnapshot: existingProduct
+      ? { admissionProductUpdatedAt: existingProduct.updatedAt.toISOString() }
+      : undefined,
     admissionProduct: stripUndefined(input.admissionProduct),
     offers: normalizeOffers(input.offers || []),
   }) satisfies Prisma.InputJsonObject;

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { adminFetch } from '@/lib/admin-api';
 import { useSearchParams } from 'react-router-dom';
 import { AlertTriangle, CheckCircle2, ClipboardCheck, Eye, FileJson, Loader2, RefreshCcw, Search, Send, XCircle } from 'lucide-react';
@@ -21,6 +22,7 @@ import { formatNumber } from '@/data';
 const PAGE_SIZE = 50;
 
 type ActionName = 'approve' | 'reject' | 'apply';
+type PendingAction = { request: AdminEventChangeRequestRowDto; action: 'reject' | 'apply' };
 
 export function EventChangeRequestsPage() {
   const [params, setParams] = useSearchParams();
@@ -34,6 +36,8 @@ export function EventChangeRequestsPage() {
   const [detail, setDetail] = React.useState<AdminEventChangeRequestDetailDto | null>(null);
   const [detailLoading, setDetailLoading] = React.useState(false);
   const [detailError, setDetailError] = React.useState<string | null>(null);
+  const [pendingAction, setPendingAction] = React.useState<PendingAction | null>(null);
+  const [actionComment, setActionComment] = React.useState('');
 
   const status = params.get('status') ?? 'all';
   const type = params.get('type') ?? 'all';
@@ -125,10 +129,7 @@ export function EventChangeRequestsPage() {
   }, [offset, params, q, reloadTick, status, type]);
 
   const runAction = React.useCallback(
-    (request: AdminEventChangeRequestRowDto, action: ActionName) => {
-      const adminComment = action === 'reject' ? window.prompt('Комментарий для отклонения заявки') : null;
-      if (action === 'reject' && !adminComment?.trim()) return;
-
+    (request: AdminEventChangeRequestRowDto, action: ActionName, adminComment?: string) => {
       setActingId(`${request.id}:${action}`);
       setActionError(null);
       adminFetch(`/api/admin/event-change-requests/${encodeURIComponent(request.id)}/${action}`, {
@@ -141,7 +142,11 @@ export function EventChangeRequestsPage() {
           if (!response.ok) throw new Error(body?.message || body?.error || `HTTP ${response.status}`);
           return body;
         })
-        .then(() => refresh())
+        .then(() => {
+          setPendingAction(null);
+          setActionComment('');
+          refresh();
+        })
         .then(() => {
           if (selectedRequestId === request.id) loadDetail(request.id);
         })
@@ -149,6 +154,18 @@ export function EventChangeRequestsPage() {
         .finally(() => setActingId(null));
     },
     [loadDetail, refresh, selectedRequestId],
+  );
+
+  const requestAction = React.useCallback(
+    (request: AdminEventChangeRequestRowDto, action: ActionName) => {
+      if (action === 'approve') {
+        runAction(request, action);
+        return;
+      }
+      setActionComment('');
+      setPendingAction({ request, action });
+    },
+    [runAction],
   );
 
   const quickFilters = React.useMemo(() => buildQuickFilters(payload), [payload]);
@@ -177,7 +194,7 @@ export function EventChangeRequestsPage() {
       />
 
       <InfoNote>
-        В таблице показываются безопасные поля заявки и ключи payload. Сырые изменения лучше выводить позже в отдельном diff-экране, чтобы случайно не подсветить технические поля источников.
+        Откройте заявку, чтобы сравнить текущие данные с предложенными. Применение меняет опубликованный объект только после одобрения.
       </InfoNote>
 
       <Card className="mt-4 border-border p-3">
@@ -187,7 +204,7 @@ export function EventChangeRequestsPage() {
             <Input
               value={q}
               onChange={(event) => setParam('q', event.target.value)}
-              placeholder="Событие, поставщик, slug или комментарий"
+              placeholder="Объект, поставщик или комментарий"
               className="h-9 border-border bg-background pl-8 text-sm"
             />
           </div>
@@ -213,18 +230,20 @@ export function EventChangeRequestsPage() {
 
       <DataTableShell
         loading={loading}
-        columns={['Заявка', 'Событие', 'Поставщик', 'Изменение', 'Статус', 'Данные', 'Действия']}
+        columns={['Заявка', 'Объект', 'Поставщик', 'Изменение', 'Статус', 'Комментарий', 'Действия']}
         empty={!loading && payload.items.length === 0 ? <RequestsEmptyState /> : null}
       >
         {payload.items.map((request: AdminEventChangeRequestRowDto) => (
           <tr key={request.id} className="border-b border-border last:border-0 hover:bg-secondary/40">
             <td className="min-w-[210px] px-4 py-3 align-top">
               <div className="font-medium text-foreground">{request.title || requestTypeLabel(request.type)}</div>
-              <div className="mt-1 font-mono text-[11px] text-muted-foreground">{request.id}</div>
               <div className="mt-1 text-xs text-muted-foreground">{formatDateTime(request.createdAt)}</div>
             </td>
             <td className="min-w-[260px] px-4 py-3 align-top">
-              <div className="font-medium text-foreground">{request.event?.title || 'Новое событие'}</div>
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="font-medium text-foreground">{requestObjectTitle(request)}</div>
+                <Badge variant="outline">{requestSubjectLabel(request.subject)}</Badge>
+              </div>
               {request.event?.slug ? <div className="mt-1 font-mono text-[11px] text-muted-foreground">{request.event.slug}</div> : null}
               {request.event ? (
                 <div className="mt-2 flex flex-wrap gap-1.5">
@@ -238,9 +257,8 @@ export function EventChangeRequestsPage() {
               {request.supplier?.slug ? <div className="mt-1 font-mono text-[11px] text-muted-foreground">{request.supplier.slug}</div> : null}
             </td>
             <td className="min-w-[220px] px-4 py-3 align-top">
-              <Badge variant="outline">{requestTypeLabel(request.type)}</Badge>
+              <Badge variant="outline">{requestChangeLabel(request)}</Badge>
               {request.summary ? <div className="mt-2 text-xs text-muted-foreground">{request.summary}</div> : null}
-              {request.adminComment ? <div className="mt-2 rounded-md bg-secondary px-2 py-1 text-xs text-muted-foreground">{request.adminComment}</div> : null}
             </td>
             <td className="px-4 py-3 align-top">
               <StatusBadge status={statusTone(request.status)} label={requestStatusLabel(request.status)} />
@@ -248,17 +266,7 @@ export function EventChangeRequestsPage() {
               {request.appliedAt ? <div className="mt-1 text-xs text-muted-foreground">применено {formatDateTime(request.appliedAt)}</div> : null}
             </td>
             <td className="max-w-[260px] px-4 py-3 align-top">
-              {request.payloadKeys.length ? (
-                <div className="flex flex-wrap gap-1.5">
-                  {request.payloadKeys.map((key: string) => (
-                    <Badge key={key} variant="outline" className="font-mono text-[11px]">
-                      {key}
-                    </Badge>
-                  ))}
-                </div>
-              ) : (
-                <span className="text-xs text-muted-foreground">-</span>
-              )}
+              <span className="text-xs text-muted-foreground">{request.adminComment || '-'}</span>
             </td>
             <td className="min-w-[230px] px-4 py-3 align-top">
               <div className="flex flex-wrap gap-2">
@@ -274,7 +282,7 @@ export function EventChangeRequestsPage() {
                   variant="outline"
                   size="sm"
                   disabled={!request.actions.canApprove || actingId !== null}
-                  onClick={() => runAction(request, 'approve')}
+                  onClick={() => requestAction(request, 'approve')}
                 >
                   {actingId === `${request.id}:approve` ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />}
                   Одобрить
@@ -283,7 +291,7 @@ export function EventChangeRequestsPage() {
                   variant="outline"
                   size="sm"
                   disabled={!request.actions.canReject || actingId !== null}
-                  onClick={() => runAction(request, 'reject')}
+                  onClick={() => requestAction(request, 'reject')}
                 >
                   {actingId === `${request.id}:reject` ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <XCircle className="mr-1.5 h-3.5 w-3.5" />}
                   Отклонить
@@ -292,7 +300,7 @@ export function EventChangeRequestsPage() {
                   variant="default"
                   size="sm"
                   disabled={!request.actions.canApply || actingId !== null}
-                  onClick={() => runAction(request, 'apply')}
+                  onClick={() => requestAction(request, 'apply')}
                 >
                   {actingId === `${request.id}:apply` ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <Send className="mr-1.5 h-3.5 w-3.5" />}
                   Применить
@@ -316,7 +324,23 @@ export function EventChangeRequestsPage() {
           setDetail(null);
           setDetailError(null);
         }}
-        onAction={runAction}
+        onAction={requestAction}
+      />
+
+      <ActionConfirmationDialog
+        pending={pendingAction}
+        comment={actionComment}
+        actingId={actingId}
+        onCommentChange={setActionComment}
+        onClose={() => {
+          if (actingId) return;
+          setPendingAction(null);
+          setActionComment('');
+        }}
+        onConfirm={() => {
+          if (!pendingAction) return;
+          runAction(pendingAction.request, pendingAction.action, actionComment);
+        }}
       />
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
@@ -355,6 +379,7 @@ function RequestDetailSheet({
   onOpenChange: (open: boolean) => void;
   onAction: (request: AdminEventChangeRequestRowDto, action: ActionName) => void;
 }) {
+  const changedItems = detail?.diff.items.filter((item) => item.changeType !== 'unchanged') || [];
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="flex w-[min(980px,96vw)] flex-col overflow-y-auto sm:max-w-[980px]">
@@ -372,16 +397,15 @@ function RequestDetailSheet({
             <>
               <div className="flex flex-wrap items-center gap-2">
                 <StatusBadge status={statusTone(detail.status)} label={requestStatusLabel(detail.status)} />
-                <Badge variant="outline">{requestTypeLabel(detail.type)}</Badge>
+                <Badge variant="outline">{requestChangeLabel(detail)}</Badge>
                 {detail.event?.scheduleLocked ? <Badge variant="outline">расписание закрыто</Badge> : null}
               </div>
               <div className="mt-3 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                 <div className="min-w-0">
                   <h2 className="text-xl font-semibold leading-snug">{detail.title || detail.event?.title || requestTypeLabel(detail.type)}</h2>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    {detail.event?.title || 'Новое событие'} · {detail.supplier?.title || 'поставщик не указан'}
+                    {requestObjectTitle(detail)} · {detail.supplier?.title || 'поставщик не указан'}
                   </p>
-                  <div className="mt-2 font-mono text-[11px] text-muted-foreground">{detail.id}</div>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <Button variant="outline" size="sm" onClick={onRefresh}>
@@ -414,10 +438,12 @@ function RequestDetailSheet({
                 </div>
               ) : null}
 
+              {detail.subject === 'ADMISSION_PRODUCT' ? <AdmissionRequestSummary detail={detail} /> : null}
+
               <Card className="mt-5 border-border p-4">
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <h3 className="text-sm font-semibold">Что изменится</h3>
-                  <Badge variant="outline">{formatNumber(detail.diff.items.length)} полей</Badge>
+                  <Badge variant="outline">{formatNumber(changedItems.length)} изменений</Badge>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
@@ -430,17 +456,16 @@ function RequestDetailSheet({
                       </tr>
                     </thead>
                     <tbody>
-                      {detail.diff.items.map((item: AdminEventChangeRequestDiffItemDto) => (
+                      {changedItems.map((item: AdminEventChangeRequestDiffItemDto) => (
                         <tr key={item.path} className="border-b border-border last:border-0">
                           <td className="min-w-[180px] py-3 pr-3 align-top">
                             <div className="font-medium text-foreground">{item.label}</div>
-                            <div className="mt-1 font-mono text-[11px] text-muted-foreground">{item.path}</div>
                           </td>
                           <td className="max-w-[280px] px-3 py-3 align-top text-xs text-muted-foreground">
-                            <DiffValue value={item.currentValue} />
+                            <DiffValue value={item.currentValue} path={item.path} />
                           </td>
                           <td className="max-w-[280px] px-3 py-3 align-top text-xs text-foreground">
-                            <DiffValue value={item.proposedValue} />
+                            <DiffValue value={item.proposedValue} path={item.path} />
                           </td>
                           <td className="py-3 pl-3 align-top">
                             <ChangeTypeBadge item={item} />
@@ -450,8 +475,8 @@ function RequestDetailSheet({
                     </tbody>
                   </table>
                 </div>
-                {!detail.diff.items.length ? (
-                  <div className="rounded-md bg-secondary p-4 text-sm text-muted-foreground">Для этой заявки нет вычисленного diff. Проверь превью данных ниже.</div>
+                {!changedItems.length ? (
+                  <div className="rounded-md bg-secondary p-4 text-sm text-muted-foreground">Фактических изменений не найдено.</div>
                 ) : null}
               </Card>
 
@@ -459,8 +484,9 @@ function RequestDetailSheet({
                 <Card className="border-border p-4">
                   <h3 className="text-sm font-semibold">Контекст</h3>
                   <dl className="mt-3 space-y-2 text-sm">
-                    <DetailTerm label="Событие" value={detail.event?.title || 'Новое событие'} />
-                    <DetailTerm label="ЧПУ" value={detail.event?.slug || '-'} mono />
+                    <DetailTerm label="Объект" value={requestObjectTitle(detail)} />
+                    <DetailTerm label="Тип" value={requestSubjectLabel(detail.subject)} />
+                    <DetailTerm label="Адрес страницы" value={detail.event?.slug || detail.admissionProduct?.slug || '-'} mono />
                     <DetailTerm label="Поставщик" value={detail.supplier?.title || '-'} />
                     <DetailTerm label="Создал" value={detail.createdBy?.email || '-'} />
                     <DetailTerm label="Проверил" value={detail.reviewedBy?.email || '-'} />
@@ -469,7 +495,7 @@ function RequestDetailSheet({
                   </dl>
                 </Card>
 
-                <Card className="border-border p-4">
+                {detail.subject === 'EVENT' ? <Card className="border-border p-4">
                   <div className="mb-3 flex items-center gap-2">
                     <FileJson className="h-4 w-4 text-muted-foreground" />
                     <h3 className="text-sm font-semibold">Превью данных</h3>
@@ -485,13 +511,112 @@ function RequestDetailSheet({
                       <div className="rounded-md bg-secondary p-4 text-sm text-muted-foreground">Данные пустые.</div>
                     ) : null}
                   </div>
-                </Card>
+                </Card> : null}
               </div>
             </>
           ) : null}
         </div>
       </SheetContent>
     </Sheet>
+  );
+}
+
+function ActionConfirmationDialog({
+  pending,
+  comment,
+  actingId,
+  onCommentChange,
+  onClose,
+  onConfirm,
+}: {
+  pending: PendingAction | null;
+  comment: string;
+  actingId: string | null;
+  onCommentChange: (value: string) => void;
+  onClose: () => void;
+  onConfirm: () => void;
+}) {
+  const isReject = pending?.action === 'reject';
+  const busy = Boolean(pending && actingId === `${pending.request.id}:${pending.action}`);
+  return (
+    <DialogPrimitive.Root open={Boolean(pending)} onOpenChange={(open) => !open && onClose()}>
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Overlay className="fixed inset-0 z-[70] bg-black/55" />
+        <DialogPrimitive.Content className="fixed left-1/2 top-1/2 z-[71] w-[min(520px,calc(100vw-32px))] -translate-x-1/2 -translate-y-1/2 rounded-md border border-border bg-background p-5 shadow-xl focus:outline-none">
+          <DialogPrimitive.Title className="text-lg font-semibold">
+            {isReject ? 'Отклонить заявку' : 'Применить изменения'}
+          </DialogPrimitive.Title>
+          <DialogPrimitive.Description className="mt-2 text-sm text-muted-foreground">
+            {isReject
+              ? 'Комментарий увидит поставщик. Коротко укажите, что нужно исправить.'
+              : `Изменения будут записаны ${pending?.request.subject === 'ADMISSION_PRODUCT' ? 'в карточку входного билета' : 'в карточку события'}. Перед применением проверьте сравнение в заявке.`}
+          </DialogPrimitive.Description>
+          {isReject ? (
+            <textarea
+              value={comment}
+              onChange={(event) => onCommentChange(event.target.value)}
+              rows={4}
+              autoFocus
+              placeholder="Например: уточните срок действия и цену детского билета"
+              className="mt-4 w-full resize-y rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+            />
+          ) : null}
+          <div className="mt-5 flex justify-end gap-2">
+            <Button variant="outline" onClick={onClose} disabled={busy}>Отмена</Button>
+            <Button
+              variant={isReject ? 'outline' : 'default'}
+              onClick={onConfirm}
+              disabled={busy || (isReject && !comment.trim())}
+            >
+              {busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              {isReject ? 'Отклонить' : 'Применить'}
+            </Button>
+          </div>
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive.Root>
+  );
+}
+
+function AdmissionRequestSummary({ detail }: { detail: AdminEventChangeRequestDetailDto }) {
+  const draft = payloadSectionRecord(detail, 'admissionProduct');
+  const offers = payloadSectionArray(detail, 'offers');
+  return (
+    <section className="mt-5 border-y border-border py-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="text-sm font-semibold">Входной билет</h3>
+        <Badge variant="outline">{detail.admissionProduct ? 'изменение' : 'новый'}</Badge>
+      </div>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <DetailTerm label="Название" value={displayText(draft?.title) || detail.admissionProduct?.title || '-'} />
+        <DetailTerm label="Тип" value={admissionTypeLabel(displayText(draft?.type) || detail.admissionProduct?.type)} />
+        <DetailTerm label="Срок действия" value={validityModeLabel(displayText(draft?.validityMode) || detail.admissionProduct?.validityMode)} />
+        <DetailTerm label="Площадка" value={detail.admissionProduct?.venue?.title || (draft?.venueId ? 'Выбрана поставщиком' : '-')} />
+      </div>
+      <div className="mt-4 overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-border text-left text-xs text-muted-foreground">
+              <th className="py-2 pr-3 font-medium">Категория</th>
+              <th className="px-3 py-2 font-medium">Цена</th>
+              <th className="px-3 py-2 font-medium">Старая цена</th>
+              <th className="py-2 pl-3 font-medium">Лимит</th>
+            </tr>
+          </thead>
+          <tbody>
+            {offers.map((offer, index) => (
+              <tr key={`${displayText(offer.title)}-${index}`} className="border-b border-border last:border-0">
+                <td className="py-2.5 pr-3 font-medium">{displayText(offer.title) || `Категория ${index + 1}`}</td>
+                <td className="px-3 py-2.5">{formatRub(offer.priceRub)}</td>
+                <td className="px-3 py-2.5 text-muted-foreground">{formatRub(offer.oldPriceRub)}</td>
+                <td className="py-2.5 pl-3 text-muted-foreground">{displayText(offer.capacityTotal) || '-'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {!offers.length ? <div className="py-3 text-sm text-muted-foreground">Категории билетов не переданы.</div> : null}
+      </div>
+    </section>
   );
 }
 
@@ -515,12 +640,15 @@ function PayloadBlock({ title, value }: { title: string; value: unknown }) {
   );
 }
 
-function DiffValue({ value }: { value: unknown }) {
+function DiffValue({ value, path }: { value: unknown; path?: string }) {
   if (value === null || value === undefined || value === '') return <span className="text-muted-foreground">-</span>;
   if (typeof value === 'object') {
     return <pre className="max-h-36 overflow-auto whitespace-pre-wrap rounded-md bg-secondary p-2">{formatJson(value)}</pre>;
   }
-  return <span className="whitespace-pre-wrap">{String(value)}</span>;
+  if (typeof value === 'number' && path?.toLowerCase().includes('price')) {
+    return <span>{formatRub(value)}</span>;
+  }
+  return <span className="whitespace-pre-wrap">{humanValue(value)}</span>;
 }
 
 function ChangeTypeBadge({ item }: { item: AdminEventChangeRequestDiffItemDto }) {
@@ -596,6 +724,91 @@ function emptyPayload(params: URLSearchParams): AdminEventChangeRequestsListDto 
     },
     items: [],
   };
+}
+
+function requestObjectTitle(request: AdminEventChangeRequestRowDto): string {
+  if (request.event?.title) return request.event.title;
+  if (request.subject === 'ADMISSION_PRODUCT') {
+    const separator = request.title?.indexOf(':') ?? -1;
+    if (separator >= 0) return request.title!.slice(separator + 1).trim();
+    return request.title || 'Новый входной билет';
+  }
+  return request.title || 'Новое событие';
+}
+
+function requestSubjectLabel(subject: AdminEventChangeRequestRowDto['subject']): string {
+  return subject === 'ADMISSION_PRODUCT' ? 'Входной билет' : 'Событие';
+}
+
+function requestChangeLabel(request: AdminEventChangeRequestRowDto): string {
+  if (request.subject === 'ADMISSION_PRODUCT') {
+    return request.type === 'CREATE' ? 'новый билет' : 'изменение билета';
+  }
+  return requestTypeLabel(request.type);
+}
+
+function payloadSectionRecord(
+  detail: AdminEventChangeRequestDetailDto,
+  id: string,
+): Record<string, unknown> | null {
+  const value = detail.payloadPreview.sections.find((section) => section.id === id)?.value;
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : null;
+}
+
+function payloadSectionArray(
+  detail: AdminEventChangeRequestDetailDto,
+  id: string,
+): Array<Record<string, unknown>> {
+  const value = detail.payloadPreview.sections.find((section) => section.id === id)?.value;
+  return Array.isArray(value)
+    ? value.filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === 'object' && !Array.isArray(item))
+    : [];
+}
+
+function displayText(value: unknown): string {
+  if (value === null || value === undefined || value === '') return '';
+  return String(value);
+}
+
+function humanValue(value: unknown): string {
+  if (typeof value !== 'string') return String(value);
+  const admissionType = admissionTypeLabel(value);
+  if (admissionType !== value) return admissionType;
+  const validity = validityModeLabel(value);
+  return validity !== value ? validity : value;
+}
+
+function formatRub(value: unknown): string {
+  const amount = Number(value);
+  return Number.isFinite(amount) ? `${formatNumber(Math.round(amount))} ₽` : '-';
+}
+
+function admissionTypeLabel(value?: string | null): string {
+  const labels: Record<string, string> = {
+    MUSEUM_ENTRY: 'Музей',
+    GALLERY_ENTRY: 'Галерея',
+    ART_SPACE_ENTRY: 'Арт-пространство',
+    EXHIBITION_ENTRY: 'Выставка',
+    OBSERVATION_ENTRY: 'Смотровая площадка',
+    PARK_ENTRY: 'Парк',
+    ATTRACTION_ENTRY: 'Аттракцион',
+    ZOO_ENTRY: 'Зоопарк',
+    AQUARIUM_ENTRY: 'Океанариум',
+    COMPLEX_ENTRY: 'Комплексный билет',
+    OTHER: 'Другое',
+  };
+  return value ? labels[value] || value : '-';
+}
+
+function validityModeLabel(value?: string | null): string {
+  const labels: Record<string, string> = {
+    OPEN_DATE: 'Открытая дата',
+    FIXED_WINDOW: 'Период действия',
+    VALID_DAYS_AFTER_PURCHASE: 'После покупки',
+  };
+  return value ? labels[value] || value : '-';
 }
 
 function requestStatusLabel(status: string) {

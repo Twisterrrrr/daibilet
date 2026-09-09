@@ -73,6 +73,7 @@
 | P.3f5 | **Supplier LC order operations** — фильтры заказов, очередь обработки, сумма к выплате без технических id | Высокий | ✅ supplier UI + typecheck/build |
 | P.3f6 | **YooKassa Widget Checkout** — embedded form, reusable idempotency key, backend status watcher and immediate result navigation | Высокий | 🔄 code/tests/build done; sandbox browser smoke pending |
 | P.3g | **Supplier write flows** — создание/редактирование admission и событий через заявки | Средний | ✅ admission create/update admin apply + DB smoke; event create apply deferred |
+| P.3g1 | **Admin admission moderation workspace** — предметный diff, reject comment, apply confirmation и stale-request guard | Высокий | ✅ code + DB/unit/build 2026-09-09; deploy/joint smoke pending |
 | P.3h | **YooKassa reconcile ops** — service/timer на `.159`, runbook и ручной dry-run/apply | Высокий | ✅ live `.159` installed/enabled; scheduled tick green 2026-08-09 |
 | P.3i | **Finance E2E foundation roadmap** - admin finance contour, supplier LC money views, refunds, reports, settlements, closing docs and supplier reviews | High | 🔄 refund foundation + admin ledger/reconcile + supplier finance/docs read views |
 | P.3j | **Reports/settlements/documents write flow** - draft `SupplierReport`, close `SupplierSettlement`, issue `SupplierDocument` from reconciled ledger | High | 🔄 code done; close-period mutation + admin UI + backend test green |
@@ -503,6 +504,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | G.10 | Embedded YooKassa widget + immediate catalog return by order projection | High | finance create/replay smoke done (`3815847`); catalog port + paid browser smoke pending |
 | G.11 | Buyer order access proof: HMAC token + optional finance enforcement | Critical | done 2026-09-08; `.159` live at `93f1fc1`, enforcement off pending catalog BFF cookie bridge |
 | G.12 | Supplier admission edit request + multi-category offer editor | High | done 2026-09-09; CI `34381868285`, `.159` live at `32e5de0`, non-mutating browser smoke passed |
+| G.13 | Admin admission review/apply UX + stale update protection | High | code done 2026-09-09; 22 targeted tests + DB flow + admin build green; deploy pending |
 
 Seed command: `pnpm backend:checkout:seed-stub-admission`.
 Smoke order command: `pnpm backend:checkout:seed-stub-admission -- --order`.
