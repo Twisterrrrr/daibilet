@@ -521,7 +521,7 @@ export function CatalogToolbar({
           )}
         >
           <div className="catalog-content">
-            <div className="catalog-date-timeline w-full">
+            <div className="catalog-date-timeline w-full min-w-0">
               <CatalogDateRail disabled={disabled} className="min-w-0 w-full" />
             </div>
             <CatalogMobileQuickFilters
@@ -657,7 +657,7 @@ export function CatalogToolbar({
 
           {/* Mobile: date carousel (Lovable) + category icon rail. */}
           <div className="space-y-2 md:hidden">
-            <div className="catalog-date-timeline w-full">
+            <div className="catalog-date-timeline w-full min-w-0">
               <CatalogDateRail disabled={disabled} className="min-w-0 w-full" />
             </div>
             <MobileCategoryIconRail

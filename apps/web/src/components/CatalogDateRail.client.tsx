@@ -1,14 +1,13 @@
 'use client';
 
-import { Calendar as CalendarIcon } from 'lucide-react';
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import {
   buildCatalogDateRailChips,
   CATALOG_DATE_RAIL_DAYS_DESKTOP_MAX,
-  CATALOG_DATE_RAIL_DAYS_TABLET,
   formatCatalogDateRangeLabel,
   isDateRailChipActive,
   nextCatalogDateRailSelection,
@@ -27,27 +26,30 @@ type CatalogDateRailProps = {
   className?: string;
 };
 
-const DESKTOP_DATE_RAIL_MQ = '(min-width: 1024px)';
+const EDGE_EPS = 4;
+const SCROLL_STEP_CARDS = 5;
 
 /**
  * Vertical day cards (СЕГ/ЗАВ + number + month) with range selection:
  * click A → day; click B → range A–B; click inside range → that day; click same day again → clear.
+ * Desktop: Afisha-style prev/next; calendar/filter control on the row below so the day strip uses full width.
  */
 export function CatalogDateRail({ disabled = false, className = '' }: CatalogDateRailProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [upcomingDays, setUpcomingDays] = useState(CATALOG_DATE_RAIL_DAYS_TABLET);
   const chips = useMemo(
-    () => buildCatalogDateRailChips(new Date(), upcomingDays) as CatalogDateRailDayChip[],
-    [upcomingDays],
+    () =>
+      buildCatalogDateRailChips(new Date(), CATALOG_DATE_RAIL_DAYS_DESKTOP_MAX) as CatalogDateRailDayChip[],
+    [],
   );
   const [pickerOpen, setPickerOpen] = useState(false);
   const [draftFrom, setDraftFrom] = useState('');
   const [draftTo, setDraftTo] = useState('');
+  const [canPrev, setCanPrev] = useState(false);
+  const [canNext, setCanNext] = useState(false);
   const pickerRef = useRef<HTMLDivElement>(null);
   const fromInputRef = useRef<HTMLInputElement>(null);
   const railRef = useRef<HTMLDivElement>(null);
-  const measureRef = useRef<HTMLDivElement>(null);
 
   const filters = useMemo(() => {
     const minRaw = searchParams.get('minPrice');
@@ -77,53 +79,34 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
   const rangeLabel = formatCatalogDateRangeLabel(filters.from, filters.to || filters.from);
   const dateFilterOn = Boolean(filters.from || filters.to) && !filters.date;
 
-  const measurePool = useMemo(
-    () => buildCatalogDateRailChips(new Date(), CATALOG_DATE_RAIL_DAYS_DESKTOP_MAX) as CatalogDateRailDayChip[],
-    [],
-  );
+  const syncScrollState = useCallback(() => {
+    const el = railRef.current;
+    if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    const overflow = scrollWidth > clientWidth + EDGE_EPS;
+    setCanPrev(overflow && scrollLeft > EDGE_EPS);
+    setCanNext(overflow && scrollLeft + clientWidth < scrollWidth - EDGE_EPS);
+  }, []);
 
   useLayoutEffect(() => {
-    const mq = window.matchMedia(DESKTOP_DATE_RAIL_MQ);
+    syncScrollState();
+  }, [syncScrollState, chips.length]);
 
-    const fitDesktopDays = () => {
-      if (!mq.matches) {
-        setUpcomingDays(CATALOG_DATE_RAIL_DAYS_TABLET);
-        return;
-      }
-      const rail = railRef.current;
-      const measure = measureRef.current;
-      if (!rail || !measure) {
-        setUpcomingDays(CATALOG_DATE_RAIL_DAYS_DESKTOP_MAX);
-        return;
-      }
-      const available = rail.clientWidth;
-      if (available <= 0) return;
-
-      const gap = 8;
-      const kids = Array.from(measure.children) as HTMLElement[];
-      const calendarEl = kids[kids.length - 1];
-      const calendarW = calendarEl?.offsetWidth ?? 44;
-      let used = calendarW;
-      let dayCount = 0;
-      for (let i = 0; i < kids.length - 1; i += 1) {
-        const w = kids[i]!.offsetWidth;
-        const next = used + gap + w;
-        if (next > available + 0.5) break;
-        used = next;
-        dayCount += 1;
-      }
-      setUpcomingDays(Math.max(CATALOG_DATE_RAIL_DAYS_TABLET, dayCount));
-    };
-
-    fitDesktopDays();
-    const ro = new ResizeObserver(fitDesktopDays);
-    if (railRef.current) ro.observe(railRef.current);
-    mq.addEventListener('change', fitDesktopDays);
+  useEffect(() => {
+    const el = railRef.current;
+    if (!el) return;
+    el.addEventListener('scroll', syncScrollState, { passive: true });
+    el.addEventListener('scrollend', syncScrollState);
+    window.addEventListener('resize', syncScrollState, { passive: true });
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(syncScrollState) : null;
+    ro?.observe(el);
     return () => {
-      ro.disconnect();
-      mq.removeEventListener('change', fitDesktopDays);
+      el.removeEventListener('scroll', syncScrollState);
+      el.removeEventListener('scrollend', syncScrollState);
+      window.removeEventListener('resize', syncScrollState);
+      ro?.disconnect();
     };
-  }, [measurePool]);
+  }, [syncScrollState]);
 
   useEffect(() => {
     if (!pickerOpen) return;
@@ -214,27 +197,45 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
     setPickerOpen(false);
   };
 
+  const scrollByDir = (dir: -1 | 1) => {
+    const el = railRef.current;
+    if (!el) return;
+    if (dir < 0 && !canPrev) return;
+    if (dir > 0 && !canNext) return;
+    if (dir > 0) setCanPrev(true);
+    if (dir < 0) setCanNext(true);
+
+    const firstCard = el.querySelector<HTMLElement>('[data-day]');
+    const gap = 8;
+    const cardW = firstCard?.offsetWidth ?? 54;
+    const step = (cardW + gap) * SCROLL_STEP_CARDS;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    el.scrollBy({ left: dir * step, behavior: reduceMotion ? 'auto' : 'smooth' });
+    requestAnimationFrame(() => {
+      syncScrollState();
+      requestAnimationFrame(syncScrollState);
+    });
+  };
+
   const minDay = toLocalIsoDay(new Date());
 
-  const renderDayCard = (chip: CatalogDateRailDayChip, opts?: { measure?: boolean }) => {
+  const renderDayCard = (chip: CatalogDateRailDayChip) => {
     const active = isDateRailChipActive(chip, filters);
     const idleWeekend = !active && chip.isWeekend;
     return (
       <button
-        key={opts?.measure ? `m-${chip.iso}` : chip.iso}
+        key={chip.iso}
         type="button"
         data-day={chip.iso}
-        disabled={disabled || opts?.measure}
-        tabIndex={opts?.measure ? -1 : undefined}
-        aria-pressed={opts?.measure ? undefined : active}
+        disabled={disabled}
+        aria-pressed={active}
         aria-label={`Выбрать ${chip.dayNum} ${chip.monthShort}`}
         title={`${chip.dayNum} ${chip.monthShort}`}
-        onClick={opts?.measure ? undefined : () => onSelectDay(chip.iso)}
+        onClick={() => onSelectDay(chip.iso)}
         className={[
           'catalog-date-day-card snap-start',
           active ? 'catalog-date-day-card-on' : idleWeekend ? 'catalog-date-day-card-weekend' : 'catalog-date-day-card-idle',
-          disabled || opts?.measure ? 'opacity-60' : '',
-          opts?.measure ? 'pointer-events-none' : '',
+          disabled ? 'opacity-60' : '',
         ]
           .filter(Boolean)
           .join(' ')}
@@ -246,6 +247,12 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
     );
   };
 
+  const arrowBtnClass = (enabled: boolean) =>
+    [
+      'catalog-date-rail-arrow inline-btn hidden shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 md:inline-flex',
+      enabled ? 'opacity-100 hover:bg-slate-50' : 'pointer-events-none opacity-35',
+    ].join(' ');
+
   const calendarButton = (
     <button
       type="button"
@@ -256,12 +263,15 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
       aria-haspopup="dialog"
       aria-pressed={dateFilterOn || pickerOpen}
       onClick={() => setPickerOpen((open) => !open)}
-      className={`catalog-date-day-card catalog-date-day-card-dates shrink-0 disabled:opacity-60 ${
-        dateFilterOn || pickerOpen ? 'catalog-date-day-card-on' : ''
-      }`}
+      className={[
+        'catalog-date-rail-calendar inline-btn inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-60',
+        dateFilterOn || pickerOpen
+          ? 'border-primary/60 bg-primary text-white hover:bg-primary/90'
+          : 'border-slate-200 bg-[#F0F1F3] text-graphite/80 hover:border-primary/40 hover:bg-primary/10 hover:text-primary',
+      ].join(' ')}
     >
-      <CalendarIcon className="size-[1.15rem]" strokeWidth={2.25} aria-hidden />
-      <span className="catalog-date-day-card-dates-label">даты</span>
+      <CalendarIcon className="size-4" strokeWidth={2.25} aria-hidden />
+      <span>Календарь</span>
     </button>
   );
 
@@ -343,27 +353,47 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
       : null;
 
   return (
-    <div className={`relative min-w-0 ${className}`} data-catalog-date-rail="cards">
-      <div
-        ref={railRef}
-        role="group"
-        aria-label="Дата"
-        className="horizontal-snap-row flex min-w-0 w-full flex-nowrap items-center gap-2 overflow-x-auto pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:overflow-x-hidden"
-      >
-        {chips.map((chip) => renderDayCard(chip))}
-        {calendarButton}
+    <div className={`relative w-full min-w-0 ${className}`} data-catalog-date-rail="cards">
+      <div className="catalog-date-rail-track flex w-full min-w-0 items-center gap-1.5 sm:gap-2">
+        <button
+          type="button"
+          aria-label="Прокрутить даты влево"
+          aria-disabled={!canPrev}
+          tabIndex={canPrev ? 0 : -1}
+          disabled={disabled}
+          onClick={() => scrollByDir(-1)}
+          className={arrowBtnClass(canPrev && !disabled)}
+        >
+          <ChevronLeft className="h-5 w-5" strokeWidth={2} aria-hidden />
+        </button>
+
+        <div
+          ref={railRef}
+          role="group"
+          aria-label="Дата"
+          className="horizontal-snap-row catalog-date-rail-scroller flex min-w-0 flex-1 flex-nowrap items-center gap-2 overflow-x-auto pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {chips.map((chip) => renderDayCard(chip))}
+        </div>
+
+        <button
+          type="button"
+          aria-label="Прокрутить даты вправо"
+          aria-disabled={!canNext}
+          tabIndex={canNext ? 0 : -1}
+          disabled={disabled}
+          onClick={() => scrollByDir(1)}
+          className={arrowBtnClass(canNext && !disabled)}
+        >
+          <ChevronRight className="h-5 w-5" strokeWidth={2} aria-hidden />
+        </button>
       </div>
 
-      <div
-        ref={measureRef}
-        aria-hidden
-        className="pointer-events-none absolute -left-[9999px] top-0 flex flex-nowrap items-center gap-2 opacity-0"
-      >
-        {measurePool.map((chip) => renderDayCard(chip, { measure: true }))}
-        <span className="catalog-date-day-card catalog-date-day-card-dates">
-          <CalendarIcon className="size-[1.15rem]" strokeWidth={2.25} aria-hidden />
-          <span className="catalog-date-day-card-dates-label">даты</span>
-        </span>
+      <div className="catalog-date-rail-actions mt-2.5 flex w-full min-w-0 flex-wrap items-center gap-2">
+        {calendarButton}
+        {rangeLabel ? (
+          <span className="text-xs font-medium text-graphite-muted sm:text-sm">{rangeLabel}</span>
+        ) : null}
       </div>
 
       {modal}

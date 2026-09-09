@@ -1,3 +1,56 @@
+## 2026-09-09 - `/events` date rail: Afisha arrows + calendar below
+
+### Наблюдения
+- На десктопе лента дат «не листалась вправо»: fit-to-width обрезал число дней под `clientWidth`, overflow не было.
+- Кнопка календаря сидела в той же полосе и отъедала ширину у дней.
+
+### Решения
+- `CatalogDateRail`: полный пул дней (`DESKTOP_MAX`), горизонтальный scroll + prev/next на `md+` (как Афиша).
+- Календарь на второй строке (pill «Календарь»); день-лента на всю ширину `catalog-main`.
+- Убран measure/fit desktop; sticky timeline без лишнего `overflow-x` на обёртке.
+
+### Проблемы
+- На live пока старый fit-rail, пока не batch deploy web.
+
+---
+
+## 2026-09-09 - PDP batch: related + Yandex map + TITLE-CAPS
+
+### Наблюдения
+- Три тикета из SEO-аудита 02.09 ещё висели как «code; Deploy», хотя related/map/CAPS уже в ветке с 02–03.09.
+- Пробелы TITLE-CAPS: сырой `session.title` в region cards, favorites drawer, region nearby, venue stop-lists.
+- Related live path = `public-event.dto.ts` → `loadRelatedSessionsFromDb` + `pickRelatedSessions` (нужен API restart на MSK).
+
+### Решения
+- Добили `formatPublicTitle` в `RegionEventCard`, `RegionVenueSeriesCard`, `FavoritesPanel`, `RegionNearbyStrip`, venue stop-lists.
+- Карта PDP уже на `YandexMapEmbed` (`EventExpandableMap`, open by default).
+- Выкат: Deploy MSK web (artifact swap делает `git reset` + `systemctl restart daibilet-api`).
+
+### Проблемы
+- Локальный SSH `deploy@MSK` с owner-ключа пока Permission denied - выкат через GHA secrets.
+
+---
+
+## 2026-09-09 - Teplohod AI rewrite: 48 EventOverride applied
+
+### Наблюдения
+- Пачка `tmp/teplohod-rewrites.json` (48 TEP) была готова; блокер - SSH с owner IP.
+- `PermitRootLogin no` → alias `daibilet-msk` должен быть `User deploy`, не root.
+- Owner pubkey отсутствовал у `deploy`; fail2ban банил `23.229.0.242` после root-отказов.
+- Prisma `@default(cuid())` на `EventOverride.id` не в SQL default → raw INSERT без id падал.
+
+### Решения
+- GHA `msk-ssh-diagnose` / `msk-ssh-unban`: дописали pubkey deploy + unban IP.
+- SSH config: `daibilet-msk` → `deploy`; LocalForward 5433→5437.
+- `scripts/apply-teplohod-description-rewrites.js`: генерит `id`, upsert по `eventId`.
+- Apply на MSK: **updated=48** в `EventOverride.description` (source Event не трогали).
+
+### Проблемы
+- После серии неудачных root-попыток fail2ban снова режет IP - при необходимости `msk-ssh-unban`.
+- В `deploy` authorized_keys остался мусорный placeholder `ИХ_ПУБЛИЧНЫЙ_КЛЮЧ` - вычистить при случае.
+
+---
+
 ## 2026-09-09 - UX Catalog: rollback featured/bento on /events
 
 ### Наблюдения

@@ -1291,14 +1291,23 @@ html[data-nav-pending='1'] {
     }
   }
 
-  /** Date rail in main column — full width; sticky on desktop while scrolling cards */
+  /** Date rail in main column — full width of catalog-main; sticky on desktop */
   .catalog-date-timeline {
     width: 100%;
-    max-width: 100%;
+    max-width: none;
     margin-bottom: 1.25rem;
-    overflow-x: auto;
     padding-bottom: 0.25rem;
-    scrollbar-width: thin;
+  }
+
+  .catalog-date-rail-arrow {
+    width: 2.25rem;
+    height: 2.25rem;
+    min-width: 2.25rem;
+  }
+
+  .catalog-date-rail-scroller {
+    width: 100%;
+    max-width: 100%;
   }
 
   @media (min-width: 1024px) {
@@ -1514,7 +1523,7 @@ html[data-nav-pending='1'] {
   }
 
   .catalog-date-day-card-dates {
-    @apply ml-1 h-auto gap-0 bg-[#F0F1F3] text-graphite/80 hover:-translate-y-0.5 hover:border-primary/40 hover:bg-primary/10 hover:text-primary hover:shadow-sm;
+    @apply h-auto gap-0 bg-[#F0F1F3] text-graphite/80 hover:-translate-y-0.5 hover:border-primary/40 hover:bg-primary/10 hover:text-primary hover:shadow-sm;
   }
 
   .catalog-date-day-card-dates.catalog-date-day-card-on {
