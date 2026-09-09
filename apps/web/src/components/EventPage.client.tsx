@@ -622,6 +622,11 @@ export function EventHero({
       }`}
     >
       <EventPageCitySync city={event.city} />
+      {/*
+        Mobile: full-bleed cover (portrait frame).
+        md+: contain within hero height — no side crop/upscale stretch; pillarbox
+        into slate, then soft L/R fades + shared vertical wash.
+      */}
       <SafeImage
         src={heroImage || null}
         alt={formatPublicTitle(event.title)}
@@ -629,12 +634,20 @@ export function EventHero({
         priority
         sizes={IMAGE_SIZES.eventHero}
         style={{ objectPosition: heroObjectPosition }}
-        className="object-cover object-[center_20%] opacity-80"
+        className="object-cover object-[center_20%] opacity-80 md:object-contain"
         fallback={
           <div className="flex h-full items-center justify-center bg-gradient-to-br from-primary-600 to-primary-900">
             <span className="text-8xl opacity-30">🎭</span>
           </div>
         }
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 left-0 hidden w-[18%] bg-gradient-to-r from-slate-900 via-slate-900/70 to-transparent md:block"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 right-0 hidden w-[18%] bg-gradient-to-l from-slate-900 via-slate-900/70 to-transparent md:block"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/45 to-slate-900/25" />
 
