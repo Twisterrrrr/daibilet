@@ -908,9 +908,8 @@ html[data-nav-pending='1'] {
   }
 
   /*
-   * Bento hero: do NOT lock 16/10 on the wide 2fr column - that inflates the
-   * cluster (~600px photo) and crushes the teaser to ~50px (looks empty).
-   * Height comes from the two stack cards; photo flex-fills leftover; copy keeps natural height.
+   * Bento hero: photo absorbs leftover height from the two stack neighbors.
+   * Teaser keeps natural height (1–2 paragraphs) - never leave a white void in the body.
    */
   .catalog-featured-cluster__hero .event-card--featured [data-card-media] {
     flex: 1 1 0%;

@@ -16,7 +16,12 @@ import { HomePopularCitiesRail } from '@/components/HomePopularCitiesRail.client
 import { IMAGE_SIZES, BlogCardSafeImage, BLOG_LISTING_IMAGE_QUALITY, SafeImage } from '@/components/SafeImage.client';
 import { ScrollRail } from '@/components/ScrollRail.client';
 import { blogSurfaceMeta, blogSurfaceMetaLine } from '@/lib/blog-meta';
-import { clipBlogFeaturedLead, hubBlogCardExcerpt, mergeBlogCards } from '@/lib/blog-utils';
+import {
+  clipBlogFeaturedLead,
+  hubBlogCardExcerpt,
+  mergeBlogCards,
+  pickHomeBlogStrip,
+} from '@/lib/blog-utils';
 import '@/lib/env';
 import { catalogSocialStats } from '@/lib/catalog-social-stats';
 import { formatMoney, formatNumber, pluralEvents } from '@/lib/format';
@@ -91,11 +96,15 @@ async function HomePageBody() {
   const blogCards = mergeBlogCards(
     (articlesPayload?.articles as BlogApiArticles | undefined) ?? null,
   );
-  const orderedBlog = blogCards.some((card) => card.publishedAt)
-    ? blogCards
-    : [...blogCards].reverse();
-  const blogPosts = orderedBlog.slice(0, 4);
-  const [featuredBlog, ...restBlog] = blogPosts;
+  // API order: isFeatured first, then publishedAt. For home strip drop the sticky
+  // pin and sort by recency so «Материал недели» can rotate weekly.
+  const orderedBlog = [...blogCards].sort((a, b) => {
+    const aTs = a.publishedAt ? Date.parse(a.publishedAt) : 0;
+    const bTs = b.publishedAt ? Date.parse(b.publishedAt) : 0;
+    if (aTs !== bTs) return bTs - aTs;
+    return a.slug.localeCompare(b.slug, 'ru');
+  });
+  const { featured: featuredBlog, rest: restBlog } = pickHomeBlogStrip(orderedBlog, { limit: 4 });
   const featuredLead = featuredBlog
     ? clipBlogFeaturedLead(featuredBlog.slug, featuredBlog.excerpt, 2, 520)
     : '';

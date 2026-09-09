@@ -119,7 +119,10 @@ test('resolveFeaturedCardTeaserLines falls back when description is logistics', 
   });
   assert.equal(lines.length, 2);
   assert.match(lines[0]!, /Экскурсии в Пермь/);
+  assert.match(lines[0]!, /Набережная/);
   assert.match(lines[1]!, /2 часа/);
+  assert.ok(lines[0]!.length >= 60, 'fallback lead should fill featured band');
+  assert.ok(lines[1]!.length >= 60, 'fallback second should fill featured band');
 });
 
 test('resolveEventCardLocationLabel prefers street address over venue name', () => {

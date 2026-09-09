@@ -20,7 +20,9 @@ import {
   expandLargeListingCopy,
   hubBlogCardExcerpt,
   mergeBlogCards,
+  isoWeekKey,
   orderBlogCardsForVisit,
+  pickHomeBlogStrip,
   resolveBlogCardDateLabel,
   splitBlogListingHero,
   staticBlogCards,
@@ -110,6 +112,38 @@ test('splitBlogListingHero: isFeatured wins, else first card', () => {
   const split = splitBlogListingHero(withFlag);
   assert.equal(split.featured?.slug, flaggedSlug);
   assert.ok(!split.feed.some((p) => p.slug === split.featured?.slug));
+});
+
+test('pickHomeBlogStrip: weekly hero rotates, ignores isFeatured sticky', () => {
+  const cards = staticBlogCards().slice(0, 6).map((c, i) => ({
+    ...c,
+    isFeatured: i === 0,
+    publishedAt: `2026-0${Math.min(9, i + 1)}-01T12:00:00.000Z`,
+  }));
+  assert.ok(cards.length >= 4);
+
+  const weekA = pickHomeBlogStrip(cards, { now: new Date('2026-09-07T12:00:00.000Z'), limit: 4 });
+  const weekAAgain = pickHomeBlogStrip(cards, {
+    now: new Date('2026-09-09T18:00:00.000Z'),
+    limit: 4,
+  });
+  assert.equal(weekA.featured?.slug, weekAAgain.featured?.slug);
+  assert.equal(weekA.rest.length, 3);
+  assert.ok(!weekA.rest.some((p) => p.slug === weekA.featured?.slug));
+
+  const weekB = pickHomeBlogStrip(cards, { now: new Date('2026-09-14T12:00:00.000Z'), limit: 4 });
+  // Different ISO week → different seed; allow rare collision but prefer change.
+  if (cards.length >= 3) {
+    assert.notEqual(isoWeekKey(new Date('2026-09-07T12:00:00.000Z')), isoWeekKey(new Date('2026-09-14T12:00:00.000Z')));
+  }
+  assert.ok(weekB.featured);
+  assert.equal(weekB.rest.length, 3);
+  // Sticky isFeatured (cards[0]) must not always win home hero.
+  const manyWeeks = Array.from({ length: 12 }, (_, i) => {
+    const d = new Date(Date.UTC(2026, 0, 5 + i * 7));
+    return pickHomeBlogStrip(cards, { now: d, limit: 4 }).featured?.slug;
+  });
+  assert.ok(new Set(manyWeeks).size >= 2, 'home hero should rotate across weeks');
 });
 
 test('orderBlogCardsForVisit: pin stays first, rest can shuffle', () => {

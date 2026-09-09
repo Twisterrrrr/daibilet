@@ -353,7 +353,7 @@ export function EventCard({
             {featuredTeaserLines.map((line, index) => (
               <p
                 key={`${index}-${line.slice(0, 24)}`}
-                className="shrink-0 text-pretty line-clamp-3 sm:line-clamp-4"
+                className="shrink-0 text-pretty line-clamp-4 sm:line-clamp-5"
               >
                 {line}
               </p>
@@ -385,12 +385,7 @@ export function EventCard({
           />
         ) : null}
 
-        <div
-          className={`flex shrink-0 items-center justify-between gap-2 pt-3 ${
-            // Featured: teaser flex-1 fills the band; footer stays at bottom.
-            catalogFeatured && hasFeaturedTeaser ? 'mt-auto' : catalogFeatured ? 'mt-1' : 'mt-auto'
-          }`}
-        >
+        <div className="mt-auto flex shrink-0 items-center justify-between gap-2 pt-3">
           {landingActions ? (
             <LandingPurchaseButton
               session={session}

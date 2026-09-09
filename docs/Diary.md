@@ -1,3 +1,34 @@
+## 2026-09-09 - Home blog strip: weekly rotate
+
+### Наблюдения
+- Owner: блок блога на главной «никогда не меняется».
+- Причина: API отдаёт `isFeatured` первым, home брал `slice(0,4)` без ротации; sticky Blog Hero pin замораживал «Материал недели».
+
+### Решения
+- `pickHomeBlogStrip`: weekly SSR-stable hero среди свежих; `isFeatured` остаётся только для `/blog` magazine hero.
+- Home сортирует по `publishedAt` перед pick (не по sticky pin).
+
+### Проблемы
+- Смена hero на live - после ISR/`revalidate` на границе ISO-недели (не мгновенно при F5 в ту же неделю).
+
+---
+
+## 2026-09-09 - UX Catalog 2.0: denser featured teaser band
+
+### Наблюдения
+- Owner: bento лучше, но в tall hero оставалась белая полоса между meta и ценой - нужны 1–2 абзаца.
+- На preview после первого фикса текст уже был, но band визуально «дырявил», если body растягивался.
+
+### Решения
+- Featured teaser: до 2 абзацев (`line-clamp-4/5`), denser structural fallback для logistics/empty description на live.
+- Bento: фото `flex:1` поглощает leftover; body+teaser natural height - без orphan white под copy.
+- Preview mocks: более плотные 2-sentence teasers для featured seeds.
+
+### Проблемы
+- Dev overlay «Issues» на `/preview-cards` может мигать на первом paint (columns SSR→client); не блокер ship.
+
+---
+
 ## 2026-09-09 - UX Catalog 2.0: featured teaser + hydrate snapshots
 
 ### Наблюдения

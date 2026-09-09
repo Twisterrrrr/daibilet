@@ -471,6 +471,46 @@ export function splitBlogListingHero(
   };
 }
 
+/** ISO week key `YYYY-Www` for SSR-stable weekly picks (UTC). */
+export function isoWeekKey(date: Date = new Date()): string {
+  const utc = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+  // Thursday in current week decides the year.
+  utc.setUTCDate(utc.getUTCDate() + 4 - (utc.getUTCDay() || 7));
+  const yearStart = new Date(Date.UTC(utc.getUTCFullYear(), 0, 1));
+  const week = Math.ceil(((utc.getTime() - yearStart.getTime()) / 86_400_000 + 1) / 7);
+  return `${utc.getUTCFullYear()}-W${String(week).padStart(2, '0')}`;
+}
+
+function stableIndex(seed: string, modulo: number): number {
+  if (modulo <= 0) return 0;
+  let hash = 0;
+  for (let i = 0; i < seed.length; i += 1) {
+    hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+  }
+  return hash % modulo;
+}
+
+/**
+ * Home «Материал недели» strip (4 cards).
+ * Rotates the hero weekly among recent posts - independent of admin Blog Hero
+ * (`isFeatured`), which remains `/blog`-only. Rest = next newest excluding hero.
+ * SSR-stable within the same ISO week (no hydrate shuffle).
+ */
+export function pickHomeBlogStrip(
+  posts: BlogCardDto[],
+  opts?: { now?: Date; limit?: number; poolSize?: number },
+): { featured: BlogCardDto | null; rest: BlogCardDto[] } {
+  const limit = Math.max(1, opts?.limit ?? 4);
+  if (!posts.length) return { featured: null, rest: [] };
+
+  const poolSize = Math.max(1, Math.min(opts?.poolSize ?? 8, posts.length));
+  const pool = posts.slice(0, poolSize);
+  const week = isoWeekKey(opts?.now ?? new Date());
+  const featured = pool[stableIndex(`home-blog:${week}`, pool.length)]!;
+  const rest = posts.filter((post) => post.slug !== featured.slug).slice(0, limit - 1);
+  return { featured, rest };
+}
+
 /**
  * Per-reload feed order: keep one pinned hero, shuffle the rest.
  * Pin = first `isFeatured`, else editorial first card (SSR order).
