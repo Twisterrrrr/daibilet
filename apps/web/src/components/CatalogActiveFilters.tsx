@@ -6,6 +6,11 @@ import { X } from 'lucide-react';
 import { displayCatalogLabel } from '@/lib/catalog-labels';
 import { formatCatalogDateRangeLabel } from '@/lib/catalog-date-rail';
 import {
+  catalogExcludeThemeChip,
+  normalizeExcludeLandingList,
+  removeExcludeLanding,
+} from '@/lib/catalog-exclude-themes';
+import {
   AGE_FILTER_OPTIONS,
   buildCatalogHref,
   clearCatalogFilterKey,
@@ -41,29 +46,76 @@ export function CatalogActiveFilters({
   values: CatalogFilterValues;
   className?: string;
 }) {
-  const chips: Array<{ key: keyof CatalogFilterValues; label: string }> = [];
+  const chips: Array<{ key: string; label: string; href: string }> = [];
 
-  if (values.q?.trim()) chips.push({ key: 'q', label: `«${values.q.trim()}»` });
-  if (values.category) {
-    chips.push({ key: 'category', label: displayCatalogLabel(values.category) });
+  if (values.q?.trim()) {
+    chips.push({
+      key: 'q',
+      label: `«${values.q.trim()}»`,
+      href: buildCatalogHref(clearCatalogFilterKey(values, 'q')),
+    });
   }
-  if (values.landing) chips.push({ key: 'landing', label: values.landing });
+  if (values.category) {
+    chips.push({
+      key: 'category',
+      label: displayCatalogLabel(values.category),
+      href: buildCatalogHref(clearCatalogFilterKey(values, 'category')),
+    });
+  }
+  if (values.landing) {
+    chips.push({
+      key: 'landing',
+      label: values.landing,
+      href: buildCatalogHref(clearCatalogFilterKey(values, 'landing')),
+    });
+  }
+
+  for (const slug of normalizeExcludeLandingList(values.excludeLanding)) {
+    chips.push({
+      key: `exclude:${slug}`,
+      label: `без ${catalogExcludeThemeChip(slug)}`,
+      href: buildCatalogHref({
+        ...values,
+        excludeLanding: removeExcludeLanding(values.excludeLanding, slug),
+        page: undefined,
+      }),
+    });
+  }
 
   if (values.from || values.to) {
     const rangeLabel = formatCatalogDateRangeLabel(values.from, values.to)?.replace(/\u2014/g, '-');
     chips.push({
       key: 'from',
       label: rangeLabel || [values.from, values.to].filter(Boolean).join(' - '),
+      href: buildCatalogHref(clearCatalogFilterKey(values, 'from')),
     });
   } else if (values.date) {
     const dateLabel = humanDateChipLabel(values.date);
-    if (dateLabel) chips.push({ key: 'date', label: dateLabel });
+    if (dateLabel) {
+      chips.push({
+        key: 'date',
+        label: dateLabel,
+        href: buildCatalogHref(clearCatalogFilterKey(values, 'date')),
+      });
+    }
   }
 
   // «Бесплатно» lives on the quick chip row.
   if (!(values.minPrice === 0 && values.maxPrice === 0)) {
-    if (values.minPrice != null) chips.push({ key: 'minPrice', label: `от ${values.minPrice} ₽` });
-    if (values.maxPrice != null) chips.push({ key: 'maxPrice', label: `до ${values.maxPrice} ₽` });
+    if (values.minPrice != null) {
+      chips.push({
+        key: 'minPrice',
+        label: `от ${values.minPrice} ₽`,
+        href: buildCatalogHref(clearCatalogFilterKey(values, 'minPrice')),
+      });
+    }
+    if (values.maxPrice != null) {
+      chips.push({
+        key: 'maxPrice',
+        label: `до ${values.maxPrice} ₽`,
+        href: buildCatalogHref(clearCatalogFilterKey(values, 'maxPrice')),
+      });
+    }
   }
   // «С детьми» (ageMax=12) lives on the quick chip row.
   if (values.ageMax != null && values.ageMax >= 0 && values.ageMax !== 12) {
@@ -71,6 +123,7 @@ export function CatalogActiveFilters({
     chips.push({
       key: 'ageMax',
       label: ageLabel ? `Возраст ${ageLabel}` : `до ${values.ageMax}+`,
+      href: buildCatalogHref(clearCatalogFilterKey(values, 'ageMax')),
     });
   }
 
@@ -85,7 +138,7 @@ export function CatalogActiveFilters({
       {chips.map((chip) => (
         <Link
           key={`${chip.key}:${chip.label}`}
-          href={buildCatalogHref(clearCatalogFilterKey(values, chip.key))}
+          href={chip.href}
           className="inline-flex items-center gap-1 text-graphite transition hover:text-primary"
         >
           <span>{chip.label}</span>

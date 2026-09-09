@@ -155,6 +155,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
       city: query.city,
       category: query.category,
       landing: query.landing,
+      excludeLanding: query.excludeLanding,
       date: query.date,
       from: query.from,
       to: query.to,

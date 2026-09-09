@@ -1366,6 +1366,17 @@ function filterSessions(sessions, searchParams) {
   const city = searchParams.get('city');
   const category = searchParams.get('category');
   const landing = searchParams.get('landing');
+  const excludeLandingSet = new Set(
+    [
+      ...searchParams.getAll('excludeLanding'),
+      ...String(searchParams.get('excludeLanding') || '')
+        .split(',')
+        .map((item) => item.trim())
+        .filter(Boolean),
+    ]
+      .map((slug) => String(slug || '').trim().toLowerCase())
+      .filter(Boolean),
+  );
   const date = searchParams.get('date');
   const sort = searchParams.get('sort') || 'time';
   const maxPrice = Number(searchParams.get('maxPrice'));
@@ -1381,6 +1392,12 @@ function filterSessions(sessions, searchParams) {
     if (city && city !== 'all' && session.city !== city && session.destination !== city) return false;
     if (category && category !== 'all' && session.category !== category && !(session.tags || []).includes(category)) return false;
     if (landing && landing !== 'all' && !(session.landingSlugs || []).includes(landing)) return false;
+    if (excludeLandingSet.size) {
+      const sessionLandings = (session.landingSlugs || []).map((slug) =>
+        String(slug || '').trim().toLowerCase(),
+      );
+      if (sessionLandings.some((slug) => excludeLandingSet.has(slug))) return false;
+    }
     if (dateFrom || dateTo) {
       if (!matchesFallbackCatalogDateRange(session, dateFrom, dateTo)) return false;
     } else if (date && date !== 'all' && !matchesSessionDate(session, date)) return false;

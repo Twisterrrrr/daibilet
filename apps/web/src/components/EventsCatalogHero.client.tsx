@@ -38,6 +38,7 @@ export function EventsCatalogHero() {
       city: searchParams.get('city') || undefined,
       category: searchParams.get('category') || undefined,
       landing: searchParams.get('landing') || undefined,
+      excludeLanding: searchParams.get('excludeLanding') || undefined,
       date: searchParams.get('date') || undefined,
       from: searchParams.get('from') || undefined,
       to: searchParams.get('to') || undefined,

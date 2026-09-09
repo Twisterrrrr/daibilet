@@ -906,7 +906,9 @@ function matchesCatalogCity(session: PublicSessionDto, city: string): boolean {
 function matchesCatalogQuery(
   session: PublicSessionDto,
   query: PublicCatalogQuery,
-  ignore: Partial<Record<'city' | 'category' | 'landing' | 'date' | 'price' | 'age' | 'q', boolean>> = {},
+  ignore: Partial<
+    Record<'city' | 'category' | 'landing' | 'excludeLanding' | 'date' | 'price' | 'age' | 'q', boolean>
+  > = {},
 ): boolean {
   if (query.ids?.length) {
     const keys = new Set(query.ids);
@@ -935,6 +937,15 @@ function matchesCatalogQuery(
   ) {
     return false;
   }
+  if (!ignore.excludeLanding && query.excludeLanding?.length) {
+    const excluded = new Set(
+      query.excludeLanding.map((slug) => String(slug || '').trim().toLowerCase()).filter(Boolean),
+    );
+    const sessionLandings = (session.landingSlugs || []).map((slug) =>
+      String(slug || '').trim().toLowerCase(),
+    );
+    if (sessionLandings.some((slug) => excluded.has(slug))) return false;
+  }
   if (!ignore.date && query.date && query.date !== 'all' && !sessionMatchesCatalogPresetDate(session, query.date)) {
     return false;
   }
@@ -962,7 +973,10 @@ function buildConditionalCatalogFacets(
 ): PublicCatalogDto['facets'] {
   const forCities = sessions.filter((session) => matchesCatalogQuery(session, query, { city: true }));
   const forCategories = sessions.filter((session) => matchesCatalogQuery(session, query, { category: true }));
-  const forLandings = sessions.filter((session) => matchesCatalogQuery(session, query, { landing: true }));
+  // Keep theme counts visible while excludeLanding is on so chips stay toggleable.
+  const forLandings = sessions.filter((session) =>
+    matchesCatalogQuery(session, query, { landing: true, excludeLanding: true }),
+  );
   const forPrice = sessions.filter((session) => matchesCatalogQuery(session, query, { price: true }));
   const forSubcategories = forCategories;
 
@@ -998,6 +1012,7 @@ function catalogRandomSeed(query: PublicCatalogQuery): number {
     query.city || '',
     query.category || '',
     query.landing || '',
+    Array.isArray(query.excludeLanding) ? [...query.excludeLanding].sort().join(',') : '',
     query.q || '',
     query.date || '',
     query.from || '',

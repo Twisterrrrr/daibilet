@@ -4359,6 +4359,17 @@ export async function buildCatalogSessions(db, searchParams) {
   const city = searchParams.get('city');
   const category = searchParams.get('category');
   const landing = searchParams.get('landing');
+  const excludeLandingSet = new Set(
+    [
+      ...searchParams.getAll('excludeLanding'),
+      ...String(searchParams.get('excludeLanding') || '')
+        .split(',')
+        .map((item) => item.trim())
+        .filter(Boolean),
+    ]
+      .map((slug) => String(slug || '').trim().toLowerCase())
+      .filter(Boolean),
+  );
   const date = searchParams.get('date');
   const sort = searchParams.get('sort') || 'time';
   const maxPriceRaw = searchParams.get('maxPrice');
@@ -4382,6 +4393,12 @@ export async function buildCatalogSessions(db, searchParams) {
     if (city && city !== 'all' && session.city !== city && session.destination !== city) return false;
     if (category && category !== 'all' && session.category !== category && !pickCatalogSubcategories(session).includes(category)) return false;
     if (landing && landing !== 'all' && !(session.landingSlugs || []).includes(landing)) return false;
+    if (excludeLandingSet.size) {
+      const sessionLandings = (session.landingSlugs || []).map((slug) =>
+        String(slug || '').trim().toLowerCase(),
+      );
+      if (sessionLandings.some((slug) => excludeLandingSet.has(slug))) return false;
+    }
     if (dateFrom || dateTo) {
       if (!matchesCatalogDateRange(session, dateFrom, dateTo)) return false;
     } else if (date && date !== 'all' && !matchesCatalogDate(session, date)) return false;
@@ -5523,7 +5540,7 @@ function buildProviderWidgetPayload(row) {
     return {
       provider,
       tepEventId,
-      tepWidgetId: process.env.TEP_WIDGET_ID || '14208',
+      tepWidgetId: process.env.TEP_WIDGET_ID || '14460',
     };
   }
 
@@ -7922,7 +7939,7 @@ function buildTeplohodUrl(eventExternalId) {
   if (!eventExternalId) return null;
   const eventId = String(eventExternalId).replace(/^tep-/i, '').trim();
   if (!/^\d+$/.test(eventId)) return null;
-  const widgetId = String(process.env.TEP_WIDGET_ID || '14208').trim() || '14208';
+  const widgetId = String(process.env.TEP_WIDGET_ID || '14460').trim() || '14460';
   // teplohod.info/event/{id} currently returns "Ошибка!"; working checkout is account.teplohod.info.
   const checkoutBase = (process.env.TEP_CHECKOUT_BASE_URL || 'https://account.teplohod.info').replace(/\/+$/, '');
   const url = new URL(`${checkoutBase}/order/event-order`);

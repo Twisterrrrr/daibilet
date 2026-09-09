@@ -1,3 +1,20 @@
+## 2026-09-09 - UX2: быстрый exclude тем на /events
+
+### Наблюдения
+- Owner: перенасыщение стендапом/речными; нужен быстрый «убрать тему», не полный redesign фильтров.
+- H1 «События: …» + маркетинговая подпись уже заменены ранее (`Экскурсии в {городе}` + chips с ×).
+- Date rail стрелки md+ уже в ветке (`d23cb09a`).
+
+### Решения
+- Query `excludeLanding` (csv) end-to-end: contracts schema → backend match → web URL/RSC fetch.
+- UI ряд «Скрыть»: curated slugs `standup`, `river-cruises`, `river-party`, `bus-tours`, `concerts-genre` (только если facet > 0 или уже excluded).
+- Active chips: `без Стендап` с ×; include-`landing=` сбрасывает excludes.
+
+### Проблемы
+- Пока нет web deploy - на live чипов «Скрыть» не будет.
+
+---
+
 ## 2026-09-09 - AI rewrite markdown leak на PDP
 
 ### Наблюдения

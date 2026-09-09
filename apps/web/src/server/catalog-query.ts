@@ -25,6 +25,7 @@ export function catalogFiltersCacheKey(
     city?: string;
     category?: string;
     landing?: string;
+    excludeLanding?: string[] | string;
     date?: string;
     from?: string;
     to?: string;
@@ -36,11 +37,21 @@ export function catalogFiltersCacheKey(
   },
   page: number,
 ): string {
+  const exclude =
+    Array.isArray(filters.excludeLanding)
+      ? [...filters.excludeLanding].map((s) => String(s).trim().toLowerCase()).filter(Boolean).sort().join(',')
+      : String(filters.excludeLanding || '')
+          .split(',')
+          .map((s) => s.trim().toLowerCase())
+          .filter(Boolean)
+          .sort()
+          .join(',');
   return catalogQueryCacheKey({
     q: filters.q,
     city: filters.city,
     category: filters.category,
     landing: filters.landing,
+    excludeLanding: exclude ? exclude.split(',') : undefined,
     date: filters.date,
     from: filters.from,
     to: filters.to,
@@ -56,11 +67,15 @@ export function catalogFiltersCacheKey(
 /** Stable cache key for catalog SSR / client skip-fetch alignment. */
 export function catalogQueryCacheKey(query: PublicCatalogQuery & { page?: number }): string {
   const limit = query.limit ?? CATALOG_PAGE_SIZE_DEFAULT;
+  const excludeLanding = Array.isArray(query.excludeLanding)
+    ? [...query.excludeLanding].map((s) => String(s).trim().toLowerCase()).filter(Boolean).sort().join(',')
+    : '';
   const normalized = {
     q: query.q ?? '',
     city: query.city ?? '',
     category: query.category ?? '',
     landing: query.landing ?? '',
+    excludeLanding,
     date: query.date ?? '',
     from: query.from ?? '',
     to: query.to ?? '',
@@ -160,6 +175,7 @@ export function buildCatalogApiSearchParams(
     city?: string;
     category?: string;
     landing?: string;
+    excludeLanding?: string[] | string;
     date?: string;
     from?: string;
     to?: string;
@@ -177,6 +193,14 @@ export function buildCatalogApiSearchParams(
   if (filters.city) params.set('city', filters.city);
   if (filters.category) params.set('category', filters.category);
   if (filters.landing) params.set('landing', filters.landing);
+  const exclude = Array.isArray(filters.excludeLanding)
+    ? [...filters.excludeLanding].map((s) => String(s).trim().toLowerCase()).filter(Boolean).sort()
+    : String(filters.excludeLanding || '')
+        .split(',')
+        .map((s) => s.trim().toLowerCase())
+        .filter(Boolean)
+        .sort();
+  if (exclude.length) params.set('excludeLanding', exclude.join(','));
   if (filters.date && filters.date !== 'all') params.set('date', filters.date);
   if (filters.from) params.set('from', filters.from);
   if (filters.to) params.set('to', filters.to);

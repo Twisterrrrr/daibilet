@@ -27,6 +27,7 @@
 | UX2.GRID-FEATURED | Ритм `/events` featured/bento | Высокий | ❌ rolled back owner 2026-09-09 - ровная сетка |
 | UX2.TYPE-CARD | Иерархия EventCard (часть W3 в bento) | Высокий | ❌ rolled back вместе с GRID |
 | UX2.FIND-SUGGEST | Typeahead city/category на FilterRail | Средний | ⏳ deferred |
+| UX2.EXCLUDE-THEMES | `/events`: быстрые «Скрыть» chips (standup/river/bus/…) → `excludeLanding`; H1 «Категория в городе» + chips с ×; date rail стрелки md+ | Высокий | ✅ code; live после batch Deploy MSK web |
 | UX2.BLOG-LIST-IMG | `/blog` listing: sidecar chain card→thumb→og + BlogCardSafeImage везде + aspect/quality | Средний | ✅ |
 | UX2.SMOKE | Preview: `/preview-cards` = flat grid smoke | Средний | ✅ flat after rollback |
 | UX2.FEATURED-TEASER | Bento hero teaser | Высокий | ❌ rolled back с GRID |

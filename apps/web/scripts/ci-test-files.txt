@@ -1,7 +1,10 @@
 # CI allowlist: stable logic tests (no hub packs / image inventory / TZ-sensitive venue slots).
 # Full suite: pnpm web:test — ~30 hub/content tests need refresh (tech debt).
 src/lib/catalog-date-rail.test.ts
+src/lib/catalog-exclude-landing-schema.test.ts
+src/lib/catalog-exclude-themes.test.ts
 src/lib/catalog-interstitials.test.ts
+src/lib/events-catalog-heading.test.ts
 src/lib/chunk-load-recovery.test.ts
 src/lib/city-declension.test.ts
 src/lib/city-place-href.test.ts

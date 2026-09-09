@@ -33,6 +33,8 @@ export const publicCatalogQuerySchema = paginationQuerySchema.extend({
   category: optionalString,
   tag: optionalString,
   landing: optionalString,
+  /** Comma / repeated: hide sessions tagged with these landing slugs (e.g. standup,river-cruises). */
+  excludeLanding: csvIdList,
   date: optionalString,
   from: optionalString,
   to: optionalString,

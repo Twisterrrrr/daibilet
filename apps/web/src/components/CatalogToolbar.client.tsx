@@ -11,6 +11,7 @@ import { CatalogSidebarDateFilters } from '@/components/CatalogSidebarDateFilter
 import { CatalogAdvancedFiltersInline } from '@/components/CatalogAdvancedFiltersInline.client';
 import { CatalogDateRail } from '@/components/CatalogDateRail.client';
 import { CatalogDrawerApplyFooter } from '@/components/CatalogDrawerApplyFooter.client';
+import { CatalogExcludeThemes } from '@/components/CatalogExcludeThemes.client';
 import { CatalogMobileQuickFilters } from '@/components/CatalogMobileQuickFilters.client';
 import { CatalogPriceRange } from '@/components/CatalogPriceRange.client';
 import {
@@ -225,6 +226,15 @@ export function CatalogToolbar({
     </div>
   );
 
+  const excludeThemesRow = (
+    <CatalogExcludeThemes
+      filters={effectiveFilters}
+      landings={facets.landings || []}
+      disabled={disabled}
+      onNavigate={catalogNavigate}
+    />
+  );
+
   const advancedPanel = filtersOpen ? (
     <CatalogAdvancedFiltersPanel
       open={filtersOpen}
@@ -281,6 +291,7 @@ export function CatalogToolbar({
             onClick={() => setFiltersOpen(true)}
           />
         </div>
+        {excludeThemesRow}
         {advancedPanel}
         <MoreCategoriesSheet
           open={categoriesMoreOpen}
@@ -532,6 +543,7 @@ export function CatalogToolbar({
               onNavigate={navigate}
               onOpenAllFilters={() => openSidebarDrawerRef.current?.()}
             />
+            {excludeThemesRow}
             {children}
           </div>
         </CatalogSidebarLayout>
@@ -670,7 +682,10 @@ export function CatalogToolbar({
         </form>
 
         {/* Desktop sticky: categories + sort (date rail lives in EventsCatalogHero). */}
-        <div className="hidden md:block">{discoveryRow}</div>
+        <div className="hidden space-y-2 md:block">
+          {discoveryRow}
+          {excludeThemesRow}
+        </div>
       </div>
 
       {advancedPanel}
@@ -1285,6 +1300,7 @@ function mergeAdvancedFilters(
   const minPrice = next.minPrice === 'all' ? undefined : Number(next.minPrice);
   const maxPrice = next.maxPrice === 'all' ? undefined : Number(next.maxPrice);
   const hasRange = Boolean(next.dateFrom || next.dateTo);
+  const landing = next.landing === 'all' ? undefined : next.landing;
   return {
     ...filters,
     q: qDraft.trim() || filters.q,
@@ -1294,7 +1310,9 @@ function mergeAdvancedFilters(
     minPrice: Number.isFinite(minPrice) ? minPrice : undefined,
     maxPrice: Number.isFinite(maxPrice) ? maxPrice : undefined,
     ageMax: next.ageMax >= 0 ? next.ageMax : undefined,
-    landing: next.landing === 'all' ? undefined : next.landing,
+    landing,
+    // Include-landing and exclude themes conflict - drop excludes when pinning a landing.
+    excludeLanding: landing ? undefined : filters.excludeLanding,
     page: undefined,
   };
 }
@@ -1313,19 +1331,5 @@ function applyAdvanced(
     landing: string;
   },
 ) {
-  const minPrice = next.minPrice === 'all' ? undefined : Number(next.minPrice);
-  const maxPrice = next.maxPrice === 'all' ? undefined : Number(next.maxPrice);
-  const hasRange = Boolean(next.dateFrom || next.dateTo);
-  navigate({
-    ...filters,
-    q: qDraft.trim() || filters.q,
-    date: hasRange ? undefined : next.date || undefined,
-    from: next.dateFrom || undefined,
-    to: next.dateTo || undefined,
-    minPrice: Number.isFinite(minPrice) ? minPrice : undefined,
-    maxPrice: Number.isFinite(maxPrice) ? maxPrice : undefined,
-    ageMax: next.ageMax >= 0 ? next.ageMax : undefined,
-    landing: next.landing === 'all' ? undefined : next.landing,
-    page: undefined,
-  });
+  navigate(mergeAdvancedFilters(filters, qDraft, next));
 }

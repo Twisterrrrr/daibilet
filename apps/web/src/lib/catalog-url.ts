@@ -10,6 +10,8 @@ export interface CatalogFilterValues {
   city?: string;
   category?: string;
   landing?: string;
+  /** Hide sessions that carry these landing slugs (standup, river-cruises, …). */
+  excludeLanding?: string[] | string;
   date?: string;
   from?: string;
   to?: string;
@@ -19,6 +21,22 @@ export interface CatalogFilterValues {
   maxPrice?: number;
   ageMax?: number;
   page?: number;
+}
+
+export function normalizeExcludeLandingParam(raw?: string[] | string | null): string[] {
+  if (raw == null || raw === '') return [];
+  const parts = Array.isArray(raw)
+    ? raw.flatMap((item) => String(item).split(','))
+    : String(raw).split(',');
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const part of parts) {
+    const slug = String(part || '').trim().toLowerCase();
+    if (!slug || seen.has(slug)) continue;
+    seen.add(slug);
+    out.push(slug);
+  }
+  return out.slice(0, 12);
 }
 
 export const CATALOG_SORT_OPTIONS: Array<{ value: CatalogSort; label: string }> = [
@@ -65,11 +83,13 @@ export const AGE_FILTER_OPTIONS = [
 ] as const;
 
 export function catalogFiltersFromQuery(query: CatalogFilterValues): CatalogFilterValues {
+  const excludeLanding = normalizeExcludeLandingParam(query.excludeLanding);
   return {
     q: query.q || undefined,
     city: query.city && query.city !== 'all' ? query.city : undefined,
     category: query.category && query.category !== 'all' ? query.category : undefined,
     landing: query.landing && query.landing !== 'all' ? query.landing : undefined,
+    excludeLanding: excludeLanding.length ? excludeLanding : undefined,
     date: query.date && query.date !== 'all' ? query.date : undefined,
     from: query.from || undefined,
     to: query.to || undefined,
@@ -89,6 +109,8 @@ export function buildCatalogHref(values: CatalogFilterValues): string {
   if (values.city) params.set('city', values.city);
   if (values.category) params.set('category', values.category);
   if (values.landing) params.set('landing', values.landing);
+  const excludeLanding = normalizeExcludeLandingParam(values.excludeLanding);
+  if (excludeLanding.length) params.set('excludeLanding', excludeLanding.join(','));
   if (values.date) params.set('date', values.date);
   if (values.from) params.set('from', values.from);
   if (values.to) params.set('to', values.to);
@@ -196,6 +218,7 @@ export function clearCatalogFilterKey(
   if (key === 'city') delete next.city;
   if (key === 'category') delete next.category;
   if (key === 'landing') delete next.landing;
+  if (key === 'excludeLanding') delete next.excludeLanding;
   if (key === 'date') delete next.date;
   if (key === 'from') {
     delete next.from;
@@ -226,5 +249,7 @@ export function countAdvancedFilters(values: CatalogFilterValues): number {
   if (values.minPrice != null || values.maxPrice != null) count += 1;
   if (values.ageMax != null && values.ageMax >= 0) count += 1;
   if (values.landing) count += 1;
+  const excluded = normalizeExcludeLandingParam(values.excludeLanding);
+  if (excluded.length) count += excluded.length;
   return count;
 }
