@@ -20,8 +20,8 @@
 | UX2.FIND-SUGGEST | Typeahead city/category на FilterRail (после W1-W3) | Средний | ⏳ blocked smoke |
 | UX2.BLOG-LIST-IMG | `/blog` listing: sidecar chain card→thumb→og + BlogCardSafeImage везде + aspect/quality | Средний | ✅ |
 | UX2.SMOKE | Preview smoke: `/preview-cards` (мок featured) → `/events`, `/cities/perm`, `/blog` | Высокий | ✅ `8d86eb91` + Deploy MSK [34324117163](https://github.com/Twisterrrrr/daibilet/actions/runs/34324117163) |
-| UX2.FEATURED-TEASER | Bento hero: 1–2 абзаца teaser + denser fallback (без белой дыры) | Высокий | 🔄 commit+deploy |
-| UX2.HOME-BLOG-ROTATE | Home «Материал недели»: weekly rotate, не sticky isFeatured | Высокий | 🔄 commit+deploy |
+| UX2.FEATURED-TEASER | Bento hero: 1–2 абзаца teaser + denser fallback (без белой дыры) | Высокий | ✅ `c913c885` + Deploy MSK [34365835832](https://github.com/Twisterrrrr/daibilet/actions/runs/34365835832) |
+| UX2.HOME-BLOG-ROTATE | Home «Материал недели»: weekly rotate, не sticky isFeatured | Высокий | ✅ `c913c885` + Deploy MSK [34365835832](https://github.com/Twisterrrrr/daibilet/actions/runs/34365835832) |
 
 ## 2026-09-03 - Live ISR 500 (SiteLayout cookies)
 
