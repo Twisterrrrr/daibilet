@@ -617,8 +617,8 @@ export function EventHero({
     <div
       className={`relative isolate grid w-full min-w-0 overflow-hidden bg-slate-900 aspect-[3/4] md:aspect-auto ${
         longHeroTitle
-          ? 'md:min-h-[26rem] lg:min-h-[28rem]'
-          : 'md:min-h-[24rem] lg:min-h-[420px]'
+          ? 'md:min-h-[40rem] lg:min-h-[28rem]'
+          : 'md:min-h-[36rem] lg:min-h-[420px]'
       }`}
     >
       <EventPageCitySync city={event.city} />
@@ -638,139 +638,144 @@ export function EventHero({
       />
       <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/45 to-slate-900/25" />
 
-      {/* Tablet+: taller hero + stronger top padding so copy sits lower (desktop-like), not vertically centered. */}
-      <div className="container-page absolute inset-0 z-10 flex min-w-0 flex-col justify-end pb-5 pt-20 md:pb-5 md:pt-28 lg:pb-8 lg:pt-24">
-        {/* 1. Breadcrumbs without event title (last crumb sr-only for a11y; JSON-LD stays full). */}
-        <nav aria-label="Хлебные крошки" className="mb-2 flex min-w-0 flex-wrap items-center gap-1.5 text-sm text-white/70">
-          {trailCrumbs.map((crumb, index) => (
-            <span key={`${crumb.path}:${index}`} className="inline-flex shrink-0 items-center gap-1.5">
-              {index > 0 ? <ChevronRight className="h-3.5 w-3.5" aria-hidden /> : null}
-              <Link href={crumb.path} className="transition hover:text-white">
-                {crumb.name}
-              </Link>
-            </span>
-          ))}
-          {currentCrumb ? <span className="sr-only">{currentCrumb.name}</span> : null}
-        </nav>
+      {/*
+        Tablet (md…lg): taller hero + top >> bottom so copy sits low like desktop.
+        mt-auto (not justify-end): pt-* remains a real top inset when the block is tall.
+      */}
+      <div className="container-page absolute inset-0 z-10 flex min-w-0 flex-col pb-4 pt-16 md:pb-4 md:pt-44 lg:pb-8 lg:pt-24">
+        <div className="mt-auto min-w-0">
+          {/* 1. Breadcrumbs without event title (last crumb sr-only for a11y; JSON-LD stays full). */}
+          <nav aria-label="Хлебные крошки" className="mb-2 flex min-w-0 flex-wrap items-center gap-1.5 text-sm text-white/70">
+            {trailCrumbs.map((crumb, index) => (
+              <span key={`${crumb.path}:${index}`} className="inline-flex shrink-0 items-center gap-1.5">
+                {index > 0 ? <ChevronRight className="h-3.5 w-3.5" aria-hidden /> : null}
+                <Link href={crumb.path} className="transition hover:text-white">
+                  {crumb.name}
+                </Link>
+              </span>
+            ))}
+            {currentCrumb ? <span className="sr-only">{currentCrumb.name}</span> : null}
+          </nav>
 
-        <div className="flex min-w-0 items-end justify-between gap-4">
-          <div className="min-w-0 max-w-3xl">
-            {/* 2. Category / type - readable, not full-width giant caps */}
-            <div className="mb-1.5 flex flex-wrap items-center gap-2">
-              {event.category ? (
-                <p className="text-[11px] font-medium uppercase tracking-wide text-white/70">
-                  {event.category}
-                </p>
+          <div className="flex min-w-0 items-end justify-between gap-4">
+            <div className="min-w-0 max-w-3xl">
+              {/* 2. Category / type - readable, not full-width giant caps */}
+              <div className="mb-1.5 flex flex-wrap items-center gap-2">
+                {event.category ? (
+                  <p className="text-[11px] font-medium uppercase tracking-wide text-white/70">
+                    {event.category}
+                  </p>
+                ) : null}
+                {aggregate ? (
+                  <span className="hidden md:inline-flex">
+                    <EventRatingBadge ratingValue={aggregate.ratingValue} reviewCount={aggregate.reviewCount} />
+                  </span>
+                ) : null}
+              </div>
+
+              {/* 3. Title */}
+              <h1
+                className={`font-bold leading-tight text-white break-normal ${
+                  longHeroTitle
+                    ? 'text-xl sm:text-3xl lg:text-4xl'
+                    : 'text-2xl sm:text-3xl lg:text-4xl'
+                }`}
+              >
+                {titleSplit ? (
+                  <>
+                    {titleSplit.lead}
+                    {titleSplit.mark}
+                    <br />
+                    {titleSplit.tail}
+                  </>
+                ) : (
+                  heroTitle
+                )}
+              </h1>
+
+              {/* 4. Location + age */}
+              {(placeLabel && !placeDuplicatesAddress) || ageLimit || oldPrice ? (
+                <div className="mt-3 flex min-w-0 flex-wrap gap-1.5">
+                  {placeLabel && !placeDuplicatesAddress ? (
+                    venuePageHref ? (
+                      <Link href={venuePageHref} className={solidChipLinkClassName}>
+                        <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.75} />
+                        <span className="truncate">{placeLabel}</span>
+                      </Link>
+                    ) : (
+                      <span className={solidChipClassName}>
+                        <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.75} />
+                        <span className="truncate">{placeLabel}</span>
+                      </span>
+                    )
+                  ) : null}
+                  {ageLimit ? (
+                    <span className={solidChipClassName}>
+                      <Users className="h-3 w-3" strokeWidth={1.75} />
+                      {ageLimit}
+                    </span>
+                  ) : null}
+                  {oldPrice ? (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/95 px-2.5 py-1 text-[11px] font-semibold text-slate-900">
+                      <Percent className="h-3 w-3" strokeWidth={1.75} />
+                      Скидка
+                    </span>
+                  ) : null}
+                </div>
               ) : null}
-              {aggregate ? (
-                <span className="hidden md:inline-flex">
-                  <EventRatingBadge ratingValue={aggregate.ratingValue} reviewCount={aggregate.reviewCount} />
-                </span>
+
+              {/* 5. Price min-max range (not only «от») */}
+              {priceRange || fallbackPrice ? (
+                <div className="mt-3 flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
+                  <span className="break-words text-2xl font-bold text-white sm:text-3xl">
+                    {priceRange ? formatBuyCardPrice(priceRange) : `от ${fallbackPrice}`}
+                  </span>
+                  {oldPrice ? (
+                    <span className="text-sm text-white/55 line-through">{formatPriceRub(oldPrice)}</span>
+                  ) : null}
+                </div>
+              ) : null}
+
+              {/* 6. Nearest slot */}
+              {nearestLabel ? (
+                <div className="mt-3 flex min-w-0 items-center gap-1.5 text-sm text-white/85 sm:mt-4">
+                  <Calendar className="h-4 w-4 shrink-0" strokeWidth={1.75} />
+                  <span className="min-w-0">{nearestLabel}</span>
+                </div>
+              ) : null}
+
+              {/* 7. Street + house, own left-aligned line (not the full index address). */}
+              {venueStreetAddress ? (
+                canOpenVenueModal ? (
+                  <EventVenueTrigger
+                    event={event}
+                    className={`flex w-full min-w-0 items-start justify-start gap-1.5 text-left text-sm text-white/85 underline decoration-white/30 underline-offset-2 hover:text-white ${
+                      nearestLabel ? 'mt-1.5' : 'mt-3 sm:mt-4'
+                    }`}
+                  >
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.75} />
+                    <span className="min-w-0 break-words">{venueStreetAddress}</span>
+                  </EventVenueTrigger>
+                ) : (
+                  <span
+                    className={`flex w-full min-w-0 items-start justify-start gap-1.5 text-left text-sm text-white/85 ${
+                      nearestLabel ? 'mt-1.5' : 'mt-3 sm:mt-4'
+                    }`}
+                  >
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.75} />
+                    <span className="min-w-0 break-words">{venueStreetAddress}</span>
+                  </span>
+                )
               ) : null}
             </div>
 
-            {/* 3. Title */}
-            <h1
-              className={`font-bold leading-tight text-white break-normal ${
-                longHeroTitle
-                  ? 'text-xl sm:text-3xl lg:text-4xl'
-                  : 'text-2xl sm:text-3xl lg:text-4xl'
-              }`}
-            >
-              {titleSplit ? (
-                <>
-                  {titleSplit.lead}
-                  {titleSplit.mark}
-                  <br />
-                  {titleSplit.tail}
-                </>
-              ) : (
-                heroTitle
-              )}
-            </h1>
-
-            {/* 4. Location + age */}
-            {(placeLabel && !placeDuplicatesAddress) || ageLimit || oldPrice ? (
-              <div className="mt-3 flex min-w-0 flex-wrap gap-1.5">
-                {placeLabel && !placeDuplicatesAddress ? (
-                  venuePageHref ? (
-                    <Link href={venuePageHref} className={solidChipLinkClassName}>
-                      <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.75} />
-                      <span className="truncate">{placeLabel}</span>
-                    </Link>
-                  ) : (
-                    <span className={solidChipClassName}>
-                      <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.75} />
-                      <span className="truncate">{placeLabel}</span>
-                    </span>
-                  )
-                ) : null}
-                {ageLimit ? (
-                  <span className={solidChipClassName}>
-                    <Users className="h-3 w-3" strokeWidth={1.75} />
-                    {ageLimit}
-                  </span>
-                ) : null}
-                {oldPrice ? (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/95 px-2.5 py-1 text-[11px] font-semibold text-slate-900">
-                    <Percent className="h-3 w-3" strokeWidth={1.75} />
-                    Скидка
-                  </span>
-                ) : null}
+            {/* Sticky bar covers mobile; buy CTA only where sticky is hidden */}
+            {priceLabel ? (
+              <div className="hidden shrink-0 lg:block">
+                <EventHeroBuyButton payload={payload} priceLabel={priceLabel} />
               </div>
-            ) : null}
-
-            {/* 5. Price min-max range (not only «от») */}
-            {priceRange || fallbackPrice ? (
-              <div className="mt-3 flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
-                <span className="break-words text-2xl font-bold text-white sm:text-3xl">
-                  {priceRange ? formatBuyCardPrice(priceRange) : `от ${fallbackPrice}`}
-                </span>
-                {oldPrice ? (
-                  <span className="text-sm text-white/55 line-through">{formatPriceRub(oldPrice)}</span>
-                ) : null}
-              </div>
-            ) : null}
-
-            {/* 6. Nearest slot */}
-            {nearestLabel ? (
-              <div className="mt-3 flex min-w-0 items-center gap-1.5 text-sm text-white/85 sm:mt-4">
-                <Calendar className="h-4 w-4 shrink-0" strokeWidth={1.75} />
-                <span className="min-w-0">{nearestLabel}</span>
-              </div>
-            ) : null}
-
-            {/* 7. Street + house, own left-aligned line (not the full index address). */}
-            {venueStreetAddress ? (
-              canOpenVenueModal ? (
-                <EventVenueTrigger
-                  event={event}
-                  className={`flex w-full min-w-0 items-start justify-start gap-1.5 text-left text-sm text-white/85 underline decoration-white/30 underline-offset-2 hover:text-white ${
-                    nearestLabel ? 'mt-1.5' : 'mt-3 sm:mt-4'
-                  }`}
-                >
-                  <MapPin className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.75} />
-                  <span className="min-w-0 break-words">{venueStreetAddress}</span>
-                </EventVenueTrigger>
-              ) : (
-                <span
-                  className={`flex w-full min-w-0 items-start justify-start gap-1.5 text-left text-sm text-white/85 ${
-                    nearestLabel ? 'mt-1.5' : 'mt-3 sm:mt-4'
-                  }`}
-                >
-                  <MapPin className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.75} />
-                  <span className="min-w-0 break-words">{venueStreetAddress}</span>
-                </span>
-              )
             ) : null}
           </div>
-
-          {/* Sticky bar covers mobile; buy CTA only where sticky is hidden */}
-          {priceLabel ? (
-            <div className="hidden shrink-0 lg:block">
-              <EventHeroBuyButton payload={payload} priceLabel={priceLabel} />
-            </div>
-          ) : null}
         </div>
       </div>
     </div>
