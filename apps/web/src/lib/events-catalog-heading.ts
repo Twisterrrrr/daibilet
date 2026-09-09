@@ -17,8 +17,9 @@ export type EventsCatalogHeading = {
 };
 
 /**
- * Visible H1/subtitle for `/events` (not document title).
- * City lands in the H1 when known - never only as a weak subtitle dash after category.
+ * Visible H1 for `/events` (not document title).
+ * Category + city → «Экскурсии в Санкт-Петербурге». Date/price/etc. stay in removable chips, not H1/subtitle.
+ * Subtitle only for the empty hub (no city yet); filtered views use chips instead of marketing copy.
  */
 export function buildEventsCatalogHeading(input: EventsCatalogHeadingInput): EventsCatalogHeading {
   const q = String(input.q || '').trim();
@@ -31,39 +32,39 @@ export function buildEventsCatalogHeading(input: EventsCatalogHeadingInput): Eve
   if (q) {
     return {
       title: `Результаты поиска: «${q}»`,
-      subtitle: cityIn ? `Подборка по запросу ${cityIn}` : 'Подборка по запросу',
+      subtitle: '',
       filtered,
     };
   }
 
   if (category && cityIn) {
     return {
-      title: dateLabel ? `${category} ${cityIn}, ${dateLabel}` : `${category} ${cityIn}`,
-      subtitle: 'Билеты и расписание - выбирайте по дате и интересам',
+      title: `${category} ${cityIn}`,
+      subtitle: '',
       filtered,
     };
   }
 
   if (category) {
     return {
-      title: dateLabel ? `${category}, ${dateLabel}` : category,
-      subtitle: 'Укажите город в шапке - покажем только локальную афишу',
+      title: category,
+      subtitle: '',
       filtered,
     };
   }
 
   if (cityIn) {
     return {
-      title: dateLabel ? `Афиша ${cityIn}, ${dateLabel}` : `Афиша событий ${cityIn}`,
-      subtitle: 'Билеты и расписание - выбирайте по дате и интересам',
+      title: `Афиша событий ${cityIn}`,
+      subtitle: '',
       filtered,
     };
   }
 
   if (dateLabel) {
     return {
-      title: `Афиша на ${dateLabel.toLowerCase()}`,
-      subtitle: 'Сначала выберите город - покажем только актуальную афишу',
+      title: 'Афиша событий',
+      subtitle: '',
       filtered: true,
     };
   }

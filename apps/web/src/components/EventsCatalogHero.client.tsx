@@ -100,16 +100,13 @@ export function EventsCatalogHero() {
           >
             {title}
           </h1>
-          <p
-            className={
-              filtered
-                ? 'mt-1 text-sm leading-snug text-graphite-muted sm:text-[15px]'
-                : 'hidden text-sm leading-snug text-graphite-muted sm:mt-1 sm:block sm:text-[15px]'
-            }
-          >
-            {subtitle}
-          </p>
-          <CatalogActiveFilters values={chipValues} className="mt-3" />
+          {/* Filtered: chips with × replace marketing subtitle. Hub-only keeps a short hint. */}
+          {!filtered && subtitle ? (
+            <p className="hidden text-sm leading-snug text-graphite-muted sm:mt-1 sm:block sm:text-[15px]">
+              {subtitle}
+            </p>
+          ) : null}
+          <CatalogActiveFilters values={chipValues} className={filtered ? 'mt-2.5' : 'mt-3'} />
         </div>
       </div>
     </>

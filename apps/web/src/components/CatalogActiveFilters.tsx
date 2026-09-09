@@ -78,7 +78,7 @@ export function CatalogActiveFilters({
 
   return (
     <div
-      className={`flex items-center gap-2 overflow-x-auto py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:flex-wrap sm:overflow-visible ${className}`}
+      className={`flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm text-graphite-muted ${className}`}
       role="region"
       aria-label="Активные фильтры"
     >
@@ -86,10 +86,10 @@ export function CatalogActiveFilters({
         <Link
           key={`${chip.key}:${chip.label}`}
           href={buildCatalogHref(clearCatalogFilterKey(values, chip.key))}
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary transition hover:bg-primary/15"
+          className="inline-flex items-center gap-1 text-graphite transition hover:text-primary"
         >
-          {chip.label}
-          <X className="h-3.5 w-3.5 opacity-80" aria-hidden strokeWidth={2} />
+          <span>{chip.label}</span>
+          <X className="h-3.5 w-3.5 shrink-0 opacity-70" aria-hidden strokeWidth={2} />
           <span className="sr-only">Убрать фильтр</span>
         </Link>
       ))}
@@ -99,10 +99,9 @@ export function CatalogActiveFilters({
           sort: values.sort,
           limit: values.limit,
         })}
-        className="inline-flex shrink-0 items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold text-graphite-muted transition hover:bg-surface-muted hover:text-graphite"
+        className="inline-flex items-center gap-1 text-graphite-muted/80 transition hover:text-graphite"
       >
-        <X className="h-3.5 w-3.5" aria-hidden strokeWidth={1.75} />
-        Сбросить
+        Сбросить все
       </Link>
     </div>
   );
