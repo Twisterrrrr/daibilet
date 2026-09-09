@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-import { CatalogActiveFilters } from '@/components/CatalogActiveFilters';
 import { CatalogPaginationLinks } from '@/components/CatalogPaginationLinks';
 import { CatalogResults, ViewModeToggle } from '@/components/CatalogResults.client';
 import { CatalogSortSelect } from '@/components/CatalogSortSelect.client';
@@ -435,12 +434,8 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
       cityReady={cityReady || urlHasCity}
       layout="split"
     >
-      {/* Active chips: sm+ only - on mobile filters live in the drawer. */}
-      <div className="hidden sm:block">
-        <CatalogActiveFilters values={filterValues} />
-      </div>
-
-      {/* Count on sm+; sort + page size + view stay on one row. */}
+      {/* Count on sm+; sort + page size + view stay on one row.
+          Active filter chips live under H1 in EventsCatalogHero. */}
       <div
         id="catalog-results"
         className="catalog-meta-row mt-3 scroll-mt-[calc(var(--site-header-height)+5.5rem)] flex flex-col gap-2 sm:mt-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between"
