@@ -865,77 +865,6 @@ html[data-nav-pending='1'] {
     }
   }
 
-  /**
-   * Featured editorial unit (hero + 2 stack) - desktop only.
-   * Mobile/tablet never mounts this wrapper (JS flattens to equal cards + badge).
-   * Full-row span avoids the classic col-span-2 empty-cell hole in a 3-col grid.
-   */
-  .catalog-featured-cluster-item {
-    grid-column: 1 / -1;
-    list-style: none;
-  }
-
-  .catalog-featured-cluster {
-    display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-    grid-template-rows: 1fr 1fr;
-    align-items: stretch;
-    gap: 1.5rem 1.25rem;
-  }
-
-  .catalog-featured-cluster__hero {
-    grid-column: 1;
-    grid-row: 1 / -1;
-    min-width: 0;
-    min-height: 0;
-  }
-
-  .catalog-featured-cluster__stack {
-    display: grid;
-    grid-column: 2;
-    grid-row: 1 / -1;
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: 1fr 1fr;
-    min-width: 0;
-    min-height: 0;
-    gap: 1.5rem 1.25rem;
-  }
-
-  .catalog-featured-cluster__hero .event-card,
-  .catalog-featured-cluster__stack .event-card {
-    height: 100%;
-    min-height: 0;
-  }
-
-  /*
-   * Bento hero: photo absorbs leftover height from the two stack neighbors.
-   * Teaser keeps natural height (1–2 paragraphs) - never leave a white void in the body.
-   */
-  .catalog-featured-cluster__hero .event-card--featured [data-card-media] {
-    flex: 1 1 0%;
-    aspect-ratio: auto;
-    min-height: 11rem;
-    max-height: none;
-  }
-
-  .catalog-featured-cluster__hero .event-card--featured > div:not([data-card-media]) {
-    flex: 0 0 auto;
-  }
-
-  .catalog-featured-cluster__hero .event-card--featured [data-featured-teaser] {
-    flex: 0 0 auto;
-    overflow: hidden;
-  }
-
-  .catalog-featured-cluster__hero .event-card--featured [data-featured-teaser] p {
-    overflow-wrap: break-word;
-  }
-
-  .catalog-featured-cluster__stack > * {
-    min-width: 0;
-    min-height: 0;
-  }
-
   /** Event PDP: related cards — up to 5 per row on ultrawide. */
   .event-related-grid {
     display: grid;
@@ -1660,18 +1589,10 @@ html[data-nav-pending='1'] {
     @apply relative flex h-full flex-col overflow-hidden rounded-[14px] border border-slate-100 bg-white shadow-sm transition-all duration-200;
   }
 
-  .event-card--featured {
-    @apply border-primary/25 shadow-[0_8px_24px_rgba(15,23,42,0.07)] ring-1 ring-primary/15;
-  }
-
   @media (hover: hover) {
     .event-card:hover {
       transform: translateY(-4px);
       @apply border-slate-200/80 shadow-[0_12px_30px_rgba(15,23,42,0.08)];
-    }
-
-    .event-card--featured:hover {
-      @apply border-primary/35 shadow-[0_12px_30px_rgba(15,23,42,0.1)] ring-primary/25;
     }
   }
 

@@ -10,11 +10,7 @@ const COLLAPSED_GRID_GAP_PX = 20;
 /** SSR / hydrate snapshot: 2-col flat (tablet-safe). Desktop upgrades after hydrate. */
 const SERVER_CATALOG_COLUMNS = 2;
 
-/**
- * Mirrors `.catalog-card-grid`: 2 → lg:3 → 2xl:4.
- * Tablet stays at 2 → layout flattens featured to equal tiles (badge only).
- * Column count ≥3 unlocks magazine bento clusters on desktop.
- */
+/** Mirrors `.catalog-card-grid`: 2 → lg:3 → 2xl:4 (for interstitial banner spacing). */
 export function estimateCatalogGridColumns(
   viewportWidth: number,
   filtersCollapsed: boolean,
@@ -69,7 +65,7 @@ function getServerCatalogColumnsSnapshot(): number {
 }
 
 /**
- * Column count for featured packing.
+ * Column count for interstitial banner spacing.
  * Viewport estimate via useSyncExternalStore (SSR=2, no window in useState).
  * After mount, ResizeObserver refines from the real CSS grid.
  */

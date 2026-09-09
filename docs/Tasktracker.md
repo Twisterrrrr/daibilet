@@ -15,13 +15,14 @@
 | UX2.BRIEF | Brief UX Catalog 2.0: CLS/fade, grid rhythm, type hierarchy, find, blog listing | Высокий | ✅ docs |
 | UX2.PERF-FADE | SafeImage/CardSafeImage: skeleton + opacity fade onLoad; LCP priority без мигания | Критический | ✅ |
 | UX2.PERF-CLS | Жёсткий aspect media на всех листинг-карточках (events/hub/blog card); без прыжка сетки | Критический | ✅ aspect уже был; fade закрывает pop-in |
-| UX2.GRID-FEATURED | Ритм `/events`: tablet/mobile = flat + бейдж; lg+ magazine bento full-row (без col-span / contents) | Высокий | ✅ rebuild |
-| UX2.TYPE-CARD | Иерархия EventCard: title > price > muted meta + воздух; без смены Manrope/`fonts.ts` | Высокий | ✅ |
-| UX2.FIND-SUGGEST | Typeahead city/category на FilterRail (после W1-W3) | Средний | ⏳ blocked smoke |
+| UX2.GRID-FEATURED | Ритм `/events` featured/bento | Высокий | ❌ rolled back owner 2026-09-09 - ровная сетка |
+| UX2.TYPE-CARD | Иерархия EventCard (часть W3 в bento) | Высокий | ❌ rolled back вместе с GRID |
+| UX2.FIND-SUGGEST | Typeahead city/category на FilterRail | Средний | ⏳ deferred |
 | UX2.BLOG-LIST-IMG | `/blog` listing: sidecar chain card→thumb→og + BlogCardSafeImage везде + aspect/quality | Средний | ✅ |
-| UX2.SMOKE | Preview smoke: `/preview-cards` (мок featured) → `/events`, `/cities/perm`, `/blog` | Высокий | ✅ `8d86eb91` + Deploy MSK [34324117163](https://github.com/Twisterrrrr/daibilet/actions/runs/34324117163) |
-| UX2.FEATURED-TEASER | Bento hero: 1–2 абзаца teaser + denser fallback (без белой дыры) | Высокий | ✅ `c913c885` + Deploy MSK [34365835832](https://github.com/Twisterrrrr/daibilet/actions/runs/34365835832) |
+| UX2.SMOKE | Preview: `/preview-cards` = flat grid smoke | Средний | ✅ flat after rollback |
+| UX2.FEATURED-TEASER | Bento hero teaser | Высокий | ❌ rolled back с GRID |
 | UX2.HOME-BLOG-ROTATE | Home «Материал недели»: weekly rotate, не sticky isFeatured | Высокий | ✅ `c913c885` + Deploy MSK [34365835832](https://github.com/Twisterrrrr/daibilet/actions/runs/34365835832) |
+| UX2.GRID-ROLLBACK | `/events`: убрать featured cluster/bento/teaser; равные карточки как до UX2 GRID | Критический | 🔄 commit + Deploy MSK |
 
 ## 2026-09-03 - Live ISR 500 (SiteLayout cookies)
 

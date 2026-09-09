@@ -384,64 +384,6 @@ export function extractAddressFromListDescription(value?: string | null): string
   return formatListDescription(value);
 }
 
-/**
- * Featured bento hero: 1–2 marketing paragraphs under meta.
- * Prefers catalog description; falls back to short structural blurb so the
- * tall hero body is never a white void when TC text is missing/logistics.
- */
-export function resolveFeaturedCardTeaserLines(
-  description?: string | null,
-  fallback?: { category?: string | null; city?: string | null; venue?: string | null; duration?: string | null },
-): string[] {
-  const category = String(fallback?.category || '').trim();
-  const city = String(fallback?.city || '').trim();
-  const venue = String(fallback?.venue || '').trim();
-  const duration = String(fallback?.duration || '').trim();
-
-  const structuralSecond = (): string | null => {
-    if (duration) {
-      return `Ориентир по длительности - ${duration}. На странице события можно сравнить слоты, увидеть актуальную цену и сразу перейти к оформлению билета.`;
-    }
-    if (venue && city) {
-      return `Старт у «${venue}» в ${city}. Откройте карточку, чтобы выбрать удобное время и оформить билет без лишних переходов.`;
-    }
-    return 'На странице события - актуальные слоты, цена и детали площадки. Можно сравнить варианты и сразу перейти к покупке.';
-  };
-
-  if (description && !isLogisticsListDescription(description)) {
-    const raw = formatListDescription(description);
-    if (raw.length >= 40) {
-      const lines = splitListDescriptionSentences(description, 2).filter((line) => line.length >= 12);
-      if (lines.length >= 2) return lines.slice(0, 2);
-      if (lines.length === 1) return [lines[0]!, structuralSecond()!];
-      return [raw, structuralSecond()!];
-    }
-    if (raw.length >= 20) return [raw, structuralSecond()!];
-  }
-
-  if (!category && !city) return [];
-
-  const lines: string[] = [];
-  if (category && city) {
-    lines.push(
-      venue
-        ? `${category} в ${city}: спокойный сценарий с удобным стартом у «${venue}». Без суеты вокруг площадки - сразу к смыслу маршрута и понятным паузам.`
-        : `${category} в ${city}: ближайшие слоты и цена собраны на одной карточке, чтобы быстрее выбрать подходящий вариант.`,
-    );
-  } else if (category) {
-    lines.push(
-      `${category}: сравните время, площадку и стоимость до перехода к покупке. Короткий обзор без лишней логистики в ленте.`,
-    );
-  } else if (city) {
-    lines.push(
-      `Событие в ${city}: откройте карточку, чтобы выбрать слот и оформить билет. Детали площадки и актуальная цена - на следующей странице.`,
-    );
-  }
-  const second = structuralSecond();
-  if (second) lines.push(second);
-  return lines.slice(0, 2);
-}
-
 /** Стабильный псевдорейтинг 4.5–5.0 до ≥10 реальных отзывов (только UI). */
 export function resolvePseudoRating(seed: string): number {
   let hash = 0;

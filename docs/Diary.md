@@ -1,3 +1,18 @@
+## 2026-09-09 - UX Catalog: rollback featured/bento on /events
+
+### Наблюдения
+- Owner: UX 2.0 сетка на `/events` - «полный ужас» (bento/featured после сжатия контейнера давал неприятную вёрстку).
+
+### Решения
+- Откат GRID/TYPE/FEATURED-TEASER: `CatalogResults` снова равные плитки; удалены `CatalogFeaturedCluster`, `catalog-featured*`, teaser helper, CSS bento.
+- Сохранены: SafeImage fade (W1), blog listing budget (W5), home blog weekly rotate.
+- `/preview-cards` - flat smoke без featured.
+
+### Проблемы
+- Нужен Deploy MSK web, чтобы live `/events` совпал с веткой.
+
+---
+
 ## 2026-09-09 - Home blog strip: weekly rotate
 
 ### Наблюдения

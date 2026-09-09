@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { ArrowRight, Grid3X3, List, Table2 } from 'lucide-react';
 import { useMemo, useRef } from 'react';
 
-import { CatalogFeaturedCluster } from '@/components/CatalogFeaturedCluster';
 import { EventCard } from '@/components/EventCard';
 import { EventCardHorizontal } from '@/components/EventCardHorizontal';
 import { CatalogListRow } from '@/components/CatalogListRow.client';
@@ -27,12 +26,6 @@ import { useCatalogGridColumnCount } from '@/lib/catalog-grid-columns';
 import { collapseCatalogComboFamilies } from '@/lib/home-showcase-sections';
 import { CATALOG_IMAGE_QUALITY, IMAGE_SIZES, CardSafeImage } from '@/components/SafeImage.client';
 import { useCatalogFiltersLayout } from '@/components/CatalogSidebarLayout.client';
-import {
-  layoutCatalogFeaturedUnits,
-  packCatalogFeaturedUnits,
-  pickCatalogFeaturedIds,
-  type CatalogFeaturedUnit,
-} from '@/lib/catalog-featured';
 
 /** First N catalog cards load images eagerly (LCP / perceived speed). */
 const CATALOG_IMAGE_PRIORITY_COUNT = 9;
@@ -77,36 +70,29 @@ function isCurrentEmptyHubCity(
 }
 
 type CatalogGridEntry =
-  | { kind: 'unit'; unit: CatalogFeaturedUnit }
+  | { kind: 'event'; session: PublicCatalogListItemDto }
   | { kind: 'banner'; banner: CatalogInterstitial };
 
-function unitEventCount(unit: CatalogFeaturedUnit): number {
-  return unit.kind === 'cluster' ? 3 : 1;
-}
-
 function buildCatalogGridEntries(
-  units: CatalogFeaturedUnit[],
+  items: PublicCatalogListItemDto[],
   city?: string | null,
   columnsPerRow = 4,
 ): CatalogGridEntry[] {
   const banners = catalogInterstitialsForCity(city);
   const every = catalogInterstitialInterval(columnsPerRow);
-  const totalEvents = units.reduce((sum, unit) => sum + unitEventCount(unit), 0);
-  if (!banners.length || totalEvents < every) {
-    return units.map((unit) => ({ kind: 'unit' as const, unit }));
+  if (!banners.length || items.length < every) {
+    return items.map((session) => ({ kind: 'event' as const, session }));
   }
 
   const entries: CatalogGridEntry[] = [];
   let bannerIndex = 0;
-  let eventsSeen = 0;
-  for (const unit of units) {
-    entries.push({ kind: 'unit', unit });
-    eventsSeen += unitEventCount(unit);
-    if (eventsSeen % every === 0 && bannerIndex < banners.length) {
+  items.forEach((session, index) => {
+    entries.push({ kind: 'event', session });
+    if ((index + 1) % every === 0 && bannerIndex < banners.length) {
       entries.push({ kind: 'banner', banner: banners[bannerIndex]! });
       bannerIndex += 1;
     }
-  }
+  });
   return entries;
 }
 
@@ -251,18 +237,9 @@ export function CatalogResults({
     : catalogItems;
   const gridRef = useRef<HTMLUListElement>(null);
   const columnsPerRow = useCatalogGridColumnCount(gridRef, filtersCollapsed, listItems.length);
-  const featuredIds = useMemo(
-    () => (viewMode === 'cards' ? pickCatalogFeaturedIds(listItems) : new Set<string>()),
-    [viewMode, listItems],
-  );
-  const featuredUnits = useMemo(() => {
-    if (viewMode !== 'cards') return [] as CatalogFeaturedUnit[];
-    const packed = packCatalogFeaturedUnits(listItems, featuredIds);
-    return layoutCatalogFeaturedUnits(packed, columnsPerRow);
-  }, [viewMode, listItems, featuredIds, columnsPerRow]);
   const gridEntries = useMemo(
-    () => (viewMode === 'cards' ? buildCatalogGridEntries(featuredUnits, city, columnsPerRow) : null),
-    [viewMode, featuredUnits, city, columnsPerRow],
+    () => (viewMode === 'cards' ? buildCatalogGridEntries(listItems, city, columnsPerRow) : null),
+    [viewMode, listItems, city, columnsPerRow],
   );
 
   return (
@@ -299,30 +276,11 @@ export function CatalogResults({
                   <CatalogInterstitialBanner key={`banner-${entry.banner.id}`} banner={entry.banner} />
                 );
               }
-              const { unit } = entry;
-              if (unit.kind === 'cluster') {
-                const priority = eventOrdinal < CATALOG_IMAGE_PRIORITY_COUNT;
-                eventOrdinal += 3;
-                return (
-                  <CatalogFeaturedCluster
-                    key={`cluster-${unit.featured.id}-${unit.featured.startsAt}`}
-                    featured={unit.featured}
-                    stack={unit.stack}
-                    imagePriority={priority}
-                  />
-                );
-              }
               const priority = eventOrdinal < CATALOG_IMAGE_PRIORITY_COUNT;
               eventOrdinal += 1;
               return (
-                <li key={`${unit.session.id}-${unit.session.startsAt}`}>
-                  <EventCard
-                    session={unit.session}
-                    compact
-                    catalogDense={!unit.featured}
-                    catalogFeatured={unit.featured}
-                    imagePriority={priority}
-                  />
+                <li key={`${entry.session.id}-${entry.session.startsAt}`}>
+                  <EventCard session={entry.session} compact catalogDense imagePriority={priority} />
                 </li>
               );
             });
