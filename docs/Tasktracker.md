@@ -502,7 +502,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | G.9 | FIN.RETURN-1: YooKassa return_url goes to catalog result with `?order={publicCode}` | High | done 2026-09-07: deployed on `.159`; redirect remains compatible |
 | G.10 | Embedded YooKassa widget + immediate catalog return by order projection | High | finance create/replay smoke done (`3815847`); catalog port + paid browser smoke pending |
 | G.11 | Buyer order access proof: HMAC token + optional finance enforcement | Critical | done 2026-09-08; `.159` live at `93f1fc1`, enforcement off pending catalog BFF cookie bridge |
-| G.12 | Supplier admission edit request + multi-category offer editor | High | code/test/browser smoke done 2026-09-09; CI and `.159` deploy pending |
+| G.12 | Supplier admission edit request + multi-category offer editor | High | done 2026-09-09; CI `34381868285`, `.159` live at `32e5de0`, non-mutating browser smoke passed |
 
 Seed command: `pnpm backend:checkout:seed-stub-admission`.
 Smoke order command: `pnpm backend:checkout:seed-stub-admission -- --order`.

@@ -29,7 +29,8 @@
 - [x] At least one active category is required; active prices have a 100 RUB browser minimum and backend validation remains authoritative.
 - [x] Submit writes an `UPDATE` moderation request and does not mutate the live admission product.
 - [x] Local DB integration: create request -> admin approve/apply -> published admission -> STUB checkout -> supplier order projection.
-- [ ] Production `.159`: submit a harmless update request, inspect it in admin and reject it after smoke.
+- [x] Production `.159`: authenticated admission list and two-category update editor load from live API.
+- [ ] Joint admin smoke: submit one harmless update request, inspect its payload and reject it without changing the published test product.
 - [ ] Embedded YooKassa: complete paid browser flow and verify `CONFIRMED`, ticket numbers and supplier order visibility.
 
 

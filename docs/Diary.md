@@ -3616,6 +3616,14 @@
 
 ### Next gate
 
-1. Push and wait for finance supplier CI.
-2. Deploy the API and supplier static build to `.159`, then verify login, product edit drawer and request creation without applying a destructive change to the live test product.
-3. Continue with admin review/apply UX for the richer admission payload and the embedded YooKassa paid browser smoke.
+1. Continue with admin review/apply UX for the richer admission payload.
+2. Submit and reject one harmless production request during the joint admin smoke, keeping the published test product unchanged.
+3. Complete the embedded YooKassa paid browser smoke.
+
+### Production closeout
+
+- GitHub Actions run `34381868285` passed for `32e5de00`.
+- Finance `.159` was fast-forwarded to `32e5de0`; no migration was required.
+- Supplier assets were built into a separate directory and swapped atomically; the previous build remains under `/home/deploy/daibilet-releases`.
+- API restart recovered normally, local health is green and the server worktree is clean.
+- Production browser smoke passed: supplier login/session, admission list, two-category prefill and edit drawer rendering. No live request was submitted, so the moderation queue and published test product were not changed.
