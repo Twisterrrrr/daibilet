@@ -106,7 +106,7 @@ export function BlogListingBody({
       </Suspense>
 
       {/* container-page keeps filters/Свежее aligned with header/footer gutters. */}
-      <div className="container-page pt-6 pb-10 sm:pt-8 sm:pb-14">
+      <div className="container-page blog-listing-container pt-6 pb-10 sm:pt-8 sm:pb-14">
         <Suspense
           fallback={
             <div className="space-y-4">

@@ -326,6 +326,17 @@ html[data-nav-pending='1'] {
     gap: 1.5rem;
   }
 
+  .blog-layout__main {
+    min-width: 0;
+    container-name: blog-feed;
+    container-type: inline-size;
+  }
+
+  /* The rail duplicates mobile/tablet promos and only earns its space on wide desktop. */
+  .blog-layout__aside {
+    display: none;
+  }
+
   @media (max-width: 47.99em) {
     .blog-layout {
       padding-bottom: 5.5rem;
@@ -413,21 +424,22 @@ html[data-nav-pending='1'] {
       gap: 2rem;
       align-items: start;
     }
-
-    .blog-layout__aside {
-      grid-column: 1 / -1;
-    }
   }
 
-  @media (min-width: 85em) {
+  /* Three rails need a genuinely wide canvas, not merely a 1360px viewport. */
+  @media (min-width: 100em) {
+    .blog-listing-container {
+      max-width: 100rem;
+    }
+
     .blog-layout {
       grid-template-columns: 16.25rem minmax(0, 1fr) 20rem;
       gap: 2.5rem;
-      max-width: 137.5rem; /* ~2200px */
       margin-inline: auto;
     }
 
     .blog-layout__aside {
+      display: block;
       grid-column: auto;
       position: sticky;
       top: 6rem;
@@ -554,8 +566,8 @@ html[data-nav-pending='1'] {
     gap: 1.25rem;
   }
 
-  /* ~1360px+: 3-col blog layout — room for 2 horizontal + 1 vertical bento */
-  @media (min-width: 85em) {
+  /* Switch to magazine composition only when the feed itself has enough room. */
+  @container blog-feed (min-width: 52rem) {
     .blog-bento {
       gap: 2.25rem;
     }
@@ -631,19 +643,6 @@ html[data-nav-pending='1'] {
 
     .blog-bento__leftovers {
       gap: 1.5rem;
-    }
-  }
-
-  /* Ultrawide 3-col blog layout: slightly roomier gaps */
-  @media (min-width: 85em) {
-    .blog-bento,
-    .blog-bento-block,
-    .blog-bento__leftovers {
-      gap: 2.5rem;
-    }
-
-    .blog-bento__lead {
-      margin-bottom: 2rem;
     }
   }
 
@@ -2086,4 +2085,3 @@ body > div:has(iframe[src*='ticketscloud']) {
     border-bottom: 1px solid #e2e8f0 !important;
   }
 }
-
