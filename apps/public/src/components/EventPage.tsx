@@ -448,15 +448,21 @@ function EventDescription({ event }: { event: PublicEvent }) {
       <h2 className="text-lg font-bold text-slate-900">О событии</h2>
       {hasHtml ? (
         <div
-          className={`${textClassName} [&_li+li]:mt-2 [&_p+p]:mt-5 [&_ul]:mt-3 [&_ul]:list-disc [&_ul]:pl-5`}
+          className={`${textClassName} [&_h3]:mb-2 [&_h3]:mt-7 [&_h3]:text-base [&_h3]:font-bold [&_h3]:text-slate-900 [&_li+li]:mt-2 [&_p+p]:mt-5 [&_ul]:mt-3 [&_ul]:list-disc [&_ul]:pl-5`}
           dangerouslySetInnerHTML={{ __html: sanitizeEventHtml(description) }}
         />
       ) : (
-        <div className={`${textClassName} space-y-5`}>
-          {splitDescriptionParagraphs(description).map((paragraph, index) => (
-            <p key={index} className={paragraphClassName}>
-              {paragraph}
-            </p>
+        <div className={`${textClassName} space-y-4`}>
+          {parseDescriptionBlocks(description).map((block, index) => block.type === 'heading' ? (
+            <h3 key={index} className="pt-3 text-base font-bold text-slate-900">
+              {block.text}
+            </h3>
+          ) : block.type === 'list' ? (
+            <ul key={index} className="list-disc space-y-2 pl-5 marker:text-primary-500">
+              {block.items.map((item, itemIndex) => <li key={itemIndex}>{item}</li>)}
+            </ul>
+          ) : (
+            <p key={index} className={paragraphClassName}>{block.text}</p>
           ))}
         </div>
       )}
@@ -464,22 +470,57 @@ function EventDescription({ event }: { event: PublicEvent }) {
   );
 }
 
-function splitDescriptionParagraphs(text: string): string[] {
-  const normalized = text.replace(/\r\n?/g, '\n').trim();
-  const byBlankLine = normalized
-    .split(/\n\s*\n+/)
-    .map((part) => cleanDisplayText(part))
-    .filter(Boolean);
-  if (byBlankLine.length > 1) return byBlankLine;
+type DescriptionBlock =
+  | { type: 'heading'; text: string }
+  | { type: 'paragraph'; text: string }
+  | { type: 'list'; items: string[] };
 
-  const byLine = normalized
-    .split(/\n+/)
-    .map((part) => cleanDisplayText(part))
-    .filter(Boolean);
-  if (byLine.length > 1) return byLine;
+function parseDescriptionBlocks(text: string): DescriptionBlock[] {
+  const blocks: DescriptionBlock[] = [];
+  let paragraphLines: string[] = [];
+  let listItems: string[] = [];
 
-  const single = cleanDisplayText(normalized);
-  return single ? [single] : [];
+  const flushParagraph = () => {
+    const value = cleanDisplayText(paragraphLines.join(' '));
+    if (value) blocks.push({ type: 'paragraph', text: value });
+    paragraphLines = [];
+  };
+  const flushList = () => {
+    if (listItems.length) blocks.push({ type: 'list', items: listItems });
+    listItems = [];
+  };
+
+  for (const rawLine of text.replace(/\r\n?/g, '\n').trim().split('\n')) {
+    const line = rawLine.trim();
+    if (!line) {
+      flushParagraph();
+      flushList();
+      continue;
+    }
+
+    const heading = line.match(/^#{2,4}\s+(.+)$/)?.[1]
+      || line.match(/^\*\*(.+)\*\*$/)?.[1];
+    if (heading) {
+      flushParagraph();
+      flushList();
+      blocks.push({ type: 'heading', text: cleanDisplayText(heading) });
+      continue;
+    }
+
+    const bullet = line.match(/^[-–—•*]\s+(.+)$/)?.[1];
+    if (bullet) {
+      flushParagraph();
+      listItems.push(cleanDisplayText(bullet));
+      continue;
+    }
+
+    flushList();
+    paragraphLines.push(line);
+  }
+
+  flushParagraph();
+  flushList();
+  return blocks;
 }
 
 function QuickInfo({ event }: { event: PublicEvent }) {
