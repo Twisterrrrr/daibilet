@@ -3,8 +3,8 @@
 import { useEffect, useRef } from 'react';
 
 /**
- * Intersection Observer sentinel for catalog infinite scroll
- * (same UX pattern as events «Показать ещё» / blog cursor feed).
+ * Intersection Observer sentinel for progressive catalog loading.
+ * Pagination stays available; cards append when a reader naturally reaches the tail.
  */
 export function CatalogInfiniteSentinel({
   enabled,

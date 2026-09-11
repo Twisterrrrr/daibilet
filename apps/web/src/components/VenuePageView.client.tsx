@@ -36,7 +36,6 @@ import {
   type VenuePlaybillEntry,
 } from '@/lib/venue-program';
 import { filterVenuePageSessionsByCity } from '@/lib/venue-page-sessions';
-import { venuePageTemplate } from '@/lib/venue-meta';
 
 const PLAYBILL_WEEKDAY_SHORT = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'] as const;
 
@@ -82,10 +81,12 @@ export function VenuePageView({
   slug,
   initialPayload,
   admissionProducts = [],
+  pageTemplate,
 }: {
   slug: string;
   initialPayload: PublicVenuePageDto | null;
   admissionProducts?: FinanceAdmissionProduct[];
+  pageTemplate: 'location' | 'institution';
 }) {
   const params = useParams();
   const pathname = usePathname();
@@ -182,7 +183,6 @@ export function VenuePageView({
   );
   const matchedPayload =
     payload?.venue && venueMatchesRouteSlug(payload.venue, routeSlug) ? payload : matchedInitial;
-  const pageTemplate = venue ? venuePageTemplate(venue.type) : 'location';
   const isLocationPage = pageTemplate === 'location';
   const isInstitutionPage = pageTemplate === 'institution';
   const useLovableLayout = isLocationPage || isInstitutionPage;

@@ -300,6 +300,7 @@ export async function VenueDetailPage({
           slug={decodedSlug}
           initialPayload={payload}
           admissionProducts={admission.items}
+          pageTemplate={family}
         />
       </SiteLayout>
     </>

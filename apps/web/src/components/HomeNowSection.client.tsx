@@ -83,6 +83,7 @@ export function HomeNowSection({
           key={current.key}
           className="mt-5"
           arrowAlign="center"
+          hideScrollbar
           aria-label={sectionTitle}
         >
           <div className="horizontal-snap-track">
@@ -130,7 +131,7 @@ export function HomeEventRail({
             Смотреть все <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
-        <ScrollRail className="mt-5" arrowAlign="center" aria-label={title}>
+        <ScrollRail className="mt-5" arrowAlign="center" hideScrollbar aria-label={title}>
           <div className="horizontal-snap-track">
             {events.map((event) => (
               <div key={event.id} className="showcase-rail-card">

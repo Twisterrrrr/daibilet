@@ -21,7 +21,7 @@ import type { BlogSidebarPromoDto } from '@/lib/blog-sidebar-promo';
 import type { BlogFeedPromoKind, BlogFeedPromoLayout } from '@/lib/blog-feed-promo';
 
 const FALLBACK_IMAGE = '/images/blog/blog-hero-promo.jpg';
-const FEED_IMAGE_SIZES = '(max-width: 768px) 40vw, 280px';
+const FEED_IMAGE_SIZES = '(max-width: 768px) 100vw, 380px';
 
 type BlogFeedPromoProps = {
   promo: BlogSidebarPromoDto;
@@ -163,52 +163,50 @@ function FeedPromoImage({
   );
 }
 
-/** Same shell as BlogPostCard strip - magazine article card, not event banner. */
-function ArticleStripCard({ copy }: { copy: ResolvedCopy }) {
+/** Magazine tile: visually equal to an article card, but carries live afisha data. */
+function ArticleTileCard({ copy }: { copy: ResolvedCopy }) {
   return (
-    <article className="group overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-sm transition duration-300 hover:border-slate-300 hover:shadow-md">
-      <div className="flex h-full min-h-[13rem] flex-col lg:flex-row">
-        <Link
-          href={copy.href}
-          aria-label={copy.title}
-          className="relative block aspect-[16/10] w-full shrink-0 overflow-hidden bg-slate-100 lg:aspect-auto lg:h-auto lg:w-[38%] lg:min-w-[11rem] lg:max-w-[16rem] lg:self-stretch"
-        >
-          <FeedPromoImage
-            src={copy.imageSrc}
-            fallback={copy.imageFallback}
-            probeEventCover={copy.probeEventCover}
-            sizes={FEED_IMAGE_SIZES}
-          />
-        </Link>
-        <div className="flex min-w-0 flex-1 flex-col justify-center gap-2.5 p-5 sm:p-6">
-          <div className="flex flex-wrap gap-1.5">
-            <span
-              className={`inline-flex max-w-full truncate rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ring-1 sm:text-[11px] ${blogTagBadgeClassName(copy.eyebrow)}`}
-            >
-              {copy.eyebrow}
-            </span>
-            <span
-              className={`inline-flex max-w-full truncate rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ring-1 sm:text-[11px] ${blogCityBadgeClassName(copy.citySlug)}`}
-            >
-              {copy.cityTag}
-            </span>
-          </div>
-          <h3 className="break-words text-lg font-semibold leading-snug tracking-tight text-slate-900 transition-colors group-hover:text-primary-700 lg:text-xl">
-            <Link href={copy.href}>{copy.title}</Link>
-          </h3>
-          <p className="break-words text-sm leading-relaxed text-slate-600">{copy.excerpt}</p>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-1 text-xs text-slate-500">
-            <Link
-              href={copy.href}
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary-700 transition-all duration-300 group-hover:gap-2.5 group-hover:text-primary-800"
-            >
-              {copy.cta}
-              <ArrowRight className="h-4 w-4" aria-hidden />
-            </Link>
-            {copy.meta.map((item) => (
-              <span key={item}>{item}</span>
-            ))}
-          </div>
+    <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-sm transition duration-300 hover:border-slate-300 hover:shadow-md">
+      <Link
+        href={copy.href}
+        aria-label={copy.title}
+        className="relative block aspect-[16/10] w-full shrink-0 overflow-hidden bg-slate-100"
+      >
+        <FeedPromoImage
+          src={copy.imageSrc}
+          fallback={copy.imageFallback}
+          probeEventCover={copy.probeEventCover}
+          sizes={FEED_IMAGE_SIZES}
+        />
+      </Link>
+      <div className="flex min-w-0 flex-1 flex-col gap-2.5 p-4 sm:p-5">
+        <div className="flex flex-wrap gap-1.5">
+          <span
+            className={`inline-flex max-w-full truncate rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ring-1 sm:text-[11px] ${blogTagBadgeClassName(copy.eyebrow)}`}
+          >
+            {copy.eyebrow}
+          </span>
+          <span
+            className={`inline-flex max-w-full truncate rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ring-1 sm:text-[11px] ${blogCityBadgeClassName(copy.citySlug)}`}
+          >
+            {copy.cityTag}
+          </span>
+        </div>
+        <h3 className="break-words text-base font-semibold leading-snug tracking-tight text-slate-900 transition-colors group-hover:text-primary-700 sm:text-lg">
+          <Link href={copy.href}>{copy.title}</Link>
+        </h3>
+        <p className="break-words text-sm leading-relaxed text-slate-600">{copy.excerpt}</p>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-1 text-xs text-slate-500">
+          <Link
+            href={copy.href}
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary-700 transition-all duration-300 group-hover:gap-2.5 group-hover:text-primary-800"
+          >
+            {copy.cta}
+            <ArrowRight className="h-4 w-4" aria-hidden />
+          </Link>
+          {copy.meta.map((item) => (
+            <span key={item}>{item}</span>
+          ))}
         </div>
       </div>
     </article>
@@ -217,7 +215,6 @@ function ArticleStripCard({ copy }: { copy: ResolvedCopy }) {
 
 export function BlogFeedPromo({ promo, kind, layout }: BlogFeedPromoProps) {
   const copy = resolveCopy(promo, kind);
-  // All feed layouts render as article strip - overlay/split were event-banner leftovers.
   void layout;
-  return <ArticleStripCard copy={copy} />;
+  return <ArticleTileCard copy={copy} />;
 }

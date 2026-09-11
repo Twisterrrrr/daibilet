@@ -306,7 +306,7 @@ export function DayRouteOsmMap({
   return (
     <div
       ref={containerRef}
-      className={className}
+      className={`bg-slate-100 ${className || ''}`.trim()}
       role="region"
       aria-label="Карта маршрута дня"
       aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight"

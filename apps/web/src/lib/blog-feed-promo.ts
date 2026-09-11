@@ -1,8 +1,8 @@
 import type { BlogSidebarPromoDto } from '@/lib/blog-sidebar-promo';
 
 export type BlogFeedPromoKind = 'city' | 'landing' | 'event';
-/** Feed break always renders as article-like strip (overlay/split kept for type compat only). */
-export type BlogFeedPromoLayout = 'strip' | 'strip-dense' | 'overlay' | 'split';
+/** Promo cards join the magazine grid as regular bento tiles. */
+export type BlogFeedPromoLayout = 'tile';
 
 export type BlogFeedPromoPlan = {
   /** Insert after this 0-based bento block index. */
@@ -25,9 +25,9 @@ function availableKinds(promo: BlogSidebarPromoDto, hasSidebar: boolean): BlogFe
 }
 
 /**
- * Sparse feed seeding: article-like strip after the first bento block (all cities).
+ * Sparse feed seeding: promo tile after the first article-only bento block.
  * A second slot (after block 2) only when there are enough blocks and seed allows (~1/4).
- * Never plans overlay/split - those read as event banners, not magazine cards.
+ * The grid consumes two articles beside each promo, so no full-width banner interrupts reading.
  */
 export function planBlogFeedPromos(input: {
   blockCount: number;
@@ -47,12 +47,12 @@ export function planBlogFeedPromos(input: {
   const kind = kinds.includes('event') ? 'event' : kinds[0]!;
 
   const plans: BlogFeedPromoPlan[] = [
-    { afterBlockIndex: 0, kind, layout: 'strip' },
+    { afterBlockIndex: 0, kind, layout: 'tile' },
   ];
 
   if (input.blockCount >= 3 && seed % 4 === 0) {
     const kind2 = kinds.find((item) => item !== kind) || kinds[(seed + 1) % kinds.length]!;
-    plans.push({ afterBlockIndex: 2, kind: kind2, layout: 'strip' });
+    plans.push({ afterBlockIndex: 2, kind: kind2, layout: 'tile' });
   }
 
   return plans;

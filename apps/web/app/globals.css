@@ -420,7 +420,7 @@ html[data-nav-pending='1'] {
 
   @media (min-width: 48em) {
     .blog-layout {
-      grid-template-columns: 15rem minmax(0, 1fr);
+      grid-template-columns: 13.5rem minmax(0, 1fr);
       gap: 2rem;
       align-items: start;
     }
@@ -429,12 +429,12 @@ html[data-nav-pending='1'] {
   /* Three rails need a genuinely wide canvas, not merely a 1360px viewport. */
   @media (min-width: 100em) {
     .blog-listing-container {
-      max-width: 100rem;
+      max-width: 112rem;
     }
 
     .blog-layout {
-      grid-template-columns: 16.25rem minmax(0, 1fr) 20rem;
-      gap: 2.5rem;
+      grid-template-columns: 13.5rem minmax(0, 1fr) 18rem;
+      gap: 2rem;
       margin-inline: auto;
     }
 
@@ -513,10 +513,6 @@ html[data-nav-pending='1'] {
     padding: 0.25rem 0;
   }
 
-  .blog-bento__promo {
-    margin: 0.5rem 0 0.25rem;
-  }
-
   .blog-bento__quote {
     margin: 0;
     max-width: 42rem;
@@ -580,13 +576,9 @@ html[data-nav-pending='1'] {
       margin: 1.25rem 0 0.5rem;
     }
 
-    .blog-bento__promo {
-      margin: 0.75rem 0 0.5rem;
-    }
-
     .blog-bento-block {
       display: grid;
-      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
       grid-template-rows: auto auto;
       gap: 1.5rem;
       align-items: stretch;
@@ -623,7 +615,7 @@ html[data-nav-pending='1'] {
     }
 
     .blog-bento-block--mirror {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
     }
 
     .blog-bento-block--mirror > .blog-bento-block__v {
@@ -698,6 +690,10 @@ html[data-nav-pending='1'] {
       padding-left: max(2rem, calc((100vw - var(--container-page-max)) / 2 + 2rem));
       padding-right: 0;
       padding-bottom: 0;
+    }
+
+    .my-day-floating-picker-dock {
+      left: max(1rem, calc((100vw - var(--container-page-max)) / 2 - 4.75rem));
     }
   }
 

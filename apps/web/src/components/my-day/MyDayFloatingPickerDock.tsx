@@ -20,7 +20,7 @@ export function MyDayFloatingPickerDock({ tabs, onOpen }: MyDayFloatingPickerDoc
 
   return (
     <div
-      className="pointer-events-none fixed left-3 top-1/2 z-40 hidden -translate-y-1/2 lg:block xl:left-4 print:hidden"
+      className="my-day-floating-picker-dock pointer-events-none fixed top-1/2 z-40 hidden -translate-y-1/2 lg:block print:hidden"
       data-my-day-floating-picker
     >
       <div className="pointer-events-auto flex flex-col items-start gap-2">

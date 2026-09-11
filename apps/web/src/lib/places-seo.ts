@@ -32,6 +32,15 @@ export function normalizePlacesFamily(
 
 const PLACES_H1 = 'Музеи, театры, локации, достопримечательности';
 
+/** Compact on-page heading; the full taxonomy remains in metadata and SEO copy. */
+export function buildPlacesDisplayHeading(
+  cityName?: string | null,
+  citySlug?: string | null,
+): string {
+  const city = resolvePlacesCityLabel(cityName, citySlug);
+  return city ? `Места ${cityToGenitive(city)}` : 'Места';
+}
+
 /** Sitemap listing is only `/places` - do not invent `?city=` / `?family=` / `?category=` facets. */
 export const PLACES_HUB_PATH = '/places';
 

@@ -19,7 +19,11 @@ import { HeroLayout } from '@/components/HeroLayout';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { placesSearchHref } from '@/lib/catalog-url';
 import { pluralCities, pluralPlaces } from '@/lib/format';
-import { buildPlacesListingCopy, normalizePlacesFamily } from '@/lib/places-seo';
+import {
+  buildPlacesDisplayHeading,
+  buildPlacesListingCopy,
+  normalizePlacesFamily,
+} from '@/lib/places-seo';
 import {
   catalogCityQueryValue,
   ensureCityInOptions,
@@ -647,7 +651,7 @@ export function PlacesHubView({
     cityFilter !== 'all'
       ? selectedCity?.selectedDestination?.slug || cityFetchKey || cityName
       : '';
-  const pageTitleText = buildPlacesListingCopy(cityName, family, citySlugForCopy).h1;
+  const pageTitleText = buildPlacesDisplayHeading(cityName, citySlugForCopy);
   const families = countCatalogFamilies(stats.types);
   const placesTotal = families.institutions + families.locations;
   const placesEyebrow = cityName

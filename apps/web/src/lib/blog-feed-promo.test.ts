@@ -29,7 +29,7 @@ test('planBlogFeedPromos: usually one slot after first block', () => {
   assert.equal(plans.length, 1);
   assert.equal(plans[0]?.afterBlockIndex, 0);
   assert.equal(plans[0]?.kind, 'event');
-  assert.equal(plans[0]?.layout, 'strip');
+  assert.equal(plans[0]?.layout, 'tile');
 });
 
 test('planBlogFeedPromos: skips city promo when sidebar already shows afisha', () => {
@@ -49,7 +49,7 @@ test('planBlogFeedPromos: event kind when only eventsCount (no titles yet)', () 
     seed: 2,
   });
   assert.equal(plans[0]?.kind, 'event');
-  assert.equal(plans[0]?.layout, 'strip');
+  assert.equal(plans[0]?.layout, 'tile');
 });
 
 test('planBlogFeedPromos: second slot only with enough blocks and seed%4===0', () => {
@@ -59,7 +59,7 @@ test('planBlogFeedPromos: second slot only with enough blocks and seed%4===0', (
   const denser = planBlogFeedPromos({ blockCount: 3, promo: basePromo, seed: 4 });
   assert.equal(denser.length, 2);
   assert.equal(denser[0]?.afterBlockIndex, 0);
-  assert.equal(denser[0]?.layout, 'strip');
+  assert.equal(denser[0]?.layout, 'tile');
   assert.equal(denser[1]?.afterBlockIndex, 2);
-  assert.equal(denser[1]?.layout, 'strip');
+  assert.equal(denser[1]?.layout, 'tile');
 });

@@ -2,7 +2,17 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { PLACES_HUB_DESCRIPTION } from './seo-meta.ts';
-import { buildPlacesListingCopy, buildPlacesListingSeo } from './places-seo.ts';
+import {
+  buildPlacesDisplayHeading,
+  buildPlacesListingCopy,
+  buildPlacesListingSeo,
+} from './places-seo.ts';
+
+test('places display heading stays concise while SEO copy keeps the full taxonomy', () => {
+  assert.equal(buildPlacesDisplayHeading(null), 'Места');
+  assert.equal(buildPlacesDisplayHeading('Санкт-Петербург'), 'Места Санкт-Петербурга');
+  assert.equal(buildPlacesDisplayHeading(null, 'moscow'), 'Места Москвы');
+});
 
 test('places H1 is the fixed kinds list plus genitive city', () => {
   assert.equal(buildPlacesListingCopy(null).h1, 'Музеи, театры, локации, достопримечательности');

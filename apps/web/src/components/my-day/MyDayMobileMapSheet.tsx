@@ -29,7 +29,7 @@ export function MyDayMobileMapSheet({
   return (
     <>
       {!open ? (
-      <div className="pointer-events-none fixed inset-x-0 bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] z-40 flex justify-center lg:hidden print:hidden">
+      <div className="pointer-events-none fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] right-4 z-40 flex justify-end sm:right-6 lg:hidden print:hidden">
         <button
           type="button"
           onClick={onOpen}

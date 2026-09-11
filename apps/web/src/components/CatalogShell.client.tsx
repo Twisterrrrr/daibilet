@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
+import { CatalogInfiniteSentinel } from '@/components/CatalogInfiniteSentinel.client';
 import { CatalogPaginationLinks } from '@/components/CatalogPaginationLinks';
 import { CatalogResults, ViewModeToggle } from '@/components/CatalogResults.client';
 import { CatalogSortSelect } from '@/components/CatalogSortSelect.client';
@@ -116,15 +117,16 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
 
   const ignoreNextUrlPageRef = useRef(false);
 
-  const writePageToUrl = useCallback((page: number) => {
+  const writePageToUrl = useCallback((page: number, historyMode: 'push' | 'replace' = 'push') => {
     const params = new URLSearchParams(window.location.search);
     if (page <= 1) params.delete('page');
     else params.set('page', String(page));
     const qs = params.toString();
     const href = qs ? `/events?${qs}` : '/events';
-    // Next patches history.pushState and would sync useSearchParams → reset paging to replace.
+    // Next patches History API and would sync useSearchParams → reset paging to replace.
     ignoreNextUrlPageRef.current = true;
-    window.history.pushState(null, '', href);
+    if (historyMode === 'replace') window.history.replaceState(null, '', href);
+    else window.history.pushState(null, '', href);
   }, []);
 
   useEffect(() => {
@@ -205,15 +207,23 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
     [writePageToUrl],
   );
 
-  const loadMoreNextPage = useCallback(() => {
+  const appendNextPage = useCallback((historyMode: 'push' | 'replace') => {
     if (loading || loadingMore || !catalog) return;
     const limit = Math.max(catalog.limit || CATALOG_PAGE_SIZE_DEFAULT, 1);
     const next = resolveCatalogNextFetchPage(catalog, limit);
     if (!next) return;
     pagingModeRef.current = 'append';
     setListPage(next);
-    writePageToUrl(next);
+    writePageToUrl(next, historyMode);
   }, [loading, loadingMore, catalog, writePageToUrl]);
+
+  const loadMoreNextPage = useCallback(() => {
+    appendNextPage('push');
+  }, [appendNextPage]);
+
+  const autoLoadMoreNextPage = useCallback(() => {
+    appendNextPage('replace');
+  }, [appendNextPage]);
 
   useEffect(() => {
     if (!pendingResultsScrollRef.current || loading || loadingMore || !catalog) return;
@@ -422,6 +432,14 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
     landings: [],
     priceSteps: [],
   };
+  const catalogLimit = Math.max(catalog?.limit || CATALOG_PAGE_SIZE_DEFAULT, 1);
+  const nextFetchPage = catalog ? resolveCatalogNextFetchPage(catalog, catalogLimit) : null;
+  const infiniteScrollEnabled = Boolean(
+    catalog &&
+      nextFetchPage &&
+      viewMode === 'cards' &&
+      !error,
+  );
 
   if (needsCityGate) {
     return <EventsCityGate />;
@@ -527,6 +545,12 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
         />
       )}
 
+      <CatalogInfiniteSentinel
+        enabled={infiniteScrollEnabled}
+        onIntersect={autoLoadMoreNextPage}
+        rootMargin="600px 0px"
+      />
+
       {catalog ? (
         <CatalogPaginationLinks
           page={Math.min(
@@ -536,10 +560,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
           shownCount={catalog.items.length}
           total={catalog.total}
           limit={catalog.limit}
-          nextFetchPage={resolveCatalogNextFetchPage(
-            catalog,
-            Math.max(catalog.limit || CATALOG_PAGE_SIZE_DEFAULT, 1),
-          )}
+          nextFetchPage={nextFetchPage}
           searchParams={paginationSearchParams}
           onPageChange={goToListPage}
           onLoadMore={loadMoreNextPage}
