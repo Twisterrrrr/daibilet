@@ -623,9 +623,9 @@ export function EventHero({
     >
       <EventPageCitySync city={event.city} />
       {/*
-        Mobile: full-bleed cover (portrait frame).
-        md+: contain within hero height — no side crop/upscale stretch; pillarbox
-        into slate, then soft L/R fades + shared vertical wash.
+        Keep the photo full-bleed at every breakpoint. Event artwork is often
+        portrait-ish, so objectPosition preserves its curated focal point while
+        cover prevents narrow pillarboxed images on desktop and ultrawide screens.
       */}
       <SafeImage
         src={heroImage || null}
@@ -634,7 +634,7 @@ export function EventHero({
         priority
         sizes={IMAGE_SIZES.eventHero}
         style={{ objectPosition: heroObjectPosition }}
-        className="object-cover object-[center_20%] opacity-80 md:object-contain"
+        className="object-cover object-[center_20%] opacity-80"
         fallback={
           <div className="flex h-full items-center justify-center bg-gradient-to-br from-primary-600 to-primary-900">
             <span className="text-8xl opacity-30">🎭</span>
