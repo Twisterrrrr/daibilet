@@ -111,8 +111,8 @@ export function escapeEventHtml(text: string): string {
     .replace(/'/g, '&#39;');
 }
 
-/** Whole-line AI markdown heading: `**Организационные условия**`. */
-const WHOLE_LINE_BOLD_RE = /^\*\*(.+?)\*\*$/u;
+/** Whole-line markdown headings: `**Организационные условия**` or `## Организационные условия`. */
+const WHOLE_LINE_MARKDOWN_HEADING_RE = /^(?:\*\*(.+?)\*\*|#{1,6}\s+(.+?))$/u;
 
 /**
  * If the line is only a bold-wrapped short title, return the inner text.
@@ -120,9 +120,12 @@ const WHOLE_LINE_BOLD_RE = /^\*\*(.+?)\*\*$/u;
  */
 export function unwrapMarkdownHeadingLine(line: string): string | null {
   const text = String(line || '').trim();
-  const match = text.match(WHOLE_LINE_BOLD_RE);
+  const match = text.match(WHOLE_LINE_MARKDOWN_HEADING_RE);
   if (!match) return null;
-  const inner = cleanDisplayText(match[1]).replace(/:$/u, '').trim();
+  const inner = cleanDisplayText(match[1] ?? match[2])
+    .replace(/\s+#+$/u, '')
+    .replace(/:$/u, '')
+    .trim();
   if (!inner || inner.length > 72) return null;
   if (/[.!?…]$/u.test(inner)) return null;
   return inner;

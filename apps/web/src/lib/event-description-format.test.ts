@@ -198,6 +198,13 @@ test('AI rewrite **heading** becomes h3 and raw asterisks do not leak', () => {
   assert.doesNotMatch(html, /\*\*/);
 });
 
+test('hash markdown heading becomes h3 and hash markers do not leak', () => {
+  const html = formatEventDescriptionHtml('## Особенности\n- первый пункт\n- второй пункт\n- третий пункт');
+  assert.match(html, /<h3>Особенности<\/h3>/);
+  assert.match(html, /<ul><li>первый пункт<\/li><li>второй пункт<\/li><li>третий пункт<\/li><\/ul>/);
+  assert.doesNotMatch(html, /##/);
+});
+
 test('inline **bold** and *italic* render as strong/em', () => {
   const html = formatEventDescriptionHtml('**Возраст:** рекомендуется детям 6-14 лет. Также *важно* взять паспорт.');
   assert.match(html, /<p><strong>Возраст:<\/strong> рекомендуется детям 6-14 лет\. Также <em>важно<\/em> взять паспорт\.<\/p>/);
