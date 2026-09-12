@@ -100,8 +100,17 @@ function purgeNginxProxyCache() {
 
 function rebuildCatalogDtoDisk(warmReason) {
   const script = path.join(rootDir, 'scripts', 'rebuild-public-catalog-dto-cache.mjs');
-  const tsxBin = path.join(rootDir, 'node_modules', '.bin', process.platform === 'win32' ? 'tsx.cmd' : 'tsx');
+  const tsxName = process.platform === 'win32' ? 'tsx.cmd' : 'tsx';
+  const tsxBin = [
+    path.join(rootDir, 'apps', 'backend', 'node_modules', '.bin', tsxName),
+    path.join(rootDir, 'node_modules', '.bin', tsxName),
+    path.join(rootDir, 'apps', 'web', 'node_modules', '.bin', tsxName),
+  ].find((candidate) => existsSync(candidate));
   const lock = process.env.DAIBILET_CATALOG_REBUILD_LOCK || '/var/lock/daibilet-catalog-dto.lock';
+
+  if (!tsxBin) {
+    return { ok: false, status: 127, stderr: 'tsx not found under apps/backend, root, or apps/web node_modules' };
+  }
 
   // Prefer flock on Linux so we don't stack with cron child rebuilds.
   const useFlock = process.platform !== 'win32';
