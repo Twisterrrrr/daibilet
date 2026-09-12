@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  Calendar,
   MapPin,
   SlidersHorizontal,
   Ticket,
@@ -19,7 +18,7 @@ import {
   type CatalogFilterValues,
 } from '@/lib/catalog-url';
 
-type QuickSheet = 'price' | 'date' | 'type' | 'location' | null;
+type QuickSheet = 'price' | 'type' | 'location' | null;
 
 type CatalogMobileQuickFiltersProps = {
   filters: CatalogFilterValues;
@@ -36,18 +35,6 @@ const PRICE_PRESETS = [
   { key: '1k3k', label: '1 000 - 3 000 ₽', min: 1000, max: 3000 },
   { key: 'from3k', label: 'от 3 000 ₽', min: 3000, max: undefined },
 ] as const;
-
-const DATE_PRESETS: Array<{
-  key: string;
-  label: string;
-  date?: CatalogFilterValues['date'];
-}> = [
-  { key: 'all', label: 'Любая дата' },
-  { key: 'today', label: 'Сегодня', date: 'today' },
-  { key: 'tomorrow', label: 'Завтра', date: 'tomorrow' },
-  { key: 'weekend', label: 'Выходные', date: 'weekend' },
-  { key: 'evening', label: 'Сегодня вечером', date: 'evening' },
-];
 
 function priceActive(filters: CatalogFilterValues): boolean {
   return filters.minPrice != null || filters.maxPrice != null;
@@ -126,13 +113,11 @@ export function CatalogMobileQuickFilters({
   const sheetTitle =
     sheet === 'price'
       ? 'Цена'
-      : sheet === 'date'
-        ? 'Дата'
-        : sheet === 'type'
-          ? 'Тип'
-          : sheet === 'location'
-            ? 'Локация'
-            : '';
+      : sheet === 'type'
+        ? 'Тип'
+        : sheet === 'location'
+          ? 'Локация'
+          : '';
 
   const sheetBody =
     sheet === 'price' ? (
@@ -162,39 +147,6 @@ export function CatalogMobileQuickFilters({
               className={chipClass(active)}
             >
               {preset.label}
-            </button>
-          );
-        })}
-      </div>
-    ) : sheet === 'date' ? (
-      <div className="flex flex-col gap-1">
-        {DATE_PRESETS.map((item) => {
-          const active =
-            item.key === 'all'
-              ? !filters.date && !filters.from && !filters.to
-              : filters.date === item.date && !filters.from && !filters.to;
-          return (
-            <button
-              key={item.key}
-              type="button"
-              disabled={disabled}
-              onClick={() => {
-                onNavigate(
-                  catalogFiltersFromQuery({
-                    ...filters,
-                    date: item.date,
-                    from: undefined,
-                    to: undefined,
-                    page: undefined,
-                  }),
-                );
-                setSheet(null);
-              }}
-              className={`flex w-full items-center rounded-xl px-3 py-3 text-left text-sm font-medium transition ${
-                active ? 'bg-graphite text-white' : 'text-graphite hover:bg-surface-muted'
-              }`}
-            >
-              {item.label}
             </button>
           );
         })}
@@ -294,19 +246,39 @@ export function CatalogMobileQuickFilters({
     <>
       <div className="catalog-mobile-quick-chips lg:hidden">
         <div className="flex items-center gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <button type="button" disabled={disabled} onClick={() => setSheet('price')} className={chipClass(priceActive(filters))}>
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={onOpenAllFilters}
+            className={chipClass(activeCount > 0)}
+          >
+            <SlidersHorizontal className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
+            {activeCount > 0 ? `Фильтры (${activeCount})` : 'Все фильтры'}
+          </button>
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={() => setSheet('price')}
+            className={chipClass(priceActive(filters))}
+          >
             <Wallet className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
             Цена
           </button>
-          <button type="button" disabled={disabled} onClick={() => setSheet('date')} className={chipClass(dateActive(filters))}>
-            <Calendar className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
-            Дата
-          </button>
-          <button type="button" disabled={disabled} onClick={() => setSheet('type')} className={chipClass(typeActive(filters))}>
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={() => setSheet('type')}
+            className={chipClass(typeActive(filters))}
+          >
             <Ticket className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
             Тип
           </button>
-          <button type="button" disabled={disabled} onClick={() => setSheet('location')} className={chipClass(locationActive(filters))}>
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={() => setSheet('location')}
+            className={chipClass(locationActive(filters))}
+          >
             <MapPin className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
             Локация
           </button>
@@ -323,38 +295,15 @@ export function CatalogMobileQuickFilters({
         </div>
       </div>
 
-      <div className="catalog-mobile-sticky-filters pointer-events-none fixed inset-x-0 bottom-0 z-[98] lg:hidden">
-        <div className="pointer-events-auto mx-3 mb-[max(0.75rem,env(safe-area-inset-bottom))] flex items-center gap-2 rounded-2xl border border-slate-200/80 bg-white/95 p-2 shadow-[0_-4px_24px_rgba(15,23,42,0.1)] backdrop-blur-md supports-[backdrop-filter]:bg-white/90">
-          <button
-            type="button"
-            disabled={disabled}
-            onClick={onOpenAllFilters}
-            className={`inline-btn inline-flex h-11 min-w-0 flex-1 items-center justify-center gap-2 rounded-xl px-3 text-sm font-semibold transition disabled:opacity-60 ${
-              activeCount > 0 ? 'bg-primary text-white hover:bg-primary/90' : 'bg-[#1A1A1A] text-white hover:bg-slate-800'
-            }`}
-          >
-            <SlidersHorizontal className="h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden />
-            <span className="truncate">{activeCount > 0 ? `Фильтры (${activeCount})` : 'Фильтры'}</span>
-          </button>
-          <button type="button" disabled={disabled} aria-label="Цена" onClick={() => setSheet('price')} className={`catalog-mobile-sticky-filters__icon ${priceActive(filters) ? 'is-active' : ''}`}>
-            <Wallet className="h-[1.15rem]" strokeWidth={1.75} aria-hidden />
-          </button>
-          <button type="button" disabled={disabled} aria-label="Дата" onClick={() => setSheet('date')} className={`catalog-mobile-sticky-filters__icon ${dateActive(filters) ? 'is-active' : ''}`}>
-            <Calendar className="h-[1.15rem]" strokeWidth={1.75} aria-hidden />
-          </button>
-          <button type="button" disabled={disabled} aria-label="Тип" onClick={() => setSheet('type')} className={`catalog-mobile-sticky-filters__icon ${typeActive(filters) ? 'is-active' : ''}`}>
-            <Ticket className="h-[1.15rem]" strokeWidth={1.75} aria-hidden />
-          </button>
-          <button type="button" disabled={disabled} aria-label="Локация" onClick={() => setSheet('location')} className={`catalog-mobile-sticky-filters__icon ${locationActive(filters) ? 'is-active' : ''}`}>
-            <MapPin className="h-[1.15rem]" strokeWidth={1.75} aria-hidden />
-          </button>
-        </div>
-      </div>
-
       {sheet && typeof document !== 'undefined'
         ? createPortal(
             <div className="fixed inset-0 z-[100] flex items-end justify-center lg:hidden">
-              <button type="button" aria-label="Закрыть" className="absolute inset-0 bg-slate-950/40" onClick={() => setSheet(null)} />
+              <button
+                type="button"
+                aria-label="Закрыть"
+                className="absolute inset-0 bg-slate-950/40"
+                onClick={() => setSheet(null)}
+              />
               <div
                 role="dialog"
                 aria-modal="true"

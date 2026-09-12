@@ -15,6 +15,7 @@ const FILTERS_COLLAPSED_KEY = 'daibilet.catalog.filters-collapsed';
 
 type CatalogFiltersLayoutContextValue = {
   desktopCollapsed: boolean;
+  desktopCollapsible: boolean;
   collapseDesktop: () => void;
   expandDesktop: () => void;
 };
@@ -28,7 +29,7 @@ export function useCatalogFiltersLayout() {
 /** Desktop header control: collapse sticky filters to free the grid. */
 export function CatalogDesktopFiltersCollapseButton() {
   const layout = useCatalogFiltersLayout();
-  if (!layout) return null;
+  if (!layout?.desktopCollapsible) return null;
   return (
     <button
       type="button"
@@ -52,6 +53,8 @@ type CatalogSidebarLayoutProps = {
   activeCount?: number;
   /** Hide legacy floating trigger when Lovable sticky bar is used */
   hideMobileTrigger?: boolean;
+  /** Keep the desktop filter column visible when it is core to the page IA. */
+  desktopCollapsible?: boolean;
   /** Expose drawer open for external sticky bar */
   onRegisterOpenDrawer?: (open: () => void) => void;
   /** Overlay / X / Escape — rollback draft without applying. */
@@ -75,6 +78,7 @@ export function CatalogSidebarLayout({
   triggerLabel = 'Фильтры и поиск',
   activeCount = 0,
   hideMobileTrigger = false,
+  desktopCollapsible = true,
   onRegisterOpenDrawer,
   onDrawerDismiss,
   onDrawerOpen,
@@ -85,12 +89,16 @@ export function CatalogSidebarLayout({
   const titleId = useId();
 
   useEffect(() => {
+    if (!desktopCollapsible) {
+      setDesktopCollapsed(false);
+      return;
+    }
     try {
       setDesktopCollapsed(window.localStorage.getItem(FILTERS_COLLAPSED_KEY) === '1');
     } catch {
       /* ignore */
     }
-  }, []);
+  }, [desktopCollapsible]);
 
   const persistCollapsed = useCallback((next: boolean) => {
     setDesktopCollapsed(next);
@@ -136,8 +144,10 @@ export function CatalogSidebarLayout({
     };
   }, [open, closeDismiss]);
 
+  const resolvedDesktopCollapsed = desktopCollapsible && desktopCollapsed;
   const layoutValue: CatalogFiltersLayoutContextValue = {
-    desktopCollapsed,
+    desktopCollapsed: resolvedDesktopCollapsed,
+    desktopCollapsible,
     collapseDesktop,
     expandDesktop,
   };
@@ -164,10 +174,10 @@ export function CatalogSidebarLayout({
       />
 
       <div
-        className={`catalog-page-layout${desktopCollapsed ? ' is-filters-collapsed' : ''}`}
-        data-catalog-filters-collapsed={desktopCollapsed ? '1' : '0'}
+        className={`catalog-page-layout${resolvedDesktopCollapsed ? ' is-filters-collapsed' : ''}`}
+        data-catalog-filters-collapsed={resolvedDesktopCollapsed ? '1' : '0'}
       >
-        {desktopCollapsed ? (
+        {resolvedDesktopCollapsed ? (
           <div className="catalog-filters-rail">
             <button
               type="button"
@@ -215,7 +225,7 @@ export function CatalogSidebarLayout({
         )}
 
         {/* Mobile drawer sidebar — same DOM, off-canvas when desktop rail is shown */}
-        {desktopCollapsed ? (
+        {resolvedDesktopCollapsed ? (
           <aside
             id="catalog-filter-sidebar"
             className={`catalog-sidebar lg:hidden${open ? ' is-open' : ''}`}

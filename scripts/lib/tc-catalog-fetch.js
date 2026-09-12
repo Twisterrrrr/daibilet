@@ -40,7 +40,7 @@ function createTicketscloudClient() {
 }
 
 function streamAll(client, metadata, method, request, options = {}) {
-  const streamTimeoutMs = Number(options.timeoutMs || process.env.TICKETSCLOUD_FULL_SYNC_TIMEOUT_MS || 360000);
+  const streamTimeoutMs = Number(options.timeoutMs || process.env.TICKETSCLOUD_FULL_SYNC_TIMEOUT_MS || 900000);
   return new Promise((resolve, reject) => {
     const items = [];
     const stream = client[method](request, metadata);
@@ -67,7 +67,7 @@ function streamAll(client, metadata, method, request, options = {}) {
 }
 
 /**
- * @param {{ ids?: string[], status?: string, statuses?: string[], progressEvery?: number, timeoutMs?: number }} options
+ * @param {{ ids?: string[], status?: string, statuses?: string[], progressEvery?: number, timeoutMs?: number, includeRaw?: boolean }} options
  * @returns {Promise<{ catalog: object[], endpoint: string, requestedIds: string[], missingIds: string[], dictionaries: object, byStatus: Record<string, number> }>}
  */
 async function fetchNormalizedCatalog(options = {}) {
@@ -140,6 +140,8 @@ async function fetchNormalizedCatalog(options = {}) {
       tagsById,
       citiesById,
       metaEventsById,
+    }, {
+      includeRaw: options.includeRaw !== false,
     }),
   );
 
@@ -156,7 +158,7 @@ async function fetchNormalizedCatalog(options = {}) {
   };
 }
 
-function normalizeEvent(event, dictionaries) {
+function normalizeEvent(event, dictionaries, options = {}) {
   const { categoriesById, venuesById, tagsById, citiesById, metaEventsById } = dictionaries;
   const venue = venuesById.get(event.venue);
   const city = venue ? citiesById.get(String(venue.city)) : undefined;
@@ -220,7 +222,9 @@ function normalizeEvent(event, dictionaries) {
     ticketsAmount: event.ticketsAmount,
     ticketsAmountVacant: event.ticketsAmountVacant,
     priceFrom: ticketPrices.length ? Math.min(...ticketPrices) : null,
-    raw: event,
+    // Full snapshots contain tens of thousands of records. Repeating the full
+    // protobuf object here pushed catalog.public.json beyond V8's string limit.
+    ...(options.includeRaw === false ? {} : { raw: event }),
   };
 }
 

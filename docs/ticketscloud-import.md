@@ -162,9 +162,11 @@ POST /api/admin/sources/ticketscloud/sync
 Цепочка full: gRPC fetch → `data/ticketscloud/catalog.public.json` → `tc-import-catalog.js` → `ProviderLink` sync → invalidate public cache.  
 Цепочка ids: gRPC by ids → upsert (без `missingFromCatalog`) → revalidate (CLI) / cache invalidate (API).
 
+Full sync сохраняет компактный нормализованный snapshot без дублирующего protobuf `raw`, пишет его атомарно и до начала импорта проверяет число записей и уникальность `externalId`. После upsert импорт дополнительно сверяет, что для каждого ID snapshot существует `EventSourceLink`; при неполном покрытии транзакция откатывается.
+
 Требуется `DATABASE_URL` и `TICKETSCLOUD_WIDGET_TOKEN` (для `EventOffer.widgetUrl`).
 
-Stats: `SourceSyncRun` — `eventsBefore`, `eventsAfter`, `missingFromCatalog`, `providerLinks`. Подробнее: [phases/phase-b-import-sync.md](./phases/phase-b-import-sync.md).
+Stats: `SourceSyncRun` — `eventsBefore`, `eventsAfter`, `snapshotLinkedEvents`, `snapshotMissingLinks`, `missingFromCatalog`, `providerLinks`. Подробнее: [phases/phase-b-import-sync.md](./phases/phase-b-import-sync.md).
 
 ---
 

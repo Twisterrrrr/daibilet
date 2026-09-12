@@ -32,7 +32,7 @@ const SCROLL_STEP_CARDS = 5;
 /**
  * Vertical day cards (СЕГ/ЗАВ + number + month) with range selection:
  * click A → day; click B → range A–B; click inside range → that day; click same day again → clear.
- * Desktop: Afisha-style prev/next; calendar/filter control on the row below so the day strip uses full width.
+ * Desktop: Afisha-style prev/next; custom calendar is part of the same control row.
  */
 export function CatalogDateRail({ disabled = false, className = '' }: CatalogDateRailProps) {
   const router = useRouter();
@@ -265,14 +265,15 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
       aria-pressed={dateFilterOn || pickerOpen}
       onClick={() => setPickerOpen((open) => !open)}
       className={[
-        'catalog-date-rail-calendar inline-btn inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-60',
+        'catalog-date-rail-calendar inline-btn inline-flex h-[3.25rem] max-w-[10rem] shrink-0 items-center gap-1.5 rounded-2xl border px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-60',
         dateFilterOn || pickerOpen
           ? 'border-primary/60 bg-primary text-white hover:bg-primary/90'
           : 'border-slate-200 bg-[#F0F1F3] text-graphite/80 hover:border-primary/40 hover:bg-primary/10 hover:text-primary',
       ].join(' ')}
     >
       <CalendarIcon className="size-4" strokeWidth={2.25} aria-hidden />
-      <span>Календарь</span>
+      <span className="hidden max-w-[7.25rem] truncate sm:inline">{rangeLabel || 'Календарь'}</span>
+      <span className="sm:hidden">{rangeLabel ? 'Период' : 'Даты'}</span>
     </button>
   );
 
@@ -388,13 +389,7 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
         >
           <ChevronRight className="h-5 w-5" strokeWidth={2} aria-hidden />
         </button>
-      </div>
-
-      <div className="catalog-date-rail-actions mt-2.5 flex w-full min-w-0 flex-wrap items-center gap-2">
         {calendarButton}
-        {rangeLabel ? (
-          <span className="text-xs font-medium text-graphite-muted sm:text-sm">{rangeLabel}</span>
-        ) : null}
       </div>
 
       {modal}

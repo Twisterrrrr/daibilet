@@ -1042,6 +1042,18 @@ html[data-nav-pending='1'] {
     margin-bottom: 0.75rem;
   }
 
+  @media (max-width: 1023px) {
+    .catalog-mobile-quick-chips {
+      position: sticky;
+      top: var(--site-header-height, 4rem);
+      z-index: 24;
+      margin-inline: -0.25rem;
+      padding: 0.5rem 0.25rem;
+      background: rgb(255 255 255 / 0.94);
+      backdrop-filter: blur(10px);
+    }
+  }
+
   .catalog-mobile-sticky-filters__icon {
     @apply inline-btn grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#F5F5F7] text-graphite transition hover:bg-slate-200/70 disabled:opacity-60;
   }

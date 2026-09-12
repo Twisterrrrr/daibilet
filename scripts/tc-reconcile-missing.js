@@ -38,6 +38,7 @@ async function main() {
   const { catalog, endpoint, byStatus } = await fetchNormalizedCatalog({
     statuses: ["PUBLIC", "STAND_BY"],
     progressEvery: 1000,
+    includeRaw: false,
   });
 
   const liveIds = catalog.map((event) => String(event.externalId || "")).filter(Boolean);

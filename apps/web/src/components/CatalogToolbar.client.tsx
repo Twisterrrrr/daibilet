@@ -15,7 +15,6 @@ import { CatalogExcludeThemes } from '@/components/CatalogExcludeThemes.client';
 import { CatalogMobileQuickFilters } from '@/components/CatalogMobileQuickFilters.client';
 import { CatalogPriceRange } from '@/components/CatalogPriceRange.client';
 import {
-  CatalogDesktopFiltersCollapseButton,
   CatalogSidebarLayout,
 } from '@/components/CatalogSidebarLayout.client';
 import { CategoryTabIcon } from '@/components/CategoryTabIcon';
@@ -436,7 +435,6 @@ export function CatalogToolbar({
                 Сбросить
               </button>
             ) : null}
-            <CatalogDesktopFiltersCollapseButton />
           </div>
         </div>
 
@@ -515,6 +513,7 @@ export function CatalogToolbar({
           triggerLabel="Фильтры и поиск"
           activeCount={sidebarActiveCount}
           hideMobileTrigger
+          desktopCollapsible={false}
           onRegisterOpenDrawer={(open) => {
             openSidebarDrawerRef.current = open;
           }}

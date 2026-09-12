@@ -51,6 +51,7 @@ async function main() {
 
   const catalog = JSON.parse(fs.readFileSync(catalogPath, "utf8")).events || [];
   const summary = fs.existsSync(summaryPath) ? JSON.parse(fs.readFileSync(summaryPath, "utf8")) : null;
+  assertCatalogSnapshot(catalog, summary);
   const stats = await importCatalogEvents(catalog, {
     mode: "catalog JSON upsert import",
     summary,
@@ -58,6 +59,28 @@ async function main() {
     endPool: true,
   });
   console.log(JSON.stringify(stats, null, 2));
+}
+
+function assertCatalogSnapshot(catalog, summary) {
+  if (!Array.isArray(catalog) || !catalog.length) {
+    throw new Error("Ticketscloud snapshot is empty or malformed; import aborted");
+  }
+
+  const expectedCount = Number(summary?.counts?.events);
+  if (Number.isFinite(expectedCount) && expectedCount !== catalog.length) {
+    throw new Error(
+      `Ticketscloud snapshot count mismatch: summary=${expectedCount}, catalog=${catalog.length}`,
+    );
+  }
+
+  const ids = catalog.map((event) => String(event?.externalId || "").trim());
+  const missingIds = ids.filter((id) => !id).length;
+  const uniqueIds = new Set(ids.filter(Boolean));
+  if (missingIds || uniqueIds.size !== catalog.length) {
+    throw new Error(
+      `Ticketscloud snapshot identity check failed: rows=${catalog.length}, unique=${uniqueIds.size}, missing=${missingIds}`,
+    );
+  }
 }
 
 /**
@@ -87,6 +110,8 @@ async function importCatalogEvents(catalog, options = {}) {
     missingDeactivatedEvents: 0,
     missingDeactivatedSessions: 0,
     providerLinks: 0,
+    snapshotLinkedEvents: 0,
+    snapshotMissingLinks: 0,
   };
 
   try {
@@ -127,6 +152,23 @@ async function importCatalogEvents(catalog, options = {}) {
       if (rowStats.city) stats.cities += 1;
       if (rowStats.hasWidgetUrl) stats.offersWithWidgetUrl += 1;
       else stats.eventsWithoutWidgetUrl += 1;
+    }
+
+    const snapshotCoverageResult = await client.query(
+      `
+        select count(distinct "externalId")::int as count
+        from "EventSourceLink"
+        where "sourceId" = $1
+          and "externalId" = any($2::text[])
+      `,
+      [TICKETSCLOUD_SOURCE_ID, [...importedExternalIds]],
+    );
+    stats.snapshotLinkedEvents = snapshotCoverageResult.rows[0]?.count ?? 0;
+    stats.snapshotMissingLinks = importedExternalIds.size - stats.snapshotLinkedEvents;
+    if (stats.snapshotMissingLinks !== 0) {
+      throw new Error(
+        `Ticketscloud import coverage check failed: snapshot=${importedExternalIds.size}, linked=${stats.snapshotLinkedEvents}`,
+      );
     }
 
     if (!skipMissingFromCatalog) {
@@ -651,6 +693,7 @@ function sha256(value) {
 }
 
 module.exports = {
+  assertCatalogSnapshot,
   importCatalogEvent,
   importCatalogEvents,
   TICKETSCLOUD_SOURCE_ID,

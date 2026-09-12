@@ -23,6 +23,9 @@ async function main() {
     // (sales stopped) - we never re-fetched those ids. Import both.
     statuses: ["PUBLIC", "STAND_BY"],
     progressEvery: 1000,
+    // The normalized record contains every field used by the importer. Keeping
+    // the full protobuf record too made the snapshot exceed V8's string limit.
+    includeRaw: false,
   });
 
   console.log("Normalizing catalog...");
@@ -34,12 +37,22 @@ async function main() {
     byStatus,
   });
 
-  fs.writeFileSync(catalogPath, JSON.stringify({ events: catalog }, null, 2));
-  fs.writeFileSync(summaryPath, JSON.stringify(summary, null, 2));
+  writeJsonAtomic(catalogPath, { events: catalog });
+  writeJsonAtomic(summaryPath, summary, 2);
 
   printSummary(summary);
   console.log(`Saved catalog to ${catalogPath}`);
   console.log(`Saved summary to ${summaryPath}`);
+}
+
+function writeJsonAtomic(targetPath, value, indent = 0) {
+  const tempPath = `${targetPath}.tmp-${process.pid}`;
+  try {
+    fs.writeFileSync(tempPath, JSON.stringify(value, null, indent));
+    fs.renameSync(tempPath, targetPath);
+  } finally {
+    if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);
+  }
 }
 
 function buildSummary({ endpoint, startedAt, catalog, dictionaries, byStatus }) {

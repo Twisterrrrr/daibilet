@@ -6,8 +6,12 @@ import {
   assertRewriteCooldown,
   buildRewriteUserPrompt,
   callOpenAiRewrite,
+  formatDurationMinutesRu,
+  formatScheduledDurationFact,
+  normalizeScheduledDurationMinutes,
   resetRewriteCooldownForTests,
   rewriteEventDescription,
+  roundDurationMinutesToFive,
   sanitizeRewriteOutput,
   truncateRewriteInput,
   AiRewriteError,
@@ -18,6 +22,8 @@ test('SYSTEM_PROMPT includes safety hexagon rules', () => {
   assert.match(SYSTEM_PROMPT, /СОХРАНЕНИЕ СТРУКТУРНЫХ ДАННЫХ/);
   assert.match(SYSTEM_PROMPT, /Ticketscloud/);
   assert.match(SYSTEM_PROMPT, /Markdown/);
+  assert.match(SYSTEM_PROMPT, /времени начала и окончания/);
+  assert.match(SYSTEM_PROMPT, /ближайших 5 минут/);
 });
 
 test('truncateRewriteInput keeps short text', () => {
@@ -42,6 +48,28 @@ test('buildRewriteUserPrompt includes title and description', () => {
   assert.match(prompt, /Обзорная по Перми/);
   assert.match(prompt, /Пермь/);
   assert.match(prompt, /Исходный текст экскурсии/);
+});
+
+test('schedule duration is rounded to five minutes and included as a structured fact', () => {
+  const { prompt } = buildRewriteUserPrompt('На занятии участники напишут картину.', {
+    title: 'Мастер-класс по живописи',
+    scheduledDurationMinutes: [67],
+  });
+
+  assert.match(prompt, /Расчётная длительность по расписанию: 1 час 5 минут/);
+  assert.match(prompt, /только если длительность отсутствует/);
+});
+
+test('schedule duration variants remain explicit after rounding', () => {
+  assert.deepEqual(normalizeScheduledDurationMinutes([67, 68, '67', null, -1]), [65, 70]);
+  assert.equal(roundDurationMinutesToFive(62), 60);
+  assert.equal(roundDurationMinutesToFive(63), 65);
+  assert.equal(roundDurationMinutesToFive('bad'), null);
+  assert.equal(formatDurationMinutesRu(125), '2 часа 5 минут');
+  assert.equal(
+    formatScheduledDurationFact([67, 68]),
+    'Расчётная длительность зависит от сеанса: 1 час 5 минут, 1 час 10 минут.',
+  );
 });
 
 test('buildRewriteUserPrompt rejects empty description', () => {

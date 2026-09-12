@@ -12,10 +12,6 @@ import {
   HORIZONTAL_PROMO_MIN_RATIO,
   resolveHorizontalFeedPromoImage,
 } from '@/lib/blog-promo-image';
-import {
-  blogCityBadgeClassName,
-  blogTagBadgeClassName,
-} from '@/lib/blog-meta';
 import { formatPriceFrom, pluralEvents } from '@/lib/format';
 import type { BlogSidebarPromoDto } from '@/lib/blog-sidebar-promo';
 import type { BlogFeedPromoKind, BlogFeedPromoLayout } from '@/lib/blog-feed-promo';
@@ -163,14 +159,14 @@ function FeedPromoImage({
   );
 }
 
-/** Magazine tile: visually equal to an article card, but carries live afisha data. */
+/** Full-image magazine tile with restrained overlay copy. */
 function ArticleTileCard({ copy }: { copy: ResolvedCopy }) {
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-sm transition duration-300 hover:border-slate-300 hover:shadow-md">
+    <article className="group relative flex h-full min-h-[20rem] overflow-hidden rounded-2xl bg-slate-900 text-white shadow-sm transition duration-300 hover:shadow-md">
       <Link
         href={copy.href}
         aria-label={copy.title}
-        className="relative block aspect-[16/10] w-full shrink-0 overflow-hidden bg-slate-100"
+        className="absolute inset-0 block overflow-hidden bg-slate-900"
       >
         <FeedPromoImage
           src={copy.imageSrc}
@@ -178,28 +174,34 @@ function ArticleTileCard({ copy }: { copy: ResolvedCopy }) {
           probeEventCover={copy.probeEventCover}
           sizes={FEED_IMAGE_SIZES}
         />
+        <span
+          aria-hidden
+          className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/45 to-transparent"
+        />
       </Link>
-      <div className="flex min-w-0 flex-1 flex-col gap-2.5 p-4 sm:p-5">
+      <div className="relative z-[1] mt-auto flex min-w-0 flex-col gap-2.5 p-5 sm:p-6">
         <div className="flex flex-wrap gap-1.5">
           <span
-            className={`inline-flex max-w-full truncate rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ring-1 sm:text-[11px] ${blogTagBadgeClassName(copy.eyebrow)}`}
+            className="inline-flex max-w-full truncate rounded-md bg-white/90 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-900 ring-1 ring-white/70 sm:text-[11px]"
           >
             {copy.eyebrow}
           </span>
           <span
-            className={`inline-flex max-w-full truncate rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ring-1 sm:text-[11px] ${blogCityBadgeClassName(copy.citySlug)}`}
+            className="inline-flex max-w-full truncate rounded-md bg-sky-100/95 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-sky-900 ring-1 ring-sky-200/80 sm:text-[11px]"
           >
             {copy.cityTag}
           </span>
         </div>
-        <h3 className="break-words text-base font-semibold leading-snug tracking-tight text-slate-900 transition-colors group-hover:text-primary-700 sm:text-lg">
-          <Link href={copy.href}>{copy.title}</Link>
+        <h3 className="break-words font-display text-xl font-bold leading-snug text-white transition-colors sm:text-2xl">
+          <Link href={copy.href} className="hover:text-white/90">
+            {copy.title}
+          </Link>
         </h3>
-        <p className="break-words text-sm leading-relaxed text-slate-600">{copy.excerpt}</p>
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-1 text-xs text-slate-500">
+        <p className="line-clamp-2 break-words text-sm leading-relaxed text-white/80">{copy.excerpt}</p>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 pt-1 text-xs text-white/70">
           <Link
             href={copy.href}
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary-700 transition-all duration-300 group-hover:gap-2.5 group-hover:text-primary-800"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-white px-3.5 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
           >
             {copy.cta}
             <ArrowRight className="h-4 w-4" aria-hidden />

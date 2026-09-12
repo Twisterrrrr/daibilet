@@ -17,9 +17,11 @@ test('POST rewrite-description returns text and does not write override', async 
           title: 'Обзорная',
           sourceDescription: 'Оригинал с Ticketscloud',
           overrideDescription: null,
+          scheduledDurationMinutes: [65],
         };
       },
-      async rewriteEventDescription() {
+      async rewriteEventDescription(params) {
+        assert.deepEqual(params.meta?.scheduledDurationMinutes, [65]);
         return { text: 'Уникальный рерайт', model: 'gpt-test', truncatedInput: false };
       },
       async updateAdminEventOverride() {
@@ -43,6 +45,7 @@ test('POST rewrite-description returns text and does not write override', async 
   const body = JSON.parse(response.body);
   assert.equal(body.text, 'Уникальный рерайт');
   assert.equal(body.sourceUsed, 'source');
+  assert.deepEqual(body.scheduledDurationMinutes, [65]);
 });
 
 test('POST rewrite-description falls back to override when source empty', async () => {
@@ -126,7 +129,13 @@ function createDeps(overrides: Partial<AdminEventsHandlerDependencies> = {}): Ad
       async query() {
         return { rows: [] };
       },
-    } as AdminEventsHandlerDependencies['db'],
+      async stats() {
+        return {};
+      },
+      async recentEvents() {
+        return [];
+      },
+    },
     async updateAdminEventOverride() {
       return {};
     },

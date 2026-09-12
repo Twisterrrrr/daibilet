@@ -19,6 +19,12 @@ export const SYSTEM_PROMPT = `Вы — профессиональный комм
 5. ТОН ГОЛОСА (TONE OF VOICE): Деловой, вовлекающий, экспертный, без панибратства. Избегайте капслока, восклицательных знаков (максимум 1 на весь текст) и эмодзи (никаких смайликов, стрелочек и огоньков в тексте карточки).
 6. ФОРМАТ ВЫВОДА: Верни ТОЛЬКО готовый очищенный текст в формате Markdown. Никаких преамбул ("Вот ваш текст:"), никаких постскриптумов ("Надеюсь, вам понравилось"). Только тело описания (body description).
 
+### СТРУКТУРИРОВАННЫЕ ФАКТЫ ИЗ РАСПИСАНИЯ:
+- Вместе с исходным текстом может быть передана расчётная длительность. Она получена из времени начала и окончания сеансов и уже округлена до ближайших 5 минут.
+- Используй её только если длительность не заявлена в исходном описании. Явно указанная организатором длительность имеет приоритет.
+- Если длительность различается между сеансами, не называй одно фиксированное значение. Напиши, что она зависит от сеанса, и используй переданные варианты или диапазон.
+- Не объясняй читателю, откуда взялся расчёт, и не упоминай технические поля startsAt/endsAt.
+
 ### АЛГОРИТМ РАБОТЫ С ТЕКСТОМ:
 - Шаг 1: Выдели ключевую суть события в первое предложение (Что это? Где? В чем главный интерес?).
 - Шаг 2: Перепиши основное художественное описание своими словами, повышая динамику текста (используй активный залог: вместо "Вам будет показано" -> "Вы увидите").
@@ -27,6 +33,7 @@ export const SYSTEM_PROMPT = `Вы — профессиональный комм
 export type RewriteDescriptionMeta = {
   title?: string | null;
   city?: string | null;
+  scheduledDurationMinutes?: readonly number[] | null;
 };
 
 export type RewriteDescriptionResult = {
@@ -48,6 +55,59 @@ export class AiRewriteError extends Error {
 }
 
 const lastRewriteAtByEvent = new Map<string, number>();
+
+/** Round an inferred schedule duration to the nearest five minutes. */
+export function roundDurationMinutesToFive(value: unknown): number | null {
+  const minutes = typeof value === 'number' ? value : Number(value);
+  if (!Number.isFinite(minutes) || minutes <= 0) return null;
+  return Math.max(5, Math.round(minutes / 5) * 5);
+}
+
+export function normalizeScheduledDurationMinutes(
+  values: readonly unknown[] | null | undefined,
+): number[] {
+  const rounded = (values || [])
+    .map(roundDurationMinutesToFive)
+    .filter((value): value is number => value != null);
+  return [...new Set(rounded)].sort((left, right) => left - right);
+}
+
+export function formatDurationMinutesRu(totalMinutes: number): string {
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  const parts: string[] = [];
+
+  if (hours > 0) parts.push(`${hours} ${pluralRu(hours, 'час', 'часа', 'часов')}`);
+  if (minutes > 0) parts.push(`${minutes} ${pluralRu(minutes, 'минута', 'минуты', 'минут')}`);
+  return parts.join(' ') || '0 минут';
+}
+
+export function formatScheduledDurationFact(
+  values: readonly unknown[] | null | undefined,
+): string | null {
+  const durations = normalizeScheduledDurationMinutes(values);
+  if (!durations.length) return null;
+  if (durations.length === 1) {
+    return `Расчётная длительность по расписанию: ${formatDurationMinutesRu(durations[0]!)}.`;
+  }
+  if (durations.length <= 4) {
+    return `Расчётная длительность зависит от сеанса: ${durations
+      .map(formatDurationMinutesRu)
+      .join(', ')}.`;
+  }
+  return `Расчётная длительность зависит от сеанса: от ${formatDurationMinutesRu(
+    durations[0]!,
+  )} до ${formatDurationMinutesRu(durations[durations.length - 1]!)}. Не называй одно фиксированное значение.`;
+}
+
+function pluralRu(value: number, one: string, few: string, many: string): string {
+  const absolute = Math.abs(value) % 100;
+  const lastDigit = absolute % 10;
+  if (absolute > 10 && absolute < 20) return many;
+  if (lastDigit === 1) return one;
+  if (lastDigit >= 2 && lastDigit <= 4) return few;
+  return many;
+}
 
 export function truncateRewriteInput(text: string, maxChars = AI_REWRITE_MAX_INPUT_CHARS): {
   text: string;
@@ -72,8 +132,14 @@ export function buildRewriteUserPrompt(
   const lines: string[] = [];
   const title = String(meta.title || '').trim();
   const city = String(meta.city || '').trim();
+  const scheduledDurationFact = formatScheduledDurationFact(meta.scheduledDurationMinutes);
   if (title) lines.push(`Название события: ${title}`);
   if (city) lines.push(`Город: ${city}`);
+  if (scheduledDurationFact) {
+    lines.push('Структурированные данные из расписания:');
+    lines.push(scheduledDurationFact);
+    lines.push('Используй этот факт только если длительность отсутствует в исходном описании.');
+  }
   lines.push('Исходное описание:');
   lines.push(text);
   return { prompt: lines.join('\n'), truncated };
@@ -123,11 +189,11 @@ type OpenAiChatCompletionResponse = {
 };
 
 export async function callOpenAiRewrite(params: {
-  systemPrompt?: string;
+  systemPrompt?: string | undefined;
   userPrompt: string;
-  apiKey?: string;
-  model?: string;
-  fetchImpl?: typeof fetch;
+  apiKey?: string | undefined;
+  model?: string | undefined;
+  fetchImpl?: typeof fetch | undefined;
 }): Promise<{ text: string; model: string }> {
   const apiKey = String(params.apiKey || resolveOpenAiApiKey()).trim();
   if (!apiKey) {
