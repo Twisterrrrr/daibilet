@@ -71,6 +71,10 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
   const router = useRouter();
   const urlSearchParams = useSearchParams();
   const selectedCity = useSelectedCityOptional();
+  // Next refreshes server props when History API updates ?page=. Keep the
+  // hydration snapshot stable so it cannot replace an already-appended list.
+  const bootCatalogRef = useRef(initialCatalog);
+  const bootQueryKeyRef = useRef(initialQueryKey);
   const rawUrlCity = urlSearchParams.get('city')?.trim() || '';
   const urlCityIsAll = rawUrlCity.toLowerCase() === 'all';
   const urlHasCity = Boolean(rawUrlCity) && !urlCityIsAll;
@@ -313,16 +317,18 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
 
     // Deep-link / SSR shortcuts — skip when appending the next batch.
     if (!appendMode) {
-      if (initialQueryKey && effectiveQueryKey === initialQueryKey && initialCatalog && urlHasCity) {
-        setCatalog(initialCatalog);
+      const bootCatalog = bootCatalogRef.current;
+      const bootQueryKey = bootQueryKeyRef.current;
+      if (bootQueryKey && effectiveQueryKey === bootQueryKey && bootCatalog && urlHasCity) {
+        setCatalog(bootCatalog);
         setLoading(false);
         setError(null);
         fetchedQueryKeyRef.current = effectiveQueryKey;
         return;
       }
 
-      if (initialQueryKey && effectiveQueryKey === initialQueryKey && initialCatalog && !filterValues.city) {
-        setCatalog(initialCatalog);
+      if (bootQueryKey && effectiveQueryKey === bootQueryKey && bootCatalog && !filterValues.city) {
+        setCatalog(bootCatalog);
         setLoading(false);
         setError(null);
         fetchedQueryKeyRef.current = effectiveQueryKey;
@@ -394,8 +400,6 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
     };
   }, [
     effectiveQueryKey,
-    initialQueryKey,
-    initialCatalog,
     cityBootstrapPending,
     needsCityGate,
     urlHasCity,
