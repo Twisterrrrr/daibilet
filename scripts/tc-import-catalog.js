@@ -109,6 +109,7 @@ async function importCatalogEvents(catalog, options = {}) {
     missingFromCatalog: 0,
     missingDeactivatedEvents: 0,
     missingDeactivatedSessions: 0,
+    missingDeactivatedOffers: 0,
     providerLinks: 0,
     snapshotLinkedEvents: 0,
     snapshotMissingLinks: 0,
@@ -186,6 +187,7 @@ async function importCatalogEvents(catalog, options = {}) {
       const deactivated = await deactivateMissingTicketscloudEvents(client, importedExternalIds);
       stats.missingDeactivatedEvents = deactivated.eventsMarked;
       stats.missingDeactivatedSessions = deactivated.sessionsMarked;
+      stats.missingDeactivatedOffers = deactivated.offersMarked;
     }
 
     const providerLinkStats = await syncProviderLinksForSource(

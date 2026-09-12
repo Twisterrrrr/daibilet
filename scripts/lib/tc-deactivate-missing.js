@@ -12,7 +12,7 @@ const TICKETSCLOUD_SOURCE_ID = "src_ticketscloud";
 /**
  * @param {import('pg').PoolClient} client
  * @param {Iterable<string>} liveExternalIds - externalIds currently returned by TC PUBLIC∪STAND_BY
- * @returns {Promise<{ missingLinks: number, eventsMarked: number, sessionsMarked: number }>}
+ * @returns {Promise<{ missingLinks: number, eventsMarked: number, sessionsMarked: number, offersMarked: number }>}
  */
 async function deactivateMissingTicketscloudEvents(client, liveExternalIds) {
   const liveIds = [...new Set([...liveExternalIds].map(String).filter(Boolean))];
@@ -23,17 +23,13 @@ async function deactivateMissingTicketscloudEvents(client, liveExternalIds) {
       from "EventSourceLink" esl
       where esl."sourceId" = $1
         and esl."externalId" <> all($2::text[])
-        and lower(coalesce(
-          (select e."sourceStatus" from "Event" e where e.id = esl."eventId"),
-          ''
-        )) not in ('cancelled', 'canceled', 'deleted', 'hidden', 'stand_by')
     `,
     [TICKETSCLOUD_SOURCE_ID, liveIds],
   );
 
-  const eventIds = missing.rows.map((row) => row.eventId).filter(Boolean);
+  const eventIds = [...new Set(missing.rows.map((row) => row.eventId).filter(Boolean))];
   if (!eventIds.length) {
-    return { missingLinks: missing.rows.length, eventsMarked: 0, sessionsMarked: 0 };
+    return { missingLinks: missing.rows.length, eventsMarked: 0, sessionsMarked: 0, offersMarked: 0 };
   }
 
   const events = await client.query(
@@ -48,6 +44,9 @@ async function deactivateMissingTicketscloudEvents(client, liveExternalIds) {
         "isIndexable" = false,
         "updatedAt" = now()
       where id = any($1::text[])
+        and lower(coalesce("sourceStatus", '')) not in (
+          'cancelled', 'canceled', 'deleted', 'hidden', 'stand_by'
+        )
       returning id
     `,
     [eventIds],
@@ -71,10 +70,23 @@ async function deactivateMissingTicketscloudEvents(client, liveExternalIds) {
     [eventIds],
   );
 
+  const offers = await client.query(
+    `
+      update "EventOffer"
+      set active = false
+      where "eventId" = any($1::text[])
+        and "sourceCode" = 'TICKETSCLOUD'
+        and active is distinct from false
+      returning id
+    `,
+    [eventIds],
+  );
+
   return {
     missingLinks: missing.rows.length,
     eventsMarked: events.rowCount || 0,
     sessionsMarked: sessions.rowCount || 0,
+    offersMarked: offers.rowCount || 0,
   };
 }
 
