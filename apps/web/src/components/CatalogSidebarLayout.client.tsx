@@ -55,6 +55,8 @@ type CatalogSidebarLayoutProps = {
   hideMobileTrigger?: boolean;
   /** Keep the desktop filter column visible when it is core to the page IA. */
   desktopCollapsible?: boolean;
+  /** Place filters in the free page gutter when it is wide enough. */
+  desktopPlacement?: 'inside' | 'outside-gutter';
   /** Expose drawer open for external sticky bar */
   onRegisterOpenDrawer?: (open: () => void) => void;
   /** Overlay / X / Escape — rollback draft without applying. */
@@ -79,6 +81,7 @@ export function CatalogSidebarLayout({
   activeCount = 0,
   hideMobileTrigger = false,
   desktopCollapsible = true,
+  desktopPlacement = 'inside',
   onRegisterOpenDrawer,
   onDrawerDismiss,
   onDrawerOpen,
@@ -145,6 +148,7 @@ export function CatalogSidebarLayout({
   }, [open, closeDismiss]);
 
   const resolvedDesktopCollapsed = desktopCollapsible && desktopCollapsed;
+  const outsideGutter = desktopPlacement === 'outside-gutter';
   const layoutValue: CatalogFiltersLayoutContextValue = {
     desktopCollapsed: resolvedDesktopCollapsed,
     desktopCollapsible,
@@ -168,13 +172,13 @@ export function CatalogSidebarLayout({
       ) : null}
 
       <div
-        className={`catalog-sidebar-overlay${open ? ' is-visible' : ''}`}
+        className={`catalog-sidebar-overlay${outsideGutter ? ' catalog-sidebar-overlay--outside-gutter' : ''}${open ? ' is-visible' : ''}`}
         aria-hidden={!open}
         onClick={closeDismiss}
       />
 
       <div
-        className={`catalog-page-layout${resolvedDesktopCollapsed ? ' is-filters-collapsed' : ''}`}
+        className={`catalog-page-layout${outsideGutter ? ' catalog-page-layout--outside-filters' : ''}${resolvedDesktopCollapsed ? ' is-filters-collapsed' : ''}`}
         data-catalog-filters-collapsed={resolvedDesktopCollapsed ? '1' : '0'}
       >
         {resolvedDesktopCollapsed ? (
@@ -202,7 +206,7 @@ export function CatalogSidebarLayout({
             className={`catalog-sidebar${open ? ' is-open' : ''}`}
             aria-labelledby={titleId}
           >
-            <div className="catalog-sidebar-mobile-header lg:hidden">
+            <div className={`catalog-sidebar-mobile-header${outsideGutter ? ' catalog-sidebar-mobile-header--adaptive' : ' lg:hidden'}`}>
               <h2 id={titleId} className="text-base font-bold text-slate-900">
                 {title}
               </h2>
@@ -217,7 +221,7 @@ export function CatalogSidebarLayout({
             </div>
             <div className="catalog-sidebar-scroll">{sidebar}</div>
             {footer ? (
-              <div className="catalog-sidebar-mobile-footer lg:hidden">
+              <div className={`catalog-sidebar-mobile-footer${outsideGutter ? ' catalog-sidebar-mobile-footer--adaptive' : ' lg:hidden'}`}>
                 {typeof footer === 'function' ? footer({ closeApply, closeDismiss }) : footer}
               </div>
             ) : null}

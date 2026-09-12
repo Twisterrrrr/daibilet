@@ -522,6 +522,7 @@ export function CatalogToolbar({
           activeCount={sidebarActiveCount}
           hideMobileTrigger
           desktopCollapsible={false}
+          desktopPlacement="outside-gutter"
           onRegisterOpenDrawer={(open) => {
             openSidebarDrawerRef.current = open;
           }}

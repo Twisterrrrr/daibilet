@@ -244,7 +244,7 @@ export function CatalogMobileQuickFilters({
 
   return (
     <>
-      <div className="catalog-mobile-quick-chips lg:hidden">
+      <div className="catalog-mobile-quick-chips">
         <div className="flex items-center gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <button
             type="button"
@@ -297,7 +297,7 @@ export function CatalogMobileQuickFilters({
 
       {sheet && typeof document !== 'undefined'
         ? createPortal(
-            <div className="fixed inset-0 z-[100] flex items-end justify-center lg:hidden">
+            <div className="catalog-quick-sheet fixed inset-0 z-[100] flex items-end justify-center">
               <button
                 type="button"
                 aria-label="Закрыть"
@@ -308,7 +308,7 @@ export function CatalogMobileQuickFilters({
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby={titleId}
-                className="relative z-[1] flex max-h-[min(75vh,28rem)] w-full flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl"
+                className="catalog-quick-sheet__panel relative z-[1] flex max-h-[min(75vh,28rem)] w-full flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl"
               >
                 <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
                   <h2 id={titleId} className="font-display text-base font-bold text-graphite">

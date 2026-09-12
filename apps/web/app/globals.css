@@ -826,6 +826,74 @@ html[data-nav-pending='1'] {
     }
   }
 
+  /**
+   * Events filters use the otherwise empty left page gutter. Below this width
+   * the gutter cannot hold a useful rail, so the same controls become a drawer.
+   */
+  @media (min-width: 1024px) and (max-width: 1839px) {
+    .catalog-page-layout.catalog-page-layout--outside-filters {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
+    }
+
+    .catalog-page-layout--outside-filters .catalog-sidebar {
+      position: fixed;
+      top: 0;
+      left: -100%;
+      z-index: 1000;
+      display: flex;
+      width: min(100vw, 24rem);
+      height: 100vh;
+      max-height: none;
+      flex-direction: column;
+      align-self: auto;
+      overflow: hidden;
+      padding: 1rem 1rem 0;
+      border: 0;
+      border-radius: 0 1rem 1rem 0;
+      background: #fff;
+      box-shadow: 1.25rem 0 2.5rem rgba(15, 23, 42, 0.15);
+      transition: left 0.28s ease;
+    }
+
+    .catalog-page-layout--outside-filters .catalog-sidebar.is-open {
+      left: 0;
+    }
+
+    .catalog-sidebar-overlay--outside-gutter {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      background: rgba(15, 23, 42, 0.4);
+    }
+
+    .catalog-sidebar-overlay--outside-gutter.is-visible {
+      display: block;
+    }
+  }
+
+  @media (min-width: 1840px) {
+    .catalog-page-layout.catalog-page-layout--outside-filters {
+      --catalog-outside-filter-width: 18rem;
+      --catalog-outside-filter-gap: 1.5rem;
+      width: calc(100% + var(--catalog-outside-filter-width) + var(--catalog-outside-filter-gap));
+      margin-left: calc(-1 * (var(--catalog-outside-filter-width) + var(--catalog-outside-filter-gap)));
+      grid-template-columns: var(--catalog-outside-filter-width) minmax(0, 1fr);
+      gap: var(--catalog-outside-filter-gap);
+    }
+
+    .catalog-page-layout--outside-filters .catalog-sidebar {
+      padding: 1.25rem;
+    }
+
+    .catalog-page-layout--outside-filters .catalog-sidebar-mobile-header--adaptive,
+    .catalog-page-layout--outside-filters .catalog-sidebar-mobile-footer--adaptive,
+    .catalog-mobile-quick-chips,
+    .catalog-quick-sheet {
+      display: none !important;
+    }
+  }
+
   /* Collapsed filters: more columns on ultrawide, stretch to fill row width. */
   @media (min-width: 1024px) {
     .catalog-page-layout.is-filters-collapsed .catalog-card-grid {
@@ -1042,7 +1110,7 @@ html[data-nav-pending='1'] {
     margin-bottom: 0.75rem;
   }
 
-  @media (max-width: 1023px) {
+  @media (max-width: 1839px) {
     .catalog-mobile-quick-chips {
       position: sticky;
       top: var(--site-header-height, 4rem);
@@ -1051,6 +1119,68 @@ html[data-nav-pending='1'] {
       padding: 0.5rem 0.25rem;
       background: rgb(255 255 255 / 0.94);
       backdrop-filter: blur(10px);
+    }
+  }
+
+  @media (min-width: 768px) and (max-width: 1839px) {
+    .catalog-quick-sheet {
+      align-items: center;
+      padding: 1.5rem;
+    }
+
+    .catalog-quick-sheet__panel {
+      max-width: 30rem;
+      border-radius: 1rem;
+    }
+  }
+
+  .catalog-zen-spotlight-grid {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: min(84vw, 21rem);
+    gap: 0.75rem;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+    scrollbar-width: none;
+    scroll-snap-type: x proximity;
+  }
+
+  .catalog-zen-spotlight-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .catalog-zen-spotlight-item {
+    min-height: 18rem;
+    scroll-snap-align: start;
+  }
+
+  @media (min-width: 640px) {
+    .catalog-zen-spotlight-grid {
+      grid-auto-flow: row;
+      grid-auto-columns: auto;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      overflow: visible;
+    }
+
+    .catalog-zen-spotlight-item {
+      min-height: 20rem;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .catalog-zen-spotlight-grid {
+      min-height: 27rem;
+      grid-template-columns: minmax(0, 1.65fr) minmax(18rem, 0.75fr);
+      grid-template-rows: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .catalog-zen-spotlight-item {
+      min-height: 0;
+    }
+
+    .catalog-zen-spotlight-item:first-child {
+      grid-row: 1 / span 2;
     }
   }
 

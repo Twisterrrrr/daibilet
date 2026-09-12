@@ -23,7 +23,7 @@ function citySlug(city: PublicDestinationDto): string {
 /** Compact chip labels for the popular row (full name stays in the select). */
 function chipLabel(city: PublicDestinationDto): string {
   if (isPopularRailMoscow(city)) return 'Москва';
-  if (isPopularRailSpb(city)) return 'СПб';
+  if (isPopularRailSpb(city)) return 'Санкт-Петербург';
   if (citySlug(city) === 'kaliningrad') return 'Калининград';
   return city.name;
 }

@@ -18,7 +18,7 @@ const POPULAR_CITY_LIMIT = 24;
 
 function chipLabel(city: PublicDestinationDto): string {
   if (isPopularRailMoscow(city)) return 'Москва';
-  if (isPopularRailSpb(city)) return 'СПб';
+  if (isPopularRailSpb(city)) return 'Санкт-Петербург';
   const slug = String(city.slug || '').trim().toLowerCase();
   if (slug === 'kaliningrad') return 'Калининград';
   return city.name;

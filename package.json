@@ -49,6 +49,7 @@
     "tc:count": "node scripts/tc-count-events.js",
     "tc:full-sync": "node scripts/tc-full-sync.js",
     "tc:import": "node scripts/tc-import-catalog.js",
+    "event:rewrite:audit": "node scripts/event-rewrite-audit.js",
     "tc:sync": "node scripts/tc-sync.js",
     "tc:sync:help": "node scripts/tc-sync.js --help",
     "check:widgets": "node scripts/widget-readiness-check.mjs",
