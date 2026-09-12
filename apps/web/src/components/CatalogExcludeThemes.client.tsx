@@ -17,6 +17,7 @@ type CatalogExcludeThemesProps = {
   disabled?: boolean;
   onNavigate: (next: CatalogFilterValues) => void;
   className?: string;
+  variant?: 'inline' | 'sidebar';
 };
 
 /**
@@ -29,6 +30,7 @@ export function CatalogExcludeThemes({
   disabled = false,
   onNavigate,
   className = '',
+  variant = 'inline',
 }: CatalogExcludeThemesProps) {
   if (filters.landing) return null;
 
@@ -37,19 +39,32 @@ export function CatalogExcludeThemes({
   if (!options.length) return null;
 
   const excludedSet = new Set(excluded);
+  const sidebar = variant === 'sidebar';
 
   return (
     <div
-      className={`flex min-w-0 flex-wrap items-center gap-2 ${className}`}
+      className={`${sidebar ? 'catalog-sidebar-section flex-col items-stretch' : 'flex flex-wrap items-center'} min-w-0 gap-2 ${className}`}
       role="group"
       aria-label="Скрыть темы"
       data-catalog-exclude-themes
     >
-      <span className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-graphite-muted">
+      <span
+        className={
+          sidebar
+            ? 'catalog-sidebar-section__title inline-flex items-center gap-1.5'
+            : 'inline-flex shrink-0 items-center gap-1 text-xs font-medium text-graphite-muted'
+        }
+      >
         <EyeOff className="h-3.5 w-3.5" strokeWidth={2} aria-hidden />
-        Скрыть
+        {sidebar ? 'Не показывать' : 'Скрыть'}
       </span>
-      <div className="horizontal-snap-row flex min-w-0 flex-1 flex-nowrap items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div
+        className={
+          sidebar
+            ? 'flex min-w-0 flex-wrap items-center gap-1.5'
+            : 'horizontal-snap-row flex min-w-0 flex-1 flex-nowrap items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
+        }
+      >
         {options.map((option) => {
           const on = excludedSet.has(option.slug);
           return (

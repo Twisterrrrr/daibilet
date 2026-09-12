@@ -489,6 +489,14 @@ export function CatalogToolbar({
           />
         </div>
 
+        <CatalogExcludeThemes
+          filters={effectiveFilters}
+          landings={facets.landings || []}
+          disabled={disabled}
+          onNavigate={catalogNavigate}
+          variant="sidebar"
+        />
+
         <CatalogAdvancedFiltersInline
           filters={effectiveFilters}
           landings={facets.landings}
@@ -542,7 +550,6 @@ export function CatalogToolbar({
               onNavigate={navigate}
               onOpenAllFilters={() => openSidebarDrawerRef.current?.()}
             />
-            {excludeThemesRow}
             {children}
           </div>
         </CatalogSidebarLayout>
