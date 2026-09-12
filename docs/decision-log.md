@@ -119,7 +119,7 @@
 
 **Почему:** Приоритет — открытие виджетов и корректная передача ID, а не продажи. API-check дешевле и воспроизводимее ручного клика.
 
-**Статус:** Активно. Browser smoke — ручной чеклист в `widget-data-contract.md`. Импорт sync→БД — фаза B.
+**Статус:** Активно. Browser smoke 0.2 закрыт 2026-07-22 (ручное подтверждение). Импорт sync→БД — фаза B.
 
 ---
 
@@ -163,13 +163,33 @@
 
 ---
 
+## 2026-07-10 — Codex split: phase2-foundation, cherry-pick после F3
+
+**Решение:** Codex = ветка **`codex/phase2-foundation`** (не `phase2-finance-next`). Unrelated history — **no wholesale merge**. Canonical public Next = **`apps/web`**. Cherry-pick после F3: Phase 2 schema, event change requests, admin contracts. **Не мержить** Codex Next в `apps/public` + proxy bridge.
+
+**Почему:** Два конкурирующих Next-подхода (Path A proxy vs Path B full-stack). F3 cutover не должен блокироваться на merge Codex.
+
+**Статус:** Активно. [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md), [codex-cherry-pick-plan.md](./codex-cherry-pick-plan.md).
+
+---
+
+## 2026-07-10 — F2 закрыт: landings ISR, catalog filters, widgets
+
+**Решение:** Завершён F2 public SSR: landings (`/podborki` + SEO paths) с ISR/SSG, SSR-фильтры каталога (city/date/sort/q), client widgets TC/Teplohod на event page, `backend:next:parity`.
+
+**Почему:** Exit criteria F2 — indexable HTML без JS + parity с legacy перед F3 cutover.
+
+**Статус:** Активно. Следующий шаг — F3 ([phase-f3-cutover-checklist.md](./phases/phase-f3-cutover-checklist.md)).
+
+---
+
 ## 2026-07-10 — Frontend остаётся Vite SPA (не Next.js)
 
 **Решение:** `apps/public` и `apps/admin` — Vite 6 + React 19 CSR. Next.js не в scope MVP.
 
 **Почему:** Текущий deploy (static + nginx + API) работает; миграция на Next.js не даёт ROI до стабилизации backend и SEO-требований.
 
-**Статус:** Активно. Пересмотреть в Phase F при необходимости SSR/prerender.
+**Статус:** Заменено Path B — Vite deprecated после F3 cutover.
 
 ---
 
@@ -179,9 +199,54 @@
 
 **Почему:** Vite CSR + lazy load 60 — поисковики получают мало контента без JS. Path B из аудита — целевое решение.
 
-**Codex:** параллельно `codex/phase2-finance-next` — Phase 2 schema + supplier admin read, **без** YooKassa runtime.
+**Codex:** параллельно **`codex/phase2-foundation`** — Phase 2 schema + event change requests; cherry-pick **после F3**, **без** YooKassa runtime и **без** Codex Next/proxy.
 
-**Статус:** Активно. [phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md), [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md).
+**Статус:** Активно. F2 ✅. [phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md), [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md). Ветка `feat/next-monorepo`.
+
+---
+
+## 2026-07-10 — F2: full-stack read (Prisma в Next, не proxy)
+
+**Решение:** Public SSR и Route Handlers читают через Prisma/`public-*.dto.ts` port в `apps/web`, без промежуточного fetch к `apps/backend`. Legacy backend остаётся для sync/writes/admin до F4/F5.
+
+**Почему:** Один раз попыхтим с porting DTO — дальше проще: нет dual HTTP hop, единый type graph, проще cutover и retire `dto.js`.
+
+**Статус:** Активно. F2 ✅ на `feat/next-monorepo`.
+
+---
+
+## 2026-07-10 — Catalog page sizes: 100 / 200 / 300
+
+**Решение:** Public catalog default limit **100**, max **300**, UI selector **100 / 200 / 300**. SSR page 1 всегда рендерит default (100), независимо от selector.
+
+**Почему:** Круглые порции, ×1.67 к текущим 60, вписываются в perf budget (~8 KB JSON на 100). Константы в `@daibilet/contracts/catalog`.
+
+**Статус:** Активно.
+
+---
+
+## 2026-07-13 — Defer `tc:sync` widgetUrl backfill на prod
+
+**Решение:** Не запускать полный `npm run tc:sync` на prod в рамках этапа 0. Оставить pipeline (фаза B) для staging и плановых maintenance windows; prod backfill — только при регрессии saleable events или перед включением nightly cron.
+
+**Почему:**
+
+1. **Saleable path закрыт:** `check:widgets` prod **4/4 OK** (2026-07-13) на эталонных TC/TEP slug — `purchaseReady`, `widgetPayload`, `purchaseUrl` в порядке; ProviderLink покрывает опубликованные события.
+2. **Долг не блокирует MVP:** ~62k offers без `widgetUrl` в audit — в основном исторический хвост / не-saleable; не влияет на CTA «Купить» на indexable карточках.
+3. **Риск maintenance:** prod `tc:sync` = длинный fetch + mass upsert; без окна возможны lock/contention и случайный сброс admin override (см. фаза C guards — но rollback дороже defer).
+
+**Критерии пересмотра (любой → запланировать sync):**
+
+- `check:widgets` prod FAIL на эталонах после deploy/import
+- `check:sync-invariants` prod: saleable event без ProviderLink / без widget URL
+- Новая массовая публикация TC-каталога без widget URL
+- Включение nightly `check:sync-invariants` + алерт (audit §151)
+
+**Пересмотр:** 2026-08-01 или при первом prod FAIL виджетов.
+
+**Follow-up 2026-07-13:** выполнен `npm run tc:sync` на prod (тогда `213.171.7.16`, ныне MSK `.184`): 17356 source events, 17082 offers с widgetUrl, 66535 ProviderLink, ~101s. `check:widgets` 4/4 OK после sync.
+
+**Статус:** Активно (defer снят для TC backfill; browser smoke 0.2 ✅ 2026-07-22).
 
 ---
 

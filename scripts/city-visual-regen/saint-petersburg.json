@@ -1,0 +1,37 @@
+{
+  "city": "saint-petersburg",
+  "mustSeeCount": 180,
+  "regen": [
+    {
+      "stem": "divo-ostrov",
+      "name": "Планетарий №1",
+      "clusterSize": 7,
+      "keeper": "admiralteystvo"
+    },
+    {
+      "stem": "mihaylovskiy-zamok",
+      "name": "Стрелка Васильевского острова",
+      "clusterSize": 7,
+      "keeper": "admiralteystvo"
+    },
+    {
+      "stem": "sheremetevskiy-dvorets-fontannyy-dom",
+      "name": "Дворец Великого князя Владимира Александровича (Дом ученых)",
+      "clusterSize": 7,
+      "keeper": "admiralteystvo"
+    },
+    {
+      "stem": "tsentralnyy-voenno-morskoy-muzey",
+      "name": "Эрарта",
+      "clusterSize": 7,
+      "keeper": "admiralteystvo"
+    },
+    {
+      "stem": "yusupovskiy-dvorets",
+      "name": "Музей Фаберже",
+      "clusterSize": 7,
+      "keeper": "admiralteystvo"
+    }
+  ],
+  "d0": 0
+}

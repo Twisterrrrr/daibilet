@@ -1,0 +1,19 @@
+{
+  "city": "rostov-na-donu",
+  "mustSeeCount": 83,
+  "regen": [
+    {
+      "stem": "starocherkasskaya-monastyrskoe-urochishche",
+      "name": "Здание заставы",
+      "clusterSize": 2,
+      "keeper": "puhlyakovskiy"
+    },
+    {
+      "stem": "teatral-naya-ploschad",
+      "name": "teatral naya ploschad",
+      "clusterSize": 2,
+      "keeper": "bar-golodranets"
+    }
+  ],
+  "d0": 2
+}

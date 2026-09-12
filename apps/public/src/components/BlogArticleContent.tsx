@@ -4,6 +4,7 @@ import { BlogArticleCta, parseCtaBlock } from '@/components/BlogArticleCta';
 import { handleBlogLinkClick } from '@/lib/blog-navigate';
 
 const IMAGE_BLOCK_REGEX = /^\[image\s+side=(left|right)\s+src="([^"]+)"(?:\s+alt="([^"]*)")?\]$/i;
+const MD_IMAGE_LINE_REGEX = /^!\[([^\]]*)\]\(([^)]+)\)$/;
 
 export type ParsedImageBlock = {
   side: 'left' | 'right';
@@ -12,13 +13,24 @@ export type ParsedImageBlock = {
 };
 
 export function parseImageBlock(block: string): ParsedImageBlock | null {
-  const match = block.trim().match(IMAGE_BLOCK_REGEX);
-  if (!match) return null;
-  return {
-    side: match[1].toLowerCase() as 'left' | 'right',
-    src: match[2],
-    alt: match[3] || '',
-  };
+  const trimmed = block.trim();
+  const match = trimmed.match(IMAGE_BLOCK_REGEX);
+  if (match) {
+    return {
+      side: match[1].toLowerCase() as 'left' | 'right',
+      src: match[2],
+      alt: match[3] || '',
+    };
+  }
+  const md = trimmed.match(MD_IMAGE_LINE_REGEX);
+  if (md) {
+    return {
+      side: 'left',
+      src: md[2],
+      alt: md[1] || '',
+    };
+  }
+  return null;
 }
 
 type ContentBlock =
@@ -31,9 +43,11 @@ type ContentBlock =
   | { type: 'image'; image: ParsedImageBlock }
   | { type: 'cta'; data: ReturnType<typeof parseCtaBlock> & object };
 
-function renderInline(text: string, keyPrefix = ''): React.ReactNode[] {
+/** Inline markdown на одной строке (без \\n). */
+function renderInlineLine(text: string, keyPrefix = ''): React.ReactNode[] {
   const nodes: React.ReactNode[] = [];
-  const regex = /\[([^\]]+)\]\(([^)]+)\)|\*\*([^*]+)\*\*/g;
+  // **bold** before *italic* so double asterisks are not split into empties.
+  const regex = /\[([^\]]+)\]\(([^)]+)\)|\*\*([^*]+)\*\*|\*([^*]+)\*/g;
   let last = 0;
   let match: RegExpExecArray | null;
   let key = 0;
@@ -58,11 +72,35 @@ function renderInline(text: string, keyPrefix = ''): React.ReactNode[] {
           {match[3]}
         </strong>,
       );
+    } else if (match[4]) {
+      nodes.push(
+        <em key={`${keyPrefix}em-${key++}`} className="italic text-slate-700">
+          {match[4]}
+        </em>,
+      );
     }
     last = regex.lastIndex;
   }
 
   if (last < text.length) nodes.push(text.slice(last));
+  return nodes;
+}
+
+/**
+ * Как в админском textarea: одиночный Enter → перенос (<br>),
+ * пустая строка (\\n\\n) → новый абзац (см. parseContentBlocks).
+ */
+function renderInline(text: string, keyPrefix = ''): React.ReactNode[] {
+  const lines = String(text || '').split('\n');
+  if (lines.length <= 1) return renderInlineLine(text, keyPrefix);
+
+  const nodes: React.ReactNode[] = [];
+  lines.forEach((line, lineIndex) => {
+    if (lineIndex > 0) {
+      nodes.push(<br key={`${keyPrefix}br-${lineIndex}`} />);
+    }
+    nodes.push(...renderInlineLine(line, `${keyPrefix}l${lineIndex}-`));
+  });
   return nodes;
 }
 
@@ -278,14 +316,10 @@ function BlogFigure({
       <img
         src={image.src}
         alt={image.alt}
+        title={image.alt || undefined}
         loading="lazy"
         className="aspect-[4/3] w-full rounded-xl border border-slate-200/80 object-cover shadow-md"
       />
-      {image.alt ? (
-        <figcaption className="mt-2.5 text-center text-xs leading-snug text-slate-500 sm:text-sm">
-          {image.alt}
-        </figcaption>
-      ) : null}
     </figure>
   );
 }
@@ -410,8 +444,44 @@ export function filterDuplicateImageBlocks(
   });
 }
 
+/**
+ * Первый inline `[image]` слишком близко к hero даёт две картинки подряд (особенно на mobile).
+ * Переносим его после N текстовых абзацев; filterDuplicateImageBlocks не трогаем.
+ */
+export function deferLeadingImageBlock(
+  blocks: ContentBlock[],
+  minParagraphsBefore = 2,
+): ContentBlock[] {
+  const imageIndex = blocks.findIndex((block) => block.type === 'image');
+  if (imageIndex < 0) return blocks;
+
+  let paragraphsBefore = 0;
+  for (let i = 0; i < imageIndex; i += 1) {
+    if (blocks[i].type === 'paragraph') paragraphsBefore += 1;
+  }
+  if (paragraphsBefore >= minParagraphsBefore) return blocks;
+
+  const imageBlock = blocks[imageIndex];
+  const withoutImage = [...blocks.slice(0, imageIndex), ...blocks.slice(imageIndex + 1)];
+
+  let seen = 0;
+  let insertAt = withoutImage.length;
+  for (let i = 0; i < withoutImage.length; i += 1) {
+    if (withoutImage[i].type !== 'paragraph') continue;
+    seen += 1;
+    if (seen >= minParagraphsBefore) {
+      insertAt = i + 1;
+      break;
+    }
+  }
+
+  return [...withoutImage.slice(0, insertAt), imageBlock, ...withoutImage.slice(insertAt)];
+}
+
 export function renderBlogArticleContent(content: string, coverImageUrl?: string | null) {
-  const blocks = filterDuplicateImageBlocks(parseContentBlocks(content), coverImageUrl);
+  const blocks = deferLeadingImageBlock(
+    filterDuplicateImageBlocks(parseContentBlocks(content), coverImageUrl),
+  );
   const nodes: React.ReactNode[] = [];
   let isLeadParagraph = true;
 
@@ -441,17 +511,8 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
       continue;
     }
 
-    if (block.type === 'paragraph' && next?.type === 'image') {
-      const { paragraphs, endIndex } = collectParagraphBlocks(blocks, index);
-      nodes.push(
-        <BlogFloatedSection key={`p-img-${index}`} image={next.image}>
-          {renderParagraphNodes(paragraphs, `p-img-${index}`, isLeadParagraph)}
-        </BlogFloatedSection>,
-      );
-      index = endIndex + 2;
-      isLeadParagraph = false;
-      continue;
-    }
+    // Абзацы перед картинкой рендерим отдельно: иначе float ставит img первым в DOM
+    // (mobile: hero → inline подряд). Картинка подхватывается веткой `image` ниже.
 
     if (block.type === 'image') {
       const { paragraphs, endIndex } = collectParagraphBlocks(blocks, index + 1);

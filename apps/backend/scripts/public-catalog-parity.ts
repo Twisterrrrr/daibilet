@@ -45,7 +45,7 @@ for (const queryString of cases) {
 
 const typedCatalog = await buildPublicCatalogDto(parseSearchParams(
   publicCatalogQuerySchema,
-  new URLSearchParams('limit=200&sort=time'),
+  new URLSearchParams('limit=100&sort=time'),
 ));
 
 const scheduleSlots = typedCatalog.items

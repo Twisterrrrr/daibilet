@@ -2,7 +2,7 @@ import { ArrowRight, Clock, Compass, Heart, MapPin, Sparkles, Star, Wallet } fro
 import * as React from 'react';
 
 import { BRIDGES_LANDING } from '@/data/bridges-landing';
-import { formatMoneyRange, formatNumber } from '@/data';
+import { formatMoneyRange, formatNumber, formatPriceFrom, moneyRangeStatLabel } from '@/data';
 import type { BridgesScheduleRow } from '@/lib/bridges-session-utils';
 
 const PALACE_BRIDGE_LIFT_HOUR = 1;
@@ -74,7 +74,6 @@ export function BridgesHeroBlock({
   priceFrom,
   priceTo,
   visibleCount,
-  soldEstimate,
   sessionsReady,
   onPickTour,
   onViewSchedule,
@@ -82,46 +81,46 @@ export function BridgesHeroBlock({
   priceFrom: number | null;
   priceTo?: number | null;
   visibleCount: number;
-  soldEstimate: number;
   sessionsReady: boolean;
   onPickTour: () => void;
   onViewSchedule: () => void;
 }) {
   const countdown = usePalaceBridgeCountdown();
-  const priceLabel = priceFrom ? formatMoneyRange(priceFrom, priceTo) : null;
+  // CTA: only «от min»; min–max lives in the «диапазон цен» stat cell
+  const priceCtaLabel = priceFrom ? formatPriceFrom(priceFrom) : null;
+  const priceRangeLabel = priceFrom ? formatMoneyRange(priceFrom, priceTo) : null;
+  const priceStatLabel = moneyRangeStatLabel(priceFrom, priceTo);
 
   return (
-    <div className="space-y-0">
-      <div className="grid gap-4 md:grid-cols-[auto_1fr_auto] md:items-center">
+    <div>
+      <div className="mb-8 grid gap-4 md:grid-cols-[auto_1fr_auto] md:items-center">
         <BridgesCountdownCard hours={countdown.hours} minutes={countdown.minutes} inSeason={countdown.inSeason} />
         <div className="hidden h-px bg-gradient-to-r from-primary-foreground/25 to-transparent md:block" aria-hidden />
         <div className="flex flex-wrap items-center gap-3">
           <button
             type="button"
             onClick={onPickTour}
-            className="inline-btn inline-flex items-center gap-2 rounded-full bridges-cta-gradient px-6 py-3 text-sm font-semibold text-white transition hover:brightness-105"
+            className="inline-btn inline-flex items-center gap-2 rounded-full bridges-cta-gradient px-6 py-3 text-sm font-semibold text-white transition hover:brightness-105 active:scale-[0.98]"
           >
-            {priceLabel ? `Выбрать рейс · ${priceLabel}` : 'Выбрать рейс'}
+            {priceCtaLabel ? `Выбрать рейс · ${priceCtaLabel}` : 'Выбрать рейс'}
             <ArrowRight className="h-4 w-4" />
           </button>
           <button
             type="button"
             onClick={onViewSchedule}
-            className="inline-btn rounded-full border border-primary-foreground/25 px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary-foreground/10"
+            className="inline-btn rounded-full border border-primary-foreground/25 px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary-foreground/10 active:scale-[0.98]"
           >
             Смотреть график разводки
           </button>
         </div>
       </div>
 
-      <dl className="mt-12 grid grid-cols-2 gap-4 border-t border-primary-foreground/15 pt-6 md:grid-cols-4">
+      <dl className="grid grid-cols-2 gap-4 border-t border-primary-foreground/15 pt-6 md:max-w-lg md:grid-cols-2">
         {sessionsReady ? (
           <>
             {[
               { value: formatNumber(visibleCount), label: 'рейсов ночью', nowrap: false },
-              { value: `${formatNumber(soldEstimate)}+`, label: 'билетов продано', nowrap: false },
-              { value: '4.7', label: 'средний рейтинг', nowrap: false },
-              { value: priceLabel || '—', label: 'диапазон цен', nowrap: true },
+              { value: priceRangeLabel || '—', label: priceStatLabel, nowrap: true },
             ].map((item) => (
               <div key={item.label}>
                 <dt
@@ -430,7 +429,7 @@ export function BridgesMobileStickyCta({
         className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground"
       >
         <Star className="h-4 w-4" />
-        {priceFrom ? `Показать рейсы ${formatMoneyRange(priceFrom, priceTo)}` : 'Выбрать рейс'}
+        {priceFrom ? `Показать рейсы ${formatPriceFrom(priceFrom)}` : 'Выбрать рейс'}
       </a>
     </div>
   );

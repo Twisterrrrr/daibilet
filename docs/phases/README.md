@@ -10,7 +10,7 @@
 | **C** | Целостность данных (инварианты, guards) | ✅ Закрыта | [phase-c-data-integrity.md](./phase-c-data-integrity.md) |
 | **D** | Deploy / parity / CI | ✅ Закрыта | [phase-d-deploy-parity.md](./phase-d-deploy-parity.md) |
 | **E** | Prisma runtime rollout (TS flags → staging → prod) | ✅ Закрыта | [phase-e-prisma-runtime.md](./phase-e-prisma-runtime.md) |
-| **F** | Next.js full-stack monorepo (Path B, SEO SSR) | 🔄 F1 | [phase-f-next-fullstack.md](./phase-f-next-fullstack.md) |
+| **F** | Next.js full-stack monorepo (Path B, SEO SSR) | ✅ F2 / 🔄 F3 | [phase-f-next-fullstack.md](./phase-f-next-fullstack.md) |
 | **G** | Phase 2 finance runtime (Codex + flags) | ⏳ После F | [codex-phase2-next-handoff.md](../codex-phase2-next-handoff.md) |
 
 **Аудит стека (2026-07-10):** [audit-2026-07-10-stack-state.md](../audit-2026-07-10-stack-state.md)  

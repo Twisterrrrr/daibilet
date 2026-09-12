@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Блоки PDP Daibilet - research</title>
+  <link rel="stylesheet" href="../styles.css" />
+</head>
+<body>
+  <nav class="site-nav" aria-label="Разделы пакета">
+    <a href="../index.html">Обзор</a>
+    <a href="../comparison.html">Сравнение</a>
+    <a href="../ermitazh.html">Эрмитаж</a>
+    <a href="../garazh.html">Гараж</a>
+    <a href="./daibilet.html" aria-current="page">Блоки Daibilet</a>
+    <a href="./spbboats.html">Блоки SPBBOATS</a>
+  </nav>
+
+  <main class="wrap">
+    <p class="eyebrow">block-layout</p>
+    <h1>Daibilet: структура блоков venue PDP (institution)</h1>
+    <p class="lead">
+      Источник: <code>InstitutionVenueLayout.client.tsx</code>.
+      Роутер: <code>VenuePageView.client.tsx</code> - institution | location.
+      Модель: Prisma <code>Venue</code> без highlights/faq/features JSON.
+    </p>
+
+    <h2>Порядок секций</h2>
+    <p class="meta">institution = музеи/арт, в т.ч. ermitazh / moscow-muzey-garazh</p>
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Блок</th>
+            <th>Cond</th>
+            <th>Данные</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>0</td><td>Breadcrumbs</td><td>всегда</td><td>pagePayload</td></tr>
+          <tr><td>1</td><td>Hero</td><td>всегда</td><td>heroImageUrl, seoH1/title, shortDescription, stats, share, AddToDayRoute</td></tr>
+          <tr><td>2</td><td>Anchor nav</td><td>если есть афиша</td><td>#venue-program, #about, #faq</td></tr>
+          <tr><td>3</td><td>VenueAdmissionBlock</td><td>finance products</td><td>AdmissionProduct[]</td></tr>
+          <tr><td>4</td><td>«Ближайшие события»</td><td>sessions</td><td>первые 4 слота</td></tr>
+          <tr><td>5</td><td>STOP / nearby экскурсии</td><td>stopEvents | nearbyEvents</td><td>связи с каталогом экскурсий</td></tr>
+          <tr><td>6</td><td>Афиша и билеты (VenueProgramBlock)</td><td>sessions</td><td>date chips + groups</td></tr>
+          <tr><td>7</td><td>«О месте»</td><td>description</td><td>текст (без highlights chips)</td></tr>
+          <tr><td>8</td><td>FAQ</td><td>всегда (хардкод)</td><td>3 общих вопроса, не per-venue</td></tr>
+          <tr><td>9</td><td>Похожие площадки</td><td>relatedVenues</td><td>до 4</td></tr>
+          <tr><td>10</td><td>Sidebar logistics + map</td><td>address/metro/wayToFind</td><td>VenueLogisticsBlock + OSM</td></tr>
+          <tr><td>-</td><td>Mobile sticky</td><td>mobile</td><td>CTA</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Поля Venue (релевантные контенту)</h2>
+    <ul>
+      <li>title, description, shortDescription, heroImageUrl</li>
+      <li>address, lat/lng, metroStation</li>
+      <li><strong>wayToFind</strong>, <strong>parkingInfo</strong>, <strong>hookFact</strong> - наши editorial-поля; в SPBBOATS seed-venues их нет</li>
+      <li>kind, pageStatus, SEO (seoH1/Title/Description, canonicalPath)</li>
+      <li>Нет: highlights[], faq[], features[], openingHours Json, venueTemplateData, phone, website как колонки Venue</li>
+    </ul>
+
+    <div class="note warn">
+      Часы для части slug (в т.ч. <code>moscow-muzey-garazh</code>) - hardcode в
+      <code>venue-opening-hours.ts</code>, не в БД.
+    </div>
+
+    <p class="footer">
+      Markdown: <code>block-layout/daibilet-venue-pdp-blocks.md</code>
+      · <a href="./spbboats.html">SPBBOATS блоки</a>
+      · <a href="../index.html">К обзору</a>
+    </p>
+  </main>
+</body>
+</html>

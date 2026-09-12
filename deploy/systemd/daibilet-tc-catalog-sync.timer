@@ -1,0 +1,12 @@
+[Unit]
+Description=Run Daibilet Ticketscloud catalog sync once nightly
+Requires=daibilet-tc-catalog-sync.service
+
+[Timer]
+# Server local time (~MSK on Timeweb). Once per day.
+OnCalendar=*-*-* 03:20:00
+Persistent=true
+Unit=daibilet-tc-catalog-sync.service
+
+[Install]
+WantedBy=timers.target

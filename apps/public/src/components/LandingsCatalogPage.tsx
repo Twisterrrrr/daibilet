@@ -20,6 +20,7 @@ const LANDING_EMOJI: Record<string, string> = {
   'river-party': '🎉',
   'bridges-night': '🌉',
   'moscow-dinner-boat': '🍽',
+  'moscow-city-day': '🎆',
   'moscow-museums': '🏛',
   'spb-yards': '🏛',
   'standup': '🎤',

@@ -1,20 +1,52 @@
 # Daibilet nginx template.
 # SSL certificates can be managed by Timeweb/certbot. This file shows routing only.
 
+# Public read API: ~60 req/min per IP, burst 15 (see patch-prod-nginx-ratelimit.py)
+limit_req_zone $binary_remote_addr zone=daibilet_public_api:10m rate=60r/m;
+limit_req_status 429;
+
+# Known scrapers (liliabots.ru mirrors) — see patch-prod-nginx-scraper-block.py
+map $http_user_agent $daibilet_block_scraper {
+    default 0;
+    ~*(liliabots|liliabot) 1;
+}
+
 upstream daibilet_api {
     server 127.0.0.1:4000;
     keepalive 32;
 }
 
+upstream daibilet_web {
+    server 127.0.0.1:3001;
+    keepalive 16;
+}
+
+# Force www → apex (HTTP)
 server {
     listen 80;
-    server_name daibilet.ru www.daibilet.ru;
+    server_name www.daibilet.ru;
+    return 301 https://daibilet.ru$request_uri;
+}
+
+server {
+    listen 80;
+    server_name daibilet.ru;
 
     root /var/www/daibilet/public;
     index index.html;
 
     location / {
         try_files $uri $uri/ /index.html;
+    }
+
+    location ^~ /api/public/ {
+        limit_req zone=daibilet_public_api burst=15 nodelay;
+        proxy_pass http://daibilet_api;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 
     location /api/ {
@@ -41,6 +73,7 @@ server {
     }
 
     location ^~ /api/public/ {
+        limit_req zone=daibilet_public_api burst=15 nodelay;
         proxy_pass http://daibilet_api;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
@@ -74,8 +107,8 @@ server {
     auth_basic "Daibilet admin";
     auth_basic_user_file /etc/nginx/.htpasswd-daibilet-admin;
 
-    root /var/www/daibilet/admin;
-    index index.html;
+    # F4.6: Vite /legacy hard-retired. Admin ops served by Next only.
+    # See docs/phases/phase-f4-retire-legacy.md
 
     location /api/ {
         proxy_pass http://daibilet_api;
@@ -85,9 +118,19 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header Authorization $http_authorization;
+        proxy_read_timeout 600s;
     }
 
+    # Next apps/web :3001 — middleware rewrites / → /admin, /events → /admin/events
     location / {
-        try_files $uri $uri/ /index.html;
+        proxy_pass http://daibilet_web;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Authorization $http_authorization;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
     }
 }

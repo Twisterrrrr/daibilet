@@ -35,9 +35,9 @@ export function InstitutionListRow({
 
       <div className="hidden shrink-0 text-right sm:block">
         <div className="text-xs text-slate-400">{typeLabel}</div>
-        <div className="text-sm font-semibold text-slate-700">
-          {venue.events > 0 ? pluralEvents(venue.events) : 'Скоро'}
-        </div>
+        {venue.events > 0 ? (
+          <div className="text-sm font-semibold text-slate-700">{pluralEvents(venue.events)}</div>
+        ) : null}
       </div>
 
       <ChevronRight className="h-4 w-4 shrink-0 text-slate-300 group-hover:text-primary-500" aria-hidden />

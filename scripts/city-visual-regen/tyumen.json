@@ -1,0 +1,49 @@
+{
+  "city": "tyumen",
+  "mustSeeCount": 97,
+  "regen": [
+    {
+      "stem": "avan-termy",
+      "name": "avan termy",
+      "clusterSize": 2,
+      "keeper": "amfiteatr-nizhney-naberezhnoy"
+    },
+    {
+      "stem": "muzey-slovtsova",
+      "name": "muzey slovtsova",
+      "clusterSize": 2,
+      "keeper": "chetyrehurovnevaya-naberezhnaya"
+    },
+    {
+      "stem": "peshehodnaya-ulitsa-dzerzhinskogo",
+      "name": "peshehodnaya ulitsa dzerzhinskogo",
+      "clusterSize": 2,
+      "keeper": "detskiy-muzey-skazki"
+    },
+    {
+      "stem": "skver-sibirskih-koshek",
+      "name": "skver sibirskih koshek",
+      "clusterSize": 2,
+      "keeper": "muzey-kuznechnogo-remesla"
+    },
+    {
+      "stem": "sobornaya-mechet",
+      "name": "sobornaya mechet",
+      "clusterSize": 2,
+      "keeper": "identity-symbol"
+    },
+    {
+      "stem": "yalutorovsk",
+      "name": "yalutorovsk",
+      "clusterSize": 2,
+      "keeper": "yalutorovsk-ostrog"
+    },
+    {
+      "stem": "znamenskiy-kafedral-nyy-sobor",
+      "name": "znamenskiy kafedral nyy sobor",
+      "clusterSize": 2,
+      "keeper": "muzey-nauki-i-tehniki-zauralya"
+    }
+  ],
+  "d0": 2
+}

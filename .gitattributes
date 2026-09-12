@@ -6,3 +6,8 @@
 *.jpeg binary
 *.webp binary
 *.ico binary
+
+# Legacy Vite catalog dumps (~6MB) - exclude from GitHub Linguist language bar.
+apps/admin/data.js linguist-generated linguist-vendored
+apps/public/data.js linguist-generated linguist-vendored
+apps/**/data.js linguist-generated linguist-vendored

@@ -1,4 +1,4 @@
-import { Clock, MapPin, Train } from 'lucide-react';
+import { Clock, MapPin } from 'lucide-react';
 
 import { formatStreetAddress } from '@/lib/address';
 import { pluralEvents, venueTypeIcon, venueTypeLabel } from '@/lib/venue-meta';
@@ -8,6 +8,8 @@ const TYPE_GRADIENT: Record<string, string> = {
   pier: 'from-sky-500 via-cyan-600 to-indigo-700',
   pier_water: 'from-sky-500 via-cyan-600 to-indigo-700',
   bus: 'from-amber-600 via-orange-600 to-rose-700',
+  park: 'from-emerald-600 via-green-700 to-emerald-950',
+  monument: 'from-stone-600 via-slate-700 to-stone-900',
   outdoor_location: 'from-emerald-600 via-green-700 to-emerald-950',
   attraction: 'from-violet-600 via-purple-700 to-indigo-800',
   sport_activity_space: 'from-orange-600 via-red-600 to-rose-800',
@@ -43,19 +45,16 @@ export function LocationCard({
       <div className="flex min-w-0 flex-1 flex-col p-4">
         <div className="flex items-start justify-between gap-3">
           <h3 className="line-clamp-2 text-base font-semibold text-slate-900 group-hover:text-primary-600">{venue.name}</h3>
-          <span className="shrink-0 rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700">
-            {venue.events > 0 ? pluralEvents(venue.events) : 'Скоро'}
-          </span>
+          {venue.events > 0 ? (
+            <span className="shrink-0 rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700">
+              {pluralEvents(venue.events)}
+            </span>
+          ) : null}
         </div>
 
         <div className="mt-2 flex items-center gap-1.5 text-sm text-slate-500">
           <MapPin className="h-3.5 w-3.5 shrink-0" />
           <span className="truncate">{street}</span>
-        </div>
-
-        <div className="mt-1 flex items-center gap-1.5 text-sm text-slate-500">
-          <Train className="h-3.5 w-3.5 shrink-0 opacity-40" />
-          <span className="truncate text-slate-400">{venue.city}</span>
         </div>
 
         {nextSlot ? (

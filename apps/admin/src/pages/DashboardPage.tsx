@@ -17,6 +17,7 @@ import {
   Search,
 } from 'lucide-react';
 
+import { adminFetch } from '@/lib/admin-api';
 import { PageHeader, SourceBadge, StatusBadge } from '@/components/admin/primitives';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -24,9 +25,6 @@ import { Card } from '@/components/ui/card';
 import { adminData, formatNumber } from '@/data';
 import type { AdminData, AdminSourceRow } from '@/types';
 
-const API_BASE_URL =
-  ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env?.VITE_DAIBILET_API_URL as string | undefined) ||
-  'http://127.0.0.1:4000';
 
 type OrderMetrics = {
   imported: number;
@@ -44,13 +42,14 @@ export function DashboardPage() {
   const liveSources = sourceRows.filter((source) => source.status === 'live').length;
   const sessions = sourceRows.reduce((sum, source) => sum + source.sessions, 0);
   const launch = dashboardMetrics.launch || adminData.metrics.launch || fallbackLaunchMetrics();
-  const events = sourceEvents || launch.groupedEvents || dashboardMetrics.events || adminData.metrics.events;
+  // Prefer public catalog grouped count (dashboard/stats), not sum of source raw/group hybrids.
+  const events = launch.groupedEvents || dashboardMetrics.events || sourceEvents || adminData.metrics.events;
   const landingHits = launch.landingMatched || adminData.eventRows.filter((event) => event.landingHits.length > 0).length;
   const venues = sourceRows.length ? sourceRows.reduce((sum, source) => sum + source.venues, 0) : dashboardMetrics.venues || adminData.metrics.venues;
 
   React.useEffect(() => {
     const controller = new AbortController();
-    fetch(`${API_BASE_URL}/api/admin/dashboard`, { cache: 'no-store', signal: controller.signal })
+    adminFetch(`/api/admin/dashboard`, { cache: 'no-store', signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return (await response.json()) as Pick<AdminData, 'metrics'>;
@@ -65,7 +64,7 @@ export function DashboardPage() {
 
   React.useEffect(() => {
     const controller = new AbortController();
-    fetch(`${API_BASE_URL}/api/admin/sources`, { cache: 'no-store', signal: controller.signal })
+    adminFetch(`/api/admin/sources`, { cache: 'no-store', signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return (await response.json()) as { sources?: AdminSourceRow[] };
@@ -80,7 +79,7 @@ export function DashboardPage() {
 
   React.useEffect(() => {
     const controller = new AbortController();
-    fetch(`${API_BASE_URL}/api/admin/orders?limit=1`, { cache: 'no-store', signal: controller.signal })
+    adminFetch(`/api/admin/orders?limit=1`, { cache: 'no-store', signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return (await response.json()) as { metrics?: Partial<OrderMetrics> };
@@ -111,7 +110,7 @@ export function DashboardPage() {
             <SourceBadge source="teplohod" />
             <Badge variant="outline" className="gap-1 border-success/30 bg-success/10 text-success">
               <CheckCircle2 className="h-3 w-3" />
-              Imported Sales MVP
+              MVP импорта продаж
             </Badge>
           </>
         }
@@ -166,13 +165,13 @@ export function DashboardPage() {
               <ImportRow
                 key={source.code}
                 source={source.name}
-                status={source.status}
+                status={importStatusLabel(source.healthStatus || source.status)}
                 mode={`${formatNumber(source.events)} карточек · ${formatNumber(source.sessions)} сеансов`}
                 live={source.status === 'live'}
               />
             ))}
             <div className="grid grid-cols-2 gap-2 pt-1">
-              <Metric icon={Layers} label="Категорий" value={adminData.importJob.categories} to="/taxonomy" />
+              <Metric icon={Layers} label="Категорий" value={adminData.importJob.categories} to="/events" />
               <Metric icon={MapPin} label="Городов" value={adminData.importJob.cities} to="/cities" />
             </div>
           </div>
@@ -358,6 +357,16 @@ function ImportRow({ source, status, mode, live }: { source: string; status: str
       {live ? <StatusBadge status="live" label={status} /> : <StatusBadge status="incomplete" label={status} />}
     </div>
   );
+}
+
+function importStatusLabel(status?: string | null) {
+  const normalized = String(status || '').toLowerCase();
+  if (normalized === 'ok' || normalized === 'live') return 'в работе';
+  if (normalized === 'warning') return 'есть вопросы';
+  if (normalized === 'error') return 'ошибка';
+  if (normalized === 'paused') return 'пауза';
+  if (normalized === 'incomplete') return 'неполно';
+  return status || 'статус';
 }
 
 function fallbackSourceRows(): AdminSourceRow[] {

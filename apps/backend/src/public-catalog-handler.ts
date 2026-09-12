@@ -1,4 +1,4 @@
-import { sendJson } from './http.js';
+import { sendPublicJson } from './http.js';
 import { type RouteContext } from './routing.js';
 import { publicCatalogQuerySchema, type PublicCatalogQuery } from './types/schemas.js';
 import type { PublicCatalogDto } from './types/public.js';
@@ -17,7 +17,7 @@ export function createPublicCatalogRouteHandler(
     if (!deps.enabled || context.route !== 'GET /api/public/events') return false;
 
     const query = parseSearchParams(publicCatalogQuerySchema, context.searchParams);
-    sendJson(context.response, await deps.buildPublicCatalog(query));
+    sendPublicJson(context.response, await deps.buildPublicCatalog(query));
     return true;
   };
 }

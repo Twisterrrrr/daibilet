@@ -1,13 +1,8 @@
-import { createRequire } from 'node:module';
-import path from 'node:path';
+import pg from 'pg';
 import type { DbClient, QueryResult } from './types/db.js';
 
 interface PgPool {
   query<Row = Record<string, unknown>>(text: string, params?: readonly unknown[]): Promise<QueryResult<Row>>;
-}
-
-interface PgModule {
-  Pool: new (config: { connectionString: string; max: number }) => PgPool;
 }
 
 export interface DbStatsRow {
@@ -30,9 +25,8 @@ export interface RecentEventRow {
 
 let pool: PgPool | undefined;
 
-export function createDb(rootDir: string): DbClient {
-  const requireFromDbPackage = createRequire(path.join(rootDir, 'packages', 'db', 'package.json'));
-  const { Pool } = requireFromDbPackage('pg') as PgModule;
+export function createDb(_rootDir?: string): DbClient {
+  const { Pool } = pg;
   const connectionString = process.env.DATABASE_URL || 'postgresql://daibilet:daibilet@127.0.0.1:5437/daibilet';
 
   pool ??= new Pool({ connectionString, max: 3 });

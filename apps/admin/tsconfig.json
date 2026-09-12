@@ -17,7 +17,8 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@daibilet/contracts/admin": ["../../packages/contracts/src/admin.ts"]
     }
   },
   "include": ["src"],

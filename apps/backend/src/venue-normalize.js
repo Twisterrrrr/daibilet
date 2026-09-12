@@ -79,7 +79,7 @@ function loadOverrideMap() {
 
 export function findVenueOverride(input = {}) {
   const overrides = loadOverrideMap();
-  const keys = [input.id, input.title, input.name].filter(Boolean).map(normalizeKey);
+  const keys = [input.id, input.title, input.name, input.slug].filter(Boolean).map(normalizeKey);
   for (const key of keys) {
     if (overrides.has(key)) return overrides.get(key);
   }
@@ -137,6 +137,23 @@ function isPlusCodeAddress(value) {
   return PLUS_CODE_RE.test(String(value || '').trim());
 }
 
+function stripCityPrefix(value) {
+  return String(value || '')
+    .trim()
+    .replace(/^(?:г\.?|город)\s+/iu, '')
+    .trim();
+}
+
+function looksLikeCityOrSettlementPart(part) {
+  const text = String(part || '').trim();
+  if (!text) return false;
+  // Avoid \\b after «г.» - period is non-word so «г. Пушкин» would miss.
+  if (/^(?:г\.?|город|пос\.?|пгт\.?|посёлок|поселок|село|деревня)(?:\s+|$)/iu.test(text)) return true;
+  // Bare "д. Name" settlement (not house "д. 12") - letter after д.
+  if (/^д\.?\s*[\p{L}]/iu.test(text) && !/^д\.?\s*\d/iu.test(text)) return true;
+  return false;
+}
+
 function stripAddressMetaParts(parts, city) {
   const cityNorm = normalizeKey(city);
   return parts.filter((part) => {
@@ -145,6 +162,8 @@ function stripAddressMetaParts(parts, city) {
     if (/^\d{5,6}$/.test(clean)) return false;
     if (/^(?:россия|russia|рф)$/i.test(clean)) return false;
     if (city && normalizeKey(clean) === cityNorm) return false;
+    // "г. Санкт-Петербург" when city is Санкт-Петербург
+    if (city && normalizeKey(stripCityPrefix(clean)) === cityNorm) return false;
     if (/^[\p{L}][\p{L}\d-]*\s+(?:обл\.|область|край|респ\.|республика)$/iu.test(clean)) return false;
     return true;
   });
@@ -177,12 +196,15 @@ function enrichBareStreetAddress(address) {
 
   const parts = text.split(',').map((part) => part.trim()).filter(Boolean);
   if (parts.length === 1 && !STREET_MARKER_RE.test(parts[0])) {
+    if (looksLikeCityOrSettlementPart(parts[0])) return text;
     if (/^\d/.test(parts[0]) || /^50\s+лет/i.test(parts[0])) {
       return `ул. ${parts[0]}`;
     }
   }
   if (parts.length >= 2 && isBareStreetPrefix(parts[0])) {
     const first = parts[0];
+    // Never invent "ул. г. Санкт-Петербург, …" from a city/settlement prefix.
+    if (looksLikeCityOrSettlementPart(first)) return text;
     if (!/(?:переулок|проспект|набережная|бульвар|шоссе|площадь|линия|проезд|тупик)/i.test(first)) {
       return `ул. ${first}, ${parts.slice(1).join(', ')}`;
     }
@@ -193,6 +215,9 @@ function enrichBareStreetAddress(address) {
 function normalizePublicVenueAddress(address, city) {
   let text = String(address || '').trim();
   if (!text || isPlusCodeAddress(text)) return null;
+
+  // Undo poisoned «ул. г. …» from older enrichBareStreetAddress.
+  text = text.replace(/^ул\.\s+(?=г\.?\s|город\s)/iu, '');
 
   const parts = stripAddressMetaParts(
     text.split(',').map((part) => part.trim()).filter(Boolean),
@@ -213,11 +238,26 @@ function normalizePublicVenueAddress(address, city) {
   return enrichBareStreetAddress(text);
 }
 
+function stripVesselNamesForCityInference(text) {
+  return String(text || '')
+    .replace(/(?:теплоход|катер|яхт[аы]?|судно|пароход|корабль)\s*[«"'][^»"']+[»"']/giu, ' ')
+    .replace(/(?:теплоход|катер|яхт[аы]?|судно|пароход|корабль)\s+[\p{L}][\p{L}\d.\s-]*[-–—]\s*\d{1,4}/giu, ' ')
+    .replace(/\b[\p{L}]+[-–—]\d{1,4}\b/giu, ' ');
+}
+
 function inferCityFromAddressText(text) {
-  const value = String(text || '').toLowerCase();
+  const value = stripVesselNamesForCityInference(text).toLowerCase();
   if (value.includes('ефремкино') || value.includes('хакас') || value.includes('ширинск')) return 'Абакан';
   if (value.includes('суздал')) return 'Суздаль';
   if (value.includes('всеволожск')) return 'Всеволожск';
+  // SPB embankment piers without city token in address (avoid Moscow from ship «Москва-N»).
+  if (
+    /воскресенск|адмиралтейск|синопск|дворцов(?:ая|ой)?\s+наб|университетск|фонтанк|английск(?:ая|ой)?\s+наб|макаров/i.test(
+      value,
+    )
+  ) {
+    return 'Санкт-Петербург';
+  }
   return null;
 }
 
@@ -265,11 +305,48 @@ function isBareStreetPrefix(part) {
   return text.length >= 2 && text.length <= 60;
 }
 
-function formatPublicVenueTitle(value) {
-  if (value == null) return value;
-  return String(value)
-    .replace(/\s*\(\s*-?\d+(?:\.\d+)?\s*,\s*-?\d+(?:\.\d+)?\s*\)\s*$/u, '')
+const LAT_LNG_TITLE_RE = /\s*\(\s*-?\d+(?:\.\d+)?\s*,\s*-?\d+(?:\.\d+)?\s*\)\s*$/u;
+const PICKUP_PAREN_RE =
+  /\s*\((?=[^)]*(?:внутренняя территория|ближе к|со стороны|точка сбора|место сбора|место встречи|вход со стороны|у входа|площадка расположена|ориентир))[^)]*\)\s*$/iu;
+const INNER_SUBUNIT_RE = /равелин|бастион|куртина|внутренн|корпус|крыло|флигель|башня\b/iu;
+const TITLE_ABBREV_TAIL_RE = /^(им|ул|пр|пер|наб|ш|пл|д|г|стр|лит|о|т|п|с|ч|н)\.?$/i;
+/**
+ * Partner pickup-point titles: «Landmark. Subunit (внутренняя территория…)» → Landmark.
+ * Does not strip legitimate «им. …» / «Эрмитаж (Зимний дворец)».
+ */
+export function sanitizePartnerVenueDisplayTitle(value) {
+  let text = String(value || '')
+    .replace(/\s+/g, ' ')
     .trim();
+  if (!text) return text;
+  text = text.replace(LAT_LNG_TITLE_RE, '').trim();
+  const hadPickupParen = PICKUP_PAREN_RE.test(text);
+  text = text.replace(PICKUP_PAREN_RE, '').replace(/[.,;:\s]+$/u, '').trim();
+  const split = text.match(/^(.{4,120}?)\.\s+([^.]+)$/u);
+  if (!split) return text;
+  const head = split[1].trim();
+  const tail = split[2].trim();
+  const lastWord = head.split(/\s+/).pop() || '';
+  const isAbbrev = TITLE_ABBREV_TAIL_RE.test(lastWord) || /^[А-ЯЁA-Z]\.?$/u.test(lastWord);
+  if (isAbbrev) return text;
+  if (hadPickupParen || INNER_SUBUNIT_RE.test(tail)) return head;
+  return text;
+}
+
+/**
+ * One public identity for the fortress complex (ravelin pickup → same card).
+ * Saleable tickets make this a museum row, not a second sight.
+ */
+export function isFortressComplexName(name) {
+  const text = sanitizePartnerVenueDisplayTitle(name);
+  if (!text) return false;
+  if (/собор|церков|тюрьм/i.test(text) && !/крепост/i.test(text)) return false;
+  return /крепост/i.test(text);
+}
+
+export function formatPublicVenueTitle(value) {
+  if (value == null) return value;
+  return sanitizePartnerVenueDisplayTitle(value);
 }
 
 function cityContradictsAddress(city, title, address) {
@@ -333,6 +410,22 @@ function venueTitleLooksLikeEmbankmentAddress(name) {
   );
 }
 
+/** Ship / boat hull names must not be shown as pier venue titles. */
+export function venueTitleLooksLikeVesselName(name) {
+  const text = String(name || '').trim();
+  if (!text) return false;
+  if (STREET_MARKER_RE.test(text) || /(?:^|\s)причал(?:\s|$)|(?:^|\s)пристань(?:\s|$)/i.test(text)) {
+    return false;
+  }
+  // Do not use \b with Cyrillic - JS word boundaries are ASCII-only.
+  if (/^(?:теплоход|катер|яхт[аы]?|судно|пароход|корабль)(?:\s|[«"']|$)/iu.test(text)) return true;
+  // Hull codes like «Москва-99», «РИО-1» without street context.
+  if (/^[«"']?[\p{L}][\p{L}\d.\s-]{0,40}[»"']?\s*[-–—]\s*\d{1,4}[»"']?$/iu.test(text)) {
+    return true;
+  }
+  return false;
+}
+
 function looksLikeNamedLandmark(title) {
   return /(?:^|\s)(?:мост|угол|площадь|сквер|памятник|парк|дворец|крепость|собор|театр|музей|спуск|набережная\s+[\p{L}]+(?:\s+[\p{L}]+){0,2}\s+и\s+[\p{L}])/iu.test(
     String(title || ''),
@@ -355,6 +448,9 @@ function shouldUsePierAddressDisplayName(name, address) {
   const title = formatPublicVenueTitle(name);
   if (!address) return false;
   if (hasDescriptivePierTitle(title)) return false;
+  // Named river ports / terminals keep their proper noun (Казань Девятаева, etc.).
+  if (/речн(?:ой|ая|ого|ые)?\s+порт|речпорт|морск(?:ой|ого|ая)?\s+вокзал/i.test(title)) return false;
+  if (venueTitleLooksLikeVesselName(title)) return true;
   if (/^при(?:чал|стан(?:ь|и)?)\b/i.test(title) && /\d/.test(title)) {
     const locationPart = stripPierPrefixFromTitle(title);
     if (venueTitleLooksLikeEmbankmentAddress(locationPart)) return true;
@@ -372,7 +468,16 @@ function normalizePierVenueAddress(address, city) {
   if (stripped && stripped !== text) {
     text = normalizePublicVenueAddress(stripped, city) || stripped;
   }
-  return text;
+  return rewriteSinopskayaHouseNumber(text);
+}
+
+/** Owner canon: Синопская наб. house is 10А (Cyrillic А), never bare 10 after import. */
+function rewriteSinopskayaHouseNumber(value) {
+  const text = String(value || '');
+  if (!text || !/синопск/iu.test(text)) return text;
+  return text
+    .replace(/,\s*10(?![АаAa\d])(?=\s*(?:,|$))/gu, ', 10А')
+    .replace(/(\s)10(?![АаAa\d])(?=\s*(?:,|$))/gu, '$110А');
 }
 
 function normalizeComparableStreet(value) {
@@ -431,7 +536,8 @@ export function formatPierLocationDisplayName(name, address, city) {
     return title;
   }
 
-  return shortAddress ? `Причал — ${shortAddress}` : 'Причал';
+  // Like bus boarding points: badge already says «Причал», no decorative dash prefix.
+  return shortAddress || 'Причал';
 }
 
 export function formatBusLocationDisplayName(name, address, city) {
@@ -445,7 +551,7 @@ export function formatBusLocationDisplayName(name, address, city) {
   }
 
   if (shortAddress) {
-    return `Место посадки — ${shortAddress}`;
+    return shortAddress;
   }
 
   return 'Место посадки';
@@ -504,7 +610,13 @@ export function normalizePublicVenueRecord(input = {}) {
   }
 
   const inferredCity = inferCityFromAddressText(`${title} ${address}`);
-  if (inferredCity && (!city || city === 'Не указан' || cityContradictsAddress(city, title, address))) {
+  if (
+    inferredCity &&
+    (!city ||
+      city === 'Не указан' ||
+      cityContradictsAddress(city, title, address) ||
+      (venueTitleLooksLikeVesselName(title) && normalizeKey(inferredCity) !== normalizeKey(city)))
+  ) {
     city = inferredCity;
   }
 
@@ -512,6 +624,9 @@ export function normalizePublicVenueRecord(input = {}) {
   if (isPierLikeVenueText(title, address)) {
     address = normalizePierVenueAddress(address, city);
   }
+
+  title = rewriteSinopskayaHouseNumber(title);
+  address = rewriteSinopskayaHouseNumber(address);
 
   if (override?.title) title = override.title;
   if (override?.address) address = override.address;

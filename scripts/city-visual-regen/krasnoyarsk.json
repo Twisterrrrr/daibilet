@@ -1,0 +1,37 @@
+{
+  "city": "krasnoyarsk",
+  "mustSeeCount": 66,
+  "regen": [
+    {
+      "stem": "pamyatnik-dubenskomu-strelka",
+      "name": "pamyatnik dubenskomu strelka",
+      "clusterSize": 2,
+      "keeper": "literaturnyy-muzey-astafieva"
+    },
+    {
+      "stem": "smotrovaya-na-gorod",
+      "name": "smotrovaya na gorod",
+      "clusterSize": 2,
+      "keeper": "smotrovaya-ges"
+    },
+    {
+      "stem": "sudopodemnik",
+      "name": "sudopodemnik",
+      "clusterSize": 2,
+      "keeper": "kupecheskiy-kvartal-mira"
+    },
+    {
+      "stem": "torgashinskaya-lestnitsa",
+      "name": "torgashinskaya lestnitsa",
+      "clusterSize": 3,
+      "keeper": "ekopark-gremyachaya-griva"
+    },
+    {
+      "stem": "znamenskiy-skit",
+      "name": "znamenskiy skit",
+      "clusterSize": 3,
+      "keeper": "ekopark-gremyachaya-griva"
+    }
+  ],
+  "d0": 4
+}

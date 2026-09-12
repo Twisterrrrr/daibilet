@@ -5,15 +5,14 @@ import {
   Building2,
   CalendarDays,
   Download,
-  FileText,
-  Inbox,
   LayoutDashboard,
   LayoutTemplate,
   MapPin,
+  MessageSquareQuote,
   Receipt,
   Settings,
-  Tags,
   UserRound,
+  GitPullRequest,
 } from 'lucide-react';
 
 export type NavZoneId = 'work' | 'hubs' | 'system';
@@ -35,7 +34,11 @@ export const NAV_ZONES: NavZone[] = [
     items: [
       { id: 'dashboard', title: 'Дашборд', path: '/', icon: LayoutDashboard, end: true },
       { id: 'events', title: 'События', path: '/events', icon: CalendarDays },
+      ...(import.meta.env.VITE_DAIBILET_EVENT_CHANGE_REQUESTS === '1'
+        ? [{ id: 'change-requests', title: 'Заявки на изменения', path: '/change-requests', icon: GitPullRequest }]
+        : []),
       { id: 'orders', title: 'Заказы', path: '/orders', icon: Receipt },
+      { id: 'reviews', title: 'Отзывы', path: '/reviews', icon: MessageSquareQuote },
       { id: 'buyers', title: 'Покупатели', path: '/buyers', icon: UserRound },
     ],
   },
@@ -54,10 +57,7 @@ export const NAV_ZONES: NavZone[] = [
     title: 'Импорт и система',
     items: [
       { id: 'sources', title: 'Источники', path: '/sources', icon: Download },
-      { id: 'mapping', title: 'Маппинг', path: '/mapping-inbox', icon: Inbox },
-      { id: 'sync', title: 'Sync health', path: '/sync-health', icon: BarChart3 },
-      { id: 'taxonomy', title: 'Категории и теги', path: '/taxonomy', icon: Tags },
-      { id: 'audit', title: 'Журнал изменений', path: '/audit-log', icon: FileText },
+      { id: 'sync', title: 'Здоровье синхронизации', path: '/sync-health', icon: BarChart3 },
       { id: 'settings', title: 'Настройки', path: '/settings', icon: Settings },
     ],
   },

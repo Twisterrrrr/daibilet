@@ -1,5 +1,5 @@
-import type { ProviderEntityKind, SourceCode } from '../../../packages/db/src/client.ts';
-import { prisma } from '../../../packages/db/src/client.ts';
+import type { ProviderEntityKind, SourceCode } from '@daibilet/db';
+import { prisma } from '@daibilet/db';
 
 export interface ProviderIdentityLookup {
   sourceCode: SourceCode;
