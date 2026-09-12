@@ -389,7 +389,7 @@ async function upsertVenue(client, event, place, cityId) {
     `
       insert into "Venue" (id, slug, title, description, "shortDescription", "heroImageUrl", "cityId", address, latitude, longitude, kind, "pageStatus", "createdAt", "updatedAt")
       values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'PIER', 'CANDIDATE', now(), now())
-      on conflict (slug) do update set
+      on conflict (id) do update set
         title = excluded.title,
         description = coalesce(excluded.description, "Venue".description),
         "shortDescription" = coalesce(excluded."shortDescription", "Venue"."shortDescription"),
