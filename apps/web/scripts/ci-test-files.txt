@@ -21,3 +21,4 @@ src/lib/podborki-city-seo.test.ts
 src/lib/region-child-city-scope.test.ts
 src/lib/remote-image-bypass.test.ts
 src/lib/selected-city-alias.test.ts
+src/lib/venue-page-sessions.test.ts

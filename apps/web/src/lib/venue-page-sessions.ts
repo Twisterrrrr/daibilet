@@ -17,6 +17,7 @@ function foldCityKey(value: string | null | undefined): string {
 const CITY_ALIASES: Record<string, string> = {
   moscow: 'moskva',
   moskva: 'moskva',
+  москва: 'moskva',
   'saint petersburg': 'sankt peterburg',
   'sankt peterburg': 'sankt peterburg',
   spb: 'sankt peterburg',
