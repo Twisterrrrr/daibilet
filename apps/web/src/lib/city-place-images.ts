@@ -15,6 +15,8 @@ import {
 } from './city-place-images-region-packs.ts';
 
 const MOSCOW_IMAGES: Record<string, string> = {
+  'severnyi-rechnoi-vokzal-prichal-no1-57':
+    'https://cdn.teplohod.info/images/cache/Events/Event511/eeb8dfe505-1.jpg',
   'moscow-krasnaya-ploschad-i-kreml':
     '/images/venues/moscow/krasnaya-ploschad-kreml.jpg',
   'moscow-sobor-vasiliya-blazhennogo':
