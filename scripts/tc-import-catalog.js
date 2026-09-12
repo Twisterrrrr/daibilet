@@ -488,17 +488,20 @@ async function upsertTicketscloudOffers(client, { eventId, externalId, event, pr
     })
     .filter(Boolean);
 
-  if (namedSets.length) {
-    await client.query(
-      `
-        update "EventOffer"
-        set active = false
-        where "eventId" = $1
-          and lower(coalesce(title, '')) like '%ticketscloud widget%'
-      `,
-      [eventId],
-    );
+  // A set can disappear or change id while the event remains in the snapshot.
+  // Disable the previous per-event snapshot first, then reactivate only current rows.
+  await client.query(
+    `
+      update "EventOffer"
+      set active = false
+      where "eventId" = $1
+        and "sourceCode" = 'TICKETSCLOUD'
+        and active is not false
+    `,
+    [eventId],
+  );
 
+  if (namedSets.length) {
     for (const set of namedSets) {
       await client.query(
         `
@@ -698,6 +701,7 @@ module.exports = {
   assertCatalogSnapshot,
   importCatalogEvent,
   importCatalogEvents,
+  upsertTicketscloudOffers,
   TICKETSCLOUD_SOURCE_ID,
 };
 
