@@ -928,6 +928,17 @@ html[data-nav-pending='1'] {
     }
   }
 
+  /** Event PDP: mobile keeps curated focal points; desktop uses vertical center. */
+  .event-page-hero-image {
+    object-position: var(--event-hero-mobile-position, center 18%);
+  }
+
+  @media (min-width: 768px) {
+    .event-page-hero-image {
+      object-position: center center;
+    }
+  }
+
   /** Event PDP: related cards — up to 5 per row on ultrawide. */
   .event-related-grid {
     display: grid;

@@ -34,6 +34,8 @@ type CatalogResultsProps = {
   items: PublicCatalogListItemDto[];
   viewMode: CatalogViewMode;
   onViewModeChange: (mode: CatalogViewMode) => void;
+  /** Editorial afisha gets a lead bento and promos; search catalog stays strictly functional. */
+  editorialMode?: boolean;
   clearHref?: string;
   city?: string | null;
   /** Current catalog sort - used for zero-fetch «Сейчас в городе» strip. */
@@ -225,6 +227,7 @@ export function CatalogResults({
   items,
   viewMode,
   onViewModeChange: _onViewModeChange,
+  editorialMode = false,
   clearHref = '/events',
   city,
   sort,
@@ -329,7 +332,9 @@ export function CatalogResults({
   const SHOW_CATALOG_LIVE_RAIL = false;
   const showLiveRail = SHOW_CATALOG_LIVE_RAIL && liveRailItems.length >= 3 && viewMode === 'cards';
   const spotlightItems =
-    viewMode === 'cards' && !hasExtraFilters ? pickCatalogZenSpotlightItems(catalogItems) : [];
+    editorialMode && viewMode === 'cards' && !hasExtraFilters
+      ? pickCatalogZenSpotlightItems(catalogItems)
+      : [];
   const spotlightIds = new Set(spotlightItems.map((item) => item.id));
   // Keep «Сейчас выбирают» / «Популярное сейчас» from mirroring the first page of cards 1:1.
   const listItemsWithoutLiveRail = showLiveRail
@@ -341,13 +346,26 @@ export function CatalogResults({
   const gridRef = useRef<HTMLUListElement>(null);
   const columnsPerRow = useCatalogGridColumnCount(gridRef, filtersCollapsed, listItems.length);
   const gridEntries = useMemo(
-    () => (viewMode === 'cards' ? buildCatalogGridEntries(listItems, city, columnsPerRow) : null),
-    [viewMode, listItems, city, columnsPerRow],
+    () =>
+      viewMode === 'cards'
+        ? editorialMode
+          ? buildCatalogGridEntries(listItems, city, columnsPerRow)
+          : listItems.map((session) => ({ kind: 'event' as const, session }))
+        : null,
+    [viewMode, editorialMode, listItems, city, columnsPerRow],
   );
 
   return (
     <>
       {spotlightItems.length ? <CatalogZenSpotlight items={spotlightItems} /> : null}
+      {editorialMode ? (
+        <div className={`${spotlightItems.length ? 'mt-7 sm:mt-9' : 'mt-4'} flex items-end justify-between gap-4`}>
+          <div>
+            <p className="mb-1 text-[11px] font-bold uppercase text-primary-700">Вся афиша</p>
+            <h2 className="font-display text-xl font-bold text-graphite sm:text-2xl">Ближайшие события</h2>
+          </div>
+        </div>
+      ) : null}
       {showLiveRail ? (
         <CatalogLiveRail items={liveRailItems} popularSort={sort === 'popular'} />
       ) : null}

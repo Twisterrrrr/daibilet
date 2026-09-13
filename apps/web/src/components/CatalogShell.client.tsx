@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { CalendarDays, Search } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { CatalogInfiniteSentinel } from '@/components/CatalogInfiniteSentinel.client';
@@ -17,6 +18,7 @@ import {
   buildCatalogHref,
   catalogFiltersFromQuery,
   venueCatalogHrefWithSelectedCity,
+  type CatalogExperienceMode,
   type CatalogFilterValues,
   type CatalogSort,
 } from '@/lib/catalog-url';
@@ -76,6 +78,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
   const bootCatalogRef = useRef(initialCatalog);
   const bootQueryKeyRef = useRef(initialQueryKey);
   const rawUrlCity = urlSearchParams.get('city')?.trim() || '';
+  const requestedExperienceMode = urlSearchParams.get('mode') === 'catalog' ? 'catalog' : undefined;
   const urlCityIsAll = rawUrlCity.toLowerCase() === 'all';
   const urlHasCity = Boolean(rawUrlCity) && !urlCityIsAll;
   // Keep SSR catalog visible during city bootstrap; only refetch when injected city differs.
@@ -157,6 +160,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
 
   const filterValues = useMemo(() => {
     const base = catalogFiltersFromQuery({
+      mode: requestedExperienceMode,
       q: query.q,
       city: query.city,
       category: query.category,
@@ -180,7 +184,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
       destinations: selectedCity?.destinations || [],
     });
     return { ...base, city: fetchCity };
-  }, [query, cityReady, selectedCity, rawUrlCity, urlCityIsAll, listPage]);
+  }, [query, requestedExperienceMode, cityReady, selectedCity, rawUrlCity, urlCityIsAll, listPage]);
 
   const filtersQueryKey = useMemo(
     () => catalogFiltersCacheKey(filterValues, 1),
@@ -249,6 +253,13 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
         (filterValues.ageMax != null && filterValues.ageMax >= 0),
     );
   }, [filterValues]);
+  const experienceMode: CatalogExperienceMode =
+    filterValues.mode === 'catalog' || hasExtraCatalogFilters ? 'catalog' : 'afisha';
+  const effectiveViewMode: CatalogViewMode = experienceMode === 'afisha' ? 'cards' : viewMode;
+  const catalogFilterValues = useMemo<CatalogFilterValues>(
+    () => ({ ...filterValues, mode: 'catalog' }),
+    [filterValues],
+  );
 
   /** Effective query key from resolved filters (header city may lead URL by one frame). */
   const effectiveQueryKey = useMemo(
@@ -441,7 +452,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
   const infiniteScrollEnabled = Boolean(
     catalog &&
       nextFetchPage &&
-      viewMode === 'cards' &&
+      effectiveViewMode === 'cards' &&
       !error,
   );
 
@@ -449,99 +460,120 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
     return <EventsCityGate />;
   }
 
-  return (
-    <CatalogToolbar
-      facets={facets}
-      values={filterValues}
-      disabled={(loading && !catalog) || cityBootstrapPending}
-      cityReady={cityReady || urlHasCity}
-      layout="split"
-    >
+  const switchExperienceMode = (next: CatalogExperienceMode) => {
+    if (next === experienceMode) return;
+    if (next === 'catalog') {
+      router.push(
+        buildCatalogHref({
+          ...filterValues,
+          mode: 'catalog',
+          page: undefined,
+        }),
+        { scroll: false },
+      );
+      return;
+    }
+    router.push(
+      buildCatalogHref({
+        city: filterValues.city,
+      }),
+      { scroll: false },
+    );
+  };
+
+  const resultsContent = (
+    <>
       {/* Count on sm+; sort + page size + view stay on one row.
           Active filter chips live under H1 in EventsCatalogHero. */}
-      <div
-        id="catalog-results"
-        className="catalog-meta-row mt-3 scroll-mt-[calc(var(--site-header-height)+5.5rem)] flex flex-col gap-2 sm:mt-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between"
-      >
-        <p className="hidden min-w-0 text-sm text-graphite-muted sm:block">
-          {loading && !catalog ? 'Загрузка…' : null}
-          {loading && catalog ? 'Обновляем… · ' : null}
-          {catalog ? (
-            <>
-              {pluralEvents(catalog.total)}
-              {catalog.items.length < catalog.total ? ` · показано ${catalog.items.length}` : ''}
-            </>
-          ) : null}
-          {error ? error : null}
-        </p>
-        {error ? <p className="text-sm text-rose-600 sm:hidden">{error}</p> : null}
+      {experienceMode === 'catalog' ? (
+        <div
+          id="catalog-results"
+          className="catalog-meta-row mt-3 scroll-mt-[calc(var(--site-header-height)+5.5rem)] flex flex-col gap-2 sm:mt-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between"
+        >
+          <p className="hidden min-w-0 text-sm text-graphite-muted sm:block">
+            {loading && !catalog ? 'Загрузка…' : null}
+            {loading && catalog ? 'Обновляем… · ' : null}
+            {catalog ? (
+              <>
+                {pluralEvents(catalog.total)}
+                {catalog.items.length < catalog.total ? ` · показано ${catalog.items.length}` : ''}
+              </>
+            ) : null}
+            {error ? error : null}
+          </p>
+          {error ? <p className="text-sm text-rose-600 sm:hidden">{error}</p> : null}
 
-        <div className="flex w-full min-w-0 flex-nowrap items-center justify-end gap-2 sm:ml-auto sm:w-auto">
-          <CatalogSortSelect
-            id="catalog-sort"
-            value={filterValues.sort}
-            disabled={(loading && !catalog) || cityBootstrapPending}
-            className="min-w-0 shrink"
-            onChange={(sort: CatalogSort) => {
-              router.push(
-                buildCatalogHref({
-                  ...filterValues,
-                  sort,
-                  page: undefined,
-                }),
-              );
-            }}
-          />
-          <div
-            role="radiogroup"
-            aria-label="Событий на странице"
-            className="catalog-page-size-toggle hidden items-center gap-1 rounded-full bg-[#F5F5F7] px-2 py-0.5 sm:inline-flex"
-          >
-            {CATALOG_PAGE_SIZES.map((size) => {
-              const active = (filterValues.limit || CATALOG_PAGE_SIZE_DEFAULT) === size;
-              return (
-                <button
-                  key={size}
-                  type="button"
-                  role="radio"
-                  aria-checked={active}
-                  disabled={(loading && !catalog) || cityBootstrapPending}
-                  onClick={() => {
-                    if (active) return;
-                    router.push(
-                      buildCatalogHref({
-                        ...filterValues,
-                        limit: size as CatalogPageSize,
-                        page: undefined,
-                      }),
-                    );
-                  }}
-                  className={`inline-btn inline-flex h-7 min-w-[2.5rem] items-center justify-center rounded-lg px-2 text-xs font-semibold tabular-nums leading-none transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 disabled:opacity-60 ${
-                    active
-                      ? 'bg-white text-primary-700 shadow-sm'
-                      : 'text-slate-500 hover:text-slate-800'
-                  }`}
-                >
-                  {size}
-                </button>
-              );
-            })}
+          <div className="flex w-full min-w-0 flex-nowrap items-center justify-end gap-2 sm:ml-auto sm:w-auto">
+            <CatalogSortSelect
+              id="catalog-sort"
+              value={catalogFilterValues.sort}
+              disabled={(loading && !catalog) || cityBootstrapPending}
+              className="min-w-0 shrink"
+              onChange={(sort: CatalogSort) => {
+                router.push(
+                  buildCatalogHref({
+                    ...catalogFilterValues,
+                    sort,
+                    page: undefined,
+                  }),
+                );
+              }}
+            />
+            <div
+              role="radiogroup"
+              aria-label="Событий на странице"
+              className="catalog-page-size-toggle hidden items-center gap-1 rounded-full bg-[#F5F5F7] px-2 py-0.5 sm:inline-flex"
+            >
+              {CATALOG_PAGE_SIZES.map((size) => {
+                const active = (catalogFilterValues.limit || CATALOG_PAGE_SIZE_DEFAULT) === size;
+                return (
+                  <button
+                    key={size}
+                    type="button"
+                    role="radio"
+                    aria-checked={active}
+                    disabled={(loading && !catalog) || cityBootstrapPending}
+                    onClick={() => {
+                      if (active) return;
+                      router.push(
+                        buildCatalogHref({
+                          ...catalogFilterValues,
+                          limit: size as CatalogPageSize,
+                          page: undefined,
+                        }),
+                      );
+                    }}
+                    className={`inline-btn inline-flex h-7 min-w-[2.5rem] items-center justify-center rounded-lg px-2 text-xs font-semibold tabular-nums leading-none transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 disabled:opacity-60 ${
+                      active
+                        ? 'bg-white text-primary-700 shadow-sm'
+                        : 'text-slate-500 hover:text-slate-800'
+                    }`}
+                  >
+                    {size}
+                  </button>
+                );
+              })}
+            </div>
+            <ViewModeToggle mode={viewMode} onChange={setViewMode} />
           </div>
-          <ViewModeToggle mode={viewMode} onChange={setViewMode} />
         </div>
-      </div>
+      ) : (
+        <div id="catalog-results" className="scroll-mt-[calc(var(--site-header-height)+2rem)]" />
+      )}
 
       {(loading && !catalog) || (cityBootstrapPending && !catalog) ? (
         <CatalogCardSkeletonGrid />
       ) : (
         <CatalogResults
           items={catalog?.items ?? []}
-          viewMode={viewMode}
+          viewMode={effectiveViewMode}
           onViewModeChange={setViewMode}
+          editorialMode={experienceMode === 'afisha'}
           city={filterValues.city}
           sort={filterValues.sort}
           hasExtraFilters={hasExtraCatalogFilters}
           clearHref={buildCatalogHref({
+            mode: experienceMode === 'catalog' ? 'catalog' : undefined,
             city: filterValues.city,
             sort: filterValues.sort,
             limit: filterValues.limit,
@@ -595,7 +627,88 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
           Подборки
         </Link>
       </nav>
-    </CatalogToolbar>
+    </>
+  );
+
+  return (
+    <>
+      <CatalogExperienceSwitch mode={experienceMode} onChange={switchExperienceMode} />
+      {experienceMode === 'catalog' ? (
+        <CatalogToolbar
+          facets={facets}
+          values={catalogFilterValues}
+          disabled={(loading && !catalog) || cityBootstrapPending}
+          cityReady={cityReady || urlHasCity}
+          layout="split"
+        >
+          {resultsContent}
+        </CatalogToolbar>
+      ) : (
+        <div className="catalog-content">{resultsContent}</div>
+      )}
+    </>
+  );
+}
+
+function CatalogExperienceSwitch({
+  mode,
+  onChange,
+}: {
+  mode: CatalogExperienceMode;
+  onChange: (mode: CatalogExperienceMode) => void;
+}) {
+  return (
+    <div className="mb-3 flex items-center border-b border-slate-200 pb-3 sm:mb-4 sm:pb-4">
+      <div
+        role="radiogroup"
+        aria-label="Режим страницы событий"
+        className="inline-flex items-center rounded-lg bg-slate-100 p-1"
+      >
+        <ExperienceModeButton
+          active={mode === 'afisha'}
+          label="Афиша"
+          onClick={() => onChange('afisha')}
+        >
+          <CalendarDays className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+        </ExperienceModeButton>
+        <ExperienceModeButton
+          active={mode === 'catalog'}
+          label="Каталог"
+          onClick={() => onChange('catalog')}
+        >
+          <Search className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+        </ExperienceModeButton>
+      </div>
+    </div>
+  );
+}
+
+function ExperienceModeButton({
+  active,
+  label,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  label: string;
+  onClick: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={active}
+      onClick={onClick}
+      className={`inline-btn inline-flex h-9 items-center gap-2 rounded-md px-3.5 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${
+        active
+          ? 'bg-white text-slate-950 shadow-sm ring-1 ring-slate-200/80'
+          : 'text-slate-500 hover:text-slate-900'
+      }`}
+    >
+      {children}
+      {label}
+    </button>
   );
 }
 

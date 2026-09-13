@@ -218,7 +218,12 @@ export function EventCard({
           }
         />
 
-        <EventImageBadges event={session} showSoonBadge={showSoonBadge} hideRelativeCoverDate />
+        <EventImageBadges
+          event={session}
+          showSoonBadge={showSoonBadge}
+          hideRelativeCoverDate
+          suppressMarketingBadges={catalogDense}
+        />
         <EventFavoriteButton eventId={session.id} className="right-2 top-2 sm:right-3 sm:top-3" />
         {!landingActions && dayRouteVenue ? (
           <AddToDayRouteButton

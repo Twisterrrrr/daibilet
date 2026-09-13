@@ -34,6 +34,7 @@ export function EventsCatalogHero() {
   const filterValues = useMemo(() => {
     const limitRaw = parseOptionalInt(searchParams.get('limit'));
     return catalogFiltersFromQuery({
+      mode: searchParams.get('mode') === 'catalog' ? 'catalog' : undefined,
       q: searchParams.get('q') || undefined,
       city: searchParams.get('city') || undefined,
       category: searchParams.get('category') || undefined,
@@ -71,6 +72,8 @@ export function EventsCatalogHero() {
       }),
     [filterValues.q, filterValues.category, cityName, dateLabel],
   );
+  const pageTitle =
+    filterValues.mode === 'catalog' ? title.replace(/^Афиша/u, 'Каталог') : title;
 
   const chipValues = useMemo((): CatalogFilterValues => {
     // Prefer resolved city name slug from URL/header so "Сбросить" keeps city context.
@@ -99,10 +102,10 @@ export function EventsCatalogHero() {
                 : 'max-sm:sr-only font-display text-2xl font-bold tracking-tight text-graphite sm:text-3xl'
             }
           >
-            {title}
+            {pageTitle}
           </h1>
           {/* Filtered: chips with × replace marketing subtitle. Hub-only keeps a short hint. */}
-          {!filtered && subtitle ? (
+          {!filtered && filterValues.mode !== 'catalog' && subtitle ? (
             <p className="hidden text-sm leading-snug text-graphite-muted sm:mt-1 sm:block sm:text-[15px]">
               {subtitle}
             </p>

@@ -633,8 +633,8 @@ export function EventHero({
         fill
         priority
         sizes={IMAGE_SIZES.eventHero}
-        style={{ objectPosition: heroObjectPosition }}
-        className="object-cover object-[center_20%] opacity-80"
+        style={{ '--event-hero-mobile-position': heroObjectPosition } as React.CSSProperties}
+        className="event-page-hero-image object-cover opacity-80"
         fallback={
           <div className="flex h-full items-center justify-center bg-gradient-to-br from-primary-600 to-primary-900">
             <span className="text-8xl opacity-30">🎭</span>

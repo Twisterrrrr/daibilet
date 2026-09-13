@@ -11,7 +11,6 @@ import {
   isOpenDate,
   LOW_TICKETS_THRESHOLD,
 } from '@/lib/event-card-meta';
-import { formatVacantSeats } from '@/lib/event-page-utils';
 
 function isTodayTomorrowCoverBadge(label: string | null): boolean {
   if (!label) return false;
@@ -27,8 +26,10 @@ type EventImageBadgesProps = {
   editorsPick?: boolean;
   /** Cover: only compact date (city hub / cleaned rails). */
   dateOnly?: boolean;
-  /** Grid catalog: drop Сегодня/Завтра on the photo; Hit and other signals stay. */
+  /** Grid catalog: drop Сегодня/Завтра from the photo. */
   hideRelativeCoverDate?: boolean;
+  /** Dense search/editorial grids stay clean; recommendations belong in curated rails. */
+  suppressMarketingBadges?: boolean;
 };
 
 const DATE_BADGE_CLASS =
@@ -41,6 +42,7 @@ export function EventImageBadges({
   editorsPick = false,
   dateOnly = false,
   hideRelativeCoverDate = false,
+  suppressMarketingBadges = false,
 }: EventImageBadgesProps) {
   const dateBadge = formatCoverDateBadge(event);
   const showCoverDate = Boolean(dateBadge) && !(hideRelativeCoverDate && isTodayTomorrowCoverBadge(dateBadge));
@@ -57,15 +59,17 @@ export function EventImageBadges({
     );
   }
 
-  const showLowTickets =
-    typeof event.vacant === 'number' && event.vacant > 0 && event.vacant <= LOW_TICKETS_THRESHOLD;
   const departingSoonMinutes =
     !isOpenDate(event) && event.startsAt ? getDepartingSoonMinutes(event.startsAt) : null;
-  const recommend = editorsPick || isRecommendBadgeEvent(event);
+  const hasSuppressedVacancyBadge =
+    typeof event.vacant === 'number' && event.vacant > 0 && event.vacant <= LOW_TICKETS_THRESHOLD;
+  const recommend = !suppressMarketingBadges && (editorsPick || isRecommendBadgeEvent(event));
   const recommendLabel = editorsPick ? 'Выбор редакции' : 'Рекомендуем';
-  const hit = editorsPick
-    ? (event.sessionCount || 0) >= 4 || (event.landingSlugs?.length || 0) > 0
-    : isHitEvent(event);
+  const hit = !suppressMarketingBadges && (
+    editorsPick
+      ? (event.sessionCount || 0) >= 4 || (event.landingSlugs?.length || 0) > 0
+      : isHitEvent(event)
+  );
   const maxSecondary = 4;
   const todayOnCover = dateBadge === 'Сегодня';
 
@@ -78,13 +82,7 @@ export function EventImageBadges({
       </EventCardBadge>,
     );
   }
-  if (showLowTickets && secondary.length < maxSecondary) {
-    secondary.push(
-      <EventCardBadge key="vacant" className="bg-slate-900/85 text-white shadow-md ring-1 ring-white/20 backdrop-blur-md">
-        {formatVacantSeats(event.vacant ?? 0)}
-      </EventCardBadge>,
-    );
-  } else if (hit && secondary.length < maxSecondary) {
+  if (!hasSuppressedVacancyBadge && hit && secondary.length < maxSecondary) {
     secondary.push(
       <EventCardBadge key="hit" className="bg-white/90 text-slate-950 shadow-[0_4px_12px_rgba(0,0,0,0.05)] ring-1 ring-white/60 backdrop-blur-md">
         Хит
@@ -118,8 +116,6 @@ export function EventImageBadges({
 
 /** True when card has a real social/urgency signal (no invented counts). */
 export function catalogItemHasLiveSignal(event: PublicSessionDto): boolean {
-  const lowTickets =
-    typeof event.vacant === 'number' && event.vacant > 0 && event.vacant <= LOW_TICKETS_THRESHOLD;
   const departingSoon = Boolean(event.startsAt && getDepartingSoonMinutes(event.startsAt));
-  return lowTickets || departingSoon || isRecommendBadgeEvent(event) || isHitEvent(event);
+  return departingSoon || isRecommendBadgeEvent(event) || isHitEvent(event);
 }

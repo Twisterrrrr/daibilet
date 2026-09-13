@@ -34,6 +34,12 @@ test('parseCatalogPageQuery keeps user limit on page > 1', () => {
   }
 });
 
+test('parseCatalogPageQuery ignores UI-only mode', () => {
+  const query = parseCatalogPageQuery({ mode: 'catalog', city: 'saint-petersburg' });
+  assert.equal(query.city, 'saint-petersburg');
+  assert.equal('mode' in query, false);
+});
+
 test('catalogQueryCacheKey includes paging via page when offset omitted', () => {
   const page1 = catalogQueryCacheKey({ city: 'moscow', limit: 100, page: 1 });
   const page2 = catalogQueryCacheKey({ city: 'moscow', limit: 100, page: 2 });
