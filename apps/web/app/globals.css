@@ -1568,6 +1568,66 @@ html[data-nav-pending='1'] {
     @apply flex w-full max-w-[40rem] flex-col gap-2 sm:flex-row sm:items-stretch sm:gap-3 xl:max-w-[44rem];
   }
 
+  /** Events filter surface: search first, quick choices second, full filters in a dialog. */
+  .catalog-filter-surface {
+    @apply flex w-full min-w-0 flex-col gap-2 border-b border-slate-200/70 bg-white pb-3;
+  }
+
+  .catalog-filter-surface__search {
+    @apply flex w-full min-w-0 items-center gap-2;
+  }
+
+  .catalog-filter-surface__search .catalog-toolbar-search-field {
+    @apply min-w-0 flex-1 md:max-w-none;
+  }
+
+  .catalog-filter-surface__submit {
+    @apply inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-graphite text-white transition hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 disabled:opacity-60 sm:h-10 sm:w-10;
+  }
+
+  .catalog-filter-surface__desktop-discovery,
+  .catalog-filter-surface__desktop-excludes {
+    @apply hidden min-w-0;
+  }
+
+  .catalog-filter-surface__mobile-quick {
+    @apply min-w-0;
+  }
+
+  .catalog-filter-surface__mobile-quick .catalog-mobile-quick-chips {
+    position: static;
+    z-index: auto;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    backdrop-filter: none;
+  }
+
+  @media (min-width: 768px) {
+    .catalog-filter-surface {
+      @apply gap-2.5 pb-3.5;
+    }
+
+    .catalog-filter-surface__mobile-quick {
+      display: none;
+    }
+
+    .catalog-filter-surface__desktop-discovery,
+    .catalog-filter-surface__desktop-excludes {
+      display: block;
+    }
+
+    .catalog-filter-surface__desktop-discovery .catalog-discovery-row {
+      display: flex;
+      max-width: none;
+      padding-bottom: 0;
+    }
+
+    .catalog-filter-surface__desktop-excludes {
+      padding-top: 0.125rem;
+    }
+  }
+
   /** Events toolbar: cap search row width on wide screens. */
   .catalog-toolbar-search-row {
     @apply flex w-full min-w-0 flex-wrap items-center gap-2 md:max-w-[44rem] md:gap-3;

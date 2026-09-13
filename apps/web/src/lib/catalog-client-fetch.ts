@@ -4,8 +4,11 @@ import { CATALOG_PAGE_SIZE_DEFAULT, CATALOG_PAGE_SIZE_MAX, isCatalogPageSize, ty
 export function catalogClientFetchTimeoutMs(limit?: number | null): number {
   const size =
     typeof limit === 'number' && Number.isFinite(limit) ? limit : CATALOG_PAGE_SIZE_DEFAULT;
-  if (size >= CATALOG_PAGE_SIZE_MAX) return 15_000;
-  return 8_000;
+  // A cold catalog rebuild currently takes about 12 seconds in production.
+  // Keep the browser budget above the server proxy timeout for larger pages.
+  if (size >= CATALOG_PAGE_SIZE_MAX) return 40_000;
+  if (size >= 100) return 25_000;
+  return 12_000;
 }
 
 export function readCatalogLimitFromSearchParams(params: URLSearchParams): CatalogPageSize | undefined {

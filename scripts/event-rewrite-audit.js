@@ -99,8 +99,17 @@ async function main() {
         count(*) filter (where override_description is null and duplicate_count > 1)::int as internal_duplicate,
         count(*) filter (
           where override_description is null
+            and description_length < 320
+        )::int as direct_content_gap,
+        count(*) filter (
+          where override_description is null
+            and description_length >= 320
+            and duplicate_count > 1
+        )::int as duplicate_only_review,
+        count(*) filter (
+          where override_description is null
             and (description_length < 320 or duplicate_count > 1)
-        )::int as priority_rewrite,
+        )::int as needs_editorial_action,
         count(*) filter (
           where override_description is null
             and description_length >= 320
@@ -109,6 +118,57 @@ async function main() {
       from scored
       group by source_code
       order by eligible desc, source_code
+    `);
+
+    const duplicateSummary = await client.query(`${ELIGIBLE_CTE}, duplicate_clusters as (
+      select
+        source_code,
+        description_fingerprint,
+        max(description_length)::int as description_length,
+        count(*)::int as member_count,
+        count(*) filter (where override_description is null)::int as untreated_count,
+        (array_agg(title order by title))[1:4] as sample_titles
+      from scored
+      where description_fingerprint is not null
+      group by source_code, description_fingerprint
+      having count(*) > 1
+        and count(*) filter (where override_description is null) > 0
+    )
+      select
+        source_code,
+        count(*)::int as cluster_count,
+        sum(member_count)::int as duplicated_rows,
+        sum(untreated_count)::int as untreated_rows,
+        sum(member_count - 1)::int as excess_rows,
+        max(member_count)::int as largest_cluster
+      from duplicate_clusters
+      group by source_code
+      order by duplicated_rows desc, source_code
+    `);
+
+    const largestDuplicateClusters = await client.query(`${ELIGIBLE_CTE}, duplicate_clusters as (
+      select
+        source_code,
+        description_fingerprint,
+        max(description_length)::int as "descriptionLength",
+        count(*)::int as "memberCount",
+        count(*) filter (where override_description is null)::int as "untreatedCount",
+        (array_agg(title order by title))[1:4] as "sampleTitles"
+      from scored
+      where description_fingerprint is not null
+      group by source_code, description_fingerprint
+      having count(*) > 1
+        and count(*) filter (where override_description is null) > 0
+    )
+      select
+        source_code as source,
+        "descriptionLength",
+        "memberCount",
+        "untreatedCount",
+        "sampleTitles"
+      from duplicate_clusters
+      order by "memberCount" desc, source_code
+      limit 15
     `);
 
     const sample = await client.query(`${ELIGIBLE_CTE}
@@ -144,7 +204,9 @@ async function main() {
           'missing_description',
           'short_description',
           'internal_duplicate',
-          'priority_rewrite',
+          'direct_content_gap',
+          'duplicate_only_review',
+          'needs_editorial_action',
           'defer_no_rewrite',
         ]) {
           acc[key] += Number(row[key] || 0);
@@ -157,7 +219,9 @@ async function main() {
         missing_description: 0,
         short_description: 0,
         internal_duplicate: 0,
-        priority_rewrite: 0,
+        direct_content_gap: 0,
+        duplicate_only_review: 0,
+        needs_editorial_action: 0,
         defer_no_rewrite: 0,
       },
     );
@@ -174,6 +238,8 @@ async function main() {
           },
           totals,
           bySource: metrics.rows,
+          duplicateSummary: duplicateSummary.rows,
+          largestDuplicateClusters: largestDuplicateClusters.rows,
           prioritySample: sample.rows,
         },
         null,

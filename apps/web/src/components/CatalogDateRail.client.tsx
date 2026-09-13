@@ -24,6 +24,8 @@ import {
 type CatalogDateRailProps = {
   disabled?: boolean;
   className?: string;
+  /** The full filters dialog is the period picker on compact catalog surfaces. */
+  showCalendarButton?: boolean;
 };
 
 const EDGE_EPS = 4;
@@ -34,7 +36,11 @@ const SCROLL_STEP_CARDS = 5;
  * click A → day; click B → range A–B; click inside range → that day; click same day again → clear.
  * Desktop: Afisha-style prev/next; custom calendar is part of the same control row.
  */
-export function CatalogDateRail({ disabled = false, className = '' }: CatalogDateRailProps) {
+export function CatalogDateRail({
+  disabled = false,
+  className = '',
+  showCalendarButton = true,
+}: CatalogDateRailProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const chips = useMemo(
@@ -389,7 +395,7 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
         >
           <ChevronRight className="h-5 w-5" strokeWidth={2} aria-hidden />
         </button>
-        {calendarButton}
+        {showCalendarButton ? calendarButton : null}
       </div>
 
       {modal}

@@ -15,9 +15,9 @@ function catalogFetchTimeoutMs(query: PublicCatalogQuery): number {
     typeof query.limit === 'number' && Number.isFinite(query.limit)
       ? query.limit
       : CATALOG_PAGE_SIZE_DEFAULT;
-  if (limit >= CATALOG_PAGE_SIZE_MAX) return 20_000;
-  if (limit >= 100) return 12_000;
-  return 5_000;
+  if (limit >= CATALOG_PAGE_SIZE_MAX) return 30_000;
+  if (limit >= 100) return 20_000;
+  return 8_000;
 }
 
 const catalogCacheOptions = {

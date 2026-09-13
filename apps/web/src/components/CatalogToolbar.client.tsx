@@ -7,16 +7,9 @@ import dynamic from 'next/dynamic';
 import { FormEvent, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
-import { CatalogSidebarDateFilters } from '@/components/CatalogSidebarDateFilters.client';
-import { CatalogAdvancedFiltersInline } from '@/components/CatalogAdvancedFiltersInline.client';
 import { CatalogDateRail } from '@/components/CatalogDateRail.client';
-import { CatalogDrawerApplyFooter } from '@/components/CatalogDrawerApplyFooter.client';
 import { CatalogExcludeThemes } from '@/components/CatalogExcludeThemes.client';
 import { CatalogMobileQuickFilters } from '@/components/CatalogMobileQuickFilters.client';
-import { CatalogPriceRange } from '@/components/CatalogPriceRange.client';
-import {
-  CatalogSidebarLayout,
-} from '@/components/CatalogSidebarLayout.client';
 import { CategoryTabIcon } from '@/components/CategoryTabIcon';
 import { displayCatalogLabel } from '@/lib/catalog-labels';
 import {
@@ -51,10 +44,7 @@ type CatalogToolbarProps = {
   children?: ReactNode;
 };
 
-const CATALOG_PRICE_MAX = 10_000;
-
 const SEARCH_DEBOUNCE_MS = 350;
-const MOBILE_DRAWER_MQ = '(max-width: 1023px)';
 /** Events with ageLimit ≤ 12 - family-friendly quick filter. */
 const KIDS_AGE_MAX = 12;
 
@@ -72,16 +62,11 @@ export function CatalogToolbar({
   const filtersRef = useRef(filters);
   filtersRef.current = filters;
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
-  const [drawerDraft, setDrawerDraft] = useState<CatalogFilterValues | null>(null);
-  const [drawerQDraft, setDrawerQDraft] = useState<string | null>(null);
-  const drawerSnapshotRef = useRef<{ filters: CatalogFilterValues; q: string } | null>(null);
   const [categoriesMoreOpen, setCategoriesMoreOpen] = useState(false);
   const [qDraft, setQDraft] = useState(filters.q || '');
   const [searchFocused, setSearchFocused] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchWrapRef = useRef<HTMLDivElement>(null);
-  const openSidebarDrawerRef = useRef<(() => void) | null>(null);
   const advancedCount = countAdvancedFilters(filters);
   const categorySplit = useMemo(
     () => splitCatalogCategories(facets.categories, filters.category),
@@ -125,63 +110,10 @@ export function CatalogToolbar({
     router.push(buildCatalogHref(next));
   };
 
-  const isMobileDrawerDraft = mobileDrawerOpen && drawerDraft != null;
-
-  const effectiveFilters = isMobileDrawerDraft ? drawerDraft : filters;
-  const effectiveQDraft = isMobileDrawerDraft && drawerQDraft != null ? drawerQDraft : qDraft;
-
-  const catalogNavigate = (next: CatalogFilterValues) => {
-    if (isMobileDrawerDraft) {
-      setDrawerDraft(next);
-      return;
-    }
-    navigate(next);
-  };
-
-  const setEffectiveQDraft = (next: string) => {
-    if (isMobileDrawerDraft) {
-      setDrawerQDraft(next);
-      setQDraft(next);
-      return;
-    }
-    setQDraft(next);
-  };
-
-  const openMobileDrawer = () => {
-    drawerSnapshotRef.current = { filters, q: qDraft };
-    setDrawerDraft({ ...filters });
-    setDrawerQDraft(qDraft);
-    setMobileDrawerOpen(true);
-  };
-
-  const dismissMobileDrawer = () => {
-    const snapshot = drawerSnapshotRef.current;
-    if (snapshot) setQDraft(snapshot.q);
-    drawerSnapshotRef.current = null;
-    setDrawerDraft(null);
-    setDrawerQDraft(null);
-    setMobileDrawerOpen(false);
-  };
-
-  const applyMobileDrawer = () => {
-    const next = drawerDraft ?? filters;
-    const q = (drawerQDraft ?? qDraft).trim();
-    drawerSnapshotRef.current = null;
-    setDrawerDraft(null);
-    setDrawerQDraft(null);
-    setMobileDrawerOpen(false);
-    navigate({
-      ...next,
-      q: q || undefined,
-      page: undefined,
-    });
-  };
-
-  // Live search on desktop-sized viewports; mobile drawer uses draft until «Применить».
+  // Desktop search settles after a short pause; mobile commits on submit.
   useEffect(() => {
     if (typeof window !== 'undefined') {
       if (window.matchMedia('(max-width: 639px)').matches) return;
-      if (window.matchMedia(MOBILE_DRAWER_MQ).matches && mobileDrawerOpen) return;
     }
     const next = qDraft.trim();
     const current = (filtersRef.current.q || '').trim();
@@ -195,14 +127,14 @@ export function CatalogToolbar({
       });
     }, SEARCH_DEBOUNCE_MS);
     return () => window.clearTimeout(timer);
-  }, [qDraft, mobileDrawerOpen]);
+  }, [qDraft]);
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setSearchFocused(false);
-    catalogNavigate({
-      ...effectiveFilters,
-      q: effectiveQDraft.trim() || undefined,
+    navigate({
+      ...filters,
+      q: qDraft.trim() || undefined,
       page: undefined,
     });
   };
@@ -227,10 +159,10 @@ export function CatalogToolbar({
 
   const excludeThemesRow = (
     <CatalogExcludeThemes
-      filters={effectiveFilters}
+      filters={filters}
       landings={facets.landings || []}
       disabled={disabled}
-      onNavigate={catalogNavigate}
+      onNavigate={navigate}
     />
   );
 
@@ -238,30 +170,25 @@ export function CatalogToolbar({
     <CatalogAdvancedFiltersPanel
       open={filtersOpen}
       filters={{
-        dateFrom: effectiveFilters.from || '',
-        dateTo: effectiveFilters.to || '',
-        date: effectiveFilters.date || '',
-        minPrice: effectiveFilters.minPrice != null ? String(effectiveFilters.minPrice) : 'all',
-        maxPrice: effectiveFilters.maxPrice != null ? String(effectiveFilters.maxPrice) : 'all',
+        dateFrom: filters.from || '',
+        dateTo: filters.to || '',
+        date: filters.date || '',
+        minPrice: filters.minPrice != null ? String(filters.minPrice) : 'all',
+        maxPrice: filters.maxPrice != null ? String(filters.maxPrice) : 'all',
         ageMax:
-          effectiveFilters.ageMax != null && effectiveFilters.ageMax >= 0
-            ? effectiveFilters.ageMax
+          filters.ageMax != null && filters.ageMax >= 0
+            ? filters.ageMax
             : -1,
-        landing: effectiveFilters.landing || 'all',
+        landing: filters.landing || 'all',
       }}
       landings={facets.landings}
       previewContext={{
-        q: effectiveQDraft.trim() || effectiveFilters.q,
-        city: effectiveFilters.city,
-        category: effectiveFilters.category,
-        sort: effectiveFilters.sort,
+        q: qDraft.trim() || filters.q,
+        city: filters.city,
+        category: filters.category,
+        sort: filters.sort,
       }}
       onApply={(next) => {
-        if (isMobileDrawerDraft) {
-          setDrawerDraft(mergeAdvancedFilters(drawerDraft ?? filters, drawerQDraft ?? qDraft, next));
-          setFiltersOpen(false);
-          return;
-        }
         applyAdvanced(navigate, filters, qDraft, next);
         setFiltersOpen(false);
       }}
@@ -302,43 +229,10 @@ export function CatalogToolbar({
     );
   }
 
-  const priceMinValue = effectiveFilters.minPrice ?? 0;
-  const priceMaxValue = effectiveFilters.maxPrice ?? CATALOG_PRICE_MAX;
-
-  const setPriceRange = (min: number, max: number) => {
-    const atDefault = min <= 0 && max >= CATALOG_PRICE_MAX;
-    catalogNavigate({
-      ...effectiveFilters,
-      q: effectiveQDraft.trim() || effectiveFilters.q,
-      minPrice: atDefault ? undefined : min,
-      maxPrice: atDefault ? undefined : max,
-      page: undefined,
-    });
-  };
-
-  const resetSidebarFilters = () => {
-    if (isMobileDrawerDraft) {
-      setDrawerDraft({
-        city: effectiveFilters.city,
-        sort: effectiveFilters.sort,
-        limit: effectiveFilters.limit,
-      });
-      setDrawerQDraft('');
-      setQDraft('');
-      return;
-    }
-    setQDraft('');
-    navigate({
-      city: filters.city,
-      sort: filters.sort,
-      limit: filters.limit,
-    });
-  };
-
   const sidebarActiveCount =
-    countAdvancedFilters(effectiveFilters) +
-    (effectiveFilters.category ? 1 : 0) +
-    (effectiveQDraft.trim() ? 1 : 0);
+    countAdvancedFilters(filters) +
+    (filters.category ? 1 : 0) +
+    (qDraft.trim() ? 1 : 0);
 
   const catalogSearchField = (
     <div ref={searchWrapRef} className="catalog-toolbar-search-field max-w-none md:max-w-none">
@@ -353,8 +247,8 @@ export function CatalogToolbar({
           ref={searchInputRef}
           type="search"
           name="q"
-          value={effectiveQDraft}
-          onChange={(event) => setEffectiveQDraft(event.target.value)}
+          value={qDraft}
+          onChange={(event) => setQDraft(event.target.value)}
           onFocus={() => setSearchFocused(true)}
           placeholder="Название, место или артист"
           aria-label="Поиск по событиям"
@@ -364,14 +258,14 @@ export function CatalogToolbar({
           autoComplete="off"
           className="inline-btn h-11 w-full rounded-xl border-0 bg-transparent pl-10 pr-9 text-sm text-graphite outline-none transition placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-primary/30 disabled:opacity-60 search-input--custom-clear"
         />
-        {effectiveQDraft ? (
+        {qDraft ? (
           <button
             type="button"
             aria-label="Очистить поиск"
             disabled={disabled}
             onClick={() => {
-              setEffectiveQDraft('');
-              catalogNavigate({ ...effectiveFilters, q: undefined, page: undefined });
+              setQDraft('');
+              navigate({ ...filters, q: undefined, page: undefined });
             }}
             className="inline-btn absolute right-1.5 top-1/2 grid h-6 w-6 -translate-y-1/2 place-items-center rounded-lg text-graphite-muted hover:bg-surface-muted hover:text-graphite disabled:opacity-60"
           >
@@ -398,17 +292,17 @@ export function CatalogToolbar({
               onClick={() => {
                 setSearchFocused(false);
                 if (hint.kind === 'q' && hint.q) {
-                  setEffectiveQDraft(hint.q);
-                  catalogNavigate({
-                    ...effectiveFilters,
+                  setQDraft(hint.q);
+                  navigate({
+                    ...filters,
                     q: hint.q,
                     category: undefined,
                     page: undefined,
                   });
                   return;
                 }
-                catalogNavigate({
-                  ...effectiveFilters,
+                navigate({
+                  ...filters,
                   q: undefined,
                   category: hint.category,
                   page: undefined,
@@ -425,135 +319,53 @@ export function CatalogToolbar({
   );
 
   if (layout === 'split') {
-    const eventsSidebar = (
-      <>
-        <div className="catalog-sidebar-desktop-header">
-          <span className="catalog-sidebar-desktop-title">Фильтры</span>
-          <div className="flex items-center gap-0.5">
-            {sidebarActiveCount > 0 ? (
-              <button type="button" className="catalog-sidebar-clear" onClick={resetSidebarFilters}>
-                Сбросить
-              </button>
-            ) : null}
-          </div>
-        </div>
-
-        <form onSubmit={onSubmit} className="catalog-sidebar-section catalog-sidebar-search">
-          {catalogSearchField}
-          <button
-            type="submit"
-            disabled={disabled}
-            className="catalog-sidebar-search__submit mt-2.5"
-          >
-            Найти
-          </button>
-        </form>
-
-        <div className="catalog-sidebar-section">
-          <p className="catalog-sidebar-section__title">Стоимость, ₽</p>
-          <CatalogPriceRange
-            min={0}
-            max={CATALOG_PRICE_MAX}
-            valueMin={priceMinValue}
-            valueMax={priceMaxValue}
-            disabled={disabled}
-            onChange={setPriceRange}
-          />
-        </div>
-
-        <CatalogSidebarDateFilters
-          filters={effectiveFilters}
-          qDraft={effectiveQDraft}
-          disabled={disabled}
-          onNavigate={catalogNavigate}
-        />
-
-        <div className="catalog-sidebar-section">
-          <p className="catalog-sidebar-section__title">Категории</p>
-          <CategorySidebarNav
-            filters={effectiveFilters}
-            primary={categorySplit.primary}
-            overflow={categorySplit.overflow}
-            onOpenMore={() => setCategoriesMoreOpen(true)}
-            onNavigate={catalogNavigate}
-          />
-        </div>
-
-        <div className="catalog-sidebar-section">
-          <p className="catalog-sidebar-section__title">Особенности</p>
-          <QuickFilterSidebarNav
-            filters={effectiveFilters}
-            qDraft={effectiveQDraft}
-            disabled={disabled}
-            onNavigate={catalogNavigate}
-          />
-        </div>
-
-        <CatalogExcludeThemes
-          filters={effectiveFilters}
-          landings={facets.landings || []}
-          disabled={disabled}
-          onNavigate={catalogNavigate}
-          variant="sidebar"
-        />
-
-        <CatalogAdvancedFiltersInline
-          filters={effectiveFilters}
-          landings={facets.landings}
-          qDraft={effectiveQDraft}
-          disabled={disabled}
-          onNavigate={catalogNavigate}
-        />
-
-      </>
-    );
-
-    const drawerPreviewFilters: CatalogFilterValues = {
-      ...effectiveFilters,
-      q: effectiveQDraft.trim() || effectiveFilters.q,
-    };
-
     return (
       <>
-        <CatalogSidebarLayout
-          sidebar={eventsSidebar}
-          title="Фильтры"
-          triggerLabel="Фильтры и поиск"
-          activeCount={sidebarActiveCount}
-          hideMobileTrigger
-          desktopCollapsible={false}
-          desktopPlacement="outside-gutter"
-          onRegisterOpenDrawer={(open) => {
-            openSidebarDrawerRef.current = open;
-          }}
-          onDrawerOpen={openMobileDrawer}
-          onDrawerDismiss={dismissMobileDrawer}
-          footer={({ closeApply }) => (
-            <CatalogDrawerApplyFooter
-              filters={drawerPreviewFilters}
+        <section className="catalog-filter-surface" aria-label="Поиск и фильтры событий">
+          <form onSubmit={onSubmit} className="catalog-filter-surface__search">
+            {catalogSearchField}
+            <button
+              type="submit"
               disabled={disabled}
-              onApply={() => {
-                applyMobileDrawer();
-                closeApply();
-              }}
+              className="catalog-filter-surface__submit"
+              aria-label="Найти"
+              title="Найти"
+            >
+              <Search aria-hidden className="h-4 w-4" strokeWidth={2} />
+            </button>
+            <FiltersButton
+              open={filtersOpen}
+              count={sidebarActiveCount}
+              disabled={disabled}
+              onClick={() => setFiltersOpen(true)}
             />
-          )}
-        >
-          <div className="catalog-content">
-            <div className="catalog-date-timeline w-full min-w-0">
-              <CatalogDateRail disabled={disabled} className="min-w-0 w-full" />
-            </div>
+          </form>
+
+          <div className="catalog-filter-surface__desktop-discovery">{discoveryRow}</div>
+          <div className="catalog-filter-surface__mobile-quick">
             <CatalogMobileQuickFilters
               filters={filters}
               categories={facets.categories}
               disabled={disabled}
               activeCount={sidebarActiveCount}
               onNavigate={navigate}
-              onOpenAllFilters={() => openSidebarDrawerRef.current?.()}
+              onOpenAllFilters={() => setFiltersOpen(true)}
             />
-            {children}
           </div>
-        </CatalogSidebarLayout>
+          <div className="catalog-filter-surface__desktop-excludes">{excludeThemesRow}</div>
+        </section>
+
+        <div className="catalog-content">
+          <div className="catalog-date-timeline w-full min-w-0">
+            <CatalogDateRail
+              disabled={disabled}
+              className="min-w-0 w-full"
+              showCalendarButton={false}
+            />
+          </div>
+          {children}
+        </div>
+
         {advancedPanel}
         <MoreCategoriesSheet
           open={categoriesMoreOpen}
@@ -907,184 +719,6 @@ function QuickFilterToggles({
         <span className="whitespace-nowrap">С детьми</span>
       </button>
     </>
-  );
-}
-
-function QuickFilterSidebarNav({
-  filters,
-  qDraft,
-  disabled,
-  onNavigate,
-}: {
-  filters: CatalogFilterValues;
-  qDraft: string;
-  disabled?: boolean;
-  onNavigate: (next: CatalogFilterValues) => void;
-}) {
-  const freeOn = filters.minPrice === 0 && filters.maxPrice === 0;
-  const kidsOn = filters.ageMax === KIDS_AGE_MAX;
-  const eveningOn = filters.date === 'evening' && !filters.from && !filters.to;
-
-  const withQ = (next: CatalogFilterValues): CatalogFilterValues => ({
-    ...next,
-    q: qDraft.trim() || filters.q,
-    page: undefined,
-  });
-
-  const items = [
-    {
-      key: 'evening',
-      label: 'Сегодня вечером',
-      active: eveningOn,
-      onClick: () =>
-        onNavigate(
-          withQ({
-            ...filters,
-            date: eveningOn ? undefined : 'evening',
-            from: undefined,
-            to: undefined,
-          }),
-        ),
-    },
-    {
-      key: 'free',
-      label: 'Бесплатные',
-      active: freeOn,
-      onClick: () =>
-        onNavigate(
-          withQ({
-            ...filters,
-            minPrice: freeOn ? undefined : 0,
-            maxPrice: freeOn ? undefined : 0,
-          }),
-        ),
-    },
-    {
-      key: 'kids',
-      label: 'С детьми',
-      active: kidsOn,
-      onClick: () =>
-        onNavigate(
-          withQ({
-            ...filters,
-            ageMax: kidsOn ? undefined : KIDS_AGE_MAX,
-          }),
-        ),
-    },
-  ];
-
-  return (
-    <div className="catalog-sidebar-checkbox-list" aria-label="Особенности">
-      {items.map((item) => (
-        <label key={item.key} className="catalog-sidebar-checkbox">
-          <input
-            type="checkbox"
-            checked={item.active}
-            disabled={disabled}
-            onChange={() => item.onClick()}
-          />
-          <span className="catalog-sidebar-checkbox__mark" aria-hidden />
-          <span className="catalog-sidebar-checkbox__label">{item.label}</span>
-        </label>
-      ))}
-    </div>
-  );
-}
-
-function CategorySidebarNav({
-  filters,
-  primary,
-  overflow,
-  onOpenMore,
-  onNavigate,
-}: {
-  filters: CatalogFilterValues;
-  primary: CatalogCategoryFacet[];
-  overflow: CatalogCategoryFacet[];
-  onOpenMore: () => void;
-  onNavigate?: (next: CatalogFilterValues) => void;
-}) {
-  const pickCategory = (category?: string) => {
-    const next = { ...filters, category, page: undefined };
-    if (onNavigate) {
-      onNavigate(next);
-      return;
-    }
-  };
-
-  return (
-    <nav className="catalog-sidebar-nav" aria-label="Категории">
-      {onNavigate ? (
-        <button
-          type="button"
-          onClick={() => pickCategory(undefined)}
-          className={`catalog-sidebar-nav__item${!filters.category ? ' catalog-sidebar-nav__item--active' : ''}`}
-        >
-          <span className="catalog-sidebar-nav__name">Все события</span>
-        </button>
-      ) : (
-        <Link
-          href={buildCatalogHref({ ...filters, category: undefined, page: undefined })}
-          className={`catalog-sidebar-nav__item${!filters.category ? ' catalog-sidebar-nav__item--active' : ''}`}
-        >
-          <span className="catalog-sidebar-nav__name">Все события</span>
-        </Link>
-      )}
-      {primary.map((item) => {
-        const active = filters.category === item.name;
-        const empty = item.events <= 0;
-        const label = displayCatalogLabel(item.name);
-        if (empty && !active) {
-          return (
-            <span
-              key={item.name}
-              className="catalog-sidebar-nav__item cursor-not-allowed opacity-40"
-              aria-disabled="true"
-            >
-              <span className="catalog-sidebar-nav__name">{label}</span>
-              <span className="catalog-sidebar-nav__count">0</span>
-            </span>
-          );
-        }
-        if (onNavigate) {
-          return (
-            <button
-              key={item.name}
-              type="button"
-              onClick={() => pickCategory(active ? undefined : item.name)}
-              className={`catalog-sidebar-nav__item${active ? ' catalog-sidebar-nav__item--active' : ''}${empty ? ' opacity-60' : ''}`}
-            >
-              <span className="catalog-sidebar-nav__name">{label}</span>
-              {item.events > 0 ? (
-                <span className="catalog-sidebar-nav__count">{item.events}</span>
-              ) : null}
-            </button>
-          );
-        }
-        return (
-          <Link
-            key={item.name}
-            href={buildCatalogHref({
-              ...filters,
-              category: active ? undefined : item.name,
-              page: undefined,
-            })}
-            className={`catalog-sidebar-nav__item${active ? ' catalog-sidebar-nav__item--active' : ''}${empty ? ' opacity-60' : ''}`}
-          >
-            <span className="catalog-sidebar-nav__name">{label}</span>
-            {item.events > 0 ? (
-              <span className="catalog-sidebar-nav__count">{item.events}</span>
-            ) : null}
-          </Link>
-        );
-      })}
-      {overflow.length > 0 ? (
-        <button type="button" onClick={onOpenMore} className="catalog-sidebar-nav__item catalog-sidebar-nav__item--more">
-          <span className="catalog-sidebar-nav__name">Ещё категории</span>
-          <span className="catalog-sidebar-nav__count">{overflow.length}</span>
-        </button>
-      ) : null}
-    </nav>
   );
 }
 
