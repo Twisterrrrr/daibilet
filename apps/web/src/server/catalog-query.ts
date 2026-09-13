@@ -105,7 +105,7 @@ export function searchParamsToRecord(
 }
 
 /** UI-only query keys — must not fail catalog SSR/API validation. */
-const CATALOG_UI_QUERY_KEYS = new Set(['view', 'mode']);
+const CATALOG_UI_QUERY_KEYS = new Set(['view']);
 
 function catalogQueryParams(raw: Record<string, string>): Record<string, string> {
   const filtered: Record<string, string> = {};

@@ -1,15 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import {
-  buildCatalogHref,
-  catalogFiltersFromQuery,
-  catalogHrefWithSelectedCity,
-  isPlacesSectionPath,
-  placesSearchHref,
-  resolveCatalogSortSelectValue,
-  venueCatalogHrefWithSelectedCity,
-} from './catalog-url.ts';
+import { buildCatalogHref, catalogHrefWithSelectedCity, isPlacesSectionPath, placesSearchHref, resolveCatalogSortSelectValue, venueCatalogHrefWithSelectedCity } from './catalog-url.ts';
 import {
   catalogCityQueryValue,
   isAllCitiesQuery,
@@ -59,14 +51,6 @@ test('buildCatalogHref omits default time sort and keeps explicit popular', () =
   assert.equal(buildCatalogHref({ sort: 'time' }), '/events');
   assert.equal(buildCatalogHref({ sort: 'popular' }), '/events?sort=popular');
   assert.equal(buildCatalogHref({ sort: 'price_asc' }), '/events?sort=price_asc');
-});
-
-test('buildCatalogHref preserves the UI-only catalog experience mode', () => {
-  assert.equal(buildCatalogHref({ mode: 'catalog' }), '/events?mode=catalog');
-  assert.equal(
-    buildCatalogHref(catalogFiltersFromQuery({ mode: 'catalog', category: 'Экскурсии' })),
-    '/events?mode=catalog&category=%D0%AD%D0%BA%D1%81%D0%BA%D1%83%D1%80%D1%81%D0%B8%D0%B8',
-  );
 });
 
 test('resolveCatalogSortSelectValue maps legacy price to cheapest-first', () => {

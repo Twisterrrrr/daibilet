@@ -1,14 +1,11 @@
 import { CATALOG_PAGE_SIZE_DEFAULT, CATALOG_PAGE_SIZES, type CatalogPageSize } from '@daibilet/contracts/catalog';
 
 export type CatalogSort = 'time' | 'price' | 'price_asc' | 'price_desc' | 'popular' | 'departing_soon' | 'random';
-export type CatalogExperienceMode = 'afisha' | 'catalog';
 
 /** Default `/events` order: nearest session first. Matches the sort select. */
 export const CATALOG_SORT_DEFAULT: CatalogSort = 'time';
 
 export interface CatalogFilterValues {
-  /** UI-only: keep the search catalog separate from the editorial afisha. */
-  mode?: CatalogExperienceMode;
   q?: string;
   city?: string;
   category?: string;
@@ -88,7 +85,6 @@ export const AGE_FILTER_OPTIONS = [
 export function catalogFiltersFromQuery(query: CatalogFilterValues): CatalogFilterValues {
   const excludeLanding = normalizeExcludeLandingParam(query.excludeLanding);
   return {
-    mode: query.mode === 'catalog' ? 'catalog' : undefined,
     q: query.q || undefined,
     city: query.city && query.city !== 'all' ? query.city : undefined,
     category: query.category && query.category !== 'all' ? query.category : undefined,
@@ -109,7 +105,6 @@ export function catalogFiltersFromQuery(query: CatalogFilterValues): CatalogFilt
 export function buildCatalogHref(values: CatalogFilterValues): string {
   const params = new URLSearchParams();
 
-  if (values.mode === 'catalog') params.set('mode', 'catalog');
   if (values.q?.trim()) params.set('q', values.q.trim());
   if (values.city) params.set('city', values.city);
   if (values.category) params.set('category', values.category);
