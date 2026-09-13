@@ -5,6 +5,7 @@ import {
   regroupMappedPublicCatalogSessions,
   sessionHasCoverImage,
 } from './public-catalog-grouping.js';
+import { isPublicCatalogExcludedMuseumAdmission } from './public-catalog-exclusions.js';
 import type { PublicSessionDto } from './types/public.js';
 
 function session(overrides: Partial<PublicSessionDto>): PublicSessionDto {
@@ -69,4 +70,33 @@ test('regroupMappedPublicCatalogSessions merges slots by groupKey', () => {
 test('dedupeCrossSourceCatalogSessions leaves non-widget sessions untouched', () => {
   const input = [session({ id: 'only' })];
   assert.deepEqual(dedupeCrossSourceCatalogSessions(input), input);
+});
+
+test('catalog excludes Harry Potter museum admissions without hiding themed shows', () => {
+  assert.equal(
+    isPublicCatalogExcludedMuseumAdmission(
+      session({ title: 'Взрослый билет', venue: 'Музей Гарри Поттера' }),
+    ),
+    true,
+  );
+  assert.equal(
+    isPublicCatalogExcludedMuseumAdmission(
+      session({
+        title: 'Комбо-квест',
+        venue: 'Перинные ряды',
+        venueSlug: 'muzei-garri-pottera-683e8e0935b8fc7a60f565d3',
+      }),
+    ),
+    true,
+  );
+  assert.equal(
+    isPublicCatalogExcludedMuseumAdmission(
+      session({
+        title: 'Гарри Поттер: музыкальное шоу в планетарии',
+        venue: 'Планетарий 1',
+        slug: 'garri-potter-muzykalnoe-shou',
+      }),
+    ),
+    false,
+  );
 });

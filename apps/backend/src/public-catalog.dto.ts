@@ -25,6 +25,7 @@ import {
   regroupMappedPublicCatalogSessions,
   sessionHasCoverImage,
 } from './public-catalog-grouping.js';
+import { isPublicCatalogExcludedMuseumAdmission } from './public-catalog-exclusions.js';
 import { formatDate, formatTime, normalizeStartsAt, timeBucket } from './public-datetime.js';
 import { mapGroupedPublicSession, collectSeparateCityHubNames, pickCatalogSubcategories } from './public-catalog.mapper.js';
 import { findLandingRule } from './landing-rules.js';
@@ -196,8 +197,11 @@ export async function buildPublicCatalogDto(query: PublicCatalogQuery): Promise<
   // Base catalog cache omits heavy slot hydration; hydrate only the requested page.
   const sessions = await getPublicCatalogSessions(query.refresh === 1, { hydrateSlots: false });
   const byIds = Boolean(query.ids?.length);
+  const visibleSessions = sessions.filter(
+    (session) => !isPublicCatalogExcludedMuseumAdmission(session),
+  );
   // Favorites / ids lookup: allow sessions without cover; normal catalog stays cover-gated.
-  const sourceSessions = byIds ? sessions : sessions.filter(sessionHasCoverImage);
+  const sourceSessions = byIds ? visibleSessions : visibleSessions.filter(sessionHasCoverImage);
   const filtered = sourceSessions.filter((session) => matchesCatalogQuery(session, query));
   const sortKey = query.sort || 'time';
   // City/scoped lists are small enough to hydrate next-session times before sort.
