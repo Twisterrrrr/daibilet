@@ -233,6 +233,10 @@ export NODE_OPTIONS="${NODE_OPTIONS:---max-old-space-size=5120}"
 export EVENT_SSG_TOP_N="${EVENT_SSG_TOP_N:-40}"
 echo "web:build NODE_OPTIONS=${NODE_OPTIONS} EVENT_SSG_TOP_N=${EVENT_SSG_TOP_N}"
 
+# Generated public assets may be root-owned after maintenance jobs. Normalize the
+# destination before `web:build`, whose first step syncs those assets again.
+sync_public_assets_deploy
+
 set +e
 pnpm web:build
 BUILD_RC=$?
