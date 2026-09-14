@@ -344,6 +344,16 @@ export function CatalogToolbar({
               alwaysShowLabel
             />
           </div>
+          <div className="catalog-events-mobile-filter-rows md:hidden">
+            <CatalogMobileQuickFilters
+              filters={filters}
+              categories={facets.categories}
+              disabled={disabled}
+              activeCount={sidebarActiveCount}
+              onNavigate={navigate}
+              onOpenAllFilters={() => setFiltersOpen(true)}
+            />
+          </div>
           {children}
         </div>
 

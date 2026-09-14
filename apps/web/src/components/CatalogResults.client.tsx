@@ -9,6 +9,7 @@ import { EventCardHorizontal } from '@/components/EventCardHorizontal';
 import { CatalogListRow } from '@/components/CatalogListRow.client';
 import type { PublicCatalogListItemDto } from '@daibilet/contracts/public';
 import { trackCatalogBannerClick } from '@/lib/catalog-analytics';
+import { isCatalogExcludedMuseumAdmission } from '@/lib/catalog-exclusions';
 import { catalogItemHasLiveSignal } from '@/lib/event-card-badges';
 import { resolveEventCardFallbackImage, resolveEventCardPrimaryImage } from '@/lib/event-card-image';
 import { formatMoneyRange } from '@/lib/format';
@@ -45,6 +46,8 @@ type CatalogResultsProps = {
   sort?: string | null;
   /** Date/category/q/etc. active - keep filter-reset primary, city hubs secondary. */
   hasExtraFilters?: boolean;
+  /** Items already surfaced in the editorial affiche block. */
+  excludeEventIds?: readonly string[];
 };
 
 const CATALOG_EMPTY_CITY_HUBS = [
@@ -101,33 +104,40 @@ function buildCatalogGridEntries(
   return entries;
 }
 
-function pickCatalogZenSpotlightItems(items: PublicCatalogListItemDto[]): PublicCatalogListItemDto[] {
+export function pickCatalogZenSpotlightItems(items: PublicCatalogListItemDto[]): PublicCatalogListItemDto[] {
   const selected: PublicCatalogListItemDto[] = [];
   const seenTitles = new Set<string>();
 
   for (const item of items) {
+    if (isCatalogExcludedMuseumAdmission(item)) continue;
     const image = resolveEventCardPrimaryImage(item) || resolveEventCardFallbackImage(item);
     const titleKey = formatPublicTitle(item.title).trim().toLocaleLowerCase('ru-RU');
     if (!image || !titleKey || seenTitles.has(titleKey)) continue;
     seenTitles.add(titleKey);
     selected.push(item);
-    if (selected.length === 3) break;
+    if (selected.length === 10) break;
   }
 
-  return selected.length === 3 ? selected : [];
+  return selected.length >= 4 ? selected : [];
 }
 
-function CatalogZenSpotlight({ items }: { items: PublicCatalogListItemDto[] }) {
+export function CatalogZenSpotlight({ items }: { items: PublicCatalogListItemDto[] }) {
   return (
-    <section className="mt-5 border-y border-slate-200 py-5 sm:mt-6 sm:py-6" aria-labelledby="catalog-zen-title">
-      <div className="mb-4 flex items-end justify-between gap-4">
+    <section className="mt-6 border-b border-slate-200 pb-6 sm:mt-7 sm:pb-8" aria-labelledby="catalog-zen-title">
+      <div className="mb-4 flex items-end justify-between gap-4 sm:mb-5">
         <div>
-          <p className="mb-1 text-[11px] font-bold uppercase text-primary-700">Выбор афиши</p>
+          <p className="mb-1 text-[11px] font-bold uppercase text-primary-700">Афиша города</p>
           <h2 id="catalog-zen-title" className="font-display text-xl font-bold text-graphite sm:text-2xl">
             Стоит увидеть
           </h2>
         </div>
-        <p className="hidden text-sm text-graphite-muted sm:block">Три повода выйти из дома</p>
+        <Link
+          href="#catalog-results"
+          className="hidden h-9 items-center gap-1.5 rounded-lg border border-slate-200 px-3 text-sm font-semibold text-graphite transition hover:border-primary-300 hover:text-primary-700 sm:inline-flex"
+        >
+          Смотреть каталог
+          <ArrowRight className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+        </Link>
       </div>
 
       <ul className="catalog-zen-spotlight-grid">
@@ -143,50 +153,45 @@ function CatalogZenSpotlight({ items }: { items: PublicCatalogListItemDto[] }) {
             <li key={`zen-${session.id}-${session.startsAt}`} className="catalog-zen-spotlight-item min-w-0">
               <Link
                 href={eventHref(session)}
-                className="group relative isolate flex h-full min-h-full overflow-hidden rounded-lg bg-slate-900 text-white"
+                className="group flex h-full min-h-full flex-col overflow-hidden rounded-lg border border-slate-200 bg-white text-graphite shadow-sm transition hover:-translate-y-0.5 hover:border-primary-200 hover:shadow-md"
               >
-                <CardSafeImage
-                  src={image}
-                  alt={title}
-                  fill
-                  sizes={
-                    index === 0
-                      ? '(min-width: 1840px) 850px, (min-width: 1280px) 60vw, (min-width: 640px) 33vw, 84vw'
-                      : '(min-width: 1280px) 380px, (min-width: 640px) 33vw, 84vw'
-                  }
-                  quality={CATALOG_IMAGE_QUALITY}
-                  priority={index === 0}
-                  loading={index === 0 ? undefined : 'lazy'}
-                  className="object-cover transition-transform duration-500 group-hover:scale-[1.025]"
-                  fallback={<div className="h-full w-full bg-slate-800" />}
-                />
-                <span className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/35 to-transparent" aria-hidden />
-                <span className="relative z-[1] mt-auto flex w-full min-w-0 flex-col p-4 sm:p-5 xl:p-6">
-                  <span className="text-[10px] font-bold uppercase text-white/75 sm:text-[11px]">
+                <span className="relative block aspect-[4/3] w-full shrink-0 overflow-hidden bg-slate-100">
+                  <CardSafeImage
+                    src={image}
+                    alt={title}
+                    fill
+                    sizes="(min-width: 1840px) 360px, (min-width: 1280px) 22vw, (min-width: 640px) 38vw, 82vw"
+                    quality={CATALOG_IMAGE_QUALITY}
+                    priority={index === 0}
+                    loading={index === 0 ? undefined : 'lazy'}
+                    className="object-cover transition-transform duration-500 group-hover:scale-[1.025]"
+                    fallback={<div className="h-full w-full bg-slate-100" />}
+                  />
+                  <span className="absolute left-3 top-3 rounded-md bg-white/95 px-2 py-1 text-[10px] font-bold uppercase text-primary-700 shadow-sm backdrop-blur-sm sm:text-[11px]">
                     {session.category || 'Событие'}
                   </span>
+                </span>
+                <span className="flex min-h-0 flex-1 flex-col p-4 sm:p-5">
                   <span
-                    className={`mt-2 line-clamp-3 font-display font-bold leading-snug ${
-                      index === 0 ? 'text-xl sm:text-lg xl:text-3xl' : 'text-xl sm:text-base xl:text-lg'
-                    }`}
+                    className="mt-2 line-clamp-3 font-display text-xl font-bold leading-snug sm:text-[1.35rem]"
                   >
                     {title}
                   </span>
-                  <span className="mt-3 flex min-w-0 items-center gap-1.5 text-xs font-semibold text-white/85 sm:text-[13px]">
+                  <span className="mt-3 flex min-w-0 items-center gap-1.5 text-xs font-semibold text-slate-700 sm:text-[13px]">
                     <CalendarDays className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} aria-hidden />
                     <span className="truncate">{formatShowcaseSessionDate(session)}</span>
                   </span>
                   {location ? (
-                    <span className="mt-1.5 flex min-w-0 items-center gap-1.5 text-xs text-white/70 sm:text-[13px]">
+                    <span className="mt-1.5 flex min-w-0 items-center gap-1.5 text-xs text-graphite-muted sm:text-[13px]">
                       <MapPin className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} aria-hidden />
                       <span className="truncate">{location}</span>
                     </span>
                   ) : null}
-                  <span className="mt-4 flex items-center justify-between gap-3">
-                    <span className="text-sm font-bold sm:text-base">
+                  <span className="mt-auto flex items-center justify-between gap-3 pt-4">
+                    <span className="text-sm font-bold text-primary-700 sm:text-base">
                       {hasPrice ? formatMoneyRange(session.priceFrom, session.priceTo) : 'Подробнее'}
                     </span>
-                    <ArrowRight className="h-4 w-4 shrink-0 transition-transform group-hover:translate-x-1" strokeWidth={1.75} aria-hidden />
+                    <ArrowRight className="h-4 w-4 shrink-0 text-primary-700 transition-transform group-hover:translate-x-1" strokeWidth={1.75} aria-hidden />
                   </span>
                 </span>
               </Link>
@@ -247,10 +252,13 @@ export function CatalogResults({
   city,
   sort,
   hasExtraFilters = false,
+  excludeEventIds = [],
 }: CatalogResultsProps) {
   const filtersLayout = useCatalogFiltersLayout();
   const filtersCollapsed = filtersLayout?.desktopCollapsed ?? false;
-  const catalogItems = collapseCatalogComboFamilies(items);
+  const catalogItems = collapseCatalogComboFamilies(items).filter(
+    (item) => !isCatalogExcludedMuseumAdmission(item),
+  );
   if (!catalogItems.length) {
     const cityName = String(city || '').trim();
     const cityScoped = Boolean(cityName) && cityName.toLowerCase() !== 'all';
@@ -346,9 +354,7 @@ export function CatalogResults({
   // Owner 2026-08-13: temporarily hide «Сейчас выбирают» / «Популярное сейчас» rail on /events.
   const SHOW_CATALOG_LIVE_RAIL = false;
   const showLiveRail = SHOW_CATALOG_LIVE_RAIL && liveRailItems.length >= 3 && viewMode === 'cards';
-  const spotlightItems =
-    viewMode === 'cards' && !hasExtraFilters ? pickCatalogZenSpotlightItems(catalogItems) : [];
-  const spotlightIds = new Set(spotlightItems.map((item) => item.id));
+  const spotlightIds = new Set(excludeEventIds);
   // Keep «Сейчас выбирают» / «Популярное сейчас» from mirroring the first page of cards 1:1.
   const listItemsWithoutLiveRail = showLiveRail
     ? catalogItems.filter((item) => !liveRailItems.some((rail) => rail.id === item.id))
@@ -365,7 +371,6 @@ export function CatalogResults({
 
   return (
     <>
-      {spotlightItems.length ? <CatalogZenSpotlight items={spotlightItems} /> : null}
       {showLiveRail ? (
         <CatalogLiveRail items={liveRailItems} popularSort={sort === 'popular'} />
       ) : null}

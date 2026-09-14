@@ -241,9 +241,55 @@ export function CatalogMobileQuickFilters({
     ) : null;
 
   const resetCount = countResettable(filters);
+  const visibleCategories = categories.filter((item) => item.events > 0 || filters.category === item.name);
 
   return (
     <>
+      <div
+        className="catalog-mobile-category-carousel"
+        role="group"
+        aria-label="Категории событий"
+      >
+        <button
+          type="button"
+          disabled={disabled}
+          aria-pressed={!filters.category}
+          onClick={() => {
+            if (!filters.category) return;
+            onNavigate(catalogFiltersFromQuery({ ...filters, category: undefined, page: undefined }));
+          }}
+          className={chipClass(!filters.category)}
+        >
+          <CategoryTabIcon name="Все" className="h-3.5 w-3.5" />
+          Все
+        </button>
+        {visibleCategories.map((item) => {
+          const label = displayCatalogLabel(item.name);
+          const active = filters.category === item.name;
+          return (
+            <button
+              key={item.name}
+              type="button"
+              disabled={disabled}
+              aria-pressed={active}
+              onClick={() => {
+                onNavigate(
+                  catalogFiltersFromQuery({
+                    ...filters,
+                    category: active ? undefined : item.name,
+                    page: undefined,
+                  }),
+                );
+              }}
+              className={chipClass(active)}
+            >
+              <CategoryTabIcon name={label} className="h-3.5 w-3.5" />
+              {label}
+            </button>
+          );
+        })}
+      </div>
+
       <div className="catalog-mobile-quick-chips">
         <div className="flex items-center gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <button

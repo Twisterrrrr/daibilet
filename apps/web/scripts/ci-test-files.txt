@@ -3,6 +3,7 @@
 src/lib/catalog-date-rail.test.ts
 src/lib/catalog-exclude-landing-schema.test.ts
 src/lib/catalog-exclude-themes.test.ts
+src/lib/catalog-exclusions.test.ts
 src/lib/catalog-interstitials.test.ts
 src/lib/events-catalog-heading.test.ts
 src/lib/chunk-load-recovery.test.ts

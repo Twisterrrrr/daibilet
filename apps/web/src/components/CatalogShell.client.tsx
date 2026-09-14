@@ -6,7 +6,12 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 import { CatalogInfiniteSentinel } from '@/components/CatalogInfiniteSentinel.client';
 import { CatalogPaginationLinks } from '@/components/CatalogPaginationLinks';
-import { CatalogResults, ViewModeToggle } from '@/components/CatalogResults.client';
+import {
+  CatalogResults,
+  CatalogZenSpotlight,
+  ViewModeToggle,
+  pickCatalogZenSpotlightItems,
+} from '@/components/CatalogResults.client';
 import { CatalogSortSelect } from '@/components/CatalogSortSelect.client';
 import { CatalogToolbar } from '@/components/CatalogToolbar.client';
 import { EventsCityGate } from '@/components/EventsCityGate.client';
@@ -444,6 +449,14 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
       viewMode === 'cards' &&
       !error,
   );
+  const spotlightItems = useMemo(
+    () =>
+      catalog && viewMode === 'cards' && !hasExtraCatalogFilters
+        ? pickCatalogZenSpotlightItems(catalog.items)
+        : [],
+    [catalog, viewMode, hasExtraCatalogFilters],
+  );
+  const spotlightIds = useMemo(() => spotlightItems.map((item) => item.id), [spotlightItems]);
 
   if (needsCityGate) {
     return <EventsCityGate />;
@@ -457,6 +470,8 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
       cityReady={cityReady || urlHasCity}
       layout="split"
     >
+      {spotlightItems.length ? <CatalogZenSpotlight items={spotlightItems} /> : null}
+
       {/* Count on sm+; sort + page size + view stay on one row.
           Active filter chips live under H1 in EventsCatalogHero. */}
       <div
@@ -541,6 +556,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
           city={filterValues.city}
           sort={filterValues.sort}
           hasExtraFilters={hasExtraCatalogFilters}
+          excludeEventIds={spotlightIds}
           clearHref={buildCatalogHref({
             city: filterValues.city,
             sort: filterValues.sort,
