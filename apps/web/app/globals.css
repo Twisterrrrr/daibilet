@@ -1458,6 +1458,42 @@ html[data-nav-pending='1'] {
     max-width: 100%;
   }
 
+  .catalog-events-sticky-controls {
+    position: sticky;
+    top: var(--site-header-height, 4rem);
+    z-index: 30;
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 -1rem 0.75rem;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid rgb(226 232 240 / 0.8);
+    background: rgb(255 255 255 / 0.95);
+    backdrop-filter: blur(12px);
+  }
+
+  @media (min-width: 640px) {
+    .catalog-events-sticky-controls {
+      margin-right: -1.5rem;
+      margin-left: -1.5rem;
+      padding-right: 1.5rem;
+      padding-left: 1.5rem;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .catalog-events-sticky-controls {
+      margin-right: 0;
+      margin-left: 0;
+      padding: 0.6rem 0.75rem;
+      border: 1px solid rgb(226 232 240 / 0.82);
+      border-radius: 0.875rem;
+      box-shadow: 0 6px 22px rgb(15 23 42 / 0.06);
+    }
+  }
+
   @media (min-width: 1024px) {
     .catalog-date-timeline {
       position: sticky;
@@ -1566,6 +1602,25 @@ html[data-nav-pending='1'] {
   /** Places/events/blog hero: keep search + selects grouped, not edge-to-edge. */
   .catalog-hub-filters {
     @apply flex w-full max-w-[40rem] flex-col gap-2 sm:flex-row sm:items-stretch sm:gap-3 xl:max-w-[44rem];
+  }
+
+  /** Places is a browsing catalog: quick choices stay visible, the long tail lives in a dialog. */
+  .places-filter-surface {
+    @apply sticky top-[var(--site-header-height)] z-30 flex min-w-0 flex-col gap-2.5 border-b border-slate-200/70 bg-white/95 pb-3 pt-1 backdrop-blur-md supports-[backdrop-filter]:bg-white/90;
+  }
+
+  .places-quick-filter-row {
+    @apply flex min-w-0 flex-nowrap items-center gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none];
+  }
+
+  .places-quick-filter-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (max-width: 479px) {
+    .catalog-card-grid.places-card-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
 
   /** Events filter surface: search first, quick choices second, full filters in a dialog. */

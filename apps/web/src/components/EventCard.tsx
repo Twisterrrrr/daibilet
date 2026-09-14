@@ -219,7 +219,7 @@ export function EventCard({
         />
 
         <EventImageBadges event={session} showSoonBadge={showSoonBadge} hideRelativeCoverDate />
-        <EventFavoriteButton eventId={session.id} className="right-2 top-2 sm:right-3 sm:top-3" />
+        <EventFavoriteButton eventId={session.id} session={session} className="right-2 top-2 sm:right-3 sm:top-3" />
         {!landingActions && dayRouteVenue ? (
           <AddToDayRouteButton
             intent="day"
@@ -590,7 +590,7 @@ function ShowcaseEventCard({
           dateOnly={cityHub}
         />
         {cityHub ? null : (
-          <EventFavoriteButton eventId={session.id} className="right-2 top-2 sm:right-3 sm:top-3" />
+          <EventFavoriteButton eventId={session.id} session={session} className="right-2 top-2 sm:right-3 sm:top-3" />
         )}
       </div>
 

@@ -7,8 +7,8 @@ import { useDayRouteState } from '@/hooks/useDayRouteState';
 
 /**
  * Sticky chrome day-route entry.
- * - Empty: icon; on lg+ also label «Маршрут» (no badge).
- * - Filled: icon + green count badge only (never «Маршрут · N» - digit lives in badge).
+ * - Empty: icon; on lg+ also product label «Мой день» (no badge).
+ * - Filled: icon + green count badge only (the digit lives in the badge).
  * - Mobile (below lg): icon-first, label hidden.
  */
 export function DayRouteBadge({ className = '' }: { className?: string }) {
@@ -24,7 +24,7 @@ export function DayRouteBadge({ className = '' }: { className?: string }) {
     >
       <Route className="h-5 w-5" strokeWidth={1.75} />
       {count === 0 ? (
-        <span className="hidden text-xs font-semibold lg:inline">Маршрут</span>
+        <span className="hidden text-xs font-semibold lg:inline">Мой день</span>
       ) : null}
       {count > 0 ? (
         <span

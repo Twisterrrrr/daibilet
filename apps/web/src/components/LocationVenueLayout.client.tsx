@@ -33,6 +33,7 @@ import {
   resolveVenueEditorialContent,
 } from '@/lib/venue-editorial-content';
 import { normalizeVenueKind, resolveLocationVenueCopy, resolveVenueAboutHeading, splitVenueProseParagraphs, venueTypeIcon, venueTypeLabel } from '@/lib/venue-meta';
+import { resolveVenueExperienceProfile } from '@/lib/venue-experience-profile';
 import { eventHref, venueHref } from '@/lib/routes';
 import type {
   PublicSessionDto,
@@ -64,6 +65,10 @@ export function LocationVenueLayout({
 }) {
   void _nearbyEvents;
   const venue = React.useMemo(() => applyVenueEditorialOverlay(venueProp), [venueProp]);
+  const experience = React.useMemo(
+    () => resolveVenueExperienceProfile({ type: venue.type, name: venue.name }),
+    [venue.type, venue.name],
+  );
   const editorial = React.useMemo(
     () => resolveVenueEditorialContent(venue.slug),
     [venue.slug],
@@ -125,7 +130,11 @@ export function LocationVenueLayout({
       Number(stats.events || 0) > 0);
 
   return (
-    <div className="bg-white pb-24 lg:pb-0" data-venue-pdp-md>
+    <div
+      className="bg-white pb-24 lg:pb-0"
+      data-venue-pdp-md
+      data-venue-experience={experience.id}
+    >
       <div className="border-b border-slate-200 bg-white">
         <VenueBreadcrumbsNav payload={pagePayload} />
       </div>
@@ -180,6 +189,31 @@ export function LocationVenueLayout({
                   <Ticket className="h-4 w-4" /> {formatMoney(stats.priceFrom)}
                 </span>
               </div>
+              {routeGroups.length > 0 ? (
+                <div className="mt-6 hidden flex-wrap items-center gap-3 md:flex">
+                  <a
+                    href="#location-routes"
+                    className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-6 py-2.5 text-sm font-bold text-slate-950 hover:bg-slate-100"
+                  >
+                    {experience.routeCtaLabel}
+                  </a>
+                  <AddToDayRouteButton
+                    variant="dark"
+                    venue={{
+                      id: venue.id,
+                      slug: venue.slug,
+                      title: venue.title || venue.name,
+                      city: venue.city,
+                      citySlug: venue.citySlug,
+                      href: venueHref(venue),
+                      imageUrl: venue.heroImageUrl,
+                      address: venue.address,
+                      latitude: venue.latitude,
+                      longitude: venue.longitude,
+                    }}
+                  />
+                </div>
+              ) : null}
             </div>
           </section>
           {(heroLead) ? (
@@ -429,7 +463,7 @@ export function LocationVenueLayout({
         <div className="space-y-8 lg:col-span-2">
           {isPier && routeGroups.length > 0 ? (
             <section id="location-routes" className="scroll-mt-24">
-              <h2 className="text-xl font-bold text-slate-900">Маршруты с этого причала</h2>
+              <h2 className="text-xl font-bold text-slate-900">{experience.routeSectionTitle}</h2>
               <p className="mt-3 text-sm leading-6 text-slate-500">Купите билет онлайн - приходите за 15 минут до отправления.</p>
               <div className="mt-6 space-y-3">
                 {routeGroups.map((group) => {
@@ -630,7 +664,7 @@ export function LocationVenueLayout({
             href="#location-routes"
             className="inline-flex h-11 flex-1 items-center justify-center rounded-full bg-primary-600 px-4 text-sm font-bold text-white hover:bg-primary-700"
           >
-            Маршруты
+            {experience.programTabLabel}
           </a>
         ) : null}
         <AddToDayRouteButton

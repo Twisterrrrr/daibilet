@@ -35,6 +35,7 @@ import {
   type VenueMonthRailChip,
   type VenuePlaybillEntry,
 } from '@/lib/venue-program';
+import { resolveVenueExperienceProfile } from '@/lib/venue-experience-profile';
 import { filterVenuePageSessionsByCity } from '@/lib/venue-page-sessions';
 
 const PLAYBILL_WEEKDAY_SHORT = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'] as const;
@@ -159,6 +160,9 @@ export function VenuePageView({
   }, [routeSlug, matchedInitialVenueId]);
 
   const venue = resolveVenueForRouteSlug(routeSlug, initialPayload, payload);
+  const experience = venue
+    ? resolveVenueExperienceProfile({ type: venue.type, name: venue.name })
+    : null;
   const baseSessions = React.useMemo(
     () => filterVenuePageSessionsByCity(payload?.sessions ?? [], venue),
     [payload?.sessions, venue],
@@ -230,7 +234,7 @@ export function VenuePageView({
                 {admissionProducts.length > 0 ? <VenueAdmissionBlock products={admissionProducts} /> : null}
                 {baseSessions.length > 0 ? (
                   <VenueProgramBlock
-                    title="Расписание и билеты"
+                    title={experience?.programTitle || 'Расписание и билеты'}
                     selected={resolvedMonthFilter}
                     availableMonths={availableMonths}
                     onMonthChange={setMonthFilter}
@@ -252,7 +256,7 @@ export function VenuePageView({
               >
                 {baseSessions.length > 0 ? (
                   <VenueProgramBlock
-                    title="Афиша"
+                    title={experience?.programTitle || 'Афиша'}
                     selected={resolvedMonthFilter}
                     availableMonths={availableMonths}
                     onMonthChange={setMonthFilter}
@@ -269,7 +273,7 @@ export function VenuePageView({
             {!useLovableLayout && baseSessions.length > 0 ? (
               <section className="container-page grid gap-6 py-8 lg:grid-cols-[minmax(0,1fr)_320px]">
                 <VenueProgramBlock
-                  title="Расписание и билеты"
+                  title={experience?.programTitle || 'Расписание и билеты'}
                   selected={resolvedMonthFilter}
                   availableMonths={availableMonths}
                   onMonthChange={setMonthFilter}

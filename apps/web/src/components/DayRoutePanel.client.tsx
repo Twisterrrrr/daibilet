@@ -77,10 +77,10 @@ import {
   DayRouteSearchSelect,
   type DayRouteSearchOption,
 } from '@/components/DayRouteSearchSelect.client';
-import { MobileStickyActionBar } from '@/components/MobileStickyActionBar';
 import { SuburbsCarousel } from '@/components/SuburbsCarousel.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { catalogHrefWithSelectedCity, placesHubHrefWithSelectedCity } from '@/lib/catalog-url';
+import { matchDestination } from '@/lib/selected-city';
 import { resolveCityInfo } from '@/lib/cityInfo';
 import { isSpbDayRouteCity } from '@/lib/day-route-boat';
 import {
@@ -441,6 +441,7 @@ function DayRoutePanelInner() {
   const itemsParam = searchParams.get('items');
   const cityParam = searchParams.get('city');
   const dayParam = searchParams.get('day');
+  const [mounted, setMounted] = useState(false);
   const [route, setRoute] = useState<DayRouteState>(() =>
     typeof window === 'undefined' ? { cityId: null, venues: [] } : readDayRoute(),
   );
@@ -513,6 +514,8 @@ function DayRoutePanelInner() {
   const [savedScenarios, setSavedScenarios] = useState<DayRouteSavedScenario[]>([]);
   const [scenarioBusy, setScenarioBusy] = useState(false);
   const [scenarioSheetOpen, setScenarioSheetOpen] = useState(false);
+
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     setSavedScenarios(readDayRouteScenarios());
@@ -927,18 +930,27 @@ function DayRoutePanelInner() {
   const destinations = selectedCity?.destinations?.length
     ? selectedCity.destinations
     : destinationsFallback;
-  const pageCityName = headerCityName;
-  const pageCitySlug = headerCitySlug;
+  const urlCityDestination = useMemo(() => {
+    const token = String(cityParam || '').trim();
+    if (!token || token === 'all') return null;
+    return matchDestination(destinations, token);
+  }, [cityParam, destinations]);
+  const pageCityDestination = urlCityDestination || selectedCity?.selectedDestination || null;
+  const pageCityName = urlCityDestination?.name || headerCityName;
+  const pageCitySlug =
+    pageCityDestination?.type === 'city'
+      ? String(pageCityDestination.slug || '').trim() || headerCitySlug
+      : headerCitySlug;
   const pageCitySourceSlug =
-    selectedCity?.selectedDestination?.type === 'city'
-      ? String(selectedCity.selectedDestination.sourceSlug || '').trim() || null
+    pageCityDestination?.type === 'city'
+      ? String(pageCityDestination.sourceSlug || '').trim() || null
       : null;
-  const pageCityId = selectedCity?.selectedDestination?.id || null;
+  const pageCityId = pageCityDestination?.id || null;
   /** Region hubs are aggregators - My Day needs a real city (hub or oblast town). */
   const selectedRegionAlternatives = useMemo(
     () =>
-      resolveMyDayRegionAlternatives(selectedCity?.selectedDestination, destinations || []),
-    [selectedCity?.selectedDestination, destinations],
+      resolveMyDayRegionAlternatives(pageCityDestination, destinations || []),
+    [pageCityDestination, destinations],
   );
   const hasPageCity = Boolean(pageCityName) && !selectedRegionAlternatives;
   const scopeCityName = cityTitle || pageCityName;
@@ -974,8 +986,8 @@ function DayRoutePanelInner() {
       const byName = list.find((row) => row?.type === 'city' && row.name === name);
       if (byName) return byName;
     }
-    return selectedCity?.selectedDestination?.type === 'city'
-      ? selectedCity.selectedDestination
+    return pageCityDestination?.type === 'city'
+      ? pageCityDestination
       : null;
   }, [
     citySlug,
@@ -983,7 +995,7 @@ function DayRoutePanelInner() {
     destinations,
     pageCityName,
     pageCitySlug,
-    selectedCity?.selectedDestination,
+    pageCityDestination,
   ]);
   const catalogCityName = catalogCityDest?.name || cityTitle || pageCityName;
   const catalogCitySlug = catalogCityDest?.slug || citySlug || pageCitySlug;
@@ -3207,28 +3219,6 @@ function DayRoutePanelInner() {
     );
   }
 
-  function renderEmptyPickerChips() {
-    if (!pickerTabs.length) return null;
-    return (
-      <div className="mt-4 flex flex-wrap gap-2" data-my-day-empty-chips>
-        {pickerTabs.map((t) => {
-          const Icon = t.icon;
-          return (
-            <button
-              key={t.value}
-              type="button"
-              onClick={() => openPicker(t.value)}
-              className="inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50"
-            >
-              <Icon className="h-3.5 w-3.5" aria-hidden />
-              {t.label}
-            </button>
-          );
-        })}
-      </div>
-    );
-  }
-
   /**
    * Non-empty plan: search under H1 (no city picker row; quiet «или сменить город»).
    * Picker sheet has the same unified search for mobile / add-more.
@@ -3492,12 +3482,18 @@ function DayRoutePanelInner() {
     grip.focus({ preventScroll: true });
   }
 
+  // The planner restores route and city from browser storage. Keep the server
+  // and first client frame identical, then reveal the interactive state.
+  if (!mounted || (!cityParam && selectedCity && !selectedCity.cityReady)) {
+    return <DayRoutePanelFallback />;
+  }
+
   return (
     <>
     <div
       className={`container-page px-4 sm:px-6 lg:px-8 py-5 sm:py-10 print:hidden lg:pb-10 ${
         isEmptyRoute
-          ? 'pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))]'
+          ? 'pb-10'
           : hasMapStops
             ? 'pb-[calc(8rem+env(safe-area-inset-bottom,0px))] lg:pb-0'
             : 'pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))]'
@@ -4349,23 +4345,21 @@ function DayRoutePanelInner() {
             <>
               <div className="mt-4 lg:hidden" data-my-day-empty-mobile>
                 {renderEmptyStarter()}
-                <div className="mt-4" data-my-day-picker-host>
-                  <MyDayPickerLaunch tabs={pickerTabs} onOpen={openPicker} />
-                </div>
               </div>
               <div
-                className="mt-4 hidden lg:grid lg:grid-cols-[minmax(0,35fr)_minmax(0,65fr)] lg:items-stretch lg:gap-5"
+                className="mt-5 hidden lg:grid lg:grid-cols-[minmax(0,56fr)_minmax(24rem,44fr)] lg:items-stretch lg:gap-6"
                 data-my-day-empty-two-blocks
               >
-                <div className="flex min-w-0 flex-col gap-4" data-my-day-picker-host>
-                  <MyDayPickerLaunch tabs={pickerTabs} onOpen={openPicker} />
+                <div className="min-w-0" data-my-day-picker-host>
                   {renderEmptyStarter({ hideMap: true })}
-                  {renderEmptyPickerChips()}
                 </div>
                 <div
-                  className="relative min-h-[28rem] overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 lg:min-h-[min(70vh,36rem)]"
+                  className="relative min-h-[26rem] overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 lg:min-h-[min(58vh,32rem)]"
                   data-my-day-empty-map
                 >
+                  <div className="pointer-events-none absolute left-3 top-3 z-[500] rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm">
+                    Точки появятся здесь
+                  </div>
                   <button
                     type="button"
                     onClick={myDay.openMapFull}
@@ -4386,7 +4380,7 @@ function DayRoutePanelInner() {
             </>
           ) : (
             <>
-              {hasCatalogCity && pickerTabs.length ? (
+              {!isEmptyRoute && hasCatalogCity && pickerTabs.length ? (
                 <div className="mt-4 lg:mt-5 xl:max-w-3xl" data-my-day-picker-host>
                   <MyDayPickerLaunch tabs={pickerTabs} onOpen={openPicker} />
                 </div>
@@ -4952,21 +4946,6 @@ function DayRoutePanelInner() {
         />
       </MyDayMapFullScreen>
 
-      {!route.venues.length ? (
-      <MobileStickyActionBar>
-        <button
-          type="button"
-          onClick={() => {
-            openPicker(pickerTabs[0]?.value || 'own');
-          }}
-          data-day-add-sticky
-          className="inline-flex h-12 flex-1 items-center justify-center gap-1.5 rounded-full bg-primary-600 px-4 text-sm font-bold text-white hover:bg-primary-700"
-        >
-          <Plus className="h-4 w-4" />
-          Добавить места
-        </button>
-      </MobileStickyActionBar>
-      ) : null}
       </div>
     </div>
 

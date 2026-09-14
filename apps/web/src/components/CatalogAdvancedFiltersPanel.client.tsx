@@ -2,13 +2,33 @@
 
 import * as React from 'react';
 import { createPortal } from 'react-dom';
-import { Calendar as CalendarIcon, ChevronDown, SlidersHorizontal, Users, Wallet, X } from 'lucide-react';
+import {
+  Calendar as CalendarIcon,
+  ChevronDown,
+  EyeOff,
+  Search,
+  SlidersHorizontal,
+  Tags,
+  Users,
+  Wallet,
+  X,
+} from 'lucide-react';
 
+import { displayCatalogLabel } from '@/lib/catalog-labels';
+import {
+  normalizeExcludeLandingList,
+  pickCatalogExcludeThemeOptions,
+  toggleExcludeLanding,
+} from '@/lib/catalog-exclude-themes';
 import { formatNumber, pluralEvents } from '@/lib/format';
 
 type LandingFacet = { slug: string; title: string; events: number };
+type CategoryFacet = { name: string; events: number };
 
 export type AdvancedCatalogFilters = {
+  q?: string;
+  category?: string;
+  excludeLanding?: string[];
   dateFrom: string;
   dateTo: string;
   /** Preset date: today | tomorrow | weekend | evening */
@@ -52,6 +72,9 @@ function filterChip(active: boolean) {
 
 function emptyFilters(): AdvancedCatalogFilters {
   return {
+    q: '',
+    category: '',
+    excludeLanding: [],
     dateFrom: '',
     dateTo: '',
     date: '',
@@ -84,9 +107,11 @@ function buildPreviewQuery(
 ): string {
   const params = new URLSearchParams();
   params.set('limit', '1');
-  if (context.q?.trim()) params.set('q', context.q.trim());
+  const q = draft.q?.trim() || context.q?.trim();
+  const category = draft.category || context.category;
+  if (q) params.set('q', q);
   if (context.city) params.set('city', context.city);
-  if (context.category) params.set('category', context.category);
+  if (category) params.set('category', category);
   if (context.sort && context.sort !== 'time') params.set('sort', context.sort);
 
   const hasRange = Boolean(draft.dateFrom || draft.dateTo);
@@ -103,6 +128,8 @@ function buildPreviewQuery(
   if (Number.isFinite(maxPrice)) params.set('maxPrice', String(maxPrice));
   if (draft.ageMax >= 0) params.set('ageMax', String(draft.ageMax));
   if (draft.landing && draft.landing !== 'all') params.set('landing', draft.landing);
+  const excluded = normalizeExcludeLandingList(draft.excludeLanding);
+  if (excluded.length) params.set('excludeLanding', excluded.join(','));
 
   return params.toString();
 }
@@ -123,6 +150,7 @@ function isPricePreset(minDraft: string, maxDraft: string, min: string, max: str
 export function CatalogAdvancedFiltersPanel({
   open,
   filters,
+  categories,
   landings,
   previewContext,
   onApply,
@@ -131,6 +159,7 @@ export function CatalogAdvancedFiltersPanel({
 }: {
   open: boolean;
   filters: AdvancedCatalogFilters;
+  categories?: CategoryFacet[];
   landings: LandingFacet[];
   previewContext?: CatalogFilterPreviewContext;
   onApply: (next: AdvancedCatalogFilters) => void;
@@ -147,6 +176,11 @@ export function CatalogAdvancedFiltersPanel({
   const dialogRef = React.useRef<HTMLDivElement>(null);
   const fromInputRef = React.useRef<HTMLInputElement>(null);
   const titleId = React.useId();
+  const excludedThemes = normalizeExcludeLandingList(draft.excludeLanding);
+  const excludeThemeOptions = pickCatalogExcludeThemeOptions(landings, excludedThemes);
+  const categoryOptions = (categories || []).filter(
+    (item) => item.events > 0 || item.name === draft.category,
+  );
 
   React.useEffect(() => {
     setMounted(true);
@@ -339,6 +373,66 @@ export function CatalogAdvancedFiltersPanel({
         <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-3 sm:px-5 sm:py-4">
           <div className="grid gap-6 sm:gap-7">
             <section>
+              <label htmlFor="catalog-advanced-search" className={labelCls}>
+                <Search aria-hidden className="h-3.5 w-3.5 text-slate-400" />
+                Поиск
+              </label>
+              <div className="relative">
+                <Search
+                  aria-hidden
+                  className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                  strokeWidth={1.75}
+                />
+                <input
+                  id="catalog-advanced-search"
+                  type="search"
+                  value={draft.q || ''}
+                  onChange={(event) => patchDraft({ q: event.target.value })}
+                  placeholder="Название, место или артист"
+                  className={`${inputCls} pl-10`}
+                />
+              </div>
+            </section>
+
+            {categoryOptions.length ? (
+              <section>
+                <div className={labelCls}>
+                  <Tags aria-hidden className="h-3.5 w-3.5 text-slate-400" />
+                  Категория
+                </div>
+                <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label="Категория события">
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={!draft.category}
+                    onClick={() => patchDraft({ category: '' })}
+                    className={filterChip(!draft.category)}
+                  >
+                    Все
+                  </button>
+                  {categoryOptions.map((item) => {
+                    const active = draft.category === item.name;
+                    return (
+                      <button
+                        key={item.name}
+                        type="button"
+                        role="radio"
+                        aria-checked={active}
+                        onClick={() => patchDraft({ category: active ? '' : item.name })}
+                        className={filterChip(active)}
+                      >
+                        {displayCatalogLabel(item.name)}
+                        <span className={active ? 'text-white/65' : 'text-slate-400'}>
+                          {formatNumber(item.events)}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+            ) : null}
+
+            <section>
               <div className={labelCls}>
                 <CalendarIcon aria-hidden className="h-3.5 w-3.5 text-slate-400" />
                 Дата
@@ -519,7 +613,13 @@ export function CatalogAdvancedFiltersPanel({
                     <select
                       id="catalog-advanced-landing"
                       value={draft.landing}
-                      onChange={(event) => patchDraft({ landing: event.target.value })}
+                      onChange={(event) =>
+                        patchDraft({
+                          landing: event.target.value,
+                          excludeLanding:
+                            event.target.value === 'all' ? draft.excludeLanding : [],
+                        })
+                      }
                       className={`${inputCls} appearance-none pr-10`}
                     >
                       <option value="all">Все подборки</option>
@@ -538,6 +638,38 @@ export function CatalogAdvancedFiltersPanel({
                       className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6E6E73]"
                       strokeWidth={1.75}
                     />
+                  </div>
+                </div>
+              ) : null}
+
+              {excludeThemeOptions.length ? (
+                <div>
+                  <div className={labelCls}>
+                    <EyeOff aria-hidden className="h-3.5 w-3.5 text-slate-400" />
+                    Не показывать
+                  </div>
+                  <div className="flex flex-wrap gap-1.5" role="group" aria-label="Исключить темы">
+                    {excludeThemeOptions.map((option) => {
+                      const active = excludedThemes.includes(option.slug);
+                      return (
+                        <button
+                          key={option.slug}
+                          type="button"
+                          aria-pressed={active}
+                          title={option.label}
+                          onClick={() =>
+                            patchDraft({
+                              landing: 'all',
+                              excludeLanding:
+                                toggleExcludeLanding(excludedThemes, option.slug) || [],
+                            })
+                          }
+                          className={filterChip(active)}
+                        >
+                          {option.chip}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               ) : null}

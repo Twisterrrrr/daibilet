@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 export default function MyDayPage() {
   return (
     <SiteLayout footerVariant="compact">
-      <div className="min-h-[calc(100vh-var(--site-header-height))] bg-[#E6E8EC]">
+      <div className="min-h-[calc(100vh-var(--site-header-height))] bg-slate-50">
         <DayRoutePanel />
       </div>
     </SiteLayout>

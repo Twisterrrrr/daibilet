@@ -23,8 +23,10 @@ import {
   buildCatalogHref,
   catalogFiltersFromQuery,
   countAdvancedFilters,
+  normalizeExcludeLandingParam,
   type CatalogFilterValues,
 } from '@/lib/catalog-url';
+import type { AdvancedCatalogFilters } from '@/components/CatalogAdvancedFiltersPanel.client';
 
 /** Heavy filter sheet - load only when drawer opens (keeps /events first JS lighter). */
 const CatalogAdvancedFiltersPanel = dynamic(
@@ -170,6 +172,9 @@ export function CatalogToolbar({
     <CatalogAdvancedFiltersPanel
       open={filtersOpen}
       filters={{
+        q: qDraft,
+        category: filters.category || '',
+        excludeLanding: normalizeExcludeLandingParam(filters.excludeLanding),
         dateFrom: filters.from || '',
         dateTo: filters.to || '',
         date: filters.date || '',
@@ -181,6 +186,7 @@ export function CatalogToolbar({
             : -1,
         landing: filters.landing || 'all',
       }}
+      categories={facets.categories}
       landings={facets.landings}
       previewContext={{
         q: qDraft.trim() || filters.q,
@@ -189,15 +195,15 @@ export function CatalogToolbar({
         sort: filters.sort,
       }}
       onApply={(next) => {
-        applyAdvanced(navigate, filters, qDraft, next);
+        setQDraft(next.q || '');
+        applyAdvanced(navigate, filters, next);
         setFiltersOpen(false);
       }}
       onClose={() => setFiltersOpen(false)}
       onReset={() => {
+        setQDraft('');
         navigate({
-          q: filters.q,
           city: filters.city,
-          category: filters.category,
           sort: filters.sort,
           limit: filters.limit,
         });
@@ -321,58 +327,27 @@ export function CatalogToolbar({
   if (layout === 'split') {
     return (
       <>
-        <section className="catalog-filter-surface" aria-label="Поиск и фильтры событий">
-          <form onSubmit={onSubmit} className="catalog-filter-surface__search">
-            {catalogSearchField}
-            <button
-              type="submit"
-              disabled={disabled}
-              className="catalog-filter-surface__submit"
-              aria-label="Найти"
-              title="Найти"
-            >
-              <Search aria-hidden className="h-4 w-4" strokeWidth={2} />
-            </button>
+        <div className="catalog-content">
+          <div className="catalog-events-sticky-controls">
+            <div className="min-w-0 flex-1">
+              <CatalogDateRail
+                disabled={disabled}
+                className="min-w-0 w-full"
+                showCalendarButton={false}
+              />
+            </div>
             <FiltersButton
               open={filtersOpen}
               count={sidebarActiveCount}
               disabled={disabled}
               onClick={() => setFiltersOpen(true)}
-            />
-          </form>
-
-          <div className="catalog-filter-surface__desktop-discovery">{discoveryRow}</div>
-          <div className="catalog-filter-surface__mobile-quick">
-            <CatalogMobileQuickFilters
-              filters={filters}
-              categories={facets.categories}
-              disabled={disabled}
-              activeCount={sidebarActiveCount}
-              onNavigate={navigate}
-              onOpenAllFilters={() => setFiltersOpen(true)}
-            />
-          </div>
-          <div className="catalog-filter-surface__desktop-excludes">{excludeThemesRow}</div>
-        </section>
-
-        <div className="catalog-content">
-          <div className="catalog-date-timeline w-full min-w-0">
-            <CatalogDateRail
-              disabled={disabled}
-              className="min-w-0 w-full"
-              showCalendarButton={false}
+              alwaysShowLabel
             />
           </div>
           {children}
         </div>
 
         {advancedPanel}
-        <MoreCategoriesSheet
-          open={categoriesMoreOpen}
-          filters={filters}
-          overflow={categorySplit.overflow}
-          onClose={() => setCategoriesMoreOpen(false)}
-        />
       </>
     );
   }
@@ -893,12 +868,14 @@ function FiltersButton({
   disabled,
   onClick,
   className = '',
+  alwaysShowLabel = false,
 }: {
   open: boolean;
   count: number;
   disabled?: boolean;
   onClick: () => void;
   className?: string;
+  alwaysShowLabel?: boolean;
 }) {
   return (
     <button
@@ -915,7 +892,7 @@ function FiltersButton({
       } ${className}`}
     >
       <SlidersHorizontal aria-hidden className="h-4 w-4" strokeWidth={1.75} />
-      <span className="hidden sm:inline">Фильтры</span>
+      <span className={alwaysShowLabel ? '' : 'hidden sm:inline'}>Фильтры</span>
       {count > 0 ? (
         <span className="grid min-w-5 place-items-center rounded-md bg-white/25 px-1.5 text-xs" aria-label={`Активных фильтров: ${count}`}>
           {count}
@@ -927,24 +904,17 @@ function FiltersButton({
 
 function mergeAdvancedFilters(
   filters: CatalogFilterValues,
-  qDraft: string,
-  next: {
-    dateFrom: string;
-    dateTo: string;
-    date?: string;
-    minPrice: string;
-    maxPrice: string;
-    ageMax: number;
-    landing: string;
-  },
+  next: AdvancedCatalogFilters,
 ): CatalogFilterValues {
   const minPrice = next.minPrice === 'all' ? undefined : Number(next.minPrice);
   const maxPrice = next.maxPrice === 'all' ? undefined : Number(next.maxPrice);
   const hasRange = Boolean(next.dateFrom || next.dateTo);
   const landing = next.landing === 'all' ? undefined : next.landing;
+  const excludeLanding = normalizeExcludeLandingParam(next.excludeLanding);
   return {
     ...filters,
-    q: qDraft.trim() || filters.q,
+    q: next.q?.trim() || undefined,
+    category: next.category || undefined,
     date: hasRange ? undefined : next.date || undefined,
     from: next.dateFrom || undefined,
     to: next.dateTo || undefined,
@@ -953,7 +923,7 @@ function mergeAdvancedFilters(
     ageMax: next.ageMax >= 0 ? next.ageMax : undefined,
     landing,
     // Include-landing and exclude themes conflict - drop excludes when pinning a landing.
-    excludeLanding: landing ? undefined : filters.excludeLanding,
+    excludeLanding: landing ? undefined : excludeLanding.length ? excludeLanding : undefined,
     page: undefined,
   };
 }
@@ -961,16 +931,7 @@ function mergeAdvancedFilters(
 function applyAdvanced(
   navigate: (next: CatalogFilterValues) => void,
   filters: CatalogFilterValues,
-  qDraft: string,
-  next: {
-    dateFrom: string;
-    dateTo: string;
-    date?: string;
-    minPrice: string;
-    maxPrice: string;
-    ageMax: number;
-    landing: string;
-  },
+  next: AdvancedCatalogFilters,
 ) {
-  navigate(mergeAdvancedFilters(filters, qDraft, next));
+  navigate(mergeAdvancedFilters(filters, next));
 }

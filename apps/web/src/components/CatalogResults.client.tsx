@@ -24,7 +24,12 @@ import {
 } from '@/lib/catalog-interstitials';
 import { useCatalogGridColumnCount } from '@/lib/catalog-grid-columns';
 import { collapseCatalogComboFamilies } from '@/lib/home-showcase-sections';
-import { CATALOG_IMAGE_QUALITY, IMAGE_SIZES, CardSafeImage } from '@/components/SafeImage.client';
+import {
+  CATALOG_IMAGE_QUALITY,
+  IMAGE_SIZES,
+  CardSafeImage,
+  SafeImage,
+} from '@/components/SafeImage.client';
 import { useCatalogFiltersLayout } from '@/components/CatalogSidebarLayout.client';
 
 /** First N catalog cards load images eagerly (LCP / perceived speed). */
@@ -199,23 +204,36 @@ function CatalogInterstitialBanner({ banner }: { banner: CatalogInterstitial }) 
       <Link
         href={banner.href}
         onClick={() => trackCatalogBannerClick(banner.id)}
-        className="group relative flex max-h-[11.5rem] flex-row items-center justify-between gap-3 overflow-hidden rounded-card border border-slate-200/70 bg-[#F8F9FA] px-4 py-3.5 transition hover:border-primary/20 hover:bg-primary/[0.05] sm:max-h-none sm:gap-4 sm:px-6 sm:pb-6 sm:pt-7"
+        className="group relative isolate flex min-h-[10.5rem] items-end overflow-hidden rounded-lg bg-slate-900 text-white shadow-sm transition hover:shadow-lg sm:min-h-[13rem]"
       >
-        <span className="absolute left-3 top-2.5 rounded-md bg-white px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider text-primary-700 ring-1 ring-slate-200/80 sm:left-4 sm:top-3 sm:text-xs">
-          {banner.eyebrow}
-        </span>
-        <div className="min-w-0 flex-1 pt-4 sm:pt-5">
-          <h3 className="line-clamp-2 font-display text-base font-bold leading-snug tracking-tight text-graphite sm:line-clamp-none sm:text-2xl">
-            {banner.title}
-          </h3>
-          <p className="mt-1 hidden max-w-2xl text-sm leading-6 text-graphite-muted sm:mt-2 sm:block">
-            {banner.description}
-          </p>
+        <SafeImage
+          src={banner.imageUrl}
+          alt=""
+          fill
+          sizes="(min-width: 1840px) 1600px, (min-width: 1024px) 1200px, 100vw"
+          quality={CATALOG_IMAGE_QUALITY}
+          className="object-cover transition-transform duration-500 group-hover:scale-[1.025]"
+          fallback={<div className="h-full w-full bg-slate-800" />}
+        />
+        <span className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/55 to-slate-950/15" aria-hidden />
+        <span className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent" aria-hidden />
+        <div className="relative z-[1] flex w-full items-end justify-between gap-4 p-4 sm:p-6">
+          <div className="min-w-0 max-w-3xl">
+            <span className="inline-flex rounded-md bg-white/15 px-2 py-1 text-[10px] font-bold uppercase text-white/85 backdrop-blur-sm sm:text-[11px]">
+              {banner.eyebrow}
+            </span>
+            <h3 className="mt-2 line-clamp-2 font-display text-xl font-bold leading-snug sm:line-clamp-none sm:text-3xl">
+              {banner.title}
+            </h3>
+            <p className="mt-2 line-clamp-2 max-w-2xl text-sm leading-5 text-white/75 sm:text-base sm:leading-6">
+              {banner.description}
+            </p>
+          </div>
+          <span className="inline-flex h-10 shrink-0 items-center gap-2 rounded-full bg-white px-4 text-sm font-semibold text-slate-950 transition group-hover:bg-primary-600 group-hover:text-white sm:h-11 sm:px-5">
+            <span className="hidden sm:inline">{banner.cta}</span>
+            <ArrowRight className="h-4 w-4" strokeWidth={1.9} aria-hidden />
+          </span>
         </div>
-        <span className="inline-flex shrink-0 items-center gap-1.5 self-center rounded-xl bg-white px-3 py-2 text-xs font-semibold text-primary-700 ring-1 ring-slate-200/80 transition group-hover:ring-primary/30 sm:gap-2 sm:px-4 sm:py-2.5 sm:text-sm">
-          <span className="max-w-[7.5rem] truncate sm:max-w-none">{banner.cta}</span>
-          <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" strokeWidth={1.75} />
-        </span>
       </Link>
     </li>
   );

@@ -245,7 +245,7 @@ export function EventCardHorizontal({
           }
         />
         <EventImageBadges event={session} rail recommendVariant="compact" />
-        <EventFavoriteButton eventId={session.id} className="right-2 top-2 sm:right-3 sm:top-3" />
+        <EventFavoriteButton eventId={session.id} session={session} className="right-2 top-2 sm:right-3 sm:top-3" />
       </div>
 
       <div className="flex flex-1 flex-col gap-3 p-4 sm:p-5 sm:pl-6">

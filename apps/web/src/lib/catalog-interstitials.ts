@@ -6,6 +6,7 @@ export type CatalogInterstitial = {
   eyebrow: string;
   title: string;
   description: string;
+  imageUrl: string;
   href: string;
   cta: string;
 };
@@ -35,6 +36,7 @@ export function catalogInterstitialsForCity(citySlug?: string | null): CatalogIn
           ? 'Впервые в Питере?'
           : 'Посмотреть на город с высоты',
       description: 'Подборка прогулок по крышам и смотровым площадкам в разных городах России',
+      imageUrl: '/images/landings/rooftops.jpg',
       href: landingCategoryHref('rooftops', city),
       cta: 'Перейти',
     },
@@ -43,6 +45,7 @@ export function catalogInterstitialsForCity(citySlug?: string | null): CatalogIn
       eyebrow: 'Подборка',
       title: 'Речные прогулки',
       description: 'Дневные рейсы, закаты и круизы с ужином - сравнивайте цены, причалы и время отправления',
+      imageUrl: '/images/landings/river-cruises.jpg',
       href: landingCategoryHref('river-cruises', city),
       cta: 'Выбрать рейс',
     },
@@ -51,6 +54,7 @@ export function catalogInterstitialsForCity(citySlug?: string | null): CatalogIn
       eyebrow: 'Подборка',
       title: 'Что посмотреть на выходных',
       description: 'Готовые сценарии под настроение: с детьми, для двоих или большой компанией.',
+      imageUrl: '/images/landings/excursions.jpg',
       href: podborkiHref,
       cta: 'Открыть подборки',
     },
@@ -59,6 +63,7 @@ export function catalogInterstitialsForCity(citySlug?: string | null): CatalogIn
       eyebrow: 'Из Блога',
       title: 'Маршруты и советы',
       description: 'Статьи с картами и ссылками на билеты - удобно перед поездкой.',
+      imageUrl: '/images/blog/blog-hero-promo.jpg',
       href: '/blog',
       cta: 'Читать блог',
     },

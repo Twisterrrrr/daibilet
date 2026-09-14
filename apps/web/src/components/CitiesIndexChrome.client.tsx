@@ -125,7 +125,6 @@ export function CitiesIndexChrome({ destinations }: { destinations: PublicDestin
         variant="minimal"
         dense
         containerClassName="container-page"
-        breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Города' }]}
         title="Города России"
       >
         <div className="relative mt-5 w-full">

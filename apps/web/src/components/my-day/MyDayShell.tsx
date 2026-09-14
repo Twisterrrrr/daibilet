@@ -6,10 +6,10 @@ import { MyDayResizeHandle } from '@/components/my-day/MyDayResizeHandle';
 import { usePersistedNumber } from '@/components/my-day/usePersistedNumber';
 
 const LIST_SPLIT_KEY = 'daibilet.my-day.list-split';
-/** Prefer a wider map on desktop; user can still drag the divider. */
-const LIST_SPLIT_DEFAULT = 35;
-const LIST_SPLIT_MIN = 32;
-const LIST_SPLIT_MAX = 72;
+/** Keep the itinerary readable; the map remains resizable once there are stops. */
+const LIST_SPLIT_DEFAULT = 46;
+const LIST_SPLIT_MIN = 38;
+const LIST_SPLIT_MAX = 70;
 
 type MyDayShellProps = {
   mapOpen: boolean;
@@ -37,6 +37,7 @@ export function MyDayShell({
 }: MyDayShellProps) {
   const shellRef = useRef<HTMLDivElement | null>(null);
   const [listPct, setListPct] = usePersistedNumber(listSplitKey, listSplitDefault);
+  const effectiveListPct = Math.min(LIST_SPLIT_MAX, Math.max(LIST_SPLIT_MIN, listPct));
   const splitOn = showMapColumn && mapOpen;
   const gridClass = !showMapColumn
     ? 'lg:grid-cols-1'
@@ -51,13 +52,13 @@ export function MyDayShell({
       style={
         splitOn
           ? {
-              gridTemplateColumns: `minmax(22rem, ${listPct}fr) minmax(16rem, ${100 - listPct}fr)`,
+              gridTemplateColumns: `minmax(24rem, ${effectiveListPct}fr) minmax(20rem, ${100 - effectiveListPct}fr)`,
             }
           : undefined
       }
       data-my-day-shell="1"
       data-my-day-map-open={showMapColumn && mapOpen ? '1' : '0'}
-      data-my-day-list-split={splitOn ? String(listPct) : undefined}
+      data-my-day-list-split={splitOn ? String(effectiveListPct) : undefined}
     >
       <div className="relative min-w-0 lg:pr-3" data-my-day-list-col>
         {list}

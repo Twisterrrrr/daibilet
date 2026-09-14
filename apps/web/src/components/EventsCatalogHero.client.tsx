@@ -7,7 +7,6 @@ import {
   CatalogActiveFilters,
   catalogActiveDateHeadingLabel,
 } from '@/components/CatalogActiveFilters';
-import { PageBreadcrumbBar } from '@/components/PageBreadcrumbs';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { isCatalogPageSize } from '@daibilet/contracts/catalog';
 import {
@@ -24,7 +23,7 @@ function parseOptionalInt(raw: string | null): number | undefined {
 }
 
 /**
- * Catalog header: breadcrumbs + H1/subtitle + removable active-filter chips.
+ * Catalog header: H1/subtitle + removable active-filter chips.
  * Date rail lives in catalog-main (same width as the card grid).
  */
 export function EventsCatalogHero() {
@@ -81,17 +80,8 @@ export function EventsCatalogHero() {
   }, [filterValues, selectedCity?.cityValue]);
 
   return (
-    <>
-      <PageBreadcrumbBar
-        hideOnMobile
-        items={[
-          { label: 'Главная', href: '/' },
-          { label: 'События', href: '/events' },
-          ...(filterValues.category ? [{ label: filterValues.category }] : []),
-        ]}
-      />
-      <div className="border-b border-slate-100 bg-white max-sm:border-0 max-sm:bg-transparent">
-        <div className={`container-page ${filtered ? 'py-3 sm:py-5' : 'sm:py-5'}`}>
+    <div className="border-b border-slate-100 bg-white max-sm:border-0 max-sm:bg-transparent">
+      <div className={`container-page ${filtered ? 'py-3 sm:py-5' : 'sm:py-5'}`}>
           <h1
             className={
               filtered
@@ -108,8 +98,7 @@ export function EventsCatalogHero() {
             </p>
           ) : null}
           <CatalogActiveFilters values={chipValues} className={filtered ? 'mt-2.5' : 'mt-3'} />
-        </div>
       </div>
-    </>
+    </div>
   );
 }

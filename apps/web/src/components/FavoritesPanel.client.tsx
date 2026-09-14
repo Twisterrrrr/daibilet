@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Heart, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
@@ -10,8 +10,10 @@ import { useSelectedCityOptional } from '@/components/SelectedCityProvider.clien
 import {
   FAVORITES_CHANGED_EVENT,
   readFavoriteIds,
+  readFavoriteEvents,
   resolveFavoriteSessions,
   toggleFavoriteId,
+  type FavoriteEventItem,
 } from '@/lib/favorites';
 import {
   PLACE_FAVORITES_CHANGED_EVENT,
@@ -27,15 +29,47 @@ import { catalogHrefWithSelectedCity } from '@/lib/catalog-url';
 export function FavoritesPanel({ onClose }: { onClose: () => void }) {
   const selectedCity = useSelectedCityOptional();
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(() => readFavoriteIds());
+  const [savedEvents, setSavedEvents] = useState<FavoriteEventItem[]>(() => readFavoriteEvents());
   const [placeFavorites, setPlaceFavorites] = useState<PlaceFavoriteItem[]>(() => readPlaceFavorites());
   const [catalogSessions, setCatalogSessions] = useState<PublicSessionDto[]>([]);
-  const sessions = resolveFavoriteSessions(favoriteIds, catalogSessions);
+  const favoriteEvents = useMemo(() => {
+    const savedByKey = new Map<string, FavoriteEventItem>();
+    for (const item of savedEvents) {
+      savedByKey.set(item.id, item);
+      if (item.groupKey) savedByKey.set(item.groupKey, item);
+    }
+    const fetched = resolveFavoriteSessions(favoriteIds, catalogSessions);
+    const fetchedByKey = new Map<string, PublicSessionDto>();
+    for (const session of fetched) {
+      fetchedByKey.set(session.id, session);
+      if (session.groupKey) fetchedByKey.set(session.groupKey, session);
+    }
+    return [...favoriteIds]
+      .map((favoriteKey) => {
+        const saved = savedByKey.get(favoriteKey);
+        if (saved) return { ...saved, favoriteKey };
+        const session = fetchedByKey.get(favoriteKey);
+        if (!session) return null;
+        return {
+          id: session.id,
+          groupKey: session.groupKey || undefined,
+          title: session.title,
+          city: session.city || undefined,
+          imageUrl: session.imageUrl || undefined,
+          priceFrom: typeof session.priceFrom === 'number' ? session.priceFrom : undefined,
+          href: eventHref(session),
+          favoriteKey,
+        };
+      })
+      .filter((item): item is FavoriteEventItem & { favoriteKey: string } => Boolean(item));
+  }, [favoriteIds, savedEvents, catalogSessions]);
   const eventsHref = catalogHrefWithSelectedCity(selectedCity?.cityValue);
   const totalCount = favoriteIds.size + placeFavorites.length;
 
   useEffect(() => {
     const sync = () => {
       setFavoriteIds(readFavoriteIds());
+      setSavedEvents(readFavoriteEvents());
       setPlaceFavorites(readPlaceFavorites());
     };
     sync();
@@ -88,13 +122,13 @@ export function FavoritesPanel({ onClose }: { onClose: () => void }) {
           </button>
         </div>
 
-        {sessions.length || placeFavorites.length ? (
+        {favoriteEvents.length || placeFavorites.length ? (
           <ul className="mt-4 flex-1 space-y-3 overflow-y-auto pr-1">
-            {sessions.map((session) => (
-              <li key={session.groupKey || session.id} className="flex gap-3 rounded-xl border border-slate-200 p-3">
-                <Link href={eventHref(session)} onClick={onClose} className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-slate-100">
+            {favoriteEvents.map((event) => (
+              <li key={event.favoriteKey} className="flex gap-3 rounded-xl border border-slate-200 p-3">
+                <Link href={event.href} onClick={onClose} className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-slate-100">
                   <SafeImage
-                    src={session.imageUrl}
+                    src={event.imageUrl}
                     alt=""
                     fill
                     sizes={IMAGE_SIZES.favoritesThumb}
@@ -107,18 +141,18 @@ export function FavoritesPanel({ onClose }: { onClose: () => void }) {
                   />
                 </Link>
                 <div className="min-w-0 flex-1">
-                  <Link href={eventHref(session)} onClick={onClose} className="line-clamp-2 text-sm font-semibold text-slate-900 hover:text-primary-700">
-                    {formatPublicTitle(session.title)}
+                  <Link href={event.href} onClick={onClose} className="line-clamp-2 text-sm font-semibold text-slate-900 hover:text-primary-700">
+                    {formatPublicTitle(event.title)}
                   </Link>
-                  <p className="mt-1 truncate text-xs text-slate-500">{session.city || 'Город не указан'}</p>
+                  <p className="mt-1 truncate text-xs text-slate-500">{event.city || 'Город не указан'}</p>
                   <p className="mt-1 text-xs font-semibold text-slate-800">
-                    {session.priceFrom ? formatPriceFrom(session.priceFrom) : 'Цена уточняется'}
+                    {event.priceFrom ? formatPriceFrom(event.priceFrom) : 'Цена уточняется'}
                   </p>
                 </div>
                 <button
                   type="button"
                   aria-label="Убрать из избранного"
-                  onClick={() => toggleFavoriteId(session.id)}
+                  onClick={() => toggleFavoriteId(event.favoriteKey)}
                   className="shrink-0 self-start rounded-full p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-500"
                 >
                   <Heart className="h-4 w-4 fill-rose-500 text-rose-500" />

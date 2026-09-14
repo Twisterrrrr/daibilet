@@ -1,11 +1,21 @@
 'use client';
 
 import { Heart } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { FAVORITES_CHANGED_EVENT, readFavoriteIds, toggleFavoriteId } from '@/lib/favorites';
+import type { PublicCatalogListItemDto } from '@daibilet/contracts/public';
+import {
+  FAVORITES_CHANGED_EVENT,
+  readFavoriteIds,
+  rememberFavoriteEvent,
+  toggleFavoriteEvent,
+  toggleFavoriteId,
+  type FavoriteEventItem,
+} from '@/lib/favorites';
+import { resolveEventCardFallbackImage, resolveEventCardPrimaryImage } from '@/lib/event-card-image';
+import { eventHref } from '@/lib/routes';
 
-export function useEventFavorite(eventId: string) {
+export function useEventFavorite(eventId: string, event?: FavoriteEventItem) {
   const [favorite, setFavorite] = useState(() => readFavoriteIds().has(eventId));
 
   useEffect(() => {
@@ -19,6 +29,10 @@ export function useEventFavorite(eventId: string) {
     };
   }, [eventId]);
 
+  useEffect(() => {
+    if (favorite && event) rememberFavoriteEvent(event);
+  }, [event, favorite]);
+
   const toggleFavorite = useCallback(
     (clickEvent: React.MouseEvent) => {
       clickEvent.preventDefault();
@@ -27,20 +41,46 @@ export function useEventFavorite(eventId: string) {
       // Optimistic UI: heart flips immediately; localStorage sync in same tick.
       setFavorite(!prev);
       try {
-        const next = toggleFavoriteId(eventId);
+        const next = event ? toggleFavoriteEvent(event) : toggleFavoriteId(eventId);
         setFavorite(next.has(eventId));
       } catch {
         setFavorite(prev);
       }
     },
-    [eventId, favorite],
+    [event, eventId, favorite],
   );
 
   return { favorite, toggleFavorite };
 }
 
-export function EventFavoriteButton({ eventId, className = '' }: { eventId: string; className?: string }) {
-  const { favorite, toggleFavorite } = useEventFavorite(eventId);
+export function EventFavoriteButton({
+  eventId,
+  session,
+  className = '',
+}: {
+  eventId: string;
+  session?: PublicCatalogListItemDto;
+  className?: string;
+}) {
+  const event = useMemo<FavoriteEventItem | undefined>(
+    () =>
+      session
+        ? {
+            id: session.id,
+            groupKey: session.groupKey || undefined,
+            title: session.title,
+            city: session.city || undefined,
+            imageUrl:
+              resolveEventCardPrimaryImage(session) ||
+              resolveEventCardFallbackImage(session) ||
+              undefined,
+            priceFrom: typeof session.priceFrom === 'number' ? session.priceFrom : undefined,
+            href: eventHref(session),
+          }
+        : undefined,
+    [session],
+  );
+  const { favorite, toggleFavorite } = useEventFavorite(eventId, event);
 
   return (
     <button

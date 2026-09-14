@@ -316,7 +316,6 @@ export function LandingsCatalogView({
     <>
       <HeroLayout
         variant="minimal"
-        breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Подборки' }]}
         title={heroTitle || 'Готовые планы на вечер и выходные'}
         description={
           heroDescription ||

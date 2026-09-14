@@ -56,6 +56,7 @@ import {
   splitVenueProseParagraphs,
   venueTypeLabel,
 } from '@/lib/venue-meta';
+import { resolveVenueExperienceProfile } from '@/lib/venue-experience-profile';
 import { eventHref, venueHref } from '@/lib/routes';
 import type {
   PublicSessionDto,
@@ -95,6 +96,10 @@ export function InstitutionVenueLayout({
   const hasMap = Boolean(venue.latitude && venue.longitude);
   const isTheatre = normalizeVenueKind(venue.type) === 'theater';
   const publicType = resolvePublicVenueType(venue.type, venue.name);
+  const experience = React.useMemo(
+    () => resolveVenueExperienceProfile({ type: venue.type, name: venue.name }),
+    [venue.type, venue.name],
+  );
   const isMuseumOrArt = MUSEUM_ART_KINDS.has(publicType);
   const typeLabel = venueTypeLabel(venue.type, venue.name);
   const aboutHeading = React.useMemo(
@@ -178,9 +183,9 @@ export function InstitutionVenueLayout({
     || (venue.description && venue.description !== intro ? venue.description : '');
   /** Admission when LC inventory exists; otherwise jump to live playbill. */
   const admissionCta = hasInternalLcTickets
-    ? ({ href: '#venue-admission', label: 'К билетам' } as const)
+    ? ({ href: '#venue-admission', label: experience.admissionCtaLabel } as const)
     : hasAfisha
-      ? ({ href: '#venue-program', label: 'Афиша' } as const)
+      ? ({ href: '#venue-program', label: experience.programCtaLabel } as const)
       : null;
   const heroBadges = React.useMemo(() => {
     if (editorial?.badges?.length) return editorial.badges.slice(0, 5);
@@ -218,13 +223,13 @@ export function InstitutionVenueLayout({
   const stickyTabs = React.useMemo(() => {
     const tabs: Array<readonly [string, string]> = [['#about', aboutHeading]];
     if (hasInternalLcTickets) tabs.push(['#venue-admission', 'Билеты']);
-    if (hasAfisha) tabs.push(['#venue-program', 'Афиша']);
+    if (hasAfisha) tabs.push(['#venue-program', experience.programTabLabel]);
     if (showVisitSection) tabs.push(['#visit', 'Как посетить']);
     if (showFaq) tabs.push(['#faq', 'Вопросы']);
     tabs.push(['#reviews', 'Отзывы']);
     if (showSimilarTab) tabs.push(['#similar', 'Экскурсии']);
     return tabs;
-  }, [aboutHeading, hasInternalLcTickets, hasAfisha, showVisitSection, showFaq, showSimilarTab]);
+  }, [aboutHeading, experience.programTabLabel, hasInternalLcTickets, hasAfisha, showVisitSection, showFaq, showSimilarTab]);
 
   const share = () => {
     if (navigator.share) {
@@ -235,7 +240,12 @@ export function InstitutionVenueLayout({
   };
 
   return (
-    <div className="bg-white pb-24 lg:pb-0" data-venue-pdp-editorial data-venue-pdp-md>
+    <div
+      className="bg-white pb-24 lg:pb-0"
+      data-venue-pdp-editorial
+      data-venue-pdp-md
+      data-venue-experience={experience.id}
+    >
       <div className="border-b border-zinc-200/80 bg-white">
         <VenueBreadcrumbsNav payload={pagePayload} />
       </div>
@@ -481,15 +491,15 @@ export function InstitutionVenueLayout({
           {nextSessions.length > 0 ? (
             <section className="space-y-5" data-venue-upcoming-events>
               <CityHubSectionHeading
-                title="Ближайшие события"
-                description="Афиша площадки на ближайшие дни"
+                title={experience.featuredProgramTitle}
+                description={experience.featuredProgramDescription}
                 editorial
                 actions={
                   <a
                     href="#venue-program"
                     className="shrink-0 text-sm font-semibold text-primary-700 hover:underline"
                   >
-                    Вся афиша →
+                    {experience.allProgramLabel} →
                   </a>
                 }
               />

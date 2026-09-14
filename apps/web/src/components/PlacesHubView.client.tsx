@@ -3,16 +3,13 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
-import { Grid3X3, List } from 'lucide-react';
+import { Grid3X3, List, SlidersHorizontal } from 'lucide-react';
 
 import { CatalogPaginationLinks } from '@/components/CatalogPaginationLinks';
-import {
-  CatalogDesktopFiltersCollapseButton,
-  CatalogSidebarLayout,
-} from '@/components/CatalogSidebarLayout.client';
 import { InstitutionCard } from '@/components/InstitutionCard.client';
 import { InstitutionList } from '@/components/InstitutionListRow.client';
 import { LocationCard } from '@/components/LocationCard.client';
+import { PlacesFiltersDialog } from '@/components/PlacesFiltersDialog.client';
 import { PlacesSearch } from '@/components/PlacesSearch.client';
 import { VenuesCatalogSkeleton } from '@/components/VenueCatalogSkeletons';
 import { HeroLayout } from '@/components/HeroLayout';
@@ -198,6 +195,7 @@ export function PlacesHubView({
   const selectedCity = useSelectedCityOptional();
   const [, startTransition] = useTransition();
   const [viewMode, setViewMode] = useState<ViewMode>('cards');
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [venues, setVenues] = useState(initialPage.venues);
   const [total, setTotal] = useState(initialPage.total);
   const [stats, setStats] = useState(initialPage.stats);
@@ -279,16 +277,21 @@ export function PlacesHubView({
   }, [stats.cities, venues, selectedCity?.cityLabel, selectedCity?.destinations, urlCity]);
 
   const cityFilter = useMemo(
-    () =>
-      resolveSectionCityFilter({
-        cityReady,
+    () => {
+      // An explicit deep-link city must win on the hydration frame. The header
+      // provider resolves its own URL bridge in a layout effect and otherwise
+      // briefly reports `all`, which makes this client tree disagree with SSR.
+      const explicitUrlCity = Boolean(rawUrlCity);
+      return resolveSectionCityFilter({
+        cityReady: explicitUrlCity ? false : cityReady,
         headerCityValue: selectedCity?.cityValue,
         headerCityLabel: selectedCity?.cityLabel,
         urlCity,
         urlCityAll,
         cityOptions,
-      }),
-    [urlCity, urlCityAll, cityReady, selectedCity, cityOptions],
+      });
+    },
+    [rawUrlCity, urlCity, urlCityAll, cityReady, selectedCity, cityOptions],
   );
 
   const cityFetchKey = useMemo(() => {
@@ -669,8 +672,9 @@ export function PlacesHubView({
     return params;
   }, [searchParams, listPage]);
 
-  const allTypesOn = typeFilter === 'all' && family === 'all' && !hasEvents;
   const filtersActiveCount = hasEvents || family !== 'all' ? 1 : 0;
+  const activeFilterCount =
+    filtersActiveCount + (q ? 1 : 0) + (typeFilter !== 'all' ? 1 : 0);
 
   const resetPlacesFilters = () => {
     pagingModeRef.current = 'replace';
@@ -685,113 +689,86 @@ export function PlacesHubView({
     });
   };
 
-  const placesSidebar = (
-    <>
-      <div className="catalog-sidebar-desktop-header">
-        <span className="catalog-sidebar-desktop-title">Фильтры</span>
-        <div className="flex items-center gap-0.5">
-          {filtersActiveCount > 0 || q || typeFilter !== 'all' ? (
-            <button type="button" className="catalog-sidebar-clear" onClick={resetPlacesFilters}>
-              Сбросить
-            </button>
-          ) : null}
-          <CatalogDesktopFiltersCollapseButton />
-        </div>
-      </div>
-
-      <div className="catalog-sidebar-section">
-        <PlacesSearch mode="hub" initialQuery={q} tone="muted" />
-      </div>
-
-      <div className="catalog-sidebar-section">
-        <label className="catalog-sidebar-section__title" htmlFor="places-sidebar-city">
-          Город
-        </label>
-        <select
-          id="places-sidebar-city"
-          value={cityPending ? '' : cityFilter}
-          disabled={cityPending}
-          onChange={(event) => setCityFilter(event.target.value)}
-          className="w-full rounded-xl bg-[#F5F5F7] px-3 py-2.5 text-sm outline-none disabled:opacity-70"
-        >
-          {cityPending ? <option value="">Город…</option> : null}
-          <option value="all">Все города</option>
-          {cityOptions.map(([city]) => (
-            <option key={city} value={city}>
-              {city}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="catalog-sidebar-section">
-        <p className="catalog-sidebar-section__title">Показывать</p>
-        <nav className="catalog-sidebar-nav" aria-label="Область каталога">
-          {FILTER_SCOPE_OPTIONS.map(([value, label]) => {
-            const active = scope === value;
-            return (
-              <button
-                key={value}
-                type="button"
-                onClick={() => setScope(value)}
-                className={`catalog-sidebar-nav__item${active ? ' catalog-sidebar-nav__item--active' : ''}`}
-              >
-                <span>{label}</span>
-              </button>
-            );
-          })}
-        </nav>
-      </div>
-
-      <div className="catalog-sidebar-section">
-        <p className="catalog-sidebar-section__title">Категории</p>
-        <nav className="catalog-sidebar-nav" aria-label="Тип места">
-          <button
-            type="button"
-            onClick={() => setTypeFilter('all')}
-            className={`catalog-sidebar-nav__item${allTypesOn ? ' catalog-sidebar-nav__item--active' : ''}`}
-          >
-            <span>Все места</span>
-          </button>
-          {categoryChips.map((chip) => {
-            const active = typeFilter === chip.id;
-            return (
-              <button
-                key={chip.id}
-                type="button"
-                onClick={() => setTypeFilter(active ? 'all' : chip.id)}
-                className={`catalog-sidebar-nav__item${active ? ' catalog-sidebar-nav__item--active' : ''}`}
-              >
-                <span>{chip.label}</span>
-                <span className="catalog-sidebar-nav__count">{chip.count}</span>
-              </button>
-            );
-          })}
-        </nav>
-      </div>
-    </>
-  );
-
   return (
     <>
       <HeroLayout
         variant="minimal"
         dense
-        breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Места' }]}
         eyebrow={placesEyebrow}
         title={pageTitleText}
         tone="light"
         className=""
       />
 
-      <div className="container-page py-6 sm:py-8">
-        <CatalogSidebarLayout
-          sidebar={placesSidebar}
-          title="Фильтры мест"
-          triggerLabel="Фильтры и поиск"
-          activeCount={filtersActiveCount + (q ? 1 : 0) + (typeFilter !== 'all' ? 1 : 0)}
-        >
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+      <div className="container-page py-5 sm:py-7">
+        <section className="places-filter-surface" aria-label="Поиск и фильтры мест">
+          <div className="flex min-w-0 items-center gap-2">
+            <PlacesSearch mode="hub" initialQuery={q} tone="outlined" />
+            <button
+              type="button"
+              aria-haspopup="dialog"
+              aria-expanded={filtersOpen}
+              onClick={() => setFiltersOpen(true)}
+              className={`inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl px-3.5 text-sm font-semibold transition sm:px-4 ${
+                filtersOpen || activeFilterCount > 0
+                  ? 'bg-slate-950 text-white hover:bg-slate-800'
+                  : 'bg-[#F5F5F7] text-slate-800 hover:bg-slate-200/70'
+              }`}
+            >
+              <SlidersHorizontal className="h-4 w-4" aria-hidden />
+              <span className="hidden sm:inline">Фильтры</span>
+              {activeFilterCount > 0 ? (
+                <span className="grid h-5 min-w-5 place-items-center rounded-full bg-white/15 px-1 text-[11px]">
+                  {activeFilterCount}
+                </span>
+              ) : null}
+            </button>
+          </div>
+
+          <div className="places-quick-filter-row" role="group" aria-label="Быстрые фильтры мест">
+            {FILTER_SCOPE_OPTIONS.map(([value, label]) => {
+              const active = scope === value && typeFilter === 'all';
+              const quickLabel =
+                value === 'all'
+                  ? 'Все'
+                  : value === 'institutions'
+                    ? 'Площадки'
+                    : value === 'locations'
+                      ? 'Локации'
+                      : 'С событиями';
+              return (
+                <button
+                  key={value}
+                  type="button"
+                  aria-label={label}
+                  aria-pressed={active}
+                  onClick={() => setScope(value)}
+                  className={`catalog-chip ${active ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
+                >
+                  {quickLabel}
+                </button>
+              );
+            })}
+            <span className="mx-0.5 hidden h-6 w-px shrink-0 bg-slate-200 sm:block" aria-hidden />
+            {categoryChips.slice(0, 6).map((chip) => {
+              const active = typeFilter === chip.id;
+              return (
+                <button
+                  key={chip.id}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => setTypeFilter(active ? 'all' : chip.id)}
+                  className={`catalog-chip ${active ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
+                >
+                  {chip.label}
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        <div className="mt-5 sm:mt-6">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200/70 pb-3">
             <p className="text-sm text-slate-500">
               {listPending || listRefreshing
                 ? 'Обновляем список…'
@@ -856,7 +833,7 @@ export function PlacesHubView({
               {viewMode === 'list' ? (
                 <InstitutionList venues={venues} hrefFor={venueHref} />
               ) : (
-                <div className="catalog-card-grid">
+                <div className="catalog-card-grid places-card-grid">
                   {venues.map((venue, index) =>
                     venuePageTemplate(venue.type) === 'institution' ? (
                       <InstitutionCard
@@ -884,6 +861,9 @@ export function PlacesHubView({
                 page={listPage}
                 total={total}
                 limit={VENUE_CATALOG_PAGE_SIZE}
+                nextFetchPage={
+                  listPage * VENUE_CATALOG_PAGE_SIZE < total ? listPage + 1 : null
+                }
                 searchParams={paginationParams}
                 basePath="/places"
                 onPageChange={goToListPage}
@@ -908,8 +888,25 @@ export function PlacesHubView({
               ) : null}
             </div>
           )}
-        </CatalogSidebarLayout>
+        </div>
       </div>
+
+      <PlacesFiltersDialog
+        open={filtersOpen}
+        activeCount={activeFilterCount}
+        resultLabel={listPending || listRefreshing ? 'Обновляем список...' : `Показать ${pluralPlaces(total)}`}
+        cityPending={cityPending}
+        cityFilter={cityFilter}
+        cityOptions={cityOptions}
+        scope={scope}
+        typeFilter={typeFilter}
+        categoryChips={categoryChips}
+        onCityChange={setCityFilter}
+        onScopeChange={setScope}
+        onTypeChange={setTypeFilter}
+        onReset={resetPlacesFilters}
+        onClose={() => setFiltersOpen(false)}
+      />
     </>
   );
 }
