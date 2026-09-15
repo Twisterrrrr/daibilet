@@ -21,6 +21,16 @@ nginx_deploy() {
   fi
 }
 
+python3_deploy() {
+  local python_bin
+  python_bin="$(command -v python3 || printf '%s\n' /usr/bin/python3)"
+  if [[ "$(id -u)" -eq 0 ]]; then
+    "$python_bin" "$@"
+  else
+    sudo -n "$python_bin" "$@"
+  fi
+}
+
 deploy_lock_dir() {
   echo "${APP_DIR:-/opt/daibilet}/var/lock"
 }

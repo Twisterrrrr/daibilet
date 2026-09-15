@@ -8,6 +8,13 @@ import {
 } from '@/lib/admin-basic-auth';
 import { isAdminHost, rewriteAdminHostPathname } from '@/lib/admin-host';
 import { cyrillicEventRedirectPath } from '@/lib/event-slug-redirect';
+import {
+  EVENTS_CATALOG_CANONICAL_HINT_HEADER,
+  EVENTS_CATALOG_PATH,
+  EVENTS_CATALOG_ROBOTS_HINT_HEADER,
+  absoluteEventsCatalogCanonical,
+  evaluateEventsCatalogIndexing,
+} from '@/lib/events-catalog-indexing';
 import { resolveLegacyLandingRedirect } from '@/lib/landing-routes';
 import { resolvePodborkiCityQueryRedirect } from '@/lib/podborki-city-seo';
 import { canonicalizeRegionChildCitySearch } from '../backend/src/search-geo-match.ts';
@@ -96,12 +103,47 @@ export async function middleware(request: NextRequest) {
   const podborkiCityRedirect = redirectPodborkiCityQueryToMarker(request);
   if (podborkiCityRedirect) return podborkiCityRedirect;
 
+  const eventsCatalogResponse = handleEventsCatalogIndexing(request, host);
+  if (eventsCatalogResponse) return eventsCatalogResponse;
+
   const redirectTarget = resolveLegacyLandingRedirect(pathname);
   if (!redirectTarget) return NextResponse.next();
 
   const url = request.nextUrl.clone();
   url.pathname = redirectTarget.replace(/\/+$/, '') || '/';
   return NextResponse.redirect(url, 301);
+}
+
+function handleEventsCatalogIndexing(
+  request: NextRequest,
+  host: string,
+): NextResponse | null {
+  if (request.nextUrl.pathname !== EVENTS_CATALOG_PATH) return null;
+  // Only the canonical production host consumes these private response hints.
+  // Staging already has a blanket noindex policy and localhost has no nginx map.
+  if (host.split(':')[0] !== 'daibilet.ru') return NextResponse.next();
+
+  const decision = evaluateEventsCatalogIndexing(request.nextUrl);
+  if (decision.redirectPath) {
+    const url = request.nextUrl.clone();
+    url.pathname = decision.redirectPath;
+    url.search = '';
+    return NextResponse.redirect(url, 301);
+  }
+
+  const siteUrl =
+    process.env.DAIBILET_SITE_URL ||
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    'https://daibilet.ru';
+  const response = NextResponse.next();
+  response.headers.set(
+    EVENTS_CATALOG_CANONICAL_HINT_HEADER,
+    absoluteEventsCatalogCanonical(decision.canonicalPath, siteUrl),
+  );
+  if (decision.robots) {
+    response.headers.set(EVENTS_CATALOG_ROBOTS_HINT_HEADER, decision.robots);
+  }
+  return response;
 }
 
 function redirectCyrillicEventSlug(request: NextRequest): NextResponse | null {

@@ -3,9 +3,7 @@ import type { Metadata } from 'next';
 import { cityToNominative, cityToPrepositional } from './city-declension.ts';
 import {
   EVENTS_HUB_DESCRIPTION,
-  INDEX_FOLLOW_ROBOTS,
   buildShareMetadata,
-  canonicalHref,
   ensureSeoDescription,
   eventsCityDescriptionFallback,
   pageTitle,
@@ -136,9 +134,8 @@ export function buildEventsCatalogMetadata(
   return {
     title: cleanTitle,
     description,
-    alternates: { canonical: canonicalHref(EVENTS_HUB_PATH) },
-    // Query-фильтры - UX-срезы одной афиши; канон чистый `/events`, не `/`.
-    robots: INDEX_FOLLOW_ROBOTS,
+    // Canonical and faceted noindex are emitted as HTTP headers. This keeps the
+    // page ISR-friendly while nginx can suppress both headers on non-200s.
     ...buildShareMetadata({
       title: shareTitle,
       description,

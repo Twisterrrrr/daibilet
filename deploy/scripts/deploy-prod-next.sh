@@ -304,7 +304,7 @@ fi
 
 # F4.6 nginx: admin.daibilet.ru → Next only (no /legacy)
 if [[ "$APPLY_ADMIN_NGINX_PATCH" == "1" && -f "$APP_DIR/deploy/nginx/patch-prod-admin-next.py" ]]; then
-  if python3 "$APP_DIR/deploy/nginx/patch-prod-admin-next.py"; then
+  if python3_deploy "$APP_DIR/deploy/nginx/patch-prod-admin-next.py"; then
     if nginx_deploy -t 2>/dev/null; then
       systemctl_deploy reload nginx && echo "nginx reloaded (admin Next-only, no /legacy)"
     else
@@ -317,21 +317,21 @@ fi
 
 # Serve /images/* and /_next/static from disk (bypass Node + proxy_cache).
 # AFTER admin patch: that script rewrites daibilet.conf and would drop these aliases.
-NGINX_STATIC_PATCHED=0
-for _patch in patch-prod-nginx-images-static.py patch-prod-nginx-next-static.py; do
+NGINX_PATCHED=0
+for _patch in patch-prod-nginx-images-static.py patch-prod-nginx-next-static.py patch-prod-nginx-events-seo.py; do
   if [[ -f "$APP_DIR/deploy/nginx/$_patch" ]]; then
-    if python3 "$APP_DIR/deploy/nginx/$_patch"; then
-      NGINX_STATIC_PATCHED=1
+    if python3_deploy "$APP_DIR/deploy/nginx/$_patch"; then
+      NGINX_PATCHED=1
     else
       echo "Warning: $_patch failed"
     fi
   fi
 done
-if [[ "$NGINX_STATIC_PATCHED" == "1" ]]; then
+if [[ "$NGINX_PATCHED" == "1" ]]; then
   if nginx_deploy -t 2>/dev/null; then
-    systemctl_deploy reload nginx && echo "nginx reloaded (/images + /_next/static alias)"
+    systemctl_deploy reload nginx && echo "nginx reloaded (static aliases + events SEO policy)"
   else
-    echo "Warning: nginx -t failed after static alias patch — not reloading"
+    echo "Warning: nginx -t failed after nginx patches — not reloading"
   fi
 fi
 

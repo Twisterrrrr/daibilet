@@ -1,9 +1,10 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 import { adminApiFetch } from '@/server/admin-api-fetch';
+import { EVENT_PAGE_CACHE_TAG } from '@/server/cache-config';
 
 export async function moderateAdminReviewAction(formData: FormData) {
   const id = String(formData.get('id') || '').trim();
@@ -29,6 +30,10 @@ export async function moderateAdminReviewAction(formData: FormData) {
     throw new Error(`review ${action} failed HTTP ${response.status}${text ? `: ${text.slice(0, 200)}` : ''}`);
   }
 
+  // Rating JSON-LD is derived only from approved reviews. Invalidate both the
+  // aggregate query and rendered PDPs when a review crosses moderation states.
+  revalidateTag(EVENT_PAGE_CACHE_TAG);
+  revalidatePath('/events/[slug]', 'page');
   revalidatePath('/admin/reviews');
   const qs =
     statusFilter && statusFilter !== 'PENDING_MODERATION'

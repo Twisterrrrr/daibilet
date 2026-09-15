@@ -22,6 +22,7 @@ import {
   listCatalogIntents,
 } from '@/lib/catalog-intent-routes';
 import { hasSeoListingEditorial } from '@/data/seo-listing-texts';
+import { isEventsCatalogSitemapEligibleUrl } from '@/lib/events-catalog-indexing';
 import { evaluateListingIndexability, MIN_LISTING_OFFERS_FOR_INDEX } from '@/lib/seo-listing-meta';
 import { buildPodborkiCityCanonicalPath, isPodborkiSeoPilotCitySlug, PODBORKI_SEO_PILOT_CITY_SLUGS } from '@/lib/podborki-city-seo';
 import { venueHref } from '@/lib/routes';
@@ -305,28 +306,50 @@ export async function buildLandingsSitemapEntries(now = new Date()): Promise<Sit
 
 export async function buildBlogSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
   const payload = await buildPublicArticlesListDto();
-  return (payload?.articles || [])
+  const articles = (payload?.articles || []) as Array<{
+    slug?: string | null;
+    isIndexable?: boolean | null;
+  }>;
+  return articles
     .filter((article) => article.slug && article.isIndexable !== false)
     .map((article) => entry(`/blog/${encodeURIComponent(String(article.slug))}`, now, 'weekly', 0.6));
 }
 
 export async function buildSitemapChunkEntries(chunk: SitemapChunk): Promise<SitemapEntry[]> {
   const now = new Date();
+  let entries: SitemapEntry[];
   switch (chunk) {
     case 'static':
-      return await buildStaticSitemapEntries(now);
+      entries = await buildStaticSitemapEntries(now);
+      break;
     case 'events':
-      return buildEventsSitemapEntries(now);
+      entries = await buildEventsSitemapEntries(now);
+      break;
     case 'cities':
-      return buildCitiesSitemapEntries(now);
+      entries = await buildCitiesSitemapEntries(now);
+      break;
     case 'venues':
-      return buildVenuesSitemapEntries(now);
+      entries = await buildVenuesSitemapEntries(now);
+      break;
     case 'landings':
-      return buildLandingsSitemapEntries(now);
+      entries = await buildLandingsSitemapEntries(now);
+      break;
     case 'blog':
-      return buildBlogSitemapEntries(now);
+      entries = await buildBlogSitemapEntries(now);
+      break;
     default:
-      return [];
+      entries = [];
+  }
+  assertSitemapNoindexInvariant(entries);
+  return entries;
+}
+
+export function assertSitemapNoindexInvariant(entries: readonly SitemapEntry[]): void {
+  const conflicts = entries
+    .map((item) => item.url)
+    .filter((url) => !isEventsCatalogSitemapEligibleUrl(url));
+  if (conflicts.length) {
+    throw new Error(`Sitemap contains noindex events catalog URL: ${conflicts.join(', ')}`);
   }
 }
 

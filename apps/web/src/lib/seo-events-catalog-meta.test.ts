@@ -34,21 +34,17 @@ test('date=today and category combine', () => {
   assert.equal(parts.title, 'Музеи и арт - Сегодня - билеты онлайн');
 });
 
-test('metadata keeps index,follow with absolute canonical /events', () => {
+test('metadata leaves canonical and robots to the response policy', () => {
   const meta = buildEventsCatalogMetadata({ category: 'Развлечения', date: 'today' });
-  const canonical = String(meta.alternates?.canonical || '');
-  assert.match(canonical, /^https:\/\//);
-  assert.match(canonical, /\/events$/);
-  assert.ok(!canonical.includes('?'));
-  assert.deepEqual(meta.robots, { index: true, follow: true });
+  assert.equal(meta.alternates, undefined);
+  assert.equal(meta.robots, undefined);
   assert.equal(meta.title, 'Развлечения - Сегодня - билеты онлайн');
   assert.ok(String(meta.description || '').trim().length > 40);
 });
 
 test('base /events description is dense and non-empty', () => {
   const meta = buildEventsCatalogMetadata({});
-  const canonical = String(meta.alternates?.canonical || '');
-  assert.match(canonical, /\/events$/);
+  assert.equal(meta.alternates, undefined);
   assert.ok(String(meta.description || '').includes('Афиша событий Дайбилет'));
   assert.ok(!String(meta.description || '').includes('\u2014'));
 });
