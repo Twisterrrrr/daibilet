@@ -33,6 +33,7 @@ export interface DateTimeSlot {
   dateLabel: string;
   timeLabel: string;
   timeBucket?: TimeBucket;
+  timeZone?: string | null;
 }
 
 export interface ReadinessIssue {

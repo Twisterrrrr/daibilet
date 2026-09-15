@@ -1,25 +1,27 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { loadCityRoutingConfig } from './city-routing-config.js';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const routingPath = path.join(__dirname, '..', '..', '..', 'data', 'geo', 'city-routing.ru.json');
-const routing = JSON.parse(fs.readFileSync(routingPath, 'utf8'));
+// INC.CITY404.4: do not read via import.meta.url alone - Next CI bakes
+// /home/runner/work/... which 500s revalidate on MSK after artifact swap.
+const routing = loadCityRoutingConfig(import.meta.url);
 
 export const DEFAULT_CITY_TIME_ZONE = 'Europe/Moscow';
 
 /** Города с часовым поясом, отличным от Europe/Moscow. */
 const CITY_TIME_ZONE_OVERRIDES = {
   Абакан: 'Asia/Krasnoyarsk',
+  Астрахань: 'Europe/Astrakhan',
   Барнаул: 'Asia/Barnaul',
+  'Благовещенск (Амурская область)': 'Asia/Yakutsk',
   Владивосток: 'Asia/Vladivostok',
   Екатеринбург: 'Asia/Yekaterinburg',
   Ижевск: 'Europe/Samara',
   Иркутск: 'Asia/Irkutsk',
   Калининград: 'Europe/Kaliningrad',
   Кемерово: 'Asia/Novokuznetsk',
+  'Киров (Кировская область)': 'Europe/Kirov',
   'Комсомольск-на-Амуре': 'Asia/Vladivostok',
   Красноярск: 'Asia/Krasnoyarsk',
+  Курган: 'Asia/Yekaterinburg',
   Магадан: 'Asia/Magadan',
   Новосибирск: 'Asia/Novosibirsk',
   Омск: 'Asia/Omsk',
@@ -27,14 +29,20 @@ const CITY_TIME_ZONE_OVERRIDES = {
   Пермь: 'Asia/Yekaterinburg',
   'Петропавловск-Кamчatsky': 'Asia/Kamchatka',
   Самара: 'Europe/Samara',
+  Тольятти: 'Europe/Samara',
+  Сургут: 'Asia/Yekaterinburg',
+  Новокузнецк: 'Asia/Novokuznetsk',
   Саратов: 'Europe/Saratov',
   Томск: 'Asia/Novosibirsk',
   Тюмень: 'Asia/Yekaterinburg',
+  'Улан-Удэ': 'Asia/Irkutsk',
   Ульяновск: 'Europe/Samara',
   Уфа: 'Asia/Yekaterinburg',
   Хабаровск: 'Asia/Vladivostok',
+  'Ханты-Мансийск': 'Asia/Yekaterinburg',
   Челябинск: 'Asia/Yekaterinburg',
   Чита: 'Asia/Yakutsk',
+  'Южно-Сахалинск': 'Asia/Sakhalin',
   ['\u042f\u043a\u0443\u0442\u0441\u043a']: 'Asia/Yakutsk',
 };
 
@@ -43,13 +51,20 @@ const REGION_TIME_ZONES = {
   'Ульяновская область': 'Europe/Samara',
   'Хабаровский край': 'Asia/Vladivostok',
   'Республика Хакасия': 'Asia/Krasnoyarsk',
+  'Республика Татарстан': 'Europe/Moscow',
+  'Республика Башкортостан': 'Asia/Yekaterinburg',
+  'Республика Карелия': 'Europe/Moscow',
   'Алтайский край': 'Asia/Barnaul',
   'Приморский край': 'Asia/Vladivostok',
   'Иркутская область': 'Asia/Irkutsk',
   'Забайкальский край': 'Asia/Yakutsk',
   'Сахалинская область': 'Asia/Sakhalin',
   'Камчатский край': 'Asia/Kamchatka',
-  Япония: 'Asia/Tokyo',
+  'Самарская область': 'Europe/Samara',
+  'Челябинская область': 'Asia/Yekaterinburg',
+  'Кемеровская область': 'Asia/Novokuznetsk',
+  'Свердловская область': 'Asia/Yekaterinburg',
+  'Ханты-Мансийский автономный округ': 'Asia/Yekaterinburg',
 };
 
 const cityToRegion = routing.cityToRegion || {};

@@ -1,0 +1,31 @@
+{
+  "city": "samara",
+  "mustSeeCount": 69,
+  "regen": [
+    {
+      "stem": "gryazelechebnitsa-sergiyevsk",
+      "name": "gryazelechebnitsa sergiyevsk",
+      "clusterSize": 5,
+      "keeper": "botanicheskiy-sad"
+    },
+    {
+      "stem": "sergievskie-mineralnye-vody",
+      "name": "sergievskie mineralnye vody",
+      "clusterSize": 5,
+      "keeper": "botanicheskiy-sad"
+    },
+    {
+      "stem": "shiryaevskie-shtolni",
+      "name": "shiryaevskie shtolni",
+      "clusterSize": 5,
+      "keeper": "botanicheskiy-sad"
+    },
+    {
+      "stem": "smotrovaya-sernovodsk",
+      "name": "smotrovaya sernovodsk",
+      "clusterSize": 5,
+      "keeper": "botanicheskiy-sad"
+    }
+  ],
+  "d0": 10
+}

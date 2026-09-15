@@ -199,7 +199,7 @@ Base URL:
 
 - прямые запросы с локальной машины могут не проходить, если локальный IP не в allowlist;
 - для разработки парсера используйте fixture-ответы или `npm run tep:fixture-bridge` + `TEP_API_URL=http://127.0.0.1:8787/v1`;
-- боевой импорт и auto-sync — только с сервера `213.171.7.16` (или другого IP из allowlist);
+- боевой импорт и auto-sync - только с MSK catalog `201.24.125.184` (IP в Teplohod allowlist);
 - в админке при 403 показывать: `source_unreachable_or_ip_not_allowed`.
 
 Рекомендуемые переменные окружения:
@@ -369,18 +369,19 @@ Endpoint:
 - `GET /events`;
 - `GET /events/{id}`.
 
-По рабочей модели статусы заказов Teplohod.info можно получать через API, но точный endpoint и формат ответа пока не описаны в переданном документе.
+**Prod probe 2026-07-19 (IP allowlist сервера):**
 
-В документе не описаны:
+| URL | HTTP |
+| --- | --- |
+| `GET https://api.teplohod.info/v1/events` | 200 |
+| `GET https://api.teplohod.info/v1/orders` (и aliases bookings/sales/…) | **404** |
+| `GET https://account.teplohod.info/api/orders` | **401** (endpoint существует) |
+| `GET https://account.teplohod.info/api/widgets` / `profile` / `events` | **401** |
 
-- создание заказа;
-- получение факта покупки;
-- получение статуса билета/заказа;
-- webhook/callback после покупки;
-- endpoint городов, хотя он упоминается как `https://api.teplohod.info/v1/cities`;
-- лимиты и rate limits;
-- формат ссылки на покупку;
-- правила подписи webhook, если webhook существует.
+**2026-07-19 — отложено:** партнёр подтвердил, что **API/выгрузки заказов нет**.
+Не запрашивать `TEP_ORDERS_TOKEN`. Cron `tep-orders-sync` на prod отключён.
+Скрипт `npm run tep:orders` остаётся в репо как заготовка, не активный prod-path.
+См. `docs/qa.md` (закрыто) и Diary 2026-07-19.
 
 ### Предварительный маппинг
 
@@ -392,7 +393,7 @@ fetchCategories() // категории можно выводить из пол�
 fetchVenues()
 fetchEvents(updatedSince?)
 fetchEventSessions(eventExternalId)
-fetchOrders(updatedSince?) // статусы доступны через API, требуется точный endpoint
+fetchOrders(updatedSince?) // DEFERRED: у партнёра нет orders API (2026-07-19)
 ```
 
 Адаптер должен возвращать нормализованные DTO, не завязанные на оригинальные поля источника. Оригинальный ответ сохраняем в `source_payload`.

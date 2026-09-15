@@ -3,6 +3,9 @@ import type { AdminAuthConfig } from './auth.js';
 
 export type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'DELETE' | 'OPTIONS' | string;
 
+/** CDN/browser cache for public GET JSON (catalog, city, event, venue). */
+export const PUBLIC_JSON_CACHE_CONTROL = 'public, max-age=60, s-maxage=300, stale-while-revalidate=600';
+
 export interface JsonResponseOptions {
   statusCode?: number;
   cacheControl?: string;
@@ -22,6 +25,13 @@ export function sendJson(response: ServerResponse, payload: unknown, options: Js
     'cache-control': options.cacheControl || 'no-store',
   });
   response.end(body);
+}
+
+export function sendPublicJson(response: ServerResponse, payload: unknown, options: JsonResponseOptions = {}): void {
+  sendJson(response, payload, {
+    ...options,
+    cacheControl: options.cacheControl || PUBLIC_JSON_CACHE_CONTROL,
+  });
 }
 
 export function sendEmpty(response: ServerResponse, statusCode: number): void {
@@ -59,4 +69,3 @@ export async function readJsonBody<T = unknown>(request: IncomingMessage): Promi
 export function requestUrl(request: IncomingMessage): URL {
   return new URL(request.url || '/', `http://${request.headers.host || '127.0.0.1'}`);
 }
-

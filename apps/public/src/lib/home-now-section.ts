@@ -1,4 +1,4 @@
-import { isSessionToday } from '@/lib/event-card-meta';
+import { isSessionToday } from '@/lib/datetime';
 import {
   formatSessionDate,
   formatSessionTime,
@@ -7,7 +7,9 @@ import {
   parseSessionStartsAt,
   resolveSessionTimeZoneForSession,
 } from '@/lib/datetime';
-import { spreadCatalogSessionsByCoverImage } from '@/lib/session-cover-image';
+import { isHomeRailTabooSession } from '@/lib/home-rail-taboos';
+import { collectSessionImageDedupeKeys, sessionHasCoverImage, spreadCatalogSessionsByCoverImage } from '@/lib/session-cover-image';
+import { createHomePickState, sessionFamilyKey, type HomePickState } from '@/lib/home-showcase-sections';
 import type { PublicSession } from '@/types';
 
 export type HomeNowTabKey = 'today' | 'tomorrow' | 'weekend' | 'nearest';
@@ -70,18 +72,33 @@ function popularScore(event: PublicSession): number {
 function sessionDedupeKey(event: PublicSession): string {
   const groupKey = String(event.groupKey || '').trim().toLowerCase();
   if (groupKey) return `group:${groupKey}`;
-  return `title:${event.title.trim().toLowerCase()}`;
+  return `title:${String(event.title || '').trim().toLowerCase()}`;
 }
 
-function takeUnique(events: PublicSession[], max: number): PublicSession[] {
-  const seenIds = new Set<string>();
-  const seenTitles = new Set<string>();
+function sessionCoverKeys(event: PublicSession, state: HomePickState): string[] {
+  const keys = collectSessionImageDedupeKeys(event.imageUrl);
+  const url = String(event.imageUrl || '').trim();
+  const fingerprint = url ? state.fingerprints.get(url) : undefined;
+  if (fingerprint) keys.push(fingerprint);
+  return keys;
+}
+
+function takeUnique(events: PublicSession[], max: number, state: HomePickState): PublicSession[] {
   const result: PublicSession[] = [];
 
   for (const event of events) {
-    if (seenIds.has(event.id) || seenTitles.has(sessionDedupeKey(event))) continue;
-    seenIds.add(event.id);
-    seenTitles.add(sessionDedupeKey(event));
+    if (!sessionHasCoverImage(event)) continue;
+    if (isHomeRailTabooSession(event)) continue;
+    const dedupeKey = sessionDedupeKey(event);
+    const familyKey = sessionFamilyKey(event);
+    if (state.seenIds.has(event.id) || state.seenTitles.has(dedupeKey) || state.seenFamilies.has(familyKey)) continue;
+    const imageKeys = sessionCoverKeys(event, state);
+    if (imageKeys.some((key) => state.seenImages.has(key))) continue;
+
+    state.seenIds.add(event.id);
+    state.seenTitles.add(dedupeKey);
+    state.seenFamilies.add(familyKey);
+    for (const key of imageKeys) state.seenImages.add(key);
     result.push(event);
     if (result.length >= max) break;
   }
@@ -105,21 +122,23 @@ function sortByMatchingSlot(events: PublicSession[], slotFilter: SlotFilter): Pu
   });
 }
 
-function buildTabPool(sessions: PublicSession[], slotFilter: SlotFilter): PublicSession[] {
+function buildTabPool(sessions: PublicSession[], slotFilter: SlotFilter, state: HomePickState): PublicSession[] {
   const matched = sortByMatchingSlot(
     sessions.filter((event) => eventMatchesSlotFilter(event, slotFilter)),
     slotFilter,
   ).map((event) => withTabDisplaySlot(event, slotFilter));
 
-  return spreadCatalogSessionsByCoverImage(takeUnique(matched, TAB_LIMIT));
+  return spreadCatalogSessionsByCoverImage(takeUnique(matched, TAB_LIMIT, state), state.fingerprints);
 }
 
 type BuildHomeNowTabsOptions = {
   cityName?: string | null;
+  pickState?: HomePickState;
 };
 
 export function buildHomeNowTabs(sessions: PublicSession[], options: BuildHomeNowTabsOptions = {}): HomeNowTab[] {
   const cityName = options.cityName?.trim() || null;
+  const pickState = options.pickState ?? createHomePickState();
   const inCity = cityName ? ` в ${cityName}` : '';
 
   const tabDefs: Array<{
@@ -178,7 +197,7 @@ export function buildHomeNowTabs(sessions: PublicSession[], options: BuildHomeNo
 
   return tabDefs
     .map((def) => {
-      const primary = buildTabPool(sessions, def.slotFilter);
+      const primary = buildTabPool(sessions, def.slotFilter, pickState);
       const usedFallback = primary.length < MIN_PRIMARY_EVENTS;
       let events = primary;
 
@@ -188,7 +207,10 @@ export function buildHomeNowTabs(sessions: PublicSession[], options: BuildHomeNo
           const rotated = [...sessions.slice(offset), ...sessions.slice(0, offset)];
           fallbackByTab.set(
             def.key,
-            spreadCatalogSessionsByCoverImage(takeUnique(sortByPopular(rotated), TAB_LIMIT)),
+            spreadCatalogSessionsByCoverImage(
+              takeUnique(sortByPopular(rotated), TAB_LIMIT, pickState),
+              pickState.fingerprints,
+            ),
           );
         }
         events = fallbackByTab.get(def.key) || [];

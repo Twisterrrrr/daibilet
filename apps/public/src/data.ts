@@ -269,6 +269,18 @@ export function roundStatToTen(value?: number | null): number {
   return rounded > 0 ? rounded : 10;
 }
 
+/**
+ * Marketing count for catalog eyebrows: floor to decade with `+` when not exact.
+ * 51 → 50+, 55 → 50+, 50 → 50, 9 → 9.
+ */
+export function formatCountFloorTenPlus(value?: number | null): string {
+  const count = Math.max(0, Math.round(value || 0));
+  if (count < 10) return formatNumber(count);
+  const floored = Math.floor(count / 10) * 10;
+  if (count === floored) return formatNumber(count);
+  return `${formatNumber(floored)}+`;
+}
+
 /** Для блоков метрик: «+» только при достаточно больших числах, чтобы не показывать «1+». */
 export function formatStatCount(value?: number | null, plusThreshold = 500): string {
   const count = Math.max(0, Math.round(value || 0));
@@ -285,12 +297,26 @@ export function formatMoney(value?: number | null): string {
   return `от ${formatNumber(Math.round(value))}\u00a0₽`;
 }
 
+/** Primary buy / CTA: always «от min», never min–max. */
+export function formatPriceFrom(value?: number | null): string {
+  if (!value || value <= 0) return 'Цена уточняется';
+  return `от ${formatNumber(Math.round(value))} ₽`;
+}
+
+/** Stats / comparison: min-max when different, else exact price (no «от»). Not for primary buy CTAs. */
 export function formatMoneyRange(from?: number | null, to?: number | null): string {
   if (!from || from <= 0) return '—';
   const min = Math.round(from);
   const max = to && to > 0 ? Math.round(to) : min;
-  if (max > min) return `от ${formatNumber(min)} до ${formatNumber(max)}\u00a0₽`;
-  return `от ${formatNumber(min)}\u00a0₽`;
+  if (max > min) return `${formatNumber(min)}-${formatNumber(max)} ₽`;
+  return `${formatNumber(min)} ₽`;
+}
+
+export function moneyRangeStatLabel(from?: number | null, to?: number | null): string {
+  if (!from || from <= 0) return 'цена';
+  const min = Math.round(from);
+  const max = to && to > 0 ? Math.round(to) : min;
+  return max > min ? 'диапазон цен' : 'цена';
 }
 
 export function formatDate(value?: string | null, timeZone = 'Europe/Moscow'): string {

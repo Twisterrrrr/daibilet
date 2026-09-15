@@ -26,12 +26,20 @@ export function BlogArticleHero({
 }: BlogArticleHeroProps) {
   const [hasImageError, setHasImageError] = React.useState(false);
   const showImage = Boolean(coverImageUrl) && !hasImageError;
+  // «…Петербурга. Часть N:» / «Больше чем ТОП-100. Часть N:» → break after period
+  const seriesMatch = String(title || '')
+    .trim()
+    .match(/^(.+\.)\s+(Часть\s+\d+:[\s\S]*)$/u);
+  const seriesTitle = seriesMatch?.[1] && seriesMatch[2]
+    ? { lead: seriesMatch[1], rest: seriesMatch[2] }
+    : null;
 
   return (
     <>
       <PageBreadcrumbBar items={breadcrumbs} />
       <section className="relative overflow-hidden border-b border-slate-200 bg-slate-900 text-white">
-        <div className="relative min-h-[280px] sm:min-h-[320px] lg:min-h-[380px]">
+        {/* Mobile ~3:4 (на 25% ниже прежнего 9:16); на lg потолок высоты. */}
+        <div className="relative aspect-[3/4] w-full lg:aspect-auto lg:h-[min(48vw,36rem)]">
           {showImage ? (
             <img
               src={coverImageUrl || ''}
@@ -45,7 +53,7 @@ export function BlogArticleHero({
             <div className="absolute inset-0 bg-gradient-to-br from-amber-500 via-rose-500 to-primary-700" />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/55 to-slate-950/25" />
-          <div className="container-page relative flex h-full min-h-[inherit] flex-col justify-end py-10 sm:py-12 lg:py-14">
+          <div className="container-page relative flex h-full flex-col justify-end py-10 sm:py-12 lg:py-14">
             <div className="flex flex-wrap items-center gap-2">
               <p className="inline-flex items-center gap-1.5 text-sm font-semibold uppercase tracking-wider text-white/80">
                 <BookOpen className="h-4 w-4" />
@@ -61,7 +69,17 @@ export function BlogArticleHero({
                 </a>
               ) : null}
             </div>
-            <h1 className="font-display mt-2 max-w-4xl text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">{title}</h1>
+            <h1 className="font-display mt-2 max-w-4xl text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
+              {seriesTitle ? (
+                <>
+                  {seriesTitle.lead}
+                  <br />
+                  {seriesTitle.rest}
+                </>
+              ) : (
+                title
+              )}
+            </h1>
             {description ? <p className="mt-3 max-w-2xl text-base text-white/85 sm:text-lg">{description}</p> : null}
             <div className="mt-5 flex flex-wrap items-center gap-4 text-sm text-white/70">
               {publishedLabel ? <span>{publishedLabel}</span> : null}

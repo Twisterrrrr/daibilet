@@ -1,140 +1,152 @@
-# Codex handoff — Phase 2 finance в Next full-stack monorepo
+# Codex ↔ Cursor — Phase 2 finance и split веток
 
-**Дата:** 2026-07-10  
-**Для:** Codex / Daibilet Local  
-**Базовая ветка:** `feat/next-monorepo` (после F1 shell от Cursor)  
-**Целевая ветка Codex:** `codex/phase2-finance-next`
+**Обновлено:** 2026-07-10  
+**Cursor (public Next):** `feat/next-monorepo` → **`apps/web`** (Path B, full-stack read)  
+**Codex (Phase 2 + admin):** **`codex/phase2-foundation`** (фактическая ветка на GitHub)
 
----
-
-## Контекст
-
-Cursor идёт по **Path B**: Next.js full-stack monorepo + Prisma (`docs/phases/phase-f-next-fullstack.md`).
-
-**Твоя задача** — подготовить **Phase 2 foundation (финконтур + ЛК поставщика)** в **новой структуре monorepo**, не ломая widget MVP и не включая платежи в runtime.
-
-Старая ветка `codex/phase2-foundation` — **reference only** (unrelated git history). Переноси идеи cherry-pick, не merge wholesale.
+> ⚠️ Ветки **`codex/phase2-finance-next` на remote нет**. Handoff изначально предполагал rebase Codex на `feat/next-monorepo`; Codex продолжил работу в **`codex/phase2-foundation`** с **unrelated git history** — wholesale merge **запрещён**.
 
 ---
 
-## Что сделать
+## Фактическое состояние (2026-07-10)
 
-### 1. Monorepo alignment
+| | Cursor `feat/next-monorepo` | Codex `codex/phase2-foundation` |
+|---|---------------------------|--------------------------------|
+| **Tip** | `fec7ff5` F2 complete | `229ad3b` SPBBOATS doc + Next-in-public |
+| **Next app** | `apps/web` — SSR/ISR, Prisma read | `apps/public` — Next catch-all **+ SPA inside** |
+| **Public API** | Route Handlers, `@daibilet/backend/public-read` | **Proxy bridge** → legacy `:4000` |
+| **Prisma models** | ~29 | **~66** (+ Phase 2 migrations) |
+| **Merge base** | — | **нет** с `feat/next-monorepo` |
 
-После появления `feat/next-monorepo`:
+### Что сделал Codex (ценное для cherry-pick)
+
+- Prisma migrations: `phase2_commerce_supplier_contracts`, `phase2_event_management_buyer_account`
+- `docs/phase-2-finance-supplier-blueprint.md`, `docs/spbboats-next-prisma-extraction.md`
+- **Event Change Requests:** backend handlers, applier, admin queue UI (`a6beaef`…`e9f612d`)
+- `packages/contracts/src/admin.ts` (расширенные admin types)
+- Typed admin dashboard/sources DTO (`8cf79b8`)
+
+### Что из Codex **не мержить**
+
+| Артефакт | Причина |
+|----------|---------|
+| Next в `apps/public` + `backend-proxy.ts` | Конфликт с canonical **`apps/web`** |
+| `app/[[...path]]/page.tsx` SPA-in-Next | Path A (bridge), не Path B |
+| Wholesale lockfile / unrelated history | Риск регрессии MVP |
+
+**Canonical public Next:** только **`apps/web`** на `feat/next-monorepo`.
+
+---
+
+## План интеграции Codex → Cursor
+
+**Когда:** после **F3 cutover** (staging smoke green, prod public на Next).
+
+**Как:** cherry-pick / ручной port по файлам, **не** `git merge codex/phase2-foundation`.
+
+### Slice 1 — Schema (Критический, после F3)
 
 ```
-apps/web/                    # Next — не трогать public routes Cursor
-packages/db/prisma/          # additive migrations Phase 2
-packages/contracts/          # supplier, checkout, order types + Zod
-apps/web/app/api/admin/      # read-only admin routes (optional slice)
+packages/db/prisma/migrations/20260709223000_phase2_commerce_supplier_contracts/
+packages/db/prisma/migrations/20260710110000_phase2_event_management_buyer_account/
+packages/db/prisma/schema.prisma  # additive diff only
+packages/db/README.md
 ```
 
-**Package manager:** pnpm (как в твоём foundation doc).
+Проверка: `pnpm db:deploy` на staging `5438`, `pnpm db:smoke`.
 
-### 2. Prisma schema (Phase 2 models)
+### Slice 2 — Event Change Requests (Высокий)
 
-Заложить модели из `docs/marketplace-phase-foundation.md` / твоего blueprint:
+```
+apps/backend/src/event-change-request-*.ts
+apps/backend/src/admin-event-change-requests-*.ts
+apps/admin/src/pages/EventChangeRequestsPage.tsx
+apps/admin/src/config/navigation.ts  # nav entry
+packages/contracts/src/admin.ts      # merge types, не replace wholesale
+```
 
-- `Supplier`, `SupplierUser`, `SupplierVenue`, `SupplierEvent`
-- `SupplierCommissionRule`, `SupplierLegalProfile`, `SupplierBankAccount`
-- `SupplierLedgerEntry`, `SupplierReport`, `SupplierSettlement`
-- `CheckoutOrder`, `CheckoutItem`, `Payment`, `FiscalReceipt`
-- `RefundRequest`, `PaymentEventLog`, `IdempotencyKey`
+Feature flag: routes off until admin review (`DAIBILET_EVENT_CHANGE_REQUESTS=0`).
 
-**Правила:**
+### Slice 3 — Admin contracts & docs (Средний)
 
-- Migrations **только additive**
-- Не удалять/не переименовывать MVP models (Event, ExternalOrder, …)
-- `CheckoutOrder` ≠ `ExternalOrder` — разные контуры
+```
+docs/phase-2-finance-supplier-blueprint.md
+docs/spbboats-next-prisma-extraction.md  # reference
+```
 
-### 3. Admin read (без mock)
+### Slice 4 — Phase G only (позже)
 
-- `GET /api/admin/suppliers` — list
-- `GET /api/admin/suppliers/[id]` — detail
-- DTO через Prisma, **не** fallback mock data
-- Parity test vs fixture DB (может быть 0 rows)
-
-### 4. Документация
-
-- `docs/phase-2-finance-supplier-blueprint.md` — актуализировать под Next structure
-- `packages/db/README.md` — как деплоить migrations на staging DB `5438`
-
-### 5. Tests
-
-- Unit tests для Zod contracts
-- Integration smoke: `supplier.findMany()` на empty DB
+- Supplier admin read routes
+- Checkout/YooKassa runtime
+- `DAIBILET_PHASE2_*` flags
 
 ---
 
-## Что НЕ делать
+## Роли после синхронизации
 
-| Запрещено | Почему |
-|-----------|--------|
-| YooKassa API / webhooks в runtime | Phase G, не сейчас |
-| Checkout UI / «Купить через Daibilet» | Widget MVP |
-| Включать Phase 2 routes на prod | Feature flag `DAIBILET_PHASE2=0` |
-| Merge в `integrate/mvp-launch` без review | Parallel work |
-| Переписывать public catalog/event Cursor | Conflict F2 |
-| pnpm migrate prod до F1 complete | Deploy risk |
+| Кто | Владеет |
+|-----|---------|
+| **Cursor** | `apps/web` public SSR, F3–F5 cutover, nginx/systemd |
+| **Codex** | Phase 2 schema, supplier/checkout **foundation**, event change workflow |
+| **Shared** | `packages/db` migrations (additive), `packages/contracts` (review both sides) |
+
+Codex **может** продолжать Phase 2 backend/admin в `codex/phase2-foundation`, но **не** трогает `apps/web` public routes.
+
+---
+
+## Git workflow (актуальный)
+
+### Codex — продолжение работы
+
+```bash
+git fetch origin codex/phase2-foundation
+git checkout codex/phase2-foundation
+# work on backend/admin/schema only — NOT apps/web
+git push origin codex/phase2-foundation
+```
+
+### Cursor — cherry-pick после F3
+
+```bash
+git checkout feat/next-monorepo
+git fetch origin codex/phase2-foundation
+
+# Пример: один коммит schema (проверить конфликты!)
+git cherry-pick a6beaef   # event change applier — после schema slice
+git cherry-pick 6f88fb7   # admin queue
+# … по одному, CI после каждого
+
+pnpm db:deploy && pnpm backend:test:ts && pnpm web:build
+```
+
+**Не делать:** `git merge origin/codex/phase2-foundation`.
 
 ---
 
 ## Feature flags (задел)
 
 ```env
-# .env.example — все выключены по умолчанию
 DAIBILET_PHASE2_SUPPLIERS=0
 DAIBILET_PHASE2_CHECKOUT=0
 DAIBILET_YOOKASSA_ENABLED=0
+DAIBILET_EVENT_CHANGE_REQUESTS=0
 ```
 
-Route handlers проверяют flag → 404 если off.
+---
+
+## Exit criteria интеграции (post-F3)
+
+- [ ] Phase 2 migrations apply на staging `5438` без конфликта с F2 schema
+- [ ] Event change requests: backend tests green, admin page behind flag
+- [ ] `apps/web` public routes **без изменений** после cherry-pick
+- [ ] Codex Next/proxy **не** в `feat/next-monorepo`
+- [ ] `docs/decision-log.md` + Tasktracker обновлены
 
 ---
 
-## Git workflow
+## Связанные документы
 
-```bash
-git fetch origin feat/next-monorepo
-git checkout -b codex/phase2-finance-next origin/feat/next-monorepo
-# work...
-git push -u origin codex/phase2-finance-next
-```
-
-**Weekly:** rebase на `feat/next-monorepo`.  
-**PR в `feat/next-monorepo`:** только после F1 merge + CI green + Cursor review.
-
----
-
-## Reference (твои прошлые артефакты)
-
-Cherry-pick ideas from `origin/codex/phase2-foundation`:
-
-- `packages/contracts/src/*`
-- `admin-dashboard.dto.ts`, `admin-sources.dto.ts` patterns
-- `docs/phase-2-finance-supplier-blueprint.md`
-- `event-change-request-*.ts` (optional, lower priority)
-
-**Не cherry-pick:** unrelated history, wholesale pnpm lock replace on `integrate/mvp-launch`.
-
----
-
-## Exit criteria Codex
-
-- [ ] Phase 2 migrations apply clean on `daibilet_staging` (5438)
-- [ ] `packages/contracts` exports supplier + checkout types
-- [ ] Admin suppliers read routes behind flag
-- [ ] Zero YooKassa network calls in codebase
-- [ ] README + blueprint updated
-- [ ] CI: typecheck + test green on `codex/phase2-finance-next`
-
----
-
-## Контакт / sync
-
-Cursor владеет: F1 shell, public SSR, prod cutover.  
-Codex владеет: Phase 2 schema + supplier admin read foundation.  
-Sync point: **после F1** — согласовать `packages/contracts` export map.
-
-См. также [cursor-handoff-prompt.md](./cursor-handoff-prompt.md) (Codex branch) для widget-first правил.
+- [phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md) — Path B
+- [phase-f3-cutover-checklist.md](./phases/phase-f3-cutover-checklist.md) — cutover до cherry-pick
+- [codex-cherry-pick-plan.md](./codex-cherry-pick-plan.md) — детальный чеклист коммитов
+- [Project.md](./Project.md), [Tasktracker.md](./Tasktracker.md)

@@ -11,6 +11,7 @@ import {
   clearPublicVenueDtoCache,
   venueCatalogCore,
 } from '../src/public-venue.dto.js';
+import type { PublicSessionDto, PublicVenueDto } from '../src/types/public.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(dirname, '../../..');
@@ -72,24 +73,7 @@ for (const venue of selected) {
 
 process.exit(0);
 
-function venueCore(value: {
-  id: string;
-  slug: string;
-  name: string;
-  title: string;
-  city: string;
-  address: string | null;
-  latitude: number | null;
-  longitude: number | null;
-  type: string;
-  pageStatus: string;
-  description: string | null;
-  shortDescription: string | null;
-  heroImageUrl: string | null;
-  isIndexable: boolean;
-  events: number;
-  categories: Record<string, number>;
-}) {
+function venueCore(value: PublicVenueDto) {
   return {
     id: value.id,
     slug: value.slug,
@@ -110,21 +94,14 @@ function venueCore(value: {
   };
 }
 
-function sessionCore(value: {
-  id: string;
-  slug: string;
-  groupEventIds?: string[];
-  title: string;
-  startsAt: string | null;
-  priceFrom: number | null;
-}) {
+function sessionCore(value: PublicSessionDto) {
   return {
     id: value.id,
-    slug: value.slug,
-    groupEventIds: value.groupEventIds,
+    slug: value.slug ?? null,
+    ...(value.groupEventIds ? { groupEventIds: value.groupEventIds } : {}),
     title: value.title,
-    startsAt: value.startsAt,
-    priceFrom: value.priceFrom,
+    startsAt: value.startsAt ?? null,
+    priceFrom: value.priceFrom ?? null,
   };
 }
 

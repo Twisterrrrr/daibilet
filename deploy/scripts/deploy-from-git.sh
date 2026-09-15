@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
+# LEGACY: deploys Vite apps/public — do NOT use for Next cutover. Use deploy-prod-next.sh instead.
 set -euo pipefail
+
+echo "WARNING: deploy-from-git.sh is legacy (Vite public). For production Next use deploy/scripts/deploy-prod-next.sh" >&2
 
 APP_DIR="${APP_DIR:-/opt/daibilet}"
 PUBLIC_DIR="${PUBLIC_DIR:-/var/www/daibilet/public}"
