@@ -1,0 +1,54 @@
+# =============================================================================
+# EXAMPLE ONLY - pay.daibilet.ru split (thin Buyer UI vs Supplier LC)
+# =============================================================================
+# НЕ apply на finance .159 без явного запроса owner («выкатывай на finance»).
+# Пути / upstream ports могут отличаться от live - сверить с inventory на хосте.
+# Secrets / TLS cert paths / real upstream ports сюда НЕ коммитить.
+# =============================================================================
+
+# upstream examples (имена/ports - placeholder; сверить inventory):
+# upstream pay_thin_buyer { server 127.0.0.1:3002; }
+# upstream pay_supplier_lc { server 127.0.0.1:8080; }
+
+server {
+    listen 443 ssl http2;
+    server_name pay.daibilet.ru;
+
+    # ssl_certificate     /path/to/fullchain.pem;   # NOT in git
+    # ssl_certificate_key /path/to/privkey.pem;     # NOT in git
+
+    # Supplier LC - isolated path prefix on same host
+    location ^~ /supplier/ {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location ^~ /api/supplier/ {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Thin Buyer UI (Codex parallel track) - checkout surface on pay
+    location ^~ /checkout/ {
+        # proxy_pass http://127.0.0.1:3002;  # thin-buyer upstream - inventory
+        proxy_pass http://127.0.0.1:3002;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Default: do not serve catalog marketing on pay - send to apex
+    location / {
+        return 301 https://daibilet.ru$request_uri;
+    }
+}

@@ -1,0 +1,48 @@
+/* Loaded after leaflet.css so !important beats upstream display:inline */
+.leaflet-control-attribution .leaflet-attribution-flag {
+  display: none !important;
+}
+
+/*
+ * Leaflet panes use z-index 200–700. Without a local stacking context those
+ * values compete with page chrome (MobileStickyActionBar is z-40) and paint
+ * the map above fixed bottom CTAs. Keep map layers inside the embed.
+ *
+ * height/width 100%: tiles must fill the host box (no gray gutters left/top
+ * when the container grows after a 0-size init).
+ */
+[data-osm-map='leaflet'],
+[data-day-route-map='leaflet'],
+[data-locations-catalog-map='leaflet'] {
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
+  width: 100%;
+  /* Height must come from Tailwind (h-56 / h-full). Forcing height:100% here
+     beats utility classes and collapses the map when the parent has no height
+     (event PDP «Карта» accordion → blank white box). */
+  background: #f1f5f9;
+}
+
+/* Global img max-width resets break OSM tile sizing - keep tiles native. */
+.leaflet-container img.leaflet-tile {
+  max-width: none !important;
+  max-height: none !important;
+}
+
+/* Ticket / content pages: locked map lets vertical page scroll pass through */
+[data-osm-map='leaflet'][data-map-interaction='locked'] {
+  cursor: grab;
+  touch-action: pan-y !important;
+}
+
+[data-osm-map='leaflet'][data-map-interaction='active'] {
+  cursor: grab;
+}
+
+/* Region hub orientation map: DivIcon without Leaflet default white square */
+.daibilet-region-orient-marker,
+.daibilet-locations-catalog-marker {
+  background: transparent !important;
+  border: none !important;
+}

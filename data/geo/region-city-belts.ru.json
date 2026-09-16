@@ -1,0 +1,32 @@
+{
+  "moskovskaya-oblast": {
+    "anchor": { "name": "МКАД", "lat": 55.7558, "lng": 37.6173 },
+    "cities": {
+      "balashikha": { "name": "Балашиха", "belt": "near", "kmFromMkad": 8, "transit": "MCD", "lat": 55.7963, "lng": 37.9382 },
+      "vidnoe": { "name": "Видное", "belt": "near", "kmFromMkad": 6, "transit": "rail", "lat": 55.5526, "lng": 37.7097 },
+      "lyubertsy": { "name": "Люберцы", "belt": "near", "kmFromMkad": 5, "transit": "MCD", "lat": 55.6762, "lng": 37.8932 },
+      "mytishchi": { "name": "Мытищи", "belt": "near", "kmFromMkad": 7, "transit": "rail", "lat": 55.9104, "lng": 37.7365 },
+      "khimki": { "name": "Химки", "belt": "near", "kmFromMkad": 4, "transit": "MCD", "lat": 55.8881, "lng": 37.4305 },
+      "korolev": { "name": "Королёв", "belt": "near", "kmFromMkad": 10, "transit": "rail", "lat": 55.9221, "lng": 37.8255 },
+      "korolyov": { "name": "Королёв", "belt": "near", "kmFromMkad": 10, "transit": "rail", "lat": 55.9221, "lng": 37.8255 },
+      "podolsk": { "name": "Подольск", "belt": "near", "kmFromMkad": 16, "transit": "rail", "lat": 55.4312, "lng": 37.5448 },
+      "domodedovo": { "name": "Домодедово", "belt": "near", "kmFromMkad": 22, "transit": "rail", "lat": 55.4413, "lng": 37.753 },
+      "ramenskoe": { "name": "Раменское", "belt": "mid", "kmFromMkad": 35, "transit": "rail", "lat": 55.5669, "lng": 38.2303 },
+      "bronnitsy": { "name": "Бронницы", "belt": "mid", "kmFromMkad": 45, "transit": "rail", "lat": 55.4217, "lng": 38.2763 },
+      "bronniczy": { "name": "Бронницы", "belt": "mid", "kmFromMkad": 45, "transit": "rail", "lat": 55.4217, "lng": 38.2763 },
+      "zhukovskiy": { "name": "Жуковский", "belt": "mid", "kmFromMkad": 32, "transit": "rail", "lat": 55.5975, "lng": 38.1203 },
+      "fryazino": { "name": "Фрязино", "belt": "mid", "kmFromMkad": 28, "transit": "rail", "lat": 55.9606, "lng": 38.0456 },
+      "dmitrov": { "name": "Дмитров", "belt": "mid", "kmFromMkad": 55, "transit": "rail", "lat": 56.344, "lng": 37.5204 },
+      "chekhov": { "name": "Чехов", "belt": "mid", "kmFromMkad": 50, "transit": "rail", "lat": 55.1477, "lng": 37.4773 },
+      "voskresensk": { "name": "Воскресенск", "belt": "mid", "kmFromMkad": 70, "transit": "rail", "lat": 55.3226, "lng": 38.6638 },
+      "orekhovo-zuevo": { "name": "Орехово-Зуево", "belt": "mid", "kmFromMkad": 75, "transit": "rail", "lat": 55.8067, "lng": 38.9618 },
+      "sergiev-posad": { "name": "Сергиев Посад", "belt": "far", "kmFromMkad": 55, "transit": "rail", "lat": 56.31, "lng": 38.13 },
+      "dubna": { "name": "Дубна", "belt": "far", "kmFromMkad": 110, "transit": "rail", "lat": 56.744, "lng": 37.175 },
+      "kolomna": { "name": "Коломна", "belt": "far", "kmFromMkad": 95, "transit": "rail", "lat": 55.0794, "lng": 38.7783 },
+      "serpukhov": { "name": "Серпухов", "belt": "far", "kmFromMkad": 85, "transit": "rail", "lat": 54.915, "lng": 37.411 },
+      "egorevsk": { "name": "Егорьевск", "belt": "far", "kmFromMkad": 90, "transit": "rail", "lat": 55.3828, "lng": 39.0323 },
+      "kurovskoe": { "name": "Куровское", "belt": "far", "kmFromMkad": 85, "transit": "rail", "lat": 55.5791, "lng": 38.9209 },
+      "petrovo-dalnee": { "name": "Петрово-Дальнее", "belt": "mid", "kmFromMkad": 25, "transit": "car", "lat": 55.75, "lng": 37.2 }
+    }
+  }
+}

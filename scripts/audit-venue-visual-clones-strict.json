@@ -1,0 +1,1099 @@
+{
+  "thresh": 2,
+  "summary": [
+    {
+      "city": "saint-petersburg",
+      "files": 322,
+      "md5": 0,
+      "pairs": 8,
+      "d0": 0,
+      "clusters": 1,
+      "topCluster": 7
+    },
+    {
+      "city": "ekaterinburg",
+      "files": 101,
+      "md5": 0,
+      "pairs": 1,
+      "d0": 0,
+      "clusters": 1,
+      "topCluster": 2
+    },
+    {
+      "city": "kazan",
+      "files": 79,
+      "md5": 0,
+      "pairs": 1,
+      "d0": 0,
+      "clusters": 1,
+      "topCluster": 2
+    },
+    {
+      "city": "place",
+      "files": 5,
+      "md5": 0,
+      "pairs": 1,
+      "d0": 0,
+      "clusters": 1,
+      "topCluster": 2
+    },
+    {
+      "city": "abakan",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "arhangelsk",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "astrahan",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "barnaul",
+      "files": 77,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "belgorod",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "blagoveschensk-amurskaya-oblast",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "bryansk",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "cheboksary",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "chelyabinsk",
+      "files": 111,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "chita",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "habarovsk",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "irkutsk",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "ivanovo",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "izhevsk",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "kaliningrad",
+      "files": 91,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "kaluga",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "kemerovo",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "kirov",
+      "files": 1,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "kirov-kirovskaya-oblast",
+      "files": 5,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "kostroma",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "krasnodar",
+      "files": 74,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "krasnoyarsk",
+      "files": 71,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "kurgan",
+      "files": 7,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "kursk",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "lipeck",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "moscow",
+      "files": 243,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "murmansk",
+      "files": 7,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "nizhny-novgorod",
+      "files": 115,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "novosibirsk",
+      "files": 101,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "omsk",
+      "files": 86,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "orel",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "orenburg",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "penza",
+      "files": 74,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "perm",
+      "files": 80,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "pskov",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "rostov-na-donu",
+      "files": 86,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "ryazan",
+      "files": 94,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "samara",
+      "files": 80,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "saransk",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "saratov",
+      "files": 77,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "sevastopol",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "simferopol",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "smolensk",
+      "files": 96,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "sochi",
+      "files": 98,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "sortavala",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "stavropol",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "surgut",
+      "files": 8,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "syktyvkar",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "tambov",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "tolyatti",
+      "files": 8,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "tomsk",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "tula",
+      "files": 87,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "tver",
+      "files": 90,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "tyumen",
+      "files": 102,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "ufa",
+      "files": 85,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "ulan-ude",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "ulyanovsk",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "veliky-novgorod",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "vladikavkaz",
+      "files": 8,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "vladimir",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "vladivostok",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "volgograd",
+      "files": 75,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "vologda",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "voronezh",
+      "files": 92,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "vyborg",
+      "files": 8,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "yaroslavl",
+      "files": 74,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "yoshkar-ola",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "yuzhno-sahalinsk",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    }
+  ],
+  "full": {
+    "abakan": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "arhangelsk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "astrahan": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "barnaul": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "belgorod": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "blagoveschensk-amurskaya-oblast": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "bryansk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "cheboksary": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "chelyabinsk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "chita": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "ekaterinburg": {
+      "md5Dups": [],
+      "near": [
+        {
+          "d": 1,
+          "a": "belaya-bashnya.jpg",
+          "b": "mostik-vlyublennyh-bazhovskie.jpg"
+        }
+      ],
+      "clusters": [
+        [
+          "belaya-bashnya.jpg",
+          "mostik-vlyublennyh-bazhovskie.jpg"
+        ]
+      ]
+    },
+    "habarovsk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "irkutsk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "ivanovo": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "izhevsk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "kaliningrad": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "kaluga": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "kazan": {
+      "md5Dups": [],
+      "near": [
+        {
+          "d": 1,
+          "a": "azimovskaya-mechet.jpg",
+          "b": "raifa-ekotropa-zapovednika.jpg"
+        }
+      ],
+      "clusters": [
+        [
+          "azimovskaya-mechet.jpg",
+          "raifa-ekotropa-zapovednika.jpg"
+        ]
+      ]
+    },
+    "kemerovo": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "kirov": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "kirov-kirovskaya-oblast": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "kostroma": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "krasnodar": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "krasnoyarsk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "kurgan": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "kursk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "lipeck": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "moscow": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "murmansk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "nizhny-novgorod": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "novosibirsk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "omsk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "orel": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "orenburg": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "penza": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "perm": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "place": {
+      "md5Dups": [],
+      "near": [
+        {
+          "d": 2,
+          "a": "korolevskiy-bor.jpg",
+          "b": "ornitologicheskaya-stantsiya-fringilla.jpg"
+        }
+      ],
+      "clusters": [
+        [
+          "korolevskiy-bor.jpg",
+          "ornitologicheskaya-stantsiya-fringilla.jpg"
+        ]
+      ]
+    },
+    "pskov": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "rostov-na-donu": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "ryazan": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "saint-petersburg": {
+      "md5Dups": [],
+      "near": [
+        {
+          "d": 1,
+          "a": "admiralteystvo.jpg",
+          "b": "divo-ostrov.jpg"
+        },
+        {
+          "d": 1,
+          "a": "admiralteystvo.jpg",
+          "b": "yusupovskiy-dvorets.jpg"
+        },
+        {
+          "d": 2,
+          "a": "divo-ostrov.jpg",
+          "b": "kryshi.jpg"
+        },
+        {
+          "d": 2,
+          "a": "divo-ostrov.jpg",
+          "b": "mihaylovskiy-zamok.jpg"
+        },
+        {
+          "d": 2,
+          "a": "divo-ostrov.jpg",
+          "b": "sheremetevskiy-dvorets-fontannyy-dom.jpg"
+        },
+        {
+          "d": 2,
+          "a": "divo-ostrov.jpg",
+          "b": "yusupovskiy-dvorets.jpg"
+        },
+        {
+          "d": 2,
+          "a": "kryshi.jpg",
+          "b": "tsentralnyy-voenno-morskoy-muzey.jpg"
+        },
+        {
+          "d": 2,
+          "a": "mihaylovskiy-zamok.jpg",
+          "b": "sheremetevskiy-dvorets-fontannyy-dom.jpg"
+        }
+      ],
+      "clusters": [
+        [
+          "admiralteystvo.jpg",
+          "divo-ostrov.jpg",
+          "yusupovskiy-dvorets.jpg",
+          "kryshi.jpg",
+          "mihaylovskiy-zamok.jpg",
+          "sheremetevskiy-dvorets-fontannyy-dom.jpg",
+          "tsentralnyy-voenno-morskoy-muzey.jpg"
+        ]
+      ]
+    },
+    "samara": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "saransk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "saratov": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "sevastopol": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "simferopol": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "smolensk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "sochi": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "sortavala": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "stavropol": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "surgut": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "syktyvkar": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "tambov": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "tolyatti": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "tomsk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "tula": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "tver": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "tyumen": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "ufa": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "ulan-ude": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "ulyanovsk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "veliky-novgorod": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "vladikavkaz": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "vladimir": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "vladivostok": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "volgograd": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "vologda": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "voronezh": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "vyborg": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "yaroslavl": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "yoshkar-ola": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "yuzhno-sahalinsk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    }
+  }
+}
