@@ -2,11 +2,13 @@ import type { Metadata } from 'next';
 import { notFound, permanentRedirect } from 'next/navigation';
 
 import { BlogArticleView } from '@/components/BlogArticleView';
+import { BLOG_POSTS } from '@/data/blog-posts';
 import '@/lib/env';
 import { buildBlogArticleJsonLd, buildBlogArticleMetadata } from '@/lib/blog-article-seo';
 import { getCachedBlogArticle, getCachedBlogRelated } from '@/server/cached-blog-data';
 
 export const revalidate = 300;
+export const dynamicParams = true;
 
 /** Старые slug → каноническая статья (объединения / переезды). */
 const BLOG_SLUG_REDIRECTS: Record<string, string> = {
@@ -19,6 +21,13 @@ const BLOG_SLUG_REDIRECTS: Record<string, string> = {
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
+
+/** Prebuild the editorial catalog; CMS-only slugs still use on-demand ISR. */
+export function generateStaticParams() {
+  return BLOG_POSTS.filter((post) => post.slug && !BLOG_SLUG_REDIRECTS[post.slug]).map((post) => ({
+    slug: post.slug,
+  }));
+}
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;

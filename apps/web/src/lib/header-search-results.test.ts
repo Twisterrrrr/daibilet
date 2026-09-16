@@ -91,3 +91,42 @@ test('header search still returns Выборг when the API list is empty or cra
     '/cities/leningradskaya-oblast?city=vyborg',
   );
 });
+
+test('header search collapses slot twins with the same title and context', () => {
+  const items = mergeHeaderSearchItems('матрешки', [
+    {
+      type: 'event',
+      label: 'Билет в Музей Матрешки',
+      sublabel: 'Санкт-Петербург · Музей Матрешки',
+      href: '/events/matreshki-slot-1',
+    },
+    {
+      type: 'event',
+      label: 'Билет в музей матрёшки',
+      sublabel: 'Санкт Петербург — Музей Матрешки',
+      href: '/events/matreshki-slot-2',
+    },
+  ]);
+
+  assert.equal(items.length, 1);
+  assert.equal(items[0]?.href, '/events/matreshki-slot-1');
+});
+
+test('header search keeps same title at another venue', () => {
+  const items = mergeHeaderSearchItems('ночь в музее', [
+    {
+      type: 'event',
+      label: 'Ночь в музее',
+      sublabel: 'Москва · Музей А',
+      href: '/events/night-a',
+    },
+    {
+      type: 'event',
+      label: 'Ночь в музее',
+      sublabel: 'Москва · Музей Б',
+      href: '/events/night-b',
+    },
+  ]);
+
+  assert.equal(items.length, 2);
+});

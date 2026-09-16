@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 import { resolveBlogCityHref } from '@/lib/blog-article-city';
 import { stripColumnMetaPrefix } from '@/lib/blog-meta';
-import type { BlogArticleDto } from '@/lib/blog-utils';
+import type { BlogArticleDto, BlogCardDto } from '@/lib/blog-utils';
 import { resolveBlogShareImage } from '@/lib/blog-og-image';
 import {
   BLOG_HUB_DESCRIPTION,
@@ -163,5 +163,31 @@ export function buildBlogListMetadata(): Metadata {
       imageWidth: 1200,
       imageHeight: 630,
     }),
+  };
+}
+
+export function buildBlogListJsonLd(posts: BlogCardDto[]): Record<string, unknown> {
+  const items = posts.filter((post) => post.slug && post.title).slice(0, 48);
+  const canonical = absoluteUrl('/blog');
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    name: 'Блог Дайбилет',
+    description: BLOG_HUB_DESCRIPTION,
+    url: canonical,
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: items.length,
+      itemListElement: items.map((post, index) => {
+        const url = absoluteUrl(`/blog/${post.slug}`);
+        return {
+          '@type': 'ListItem',
+          position: index + 1,
+          name: post.title,
+          url,
+          item: url,
+        };
+      }),
+    },
   };
 }

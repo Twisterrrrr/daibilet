@@ -11,7 +11,7 @@ test('popular tags map to CHPU landings', () => {
   assert.match(buildCatalogTagHref('Речные прогулки', 'moscow'), /\/rechnye-progulki\/moscow\/?$/);
 
   assert.equal(resolveCatalogTagHref('Рок', 'moscow').kind, 'chpu');
-  assert.equal(buildCatalogTagHref('Рок', 'moscow'), '/kontserty/moscow/?genre=%D0%A0%D0%BE%D0%BA');
+  assert.equal(buildCatalogTagHref('Рок', 'moscow'), '/kontserty/moscow?genre=%D0%A0%D0%BE%D0%BA');
 
   assert.equal(resolveCatalogTagHref('Юмор').kind, 'chpu');
   assert.match(buildCatalogTagHref('Юмор'), /\/stendap-i-yumor\/?$/);

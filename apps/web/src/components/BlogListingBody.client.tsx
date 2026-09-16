@@ -1,16 +1,14 @@
-'use client';
-
 import Link from 'next/link';
-import { Suspense, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { Suspense, type ReactNode } from 'react';
 
 import { BlogFeaturedHero } from '@/components/BlogFeaturedHero';
+import { BlogListingSsrFallback } from '@/components/BlogListingSsrFallback';
 import { BlogListingSidebar } from '@/components/BlogListingSidebar';
 import { BlogListFiltered } from '@/components/BlogListFiltered.client';
 import { BlogListHero } from '@/components/BlogListHero';
 import { cityFilterLabel } from '@/lib/blog-meta';
 import type { BlogSidebarPromoDto } from '@/lib/blog-sidebar-promo';
 import {
-  orderBlogCardsForVisit,
   splitBlogListingHero,
   truncateAtSentence,
   type BlogCardDto,
@@ -42,20 +40,8 @@ export function BlogListingBody({
   afishaPromos = {},
 }: BlogListingBodyProps) {
   // Cross-city feed by default: header CityPicker must not hard-filter /blog.
-  // Featured stays pinned (isFeatured || editorial first); only the rest reshuffles per reload.
-  const { featured, feed: ssrFeed, hot: ssrHot } = useMemo(
-    () => splitBlogListingHero(posts),
-    [posts],
-  );
-  const [feed, setFeed] = useState(ssrFeed);
-  const [hot, setHot] = useState(ssrHot);
-
-  useEffect(() => {
-    const ordered = orderBlogCardsForVisit(posts);
-    const next = splitBlogListingHero(ordered);
-    setFeed(next.feed);
-    setHot(next.hot);
-  }, [posts]);
+  // Keep the server order deterministic so crawlers and hydration see the same cards.
+  const { featured, feed, hot } = splitBlogListingHero(posts);
 
   const fallbackCityLabel = featured ? cityFilterLabel(featured.citySlug, featured.city) : null;
   const afishaFallbackCityName =
@@ -109,17 +95,12 @@ export function BlogListingBody({
       <div className="container-page blog-listing-container pt-6 pb-10 sm:pt-8 sm:pb-14">
         <Suspense
           fallback={
-            <div className="space-y-4">
-              <div className="h-10 w-full max-w-xl animate-pulse rounded-xl bg-gradient-to-r from-sky-100 to-primary-100/70" />
-              <div className="catalog-card-grid">
-                {Array.from({ length: 6 }).map((_, index) => (
-                  <div
-                    key={index}
-                    className="h-64 animate-pulse rounded-2xl bg-gradient-to-br from-sky-100/90 via-primary-50 to-amber-50/80"
-                  />
-                ))}
-              </div>
-            </div>
+            <BlogListingSsrFallback
+              posts={feed}
+              featuredSlot={featuredSlot}
+              editorialQuote={editorialQuote}
+              sidebarSlot={sidebarSlot}
+            />
           }
         >
           <BlogListFiltered

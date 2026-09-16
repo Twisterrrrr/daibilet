@@ -8,6 +8,7 @@ import {
   isMuseumLikeSearchVenue,
   searchVenueTextKey,
 } from './public-search-venues.ts';
+import { collapsePublicSearchEventRows } from './public-search-events.ts';
 
 const LANDING_CATEGORY_PATH: Record<string, string> = {
   'river-cruises': 'rechnye-progulki',
@@ -38,9 +39,9 @@ const CITY_SCOPED_LANDING_PATH: Record<string, { city: string; topic: string }> 
 
 function landingSearchHref(slug: string): string {
   const scoped = CITY_SCOPED_LANDING_PATH[slug];
-  if (scoped) return `/${scoped.city}/${scoped.topic}/`;
+  if (scoped) return `/${scoped.city}/${scoped.topic}`;
   const category = LANDING_CATEGORY_PATH[slug] || slug;
-  return `/${category}/`;
+  return `/${category}`;
 }
 
 export type PublicSearchItem = {
@@ -163,11 +164,12 @@ export async function buildPublicSearchDto(
     );
   }
 
-  const [events, venues, landings] = await Promise.all([
-    searchEventsTrgm(primary, like, cityFilter, 6),
+  const [eventRows, venues, landings] = await Promise.all([
+    searchEventsTrgm(primary, like, cityFilter, 24),
     searchVenuesTrgm(primary, like, cityFilter, 4),
     searchLandingsIlike(terms, 3),
   ]);
+  const events = collapsePublicSearchEventRows(eventRows, 6);
 
   for (const row of events) {
     push(

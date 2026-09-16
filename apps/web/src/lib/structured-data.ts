@@ -1,4 +1,5 @@
 import type {
+  PublicCatalogListItemDto,
   PublicCityPageDto,
   PublicEventDto,
   PublicEventPageDto,
@@ -94,10 +95,7 @@ export function buildLandingBreadcrumbs(input: {
   return crumbs;
 }
 
-/**
- * ItemList только для CHPU-листингов с непустой выдачей.
- * Не вызывать для `/events` каталога.
- */
+/** ItemList для CHPU-листингов с непустой выдачей. */
 export function buildLandingItemListJsonLd(input: {
   sessions: Array<Pick<PublicSessionDto, 'title' | 'slug' | 'sourceSlug' | 'id'>>;
   canonicalPath: string;
@@ -122,6 +120,59 @@ export function buildLandingItemListJsonLd(input: {
         item: toAbsoluteUrl(path),
       };
     }),
+  };
+}
+
+/** `/events` index: crawlable event URLs without pretending the listing is an Event detail page. */
+export function buildEventsCatalogItemListJsonLd(
+  sessions: Array<Pick<PublicCatalogListItemDto, 'title' | 'slug' | 'id'>>,
+): Record<string, unknown> | null {
+  const items = sessions.slice(0, 48);
+  if (!items.length) return null;
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Афиша событий',
+    url: toAbsoluteUrl('/events'),
+    numberOfItems: items.length,
+    itemListElement: items.map((session, index) => {
+      const path = eventHref(session);
+      return {
+        '@type': 'ListItem',
+        position: index + 1,
+        name: formatPublicTitle(session.title),
+        url: toAbsoluteUrl(path),
+        item: toAbsoluteUrl(path),
+      };
+    }),
+  };
+}
+
+export function buildCollectionPageJsonLd(input: {
+  name: string;
+  description?: string | null;
+  canonicalPath: string;
+  items: Array<{ name: string; path: string }>;
+}): Record<string, unknown> {
+  const items = input.items.slice(0, 100);
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: input.name,
+    description: input.description || undefined,
+    url: toAbsoluteUrl(input.canonicalPath),
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: items.length,
+      itemListElement: items.map((item, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: item.name,
+        url: toAbsoluteUrl(item.path),
+        item: toAbsoluteUrl(item.path),
+      })),
+    },
   };
 }
 
@@ -160,7 +211,10 @@ export function buildBreadcrumbListJsonLd(items: StructuredBreadcrumb[]): Record
   };
 }
 
-function pickEventStartDate(payload: PublicEventPageDto): string | undefined {
+function pickEventSchedule(payload: PublicEventPageDto): {
+  startDate?: string;
+  endDate?: string;
+} {
   const sessions = payload.sessions ?? [];
   const dated = sessions.find(
     (session) =>
@@ -168,10 +222,23 @@ function pickEventStartDate(payload: PublicEventPageDto): string | undefined {
       !isFlexibleScheduleSession(session) &&
       !Number.isNaN(Date.parse(session.startsAt)),
   );
-  if (dated?.startsAt) return dated.startsAt;
+  if (dated?.startsAt) {
+    return {
+      startDate: dated.startsAt,
+      endDate: dated.endsAt && !Number.isNaN(Date.parse(dated.endsAt)) ? dated.endsAt : undefined,
+    };
+  }
 
   const anyDated = sessions.find((session) => session.startsAt && !Number.isNaN(Date.parse(session.startsAt)));
-  return anyDated?.startsAt || undefined;
+  return anyDated?.startsAt
+    ? {
+        startDate: anyDated.startsAt,
+        endDate:
+          anyDated.endsAt && !Number.isNaN(Date.parse(anyDated.endsAt))
+            ? anyDated.endsAt
+            : undefined,
+      }
+    : {};
 }
 
 function resolveOfferPrice(payload: PublicEventPageDto): number | null {
@@ -187,21 +254,6 @@ function resolveOfferPrice(payload: PublicEventPageDto): number | null {
   return null;
 }
 
-function resolveOfferUrl(payload: PublicEventPageDto, canonical: string): string {
-  const event = payload.event;
-  const candidates = [
-    event.purchaseUrl,
-    event.deeplinkUrl,
-    ...(payload.offers ?? []).map((offer) => offer.purchaseUrl),
-    ...(payload.sessions ?? []).map((session) => session.purchaseUrl),
-  ];
-  for (const raw of candidates) {
-    const value = String(raw || '').trim();
-    if (/^https?:\/\//i.test(value)) return value;
-  }
-  return canonical;
-}
-
 /** Schema.org Event (+ Offer при наличии цены). AggregateRating — только при ≥10 реальных отзывов. */
 export function buildEventJsonLd(
   payload: PublicEventPageDto,
@@ -210,7 +262,7 @@ export function buildEventJsonLd(
   const event = payload.event;
   const path = event.canonicalPath || eventHref(event);
   const canonical = toAbsoluteUrl(path);
-  const startDate = pickEventStartDate(payload);
+  const schedule = pickEventSchedule(payload);
   const image = event.imageUrl ? toAbsoluteUrl(event.imageUrl) : undefined;
   const description = event.seoDescription || event.description || undefined;
   const price = resolveOfferPrice(payload);
@@ -246,7 +298,8 @@ export function buildEventJsonLd(
     image: image ? [image] : undefined,
     eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
     eventStatus: 'https://schema.org/EventScheduled',
-    startDate,
+    startDate: schedule.startDate,
+    endDate: schedule.endDate,
     location,
     organizer: {
       '@type': 'Organization',
@@ -258,7 +311,7 @@ export function buildEventJsonLd(
   if (price != null) {
     block.offers = {
       '@type': 'Offer',
-      url: resolveOfferUrl(payload, canonical),
+      url: canonical,
       price: String(Math.round(price)),
       priceCurrency: 'RUB',
       availability: 'https://schema.org/InStock',
@@ -320,7 +373,20 @@ export function buildCityPageJsonLd(payload: PublicCityPageDto): Array<Record<st
     return buildRegionPageJsonLd(payload);
   }
 
+  const city = payload.city;
+  const canonicalPath = city.canonicalPath || `/cities/${city.slug}`;
   const blocks: Array<Record<string, unknown>> = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'City',
+      name: city.seoH1 || city.name,
+      description: city.seoDescription || undefined,
+      url: toAbsoluteUrl(canonicalPath),
+      containedInPlace: {
+        '@type': 'Country',
+        name: 'Россия',
+      },
+    },
     buildBreadcrumbListJsonLd(buildCityBreadcrumbs(payload)),
   ];
 
@@ -334,6 +400,38 @@ export function buildCityPageJsonLd(payload: PublicCityPageDto): Array<Record<st
   if (decision.indexable) {
     const faq = buildFaqPageJsonLd(buildCityFaqItems(payload));
     if (faq) blocks.unshift(faq);
+
+    const venues = (payload.venues || [])
+      .filter((venue) => venue.id && venue.name)
+      .slice(0, 24);
+    if (venues.length) {
+      blocks.push({
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        name: `Места и площадки: ${city.name}`,
+        numberOfItems: venues.length,
+        itemListElement: venues.map((venue, index) => {
+          const path = venue.canonicalPath || venueHref(venue);
+          return {
+            '@type': 'ListItem',
+            position: index + 1,
+            item: {
+              '@type': 'Place',
+              name: venue.seoH1 || venue.title || venue.name,
+              url: toAbsoluteUrl(path),
+              address: venue.address
+                ? {
+                    '@type': 'PostalAddress',
+                    addressLocality: city.name,
+                    streetAddress: venue.address,
+                    addressCountry: 'RU',
+                  }
+                : undefined,
+            },
+          };
+        }),
+      });
+    }
   }
 
   return blocks;

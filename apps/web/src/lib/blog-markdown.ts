@@ -20,7 +20,18 @@ export const PRICE_RE =
 const INLINE_MD_RE = /\[([^\]]+)\]\(([^)]+)\)|\*\*([^*]+)\*\*|\*([^*]+)\*/g;
 
 export function normalizeBlogHref(href: string | null | undefined): string {
-  return String(href || '').trim();
+  const value = String(href || '').trim();
+  if (!value) return '';
+
+  const match = value.match(/^([^?#]*)([?#].*)?$/);
+  const base = match?.[1] || value;
+  const suffix = match?.[2] || '';
+  const isInternalPath = base.startsWith('/') && !base.startsWith('//');
+  const isDaibiletUrl = /^https?:\/\/(?:www\.)?daibilet\.ru(?:\/|$)/i.test(base);
+  if (!isInternalPath && !isDaibiletUrl) return value;
+
+  const rootOnly = base === '/' || /^https?:\/\/(?:www\.)?daibilet\.ru\/?$/i.test(base);
+  return `${rootOnly ? base : base.replace(/\/+$/, '')}${suffix}`;
 }
 
 export function isUsableBlogHref(href: string | null | undefined): boolean {

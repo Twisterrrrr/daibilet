@@ -20,11 +20,11 @@ describe('blog-markdown inline', () => {
     assert.deepEqual(links[0], {
       type: 'link',
       text: 'экскурсии по Казани',
-      href: '/ekskursii/kazan/',
+      href: '/ekskursii/kazan',
     });
     assert.equal(links[1].type, 'link');
     if (links[1].type === 'link') {
-      assert.equal(links[1].href, 'https://daibilet.ru/rechnye-progulki/kazan/');
+      assert.equal(links[1].href, 'https://daibilet.ru/rechnye-progulki/kazan');
     }
   });
 

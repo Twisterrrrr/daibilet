@@ -349,11 +349,11 @@ export function landingCategoryHref(
   if (isCityScopedLanding(slug)) {
     const city = DEFAULT_CITY_BY_LANDING_SLUG[slug] || citySlug;
     const citySegment = cityPathSegment(city);
-    if (!citySegment) return `/${CITY_LANDING_PATH_BY_SLUG[slug] || slug}/`;
+    if (!citySegment) return `/${CITY_LANDING_PATH_BY_SLUG[slug] || slug}`;
     const topic = CITY_LANDING_PATH_BY_SLUG[slug] || slug;
     const segments = [citySegment, topic];
     if (options?.subcategory) segments.push(options.subcategory.replace(/^\/+|\/+$/g, ''));
-    return `/${segments.join('/')}/`;
+    return `/${segments.join('/')}`;
   }
 
   const categoryPath = LANDING_CATEGORY_PATH_BY_SLUG[slug] || slug;
@@ -368,7 +368,7 @@ export function landingCategoryHref(
     segments.push(options.subcategory.replace(/^\/+|\/+$/g, ''));
   }
 
-  return `/${segments.join('/')}/`;
+  return `/${segments.join('/')}`;
 }
 
 export function resolveMisorderedLandingRedirect(pathname: string): string | null {
@@ -496,10 +496,10 @@ export function resolveConcertGenreTag(value?: string | null): string | null {
   return exact || null;
 }
 
-/** /kontserty/moscow/?genre=Джаз — лендинг концертов с городом и жанром. */
+/** /kontserty/moscow?genre=Джаз — лендинг концертов с городом и жанром. */
 export function concertsLandingHref(citySlug?: string | null, genre?: string | null): string {
   const citySegment = citySlug ? cityPathSegment(citySlug) || citySlug : null;
-  const base = citySegment ? `/kontserty/${citySegment}/` : '/kontserty/';
+  const base = citySegment ? `/kontserty/${citySegment}` : '/kontserty';
   const genreTag = resolveConcertGenreTag(genre);
   if (!genreTag) return base;
   return `${base}?genre=${encodeURIComponent(genreTag)}`;

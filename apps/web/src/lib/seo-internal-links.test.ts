@@ -45,7 +45,7 @@ describe('seo-internal-links', () => {
     });
     assert.ok(match);
     assert.equal(match!.landingSlug, 'standup');
-    assert.equal(match!.href, '/stendap-i-yumor/saint-petersburg/');
+    assert.equal(match!.href, '/stendap-i-yumor/saint-petersburg');
     assert.equal(match!.label, 'Стендап и юмор');
   });
 });
@@ -71,7 +71,7 @@ describe('structured-data landing/event', () => {
     );
     assert.equal(crumbs[0].path, '/');
     assert.equal(crumbs[1].path, '/cities/sankt-peterburg');
-    assert.equal(crumbs[2].path, '/stendap-i-yumor/saint-petersburg/');
+    assert.equal(crumbs[2].path, '/stendap-i-yumor/saint-petersburg');
   });
 
   it('landing JSON-LD omits ItemList when empty', () => {

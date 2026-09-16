@@ -18,6 +18,24 @@ export type HeaderSearchItem = {
 const RESULT_LIMIT = 8;
 const GEO_SLOTS = 2;
 
+function normalizedResultPart(value?: string | null): string {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/ё/g, 'е')
+    .replace(/[-–—]/gu, ' ')
+    .replace(/[^a-z0-9а-я]+/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function eventContextKey(item: HeaderSearchItem): string | null {
+  if (item.type !== 'event') return null;
+  const label = normalizedResultPart(item.label);
+  if (!label) return null;
+  return `${label}|${normalizedResultPart(item.sublabel)}`;
+}
+
 function geoHitToSearchItem(hit: SearchGeoHit): HeaderSearchItem {
   return {
     type: hit.kind === 'suburb' ? 'suburb' : 'city',
@@ -68,10 +86,14 @@ export function mergeHeaderSearchItems(
   const geoItems = headerSearchGeoItems(query, GEO_SLOTS);
   const out: HeaderSearchItem[] = [];
   const seen = new Set<string>();
+  const seenEventContexts = new Set<string>();
   const push = (item: HeaderSearchItem | null | undefined) => {
     const href = String(item?.href || '').trim();
     if (!item || !href || seen.has(href) || out.length >= limit) return;
+    const contextKey = eventContextKey(item);
+    if (contextKey && seenEventContexts.has(contextKey)) return;
     seen.add(href);
+    if (contextKey) seenEventContexts.add(contextKey);
     out.push(item);
   };
   for (const item of geoItems) push(item);
