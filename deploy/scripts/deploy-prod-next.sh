@@ -219,6 +219,11 @@ reap_orphan_next_build_workers "pre-build"
 
 WEB_NEXT_DIR="apps/web/.next"
 WEB_NEXT_PREV="apps/web/.next.prev"
+# The running web service can leave root-owned incremental cache files behind.
+# They are disposable and must be removed before `next build` tries to update
+# `.next/cache/.rscinfo` as the deploy user.
+rm_rf_deploy "${WEB_NEXT_DIR}/cache"
+echo "Cleared ${WEB_NEXT_DIR}/cache before build"
 # Keep last healthy build for rollback if web:build fails mid-SSG.
 if [[ -f "${WEB_NEXT_DIR}/prerender-manifest.json" && -f "${WEB_NEXT_DIR}/BUILD_ID" ]]; then
   rm_rf_deploy "${WEB_NEXT_PREV}"
