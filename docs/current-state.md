@@ -60,7 +60,7 @@
 | Backend/admin/web typecheck | ✅ | |
 | `pnpm deploy:preflight` | ✅ | |
 
-| Мультисобытие `mergeGroupKey` | 🔄 | код в ветке, нужен `db:deploy` + deploy |
+| Мультисобытие `mergeGroupKey` | ✅ | schema+DTO+admin+HP scripts; в tip lineage |
 
 ### Production-green gate (Codex audit 4d0fc7e → fix)
 

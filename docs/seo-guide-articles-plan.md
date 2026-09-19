@@ -167,7 +167,7 @@
 | 1 | `kazan-2-3-dnya-samostoyatelno-karta` | 2026-07-23 09:00 | long | ✅ live | уникальный jpg (batch A) |
 | 8 | `ekb-stendap-uralskiy-yumor` | 2026-07-23 09:00 | events | ✅ live | уникальный jpg (batch A) |
 | 11 | `moscow-2-dnya-samostoyatelno-marshrut` | 2026-07-23 09:00 | long | ✅ live | TODO уникальное фото |
-| 10 | `ekb-uralskiy-mars-bazhovskie-ekskursii` | 2026-07-24 11:15 | top5 | ⏳ schedule | уникальный jpg (batch A) |
+| 10 | `ekb-uralskiy-mars-bazhovskie-ekskursii` | 2026-07-24 11:15 | top5 | ✅ PUBLISHED | уникальный jpg (batch A) |
 | 18 | `sankt-peterburg-3-dnya-samostoyatelno` | 2026-07-24 16:40 | long | ⏳ schedule | TODO уникальное фото |
 | 12 | `moskva-rechnye-progulki-kak-vybrat` | 2026-07-25 14:25 | top5 | ⏳ schedule | TODO уникальное фото |
 | - | `open-air-festy-vyhodnoi-ru` | 2026-07-27 10:35 | column | ⏳ schedule пн | jpg есть |

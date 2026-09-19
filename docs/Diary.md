@@ -1,3 +1,20 @@
+## 2026-09-20 - Status drift residual (B.32 / 0.5.5 / PILOT-2 + VK.10)
+
+### Наблюдения
+- Tip product live без изменений: Deploy [35469406278](https://github.com/Twisterrrrr/daibilet/actions/runs/35469406278) `4dcd3a28`; после tip только docs/`.cursorignore`.
+- Agent curl к daibilet.ru - timeout; WebFetch: `/events` 200, PDP 925 200 (сеансы + «О событии» без сырого `**`).
+- Уже ✅ tip-тикеты (AI-REWRITE-MD / TEP 14460 / EXCLUDE-THEMES / ISR500) не трогали; новый Deploy MSK web не запускали.
+- Stale: B.32 «commit/deploy», 0.5.5 «deploy ⏳», PILOT-2 «waiting», VK.10 «blocker deploy API», FIX.PRICETo «нужен API restart».
+
+### Решения
+- Tasktracker/current-state/seo-guide-plan: B.32 / 0.5.5 / SEO.PODBORKI-PILOT-2 / VK.10 / PRICETo → ✅/superseded; roadmap Next 8.
+- Docs-only commit+push; без MSK deploy / secrets / finance `.159`.
+
+### Проблемы
+- Open: TC reconcile MSK runtime, PERF.WM2 blog ISR, lean home, finance Stage 0 sandbox closeout.
+
+---
+
 ## 2026-09-20 - Deploy/status pass: без нового MSK web
 
 ### Наблюдения
@@ -12,7 +29,7 @@
 - Docs-only commit+push; finance `.159` / secrets не трогали.
 
 ### Проблемы
-- Open (не web-deploy): TC reconcile MSK runtime, PERF.WM2 blog ISR gap, lean home, finance Stage 0 sandbox closeout, PODBORKI-PILOT-2 owner gate.
+- Open (не web-deploy): TC reconcile MSK runtime, PERF.WM2 blog ISR gap, lean home, finance Stage 0 sandbox closeout; PILOT-2 allowlist уже ✅ (см. запись residual выше).
 
 ---
 

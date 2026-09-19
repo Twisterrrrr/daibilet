@@ -78,7 +78,7 @@
 | BLOG.RESTORE-SPB-BARS | owner-текст барного гида | 🔄 | `/blog/spb-barnyy-peterburg-ryumochnye-spikizi` 200, лид «интеллигентно» | ✅ live (CMS body ok) |
 | FIX.TC-CANCELLED-MISSING | `tc:reconcile-missing` на MSK | 🔄 | script в repo; **runtime reconcile на MSK не подтверждён** | 🔄 code; MSK cron/run pending |
 | PERF.WM2 / WEB.LIGHT.A5 | blog `[slug]` ISR | 🔄 / ⏳ | live `Cache-Control: private, no-store` на article | 🔄 code; live gap |
-| SEO.PODBOKI-PILOT-2 | NN+Perm после Вебмастер 1-2 нед | ⏳ | пилот KGD+SPB locked **2026-08-11** → **~19 дней**; окно вышло | 🟡 owner: проверить индекс пилота → старт PILOT-2 |
+| SEO.PODBOKI-PILOT-2 | NN+Perm после Вебмастер 1-2 нед | ⏳ | allowlist NN+Perm уже ✅ (см. `PODBORKI_SEO_PILOT_CITY_SLUGS`) | ✅ code/live; optional: Вебмастер index spot-check |
 
 ## 2026-08-28 - Production readiness (Habr checklist + ROI top-5)
 
@@ -944,7 +944,7 @@ Live: Deploy MSK web [`32371428354`](https://github.com/Twisterrrrr/daibilet/act
 | SEO.PODBORKI-CITY-META | Пилот Title/Desc/H1 + self-canonical `?city=` (active: kgd/spb; msk leftover) | Высокий | ✅ code live; smoke OK |
 | SEO.PODBORKI-STABLE | Stable index/sitemap пилот × (C MULTI + E) + salute D year-round index | Критический | ✅ `028e24b1` Deploy MSK web `31535631523` |
 | SEO.PODBORKI-OVERRIDE | SeoOverride + templates + Stage-1 HTML (5 пар) + intent meta; self-canonical smoke | Критический | ✅ `f8217d70` migrate+upsert MSK; fallback deploy-prod-next; smoke PASS |
-| SEO.PODBORKI-PILOT-2 | Пилот-2: расширить `PODBORKI_SEO_PILOT_CITY_SLUGS` на `nizhny-novgorod` + `perm` (meta/self-canonical/index + intents); SeoOverride только 1–2 ключа/город, не пачкой. **Не внедрять сейчас** | Высокий | 🟡 waiting elapsed: пилот KGD+SPB locked **2026-08-11** → **~19 дней** (2026-08-30); owner: Вебмастер index check → старт PILOT-2 |
+| SEO.PODBORKI-PILOT-2 | Пилот-2: расширить `PODBORKI_SEO_PILOT_CITY_SLUGS` на `nizhny-novgorod` + `perm` (meta/self-canonical/index + intents) | Высокий | ✅ code (owner 2026-09-03): KGD+SPB+NN+Perm в allowlist; SeoOverride по-прежнему точечно; optional Вебмастер index spot-check |
 | SEO.PODBORKI-CITY-3 | Phase 3: card SEO blurbs + «N • от X» | Средний | ⏳ |
 | SEO.PODBORKI-CITY-4 | Phase 4: blog banners → подборка → события | Средний | ⏳ after marker URL lock |
 | SEO.PODBORKI-TRACK | Не смешивать с My Day / не откатывать `seo-listing-texts` index | Высокий | ✅ |
@@ -1059,7 +1059,7 @@ Live: Deploy MSK web [`32371428354`](https://github.com/Twisterrrrr/daibilet/act
 | INC.LOC404.VLAD | STALE 404 `/locations/saint-petersburg-vladimirskiy-sobor` | Критический | ✅ ops 200; code miss≠unavailable + canon redirect |
 | FIX.CITY-MULTI-LANDINGS | normalizeKnownCitySlug: все destination cities → концерты/стендап в hub/podborki | Критический | ✅ live: `landing-routes` (all destination-like slugs) в Deploy lineage `a5cfaaab` / [34390637907](https://github.com/Twisterrrrr/daibilet/actions/runs/34390637907) |
 | FIX.HERO-CTA-FROM | Hero CTA «от min»; stats min-max | Высокий | ✅ code; deploy пачкой |
-| FIX.PRICETo-REAL | Catalog SQL real priceTo (offers/sessions max) | Высокий | ✅ dto.js; нужен API restart |
+| FIX.PRICETo-REAL | Catalog SQL real priceTo (offers/sessions max) | Высокий | ✅ dto.js live (API restart в последующих Deploy MSK / API waves) |
 | OPS.DEPLOY-HEAD | Live на `7c5f2210` Deploy `31260953355` BUILD_ID=`dKXqka8q8BXEbdT7y7aRQ` | Критический | ✅ |
 | FIX.PRICETo-CTE | Catalog SQL priceTo -> max(priceFrom) hotfix | Критический | ✅ `7c5f2210` (superseded by FIX.PRICETo-REAL) |
 | FIX.TEPLOHOD-404 | HIDE venue_6a4d0400... public teplohod-moskva-99 | Высокий | ✅ API/web 404 |
@@ -1815,7 +1815,7 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | VK.7 | City hub «Главные места»: title → venue/location href | Высокий | ✅ model + UI Link; cityInfo mustSee slug-патч 246 (web+public dirty) |
 | VK.8 | Content places в каталогах /venues|/locations без events | Высокий | ✅ в репо; 🚫 live MSK dto.js без import hub-gate → listing/page null |
 | VK.9 | Bulk seed mustSee → Venue + cityInfo slug (`seed-cityinfo-must-see-venues.js`) | Высокий | ✅ MSK apply: skip-no-city 0 (было 216); aliases latin→кирилл slug; cityInfo 246 slug dirty |
-| VK.10 | Deploy+restart MSK API (dto hub-gate) + smoke Perm 6 in /locations|/venues | Критический | ⏳ blocker видимости для owner |
+| VK.10 | Deploy+restart MSK API (dto hub-gate) + smoke Perm 6 in /locations|/venues | Критический | ✅ superseded: hub-gate в tip lineage; locations/venues live (см. CAT.HUB-LOCATION-PAGES / VK.16+) |
 | VK.11 | Editorial enrich must-see top-12 cities (hookFact/about/way/coords/address/metro) | Высокий | ✅ 69 MSK; shortDescription preserve; CMS kind guard; ATTRACTION twins HIDDEN |
 | VK.12 | Editorial enrich batch2: Омск/Уфа/Новгород/Тверь/Краснодар/Сочи/Тюмень/Воронеж/Ростов (53) | Высокий | ✅ 53 update MSK; база 122; shortDescription preserve |
 | VK.12b | Ростов: Центральный рынок (Старый базар) editorial #6 | Средний | ✅ MSK; база 123 |
@@ -2542,16 +2542,29 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 
 ## Общий product roadmap (сводка 2026-09-20)
 
-Live web tip: Deploy MSK [35469406278](https://github.com/Twisterrrrr/daibilet/actions/runs/35469406278) `4dcd3a28` BUILD_ID=`W613Pc4T6ddj9IkD670wc`. Свежий web batch **не** нужен: после tip только docs/`.cursorignore`.
+Live web tip: Deploy MSK [35469406278](https://github.com/Twisterrrrr/daibilet/actions/runs/35469406278) `4dcd3a28` BUILD_ID=`W613Pc4T6ddj9IkD670wc`. Свежий web batch **не** нужен: после tip только docs/`.cursorignore`. WebFetch 2026-09-20: `/events` 200; PDP 925 200 (сеансы + чистое «О событии»).
 
 | Контур | Где сейчас | Ближайшее (P0–P1) |
 |--------|------------|-------------------|
-| **Web / catalog** | TEP 14460, AI markdown PDP, exclude themes, ISR500 cookies - ✅ live | Visual buy smoke TEP 925 (optional); lean home (`PERF.HOME-EVENTS-SSR`); blog ISR HIT (`PERF.WM2`) |
+| **Web / catalog** | TEP 14460, AI markdown PDP, exclude themes, ISR500 cookies - ✅ live | Optional visual buy widget 925; lean home (`PERF.HOME-EVENTS-SSR`); blog ISR HIT (`PERF.WM2`) |
 | **Catalog ops** | TC sync nightly есть | `FIX.TC-CANCELLED-MISSING`: подтвердить `tc:reconcile-missing` cron/run на MSK |
-| **SEO** | Pilot KGD+SPB locked 2026-08-11; окно вышло | Owner: индекс пилота → `SEO.PODBORKI-PILOT-2` (NN+Perm) |
+| **SEO** | PILOT-2 allowlist ✅ (KGD+SPB+NN+Perm) | Optional Вебмастер index; `SEO.PODBORKI-CITY-3/4` blurbs/banners |
 | **Finance / LC** | Stage 0 code live на `.159` | **Blocker:** sandbox pay → `CONFIRMED` + `ticketNumbers` (не трогать `.159` агентом) |
 | **Geo / хабы** | Registry 86/86; hub packs в tip | Editorial coords thin hubs; MSK mustSee grow (~56 gap) |
-| **Perf / ops** | Deploy cadence batch / по запросу | Не гонять MSK build на docs; optional env audit `TEP_WIDGET_ID` |
+| **Perf / ops** | Deploy cadence batch / по запросу | TC reconcile MSK; lean home / blog ISR; не MSK build на docs |
+
+### Next 8 (приоритет)
+
+1. **P0 finance closeout** - `M1.WH` / Stage 0: sandbox pay → `CONFIRMED` + `ticketNumbers` (owner + Codex; агент не трогает `.159`).
+2. **P0 catalog hygiene** - `FIX.TC-CANCELLED-MISSING`: один подтверждённый run/cron `tc:reconcile-missing` на MSK.
+3. **P1 perf** - `PERF.HOME-EVENTS-SSR` / `WEB.LIGHT.A1-A2`: lean home HTML.
+4. **P1 perf** - `PERF.WM2` / `WEB.LIGHT.A5`: blog `[slug]` ISR HIT (сейчас live `no-store`).
+5. **P1 SEO** - optional Вебмастер spot-check пилота; затем `SEO.PODBORKI-CITY-3` blurbs.
+6. **P1 geo** - `MS.MSK-GROW200` gap ~56 curated mustSee (качество, не dump).
+7. **P2 UX catalog** - `UX2.FIND-SUGGEST` typeahead (deferred) или mobile `UX.LOC5/6` по запросу.
+8. **P2 content** - thin TEP descriptions / editorial coords long-tail hubs (не web-deploy blocker).
+
+Stuck сейчас не на web deploy: product tip live. Реальные blockers - finance sandbox closeout (owner) и MSK ops confirm TC reconcile.
 
 ---
 
@@ -2630,7 +2643,7 @@ Live web tip: Deploy MSK [35469406278](https://github.com/Twisterrrrr/daibilet/a
 | B.30 | Pack C: 9 гидов + 2 колонки Макса (1024610) | Высокий | ✅ контент+images; blog:upsert prod; slug 404 до publishedAt | владелец + агент |
 | B.30a | Owner early-publish: Самара `samara-vykhodnye-dva-dnya-bez-gonki` (из списка 8 городов) | Высокий | ✅ `836a75f8` live; 🚫 owner 2026-08-08 → HIDDEN (без конкретики); hub blogSlug не было | агент |
 | B.31 | Blog inline images: подпись (figcaption/alt) скрыта по умолчанию, показ при hover | Средний | ✅ 2026-07-27 `BlogFigure` web+public: `group-hover` + `@media(hover:hover)`, `title`+`alt` на img | агент |
-| B.32 | Owner rewrite `ekb-uralskiy-mars-bazhovskie-ekskursii` (3 сценария) | Высокий | 🔄 MD+sync; commit/push/upsert/deploy | агент |
+| B.32 | Owner rewrite `ekb-uralskiy-mars-bazhovskie-ekskursii` (3 сценария) | Высокий | ✅ `PUBLISHED` + unique cover/inline; 3 сценария в MD | агент |
 
 ---
 
@@ -2782,7 +2795,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | 0.5.2 | Teplohod widget bootstrap / related cards | Высокий | ✅ |
 | 0.5.3 | EventCard title + «Подробнее» links | Высокий | ✅ |
 | 0.5.4 | Catalog city filter instant apply | Средний | ✅ |
-| 0.5.5 | Мультисобытие `mergeGroupKey` + HP script | Средний | 🔄 код готов, deploy ⏳ |
+| 0.5.5 | Мультисобытие `mergeGroupKey` + HP script | Средний | ✅ schema+DTO+admin+HP scripts; в tip lineage live |
 | 0.5.6 | Admin lists pagination / lean payloads (orders, buyers, events, venues) | Критический | ✅ 2026-07-13 deploy prod |
 | 0.5.7 | Admin cities/landings page envelopes + landing detail events pager + compact dashboard | Критический | ✅ 2026-07-14 |
 | 0.5.8 | Быстрые переключения админки: SWR catalog + landings base-cache + sources SWR | Высокий | ✅ 2026-07-14 |
