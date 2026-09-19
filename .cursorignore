@@ -8,6 +8,9 @@ node_modules/
 **/node_modules/
 
 # Prisma generated / engine cache (default .prisma + monorepo)
+# Ignore .prisma dirs only - never schema.prisma
+.prisma/
+**/.prisma/
 node_modules/.prisma/
 **/node_modules/.prisma/
 packages/db/node_modules/.prisma/
