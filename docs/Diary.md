@@ -1,17 +1,17 @@
-## 2026-09-19 - Status audit (без live curl)
+## 2026-09-20 - Re-audit (.cursorignore + Tasktracker; без curl к live)
 
 ### Наблюдения
-- Предыдущие субагенты упали на provider/SQLite/curl timeout; сверка только git + `gh run view`.
-- Live Deploy MSK web: `34390637907` head `a5cfaaab`; предыдущий batch `34378885906` head `7ba0fb27`.
-- TEP defaults `14460` были только в working tree: committed HEAD ещё `14208` (кроме `dto.js`).
+- Повтор после падений субагентов: только git + `gh run view` (без HTTP к daibilet.ru).
+- Live tip по GHA: Deploy [34390637907](https://github.com/Twisterrrrr/daibilet/actions/runs/34390637907) `a5cfaaab`; batch [34378885906](https://github.com/Twisterrrrr/daibilet/actions/runs/34378885906) `7ba0fb27`.
+- TEP defaults `14460` уже в HEAD `4dcd3a28`; Deploy MSK [35469406278](https://github.com/Twisterrrrr/daibilet/actions/runs/35469406278) in_progress.
 
 ### Решения
-- `.cursorignore` дополнен (Prisma/.next/tmp/.git; `schema.prisma` не игнорим).
-- Tasktracker верх 2026-09: закрыты по evidence `FIX.AI-REWRITE-MD` / `UX2.EXCLUDE-THEMES` / `INC.ISR500.COOKIES`; `FIX.TEP-WIDGET-14460` = code commit + ⏳ MSK env/batch.
-- Live HTTP smoke не гоняли: `code on HEAD; live unknown` кроме SHA из успешных GHA runs.
+- `.cursorignore` подтверждён/дополнен (node_modules/.prisma/migrations/.next/out/build/tmp/.deploy-tmp/.git); `schema.prisma` не игнорим; `.env` не коммитим.
+- Tasktracker: TEP = code ✅ + ⏳ env/deploy; закрыты stale 🔄 с deploy SHA (Hermitage V3, home cities tap, city-hub brief/selects, my-day guide/canon, hub «git без live» → ✅ live).
+- Не перезатирали уже верные ✅; open: TC reconcile MSK, lean home, WEB.LIGHT, finance M1.
 
 ### Проблемы
-- Buy 925 на live останется на `14208`, пока MSK env + API/web batch не подхватят `14460`.
+- Live HTTP unknown; buy 925 на live может ещё держать `14208`, пока env+deploy не подтверждены.
 
 ---
 

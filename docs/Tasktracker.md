@@ -5,7 +5,7 @@
 | SEO.TEP-REWRITE-48 | 48 TEP описаний → EventOverride.description (batches 1–4) | Высокий | ✅ apply на MSK 2026-09-09; script `ed41beca` |
 | FIX.AI-REWRITE-MD | PDP «О событии»: рендер AI markdown (`**h**` / `*em*` / `##` / whole-line headings) | Высокий | ✅ live `1e81d896` в Deploy [34390637907](https://github.com/Twisterrrrr/daibilet/actions/runs/34390637907) (`a5cfaaab`); ## headings `4f1e4953` в HEAD (post-live) |
 | OPS.MSK-SSH-DEPLOY | Owner SSH через `deploy` (root запрещён); diagnose/unban workflows | Высокий | ✅ pubkey + unban; config User=deploy |
-| FIX.TEP-WIDGET-14460 | TEP buy: affiliate widget `14208`→`14460` (925 «закрыто» vs живое расписание) | Критический | ✅ code defaults `14460` (web/public/`provider-purchase`/`.env.example`/`dto.js`); ⏳ MSK env confirm + API/web batch |
+| FIX.TEP-WIDGET-14460 | TEP buy: affiliate widget `14208`→`14460` (925 «закрыто» vs живое расписание) | Критический | ✅ code `4dcd3a28` defaults `14460` (web/public/`provider-purchase`/`.env.example`/`dto.js`); ⏳ MSK env confirm + Deploy [35469406278](https://github.com/Twisterrrrr/daibilet/actions/runs/35469406278) in_progress; live HTTP unknown |
 
 ## 2026-09-08 - AI rewrite event descriptions (admin MVP)
 
@@ -325,7 +325,7 @@ Live: Deploy MSK web [`32371428354`](https://github.com/Twisterrrrr/daibilet/act
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
 | UX.MYDAY-MAX-20 | `DAY_ROUTE_MAX=20`; named presets не режутся soft=10 | Критический | ✅ |
-| CONT.PERM-GREEN-RED | Сценарии Зелёная (20) + Красная (10) в cityInfo | Высокий | ✅ coords+порядок сверены 2026-08-15 (Nominatim/wiki); commit+push, без live / без prod DB seed |
+| CONT.PERM-GREEN-RED | Сценарии Зелёная (20) + Красная (10) в cityInfo | Высокий | ✅ live web `8e0856e3` в Deploy lineage `7ba0fb27`; prod DB seed отдельно по запросу |
 
 ## 2026-08-15 - Hub events zone: festivals + near-city
 
@@ -340,7 +340,7 @@ Live: Deploy MSK web [`32371428354`](https://github.com/Twisterrrrr/daibilet/act
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.HUB-HERO-LOVABLE | Night photo right 62% + mask; night PNGs | Высокий | ✅ commit+push, без live |
+| UX.HUB-HERO-LOVABLE | Night photo right 62% + mask; night PNGs | Высокий | ✅ live `city-night-hero` (`md:w-[62%]`) в Deploy lineage `7ba0fb27` |
 | UX.HUB-FONTS-MANROPE | Hub titles Manrope extrabold tracking-tight | Высокий | ✅ |
 | UX.NAV-TOP-IN-COLUMN | «Наверх» в колонке max-w-[1240px] | Высокий | ✅ |
 | UX.HUB-MOBILE-STICKY | Sticky labels/order; без О городе; Заметки | Высокий | ✅ |
@@ -355,7 +355,7 @@ Live: Deploy MSK web [`32371428354`](https://github.com/Twisterrrrr/daibilet/act
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.MSK-WEATHER | Погода+сезоны Москва (Open-Meteo / day-route) | Высокий | ✅ commit+push, без live |
+| UX.MSK-WEATHER | Погода+сезоны Москва (Open-Meteo / day-route) | Высокий | ✅ live в Deploy lineage `7ba0fb27` |
 | UX.MSK-KGD-PRESET-COVERS | coverImageUrl на 10 MSK presets + KGD classic | Высокий | ✅ commit+push |
 | UX.VISITMINUTES-4 | visitMinutes mustSee: owner table (15/20/30/60/1-2ч/2ч) via `must-see-visit-minutes` | Высокий | ✅ rules + chip/dwell wire |
 | UX.HUB-SEO-P2D | Meta city hubs → единый P.2d как СПб (снять year-шаблон Казань/Екб) | Высокий | ✅ code |
@@ -366,7 +366,7 @@ Live: Deploy MSK web [`32371428354`](https://github.com/Twisterrrrr/daibilet/act
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.HUB-MUSTSEE-ROUTE-TOGGLE | Must-see «+ В маршрут» → «Убрать» + sync via day-route event | Высокий | ✅ commit+push, без live |
+| UX.HUB-MUSTSEE-ROUTE-TOGGLE | Must-see «+ В маршрут» → «Убрать» + sync via day-route event | Высокий | ✅ live `AddToDayRouteButton` compact «Убрать» в Deploy lineage `7ba0fb27` |
 
 ## 2026-08-15 - Affiche collections continuous + must-see subtitle
 
@@ -438,13 +438,13 @@ Live: Deploy MSK web [`32371428354`](https://github.com/Twisterrrrr/daibilet/act
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| HUB.EKB-SCENARIOS-V2 | 3 сценария (Демидовы/авангард/неформальный) + coords + новые точки | Высокий | ✅ git; deploy по «выкатывай» |
+| HUB.EKB-SCENARIOS-V2 | 3 сценария (Демидовы/авангард/неформальный) + coords + новые точки | Высокий | ✅ live (hub pack в Deploy lineage `7ba0fb27`+) |
 
 ## 2026-08-15 - Нижний: городские сценарии + coords
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| HUB.NN-SCENARIOS-V2 | Пересборка `nn-one-day` / `nn-instagram` / `Купеческий вкус` + Nominatim coords / новые точки | Высокий | ✅ git; deploy по «выкатывай» |
+| HUB.NN-SCENARIOS-V2 | Пересборка `nn-one-day` / `nn-instagram` / `Купеческий вкус` + Nominatim coords / новые точки | Высокий | ✅ live (hub pack в Deploy lineage `7ba0fb27`+) |
 
 ## 2026-08-14 - Live: Deploy MSK web `31829274518`
 
@@ -494,7 +494,7 @@ Live: Deploy MSK web [`32371428354`](https://github.com/Twisterrrrr/daibilet/act
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.HUB-LIFEHACKS-NO-TABS | Лайфхаки: все карточки в карусели сразу, без табов категорий | Высокий | ✅ commit+push, без live |
+| UX.HUB-LIFEHACKS-NO-TABS | Лайфхаки: все карточки в карусели сразу, без табов категорий | Высокий | ✅ live `CityLifehacksSection` в Deploy lineage `7ba0fb27` |
 
 ## 2026-08-14 - Hub must-see: desktop single-row carousel
 
@@ -601,9 +601,9 @@ Live: Deploy MSK web [`32371428354`](https://github.com/Twisterrrrr/daibilet/act
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.HUB-AFFICHE-TOURIST | Дефолт «Экскурсии», ранг река/театр > стендап, скрыть тонкий таб Музеи, схлопнуть стендап | Высокий | ✅ git, без live deploy |
-| UX.HUB-AFFICHE-BEFORE-SUBURBS | MSK/SPB/PERM/KGD/NN: афиша после сценариев, пригороды ниже | Высокий | ✅ git, без live deploy |
-| UX.HUB-SUBURB-COLLAPSE | Хохловка и др.: 3 точки + «Ещё N» | Высокий | ✅ git, без live deploy |
+| UX.HUB-AFFICHE-TOURIST | Дефолт «Экскурсии», ранг река/театр > стендап, скрыть тонкий таб Музеи, схлопнуть стендап | Высокий | ✅ live |
+| UX.HUB-AFFICHE-BEFORE-SUBURBS | MSK/SPB/PERM/KGD/NN: афиша после сценариев, пригороды ниже | Высокий | ✅ live |
+| UX.HUB-SUBURB-COLLAPSE | Хохловка и др.: 3 точки + «Ещё N» | Высокий | ✅ live |
 | UX.HUB-FEST-PAST | Прошедшие фестивали в details, не в сетке | Средний | ⛔ superseded: UX.HUB-FEST-PAST-COL |
 
 ## 2026-08-14 - City hub: лайфхаки + сезоны MSK/SPB/KGD/NN
@@ -619,17 +619,17 @@ Live: Deploy MSK web [`32371428354`](https://github.com/Twisterrrrr/daibilet/act
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.PERM-LIFEHACKS | Хаб `#practice`: «Лайфхаки по городу» - 4 таба, короткие карточки, CTA; пилот Пермь | Высокий | ✅ git, без live deploy |
+| UX.PERM-LIFEHACKS | Хаб `#practice`: «Лайфхаки по городу» - 4 таба, короткие карточки, CTA; пилот Пермь | Высокий | ✅ live |
 
 ## 2026-08-14 - Event PDP mobile hero + tickets chrome
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.EVENT-HERO-FULL | Mobile event overlay: crumbs(-title) · type · H1 · place/age · min-max price · nearest · address; не slim под фото | Высокий | ✅ git, без live deploy |
-| UX.EVENT-CRUMB-HIDE-TITLE | Last crumb события hidden (`sr-only`), H1 остаётся источником названия | Высокий | ✅ git, без live deploy |
-| FIX.HEADER-SCROLL-JITTER | Compact header не меняет `--site-header-height` / spacer | Высокий | ✅ git, без live deploy |
-| FIX.EVENT-TICKETS-OVERFLOW | Buy card / date chips / grid `min-w-0` на ~375px | Высокий | ✅ git, без live deploy |
-| UX.EVENT-AUTO-NEXT-SLOT | Default day = первый с открытой продажей; ручной выбор не трогаем | Высокий | ✅ git, без live deploy |
+| UX.EVENT-HERO-FULL | Mobile event overlay: crumbs(-title) · type · H1 · place/age · min-max price · nearest · address; не slim под фото | Высокий | ✅ live (PDP hero batch Sep + Aug) |
+| UX.EVENT-CRUMB-HIDE-TITLE | Last crumb события hidden (`sr-only`), H1 остаётся источником названия | Высокий | ✅ live |
+| FIX.HEADER-SCROLL-JITTER | Compact header не меняет `--site-header-height` / spacer | Высокий | ✅ live |
+| FIX.EVENT-TICKETS-OVERFLOW | Buy card / date chips / grid `min-w-0` на ~375px | Высокий | ✅ live |
+| UX.EVENT-AUTO-NEXT-SLOT | Default day = первый с открытой продажей; ручной выбор не трогаем | Высокий | ✅ live |
 
 ## 2026-08-14 - Empty city labels on blog hero/cards
 
@@ -640,27 +640,27 @@ Live: Deploy MSK web [`32371428354`](https://github.com/Twisterrrrr/daibilet/act
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| FIX.BLOG-CITY-CANON | Городские/мульти статьи не «Регионы»; `afisha-regionalnye-goroda` → Екб/НН/Уфа | Высокий | ✅ git, без live deploy |
+| FIX.BLOG-CITY-CANON | Городские/мульти статьи не «Регионы»; `afisha-regionalnye-goroda` → Екб/НН/Уфа | Высокий | ✅ live |
 
 ## 2026-08-14 - City hub hero: duplicate Афиша
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.CITY-HUB-AFISHA-CTA | City hub hero: одна верхняя «Афиша»; убрать нижний mobile jump-chip | Высокий | ✅ git, без live deploy |
+| UX.CITY-HUB-AFISHA-CTA | City hub hero: одна верхняя «Афиша»; убрать нижний mobile jump-chip | Высокий | ✅ live |
 
 ## 2026-08-14 - PDP slim mobile hero + date chips
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
 | UX.PDP-HERO-SLIM | ~~Mobile overlay: H1 + meta~~ superseded `UX.EVENT-HERO-FULL` (owner 2026-08-14) | Высокий | ⛔ superseded |
-| UX.PDP-DATE-CHIPS | Ticket card date chips: horizontal scroll без clip, fade + peek | Высокий | ✅ git, без live deploy |
+| UX.PDP-DATE-CHIPS | Ticket card date chips: horizontal scroll без clip, fade + peek | Высокий | ✅ live |
 
 ## 2026-08-14 - City picker stale label + blog multi-city filter
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| FIX.CITY-PICKER-STALE | Пикер ГОРОД: лейбл сразу Санкт-Петербург; алиасы saint-petersburg / sankt-peterburg, не stale previous city | Критический | ✅ git, без live deploy |
-| FIX.BLOG-MULTI-CITY | Дропдаун блога: не «Несколько городов», а города с тегов статьи | Высокий | ✅ git, без live deploy |
+| FIX.CITY-PICKER-STALE | Пикер ГОРОД: лейбл сразу Санкт-Петербург; алиасы saint-petersburg / sankt-peterburg, не stale previous city | Критический | ✅ live |
+| FIX.BLOG-MULTI-CITY | Дропдаун блога: не «Несколько городов», а города с тегов статьи | Высокий | ✅ live |
 
 ## 2026-08-14 - Live batch after 7eab8fc
 
@@ -903,7 +903,7 @@ Live: Deploy MSK web [`32371428354`](https://github.com/Twisterrrrr/daibilet/act
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
 | CAT.MONUMENTS-PACK | Пак памятников в каталог `/locations`: СПб 35, Мск 35, НН 16, КГД 15, Пермь 15 | Высокий | ✅ 2026-08-13 MSK DB; hub/My Day mustSee live `31776097211` BUILD_ID=`RQr1vlwv-OuvxsAMcPT3i` |
-| CONT.MYDAY-MONUMENT-THUMBS | Мини-превью памятников пакета 13.08 в My Day (не 2-3MB) | Высокий | ✅ 2026-08-14 GenerateImage x108 + lean JPEG + `MONUMENT_PACK_IMAGES`; 8 старых covers тоже lean; без live deploy |
+| CONT.MYDAY-MONUMENT-THUMBS | Мини-превью памятников пакета 13.08 в My Day (не 2-3MB) | Высокий | ✅ live assets + `MONUMENT_PACK_IMAGES` в Deploy lineage `7ba0fb27` (GenerateImage x108 + lean JPEG) |
 | UX.NAV-PLACES-HUB | Primary V1.1 superseded V1.2 (`UX.NAV-PRIMARY-V12`); `/places` chrome+entity URL без ломки | Высокий | ✅ chrome/301; primary nav → V1.2 |
 | SEO.PLACES-META-301 | Meta city-aware на `/places`; 301 `/venues` `/locations` листинги; sitemap listing = `/places` | Высокий | ✅ 2026-08-13 code; live после Deploy MSK web |
 | UX.PLACES-UNIFIED-SEARCH | Один поиск на раздел Места: `/places?q=` mixed + тег Площадка/Локация; каталоги не режут q по family | Высокий | ✅ live `31693704581` / `31694312986` |
@@ -961,13 +961,13 @@ Live: Deploy MSK web [`32371428354`](https://github.com/Twisterrrrr/daibilet/act
 | P.2r4 | Smoke `region-hub.test.ts` + MSK deploy | Высокий | ✅ test; deploy batch / по запросу |
 | UX.REGION-A1 | Tier A UX Phase A: lean cards, city avatar rail, sticky date+genre, venue series collapse | Критический | ✅ code |
 | UX.REGION-A2 | Tier A UX Phase B: `region-city-belts` (MSK oblast) + logistics chip + orient map | Высокий | ✅ code (пилот `moskovskaya-oblast`) |
-| UX.REGION-A3 | Tier A previews: topPlaces photo-first + city rail session covers; map open by default | Высокий | 🔄 push; deploy по «выкатывай» |
+| UX.REGION-A3 | Tier A previews: topPlaces photo-first + city rail session covers; map open by default | Высокий | ✅ live (region A surfaces в Deploy lineage `7ba0fb27`+) |
 
 ## Follow-up deploy/smoke (2026-08-08)
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| B.ANNA-SOCHI-NIGHT | Колонка Анны: ночной Сочи без глянца (рок/стендап/джаз) | Высокий | 🔄 ship+Deploy MSK web |
+| B.ANNA-SOCHI-NIGHT | Колонка Анны: ночной Сочи без глянца (рок/стендап/джаз) | Высокий | ✅ live (blog column ship; в web Deploy lineage) |
 | B.ARTUR-VII-CHEL | Колонка Артура: гастроспектакль «Вий» в Челябинске (Horse Head) | Высокий | ✅ `8c77f77f` Deploy MSK web `31528362734` |
 | B.MAX-MSK-CIRCLE | Колонка Макса «Как перестать гулять по кругу» + `isFeatured` материал недели | Высокий | ✅ `5e703d2c` upsert+featured; Deploy `31525508276` |
 | UX.MUSTSEE-DROP-BULK | my-day «Главные места»: убрать bulk «Добавить главные места»; chips + list остаются | Высокий | ✅ `8b889e85` Deploy MSK web `31473922071` BUILD_ID=`FZI5gnbEMamJmDZd6NqvN` |
@@ -985,20 +985,22 @@ Live: Deploy MSK web [`32371428354`](https://github.com/Twisterrrrr/daibilet/act
 | UX.MYDAY-STOPS-GRID | `/my-day`: Шаги timeline always on; toggle Сетка\|Список (restore fence) | Критический | ✅ `77debf04` tip `502dcace` Deploy `31429446266` BUILD_ID=`CbfydAWBpi_OYVn2yFIJt` |
 | FIX.EVENT-STANDBY-TEP-TWIN | `/events/…-6a1ef2c…` 404: STAND_BY TC → soft title-twin TEP + permanentRedirect | Критический | ✅ `71a0ccaa` API restart + Deploy `31428772500` |
 | FIX.MYDAY-BOAT-PIERS | my-day boat wizard: dedupe pier twins; hide 0-route cards; Dvortsovaya 18 distance via coords fallback | Критический | ✅ `813160fa` Deploy `31428529388` |
-| UX.HERMITAGE-PDP-V3 | Hermitage PDP: hide commercial tickets; no hero chips; hours above map; Факт; sticky tabs; gallery; open-now; event thumbs; MSK/SPB nearest metro | Критический | 🔄 `896578ab` Deploy `31428001571` |
+| UX.HERMITAGE-PDP-V3 | Hermitage PDP: hide commercial tickets; no hero chips; hours above map; Факт; sticky tabs; gallery; open-now; event thumbs; MSK/SPB nearest metro | Критический | ✅ live Deploy `31428001571` (`896578ab` + follow-ups) |
+
 | UX.HERMITAGE-SPBBOATS | Hermitage PDP: commercial hero/tickets/contacts; similar museums only; title Государственный Эрмитаж | Критический | ✅ `454b315c` Deploy `31419097355` + API restart MSK |
 | FIX.HERMITAGE-ALIAS-PDP | Redirect `gosudarstvennyi-ermitazh`→`ermitazh`; institution PDP: no hero chips, metro, about/visit before routes, FAQ bottom | Критический | ✅ `3fa8979e` Deploy `31415510287` |
 | FIX.HOME-CITIES-LOOP | Popular cities rail: restore infinite arrow loop (no snap-back at last city after ea6c7897) | Критический | ✅ `6234df27` Deploy `31469259250` |
-| FIX.HOME-CITIES-MOBILE-TAP | Popular cities rail mobile: tap opens city hub (defer loop wrap + touch router.push); compact card static event count | Критический | 🔄 `d279f68b` tip `8a340831` Deploy `31500542809` |
+| FIX.HOME-CITIES-MOBILE-TAP | Popular cities rail mobile: tap opens city hub (defer loop wrap + touch router.push); compact card static event count | Критический | ✅ live Deploy `31500542809` |
+
 | UX.HOME-CITIES-MSK-ANCHOR | Popular cities rail: MSK left under H2 (adaptive); SPB next; keep infinite loop | Критический | ✅ `5d995893` tip `65276de6` Deploy `31410582677` |
 | FIX.SWAP-STATIC-COMPAT | Artifact swap: merge `.next.prev` hashed css/chunks/media (no-clobber) so s-maxage HTML не 404 CSS | Критический | ✅ `fc4d8bd7` Deploy `31468859832` BUILD_ID=`VI6qxKHs2rwnQwwgRsaIn` |
 | UX.LOGO-Y-STATIC | Logo: em-кратка point-1 = й always; zero animation; mobile кратка only | Критический | ✅ `4f20ceed` Deploy `31468480615` |
 | UX.LOGO-BREVE-LINE | Logo: solid breve-stroke over «и» → dashed route (replace black point-1) | Критический | ✅ `47fcad03` tip `65276de6` Deploy `31410582677` (superseded by UX.LOGO-Y-STATIC) |
 | UX.CITY-HUB-HERO-CTAS | City hub hero: remove search; restore Афиша + Подборки событий buttons | Критический | ✅ `47fcad03` tip `65276de6` Deploy `31410582677` |
-| UX.CITY-HUB-HERO-BRIEF | City hub: brief in hero; first submenu «Зачем ехать» (не body Описание) | Критический | 🔄 ship |
-| UX.EVENTS-MOBILE-SELECTS | `/events` mobile: search + Дата/Тип dropdowns (не chip rails); desktop date rail | Критический | 🔄 ship |
-| UX.CITY-HUB-EDITORIAL-ORDER | City hub: Описание + Факты + Зачем ехать before «Готовые сценарии» (restore CityWhyGo / places rail) | Критический | ✅ `b113a927` push; deploy по «выкатывай» |
-| UX.EVENTS-CALENDAR-COVERS | `/events`: calendar corner in date rail; remap center-cruise text flyers; live rail full container width | Высокий | ✅ `1c0fd42f` push; deploy по «выкатывай» |
+| UX.CITY-HUB-HERO-BRIEF | City hub: brief in hero; first submenu «Зачем ехать» (не body Описание) | Критический | ✅ live (CityPageView brief-in-hero + tab «Зачем ехать») |
+| UX.EVENTS-MOBILE-SELECTS | `/events` mobile: search + Дата/Тип dropdowns (не chip rails); desktop date rail | Критический | ✅ live `c68d010e` Deploy `31335835810` (см. дубль ниже) |
+| UX.CITY-HUB-EDITORIAL-ORDER | City hub: Описание + Факты + Зачем ехать before «Готовые сценарии» (restore CityWhyGo / places rail) | Критический | ✅ live (editorial order в CityPageView; в lineage post-Aug deploys) |
+| UX.EVENTS-CALENDAR-COVERS | `/events`: calendar corner in date rail; remap center-cruise text flyers; live rail full container width | Высокий | ✅ live (date rail / calendar в lineage Deploy `34390637907`) |
 | UX.CITY-HUB-SEARCH-SCENARIOS | City hub: search hero; scenarios magazine merge; collections grid; editorial blog cards; mobile jump chips | Высокий | ✅ `b3b52684` (hero search superseded by UX.CITY-HUB-HERO-CTAS) |
 | UX.HOME-BLEED-BOX | Homepage rhythm: cities gray full-bleed rail; My Day graphite band; blog magazine feature; editors/popular/podborki boxed | Высокий | ✅ `0a906fe6` push; deploy по «выкатывай» |
 | UX.HOME-RHYTHM | Homepage P0-P2: clean hero+swipe chips; editors rail; merge now/popular; My Day constructor preview; cities/podborki rails | Высокий | ✅ `b48ea8cb` push; deploy по «выкатывай» |
@@ -1036,12 +1038,12 @@ Live: Deploy MSK web [`32371428354`](https://github.com/Twisterrrrr/daibilet/act
 | CONT.TRANSIT-TIPS | Schema `transitTip` + UI suburb timeline; NN logistics; SPB triangle/Petrograd/Bertgold/bar; Perm/KGD tips | Высокий | ✅ `c5d644d8` Deploy MSK web `31305337295` BUILD_ID=`gOTUGQNTVuIsCS_1DvAT_` |
 | CONT.KGD-LOGISTICS | KGD suburbs/presets: коса углубление+Фрингилла возврат, Зел/Свет/Балт/Янт порядок+timingNote | Высокий | ✅ `7644445c` Deploy MSK web `31304947725` |
 | CONT.PERM-LOGISTICS | Perm suburbs/presets: Хохловка CCW, Кунгур центр+пещера, Белая гора split, Усьва/Губаха 2 дня | Высокий | ✅ `7644445c` Deploy MSK web `31304947725` BUILD_ID=`mi3IHPRLphsEf9IgHXj9a` |
-| UX.GUIDE-OPEN | my-day: suburbs/scenarios DayTripCanonCard always open (not accordion); accordion = route tools | Критический | 🔄 ship+Deploy MSK web |
-| UX.MUSTSEE-CHIPS-2ROW | Hub must-see filter chips: mobile 2-row horizontal scroll; sm+ wrap | Критический | 🔄 ship+Deploy MSK web |
-| UX.CANON-ALIGN | DayTripCanonCard desktop: gutter nums + text vertical = title; mobile wider; tips; scenarios carousel | Критический | 🔄 ship+Deploy MSK web |
-| UX.SCENARIOS-WRAP | Scenarios chips: mobile carousel (nowrap scroll), sm+ wrap; SPB drop suburb dupes | Критический | 🔄 ship+Deploy MSK web |
-| UX.MYDAY-TRANSIT | Between-stop `↓ tip` in my-day list; merge keeps transitTip; Peterhof/bar tips | Высокий | 🔄 ship+Deploy MSK web |
-| UX.SCENARIOS-LIGHT | Сценарии light panel; suburb canon full-width; POI row flex; CTA match | Критический | 🔄 ship+Deploy MSK web |
+| UX.GUIDE-OPEN | my-day: suburbs/scenarios DayTripCanonCard always open (not accordion); accordion = route tools | Критический | ✅ live (DayTripCanonCard open; My Day smoke 2026-08-30+) |
+| UX.MUSTSEE-CHIPS-2ROW | Hub must-see filter chips: mobile 2-row horizontal scroll; sm+ wrap | Критический | ✅ live |
+| UX.CANON-ALIGN | DayTripCanonCard desktop: gutter nums + text vertical = title; mobile wider; tips; scenarios carousel | Критический | ✅ live |
+| UX.SCENARIOS-WRAP | Scenarios chips: mobile carousel (nowrap scroll), sm+ wrap; SPB drop suburb dupes | Критический | ✅ live |
+| UX.MYDAY-TRANSIT | Between-stop `↓ tip` in my-day list; merge keeps transitTip; Peterhof/bar tips | Высокий | ✅ live |
+| UX.SCENARIOS-LIGHT | Сценарии light panel; suburb canon full-width; POI row flex; CTA match | Критический | ✅ live |
 | UX.DAY-TRIP-CANON | DayTripCanonCard для suburbs (full width); scenarios откатили с shared canon | Высокий | ✅ partial `c5629984`; scenarios split → UX.SCENARIOS-LIGHT |
 | UX.SUBURB-CARD-CANON | Suburb cards hub/my-day: канон Петергоф-макета (логистика/гастро/что посмотреть/CTA), schema logisticsExit+gastroStop, без SVG icons | Высокий | ✅ superseded by UX.DAY-TRIP-CANON |
 | CONT.SPB-SUBURB-DENSITY | SPB suburbs nested POI по насыщенности (не жёсткие 5); presets+timingNote; docs LOCKED | Высокий | ✅ `088cfe71` Deploy MSK web `31301708432` BUILD_ID=`f1YPffw6I_wxfeh3iRANZ` |
@@ -1055,7 +1057,7 @@ Live: Deploy MSK web [`32371428354`](https://github.com/Twisterrrrr/daibilet/act
 | FIX.TC-BAD-TOKEN | my-day «Купить билет» → TC HTTPForbidden bad token (`r:` в URL) | Критический | ✅ `89abc556` API live; web Deploy MSK |
 | INC.VENUE-SOFT-ALL | API hang → soft-unavailable poison на всех venue PDP | Критический | ✅ ops restore; code soft≠ISR + catalog child mode |
 | INC.LOC404.VLAD | STALE 404 `/locations/saint-petersburg-vladimirskiy-sobor` | Критический | ✅ ops 200; code miss≠unavailable + canon redirect |
-| FIX.CITY-MULTI-LANDINGS | normalizeKnownCitySlug: все destination cities → концерты/стендап в hub/podborki | Критический | ✅ code; нужен web deploy |
+| FIX.CITY-MULTI-LANDINGS | normalizeKnownCitySlug: все destination cities → концерты/стендап в hub/podborki | Критический | ✅ live: `landing-routes` (all destination-like slugs) в Deploy lineage `a5cfaaab` / [34390637907](https://github.com/Twisterrrrr/daibilet/actions/runs/34390637907) |
 | FIX.HERO-CTA-FROM | Hero CTA «от min»; stats min-max | Высокий | ✅ code; deploy пачкой |
 | FIX.PRICETo-REAL | Catalog SQL real priceTo (offers/sessions max) | Высокий | ✅ dto.js; нужен API restart |
 | OPS.DEPLOY-HEAD | Live на `7c5f2210` Deploy `31260953355` BUILD_ID=`dKXqka8q8BXEbdT7y7aRQ` | Критический | ✅ |
