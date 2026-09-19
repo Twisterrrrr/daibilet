@@ -3,9 +3,9 @@
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
 | SEO.TEP-REWRITE-48 | 48 TEP описаний → EventOverride.description (batches 1–4) | Высокий | ✅ apply на MSK 2026-09-09; script `ed41beca` |
-| FIX.AI-REWRITE-MD | PDP «О событии»: рендер AI markdown (`**h**` / `*em*` / whole-line headings) | Высокий | 🔄 code+tests; нужен web deploy |
+| FIX.AI-REWRITE-MD | PDP «О событии»: рендер AI markdown (`**h**` / `*em*` / `##` / whole-line headings) | Высокий | ✅ `1e81d896` + Codex `4f1e4953` (## headings) в HEAD `a8492653` |
 | OPS.MSK-SSH-DEPLOY | Owner SSH через `deploy` (root запрещён); diagnose/unban workflows | Высокий | ✅ pubkey + unban; config User=deploy |
-| FIX.TEP-WIDGET-14460 | TEP buy: affiliate widget `14208`→`14460` (925 «закрыто» vs живое расписание) | Критический | 🔄 code; нужен MSK env + API/web |
+| FIX.TEP-WIDGET-14460 | TEP buy: affiliate widget `14208`→`14460` (925 «закрыто» vs живое расписание) | Критический | 🔄 **не закрыт в HEAD**: web/public/`provider-purchase.ts`/`.env.example` ещё default `14208`; Diary заявлял 14460 раньше кода; нужен code+MSK env+API/web |
 
 ## 2026-09-08 - AI rewrite event descriptions (admin MVP)
 
@@ -27,7 +27,7 @@
 | UX2.GRID-FEATURED | Ритм `/events` featured/bento | Высокий | ❌ rolled back owner 2026-09-09 - ровная сетка |
 | UX2.TYPE-CARD | Иерархия EventCard (часть W3 в bento) | Высокий | ❌ rolled back вместе с GRID |
 | UX2.FIND-SUGGEST | Typeahead city/category на FilterRail | Средний | ⏳ deferred |
-| UX2.EXCLUDE-THEMES | `/events`: быстрые «Скрыть» chips (standup/river/bus/…) → `excludeLanding`; H1 «Категория в городе» + chips с ×; date rail стрелки md+ | Высокий | ✅ code; live после batch Deploy MSK web |
+| UX2.EXCLUDE-THEMES | `/events`: быстрые «Скрыть» chips (standup/river/bus/…) → `excludeLanding`; H1 «Категория в городе» + chips с ×; date rail стрелки md+ | Высокий | ✅ code в HEAD (`a5cfaaab`+); live gap до batch Deploy MSK web |
 | UX2.BLOG-LIST-IMG | `/blog` listing: sidecar chain card→thumb→og + BlogCardSafeImage везде + aspect/quality | Средний | ✅ |
 | UX2.SMOKE | Preview: `/preview-cards` = flat grid smoke | Средний | ✅ flat after rollback |
 | UX2.FEATURED-TEASER | Bento hero teaser | Высокий | ❌ rolled back с GRID |
@@ -38,26 +38,26 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| INC.ISR500.COOKIES | `cookies()` в SiteLayout → DYNAMIC_SERVER_USAGE 500 на event/city/venue PDP | Критический | 🔄 commit + Deploy MSK web |
+| INC.ISR500.COOKIES | `cookies()` в SiteLayout → DYNAMIC_SERVER_USAGE 500 на event/city/venue PDP | Критический | ✅ code `72546cfd` в HEAD (SiteLayout без cookies + guard-test); live gap только если artifact старше SHA |
 
 ## 2026-09-03 - Related / filters / blog flash / SEO P0-P2
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
 | FIX.RELATED-QUALITY | PDP related: same-city + score + title dedupe + seed self-title (no twin night) | Критический | ✅ live 2026-09-09 Deploy [34378885906](https://github.com/Twisterrrrr/daibilet/actions/runs/34378885906) |
-| FIX.CATALOG-FILTER-SCROLL | Desktop sidebar: definite `height` + inner overflow | Высокий | 🔄 |
-| FIX.BLOG-HERO-FLASH | Убран client shuffle + stable promo seed | Высокий | 🔄 |
+| FIX.CATALOG-FILTER-SCROLL | Desktop sidebar: definite `height` + inner overflow | Высокий | ✅ code в `globals.css` (`.catalog-sidebar` height + `.catalog-sidebar-scroll`); live после batch Deploy |
+| FIX.BLOG-HERO-FLASH | Убран client shuffle + stable promo seed | Высокий | ✅ code: `planBlogFeedPromos({ seed })`, client shuffle с listing снят |
 | SEO.PODBORKI-PILOT-2 | NN+Perm в allowlist + маркер CHPU | Высокий | ✅ code |
 | SEO.PODBORKI-CITY-1 | `/podborki/c/{city}` + 301 | Высокий | ✅ |
-| PERF.HOME-EVENTS-SSR | Lean destinations/catalog/home articles | Высокий | 🔄 |
-| SEO.HUB-CONTENT-GATE | City index ≥6 офферов (strong cities bypass) | Средний | 🔄 |
+| PERF.HOME-EVENTS-SSR | Lean destinations/catalog/home articles | Высокий | 🔄 partial: `slimDestinationsForLayout` в SiteLayout; полный lean home ещё open |
+| SEO.HUB-CONTENT-GATE | City index ≥6 офферов (strong cities bypass) | Средний | ✅ code `seo-listing-meta` / sitemap `MIN_LISTING_OFFERS_FOR_INDEX` |
 
 ## 2026-09-02 - Event map + My Day pins + CAPS + SEO audit
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
 | FIX.EVENT-MAP-YANDEX | PDP карта: Yandex iframe вместо blank Leaflet | Критический | ✅ live 2026-09-09 (Yandex + batch deploy 34378885906) |
-| FIX.MYDAY-PIN-LABELS | CSS подписи пинов (`left:100%` клипал caption) | Высокий | 🔄 |
+| FIX.MYDAY-PIN-LABELS | CSS подписи пинов (`left:100%` клипал caption) | Высокий | ✅ code в `globals.css` / `DayRouteOsmMap` (не `left:100%`); live после batch Deploy |
 | UX.TITLE-CAPS | `formatPublicTitle` на list/table/hub/affiche + region/favorites/venue stop-lists | Высокий | ✅ live 2026-09-09 Deploy [34378885906](https://github.com/Twisterrrrr/daibilet/actions/runs/34378885906) |
 | SEO.AUDIT-0902 | `docs/seo-audit-2026-09-02.md` вердикт + чеклист | Высокий | ✅ docs |
 
@@ -229,7 +229,7 @@ Live: Deploy MSK web [`32371428354`](https://github.com/Twisterrrrr/daibilet/act
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.HEADER-CITY-PIN-FIRST | Mobile header: город только пиктограмма MapPin (не чип с именем); aria-label с городом; tap → CityPicker. Desktop: именованный чип. Первый визит: CityConfirmModal | Высокий | 🔄 code |
+| UX.HEADER-CITY-PIN-FIRST | Mobile header: город только пиктограмма MapPin (не чип с именем); aria-label с городом; tap → CityPicker. Desktop: именованный чип. Первый визит: CityConfirmModal | Высокий | ✅ code в `CityPicker` header variant (mobile MapPin / lg+ chip) |
 
 ## 2026-08-17 - Ханты-Мансийск в сетке /cities
 

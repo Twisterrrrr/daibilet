@@ -19,16 +19,16 @@
 
 ### Наблюдения
 - После batch AI-рерайта в блоке «О событии» сырые `**Организационные условия**` (списки `-` уже ок).
-- Промпт `ai-rewrite-description` требует Markdown; live `formatEventDescriptionHtml` только escape, без `**`/`*`.
+- Промпт `ai-rewrite-description` требует Markdown; раньше `formatEventDescriptionHtml` только escape, без `**`/`*`.
 
 ### Решения
-- `unwrapMarkdownHeadingLine`: целая строка `**…**` → `h3`.
-- `formatInlineEventMarkdown`: inline `**bold**` / `*italic*` → `<strong>`/`<em>` после escape.
-- Расширен allowlist секций (`организационные условия`, `на борту`, …).
-- Тест на kazan disco cruise sample: asterisks не leak.
+- `1e81d896`: `unwrapMarkdownHeadingLine` (`**…**` → `h3`) + `formatInlineEventMarkdown` (`**bold**` / `*italic*`).
+- Codex `4f1e4953`: whole-line `## …` / `#…######` тоже → `h3` (TEP editorial batch).
+- Allowlist секций + тесты (kazan disco / `## Особенности` / inline bold+italic).
+- Статус: код в HEAD `feat/next-monorepo` (`a8492653`); тикет `FIX.AI-REWRITE-MD` закрыт в tracker.
 
 ### Проблемы
-- На live до web deploy звёздочки ещё видны на уже применённых override.
+- Нет: markdown-рендер закрыт в ветке; остаточный live-gap только если web artifact старше этих SHA.
 
 ---
 
@@ -40,13 +40,13 @@
 - В payload/purchaseUrl каталога был зашит legacy affiliate id `14208`.
 
 ### Решения
-- Default `TEP_WIDGET_ID` / `NEXT_PUBLIC_TEP_WIDGET_ID` / `VITE_TEP_WIDGET_ID` → `14460`.
-- Web `getTeplohodWidgetIds`: всегда брать account-level default, не stale `widgetPayload.tepWidgetId`.
-- Backend `buildTeplohodUrl` / `buildProviderWidgetPayload` defaults обновлены.
-- На MSK обязательно выставить env `TEP_WIDGET_ID=14460` и `NEXT_PUBLIC_TEP_WIDGET_ID=14460` (если явно задан старый) + restart API / web batch.
+- Целевой default: `TEP_WIDGET_ID` / `NEXT_PUBLIC_TEP_WIDGET_ID` / `VITE_TEP_WIDGET_ID` → `14460`.
+- Канон: account-level default, не stale `widgetPayload.tepWidgetId`.
+- На MSK: env `14460` + restart API / web batch.
 
 ### Проблемы
-- Пока MSK env = 14208, live buy останется закрытым даже после code deploy.
+- **HEAD `a8492653` ещё не уравнен:** `TeplohodWidget.client.tsx`, `apps/public` TeplohodWidget, `provider-purchase.ts`, `.env.example` / staging example всё ещё fallback `14208` (в `dto.js` местами уже `14460` - рассинхрон).
+- Пока code+MSK env = 14208, live buy 925 останется «закрыт».
 - Описание evt_tep_925 по-прежнему тонкое (отдельный контент-тикет).
 
 ---
