@@ -1,4 +1,32 @@
-## 2026-09-20 - Docs sync: .cursorignore + TEP 14460 live (без curl)
+## 2026-09-20 - Tasktracker drift close (docs-only; без curl)
+
+### Наблюдения
+- Целевые FIX.AI-REWRITE-MD / FIX.TEP-WIDGET-14460 / UX2.EXCLUDE-THEMES / INC.ISR500.COOKIES уже были ✅; TEP/AI-REWRITE уточнены по tip Deploy `35469406278` (`4dcd3a28`), без отката.
+- Параллельно закрыт явный stale 🔄: MYDAY-SESSION/STOP-COMPACT, L.2b, R.4b/R.9, B.12c (код в live lineage).
+
+### Решения
+- Commit+push docs + ранее запушенный `.cursorignore` (`.prisma/`); без MSK deploy / без force.
+
+### Проблемы
+- Нет.
+
+---
+## 2026-09-20 - Status sync: tip `4dcd3a28` / Deploy 35469406278
+
+### Наблюдения
+- GHA Deploy MSK [35469406278](https://github.com/Twisterrrrr/daibilet/actions/runs/35469406278) `success` head `4dcd3a28`; agent HTTP к daibilet.ru - timeout (сеть), не опровергает deploy.
+- `##` markdown headings (`4f1e4953`) уже в tip - не post-live.
+- Stale «нужен deploy» / `🔄 commit+deploy`: MYDAY-SESSION/STOP-COMPACT, L.2b, B.12c, R.9, R.4b - код в HEAD/live lineage.
+
+### Решения
+- Tasktracker: закрыты перечисленные тикеты на ✅ с SHA/Deploy; TEP-WIDGET и AI-REWRITE-MD синхронизированы с tip.
+- Код не трогали; MSK web deploy не запускали.
+
+### Проблемы
+- Open без ложного «deploy pending»: TC reconcile MSK runtime, PERF.HOME/WEB.LIGHT, finance M1, SEO.PODBORKI-PILOT-2 owner check.
+
+---
+
 
 ### Наблюдения
 - `gh run view` (без HTTP к daibilet.ru): Deploy [35469406278](https://github.com/Twisterrrrr/daibilet/actions/runs/35469406278) `success`, head `4dcd3a28` (TEP defaults `14460`).

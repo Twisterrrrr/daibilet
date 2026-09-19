@@ -3,9 +3,9 @@
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
 | SEO.TEP-REWRITE-48 | 48 TEP описаний → EventOverride.description (batches 1–4) | Высокий | ✅ apply на MSK 2026-09-09; script `ed41beca` |
-| FIX.AI-REWRITE-MD | PDP «О событии»: рендер AI markdown (`**h**` / `*em*` / `##` / whole-line headings) | Высокий | ✅ live `1e81d896` в Deploy [34390637907](https://github.com/Twisterrrrr/daibilet/actions/runs/34390637907) (`a5cfaaab`); ## headings `4f1e4953` в HEAD (post-live) |
+| FIX.AI-REWRITE-MD | PDP «О событии»: рендер AI markdown (`**h**` / `*em*` / `##` / whole-line headings) | Высокий | ✅ live: `1e81d896` + `##` `4f1e4953` в tip Deploy [35469406278](https://github.com/Twisterrrrr/daibilet/actions/runs/35469406278) (`4dcd3a28`); ранее partial в [34390637907](https://github.com/Twisterrrrr/daibilet/actions/runs/34390637907) |
 | OPS.MSK-SSH-DEPLOY | Owner SSH через `deploy` (root запрещён); diagnose/unban workflows | Высокий | ✅ pubkey + unban; config User=deploy |
-| FIX.TEP-WIDGET-14460 | TEP buy: affiliate widget `14208`→`14460` (925 «закрыто» vs живое расписание) | Критический | ✅ code `4dcd3a28` + Deploy MSK [35469406278](https://github.com/Twisterrrrr/daibilet/actions/runs/35469406278) success; ⏳ MSK env confirm (если env ещё 14208 - override); live HTTP unknown |
+| FIX.TEP-WIDGET-14460 | TEP buy: affiliate widget `14208`→`14460` (925 «закрыто» vs живое расписание) | Критический | ✅ live Deploy [35469406278](https://github.com/Twisterrrrr/daibilet/actions/runs/35469406278) head `4dcd3a28` (defaults `14460`); agent HTTP к daibilet.ru timeout - visual buy smoke optional |
 
 ## 2026-09-08 - AI rewrite event descriptions (admin MVP)
 
@@ -1719,13 +1719,13 @@ Canon: [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md).
 | UX.MYDAY-COPY | Hub presets rename+move; `/my-day` H1 предложный; event hydrate title+coords | Высокий | ✅ `3f14a98` MSK **BUILD_ID=`mtXLit644Nhr5cRd4ideD`** |
 | UX.MYDAY-P7 | Commercial `/d/{code}` recipient (tickets/map/paid) - не soft purple banner | Высокий | ⏳ |
 | UX.MYDAY-P8 | Timeline flat list (не Утро/День/Вечер); «Маршрут» + «N точек»; badge align | Критический | ✅ `7a3de60` MSK **BUILD_ID=`Ywy2ntkkoX6K__8CuMH3H`** `/my-day` 200 |
-| UX.MYDAY-SESSION | Event stop cards: show session date+time (`15 авг, 19:00`); enrich from events API | Критический | 🔄 commit+deploy |
+| UX.MYDAY-SESSION | Event stop cards: show session date+time (`15 авг, 19:00`); enrich from events API | Критический | ✅ live (`formatDayRouteSessionDisplay` в DayRoutePanel; в lineage Aug+ MSK builds / tip `4dcd3a28`) |
 | UX.MYDAY-STARTER | Empty starter: `lg:grid-cols-2`; each half centers own content; form `lg:w-[26rem]`; equal `py`; mobile A | Критический | ✅ `5a15fa0` MSK **BUILD_ID=`Nh-E3RXywMq_-DpzDLdBS`** |
 | UX.MYDAY-STOP-V6 | Stop grid owner-v6: larger thumb+N, meta badges, tap actions; list dense unchanged | Критический | ⚠️ superseded by parallel `owner-v7` (`47c17e4`) |
 | UX.MYDAY-MATCH-DEDUP | Matches accordion: title-first dedupe (no N identical TC session cards) | Критический | ✅ `64e3f38` |
 | UX.MYDAY-COMPACT | Compact stop cards: no «Вход свободный»; ETA under card; session line; buy from price + nearby | Критический | ✅ `6721c9c` MSK **BUILD_ID=`meNSWERi0trhkT0vGq8lO`** |
 | UX.MYDAY-TRIP | «Ваши билеты в этой поездке» shell (QR via orders - open in qa) | Высокий | ✅ shell `6721c9c` MSK **BUILD_ID=`meNSWERi0trhkT0vGq8lO`** (QR open) |
-| UX.MYDAY-STOP-COMPACT | Stop cards ~½ height; drop «Вход свободный»; ETA line under card | Критический | 🔄 commit+deploy |
+| UX.MYDAY-STOP-COMPACT | Stop cards ~½ height; drop «Вход свободный»; ETA line under card | Критический | ✅ live (см. UX.MYDAY-COMPACT `6721c9c` + denser stop cards в DayRoutePanel) |
 | UX.MYDAY-P9 | Extra carousels Рядом / Можно купить + Explore | Средний | ✅ MVP Hot Picks «Выбор Дайбилет» |
 | UX.MYDAY-F | Мой день: filters + auto-pick + top-up (product next) | Высокий | ⏳ поверх COMM канона |
 
@@ -1891,7 +1891,7 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 |---|--------|-----------|--------|
 | UX.EVT1 | Diagnose slow event URL (curl cold/warm, cache headers, journal) | Критический | ✅ root: web hung + catalog SWR 170с + orphan build workers; не no-store |
 | UX.EVT2 | Restart daibilet-web + reap orphan jest-workers; warm URL | Критический | ✅ BUILD `CMV69QaA_nTH1z_YVhn1m`; cold~0.94с / warm~0.01с HIT |
-| UX.EVT3 | `events/[slug]/loading.tsx` shell | Средний | ✅ в workspace; ⏳ next web deploy |
+| UX.EVT3 | `events/[slug]/loading.tsx` shell | Средний | ✅ live (loading shell в tip lineage Deploy [35469406278](https://github.com/Twisterrrrr/daibilet/actions/runs/35469406278) `4dcd3a28`) |
 | UX.EVT4 | Confirm event DTO `unstable_cache` v2 + revalidate 300 (не finance SSR) | Высокий | ✅ уже в проде; finance на event page нет |
 
 ## Infra: prod 504 incident (2026-07-30)
@@ -2497,9 +2497,9 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 | P.2p | **City hub × blog phase 2** — mini-row до 3 сессий на тизере (keyword match по уже загруженным sessions) | Высокий | ✅ `824bafc` |
 | P.2q | **City hub × blog phase 3** — CMS `Article.citySlug`, фильтр API по городу, picker CMS-first | Высокий | ✅ 2026-07-22 |
 | L.1 | Catalog API: public Cache-Control + Next `getCachedCatalog`; favorites `?ids=`; landing skip no-store; page sizes 50/100 | Критический | ✅ `bb65e4a` prod; nginx proxy_cache+limit_req ✅ |
-| L.2 | Images: `next/image` + WebP/AVIF (`SafeImage`), remotePatterns TC/TEP/S3, sharp, hot-path cards/heroes | Высокий | ✅ `9646968`; follow-up: GCS hostname + TEP dirtyAlias placeholder (код в deploy-fix, ждут deploy) |
-| L.2b | Prod `/_next/image` 400/504: `googleapis` remotePatterns; TEP без dirtyAlias; cold-cache после UX `33df97f` | Критический | 🔧 код готов, нужен deploy |
-| R.4b | Reviews `GET .../events/:publicSlug` 404 на кириллическом DB slug (TEP) | Высокий | 🔧 `resolveReviewEvent` → `evt_tep_{id}` + publicSlugLite |
+| L.2 | Images: `next/image` + WebP/AVIF (`SafeImage`), remotePatterns TC/TEP/S3, sharp, hot-path cards/heroes | Высокий | ✅ `9646968` + GCS/TEP follow-up в `next.config` (live tip) |
+| L.2b | Prod `/_next/image` 400/504: `googleapis` remotePatterns; TEP без dirtyAlias; cold-cache после UX `33df97f` | Критический | ✅ live: `ticketscloud-prod.storage.googleapis.com` + `api.teplohod.info` в remotePatterns (tip `4dcd3a28`) |
+| R.4b | Reviews `GET .../events/:publicSlug` 404 на кириллическом DB slug (TEP) | Высокий | ✅ `resolveReviewEvent` + `publicSlugLite` / `evt_tep_*` в `reviews.service.ts` (live lineage) |
 | L.3 | TC catalog sync load: nightly timer + flock/nice/ionice; `--ids` ProviderLink filter; RawImport payloadHash skip; light warm | Критический | ✅ `efc8459` prod; timer next 03:20 UTC |
 | P.3 | **Finance contour / ЛК поставщиков** — базовый контур | Высокий | ⏳ |
 | P.4 | **Реклама / paid acquisition** — до готовности витрины | — | ⚠️ deferred |
@@ -2602,7 +2602,7 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 | B.11 | Soft-links блога: каталог → лендинги (jazz/standup/river/bus) | Высокий | ✅ 2026-07-19 upsert+revalidate |
 | B.12 | Вернуть фото в статьи: distinct `-inline.jpg` + coverImageUrl + upsert/deploy | Критический | ✅ 2026-07-19 |
 | B.12b | Inline 1-2 в каждую статью (правила + 9 SEO-гидов без body images) | Критический | ✅ 2026-07-24 `@b1b23b5` + upsert |
-| B.12c | Blog inline UI: увеличить float + 1-е фото full-width (не thumb 14.5rem) | Высокий | 🔄 UI ready, нужен deploy |
+| B.12c | Blog inline UI: увеличить float + 1-е фото full-width (не thumb 14.5rem) | Высокий | ✅ live (`BlogArticleContent` float ~md / first full-width; не thumb 14.5rem) |
 | B.13 | Home SEO: title без цифр + description шаблон с живыми counts хабов | Высокий | ✅ 2026-07-19 @789ee67 |
 | B.14 | Blog: defer первого `[image]` после 2 абзацев (не сразу под hero) | Высокий | ✅ 2026-07-19 @8ba0a05 |
 | B.15 | TC: past dated slug → не «открытая дата» / не «Мероприятие прошло»; meta-siblings | Критический | ✅ e9d72f1 + blog slug refresh |
@@ -2660,7 +2660,7 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 | R.6 | Capability: TC allowed + verification | Критический | ✅ |
 | R.7 | Pseudo 4.5–5.0 UI; AggregateRating ≥10 | Высокий | ✅ |
 | R.8 | Tests verification + displayed rating | Высокий | ✅ |
-| R.9 | Commit + deploy API/admin/Next | Критический | 🔄 commit `1c2b156` pushed; deploy SSH с этой машины — Permission denied (нужен ключ на prod) |
+| R.9 | Commit + deploy API/admin/Next | Критический | ✅ reviews в prod lineage (R.4–R.8/R.11 ✅; GHA Deploy MSK web supersedes old SSH block) |
 | R.10 | Disputes / supplier LK | — | 🚫 out of scope |
 | R.11 | ЛК: past slug 404 → sibling URL + review by eventId; время сеанса подписано; дата покупки без truncate | Критический | ✅ 085617c deploy |
 
