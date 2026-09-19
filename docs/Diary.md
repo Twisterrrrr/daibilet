@@ -1,14 +1,16 @@
 ## 2026-09-20 - Tasktracker drift close (docs-only; без curl)
 
 ### Наблюдения
-- Целевые FIX.AI-REWRITE-MD / FIX.TEP-WIDGET-14460 / UX2.EXCLUDE-THEMES / INC.ISR500.COOKIES уже были ✅; TEP/AI-REWRITE уточнены по tip Deploy `35469406278` (`4dcd3a28`), без отката.
-- Параллельно закрыт явный stale 🔄: MYDAY-SESSION/STOP-COMPACT, L.2b, R.4b/R.9, B.12c (код в live lineage).
+- Повтор после падений субагентов: без curl к daibilet.ru; `gh run view 35469406278` = success / `4dcd3a28`.
+- HEAD: TEP default `14460`, `formatEventDescriptionHtml` + whole-line `##`, SiteLayout без `cookies()`, `CatalogExcludeThemes` / `excludeLanding`.
+- Целевые FIX.AI-REWRITE-MD / FIX.TEP-WIDGET-14460 / UX2.EXCLUDE-THEMES / INC.ISR500.COOKIES уже были ✅ - не откатывали.
+- Закрыт stale 🔄 «нужен deploy»: MYDAY-SESSION/STOP-COMPACT, L.2b, R.4b/R.9, B.12c (код в tip lineage).
 
 ### Решения
-- Commit+push docs + ранее запушенный `.cursorignore` (`.prisma/`); без MSK deploy / без force.
+- Commit+push только docs; `.cursorignore` уже в tip (`9216c210`); без MSK deploy / без force.
 
 ### Проблемы
-- Нет.
+- Live HTTP visual smoke unknown (сеть); open: TC reconcile MSK, lean home / WEB.LIGHT, finance M1, PODBORKI-PILOT-2 owner.
 
 ---
 ## 2026-09-20 - Status sync: tip `4dcd3a28` / Deploy 35469406278
