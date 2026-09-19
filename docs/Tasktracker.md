@@ -1891,7 +1891,7 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 |---|--------|-----------|--------|
 | UX.EVT1 | Diagnose slow event URL (curl cold/warm, cache headers, journal) | Критический | ✅ root: web hung + catalog SWR 170с + orphan build workers; не no-store |
 | UX.EVT2 | Restart daibilet-web + reap orphan jest-workers; warm URL | Критический | ✅ BUILD `CMV69QaA_nTH1z_YVhn1m`; cold~0.94с / warm~0.01с HIT |
-| UX.EVT3 | `events/[slug]/loading.tsx` shell | Средний | ✅ live (loading shell в tip lineage Deploy [35469406278](https://github.com/Twisterrrrr/daibilet/actions/runs/35469406278) `4dcd3a28`) |
+| UX.EVT3 | `events/[slug]/loading.tsx` shell | Средний | ⚠️ superseded: detail `loading.tsx` снят (soft-404); catalog `(catalog)/loading.tsx` live |
 | UX.EVT4 | Confirm event DTO `unstable_cache` v2 + revalidate 300 (не finance SSR) | Высокий | ✅ уже в проде; finance на event page нет |
 
 ## Infra: prod 504 incident (2026-07-30)
