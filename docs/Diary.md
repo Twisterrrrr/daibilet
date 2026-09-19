@@ -5,42 +5,13 @@
 - HEAD: TEP default `14460`, `formatEventDescriptionHtml` + whole-line `##`, SiteLayout без `cookies()`, `CatalogExcludeThemes` / `excludeLanding`.
 - Целевые FIX.AI-REWRITE-MD / FIX.TEP-WIDGET-14460 / UX2.EXCLUDE-THEMES / INC.ISR500.COOKIES уже были ✅ - не откатывали.
 - Закрыт stale 🔄 «нужен deploy»: MYDAY-SESSION/STOP-COMPACT, L.2b, R.4b/R.9, B.12c (код в tip lineage).
+- UX.EVT3 → ⚠️ superseded (detail `loading.tsx` снят soft-404; catalog loading live).
 
 ### Решения
-- Commit+push только docs; `.cursorignore` уже в tip (`9216c210`); без MSK deploy / без force.
+- Commit+push только docs; `.cursorignore` уже в tip; без MSK deploy / без force.
 
 ### Проблемы
 - Live HTTP visual smoke unknown (сеть); open: TC reconcile MSK, lean home / WEB.LIGHT, finance M1, PODBORKI-PILOT-2 owner.
-
----
-## 2026-09-20 - Status sync: tip `4dcd3a28` / Deploy 35469406278
-
-### Наблюдения
-- GHA Deploy MSK [35469406278](https://github.com/Twisterrrrr/daibilet/actions/runs/35469406278) `success` head `4dcd3a28`; agent HTTP к daibilet.ru - timeout (сеть), не опровергает deploy.
-- `##` markdown headings (`4f1e4953`) уже в tip - не post-live.
-- Stale «нужен deploy» / `🔄 commit+deploy`: MYDAY-SESSION/STOP-COMPACT, L.2b, B.12c, R.9, R.4b - код в HEAD/live lineage.
-
-### Решения
-- Tasktracker: закрыты перечисленные тикеты на ✅ с SHA/Deploy; TEP-WIDGET и AI-REWRITE-MD синхронизированы с tip.
-- Код не трогали; MSK web deploy не запускали.
-
-### Проблемы
-- Open без ложного «deploy pending»: TC reconcile MSK runtime, PERF.HOME/WEB.LIGHT, finance M1, SEO.PODBORKI-PILOT-2 owner check.
-
----
-
-
-### Наблюдения
-- `gh run view` (без HTTP к daibilet.ru): Deploy [35469406278](https://github.com/Twisterrrrr/daibilet/actions/runs/35469406278) `success`, head `4dcd3a28` (TEP defaults `14460`).
-- FIX.AI-REWRITE-MD / UX2.EXCLUDE-THEMES / INC.ISR500.COOKIES уже ✅ live - без отката.
-- `.cursorignore`: добавлены корневые `.prisma/` / `**/.prisma/` (schema.prisma не трогаем).
-
-### Решения
-- Tasktracker: `FIX.TEP-WIDGET-14460` → ✅ live Deploy `35469406278` / `4dcd3a28`.
-- Commit+push только docs + `.cursorignore`; без MSK deploy.
-
-### Проблемы
-- Нет: optional MSK `TEP_WIDGET_ID` env - defaults уже в коде live.
 
 ---
 
