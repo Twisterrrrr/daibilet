@@ -1,17 +1,33 @@
+## 2026-09-20 - Docs sync: .cursorignore + TEP 14460 live (без curl)
+
+### Наблюдения
+- `gh run view` (без HTTP к daibilet.ru): Deploy [35469406278](https://github.com/Twisterrrrr/daibilet/actions/runs/35469406278) `success`, head `4dcd3a28` (TEP defaults `14460`).
+- FIX.AI-REWRITE-MD / UX2.EXCLUDE-THEMES / INC.ISR500.COOKIES уже ✅ live - без отката.
+- `.cursorignore`: добавлены корневые `.prisma/` / `**/.prisma/` (schema.prisma не трогаем).
+
+### Решения
+- Tasktracker: `FIX.TEP-WIDGET-14460` → ✅ live Deploy `35469406278` / `4dcd3a28`.
+- Commit+push только docs + `.cursorignore`; без MSK deploy.
+
+### Проблемы
+- Нет: optional MSK `TEP_WIDGET_ID` env - defaults уже в коде live.
+
+---
+
 ## 2026-09-20 - Re-audit (.cursorignore + Tasktracker; без curl к live)
 
 ### Наблюдения
 - Повтор после падений субагентов: только git + `gh run view` (без HTTP к daibilet.ru).
 - Live tip по GHA: Deploy [34390637907](https://github.com/Twisterrrrr/daibilet/actions/runs/34390637907) `a5cfaaab`; batch [34378885906](https://github.com/Twisterrrrr/daibilet/actions/runs/34378885906) `7ba0fb27`.
-- TEP defaults `14460` уже в HEAD `4dcd3a28`; Deploy MSK [35469406278](https://github.com/Twisterrrrr/daibilet/actions/runs/35469406278) in_progress.
+- TEP defaults `14460` уже в HEAD `4dcd3a28`; Deploy MSK [35469406278](https://github.com/Twisterrrrr/daibilet/actions/runs/35469406278) later completed success (см. запись выше).
 
 ### Решения
 - `.cursorignore` подтверждён/дополнен (node_modules/.prisma/migrations/.next/out/build/tmp/.deploy-tmp/.git); `schema.prisma` не игнорим; `.env` не коммитим.
-- Tasktracker: TEP = code ✅ + ⏳ env/deploy; закрыты stale 🔄 с deploy SHA (Hermitage V3, home cities tap, city-hub brief/selects, my-day guide/canon, hub «git без live» → ✅ live).
+- Tasktracker: закрыты stale 🔄 с deploy SHA (Hermitage V3, home cities tap, city-hub brief/selects, my-day guide/canon, hub «git без live» → ✅ live).
 - Не перезатирали уже верные ✅; open: TC reconcile MSK, lean home, WEB.LIGHT, finance M1.
 
 ### Проблемы
-- Live HTTP unknown; buy 925 на live может ещё держать `14208`, пока env+deploy не подтверждены.
+- (устарело) live HTTP / 14208 - снято после success Deploy `35469406278`.
 
 ---
 

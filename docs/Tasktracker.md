@@ -5,7 +5,7 @@
 | SEO.TEP-REWRITE-48 | 48 TEP описаний → EventOverride.description (batches 1–4) | Высокий | ✅ apply на MSK 2026-09-09; script `ed41beca` |
 | FIX.AI-REWRITE-MD | PDP «О событии»: рендер AI markdown (`**h**` / `*em*` / `##` / whole-line headings) | Высокий | ✅ live `1e81d896` в Deploy [34390637907](https://github.com/Twisterrrrr/daibilet/actions/runs/34390637907) (`a5cfaaab`); ## headings `4f1e4953` в HEAD (post-live) |
 | OPS.MSK-SSH-DEPLOY | Owner SSH через `deploy` (root запрещён); diagnose/unban workflows | Высокий | ✅ pubkey + unban; config User=deploy |
-| FIX.TEP-WIDGET-14460 | TEP buy: affiliate widget `14208`→`14460` (925 «закрыто» vs живое расписание) | Критический | ✅ code `4dcd3a28` defaults `14460` (web/public/`provider-purchase`/`.env.example`/`dto.js`); ⏳ MSK env confirm + Deploy [35469406278](https://github.com/Twisterrrrr/daibilet/actions/runs/35469406278) in_progress; live HTTP unknown |
+| FIX.TEP-WIDGET-14460 | TEP buy: affiliate widget `14208`→`14460` (925 «закрыто» vs живое расписание) | Критический | ✅ code `4dcd3a28` + Deploy MSK [35469406278](https://github.com/Twisterrrrr/daibilet/actions/runs/35469406278) success; ⏳ MSK env confirm (если env ещё 14208 - override); live HTTP unknown |
 
 ## 2026-09-08 - AI rewrite event descriptions (admin MVP)
 
