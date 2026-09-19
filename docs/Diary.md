@@ -1,3 +1,21 @@
+## 2026-09-20 - Deploy/status pass: без нового MSK web
+
+### Наблюдения
+- Product tip live = `4dcd3a28` Deploy [35469406278](https://github.com/Twisterrrrr/daibilet/actions/runs/35469406278); BUILD_ID=`W613Pc4T6ddj9IkD670wc`; GHA public smoke `/` `/events` `/cities` + api health 200.
+- После tip в HEAD только docs/`.cursorignore` - **новый Deploy MSK web не запускали**.
+- WebFetch: `/events` 200; PDP 925 200 (живые сеансы, «О событии» без сырого `**`); agent curl к daibilet.ru с этой машины timeout.
+- FIX.AI-REWRITE-MD / UX2.EXCLUDE-THEMES / INC.ISR500.COOKIES / TEP 14460 уже ✅; `##` headings в tip через ancestor `4f1e4953`.
+- Stale «нужен deploy» (MYDAY-SESSION/STOP-COMPACT, L.2b, B.12c, UX.EVT3, MOSQUE matcher) закрыты/superseded без отката более поздних ✅.
+
+### Решения
+- Tasktracker: TEP + mosque statuses уточнены smoke/BUILD_ID; roadmap-сводка → 2026-09-20.
+- Docs-only commit+push; finance `.159` / secrets не трогали.
+
+### Проблемы
+- Open (не web-deploy): TC reconcile MSK runtime, PERF.WM2 blog ISR gap, lean home, finance Stage 0 sandbox closeout, PODBORKI-PILOT-2 owner gate.
+
+---
+
 ## 2026-09-20 - Tasktracker drift close (docs-only; без curl)
 
 ### Наблюдения

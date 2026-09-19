@@ -5,7 +5,7 @@
 | SEO.TEP-REWRITE-48 | 48 TEP описаний → EventOverride.description (batches 1–4) | Высокий | ✅ apply на MSK 2026-09-09; script `ed41beca` |
 | FIX.AI-REWRITE-MD | PDP «О событии»: рендер AI markdown (`**h**` / `*em*` / `##` / whole-line headings) | Высокий | ✅ live: `1e81d896` + `##` `4f1e4953` в tip Deploy [35469406278](https://github.com/Twisterrrrr/daibilet/actions/runs/35469406278) (`4dcd3a28`); ранее partial в [34390637907](https://github.com/Twisterrrrr/daibilet/actions/runs/34390637907) |
 | OPS.MSK-SSH-DEPLOY | Owner SSH через `deploy` (root запрещён); diagnose/unban workflows | Высокий | ✅ pubkey + unban; config User=deploy |
-| FIX.TEP-WIDGET-14460 | TEP buy: affiliate widget `14208`→`14460` (925 «закрыто» vs живое расписание) | Критический | ✅ live Deploy [35469406278](https://github.com/Twisterrrrr/daibilet/actions/runs/35469406278) head `4dcd3a28` (defaults `14460`); agent HTTP к daibilet.ru timeout - visual buy smoke optional |
+| FIX.TEP-WIDGET-14460 | TEP buy: affiliate widget `14208`→`14460` (925 «закрыто» vs живое расписание) | Критический | ✅ live Deploy [35469406278](https://github.com/Twisterrrrr/daibilet/actions/runs/35469406278) head `4dcd3a28` BUILD_ID=`W613Pc4T6ddj9IkD670wc`; GHA smoke `/` `/events` `/cities` 200; WebFetch PDP 925 200 (сеансы + чистое «О событии»); optional: MSK env override если когда-то был `TEP_WIDGET_ID=14208` |
 
 ## 2026-09-08 - AI rewrite event descriptions (admin MVP)
 
@@ -1568,7 +1568,7 @@ Alias `museum-1` = первый open-date контракт (не «музеи fo
 |---|--------|-----------|--------|
 | UX.ECARD-DAY-OVERLAY | EventCard grid: «В мой день»/«Добавлено» на cover bottom-right overlay; footer = price+Купить | Высокий | ✅ `49be710` MSK **BUILD_ID=`J2r1pJc-sK2W_wGzB2KzY`** `/events` 200 |
 
-| UX.MYDAY-MOSQUE-MATCH | SPB соборная мечеть: ложный match → МТС Live Hall (Ded Moroz + concert copy / Anna-Elza PDP); truncate title | Критический | ✅ code `2cdebd4`; MSK DB promote+revalidate (`fix-spb-sobornaya-mechet-venue`); web deploy matcher still pending «выкатывай» |
+| UX.MYDAY-MOSQUE-MATCH | SPB соборная мечеть: ложный match → МТС Live Hall (Ded Moroz + concert copy / Anna-Elza PDP); truncate title | Критический | ✅ live: matcher в `city-place-href` (+tests) в tip `4dcd3a28` / Deploy [35469406278](https://github.com/Twisterrrrr/daibilet/actions/runs/35469406278); DB promote+revalidate ранее |
 | UX.MYDAY-STOP-CHIPS | Stop cards: offer chips горизонтально (flex-wrap) + всегда title·price (не столбик ml-auto / не голый «Купить билет») | Критический | ✅ `3d2686b` push; deploy n/a |
 | UX.MYDAY-STOP-OFFERS-BELOW | Stop cards: offer chips ниже main row (не поверх ~time/km); layout как «Руки Вверх» | Критический | ✅ push; deploy n/a (owner не просил выкатывай) |
 | UX.MYDAY-STOP-OFFERS-LG-ROW | Desktop lg+: offers справа в одном ряду с place/travel; mobile stacked ниже | Критический | ✅ `a201ea9`; MSK **BUILD_ID=`4cziKHuRaIqdm9UB0NYYW`** `/my-day` 200 |
@@ -2540,15 +2540,18 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 
 ---
 
-## Общий product roadmap (сводка 2026-08-19)
+## Общий product roadmap (сводка 2026-09-20)
 
-| Контур | Ближайшее | Средний горизонт |
-|--------|-----------|------------------|
-| **Geo / хабы** | Destination registry 86/86; hub seed +80 Venue; public cityInfo DEPRECATED mirror | Region child guides для satellite-city; editorial coords для ~359 thin hubs |
-| **Catalog / SEO** | podborki pilot KGD+SPB locked 2026-08-11 → **~19 дней**; owner: index check → PILOT-2 (NN+Perm) | ЧПУ `/podborki/c/{city}` после gate; PERF.WM2 blog ISR gap |
-| **Контент** | Blog inline UI deploy; city hub lifehacks | Региональные статьи под новые destination pages |
-| **Finance / LC** | Stage 0 sandbox pay → CONFIRMED (`.159`) | Supplier LK M1, operator reconcile (qa.md § Roadmap) |
-| **Perf / ops** | MSK web batch deploy; не гонять build на каждый UI-фикс | TC sync timer; image remotePatterns follow-ups |
+Live web tip: Deploy MSK [35469406278](https://github.com/Twisterrrrr/daibilet/actions/runs/35469406278) `4dcd3a28` BUILD_ID=`W613Pc4T6ddj9IkD670wc`. Свежий web batch **не** нужен: после tip только docs/`.cursorignore`.
+
+| Контур | Где сейчас | Ближайшее (P0–P1) |
+|--------|------------|-------------------|
+| **Web / catalog** | TEP 14460, AI markdown PDP, exclude themes, ISR500 cookies - ✅ live | Visual buy smoke TEP 925 (optional); lean home (`PERF.HOME-EVENTS-SSR`); blog ISR HIT (`PERF.WM2`) |
+| **Catalog ops** | TC sync nightly есть | `FIX.TC-CANCELLED-MISSING`: подтвердить `tc:reconcile-missing` cron/run на MSK |
+| **SEO** | Pilot KGD+SPB locked 2026-08-11; окно вышло | Owner: индекс пилота → `SEO.PODBORKI-PILOT-2` (NN+Perm) |
+| **Finance / LC** | Stage 0 code live на `.159` | **Blocker:** sandbox pay → `CONFIRMED` + `ticketNumbers` (не трогать `.159` агентом) |
+| **Geo / хабы** | Registry 86/86; hub packs в tip | Editorial coords thin hubs; MSK mustSee grow (~56 gap) |
+| **Perf / ops** | Deploy cadence batch / по запросу | Не гонять MSK build на docs; optional env audit `TEP_WIDGET_ID` |
 
 ---
 
