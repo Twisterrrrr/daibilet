@@ -1,0 +1,42 @@
+# Cursor indexing: cut Next.js/Prisma noise that stalls planning/reconnecting.
+# Keep schema.prisma indexable — only migrations and generated client are ignored.
+# Prisma lives at: packages/db/prisma/schema.prisma (do NOT ignore that file).
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Prisma generated client (default location + nested monorepo)
+node_modules/.prisma/
+**/node_modules/.prisma/
+packages/db/node_modules/.prisma/
+**/node_modules/.cache/prisma/
+
+# Prisma migration SQL history (do NOT ignore schema.prisma)
+prisma/migrations/
+**/prisma/migrations/
+apps/*/prisma/migrations/
+packages/*/prisma/migrations/
+packages/db/prisma/migrations/
+
+# Prisma generated client output (this monorepo; custom output, not schema.prisma)
+packages/db/src/generated/
+packages/db/src/generated/prisma/
+
+# Next.js / build artifacts
+.next/
+**/.next/
+out/
+**/out/
+build/
+**/build/
+dist/
+**/dist/
+
+# Deploy / scratch
+.deploy-tmp/
+tmp/
+tmp-*/
+
+# Git internals (never useful for code intelligence)
+.git/
