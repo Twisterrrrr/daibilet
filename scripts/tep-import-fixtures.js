@@ -860,7 +860,7 @@ function cityFromText(value) {
 function teplohodPurchaseUrl(eventId) {
   const normalized = String(eventId || "").replace(/^tep-/i, "").trim();
   if (!/^\d+$/.test(normalized)) return null;
-  const widgetId = String(process.env.TEP_WIDGET_ID || "14208").trim() || "14208";
+  const widgetId = String(process.env.TEP_WIDGET_ID || "14460").trim() || "14460";
   const checkoutBase = (process.env.TEP_CHECKOUT_BASE_URL || "https://account.teplohod.info").replace(/\/+$/, "");
   const url = new URL(`${checkoutBase}/order/event-order`);
   url.searchParams.set("widget_id", widgetId);

@@ -67,7 +67,7 @@ export function buildProviderWidgetPayload(input: ProviderPurchaseInput): Record
     return {
       provider,
       tepEventId: normalizeTeplohodEventId(input.externalId),
-      tepWidgetId: process.env.TEP_WIDGET_ID || '14208',
+      tepWidgetId: process.env.TEP_WIDGET_ID || '14460',
     };
   }
   if (provider === 'TICKETSCLOUD') {
@@ -122,7 +122,7 @@ function buildTeplohodUrl(eventExternalId?: string | null): string | null {
   if (!eventExternalId) return null;
   const eventId = String(eventExternalId).replace(/^tep-/i, '').trim();
   if (!/^\d+$/.test(eventId)) return null;
-  const widgetId = String(process.env.TEP_WIDGET_ID || '14208').trim() || '14208';
+  const widgetId = String(process.env.TEP_WIDGET_ID || '14460').trim() || '14460';
   // teplohod.info/event/{id} currently returns "Ошибка!"; working checkout is account.teplohod.info.
   const checkoutBase = (process.env.TEP_CHECKOUT_BASE_URL || 'https://account.teplohod.info').replace(/\/+$/, '');
   const url = new URL(`${checkoutBase}/order/event-order`);

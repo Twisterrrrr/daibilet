@@ -161,7 +161,7 @@ test('uses ProviderLink SESSION parent identity for a Teplohod slot', () => {
 
   assert.equal(
     result.upcomingSlots?.[0]?.purchaseUrl,
-    'https://account.teplohod.info/order/event-order?widget_id=14208&event_id=14',
+    'https://account.teplohod.info/order/event-order?widget_id=14460&event_id=14',
   );
 });
 

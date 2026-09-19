@@ -1,3 +1,20 @@
+## 2026-09-19 - Status audit (без live curl)
+
+### Наблюдения
+- Предыдущие субагенты упали на provider/SQLite/curl timeout; сверка только git + `gh run view`.
+- Live Deploy MSK web: `34390637907` head `a5cfaaab`; предыдущий batch `34378885906` head `7ba0fb27`.
+- TEP defaults `14460` были только в working tree: committed HEAD ещё `14208` (кроме `dto.js`).
+
+### Решения
+- `.cursorignore` дополнен (Prisma/.next/tmp/.git; `schema.prisma` не игнорим).
+- Tasktracker верх 2026-09: закрыты по evidence `FIX.AI-REWRITE-MD` / `UX2.EXCLUDE-THEMES` / `INC.ISR500.COOKIES`; `FIX.TEP-WIDGET-14460` = code commit + ⏳ MSK env/batch.
+- Live HTTP smoke не гоняли: `code on HEAD; live unknown` кроме SHA из успешных GHA runs.
+
+### Проблемы
+- Buy 925 на live останется на `14208`, пока MSK env + API/web batch не подхватят `14460`.
+
+---
+
 ## 2026-09-09 - UX2: быстрый exclude тем на /events
 
 ### Наблюдения
@@ -11,7 +28,7 @@
 - Active chips: `без Стендап` с ×; include-`landing=` сбрасывает excludes.
 
 ### Проблемы
-- Пока нет web deploy - на live чипов «Скрыть» не будет.
+- Нет: live Deploy [34390637907](https://github.com/Twisterrrrr/daibilet/actions/runs/34390637907) head `a5cfaaab` (= сам commit exclude themes).
 
 ---
 
@@ -25,10 +42,10 @@
 - `1e81d896`: `unwrapMarkdownHeadingLine` (`**…**` → `h3`) + `formatInlineEventMarkdown` (`**bold**` / `*italic*`).
 - Codex `4f1e4953`: whole-line `## …` / `#…######` тоже → `h3` (TEP editorial batch).
 - Allowlist секций + тесты (kazan disco / `## Особенности` / inline bold+italic).
-- Статус: код в HEAD `feat/next-monorepo` (`a8492653`); тикет `FIX.AI-REWRITE-MD` закрыт в tracker.
+- Тикет `FIX.AI-REWRITE-MD`: `1e81d896` в live `a5cfaaab`; `##` headings `4f1e4953` ещё post-live в HEAD.
 
 ### Проблемы
-- Нет: markdown-рендер закрыт в ветке; остаточный live-gap только если web artifact старше этих SHA.
+- Нет критичных: `**`/`*em*` на live; residual только `##` headings до следующего web batch.
 
 ---
 
@@ -42,14 +59,16 @@
 ### Решения
 - Целевой default: `TEP_WIDGET_ID` / `NEXT_PUBLIC_TEP_WIDGET_ID` / `VITE_TEP_WIDGET_ID` → `14460`.
 - Канон: account-level default, не stale `widgetPayload.tepWidgetId`.
+- 2026-09-19: уравнены web/public/`provider-purchase`/`.env.example`/staging example (+ docs); `dto.js` уже был `14460`.
 - На MSK: env `14460` + restart API / web batch.
 
 ### Проблемы
-- **HEAD `a8492653` ещё не уравнен:** `TeplohodWidget.client.tsx`, `apps/public` TeplohodWidget, `provider-purchase.ts`, `.env.example` / staging example всё ещё fallback `14208` (в `dto.js` местами уже `14460` - рассинхрон).
-- Пока code+MSK env = 14208, live buy 925 останется «закрыт».
+- Live artifact `a5cfaaab` ещё fallback `14208`; без MSK env + batch buy 925 останется «закрыт».
 - Описание evt_tep_925 по-прежнему тонкое (отдельный контент-тикет).
 
 ---
+
+## 2026-09-09 - Catalog date rail scroll
 
 ### Наблюдения
 - На десктопе лента дат «не листалась вправо»: fit-to-width обрезал число дней под `clientWidth`, overflow не было.
@@ -61,7 +80,7 @@
 - Убран measure/fit desktop; sticky timeline без лишнего `overflow-x` на обёртке.
 
 ### Проблемы
-- На live пока старый fit-rail, пока не batch deploy web.
+- Нет: `d23cb09a` в live Deploy `a5cfaaab`.
 
 ---
 

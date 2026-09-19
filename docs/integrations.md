@@ -207,7 +207,7 @@ Base URL:
 ```env
 TEP_API_URL=https://api.teplohod.info/v1
 TEP_USER_AGENT=Daibilet/1.0
-TEP_WIDGET_ID=14208
+TEP_WIDGET_ID=14460
 TEP_WIDGET_BASE_URL=https://teplohod.info
 ```
 

@@ -10,7 +10,7 @@ import {
   isPurchaseOpeningActive,
 } from '@/components/PurchaseOpeningFeedback.client';
 
-const DEFAULT_TEP_WIDGET_ID = process.env.NEXT_PUBLIC_TEP_WIDGET_ID?.trim() || '14208';
+const DEFAULT_TEP_WIDGET_ID = process.env.NEXT_PUBLIC_TEP_WIDGET_ID?.trim() || '14460';
 const TEP_WIDGET_SCRIPT_URL = 'https://api.teplohod.info/v1/widget/widget.js';
 
 const TEP_WIDGET_CSS = `
