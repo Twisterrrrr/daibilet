@@ -10,7 +10,7 @@
 - Docs: Project / qa / geo-excluded.
 
 ### Проблемы
-- Live: нужен restart `daibilet-api` на MSK (не web-only). Порог не раздувает сырой `Event` count в БД - только visibility `/cities` + unfolder.
+- ~~Live: нужен restart `daibilet-api`~~ закрыто Deploy MSK [35502033111](https://github.com/Twisterrrrr/daibilet/actions/runs/35502033111) SHA `44ac2d24` (swap + API). Smoke `/api/public/destinations`: Тольятти/Сургут city; thin 3-5 (Абакан/Белгород/…); Сортавала всё ещё <3 - fold в субъект. Порог не раздувает сырой `Event` count в БД.
 
 ---
 

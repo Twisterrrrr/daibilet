@@ -2,7 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| GEO.THIN-MIN-3 | `/cities`: regional towns (Тольятти/Сургут/Сортавала/…) карточка при `events >= 3` (было >5 / `PUBLIC_CATALOG_THIN_MIN_EVENTS=6`) | Высокий | 🔄 code+tests; нужен API restart MSK |
+| GEO.THIN-MIN-3 | `/cities`: regional towns (Тольятти/Сургут/Сортавала/…) карточка при `events >= 3` (было >5 / `PUBLIC_CATALOG_THIN_MIN_EVENTS=6`) | Высокий | ✅ live Deploy [35502033111](https://github.com/Twisterrrrr/daibilet/actions/runs/35502033111) `44ac2d24`; smoke destinations: Тольятти/Сургут city + 8 thin (3–5) |
 
 ## 2026-09-09 - Teplohod AI rewrite batch apply
 
