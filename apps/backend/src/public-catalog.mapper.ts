@@ -131,7 +131,7 @@ const knownSessionCities = [
 ].sort((left, right) => right.length - left.length);
 
 export type MapGroupedPublicSessionOptions = {
-  /** Towns with saleable events > 5: keep type=city instead of folding to the subject. */
+  /** Towns with saleable events >= 3: keep type=city instead of folding to the subject. */
   separateCityHubs?: ReadonlySet<string>;
 };
 

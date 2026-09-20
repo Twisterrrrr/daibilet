@@ -5,8 +5,8 @@ import type { DestinationType } from './types/common.js';
 import type { PublicDestinationDto, PublicSessionDto } from './types/public.js';
 
 const PUBLIC_DESTINATION_MIN_EVENTS = 1;
-/** Owner 2026-08-17: regional-town cards on /cities only if events > 5. Adm centers stay at ≥1. */
-export const PUBLIC_CATALOG_THIN_MIN_EVENTS = 6;
+/** Owner 2026-09-20: regional-town cards on /cities only if events >= 3 (was > 5 / >= 6). Adm centers stay at ≥1. */
+export const PUBLIC_CATALOG_THIN_MIN_EVENTS = 3;
 
 interface CityRoutingConfig {
   standaloneCities?: string[];
@@ -240,7 +240,7 @@ export function isSubjectCapitalCity(name?: string | null): boolean {
   return standaloneCityNames.has(clean) && !cityToRegion.has(clean);
 }
 
-/** Региональный городок: dual membership, не адмцентр. Карточка /cities только при events > 5. */
+/** Региональный городок: dual membership, не адмцентр. Карточка /cities только при events >= 3. */
 export function isFoldingRegionalTown(name?: string | null): boolean {
   const clean = cleanDisplayName(name);
   if (!clean) return false;

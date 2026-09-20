@@ -99,7 +99,7 @@ test('non-capital standalone is a city destination, not folded to region', () =>
   assert.equal(tolyatti.name, 'Тольятти');
 });
 
-test('adm centers show a /cities card from 1 event; regional towns need events > 5', () => {
+test('adm centers show a /cities card from 1 event; regional towns need events >= 3', () => {
   assert.equal(isSubjectCapitalCity('Ханты-Мансийск'), true);
   assert.equal(isSubjectCapitalCity('Владикавказ'), true);
   assert.equal(isSubjectCapitalCity('Самара'), true);
@@ -113,9 +113,10 @@ test('adm centers show a /cities card from 1 event; regional towns need events >
   assert.equal(isVisibleOnCitiesCatalog({ name: 'Владикавказ', type: 'city', events: 1 }), true);
   assert.equal(isVisibleOnCitiesCatalog({ name: 'Самара', type: 'city', events: 1 }), true);
   assert.equal(isVisibleOnCitiesCatalog({ name: 'Сортавала', type: 'city', events: 0 }), false);
-  assert.equal(isVisibleOnCitiesCatalog({ name: 'Сортавала', type: 'city', events: 5 }), false);
-  assert.equal(isVisibleOnCitiesCatalog({ name: 'Сортавала', type: 'city', events: 6 }), true);
-  assert.equal(isVisibleOnCitiesCatalog({ name: 'Тольятти', type: 'city', events: 5 }), false);
+  assert.equal(isVisibleOnCitiesCatalog({ name: 'Сортавала', type: 'city', events: 2 }), false);
+  assert.equal(isVisibleOnCitiesCatalog({ name: 'Сортавала', type: 'city', events: 3 }), true);
+  assert.equal(isVisibleOnCitiesCatalog({ name: 'Тольятти', type: 'city', events: 2 }), false);
+  assert.equal(isVisibleOnCitiesCatalog({ name: 'Тольятти', type: 'city', events: 3 }), true);
 
   const khanty = buildPublicDestinationRowsFromSessions(citySessions('Ханты-Мансийск', 3) as never);
   assert.equal(khanty.some((row) => row.name === 'Ханты-Мансийск' && row.type === 'city'), true);
@@ -149,14 +150,30 @@ test('adm centers show a /cities card from 1 event; regional towns need events >
     khantyWithSurgut.some((row) => row.name === 'Ханты-Мансийск' && row.type === 'city' && row.events === 3),
     true,
   );
-  assert.equal(khantyWithSurgut.some((row) => row.name === 'Сургут'), false);
   assert.equal(
-    khantyWithSurgut.some((row) => row.name === 'Ханты-Мансийский автономный округ' && row.type === 'region' && row.events === 3),
+    khantyWithSurgut.some((row) => row.name === 'Сургут' && row.type === 'city' && row.events === 3),
     true,
   );
+  assert.equal(
+    khantyWithSurgut.some((row) => row.name === 'Ханты-Мансийский автономный округ' && row.events > 0),
+    false,
+  );
+
+  const sortavalaThin = buildPublicDestinationRowsFromSessions(citySessions('Сортавала', 2) as never);
+  assert.equal(sortavalaThin.some((row) => row.name === 'Сортавала'), false);
 
   const sortavala = buildPublicDestinationRowsFromSessions(citySessions('Сортавала', 3) as never);
-  assert.equal(sortavala.some((row) => row.name === 'Сортавала'), false);
+  assert.equal(sortavala.some((row) => row.name === 'Сортавала' && row.type === 'city'), true);
+
+  const foldedThin = buildPublicDestinationRowsFromSessions(
+    citySessions('Сортавала', 2).map((session) => ({
+      ...session,
+      destination: 'Республика Карелия',
+      destinationType: 'region' as const,
+    })) as never,
+  );
+  assert.equal(foldedThin.some((row) => row.name === 'Сортавала'), false);
+  assert.equal(foldedThin.some((row) => row.name === 'Республика Карелия' && row.type === 'region'), true);
 
   const folded = buildPublicDestinationRowsFromSessions(
     citySessions('Сортавала', 3).map((session) => ({
@@ -165,16 +182,16 @@ test('adm centers show a /cities card from 1 event; regional towns need events >
       destinationType: 'region' as const,
     })) as never,
   );
-  assert.equal(folded.some((row) => row.name === 'Сортавала'), false);
-  assert.equal(folded.some((row) => row.name === 'Республика Карелия' && row.type === 'region'), true);
+  assert.equal(folded.some((row) => row.name === 'Сортавала' && row.type === 'city' && row.events === 3), true);
+  assert.equal(folded.some((row) => row.name === 'Республика Карелия' && row.events > 0), false);
 
-  const tolyatti = buildPublicDestinationRowsFromSessions(citySessions('Тольятти', 6) as never);
+  const tolyatti = buildPublicDestinationRowsFromSessions(citySessions('Тольятти', 3) as never);
   assert.equal(tolyatti.some((row) => row.name === 'Тольятти' && row.type === 'city'), true);
 
-  const surgut = buildPublicDestinationRowsFromSessions(citySessions('Сургут', 6) as never);
+  const surgut = buildPublicDestinationRowsFromSessions(citySessions('Сургут', 3) as never);
   assert.equal(surgut.some((row) => row.name === 'Сургут'), true);
 
-  const novokuznetsk = buildPublicDestinationRowsFromSessions(citySessions('Новокузнецк', 6) as never);
+  const novokuznetsk = buildPublicDestinationRowsFromSessions(citySessions('Новокузнецк', 3) as never);
   assert.equal(novokuznetsk.some((row) => row.name === 'Новокузнецк'), true);
 
   const vologda = buildPublicDestinationRowsFromSessions(citySessions('Вологда', 3) as never);

@@ -1,3 +1,19 @@
+## 2026-09-20 - Regional towns /cities: порог events ≥ 3
+
+### Наблюдения
+- Owner: карточки региональных городков на `/cities` не росли из-за `PUBLIC_CATALOG_THIN_MIN_EVENTS=6` (events > 5).
+- Адмцентры субъекта по-прежнему с ≥1.
+
+### Решения
+- `PUBLIC_CATALOG_THIN_MIN_EVENTS = 3` в `public-destination.ts` (+ mapper comment).
+- Тесты: Сортавала/Тольятти/Сургут с 3 saleable - отдельная city-карточка; с 2 - свёртка в субъект.
+- Docs: Project / qa / geo-excluded.
+
+### Проблемы
+- Live: нужен restart `daibilet-api` на MSK (не web-only). Порог не раздувает сырой `Event` count в БД - только visibility `/cities` + unfolder.
+
+---
+
 ## 2026-09-20 - Status drift residual (B.32 / 0.5.5 / PILOT-2 + VK.10)
 
 ### Наблюдения

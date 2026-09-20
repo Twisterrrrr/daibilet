@@ -1,3 +1,9 @@
+## 2026-09-20 - Regional towns /cities threshold ≥3
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| GEO.THIN-MIN-3 | `/cities`: regional towns (Тольятти/Сургут/Сортавала/…) карточка при `events >= 3` (было >5 / `PUBLIC_CATALOG_THIN_MIN_EVENTS=6`) | Высокий | 🔄 code+tests; нужен API restart MSK |
+
 ## 2026-09-09 - Teplohod AI rewrite batch apply
 
 | ID | Задача | Приоритет | Статус |

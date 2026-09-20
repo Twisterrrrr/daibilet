@@ -12,7 +12,7 @@
 | Адм. центр субъекта + saleable | `standaloneCities` (+ hub) | нет — публичный city |
 | Город субъекта, не центр | `cityToRegion` → область/край/республика | **нет** - штатная свёртка |
 | Мелкий посёлок без хаба (Лебяжье, …) | только `cityToRegion`, не standalone | нет |
-| Туристический магнит не-адмцентр (Сортавала) | dual: `standaloneCities` + `cityToRegion`; индекс `/cities` при events > 5; search сразу | нет |
+| Туристический магнит не-адмцентр (Сортавала) | dual: `standaloneCities` + `cityToRegion`; индекс `/cities` при events ≥ 3; search сразу | нет |
 | Набережные Челны | `cityToRegion` → Республика Татарстан → под карточкой **Казани** | нет (после fix republic) |
 | Зарубежье (Батуми, Осака, …) | `foreignCities` — cut из destinations и public catalog sessions | нет — намеренный отсев |
 | Нет saleable | не попадает в destination buckets | `no-saleable` |
@@ -63,7 +63,7 @@
 
 | Город | Событий (READY/saleable) | Причина (аудит) | После политики |
 |---|---:|---|---|
-| Сортавала | 0/877 | allowlist | **standalone 2026-08-17** (search + URL; сетка `/cities` при events > 5) |
+| Сортавала | 0/877 | allowlist | **standalone 2026-08-17** (search + URL; сетка `/cities` при events ≥ 3) |
 | Раменское | 362/199 | cityToRegion→Московская область | без изменений (region) |
 | Лебяжье | 0/72 | allowlist | cityToRegion→Ленинградская область |
 | Чебоксары | 75/62 | allowlist | **standalone** |
