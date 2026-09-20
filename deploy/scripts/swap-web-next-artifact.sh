@@ -41,9 +41,21 @@ clear_deploy_active() {
 trap clear_deploy_active EXIT
 echo "Deploy lock acquired (${DEPLOY_LOCK})"
 
+# Past root deploys can leave .git/objects unwritable for deploy@.
+if ! touch .git/objects/.daibilet-write-probe 2>/dev/null; then
+  if sudo -n chown -R "$(whoami):$(id -gn)" .git 2>/dev/null; then
+    echo "chown .git → $(whoami) (sudo)"
+  else
+    echo "WARN: .git not writable and sudo chown failed; fetch may fail" >&2
+  fi
+else
+  rm -f .git/objects/.daibilet-write-probe
+fi
+
 git fetch origin "$BRANCH" || {
   echo "ERROR: git fetch origin failed." >&2
   echo "MSK origin must be SSH with a read-only deploy key (not HTTPS without creds)." >&2
+  echo "If 'insufficient permission ... .git/objects': sudo chown -R deploy:deploy /opt/daibilet/.git" >&2
   echo "See docs/deploy-timeweb.md § GitHub. remote=$(git remote get-url origin 2>/dev/null || echo unknown)" >&2
   exit 1
 }

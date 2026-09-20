@@ -156,8 +156,11 @@ jobs:
           SCP=(scp -i "$HOME/.ssh/msk_key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o BatchMode=yes)
           REMOTE_TGZ="/tmp/daibilet-web-next-${DEPLOY_SHA}.tgz"
           "${SCP[@]}" /tmp/daibilet-web-next.tgz "${MSK_SSH_USER}@${MSK_SSH_HOST}:${REMOTE_TGZ}"
+          # .git/objects may be root-owned after a past root deploy; deploy@ needs write for fetch.
           "${SSH[@]}" "${MSK_SSH_USER}@${MSK_SSH_HOST}" \
-            "cd /opt/daibilet && git fetch origin feat/next-monorepo && \
+            "cd /opt/daibilet && \
+             (sudo -n chown -R \"\$(whoami):\$(id -gn)\" .git 2>/dev/null || true) && \
+             git fetch origin feat/next-monorepo && \
              git checkout feat/next-monorepo && git reset --hard origin/feat/next-monorepo && \
              ARTIFACT=${REMOTE_TGZ} GIT_SHA=${DEPLOY_SHA} BRANCH=feat/next-monorepo \
              bash ./deploy/scripts/swap-web-next-artifact.sh && rm -f ${REMOTE_TGZ}"
