@@ -1,12 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, CalendarDays, Grid3X3, List, MapPin, Table2 } from 'lucide-react';
+import { ArrowRight, Grid3X3, List, Table2 } from 'lucide-react';
 import { useMemo, useRef } from 'react';
 
 import { EventCard } from '@/components/EventCard';
 import { EventCardHorizontal } from '@/components/EventCardHorizontal';
 import { CatalogListRow } from '@/components/CatalogListRow.client';
+import { ScrollRail } from '@/components/ScrollRail.client';
 import type { PublicCatalogListItemDto } from '@daibilet/contracts/public';
 import { trackCatalogBannerClick } from '@/lib/catalog-analytics';
 import { isCatalogExcludedMuseumAdmission } from '@/lib/catalog-exclusions';
@@ -15,7 +16,7 @@ import { resolveEventCardFallbackImage, resolveEventCardPrimaryImage } from '@/l
 import { formatMoneyRange } from '@/lib/format';
 import { formatPublicTitle } from '@/lib/format-public-title';
 import { formatShowcaseSessionDate, MIN_DISPLAY_PRICE_RUB } from '@/lib/event-card-meta';
-import { resolveEventCardDestinationLabel, resolveEventCardLocationLabel } from '@/lib/event-location';
+import { resolveEventCardDestinationLabel } from '@/lib/event-location';
 import { eventHref, sessionVenueHref } from '@/lib/routes';
 import type { CatalogViewMode } from '@/lib/catalog-view-mode';
 import {
@@ -140,65 +141,24 @@ export function CatalogZenSpotlight({ items }: { items: PublicCatalogListItemDto
         </Link>
       </div>
 
-      <ul className="catalog-zen-spotlight-grid">
-        {items.map((session, index) => {
-          const title = formatPublicTitle(session.title);
-          const image = resolveEventCardPrimaryImage(session) || resolveEventCardFallbackImage(session);
-          const location =
-            resolveEventCardLocationLabel(session) || resolveEventCardDestinationLabel(session) || '';
-          const hasPrice =
-            typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB;
-
-          return (
-            <li key={`zen-${session.id}-${session.startsAt}`} className="catalog-zen-spotlight-item min-w-0">
-              <Link
-                href={eventHref(session)}
-                className="group flex h-full min-h-full flex-col overflow-hidden rounded-lg border border-slate-200 bg-white text-graphite shadow-sm transition hover:-translate-y-0.5 hover:border-primary-200 hover:shadow-md"
-              >
-                <span className="relative block aspect-[4/3] w-full shrink-0 overflow-hidden bg-slate-100">
-                  <CardSafeImage
-                    src={image}
-                    alt={title}
-                    fill
-                    sizes="(min-width: 1840px) 360px, (min-width: 1280px) 22vw, (min-width: 640px) 38vw, 82vw"
-                    quality={CATALOG_IMAGE_QUALITY}
-                    priority={index === 0}
-                    loading={index === 0 ? undefined : 'lazy'}
-                    className="object-cover transition-transform duration-500 group-hover:scale-[1.025]"
-                    fallback={<div className="h-full w-full bg-slate-100" />}
-                  />
-                  <span className="absolute left-3 top-3 rounded-md bg-white/95 px-2 py-1 text-[10px] font-bold uppercase text-primary-700 shadow-sm backdrop-blur-sm sm:text-[11px]">
-                    {session.category || 'Событие'}
-                  </span>
-                </span>
-                <span className="flex min-h-0 flex-1 flex-col p-4 sm:p-5">
-                  <span
-                    className="mt-2 line-clamp-3 font-display text-xl font-bold leading-snug sm:text-[1.35rem]"
-                  >
-                    {title}
-                  </span>
-                  <span className="mt-3 flex min-w-0 items-center gap-1.5 text-xs font-semibold text-slate-700 sm:text-[13px]">
-                    <CalendarDays className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} aria-hidden />
-                    <span className="truncate">{formatShowcaseSessionDate(session)}</span>
-                  </span>
-                  {location ? (
-                    <span className="mt-1.5 flex min-w-0 items-center gap-1.5 text-xs text-graphite-muted sm:text-[13px]">
-                      <MapPin className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} aria-hidden />
-                      <span className="truncate">{location}</span>
-                    </span>
-                  ) : null}
-                  <span className="mt-auto flex items-center justify-between gap-3 pt-4">
-                    <span className="text-sm font-bold text-primary-700 sm:text-base">
-                      {hasPrice ? formatMoneyRange(session.priceFrom, session.priceTo) : 'Подробнее'}
-                    </span>
-                    <ArrowRight className="h-4 w-4 shrink-0 text-primary-700 transition-transform group-hover:translate-x-1" strokeWidth={1.75} aria-hidden />
-                  </span>
-                </span>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+      {/* Same rail chrome as city hub affiche: swipe carousel + md+ arrows. */}
+      <ScrollRail
+        className="mt-1"
+        hideScrollbar
+        viewportClassName="flex flex-nowrap gap-2.5 snap-x snap-mandatory pb-0.5"
+        aria-label="Стоит увидеть"
+      >
+        {items.map((session) => (
+          <div
+            key={`zen-${session.id}-${session.startsAt}`}
+            className="w-[min(62%,11.5rem)] shrink-0 snap-start sm:w-[12rem] md:w-[12.5rem] lg:w-[13rem]"
+            data-rail-item
+            data-catalog-zen-card
+          >
+            <EventCard session={session} showcaseRail cityHub />
+          </div>
+        ))}
+      </ScrollRail>
     </section>
   );
 }

@@ -6,6 +6,7 @@ import { SectionPageHero } from '@/components/PageBreadcrumbs';
 import type { CatalogIntentDefinition } from '@/lib/catalog-intent-routes';
 import { catalogIntentPath, formatIntentSeoBody, listCatalogIntents } from '@/lib/catalog-intent-routes';
 import { sanitizeEventHtml } from '@/lib/event-description-format';
+import { cityHref } from '@/lib/routes';
 import type { CatalogPageQuery } from '@/server/catalog-query';
 import { catalogQueryCacheKey } from '@/server/catalog-query';
 import { getCachedCatalog } from '@/server/cached-catalog-data';
@@ -42,8 +43,11 @@ export async function IntentCollectionView({
   const crumbs = [
     { label: 'Главная', href: '/' },
     { label: 'Подборки', href: '/podborki' },
+    ...(citySlug && cityName
+      ? [{ label: cityName, href: cityHref({ name: cityName, slug: citySlug }) }]
+      : []),
     {
-      label: cityName ? `${intent.label} · ${cityName}` : intent.label,
+      label: intent.label,
     },
   ];
   const titleText =

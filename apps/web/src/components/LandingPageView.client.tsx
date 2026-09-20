@@ -1540,7 +1540,10 @@ function LandingHero({
               <span className="flex items-center gap-2">
                 <span>/</span>
                 <a
-                  href={citySlug ? cityHref({ name: cityName, slug: citySlug }) : '/cities'}
+                  href={cityHref({
+                    name: cityName,
+                    slug: citySlug || citySlugFromCityName(cityName) || citySlugByName(cityName) || undefined,
+                  })}
                   className="transition-colors hover:text-primary-foreground"
                 >
                   {cityName}
