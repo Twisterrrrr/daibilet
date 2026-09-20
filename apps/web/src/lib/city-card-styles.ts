@@ -1,9 +1,12 @@
 /** Чуть выше 16:9 - единый ритм карточек в rail / сетке. */
 export const CITY_CARD_ASPECT_CLASS = 'aspect-[5/3]';
 
-/** Semi-circle scrim under city name (dark tone cards). Mobile size locked; tighter on desktop grids. */
+/**
+ * Bottom-left darkening under city name/stats (dark tone cards).
+ * Inset radial only - the old absolute oval used negative % and leaked below the photo onto tags.
+ */
 export const CITY_CARD_DARK_SCRIM_CLASS =
-  'pointer-events-none absolute -bottom-[18%] -left-[22%] h-[78%] w-[78%] rounded-full bg-black/30 md:-bottom-[11%] md:-left-[15%] md:h-[56%] md:w-[56%] lg:-bottom-[9%] lg:-left-[13%] lg:h-[50%] lg:w-[50%] xl:h-[44%] xl:w-[44%]';
+  'pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_95%_80%_at_18%_100%,rgba(0,0,0,0.48)_0%,rgba(0,0,0,0.22)_42%,transparent_72%)]';
 
 
 /** Одна строка: длинные имена (Нижний Новгород) не ломают высоту блока. */

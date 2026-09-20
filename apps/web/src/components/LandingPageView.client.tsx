@@ -112,7 +112,7 @@ import {
 import { isOpenDate, FLEXIBLE_SCHEDULE_LABEL, isFlexibleScheduleSession, resolveSessionPriceRange } from '@/lib/event-card-meta';
 import { isBookingPlatformLabel, resolveEventCardLocationLabel } from '@/lib/event-location';
 import { formatVacantSeats } from '@/lib/event-page-utils';
-import { eventHref, sessionVenueHref } from '@/lib/routes';
+import { cityHref, eventHref, sessionVenueHref } from '@/lib/routes';
 import type { PublicLandingDto, PublicLandingPageDto, PublicSessionDto } from '@daibilet/contracts/public';
 
 type LandingContentBlock = NonNullable<PublicLandingPageDto['blocks']>[number];
@@ -1539,7 +1539,12 @@ function LandingHero({
             ) : cityName ? (
               <span className="flex items-center gap-2">
                 <span>/</span>
-                <a href="/cities" className="transition-colors hover:text-primary-foreground">{cityName}</a>
+                <a
+                  href={citySlug ? cityHref({ name: cityName, slug: citySlug }) : '/cities'}
+                  className="transition-colors hover:text-primary-foreground"
+                >
+                  {cityName}
+                </a>
               </span>
             ) : null}
             {!isBus && !isDinner && !isRiver && !isSeasonal && !isBridges ? (

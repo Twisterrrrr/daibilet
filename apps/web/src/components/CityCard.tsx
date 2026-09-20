@@ -201,7 +201,7 @@ export function CityCard({
             : 'hover:shadow-[0_10px_28px_-8px_hsl(221_83%_53%_/_0.35)]'
         }`}
       >
-        <div className={`relative ${CITY_CARD_ASPECT_CLASS} overflow-hidden`}>
+        <div className={`relative isolate ${CITY_CARD_ASPECT_CLASS} overflow-hidden rounded-[inherit]`}>
           <SafeImage
             src={imageUrl}
             alt=""
@@ -225,7 +225,7 @@ export function CityCard({
               aria-hidden
             />
           ) : (
-            /* Owner: semi-circle under title/stats — compact on desktop grids. */
+            /* Bottom-left scrim for title/stats - inset radial, no leak under tags. */
             <div className={CITY_CARD_DARK_SCRIM_CLASS} aria-hidden />
           )}
           <div
