@@ -27,7 +27,8 @@ import type { FinanceAdmissionListResult } from '@/lib/finance-projection';
 import { withSoftTimeout } from '@/lib/soft-timeout';
 import { buildVenuePageJsonLd } from '@/lib/structured-data';
 import { resolveVenueSeoTitle } from '@/lib/venue-seo';
-import { resolveVenueHeroImage, resolveVenueShareImage, localPublicImageExists } from '@/lib/city-place-images';
+import { resolveVenueHeroImage } from '@/lib/city-place-images';
+import { resolveVenueShareImage, localPublicImageExists } from '@/lib/city-place-images-server';
 import { applyVenueEditorialOverlay } from '@/lib/venue-editorial-content';
 import type { PublicVenuePageDto } from '@daibilet/contracts/public';
 

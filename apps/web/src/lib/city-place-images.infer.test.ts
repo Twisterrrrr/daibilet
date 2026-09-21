@@ -4,9 +4,11 @@ import test from 'node:test';
 import {
   lookupEditorialPlaceImage,
   resolveVenueHeroImage,
+} from './city-place-images.ts';
+import {
   resolveVenueShareImage,
   localPublicImageExists,
-} from './city-place-images.ts';
+} from './city-place-images-server.ts';
 
 test('Ufa hub slugs resolve to real venue stills, not cities placeholders', () => {
   assert.equal(
