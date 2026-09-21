@@ -69,14 +69,7 @@ export function toHomeSsrSession(session: CatalogCardSession): PublicCatalogList
   if (session.purchaseProvider != null) item.purchaseProvider = session.purchaseProvider;
   if (session.purchaseUrl != null) item.purchaseUrl = session.purchaseUrl;
   if (session.widgetUrl != null) item.widgetUrl = session.widgetUrl;
-  if ('manualLandingStatus' in session && session.manualLandingStatus != null) {
-    (item as PublicCatalogListItemDto & { manualLandingStatus?: string | null }).manualLandingStatus =
-      session.manualLandingStatus;
-  }
-  if ('landingSlugs' in session && session.landingSlugs?.length) {
-    (item as PublicCatalogListItemDto & { landingSlugs?: string[] }).landingSlugs =
-      session.landingSlugs.slice(0, 6);
-  }
+  // Home rails do not need landingSlugs / manualLandingStatus in RSC flight.
 
   return item;
 }

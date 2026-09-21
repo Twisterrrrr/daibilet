@@ -30,7 +30,10 @@ import { landingCategoryHref } from '@/lib/landing-routes';
 import { orderPopularRailCities } from '@/lib/popular-cities-rail';
 import { withSoftTimeout } from '@/lib/soft-timeout';
 import {
-  filterFingerprintsForSessions,
+  buildHomePageSectionsSync,
+  mergeHomeNowTabsForSsr,
+} from '@/lib/home-page-sections-sync';
+import {
   toHomeSsrSession,
   toSlimCityDestination,
   toSlimLandingHeroChip,
@@ -76,14 +79,20 @@ async function HomePageBody() {
   const luckyCities = [...cities]
     .filter((c) => c.events > 0)
     .sort((a, b) => b.events - a.events || a.name.localeCompare(b.name, 'ru'))
-    .slice(0, 40)
+    .slice(0, 24)
     .map(toSlimCityDestination);
   // Same canon as SiteFooter (not catalogPayload.total - that under/over-counts vs destinations).
   const { places: liveCities, events: liveEvents } = catalogSocialStats(destinations);
 
   const sessions = (catalogPayload?.items ?? []).map(toHomeSsrSession);
   const sparseCatalog = sessions.length < 12;
-  const fingerprints = filterFingerprintsForSessions(fingerprintsRecord, sessions);
+  // WEB.LIGHT.A1: build rails on the server - client island gets sections only, not the pool.
+  const fingerprintMap = new Map(Object.entries(fingerprintsRecord || {}));
+  const { editorsPick, homeNowTabs, popular } = buildHomePageSectionsSync(sessions, {
+    cityName: ssrCityName,
+    fingerprints: fingerprintMap,
+  });
+  const mergedHomeNowTabs = mergeHomeNowTabsForSsr(homeNowTabs, popular, sparseCatalog);
 
   const promoLandings = (landingsCatalog?.items || [])
     .filter((item) => item.events > 0)
@@ -91,7 +100,7 @@ async function HomePageBody() {
     .map(toSlimLandingPromo);
   const heroLandings = (landingsCatalog?.items || [])
     .filter((item) => item.events > 0)
-    .slice(0, 24)
+    .slice(0, 12)
     .map(toSlimLandingHeroChip);
   const blogCards = mergeBlogCards(
     (articlesPayload?.articles as BlogApiArticles | undefined) ?? null,
@@ -142,8 +151,8 @@ async function HomePageBody() {
 
       {/* Rhythm: editors → cities → My Day */}
       <HomeCityAwareSections
-        sessions={sessions}
-        fingerprints={fingerprints}
+        editorsPick={editorsPick}
+        homeNowTabs={mergedHomeNowTabs}
         sparseCatalog={sparseCatalog}
         ssrCityName={ssrCityName}
       >

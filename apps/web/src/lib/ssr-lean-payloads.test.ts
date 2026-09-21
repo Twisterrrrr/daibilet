@@ -43,12 +43,19 @@ function sampleSession(overrides: Partial<PublicCatalogListItemDto> = {}): Publi
 
 describe('ssr-lean-payloads', () => {
   it('toHomeSsrSession drops description and caps slots', () => {
-    const lean = toHomeSsrSession(sampleSession());
+    const lean = toHomeSsrSession(
+      sampleSession({
+        landingSlugs: ['a', 'b', 'c'],
+        manualLandingStatus: 'PINNED',
+      } as Partial<PublicCatalogListItemDto>),
+    );
     assert.equal(lean.description, undefined);
     assert.equal(lean.deeplinkUrl, undefined);
     assert.equal(lean.purchaseUrl, 'https://example.com/buy');
     assert.equal(lean.upcomingSlots?.length, 3);
     assert.equal(lean.tags.length, 4);
+    assert.equal((lean as { landingSlugs?: string[] }).landingSlugs, undefined);
+    assert.equal((lean as { manualLandingStatus?: string }).manualLandingStatus, undefined);
   });
 
   it('toCatalogSsrItem keeps full blurb and purchase CTA', () => {

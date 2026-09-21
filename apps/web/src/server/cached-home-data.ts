@@ -57,20 +57,20 @@ export const getHomeDestinations = unstable_cache(
 
 function homeCatalogSearchParams(citySlug?: string | null) {
   const city = String(citySlug || '').trim();
+  // 40 is enough for editors + now-tabs + popular after cover dedupe; sections are
+  // built on the server so the client island no longer carries the full pool.
   return city
-    ? { limit: 56, sort: 'popular' as const, city }
-    : { limit: 56, sort: 'popular' as const };
+    ? { limit: 40, sort: 'popular' as const, city }
+    : { limit: 40, sort: 'popular' as const };
 }
 
 export const getHomeCatalog = unstable_cache(
-  // Wider pool so cover-content dedupe can refill rails after skipping identical binaries.
-  // 56 is enough for editors + now-tabs + popular after city filter; keeps RSC flight smaller.
   () =>
     fetchPublicApiJson<PublicCatalogDto>('/api/public/events', {
       searchParams: homeCatalogSearchParams(),
       timeoutMs: 5_000,
     }),
-  ['home-catalog-v9-http'],
+  ['home-catalog-v10-http'],
   homeCacheOptions,
 );
 
@@ -83,7 +83,7 @@ export async function getHomeCatalogForCity(citySlug?: string | null): Promise<P
         searchParams: homeCatalogSearchParams(city),
         timeoutMs: 5_000,
       }),
-    ['home-catalog-v9-http', city],
+    ['home-catalog-v10-http', city],
     homeCacheOptions,
   );
   return cached();
