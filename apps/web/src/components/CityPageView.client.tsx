@@ -19,7 +19,7 @@ import { EventCard } from '@/components/EventCard';
 import { LandingDirectionCard } from '@/components/LandingDirectionCard.client';
 import { PageBreadcrumbBar } from '@/components/PageBreadcrumbs';
 import { RegionNearbyStrip } from '@/components/RegionNearbyStrip.client';
-import { CardSafeImage, IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
+import { CardSafeImage, AFFICHE_IMAGE_QUALITY, IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { useDayRouteState } from '@/hooks/useDayRouteState';
 import { CityDayPresetBlock } from '@/components/CityDayPresetBlock.client';
@@ -2083,6 +2083,7 @@ function AffichePosterCard({ session }: { session: PublicSessionDto }) {
           alt=""
           fill
           sizes={IMAGE_SIZES.affichePoster}
+          quality={AFFICHE_IMAGE_QUALITY}
           className="object-cover outline outline-1 -outline-offset-1 outline-black/5 transition-transform duration-500 group-hover:scale-[1.03]"
           fallback={
             <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-zinc-100 to-zinc-200">

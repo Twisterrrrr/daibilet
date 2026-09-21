@@ -5,6 +5,7 @@ import * as React from 'react';
 
 import { blogListingImageFallbacks, listingImageFallbacks } from '@/lib/card-image';
 import {
+  AFFICHE_POSTER_SIZES,
   BLOG_LISTING_CARD_SIZES,
   BLOG_LISTING_IMAGE_QUALITY,
   CARD_EVENT_SIZES,
@@ -28,8 +29,8 @@ export const IMAGE_SIZES = {
   /** Dense `/events` catalog grid only - prefer with CATALOG_IMAGE_QUALITY. */
   eventCardCatalog: CATALOG_EVENT_CARD_SIZES,
   eventCardHorizontal: CATALOG_EVENT_CARD_HORIZONTAL_SIZES,
-  /** Editorial city hub poster 4:5 */
-  affichePoster: '(max-width: 640px) 72vw, (max-width: 1024px) 33vw, 16rem',
+  /** Editorial city hub / zen poster 3:4 (oversized for landscape->portrait crop). */
+  affichePoster: AFFICHE_POSTER_SIZES,
   cityCard: '(max-width: 640px) 68vw, (max-width: 1024px) 218px, 229px',
   /** /places + venue/location cards: 1 / 2 / 3 col, not 100vw */
   institutionCard: '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',

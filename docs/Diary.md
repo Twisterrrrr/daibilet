@@ -1,3 +1,19 @@
+## 2026-09-21 - /events zen afisha: landscape cover upscale
+
+### Наблюдения
+- Owner: сетка каталога ок, афиша «Стоит увидеть» пережата.
+- Live probe: poster 254x339, natural 384x216 (landscape) + sizes ~20vw/q88 → после object-cover высота апскейлится.
+- Portrait 3:4 из landscape 16:9 требует ~2.2x ширины источника.
+
+### Решения
+- AFFICHE_IMAGE_QUALITY 92→95; AFFICHE_POSTER_SIZES = 100vw / 70vw / 828px.
+- next.config qualities +95; AffichePosterCard тоже quality=95.
+- Catalog dense не трогали (owner сказал ок).
+
+### Проблемы
+- Без web deploy на live не видно; CDN cache /_next/image может держать старые w=384.
+
+---
 ## 2026-09-21 - /events: качество обложек round 3 (q90 / 480px)
 
 ### Наблюдения

@@ -14,8 +14,18 @@ export const CATALOG_IMAGE_QUALITY = 90;
 /** Default card quality outside the dense catalog grid (hub / PDP / home / related). */
 export const CARD_IMAGE_QUALITY = 88;
 
-/** City-hub / venue / `/events` zen poster rail: slightly sharper than generic cards. */
-export const AFFICHE_IMAGE_QUALITY = 92;
+/**
+ * City-hub / venue / `/events` zen poster rail (portrait 3:4).
+ * Landscape TC covers lose height under object-cover - keep q high.
+ */
+export const AFFICHE_IMAGE_QUALITY = 95;
+
+/**
+ * Oversize sizes budget vs CSS tile (~14-16rem): landscape 16:9 -> portrait 3:4
+ * crop needs ~2.2x source width so vertical pixels are not upscaled.
+ */
+export const AFFICHE_POSTER_SIZES =
+  '(max-width: 640px) 100vw, (max-width: 1024px) 70vw, 828px';
 
 /**
  * `/blog` listing cards (feed / home rail). Local `/images/blog` is unoptimized
