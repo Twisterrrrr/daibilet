@@ -1,3 +1,37 @@
+## 2026-09-21 - /events: качество обложек round 3 (q90 / 480px)
+
+### Наблюдения
+- Live всё ещё q=78 / sizes cap 360px (cb7160f1); round 2 (q85/420) лежал uncommitted.
+- Owner снова: карточки /events пережаты. TC covers идут через /_next/image?q=.
+- Локальные /images/*-card.jpg unoptimized (~30-50KB) - quality на них не влияет; compress defaults 960/@82 слишком тощие для retina.
+
+### Решения
+- CATALOG_IMAGE_QUALITY 78→90; CARD 85→88; AFFICHE 88→92 (zen «Стоит увидеть»).
+- Desktop sizes cap 360→480px; imageSizes +480; images.qualities [75,85,88,90,92].
+- ffichePoster sizes: mobile 72vw, desktop 16rem (под fixed zen/hub posters).
+- compress-card-images.mjs: 1200/@88 (для regen на MSK после deploy).
+- Commit + Deploy MSK web.
+
+### Проблемы
+- Без 
+ode scripts/compress-card-images.mjs events на MSK локальные sidecar останутся старыми; TC/Yandex сразу станут чётче после web swap.
+
+---## 2026-09-21 - /events: качество обложек round 2 (q85 / 420px)
+
+### Наблюдения
+- Owner снова: `/events` пережато; round 1 (`cb7160f1` q78/360) на live либо не хватило, либо ещё не успел проявиться.
+- TC covers идут через `/_next/image` (`q=` в URL) - основной рычаг для афиши.
+- Локальные `/images/*` unoptimized (`-card` sidecar) - `quality` не влияет; при мыле после deploy: `node scripts/compress-card-images.mjs events` на MSK (960/@82).
+
+### Решения
+- `CATALOG_IMAGE_QUALITY` 78→85 (как `CARD_IMAGE_QUALITY`); desktop sizes cap 360→420px.
+- `next.config` `imageSizes` +480 (мост к retina tile до deviceSizes 640).
+- Commit + Deploy MSK web по запросу owner.
+
+### Проблемы
+- Teplohod CDN bypass optimizer - качество = исходник URL.
+
+---
 ## 2026-09-21 - /events: поднять качество обложек в сетке
 
 ### Наблюдения
@@ -12,6 +46,19 @@
 
 ### Проблемы
 - Без web deploy на live не видно. Teplohod CDN bypass optimizer - качество = исходник URL.
+
+---
+## 2026-09-21 - /events img quality: owner → deploy
+
+### Наблюдения
+- Owner: коммит и выкат. Код уже на `feat/next-monorepo` (`cb7160f1`).
+
+### Решения
+- Trigger Deploy MSK web на `feat/next-monorepo` / `cb7160f1`.
+- После success обновить Tasktracker → live.
+
+### Проблемы
+- Нет.
 
 ---
 ## 2026-09-21 - Owner «погнали»: post-deploy verify
@@ -20617,3 +20664,4 @@ evalidateNextBlogArticle (/blog, slug, city hub).
 ### Follow-ups
 - Ask Timeweb about intermittent SSH banner/TLS connect stalls with timestamps; app loopback is healthy while outside connections sometimes do not reach nginx.
 - Decide later whether to clean archived `.next.bak-*` and generated media on prod; no cleanup was done in this pass.
+

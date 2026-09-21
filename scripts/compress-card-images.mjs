@@ -3,7 +3,7 @@
  *
  *   node scripts/compress-card-images.mjs [events|venues|blog|blog-inline|landings|all] [--dry-run]
  *
- * P0: events/** → sibling `-card.jpg` (width 960, q~82, sharp listing).
+ * P0: events/** → sibling `-card.jpg` (width 1200, q~88, sharp listing).
  *     Does not overwrite originals (PDP keeps image.jpg).
  *     Skips sources already ≤80KB (lean stubs).
  * P0 venues: optional copy/compress from venues/** (places already have `-thumb`).
@@ -32,10 +32,10 @@ const rootDir = path.resolve(__dirname, '..');
 const publicImages = path.join(rootDir, 'apps/public/public/images');
 const webImages = path.join(rootDir, 'apps/web/public/images');
 
-const CARD_WIDTH = 960;
-const CARD_QUALITY = 82;
-const CARD_QUALITY_MIN = 72;
-const CARD_TARGET_MAX = 180 * 1024;
+const CARD_WIDTH = 1200;
+const CARD_QUALITY = 88;
+const CARD_QUALITY_MIN = 78;
+const CARD_TARGET_MAX = 220 * 1024;
 const LEAN_BYTES = 80 * 1024;
 const INLINE_MAX_SIDE = 1400;
 const INLINE_QUALITY = 82;
@@ -367,3 +367,4 @@ main().catch((error) => {
   console.error(error);
   process.exit(1);
 });
+

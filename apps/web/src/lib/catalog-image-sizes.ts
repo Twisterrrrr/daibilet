@@ -1,20 +1,21 @@
 /**
  * Catalog listing image budget: `/_next/image` widths + quality for dense `/events`.
- * Supplier covers (esp. TC PNG) are often 1–3MB; grid tiles need ~360–480 CSS px
- * (retina) - not the old 280px/q65 pack that looked mushy on live.
+ * Supplier covers (esp. TC) go through the optimizer with `q=` in the URL.
+ * Live q78 + 360px still looked soft on retina 4-col grids; q85 was prepared but
+ * not yet on live - bump to q90 / 480px for a visible sharpen without 100vw.
  *
  * Keep CATALOG_IMAGE_QUALITY scoped to `/events` catalog grids.
- * Home / related / venue / hub cards use CARD_IMAGE_QUALITY so they stay sharp.
+ * Home / related / venue / hub cards use CARD_IMAGE_QUALITY.
  */
 
-/** Catalog grid (`/events`) preview quality for `/_next/image`. */
-export const CATALOG_IMAGE_QUALITY = 78;
+/** Catalog grid (`/events`) preview quality for `/_next/image` (TC CDN etc.). */
+export const CATALOG_IMAGE_QUALITY = 90;
 
 /** Default card quality outside the dense catalog grid (hub / PDP / home / related). */
-export const CARD_IMAGE_QUALITY = 85;
+export const CARD_IMAGE_QUALITY = 88;
 
-/** City-hub / venue poster rail: slightly sharper than generic cards. */
-export const AFFICHE_IMAGE_QUALITY = 88;
+/** City-hub / venue / `/events` zen poster rail: slightly sharper than generic cards. */
+export const AFFICHE_IMAGE_QUALITY = 92;
 
 /**
  * `/blog` listing cards (feed / home rail). Local `/images/blog` is unoptimized
@@ -24,12 +25,13 @@ export const BLOG_LISTING_IMAGE_QUALITY = 70;
 
 /**
  * Match `.catalog-card-grid` (2 / 3 / 4 cols).
- * Never `100vw` on mobile: that pulled 640–750px for a ~50vw tile.
+ * Never `100vw` on mobile: that pulled 640-750px for a ~50vw tile.
+ * Desktop cap 480px so 2x retina lands on w=828-1080, not undersized 640.
  */
 export const CATALOG_EVENT_CARD_SIZES =
-  '(max-width: 639px) 50vw, (max-width: 1023px) 33vw, (max-width: 1535px) 25vw, 360px';
+  '(max-width: 639px) 50vw, (max-width: 1023px) 33vw, (max-width: 1535px) 25vw, 480px';
 
-/** Horizontal list thumb (~14–16rem). */
+/** Horizontal list thumb (~14-16rem). */
 export const CATALOG_EVENT_CARD_HORIZONTAL_SIZES = '(max-width: 639px) 100vw, 16rem';
 
 /** Home / related / showcase cards: allow a larger decode than dense catalog. */

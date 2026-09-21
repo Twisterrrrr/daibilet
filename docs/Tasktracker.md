@@ -2,7 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| UX.EVENTS-IMG-Q | `/events` grid: quality 65→78, sizes cap 280→360px | Высокий | ✅ код; ⏳ web deploy batch |
+| UX.EVENTS-IMG-Q | `/events` grid: q78→90, sizes 360→480px, AFFICHE 92, qualities config | Высокий | 🔄 commit+Deploy MSK web |
 
 ## 2026-09-21 - Когда ехать UX (вердикт)
 
@@ -3099,3 +3099,4 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 - [x] **Критический** — файл `googleb3313872246ac993.html` в `apps/web/public/`, deploy prod, curl 200 (2026-07-19)
 
 13872246ac993.html` в `apps/web/public/`, deploy prod, curl 200 (2026-07-19)
+
