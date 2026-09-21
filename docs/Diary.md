@@ -1,3 +1,20 @@
+## 2026-09-21 - MSK mustSee: photo batch1 + owner order closeout
+
+### Наблюдения
+- Smoke sample venues: **0×5XX**, H1 = editorial, Place/EventVenue LD `ldErr=0`, canonical на канон.
+- SSR HTML хаба не содержит имён mustSee (CityPageView client) - ложные «0 hits» в curl; smoke через UI/chunk.
+- Live `/cities/moskva`: Окуджава ×1 (Памятники), Стена Цоя + «Большая глина» (Необычное / creative), Вахтангов (Главные) - три разные, не копии.
+- До batch1: og missing → `default-og.jpg` 200; UI без битых img.
+- IndexNow 162 уже сдан (Yandex 200); повтор не нужен без URL-дельты.
+
+### Решения
+- Photo batch1: **20** stems × (jpg+card+thumb) в `apps/public/public/images/venues/moscow/` + map в `city-place-images.ts`.
+- Канон путей: `apps/public/...` (не gitignored `apps/web/public/images/`).
+
+### Проблемы
+- Google Rich Results Test с агента нестабилен (crawl); edge JSON-LD валиден парсером.
+
+---
 ## 2026-09-21 - /events zen afisha: landscape cover upscale
 
 ### Наблюдения

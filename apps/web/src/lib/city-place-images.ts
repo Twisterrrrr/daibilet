@@ -238,6 +238,31 @@ const MOSCOW_IMAGES: Record<string, string> = {
   'moscow-zhivopisnyy-most': '/images/venues/moscow/zhivopisnyy-most.jpg',
   'moscow-zil': '/images/venues/moscow/zil.jpg',
   'moscow-znamenie-dubrovitsy': '/images/venues/moscow/znamenie-dubrovitsy.jpg',
+  // mustSee 201 photo batch1 (2026-09-21)
+  'moscow-pamyatnik-a-s-pushkinu': '/images/venues/moscow/pamyatnik-a-s-pushkinu.jpg',
+  'moscow-art-obekt-bolshaya-glina-4': '/images/venues/moscow/art-obekt-bolshaya-glina-4.jpg',
+  'moscow-pamyatnik-yuriyu-gagarinu': '/images/venues/moscow/pamyatnik-yuriyu-gagarinu.jpg',
+  'moscow-pamyatnik-petru-i': '/images/venues/moscow/pamyatnik-petru-i.jpg',
+  'moscow-pamyatnik-vladimiru-velikomu': '/images/venues/moscow/pamyatnik-vladimiru-velikomu.jpg',
+  'moscow-monument-rabochiy-i-kolhoznitsa': '/images/venues/moscow/monument-rabochiy-i-kolhoznitsa.jpg',
+  'moscow-pamyatnik-f-m-dostoevskomu': '/images/venues/moscow/pamyatnik-f-m-dostoevskomu.jpg',
+  'moscow-pamyatnik-v-v-mayakovskomu': '/images/venues/moscow/pamyatnik-v-v-mayakovskomu.jpg',
+  'moscow-pamyatnik-m-yu-lermontovu': '/images/venues/moscow/pamyatnik-m-yu-lermontovu.jpg',
+  'moscow-pamyatnik-gogolyu-skorbnyy-nikitskiy':
+    '/images/venues/moscow/pamyatnik-gogolyu-skorbnyy-nikitskiy.jpg',
+  'moscow-pamyatnik-gogolyu-torzhestvennyy-gogolevskiy':
+    '/images/venues/moscow/pamyatnik-gogolyu-torzhestvennyy-gogolevskiy.jpg',
+  'moscow-deti-zhertvy-porokov-vzroslyh': '/images/venues/moscow/deti-zhertvy-porokov-vzroslyh.jpg',
+  'moscow-art-obekt-krasnye-vorota-polisskiy':
+    '/images/venues/moscow/art-obekt-krasnye-vorota-polisskiy.jpg',
+  'moscow-pamyatnik-aleksandru-griboedovu': '/images/venues/moscow/pamyatnik-aleksandru-griboedovu.jpg',
+  'moscow-art-obekt-uho-derevo-zhelaniy': '/images/venues/moscow/art-obekt-uho-derevo-zhelaniy.jpg',
+  'moscow-vozvraschenie-bludnogo-syna-sidur':
+    '/images/venues/moscow/vozvraschenie-bludnogo-syna-sidur.jpg',
+  'moscow-pamyatnik-iosifu-brodskomu': '/images/venues/moscow/pamyatnik-iosifu-brodskomu.jpg',
+  'moscow-sherlok-holms-i-doktor-vatson': '/images/venues/moscow/sherlok-holms-i-doktor-vatson.jpg',
+  'moscow-pamyatnik-aleksandru-ii': '/images/venues/moscow/pamyatnik-aleksandru-ii.jpg',
+  'moscow-skulptura-prostranstvo-sveta': '/images/venues/moscow/skulptura-prostranstvo-sveta.jpg',
 };
 
 const KAZAN_IMAGES: Record<string, string> = {
