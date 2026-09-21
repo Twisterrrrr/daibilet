@@ -8,8 +8,8 @@
 - IndexNow paths: **162** = `/cities/moskva` + 161 venue (без отдельных URL expand-секций).
 
 ### Решения
-- IndexNow: `scripts/submit-moscow-mustsee-indexnow.mjs` + `docs/drafts/_msk-mustsee-indexnow-paths.json` → прогон на daibilet-msk через localhost web API.
-- Фото батчами отдельно; IndexNow не ждёт фото.
+- IndexNow на MSK `d720895a`: **162** URL / 3 batch / **Yandex 200**; `api.indexnow.org` 403 (как раньше, не блокер).
+- Фото батчами отдельно; IndexNow не ждал фото.
 
 ### Проблемы
 - Google Rich Results Test с агента раньше падал crawl; edge JSON-LD Place/EventVenue парсится (ldErr 0).
@@ -27,7 +27,7 @@
 - Канон выгрузки: `docs/when-to-go-texts.md`.
 
 ### Проблемы
-- Нужен Deploy MSK web, чтобы live хабы показали вердикт вместо старых табов.
+- Закрыто: live `dfdbeb3a` Deploy 35577213920; chunk smoke ok.
 
 ---
 ## 2026-09-21 - Owner order: smoke → wire/og/gline ship → IndexNow

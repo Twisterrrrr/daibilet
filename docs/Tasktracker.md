@@ -2,7 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| UX.WHEN-TO-GO-VERDICT | Убрать season tabs; вердикт + сезоны; контекст локальных имён (27 хабов) | Высокий | 🔄 commit+push; next = Deploy MSK web |
+| UX.WHEN-TO-GO-VERDICT | Убрать season tabs; вердикт + сезоны; контекст локальных имён (27 хабов) | Высокий | ✅ live Deploy [35577213920](https://github.com/Twisterrrrr/daibilet/actions/runs/35577213920) `dfdbeb3a` |
 
 ## 2026-09-21 - /events «Стоит увидеть»: одна цена + шум карточки
 
@@ -14,7 +14,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| CONT.MSK-MUSTSEE-200 | Хаб Москвы → ~200 mustSee: union + geo + «в один укус» + seed + IndexNow | Высокий | 🔄 Deploy live `79584313`; hub Arbat×3 + Glina creative + og default; **next = IndexNow 162** + фото батчами |
+| CONT.MSK-MUSTSEE-200 | Хаб Москвы → ~200 mustSee: union + geo + «в один укус» + seed + IndexNow | Высокий | ✅ smoke+wire+og+gline+IndexNow 162; **next = фото батчами 20–30** |
 | CONT.MSK-MUSTSEE-UNION | Свести dump 190 ∩ 58 + hub-only; дедуп coords &lt;50 м; expand/insert | Высокий | ✅ seed draft: expand40 + insert142 + hub_only19 = **201** (после Bulgakov→expand) |
 | CONT.MSK-MUSTSEE-GEO | Geocoder по union (не модель); primary = dump coords | Высокий | ✅ Nominatim `moscow-must-see-geocode.json` 221/221 ok |
 | CONT.MSK-MUSTSEE-DESC | Эталон 10 + батчи 01–11 + assemble → editorial 201 | Высокий | ✅ freqs PASS; `must-see-editorial-moscow.json` 201 in `ce4d0c96` |
