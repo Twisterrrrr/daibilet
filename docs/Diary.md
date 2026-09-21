@@ -1,3 +1,19 @@
+## 2026-09-21 - Commit/deploy: zen afisha + MSK mustSee Venue apply
+
+### Наблюдения
+- Owner: коммит+деплой по готовности; то же для МСК точек.
+- Live `/events` «Стоит увидеть» снова схлопывался в одну min-цену после `45f9e1e5`.
+- MSK Postgres доступен по SSH (`127.0.0.1:5437` на daibilet-msk), локальный `DATABASE_URL` не нужен.
+
+### Решения
+- `c61d9241` + Deploy MSK web [35563841070](https://github.com/Twisterrrrr/daibilet/actions/runs/35563841070): round-robin цен + `line-clamp-4` на cityHub title.
+- `enrich-must-see-editorial.js` на MSK: dry-run → apply `--limit=50` → `125` → full. Итог **161 Venue** (insert/update), 40 expand = hub sections (не upsert Venue), hub_only Izmaylovo kreml без `/venues/*` (ожидаемо).
+- Smoke 200: Pushkin, Bolshaya glina, Izmaylovo park/usadba, Gogol; `/events` `/cities/moskva` 200.
+
+### Проблемы
+- Осталось: провязка expand-секций в cityInfo/хаб + фото батчем + IndexNow. «Большая глина» art-filter в бэклоге.
+
+---
 ## 2026-09-21 - Zen afisha: round-robin цен (follow-up)
 
 ### Наблюдения
@@ -10,7 +26,7 @@
 - cityHub title: `line-clamp-4 break-words`.
 
 ### Проблемы
-- MSK mustSee apply по-прежнему ждёт DATABASE_URL / туннель (не web deploy).
+- Закрыто follow-up деплоем `c61d9241` / [35563841070](https://github.com/Twisterrrrr/daibilet/actions/runs/35563841070).
 
 ---
 ## 2026-09-21 - /events «Стоит увидеть»: цена/адрес/CTA/title
