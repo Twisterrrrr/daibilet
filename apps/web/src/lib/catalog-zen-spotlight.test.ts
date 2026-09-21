@@ -51,10 +51,28 @@ test('pickCatalogZenSpotlightItems: prefers unique priceFrom across different ve
   ];
 
   const picked = pickCatalogZenSpotlightItems(items);
-  assert.equal(picked.length, 4);
+  assert.equal(picked.length, 5);
   assert.deepEqual(
-    picked.map((row) => row.priceFrom),
+    picked.slice(0, 4).map((row) => row.priceFrom),
     [1350, 900, 1500, 800],
   );
-  assert.equal(picked.filter((row) => row.priceFrom === 1350).length, 1);
+  assert.equal(picked.filter((row) => row.priceFrom === 1350).length, 2);
+});
+
+test('pickCatalogZenSpotlightItems: same-price flood fills only after unique prices', () => {
+  const items = [
+    item({ id: 'a1', title: 'Квест А', venueSlug: 'estate-a', priceFrom: 1350 }),
+    item({ id: 'a2', title: 'Квест Б', venueSlug: 'estate-b', priceFrom: 1350 }),
+    item({ id: 'a3', title: 'Квест В', venueSlug: 'estate-c', priceFrom: 1350 }),
+    item({ id: 'a4', title: 'Квест Г', venueSlug: 'estate-d', priceFrom: 1350 }),
+    item({ id: 'a5', title: 'Квест Д', venueSlug: 'estate-e', priceFrom: 1350 }),
+    item({ id: 'b1', title: 'Речная прогулка', venueSlug: 'pier-1', priceFrom: 900 }),
+  ];
+
+  const picked = pickCatalogZenSpotlightItems(items);
+  assert.equal(picked.length, 3);
+  assert.equal(picked[0]?.priceFrom, 1350);
+  assert.equal(picked[1]?.priceFrom, 900);
+  assert.equal(picked.filter((row) => row.priceFrom === 1350).length, 2);
+  assert.equal(picked.filter((row) => row.priceFrom === 900).length, 1);
 });

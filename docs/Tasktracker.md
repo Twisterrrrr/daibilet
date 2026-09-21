@@ -2,8 +2,8 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| FIX.EVENTS-ZEN-PRICE | Zen rail: дедуп venue + diversify priceFrom (не «от 1350» на всех) | Критический | ✅ live Deploy [35562662494](https://github.com/Twisterrrrr/daibilet/actions/runs/35562662494) `45f9e1e5` |
-| FIX.EVENTS-ZEN-CARD | cityHub: без адреса / «Купить билет»; title без line-clamp + break-words; шире rail | Высокий | ✅ live Deploy [35562662494](https://github.com/Twisterrrrr/daibilet/actions/runs/35562662494) `45f9e1e5` |
+| FIX.EVENTS-ZEN-PRICE | Zen rail: дедуп venue + diversify priceFrom (не «от 1350» на всех) | Критический | 🔄 follow-up: round-robin по цене + cap ≤2 одной priceFrom (fallback `45f9e1e5` снова заливал рейл) |
+| FIX.EVENTS-ZEN-CARD | cityHub: без адреса / «Купить билет»; title line-clamp-4 + break-words; шире rail | Высокий | ✅ live Deploy [35562662494](https://github.com/Twisterrrrr/daibilet/actions/runs/35562662494) `45f9e1e5`; title clamp-4 в follow-up |
 ## 2026-09-20 - Москва mustSee ~200 (пайплайн)
 
 | ID | Задача | Приоритет | Статус |

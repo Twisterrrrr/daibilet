@@ -1,3 +1,18 @@
+## 2026-09-21 - Zen afisha: round-robin цен (follow-up)
+
+### Наблюдения
+- После `45f9e1e5` на live снова «от 1 350 ₽» на всём рейле: первая страница каталога - квесты с одним min; fallback `diversifyPrice:false` заливал рейл.
+- Адрес/CTA на cityHub уже скрыты в коде; title - нужен line-clamp-4, не бесконечный wrap без clamp.
+
+### Решения
+- `orderZenSpotlightCandidates`: round-robin по price buckets.
+- Pass 2: cap ≤2 карточки с одной priceFrom (не wholesale disable diversify).
+- cityHub title: `line-clamp-4 break-words`.
+
+### Проблемы
+- MSK mustSee apply по-прежнему ждёт DATABASE_URL / туннель (не web deploy).
+
+---
 ## 2026-09-21 - /events «Стоит увидеть»: цена/адрес/CTA/title
 
 ### Наблюдения

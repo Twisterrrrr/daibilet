@@ -603,7 +603,7 @@ function ShowcaseEventCard({
         <h3
           className={`font-display font-bold leading-snug text-graphite ${
             cityHub
-              ? 'break-words text-[13px] sm:text-ui-sm'
+              ? 'line-clamp-4 break-words text-[13px] sm:text-ui-sm'
               : rail
                 ? 'line-clamp-2 text-ui-sm'
                 : 'line-clamp-2 text-ui-sm sm:text-base'
