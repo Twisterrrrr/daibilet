@@ -11,7 +11,7 @@
 - Тесты: catalog-zen-spotlight.test.ts.
 
 ### Проблемы
-- До Deploy MSK web live ещё со старым chrome.
+- Исправлено live Deploy [35562662494](https://github.com/Twisterrrrr/daibilet/actions/runs/35562662494) `45f9e1e5`; full HEAD (+mustSee slug + lean home) [35562857858](https://github.com/Twisterrrrr/daibilet/actions/runs/35562857858) `91059dec`.
 
 ---
 ## 2026-09-21 - Москва mustSee: art filter + apply blocked on DB
@@ -23,6 +23,8 @@
 
 ### Решения
 - Editorial + seed-draft: `mustSeeFilter`/`type` → `art`; pipeline checkbox закрыт.
+- Repo: `ce4d0c96` editorial 201 + scripts; web slug live в [35562857858](https://github.com/Twisterrrrr/daibilet/actions/runs/35562857858).
+- Apply в prod DB **не** делали: нет локального `DATABASE_URL` / `:5437` ECONNREFUSED.
 - Dry-run/apply: без MSK `DATABASE_URL` (local PG и MCP `5433`/`5437` ECONNREFUSED). Ждём tunnel / URL от owner.
 
 ### Проблемы
