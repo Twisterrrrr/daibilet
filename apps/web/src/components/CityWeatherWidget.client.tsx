@@ -1,13 +1,11 @@
 'use client';
 
-import { Cloud, CloudRain, CloudSun, Flower2, Leaf, Ship, Snowflake, Sun } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { Cloud, CloudRain, CloudSun, Sun } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 import {
   resolveCityLocalFlavor,
   resolveWhenToGoBlurb,
-  seasonGuideForTab,
-  type CitySeasonTabId,
   type CityWeatherFlavor,
 } from '@/lib/city-hub-local-flavor';
 import { normalizeCityHubSlug } from '@/lib/city-hub-config';
@@ -75,13 +73,6 @@ async function loadCityWeatherSnapshot(
   return snapshot;
 }
 
-const TAB_ICON = {
-  spring: Flower2,
-  summer: Sun,
-  autumn: Leaf,
-  winter: Snowflake,
-} as const;
-
 export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props) {
   const resolvedSlug = normalizeCityHubSlug(citySlug) || citySlug;
   const flavor = resolveCityLocalFlavor(resolvedSlug);
@@ -89,11 +80,6 @@ export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props
   const whenToGo = flavor?.whenToGo;
   const current = resolveWhenToGoBlurb(resolvedSlug);
   const [state, setState] = useState<LoadState>(weather ? { status: 'loading' } : { status: 'idle' });
-  const [tab, setTab] = useState<CitySeasonTabId>(current?.tab || 'summer');
-
-  useEffect(() => {
-    if (current?.tab) setTab(current.tab);
-  }, [current?.tab]);
 
   useEffect(() => {
     if (!weather) {
@@ -114,8 +100,6 @@ export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props
     return () => controller.abort();
   }, [resolvedSlug, weather]);
 
-  const guide = useMemo(() => seasonGuideForTab(whenToGo, current, tab), [whenToGo, current, tab]);
-
   if (!weather && !current && !whenToGo) return null;
 
   const today = state.status === 'ready' ? state.snapshot.today : null;
@@ -124,8 +108,7 @@ export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props
   const temp = today ? formatTempCFull(today.temperatureC) || formatTempCFull(today.tempMaxC) : null;
   const title = cityIn ? `Погода ${cityIn}` : 'Погода';
   const showForecast = state.status === 'ready' && Boolean(today);
-  const hasSeasons = Boolean(whenToGo?.tabs?.length);
-  // Reserve forecast column as soon as weather pack exists (avoid late pop-in after fetch).
+  const hasSeasons = Boolean(whenToGo?.seasons?.length);
   const showForecastShell = Boolean(weather);
   const twoCol = showForecastShell && hasSeasons;
   const forecastPending = showForecastShell && !showForecast;
@@ -141,6 +124,15 @@ export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props
   const dayTempClass = `flex items-center gap-1.5 text-base font-bold ${
     editorial ? 'text-zinc-900' : 'text-slate-900'
   }`;
+  const nowBadge = editorial
+    ? 'rounded-full bg-zinc-900 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white'
+    : 'rounded-full bg-slate-900 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white';
+  const seasonCard = editorial
+    ? 'rounded-xl bg-zinc-50 px-3 py-2.5 ring-1 ring-zinc-200/80'
+    : 'rounded-xl bg-slate-50 px-3 py-2.5 ring-1 ring-slate-200/70';
+  const seasonCardNow = editorial
+    ? 'rounded-xl bg-white px-3 py-2.5 ring-1 ring-zinc-900/15 shadow-sm'
+    : 'rounded-xl bg-white px-3 py-2.5 ring-1 ring-slate-900/10 shadow-sm';
 
   return (
     <div
@@ -155,7 +147,7 @@ export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props
       <div
         className={
           twoCol
-            ? 'grid flex-1 gap-5 md:grid-cols-2 md:items-stretch md:gap-0'
+            ? 'grid flex-1 gap-5 md:grid-cols-2 md:items-start md:gap-0'
             : 'min-w-0'
         }
       >
@@ -234,63 +226,55 @@ export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props
             <h3 id="seasons-title" className={kickerClass}>
               Когда ехать
             </h3>
-            <p className={`mt-1 text-xs ${muted}`}>Выберите сезон - совет ниже обновится</p>
-            <div
-              role="tablist"
-              aria-labelledby="seasons-title"
-              className="mt-3 flex flex-wrap gap-2"
-            >
-              {whenToGo.tabs.map((item) => {
-                const isSpbSummer =
-                  item.id === 'summer' && resolvedSlug === 'saint-petersburg';
-                const Icon = isSpbSummer ? Ship : TAB_ICON[item.id];
-                const active = item.id === tab;
-                const isNow = current?.tab === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    role="tab"
-                    id={`season-tab-${item.id}`}
-                    aria-selected={active}
-                    aria-controls="season-panel"
-                    onClick={() => setTab(item.id)}
-                    className={`inline-flex min-h-11 min-w-0 flex-[1_1_calc(50%-0.25rem)] items-center justify-center gap-1.5 rounded-full px-3 py-2.5 text-sm font-medium transition sm:gap-2 sm:px-4 ${
-                      active
-                        ? editorial
-                          ? 'bg-zinc-900 text-white shadow-sm'
-                          : 'bg-slate-900 text-white shadow-sm'
-                        : editorial
-                          ? 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
-                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                    }`}
+
+            {whenToGo.verdict?.length ? (
+              <dl
+                className={`mt-3 space-y-1.5 text-sm ${body}`}
+                data-city-when-to-go="verdict"
+              >
+                {whenToGo.verdict.map((line) => (
+                  <div
+                    key={line.label}
+                    className="grid grid-cols-[minmax(0,0.95fr)_minmax(0,1.25fr)] gap-x-3 gap-y-0.5 sm:grid-cols-[9.5rem_minmax(0,1fr)]"
                   >
-                    <Icon
-                      className={`h-4 w-4 ${isSpbSummer ? 'motion-safe:animate-pulse' : ''}`}
-                      strokeWidth={1.75}
-                      aria-hidden
-                    />
-                    {item.label}
-                    {isNow ? (
-                      <span className={`text-[11px] font-semibold ${active ? 'text-white/70' : muted}`}>
-                        сейчас
-                      </span>
-                    ) : null}
-                  </button>
+                    <dt className={`font-medium ${editorial ? 'text-zinc-800' : 'text-slate-800'}`}>
+                      {line.label}
+                    </dt>
+                    <dd className={muted}>{line.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            ) : null}
+
+            <div
+              className="mt-4 space-y-2"
+              aria-labelledby="seasons-title"
+              data-city-when-to-go="seasons"
+            >
+              {whenToGo.seasons.map((season) => {
+                const isNow = current?.seasonId === season.id;
+                return (
+                  <article
+                    key={season.id}
+                    className={isNow ? seasonCardNow : seasonCard}
+                    data-season-id={season.id}
+                    data-season-now={isNow ? '1' : undefined}
+                  >
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h4
+                        className={`text-sm font-semibold ${
+                          editorial ? 'text-zinc-950' : 'text-slate-950'
+                        }`}
+                      >
+                        {season.headline}
+                      </h4>
+                      {isNow ? <span className={nowBadge}>сейчас</span> : null}
+                    </div>
+                    <p className={`mt-1 text-sm leading-relaxed ${body}`}>{season.body}</p>
+                  </article>
                 );
               })}
             </div>
-            {guide.body ? (
-              <p
-                id="season-panel"
-                role="tabpanel"
-                aria-labelledby={`season-tab-${tab}`}
-                className={`mt-3 text-sm leading-relaxed ${body}`}
-                data-city-when-to-go="now"
-              >
-                {guide.body}
-              </p>
-            ) : null}
           </div>
         ) : null}
       </div>

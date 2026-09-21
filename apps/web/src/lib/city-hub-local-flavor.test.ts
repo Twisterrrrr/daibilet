@@ -367,6 +367,13 @@ test('when-to-go covers Perm, Moscow, SPB, Kaliningrad, NN, EKB, Kazan, Samara, 
   assert.equal(cityHasWhenToGo('omsk'), true);
   assert.equal(cityHasWhenToGo('chelyabinsk'), true);
   assert.equal(cityHasWhenToGo('tyumen'), true);
+  assert.equal(cityHasWhenToGo('tula'), true);
+  assert.equal(cityHasWhenToGo('smolensk'), true);
+  assert.equal(cityHasWhenToGo('barnaul'), true);
+  assert.equal(cityHasWhenToGo('sochi'), true);
+  assert.equal(cityHasWhenToGo('saratov'), true);
+  assert.equal(cityHasWhenToGo('yaroslavl'), true);
+  assert.equal(cityHasWhenToGo('volgograd'), true);
   for (const slug of [
     'perm',
     'moscow',
@@ -388,10 +395,17 @@ test('when-to-go covers Perm, Moscow, SPB, Kaliningrad, NN, EKB, Kazan, Samara, 
     'omsk',
     'chelyabinsk',
     'tyumen',
+    'tula',
+    'smolensk',
+    'barnaul',
+    'sochi',
+    'saratov',
+    'yaroslavl',
+    'volgograd',
   ]) {
     const flavor = resolveCityLocalFlavor(slug)?.whenToGo;
     assert.ok(flavor, slug);
-    assert.equal(flavor.tabs.length, 4);
+    assert.ok(flavor.verdict?.length >= 3, `${slug}:verdict`);
     const covered = flavor.seasons.flatMap((season) => season.months).sort((a, b) => a - b);
     assert.deepEqual(covered, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], slug);
     for (const season of flavor.seasons) {
@@ -399,8 +413,11 @@ test('when-to-go covers Perm, Moscow, SPB, Kaliningrad, NN, EKB, Kazan, Samara, 
       assert.equal(season.body.includes('\u2013'), false, `${slug}:${season.id}`);
       assert.ok(season.headline);
     }
-    for (const tab of flavor.tabs) {
-      assert.equal(tab.body.includes('\u2014'), false, `${slug}:${tab.id}`);
+    for (const line of flavor.verdict) {
+      assert.ok(line.label, `${slug}:verdict-label`);
+      assert.ok(line.value, `${slug}:verdict-value`);
+      assert.equal(line.value.includes('\u2014'), false, `${slug}:${line.label}`);
+      assert.equal(line.value.includes('\u2013'), false, `${slug}:${line.label}`);
     }
   }
 });
@@ -413,7 +430,7 @@ test('Perm when-to-go maps months to honest seasonal copy', () => {
   assert.equal(august?.monthLabel, 'Август');
   assert.equal(august?.tab, 'summer');
   assert.match(august?.body || '', /Хохловка/);
-  assert.match(august?.body || '', /Усьва/);
+  assert.match(august?.body || '', /Усьв/);
 
   const january = resolveWhenToGoBlurb('perm', new Date('2026-01-15T12:00:00Z'));
   assert.equal(january?.seasonId, 'winter');
@@ -422,11 +439,11 @@ test('Perm when-to-go maps months to honest seasonal copy', () => {
 
   const may = resolveWhenToGoBlurb('perm', new Date('2026-05-10T12:00:00Z'));
   assert.equal(may?.seasonId, 'spring');
-  assert.match(may?.body || '', /Межсезонье/);
+  assert.match(may?.body || '', /раскисает|Театр-Театр/);
 
   const june = resolveWhenToGoBlurb('perm', new Date('2026-06-20T12:00:00Z'));
   assert.equal(june?.seasonId, 'summer');
-  assert.match(june?.body || '', /Речной сезон/);
+  assert.match(june?.body || '', /сплавов|теплоходы/);
 
   const september = resolveWhenToGoBlurb('perm', new Date('2026-09-05T12:00:00Z'));
   assert.equal(september?.seasonId, 'earlyAutumn');
@@ -448,21 +465,17 @@ test('Perm when-to-go maps months to honest seasonal copy', () => {
   assert.match(nskOctober?.body || '', /Заельцовского|театральных/);
 });
 
-test('season tabs do not keep August copy when Winter is selected', () => {
-  const flavor = resolveCityLocalFlavor('perm')?.whenToGo;
-  const august = resolveWhenToGoBlurb('perm', new Date('2026-08-14T08:00:00Z'));
+test('when-to-go verdict answers goals without duplicating season tabs', () => {
+  const flavor = resolveCityLocalFlavor('saint-petersburg')?.whenToGo;
   assert.ok(flavor);
-  assert.ok(august);
-  const summer = seasonGuideForTab(flavor, august, 'summer');
-  assert.equal(summer.isCurrent, true);
-  assert.equal(summer.nowLabel, 'Конец лета (Август)');
-  assert.match(summer.body, /Хохловка/);
-  const winter = seasonGuideForTab(flavor, august, 'winter');
-  assert.equal(winter.isCurrent, false);
-  assert.equal(winter.nowLabel, null);
-  assert.match(winter.body, /Губахе/);
-  assert.equal(winter.body.includes('Конец лета'), false);
-  assert.equal(winter.body.includes('август'), false);
+  assert.equal(flavor.verdict[0]?.label, 'Лучшее время');
+  assert.match(flavor.verdict[0]?.value || '', /май/);
+  assert.ok(flavor.verdict.some((line) => /Музеи|Фонтаны|Худшее/.test(line.label)));
+  const august = resolveWhenToGoBlurb('perm', new Date('2026-08-14T08:00:00Z'));
+  const guide = seasonGuideForTab(flavor, august, 'summer');
+  assert.equal(guide.isCurrent, true);
+  assert.equal(guide.nowLabel, 'Конец лета (Август)');
+  assert.match(guide.body, /Хохловка/);
 });
 
 function emptyHubDesc(value: unknown): boolean {

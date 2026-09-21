@@ -4,19 +4,8 @@
  */
 import type {
   CityIdentitySlide,
-  CitySeasonTab,
   CityWeatherFlavor,
-  CityWhenToGoFlavor,
 } from './city-hub-local-flavor.ts';
-
-function seasonTabs(bodies: Record<'spring' | 'summer' | 'autumn' | 'winter', string>): CitySeasonTab[] {
-  return [
-    { id: 'spring', label: 'Весна', body: bodies.spring },
-    { id: 'summer', label: 'Лето', body: bodies.summer },
-    { id: 'autumn', label: 'Осень', body: bodies.autumn },
-    { id: 'winter', label: 'Зима', body: bodies.winter },
-  ];
-}
 
 export const SARATOV_WEATHER: CityWeatherFlavor = {
   latitude: 51.533,
@@ -40,42 +29,6 @@ export const SARATOV_WEATHER: CityWeatherFlavor = {
   indoorCtaOvercast: 'Серо: Радищевский, краеведческий или кофе в «Coupe»',
   indoorCtaRain: 'Дождь: Радищевский, опера или гастробар «Культура»',
   indoorCtaSnow: 'Снег: музеи у Консерватории, потом калач в тепле',
-};
-
-export const SARATOV_WHEN_TO_GO: CityWhenToGoFlavor = {
-  timeZone: 'Europe/Saratov',
-  seasons: [
-    {
-      id: 'winter',
-      months: [12, 1, 2],
-      headline: 'Зима',
-      body: 'Волга стоит, ветер с реки режет. Хвалынск забирает лыжников; в городе - коньки у «Динамо» на фоне готики СГАУ и тёплая обувь по сугробам.',
-    },
-    {
-      id: 'spring',
-      months: [3, 4, 5],
-      headline: 'Весна',
-      body: 'В марте лёд уходит с шумом, к маю каштаны и сирень. Запускают теплоходы; в степи ловите дикие пионы, пока не отцвели.',
-    },
-    {
-      id: 'summer',
-      months: [6, 7, 8],
-      headline: 'Лето',
-      body: 'Жара на Городских песках и островах. Днём кепка и тень, вечером - сап под мостом и стерлядь вместо дневного зноя.',
-    },
-    {
-      id: 'autumn',
-      months: [9, 10, 11],
-      headline: 'Осень',
-      body: 'Сентябрь: арбузы, яблоки, раки. В октябре жёлтеет Кумысная поляна; ноябрь отдайте Радищевскому и старым театрам.',
-    },
-  ],
-  tabs: seasonTabs({
-    spring: 'Ледоход и сирень. Теплоходы и степные пионы.',
-    summer: 'Пески и острова. Жизнь вечером, не в полдень.',
-    autumn: 'Арбузы в сентябре. Позже - Радищевский.',
-    winter: 'Ветер с Волги. Хвалынск или коньки у «Динамо».',
-  }),
 };
 
 export const SARATOV_SLIDES: CityIdentitySlide[] = [

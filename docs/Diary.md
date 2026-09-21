@@ -1,3 +1,35 @@
+## 2026-09-21 - MSK mustSee: post-deploy smoke + IndexNow gate
+
+### Наблюдения
+- Deploy MSK web `79584313` live: sample venues **0×5XX**; H1 = editorial.
+- Хаб `/cities/moskva`: Арбат **три разные** карточки - Окуджава (Памятники), Цоя + Глина (Необычное), Вахтангов (Главные). Не три копии одной.
+- Глина в UI как **Арт-объект**, filter `creative` / вкладка «Необычное» - не monument.
+- og:image на missing-фото → `https://daibilet.ru/images/og/default-og.jpg` **200** (Pushkin/Glina).
+- IndexNow paths: **162** = `/cities/moskva` + 161 venue (без отдельных URL expand-секций).
+
+### Решения
+- IndexNow: `scripts/submit-moscow-mustsee-indexnow.mjs` + `docs/drafts/_msk-mustsee-indexnow-paths.json` → прогон на daibilet-msk через localhost web API.
+- Фото батчами отдельно; IndexNow не ждёт фото.
+
+### Проблемы
+- Google Rich Results Test с агента раньше падал crawl; edge JSON-LD Place/EventVenue парсится (ldErr 0).
+
+---
+## 2026-09-21 - Когда ехать: вердикт вместо табов + контекст имён
+
+### Наблюдения
+- Табы Весна/Лето/Осень/Зима дублировали сезоны (6 сезонных карточек vs 4 таба) и заставляли кликать до чтения.
+- Локальные имена (Хохловка, Стрелка, Вайнера, Тарханы) без 2-4 слов контекста пусты для первого визита.
+
+### Решения
+- Option C: убрать табы; над сезонами - компактный **вердикт** (Лучшее время / цель / худшее).
+- Тексты 27 хабов вынесены в `when-to-go-packs.ts`; UI - `CityWeatherWidget` (verdict + полный список seasons).
+- Канон выгрузки: `docs/when-to-go-texts.md`.
+
+### Проблемы
+- Нужен Deploy MSK web, чтобы live хабы показали вердикт вместо старых табов.
+
+---
 ## 2026-09-21 - Owner order: smoke → wire/og/gline ship → IndexNow
 
 ### Наблюдения

@@ -5,19 +5,8 @@
  */
 import type {
   CityIdentitySlide,
-  CitySeasonTab,
   CityWeatherFlavor,
-  CityWhenToGoFlavor,
 } from './city-hub-local-flavor.ts';
-
-function seasonTabs(bodies: Record<'spring' | 'summer' | 'autumn' | 'winter', string>): CitySeasonTab[] {
-  return [
-    { id: 'spring', label: 'Весна', body: bodies.spring },
-    { id: 'summer', label: 'Лето', body: bodies.summer },
-    { id: 'autumn', label: 'Осень', body: bodies.autumn },
-    { id: 'winter', label: 'Зима', body: bodies.winter },
-  ];
-}
 
 export const VOLGOGRAD_WEATHER: CityWeatherFlavor = {
   latitude: 48.708,
@@ -41,42 +30,6 @@ export const VOLGOGRAD_WEATHER: CityWeatherFlavor = {
   indoorCtaOvercast: 'Серо: панорама, музей Машкова или кофе в «Angel Cakes»',
   indoorCtaRain: 'Дождь: панорама, планетарий или обед в «Волгограде»',
   indoorCtaSnow: 'Степной ветер: метротрам, музеи центра, кофе на Чуйкова',
-};
-
-export const VOLGOGRAD_WHEN_TO_GO: CityWhenToGoFlavor = {
-  timeZone: 'Europe/Volgograd',
-  seasons: [
-    {
-      id: 'winter',
-      months: [12, 1, 2],
-      headline: 'Зима',
-      body: 'Степной ветер режет сильнее градусника. Курган в снегу стоит того; между точками прячьтесь в метротраме, иначе замёрзнете ещё до панорамы.',
-    },
-    {
-      id: 'spring',
-      months: [3, 4, 5],
-      headline: 'Весна',
-      body: 'От мартовской грязи к майскому теплу за пару недель. Начало мая забито Днём Победы - жильё берите заранее; если повезёт, застанете сброс на Волжской ГЭС.',
-    },
-    {
-      id: 'summer',
-      months: [6, 7, 8],
-      headline: 'Лето',
-      body: 'Пекло. В июне мошка, в июле-августе - косы поймы и быковские арбузы. На Мамаев только рано утром, иначе к Родине-матери уже нет сил.',
-    },
-    {
-      id: 'autumn',
-      months: [9, 10, 11],
-      headline: 'Осень',
-      body: 'Сентябрь-октябрь - длинные куски по центру и набережной без пекла. Ноябрь приносит туманы: панорама и театры выигрывают у улицы.',
-    },
-  ],
-  tabs: seasonTabs({
-    spring: 'Грязь быстро уходит. Май - Победа и толпа, жильё заранее.',
-    summer: 'Пекло и мошка. Мамаев - только утром.',
-    autumn: 'Набережная без жары. Ноябрь - панорама и театры.',
-    winter: 'Степной ветер. Метротрам между точками обязателен.',
-  }),
 };
 
 export const VOLGOGRAD_SLIDES: CityIdentitySlide[] = [

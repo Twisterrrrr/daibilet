@@ -6,20 +6,8 @@
 
 import type {
   CityIdentitySlide,
-  CitySeasonTab,
-  CitySeasonTabId,
   CityWeatherFlavor,
-  CityWhenToGoFlavor,
 } from './city-hub-local-flavor.ts';
-
-function seasonTabs(bodies: Record<CitySeasonTabId, string>): CitySeasonTab[] {
-  return [
-    { id: 'spring', label: 'Весна', body: bodies.spring },
-    { id: 'summer', label: 'Лето', body: bodies.summer },
-    { id: 'autumn', label: 'Осень', body: bodies.autumn },
-    { id: 'winter', label: 'Зима', body: bodies.winter },
-  ];
-}
 
 export const YAROSLAVL_WEATHER: CityWeatherFlavor = {
   latitude: 57.6261,
@@ -43,42 +31,6 @@ export const YAROSLAVL_WEATHER: CityWeatherFlavor = {
   indoorCtaOvercast: 'Серо: Худмузей, «Музыка и время» или кофе в «Утро»',
   indoorCtaRain: 'Дождь: Худмузей, Волковский или трактир «Иоанн Васильевич»',
   indoorCtaSnow: 'Снег: музеи у Медведя, потом медовуха в тепле',
-};
-
-export const YAROSLAVL_WHEN_TO_GO: CityWhenToGoFlavor = {
-  timeZone: 'Europe/Moscow',
-  seasons: [
-    {
-      id: 'winter',
-      months: [12, 1, 2],
-      headline: 'Зима',
-      body: 'Изразцы на белом фоне, каток на Советской. На Стрелке продувает - сани и медовуха; без непромокаемой обуви вечер короткий.',
-    },
-    {
-      id: 'spring',
-      months: [3, 4, 5],
-      headline: 'Весна',
-      body: 'В апреле Которосль и Волга открывают набережные ото льда. К маю черёмуха и первые круизы; в конце мая ждите День города и салют.',
-    },
-    {
-      id: 'summer',
-      months: [6, 7, 8],
-      headline: 'Лето',
-      body: 'Даманский, пляжи Подзеленья, вечерние звоны. Судака берите после воды - на реке всё равно нужна ветровка.',
-    },
-    {
-      id: 'autumn',
-      months: [9, 10, 11],
-      headline: 'Осень',
-      body: 'Жёлтый Губернаторский сад. В октябре туристические автобусы редеют - время музеев; ноябрь отдайте Волковскому.',
-    },
-  ],
-  tabs: seasonTabs({
-    spring: 'Набережные ото льда. Май - круизы и День города.',
-    summer: 'Даманский и пляжи. На воде продувает.',
-    autumn: 'Сад в сентябре. Позже - музеи и Волковский.',
-    winter: 'Изразцы и каток. На Стрелке без тёплой обуви не задерживайтесь.',
-  }),
 };
 
 export const YAROSLAVL_SLIDES: CityIdentitySlide[] = [
