@@ -111,7 +111,6 @@ export function CatalogZenSpotlight({ items }: { items: PublicCatalogListItemDto
   return (
     <section className="mt-6 border-b border-slate-200 pb-6 sm:mt-7 sm:pb-8" aria-labelledby="catalog-zen-title">
       <div className="mb-4 sm:mb-5">
-        <p className="mb-1 text-[11px] font-bold uppercase text-primary-700">Афиша города</p>
         <h2 id="catalog-zen-title" className="font-display text-xl font-bold text-graphite sm:text-2xl">
           Стоит увидеть
         </h2>
