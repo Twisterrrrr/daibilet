@@ -77,7 +77,7 @@ const MOSCOW_BLOCK = `  moscow: {
       { name: 'Коломенское', desc: 'Царская усадьба, церковь Вознесения и вид на Москву-реку.', mustSeeFilter: 'park', locationSlug: 'moscow-kolomenskoe', latitude: 55.6672, longitude: 37.6708 },
       { name: 'Царицыно', desc: 'Дворцово-парковый ансамбль Баженова и Казакова с прудами.', mustSeeFilter: 'park', locationSlug: 'moscow-tsaritsyno', latitude: 55.6156, longitude: 37.682 },
       { name: 'Кусково', desc: 'Усадьба Шереметевых с дворцом, оранжереей и регулярным парком.', mustSeeFilter: 'park', locationSlug: 'moscow-kuskovo', latitude: 55.7355, longitude: 37.8075 },
-      { name: 'Измайловский парк и кремль', desc: 'Огромный лесопарк и деревянный Измайловский кремль у рынка.', mustSeeFilter: 'park', locationSlug: 'moscow-izmaylovskiy-park', latitude: 55.7915, longitude: 37.7495 },
+      { name: 'Измайловский парк и кремль', desc: 'Огромный лесопарк и деревянный Измайловский кремль у рынка.', mustSeeFilter: 'park', locationSlug: 'moscow-izmaylovskiy-park-i-kreml', latitude: 55.7915, longitude: 37.7495 },
       { name: 'Сокольники', desc: 'Классический парк с лучами аллей и павильонами на северо-востоке.', mustSeeFilter: 'park', locationSlug: 'moscow-sokolniki', latitude: 55.8045, longitude: 37.6775 },
       { name: 'Аптекарский огород', desc: 'Ботанический сад МГУ у Проспекта Мира - оранжереи и сезонные выставки.', mustSeeFilter: 'park', locationSlug: 'moscow-aptekarskiy-ogorod', latitude: 55.7785, longitude: 37.6355 },
       // --- temple (6) ---

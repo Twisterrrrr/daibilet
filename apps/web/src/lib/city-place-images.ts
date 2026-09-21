@@ -76,6 +76,8 @@ const MOSCOW_IMAGES: Record<string, string> = {
   'moscow-tsaritsyno': '/images/venues/moscow/tsaritsyno.jpg',
   'moscow-kuskovo': '/images/venues/moscow/kuskovo.jpg',
   'moscow-izmaylovskiy-park': '/images/venues/moscow/izmaylovskiy-park.jpg',
+  'moscow-izmaylovskiy-park-i-kreml':
+    '/images/venues/moscow/izmaylovskiy-park.jpg',
   'moscow-sokolniki': '/images/venues/moscow/sokolniki.jpg',
   'moscow-aptekarskiy-ogorod':
     '/images/venues/moscow/aptekarskiy-ogorod.jpg',

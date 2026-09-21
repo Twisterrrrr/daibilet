@@ -1604,7 +1604,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         latitude: 55.7915,
         longitude: 37.7495,
         mustSeeFilter: "park",
-        locationSlug: "moscow-izmaylovskiy-park",
+        locationSlug: "moscow-izmaylovskiy-park-i-kreml",
       },
       {
         name: "Сокольники",

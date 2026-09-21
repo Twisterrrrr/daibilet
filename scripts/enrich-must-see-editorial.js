@@ -6,11 +6,18 @@
  * NEVER overwrites non-empty shortDescription (card lead from cityInfo).
  * Creates missing Venue rows (PUBLISHED) when city resolves.
  *
+ * Roles (moscow pack and later):
+ *   insert   → upsert Venue by slug (unique among insert/hub_only)
+ *   hub_only → upsert Venue by slug (unique among insert/hub_only)
+ *   expand   → hub section, NOT a Venue upsert. Keyed by (hubSlug + title).
+ *              Shared hub slug across expands is expected (Арбат / Царицыно / …).
+ *
  * Usage:
  *   node scripts/enrich-must-see-editorial.js --dry-run
  *   node scripts/enrich-must-see-editorial.js --apply
  *   node scripts/enrich-must-see-editorial.js --apply --cities=moscow,saint-petersburg
  *   node scripts/enrich-must-see-editorial.js --apply --file=scripts/data/spb-kgd-venue-coords.json
+ *   node scripts/enrich-must-see-editorial.js --dry-run --file=… --limit=50
  */
 const path = require('path');
 const fs = require('fs');
@@ -204,8 +211,63 @@ const dryRun = process.argv.includes('--dry-run') || !process.argv.includes('--a
 const writeCityInfo = process.argv.includes('--write-cityinfo');
 const writeCityInfoOnly = process.argv.includes('--write-cityinfo-only');
 const citiesFilter = parseCitiesFilter(process.argv);
+const rowLimit = parseLimit(process.argv);
 const connectionString =
   process.env.DATABASE_URL || 'postgresql://daibilet:daibilet@127.0.0.1:5437/daibilet';
+
+function parseLimit(argv) {
+  const arg = argv.find((a) => a.startsWith('--limit='));
+  if (!arg) return null;
+  const n = Number(arg.slice('--limit='.length));
+  return Number.isFinite(n) && n > 0 ? Math.floor(n) : null;
+}
+
+/** Fail hard if insert/hub_only share a slug. Expands may share a hub slug. */
+function assertVenueSlugUniqueness(rows) {
+  const bySlug = new Map();
+  for (const row of rows) {
+    const role = String(row.role || 'insert');
+    if (role === 'expand') continue;
+    const slug = String(row.slug || '').trim();
+    if (!slug) continue;
+    const bucket = bySlug.get(slug) || [];
+    bucket.push(`${role}:${row.title || row.name || '?'}`);
+    bySlug.set(slug, bucket);
+  }
+  const collisions = [...bySlug.entries()].filter(([, list]) => list.length > 1);
+  if (collisions.length) {
+    throw new Error(
+      `Venue slug collision among insert/hub_only:\n${collisions
+        .map(([slug, list]) => `  ${slug} → ${list.join(' | ')}`)
+        .join('\n')}`,
+    );
+  }
+}
+
+function collectExpandSections(rows) {
+  const byHub = new Map();
+  for (const row of rows) {
+    if (String(row.role || '') !== 'expand') continue;
+    const hubSlug = String(row.slug || '').trim();
+    const title = String(row.title || row.name || '').trim();
+    if (!hubSlug || !title) continue;
+    const list = byHub.get(hubSlug) || [];
+    const key = `${hubSlug}::${title}`;
+    if (list.some((s) => s.key === key)) continue;
+    list.push({
+      key,
+      hubSlug,
+      title,
+      description: row.description || row.shortDescription || null,
+      shortDescription: row.shortDescription || null,
+      latitude: row.latitude ?? null,
+      longitude: row.longitude ?? null,
+      address: row.address ?? null,
+    });
+    byHub.set(hubSlug, list);
+  }
+  return Object.fromEntries([...byHub.entries()].map(([slug, sections]) => [slug, sections]));
+}
 
 main().catch((error) => {
   console.error(error);
@@ -340,8 +402,14 @@ async function main() {
     ? all.filter((row) => citiesFilter.has(row.cityKey))
     : all;
 
+  assertVenueSlugUniqueness(rows);
+  const expandByHub = collectExpandSections(rows);
+  const expandCount = Object.values(expandByHub).reduce((n, list) => n + list.length, 0);
+  const venueRowsAll = rows.filter((row) => String(row.role || 'insert') !== 'expand');
+  const venueRows = rowLimit ? venueRowsAll.slice(0, rowLimit) : venueRowsAll;
+
   if (writeCityInfoOnly) {
-    const resolvedRows = rows.map((item) => ({
+    const resolvedRows = venueRows.map((item) => ({
       item,
       family: inferKindAndFamily(item.title, item).family,
     }));
@@ -350,8 +418,11 @@ async function main() {
         {
           dryRun: false,
           total: rows.length,
+          venueTotal: venueRows.length,
+          expandTotal: expandCount,
+          expandHubs: Object.keys(expandByHub).length,
           cityInfo: writeOwnerCityInfo(resolvedRows, false),
-          note: 'cityInfo-only mode does not access the database',
+          note: 'cityInfo-only mode does not access the database; expands skipped (hub sections)',
         },
         null,
         2,
@@ -362,7 +433,18 @@ async function main() {
 
   const pool = new Pool({ connectionString, max: 2 });
   const cityCache = new Map();
-  const report = { dryRun, total: rows.length, byAction: {}, sample: [], missingCity: [] };
+  const report = {
+    dryRun,
+    total: rows.length,
+    venueTotal: venueRows.length,
+    venueSkippedByLimit: Math.max(0, venueRowsAll.length - venueRows.length),
+    expandTotal: expandCount,
+    expandHubs: Object.keys(expandByHub).length,
+    expandNote: 'expands are hub sections (slug+title); not Venue upserts in this pass',
+    byAction: {},
+    sample: [],
+    missingCity: [],
+  };
   const resolvedRows = [];
 
   try {
@@ -371,7 +453,7 @@ async function main() {
     const hasMetro = await columnExists(pool, 'Venue', 'metroStation');
     report.columns = { hasHookFact, hasWayToFind, hasMetro };
 
-    for (const item of rows) {
+    for (const item of venueRows) {
       const city = await resolveCity(pool, cityCache, item.cityKey);
       if (!city) {
         report.missingCity.push({ slug: item.slug, cityKey: item.cityKey });

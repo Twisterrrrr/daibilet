@@ -1,0 +1,42 @@
+{
+  "generatedAt": "2026-09-20T20:59:16.702Z",
+  "unionCount": 202,
+  "expandCount": 39,
+  "insertCount": 143,
+  "hubOnlyCount": 20,
+  "nameReviewCount": 24,
+  "geocodedOk": 143,
+  "geocodedWarn": [],
+  "geocodedError": [],
+  "geoReviewNeeded": [],
+  "farExpandsDistM200": [],
+  "removedHubOnly": [],
+  "filterFixes": [],
+  "mustSeeFilter": {
+    "expands": {
+      "NONE": 39
+    },
+    "inserts": {
+      "monument": 40,
+      "main": 33,
+      "museum": 21,
+      "park": 9,
+      "temple": 20,
+      "views": 8,
+      "gastro": 12
+    }
+  },
+  "sanity": {
+    "expandTheaterOrGastro": [],
+    "parkTheaters": [],
+    "parkGastro": [],
+    "arraysSumOk": true
+  },
+  "readiness": {
+    "geocodedErrorZero": true,
+    "geoReviewNeededOk": true,
+    "noExpandTheaterGastro": true,
+    "nameReviewApplied": true,
+    "farExpandMaxFew": true
+  }
+}

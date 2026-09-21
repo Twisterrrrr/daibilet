@@ -1,0 +1,132 @@
+{
+  "generatedAt": "2026-09-20",
+  "updatedAt": "2026-09-20",
+  "rule": "hub is source of truth; expand = no second card; insert only if distinct POI; insert wins even if coords <50m",
+  "decisions": [
+    {
+      "dump": "Усадьба Кусково",
+      "hub": "Кусково",
+      "decision": "expand"
+    },
+    {
+      "dump": "Новая Третьяковка",
+      "hub": "Новая Третьяковка",
+      "decision": "expand"
+    },
+    {
+      "dump": "Еврейский музей",
+      "hub": "Еврейский музей и центр толерантности",
+      "decision": "expand"
+    },
+    {
+      "dump": "«Гараж»",
+      "hub": "Музей современного искусства «Гараж»",
+      "decision": "expand"
+    },
+    {
+      "dump": "Политехнический музей",
+      "hub": "Политехнический музей",
+      "decision": "expand"
+    },
+    {
+      "dump": "Музей русского импрессионизма",
+      "hub": "Музей русского импрессионизма",
+      "decision": "expand"
+    },
+    {
+      "dump": "Бункер-42",
+      "hub": "Бункер-42 на Таганке",
+      "decision": "expand"
+    },
+    {
+      "dump": "Музей кино (ВДНХ)",
+      "hub": "ВДНХ",
+      "decision": "insert"
+    },
+    {
+      "dump": "Музей «Слово» (ВДНХ)",
+      "hub": "ВДНХ",
+      "decision": "insert"
+    },
+    {
+      "dump": "Новодевичий монастырь",
+      "hub": "Новодевичий монастырь",
+      "decision": "expand"
+    },
+    {
+      "dump": "Донской монастырь",
+      "hub": "Донской монастырь",
+      "decision": "expand"
+    },
+    {
+      "dump": "Богоявленский собор в Елохове",
+      "hub": "Богоявленский собор в Елохове",
+      "decision": "expand"
+    },
+    {
+      "dump": "Храм Вознесения в Коломенском",
+      "hub": "Храм Вознесения в Коломенском",
+      "decision": "expand"
+    },
+    {
+      "dump": "Парк «Зарядье»",
+      "hub": "Парк Зарядье",
+      "decision": "expand"
+    },
+    {
+      "dump": "ВДНХ",
+      "hub": "ВДНХ",
+      "decision": "expand"
+    },
+    {
+      "dump": "Сокольники",
+      "hub": "Сокольники",
+      "decision": "expand",
+      "note": "same park; hub coords (dump offset 1.2km)"
+    },
+    {
+      "dump": "Аптекарский огород",
+      "hub": "Аптекарский огород",
+      "decision": "expand"
+    },
+    {
+      "dump": "Коломенское",
+      "hub": "Коломенское",
+      "decision": "expand"
+    },
+    {
+      "dump": "Патриаршие пруды",
+      "hub": "Патриаршие пруды",
+      "decision": "expand"
+    },
+    {
+      "dump": "Измайловский парк",
+      "hub": "Измайловский парк и кремль",
+      "decision": "insert",
+      "note": "4500m: park vs kremlin cluster - distinct; do not collapse"
+    },
+    {
+      "dump": "Даниловский рынок",
+      "hub": "Даниловский рынок",
+      "decision": "expand"
+    },
+    {
+      "dump": "Памятник Минину и Пожарскому",
+      "hub": "Собор Василия Блаженного",
+      "decision": "expand",
+      "note": "owner 2026-09-20: Red Square ensemble with St Basil; not separate card"
+    },
+    {
+      "dump": "Монумент «Покорителям космоса»",
+      "hub": "Музей космонавтики",
+      "decision": "insert",
+      "note": "45m but distinct monument vs museum"
+    },
+    {
+      "dump": "Смотровая Воробьевых гор",
+      "hub": "Смотровая на Воробьевых горах",
+      "decision": "expand",
+      "note": "same viewpoint; also marks Воробьевы горы hub twin"
+    }
+  ]
+}

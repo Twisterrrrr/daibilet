@@ -3,28 +3,30 @@
   "coordDupM": 50,
   "hubMustSeeCount": 58,
   "dumpCount": 190,
-  "expandCount": 42,
-  "insertCount": 141,
-  "insertDroppedIntraDump": 7,
-  "hubOnlyCount": 23,
-  "unionCount": 206,
-  "note": "In-city only (mustSee). Suburbs excluded. Target ~200 after editorial trim. ABCD superseded.",
+  "expandCount": 38,
+  "expandFarCount": 9,
+  "insertCount": 142,
+  "insertDroppedIntraDump": 8,
+  "insertDroppedVsHub": 2,
+  "hubOnlyCount": 20,
+  "hubOnlyDroppedDupes": 1,
+  "nameReviewCount": 0,
+  "nameReviewDecisionsApplied": 24,
+  "unionCount": 200,
+  "note": "In-city only (mustSee). Dedup key = coords <50m; name_review insert wins over coords; expand uses hub lat/lng. Suburbs excluded. Do not force count to 200.",
   "hubOnly": [
-    "Москва-Сити",
-    "Воробьевы горы",
     "Останкинская телебашня",
     "Музей Михаила Булгакова",
     "Парящий мост в Зарядье",
-    "Смотровая на Воробьевых горах",
     "Крымская набережная",
     "Набережная у Кремля",
-    "Смотровая Останкинской башни",
     "Никольская улица",
     "Кузнецкий Мост",
     "Камергерский переулок",
     "Пятницкая улица",
     "Парк Горького",
     "Музеон",
+    "Измайловский парк и кремль",
     "Покровский монастырь",
     "Московский зоопарк",
     "Москвариум на ВДНХ",
@@ -34,31 +36,71 @@
     "Artplay",
     "Флакон"
   ],
+  "expandFar": [
+    {
+      "name": "Еврейский музей",
+      "hubName": "Еврейский музей и центр толерантности",
+      "distM": 488,
+      "via": "name_review"
+    },
+    {
+      "name": "Музей русского импрессионизма",
+      "hubName": "Музей русского импрессионизма",
+      "distM": 1111,
+      "via": "name_review"
+    },
+    {
+      "name": "Бункер-42",
+      "hubName": "Бункер-42 на Таганке",
+      "distM": 479,
+      "via": "name_review"
+    },
+    {
+      "name": "Донской монастырь",
+      "hubName": "Донской монастырь",
+      "distM": 301,
+      "via": "name_review"
+    },
+    {
+      "name": "Богоявленский собор в Елохове",
+      "hubName": "Богоявленский собор в Елохове",
+      "distM": 658,
+      "via": "name_review"
+    },
+    {
+      "name": "Храм Вознесения в Коломенском",
+      "hubName": "Храм Вознесения в Коломенском",
+      "distM": 440,
+      "via": "name_review"
+    },
+    {
+      "name": "Смотровая Воробьевых гор",
+      "hubName": "Смотровая на Воробьевых горах",
+      "distM": 1014,
+      "via": "name_review"
+    },
+    {
+      "name": "Сокольники",
+      "hubName": "Сокольники",
+      "distM": 1207,
+      "via": "name_review"
+    },
+    {
+      "name": "Коломенское",
+      "hubName": "Коломенское",
+      "distM": 459,
+      "via": "name_review"
+    }
+  ],
   "expandSample": [
-    {
-      "role": "expand",
-      "name": "Памятник Минину и Пожарскому",
-      "hubName": "Собор Василия Блаженного",
-      "lat": 55.752701,
-      "lon": 37.622557,
-      "distM": 41,
-      "via": "coords"
-    },
-    {
-      "role": "expand",
-      "name": "Монумент «Покорителям космоса»",
-      "hubName": "Музей космонавтики",
-      "lat": 55.822295,
-      "lon": 37.639726,
-      "distM": 45,
-      "via": "coords"
-    },
     {
       "role": "expand",
       "name": "Памятник Булату Окуджаве",
       "hubName": "Старый Арбат",
-      "lat": 55.749717,
-      "lon": 37.591942,
+      "lat": 55.7494,
+      "lon": 37.5915,
+      "dumpLat": 55.749717,
+      "dumpLon": 37.591942,
       "distM": 45,
       "via": "coords"
     },
@@ -66,8 +108,10 @@
       "role": "expand",
       "name": "Стена Цоя",
       "hubName": "Старый Арбат",
-      "lat": 55.749298,
-      "lon": 37.591283,
+      "lat": 55.7494,
+      "lon": 37.5915,
+      "dumpLat": 55.749298,
+      "dumpLon": 37.591283,
       "distM": 18,
       "via": "coords"
     },
@@ -75,8 +119,10 @@
       "role": "expand",
       "name": "Красная площадь",
       "hubName": "Красная площадь и Кремль",
-      "lat": 55.75393,
-      "lon": 37.620795,
+      "lat": 55.7539,
+      "lon": 37.6208,
+      "dumpLat": 55.75393,
+      "dumpLon": 37.620795,
       "distM": 3,
       "via": "coords"
     },
@@ -84,8 +130,10 @@
       "role": "expand",
       "name": "ГУМ",
       "hubName": "ГУМ",
-      "lat": 55.754743,
-      "lon": 37.621532,
+      "lat": 55.7546,
+      "lon": 37.6215,
+      "dumpLat": 55.754743,
+      "dumpLon": 37.621532,
       "distM": 16,
       "via": "coords"
     },
@@ -93,17 +141,23 @@
       "role": "expand",
       "name": "Усадьба Кусково",
       "hubName": "Кусково",
-      "lat": 55.735163,
-      "lon": 37.808076,
+      "lat": 55.7355,
+      "lon": 37.8075,
+      "dumpLat": 55.735163,
+      "dumpLon": 37.808076,
       "distM": 52,
-      "via": "name"
+      "via": "name_review",
+      "distWarn": false,
+      "note": ""
     },
     {
       "role": "expand",
       "name": "Высотка на Котельнической",
       "hubName": "Котельническая набережная",
-      "lat": 55.747116,
-      "lon": 37.642873,
+      "lat": 55.7472,
+      "lon": 37.6428,
+      "dumpLat": 55.747116,
+      "dumpLon": 37.642873,
       "distM": 10,
       "via": "coords"
     },
@@ -111,8 +165,10 @@
       "role": "expand",
       "name": "Усадьба Царицыно (Большой дворец)",
       "hubName": "Царицыно",
-      "lat": 55.615655,
-      "lon": 37.681651,
+      "lat": 55.6156,
+      "lon": 37.682,
+      "dumpLat": 55.615655,
+      "dumpLon": 37.681651,
       "distM": 23,
       "via": "coords"
     },
@@ -120,8 +176,10 @@
       "role": "expand",
       "name": "Третьяковская галерея",
       "hubName": "Третьяковская галерея",
-      "lat": 55.741389,
-      "lon": 37.620286,
+      "lat": 55.7415,
+      "lon": 37.6208,
+      "dumpLat": 55.741389,
+      "dumpLon": 37.620286,
       "distM": 34,
       "via": "coords"
     },
@@ -129,17 +187,23 @@
       "role": "expand",
       "name": "Новая Третьяковка",
       "hubName": "Новая Третьяковка",
-      "lat": 55.734743,
-      "lon": 37.604639,
+      "lat": 55.7345,
+      "lon": 37.6059,
+      "dumpLat": 55.734743,
+      "dumpLon": 37.604639,
       "distM": 83,
-      "via": "name"
+      "via": "name_review",
+      "distWarn": false,
+      "note": ""
     },
     {
       "role": "expand",
       "name": "ГМИИ им. Пушкина",
       "hubName": "ГМИИ имени Пушкина",
-      "lat": 55.747188,
-      "lon": 37.605178,
+      "lat": 55.7473,
+      "lon": 37.6051,
+      "dumpLat": 55.747188,
+      "dumpLon": 37.605178,
       "distM": 13,
       "via": "coords"
     },
@@ -147,8 +211,10 @@
       "role": "expand",
       "name": "Музей космонавтики",
       "hubName": "Музей космонавтики",
-      "lat": 55.822765,
-      "lon": 37.639726,
+      "lat": 55.8227,
+      "lon": 37.6397,
+      "dumpLat": 55.822765,
+      "dumpLon": 37.639726,
       "distM": 7,
       "via": "coords"
     },
@@ -156,8 +222,10 @@
       "role": "expand",
       "name": "Музей Москвы",
       "hubName": "Музей Москвы",
-      "lat": 55.736868,
-      "lon": 37.592728,
+      "lat": 55.7368,
+      "lon": 37.5925,
+      "dumpLat": 55.736868,
+      "dumpLon": 37.592728,
       "distM": 16,
       "via": "coords"
     },
@@ -165,12 +233,43 @@
       "role": "expand",
       "name": "Еврейский музей",
       "hubName": "Еврейский музей и центр толерантности",
-      "lat": 55.791247,
-      "lon": 37.615124,
+      "lat": 55.7886,
+      "lon": 37.6089,
+      "dumpLat": 55.791247,
+      "dumpLon": 37.615124,
       "distM": 488,
-      "via": "name"
+      "via": "name_review",
+      "distWarn": true,
+      "note": ""
+    },
+    {
+      "role": "expand",
+      "name": "«Гараж»",
+      "hubName": "Музей современного искусства «Гараж»",
+      "lat": 55.7278,
+      "lon": 37.6014,
+      "dumpLat": 55.727425,
+      "dumpLon": 37.601911,
+      "distM": 53,
+      "via": "name_review",
+      "distWarn": false,
+      "note": ""
+    },
+    {
+      "role": "expand",
+      "name": "Политехнический музей",
+      "hubName": "Политехнический музей",
+      "lat": 55.7585,
+      "lon": 37.6295,
+      "dumpLat": 55.757753,
+      "dumpLon": 37.628892,
+      "distM": 91,
+      "via": "name_review",
+      "distWarn": false,
+      "note": ""
     }
   ],
+  "nameReview": [],
   "insertAll": [
     {
       "role": "insert",
@@ -178,7 +277,8 @@
       "lat": 55.765604,
       "lon": 37.605892,
       "nearestHub": "Музей Михаила Булгакова",
-      "distM": 787
+      "distM": 787,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -186,7 +286,8 @@
       "lat": 55.742848,
       "lon": 37.61486,
       "nearestHub": "Третьяковская галерея",
-      "distM": 401
+      "distM": 401,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -194,7 +295,8 @@
       "lat": 55.707834,
       "lon": 37.580196,
       "nearestHub": "Воробьевы горы",
-      "distM": 1354
+      "distM": 1354,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -202,7 +304,8 @@
       "lat": 55.740528,
       "lon": 37.608031,
       "nearestHub": "Патриарший мост",
-      "distM": 332
+      "distM": 332,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -210,7 +313,8 @@
       "lat": 55.749666,
       "lon": 37.611756,
       "nearestHub": "Набережная у Кремля",
-      "distM": 50
+      "distM": 50,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -218,7 +322,8 @@
       "lat": 55.828352,
       "lon": 37.646549,
       "nearestHub": "ВДНХ",
-      "distM": 651
+      "distM": 651,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -226,7 +331,8 @@
       "lat": 55.755403,
       "lon": 37.618037,
       "nearestHub": "Казанский собор на Красной площади",
-      "distM": 61
+      "distM": 61,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -234,7 +340,8 @@
       "lat": 55.761358,
       "lon": 37.609204,
       "nearestHub": "Камергерский переулок",
-      "distM": 320
+      "distM": 320,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -242,7 +349,8 @@
       "lat": 55.751351,
       "lon": 37.609462,
       "nearestHub": "Набережная у Кремля",
-      "distM": 280
+      "distM": 280,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -250,7 +358,8 @@
       "lat": 55.769512,
       "lon": 37.595604,
       "nearestHub": "Музей Михаила Булгакова",
-      "distM": 329
+      "distM": 329,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -258,7 +367,8 @@
       "lat": 55.769188,
       "lon": 37.649377,
       "nearestHub": "Аптекарский огород",
-      "distM": 1351
+      "distM": 1351,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -266,7 +376,8 @@
       "lat": 55.753361,
       "lon": 37.599144,
       "nearestHub": "Старый Арбат",
-      "distM": 650
+      "distM": 650,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -274,7 +385,8 @@
       "lat": 55.750567,
       "lon": 37.601911,
       "nearestHub": "ГМИИ имени Пушкина",
-      "distM": 414
+      "distM": 414,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -282,7 +394,8 @@
       "lat": 55.757753,
       "lon": 37.606277,
       "nearestHub": "Камергерский переулок",
-      "distM": 506
+      "distM": 506,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -290,7 +403,8 @@
       "lat": 55.762886,
       "lon": 37.602656,
       "nearestHub": "Патриаршие пруды",
-      "distM": 662
+      "distM": 662,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -298,7 +412,8 @@
       "lat": 55.745672,
       "lon": 37.619075,
       "nearestHub": "Третьяковская галерея",
-      "distM": 476
+      "distM": 476,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -306,7 +421,8 @@
       "lat": 55.769747,
       "lon": 37.656554,
       "nearestHub": "Artplay",
-      "distM": 1282
+      "distM": 1282,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -314,7 +430,8 @@
       "lat": 55.765697,
       "lon": 37.636605,
       "nearestHub": "Кузнецкий Мост",
-      "distM": 890
+      "distM": 890,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -322,7 +439,8 @@
       "lat": 55.772592,
       "lon": 37.620025,
       "nearestHub": "Аптекарский огород",
-      "distM": 1170
+      "distM": 1170,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -330,7 +448,8 @@
       "lat": 55.761614,
       "lon": 37.615124,
       "nearestHub": "Камергерский переулок",
-      "distM": 226
+      "distM": 226,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -338,7 +457,8 @@
       "lat": 55.735165,
       "lon": 37.607412,
       "nearestHub": "Музеон",
-      "distM": 70
+      "distM": 70,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -346,7 +466,8 @@
       "lat": 55.826359,
       "lon": 37.637651,
       "nearestHub": "ВДНХ",
-      "distM": 57
+      "distM": 57,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -354,7 +475,8 @@
       "lat": 55.755353,
       "lon": 37.584347,
       "nearestHub": "Старый Арбат",
-      "distM": 799
+      "distM": 799,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -362,7 +484,8 @@
       "lat": 55.752317,
       "lon": 37.575306,
       "nearestHub": "Планетарий",
-      "distM": 1022
+      "distM": 1022,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -370,7 +493,8 @@
       "lat": 55.744111,
       "lon": 37.606277,
       "nearestHub": "Храм Христа Спасителя",
-      "distM": 73
+      "distM": 73,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -378,7 +502,8 @@
       "lat": 55.754763,
       "lon": 37.63223,
       "nearestHub": "Парк Зарядье",
-      "distM": 445
+      "distM": 445,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -386,7 +511,8 @@
       "lat": 55.747805,
       "lon": 37.626707,
       "nearestHub": "Парящий мост в Зарядье",
-      "distM": 249
+      "distM": 249,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -394,7 +520,8 @@
       "lat": 55.756285,
       "lon": 37.604639,
       "nearestHub": "Камергерский переулок",
-      "distM": 678
+      "distM": 678,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -402,7 +529,8 @@
       "lat": 55.771343,
       "lon": 37.620835,
       "nearestHub": "Кузнецкий Мост",
-      "distM": 1118
+      "distM": 1118,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -410,7 +538,8 @@
       "lat": 55.767425,
       "lon": 37.616238,
       "nearestHub": "Кузнецкий Мост",
-      "distM": 837
+      "distM": 837,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -418,7 +547,8 @@
       "lat": 55.764511,
       "lon": 37.562304,
       "nearestHub": "Планетарий",
-      "distM": 833
+      "distM": 833,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -426,7 +556,8 @@
       "lat": 55.723145,
       "lon": 37.525624,
       "nearestHub": "Новодевичий монастырь",
-      "distM": 1932
+      "distM": 1932,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -434,7 +565,8 @@
       "lat": 55.754665,
       "lon": 37.610992,
       "nearestHub": "Казанский собор на Красной площади",
-      "distM": 506
+      "distM": 506,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -442,7 +574,8 @@
       "lat": 55.731452,
       "lon": 37.572412,
       "nearestHub": "Новодевичий монастырь",
-      "distM": 1182
+      "distM": 1182,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -450,7 +583,8 @@
       "lat": 55.711818,
       "lon": 37.621458,
       "nearestHub": "Даниловский рынок",
-      "distM": 147
+      "distM": 147,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -458,7 +592,8 @@
       "lat": 55.742328,
       "lon": 37.624792,
       "nearestHub": "Пятницкая улица",
-      "distM": 233
+      "distM": 233,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -466,7 +601,8 @@
       "lat": 55.780182,
       "lon": 37.632296,
       "nearestHub": "Аптекарский огород",
-      "distM": 274
+      "distM": 274,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -474,7 +610,8 @@
       "lat": 55.729744,
       "lon": 37.635839,
       "nearestHub": "Марфо-Мариинская обитель",
-      "distM": 1243
+      "distM": 1243,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -482,7 +619,8 @@
       "lat": 55.729447,
       "lon": 37.613317,
       "nearestHub": "Крымская набережная",
-      "distM": 542
+      "distM": 542,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -490,7 +628,8 @@
       "lat": 55.752004,
       "lon": 37.617456,
       "nearestHub": "Красная площадь и Кремль",
-      "distM": 297
+      "distM": 297,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -498,15 +637,8 @@
       "lat": 55.753733,
       "lon": 37.619889,
       "nearestHub": "Красная площадь и Кремль",
-      "distM": 60
-    },
-    {
-      "role": "insert",
-      "name": "Лобное место",
-      "lat": 55.753127,
-      "lon": 37.622561,
-      "nearestHub": "Собор Василия Блаженного",
-      "distM": 77
+      "distM": 60,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -514,7 +646,8 @@
       "lat": 55.773822,
       "lon": 37.655937,
       "nearestHub": "Богоявленский собор в Елохове",
-      "distM": 1272
+      "distM": 1272,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -522,7 +655,8 @@
       "lat": 55.752317,
       "lon": 37.626487,
       "nearestHub": "Парк Зарядье",
-      "distM": 200
+      "distM": 200,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -530,7 +664,8 @@
       "lat": 55.751792,
       "lon": 37.629161,
       "nearestHub": "Парк Зарядье",
-      "distM": 67
+      "distM": 67,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -538,7 +673,8 @@
       "lat": 55.759247,
       "lon": 37.622728,
       "nearestHub": "Никольская улица",
-      "distM": 200
+      "distM": 200,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -546,7 +682,8 @@
       "lat": 55.758032,
       "lon": 37.611116,
       "nearestHub": "Камергерский переулок",
-      "distM": 247
+      "distM": 247,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -554,7 +691,8 @@
       "lat": 55.749842,
       "lon": 37.608977,
       "nearestHub": "Набережная у Кремля",
-      "distM": 224
+      "distM": 224,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -562,7 +700,8 @@
       "lat": 55.755106,
       "lon": 37.611598,
       "nearestHub": "Казанский собор на Красной площади",
-      "distM": 464
+      "distM": 464,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -570,7 +709,8 @@
       "lat": 55.753724,
       "lon": 37.625893,
       "nearestHub": "Собор Василия Блаженного",
-      "distM": 222
+      "distM": 222,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -578,7 +718,8 @@
       "lat": 55.666991,
       "lon": 37.669389,
       "nearestHub": "Храм Вознесения в Коломенском",
-      "distM": 70
+      "distM": 70,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -586,7 +727,8 @@
       "lat": 55.793739,
       "lon": 37.551722,
       "nearestHub": "Музей русского импрессионизма",
-      "distM": 814
+      "distM": 814,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -594,7 +736,8 @@
       "lat": 55.702868,
       "lon": 37.530752,
       "nearestHub": "Воробьевы горы",
-      "distM": 1949
+      "distM": 1949,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -602,7 +745,8 @@
       "lat": 55.752317,
       "lon": 37.566113,
       "nearestHub": "Планетарий",
-      "distM": 1148
+      "distM": 1148,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -610,7 +754,8 @@
       "lat": 55.746098,
       "lon": 37.584617,
       "nearestHub": "Старый Арбат",
-      "distM": 566
+      "distM": 566,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -618,7 +763,8 @@
       "lat": 55.75549,
       "lon": 37.581026,
       "nearestHub": "Планетарий",
-      "distM": 783
+      "distM": 783,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -626,7 +772,8 @@
       "lat": 55.749964,
       "lon": 37.589886,
       "nearestHub": "Старый Арбат",
-      "distM": 119
+      "distM": 119,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -634,7 +781,8 @@
       "lat": 55.758882,
       "lon": 37.596041,
       "nearestHub": "Патриаршие пруды",
-      "distM": 597
+      "distM": 597,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -642,7 +790,8 @@
       "lat": 55.763428,
       "lon": 37.621743,
       "nearestHub": "Кузнецкий Мост",
-      "distM": 275
+      "distM": 275,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -650,7 +799,8 @@
       "lat": 55.73663,
       "lon": 37.520445,
       "nearestHub": "Москва-Сити",
-      "distM": 1784
+      "distM": 1784,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -658,7 +808,8 @@
       "lat": 55.728073,
       "lon": 37.658826,
       "nearestHub": "Покровский монастырь",
-      "distM": 1371
+      "distM": 1371,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -666,7 +817,8 @@
       "lat": 55.743825,
       "lon": 37.609462,
       "nearestHub": "Патриарший мост",
-      "distM": 70
+      "distM": 70,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -674,7 +826,8 @@
       "lat": 55.744747,
       "lon": 37.612058,
       "nearestHub": "Патриарший мост",
-      "distM": 262
+      "distM": 262,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -682,7 +835,8 @@
       "lat": 55.764047,
       "lon": 37.635839,
       "nearestHub": "Политехнический музей",
-      "distM": 733
+      "distM": 733,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -690,7 +844,8 @@
       "lat": 55.767425,
       "lon": 37.604639,
       "nearestHub": "Музей Михаила Булгакова",
-      "distM": 700
+      "distM": 700,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -698,7 +853,8 @@
       "lat": 55.792582,
       "lon": 37.762296,
       "nearestHub": "Измайловский парк и кремль",
-      "distM": 809
+      "distM": 809,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -706,7 +862,8 @@
       "lat": 55.759247,
       "lon": 37.580756,
       "nearestHub": "Московский зоопарк",
-      "distM": 388
+      "distM": 388,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -714,7 +871,8 @@
       "lat": 55.746697,
       "lon": 37.605448,
       "nearestHub": "ГМИИ имени Пушкина",
-      "distM": 70
+      "distM": 70,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -722,7 +880,8 @@
       "lat": 55.766116,
       "lon": 37.61486,
       "nearestHub": "Камергерский переулок",
-      "distM": 707
+      "distM": 707,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -730,7 +889,8 @@
       "lat": 55.828654,
       "lon": 37.593741,
       "nearestHub": "Останкинская телебашня",
-      "distM": 1500
+      "distM": 1500,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -738,7 +898,8 @@
       "lat": 55.766947,
       "lon": 37.592728,
       "nearestHub": "Музей Михаила Булгакова",
-      "distM": 51
+      "distM": 51,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -746,7 +907,8 @@
       "lat": 55.759247,
       "lon": 37.629161,
       "nearestHub": "Политехнический музей",
-      "distM": 86
+      "distM": 86,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -754,7 +916,8 @@
       "lat": 55.738882,
       "lon": 37.522873,
       "nearestHub": "Москва-Сити",
-      "distM": 1493
+      "distM": 1493,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -762,7 +925,8 @@
       "lat": 55.731452,
       "lon": 37.504992,
       "nearestHub": "Москва-Сити",
-      "distM": 2859
+      "distM": 2859,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -770,7 +934,8 @@
       "lat": 55.75549,
       "lon": 37.609462,
       "nearestHub": "Камергерский переулок",
-      "distM": 542
+      "distM": 542,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -778,7 +943,8 @@
       "lat": 55.624792,
       "lon": 37.514083,
       "nearestHub": "Воробьевы горы",
-      "distM": 9906
+      "distM": 9906,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -786,7 +952,8 @@
       "lat": 55.690868,
       "lon": 37.562304,
       "nearestHub": "Воробьевы горы",
-      "distM": 2160
+      "distM": 2160,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -794,7 +961,8 @@
       "lat": 55.774512,
       "lon": 37.614058,
       "nearestHub": "Аптекарский огород",
-      "distM": 1412
+      "distM": 1412,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -802,7 +970,8 @@
       "lat": 55.834012,
       "lon": 37.632296,
       "nearestHub": "Москвариум на ВДНХ",
-      "distM": 695
+      "distM": 695,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -810,7 +979,8 @@
       "lat": 55.749717,
       "lon": 37.613317,
       "nearestHub": "Набережная у Кремля",
-      "distM": 57
+      "distM": 57,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -818,7 +988,8 @@
       "lat": 55.752317,
       "lon": 37.610992,
       "nearestHub": "Набережная у Кремля",
-      "distM": 327
+      "distM": 327,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -826,7 +997,18 @@
       "lat": 55.772592,
       "lon": 37.596041,
       "nearestHub": "Музей Михаила Булгакова",
-      "distM": 663
+      "distM": 663,
+      "via": "coords"
+    },
+    {
+      "role": "insert",
+      "name": "Музей кино (ВДНХ)",
+      "lat": 55.838882,
+      "lon": 37.632296,
+      "nearestHub": "ВДНХ",
+      "distM": 979,
+      "via": "name_review",
+      "note": ""
     },
     {
       "role": "insert",
@@ -834,7 +1016,8 @@
       "lat": 55.734165,
       "lon": 37.588886,
       "nearestHub": "Музей Москвы",
-      "distM": 370
+      "distM": 370,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -842,7 +1025,18 @@
       "lat": 55.746098,
       "lon": 37.606277,
       "nearestHub": "ГМИИ имени Пушкина",
-      "distM": 153
+      "distM": 153,
+      "via": "coords"
+    },
+    {
+      "role": "insert",
+      "name": "Музей «Слово» (ВДНХ)",
+      "lat": 55.831452,
+      "lon": 37.629161,
+      "nearestHub": "ВДНХ",
+      "distM": 492,
+      "via": "name_review",
+      "note": ""
     },
     {
       "role": "insert",
@@ -850,7 +1044,8 @@
       "lat": 55.753361,
       "lon": 37.613317,
       "nearestHub": "Казанский собор на Красной площади",
-      "distM": 416
+      "distM": 416,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -858,7 +1053,8 @@
       "lat": 55.710712,
       "lon": 37.620286,
       "nearestHub": "Даниловский рынок",
-      "distM": 80
+      "distM": 80,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -866,7 +1062,8 @@
       "lat": 55.765697,
       "lon": 37.630512,
       "nearestHub": "Кузнецкий Мост",
-      "distM": 599
+      "distM": 599,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -874,7 +1071,8 @@
       "lat": 55.740528,
       "lon": 37.601911,
       "nearestHub": "Храм Христа Спасителя",
-      "distM": 505
+      "distM": 505,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -882,7 +1080,8 @@
       "lat": 55.766947,
       "lon": 37.615697,
       "nearestHub": "Камергерский переулок",
-      "distM": 807
+      "distM": 807,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -890,7 +1089,8 @@
       "lat": 55.749298,
       "lon": 37.670196,
       "nearestHub": "Винзавод",
-      "distM": 750
+      "distM": 750,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -898,7 +1098,8 @@
       "lat": 55.732488,
       "lon": 37.656554,
       "nearestHub": "Бункер-42 на Таганке",
-      "distM": 1014
+      "distM": 1014,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -906,7 +1107,8 @@
       "lat": 55.778882,
       "lon": 37.626707,
       "nearestHub": "Аптекарский огород",
-      "distM": 552
+      "distM": 552,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -914,7 +1116,8 @@
       "lat": 55.755403,
       "lon": 37.635839,
       "nearestHub": "Политехнический музей",
-      "distM": 525
+      "distM": 525,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -922,7 +1125,8 @@
       "lat": 55.756534,
       "lon": 37.639726,
       "nearestHub": "Политехнический музей",
-      "distM": 676
+      "distM": 676,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -930,7 +1134,8 @@
       "lat": 55.734165,
       "lon": 37.591942,
       "nearestHub": "Музей Москвы",
-      "distM": 295
+      "distM": 295,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -938,7 +1143,8 @@
       "lat": 55.791247,
       "lon": 37.629161,
       "nearestHub": "Еврейский музей и центр толерантности",
-      "distM": 1300
+      "distM": 1300,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -946,7 +1152,8 @@
       "lat": 55.741964,
       "lon": 37.599144,
       "nearestHub": "Храм Христа Спасителя",
-      "distM": 494
+      "distM": 494,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -954,7 +1161,8 @@
       "lat": 55.740528,
       "lon": 37.629161,
       "nearestHub": "Пятницкая улица",
-      "distM": 223
+      "distM": 223,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -962,7 +1170,8 @@
       "lat": 55.758032,
       "lon": 37.604639,
       "nearestHub": "Камергерский переулок",
-      "distM": 588
+      "distM": 588,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -970,7 +1179,8 @@
       "lat": 55.753733,
       "lon": 37.634012,
       "nearestHub": "Парк Зарядье",
-      "distM": 422
+      "distM": 422,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -978,7 +1188,8 @@
       "lat": 55.752317,
       "lon": 37.629161,
       "nearestHub": "Парк Зарядье",
-      "distM": 125
+      "distM": 125,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -986,7 +1197,8 @@
       "lat": 55.758032,
       "lon": 37.596041,
       "nearestHub": "Патриаршие пруды",
-      "distM": 685
+      "distM": 685,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -994,7 +1206,8 @@
       "lat": 55.756534,
       "lon": 37.646549,
       "nearestHub": "Котельническая набережная",
-      "distM": 1064
+      "distM": 1064,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1002,7 +1215,8 @@
       "lat": 55.766947,
       "lon": 37.568912,
       "nearestHub": "Планетарий",
-      "distM": 699
+      "distM": 699,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1010,15 +1224,8 @@
       "lat": 55.732488,
       "lon": 37.615697,
       "nearestHub": "Крымская набережная",
-      "distM": 464
-    },
-    {
-      "role": "insert",
-      "name": "Смотровая Воробьевых гор",
-      "lat": 55.709462,
-      "lon": 37.542873,
-      "nearestHub": "Воробьевы горы",
-      "distM": 1014
+      "distM": 464,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1026,7 +1233,8 @@
       "lat": 55.836868,
       "lon": 37.599144,
       "nearestHub": "Москвариум на ВДНХ",
-      "distM": 1478
+      "distM": 1478,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1034,7 +1242,8 @@
       "lat": 55.838882,
       "lon": 37.380196,
       "nearestHub": "Экспериментариум",
-      "distM": 7454
+      "distM": 7454,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1042,7 +1251,8 @@
       "lat": 55.786947,
       "lon": 37.530752,
       "nearestHub": "Музей русского импрессионизма",
-      "distM": 1935
+      "distM": 1935,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1050,7 +1260,8 @@
       "lat": 55.711818,
       "lon": 37.575306,
       "nearestHub": "Воробьевы горы",
-      "distM": 1037
+      "distM": 1037,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1058,7 +1269,8 @@
       "lat": 55.770712,
       "lon": 37.608882,
       "nearestHub": "Музей Михаила Булгакова",
-      "distM": 1056
+      "distM": 1056,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1066,7 +1278,8 @@
       "lat": 55.762886,
       "lon": 37.642873,
       "nearestHub": "Политехнический музей",
-      "distM": 968
+      "distM": 968,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1074,7 +1287,18 @@
       "lat": 55.758032,
       "lon": 37.546098,
       "nearestHub": "Смотровая Москва-Сити",
-      "distM": 1081
+      "distM": 1081,
+      "via": "coords"
+    },
+    {
+      "role": "insert",
+      "name": "Измайловский парк",
+      "lat": 55.75168,
+      "lon": 37.762296,
+      "nearestHub": "Измайловский парк и кремль",
+      "distM": 3353,
+      "via": "name_review",
+      "note": "4500m: park vs kremlin cluster - distinct; do not collapse"
     },
     {
       "role": "insert",
@@ -1082,7 +1306,8 @@
       "lat": 55.759717,
       "lon": 37.625624,
       "nearestHub": "Кузнецкий Мост",
-      "distM": 210
+      "distM": 210,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1090,7 +1315,8 @@
       "lat": 55.693739,
       "lon": 37.663487,
       "nearestHub": "Коломенское",
-      "distM": 2986
+      "distM": 2986,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1098,7 +1324,8 @@
       "lat": 55.666116,
       "lon": 37.534012,
       "nearestHub": "Воробьевы горы",
-      "distM": 5146
+      "distM": 5146,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1106,7 +1333,8 @@
       "lat": 55.780182,
       "lon": 37.623912,
       "nearestHub": "Аптекарский огород",
-      "distM": 748
+      "distM": 748,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1114,7 +1342,8 @@
       "lat": 55.802868,
       "lon": 37.774937,
       "nearestHub": "Измайловский парк и кремль",
-      "distM": 2031
+      "distM": 2031,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1122,7 +1351,8 @@
       "lat": 55.747188,
       "lon": 37.472412,
       "nearestHub": "Смотровая Москва-Сити",
-      "distM": 4064
+      "distM": 4064,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1130,7 +1360,8 @@
       "lat": 55.761614,
       "lon": 37.601911,
       "nearestHub": "Патриаршие пруды",
-      "distM": 654
+      "distM": 654,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1138,7 +1369,8 @@
       "lat": 55.750712,
       "lon": 37.618037,
       "nearestHub": "Набережная у Кремля",
-      "distM": 372
+      "distM": 372,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1146,7 +1378,8 @@
       "lat": 55.779744,
       "lon": 37.591942,
       "nearestHub": "Музей Михаила Булгакова",
-      "distM": 1443
+      "distM": 1443,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1154,7 +1387,8 @@
       "lat": 55.760286,
       "lon": 37.613317,
       "nearestHub": "Камергерский переулок",
-      "distM": 55
+      "distM": 55,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1162,7 +1396,8 @@
       "lat": 55.768654,
       "lon": 37.606277,
       "nearestHub": "Музей Михаила Булгакова",
-      "distM": 825
+      "distM": 825,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1170,7 +1405,8 @@
       "lat": 55.766116,
       "lon": 37.608882,
       "nearestHub": "Камергерский переулок",
-      "distM": 759
+      "distM": 759,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1178,7 +1414,8 @@
       "lat": 55.761614,
       "lon": 37.646549,
       "nearestHub": "Политехнический музей",
-      "distM": 1121
+      "distM": 1121,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1186,7 +1423,8 @@
       "lat": 55.764047,
       "lon": 37.604639,
       "nearestHub": "Камергерский переулок",
-      "distM": 728
+      "distM": 728,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1194,7 +1432,8 @@
       "lat": 55.774512,
       "lon": 37.61486,
       "nearestHub": "Аптекарский огород",
-      "distM": 1365
+      "distM": 1365,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1202,7 +1441,8 @@
       "lat": 55.756534,
       "lon": 37.615697,
       "nearestHub": "Казанский собор на Красной площади",
-      "distM": 248
+      "distM": 248,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1210,7 +1450,8 @@
       "lat": 55.759247,
       "lon": 37.619075,
       "nearestHub": "Большой театр",
-      "distM": 58
+      "distM": 58,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1218,7 +1459,8 @@
       "lat": 55.766947,
       "lon": 37.623912,
       "nearestHub": "Кузнецкий Мост",
-      "distM": 607
+      "distM": 607,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1226,7 +1468,8 @@
       "lat": 55.750567,
       "lon": 37.63223,
       "nearestHub": "Парк Зарядье",
-      "distM": 214
+      "distM": 214,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1234,7 +1477,8 @@
       "lat": 55.748654,
       "lon": 37.584347,
       "nearestHub": "Старый Арбат",
-      "distM": 455
+      "distM": 455,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1242,7 +1486,8 @@
       "lat": 55.758882,
       "lon": 37.620835,
       "nearestHub": "Большой театр",
-      "distM": 172
+      "distM": 172,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1250,7 +1495,8 @@
       "lat": 55.765697,
       "lon": 37.614058,
       "nearestHub": "Камергерский переулок",
-      "distM": 657
+      "distM": 657,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1258,7 +1504,8 @@
       "lat": 55.727425,
       "lon": 37.568912,
       "nearestHub": "Новодевичий монастырь",
-      "distM": 820
+      "distM": 820,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1266,7 +1513,8 @@
       "lat": 55.741964,
       "lon": 37.536868,
       "nearestHub": "Москва-Сити",
-      "distM": 828
+      "distM": 828,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1274,7 +1522,8 @@
       "lat": 55.756991,
       "lon": 37.615697,
       "nearestHub": "Казанский собор на Красной площади",
-      "distM": 279
+      "distM": 279,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1282,7 +1531,8 @@
       "lat": 55.754763,
       "lon": 37.601911,
       "nearestHub": "ГМИИ имени Пушкина",
-      "distM": 854
+      "distM": 854,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1290,7 +1540,8 @@
       "lat": 55.75549,
       "lon": 37.605448,
       "nearestHub": "Камергерский переулок",
-      "distM": 695
+      "distM": 695,
+      "via": "coords"
     },
     {
       "role": "insert",
@@ -1298,10 +1549,16 @@
       "lat": 55.780182,
       "lon": 37.599144,
       "nearestHub": "Еврейский музей и центр толерантности",
-      "distM": 1117
+      "distM": 1117,
+      "via": "coords"
     }
   ],
   "droppedDumpDupes": [
+    {
+      "keep": "Памятник Минину и Пожарскому",
+      "drop": "Лобное место",
+      "distM": 47
+    },
     {
       "keep": "Памятник маршалу Жукову",
       "drop": "Исторический музей (ГИМ)",
@@ -1336,6 +1593,24 @@
       "keep": "Памятник В.В. Маяковскому",
       "drop": "Театр сатиры",
       "distM": 36
+    }
+  ],
+  "droppedVsHub": [
+    {
+      "drop": "Памятник Минину и Пожарскому",
+      "keep": "Собор Василия Блаженного",
+      "distM": 41
+    },
+    {
+      "drop": "Монумент «Покорителям космоса»",
+      "keep": "Музей космонавтики",
+      "distM": 45
+    }
+  ],
+  "droppedHubOnlyDupes": [
+    {
+      "keep": "Останкинская телебашня",
+      "drop": "Смотровая Останкинской башни"
     }
   ]
 }
