@@ -1078,6 +1078,14 @@ function placeKey(place: {
     .toLowerCase();
 }
 
+function normMustSeeName(name?: string | null): string {
+  return String(name || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[«»""']/g, '')
+    .replace(/\s+/g, ' ');
+}
+
 /** Append pack monuments missing from curated mustSee (skip duplicate slugs/names). */
 export function mergeMonumentMustSeeIntoCityInfo(
   cityInfo: Record<string, { mustSee?: Array<Record<string, unknown>> }>,
@@ -1097,9 +1105,16 @@ export function mergeMonumentMustSeeIntoCityInfo(
         )
         .filter(Boolean),
     );
+    // Expand hub sections often share a parent locationSlug (Арбат×3) but reuse
+    // the same display name as a pack statue - skip by name so we don't show two
+    // «Памятник Булату Окуджаве» cards (pack slug ≠ expand parent slug).
+    const seenNames = new Set(
+      entry.mustSee.map((place) => normMustSeeName(place.name as string | undefined)).filter(Boolean),
+    );
     for (const extra of extras) {
       const key = placeKey(extra);
-      if (!key || seen.has(key)) continue;
+      const nameKey = normMustSeeName(extra.name);
+      if (!key || seen.has(key) || (nameKey && seenNames.has(nameKey))) continue;
       const filter = extra.mustSeeFilter === 'creative' ? 'creative' : 'monument';
       entry.mustSee.push({
         ...extra,
@@ -1107,6 +1122,7 @@ export function mergeMonumentMustSeeIntoCityInfo(
         visitMinutes: typeof extra.visitMinutes === 'number' ? extra.visitMinutes : 15,
       });
       seen.add(key);
+      if (nameKey) seenNames.add(nameKey);
     }
   }
 }

@@ -150,6 +150,14 @@ function placeKey(place: {
     .toLowerCase();
 }
 
+function normMustSeeName(name?: string | null): string {
+  return String(name || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[«»""']/g, '')
+    .replace(/\\s+/g, ' ');
+}
+
 /** Append pack monuments missing from curated mustSee (skip duplicate slugs/names). */
 export function mergeMonumentMustSeeIntoCityInfo(
   cityInfo: Record<string, { mustSee?: Array<Record<string, unknown>> }>,
@@ -169,11 +177,16 @@ export function mergeMonumentMustSeeIntoCityInfo(
         )
         .filter(Boolean),
     );
+    const seenNames = new Set(
+      entry.mustSee.map((place) => normMustSeeName(place.name as string | undefined)).filter(Boolean),
+    );
     for (const extra of extras) {
       const key = placeKey(extra);
-      if (!key || seen.has(key)) continue;
+      const nameKey = normMustSeeName(extra.name);
+      if (!key || seen.has(key) || (nameKey && seenNames.has(nameKey))) continue;
       entry.mustSee.push({ ...extra });
       seen.add(key);
+      if (nameKey) seenNames.add(nameKey);
     }
   }
 }

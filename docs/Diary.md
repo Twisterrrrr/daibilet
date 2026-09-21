@@ -1,3 +1,17 @@
+## 2026-09-21 - MSK mustSee: dedupe Окуджава (pack vs expand)
+
+### Наблюдения
+- Live хаб после wire: Окуджава/Цоя/Вахтангов/Глина на месте, но **две** карточки «Памятник Булату Окуджаве» - expand (`moscow-staryy-arbat`) + monuments pack (`moscow-pamyatnik-bulatu-okudzhave`).
+- `mergeMonumentMustSeeIntoCityInfo` дедупил только по slug, не по name (комментарий врал).
+
+### Решения
+- Merge: skip pack item если нормализованное **name** уже в curated mustSee (Арбат expand, Минин на Василии и т.п.).
+- Tests: Okudzhava ×1; Minin ×1 по name; pack slug optional если name hit.
+
+### Проблемы
+- Нужен Deploy MSK web, иначе live остаётся с дублем.
+
+---
 ## 2026-09-21 - MSK mustSee: post-deploy smoke + IndexNow gate
 
 ### Наблюдения
@@ -13,6 +27,7 @@
 
 ### Проблемы
 - Google Rich Results Test с агента раньше падал crawl; edge JSON-LD Place/EventVenue парсится (ldErr 0).
+- Post-factum: дубль Окуджавы pack vs expand - см. запись выше.
 
 ---
 ## 2026-09-21 - Когда ехать: вердикт вместо табов + контекст имён
