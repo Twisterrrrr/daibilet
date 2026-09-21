@@ -2,7 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| UX.EVENTS-IMG-Q | `/events` grid: q78→90, sizes 360→480px, AFFICHE 92, qualities config | Высокий | 🔄 Deploy [35648940339](https://github.com/Twisterrrrr/daibilet/actions/runs/35648940339) `42837b91` |
+| UX.EVENTS-IMG-Q | `/events` grid: q78→90, sizes 360→480px, AFFICHE 92, qualities config | Высокий | ✅ live Deploy [35648940339](https://github.com/Twisterrrrr/daibilet/actions/runs/35648940339) `42837b91` |
 
 ## 2026-09-21 - Когда ехать UX (вердикт)
 
