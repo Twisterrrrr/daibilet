@@ -1,3 +1,73 @@
+## 2026-09-21 - Owner order: smoke → wire/og/gline ship → IndexNow
+
+### Наблюдения
+- Fresh prod smoke (15 карточек + `/cities/moscow|moskva`): **0×5XX**, все sample **200**, H1=editorial, Place/EventVenue ldErr **0**.
+- Хаб live: Окуджава/Цоя/Вахтангов как mustSee-карточки ещё **0** (wire только в working tree).
+- Глина: H1 «Арт-объект…», UI placeholder без битой иконки; og:image conventional **404** до deploy.
+- expand wire: 40 editorial → +distinct в cityInfo; 12 skipDup near-parent (Кусково/Третьяковка/…). Арбат×3 distinct.
+
+### Решения
+- Ship: cityInfo expand + Глина `creative` + `resolveVenueShareImage` (disk + same-origin absolute) → Deploy MSK web → IndexNow 200-only.
+- Фото: отдельная ветка батчами; IndexNow не ждёт фото.
+
+### Проблемы
+- Rich Results Test crawl с агента нестабилен; edge-парс JSON-LD ок.
+- IndexNow/хаб expand видны только после web deploy.
+
+---
+## 2026-09-21 - Owner order: smoke → wire/og ship → IndexNow
+
+### Наблюдения
+- Fresh prod smoke (sample 15 cards + 2 hubs): **0×5XX**, все sample **200**, H1=editorial, Place/EventVenue ldErr0, broken img hints0.
+- Live хаб до deploy: Окуджава=1 (шум), Цоя/Вахтангов=0, Глина на хабе=0. Карточка Глины уже H1 «Арт-объект», без «памятник».
+- og:image live ещё conventional path **404** (Pushkin/Glina); UI не падает. Fix в коде до ship.
+- Wire dry: 40 expand = 28 exact + 11 near-parent + 1 near-parent-multi; add=0 (уже в cityInfo). Арбат×3 distinct.
+
+### Решения
+- Ship: cityInfo expand + Глина `creative` + `resolveVenueShareImage` / no inject missing hero.
+- IndexNow после Deploy: **161 venue URL + `/cities/moskva`** (expand без собственных URL).
+- Фото - отдельная ветка батчами; IndexNow не блокировать.
+
+### Проблемы
+- До swap live без expand/og-fix. После Deploy - повторный smoke хаба (Окуджава/Цоя/Вахтангов distinct) + IndexNow.
+
+---
+## 2026-09-21 - Smoke → DB tail → wire/og ship → IndexNow gate
+
+### Наблюдения
+- Prod smoke 161: **0×5XX**, после apply/revalidate/purge: **144×200 + 17×308 + 0×404**.
+- 13×404 были не «дыры», а editorial slug ≠ live slug / address-only fuzzy overwrite (Владимир→Оружейная).
+- Live хаб до web deploy: Окуджава/Цоя/Вахтангов как отдельные mustSee = 0.
+- og:image на missing-фото → conventional path 404; UI не падает. Fix в коде: `resolveVenueShareImage`.
+- Google Rich Results Test: crawl failed («URL is not available»), Breadcrumbs valid; Place/EventVenue парсятся с edge (ldErr 0).
+
+### Решения
+- enrich: exact-slug first; fuzzy только title equality; skip event-hash slugs; rename→editorial slug; force canonicalPath; id-clash retry.
+- MSK apply: rename+insert хвоста; re-insert `moscow-pamyatnik-vladimiru-velikomu`; API restart + DTO + nginx purge + revalidate.
+- Ship: expand wire в cityInfo (+Глина `creative`) + og share fallback; Deploy MSK web → IndexNow 200-only (161 venues + `/cities/moskva`, без отдельных URL секций).
+
+### Проблемы
+- IndexNow/хаб expand видны только после web deploy.
+- Фото батчами отдельно; IndexNow не ждёт фото.
+
+---
+## 2026-09-21 - MSK smoke + Izmaylovo DB split + enrich matcher
+
+### Наблюдения
+- Smoke prod: 5XX нет. `/locations/moscow-izmaylovskiy-park` отдавал H1 «парк и кремль» (контент hub_only на slug insert).
+- `park-i-kreml` и `kafe-pushkin` были 404; кафе жило под `moscow-pamyatnik-sergeyu-eseninu` (fuzzy overwrite).
+- Арбат 200, но expand-секций Окуджава/Цоя/Вахтангов в UI нет - wire ещё не сделан.
+- Gline уже `creative`/`art-объект` на live; editorial `art` → `creative` под hub chips.
+
+### Решения
+- `findExistingVenueCandidate`: exact slug first; title только equality (без includes).
+- MSK apply: park overwrite Плеханова 13; INSERT `…-park-i-kreml`; rename eseninu→`moscow-kafe-pushkin`.
+- API restart + DTO rebuild; live smoke H1/address OK на park/kreml/cafe.
+
+### Проблемы
+- Следующий блокер: wire 40 expand в хаб. IndexNow после wire. Фото отдельно. Памятник Есенина мог потерять slug - проверить отдельно.
+
+---
 ## 2026-09-21 - Commit/deploy: zen afisha + MSK mustSee Venue apply
 
 ### Наблюдения

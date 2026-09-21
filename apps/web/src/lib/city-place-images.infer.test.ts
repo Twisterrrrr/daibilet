@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { lookupEditorialPlaceImage, resolveVenueHeroImage } from './city-place-images.ts';
+import {
+  lookupEditorialPlaceImage,
+  resolveVenueHeroImage,
+  resolveVenueShareImage,
+  localPublicImageExists,
+} from './city-place-images.ts';
 
 test('Ufa hub slugs resolve to real venue stills, not cities placeholders', () => {
   assert.equal(
@@ -37,6 +42,23 @@ test('resolveVenueHeroImage uses city identity pack when slug is unmapped', () =
   assert.equal(
     resolveVenueHeroImage('chelyabinsk-brand-new-spot', '/images/venues/generated/venue-auto-stub.jpg'),
     '/images/venues/chelyabinsk/identity-symbol.jpg',
+  );
+});
+
+test('resolveVenueShareImage drops local paths that are not on disk', () => {
+  assert.equal(localPublicImageExists('/images/venues/moscow/__no-such-file__.jpg'), false);
+  assert.equal(
+    resolveVenueShareImage('moscow-art-obekt-bolshaya-glina-4', null),
+    localPublicImageExists('/images/venues/moscow/art-obekt-bolshaya-glina-4.jpg')
+      ? '/images/venues/moscow/art-obekt-bolshaya-glina-4.jpg'
+      : null,
+  );
+  assert.equal(
+    resolveVenueShareImage(
+      null,
+      'https://daibilet.ru/images/venues/moscow/__no-such-file__.jpg',
+    ),
+    null,
   );
 });
 

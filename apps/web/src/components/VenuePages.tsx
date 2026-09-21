@@ -27,7 +27,7 @@ import type { FinanceAdmissionListResult } from '@/lib/finance-projection';
 import { withSoftTimeout } from '@/lib/soft-timeout';
 import { buildVenuePageJsonLd } from '@/lib/structured-data';
 import { resolveVenueSeoTitle } from '@/lib/venue-seo';
-import { resolveVenueHeroImage } from '@/lib/city-place-images';
+import { resolveVenueHeroImage, resolveVenueShareImage, localPublicImageExists } from '@/lib/city-place-images';
 import { applyVenueEditorialOverlay } from '@/lib/venue-editorial-content';
 import type { PublicVenuePageDto } from '@daibilet/contracts/public';
 
@@ -145,8 +145,7 @@ export async function generateVenueDetailMetadata(slug: string): Promise<Metadat
   try {
     const payload = loaded.payload;
     const venue = applyVenueEditorialOverlay(payload.venue);
-  const heroForShare =
-    resolveVenueHeroImage(venue.slug || slug, venue.heroImageUrl) || venue.heroImageUrl;
+  const heroForShare = resolveVenueShareImage(venue.slug || slug, venue.heroImageUrl);
   const decision = evaluateVenueIndexability({
     events: payload.stats?.events ?? venue.events ?? 0,
     isIndexable: venue.isIndexable,
@@ -276,7 +275,13 @@ export async function VenueDetailPage({
     payload.venue.heroImageUrl,
   );
   let venue = applyVenueEditorialOverlay(payload.venue);
-  if (editorialHero && editorialHero !== venue.heroImageUrl) {
+  // Only inject editorial hero when the asset is real - otherwise PDP keeps
+  // null heroImageUrl and shows the gradient plane (not a broken <img>).
+  if (
+    editorialHero &&
+    editorialHero !== venue.heroImageUrl &&
+    (/^https?:\/\//i.test(editorialHero) || localPublicImageExists(editorialHero))
+  ) {
     venue = { ...venue, heroImageUrl: editorialHero };
   }
   if (venue !== payload.venue) {

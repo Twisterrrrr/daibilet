@@ -354,31 +354,42 @@ function distanceMeters(left, right) {
   return 6_371_000 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+function looksLikeImportedEventSlug(slug) {
+  const value = String(slug || '');
+  // Ticket/event imports: trailing mongo/hex id. Place catalog slugs stay moscow-….
+  return /-[a-f0-9]{10,}$/i.test(value) || /-[a-f0-9]{8}$/i.test(value);
+}
+
 function findExistingVenueCandidate(rows, item) {
+  // Exact slug always wins. Otherwise «Измайловский парк» vs «…парк и кремль»
+  // (and other intentional slug splits) collapse via substring title match.
+  const exact = rows.find((row) => row.slug === item.slug);
+  if (exact) return exact;
+
   const itemIdentity = normalizeVenueIdentity(item.title);
   const itemAddress = normalizeAddress(item.address);
   let best = null;
 
   for (const row of rows) {
+    // Never absorb ticket-import rows into must-see catalog identity.
+    if (looksLikeImportedEventSlug(row.slug)) continue;
     const rowIdentity = normalizeVenueIdentity(row.title);
     const rowAddress = normalizeAddress(row.address);
     const distance = distanceMeters(row, item);
+    // Equality only - includes() merged distinct places that share a stem.
     const titleMatch =
-      itemIdentity.length >= 8 &&
-      rowIdentity.length >= 8 &&
-      (itemIdentity === rowIdentity || itemIdentity.includes(rowIdentity) || rowIdentity.includes(itemIdentity));
+      itemIdentity.length >= 8 && rowIdentity.length >= 8 && itemIdentity === rowIdentity;
     const addressMatch = itemAddress.length >= 8 && itemAddress === rowAddress;
-    // Nearby alone is not enough: island parks vs temples, twin monuments
-    // at one campus would otherwise overwrite an unrelated slug.
-    const exactSlug = row.slug === item.slug;
-    if (!titleMatch && !addressMatch && !exactSlug) continue;
+    // Title equality is mandatory for fuzzy merge. Address-only nearby stole
+    // Владимиру Великому → Манеж / Оружейная on Манежная улица.
+    if (!titleMatch) continue;
     const nearby = distance != null && distance <= 100;
+    if (!addressMatch && !nearby) continue;
 
     const score =
       (titleMatch ? 10_000 : 0) +
       (addressMatch ? 5_000 : 0) +
-      (nearby ? Math.max(0, 1_000 - Math.round(distance || 0)) : 0) +
-      (exactSlug ? 100 : 0);
+      (nearby ? Math.max(0, 1_000 - Math.round(distance || 0)) : 0);
     if (!best || score > best.score) best = { row, score };
   }
   return best?.row || null;
@@ -478,10 +489,27 @@ async function main() {
         [city.id],
       );
       const existing = findExistingVenueCandidate(candidates.rows, item);
-      const action = existing ? 'update' : 'insert';
-      // Existing public links remain canonical. The owner row enriches that
-      // entity instead of producing a twin under a newly generated slug.
-      if (existing && existing.slug !== item.slug) item.slug = existing.slug;
+      let action = existing ? 'update' : 'insert';
+      let renamedFrom = null;
+      // Prefer editorial catalogSlug when the entity already exists under a
+      // legacy/hash slug - otherwise IndexNow of the pack keeps hitting 404.
+      // If the editorial slug is taken by another row, keep the live slug.
+      if (existing && existing.slug !== item.slug) {
+        const taken = candidates.rows.some((row) => row.slug === item.slug && row.id !== existing.id);
+        if (!taken) {
+          renamedFrom = existing.slug;
+          if (!dryRun) {
+            await pool.query(`update "Venue" set slug = $1, "updatedAt" = now() where id = $2`, [
+              item.slug,
+              existing.id,
+            ]);
+          }
+          existing.slug = item.slug;
+          action = 'rename+update';
+        } else {
+          item.slug = existing.slug;
+        }
+      }
       canonicalPath =
         inferred.family === 'institution' ? `/venues/${item.slug}` : `/locations/${item.slug}`;
       resolvedRows.push({ item, family: inferred.family });
@@ -515,10 +543,11 @@ async function main() {
       }
 
       bump(report.byAction, action);
-      if (report.sample.length < 12) {
+      if (report.sample.length < 20) {
         report.sample.push({
           slug: item.slug,
           action,
+          renamedFrom,
           city: city.slug,
           preservedShort: Boolean(existing && String(existing.shortDescription || '').trim()),
         });
@@ -589,7 +618,7 @@ async function updateVenue(pool, ctx) {
     '"seoH1" = $11',
     '"seoTitle" = $12',
     '"seoDescription" = $13',
-    '"canonicalPath" = coalesce(nullif(trim("canonicalPath"), \'\'), $14)',
+    '"canonicalPath" = $14',
     '"isIndexable" = true',
     '"updatedAt" = now()',
   ];
@@ -641,7 +670,17 @@ async function insertVenue(pool, ctx) {
     hasWayToFind,
     hasMetro,
   } = ctx;
-  const id = `ven_ms_${crypto.createHash('sha1').update(item.slug).digest('hex').slice(0, 16)}`;
+  let id = `ven_ms_${crypto.createHash('sha1').update(item.slug).digest('hex').slice(0, 16)}`;
+  const idClash = await pool.query(`select id, slug from "Venue" where id = $1 limit 1`, [id]);
+  if (idClash.rows.length) {
+    // Deterministic id may still be occupied after a prior fuzzy overwrite
+    // kept the old id under a new slug (Кафе Пушкинъ ← Есенин).
+    id = `ven_ms_${crypto
+      .createHash('sha1')
+      .update(`${item.slug}:${idClash.rows[0].slug}`)
+      .digest('hex')
+      .slice(0, 16)}`;
+  }
   const seoTitle = item.seoTitle || `${item.title} | Дайбилет`;
   const seoH1 = item.seoH1 || item.title;
   const seoDescription = item.seoDescription || item.shortDescription || null;

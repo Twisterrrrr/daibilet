@@ -8,14 +8,18 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| CONT.MSK-MUSTSEE-200 | Хаб Москвы → ~200 mustSee: union + geo + «в один укус» + seed + IndexNow | Высокий | 🔄 Venue enrich ✅ 161 на MSK DB; next: hub expand-секции / cityInfo wire + фото + IndexNow |
+| CONT.MSK-MUSTSEE-200 | Хаб Москвы → ~200 mustSee: union + geo + «в один укус» + seed + IndexNow | Высокий | 🔄 smoke ✅ 0×5XX; ship wire+og+gline; **next = Deploy → IndexNow 161+hub** + фото батчами |
 | CONT.MSK-MUSTSEE-UNION | Свести dump 190 ∩ 58 + hub-only; дедуп coords &lt;50 м; expand/insert | Высокий | ✅ seed draft: expand40 + insert142 + hub_only19 = **201** (после Bulgakov→expand) |
 | CONT.MSK-MUSTSEE-GEO | Geocoder по union (не модель); primary = dump coords | Высокий | ✅ Nominatim `moscow-must-see-geocode.json` 221/221 ok |
 | CONT.MSK-MUSTSEE-DESC | Эталон 10 + батчи 01–11 + assemble → editorial 201 | Высокий | ✅ freqs PASS; `must-see-editorial-moscow.json` 201 in `ce4d0c96` |
-| CONT.MSK-MUSTSEE-SEED | Dry-run → apply MSK волнами; smoke | Высокий | ✅ 2026-09-21 MSK: dry-run OK → apply 50 → 125 → full **161 Venue** (37+68+13 insert waves; expands=40 hub sections, не Venue); smoke Pushkin/Glina/Izmaylovo park 200; hub_only kreml без /venues (ожидаемо) |
-| CONT.MSK-MUSTSEE-IZMAYLOVO-SLUG | Развести hub/park: `…-park-i-kreml` vs `…-park` (cityInfo + patch + alias) | Высокий | ✅ 2026-09-21 |
+| CONT.MSK-MUSTSEE-SEED | Dry-run → apply MSK волнами; smoke | Высокий | ✅ 161 Venue; smoke 2026-09-21: sample 15×200 H1/LD OK |
+| CONT.MSK-MUSTSEE-IZMAYLOVO-SLUG | Развести hub/park: `…-park-i-kreml` vs `…-park` (cityInfo + DB) | Высокий | ✅ live: park=Плеханова 13; kreml=проезд 6605; enrich exact-slug-first |
+| CONT.MSK-MUSTSEE-ENRICH-MATCH | enrich: exact slug first; title equality (no includes); cafe slug rename | Критический | ✅ code + MSK apply 2026-09-21 |
 | CONT.MSK-MUSTSEE-ETALON10 | 10 эталонных текстов + промпт-канон частот | Высокий | ✅ `moscow-mustsee-etalon-10.md`; «не X» #2/#4/#7 |
-| CONT.MSK-MUSTSEE-ART-FILTER | Seed: «Большая глина № 4» filter `art` (сейчас union `monument`) | Средний | ⏳ бэклог; не блокер apply |
+| CONT.MSK-MUSTSEE-ART-FILTER | «Большая глина» → hub filter `creative` (не monument/art) | Средний | ✅ editorial+seed+hub `creative`; live H1 уже «Арт-объект» |
+| CONT.MSK-MUSTSEE-EXPAND-WIRE | 40 expand → секции на хаб (Арбат: Окуджава/Цоя/Вахтангов) | Критический | ✅ cityInfo 156 mustSee (Арбат×3); ждёт Deploy MSK web |
+| CONT.MSK-MUSTSEE-INDEXNOW | IndexNow после expand wire (200-only URLs, без 404) | Высокий | ⏳ сразу после Deploy MSK web |
+| CONT.MSK-MUSTSEE-OG-MISSING | photoStatus missing: og:image → default, не 404 conventional path | Высокий | ✅ code+tests; live og 404 до Deploy |
 | CONT.MSK-MUSTSEE-ABCD | Ядро A/B/C/D на приёмку | Средний | ⛔ superseded 2026-09-20; архив `moscow-must-see-core-25.md` |
 
 ## 2026-09-20 - Regional towns /cities threshold ≥3

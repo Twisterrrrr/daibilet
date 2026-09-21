@@ -2541,7 +2541,23 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         longitude: 37.6181,
         mustSeeFilter: "gastro",
         locationSlug: "moscow-petrovskiy-passazh",
-      }
+      },
+
+      // --- expand sections from must-see-editorial-moscow (10) ---
+      { name: 'Памятник Булату Окуджаве', desc: 'Окуджава на Арбате - стоп на две минуты. Скульптура стоит в потоке пешеходов, рядом арбатская витринная жизнь; это якорь для фото и точка...', mustSeeFilter: 'monument', locationSlug: 'moscow-staryy-arbat', latitude: 55.7494, longitude: 37.5915 },
+      { name: 'Стена Цоя', desc: 'На Арбате стена с автографами и портретом Цоя держит поток даже в будни. Люди останавливаются на минуту: фото, надпись, дальше по пешеход...', mustSeeFilter: 'creative', locationSlug: 'moscow-staryy-arbat', latitude: 55.7494, longitude: 37.5915 },
+      { name: 'Усадьба Царицыно (Большой дворец)', desc: 'Если нужен парк с дворцом на юге, а не ещё один центр - Царицыно. Большой дворец, мосты, пруд, длинные аллеи: сюда едут на полдня, иначе ...', mustSeeFilter: 'park', locationSlug: 'moscow-tsaritsyno', latitude: 55.6156, longitude: 37.682 },
+      { name: 'Богоявленский собор в Елохове', desc: 'Где в Басманном районе остановиться на десять минут и поймать другой масштаб улицы? Елоховский собор. Белый объём, купола, площадь перед ...', mustSeeFilter: 'temple', locationSlug: 'moscow-bogoyavlenskiy-sobor-elohovo', latitude: 55.7785, longitude: 37.6745 },
+      { name: 'Храм Вознесения в Коломенском', desc: 'Заложите отдельный слот на шатровую церковь над Москвой-рекой: белый объём читается с парка Коломенского задолго до входа. Действующий хр...', mustSeeFilter: 'temple', locationSlug: 'moscow-hram-vozneseniya-kolomenskoe', latitude: 55.667, longitude: 37.6705 },
+      { name: 'Смотровая Воробьевых гор', desc: 'Нужен широкий кадр на Лужники, реку и город сразу? Смотровая на Воробьёвых. Площадка открытая, ветер бывает резкий, свет меняет картинку ...', mustSeeFilter: 'views', locationSlug: 'moscow-smotrovaya-vorobevyh-gor', latitude: 55.7102, longitude: 37.559 },
+      { name: 'Парк Царицыно', desc: 'Дворец отражается в прудах, мосты режут аллеи, а очередь к кассе в выходные растягивается ещё до входа в парк. Царицыно держит полдня: дв...', mustSeeFilter: 'park', locationSlug: 'moscow-tsaritsyno', latitude: 55.6156, longitude: 37.682 },
+      { name: 'Театр Вахтангова', desc: 'Огни афиши на Арбате, очередь к кассе перед началом, зал с узнаваемым репертуаром. Билет берут под конкретный спектакль; вечер занимает т...', mustSeeFilter: 'main', locationSlug: 'moscow-staryy-arbat', latitude: 55.7494, longitude: 37.5915 },
+      { name: 'Памятник Минину и Пожарскому', desc: 'Мимо бронзовой пары на Красной площади проходят почти все маршруты центра. Минин и Пожарский стоят напротив собора Василия Блаженного - к...', mustSeeFilter: 'monument', locationSlug: 'moscow-sobor-vasiliya-blazhennogo', latitude: 55.7525, longitude: 37.6231 },
+      { name: 'Музей Булгакова («Нехорошая квартира»)', desc: 'Где в доме на Садовой увидеть ту самую квартиру из романа? В музее на Большой Садовой, 10. Экспозиция компактная: час-полтора при спокойн...', mustSeeFilter: 'museum', venueSlug: 'moscow-muzey-bulgakova', latitude: 55.7668, longitude: 37.5935 },
+
+      // --- expand sections from must-see-editorial-moscow (1) ---
+      { name: 'Николай на Берсеневке', desc: 'Белый храм у Патриаршего моста читается с набережной за минуту пути: действующий приход, двор, короткая остановка между «Красным Октябрём...', mustSeeFilter: 'temple', locationSlug: 'moscow-patriarshiy-most', latitude: 55.7435, longitude: 37.6085 },
+      { name: 'Арт-объект «Большая глина № 4»', desc: 'На Болотной набережной огромная «глиняная» рука Урса Фишера сама попадает в кадр. Вода, парк, поток между Кремлём и Замоскворечьем - вход...', mustSeeFilter: 'creative', locationSlug: 'moscow-art-obekt-bolshaya-glina-4', latitude: 55.742848, longitude: 37.61486 },
     ],
     significantSuburbs: MOSCOW_SUBURBS,
     dayRoutePresets: [
