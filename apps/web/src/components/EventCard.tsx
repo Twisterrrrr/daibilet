@@ -38,7 +38,6 @@ import { resolveEventCardFallbackImage, resolveEventCardPrimaryImage } from '@/l
 import {
   resolveEventCardDestinationLabel,
   resolveEventCardLocationLabel,
-  resolveHubAfficheLocationLine,
 } from '@/lib/event-location';
 import { dayRouteItemFromEvent } from '@/lib/day-route-from-place';
 import { formatMoneyRange, formatPriceFrom } from '@/lib/format';
@@ -522,8 +521,10 @@ function ShowcaseEventCard({
   const hasPrice = typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB;
   const dateLabel = rail ? formatShowcaseSessionDateCompact(session) : formatShowcaseSessionDate(session);
   const cityLabel = resolveEventCardDestinationLabel(session) || null;
+  // cityHub rails (/events «Стоит увидеть», hub affiche): whole card is the CTA -
+  // no address line and no secondary «Купить билет» chrome.
   const locationLine = cityHub
-    ? resolveHubAfficheLocationLine(session)
+    ? null
     : resolveShowcaseLocationLine(session, cityLabel);
   const categoryLabel = cityHub ? null : session.category?.trim() || null;
   const showCityMeta = !cityHub && Boolean(categoryLabel || cityLabel);
@@ -601,7 +602,11 @@ function ShowcaseEventCard({
       >
         <h3
           className={`font-display font-bold leading-snug text-graphite ${
-            rail || cityHub ? 'line-clamp-2 text-ui-sm' : 'line-clamp-2 text-ui-sm sm:text-base'
+            cityHub
+              ? 'break-words text-[13px] sm:text-ui-sm'
+              : rail
+                ? 'line-clamp-2 text-ui-sm'
+                : 'line-clamp-2 text-ui-sm sm:text-base'
           }`}
         >
           <Link
@@ -640,25 +645,31 @@ function ShowcaseEventCard({
             </p>
           ) : null}
           {locationLine ? (
-            <p className={`event-card-meta ${cityHub ? 'text-graphite-muted' : ''}`}>
+            <p className="event-card-meta">
               <MapPin className="event-card-meta-icon shrink-0" />
               <span className="truncate">{locationLine}</span>
             </p>
           ) : null}
         </div>
 
-        <div className="mt-auto flex items-center justify-between gap-1.5 pt-1">
+        <div
+          className={`mt-auto flex items-center gap-1.5 pt-1 ${
+            cityHub ? 'justify-start' : 'justify-between'
+          }`}
+        >
           {priceLabel ? (
-            <span className="min-w-0 flex-1 whitespace-nowrap text-ui-sm font-extrabold tracking-tight text-graphite">
+            <span className="min-w-0 whitespace-nowrap text-ui-sm font-extrabold tracking-tight text-graphite">
               {priceLabel}
             </span>
-          ) : (
+          ) : cityHub ? null : (
             <span />
           )}
-          <span className={SHOWCASE_BUY_CTA_CLASS}>
-            <Ticket className="h-3 w-3 shrink-0" strokeWidth={1.75} />
-            Купить билет
-          </span>
+          {cityHub ? null : (
+            <span className={SHOWCASE_BUY_CTA_CLASS}>
+              <Ticket className="h-3 w-3 shrink-0" strokeWidth={1.75} />
+              Купить билет
+            </span>
+          )}
         </div>
       </div>
     </article>

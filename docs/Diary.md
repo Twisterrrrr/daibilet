@@ -1,3 +1,88 @@
+## 2026-09-21 - /events «Стоит увидеть»: цена/адрес/CTA/title
+
+### Наблюдения
+- На rail все карточки показывали одну и ту же «от 1 350 ₽» (квесты одной площадки / один min).
+- Адрес и «Купить билет» лишние: вся карточка уже CTA.
+- Title обрезался line-clamp-2 на узкой карточке.
+
+### Решения
+- catalog-zen-spotlight.ts: 1 card/venue + prefer unique priceFrom (fallback если <4).
+- Showcase cityHub: locationLine=null, hide buy CTA, title wrap (break-words), шире rail в CatalogZenSpotlight.
+- Тесты: catalog-zen-spotlight.test.ts.
+
+### Проблемы
+- До Deploy MSK web live ещё со старым chrome.
+
+---
+## 2026-09-21 - Москва mustSee: art filter + apply blocked on DB
+
+### Наблюдения
+- Owner порядок: Измайлово → enrich shared slug → dry-run → волны 50/75/76.
+- Измайлово + enrich уже ✅ (см. запись выше). Локальный assert: 201 rows, venue slug collisions **0**; shared expand hubs Арбат×3 / Царицыно×2 / Василий×2.
+- «Большая глина № 4» ещё была `monument` в editorial/seed-draft при эталоне `art`.
+
+### Решения
+- Editorial + seed-draft: `mustSeeFilter`/`type` → `art`; pipeline checkbox закрыт.
+- Dry-run/apply: без MSK `DATABASE_URL` (local PG и MCP `5433`/`5437` ECONNREFUSED). Ждём tunnel / URL от owner.
+
+### Проблемы
+- Prod apply только после dry-run и явного OK на волну 1.
+
+---
+
+
+### Наблюдения
+- Owner review: риск коллизии `moscow-izmaylovskiy-park` (insert парк vs hub «парк и кремль»).
+- В editorial JSON slug уже был разведён (`…-park` / `…-park-i-kreml`); в live `cityInfo` хаб ещё смотрел на старый slug.
+- expand × shared hub slug ожидаем (Арбат 3, Царицыно 2, Василий 2); enrich ключует `(hubSlug + title)`.
+
+### Решения
+- `cityInfo` web+public + `patch-moscow-hub-pack.js`: hub → `moscow-izmaylovskiy-park-i-kreml`.
+- Image alias на тот же jpg; insert парк остаётся на `moscow-izmaylovskiy-park`.
+- Apply план: dry-run → волны 50/75/76; фото не блокер; ART-FILTER в бэклоге.
+
+### Проблемы
+- Dry-run/apply по-прежнему ждут MSK DB (local `:5437` down).
+
+---
+
+## 2026-09-21 - Москва mustSee: texts+geo готовы, dry-run ждёт БД
+
+### Наблюдения
+- Owner «гоняй»: генерация уже закрыта батчами 01–11; freqs PASS; etalon «сцена» 40% только WARN.
+- Editorial `must-see-editorial-moscow.json`: **201** (desc+coords). Geocode Nominatim **221/221**.
+- Dry-run `enrich-must-see-editorial.js` → `ECONNREFUSED 127.0.0.1:5437` (локальный PG не поднят).
+
+### Решения
+- Tasktracker/pipeline: GEO + DESC ✅; SEED = next через MSK `DATABASE_URL` / owner «apply».
+- Фото в editorial ещё нет (`imageUrl` отсутствует) - отдельный шаг до/параллельно apply.
+- ART-FILTER («Большая глина») остаётся бэклогом.
+
+### Проблемы
+- Без доступа к MSK Postgres нельзя честно dry-run/apply из этой машины.
+- Apply в prod - только по явному OK owner.
+
+---
+
+## 2026-09-20 - Москва mustSee: ABCD снят → пайплайн ~200
+
+### Наблюдения
+- Owner: ядро A/B/C/D тормозило; цель - ~200 локаций в хабе, не идеальные 25.
+- Дамп: 190. Хаб in-city: **58**. Ошибка «хаб=144» отменена.
+- Первый diff тащил suburb POI (hubCount 98) - ложный hubOnly с Сергиевым Посадом и т.п.
+
+### Решения
+- Канон: [`drafts/moscow-must-see-pipeline.md`](./drafts/moscow-must-see-pipeline.md).
+- ABCD → archive [`drafts/moscow-must-see-core-25.md`](./drafts/moscow-must-see-core-25.md).
+- `_diff-moscow-mustsee.mjs`: только блок `mustSee` до `significantSuburbs`; порог **50 м**.
+- Union: expand **42** + insert **141** + hub_only **23** = **206** → `moscow-must-see-union.json`.
+- Приёмка: случайные 10 после seed, не ABCD.
+
+### Проблемы
+- Следующее: Geocoder/DaData по union, описания «в один укус», фото, dry-run seed. Prod apply - только по OK owner.
+
+---
+
 ## 2026-09-20 - Regional towns /cities: порог events ≥ 3
 
 ### Наблюдения

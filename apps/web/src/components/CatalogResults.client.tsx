@@ -105,22 +105,7 @@ function buildCatalogGridEntries(
   return entries;
 }
 
-export function pickCatalogZenSpotlightItems(items: PublicCatalogListItemDto[]): PublicCatalogListItemDto[] {
-  const selected: PublicCatalogListItemDto[] = [];
-  const seenTitles = new Set<string>();
-
-  for (const item of items) {
-    if (isCatalogExcludedMuseumAdmission(item)) continue;
-    const image = resolveEventCardPrimaryImage(item) || resolveEventCardFallbackImage(item);
-    const titleKey = formatPublicTitle(item.title).trim().toLocaleLowerCase('ru-RU');
-    if (!image || !titleKey || seenTitles.has(titleKey)) continue;
-    seenTitles.add(titleKey);
-    selected.push(item);
-    if (selected.length === 10) break;
-  }
-
-  return selected.length >= 4 ? selected : [];
-}
+export { pickCatalogZenSpotlightItems } from '@/lib/catalog-zen-spotlight';
 
 export function CatalogZenSpotlight({ items }: { items: PublicCatalogListItemDto[] }) {
   return (
@@ -151,7 +136,7 @@ export function CatalogZenSpotlight({ items }: { items: PublicCatalogListItemDto
         {items.map((session) => (
           <div
             key={`zen-${session.id}-${session.startsAt}`}
-            className="w-[min(62%,11.5rem)] shrink-0 snap-start sm:w-[12rem] md:w-[12.5rem] lg:w-[13rem]"
+            className="w-[min(72%,14rem)] shrink-0 snap-start sm:w-[15rem] md:w-[15.5rem] lg:w-[16rem]"
             data-rail-item
             data-catalog-zen-card
           >
