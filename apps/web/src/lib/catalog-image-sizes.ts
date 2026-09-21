@@ -1,13 +1,14 @@
 /**
- * Catalog listing image budget: small `/_next/image` widths + moderate quality.
- * Supplier covers (esp. TC PNG) are often 1–3MB; catalog grid cards only need ~280–384px.
+ * Catalog listing image budget: `/_next/image` widths + quality for dense `/events`.
+ * Supplier covers (esp. TC PNG) are often 1–3MB; grid tiles need ~360–480 CSS px
+ * (retina) - not the old 280px/q65 pack that looked mushy on live.
  *
  * Keep CATALOG_IMAGE_QUALITY scoped to `/events` catalog grids.
  * Home / related / venue / hub cards use CARD_IMAGE_QUALITY so they stay sharp.
  */
 
 /** Catalog grid (`/events`) preview quality for `/_next/image`. */
-export const CATALOG_IMAGE_QUALITY = 65;
+export const CATALOG_IMAGE_QUALITY = 78;
 
 /** Default card quality outside the dense catalog grid (hub / PDP / home / related). */
 export const CARD_IMAGE_QUALITY = 85;
@@ -26,7 +27,7 @@ export const BLOG_LISTING_IMAGE_QUALITY = 70;
  * Never `100vw` on mobile: that pulled 640–750px for a ~50vw tile.
  */
 export const CATALOG_EVENT_CARD_SIZES =
-  '(max-width: 639px) 50vw, (max-width: 1023px) 33vw, (max-width: 1535px) 25vw, 280px';
+  '(max-width: 639px) 50vw, (max-width: 1023px) 33vw, (max-width: 1535px) 25vw, 360px';
 
 /** Horizontal list thumb (~14–16rem). */
 export const CATALOG_EVENT_CARD_HORIZONTAL_SIZES = '(max-width: 639px) 100vw, 16rem';

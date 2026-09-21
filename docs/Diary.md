@@ -1,3 +1,35 @@
+## 2026-09-21 - /events: поднять качество обложек в сетке
+
+### Наблюдения
+- Owner: карточки `/events` выглядят пережато.
+- Dense catalog: `CATALOG_IMAGE_QUALITY=65` + `sizes` cap `280px` (history PERF LCP). Home/hub уже на `CARD_IMAGE_QUALITY=85`.
+- Локальные `/images/*` идут unoptimized (`-card.jpg` sidecar) - `quality` на них не влияет; старые card на MSK могли быть ~640/@65 из python-скрипта.
+
+### Решения
+- `CATALOG_IMAGE_QUALITY` 65→78; desktop sizes cap 280→360px (retina budget без `100vw` на mobile).
+- Test `catalog-image-sizes.test.ts` обновлён.
+- Если после web deploy локальные editorial всё ещё мыльные - на MSK пересобрать `node scripts/compress-card-images.mjs events` (mjs: 960/@82; не коммитить тысячи sidecar).
+
+### Проблемы
+- Без web deploy на live не видно. Teplohod CDN bypass optimizer - качество = исходник URL.
+
+---
+## 2026-09-21 - Owner «погнали»: post-deploy verify
+
+### Наблюдения
+- Deploy [35580578412](https://github.com/Twisterrrrr/daibilet/actions/runs/35580578412) `5de2297c` live.
+- Smoke sample venues: **0×5XX / 0×404**, H1=editorial, Place/EventVenue ldErr 0; missing-фото og → `default-og.jpg` 200.
+- Хаб `/cities/moskva`: Вахтангов (Главные), Окуджава ×1 (Памятники, expand-текст), Цоя + Глина как арт-объект (Необычное) - не три копии одной.
+- IndexNow 162 уже был (Yandex 200); повтор не нужен.
+
+### Решения
+- Пайплайн owner-order закрыт: smoke → wire → gline/creative → og fallback → IndexNow → dedupe pack.
+- Next: фото батчами 20–30 (отдельная ветка); IndexNow не блокировать.
+
+### Проблемы
+- Строковый HTML-smoke хаба не ловит карточки вне активного фильтра (только вкладка «Главные» в SSR/a11y tree) - проверка фильтров через UI/browser.
+
+---
 ## 2026-09-21 - MSK mustSee: dedupe Окуджава (pack vs expand)
 
 ### Наблюдения
@@ -7,9 +39,10 @@
 ### Решения
 - Merge: skip pack item если нормализованное **name** уже в curated mustSee (Арбат expand, Минин на Василии и т.п.).
 - Tests: Okudzhava ×1; Minin ×1 по name; pack slug optional если name hit.
+- Deploy [35580578412](https://github.com/Twisterrrrr/daibilet/actions/runs/35580578412) `5de2297c` - live Памятники 31→29.
 
 ### Проблемы
-- Нужен Deploy MSK web, иначе live остаётся с дублем.
+- Закрыто verify выше.
 
 ---
 ## 2026-09-21 - MSK mustSee: post-deploy smoke + IndexNow gate

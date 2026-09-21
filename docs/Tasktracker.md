@@ -1,3 +1,9 @@
+## 2026-09-21 - /events quality cover
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| UX.EVENTS-IMG-Q | `/events` grid: quality 65→78, sizes cap 280→360px | Высокий | ✅ код; ⏳ web deploy batch |
+
 ## 2026-09-21 - Когда ехать UX (вердикт)
 
 | ID | Задача | Приоритет | Статус |
@@ -23,8 +29,8 @@
 | CONT.MSK-MUSTSEE-ENRICH-MATCH | enrich: exact slug first; title equality (no includes); cafe slug rename | Критический | ✅ code + MSK apply 2026-09-21 |
 | CONT.MSK-MUSTSEE-ETALON10 | 10 эталонных текстов + промпт-канон частот | Высокий | ✅ `moscow-mustsee-etalon-10.md`; «не X» #2/#4/#7 |
 | CONT.MSK-MUSTSEE-ART-FILTER | «Большая глина» → hub filter `creative` (не monument/art) | Средний | ✅ editorial+seed+hub `creative`; live H1 уже «Арт-объект» |
-| CONT.MSK-MUSTSEE-EXPAND-WIRE | 40 expand → секции на хаб (Арбат: Окуджава/Цоя/Вахтангов) | Критический | ✅ live distinct; 🔄 dedupe pack name (Окуджава×2) → Deploy |
-| CONT.MSK-MUSTSEE-PACK-NAME-DEDUP | merge monuments: skip duplicate **name** (expand parent slug ≠ pack slug) | Высокий | 🔄 code; Deploy MSK web |
+| CONT.MSK-MUSTSEE-EXPAND-WIRE | 40 expand → секции на хаб (Арбат: Окуджава/Цоя/Вахтангов) | Критический | ✅ live: Главные/Памятники/Необычное - три разные карточки |
+| CONT.MSK-MUSTSEE-PACK-NAME-DEDUP | merge monuments: skip duplicate **name** (expand parent slug ≠ pack slug) | Высокий | ✅ live Deploy [35580578412](https://github.com/Twisterrrrr/daibilet/actions/runs/35580578412) `5de2297c`; Памятники 31→29 |
 | CONT.MSK-MUSTSEE-INDEXNOW | IndexNow после expand wire (200-only URLs, без 404) | Высокий | ✅ MSK `d720895a`: 162 URL, 3 batch, Yandex 200; api.indexnow.org 403 (не блокер) |
 | CONT.MSK-MUSTSEE-OG-MISSING | photoStatus missing: og:image → default, не 404 conventional path | Высокий | ✅ live: Pushkin/Glina → default-og.jpg 200 |
 | CONT.MSK-MUSTSEE-ABCD | Ядро A/B/C/D на приёмку | Средний | ⛔ superseded 2026-09-20; архив `moscow-must-see-core-25.md` |
