@@ -2,17 +2,17 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| FIX.EVENTS-ZEN-PRICE | Zen rail: дедуп venue + diversify priceFrom (не «от 1350» на всех) | Критический | 🔄 code; Deploy MSK web |
-| FIX.EVENTS-ZEN-CARD | cityHub: без адреса / «Купить билет»; title без line-clamp + break-words; шире rail | Высокий | 🔄 code; Deploy MSK web |
+| FIX.EVENTS-ZEN-PRICE | Zen rail: дедуп venue + diversify priceFrom (не «от 1350» на всех) | Критический | ✅ live Deploy [35562662494](https://github.com/Twisterrrrr/daibilet/actions/runs/35562662494) `45f9e1e5` |
+| FIX.EVENTS-ZEN-CARD | cityHub: без адреса / «Купить билет»; title без line-clamp + break-words; шире rail | Высокий | ✅ live Deploy [35562662494](https://github.com/Twisterrrrr/daibilet/actions/runs/35562662494) `45f9e1e5` |
 ## 2026-09-20 - Москва mustSee ~200 (пайплайн)
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| CONT.MSK-MUSTSEE-200 | Хаб Москвы → ~200 mustSee: union + geo + «в один укус» + seed + IndexNow | Высокий | 🔄 texts+geo+assemble ✅; next: dry-run/apply MSK + фото + smoke |
+| CONT.MSK-MUSTSEE-200 | Хаб Москвы → ~200 mustSee: union + geo + «в один укус» + seed + IndexNow | Высокий | 🔄 repo+web Deploy [35562857858](https://github.com/Twisterrrrr/daibilet/actions/runs/35562857858) `91059dec` (Izmaylovo slug live); next: dry-run/apply MSK DB + фото + smoke |
 | CONT.MSK-MUSTSEE-UNION | Свести dump 190 ∩ 58 + hub-only; дедуп coords &lt;50 м; expand/insert | Высокий | ✅ seed draft: expand40 + insert142 + hub_only19 = **201** (после Bulgakov→expand) |
 | CONT.MSK-MUSTSEE-GEO | Geocoder по union (не модель); primary = dump coords | Высокий | ✅ Nominatim `moscow-must-see-geocode.json` 221/221 ok |
-| CONT.MSK-MUSTSEE-DESC | Эталон 10 + батчи 01–11 + assemble → editorial 201 | Высокий | ✅ freqs PASS (etalon «сцена» 40% WARN only); `must-see-editorial-moscow.json` 201 |
-| CONT.MSK-MUSTSEE-SEED | Dry-run → owner OK → apply MSK волнами 50/75/76; smoke 10 | Высокий | 🔄 slug Измайлово ✅; enrich shared-hub ✅; dry-run ждёт MSK DB |
+| CONT.MSK-MUSTSEE-DESC | Эталон 10 + батчи 01–11 + assemble → editorial 201 | Высокий | ✅ freqs PASS; `must-see-editorial-moscow.json` 201 in `ce4d0c96` |
+| CONT.MSK-MUSTSEE-SEED | Dry-run → owner OK → apply MSK волнами 50/75/76; smoke 10 | Высокий | 🔄 code+slug+enrich in git; dry-run/apply ждёт MSK `DATABASE_URL` |
 | CONT.MSK-MUSTSEE-IZMAYLOVO-SLUG | Развести hub/park: `…-park-i-kreml` vs `…-park` (cityInfo + patch + alias) | Высокий | ✅ 2026-09-21 |
 | CONT.MSK-MUSTSEE-ETALON10 | 10 эталонных текстов + промпт-канон частот | Высокий | ✅ `moscow-mustsee-etalon-10.md`; «не X» #2/#4/#7 |
 | CONT.MSK-MUSTSEE-ART-FILTER | Seed: «Большая глина № 4» filter `art` (сейчас union `monument`) | Средний | ⏳ бэклог; не блокер apply |
