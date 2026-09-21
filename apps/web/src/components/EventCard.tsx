@@ -22,7 +22,6 @@ import {
   collectAllDisplaySlotLabels,
   COMPACT_MOBILE_SLOT_LIMIT,
   CATALOG_DISPLAY_SLOT_LIMIT,
-  formatCoverDateBadge,
   formatEventNextSession,
   formatPriceRub,
   formatShowcasePriceLabel,
@@ -533,7 +532,6 @@ function ShowcaseEventCard({
       ? formatPriceFrom(session.priceFrom)
       : formatShowcasePriceLabel(session.priceFrom, 'priceTo' in session ? session.priceTo : null)
     : null;
-  const coverDateBadge = formatCoverDateBadge(session);
   const imageSizes = cityHub ? IMAGE_SIZES.affichePoster : IMAGE_SIZES.eventCard;
   const imageQuality = cityHub ? AFFICHE_IMAGE_QUALITY : CARD_IMAGE_QUALITY;
   const displayTitle = formatPublicTitle(session.title);
@@ -584,12 +582,13 @@ function ShowcaseEventCard({
           }
         />
 
-        <EventImageBadges
-          event={session}
-          rail={rail || cityHub}
-          editorsPick={cityHub ? false : editorsPickBadge}
-          dateOnly={cityHub}
-        />
+        {cityHub ? null : (
+          <EventImageBadges
+            event={session}
+            rail={rail}
+            editorsPick={editorsPickBadge}
+          />
+        )}
         {cityHub ? null : (
           <EventFavoriteButton eventId={session.id} session={session} className="right-2 top-2 sm:right-3 sm:top-3" />
         )}
@@ -638,12 +637,10 @@ function ShowcaseEventCard({
         ) : null}
 
         <div className="flex min-w-0 flex-col gap-0.5">
-          {!cityHub || !coverDateBadge ? (
-            <p className="event-card-meta">
-              <Clock className="event-card-meta-icon" />
-              <span className="truncate font-medium text-graphite">{dateLabel}</span>
-            </p>
-          ) : null}
+          <p className="event-card-meta">
+            <Clock className="event-card-meta-icon" />
+            <span className="truncate font-medium text-graphite">{dateLabel}</span>
+          </p>
           {locationLine ? (
             <p className="event-card-meta">
               <MapPin className="event-card-meta-icon shrink-0" />
@@ -658,7 +655,11 @@ function ShowcaseEventCard({
           }`}
         >
           {priceLabel ? (
-            <span className="min-w-0 whitespace-nowrap text-ui-sm font-extrabold tracking-tight text-graphite">
+            <span
+              className={`min-w-0 whitespace-nowrap font-extrabold tracking-tight text-graphite ${
+                cityHub ? 'text-[1.3125rem] leading-none sm:text-[1.375rem]' : 'text-ui-sm'
+              }`}
+            >
               {priceLabel}
             </span>
           ) : cityHub ? null : (
