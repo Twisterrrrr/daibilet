@@ -12,6 +12,18 @@ describe('place slug aliases', () => {
     assert.equal(resolvePlaceSlugAlias('ufa-monument-salavat-yulaev'), 'ufa-pamyatnik-salavatu-yulaevu');
     assert.equal(resolvePlaceSlugAlias('voronezh-kramskoy'), 'voronezh-hudozhestvennyy-muzey-kramskogo');
     assert.equal(resolvePlaceSlugAlias('ryazan-kreml'), 'ryazan-ryazanskiy-kreml');
+    assert.equal(
+      resolvePlaceSlugAlias('naprotiv-teatra-sovremennik-625af9838532f4ffe3fefe4b'),
+      'moscow-sovremennik',
+    );
+    assert.equal(
+      resolvePlaceSlugAlias('yusupovskiy-dvorec-63986bf7a7df'),
+      'saint-petersburg-yusupovskiy-dvorets',
+    );
+    assert.equal(
+      resolvePlaceSlugAlias('petrovskii-putevoi-dvorec-5cd1bf3d079a40000c1e0639'),
+      'moscow-petrovskiy-putevoy-dvorets',
+    );
   });
 
   it('leaves canonical slugs untouched', () => {
@@ -29,10 +41,14 @@ describe('place slug aliases', () => {
       '/venues/voronezh-hudozhestvennyy-muzey-kramskogo',
     );
     assert.equal(placeSlugAliasHref('ryazan-kreml'), '/locations/ryazan-ryazanskiy-kreml');
+    assert.equal(
+      placeSlugAliasHref('naprotiv-teatra-sovremennik-625af9838532f4ffe3fefe4b'),
+      '/venues/moscow-sovremennik',
+    );
     assert.equal(placeSlugAliasHref('unknown-place'), null);
 
     const redirects = placeSlugAliasRedirects();
-    assert.equal(redirects.length, 6);
+    assert.equal(redirects.length, 12);
     assert.ok(
       redirects.some(
         (row) =>

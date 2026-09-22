@@ -20,6 +20,19 @@ export const PLACE_SLUG_ALIASES: Record<string, PlaceSlugAliasTarget> = {
     slug: 'ryazan-ryazanskiy-kreml',
     family: 'location',
   },
+  'naprotiv-teatra-sovremennik-625af9838532f4ffe3fefe4b': {
+    slug: 'moscow-sovremennik',
+    family: 'institution',
+  },
+  // Family audit batch A twins (2026-09-22): hide duplicate PUBLISHED → 301 to canon.
+  'yusupovskiy-dvorec-63986bf7a7df': {
+    slug: 'saint-petersburg-yusupovskiy-dvorets',
+    family: 'institution',
+  },
+  'petrovskii-putevoi-dvorec-5cd1bf3d079a40000c1e0639': {
+    slug: 'moscow-petrovskiy-putevoy-dvorets',
+    family: 'institution',
+  },
 };
 
 function normalizePlaceSlug(value: string): string {
