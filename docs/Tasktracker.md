@@ -2,8 +2,8 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| FIX.DINNER-SEO-DATIVE | On-page SEO «по Москва» → `cityToDative` (по Москве) | Высокий | ✅ live Deploy [35699033177](https://github.com/Twisterrrrr/daibilet/actions/runs/35699033177) `827c2728` |
-| CONT.MSK-MUSTSEE-CLOSEOUT | Verify expand/IndexNow/фото/lean-defer; smoke hub+dinner | Высокий | ✅ 2026-09-22 |
+| FIX.DINNER-SEO-DATIVE | On-page SEO «по Москва» → `cityToDative` (по Москве) | Высокий | 🔄 harden cityPrep dinner/river + ignore nominative cityPrep; Deploy |
+| CONT.MSK-MUSTSEE-CLOSEOUT | Verify expand/IndexNow/фото/lean-defer; smoke hub+dinner | Высокий | ✅ UI Арбат×3; wire 40=add/exact/near-parent; IndexNow162; фото67; lean deferred |
 
 ## 2026-09-21 - /events quality cover
 

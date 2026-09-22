@@ -118,3 +118,16 @@ test('on-page SEO text uses dative city after по (never по Москва)', (
   assert.match(text, /по Москве/);
   assert.equal(/по Москва(?!е)/.test(text), false);
 });
+
+test('on-page SEO text ignores nominative cityPrep after по', () => {
+  const text = buildLandingOnPageSeoText({
+    slug: 'moscow-dinner-boat',
+    profile: 'dinner',
+    landingTitle: 'Ужин на теплоходе в Москве',
+    cityName: 'Москва',
+    cityPrep: 'Москва',
+    stats: { events: 10, priceFrom: 630 },
+  });
+  assert.match(text, /по Москве/);
+  assert.equal(/по Москва(?!е)/.test(text), false);
+});

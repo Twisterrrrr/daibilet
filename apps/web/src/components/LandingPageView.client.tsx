@@ -113,6 +113,7 @@ import { isOpenDate, FLEXIBLE_SCHEDULE_LABEL, isFlexibleScheduleSession, resolve
 import { isBookingPlatformLabel, resolveEventCardLocationLabel } from '@/lib/event-location';
 import { formatVacantSeats } from '@/lib/event-page-utils';
 import { cityHref, eventHref, sessionVenueHref } from '@/lib/routes';
+import { cityToDative } from '@/lib/city-declension';
 import type { PublicLandingDto, PublicLandingPageDto, PublicSessionDto } from '@daibilet/contracts/public';
 
 type LandingContentBlock = NonNullable<PublicLandingPageDto['blocks']>[number];
@@ -296,16 +297,16 @@ function extractFormatLabel(tags: string[]): string {
 }
 
 function resolveLandingCityPrep(cityName: string | null, profile: LandingProfile, landingSlug: string): string | null {
-  if (!cityName) return profile === 'bus' || profile === 'river' ? 'России' : null;
+  if (!cityName) return profile === 'bus' || profile === 'river' || profile === 'dinner' ? 'России' : null;
   if (profile === 'bus') return BUS_CITY_META[cityName]?.prepositional || cityName;
-  // Dative for «по …»; river guides cover pier cities, BUS_CITY_META covers EKB etc.
-  if (profile === 'river') {
-    return riverCityGuide(cityName)?.cityNameDative || BUS_CITY_META[cityName]?.prepositional || cityName;
+  // Dative for «по …»; river/dinner share pier cities; never fall back to nominative.
+  if (profile === 'river' || profile === 'dinner') {
+    return riverCityGuide(cityName)?.cityNameDative || cityToDative(cityName);
   }
   if (profile === 'seasonal') {
-    return seasonalCityGuide(landingSlug, cityName)?.cityNameDative || cityName;
+    return seasonalCityGuide(landingSlug, cityName)?.cityNameDative || cityToDative(cityName);
   }
-  return cityName;
+  return cityToDative(cityName);
 }
 
 function buildLandingSeoInput(

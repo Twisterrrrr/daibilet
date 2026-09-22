@@ -412,9 +412,8 @@ export function resolveLandingSeo(input: LandingSeoInput): LandingSeo {
 export function buildLandingOnPageSeoText(input: LandingSeoInput): string {
   const seo = resolveLandingSeo(input);
   const cityName = input.cityName?.trim() || null;
-  // «по …» needs dative (Москве), never nominative fallback (по Москва).
-  const prep =
-    input.cityPrep?.trim() || (cityName ? cityToDative(cityName) : '') || 'России';
+  // «по …» always dative from cityName. Do not trust cityPrep (often nominative for dinner).
+  const prep = (cityName ? cityToDative(cityName) : input.cityPrep?.trim()) || 'России';
   const events = resolveEventsCount(input);
   const priceFrom = input.stats?.priceFrom ?? null;
   const title = input.landingTitle?.trim() || seo.h1Lead.trim();
