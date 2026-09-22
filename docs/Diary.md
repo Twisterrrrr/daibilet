@@ -1,16 +1,16 @@
-## 2026-09-22 - Dinner-boat: «по Москва» из-за cityPrep nominative
+## 2026-09-22 - Must-see closeout + dinner dative live
 
 ### Наблюдения
-- Live `/moscow/dinner-boat` всё ещё 1× «по Москва» в SEO-низу после `827c2728`.
-- Root: `resolveLandingCityPrep` для profile `dinner` возвращал номинатив `cityName`; `buildLandingOnPageSeoText` брал `cityPrep` раньше `cityToDative`.
-- Must-see closeout подтверждён UI: Арбат×3 в разных фильтрах (Вахтангов/main, Окуджава/monument, Цоя+Глина/creative). IndexNow 162; фото 67/161; lean deferred.
+- Expand: UI Арбат×3 distinct (Вахтангов/Главные, Окуджава/Памятники, Цоя+Глина/Необычное). Wire dry-run add=0: 40 = exact-name + same-slug-near-parent (ГМИИ/Высотка/Собор = parent с другим title, не дыры).
+- IndexNow 162 уже сдан (expand без своих URL). Фото 67/161. Lean home отложен (cookies→не ISR).
+- Dinner: после harden `ba49ebd9` live «по Москва»=0, «по Москве»>0. Home/hub 200, без 5XX.
 
 ### Решения
-- Dinner/river: cityPrep = river dative / `cityToDative`; on-page SEO «по» всегда из `cityToDative(cityName)`.
-- Test: nominative cityPrep не пробивает «по Москве».
+- Deploy MSK web [35700608802](https://github.com/Twisterrrrr/daibilet/actions/runs/35700608802) tip `ba49ebd9`.
+- Closeout must-see 201 по критерию готовности закрыт.
 
 ### Проблемы
-- Нужен Deploy MSK web, иначе live SEO остаётся с «по Москва».
+- Optional: photo batch2 (~94 missing). Harry Potter в подборке - зона Codex.
 
 ---
 ## 2026-09-22 - MSK mustSee closeout + dinner-boat «по Москве»
