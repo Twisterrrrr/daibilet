@@ -1,3 +1,10 @@
+## 2026-09-22 - Dinner-boat SEO copy + mustSee closeout
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| FIX.DINNER-SEO-DATIVE | On-page SEO «по Москва» → `cityToDative` (по Москве) | Высокий | 🔄 code; Deploy MSK web |
+| CONT.MSK-MUSTSEE-CLOSEOUT | Verify expand/IndexNow/фото/lean-defer; smoke hub+dinner | Высокий | ✅ 2026-09-22 |
+
 ## 2026-09-21 - /events quality cover
 
 | ID | Задача | Приоритет | Статус |
@@ -20,8 +27,8 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| CONT.MSK-MUSTSEE-200 | Хаб Москвы → ~200 mustSee: union + geo + «в один укус» + seed + IndexNow | Высокий | ✅ smoke+wire+og+gline+IndexNow 162; фото batch1 20/… |
-| CONT.MSK-MUSTSEE-PHOTO | Venue stills батчами 20–30 → `apps/public/.../venues/moscow/` + map | Высокий | 🔄 batch1 **20** stems (jpg/card/thumb); next batch2 |
+| CONT.MSK-MUSTSEE-200 | Хаб Москвы → ~200 mustSee: union + geo + «в один укус» + seed + IndexNow | Высокий | ✅ closeout 2026-09-22: wire+IndexNow162+фото≥67; lean home deferred |
+| CONT.MSK-MUSTSEE-PHOTO | Venue stills батчами 20–30 → `apps/public/.../venues/moscow/` + map | Высокий | ✅ приоритет ≥20-30 закрыт (67 editorial stems); 🔄 optional batch2 ~94 missing |
 | CONT.MSK-MUSTSEE-UNION | Свести dump 190 ∩ 58 + hub-only; дедуп coords &lt;50 м; expand/insert | Высокий | ✅ seed draft: expand40 + insert142 + hub_only19 = **201** (после Bulgakov→expand) |
 | CONT.MSK-MUSTSEE-GEO | Geocoder по union (не модель); primary = dump coords | Высокий | ✅ Nominatim `moscow-must-see-geocode.json` 221/221 ok |
 | CONT.MSK-MUSTSEE-DESC | Эталон 10 + батчи 01–11 + assemble → editorial 201 | Высокий | ✅ freqs PASS; `must-see-editorial-moscow.json` 201 in `ce4d0c96` |
@@ -93,7 +100,7 @@
 | FIX.BLOG-HERO-FLASH | Убран client shuffle + stable promo seed | Высокий | ✅ code: `planBlogFeedPromos({ seed })`, client shuffle с listing снят; в lineage Deploy `7ba0fb27` |
 | SEO.PODBORKI-PILOT-2 | NN+Perm в allowlist + маркер CHPU | Высокий | ✅ code |
 | SEO.PODBORKI-CITY-1 | `/podborki/c/{city}` + 301 | Высокий | ✅ |
-| PERF.HOME-EVENTS-SSR | Lean destinations/catalog/home articles | Высокий | 🔄 A1 in progress: home rails SSR-prebuilt (no 40-session client pool); `slimDestinationsForLayout` already live; deploy wait Codex crawler |
+| PERF.HOME-EVENTS-SSR | Lean destinations/catalog/home articles | Высокий | ⏸️ deferred 2026-09-22: без выноса города из cookies() - паллиатив не ISR; после must-see |
 | SEO.HUB-CONTENT-GATE | City index ≥6 офферов (strong cities bypass) | Средний | ✅ code `seo-listing-meta` / sitemap `MIN_LISTING_OFFERS_FOR_INDEX` |
 
 ## 2026-09-02 - Event map + My Day pins + CAPS + SEO audit
@@ -1160,7 +1167,7 @@ Live: Deploy MSK web [`32371428354`](https://github.com/Twisterrrrr/daibilet/act
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
 | WEB.LIGHT.DOC | Architecture plan ranked causes + budgets + phases | Критический | ✅ `docs/web-lightweight-seo.md` |
-| WEB.LIGHT.A1 | Lean home HTML ≤350KB (PERF.WM4) | Высокий | 🔄 code: sections SSR-prebuilt + catalog limit 40; live measure after batch deploy |
+| WEB.LIGHT.A1 | Lean home HTML ≤350KB (PERF.WM4) | Высокий | ⏸️ deferred с PERF.HOME-EVENTS-SSR (cookies/city) |
 | WEB.LIGHT.A2 | Home SSR single LCP hero frame; rotator client | Высокий | ⏳ |
 | WEB.LIGHT.A3 | Font weights / subset trim | Средний | ⏳ |
 | WEB.LIGHT.A4 | Single `priority` LCP audit | Средний | ⏳ |

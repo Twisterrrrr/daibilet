@@ -1,6 +1,6 @@
 import { getSeasonalLanding } from '@/data/seasonal-landings';
 import { formatBridgesSeoDescription, formatBridgesSeoTitle } from '@/lib/bridges-seo';
-import { cityToPrepositional, resolveCityCases } from '@/lib/city-declension';
+import { cityToDative, cityToPrepositional, resolveCityCases } from '@/lib/city-declension';
 import { canonicalLandingSlug, isBridgesNightLandingSlug, isRiverPartyLandingSlug } from '@/lib/landing-constants';
 import type { LandingProfileKind } from '@/lib/landing-copy';
 import { formatLandingTodayParts, SITE_TIME_ZONE } from '@/lib/datetime';
@@ -412,7 +412,9 @@ export function resolveLandingSeo(input: LandingSeoInput): LandingSeo {
 export function buildLandingOnPageSeoText(input: LandingSeoInput): string {
   const seo = resolveLandingSeo(input);
   const cityName = input.cityName?.trim() || null;
-  const prep = input.cityPrep?.trim() || cityName || 'России';
+  // «по …» needs dative (Москве), never nominative fallback (по Москва).
+  const prep =
+    input.cityPrep?.trim() || (cityName ? cityToDative(cityName) : '') || 'России';
   const events = resolveEventsCount(input);
   const priceFrom = input.stats?.priceFrom ?? null;
   const title = input.landingTitle?.trim() || seo.h1Lead.trim();

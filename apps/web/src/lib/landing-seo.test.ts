@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { resolveLandingSeo } from './landing-seo.ts';
+import { buildLandingOnPageSeoText, resolveLandingSeo } from './landing-seo.ts';
 
 test('new-year national: no сегодня and festive framing', () => {
   const seo = resolveLandingSeo({
@@ -105,4 +105,16 @@ test('rooftops title has single colon before афиша', () => {
     'Смотровые площадки и крыши в Москве сегодня, 6 августа: афиша, цены и билеты',
   );
   assert.ok(!/: :/.test(seo.h1));
+});
+
+test('on-page SEO text uses dative city after по (never по Москва)', () => {
+  const text = buildLandingOnPageSeoText({
+    slug: 'moscow-dinner-boat',
+    profile: 'dinner',
+    landingTitle: 'Ужин на теплоходе в Москве',
+    cityName: 'Москва',
+    stats: { events: 10, priceFrom: 630 },
+  });
+  assert.match(text, /по Москве/);
+  assert.equal(/по Москва(?!е)/.test(text), false);
 });

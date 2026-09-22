@@ -1,3 +1,20 @@
+## 2026-09-22 - MSK mustSee closeout + dinner-boat «по Москве»
+
+### Наблюдения
+- Expand wire уже live: Арбат×3 distinct (Вахтангов/main, Окуджава/monument, Цоя+Глина/creative); wire dry-run add=0 (40 skip exact/near-parent).
+- IndexNow 162 уже сдан (expand без собственных URL). Фото: ≥67 editorial stems на диске (критерий 20-30 закрыт); хвост missing не блокер.
+- Lean home: отложен - без выноса города из cookies() это паллиатив, не ISR; приоритет ниже must-see.
+- Dinner-boat: сетка рейсов ок; SEO-низ «по Москва» (nominative fallback).
+- Home/hub: scrim/wheel визуально ок, 5XX нет.
+
+### Решения
+- `buildLandingOnPageSeoText`: fallback city через `cityToDative` (по Москве).
+- Docs: CONT.MSK-MUSTSEE-200 closeout; PERF.HOME / WEB.LIGHT.A1 явно deferred.
+
+### Проблемы
+- Photo batch2+ по желанию (остальные ~94 missing). Harry Potter в подборке - зона Codex.
+
+---
 ## 2026-09-21 - MSK mustSee: photo batch1 + owner order closeout
 
 ### Наблюдения
