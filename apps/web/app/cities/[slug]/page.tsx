@@ -317,14 +317,16 @@ export default async function CityPage({ params }: PageProps) {
     <>
       <JsonLdScripts blocks={jsonLdBlocks} idPrefix="city-jsonld" />
       <SiteLayout>
-        <View
-          slug={decodedSlug}
-          initialPayload={payload}
-          faqItems={faqItems}
-          seoText={seoText}
-          hubArticles={hubArticles}
-          admission={admission}
-        />
+        <Suspense fallback={null}>
+          <View
+            slug={decodedSlug}
+            initialPayload={payload}
+            faqItems={faqItems}
+            seoText={seoText}
+            hubArticles={hubArticles}
+            admission={admission}
+          />
+        </Suspense>
         <CityFaqServer cityName={payload.city.name} items={visibleFaq} />
       </SiteLayout>
     </>
