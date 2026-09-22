@@ -406,6 +406,30 @@ export function buildCityPageJsonLd(payload: PublicCityPageDto): Array<Record<st
     ));
     if (faq) blocks.unshift(faq);
 
+    const suburbs = resolveCityInfo(city.slug, city.sourceSlug)?.significantSuburbs || [];
+    if (suburbs.length) {
+      blocks.push({
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        name: `Значимые пригороды: ${city.name}`,
+        numberOfItems: suburbs.length,
+        itemListElement: suburbs.map((suburb, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          item: {
+            '@type': 'Place',
+            name: suburb.name,
+            description: suburb.desc,
+            containsPlace: (suburb.places || []).map((place) => ({
+              '@type': 'Place',
+              name: place.name,
+              description: place.desc || undefined,
+            })),
+          },
+        })),
+      });
+    }
+
     const venues = (payload.venues || [])
       .filter((venue) => venue.id && venue.name)
       .slice(0, 24);

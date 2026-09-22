@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Before hydration and without JS, show the complete server suburb guide.
+   Once the client carousel is ready, keep only its interactive version visible. */
+html[data-city-hydrated='1'] [data-city-suburbs-server] {
+  display: none;
+}
+
 @keyframes nav-progress {
   0% {
     transform: scaleX(0.12);
