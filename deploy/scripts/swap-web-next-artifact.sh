@@ -128,6 +128,18 @@ if [[ -d "${WEB_NEXT_PREV}/static" && -d "${WEB_NEXT_DIR}/static" ]]; then
   echo "Merged previous hashed static from .next.prev (css/chunks/media compat)"
 fi
 
+# Enum expands (TEMPLE/BUS …) require a fresh Prisma client on MSK before API restart.
+# Restart alone is not enough: node_modules/@prisma/client stays stale and
+# `kind: { in: […, TEMPLE] }` 500s the whole /api/public/venues surface.
+if [[ -f package.json ]]; then
+  if command -v pnpm >/dev/null 2>&1; then
+    pnpm db:generate
+  else
+    npx --yes prisma generate --schema packages/db/prisma/schema.prisma
+  fi
+  echo "Prisma client regenerated for API"
+fi
+
 if systemctl_deploy is-active --quiet "$API_SERVICE" 2>/dev/null; then
   systemctl_deploy restart "$API_SERVICE"
   echo "Restarted ${API_SERVICE} after git sync (backend TS may have changed)"
