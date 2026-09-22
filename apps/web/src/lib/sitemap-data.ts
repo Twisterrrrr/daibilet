@@ -1,8 +1,6 @@
 import {
   buildPublicArticlesListDto,
-  buildPublicDestinationsDto,
   buildPublicVenuesDto,
-  getPublicCatalogSessions,
 } from '@daibilet/backend/public-read';
 
 import { evaluateCityIndexability, evaluateRegionIndexability, evaluateVenueIndexability } from '@/lib/hub-indexability';
@@ -27,6 +25,7 @@ import { evaluateListingIndexability, MIN_LISTING_OFFERS_FOR_INDEX } from '@/lib
 import { buildPodborkiCityCanonicalPath, isPodborkiSeoPilotCitySlug, PODBORKI_SEO_PILOT_CITY_SLUGS } from '@/lib/podborki-city-seo';
 import { venueHref } from '@/lib/routes';
 import { getCachedCatalog } from '@/server/cached-catalog-data';
+import { getCachedDestinations } from '@/server/cached-public-surfaces';
 import { parseCatalogPageQuery } from '@/server/catalog-query';
 import { finalizeLandingPayload, fetchLandingPageDto } from '@/server/landing-page';
 
@@ -174,23 +173,27 @@ export async function buildStaticSitemapEntries(now = new Date()): Promise<Sitem
 }
 
 export async function buildEventsSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
-  const sessions = await getPublicCatalogSessions(false, { hydrateSlots: false });
   const seen = new Set<string>();
   const entries: SitemapEntry[] = [];
+  const limit = 200;
 
-  for (const session of sessions) {
-    if (entries.length >= MAX_EVENTS) break;
-    const slug = session.slug || session.sourceSlug || session.id;
-    if (!slug || seen.has(slug)) continue;
-    seen.add(slug);
-    entries.push(entry(`/events/${encodeURIComponent(slug)}`, now, 'daily', 0.7));
+  for (let offset = 0; offset < MAX_EVENTS; offset += limit) {
+    const page = await getCachedCatalog(parseCatalogPageQuery({ limit: String(limit), offset: String(offset) }));
+    for (const event of page.items || []) {
+      if (entries.length >= MAX_EVENTS) break;
+      const slug = event.slug || event.id;
+      if (!slug || seen.has(slug)) continue;
+      seen.add(slug);
+      entries.push(entry(`/events/${encodeURIComponent(slug)}`, now, 'daily', 0.7));
+    }
+    if (!page.hasMore || !page.items?.length || entries.length >= MAX_EVENTS) break;
   }
 
   return entries;
 }
 
 export async function buildCitiesSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
-  const destinationsPayload = await buildPublicDestinationsDto();
+  const destinationsPayload = await getCachedDestinations();
   return (destinationsPayload?.destinations || [])
     .filter((destination) => {
       if (!destination.slug) return false;

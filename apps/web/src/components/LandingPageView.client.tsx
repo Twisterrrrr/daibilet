@@ -250,8 +250,10 @@ function dinnerCityGuide(cityName: string | null, citySlug?: string): DinnerCity
 
 function matchesMenuFilter(session: PublicSessionDto, menu: MenuFilter): boolean {
   if (menu === 'all') return true;
-  const text = [session.title, session.category, ...(session.tags || [])].join(' ').toLowerCase();
-  if (menu === 'set') return /сет|set-menu|дегуста/i.test(text);
+  const text = [session.title, session.category, ...(session.tags || []), ...(session.subcategories || [])]
+    .join(' ')
+    .toLowerCase();
+  if (menu === 'set') return /сет-?меню|set-?menu|дегустац/i.test(text);
   if (menu === 'buffet') return /фуршет|buffet/i.test(text);
   return true;
 }
@@ -265,11 +267,24 @@ function matchesDinnerTimeFilter(session: PublicSessionDto, filter: DinnerTimeFi
   return true;
 }
 
-function extractMenuLabel(tags: string[]): string {
-  const text = (tags || []).join(' ').toLowerCase();
+function extractMenuLabel(session: PublicSessionDto): string | null {
+  const text = [session.title, session.category, ...(session.tags || []), ...(session.subcategories || [])]
+    .join(' ')
+    .toLowerCase();
   if (/фуршет/i.test(text)) return 'Фуршет';
-  if (/сет/i.test(text)) return 'Сет-меню';
-  return 'Ужин';
+  if (/сет-?меню|дегустац|set-?menu/i.test(text)) return 'Сет-меню';
+  return null;
+}
+
+function collectDinnerMenuFacets(sessions: PublicSessionDto[]): Array<{ value: Exclude<MenuFilter, 'all'>; label: string }> {
+  const facets: Array<{ value: Exclude<MenuFilter, 'all'>; label: string }> = [
+    { value: 'set', label: 'Сет-меню' },
+    { value: 'buffet', label: 'Фуршет' },
+  ];
+  return facets.filter((facet) => {
+    const count = sessions.filter((session) => matchesMenuFilter(session, facet.value)).length;
+    return count > 0 && count < sessions.length;
+  });
 }
 
 function extractFormatLabel(tags: string[]): string {
@@ -1025,6 +1040,17 @@ export function LandingPageView({
     () => (payload && sessionsReady ? groupLandingSessions(payload.sessions) : []),
     [payload, sessionsReady],
   );
+  const dinnerMenuFacets = React.useMemo(
+    () => (profile === 'dinner' && payload ? collectDinnerMenuFacets(payload.sessions) : []),
+    [payload, profile],
+  );
+  const dinnerBadgeFacets = React.useMemo(() => {
+    if (profile !== 'dinner' || !payload?.sessions.length) return [];
+    return collectLandingBadgeFacets(payload.sessions, ['vip', 'live-music', 'guide', 'open-deck']).filter((facet) => {
+      const count = payload.sessions.filter((session) => sessionMatchesLandingBadge(session, facet.id)).length;
+      return count > 0 && count < payload.sessions.length;
+    });
+  }, [payload, profile]);
   const groups = React.useMemo(() => sortEventGroups(groupLandingSessions(filteredSessions), sort), [filteredSessions, sort]);
   const cityName = resolveLandingCityName(citySlug, slug);
   const contextWidget = React.useMemo(() => resolveLandingContextWidget(slug), [slug]);
@@ -1148,7 +1174,8 @@ export function LandingPageView({
                 menuFilter={menuFilter}
                 dinnerTimeFilter={dinnerTimeFilter}
                 dinnerBadgeFilter={dinnerBadgeFilter}
-                badgeFacets={collectLandingBadgeFacets(payload.sessions)}
+                badgeFacets={dinnerBadgeFacets}
+                menuFacets={dinnerMenuFacets}
                 setDateFilter={setDateFilter}
                 setSort={setSort}
                 setMenuFilter={setMenuFilter}
@@ -1816,6 +1843,7 @@ function LandingDinnerFilters({
   dinnerTimeFilter,
   dinnerBadgeFilter,
   badgeFacets,
+  menuFacets,
   setDateFilter,
   setSort,
   setMenuFilter,
@@ -1830,6 +1858,7 @@ function LandingDinnerFilters({
   dinnerTimeFilter: DinnerTimeFilter;
   dinnerBadgeFilter: DinnerBadgeFilter;
   badgeFacets: Array<{ id: LandingCardBadgeId; label: string }>;
+  menuFacets: Array<{ value: Exclude<MenuFilter, 'all'>; label: string }>;
   setDateFilter: (value: DateFilter) => void;
   setSort: (value: SortFilter) => void;
   setMenuFilter: (value: MenuFilter) => void;
@@ -1900,13 +1929,16 @@ function LandingDinnerFilters({
             Другая дата
           </button>
         </div>
-        <div className="mx-1 h-6 w-px bg-border" />
-        <div className="flex items-center gap-1.5">
-          <UtensilsCrossed className="h-4 w-4 text-muted-foreground" />
-          {menuChip('all', 'Любое меню')}
-          {menuChip('set', 'Сет-меню')}
-          {menuChip('buffet', 'Фуршет')}
-        </div>
+        {menuFacets.length ? (
+          <>
+            <div className="mx-1 h-6 w-px bg-border" />
+            <div className="flex items-center gap-1.5">
+              <UtensilsCrossed className="h-4 w-4 text-muted-foreground" />
+              {menuChip('all', 'Любое меню')}
+              {menuFacets.map((facet) => menuChip(facet.value, facet.label))}
+            </div>
+          </>
+        ) : null}
         <div className="h-6 w-px bg-border" />
         <div className="flex items-center gap-1.5">
           <button
@@ -1979,11 +2011,12 @@ function LandingDinnerFilters({
             </button>
           ))}
         </div>
-        <div className="flex flex-wrap gap-2">
-          {menuChip('all', 'Меню: любое')}
-          {menuChip('set', 'Сет-меню')}
-          {menuChip('buffet', 'Фуршет')}
-        </div>
+        {menuFacets.length ? (
+          <div className="flex flex-wrap gap-2">
+            {menuChip('all', 'Меню: любое')}
+            {menuFacets.map((facet) => menuChip(facet.value, facet.label))}
+          </div>
+        ) : null}
         <div className="flex gap-2">
           <select
             value={dinnerTimeFilter}
@@ -2052,11 +2085,16 @@ function LandingDinnerScheduleList({
     );
   }
 
+  const showMenuColumn = groups.some((group) => extractMenuLabel(group.representative));
+  const desktopGrid = showMenuColumn
+    ? 'md:grid-cols-[1.8fr_0.7fr_0.6fr_0.5fr_0.6fr_auto]'
+    : 'md:grid-cols-[2.4fr_0.65fr_0.55fr_0.65fr_auto]';
+
   return (
     <>
-      <div className="mb-2 hidden items-center gap-4 px-5 py-2 md:grid md:grid-cols-[1.5fr_0.7fr_0.6fr_0.5fr_0.6fr_auto]">
-        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Теплоход</span>
-        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Меню</span>
+      <div className={`mb-2 hidden items-center gap-4 px-5 py-2 md:grid ${desktopGrid}`}>
+        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Прогулка</span>
+        {showMenuColumn ? <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Меню</span> : null}
         <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Цена</span>
         <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Время</span>
         <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Формат</span>
@@ -2064,19 +2102,32 @@ function LandingDinnerScheduleList({
       </div>
       <div className="space-y-3">
         {groups.map((group, index) => (
-          <LandingDinnerScheduleRow key={group.key} group={group} isOptimal={index === pickOptimalIndex(groups)} />
+          <LandingDinnerScheduleRow
+            key={group.key}
+            group={group}
+            isOptimal={index === pickOptimalIndex(groups)}
+            showMenuColumn={showMenuColumn}
+          />
         ))}
       </div>
     </>
   );
 }
 
-function LandingDinnerScheduleRow({ group, isOptimal }: { group: EventGroup; isOptimal: boolean }) {
+function LandingDinnerScheduleRow({
+  group,
+  isOptimal,
+  showMenuColumn,
+}: {
+  group: EventGroup;
+  isOptimal: boolean;
+  showMenuColumn: boolean;
+}) {
   const session = group.representative;
   const slot = session.upcomingSlots?.[0];
   const time = resolveSessionTime(session, slot);
-  const shipName = session.tags?.find((tag) => /теплоход|катер|яхт|palace|ривер|монарх|нео/i.test(tag)) || group.title;
-  const menu = extractMenuLabel(session.tags);
+  const shipName = session.tags?.find((tag) => /теплоход|катер|яхт|palace|ривер|монарх|нео/i.test(tag)) || null;
+  const menu = extractMenuLabel(session);
   const format = extractFormatLabel(session.tags);
   const badges = deriveLandingCardBadges(session);
   const href = eventHref(session);
@@ -2096,18 +2147,22 @@ function LandingDinnerScheduleRow({ group, isOptimal }: { group: EventGroup; isO
           <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary">⭐ Оптимальный выбор</span>
         </div>
       ) : null}
-      <div className="hidden items-center gap-4 md:grid md:grid-cols-[1.5fr_0.7fr_0.6fr_0.5fr_0.6fr_auto]">
+      <div
+        className={`hidden items-center gap-4 md:grid ${
+          showMenuColumn
+            ? 'md:grid-cols-[1.8fr_0.7fr_0.6fr_0.5fr_0.6fr_auto]'
+            : 'md:grid-cols-[2.4fr_0.65fr_0.55fr_0.65fr_auto]'
+        }`}
+      >
         <div className="min-w-0">
           {isOptimal ? <div className="mb-1 text-xs font-bold text-primary">⭐ Оптимальный выбор</div> : null}
           <div className="truncate font-semibold text-foreground">
-            <a href={href} className="hover:text-primary">{shipName}</a>
-          </div>
-          <div className="truncate text-sm text-muted-foreground">
             <a href={href} className="hover:text-primary">{group.title}</a>
           </div>
+          {shipName ? <div className="truncate text-sm text-muted-foreground">{shipName}</div> : null}
           <LandingCardBadgeRow badges={badges} className="mt-1.5" />
         </div>
-        <div className="text-sm text-foreground">{menu}</div>
+        {showMenuColumn ? <div className="text-sm text-foreground">{menu || 'Не указано'}</div> : null}
         <div className="text-sm font-semibold text-foreground">{priceLabel}</div>
         <div className="text-sm text-foreground">{time}</div>
         <div className="text-sm text-muted-foreground">{format}</div>
@@ -2123,14 +2178,12 @@ function LandingDinnerScheduleRow({ group, isOptimal }: { group: EventGroup; isO
       </div>
       <div className="space-y-2 md:hidden">
         <div className="font-semibold text-foreground">
-          <a href={href} className="hover:text-primary">{shipName}</a>
-        </div>
-        <div className="text-sm text-muted-foreground">
           <a href={href} className="hover:text-primary">{group.title}</a>
         </div>
+        {shipName ? <div className="text-sm text-muted-foreground">{shipName}</div> : null}
         <LandingCardBadgeRow badges={badges} />
         <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
-          <span>{menu}</span>
+          {menu ? <span>{menu}</span> : null}
           <span>{time}</span>
           <span>{format}</span>
         </div>

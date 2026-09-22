@@ -323,7 +323,7 @@ fi
 # Serve /images/* and /_next/static from disk (bypass Node + proxy_cache).
 # AFTER admin patch: that script rewrites daibilet.conf and would drop these aliases.
 NGINX_PATCHED=0
-for _patch in patch-prod-nginx-images-static.py patch-prod-nginx-next-static.py patch-prod-nginx-events-seo.py; do
+for _patch in patch-prod-nginx-images-static.py patch-prod-nginx-next-static.py patch-prod-nginx-social-preview.py patch-prod-nginx-events-seo.py; do
   if [[ -f "$APP_DIR/deploy/nginx/$_patch" ]]; then
     if python3_deploy "$APP_DIR/deploy/nginx/$_patch"; then
       NGINX_PATCHED=1
@@ -418,5 +418,9 @@ if [[ -n "$REVALIDATE_SECRET" ]]; then
 else
   echo "Warning: DAIBILET_NEXT_REVALIDATE_SECRET missing — skip revalidate/IndexNow"
 fi
+
+echo "Running search-crawler and curated-landing smoke..."
+PUBLIC_SITE_URL="${PUBLIC_SITE_URL:-https://daibilet.ru}" \
+  bash "$APP_DIR/deploy/scripts/smoke-crawler-prod.sh"
 
 echo "F3 prod deploy complete → ${PUBLIC_SITE_URL:-https://daibilet.ru} (branch: $BRANCH, Next :$WEB_PORT)"

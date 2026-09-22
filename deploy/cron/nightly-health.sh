@@ -19,4 +19,5 @@ cd "$APP_DIR"
   POST_DEPLOY_CHECK_WEB=1 \
   PORT="${PORT:-4000}" \
   bash scripts/post-deploy-check.sh
+  PUBLIC_SITE_URL="$PUBLIC_BASE" FULL_LANDING_AUDIT=1 bash deploy/scripts/smoke-crawler-prod.sh
 } >>"$LOG_FILE" 2>&1

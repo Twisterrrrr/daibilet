@@ -64,6 +64,7 @@ jobs:
           bash -n deploy/scripts/deploy-from-git.sh
           bash -n deploy/scripts/deploy-staging.sh
           bash -n deploy/scripts/deploy-prod-next.sh
+          bash -n deploy/scripts/smoke-crawler-prod.sh
           bash -n deploy/scripts/swap-web-next-artifact.sh
           bash -n deploy/scripts/postgres-backup-common.sh
           bash -n deploy/cron/postgres-backup.sh

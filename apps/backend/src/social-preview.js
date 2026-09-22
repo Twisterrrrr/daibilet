@@ -111,11 +111,13 @@ function cityShareImageFallback(slug, sourceSlug, name) {
   return null;
 }
 
-const BOT_UA_RE =
-  /(bot|telegram|facebook|twitter|linkedin|slack|whatsapp|discord|vkshare|preview|embedly|pinterest|skype|googlebot|bingpreview|yandex|mail\.ru)/i;
+// Search crawlers must receive the complete Next SSR page. This route exists
+// only for link-unfurl clients that need a tiny, deterministic OG document.
+const SOCIAL_PREVIEW_UA_RE =
+  /(telegrambot|facebookexternalhit|facebot|twitterbot|linkedinbot|slackbot|whatsapp|discordbot|vkshare|viber|pinterestbot|skypeuripreview|embedly|odklbot)/i;
 
 export function isSocialPreviewAgent(userAgent = '') {
-  return BOT_UA_RE.test(String(userAgent || ''));
+  return SOCIAL_PREVIEW_UA_RE.test(String(userAgent || ''));
 }
 
 function escapeHtml(value) {

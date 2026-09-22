@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""Route social crawlers to /api/public/social-preview (clean OG HTML on :4000).
+"""Route link-unfurl clients to /api/public/social-preview on :4000.
 
-Idempotent. Relies on existing map $daibilet_social_bot.
+Search crawlers must stay on the full Next SSR route. The patch replaces an
+older broad ``bot`` map as well as installing the block on a fresh host.
 """
 
 from __future__ import annotations
@@ -18,17 +19,22 @@ REWRITE = """    # Social bots: static OG HTML from API (avoid Next RSC/cache-co
     }
 """
 
-
-def ensure_map(text: str) -> str:
-    if "map $http_user_agent $daibilet_social_bot" in text:
-        return text
-    block = """map $http_user_agent $daibilet_social_bot {
+SOCIAL_BOT_MAP = r"""map $http_user_agent $daibilet_social_bot {
     default 0;
-    ~*(bot|telegram|facebook|twitter|linkedin|slack|whatsapp|discord|vkshare|preview|embedly|pinterest|skype|googlebot|bingpreview|yandex|mail\\.ru) 1;
+    ~*(telegrambot|facebookexternalhit|facebot|twitterbot|linkedinbot|slackbot|whatsapp|discordbot|vkshare|viber|pinterestbot|skypeuripreview|embedly|odklbot) 1;
 }
 
 """
-    return block + text
+
+
+def ensure_map(text: str) -> str:
+    pattern = re.compile(
+        r"map \$http_user_agent \$daibilet_social_bot \{.*?\n\}\n+",
+        re.S,
+    )
+    if pattern.search(text):
+        return pattern.sub(SOCIAL_BOT_MAP, text, count=1)
+    return SOCIAL_BOT_MAP + text
 
 
 def ensure_rewrite(text: str) -> str:
