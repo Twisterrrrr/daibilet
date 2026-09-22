@@ -56,6 +56,9 @@ jobs:
 
       - name: Syntax check deploy and import scripts
         run: |
+          node --test scripts/crawler-infra.test.mjs
+          bash -n deploy/cron/crawler-log-monitor.sh
+          bash -n deploy/cron/indexnow-sitemaps.sh
           node --check scripts/tc-import-catalog.js
           node --check scripts/sync-invariants-check.js
           node --check scripts/lib/provider-link-sync.js

@@ -11,6 +11,7 @@ import { toEventPageClientPayload } from '@/lib/event-page-client-props';
 import { eventHref } from '@/lib/routes';
 import { getTicketPriceRange } from '@/lib/event-page-utils';
 import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
+import { resolveSsrOgImage } from '@/server/og-image';
 import { buildEventListingMeta, buildEventPageMetaTitle } from '@/lib/seo-event-meta';
 import { buildEventPageJsonLd } from '@/lib/structured-data';
 import { pickRepresentativeSession } from '@/lib/event-purchase';
@@ -118,7 +119,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         title: shareTitle,
         description,
         path,
-        image: event.imageUrl,
+        image: await resolveSsrOgImage(event.imageUrl),
       }),
     };
   } catch (error) {

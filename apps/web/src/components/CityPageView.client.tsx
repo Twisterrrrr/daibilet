@@ -36,7 +36,7 @@ import { formatStreetAddress } from '@/lib/address';
 import { placesHubHrefWithSelectedCity } from '@/lib/catalog-url';
 import { formatNumber, formatPriceFrom, pluralEvents, pluralVenues } from '@/lib/format';
 import { formatPublicTitle } from '@/lib/format-public-title';
-import type { CityFaqItem } from '@/lib/city-faq';
+import { visibleCityFaqItems, type CityFaqItem } from '@/lib/city-faq';
 import type { CityHubArticlesBuckets } from '@/lib/city-hub-articles';
 import type { CityHubTemplate } from '@/lib/city-hub-template';
 import type { BlogCardDto } from '@/lib/blog-utils';
@@ -295,10 +295,8 @@ export function CityPageView({
   const guide = city ? cityGuideFor(city) : null;
   const hubConfig = React.useMemo(() => resolveCityHubConfig(slug), [slug]);
   const unifiedFaq = React.useMemo(() => {
-    const merged = mergeCityFaqItems(guide?.faq, faqItems);
-    if (merged.length) return merged;
     if (!city?.name) return [];
-    return defaultCityFaq(city.name);
+    return visibleCityFaqItems(city.name, guide?.faq, faqItems);
   }, [faqItems, guide?.faq, city?.name]);
   const featuredDirections = React.useMemo(
     () =>
@@ -376,7 +374,7 @@ export function CityPageView({
   }, []);
   // Story cards UI hidden (owner 2026-08-03); keep build helper for later - do not render.
 
-  const hasFaqBlogSplit = hasFaq || footerArticles.length > 0;
+  const hasFaqBlogSplit = footerArticles.length > 0;
 
   const tabs = React.useMemo(() => {
     const filled = new Set<string>();
@@ -620,7 +618,7 @@ export function CityPageView({
             {hasFaqBlogSplit ? (
               <CityFaqBlogSplit
                 city={city}
-                faqItems={hasFaq ? unifiedFaq : []}
+                faqItems={[]}
                 articles={footerArticles}
                 editorial={editorial}
               />
@@ -2179,7 +2177,7 @@ function CityFaqBlogSplit({
 
   return (
     <section
-      id="faq"
+      id={hasFaqCol ? 'faq' : undefined}
       className={`border-t py-10 sm:py-12 lg:py-14 ${SECTION_SCROLL_MT} ${
         editorial ? 'border-zinc-200 bg-white/70' : 'border-slate-100 bg-white/80'
       }`}
@@ -2263,7 +2261,6 @@ function CityFaqSection({
   editorial?: boolean;
   nested?: boolean;
 }) {
-  const [openIndex, setOpenIndex] = React.useState<number | null>(0);
   const [askOpen, setAskOpen] = React.useState(false);
   const [askQuestion, setAskQuestion] = React.useState('');
   const [askEmail, setAskEmail] = React.useState('');
@@ -2386,41 +2383,32 @@ function CityFaqSection({
 
       <div className="space-y-2">
         {items.map((item, index) => {
-          const open = openIndex === index;
           return (
-            <div
+            <details
               key={`${item.question}:${index}`}
-              className={`rounded-xl border transition-colors ${
+              open={index === 0}
+              className={`group rounded-xl border transition-colors ${
                 editorial
                   ? 'border-zinc-200 bg-white hover:border-zinc-300'
                   : 'border-slate-200 bg-white hover:border-slate-300'
               }`}
             >
-              <button
-                type="button"
-                aria-expanded={open}
-                onClick={() => setOpenIndex(open ? null : index)}
+              <summary
                 className={`flex w-full cursor-pointer items-center justify-between gap-3 p-4 text-left text-sm font-medium ${
                   editorial ? 'text-zinc-900' : 'text-slate-900'
-                }`}
+                } list-none [&::-webkit-details-marker]:hidden`}
               >
                 <span className="pr-2">{item.question}</span>
                 <span
-                  className={`shrink-0 transition-transform ${editorial ? 'text-zinc-400' : 'text-slate-400'} ${
-                    open ? 'rotate-180' : ''
-                  }`}
+                  className={`shrink-0 transition-transform group-open:rotate-180 ${editorial ? 'text-zinc-400' : 'text-slate-400'}`}
                 >
                   ▾
                 </span>
-              </button>
-              {open ? (
-                <div
-                  className={`px-4 pb-4 text-sm leading-relaxed ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}
-                >
-                  {item.answer}
-                </div>
-              ) : null}
-            </div>
+              </summary>
+              <div className={`px-4 pb-4 text-sm leading-relaxed ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+                {item.answer}
+              </div>
+            </details>
           );
         })}
       </div>
@@ -2454,32 +2442,6 @@ function cityGuideFor(city: PublicCityDto) {
 }
 
 /** Только city FAQ (cityInfo / editorial props). Платформенные FAQ про Дайбилет не подмешиваем. */
-function mergeCityFaqItems(
-  editorial: CityInfoEntry['faq'] | undefined,
-  cityFaq: CityFaqItem[],
-): CityFaqItem[] {
-  const items: CityFaqItem[] = [];
-  const seen = new Set<string>();
-
-  for (const item of editorial || []) {
-    const question = item.q.trim();
-    const key = question.toLowerCase();
-    if (!question || seen.has(key)) continue;
-    seen.add(key);
-    items.push({ question, answer: item.a });
-  }
-
-  for (const item of cityFaq) {
-    const question = item.question.trim();
-    const key = question.toLowerCase();
-    if (!question || seen.has(key)) continue;
-    seen.add(key);
-    items.push(item);
-  }
-
-  return items;
-}
-
 function dedupeHubSessions(sessions: PublicSessionDto[]): PublicSessionDto[] {
   const seen = new Set<string>();
   const out: PublicSessionDto[] = [];
@@ -2496,26 +2458,6 @@ function dedupeHubSessions(sessions: PublicSessionDto[]): PublicSessionDto[] {
     out.push(session);
   }
   return out;
-}
-
-function defaultCityFaq(cityName: string): CityFaqItem[] {
-  return [
-    {
-      question: `Нужно ли покупать билеты заранее в ${cityName}?`,
-      answer:
-        'На популярные экскурсии и вечерние шоу лучше брать билеты онлайн заранее - особенно в выходные и высокий сезон. Так вы фиксируете цену и не стоите в кассе.',
-    },
-    {
-      question: 'Как удобнее спланировать один день в городе?',
-      answer:
-        'Начните с блока «Главные места», затем откройте афишу на сегодня или завтра.',
-    },
-    {
-      question: 'Где смотреть логистику и сезон?',
-      answer:
-        'Короткие ответы - в разделе «Лайфхаки» (если есть у города) и в блоке FAQ и блога внизу страницы.',
-    },
-  ];
 }
 
 function buildFallbackMustSee(

@@ -14,7 +14,7 @@ fetch_path() {
   local label="$3"
   local body="$TMP_DIR/body.html"
   local code
-  code="$(curl -L -sS --max-time 30 -A "$agent" -o "$body" -w '%{http_code}' "${BASE_URL}${path}")"
+  code="$(curl -sS --max-time 30 -A "$agent" -o "$body" -w '%{http_code}' "${BASE_URL}${path}")"
   if [[ "$code" != "200" ]]; then
     echo "ERROR: $label $path returned HTTP $code" >&2
     return 1
@@ -50,14 +50,26 @@ event_path="$(first_sitemap_path "${BASE_URL}/sitemaps/events.xml" '/events/' ||
 blog_path="$(first_sitemap_path "${BASE_URL}/sitemaps/blog.xml" '/blog/' || true)"
 [[ -n "$event_path" ]] || { echo 'ERROR: no event URL in sitemap' >&2; exit 1; }
 [[ -n "$blog_path" ]] || { echo 'ERROR: no blog URL in sitemap' >&2; exit 1; }
+city_path="$(first_sitemap_path "${BASE_URL}/sitemaps/cities.xml" '/cities/')"
+venue_path="$(first_sitemap_path "${BASE_URL}/sitemaps/venues.xml" '/venues/')"
+location_path="$(first_sitemap_path "${BASE_URL}/sitemaps/venues.xml" '/locations/')"
+for required_path in "$city_path" "$venue_path" "$location_path"; do
+  [[ -n "$required_path" ]] || { echo 'ERROR: missing city/venue/location sitemap sample' >&2; exit 1; }
+done
 
 paths=(
+  '/'
   '/events'
   "$event_path"
   '/blog'
   "$blog_path"
   '/podborki'
-  '/cities/sankt-peterburg'
+  '/cities'
+  "$city_path"
+  '/places'
+  "$venue_path"
+  "$location_path"
+  '/vystavki-i-muzei'
   '/d/68tssyi'
 )
 
