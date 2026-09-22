@@ -39,11 +39,17 @@ const TEMPLE_RE =
 const BUS_RE =
   /(?:автобус|\bbus\b|автовокзал|место посадки|посадка\s+на\s+автобус|экскурсия\s+на\s+автобус|hop[-\s]?on|якарели|yakareli)/iu;
 
-/** Paid cathedral-museums must stay ATTRACTION / museum path — not TEMPLE. */
+/**
+ * Paid cathedral-museums / ticketed landmarks stay ATTRACTION (review, not TEMPLE).
+ * Step 4 may revisit family=institution; until then keep them out of TEMPLE migrate.
+ * Do NOT use broad «покровский собор» — too many ordinary parish churches.
+ */
 const TICKETABLE_MUSEUM_TEMPLE_RE = new RegExp(
   [
     'исаакиевск',
     'спас\\s+на\\s+крови',
+    'храм\\s+христа\\s+спасител',
+    'собор\\s+васили\\p{L}*\\s+блаженн',
     'юсуповск',
     'екатерининск\\p{L}*\\s+дворец',
     'павловск\\p{L}*\\s+дворец',

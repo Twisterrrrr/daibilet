@@ -7,7 +7,7 @@ Mapping: `apps/web/src/lib/venue-kind-mapping.ts`
 
 **Owner OK 2026-09-22:** apply 1–11 + Депо, **четырьмя коммитами** (path → flips → hides → kind).  
 Решения: цирк → `THEATER`, Петровский → museum, особняки → `CONCERT_HALL`, twins → hide+301.  
-**Apply status:** path+flips уже в MSK DB; hides×3 + Депо GASTRO applied 2026-09-22; aliases → deploy.
+**Apply status:** path+flips+hides×3+Депо GASTRO в MSK DB; 4 git-коммита (path→flips→hides→kind); push → Deploy MSK web + smoke 301×6.
 
 ---
 

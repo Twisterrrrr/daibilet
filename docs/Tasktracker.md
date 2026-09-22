@@ -1,3 +1,13 @@
+## 2026-09-22 - Venue family шаг 4 (audit → apply)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| VK.FAMILY-CANON | ticket-critical / location-always / review / «family один раз»+исключение flip / chip≠family / circus=THEATER / palace criterion | Критический | ✅ docs |
+| VK.FAMILY-AUDIT-100 | Стратифицированный аудит ~100 + 3 сигнала + exceptions; dry-run | Высокий | ✅ отчёт; owner OK |
+| VK.FAMILY-FLIP-A | Batch A: 4 коммита path→flips→hides→kind | Высокий | ✅ DB + 4 commits; push → Deploy |
+| VK.FAMILY-SMOKE | curl 301 ×6 flip + path/hide; sitemap; CI inv 1–4 | Высокий | 🔄 после Deploy MSK web |
+| VK.PALACE-BATCH | Дворцы-музеи ~25: отдельный upgrade, не пачка с A | Средний | ⏳ review |
+
 ## 2026-09-22 - Dinner-boat SEO copy + mustSee closeout
 
 | ID | Задача | Приоритет | Статус |

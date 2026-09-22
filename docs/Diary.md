@@ -1,3 +1,42 @@
+## 2026-09-22 - Шаг 4 apply batch A (4 коммита)
+
+### Наблюдения
+- Owner OK: path → flips → hides → kind; цирк=THEATER, Петровский=museum, особняки=CONCERT_HALL, twins=hide+301.
+- `naprotiv-teatra-sovremennik-…` оказался twin (тот же title+address что `moscow-sovremennik`), не MEETING_POINT: hub gate / PDP 404. Ушёл в hide+301.
+- Path+flips уже были в MSK DB до финального прогона. Hides×3 (naprotiv, yusupov twin, petrovsky twin) + Депо→GASTRO applied.
+- Live `daibilet.ru` API/HTML ещё держал stale cache (Современник как location), пока localhost:4000 уже theater/institution.
+
+### Решения
+- Канон: circus=THEATER до CIRCUS; дворец→museum по входному билету; NN club review 2–3 мес.; flip = 301+docs+отдельный коммит.
+- Скрипт `scripts/family-audit-batch-a.mjs`. Aliases twins в `place-slug-aliases` (web+backend).
+- 4 коммита (path → flips canon → twin aliases → kind/docs): `f26f0f82` `9c331add` `3fcab0a8` + kind closeout. Deploy MSK web; smoke 301×6 после deploy. Редизайн places/PDP - завтра, ≥24ч после flips.
+
+### Проблемы
+- MEETING_POINT без bus-сессий не отдаёт PDP - не использовать для «точки у театра» без правки hub gate.
+- Публичный кэш venue DTO / ISR может отставать от DB - после deploy нужен smoke + при необходимости revalidate.
+
+---
+
+## 2026-09-22 - Шаг 4.1 family audit (dry-run отчёт владельцу)
+
+### Наблюдения
+- Канон: «family один раз» + **явное исключение** (301 + docs + отдельный коммит); ticket-critical / location-always / review / chip≠family - в `catalog-location-venue-canon.md`.
+- PUBLISHED 1857: path↔mapping mismatch **2**; null path **1** (ЯКарелия museum).
+- Выборка 116 стратифицированных: правило family держится. GASTRO/Даниловский = location ок. SPORT PUBLISHED=0.
+- **Три сигнала:** (1) location+READY = PIER×2 (не flip) + особняки Половцова/Мясникова (flip); (2) institution без READY: музеи/театры **не** reverse (Option A), NN CLUB×10 → review; (3) TEMPLE+«музей» в title = **0**.
+- Exceptions URL-flip ≤11 (batch A); дворец-кластер ~25 и NN club → **review**, не пачка.
+- ХХС / Исаакий / Василий: 0 READY → **оставить location** (не в batch A).
+
+### Решения
+- Отчёт: `docs/drafts/family-audit-step4-2026-09-22.md`. Apply после OK владельца (4 коммита).
+- Batch A: path-bugs, Ростов-площадь, Современник-театр, Юсуповский, Чинизелли, Петровский+twins hide, ЯКарелия path, **+2 особняка → CONCERT_HALL**, Депо → GASTRO kind-only.
+- Palace-museum upgrade - отдельный batch после стабилизации A.
+
+### Проблемы
+- Два PUBLISHED twin на Юсуповский и Петровский - антидубль до/вместе с flip.
+- `temple` ещё не в `INSTITUTION_PUBLIC_CHIPS` - будущий upgrade ХХС только с layout-diff или chip museum.
+
+---
 ## 2026-09-22 - VenueKind TEMPLE/BUS (шаг 3, pre-apply)
 
 ### Наблюдения
