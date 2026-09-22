@@ -1,5 +1,33 @@
 # Cron jobs
 
+## Production: crawler health and IndexNow sitemaps
+
+After deploying the matching API/web build, run as root:
+
+```bash
+APP_DIR=/opt/daibilet bash /opt/daibilet/deploy/scripts/install-crawler-infra.sh
+```
+
+This installs `/etc/cron.d/daibilet-crawler-infra`: every two hours it scans nginx
+access logs for Googlebot/YandexBot 5XX and the API/web journal for `ReferenceError`
+(including `cleanImportedDescription`). Findings go to
+`/var/log/daibilet/crawler-alerts.jsonl`; failures also surface in the scheduled
+GitHub Actions **Crawler health** workflow. The monitor advances a durable
+watermark only after successful scanning and notification. If
+`TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` are configured, it also sends the
+alert there. Logs: `/var/log/daibilet/crawler-monitor.log`.
+
+After sitemap generation, or daily at 05:40, `indexnow-sitemaps.sh` reads
+`events.xml` and `cities.xml`, verifies the public key, submits new URLs to
+Yandex in batches, and records each HTTP status/response in
+`/var/log/daibilet/indexnow-sitemaps.log`. Accepted URLs are persisted in
+`/var/lib/daibilet/indexnow/sitemaps.json`; existing revalidate hooks report
+changes to older URLs. Both senders reserve against the same 10,000 URL/day
+UTC budget in `/var/lib/daibilet/indexnow/budget.json`. On first rollout the
+budget includes today's earlier Next journal submissions. A stale `.lock`
+requires operator inspection before removal. `INDEXNOW_KEY` must match the
+public `/indexnow-key.txt` exactly.
+
 Канон F4.2: out-of-process sync через `@daibilet/worker` (`node apps/worker/bin/run.mjs <job>`).
 Wrappers ниже сохраняют flock/nice; systemd `ExecStart` без смены пути.
 

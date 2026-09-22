@@ -7,7 +7,8 @@ import type {
   PublicVenuePageDto,
 } from '@daibilet/contracts/public';
 
-import { buildCityFaqItems, type CityFaqItem } from '@/lib/city-faq';
+import { buildCityFaqItems, visibleCityFaqItems, type CityFaqItem } from '@/lib/city-faq';
+import { resolveCityInfo } from '@/lib/cityInfo';
 import { getTicketPriceRange, isFlexibleScheduleSession } from '@/lib/event-page-utils';
 import { evaluateCityIndexability, evaluateRegionIndexability } from '@/lib/hub-indexability';
 import { resolveLandingCityName } from '@/lib/landing-city';
@@ -398,7 +399,11 @@ export function buildCityPageJsonLd(payload: PublicCityPageDto): Array<Record<st
   });
 
   if (decision.indexable) {
-    const faq = buildFaqPageJsonLd(buildCityFaqItems(payload));
+    const faq = buildFaqPageJsonLd(visibleCityFaqItems(
+      city.name,
+      resolveCityInfo(city.slug, city.sourceSlug)?.faq,
+      buildCityFaqItems(payload),
+    ));
     if (faq) blocks.unshift(faq);
 
     const venues = (payload.venues || [])

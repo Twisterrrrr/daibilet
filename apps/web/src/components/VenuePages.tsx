@@ -20,6 +20,7 @@ import { resolvePlaceSlugAlias } from '@/lib/place-slug-aliases';
 import { venueHref, venueCanonicalPath, venuePageTemplate } from '@/lib/routes';
 import { safeNotFound } from '@/lib/safe-not-found';
 import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
+import { resolveSsrOgImage } from '@/server/og-image';
 import { getCachedVenuesCatalog } from '@/server/cached-public-surfaces';
 import { getCachedPublicVenueDto } from '@/server/cached-venue-data';
 import { fetchVenueAdmissionProducts } from '@/server/finance-projection-client';
@@ -165,7 +166,7 @@ export async function generateVenueDetailMetadata(slug: string): Promise<Metadat
         title: shareTitle,
         description,
         path: canonicalPath,
-        image: heroForShare,
+        image: await resolveSsrOgImage(heroForShare),
       }),
     };
   } catch (error) {

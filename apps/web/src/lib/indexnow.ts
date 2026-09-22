@@ -4,6 +4,8 @@
  * Key file: https://{host}/indexnow-key.txt (stable keyLocation; also /{key}.txt via public file on deploy).
  */
 
+import { reserveIndexNowUrls } from '@daibilet/backend/indexnow-budget';
+
 const INDEXNOW_ENDPOINTS = [
   'https://yandex.com/indexnow',
   'https://api.indexnow.org/indexnow',
@@ -178,7 +180,7 @@ export async function submitIndexNow(
   }
 
   const siteUrl = getSiteUrl();
-  const urls = pathsToAbsoluteUrls(pathsOrUrls, siteUrl).slice(0, MAX_URLS_PER_REQUEST);
+  let urls = pathsToAbsoluteUrls(pathsOrUrls, siteUrl).slice(0, MAX_URLS_PER_REQUEST);
   if (!urls.length) {
     return { ok: false, skipped: true, reason: 'no_urls' };
   }
@@ -194,6 +196,13 @@ export async function submitIndexNow(
   if (!keyLocation) {
     return { ok: false, skipped: true, reason: 'missing_key' };
   }
+  try {
+    urls = urls.slice(0, reserveIndexNowUrls(urls.length));
+  } catch (error) {
+    console.error('[indexnow] budget unavailable:', error instanceof Error ? error.message : String(error));
+    return { ok: false, skipped: true, reason: 'budget_unavailable' };
+  }
+  if (!urls.length) return { ok: false, skipped: true, reason: 'daily_budget_exhausted' };
   const body = JSON.stringify({
     host,
     key,

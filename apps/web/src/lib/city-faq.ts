@@ -10,6 +10,52 @@ export type CityFaqItem = {
   answer: string;
 };
 
+/** One list for visible FAQ and FAQPage JSON-LD. */
+export function mergeCityFaqItems(
+  editorial: Array<{ q: string; a: string }> | undefined,
+  cityFaq: CityFaqItem[],
+): CityFaqItem[] {
+  const items: CityFaqItem[] = [];
+  const seen = new Set<string>();
+  for (const item of editorial || []) {
+    const question = item.q.trim();
+    const key = question.toLowerCase();
+    if (!question || seen.has(key)) continue;
+    seen.add(key);
+    items.push({ question, answer: item.a });
+  }
+  for (const item of cityFaq) {
+    const question = item.question.trim();
+    const key = question.toLowerCase();
+    if (!question || seen.has(key)) continue;
+    seen.add(key);
+    items.push(item);
+  }
+  return items;
+}
+
+export function defaultCityFaq(cityName: string): CityFaqItem[] {
+  return [
+    {
+      question: `Нужно ли покупать билеты заранее в ${cityName}?`,
+      answer: 'На популярные экскурсии и вечерние шоу лучше брать билеты онлайн заранее - особенно в выходные и высокий сезон. Так вы фиксируете цену и не стоите в кассе.',
+    },
+    {
+      question: 'Как удобнее спланировать один день в городе?',
+      answer: 'Начните с блока «Главные места», затем откройте афишу на сегодня или завтра.',
+    },
+    {
+      question: 'Где смотреть логистику и сезон?',
+      answer: 'Короткие ответы - в разделе «Лайфхаки» (если есть у города) и в блоке FAQ и блога внизу страницы.',
+    },
+  ];
+}
+
+export function visibleCityFaqItems(cityName: string, editorial: Array<{ q: string; a: string }> | undefined, cityFaq: CityFaqItem[]): CityFaqItem[] {
+  const merged = mergeCityFaqItems(editorial, cityFaq);
+  return merged.length ? merged : defaultCityFaq(cityName);
+}
+
 /** Редакционный FAQ из CITY_INFO (как добраться / городские вопросы). */
 export function buildCityEditorialFaqItems(payload: PublicCityPageDto): CityFaqItem[] {
   const info = resolveCityInfo(payload.city.slug, payload.city.sourceSlug);

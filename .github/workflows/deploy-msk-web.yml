@@ -175,3 +175,4 @@ jobs:
             test "$code" = "200"
           done
           curl -fsS -o /dev/null -w "api health %{http_code}\n" https://daibilet.ru/api/health
+          bash deploy/scripts/smoke-crawler-prod.sh

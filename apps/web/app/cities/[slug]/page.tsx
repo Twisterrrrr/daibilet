@@ -3,11 +3,13 @@ import { Suspense } from 'react';
 
 import { CityPageView } from '@/components/CityPageView.client';
 import { CityPageViewEditorial } from '@/components/CityPageViewEditorial.client';
+import { CityFaqServer } from '@/components/CityFaqServer';
 import { JsonLdScripts } from '@/components/JsonLdScripts';
 import { RegionPageView } from '@/components/RegionPageView.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
-import { buildCityFaqItems, buildCitySeoText } from '@/lib/city-faq';
+import { buildCityFaqItems, buildCitySeoText, visibleCityFaqItems } from '@/lib/city-faq';
+import { resolveCityInfo } from '@/lib/cityInfo';
 import { pickCityHubArticles } from '@/lib/city-hub-articles';
 import { resolveCityHubTemplate } from '@/lib/city-hub-template';
 import {
@@ -275,6 +277,11 @@ export default async function CityPage({ params }: PageProps) {
 
   const faqStartedAt = Date.now();
   const faqItems = buildCityFaqItems(payload);
+  const visibleFaq = visibleCityFaqItems(
+    payload.city.name,
+    resolveCityInfo(payload.city.slug, payload.city.sourceSlug)?.faq,
+    faqItems,
+  );
   const seoText = buildCitySeoText(payload);
   let jsonLdBlocks: Array<Record<string, unknown>> = [];
   try {
@@ -310,14 +317,17 @@ export default async function CityPage({ params }: PageProps) {
     <>
       <JsonLdScripts blocks={jsonLdBlocks} idPrefix="city-jsonld" />
       <SiteLayout>
-        <View
-          slug={decodedSlug}
-          initialPayload={payload}
-          faqItems={faqItems}
-          seoText={seoText}
-          hubArticles={hubArticles}
-          admission={admission}
-        />
+        <Suspense fallback={null}>
+          <View
+            slug={decodedSlug}
+            initialPayload={payload}
+            faqItems={faqItems}
+            seoText={seoText}
+            hubArticles={hubArticles}
+            admission={admission}
+          />
+        </Suspense>
+        <CityFaqServer cityName={payload.city.name} items={visibleFaq} />
       </SiteLayout>
     </>
   );

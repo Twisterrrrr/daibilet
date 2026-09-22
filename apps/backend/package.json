@@ -4,6 +4,8 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./catalog-exclusions": "./src/public-catalog-exclusions.ts",
+    "./indexnow-budget": "./src/indexnow-budget.js",
     "./public-read": {
       "types": "./src/public-read.ts",
       "default": "./src/public-read.ts"

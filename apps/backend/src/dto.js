@@ -1,4 +1,5 @@
 import { createHash, randomUUID } from 'node:crypto';
+import { isPublicCatalogExcludedMuseumAdmission } from './public-catalog-exclusions.ts';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -4703,7 +4704,7 @@ export async function buildPublicLandingPage(db, landingSlug, cityFilter = '') {
 
   const catalogSessions = await publicCatalogSessions(db);
   const { matchedSessions, pageSessions, matchCount } = selectLandingPageSessions(
-    filterSessionsForLandingRule(catalogSessions, rule),
+    filterSessionsForLandingRule(catalogSessions.filter((session) => !isPublicCatalogExcludedMuseumAdmission(session)), rule),
     cityFilter,
   );
   // Lean SSR: city-scoped first, then card budget - avoid national top-N starving city URLs.
@@ -4794,6 +4795,8 @@ export async function buildPublicLandingPageManaged(db, landingSlug, cityFilter 
   const manualByEventId = new Map(manualRows.map((row) => [row.eventId, row]));
   const ruleMatchedSessions = catalogSessions
     .filter((session) => {
+      // Global catalog exclusions win over PINNED, including stale cache reads.
+      if (isPublicCatalogExcludedMuseumAdmission(session)) return false;
       const ids = sessionGroupIds(session);
       if (ids.some((id) => excludedIds.has(id))) return false;
       if (ids.some((id) => pinnedIds.has(id))) return true;
