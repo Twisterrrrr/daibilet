@@ -9,6 +9,7 @@ export const CONTENT_PLACE_DB_KINDS = new Set([
   'MONUMENT',
   'OUTDOOR_LOCATION',
   'ATTRACTION',
+  'TEMPLE',
   'GASTRO',
   'MUSEUM_ART_SPACE',
   'THEATER',

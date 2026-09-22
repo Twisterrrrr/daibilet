@@ -42,6 +42,10 @@ enum VenueKind {
   MONUMENT
   /// Tourist cafe/restaurant/bar on /locations (not institution CLUB_BAR_RESTAURANT).
   GASTRO
+  /// Cathedral / church / mosque / synagogue / monastery (location family; was ATTRACTION + title heuristic).
+  TEMPLE
+  /// Bus boarding / hop-on meeting point (location family; was MEETING_POINT + title/events heuristic).
+  BUS
   ONLINE
   OTHER
 }

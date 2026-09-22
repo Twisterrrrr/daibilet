@@ -1912,13 +1912,16 @@ export function resolvePublicVenueKind(storedKind, name, address, options = {}) 
   // must not turn concert halls / clubs into pier pages).
   if (stored === 'park') return 'park';
   if (stored === 'monument') return 'monument';
+  // Explicit enum TEMPLE / BUS (step 3) — chip from kind, not title.
+  if (stored === 'temple') return 'temple';
+  if (stored === 'bus') return 'bus';
   // Paid cathedral-museums / palace interiors → institution even if CMS still says ATTRACTION.
   if (isTicketableMuseumTemple(name, slug) && stored !== 'park' && stored !== 'monument') {
     return 'museum';
   }
-  // Соборы / церкви / монастыри: отдельный public kind для чипа «Храмы» на /places.
+  // Legacy: ATTRACTION / OUTDOOR still title→temple until reclassify apply finishes.
   if (
-    (stored === 'attraction' || stored === 'outdoor_location' || stored === 'temple') &&
+    (stored === 'attraction' || stored === 'outdoor_location') &&
     isTempleLikeVenueName(name)
   ) {
     return 'temple';
@@ -2041,7 +2044,7 @@ export function isPublicVenueHub(row, options = {}) {
   if (PUBLIC_VENUE_HUB_EXCLUDED_KINDS.has(kind)) {
     // Bus boarding points are stored as MEETING_POINT; allow when resolved public type is bus
     // (catalog bus events OR editorial publicKind override), not only busEvents > 0.
-    if (!(kind === 'MEETING_POINT' && (hasActiveBusCatalogEvents(row.busEvents) || resolvedKind === 'bus'))) {
+      if (!(kind === 'MEETING_POINT' && (hasActiveBusCatalogEvents(row.busEvents) || resolvedKind === 'bus'))) {
       return false;
     }
   }

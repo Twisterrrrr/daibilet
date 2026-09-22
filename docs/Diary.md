@@ -1,3 +1,39 @@
+## 2026-09-22 - VenueKind TEMPLE/BUS (шаг 3, pre-apply)
+
+### Наблюдения
+- Audit EMBANKMENT/VIEWPOINT: public API name-probe ~60 «набережн» (pier/theater/outdoor/attraction смешанно), viewpoint ~1. Кластеры нестабильны / <15 явных → **не добавляем** enum (оговорка owner).
+- Public chip сейчас: temple≈183, bus=11. Title-эвристика bus почти не покрывает boarding points (Лиговский / пл.Восстания) - они bus через events/бренд; в migrate попадут редко, остальное → review.
+- Локального DATABASE_URL / tunnel :5437 нет (ECONNREFUSED); SSH MSK publickey denied. Dry-run/apply по БД ждёт owner URL/tunnel.
+
+### Решения
+- Prisma: `TEMPLE` + `BUS` в enum + migration `20260922120000_venue_kind_temple_bus`. Family = location (URL не едет).
+- Mapping: `VENUE_KIND_MAP` + chip из kind; title→chip эвристики temple/bus **удалены** (остался art_space). Хелперы `isTempleLike*` / `isBusLike*` только для reclassify.
+- Скрипт `scripts/reclassify-venue-kinds.mjs` (--dry-run / --apply, hub_only NONE → review, ticketable museum-temple → review).
+- Hub-gate: TEMPLE в CONTENT_PLACE_DB_KINDS. Backend resolve: stored temple/bus явные; legacy ATTRACTION title→temple до apply.
+- CI web `--ci`: 179 pass. `db:generate` OK.
+
+### Проблемы
+- Apply в prod DB + `migrate deploy` - блокер без DATABASE_URL. Не деплоить web с удалёнными эвристиками до reclassify apply (иначе chip temple отвалится у ATTRACTION).
+- После dry-run на MSK: подтвердить числа TEMPLE/BUS/review, затем `--apply`.
+
+---
+
+
+### Наблюдения
+- Маппинг kind → family → chip был размазан: `routes.venuePageTemplate`, `venue-meta.INSTITUTION_KINDS`, эвристики temple/art_space.
+- `sitemap-data` всё ещё пишет `canonicalPath || venueHref` (зона Codex) - на wrong-family stored path расходится с `venueCanonicalPath` (поймано тестом).
+
+### Решения
+- Единый источник: `apps/web/src/lib/venue-kind-mapping.ts` (`VENUE_KIND_MAP` + `venueFamily` / `venueChip` / `venueTemplate` / `venueKindLabel`).
+- `routes.ts` и `venue-meta.ts` читают family/template/chip только оттуда.
+- CI: `canon-invariants.test.ts` + `venue-kind-mapping.test.ts` в `ci-test-files.txt`.
+- Эвристики оставлены явно: art_space ← MUSEUM_ART_SPACE; temple ← ATTRACTION; bus ← MEETING_POINT. Enum не трогали (шаг 3).
+
+### Проблемы
+- Шаги 3-5 вне этой итерации: расширить enum (TEMPLE/BUS/…), пересмотр family, hub_only PDP.
+- Codex: перевести sitemap venues на `venueCanonicalPath`.
+
+---
 ## 2026-09-22 - Must-see closeout + dinner dative live
 
 ### Наблюдения

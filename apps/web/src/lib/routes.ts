@@ -1,4 +1,5 @@
 import type { PublicSessionDto } from '@daibilet/contracts/public';
+import { venueTemplate } from '@/lib/venue-kind-mapping';
 
 type EventRouteSource = Pick<PublicSessionDto, 'id' | 'slug' | 'sourceSlug' | 'title'>;
 type CityRouteSource = { slug?: string | null; sourceSlug?: string | null; name: string };
@@ -77,25 +78,9 @@ export function venueSlug(venue: VenueRouteSource): string {
   return normalizeSlug(idPart) || idPart;
 }
 
+/** Family/template из единого mapping (venue-kind-mapping.ts). */
 export function venuePageTemplate(type?: string | null): 'institution' | 'location' {
-  const value = String(type || '')
-    .trim()
-    .toLowerCase()
-    .replace(/-/g, '_');
-  /** session.venueKind / legacy aliases. */
-  if (value === 'institution') return 'institution';
-  if (value === 'location' || value.includes('причал') || value.includes('теплоход')) return 'location';
-  const institutionKinds = new Set([
-    'museum',
-    'art_space',
-    'museum_art_space',
-    'theater',
-    'concert_hall',
-    'bar',
-    'club_bar_restaurant',
-  ]);
-  if (institutionKinds.has(value)) return 'institution';
-  return 'location';
+  return venueTemplate(type);
 }
 
 export function venueCatalogHref(template: 'institution' | 'location' = 'institution'): string {

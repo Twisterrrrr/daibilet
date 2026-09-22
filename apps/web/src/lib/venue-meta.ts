@@ -1,18 +1,25 @@
 import { Anchor, Bus, Landmark, MapPin, Trees, type LucideIcon } from 'lucide-react';
 
 import { formatNumber } from '@/lib/format';
+import {
+  INSTITUTION_KIND_KEYS,
+  normalizeVenueKindKey,
+  resolveChipFromKind,
+  venueKindLabel,
+  venueTemplate,
+  type VenueTemplate,
+} from '@/lib/venue-kind-mapping';
 
-export type VenuePageTemplate = 'institution' | 'location';
+export type VenuePageTemplate = VenueTemplate;
 
-export const INSTITUTION_KINDS = new Set([
-  'museum',
-  'art_space',
-  'museum_art_space',
-  'theater',
-  'concert_hall',
-  'bar',
-  'club_bar_restaurant',
-]);
+/** Re-export for callers; source of truth is venue-kind-mapping. */
+export const INSTITUTION_KINDS = INSTITUTION_KIND_KEYS;
+
+export {
+  classifyMuseumOrArtSpace,
+  isTempleLikeVenueName,
+  resolveChipFromKind,
+} from '@/lib/venue-kind-mapping';
 
 /** Split catalog `stats.types` into institution vs location counts for Places eyebrow. */
 export function countCatalogFamilies(types: Record<string, number> | null | undefined): {
@@ -23,7 +30,7 @@ export function countCatalogFamilies(types: Record<string, number> | null | unde
   let locations = 0;
   for (const [kind, raw] of Object.entries(types || {})) {
     const n = Number(raw) || 0;
-    if (INSTITUTION_KINDS.has(normalizeVenueKind(kind))) institutions += n;
+    if (venueTemplate(kind) === 'institution') institutions += n;
     else locations += n;
   }
   return { institutions, locations };
@@ -82,52 +89,9 @@ const VENUE_TYPE_BREADCRUMB_PLURALS: Record<string, string> = {
   location: 'Локации',
 };
 
-/**
- * Public split MUSEUM_ART_SPACE → museum | art_space (crumbs + ?type=).
- * DB enum пока один; TODO: Prisma MUSEUM / ART_SPACE + backfill.
- * Третьяковка → museum; «Галерея …» / арт-пространство → art_space.
- */
-export function classifyMuseumOrArtSpace(name?: string | null, extraText?: string | null): 'museum' | 'art_space' {
-  const text = `${name || ''} ${extraText || ''}`.toLowerCase();
-  // Explicit overrides: Erarta (legacy ART_SPACE) stays art_space despite «Музей» in title.
-  if (/эрарта|\berarta\b|ven_spbboats_erarta/i.test(text)) return 'art_space';
-  // Commercial gallery despite «Музейно-выставочный центр» in the legal title.
-  if (
-    /петербургск(?:ий|ого)\s+художник|muzeino-vystavochnyi-centr-peterburgskii-hudozhnik/i.test(
-      text,
-    )
-  ) {
-    return 'art_space';
-  }
-  if (/музей\s+современного\s+искусств/i.test(text)) return 'art_space';
-  if (/арт[-\s]?пространств|art[-\s]?space|иммерсив|люмьер|глазунов/i.test(text)) return 'art_space';
-  if (/галере/i.test(text) && !/музей|третьяков|эрмитаж|пушкинск|русск(?:ий|ого)\s+музей/i.test(text)) {
-    return 'art_space';
-  }
-  return 'museum';
-}
-
-/** Собор / церковь / монастырь / мечеть → public kind `temple` (чип «Храмы»). */
-export function isTempleLikeVenueName(name?: string | null): boolean {
-  return /(?:собор|церков|храм|монастыр|мечет|синагог|кирх|часовн|костел|\bлавр[аы]\b)/iu.test(
-    String(name || ''),
-  );
-}
-
-/** Нормализует public type для крошек/фильтров (split museum_art_space + temple). */
+/** Нормализует public type для крошек/фильтров (chip из venue-kind-mapping). */
 export function resolvePublicVenueType(type?: string | null, name?: string | null): string {
-  const key = normalizeVenueKind(type);
-  if (key === 'temple') return 'temple';
-  if (
-    (key === 'attraction' || key === 'outdoor_location') &&
-    isTempleLikeVenueName(name)
-  ) {
-    return 'temple';
-  }
-  if (key === 'art_space') return 'art_space';
-  // Stored museum / legacy museum_art_space: title may still mean gallery (Глазунов, Петербургский художник).
-  if (key === 'museum' || key === 'museum_art_space') return classifyMuseumOrArtSpace(name);
-  return key;
+  return resolveChipFromKind(type, name);
 }
 
 /** Href сегмента типа в крошках: /places?type=museum&city=… */
@@ -145,10 +109,7 @@ export function venueTypeCatalogHref(input: {
 }
 
 export function normalizeVenueKind(type?: string | null): string {
-  return String(type || 'other')
-    .trim()
-    .toLowerCase()
-    .replace(/-/g, '_');
+  return normalizeVenueKindKey(type);
 }
 
 export function formatPublicVenueTitle(value?: string | null): string {
@@ -190,7 +151,7 @@ export function isMeetingPointLike(input: {
 export function venueTypeLabel(type?: string | null, name?: string | null): string {
   const key = resolvePublicVenueType(type, name);
   if (key === 'pier_water') return VENUE_TYPE_LABELS.pier;
-  return VENUE_TYPE_LABELS[key] || VENUE_TYPE_LABELS.other;
+  return VENUE_TYPE_LABELS[key] || venueKindLabel(type, name) || VENUE_TYPE_LABELS.other;
 }
 
 /** Plural nominative для middle-сегмента breadcrumbs (не generic «Площадки»). */
@@ -206,16 +167,12 @@ export function venueTypeIcon(type?: string | null): LucideIcon {
   if (key === 'bus') return Bus;
   if (key === 'park') return Trees;
   if (key === 'monument' || key === 'temple' || key === 'attraction') return Landmark;
-  if (INSTITUTION_KINDS.has(key)) return Landmark;
+  if (venueTemplate(key) === 'institution') return Landmark;
   return MapPin;
 }
 
 export function venuePageTemplate(type?: string | null): VenuePageTemplate {
-  const key = normalizeVenueKind(type);
-  if (key === 'institution') return 'institution';
-  if (key === 'location') return 'location';
-  if (INSTITUTION_KINDS.has(key)) return 'institution';
-  return 'location';
+  return venueTemplate(type);
 }
 
 const WEAK_VENUE_LEAD_RE = /^(легенда|описание|текст|n\/a|нет|—|-)$/i;

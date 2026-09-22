@@ -60,10 +60,11 @@ describe('places hub split chips', () => {
     assert.ok(!byId.outdoors.types.includes('attraction'));
   });
 
-  it('maps cathedral titles to temple public kind', () => {
+  it('maps TEMPLE kind to temple public chip (title heuristic only for reclassify)', () => {
     assert.equal(isTempleLikeVenueName('Исаакиевский собор'), true);
     assert.equal(isTempleLikeVenueName('Петропавловская крепость'), false);
-    assert.equal(resolvePublicVenueType('attraction', 'Исаакиевский собор'), 'temple');
+    assert.equal(resolvePublicVenueType('TEMPLE', 'Исаакиевский собор'), 'temple');
+    assert.equal(resolvePublicVenueType('attraction', 'Исаакиевский собор'), 'attraction');
     assert.equal(resolvePublicVenueType('attraction', 'Бункер-42 на Таганке'), 'attraction');
     assert.equal(resolvePlacesHubCategoryChip('temples')?.label, 'Храмы');
     assert.equal(resolvePlacesHubCategoryChip('temple')?.id, 'temples');

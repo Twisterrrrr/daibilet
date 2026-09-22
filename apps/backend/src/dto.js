@@ -3006,6 +3006,7 @@ const SUGGEST_KIND_ALLOWLIST = new Set([
   'MONUMENT',
   'PARK',
   'ATTRACTION',
+  'TEMPLE',
   'MUSEUM_ART_SPACE',
   'OUTDOOR_LOCATION',
   'MEETING_POINT',
@@ -3016,6 +3017,7 @@ const SUGGEST_KIND_SCORE = {
   MONUMENT: 5,
   PARK: 5,
   ATTRACTION: 5,
+  TEMPLE: 5,
   OUTDOOR_LOCATION: 4,
   MUSEUM_ART_SPACE: 3,
   PIER: 3,
@@ -5981,7 +5983,7 @@ function normalizeVenuePayload(payload) {
 
   if (Object.prototype.hasOwnProperty.call(payload, 'kind')) {
     const value = normalizeNullableString(payload.kind);
-    const allowed = new Set(['VENUE', 'MUSEUM_ART_SPACE', 'THEATER', 'CONCERT_HALL', 'CLUB_BAR_RESTAURANT', 'PIER', 'MEETING_POINT', 'OUTDOOR_LOCATION', 'SPORT_ACTIVITY_SPACE', 'ATTRACTION', 'PARK', 'MONUMENT', 'GASTRO', 'ONLINE', 'OTHER']);
+    const allowed = new Set(['VENUE', 'MUSEUM_ART_SPACE', 'THEATER', 'CONCERT_HALL', 'CLUB_BAR_RESTAURANT', 'PIER', 'MEETING_POINT', 'OUTDOOR_LOCATION', 'SPORT_ACTIVITY_SPACE', 'ATTRACTION', 'PARK', 'MONUMENT', 'GASTRO', 'TEMPLE', 'BUS', 'ONLINE', 'OTHER']);
     normalized.kind = value && allowed.has(value) ? value : null;
   }
 

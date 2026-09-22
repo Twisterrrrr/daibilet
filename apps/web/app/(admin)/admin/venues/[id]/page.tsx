@@ -21,6 +21,8 @@ const KIND_OPTIONS = [
   'OUTDOOR_LOCATION',
   'SPORT_ACTIVITY_SPACE',
   'ATTRACTION',
+  'TEMPLE',
+  'BUS',
   'ONLINE',
   'OTHER',
 ];

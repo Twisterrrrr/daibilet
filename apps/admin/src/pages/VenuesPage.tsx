@@ -56,6 +56,8 @@ const kindOptions = [
   { value: 'OUTDOOR_LOCATION', label: 'Открытая локация' },
   { value: 'SPORT_ACTIVITY_SPACE', label: 'Спорт / активность' },
   { value: 'ATTRACTION', label: 'Аттракцион' },
+  { value: 'TEMPLE', label: 'Храм' },
+  { value: 'BUS', label: 'Автобус / посадка' },
   { value: 'ONLINE', label: 'Онлайн' },
   { value: 'OTHER', label: 'Другое' },
 ];
