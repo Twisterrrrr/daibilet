@@ -4,6 +4,7 @@ import { Suspense } from 'react';
 import { CityPageView } from '@/components/CityPageView.client';
 import { CityPageViewEditorial } from '@/components/CityPageViewEditorial.client';
 import { CityFaqServer } from '@/components/CityFaqServer';
+import { CitySuburbsServer } from '@/components/CitySuburbsServer';
 import { JsonLdScripts } from '@/components/JsonLdScripts';
 import { RegionPageView } from '@/components/RegionPageView.client';
 import { SiteLayout } from '@/components/SiteLayout';
@@ -282,6 +283,7 @@ export default async function CityPage({ params }: PageProps) {
     resolveCityInfo(payload.city.slug, payload.city.sourceSlug)?.faq,
     faqItems,
   );
+  const suburbs = resolveCityInfo(payload.city.slug, payload.city.sourceSlug)?.significantSuburbs || [];
   const seoText = buildCitySeoText(payload);
   let jsonLdBlocks: Array<Record<string, unknown>> = [];
   try {
@@ -327,6 +329,7 @@ export default async function CityPage({ params }: PageProps) {
             admission={admission}
           />
         </Suspense>
+        <CitySuburbsServer cityName={payload.city.name} suburbs={suburbs} />
         <CityFaqServer cityName={payload.city.name} items={visibleFaq} />
       </SiteLayout>
     </>

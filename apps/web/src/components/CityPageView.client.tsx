@@ -212,6 +212,11 @@ export function CityPageView({
   const userPickedCategory = React.useRef(false);
 
   React.useEffect(() => {
+    document.documentElement.dataset.cityHydrated = '1';
+    return () => { delete document.documentElement.dataset.cityHydrated; };
+  }, []);
+
+  React.useEffect(() => {
     setPlaceFocus(null);
   }, [slug]);
 
