@@ -39,8 +39,11 @@ export async function main() {
       }
     } catch (error) { if (file === accessLog || error.code !== 'ENOENT') throw error; }
   }
-  const journal = spawnSync('journalctl', ['-u', 'daibilet-api', '-u', 'daibilet-web', '--since', `@${Math.floor(since / 1000)}`, '--until', `@${Math.ceil(until / 1000)}`, '-o', 'json', '--no-pager'], { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 });
-  if (journal.error || journal.status !== 0) throw new Error('Unable to read API/web journal');
+  // Filter inside journald: the unfiltered web log can exceed spawnSync's buffer
+  // during an incident, exactly when the monitor must keep running.
+  const journal = spawnSync('journalctl', ['-u', 'daibilet-api', '-u', 'daibilet-web', '--since', `@${Math.floor(since / 1000)}`, '--until', `@${Math.ceil(until / 1000)}`, '--grep', 'ReferenceError|cleanImportedDescription', '-o', 'json', '--no-pager'], { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 });
+  // journalctl returns 1 for an empty filtered result. Other errors still fail.
+  if (journal.error || (journal.status !== 0 && !(journal.status === 1 && !journal.stderr?.trim()))) throw new Error(`Unable to read API/web journal: ${journal.error?.message || journal.stderr?.trim() || journal.status}`);
   for (const line of journal.stdout.trim().split('\n').filter(Boolean)) {
     const entry = JSON.parse(line);
     const time = Number(entry.__REALTIME_TIMESTAMP) / 1000;
