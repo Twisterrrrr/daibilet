@@ -245,6 +245,12 @@ export default async function CityPage({ params }: PageProps) {
           <Suspense fallback={<RegionPageFallback />}>
             <RegionPageView slug={decodedSlug} initialPayload={payload} />
           </Suspense>
+          <CityFaqServer
+            cityName={payload.city.name}
+            items={(payload.regionInfo?.faq || [])
+              .filter((item) => item.q?.trim() && item.a?.trim())
+              .map((item) => ({ question: item.q, answer: item.a }))}
+          />
         </SiteLayout>
       </>
     );

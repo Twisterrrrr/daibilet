@@ -4,9 +4,9 @@ import { Suspense } from 'react';
 import { ArrowRight, Dices } from 'lucide-react';
 
 import { HomeCityAwareSections } from '@/components/HomeCityAwareSections.client';
+import { HomeCategoryStack } from '@/components/HomeCategoryStack.client';
 import {
   HomeBottomNav,
-  HomeCategoryStack,
   HomeMyDayBanner,
   LuckyCityButton,
 } from '@/components/HomeDeferredIslands.client';

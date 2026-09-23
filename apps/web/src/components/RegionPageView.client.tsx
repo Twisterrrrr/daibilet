@@ -800,23 +800,6 @@ export function RegionPageView({
           </section>
         ) : null}
 
-        {faqItems.length ? (
-          <section id="faq" className={`border-b border-slate-200 bg-white ${SECTION_SCROLL_MT}`}>
-            <div className="container-page py-8 sm:py-10">
-              <h2 className="text-2xl font-bold text-slate-950">FAQ</h2>
-              <div className="mt-6 space-y-3">
-                {faqItems.map((item) => (
-                  <details key={item.q} className="group rounded-xl border border-slate-200 px-4 py-3">
-                    <summary className="cursor-pointer list-none font-medium text-slate-900 marker:content-none">
-                      {item.q}
-                    </summary>
-                    <p className="mt-2 text-sm leading-6 text-slate-600">{item.a}</p>
-                  </details>
-                ))}
-              </div>
-            </div>
-          </section>
-        ) : null}
       </main>
     </div>
   );

@@ -1339,6 +1339,7 @@ function CitySightsSection({
       )}
       {beforeSuburbs}
       {suburbs.length ? (
+        <React.Suspense fallback={null}>
         <SuburbsCarousel
           places={suburbs}
           venues={venues}
@@ -1355,6 +1356,7 @@ function CitySightsSection({
               : undefined
           }
         />
+        </React.Suspense>
       ) : null}
       {articles.length ? (
         <div className={places.length || suburbs.length ? 'mt-8' : 'mt-4'}>
