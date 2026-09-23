@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { useMemo } from 'react';
 
-import { InstitutionCard } from '@/components/InstitutionCard.client';
+import { LocationCard } from '@/components/LocationCard.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { PublicVenueDto } from '@daibilet/contracts/public';
 import { balancedTileGridClass } from '@/lib/balanced-tile-grid';
@@ -63,7 +63,7 @@ export function HomeVenuesSection({ venues }: { venues: PublicVenueDto[] }) {
         </div>
         <div className={`mt-6 grid gap-4 sm:grid-cols-2 ${balancedTileGridClass(homeVenues.length, { lg: 4 })}`}>
           {homeVenues.map((venue, index) => (
-            <InstitutionCard
+            <LocationCard
               key={venue.id}
               venue={venue}
               href={venueHref(venue)}

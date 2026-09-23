@@ -2,11 +2,11 @@
 export const CITY_CARD_ASPECT_CLASS = 'aspect-[5/3]';
 
 /**
- * Bottom-left darkening under city name/stats (dark tone cards).
- * Linear inset gradient only - radial/blur ovals painted past the photo onto tags.
+ * Full-width bottom scrim under city name/stats (dark tone cards).
+ * Linear gradient only - never radial/oval blobs that leak past the photo.
  */
 export const CITY_CARD_DARK_SCRIM_CLASS =
-  'pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-black/20 to-transparent';
+  'pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent';
 
 
 /** Одна строка: длинные имена (Нижний Новгород) не ломают высоту блока. */

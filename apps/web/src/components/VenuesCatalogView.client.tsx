@@ -6,7 +6,7 @@ import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { Grid3X3, List } from 'lucide-react';
 
 import { CatalogPaginationLinks } from '@/components/CatalogPaginationLinks';
-import { InstitutionCard } from '@/components/InstitutionCard.client';
+import { LocationCard } from '@/components/LocationCard.client';
 import { InstitutionList } from '@/components/InstitutionListRow.client';
 import { PlacesSearch } from '@/components/PlacesSearch.client';
 import { VenuesCatalogSkeleton } from '@/components/VenueCatalogSkeletons';
@@ -607,7 +607,7 @@ export function VenuesCatalogView({
             ) : (
               <div className="catalog-card-grid">
                 {venues.map((venue, index) => (
-                  <InstitutionCard
+                  <LocationCard
                     key={venue.id}
                     venue={venue}
                     href={venueHref(venue)}

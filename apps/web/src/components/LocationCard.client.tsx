@@ -11,10 +11,16 @@ import { venueCardImageUrl } from '@/lib/venue-card-image';
 import { dayRouteHookLine } from '@/lib/day-route-from-place';
 import { pluralEvents } from '@/lib/format';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
-import { resolvePublicVenueType, venueTypeLabel, normalizeVenueKind } from '@/lib/venue-meta';
+import {
+  venueChip,
+  venueFamily,
+  venueKindLabel,
+} from '@/lib/venue-kind-mapping';
+import { venueTypeIcon } from '@/lib/venue-meta';
 import { isRegionLikeCityTitle, resolveVenuePlaceCity } from '@/lib/venue-place-city';
 
-const TYPE_GRADIENT: Record<string, string> = {
+/** Fallback gradient plane when hero is missing - keyed by public chip. */
+const CHIP_GRADIENT: Record<string, string> = {
   pier: 'from-sky-500 via-cyan-600 to-sky-800',
   pier_water: 'from-sky-500 via-cyan-600 to-sky-800',
   bus: 'from-amber-600 via-orange-600 to-rose-700',
@@ -26,6 +32,16 @@ const TYPE_GRADIENT: Record<string, string> = {
   sport_activity_space: 'from-orange-600 via-red-600 to-rose-800',
   gastro: 'from-amber-700 via-orange-800 to-slate-950',
   venue: 'from-primary-600 via-primary-700 to-slate-900',
+  museum: 'from-stone-600 via-amber-800 to-slate-900',
+  art_space: 'from-violet-700 via-fuchsia-900 to-slate-950',
+  museum_art_space: 'from-stone-600 via-amber-800 to-slate-900',
+  theater: 'from-rose-700 via-red-900 to-slate-950',
+  concert_hall: 'from-slate-600 via-slate-800 to-slate-950',
+  bar: 'from-amber-800 via-orange-950 to-slate-950',
+  club_bar_restaurant: 'from-teal-700 via-slate-800 to-slate-950',
+  meeting_point: 'from-slate-600 via-slate-700 to-slate-900',
+  online: 'from-indigo-600 via-slate-800 to-slate-950',
+  other: 'from-slate-700 via-slate-800 to-slate-950',
 };
 
 /**
@@ -66,6 +82,10 @@ function realRating(value: unknown): number | null {
   return Math.round(n * 10) / 10;
 }
 
+/**
+ * Одна карточка каталога /places (и /venues|/locations grids).
+ * Ветвление только по chip / label / href - не отдельные must-see или family-карточки.
+ */
 export function LocationCard({
   venue,
   href,
@@ -78,7 +98,7 @@ export function LocationCard({
   href: string;
   /** When catalog is already city-scoped, omit city from the meta line. */
   hideCity?: boolean;
-  /** Mixed /places grid: show «Локация» on the photo. */
+  /** Mixed /places grid: show family chip on the photo. */
   showFamilyTag?: boolean;
   /** First-row LCP only - never the whole grid. */
   priority?: boolean;
@@ -86,10 +106,11 @@ export function LocationCard({
   hideBlurb?: boolean;
 }) {
   const coverSrc = venueCardImageUrl(venue.heroImageUrl);
-  const kind = normalizeVenueKind(venue.type);
-  const publicType = resolvePublicVenueType(venue.type, venue.name);
-  const typeLabel = venueTypeLabel(publicType, venue.name);
-  const gradient = TYPE_GRADIENT[kind] || TYPE_GRADIENT[venue.type] || 'from-slate-700 via-slate-800 to-slate-950';
+  const chip = venueChip(venue.type, venue.name);
+  const family = venueFamily(venue.type);
+  const typeLabel = venueKindLabel(venue.type, venue.name);
+  const TypeIcon = venueTypeIcon(chip);
+  const gradient = CHIP_GRADIENT[chip] || CHIP_GRADIENT.other;
   const street = formatStreetAddress(venue.address, { city: venue.city });
   const displayName = stripBoardingPlacePrefix(venue.name);
   const routeTitle = displayName;
@@ -107,10 +128,8 @@ export function LocationCard({
   const eventsLabel = ownEvents > 0 ? pluralEvents(ownEvents) : null;
   const placeCity = resolveVenuePlaceCity(venue.city, venue.citySlug);
   const showPlaceCity = Boolean(placeCity) && (isRegionLikeCityTitle(venue.city) || !hideCity);
-  const metaLine = [typeLabel, showPlaceCity ? placeCity : null]
-    .filter(Boolean)
-    .join(' · ')
-    .toUpperCase();
+  // Type chip lives on the photo (icon + label). Meta keeps only city when useful.
+  const metaLine = showPlaceCity ? String(placeCity).toUpperCase() : '';
   // Bus/pier titles often ARE the meeting address («Лиговский пр. 10»). Hiding the duplicate
   // street then also hiding city (hideCity on city-scoped /places) left «Адрес уточняется».
   const streetIsTitle = Boolean(street) && sameAddressLabel(street, displayName);
@@ -126,6 +145,11 @@ export function LocationCard({
     addressLine ||
     (streetIsTitle || looksLikeMeetingPointLabel(displayName) ? cityLabel || displayName : null) ||
     'Адрес уточняется';
+  const photoChipLabel = showFamilyTag
+    ? family === 'institution'
+      ? 'Площадка'
+      : 'Локация'
+    : typeLabel;
 
   const dayRouteVenue = {
     id: venue.id,
@@ -157,11 +181,10 @@ export function LocationCard({
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent" />
         </Link>
 
-        {showFamilyTag ? (
-          <span className="pointer-events-none absolute left-2.5 top-2.5 z-[1] rounded-md border border-white/20 bg-black/35 px-2 py-0.5 text-[11px] font-medium tracking-wide text-white/95 backdrop-blur-md">
-            Локация
-          </span>
-        ) : null}
+        <span className="pointer-events-none absolute left-2.5 top-2.5 z-[1] inline-flex items-center gap-1 rounded-md border border-white/20 bg-black/35 px-2 py-0.5 text-[11px] font-medium tracking-wide text-white/95 backdrop-blur-md">
+          <TypeIcon className="h-3 w-3 shrink-0 opacity-90" strokeWidth={1.75} aria-hidden />
+          {photoChipLabel}
+        </span>
 
         <PlaceFavoriteButton
           className="right-2 top-2 sm:right-3 sm:top-3"

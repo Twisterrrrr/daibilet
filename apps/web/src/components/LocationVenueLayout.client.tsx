@@ -32,7 +32,8 @@ import {
   formatVenueMetroLabel,
   resolveVenueEditorialContent,
 } from '@/lib/venue-editorial-content';
-import { normalizeVenueKind, resolveLocationVenueCopy, resolveVenueAboutHeading, splitVenueProseParagraphs, venueTypeIcon, venueTypeLabel } from '@/lib/venue-meta';
+import { normalizeVenueKind, resolveLocationVenueCopy, resolveVenueAboutHeading, splitVenueProseParagraphs, venueTypeIcon } from '@/lib/venue-meta';
+import { venueKindLabel } from '@/lib/venue-kind-mapping';
 import { resolveVenueExperienceProfile } from '@/lib/venue-experience-profile';
 import { eventHref, venueHref } from '@/lib/routes';
 import type {
@@ -105,7 +106,7 @@ export function LocationVenueLayout({
   const todaySlots = React.useMemo(() => collectTodayTimeSlots(sessions), [sessions]);
   const uniqueStopEvents = React.useMemo(() => dedupeVenueLinkedEvents(stopEvents), [stopEvents]);
   const TypeIcon = venueTypeIcon(venue.type);
-  const typeLabel = venueTypeLabel(venue.type, venue.name);
+  const typeLabel = venueKindLabel(venue.type, venue.name);
   const routeCount = routeGroups.length || stats.events;
   const { aboutBody, heroLead: copyLead } = resolveLocationVenueCopy(venue);
   const heroLead = editorial?.heroLead || copyLead;

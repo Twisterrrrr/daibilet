@@ -225,7 +225,7 @@ export function CityCard({
               aria-hidden
             />
           ) : (
-            /* Bottom-left scrim for title/stats - inset radial, no leak under tags. */
+            /* Full-width bottom scrim for title/stats - not an oval blob. */
             <div className={CITY_CARD_DARK_SCRIM_CLASS} aria-hidden />
           )}
           <div

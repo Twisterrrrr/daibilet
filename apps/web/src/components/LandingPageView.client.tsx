@@ -112,6 +112,7 @@ import {
 } from '@/lib/datetime';
 import { isOpenDate, FLEXIBLE_SCHEDULE_LABEL, isFlexibleScheduleSession, resolveSessionPriceRange } from '@/lib/event-card-meta';
 import { isBookingPlatformLabel, resolveEventCardLocationLabel } from '@/lib/event-location';
+import { formatShipSecondaryLabel, resolveCruiseDisplayTitle } from '@/lib/cruise-display-title';
 import { formatVacantSeats } from '@/lib/event-page-utils';
 import { cityHref, eventHref, sessionVenueHref } from '@/lib/routes';
 import { cityToDative } from '@/lib/city-declension';
@@ -2128,7 +2129,9 @@ function LandingDinnerScheduleRow({
   const session = group.representative;
   const slot = session.upcomingSlots?.[0];
   const time = resolveSessionTime(session, slot);
-  const shipName = session.tags?.find((tag) => /теплоход|катер|яхт|palace|ривер|монарх|нео/i.test(tag)) || null;
+  const cruise = resolveCruiseDisplayTitle({ title: group.title, tags: session.tags });
+  const shipName = formatShipSecondaryLabel(cruise.shipName);
+  const displayTitle = cruise.excursionTitle;
   const menu = extractMenuLabel(session);
   const format = extractFormatLabel(session.tags);
   const badges = deriveLandingCardBadges(session);
@@ -2159,7 +2162,7 @@ function LandingDinnerScheduleRow({
         <div className="min-w-0">
           {isOptimal ? <div className="mb-1 text-xs font-bold text-primary">⭐ Оптимальный выбор</div> : null}
           <div className="truncate font-semibold text-foreground">
-            <a href={href} className="hover:text-primary">{group.title}</a>
+            <a href={href} className="hover:text-primary">{displayTitle}</a>
           </div>
           {shipName ? <div className="truncate text-sm text-muted-foreground">{shipName}</div> : null}
           <LandingCardBadgeRow badges={badges} className="mt-1.5" />
@@ -2180,7 +2183,7 @@ function LandingDinnerScheduleRow({
       </div>
       <div className="space-y-2 md:hidden">
         <div className="font-semibold text-foreground">
-          <a href={href} className="hover:text-primary">{group.title}</a>
+          <a href={href} className="hover:text-primary">{displayTitle}</a>
         </div>
         {shipName ? <div className="text-sm text-muted-foreground">{shipName}</div> : null}
         <LandingCardBadgeRow badges={badges} />
@@ -3231,13 +3234,18 @@ function LandingScheduleRow({ group, isOptimal, profile }: { group: EventGroup; 
   const badges = deriveLandingCardBadges(session);
   const timeChips = collectScheduleTimeChips(group);
   const isBus = profile === 'bus';
-  const rawShipName = isBus
+  const cruise = isBus
+    ? null
+    : resolveCruiseDisplayTitle({ title: group.title, tags: session.tags });
+  const rawBusLabel = isBus
     ? session.tags?.find((tag) => /city sightseeing|hop-on|оператор/i.test(tag)) || null
-    : session.tags?.find((tag) => /теплоход|катер|яхт/i.test(tag)) || session.category;
-  const shipName =
-    rawShipName && !isBookingPlatformLabel(rawShipName) && !/^место\s+отправления/i.test(rawShipName)
-      ? rawShipName
-      : null;
+    : null;
+  const shipName = isBus
+    ? rawBusLabel && !isBookingPlatformLabel(rawBusLabel) && !/^место\s+отправления/i.test(rawBusLabel)
+      ? rawBusLabel
+      : null
+    : formatShipSecondaryLabel(cruise?.shipName);
+  const displayTitle = isBus ? group.title : cruise?.excursionTitle || group.title;
   const locationLabel = resolveEventCardLocationLabel(session);
   const amenities = amenityIcons(session.tags);
   const href = eventHref(session);
@@ -3276,7 +3284,7 @@ function LandingScheduleRow({ group, isOptimal, profile }: { group: EventGroup; 
         <div className="min-w-0 flex-1 space-y-1.5">
           <h3 className="truncate font-semibold text-foreground">
             <a href={href} className="hover:text-primary">
-              {group.title}
+              {displayTitle}
             </a>
           </h3>
           <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
@@ -3352,9 +3360,10 @@ function LandingScheduleRow({ group, isOptimal, profile }: { group: EventGroup; 
           <div className="min-w-0">
             <h3 className="text-sm font-semibold leading-tight text-foreground">
               <a href={href} className="hover:text-primary">
-                {group.title}
+                {displayTitle}
               </a>
             </h3>
+            {shipName ? <p className="mt-0.5 text-xs text-muted-foreground">{shipName}</p> : null}
           </div>
         </div>
         <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">

@@ -1,3 +1,27 @@
+## 2026-09-23 - Places/PDP redesign + visual tails
+
+### Наблюдения
+- Референс UX: `Twisterrrrr/dbshablon` (карточка + hero PDP). Архитектуру Lovable не копировали.
+- InstitutionVenueLayout / LocationVenueLayout уже были; layout выбирается через `venueTemplate(kind)`.
+- /places ветвил InstitutionCard vs LocationCard - нарушало канон «одна карточка».
+- ScrollRail: вертикальный wheel снова перехватывал горизонтальный rail (регресс после SEO-fix).
+- Dinner-boat: имя теплохода часто внутри title; фильтры меню уже скрывались без реального выбора.
+
+### Решения
+- Единый `LocationCard`: chip/label через `venueChip` / `venueKindLabel`, href через `venueHref`; InstitutionCard = alias.
+- PlacesHubView / VenuesCatalogView / HomeVenuesSection → только LocationCard.
+- VenuePageView: layout из `venueTemplate(venue.type)`.
+- ScrollRail: restore `forwardVerticalWheel`.
+- CityCard scrim: полноширинный linear gradient (не овал).
+- Dinner: `resolveCruiseDisplayTitle` - прогулка primary, теплоход secondary.
+
+### Проблемы
+- Live Isaakiy сейчас на `/venues` (DB family) - расходится с family-audit «оставить location»; не трогали DB в этой итерации.
+- Локальный web не поднят - visual smoke на preview/deploy; unit tests green.
+- Rich Results Test / LCP mobile - после web deploy batch.
+
+---
+
 ## 2026-09-22 - Шаг 4 apply batch A (4 коммита)
 
 ### Наблюдения

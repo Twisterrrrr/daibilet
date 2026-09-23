@@ -54,8 +54,8 @@ import {
   resolveVenueAboutHeading,
   splitVenueLabeledProse,
   splitVenueProseParagraphs,
-  venueTypeLabel,
 } from '@/lib/venue-meta';
+import { venueKindLabel } from '@/lib/venue-kind-mapping';
 import { resolveVenueExperienceProfile } from '@/lib/venue-experience-profile';
 import { eventHref, venueHref } from '@/lib/routes';
 import type {
@@ -101,7 +101,7 @@ export function InstitutionVenueLayout({
     [venue.type, venue.name],
   );
   const isMuseumOrArt = MUSEUM_ART_KINDS.has(publicType);
-  const typeLabel = venueTypeLabel(venue.type, venue.name);
+  const typeLabel = venueKindLabel(venue.type, venue.name);
   const aboutHeading = React.useMemo(
     () => resolveVenueAboutHeading(venue.type, venue.title || venue.name),
     [venue.type, venue.title, venue.name],

@@ -1,3 +1,12 @@
+## 2026-09-23 - Places/PDP UX + visual tails
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| UX.PLACES-PDP-LAYOUT | InstitutionVenueLayout / LocationVenueLayout via venueTemplate; один LocationCard | Высокий | ✅ local; deploy по запросу |
+| UX.DINNER-SHIP-SECONDARY | Dinner-boat: название прогулки primary, теплоход secondary; меню-фильтры только при выборе | Высокий | ✅ local |
+| FIX.CITY-SCRIM-FULL | CityCard scrim - полноширинный gradient, не овал | Средний | ✅ local |
+| FIX.SCROLLRAIL-WHEEL | Vertical wheel → page scroll на горизонтальных rail | Высокий | ✅ local |
+
 ## 2026-09-23 - Когда ехать UX (tabs A) + FAQ/blog layout
 
 | ID | Задача | Приоритет | Статус |

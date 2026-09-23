@@ -6,7 +6,6 @@ import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { Grid3X3, List, SlidersHorizontal } from 'lucide-react';
 
 import { CatalogPaginationLinks } from '@/components/CatalogPaginationLinks';
-import { InstitutionCard } from '@/components/InstitutionCard.client';
 import { InstitutionList } from '@/components/InstitutionListRow.client';
 import { LocationCard } from '@/components/LocationCard.client';
 import { PlacesFiltersDialog } from '@/components/PlacesFiltersDialog.client';
@@ -46,7 +45,7 @@ import {
   placesHubCategoryCount,
   resolvePlacesHubCategoryChip,
 } from '@/lib/venue-meta';
-import { venueHref, venuePageTemplate } from '@/lib/routes';
+import { venueHref } from '@/lib/routes';
 import { isRegionLikeCityTitle, resolveVenuePlaceCity } from '@/lib/venue-place-city';
 
 type ViewMode = 'cards' | 'list';
@@ -834,27 +833,16 @@ export function PlacesHubView({
                 <InstitutionList venues={venues} hrefFor={venueHref} />
               ) : (
                 <div className="catalog-card-grid places-card-grid">
-                  {venues.map((venue, index) =>
-                    venuePageTemplate(venue.type) === 'institution' ? (
-                      <InstitutionCard
-                        key={venue.id}
-                        venue={venue}
-                        href={venueHref(venue)}
-                        hideCity={hideCityOnCards}
-                        hideBlurb
-                        priority={index < 3}
-                      />
-                    ) : (
-                      <LocationCard
-                        key={venue.id}
-                        venue={venue}
-                        href={venueHref(venue)}
-                        hideCity={hideCityOnCards}
-                        hideBlurb
-                        priority={index < 3}
-                      />
-                    ),
-                  )}
+                  {venues.map((venue, index) => (
+                    <LocationCard
+                      key={venue.id}
+                      venue={venue}
+                      href={venueHref(venue)}
+                      hideCity={hideCityOnCards}
+                      hideBlurb
+                      priority={index < 3}
+                    />
+                  ))}
                 </div>
               )}
               <CatalogPaginationLinks

@@ -30,6 +30,7 @@ src/lib/selected-city-alias.test.ts
 src/lib/venue-page-sessions.test.ts
 src/lib/venue-kind-mapping.test.ts
 src/lib/canon-invariants.test.ts
+src/lib/cruise-display-title.test.ts
 src/lib/routes.venue-canonical.test.ts
 src/lib/venue-meta.museum-art.test.ts
 src/lib/venue-meta.park-monument.test.ts

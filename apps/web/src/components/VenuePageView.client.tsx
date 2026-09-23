@@ -37,6 +37,7 @@ import {
 } from '@/lib/venue-program';
 import { resolveVenueExperienceProfile } from '@/lib/venue-experience-profile';
 import { filterVenuePageSessionsByCity } from '@/lib/venue-page-sessions';
+import { venueTemplate } from '@/lib/venue-kind-mapping';
 
 const PLAYBILL_WEEKDAY_SHORT = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'] as const;
 
@@ -187,8 +188,12 @@ export function VenuePageView({
   );
   const matchedPayload =
     payload?.venue && venueMatchesRouteSlug(payload.venue, routeSlug) ? payload : matchedInitial;
-  const isLocationPage = pageTemplate === 'location';
-  const isInstitutionPage = pageTemplate === 'institution';
+  // Layout from mapping (venueTemplate), not a hardcoded kind list.
+  const resolvedTemplate = venue
+    ? venueTemplate(venue.type)
+    : pageTemplate;
+  const isLocationPage = resolvedTemplate === 'location';
+  const isInstitutionPage = resolvedTemplate === 'institution';
   const useLovableLayout = isLocationPage || isInstitutionPage;
 
   // A flat venue URL has no city segment. Make its verified venue city the
