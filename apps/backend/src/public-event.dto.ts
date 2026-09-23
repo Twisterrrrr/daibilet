@@ -5,6 +5,7 @@ import {
   hasUpcomingOrOpenSchedule,
   isOpenDateCatalogRow,
   isPublicSessionRowOnSale,
+  isStartedTicketcloudSlot,
   isSaleableEventForPublic,
   isWideLifetimeSession,
 } from './catalog-availability.js';
@@ -204,6 +205,11 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
         if (!isPublicSessionRowOnSale(session)) return false;
         const event = eventsById.get(session.eventId) || requestedEvent;
         if (!isPublicSessionRowOnSale({ sourceStatus: event.sourceStatus })) return false;
+        if (isStartedTicketcloudSlot(
+          { kind: event.kind, sourceStatus: session.sourceStatus, startsAt: session.startsAt },
+          purchaseProviderForEvent(event) || purchaseProvider,
+          now,
+        )) return false;
         return hasUpcomingOrOpenSchedule({
           kind: event.kind,
           sourceStatus: session.sourceStatus,

@@ -13,6 +13,7 @@ import {
   expandSessionPurchaseVariants,
   extractTcEventIdFromSession,
   isSessionPurchaseBlocked,
+  isStartedTcSession,
   pickDefaultSessionDayKey,
   pickRepresentativeSession,
   resolveTcPurchaseTarget,
@@ -65,6 +66,11 @@ const EVENT_PAGE_NEAREST_SLOTS = 5;
 export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
   const { event } = payload;
   const sessions = payload.sessions ?? [];
+  const [nowMs, setNowMs] = React.useState(() => Date.now());
+  React.useEffect(() => {
+    const timer = window.setInterval(() => setNowMs(Date.now()), 30_000);
+    return () => window.clearInterval(timer);
+  }, []);
   const offers = payload.offers ?? [];
   const teplohod = getTeplohodWidgetIds(event);
   const primaryOffer = offers.find((offer) => offer.active !== false) || offers[0] || null;
@@ -78,6 +84,7 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
       ? formatBuyCardPriceHint(priceRange)
       : null;
   const scheduleSessions = [...(sessions as EventSession[]).flatMap((session) => expandSessionPurchaseVariants(session))]
+    .filter((session) => !isStartedTcSession(session, nowMs, event.purchaseProvider))
     .sort(compareSessionsByStartsAt)
     .slice(0, EVENT_PAGE_NEAREST_SLOTS);
   const allFlexible =
