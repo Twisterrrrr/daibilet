@@ -15,7 +15,7 @@ import { getTicketPriceRange, isFlexibleScheduleSession } from '@/lib/event-page
 import { evaluateCityIndexability, evaluateRegionIndexability } from '@/lib/hub-indexability';
 import { resolveLandingCityName } from '@/lib/landing-city';
 import { landingCategoryHref } from '@/lib/landing-routes';
-import { cityHref, eventHref, venueHref, venuePageTemplate } from '@/lib/routes';
+import { cityHref, eventHref, venueCanonicalPath, venueHref, venuePageTemplate } from '@/lib/routes';
 import { resolveVenueBreadcrumbRegion } from '@/lib/cityRegionHub';
 import {
   cityHubPathFromLandingCity,
@@ -442,7 +442,7 @@ export function buildCityPageJsonLd(payload: PublicCityPageDto): Array<Record<st
         url: toAbsoluteUrl(cityPlacesCatalogHref(city.slug || city.sourceSlug || '')),
         numberOfItems: venues.length,
         itemListElement: venues.map((venue, index) => {
-          const path = venue.canonicalPath || venueHref(venue);
+          const path = venueCanonicalPath(venue);
           return {
             '@type': 'ListItem',
             position: index + 1,
@@ -527,7 +527,7 @@ export function buildRegionPageJsonLd(payload: PublicCityPageDto): Array<Record<
  */
 export function buildVenueBreadcrumbs(payload: PublicVenuePageDto): StructuredBreadcrumb[] {
   const venue = payload.venue;
-  const path = venue.canonicalPath || venueHref(venue);
+  const path = venueCanonicalPath(venue);
   const venueTitle = venue.seoH1 || venue.title || venue.name;
   const publicType = resolvePublicVenueType(venue.type, venueTitle);
   const crumbs: StructuredBreadcrumb[] = [{ name: 'Главная', path: '/' }];
@@ -576,7 +576,7 @@ export function buildVenueBreadcrumbs(payload: PublicVenuePageDto): StructuredBr
  */
 export function buildVenuePlaceJsonLd(payload: PublicVenuePageDto): Record<string, unknown> {
   const venue = payload.venue;
-  const path = venue.canonicalPath || venueHref(venue);
+  const path = venueCanonicalPath(venue);
   const canonical = toAbsoluteUrl(path);
   const image = venue.heroImageUrl ? toAbsoluteUrl(venue.heroImageUrl) : undefined;
   const description = venue.seoDescription || venue.shortDescription || venue.description || undefined;
@@ -623,7 +623,7 @@ export function buildVenueEventListJsonLd(
 ): Record<string, unknown> | null {
   const venue = payload.venue;
   const venueName = venue.seoH1 || venue.title || venue.name;
-  const venueUrl = toAbsoluteUrl(venue.canonicalPath || venueHref(venue));
+  const venueUrl = toAbsoluteUrl(venueCanonicalPath(venue));
   const sessions = (payload.sessions || [])
     .filter((session) => (session.slug || session.id) && session.startsAt)
     .slice(0, limit);

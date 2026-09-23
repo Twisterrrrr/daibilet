@@ -4,12 +4,15 @@
 - Референс dbshablon и UX-хвосты уже в `21d79af9` (единый LocationCard, layouts via venueTemplate, scrim/wheel/dinner).
 - Live smoke: `/venues` `/locations` → 308 на `/places?family=*`; mismatch family → 308 на канон; og:title/desc/image + Place на 6 PDP.
 - Location Place был `@type: [EventVenue, Place]` - для парков/храмов/гастро слабее, чем TouristAttraction.
+- `buildVenuePlaceJsonLd` / breadcrumbs / hub ItemList ещё брали `canonicalPath || href` - naive path из CI-инварианта 2.
 
 ### Решения
 - `buildVenuePlaceJsonLd`: institution → EventVenue+Place; location → TouristAttraction+Place (`venuePageTemplate`).
+- Venue JSON-LD + breadcrumbs + city hub ItemList → `venueCanonicalPath` (wrong-family stored path игнорируется).
 
 ### Проблемы
 - UI-полировка LocationCard/dinner/scrim/wheel на live только после web deploy batch.
+- Live pier ещё `EventVenue` - tip `e4c79fdc` не в web artifact.
 - Rich Results Test / LCP mobile - после deploy.
 - Live Isaakiy family vs audit - DB, вне зоны.
 

@@ -6,7 +6,8 @@
 | UX.DINNER-SHIP-SECONDARY | Dinner-boat: название прогулки primary, теплоход secondary; меню-фильтры только при выборе | Высокий | ✅ local |
 | FIX.CITY-SCRIM-FULL | CityCard scrim - полноширинный gradient, не овал | Средний | ✅ local |
 | FIX.SCROLLRAIL-WHEEL | Vertical wheel → page scroll на горизонтальных rail | Высокий | ✅ local |
-| SEO.VENUE-TA-JSONLD | Location PDP: TouristAttraction+Place (institution: EventVenue+Place) | Высокий | ✅ local; deploy по запросу |
+| SEO.VENUE-TA-JSONLD | Location PDP: TouristAttraction+Place (institution: EventVenue+Place) | Высокий | ✅ code; 🔄 live после web deploy |
+| SEO.VENUE-JSONLD-CANON | Place/Event JSON-LD url через venueCanonicalPath (не naive canonicalPath\|\|href) | Высокий | ✅ local uncommitted |
 
 ## 2026-09-23 - Когда ехать UX (tabs A) + FAQ/blog layout
 

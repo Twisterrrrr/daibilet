@@ -235,3 +235,45 @@ describe('heuristics documented in mapping', () => {
     );
   });
 });
+
+describe('venue Place JSON-LD prefers venueCanonicalPath', () => {
+  it('ignores wrong-family stored canonicalPath and picks TouristAttraction for location', async () => {
+    const { buildVenuePlaceJsonLd } = await import('./structured-data.ts');
+    const block = buildVenuePlaceJsonLd({
+      venue: {
+        id: 'v1',
+        slug: 'park-gorkogo',
+        name: 'Парк Горького',
+        type: 'PARK',
+        canonicalPath: '/venues/park-gorkogo',
+        city: 'Москва',
+        latitude: 55.73,
+        longitude: 37.6,
+      },
+      stats: { events: 0 },
+      sessions: [],
+      relatedVenues: [],
+    } as never);
+    assert.equal(block.url, 'https://daibilet.ru/locations/park-gorkogo');
+    assert.deepEqual(block['@type'], ['TouristAttraction', 'Place']);
+  });
+
+  it('institution stays EventVenue+Place', async () => {
+    const { buildVenuePlaceJsonLd } = await import('./structured-data.ts');
+    const block = buildVenuePlaceJsonLd({
+      venue: {
+        id: 'v2',
+        slug: 'bolshoy-teatr',
+        name: 'Большой театр',
+        type: 'THEATER',
+        canonicalPath: '/locations/bolshoy-teatr',
+        city: 'Москва',
+      },
+      stats: { events: 0 },
+      sessions: [],
+      relatedVenues: [],
+    } as never);
+    assert.equal(block.url, 'https://daibilet.ru/venues/bolshoy-teatr');
+    assert.deepEqual(block['@type'], ['EventVenue', 'Place']);
+  });
+});
