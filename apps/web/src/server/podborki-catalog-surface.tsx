@@ -1,6 +1,4 @@
-import { Suspense } from 'react';
-
-import { LandingsCatalogView } from '@/components/LandingsCatalogView.client';
+import { PodborkiInteractive } from '@/components/PodborkiInteractive.client';
 import { JsonLdScripts } from '@/components/JsonLdScripts';
 import { PodborkiCatalogSsrFallback } from '@/components/PodborkiCatalogSsrFallback';
 import { SiteLayout } from '@/components/SiteLayout';
@@ -166,17 +164,14 @@ export async function PodborkiCatalogSurface({
       <JsonLdScripts blocks={[jsonLd]} idPrefix="podborki-list-jsonld" />
       <SiteLayout>
       <div className="min-h-screen bg-slate-50 text-slate-900">
-        <Suspense
-          fallback={
-            <PodborkiCatalogSsrFallback
-              items={items}
-              citySlug={citySlug}
-              title={seo.h1}
-              description={seo.heroDescription}
-            />
-          }
-        >
-          <LandingsCatalogView
+        <style>{'html[data-podborki-hydrated="1"] [data-ssr-podborki-list]{display:none}'}</style>
+        <PodborkiCatalogSsrFallback
+          items={items}
+          citySlug={citySlug}
+          title={seo.h1}
+          description={seo.heroDescription}
+        />
+        <PodborkiInteractive
             items={items}
             city={seo.catalogCity}
             cities={destinationsPayload.destinations}
@@ -184,8 +179,7 @@ export async function PodborkiCatalogSurface({
             totalEvents={totalEvents}
             heroTitle={seo.h1}
             heroDescription={seo.heroDescription}
-          />
-        </Suspense>
+        />
         {seo.seoText ? (
           <section className="container-page border-t border-slate-200 py-10">
             <div

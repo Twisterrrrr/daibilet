@@ -108,6 +108,11 @@ export function LandingsCatalogView({
   heroTitle?: string;
   heroDescription?: string;
 }) {
+  useEffect(() => {
+    document.documentElement.dataset.podborkiHydrated = '1';
+    return () => { delete document.documentElement.dataset.podborkiHydrated; };
+  }, []);
+
   const urlSearchParams = useSearchParams();
   const pathname = usePathname();
   const selectedCity = useSelectedCityOptional();

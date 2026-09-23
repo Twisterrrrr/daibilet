@@ -10,6 +10,9 @@ const agents = {
 const checks = [
   ['/', (html) => count(html, /role="listitem"/g) >= 12, 'featured cities missing from HTML'],
   ['/events', (html) => html.includes('data-ssr-event-catalog'), 'event catalog missing from HTML'],
+  ['/blog', (html) => schemaLinksVisible(html, 'Blog'), 'blog schema lists articles absent from HTML'],
+  ['/podborki', (html) => schemaLinksVisible(html, 'CollectionPage'), 'collection schema lists landings absent from HTML'],
+  ['/podborki/c/moskva', (html) => schemaLinksVisible(html, 'CollectionPage'), 'city collection links missing from HTML'],
   ['/cities', (html) => count(html, /href="\/cities\/[^"?#]+/g) >= 15, 'city links missing from HTML'],
   ['/cities/moskva', (html) => count(html, /href="\/events\/[^"?#]+/g) > 0, 'city events missing from HTML'],
   ['/cities/moskovskaya-oblast', (html) => faqIsVisible(html), 'regional FAQ missing from HTML'],
@@ -30,6 +33,21 @@ function faqIsVisible(html) {
   }).find((item) => item?.['@type'] === 'FAQPage');
   if (!faq?.mainEntity?.length) return false;
   return count(html, /<details\b/g) >= faq.mainEntity.length;
+}
+
+function schemaLinksVisible(html, type) {
+  const scripts = [...html.matchAll(/<script[^>]+type="application\/ld\+json"[^>]*>(.*?)<\/script>/gs)];
+  const structured = scripts.map((match) => {
+    try { return JSON.parse(match[1]); } catch { return null; }
+  }).find((item) => item?.['@type'] === type);
+  const entries = structured?.mainEntity?.itemListElement;
+  if (!Array.isArray(entries) || entries.length === 0) return false;
+  const hrefs = new Set([...html.matchAll(/<a\b[^>]*\bhref="([^"]+)"/g)]
+    .map((match) => new URL(match[1], base).pathname));
+  return entries.every((entry) => {
+    const link = entry.url || entry.item?.url || entry.item;
+    return typeof link === 'string' && hrefs.has(new URL(link, base).pathname);
+  });
 }
 
 let failed = false;

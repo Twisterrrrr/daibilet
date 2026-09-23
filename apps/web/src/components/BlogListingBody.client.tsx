@@ -97,6 +97,7 @@ export function BlogListingBody({
           fallback={
             <BlogListingSsrFallback
               posts={feed}
+              allPosts={posts}
               featuredSlot={featuredSlot}
               editorialQuote={editorialQuote}
               sidebarSlot={sidebarSlot}
