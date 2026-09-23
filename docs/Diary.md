@@ -251,6 +251,20 @@ ode scripts/compress-card-images.mjs events на MSK локальные sidecar 
 - Post-factum: дубль Окуджавы pack vs expand - см. запись выше.
 
 ---
+## 2026-09-23 - Hub FAQ+блог split: регресс после SSR FAQ
+
+### Наблюдения
+- После `0aeab926` (SEO SSR FAQ) в `CityFaqBlogSplit` передавали `faqItems={[]}`, а `CityFaqServer` рисовали отдельно внизу страницы.
+- Итог: блог на всю ширину; FAQ уехал под весь хаб (в т.ч. под блог).
+
+### Решения
+- Снова `faqItems={unifiedFaq}` в split; `hasFaqBlogSplit = hasFaq || articles`.
+- Дубль `CityFaqServer` у city hub убран (регионы без изменений). Ответы FAQ в HTML через `<details>` в client SSR; JSON-LD FAQPage без изменений.
+
+### Проблемы
+- Нет; web deploy - batch / по запросу.
+
+---
 ## 2026-09-23 - Когда ехать: вернуть pill-табы (вариант A)
 
 ### Наблюдения
@@ -261,7 +275,7 @@ ode scripts/compress-card-images.mjs events на MSK локальные sidecar 
 - `CityWeatherWidget`: снова `role="tablist"` (Весна/Лето/Осень/Зима), бейдж «сейчас», один `tabpanel`.
 - Подзаголовок из `verdict` (`Лучшее время - {value}`); полный `dl` и стек карточек убраны из UI.
 - `seasonGuideForTab`: на текущем макросезоне - body текущего месяца; иначе - склейка seasons макротаба.
-- Packs/вердикт в данных сохранены (контекст имён).
+- Packs/вердикт в данных сохранены (контекст имён DeepSeek от 2026-09-21 в `when-to-go-packs.ts`).
 
 ### Проблемы
 - Нет; web deploy - batch / по запросу.

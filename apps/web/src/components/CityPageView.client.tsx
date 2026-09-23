@@ -379,7 +379,8 @@ export function CityPageView({
   }, []);
   // Story cards UI hidden (owner 2026-08-03); keep build helper for later - do not render.
 
-  const hasFaqBlogSplit = footerArticles.length > 0;
+  // FAQ + blog share one desktop row; either side alone still shows the section.
+  const hasFaqBlogSplit = hasFaq || footerArticles.length > 0;
 
   const tabs = React.useMemo(() => {
     const filled = new Set<string>();
@@ -624,7 +625,7 @@ export function CityPageView({
             {hasFaqBlogSplit ? (
               <CityFaqBlogSplit
                 city={city}
-                faqItems={[]}
+                faqItems={hasFaq ? unifiedFaq : []}
                 articles={footerArticles}
                 editorial={editorial}
               />

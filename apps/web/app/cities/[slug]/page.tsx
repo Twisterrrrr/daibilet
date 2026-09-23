@@ -9,7 +9,7 @@ import { JsonLdScripts } from '@/components/JsonLdScripts';
 import { RegionPageView } from '@/components/RegionPageView.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
-import { buildCityFaqItems, buildCitySeoText, visibleCityFaqItems } from '@/lib/city-faq';
+import { buildCityFaqItems, buildCitySeoText } from '@/lib/city-faq';
 import { resolveCityInfo } from '@/lib/cityInfo';
 import { pickCityHubArticles } from '@/lib/city-hub-articles';
 import { resolveCityHubTemplate } from '@/lib/city-hub-template';
@@ -284,11 +284,6 @@ export default async function CityPage({ params }: PageProps) {
 
   const faqStartedAt = Date.now();
   const faqItems = buildCityFaqItems(payload);
-  const visibleFaq = visibleCityFaqItems(
-    payload.city.name,
-    resolveCityInfo(payload.city.slug, payload.city.sourceSlug)?.faq,
-    faqItems,
-  );
   const suburbs = resolveCityInfo(payload.city.slug, payload.city.sourceSlug)?.significantSuburbs || [];
   const seoText = buildCitySeoText(payload);
   let jsonLdBlocks: Array<Record<string, unknown>> = [];
@@ -336,7 +331,7 @@ export default async function CityPage({ params }: PageProps) {
           />
         </Suspense>
         <CitySuburbsServer cityName={payload.city.name} suburbs={suburbs} />
-        <CityFaqServer cityName={payload.city.name} items={visibleFaq} />
+        {/* FAQ lives in CityFaqBlogSplit (client SSR via details) - not a second full-width block below. */}
       </SiteLayout>
     </>
   );

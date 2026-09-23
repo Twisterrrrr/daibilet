@@ -1,8 +1,9 @@
-## 2026-09-23 - Когда ехать UX (tabs A)
+## 2026-09-23 - Когда ехать UX (tabs A) + FAQ/blog layout
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
 | UX.WHEN-TO-GO-TABS-A | Вернуть pill-табы; подзаголовок «Лучшее время - …»; packs без изменений | Высокий | ✅ local; deploy по запросу |
+| UX.HUB-FAQ-BLOG-SPLIT | Вернуть FAQ|блог 2-col; убрать дубль CityFaqServer внизу хаба | Высокий | ✅ local; deploy по запросу |
 
 ## 2026-09-22 - Venue family шаг 4 (audit → apply)
 
