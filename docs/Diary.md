@@ -4,16 +4,17 @@
 - Owner OK: path → flips → hides → kind; цирк=THEATER, Петровский=museum, особняки=CONCERT_HALL, twins=hide+301.
 - `naprotiv-teatra-sovremennik-…` оказался twin (тот же title+address что `moscow-sovremennik`), не MEETING_POINT: hub gate / PDP 404. Ушёл в hide+301.
 - Path+flips уже были в MSK DB до финального прогона. Hides×3 (naprotiv, yusupov twin, petrovsky twin) + Депо→GASTRO applied.
-- Live `daibilet.ru` API/HTML ещё держал stale cache (Современник как location), пока localhost:4000 уже theater/institution.
+- После Deploy MSK web [35709509586](https://github.com/Twisterrrrr/daibilet/actions/runs/35709509586): twin aliases 308 OK, но `/api/public/venues/*` → **500** (`kind in […, TEMPLE]` vs stale Prisma client без TEMPLE/BUS). PDP soft-200 на обоих префиксах - family 301 не срабатывает.
 
 ### Решения
 - Канон: circus=THEATER до CIRCUS; дворец→museum по входному билету; NN club review 2–3 мес.; flip = 301+docs+отдельный коммит.
 - Скрипт `scripts/family-audit-batch-a.mjs`. Aliases twins в `place-slug-aliases` (web+backend).
-- 4 коммита (path → flips canon → twin aliases → kind/docs): `f26f0f82` `9c331add` `3fcab0a8` + kind closeout. Deploy MSK web; smoke 301×6 после deploy. Редизайн places/PDP - завтра, ≥24ч после flips.
+- 4 коммита: `f26f0f82` `9c331add` `3fcab0a8` `580213ea`. Hotfix: workflow `MSK API prisma generate + restart` + `pnpm db:generate` в `swap-web-next-artifact.sh` перед restart API.
+- Редизайн places/PDP - завтра, ≥24ч после flips (после зелёного smoke 301×6).
 
 ### Проблемы
 - MEETING_POINT без bus-сессий не отдаёт PDP - не использовать для «точки у театра» без правки hub gate.
-- Публичный кэш venue DTO / ISR может отставать от DB - после deploy нужен smoke + при необходимости revalidate.
+- Deploy web рестартит API, но **без** prisma generate - после enum-expand ломает весь public venues surface.
 
 ---
 
@@ -248,6 +249,22 @@ ode scripts/compress-card-images.mjs events на MSK локальные sidecar 
 ### Проблемы
 - Google Rich Results Test с агента раньше падал crawl; edge JSON-LD Place/EventVenue парсится (ldErr 0).
 - Post-factum: дубль Окуджавы pack vs expand - см. запись выше.
+
+---
+## 2026-09-23 - Когда ехать: вернуть pill-табы (вариант A)
+
+### Наблюдения
+- После вердикта+стека seasons пропали переключения сезонов и компактность блока.
+- Owner выбрал research-вариант A: 4 макротаба + один panel; подзаголовок не «Выберите сезон…», а «Лучшее время - …».
+
+### Решения
+- `CityWeatherWidget`: снова `role="tablist"` (Весна/Лето/Осень/Зима), бейдж «сейчас», один `tabpanel`.
+- Подзаголовок из `verdict` (`Лучшее время - {value}`); полный `dl` и стек карточек убраны из UI.
+- `seasonGuideForTab`: на текущем макросезоне - body текущего месяца; иначе - склейка seasons макротаба.
+- Packs/вердикт в данных сохранены (контекст имён).
+
+### Проблемы
+- Нет; web deploy - batch / по запросу.
 
 ---
 ## 2026-09-21 - Когда ехать: вердикт вместо табов + контекст имён

@@ -1,6 +1,7 @@
 /**
  * Editorial «Когда ехать» packs: verdict (goal answers) + seasons (month copy).
- * No season tabs - they duplicated seasons. Hyphen-only user copy.
+ * UI shows macro season tabs; bodies come from seasons via seasonGuideForTab.
+ * Hyphen-only user copy.
  */
 import type { CityWhenToGoFlavor } from './city-hub-local-flavor.ts';
 

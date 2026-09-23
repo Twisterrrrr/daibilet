@@ -100,12 +100,18 @@ export type CityWhenToGoSeason = {
 
 export type CitySeasonTabId = 'spring' | 'summer' | 'autumn' | 'winter';
 
-/** @deprecated Tabs removed in favor of verdict + full seasons list. */
 export type CitySeasonTab = {
   id: CitySeasonTabId;
   label: string;
-  body: string;
 };
+
+/** Macro season pills for the «Когда ехать» tablist (bodies come from seasons). */
+export const CITY_SEASON_TABS: CitySeasonTab[] = [
+  { id: 'spring', label: 'Весна' },
+  { id: 'summer', label: 'Лето' },
+  { id: 'autumn', label: 'Осень' },
+  { id: 'winter', label: 'Зима' },
+];
 
 export type CityWhenToGoVerdictLine = {
   label: string;
@@ -2227,18 +2233,38 @@ export function resolveWhenToGoBlurb(
   };
 }
 
-/** @deprecated Tabs removed - prefer current season blurb + verdict. */
+/**
+ * Copy under season tabs: on the active calendar season use that month's body;
+ * otherwise join all season paragraphs that map to the macro tab.
+ */
 export function seasonGuideForTab(
   whenToGo: CityWhenToGoFlavor | null | undefined,
   current: CityWhenToGoBlurb | null | undefined,
-  _tabId: CitySeasonTabId,
+  tabId: CitySeasonTabId,
 ): { body: string; nowLabel: string | null; isCurrent: boolean } {
-  void whenToGo;
-  const body = current?.body?.trim() || '';
-  const nowLabel = current
-    ? `${current.headline}${current.monthLabel ? ` (${current.monthLabel})` : ''}`
-    : null;
-  return { body, nowLabel, isCurrent: Boolean(current) };
+  const isCurrent = Boolean(current && current.tab === tabId);
+  if (isCurrent && current?.body?.trim()) {
+    return {
+      body: current.body.trim(),
+      nowLabel: `${current.headline}${current.monthLabel ? ` (${current.monthLabel})` : ''}`,
+      isCurrent: true,
+    };
+  }
+  const bodies = (whenToGo?.seasons || [])
+    .filter((season) => tabForSeasonId(season.id) === tabId)
+    .map((season) => season.body.trim())
+    .filter(Boolean);
+  return { body: bodies.join(' '), nowLabel: null, isCurrent: false };
+}
+
+export function whenToGoBestTime(
+  whenToGo: CityWhenToGoFlavor | null | undefined,
+): string | null {
+  const line =
+    whenToGo?.verdict?.find((item) => item.label === 'Лучшее время') ||
+    whenToGo?.verdict?.[0];
+  const value = line?.value?.trim();
+  return value || null;
 }
 
 export function cityIdentitySlides(slug: string | null | undefined): CityIdentitySlide[] {

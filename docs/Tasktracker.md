@@ -1,11 +1,18 @@
+## 2026-09-23 - Когда ехать UX (tabs A)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| UX.WHEN-TO-GO-TABS-A | Вернуть pill-табы; подзаголовок «Лучшее время - …»; packs без изменений | Высокий | ✅ local; deploy по запросу |
+
 ## 2026-09-22 - Venue family шаг 4 (audit → apply)
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
 | VK.FAMILY-CANON | ticket-critical / location-always / review / «family один раз»+исключение flip / chip≠family / circus=THEATER / palace criterion | Критический | ✅ docs |
 | VK.FAMILY-AUDIT-100 | Стратифицированный аудит ~100 + 3 сигнала + exceptions; dry-run | Высокий | ✅ отчёт; owner OK |
-| VK.FAMILY-FLIP-A | Batch A: 4 коммита path→flips→hides→kind | Высокий | ✅ DB + 4 commits; push → Deploy |
-| VK.FAMILY-SMOKE | curl 301 ×6 flip + path/hide; sitemap; CI inv 1–4 | Высокий | 🔄 после Deploy MSK web |
+| VK.FAMILY-FLIP-A | Batch A: 4 коммита path→flips→hides→kind | Высокий | ✅ DB + commits `f26f0f82`…`580213ea`; Deploy [35709509586](https://github.com/Twisterrrrr/daibilet/actions/runs/35709509586) |
+| VK.FAMILY-SMOKE | curl 301 ×6 flip + path/hide; sitemap; CI inv 1–4 | Высокий | 🔄 blocked: API 500 TEMPLE/Prisma → regen |
+| VK.API-PRISMA-TEMPLE | MSK `pnpm db:generate` + restart API; swap script generate before restart | Критический | 🔄 hotfix workflow |
 | VK.PALACE-BATCH | Дворцы-музеи ~25: отдельный upgrade, не пачка с A | Средний | ⏳ review |
 
 ## 2026-09-22 - Dinner-boat SEO copy + mustSee closeout
@@ -25,7 +32,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| UX.WHEN-TO-GO-VERDICT | Убрать season tabs; вердикт + сезоны; контекст локальных имён (27 хабов) | Высокий | ✅ live Deploy [35577213920](https://github.com/Twisterrrrr/daibilet/actions/runs/35577213920) `dfdbeb3a` |
+| UX.WHEN-TO-GO-VERDICT | Убрать season tabs; вердикт + сезоны; контекст локальных имён (27 хабов) | Высокий | ✅ live `dfdbeb3a`; chrome откатан к tabs A (см. UX.WHEN-TO-GO-TABS-A) |
 
 ## 2026-09-21 - /events «Стоит увидеть»: одна цена + шум карточки
 
