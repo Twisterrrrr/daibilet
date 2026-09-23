@@ -8,12 +8,14 @@ import type {
 } from '@daibilet/contracts/public';
 
 import { buildCityFaqItems, visibleCityFaqItems, type CityFaqItem } from '@/lib/city-faq';
+import { cityPlacesCatalogHref } from '@/lib/catalog-url';
+import { isCityHubSectionHidden, resolveCityHubConfig } from '@/lib/city-hub-config';
 import { resolveCityInfo } from '@/lib/cityInfo';
 import { getTicketPriceRange, isFlexibleScheduleSession } from '@/lib/event-page-utils';
 import { evaluateCityIndexability, evaluateRegionIndexability } from '@/lib/hub-indexability';
 import { resolveLandingCityName } from '@/lib/landing-city';
 import { landingCategoryHref } from '@/lib/landing-routes';
-import { cityHref, eventHref, venueHref } from '@/lib/routes';
+import { cityHref, eventHref, venueHref, venuePageTemplate } from '@/lib/routes';
 import { resolveVenueBreadcrumbRegion } from '@/lib/cityRegionHub';
 import {
   cityHubPathFromLandingCity,
@@ -26,7 +28,7 @@ import {
   venueTypeBreadcrumbPlural,
   venueTypeCatalogHref,
 } from '@/lib/venue-meta';
-import { resolveVenueFaqItems } from '@/lib/venue-editorial-content';
+import { resolveVenueCuratedFaqItems } from '@/lib/venue-editorial-content';
 import { formatPublicTitle } from '@/lib/format-public-title';
 
 const SITE_URL = (process.env.DAIBILET_SITE_URL || 'https://daibilet.ru').replace(/\/$/, '');
@@ -430,14 +432,20 @@ export function buildCityPageJsonLd(payload: PublicCityPageDto): Array<Record<st
       });
     }
 
-    const venues = (payload.venues || [])
-      .filter((venue) => venue.id && venue.name)
-      .slice(0, 24);
+    const hubConfig = resolveCityHubConfig(city.slug || city.sourceSlug || '');
+    const eligibleVenues = (payload.venues || []).filter((venue) => venue.id && venue.name);
+    const venues = isCityHubSectionHidden(hubConfig, 'venues')
+      ? []
+      : [
+          ...eligibleVenues.filter((venue) => venuePageTemplate(venue.type) !== 'location'),
+          ...eligibleVenues.filter((venue) => venuePageTemplate(venue.type) === 'location'),
+        ].slice(0, Math.max(1, hubConfig?.venuesTopN ?? 6));
     if (venues.length) {
       blocks.push({
         '@context': 'https://schema.org',
         '@type': 'ItemList',
         name: `Места и площадки: ${city.name}`,
+        url: toAbsoluteUrl(cityPlacesCatalogHref(city.slug || city.sourceSlug || '')),
         numberOfItems: venues.length,
         itemListElement: venues.map((venue, index) => {
           const path = venue.canonicalPath || venueHref(venue);
@@ -615,7 +623,9 @@ export function buildVenueEventListJsonLd(
   const venue = payload.venue;
   const venueName = venue.seoH1 || venue.title || venue.name;
   const venueUrl = toAbsoluteUrl(venue.canonicalPath || venueHref(venue));
-  const sessions = (payload.sessions || []).slice(0, limit).filter((s) => s.slug || s.id);
+  const sessions = (payload.sessions || [])
+    .filter((session) => (session.slug || session.id) && session.startsAt)
+    .slice(0, limit);
   if (!sessions.length) return null;
 
   return {
@@ -664,7 +674,8 @@ export function buildVenuePageJsonLd(payload: PublicVenuePageDto): Array<Record<
     buildVenuePlaceJsonLd(payload),
     buildBreadcrumbListJsonLd(buildVenueBreadcrumbs(payload)),
   ];
-  const faq = buildFaqPageJsonLd(resolveVenueFaqItems(payload.venue.slug));
+  // PDP layouts show only curated questions; do not mark up generic FAQ absent from HTML.
+  const faq = buildFaqPageJsonLd(resolveVenueCuratedFaqItems(payload.venue.slug));
   if (faq) blocks.push(faq);
   const events = buildVenueEventListJsonLd(payload);
   if (events) blocks.push(events);
