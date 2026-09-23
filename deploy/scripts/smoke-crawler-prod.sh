@@ -97,4 +97,5 @@ if [[ "${FULL_LANDING_AUDIT:-0}" == "1" ]]; then
   for path in "${landing_paths[@]}"; do audit_landing_links "$path"; done
 fi
 
-echo 'Crawler and landing-link smoke passed.'
+node scripts/smoke-indexability-prod.mjs
+echo 'Crawler, landing-link, and indexability smoke passed.'

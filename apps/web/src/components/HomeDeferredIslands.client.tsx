@@ -12,11 +12,6 @@ export const HomeBottomNav = dynamic(
   { ssr: false },
 );
 
-export const HomeCategoryStack = dynamic(
-  () => import('@/components/HomeCategoryStack.client').then((m) => m.HomeCategoryStack),
-  { ssr: false, loading: () => <div className="min-h-[11rem] md:hidden" aria-hidden /> },
-);
-
 export const HomeMyDayBanner = dynamic(
   () => import('@/components/HomeMyDayBanner.client').then((m) => m.HomeMyDayBanner),
   { ssr: false, loading: () => <div className="min-h-[9rem]" aria-hidden /> },

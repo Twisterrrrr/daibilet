@@ -14,6 +14,7 @@ import {
   isRiverPartyLandingSlug,
 } from '@/lib/landing-constants';
 import { resolveLandingCardImage } from '@/lib/landing-images';
+import { resolveLandingFaqItems } from '@/lib/landing-faq-items';
 import {
   landingCategoryHref,
   resolveLandingBoundCitySlug,
@@ -30,7 +31,7 @@ import {
 import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
 import { getLandingSeo } from '@/lib/seo/get-landing-seo';
 import { isPodborkiSeoPilotCitySlug } from '@/lib/podborki-city-seo';
-import { buildLandingPageJsonLd } from '@/lib/structured-data';
+import { buildFaqPageJsonLd, buildLandingPageJsonLd } from '@/lib/structured-data';
 import { fetchLandingPageDto, finalizeLandingPayload } from '@/server/landing-page';
 import { loadThinRelatedCardSessions } from '@/server/landing-thin-related';
 import { findSeoOverride } from '@/server/seo-override';
@@ -192,6 +193,13 @@ export async function LandingRoutePage({ pathname }: { pathname: string }) {
     canonicalPath: canonical,
     sessions: finalized.sessions,
   });
+  const faq = buildFaqPageJsonLd(resolveLandingFaqItems({
+    slug,
+    profile: resolveLandingProfileKind(slug),
+    citySlug: route.citySlug,
+    blocks: finalized.blocks || [],
+  }));
+  if (faq) jsonLdBlocks.push(faq);
 
   const dbOverride =
     seoCitySlug && isPodborkiSeoPilotCitySlug(seoCitySlug)

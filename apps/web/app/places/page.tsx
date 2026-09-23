@@ -3,8 +3,8 @@ import { unstable_noStore as noStore } from 'next/cache';
 import { Suspense } from 'react';
 
 import { PlacesHubView } from '@/components/PlacesHubView.client';
+import { PlacesHubSsrFallback } from '@/components/PlacesHubSsrFallback';
 import { SiteLayout } from '@/components/SiteLayout';
-import { VenueCatalogPageSkeleton } from '@/components/VenueCatalogSkeletons';
 import { cityToNominative } from '@/lib/city-declension';
 import {
   buildPlacesListingSeo,
@@ -155,7 +155,7 @@ export default async function PlacesIndexPage({ searchParams }: PageProps) {
 
   return (
     <SiteLayout>
-      <Suspense fallback={<VenueCatalogPageSkeleton family={family === 'location' ? 'location' : 'institution'} />}>
+      <Suspense fallback={<PlacesHubSsrFallback page={initialPage} family={family || 'all'} />}>
         <PlacesHubView initialPage={initialPage} initialQueryKey={initialQueryKey} />
       </Suspense>
     </SiteLayout>

@@ -24,9 +24,11 @@ export function HomeNowSection({
   const selectedCity = useSelectedCityOptional();
   const cityValue = selectedCity?.cityReady ? selectedCity.cityValue : 'all';
   const [activeTab, setActiveTab] = useState<HomeNowTabKey>(() => pickDefaultHomeNowTab(tabs));
+  const [hydrated, setHydrated] = useState(false);
   const current = tabs.find((tab) => tab.key === activeTab) || tabs[0];
 
   useEffect(() => {
+    setHydrated(true);
     if (!tabs.some((tab) => tab.key === activeTab)) {
       setActiveTab(pickDefaultHomeNowTab(tabs));
     }
@@ -79,21 +81,24 @@ export function HomeNowSection({
           </div>
         ) : null}
 
-        <ScrollRail
-          key={current.key}
-          className="mt-5"
-          arrowAlign="center"
-          hideScrollbar
-          aria-label={sectionTitle}
-        >
-          <div className="horizontal-snap-track">
-            {current.events.map((event) => (
-              <div key={`${current.key}-${event.id}-${event.startsAt}`} className="showcase-rail-card">
-                <EventCard session={event} showcaseRail />
+        {tabs.map((tab) => (
+          <div key={tab.key} hidden={hydrated && tab.key !== current.key}>
+            <ScrollRail
+              className="mt-5"
+              arrowAlign="center"
+              hideScrollbar
+              aria-label={`${sectionTitle}: ${tab.label}`}
+            >
+              <div className="horizontal-snap-track">
+                {tab.events.map((event) => (
+                  <div key={`${tab.key}-${event.id}-${event.startsAt}`} className="showcase-rail-card">
+                    <EventCard session={event} showcaseRail />
+                  </div>
+                ))}
               </div>
-            ))}
+            </ScrollRail>
           </div>
-        </ScrollRail>
+        ))}
       </div>
     </section>
   );
