@@ -38,8 +38,11 @@ export type VenueFeatureChip = {
 };
 
 export type VenueEditorialTickets = {
-  /** Display price in rubles (seed priceFrom is kopecks / 100). */
-  priceFromRub: number;
+  /**
+   * Display price in rubles (optional).
+   * Omit when public «от» is unknown - CTA still shows official-site link + badge.
+   */
+  priceFromRub?: number;
   /** Primary purchase URL (official / redirect). */
   href: string;
   /** Short badge under CTA, e.g. «Официальный сайт». */
@@ -76,8 +79,8 @@ export type VenueEditorialContent = {
   wayToFind?: string;
   visitTips?: string;
   /**
-   * External official tickets CTA (not internal LC inventory).
-   * Kept in overlay for future use; institution PDP hides commercial blocks for now.
+   * External official tickets CTA when LC admission inventory is empty.
+   * Used by resolveVenuePrimaryCta + VenueEditorialTicketsBlock (Wave 1 commercial center).
    */
   tickets?: VenueEditorialTickets;
 };

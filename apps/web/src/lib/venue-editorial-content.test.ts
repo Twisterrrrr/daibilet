@@ -55,6 +55,9 @@ test('moscow museum packs have unique seo sections and clean sources hygiene', (
   assert.ok(novaya!.faq[0]!.question.includes('Лаврушинском'));
   assert.equal(garage!.website, 'https://garagemca.org');
   assert.ok(pushkin!.hookFact?.includes('Иваном Цветаевым'));
+  assert.equal(pushkin!.tickets?.priceFromRub, 700);
+  assert.equal(garage!.tickets?.priceFromRub, 600);
+  assert.equal(novaya!.tickets?.priceFromRub, 550);
   for (const pack of [pushkin!, garage!, novaya!]) {
     const blob = [
       pack.heroLead || '',
@@ -64,6 +67,30 @@ test('moscow museum packs have unique seo sections and clean sources hygiene', (
     ].join('\n');
     assertNoLongDash(blob);
   }
+});
+
+test('wave1 commercial tickets cover theaters, hall and galleries', () => {
+  const ticketed = [
+    'moscow-mht-im-chehova',
+    'moscow-lenkom',
+    'moscow-sovremennik',
+    'moscow-malyy-teatr',
+    'moscow-teatr-natsiy',
+    'moscow-mkz-zaryade',
+    'moscow-mmoma',
+    'moscow-red-ges-2',
+  ];
+  for (const slug of ticketed) {
+    const pack = resolveVenueEditorialContent(slug);
+    assert.ok(pack?.tickets?.href, slug);
+    assert.ok((pack!.tickets!.priceFromRub || 0) > 0, slug);
+  }
+  assert.equal(resolveVenueEditorialContent('moscow-red-ges-2')!.tickets!.href, 'https://ges-2.org/tickets');
+
+  const bolshoy = resolveVenueEditorialContent('moscow-bol-shoy-teatr');
+  assert.ok(bolshoy?.tickets?.href);
+  assert.equal(bolshoy!.tickets!.priceFromRub, undefined);
+  assert.equal(bolshoy!.tickets!.badge, 'Официальный сайт');
 });
 
 test('spb location packs resolve by catalog slugs', () => {
@@ -176,5 +203,5 @@ test('butman jazz club pack resolves catalog + spb alias', () => {
 test('unknown slug has no editorial overlay', () => {
   assert.equal(resolveVenueEditorialContent('erarta'), null);
   assert.equal(resolveVenueEditorialContent(''), null);
-  assert.equal(__editorialVenueContentSlugCountForTests(), 11);
+  assert.equal(__editorialVenueContentSlugCountForTests(), 20);
 });

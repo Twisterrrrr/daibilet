@@ -14,10 +14,10 @@ import {
 } from 'lucide-react';
 
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
-import { MobileStickyActionBar } from '@/components/MobileStickyActionBar';
 import { YandexMapEmbed } from '@/components/YandexMapEmbed';
 import { VenueNearbyMiniGrid } from '@/components/VenueNearbyMiniGrid.client';
 import { VenueBreadcrumbsNav } from '@/components/VenueBreadcrumbsNav.client';
+import { VenueStickyCashier } from '@/components/VenueStickyCashier.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { expandSessionPurchaseVariants, isSessionPurchaseBlocked } from '@/lib/event-purchase';
 import { formatMoney, formatNumber } from '@/lib/format';
@@ -32,6 +32,7 @@ import {
   formatVenueMetroLabel,
   resolveVenueEditorialContent,
 } from '@/lib/venue-editorial-content';
+import { hasVenueCommercialCenter, resolveVenuePrimaryCta } from '@/lib/venue-cta';
 import { normalizeVenueKind, resolveLocationVenueCopy, resolveVenueAboutHeading, splitVenueProseParagraphs, venueTypeIcon } from '@/lib/venue-meta';
 import { venueKindLabel } from '@/lib/venue-kind-mapping';
 import { resolveVenueExperienceProfile } from '@/lib/venue-experience-profile';
@@ -120,6 +121,30 @@ export function LocationVenueLayout({
   const stopExcursionCount =
     uniqueStopEvents.length > 0 ? uniqueStopEvents.length : Number(venue.stopEventCount ?? 0);
   const hasStopExcursions = stopExcursionCount > 0;
+  const hasPierRoutes = isPier && routeGroups.length > 0;
+  const hasProgram =
+    hasPierRoutes || sessions.length > 0 || routeGroups.length > 0 || hasStopExcursions;
+  const programHref = hasPierRoutes
+    ? '#location-routes'
+    : hasStopExcursions
+      ? '#venue-stop-events'
+      : '#venue-program';
+  const showCommercialCenter = hasVenueCommercialCenter({
+    hasAdmission: false,
+    hasProgram,
+    showEditorialTickets: false,
+  });
+  const primaryCta = resolveVenuePrimaryCta({
+    hasAdmission: false,
+    hasProgram,
+    hasVisitAnchor: Boolean(visitTips || hasMap),
+    admissionLabel: experience.admissionCtaLabel,
+    programLabel: hasStopExcursions && !hasPierRoutes
+      ? experience.routeCtaLabel
+      : experience.programCtaLabel,
+    programHref,
+    visitLabel: 'Как добраться',
+  });
   /** Late FAQ only for timed boards / ticketed departures - not static monuments. */
   const showLateArrivalFaq =
     !curatedFaq.length &&
@@ -190,14 +215,16 @@ export function LocationVenueLayout({
                   <Ticket className="h-4 w-4" /> {formatMoney(stats.priceFrom)}
                 </span>
               </div>
-              {routeGroups.length > 0 ? (
+              {routeGroups.length > 0 || primaryCta ? (
                 <div className="mt-6 hidden flex-wrap items-center gap-3 md:flex">
-                  <a
-                    href="#location-routes"
-                    className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-6 py-2.5 text-sm font-bold text-slate-950 hover:bg-slate-100"
-                  >
-                    {experience.routeCtaLabel}
-                  </a>
+                  {primaryCta ? (
+                    <a
+                      href={primaryCta.href}
+                      className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-6 py-2.5 text-sm font-bold text-slate-950 hover:bg-slate-100"
+                    >
+                      {primaryCta.label}
+                    </a>
+                  ) : null}
                   <AddToDayRouteButton
                     variant="dark"
                     venue={{
@@ -347,12 +374,12 @@ export function LocationVenueLayout({
             ) : null}
             {/* Sticky footer has CTA on mobile - avoid duplicate hero buttons */}
             <div className="mt-6 hidden flex-wrap items-center gap-3 md:flex">
-              {hasStopExcursions ? (
+              {primaryCta ? (
                 <a
-                  href="#venue-stop-events"
+                  href={primaryCta.href}
                   className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-6 py-2.5 text-sm font-bold text-slate-950 hover:bg-slate-100"
                 >
-                  Посмотреть экскурсии
+                  {primaryCta.label}
                 </a>
               ) : null}
               <AddToDayRouteButton
@@ -462,45 +489,118 @@ export function LocationVenueLayout({
 
       <div className="container-page grid grid-cols-[minmax(0,1fr)] gap-8 py-8 lg:grid-cols-3">
         <div className="space-y-8 lg:col-span-2">
-          {isPier && routeGroups.length > 0 ? (
-            <section id="location-routes" className="scroll-mt-24">
-              <h2 className="text-xl font-bold text-slate-900">{experience.routeSectionTitle}</h2>
-              <p className="mt-3 text-sm leading-6 text-slate-500">Купите билет онлайн - приходите за 15 минут до отправления.</p>
-              <div className="mt-6 space-y-3">
-                {routeGroups.map((group) => {
-                  const nextSlot = group.visibleSlots[0] || group.representative;
-                  return (
-                    <div key={group.key} className="flex flex-col gap-4 rounded-xl bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="min-w-0 flex-1">
-                        <a href={eventHref(group.representative)} className="font-semibold text-slate-900 hover:text-primary-700">
-                          {group.title}
-                        </a>
-                        <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-slate-500">
-                          <span className="inline-flex items-center gap-1">
-                            <Clock className="h-3 w-3" /> {group.category}
-                          </span>
-                          {nextSlot ? (
-                            <span className="inline-flex items-center gap-1 font-semibold text-sky-700">
-                              <Waves className="h-3 w-3" /> Ближайший рейс: {nextSlot.dateLabel} · {nextSlot.timeLabel}
-                            </span>
-                          ) : null}
-                        </div>
-                      </div>
-                      <div className="flex shrink-0 items-center gap-3 self-center sm:self-auto">
-                        <div className="text-lg font-bold leading-none text-slate-900">{formatMoney(group.priceFrom)}</div>
-                        <a
-                          href={eventHref(group.representative)}
-                          className="inline-flex min-h-9 items-center justify-center rounded-full bg-primary-600 px-5 py-2 text-sm font-semibold text-white hover:bg-primary-700"
+          {showCommercialCenter ? (
+            <div
+              id="center"
+              className="scroll-mt-24 space-y-8"
+              data-venue-commercial-center
+            >
+              {hasPierRoutes ? (
+                <section id="location-routes" className="scroll-mt-24">
+                  <h2 className="text-xl font-bold text-slate-900">{experience.routeSectionTitle}</h2>
+                  <p className="mt-3 text-sm leading-6 text-slate-500">
+                    Купите билет онлайн - приходите за 15 минут до отправления.
+                  </p>
+                  <div className="mt-6 space-y-3">
+                    {routeGroups.map((group) => {
+                      const nextSlot = group.visibleSlots[0] || group.representative;
+                      return (
+                        <div
+                          key={group.key}
+                          className="flex flex-col gap-4 rounded-xl bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between"
                         >
-                          Купить
+                          <div className="min-w-0 flex-1">
+                            <a
+                              href={eventHref(group.representative)}
+                              className="font-semibold text-slate-900 hover:text-primary-700"
+                            >
+                              {group.title}
+                            </a>
+                            <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-slate-500">
+                              <span className="inline-flex items-center gap-1">
+                                <Clock className="h-3 w-3" /> {group.category}
+                              </span>
+                              {nextSlot ? (
+                                <span className="inline-flex items-center gap-1 font-semibold text-sky-700">
+                                  <Waves className="h-3 w-3" /> Ближайший рейс: {nextSlot.dateLabel} ·{' '}
+                                  {nextSlot.timeLabel}
+                                </span>
+                              ) : null}
+                            </div>
+                          </div>
+                          <div className="flex shrink-0 items-center gap-3 self-center sm:self-auto">
+                            <div className="text-lg font-bold leading-none text-slate-900">
+                              {formatMoney(group.priceFrom)}
+                            </div>
+                            <a
+                              href={eventHref(group.representative)}
+                              className="inline-flex min-h-9 items-center justify-center rounded-full bg-primary-600 px-5 py-2 text-sm font-semibold text-white hover:bg-primary-700"
+                            >
+                              Купить
+                            </a>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </section>
+              ) : null}
+
+              {isParkLike && hasStopExcursions ? (
+                <section id="venue-stop-events" className="scroll-mt-24">
+                  <h2 className="text-xl font-bold text-slate-900">
+                    Экскурсии, которые включают это место
+                  </h2>
+                  <p className="mt-3 text-sm leading-6 text-slate-500">
+                    Маршруты с явной остановкой у этой локации.
+                  </p>
+                  <ul className="mt-5 divide-y divide-slate-100" data-venue-linked-events-deduped>
+                    {uniqueStopEvents.slice(0, 5).map((event) => (
+                      <li key={event.id}>
+                        <a
+                          href={`/events/${encodeURIComponent(event.slug)}`}
+                          className="block truncate py-2.5 text-sm font-medium text-slate-900 transition hover:text-primary-700"
+                        >
+                          {formatPublicTitle(event.title)}
                         </a>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null}
+
+              {todaySlots.length > 0 ? (
+                <section className="scroll-mt-24">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <h2 className="text-xl font-bold text-slate-900">
+                      {isPier
+                        ? 'Отправления сегодня'
+                        : isBus
+                          ? 'Отправления автобуса сегодня'
+                          : 'Ближайшие сборы сегодня'}
+                    </h2>
+                    <span className="text-sm text-slate-500">
+                      {formatNumber(routeCount)} маршрутов отсюда
+                    </span>
+                  </div>
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    {todaySlots.map((time) => (
+                      <a
+                        key={time}
+                        href="#venue-program"
+                        className="group inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-900 hover:border-primary-600 hover:bg-primary-600 hover:text-white"
+                      >
+                        <Clock className="h-3.5 w-3.5 text-primary-600 group-hover:text-white" />
+                        {time}
+                      </a>
+                    ))}
+                  </div>
+                </section>
+              ) : null}
+            </div>
           ) : null}
+
+          {children ? children : null}
 
           {((hookFact && !isParkLike) || aboutBody || editorial?.highlights?.length) ? (
           <section className="scroll-mt-24">
@@ -589,56 +689,6 @@ export function LocationVenueLayout({
             </section>
           ) : null}
 
-          {/* Address / metro / directions live in sidebar Contacts + Map. */}
-
-          {isParkLike && hasStopExcursions ? (
-            <section id="venue-stop-events" className="scroll-mt-24">
-              <h2 className="text-xl font-bold text-slate-900">
-                Экскурсии, которые включают это место
-              </h2>
-              <p className="mt-3 text-sm leading-6 text-slate-500">
-                Маршруты с явной остановкой у этой локации.
-              </p>
-              <ul className="mt-5 divide-y divide-slate-100" data-venue-linked-events-deduped>
-                {uniqueStopEvents.slice(0, 5).map((event) => (
-                  <li key={event.id}>
-                    <a
-                      href={`/events/${encodeURIComponent(event.slug)}`}
-                      className="block truncate py-2.5 text-sm font-medium text-slate-900 transition hover:text-primary-700"
-                    >
-                      {formatPublicTitle(event.title)}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ) : null}
-
-          {todaySlots.length > 0 ? (
-            <section className="scroll-mt-24">
-              <div className="flex items-baseline justify-between gap-3">
-                <h2 className="text-xl font-bold text-slate-900">
-                  {isPier ? 'Отправления сегодня' : isBus ? 'Отправления автобуса сегодня' : 'Ближайшие сборы сегодня'}
-                </h2>
-                <span className="text-sm text-slate-500">{formatNumber(routeCount)} маршрутов отсюда</span>
-              </div>
-              <div className="mt-5 flex flex-wrap gap-2">
-                {todaySlots.map((time) => (
-                  <a
-                    key={time}
-                    href="#venue-program"
-                    className="group inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-900 hover:border-primary-600 hover:bg-primary-600 hover:text-white"
-                  >
-                    <Clock className="h-3.5 w-3.5 text-primary-600 group-hover:text-white" />
-                    {time}
-                  </a>
-                ))}
-              </div>
-            </section>
-          ) : null}
-
-          {children}
-
           {showLateArrivalFaq ? (
             <div className="scroll-mt-24">
               <h3 className="text-base font-bold text-slate-900">Что делать, если опаздываю?</h3>
@@ -649,42 +699,13 @@ export function LocationVenueLayout({
           ) : null}
         </div>
 
-        <LocationVenueSidebar venue={venue} relatedVenues={relatedVenues} metroLabel={metroLabel} />
+        <div className="space-y-4 lg:sticky lg:top-[calc(var(--site-header-height)+3.5rem)] lg:self-start">
+          {primaryCta ? (
+            <VenueStickyCashier cta={primaryCta} hint={heroAddressLine || null} />
+          ) : null}
+          <LocationVenueSidebar venue={venue} relatedVenues={relatedVenues} metroLabel={metroLabel} />
+        </div>
       </div>
-
-      <MobileStickyActionBar>
-        {hasStopExcursions ? (
-          <a
-            href="#venue-stop-events"
-            className="inline-flex h-11 flex-1 items-center justify-center rounded-full bg-primary-600 px-4 text-sm font-bold text-white hover:bg-primary-700"
-          >
-            Экскурсии
-          </a>
-        ) : isPier && routeGroups.length > 0 ? (
-          <a
-            href="#location-routes"
-            className="inline-flex h-11 flex-1 items-center justify-center rounded-full bg-primary-600 px-4 text-sm font-bold text-white hover:bg-primary-700"
-          >
-            {experience.programTabLabel}
-          </a>
-        ) : null}
-        <AddToDayRouteButton
-          className={`min-h-11 rounded-full px-4 text-sm ${hasStopExcursions || (isPier && routeGroups.length > 0) ? 'flex-1' : 'w-full'}`}
-          venue={{
-            id: venue.id,
-            slug: venue.slug,
-            title: venue.title || venue.name,
-            city: venue.city,
-            cityId: venue.cityId,
-            citySlug: venue.citySlug,
-            href: venueHref(venue),
-            imageUrl: venue.heroImageUrl,
-            address: venue.address,
-            latitude: venue.latitude,
-            longitude: venue.longitude,
-          }}
-        />
-      </MobileStickyActionBar>
     </div>
   );
 }

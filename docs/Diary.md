@@ -1,3 +1,29 @@
+## 2026-09-23 - PDP Wave 1: commercial center after hero
+
+### Наблюдения
+- Lovable dbshablon: CTA сразу после hero; у нас admission/афиша шли после about/gallery.
+- Референс: `docs/drafts/_dbshablon-*`. Фейки (seatMap, VIP, checkout modal, email, отзывы-placeholder) вне скоупа.
+- Волна 1 проверяет гипотезу «коммерческий центр после hero»; rules/planner/FAQ-accordion - волна 2.
+
+### Решения
+- `resolveVenuePrimaryCta`: LC admission → playbill → editorial.tickets → #visit (`venue-cta.ts` + тесты).
+- `VenueStickyCashier` + `VenueEditorialTicketsBlock`; порядок секций в Institution/Location: `#center` сразу после hero/meta.
+- `#center` = один commercial XOR (LC | featured afisha/routes | editorial); `VenueProgramBlock` - sibling сразу после, не внутри.
+- `priceFromRub?` optional: pack без публичного «от» всё равно даёт official-site CTA (Большой).
+- Mobile sticky: **вместо** тонкого бара, не поверх; без AddToDay в sticky (только primary CTA).
+- Editorial tickets: Эрмитаж + Пушкин/Гараж/Новая Третьяковка + 6 театров (вкл. Большой без цены) + МКЗ Зарядье + ММОМА + ГЭС-2 (20 packs). Консерватория - нет slug, не выдумывали.
+- Reviews placeholder убран. `secondaryEvents` из Lovable не переносили. `programHref` для pier (`#location-routes`) / park (`#venue-stop-events`).
+- `data-venue-cta-kind` на sticky для Metrika baseline до/после.
+- Один VenueDetailPage + TYPE experience profile; без fork MuseumPDP.
+- Пустые блоки: `#center` только при `hasVenueCommercialCenter`; FAQ/visit - length-гейты.
+
+### Проблемы
+- Конверсия CTA до/после - baseline Metrika на 10 URL (owner) до live deploy.
+- Smoke ≥10 карточек museum/theater/pier/park + OG/JSON-LD - после локального preview / batch deploy.
+- Волна 2: VenueRulesInformer / VisitPlanner / FaqAccordion - не стартовать, пока не подтвердим Wave 1.
+
+---
+
 ## 2026-09-23 - Places/PDP: TouristAttraction JSON-LD
 
 ### Наблюдения
@@ -11,9 +37,9 @@
 - Venue JSON-LD + breadcrumbs + city hub ItemList → `venueCanonicalPath` (wrong-family stored path игнорируется).
 
 ### Проблемы
-- UI-полировка LocationCard/dinner/scrim/wheel на live только после web deploy batch.
-- Live pier ещё `EventVenue` - tip `e4c79fdc` не в web artifact.
-- Rich Results Test / LCP mobile - после deploy.
+- ~~UI-полировка / TA JSON-LD на live~~ → Deploy MSK web [`35873140709`](https://github.com/Twisterrrrr/daibilet/actions/runs/35873140709) SHA `0175a019` (уже был success до «выкатывай»; повторный run не нужен).
+- Live smoke 2026-09-23: `/places?family=*` 200; `/venues`/`/locations` → 308 `/places?family=*`; mismatch `/venues/{loc}` → 308 `/locations/{slug}`; og:title/image на PDP.
+- Rich Results Test / LCP mobile - ручная проверка owner.
 - Live Isaakiy family vs audit - DB, вне зоны.
 
 ---

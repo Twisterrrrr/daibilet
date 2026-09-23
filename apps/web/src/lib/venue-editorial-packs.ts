@@ -107,6 +107,11 @@ export const VENUE_EDITORIAL_PACKS: Record<string, VenueEditorialContent> = {
       'Вход со стороны улицы Волхонка через кованые ворота, ориентир - парадная лестница с колоннадой.',
     visitTips:
       'Билеты на временные выставки и в Галерею искусства стран Европы и Америки обычно открывают продажи заранее - проверяйте старт продаж в афише и бронируйте слот онлайн.',
+    tickets: {
+      priceFromRub: 700,
+      href: 'https://pushkinmuseum.art/tickets/',
+      badge: 'Официальный сайт',
+    },
     faq: [
       {
         question: 'Можно ли по одному билету посетить Главное здание и Галерею импрессионистов?',
@@ -174,6 +179,11 @@ export const VENUE_EDITORIAL_PACKS: Record<string, VenueEditorialContent> = {
       'На территории Парка Горького у Пионерского пруда: вход через раздвижные стеклянные двери фасада.',
     visitTips:
       'В дни смены экспозиций залы могут быть закрыты на монтаж. Перед бронированием сверяйте статус проектов в афише.',
+    tickets: {
+      priceFromRub: 600,
+      href: 'https://garagemca.org/visit',
+      badge: 'Официальный сайт',
+    },
     faq: [
       {
         question: 'Можно ли зайти внутрь здания без билета?',
@@ -241,6 +251,11 @@ export const VENUE_EDITORIAL_PACKS: Record<string, VenueEditorialContent> = {
       'Вход со стороны Садового кольца и парка Музеон, ориентир - ступенчатый светлый фасад с широкой лестницей.',
     visitTips:
       'Чтобы меньше пересекаться с группами у Малевича и Шагала, удобны вечерние часы в дни продленной работы залов - сверяйте график в афише.',
+    tickets: {
+      priceFromRub: 550,
+      href: 'https://www.tretyakovgallery.ru/tickets/',
+      badge: 'Официальный сайт',
+    },
     faq: [
       {
         question: 'Чем Новая Третьяковка отличается от здания в Лаврушинском переулке?',
@@ -766,5 +781,114 @@ export const VENUE_EDITORIAL_PACKS: Record<string, VenueEditorialContent> = {
         ].join('\n\n'),
       },
     ],
+  },
+
+  /** Tickets-only overlays for theater / hall / gallery commercial-center smoke (Wave 1). */
+  'moscow-mht-im-chehova': {
+    highlights: [],
+    features: [],
+    faq: [],
+    website: 'https://mxat.ru',
+    websiteLabel: 'Официальный сайт',
+    tickets: {
+      priceFromRub: 800,
+      href: 'https://mxat.ru/',
+      badge: 'Официальный сайт',
+    },
+  },
+  'moscow-lenkom': {
+    highlights: [],
+    features: [],
+    faq: [],
+    website: 'https://lenkom.ru',
+    websiteLabel: 'Официальный сайт',
+    tickets: {
+      priceFromRub: 700,
+      href: 'https://lenkom.ru/',
+      badge: 'Официальный сайт',
+    },
+  },
+  'moscow-sovremennik': {
+    highlights: [],
+    features: [],
+    faq: [],
+    website: 'https://www.sovremennik.ru',
+    websiteLabel: 'Официальный сайт',
+    tickets: {
+      priceFromRub: 700,
+      href: 'https://www.sovremennik.ru/',
+      badge: 'Официальный сайт',
+    },
+  },
+  'moscow-malyy-teatr': {
+    highlights: [],
+    features: [],
+    faq: [],
+    website: 'https://www.maly.ru',
+    websiteLabel: 'Официальный сайт',
+    tickets: {
+      priceFromRub: 600,
+      href: 'https://www.maly.ru/',
+      badge: 'Официальный сайт',
+    },
+  },
+  'moscow-teatr-natsiy': {
+    highlights: [],
+    features: [],
+    faq: [],
+    website: 'https://theatreofnations.ru',
+    websiteLabel: 'Официальный сайт',
+    tickets: {
+      priceFromRub: 800,
+      href: 'https://theatreofnations.ru/',
+      badge: 'Официальный сайт',
+    },
+  },
+  'moscow-bol-shoy-teatr': {
+    highlights: [],
+    features: [],
+    faq: [],
+    website: 'https://bolshoi.ru',
+    websiteLabel: 'Официальный сайт',
+    tickets: {
+      href: 'https://bolshoi.ru/timetable/',
+      badge: 'Официальный сайт',
+    },
+  },
+  'moscow-mkz-zaryade': {
+    highlights: [],
+    features: [],
+    faq: [],
+    website: 'https://zaryadyehall.com',
+    websiteLabel: 'Официальный сайт',
+    tickets: {
+      priceFromRub: 900,
+      href: 'https://zaryadyehall.com/',
+      badge: 'Официальный сайт',
+    },
+  },
+  'moscow-mmoma': {
+    highlights: [],
+    features: [],
+    faq: [],
+    website: 'https://mmoma.ru',
+    websiteLabel: 'Официальный сайт',
+    tickets: {
+      priceFromRub: 500,
+      href: 'https://mmoma.ru/',
+      badge: 'Официальный сайт',
+    },
+  },
+  'moscow-red-ges-2': {
+    highlights: [],
+    features: [],
+    faq: [],
+    website: 'https://ges-2.org',
+    websiteLabel: 'Официальный сайт',
+    tickets: {
+      priceFromRub: 400,
+      href: 'https://ges-2.org/tickets',
+      badge: 'Официальный сайт',
+    },
   },
 };

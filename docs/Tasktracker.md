@@ -1,13 +1,24 @@
+## 2026-09-23 - PDP commercial center (Wave 1)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| UX.PDP-CTA-RESOLVER | resolveVenuePrimaryCta: LC → afisha → editorial.tickets → #visit; priceFromRub optional | Критический | ✅ local |
+| UX.PDP-STICKY-CASHIER | VenueStickyCashier desktop+mobile; один sticky вместо AddToDay; data-venue-cta-kind | Критический | ✅ local |
+| UX.PDP-CENTER-ORDER | #center XOR после hero; VenueProgramBlock sibling; park stop-events up; без reviews | Критический | ✅ local |
+| CONT.PDP-EDITORIAL-TICKETS | tickets в 10+ packs (музеи/театры/зал/галерея; Большой без цены) | Высокий | ✅ local (20 packs) |
+| QA.PDP-CTA-SMOKE | Smoke ≥10 museum/theater/pier/park + OG/JSON-LD; Metrika baseline до deploy | Высокий | ⏳ после preview |
+| UX.PDP-WAVE-2 | RulesInformer / VisitPlanner / FaqAccordion | Средний | ⏳ после Wave 1 метрики |
+
 ## 2026-09-23 - Places/PDP UX + visual tails
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| UX.PLACES-PDP-LAYOUT | InstitutionVenueLayout / LocationVenueLayout via venueTemplate; один LocationCard | Высокий | ✅ local; deploy по запросу |
-| UX.DINNER-SHIP-SECONDARY | Dinner-boat: название прогулки primary, теплоход secondary; меню-фильтры только при выборе | Высокий | ✅ local |
-| FIX.CITY-SCRIM-FULL | CityCard scrim - полноширинный gradient, не овал | Средний | ✅ local |
-| FIX.SCROLLRAIL-WHEEL | Vertical wheel → page scroll на горизонтальных rail | Высокий | ✅ local |
-| SEO.VENUE-TA-JSONLD | Location PDP: TouristAttraction+Place (institution: EventVenue+Place) | Высокий | ✅ code; 🔄 live после web deploy |
-| SEO.VENUE-JSONLD-CANON | Place/Event JSON-LD url через venueCanonicalPath (не naive canonicalPath\|\|href) | Высокий | ✅ local uncommitted |
+| UX.PLACES-PDP-LAYOUT | InstitutionVenueLayout / LocationVenueLayout via venueTemplate; один LocationCard | Высокий | ✅ live Deploy [35873140709](https://github.com/Twisterrrrr/daibilet/actions/runs/35873140709) `0175a019` |
+| UX.DINNER-SHIP-SECONDARY | Dinner-boat: название прогулки primary, теплоход secondary; меню-фильтры только при выборе | Высокий | ✅ live `0175a019` |
+| FIX.CITY-SCRIM-FULL | CityCard scrim - полноширинный gradient, не овал | Средний | ✅ live `0175a019` |
+| FIX.SCROLLRAIL-WHEEL | Vertical wheel → page scroll на горизонтальных rail | Высокий | ✅ live `0175a019` |
+| SEO.VENUE-TA-JSONLD | Location PDP: TouristAttraction+Place (institution: EventVenue+Place) | Высокий | ✅ live Deploy [35873140709](https://github.com/Twisterrrrr/daibilet/actions/runs/35873140709) `0175a019` |
+| SEO.VENUE-JSONLD-CANON | Place/Event JSON-LD url через venueCanonicalPath (не naive canonicalPath\|\|href) | Высокий | ✅ live `0175a019` |
 
 ## 2026-09-23 - Когда ехать UX (tabs A) + FAQ/blog layout
 
