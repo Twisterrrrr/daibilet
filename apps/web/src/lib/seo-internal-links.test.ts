@@ -128,7 +128,19 @@ describe('structured-data landing/event', () => {
     assert.equal(blocks[1]['@type'], 'BreadcrumbList');
     const crumbNames = ((blocks[1] as any).itemListElement || []).map((item: any) => item.name);
     assert.deepEqual(crumbNames, ['Главная', 'Санкт-Петербург', 'Музеи', 'Эрмитаж']);
-    assert.equal(blocks[2]['@type'], 'FAQPage');
+    assert.ok(!blocks.some((block) => block['@type'] === 'FAQPage'));
+  });
+
+  it('does not mark generic venue FAQ that the PDP does not display', () => {
+    const blocks = buildVenuePageJsonLd({
+      ok: true,
+      venue: {
+        id: 'v-generic', slug: 'unlisted-venue', name: 'Площадка', city: 'Москва',
+        citySlug: 'moskva', type: 'theater', events: 0, categories: {},
+      },
+      sessions: [], relatedVenues: [], stats: { events: 0, categories: 0 },
+    } as any);
+    assert.ok(!blocks.some((block) => block['@type'] === 'FAQPage'));
   });
 
   it('location venue breadcrumbs are city-first with type plural', () => {

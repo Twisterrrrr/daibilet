@@ -24,6 +24,7 @@ import { isEventsCatalogSitemapEligibleUrl } from '@/lib/events-catalog-indexing
 import { evaluateListingIndexability, MIN_LISTING_OFFERS_FOR_INDEX } from '@/lib/seo-listing-meta';
 import { buildPodborkiCityCanonicalPath, isPodborkiSeoPilotCitySlug, PODBORKI_SEO_PILOT_CITY_SLUGS } from '@/lib/podborki-city-seo';
 import { venueHref } from '@/lib/routes';
+import { cityPlacesCatalogHref } from '@/lib/catalog-url';
 import { getCachedCatalog } from '@/server/cached-catalog-data';
 import { getCachedDestinations } from '@/server/cached-public-surfaces';
 import { parseCatalogPageQuery } from '@/server/catalog-query';
@@ -212,9 +213,12 @@ export async function buildCitiesSitemapEntries(now = new Date()): Promise<Sitem
       }
       return false;
     })
-    .map((destination) =>
+    .flatMap((destination) => [
       entry(`/cities/${encodeURIComponent(String(destination.slug))}`, now, 'daily', destination.type === 'region' ? 0.7 : 0.75),
-    );
+      ...(destination.type === 'city' && destination.venues > 0
+        ? [entry(cityPlacesCatalogHref(String(destination.slug)), now, 'daily', 0.65)]
+        : []),
+    ]);
 }
 
 export async function buildVenuesSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {

@@ -15,6 +15,7 @@ const checks = [
   ['/podborki/c/moskva', (html) => schemaLinksVisible(html, 'CollectionPage'), 'city collection links missing from HTML'],
   ['/cities', (html) => count(html, /href="\/cities\/[^"?#]+/g) >= 15, 'city links missing from HTML'],
   ['/cities/moskva', (html) => count(html, /href="\/events\/[^"?#]+/g) > 0, 'city events missing from HTML'],
+  ['/places/c/moskva', (html) => html.includes('data-city-places-catalog') && schemaLinksVisible(html, 'ItemList'), 'city places catalog or ItemList missing from HTML'],
   ['/cities/moskovskaya-oblast', (html) => faqIsVisible(html), 'regional FAQ missing from HTML'],
   ['/vystavki-i-muzei', (html) => faqIsVisible(html), 'landing FAQ missing from HTML or JSON-LD'],
   ['/places', (html) => count(html, /href="\/(?:venues|locations)\/[^"?#]+/g) >= 12, 'places missing from HTML'],
@@ -40,7 +41,7 @@ function schemaLinksVisible(html, type) {
   const structured = scripts.map((match) => {
     try { return JSON.parse(match[1]); } catch { return null; }
   }).find((item) => item?.['@type'] === type);
-  const entries = structured?.mainEntity?.itemListElement;
+  const entries = structured?.itemListElement || structured?.mainEntity?.itemListElement;
   if (!Array.isArray(entries) || entries.length === 0) return false;
   const hrefs = new Set([...html.matchAll(/<a\b[^>]*\bhref="([^"]+)"/g)]
     .map((match) => new URL(match[1], base).pathname));

@@ -33,7 +33,7 @@ import { MustSeeFilterTabs } from '@/components/MustSeeFilterTabs.client';
 import { ScrollRail } from '@/components/ScrollRail.client';
 import { SuburbsCarousel } from '@/components/SuburbsCarousel.client';
 import { formatStreetAddress } from '@/lib/address';
-import { placesHubHrefWithSelectedCity } from '@/lib/catalog-url';
+import { cityPlacesCatalogHref } from '@/lib/catalog-url';
 import { formatNumber, formatPriceFrom, pluralEvents, pluralVenues } from '@/lib/format';
 import { formatPublicTitle } from '@/lib/format-public-title';
 import { visibleCityFaqItems, type CityFaqItem } from '@/lib/city-faq';
@@ -612,6 +612,7 @@ export function CityPageView({
                   <VenueHighlights
                     city={city}
                     venues={payload.venues}
+                    totalVenues={payload.stats?.venues || payload.venues.length}
                     topN={hubConfig?.venuesTopN}
                     editorial={editorial}
                     nested
@@ -1816,12 +1817,14 @@ function CitySightsMustSeeList({
 function VenueHighlights({
   city,
   venues,
+  totalVenues,
   topN = 6,
   editorial = false,
   nested = false,
 }: {
   city: PublicCityDto;
   venues: PublicVenueDto[];
+  totalVenues?: number;
   topN?: number;
   editorial?: boolean;
   nested?: boolean;
@@ -1852,7 +1855,7 @@ function VenueHighlights({
             Площадки и локации
           </h3>
           <p className={`mt-2 max-w-3xl text-base leading-7 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>
-            Музеи, театры, причалы и точки старта экскурсий {cityIn}.
+            Музеи, театры, причалы и точки старта экскурсий {cityIn}. Показано {featured.length} из {Math.max(featured.length, totalVenues || venues.length)} мест.
           </p>
         </div>
         <div className={`flex flex-wrap gap-3 text-sm font-semibold ${editorial ? 'text-zinc-800' : ''}`}>
@@ -1868,7 +1871,7 @@ function VenueHighlights({
           </a>
           {venues.length ? (
             <a
-              href={placesHubHrefWithSelectedCity(undefined, citySlug)}
+              href={cityPlacesCatalogHref(citySlug || city.slug)}
               className={editorial ? 'hover:underline' : 'text-primary-700 hover:text-primary-800'}
             >
               Все места →

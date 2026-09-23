@@ -129,9 +129,27 @@ describe('catalog listing JSON-LD', () => {
 
     const city = blocks.find((block) => block['@type'] === 'City')!;
     assert.equal((city.containedInPlace as Record<string, unknown>)['@type'], 'Country');
-    const list = blocks.find((block) => block['@type'] === 'ItemList')!;
+    const list = blocks.find((block) => block['@type'] === 'ItemList' && block.name === 'Места и площадки: Москва')!;
+    assert.equal(list.url, 'https://daibilet.ru/places/c/moscow');
+    assert.equal(list.numberOfItems, 1);
     const item = (list.itemListElement as Array<Record<string, any>>)[0]!;
     assert.equal(item.item['@type'], 'Place');
     assert.equal(item.item.address.addressLocality, 'Москва');
+  });
+
+  it('marks only the venues shown in the city hub selection', () => {
+    const blocks = buildCityPageJsonLd({
+      city: { id: 'c1', slug: 'moscow', name: 'Москва', type: 'city', events: 10, venues: 20, categories: {} },
+      sessions: [],
+      venues: Array.from({ length: 20 }, (_, index) => ({
+        id: `v${index}`, slug: `venue-${index}`, name: `Место ${index}`,
+        city: 'Москва', type: 'museum', events: 1, categories: {},
+      })),
+      landings: [],
+      stats: { events: 10, venues: 20, categories: 1 },
+    } as any);
+    const list = blocks.find((block) => block['@type'] === 'ItemList' && block.name === 'Места и площадки: Москва')!;
+    assert.equal(list.numberOfItems, 12);
+    assert.equal((list.itemListElement as unknown[]).length, 12);
   });
 });
