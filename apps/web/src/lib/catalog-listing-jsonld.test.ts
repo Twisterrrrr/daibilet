@@ -98,6 +98,19 @@ describe('catalog listing JSON-LD', () => {
     );
   });
 
+  it('uses the next future session for Event markup when older sessions remain in the API response', () => {
+    const block = buildEventJsonLd({
+      event: { id: 'e1', slug: 'concert-1', title: 'Концерт', city: 'Москва', tags: [] },
+      sessions: [
+        { id: 'past', startsAt: '2000-01-01T19:00:00Z', endsAt: '2000-01-01T21:00:00Z' },
+        { id: 'later', startsAt: '2099-01-02T19:00:00Z', endsAt: '2099-01-02T21:00:00Z' },
+        { id: 'next', startsAt: '2099-01-01T19:00:00Z', endsAt: '2099-01-01T21:00:00Z' },
+      ],
+      offers: [], related: [], landings: [], stats: {},
+    } as any);
+    assert.equal(block.startDate, '2099-01-01T19:00:00Z');
+  });
+
   it('describes a city and its places with structured context', () => {
     const blocks = buildCityPageJsonLd({
       city: {

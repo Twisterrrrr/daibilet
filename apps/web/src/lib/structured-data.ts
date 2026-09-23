@@ -218,30 +218,24 @@ function pickEventSchedule(payload: PublicEventPageDto): {
   startDate?: string;
   endDate?: string;
 } {
-  const sessions = payload.sessions ?? [];
-  const dated = sessions.find(
-    (session) =>
-      session.startsAt &&
-      !isFlexibleScheduleSession(session) &&
-      !Number.isNaN(Date.parse(session.startsAt)),
+  const now = Date.now();
+  const dated = (payload.sessions ?? [])
+    .filter((session) => session.startsAt && !Number.isNaN(Date.parse(session.startsAt)))
+    .sort((left, right) => Date.parse(left.startsAt!) - Date.parse(right.startsAt!));
+  const future = dated.filter((session) => Date.parse(session.startsAt!) >= now);
+  const ongoing = dated.filter((session) =>
+    session.endsAt && !Number.isNaN(Date.parse(session.endsAt)) && Date.parse(session.endsAt) > now,
   );
-  if (dated?.startsAt) {
-    return {
-      startDate: dated.startsAt,
-      endDate: dated.endsAt && !Number.isNaN(Date.parse(dated.endsAt)) ? dated.endsAt : undefined,
-    };
-  }
-
-  const anyDated = sessions.find((session) => session.startsAt && !Number.isNaN(Date.parse(session.startsAt)));
-  return anyDated?.startsAt
-    ? {
-        startDate: anyDated.startsAt,
-        endDate:
-          anyDated.endsAt && !Number.isNaN(Date.parse(anyDated.endsAt))
-            ? anyDated.endsAt
-            : undefined,
-      }
-    : {};
+  const chosen = future.find((session) => !isFlexibleScheduleSession(session))
+    || future[0]
+    || ongoing.find((session) => !isFlexibleScheduleSession(session))
+    || ongoing[0]
+    || dated.find((session) => !isFlexibleScheduleSession(session))
+    || dated[0];
+  return chosen?.startsAt ? {
+    startDate: chosen.startsAt,
+    endDate: chosen.endsAt && !Number.isNaN(Date.parse(chosen.endsAt)) ? chosen.endsAt : undefined,
+  } : {};
 }
 
 function resolveOfferPrice(payload: PublicEventPageDto): number | null {
