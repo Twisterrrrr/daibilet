@@ -4,6 +4,7 @@ import * as React from 'react';
 
 import {
   extractTcEventIdFromSession,
+  isStartedTcSession,
   type TcPurchaseTarget,
 } from '@/lib/event-purchase';
 import {
@@ -402,6 +403,7 @@ export function TcSessionSlot({
         type="button"
         className="tc-session-slot relative z-[2] flex w-full items-center justify-between rounded-lg bg-slate-50 px-3 py-2.5 text-left transition hover:bg-slate-100 active:scale-[0.99]"
         onClick={() => {
+          if (isStartedTcSession({ ...session, purchaseProvider: 'TICKETSCLOUD' })) return;
           void runTcPurchaseFlow({
             trigger: hiddenTriggerRef.current,
             purchaseUrl: session.purchaseUrl,
