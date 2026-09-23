@@ -22,8 +22,9 @@ describe('seo-internal-links', () => {
     const mskOnly = getFooterPopularDirections('moscow');
     assert.equal(mskOnly.length, 1);
     assert.equal(mskOnly[0]?.citySlug, 'moscow');
+    // Non-MSK/SPB: keep national MSK+SPB rails (same as empty preference).
     const otherCity = getFooterPopularDirections('kaliningrad');
-    assert.equal(otherCity.length, 0);
+    assert.equal(otherCity.length, 2);
     const national = getFooterPopularDirections();
     assert.equal(national.length, 2);
   });
@@ -120,7 +121,7 @@ describe('structured-data landing/event', () => {
       relatedVenues: [],
       stats: { events: 12, categories: 1 },
     } as any);
-    assert.ok(blocks.length >= 3);
+    assert.ok(blocks.length >= 2);
     assert.deepEqual(blocks[0]['@type'], ['EventVenue', 'Place']);
     assert.equal(blocks[0].url, 'https://daibilet.ru/venues/ermitage');
     assert.equal((blocks[0].address as any).streetAddress, 'Дворцовая наб., 34');
@@ -129,6 +130,27 @@ describe('structured-data landing/event', () => {
     const crumbNames = ((blocks[1] as any).itemListElement || []).map((item: any) => item.name);
     assert.deepEqual(crumbNames, ['Главная', 'Санкт-Петербург', 'Музеи', 'Эрмитаж']);
     assert.ok(!blocks.some((block) => block['@type'] === 'FAQPage'));
+  });
+
+  it('location venue Place JSON-LD uses TouristAttraction', () => {
+    const blocks = buildVenuePageJsonLd({
+      ok: true,
+      venue: {
+        id: 'v-park',
+        slug: 'park-test',
+        name: 'Парк Тест',
+        city: 'Москва',
+        citySlug: 'moskva',
+        type: 'park',
+        events: 0,
+        categories: {},
+      },
+      sessions: [],
+      relatedVenues: [],
+      stats: { events: 0, categories: 0 },
+    } as any);
+    assert.deepEqual(blocks[0]['@type'], ['TouristAttraction', 'Place']);
+    assert.equal(blocks[0].url, 'https://daibilet.ru/locations/park-test');
   });
 
   it('does not mark generic venue FAQ that the PDP does not display', () => {
@@ -160,7 +182,7 @@ describe('structured-data landing/event', () => {
       relatedVenues: [],
       stats: { events: 5, categories: 1 },
     } as any);
-    assert.deepEqual(blocks[0]['@type'], ['EventVenue', 'Place']);
+    assert.deepEqual(blocks[0]['@type'], ['TouristAttraction', 'Place']);
     assert.equal(blocks[0].url, 'https://daibilet.ru/locations/prichal-admiralteyskaya');
     const crumbNames = ((blocks[1] as any).itemListElement || []).map((item: any) => item.name);
     assert.deepEqual(crumbNames, ['Главная', 'Санкт-Петербург', 'Причалы', 'Причал Адмиралтейская']);
@@ -250,7 +272,7 @@ describe('structured-data landing/event', () => {
     assert.equal(crumbs[2].item, 'https://daibilet.ru/places?type=museum&city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0');
   });
 
-  it('art space breadcrumbs use Арт-пространства and ?type=art_space', () => {
+  it('art space breadcrumbs use Галереи and ?type=art_space', () => {
     const blocks = buildVenuePageJsonLd({
       ok: true,
       venue: {
@@ -271,7 +293,7 @@ describe('structured-data landing/event', () => {
     const crumbs = (blocks[1] as any).itemListElement || [];
     assert.deepEqual(
       crumbs.map((item: any) => item.name),
-      ['Главная', 'Москва', 'Арт-пространства', 'Галерея Ильи Глазунова'],
+      ['Главная', 'Москва', 'Галереи', 'Галерея Ильи Глазунова'],
     );
     assert.equal(crumbs[2].item, 'https://daibilet.ru/places?type=art_space&city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0');
   });

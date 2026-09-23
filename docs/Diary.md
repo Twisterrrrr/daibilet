@@ -1,3 +1,20 @@
+## 2026-09-23 - Places/PDP: TouristAttraction JSON-LD
+
+### Наблюдения
+- Референс dbshablon и UX-хвосты уже в `21d79af9` (единый LocationCard, layouts via venueTemplate, scrim/wheel/dinner).
+- Live smoke: `/venues` `/locations` → 308 на `/places?family=*`; mismatch family → 308 на канон; og:title/desc/image + Place на 6 PDP.
+- Location Place был `@type: [EventVenue, Place]` - для парков/храмов/гастро слабее, чем TouristAttraction.
+
+### Решения
+- `buildVenuePlaceJsonLd`: institution → EventVenue+Place; location → TouristAttraction+Place (`venuePageTemplate`).
+
+### Проблемы
+- UI-полировка LocationCard/dinner/scrim/wheel на live только после web deploy batch.
+- Rich Results Test / LCP mobile - после deploy.
+- Live Isaakiy family vs audit - DB, вне зоны.
+
+---
+
 ## 2026-09-23 - Places/PDP redesign + visual tails
 
 ### Наблюдения

@@ -570,17 +570,24 @@ export function buildVenueBreadcrumbs(payload: PublicVenuePageDto): StructuredBr
   return crumbs;
 }
 
-/** Schema.org EventVenue / Place (+ GeoCoordinates) для страницы площадки / локации. */
+/**
+ * Schema.org Place for venue PDP (+ GeoCoordinates).
+ * Institution → EventVenue+Place (ticketed indoor). Location → TouristAttraction+Place.
+ */
 export function buildVenuePlaceJsonLd(payload: PublicVenuePageDto): Record<string, unknown> {
   const venue = payload.venue;
   const path = venue.canonicalPath || venueHref(venue);
   const canonical = toAbsoluteUrl(path);
   const image = venue.heroImageUrl ? toAbsoluteUrl(venue.heroImageUrl) : undefined;
   const description = venue.seoDescription || venue.shortDescription || venue.description || undefined;
+  const isLocation = venuePageTemplate(venue.type) === 'location';
+  const placeTypes = isLocation
+    ? (['TouristAttraction', 'Place'] as const)
+    : (['EventVenue', 'Place'] as const);
 
   const block: Record<string, unknown> = {
     '@context': 'https://schema.org',
-    '@type': ['EventVenue', 'Place'],
+    '@type': [...placeTypes],
     name: venue.seoH1 || venue.title || venue.name,
     description,
     url: canonical,
@@ -662,7 +669,7 @@ export function buildVenueEventListJsonLd(
   };
 }
 
-/** SSR blocks для venue/location: EventVenue, FAQ, upcoming Events, BreadcrumbList. */
+/** SSR blocks для venue/location: Place (+ EventVenue|TouristAttraction), FAQ, Events, Breadcrumbs. */
 export function buildVenuePageJsonLd(payload: PublicVenuePageDto): Array<Record<string, unknown>> {
   const blocks: Array<Record<string, unknown>> = [
     buildVenuePlaceJsonLd(payload),
