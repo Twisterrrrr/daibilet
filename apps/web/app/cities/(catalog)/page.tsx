@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { Suspense } from 'react';
 
 import { CitiesIndexChrome } from '@/components/CitiesIndexChrome.client';
@@ -6,6 +7,7 @@ import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
 import { INDEX_FOLLOW_ROBOTS, canonicalHref } from '@/lib/seo-meta';
 import { withSoftTimeout } from '@/lib/soft-timeout';
+import { cityHref } from '@/lib/routes';
 import { getCachedDestinations } from '@/server/cached-public-surfaces';
 
 const CITIES_HUB_DESCRIPTION =
@@ -41,10 +43,18 @@ export default async function CitiesIndexPage() {
     <SiteLayout>
       <Suspense
         fallback={
-          <div className="container-page py-16">
-            <div className="h-10 w-64 animate-pulse rounded-xl bg-slate-100" />
-            <div className="mt-6 h-48 animate-pulse rounded-2xl bg-slate-100" />
-          </div>
+          <main className="container-page py-12" data-ssr-cities-catalog>
+            <h1 className="font-display text-3xl font-bold text-slate-950">Города России</h1>
+            <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {destinations.filter((item) => item.type === 'city').map((city) => (
+                <li key={city.slug || city.name}>
+                  <Link href={cityHref(city)} className="block rounded-xl border border-slate-200 bg-white p-4 font-semibold text-slate-900 hover:border-slate-300">
+                    {city.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </main>
         }
       >
         <CitiesIndexChrome destinations={destinations} />

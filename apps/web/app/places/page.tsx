@@ -155,7 +155,7 @@ export default async function PlacesIndexPage({ searchParams }: PageProps) {
 
   return (
     <SiteLayout>
-      <Suspense fallback={<PlacesHubSsrFallback page={initialPage} />}>
+      <Suspense fallback={<PlacesHubSsrFallback page={initialPage} family={family || 'all'} />}>
         <PlacesHubView initialPage={initialPage} initialQueryKey={initialQueryKey} />
       </Suspense>
     </SiteLayout>

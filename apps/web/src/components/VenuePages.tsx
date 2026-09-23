@@ -6,7 +6,7 @@ import { Suspense } from 'react';
 import { LocationsCatalogView } from '@/components/LocationsCatalogView.client';
 import { VenuesCatalogView } from '@/components/VenuesCatalogView.client';
 import { VenuePageView } from '@/components/VenuePageView.client';
-import { VenueCatalogPageSkeleton } from '@/components/VenueCatalogSkeletons';
+import { PlacesHubSsrFallback } from '@/components/PlacesHubSsrFallback';
 import { JsonLdScripts } from '@/components/JsonLdScripts';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
@@ -221,11 +221,11 @@ export async function VenueListPage({ family }: Pick<PageProps, 'family'>) {
   return (
     <SiteLayout>
       {family === 'location' ? (
-        <Suspense fallback={<VenueCatalogPageSkeleton family="location" />}>
+        <Suspense fallback={<PlacesHubSsrFallback page={initialPage} family="location" />}>
           <LocationsCatalogView initialPage={initialPage} initialQueryKey={initialQueryKey} />
         </Suspense>
       ) : (
-        <Suspense fallback={<VenueCatalogPageSkeleton family="institution" />}>
+        <Suspense fallback={<PlacesHubSsrFallback page={initialPage} family="institution" />}>
           <VenuesCatalogView initialPage={initialPage} initialQueryKey={initialQueryKey} />
         </Suspense>
       )}

@@ -5,12 +5,20 @@ import type { VenueCatalogFeedPage } from '@/lib/venue-catalog-feed';
 import { venueHref } from '@/lib/routes';
 
 /** Search-param controls may client-render; keep the first venue page crawlable. */
-export function PlacesHubSsrFallback({ page }: { page: VenueCatalogFeedPage }) {
-  if (!page.venues.length) return <VenueCatalogPageSkeleton family="institution" />;
+export function PlacesHubSsrFallback({
+  page,
+  family = 'institution',
+}: {
+  page: VenueCatalogFeedPage;
+  family?: 'institution' | 'location' | 'all';
+}) {
+  if (!page.venues.length) return <VenueCatalogPageSkeleton family={family === 'location' ? 'location' : 'institution'} />;
+
+  const title = family === 'location' ? 'Локации' : family === 'institution' ? 'Площадки' : 'Места';
 
   return (
     <main className="container-page py-8" data-ssr-places-catalog>
-      <h1 className="font-display text-3xl font-bold text-slate-950">Места</h1>
+      <h1 className="font-display text-3xl font-bold text-slate-950">{title}</h1>
       <p className="mt-2 text-sm text-slate-600">Площадки и локации с событиями и маршрутами</p>
       <ul className="catalog-card-grid mt-8">
         {page.venues.map((venue) => (
