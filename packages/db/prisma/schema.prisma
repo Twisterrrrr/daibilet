@@ -595,6 +595,7 @@ model Event {
   reviewRequests  ReviewRequest[]
   override        EventOverride?
   routeItems      EventVenueRouteItem[]
+  descriptionRewrite EventDescriptionRewrite?
 
   @@index([status])
   @@index([purchaseFlow])
@@ -607,6 +608,25 @@ model Event {
 }
 
 /// Route stops / hubs on an excursion. Event.venueId remains the start point.
+model EventDescriptionRewrite {
+  eventId              String   @id
+  originalDescription  String
+  rewrittenDescription String?
+  status               String   @default("pending")
+  attempts             Int      @default(0)
+  model                String?
+  promptVersion        String?
+  usage                Json?
+  costUsd              Decimal? @db.Decimal(14, 8)
+  reviewReasons        Json?
+  error                String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @default(now())
+  event                Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([status, createdAt])
+}
+
 model EventVenueRouteItem {
   id        String        @id @default(cuid())
   eventId   String

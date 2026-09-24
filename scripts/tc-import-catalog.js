@@ -12,6 +12,7 @@ const { normalizeImportEventTitle } = require("./lib/event-title-normalize");
 const { ENTERTAINMENT_DISCO_TAXONOMY, isDiscoOrPartyEvent } = require("./lib/event-taxonomy");
 const { applyVenueAddressCanon } = require("./lib/venue-address-overrides");
 const { deactivateMissingTicketscloudEvents } = require("./lib/tc-deactivate-missing");
+const { enqueueDescriptionRewrite } = require("./lib/event-rewrite-queue");
 
 const requireFromDbPackage = createRequire(path.join(rootDir, "packages", "db", "package.json"));
 const { Pool } = requireFromDbPackage("pg");
@@ -384,6 +385,9 @@ async function importCatalogEvent(client, event, summary) {
       categoryId,
     ],
   );
+
+  // Preserve the first imported source verbatim; do not overwrite editorial copy.
+  await enqueueDescriptionRewrite(client, eventId, event.description);
 
   for (const link of tagLinks) {
     await client.query(
