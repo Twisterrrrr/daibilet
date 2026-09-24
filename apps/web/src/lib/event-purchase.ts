@@ -14,6 +14,7 @@ export type PurchaseSession = {
   eventSourceStatus?: string | null;
   purchaseProvider?: string | null;
   offerSourceCode?: string | null;
+  kind?: string | null;
   startsAt?: string | null;
   dateLabel?: string | null;
   timeLabel?: string | null;
@@ -63,7 +64,22 @@ function isTeplohodPurchaseSession(session: PurchaseSession): boolean {
   );
 }
 
+export function isStartedTcSession(
+  session: PurchaseSession,
+  nowMs = Date.now(),
+  fallbackProvider?: string | null,
+): boolean {
+  const provider = String(session.purchaseProvider || session.offerSourceCode || fallbackProvider || '').toUpperCase();
+  const url = String(session.purchaseUrl || session.widgetUrl || '');
+  if (!provider.includes('TICKETSCLOUD') && provider !== 'TC' && !/ticketscloud/i.test(url)) return false;
+  if (String(session.kind || '').toUpperCase() === 'OPEN_DATE') return false;
+  if (['open_date', 'widget'].includes(String(session.sourceStatus || '').toLowerCase())) return false;
+  const startMs = session.startsAt ? Date.parse(session.startsAt) : NaN;
+  return Number.isFinite(startMs) && startMs < nowMs;
+}
+
 export function isSessionPurchaseBlocked(session: PurchaseSession): boolean {
+  if (isStartedTcSession(session)) return true;
   const statuses = [session.sourceStatus, session.eventSourceStatus].map((value) =>
     String(value || '').toLowerCase(),
   );

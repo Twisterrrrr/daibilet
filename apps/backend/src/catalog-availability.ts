@@ -90,6 +90,18 @@ export function isOpenDateCatalogRow(row: CatalogScheduleRow): boolean {
   return kind === 'OPEN_DATE' || sourceStatus === 'open_date';
 }
 
+/** Ticketscloud may still sell a slot after its advertised start; hide dated starts immediately. */
+export function isStartedTicketcloudSlot(
+  row: CatalogScheduleRow,
+  provider: string | null | undefined,
+  now = new Date(),
+): boolean {
+  if (String(provider || '').toUpperCase() !== 'TICKETSCLOUD') return false;
+  if (isOpenDateCatalogRow(row) || String(row.sourceStatus || '').toLowerCase() === 'widget') return false;
+  const startsAt = row.startsAt ? Date.parse(String(row.startsAt)) : NaN;
+  return Number.isFinite(startsAt) && startsAt < now.getTime();
+}
+
 export function isWideLifetimeSession(
   startsAt?: string | Date | null,
   endsAt?: string | Date | null,
