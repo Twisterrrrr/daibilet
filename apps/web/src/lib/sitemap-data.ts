@@ -23,7 +23,7 @@ import { hasSeoListingEditorial } from '@/data/seo-listing-texts';
 import { isEventsCatalogSitemapEligibleUrl } from '@/lib/events-catalog-indexing';
 import { evaluateListingIndexability, MIN_LISTING_OFFERS_FOR_INDEX } from '@/lib/seo-listing-meta';
 import { buildPodborkiCityCanonicalPath, isPodborkiSeoPilotCitySlug, PODBORKI_SEO_PILOT_CITY_SLUGS } from '@/lib/podborki-city-seo';
-import { venueHref } from '@/lib/routes';
+import { venueSitemapEntry } from '@/lib/venue-sitemap-entry';
 import { cityPlacesCatalogHref } from '@/lib/catalog-url';
 import { getCachedCatalog } from '@/server/cached-catalog-data';
 import { getCachedDestinations } from '@/server/cached-public-surfaces';
@@ -232,17 +232,7 @@ export async function buildVenuesSitemapEntries(now = new Date()): Promise<Sitem
       }).indexable;
     })
     .slice(0, MAX_VENUES)
-    .map((venue) => {
-      const path =
-        venue.canonicalPath ||
-        venueHref({
-          id: venue.id,
-          slug: venue.slug,
-          name: venue.name,
-          type: venue.type,
-        });
-      return entry(path, now, 'weekly', 0.6);
-    });
+    .map((venue) => venueSitemapEntry(venue, getSiteUrl(), now));
 }
 
 export async function buildLandingsSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
