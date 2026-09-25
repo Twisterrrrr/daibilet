@@ -1345,22 +1345,6 @@ async function resolvePublicVenueRowByComputedSlug(db, requestedSlug) {
     if (publicVenueSlug(row.slug, row.title, row.id) === normalized) return row;
   }
 
-  // The public hub publishes transliterated slugs for old Cyrillic Venue rows.
-  // Looking at only the 1,200 most recently updated rows below leaves older
-  // published pages in the sitemap that the detail endpoint cannot resolve.
-  // Reuse the same full catalog universe as the list and sitemap, then load the
-  // matching row by ID for the complete detail fields.
-  try {
-    const hubRows = await publicVenueHubRows(db, VENUE_CATALOG_HUB_MAX, { requireEvents: false });
-    const hubMatch = hubRows.find((row) => mapPublicVenueListItem(row).slug === normalized);
-    if (hubMatch) {
-      const result = await db.query(`${PUBLIC_VENUE_ROW_SELECT} where venue.id = $1 limit 1`, [hubMatch.id]);
-      if (result.rows[0]) return result.rows[0];
-    }
-  } catch {
-    // The existing bounded Cyrillic lookup below remains available on a hub failure.
-  }
-
   const cyrillicResult = await db.query(
     `${PUBLIC_VENUE_ROW_SELECT} where venue.slug ~ '[А-Яа-яЁё]' order by venue."updatedAt" desc nulls last limit 1200`,
   );
