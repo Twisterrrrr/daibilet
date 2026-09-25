@@ -5,6 +5,7 @@ import {
   isOpenDateCatalogRow,
   isPublicSalesStatusBlocked,
   isPublicSessionRowOnSale,
+  isStartedTicketcloudSlot,
   isSaleableEventForPublic,
   isSaleableForPublicCatalog,
 } from './catalog-availability.js';
@@ -15,6 +16,15 @@ test('isOpenDateCatalogRow accepts OPEN_DATE kind and open_date status', () => {
   assert.equal(isOpenDateCatalogRow({ kind: 'SINGLE' }), false);
   assert.equal(isOpenDateCatalogRow({ kind: 'RECURRING', sourceStatus: 'PUBLIC' }), false);
   assert.equal(isOpenDateCatalogRow({ kind: 'SERIES', sourceStatus: 'widget' }), false);
+});
+
+test('started Ticketscloud slots are hidden while future and open-date slots remain', () => {
+  const now = new Date('2026-09-23T10:00:00Z');
+  const past = { kind: 'SINGLE', startsAt: '2026-09-23T09:55:00Z' };
+  assert.equal(isStartedTicketcloudSlot(past, 'TICKETSCLOUD', now), true);
+  assert.equal(isStartedTicketcloudSlot(past, 'TEPLOHOD', now), false);
+  assert.equal(isStartedTicketcloudSlot({ ...past, startsAt: '2026-09-23T10:01:00Z' }, 'TICKETSCLOUD', now), false);
+  assert.equal(isStartedTicketcloudSlot({ ...past, kind: 'OPEN_DATE' }, 'TICKETSCLOUD', now), false);
 });
 
 test('hasUpcomingOrOpenSchedule rejects past TEP rows without schedule', () => {
