@@ -47,8 +47,9 @@ export function venueHref(venue: VenueRouteSource): string {
 }
 
 /**
- * Prefer stored canonicalPath only when its route family matches venue type.
- * Mismatched `/locations` vs `/venues` paths caused permanentRedirect loops.
+ * A canonical must be the exact public route. Stored source paths can use the
+ * wrong family or an opaque ID suffix that the public slug resolver removes;
+ * those paths redirect and must not enter metadata or the sitemap.
  */
 export function venueCanonicalPath(
   venue: VenueRouteSource & { canonicalPath?: string | null },
@@ -56,14 +57,7 @@ export function venueCanonicalPath(
   const href = venueHref(venue);
   const stored = String(venue.canonicalPath || '').trim();
   if (!stored) return href;
-  const storedFamily = stored.startsWith('/locations/')
-    ? 'location'
-    : stored.startsWith('/venues/')
-      ? 'institution'
-      : null;
-  if (!storedFamily) return href;
-  if (storedFamily !== venuePageTemplate(venue.type)) return href;
-  return stored.startsWith('/') ? stored : `/${stored}`;
+  return stored === href ? stored : href;
 }
 
 export function venueSlug(venue: VenueRouteSource): string {
