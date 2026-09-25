@@ -218,3 +218,13 @@ jobs:
           done
           curl -fsS -o /dev/null -w "api health %{http_code}\n" https://daibilet.ru/api/health
           bash deploy/scripts/smoke-crawler-prod.sh
+
+      - name: Verify deploy
+        if: ${{ inputs.skip_swap != true }}
+        env:
+          DEPLOY_SHA: ${{ env.DEPLOY_SHA }}
+          DEPLOY_MARKER: ${{ inputs.marker }}
+          MSK_SSH_HOST: ${{ secrets.MSK_SSH_HOST }}
+          MSK_SSH_USER: ${{ secrets.MSK_SSH_USER }}
+          MSK_SSH_KEY_FILE: /home/runner/.ssh/msk_key
+        run: bash .deploy-control/infra/deploy-verify.sh "$DEPLOY_SHA" "$DEPLOY_MARKER"

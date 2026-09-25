@@ -9,13 +9,12 @@ Public home must return HTTP 200; home failure restores the previous build
 and checkout when a previous build exists. A missing optional literal HTML
 marker fails verification without automatic rollback.
 
-Step 4 belongs to Cursor on the other machine: add the post-deploy invocation
+Step 4 (Cursor): done — workflow step `Verify deploy` calls
 `bash .deploy-control/infra/deploy-verify.sh "$DEPLOY_SHA" "$DEPLOY_MARKER"` with
-`DEPLOY_MARKER` populated through step env from `inputs.marker`, and supply
-`MSK_SSH_HOST`, `MSK_SSH_USER`, `MSK_SSH_KEY_FILE: /home/runner/.ssh/msk_key`.
-The workflow's `BUILD_ID` environment value enables exact build comparison.
-Skip verification when `inputs.skip_swap` is true. Do not interpolate marker
-text directly into shell source.
+`DEPLOY_MARKER` from `inputs.marker` via step env (no shell interpolation of the
+input), plus `MSK_SSH_HOST` / `MSK_SSH_USER` / `MSK_SSH_KEY_FILE`. Skipped when
+`inputs.skip_swap` is true. `BUILD_ID` from the job env enables exact build
+comparison.
 
 Use full SHA `13916c0f1ac4ce16a6c9fd0523a5734397140802` for the referenced
 Wave 1 revision. Short examples are intentionally rejected. Forty zeroes
