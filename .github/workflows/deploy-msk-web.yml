@@ -18,13 +18,24 @@ name: Deploy MSK web (CI build + atomic swap)
 # EVENT_SSG_TOP_N=0 skips Prisma event prebuild (no DB tunnel / no DATABASE_URL secret).
 # Soft-fail SSG (home/podborki/landings/withSoftTimeout) is a safety net if API is down.
 
+run-name: "Deploy MSK web | SHA ${{ inputs.sha }} | branch ${{ inputs.expected_ref }}"
+
 on:
   workflow_dispatch:
     inputs:
-      ref:
-        description: "Git ref to deploy (branch or SHA). Default: feat/next-monorepo (MVP monorepo with pnpm-lock.yaml)."
-        required: false
+      sha:
+        description: "Full 40-character commit SHA to deploy"
+        required: true
+        type: string
+      expected_ref:
+        description: "Expected branch containing the commit"
+        required: true
+        type: string
         default: "feat/next-monorepo"
+      marker:
+        description: "Optional literal marker expected in live HTML"
+        type: string
+        required: false
       skip_swap:
         description: "Build artifact only (skip SSH swap)"
         type: boolean
@@ -38,17 +49,44 @@ jobs:
   build-and-swap:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    env:
+      DEPLOY_SHA: ${{ inputs.sha }}
+      EXPECTED_REF: ${{ inputs.expected_ref }}
     steps:
+      - name: Validate input format
+        run: |
+          set -euo pipefail
+          [[ "$DEPLOY_SHA" =~ ^[0-9a-f]{40}$ ]] || { echo "::error::sha must be full 40-character lowercase hex"; exit 1; }
+          git check-ref-format "refs/heads/$EXPECTED_REF"
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.ref || 'feat/next-monorepo' }}
+          ref: ${{ inputs.sha }}
+          fetch-depth: 0
 
-      - name: Resolve deploy SHA
+      - name: Confirm checkout SHA and branch membership
         id: meta
         run: |
+          set -euo pipefail
+          echo "Expected SHA: $DEPLOY_SHA"
+          echo "Actual SHA: $(git rev-parse HEAD)"
+          test "$(git rev-parse HEAD)" = "$DEPLOY_SHA"
+          git fetch origin "+refs/heads/$EXPECTED_REF:refs/remotes/origin/$EXPECTED_REF"
+          git merge-base --is-ancestor "$DEPLOY_SHA" "refs/remotes/origin/$EXPECTED_REF" || { echo "::error::SHA is not in expected branch"; exit 1; }
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
           echo "short=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+
+      # Deployment tooling comes from this workflow revision, even when deploying
+      # an older application SHA that predates these scripts.
+      - name: Checkout deployment tooling
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.workflow_sha }}
+          path: .deploy-control
+          sparse-checkout: |
+            scripts
+            infra
 
       - uses: pnpm/action-setup@v4
         with:
@@ -124,7 +162,12 @@ jobs:
         run: |
           test -f apps/web/.next/BUILD_ID
           test -f apps/web/.next/prerender-manifest.json
-          echo "BUILD_ID=$(cat apps/web/.next/BUILD_ID)"
+          BUILD_ID="$(cat apps/web/.next/BUILD_ID)"
+          test -n "$BUILD_ID"
+          printf '%s\n' "$DEPLOY_SHA" > apps/web/.next/DEPLOY_SHA
+          printf '%s\n' "$BUILD_ID" > /tmp/daibilet-web-build-id
+          echo "BUILD_ID=$BUILD_ID" >> "$GITHUB_ENV"
+          printf '### Built deployment\n- DEPLOY_SHA: %s\n- Expected branch: %s\n- BUILD_ID: %s\n' "$DEPLOY_SHA" "$EXPECTED_REF" "$BUILD_ID" >> "$GITHUB_STEP_SUMMARY"
           rm -rf apps/web/.next/cache
           tar -C apps/web -czf /tmp/daibilet-web-next.tgz .next
           ls -lh /tmp/daibilet-web-next.tgz
@@ -143,6 +186,7 @@ jobs:
           MSK_SSH_USER: ${{ secrets.MSK_SSH_USER }}
           MSK_SSH_KEY: ${{ secrets.MSK_SSH_KEY }}
           DEPLOY_SHA: ${{ steps.meta.outputs.sha }}
+          DEPLOY_MARKER: ${{ inputs.marker }}
         run: |
           set -euo pipefail
           if [[ -z "${MSK_SSH_HOST:-}" || -z "${MSK_SSH_USER:-}" || -z "${MSK_SSH_KEY:-}" ]]; then
@@ -156,14 +200,12 @@ jobs:
           SCP=(scp -i "$HOME/.ssh/msk_key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o BatchMode=yes)
           REMOTE_TGZ="/tmp/daibilet-web-next-${DEPLOY_SHA}.tgz"
           "${SCP[@]}" /tmp/daibilet-web-next.tgz "${MSK_SSH_USER}@${MSK_SSH_HOST}:${REMOTE_TGZ}"
-          # .git/objects may be root-owned after a past root deploy; deploy@ needs write for fetch.
-          "${SSH[@]}" "${MSK_SSH_USER}@${MSK_SSH_HOST}" \
-            "cd /opt/daibilet && \
-             (sudo -n chown -R \"\$(whoami):\$(id -gn)\" .git 2>/dev/null || true) && \
-             git fetch origin feat/next-monorepo && \
-             git checkout feat/next-monorepo && git reset --hard origin/feat/next-monorepo && \
-             ARTIFACT=${REMOTE_TGZ} GIT_SHA=${DEPLOY_SHA} BRANCH=feat/next-monorepo \
-             bash ./deploy/scripts/swap-web-next-artifact.sh && rm -f ${REMOTE_TGZ}"
+          REMOTE_SCRIPT="/tmp/daibilet-deploy-${DEPLOY_SHA}.sh"
+          "${SCP[@]}" .deploy-control/scripts/deploy-msk-web.sh "${MSK_SSH_USER}@${MSK_SSH_HOST}:${REMOTE_SCRIPT}"
+          "${SCP[@]}" /tmp/daibilet-web-build-id "${MSK_SSH_USER}@${MSK_SSH_HOST}:${REMOTE_TGZ}.build-id"
+          printf -v REMOTE_COMMAND 'ARTIFACT=%q EXPECTED_BUILD_ID_FILE=%q DEPLOY_MARKER=%q bash %q %q %q' "$REMOTE_TGZ" "$REMOTE_TGZ.build-id" "$DEPLOY_MARKER" "$REMOTE_SCRIPT" "$DEPLOY_SHA" "$EXPECTED_REF"
+          "${SSH[@]}" "${MSK_SSH_USER}@${MSK_SSH_HOST}" "$REMOTE_COMMAND"
+          echo "Swap succeeded: DEPLOY_SHA=$DEPLOY_SHA BUILD_ID=$BUILD_ID" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Public smoke (prod URL)
         if: ${{ inputs.skip_swap != true }}
