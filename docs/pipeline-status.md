@@ -32,4 +32,11 @@ are valid hex syntax but rejected as a nonexistent commit.
 - Mock SSH/HTTP verification: matching SHA/build/literal marker passes;
   wrong HEAD, wrong BUILD_ID, HTTP 500 and missing marker fail.
 - Production workflow dispatch and live Wave 1 acceptance were not run.
-  Step 4 still needs integration by Cursor before the full end-to-end check.
+- Step 4 integrated on `feat/next-monorepo` @ `8052d742` (CI green:
+  https://github.com/Twisterrrrr/daibilet/actions/runs/36167511215).
+- **STOP before Wave 1 deploy:** no baseline commit in branch
+  (`git log --grep=baseline` empty; `docs/drafts/pdp-wave1-baseline-urls.md`
+  untracked, no Metrika numbers). Await owner baseline commit, then:
+  `gh workflow run deploy-msk-web.yml -f sha=13916c0f1ac4ce16a6c9fd0523a5734397140802 -f expected_ref=feat/next-monorepo`
+  (marker optional — `deploy-verify.sh` greps home HTML; venue-only
+  `data-venue-cta-kind` would false-fail without auto-rollback).
