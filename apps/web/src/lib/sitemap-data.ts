@@ -226,6 +226,7 @@ export async function buildVenuesSitemapEntries(now = new Date()): Promise<Sitem
   // Walk its cursor so later catalog pages enter the sitemap too.
   const entries: SitemapEntry[] = [];
   const seen = new Set<string>();
+  const seenUrls = new Set<string>();
   let cursor: string | null = null;
   for (let page = 0; page < Math.ceil(MAX_VENUES / 2000); page++) {
     const params = new URLSearchParams({ limit: '2000' });
@@ -239,7 +240,12 @@ export async function buildVenuesSitemapEntries(now = new Date()): Promise<Sitem
         events: venue.events,
         isIndexable: venue.isIndexable,
       }).indexable) continue;
-      entries.push(venueSitemapEntry(venue, getSiteUrl(), now));
+      const item = venueSitemapEntry(venue, getSiteUrl(), now);
+      // Different source venues can collapse to the same public slug. One URL
+      // has one routable page, so it must appear only once in the sitemap.
+      if (seenUrls.has(item.url)) continue;
+      seenUrls.add(item.url);
+      entries.push(item);
     }
     if (!payload.hasMore) return entries;
     if (!payload.nextCursor || payload.nextCursor === cursor || !(payload.venues || []).length) {
