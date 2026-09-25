@@ -222,17 +222,32 @@ export async function buildCitiesSitemapEntries(now = new Date()): Promise<Sitem
 }
 
 export async function buildVenuesSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
-  const venuesPayload = await buildPublicVenuesDto(new URLSearchParams(`limit=${MAX_VENUES}`));
-  return (venuesPayload?.venues || [])
-    .filter((venue) => {
-      if (!venue.slug) return false;
-      return evaluateVenueIndexability({
+  // The public venue DTO caps a single dump at 2,000 even when limit=10,000.
+  // Walk its cursor so later catalog pages enter the sitemap too.
+  const entries: SitemapEntry[] = [];
+  const seen = new Set<string>();
+  let cursor: string | null = null;
+  for (let page = 0; page < Math.ceil(MAX_VENUES / 2000); page++) {
+    const params = new URLSearchParams({ limit: '2000' });
+    if (cursor) params.set('cursor', cursor);
+    const payload = await buildPublicVenuesDto(params);
+    if (payload.countsPending) throw new Error('Venue sitemap requires complete event counts');
+    for (const venue of payload.venues || []) {
+      if (!venue.slug || seen.has(venue.id)) continue;
+      seen.add(venue.id);
+      if (!evaluateVenueIndexability({
         events: venue.events,
         isIndexable: venue.isIndexable,
-      }).indexable;
-    })
-    .slice(0, MAX_VENUES)
-    .map((venue) => venueSitemapEntry(venue, getSiteUrl(), now));
+      }).indexable) continue;
+      entries.push(venueSitemapEntry(venue, getSiteUrl(), now));
+    }
+    if (!payload.hasMore) return entries;
+    if (!payload.nextCursor || payload.nextCursor === cursor || !(payload.venues || []).length) {
+      throw new Error('Venue sitemap pagination stalled');
+    }
+    cursor = payload.nextCursor;
+  }
+  throw new Error(`Venue sitemap exceeded ${MAX_VENUES} catalog rows`);
 }
 
 export async function buildLandingsSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
