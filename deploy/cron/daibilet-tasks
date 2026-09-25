@@ -1,0 +1,23 @@
+# /etc/cron.d/daibilet-tasks
+# Install: cp deploy/cron/daibilet-tasks /etc/cron.d/daibilet-tasks && chmod 644 ...
+#          install -m 755 deploy/cron/ssr-healthcheck.sh /opt/daibilet/deploy/cron/ssr-healthcheck.sh
+#          install -m 755 deploy/cron/api-healthcheck.sh /opt/daibilet/deploy/cron/api-healthcheck.sh
+# Canonical MSK ops (INC.504.17 / INC.504.19 / INC.504.20 / INC.504.21 / INC.504.26):
+#   - warm hubs TEMPORARILY OFF (owner exhausted; hang recurrence)
+#   - SSR healthcheck every minute via script (cron bare % truncates inline date/+%Y)
+#   - API healthcheck every minute (event-loop / swap-thrash; /api/health TTFB)
+#   - MUST install -m 755 (INC.504.21: 644 → Permission denied; cron silent)
+#   - Invoke via /bin/bash so missing +x cannot disable recovery again
+# Safe warm kill: pkill -f '[w]arm-hub-pages' (bracket trick; never bare warm-hub-pages).
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# 1. Hub warm — DISABLED INC.504.20 until SSR hang root cause fixed.
+# Was */12 + flock + timeout 90s. Re-enable only after INC.504.15 stable smoke.
+#0 */2 * * * root DAIBILET_WEB_PORT=3001 flock -n /var/lock/daibilet-warm-hubs.lock timeout 90s bash -lc 'cd /opt/daibilet && /usr/bin/node scripts/warm-hub-pages.mjs' >>/var/log/daibilet/warm-hubs.log 2>&1
+
+# 2. SSR healthcheck every minute (script avoids cron % newline trap; flock anti-thrash)
+* * * * * root flock -n /var/lock/daibilet-ssr-health.lock /usr/bin/timeout --kill-after=10s 90s /bin/bash /opt/daibilet/deploy/cron/ssr-healthcheck.sh
+
+# 3. API healthcheck every minute (INC.504.26: hung API while web still 200 from ISR)
+* * * * * root flock -n /var/lock/daibilet-api-health.lock /usr/bin/timeout --kill-after=10s 90s /bin/bash /opt/daibilet/deploy/cron/api-healthcheck.sh

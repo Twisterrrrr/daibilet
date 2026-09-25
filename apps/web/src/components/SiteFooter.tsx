@@ -1,0 +1,287 @@
+'use client';
+
+import Link from 'next/link';
+
+import type { PublicDestinationDto } from '@daibilet/contracts/public';
+import { DaibiletLogo } from '@/components/DaibiletLogo';
+import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
+import { catalogSocialStats } from '@/lib/catalog-social-stats';
+import { formatNumber } from '@/lib/format';
+import { cityHref } from '@/lib/routes';
+import { landingCategoryHref } from '@/lib/landing-routes';
+import { CANONICAL_LANDING_SLUGS } from '@/lib/landing-constants';
+import { getFooterPopularDirections } from '@/lib/seo-internal-links';
+import { catalogCityQueryValue } from '@/lib/selected-city';
+import { buildPodborkiCityHref } from '@/lib/podborki-city-seo';
+
+function normalizeFooterCitySlug(value: string): string {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/_/g, '-');
+}
+const catalogLinkDefs: Array<
+  | { label: string; category: string; landing?: never }
+  | { label: string; landing: string; category?: never }
+> = [
+  { label: 'Экскурсии', category: 'Экскурсии' },
+  { label: 'Музеи и арт', category: 'Музеи и арт' },
+  { label: 'Мероприятия', category: 'Мероприятия' },
+  { label: 'Активный отдых', category: 'Активный отдых' },
+  { label: 'Развлечения', category: 'Развлечения' },
+  { label: 'Речные прогулки', landing: CANONICAL_LANDING_SLUGS.river },
+  { label: 'Автобусные экскурсии', landing: CANONICAL_LANDING_SLUGS.bus },
+];
+
+const companyLinks = [
+  { label: 'О проекте', href: '/about' },
+  { label: 'Реклама и сотрудничество', href: '/partners' },
+  { label: 'Блог', href: '/blog' },
+  { label: 'Контакты', href: '/contacts' },
+  { label: 'Помощь', href: '/help' },
+  { label: 'Места', href: '/places' },
+  { label: 'Подборки', href: '/podborki' },
+  { label: 'Реквизиты', href: '/requisites' },
+  { label: 'Мои покупки', href: '/account/purchases' },
+];
+
+type SiteFooterProps = {
+  destinations: PublicDestinationDto[];
+  variant?: 'default' | 'compact';
+};
+
+function FooterLegalLinks() {
+  return (
+    <div className="flex flex-col gap-2 text-left sm:ml-auto sm:max-w-none sm:text-right lg:pr-28">
+      <div className="flex flex-wrap justify-start gap-x-5 gap-y-1.5 sm:justify-end">
+        <Link href="/privacy#user-agreement" className="text-sm text-graphite-muted hover:text-graphite">
+          Пользовательское соглашение
+        </Link>
+        <Link href="/privacy#privacy-policy" className="text-sm text-graphite-muted hover:text-graphite">
+          Политика конфиденциальности
+        </Link>
+        <Link href="/offer" className="text-sm text-graphite-muted hover:text-graphite">
+          Договор-оферта (для партнёров)
+        </Link>
+      </div>
+      <div className="flex flex-wrap justify-start gap-x-5 gap-y-1.5 sm:justify-end">
+        <Link href="/legal#refunds" className="text-sm text-graphite-muted hover:text-graphite">
+          Правила возврата
+        </Link>
+        <Link href="/legal#rightsholders" className="text-sm text-graphite-muted hover:text-graphite">
+          Правообладателям
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function eventsCategoryHref(category: string, citySlug?: string) {
+  const params = new URLSearchParams();
+  params.set('category', category);
+  if (citySlug) params.set('city', citySlug);
+  return `/events?${params.toString()}`;
+}
+
+function placesHrefWithCity(citySlug?: string) {
+  if (!citySlug) return '/places';
+  return `/places?city=${encodeURIComponent(citySlug)}`;
+}
+
+function podborkiHrefWithCity(citySlug?: string) {
+  if (!citySlug) return '/podborki';
+  return buildPodborkiCityHref(citySlug);
+}
+
+export function SiteFooter({ destinations, variant = 'default' }: SiteFooterProps) {
+  const selectedCity = useSelectedCityOptional();
+  const cityReady = selectedCity?.cityReady ?? true;
+  const citySlug =
+    cityReady && selectedCity && selectedCity.cityValue !== 'all'
+      ? catalogCityQueryValue(destinations, selectedCity.cityValue)
+      : '';
+  const cityName =
+    citySlug && selectedCity
+      ? selectedCity.selectedDestination?.name ||
+        (selectedCity.cityLabel !== 'Все города' ? selectedCity.cityLabel : '')
+      : '';
+
+  if (variant === 'compact') {
+    return (
+      <footer className="border-t border-slate-200/80 bg-surface-muted" data-site-footer="compact">
+        <div className="container-page site-footer-inner py-6 sm:py-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <Link href="/" className="inline-flex" aria-label="Дайбилет">
+                <DaibiletLogo textClassName="text-lg" />
+              </Link>
+              <div className="mt-3 text-sm font-medium text-graphite">
+                <a href="mailto:info@daibilet.ru" className="transition-colors hover:text-primary-600">
+                  info@daibilet.ru
+                </a>
+              </div>
+            </div>
+            <p className="text-sm text-graphite">&copy; {new Date().getFullYear()} Дайбилет</p>
+          </div>
+          <div className="mt-5 border-t border-slate-200/80 pt-5">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-end">
+              <FooterLegalLinks />
+            </div>
+          </div>
+        </div>
+      </footer>
+    );
+  }
+
+  const cities = destinations.filter((item) => item.type === 'city');
+  const cityLinks = (() => {
+    const ranked = [...cities].sort((a, b) => b.events - a.events);
+    const top = ranked.slice(0, 8);
+    const links: Array<{ label: string; href: string }> = top.map((city) => ({
+      label: city.name,
+      href: cityHref(city),
+    }));
+    if (citySlug) {
+      const current =
+        ranked.find(
+          (city) =>
+            city.slug === citySlug ||
+            city.sourceSlug === citySlug ||
+            normalizeFooterCitySlug(city.slug) === normalizeFooterCitySlug(citySlug),
+        ) || null;
+      if (current && !top.some((city) => city.slug === current.slug)) {
+        links.unshift({ label: current.name, href: cityHref(current) });
+        if (links.length > 9) links.pop();
+      } else if (!current && cityName) {
+        links.unshift({
+          label: cityName,
+          href: `/cities/${encodeURIComponent(citySlug)}`,
+        });
+        if (links.length > 9) links.pop();
+      }
+    }
+    links.push({ label: 'Все города', href: '/cities' });
+    return links;
+  })();
+
+  const { events: eventsCount, venues: venuesCount, places: placesCount } =
+    catalogSocialStats(destinations);
+  const catalogStatsLine =
+    eventsCount > 0 || venuesCount > 0 || placesCount > 0
+      ? `${formatNumber(eventsCount)} событий · ${formatNumber(venuesCount)} площадок · ${formatNumber(placesCount)} городов`
+      : null;
+
+  const catalogLinks = catalogLinkDefs.map((item) => {
+    if (item.landing) {
+      return {
+        label: item.label,
+        href: landingCategoryHref(item.landing, citySlug || undefined),
+      };
+    }
+    return {
+      label: item.label,
+      href: eventsCategoryHref(item.category, citySlug || undefined),
+    };
+  });
+
+  const companyLinksScoped = companyLinks.map((link) => {
+    if (link.href === '/places') return { ...link, href: placesHrefWithCity(citySlug || undefined) };
+    if (link.href === '/podborki') return { ...link, href: podborkiHrefWithCity(citySlug || undefined) };
+    return link;
+  });
+
+  const popularDirections = getFooterPopularDirections(citySlug || undefined);
+  const eventsColumnTitle = cityName ? `События · ${cityName}` : 'События';
+
+  return (
+    <footer className="border-t border-slate-200/80 bg-surface-muted" data-site-footer="default">
+      <div className="container-page site-footer-inner py-14 sm:py-16">
+        <div className="grid grid-cols-2 gap-10 md:grid-cols-4 md:gap-12">
+          <div className="col-span-2 md:col-span-1">
+            <Link href="/" className="inline-flex" aria-label="Дайбилет">
+              <DaibiletLogo textClassName="text-lg" />
+            </Link>
+            <p className="mt-4 max-w-xs text-sm leading-6 text-graphite-muted" data-nosnippet>
+              Билеты на экскурсии, музеи и мероприятия по городам России.
+              Покупайте онлайн, посещайте лучшее.
+            </p>
+            {catalogStatsLine ? (
+              <p className="mt-3 max-w-xs text-sm text-graphite-muted" data-nosnippet>
+                {catalogStatsLine}
+              </p>
+            ) : null}
+            <div className="mt-5 text-sm font-medium text-graphite">
+              <a href="mailto:info@daibilet.ru" className="transition-colors hover:text-primary-600">
+                info@daibilet.ru
+              </a>
+            </div>
+          </div>
+
+          <FooterColumn title={eventsColumnTitle} links={catalogLinks} />
+          <FooterColumn title={cityName ? `Город · ${cityName}` : 'Города'} links={cityLinks} />
+          <FooterColumn title="Компания" links={companyLinksScoped} />
+        </div>
+
+        {popularDirections.length ? (
+          <div className="mt-12 pt-10">
+            <h3 className="text-sm font-semibold text-graphite">
+              {cityName ? `Популярные направления · ${cityName}` : 'Популярные направления'}
+            </h3>
+            <div className="mt-5 grid gap-8 sm:grid-cols-2">
+              {popularDirections.map((block) => (
+                <div key={block.citySlug}>
+                  <p className="text-sm font-medium text-graphite">{block.cityName}</p>
+                  <ul className="mt-2.5 flex flex-wrap gap-x-4 gap-y-2">
+                    {block.links.map((link) => (
+                      <li key={`${block.citySlug}:${link.href}`}>
+                        <Link
+                          href={link.href}
+                          className="text-sm text-graphite-muted transition-colors hover:text-primary-600"
+                        >
+                          {link.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
+        <div className="mt-12 border-t border-slate-200/80 pt-8">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+            <p className="text-sm text-graphite">&copy; {new Date().getFullYear()} Дайбилет</p>
+            <FooterLegalLinks />
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+function FooterColumn({
+  title,
+  links,
+}: {
+  title: string;
+  links: Array<{ label: string; href: string }>;
+}) {
+  return (
+    <div>
+      <h3 className="text-sm font-semibold text-graphite">{title}</h3>
+      <ul className="mt-4 space-y-2.5">
+        {links.map((link) => (
+          <li key={`${title}:${link.href}:${link.label}`}>
+            <Link
+              href={link.href}
+              className="text-sm text-graphite-muted transition-colors hover:text-primary-600"
+            >
+              {link.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}

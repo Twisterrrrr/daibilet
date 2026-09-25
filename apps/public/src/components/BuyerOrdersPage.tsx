@@ -186,7 +186,7 @@ export function BuyerOrderCard({ order }: { order: PublicBuyerOrder }) {
 function OrderCard({ order }: { order: PublicBuyerOrder }) {
   return (
     <article className="overflow-hidden rounded-2xl bg-white shadow-[0_14px_40px_rgba(15,23,42,0.08)]">
-      <div className="grid gap-4 p-5 lg:grid-cols-[minmax(0,1fr)_280px]">
+      <div className="grid gap-4 p-5 lg:grid-cols-[minmax(0,1fr)_minmax(260px,340px)]">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <StatusPill order={order} />
@@ -210,7 +210,7 @@ function OrderCard({ order }: { order: PublicBuyerOrder }) {
           <InfoRow label="Покупатель" value={order.buyer.name || 'не указан'} />
           <InfoRow label="Email" value={order.buyer.email || '-'} />
           <InfoRow label="Телефон" value={order.buyer.phone || '-'} />
-          <InfoRow label="Дата покупки" value={formatDateTime(order.purchasedAt)} />
+          <InfoRow label="Дата покупки" value={formatPurchaseDateTime(order.purchasedAt)} />
           {order.amountRub ? <InfoRow label="Сумма" value={`${formatNumber(order.amountRub)} ₽`} /> : null}
         </dl>
       </div>
@@ -226,7 +226,12 @@ function OrderCard({ order }: { order: PublicBuyerOrder }) {
               <div key={ticket.id} className="grid gap-2 rounded-xl bg-white p-3 text-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
                 <div className="min-w-0">
                   <div className="font-semibold text-slate-900">{ticket.number || 'Билет без номера'}</div>
-                  <div className="mt-1 text-xs text-slate-500">{ticket.eventTitle || order.eventTitle || 'Событие уточняется'} · {formatDateTime(ticket.startsAt)}</div>
+                  <div className="mt-1 text-xs text-slate-500">{ticket.eventTitle || order.eventTitle || 'Событие уточняется'}</div>
+                  {ticket.startsAt ? (
+                    <div className="mt-1 text-xs text-slate-600">
+                      <span className="text-slate-400">Сеанс:</span> {formatSessionDateTime(ticket.startsAt)}
+                    </div>
+                  ) : null}
                 </div>
                 <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">{ticket.displayStatus}</span>
               </div>
@@ -262,9 +267,9 @@ function StatusPill({ order }: { order: PublicBuyerOrder }) {
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-start justify-between gap-3">
-      <dt className="text-slate-500">{label}</dt>
-      <dd className="max-w-[170px] truncate text-right font-semibold text-slate-800">{value}</dd>
+    <div className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-3">
+      <dt className="shrink-0 text-slate-500">{label}</dt>
+      <dd className="min-w-0 whitespace-normal break-words text-right font-semibold text-slate-800">{value}</dd>
     </div>
   );
 }
@@ -310,7 +315,21 @@ function Notice({ tone, title, text }: { tone: 'error'; title: string; text: str
   );
 }
 
-function formatDateTime(value?: string | null): string {
+function formatSessionDateTime(value?: string | null): string {
+  if (!value) return 'не указан';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return 'не указан';
+  return new Intl.DateTimeFormat('ru-RU', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Europe/Moscow',
+  }).format(date);
+}
+
+function formatPurchaseDateTime(value?: string | null): string {
   if (!value) return 'не указана';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return 'не указана';
@@ -320,6 +339,7 @@ function formatDateTime(value?: string | null): string {
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: 'Europe/Moscow',
   }).format(date);
 }
 

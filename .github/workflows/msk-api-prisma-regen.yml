@@ -1,0 +1,67 @@
+name: MSK API prisma generate + restart
+
+# Hotfix when VenueKind enum grows (TEMPLE/BUS) but node_modules/@prisma/client
+# on MSK is stale → /api/public/venues 500 Invalid value for argument `in`.
+# Secrets: same MSK_SSH_* as Deploy MSK web.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: msk-api-prisma-regen
+  cancel-in-progress: false
+
+jobs:
+  regen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Prisma generate + restart daibilet-api
+        env:
+          MSK_SSH_HOST: ${{ secrets.MSK_SSH_HOST }}
+          MSK_SSH_USER: ${{ secrets.MSK_SSH_USER }}
+          MSK_SSH_KEY: ${{ secrets.MSK_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${MSK_SSH_HOST:-}" || -z "${MSK_SSH_USER:-}" || -z "${MSK_SSH_KEY:-}" ]]; then
+            echo "ERROR: set secrets MSK_SSH_HOST, MSK_SSH_USER, MSK_SSH_KEY"
+            exit 2
+          fi
+          install -d -m 700 "$HOME/.ssh"
+          install -m 600 /dev/null "$HOME/.ssh/msk_key"
+          printf '%s\n' "$MSK_SSH_KEY" > "$HOME/.ssh/msk_key"
+          SSH=(ssh -i "$HOME/.ssh/msk_key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o BatchMode=yes)
+
+          "${SSH[@]}" "${MSK_SSH_USER}@${MSK_SSH_HOST}" 'set -euo pipefail
+            cd /opt/daibilet
+            git fetch origin feat/next-monorepo
+            git checkout feat/next-monorepo
+            git reset --hard origin/feat/next-monorepo
+            echo "HEAD=$(git rev-parse --short HEAD)"
+            if command -v pnpm >/dev/null 2>&1; then
+              pnpm db:generate
+            else
+              npx --yes prisma generate --schema packages/db/prisma/schema.prisma
+            fi
+            sudo -n systemctl restart daibilet-api
+            for i in 1 2 3 4 5 6 7 8 9 10 11 12; do
+              if curl -fsS --max-time 3 http://127.0.0.1:4000/api/health >/dev/null 2>&1; then
+                echo "API health OK"
+                break
+              fi
+              sleep 2
+            done
+            curl -fsS --max-time 15 "http://127.0.0.1:4000/api/public/venues/moscow-sovremennik" | head -c 200
+            echo
+          '
+
+      - name: Public API smoke
+        run: |
+          set -euo pipefail
+          sleep 3
+          code="$(curl -sS -o /tmp/venue.json -w '%{http_code}' --max-time 20 \
+            "https://daibilet.ru/api/public/venues/moscow-sovremennik")"
+          echo "venues/moscow-sovremennik → ${code}"
+          test "$code" = "200"
+          grep -qi 'sovremennik\|theater\|theatre\|type' /tmp/venue.json
+          head -c 240 /tmp/venue.json; echo

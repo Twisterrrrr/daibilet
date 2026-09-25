@@ -227,13 +227,18 @@ function venueKind(input) {
     theater: "THEATER",
     concert_hall: "CONCERT_HALL",
     sport_outdoor: "SPORT_ACTIVITY_SPACE",
+    park: "PARK",
+    monument: "MONUMENT",
     generic_location: "MEETING_POINT",
   }[input] || "OTHER";
 }
 
 function venuePageStatus(input, events) {
-  if (input === "generic_location") return "NONE";
-  if (events >= 5 || ["pier_water", "museum_art", "theater", "concert_hall"].includes(input)) return "CANDIDATE";
+  // Keep in sync with scripts/tc-import-catalog.js venuePageStatus.
+  if (input === "generic_location") return events >= 1 ? "CANDIDATE" : "NONE";
+  if (events >= 5 || ["pier_water", "museum_art", "theater", "concert_hall", "park", "monument", "club_restaurant"].includes(input)) {
+    return "CANDIDATE";
+  }
   return "NONE";
 }
 
@@ -271,6 +276,8 @@ function isEnumValue(input) {
     "OUTDOOR_LOCATION",
     "SPORT_ACTIVITY_SPACE",
     "ATTRACTION",
+    "PARK",
+    "MONUMENT",
     "ONLINE",
     "OTHER",
     "NONE",

@@ -1,0 +1,557 @@
+{
+  "generatedAt": "2026-08-23T20:03:38.811Z",
+  "total": 78,
+  "byCity": {
+    "chelyabinsk": 32,
+    "tula": 32,
+    "voronezh": 14
+  },
+  "queue": [
+    {
+      "city": "chelyabinsk",
+      "stem": "taganay-usadba",
+      "name": "taganay usadba",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "taganay-teschin-yazyk",
+      "name": "taganay teschin yazyk",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "taganay-kamennaya-reka",
+      "name": "taganay kamennaya reka",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "taganay-belyy-klyuch",
+      "name": "taganay belyy klyuch",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "taganay-lestnitsa",
+      "name": "taganay lestnitsa",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "taganay-perya",
+      "name": "taganay perya",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "taganay-meteostantsiya",
+      "name": "taganay meteostantsiya",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "turgoyak-plyazh",
+      "name": "turgoyak plyazh",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "turgoyak-megalit-1",
+      "name": "turgoyak megalit 1",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "turgoyak-mengiry",
+      "name": "turgoyak mengiry",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "turgoyak-skit",
+      "name": "turgoyak skit",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "turgoyak-simvol-very",
+      "name": "turgoyak simvol very",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "turgoyak-buhta-trimaranov",
+      "name": "turgoyak buhta trimaranov",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "turgoyak-ekotropa",
+      "name": "turgoyak ekotropa",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "arkaim-muzey-vosssozdanogo-poseleniya",
+      "name": "arkaim muzey vosssozdanogo poseleniya",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "arkaim-kurgan-temir",
+      "name": "arkaim kurgan temir",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "arkaim-gora-shamanka-lysaya",
+      "name": "arkaim gora shamanka lysaya",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "arkaim-vetryanaya-melnitsa",
+      "name": "arkaim vetryanaya melnitsa",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "arkaim-muzey-prirody-i-cheloveka",
+      "name": "arkaim muzey prirody i cheloveka",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "uvildy-tsentralnyy-plyazh",
+      "name": "uvildy tsentralnyy plyazh",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "uvildy-ostrov-vyazovyy",
+      "name": "uvildy ostrov vyazovyy",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "uvildy-radonovyy-byuvet",
+      "name": "uvildy radonovyy byuvet",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "uvildy-mys-krasnyy",
+      "name": "uvildy mys krasnyy",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "uvildy-ostrov-golodai",
+      "name": "uvildy ostrov golodai",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "uvildy-lesnoe-ozero-maloe-uvildy",
+      "name": "uvildy lesnoe ozero maloe uvildy",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "zyuratkul-vysokogornoe-ozero",
+      "name": "zyuratkul vysokogornoe ozero",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "zyuratkul-ekotropa-na-hrebet",
+      "name": "zyuratkul ekotropa na hrebet",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "zyuratkul-skaly-medvedi",
+      "name": "zyuratkul skaly medvedi",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "zyuratkul-maralovaya-ferma",
+      "name": "zyuratkul maralovaya ferma",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "zyuratkul-kipyashchiy-klyuch",
+      "name": "zyuratkul kipyashchiy klyuch",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "zyuratkul-reka-bolshaya-satka",
+      "name": "zyuratkul reka bolshaya satka",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "zyuratkul-gora-lukash",
+      "name": "zyuratkul gora lukash",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "muzey-garmoni-deda-filimona",
+      "name": "Музей «Гармони Деда Филимона»",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "yasnaya-polyana-prespekt",
+      "name": "Дом-музей Л. Н. Толстого",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "yasnaya-polyana-prud",
+      "name": "Флигель Кузминских",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "yasnaya-polyana-dom-muzey",
+      "name": "Историческая пашня и конюшня",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "yasnaya-polyana-fligel-kuzminskih",
+      "name": "Любимая скамейка писателя",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "yasnaya-polyana-pashnya",
+      "name": "Могила Льва Толстого",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "yasnaya-polyana-skameyka",
+      "name": "Музейный комплекс «Куликово поле» в Моховом",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "yasnaya-polyana-mogila",
+      "name": "Интерактивный макет Куликовской битвы",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "kulikovo-pole",
+      "name": "Памятник-колонна Дмитрию Донскому",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "kulikovo-pole-muzeynyy-kompleks",
+      "name": "Храм-памятник Сергия Радонежского",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "kulikovo-pole-maket-bitvy",
+      "name": "Музей купеческого быта в Епифани",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "kulikovo-pole-kolonna-dmitriyu-donskomu",
+      "name": "Слияние рек Дона и Непрядвы",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "kulikovo-pole-hram-sergiya",
+      "name": "Аллея Памяти городов-участников битвы",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "kulikovo-pole-muzey-epifani",
+      "name": "Большой дом с коллекциями живописи",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "kulikovo-pole-slianie-don-nepryadva",
+      "name": "Мастерская художника «Аббатство»",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "kulikovo-pole-alleya-pamyati",
+      "name": "Здание «Адмиралтейство»",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "polenovo",
+      "name": "Фахверковый сарай",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "polenovo-bolshoy-dom",
+      "name": "Живописная тропа к реке Оке",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "polenovo-abbatstvo",
+      "name": "Троицкая церковь в селе Бехово",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "polenovo-admiralteystvo",
+      "name": "Святой источник и смотровая на обрыве",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "polenovo-fahverkovyy-saray",
+      "name": "Отель-ковчег",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "polenovo-tropa-k-oke",
+      "name": "Арт-объект «Дом-Бык»",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "polenovo-troitskaya-tserkov-behovo",
+      "name": "Портал времени из дерева",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "polenovo-svyatoy-istochnik",
+      "name": "Современный конный комплекс",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "yasno-pole",
+      "name": "Пруды для рыбалки и настилы",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "yasno-pole-otel-kovcheg",
+      "name": "Локальная эко-ферма",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "yasno-pole-dom-byk",
+      "name": "Цех авторских сыров",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "yasno-pole-portal-vremeni",
+      "name": "yasno pole portal vremeni",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "yasno-pole-konnyy-kompleks",
+      "name": "yasno pole konnyy kompleks",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "yasno-pole-prudy",
+      "name": "yasno pole prudy",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "yasno-pole-eko-ferma",
+      "name": "yasno pole eko ferma",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "tula",
+      "stem": "yasno-pole-syrovarnya",
+      "name": "yasno pole syrovarnya",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "voronezh",
+      "stem": "kostenki-podlinnoe-zhilishche-iz-kostey-mamont",
+      "name": "kostenki podlinnoe zhilishche iz kostey mamont",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "voronezh",
+      "stem": "kostenki-skulptura-mamont-stepan",
+      "name": "kostenki skulptura mamont stepan",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "voronezh",
+      "stem": "kostenki-paleoliticheskie-veneri",
+      "name": "kostenki paleoliticheskie veneri",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "voronezh",
+      "stem": "kostenki-ekspozitsiya-drevnih-orudiy-truda",
+      "name": "kostenki ekspozitsiya drevnih orudiy truda",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "voronezh",
+      "stem": "kostenki-melovye-holmy",
+      "name": "kostenki melovye holmy",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "voronezh",
+      "stem": "kostenki-smotrovaya-izluchina-dona",
+      "name": "kostenki smotrovaya izluchina dona",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "voronezh",
+      "stem": "kostenki-interaktivnaya-arheologicheskaya-pesochnitsa",
+      "name": "kostenki interaktivnaya arheologicheskaya pesochnitsa",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "voronezh",
+      "stem": "venevitinovy-gospodskiy-dom",
+      "name": "venevitinovy gospodskiy dom",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "voronezh",
+      "stem": "venevitinovy-ampirnaya-rotonda",
+      "name": "venevitinovy ampirnaya rotonda",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "voronezh",
+      "stem": "venevitinovy-parternyy-usadebnyy-sad",
+      "name": "venevitinovy parternyy usadebnyy sad",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "voronezh",
+      "stem": "venevitinovy-muzykalnaya-gostinaya",
+      "name": "venevitinovy muzykalnaya gostinaya",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "voronezh",
+      "stem": "venevitinovy-derevyannyy-pirs",
+      "name": "venevitinovy derevyannyy pirs",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "voronezh",
+      "stem": "venevitinovy-poeziya-mysli",
+      "name": "venevitinovy poeziya mysli",
+      "reason": "small",
+      "wave": "wave2-small"
+    },
+    {
+      "city": "voronezh",
+      "stem": "venevitinovy-kuhonnyy-fligel",
+      "name": "venevitinovy kuhonnyy fligel",
+      "reason": "small",
+      "wave": "wave2-small"
+    }
+  ]
+}

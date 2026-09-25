@@ -1,0 +1,230 @@
+name: Deploy MSK web (CI build + atomic swap)
+
+# Builds apps/web on GitHub runners, ships .next to daibilet-msk, swaps without
+# in-place web:build on the 4GB VPS. Fallback remains:
+#   BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh
+#
+# Required repo secrets:
+#   MSK_SSH_HOST   - e.g. 201.24.125.184 or daibilet-msk
+#   MSK_SSH_USER   - deploy user with systemd rights for daibilet-web
+#   MSK_SSH_KEY    - private key (PEM)
+# Optional (bake into Next public bundle; match prod .env when possible):
+#   NEXT_PUBLIC_TC_WIDGET_TOKEN
+#   NEXT_PUBLIC_TEP_WIDGET_ID
+#
+# Build-time data: CI has no local Postgres :5437 / API :4000.
+# Before web:build we open an SSH local-forward to MSK API (127.0.0.1:4000)
+# so SSG can fetch real public data without exposing Postgres publicly.
+# EVENT_SSG_TOP_N=0 skips Prisma event prebuild (no DB tunnel / no DATABASE_URL secret).
+# Soft-fail SSG (home/podborki/landings/withSoftTimeout) is a safety net if API is down.
+
+run-name: "Deploy MSK web | SHA ${{ inputs.sha }} | branch ${{ inputs.expected_ref }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: "Full 40-character commit SHA to deploy"
+        required: true
+        type: string
+      expected_ref:
+        description: "Expected branch containing the commit"
+        required: true
+        type: string
+        default: "feat/next-monorepo"
+      marker:
+        description: "Optional literal marker expected in live HTML"
+        type: string
+        required: false
+      skip_swap:
+        description: "Build artifact only (skip SSH swap)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: deploy-msk-web
+  cancel-in-progress: false
+
+jobs:
+  build-and-swap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      DEPLOY_SHA: ${{ inputs.sha }}
+      EXPECTED_REF: ${{ inputs.expected_ref }}
+    steps:
+      - name: Validate input format
+        run: |
+          set -euo pipefail
+          [[ "$DEPLOY_SHA" =~ ^[0-9a-f]{40}$ ]] || { echo "::error::sha must be full 40-character lowercase hex"; exit 1; }
+          git check-ref-format "refs/heads/$EXPECTED_REF"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.sha }}
+          fetch-depth: 0
+
+      - name: Confirm checkout SHA and branch membership
+        id: meta
+        run: |
+          set -euo pipefail
+          echo "Expected SHA: $DEPLOY_SHA"
+          echo "Actual SHA: $(git rev-parse HEAD)"
+          test "$(git rev-parse HEAD)" = "$DEPLOY_SHA"
+          git fetch origin "+refs/heads/$EXPECTED_REF:refs/remotes/origin/$EXPECTED_REF"
+          git merge-base --is-ancestor "$DEPLOY_SHA" "refs/remotes/origin/$EXPECTED_REF" || { echo "::error::SHA is not in expected branch"; exit 1; }
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "short=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+
+      # Deployment tooling comes from this workflow revision, even when deploying
+      # an older application SHA that predates these scripts.
+      - name: Checkout deployment tooling
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.workflow_sha }}
+          path: .deploy-control
+          sparse-checkout: |
+            scripts
+            infra
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.7.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Prisma generate
+        run: pnpm db:generate
+
+      - name: SSH tunnel to MSK API
+        id: tunnel
+        env:
+          MSK_SSH_HOST: ${{ secrets.MSK_SSH_HOST }}
+          MSK_SSH_USER: ${{ secrets.MSK_SSH_USER }}
+          MSK_SSH_KEY: ${{ secrets.MSK_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${MSK_SSH_HOST:-}" || -z "${MSK_SSH_USER:-}" || -z "${MSK_SSH_KEY:-}" ]]; then
+            echo "WARN: MSK_SSH_* secrets missing — build will soft-fail SSG without live API"
+            echo "tunnel=0" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          install -d -m 700 "$HOME/.ssh"
+          install -m 600 /dev/null "$HOME/.ssh/msk_key"
+          printf '%s\n' "$MSK_SSH_KEY" > "$HOME/.ssh/msk_key"
+          # Local-forward only (not reverse): GH runner :4000 → MSK loopback API.
+          # Do not forward Postgres; EVENT_SSG_TOP_N=0 skips Prisma SSG.
+          # Soft-fail: tunnel is optional for CI build (EVENT_SSG_TOP_N=0 + soft SSG).
+          if ! ssh -fN -i "$HOME/.ssh/msk_key" \
+            -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=accept-new \
+            -o BatchMode=yes \
+            -o ExitOnForwardFailure=yes \
+            -o ServerAliveInterval=30 \
+            -o ServerAliveCountMax=3 \
+            -L 4000:127.0.0.1:4000 \
+            "${MSK_SSH_USER}@${MSK_SSH_HOST}"; then
+            echo "WARN: SSH tunnel connect failed — build will soft-fail SSG without live API"
+            echo "tunnel=0" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          for _i in 1 2 3 4 5 6 7 8 9 10; do
+            if curl -fsS --max-time 3 "http://127.0.0.1:4000/api/health" >/dev/null 2>&1 \
+              || curl -fsS --max-time 3 "http://127.0.0.1:4000/api/public/stats" >/dev/null 2>&1; then
+              echo "MSK API tunnel OK on localhost:4000"
+              echo "tunnel=1" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "WARN: SSH tunnel up but MSK API :4000 not healthy — build without live API"
+          echo "tunnel=0" >> "$GITHUB_OUTPUT"
+
+      - name: Build web
+        env:
+          NODE_OPTIONS: --max-old-space-size=6144
+          # Skip Prisma event SSG on CI (no DATABASE_URL / no DB tunnel).
+          EVENT_SSG_TOP_N: "0"
+          DAIBILET_API_INTERNAL_URL: http://127.0.0.1:4000
+          DAIBILET_PUBLIC_API_INTERNAL_URL: http://127.0.0.1:4000
+          NEXT_PUBLIC_TC_WIDGET_TOKEN: ${{ secrets.NEXT_PUBLIC_TC_WIDGET_TOKEN }}
+          NEXT_PUBLIC_TEP_WIDGET_ID: ${{ secrets.NEXT_PUBLIC_TEP_WIDGET_ID }}
+        run: pnpm web:build
+
+      - name: Pack .next artifact
+        run: |
+          test -f apps/web/.next/BUILD_ID
+          test -f apps/web/.next/prerender-manifest.json
+          BUILD_ID="$(cat apps/web/.next/BUILD_ID)"
+          test -n "$BUILD_ID"
+          printf '%s\n' "$DEPLOY_SHA" > apps/web/.next/DEPLOY_SHA
+          printf '%s\n' "$BUILD_ID" > /tmp/daibilet-web-build-id
+          echo "BUILD_ID=$BUILD_ID" >> "$GITHUB_ENV"
+          printf '### Built deployment\n- DEPLOY_SHA: %s\n- Expected branch: %s\n- BUILD_ID: %s\n' "$DEPLOY_SHA" "$EXPECTED_REF" "$BUILD_ID" >> "$GITHUB_STEP_SUMMARY"
+          rm -rf apps/web/.next/cache
+          tar -C apps/web -czf /tmp/daibilet-web-next.tgz .next
+          ls -lh /tmp/daibilet-web-next.tgz
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-next-${{ steps.meta.outputs.short }}
+          path: /tmp/daibilet-web-next.tgz
+          retention-days: 7
+
+      - name: Swap on MSK
+        if: ${{ inputs.skip_swap != true }}
+        env:
+          MSK_SSH_HOST: ${{ secrets.MSK_SSH_HOST }}
+          MSK_SSH_USER: ${{ secrets.MSK_SSH_USER }}
+          MSK_SSH_KEY: ${{ secrets.MSK_SSH_KEY }}
+          DEPLOY_SHA: ${{ steps.meta.outputs.sha }}
+          DEPLOY_MARKER: ${{ inputs.marker }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${MSK_SSH_HOST:-}" || -z "${MSK_SSH_USER:-}" || -z "${MSK_SSH_KEY:-}" ]]; then
+            echo "ERROR: set secrets MSK_SSH_HOST, MSK_SSH_USER, MSK_SSH_KEY"
+            exit 2
+          fi
+          install -d -m 700 "$HOME/.ssh"
+          install -m 600 /dev/null "$HOME/.ssh/msk_key"
+          printf '%s\n' "$MSK_SSH_KEY" > "$HOME/.ssh/msk_key"
+          SSH=(ssh -i "$HOME/.ssh/msk_key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o BatchMode=yes)
+          SCP=(scp -i "$HOME/.ssh/msk_key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o BatchMode=yes)
+          REMOTE_TGZ="/tmp/daibilet-web-next-${DEPLOY_SHA}.tgz"
+          "${SCP[@]}" /tmp/daibilet-web-next.tgz "${MSK_SSH_USER}@${MSK_SSH_HOST}:${REMOTE_TGZ}"
+          REMOTE_SCRIPT="/tmp/daibilet-deploy-${DEPLOY_SHA}.sh"
+          "${SCP[@]}" .deploy-control/scripts/deploy-msk-web.sh "${MSK_SSH_USER}@${MSK_SSH_HOST}:${REMOTE_SCRIPT}"
+          "${SCP[@]}" /tmp/daibilet-web-build-id "${MSK_SSH_USER}@${MSK_SSH_HOST}:${REMOTE_TGZ}.build-id"
+          printf -v REMOTE_COMMAND 'ARTIFACT=%q EXPECTED_BUILD_ID_FILE=%q DEPLOY_MARKER=%q bash %q %q %q' "$REMOTE_TGZ" "$REMOTE_TGZ.build-id" "$DEPLOY_MARKER" "$REMOTE_SCRIPT" "$DEPLOY_SHA" "$EXPECTED_REF"
+          "${SSH[@]}" "${MSK_SSH_USER}@${MSK_SSH_HOST}" "$REMOTE_COMMAND"
+          echo "Swap succeeded: DEPLOY_SHA=$DEPLOY_SHA BUILD_ID=$BUILD_ID" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Public smoke (prod URL)
+        if: ${{ inputs.skip_swap != true }}
+        run: |
+          set -euo pipefail
+          for path in / /events /cities; do
+            code="$(curl -fsS -o /dev/null -w '%{http_code}' -H 'Cache-Control: no-cache' "https://daibilet.ru${path}")"
+            echo "${path} → ${code}"
+            test "$code" = "200"
+          done
+          curl -fsS -o /dev/null -w "api health %{http_code}\n" https://daibilet.ru/api/health
+          bash deploy/scripts/smoke-crawler-prod.sh
+
+      - name: Verify deploy
+        if: ${{ inputs.skip_swap != true }}
+        env:
+          DEPLOY_SHA: ${{ env.DEPLOY_SHA }}
+          DEPLOY_MARKER: ${{ inputs.marker }}
+          MSK_SSH_HOST: ${{ secrets.MSK_SSH_HOST }}
+          MSK_SSH_USER: ${{ secrets.MSK_SSH_USER }}
+          MSK_SSH_KEY_FILE: /home/runner/.ssh/msk_key
+        run: bash .deploy-control/infra/deploy-verify.sh "$DEPLOY_SHA" "$DEPLOY_MARKER"

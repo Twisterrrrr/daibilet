@@ -136,16 +136,37 @@ async function persistOrders(orders, refs, syncId, startedAt, options) {
         status,
         purchasedAt: parseTcDate(order.done_at || order.created_at),
         buyerSnapshot: snapshot,
+        buyerEmailNormalized: normalizeEmail(snapshot.buyer?.email),
+        buyerPhoneNormalized: normalizePhone(snapshot.buyer?.phone),
+        publicCode: preferredProviderOrderNumber(order),
+        archivedAt: shouldAutoArchiveTcOrder(order, status) ? new Date().toISOString() : null,
       });
 
       await upsertRawOrder(client, externalOrderId, order, refs);
-      await client.query('delete from "ExternalTicket" where "externalOrderId" = $1 and coalesce(origin, $2) = $2', [orderDbId, "source"]);
+      await client.query(
+        'delete from "ExternalTicket" where "externalOrderId" = $1 and coalesce(origin, $2) in ($2, $3)',
+        [orderDbId, "source", "set"],
+      );
 
-      const tickets = Array.isArray(order.tickets) ? order.tickets : [];
+      let tickets = Array.isArray(order.tickets) ? order.tickets : [];
+      if (!tickets.length) {
+        const sets = order.values?.sets_values;
+        if (sets && typeof sets === "object" && !Array.isArray(sets)) {
+          tickets = Object.values(sets)
+            .filter((item) => item && typeof item === "object")
+            .map((set, index) => ({
+              id: set.id || `${externalOrderId}_set_${index + 1}`,
+              number: set.name || `set-${index + 1}`,
+              status: order.status || "done",
+              origin: "set",
+            }));
+        }
+      }
       if (!tickets.length) stats.withoutTickets += 1;
 
       for (const [index, ticket] of tickets.entries()) {
         const externalTicketId = String(ticket.id || ticket.number || `${externalOrderId}_${index + 1}`);
+        const origin = ticket.origin === "set" ? "set" : "source";
         await client.query(
           `
             insert into "ExternalTicket" (id, "externalOrderId", "externalTicketId", status, "eventId", "sessionId", origin)
@@ -159,13 +180,13 @@ async function persistOrders(orders, refs, syncId, startedAt, options) {
               origin = excluded.origin
           `,
           [
-            stableId("extticket_tc", externalTicketId),
+            stableId(origin === "set" ? "extticket_tc_set" : "extticket_tc", externalTicketId),
             orderDbId,
             externalTicketId,
             String(ticket.status || order.status || "unknown"),
             linked.eventId,
             linked.sessionId,
-            "source",
+            origin,
           ],
         );
         stats.importedTickets += 1;
@@ -208,16 +229,29 @@ async function ensureSource(client) {
 }
 
 async function upsertExternalOrder(client, order) {
-  const publicCode = order.publicCode || await allocatePublicOrderCode(client, SOURCE_ID, order.externalOrderId);
+  let publicCode = order.publicCode || null;
+  if (publicCode) {
+    const conflict = await client.query(
+      'select 1 from "ExternalOrder" where "publicCode" = $1 and not ("sourceId" = $2 and "externalOrderId" = $3) limit 1',
+      [publicCode, SOURCE_ID, order.externalOrderId],
+    );
+    if (conflict.rows.length) publicCode = null;
+  }
+  if (!publicCode) {
+    publicCode = await allocatePublicOrderCode(client, SOURCE_ID, order.externalOrderId);
+  }
   const result = await client.query(
     `
-      insert into "ExternalOrder" (id, "sourceId", "externalOrderId", "publicCode", status, "buyerSnapshot", "purchasedAt", "updatedAt")
-      values ($1, $2, $3, $4, $5, $6::jsonb, $7, now())
+      insert into "ExternalOrder" (id, "sourceId", "externalOrderId", "publicCode", status, "buyerSnapshot", "buyerEmailNormalized", "buyerPhoneNormalized", "purchasedAt", "archivedAt", "updatedAt")
+      values ($1, $2, $3, $4, $5, $6::jsonb, $7, $8, $9, $10, now())
       on conflict ("sourceId", "externalOrderId") do update set
-        "publicCode" = coalesce("ExternalOrder"."publicCode", excluded."publicCode"),
+        "publicCode" = coalesce(excluded."publicCode", "ExternalOrder"."publicCode"),
         status = excluded.status,
         "buyerSnapshot" = excluded."buyerSnapshot",
+        "buyerEmailNormalized" = coalesce(excluded."buyerEmailNormalized", "ExternalOrder"."buyerEmailNormalized"),
+        "buyerPhoneNormalized" = coalesce(excluded."buyerPhoneNormalized", "ExternalOrder"."buyerPhoneNormalized"),
         "purchasedAt" = excluded."purchasedAt",
+        "archivedAt" = coalesce("ExternalOrder"."archivedAt", excluded."archivedAt"),
         "updatedAt" = excluded."updatedAt"
       returning id
     `,
@@ -228,10 +262,45 @@ async function upsertExternalOrder(client, order) {
       publicCode,
       order.status,
       JSON.stringify(order.buyerSnapshot),
+      order.buyerEmailNormalized || null,
+      order.buyerPhoneNormalized || null,
       order.purchasedAt,
+      order.archivedAt || null,
     ],
   );
   return result.rows[0].id;
+}
+
+/** Prefer human-readable Ticketscloud order number over our hashed code. */
+function preferredProviderOrderNumber(order) {
+  const candidates = [order.number, order.code];
+  for (const value of candidates) {
+    if (value == null || value === "") continue;
+    const text = String(value).trim().replace(/^#/, "");
+    if (!text) continue;
+    // Skip UUID/hex ids — those stay as externalOrderId, not as customer-facing №.
+    if (/^[a-f0-9]{16,}$/i.test(text)) continue;
+    if (/^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(text)) continue;
+    if (/^\d{4,}$/.test(text) || /^[A-Z0-9][-A-Z0-9]{3,}$/i.test(text)) return text;
+  }
+  return null;
+}
+
+function isArchivableTcStatus(status) {
+  const value = String(status || "").toLowerCase();
+  return ["cancel", "return", "refund", "reject", "expired", "deleted"].some((token) => value.includes(token));
+}
+
+const STALE_CANCELLED_ARCHIVE_DAYS = 30;
+
+function shouldAutoArchiveTcOrder(order, status) {
+  if (!isArchivableTcStatus(status)) return false;
+  const raw = order.done_at || order.created_at || order.expired_after || null;
+  if (!raw) return false;
+  const when = parseTcDate(raw);
+  if (!when) return false;
+  const ageMs = Date.now() - new Date(when).getTime();
+  return ageMs >= STALE_CANCELLED_ARCHIVE_DAYS * 24 * 60 * 60 * 1000;
 }
 
 async function upsertRawOrder(client, externalOrderId, order, refs) {
@@ -245,6 +314,7 @@ async function upsertRawOrder(client, externalOrderId, order, refs) {
         payload = excluded.payload,
         "payloadHash" = excluded."payloadHash",
         "importedAt" = excluded."importedAt"
+      where "RawImportRecord"."payloadHash" is distinct from excluded."payloadHash"
     `,
     [stableId("raw_tc_order", externalOrderId), SOURCE_ID, externalOrderId, payloadText, sha256(payloadText)],
   );
@@ -303,18 +373,63 @@ function buildOrdersUrl({ page, pageSize, status, events, from, to, onlyWithCust
 }
 
 function buildBuyerSnapshot(order, refs) {
-  const customer = firstObject(order.customer, order.buyer, order.user, order.visitor, order.owner);
+  const settingsCustomer = firstObject(order.settings?.customer, order.settings?.buyer);
+  const customer = firstObject(
+    order.customer,
+    order.buyer,
+    order.user,
+    order.visitor,
+    order.owner,
+    settingsCustomer,
+  );
   const customFields = normalizeCustomFields(order.custom_fields);
+  const orderCustomFields = normalizeCustomFields(order.custom_fields?.order);
   const vendorData = firstObject(order.vendor_data);
   const payment = Array.isArray(order.payments) ? order.payments[0] : firstObject(order.payments);
   const eventRef = refs?.events?.[order.event] || null;
   const partnerRef = refs?.partners?.[order.vendor] || refs?.partners?.[order.org] || null;
   const buyer = {
-    name: firstString(customer?.name, customer?.full_name, customFields.name, customFields.fio, vendorData?.name),
-    email: firstString(customer?.email, customFields.email, vendorData?.email),
-    phone: firstString(customer?.phone, customer?.phone_number, customFields.phone, customFields.tel, vendorData?.phone),
+    name: firstString(
+      customer?.name,
+      customer?.full_name,
+      settingsCustomer?.name,
+      settingsCustomer?.full_name,
+      customFields.name,
+      customFields.fio,
+      orderCustomFields.name,
+      orderCustomFields.fio,
+      vendorData?.name,
+    ),
+    email: firstString(
+      customer?.email,
+      settingsCustomer?.email,
+      customFields.email,
+      customFields.mail,
+      customFields.e_mail,
+      orderCustomFields.email,
+      vendorData?.email,
+      payment?.email,
+      payment?.customer_email,
+    ),
+    phone: firstString(
+      customer?.phone,
+      customer?.phone_number,
+      settingsCustomer?.phone,
+      settingsCustomer?.phone_number,
+      customFields.phone,
+      customFields.tel,
+      customFields.mobile,
+      orderCustomFields.phone,
+      vendorData?.phone,
+      payment?.phone,
+    ),
     notes: firstString(order.code, order.number != null ? `#${order.number}` : null),
   };
+
+  if (!buyer.email) buyer.email = extractEmailFromPayload(order);
+  if (!buyer.phone) buyer.phone = extractPhoneFromPayload(order);
+  if (!buyer.name) buyer.name = extractNameFromPayload(order);
+  buyer.phone = normalizePhoneDisplay(buyer.phone);
 
   return {
     buyer,
@@ -379,6 +494,122 @@ function firstString(...values) {
     if (value == null) continue;
     const text = String(value).trim();
     if (text) return text;
+  }
+  return null;
+}
+
+const EMAIL_RE = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i;
+
+function normalizeEmail(value) {
+  if (!value) return null;
+  const text = String(value).trim().toLowerCase();
+  if (!text || !text.includes("@")) return null;
+  const match = text.match(EMAIL_RE);
+  return match ? match[0].toLowerCase() : null;
+}
+
+function normalizePhone(value) {
+  if (!value) return null;
+  const text = String(value).trim();
+  if (looksLikeDateTime(text)) return null;
+  if (/^[a-f0-9]{16,}$/i.test(text.replace(/\s/g, ""))) return null;
+  const digits = text.replace(/\D/g, "");
+  if (digits.length < 10 || digits.length > 15) return null;
+  if (digits.length === 11 && digits.startsWith("8")) return `7${digits.slice(1)}`;
+  if (digits.length === 10) return `7${digits}`;
+  return digits;
+}
+
+function normalizePhoneDisplay(value) {
+  if (!value || looksLikeDateTime(value)) return null;
+  return normalizePhone(value) ? String(value).trim() : null;
+}
+
+function looksLikeDateTime(value) {
+  const text = String(value || "").trim();
+  return /^\d{4}-\d{2}-\d{2}([ T]\d{2}:\d{2}(:\d{2})?)?/.test(text);
+}
+
+function extractEmailFromPayload(value, depth = 0) {
+  if (depth > 8 || value == null) return null;
+  if (typeof value === "string") {
+    const match = value.match(EMAIL_RE);
+    return match ? match[0].toLowerCase() : null;
+  }
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const found = extractEmailFromPayload(item, depth + 1);
+      if (found) return found;
+    }
+    return null;
+  }
+  if (typeof value === "object") {
+    for (const key of ["email", "customer_email", "buyer_email", "mail", "e-mail", "e_mail"]) {
+      const direct = normalizeEmail(value[key]);
+      if (direct) return direct;
+    }
+    for (const [key, nested] of Object.entries(value)) {
+      if (/email|mail/i.test(key)) {
+        const direct = normalizeEmail(nested);
+        if (direct) return direct;
+      }
+    }
+    for (const nested of Object.values(value)) {
+      const found = extractEmailFromPayload(nested, depth + 1);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+function extractPhoneFromPayload(value, depth = 0) {
+  if (depth > 8 || value == null) return null;
+  if (typeof value === "string") {
+    return normalizePhoneDisplay(value);
+  }
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const found = extractPhoneFromPayload(item, depth + 1);
+      if (found) return found;
+    }
+    return null;
+  }
+  if (typeof value === "object") {
+    for (const key of ["phone", "phone_number", "mobile", "tel", "telephone"]) {
+      const direct = normalizePhoneDisplay(value[key]);
+      if (direct) return direct;
+    }
+    // Prefer known customer containers before deep walk.
+    for (const key of ["customer", "buyer", "settings"]) {
+      if (value[key]) {
+        const found = extractPhoneFromPayload(value[key], depth + 1);
+        if (found) return found;
+      }
+    }
+  }
+  return null;
+}
+
+function extractNameFromPayload(value, depth = 0) {
+  if (depth > 6 || value == null) return null;
+  if (typeof value === "string") {
+    const text = value.trim();
+    if (text.length < 2 || text.includes("@") || looksLikeDateTime(text) || /^\d+$/.test(text)) return null;
+    if (/[a-zа-яё]/i.test(text) && text.split(/\s+/).length <= 6) return text;
+    return null;
+  }
+  if (Array.isArray(value)) return null;
+  if (typeof value === "object") {
+    for (const key of ["name", "full_name", "fullName", "customer_name", "fio"]) {
+      const direct = extractNameFromPayload(value[key], depth + 1);
+      if (direct) return direct;
+    }
+    for (const key of ["customer", "buyer", "settings"]) {
+      if (value[key]) {
+        const found = extractNameFromPayload(value[key], depth + 1);
+        if (found) return found;
+      }
+    }
   }
   return null;
 }

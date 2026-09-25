@@ -1,0 +1,223 @@
+/** SPB hub suburb cards (palace belt + coast). Hyphen-only copy. */
+import type { CitySuburbItem } from './cityInfo.ts';
+
+export const PETERHOF_SUBURB_CARD: CitySuburbItem = {
+    name: 'Петергоф',
+    desc: 'Парадная резиденция Петра I на заливе: фонтаны без насосов, Большой каскад и Нижний парк.',
+    mustSeeFilter: 'main',
+    // Hub cover = Lower Park cascade axis (petergof.jpg); palace POI uses bolshoy-dvorets-*.
+    locationSlug: 'saint-petersburg-petergof',
+    places: [
+      { name: 'Нижний парк Петергофа', seasonLabel: 'Летняя навигация - май-октябрь', desc: 'регулярный парадный сад Петра I на берегу Финского залива со знаменитой системой фонтанов, работающей вообще без насосов.', locationSlug: 'saint-petersburg-nizhniy-park-petergofa', latitude: 59.885112, longitude: 29.908214, transitTip: 'От ст. Новый Петергоф автобус' },
+      { name: 'Большой каскад', seasonLabel: 'Летняя навигация - май-октябрь', desc: 'монументальное фонтанное сооружение с гротами и позолоченной фигурой Самсона, разрывающего пасть льва, символизирующей победу над Швецией.', locationSlug: 'saint-petersburg-bolshoy-kaskad-petergofa', latitude: 59.88935, longitude: 29.90855},
+      { name: 'Большой дворец Петергофа', desc: 'парадная барочная резиденция Петра I и Елизаветы над каскадом, с тронным залом и анфиладой парадных покоев.', locationSlug: 'saint-petersburg-bolshoy-dvorets-petergofa', latitude: 59.89055, longitude: 29.90785},
+      { name: 'Верхний сад', desc: 'регулярный партер перед южным фасадом Большого дворца с фонтаном Нептун и парадным въездом со стороны города.', locationSlug: 'saint-petersburg-verkhniy-sad-petergofa', latitude: 59.89185, longitude: 29.90845},
+      { name: 'Дворец Монплезир', desc: 'любимый приморский дворец Петра Великого со старинной голландской плиткой, где царь лично принимал иностранных послов.', locationSlug: 'saint-petersburg-dvorets-monplezir', latitude: 59.8879, longitude: 29.9184},
+      { name: 'Павильон Марли', desc: 'камерный голландский павильон Петра I у прудов западной части Нижнего парка, любимое место уединения царя.', locationSlug: 'saint-petersburg-pavilion-marli', latitude: 59.88685, longitude: 29.89655},
+      { name: 'Парк Александрия', desc: 'уединенная пейзажная резиденция четырех поколений Романовых, оформленная в стиле романтической английской неоготики.', locationSlug: 'saint-petersburg-park-aleksandriya', latitude: 59.8808, longitude: 29.9212, transitTip: '~10-15 мин переход в Александрию' },
+      { name: 'Готическая капелла', desc: 'домашняя церковь императорской семьи в Александрии, являющаяся шедевром ложной готики работы архитектора Шинкеля.', locationSlug: 'saint-petersburg-goticheskaya-kapella', latitude: 59.8786, longitude: 29.9261},
+    ],
+    travelVector: 'Юго-Западный и Морской вектор',
+    travelVectorBlurb: 'Направление вдоль южного побережья Финского залива. Доступно на электричках от метро «Балтийская» или на скоростных водных судах «Метеор» от причалов Эрмитажа.',
+    stationHub: 'Балтийский вокзал',
+    stationName: 'Станция Новый Петергоф',
+    logisticsExit: 'Станция Новый Петергоф',
+    logisticsExitLabel: 'Где выходить',
+    gastroStop: { name: 'Кафе-кондитерская «Оранжерея»', blurb: 'Десерты ручной работы и кофе с видом на императорские конюшни.' },
+    gastroHint: 'Кафе-кондитерская «Оранжерея» (Петергоф) - Уютное заведение в историческом здании придворных оранжерей, знаменитое своими десертами ручной работы и возможностью выпить кофе с видом на парадные императорские конюшни.'
+  };
+
+export const PUSHKIN_SUBURB_CARD: CitySuburbItem = {
+    name: 'Царское Село / Пушкин',
+    desc: 'Барочный Екатерининский дворец с Янтарной комнатой и парками в Пушкине.',
+    mustSeeFilter: 'main',
+    places: [
+      { name: 'Екатерининский дворец', desc: 'грандиозный барочный замок Франческо Растрелли, внутри которого находится знаменитая, полностью восстановленная Янтарная комната.', locationSlug: 'saint-petersburg-ekaterininskiy-dvorets', latitude: 59.715911, longitude: 30.395812 },
+      { name: 'Екатерининский парк', desc: 'парадный регулярный сад и пейзажная часть вокруг дворца с прудами, мостами и павильонами XVIII века.', locationSlug: 'saint-petersburg-ekaterininskiy-park', latitude: 59.71455, longitude: 30.39685 },
+      { name: 'Царскосельский лицей', desc: 'мемориальный музей, сохранивший подлинную обстановку комнат и классов, где учился и писал первые стихи Александр Пушкин.', locationSlug: 'saint-petersburg-tsarskoselskiy-litsey', latitude: 59.716912, longitude: 30.397114 },
+      { name: 'Камеронова галерея', desc: 'видовая колоннада Чарльза Камерона над склоном к пруду - классический смотровой акцент Царского Села.', locationSlug: 'saint-petersburg-kameronova-galereya', latitude: 59.71415, longitude: 30.39455 },
+      { name: 'Павильон «Эрмитаж»', desc: 'барочный парковый павильон Екатерининского парка, оборудованный потайными подъемными механизмами для обеденных столов.', locationSlug: 'saint-petersburg-pavilion-ermitazh-tsarskoe', latitude: 59.71345, longitude: 30.39865 },
+      { name: 'Александровский дворец', desc: 'любимый уединенный дом последнего императора Николая II, откуда вся царская семья была навсегда отправлена в ссылку в Сибирь.', locationSlug: 'saint-petersburg-aleksandrovskiy-dvorets', latitude: 59.71855, longitude: 30.39135 },
+      { name: 'Китайская деревня', desc: 'живописный ансамбль псевдокитайских домиков в Александровском парке, задуманный Екатериной II.', locationSlug: 'saint-petersburg-kitayskaya-derevnya', latitude: 59.71985, longitude: 30.38565 },
+      { name: 'Ратная палата', desc: 'уникальный комплекс в неорусском стиле, где сегодня открыт единственный в России музей истории Первой мировой войны.', locationSlug: 'saint-petersburg-ratnaya-palata', latitude: 59.71235, longitude: 30.40585 },
+    ],
+    travelVector: 'Южный вектор',
+    travelVectorBlurb: 'Базовый узел для классических дворцово-пейзажных маршрутов. Электрички «Ласточки» и стандартные пригородные поезда отходят от Витебского вокзала у метро «Пушкинская».',
+    stationHub: 'Витебский вокзал / метро «Пушкинская»',
+    stationName: 'Станция Царское Село',
+    logisticsExit: 'Станция Царское Село'
+  };
+
+export const KRONSTADT_SUBURB_CARD: CitySuburbItem = {
+    name: 'Кронштадт',
+    desc: 'Остров-крепость на Котлине: Морской Никольский собор, форты и музей военно-морской славы.',
+    mustSeeFilter: 'main',
+    places: [
+      { name: 'Морской Никольский собор', desc: 'колоссальный ставропигиальный храм на Якорной площади, построенный по образу Софии Константинопольской как мемориал погибшим морякам.', locationSlug: 'saint-petersburg-morskoy-nikolskiy-sobor', latitude: 59.993412, longitude: 29.777414 },
+      { name: 'Якорная площадь', desc: 'главная площадь Кронштадта с исторической чугунной мостовой, Морским Никольским собором и памятником адмиралу Макарову.', locationSlug: 'saint-petersburg-yakornaya-ploschad', latitude: 59.99185, longitude: 29.77645 },
+      { name: 'Парк «Остров фортов»', desc: 'масштабное общественное пространство, посвященное истории флота, с Аллеей героев, маяком памяти и панорамными качелями.', locationSlug: 'saint-petersburg-ostrov-fortov', latitude: 59.9952, longitude: 29.7018 },
+      { name: 'Музей военно-морской славы', desc: 'ультрасовременный павильон, главным экспонатом которого стала первая советская атомная подлодка К-3, размещенная прямо внутри здания.', locationSlug: 'saint-petersburg-muzey-voenno-morskoy-slavy', venueSlug: 'saint-petersburg-muzey-voenno-morskoy-slavy', latitude: 59.989211, longitude: 29.761512 },
+      { name: 'Петровский док', desc: 'исторический сухой док петровской эпохи, один из ключевых инженерных памятников острова Котлин.', locationSlug: 'saint-petersburg-petrovskiy-dok', latitude: 59.99095, longitude: 29.76635 },
+      { name: 'Форт «Константин»', desc: 'исторический береговой форт на южном берегу Кронштадта с панорамой на фарватер и музейной экспозицией.', locationSlug: 'saint-petersburg-fort-konstantin', latitude: 59.99555, longitude: 29.70125 },
+      { name: 'Петровский парк', desc: 'городской парк у Петровского дока с памятником Петру I и видом на гавань Кронштадта.', locationSlug: 'saint-petersburg-petrovskiy-park-kronstadt', latitude: 59.98955, longitude: 29.76785 },
+    ],
+    travelVector: 'Финский залив и Балтийский вектор',
+    travelVectorBlurb:
+      'Как добраться: метеоры/катамараны из центра СПб, на авто или автобусе по КАД',
+    stationHub: 'Дамба/к западу от СПБ',
+    stationName: 'остров Котлин',
+    logisticsExit: 'остров Котлин',
+    logisticsExitLabel: 'Где расположен',
+    gastroStop: { name: '«Голландская кухня»', blurb: 'Кухня в духе голландских мастеров верфей Петра у Петровского дока.' },
+    gastroHint: '«Голландская кухня» (Кронштадт, у Петровского дока) - Историческое заведение, переосмыслившее кулинарные традиции голландских мастеров верфей Петра.'
+  };
+
+export const GATCHINA_SUBURB_CARD: CitySuburbItem = {
+    name: 'Гатчина',
+    desc: 'Охотничий замок Павла I из пудостского камня, Приоратский дворец и пейзажный парк.',
+    mustSeeFilter: 'main',
+    places: [
+      { name: 'Большой Гатчинский дворец', desc: 'суровый охотничий замок Антонио Ринальди из пудостского камня, скрывающий 130-метровый подземный ход к Серебряному озеру.', locationSlug: 'saint-petersburg-bolshoy-gatchinskiy-dvorets', latitude: 59.564112, longitude: 30.108114 },
+      { name: 'Приоратский дворец', desc: 'уникальный миниатюрный замок Мальтийского ордена на берегу Черного озера, полностью построенный из прессованной земли по технологии землебита.', locationSlug: 'saint-petersburg-prioratskiy-dvorets', latitude: 59.558311, longitude: 30.120812 },
+      { name: 'Дворцовый парк в Гатчине', desc: 'старейший пейзажный парк региона с Водным лабиринтом, павильоном Венеры и регулярными Садами на островах.', locationSlug: 'saint-petersburg-dvortsovyy-park-gatchina', latitude: 59.56585, longitude: 30.11145 },
+      { name: 'Серебряное озеро', desc: 'живописный пруд у Большого дворца, куда выходит знаменитый подземный ход из дворцовых подвалов.', locationSlug: 'saint-petersburg-serebryanoe-ozero-gatchina', latitude: 59.56685, longitude: 30.10555 },
+      { name: 'Павильон Орла', desc: 'монументальная каменная колоннада-ротонда на берегу Белого озера, построенная по проекту Бренны для императора Павла I.', locationSlug: 'saint-petersburg-pavilion-orla-gatchina', latitude: 59.56915, longitude: 30.10785 },
+      { name: 'Гатчинский гейзер (Источник)', desc: 'необычная природно-техногенная аттракция в лесах под Гатчиной, где из старых скважин бьют настоящие водяные фонтаны.', locationSlug: 'saint-petersburg-gatchinskiy-geyzer', latitude: 59.5512, longitude: 30.0685 },
+    ],
+    travelVector: 'Южный вектор',
+    travelVectorBlurb: 'Электрички от Балтийского вокзала (метро «Балтийская») до станции Гатчина-Балтийская - удобный полудневный маршрут к дворцу и парку.',
+    stationHub: 'Балтийский вокзал',
+    stationName: 'Станция Гатчина-Балтийская',
+    logisticsExit: 'Станция Гатчина-Балтийская'
+  };
+
+export const PAVLOVSK_SUBURB_CARD: CitySuburbItem = {
+    name: 'Павловск',
+    desc: 'Классический дворец Камерона и один из самых больших пейзажных парков Европы.',
+    mustSeeFilter: 'main',
+    places: [
+      { name: 'Павловский парк', seasonLabel: 'Зимний эксклюзив: заснеженный парк', desc: 'один из самых больших пейзажных парков Европы (600 гектаров), славящийся своими живописными районами «Белая береза» и «Старая Сильвия».', locationSlug: 'saint-petersburg-pavlovskiy-park', latitude: 59.6875, longitude: 30.4485 },
+      { name: 'Павловский дворец', desc: 'золотисто-белый классический дворец Чарльза Камерона, возведенный на высоком холме над извилистой рекой Славянкой.', locationSlug: 'saint-petersburg-pavlovskiy-dvorets', latitude: 59.685911, longitude: 30.453912 },
+      { name: 'Долина реки Славянки', desc: 'самый поэтичный прогулочный маршрут Павловска со множеством изящных мостиков, Колоннадой Аполлона и павильоном «Храм Дружбы».', locationSlug: 'saint-petersburg-dolina-slavyanki', latitude: 59.68385, longitude: 30.44715 },
+      { name: 'Храм Дружбы', desc: 'круглый классический павильон Камерона в долине Славянки - один из главных символов Павловского парка.', locationSlug: 'saint-petersburg-hram-druzhby-pavlovsk', latitude: 59.68455, longitude: 30.44585 },
+      { name: 'Колоннада Аполлона', desc: 'полукруглая колоннада на холме над Славянкой, открывающая один из лучших видов Павловска.', locationSlug: 'saint-petersburg-kolonada-apollona', latitude: 59.68295, longitude: 30.44955 },
+      { name: 'Павильон «Пиль-башня»', desc: 'необычная парковая постройка в виде замшелой водяной мельницы с соломенной крышей, внутри которой скрывается роскошный парадный салон.', locationSlug: 'saint-petersburg-pavilion-pil-bashnya', latitude: 59.68245, longitude: 30.44185 },
+      { name: 'Собственный садик императрицы', desc: 'скрытый регулярный мини-сад у южного фасада дворца, украшенный статуями и редкими сортами голландских цветов.', locationSlug: 'saint-petersburg-sobstvennyy-sadik-pavlovsk', latitude: 59.68545, longitude: 30.45335 },
+    ],
+    travelVector: 'Южный вектор',
+    travelVectorBlurb: 'Базовый узел для классических дворцово-пейзажных маршрутов. Электрички «Ласточки» и стандартные пригородные поезда отходят от Витебского вокзала у метро «Пушкинская».',
+    stationHub: 'Витебский вокзал / метро «Пушкинская»',
+    stationName: 'Станция Павловск',
+    logisticsExit: 'Станция Павловск',
+    gastroStop: { name: 'Ресторан «Подворье»', blurb: 'Русская кухня в бревенчатом тереме усадебного масштаба у парка.' },
+    gastroHint: 'Ресторан «Подворье» (Павловск) - Огромный бревенчатый терем русской кухни усадебного масштаба, прозванный «самым русским рестораном страны», где гостей кормят блюдами по старинным рецептам и домашними наливками в окружении аутентичного резного дерева.'
+  };
+
+export const ORANIENBAUM_SUBURB_CARD: CitySuburbItem = {
+    name: 'Ораниенбаум / Ломоносов',
+    desc: 'Барочный Меншиковский дворец, Китайский дворец рококо и павильон Катальной горки.',
+    mustSeeFilter: 'main',
+    places: [
+      { name: 'Большой Меншиковский дворец', desc: 'грандиозная барочная резиденция фаворита Петра I, которая по своим масштабам изначально превосходила даже строящийся в то же время Петергоф.', locationSlug: 'saint-petersburg-menshikovkiy-dvorets-oranienbaum', latitude: 59.91485, longitude: 29.75365 },
+      { name: 'Китайский дворец', desc: 'подлинный шедевр стиля рококо архитектора Антонио Ринальди, уцелевший в войну и знаменитый своим уникальным Стеклярусным кабинетом с мерцающими панно.', locationSlug: 'saint-petersburg-kitayskiy-dvorets-oranienbaum', latitude: 59.90895, longitude: 29.75085 },
+      { name: 'Павильон Катальной горки', desc: 'уцелевшая часть огромного императорского аттракциона XVIII века, откуда царская знать спускалась на специальных колясочках с высоты 20 метров.', locationSlug: 'saint-petersburg-pavilion-katalnoy-gorki', latitude: 59.90785, longitude: 29.75345 },
+      { name: 'Дворец Петра III', desc: 'миниатюрный каменный замок-крепость «Петерштадт», построенный для уединенных военных игр и отдыха несчастного императора.', locationSlug: 'saint-petersburg-dvorets-petra-iii', latitude: 59.91055, longitude: 29.75515 },
+      { name: 'Кавалерский корпус', desc: 'служебный флигель ансамбля рядом с Китайским дворцом, часть дворцово-паркового комплекса Ораниенбаума.', locationSlug: 'saint-petersburg-kavalerskiy-korpus', latitude: 59.90955, longitude: 29.74985 },
+      { name: 'Нижний сад Ораниенбаума', desc: 'регулярный сад у Меншиковского дворца с каналами и видом на залив - парадный вход в ансамбль.', locationSlug: 'saint-petersburg-nizhniy-sad-oranienbaum', latitude: 59.91555, longitude: 29.75485 },
+      { name: 'Парк Ораниенбаум', desc: 'огромный пейзажный массив с вековыми деревьями, мостиками Ринальди и прудами, разделенный на Верхний и Нижний регулярные сады.', locationSlug: 'saint-petersburg-park-oranienbaum', latitude: 59.91185, longitude: 29.75245 },
+    ],
+    travelVector: 'Юго-Западный и Морской вектор',
+    travelVectorBlurb: 'Направление вдоль южного побережья Финского залива. Доступно на электричках от метро «Балтийская» или на скоростных водных судах «Метеор» от причалов Эрмитажа.',
+    stationHub: 'Балтийский вокзал',
+    stationName: 'Станция Ораниенбаум-1',
+    logisticsExit: 'Станция Ораниенбаум-1'
+  };
+
+export const STRELNA_SUBURB_CARD: CitySuburbItem = {
+    name: 'Стрельна',
+    desc: 'Константиновский дворец конгрессов у залива и путевой дом Петра I.',
+    mustSeeFilter: 'main',
+    places: [
+      { name: 'Константиновский дворец', desc: 'величественная парадная резиденция Романовых у самой воды, полностью восстановленная в XXI веке как действующий Государственный комплекс «Дворец конгрессов».', locationSlug: 'saint-petersburg-konstantinovskiy-dvorets', latitude: 59.85585, longitude: 30.05765 },
+      { name: 'Путевой дворец Петра I', desc: 'скромный деревянный дом царя, заложенный у реки Стрелки, где были обустроены первые в России опытные грядки для картофеля и лекарственных трав.', locationSlug: 'saint-petersburg-putevoi-dvorets-petra-strelna', latitude: 59.85195, longitude: 30.04285 },
+      { name: 'Константиновский парк', desc: 'масштабный гидротехнический парк с каналами и разводными мостами, открывающий парадную панораму на Финский залив.', locationSlug: 'saint-petersburg-konstantinovskiy-park', latitude: 59.85455, longitude: 30.05615 },
+      { name: 'Львовский дворец', desc: 'изящная неоготическая усадьба с зубчатыми башнями, построенная для генерал-адъютанта князя Львова прямо на Петергофской дороге.', locationSlug: 'saint-petersburg-lvovskiy-dvorets', latitude: 59.84985, longitude: 30.04845 },
+      { name: 'Орловский парк', desc: 'заброшенный романтический парк с прудом, готической башней-руиной и конюшнями, принадлежавший некогда графу Орлову.', locationSlug: 'saint-petersburg-orlovskiy-park', latitude: 59.84755, longitude: 30.06125 },
+    ],
+    travelVector: 'Юго-Западный и Морской вектор',
+    travelVectorBlurb: 'Направление вдоль южного побережья Финского залива. Доступно на электричках от метро «Балтийская» или на скоростных водных судах «Метеор» от причалов Эрмитажа.',
+    stationHub: 'Балтийский вокзал',
+    stationName: 'Станция Стрельна',
+    logisticsExit: 'Станция Стрельна'
+  };
+
+export const KURORT_COAST_SUBURB_CARD: CitySuburbItem = {
+    name: 'Курортный район / Побережье',
+    desc: 'Сестрорецк, Репино и Комарово: дюны, экотропы и репинские «Пенаты».',
+    mustSeeFilter: 'main',
+    places: [
+      { name: 'Сестрорецкий Рубеж', desc: 'выставочный комплекс на месте оборонительного Карельского укрепрайона с подлинным железобетонным ДОТом «Миллионер» внутри.', locationSlug: 'saint-petersburg-sestroretskiy-rubezh', latitude: 60.11295, longitude: 29.9712 },
+      { name: 'Экотропа «Комаровский берег»', desc: 'пешеходный деревянный маршрут сквозь вековой таежный лес, дюны и муравейники-гиганты прямо к песчаному пляжу залива.', locationSlug: 'saint-petersburg-ekotropa-komarovskiy-bereg', latitude: 60.1825, longitude: 29.7855 },
+      { name: 'Музей-усадьба И. Е. Репина «Пенаты»', desc: 'деревянный дом художника в Репино с уникальной стеклянной крышей-куполом, где он провел последние тридцать лет жизни.', locationSlug: 'saint-petersburg-penaty-repina', latitude: 60.15586, longitude: 29.89661 },
+      { name: 'Комаровский некрополь', desc: 'тихое лесное мемориальное кладбище, ставшее местом упокоения Анны Ахматовой, Дмитрия Лихачева и других деятелей науки и культуры.', locationSlug: 'saint-petersburg-komarovskiy-nekropol', latitude: 60.20462, longitude: 29.79991 },
+      { name: 'Заказник «Сестрорецкое болото»', desc: 'масштабная болотная экосистема с длинной пешеходной тропой на сваях, проложенной через нетронутые дикие топи.', locationSlug: 'saint-petersburg-sestroretskoe-boloto', latitude: 60.1055, longitude: 30.0155 },
+    ],
+    travelVector: 'Северный и Выборгский вектор',
+    travelVectorBlurb: 'Скоростные электрички «Ласточки» от метро «Площадь Ленина» связывают центр с курортным побережьем и Выборгом.',
+    stationHub: 'Финляндский вокзал',
+    stationName: 'Станции Сестрорецк, Репино, Комарово',
+    logisticsExit: 'Станции Сестрорецк, Репино, Комарово'
+  };
+
+export const SHLISSELBURG_SUBURB_CARD: CitySuburbItem = {
+    name: 'Шлиссельбург / Ладога',
+    desc: 'Крепость Орешек на острове в истоке Невы и старая имперская тюрьма.',
+    mustSeeFilter: 'main',
+    places: [
+      { name: 'Крепость Орешек', seasonLabel: 'Летняя навигация - май-октябрь', desc: 'древняя новгородская фортеция XIV века на Ореховом острове в истоке Невы, выдержавшая жестокие штурмы шведов и ставшая главной тюрьмой империи.', locationSlug: 'saint-petersburg-krepost-oreshek', latitude: 59.9535, longitude: 31.0385 },
+      { name: 'Секретный дом (Старая тюрьма)', desc: 'сохранившийся крепостной корпус, где в одиночных камерах десятилетиями содержались декабристы, народовольцы и полярник шекспировед Морозов.', locationSlug: 'saint-petersburg-sekretnyy-dom-oreshek', latitude: 59.9538, longitude: 31.0392 },
+      { name: 'Королевская башня', desc: 'мощная угловая башня крепости, построенная шведами по последнему слову средневековой фортификации во время оккупации острова.', locationSlug: 'saint-petersburg-korolevskaya-bashnya-oreshek', latitude: 59.9541, longitude: 31.0375 },
+      { name: 'Староладожский канал', desc: 'грандиозное гидротехническое сооружение первой половины XVIII века, строившееся по приказу Петра I для безопасного обхода бурной Ладоги.', locationSlug: 'saint-petersburg-staroladozhskiy-kanal', latitude: 59.9395, longitude: 31.0285 },
+      { name: 'Памятник Петру I в Шлиссельбурге', desc: 'один из немногих советских памятников царю, установленный на пристани, откуда катера отправляются на остров.', locationSlug: 'saint-petersburg-pamyatnik-petru-shlisselburg', latitude: 59.9485, longitude: 31.0335 },
+    ],
+    travelVector: 'Островной и Ладожский вектор',
+    travelVectorBlurb: 'Водная логистика, катера от Невы или КАД/Дамба.',
+    stationHub: 'Дамба / Водный транспорт',
+    stationName: 'Катера от Невы',
+    logisticsExit: 'Катера от Невы'
+  };
+
+export const SOSNOVY_BOR_SUBURB_CARD: CitySuburbItem = {
+    name: 'Сосновый Бор / Атомград',
+    desc: 'Детский Андерсенград, Липовский пляж и приморский лесопарк на юге залива.',
+    mustSeeFilter: 'main',
+    places: [
+      { name: 'Андерсенград', desc: 'уникальный детский игровой городок из камня, построенный к 175-летию Ханса Кристиана Андерсена в стиле средневековой западноевропейской архитектуры с ратушей, подземным ходом и бастионами.', locationSlug: 'saint-petersburg-andersengrad-sosnovyy-bor', latitude: 59.897811, longitude: 29.086412 },
+      { name: 'Природный парк «Липовский пляж»', desc: 'многокилометровый песчаный берег Финского залива с вековыми соснами и дюнами, обрамляющий уникальное соленое озеро Липово.', locationSlug: 'saint-petersburg-lipovskiy-plyazh', latitude: 59.9055, longitude: 29.0455 },
+      { name: 'Парк «Приморский»', desc: 'благоустроенный прибрежный лесопарк с современными деревянными набережными, экотропами на сваях и панорамными смотровыми площадками на залив.', locationSlug: 'saint-petersburg-park-primorskiy-sosnovyy-bor', latitude: 59.9015, longitude: 29.0725 },
+      { name: 'Копорская крепость', desc: 'расположенная неподалеку древнерусская каменная фортеция XIII века, возведенная на высокой скале и частично сохранившая средневековые башни и оборонительные стены.', locationSlug: 'saint-petersburg-koporskaya-krepost', latitude: 59.7085, longitude: 29.0325 },
+      { name: 'Ранчо «Эвелон»', desc: 'популярный загородный эко-комплекс и конный клуб в окрестностях города, предлагающий прогулки по хвойным лесам побережья.', locationSlug: 'saint-petersburg-rancho-evelon', latitude: 59.8755, longitude: 29.1255 },
+    ],
+    travelVector: 'Южный Атомный вектор',
+    travelVectorBlurb: 'Дальнее прибрежное направление юга залива. Поезда до конечной станции Калище.',
+    stationHub: 'Балтийский вокзал / Калище',
+    stationName: 'Станция Калище',
+    logisticsExit: 'Станция Калище',
+    gastroStop: { name: 'Кафе «Тайм-аут»', blurb: 'Бургеры и рыба Финского залива на видовой террасе у Приморского парка.' },
+    gastroHint: 'Кафе «Тайм-аут» (Сосновый Бор) - Популярный локальный гастро-спот у Приморского парка, где подают отличные бургеры и блюда из свежевыловленной рыбы Финского залива на видовой террасе.'
+  };
+export function buildSaintPetersburgSuburbs(vyborgCard: CitySuburbItem): CitySuburbItem[] {
+  return [
+    PETERHOF_SUBURB_CARD,
+    PUSHKIN_SUBURB_CARD,
+    KRONSTADT_SUBURB_CARD,
+    GATCHINA_SUBURB_CARD,
+    PAVLOVSK_SUBURB_CARD,
+    ORANIENBAUM_SUBURB_CARD,
+    STRELNA_SUBURB_CARD,
+    vyborgCard,
+    KURORT_COAST_SUBURB_CARD,
+    SHLISSELBURG_SUBURB_CARD,
+    SOSNOVY_BOR_SUBURB_CARD,
+  ];
+}

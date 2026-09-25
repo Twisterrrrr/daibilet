@@ -155,10 +155,38 @@ function capitalizeWord(value: string): string {
   return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
 }
 
+/** Type-first + adjectival name (API quirk) → name + type: «Проспект Кольский» → «Кольский проспект». */
+const STREET_TYPE_FIRST_RE =
+  /^(проспект|пр-?т|просп\.?|пр\.|улица|ул\.|переулок|пер\.|бульвар|б-?р\.?|площадь|пл\.|набережная|наб\.?)\s+(.+)$/iu;
+/** Nominative adjectives only — keep genitives like «проспект Мира», «улица Ленина». */
+const ADJECTIVE_STREET_NAME_RE =
+  /^[\p{L}][\p{L}\d-]*(?:ский|ская|ское|ские|цкий|цкая|цкое|ный|ная|ное|ной|овый|овая|овое)$/iu;
+
+function canonicalStreetType(typeRaw: string): string {
+  const t = typeRaw.replace(/\.$/, '').toLowerCase().replace(/\s+/g, '');
+  if (t === 'ул' || t.startsWith('улиц')) return 'улица';
+  if (t === 'пр' || t === 'пр-т' || t === 'прт' || t.startsWith('просп')) return 'проспект';
+  if (t === 'пер' || t.startsWith('переул')) return 'переулок';
+  if (t === 'б-р' || t === 'бр' || t.startsWith('бульвар')) return 'бульвар';
+  if (t === 'пл' || t.startsWith('площад')) return 'площадь';
+  if (t === 'наб' || t.startsWith('набереж')) return 'набережная';
+  return typeRaw.toLowerCase();
+}
+
+function reorderStreetTypePrefix(part: string): string {
+  const text = part.trim();
+  if (!text) return text;
+  const match = text.match(STREET_TYPE_FIRST_RE);
+  if (!match) return text;
+  const name = match[2].trim();
+  if (!name || /\d/.test(name) || !ADJECTIVE_STREET_NAME_RE.test(name)) return text;
+  return `${capitalizeWord(name)} ${canonicalStreetType(match[1])}`;
+}
+
 function formatInlineStreetAddress(value: string): string | null {
   const match = value.trim().match(INLINE_STREET_RE);
   if (!match) return null;
-  const street = capitalizeWord(match[1]);
+  const street = reorderStreetTypePrefix(capitalizeWord(match[1]));
   const house = match[2];
   if (STREET_MARKERS_RE.test(street)) return `${street}, ${house}`;
   return `ул. ${street}, ${house}`;
@@ -222,7 +250,9 @@ export function formatStreetAddress(
   const withoutInstitution = stripInstitutionPrefix(parts, options?.city);
 
   if (withoutInstitution.length <= 1) {
-    return formatInlineStreetAddress(trimmed) || trimmed;
+    const inline = formatInlineStreetAddress(trimmed);
+    if (inline) return inline;
+    return reorderStreetTypePrefix(trimmed);
   }
 
   const cleaned = stripTrailingMeta(withoutInstitution, options?.city);
@@ -232,7 +262,11 @@ export function formatStreetAddress(
   const bareStreetLine = formatBareStreetLine(cleaned, options?.city);
   if (bareStreetLine) return bareStreetLine;
 
-  const result = cleaned.map((part) => cleanAddressPart(part)).filter(Boolean).join(', ').trim();
+  const result = cleaned
+    .map((part) => reorderStreetTypePrefix(cleanAddressPart(part)))
+    .filter(Boolean)
+    .join(', ')
+    .trim();
   return result || trimmed;
 }
 

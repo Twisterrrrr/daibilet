@@ -1,6 +1,7 @@
 import * as React from 'react';
+import { adminFetch } from '@/lib/admin-api';
 import { useSearchParams } from 'react-router-dom';
-import { AlertTriangle, CheckCircle2, Clock, Copy, Plus, Receipt, RefreshCcw, Search, Ticket } from 'lucide-react';
+import { AlertTriangle, Archive, CheckCircle2, Clock, Copy, Plus, Receipt, RefreshCcw, Search, Ticket, Trash2 } from 'lucide-react';
 
 import { DataTableShell, EmptyState, InfoNote, PageHeader, QuickFilterBar, SourceBadge, StatusBadge } from '@/components/admin/primitives';
 import { Badge } from '@/components/ui/badge';
@@ -10,18 +11,17 @@ import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { formatNumber } from '@/data';
 
-const API_BASE_URL =
-  ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env?.VITE_DAIBILET_API_URL as string | undefined) ||
-  'http://127.0.0.1:4000';
 const PAGE_SIZE = 50;
 
 const QUICK_FILTER_LABELS: Record<string, string> = {
-  all: 'Все',
+  all: 'Активные',
   attention: 'Требуют внимания',
   pending_refunds: 'Возвраты',
   missing_artifact: 'Без билетов',
   failed_integration: 'Проблемы',
   unlinked: 'Без связи',
+  archivable: 'К архиву',
+  archive: 'Архив',
 };
 
 type OrderStatusTone = 'draft' | 'ready' | 'live' | 'paused' | 'archived' | 'incomplete' | 'error';
@@ -44,6 +44,9 @@ type AdminOrderRow = {
   };
   purchasedAt?: string | null;
   updatedAt?: string | null;
+  archivedAt?: string | null;
+  isArchived?: boolean;
+  canArchive?: boolean;
   ticketCount: number;
   unlinkedTickets: number;
   eventTitle?: string | null;
@@ -112,6 +115,7 @@ type AdminOrdersPayload = {
     missingArtifacts: number;
     failedIntegration: number;
     needsAttention: number;
+    archived?: number;
   };
 };
 
@@ -121,6 +125,8 @@ export function ExternalOrdersPage() {
   const [loading, setLoading] = React.useState(true);
   const [loadError, setLoadError] = React.useState<string | null>(null);
   const [syncing, setSyncing] = React.useState(false);
+  const [archivingBulk, setArchivingBulk] = React.useState(false);
+  const [actionBusyId, setActionBusyId] = React.useState<string | null>(null);
   const [reloadTick, setReloadTick] = React.useState(0);
   const [selectedOrder, setSelectedOrder] = React.useState<AdminOrderRow | null>(null);
   const [isSavingTicket, setIsSavingTicket] = React.useState(false);
@@ -157,7 +163,7 @@ export function ExternalOrdersPage() {
   const openOrder = React.useCallback((order: AdminOrderRow) => {
     setSelectedOrder(order);
     setTicketSaveError(null);
-    fetch(`${API_BASE_URL}/api/admin/orders/${encodeURIComponent(order.id)}`, { cache: 'no-store' })
+    adminFetch(`/api/admin/orders/${encodeURIComponent(order.id)}`, { cache: 'no-store' })
       .then(async (response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return (await response.json()) as AdminOrderRow;
@@ -170,7 +176,7 @@ export function ExternalOrdersPage() {
     (order: AdminOrderRow, patch: { id?: string; externalTicketId: string; status: string; eventId?: string | null; sessionId?: string | null }) => {
       setIsSavingTicket(true);
       setTicketSaveError(null);
-      return fetch(`${API_BASE_URL}/api/admin/orders/${encodeURIComponent(order.id)}/tickets`, {
+      return adminFetch(`/api/admin/orders/${encodeURIComponent(order.id)}/tickets`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(patch),
@@ -194,7 +200,7 @@ export function ExternalOrdersPage() {
 
   const syncTicketscloudOrders = React.useCallback(() => {
     setSyncing(true);
-    fetch(`${API_BASE_URL}/api/admin/orders/sync`, { method: 'POST' })
+    adminFetch(`/api/admin/orders/sync`, { method: 'POST' })
       .then(async (response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return response.json();
@@ -209,13 +215,71 @@ export function ExternalOrdersPage() {
       .finally(() => setSyncing(false));
   }, [refresh]);
 
+  const archiveCancelledOrders = React.useCallback(() => {
+    setArchivingBulk(true);
+    adminFetch(`/api/admin/orders/archive`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ statuses: ['cancelled', 'canceled', 'expired', 'deleted', 'rejected', 'refunded'] }),
+    })
+      .then(async (response) => {
+        const body = await response.json().catch(() => null);
+        if (!response.ok) throw new Error(body?.error || `HTTP ${response.status}`);
+        setLoadError(null);
+        refresh();
+      })
+      .catch((error) => {
+        setLoadError(error instanceof Error ? `Архивация не прошла: ${error.message}` : String(error));
+      })
+      .finally(() => setArchivingBulk(false));
+  }, [refresh]);
+
+  const setOrderArchived = React.useCallback(
+    (order: AdminOrderRow, archive: boolean) => {
+      setActionBusyId(order.id);
+      adminFetch(`/api/admin/orders/${encodeURIComponent(order.id)}/${archive ? 'archive' : 'unarchive'}`, { method: 'POST' })
+        .then(async (response) => {
+          const body = await response.json().catch(() => null);
+          if (!response.ok) throw new Error(body?.error || body?.message || `HTTP ${response.status}`);
+          setLoadError(null);
+          if (selectedOrder?.id === order.id) setSelectedOrder(null);
+          refresh();
+        })
+        .catch((error) => {
+          setLoadError(error instanceof Error ? error.message : String(error));
+        })
+        .finally(() => setActionBusyId(null));
+    },
+    [refresh, selectedOrder?.id],
+  );
+
+  const deleteOrder = React.useCallback(
+    (order: AdminOrderRow) => {
+      if (!window.confirm(`Удалить заказ №${order.publicCode || order.externalOrderId} безвозвратно?`)) return;
+      setActionBusyId(order.id);
+      adminFetch(`/api/admin/orders/${encodeURIComponent(order.id)}`, { method: 'DELETE' })
+        .then(async (response) => {
+          const body = await response.json().catch(() => null);
+          if (!response.ok) throw new Error(body?.error || body?.message || `HTTP ${response.status}`);
+          setLoadError(null);
+          if (selectedOrder?.id === order.id) setSelectedOrder(null);
+          refresh();
+        })
+        .catch((error) => {
+          setLoadError(error instanceof Error ? error.message : String(error));
+        })
+        .finally(() => setActionBusyId(null));
+    },
+    [refresh, selectedOrder?.id],
+  );
+
   React.useEffect(() => {
     const controller = new AbortController();
     const nextParams = new URLSearchParams(params);
     nextParams.set('limit', String(PAGE_SIZE));
     setLoading(true);
 
-    fetch(`${API_BASE_URL}/api/admin/orders?${nextParams.toString()}`, {
+    adminFetch(`/api/admin/orders?${nextParams.toString()}`, {
       cache: 'no-store',
       signal: controller.signal,
     })
@@ -281,6 +345,10 @@ export function ExternalOrdersPage() {
               <RefreshCcw className="mr-2 h-4 w-4" />
               Обновить
             </Button>
+            <Button variant="outline" size="sm" onClick={archiveCancelledOrders} disabled={archivingBulk || view === 'archive'}>
+              <Archive className={`mr-2 h-4 w-4 ${archivingBulk ? 'animate-pulse' : ''}`} />
+              {archivingBulk ? 'Архивация...' : 'В архив отменённые'}
+            </Button>
             <Button variant="default" size="sm" onClick={syncTicketscloudOrders} disabled={syncing}>
               <RefreshCcw className={`mr-2 h-4 w-4 ${syncing ? 'animate-spin' : ''}`} />
               {syncing ? 'Синхронизация...' : 'Синхронизировать TC'}
@@ -290,7 +358,8 @@ export function ExternalOrdersPage() {
       />
 
       <InfoNote>
-        Для покупателя это будет раздел "Мои заказы". В админке оставляем рабочие поля: номер заказа, покупатель, событие, статус и билеты.
+        Активные заказы — рабочие. Отменённые, истёкшие и удалённые старше 30 дней уходят в архив автоматически
+        (и вместе с ними пропадают из активных покупателей). Кнопка «В архив отменённые» архивирует сразу, без ожидания.
       </InfoNote>
 
       <div className="mt-4 grid grid-cols-2 gap-2 lg:grid-cols-4">
@@ -335,7 +404,7 @@ export function ExternalOrdersPage() {
             {loading ? 'загрузка...' : `${formatNumber(payload.total)} найдено`}
           </div>
         </div>
-        {loadError ? <div className="mt-2 rounded-md border border-warning/30 bg-warning/10 px-3 py-2 text-xs text-warning-foreground">Backend недоступен: {loadError}</div> : null}
+        {loadError ? <div className="mt-2 rounded-md border border-warning/30 bg-warning/10 px-3 py-2 text-xs text-warning-foreground">Сервер недоступен: {loadError}</div> : null}
       </Card>
 
       <div className="mt-4">
@@ -414,9 +483,43 @@ export function ExternalOrdersPage() {
                 </td>
               ) : null}
               <td className="px-4 py-3 align-top">
-                <Button variant="outline" size="sm" onClick={() => openOrder(order)}>
-                  Открыть
-                </Button>
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="outline" size="sm" onClick={() => openOrder(order)}>
+                    Открыть
+                  </Button>
+                  {order.isArchived || view === 'archive' ? (
+                    <>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={actionBusyId === order.id}
+                        onClick={() => setOrderArchived(order, false)}
+                      >
+                        Вернуть
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-destructive"
+                        disabled={actionBusyId === order.id}
+                        onClick={() => deleteOrder(order)}
+                      >
+                        <Trash2 className="mr-1 h-3.5 w-3.5" />
+                        Удалить
+                      </Button>
+                    </>
+                  ) : order.canArchive ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={actionBusyId === order.id}
+                      onClick={() => setOrderArchived(order, true)}
+                    >
+                      <Archive className="mr-1 h-3.5 w-3.5" />
+                      В архив
+                    </Button>
+                  ) : null}
+                </div>
               </td>
             </tr>
           ))}
@@ -502,7 +605,7 @@ function OrderDetailSheet({
       const nextParams = new URLSearchParams({ limit: '12' });
       if (eventQuery.trim()) nextParams.set('q', eventQuery.trim());
       setEventCandidatesLoading(true);
-      fetch(`${API_BASE_URL}/api/admin/order-event-candidates?${nextParams.toString()}`, {
+      adminFetch(`/api/admin/order-event-candidates?${nextParams.toString()}`, {
         cache: 'no-store',
         signal: controller.signal,
       })
@@ -762,6 +865,7 @@ function emptyPayload(params: URLSearchParams): AdminOrdersPayload {
       missingArtifacts: 0,
       failedIntegration: 0,
       needsAttention: 0,
+      archived: 0,
     },
   };
 }
