@@ -23,7 +23,7 @@ import { hasSeoListingEditorial } from '@/data/seo-listing-texts';
 import { isEventsCatalogSitemapEligibleUrl } from '@/lib/events-catalog-indexing';
 import { evaluateListingIndexability, MIN_LISTING_OFFERS_FOR_INDEX } from '@/lib/seo-listing-meta';
 import { buildPodborkiCityCanonicalPath, isPodborkiSeoPilotCitySlug, PODBORKI_SEO_PILOT_CITY_SLUGS } from '@/lib/podborki-city-seo';
-import { venueHref } from '@/lib/routes';
+import { venueSitemapEntry } from '@/lib/venue-sitemap-entry';
 import { cityPlacesCatalogHref } from '@/lib/catalog-url';
 import { getCachedCatalog } from '@/server/cached-catalog-data';
 import { getCachedDestinations } from '@/server/cached-public-surfaces';
@@ -222,27 +222,38 @@ export async function buildCitiesSitemapEntries(now = new Date()): Promise<Sitem
 }
 
 export async function buildVenuesSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
-  const venuesPayload = await buildPublicVenuesDto(new URLSearchParams(`limit=${MAX_VENUES}`));
-  return (venuesPayload?.venues || [])
-    .filter((venue) => {
-      if (!venue.slug) return false;
-      return evaluateVenueIndexability({
+  // The public venue DTO caps a single dump at 2,000 even when limit=10,000.
+  // Walk its cursor so later catalog pages enter the sitemap too.
+  const entries: SitemapEntry[] = [];
+  const seen = new Set<string>();
+  const seenUrls = new Set<string>();
+  let cursor: string | null = null;
+  for (let page = 0; page < Math.ceil(MAX_VENUES / 2000); page++) {
+    const params = new URLSearchParams({ limit: '2000' });
+    if (cursor) params.set('cursor', cursor);
+    const payload = await buildPublicVenuesDto(params);
+    if (payload.countsPending) throw new Error('Venue sitemap requires complete event counts');
+    for (const venue of payload.venues || []) {
+      if (!venue.slug || seen.has(venue.id)) continue;
+      seen.add(venue.id);
+      if (!evaluateVenueIndexability({
         events: venue.events,
         isIndexable: venue.isIndexable,
-      }).indexable;
-    })
-    .slice(0, MAX_VENUES)
-    .map((venue) => {
-      const path =
-        venue.canonicalPath ||
-        venueHref({
-          id: venue.id,
-          slug: venue.slug,
-          name: venue.name,
-          type: venue.type,
-        });
-      return entry(path, now, 'weekly', 0.6);
-    });
+      }).indexable) continue;
+      const item = venueSitemapEntry(venue, getSiteUrl(), now);
+      // Different source venues can collapse to the same public slug. One URL
+      // has one routable page, so it must appear only once in the sitemap.
+      if (seenUrls.has(item.url)) continue;
+      seenUrls.add(item.url);
+      entries.push(item);
+    }
+    if (!payload.hasMore) return entries;
+    if (!payload.nextCursor || payload.nextCursor === cursor || !(payload.venues || []).length) {
+      throw new Error('Venue sitemap pagination stalled');
+    }
+    cursor = payload.nextCursor;
+  }
+  throw new Error(`Venue sitemap exceeded ${MAX_VENUES} catalog rows`);
 }
 
 export async function buildLandingsSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
