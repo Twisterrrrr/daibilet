@@ -45,6 +45,9 @@ jobs:
       - name: Web lib unit tests (CI allowlist)
         run: pnpm web:test:ci
 
+      - name: Crawler and Webmaster report tests
+        run: node --test scripts/crawler-infra.test.mjs scripts/webmaster-indexnow-report.test.mjs scripts/telegram-alert.test.mjs
+
       - name: Next web build
         run: pnpm web:build
 

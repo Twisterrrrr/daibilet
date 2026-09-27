@@ -4,6 +4,7 @@ import { createInterface } from 'node:readline';
 import { spawnSync } from 'node:child_process';
 import { dirname } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { sendTelegramAlert } from './lib/telegram-alert.mjs';
 
 export function botFailure(line) {
   const match = line.match(/\[([^\]]+)\]\s+"[^"]*"\s+(5\d\d)\s+\S+\s+"[^"]*"\s+"([^"]*)"/);
@@ -56,13 +57,7 @@ export async function main() {
     appendFileSync(alertFile, `${JSON.stringify(report)}\n`);
     // Local durable alert always exists; use the established Telegram channel if configured.
     if (process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID) {
-      const response = await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: process.env.TELEGRAM_CHAT_ID, text: `Daibilet crawler ALERT\n${JSON.stringify(report)}` }),
-        signal: AbortSignal.timeout(10_000),
-      });
-      const body = await response.json();
-      if (!response.ok || !body.ok) throw new Error('Crawler Telegram alert delivery failed');
+      await sendTelegramAlert(`Daibilet crawler ALERT\n${JSON.stringify(report)}`);
     }
   }
   mkdirSync(dirname(stateFile), { recursive: true });

@@ -25,3 +25,15 @@ test('venueCanonicalPath keeps matching location path', () => {
   };
   assert.equal(venueCanonicalPath(venue), '/locations/park-gorkogo');
 });
+
+test('venueCanonicalPath ignores stored same-family ID suffix that redirects to the public slug', () => {
+  const venue = {
+    id: 'venue_5dd900bd6314a2f6642d8b07',
+    slug: 'maksimilians',
+    name: 'Максимилианс',
+    type: 'concert_hall',
+    canonicalPath: '/venues/maksimilians-5dd900bd6314a2f6642d8b07',
+  };
+  assert.equal(venueHref(venue), '/venues/maksimilians');
+  assert.equal(venueCanonicalPath(venue), '/venues/maksimilians');
+});

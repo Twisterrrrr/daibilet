@@ -6,6 +6,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import { venueCanonicalPath, venueHref } from './routes.ts';
+import { venueSitemapEntry } from './venue-sitemap-entry.ts';
 import {
   INSTITUTION_PUBLIC_CHIPS,
   LOCATION_PUBLIC_CHIPS,
@@ -85,7 +86,7 @@ export function assertSitemapPathsEqualCanonical(venues: VenueFixture[]): void {
     // Правильный билдер sitemap: всегда venueCanonicalPath.
     // Наивный `canonicalPath || href` ломается на wrong-family stored path.
     assert.equal(
-      canonical,
+      new URL(venueSitemapEntry(venue, 'https://daibilet.ru').url).pathname,
       venueCanonicalPath(venue),
       `sitemap path drift for ${venue.slug}`,
     );
@@ -171,6 +172,8 @@ describe('canon invariants', () => {
       canonicalPath: '/locations/ermitage',
     };
     assert.equal(venueCanonicalPath(venue), '/venues/ermitage');
+    assert.equal(venueSitemapEntry(venue, 'https://daibilet.ru').url, 'https://daibilet.ru/venues/ermitage');
+    assertSitemapPathsEqualCanonical([venue]);
     assert.equal(venueHref(venue), '/venues/ermitage');
   });
 });

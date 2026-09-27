@@ -2211,6 +2211,7 @@ export function mapPublicVenueListItem(row) {
     type,
     template: publicVenuePageTemplate(type),
     pageStatus: normalized.pageStatus,
+    isIndexable: normalized.isIndexable !== false,
     shortDescription,
     heroImageUrl: normalized.heroImageUrl,
     events: normalized.events,
