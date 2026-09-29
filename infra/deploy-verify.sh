@@ -11,7 +11,7 @@ if [[ -n "${MSK_SSH_KEY_FILE:-}" ]]; then
   SSH+=(-i "$MSK_SSH_KEY_FILE" -o IdentitiesOnly=yes)
 fi
 TARGET="${MSK_SSH_TARGET:-${MSK_SSH_USER:+${MSK_SSH_USER}@}${MSK_SSH_HOST:-msk-web}}"
-SERVER_INFO="$("${SSH[@]}" "$TARGET" 'set -eu; cd /opt/daibilet; cat apps/web/.next/BUILD_ID; git rev-parse HEAD; cat apps/web/.next/DEPLOY_SHA')"
+SERVER_INFO="$("${SSH[@]}" "$TARGET" 'set -eu; cd /opt/daibilet; cat apps/web/.next/BUILD_ID; echo; git rev-parse HEAD; cat apps/web/.next/DEPLOY_SHA')"
 mapfile -t INFO <<< "$SERVER_INFO"
 [[ ${#INFO[@]} -eq 3 && -n "${INFO[0]}" ]] || { echo 'FAIL: missing build metadata'; exit 1; }
 printf 'Expected SHA: %s\nServer BUILD_ID: %s\nServer HEAD: %s\nArtifact SHA: %s\n' "$EXPECTED_SHA" "${INFO[@]}"
