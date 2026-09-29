@@ -129,6 +129,18 @@ export function createHomePickState(seed?: Partial<HomePickState>): HomePickStat
 /**
  * Collapse near-identical tourist products that reuse the same stock Hermitage /
  * night-city flyer under different CDN asset ids (fingerprints often missing client-side).
+ *
+ * 29.09: the matcher was dead for every Russian title. In JavaScript `\w` is
+ * `[A-Za-z0-9_]` and never matches Cyrillic, so `ночн\w*\s+петербург` reduced to
+ * `ночн` followed by zero ASCII word chars, and could not match "Ночной Петербург"
+ * for any input. The two titles the test expected to bucket only matched by
+ * accident, through unrelated hardcoded literals ("от классики до футури",
+ * "магия огней"). Anything phrased differently fell through as its own theme, so
+ * two night excursions landed next to each other in the editors rail.
+ *
+ * Now the night signal and the city signal are tested independently rather than
+ * requiring them adjacent, and the letter class is unicode-aware. The literal
+ * phrases are kept as a safety net for titles with no city in them at all.
  */
 export function sessionEditorsThemeKey(event: Pick<PublicSession, 'title' | 'category'>): string | null {
   const title = String(event.title || '')
@@ -138,13 +150,21 @@ export function sessionEditorsThemeKey(event: Pick<PublicSession, 'title' | 'cat
     .trim();
   if (!title) return null;
 
-  if (/ночн\w*\s+петербург|вечерн\w*\s+петербург|петербург.*лахат|лахта.*петербург|магия огней|от классики до футури/i.test(title)) {
+  // The `u` flag is required: without it \p{L} is a literal "p{L}", not a
+  // letter class, and isNight silently matches nothing.
+  const isNight = /ночн\p{L}*|вечерн\p{L}*|ночно|\p{L}*\s+ночн/u.test(title);
+  const isSights = /магия огней|от классики до футури/.test(title);
+  const isLakhta = /лахат|васильевск/u.test(title);
+  const isPushkin = /пушкин|царск\p{L}*\s+сел/u.test(title);
+  const isSivers = /ситив\p{L}*\s+огнях/u.test(title);
+
+  if ((isNight && /петербург/.test(title)) || isLakhta || isSights) {
     return 'theme:spb-night-tour';
   }
-  if (/пушкин|царск\w*\s+сел/i.test(title)) {
+  if (isPushkin) {
     return 'theme:spb-pushkin-tour';
   }
-  if (/ночн\w*\s+москв|вечерн\w*\s+москв|москва\s+ситив\w*\s+огнях/i.test(title)) {
+  if ((isNight && /москв/.test(title)) || isSivers) {
     return 'theme:msk-night-tour';
   }
   return null;
