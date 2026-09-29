@@ -22,8 +22,19 @@ const STOP_TYPE_BY_FILTER: Record<string, string> = {
 };
 
 /** Places where «Вход свободный» would be a tourist trap. */
+/**
+ * 29.09. The alternative `екатерининск` matched every "Екатерининск…" name, so it
+ * flagged Krasnodar's «Екатерининский сквер и Екатерина II» - a free-standing
+ * monument in a public square whose «Вход свободный» chip is accurate. The
+ * intent was the paid Catherine Palace in Pushkin, and `дворец` already matches
+ * that name, so the stem added nothing but false positives.
+ *
+ * Verified against every editorial place containing the stem: the SPb palace and
+ * park are the paid complex, the Tver monastery and Krasnodar cathedral claim no
+ * free entry, and only the Krasnodar square carries a free-entry chip.
+ */
 const MUST_NOT_CLAIM_FREE_RE =
-  /ботаническ|оранжерей|зоопарк|океанариум|планетари|колоннад|лахта|смотров|петергоф|павловск|царск|кусков|царицын|гатчин|ораниенбаум|меншиков|фаберже|эрмитаж|исааки|кунсткамер|юсупов|канатно|телебашн|останкин|бункер|ледокол|аквапарк|дельфин|\bцирк|некропол|макет|крепост|замок|дворец|особняк|музей|галере|театр|усадьб|павильон|аврора|крейсер|лицей|аттракцион|диво-остров|дендрар|аптекарск|собор|храм|кирха|церковь|монастыр|лавр|дацан|чесменск|екатерининск|александрия|нижний парк|верхний сад|елагин/i;
+  /ботаническ|оранжерей|зоопарк|океанариум|планетари|колоннад|лахта|смотров|петергоф|павловск|царск|кусков|царицын|гатчин|ораниенбаум|меншиков|фаберже|эрмитаж|исааки|кунсткамер|юсупов|канатно|телебашн|останкин|бункер|ледокол|аквапарк|дельфин|\bцирк|некропол|макет|крепост|замок|дворец|особняк|музей|галере|театр|усадьб|павильон|аврора|крейсер|лицей|аттракцион|диво-остров|дендрар|аптекарск|собор|храм|кирха|церковь|монастыр|лавр|дацан|чесменск|александрия|нижний парк|верхний сад|елагин/i;
 
 type AuditRow = {
   city: string;
