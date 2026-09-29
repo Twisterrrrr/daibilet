@@ -1,5 +1,6 @@
 import {
   buildPublicArticlesListDto,
+  buildPublicEventFreshnessMap,
   buildPublicVenuesDto,
 } from '@daibilet/backend/public-read';
 
@@ -196,6 +197,9 @@ export async function buildEventsSitemapEntries(now = new Date()): Promise<Sitem
   const seen = new Set<string>();
   const entries: SitemapEntry[] = [];
   const limit = 200;
+  // Lookup only: which URLs to list stays decided by the catalog exactly as
+  // before, so a stale or missing row can only affect a date, never the list.
+  const freshness = await buildPublicEventFreshnessMap();
 
   for (let offset = 0; offset < MAX_EVENTS; offset += limit) {
     const page = await getCachedCatalog(parseCatalogPageQuery({ limit: String(limit), offset: String(offset) }));
@@ -204,7 +208,9 @@ export async function buildEventsSitemapEntries(now = new Date()): Promise<Sitem
       const slug = event.slug || event.id;
       if (!slug || seen.has(slug)) continue;
       seen.add(slug);
-      entries.push(entry(`/events/${encodeURIComponent(slug)}`, now, 'daily', 0.7));
+      entries.push(
+        entry(`/events/${encodeURIComponent(slug)}`, now, 'daily', 0.7, freshness.get(slug)),
+      );
     }
     if (!page.hasMore || !page.items?.length || entries.length >= MAX_EVENTS) break;
   }

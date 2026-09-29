@@ -40,3 +40,52 @@ are valid hex syntax but rejected as a nonexistent commit.
   `gh workflow run deploy-msk-web.yml -f sha=13916c0f1ac4ce16a6c9fd0523a5734397140802 -f expected_ref=feat/next-monorepo`
   (marker optional — `deploy-verify.sh` greps home HTML; venue-only
   `data-venue-cta-kind` would false-fail without auto-rollback).
+
+---
+
+## 2026-09-29 — SEO-аудит, ветки и зоны
+
+### `deepseek/sitemap-lastmod` — ждёт ревью Codex, не мержить
+
+Ветка содержит смешанный по зонам коммит:
+
+| Файл | Зона | Статус |
+|------|------|--------|
+| `apps/web/src/lib/sitemap-data.ts` | Cline | готово |
+| `apps/web/src/lib/sitemap-lastmod.test.ts` | Cline | готово |
+| `apps/backend/src/public-event-freshness.ts` | **Codex** | **ждёт ревью 30.09** |
+| `apps/backend/src/public-read.ts` | **Codex** | **ждёт ревью 30.09** |
+
+Backend-часть сделана до 29.09, когда зона была общей. По текущему протоколу
+`apps/backend` не зона Cline. Работа закончена и проверена (982 теста, 8 новых
+зелёные; backend typecheck 0; web typecheck 192 — базовый уровень), поэтому
+не откатывалась: `sitemap-data.ts` импортирует `buildPublicEventFreshnessMap`,
+и без него не собирается.
+
+**Не мержить в `feat/next-monorepo` до ревью Codex 30.09.**
+
+Зависимость: ветка построена поверх `fix/seo-audit-titles-sitemap` — функция
+`entry()` с параметром `lastModified` и `resolveSitemapLastModified` оттуда.
+
+Последний подтверждённый полный прогон сборки (`BUILD=OK`) был **до** этого
+коммита. Сборку перезапустить и получить зелёный результат — обязательное
+условие перед любым merge.
+
+### Прозрачность: правила записаны 29.09, нарушения были раньше
+
+- `fix/seo-audit-titles-sitemap` содержит **5 смешанных коммитов** (title,
+  description, lastmod, noindex, 301). На тот момент правила «один коммит =
+  одна задача» ещё не существовало.
+- Сообщение коммита `4c97b033e` было переписано через `git commit --amend`,
+  затем запушено с `--force-with-lease`. Переписано потому, что исходное
+  сообщение содержало ложное обоснование (см. ниже). По текущим правилам так
+  нельзя.
+- **Ложное обоснование, исправленное в b344d1bfc:** коммит утверждал, что
+  закрывает `/venues/base`. На деле это BASE — концертный зал в «Гигант
+  Конти» (Кондратьевский пр. 44), ~2850 отзывов в Google. Первое чтение API
+  вернуло `type: meeting_point`, и я назвал запись мусорной по имени, не
+  сверив карточку. Полный скан 1391 строки `venues.xml` дал **0 записей,
+  которые правило снимает с индексации** — на момент коммита оно было no-op.
+
+Коммиты остаются как есть, для истории. Новые правила применяются с 29.09.
+
