@@ -1,4 +1,3 @@
-import { cookies } from 'next/headers';
 import Link from 'next/link';
 import { Suspense } from 'react';
 import { ArrowRight, Dices } from 'lucide-react';
@@ -41,7 +40,6 @@ import {
 } from '@/lib/ssr-lean-payloads';
 import { getHomeArticles, getHomeCoverFingerprints, getHomePageData } from '@/server/cached-home-data';
 import { getActiveHeroBanners, heroFramesFromBanners } from '@/server/hero-banners';
-import { decodeSelectedCityCookie, matchDestination, SELECTED_CITY_COOKIE } from '@/lib/selected-city';
 
 /** External CDN HEAD fingerprints must not stall home TTFB on bad egress/DNS. */
 const HOME_FINGERPRINTS_TIMEOUT_MS = 800;
@@ -50,10 +48,16 @@ const HOME_ARTICLES_TIMEOUT_MS = 1_200;
 type BlogApiArticles = NonNullable<Parameters<typeof mergeBlogCards>[0]>;
 
 async function HomePageBody() {
-  const cityCookie = decodeSelectedCityCookie((await cookies()).get(SELECTED_CITY_COOKIE)?.value);
+  // No dynamic request API here. Reading the selected-city cookie made `/`
+  // dynamic, so Next served `Cache-Control: private, no-store`, nginx
+  // proxy_cache refused to store the homepage, and the deploy restart window
+  // surfaced as 502 to Googlebot/Yandex. The catalog is fetched for all cities
+  // and HomeCityAwareSections filters it client-side from the same selected-city
+  // state, exactly like /events, /podborki and /places already do.
+  // Crawlers send no cookie, so the server-side filter never reached them anyway.
   const [{ destinationsPayload, catalogPayload, landingsCatalog }, fingerprintsRecord, articlesPayload] =
     await Promise.all([
-      getHomePageData(cityCookie),
+      getHomePageData(),
       withSoftTimeout(
         getHomeCoverFingerprints(),
         HOME_FINGERPRINTS_TIMEOUT_MS,
@@ -69,9 +73,10 @@ async function HomePageBody() {
     ]);
 
   const destinations = destinationsPayload?.destinations ?? [];
-  const ssrCity = matchDestination(destinations, cityCookie);
-  const ssrCityName = ssrCity?.name || null;
-  const ssrCitySlug = ssrCity?.slug || ssrCity?.sourceSlug || null;
+  // The cookie is not visible here any more; the header resolves the stored city
+  // after hydration. These stay null so the hero does not claim an SSR city.
+  const ssrCityName = null;
+  const ssrCitySlug = null;
   const cities = destinations.filter((item) => item.type === 'city');
   // Top by events, then pin Moscow + SPB first so the rail can center that pair on load.
   const topCities = orderPopularRailCities(cities, 12).map(toSlimCityDestination);

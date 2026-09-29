@@ -46,7 +46,31 @@ export function HomeCityAwareSections({
   });
 
   const cityHint = cityReady && cityName ? ` · ${cityName}` : '';
-  const showEditorsPick = editorsPick.length > 0;
+
+  // Since 2026-09-29 the RSC ships the all-cities catalog and the selected city
+  // is applied here, so the homepage can stay a static/ISR route that nginx is
+  // able to cache. Matches how /events, /podborki and /places already behave.
+  // A session counts as local when its own city fields match; when none of them
+  // are set we keep it rather than blanking the rail for an unrecognised slug.
+  const citySlug = selectedCity?.selectedDestination?.slug || null;
+  const filterByCity = cityReady && cityValue !== 'all' && Boolean(citySlug);
+
+  const matchesCity = (session: PublicSession): boolean => {
+    if (!filterByCity) return true;
+    // `sourceCitySlug` only exists on PublicSessionDto, not on
+    // PublicCatalogListItemDto, so the union needs a runtime guard here.
+    const sourceSlug = 'sourceCitySlug' in session ? session.sourceCitySlug : null;
+    const slugs = [session.citySlug, sourceSlug].filter(Boolean) as string[];
+    if (slugs.length === 0) return true;
+    return slugs.some((slug) => slug === citySlug);
+  };
+
+  const visibleEditorsPick = filterByCity ? editorsPick.filter(matchesCity) : editorsPick;
+  const visibleHomeNowTabs = filterByCity
+    ? homeNowTabs.map((tab) => ({ ...tab, events: tab.events.filter(matchesCity) }))
+    : homeNowTabs;
+
+  const showEditorsPick = visibleEditorsPick.length > 0;
 
   return (
     <>
@@ -55,7 +79,7 @@ export function HomeCityAwareSections({
         title="Выбор редакции"
         subtitle={`Закреплённые в подборках и сильные предложения с ближайшими датами${cityHint}`}
         href={editorsHref}
-        events={editorsPick as PublicSessionDto[]}
+        events={visibleEditorsPick as PublicSessionDto[]}
         editorsPickBadge
         sectionClassName={showEditorsPick ? 'max-sm:!pt-[calc(var(--space-section)/2)]' : undefined}
       />
@@ -74,7 +98,7 @@ export function HomeCityAwareSections({
 
       {homeNowTabs.length ? (
         <HomeNowSection
-          tabs={homeNowTabs}
+          tabs={visibleHomeNowTabs}
           sectionTitle={sparseCatalog ? 'Рекомендуем начать с этого' : 'Популярно на этой неделе'}
           sectionSubtitle={`События с фото и ближайшими датами${cityHint}`}
         />

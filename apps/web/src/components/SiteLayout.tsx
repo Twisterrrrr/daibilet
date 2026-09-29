@@ -29,10 +29,15 @@ export async function SiteLayout({
   children: React.ReactNode;
   footerVariant?: 'default' | 'compact';
   /**
-   * Cookie/SSR city from pages that are already dynamic (home).
+   * Server-known city for routes that are dynamic by design.
    * Do NOT read the request cookie store here: SiteLayout is inlined into ISR hubs/PDPs
    * (`revalidate` + notFound). Dynamic request APIs during static generation
    * become HTTP 500 (DYNAMIC_SERVER_USAGE) on /events/[slug], /cities/*, venues.
+   *
+   * As of 2026-09-29 no route passes this. The homepage used to read the
+   * selected-city cookie, which made `/` dynamic and therefore uncacheable end to
+   * end. Kept as a hook for genuinely dynamic routes only - do not reintroduce
+   * it on ISR pages.
    */
   initialCity?: string | null;
 }) {

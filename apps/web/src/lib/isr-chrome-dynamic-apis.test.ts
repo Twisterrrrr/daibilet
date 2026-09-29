@@ -9,9 +9,23 @@ import test from 'node:test';
  * digest DYNAMIC_SERVER_USAGE, which Next surfaces as HTTP 500
  * (live 2026-09-03: /events/[slug], /cities/*, /venues/*, /locations/*).
  *
- * Home may read cookies in `app/page.tsx` and pass `initialCity`.
+ * The homepage used to read the selected-city cookie in `app/page.tsx`. That
+ * made `/` dynamic, so Next served `Cache-Control: private, no-store`, nginx
+ * proxy_cache refused to store it, and the deploy restart window surfaced as
+ * 502 to Googlebot/Yandex. The city is a client concern now.
  */
 const WEB_ROOT = path.resolve(__dirname, '../..');
+
+test('homepage must stay static: no dynamic request API in app/page.tsx', () => {
+  const source = fs.readFileSync(path.join(WEB_ROOT, 'app/page.tsx'), 'utf8');
+  assert.equal(source.includes("from 'next/headers'"), false, 'home imports next/headers');
+  assert.equal(/await\s+cookies\s*\(/.test(source), false, 'home calls cookies()');
+  assert.equal(/await\s+headers\s*\(/.test(source), false, 'home calls headers()');
+  assert.equal(/await\s+connection\s*\(/.test(source), false, 'home calls connection()');
+  assert.equal(source.includes('noStore('), false, 'home calls noStore()');
+  // revalidate is only meaningful while the route is static - keep it declared.
+  assert.match(source, /export const revalidate\s*=\s*\d+/);
+});
 
 test('ISR chrome: SiteLayout must not call cookies/headers/connection/noStore', () => {
   const source = fs.readFileSync(path.join(WEB_ROOT, 'src/components/SiteLayout.tsx'), 'utf8');
