@@ -17,6 +17,21 @@ test('isWeekendStartsAt: sat/sun only', () => {
   assert.equal(isWeekendStartsAt(null), false);
 });
 
+/**
+ * 29.09. Both assertions expected the legacy `/images/cities/{slug}.png`, but
+ * `resolveCityCardImage` now prefers the daytime card thumb over the legacy PNG
+ * ("Prefer daytime card thumb over legacy PNG so catalog/home never keep night
+ * covers primary", city-images.ts). The promo passes `heroImageUrl: null`, so the
+ * thumb is what resolves - the code is doing what it documents.
+ *
+ * The real contract of the second test is that a *city* image wins over a remote
+ * event cover for `imageUrl`, while the remote cover is still exposed separately
+ * as `featuredEventImageUrl`. That is asserted by shape rather than by a literal
+ * path, so the asset convention can change again without a false failure, and so
+ * a regression that swaps the two roles still fails here.
+ */
+const CITY_CARD_IMAGE = /^\/images\/cities\/(?:top\/)?moscow(?:-\w+)?\.(?:png|jpe?g|webp)$/;
+
 test('buildBlogSidebarPromoFromCityPage: price, titles, chips, image', () => {
   const page = {
     generatedAt: new Date().toISOString(),
@@ -89,7 +104,7 @@ test('buildBlogSidebarPromoFromCityPage: price, titles, chips, image', () => {
   assert.equal(promo!.priceFrom, 900);
   assert.equal(promo!.weekendCount, 1);
   assert.deepEqual(promo!.upcomingTitles, ['Пианиссимо', 'Сапрыкин']);
-  assert.equal(promo!.imageUrl, '/images/cities/moscow.png');
+  assert.match(promo!.imageUrl ?? '', CITY_CARD_IMAGE);
   assert.equal(promo!.featuredEventImageUrl, 'https://cdn.example.com/cover1.jpg');
 });
 
@@ -134,7 +149,10 @@ test('buildBlogSidebarPromoFromCityPage: city image wins over remote event cover
 
   const promo = buildBlogSidebarPromoFromCityPage(page);
   assert.ok(promo);
-  assert.equal(promo!.imageUrl, '/images/cities/moscow.png');
+  // The city art must stay on imageUrl even though a session has a remote cover,
+  // and that cover must remain available separately.
+  assert.match(promo!.imageUrl ?? '', CITY_CARD_IMAGE);
+  assert.notEqual(promo!.imageUrl, 'https://cdn.example.com/cover1.jpg');
   assert.equal(promo!.featuredEventImageUrl, 'https://cdn.example.com/cover1.jpg');
   assert.equal(promo!.featuredEventHref, '/events/zoo-quest');
 });
