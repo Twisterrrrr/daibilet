@@ -79,67 +79,91 @@ test('formatCatalogSlotChipLabel: day short month time without weekday', () => {
   assert.ok(!label.includes('.'));
 });
 
+/**
+ * 29.09. The slot tests below used to pin July/August 2026 dates.
+ * `collectUpcomingSlotRows` in event-card-meta.ts drops every slot that starts in
+ * the past, which is correct - a card must not advertise a slot that already
+ * happened. Once the wall clock passed those dates the filter emptied the array,
+ * so the tests failed with no code change: "empty when only primary slot" passed
+ * for the wrong reason, and the other two failed expecting 2 and 3 labels.
+ *
+ * Rebuilt relative to now so they keep describing an upcoming run of slots.
+ */
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/** An ISO instant `daysFromNow` days ahead, at a fixed UTC hour. */
+function isoDaysFromNow(daysFromNow: number, hourUtc = 16): string {
+  const base = new Date();
+  base.setUTCHours(hourUtc, 0, 0, 0);
+  return new Date(base.getTime() + daysFromNow * DAY_MS).toISOString();
+}
+
 test('collectDisplaySlotLabels: empty when only primary slot', () => {
   const labels = collectDisplaySlotLabels(
     session({
-      startsAt: '2026-07-30T16:30:00Z',
+      startsAt: isoDaysFromNow(1),
       upcomingSlots: [
         {
           eventId: 'evt-1',
-          startsAt: '2026-07-30T16:30:00Z',
-          dateLabel: 'чт, 30 июл.',
+          startsAt: isoDaysFromNow(1),
           timeLabel: '19:30',
         },
       ],
     }),
   );
+  // The only slot is the primary one, so nothing is left to advertise.
   assert.deepEqual(labels, []);
 });
 
 test('collectDisplaySlotLabels: excludes primary, compact format up to 4', () => {
   const labels = collectDisplaySlotLabels(
     session({
-      startsAt: '2026-07-30T16:30:00Z',
+      startsAt: isoDaysFromNow(1),
       upcomingSlots: [
         {
           eventId: 'evt-1',
-          startsAt: '2026-07-30T16:30:00Z',
-          dateLabel: 'чт, 30 июл.',
+          startsAt: isoDaysFromNow(1),
           timeLabel: '19:30',
         },
         {
           eventId: 'evt-2',
-          startsAt: '2026-07-31T16:30:00Z',
-          dateLabel: 'пт, 31 июл.',
+          startsAt: isoDaysFromNow(2),
           timeLabel: '19:30',
         },
         {
           eventId: 'evt-3',
-          startsAt: '2026-08-01T16:30:00Z',
-          dateLabel: 'сб, 1 авг.',
+          startsAt: isoDaysFromNow(3),
           timeLabel: '19:30',
         },
       ],
     }),
   );
-  assert.deepEqual(labels, ['31 июл, 19:30', '1 авг, 19:30']);
+  // Primary excluded, the two later slots survive the "starts in the past" filter.
+  assert.equal(labels.length, 2);
+  // Compact chip shape: `D month, HH:MM` - no weekday, no trailing dot. The clock
+  // is deliberately not asserted to a fixed value: formatCatalogSlotChipLabel
+  // derives it from startsAt in the city timezone, so it moves with the fixture.
+  for (const label of labels) {
+    assert.match(label, /^\d{1,2} \p{L}{3}, \d{2}:\d{2}$/u);
+  }
 });
 
 test('collectDisplaySlotPreview: moreCount after limit', () => {
+  // Starts at day+2, not day+1: day+1 is the primary start, and
+  // collectAllDisplaySlotLabels drops any slot that repeats the primary, which
+  // would silently shrink the pool from 6 to 5 and make moreCount come out 2.
   const slots = Array.from({ length: 6 }, (_, index) => ({
     eventId: `evt-${index + 2}`,
-    startsAt: `2026-08-0${index + 1}T16:30:00Z`,
-    dateLabel: `${index + 1} авг.`,
+    startsAt: isoDaysFromNow(index + 2),
     timeLabel: '19:30',
   }));
   const preview = collectDisplaySlotPreview(
     session({
-      startsAt: '2026-07-30T16:30:00Z',
+      startsAt: isoDaysFromNow(1),
       upcomingSlots: [
         {
           eventId: 'evt-1',
-          startsAt: '2026-07-30T16:30:00Z',
-          dateLabel: 'чт, 30 июл.',
+          startsAt: isoDaysFromNow(1),
           timeLabel: '19:30',
         },
         ...slots,
@@ -148,8 +172,11 @@ test('collectDisplaySlotPreview: moreCount after limit', () => {
     3,
   );
   assert.equal(preview.labels.length, 3);
+  // 7 slots total, one is the primary, 3 shown, 3 left over.
   assert.equal(preview.moreCount, 3);
-  assert.ok(preview.labels.every((label) => !label.includes('чт') && !label.includes('пт')));
+  for (const label of preview.labels) {
+    assert.match(label, /^\d{1,2} \p{L}{3}, \d{2}:\d{2}$/u);
+  }
 });
 
 test('formatCardScheduleLine drops Сегодня when cover already has it', () => {
