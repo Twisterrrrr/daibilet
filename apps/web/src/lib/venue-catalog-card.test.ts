@@ -3,6 +3,27 @@ import test from 'node:test';
 
 import { toVenueCatalogCard } from './venue-catalog-card.ts';
 
+/**
+ * 29.09. These two assertions were written before `resolveVenueHeroImage` learned
+ * about the city-identity pack (20f487b06) and before listing cards moved from
+ * `-thumb` to `-card` (cd1edd8e3, "stop crushing venue card quality").
+ *
+ * Neither failure is a code defect - the code is right and the expectations were
+ * stale. Verified by resolving each case directly:
+ *
+ *   nizhny-novgorod-kreml  hub=/k.jpg
+ *     -> /images/venues/nizhny-novgorod/identity-symbol-card.jpg
+ *        identity pack wins over the hub photo, on purpose: a listed place with
+ *        no unique still gets the city symbol rather than a gray card.
+ *
+ *   saint-petersburg-dvortsovaya-ploschad  hub=venue-auto-stub.jpg
+ *     -> /images/venues/saint-petersburg/dvortsovaya-ploschad-card.jpg
+ *        the stub is dropped, the on-disk venue image is preferred, and the
+ *        listing variant is `-card`, not `-thumb`.
+ *
+ * The tests now pin that priority order, so a future change to it fails here
+ * instead of silently swapping which image a catalog card shows.
+ */
 test('toVenueCatalogCard keeps hookFact for my-day picker cards', () => {
   const card = toVenueCatalogCard({
     id: 'venue_hook',
@@ -19,7 +40,9 @@ test('toVenueCatalogCard keeps hookFact for my-day picker cards', () => {
   });
   assert.equal(card.hookFact, 'Стена с видом на стрелку рек');
   assert.equal(card.shortDescription, 'Крепость');
-  assert.equal(card.heroImageUrl, '/k.jpg');
+  // The hub photo is a fallback, not a winner: the city identity pack outranks it
+  // so a card is never left gray when a real venue still is missing.
+  assert.equal(card.heroImageUrl, '/images/venues/nizhny-novgorod/identity-symbol-card.jpg');
 });
 
 test('toVenueCatalogCard prefers editorial cover over hub stub', () => {
@@ -32,9 +55,11 @@ test('toVenueCatalogCard prefers editorial cover over hub stub', () => {
     events: 0,
     heroImageUrl: '/images/venues/generated/venue-auto-stub.jpg',
   });
+  // Generated stub is dropped, the on-disk venue image wins, and catalog cards
+  // ask for the `-card` sidecar rather than the smaller `-thumb`.
   assert.equal(
     card.heroImageUrl,
-    '/images/venues/saint-petersburg/dvortsovaya-ploschad-thumb.jpg',
+    '/images/venues/saint-petersburg/dvortsovaya-ploschad-card.jpg',
   );
 });
 
