@@ -64,7 +64,7 @@ test('buildEventListingMeta only for expansion cities', () => {
   assert.match(meta!.description, /Daibilet\.ru/);
 });
 
-test('event page title adds date disambiguator for twin sessions', () => {
+test('event page title disambiguates twin sessions by venue, not by date', () => {
   const titleA = buildEventPageMetaTitle({
     eventTitle: 'Экскурсия в галерею «Золотой век СССР. Искусство эпохи». Музей живописца Бориса Семёнова',
     seoTitle:
@@ -81,10 +81,41 @@ test('event page title adds date disambiguator for twin sessions', () => {
     dateLabel: 'вс, 12 июл.',
     timeLabel: '14:00',
   });
-  assert.notEqual(titleA, titleB);
-  assert.match(titleA, /11 июл/);
-  assert.match(titleB, /12 июл/);
+  // Same URL, different session times -> the title must NOT move.
+  // 29.09: the disambiguator used to be the next session's date and time, so all
+  // 3018 event titles changed as sessions ran out - on live:
+  // "Прогулка от причала Киевский (вт, 29 сент., 18:07): билеты и расписание".
+  assert.equal(titleA, titleB, 'title must be stable across sessions');
+  assert.doesNotMatch(titleA, /11 июл|12 июл|12:00|14:00/);
+  assert.match(titleA, /Музей/);
+  assert.match(titleA, /билеты и расписание/);
   assert.ok(!titleA.includes('\u2014') && !titleA.includes('\u2013'));
+});
+
+test('event page title stays stable when date and time shift', () => {
+  const base = {
+    eventTitle: 'Речная прогулка по центру Москвы от причала Киевский',
+    venueName: 'Патриарший сектор «A»',
+  };
+  const january = buildEventPageMetaTitle({ ...base, dateLabel: 'пн, 12 янв.', timeLabel: '10:00' });
+  const evening = buildEventPageMetaTitle({ ...base, dateLabel: 'вт, 13 янв.', timeLabel: '18:07' });
+  assert.equal(january, evening);
+  assert.doesNotMatch(january, /\d{1,2}:\d{2}/);
+  assert.doesNotMatch(january, /янв/);
+  assert.match(january, /Патриарший сектор/);
+});
+
+test('event page title does not repeat a city already present in the event name', () => {
+  // "Концерт в Москве" already names the city, declined. The field holds the
+  // nominative "Москва", so a nominative-only check would append it twice.
+  const title = buildEventPageMetaTitle({
+    eventTitle: 'Концерт в Москве',
+    cityName: 'Москва',
+    dateLabel: 'вт, 29 сент.',
+    timeLabel: '19:00',
+  });
+  assert.equal((title.match(/Москв/gi) || []).length, 1, title);
+  assert.doesNotMatch(title, /29 сент|19:00/);
 });
 
 test('event meta soft-cases ALL CAPS supplier titles', () => {

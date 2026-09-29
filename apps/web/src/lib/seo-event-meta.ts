@@ -87,9 +87,23 @@ function includesIgnoreCase(haystack: string, needle: string): boolean {
 }
 
 /**
- * Title карточки события с disambiguator (дата / площадка / город),
- * чтобы TC-сессии с одинаковым названием не получали один SERP title.
+ * Title события с disambiguator (площадка / город), чтобы TC-сессии с
+ * одинаковым названием не получали один SERP title.
  * Возвращает core без `| Дайбилет` (его добавит template / share).
+ *
+ * 29.09: дата и время убраны. Раньше disambiguator был `[dateLabel, timeLabel]`
+ * ближайшего сеанса, и заголовок менялся по мере расхода сеансов — у 3018 URL
+ * заголовок был нестабилен с периодом в часы. На live это выглядело так:
+ * «Речная прогулка от причала Киевский (вт, 29 сент., 18:07): билеты и
+ * расписание». Площадка и город меняются гораздо реже, поэтому остаются
+ * disambiguator'ами, а дата больше не участвует.
+ *
+ * H1 не связан с этой функцией: `EventPage.client.tsx` рендерит
+ * `splitLongTitleAtBreak(heroTitle)` — чистый перенос строки по названию
+ * события. Поэтому правка не задевает то, что видит пользователь.
+ *
+ * `dateLabel` / `timeLabel` оставлены в сигнатуре, чтобы вызывающая сторона
+ * не менялась; на результат они больше не влияют.
  */
 export function buildEventPageMetaTitle(input: {
   eventTitle: string;
@@ -102,23 +116,24 @@ export function buildEventPageMetaTitle(input: {
   const eventTitle = formatPublicTitle(input.eventTitle) || 'Событие';
   const customRaw = pageTitle(String(input.seoTitle || '').trim());
   const custom = customRaw ? formatPublicTitle(customRaw) || customRaw : '';
-  const dateLabel = String(input.dateLabel || '').trim();
-  const timeLabel = String(input.timeLabel || '').trim();
   const venueName = String(input.venueName || '').trim();
   const cityName = String(input.cityName || '').trim();
 
-  const sessionBit = [dateLabel, timeLabel].filter(Boolean).join(', ');
   const base =
     custom && custom !== eventTitle && !custom.endsWith(DEFAULT_EVENT_SEO_SUFFIX)
       ? custom.replace(/\s*:\s*билеты и расписание\s*$/i, '').trim() || custom
       : eventTitle;
 
   const extras: string[] = [];
-  if (sessionBit && !includesIgnoreCase(base, dateLabel)) {
-    extras.push(sessionBit);
-  } else if (venueName && !includesIgnoreCase(base, venueName)) {
+  const mentions = (value: string) =>
+    // Both cases: names usually spell a city declined ("в Москве") while the
+    // field holds the nominative ("Москва"), so a nominative-only check misses it
+    // and the city is appended a second time.
+    includesIgnoreCase(base, value) || includesIgnoreCase(base, cityToPrepositional(value));
+
+  if (venueName && !mentions(venueName)) {
     extras.push(venueName);
-  } else if (cityName && !includesIgnoreCase(base, cityName)) {
+  } else if (cityName && !mentions(cityName)) {
     extras.push(cityName);
   }
 
