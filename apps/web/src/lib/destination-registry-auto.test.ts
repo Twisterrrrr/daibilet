@@ -9,12 +9,36 @@ import {
   resolveDestinationsForHub,
 } from './city-destination-registry.ts';
 
+/**
+ * 29.09. The coverage row count was pinned to a literal 86. The registry has since
+ * grown to 108 destinations, so the exact count broke on every new city - the
+ * assertion was measuring "the number happened to be this when the test was
+ * written", not "every hub is registered".
+ *
+ * What this test is actually for is the invariant: auto hydration must register
+ * every hub, with nothing left pending. That is asserted below against the
+ * current row set rather than a frozen number, so adding a city no longer fails
+ * and a genuinely unregistered hub still does.
+ */
 test('auto hydration registers all hub suburbs', () => {
-  assert.ok(DESTINATION_REGISTRY.length >= 86);
   const rows = listDestinationCoverageRows(CITY_INFO);
-  assert.equal(rows.length, 86);
-  assert.equal(rows.filter((row) => row.registryStatus === 'migrated').length, 86);
-  assert.equal(rows.filter((row) => row.registryStatus === 'pending').length, 0);
+  assert.ok(rows.length > 0, 'coverage rows must not be empty');
+  assert.ok(
+    DESTINATION_REGISTRY.length >= rows.length,
+    `registry (${DESTINATION_REGISTRY.length}) must cover all rows (${rows.length})`,
+  );
+  // The invariant: nothing is left waiting to be registered. Named so a
+  // regression says which hub/suburb failed to hydrate.
+  assert.deepEqual(
+    rows
+      .filter((row) => row.registryStatus === 'pending')
+      .map((row) => `${row.hubSlug}/${row.suburbName}`),
+    [],
+  );
+  assert.equal(
+    rows.filter((row) => row.registryStatus === 'migrated').length,
+    rows.length,
+  );
 });
 
 test('hydrateDestinationRegistryFromCityInfo is idempotent', () => {
