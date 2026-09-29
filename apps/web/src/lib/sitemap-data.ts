@@ -85,16 +85,35 @@ export function normalizeSitemapChunkParam(raw: string): SitemapChunk | null {
   return isSitemapChunk(key) ? key : null;
 }
 
+/**
+ * Resolve a sitemap `lastmod` from an entity's real `updatedAt`.
+ *
+ * Cities and venues still fall back to the build-time `now` because their
+ * public DTO exposes no `updatedAt` yet - see the `entry()` note below. Never
+ * substitute `new Date()` for a real value: a lastmod that moves on every
+ * rebuild is worse than none, because it tells crawlers the whole site changes
+ * daily and they stop trusting the field.
+ */
+export function resolveSitemapLastModified(
+  candidate: Date | string | null | undefined,
+  fallback: Date,
+): Date {
+  if (candidate == null) return fallback;
+  const parsed = candidate instanceof Date ? candidate : new Date(candidate);
+  return Number.isNaN(parsed.getTime()) ? fallback : parsed;
+}
+
 function entry(
   path: string,
   now: Date,
   changeFrequency: SitemapEntry['changeFrequency'],
   priority: number,
+  lastModified?: Date | string | null,
 ): SitemapEntry {
   const normalized = path.startsWith('/') ? path : `/${path}`;
   return {
     url: `${getSiteUrl()}${normalized === '/' ? '/' : normalized}`,
-    lastModified: now,
+    lastModified: resolveSitemapLastModified(lastModified, now),
     changeFrequency,
     priority,
   };
@@ -316,10 +335,13 @@ export async function buildBlogSitemapEntries(now = new Date()): Promise<Sitemap
   const articles = (payload?.articles || []) as Array<{
     slug?: string | null;
     isIndexable?: boolean | null;
+    updatedAt?: string | null;
   }>;
   return articles
     .filter((article) => article.slug && article.isIndexable !== false)
-    .map((article) => entry(`/blog/${encodeURIComponent(String(article.slug))}`, now, 'weekly', 0.6));
+    .map((article) =>
+      entry(`/blog/${encodeURIComponent(String(article.slug))}`, now, 'weekly', 0.6, article.updatedAt),
+    );
 }
 
 export async function buildSitemapChunkEntries(chunk: SitemapChunk): Promise<SitemapEntry[]> {

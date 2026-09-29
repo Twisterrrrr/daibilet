@@ -26,7 +26,9 @@ src/lib/region-child-city-scope.test.ts
 src/lib/remote-image-bypass.test.ts
 src/lib/review-rating.test.ts
 src/lib/robots-policy.test.ts
+src/lib/seo-listing-meta.test.ts
 src/lib/selected-city-alias.test.ts
+src/lib/sitemap-lastmod.test.ts
 src/lib/venue-page-sessions.test.ts
 src/lib/venue-cta.test.ts
 src/lib/venue-editorial-content.test.ts
