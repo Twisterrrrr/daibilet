@@ -151,6 +151,7 @@ export async function generateVenueDetailMetadata(slug: string): Promise<Metadat
   const decision = evaluateVenueIndexability({
     events: payload.stats?.events ?? venue.events ?? 0,
     isIndexable: venue.isIndexable,
+    type: venue.type,
   });
   const { core: title, full: shareTitle } = resolveVenueSeoTitle(venue);
   const description =

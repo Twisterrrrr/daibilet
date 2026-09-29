@@ -248,6 +248,7 @@ export async function buildVenuesSitemapEntries(now = new Date()): Promise<Sitem
       return evaluateVenueIndexability({
         events: venue.events,
         isIndexable: venue.isIndexable,
+        type: venue.type,
       }).indexable;
     })
     .slice(0, MAX_VENUES)

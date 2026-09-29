@@ -44,8 +44,35 @@ export const STRONG_CITY_SLUGS = new Set([
 export type HubIndexDecision = {
   indexable: boolean;
   thin: boolean;
-  reason: 'strong_city' | 'enough_events' | 'low_event_count' | 'zero_events' | 'explicit_noindex';
+  reason:
+    | 'strong_city'
+    | 'enough_events'
+    | 'low_event_count'
+    | 'zero_events'
+    | 'explicit_noindex'
+    | 'non_venue_type';
 };
+
+/**
+ * Venue types that are sub-entities of an event rather than a destination in
+ * their own right, so they must never get a standalone indexable page.
+ *
+ * A meeting point inherits every event of the excursion it belongs to, so it
+ * always clears MIN_VENUE_EVENTS_FOR_INDEX (= 1) no matter how thin it is.
+ * Live example: /venues/base - "BASE", type meeting_point, one address, a
+ * generic name, self-canonical, `index, follow`, and present in venues.xml.
+ *
+ * Deliberately narrow. Parks, piers, temples, buses and monuments are real
+ * places with their own demand and stay indexable; only the degenerate
+ * collection/placeholder types are excluded.
+ */
+export const NON_INDEXABLE_VENUE_TYPES = new Set(['meeting_point', 'online', 'other']);
+
+function normalizeVenueType(value?: string | null): string {
+  return String(value || '')
+    .trim()
+    .toLowerCase();
+}
 
 function normalizeSlug(value?: string | null): string {
   return String(value || '')
@@ -85,9 +112,14 @@ export function evaluateCityIndexability(input: {
 export function evaluateVenueIndexability(input: {
   events: number;
   isIndexable?: boolean | null;
+  type?: string | null;
 }): HubIndexDecision {
   if (input.isIndexable === false) {
     return { indexable: false, thin: true, reason: 'explicit_noindex' };
+  }
+
+  if (NON_INDEXABLE_VENUE_TYPES.has(normalizeVenueType(input.type))) {
+    return { indexable: false, thin: true, reason: 'non_venue_type' };
   }
 
   const events = Number(input.events) || 0;
