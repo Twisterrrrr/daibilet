@@ -1,9 +1,10 @@
+import { cityToPrepositional } from '@/lib/city-declension';
 import { formatLandingTodayParts } from '@/lib/datetime';
 import { pageTitle } from '@/lib/seo-meta';
 
 /**
  * SEO title venue/location:
- * «{Площадка} в {Город}: афиша и билеты на сегодня, {date} | Дайбилет».
+ * «{Площадка} в {Город_предл}: афиша и билеты на сегодня, {date} | Дайбилет».
  * Живая дата (MSK), как у city hubs. City adds local commercial intent.
  */
 export function buildVenueSeoTitle(
@@ -13,9 +14,13 @@ export function buildVenueSeoTitle(
 ): string {
   const name = pageTitle(String(venueName || '').trim() || 'Площадка');
   const cityLabel = String(city || '').trim();
+  // Declension bug (baseline 2026-09-29): every one of the 12 Wave 1 sample URLs
+  // shipped "Пушкинский музей в Москва: ..." - nominative after "в". The
+  // comparison stays on the nominative form, because that is how the city is
+  // spelled inside venue names; only the rendered form changes.
   const withGeo =
     cityLabel && cityLabel !== 'Не указан' && !name.toLowerCase().includes(cityLabel.toLowerCase())
-      ? `${name} в ${cityLabel}`
+      ? `${name} в ${cityToPrepositional(cityLabel)}`
       : name;
   const { short } = formatLandingTodayParts(reference);
   return `${withGeo}: афиша и билеты на сегодня, ${short} | Дайбилет`;
