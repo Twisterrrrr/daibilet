@@ -1,10 +1,5 @@
 import { cityToPrepositional, inCityPrepositional, isSeoExpansionCity } from '@/lib/city-declension';
-import { formatLandingTodayParts, SITE_TIME_ZONE } from '@/lib/datetime';
 import { canonicalLandingSlug } from '@/lib/landing-constants';
-import {
-  resolveLandingEventWindow,
-  resolveLandingTitleDateShort,
-} from '@/lib/landing-event-windows';
 import { stripCityFromLandingTopic } from '@/lib/landing-seo';
 
 /**
@@ -158,8 +153,16 @@ export function listingSeoYear(referenceDate: Date = new Date()): number {
 
 /**
  * Title (absolute).
- * Pattern: `{Категория} в {City_Пр} сегодня, {date}: афиша, цены и билеты`
- * Without em/en dash; city once in prepositional; holiday landings use window date when outside season.
+ * Pattern: `{Категория} в {City_Пр}: афиша, цены и билеты`
+ *
+ * The date used to be baked in here ("сегодня, 6 августа"), which made every
+ * URL's title change daily at revalidation time. In a SERP that title sits for
+ * weeks, so "сегодня" was factually wrong for anyone who searched later - the
+ * defect was already visible in the salute-9-may case, which had to be
+ * special-cased to suppress the word. A stable title is the general fix.
+ *
+ * `referenceDate`, `timeZone` and `landingSlug` are still accepted so the four
+ * call sites need no change; they no longer affect the output.
  */
 export function buildCategoryCityMetaTitle(input: {
   categoryTitle: string;
@@ -172,19 +175,7 @@ export function buildCategoryCityMetaTitle(input: {
   const cityRaw = String(input.cityName || '').trim() || 'городе';
   const intent = stripCityFromLandingTopic(String(input.categoryTitle || '').trim() || 'События', cityRaw);
   const cityPrep = cityToPrepositional(cityRaw);
-  const timeZone = input.timeZone || SITE_TIME_ZONE;
-  const reference = input.referenceDate || new Date();
-  const titleDate = input.landingSlug
-    ? resolveLandingTitleDateShort(input.landingSlug, reference, timeZone)
-    : {
-        short: formatLandingTodayParts(reference, timeZone).short,
-        useTodayWord: true,
-        window: resolveLandingEventWindow('', reference),
-      };
-  const datePart = titleDate.useTodayWord
-    ? `сегодня, ${titleDate.short}`
-    : titleDate.short;
-  return `${intent} в ${cityPrep} ${datePart}: афиша, цены и билеты`;
+  return `${intent} в ${cityPrep}: афиша, цены и билеты`;
 }
 
 /**
