@@ -646,7 +646,19 @@ export function blogPostFilterCities(post: {
   if (slug && slug !== MULTI_CITY_FILTER_SLUG && slug !== 'regions') add(slug, name);
   else if (name && !BLOG_PSEUDO_CITY_LABELS.has(name)) add(null, name);
 
-  // No bare «Регионы» chip: retag with concrete citySlugs instead.
+  // 29.09. A post tagged «Регионы» that resolved to no concrete city is genuinely a
+  // region post, and Project.md is explicit: «Регионы» only if the material has no
+  // concrete catalog cities. This branch used to return [] for those, which left the
+  // `raw === 'regions'` branch in filterBlogFeedByCity dead - /blog?city=regions
+  // always rendered an empty feed while the code looked like it was supported.
+  // A stale CMS `regions` label is still ignored above: concrete citySlugs win and
+  // return early, so only a post with no real city at all lands here.
+  if (!out.length) {
+    const resolved = slug || normalizeBlogCitySlug(null, name);
+    if (resolved === 'regions') {
+      out.push({ value: 'regions', label: BLOG_CITY_FILTER_LABELS.regions || 'Регионы' });
+    }
+  }
   return out;
 }
 
