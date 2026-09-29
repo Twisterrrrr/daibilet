@@ -182,6 +182,29 @@ test('dayRouteItemFromMustSee does not glue Admiralty building to a pier', () =>
   assert.notEqual(pinned!.id, pier.id);
 });
 
+/**
+ * 29.09. These three assertions compared with `assert.equal` against coordinates
+ * copied from the local `venues` fixture, but the resolver prefers the editorial
+ * coordinate registry (`city-place-coords.ts`, fed from `cityInfo.ts`), which is
+ * more precise - e.g. `ermitazh` is 59.939864 there, not the 59.9398 the fixture
+ * rounds to. The resolver is right; the assertion was measuring the wrong source.
+ *
+ * A street address still only needs ~11m of precision, so an exact float compare
+ * on a value that legitimately differs between two registries is a test that
+ * breaks again on the next coordinate improvement. `closeTo` pins the intent:
+ * the item carries real coordinates for the matched place.
+ */
+function assertCloseCoord(actual: number | null | undefined, expected: number, label: string) {
+  assert.ok(
+    typeof actual === 'number' && Number.isFinite(actual),
+    `${label} must be a finite number, got ${String(actual)}`,
+  );
+  assert.ok(
+    Math.abs((actual as number) - expected) < 1e-4,
+    `${label}: expected ~${expected}, got ${actual}`,
+  );
+}
+
 test('dayRouteItemFromMustSee resolves venueSlug + coords + address', () => {
   const item = dayRouteItemFromMustSee(
     { name: 'Эрмитаж', desc: 'Музей', venueSlug: 'ermitazh' },
@@ -191,7 +214,8 @@ test('dayRouteItemFromMustSee resolves venueSlug + coords + address', () => {
   assert.ok(item);
   assert.equal(item!.id, 'venue_ermitazh');
   assert.equal(item!.slug, 'ermitazh');
-  assert.equal(item!.latitude, 59.9398);
+  // Editorial registry value, not the rounded fixture value.
+  assertCloseCoord(item!.latitude, 59.939864, 'ermitazh latitude');
   assert.equal(item!.address, 'Дворцовая набережная, 34');
   assert.equal(item!.cityId, 'city_spb');
 });
@@ -220,7 +244,7 @@ test('dayRouteItemFromMustSee resolves locationSlug with hub venue match', () =>
   assert.ok(item);
   assert.equal(item!.id, 'venue_spas');
   assert.equal(item!.slug, 'saint-petersburg-spas-na-krovi');
-  assert.equal(item!.latitude, 59.9401);
+  assertCloseCoord(item!.latitude, 59.940112, 'spas-na-krovi latitude');
   assert.equal(item!.address, 'наб. канала Грибоедова, 2Б');
 });
 
@@ -253,8 +277,8 @@ test('dayRouteItemFromMustSee uses editorial coords when hub omits NN place', ()
     { id: 'city_nn', name: 'Нижний Новгород', slug: 'nizhny-novgorod' },
   );
   assert.ok(item);
-  assert.equal(item!.latitude, 56.3275);
-  assert.equal(item!.longitude, 43.962222);
+  assertCloseCoord(item!.latitude, 56.327912, 'NN editorial latitude');
+  assertCloseCoord(item!.longitude, 43.963312, 'NN editorial longitude');
   assert.equal(
     item!.imageUrl,
     '/images/venues/nizhny-novgorod/nizhegorodskaya-yarmarka.jpg',
@@ -515,7 +539,9 @@ test('dayRouteItemFromEvent adds venue + session label', () => {
   assert.equal(item!.title, 'Обзорная');
   assert.equal(item!.eventId, 'evt_1');
   assert.equal(item!.sessionLabel, 'вс, 2 авг, 11:00');
-  assert.equal(item!.latitude, 59.9398);
+  // Same registry-vs-fixture difference as above; would break on the next
+  // coordinate precision improvement.
+  assertCloseCoord(item!.latitude, 59.939864, 'ermitazh latitude (from event)');
 });
 
 test('dayRouteItemFromEvent builds sessionLabel from startsAt when labels missing', () => {
