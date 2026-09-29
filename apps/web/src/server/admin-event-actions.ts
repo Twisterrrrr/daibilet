@@ -13,13 +13,19 @@ function emptyToNull(value: FormDataEntryValue | null): string | null {
 
 /** Bust public `/events/[slug]` Data Cache + HTML after admin edits. */
 function revalidatePublicEventSurfaces(formData: FormData) {
-  revalidateTag(EVENT_PAGE_CACHE_TAG);
-  revalidateTag(CATALOG_PAGE_CACHE_TAG);
+  // Next 16 deprecated the single-argument revalidateTag(tag) and now requires a
+  // profile. `{ expire: 0 }` keeps the previous behaviour - the tag expires
+  // immediately instead of falling back to stale-while-revalidate - so an admin
+  // still sees their own edit on the next request.
+  // `updateTag()` is the documented alternative for Server Actions, but it is
+  // not visible through the `next/cache` types under TypeScript 6.0.3.
+  revalidateTag(EVENT_PAGE_CACHE_TAG, { expire: 0 });
+  revalidateTag(CATALOG_PAGE_CACHE_TAG, { expire: 0 });
   revalidatePath('/events');
 
   const slug = String(formData.get('slug') || formData.get('publicSlug') || '').trim();
   if (slug) {
-    revalidateTag(eventPageCacheTag(slug));
+    revalidateTag(eventPageCacheTag(slug), { expire: 0 });
     revalidatePath(`/events/${encodeURIComponent(slug)}`);
   }
 }

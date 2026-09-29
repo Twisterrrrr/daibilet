@@ -4,7 +4,8 @@ import { placeSlugAliasRedirects } from './src/lib/place-slug-aliases';
 
 const nextConfig: NextConfig = {
   // MSK prod ~8Gi / 4 CPU: allow parallel build. (Legacy SPB 3.8Gi used cpus:1 + workerThreads:false.)
-  eslint: { ignoreDuringBuilds: true },
+  // Next 16 removed the built-in ESLint build step and the `eslint` NextConfig key.
+  // Nothing to skip anymore: lint is not run during `next build`.
   typescript: { ignoreBuildErrors: true },
   productionBrowserSourceMaps: false,
   experimental: {
@@ -91,6 +92,12 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  // Next 16 defaults to Turbopack, which does not implement webpack's
+  // `resolve.extensionAlias`. The workspace packages are consumed as TypeScript
+  // source and use the ESM convention of importing './foo.js' for './foo.ts'
+  // (~301 such imports under apps/backend/src and packages/), so the alias is
+  // required. The build script therefore passes `--webpack` explicitly.
+  // Migrating to Turbopack needs those specifiers rewritten first.
   webpack: (config) => {
     config.resolve.extensionAlias = {
       '.js': ['.ts', '.tsx', '.js'],

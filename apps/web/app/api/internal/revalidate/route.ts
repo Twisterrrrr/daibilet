@@ -88,7 +88,11 @@ export async function POST(request: Request) {
   }
 
   for (const tag of tags) {
-    revalidateTag(tag);
+    // Next 16: the single-argument form is deprecated and now a type error.
+    // This is a Route Handler (webhook-style invalidation), so updateTag() is
+    // not available. `{ expire: 0 }` keeps the previous behaviour: the tag
+    // expires immediately instead of falling back to stale-while-revalidate.
+    revalidateTag(tag, { expire: 0 });
   }
   for (const path of paths) {
     revalidatePath(path);

@@ -83,8 +83,9 @@ test('ISR pages do not gain new next/navigation redirects', () => {
   assert.deepEqual(offenders, [], `ISR navigation redirect not allowlisted: ${offenders.join(', ')}`);
 });
 
-test('middleware owns Cyrillic event slug 308', () => {
-  const middleware = fs.readFileSync(path.join(WEB_ROOT, 'middleware.ts'), 'utf8');
-  assert.match(middleware, /cyrillicEventRedirectPath/);
-  assert.match(middleware, /redirectCyrillicEventSlug/);
+test('proxy owns Cyrillic event slug 308', () => {
+  // Next 16 renamed the `middleware.ts` file convention to `proxy.ts`.
+  const proxy = fs.readFileSync(path.join(WEB_ROOT, 'proxy.ts'), 'utf8');
+  assert.match(proxy, /cyrillicEventRedirectPath/);
+  assert.match(proxy, /redirectCyrillicEventSlug/);
 });
