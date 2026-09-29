@@ -18,7 +18,7 @@ export const DAY_ROUTE_SOFT_LUNCH_AT = 14 * 60;
 
 export type DayRouteSoftTimingHint = {
   venueId: string;
-  /** e.g. «10:00 - 11:30» or «В 15:00» */
+  /** e.g. «10:00-11:30» (hyphen, no spaces) or «В 15:00» */
   label: string;
   startMin: number;
   endMin: number;
