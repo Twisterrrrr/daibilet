@@ -447,13 +447,18 @@ export function formatMagazineCatalogDate(event: PublicSessionDto): string {
     const fallback = [event.dateLabel, event.timeLabel].filter(Boolean).join(', ');
     return (fallback || 'Дата уточняется').toLocaleUpperCase('ru-RU');
   }
-  const day = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', timeZone }).format(d);
-  const month = new Intl.DateTimeFormat('ru-RU', { month: 'long', timeZone })
+  // 29.09. Day and month have to come out of ONE Intl call. Asking for the month
+  // on its own yields the standalone (nominative) form - "август" - so the card
+  // read "26 АВГУСТ". Russian needs the genitive after a numeral: "26 августа".
+  // The test expected "26 АВГУСТА" and was right. No invisible characters were
+  // involved; two separate formatters simply disagreed on case agreement, and
+  // only the joined form knows which of the two Russian month forms applies.
+  const dayMonth = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', timeZone })
     .format(d)
     .toLocaleUpperCase('ru-RU');
   const time = formatSessionTime(event.startsAt, event.timeLabel, timeZone);
-  if (!time || time === '—') return `${day} ${month}`;
-  return `${day} ${month}, ${time}`;
+  if (!time || time === '—') return dayMonth;
+  return `${dayMonth}, ${time}`;
 }
 
 export function hasDisplayPrice(priceFrom?: number | null): boolean {
