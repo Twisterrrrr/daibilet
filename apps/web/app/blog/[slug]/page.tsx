@@ -14,6 +14,11 @@ export const dynamicParams = true;
 const BLOG_SLUG_REDIRECTS: Record<string, string> = {
   // Дубль колонки Макса (HIDDEN) → live канон
   'bylinnyy-bereg-fentezi-fest': '/blog/fentezi-fest-bylinnyy-bereg',
+  // Тот же дубль, но с "-volhov" в слаге. Остался отдельной индексируемой
+  // страницей: 200, self-canonical, isIndexable=true, присутствует в blog.xml.
+  // Тема та же (Былинный берег + Фэнтези Фест на Волхове), тела разные,
+  // поэтому это каннибализация ключа, а не побайтовый дубль.
+  'bylinnyy-bereg-fentezi-fest-volhov': '/blog/fentezi-fest-bylinnyy-bereg',
   // Старый open-air Макса (HIDDEN) → актуальная колонка про парки
   'open-air-festy-vyhodnoi-ru': '/blog/moskva-parki-open-air-vyhodnye',
 };
