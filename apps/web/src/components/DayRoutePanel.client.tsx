@@ -1259,7 +1259,12 @@ function DayRoutePanelInner() {
         (
           row,
         ): row is {
-          place: (typeof mustSeePlaces)[number] & { type?: string | null };
+          // Must match exactly what the `.map` above produces, otherwise the
+          // predicate is rejected (TS2677) and every consumer below keeps seeing
+          // `row` as `| null` - that single mismatch produced 43 TS18047 errors in
+          // this file. `map` always writes `type`, so it is required here, not
+          // optional.
+          place: (typeof mustSeePlaces)[number] & { type: string | null };
           item: DayRouteVenueItem;
           hook: string | null;
         } => Boolean(row),
