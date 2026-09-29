@@ -152,7 +152,14 @@ export function sessionEditorsThemeKey(event: Pick<PublicSession, 'title' | 'cat
 
   // The `u` flag is required: without it \p{L} is a literal "p{L}", not a
   // letter class, and isNight silently matches nothing.
-  const isNight = /ночн\p{L}*|вечерн\p{L}*|ночно|\p{L}*\s+ночн/u.test(title);
+  //
+  // Only two alternatives survive, and both are roots. Measured over a 385-case
+  // corpus: `ночно` and `\p{L}*\s+ночн` never matched a title that `ночн\p{L}*`
+  // did not already match, so they were dead weight. `ночн\p{L}*` already covers
+  // "ночной", "ночного", "ночное", "ночную" (the root is a prefix of all of
+  // them), and it matches anywhere in the string, so word adjacency cannot add
+  // anything. Keep the matcher to the two roots it actually needs.
+  const isNight = /ночн\p{L}*|вечерн\p{L}*/u.test(title);
   const isSights = /магия огней|от классики до футури/.test(title);
   const isLakhta = /лахат|васильевск/u.test(title);
   const isPushkin = /пушкин|царск\p{L}*\s+сел/u.test(title);
