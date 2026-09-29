@@ -11,6 +11,7 @@ import {
   weatherMoodFromCode,
 } from './city-weather.ts';
 import { resolveCityLocalFlavor } from './city-hub-local-flavor.ts';
+import { CITY_INFO } from './cityInfo.ts';
 
 test('WMO 0-2 is sunny leisure, overcast and rain go indoor', () => {
   assert.equal(weatherMoodFromCode(0), 'sunny');
@@ -37,6 +38,40 @@ test('indoor CTA copy follows actual condition, not a generic lie', () => {
   assert.equal(indoorCtaForCode(3, flavor).includes('\u2014'), false);
   assert.equal(weatherLabelRu(0), 'Ясно');
   assert.equal(weatherLabelRu(3), 'Пасмурно');
+});
+
+/**
+ * 29.09. Six cities had drifted to a truncated «Серо: …» label instead of
+ * «Пасмурно: …» - three in city-hub-local-flavor.ts (Kaliningrad, Moscow,
+ * Yekaterinburg) and three in the Saratov / Volgograd / Yaroslavl fragments. No test
+ * covered them, which is why the drift went unnoticed; the weather test only looked
+ * at Perm.
+ *
+ * The guard targets that exact defect and nothing else. An earlier version required
+ * the copy to open with one of «Пасмурно/Дождь/Снег» and wrongly flagged deliberate
+ * variants that name the condition just as honestly: «Ливень:», «Редкий снег:»,
+ * «Сыро и холодно:», «Серо над морем:», «Степной ветер:». What is wrong with
+ * «Серо:» is that the label stops at a short-form adjective and never reaches a
+ * noun, so the reader is not told what the weather is. That is what this asserts.
+ */
+test('no city indoor CTA is truncated to a bare "Серо:" label', () => {
+  const offenders: string[] = [];
+  let checked = 0;
+  for (const city of Object.keys(CITY_INFO)) {
+    const weather = resolveCityLocalFlavor(city)?.weather;
+    if (!weather) continue;
+    checked += 1;
+    for (const [label, copy] of [
+      ['overcast', weather.indoorCtaOvercast],
+      ['rain', weather.indoorCtaRain],
+      ['snow', weather.indoorCtaSnow],
+    ] as const) {
+      if (!copy) continue;
+      if (/^Серо\s*:/u.test(copy)) offenders.push(`${city} ${label}: ${copy}`);
+    }
+  }
+  assert.ok(checked > 15, `expected a broad sweep of cities, checked ${checked}`);
+  assert.deepEqual(offenders, [], offenders.join('\n'));
 });
 
 test('parseOpenMeteoForecast prefers current code for today', () => {
