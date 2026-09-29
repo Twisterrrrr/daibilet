@@ -45,6 +45,33 @@ jobs:
       - name: Web lib unit tests (CI allowlist)
         run: pnpm web:test:ci
 
+      # Non-blocking visibility for apps/web TypeScript errors.
+      # apps/web/next.config.ts sets typescript.ignoreBuildErrors = true, so a type
+      # regression never fails the build on its own. This step only reports the
+      # current count into the job summary so the baseline (192 errors at
+      # e4e772c3f) can be tracked instead of silently growing.
+      # Baseline to improve: `chore/ci-web-typecheck-baseline`.
+      - name: Web typecheck (non-blocking baseline)
+        continue-on-error: true
+        run: |
+          set +e
+          pnpm web:typecheck > /tmp/web-typecheck.log 2>&1
+          code=$?
+          count=$(grep -cE 'error TS[0-9]+' /tmp/web-typecheck.log || true)
+          {
+            echo '### apps/web typecheck (non-blocking)'
+            echo
+            echo "exit code: \`$code\`"
+            echo "TypeScript errors: \`$count\`"
+            echo
+            echo '```'
+            head -c 8000 /tmp/web-typecheck.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "web-typecheck-errors=$count" >> "$GITHUB_OUTPUT"
+          tail -n 30 /tmp/web-typecheck.log
+          exit 0
+
       - name: Next web build
         run: pnpm web:build
 
