@@ -20,6 +20,11 @@ export type UpdateAdminEventOverride = (
 
 export type LoadEventDescriptionForRewrite = (eventId: string) => Promise<{
   title: string | null;
+  city?: string | null;
+  venue?: string | null;
+  venueAddress?: string | null;
+  ageLimit?: string | null;
+  category?: string | null;
   sourceDescription: string | null;
   overrideDescription: string | null;
   scheduledDurationMinutes?: number[];
@@ -28,7 +33,15 @@ export type LoadEventDescriptionForRewrite = (eventId: string) => Promise<{
 export type RewriteEventDescriptionFn = (params: {
   eventId: string;
   originalDescription: string;
-  meta?: { title?: string | null; scheduledDurationMinutes?: readonly number[] | null };
+  meta?: {
+    title?: string | null;
+    city?: string | null;
+    venue?: string | null;
+    venueAddress?: string | null;
+    ageLimit?: string | null;
+    category?: string | null;
+    scheduledDurationMinutes?: readonly number[] | null;
+  };
 }) => Promise<RewriteDescriptionResult>;
 
 export interface AdminEventsHandlerDependencies {
@@ -88,6 +101,11 @@ async function handleEventDescriptionRewrite(
       originalDescription,
       meta: {
         title: row.title,
+        city: row.city ?? null,
+        venue: row.venue ?? null,
+        venueAddress: row.venueAddress ?? null,
+        ageLimit: row.ageLimit ?? null,
+        category: row.category ?? null,
         scheduledDurationMinutes: row.scheduledDurationMinutes || [],
       },
     });
@@ -119,6 +137,11 @@ export async function loadEventDescriptionForRewriteFromDb(
   eventId: string,
 ): Promise<{
   title: string | null;
+  city: string | null;
+  venue: string | null;
+  venueAddress: string | null;
+  ageLimit: string | null;
+  category: string | null;
   sourceDescription: string | null;
   overrideDescription: string | null;
   scheduledDurationMinutes: number[];
@@ -127,6 +150,11 @@ export async function loadEventDescriptionForRewriteFromDb(
     `
       select
         e.title,
+        city.title as city,
+        venue.title as venue,
+        venue.address as "venueAddress",
+        e."ageLimit",
+        category.title as category,
         e.description as "sourceDescription",
         override.description as "overrideDescription",
         coalesce(
@@ -141,10 +169,13 @@ export async function loadEventDescriptionForRewriteFromDb(
           '{}'::numeric[]
         ) as "sessionDurationMinutes"
       from "Event" e
+      left join "City" city on city.id = e."primaryCityId"
+      left join "Venue" venue on venue.id = e."venueId"
+      left join "Category" category on category.id = e."categoryId"
       left join "EventOverride" override on override."eventId" = e.id
       left join "EventSession" session on session."eventId" = e.id
       where e.id = $1
-      group by e.id, e.title, e.description, override.description
+      group by e.id, e.title, city.title, venue.title, venue.address, e."ageLimit", category.title, e.description, override.description
       limit 1
     `,
     [eventId],
@@ -152,6 +183,11 @@ export async function loadEventDescriptionForRewriteFromDb(
   const row = result.rows?.[0] as
     | {
         title?: string | null;
+        city?: string | null;
+        venue?: string | null;
+        venueAddress?: string | null;
+        ageLimit?: string | null;
+        category?: string | null;
         sourceDescription?: string | null;
         overrideDescription?: string | null;
         sessionDurationMinutes?: unknown[] | null;
@@ -160,6 +196,11 @@ export async function loadEventDescriptionForRewriteFromDb(
   if (!row) return null;
   return {
     title: row.title ?? null,
+    city: row.city ?? null,
+    venue: row.venue ?? null,
+    venueAddress: row.venueAddress ?? null,
+    ageLimit: row.ageLimit ?? null,
+    category: row.category ?? null,
     sourceDescription: row.sourceDescription ?? null,
     overrideDescription: row.overrideDescription ?? null,
     scheduledDurationMinutes: normalizeScheduledDurationMinutes(row.sessionDurationMinutes),

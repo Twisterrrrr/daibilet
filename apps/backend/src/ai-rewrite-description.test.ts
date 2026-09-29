@@ -14,6 +14,7 @@ import {
   roundDurationMinutesToFive,
   sanitizeRewriteOutput,
   truncateRewriteInput,
+  validateRewriteStructure,
   AiRewriteError,
 } from './ai-rewrite-description.js';
 
@@ -24,6 +25,9 @@ test('SYSTEM_PROMPT includes safety hexagon rules', () => {
   assert.match(SYSTEM_PROMPT, /Markdown/);
   assert.match(SYSTEM_PROMPT, /времени начала и окончания/);
   assert.match(SYSTEM_PROMPT, /ближайших 5 минут/);
+  assert.match(SYSTEM_PROMPT, /ОБЯЗАТЕЛЬНЫЙ РИТМ ТЕКСТА/);
+  assert.match(SYSTEM_PROMPT, /## Особенности/);
+  assert.match(SYSTEM_PROMPT, /Не пиши заголовок/);
 });
 
 test('truncateRewriteInput keeps short text', () => {
@@ -43,10 +47,18 @@ test('buildRewriteUserPrompt includes title and description', () => {
   const { prompt, truncated } = buildRewriteUserPrompt('Исходный текст экскурсии', {
     title: 'Обзорная по Перми',
     city: 'Пермь',
+    venue: 'Дом культуры',
+    venueAddress: 'ул. Ленина, 1',
+    ageLimit: '12',
+    category: 'Экскурсии',
   });
   assert.equal(truncated, false);
   assert.match(prompt, /Обзорная по Перми/);
   assert.match(prompt, /Пермь/);
+  assert.match(prompt, /Дом культуры/);
+  assert.match(prompt, /ул\. Ленина, 1/);
+  assert.match(prompt, /12\+/);
+  assert.match(prompt, /Категория: Экскурсии/);
   assert.match(prompt, /Исходный текст экскурсии/);
 });
 
@@ -57,7 +69,7 @@ test('schedule duration is rounded to five minutes and included as a structured 
   });
 
   assert.match(prompt, /Расчётная длительность по расписанию: 1 час 5 минут/);
-  assert.match(prompt, /только если длительность отсутствует/);
+  assert.match(prompt, /длительность добавляй только если ее нет/);
 });
 
 test('schedule duration variants remain explicit after rounding', () => {
@@ -85,6 +97,58 @@ test('sanitizeRewriteOutput strips fences and preambles', () => {
   assert.equal(sanitizeRewriteOutput('"Обёрнутый"'), 'Обёрнутый');
 });
 
+test('validateRewriteStructure requires an intro, sections and feature bullets', () => {
+  const valid = validateRewriteStructure(`Камерное занятие знакомит участников с техникой и форматом работы.
+
+## Что вас ждет
+Короткая практическая часть по исходной программе организатора.
+
+## Особенности
+- Продолжительность - 45 минут
+- Площадка находится в центре города`, { requireFeatures: true });
+  assert.equal(valid.valid, true);
+  assert.deepEqual(valid.headings, ['Что вас ждет', 'Особенности']);
+  assert.equal(valid.featureCount, 2);
+
+  const wall = validateRewriteStructure('Один длинный абзац без смысловых блоков и без списка особенностей.');
+  assert.equal(wall.valid, false);
+  assert.match(wall.errors.join(' '), /смысловых секций/);
+
+  const duplicateHeading = validateRewriteStructure(`Содержательное вступление перед секциями занимает больше сорока знаков.
+
+## О событии
+Описание.
+
+## Особенности
+- Первый факт
+- Второй факт`);
+  assert.equal(duplicateHeading.valid, false);
+  assert.match(duplicateHeading.errors.join(' '), /дублировать/);
+});
+
+test('validateRewriteStructure keeps features optional for a sparse source', () => {
+  const result = validateRewriteStructure(`Событие с коротким исходным описанием, для которого доступны только основные сведения о формате.
+
+## Формат
+Подробности программы организатор не уточняет.
+
+## Перед посещением
+Проверьте актуальные условия выбранного сеанса.`);
+
+  assert.equal(result.valid, true);
+  assert.equal(result.featureCount, 0);
+
+  const required = validateRewriteStructure(`Содержательное вступление перед двумя секциями занимает больше сорока знаков.
+
+## Формат
+Короткое описание формата.
+
+## Перед посещением
+Практическая информация.`, { requireFeatures: true });
+  assert.equal(required.valid, false);
+  assert.match(required.errors.join(' '), /Особенности/);
+});
+
 test('assertRewriteCooldown blocks rapid repeats', () => {
   resetRewriteCooldownForTests();
   assertRewriteCooldown('evt_1', 1_000);
@@ -107,7 +171,7 @@ test('rewriteEventDescription uses mock OpenAI HTTP', async () => {
   const fetchImpl: typeof fetch = async () =>
     new Response(
       JSON.stringify({
-        choices: [{ message: { content: '```md\nУникальный текст экскурсии\n```' } }],
+        choices: [{ message: { content: '```md\nУникальный текст экскурсии помогает понять формат до покупки билета.\n\n## Что вас ждет\nФактическая программа из исходного описания.\n\n## Особенности\n- Первый подтвержденный факт\n- Второй подтвержденный факт\n```' } }],
       }),
       { status: 200, headers: { 'content-type': 'application/json' } },
     );
@@ -121,9 +185,29 @@ test('rewriteEventDescription uses mock OpenAI HTTP', async () => {
     fetchImpl,
   });
 
-  assert.equal(result.text, 'Уникальный текст экскурсии');
+  assert.match(result.text, /## Особенности/);
   assert.equal(result.model, 'gpt-test');
   assert.equal(result.truncatedInput, false);
+});
+
+test('rewriteEventDescription rejects a one-block model response', async () => {
+  resetRewriteCooldownForTests();
+  const fetchImpl: typeof fetch = async () =>
+    new Response(
+      JSON.stringify({ choices: [{ message: { content: 'Готовый, но неструктурированный абзац.' } }] }),
+      { status: 200, headers: { 'content-type': 'application/json' } },
+    );
+
+  await assert.rejects(
+    () => rewriteEventDescription({
+      eventId: 'evt_bad_structure',
+      originalDescription: 'Оригинальное описание события.',
+      apiKey: 'sk-test',
+      model: 'gpt-test',
+      fetchImpl,
+    }),
+    (error: unknown) => error instanceof AiRewriteError && error.code === 'invalid_rewrite_structure',
+  );
 });
 
 test('callOpenAiRewrite maps OpenAI HTTP errors', async () => {

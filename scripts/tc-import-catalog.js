@@ -12,6 +12,7 @@ const { normalizeImportEventTitle } = require("./lib/event-title-normalize");
 const { ENTERTAINMENT_DISCO_TAXONOMY, isDiscoOrPartyEvent } = require("./lib/event-taxonomy");
 const { applyVenueAddressCanon } = require("./lib/venue-address-overrides");
 const { deactivateMissingTicketscloudEvents } = require("./lib/tc-deactivate-missing");
+const { inheritTicketscloudSeriesEditorial } = require("./lib/tc-editorial-inheritance");
 
 const requireFromDbPackage = createRequire(path.join(rootDir, "packages", "db", "package.json"));
 const { Pool } = requireFromDbPackage("pg");
@@ -113,6 +114,7 @@ async function importCatalogEvents(catalog, options = {}) {
     providerLinks: 0,
     snapshotLinkedEvents: 0,
     snapshotMissingLinks: 0,
+    editorialInherited: 0,
   };
 
   try {
@@ -153,6 +155,7 @@ async function importCatalogEvents(catalog, options = {}) {
       if (rowStats.city) stats.cities += 1;
       if (rowStats.hasWidgetUrl) stats.offersWithWidgetUrl += 1;
       else stats.eventsWithoutWidgetUrl += 1;
+      if (rowStats.editorialInherited) stats.editorialInherited += 1;
     }
 
     const snapshotCoverageResult = await client.query(
@@ -240,7 +243,16 @@ async function importCatalogEvents(catalog, options = {}) {
 }
 
 async function importCatalogEvent(client, event, summary) {
-  const rowStats = { eventId: null, sessions: 0, offers: 0, tags: 0, venue: false, city: false, hasWidgetUrl: false };
+  const rowStats = {
+    eventId: null,
+    sessions: 0,
+    offers: 0,
+    tags: 0,
+    venue: false,
+    city: false,
+    hasWidgetUrl: false,
+    editorialInherited: false,
+  };
   const externalId = String(event.externalId);
   const eventId = id("evt", externalId);
   rowStats.eventId = eventId;
@@ -430,6 +442,13 @@ async function importCatalogEvent(client, event, summary) {
       buildTicketscloudWidgetUrl(externalId),
     ],
   );
+
+  rowStats.editorialInherited = await inheritTicketscloudSeriesEditorial(client, {
+    eventId,
+    sourceId: TICKETSCLOUD_SOURCE_ID,
+    metaExternalId: event.metaExternalId,
+    overrideId: id("ovr_tc_series", externalId),
+  });
 
   if (event.startsAt || event.endsAt) {
     await client.query(

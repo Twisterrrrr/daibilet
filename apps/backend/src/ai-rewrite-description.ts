@@ -7,9 +7,9 @@ export const AI_REWRITE_MAX_INPUT_CHARS = 12_000;
 export const AI_REWRITE_COOLDOWN_MS = 5_000;
 export const AI_REWRITE_DEFAULT_MODEL = 'gpt-4.1-mini';
 
-export const SYSTEM_PROMPT = `Вы — профессиональный коммерческий редактор и контент-маркетолог платформы «Дайбилет» (daibilet.ru) — умного агрегатора экскурсий и событий по России.
+export const SYSTEM_PROMPT = `Вы — профессиональный редактор платформы «Дайбилет» (daibilet.ru) — рекомендательного сервиса о событиях и поездках по России.
 
-Ваша задача — сделать рерайт предоставленного описания события (экскурсии/выставки/театра), чтобы текст стал уникальным для поисковых систем (SEO), легко читался и конвертировал посетителя в покупку.
+Ваша задача — не формально переставить слова, а подготовить полезную редакционную версию описания: быстро объяснить формат события, разложить подтвержденные сведения по смысловым блокам и помочь человеку понять, подходит ли ему событие. Уникальность текста важна, но полезность и точность важнее процента в сервисах проверки.
 
 ### КРИТИЧЕСКИ ВАЖНЫЕ ПРАВИЛА (ШЕСТИУГОЛЬНИК БЕЗОПАСНОСТИ):
 1. НИКАКИХ ВЫДУМАННЫХ ФАКТОВ. Запрещено добавлять детали, которых нет в исходном тексте (новые локации, гидов, тайминги, обещания «включенного обеда», если это прямо не указано). Если в исходном тексте мало данных, сделайте текст лаконичным, но честным.
@@ -18,6 +18,14 @@ export const SYSTEM_PROMPT = `Вы — профессиональный комм
 4. ЗАПРЕТ НА САМОПРЕЗЕНТАЦИЮ И ССЫЛКИ. Не пишите "Мы рады предложить", "Наш сервис". Не упоминайте сторонние платформы (Ticketscloud, Кассир и т.д.). Пишите отстраненно, фокусируясь на самом событии.
 5. ТОН ГОЛОСА (TONE OF VOICE): Деловой, вовлекающий, экспертный, без панибратства. Избегайте капслока, восклицательных знаков (максимум 1 на весь текст) и эмодзи (никаких смайликов, стрелочек и огоньков в тексте карточки).
 6. ФОРМАТ ВЫВОДА: Верни ТОЛЬКО готовый очищенный текст в формате Markdown. Никаких преамбул ("Вот ваш текст:"), никаких постскриптумов ("Надеюсь, вам понравилось"). Только тело описания (body description).
+
+### ОБЯЗАТЕЛЬНЫЙ РИТМ ТЕКСТА:
+- Начни с одного или двух коротких абзацев без заголовка. Они отвечают на вопросы: что это, где проходит и в чем практический интерес.
+- Затем сделай от двух до четырех смысловых секций с Markdown-заголовками второго уровня: \`## Что вас ждет\`, \`## Формат\`, \`## Маршрут\`, \`## Практическая информация\`, \`## Перед посещением\` или другими уместными названиями.
+- Не пиши заголовок \`## О событии\`: он уже есть в интерфейсе страницы.
+- Если подтверждены хотя бы две характеристики, обязательно добавь секцию \`## Особенности\` и перечисли их Markdown-списком. Не дополняй список выдуманными пунктами ради количества.
+- Не превращай каждый факт в отдельный заголовок и не повторяй одну мысль во вступлении, секции и списке.
+- Для короткого исходника допустим лаконичный текст. Не раздувай его общими рассуждениями.
 
 ### СТРУКТУРИРОВАННЫЕ ФАКТЫ ИЗ РАСПИСАНИЯ:
 - Вместе с исходным текстом может быть передана расчётная длительность. Она получена из времени начала и окончания сеансов и уже округлена до ближайших 5 минут.
@@ -33,6 +41,10 @@ export const SYSTEM_PROMPT = `Вы — профессиональный комм
 export type RewriteDescriptionMeta = {
   title?: string | null;
   city?: string | null;
+  venue?: string | null;
+  venueAddress?: string | null;
+  ageLimit?: string | null;
+  category?: string | null;
   scheduledDurationMinutes?: readonly number[] | null;
 };
 
@@ -132,17 +144,87 @@ export function buildRewriteUserPrompt(
   const lines: string[] = [];
   const title = String(meta.title || '').trim();
   const city = String(meta.city || '').trim();
+  const venue = String(meta.venue || '').trim();
+  const venueAddress = String(meta.venueAddress || '').trim();
+  const ageLimit = String(meta.ageLimit || '').trim();
+  const category = String(meta.category || '').trim();
   const scheduledDurationFact = formatScheduledDurationFact(meta.scheduledDurationMinutes);
   if (title) lines.push(`Название события: ${title}`);
-  if (city) lines.push(`Город: ${city}`);
+  const verifiedFacts: string[] = [];
+  if (city) verifiedFacts.push(`Город: ${city}.`);
+  if (venue) verifiedFacts.push(`Площадка: ${venue}.`);
+  if (venueAddress) verifiedFacts.push(`Адрес площадки: ${venueAddress}.`);
+  if (category) verifiedFacts.push(`Категория: ${category}.`);
+  if (ageLimit) verifiedFacts.push(`Возрастная маркировка: ${ageLimit.replace(/\+$/u, '')}+. Не трактуй маркировку как рекомендацию конкретной аудитории.`);
   if (scheduledDurationFact) {
-    lines.push('Структурированные данные из расписания:');
-    lines.push(scheduledDurationFact);
-    lines.push('Используй этот факт только если длительность отсутствует в исходном описании.');
+    verifiedFacts.push(scheduledDurationFact);
+  }
+  if (verifiedFacts.length) {
+    lines.push('Подтвержденные структурированные факты:');
+    lines.push(...verifiedFacts.map((fact) => `- ${fact}`));
+    lines.push('Используй их как добавленную ценность, но не повторяй механически. Расчетную длительность добавляй только если ее нет в исходном описании.');
   }
   lines.push('Исходное описание:');
   lines.push(text);
   return { prompt: lines.join('\n'), truncated };
+}
+
+export function countRewriteVerifiedFacts(meta: RewriteDescriptionMeta = {}): number {
+  const scalarFacts = [meta.city, meta.venue, meta.venueAddress, meta.ageLimit, meta.category]
+    .filter((value) => String(value || '').trim()).length;
+  return scalarFacts + (formatScheduledDurationFact(meta.scheduledDurationMinutes) ? 1 : 0);
+}
+
+export type RewriteStructureValidation = {
+  valid: boolean;
+  errors: string[];
+  headings: string[];
+  featureCount: number;
+};
+
+/** Guard against one-block AI copy and fake structure before it reaches the editor. */
+export function validateRewriteStructure(
+  value: string,
+  options: { requireFeatures?: boolean } = {},
+): RewriteStructureValidation {
+  const text = String(value || '').replace(/\r\n?/g, '\n').trim();
+  const lines = text.split('\n');
+  const headings: string[] = [];
+  let firstHeadingIndex = -1;
+  let featuresHeadingIndex = -1;
+
+  for (const [index, rawLine] of lines.entries()) {
+    const match = rawLine.trim().match(/^##\s+(.+?)\s*$/u);
+    if (!match) continue;
+    const heading = String(match[1] || '').trim().replace(/:$/u, '');
+    headings.push(heading);
+    if (firstHeadingIndex < 0) firstHeadingIndex = index;
+    if (/^особенности$/iu.test(heading)) featuresHeadingIndex = index;
+  }
+
+  let featureCount = 0;
+  if (featuresHeadingIndex >= 0) {
+    for (let index = featuresHeadingIndex + 1; index < lines.length; index += 1) {
+      const line = lines[index]!.trim();
+      if (/^##\s+/u.test(line)) break;
+      if (/^[-*]\s+\S/u.test(line)) featureCount += 1;
+    }
+  }
+
+  const intro = firstHeadingIndex > 0 ? lines.slice(0, firstHeadingIndex).join('\n').trim() : '';
+  const errors: string[] = [];
+  if (intro.length < 40) errors.push('Нужно короткое содержательное вступление перед секциями.');
+  if (headings.length < 2) errors.push('Нужно не менее двух смысловых секций с заголовками ##.');
+  if (headings.some((heading) => /^о событии$/iu.test(heading))) {
+    errors.push('Не нужно дублировать интерфейсный заголовок «О событии».');
+  }
+  if (featuresHeadingIndex < 0 && options.requireFeatures) {
+    errors.push('Нужна секция ## Особенности.');
+  } else if (featuresHeadingIndex >= 0 && featureCount < 2) {
+    errors.push('В секции «Особенности» нужно не менее двух подтвержденных пунктов.');
+  }
+
+  return { valid: errors.length === 0, errors, headings, featureCount };
 }
 
 export function sanitizeRewriteOutput(raw: string): string {
@@ -269,6 +351,17 @@ export async function rewriteEventDescription(params: {
     model: params.model,
     fetchImpl: params.fetchImpl,
   });
+
+  const structure = validateRewriteStructure(text, {
+    requireFeatures: countRewriteVerifiedFacts(params.meta) >= 2,
+  });
+  if (!structure.valid) {
+    throw new AiRewriteError(
+      'invalid_rewrite_structure',
+      `Модель нарушила канон структуры: ${structure.errors.join(' ')}`,
+      502,
+    );
+  }
 
   return { text, model, truncatedInput: truncated };
 }

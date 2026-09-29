@@ -15,6 +15,11 @@ test('POST rewrite-description returns text and does not write override', async 
       async loadEventDescriptionForRewrite() {
         return {
           title: 'Обзорная',
+          city: 'Пермь',
+          venue: 'Дом культуры',
+          venueAddress: 'ул. Ленина, 1',
+          ageLimit: '12',
+          category: 'Экскурсии',
           sourceDescription: 'Оригинал с Ticketscloud',
           overrideDescription: null,
           scheduledDurationMinutes: [65],
@@ -22,6 +27,11 @@ test('POST rewrite-description returns text and does not write override', async 
       },
       async rewriteEventDescription(params) {
         assert.deepEqual(params.meta?.scheduledDurationMinutes, [65]);
+        assert.equal(params.meta?.city, 'Пермь');
+        assert.equal(params.meta?.venue, 'Дом культуры');
+        assert.equal(params.meta?.venueAddress, 'ул. Ленина, 1');
+        assert.equal(params.meta?.ageLimit, '12');
+        assert.equal(params.meta?.category, 'Экскурсии');
         return { text: 'Уникальный рерайт', model: 'gpt-test', truncatedInput: false };
       },
       async updateAdminEventOverride() {
