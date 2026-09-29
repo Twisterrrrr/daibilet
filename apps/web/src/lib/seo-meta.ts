@@ -26,9 +26,17 @@ export const BLOG_LIST_OG_IMAGE = '/images/blog/blog-hero-promo.jpg';
 
 const DEFAULT_OG_ALT = 'Дайбилет';
 
-/** Default home / root title - keep ≤~60–70 chars for SERP; no live counts. */
-export const HOME_SEO_TITLE =
-  'Дайбилет - экскурсии, музеи и мероприятия в городах России';
+/**
+ * Home / root title. Descriptive part first, brand last.
+ *
+ * Was `Дайбилет - экскурсии, музеи и мероприятия в городах России`, which put
+ * the brand ahead of a dash. That reads as "brand + optional suffix", and for a
+ * brand query such as "дай билет" Google served the site as just `Дайбилет`,
+ * dropping everything after the dash. Leading with the keywords and using the
+ * same `| Дайбилет` separator as the site-wide title template makes the
+ * descriptive half the primary signal. 57 chars, fits one line on desktop.
+ */
+export const HOME_SEO_TITLE = 'Экскурсии, музеи и мероприятия в городах России | Дайбилет';
 
 /** Static fallback (layout / build without destinations) - no hardcoded city counts. */
 export const HOME_SEO_DESCRIPTION_FALLBACK =
@@ -48,14 +56,6 @@ export const BLOG_HUB_DESCRIPTION =
 
 /** Default indexable robots for public hubs (home/blog/places/events). */
 export const INDEX_FOLLOW_ROBOTS = { index: true, follow: true } as const;
-
-/** Fixed hubs + display names for home meta description. */
-const HOME_SEO_CITIES = [
-  { slug: 'moskva', label: 'Москва' },
-  { slug: 'sankt-peterburg', label: 'Санкт-Петербург' },
-  { slug: 'kazan', label: 'Казань' },
-  { slug: 'ekaterinburg', label: 'Екатеринбург' },
-] as const;
 
 type DestinationLike = {
   name: string;
@@ -89,27 +89,37 @@ export function pageTitle(title: string): string {
 }
 
 /**
- * Home meta description with live city event counts.
- * Lead with purchase CTA - never with middleman / widget disclaimer.
+ * Home meta description.
+ *
+ * Was: `Купите билеты на экскурсии, музеи и мероприятия онлайн: Москва - 852,
+ * Санкт-Петербург - 877, Казань - 48, Екатеринбург - 90. Афиша городов России
+ * на Дайбилет.`
+ *
+ * Two problems with that. The four per-city event counts ate ~40% of the
+ * snippet, and Google cut the description right after the last number - so the
+ * brand and the actual value proposition fell outside the visible snippet and
+ * the user saw a list of integers. The counts also came from the destinations
+ * cache, so the description changed on every catalog sync, the same daily-churn
+ * defect the listing titles had.
+ *
+ * One live number is worth keeping: how many cities actually have events. It is
+ * real scale, it barely moves, and it is short. Everything else is static.
  */
 export function buildHomeSeoDescription(destinations: DestinationLike[]): string {
-  const bySlug = new Map(
+  const cityCount = new Set(
     destinations
-      .filter((item) => item.type === 'city' && item.slug)
-      .map((city) => [String(city.slug).toLowerCase(), city] as const),
+      .filter((item) => item.type === 'city' && item.slug && Number(item.events) > 0)
+      .map((item) => String(item.slug).toLowerCase()),
+  ).size;
+
+  if (cityCount <= 0) return HOME_SEO_DESCRIPTION_FALLBACK;
+
+  return (
+    `Купите билеты на экскурсии, музеи, концерты и теплоходы в ${cityCount} ` +
+    // Plain hyphens only: ensureSeoDescription() rewrites en/em dashes, so an
+    // em dash here would not survive to the served meta description.
+    'городах России. Свежая афиша, честные цены и электронные билеты - покупайте онлайн на Дайбилет.'
   );
-
-  const parts: string[] = [];
-  for (const hub of HOME_SEO_CITIES) {
-    const city = bySlug.get(hub.slug);
-    const count = city ? Number(city.events) : 0;
-    if (!Number.isFinite(count) || count <= 0) continue;
-    parts.push(`${hub.label} - ${count}`);
-  }
-
-  if (!parts.length) return HOME_SEO_DESCRIPTION_FALLBACK;
-
-  return `Купите билеты на экскурсии, музеи и мероприятия онлайн: ${parts.join(', ')}. Афиша городов России на Дайбилет.`;
 }
 
 export function absoluteUrl(pathname: string): string {

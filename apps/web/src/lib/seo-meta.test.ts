@@ -5,11 +5,14 @@ import {
   DEFAULT_OG_IMAGE,
   DEFAULT_OG_IMAGE_PATH,
   EVENTS_HUB_DESCRIPTION,
+  HOME_SEO_DESCRIPTION_FALLBACK,
+  HOME_SEO_TITLE,
   OG_IMAGE_HEIGHT,
   OG_IMAGE_TYPE,
   OG_IMAGE_WIDTH,
   PLACES_HUB_DESCRIPTION,
   absoluteUrl,
+  buildHomeSeoDescription,
   buildShareMetadata,
   canonicalHref,
   ensureSeoDescription,
@@ -96,4 +99,65 @@ test('buildShareMetadata without image uses default OG pack', () => {
   assert.equal(first.type, 'image/jpeg');
   assert.equal(share.twitter?.card, 'summary_large_image');
   assert.deepEqual(share.twitter?.images, [DEFAULT_OG_IMAGE]);
+});
+
+const dest = (name: string, slug: string, events: number, type = 'city') => ({
+  name,
+  slug,
+  events,
+  type,
+});
+
+/**
+ * The home snippet used to be a numbers dump: "Купите билеты ...: Москва - 852,
+ * Санкт-Петербург - 877, Казань - 48, Екатеринбург - 90. Афиша городов России на
+ * Дайбилет." The four per-city counts took ~40% of the description, Google cut the
+ * snippet right after the last number, and the brand plus the value proposition
+ * never made it into view. The title was brand-first across a dash, and for a
+ * brand query like "дай билет" Google served the site as plain "Дайбилет".
+ */
+test('home title leads with keywords and carries the brand last', () => {
+  assert.equal(HOME_SEO_TITLE, 'Экскурсии, музеи и мероприятия в городах России | Дайбилет');
+  assert.doesNotMatch(HOME_SEO_TITLE, /^Дайбилет\s*[-\u2013\u2014|]/);
+  assert.ok(HOME_SEO_TITLE.endsWith('| Дайбилет'));
+  assert.ok(HOME_SEO_TITLE.length <= 60, `title is ${HOME_SEO_TITLE.length} chars, want <= 60`);
+});
+
+test('home description fits the SERP and keeps the brand visible', () => {
+  const description = buildHomeSeoDescription([
+    dest('Москва', 'moskva', 852),
+    dest('Санкт-Петербург', 'sankt-peterburg', 877),
+    dest('Казань', 'kazan', 48),
+    dest('Екатеринбург', 'ekaterinburg', 90),
+  ]);
+  assert.ok(description.length <= 160, `description is ${description.length} chars, want <= 160`);
+  assert.ok(description.endsWith('Дайбилет.'), 'brand must survive the snippet cut');
+  assert.doesNotMatch(description, /Москва|Санкт-Петербург|Екатеринбург/);
+  // Must survive ensureSeoDescription() unchanged, or the served copy differs.
+  assert.equal(ensureSeoDescription(description, HOME_SEO_DESCRIPTION_FALLBACK), description);
+});
+
+test('home description carries one stable number, not per-city counts', () => {
+  const a = buildHomeSeoDescription([dest('Москва', 'moskva', 852), dest('Казань', 'kazan', 48)]);
+  const b = buildHomeSeoDescription([dest('Москва', 'moskva', 801), dest('Казань', 'kazan', 61)]);
+  assert.equal(a, b, 'description must not churn when event counts move');
+  assert.match(a, /в 2 городах России/);
+});
+
+test('home description counts only cities that actually have events', () => {
+  const description = buildHomeSeoDescription([
+    dest('Москва', 'moskva', 852),
+    dest('Пустой город', 'pusto', 0),
+    dest('Регион', 'region-1', 500, 'region'),
+  ]);
+  assert.match(description, /в 1 городах России/);
+  assert.doesNotMatch(description, /Пустой город|Регион/);
+});
+
+test('home description falls back when there are no live cities', () => {
+  assert.equal(buildHomeSeoDescription([]), HOME_SEO_DESCRIPTION_FALLBACK);
+  assert.equal(
+    buildHomeSeoDescription([dest('Пустой', 'pusto', 0), dest('Регион', 'r', 10, 'region')]),
+    HOME_SEO_DESCRIPTION_FALLBACK,
+  );
 });
