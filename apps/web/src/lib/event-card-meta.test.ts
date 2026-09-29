@@ -98,17 +98,26 @@ function isoDaysFromNow(daysFromNow: number, hourUtc = 16): string {
   return new Date(base.getTime() + daysFromNow * DAY_MS).toISOString();
 }
 
+/**
+ * Slot fixtures need `dateLabel` even though formatCatalogSlotChipLabel no longer
+ * reads it (it derives the date from startsAt now): `dateLabel` is a required field
+ * of DateTimeSlot, so omitting it fails `tsc --noEmit`. The value is a stable
+ * placeholder - nothing asserts on it.
+ */
+function slotFixture(eventId: string, dayOffset: number) {
+  return {
+    eventId,
+    startsAt: isoDaysFromNow(dayOffset),
+    dateLabel: `${dayOffset} сен`,
+    timeLabel: '19:30',
+  };
+}
+
 test('collectDisplaySlotLabels: empty when only primary slot', () => {
   const labels = collectDisplaySlotLabels(
     session({
       startsAt: isoDaysFromNow(1),
-      upcomingSlots: [
-        {
-          eventId: 'evt-1',
-          startsAt: isoDaysFromNow(1),
-          timeLabel: '19:30',
-        },
-      ],
+      upcomingSlots: [slotFixture('evt-1', 1)],
     }),
   );
   // The only slot is the primary one, so nothing is left to advertise.
@@ -119,23 +128,7 @@ test('collectDisplaySlotLabels: excludes primary, compact format up to 4', () =>
   const labels = collectDisplaySlotLabels(
     session({
       startsAt: isoDaysFromNow(1),
-      upcomingSlots: [
-        {
-          eventId: 'evt-1',
-          startsAt: isoDaysFromNow(1),
-          timeLabel: '19:30',
-        },
-        {
-          eventId: 'evt-2',
-          startsAt: isoDaysFromNow(2),
-          timeLabel: '19:30',
-        },
-        {
-          eventId: 'evt-3',
-          startsAt: isoDaysFromNow(3),
-          timeLabel: '19:30',
-        },
-      ],
+      upcomingSlots: [slotFixture('evt-1', 1), slotFixture('evt-2', 2), slotFixture('evt-3', 3)],
     }),
   );
   // Primary excluded, the two later slots survive the "starts in the past" filter.
@@ -152,22 +145,11 @@ test('collectDisplaySlotPreview: moreCount after limit', () => {
   // Starts at day+2, not day+1: day+1 is the primary start, and
   // collectAllDisplaySlotLabels drops any slot that repeats the primary, which
   // would silently shrink the pool from 6 to 5 and make moreCount come out 2.
-  const slots = Array.from({ length: 6 }, (_, index) => ({
-    eventId: `evt-${index + 2}`,
-    startsAt: isoDaysFromNow(index + 2),
-    timeLabel: '19:30',
-  }));
+  const slots = Array.from({ length: 6 }, (_, index) => slotFixture(`evt-${index + 2}`, index + 2));
   const preview = collectDisplaySlotPreview(
     session({
       startsAt: isoDaysFromNow(1),
-      upcomingSlots: [
-        {
-          eventId: 'evt-1',
-          startsAt: isoDaysFromNow(1),
-          timeLabel: '19:30',
-        },
-        ...slots,
-      ],
+      upcomingSlots: [slotFixture('evt-1', 1), ...slots],
     }),
     3,
   );
