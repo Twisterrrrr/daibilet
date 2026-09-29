@@ -6,7 +6,7 @@ import type {
   PublicDestinationDto,
   PublicLandingDto,
 } from '@daibilet/contracts/public';
-import { HOME_PAGE_CACHE_TAG, PUBLIC_PAGE_REVALIDATE } from '@/server/cache-config';
+import { HOME_PAGE_CACHE_TAG, PUBLIC_PAGE_REVALIDATE, DESTINATIONS_CACHE_TAG } from '@/server/cache-config';
 import { resolveCoverContentFingerprints } from '@/server/cover-image-fingerprint';
 import { fetchPublicApiJson } from '@/server/public-api-client';
 import { matchDestination } from '@/lib/selected-city';
@@ -16,6 +16,23 @@ export { HOME_PAGE_CACHE_TAG };
 const homeCacheOptions = {
   revalidate: PUBLIC_PAGE_REVALIDATE,
   tags: [HOME_PAGE_CACHE_TAG] as string[],
+};
+
+/**
+ * `/api/public/destinations` is also read by SiteLayout through
+ * `getCachedDestinations`, which is tagged `destinations` and revalidates every
+ * 24h. This copy used to carry only `home-page`, so a destinations revalidate
+ * dropped one cache and not the other, and the same page then showed two
+ * different totals: the footer read the fresh set while the home stats block
+ * read the stale one (e.g. 2 974 vs 2 940 events on 2026-09-29).
+ *
+ * Scoped to this function only - putting the tag in the shared `homeCacheOptions`
+ * would also evict the home catalog, landings and articles caches on every
+ * destinations invalidation.
+ */
+const homeDestinationsCacheOptions = {
+  revalidate: PUBLIC_PAGE_REVALIDATE,
+  tags: [HOME_PAGE_CACHE_TAG, DESTINATIONS_CACHE_TAG] as string[],
 };
 
 type HomePageData = {
@@ -52,7 +69,7 @@ function emptyHomePageData(): HomePageData {
 export const getHomeDestinations = unstable_cache(
   () => fetchPublicApiJson<HomePageData['destinationsPayload']>('/api/public/destinations', { timeoutMs: 3_000 }),
   ['home-destinations-v4-http'],
-  homeCacheOptions,
+  homeDestinationsCacheOptions,
 );
 
 function homeCatalogSearchParams(citySlug?: string | null) {
