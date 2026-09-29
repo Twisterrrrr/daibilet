@@ -25,9 +25,15 @@ test('WMO 0-2 is sunny leisure, overcast and rain go indoor', () => {
 test('indoor CTA copy follows actual condition, not a generic lie', () => {
   const flavor = resolveCityLocalFlavor('perm')?.weather;
   assert.ok(flavor);
-  assert.match(indoorCtaForCode(3, flavor), /пасмурно/);
-  assert.match(indoorCtaForCode(61, flavor), /дождь/);
-  assert.match(indoorCtaForCode(73, flavor), /снег/);
+  // Case-insensitive on purpose: the CTA opens with the condition name, so it is
+  // capitalised as a sentence («Пасмурно:», «Дождь:», «Снег:») - correct Russian.
+  // The contract under test is that the copy names the real condition, not that the
+  // word is lowercase; asserting case-sensitively only tested a sentence's first
+  // letter. 29.09: the Perm overcast copy said «Серое небо:», so it also lost the
+  // condition name entirely and is now aligned with the other 10+ cities.
+  assert.match(indoorCtaForCode(3, flavor), /пасмурно/i);
+  assert.match(indoorCtaForCode(61, flavor), /дождь/i);
+  assert.match(indoorCtaForCode(73, flavor), /снег/i);
   assert.equal(indoorCtaForCode(3, flavor).includes('\u2014'), false);
   assert.equal(weatherLabelRu(0), 'Ясно');
   assert.equal(weatherLabelRu(3), 'Пасмурно');
