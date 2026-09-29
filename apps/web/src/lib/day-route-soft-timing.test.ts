@@ -26,7 +26,10 @@ describe('day-route-hour-plan', () => {
       { startHHMM: '10:00', endHHMM: '22:00', lunch: false },
     );
     assert.equal(result.byId.boat?.label, 'В 15:00');
-    assert.match(result.byId.p1?.label || '', /^\d{2}:\d{2} - \d{2}:\d{2}$/);
+    // Hyphen without spaces, per rangeLabel(): "Lovable screenshot style:
+    // 12:25-14:25 (hyphen, no en-dash)". The test still expected the old
+    // spaced form "10:00 - 11:30" and failed on the separator only.
+    assert.match(result.byId.p1?.label || '', /^\d{2}:\d{2}-\d{2}:\d{2}$/);
     assert.equal(result.overflowIds.length, 0);
   });
 
