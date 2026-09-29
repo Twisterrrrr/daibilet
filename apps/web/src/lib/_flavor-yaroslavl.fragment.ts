@@ -28,7 +28,7 @@ export const YAROSLAVL_WEATHER: CityWeatherFlavor = {
     'yaroslavl-kofeynya-utro',
   ],
   outdoorCta: 'Сухо: Стрелка, Волжская набережная или Губернаторский сад',
-  indoorCtaOvercast: 'Серо: Худмузей, «Музыка и время» или кофе в «Утро»',
+  indoorCtaOvercast: 'Пасмурно: Худмузей, «Музыка и время» или кофе в «Утро»',
   indoorCtaRain: 'Дождь: Худмузей, Волковский или трактир «Иоанн Васильевич»',
   indoorCtaSnow: 'Снег: музеи у Медведя, потом медовуха в тепле',
 };

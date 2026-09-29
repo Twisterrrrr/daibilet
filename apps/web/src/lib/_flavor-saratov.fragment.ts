@@ -26,7 +26,7 @@ export const SARATOV_WEATHER: CityWeatherFlavor = {
     'saratov-kofeynya-coupe',
   ],
   outdoorCta: 'Сухо: набережная Космонавтов, Липки или вид с моста',
-  indoorCtaOvercast: 'Серо: Радищевский, краеведческий или кофе в «Coupe»',
+  indoorCtaOvercast: 'Пасмурно: Радищевский, краеведческий или кофе в «Coupe»',
   indoorCtaRain: 'Дождь: Радищевский, опера или гастробар «Культура»',
   indoorCtaSnow: 'Снег: музеи у Консерватории, потом калач в тепле',
 };

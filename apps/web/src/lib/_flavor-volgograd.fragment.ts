@@ -27,7 +27,7 @@ export const VOLGOGRAD_WEATHER: CityWeatherFlavor = {
     'volgograd-restoran-volgograd',
   ],
   outdoorCta: 'Сухо: Мамаев курган рано утром, Аллея Героев или набережная 62-й',
-  indoorCtaOvercast: 'Серо: панорама, музей Машкова или кофе в «Angel Cakes»',
+  indoorCtaOvercast: 'Пасмурно: панорама, музей Машкова или кофе в «Angel Cakes»',
   indoorCtaRain: 'Дождь: панорама, планетарий или обед в «Волгограде»',
   indoorCtaSnow: 'Степной ветер: метротрам, музеи центра, кофе на Чуйкова',
 };
