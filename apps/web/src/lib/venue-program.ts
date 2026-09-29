@@ -233,7 +233,11 @@ export function expandVenuePlaybillEntries(groups: VenueEventGroup[]): VenuePlay
       seen.add(dedupe);
       entries.push({
         key: `${group.key}:${dedupe}`,
-        title: group.title || session.title || session.eventTitle || '',
+        // `session.eventTitle` was a leftover from an older DTO shape: the public
+        // catalog mapper never sets it and PublicSessionDto has no such field, so
+        // the fallback always evaluated to undefined. It was also the single
+        // tsc error on the Wave 1 venue-PDP path.
+        title: group.title || session.title || '',
         category: group.category || session.category || '',
         session,
       });
