@@ -27,10 +27,6 @@ export {
   buildPublicArticlePageDto,
   clearPublicArticlesDtoCache,
 } from './public-articles.dto.js';
-export {
-  buildPublicEventFreshnessMap,
-  clearPublicEventFreshnessCache,
-} from './public-event-freshness.js';
 export { buildPublicBuyerOrdersDto } from './public-orders.dto.js';
 export { buildPublicStatsDto } from './public-stats.dto.js';
 export { buildPublicSearchDto } from './public-search.dto.js';
