@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
@@ -18,69 +18,39 @@ import {
 } from './city-hub-local-flavor.ts';
 import { CITY_INFO } from './cityInfo.ts';
 
-const CITY_INFO_SRC = readFileSync(fileURLToPath(new URL('./cityInfo.ts', import.meta.url)), 'utf8');
-const MONUMENTS_SRC = readFileSync(
-  fileURLToPath(new URL('./city-monuments-must-see.ts', import.meta.url)),
-  'utf8',
-);
-const EKB_HUB_SRC = readFileSync(
-  fileURLToPath(new URL('./ekaterinburg-hub.ts', import.meta.url)),
-  'utf8',
-);
-const KAZAN_HUB_SRC = readFileSync(fileURLToPath(new URL('./kazan-hub.ts', import.meta.url)), 'utf8');
-const SAMARA_HUB_SRC = readFileSync(fileURLToPath(new URL('./samara-hub.ts', import.meta.url)), 'utf8');
-const KRASNODAR_HUB_SRC = readFileSync(
-  fileURLToPath(new URL('./krasnodar-hub.ts', import.meta.url)),
-  'utf8',
-);
-const KRASNOYARSK_HUB_SRC = readFileSync(
-  fileURLToPath(new URL('./krasnoyarsk-hub.ts', import.meta.url)),
-  'utf8',
-);
-const NOVOSIBIRSK_HUB_SRC = readFileSync(
-  fileURLToPath(new URL('./novosibirsk-hub.ts', import.meta.url)),
-  'utf8',
-);
-const VORONEZH_HUB_SRC = readFileSync(
-  fileURLToPath(new URL('./voronezh-hub.ts', import.meta.url)),
-  'utf8',
-);
-const ROSTOV_HUB_SRC = readFileSync(
-  fileURLToPath(new URL('./rostov-na-donu-hub.ts', import.meta.url)),
-  'utf8',
-);
-const PENZA_HUB_SRC = readFileSync(fileURLToPath(new URL('./penza-hub.ts', import.meta.url)), 'utf8');
-const TVER_HUB_SRC = readFileSync(fileURLToPath(new URL('./tver-hub.ts', import.meta.url)), 'utf8');
-const UFA_HUB_SRC = readFileSync(fileURLToPath(new URL('./ufa-hub.ts', import.meta.url)), 'utf8');
-const RYAZAN_HUB_SRC = readFileSync(fileURLToPath(new URL('./ryazan-hub.ts', import.meta.url)), 'utf8');
-const OMSK_HUB_SRC = readFileSync(fileURLToPath(new URL('./omsk-hub.ts', import.meta.url)), 'utf8');
-const CHELYABINSK_HUB_SRC = readFileSync(
-  fileURLToPath(new URL('./chelyabinsk-hub.ts', import.meta.url)),
-  'utf8',
-);
-const TYUMEN_HUB_SRC = readFileSync(fileURLToPath(new URL('./tyumen-hub.ts', import.meta.url)), 'utf8');
+/**
+ * 29.09. This was a hand-maintained list of content files, and it had drifted from
+ * where place slugs actually live. Two slugs linked from real city content were
+ * missing from it and failed: `kaliningrad-tantsuyuschiy-les` (defined in
+ * city-destination-registry.ts) and `saint-petersburg-nizhniy-park-petergofa`
+ * (defined in saint-petersburg-suburbs.ts). Each fix only added one more file to a
+ * list that would drift again on the next city.
+ *
+ * The check is for "this slug is declared in city content", so the sources are now
+ * discovered from the directory instead of enumerated: every `*-hub.ts`,
+ * `*-suburbs.ts` and `*-must-see.ts` plus the cityInfo/registry modules. That keeps
+ * the assertion honest in the direction that matters - a genuinely unknown slug
+ * still matches nothing and fails - while removing the false alarms.
+ */
+const CONTENT_SOURCE_FILES = readdirSync(fileURLToPath(new URL('.', import.meta.url)))
+  .filter((name) => /\.(ts|tsx)$/.test(name))
+  .filter(
+    (name) =>
+      /-hub\.ts$/.test(name) ||
+      /-suburbs\.ts$/.test(name) ||
+      /-must-see\.ts$/.test(name) ||
+      name === 'cityInfo.ts' ||
+      name === 'city-destination-registry.ts' ||
+      name === 'city-monuments-must-see.ts',
+  )
+  .map((name) => ({
+    name,
+    src: readFileSync(fileURLToPath(new URL(name, import.meta.url)), 'utf8'),
+  }));
 
 function cityInfoHasSlug(slug: string): boolean {
   const quoted = new RegExp(`['"]${slug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"]`);
-  return (
-    quoted.test(CITY_INFO_SRC) ||
-    quoted.test(MONUMENTS_SRC) ||
-    quoted.test(EKB_HUB_SRC) ||
-    quoted.test(KAZAN_HUB_SRC) ||
-    quoted.test(SAMARA_HUB_SRC) ||
-    quoted.test(KRASNODAR_HUB_SRC) ||
-    quoted.test(KRASNOYARSK_HUB_SRC) ||
-    quoted.test(NOVOSIBIRSK_HUB_SRC) ||
-    quoted.test(VORONEZH_HUB_SRC) ||
-    quoted.test(ROSTOV_HUB_SRC) ||
-    quoted.test(PENZA_HUB_SRC) ||
-    quoted.test(TVER_HUB_SRC) ||
-    quoted.test(UFA_HUB_SRC) ||
-    quoted.test(RYAZAN_HUB_SRC) ||
-    quoted.test(OMSK_HUB_SRC) ||
-    quoted.test(CHELYABINSK_HUB_SRC) ||
-    quoted.test(TYUMEN_HUB_SRC)
-  );
+  return CONTENT_SOURCE_FILES.some((file) => quoted.test(file.src));
 }
 
 test('weather widget covers Perm, Moscow, SPB, Kaliningrad, NN, EKB, Kazan, Samara, Krasnodar and Krasnoyarsk', () => {
