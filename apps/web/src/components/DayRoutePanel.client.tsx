@@ -5561,7 +5561,6 @@ function DayRouteVenueCard({
   // Ticket QR / «отметить купленным» живут в блоке «Билеты в поездке», не в строке места.
   void onToggleBought;
   void onShowTicket;
-  void showStatusChip;
   const textStop = isTextDayRouteStop(venue);
   const noteStop = isNoteDayRouteStop(venue);
   const purchased = group === 'purchased' || Boolean(venue.ticketBought);
@@ -5592,7 +5591,6 @@ function DayRouteVenueCard({
   const bought = Boolean(venue.ticketBought);
   const thumbUrl = resolveDayRouteStopImage(venue) || fallbackImageUrl || null;
   const chip = classifyDayRouteCommercialChip(venue);
-  const showStatusChip = chip.kind !== 'free';
   const buyCtaLabel = formatDayRouteBuyCtaLabel(venue);
   const buyOfferChip = formatDayRouteOfferChip({
     title: venue.title,
