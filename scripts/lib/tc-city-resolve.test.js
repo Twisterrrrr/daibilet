@@ -34,3 +34,18 @@ test('a new provider city still uses the slug upsert', async () => {
   assert.equal(id, 'city_existing_slug');
   assert.match(calls[1].sql, /on conflict \(slug\)/);
 });
+
+test('a city repeated throughout the catalog is resolved once per import', async () => {
+  let queries = 0;
+  const client = {
+    async query() {
+      queries += 1;
+      return { rows: [{ id: 'city_463343' }] };
+    },
+  };
+  const cache = new Map();
+  const args = { cityId: 'city_463343', citySlug: 'железногорск', cityName: 'Железногорск' };
+  assert.equal(await resolveTicketscloudCityId(client, args, cache), 'city_463343');
+  assert.equal(await resolveTicketscloudCityId(client, args, cache), 'city_463343');
+  assert.equal(queries, 1);
+});

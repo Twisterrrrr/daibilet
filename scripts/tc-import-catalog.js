@@ -142,9 +142,10 @@ async function importCatalogEvents(catalog, options = {}) {
     );
 
     const importedEventIds = [];
+    const cityIdCache = new Map();
     for (const event of catalog) {
       importedExternalIds.add(String(event.externalId));
-      const rowStats = await importCatalogEvent(client, event, summary);
+      const rowStats = await importCatalogEvent(client, event, summary, cityIdCache);
       if (rowStats.eventId) importedEventIds.push(rowStats.eventId);
       stats.importedEvents += 1;
       stats.sessions += rowStats.sessions;
@@ -240,7 +241,7 @@ async function importCatalogEvents(catalog, options = {}) {
   }
 }
 
-async function importCatalogEvent(client, event, summary) {
+async function importCatalogEvent(client, event, summary, cityIdCache) {
   const rowStats = { eventId: null, sessions: 0, offers: 0, tags: 0, venue: false, city: false, hasWidgetUrl: false };
   const externalId = String(event.externalId);
   const eventId = id("evt", externalId);
@@ -263,7 +264,7 @@ async function importCatalogEvent(client, event, summary) {
       cityId,
       citySlug: slugify(city.name),
       cityName: city.name,
-    });
+    }, cityIdCache);
     rowStats.city = true;
   }
 
