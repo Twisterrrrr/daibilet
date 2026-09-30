@@ -605,7 +605,9 @@ function getStableServerDayRouteSnapshot(): DayRouteState {
   if (!globalThis.__daibiletServerDayRouteSnapshot) {
     globalThis.__daibiletServerDayRouteSnapshot = Object.freeze({
       cityId: null,
-      venues: Object.freeze([]) as DayRouteVenueItem[],
+      // `Object.freeze([])` infers `readonly never[]`, which the mutable cast
+      // cannot bridge. Type the frozen literal so both sides agree.
+      venues: Object.freeze([]) as unknown as DayRouteVenueItem[],
     });
   }
   return globalThis.__daibiletServerDayRouteSnapshot;
@@ -821,9 +823,12 @@ export function writeDayRoute(state: DayRouteState): boolean {
     // Quota / private mode: do not update snapshot or UI - keeps badge/buttons honest.
     return false;
   }
+  // `normalized` is a `let` assigned inside the closure above, so control-flow
+  // analysis does not narrow it past the guard. Bind the narrowed value once.
+  const nextState: DayRouteState = normalized;
   const runtime = getDayRouteRuntime();
   // Keep empty route on the same identity as getServerSnapshot (React useSyncExternalStore).
-  if (normalized.cityId == null && normalized.venues.length === 0) {
+  if (nextState.cityId == null && nextState.venues.length === 0) {
     runtime.snapshotCache = { raw, state: SERVER_DAY_ROUTE_SNAPSHOT };
     notifyDayRouteChanged();
     notifyDayRouteSubscribers(cloneDayRouteState(SERVER_DAY_ROUTE_SNAPSHOT));

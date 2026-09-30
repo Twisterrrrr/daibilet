@@ -154,10 +154,12 @@ export function DayRouteOsmMap({
         ? [stops[0].latitude, stops[0].longitude]
         : [fallbackCenter!.latitude, fallbackCenter!.longitude];
 
-      let map = mapRef.current;
-      if (!map) {
-        map = L.map(node, {
-          center: initialCenter,
+      // `let map` stayed LeafletMap | null after the branch assigned it, so the
+      // later setView/fitBounds calls all reported "possibly null" despite the
+      // branch guaranteeing a map. Resolve the nullable read first.
+      const existingMap = mapRef.current;
+      const map: LeafletMap = existingMap ?? L.map(node, {
+        center: initialCenter,
           zoom: 13,
           minZoom: MIN_ZOOM,
           maxZoom: MAX_ZOOM,
@@ -184,7 +186,6 @@ export function DayRouteOsmMap({
           if (mapRef.current) syncLeafletSize(mapRef.current);
         });
         resizeObserver.observe(node);
-      }
 
       for (const marker of markersRef.current) marker.remove();
       markersRef.current = [];
