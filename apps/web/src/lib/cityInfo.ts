@@ -284,6 +284,16 @@ export type CitySuburbPlace = CityPlaceLinkFields & {
   latitude?: number | null;
   longitude?: number | null;
   /**
+   * Optional hub chip override (Главные места / Музеи / Парки / Храмы / Гастро).
+   * When set, wins over name/slug heuristics in must-see-filters.
+   *
+   * Reuses CityMustSeeItem's union rather than restating it: the same ids are
+   * classified in must-see-filters.ts, and a second copy of the list would
+   * drift. Suburb cards in the destination registry set this on their places
+   * while this type omitted it, so those literals failed to typecheck.
+   */
+  mustSeeFilter?: CityMustSeeItem['mustSeeFilter'];
+  /**
    * Совет по перемещению к этой точке от предыдущей (или от станции для первой).
    * UI: серая строка между пунктами «Что посмотреть».
    */
