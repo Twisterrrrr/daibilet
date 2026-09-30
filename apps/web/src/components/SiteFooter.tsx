@@ -14,7 +14,9 @@ import { getFooterPopularDirections } from '@/lib/seo-internal-links';
 import { catalogCityQueryValue } from '@/lib/selected-city';
 import { buildPodborkiCityHref } from '@/lib/podborki-city-seo';
 
-function normalizeFooterCitySlug(value: string): string {
+// The body already ran `String(value || '')`, so this has always tolerated a
+// missing slug; the parameter type was just narrower than the behaviour.
+function normalizeFooterCitySlug(value: string | null | undefined): string {
   return String(value || '')
     .trim()
     .toLowerCase()
@@ -178,9 +180,12 @@ export function SiteFooter({ destinations, variant = 'default' }: SiteFooterProp
         href: landingCategoryHref(item.landing, citySlug || undefined),
       };
     }
+    // The second union member declares `category?: never`, so `item.category`
+    // stays possibly-undefined here even though this branch only runs for
+    // entries that define it.
     return {
       label: item.label,
-      href: eventsCategoryHref(item.category, citySlug || undefined),
+      href: eventsCategoryHref(item.category!, citySlug || undefined),
     };
   });
 

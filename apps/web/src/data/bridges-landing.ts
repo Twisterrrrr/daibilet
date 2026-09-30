@@ -169,7 +169,9 @@ export const BRIDGES_LANDING = {
     },
   ],
   // Hardcoded reviews are not rendered (LandingReviews returns null until real Review API).
-  reviews: [],
+  // Typed explicitly because a bare `[]` literal infers `never[]`, which made
+  // every `review.author` / `.stars` access in bridges-seo.ts an error on `never`.
+  reviews: [] as Array<{ author: string; stars: number; text: string }>,
 };
 
 /** Подбор популярных рейсов на лендинге - порядок отображения. */
