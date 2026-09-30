@@ -12,6 +12,7 @@ const { normalizeImportEventTitle } = require("./lib/event-title-normalize");
 const { ENTERTAINMENT_DISCO_TAXONOMY, isDiscoOrPartyEvent } = require("./lib/event-taxonomy");
 const { applyVenueAddressCanon } = require("./lib/venue-address-overrides");
 const { deactivateMissingTicketscloudEvents } = require("./lib/tc-deactivate-missing");
+const { resolveTicketscloudCityId } = require("./lib/tc-city-resolve");
 
 const requireFromDbPackage = createRequire(path.join(rootDir, "packages", "db", "package.json"));
 const { Pool } = requireFromDbPackage("pg");
@@ -258,20 +259,11 @@ async function importCatalogEvent(client, event, summary) {
 
   let resolvedCityId = cityId;
   if (cityId && city.name) {
-    const citySlug = slugify(city.name);
-    const cityResult = await client.query(
-      `
-        insert into "City" (id, slug, title, "sourceTitle", "isDestination")
-        values ($1, $2, $3, $3, true)
-        on conflict (slug) do update set
-          title = excluded.title,
-          "sourceTitle" = coalesce("City"."sourceTitle", excluded."sourceTitle"),
-          "isDestination" = true
-        returning id
-      `,
-      [cityId, citySlug, city.name],
-    );
-    resolvedCityId = cityResult.rows[0]?.id || cityId;
+    resolvedCityId = await resolveTicketscloudCityId(client, {
+      cityId,
+      citySlug: slugify(city.name),
+      cityName: city.name,
+    });
     rowStats.city = true;
   }
 
