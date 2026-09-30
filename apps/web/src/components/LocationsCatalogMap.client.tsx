@@ -95,9 +95,11 @@ export function LocationsCatalogMap({
       const L = await loadDaibiletLeaflet();
       if (cancelled || !node) return;
 
-      let map = mapRef.current;
-      if (!map) {
-        map = L.map(node, {
+      // `let map` stayed `LeafletMap | null` past the assignment below, so every
+      // later use reported "possibly null" even though the branch guarantees it.
+      // Resolving the nullable read first keeps the narrowed binding.
+      const existingMap = mapRef.current;
+      const map: LeafletMap = existingMap ?? L.map(node, {
           center: defaultCenter
             ? [defaultCenter.latitude, defaultCenter.longitude]
             : [pins[0].latitude, pins[0].longitude],
@@ -124,7 +126,6 @@ export function LocationsCatalogMap({
           map?.invalidateSize({ animate: false });
         });
         resizeObserver.observe(node);
-      }
 
       for (const marker of markersRef.current) marker.remove();
       markersRef.current = [];

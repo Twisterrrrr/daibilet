@@ -42,7 +42,10 @@ test('Ryazan hub mustSee has 50 core plus monuments and mushroom quest', () => {
 
 test('Ryazan suburbs Konstantinovo and Solotcha keep nested POIs', () => {
   const bySlug = new Map(
-    RYAZAN_SUBURBS.map((suburb: { locationSlug?: string }) => [suburb.locationSlug, suburb]),
+    // The explicit parameter type used to narrow each suburb to just
+    // { locationSlug }, hiding travelVectorBlurb on the map values.
+
+    RYAZAN_SUBURBS.map((suburb) => [suburb.locationSlug, suburb]),
   );
   for (const slug of ['ryazan-konstantinovo', 'ryazan-solotcha']) {
     const suburb = bySlug.get(slug) as

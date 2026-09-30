@@ -91,14 +91,22 @@ test('buildShareMetadata without image uses default OG pack', () => {
   });
   const image = share.openGraph?.images;
   const first = Array.isArray(image) ? image[0] : image;
-  assert.ok(first && typeof first === 'object');
-  assert.equal(first.url, DEFAULT_OG_IMAGE);
-  assert.equal(first.secureUrl, DEFAULT_OG_IMAGE.replace(/^http:\/\//i, 'https://'));
-  assert.equal(first.width, 1200);
-  assert.equal(first.height, 630);
-  assert.equal(first.type, 'image/jpeg');
-  assert.equal(share.twitter?.card, 'summary_large_image');
-  assert.deepEqual(share.twitter?.images, [DEFAULT_OG_IMAGE]);
+  // `openGraph.images` is typed `URL | OGImageDescriptor`, and `assert.ok` is a
+  // runtime check that does not narrow the type. Narrow it here so the
+  // descriptor fields below are visible to the compiler.
+  assert.ok(first && typeof first === 'object' && !(first instanceof URL));
+  const descriptor = first as { url: string; secureUrl: string; width: number; height: number; type: string };
+  assert.equal(descriptor.url, DEFAULT_OG_IMAGE);
+  assert.equal(descriptor.secureUrl, DEFAULT_OG_IMAGE.replace(/^http:\/\//i, 'https://'));
+  assert.equal(descriptor.width, 1200);
+  assert.equal(descriptor.height, 630);
+  assert.equal(descriptor.type, 'image/jpeg');
+  // `Metadata['twitter']` does not declare `card`, only the card family members,
+  // so read it off a widened view rather than asserting on a field the type
+  // does not carry.
+  const twitter = share.twitter as { card?: string; images?: unknown } | undefined;
+  assert.equal(twitter?.card, 'summary_large_image');
+  assert.deepEqual(twitter?.images, [DEFAULT_OG_IMAGE]);
 });
 
 const dest = (name: string, slug: string, events: number, type = 'city') => ({
