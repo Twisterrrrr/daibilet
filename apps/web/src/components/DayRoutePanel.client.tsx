@@ -566,7 +566,7 @@ function DayRoutePanelInner() {
   const skipUrlSyncRef = useRef(false);
   const titleFieldRef = useRef<HTMLInputElement | null>(null);
   const shareMenuRef = useRef<HTMLElement | null>(null);
-  const unifiedSearchRef = useRef<HTMLElement | null>(null);
+  const unifiedSearchRef = useRef<HTMLDivElement>(null);
   const eventEnrichAttemptedRef = useRef<Set<string>>(new Set());
 
   /** Keep viewport on the tapped card when route list grows/shrinks above it. */
@@ -638,8 +638,16 @@ function DayRoutePanelInner() {
     if (route.venues.length === 0) setMobileShelf('route');
   }, [route.venues.length]);
 
-  /** Wave 1.5: always list itinerary (Lovable parity). */
-  const effectiveStopViewMode: DayRouteStopViewMode = 'list';
+  /**
+   * Wave 1.5: always list itinerary (Lovable parity).
+   *
+   * The `as` widens the literal back to the union on purpose. Annotating the
+   * const directly would make it collapse to the literal 'list', and every
+   * `=== 'grid'` branch below would be flagged as a comparison TS can prove is
+   * always false. Those grid branches are intentionally kept dormant, not
+   * deleted, so the union has to survive here.
+   */
+  const effectiveStopViewMode = 'list' as DayRouteStopViewMode;
   const timelineStops = useMemo(
     () =>
       route.venues.map((venue) => ({
@@ -1581,7 +1589,10 @@ function DayRoutePanelInner() {
     () =>
       resolveCityCardImage({
         slug: pageCitySlug || pageCitySourceSlug || undefined,
-        name: pageCityName || undefined,
+        // CityImageSource requires a string name, but pageCityName is optional
+        // (no URL city and no header city both yield undefined). Empty string
+        // is what the falsy branch already resolved to at runtime.
+        name: pageCityName ?? '',
       }),
     [pageCitySlug, pageCitySourceSlug, pageCityName],
   );
