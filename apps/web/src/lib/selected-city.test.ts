@@ -22,10 +22,14 @@ import {
   SELECTED_CITY_STORAGE_KEY,
 } from './selected-city.ts';
 
+// Not `as const`: the consumers take a mutable `PublicDestinationDto[]`, and a
+// const assertion makes both the array and `categories` readonly, which no longer
+// assigns. `type` keeps its own literal assertion instead, which is the part the
+// DTO actually needs.
 const destinations = [
   { id: '1', name: 'Уфа', slug: 'ufa', type: 'city' as const, events: 10, venues: 2, categories: [] },
   { id: '2', name: 'Москва', slug: 'moscow', type: 'city' as const, events: 100, venues: 20, categories: [] },
-] as const;
+];
 
 test('catalogHrefWithSelectedCity adds header city when URL has none', () => {
   assert.equal(catalogHrefWithSelectedCity('Уфа'), '/events?city=%D0%A3%D1%84%D0%B0');
