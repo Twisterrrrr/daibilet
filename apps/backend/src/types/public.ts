@@ -156,6 +156,8 @@ export interface PublicVenueDto extends SeoFields {
   description?: string | null;
   shortDescription?: string | null;
   heroImageUrl?: string | null;
+  hasEditorialPack?: boolean;
+  mustSee?: boolean;
   events: number;
   categories: Record<string, number>;
 }

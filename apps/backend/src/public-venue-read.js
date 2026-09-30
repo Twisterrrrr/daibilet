@@ -34,6 +34,7 @@ import { pickFirstUsableEventImageUrl } from './event-image-url.ts';
 import { loadCityRoutingConfig } from './city-routing-config.js';
 import { resolveProjectRoot } from './project-root.js';
 import { resolvePlaceSlugAlias } from './place-slug-aliases.js';
+import { publicVenueEditorialFlags } from './public-venue-editorial-flags.js';
 
 const PUBLIC_CATALOG_CACHE_MS = 5 * 60 * 1000;
 /** Soft TTL: serve expired hub while single-flight rebuild runs (INC.504 venues hang). */
@@ -601,11 +602,13 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
   const stopEventCount = stopEvents.length;
   const displayEventCount = routeCount > 0 ? routeCount : stopEventCount;
 
+  const pageSlug = publicVenueSlug(canonicalVenue.slug, normalizedVenue.name, canonicalVenue.id);
   return {
     generatedAt: new Date().toISOString(),
     venue: {
       id: canonicalVenue.id,
-      slug: publicVenueSlug(canonicalVenue.slug, normalizedVenue.name, canonicalVenue.id),
+      slug: pageSlug,
+      ...publicVenueEditorialFlags(pageSlug, canonicalVenue.citySlug, normalizedVenue.city),
       name: normalizedVenue.name,
       title: normalizedVenue.name,
       city: normalizedVenue.city || 'Не указан',
@@ -2200,9 +2203,11 @@ export function mapPublicVenueListItem(row) {
     normalizeNullableString(normalized.citySlug) ||
     (normalized.city && normalized.city !== 'Не указан' ? publicCitySlug(normalized.city) : null);
   // Lean list DTO: no sessions / mini-affiche / empty categories blob.
+  const slug = publicVenueSlug(normalized.slug, name, normalized.id);
   return {
     id: normalized.id,
-    slug: publicVenueSlug(normalized.slug, name, normalized.id),
+    slug,
+    ...publicVenueEditorialFlags(slug, citySlug, normalized.city),
     name,
     city: normalized.city,
     cityId,
