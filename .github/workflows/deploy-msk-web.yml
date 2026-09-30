@@ -36,6 +36,11 @@ on:
         description: "Optional literal marker expected in live HTML"
         type: string
         required: false
+      marker_url:
+        description: "Page containing the optional HTML marker"
+        type: string
+        required: false
+        default: "https://daibilet.ru/venues/klub-alekseya-kozlova"
       skip_swap:
         description: "Build artifact only (skip SSH swap)"
         type: boolean
@@ -224,7 +229,8 @@ jobs:
         env:
           DEPLOY_SHA: ${{ env.DEPLOY_SHA }}
           DEPLOY_MARKER: ${{ inputs.marker }}
+          DEPLOY_MARKER_URL: ${{ inputs.marker_url }}
           MSK_SSH_HOST: ${{ secrets.MSK_SSH_HOST }}
           MSK_SSH_USER: ${{ secrets.MSK_SSH_USER }}
           MSK_SSH_KEY_FILE: /home/runner/.ssh/msk_key
-        run: bash .deploy-control/infra/deploy-verify.sh "$DEPLOY_SHA" "$DEPLOY_MARKER"
+        run: bash .deploy-control/infra/deploy-verify.sh "$DEPLOY_SHA" "$DEPLOY_MARKER" "$DEPLOY_MARKER_URL"
