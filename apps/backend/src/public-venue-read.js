@@ -1565,6 +1565,11 @@ export function resolvePublicVenueCanonicalPath(storedPath, pageTemplate, slug) 
       ? 'institution'
       : null;
   if (!storedFamily || storedFamily !== pageTemplate) return fallback;
+  // Provider-era canonical paths can append the opaque venue id to the public
+  // slug. Those URLs redirect back to the clean slug, so they cannot be canonicals.
+  if (normalized.startsWith(`${fallback}-`) && /^-[a-f0-9]{20,}$/i.test(normalized.slice(fallback.length))) {
+    return fallback;
+  }
   return normalized;
 }
 
