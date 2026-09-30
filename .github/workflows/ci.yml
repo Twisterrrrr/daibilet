@@ -52,7 +52,8 @@ jobs:
       # not gate merges; it makes the number visible so growth or shrinkage is
       # observable. Promote it to blocking once the count reaches zero, in the
       # same change that removes ignoreBuildErrors.
-      # Baseline 29.09: 140. 01.10: 132 (mustSeeFilter added to CitySuburbPlace).
+      # Baseline 29.09: 140. 01.10: 109 (CitySuburbPlace.mustSeeFilter, surface import,
+      # destinations fixture in selected-city.test.ts).
       - name: Web typecheck (non-blocking baseline)
         continue-on-error: true
         run: pnpm web:typecheck
