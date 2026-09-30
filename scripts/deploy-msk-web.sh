@@ -180,11 +180,13 @@ purge_nginx_proxy_cache
 echo "Artifact swap complete → BUILD_ID=$(cat "${WEB_NEXT_DIR}/BUILD_ID") HEAD=$(git rev-parse --short HEAD)"
 
 if [[ -n "${DEPLOY_MARKER:-}" ]]; then
+  MARKER_URL="${DEPLOY_MARKER_URL:-https://daibilet.ru/venues/klub-alekseya-kozlova}"
+  [[ "$MARKER_URL" =~ ^https://daibilet\.ru/[^?#]*$ ]] || { echo 'ERROR: marker_url must be a daibilet.ru path without query or fragment'; exit 1; }
   HTML_FILE="$(mktemp)"
-  curl -fsS --max-time 30 -H 'Cache-Control: no-cache' "https://daibilet.ru/?deploy=$DEPLOY_SHA" > "$HTML_FILE"
+  curl -fsS --max-time 30 -H 'Cache-Control: no-cache' "${MARKER_URL}?deploy=$DEPLOY_SHA" > "$HTML_FILE"
   if ! grep -Fq -- "$DEPLOY_MARKER" "$HTML_FILE"; then
     rm -f "$HTML_FILE"
-    echo 'ERROR: marker absent (no automatic rollback)'
+    echo "ERROR: marker absent at $MARKER_URL (no automatic rollback)"
     exit 1
   fi
   rm -f "$HTML_FILE"

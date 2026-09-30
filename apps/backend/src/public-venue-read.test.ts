@@ -129,6 +129,25 @@ test('resolvePublicVenueCanonicalPath drops mismatched location/venues family', 
   );
 });
 
+test('resolvePublicVenueCanonicalPath drops a hashed path that redirects to the clean venue slug', () => {
+  assert.equal(
+    resolvePublicVenueCanonicalPath(
+      '/venues/klub-alekseya-kozlova-590854a3515e350016705a52',
+      'institution',
+      'klub-alekseya-kozlova',
+    ),
+    '/venues/klub-alekseya-kozlova',
+  );
+  assert.equal(
+    resolvePublicVenueCanonicalPath(
+      '/venues/other-real-canonical',
+      'institution',
+      'venue-alias',
+    ),
+    '/venues/other-real-canonical',
+  );
+});
+
 test('venueTextKeysFuzzyMatch rejects bare Музей against longer museum titles', () => {
   assert.equal(venueTextKeysFuzzyMatch('музей', 'музей истории мотовилихинских заводов'), false);
   assert.equal(venueTextKeysFuzzyMatch('музей', 'музей пермских древностей'), false);

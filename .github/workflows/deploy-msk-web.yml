@@ -36,6 +36,11 @@ on:
         description: "Optional literal marker expected in live HTML"
         type: string
         required: false
+      marker_url:
+        description: "Page containing the optional HTML marker"
+        type: string
+        required: false
+        default: "https://daibilet.ru/venues/klub-alekseya-kozlova"
       skip_swap:
         description: "Build artifact only (skip SSH swap)"
         type: boolean
@@ -187,6 +192,7 @@ jobs:
           MSK_SSH_KEY: ${{ secrets.MSK_SSH_KEY }}
           DEPLOY_SHA: ${{ steps.meta.outputs.sha }}
           DEPLOY_MARKER: ${{ inputs.marker }}
+          DEPLOY_MARKER_URL: ${{ inputs.marker_url }}
         run: |
           set -euo pipefail
           if [[ -z "${MSK_SSH_HOST:-}" || -z "${MSK_SSH_USER:-}" || -z "${MSK_SSH_KEY:-}" ]]; then
@@ -203,7 +209,7 @@ jobs:
           REMOTE_SCRIPT="/tmp/daibilet-deploy-${DEPLOY_SHA}.sh"
           "${SCP[@]}" .deploy-control/scripts/deploy-msk-web.sh "${MSK_SSH_USER}@${MSK_SSH_HOST}:${REMOTE_SCRIPT}"
           "${SCP[@]}" /tmp/daibilet-web-build-id "${MSK_SSH_USER}@${MSK_SSH_HOST}:${REMOTE_TGZ}.build-id"
-          printf -v REMOTE_COMMAND 'ARTIFACT=%q EXPECTED_BUILD_ID_FILE=%q DEPLOY_MARKER=%q bash %q %q %q' "$REMOTE_TGZ" "$REMOTE_TGZ.build-id" "$DEPLOY_MARKER" "$REMOTE_SCRIPT" "$DEPLOY_SHA" "$EXPECTED_REF"
+          printf -v REMOTE_COMMAND 'ARTIFACT=%q EXPECTED_BUILD_ID_FILE=%q DEPLOY_MARKER=%q DEPLOY_MARKER_URL=%q bash %q %q %q' "$REMOTE_TGZ" "$REMOTE_TGZ.build-id" "$DEPLOY_MARKER" "$DEPLOY_MARKER_URL" "$REMOTE_SCRIPT" "$DEPLOY_SHA" "$EXPECTED_REF"
           "${SSH[@]}" "${MSK_SSH_USER}@${MSK_SSH_HOST}" "$REMOTE_COMMAND"
           echo "Swap succeeded: DEPLOY_SHA=$DEPLOY_SHA BUILD_ID=$BUILD_ID" >> "$GITHUB_STEP_SUMMARY"
 
@@ -224,7 +230,8 @@ jobs:
         env:
           DEPLOY_SHA: ${{ env.DEPLOY_SHA }}
           DEPLOY_MARKER: ${{ inputs.marker }}
+          DEPLOY_MARKER_URL: ${{ inputs.marker_url }}
           MSK_SSH_HOST: ${{ secrets.MSK_SSH_HOST }}
           MSK_SSH_USER: ${{ secrets.MSK_SSH_USER }}
           MSK_SSH_KEY_FILE: /home/runner/.ssh/msk_key
-        run: bash .deploy-control/infra/deploy-verify.sh "$DEPLOY_SHA" "$DEPLOY_MARKER"
+        run: bash .deploy-control/infra/deploy-verify.sh "$DEPLOY_SHA" "$DEPLOY_MARKER" "$DEPLOY_MARKER_URL"
