@@ -691,6 +691,39 @@ export const VENUE_KIND_MAP: Record<PrismaVenueKind, VenueKindMapping> = { … }
 Сначала sitemap по `isIndexable` — это отдельная правка в том же файле, но не
 зависит от маршрутов.
 
+### Пагинация `/places` сломана — причина найдена (30.09)
+
+Проверка перед решением о ЧПУ вскрыла дефель, который существовал до него.
+
+```
+/places?family=institution          → 72 ссылки на площадки
+/places?family=institution&page=2   → 72 ссылки, ТЕ ЖЕ САМЫЕ
+/places?page=2                      → 66 ссылок, те же самые
+/places?city=kazan                  → 63 ссылки
+```
+
+`page` в URL меняется, содержимое — нет: Google видит бесконечное число
+одинаковых URL. При этом всего **1 134 площадки, показано 72 — 6%.**
+
+**Причина в коде, `apps/web/app/places/page.tsx:118-122`:**
+```ts
+const catalogOpts = {
+  limit: VENUE_CATALOG_PAGE_SIZE,
+  counts: false as const,
+  ...(city ? { city } : {}),        // ← page не передаётся
+};
+const payload = await getCachedVenuesCatalog(family, catalogOpts);
+```
+
+Инфраструктура для пагинации **уже есть и работает**: `venueCatalogCacheKey`
+учитывает `page` (строка 4), `VENUE_CATALOG_PAGE_SIZE = 24`, в типах есть
+`page?: number`, есть `hasMore` и `nextCursor`. Страница просто не передаёт
+`page` в запрос. Правка малая: `...(page > 1 ? { page } : {})`.
+
+**Вывод: чинить в том же заходе, что ЧПУ.** Иначе новые страницы стартуют с
+`index, follow` и с неработающей пагинацией — ровно тот класс дефектов, который
+разбирали весь день.
+
 ### Правка: обход отсекает не выборка, а отдача
 
 Ранее записано «города после СПб физически не добираются» — это верно, но
