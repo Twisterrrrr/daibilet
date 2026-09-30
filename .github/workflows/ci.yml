@@ -45,14 +45,14 @@ jobs:
       - name: Web lib unit tests (CI allowlist)
         run: pnpm web:test:ci
 
-      # 29.09. Non-blocking on purpose. apps/web has ~140 type errors and
+      # 29.09. Non-blocking on purpose. apps/web had ~140 type errors and
       # next.config.ts sets typescript.ignoreBuildErrors, so nothing checked
       # them and the drift was invisible - that is how a temporal-dead-zone
       # ReferenceError in the my-day stop row reached production. This step does
       # not gate merges; it makes the number visible so growth or shrinkage is
       # observable. Promote it to blocking once the count reaches zero, in the
       # same change that removes ignoreBuildErrors.
-      # Baseline at the time of adding: 140.
+      # Baseline 29.09: 140. 01.10: 132 (mustSeeFilter added to CitySuburbPlace).
       - name: Web typecheck (non-blocking baseline)
         continue-on-error: true
         run: pnpm web:typecheck
