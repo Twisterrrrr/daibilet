@@ -31,6 +31,7 @@ import {
   applyVenueEditorialOverlay,
   formatVenueMetroLabel,
   resolveVenueEditorialContent,
+  resolveVenueGalleryImages,
 } from '@/lib/venue-editorial-content';
 import { hasVenueCommercialCenter, resolveVenuePrimaryCta } from '@/lib/venue-cta';
 import { normalizeVenueKind, resolveLocationVenueCopy, resolveVenueAboutHeading, splitVenueProseParagraphs, venueTypeIcon } from '@/lib/venue-meta';
@@ -118,6 +119,15 @@ export function LocationVenueLayout({
   const curatedFaq = editorial?.faq || [];
   const visitTips = String(editorial?.visitTips || '').trim();
   const heroBadges = editorial?.badges?.slice(0, 5) || [];
+  /** Real images only: editorial galleryUrls + hero, deduped, needs >= 2. */
+  const galleryImages = React.useMemo(
+    () =>
+      resolveVenueGalleryImages({
+        slug: venue.slug,
+        heroImageUrl: venue.heroImageUrl,
+      }),
+    [venue.slug, venue.heroImageUrl],
+  );
   const stopExcursionCount =
     uniqueStopEvents.length > 0 ? uniqueStopEvents.length : Number(venue.stopEventCount ?? 0);
   const hasStopExcursions = stopExcursionCount > 0;
@@ -601,6 +611,31 @@ export function LocationVenueLayout({
           ) : null}
 
           {children ? children : null}
+
+          {galleryImages.length >= 2 ? (
+            <section
+              className="scroll-mt-24"
+              data-venue-gallery
+              aria-label="Фотогалерея"
+            >
+              <div className="flex gap-3 overflow-x-auto pb-1 [scrollbar-width:thin]">
+                {galleryImages.map((src) => (
+                  <div
+                    key={src}
+                    className="relative h-36 w-56 shrink-0 overflow-hidden rounded-xl bg-slate-100 sm:h-44 sm:w-72"
+                  >
+                    <SafeImage
+                      src={src}
+                      alt=""
+                      fill
+                      sizes="(max-width: 640px) 14rem, 18rem"
+                      className="object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+            </section>
+          ) : null}
 
           {((hookFact && !isParkLike) || aboutBody || editorial?.highlights?.length) ? (
           <section className="scroll-mt-24">
