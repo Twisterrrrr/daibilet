@@ -10,6 +10,7 @@ import {
   PODBORKI_HUB_SEO,
   resolvePodborkiCatalogSeo,
   resolvePodborkiCityMetaPilot,
+  type PodborkiCityMetaPilotSlug,
 } from '@/lib/podborki-city-seo';
 import { getLandingSeo } from '@/lib/seo/get-landing-seo';
 import { sanitizeEventHtml } from '@/lib/event-description-format';
