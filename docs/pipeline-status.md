@@ -31,9 +31,39 @@ are valid hex syntax but rejected as a nonexistent commit.
 | 3 | Канон площадок — указывал на редирект | **закрыт Codex:** `0222cf612` |
 | 4 | Канон событий — отсутствует | **не дефект, ошибка разбора** — см. ниже |
 | 5 | 190 битых URL | ждёт сверки с тем, что реально отдаёт 410 |
-| 6 | `isVenuePublic` — один источник правды | list / sitemap / detail должны решать одинаково |
+| 6 | `isVenuePublic` — один источник правды | list / sitemap / detail должны решать одинаково. **Подтверждено на проде 30.09:** 4 страницы с `noindex` лежат в `sitemaps/venues.xml` |
 | 7 | Синк TC — 134 события | причина найдена, `b67bf05d3` / `8841d4d1f`, ждёт проверки после деплоя |
 | 8 | Слаги с датой | требует совместного решения по редиректам и старым URL |
+| 9 | **`noindex` в sitemap (новое, 30.09)** | Пушкинский, Гараж, Современник, ВДНХ — `noindex, follow` и одновременно в `venues.xml` |
+
+### Пункт 9 (новый): `noindex`-страницы публикуются в sitemap
+
+Проверено на проде 30.09 через `:3001`. Из 12 URL, взятых как baseline Wave 1,
+**7 помечены `noindex, follow`** и ни одна не получила просмотров за 4 недели.
+
+| URL | robots | в `venues.xml` |
+|-----|--------|----------------|
+| `/venues/moscow-gmii-imeni-pushkina` | noindex | **да** ← дефект |
+| `/venues/moscow-muzey-garazh` | noindex | **да** ← дефект |
+| `/venues/moscow-sovremennik` | noindex | **да** ← дефект |
+| `/locations/moscow-vdnh` | noindex | **да** ← дефект |
+| `/venues/moscow-novaya-tretyakovka` | noindex | нет |
+| `/venues/moscow-bol-shoy-teatr` | noindex | нет |
+| `/locations/moscow-mht-im-chehova` | noindex | нет |
+| `/locations/moscow-izmaylovskiy-park` | noindex | нет |
+
+Суть дефекта: sitemap отдаёт URL, которые сами же просят не индексировать.
+Поисковик получает противоречивый сигнал и тратит краул-бюджет.
+
+Симптом **не** в префиксе маршрута, а в данных: `moscow-mht-im-chehova` лежит
+в `/locations/`, но тоже `noindex`, тогда как `krymskii-most-11` и
+`park-gorkogo` из того же префикса — `index`. Значит решение принимает
+`Venue.pageStatus` / `isIndexable`, и именно его должен учитывать генератор
+sitemap. Это прямое следствие пункта 6 (`isVenuePublic` как единственный
+источник правды) — закрывать их вместе.
+
+Если страницы не в индексе GSC, **Wave 1 тут ни при чём**: это задача
+индексации, а не провал UX-эксперимента.
 
 ### Пункт 1: патч отклонён, но проблема реальна и измерима
 
