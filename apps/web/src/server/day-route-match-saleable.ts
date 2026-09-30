@@ -4,6 +4,8 @@
  * Unsaleable TC thin rows resolve to soft-404 on `/events/{slug}` - never surface as buy CTA.
  */
 
+import type { Prisma } from '@/lib/db';
+
 export const DAY_ROUTE_MATCH_START_GRACE_MS = 15 * 60 * 1000;
 export const DAY_ROUTE_MATCH_RUNNING_MAX_MS = 36 * 60 * 60 * 1000;
 
@@ -110,15 +112,23 @@ export function isDayRouteMatchSaleable(
   return dayRouteMatchHasUpcomingOrOpenSchedule(event, nowMs) && dayRouteMatchPurchaseReady(event);
 }
 
-/** Prisma `where` fragment: cheap prefilter before JS saleable gate. */
-export function dayRouteMatchSaleableWhere(now = new Date()) {
+/**
+ * Prisma `where` fragment: cheap prefilter before JS saleable gate.
+ *
+ * No `as const` anywhere in these fragments. A const assertion freezes every
+ * nested array to `readonly`, and Prisma's generated `WhereInput` types require
+ * mutable arrays, so the whole object stopped assigning at each call site.
+ * The literal values still infer correctly from the parameter type, so nothing
+ * is lost by dropping it.
+ */
+export function dayRouteMatchSaleableWhere(now = new Date()): Prisma.EventWhereInput {
   const graceStart = new Date(now.getTime() - DAY_ROUTE_MATCH_START_GRACE_MS);
   return {
-    status: { notIn: ['HIDDEN', 'DRAFT'] as const },
+    status: { notIn: ['HIDDEN', 'DRAFT'] },
     AND: [
       {
         OR: [
-          { kind: 'OPEN_DATE' as const },
+          { kind: 'OPEN_DATE' },
           { sourceStatus: 'open_date' },
           {
             sessions: {
@@ -149,7 +159,7 @@ export function dayRouteMatchSaleableWhere(now = new Date()) {
             sourceLinks: {
               some: {
                 externalId: { not: '' },
-                source: { code: { in: ['TICKETSCLOUD', 'TEPLOHOD'] as const } },
+                source: { code: { in: ['TICKETSCLOUD', 'TEPLOHOD'] } },
               },
             },
           },
@@ -160,7 +170,7 @@ export function dayRouteMatchSaleableWhere(now = new Date()) {
 }
 
 /** Select fields needed for JS saleable confirmation (fresh dates each call). */
-export function dayRouteMatchSaleableSelect(now = new Date()) {
+export function dayRouteMatchSaleableSelect(now = new Date()): Prisma.EventSelect {
   const graceStart = new Date(now.getTime() - DAY_ROUTE_MATCH_START_GRACE_MS);
   return {
     kind: true,
@@ -177,7 +187,7 @@ export function dayRouteMatchSaleableSelect(now = new Date()) {
         ],
       },
       select: { startsAt: true, endsAt: true, sourceStatus: true },
-      orderBy: { startsAt: 'asc' as const },
+      orderBy: { startsAt: 'asc' },
       take: 3,
     },
     offers: {
@@ -192,5 +202,5 @@ export function dayRouteMatchSaleableSelect(now = new Date()) {
       },
       take: 4,
     },
-  } as const;
+  };
 }
