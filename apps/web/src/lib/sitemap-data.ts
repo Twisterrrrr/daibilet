@@ -1,5 +1,6 @@
 import {
   buildPublicArticlesListDto,
+  buildPublicEventFreshnessMap,
   buildPublicVenuesDto,
 } from '@daibilet/backend/public-read';
 
@@ -197,6 +198,11 @@ export async function buildEventsSitemapEntries(now = new Date()): Promise<Sitem
   const entries: SitemapEntry[] = [];
   const limit = 200;
 
+  // Real per-event `updatedAt`, keyed by the public (transliterated) slug. Without
+  // it every entry falls back to the build timestamp, so all ~4k URLs claim to
+  // change on every rebuild and crawlers stop trusting the field.
+  const freshness = await buildPublicEventFreshnessMap().catch(() => new Map());
+
   for (let offset = 0; offset < MAX_EVENTS; offset += limit) {
     const page = await getCachedCatalog(parseCatalogPageQuery({ limit: String(limit), offset: String(offset) }));
     for (const event of page.items || []) {
@@ -204,7 +210,9 @@ export async function buildEventsSitemapEntries(now = new Date()): Promise<Sitem
       const slug = event.slug || event.id;
       if (!slug || seen.has(slug)) continue;
       seen.add(slug);
-      entries.push(entry(`/events/${encodeURIComponent(slug)}`, now, 'daily', 0.7));
+      entries.push(
+        entry(`/events/${encodeURIComponent(slug)}`, now, 'daily', 0.7, freshness.get(slug) ?? null),
+      );
     }
     if (!page.hasMore || !page.items?.length || entries.length >= MAX_EVENTS) break;
   }

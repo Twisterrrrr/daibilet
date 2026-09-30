@@ -5,6 +5,11 @@ import test from 'node:test';
 
 import { resolveSitemapLastModified } from '@/lib/sitemap-data';
 
+// The pure helpers are tested through their own module: public-read only
+// re-exports buildPublicEventFreshnessMap, not the row mapper.
+import { freshnessMapFromRows, publicFreshnessSlug } from '@daibilet/backend/event-freshness';
+
+
 /**
  * Every sitemap builder used to stamp `lastmod` with the build-time `new Date()`,
  * so all ~4k URLs claimed to change on every rebuild. A lastmod that always moves
@@ -50,3 +55,49 @@ test('sitemap lastmod: backend selects and maps article updatedAt', () => {
   // ...and the row mapper must surface it as an ISO string.
   assert.match(dto, /updatedAt: row\.updatedAt \? new Date\(row\.updatedAt\)\.toISOString\(\) : null/);
 });
+
+/**
+ * Events carry no `updatedAt` in their public DTO, so the map in
+ * public-event-freshness.ts is a separate, deliberately trivial query. The trap is
+ * the key: the database stores Cyrillic slugs while the catalog DTO and the
+ * sitemap publish the transliterated form. Patch fc8a20407 was rejected for
+ * keying on the raw Cyrillic slug - every lookup missed and lastmod silently
+ * fell back to the build timestamp. The rows below are the real shapes from prod.
+ */
+test('sitemap lastmod: Cyrillic database slug resolves to the Latin sitemap key', () => {
+  const map = freshnessMapFromRows([
+    { slug: 'живопись-гуашь-6a9d47f6e00716a8519dceba', updatedAt: '2026-03-14T08:30:00.000Z' },
+  ]);
+  assert.equal(
+    map.get('zhivopis-guash-6a9d47f6e00716a8519dceba')?.toISOString(),
+    '2026-03-14T08:30:00.000Z',
+  );
+});
+
+test('sitemap lastmod: a Latin slug keys onto itself untouched', () => {
+  // Shape taken from /api/public/events on 30.09.
+  assert.equal(
+    publicFreshnessSlug('razvodnye-mosty-peterburga-s-borta-teplohoda-6a78a2b3e0f6a901eee53523'),
+    'razvodnye-mosty-peterburga-s-borta-teplohoda-6a78a2b3e0f6a901eee53523',
+  );
+});
+
+test('sitemap lastmod: the newest duplicate row wins', () => {
+  const map = freshnessMapFromRows([
+    { slug: 'tc-123-planetarii-1', updatedAt: '2026-09-20T00:00:00.000Z' },
+    { slug: 'tc-123-planetarii-1', updatedAt: '2026-09-25T00:00:00.000Z' },
+  ]);
+  assert.equal(map.get('tc-123-planetarii-1')?.toISOString(), '2026-09-25T00:00:00.000Z');
+});
+
+test('sitemap lastmod: a slug missing from the map falls back to the build time', () => {
+  const fallback = new Date('2026-09-29T12:00:00.000Z');
+  assert.equal(resolveSitemapLastModified(null, fallback).toISOString(), fallback.toISOString());
+});
+
+test('sitemap lastmod: the events builder threads the freshness map', () => {
+  const source = fs.readFileSync(path.join(WEB_ROOT, 'src/lib/sitemap-data.ts'), 'utf8');
+  assert.match(source, /buildPublicEventFreshnessMap/);
+  assert.match(source, /freshness\.get\(slug\)/);
+});
+
