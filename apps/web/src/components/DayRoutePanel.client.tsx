@@ -1051,8 +1051,11 @@ function DayRoutePanelInner() {
     setVenueMatchCatalogReady(false);
     setCatalogError(null);
 
+    // catalogCityName is non-empty past the guard above, so it is the guaranteed
+    // last resort. `??` instead of `||` keeps a null catalogCitySourceSlug from
+    // being read as an empty fallback, and satisfies the string parameter type.
     const venuesCityFilter = catalogCitySlug || catalogCitySourceSlug || catalogCityName;
-    const eventsCityFilter = catalogCityName || catalogCitySlug || catalogCitySourceSlug;
+    const eventsCityFilter = catalogCityName || catalogCitySlug || catalogCitySourceSlug || '';
     const venuesCityQ = encodeURIComponent(venuesCityFilter);
     const eventsCityQ = encodeURIComponent(eventsCityFilter);
     const venuesQs = (family: 'location' | 'institution') =>
@@ -1160,7 +1163,8 @@ function DayRoutePanelInner() {
     }
     const controller = new AbortController();
     const timer = window.setTimeout(() => {
-      const eventsCityFilter = catalogCityName || catalogCitySlug || catalogCitySourceSlug;
+      // Same guard as above: catalogCityName is non-empty, so it closes the chain.
+      const eventsCityFilter = catalogCityName || catalogCitySlug || catalogCitySourceSlug || '';
       const eventsCityQ = encodeURIComponent(eventsCityFilter);
       const q = encodeURIComponent(needle);
       void fetch(`/api/public/events?city=${eventsCityQ}&q=${q}&limit=40&sort=popular`, {
@@ -1786,7 +1790,10 @@ function DayRoutePanelInner() {
         slug: event.slug,
         title: event.title,
         city: event.city || pageCityName,
-        cityId: event.cityId || pageCityId,
+        // PublicCatalogListItemDto carries citySlug and city but no cityId, so the
+        // per-event id is always the page's. Reading event.cityId here relied on
+        // a field the API never returns, and it resolved to undefined at runtime.
+        cityId: pageCityId,
         citySlug: event.citySlug || pageCitySlug,
         venueId: matchedVenue?.id || null,
         venueSlug: event.venueSlug || matchedVenue?.slug || null,
