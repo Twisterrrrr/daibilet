@@ -179,8 +179,10 @@ CI-иногда падает. Стоит либо встроить шрифты,
 - Step 4 integrated on `feat/next-monorepo` @ `8052d742` (CI green:
   https://github.com/Twisterrrrr/daibilet/actions/runs/36167511215).
 - **STOP before Wave 1 deploy:** no baseline commit in branch
-  (`git log --grep=baseline` empty; `docs/drafts/pdp-wave1-baseline-urls.md`
-  untracked, no Metrika numbers). Await owner baseline commit, then:
+  (`git log --grep=baseline` empty; no Metrika numbers yet).
+  Recipe is now exact — see `docs/drafts/pdp-wave1-baseline-urls.md`
+  (report «Страницы», goal `select_tickets`, 4-week window). The 12 URLs are
+  tracked and re-verified 200; only the numbers are missing. Take them, then:
   `gh workflow run deploy-msk-web.yml -f sha=13916c0f1ac4ce16a6c9fd0523a5734397140802 -f expected_ref=feat/next-monorepo`
   (marker optional — `deploy-verify.sh` greps home HTML; venue-only
   `data-venue-cta-kind` would false-fail without auto-rollback).
