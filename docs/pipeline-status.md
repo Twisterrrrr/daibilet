@@ -1799,12 +1799,12 @@ Unit tests держатся на **993 / 995** все волны, два пад�
 
 #### Оставшиеся 24 ошибки
 
-`DayRoutePanel.client.tsx` (9), `day-route-commercial.ts` (1),
-`day-route-hot-picks.test.ts` (2), `day-route.test.ts` (2),
-`soft-geocode.test.ts` (2), `CityPageView.client.tsx` (1),
-`RegionVenueSeriesCard` (1), `blog-article-seo` (1),
-`catalog-query-paging.test` (1), `day-route-pdf` (1), `landing-faq-items` (1),
-`leaflet-daibilet` (1), `my-day-region-scope.test` (1),
+`DayRoutePanel.client.tsx` (9), `day-route-commercial.ts` (2),
+`day-route-hot-picks.test.ts` (2), `soft-geocode.test.ts` (2),
+`CityPageView.client.tsx` (1), `RegionVenueSeriesCard` (1),
+`blog-article-seo` (1), `catalog-query-paging.test` (1), `day-route-pdf` (1),
+`landing-faq-items` (1), `leaflet-daibilet` (1),
+`my-day-region-scope.test` (1),
 `buyer-ticket-mail` (1, нет зависимости `nodemailer`), `catalog-query` (1).
 
 `next.config.ts` по-прежнему использует `ignoreBuildErrors`, CI typecheck
