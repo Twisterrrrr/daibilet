@@ -77,6 +77,7 @@ test('explicit noindex still wins and thin venues stay out', () => {
   );
   assert.equal(evaluateVenueIndexability({ events: 0, type: 'museum' }).reason, 'zero_events');
   assert.equal(evaluateVenueIndexability({ events: 0, type: 'meeting_point' }).reason, 'non_venue_type');
+  assert.equal(evaluateVenueIndexability({ events: 3, type: 'museum', detailAvailable: false }).reason, 'detail_unavailable');
 });
 
 test('hidden venue stays out while candidate and published statuses retain the existing rule', () => {

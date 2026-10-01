@@ -23,6 +23,7 @@ import {
   fetchVenueStopEventCounts,
 } from './public-venue-lean.ts';
 import {
+  evaluateVenueDetailContentGate,
   isContentPlaceHubEligible,
   isContentPlaceKind,
 } from './public-venue-hub-gate.js';
@@ -116,6 +117,29 @@ async function getCatalogSessions(db) {
 const VENUE_PAGE_CATALOG_SOFT_MS = Number(process.env.DAIBILET_VENUE_PAGE_CATALOG_SOFT_MS || 2_500);
 
 async function loadVenuePageCatalogSessions(venueIds, venueContexts = [], venueCityHint = null) {
+  try {
+    const catalog = await import('./public-catalog.dto.js');
+    const soft = await catalog.getPublicCatalogSessionsSoft(VENUE_PAGE_CATALOG_SOFT_MS, {
+      hydrateSlots: false,
+    });
+    if (!soft?.length) return [];
+
+    const scoped = scopedVenueCatalogSessions(venueIds, venueContexts, venueCityHint, soft, catalog);
+    if (!scoped.length) return [];
+
+    try {
+      const slotLimit = catalog.VENUE_PAGE_SLOT_LIMIT || 96;
+      return await catalog.hydrateCatalogUpcomingSlots(scoped, slotLimit);
+    } catch {
+      return scoped;
+    }
+  } catch {
+    return [];
+  }
+}
+
+/** Shared indexed lookup for detail and the sitemap's batched availability pass. */
+function scopedVenueCatalogSessions(venueIds, venueContexts, venueCityHint, sessions, catalog) {
   const keys = new Set();
   for (const id of venueIds || []) {
     const key = String(id || '').trim().toLowerCase();
@@ -129,31 +153,11 @@ async function loadVenuePageCatalogSessions(venueIds, venueContexts = [], venueC
     if (pierKey) keys.add(`pier:${pierKey}`);
   }
 
-  try {
-    const catalog = await import('./public-catalog.dto.js');
-    const soft = await catalog.getPublicCatalogSessionsSoft(VENUE_PAGE_CATALOG_SOFT_MS, {
-      hydrateSlots: false,
-    });
-    if (!soft?.length) return [];
-
-    const indexed = catalog.resolveCatalogSessionsByVenueKeys([...keys]);
-    const scopedRaw = indexed.length
-      ? sortVenueCatalogSessions(indexed).slice(0, 120)
-      : // Index miss (v1 disk / name-only fuzzy): fall back to scoped filter, still no extra promote.
-        lookupVenueCatalogSessions(venueIds, soft, venueContexts).slice(0, 120);
-    const scoped = filterSessionsToVenueCity(scopedRaw, venueCityHint);
-    if (!scoped.length) return [];
-
-    try {
-      const slotLimit = catalog.VENUE_PAGE_SLOT_LIMIT || 96;
-      return await catalog.hydrateCatalogUpcomingSlots(scoped, slotLimit);
-    } catch {
-      // Keep nearest-slot schedule if EventSession hydrate fails (date rail degrades, PDP stays up).
-      return scoped;
-    }
-  } catch {
-    return [];
-  }
+  const indexed = catalog.resolveCatalogSessionsByVenueKeys([...keys]);
+  const scopedRaw = indexed.length
+    ? sortVenueCatalogSessions(indexed).slice(0, 120)
+    : lookupVenueCatalogSessions(venueIds, sessions, venueContexts).slice(0, 120);
+  return filterSessionsToVenueCity(scopedRaw, venueCityHint);
 }
 
 const CITY_ROUTING = loadCityRoutingConfig(import.meta.url);
@@ -476,38 +480,9 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
     loadVenuePageCatalogSessions(venueIds, venueContexts, venueCityHint),
   ]);
   if (!sessions.length) {
-    const status = String(venue.pageStatus || '').toUpperCase();
     const resolvedKind = resolvePublicVenueKindFromRow(venue);
     const pageTemplate = publicVenuePageTemplate(resolvedKind);
-    const isLocationPage = pageTemplate === 'location';
-    const hasAddressProfile =
-      Boolean(String(venue.address || '').trim()) &&
-      Boolean(String(venue.description || venue.shortDescription || '').trim());
-    // Content places (must-see): title + shortDescription|hookFact|description; address optional.
-    const allowContentPlace = isContentPlaceHubEligible(
-      {
-        title: venue.title,
-        name: venue.title,
-        kind: venue.kind,
-        pageStatus: venue.pageStatus,
-        shortDescription: venue.shortDescription,
-        hookFact: venue.hookFact,
-        description: venue.description,
-      },
-      resolvedKind,
-    );
-    // CF.P2: museum/theatre admission can exist without event sessions in catalog.
-    const allowAdmissionOnlyInstitution =
-      pageTemplate === 'institution' && hasAddressProfile && status === 'PUBLISHED';
-    if (
-      !(
-        allowContentPlace ||
-        (isLocationPage && hasAddressProfile && status !== 'NONE' && status !== 'HIDDEN') ||
-        allowAdmissionOnlyInstitution
-      )
-    ) {
-      return null;
-    }
+    if (!evaluateVenueDetailContentGate(venue, resolvedKind, pageTemplate).available) return null;
   }
   const waterEvents = sessions.filter(isWaterCatalogSession).length;
   const busEvents = sessions.filter(isBusCatalogSession).length;
@@ -2251,6 +2226,33 @@ function hasValidVenueCatalogCoords(venue) {
   return Number.isFinite(lat) && Number.isFinite(lng) && !(lat === 0 && lng === 0);
 }
 
+/** One catalog snapshot, indexed venue lookup; no per-URL detail or database requests. */
+export function markVenueSitemapDetailAvailability(pageItems, hubRows, sessions, catalog) {
+  const byId = new Map(hubRows.map((row) => [row.id, row]));
+  const detailHubRows = hubRows.slice(0, 500);
+  return pageItems.map((item) => {
+    const row = byId.get(item.id);
+    if (!row) return item;
+    const kind = resolvePublicVenueKindFromRow(row);
+    if (evaluateVenueDetailContentGate(row, kind, publicVenuePageTemplate(kind)).available) {
+      return { ...item, detailAvailable: true };
+    }
+    const mergedGroup = findMergedVenueGroup(detailHubRows, row.id);
+    const contexts = collectVenueSessionLookupContexts(row, mergedGroup, detailHubRows);
+    const ids = [...new Set([
+      ...(mergedGroup?.mergedVenueIds || [row.id]),
+      ...contexts.map((context) => context.id).filter(Boolean),
+    ])];
+    const scoped = scopedVenueCatalogSessions(ids, contexts, {
+      city: row.city,
+      citySlug: row.citySlug,
+    }, sessions, catalog);
+    return scoped.length
+      ? { ...item, detailAvailable: true }
+      : { ...item, detailAvailable: false, isIndexable: false };
+  });
+}
+
 export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchParams(), options = {}) {
   const mode = String(searchParams.get('mode') || 'list').trim().toLowerCase();
   const isPins = mode === 'pins';
@@ -2430,9 +2432,20 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
     limit,
     page: pageIndex,
   });
-  const pageItems = countsPending
+  let pageItems = countsPending
     ? page.map((item) => ({ ...item, events: 0, nextSlot: null }))
     : page;
+  // The sitemap asks for the dump limit with a hard refresh. Detail may have no
+  // public catalog sessions even when the legacy event count is positive.
+  if (options.freshHub === true && requestedLimit >= VENUE_CATALOG_HUB_MAX && !countsPending) {
+    const startedAt = Date.now();
+    const catalog = await import('./public-catalog.dto.js');
+    const sessions = await catalog.getPublicCatalogSessionsSoft(10_000, { hydrateSlots: false });
+    if (!sessions) throw new Error('Sitemap venue availability unavailable: catalog sessions timed out');
+    pageItems = markVenueSitemapDetailAvailability(pageItems, rows, sessions, catalog);
+    const excluded = pageItems.filter((item) => item.detailAvailable === false).length;
+    console.info(`[sitemap] venue detail availability: ${excluded}/${pageItems.length} excluded in ${Date.now() - startedAt}ms`);
+  }
   return buildEnvelope(sorted, pageItems, nextCursor, hasMore, facetSource, countsPending, resolvedPage);
 }
 
