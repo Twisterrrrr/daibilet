@@ -150,7 +150,9 @@ export function resolveHotPickTicketTarget(
     const ticketUrl = eventHref({
       id: eventId || eventSlug || event.id,
       slug: eventSlug,
-      title: event.title || null,
+      // EventRouteSource requires a string title; event.title is nullable, so fall
+      // back to the id the same way the id field above already does.
+      title: String(event.title || eventSlug || eventId || event.id),
     });
     let pathSlug = '';
     try {

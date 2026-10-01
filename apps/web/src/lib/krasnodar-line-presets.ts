@@ -12,6 +12,8 @@ function stop(
     address?: string;
     mustSeeFilter?: string;
     visitMinutes?: number;
+    // Call sites already pass this; the helper was silently dropping it.
+    transitTip?: string;
   } = {},
 ): any {
   return {
@@ -24,6 +26,7 @@ function stop(
     ...(opts.locationSlug ? { locationSlug: opts.locationSlug } : {}),
     ...(opts.dayRouteId ? { dayRouteId: opts.dayRouteId } : {}),
     ...(opts.address ? { address: opts.address } : {}),
+    ...(opts.transitTip ? { transitTip: opts.transitTip } : {}),
   };
 }
 

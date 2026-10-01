@@ -636,7 +636,7 @@ export function buildVenueEventListJsonLd(
     numberOfItems: sessions.length,
     itemListElement: sessions.map((session, index) => {
       const path = eventHref(session);
-      const title = formatPublicTitle(session.title || session.eventTitle || 'Событие');
+      const title = formatPublicTitle(session.title || 'Событие');
       const eventBlock: Record<string, unknown> = {
         '@type': 'Event',
         name: title,

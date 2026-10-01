@@ -311,7 +311,8 @@ export function splitVenueLabeledProse(
   paragraph: string,
 ): { label: string; rest: string } | null {
   const text = String(paragraph || '').trim();
-  const match = text.match(/^([^:]{2,48}):\s+(.+)$/s);
+  /** `[\s\S]` stands in for the /s (dotAll) flag, which needs an es2018 target. */
+  const match = text.match(/^([^:]{2,48}):\s+([\s\S]+)$/);
   if (!match) return null;
   const label = match[1].trim();
   const rest = match[2].trim();
