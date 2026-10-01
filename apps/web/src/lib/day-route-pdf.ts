@@ -312,7 +312,7 @@ export type JpegPdfPage = {
 };
 
 /** Embed RGB JPEG pages into a minimal PDF (A4). Exported for unit tests. */
-export function buildPdfFromJpegPages(pages: JpegPdfPage[]): Uint8Array {
+export function buildPdfFromJpegPages(pages: JpegPdfPage[]): Uint8Array<ArrayBuffer> {
   if (!pages.length) throw new Error('pdf: empty');
 
   const A4_W = 595.28;
@@ -384,7 +384,7 @@ export function buildPdfFromJpegPages(pages: JpegPdfPage[]): Uint8Array {
   }
   push(`trailer\n<< /Size ${objCount} /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF\n`);
 
-  const out = new Uint8Array(size);
+  const out = new Uint8Array(new ArrayBuffer(size));
   let offset = 0;
   for (const chunk of chunks) {
     out.set(chunk, offset);

@@ -4,6 +4,7 @@ import {
   isCatalogPageSize,
 } from '@daibilet/contracts/catalog';
 import { publicCatalogQuerySchema, type PublicCatalogQuery } from '@daibilet/contracts/schemas';
+import { CATALOG_SORT_DEFAULT, normalizeCatalogSort } from '@/lib/catalog-url';
 
 export interface CatalogPageQuery extends PublicCatalogQuery {
   page: number;
@@ -55,7 +56,7 @@ export function catalogFiltersCacheKey(
     date: filters.date,
     from: filters.from,
     to: filters.to,
-    sort: filters.sort,
+    sort: normalizeCatalogSort(filters.sort),
     limit: filters.limit,
     minPrice: filters.minPrice,
     maxPrice: filters.maxPrice,
@@ -204,7 +205,8 @@ export function buildCatalogApiSearchParams(
   if (filters.date && filters.date !== 'all') params.set('date', filters.date);
   if (filters.from) params.set('from', filters.from);
   if (filters.to) params.set('to', filters.to);
-  if (filters.sort && filters.sort !== 'time') params.set('sort', filters.sort);
+  const normalizedSort = normalizeCatalogSort(filters.sort);
+  if (normalizedSort !== CATALOG_SORT_DEFAULT) params.set('sort', normalizedSort);
   const limit = filters.limit && filters.limit > 0 ? filters.limit : CATALOG_PAGE_SIZE_DEFAULT;
   if (limit !== CATALOG_PAGE_SIZE_DEFAULT) {
     params.set('limit', String(limit));

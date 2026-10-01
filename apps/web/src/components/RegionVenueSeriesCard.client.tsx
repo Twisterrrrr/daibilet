@@ -28,7 +28,7 @@ export function RegionVenueSeriesCard({
   const count = sessions.length;
   const preview = sessions.slice(0, 8);
   const venueLink = venueSlug
-    ? venueHref({ slug: venueSlug, name: venueName })
+    ? venueHref({ id: venueSlug, slug: venueSlug, name: venueName })
     : null;
 
   return (

@@ -75,7 +75,13 @@ export async function softGeocodeAddress(input: {
   }
 }
 
-export function softGeocodeFailureMessage(reason: SoftGeocodeResult extends { ok: false; reason: infer R } ? R : never): string {
+  // A conditional type over a union does not distribute here, so the old
+  // `SoftGeocodeResult extends { ok: false; reason: infer R } ? R : never`
+  // collapsed to `never` and every case label was rejected. Extract the
+  // failure branch explicitly instead.
+  export function softGeocodeFailureMessage(
+  reason: Extract<SoftGeocodeResult, { ok: false }>['reason'],
+  ): string {
   switch (reason) {
     case 'empty':
       return 'Укажите адрес - минимум несколько символов';

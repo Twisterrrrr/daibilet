@@ -14,7 +14,9 @@ export function defaultLandingFaq(slug: string, profile: LandingFaqProfile = 'de
   if (profile === 'bridges') return BRIDGES_LANDING.faq;
   if (profile === 'seasonal') {
     const meta = getSeasonalLanding(key);
-    const cityName = resolveLandingCityName(citySlug, key);
+    // resolveLandingCityName takes only the city slug; the landing key was a
+    // second argument it never accepted (line 47 below passes just the slug).
+    const cityName = resolveLandingCityName(citySlug);
     const cityGuide = seasonalCityGuide(key, cityName);
     if (cityGuide?.faq.length) return cityGuide.faq;
     if (meta?.defaultFaq.length) return meta.defaultFaq;

@@ -10,17 +10,24 @@
 const LEAFLET_PREFIX =
   '<a href="https://leafletjs.com" title="A JavaScript library for interactive maps" target="_blank" rel="noreferrer">Leaflet</a>';
 
-type LeafletDefault = (typeof import('leaflet'))['default'];
+/**
+ * `@types/leaflet` declares named exports only (`export as namespace L`), so the
+ * module namespace itself is the Leaflet API - there is no `default` key in the
+ * types. At runtime leaflet is CommonJS and the bundler exposes
+ * `module.exports` as `.default`, so read that when present and fall back to the
+ * namespace itself.
+ */
+type LeafletNamespace = typeof import('leaflet');
 
-let loadPromise: Promise<LeafletDefault> | null = null;
+let loadPromise: Promise<LeafletNamespace> | null = null;
 
-export function loadDaibiletLeaflet(): Promise<LeafletDefault> {
+export function loadDaibiletLeaflet(): Promise<LeafletNamespace> {
   if (!loadPromise) {
     loadPromise = (async () => {
       const leaflet = await import('leaflet');
       await import('leaflet/dist/leaflet.css');
       await import('@/styles/leaflet-daibilet.css');
-      const L = leaflet.default;
+      const L = (leaflet as unknown as { default?: LeafletNamespace }).default ?? leaflet;
       L.Control.Attribution.mergeOptions({ prefix: LEAFLET_PREFIX });
       return L;
     })();
