@@ -6,8 +6,21 @@ import {
   eventTitleTokenFingerprint,
   extractEventTrailingLookupToken,
   matchesPublicEventSlug,
+  mapTepPublicSlugIds,
   publicSlug,
 } from './public-event.dto.js';
+
+test('truncated Teplohod slugs without an ID tail resolve through the bounded map', () => {
+  const rows = [
+    { id: 'evt_tep_1080', slug: 'прогулка-с-ужином-музыкальнои-программои-с-французским-аккордионам-и-дискотекои-на-теплоходе-артурс-вечерняя-москва-в-ог' },
+    { id: 'evt_tep_172', slug: 'москва-златоглавая-круговая-речная-прогулка-по-москве-реке-от-киевскои-до-кремля-и-обратно-на-теплоходе-августина-алекси' },
+    { id: 'evt_tep_173', slug: 'вечерняя-москва-музыкальныи-круиз-с-живои-музыкои-ужином-и-без-с-видом-на-кремль-и-парящии-мост-в-парке-зарядье-на-люкс-' },
+  ];
+  const ids = mapTepPublicSlugIds(rows);
+  assert.equal(ids.get('progulka-s-uzhinom-muzykalnoi-programmoi-s-francuzskim-akkordionam-i-diskotekoi-na-teplohode-arturs-vechernyaya-moskva-v-og'), 'evt_tep_1080');
+  assert.equal(ids.get('moskva-zlatoglavaya-krugovaya-rechnaya-progulka-po-moskve-reke-ot-kievskoi-do-kremlya-i-obratno-na-teplohode-avgustina-aleksi'), 'evt_tep_172');
+  assert.equal(ids.get('vechernyaya-moskva-muzykalnyi-kruiz-s-zhivoi-muzykoi-uzhinom-i-bez-s-vidom-na-kreml-i-paryaschii-most-v-parke-zaryade-na-lyuks'), 'evt_tep_173');
+});
 
 /**
  * Regression PERF.E5: Latin public URL must resolve TEP events whose DB slug is Cyrillic.

@@ -51,6 +51,7 @@ export type HubIndexDecision = {
     | 'zero_events'
     | 'explicit_noindex'
     | 'hidden_page'
+    | 'detail_unavailable'
     | 'non_venue_type';
 };
 
@@ -115,7 +116,11 @@ export function evaluateVenueIndexability(input: {
   isIndexable?: boolean | null;
   type?: string | null;
   pageStatus?: string | null;
+  detailAvailable?: boolean | null;
 }): HubIndexDecision {
+  if (input.detailAvailable === false) {
+    return { indexable: false, thin: true, reason: 'detail_unavailable' };
+  }
   if (input.isIndexable === false) {
     return { indexable: false, thin: true, reason: 'explicit_noindex' };
   }

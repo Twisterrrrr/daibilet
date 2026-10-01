@@ -507,6 +507,14 @@ async function resolveEvent(eventSlugOrId: string): Promise<EventRecord | null> 
     }
   }
 
+  // Teplohod slugs may end with a truncated word instead of a numeric ID.
+  // Only ~260 TEP rows need transliteration; cache this bounded lookup instead
+  // of scanning 20k recent events for every unresolved public URL.
+  if (requestedSlug) {
+    const tepId = await resolveTepPublicSlugId(requestedSlug);
+    if (tepId) return prisma.event.findUnique({ where: { id: tepId }, include: eventInclude });
+  }
+
   const candidates = await prisma.event.findMany({
     select: { id: true, slug: true },
     orderBy: { updatedAt: 'desc' },
@@ -514,6 +522,31 @@ async function resolveEvent(eventSlugOrId: string): Promise<EventRecord | null> 
   });
   const match = candidates.find((candidate) => publicSlug(candidate.slug) === requestedSlug);
   return match ? prisma.event.findUnique({ where: { id: match.id }, include: eventInclude }) : null;
+}
+
+let tepPublicSlugCache: { expiresAt: number; ids: Map<string, string> } | null = null;
+
+export function mapTepPublicSlugIds(rows: Array<{ id: string; slug: string }>): Map<string, string> {
+  const ids = new Map<string, string>();
+  for (const row of rows) {
+    const slug = publicSlug(row.slug);
+    if (slug) ids.set(slug, row.id);
+  }
+  return ids;
+}
+
+async function resolveTepPublicSlugId(requestedSlug: string): Promise<string | null> {
+  if (!tepPublicSlugCache || tepPublicSlugCache.expiresAt <= Date.now()) {
+    const rows = await prisma.event.findMany({
+      where: { id: { startsWith: 'evt_tep_' } },
+      select: { id: true, slug: true },
+    });
+    tepPublicSlugCache = {
+      expiresAt: Date.now() + 5 * 60 * 1000,
+      ids: mapTepPublicSlugIds(rows),
+    };
+  }
+  return tepPublicSlugCache.ids.get(requestedSlug) || null;
 }
 
 function mapSession(

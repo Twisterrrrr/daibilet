@@ -92,3 +92,31 @@ export function isContentPlaceHubEligible(row, resolvedPublicKind) {
   if (!isContentPlaceKind(row.kind || row.proposedKind, resolvedPublicKind)) return false;
   return hasMinimalVenueProfile(row);
 }
+
+/** The content-only branch of venue detail's availability gate. */
+export function evaluateVenueDetailContentGate(row, resolvedPublicKind, pageTemplate) {
+  if (!row || String(row.pageStatus || '').trim().toUpperCase() === 'HIDDEN') {
+    return { available: false, reason: 'hidden' };
+  }
+  const status = String(row.pageStatus || '').trim().toUpperCase();
+  const hasAddress = Boolean(String(row.address || '').trim());
+  const hasDescription = Boolean(String(row.description || row.shortDescription || '').trim());
+  const hasAddressProfile = hasAddress && hasDescription;
+  if (isContentPlaceHubEligible(row, resolvedPublicKind)) {
+    return { available: true, reason: 'content_place' };
+  }
+  if (pageTemplate === 'location' && hasAddressProfile && status !== 'NONE') {
+    return { available: true, reason: 'location_profile' };
+  }
+  if (pageTemplate === 'institution' && hasAddressProfile && status === 'PUBLISHED') {
+    return { available: true, reason: 'published_institution' };
+  }
+  if (!hasDescription && !String(row.hookFact || '').trim()) {
+    return { available: false, reason: 'missing_text' };
+  }
+  if (!hasAddress && pageTemplate === 'location') {
+    return { available: false, reason: 'missing_address' };
+  }
+  if (status === 'NONE') return { available: false, reason: 'none_status' };
+  return { available: false, reason: 'incomplete_profile' };
+}

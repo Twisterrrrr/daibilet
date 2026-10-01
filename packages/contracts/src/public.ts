@@ -182,6 +182,8 @@ export interface PublicVenueDto extends SeoFields {
   hookFact?: string | null;
   type: string;
   pageStatus?: string | null;
+  /** Result of the detail availability gate for sitemap-sized venue snapshots. */
+  detailAvailable?: boolean;
   description?: string | null;
   shortDescription?: string | null;
   heroImageUrl?: string | null;
