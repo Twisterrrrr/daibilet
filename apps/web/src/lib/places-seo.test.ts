@@ -47,7 +47,7 @@ test('places listing SEO puts city in description from slug alone', () => {
   assert.equal(seo.h1, 'Музеи, театры, локации, достопримечательности Санкт-Петербурга');
 });
 
-test('places listing canonical strips query junk to hub; never homepage', () => {
+test('places listing canonical: hub without family, facet path with family', () => {
   assert.deepEqual(
     buildPlacesListingSeo({}),
     {
@@ -66,9 +66,14 @@ test('places listing canonical strips query junk to hub; never homepage', () => 
   assert.equal(city.h1, 'Музеи, театры, локации, достопримечательности Казани');
   assert.equal(city.h1, buildPlacesListingCopy('Казань').h1);
 
-  const family = buildPlacesListingSeo({ family: 'institution' });
-  assert.equal(family.canonicalPath, '/places');
-  assert.equal(family.indexable, true);
+  // Family facets are their own documents now; each gets a self-canonical path.
+  const institution = buildPlacesListingSeo({ family: 'institution' });
+  assert.equal(institution.canonicalPath, '/places/institution');
+  assert.equal(institution.indexable, true);
+
+  const location = buildPlacesListingSeo({ family: 'location' });
+  assert.equal(location.canonicalPath, '/places/location');
+
 
   const category = buildPlacesListingSeo({
     category: 'museums',
@@ -91,7 +96,8 @@ test('places listing canonical strips query junk to hub; never homepage', () => 
     type: 'museum',
     family: 'institution',
   });
-  assert.equal(typed.canonicalPath, '/places');
+  // Filters do not change the facet document; family still owns the canonical.
+  assert.equal(typed.canonicalPath, '/places/institution');
   assert.equal(typed.indexable, true);
 
   const withEvents = buildPlacesListingSeo({

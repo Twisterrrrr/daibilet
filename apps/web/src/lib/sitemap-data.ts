@@ -202,6 +202,10 @@ export async function buildStaticSitemapEntries(now = new Date()): Promise<Sitem
     entry('/events', now, 'hourly', 0.8),
     entry('/cities', now, 'daily', 0.8),
     entry('/places', now, 'daily', 0.85),
+    // Family facets are indexable documents in their own right since the ЧПУ
+    // transition on 2026-10-01; before that they canonicalised to /places.
+    entry('/places/institution', now, 'daily', 0.8),
+    entry('/places/location', now, 'daily', 0.8),
     entry('/podborki', now, 'daily', 0.8),
     ...podborkiCityHubPaths.map((path) => entry(path, now, 'daily', 0.75)),
     ...intentPaths.map((path) => entry(path, now, 'daily', 0.7)),

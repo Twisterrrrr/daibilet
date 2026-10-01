@@ -116,7 +116,10 @@ export function buildPlacesListingSeo(input: PlacesListingSeoInput): {
   return {
     ...copy,
     description: ensureSeoDescription(copy.description, placesCityDescriptionFallback(prep)),
-    canonicalPath: PLACES_HUB_PATH,
+    // Family facets have their own addressable page: /places/institution and
+    // /places/location. Previously every ?family= view canonicalised to /places,
+    // so three distinct hub contents shared one URL.
+    canonicalPath: family ? `${PLACES_HUB_PATH}/${family}` : PLACES_HUB_PATH,
     indexable: true,
   };
 }

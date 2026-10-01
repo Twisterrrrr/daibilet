@@ -8,6 +8,16 @@ const nextConfig: NextConfig = {
   // Type errors are closed (web typecheck: 0 as of 30.09), so the build may fail on them again -
   // that is the point of the TS-debt cleanup. Do not re-enable the ignore.
   typescript: { ignoreBuildErrors: false },
+
+  // /places/institution and /places/location are the public ЧПУ for the two
+  // family facets. They rewrite to the same hub with the family query so the
+  // rendering path stays single-sourced while the address is a clean path.
+  async rewrites() {
+    return [
+      { source: '/places/institution', destination: '/places?family=institution' },
+      { source: '/places/location', destination: '/places?family=location' },
+    ];
+  },
   productionBrowserSourceMaps: false,
   experimental: {
     // Soft cap: Cyrillic event prerender races at 2 on MSK; keep 1 until stable.
@@ -44,6 +54,12 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      // /places?family=* is now addressable as /places/institution and /places/location.
+      // Both facets render distinct hub copy (Площадки / Локации), so a single
+      // /places canonical merged them. Verified 2026-10-01 that no inbound
+      // external links target the query form, so the 301 is free.
+      { source: '/places', has: [{ type: 'query', key: 'family', value: 'institution' }], destination: '/places/institution', permanent: true },
+      { source: '/places', has: [{ type: 'query', key: 'family', value: 'location' }], destination: '/places/location', permanent: true },
       // English alias should resolve to the imported/canonical city slug used by catalog DTOs.
       { source: '/cities/saint-petersburg', destination: '/cities/sankt-peterburg', permanent: true },
       { source: '/my-orders', destination: '/account/purchases', permanent: true },

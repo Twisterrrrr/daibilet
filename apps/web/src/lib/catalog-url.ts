@@ -180,11 +180,14 @@ export function placesSearchHref(options: {
   const family = options.family;
   if (q) params.set('q', q);
   if (city && city !== 'all') params.set('city', city);
-  if (family === 'institution' || family === 'location') params.set('family', family);
+  // Family facets are addressable by path (/places/institution), not query.
+  // next.config rewrites those onto this query internally, so links stay clean.
   if (type && type !== 'all') params.set('type', type);
   if (Number.isFinite(page) && page > 1) params.set('page', String(page));
   const query = params.toString();
-  return query ? `/places?${query}` : '/places';
+  const isFamilyPath = family === 'institution' || family === 'location';
+  const base = isFamilyPath ? `/places/${family}` : '/places';
+  return query ? `${base}?${query}` : base;
 }
 
 /** Umbrella «Места» hub. Entity PDP stays `/venues/[slug]` and `/locations/[slug]`. */
