@@ -1,12 +1,10 @@
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
 import { createDb } from './db.js';
+import { resolveProjectRoot } from './project-root.js';
 
 export type PublicEventFreshnessRow = { slug: string; updatedAt: Date | string };
 export type PublicEventFreshnessMap = Map<string, Date>;
 
-const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
+const projectRoot = resolveProjectRoot(import.meta.url);
 const FRESHNESS_CACHE_MS = 5 * 60 * 1000;
 const CYRILLIC_MAP: Record<string, string> = {
   а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z',
@@ -52,8 +50,9 @@ export async function buildPublicEventFreshnessMap(forceRefresh = false): Promis
     const map = freshnessMapFromRows(rows || []);
     cache = { expiresAt: Date.now() + FRESHNESS_CACHE_MS, map };
     return map;
-  } catch {
+  } catch (error) {
     // The sitemap can still build if the database is temporarily unavailable.
+    console.error('[sitemap] event freshness query failed:', error);
     return new Map();
   }
 }

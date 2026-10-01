@@ -15,6 +15,10 @@ test('resolveProjectRoot finds monorepo via import.meta.url', () => {
   assert.ok(resolveCityRoutingPath(import.meta.url).endsWith(path.join('data', 'geo', 'city-routing.ru.json')));
 });
 
+test('resolveProjectRoot ignores a build-host module path when cwd is in the repo', () => {
+  assert.equal(resolveProjectRoot('file:///home/runner/work/daibilet/apps/backend/src/public-event-freshness.ts'), expectedRoot);
+});
+
 test('loadCityRoutingConfig returns standalone cities', () => {
   const routing = loadCityRoutingConfig(import.meta.url);
   assert.ok(Array.isArray(routing.standaloneCities));
