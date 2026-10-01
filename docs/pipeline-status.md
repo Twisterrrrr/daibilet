@@ -1876,6 +1876,87 @@ category must not starve hero`) существовали до этих изме�
 `LandingPageView.client.tsx` (3), `CityPageView.client.tsx` (3).
 `next.config.ts` по-прежнему использует `ignoreBuildErrors`, CI typecheck
 остаётся выключенным.
+### Проверка `projectRoot` в собранном рантайме: гипотеза ОПРОВЕРГНУТА
+
+Задача была проверить, ломается ли `projectRoot` внутри Next-сборки. **Не
+ломается — версия оказалась не той.**
+
+#### 1. `createDb` вообще не использует переданный путь
+
+```ts
+export function createDb(_rootDir?: string): DbClient {
+  const { Pool } = pg;
+  const connectionString = process.env.DATABASE_URL || 'postgresql://daibilet:daibilet@1…'
+```
+
+Параметр помечен `_` и игнорируется. Подключение идёт только через
+`process.env.DATABASE_URL`. Значит `projectRoot` из
+`public-event-freshness.ts:9` на результат **не влияет**.
+
+#### 2. Реальный `projectRoot` считается от `process.cwd()`, а не от `import.meta.url`
+
+`apps/web/src/lib/load-root-env.ts:12`:
+
+```ts
+export function getMonorepoRoot(): string {
+  return path.resolve(process.cwd(), '../..');
+}
+```
+
+Это работает и в проде: `next start` запускается из `apps/web`, `../..` даёт корень
+монорепо.
+
+#### 3. Схема корректна — SQL валиден
+
+`model Event` (`packages/db/prisma/schema.prisma:529–607`) содержит
+`slug String @unique` и `updatedAt DateTime @updatedAt`. Запрос
+`select e.slug, e."updatedAt" from "Event" e …` не может упасть из-за отсутствия
+колонок.
+
+#### 4. Модуль действительно попал в бандл
+
+`.next/server/chunks/8833.js` содержит и SQL, и таблицу `CYRILLIC_MAP`, и
+`publicFreshnessSlug`. Транспортируется корректно.
+
+#### 5. Побочный дефект, найденный попутно (не причина отказа)
+
+`import.meta.url` **запекается на этапе сборки** абсолютным путём машины сборщика:
+
+```js
+path.resolve(path.dirname(fileURLToPath(
+  "file:///D:/coding/daibilet/apps/backend/src/public-event-freshness.ts")), "../../..")
+```
+
+В прод-сборке там будет путь прод-машины. Сейчас это безвольно, потому что
+`createDb` аргумент не читает. Но если кто-то начнёт использовать `projectRoot`
+по назначению — путь окажется нерабочим. Отдельная задача.
+
+#### 6. Ответ отдаётся из кэша — но свежего
+
+```
+X-Cache-Status: HIT
+Cache-Control: public, s-maxage=3600, stale-while-revalidate=86400
+Date:           Thu, 01 Oct 2026 05:58:34 GMT
+<lastmod>       2026-10-01T05:22:24.300Z   (сгенерирован за 36 мин до запроса)
+```
+
+Кэш не скрывает до-деплойную копию: запись пересобрана за 36 минут до проверки и
+даёт те же `distinct=1`.
+
+#### Что осталось — и почему дальше нужны прод-логи
+
+Три варианта, различить их без доступа к логам рантайма нельзя:
+
+1. **Смерженный код не задеплоен.** В статусе от 30.09 прямо значилось: «последний
+   web-деплой и проверка lastmod на проде **ещё не подтверждены**». Это ведущая
+   версия и самая дешёвая в проверке — сверить SHA на проде с `008f5152c`.
+2. **Запрос падает в рантайме** (права пользователя БД, отсутствие таблицы в
+   прод-базе) — и `.catch` это скрывает.
+3. **Запрос возвращает 0 строк.**
+
+Вне зависимости от причины пункт из прошлого раздела остаётся в силе:
+`.catch(() => new Map())` обязан быть заменён на логирование. Иначе следующий
+отказ снова будет невидимым — а сегодня он уже был невидимым один раз.
 ---
 
 ## Проверка прод-интеграции lastmod 30.09 (вечер): задача НЕ закрыта
