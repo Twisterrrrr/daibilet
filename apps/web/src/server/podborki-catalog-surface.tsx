@@ -78,11 +78,17 @@ export async function resolvePodborkiCatalogSurfaceSeo(input: {
       ? getLandingSeo({ citySlug: metaPilot.citySlug, landingSlug, dbOverride })
       : null;
     const legacy = resolvePodborkiCatalogSeo(metaPilot.citySlug);
+    // getLandingSeo always returns an object (at worst FALLBACK), so `seo?.title`
+    // is always truthy and the per-city copy below was unreachable. With no landing
+    // template and no DB override it yields a generic title, which is why perm and
+    // nizhny-novgorod served the generic "Тематические подборки" while claiming
+    // index,follow. Prefer the per-city values whenever the SEO result fell back.
+    const useLegacy = !seo || seo.source === 'fallback';
     return {
       kind: 'pilot',
-      title: seo?.title || legacy.title,
-      description: seo?.description || legacy.description,
-      h1: seo?.h1 || legacy.h1,
+      title: useLegacy ? legacy.title : seo.title,
+      description: useLegacy ? legacy.description : seo.description,
+      h1: useLegacy ? legacy.h1 : seo.h1,
       heroDescription: legacy.heroDescription,
       canonicalPath: buildPodborkiCityCanonicalPath(metaPilot.citySlug),
       robots: { index: isSeoPilot, follow: true },
