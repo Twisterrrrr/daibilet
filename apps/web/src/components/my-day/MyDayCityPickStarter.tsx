@@ -57,7 +57,7 @@ function DayRoutePictogram({ className = '' }: { className?: string }) {
   );
 }
 
-export const MyDayCityPickStarter = forwardRef<HTMLSectionElement, MyDayCityPickStarterProps>(
+export const MyDayCityPickStarter = forwardRef<HTMLElement, MyDayCityPickStarterProps>(
   function MyDayCityPickStarter({ cities, value, onChange }, ref) {
     const popular = useMemo(() => {
       const cityOnly = cities.filter((item) => item.type === 'city');

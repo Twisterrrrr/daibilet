@@ -136,7 +136,13 @@ function pickPlaceSlug(place: CityPlaceLinkFields): string | null {
 }
 
 function findVenueForPlace(
-  place: CityPlaceLinkFields & { name?: string; address?: string; desc?: string },
+  // CityMustSeeItem types address as string | null while this helper declared the
+  // looser optional strings, so every must-see caller failed to match.
+  place: CityPlaceLinkFields & {
+    name?: string | null;
+    address?: string | null;
+    desc?: string | null;
+  },
   venues: DayRouteVenueMatchSource[],
   options: { allowNameMatch?: boolean } = {},
 ): DayRouteVenueMatchSource | null {
@@ -376,7 +382,7 @@ export function dayRouteItemFromEvent(event: DayRouteEventSource): DayRouteVenue
     ticketUrl = eventHref({
       id: eventId || eventSlug || rawEventId,
       slug: eventSlug,
-      title: event.title,
+      title,
     });
     const eventPath = ticketUrl.replace(/^\/events\//i, '').split('/')[0] || '';
     let eventPathDecoded = eventPath;

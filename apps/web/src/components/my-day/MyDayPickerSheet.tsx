@@ -66,7 +66,9 @@ export function MyDayPickerSheet({
 
   useEffect(() => {
     if (!open) return;
-    function onKey(e: KeyboardEvent) {
+    // `KeyboardEvent` here is React's synthetic type (imported at the top), but this
+    // handler is attached to the native document, so it must take the DOM event.
+    function onKey(e: globalThis.KeyboardEvent) {
       if (e.key === 'Escape') onClose();
     }
     document.addEventListener('keydown', onKey);

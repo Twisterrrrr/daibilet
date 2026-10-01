@@ -21,7 +21,7 @@ type MyDayRegionCityPromptProps = {
  * Region/oblast cannot drive My Day (no must-see / city catalog).
  * Offer hub + oblast towns, plus full city picker.
  */
-export const MyDayRegionCityPrompt = forwardRef<HTMLSectionElement, MyDayRegionCityPromptProps>(
+export const MyDayRegionCityPrompt = forwardRef<HTMLElement, MyDayRegionCityPromptProps>(
   function MyDayRegionCityPrompt({ alternatives, cities, value, onChange }, ref) {
     const suggestions = [
       ...(alternatives.hub ? [alternatives.hub] : []),
