@@ -50,17 +50,21 @@ export function RegionOrientMap({
       const L = await loadDaibiletLeaflet();
       if (cancelled || !node) return;
 
-      map = L.map(node, {
+      // `map` is a mutable binding declared in the outer scope and assigned inside
+      // this async closure, so TS drops its narrowing for every use in here.
+      // Work from a local const and only mirror the value out for teardown.
+      const instance = L.map(node, {
         zoomControl: true,
         scrollWheelZoom: false,
         attributionControl: true,
       }).setView([center.lat, center.lng], 8);
-      mapRef.current = map;
+      map = instance;
+      mapRef.current = instance;
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 18,
         attribution: '&copy; OpenStreetMap',
-      }).addTo(map);
+      }).addTo(instance);
 
       const bounds = L.latLngBounds([]);
       const markers: Marker[] = [];
@@ -90,9 +94,9 @@ export function RegionOrientMap({
       }
       markersRef.current = markers;
       if (points.length > 1) {
-        map.fitBounds(bounds.pad(0.2));
+        instance.fitBounds(bounds.pad(0.2));
       }
-      requestAnimationFrame(() => map?.invalidateSize({ animate: false }));
+      requestAnimationFrame(() => instance.invalidateSize({ animate: false }));
     })();
 
     return () => {

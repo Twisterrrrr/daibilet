@@ -78,7 +78,10 @@ export function OsmMapEmbed({
       const ready = await waitForMapHostSize(node, () => cancelled);
       if (cancelled || !ready || !node) return;
 
-      map = L.map(node, {
+      // `map` is a mutable binding declared in the outer scope and assigned inside
+      // this async closure, so TS drops its narrowing for uses in here. Work
+      // from a local const and mirror the value out for teardown only.
+      const instance = L.map(node, {
         center: [lat, lng],
         zoom: DEFAULT_ZOOM,
         minZoom: MIN_ZOOM,
@@ -91,7 +94,8 @@ export function OsmMapEmbed({
         boxZoom: false,
         keyboard: false,
       });
-      mapRef.current = map;
+      map = instance;
+      mapRef.current = instance;
 
       L.control
         .zoom({
@@ -99,13 +103,13 @@ export function OsmMapEmbed({
           zoomInTitle: 'Приблизить',
           zoomOutTitle: 'Отдалить',
         })
-        .addTo(map);
+        .addTo(instance);
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution:
           '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>',
         maxZoom: MAX_ZOOM,
-      }).addTo(map);
+      }).addTo(instance);
 
       const icon = L.divIcon({
         className: 'daibilet-osm-marker',
@@ -113,21 +117,21 @@ export function OsmMapEmbed({
         iconSize: [28, 40],
         iconAnchor: [14, 40],
       });
-      L.marker([lat, lng], { icon, title, keyboard: false }).addTo(map);
+      L.marker([lat, lng], { icon, title, keyboard: false }).addTo(instance);
 
       if (pageScrollFriendly) {
         setLockedChrome(true);
         const unlock = () => {
-          if (unlocked || !map) return;
+          if (unlocked) return;
           unlocked = true;
-          map.dragging.enable();
-          map.touchZoom.enable();
+          instance.dragging.enable();
+          instance.touchZoom.enable();
           setLockedChrome(false);
-          map.off('click', unlock);
-          map.off('focus', unlock);
+          instance.off('click', unlock);
+          instance.off('focus', unlock);
         };
-        map.on('click', unlock);
-        map.on('focus', unlock);
+        instance.on('click', unlock);
+        instance.on('focus', unlock);
       } else {
         setLockedChrome(false);
       }

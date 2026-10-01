@@ -75,7 +75,8 @@ function buildDayChip(day: Date, today: Date): CatalogDateRailDayChip {
   const tomorrowIso = toLocalIsoDay(addLocalDays(today, 1));
   const dow = day.getDay();
   const isWeekend = dow === 0 || dow === 6;
-  let weekday = WEEKDAY_SHORT[dow]!;
+// WEEKDAY_SHORT is as const, so the binding is a literal union; widen it
+  let weekday: string = WEEKDAY_SHORT[dow]!;
   if (iso === todayIso) weekday = 'сег';
   else if (iso === tomorrowIso) weekday = 'зав';
   const dayNum = day.getDate();

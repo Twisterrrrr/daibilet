@@ -428,7 +428,7 @@ function VenuePlaybillList({
 function VenuePlaybillRow({ entry }: { entry: VenuePlaybillEntry }) {
   const session = entry.session;
   const href = eventHref(session);
-  const title = formatPublicTitle(entry.title || session.title || session.eventTitle);
+  const title = formatPublicTitle(entry.title || session.title);
   const when = playbillWhenParts(session);
   const age = formatAgeLimit(session.ageLimit);
   const meta = [entry.category, age].filter(Boolean).join(' · ');
