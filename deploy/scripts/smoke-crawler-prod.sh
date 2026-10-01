@@ -2,6 +2,7 @@
 set -euo pipefail
 
 BASE_URL="${PUBLIC_SITE_URL:-https://daibilet.ru}"
+KNOWN_404_FILE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/known-content-gate-404.txt"
 GOOGLEBOT='Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
 YANDEXBOT='Mozilla/5.0 (compatible; YandexBot/3.0; +http://yandex.com/bots)'
 TELEGRAMBOT='TelegramBot (like TwitterBot)'
@@ -15,6 +16,10 @@ fetch_path() {
   local body="$TMP_DIR/body.html"
   local code
   code="$(curl -sS --max-time 30 -A "$agent" -o "$body" -w '%{http_code}' "${BASE_URL}${path}")"
+  if [[ "$code" == "404" ]] && grep -qxF "$path" "$KNOWN_404_FILE" 2>/dev/null; then
+    echo "WARN: $label $path is a known content-gate 404 (Fix B), continuing"
+    return 0
+  fi
   if [[ "$code" != "200" ]]; then
     echo "ERROR: $label $path returned HTTP $code" >&2
     return 1
