@@ -481,7 +481,11 @@ function createSyntheticLanding(slug: string, cityName: string | null): PublicLa
 
   if (profile === 'river') {
     const riverGuide = cityName ? riverCityGuide(cityName) : null;
-    const prep = riverGuide?.cityNameDative || BUS_CITY_META[cityName]?.prepositional || cityName || 'России';
+    const prep =
+      riverGuide?.cityNameDative ||
+      (cityName ? BUS_CITY_META[cityName]?.prepositional : undefined) ||
+      cityName ||
+      'России';
     return {
       slug,
       title: cityName ? `Речные прогулки — ${cityName}` : 'Речные прогулки',
@@ -2605,8 +2609,12 @@ function LandingFaq({
       <p className="mb-10 text-center text-slate-600">{faqSubtitle}</p>
       <div className="mx-auto max-w-3xl space-y-2">
         {items.map((item, index) => {
-          const question = String(item.question || item.title);
-          const answer = String(item.answer || item.text);
+          // items is typed as { question, answer }, but these guards also accept the
+          // legacy { title, text } shape. Read through a widened view so both
+          // shapes type-check.
+          const faqItem = item as { question?: string; answer?: string; title?: string; text?: string };
+          const question = String(faqItem.question || faqItem.title);
+          const answer = String(faqItem.answer || faqItem.text);
           return (
             <details
               key={`${question}:${index}`}

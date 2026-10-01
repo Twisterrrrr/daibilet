@@ -52,7 +52,11 @@ import {
   normalizeCityHubSlug,
   resolveCityHubConfig,
 } from '@/lib/city-hub-config';
-import { matchSightAfficheLink, resolveFeaturedDirections } from '@/lib/city-hub-directions';
+import {
+  matchSightAfficheLink,
+  resolveFeaturedDirections,
+  type LandingLike,
+} from '@/lib/city-hub-directions';
 import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import { resolveCityImage } from '@/lib/city-images';
 import { CITY_NIGHT_HERO } from '@/lib/city-night-hero';
@@ -1264,11 +1268,12 @@ function CitySightsSection({
   const cityIn = cityInPrepositional(city);
   const cityGenitive = cityToGenitive(city.name);
   const citySlug = city.slug || city.sourceSlug || undefined;
-  const landingRows = landings.map((landing) => ({
+  const landingRows: LandingLike[] = landings.map((landing) => ({
     slug: landing.slug,
     title: landing.title,
     subtitle: landing.subtitle,
-    events: landing.events,
+    // LandingLike wants a number; the source may leave it unset.
+    events: landing.events ?? 0,
     priceFrom: landing.priceFrom,
   }));
   const titleClass = `font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`;
@@ -2034,7 +2039,9 @@ function HubStandupSeriesCard({
 }) {
   const dates = sessions.slice(0, 8);
   const venueLink = sessions[0]?.venueSlug
-    ? venueHref({ slug: sessions[0].venueSlug, name: venueName })
+    // VenueRouteSource requires `id`; sessions only carry the slug, so the object
+      // literal here was structurally incomplete.
+      ? venueHref({ id: sessions[0].venueSlug, slug: sessions[0].venueSlug, name: venueName })
     : null;
   return (
     <article

@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
+import type { PublicVenueDto } from '@daibilet/contracts/public';
+
 import {
   __editorialVenueContentSlugCountForTests,
   applyVenueEditorialOverlay,
@@ -149,6 +151,8 @@ test('applyVenueEditorialOverlay patches legacy Hermitage title', () => {
 });
 
 test('applyVenueEditorialOverlay fills Pushkin SEO fields', () => {
+  // Annotate the fixture: the generic infers T straight from this literal, so
+  // the null fields came back typed `null` and `?.includes` resolved to never.
   const patched = applyVenueEditorialOverlay({
     id: 'v2',
     name: 'ГМИИ',
@@ -163,7 +167,7 @@ test('applyVenueEditorialOverlay fills Pushkin SEO fields', () => {
     wayToFind: null,
     hookFact: null,
     metroStation: null,
-  });
+  } as PublicVenueDto);
   assert.equal(patched.name, 'Пушкинский музей');
   assert.ok(patched.seoDescription?.includes('сеансам'));
   assert.ok(patched.shortDescription?.includes('Волхонке'));

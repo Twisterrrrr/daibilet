@@ -14,7 +14,12 @@ type HubCarouselChromeProps = {
   scrollerRef?: Ref<HTMLDivElement>;
   className?: string;
   trackClassName?: string;
-  trackProps?: HTMLAttributes<HTMLDivElement>;
+  /**
+   * Spread straight onto the track div, so `data-*` test hooks are legitimate
+   * here. HTMLAttributes alone rejects them, which made the
+   * data-city-must-see-rail marker unpassable from callers.
+   */
+  trackProps?: HTMLAttributes<HTMLDivElement> & Record<`data-${string}`, string | undefined>;
   'aria-label'?: string;
   showArrows?: boolean;
   canPrev?: boolean;
