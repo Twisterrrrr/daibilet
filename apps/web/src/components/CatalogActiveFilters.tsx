@@ -76,7 +76,9 @@ export function CatalogActiveFilters({
       label: `без ${catalogExcludeThemeChip(slug)}`,
       href: buildCatalogHref({
         ...values,
-        excludeLanding: removeExcludeLanding(values.excludeLanding, slug),
+        // values.excludeLanding may arrive as a bare string, but removeExcludeLanding
+        // only takes the list form, so normalise it first.
+        excludeLanding: removeExcludeLanding(normalizeExcludeLandingList(values.excludeLanding), slug),
         page: undefined,
       }),
     });

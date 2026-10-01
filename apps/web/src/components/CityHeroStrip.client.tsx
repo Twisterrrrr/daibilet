@@ -56,11 +56,13 @@ export function CityHeroStrip({
   const seasonChip = hubConfig?.highlightSeason;
   const regionBadge = resolveCityHeroRegionBadge(city);
   const guidePlaces = guide?.mustSee?.length || 0;
+  // PublicCityDto has no heroImageUrl field, but resolveCityImage accepts one and
+  // the API may still send it, so read it off a widened view.
   const heroImage = resolveCityImage({
     slug: city.slug,
     sourceSlug: city.sourceSlug,
     name: city.name,
-    heroImageUrl: city.heroImageUrl,
+    heroImageUrl: (city as { heroImageUrl?: string | null }).heroImageUrl,
   });
 
   React.useEffect(() => {

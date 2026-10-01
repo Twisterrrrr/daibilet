@@ -88,8 +88,13 @@ type ContentBlock =
   | { type: 'note'; data: NonNullable<ReturnType<typeof parseNoteBlock>> }
   | { type: 'route'; data: NonNullable<ReturnType<typeof parseRouteBlock>> };
 
+/**
+ * The `/s` (dotAll) flag needs an es2018 target and this package compiles to
+ * es2017, so spell the same behaviour out with a character class instead.
+ * `[\s\S]` matches any character including newlines, exactly like dotAll.
+ */
 const CALLOUT_LABEL_RE =
-  /^\*\*(Атмосферная деталь|Практический совет|Лайфхак|Адрес):\*\*\s*(.+)$/s;
+    /^\*\*(Атмосферная деталь|Практический совет|Лайфхак|Адрес):\*\*\s*([\s\S]+)$/;
 
 export function parseCalloutText(text: string): { label: string; body: string } | null {
   const match = String(text || '').trim().match(CALLOUT_LABEL_RE);
