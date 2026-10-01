@@ -93,6 +93,13 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  // LOAD-BEARING for the monorepo, not just apps/web: packages/contracts and
+  // apps/backend import siblings as `./foo.js` while shipping `foo.ts` (NodeNext ESM
+  // convention). There are ~304 such specifiers across those packages, and
+  // transpilePackages pulls them into this build. Removing this hook fails the build
+  // with "Can't resolve './catalog.js'" from packages/contracts/src/schemas.ts.
+  // To drop it (required for Turbopack in Next 16, which has no config.resolve),
+  // those packages must switch to extensionless or .ts specifiers first.
   webpack: (config) => {
     config.resolve.extensionAlias = {
       '.js': ['.ts', '.tsx', '.js'],
