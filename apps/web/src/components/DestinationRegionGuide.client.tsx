@@ -47,7 +47,7 @@ export function DestinationRegionGuide({
             return {
               name: place.name,
               desc: place.desc,
-              href: slug ? venueHref({ slug, name: place.name }) : null,
+              href: slug ? venueHref({ id: slug, slug, name: place.name }) : null,
               imageSlug: slug || null,
               visitMinutes: place.visitMinutes,
               transitTip: place.transitTip,

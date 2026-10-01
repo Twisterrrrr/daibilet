@@ -175,7 +175,7 @@ export function DayRouteBoatWizard({
         rankBoatPiers(
           fromCatalog.map((v) => ({
             id: v.id,
-            slug: v.slug,
+            slug: v.slug ?? null,
             name: v.name,
             city: v.city,
             cityId: v.cityId,
@@ -205,7 +205,7 @@ export function DayRouteBoatWizard({
           rankBoatPiers(
             list.map((v) => ({
               id: v.id,
-              slug: v.slug,
+              slug: v.slug ?? null,
               name: v.name,
               city: v.city,
               cityId: v.cityId,

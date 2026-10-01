@@ -77,7 +77,7 @@ function HubStandupSeriesCard({
 }) {
   const dates = sessions.slice(0, 8);
   const venueLink = sessions[0]?.venueSlug
-    ? venueHref({ slug: sessions[0].venueSlug, name: venueName })
+    ? venueHref({ id: sessions[0].venueSlug, slug: sessions[0].venueSlug, name: venueName })
     : null;
   return (
     <article className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-4">
@@ -101,7 +101,7 @@ function HubStandupSeriesCard({
                 {formatCoverDateBadge(session) || 'Дата'}
               </span>
               <span className="mt-0.5 line-clamp-2 block text-sm font-medium text-slate-900">
-                {formatPublicTitle(session.title || session.eventTitle)}
+            {formatPublicTitle(session.title)}
               </span>
             </Link>
           </li>
