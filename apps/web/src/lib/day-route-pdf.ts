@@ -18,17 +18,24 @@ export type DayRoutePdfStop = {
   dwellLabel?: string | null;
 };
 
+/**
+ * One row of the PDF flow: a numbered stop, a free-text note, or the travel leg
+ * that sits between two stops. Named and exported so the builder can annotate
+ * its flatMap callback - without an explicit element type, flatMap cannot infer
+ * one across the note branch and the stop/leg branch.
+ */
+export type DayRoutePdfRow =
+  | { kind: 'stop'; index: number; stop: DayRoutePdfStop }
+  | { kind: 'note'; text: string }
+  | { kind: 'leg'; text: string };
+
 export type DayRoutePdfPayload = {
   title: string;
   subtitle: string;
   summary: string[];
   stops: DayRoutePdfStop[];
   /** Ordered rows including notes / legs between stops. */
-  rows: Array<
-    | { kind: 'stop'; index: number; stop: DayRoutePdfStop }
-    | { kind: 'note'; text: string }
-    | { kind: 'leg'; text: string }
-  >;
+  rows: DayRoutePdfRow[];
 };
 
 const TILE = 256;

@@ -237,7 +237,7 @@ import {
 import { venueTypeLabel } from '@/lib/venue-meta';
 import { resolveCityCardImage } from '@/lib/city-images';
 import { MyDaySaveScenarioDialog } from '@/components/my-day/MyDaySaveScenarioDialog';
-import { exportDayRoutePdfWithMap } from '@/lib/day-route-pdf';
+import { exportDayRoutePdfWithMap, type DayRoutePdfRow } from '@/lib/day-route-pdf';
 import {
   applyDayRouteScenario,
   filterDayRouteScenariosByCity,
@@ -566,7 +566,9 @@ function DayRoutePanelInner() {
   const skipUrlSyncRef = useRef(false);
   const titleFieldRef = useRef<HTMLInputElement | null>(null);
   const shareMenuRef = useRef<HTMLElement | null>(null);
-  const unifiedSearchRef = useRef<HTMLDivElement>(null);
+  // This ref is attached to two <section> roots (via forwardRef on the my-day city
+  // pickers) and to <div> wrappers here, so HTMLElement is the common supertype.
+  const unifiedSearchRef = useRef<HTMLElement>(null);
   const eventEnrichAttemptedRef = useRef<Set<string>>(new Set());
 
   /** Keep viewport on the tapped card when route list grows/shrinks above it. */
@@ -2460,7 +2462,7 @@ function DayRoutePanelInner() {
           };
         })
         .filter((s) => s.latitude && s.longitude);
-      const rows = route.venues.flatMap((venue, index) => {
+      const rows = route.venues.flatMap((venue, index): DayRoutePdfRow[] => {
         if (isNoteDayRouteStop(venue)) {
           return [{ kind: 'note' as const, text: String(venue.note || venue.title || 'Заметка') }];
         }
@@ -3021,7 +3023,7 @@ function DayRoutePanelInner() {
               <li key={match.eventId} className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-4">
                 <div className="flex gap-3">
                   <Link
-                    href={eventHref({ slug: match.slug, id: match.eventId })}
+                    href={eventHref({ slug: match.slug, id: match.eventId, title: match.title })}
                     className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-slate-100 sm:h-20 sm:w-20"
                   >
                     <CardSafeImage
@@ -3034,7 +3036,7 @@ function DayRoutePanelInner() {
                   </Link>
                   <div className="min-w-0 flex-1">
                     <Link
-                      href={eventHref({ slug: match.slug, id: match.eventId })}
+                      href={eventHref({ slug: match.slug, id: match.eventId, title: match.title })}
                       className="line-clamp-2 text-sm font-semibold text-slate-900 hover:text-primary-700"
                     >
                       {match.title}
@@ -3249,7 +3251,9 @@ function DayRoutePanelInner() {
   function renderHeaderCompactSearch() {
     return (
       <div
-        ref={unifiedSearchRef}
+        ref={(node) => {
+          unifiedSearchRef.current = node;
+        }}
         className="mt-3 hidden w-full flex-col gap-1.5 sm:mt-4 lg:flex"
         data-day-unified-search
         data-day-header-search="1"
