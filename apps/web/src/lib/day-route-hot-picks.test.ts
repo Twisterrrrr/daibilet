@@ -124,17 +124,17 @@ describe('day-route-hot-picks matching + tabs', () => {
   it('tips tab curates ≤6 non-gastro cards', () => {
     const rows = [
       {
-        place: { name: 'Кремль', locationSlug: 'kreml' },
+        place: { name: 'Кремль', desc: '', locationSlug: 'kreml' },
         item: { id: '1', title: 'Кремль', slug: 'kreml' },
         hook: 'Стены и вид на стрелку',
       },
       {
-        place: { name: 'Пакгаузы', locationSlug: 'pakgauzy' },
+        place: { name: 'Пакгаузы', desc: '', locationSlug: 'pakgauzy' },
         item: { id: '2', title: 'Пакгаузы', slug: 'pakgauzy' },
         hook: 'Культурный кластер на Стрелке',
       },
       {
-        place: { name: 'Yale', venueSlug: 'yale', type: 'CLUB_BAR_RESTAURANT' },
+        place: { name: 'Yale', desc: '', venueSlug: 'yale', type: 'CLUB_BAR_RESTAURANT' },
         item: { id: '3', title: 'Yale', slug: 'yale' },
         hook: 'Вино и малые тарелки',
       },

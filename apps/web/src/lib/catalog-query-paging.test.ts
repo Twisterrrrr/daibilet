@@ -42,8 +42,13 @@ test('catalogQueryCacheKey includes paging via page when offset omitted', () => 
 });
 
 test('catalogFiltersCacheKey ignores listPage in filters snapshot', () => {
-  const base = { city: 'moscow', limit: 100 as const, sort: 'time' as const, page: 99 };
-  assert.equal(catalogFiltersCacheKey(base, 1), catalogFiltersCacheKey({ ...base, page: 2 }, 1));
+  // The point of this test is that `page` inside the filters object must not
+  // reach the cache key. Declare it as an extra field on a typed variable so
+  // the intent is explicit instead of tripping the excess-property check.
+  type FiltersWithPage = Parameters<typeof catalogFiltersCacheKey>[0] & { page: number };
+  const base: FiltersWithPage = { city: 'moscow', limit: 100, sort: 'time', page: 99 };
+  const otherPage: FiltersWithPage = { ...base, page: 2 };
+  assert.equal(catalogFiltersCacheKey(base, 1), catalogFiltersCacheKey(otherPage, 1));
 });
 
 test('buildCatalogApiSearchParams maps page + limit for load-more (50/100/200)', () => {

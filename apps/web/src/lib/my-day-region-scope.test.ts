@@ -15,7 +15,7 @@ function dest(
   return {
     id: partial.id || partial.slug || partial.name,
     slug: partial.slug || partial.name,
-    sourceSlug: partial.sourceSlug || null,
+    sourceSlug: partial.sourceSlug || undefined,
     name: partial.name,
     type: partial.type,
     events: partial.events ?? 0,
