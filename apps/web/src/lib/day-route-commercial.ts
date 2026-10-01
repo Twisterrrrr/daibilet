@@ -38,7 +38,8 @@ export function dayRouteSessionTimeLabel(
 
 /** True when stop has a buyable checkout / event page (not invented prices). */
 export function dayRouteStopHasTicket(
-  venue: Pick<DayRouteVenueItem, 'ticketUrl' | 'eventId' | 'eventSlug' | 'title'>,
+  venue: Pick<DayRouteVenueItem, 'ticketUrl' | 'eventId' | 'eventSlug' | 'title'> &
+    Partial<Pick<DayRouteVenueItem, 'slug' | 'id'>>,
 ): boolean {
   return Boolean(resolveDayRouteTicketUrl(venue));
 }

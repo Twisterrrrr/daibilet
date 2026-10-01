@@ -92,8 +92,13 @@ export function buildBlogArticleMetadata(article: BlogArticleDto): Metadata {
     description,
     alternates: { canonical: canonicalPath },
     robots: indexable ? { index: true, follow: true } : { index: false, follow: false },
+    // `share.openGraph` is the OpenGraph union, so spreading it and adding article
+    // fields leaves TS unable to pick a variant. Pin the discriminant
+    // explicitly - buildShareMetadata was called with type: 'article' above, so
+    // this matches what it returns and lets TS select the article variant.
     openGraph: {
       ...share.openGraph,
+      type: 'article',
       publishedTime: article.publishedAt || undefined,
       modifiedTime: article.publishedAt || undefined,
     },

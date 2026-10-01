@@ -1851,7 +1851,9 @@ export function dayRouteHasMixedCities(venues: DayRouteVenueItem[]): boolean {
 }
 
 /** Dominant city slug for afisha CTA (most frequent citySlug among points). */
-export function dayRouteDominantCitySlug(venues: DayRouteVenueItem[]): string | null {
+export function dayRouteDominantCitySlug(
+  venues: Array<Pick<DayRouteVenueItem, 'citySlug'> & Partial<Pick<DayRouteVenueItem, 'id' | 'title'>>>,
+): string | null {
   const counts = new Map<string, number>();
   for (const venue of venues) {
     const slug = String(venue.citySlug || '').trim();
@@ -2214,7 +2216,9 @@ export function formatDayRouteTravelMinutes(minutes: number): string {
 
 /** Venue/location keys that must never be treated as event slug/id. */
 export function dayRouteVenueIdentityKeys(
-  venue: Pick<DayRouteVenueItem, 'id' | 'slug'>,
+  // These read id/slug through String(value || ''), so a missing field was always
+  // tolerated at runtime; only the declared type demanded them.
+  venue: Partial<Pick<DayRouteVenueItem, 'id' | 'slug'>>,
 ): Set<string> {
   const keys = new Set<string>();
   const push = (value: string | null | undefined) => {
@@ -2243,7 +2247,9 @@ function decodeURIComponentSafe(value: string): string {
 /** True when key is the stop's venue/location identity (not a real event). */
 export function isDayRouteVenueAsEventKey(
   key: string | null | undefined,
-  venue: Pick<DayRouteVenueItem, 'id' | 'slug'>,
+  // These read id/slug through String(value || ''), so a missing field was always
+  // tolerated at runtime; only the declared type demanded them.
+  venue: Partial<Pick<DayRouteVenueItem, 'id' | 'slug'>>,
 ): boolean {
   const raw = String(key || '').trim();
   if (!raw) return false;
@@ -2270,7 +2276,9 @@ export function dayRouteEventPathSlug(url: string | null | undefined): string | 
 /** True when ticketUrl is `/events/{venueSlug}` (404 on live - venue is not an event). */
 export function isDayRouteVenueAsEventTicketUrl(
   url: string | null | undefined,
-  venue: Pick<DayRouteVenueItem, 'id' | 'slug'>,
+  // These read id/slug through String(value || ''), so a missing field was always
+  // tolerated at runtime; only the declared type demanded them.
+  venue: Partial<Pick<DayRouteVenueItem, 'id' | 'slug'>>,
 ): boolean {
   const pathSlug = dayRouteEventPathSlug(url);
   if (!pathSlug) return false;
@@ -2354,7 +2362,10 @@ function sanitizeDayRouteExternalTicketUrl(url: string): string {
 }
 
 export function resolveDayRouteTicketUrl(
-  venue: Pick<DayRouteVenueItem, 'ticketUrl' | 'eventId' | 'eventSlug' | 'title' | 'slug' | 'id' | 'href'>,
+  // href is not read here; slug/id are only needed for the venue-vs-event
+  // heuristics, so they are optional for callers holding a narrower shape.
+  venue: Pick<DayRouteVenueItem, 'ticketUrl' | 'eventId' | 'eventSlug' | 'title'> &
+    Partial<Pick<DayRouteVenueItem, 'slug' | 'id'>>,
 ): string | null {
   const stored = String(venue.ticketUrl || '').trim();
   if (stored) {

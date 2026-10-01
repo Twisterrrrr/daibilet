@@ -1401,13 +1401,10 @@ function CitySightsMustSeeList({
   city: PublicCityDto;
   editorial: boolean;
   namedPresets?: CityInfoEntry['dayRoutePresets'];
-  landingRows: Array<{
-    slug: string;
-    title: string;
-    subtitle?: string | null;
-    events?: number | null;
-    priceFrom?: number | null;
-  }>;
+  // Matches both ends: the caller passes the LandingLike[] built above, and
+  // matchSightAfficheLink below requires LandingLike (events is a number there,
+  // not an optional number | null).
+  landingRows: LandingLike[];
   categories: Array<[string, number]>;
   citySlug?: string;
   titleClass: string;
