@@ -1720,6 +1720,96 @@ legacy-донор контрактов. К основному проекту н�
 
 Коммиты остаются как есть, для истории. Новые правила применяются с 29.09.
 
+### TypeScript-долг 30.09 (продолжение): web typecheck 90 → 24
+
+Коммиты `7bff7e685` … `ab82a611e`. Все правки — снятие ложных ошибок
+компилятора; поведение не менялось, кроме одного случая (см. `transitTip`).
+Unit tests держатся на **993 / 995** все волны, два падения
+(`pickPodborkiFeatured prefers Moscow City Day`,
+`seasonal-first category must not starve hero`) существовали до правок.
+
+| Волна | Зоны | Итог |
+|---|---|---|
+| 1 | `seo-meta.test`, `ryazan-hub.test`, `LocationsCatalogMap` | 90 → 77 |
+| 2 | `DayRouteOsmMap`, `day-route` | 77 → 70 |
+| 3 | `DayRoutePanel` (union / ref / city image) | 70 → 64 |
+| 4 | `SiteFooter`, `bridges-landing` | 64 → 59 |
+| 5 | `CityPageView`, `LandingPageView`, `venue-editorial-content.test`, `HubCarouselChrome` | 59 → 48 |
+| 6 | `CityHeroStrip`, `CatalogActiveFilters`, `BlogArticleContent` | 48 → 40 |
+| 7 | `venueHref` id, `BoatWizard`, `affiche rail`, два layout | 40 → 34 |
+| 8 | `OsmMapEmbed`, `RegionOrientMap`, `catalog-date-rail`, `VenuePageView` | 34 → 26 |
+| 9 | `my-day` × 3, `day-route-from-place` | 26 → 30 → 24 |
+| 10 | пресеты линий, `structured-data`, `hot-picks`, `venue-meta` | 24 |
+
+#### Новые классы причин (к уже описанным четырём)
+
+5. **Поле передаётся, но хелпер его не пробрасывает.** В `krasnodar` и
+   `ekaterinburg` `stop()` объявлял `opts` без `transitTip`, хотя вызывающие
+   его передавали. Это единственная правка волны, меняющая runtime: подсказки
+   про Transit теперь реально доезжают до точек маршрута.
+
+6. **Тип из библиотеки богаче реальных данных.** `PublicSessionDto.title`
+   обязателен, а код писал `session.title || session.eventTitle` — второго
+   поля в DTO нет вообще. Такое «запасное» поле молча равно `undefined`.
+
+7. **`as const` схлопывает литеральный юни.** `WEEKDAY_SHORT` объявлен
+   `as const`, поэтому `let weekday` выводился как юнион семи строк и отвергал
+   присваивания `'сег'` / `'зав'`. Понадобился явный `let weekday: string`.
+
+8. **Regex-флаг новее таргета.** `apps/web` компилируется в `ES2017`, а `/s`
+   требует `es2018`. В двух файлах заменил на эквивалентный `[\s\S]` вместо
+   повышения таргета — это изменение конфига ради двух строк слишком дорогое.
+
+9. **Тип не существует в DOM.** `HTMLSectionElement` не является DOM-типом:
+   `<section>` маппится на `HTMLElement`. Рефы в двух `my-day` компонентах
+   были невалидны, потребителей у них нет.
+
+10. **React-синтетическое событие против нативного.** `MyDayPickerSheet`
+    импортирует `KeyboardEvent` из `react`, но `onKey` навешивается на
+    нативный `document`. Тип обработчика уточнён до `globalThis.KeyboardEvent`.
+    Соседний `onKeyNav` — настоящий `onKeyDown`, его тип оставлен как есть.
+
+#### Две неудачные попытки — и почему откатил
+
+Хотел снять две ошибки в `day-route-commercial.ts` и `day-route.ts`, расширив
+`Pick`-сигнатуры (`slug` / `id` / `href` через `Partial`). Счётчик не упал, а
+**вырос**:
+
+| Шаг | Ошибок |
+|---|---|
+| исходно | 26 |
+| расширил `dayRouteStopHasTicket` | 29 |
+| сузил `dayRouteDominantCitySlug` до `Pick<…, 'citySlug'>` | 26 |
+| сужение сломало `day-route.test.ts` (3 × TS2353) | 26 |
+
+Тест передавал литерал с `id` — то есть контракт `DayRouteVenueItem[]` там
+настоящий, а не случайно широкий. Обе правки откатил полностью, файлы вернулись
+к исходному состоянию (проверено через `git diff`).
+
+**Вывод:** расширение входного типа лечит симптом, а не причину. Правильное
+лечение — один общий тип входа для `dayRouteStopHasTicket` /
+`resolveDayRouteTicketUrl` / `dayRouteDominantCitySlug`, иначе ошибка
+переезжает на соседний вызов. Отложено как отдельная задача.
+
+Вторая причина, по которой счётчик может врать: правка через .NET
+`WriteAllLines` переписывает файл целиком и ломает точный поиск в редакторе
+инструмента («text not found» при визуально верном фрагменте). Для точечных
+правок в таких файлах надёжнее PowerShell-фильтр по регулярке с проверкой
+результата.
+
+#### Оставшиеся 24 ошибки
+
+`DayRoutePanel.client.tsx` (9), `day-route-commercial.ts` (1),
+`day-route-hot-picks.test.ts` (2), `day-route.test.ts` (2),
+`soft-geocode.test.ts` (2), `CityPageView.client.tsx` (1),
+`RegionVenueSeriesCard` (1), `blog-article-seo` (1),
+`catalog-query-paging.test` (1), `day-route-pdf` (1), `landing-faq-items` (1),
+`leaflet-daibilet` (1), `my-day-region-scope.test` (1),
+`buyer-ticket-mail` (1, нет зависимости `nodemailer`), `catalog-query` (1).
+
+`next.config.ts` по-прежнему использует `ignoreBuildErrors`, CI typecheck
+выключен. Отдельно требует решения `buyer-ticket-mail`: отсутствующий
+`nodemailer` — это не ошибка типов, а незакрытая зависимость.
 ### TypeScript-долг 30.09: web typecheck 90 → 70
 
 Два коммита, все правки — снятие ложных ошибок компилятора, без изменения
