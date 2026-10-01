@@ -6,7 +6,7 @@ import { JsonLdScripts } from '@/components/JsonLdScripts';
 import { SiteLayout } from '@/components/SiteLayout';
 import { cityPlacesCatalogHref } from '@/lib/catalog-url';
 import { matchDestination } from '@/lib/selected-city';
-import { INDEX_FOLLOW_ROBOTS } from '@/lib/seo-meta';
+import { INDEX_FOLLOW_ROBOTS, NOINDEX_FOLLOW_ROBOTS } from '@/lib/seo-meta';
 import { cityHref, venueHref } from '@/lib/routes';
 import { mapVenueCatalogFeedPage, VENUE_CATALOG_PAGE_SIZE } from '@/lib/venue-catalog-feed';
 import { getCachedDestinations, getCachedVenuesCatalog } from '@/server/cached-public-surfaces';
@@ -33,12 +33,18 @@ function readPage(value?: string | string[]) {
 export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
   const city = await resolveCity((await params).city);
   const page = readPage((await searchParams).page);
-  const path = cityPlacesCatalogHref(city.slug || city.sourceSlug || '', page);
+  const slug = city.slug || city.sourceSlug || '';
+  const path = cityPlacesCatalogHref(slug, page);
+  // Page 1 is the indexable document and keeps a self-canonical. Deeper pages
+  // stay crawlable so Google can walk the pagination links, but must not be
+  // indexed as separate documents: they are not in the sitemap and would
+  // compete with page 1 for the same city listing.
+  const isFirstPage = page <= 1;
   return {
     title: `Места и площадки: ${city.name}${page > 1 ? ` — страница ${page}` : ''}`,
     description: `Музеи, театры, причалы и другие места в городе ${city.name}. Полный список площадок и локаций с переходом на страницы мест.`,
-    alternates: { canonical: `https://daibilet.ru${path}` },
-    robots: INDEX_FOLLOW_ROBOTS,
+    alternates: { canonical: `https://daibilet.ru${isFirstPage ? path : cityPlacesCatalogHref(slug, 1)}` },
+    robots: isFirstPage ? INDEX_FOLLOW_ROBOTS : NOINDEX_FOLLOW_ROBOTS,
   };
 }
 

@@ -56,6 +56,11 @@ export const BLOG_HUB_DESCRIPTION =
 
 /** Default indexable robots for public hubs (home/blog/places/events). */
 export const INDEX_FOLLOW_ROBOTS = { index: true, follow: true } as const;
+/**
+ * For paginated surfaces that must stay crawlable (so Google can follow the
+ * pagination links) without being indexed as separate documents.
+ */
+export const NOINDEX_FOLLOW_ROBOTS = { index: false, follow: true } as const;
 
 type DestinationLike = {
   name: string;
