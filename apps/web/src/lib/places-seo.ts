@@ -41,6 +41,15 @@ export function buildPlacesDisplayHeading(
   return city ? `Места ${cityToGenitive(city)}` : 'Места';
 }
 
+/**
+ * Pagination page number; anything not an integer above 1 is treated as page 1,
+ * mirroring readPage() in app/places/page.tsx and app/places/c/[city]/page.tsx.
+ */
+export function normalizePlacesPage(raw?: string | null): number {
+  const parsed = Number(raw);
+  return Number.isInteger(parsed) && parsed > 1 ? Math.min(parsed, 1000) : 1;
+}
+
 /** Sitemap listing is only `/places` - do not invent `?city=` / `?family=` / `?category=` facets. */
 export const PLACES_HUB_PATH = '/places';
 
@@ -120,6 +129,9 @@ export function buildPlacesListingSeo(input: PlacesListingSeoInput): {
     // /places/location. Previously every ?family= view canonicalised to /places,
     // so three distinct hub contents shared one URL.
     canonicalPath: family ? `${PLACES_HUB_PATH}/${family}` : PLACES_HUB_PATH,
-    indexable: true,
+    // Page 1 is the document; deeper pages point canonical at page 1 and must not
+    // also claim indexability. Google follows canonical over robots, but leaving
+    // the two signals in disagreement is what this cleanup exists to remove.
+    indexable: normalizePlacesPage(input.page) <= 1,
   };
 }

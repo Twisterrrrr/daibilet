@@ -12,7 +12,14 @@ import {
   normalizePlacesFamily,
 } from '@/lib/places-seo';
 import { isAllCitiesQuery, matchDestination } from '@/lib/selected-city';
-import { INDEX_FOLLOW_ROBOTS, buildShareMetadata, canonicalHref, pageTitle } from '@/lib/seo-meta';
+import {
+  INDEX_FOLLOW_ROBOTS,
+  NOINDEX_FOLLOW_ROBOTS,
+  buildShareMetadata,
+  canonicalHref,
+  pageTitle,
+} from '@/lib/seo-meta';
+
 import { withSoftTimeout } from '@/lib/soft-timeout';
 import {
   mapVenueCatalogFeedPage,
@@ -87,7 +94,7 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
     title: cleanTitle,
     description: seo.description,
     alternates: { canonical },
-    robots: INDEX_FOLLOW_ROBOTS,
+    robots: seo.indexable ? INDEX_FOLLOW_ROBOTS : NOINDEX_FOLLOW_ROBOTS,
     ...buildShareMetadata({
       title: `${cleanTitle} | Дайбилет`,
       description: seo.description,

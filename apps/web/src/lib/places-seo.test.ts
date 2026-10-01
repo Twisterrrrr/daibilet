@@ -74,6 +74,19 @@ test('places listing canonical: hub without family, facet path with family', () 
   const location = buildPlacesListingSeo({ family: 'location' });
   assert.equal(location.canonicalPath, '/places/location');
 
+  // Pagination: page 1 is the indexable document, deeper pages are not, while
+  // the canonical keeps pointing at page 1.
+  const deep = buildPlacesListingSeo({ family: 'institution', page: '3' });
+  assert.equal(deep.canonicalPath, '/places/institution');
+  assert.equal(deep.indexable, false);
+
+  const firstPage = buildPlacesListingSeo({ family: 'location', page: '1' });
+  assert.equal(firstPage.canonicalPath, '/places/location');
+  assert.equal(firstPage.indexable, true);
+
+  const junk = buildPlacesListingSeo({ family: 'institution', page: 'not-a-page' });
+  assert.equal(junk.indexable, true, 'garbage page numbers fall back to page 1');
+
 
   const category = buildPlacesListingSeo({
     category: 'museums',
