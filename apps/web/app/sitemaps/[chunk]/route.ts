@@ -29,8 +29,10 @@ export async function GET(
     return new Response(renderUrlsetXml(entries), {
       headers: SITEMAP_RESPONSE_HEADERS,
     });
-  } catch {
-    return new Response(renderUrlsetXml([]), {
+  } catch (error) {
+    console.error('[sitemap] build failed:', error);
+    return new Response('Sitemap temporarily unavailable', {
+      status: 503,
       headers: SITEMAP_RESPONSE_HEADERS,
     });
   }

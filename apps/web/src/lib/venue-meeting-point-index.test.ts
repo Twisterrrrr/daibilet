@@ -79,6 +79,20 @@ test('explicit noindex still wins and thin venues stay out', () => {
   assert.equal(evaluateVenueIndexability({ events: 0, type: 'meeting_point' }).reason, 'non_venue_type');
 });
 
+test('hidden venue stays out while candidate and published statuses retain the existing rule', () => {
+  assert.equal(
+    evaluateVenueIndexability({ events: 5, type: 'museum', pageStatus: ' hidden ' }).reason,
+    'hidden_page',
+  );
+  for (const pageStatus of ['NONE', 'CANDIDATE', 'PUBLISHED']) {
+    assert.equal(
+      evaluateVenueIndexability({ events: 5, type: 'museum', pageStatus }).indexable,
+      true,
+      pageStatus,
+    );
+  }
+});
+
 test('the excluded set stays small and explicit', () => {
   assert.deepEqual([...NON_INDEXABLE_VENUE_TYPES].sort(), ['meeting_point', 'online', 'other']);
 });

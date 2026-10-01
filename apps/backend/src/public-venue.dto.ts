@@ -46,12 +46,14 @@ export function clearPublicVenueDtoCache(): void {
 function scheduleVenuesListRebuild(
   cacheKey: string,
   searchParams: URLSearchParams,
+  forceRefresh = false,
 ): Promise<PublicVenuesDto> {
-  const inflight = listBuilds.get(cacheKey);
+  const buildKey = forceRefresh ? `${cacheKey}:fresh` : cacheKey;
+  const inflight = listBuilds.get(buildKey);
   if (inflight) return inflight;
 
   const build = (async () => {
-    const payload = (await buildPublicVenuesCatalog(getLegacyDb(), searchParams)) as PublicVenuesDto;
+    const payload = (await buildPublicVenuesCatalog(getLegacyDb(), searchParams, { freshHub: forceRefresh })) as PublicVenuesDto;
     const builtAt = Date.now();
     listCache.set(cacheKey, {
       expiresAt: builtAt + PUBLIC_VENUE_CACHE_MS,
@@ -60,10 +62,10 @@ function scheduleVenuesListRebuild(
     });
     return payload;
   })().finally(() => {
-    if (listBuilds.get(cacheKey) === build) listBuilds.delete(cacheKey);
+    if (listBuilds.get(buildKey) === build) listBuilds.delete(buildKey);
   });
 
-  listBuilds.set(cacheKey, build);
+  listBuilds.set(buildKey, build);
   return build;
 }
 
@@ -79,7 +81,7 @@ export async function buildPublicVenuesDto(
 
   if (forceRefresh) {
     listCache.delete(cacheKey);
-    return scheduleVenuesListRebuild(cacheKey, searchParams);
+    return scheduleVenuesListRebuild(cacheKey, searchParams, true);
   }
 
   // Forever soft-SWR: any previous payload beats cold hub rebuild on /locations|/venues.
