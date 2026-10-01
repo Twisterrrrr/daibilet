@@ -117,11 +117,19 @@ test('groupPodborkiByCategory: Moscow City Day lifts seasonal to front', () => {
 });
 
 test('pickPodborkiFeatured prefers Moscow City Day over museums and river', () => {
+  // Moscow City Day wins only while in season (August/September, Europe/Moscow). This
+  // relied on the default `now = new Date()`, so it passed twice a year and failed the
+  // rest - it broke on 2026-10-01. Pinning the date matches the off-season test below
+  // and keeps the seasonal pin under test instead of the calendar.
+  const inSeason = new Date('2026-09-14T12:00:00+03:00');
+  const offSeason = new Date(
+    '2026-10-14T12:00:00+03:00',
+  );
   const featured = pickPodborkiFeatured([
     { slug: 'moscow-museums', title: 'Музеи', events: 61, layoutVariant: 'HERO_FEATURED' },
     { slug: 'river-cruises', title: 'Речные', events: 80 },
     { slug: 'moscow-city-day', title: 'День города в Москве', events: 11 },
-  ]);
+  ], inSeason);
   assert.equal(featured?.slug, 'moscow-city-day');
   const trending = pickPodborkiTrending(
     [
@@ -136,7 +144,19 @@ test('pickPodborkiFeatured prefers Moscow City Day over museums and river', () =
     5,
   );
   assert.equal(trending.some((item) => item.slug === 'moscow-museums'), false);
+  assert.equal(trending.some((item) => item.slug === 'moscow-museums'), false);
   assert.ok(trending.length >= 3 && trending.length <= 5);
+
+  // Out of season the pin must not fire and the hero falls back to event count.
+  const offSeasonItems = pickPodborkiFeatured(
+    [
+      { slug: 'moscow-museums', title: 'Музеи', events: 61 },
+      { slug: 'river-cruises', title: 'Речные', events: 80 },
+      { slug: 'moscow-city-day', title: 'День города в Москве', events: 11 },
+    ],
+    offSeason,
+  );
+  assert.equal(offSeasonItems?.slug, 'river-cruises');
 });
 
 test('seasonal-first category must not starve hero: full city pool still yields multi trend', () => {
@@ -154,7 +174,9 @@ test('seasonal-first category must not starve hero: full city pool still yields 
   const seasonalOnly = cityItems.filter((item) => item.categorySlug === 'seasonal');
   assert.equal(pickPodborkiTrending(seasonalOnly, 'moscow-city-day', 5).length, 1);
   // Fix: hero from full city catalog.
-  const featured = pickPodborkiFeatured(cityItems);
+  // Pinned in-season date: the seasonal pin only fires in August/September, so the
+  // default `now` made this fail from 2026-10-01 onward.
+  const featured = pickPodborkiFeatured(cityItems, new Date('2026-09-14T12:00:00+03:00'));
   const trending = pickPodborkiTrending(cityItems, featured?.slug, 5);
   assert.equal(featured?.slug, 'moscow-city-day');
   assert.ok(trending.length >= 3);
