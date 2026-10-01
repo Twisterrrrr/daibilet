@@ -152,6 +152,7 @@ export async function generateVenueDetailMetadata(slug: string): Promise<Metadat
     events: payload.stats?.events ?? venue.events ?? 0,
     isIndexable: venue.isIndexable,
     type: venue.type,
+    pageStatus: venue.pageStatus,
   });
   const { core: title, full: shareTitle } = resolveVenueSeoTitle(venue);
   const description =

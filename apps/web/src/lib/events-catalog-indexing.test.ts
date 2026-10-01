@@ -116,6 +116,18 @@ test('sitemap invariant rejects a noindex events facet', () => {
   );
 });
 
+test('sitemap invariant rejects a hidden venue and missing venue source', () => {
+  const url = 'https://daibilet.ru/venues/closed-hall';
+  const entry = [{ url }];
+  const venue = {
+    id: 'closed-hall', slug: 'closed-hall', name: 'Closed hall', city: 'Москва',
+    type: 'museum', events: 5, categories: {}, pageStatus: 'HIDDEN',
+  };
+  assert.throws(() => assertSitemapNoindexInvariant(entry, new Map([[url, venue]])), /noindex venue URL/);
+  assert.throws(() => assertSitemapNoindexInvariant(entry, new Map()), /noindex venue URL/);
+  assert.doesNotThrow(() => assertSitemapNoindexInvariant(entry, new Map([[url, { ...venue, pageStatus: 'CANDIDATE' }]])));
+});
+
 test('excludeLanding values are stable and aliases do not duplicate canonical keys', () => {
   const normalized = normalizeEventsCatalogQuery(
     new URLSearchParams('excludeLanding=standup,river-cruises,standup&from=2026-09-20&dateFrom=2020-01-01'),

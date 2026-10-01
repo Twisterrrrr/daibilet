@@ -1236,12 +1236,12 @@ export async function publicVenueHubRows(db, limit = 500, options = {}) {
   const cacheKey = `${baseKey}${shell ? ':shell' : ''}`;
   const cached = publicVenueHubCaches.get(cacheKey) || null;
 
-  if (cached?.rows?.length && cached.expiresAt > now) {
+  if (!options.forceFresh && cached?.rows?.length && cached.expiresAt > now) {
     return cached.rows;
   }
 
   // Prefer a warm FULL hub over building a shell (already has accurate event≠slots counts).
-  if (shell) {
+  if (shell && !options.forceFresh) {
     const full = publicVenueHubCaches.get(baseKey) || null;
     if (full?.rows?.length && full.expiresAt > now) {
       return full.rows;
@@ -1252,7 +1252,7 @@ export async function publicVenueHubRows(db, limit = 500, options = {}) {
   // Critical for /venues «Показать ещё»: Next ISR can paint page-1 while API hub is empty after
   // restart - but once shell/full exists (even soft-expired), page-2 must not wait on lean SQL.
   const soft = findSoftVenueHubRows(take, options);
-  if (soft?.cached?.rows?.length) {
+  if (!options.forceFresh && soft?.cached?.rows?.length) {
     void schedulePublicVenueHubRebuild(cacheKey, take, options);
     return soft.cached.rows;
   }
@@ -2251,7 +2251,7 @@ function hasValidVenueCatalogCoords(venue) {
   return Number.isFinite(lat) && Number.isFinite(lng) && !(lat === 0 && lng === 0);
 }
 
-export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchParams()) {
+export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchParams(), options = {}) {
   const mode = String(searchParams.get('mode') || 'list').trim().toLowerCase();
   const isPins = mode === 'pins';
   const hasEventsRaw = String(
@@ -2409,6 +2409,7 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
   const rows = await publicVenueHubRows(db, VENUE_CATALOG_HUB_MAX, {
     requireEvents: false,
     shell: shellCounts,
+    forceFresh: options.freshHub === true,
   });
   const fullWarm = publicVenueHubCaches.get(`${VENUE_CATALOG_HUB_MAX}:all`);
   // Warm full hub reused for shell request → counts already accurate (event≠slots).

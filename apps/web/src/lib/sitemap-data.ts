@@ -3,6 +3,7 @@ import {
   buildPublicEventFreshnessMap,
   buildPublicVenuesDto,
 } from '@daibilet/backend/public-read';
+import type { PublicVenueDto } from '@daibilet/contracts/public';
 
 import { evaluateCityIndexability, evaluateRegionIndexability, evaluateVenueIndexability } from '@/lib/hub-indexability';
 import {
@@ -51,6 +52,28 @@ export type SitemapEntry = {
 
 const MAX_EVENTS = 45_000;
 const MAX_VENUES = 10_000;
+const VENUE_SITEMAP_SNAPSHOT_MS = 5 * 60 * 1000;
+let venueSitemapSnapshot: {
+  expiresAt: number;
+  payload: Awaited<ReturnType<typeof buildPublicVenuesDto>>;
+} | null = null;
+let venueSitemapRebuild: Promise<Awaited<ReturnType<typeof buildPublicVenuesDto>>> | null = null;
+
+/** Sitemap waits for one fresh rebuild per TTL; catalog pages keep their existing SWR behavior. */
+async function freshVenuesForSitemap() {
+  if (venueSitemapSnapshot && venueSitemapSnapshot.expiresAt > Date.now()) {
+    return venueSitemapSnapshot.payload;
+  }
+  if (!venueSitemapRebuild) {
+    venueSitemapRebuild = buildPublicVenuesDto(new URLSearchParams(`limit=${MAX_VENUES}`), true)
+      .then((payload) => {
+        venueSitemapSnapshot = { payload, expiresAt: Date.now() + VENUE_SITEMAP_SNAPSHOT_MS };
+        return payload;
+      })
+      .finally(() => { venueSitemapRebuild = null; });
+  }
+  return venueSitemapRebuild;
+}
 
 /** Priority listing cities + SEO pilot cities (KGD/SPB) - без дублей. */
 function listingSitemapCitySlugs(): string[] {
@@ -249,18 +272,20 @@ export async function buildCitiesSitemapEntries(now = new Date()): Promise<Sitem
 }
 
 export async function buildVenuesSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
-  const venuesPayload = await buildPublicVenuesDto(new URLSearchParams(`limit=${MAX_VENUES}`));
-  return (venuesPayload?.venues || [])
+  const venuesPayload = await freshVenuesForSitemap();
+  const eligible = (venuesPayload?.venues || [])
     .filter((venue) => {
       if (!venue.slug) return false;
       return evaluateVenueIndexability({
         events: venue.events,
         isIndexable: venue.isIndexable,
         type: venue.type,
+        pageStatus: venue.pageStatus,
       }).indexable;
     })
-    .slice(0, MAX_VENUES)
-    .map((venue) => {
+    .slice(0, MAX_VENUES);
+  const sources = new Map<string, PublicVenueDto>();
+  const entries = eligible.map((venue) => {
       const path =
         venue.canonicalPath ||
         venueHref({
@@ -269,8 +294,12 @@ export async function buildVenuesSitemapEntries(now = new Date()): Promise<Sitem
           name: venue.name,
           type: venue.type,
         });
-      return entry(path, now, 'weekly', 0.6);
-    });
+      const result = entry(path, now, 'weekly', 0.6);
+      sources.set(result.url, venue);
+      return result;
+  });
+  assertSitemapNoindexInvariant(entries, sources);
+  return entries;
 }
 
 export async function buildLandingsSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
@@ -382,12 +411,32 @@ export async function buildSitemapChunkEntries(chunk: SitemapChunk): Promise<Sit
   return entries;
 }
 
-export function assertSitemapNoindexInvariant(entries: readonly SitemapEntry[]): void {
+export function assertSitemapNoindexInvariant(
+  entries: readonly SitemapEntry[],
+  venueSources?: ReadonlyMap<string, PublicVenueDto>,
+): void {
   const conflicts = entries
     .map((item) => item.url)
     .filter((url) => !isEventsCatalogSitemapEligibleUrl(url));
   if (conflicts.length) {
     throw new Error(`Sitemap contains noindex events catalog URL: ${conflicts.join(', ')}`);
+  }
+  if (venueSources) {
+    const venueConflicts = entries
+      .filter((item) => /\/(venues|locations)\//.test(new URL(item.url).pathname))
+      .filter((item) => {
+        const venue = venueSources.get(item.url);
+        return !venue || !evaluateVenueIndexability({
+          events: venue.events,
+          isIndexable: venue.isIndexable,
+          type: venue.type,
+          pageStatus: venue.pageStatus,
+        }).indexable;
+      })
+      .map((item) => item.url);
+    if (venueConflicts.length) {
+      throw new Error(`Sitemap contains noindex venue URL: ${venueConflicts.join(', ')}`);
+    }
   }
 }
 
