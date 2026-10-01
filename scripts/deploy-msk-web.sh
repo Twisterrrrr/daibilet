@@ -2,6 +2,7 @@
 # Run on MSK with the CI artifact; build remains in the workflow.
 # Usage: ARTIFACT=... EXPECTED_BUILD_ID_FILE=... bash deploy-msk-web.sh <sha> <expected_ref>
 set -euo pipefail
+export CI=true  # pnpm refuses to touch node_modules without CI or a TTY
 DEPLOY_SHA="${1:?usage: deploy-msk-web.sh <sha> <expected_ref>}"
 EXPECTED_REF="${2:?expected_ref required}"
 [[ "$DEPLOY_SHA" =~ ^[0-9a-f]{40}$ ]] || { echo 'ERROR: full SHA required'; exit 1; }
