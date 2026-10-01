@@ -201,7 +201,21 @@ export async function buildEventsSitemapEntries(now = new Date()): Promise<Sitem
   // Real per-event `updatedAt`, keyed by the public (transliterated) slug. Without
   // it every entry falls back to the build timestamp, so all ~4k URLs claim to
   // change on every rebuild and crawlers stop trusting the field.
-  const freshness = await buildPublicEventFreshnessMap().catch(() => new Map());
+  //
+  // The catch must stay loud. It silently returned an empty map once, which made
+  // "the query failed" and "there is no data" indistinguishable and cost a full
+  // diagnosis cycle on 30.09. An empty map is a valid outcome (zero events with
+  // a usable updatedAt); a thrown error is not, so log it and keep going.
+  const freshness = await buildPublicEventFreshnessMap().catch((error: unknown) => {
+    console.error(
+      '[sitemap] buildPublicEventFreshnessMap failed; event lastmod falls back to build time',
+      error,
+    );
+    return new Map<string, Date>();
+  });
+  if (freshness.size === 0) {
+    console.warn('[sitemap] buildPublicEventFreshnessMap returned 0 rows; all event lastmod are build time');
+  }
 
   for (let offset = 0; offset < MAX_EVENTS; offset += limit) {
     const page = await getCachedCatalog(parseCatalogPageQuery({ limit: String(limit), offset: String(offset) }));
