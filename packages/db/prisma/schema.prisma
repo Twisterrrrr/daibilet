@@ -2160,3 +2160,20 @@ model DayRouteShare {
   @@index([titleSlug])
   @@map("day_route_shares")
 }
+
+/// Catalog-owned durable delivery queue; finance order remains the payment source of truth.
+model BuyerTicketEmailDelivery {
+  id            String    @id @default(cuid())
+  publicCode    String    @unique
+  email         String
+  status        String    @default("PENDING")
+  attempts      Int       @default(0)
+  nextAttemptAt DateTime  @default(now())
+  lockedAt      DateTime?
+  sentAt        DateTime?
+  lastError     String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([status, nextAttemptAt])
+}

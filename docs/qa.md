@@ -1,5 +1,13 @@
 # qa.md — открытые вопросы
 
+## 2026-10-02 — Stage 0 ticket DTO and delivery contract (code, not deployed)
+
+- `publicCode` is the order code. `ticketNumber`/`ticketNumbers` are separate issued numbers (`TKT-…`); the finance branch `codex/stage0-r12` adds one durable `IssuedTicket` row per quantity unit and keeps the JSON mirror for compatibility.
+- The public order DTO currently includes buyer contact, venue title/address/coordinates, validity mode/end, items and totals, paid/confirmed timestamps, ticket numbers, and `supplierSupportPhone`. The catalog ticket page renders the order code, ticket number, validity, venue details and support phone when supplied.
+- Internal QR payload is the absolute `/checkout/ticket/{publicCode}` URL. A venue can open it and compare the displayed number with the printed ticket; a dedicated scanner API and redemption state are still outside Stage 0. Imported/widget QR keeps the partner code as-is.
+- HTML ticket plus browser print/Save as PDF is the Stage 0 output. Generated PDF attachment remains optional.
+- Catalog email delivery has a durable queue on branch `codex/stage0-r13-mail`: only a confirmed order is mailed, SMTP failures retry with backoff, and an operator can request a resend by public code. Deployment and a paid-order retry smoke remain open.
+
 **Как читать (2026-08-09):** фокус для owner и агентов - две секции ниже.
 - **Открыто (техника)** - что реально ждёт кода / smoke / infra; здесь приоритет ответов и следующих шагов.
 - **Отложено (продукт)** - продуктовые развилки **не удалены**, помечены `DEFERRED`; не блокируют текущий tech-трек, вернуться можно позже.
