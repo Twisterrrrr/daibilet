@@ -2160,34 +2160,3 @@ model DayRouteShare {
   @@index([titleSlug])
   @@map("day_route_shares")
 }
-
-/// Purchase funnel events.
-///
-/// Nothing in the schema recorded what a visitor did before an order existed:
-/// only finished orders were stored, so a visitor who opened a widget and left
-/// was invisible. That made the drop-off at the vendor widget impossible to
-/// confirm or deny - it could only be guessed at.
-///
-/// `widgetSession` is recorded from our side only when the vendor reports it
-/// back; seat selection itself happens inside the Ticketscloud / Teplohod
-/// widget, which we cannot instrument. Treat its absence as a known limit, not
-/// as zero sessions.
-model FunnelEvent {
-  id         String   @id @default(cuid())
-  /// event_view | widget_open | widget_session | order_created
-  kind       String
-  /// Event slug, venue slug, or ExternalOrder id depending on kind.
-  ref        String?
-  /// tc | tep
-  provider   String?
-  /// Session id minted in the browser so a funnel can be stitched per visitor.
-  visitorId  String?
-  /// Created client-side, passed through so server clock skew does not matter.
-  occurredAt DateTime @default(now())
-  createdAt  DateTime @default(now())
-
-  @@index([kind, occurredAt])
-  @@index([ref])
-  @@index([visitorId])
-  @@map("FunnelEvent")
-}
