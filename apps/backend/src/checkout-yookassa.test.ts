@@ -902,7 +902,7 @@ test('reconcile expires local YooKassa order without provider id and releases ca
       },
     });
 
-    const first = await reconcileExpiredYooKassaCheckouts({ now, dryRun: false, limit: 10, graceMinutes: 0, orderId });
+    const first = await reconcileExpiredYooKassaCheckouts({ now: new Date(), dryRun: false, limit: 10, graceMinutes: 0, orderId });
     const firstOrder = first.orders.find((order) => order.orderId === orderId);
     assert.ok(firstOrder);
     assert.equal(firstOrder.action, 'LOCAL_EXPIRED_WITHOUT_PROVIDER_PAYMENT');
@@ -916,7 +916,7 @@ test('reconcile expires local YooKassa order without provider id and releases ca
     assert.equal(afterFirst.session?.ticketsVacant, 10);
     assert.equal(afterFirst.session?.capacitySold, 0);
 
-    const second = await reconcileExpiredYooKassaCheckouts({ now, dryRun: false, limit: 10, graceMinutes: 0, orderId });
+    const second = await reconcileExpiredYooKassaCheckouts({ now: new Date(), dryRun: false, limit: 10, graceMinutes: 0, orderId });
     assert.equal(second.orders.some((order) => order.orderId === orderId), false);
     const afterSecond = await loadReconcileInvariantRows(orderId, itemId, paymentId, fulfillmentId, eventId, sessionId);
     assert.equal(afterSecond.event?.ticketsVacant, 10);
