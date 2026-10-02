@@ -179,8 +179,13 @@ export async function POST(request: Request) {
   // Queue persists while payment is pending; the worker sends only after finance confirms payment.
   const buyerEmail = order.email || String(body.buyer?.email || '');
   if (buyerEmail.includes('@')) {
-    await enqueueBuyerTicketEmail(result.publicCode, buyerEmail);
-    emailReason = 'queued';
+    try {
+      await enqueueBuyerTicketEmail(result.publicCode, buyerEmail);
+      emailReason = 'queued';
+    } catch {
+      console.error(`[buyer-ticket-delivery] enqueue failed for order ${result.publicCode}`);
+      emailReason = 'queue_unavailable';
+    }
   } else {
     emailReason = 'email_missing';
   }

@@ -8,6 +8,9 @@ SMTP or finance lookup failures use exponential backoff, capped at six hours.
 `SENT`, `RETRY`, `PENDING`, and `CANCELLED` are visible in the table and worker
 logs (`[buyer-ticket-delivery] code=… status=… attempts=…`). The queue does not
 contain SMTP credentials.
+If catalog DB enqueue fails after finance creates a payment, checkout still
+returns the payment link and logs `enqueue failed for order CODE`; the operator
+must request a manual resend after the database is restored.
 
 After the catalog DB migration is applied, install the supplied
 `deploy/systemd/daibilet-buyer-ticket-mail.service` and `.timer` on MSK `.184`
