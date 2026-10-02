@@ -18,11 +18,14 @@ async function main() {
   const limit = readNumericFlag('limit', 50);
   const graceMinutes = readNumericFlag('grace-minutes', 5);
   const orderId = readStringFlag('order-id');
+  const publicCode = readStringFlag('public-code');
+  if (orderId && publicCode) throw new Error('Use either --order-id or --public-code, not both.');
   const result = await reconcileExpiredYooKassaCheckouts({
     dryRun,
     limit,
     graceMinutes,
     orderId,
+    publicCode,
   });
   if (dryRun) {
     console.error('DRY RUN: counters describe planned reconcile actions. Use --apply to mutate checkout state.');

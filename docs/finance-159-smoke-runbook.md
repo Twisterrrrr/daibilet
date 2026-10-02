@@ -149,6 +149,8 @@ cd /opt/daibilet-finance/app
 COREPACK_ENABLE_STRICT=0 PNPM_CONFIG_ENGINE_STRICT=false corepack pnpm backend:checkout:yookassa:reconcile -- --limit=20 --grace-minutes=10
 ```
 
+Для одного заказа используйте `--public-code=4717674` (или внутренний `--order-id`, но не оба). Скрипт требует finance `.env` через `EnvironmentFile` таймера или через безопасную локальную загрузку оператором; не выводите значения переменных в логи. Сначала dry-run, затем тот же вызов с `--apply`. После применения проверьте `/api/public/checkout/orders/{publicCode}` и число билетов. Повторный запуск должен оставить статус и билеты прежними. При `FAILED` разберите причину, не повторяйте платеж покупателя вслепую.
+
 Применить изменения:
 
 ```bash
@@ -171,7 +173,7 @@ Unit file is scoped to finance `.159`: `WorkingDirectory=/opt/daibilet-finance/a
 Ожидания:
 
 - timer запускается раз в 5 минут;
-- `--grace-minutes=10` не трогает свежие платежи;
+- `--grace-minutes=10` не опрашивает платежи моложе 10 минут;
 - `LOCAL_EXPIRED_WITHOUT_PROVIDER_PAYMENT` безопасно отменяет локальный резерв и возвращает capacity;
-- при provider id reconcile читает YooKassa API и применяет terminal status как webhook;
+- при provider id reconcile читает YooKassa API даже до истечения локального заказа и применяет terminal status как webhook; ожидающий платеж остаётся PENDING;
 - exit code `2` означает, что есть failed orders и нужен разбор `journalctl -u daibilet-finance-yookassa-reconcile.service`.

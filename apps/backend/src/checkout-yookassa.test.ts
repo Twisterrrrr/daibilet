@@ -256,6 +256,12 @@ test('classifies YooKassa reconcile actions without mutating state', () => {
     hasLocalPayment: true,
     localExpired: false,
     providerPaymentId: 'pay_1',
+    remoteStatus: 'succeeded',
+  }), 'REMOTE_SUCCEEDED');
+  assert.equal(classifyYooKassaReconcileAction({
+    hasLocalPayment: true,
+    localExpired: false,
+    providerPaymentId: null,
   }), 'SKIPPED_NOT_EXPIRED');
   assert.equal(classifyYooKassaReconcileAction({
     hasLocalPayment: true,

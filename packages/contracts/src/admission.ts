@@ -121,6 +121,7 @@ export interface PublicAdmissionSupplierDto {
   status: string;
   integrationMode: string;
   defaultCatalogMode: string;
+  supplierSupportPhone: string | null;
 }
 
 export interface PublicAdmissionVenueDto {

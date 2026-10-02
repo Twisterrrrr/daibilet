@@ -48,6 +48,7 @@ const publicAdmissionProductSelect = {
       status: true,
       integrationMode: true,
       defaultCatalogMode: true,
+      phone: true,
     },
   },
   offers: {
@@ -72,6 +73,7 @@ const publicSupplierSelect = {
   status: true,
   integrationMode: true,
   defaultCatalogMode: true,
+  phone: true,
 } satisfies Prisma.SupplierSelect;
 
 const publicVenueSelect = {
@@ -314,6 +316,7 @@ function mapPublicSupplierDto(row: PublicSupplierRow | null): PublicAdmissionPro
     status: row ? String(row.status) : '',
     integrationMode: row ? String(row.integrationMode) : '',
     defaultCatalogMode: row ? String(row.defaultCatalogMode) : '',
+    supplierSupportPhone: row?.phone || null,
   };
 }
 

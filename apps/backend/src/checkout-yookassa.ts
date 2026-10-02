@@ -771,7 +771,7 @@ export function classifyYooKassaReconcileAction(input: {
 }): YooKassaReconcileAction {
   if (input.failed) return 'FAILED';
   if (!input.hasLocalPayment) return 'SKIPPED_NO_PAYMENT';
-  if (!input.localExpired) return 'SKIPPED_NOT_EXPIRED';
+  if (!input.localExpired && !input.providerPaymentId) return 'SKIPPED_NOT_EXPIRED';
   if (!input.providerPaymentId) return 'LOCAL_EXPIRED_WITHOUT_PROVIDER_PAYMENT';
   switch (input.remoteStatus) {
     case 'succeeded':
@@ -794,6 +794,7 @@ export async function reconcileExpiredYooKassaCheckouts(
     dryRun?: boolean;
     graceMinutes?: number;
     orderId?: string | null;
+    publicCode?: string | null;
     config?: YooKassaRuntimeConfig;
     fetchImpl?: FetchLike;
   } = {},
@@ -802,13 +803,14 @@ export async function reconcileExpiredYooKassaCheckouts(
   const dryRun = options.dryRun !== false;
   const limit = normalizeReconcileLimit(options.limit);
   const graceMinutes = Math.max(0, Math.trunc(options.graceMinutes ?? 5));
-  const expiredBefore = new Date(now.getTime() - graceMinutes * 60 * 1000);
+  const createdBefore = new Date(now.getTime() - graceMinutes * 60 * 1000);
   const config = options.config || readYooKassaRuntimeConfig();
   const candidates = await prisma.checkoutOrder.findMany({
     where: {
       ...(options.orderId ? { id: options.orderId } : {}),
+      ...(options.publicCode ? { publicCode: options.publicCode } : {}),
       status: 'PENDING_PAYMENT',
-      expiresAt: { lte: expiredBefore },
+      createdAt: { lte: createdBefore },
       payments: {
         some: {
           provider: 'YOOKASSA',
@@ -816,7 +818,7 @@ export async function reconcileExpiredYooKassaCheckouts(
         },
       },
     },
-    orderBy: { expiresAt: 'asc' },
+    orderBy: { createdAt: 'asc' },
     take: limit,
     select: yookassaReconcileCandidateSelect,
   });
@@ -937,7 +939,7 @@ async function reconcileYooKassaCandidate(
       reason: 'No local YooKassa payment row is attached to the pending order.',
     };
   }
-  if (!localExpired) {
+  if (!localExpired && !localPayment.providerPaymentId) {
     return {
       ...base,
       action: classifyYooKassaReconcileAction({
