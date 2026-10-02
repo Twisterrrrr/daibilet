@@ -41,6 +41,7 @@ function toneClass(tone: Tone) {
 
 export function AdminDashboardView({ data }: { data: AdminDashboardPageData }) {
   const { metrics, sources, orders, errors, generatedAt, apiBase } = data;
+  const degraded = errors.length > 0;
   const launch = metrics.launch;
   const events = launch.groupedEvents || metrics.events;
   const liveSources = sources.filter((source) => source.status === 'live').length;
@@ -86,8 +87,18 @@ export function AdminDashboardView({ data }: { data: AdminDashboardPageData }) {
       </header>
 
       {errors.length > 0 ? (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          <p className="font-medium">Часть live-данных недоступна</p>
+        <div
+          role="alert"
+          data-testid="admin-dashboard-degraded"
+          className="rounded-lg border-2 border-red-400 bg-red-50 px-4 py-3 text-sm text-red-900"
+        >
+          <p className="text-base font-semibold">
+            Часть live-данных недоступна — показатели ниже недостоверны
+          </p>
+          <p className="mt-0.5">
+            Нули означают «нет данных», а не «нет проблем». Проверьте доступность API и
+            секреты в env.
+          </p>
           <ul className="mt-1 list-disc pl-5 text-xs">
             {errors.map((error) => (
               <li key={error}>{error}</li>
@@ -102,10 +113,10 @@ export function AdminDashboardView({ data }: { data: AdminDashboardPageData }) {
       ) : null}
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <TopMetric label="Можно продавать" value={launch.readyForSales} tone="success" href={'/admin/events'} />
-        <TopMetric label="Карточек событий" value={events} tone="default" href={'/admin/events'} />
-        <TopMetric label="Активных источников" value={liveSources} tone="success" href={'/admin/sources'} />
-        <TopMetric label="Площадок" value={venues} tone="info" href={'/admin/venues'} />
+        <TopMetric label="Можно продавать" value={launch.readyForSales} tone="success" href={'/admin/events'} unavailable={degraded} />
+        <TopMetric label="Карточек событий" value={events} tone="default" href={'/admin/events'} unavailable={degraded} />
+        <TopMetric label="Активных источников" value={liveSources} tone="success" href={'/admin/sources'} unavailable={degraded} />
+        <TopMetric label="Площадок" value={venues} tone="info" href={'/admin/venues'} unavailable={degraded} />
       </div>
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
@@ -207,18 +218,29 @@ function TopMetric({
   value,
   tone,
   href,
+  unavailable = false,
 }: {
   label: string;
   value: number;
   tone: Tone;
   href: string;
+  unavailable?: boolean;
 }) {
   return (
     <a
       href={href}
-      className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition hover:bg-slate-50"
+      data-testid={`top-metric-${label}`}
+      className={`rounded-lg border bg-white p-4 shadow-sm transition hover:bg-slate-50 ${
+        unavailable ? 'border-red-200' : 'border-slate-200'
+      }`}
     >
-      <div className={`text-2xl font-semibold tabular-nums ${toneClass(tone)}`}>{formatNumber(value)}</div>
+      <div
+        className={`text-2xl font-semibold tabular-nums ${
+          unavailable ? 'text-slate-400' : toneClass(tone)
+        }`}
+      >
+        {unavailable ? '—' : formatNumber(value)}
+      </div>
       <div className="mt-1 text-xs text-slate-500">{label}</div>
     </a>
   );
