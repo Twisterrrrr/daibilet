@@ -1,7 +1,6 @@
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { CATALOG_PAGE_SIZE_DEFAULT, CATALOG_PAGE_SIZE_MAX } from '@daibilet/contracts/catalog';
 import { prisma } from '@daibilet/db';
 import { raw, sql } from '@daibilet/db/sql';
@@ -41,6 +40,7 @@ import {
 } from './public-catalog-spread.js';
 import { LIST_SLOT_PREVIEW_LIMIT, toPublicCatalogListItem } from './public-catalog-list-item.js';
 import { providerForSource } from './provider-purchase.js';
+import { resolveProjectRoot } from './project-root.js';
 import type { PublicCatalogMappingRow } from './public-catalog.mapper.js';
 import type { PublicCatalogDto, PublicSessionDto } from './types/public.js';
 import type { PublicCatalogQuery } from './types/schemas.js';
@@ -62,7 +62,7 @@ const CATALOG_HYDRATED_SLOT_LIMIT = 8;
  * Dense piers can have 10+ slots/day; 96 covers ~1-2 weeks for typical water schedules.
  */
 export const VENUE_PAGE_SLOT_LIMIT = 96;
-const PROJECT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
+const PROJECT_ROOT = resolveProjectRoot(import.meta.url);
 
 /** Keep in sync with catalogGroupTitleSqlExpression() in dto.js */
 const CATALOG_GROUP_TITLE_SQL = `regexp_replace(
