@@ -1425,6 +1425,7 @@ async function applyYooKassaPaymentObject(
       const item = await confirmFirstCheckoutItem(tx, orderId, options.now);
       const fulfillment = await confirmFirstFulfillment(tx, {
         orderId,
+        checkoutItemId: item.id,
         publicCode: order.publicCode || publicCode,
         quantity: item.quantity,
         now: options.now,
@@ -1527,6 +1528,14 @@ async function finalizeYooKassaPaidCheckout(input: {
       publicCode: input.created.order.publicCode,
       orderId: input.created.order.id,
       quantity: item.quantity,
+    });
+    await issueTicketRows(tx, {
+      orderId: input.created.order.id,
+      checkoutItemId: item.id,
+      fulfillmentItemId: input.created.fulfillment.id,
+      ticketNumbers: ticketNumbersFromProviderData(asRecord(input.created.fulfillment.providerData)).length
+        ? ticketNumbersFromProviderData(asRecord(input.created.fulfillment.providerData)) : ticketNumbers,
+      issuedAt: new Date(),
     });
     const fulfillment = await tx.fulfillmentItem.update({
       where: { id: input.created.fulfillment.id },
@@ -1703,6 +1712,7 @@ async function confirmFirstFulfillment(
   tx: Prisma.TransactionClient,
   input: {
     orderId: string;
+    checkoutItemId: string;
     publicCode: string | null;
     quantity: number;
     now: Date;
@@ -1721,6 +1731,14 @@ async function confirmFirstFulfillment(
     orderId: input.orderId,
     quantity: input.quantity,
   });
+  await issueTicketRows(tx, {
+    orderId: input.orderId,
+    checkoutItemId: input.checkoutItemId,
+    fulfillmentItemId: fulfillment.id,
+    ticketNumbers: ticketNumbersFromProviderData(asRecord(fulfillment.providerData)).length
+      ? ticketNumbersFromProviderData(asRecord(fulfillment.providerData)) : ticketNumbers,
+    issuedAt: input.now,
+  });
   return tx.fulfillmentItem.update({
     where: { id: fulfillment.id },
     data: {
@@ -1729,6 +1747,38 @@ async function confirmFirstFulfillment(
     },
     select: yookassaFulfillmentResultSelect,
   });
+}
+
+async function issueTicketRows(
+  tx: Prisma.TransactionClient,
+  input: {
+    orderId: string;
+    checkoutItemId: string;
+    fulfillmentItemId: string;
+    ticketNumbers: string[];
+    issuedAt: Date;
+  },
+): Promise<void> {
+  await tx.issuedTicket.createMany({
+    data: input.ticketNumbers.map((ticketNumber, index) => ({
+      checkoutOrderId: input.orderId,
+      checkoutItemId: input.checkoutItemId,
+      fulfillmentItemId: input.fulfillmentItemId,
+      ordinal: index + 1,
+      ticketNumber,
+      issuedAt: input.issuedAt,
+    })),
+    skipDuplicates: true,
+  });
+  const persisted = await tx.issuedTicket.findMany({
+    where: { fulfillmentItemId: input.fulfillmentItemId },
+    orderBy: { ordinal: 'asc' },
+    select: { ticketNumber: true },
+  });
+  if (persisted.length !== input.ticketNumbers.length ||
+      persisted.some((ticket, index) => ticket.ticketNumber !== input.ticketNumbers[index])) {
+    throw new Error('Issued ticket numbers do not match checkout quantity or prior issuance.');
+  }
 }
 
 function mapYooKassaCheckoutResult(input: {
@@ -2010,7 +2060,7 @@ function normalizeYooKassaConfirmationMode(value: unknown): YooKassaConfirmation
   return cleanString(value)?.toLowerCase() === 'embedded' ? 'embedded' : 'redirect';
 }
 
-function buildInternalTicketNumbers(input: {
+export function buildInternalTicketNumbers(input: {
   publicCode: string | null;
   orderId: string;
   quantity: number;

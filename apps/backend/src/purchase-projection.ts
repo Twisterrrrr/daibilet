@@ -330,6 +330,7 @@ const checkoutOrderInclude = {
           externalOrderId: true,
           externalPaymentUrl: true,
           providerData: true,
+          issuedTickets: { orderBy: { ordinal: 'asc' }, select: { ticketNumber: true, cancelledAt: true } },
         },
       },
     },
@@ -364,6 +365,7 @@ const checkoutOrderInclude = {
       externalPaymentUrl: true,
       lastError: true,
       providerData: true,
+      issuedTickets: { orderBy: { ordinal: 'asc' }, select: { ticketNumber: true, cancelledAt: true } },
       amountKopecks: true,
       refundedKopecks: true,
       createdAt: true,
@@ -1169,11 +1171,16 @@ function mapCheckoutOrderToPublicDto(row: CheckoutOrderRow): PublicCheckoutOrder
   const primaryVenue = primaryAdmission?.venue || null;
   const supplierSupportPhone = primaryAdmission?.supplier?.phone || null;
   const payment = row.payments[0] || null;
-  const fulfillmentNumbers = row.fulfillmentItems.flatMap((item) => ticketNumbersFromProviderData(item.providerData));
+  const fulfillmentNumbers = row.fulfillmentItems.flatMap((item) =>
+    item.issuedTickets.length
+      ? item.issuedTickets.filter((ticket) => !ticket.cancelledAt).map((ticket) => ticket.ticketNumber)
+      : ticketNumbersFromProviderData(item.providerData));
   const itemNumbers = new Map<string, string[]>();
   for (const item of row.items) {
     if (!item.fulfillmentItem) continue;
-    itemNumbers.set(item.id, ticketNumbersFromProviderData(item.fulfillmentItem.providerData));
+    itemNumbers.set(item.id, item.fulfillmentItem.issuedTickets.length
+      ? item.fulfillmentItem.issuedTickets.filter((ticket) => !ticket.cancelledAt).map((ticket) => ticket.ticketNumber)
+      : ticketNumbersFromProviderData(item.fulfillmentItem.providerData));
   }
   const title = checkoutItemTitle(primaryItem) || primaryAdmission?.title || 'Входной билет';
 

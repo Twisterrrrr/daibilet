@@ -1375,6 +1375,21 @@ model SupplierBankAccount {
   @@index([isPrimary])
 }
 
+/// Append-only legal/bank approval evidence. No foreign key: evidence survives
+/// deletion or replacement of the mutable supplier profile.
+model SupplierLegalReviewSnapshot {
+  id                String   @id @default(cuid())
+  supplierId        String
+  legalProfileId    String
+  action            String
+  reviewedAt        DateTime @default(now())
+  reviewedBySiteUserId String?
+  snapshotJson      Json
+  sha256            String
+
+  @@index([supplierId, reviewedAt])
+}
+
 model SupplierUser {
   id               String       @id @default(cuid())
   supplierId       String
@@ -1549,6 +1564,7 @@ model CheckoutOrder {
   payoutItems      PayoutItem[]
   tripVouchers     TripVoucher[]
   fulfillmentItems FulfillmentItem[]
+  issuedTickets    IssuedTicket[]
   refundRequests   RefundRequest[]
   reviews          Review[]
   reviewRequests   ReviewRequest[]
@@ -1596,6 +1612,7 @@ model CheckoutItem {
   tripPlanItems    TripPlanItem[]
   tripVoucherItems TripVoucherItem[]
   fulfillmentItem  FulfillmentItem?
+  issuedTickets    IssuedTicket[]
 
   @@index([checkoutOrderId])
   @@index([supplierId, status])
@@ -1635,6 +1652,7 @@ model FulfillmentItem {
   checkoutItem   CheckoutItem?   @relation(fields: [checkoutItemId], references: [id], onDelete: SetNull)
   admissionOffer AdmissionOffer? @relation(fields: [admissionOfferId], references: [id], onDelete: SetNull)
   refundRequests RefundRequest[]
+  issuedTickets  IssuedTicket[]
 
   @@index([checkoutOrderId])
   @@index([offerId])
@@ -1643,6 +1661,25 @@ model FulfillmentItem {
   @@index([provider])
   @@index([status, nextRetryAt])
   @@index([status, escalatedAt])
+}
+
+/// One entry credential per quantity unit; fulfillment remains the order-line state.
+model IssuedTicket {
+  id                String   @id @default(cuid())
+  checkoutOrderId   String
+  checkoutItemId    String
+  fulfillmentItemId String
+  ordinal           Int
+  ticketNumber      String   @unique
+  issuedAt          DateTime @default(now())
+  cancelledAt       DateTime?
+
+  order       CheckoutOrder   @relation(fields: [checkoutOrderId], references: [id], onDelete: Cascade)
+  item        CheckoutItem    @relation(fields: [checkoutItemId], references: [id], onDelete: Cascade)
+  fulfillment FulfillmentItem @relation(fields: [fulfillmentItemId], references: [id], onDelete: Cascade)
+
+  @@unique([fulfillmentItemId, ordinal])
+  @@index([checkoutOrderId])
 }
 
 model Payment {

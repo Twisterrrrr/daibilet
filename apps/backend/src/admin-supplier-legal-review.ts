@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import type { AdminSupplierDetailDto } from '@daibilet/contracts/admin';
 import { prisma, type Prisma } from '@daibilet/db';
 import { buildAdminSupplierDetailDto } from './admin-suppliers.dto.js';
@@ -42,24 +43,79 @@ export async function reviewSupplierLegalProfile(
   const legalProfile = supplier.legalProfile;
   const adminComment = cleanString(input.adminComment);
 
-  if (input.action === 'approve') {
-    assertCanApproveLegalProfile(legalProfile);
-  } else if (!adminComment) {
+  if (input.action === 'reject' && !adminComment) {
     throwHttpError('Комментарий обязателен при отклонении реквизитов.', 400);
   }
 
-  await prisma.supplierLegalProfile.update({
-    where: { id: legalProfile.id },
-    data: {
-      status: input.action === 'approve' ? 'VERIFIED' : 'REJECTED',
-      verifiedAt: input.action === 'approve' ? reviewedAt : null,
-      verifiedBySiteUserId: input.action === 'approve' ? cleanString(input.adminSiteUserId) : null,
-      rejectionComment: input.action === 'reject' ? adminComment : null,
-      metaJson: buildReviewMeta(legalProfile, input.action, reviewedAt, adminComment, input.adminSiteUserId),
-    },
+  await prisma.$transaction(async (tx) => {
+    await tx.$queryRaw`SELECT id FROM "SupplierLegalProfile" WHERE id = ${legalProfile.id} FOR UPDATE`;
+    await tx.$queryRaw`SELECT id FROM "SupplierBankAccount" WHERE "supplierLegalProfileId" = ${legalProfile.id} FOR UPDATE`;
+    const current = await tx.supplierLegalProfile.findUnique({
+      where: { id: legalProfile.id },
+      include: { bankAccounts: { orderBy: [{ isPrimary: 'desc' }, { createdAt: 'desc' }] } },
+    });
+    if (!current) throwHttpError('Юридический профиль не найден.', 409);
+    if (input.action === 'approve') assertCanApproveLegalProfile(current);
+    const snapshot = buildImmutableReviewSnapshot(current, supplier.id, input.action, reviewedAt, adminComment, input.adminSiteUserId);
+    await tx.supplierLegalProfile.update({
+      where: { id: legalProfile.id },
+      data: {
+        status: input.action === 'approve' ? 'VERIFIED' : 'REJECTED',
+        verifiedAt: input.action === 'approve' ? reviewedAt : null,
+        verifiedBySiteUserId: input.action === 'approve' ? cleanString(input.adminSiteUserId) : null,
+        rejectionComment: input.action === 'reject' ? adminComment : null,
+        metaJson: buildReviewMeta(current, input.action, reviewedAt, adminComment, input.adminSiteUserId),
+      },
+    });
+    await tx.supplierLegalReviewSnapshot.create({
+      data: {
+        supplierId: supplier.id,
+        legalProfileId: legalProfile.id,
+        action: input.action,
+        reviewedAt,
+        reviewedBySiteUserId: cleanString(input.adminSiteUserId),
+        snapshotJson: snapshot as Prisma.InputJsonValue,
+        sha256: createHash('sha256').update(JSON.stringify(snapshot)).digest('hex'),
+      },
+    });
   });
 
   return buildAdminSupplierDetailDto(supplier.id);
+}
+
+function buildImmutableReviewSnapshot(
+  profile: LegalProfileForReview,
+  supplierId: string,
+  action: AdminSupplierLegalReviewAction,
+  reviewedAt: Date,
+  comment: string | null,
+  reviewedBySiteUserId?: string | null,
+) {
+  return {
+    supplierId,
+    legalProfileId: profile.id,
+    action,
+    reviewedAt: reviewedAt.toISOString(),
+    reviewedBySiteUserId: cleanString(reviewedBySiteUserId),
+    comment,
+    legal: {
+      legalName: profile.legalName,
+      inn: profile.inn,
+      kpp: profile.kpp,
+      ogrn: profile.ogrn,
+      taxMode: profile.taxMode,
+      isVatPayer: profile.isVatPayer,
+      defaultVatRate: profile.defaultVatRate,
+    },
+    bankAccounts: profile.bankAccounts.map((account) => ({
+      id: account.id,
+      bankName: account.bankName,
+      bik: account.bik,
+      accountNumber: account.accountNumber,
+      correspondentAccount: account.correspondentAccount,
+      isPrimary: account.isPrimary,
+    })),
+  };
 }
 
 async function loadSupplierLegalProfile(idOrSlug: string) {

@@ -27,6 +27,7 @@
     "checkout:seed-stub": "tsx scripts/seed-stub-checkout-event.ts",
     "checkout:seed-stub-admission": "tsx scripts/seed-stub-admission.ts",
     "checkout:yookassa:reconcile": "tsx scripts/reconcile-yookassa-checkout.ts",
+    "checkout:tickets:backfill": "tsx scripts/backfill-issued-tickets.ts",
     "tep:fixture-bridge": "node ../../scripts/teplohod-fixture-bridge.js"
   },
   "engines": {

@@ -38,6 +38,18 @@ test('admin can approve supplier legal profile with primary bank account', async
     assert.equal(stored?.rejectionComment, null);
     assert.equal((stored?.metaJson as any)?.lastLegalReview?.action, 'approve');
     assert.equal((stored?.metaJson as any)?.lastLegalReview?.primaryBankAccount?.accountMask, '****************0001');
+    const evidence = await prisma.supplierLegalReviewSnapshot.findFirst({ where: { supplierId } });
+    assert.equal(evidence?.action, 'approve');
+    assert.equal((evidence?.snapshotJson as any)?.bankAccounts?.[0]?.accountNumber, '40702810900000000001');
+    assert.match(evidence?.sha256 || '', /^[a-f0-9]{64}$/);
+    await assert.rejects(
+      prisma.supplierLegalReviewSnapshot.update({ where: { id: evidence!.id }, data: { action: 'reject' } }),
+      /append-only/,
+    );
+    await assert.rejects(
+      prisma.supplierLegalReviewSnapshot.delete({ where: { id: evidence!.id } }),
+      /append-only/,
+    );
   } finally {
     await cleanupSupplier(supplierId);
   }
@@ -78,6 +90,7 @@ test('admin can reject supplier legal profile with comment for supplier', async 
     assert.equal(detail.legal.status, 'REJECTED');
     assert.equal(detail.legal.verifiedAt, null);
     assert.equal(detail.legal.rejectionComment, 'Проверьте ИНН и расчетный счет.');
+    assert.equal(await prisma.supplierLegalReviewSnapshot.count({ where: { supplierId, action: 'reject' } }), 1);
   } finally {
     await cleanupSupplier(supplierId);
   }

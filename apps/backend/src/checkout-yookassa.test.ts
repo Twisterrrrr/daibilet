@@ -494,7 +494,7 @@ test('YooKassa admission checkout creates pending payment and preserves idempote
       return new Response(JSON.stringify({
       id: `pay_${suffix}`,
       status: 'pending',
-      amount: { value: '700.00', currency: 'RUB' },
+      amount: { value: '1400.00', currency: 'RUB' },
       confirmation: {
         type: 'redirect',
         confirmation_url: `https://yookassa.test/pay/${suffix}`,
@@ -509,7 +509,7 @@ test('YooKassa admission checkout creates pending payment and preserves idempote
       subjectType: 'VENUE_ADMISSION',
       admissionProductId: productId,
       admissionOfferId: offerId,
-      quantity: 1,
+      quantity: 2,
       buyer: {
         email: 'buyer@daibilet.ru',
         name: 'Buyer',
@@ -565,13 +565,13 @@ test('YooKassa admission checkout creates pending payment and preserves idempote
       where: { id: productId },
       select: { ticketsVacant: true },
     });
-    assert.equal(afterFirst?.ticketsVacant, 4);
+    assert.equal(afterFirst?.ticketsVacant, 3);
 
     const replay = await createYooKassaCheckoutOrder({
       subjectType: 'VENUE_ADMISSION',
       admissionProductId: productId,
       admissionOfferId: offerId,
-      quantity: 1,
+      quantity: 2,
       buyer: {
         email: 'buyer@daibilet.ru',
         name: 'Buyer',
@@ -597,7 +597,7 @@ test('YooKassa admission checkout creates pending payment and preserves idempote
       where: { id: productId },
       select: { ticketsVacant: true },
     });
-    assert.equal(afterReplay?.ticketsVacant, 4);
+    assert.equal(afterReplay?.ticketsVacant, 3);
 
     const webhook = await applyYooKassaWebhookPayload({
       id: `notif_${suffix}`,
@@ -624,7 +624,13 @@ test('YooKassa admission checkout creates pending payment and preserves idempote
     const providerData = confirmed?.providerData as { ticketNumber?: string; ticketNumbers?: string[] } | null;
     assert.match(providerData?.ticketNumber || '', /^TKT-/);
     assert.notEqual(providerData?.ticketNumber, result.order.publicCode);
-    assert.deepEqual(providerData?.ticketNumbers, [providerData?.ticketNumber]);
+    assert.equal(providerData?.ticketNumbers?.length, 2);
+    assert.equal(providerData?.ticketNumbers?.[0], providerData?.ticketNumber);
+    const issued = await prisma.issuedTicket.findMany({
+      where: { checkoutOrderId: result.order.id }, orderBy: { ordinal: 'asc' },
+    });
+    assert.deepEqual(issued.map((ticket) => ticket.ticketNumber), providerData?.ticketNumbers);
+    assert.deepEqual(issued.map((ticket) => ticket.ordinal), [1, 2]);
 
     const replayWebhook = await applyYooKassaWebhookPayload({
       id: `notif_${suffix}`,
@@ -641,8 +647,20 @@ test('YooKassa admission checkout creates pending payment and preserves idempote
       now,
     });
     assert.equal(replayWebhook.result, 'duplicate');
+    const secondWebhook = await applyYooKassaWebhookPayload({
+      id: `notif_again_${suffix}`,
+      event: 'payment.succeeded',
+      object: { id: `pay_${suffix}`, status: 'succeeded' },
+    }, {
+      config: readYooKassaRuntimeConfig({
+        NODE_ENV: 'test', DAIBILET_YOOKASSA_VERIFY_WEBHOOK: '0',
+      } as NodeJS.ProcessEnv),
+      now,
+    });
+    assert.equal(secondWebhook.result, 'processed');
+    assert.equal(await prisma.issuedTicket.count({ where: { checkoutOrderId: result.order.id } }), 2);
   } finally {
-    await prisma.processedWebhookEvent.deleteMany({ where: { providerEventId: `notif_${suffix}` } });
+    await prisma.processedWebhookEvent.deleteMany({ where: { providerEventId: { in: [`notif_${suffix}`, `notif_again_${suffix}`] } } });
     await prisma.supplierLedgerEntry.deleteMany({ where: { supplierId } });
     await prisma.fulfillmentItem.deleteMany({
       where: { order: { items: { some: { admissionProductId: productId } } } },
