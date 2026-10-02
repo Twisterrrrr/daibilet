@@ -241,3 +241,25 @@ export function resolveVenueGalleryImages(input: {
 export function __editorialVenueContentSlugCountForTests(): number {
   return Object.keys(EDITORIAL_BY_SLUG).length;
 }
+
+/**
+ * Where a resolved metro station name came from.
+ *
+ * A hand-entered value wins over the computed one: coordinates can sit in the
+ * middle of a block, and the nearest station by straight line may need an
+ * awkward transfer or exit. Most of the 4304 venues have no value at all, so the
+ * computed fallback earns its place - but knowing which one is showing is the
+ * only way to tell a wrong station from a wrong coordinate.
+ */
+export type VenueMetroSource = 'database' | 'computed' | 'none';
+
+export function resolveVenueMetroSource(
+  stored: string | null | undefined,
+  resolved: string | null | undefined,
+): VenueMetroSource {
+  const storedText = String(stored ?? '').trim();
+  if (storedText && storedText !== '-' && storedText !== '\u2014' && storedText !== '\u2013') {
+    return 'database';
+  }
+  return String(resolved ?? '').trim() ? 'computed' : 'none';
+}

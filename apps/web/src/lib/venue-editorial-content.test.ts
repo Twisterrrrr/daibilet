@@ -11,6 +11,7 @@ import {
   resolveVenueGalleryImages,
   venueFeatureChips,
   venueFeatureLabels,
+  resolveVenueMetroSource,
 } from './venue-editorial-content.ts';
 
 function assertNoLongDash(blob: string) {
@@ -208,4 +209,18 @@ test('unknown slug has no editorial overlay', () => {
   assert.equal(resolveVenueEditorialContent('erarta'), null);
   assert.equal(resolveVenueEditorialContent(''), null);
   assert.equal(__editorialVenueContentSlugCountForTests(), 20);
+});
+
+test('resolveVenueMetroSource distinguishes stored from computed', () => {
+  // A stored value wins even when the computed fallback differs.
+  assert.equal(resolveVenueMetroSource('Чкаловская', 'Площадь Революции'), 'database');
+  assert.equal(resolveVenueMetroSource(null, 'Площадь Революции'), 'computed');
+  assert.equal(resolveVenueMetroSource('', 'Площадь Революции'), 'computed');
+  assert.equal(resolveVenueMetroSource(null, null), 'none');
+
+  // Placeholder dashes are not stored values.
+  assert.equal(resolveVenueMetroSource('-', 'Площадь Революции'), 'computed');
+  assert.equal(resolveVenueMetroSource('\u2014', 'Площадь Революции'), 'computed');
+  assert.equal(resolveVenueMetroSource('  ', 'Площадь Революции'), 'computed');
+  assert.equal(resolveVenueMetroSource('-', null), 'none');
 });

@@ -41,6 +41,7 @@ import {
 import {
   applyVenueEditorialOverlay,
   formatVenueMetroLabel,
+  resolveVenueMetroSource,
   resolveVenueCuratedFaqItems,
   resolveVenueEditorialContent,
   resolveVenueGalleryImages,
@@ -139,6 +140,17 @@ export function InstitutionVenueLayout({
   const metroLabel = React.useMemo(
     () => formatVenueMetroLabel(resolvedMetroName),
     [resolvedMetroName],
+  );
+  // Owner rule: a stored station wins over the computed one, and when both are
+  // empty the block must not render at all. Record which one is showing so a
+  // wrong station can be traced to bad coordinates rather than bad data.
+  const metroSource = React.useMemo(
+    () =>
+      resolveVenueMetroSource(
+        nonEmptyLogisticsText(venue.metroStation) || editorial?.metroStation || null,
+        resolvedMetroName,
+      ),
+    [resolvedMetroName, venue.metroStation, editorial?.metroStation],
   );
   const faqItems = React.useMemo(() => resolveVenueCuratedFaqItems(venue.slug), [venue.slug]);
   const featureChips = React.useMemo(
@@ -677,7 +689,7 @@ export function InstitutionVenueLayout({
                       <span className="shrink-0" aria-hidden="true">
                         🚇
                       </span>
-                      <span>{metroLabel}</span>
+                      <span data-metro-source={metroSource}>{metroLabel}</span>
                     </li>
                   ) : null}
                   {wayTip ? (
