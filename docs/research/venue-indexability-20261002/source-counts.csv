@@ -1,0 +1,14 @@
+kind,with_future_session,without_future_session,source
+ATTRACTION,1,477,r11_owner_snapshot
+MONUMENT,0,370,r11_owner_snapshot
+MUSEUM_ART_SPACE,76,310,r11_owner_snapshot
+OUTDOOR_LOCATION,0,242,r11_owner_snapshot
+TEMPLE,0,190,r11_owner_snapshot
+PARK,1,151,r11_owner_snapshot
+PIER,61,39,r11_owner_snapshot
+CONCERT_HALL,646,228,r11_owner_snapshot
+CLUB_BAR_RESTAURANT,416,187,r11_owner_snapshot
+THEATER,255,173,r11_owner_snapshot
+MEETING_POINT,164,178,r11_owner_snapshot
+GASTRO,0,109,r11_owner_snapshot
+SPORT_ACTIVITY_SPACE,9,19,r11_owner_snapshot
