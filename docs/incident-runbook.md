@@ -129,7 +129,60 @@ nginx_deploy -t && systemctl_deploy reload nginx
 
 ---
 
-## 7. Эскалация
+## 7. Ротация admin-секретов
+
+**Правило: меняешь секрет в `/opt/daibilet/.env` — перезапускай ВСЕ юниты, которые его читают.**
+
+```bash
+# 1. Бэкап до правки
+cp -p /opt/daibilet/.env /opt/daibilet/.env.bak.$(date +%Y%m%d-%H%M%S)
+
+# 2. Пишем НОВЫЙ хеш в ADMIN_PASSWORD_HASH
+NEW_HASH=$(printf '%s' "$NEW_PASSWORD" | sha256sum | cut -d' ' -f1)
+sed -i -E "s|^[[:space:]]*ADMIN_PASSWORD_HASH=.*|ADMIN_PASSWORD_HASH=$NEW_HASH|" /opt/daibilet/.env
+
+# 3. Перезапускаем ОБА — не только web
+sudo systemctl restart daibilet-web
+sudo systemctl restart daibilet-api
+sleep 10
+
+# 4. Проверяем вход
+curl -s -o /dev/null -w "%{http_code}\n" -u "$ADMIN_EMAIL:$NEW_PASSWORD" https://daibilet.ru/admin
+# и обязательно API:
+curl -s -o /dev/null -w "%{http_code}\n" -u "$ADMIN_EMAIL:$NEW_PASSWORD" \
+  https://daibilet.ru/api/admin/orders
+```
+
+### Почему оба
+
+Инцидент 2026-10-02: ротация выполнена, перезапущен только `daibilet-web`.
+`daibilet-api` продолжал работать со старым хешем в памяти, поэтому `adminApiFetch`
+получал `401 admin_auth_required`. Страница `/admin/orders` показывала:
+
+```
+Live API недоступен или вернул ошибку
+orders HTTP 401 · Всего: 0 · «Нет заказов по фильтру»
+```
+
+при 6 реальных заказах в БД. Проверяющий сделал бы вывод «заказов нет».
+
+**Ошибка маскировалась под пустоту** — это худший вид отказа. Поэтому в UI теперь
+при ошибке счётчики показывают `—`, а не `0`.
+
+### Как заметить рассинхрон
+
+```bash
+# если api старше web — секреты разошлись
+systemctl show daibilet-web --property=ActiveEnterTimestamp --value
+systemctl show daibilet-api --property=ActiveEnterTimestamp --value
+stat -c %y /opt/daibilet/.env     # .env новее обоих? какой-то не перезапущен
+```
+
+Формат секретов: прод держит **только SHA-256** в `ADMIN_PASSWORD_HASH`
+(64 hex). `ADMIN_PASSWORD` и `ADMIN_PASSWORD_SHA256` пустые. Открытый пароль
+невосстановим — это осознанно.
+
+## 8. Эскалация
 
 1. **Owner** — продуктовые решения, откат deploy, comms.
 2. **CODEX** — SSH, cron/systemd, DB read-only checks.
