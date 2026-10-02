@@ -7,8 +7,8 @@ import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import type { PublicSessionDto } from './types/public.js';
+import { resolveProjectRoot } from './project-root.js';
 
 /** Serializable legacy indexes (session id pointers; hydrate to Maps in dto.js). */
 export type PublicCatalogDiskIndexes = {
@@ -30,7 +30,7 @@ export interface PublicCatalogDiskSnapshot {
   sessionsBytes?: number;
 }
 
-const PROJECT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
+const PROJECT_ROOT = resolveProjectRoot(import.meta.url);
 
 /** Default timer interval for Catalog Worker (systemd OnUnitActiveSec=8min). */
 export const PUBLIC_CATALOG_WORKER_INTERVAL_MS = Math.max(
@@ -44,10 +44,10 @@ export const PUBLIC_CATALOG_STALE_ALERT_MS = Math.max(
   Number(process.env.DAIBILET_CATALOG_STALE_ALERT_MS || 2 * PUBLIC_CATALOG_WORKER_INTERVAL_MS),
 );
 
-export function resolvePublicCatalogDiskCachePath(): string {
+export function resolvePublicCatalogDiskCachePath(moduleUrl: string | URL = import.meta.url): string {
   const fromEnv = String(process.env.DAIBILET_PUBLIC_CATALOG_DISK_CACHE || '').trim();
   if (fromEnv) return fromEnv;
-  return path.join(PROJECT_ROOT, 'var', 'cache', 'public-catalog-dto.json');
+  return path.join(resolveProjectRoot(moduleUrl), 'var', 'cache', 'public-catalog-dto.json');
 }
 
 export function loadPublicCatalogDiskCache(): PublicCatalogDiskSnapshot | null {

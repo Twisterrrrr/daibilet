@@ -1,14 +1,13 @@
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { buildPublicVenuePage, buildPublicVenuesCatalog, buildPublicVenueEventCounts } from './public-venue-read.js';
 import { createDb } from './db.js';
+import { resolveProjectRoot } from './project-root.js';
 import type {
   PublicVenueDto,
   PublicVenuePageDto,
   PublicVenuesDto,
 } from './types/public.js';
 
-const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
+const projectRoot = resolveProjectRoot(import.meta.url);
 
 const PUBLIC_VENUE_CACHE_MS = 5 * 60 * 1000;
 /** Soft TTL: serve expired list while single-flight rebuild runs. */

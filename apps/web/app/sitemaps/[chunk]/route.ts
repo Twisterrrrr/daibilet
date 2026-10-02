@@ -30,7 +30,8 @@ export async function GET(
       headers: SITEMAP_RESPONSE_HEADERS,
     });
   } catch (error) {
-    console.error('[sitemap] build failed:', error);
+    const detail = error instanceof Error ? error.stack || error.message : String(error);
+    process.stderr.write(`[sitemap] chunk=${chunk} build failed: ${detail}\n`);
     return new Response('Sitemap temporarily unavailable', {
       status: 503,
       headers: SITEMAP_RESPONSE_HEADERS,

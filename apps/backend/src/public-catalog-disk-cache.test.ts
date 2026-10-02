@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import {
   loadPublicCatalogDiskCache,
@@ -49,6 +50,24 @@ test('resolvePublicCatalogDiskCachePath honors env override', () => {
     assert.equal(resolvePublicCatalogDiskCachePath(), '/tmp/daibilet-catalog-test.json');
   } finally {
     restoreEnv('DAIBILET_PUBLIC_CATALOG_DISK_CACHE', prev);
+  }
+});
+
+test('catalog snapshot path resolves from repo cwd when Next bundles the module', () => {
+  const previous = process.env.DAIBILET_PUBLIC_CATALOG_DISK_CACHE;
+  const cwd = process.cwd();
+  const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
+  try {
+    delete process.env.DAIBILET_PUBLIC_CATALOG_DISK_CACHE;
+    process.chdir(path.join(root, 'apps', 'web'));
+    assert.equal(
+      resolvePublicCatalogDiskCachePath('file:///home/runner/work/daibilet/apps/web/.next/server/chunks/8833.js'),
+      path.join(root, 'var', 'cache', 'public-catalog-dto.json'),
+    );
+  } finally {
+    process.chdir(cwd);
+    if (previous === undefined) delete process.env.DAIBILET_PUBLIC_CATALOG_DISK_CACHE;
+    else process.env.DAIBILET_PUBLIC_CATALOG_DISK_CACHE = previous;
   }
 });
 
