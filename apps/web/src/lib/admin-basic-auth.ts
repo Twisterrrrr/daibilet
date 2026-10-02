@@ -20,7 +20,12 @@ export function readAdminBasicAuthConfig(env: EnvLike = process.env): AdminBasic
     password: env.ADMIN_PASSWORD || '',
     passwordHash: env.ADMIN_PASSWORD_SHA256 || env.ADMIN_PASSWORD_HASH || '',
     realm: env.ADMIN_AUTH_REALM || 'Daibilet admin',
-    requireAuth: env.NODE_ENV === 'production' || env.DAIBILET_REQUIRE_ADMIN_AUTH === '1',
+    // Fail closed by default. Deriving this from NODE_ENV meant that any restart
+    // with NODE_ENV=development silently exposed /admin - orders and buyer data -
+    // to the internet with no password. In dev the section is closed by the
+    // missing credentials anyway (isAdminAuthConfigured returns false), so the
+    // NODE_ENV dependency bought nothing and only created the risk.
+    requireAuth: env.DAIBILET_REQUIRE_ADMIN_AUTH !== '0',
   };
 }
 
