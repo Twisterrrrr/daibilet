@@ -161,7 +161,7 @@ async function loadAdmissionHealthItems(limit: number): Promise<AdminListingHeal
       supplierId: true,
       city: { select: { id: true, slug: true, title: true } },
       venue: { select: { id: true, slug: true, title: true, kind: true } },
-      supplier: { select: { id: true, slug: true, title: true, status: true } },
+      supplier: { select: { id: true, slug: true, title: true, status: true, legalProfile: { select: { status: true } } } },
       offers: {
         orderBy: [{ active: 'desc' }, { priceRub: 'asc' }, { id: 'asc' }],
         select: {

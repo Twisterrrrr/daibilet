@@ -32,6 +32,21 @@ test('allows an active platform admission product with a valid offer', () => {
   assert.deepEqual(readiness.blockers, []);
 });
 
+test('production sale readiness blocks rejected or missing legal approval', () => {
+  const base = {
+    now, venueId: 'ven_1', supplierId: 'sup_1', supplierStatus: 'ACTIVE',
+    purchaseFlow: 'PLATFORM', managementMode: 'DAIBILET_MANAGED',
+    validityMode: 'OPEN_DATE', offers: [{ active: true, priceRub: 700 }],
+    requireLegalApproval: true,
+  };
+  for (const supplierLegalStatus of ['REJECTED', null]) {
+    const result = resolveAdmissionProductReadiness({ ...base, supplierLegalStatus });
+    assert.equal(result.canSell, false);
+    assert.ok(result.blockers.some((issue) => issue.code === 'SUPPLIER_LEGAL_NOT_APPROVED'));
+  }
+  assert.equal(resolveAdmissionProductReadiness({ ...base, supplierLegalStatus: 'VERIFIED' }).canSell, true);
+});
+
 test('blocks admission product without supplier and active priced offers', () => {
   const readiness = resolveAdmissionProductReadiness({
     now,

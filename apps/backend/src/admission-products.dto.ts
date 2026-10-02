@@ -32,7 +32,7 @@ const admissionProductSelect = {
   supplierId: true,
   city: { select: { id: true, slug: true, title: true } },
   venue: { select: { id: true, slug: true, title: true, kind: true } },
-  supplier: { select: { id: true, slug: true, title: true, status: true } },
+  supplier: { select: { id: true, slug: true, title: true, status: true, legalProfile: { select: { status: true } } } },
   offers: {
     orderBy: [{ active: 'desc' }, { priceRub: 'asc' }, { id: 'asc' }],
     select: {
@@ -150,6 +150,8 @@ export function mapAdmissionProductDto(row: AdmissionProductRow, now = new Date(
     venueKind: String(row.venue.kind),
     supplierId: row.supplierId,
     supplierStatus: row.supplier ? String(row.supplier.status) : null,
+    supplierLegalStatus: row.supplier?.legalProfile ? String(row.supplier.legalProfile.status) : null,
+    requireLegalApproval: process.env.NODE_ENV === 'production',
     status: String(row.status),
     purchaseFlow: String(row.purchaseFlow),
     managementMode: String(row.managementMode),

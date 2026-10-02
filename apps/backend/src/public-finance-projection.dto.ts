@@ -49,6 +49,7 @@ const publicAdmissionProductSelect = {
       integrationMode: true,
       defaultCatalogMode: true,
       phone: true,
+      legalProfile: { select: { status: true } },
     },
   },
   offers: {
@@ -210,6 +211,8 @@ export function mapPublicAdmissionProductDto(row: PublicAdmissionProductRow): Pu
     venueKind: String(row.venue.kind),
     supplierId: row.supplier?.id || null,
     supplierStatus: row.supplier ? String(row.supplier.status) : null,
+    supplierLegalStatus: row.supplier?.legalProfile ? String(row.supplier.legalProfile.status) : null,
+    requireLegalApproval: process.env.NODE_ENV === 'production',
     status: String(row.status),
     purchaseFlow: String(row.purchaseFlow),
     managementMode: String(row.managementMode),

@@ -28,6 +28,9 @@ the status change. PostgreSQL rejects UPDATE and DELETE on that table. It has no
 foreign key to mutable supplier/profile rows, so later profile deletion cannot
 erase the evidence. Only admin paths write review records; public DTOs do not
 select the table. The existing admin role is reused for this narrow action.
+Production YooKassa admission checkout and public `canSell` now require
+`SupplierLegalProfile.status=VERIFIED`; rejected or missing approval blocks
+sale. Controlled nonproduction STUB tests retain their prior behavior.
 
 Operator acceptance still requires deploying the migrations and checking the
 admin route and supplier readiness on the finance host. No deployment is part

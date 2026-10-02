@@ -25,6 +25,8 @@ export interface AdmissionProductReadinessInput {
   venueKind?: string | null;
   supplierId?: string | null;
   supplierStatus?: string | null;
+  supplierLegalStatus?: string | null;
+  requireLegalApproval?: boolean;
   status?: string | null;
   purchaseFlow?: string | null;
   managementMode?: string | null;
@@ -54,6 +56,9 @@ export function resolveAdmissionProductReadiness(
     blockers.push(issue('MISSING_SUPPLIER', 'Поставщик не привязан', 'high'));
   } else if (String(input.supplierStatus || '') !== 'ACTIVE') {
     blockers.push(issue('SUPPLIER_NOT_ACTIVE', 'Поставщик не активен', 'high'));
+  }
+  if (input.requireLegalApproval && input.supplierId && input.supplierLegalStatus !== 'VERIFIED') {
+    blockers.push(issue('SUPPLIER_LEGAL_NOT_APPROVED', 'Реквизиты поставщика не одобрены', 'high'));
   }
   if (String(input.purchaseFlow || '') !== 'PLATFORM') {
     blockers.push(issue('NOT_PLATFORM_CHECKOUT', 'Входной билет не подключен к checkout Daibilet', 'high'));

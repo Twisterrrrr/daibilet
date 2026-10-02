@@ -23,6 +23,7 @@ const stubCheckoutEventInclude = {
       title: true,
       status: true,
       defaultCommissionBps: true,
+      legalProfile: { select: { status: true } },
     },
   },
   supplierLinks: {
@@ -40,6 +41,7 @@ const stubCheckoutEventInclude = {
           title: true,
           status: true,
           defaultCommissionBps: true,
+          legalProfile: { select: { status: true } },
         },
       },
     },
@@ -91,6 +93,7 @@ const stubCheckoutAdmissionProductInclude = {
       title: true,
       status: true,
       defaultCommissionBps: true,
+      legalProfile: { select: { status: true } },
     },
   },
   venue: {

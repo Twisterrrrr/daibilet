@@ -313,6 +313,16 @@ test('adds YooKassa config blockers on top of admission checkout readiness', () 
   });
 
   assert.equal(issues[0]?.code, 'YOOKASSA_CHECKOUT_DISABLED');
+  const rejected = validateYooKassaAdmissionCheckoutReadiness({
+    config: readYooKassaRuntimeConfig({ NODE_ENV: 'test' } as NodeJS.ProcessEnv),
+    now,
+    product: admissionProductFixture(),
+    offer: admissionOfferFixture({ priceRub: 700 }),
+    supplier: supplierFixture({ legalProfile: { status: 'REJECTED' } }),
+    quantity: 1,
+    requireLegalApproval: true,
+  });
+  assert.ok(rejected.some((issue) => issue.label.includes('не одобрены')));
 });
 
 test('ignores malformed YooKassa webhook payload without touching DB', async () => {

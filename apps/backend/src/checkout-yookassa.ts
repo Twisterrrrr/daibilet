@@ -650,6 +650,7 @@ export function validateYooKassaAdmissionCheckoutReadiness(input: {
   offer: StubCheckoutAdmissionOfferRow | null;
   supplier: StubCheckoutSupplierRow | null;
   quantity: number;
+  requireLegalApproval?: boolean;
 }): StubCheckoutIssueDto[] {
   const issues = validateStubAdmissionCheckoutReadiness({
     enabled: true,
@@ -659,6 +660,9 @@ export function validateYooKassaAdmissionCheckoutReadiness(input: {
     supplier: input.supplier,
     quantity: input.quantity,
   });
+  if ((input.requireLegalApproval ?? process.env.NODE_ENV === 'production') && input.supplier?.legalProfile?.status !== 'VERIFIED') {
+    issues.push(issue('SUPPLIER_NOT_CONFIGURED', 'Юридические и банковские реквизиты поставщика не одобрены', 'high'));
+  }
   if (!input.config.enabled) {
     issues.unshift(issue('YOOKASSA_CHECKOUT_DISABLED', 'YooKassa checkout выключен', 'high'));
   } else if (!input.config.shopId || !input.config.secretKey) {
