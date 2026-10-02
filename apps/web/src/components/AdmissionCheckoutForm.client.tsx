@@ -148,8 +148,13 @@ export function AdmissionCheckoutForm({ product }: Props) {
       const widget = new Widget({
         confirmation_token: token,
         error_callback: () => {
+          // The widget reports a transport failure here, but the far more common
+          // case is a buyer who simply closed or went back from the payment page.
+          // Saying "technical failure" made a normal abandoned checkout look like
+          // an outage, and this is the first payment a real buyer ever sees.
+          // Name both possibilities and give the code to come back to.
           setWidgetHint(
-            'Не удалось показать форму оплаты. Сохраните код заказа и откройте страницу статуса.',
+            'Оплата не завершена — это не ошибка сайта: возможно, вы вернулись со страницы оплаты или платёж не был подтверждён. Попробуйте ещё раз, либо сохраните код заказа и откройте страницу статуса.',
           );
         },
       });
