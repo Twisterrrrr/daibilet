@@ -42,3 +42,4 @@ src/lib/venue-meta.park-monument.test.ts
 src/lib/og-image.test.ts
 src/lib/city-faq-ssr.test.tsx
 src/lib/city-suburbs-ssr.test.tsx
+src/lib/city-hub-registry.test.ts
