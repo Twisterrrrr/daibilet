@@ -34,6 +34,9 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
   const page = first(raw.page) || '1';
   const current = { q: q || undefined, view, page };
   const data = await loadAdminOrdersList({ q, view, page });
+// A failed live API must never look like "zero orders": the counters below would
+  // be taken as fact by the operator, so degrade them to an explicit dash instead.
+  const degraded = data.errors.length > 0;
   const notice =
     first(raw.synced) === '1'
       ? 'Синхронизация TC запущена/завершена.'
@@ -79,10 +82,10 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
       <AdminApiErrorBanner errors={data.errors} />
 
       <div className="grid gap-3 sm:grid-cols-4">
-        <Metric label="Импорт" value={data.metrics.imported} />
-        <Metric label="Подтверждены" value={data.metrics.confirmed} />
-        <Metric label="В обработке" value={data.metrics.processing} />
-        <Metric label="Внимание" value={data.metrics.needsAttention} />
+        <Metric label="Импорт" value={data.metrics.imported} unavailable={degraded} />
+        <Metric label="Подтверждены" value={data.metrics.confirmed} unavailable={degraded} />
+        <Metric label="В обработке" value={data.metrics.processing} unavailable={degraded} />
+        <Metric label="Внимание" value={data.metrics.needsAttention} unavailable={degraded} />
       </div>
 
       <form className="flex flex-wrap gap-2" action="/admin/orders" method="get">
@@ -140,8 +143,14 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
             <tbody>
               {data.rows.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-3 py-8 text-center text-slate-500">
-                    Нет заказов по фильтру.
+                  <td colSpan={5} className="px-3 py-8 text-center">
+                    {degraded ? (
+                      <span className="font-medium text-red-700">
+                        Не удалось загрузить заказы: live API недоступен.
+                      </span>
+                    ) : (
+                      <span className="text-slate-500">Нет заказов по фильтру.</span>
+                    )}
                   </td>
                 </tr>
               ) : (
@@ -194,10 +203,21 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
   );
 }
 
-function Metric({ label, value }: { label: string; value: number }) {
+function Metric({ label, value, unavailable = false }: { label: string; value: number; unavailable?: boolean }) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
-      <div className="text-xl font-semibold tabular-nums text-slate-900">{formatAdminNumber(value)}</div>
+    <div
+      className={`rounded-lg border bg-white p-3 shadow-sm ${
+        unavailable ? 'border-red-200' : 'border-slate-200'
+      }`}
+    >
+      <div
+        data-testid={`metric-${label}`}
+        className={`text-xl font-semibold tabular-nums ${
+          unavailable ? 'text-slate-400' : 'text-slate-900'
+        }`}
+      >
+        {unavailable ? '—' : formatAdminNumber(value)}
+      </div>
       <div className="text-xs text-slate-500">{label}</div>
     </div>
   );
