@@ -48,7 +48,12 @@ export async function POST(request: Request) {
   }
 
   const ticketUrl = buyerTicketAbsoluteUrl(publicCode, siteUrl);
-  await enqueueBuyerTicketEmail(publicCode, email);
+  try {
+    await enqueueBuyerTicketEmail(publicCode, email);
+  } catch {
+    console.error(`[buyer-ticket-delivery] enqueue failed for order ${publicCode}`);
+    return NextResponse.json({ ok: false, reason: 'queue_unavailable', publicCode }, { status: 503 });
+  }
 
   return NextResponse.json({
     ok: true,
