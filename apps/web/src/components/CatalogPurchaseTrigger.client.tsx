@@ -13,6 +13,7 @@ import {
   openTeplohodWidget,
   TeplohodWidgetEmbed,
 } from '@/components/TeplohodWidget.client';
+import { trackWidgetOpen } from '@/components/funnel-tracker';
 import { extractTcEventIdFromSession } from '@/lib/event-purchase';
 import {
   canOpenCatalogPurchase,
@@ -67,6 +68,11 @@ export function useCatalogPurchase(session: PublicSessionDto) {
             : 'external',
         source: 'catalog_purchase',
       });
+
+      // Funnel: the widget is about to open. Recorded here, before the vendor call,
+      // so a widget that fails to load still shows up as an attempt.
+      const widgetProvider = targetTeplohod?.tepEventId ? 'tep' : 'tc';
+      trackWidgetOpen(target.slug || session.slug || null, widgetProvider);
 
       if (targetTeplohod?.tepEventId) {
         setTeplohodEventId(String(targetTeplohod.tepEventId));

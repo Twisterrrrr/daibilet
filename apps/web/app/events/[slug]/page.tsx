@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import { EventCard } from '@/components/EventCard';
+import { FunnelEventView } from '@/components/funnel-tracker';
 import { EventBuyCard, EventHero } from '@/components/EventPage.client';
 import { EventPdpBody } from '@/components/EventPdpBody.client';
 import { EventTags, EventTrustStrip } from '@/components/EventPageSections';
@@ -167,6 +168,8 @@ export default async function EventDetailPage({ params }: PageProps) {
       {/* Outside SiteLayout client boundary so crawlers see scripts in View Source */}
       <JsonLdScripts blocks={jsonLdBlocks} idPrefix="event-jsonld" />
       <SiteLayout>
+        {/* Funnel: counted client-side, guarded against React strict mode double-fire. */}
+        <FunnelEventView ref={decodedSlug} />
         <EventHero payload={clientPayload} aggregate={aggregate} />
 
         <div className="container-page py-8 sm:py-10 lg:py-14">
