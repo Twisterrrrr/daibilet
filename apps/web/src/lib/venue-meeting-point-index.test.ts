@@ -21,7 +21,7 @@ import {
  */
 test('degenerate venue types are not indexable however many events they inherit', () => {
   const decision = evaluateVenueIndexability({
-    events: 999,
+    futureSessions: 999,
     isIndexable: true,
     type: 'meeting_point',
   });
@@ -32,7 +32,7 @@ test('degenerate venue types are not indexable however many events they inherit'
 
 test('type match is case and whitespace insensitive', () => {
   for (const type of ['MEETING_POINT', ' meeting_point ', 'Meeting_Point']) {
-    assert.equal(evaluateVenueIndexability({ events: 5, type }).indexable, false, `type=${type}`);
+    assert.equal(evaluateVenueIndexability({ futureSessions: 5, type }).indexable, false, `type=${type}`);
   }
 });
 
@@ -50,7 +50,7 @@ test('real venues keep their indexability and are not affected', () => {
     'monument',
   ]) {
     const decision = evaluateVenueIndexability({
-      events: MIN_VENUE_EVENTS_FOR_INDEX,
+      futureSessions: MIN_VENUE_EVENTS_FOR_INDEX,
       isIndexable: true,
       type,
     });
@@ -63,31 +63,31 @@ test('a missing type does not change existing behaviour', () => {
   // An undefined type must behave exactly as before the rule existed, otherwise
   // every venue whose DTO omits type would silently drop out of the sitemap.
   assert.deepEqual(
-    evaluateVenueIndexability({ events: 3, isIndexable: true }),
-    evaluateVenueIndexability({ events: 3, isIndexable: true, type: null }),
+    evaluateVenueIndexability({ futureSessions: 3, isIndexable: true }),
+    evaluateVenueIndexability({ futureSessions: 3, isIndexable: true, type: null }),
   );
-  assert.equal(evaluateVenueIndexability({ events: 3, type: undefined }).indexable, true);
-  assert.equal(evaluateVenueIndexability({ events: 3, type: 'unknown_future_type' }).indexable, true);
+  assert.equal(evaluateVenueIndexability({ futureSessions: 3, type: undefined }).indexable, true);
+  assert.equal(evaluateVenueIndexability({ futureSessions: 3, type: 'unknown_future_type' }).indexable, true);
 });
 
 test('explicit noindex still wins and thin venues stay out', () => {
   assert.equal(
-    evaluateVenueIndexability({ events: 99, isIndexable: false, type: 'museum' }).reason,
+    evaluateVenueIndexability({ futureSessions: 99, isIndexable: false, type: 'museum' }).reason,
     'explicit_noindex',
   );
-  assert.equal(evaluateVenueIndexability({ events: 0, type: 'museum' }).reason, 'zero_events');
-  assert.equal(evaluateVenueIndexability({ events: 0, type: 'meeting_point' }).reason, 'non_venue_type');
-  assert.equal(evaluateVenueIndexability({ events: 3, type: 'museum', detailAvailable: false }).reason, 'detail_unavailable');
+  assert.equal(evaluateVenueIndexability({ futureSessions: 0, type: 'museum' }).reason, 'zero_events');
+  assert.equal(evaluateVenueIndexability({ futureSessions: 0, type: 'meeting_point' }).reason, 'non_venue_type');
+  assert.equal(evaluateVenueIndexability({ futureSessions: 3, type: 'museum', detailAvailable: false }).reason, 'detail_unavailable');
 });
 
 test('hidden venue stays out while candidate and published statuses retain the existing rule', () => {
   assert.equal(
-    evaluateVenueIndexability({ events: 5, type: 'museum', pageStatus: ' hidden ' }).reason,
+    evaluateVenueIndexability({ futureSessions: 5, type: 'museum', pageStatus: ' hidden ' }).reason,
     'hidden_page',
   );
   for (const pageStatus of ['NONE', 'CANDIDATE', 'PUBLISHED']) {
     assert.equal(
-      evaluateVenueIndexability({ events: 5, type: 'museum', pageStatus }).indexable,
+      evaluateVenueIndexability({ futureSessions: 5, type: 'museum', pageStatus }).indexable,
       true,
       pageStatus,
     );

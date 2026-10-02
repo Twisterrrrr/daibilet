@@ -55,6 +55,8 @@ export type LeanPublicVenueRow = {
   pageStatus: string;
   hookFact: string | null;
   events: number;
+  /** Distinct logical events with at least one upcoming session. Drives indexability. */
+  futureSessionCount?: number;
   stopEventCount?: number;
   waterEvents: number;
   busEvents: number;
@@ -94,14 +96,25 @@ function chunkIds(ids: string[], size = VENUE_ID_QUERY_CHUNK): string[][] {
   return out;
 }
 
+export type VenueEventCounts = {
+  /** Distinct logical events, ALL TIME. Kept for sorting/tiles/history. */
+  total: number;
+  /** Distinct logical events having at least one upcoming session. Drives indexability. */
+  future: number;
+};
+
 /**
  * Count logical products per venue (not EventSession rows / dated TC twins).
  * Prefer EventOverride.mergeGroupKey, else normalized title.
+ *
+ * Returns both an all-time count and a future-only count. They must not be
+ * conflated: the all-time number keeps a venue "non-empty" forever, which is
+ * why sitemap and venue detail used to disagree about the same record.
  */
 export async function fetchVenueDistinctEventCounts(
   venueIds: string[],
-): Promise<Map<string, number>> {
-  const counts = new Map<string, number>();
+): Promise<Map<string, VenueEventCounts>> {
+  const counts = new Map<string, VenueEventCounts>();
   const ids = [...new Set((venueIds || []).map((id) => String(id || '').trim()).filter(Boolean))];
   if (!ids.length) return counts;
 
@@ -116,7 +129,21 @@ export async function fetchVenueDistinctEventCounts(
             nullif(trim(o."mergeGroupKey"), ''),
             nullif(${titleExpr}, ''),
             e.id
-          ))::int as events
+          ))::int as events,
+          -- Future-only variant. Same grouping key, but only events that still
+          -- have an upcoming session. The all-time count above is kept on purpose:
+          -- several consumers sort and count by it. Indexability
+          -- (sitemap-data.ts + VenuePages.tsx) must use the future one, because a
+          -- venue whose only event happened months ago must not stay indexable.
+          count(distinct coalesce(
+            nullif(trim(o."mergeGroupKey"), ''),
+            nullif(${titleExpr}, ''),
+            e.id
+          )) filter (where exists (
+            select 1 from "EventSession" s
+            where s."eventId" = e.id
+              and s."startsAt" >= now() - interval '15 minutes'
+          ))::int as "futureSessionCount"
         from "Event" e
         left join "EventOverride" o on o."eventId" = e.id
         where e."venueId" in (${placeholders})
@@ -128,7 +155,10 @@ export async function fetchVenueDistinctEventCounts(
 
     for (const row of distinctRows) {
       if (!row.venueId) continue;
-      counts.set(row.venueId, Number(row.events) || 0);
+      counts.set(row.venueId, {
+        total: Number(row.events) || 0,
+        future: Number((row as { futureSessionCount?: number }).futureSessionCount) || 0,
+      });
     }
   }
   return counts;
@@ -229,7 +259,9 @@ export async function fetchLeanPublicVenueRows(
   const merged = [...byId.values()];
   if (skipEventCounts) {
     // Progressive /venues paint: cards first, distinct product counts via enrich.
-    return merged.map((row) => mapLeanVenueRow(row, options.leanText === true, 0, 0));
+    return merged.map((row) =>
+      mapLeanVenueRow(row, options.leanText === true, { total: 0, future: 0 }, 0),
+    );
   }
   const ids = merged.map((row) => row.id);
   const [eventCounts, stopCounts] = await Promise.all([
@@ -240,7 +272,7 @@ export async function fetchLeanPublicVenueRows(
     mapLeanVenueRow(
       row,
       options.leanText === true,
-      eventCounts.get(row.id) || 0,
+      eventCounts.get(row.id) || { total: 0, future: 0 },
       stopCounts.get(row.id) || 0,
     ),
   );
@@ -249,7 +281,7 @@ export async function fetchLeanPublicVenueRows(
 function mapLeanVenueRow(
   row: VenueListRecord,
   leanText: boolean,
-  eventCount: number,
+  eventCounts: VenueEventCounts,
   stopEventCount = 0,
 ): LeanPublicVenueRow {
   const pageStatus = String(row.pageStatus || 'NONE').toLowerCase();
@@ -275,7 +307,10 @@ function mapLeanVenueRow(
     kind,
     proposedKind: String(kind || 'OTHER').toLowerCase(),
     pageStatus,
-    events: eventCount,
+    events: eventCounts.total,
+    // Indexability must read this one: `events` is an all-time count and would
+    // keep a venue with only past events marked as indexable.
+    futureSessionCount: eventCounts.future,
     ...(stopEventCount > 0 ? { stopEventCount } : {}),
     waterEvents: 0,
     busEvents: 0,

@@ -187,6 +187,13 @@ export interface PublicVenueDto extends SeoFields {
   description?: string | null;
   shortDescription?: string | null;
   heroImageUrl?: string | null;
+  
+  /**
+   * Distinct logical events that still have an upcoming session.
+   * events is an ALL-TIME count. Only this one may drive indexability:
+   * a venue whose last event happened months ago must not stay indexable.
+   */
+  futureSessionCount?: number;
   events: number;
   /** Явные STOP-связи EventVenueRouteItem на эту площадку. */
   stopEventCount?: number;

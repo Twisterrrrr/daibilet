@@ -46,6 +46,9 @@ export type HubIndexDecision = {
   thin: boolean;
   reason:
     | 'strong_city'
+    | 'enough_future_sessions'
+    | 'low_future_session_count'
+    | 'zero_future_sessions'
     | 'enough_events'
     | 'low_event_count'
     | 'zero_events'
@@ -112,7 +115,13 @@ export function evaluateCityIndexability(input: {
 }
 
 export function evaluateVenueIndexability(input: {
-  events: number;
+  /**
+   * Number of upcoming sessions. NOT the all-time event count: a venue whose
+   * only event happened months ago must not stay indexable. Renamed from
+   * `events` because sitemap and venue detail used to read that same name and
+   * disagree — sitemap counted all-time, the page counted future.
+   */
+  futureSessions?: number | null;
   isIndexable?: boolean | null;
   type?: string | null;
   pageStatus?: string | null;
@@ -133,15 +142,15 @@ export function evaluateVenueIndexability(input: {
     return { indexable: false, thin: true, reason: 'non_venue_type' };
   }
 
-  const events = Number(input.events) || 0;
-  if (events <= 0) {
-    return { indexable: false, thin: true, reason: 'zero_events' };
+  const futureSessions = Number(input.futureSessions) || 0;
+  if (futureSessions <= 0) {
+    return { indexable: false, thin: true, reason: 'zero_future_sessions' };
   }
-  if (events < MIN_VENUE_EVENTS_FOR_INDEX) {
-    return { indexable: false, thin: true, reason: 'low_event_count' };
+  if (futureSessions < MIN_VENUE_EVENTS_FOR_INDEX) {
+    return { indexable: false, thin: true, reason: 'low_future_session_count' };
   }
 
-  return { indexable: true, thin: false, reason: 'enough_events' };
+  return { indexable: true, thin: false, reason: 'enough_future_sessions' };
 }
 
 /**

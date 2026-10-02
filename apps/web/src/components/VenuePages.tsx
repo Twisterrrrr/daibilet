@@ -149,7 +149,7 @@ export async function generateVenueDetailMetadata(slug: string): Promise<Metadat
     const venue = applyVenueEditorialOverlay(payload.venue);
   const heroForShare = resolveVenueShareImage(venue.slug || slug, venue.heroImageUrl);
   const decision = evaluateVenueIndexability({
-    events: payload.stats?.events ?? venue.events ?? 0,
+    futureSessions: venue.futureSessionCount ?? payload.stats?.events ?? 0,
     isIndexable: venue.isIndexable,
     type: venue.type,
     pageStatus: venue.pageStatus,

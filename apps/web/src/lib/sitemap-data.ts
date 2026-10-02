@@ -295,7 +295,7 @@ export async function buildVenuesSitemapEntries(now = new Date()): Promise<Sitem
     .filter((venue) => {
       if (!venue.slug) return false;
       return evaluateVenueIndexability({
-        events: venue.events,
+        futureSessions: venue.futureSessionCount ?? venue.events,
         isIndexable: venue.isIndexable,
         type: venue.type,
         pageStatus: venue.pageStatus,
@@ -445,7 +445,7 @@ export function assertSitemapNoindexInvariant(
       .filter((item) => {
         const venue = venueSources.get(item.url);
         return !venue || !evaluateVenueIndexability({
-          events: venue.events,
+          futureSessions: venue.futureSessionCount ?? venue.events,
           isIndexable: venue.isIndexable,
           type: venue.type,
           pageStatus: venue.pageStatus,
