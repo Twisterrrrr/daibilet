@@ -13,6 +13,7 @@ jobs:
         run: |
           set -euo pipefail
           curl -fsS --retry 2 --max-time 30 'https://daibilet.ru/api/public/venues?limit=3' > "$RUNNER_TEMP/venues.json"
+          curl -fsS --retry 2 --max-time 60 'https://daibilet.ru/api/public/venues?limit=2000' > "$RUNNER_TEMP/venues-full.json"
           curl -fsS --retry 2 --max-time 30 'https://daibilet.ru/sitemaps/venues.xml' > "$RUNNER_TEMP/venues.xml"
           python3 - "$RUNNER_TEMP" <<'PY'
           import json, pathlib, re, sys, urllib.request, xml.etree.ElementTree as ET
@@ -34,12 +35,20 @@ jobs:
           print('futureSessionCount_values:', [row.get('futureSessionCount', 'MISSING') for row in (rows or [])[:3]])
           if not rows or not all('futureSessionCount' in row for row in rows[:3]):
               raise SystemExit('futureSessionCount missing from venue API sample')
+          full_rows = venue_rows(json.loads((root / 'venues-full.json').read_text())) or []
+          print('venue_api_full_items:', len(full_rows))
+          print('future_count_missing:', sum('futureSessionCount' not in row for row in full_rows))
+          print('future_count_zero:', sum(row.get('futureSessionCount') == 0 for row in full_rows))
+          print('future_count_positive:', sum((row.get('futureSessionCount') or 0) > 0 for row in full_rows))
+          print('all_time_events_positive:', sum((row.get('events') or 0) > 0 for row in full_rows))
 
           xml = ET.fromstring((root / 'venues.xml').read_bytes())
           urls = [element.text for element in xml.iter() if element.tag.endswith('}loc') or element.tag == 'loc']
           print('sitemap_locs:', len(urls))
           print('sitemap_unique_locs:', len(set(urls)))
-          for url in urls[:5]:
+          sample_indexes = sorted({round(i * (len(urls) - 1) / 19) for i in range(20)}) if urls else []
+          for index in sample_indexes:
+              url = urls[index]
               req = urllib.request.Request(url, headers={'User-Agent': 'Googlebot'})
               with urllib.request.urlopen(req, timeout=30) as response:
                   html = response.read().decode('utf-8', errors='replace')
