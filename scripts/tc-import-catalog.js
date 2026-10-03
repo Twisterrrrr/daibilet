@@ -291,7 +291,10 @@ async function importCatalogEvent(client, event, summary, cityIdCache) {
         values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, now(), now())
         on conflict (id) do update set
           title = excluded.title,
-          description = coalesce(excluded.description, "Venue".description),
+          description = case
+            when "Venue"."descriptionOverridden" then "Venue".description
+            else coalesce(excluded.description, "Venue".description)
+          end,
           "cityId" = excluded."cityId",
           address = excluded.address,
           latitude = excluded.latitude,

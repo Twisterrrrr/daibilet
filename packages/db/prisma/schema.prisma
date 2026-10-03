@@ -836,6 +836,13 @@ model Venue {
   slug             String          @unique
   title            String
   description      String?
+  /**
+   * Set by a human (admin or supplier) when they take ownership of `description`.
+   * The catalog import overwrites `description` on every sync, so without this
+   * flag hand-written copy is destroyed on the next run. Whoever writes the
+   * value sets this; the actor does not matter, only that a human did.
+   */
+  descriptionOverridden Boolean       @default(false)
   shortDescription String?
   heroImageUrl     String?
   seoH1            String?
