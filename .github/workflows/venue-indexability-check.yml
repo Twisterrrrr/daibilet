@@ -16,7 +16,7 @@ jobs:
           curl -fsS --retry 2 --max-time 60 'https://daibilet.ru/api/public/venues?limit=2000' > "$RUNNER_TEMP/venues-full.json"
           curl -fsS --retry 2 --max-time 30 'https://daibilet.ru/sitemaps/venues.xml' > "$RUNNER_TEMP/venues.xml"
           python3 - "$RUNNER_TEMP" <<'PY'
-          import json, pathlib, re, sys, urllib.request, xml.etree.ElementTree as ET
+          import collections, json, pathlib, re, sys, urllib.request, xml.etree.ElementTree as ET
 
           root = pathlib.Path(sys.argv[1])
           payload = json.loads((root / 'venues.json').read_text())
@@ -57,6 +57,8 @@ jobs:
           urls = [element.text for element in xml.iter() if element.tag.endswith('}loc') or element.tag == 'loc']
           print('sitemap_locs:', len(urls))
           print('sitemap_unique_locs:', len(set(urls)))
+          duplicates = [(url, count) for url, count in collections.Counter(urls).items() if count > 1]
+          print('sitemap_duplicate_locs:', duplicates)
           sample_indexes = sorted({round(i * (len(urls) - 1) / 19) for i in range(20)}) if urls else []
           for index in sample_indexes:
               url = urls[index]
