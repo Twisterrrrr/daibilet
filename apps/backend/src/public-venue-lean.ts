@@ -53,6 +53,7 @@ export type LeanPublicVenueRow = {
   kind: VenueKind;
   proposedKind: string;
   pageStatus: string;
+  isIndexable: boolean;
   hookFact: string | null;
   events: number;
   /** Distinct logical events with at least one upcoming session. Drives indexability. */
@@ -79,6 +80,7 @@ const venueListSelect = {
   hookFact: true,
   kind: true,
   pageStatus: true,
+  isIndexable: true,
   cityId: true,
   city: { select: { id: true, title: true, slug: true } },
 } as const satisfies Prisma.VenueSelect;
@@ -307,6 +309,7 @@ function mapLeanVenueRow(
     kind,
     proposedKind: String(kind || 'OTHER').toLowerCase(),
     pageStatus,
+    isIndexable: row.isIndexable,
     events: eventCounts.total,
     // Indexability must read this one: `events` is an all-time count and would
     // keep a venue with only past events marked as indexable.

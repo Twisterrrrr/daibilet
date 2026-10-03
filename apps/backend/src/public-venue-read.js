@@ -2196,6 +2196,7 @@ export function mapPublicVenueListItem(row) {
     type,
     template: publicVenuePageTemplate(type),
     pageStatus: normalized.pageStatus,
+    isIndexable: normalized.isIndexable,
     shortDescription,
     heroImageUrl: normalized.heroImageUrl,
     events: normalized.events,
@@ -2235,9 +2236,6 @@ export function markVenueSitemapDetailAvailability(pageItems, hubRows, sessions,
     const row = byId.get(item.id);
     if (!row) return item;
     const kind = resolvePublicVenueKindFromRow(row);
-    if (evaluateVenueDetailContentGate(row, kind, publicVenuePageTemplate(kind)).available) {
-      return { ...item, detailAvailable: true };
-    }
     const mergedGroup = findMergedVenueGroup(detailHubRows, row.id);
     const contexts = collectVenueSessionLookupContexts(row, mergedGroup, detailHubRows);
     const ids = [...new Set([
@@ -2248,9 +2246,23 @@ export function markVenueSitemapDetailAvailability(pageItems, hubRows, sessions,
       city: row.city,
       citySlug: row.citySlug,
     }, sessions, catalog);
-    return scoped.length
-      ? { ...item, detailAvailable: true }
-      : { ...item, detailAvailable: false, isIndexable: false };
+    const canonicalRow = mergedGroup || row;
+    const type = resolvePublicVenueKindFromRow(canonicalRow);
+    const template = publicVenuePageTemplate(type);
+    const detailAvailable = scoped.length > 0 || evaluateVenueDetailContentGate(row, kind, template).available;
+    if (!detailAvailable) return { ...item, detailAvailable: false, isIndexable: false };
+    const routeCount = new Set(scoped.map((session) => session.groupKey || session.id).filter(Boolean)).size || scoped.length;
+    const hasAddress = Boolean(String(mergedGroup?.address || canonicalRow.address || '').trim());
+    const hasDescription = Boolean(String(canonicalRow.description || mergedGroup?.shortDescription || canonicalRow.shortDescription || '').trim());
+    const hasHeroImage = Boolean(resolveVenueHeroImageUrl({
+      id: canonicalRow.id,
+      heroImageUrl: mergedGroup?.heroImageUrl || canonicalRow.heroImageUrl,
+      mergedVenueIds: ids,
+    }));
+    const weakVenuePage = template === 'location'
+      ? !hasAddress || (!hasDescription && !hasHeroImage) || scoped.length < 1
+      : routeCount < 3 || (!hasDescription && !hasHeroImage) || !hasAddress;
+    return { ...item, detailAvailable: true, isIndexable: canonicalRow.isIndexable !== false && !weakVenuePage };
   });
 }
 

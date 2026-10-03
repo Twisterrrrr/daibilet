@@ -28,3 +28,22 @@ test('sitemap batch keeps venues with catalog sessions and excludes content-only
   assert.equal(result[1].detailAvailable, true);
   assert.equal(result[2].detailAvailable, true);
 });
+
+test('sitemap batch follows venue detail indexability for weak institution pages', () => {
+  const rows = [
+    { id: 'weak', slug: 'weak-club', title: 'Weak club', kind: 'CLUB_BAR_RESTAURANT', pageStatus: 'CANDIDATE', address: 'ул. 1', shortDescription: 'О клубе', city: 'Москва', isIndexable: true },
+    { id: 'strong', slug: 'strong-club', title: 'Strong club', kind: 'CLUB_BAR_RESTAURANT', pageStatus: 'CANDIDATE', address: 'ул. 2', shortDescription: 'О клубе', city: 'Москва', isIndexable: true },
+    { id: 'blocked', slug: 'blocked-club', title: 'Blocked club', kind: 'CLUB_BAR_RESTAURANT', pageStatus: 'CANDIDATE', address: 'ул. 3', shortDescription: 'О клубе', city: 'Москва', isIndexable: false },
+  ];
+  const pageItems = rows.map((row) => ({ id: row.id, slug: row.slug, events: 3 }));
+  const sessions = [
+    ...['a', 'b'].map((id) => ({ id, venueId: 'weak', city: 'Москва' })),
+    ...['c', 'd', 'e'].map((id) => ({ id, venueId: 'strong', city: 'Москва' })),
+    ...['f', 'g', 'h'].map((id) => ({ id, venueId: 'blocked', city: 'Москва' })),
+  ];
+  const catalog = { resolveCatalogSessionsByVenueKeys: (keys: string[]) => sessions.filter((session) => keys.includes(session.venueId)) };
+  const result = markVenueSitemapDetailAvailability(pageItems, rows, sessions, catalog);
+  assert.deepEqual(result.map((item) => [item.detailAvailable, item.isIndexable]), [
+    [true, false], [true, true], [true, false],
+  ]);
+});
