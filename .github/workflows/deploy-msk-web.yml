@@ -213,6 +213,14 @@ jobs:
           "${SSH[@]}" "${MSK_SSH_USER}@${MSK_SSH_HOST}" "$REMOTE_COMMAND"
           echo "Swap succeeded: DEPLOY_SHA=$DEPLOY_SHA BUILD_ID=$BUILD_ID" >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Warm venue sitemap after restart
+        if: ${{ inputs.skip_swap != true }}
+        run: |
+          set -euo pipefail
+          curl -fsS --retry 2 --retry-delay 5 --max-time 120 \
+            -o /dev/null -w 'venue sitemap warmup HTTP %{http_code} in %{time_total}s\n' \
+            https://daibilet.ru/sitemaps/venues.xml
+
       - name: Public smoke (prod URL)
         if: ${{ inputs.skip_swap != true }}
         run: |

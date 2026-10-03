@@ -2267,20 +2267,30 @@ export function markVenueSitemapDetailAvailability(pageItems, hubRows, sessions,
 }
 
 /** A shared slug can resolve to a different DB row than the catalog item. */
-export async function markVenueSitemapCanonicalSlugs(pageItems, db) {
-  const slugs = [...new Set(pageItems.map((item) => String(item.slug || '').trim()).filter(Boolean))];
+export async function markVenueSitemapCanonicalSlugs(pageItems, db, hubRows = []) {
+  const eligible = pageItems.filter((item) => item.isIndexable !== false && Number(item.futureSessionCount) > 0);
+  const slugs = [...new Set(eligible.map((item) => String(item.slug || '').trim()).filter(Boolean))];
   if (!slugs.length) return pageItems;
   const duplicates = await db.query(
     'select slug from "Venue" where slug = any($1::text[]) group by slug having count(*) > 1',
     [slugs],
   );
-  const canonicalIds = new Map(await Promise.all(duplicates.rows.map(async ({ slug }) => {
-    const row = await resolvePublicVenueRow(db, slug);
-    return [slug, row?.id || null];
-  })));
+  const duplicateSlugs = new Set(duplicates.rows.map((row) => row.slug));
+  const hubById = new Map(hubRows.map((row) => [row.id, row]));
+  const candidates = eligible.filter((item) =>
+    duplicateSlugs.has(item.slug) ||
+    (hubById.has(item.id) && String(hubById.get(item.id).slug || '').trim() !== item.slug));
+  const resolvedIds = new Map();
+  for (let i = 0; i < candidates.length; i += 16) {
+    const batch = await Promise.all(candidates.slice(i, i + 16).map(async (item) => {
+      const row = await resolvePublicVenueRow(db, item.slug);
+      return [item.slug, row?.id || null];
+    }));
+    for (const [slug, id] of batch) resolvedIds.set(slug, id);
+  }
   return pageItems.map((item) => {
-    if (!canonicalIds.has(item.slug)) return item;
-    return canonicalIds.get(item.slug) === item.id
+    if (!resolvedIds.has(item.slug)) return item;
+    return resolvedIds.get(item.slug) === item.id
       ? item
       : { ...item, isIndexable: false };
   });
@@ -2476,7 +2486,7 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
     const sessions = await catalog.getPublicCatalogSessionsSoft(10_000, { hydrateSlots: false });
     if (!sessions) throw new Error('Sitemap venue availability unavailable: catalog sessions timed out');
     pageItems = markVenueSitemapDetailAvailability(pageItems, rows, sessions, catalog);
-    pageItems = await markVenueSitemapCanonicalSlugs(pageItems, db);
+    pageItems = await markVenueSitemapCanonicalSlugs(pageItems, db, rows);
     const excluded = pageItems.filter((item) => item.detailAvailable === false).length;
     console.info(`[sitemap] venue detail availability: ${excluded}/${pageItems.length} excluded in ${Date.now() - startedAt}ms`);
   }

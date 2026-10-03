@@ -50,9 +50,9 @@ test('sitemap batch follows venue detail indexability for weak institution pages
 
 test('sitemap excludes a duplicate slug that resolves to another venue ID', async () => {
   const items = [
-    { id: 'venue_a', slug: 'same-hall', isIndexable: true },
-    { id: 'venue_b', slug: 'same-hall', isIndexable: true },
-    { id: 'venue_c', slug: 'unique-hall', isIndexable: true },
+    { id: 'venue_a', slug: 'same-hall', isIndexable: true, futureSessionCount: 3 },
+    { id: 'venue_b', slug: 'same-hall', isIndexable: true, futureSessionCount: 3 },
+    { id: 'venue_c', slug: 'unique-hall', isIndexable: true, futureSessionCount: 3 },
   ];
   const db = {
     query: async (sql: string) => sql.includes('group by slug')
@@ -61,4 +61,16 @@ test('sitemap excludes a duplicate slug that resolves to another venue ID', asyn
   };
   const result = await markVenueSitemapCanonicalSlugs(items, db);
   assert.deepEqual(result.map((item: { isIndexable?: boolean }) => item.isIndexable), [false, true, true]);
+});
+
+test('sitemap excludes a computed slug that does not resolve to its venue ID', async () => {
+  const items = [{ id: 'venue_cyr', slug: 'harat-s-pub', isIndexable: true, futureSessionCount: 3 }];
+  const hubRows = [{ id: 'venue_cyr', slug: 'харат-с-паб' }];
+  const db = {
+    query: async (sql: string) => sql.includes('group by slug')
+      ? { rows: [] }
+      : { rows: [{ id: 'venue_other', slug: 'harat-s-pub' }] },
+  };
+  const result = await markVenueSitemapCanonicalSlugs(items, db, hubRows);
+  assert.equal(result[0]?.isIndexable, false);
 });
