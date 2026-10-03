@@ -2266,6 +2266,26 @@ export function markVenueSitemapDetailAvailability(pageItems, hubRows, sessions,
   });
 }
 
+/** A shared slug can resolve to a different DB row than the catalog item. */
+export async function markVenueSitemapCanonicalSlugs(pageItems, db) {
+  const slugs = [...new Set(pageItems.map((item) => String(item.slug || '').trim()).filter(Boolean))];
+  if (!slugs.length) return pageItems;
+  const duplicates = await db.query(
+    'select slug from "Venue" where slug = any($1::text[]) group by slug having count(*) > 1',
+    [slugs],
+  );
+  const canonicalIds = new Map(await Promise.all(duplicates.rows.map(async ({ slug }) => {
+    const row = await resolvePublicVenueRow(db, slug);
+    return [slug, row?.id || null];
+  })));
+  return pageItems.map((item) => {
+    if (!canonicalIds.has(item.slug)) return item;
+    return canonicalIds.get(item.slug) === item.id
+      ? item
+      : { ...item, isIndexable: false };
+  });
+}
+
 export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchParams(), options = {}) {
   const mode = String(searchParams.get('mode') || 'list').trim().toLowerCase();
   const isPins = mode === 'pins';
@@ -2456,6 +2476,7 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
     const sessions = await catalog.getPublicCatalogSessionsSoft(10_000, { hydrateSlots: false });
     if (!sessions) throw new Error('Sitemap venue availability unavailable: catalog sessions timed out');
     pageItems = markVenueSitemapDetailAvailability(pageItems, rows, sessions, catalog);
+    pageItems = await markVenueSitemapCanonicalSlugs(pageItems, db);
     const excluded = pageItems.filter((item) => item.detailAvailable === false).length;
     console.info(`[sitemap] venue detail availability: ${excluded}/${pageItems.length} excluded in ${Date.now() - startedAt}ms`);
   }

@@ -320,8 +320,9 @@ export async function buildVenuesSitemapEntries(now = new Date()): Promise<Sitem
       sources.set(result.url, venue);
       return result;
   });
-  assertSitemapNoindexInvariant(entries, sources);
-  return entries;
+  const uniqueEntries = [...new Map(entries.map((item) => [item.url, item])).values()];
+  assertSitemapNoindexInvariant(uniqueEntries, sources);
+  return uniqueEntries;
 }
 
 export async function buildLandingsSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {

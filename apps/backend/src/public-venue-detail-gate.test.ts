@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { evaluateVenueDetailContentGate } from './public-venue-hub-gate.js';
-import { markVenueSitemapDetailAvailability } from './public-venue-read.js';
+import { markVenueSitemapCanonicalSlugs, markVenueSitemapDetailAvailability } from './public-venue-read.js';
 
 test('detail content gate matches the no-session venue branches', () => {
   const base = { title: 'Зал', kind: 'CONCERT_HALL', pageStatus: 'CANDIDATE', address: 'ул. 1' };
@@ -43,7 +43,22 @@ test('sitemap batch follows venue detail indexability for weak institution pages
   ];
   const catalog = { resolveCatalogSessionsByVenueKeys: (keys: string[]) => sessions.filter((session) => keys.includes(session.venueId)) };
   const result = markVenueSitemapDetailAvailability(pageItems, rows, sessions, catalog);
-  assert.deepEqual(result.map((item) => [item.detailAvailable, item.isIndexable]), [
+  assert.deepEqual(result.map((item: { detailAvailable?: boolean; isIndexable?: boolean }) => [item.detailAvailable, item.isIndexable]), [
     [true, false], [true, true], [true, false],
   ]);
+});
+
+test('sitemap excludes a duplicate slug that resolves to another venue ID', async () => {
+  const items = [
+    { id: 'venue_a', slug: 'same-hall', isIndexable: true },
+    { id: 'venue_b', slug: 'same-hall', isIndexable: true },
+    { id: 'venue_c', slug: 'unique-hall', isIndexable: true },
+  ];
+  const db = {
+    query: async (sql: string) => sql.includes('group by slug')
+      ? { rows: [{ slug: 'same-hall' }] }
+      : { rows: [{ id: 'venue_b', slug: 'same-hall' }] },
+  };
+  const result = await markVenueSitemapCanonicalSlugs(items, db);
+  assert.deepEqual(result.map((item: { isIndexable?: boolean }) => item.isIndexable), [false, true, true]);
 });
