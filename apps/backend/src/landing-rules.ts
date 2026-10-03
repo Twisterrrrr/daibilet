@@ -60,10 +60,49 @@ export const LANDING_RULES: LandingRule[] = [
     subtitle: 'Теплоходы, катера, реки и каналы',
     chips: ['теплоход', 'катер', 'причалы'],
     tags: ['Водные экскурсии', 'Реки и каналы', 'На теплоходе', 'Водная экскурсия', 'На катере', 'Теплоходные экскурсии', 'Речные прогулки'],
-    keywords: ['теплоход', 'катер', 'река', 'речн', 'канал', 'причал', 'прогулк'],
+    // No bare «прогулк»: walking tours leak. Boat/pier stems only (word-start match).
+    keywords: ['теплоход', 'катер', 'река', 'речн', 'канал', 'причал', 'яхт', 'корабл', 'судн', 'лодк', 'круиз', 'водн'],
     keywordScope: 'content',
     requiredAnySubcategories: ['Водные экскурсии', 'Речные прогулки'],
-    excludeKeywords: ['автобус', 'пешеход', 'парадн', 'двор', 'коммунал', 'мастер-класс', 'квест', 'концерт', 'вечеринк', 'дискотек'],
+    // Concerts/pubs/standup are not river trips; «катер» inside «Екатеринбург» is blocked by word-start match.
+    // Charter/yacht rental is not a river stroll - TC often opens «продажи остановлены» for these.
+    // Day trips to Karelia / Ladoga skerries: bus from SPB + boat there, not city river cruise.
+    excludeKeywords: [
+      'автобус',
+      'пешеход',
+      'парадн',
+      'двор',
+      'коммунал',
+      'мастер-класс',
+      'квест',
+      'концерт',
+      'вечеринк',
+      'дискотек',
+      'стендап',
+      'stand up',
+      'комеди',
+      'юмор',
+      'рок',
+      'хит',
+      'анимаци',
+      'ben hall',
+      'индивидуальная аренда',
+      'аренда яхт',
+      'аренда яхты',
+      'аренда катер',
+      'аренда катера',
+      'yacht charter',
+      'private yacht',
+      'карели',
+      'ладож',
+      'шхер',
+      'валаам',
+      'кижи',
+      'рускеал',
+      'сортавал',
+      'приозерск',
+    ],
+    excludeKeywordFields: ['title', 'category', 'sourceCategory', 'venue', 'subcategory', 'tag'],
   },
   {
     slug: 'river-party',
@@ -102,6 +141,7 @@ export const LANDING_RULES: LandingRule[] = [
     subtitle: 'Елки, шоу, концерты и праздничные программы',
     chips: ['декабрь', 'детям', 'шоу'],
     keywords: ['новогод', 'новый год', 'елка', 'ёлка', 'рождество'],
+    requiredTitleKeywordGroups: [['новогод', 'новый год', 'елка', 'ёлка', 'рождеств']],
   },
   {
     slug: 'moscow-dinner-boat',
@@ -121,33 +161,126 @@ export const LANDING_RULES: LandingRule[] = [
     excludeKeywords: ['автобус', 'пешеход', 'мастер-класс'],
   },
   {
+    // Moscow City Day seasonal landing (not Victory Day / salute-9-may).
+    slug: 'moscow-city-day',
+    title: 'День города в Москве',
+    subtitle: 'Праздничные прогулки, салют и программы к Дню города',
+    city: 'Москва',
+    chips: ['день города', 'салют', 'теплоход'],
+    keywords: [
+      'день города',
+      'дня города',
+      'дню города',
+      'днем города',
+      'днём города',
+      'городск',
+      'салют',
+      'фейерверк',
+      'теплоход',
+      'речн',
+    ],
+    keywordScope: 'content',
+    requiredAnyKeywords: [
+      'день города',
+      'дня города',
+      'дню города',
+      'днем города',
+      'днём города',
+    ],
+    // Keep Victory Day / 9 May salute on salute-9-may only.
+    excludeKeywords: [
+      '9 мая',
+      '9.05',
+      '09.05',
+      '09 мая',
+      'день победы',
+      'дня победы',
+      'дню победы',
+      'днем победы',
+      'днём победы',
+    ],
+  },
+  {
     slug: 'salute-9-may',
     title: 'Салют 9 мая',
     subtitle: 'Лучшие точки обзора и экскурсии к Дню Победы',
     chips: ['9 мая', 'салют', 'праздник'],
-    keywords: ['салют', 'фейерверк', 'день победы', 'праздничн', 'побед'],
+    // Fireworks alone are not enough: City Day boat tours also sell «праздничный фейерверк».
+    keywords: ['салют', 'фейерверк', 'день победы', '9 мая', 'побед'],
     requiredAnyKeywords: ['салют', 'фейерверк'],
+    // Victory Day intent (date / holiday), not any urban fireworks.
+    requiredKeywordGroups: [
+      ['9 мая', 'день победы', 'побед', '9.05', '09.05', '09 мая'],
+    ],
     keywordScope: 'content',
-    excludeKeywords: ['новогод', 'ёлка', 'елка', 'рождеств'],
+    excludeKeywords: [
+      'новогод',
+      'ёлка',
+      'елка',
+      'рождеств',
+      'день города',
+      'дня города',
+      'дню города',
+      'днем города',
+      'днём города',
+    ],
   },
   {
     slug: 'bus-tours',
     title: 'Автобусные обзорные экскурсии',
     subtitle: 'Городские маршруты и обзорные программы',
     chips: ['автобус', 'обзорная', 'город'],
-    tags: ['Автобусные туры', 'Автобусные экскурсии'],
-    keywords: ['автобус', 'автобусн', 'обзорн', 'сити тур', 'city tour'],
-    requiredAnySubcategories: ['Автобусные туры', 'Автобусные экскурсии'],
-    requiredAnyVenueKeywords: ['туристическ', 'yutong', 'city sightseeing', 'hop on', 'hop-off', 'hop off'],
-    requiredTitleKeywordGroups: [
-      ['обзорн', 'экскурс', 'двухэтажн', 'hop on', 'city tour', 'сити тур'],
+    tags: [
+      'Автобусные туры',
+      'Автобусные экскурсии',
+      'Автобусный тур',
+      'Автобусная экскурсия',
+      'Обзорная экскурсия',
     ],
+    keywords: [
+      'автобус',
+      'автобусн',
+      'обзорн',
+      'двухэтажн',
+      'сити тур',
+      'city tour',
+      'hop on',
+      'hop-off',
+      'hop off',
+    ],
+    // Tag / subcategory / hop-on venue = fast path; иначе автобусный + экскурсионный сигнал в content.
+    requiredAnySubcategories: [
+      'Автобусные туры',
+      'Автобусные экскурсии',
+      'Автобусный тур',
+      'Автобусная экскурсия',
+    ],
+    requiredAnyVenueKeywords: ['туристическ', 'yutong', 'city sightseeing', 'hop on', 'hop-off', 'hop off'],
     requiredKeywordGroups: [
-      ['автобус', 'автобусн', 'двухэтажн', 'туристическ', 'yutong', 'hop on', 'city tour', 'сити тур'],
-      ['обзорн', 'экскурс', 'hop on', 'city tour', 'сити тур'],
+      ['автобус', 'автобусн', 'двухэтажн', 'yutong', 'hop on', 'hop-off', 'hop off', 'city tour', 'сити тур'],
+      ['экскурс', 'обзорн', 'hop on', 'city tour', 'сити тур', 'двухэтажн'],
     ],
     excludeTags: ['Водные экскурсии', 'На теплоходе', 'На катере', 'Реки и каналы'],
-    excludeKeywords: ['теплоход', 'катер', 'лодк', 'корабл', 'причал', 'река', 'канал', 'нева', 'мост', 'пешеход', 'пешком', 'фест', 'фестиваль'],
+    excludeKeywords: [
+      'теплоход',
+      'катер',
+      'лодк',
+      'корабл',
+      'причал',
+      'река',
+      'канал',
+      'нева',
+      'мост',
+      'пешеход',
+      'пешком',
+      'фест',
+      'фестиваль',
+      // Pure transfers / airport shuttles - not sightseeing.
+      'трансфер',
+      'transfer',
+      'аэропорт',
+      'такси',
+    ],
     excludeKeywordFields: ['title', 'category', 'sourceCategory', 'venue', 'subcategory'],
   },
   {
@@ -184,10 +317,24 @@ export const LANDING_RULES: LandingRule[] = [
     chips: ['детям', 'семья', 'цирк'],
     tags: ['Детям', 'Детская анимация', 'Шоу для детей', 'Цирк', 'Детское шоу'],
     requiredAnySubcategories: ['Детям', 'Детская анимация', 'Шоу для детей'],
-    keywords: ['детск', 'семейн', 'цирк', 'анимац', 'для детей', 'ёлк', 'елк'],
+    // No bare «анимац»: rock band «АнимациЯ» matched via stem. Kids keep tags/«для детей».
+    keywords: ['детск', 'семейн', 'цирк', 'для детей', 'ёлк', 'елк'],
     keywordScope: 'content',
-    excludeKeywords: ['18+', 'stand up', 'стендап', 'комеди', 'юмор'],
-    excludeKeywordFields: ['title', 'category', 'sourceCategory'],
+    // Band «АнимациЯ» (Кулясов); bare «анимация» would kill kids shows - use band markers + Рок.
+    excludeTags: ['Рок'],
+    excludeKeywords: [
+      '18+',
+      'stand up',
+      'стендап',
+      'комеди',
+      'юмор',
+      'кулясов',
+      'animaciya',
+      'гр. анимаци',
+      'гр.анимаци',
+      'рок',
+    ],
+    excludeKeywordFields: ['title', 'category', 'sourceCategory', 'tag', 'subcategory'],
   },
   {
     slug: 'concerts-genre',
@@ -197,22 +344,191 @@ export const LANDING_RULES: LandingRule[] = [
     tags: ['Рок', 'Джаз', 'Классика', 'Поп', 'Эстрада', 'Металл', 'Альтернатива', 'Электронная музыка', 'Хип-хоп', 'Орган', 'Симфоническая музыка', 'Инди'],
     keywords: ['концерт', 'live', 'симфон', 'оркестр', 'филармон'],
     keywordScope: 'content',
-    excludeTags: ['Юмор', 'Stand up', 'Комедия', 'Импровизация', 'TV комики'],
-    excludeKeywords: ['стендап', 'stand up', 'комеди', 'юмор', 'импров'],
-    excludeKeywordFields: ['title', 'category', 'sourceCategory', 'subcategory'],
+    // Bus tours leak via music keywords (e.g. «симфония … на автобусе»); keep them on bus-tours.
+    excludeTags: [
+      'Юмор',
+      'Stand up',
+      'Комедия',
+      'Импровизация',
+      'TV комики',
+      'Автобусные туры',
+      'Автобусные экскурсии',
+    ],
+    excludeKeywords: ['стендап', 'stand up', 'комеди', 'юмор', 'импров', 'автобус', 'автобусн'],
+    excludeKeywordFields: ['title', 'category', 'sourceCategory', 'subcategory', 'venue'],
   },
   {
     slug: 'moscow-museums',
-    title: 'Музеи и мастер-классы в Москве',
+    title: 'Музеи и выставки в Москве',
     subtitle: 'Выставки, экскурсии и творческие занятия',
     city: 'Москва',
-    chips: ['музеи', 'мастер-класс', 'творчество'],
-    tags: ['Музеи', 'Мастер-класс', 'Мастер-классы', 'Выставки', 'Искусство', 'Творчество'],
+    chips: ['музеи', 'выставки', 'творчество'],
+    // city is a filter only (global matcher); requiredAny* keep museum/workshop signal.
+    tags: ['Музеи', 'Мастер-класс', 'Мастер-классы', 'Выставки'],
     requiredAnySubcategories: ['Музеи', 'Мастер-класс', 'Мастер-классы', 'Выставки'],
-    keywords: ['мастер-класс', 'музе', 'выставк', 'эмаль'],
+    keywords: ['мастер-класс', 'музе', 'выставк', 'эмаль', 'галере', 'экспозиц'],
     keywordScope: 'content',
-    excludeKeywords: ['автобус', 'автобусн', 'теплоход', 'речн'],
-    excludeKeywordFields: ['title', 'venue', 'subcategory'],
+    requiredAnyKeywords: ['мастер-класс', 'музе', 'выставк', 'эмаль', 'галере', 'экспозиц'],
+    excludeTags: ['Юмор', 'Stand up', 'Комедия', 'Импровизация', 'TV комики'],
+    excludeKeywords: [
+      'автобус',
+      'автобусн',
+      'теплоход',
+      'речн',
+      'стендап',
+      'stand up',
+      'stand-up',
+      'standup',
+      'комеди',
+      'юмор',
+      'open mic',
+      'open-mic',
+      'открытый микрофон',
+      'импров',
+      'клубный стендап',
+    ],
+    excludeKeywordFields: ['title', 'category', 'sourceCategory', 'venue', 'subcategory', 'tag'],
+  },
+  {
+    slug: 'walking-tours',
+    title: 'Пешие экскурсии',
+    subtitle: 'Авторские прогулки, маршруты по районам и истории города',
+    chips: ['пешком', 'гид', 'маршрут'],
+    tags: [
+      'Пешеходные экскурсии',
+      'Пешие экскурсии',
+      'Авторские экскурсии',
+      'Пешеходная экскурсия',
+      'Авторская экскурсия',
+    ],
+    keywords: ['пешеход', 'пешком', 'пешая', 'пешие', 'прогулк', 'walking', 'авторск'],
+    keywordScope: 'content',
+    requiredAnySubcategories: [
+      'Пешеходные экскурсии',
+      'Пешие экскурсии',
+      'Авторские экскурсии',
+      'Пешеходная экскурсия',
+    ],
+    excludeKeywords: ['автобус', 'теплоход', 'катер', 'речн'],
+  },
+  {
+    slug: 'country-tours',
+    title: 'Загородные экскурсии',
+    subtitle: 'Маршруты из Санкт-Петербурга в пригороды и области',
+    chips: ['за город', 'пригороды', 'дворцы'],
+    city: 'Санкт-Петербург',
+    tags: ['Загородные экскурсии', 'Экскурсии в пригороды'],
+    keywords: [
+      'загород',
+      'пригород',
+      'петергоф',
+      'пушкин',
+      'царск',
+      'павловск',
+      'кронштадт',
+      'выборг',
+      'гатчин',
+      'ораниенбаум',
+      'ломоносов',
+      'стрельн',
+      'репино',
+      'сестрорецк',
+      'шлиссельбург',
+      'петергофск',
+      'царское село',
+    ],
+    // full: топоним часто в destination/venue, не только в title (content scope режет это).
+    keywordScope: 'full',
+    requiredAnySubcategories: ['Загородные экскурсии', 'Экскурсии в пригороды'],
+    // Экскурсионный сигнал (не только stem «экскурс») + топоним пригорода / загород.
+    requiredKeywordGroups: [
+      ['экскурс', 'тур', 'выезд', 'маршрут'],
+      [
+        'загород',
+        'пригород',
+        'петергоф',
+        'пушкин',
+        'царск',
+        'павловск',
+        'кронштадт',
+        'выборг',
+        'гатчин',
+        'ораниенбаум',
+        'ломоносов',
+        'стрельн',
+        'репино',
+        'сестрорецк',
+        'шлиссельбург',
+        'петергофск',
+        'царское село',
+      ],
+    ],
+    excludeKeywords: ['теплоход', 'катер', 'речн', 'концерт', 'спектакл', 'стендап', 'stand up'],
+  },
+  {
+    slug: 'exhibitions',
+    title: 'Выставки и музеи',
+    subtitle: 'Экспозиции, музейные маршруты и культурные события',
+    chips: ['выставки', 'музеи', 'искусство'],
+    tags: ['Музеи', 'Выставки', 'Искусство'],
+    keywords: ['музе', 'выставк', 'экспозиц', 'галере'],
+    keywordScope: 'content',
+    excludeKeywords: ['теплоход', 'катер', 'речн'],
+  },
+  {
+    slug: 'unusual-theatres',
+    title: 'Необычные театры',
+    subtitle: 'Иммерсивные, камерные и экспериментальные постановки',
+    chips: ['иммерсивный', 'камерный', 'спектакль'],
+    tags: ['Театр', 'Иммерсивный театр', 'Спектакль'],
+    keywords: ['театр', 'спектакл', 'иммерсив', 'перформанс'],
+    keywordScope: 'content',
+  },
+  {
+    slug: 'excursions',
+    title: 'Экскурсии',
+    subtitle: 'Городские маршруты с гидом для жителей и гостей города',
+    chips: ['гид', 'маршрут', 'город'],
+    tags: ['Экскурсии', 'Авторские экскурсии', 'Пешеходные экскурсии'],
+    keywords: ['экскурс', 'гид', 'маршрут'],
+    keywordScope: 'content',
+  },
+  {
+    slug: 'rooftops',
+    title: 'Смотровые площадки и крыши',
+    subtitle: 'Смотровые площадки, панорамы города и прогулки по крышам',
+    chips: ['смотровые', 'панорамы', 'крыши'],
+    // Национальная витрина (смотровые и крыши по городам). City-URL не lock на SPb.
+    tags: ['Экскурсии по крышам', 'Крыши', 'Смотровые площадки', 'Смотровая площадка'],
+    keywords: [
+      'крыш',
+      'руф',
+      'панорам',
+      'смотр',
+      'москва-сити',
+      'moscow city',
+      'observation',
+    ],
+    keywordScope: 'content',
+    requiredAnySubcategories: ['Экскурсии по крышам', 'Крыши', 'Смотровые площадки', 'Смотровая площадка'],
+    requiredTitleKeywordGroups: [
+      ['экскурс', 'прогулк', 'тур', 'посещени', 'смотр', 'площадк', 'панорам', 'сити'],
+    ],
+    requiredKeywordGroups: [['крыш', 'руф', 'смотр', 'москва-сити', 'moscow city']],
+    excludeKeywords: [
+      'теплоход',
+      'катер',
+      'речн',
+      'концерт',
+      'музыкальн',
+      'вечеринк',
+      'фуршет',
+      'джаз',
+      'стендап',
+      'stand up',
+      'автобус',
+      'автобусн',
+    ],
   },
   {
     slug: 'active-sport',
@@ -226,8 +542,79 @@ export const LANDING_RULES: LandingRule[] = [
   },
 ];
 
+/** Legacy URL aliases → canonical landing slug (single source for dto + Next). */
+export const LANDING_SLUG_ALIASES: Record<string, string[]> = {
+  'river-cruises': ['river-walks', 'river-cruise', 'river'],
+  'river-party': ['party-boat', 'river-disco', 'boat-party'],
+  'bridges-night': ['razvodnye-mosty', 'bridges', 'spb-bridges-night', 'bridges_night', 'night-bridges'],
+  'bus-tours': ['bus-sightseeing', 'bus'],
+  'spb-yards': ['spb-paradnye', 'yards-spb', 'dory-paradnye'],
+  'family-kids': ['kids-family', 'detyam'],
+  'concerts-genre': ['concerts', 'concerts-genres'],
+  'moscow-museums': ['moscow-museums-workshops'],
+  'moscow-city-day': ['den-goroda-moskva', 'den-goroda', 'city-day-moscow'],
+  'active-sport': ['active-extreme', 'autosport'],
+};
+
+/** Seasonally off landings: keep page, hide from /podborki and promo hub. */
+export function isLandingOffSeason(slug: string, now = new Date()): boolean {
+  const key = String(slug || '')
+    .trim()
+    .toLowerCase()
+    .replace(/_/g, '-');
+  // Prefer Europe/Moscow calendar for RU seasonal landings.
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Europe/Moscow',
+    month: 'numeric',
+    day: 'numeric',
+  }).formatToParts(now);
+  const month = Number(parts.find((part) => part.type === 'month')?.value || 0);
+  const day = Number(parts.find((part) => part.type === 'day')?.value || 0);
+
+  if (key === 'salute-9-may') {
+    // Апрель - середина мая.
+    return !(month === 4 || (month === 5 && day <= 15));
+  }
+  if (key === 'moscow-city-day') {
+    // Август - сентябрь (День города Москвы).
+    return !(month === 8 || month === 9);
+  }
+  if (key === 'new-year') {
+    // Середина ноября - середина января.
+    if (month === 11 && day >= 15) return false;
+    if (month === 12) return false;
+    if (month === 1 && day <= 15) return false;
+    return true;
+  }
+  return false;
+}
+
+export function buildOffSeasonLandingSlugs(now = new Date()): Set<string> {
+  return new Set(
+    ['salute-9-may', 'moscow-city-day', 'new-year'].filter((slug) => isLandingOffSeason(slug, now)),
+  );
+}
+
+/** @deprecated Prefer buildOffSeasonLandingSlugs() - snapshot at module load. */
+export const OFF_SEASON_LANDING_SLUGS = buildOffSeasonLandingSlugs();
+
+export function resolveLandingRuleBySlug(landingSlug: string): LandingRule | undefined {
+  const key = String(landingSlug || '').trim().toLowerCase().replace(/_/g, '-');
+  const direct = LANDING_RULES.find((item) => item.slug === key);
+  if (direct) return direct;
+  return LANDING_RULES.find((item) => (LANDING_SLUG_ALIASES[item.slug] || []).includes(key));
+}
+
+export function sessionMatchesLandingSlug(
+  session: { landingSlugs?: string[] | null },
+  canonicalSlug: string,
+): boolean {
+  const slugs = new Set([canonicalSlug, ...(LANDING_SLUG_ALIASES[canonicalSlug] || [])]);
+  return (session.landingSlugs || []).some((value) => slugs.has(String(value || '').toLowerCase()));
+}
+
 export function findLandingRule(slug: string): LandingRule | undefined {
-  return LANDING_RULES.find((rule) => rule.slug === slug);
+  return resolveLandingRuleBySlug(slug);
 }
 
 export function matchingLandingSlugs(candidate: LandingMatchCandidate): string[] {
@@ -323,6 +710,8 @@ export function explainLandingRuleMatch(
   for (const tag of tagSignals.slice(0, 4)) reasons.push(`тег: ${tag}`);
   for (const match of keywordSignals.slice(0, 4)) reasons.push(`слово(${match.field}): ${match.keyword}`);
 
+  // City is only a filter (wrong city → blocker above). It must never be a sufficient
+  // positive signal: otherwise any city-scoped rule without requiredAny* floods the landing.
   const hasRequiredSignal = Boolean(
     rule.requiredAnyTags ||
     rule.requiredAnyKeywords ||
@@ -330,8 +719,14 @@ export function explainLandingRuleMatch(
     rule.requiredTitleKeywordGroups ||
     rule.requiredKeywordGroups,
   );
+  const hasPositiveSignal = Boolean(
+    tagSignals.length ||
+    keywordSignals.length ||
+    hasRequiredSignal ||
+    rule.venue,
+  );
   return {
-    matches: Boolean(tagSignals.length || keywordSignals.length || hasRequiredSignal || rule.city || rule.venue),
+    matches: hasPositiveSignal,
     reasons: uniqueValues(reasons).slice(0, 10),
     blockers: [],
   };
@@ -442,10 +837,29 @@ function moscowHour(value: string | Date): number {
   return Number(hourPart?.value);
 }
 
+/** Stem OK (`катер`→`катера`), mid-word no (`катер` inside `екатеринбург`). */
+function textHasKeywordStem(text: string, keyword: string): boolean {
+  const normalized = keyword.toLowerCase();
+  if (!normalized) return false;
+  let from = 0;
+  while (from <= text.length) {
+    const idx = text.indexOf(normalized, from);
+    if (idx < 0) return false;
+    const before = idx === 0 ? '' : text[idx - 1];
+    if (!before || !isKeywordWordChar(before)) return true;
+    from = idx + 1;
+  }
+  return false;
+}
+
+function isKeywordWordChar(ch: string): boolean {
+  return /[0-9a-zà-öø-ÿа-яё_]/i.test(ch);
+}
+
 function firstKeywordMatch(fields: KeywordField[], keywords: string[]): KeywordMatch | null {
   for (const keyword of keywords) {
     const normalized = keyword.toLowerCase();
-    const field = fields.find((item) => item.text.includes(normalized));
+    const field = fields.find((item) => textHasKeywordStem(item.text, normalized));
     if (field) return { keyword, field: field.field };
   }
   return null;
@@ -456,7 +870,7 @@ function matchingKeywordMatches(fields: KeywordField[], keywords: string[]): Key
   const seen = new Set<string>();
   for (const keyword of keywords) {
     const normalized = keyword.toLowerCase();
-    const field = fields.find((item) => item.text.includes(normalized));
+    const field = fields.find((item) => textHasKeywordStem(item.text, normalized));
     if (!field) continue;
     const key = `${field.field}:${keyword}`;
     if (seen.has(key)) continue;

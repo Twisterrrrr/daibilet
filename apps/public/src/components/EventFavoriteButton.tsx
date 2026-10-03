@@ -21,9 +21,16 @@ export function useEventFavorite(eventId: string) {
     (clickEvent: React.MouseEvent) => {
       clickEvent.preventDefault();
       clickEvent.stopPropagation();
-      setFavorite(toggleFavoriteId(eventId).has(eventId));
+      const prev = favorite;
+      setFavorite(!prev);
+      try {
+        const next = toggleFavoriteId(eventId);
+        setFavorite(next.has(eventId));
+      } catch {
+        setFavorite(prev);
+      }
     },
-    [eventId],
+    [eventId, favorite],
   );
 
   return { favorite, toggleFavorite };

@@ -1,0 +1,32 @@
+name: Crawler health
+on:
+  schedule:
+    - cron: '20 */2 * * *'
+  workflow_dispatch:
+jobs:
+  crawler-health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/next-monorepo
+      - name: Crawler matrix
+        run: bash deploy/scripts/smoke-crawler-prod.sh
+      - name: Bot 5XX and ReferenceError monitor
+        if: always()
+        env:
+          MSK_SSH_HOST: ${{ secrets.MSK_SSH_HOST }}
+          MSK_SSH_USER: ${{ secrets.MSK_SSH_USER }}
+          MSK_SSH_KEY: ${{ secrets.MSK_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          install -d -m 700 "$HOME/.ssh"
+          printf '%s\n' "$MSK_SSH_KEY" > "$HOME/.ssh/msk_key"
+          chmod 600 "$HOME/.ssh/msk_key"
+          ssh -i "$HOME/.ssh/msk_key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o BatchMode=yes \
+            "$MSK_SSH_USER@$MSK_SSH_HOST" \
+            'cd /opt/daibilet && sudo -n env CRAWLER_MONITOR_STATE=/var/lib/daibilet/crawler-monitor/ci-state.json node scripts/crawler-log-monitor.mjs'
+      - name: Alert summary
+        if: failure()
+        run: echo '::error::Crawler health failed. Inspect bot 5XX, ReferenceError, SSH access and smoke output. Enable GitHub Actions failure notifications for this workflow.'

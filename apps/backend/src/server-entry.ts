@@ -1,7 +1,11 @@
 import type { Server } from 'node:http';
+import { buildAdminEventChangeRequestDetailDto, buildAdminEventChangeRequestsDto } from './admin-event-change-requests.dto.js';
+import { createAdminEventChangeRequestsRouteHandler } from './admin-event-change-requests-handler.js';
 import { createAdminEventsRouteHandler } from './admin-events-handler.js';
 import { createAdminEventsReadRouteHandler } from './admin-events-read-handler.js';
 import { buildAdminEventDetailDto, buildAdminEventsListDto } from './admin-events.dto.js';
+import { applyApprovedEventChangeRequest } from './event-change-request-applier.js';
+import { reviewEventChangeRequest } from './event-change-request-review.js';
 import { createAdminLandingsRouteHandler } from './admin-landings-handler.js';
 import { createAdminOrdersRouteHandler } from './admin-orders-handler.js';
 import { createAdminOrdersReadRouteHandler } from './admin-orders-read-handler.js';
@@ -10,12 +14,13 @@ import { createAdminAuthConfig } from './auth.js';
 import { readBackendEnv } from './env.js';
 import { updateAdminEventOverride, updateAdminLandingMatch, upsertAdminOrderTicket } from './dto.js';
 import { buildPublicCatalogDto, clearPublicCatalogDtoCache, getPublicCatalogSessions } from './public-catalog.dto.js';
+import { clearPublicArticlesDtoCache } from './public-articles.dto.js';
 import { createPublicCatalogRouteHandler } from './public-catalog-handler.js';
 import { buildPublicCityDto, buildPublicDestinationsDto, clearPublicCityDtoCache } from './public-city.dto.js';
 import { createPublicCityRouteHandler } from './public-city-handler.js';
 import { buildPublicEventDto, clearPublicEventDtoCache } from './public-event.dto.js';
 import { createPublicEventRouteHandler } from './public-event-handler.js';
-import { buildPublicVenueDto, buildPublicVenuesDto, clearPublicVenueDtoCache } from './public-venue.dto.js';
+import { buildPublicVenueDto, buildPublicVenuesDto, buildPublicVenueEventCountsDto, clearPublicVenueDtoCache } from './public-venue.dto.js';
 import { createPublicVenueRouteHandler } from './public-venue-handler.js';
 import { createPublicReadStackWarmer } from './public-warmup.js';
 import {
@@ -26,6 +31,7 @@ import {
   registerPublicCacheWarmer,
   startServer,
 } from './server.js';
+import { createAdminReviewsRouteHandler, createPublicReviewsRouteHandler } from './reviews-handler.js';
 import { createValidatedHandler } from './validated-handler.js';
 
 const env = readBackendEnv();
@@ -46,6 +52,7 @@ registerPublicCacheInvalidator(() => {
   clearPublicCityDtoCache();
   clearPublicEventDtoCache();
   clearPublicVenueDtoCache();
+  clearPublicArticlesDtoCache();
 });
 registerPublicCacheWarmer(createPublicReadStackWarmer({
   flags: publicFlags,
@@ -77,6 +84,7 @@ const server = startServer({
         enabled: publicFlags.venue,
         buildVenues: buildPublicVenuesDto,
         buildVenue: buildPublicVenueDto,
+        buildVenueEventCounts: buildPublicVenueEventCountsDto,
       }),
       createAdminOrdersReadRouteHandler({
         enabled: adminFlags.orders,
@@ -101,6 +109,15 @@ const server = startServer({
         updateAdminLandingMatch,
         invalidatePublicCaches,
       }),
+      createAdminEventChangeRequestsRouteHandler({
+        buildEventChangeRequests: buildAdminEventChangeRequestsDto,
+        buildEventChangeRequestDetail: buildAdminEventChangeRequestDetailDto,
+        reviewEventChangeRequest,
+        applyEventChangeRequest: applyApprovedEventChangeRequest,
+        invalidatePublicCaches,
+      }),
+      createPublicReviewsRouteHandler(),
+      createAdminReviewsRouteHandler(),
     ],
   }),
 }) as Server;

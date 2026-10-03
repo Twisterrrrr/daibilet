@@ -8,6 +8,13 @@
 - `priceFromRub`, `ticketsVacant`, `primaryCityId`, `venueId`, `categoryId`
 - sessions, offers, tags, ProviderLink
 
+### Нормализация `title` при import
+
+- `scripts/lib/event-title-normalize.js` — `normalizeImportEventTitle()`
+- Применяется в `tc-full-sync.js`, `tc-import-catalog.js`, `tep-import-fixtures.js`
+- Правило: пробелы сжимаются, **первая буква заглавная** (`ru-RU`)
+- Публичный каталог и страница события дополнительно используют `formatPublicEventTitle()` в backend
+
 ## Protected (не затираются при update)
 
 | Поле | Условие сохранения |
@@ -26,3 +33,12 @@
 ```bash
 npm run check:sync-invariants
 ```
+
+## Таксономия: дискотеки и вечеринки
+
+События с «дискотека», «вечеринка», DJ и т.п. в названии/описании/тегах классифицируются как **Развлечения** (`cat_entertainment`), а не Экскурсии — даже если это теплоход.
+
+- `scripts/lib/event-taxonomy.js` — общая эвристика
+- `tep-import-fixtures.js`, `tc-import-catalog.js` — при import
+- `scripts/reclassify-disco-events.js` — разовая переклассификация уже импортированных событий
+

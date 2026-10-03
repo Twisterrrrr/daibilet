@@ -1,0 +1,21 @@
+[Unit]
+Description=Daibilet Next.js public (production)
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/daibilet
+EnvironmentFile=/opt/daibilet/.env
+Environment=DAIBILET_WEB_PORT=3001
+Environment=NODE_ENV=production
+Environment=NODE_OPTIONS=--max-old-space-size=896
+# INC.504.4: never inline-rebuild 2.6k catalog sessions on Next event loop; cron/child writes disk cache.
+Environment=DAIBILET_CATALOG_REBUILD_MODE=child
+MemoryHigh=1100M
+MemoryMax=1400M
+ExecStart=/usr/bin/env bash deploy/scripts/start-web-prod.sh
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

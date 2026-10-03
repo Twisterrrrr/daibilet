@@ -1,0 +1,137 @@
+name: Venue indexability check
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Measure production venue API and sitemap
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsS --retry 2 --max-time 30 'https://daibilet.ru/api/public/venues?limit=3' > "$RUNNER_TEMP/venues.json"
+          curl -fsS --retry 2 --max-time 60 'https://daibilet.ru/api/public/venues?limit=2000' > "$RUNNER_TEMP/venues-full.json"
+          curl -fsS --retry 2 --max-time 60 -w 'sitemap_fetch_seconds: %{time_total}\n' 'https://daibilet.ru/sitemaps/venues.xml' -o "$RUNNER_TEMP/venues.xml"
+          python3 - "$RUNNER_TEMP" <<'PY'
+          import collections, concurrent.futures, json, pathlib, re, sys, urllib.request, xml.etree.ElementTree as ET
+
+          root = pathlib.Path(sys.argv[1])
+          payload = json.loads((root / 'venues.json').read_text())
+          def venue_rows(value):
+              if isinstance(value, list):
+                  return value
+              if isinstance(value, dict):
+                  for key in ('venues', 'items', 'results', 'data'):
+                      if key in value:
+                          rows = venue_rows(value[key])
+                          if rows is not None:
+                              return rows
+              return None
+          rows = venue_rows(payload)
+          print('venue_api_items:', len(rows) if rows is not None else 'unknown')
+          print('futureSessionCount_values:', [row.get('futureSessionCount', 'MISSING') for row in (rows or [])[:3]])
+          if not rows or not all('futureSessionCount' in row for row in rows[:3]):
+              raise SystemExit('futureSessionCount missing from venue API sample')
+          full_rows = venue_rows(json.loads((root / 'venues-full.json').read_text())) or []
+          print('venue_api_full_items:', len(full_rows))
+          print('future_count_missing:', sum('futureSessionCount' not in row for row in full_rows))
+          print('future_count_zero:', sum(row.get('futureSessionCount') == 0 for row in full_rows))
+          print('future_count_positive:', sum((row.get('futureSessionCount') or 0) > 0 for row in full_rows))
+          print('all_time_events_positive:', sum((row.get('events') or 0) > 0 for row in full_rows))
+          for slug in ('bar-vinograd', 'klub-soroka', 'klub-alekseya-kozlova', 'saint-petersburg-isaakievskiy-sobor', 'dk-zheleznodorozhnikov', 'dom-aktera', 'harat-s-pub'):
+              list_row = next((row for row in full_rows if row.get('slug') == slug), None)
+              print('list_venue:', slug, {key: list_row.get(key) for key in ('id', 'events', 'futureSessionCount', 'type', 'pageStatus', 'isIndexable')} if list_row else 'NOT_IN_DUMP')
+              try:
+                  with urllib.request.urlopen(f'https://daibilet.ru/api/public/venues/{slug}', timeout=30) as response:
+                      detail = json.load(response)
+                  venue = detail.get('venue') or {}
+                  print('detail_venue:', slug, {key: venue.get(key, 'MISSING') for key in ('events', 'futureSessionCount', 'type', 'pageStatus', 'isIndexable')}, 'stats_events:', (detail.get('stats') or {}).get('events', 'MISSING'))
+                  print('detail_sessions:', slug, 'venue_id:', venue.get('id'), 'count:', len(detail.get('sessions') or []), 'group_keys:', [row.get('groupKey') for row in (detail.get('sessions') or [])[:10]])
+              except Exception as error:
+                  print('detail_venue_error:', slug, str(error))
+                  if list_row:
+                      try:
+                          with urllib.request.urlopen(f'https://daibilet.ru/api/public/venues/{list_row["id"]}', timeout=30) as response:
+                              by_id = json.load(response)
+                          print('detail_by_id:', slug, 'id:', (by_id.get('venue') or {}).get('id'), 'slug:', (by_id.get('venue') or {}).get('slug'))
+                      except Exception as id_error:
+                          print('detail_by_id_error:', slug, str(id_error))
+
+          xml = ET.fromstring((root / 'venues.xml').read_bytes())
+          urls = [element.text for element in xml.iter() if element.tag.endswith('}loc') or element.tag == 'loc']
+          print('sitemap_locs:', len(urls))
+          print('sitemap_unique_locs:', len(set(urls)))
+          duplicates = [(url, count) for url, count in collections.Counter(urls).items() if count > 1]
+          print('sitemap_duplicate_locs:', duplicates)
+          sample_indexes = sorted({round(i * (len(urls) - 1) / 19) for i in range(20)}) if urls else []
+          for index in sample_indexes:
+              url = urls[index]
+              req = urllib.request.Request(url, headers={'User-Agent': 'Googlebot'})
+              try:
+                  with urllib.request.urlopen(req, timeout=30) as response:
+                      html = response.read().decode('utf-8', errors='replace')
+                      status = response.status
+              except Exception as error:
+                  print('sample_error:', url, str(error))
+                  continue
+              robots = re.search(r'<meta[^>]+name=["\']robots["\'][^>]+content=["\']([^"\']+)', html, re.I)
+              print('sample:', status, robots.group(1) if robots else 'NO_ROBOTS_META', url)
+          def inspect_url(url):
+              try:
+                  req = urllib.request.Request(url, headers={'User-Agent': 'Googlebot'})
+                  with urllib.request.urlopen(req, timeout=30) as response:
+                      html = response.read().decode('utf-8', errors='replace')
+                      status, final_url = response.status, response.geturl()
+                  robots = re.search(r'<meta[^>]+name=["\']robots["\'][^>]+content=["\']([^"\']+)', html, re.I)
+                  canonical = re.search(r'<link[^>]+rel=["\']canonical["\'][^>]+href=["\']([^"\']+)', html, re.I)
+                  problems = []
+                  if status != 200: problems.append(f'HTTP_{status}')
+                  if final_url != url: problems.append(f'REDIRECT_{final_url}')
+                  if not robots or 'noindex' in robots.group(1).lower(): problems.append(f'ROBOTS_{robots.group(1) if robots else "MISSING"}')
+                  if canonical and canonical.group(1) != url: problems.append(f'CANONICAL_{canonical.group(1)}')
+                  return url, problems
+              except Exception as error:
+                  return url, [str(error)]
+          with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+              results = list(pool.map(inspect_url, sorted(set(urls))))
+          problems = [(url, issues) for url, issues in results if issues]
+          print('full_crawl_checked:', len(results))
+          print('full_crawl_problem_count:', len(problems))
+          for url, issues in problems[:30]: print('full_crawl_problem:', url, issues)
+          cathedral = inspect_url('https://daibilet.ru/venues/saint-petersburg-isaakievskiy-sobor')
+          print('cathedral_robots_check:', cathedral)
+          if not any('noindex' in issue.lower() for issue in cathedral[1]):
+              raise SystemExit('cathedral lost its noindex rule')
+          with urllib.request.urlopen('https://daibilet.ru/sitemaps/events.xml', timeout=30) as response:
+              event_xml = ET.fromstring(response.read())
+          event_urls = [element.text for element in event_xml.iter() if element.tag.endswith('}loc') or element.tag == 'loc']
+          if event_urls:
+              event_slug = event_urls[0].rstrip('/').split('/')[-1]
+              with urllib.request.urlopen(f'https://daibilet.ru/api/public/events/{event_slug}', timeout=30) as response:
+                  event_detail = json.load(response)
+              def session_counts(value):
+                  if isinstance(value, dict):
+                      return ([value['sessionCount']] if 'sessionCount' in value else []) + [count for nested in value.values() for count in session_counts(nested)]
+                  if isinstance(value, list): return [count for nested in value for count in session_counts(nested)]
+                  return []
+              print('event_dto_slug:', event_slug, 'sessionCount_values:', session_counts(event_detail)[:10])
+          if problems: raise SystemExit('venue sitemap contains non-indexable or invalid URLs')
+          PY
+      - name: Read sitemap rebuild timing
+        if: always()
+        shell: bash
+        env:
+          MSK_SSH_HOST: ${{ secrets.MSK_SSH_HOST }}
+          MSK_SSH_USER: ${{ secrets.MSK_SSH_USER }}
+          MSK_SSH_KEY: ${{ secrets.MSK_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          install -d -m 700 "$HOME/.ssh"
+          printf '%s\n' "$MSK_SSH_KEY" > "$HOME/.ssh/msk_key"
+          chmod 600 "$HOME/.ssh/msk_key"
+          ssh -i "$HOME/.ssh/msk_key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ConnectTimeout=20 \
+            "$MSK_SSH_USER@$MSK_SSH_HOST" \
+            'sudo -n journalctl -u daibilet-api --since "20 minutes ago" --no-pager | grep "\[sitemap\]" | tail -10 || true'

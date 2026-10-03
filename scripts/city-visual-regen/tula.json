@@ -1,0 +1,139 @@
+{
+  "city": "tula",
+  "mustSeeCount": 82,
+  "regen": [
+    {
+      "stem": "kulikovo-pole",
+      "name": "Памятник-колонна Дмитрию Донскому",
+      "clusterSize": 4,
+      "keeper": "kulikovo-pole-slianie-don-nepryadva"
+    },
+    {
+      "stem": "kulikovo-pole-kolonna-dmitriyu-donskomu",
+      "name": "Слияние рек Дона и Непрядвы",
+      "clusterSize": 10,
+      "keeper": "kulikovo-pole-hram-sergiya"
+    },
+    {
+      "stem": "kulikovo-pole-maket-bitvy",
+      "name": "Музей купеческого быта в Епифани",
+      "clusterSize": 10,
+      "keeper": "kulikovo-pole-hram-sergiya"
+    },
+    {
+      "stem": "kulikovo-pole-muzey-epifani",
+      "name": "Большой дом с коллекциями живописи",
+      "clusterSize": 10,
+      "keeper": "kulikovo-pole-hram-sergiya"
+    },
+    {
+      "stem": "kulikovo-pole-muzeynyy-kompleks",
+      "name": "Храм-памятник Сергия Радонежского",
+      "clusterSize": 10,
+      "keeper": "kulikovo-pole-hram-sergiya"
+    },
+    {
+      "stem": "polenovo",
+      "name": "Фахверковый сарай",
+      "clusterSize": 4,
+      "keeper": "muzey-garmoni-deda-filimona"
+    },
+    {
+      "stem": "polenovo-admiralteystvo",
+      "name": "Святой источник и смотровая на обрыве",
+      "clusterSize": 10,
+      "keeper": "kulikovo-pole-hram-sergiya"
+    },
+    {
+      "stem": "polenovo-bolshoy-dom",
+      "name": "Живописная тропа к реке Оке",
+      "clusterSize": 4,
+      "keeper": "kulikovo-pole-slianie-don-nepryadva"
+    },
+    {
+      "stem": "polenovo-svyatoy-istochnik",
+      "name": "Современный конный комплекс",
+      "clusterSize": 10,
+      "keeper": "kulikovo-pole-hram-sergiya"
+    },
+    {
+      "stem": "polenovo-troitskaya-tserkov-behovo",
+      "name": "Портал времени из дерева",
+      "clusterSize": 7,
+      "keeper": "polenovo-fahverkovyy-saray"
+    },
+    {
+      "stem": "polenovo-tropa-k-oke",
+      "name": "Арт-объект «Дом-Бык»",
+      "clusterSize": 7,
+      "keeper": "polenovo-fahverkovyy-saray"
+    },
+    {
+      "stem": "yasnaya-polyana-dom-muzey",
+      "name": "Историческая пашня и конюшня",
+      "clusterSize": 7,
+      "keeper": "polenovo-fahverkovyy-saray"
+    },
+    {
+      "stem": "yasnaya-polyana-fligel-kuzminskih",
+      "name": "Любимая скамейка писателя",
+      "clusterSize": 10,
+      "keeper": "kulikovo-pole-hram-sergiya"
+    },
+    {
+      "stem": "yasnaya-polyana-pashnya",
+      "name": "Могила Льва Толстого",
+      "clusterSize": 7,
+      "keeper": "polenovo-fahverkovyy-saray"
+    },
+    {
+      "stem": "yasnaya-polyana-prud",
+      "name": "Флигель Кузминских",
+      "clusterSize": 4,
+      "keeper": "muzey-garmoni-deda-filimona"
+    },
+    {
+      "stem": "yasnaya-polyana-skameyka",
+      "name": "Музейный комплекс «Куликово поле» в Моховом",
+      "clusterSize": 4,
+      "keeper": "muzey-garmoni-deda-filimona"
+    },
+    {
+      "stem": "yasno-pole",
+      "name": "Пруды для рыбалки и настилы",
+      "clusterSize": 2,
+      "keeper": "yasnaya-polyana-mogila"
+    },
+    {
+      "stem": "yasno-pole-eko-ferma",
+      "name": "yasno pole eko ferma",
+      "clusterSize": 10,
+      "keeper": "kulikovo-pole-hram-sergiya"
+    },
+    {
+      "stem": "yasno-pole-otel-kovcheg",
+      "name": "Локальная эко-ферма",
+      "clusterSize": 7,
+      "keeper": "polenovo-fahverkovyy-saray"
+    },
+    {
+      "stem": "yasno-pole-portal-vremeni",
+      "name": "yasno pole portal vremeni",
+      "clusterSize": 4,
+      "keeper": "kulikovo-pole-slianie-don-nepryadva"
+    },
+    {
+      "stem": "yasno-pole-prudy",
+      "name": "yasno pole prudy",
+      "clusterSize": 10,
+      "keeper": "kulikovo-pole-hram-sergiya"
+    },
+    {
+      "stem": "yasno-pole-syrovarnya",
+      "name": "yasno pole syrovarnya",
+      "clusterSize": 7,
+      "keeper": "polenovo-fahverkovyy-saray"
+    }
+  ],
+  "d0": 4
+}
