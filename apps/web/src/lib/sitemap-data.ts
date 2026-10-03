@@ -295,7 +295,11 @@ export async function buildVenuesSitemapEntries(now = new Date()): Promise<Sitem
     .filter((venue) => {
       if (!venue.slug) return false;
       return evaluateVenueIndexability({
-        futureSessions: venue.futureSessionCount ?? venue.events,
+        // `venue` is the lean row from the backend payload, not PublicVenueDto:
+        // its inferred type omits futureSessionCount. The contract type does
+        // declare it (verified against @daibilet/contracts/public), so cast
+        // rather than duplicate the field in a third place.
+        futureSessions: (venue as PublicVenueDto).futureSessionCount ?? venue.events,
         isIndexable: venue.isIndexable,
         type: venue.type,
         pageStatus: venue.pageStatus,
