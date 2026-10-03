@@ -43,12 +43,13 @@ jobs:
           print('all_time_events_positive:', sum((row.get('events') or 0) > 0 for row in full_rows))
           for slug in ('bar-vinograd', 'klub-soroka', 'klub-alekseya-kozlova', 'saint-petersburg-isaakievskiy-sobor', 'dk-zheleznodorozhnikov', 'dom-aktera'):
               list_row = next((row for row in full_rows if row.get('slug') == slug), None)
-              print('list_venue:', slug, {key: list_row.get(key) for key in ('events', 'futureSessionCount', 'type', 'pageStatus', 'isIndexable')} if list_row else 'NOT_IN_DUMP')
+              print('list_venue:', slug, {key: list_row.get(key) for key in ('id', 'events', 'futureSessionCount', 'type', 'pageStatus', 'isIndexable')} if list_row else 'NOT_IN_DUMP')
               try:
                   with urllib.request.urlopen(f'https://daibilet.ru/api/public/venues/{slug}', timeout=30) as response:
                       detail = json.load(response)
                   venue = detail.get('venue') or {}
                   print('detail_venue:', slug, {key: venue.get(key, 'MISSING') for key in ('events', 'futureSessionCount', 'type', 'pageStatus', 'isIndexable')}, 'stats_events:', (detail.get('stats') or {}).get('events', 'MISSING'))
+                  print('detail_sessions:', slug, 'venue_id:', venue.get('id'), 'count:', len(detail.get('sessions') or []), 'group_keys:', [row.get('groupKey') for row in (detail.get('sessions') or [])[:10]])
               except Exception as error:
                   print('detail_venue_error:', slug, str(error))
 
