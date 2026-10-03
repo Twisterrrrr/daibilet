@@ -4,6 +4,7 @@ import {
   filterSessionsToVenueCity,
   isPublicVenueHub,
   lookupVenueCatalogSessionsForTest,
+  mapPublicVenueListItem,
   mergeCityPageVenues,
   mergePublicVenueHubRows,
   publicVenueRowMatchesCityFilter,
@@ -13,6 +14,15 @@ import {
   scoreRelatedVenueCandidate,
   venueTextKeysFuzzyMatch,
 } from './public-venue-read.js';
+
+test('venue list DTO keeps future sessions distinct from all-time events', () => {
+  const venue = mapPublicVenueListItem({
+    id: 'venue_past', slug: 'venue-past', name: 'Past venue', city: 'Москва',
+    kind: 'OTHER', pageStatus: 'PUBLISHED', events: 7, futureSessionCount: 0,
+  });
+  assert.equal(venue.events, 7);
+  assert.equal(venue.futureSessionCount, 0);
+});
 
 test('mergeCityPageVenues prefers content/editorial then appends session venues', () => {
   const merged = mergeCityPageVenues(

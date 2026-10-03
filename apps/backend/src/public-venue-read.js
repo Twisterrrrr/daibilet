@@ -2199,6 +2199,7 @@ export function mapPublicVenueListItem(row) {
     shortDescription,
     heroImageUrl: normalized.heroImageUrl,
     events: normalized.events,
+    futureSessionCount: normalized.futureSessionCount,
     stopEventCount: Number.isFinite(Number(normalized.stopEventCount))
       ? Number(normalized.stopEventCount)
       : undefined,
