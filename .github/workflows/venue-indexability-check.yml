@@ -1,0 +1,49 @@
+name: Venue indexability check
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Measure production venue API and sitemap
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsS --retry 2 --max-time 30 'https://daibilet.ru/api/public/venues?limit=3' > "$RUNNER_TEMP/venues.json"
+          curl -fsS --retry 2 --max-time 30 'https://daibilet.ru/sitemaps/venues.xml' > "$RUNNER_TEMP/venues.xml"
+          python3 - "$RUNNER_TEMP" <<'PY'
+          import json, pathlib, re, sys, urllib.request, xml.etree.ElementTree as ET
+
+          root = pathlib.Path(sys.argv[1])
+          payload = json.loads((root / 'venues.json').read_text())
+          def venue_rows(value):
+              if isinstance(value, list):
+                  return value
+              if isinstance(value, dict):
+                  for key in ('venues', 'items', 'results', 'data'):
+                      if key in value:
+                          rows = venue_rows(value[key])
+                          if rows is not None:
+                              return rows
+              return None
+          rows = venue_rows(payload)
+          print('venue_api_items:', len(rows) if rows is not None else 'unknown')
+          print('futureSessionCount_values:', [row.get('futureSessionCount', 'MISSING') for row in (rows or [])[:3]])
+          if not rows or not all('futureSessionCount' in row for row in rows[:3]):
+              raise SystemExit('futureSessionCount missing from venue API sample')
+
+          xml = ET.fromstring((root / 'venues.xml').read_bytes())
+          urls = [element.text for element in xml.iter() if element.tag.endswith('}loc') or element.tag == 'loc']
+          print('sitemap_locs:', len(urls))
+          print('sitemap_unique_locs:', len(set(urls)))
+          for url in urls[:5]:
+              req = urllib.request.Request(url, headers={'User-Agent': 'Googlebot'})
+              with urllib.request.urlopen(req, timeout=30) as response:
+                  html = response.read().decode('utf-8', errors='replace')
+                  status = response.status
+              robots = re.search(r'<meta[^>]+name=["\']robots["\'][^>]+content=["\']([^"\']+)', html, re.I)
+              print('sample:', status, robots.group(1) if robots else 'NO_ROBOTS_META', url)
+          PY
