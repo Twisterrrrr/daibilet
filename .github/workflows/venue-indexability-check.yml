@@ -41,7 +41,7 @@ jobs:
           print('future_count_zero:', sum(row.get('futureSessionCount') == 0 for row in full_rows))
           print('future_count_positive:', sum((row.get('futureSessionCount') or 0) > 0 for row in full_rows))
           print('all_time_events_positive:', sum((row.get('events') or 0) > 0 for row in full_rows))
-          for slug in ('bar-vinograd', 'klub-soroka', 'klub-alekseya-kozlova', 'saint-petersburg-isaakievskiy-sobor', 'dk-zheleznodorozhnikov', 'dom-aktera'):
+          for slug in ('bar-vinograd', 'klub-soroka', 'klub-alekseya-kozlova', 'saint-petersburg-isaakievskiy-sobor', 'dk-zheleznodorozhnikov', 'dom-aktera', 'harat-s-pub'):
               list_row = next((row for row in full_rows if row.get('slug') == slug), None)
               print('list_venue:', slug, {key: list_row.get(key) for key in ('id', 'events', 'futureSessionCount', 'type', 'pageStatus', 'isIndexable')} if list_row else 'NOT_IN_DUMP')
               try:
@@ -52,6 +52,13 @@ jobs:
                   print('detail_sessions:', slug, 'venue_id:', venue.get('id'), 'count:', len(detail.get('sessions') or []), 'group_keys:', [row.get('groupKey') for row in (detail.get('sessions') or [])[:10]])
               except Exception as error:
                   print('detail_venue_error:', slug, str(error))
+                  if list_row:
+                      try:
+                          with urllib.request.urlopen(f'https://daibilet.ru/api/public/venues/{list_row["id"]}', timeout=30) as response:
+                              by_id = json.load(response)
+                          print('detail_by_id:', slug, 'id:', (by_id.get('venue') or {}).get('id'), 'slug:', (by_id.get('venue') or {}).get('slug'))
+                      except Exception as id_error:
+                          print('detail_by_id_error:', slug, str(id_error))
 
           xml = ET.fromstring((root / 'venues.xml').read_bytes())
           urls = [element.text for element in xml.iter() if element.tag.endswith('}loc') or element.tag == 'loc']
