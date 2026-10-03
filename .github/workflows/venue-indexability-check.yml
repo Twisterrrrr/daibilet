@@ -14,7 +14,7 @@ jobs:
           set -euo pipefail
           curl -fsS --retry 2 --max-time 30 'https://daibilet.ru/api/public/venues?limit=3' > "$RUNNER_TEMP/venues.json"
           curl -fsS --retry 2 --max-time 60 'https://daibilet.ru/api/public/venues?limit=2000' > "$RUNNER_TEMP/venues-full.json"
-          curl -fsS --retry 2 --max-time 30 'https://daibilet.ru/sitemaps/venues.xml' > "$RUNNER_TEMP/venues.xml"
+          curl -fsS --retry 2 --max-time 60 -w 'sitemap_fetch_seconds: %{time_total}\n' 'https://daibilet.ru/sitemaps/venues.xml' -o "$RUNNER_TEMP/venues.xml"
           python3 - "$RUNNER_TEMP" <<'PY'
           import collections, json, pathlib, re, sys, urllib.request, xml.etree.ElementTree as ET
 
@@ -63,9 +63,28 @@ jobs:
           for index in sample_indexes:
               url = urls[index]
               req = urllib.request.Request(url, headers={'User-Agent': 'Googlebot'})
-              with urllib.request.urlopen(req, timeout=30) as response:
-                  html = response.read().decode('utf-8', errors='replace')
-                  status = response.status
+              try:
+                  with urllib.request.urlopen(req, timeout=30) as response:
+                      html = response.read().decode('utf-8', errors='replace')
+                      status = response.status
+              except Exception as error:
+                  print('sample_error:', url, str(error))
+                  continue
               robots = re.search(r'<meta[^>]+name=["\']robots["\'][^>]+content=["\']([^"\']+)', html, re.I)
               print('sample:', status, robots.group(1) if robots else 'NO_ROBOTS_META', url)
           PY
+      - name: Read sitemap rebuild timing
+        if: always()
+        shell: bash
+        env:
+          MSK_SSH_HOST: ${{ secrets.MSK_SSH_HOST }}
+          MSK_SSH_USER: ${{ secrets.MSK_SSH_USER }}
+          MSK_SSH_KEY: ${{ secrets.MSK_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          install -d -m 700 "$HOME/.ssh"
+          printf '%s\n' "$MSK_SSH_KEY" > "$HOME/.ssh/msk_key"
+          chmod 600 "$HOME/.ssh/msk_key"
+          ssh -i "$HOME/.ssh/msk_key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ConnectTimeout=20 \
+            "$MSK_SSH_USER@$MSK_SSH_HOST" \
+            'sudo -n journalctl -u daibilet-api --since "20 minutes ago" --no-pager | grep "\[sitemap\]" | tail -10 || true'
