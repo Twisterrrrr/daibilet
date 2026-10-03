@@ -6,7 +6,7 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - name: Measure production venue API and sitemap
         shell: bash
@@ -16,7 +16,7 @@ jobs:
           curl -fsS --retry 2 --max-time 60 'https://daibilet.ru/api/public/venues?limit=2000' > "$RUNNER_TEMP/venues-full.json"
           curl -fsS --retry 2 --max-time 60 -w 'sitemap_fetch_seconds: %{time_total}\n' 'https://daibilet.ru/sitemaps/venues.xml' -o "$RUNNER_TEMP/venues.xml"
           python3 - "$RUNNER_TEMP" <<'PY'
-          import collections, json, pathlib, re, sys, urllib.request, xml.etree.ElementTree as ET
+          import collections, concurrent.futures, json, pathlib, re, sys, urllib.request, xml.etree.ElementTree as ET
 
           root = pathlib.Path(sys.argv[1])
           payload = json.loads((root / 'venues.json').read_text())
@@ -79,6 +79,46 @@ jobs:
                   continue
               robots = re.search(r'<meta[^>]+name=["\']robots["\'][^>]+content=["\']([^"\']+)', html, re.I)
               print('sample:', status, robots.group(1) if robots else 'NO_ROBOTS_META', url)
+          def inspect_url(url):
+              try:
+                  req = urllib.request.Request(url, headers={'User-Agent': 'Googlebot'})
+                  with urllib.request.urlopen(req, timeout=30) as response:
+                      html = response.read().decode('utf-8', errors='replace')
+                      status, final_url = response.status, response.geturl()
+                  robots = re.search(r'<meta[^>]+name=["\']robots["\'][^>]+content=["\']([^"\']+)', html, re.I)
+                  canonical = re.search(r'<link[^>]+rel=["\']canonical["\'][^>]+href=["\']([^"\']+)', html, re.I)
+                  problems = []
+                  if status != 200: problems.append(f'HTTP_{status}')
+                  if final_url != url: problems.append(f'REDIRECT_{final_url}')
+                  if not robots or 'noindex' in robots.group(1).lower(): problems.append(f'ROBOTS_{robots.group(1) if robots else "MISSING"}')
+                  if canonical and canonical.group(1) != url: problems.append(f'CANONICAL_{canonical.group(1)}')
+                  return url, problems
+              except Exception as error:
+                  return url, [str(error)]
+          with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+              results = list(pool.map(inspect_url, sorted(set(urls))))
+          problems = [(url, issues) for url, issues in results if issues]
+          print('full_crawl_checked:', len(results))
+          print('full_crawl_problem_count:', len(problems))
+          for url, issues in problems[:30]: print('full_crawl_problem:', url, issues)
+          cathedral = inspect_url('https://daibilet.ru/venues/saint-petersburg-isaakievskiy-sobor')
+          print('cathedral_robots_check:', cathedral)
+          if not any('noindex' in issue.lower() for issue in cathedral[1]):
+              raise SystemExit('cathedral lost its noindex rule')
+          with urllib.request.urlopen('https://daibilet.ru/sitemaps/events.xml', timeout=30) as response:
+              event_xml = ET.fromstring(response.read())
+          event_urls = [element.text for element in event_xml.iter() if element.tag.endswith('}loc') or element.tag == 'loc']
+          if event_urls:
+              event_slug = event_urls[0].rstrip('/').split('/')[-1]
+              with urllib.request.urlopen(f'https://daibilet.ru/api/public/events/{event_slug}', timeout=30) as response:
+                  event_detail = json.load(response)
+              def session_counts(value):
+                  if isinstance(value, dict):
+                      return ([value['sessionCount']] if 'sessionCount' in value else []) + [count for nested in value.values() for count in session_counts(nested)]
+                  if isinstance(value, list): return [count for nested in value for count in session_counts(nested)]
+                  return []
+              print('event_dto_slug:', event_slug, 'sessionCount_values:', session_counts(event_detail)[:10])
+          if problems: raise SystemExit('venue sitemap contains non-indexable or invalid URLs')
           PY
       - name: Read sitemap rebuild timing
         if: always()
