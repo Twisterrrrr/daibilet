@@ -2282,7 +2282,7 @@ export function markVenueSitemapDetailAvailability(pageItems, hubRows, sessions,
     const decision = indexabilityDecision({
       futureSessions: scoped.length,
       routeCount,
-      isIndexable: canonicalRow.isIndexable,
+      isIndexable: item.isIndexable !== false && canonicalRow.isIndexable !== false,
       type,
       pageStatus: canonicalRow.pageStatus,
       hasAddress,
