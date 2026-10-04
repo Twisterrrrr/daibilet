@@ -2267,10 +2267,20 @@ export function markVenueSitemapDetailAvailability(pageItems, hubRows, sessions,
       citySlug: row.citySlug,
     }, sessions, catalog);
     const canonicalRow = mergedGroup || row;
-    const type = resolvePublicVenueKindFromRow(canonicalRow);
-    const template = publicVenuePageTemplate(type);
-    const detailAvailable = scoped.length > 0 || evaluateVenueDetailContentGate(row, kind, template).available;
+    const initialType = resolvePublicVenueKindFromRow(canonicalRow);
+    const detailAvailable = scoped.length > 0 || evaluateVenueDetailContentGate(row, kind, publicVenuePageTemplate(initialType)).available;
     if (!detailAvailable) return { ...item, detailAvailable: false, isIndexable: false };
+    // Detail resolves type after loading the actual sessions; use the same
+    // inputs here so an excursion pickup cannot look like an indexable pier.
+    const type = resolvePublicVenueKindFromRow({
+      ...canonicalRow,
+      events: scoped.length,
+      totalEvents: scoped.length,
+      busEvents: scoped.filter(isBusCatalogSession).length,
+      waterEvents: scoped.filter(isWaterCatalogSession).length,
+      shortDescription: mergedGroup?.shortDescription || canonicalRow.shortDescription,
+    });
+    const template = publicVenuePageTemplate(type);
     const routeCount = new Set(scoped.map((session) => session.groupKey || session.id).filter(Boolean)).size || scoped.length;
     const hasAddress = Boolean(String(mergedGroup?.address || canonicalRow.address || '').trim());
     const hasDescription = Boolean(String(canonicalRow.description || mergedGroup?.shortDescription || canonicalRow.shortDescription || '').trim());
@@ -2308,19 +2318,27 @@ export async function markVenueSitemapCanonicalSlugs(pageItems, db, hubRows = []
   const candidates = eligible.filter((item) =>
     duplicateSlugs.has(item.slug) ||
     (hubById.has(item.id) && String(hubById.get(item.id).slug || '').trim() !== item.slug));
+  // Only ambiguous/computed slugs need the authoritative detail DTO. Its
+  // resolved type and content gate can differ from the lean hub row.
   const resolvedIds = new Map();
-  for (let i = 0; i < candidates.length; i += 16) {
-    const batch = await Promise.all(candidates.slice(i, i + 16).map(async (item) => {
-      const row = await resolvePublicVenueRow(db, item.slug);
-      return [item.slug, row?.id || null];
+  for (let i = 0; i < candidates.length; i += 4) {
+    const batch = await Promise.all(candidates.slice(i, i + 4).map(async (item) => {
+      const detail = await buildPublicVenuePage(db, item.slug);
+      return [item.slug, detail?.venue || null];
     }));
-    for (const [slug, id] of batch) resolvedIds.set(slug, id);
+    for (const [slug, resolved] of batch) resolvedIds.set(slug, resolved);
   }
   return pageItems.map((item) => {
     if (!resolvedIds.has(item.slug)) return item;
-    return resolvedIds.get(item.slug) === item.id
-      ? item
-      : { ...item, isIndexable: false };
+    const resolved = resolvedIds.get(item.slug);
+    if (!resolved || resolved.id !== item.id) return { ...item, isIndexable: false };
+    const decision = indexabilityDecision({
+      futureSessions: item.futureSessionCount,
+      isIndexable: item.isIndexable !== false && resolved.isIndexable !== false,
+      type: resolved.type,
+      pageStatus: item.pageStatus,
+    });
+    return decision.indexable ? item : { ...item, isIndexable: false };
   });
 }
 
