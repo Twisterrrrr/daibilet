@@ -101,6 +101,36 @@ jobs:
           print('full_crawl_checked:', len(results))
           print('full_crawl_problem_count:', len(problems))
           for url, issues in problems[:30]: print('full_crawl_problem:', url, issues)
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, headers, newurl):
+                  return None
+          opener = urllib.request.build_opener(NoRedirect())
+          def raw_page(url):
+              try:
+                  with opener.open(urllib.request.Request(url, headers={'User-Agent': 'Googlebot'}), timeout=30) as response:
+                      return response.status, response.headers.get('Location'), response.read(180).decode('utf-8', errors='replace')
+              except urllib.error.HTTPError as error:
+                  return error.code, error.headers.get('Location'), error.read(180).decode('utf-8', errors='replace')
+              except Exception as error:
+                  return 'ERROR', None, str(error)
+          for url, issues in problems:
+              slug = url.rstrip('/').split('/')[-1]
+              matching = [row for row in full_rows if row.get('slug') == slug]
+              print('classify_url:', url, 'issues:', issues, 'raw:', raw_page(url)[:2], 'matching_list_rows:', len(matching))
+              for row in matching:
+                  print('classify_list_row:', slug, {key: row.get(key, 'MISSING') for key in ('id', 'slug', 'events', 'futureSessionCount', 'type', 'pageStatus', 'isIndexable')})
+              for identifier in [slug] + [str(row['id']) for row in matching if row.get('id')]:
+                  try:
+                      with urllib.request.urlopen(f'https://daibilet.ru/api/public/venues/{identifier}', timeout=30) as response:
+                          detail = json.load(response)
+                      venue = detail.get('venue') or {}
+                      print('classify_detail:', slug, 'lookup:', identifier, 'venue:', {key: venue.get(key, 'MISSING') for key in ('id', 'slug', 'events', 'futureSessionCount', 'type', 'pageStatus', 'isIndexable')}, 'stats_events:', (detail.get('stats') or {}).get('events', 'MISSING'), 'sessions:', len(detail.get('sessions') or []))
+                  except Exception as error:
+                      print('classify_detail_error:', slug, 'lookup:', identifier, str(error))
+          for slug in ('base', 'vnvnc'):
+              url = f'https://daibilet.ru/locations/{slug}'
+              status, location, body = raw_page(url)
+              print('placeholder_check:', url, 'in_sitemap:', url in urls, 'status:', status, 'location:', location, 'body_prefix:', repr(body[:100]))
           cathedral = inspect_url('https://daibilet.ru/venues/saint-petersburg-isaakievskiy-sobor')
           print('cathedral_robots_check:', cathedral)
           if not any('noindex' in issue.lower() for issue in cathedral[1]):
