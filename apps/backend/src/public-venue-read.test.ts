@@ -7,6 +7,7 @@ import {
   mapPublicVenueListItem,
   mergeCityPageVenues,
   mergePublicVenueHubRows,
+  needsVenueSitemapDetailCheck,
   publicVenueRowMatchesCityFilter,
   publicVenuesForSessionsFromHub,
   resolvePublicVenueCanonicalPath,
@@ -39,6 +40,12 @@ test('venue list applies the detail indexability gate and canonical resolver', (
     futureSessionCount: 3,
   });
   assert.equal(museum.canonicalPath, '/venues/muzei-im-n-ostrovskogo');
+});
+
+test('sitemap verifies pier-like rows against the authoritative detail type', () => {
+  const item = { id: 'venue_686d044da479b3c07a240887', slug: 'ekskursiya-vladimirskii-dvorec', type: 'pier' };
+  assert.equal(needsVenueSitemapDetailCheck(item, new Set(), new Map()), true);
+  assert.equal(needsVenueSitemapDetailCheck({ ...item, type: 'park' }, new Set(), new Map()), false);
 });
 
 test('mergeCityPageVenues prefers content/editorial then appends session venues', () => {

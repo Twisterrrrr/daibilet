@@ -2305,6 +2305,12 @@ export function markVenueSitemapDetailAvailability(pageItems, hubRows, sessions,
 }
 
 /** A shared slug can resolve to a different DB row than the catalog item. */
+export function needsVenueSitemapDetailCheck(item, duplicateSlugs, hubById) {
+  return duplicateSlugs.has(item.slug) ||
+    item.type === 'pier' ||
+    (hubById.has(item.id) && String(hubById.get(item.id).slug || '').trim() !== item.slug);
+}
+
 export async function markVenueSitemapCanonicalSlugs(pageItems, db, hubRows = []) {
   const eligible = pageItems.filter((item) => item.isIndexable !== false && Number(item.futureSessionCount) > 0);
   const slugs = [...new Set(eligible.map((item) => String(item.slug || '').trim()).filter(Boolean))];
@@ -2315,11 +2321,10 @@ export async function markVenueSitemapCanonicalSlugs(pageItems, db, hubRows = []
   );
   const duplicateSlugs = new Set(duplicates.rows.map((row) => row.slug));
   const hubById = new Map(hubRows.map((row) => [row.id, row]));
-  const candidates = eligible.filter((item) =>
-    duplicateSlugs.has(item.slug) ||
-    (hubById.has(item.id) && String(hubById.get(item.id).slug || '').trim() !== item.slug));
-  // Only ambiguous/computed slugs need the authoritative detail DTO. Its
-  // resolved type and content gate can differ from the lean hub row.
+  const candidates = eligible.filter((item) => needsVenueSitemapDetailCheck(item, duplicateSlugs, hubById));
+  // Ambiguous/computed slugs and piers need the authoritative detail DTO.
+  // A pier-like list row can resolve as an excursion meeting point once its
+  // actual sessions are loaded, so the lean row is not sufficient here.
   const resolvedIds = new Map();
   for (let i = 0; i < candidates.length; i += 4) {
     const batch = await Promise.all(candidates.slice(i, i + 4).map(async (item) => {
