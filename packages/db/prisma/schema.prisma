@@ -857,6 +857,16 @@ model Venue {
   metroStation     String?
   wayToFind        String?         @db.Text
   parkingInfo      String?
+  /**
+   * Official external resources. A venue with no ticket of ours can still be
+   * listed, but the page must lead somewhere: without these three fields an
+   * informational venue is a dead end. Added 04.10 - nine hand-written
+   * Hermitage cards carried hours, phone and website that had nowhere to go.
+   */
+  websiteUrl       String?
+  phone            String?
+  /** Free text, e.g. "Tue-Sun 11:00-18:00, closed Monday". Not structured yet. */
+  openingHours     String?         @db.Text
   kind             VenueKind       @default(OTHER)
   pageStatus       VenuePageStatus @default(NONE)
   /// Short micro-intrigue for location cards (optional).
