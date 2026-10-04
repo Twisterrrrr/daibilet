@@ -29,6 +29,38 @@ export function isRegionIndexableByEvents(eventCount: number): boolean {
   return resolveRegionLiveTier(eventCount) !== 'C';
 }
 
+/** One venue decision for the catalog snapshot, detail DTO, and HTML metadata. */
+export function indexabilityDecision(input: {
+  futureSessions?: number | null;
+  routeCount?: number | null;
+  isIndexable?: boolean | null;
+  type?: string | null;
+  pageStatus?: string | null;
+  detailAvailable?: boolean | null;
+  hasAddress?: boolean | null;
+  hasDescription?: boolean | null;
+  hasHeroImage?: boolean | null;
+  template?: 'location' | 'institution' | null;
+}): { indexable: boolean; reason: string } {
+  if (input.detailAvailable === false) return { indexable: false, reason: 'detail_unavailable' };
+  if (input.isIndexable === false) return { indexable: false, reason: 'explicit_noindex' };
+  if (String(input.pageStatus || '').trim().toUpperCase() === 'HIDDEN') return { indexable: false, reason: 'hidden_page' };
+  if (['meeting_point', 'online', 'other'].includes(String(input.type || '').trim().toLowerCase())) {
+    return { indexable: false, reason: 'non_venue_type' };
+  }
+  const futureSessions = Number(input.futureSessions) || 0;
+  if (futureSessions < 1) return { indexable: false, reason: 'zero_future_sessions' };
+  if (input.template && input.hasAddress != null && input.hasDescription != null && input.hasHeroImage != null) {
+    if (!input.hasAddress || (!input.hasDescription && !input.hasHeroImage)) {
+      return { indexable: false, reason: 'weak_content' };
+    }
+    if (input.template === 'institution' && Number(input.routeCount ?? futureSessions) < 3) {
+      return { indexable: false, reason: 'low_route_count' };
+    }
+  }
+  return { indexable: true, reason: 'enough_future_sessions' };
+}
+
 export type TimeBucket = 'morning' | 'day' | 'evening' | 'night';
 
 export type PurchaseMode = 'widget' | 'redirect';

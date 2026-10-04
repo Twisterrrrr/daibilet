@@ -24,6 +24,23 @@ test('venue list DTO keeps future sessions distinct from all-time events', () =>
   assert.equal(venue.futureSessionCount, 0);
 });
 
+test('venue list applies the detail indexability gate and canonical resolver', () => {
+  const base = {
+    id: 'venue_6244a4f4250b6694cf64e526', slug: 'bar-nora', name: 'Бар Нора',
+    city: 'Москва', kind: 'CLUB_BAR_RESTAURANT', pageStatus: 'CANDIDATE',
+    isIndexable: true, address: 'ул. Тестовая, 1', description: 'Программа клуба',
+    futureSessionCount: 2, events: 4,
+  };
+  assert.equal(mapPublicVenueListItem(base).isIndexable, false);
+  assert.equal(mapPublicVenueListItem({ ...base, futureSessionCount: 3 }).isIndexable, true);
+  const museum = mapPublicVenueListItem({
+    ...base, kind: 'MUSEUM_ART_SPACE', slug: 'muzei-im-n-ostrovskogo',
+    canonicalPath: '/venues/музеи-им-н-островского-5d61087e6be9adfb0dd8425b',
+    futureSessionCount: 3,
+  });
+  assert.equal(museum.canonicalPath, '/venues/muzei-im-n-ostrovskogo');
+});
+
 test('mergeCityPageVenues prefers content/editorial then appends session venues', () => {
   const merged = mergeCityPageVenues(
     [{ id: 'v1', slug: 'hall-a', name: 'Hall', latitude: null, longitude: null }],

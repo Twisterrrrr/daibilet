@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { indexabilityDecision } from '@daibilet/contracts/common';
 
 import {
   MIN_VENUE_EVENTS_FOR_INDEX,
@@ -30,6 +31,21 @@ test('degenerate venue types are not indexable however many events they inherit'
   assert.deepEqual(robotsForIndexability(decision.indexable), { index: false, follow: true });
 });
 
+test('catalog, detail, and HTML use the same venue decision', () => {
+  const inputs = [
+    { futureSessions: 2, routeCount: 2, isIndexable: true, type: 'club_bar_restaurant', template: 'institution' as const, hasAddress: true, hasDescription: true, hasHeroImage: false },
+    { futureSessions: 3, routeCount: 3, isIndexable: true, type: 'museum', template: 'institution' as const, hasAddress: true, hasDescription: true, hasHeroImage: false },
+    { futureSessions: 1, routeCount: 1, isIndexable: true, type: 'meeting_point', template: 'location' as const, hasAddress: true, hasDescription: true, hasHeroImage: false },
+  ];
+  for (const input of inputs) {
+    const catalog = indexabilityDecision(input);
+    const detail = indexabilityDecision(input);
+    const html = evaluateVenueIndexability({ ...input, isIndexable: detail.indexable });
+    assert.equal(catalog.indexable, detail.indexable);
+    assert.equal(html.indexable, detail.indexable);
+  }
+});
+
 test('type match is case and whitespace insensitive', () => {
   for (const type of ['MEETING_POINT', ' meeting_point ', 'Meeting_Point']) {
     assert.equal(evaluateVenueIndexability({ futureSessions: 5, type }).indexable, false, `type=${type}`);
@@ -55,7 +71,7 @@ test('real venues keep their indexability and are not affected', () => {
       type,
     });
     assert.equal(decision.indexable, true, `type=${type} should stay indexable`);
-    assert.equal(decision.reason, 'enough_events');
+    assert.equal(decision.reason, 'enough_future_sessions');
   }
 });
 
@@ -75,7 +91,7 @@ test('explicit noindex still wins and thin venues stay out', () => {
     evaluateVenueIndexability({ futureSessions: 99, isIndexable: false, type: 'museum' }).reason,
     'explicit_noindex',
   );
-  assert.equal(evaluateVenueIndexability({ futureSessions: 0, type: 'museum' }).reason, 'zero_events');
+  assert.equal(evaluateVenueIndexability({ futureSessions: 0, type: 'museum' }).reason, 'zero_future_sessions');
   assert.equal(evaluateVenueIndexability({ futureSessions: 0, type: 'meeting_point' }).reason, 'non_venue_type');
   assert.equal(evaluateVenueIndexability({ futureSessions: 3, type: 'museum', detailAvailable: false }).reason, 'detail_unavailable');
 });

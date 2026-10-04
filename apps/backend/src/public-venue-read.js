@@ -3,6 +3,7 @@
  * Extracted from dto.js (F5.3b). Legacy dto.js re-exports the public API.
  */
 import { readFileSync } from 'node:fs';
+import { indexabilityDecision } from '@daibilet/contracts/common';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -557,11 +558,17 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
   ));
   const pageTemplate = publicVenuePageTemplate(resolvedType);
   const sessionCount = sessions.length;
-  const weakVenuePage =
-    pageTemplate === 'location'
-      ? !hasAddress || (!hasDescription && !hasHeroImage) || sessionCount < 1
-      : routeCount < 3 || (!hasDescription && !hasHeroImage) || !hasAddress;
-  const isIndexable = canonicalVenue.isIndexable !== false && !weakVenuePage;
+  const isIndexable = indexabilityDecision({
+    futureSessions: sessionCount,
+    routeCount,
+    isIndexable: canonicalVenue.isIndexable,
+    type: resolvedType,
+    pageStatus: canonicalVenue.pageStatus,
+    hasAddress,
+    hasDescription,
+    hasHeroImage,
+    template: pageTemplate,
+  }).indexable;
 
   const venueCoordinates = resolvePublicVenueCoordinates(canonicalVenue, { resolvedType });
 
@@ -1545,7 +1552,7 @@ export function resolvePublicVenueCanonicalPath(storedPath, pageTemplate, slug) 
   if (!storedFamily || storedFamily !== pageTemplate) return fallback;
   // Provider-era canonical paths can append the opaque venue id to the public
   // slug. Those URLs redirect back to the clean slug, so they cannot be canonicals.
-  if (normalized.startsWith(`${fallback}-`) && /^-[a-f0-9]{20,}$/i.test(normalized.slice(fallback.length))) {
+  if (/-[a-f0-9]{20,}$/i.test(normalized)) {
     return fallback;
   }
   return normalized;
@@ -2179,6 +2186,18 @@ export function mapPublicVenueListItem(row) {
     (normalized.city && normalized.city !== 'Не указан' ? publicCitySlug(normalized.city) : null);
   // Lean list DTO: no sessions / mini-affiche / empty categories blob.
   const slug = publicVenueSlug(normalized.slug, name, normalized.id);
+  const template = publicVenuePageTemplate(type);
+  const decision = indexabilityDecision({
+    futureSessions: normalized.futureSessionCount,
+    routeCount: normalized.futureSessionCount,
+    isIndexable: normalized.isIndexable,
+    type,
+    pageStatus: normalized.pageStatus,
+    template,
+    hasAddress: Boolean(String(normalized.address || '').trim()),
+    hasDescription: Boolean(String(normalized.description || normalized.shortDescription || '').trim()),
+    hasHeroImage: Boolean(String(normalized.heroImageUrl || '').trim()),
+  });
   return {
     id: normalized.id,
     slug,
@@ -2194,9 +2213,10 @@ export function mapPublicVenueListItem(row) {
     wayToFind: normalizeNullableString(normalized.wayToFind),
     hookFact: normalizeNullableString(normalized.hookFact),
     type,
-    template: publicVenuePageTemplate(type),
+    template,
     pageStatus: normalized.pageStatus,
-    isIndexable: normalized.isIndexable,
+    isIndexable: decision.indexable,
+    canonicalPath: resolvePublicVenueCanonicalPath(normalized.canonicalPath, template, slug),
     shortDescription,
     heroImageUrl: normalized.heroImageUrl,
     events: normalized.events,
@@ -2259,10 +2279,18 @@ export function markVenueSitemapDetailAvailability(pageItems, hubRows, sessions,
       heroImageUrl: mergedGroup?.heroImageUrl || canonicalRow.heroImageUrl,
       mergedVenueIds: ids,
     }));
-    const weakVenuePage = template === 'location'
-      ? !hasAddress || (!hasDescription && !hasHeroImage) || scoped.length < 1
-      : routeCount < 3 || (!hasDescription && !hasHeroImage) || !hasAddress;
-    return { ...item, detailAvailable: true, isIndexable: canonicalRow.isIndexable !== false && !weakVenuePage };
+    const decision = indexabilityDecision({
+      futureSessions: scoped.length,
+      routeCount,
+      isIndexable: canonicalRow.isIndexable,
+      type,
+      pageStatus: canonicalRow.pageStatus,
+      hasAddress,
+      hasDescription,
+      hasHeroImage,
+      template,
+    });
+    return { ...item, detailAvailable: true, isIndexable: decision.indexable };
   });
 }
 

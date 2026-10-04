@@ -26,8 +26,6 @@ import { isEventsCatalogSitemapEligibleUrl } from '@/lib/events-catalog-indexing
 import { evaluateListingIndexability, MIN_LISTING_OFFERS_FOR_INDEX } from '@/lib/seo-listing-meta';
 import { buildPodborkiCityCanonicalPath, isPodborkiSeoPilotCitySlug, PODBORKI_SEO_PILOT_CITY_SLUGS } from '@/lib/podborki-city-seo';
 import { venueCanonicalPath } from '@/lib/routes';
-import { applyVenueEditorialOverlay } from '@/lib/venue-editorial-content';
-import { getCachedPublicVenueDto } from '@/server/cached-venue-data';
 import { cityPlacesCatalogHref } from '@/lib/catalog-url';
 import { getCachedCatalog } from '@/server/cached-catalog-data';
 import { getCachedDestinations } from '@/server/cached-public-surfaces';
@@ -293,7 +291,7 @@ export async function buildCitiesSitemapEntries(now = new Date()): Promise<Sitem
 
 export async function buildVenuesSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
   const venuesPayload = await freshVenuesForSitemap();
-  const candidates = (venuesPayload?.venues || [])
+  const eligible = (venuesPayload?.venues || [])
     .filter((venue) => {
       if (!venue.slug) return false;
       return evaluateVenueIndexability({
@@ -308,29 +306,10 @@ export async function buildVenuesSitemapEntries(now = new Date()): Promise<Sitem
       }).indexable;
     })
     .slice(0, MAX_VENUES);
-  // The detail DTO applies the content gate (route count, address, hero/text)
-  // and resolves canonical overrides. The lean list cannot predict either.
-  const detailRows = await Promise.all(Array.from({ length: 6 }, async (_, worker) => {
-    const accepted: Array<{ source: PublicVenueDto; path: string }> = [];
-    for (let index = worker; index < candidates.length; index += 6) {
-      const candidate = candidates[index];
-      const payload = await getCachedPublicVenueDto(String(candidate.slug));
-      if (!payload?.venue || payload.venue.id !== candidate.id) continue;
-      const venue = applyVenueEditorialOverlay(payload.venue);
-      if (!evaluateVenueIndexability({
-        futureSessions: venue.futureSessionCount ?? payload.stats?.events ?? 0,
-        isIndexable: venue.isIndexable,
-        type: venue.type,
-        pageStatus: venue.pageStatus,
-      }).indexable) continue;
-      accepted.push({ source: candidate, path: venueCanonicalPath(venue) });
-    }
-    return accepted;
-  }));
   const sources = new Map<string, PublicVenueDto>();
-  const entries = detailRows.flat().map(({ source, path }) => {
-    const result = entry(path, now, 'weekly', 0.6);
-    sources.set(result.url, source);
+  const entries = eligible.map((venue) => {
+    const result = entry(venueCanonicalPath(venue), now, 'weekly', 0.6);
+    sources.set(result.url, venue);
     return result;
   });
   const uniqueEntries = [...new Map(entries.map((item) => [item.url, item])).values()];

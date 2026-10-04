@@ -13,6 +13,7 @@
 
 import {
   REGION_TIER_B_MIN_EVENTS,
+  indexabilityDecision,
   resolveRegionLiveTier,
 } from '@daibilet/contracts/common';
 
@@ -55,7 +56,9 @@ export type HubIndexDecision = {
     | 'explicit_noindex'
     | 'hidden_page'
     | 'detail_unavailable'
-    | 'non_venue_type';
+    | 'non_venue_type'
+    | 'weak_content'
+    | 'low_route_count';
 };
 
 /**
@@ -72,12 +75,6 @@ export type HubIndexDecision = {
  * collection/placeholder types are excluded.
  */
 export const NON_INDEXABLE_VENUE_TYPES = new Set(['meeting_point', 'online', 'other']);
-
-function normalizeVenueType(value?: string | null): string {
-  return String(value || '')
-    .trim()
-    .toLowerCase();
-}
 
 function normalizeSlug(value?: string | null): string {
   return String(value || '')
@@ -126,31 +123,18 @@ export function evaluateVenueIndexability(input: {
   type?: string | null;
   pageStatus?: string | null;
   detailAvailable?: boolean | null;
+  routeCount?: number | null;
+  hasAddress?: boolean | null;
+  hasDescription?: boolean | null;
+  hasHeroImage?: boolean | null;
+  template?: 'location' | 'institution' | null;
 }): HubIndexDecision {
-  if (input.detailAvailable === false) {
-    return { indexable: false, thin: true, reason: 'detail_unavailable' };
-  }
-  if (input.isIndexable === false) {
-    return { indexable: false, thin: true, reason: 'explicit_noindex' };
-  }
-
-  if (String(input.pageStatus || '').trim().toUpperCase() === 'HIDDEN') {
-    return { indexable: false, thin: true, reason: 'hidden_page' };
-  }
-
-  if (NON_INDEXABLE_VENUE_TYPES.has(normalizeVenueType(input.type))) {
-    return { indexable: false, thin: true, reason: 'non_venue_type' };
-  }
-
-  const futureSessions = Number(input.futureSessions) || 0;
-  if (futureSessions <= 0) {
-    return { indexable: false, thin: true, reason: 'zero_future_sessions' };
-  }
-  if (futureSessions < MIN_VENUE_EVENTS_FOR_INDEX) {
-    return { indexable: false, thin: true, reason: 'low_future_session_count' };
-  }
-
-  return { indexable: true, thin: false, reason: 'enough_future_sessions' };
+  const decision = indexabilityDecision(input);
+  return {
+    indexable: decision.indexable,
+    thin: !decision.indexable,
+    reason: decision.reason as HubIndexDecision['reason'],
+  };
 }
 
 /**

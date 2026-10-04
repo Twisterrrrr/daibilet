@@ -41,6 +41,7 @@ export type LeanPublicVenueRow = {
   shortDescription: string | null;
   description: string | null;
   heroImageUrl: string | null;
+  canonicalPath: string | null;
   city: string;
   cityId: string | null;
   citySlug: string | null;
@@ -71,6 +72,7 @@ const venueListSelect = {
   shortDescription: true,
   description: true,
   heroImageUrl: true,
+  canonicalPath: true,
   address: true,
   latitude: true,
   longitude: true,
@@ -296,6 +298,7 @@ function mapLeanVenueRow(
     shortDescription: leanText ? null : row.shortDescription,
     description: leanText ? null : row.description,
     heroImageUrl: row.heroImageUrl,
+    canonicalPath: row.canonicalPath,
     city: row.city?.title || 'Не указан',
     cityId: row.cityId || row.city?.id || null,
     citySlug: row.city?.slug || null,
