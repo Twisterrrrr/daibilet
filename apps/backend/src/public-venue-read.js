@@ -1288,7 +1288,14 @@ async function resolvePublicVenueRow(db, venueSlugOrId) {
   candidates.add(publicCitySlug(value));
   candidates.add(stripOpaqueVenueIdSuffix(publicCitySlug(value)));
   for (const candidate of [...candidates]) {
-    const result = await db.query(`${PUBLIC_VENUE_ROW_SELECT} where venue.slug = $1 or venue.id = $1 limit 1`, [candidate]);
+    // A slug can belong to several imported Venue rows. Keep route resolution
+    // stable across plans/restarts so sitemap checks and page metadata agree.
+    const result = await db.query(`${PUBLIC_VENUE_ROW_SELECT}
+      where venue.slug = $1 or venue.id = $1
+      order by venue."isIndexable" desc nulls last,
+        case when upper(venue."pageStatus") = 'PUBLISHED' then 1 else 0 end desc,
+        venue."updatedAt" desc nulls last, venue.id asc
+      limit 1`, [candidate]);
     if (result.rows[0]) return result.rows[0];
   }
 
@@ -1322,7 +1329,8 @@ async function resolvePublicVenueRowByComputedSlug(db, requestedSlug) {
     `${PUBLIC_VENUE_ROW_SELECT}
      where venue.slug = $1
         or venue.slug like $2
-     order by length(venue.slug) asc
+     order by length(venue.slug) asc, venue."isIndexable" desc nulls last,
+       venue."updatedAt" desc nulls last, venue.id asc
      limit 24`,
     [normalized, `${normalized}-%`],
   );
