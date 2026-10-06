@@ -64,7 +64,14 @@ function mergeImageClassName(
   loaded: boolean,
 ): string {
   // Keep consumer transform hover; always own opacity so cards fade in without CLS.
-  return [className, 'transition-[opacity,transform] duration-300', loaded ? 'opacity-100' : 'opacity-0']
+  // `daibilet-media-loading` is the hook for the skeleton: globals.css paints a
+  // shimmering sweep on the direct parent (the media box) while the image is in
+  // flight, so the gap reads as "loading" instead of a blank slate block.
+  return [
+    className,
+    'transition-[opacity,transform] duration-300',
+    loaded ? 'opacity-100' : 'opacity-0 daibilet-media-loading',
+  ]
     .filter(Boolean)
     .join(' ');
 }
