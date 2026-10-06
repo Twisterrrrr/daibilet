@@ -2139,6 +2139,46 @@ body > div:has(iframe[src*='ticketscloud']) {
   text-decoration: none;
 }
 
+/* Media skeleton: SafeImage keeps `daibilet-media-loading` on the <img> until
+   onLoad fires (the image itself stays opacity-0). The media box - the
+   position:relative direct parent, usually aspect-* + bg-slate-100 - then shows a
+   soft sweep instead of an empty gap, and the loaded image fades in over it.
+   Scoped to the direct parent so a whole card/section never shimmers. */
+@keyframes daibilet-media-sweep {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* Class tokens are written as [class~='...'] on purpose: plain `.relative`
+   here gets swallowed by Tailwind - every `@apply relative` in @layer
+   components re-emits this rule merged with its own selector (e.g.
+   `.catalog-price-range__track[class*='aspect-']:has(...)`). The attribute
+   form matches the same elements but is not a class node for @apply. */
+[class~='relative'][class*='aspect-']:has(> img.daibilet-media-loading),
+[class~='relative'][class~='overflow-hidden']:has(> img.daibilet-media-loading) {
+  background-image: linear-gradient(
+    100deg,
+    rgba(148, 163, 184, 0.16) 30%,
+    rgba(148, 163, 184, 0.38) 50%,
+    rgba(148, 163, 184, 0.16) 70%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: daibilet-media-sweep 1.4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [class~='relative'][class*='aspect-']:has(> img.daibilet-media-loading),
+  [class~='relative'][class~='overflow-hidden']:has(> img.daibilet-media-loading) {
+    animation: none;
+    background-position: 50% 0;
+  }
+}
+
 @keyframes blog-hero-ken {
   from {
     transform: scale(1.06);
