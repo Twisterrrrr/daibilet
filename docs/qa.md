@@ -1,5 +1,13 @@
 # qa.md — открытые вопросы
 
+## 2026-10-02 — Stage 0 ticket DTO and delivery contract (code, not deployed)
+
+- `publicCode` is the order code. `ticketNumber`/`ticketNumbers` are separate issued numbers (`TKT-…`); the finance branch `codex/stage0-r12` adds one durable `IssuedTicket` row per quantity unit and keeps the JSON mirror for compatibility.
+- The public order DTO currently includes buyer contact, venue title/address/coordinates, validity mode/end, items and totals, paid/confirmed timestamps, ticket numbers, and `supplierSupportPhone`. The catalog ticket page renders the order code, ticket number, validity, venue details and support phone when supplied.
+- Internal QR payload is the absolute `/checkout/ticket/{publicCode}` URL. A venue can open it and compare the displayed number with the printed ticket; a dedicated scanner API and redemption state are still outside Stage 0. Imported/widget QR keeps the partner code as-is.
+- HTML ticket plus browser print/Save as PDF is the Stage 0 output. Generated PDF attachment remains optional.
+- Catalog email delivery has a durable queue on branch `codex/stage0-r13-mail`: only a confirmed order is mailed, SMTP failures retry with backoff, and an operator can request a resend by public code. Deployment and a paid-order retry smoke remain open.
+
 **Как читать (2026-08-09):** фокус для owner и агентов - две секции ниже.
 - **Открыто (техника)** - что реально ждёт кода / smoke / infra; здесь приоритет ответов и следующих шагов.
 - **Отложено (продукт)** - продуктовые развилки **не удалены**, помечены `DEFERRED`; не блокируют текущий tech-трек, вернуться можно позже.
@@ -159,23 +167,23 @@ Finance PR-ветка `codex/stage0-admission-ticket-core` может держа
 
 ## Открыто (техника)
 
-### 1. Stage 0 closeout - e2e/smoke на live `.159` (единственный runtime gate)
+### 1. Stage 0 closeout - частичный sandbox smoke на live `.159`
 
 **Где мы сейчас (owner 2026-08-09):** Stage 0 **по коду закрыт** и **уже live on finance `.159`**: внутренний admission checkout, Path A `return_url` → `/checkout/result?order=...`, public order lookup, выдача `TKT-{publicCode}-NN`, buyer/supplier/admin projection. PR/code done → **live on `.159`** (не «ждёт деплой»).
 
-**Что ещё открыто (runtime only):** один шаг closeout - **доплатить sandbox order** → webhook/reconcile → order `CONFIRMED` + непустые `ticketNumbers` + public lookup по `publicCode`. Checklist: [yookassa-e2e-sandbox.md](./checklists/yookassa-e2e-sandbox.md).
+**Owner report 2026-10-02:** sandbox order `4157776` прошёл create-payment → ЮKassa → `payment.succeeded` → webhook → `CheckoutOrder.CONFIRMED` / `FulfillmentItem.CONFIRMED`. Код `4229319` остался `PENDING_PAYMENT`. Это подтверждает оплаченный путь, но не отдельные строки `IssuedTicket`, письмо, полный DTO или отмену. Данные сообщены owner; этот документ не заменяет независимый smoke после следующего деплоя. Checklist: [yookassa-e2e-sandbox.md](./checklists/yookassa-e2e-sandbox.md).
 
-**Блокер:** ручная sandbox-оплата / доставка confirm (агент **не** трогает `.159` / secrets). Wide CTA и Path B calc **не** входят в closeout.
+**Открыто:** `payment.canceled`, доставку письма после SMTP-сбоя, пилот галереи и проверку новых ticket rows/approve после отдельного деплоя. Агент **не** трогает `.159` / secrets. Wide CTA и Path B calc **не** входят в closeout.
 
-**Следующий техшаг:** завершить sandbox payment на уже задеплоенном коде → подтвердить `CONFIRMED` + ticketNumbers + reopen buyer card без localStorage → закрыть Stage 0 closeout в Tasktracker/Diary. **Owner runbook:** [finance-stage0-owner-runbook.md](./finance-stage0-owner-runbook.md).
+**Следующий техшаг:** проверить `ticketNumbers` и полный public lookup для `4157776`, затем сценарий `payment.canceled` и повтор письма без новой оплаты. **Owner runbook:** [finance-stage0-owner-runbook.md](./finance-stage0-owner-runbook.md).
 
 ### 2. YooKassa webhook canon - register / verify (owner gate)
 
 **Canon URL (LOCKED):** `https://finance-api.daibilet.ru/api/checkout/yookassa/webhook`. **`pay.daibilet.ru`** - только return/user surface, **не** webhook endpoint.
 
-**Свёртка статуса:** ранее в docs фигурировало «ручная регистрация cabinet DONE» (FIN.W1 / MIG.9.5). **Owner wording 2026-08-09:** webhook ещё нужно **зарегистрировать** (или явно verify/confirm в кабинете ЮKassa). Текущий gate = owner register/verify, не смена canon URL.
+**Статус:** webhook `payment.succeeded` доставлен для sandbox order `4157776` по owner report 2026-10-02. `payment.canceled` остаётся без прогона.
 
-**Следующий техшаг:** owner регистрирует/подтверждает webhook на `finance-api…/webhook` (events: succeeded / waiting_for_capture / canceled) → e2e delivery в связке с п.1; при fail - логи verify + reconcile, без перевода webhook на `pay.`.
+**Следующий техшаг:** прогнать `payment.canceled` и сверить освобождение резерва и отсутствие валидного билета; при fail - логи verify + reconcile, без перевода webhook на `pay.`.
 
 ### 3. PurchaseProjection fan-in + purchases-by-email (m2m)
 
