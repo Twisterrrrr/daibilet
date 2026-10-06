@@ -3,7 +3,7 @@ import {
   buildPublicEventFreshnessMap,
   buildPublicVenuesDto,
 } from '@daibilet/backend/public-read';
-import type { PublicVenueDto } from '@daibilet/contracts/public';
+import type { PublicVenueDto, PublicVenuePageDto } from '@daibilet/contracts/public';
 
 import { evaluateCityIndexability, evaluateRegionIndexability, evaluateVenueIndexability } from '@/lib/hub-indexability';
 import {
@@ -29,6 +29,7 @@ import { venueCanonicalPath } from '@/lib/routes';
 import { cityPlacesCatalogHref } from '@/lib/catalog-url';
 import { getCachedCatalog } from '@/server/cached-catalog-data';
 import { getCachedDestinations } from '@/server/cached-public-surfaces';
+import { fetchPublicApiJson } from '@/server/public-api-client';
 import { parseCatalogPageQuery } from '@/server/catalog-query';
 import { finalizeLandingPayload, fetchLandingPageDto } from '@/server/landing-page';
 
@@ -312,9 +313,37 @@ export async function buildVenuesSitemapEntries(now = new Date()): Promise<Sitem
     sources.set(result.url, venue);
     return result;
   });
+  const pathCounts = new Map<string, number>();
+  for (const item of entries) pathCounts.set(item.url, (pathCounts.get(item.url) || 0) + 1);
   const uniqueEntries = [...new Map(entries.map((item) => [item.url, item])).values()];
-  assertSitemapNoindexInvariant(uniqueEntries, sources);
-  return uniqueEntries;
+  // Location types and colliding paths can resolve to a different detail row
+  // than the list DTO. Verify the final URL through the API used by HTML.
+  const checked = new Map<string, boolean>();
+  const candidates = uniqueEntries.filter((item) =>
+    new URL(item.url).pathname.startsWith('/locations/') || (pathCounts.get(item.url) || 0) > 1);
+  for (let i = 0; i < candidates.length; i += 8) {
+    const batch = await Promise.all(candidates.slice(i, i + 8).map(async (item) => {
+      const pathname = new URL(item.url).pathname;
+      const slug = decodeURIComponent(pathname.split('/').pop() || '');
+      const detail = await fetchPublicApiJson<PublicVenuePageDto | null>(
+        `/api/public/venues/${encodeURIComponent(slug)}`,
+        { timeoutMs: 15_000, notFoundAsNull: true, retries: 0 },
+      );
+      const venue = detail?.venue;
+      return [item.url, Boolean(venue &&
+        venueCanonicalPath(venue) === pathname &&
+        evaluateVenueIndexability({
+          futureSessions: venue.futureSessionCount ?? detail.stats?.events ?? 0,
+          isIndexable: venue.isIndexable,
+          type: venue.type,
+          pageStatus: venue.pageStatus,
+        }).indexable)] as const;
+    }));
+    for (const [url, indexable] of batch) checked.set(url, indexable);
+  }
+  const verifiedEntries = uniqueEntries.filter((item) => checked.get(item.url) !== false);
+  assertSitemapNoindexInvariant(verifiedEntries, sources);
+  return verifiedEntries;
 }
 
 export async function buildLandingsSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
