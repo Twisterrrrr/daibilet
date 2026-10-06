@@ -11,7 +11,10 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 3600;
 
 export function generateStaticParams() {
-  return SITEMAP_CHUNKS.flatMap((chunk) => [{ chunk }, { chunk: `${chunk}.xml` }]);
+  // venues.xml has its own runtime route: it must not bake a pre-swap backend
+  // snapshot into the CI artifact.
+  return SITEMAP_CHUNKS.filter((chunk) => chunk !== 'venues')
+    .flatMap((chunk) => [{ chunk }, { chunk: `${chunk}.xml` }]);
 }
 
 export async function GET(

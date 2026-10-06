@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # INC.504.20 / INC.504.23: SSR healthcheck (extracted from cron.d — cron treats bare % as newline).
-# Detect curl fail OR TTFB>5s → SIGKILL+start daibilet-web + safe warm kill.
+# Detect a repeat failure on a lightweight Next route before restarting web.
 #
 # INC.504.23: never fight deploy / incomplete .next / cold start:
 # - skip while /var/lock/daibilet-web-deploy.active is fresh
 # - skip when prerender-manifest.json missing (mid-build)
 # - skip SIGKILL when MainPID age < cold-start grace (avoids curl=28 kill loops)
 set -u
-URL="${DAIBILET_SSR_HEALTH_URL:-http://127.0.0.1:3001/}"
+URL="${DAIBILET_SSR_HEALTH_URL:-http://127.0.0.1:3001/robots.txt}"
 TTFB_LIMIT="${DAIBILET_SSR_TTFB_LIMIT:-5}"
 LOG="${DAIBILET_SSR_HEALTH_LOG:-/var/log/daibilet/ssr-health.log}"
 WEB_SERVICE="${DAIBILET_WEB_SERVICE:-daibilet-web}"
@@ -81,6 +81,17 @@ if [ "$BAD" -ne 1 ]; then
   if [[ "$OK_HEARTBEAT_INTERVAL" =~ ^[0-9]+$ ]] && (( NOW_EPOCH - LOG_MTIME >= OK_HEARTBEAT_INTERVAL )); then
     log_msg "OK heartbeat: TTFB=${TTFB:-na} curl=${CODE}"
   fi
+  exit 0
+fi
+
+# A busy SSR request can briefly delay one probe. Confirm that the lightweight
+# route is still unresponsive before taking down every active connection.
+sleep 2
+RETRY_CODE=0
+RETRY_TTFB="$(curl -o /dev/null -s -w '%{time_starttransfer}' --max-time "$CURL_MAX_TIME" "$URL")" || RETRY_CODE=$?
+if [ "$RETRY_CODE" -eq 0 ] && command -v bc >/dev/null && [ -n "$RETRY_TTFB" ] \
+  && (( $(echo "$RETRY_TTFB <= $TTFB_LIMIT" | bc -l) )); then
+  log_msg "SKIP recover: retry healthy (first TTFB=${TTFB:-na} curl=${CODE}; retry TTFB=${RETRY_TTFB} curl=${RETRY_CODE})"
   exit 0
 fi
 
