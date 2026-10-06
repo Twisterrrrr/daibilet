@@ -100,16 +100,21 @@ export function LocationsCatalogMap({
       // Resolving the nullable read first keeps the narrowed binding.
       const existingMap = mapRef.current;
       const map: LeafletMap = existingMap ?? L.map(node, {
-          center: defaultCenter
-            ? [defaultCenter.latitude, defaultCenter.longitude]
-            : [pins[0].latitude, pins[0].longitude],
-          zoom: defaultCenter && typeof defaultZoom === 'number' ? defaultZoom : 12,
-          minZoom: MIN_ZOOM,
-          maxZoom: MAX_ZOOM,
-          scrollWheelZoom: true,
-          zoomControl: false,
-        });
-        mapRef.current = map;
+        center: defaultCenter
+          ? [defaultCenter.latitude, defaultCenter.longitude]
+          : [pins[0].latitude, pins[0].longitude],
+        zoom: defaultCenter && typeof defaultZoom === 'number' ? defaultZoom : 12,
+        minZoom: MIN_ZOOM,
+        maxZoom: MAX_ZOOM,
+        scrollWheelZoom: true,
+        zoomControl: false,
+      });
+      mapRef.current = map;
+
+      // The effect re-runs on pin selection while the map instance survives via
+      // mapRef - controls/tiles must be created once per map, otherwise every
+      // re-run stacks another zoom control on the map corner.
+      if (!existingMap) {
         L.control
           .zoom({
             position: 'topright',
@@ -122,10 +127,13 @@ export function LocationsCatalogMap({
             '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>',
           maxZoom: MAX_ZOOM,
         }).addTo(map);
-        resizeObserver = new ResizeObserver(() => {
-          map?.invalidateSize({ animate: false });
-        });
-        resizeObserver.observe(node);
+      }
+
+      // Per-run observer: the effect cleanup disconnects it before the next run.
+      resizeObserver = new ResizeObserver(() => {
+        map.invalidateSize({ animate: false });
+      });
+      resizeObserver.observe(node);
 
       for (const marker of markersRef.current) marker.remove();
       markersRef.current = [];
