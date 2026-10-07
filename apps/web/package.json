@@ -8,7 +8,8 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test": "node scripts/run-unit-tests.mjs",
-    "test:ci": "node scripts/run-unit-tests.mjs --ci"
+    "test:ci": "node scripts/run-unit-tests.mjs --ci",
+    "ticket-mail:process": "tsx scripts/process-ticket-delivery.ts"
   },
   "dependencies": {
     "@daibilet/backend": "workspace:*",

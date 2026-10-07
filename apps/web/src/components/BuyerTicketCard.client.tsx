@@ -82,9 +82,9 @@ export function BuyerTicketCard({ order, origin, emailHint = 'unknown', classNam
     typeof window !== 'undefined'
       ? buyerTicketAbsoluteUrl(order.publicCode, origin || window.location.origin)
       : buyerTicketAbsoluteUrl(order.publicCode, origin);
-  // Prefer real ticket/order code in QR when issued or imported; do not invent a fake barcode.
-  const qrPayload =
-    order.mode === 'WIDGET_IMPORT' || ticketIssuedSeparately ? ticketNumber : ticketUrl;
+  // Internal QR opens the ticket page for manual entrance validation.
+  // Imported tickets retain the partner's original code.
+  const qrPayload = order.mode === 'WIDGET_IMPORT' ? ticketNumber : ticketUrl;
   const qrUrl = buyerTicketQrImageUrl(qrPayload, 180);
   const [copied, setCopied] = useState(false);
 

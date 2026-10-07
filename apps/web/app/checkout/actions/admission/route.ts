@@ -7,7 +7,8 @@ import {
 import { isOpenDateValidity } from '@/lib/finance-projection';
 import { buyerTicketAbsoluteUrl } from '@/lib/buyer-ticket';
 import { submitAdmissionCheckout } from '@/server/finance-checkout-client';
-import { sendBuyerTicketEmail, isBuyerTicketSmtpConfigured } from '@/server/buyer-ticket-mail';
+import { isBuyerTicketSmtpConfigured } from '@/server/buyer-ticket-mail';
+import { enqueueBuyerTicketEmail } from '@/server/buyer-ticket-delivery';
 import { fetchAdmissionProductBySlug } from '@/server/finance-projection-client';
 import { fetchPublicApiJson } from '@/server/public-api-client';
 
@@ -172,23 +173,19 @@ export async function POST(request: Request) {
   // Preferred return after pay: catalog ticket/result with publicCode (finance-owned append).
   const catalogReturnWithOrder = `${siteUrl}/checkout/result?order=${encodeURIComponent(result.publicCode)}`;
 
-  let emailSent = false;
+  const emailSent = false;
   let emailReason: string | null = null;
 
-  // Notify immediately for confirmed stub / already-paid; YooKassa PENDING waits for webhook (finance)
-  // but we still try a "pending ticket link" mail so buyer has the code.
+  // Queue persists while payment is pending; the worker sends only after finance confirms payment.
   const buyerEmail = order.email || String(body.buyer?.email || '');
   if (buyerEmail.includes('@')) {
-    const mail = await sendBuyerTicketEmail({
-      to: buyerEmail,
-      publicCode: result.publicCode,
-      title: order.title,
-      ticketUrl,
-      amountRub: order.amountRub,
-      mode: result.mode,
-    });
-    emailSent = mail.sent;
-    emailReason = mail.reason || null;
+    try {
+      await enqueueBuyerTicketEmail(result.publicCode, buyerEmail);
+      emailReason = 'queued';
+    } catch {
+      console.error(`[buyer-ticket-delivery] enqueue failed for order ${result.publicCode}`);
+      emailReason = 'queue_unavailable';
+    }
   } else {
     emailReason = 'email_missing';
   }

@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: feat/next-monorepo
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.ref_name || 'feat/next-monorepo' }}
       - name: Crawler matrix
         run: bash deploy/scripts/smoke-crawler-prod.sh
       - name: Bot 5XX and ReferenceError monitor
