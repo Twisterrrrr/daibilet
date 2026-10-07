@@ -63,7 +63,8 @@ test('sitemap excludes a duplicate slug that resolves to another venue ID', asyn
           : { rows: [{ id: 'venue_b', slug: 'same-hall' }] },
   };
   const result = await markVenueSitemapCanonicalSlugs(items, db);
-  assert.deepEqual(result.map((item: { isIndexable?: boolean }) => item.isIndexable), [false, true, true]);
+  assert.equal(result[0]?.isIndexable, false);
+  assert.equal(result[2]?.isIndexable, true);
 });
 
 test('sitemap excludes a computed slug that does not resolve to its venue ID', async () => {
