@@ -40,6 +40,20 @@ jobs:
 
   validate-build-test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: daibilet
+          POSTGRES_USER: daibilet
+          POSTGRES_PASSWORD: daibilet
+        ports:
+          - 5437:5432
+        options: >-
+          --health-cmd "pg_isready -U daibilet -d daibilet"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
     steps:
       - uses: actions/checkout@v4
 
@@ -67,6 +81,7 @@ jobs:
           pnpm db:validate
           pnpm db:generate
           pnpm db:typecheck
+          pnpm db:deploy
 
       - name: Backend typecheck and unit tests
         run: |
