@@ -297,8 +297,10 @@ export function CitiesIndexChrome({ destinations }: { destinations: PublicDestin
               </ul>
             ) : null}
 
+            {/* Same density as the home popular-cities rail (2/3/4 cols, gap
+                parity): xl+ columns shrank cards below the home reference. */}
             {filteredCities.length > 0 ? (
-              <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 min-[1800px]:grid-cols-7">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-3.5 md:grid-cols-4 lg:grid-cols-4">
                 {filteredCities.map((city) => (
                   <CityCard
                     key={`${city.type}:${city.id || city.slug || city.name}`}
