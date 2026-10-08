@@ -38,6 +38,8 @@ try {
       prisma.event.update({ where: { id: event.id }, data: { ageLimit: '18+' } }),
       prisma.venue.update({ where: { id: venue.id }, data: venueData }),
     ]);
+    const backend = await fetch('http://127.0.0.1:4000/api/internal/public-cache', { method: 'POST', headers: { 'content-type': 'application/json', authorization: `Bearer ${process.env.DAIBILET_NEXT_REVALIDATE_SECRET || ''}` }, body: JSON.stringify({ reason: 'owner TAU content update', warm: 'none' }) });
+    if (!backend.ok) throw new Error(`Backend cache invalidation failed: ${backend.status}`);
     const response = await fetch('http://127.0.0.1:3001/api/internal/revalidate', { method: 'POST', headers: { 'content-type': 'application/json', 'x-revalidate-secret': process.env.DAIBILET_NEXT_REVALIDATE_SECRET || '' }, body: JSON.stringify({ slug, paths: ['/venues/tau', `/api/public/events/${slug}`, '/api/public/venues/tau'] }) });
     console.log(`content_applied; revalidation=${response.status}`);
     if (!response.ok) throw new Error('Revalidation failed');

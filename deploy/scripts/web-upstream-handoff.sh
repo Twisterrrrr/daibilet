@@ -38,9 +38,12 @@ prepare_web_shadow() {
   sudo -n cp -al "${APP_DIR}/apps/web/.next" "${SHADOW_WEB_DIR}/.next" || return 1
   ln -s "${APP_DIR}/apps/web/public" "${SHADOW_WEB_DIR}/public"
   ln -s "${APP_DIR}/apps/web/node_modules" "${SHADOW_WEB_DIR}/node_modules"
+  local web_user
+  web_user="$(systemctl show "$WEB_SERVICE" --property=User --value)"
+  web_user="${web_user:-root}"
   # A transient unit loads the production environment without printing credentials.
   sudo -n systemd-run --unit="$SHADOW_WEB_SERVICE" --collect \
-    --uid=deploy --working-directory="$APP_DIR" \
+    --uid="$web_user" --working-directory="$APP_DIR" \
     --property="EnvironmentFile=${APP_DIR}/.env" --property=MemoryMax=2G \
     --setenv=NODE_ENV=production --setenv=NODE_OPTIONS=--max-old-space-size=1536 \
     --setenv="APP_DIR=$APP_DIR" --setenv="SHADOW_WEB_DIR=$SHADOW_WEB_DIR" \
