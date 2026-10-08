@@ -57,3 +57,4 @@ __pycache__/
 
 # Runtime disk caches (INC.504.4 catalog DTO snapshot)
 var/cache/
+var/deploy-shadow/

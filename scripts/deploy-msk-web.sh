@@ -22,6 +22,7 @@ cd "$APP_DIR"
 
 # shellcheck source=deploy-runtime.sh
 source "${APP_DIR}/deploy/scripts/deploy-runtime.sh"
+source "${DEPLOY_HANDOFF_DIR:-${APP_DIR}/deploy/scripts}/web-upstream-handoff.sh"
 
 if [[ -z "$ARTIFACT" || ! -f "$ARTIFACT" ]]; then
   echo "ERROR: ARTIFACT path required (readable .tgz of apps/web/.next)" >&2
@@ -108,6 +109,7 @@ if [[ -f package.json ]]; then
   echo "Prisma client regenerated for API"
 fi
 
+start_web_handoff
 if systemctl_deploy is-active --quiet "$WEB_SERVICE" 2>/dev/null; then
   systemctl_deploy stop "$WEB_SERVICE"
   echo "Stopped ${WEB_SERVICE} for atomic swap"
@@ -139,7 +141,8 @@ if [[ -d "${WEB_NEXT_PREV}/static" && -d "${WEB_NEXT_DIR}/static" ]]; then
   echo "Merged previous hashed static from .next.prev (css/chunks/media compat)"
 fi
 
-if systemctl_deploy is-active --quiet "$API_SERVICE" 2>/dev/null; then
+if ! git diff --quiet "$PREVIOUS_SHA" "$DEPLOY_SHA" -- apps/backend packages/db packages/contracts package.json pnpm-lock.yaml \
+  && systemctl_deploy is-active --quiet "$API_SERVICE" 2>/dev/null; then
   systemctl_deploy restart "$API_SERVICE"
   echo "Restarted ${API_SERVICE} after git sync (backend TS may have changed)"
 fi
@@ -153,9 +156,9 @@ purge_nginx_proxy_cache
 WEB_READY=0
 for _i in 1 2 3 4 5 6 7 8 9 10; do
   sleep 2
-  if [[ "$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' -H 'Cache-Control: no-cache' "https://daibilet.ru/?deploy=$DEPLOY_SHA" || true)" == 200 ]]; then
+  if [[ "$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' "http://127.0.0.1:${WEB_PORT}/robots.txt" || true)" == 200 ]]; then
     WEB_READY=1
-    echo "Public home HTTP 200"
+    echo "Primary Next robots HTTP 200"
     break
   fi
 done
@@ -168,10 +171,13 @@ if [[ "$WEB_READY" -ne 1 ]]; then
     git checkout --detach "$PREVIOUS_SHA"
     sync_public_assets_deploy
     systemctl_deploy start "$WEB_SERVICE" || true
+    finish_web_handoff || true
     echo "Restored BUILD_ID=$(cat "${WEB_NEXT_DIR}/BUILD_ID")"
   fi
   exit 1
 fi
+
+finish_web_handoff
 
 curl -fsS -o /dev/null -w "smoke / =%{http_code}\n" -H "Cache-Control: no-cache" "http://127.0.0.1:${WEB_PORT}/" || true
 

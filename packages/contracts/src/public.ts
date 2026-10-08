@@ -177,6 +177,7 @@ export interface PublicVenueDto extends SeoFields {
   longitude?: number | null;
   metroStation?: string | null;
   wayToFind?: string | null;
+  phone?: string | null;
   parkingInfo?: string | null;
   /** Короткий hook-текст для карточек локаций. */
   hookFact?: string | null;

@@ -132,6 +132,17 @@ describe('structured-data landing/event', () => {
     assert.ok(!blocks.some((block) => block['@type'] === 'FAQPage'));
   });
 
+  it('concert hall JSON-LD publishes the venue telephone and theater type', () => {
+    const blocks = buildVenuePageJsonLd({
+      venue: { id: 'tau', slug: 'tau', name: 'TAU', city: 'Москва', type: 'concert_hall',
+        phone: '+7 (495) 156-23-66', address: 'Рязанский проспект, 8а, стр. 10', events: 2, categories: {} },
+      sessions: [], relatedVenues: [], stats: { events: 2, categories: 1 },
+    } as any);
+    assert.equal(blocks[0]['@type'], 'PerformingArtsTheater');
+    assert.equal(blocks[0].telephone, '+7 (495) 156-23-66');
+    assert.equal(blocks[0].url, 'https://daibilet.ru/venues/tau');
+  });
+
   it('location venue Place JSON-LD uses TouristAttraction', () => {
     const blocks = buildVenuePageJsonLd({
       ok: true,
