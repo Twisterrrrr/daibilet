@@ -76,7 +76,7 @@ test('real SMTP transport recovers from a refused connection and delivers once',
     code,
     lookup: async () => ({ publicCode: code, status: 'CONFIRMED', title: 'Test ticket' }) as any,
     send: (payload: Parameters<typeof sendBuyerTicketEmail>[0]) => sendBuyerTicketEmail(payload, {
-      SMTP_HOST: '127.0.0.1', SMTP_PORT: String(port), SMTP_FROM: 'sender@example.test',
+      NODE_ENV: 'test', SMTP_HOST: '127.0.0.1', SMTP_PORT: String(port), SMTP_FROM: 'sender@example.test',
     }),
   };
   try {

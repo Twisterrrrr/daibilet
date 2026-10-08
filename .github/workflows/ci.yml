@@ -100,8 +100,7 @@ jobs:
       # same change that removes ignoreBuildErrors.
       # Baseline 29.09: 140. 01.10: 90 (CitySuburbPlace.mustSeeFilter, surface import,
       # destinations fixture, day-route Prisma fragments, catalog cityId).
-      - name: Web typecheck (non-blocking baseline)
-        continue-on-error: true
+      - name: Web typecheck
         run: pnpm web:typecheck
 
       - name: Next web build
