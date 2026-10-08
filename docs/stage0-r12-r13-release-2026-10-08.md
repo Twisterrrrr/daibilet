@@ -1,5 +1,38 @@
 # R12/R13: выпуск и проверки 08.10.2026
 
+## Итоговая приёмка 09.10.2026 (МСК)
+
+- R12 завершён в разрешённом sandbox `.159`: источник `7f756a5`, API active,
+  health 200; 172 DB-теста прошли, backfill повторно не создаёт билеты.
+- R13 влит и работает на сайте: очередь, SMTP retry, timer и отдельный номер
+  билета. Три ранее проверенных коммита Cline включены в выпуск.
+- Web source и `.next/DEPLOY_SHA` совпадают: `ef8d3383fc3d2aac9286a79bc09f69b48160d43a`.
+  Во время последнего свопа 268 уникальных проверочных запросов дали HTTP 200.
+- R14: финальный полный обход **344 URL**, HTTP 200 у всех, noindex — 0,
+  чужой/отсутствующий canonical — 0, редиректы — 0.
+  Сырые результаты: `docs/research/r14-acceptance-2026-10-09.json`.
+- Venue API timeout повторяется один раз; metadata и page разделяют DTO.
+  Ошибка не превращается в сохраняемую заглушку с noindex. Изолированная
+  проверка готового артефакта: timeout → 200/index за 13,5 с;
+  backend 503 → незакэшированная 500 → после восстановления 200/index.
+- Карты events/venues возвращают `Cache-Control: no-store`; XML событий
+  читает текущий API вместо сохранённых страниц каталога. Правила индексации
+  и продажи не смягчались, 404-исключения не добавлялись.
+- Halloween/TAU обновлены; «Что входит» и «Лайн-ап» отображаются как заголовки.
+
+CI [37833359587](https://github.com/Twisterrrrr/daibilet/actions/runs/37833359587) — success.
+Артефакт [37833438978](https://github.com/Twisterrrrr/daibilet/actions/runs/37833438978) — success.
+CI после слияния [37849230145](https://github.com/Twisterrrrr/daibilet/actions/runs/37849230145) — success.
+Упавший crawler [37830154888](https://github.com/Twisterrrrr/daibilet/actions/runs/37830154888)
+повторён после исправления: attempt 2 — **success**, bot5xx=0, ReferenceError=0.
+Повторный Telegram alert содержал прежний 502 07:40:38 UTC; таймаут доставки
+удерживал watermark. Сохранённая история ошибок не удалялась.
+
+Полный Stage 0 ещё требует payment.canceled, ручной refund/cancel и пилот
+с арт-галереей. Новые незакоммиченные изменения основного checkout сохранены.
+
+## История выпуска и диагностики
+
 ## R12: финансовый sandbox .159
 
 Источник: `codex/stage0-r12`, SHA `7f756a58ad9e4d5ed21d548d8e45e8db9f230ac3`.
