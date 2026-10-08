@@ -6,8 +6,13 @@ SHADOW_WEB_DIR="${APP_DIR}/var/deploy-shadow/web"
 DEPLOY_HANDOFF_DIR="${DEPLOY_HANDOFF_DIR:-${APP_DIR}/deploy/scripts}"
 
 wait_nginx_workers_drained() {
+  local pid active
   for ((attempt=0; attempt<120; attempt++)); do
-    if ! pgrep -f '^nginx: worker process is shutting down' >/dev/null; then return 0; fi
+    active=0
+    for pid in "$@"; do
+      if ps -p "$pid" -o args= 2>/dev/null | grep -q '^nginx: worker process'; then active=1; fi
+    done
+    if [[ "$active" == 0 ]]; then return 0; fi
     sleep 2
   done
   echo 'ERROR: nginx workers did not drain; leave the serving shadow running' >&2
@@ -15,9 +20,16 @@ wait_nginx_workers_drained() {
 }
 
 switch_web_upstream() {
+  local -a old_workers
+  mapfile -t old_workers < <(pgrep -f '^nginx: worker process')
+  if [[ "${#old_workers[@]}" == 0 ]]; then
+    echo 'ERROR: nginx has no workers to hand off' >&2
+    return 1
+  fi
   python3_deploy "${DEPLOY_HANDOFF_DIR}/switch-web-upstream.py" \
-    --expected-port "$1" --target-port "$2"
-  wait_nginx_workers_drained
+    --expected-port "$1" --target-port "$2" || return 1
+  # reload returns before workers enter their shutdown state; wait by captured PID.
+  wait_nginx_workers_drained "${old_workers[@]}"
 }
 
 prepare_web_shadow() {
