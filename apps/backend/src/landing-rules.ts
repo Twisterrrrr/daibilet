@@ -579,6 +579,60 @@ export const LANDING_RULES: LandingRule[] = [
     excludeKeywords: ['стендап', 'stand up', 'комеди', 'концерт', 'рок', 'джаз', 'автобус'],
     excludeKeywordFields: ['title', 'category', 'sourceCategory', 'subcategory'],
   },
+  {
+    slug: 'intimate-concerts',
+    title: 'Квартирники и камерные вечера',
+    subtitle: 'Акустические выступления, квартирники и живая музыка в небольших залах',
+    chips: ['квартирник', 'акустика', 'камерный'],
+    tags: ['Квартирник', 'Шансон'],
+    keywords: ['квартирник', 'акустик', 'камерн', 'шансон', 'авторск', 'песн', 'гитар', 'вокал', 'живой'],
+    keywordScope: 'content',
+    excludeKeywords: ['рок', 'джаз', 'классик', 'стендап', 'stand up', 'автобус', 'теплоход'],
+    excludeKeywordFields: ['title', 'category', 'sourceCategory', 'subcategory'],
+  },
+  {
+    slug: 'improv-tribute',
+    title: 'Импровизация и трибьют-шоу',
+    subtitle: 'Шоу импровизации, караоке-вечера, квизы и трибьют-концерты',
+    chips: ['импровизация', 'трибьют', 'караоке', 'квиз'],
+    tags: ['Импровизация', 'Трибьют', 'Квиз'],
+    keywords: ['импровиз', 'трибьют', 'cover', 'караоке', 'квиз', 'лото', 'музыкальн', 'гадай', 'угадай'],
+    keywordScope: 'content',
+    excludeKeywords: ['автобус', 'теплоход', 'катер', 'речн'],
+  },
+  {
+    slug: 'graduation',
+    title: 'Выпускные',
+    subtitle: 'Выпускные вечера на теплоходах и в ресторанах',
+    chips: ['выпускной', 'последний звонок', 'банкет'],
+    tags: ['Выпускной', 'Последний звонок', 'Банкет'],
+    keywords: ['выпускн', 'последн', 'звонок', 'банкет', 'фуршет', 'теплоход', 'ресторан'],
+    keywordScope: 'content',
+    excludeKeywords: ['стендап', 'stand up', 'комеди', 'автобус'],
+    excludeKeywordFields: ['title', 'category', 'sourceCategory', 'subcategory'],
+  },
+  {
+    slug: 'international-womens-day',
+    title: '8 Марта',
+    subtitle: 'Подарочные сертификаты, романтические ужины и spa-программы к 8 Марта',
+    chips: ['8 марта', 'подарок', 'романтика'],
+    tags: ['8 Марта', 'Международный женский день'],
+    keywords: ['8 марта', 'женск', 'подар', 'романт', 'spa', 'спа', 'массаж', 'ужин'],
+    keywordScope: 'content',
+    excludeKeywords: ['автобус', 'стендап'],
+    excludeKeywordFields: ['title', 'category', 'sourceCategory'],
+  },
+  {
+    slug: 'maslenitsa',
+    title: 'Масленица',
+    subtitle: 'Гастрономические туры, народные гулянья и праздничные программы на Масленицу',
+    chips: ['масленица', 'блины', 'гулянья'],
+    tags: ['Масленица', 'Гастрономический тур'],
+    keywords: ['маслениц', 'блин', 'гулянь', 'ярмарк', 'фестивал', 'зима'],
+    keywordScope: 'content',
+    excludeKeywords: ['автобус', 'стендап', 'теплоход'],
+    excludeKeywordFields: ['title', 'category', 'sourceCategory'],
+  },
 ];
 
 /** Legacy URL aliases → canonical landing slug (single source for dto + Next). */
@@ -596,6 +650,11 @@ export const LANDING_SLUG_ALIASES: Record<string, string[]> = {
   'quest-tours': ['quest', 'kvest', 'quest-excursions'],
   'show-programs': ['show', 'shou', 'entertainment'],
   'self-development': ['selfdev', 'lectures', 'masterclass'],
+  'intimate-concerts': ['acoustic', 'house-concert', 'shanson'],
+  'improv-tribute': ['improv', 'tribute', 'karaoke-night', 'quiz-night'],
+  graduation: ['vypusknoy', 'graduation-party'],
+  'international-womens-day': ['8-marta', 'womens-day'],
+  maslenitsa: ['maslenica', 'shrovetide'],
 };
 
 /** Seasonally off landings: keep page, hide from /podborki and promo hub. */
@@ -628,12 +687,24 @@ export function isLandingOffSeason(slug: string, now = new Date()): boolean {
     if (month === 1 && day <= 15) return false;
     return true;
   }
+  if (key === 'graduation') {
+    // Май-июнь: выпускные сезоны.
+    return !(month === 5 || month === 6);
+  }
+  if (key === 'international-womens-day') {
+    // Февраль-март: 8 марта.
+    return !(month === 2 || (month === 3 && day <= 10));
+  }
+  if (key === 'maslenitsa') {
+    // Февраль-март: Масленица (зависит от Пасхи).
+    return !(month === 2 || (month === 3 && day <= 10));
+  }
   return false;
 }
 
 export function buildOffSeasonLandingSlugs(now = new Date()): Set<string> {
   return new Set(
-    ['salute-9-may', 'moscow-city-day', 'new-year'].filter((slug) => isLandingOffSeason(slug, now)),
+    ['salute-9-may', 'moscow-city-day', 'new-year', 'graduation', 'international-womens-day', 'maslenitsa'].filter((slug) => isLandingOffSeason(slug, now)),
   );
 }
 

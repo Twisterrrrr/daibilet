@@ -11,6 +11,8 @@ export const LANDING_CATEGORY_PATH_BY_SLUG: Record<string, string> = {
   'quest-tours': 'kvest-ekskursii',
   'show-programs': 'shou-programmy',
   'self-development': 'samorazvitie',
+  'intimate-concerts': 'kvartirniki',
+  'improv-tribute': 'improv-i-tribyut',
   'walking-tours': 'peshie-ekskursii',
   'country-tours': 'zagorodnye-ekskursii',
   exhibitions: 'vystavki-i-muzei',
@@ -19,6 +21,9 @@ export const LANDING_CATEGORY_PATH_BY_SLUG: Record<string, string> = {
   rooftops: 'progulki-po-krysham',
   'new-year': 'novyj-god',
   'salute-9-may': 'salut-9-maya',
+  graduation: 'vypusknye',
+  'international-womens-day': '8-marta',
+  maslenitsa: 'maslenica',
 };
 
 export const CITY_LANDING_PATH_BY_SLUG: Record<string, string> = {
@@ -54,10 +59,15 @@ export const MULTI_CITY_LANDING_SLUGS = new Set<string>([
   'quest-tours',
   'show-programs',
   'self-development',
+  'intimate-concerts',
+  'improv-tribute',
   'excursions',
   'rooftops',
   'salute-9-may',
   'new-year',
+  'graduation',
+  'international-womens-day',
+  'maslenitsa',
 ]);
 
 /** Приоритетные города для sitemap / static params SEO-листингов. */

@@ -29,12 +29,21 @@ export function isLandingOffSeason(slug: string, now = new Date()): boolean {
     if (month === 1 && day <= 15) return false;
     return true;
   }
+  if (key === 'graduation') {
+    return !(month === 5 || month === 6);
+  }
+  if (key === 'international-womens-day') {
+    return !(month === 2 || (month === 3 && day <= 10));
+  }
+  if (key === 'maslenitsa') {
+    return !(month === 2 || (month === 3 && day <= 10));
+  }
   return false;
 }
 
 export function buildOffSeasonLandingSlugs(now = new Date()): Set<string> {
   return new Set(
-    ['salute-9-may', 'moscow-city-day', 'new-year'].filter((slug) => isLandingOffSeason(slug, now)),
+    ['salute-9-may', 'moscow-city-day', 'new-year', 'graduation', 'international-womens-day', 'maslenitsa'].filter((slug) => isLandingOffSeason(slug, now)),
   );
 }
 

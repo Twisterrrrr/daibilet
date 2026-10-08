@@ -154,6 +154,55 @@ export function resolveMoscowCityDayWindow(from = new Date()): LandingEventWindo
   };
 }
 
+/** Graduation season: June 1–30. */
+export function resolveGraduationWindow(from = new Date()): LandingEventWindow {
+  const y = from.getFullYear();
+  const thisStart = atLocalDay(y, 5, 1);
+  const thisEnd = atLocalDay(y, 5, 30);
+  const today = startOfLocalDay(from).getTime();
+  if (today <= thisEnd.getTime()) return { start: thisStart, end: thisEnd, label: 'Июнь', singleDay: false };
+  const start = atLocalDay(y + 1, 5, 1);
+  const end = atLocalDay(y + 1, 5, 30);
+  return { start, end, label: 'Июнь', singleDay: false };
+}
+
+/** International Women's Day: March 1–8. */
+export function resolveWomensDayWindow(from = new Date()): LandingEventWindow {
+  const y = from.getFullYear();
+  const thisStart = atLocalDay(y, 2, 1);
+  const thisEnd = atLocalDay(y, 2, 8);
+  const today = startOfLocalDay(from).getTime();
+  if (today <= thisEnd.getTime()) return { start: thisStart, end: thisEnd, label: formatRuRangeLabel(thisStart, thisEnd), singleDay: false };
+  const start = atLocalDay(y + 1, 2, 1);
+  const end = atLocalDay(y + 1, 2, 8);
+  return { start, end, label: formatRuRangeLabel(start, end), singleDay: false };
+}
+
+/**
+ * Maslenitsa: 7 weeks before Orthodox Easter (Mon before Ash Wed).
+ * Fixed dates for 2026–2030; falls back to Feb 24–Mar 2 estimate.
+ */
+const MASLENITSA_DATES: Record<number, { start: MonthDay; end: MonthDay }> = {
+  2026: { start: { month: 1, day: 16 }, end: { month: 1, day: 22 } },
+  2027: { start: { month: 2, day: 1 }, end: { month: 2, day: 7 } },
+  2028: { start: { month: 1, day: 21 }, end: { month: 1, day: 27 } },
+  2029: { start: { month: 1, day: 6 }, end: { month: 1, day: 12 } },
+  2030: { start: { month: 1, day: 26 }, end: { month: 1, day: 31 } },
+};
+
+export function resolveMaslenitsaWindow(from = new Date()): LandingEventWindow {
+  const y = from.getFullYear();
+  const known = MASLENITSA_DATES[y] || MASLENITSA_DATES[y + 1];
+  if (known) {
+    const start = atLocalDay(y, known.start.month, known.start.day);
+    const end = atLocalDay(y, known.end.month, known.end.day);
+    return { start, end, label: formatRuRangeLabel(start, end), singleDay: false };
+  }
+  const start = atLocalDay(y, 1, 24);
+  const end = atLocalDay(y, 1, 31);
+  return { start, end, label: 'Масленица', singleDay: false };
+}
+
 function slugKey(slug: string): string {
   return canonicalLandingSlug(slug);
 }
@@ -188,6 +237,15 @@ export function resolveLandingEventWindow(
     key.includes('den-vlyublennyh')
   ) {
     return resolveValentineWindow(from);
+  }
+  if (key.includes('graduation') || key.includes('vypusknoy') || key.includes('vypusk')) {
+    return resolveGraduationWindow(from);
+  }
+  if (key.includes('womens-day') || key.includes('8-marta') || key.includes('international-womens')) {
+    return resolveWomensDayWindow(from);
+  }
+  if (key.includes('maslenitsa') || key.includes('maslenica')) {
+    return resolveMaslenitsaWindow(from);
   }
   return null;
 }
