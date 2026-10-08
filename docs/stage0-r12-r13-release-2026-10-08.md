@@ -103,6 +103,26 @@ proxy_read_timeout 180s и stale/background update для этого sitemap.
 
 ## Открытые критерии Stage 0 (сохраняются)
 
+## Финальная проверка переключения
+
+Проверка с уникальными query-параметрами выявила два 502 при первом свопе
+`ddf4361a`: reload nginx завершался раньше, чем старые workers переходили
+в shutdown. Первая проба с одним URL (245 HTTP 200) могла использовать кэш
+и не подтверждала отсутствие этого окна. Исправление в PR
+[18](https://github.com/Twisterrrrr/daibilet/pull/18) сохраняет PID старых
+workers до reload и дожидается их выхода перед остановкой каждого upstream.
+Регрессионный тест моделирует задержку перехода worker в shutdown.
+Повторный реальный своп с исправлением: **163 уникальных запроса, все HTTP 200**.
+
+CI PR17: [37789840208](https://github.com/Twisterrrrr/daibilet/actions/runs/37789840208) — success.
+CI PR18: [37796003792](https://github.com/Twisterrrrr/daibilet/actions/runs/37796003792) — success.
+Финальный контрольный выпуск: `4d613c0d29133a4092f45bf3d9093b0d6b869186`,
+штатный [workflow 37796610566](https://github.com/Twisterrrrr/daibilet/actions/runs/37796610566).
+На публичной странице TAU подтверждены JSON-LD PerformingArtsTheater,
+telephone `+7 (495) 156-23-66` и URL `https://daibilet.ru/venues/tau`.
+
+## Открытые критерии Stage 0 (итог)
+
 - `S0.PAY.7`: отдельный прогон `payment.canceled`.
 - `S0.OPS.3`: приёмка ручного refund/cancel.
 - `S0.SUP.1`: реальный пилот с арт-галереей.
