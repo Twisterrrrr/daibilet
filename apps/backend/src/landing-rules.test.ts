@@ -3,6 +3,7 @@ import test from 'node:test';
 import {
   findLandingRule,
   matchesLandingRule,
+  matchesLandingSchedule,
   matchingLandingSlugs,
 } from './landing-rules.js';
 
@@ -458,6 +459,54 @@ test('city alone is never a sufficient landing match', () => {
     startsAt: '2026-07-10T19:30:00.000Z',
   }, bridges), false);
 });
+
+test('moscow-dinner-boat requires dinner token in title and start ≥15h', () => {
+  const dinner = findLandingRule('moscow-dinner-boat')!;
+  const boat = ['Водные экскурсии', 'Речные прогулки', 'Теплоход: Легенда'];
+  const match = (input: Parameters<typeof matchesLandingRule>[0]) =>
+    matchesLandingRule(input, dinner) && matchesLandingSchedule(input, dinner);
+
+  // Завтрак-обед без «ужин» → rejected (theme gate)
+  assert.equal(match({
+    title: 'Позднее утро на воде с завтраком-обедом',
+    tags: boat,
+    city: 'Москва',
+    startsAt: '2026-07-10T12:35:00+03:00',
+  }), false);
+
+  // Дневной «фуршет» без «ужин», 12:30 → rejected (schedule gate)
+  assert.equal(match({
+    title: 'Последний звонок с дискотекой и фуршетом',
+    tags: boat,
+    city: 'Москва',
+    startsAt: '2026-07-10T12:30:00+03:00',
+  }), false);
+
+  // Вечерний рейс с «ужин» → accepted
+  assert.equal(match({
+    title: 'Речная прогулка с ужином и музыкой',
+    tags: boat,
+    city: 'Москва',
+    startsAt: '2026-07-10T19:00:00+03:00',
+  }), true);
+
+  // Рейс 15:00 с «ужином» → accepted (граничное время)
+  assert.equal(match({
+    title: 'Обед/Ужин на борту теплохода',
+    tags: boat,
+    city: 'Москва',
+    startsAt: '2026-07-10T15:00:00+03:00',
+  }), true);
+
+  // Чисто «обед» без «ужин» → rejected (theme gate)
+  assert.equal(match({
+    title: 'Обед на теплоходе по Москве-реке',
+    tags: boat,
+    city: 'Москва',
+    startsAt: '2026-07-10T13:00:00+03:00',
+  }), false);
+});
+
 
 test('moscow-museums requires museum signal and excludes standup', () => {
   const museums = findLandingRule('moscow-museums');

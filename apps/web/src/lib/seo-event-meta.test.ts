@@ -118,6 +118,39 @@ test('event page title does not repeat a city already present in the event name'
   assert.doesNotMatch(title, /29 сент|19:00/);
 });
 
+test('event page title drops oversized venue disambiguator (live Nizhnekamsk case)', () => {
+  const title = buildEventPageMetaTitle({
+    eventTitle: 'Эдуард Хуснутдинов в Нижнекамске 2026',
+    venueName: 'ГАПОУ "Нижнекамский музыкальный колледж имени Салиха Сайдашева"',
+    cityName: 'Нижнекамск',
+  });
+  // On live this title reached 149 chars:
+  // «…2026 (ГАПОУ "Нижнекамский музыкальный колледж…Сайдашева"): билеты и расписание».
+  assert.equal(title, 'Эдуард Хуснутдинов в Нижнекамске 2026: билеты и расписание');
+  assert.ok(title.length <= 100, `length=${title.length}`);
+});
+
+test('event page title falls back to city when venue blows the budget', () => {
+  const title = buildEventPageMetaTitle({
+    eventTitle: 'Осенний джазовый фестиваль',
+    venueName: 'ГАПОУ "Нижнекамский музыкальный колледж имени Салиха Сайдашева"',
+    cityName: 'Нижнекамск',
+  });
+  assert.equal(title, 'Осенний джазовый фестиваль (Нижнекамск): билеты и расписание');
+});
+
+test('event page title keeps short venue disambiguator within budget', () => {
+  const title = buildEventPageMetaTitle({
+    eventTitle: 'Речная прогулка по центру Москвы от причала Киевский',
+    venueName: 'Причал Киевский',
+    cityName: 'Москва',
+  });
+  assert.equal(
+    title,
+    'Речная прогулка по центру Москвы от причала Киевский (Причал Киевский): билеты и расписание',
+  );
+});
+
 test('event meta soft-cases ALL CAPS supplier titles', () => {
   const title = buildEventCityMetaTitle({
     eventTitle: 'КОНЦЕРТ ГРУППЫ SAHALIN',

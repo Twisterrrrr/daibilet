@@ -92,6 +92,7 @@ export function EventCard({
   imagePriority = false,
   catalogDense = false,
 }: EventCardProps) {
+  const purchase = useCatalogPurchase(session);
   if (showcaseRail || editorsPickBadge) {
     return (
       <ShowcaseEventCard
@@ -148,7 +149,6 @@ export function EventCard({
   const showCategory = Boolean(session.category && !landingActions);
   // Missing display price (<100 / null) is not "soon" - event can still be on sale.
   const showSoonBadge = false;
-  const purchase = useCatalogPurchase(session);
   const displayTitle = formatPublicTitle(session.title);
   const showPurchaseWidgets = landingActions && !suppressPurchaseAnchors && purchase.purchaseEnabled;
   const dayRouteVenue = dayRouteItemFromEvent({

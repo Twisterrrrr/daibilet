@@ -41,7 +41,7 @@ export function dayRouteStopTypeTag(
   if (venue.isSuburb) return 'Пригород';
   const placeLabel = String(placeTypeTag || '').trim() || editorialTagFromTitle(venue.title);
   if (placeLabel) return placeLabel;
-  if (Boolean(venue.eventId || venue.eventSlug)) return 'Событие';
+  if (venue.eventId || venue.eventSlug) return 'Событие';
   return 'Место';
 }
 

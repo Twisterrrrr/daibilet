@@ -526,6 +526,7 @@ export function TcWidgetButton({
   className?: string;
 }) {
   const hiddenButtonRef = React.useRef<HTMLButtonElement | null>(null);
+  const [busy, setBusy] = React.useState(false);
   const eventId = String(tcEventId || '').trim();
   const widgetToken = resolveTcWidgetToken(purchaseUrl);
   const targets = React.useMemo(() => {
@@ -571,8 +572,6 @@ export function TcWidgetButton({
   const buttonClassName =
     className ||
     `tc-buy-btn inline-flex min-h-10 items-center justify-center gap-2 ${colorClasses} ${sizeClasses} ${wide ? 'w-full' : ''}`;
-
-  const [busy, setBusy] = React.useState(false);
 
   const handleClick = () => {
     if (busy || isPurchaseOpeningActive()) return;

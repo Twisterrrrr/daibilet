@@ -150,14 +150,21 @@ export const LANDING_RULES: LandingRule[] = [
     city: 'Москва',
     chips: ['ужин', 'Москва-река', 'вечер'],
     tags: ['На теплоходе', 'Водная экскурсия'],
-    keywords: ['ужин', 'обед', 'ланч', 'бранч', 'завтрак', 'фуршет', 'банкет', 'ресторан', 'теплоход', 'москва-река', 'речн', 'корабл', 'яхт', 'судн'],
+    keywords: ['ужин', 'фуршет', 'банкет', 'теплоход', 'москва-река', 'речн', 'корабл', 'яхт', 'судн'],
     keywordScope: 'content',
+    // Завтрак/обед/ланч/ресторан — не ужин. Фуршет/банкет допустимы
+    // (вечерний формат). requiredKeywordGroups проверяет boat-сигнал
+    // по содержимому (описание, теги).
     requiredTitleKeywordGroups: [
-      ['ужин', 'обед', 'ланч', 'бранч', 'завтрак', 'фуршет', 'банкет', 'ресторан'],
+      ['ужин', 'фуршет', 'банкет'],
     ],
     requiredKeywordGroups: [
       ['теплоход', 'москва-река', 'речн', 'корабл', 'яхт', 'судн'],
     ],
+    // До 15:00 — дневные рейсы (завтрак, полдник), не ужин.
+    // ≥17 по audit вырезает легитимные обеденно-стартовые рейсы 15–16h
+    // (старт 15:00, подача ужина ~17–18) и оставляет <6 событий.
+    minStartsAtHour: 15,
     excludeKeywords: ['автобус', 'пешеход', 'мастер-класс'],
   },
   {
@@ -812,7 +819,7 @@ function landingRequiredSignalsSatisfied(
   return true;
 }
 
-function matchesLandingSchedule(candidate: LandingMatchCandidate, rule: LandingRule): boolean {
+export function matchesLandingSchedule(candidate: LandingMatchCandidate, rule: LandingRule): boolean {
   if (rule.minStartsAtHour == null) return true;
   const startsAtValues = [
     ...(candidate.upcomingSlots || []).map((slot) => slot.startsAt),

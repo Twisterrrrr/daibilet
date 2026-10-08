@@ -8,12 +8,27 @@ import {
 
 test('resolveLandingContextWidget covers owner matrix slugs', () => {
   const expected = [
-    'planetarium',
-    'rooftops',
+    'active-sport',
+    'bridges-night',
+    'bus-tours',
+    'concerts-genre',
     'country-tours',
-    'river-party',
+    'exhibitions',
+    'excursions',
     'family-kids',
+    'moscow-city-day',
+    'moscow-dinner-boat',
+    'moscow-museums',
     'new-year',
+    'planetarium',
+    'river-cruises',
+    'river-party',
+    'rooftops',
+    'salute-9-may',
+    'spb-yards',
+    'standup',
+    'unusual-theatres',
+    'walking-tours',
   ];
   for (const slug of expected) {
     const config = resolveLandingContextWidget(slug);

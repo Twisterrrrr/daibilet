@@ -194,6 +194,24 @@ export function CatalogResults({
   const catalogItems = collapseCatalogComboFamilies(items).filter(
     (item) => !isCatalogExcludedMuseumAdmission(item),
   );
+  const liveRailItems = pickLiveRailItems(catalogItems, sort);
+  // Owner 2026-08-13: temporarily hide «Сейчас выбирают» / «Популярное сейчас» rail on /events.
+  const SHOW_CATALOG_LIVE_RAIL = false;
+  const showLiveRail = SHOW_CATALOG_LIVE_RAIL && liveRailItems.length >= 3 && viewMode === 'cards';
+  const spotlightIds = new Set(excludeEventIds);
+  // Keep «Сейчас выбирают» / «Популярное сейчас» from mirroring the first page of cards 1:1.
+  const listItemsWithoutLiveRail = showLiveRail
+    ? catalogItems.filter((item) => !liveRailItems.some((rail) => rail.id === item.id))
+    : catalogItems;
+  const listItems = spotlightIds.size
+    ? listItemsWithoutLiveRail.filter((item) => !spotlightIds.has(item.id))
+    : listItemsWithoutLiveRail;
+  const gridRef = useRef<HTMLUListElement>(null);
+  const columnsPerRow = useCatalogGridColumnCount(gridRef, filtersCollapsed, listItems.length);
+  const gridEntries = useMemo(
+    () => (viewMode === 'cards' ? buildCatalogGridEntries(listItems, city, columnsPerRow) : null),
+    [viewMode, listItems, city, columnsPerRow],
+  );
   if (!catalogItems.length) {
     const cityName = String(city || '').trim();
     const cityScoped = Boolean(cityName) && cityName.toLowerCase() !== 'all';
@@ -284,25 +302,6 @@ export function CatalogResults({
       </div>
     );
   }
-
-  const liveRailItems = pickLiveRailItems(catalogItems, sort);
-  // Owner 2026-08-13: temporarily hide «Сейчас выбирают» / «Популярное сейчас» rail on /events.
-  const SHOW_CATALOG_LIVE_RAIL = false;
-  const showLiveRail = SHOW_CATALOG_LIVE_RAIL && liveRailItems.length >= 3 && viewMode === 'cards';
-  const spotlightIds = new Set(excludeEventIds);
-  // Keep «Сейчас выбирают» / «Популярное сейчас» from mirroring the first page of cards 1:1.
-  const listItemsWithoutLiveRail = showLiveRail
-    ? catalogItems.filter((item) => !liveRailItems.some((rail) => rail.id === item.id))
-    : catalogItems;
-  const listItems = spotlightIds.size
-    ? listItemsWithoutLiveRail.filter((item) => !spotlightIds.has(item.id))
-    : listItemsWithoutLiveRail;
-  const gridRef = useRef<HTMLUListElement>(null);
-  const columnsPerRow = useCatalogGridColumnCount(gridRef, filtersCollapsed, listItems.length);
-  const gridEntries = useMemo(
-    () => (viewMode === 'cards' ? buildCatalogGridEntries(listItems, city, columnsPerRow) : null),
-    [viewMode, listItems, city, columnsPerRow],
-  );
 
   return (
     <>

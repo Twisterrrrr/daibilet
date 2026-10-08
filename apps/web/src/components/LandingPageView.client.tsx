@@ -298,6 +298,18 @@ function extractFormatLabel(tags: string[]): string {
   return 'Стандарт';
 }
 
+function dinnerScheduleGridClass(showMenuColumn: boolean, showFormatColumn: boolean): string {
+  const titleFr = showMenuColumn && showFormatColumn ? '1.8fr'
+    : showMenuColumn || showFormatColumn ? '2.1fr' : '2.4fr';
+  const parts = [titleFr];
+  if (showMenuColumn) parts.push('0.7fr');
+  parts.push(showMenuColumn && showFormatColumn ? '0.6fr' : '0.65fr');
+  parts.push('0.55fr');
+  if (showFormatColumn) parts.push('0.6fr');
+  parts.push('auto');
+  return `md:grid-cols-[${parts.join('_')}]`;
+}
+
 function resolveLandingCityPrep(cityName: string | null, profile: LandingProfile, landingSlug: string): string | null {
   if (!cityName) return profile === 'bus' || profile === 'river' || profile === 'dinner' ? 'России' : null;
   if (profile === 'bus') return BUS_CITY_META[cityName]?.prepositional || cityName;
@@ -2092,10 +2104,11 @@ function LandingDinnerScheduleList({
     );
   }
 
-  const showMenuColumn = groups.some((group) => extractMenuLabel(group.representative));
-  const desktopGrid = showMenuColumn
-    ? 'md:grid-cols-[1.8fr_0.7fr_0.6fr_0.5fr_0.6fr_auto]'
-    : 'md:grid-cols-[2.4fr_0.65fr_0.55fr_0.65fr_auto]';
+  const menuHits = groups.filter((g) => extractMenuLabel(g.representative)).length;
+  const showMenuColumn = menuHits >= Math.max(1, Math.ceil(groups.length / 2));
+  const formatLabels = groups.map((g) => extractFormatLabel(g.representative.tags));
+  const showFormatColumn = formatLabels.some((f) => f !== 'Стандарт');
+  const desktopGrid = dinnerScheduleGridClass(showMenuColumn, showFormatColumn);
 
   return (
     <>
@@ -2104,7 +2117,7 @@ function LandingDinnerScheduleList({
         {showMenuColumn ? <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Меню</span> : null}
         <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Цена</span>
         <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Время</span>
-        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Формат</span>
+        {showFormatColumn ? <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Формат</span> : null}
         <span />
       </div>
       <div className="space-y-3">
@@ -2114,6 +2127,7 @@ function LandingDinnerScheduleList({
             group={group}
             isOptimal={index === pickOptimalIndex(groups)}
             showMenuColumn={showMenuColumn}
+            showFormatColumn={showFormatColumn}
           />
         ))}
       </div>
@@ -2125,10 +2139,12 @@ function LandingDinnerScheduleRow({
   group,
   isOptimal,
   showMenuColumn,
+  showFormatColumn,
 }: {
   group: EventGroup;
   isOptimal: boolean;
   showMenuColumn: boolean;
+  showFormatColumn: boolean;
 }) {
   const session = group.representative;
   const slot = session.upcomingSlots?.[0];
@@ -2157,11 +2173,7 @@ function LandingDinnerScheduleRow({
         </div>
       ) : null}
       <div
-        className={`hidden items-center gap-4 md:grid ${
-          showMenuColumn
-            ? 'md:grid-cols-[1.8fr_0.7fr_0.6fr_0.5fr_0.6fr_auto]'
-            : 'md:grid-cols-[2.4fr_0.65fr_0.55fr_0.65fr_auto]'
-        }`}
+        className={`hidden items-center gap-4 md:grid ${dinnerScheduleGridClass(showMenuColumn, showFormatColumn)}`}
       >
         <div className="min-w-0">
           {isOptimal ? <div className="mb-1 text-xs font-bold text-primary">⭐ Оптимальный выбор</div> : null}
@@ -2174,7 +2186,7 @@ function LandingDinnerScheduleRow({
         {showMenuColumn ? <div className="text-sm text-foreground">{menu || 'Не указано'}</div> : null}
         <div className="text-sm font-semibold text-foreground">{priceLabel}</div>
         <div className="text-sm text-foreground">{time}</div>
-        <div className="text-sm text-muted-foreground">{format}</div>
+        {showFormatColumn ? <div className="text-sm text-muted-foreground">{format}</div> : null}
         <div>
           {soldOut ? (
             <button type="button" disabled className="inline-flex cursor-not-allowed rounded-lg bg-muted px-4 py-2 text-sm font-semibold text-muted-foreground">
@@ -2194,7 +2206,7 @@ function LandingDinnerScheduleRow({
         <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
           {menu ? <span>{menu}</span> : null}
           <span>{time}</span>
-          <span>{format}</span>
+          {showFormatColumn ? <span>{format}</span> : null}
         </div>
         <div className="flex items-center justify-between gap-3">
           <span className="text-sm font-semibold text-foreground">{priceLabel}</span>
