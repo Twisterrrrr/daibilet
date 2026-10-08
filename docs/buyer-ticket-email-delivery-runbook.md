@@ -31,4 +31,12 @@ after `SENT` does not send again. A manual resend is intentionally explicit.
 
 Acceptance on a sandbox order: enqueue during checkout while SMTP is
 unavailable; observe `RETRY`, restore SMTP, run the worker, then observe `SENT`
-without another payment or webhook. This production smoke has not been run.
+without another payment or webhook. CI now exercises this with PostgreSQL and a
+real local SMTP server: refused connection -> RETRY -> restored SMTP -> SENT,
+with exactly one delivery and no new payment/webhook. MSK SMTP authentication
+was verified separately without mailing a historical buyer.
+
+The installed systemd service runs as `deploy`, with working directory
+`/opt/daibilet/apps/web`, and invokes the installed `tsx` binary directly.
+Avoid launching pnpm as root from this timer: pnpm may try to reinstall modules
+and fail without a TTY.

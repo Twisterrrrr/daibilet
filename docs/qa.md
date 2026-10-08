@@ -1,12 +1,14 @@
 # qa.md — открытые вопросы
 
-## 2026-10-02 — Stage 0 ticket DTO and delivery contract (code, not deployed)
+## 2026-10-08 — Stage 0 ticket DTO and delivery contract
 
 - `publicCode` is the order code. `ticketNumber`/`ticketNumbers` are separate issued numbers (`TKT-…`); the finance branch `codex/stage0-r12` adds one durable `IssuedTicket` row per quantity unit and keeps the JSON mirror for compatibility.
 - The public order DTO currently includes buyer contact, venue title/address/coordinates, validity mode/end, items and totals, paid/confirmed timestamps, ticket numbers, and `supplierSupportPhone`. The catalog ticket page renders the order code, ticket number, validity, venue details and support phone when supplied.
 - Internal QR payload is the absolute `/checkout/ticket/{publicCode}` URL. A venue can open it and compare the displayed number with the printed ticket; a dedicated scanner API and redemption state are still outside Stage 0. Imported/widget QR keeps the partner code as-is.
 - HTML ticket plus browser print/Save as PDF is the Stage 0 output. Generated PDF attachment remains optional.
-- Catalog email delivery has a durable queue on branch `codex/stage0-r13-mail`: only a confirmed order is mailed, SMTP failures retry with backoff, and an operator can request a resend by public code. Deployment and a paid-order retry smoke remain open.
+- R12 is deployed on finance `.159` at `7f756a58a` with sandbox credentials. Its migrations are applied; 172 backend tests passed against an isolated PostgreSQL database, with no skips. Sandbox order `4157776` has durable ticket `TKT-4157776-01`; repeating backfill does not create another row.
+- R13 queue and worker are deployed on catalog MSK. The timer runs as `deploy` through the installed `tsx` binary. CI verifies a real local SMTP connection failure, retry after recovery, and a single delivery; production SMTP connection/auth verification passed. Catalog DTO preserves the separate issued ticket number. See [release evidence](./stage0-r12-r13-release-2026-10-08.md).
+- Stage 0 remains open for `payment.canceled`, manual refund/cancel acceptance and the gallery supplier pilot. These are separate from the R12/R13 implementation and deployment acceptance.
 
 **Как читать (2026-08-09):** фокус для owner и агентов - две секции ниже.
 - **Открыто (техника)** - что реально ждёт кода / smoke / infra; здесь приоритет ответов и следующих шагов.
