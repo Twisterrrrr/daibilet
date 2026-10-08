@@ -1293,7 +1293,7 @@ async function resolvePublicVenueRow(db, venueSlugOrId) {
     const result = await db.query(`${PUBLIC_VENUE_ROW_SELECT}
       where venue.slug = $1 or venue.id = $1
       order by venue."isIndexable" desc nulls last,
-        case when upper(venue."pageStatus") = 'PUBLISHED' then 1 else 0 end desc,
+        case when upper(venue."pageStatus"::text) = 'PUBLISHED' then 1 else 0 end desc,
         venue."updatedAt" desc nulls last, venue.id asc
       limit 1`, [candidate]);
     if (result.rows[0]) return result.rows[0];

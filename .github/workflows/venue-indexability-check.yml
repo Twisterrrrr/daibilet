@@ -140,14 +140,17 @@ jobs:
           event_urls = [element.text for element in event_xml.iter() if element.tag.endswith('}loc') or element.tag == 'loc']
           if event_urls:
               event_slug = event_urls[0].rstrip('/').split('/')[-1]
-              with urllib.request.urlopen(f'https://daibilet.ru/api/public/events/{event_slug}', timeout=30) as response:
-                  event_detail = json.load(response)
               def session_counts(value):
                   if isinstance(value, dict):
                       return ([value['sessionCount']] if 'sessionCount' in value else []) + [count for nested in value.values() for count in session_counts(nested)]
                   if isinstance(value, list): return [count for nested in value for count in session_counts(nested)]
                   return []
-              print('event_dto_slug:', event_slug, 'sessionCount_values:', session_counts(event_detail)[:10])
+              try:
+                  with urllib.request.urlopen(f'https://daibilet.ru/api/public/events/{event_slug}', timeout=30) as response:
+                      event_detail = json.load(response)
+                  print('event_dto_slug:', event_slug, 'sessionCount_values:', session_counts(event_detail)[:10])
+              except Exception as error:
+                  print('event_dto_unavailable:', event_slug, str(error))
           if problems: raise SystemExit('venue sitemap contains non-indexable or invalid URLs')
           PY
       - name: Read sitemap rebuild timing

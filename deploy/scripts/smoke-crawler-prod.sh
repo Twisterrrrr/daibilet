@@ -30,7 +30,10 @@ fetch_path() {
 first_sitemap_path() {
   local sitemap="$1"
   local prefix="$2"
-  curl -fsSL --max-time 30 "$sitemap" \
+  local timeout=60
+  if [[ "$sitemap" == *'/sitemaps/venues.xml' ]]; then timeout=180; fi
+  echo "Checking sitemap $sitemap (timeout ${timeout}s)" >&2
+  curl -fsSL --max-time "$timeout" "$sitemap" \
     | grep -oE '<loc>[^<]+' \
     | sed 's#<loc>##' \
     | sed -n "s#^${BASE_URL}${prefix}#${prefix}#p" \

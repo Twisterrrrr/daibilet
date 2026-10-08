@@ -1,0 +1,68 @@
+# R12/R13: выпуск и проверки 08.10.2026
+
+## R12: финансовый sandbox .159
+
+Источник: `codex/stage0-r12`, SHA `7f756a58ad9e4d5ed21d548d8e45e8db9f230ac3`.
+Владелец явно разрешил sandbox-деплой на `.159` в этой сессии. Общий запрет
+на включение live checkout и использование live-ключей этим не отменён.
+
+- Checkout `/opt/daibilet-finance/app` обновлён; API перезапущен 08.10.
+- Процесс использует sandbox-ключ YooKassa; `/api/health` отвечает 200.
+- Через `pnpm db:deploy` применены `20261002120000_supplier_legal_review_snapshot`
+  и `20261002130000_issued_tickets`.
+- Перед миграциями сделана отдельная резервная копия sandbox-БД.
+- Backend typecheck прошёл. На отдельном временном PostgreSQL выполнены
+  172 теста: 172 pass, 0 fail, 0 skip. Включены повторный webhook, выдача
+  билетов по количеству, approve/reject и запрет UPDATE/DELETE snapshot.
+- Заказ `4157776`: backfill создал `TKT-4157776-01`; повторный запуск вернул
+  `already_backfilled`. Временный тестовый контейнер удалён.
+
+Финансовая ветка не вливалась целиком в каталог: `.159` исполняет отдельный
+финансовый backend, каталог получает его DTO через HTTPS API.
+
+## R13: каталог MSK
+
+PR [15](https://github.com/Twisterrrrr/daibilet/pull/15) добавил очередь и worker.
+PR [16](https://github.com/Twisterrrrr/daibilet/pull/16) исправил systemd unit и
+потерю `ticketNumber` в mapper каталога. Release SHA:
+`c18b9725912f6c05abfe492e4d0f0ea5abca3875`.
+
+- Миграция очереди `20261002140000_buyer_ticket_email_delivery` применена на MSK.
+- Timer установлен; worker запускается от `deploy`, завершился с
+  `Result=success`, `ExecMainStatus=0`.
+- Production SMTP прошёл проверку подключения/авторизации. Историческому
+  покупателю тестовое письмо не отправлялось.
+- CI с PostgreSQL проверяет реальный локальный SMTP: отказ соединения,
+  `RETRY`, восстановление, `SENT`, одно письмо без новой оплаты/webhook.
+- Mapper сохраняет `ticketNumber`, отличный от `publicCode`; `paidAt` API
+  отображается в поле `purchasedAt` каталога.
+- В браузере на живой странице заказа `4157776` подтверждены статус оплаты,
+  номер `TKT-4157776-01`, отдельный код заказа, срок действия, адрес, дата
+  покупки, поддержка и QR со ссылкой на страницу билета.
+- QR внутреннего билета содержит абсолютный URL `/checkout/ticket/{publicCode}`.
+  PDF, scanner API и погашение QR не входят в приёмку R12/R13.
+
+CI: [37744044326](https://github.com/Twisterrrrr/daibilet/actions/runs/37744044326).
+Web deploy: [37744468178](https://github.com/Twisterrrrr/daibilet/actions/runs/37744468178).
+
+## CI crawler и правки Cline
+
+`crawler-health` падал на холодном `venues.xml`: лимит curl 30 секунд был
+меньше измеренных 36 секунд локального rebuild. Для этого sitemap установлен
+таймаут 180 секунд; логи теперь называют проверяемый URL.
+Три последующих плановых прогона на `99d99e4` прошли успешно.
+
+В выпуск включены три коммита Cline: `8e94cb3b5`, `1fb28acbe`, `1bc53cd5c`.
+Они исправляют повторное добавление Leaflet controls/layers, загрузочный
+shimmer изображений, высоту карты городов, сетку городов и подписи маршрута.
+После свопа на `/cities` проверены карта 820×352 и одна пара кнопок масштаба.
+На карте `/my-day` также подтверждена одна пара кнопок, маршрут пользователя
+не изменялся.
+
+## Открытые критерии Stage 0
+
+- `S0.PAY.7`: отдельный прогон `payment.canceled`.
+- `S0.OPS.3`: приёмка ручного refund/cancel.
+- `S0.SUP.1`: реальный пилот с арт-галереей.
+
+Полную готовность Stage 0 этот выпуск не объявляет.

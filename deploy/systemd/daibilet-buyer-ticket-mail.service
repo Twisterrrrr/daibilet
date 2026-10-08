@@ -5,7 +5,8 @@ Wants=network-online.target
 
 [Service]
 Type=oneshot
-WorkingDirectory=/opt/daibilet
+User=deploy
+WorkingDirectory=/opt/daibilet/apps/web
 EnvironmentFile=/opt/daibilet/.env
 Environment=NODE_ENV=production
-ExecStart=/usr/bin/env bash -lc 'corepack pnpm --filter @daibilet/web ticket-mail:process -- --limit=50'
+ExecStart=/usr/bin/node node_modules/tsx/dist/cli.mjs --tsconfig tsconfig.json scripts/process-ticket-delivery.ts --limit=50

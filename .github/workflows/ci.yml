@@ -7,8 +7,53 @@ on:
     branches: [integrate/mvp-launch, feat/next-monorepo, main, master]
 
 jobs:
+  buyer-ticket-mail-db-test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: daibilet
+          POSTGRES_USER: daibilet
+          POSTGRES_PASSWORD: daibilet
+        ports:
+          - 5437:5432
+        options: >-
+          --health-cmd "pg_isready -U daibilet -d daibilet"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.7.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm db:generate
+      - run: pnpm db:deploy
+      - name: Verify mail retry against PostgreSQL
+        run: pnpm --filter @daibilet/web exec tsx --test src/server/buyer-ticket-delivery.test.ts
+
   validate-build-test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: daibilet
+          POSTGRES_USER: daibilet
+          POSTGRES_PASSWORD: daibilet
+        ports:
+          - 5437:5432
+        options: >-
+          --health-cmd "pg_isready -U daibilet -d daibilet"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
     steps:
       - uses: actions/checkout@v4
 
@@ -36,6 +81,7 @@ jobs:
           pnpm db:validate
           pnpm db:generate
           pnpm db:typecheck
+          pnpm db:deploy
 
       - name: Backend typecheck and unit tests
         run: |
