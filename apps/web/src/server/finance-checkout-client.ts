@@ -191,7 +191,7 @@ function mapLineItemsFromOrder(order: Record<string, unknown>): BuyerTicketLineI
   return single ? [single] : [];
 }
 
-function mapOrderFromFinancePayload(
+export function mapOrderFromFinancePayload(
   payload: unknown,
   fallbackEmail: string,
   mode: string,
@@ -207,6 +207,10 @@ function mapOrderFromFinancePayload(
   const totals = asRecord(order.totals) || {};
   const item = asRecord(order.item) || {};
   const status = asString(order.status) || 'PENDING';
+  const ticketNumbers = Array.isArray(order.ticketNumbers)
+    ? order.ticketNumbers.map(asString).filter((value): value is string => Boolean(value))
+    : [];
+  const ticketNumber = asString(order.ticketNumber) || ticketNumbers[0] || null;
   const mapped = mapFinanceOrderStatus(status);
   const eventTitle = asString(subject.eventTitle);
   const admissionTitle = asString(subject.admissionProductTitle);
@@ -243,6 +247,7 @@ function mapOrderFromFinancePayload(
 
   return {
     publicCode,
+    ticketNumber,
     status,
     displayStatus: mapped.displayStatus,
     statusTone: mapped.statusTone,
