@@ -80,6 +80,13 @@ backup-файлах на MSK. `Venue.descriptionOverridden=true` защищае�
 выполнена; дополнен JSON-LD концертных площадок телефоном и типом
 PerformingArtsTheater (17 локальных тестов прошли).
 
+Полный обход `sitemaps/venues.xml` 08.10 проверил 339 URL. У 338 сразу
+подтверждены HTTP 200, собственный canonical и отсутствие noindex/редиректа.
+Один запрос к `/locations/admiralteiskaya-nab-10-45` прервался локальной
+ошибкой DNS; отдельная повторная проверка дала HTTP 200, `index, follow`
+и собственный canonical. Итого все 339 URL проверены, noindex в карте — 0.
+Web typecheck исправлен и стал обязательным CI gate.
+
 ## Открытые критерии Stage 0 (сохраняются)
 
 - `S0.PAY.7`: отдельный прогон `payment.canceled`.
