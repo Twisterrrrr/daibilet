@@ -587,11 +587,12 @@ export function buildVenuePlaceJsonLd(payload: PublicVenuePageDto): Record<strin
 
   const block: Record<string, unknown> = {
     '@context': 'https://schema.org',
-    '@type': [...placeTypes],
+    '@type': venue.type === 'concert_hall' ? 'PerformingArtsTheater' : [...placeTypes],
     name: venue.seoH1 || venue.title || venue.name,
     description,
     url: canonical,
     image: image ? [image] : undefined,
+    telephone: venue.phone || undefined,
     address: {
       '@type': 'PostalAddress',
       addressLocality: venue.city && venue.city !== 'Не указан' ? venue.city : undefined,

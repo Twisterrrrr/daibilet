@@ -92,6 +92,7 @@ jobs:
           sparse-checkout: |
             scripts
             infra
+            deploy/scripts
 
       - uses: pnpm/action-setup@v4
         with:
@@ -207,9 +208,12 @@ jobs:
           REMOTE_TGZ="/tmp/daibilet-web-next-${DEPLOY_SHA}.tgz"
           "${SCP[@]}" /tmp/daibilet-web-next.tgz "${MSK_SSH_USER}@${MSK_SSH_HOST}:${REMOTE_TGZ}"
           REMOTE_SCRIPT="/tmp/daibilet-deploy-${DEPLOY_SHA}.sh"
+          REMOTE_HANDOFF_DIR="/tmp/daibilet-handoff-${DEPLOY_SHA}"
+          "${SSH[@]}" "${MSK_SSH_USER}@${MSK_SSH_HOST}" "mkdir -p '$REMOTE_HANDOFF_DIR'"
+          "${SCP[@]}" .deploy-control/deploy/scripts/web-upstream-handoff.sh .deploy-control/deploy/scripts/start-web-shadow.mjs .deploy-control/deploy/scripts/switch-web-upstream.py "${MSK_SSH_USER}@${MSK_SSH_HOST}:${REMOTE_HANDOFF_DIR}/"
           "${SCP[@]}" .deploy-control/scripts/deploy-msk-web.sh "${MSK_SSH_USER}@${MSK_SSH_HOST}:${REMOTE_SCRIPT}"
           "${SCP[@]}" /tmp/daibilet-web-build-id "${MSK_SSH_USER}@${MSK_SSH_HOST}:${REMOTE_TGZ}.build-id"
-          printf -v REMOTE_COMMAND 'CI=true ARTIFACT=%q EXPECTED_BUILD_ID_FILE=%q DEPLOY_MARKER=%q DEPLOY_MARKER_URL=%q bash %q %q %q' "$REMOTE_TGZ" "$REMOTE_TGZ.build-id" "$DEPLOY_MARKER" "$DEPLOY_MARKER_URL" "$REMOTE_SCRIPT" "$DEPLOY_SHA" "$EXPECTED_REF"
+          printf -v REMOTE_COMMAND 'CI=true DEPLOY_HANDOFF_DIR=%q ARTIFACT=%q EXPECTED_BUILD_ID_FILE=%q DEPLOY_MARKER=%q DEPLOY_MARKER_URL=%q bash %q %q %q' "$REMOTE_HANDOFF_DIR" "$REMOTE_TGZ" "$REMOTE_TGZ.build-id" "$DEPLOY_MARKER" "$DEPLOY_MARKER_URL" "$REMOTE_SCRIPT" "$DEPLOY_SHA" "$EXPECTED_REF"
           "${SSH[@]}" "${MSK_SSH_USER}@${MSK_SSH_HOST}" "$REMOTE_COMMAND"
           echo "Swap succeeded: DEPLOY_SHA=$DEPLOY_SHA BUILD_ID=$BUILD_ID" >> "$GITHUB_STEP_SUMMARY"
 

@@ -20,6 +20,7 @@ cd "$APP_DIR"
 
 # shellcheck source=deploy-runtime.sh
 source "${APP_DIR}/deploy/scripts/deploy-runtime.sh"
+source "${APP_DIR}/deploy/scripts/web-upstream-handoff.sh"
 
 if [[ -z "$ARTIFACT" || ! -f "$ARTIFACT" ]]; then
   echo "ERROR: ARTIFACT path required (readable .tgz of apps/web/.next)" >&2
@@ -97,6 +98,7 @@ fi
 INCOMING_BUILD_ID="$(cat "${WEB_NEXT_STAGE}/BUILD_ID")"
 echo "Incoming BUILD_ID=${INCOMING_BUILD_ID}"
 
+start_web_handoff
 if systemctl_deploy is-active --quiet "$WEB_SERVICE" 2>/dev/null; then
   systemctl_deploy stop "$WEB_SERVICE"
   echo "Stopped ${WEB_SERVICE} for atomic swap"
@@ -164,10 +166,13 @@ if [[ "$WEB_READY" -ne 1 ]]; then
     rm_rf_deploy "${WEB_NEXT_DIR}"
     mv "${WEB_NEXT_PREV}" "${WEB_NEXT_DIR}"
     systemctl_deploy start "$WEB_SERVICE" || true
+    finish_web_handoff || true
     echo "Restored BUILD_ID=$(cat "${WEB_NEXT_DIR}/BUILD_ID")"
   fi
   exit 1
 fi
+
+finish_web_handoff
 
 curl -fsS -o /dev/null -w "smoke / =%{http_code}\n" -H "Cache-Control: no-cache" "http://127.0.0.1:${WEB_PORT}/" || true
 
