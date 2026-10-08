@@ -3,7 +3,7 @@ import {
   buildPublicEventFreshnessMap,
   buildPublicVenuesDto,
 } from '@daibilet/backend/public-read';
-import type { PublicVenueDto, PublicVenuePageDto } from '@daibilet/contracts/public';
+import type { PublicCatalogDto, PublicVenueDto, PublicVenuePageDto } from '@daibilet/contracts/public';
 
 import { evaluateCityIndexability, evaluateRegionIndexability, evaluateVenueIndexability } from '@/lib/hub-indexability';
 import {
@@ -246,7 +246,9 @@ export async function buildEventsSitemapEntries(now = new Date()): Promise<Sitem
   }
 
   for (let offset = 0; offset < MAX_EVENTS; offset += limit) {
-    const page = await getCachedCatalog(parseCatalogPageQuery({ limit: String(limit), offset: String(offset) }));
+    const page = await fetchPublicApiJson<PublicCatalogDto>('/api/public/events', {
+      searchParams: { limit, offset }, timeoutMs: 30_000,
+    });
     for (const event of page.items || []) {
       if (entries.length >= MAX_EVENTS) break;
       const slug = event.slug || event.id;
@@ -533,3 +535,10 @@ export const SITEMAP_RESPONSE_HEADERS = {
   'Content-Type': 'application/xml; charset=utf-8',
   'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
 } as const;
+
+export function sitemapResponseHeaders(chunk: string): Record<string, string> {
+  return {
+    ...SITEMAP_RESPONSE_HEADERS,
+    ...(chunk === 'events' || chunk === 'venues' ? { 'Cache-Control': 'no-store' } : {}),
+  };
+}

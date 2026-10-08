@@ -69,6 +69,7 @@ jobs:
         with:
           ref: ${{ inputs.sha }}
           fetch-depth: 0
+          filter: blob:none
 
       - name: Confirm checkout SHA and branch membership
         id: meta

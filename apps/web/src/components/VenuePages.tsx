@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { unstable_noStore as noStore } from 'next/cache';
 import { permanentRedirect } from 'next/navigation';
-import { Suspense } from 'react';
+import { cache, Suspense } from 'react';
 
 import { LocationsCatalogView } from '@/components/LocationsCatalogView.client';
 import { VenuesCatalogView } from '@/components/VenuesCatalogView.client';
@@ -57,27 +57,22 @@ const EMPTY_FEED = mapVenueCatalogFeedPage({
 
 type VenueDtoLoad =
   | { kind: 'ok'; payload: PublicVenuePageDto }
-  | { kind: 'miss' }
-  | { kind: 'unavailable' };
+  | { kind: 'miss' };
 
 /**
  * Prefer cached DTO only. Miss → safeNotFound without any bare `cache:'no-store'`
  * fetch (that + notFound on ISR → DYNAMIC_SERVER_USAGE / static-to-dynamic 500).
  * Soft-misses already bypass Data Cache via throw-inside-cache (v7-isr-fetch).
- * Transient API errors throw from getCachedPublicVenueDto → unavailable (not HTML 404 poison).
+ * Transient failures propagate to ISR: retain the last successful HTML instead of caching a noindex placeholder.
  */
-async function loadVenueDto(slug: string): Promise<VenueDtoLoad> {
+const loadVenueDto = cache(async (slug: string): Promise<VenueDtoLoad> => {
   const key = resolvePlaceSlugAlias(String(slug || '').trim());
   if (!key) return { kind: 'miss' };
 
-  try {
-    const cached = await getCachedPublicVenueDto(key);
-    if (cached?.venue) return { kind: 'ok', payload: cached };
-    return { kind: 'miss' };
-  } catch {
-    return { kind: 'unavailable' };
-  }
-}
+  const cached = await getCachedPublicVenueDto(key);
+  if (cached?.venue) return { kind: 'ok', payload: cached };
+  return { kind: 'miss' };
+});
 
 function resolveVenueRouteFamily(venue: PublicVenuePageDto['venue']): 'location' | 'institution' {
   const explicit = String(
@@ -89,19 +84,6 @@ function resolveVenueRouteFamily(venue: PublicVenuePageDto['venue']): 'location'
     .toLowerCase();
   if (explicit === 'location' || explicit === 'institution') return explicit;
   return venuePageTemplate(venue.type);
-}
-
-function VenueUnavailablePage({ slug }: { slug: string }) {
-  return (
-    <SiteLayout>
-      <main style={{ maxWidth: 640, margin: '4rem auto', padding: '0 1.25rem' }}>
-        <h1 style={{ fontSize: '1.5rem', marginBottom: '0.75rem' }}>Площадка временно недоступна</h1>
-        <p style={{ color: '#444', lineHeight: 1.5 }}>
-          Не удалось загрузить данные для <code>{slug}</code>. Обновите страницу чуть позже.
-        </p>
-      </main>
-    </SiteLayout>
-  );
 }
 
 type PageProps = {
@@ -138,12 +120,6 @@ export async function generateVenueDetailMetadata(slug: string): Promise<Metadat
   }
   const loaded = await loadVenueDto(decoded);
   if (loaded.kind === 'miss') safeNotFound();
-  if (loaded.kind === 'unavailable') {
-    return {
-      title: pageTitle('Площадка временно недоступна'),
-      robots: { index: false, follow: false },
-    };
-  }
   try {
     const payload = loaded.payload;
     const venue = applyVenueEditorialOverlay(payload.venue);
@@ -249,14 +225,6 @@ export async function VenueDetailPage({
   // no-store fetch + notFound() on ISR → static-to-dynamic HTTP 500.
   const loaded = await loadVenueDto(decodedSlug);
   if (loaded.kind === 'miss') safeNotFound();
-  if (loaded.kind === 'unavailable') {
-    // Soft 200 UI. Never call connection()/noStore() on this branch: on ISR routes
-    // (`revalidate=300`) those APIs throw digest DYNAMIC_SERVER_USAGE which Next
-    // surfaces as HTTP 500 instead of a dynamic bailout (live 2026-08-09:
-    // /locations/saint-petersburg-bar-hroniki while API was swap-starved).
-    // Soft HTML may be ISR-cached ≤ revalidate - far better than 500; ops purge if needed.
-    return <VenueUnavailablePage slug={decodedSlug} />;
-  }
 
   let payload = loaded.payload;
   const family = resolveVenueRouteFamily(payload.venue);

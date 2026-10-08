@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 
-import { resolveSitemapLastModified } from '@/lib/sitemap-data';
+import { resolveSitemapLastModified, sitemapResponseHeaders } from '@/lib/sitemap-data';
 
 // The pure helpers are tested through their own module: public-read only
 // re-exports buildPublicEventFreshnessMap, not the row mapper.
@@ -22,6 +22,12 @@ import { freshnessMapFromRows, publicFreshnessSlug } from '@daibilet/backend/eve
  */
 const WEB_ROOT = path.resolve(__dirname, '../..');
 const REPO_ROOT = path.resolve(WEB_ROOT, '../..');
+
+test('time-sensitive sitemaps cannot outlive an event or retain stale venue eligibility', () => {
+  assert.equal(sitemapResponseHeaders('events')['Cache-Control'], 'no-store');
+  assert.equal(sitemapResponseHeaders('venues')['Cache-Control'], 'no-store');
+  assert.equal(sitemapResponseHeaders('blog')['Cache-Control'], 'public, s-maxage=3600, stale-while-revalidate=86400');
+});
 
 test('sitemap lastmod: uses a real updatedAt when present', () => {
   const fallback = new Date('2026-09-29T12:00:00.000Z');

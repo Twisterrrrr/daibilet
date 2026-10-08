@@ -35,8 +35,8 @@ class VenueDtoMissError extends Error {
  * Next 404 (x-nextjs-cache=STALE) even after the venue becomes available. Throw inside the
  * cache fn so Next does not store the miss; re-fetch on the next request.
  *
- * Transient API/network failures must NOT become `null` either: callers map thrown errors to
- * "unavailable" (soft 200). Treating downtime as miss → `notFound()` → year-long STALE HTML 404
+ * Transient API/network failures must NOT become `null` either: ISR preserves previous successful HTML on
+ * revalidation failure. Treating downtime as miss → `notFound()` → year-long STALE HTML 404
  * for live URLs (e.g. /locations/saint-petersburg-vladimirskiy-sobor while API still had the row).
  */
 export async function getCachedPublicVenueDto(slug: string) {
@@ -48,8 +48,9 @@ export async function getCachedPublicVenueDto(slug: string) {
       const payload = await fetchPublicApiJson<PublicVenuePageDto | null>(
         `/api/public/venues/${encodeURIComponent(key)}`,
         {
-          // Cold venue DTO after API restart can be ~6-8s; 5s raced soft-unavailable poison.
-          timeoutMs: 8_000,
+          // Cold DTO work can exceed 8s; one bounded retry lets the completed backend build be reused.
+          timeoutMs: 12_000,
+          retries: 1,
           notFoundAsNull: true,
           revalidateSeconds: PUBLIC_PAGE_REVALIDATE,
         },
@@ -57,7 +58,7 @@ export async function getCachedPublicVenueDto(slug: string) {
       if (!payload?.venue) throw new VenueDtoMissError(key);
       return payload;
     },
-    ['public-venue-dto-v7-isr-fetch', key],
+    ['public-venue-dto-v8-transient-retry', key],
     venueCacheOptions,
   );
 
@@ -67,7 +68,7 @@ export async function getCachedPublicVenueDto(slug: string) {
     // True miss → null → HTTP 404. Next often wraps the throw; match by message too.
     const msg = error instanceof Error ? error.message : String(error);
     if (error instanceof VenueDtoMissError || msg.includes('venue_dto_miss:')) return null;
-    // Timeouts / 5xx / connect errors: rethrow so loadVenueDto → unavailable (not notFound poison).
+    // Timeouts / 5xx / connect errors: propagate to ISR without saving a successful placeholder response.
     console.warn(`[venue-dto-cache] unavailable after cache error for ${key}:`, msg);
     throw error instanceof Error ? error : new Error(msg);
   }
