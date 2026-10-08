@@ -8,13 +8,24 @@
  * values compete with page chrome (MobileStickyActionBar is z-40) and paint
  * the map above fixed bottom CTAs. Keep map layers inside the embed.
  *
+ * position: relative only for static hosts: this file is unlayered, so it
+ * beats Tailwind's layered .absolute. On /cities the map host (absolute
+ * inset-0 h-full) was flipped to relative, inset stopped stretching it and
+ * the map collapsed to 0 height (blank card). Hosts with .absolute are
+ * already positioned and keep their inset sizing.
+ *
  * height/width 100%: tiles must fill the host box (no gray gutters left/top
  * when the container grows after a 0-size init).
  */
+[data-osm-map='leaflet']:not(.absolute),
+[data-day-route-map='leaflet']:not(.absolute),
+[data-locations-catalog-map='leaflet']:not(.absolute) {
+  position: relative;
+}
+
 [data-osm-map='leaflet'],
 [data-day-route-map='leaflet'],
 [data-locations-catalog-map='leaflet'] {
-  position: relative;
   z-index: 0;
   isolation: isolate;
   width: 100%;

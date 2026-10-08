@@ -169,6 +169,11 @@ export function DayRouteOsmMap({
           keyboard: false,
         });
         mapRef.current = map;
+
+      // This effect re-runs on stops/selection changes and reuses the map above,
+      // so one-time layers must be gated: unguarded addTo() stacked a zoom
+      // control pair (and a tile layer) per run — 6 controls on the map.
+      if (!existingMap) {
         // bottomright: MyDayMapAside keeps collapse (left) + fullscreen (top-right).
         L.control
           .zoom({
@@ -182,6 +187,8 @@ export function DayRouteOsmMap({
             '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>',
           maxZoom: MAX_ZOOM,
         }).addTo(map);
+      }
+
         resizeObserver = new ResizeObserver(() => {
           if (mapRef.current) syncLeafletSize(mapRef.current);
         });
