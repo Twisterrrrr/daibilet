@@ -507,6 +507,55 @@ test('moscow-dinner-boat requires dinner token in title and start ≥15h', () =>
   }), false);
 });
 
+test('new landings match expected events', () => {
+  const quest = findLandingRule('quest-tours')!;
+  const show = findLandingRule('show-programs')!;
+  const selfdev = findLandingRule('self-development')!;
+  assert.ok(quest && show && selfdev);
+
+  // Квест-экскурсия по городу → matches
+  assert.equal(matchesLandingRule({
+    title: 'Квест-прогулка по Москве',
+    category: 'Экскурсии',
+    tags: ['Квест-экскурсия'],
+    city: 'Москва',
+  }, quest), true);
+
+  // Автобусная экскурсия → rejected (excludeKeywords)
+  assert.equal(matchesLandingRule({
+    title: 'Автобусная экскурсия',
+    tags: ['Автобусные туры'],
+    city: 'Москва',
+  }, quest), false);
+
+  // Шоу-программа → matches
+  assert.equal(matchesLandingRule({
+    title: 'Вечернее шоу',
+    tags: ['Шоу - программа'],
+    city: 'Москва',
+  }, show), true);
+
+  // Стендап → rejected (excludeKeywords)
+  assert.equal(matchesLandingRule({
+    title: 'Стендап-шоу',
+    tags: ['Stand up'],
+    city: 'Москва',
+  }, show), false);
+
+  // Лекция → matches
+  assert.equal(matchesLandingRule({
+    title: 'Лекция по психологии',
+    tags: ['Саморазвитие'],
+    city: 'Москва',
+  }, selfdev), true);
+
+  // Концерт → rejected (excludeKeywords)
+  assert.equal(matchesLandingRule({
+    title: 'Рок-концерт',
+    tags: ['Рок'],
+    city: 'Москва',
+  }, selfdev), false);
+});
 
 test('moscow-museums requires museum signal and excludes standup', () => {
   const museums = findLandingRule('moscow-museums');

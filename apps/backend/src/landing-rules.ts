@@ -547,6 +547,38 @@ export const LANDING_RULES: LandingRule[] = [
     keywords: ['дрифт', 'автоспорт', 'картинг', 'гонк', 'формул'],
     keywordScope: 'content',
   },
+  {
+    slug: 'quest-tours',
+    title: 'Квест-экскурсии',
+    subtitle: 'Интерактивные городские квесты с заданиями и загадками',
+    chips: ['квест', 'загадки', 'маршрут'],
+    tags: ['Квест-экскурсия'],
+    keywords: ['квест', 'загадк', 'маршрут', 'задан', 'интерактив', 'приключен'],
+    keywordScope: 'content',
+    excludeKeywords: ['автобус', 'теплоход', 'катер', 'речн'],
+  },
+  {
+    slug: 'show-programs',
+    title: 'Шоу-программы',
+    subtitle: 'Развлекательные шоу, вечеринки и интерактивные программы',
+    chips: ['шоу', 'вечеринка', 'развлечение'],
+    tags: ['Шоу - программа', 'Тематические вечеринки', 'Шоу программы'],
+    keywords: ['шоу', 'программ', 'вечеринк', 'тематическ', 'квартирник', 'караоке'],
+    keywordScope: 'content',
+    excludeKeywords: ['стендап', 'stand up', 'комеди', 'юмор', 'концерт', 'рок', 'джаз'],
+    excludeKeywordFields: ['title', 'category', 'sourceCategory', 'subcategory'],
+  },
+  {
+    slug: 'self-development',
+    title: 'Саморазвитие и лекции',
+    subtitle: 'Мастер-классы, лекции, тренинги и творческие занятия',
+    chips: ['лекция', 'мастер-класс', 'тренинг'],
+    tags: ['Саморазвитие', 'Лекция', 'Мастер-класс'],
+    keywords: ['лекц', 'тренинг', 'семинар', 'воркшоп', 'саморазвит', 'обучен', 'курс'],
+    keywordScope: 'content',
+    excludeKeywords: ['стендап', 'stand up', 'комеди', 'концерт', 'рок', 'джаз', 'автобус'],
+    excludeKeywordFields: ['title', 'category', 'sourceCategory', 'subcategory'],
+  },
 ];
 
 /** Legacy URL aliases → canonical landing slug (single source for dto + Next). */
@@ -561,6 +593,9 @@ export const LANDING_SLUG_ALIASES: Record<string, string[]> = {
   'moscow-museums': ['moscow-museums-workshops'],
   'moscow-city-day': ['den-goroda-moskva', 'den-goroda', 'city-day-moscow'],
   'active-sport': ['active-extreme', 'autosport'],
+  'quest-tours': ['quest', 'kvest', 'quest-excursions'],
+  'show-programs': ['show', 'shou', 'entertainment'],
+  'self-development': ['selfdev', 'lectures', 'masterclass'],
 };
 
 /** Seasonally off landings: keep page, hide from /podborki and promo hub. */
