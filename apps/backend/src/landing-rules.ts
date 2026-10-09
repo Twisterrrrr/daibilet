@@ -699,12 +699,19 @@ export function isLandingOffSeason(slug: string, now = new Date()): boolean {
     // Февраль-март: Масленица (зависит от Пасхи).
     return !(month === 2 || (month === 3 && day <= 10));
   }
+  // Навигационный сезон (речные прогулки, мосты, вечеринки на воде, ужин на теплоходе).
+  if (key === 'river-cruises' || key === 'bridges-night' || key === 'river-party' || key === 'moscow-dinner-boat') {
+    if (month >= 5 && month <= 9) return false;
+    if (month === 4 && day >= 15) return false;
+    if (month === 10) return false;
+    return true;
+  }
   return false;
 }
 
 export function buildOffSeasonLandingSlugs(now = new Date()): Set<string> {
   return new Set(
-    ['salute-9-may', 'moscow-city-day', 'new-year', 'graduation', 'international-womens-day', 'maslenitsa'].filter((slug) => isLandingOffSeason(slug, now)),
+    ['salute-9-may', 'moscow-city-day', 'new-year', 'graduation', 'international-womens-day', 'maslenitsa', 'river-cruises', 'bridges-night', 'river-party', 'moscow-dinner-boat'].filter((slug) => isLandingOffSeason(slug, now)),
   );
 }
 
