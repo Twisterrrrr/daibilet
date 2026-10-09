@@ -99,6 +99,7 @@ import {
   type RiverCitySpot,
 } from '@/data/river-landings';
 import { busCityGuide } from '@/data/bus-landings';
+import { dinnerCityGuide, type DinnerPier, type DinnerMealFormat } from '@/data/dinner-landings';
 import { formatMoney, formatMoneyRange, formatLandingBuyPrice, formatNumber } from '@/lib/format';
 import {
   collectSessionStartsAtTimes,
@@ -158,59 +159,6 @@ function riverLandingRoot(landingSlug: string) {
   if (isBridgesNightLandingSlug(landingSlug)) return landingCategoryHref(CANONICAL_LANDING_SLUGS.bridges);
   return riverLandingHref();
 }
-
-type DinnerCityGuide = {
-  heroTitle: string;
-  heroSubtitle: string;
-  breadcrumbCurrent: string;
-  introTitle: string;
-  introText: string;
-  scheduleTitle: string;
-  riverCruiseHref: string;
-  riverCruiseLabel: string;
-};
-
-const DINNER_CITY_GUIDES: Partial<Record<string, DinnerCityGuide>> = {
-  Москва: {
-    heroTitle: 'Ужин на теплоходе по Москве-реке сегодня — цены и расписание',
-    heroSubtitle: 'Сравните рестораны на воде и выберите лучший вечерний круиз по Москве-реке.',
-    breadcrumbCurrent: 'Ужин на теплоходе — Москва',
-    introTitle: 'Ужин на теплоходе — ресторан с видом на Кремль',
-    introText:
-      'Москва-река — идеальная декорация для вечернего ужина. Вы проплываете мимо Кремля, Храма Христа Спасителя и Москва-Сити, пока шеф-повар готовит блюда на борту. Это не просто прогулка — это полноценный ресторанный опыт на воде: от сет-меню из 5 блюд до фуршетов с живой музыкой.',
-    scheduleTitle: 'Теплоходы с ужином — Москва',
-    riverCruiseHref: riverLandingHref('moscow'),
-    riverCruiseLabel: 'Все речные прогулки по Москве',
-  },
-  'Санкт-Петербург': {
-    heroTitle: 'Ужин на теплоходе по Неве сегодня — цены и расписание',
-    heroSubtitle: 'Сравните рестораны на воде и выберите лучший вечерний круиз по Неве.',
-    breadcrumbCurrent: 'Ужин на теплоходе — Санкт-Петербург',
-    introTitle: 'Ужин на теплоходе — ресторан с видом на разводные мосты',
-    introText:
-      'Нева вечером — лучший фон для ужина на воде. Панорамные окна, живая музыка и подсветка дворцов создают атмосферу, которую не повторить в обычном ресторане.',
-    scheduleTitle: 'Теплоходы с ужином — Санкт-Петербург',
-    riverCruiseHref: riverLandingHref('saint-petersburg'),
-    riverCruiseLabel: 'Все речные прогулки по Петербургу',
-  },
-};
-
-function dinnerCityGuide(cityName: string | null, citySlug?: string): DinnerCityGuide | null {
-  if (!cityName) return null;
-  if (DINNER_CITY_GUIDES[cityName]) return DINNER_CITY_GUIDES[cityName]!;
-  const slugKey = citySlug || citySlugByName(cityName) || 'moscow';
-  return {
-    heroTitle: `Ужин на теплоходе в ${cityName} — цены и расписание`,
-    heroSubtitle: `Сравните рестораны на воде и выберите лучший вечерний круиз в ${cityName}.`,
-    breadcrumbCurrent: `Ужин на теплоходе — ${cityName}`,
-    introTitle: `Ужин на теплоходе в ${cityName}`,
-    introText: `Вечерний круиз с ужином на борту — удобный способ совместить гастрономию и обзор города с воды.`,
-    scheduleTitle: `Теплоходы с ужином — ${cityName}`,
-    riverCruiseHref: riverCruiseCityHref(slugKey),
-    riverCruiseLabel: `Все речные прогулки в ${cityName}`,
-  };
-}
-
 function matchesMenuFilter(session: PublicSessionDto, menu: MenuFilter): boolean {
   if (menu === 'all') return true;
   const text = [session.title, session.category, ...(session.tags || []), ...(session.subcategories || [])]
@@ -1139,6 +1087,9 @@ export function LandingPageView({
           {profile === 'dinner' && citySlug && !useLandingCopy ? (
             <LandingDinnerIntro cityName={cityName} citySlug={citySlug} />
           ) : null}
+          {profile === 'dinner' && citySlug ? (
+            <LandingDinnerPiers cityName={cityName} citySlug={citySlug} />
+          ) : null}
           <section id="variants" className={`container-page scroll-mt-24 ${profile === 'dinner' ? 'py-6' : profile === 'bridges' ? 'py-10 md:py-12' : 'py-12'}`}>
         {profile === 'bridges' ? (
           <div className="mb-8">
@@ -1830,6 +1781,52 @@ function LandingDinnerIntro({ cityName, citySlug }: { cityName: string | null; c
         <h2 className="mb-3 text-xl font-bold text-foreground md:text-2xl">{guide.introTitle}</h2>
         <p className="max-w-4xl leading-relaxed text-muted-foreground">{guide.introText}</p>
       </div>
+    </section>
+  );
+}
+
+function LandingDinnerPiers({ cityName, citySlug }: { cityName: string | null; citySlug?: string }) {
+  const guide = dinnerCityGuide(cityName, citySlug);
+  if (!guide || (!guide.piers.length && !guide.mealFormats.length)) return null;
+
+  return (
+    <section className="container-page space-y-8 py-6">
+      {guide.piers.length ? (
+        <div>
+          <h2 className="mb-4 text-xl font-bold text-foreground md:text-2xl">Причалы отправления</h2>
+          <div className="grid gap-4 md:grid-cols-3">
+            {guide.piers.map((pier) => (
+              <article key={pier.name} className="rounded-xl border border-border bg-card p-5">
+                <h3 className="mb-1 text-base font-semibold text-foreground">{pier.name}</h3>
+                <p className="mb-2 text-sm leading-relaxed text-muted-foreground">{pier.description}</p>
+                {pier.transport ? (
+                  <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                    🚇 {pier.transport}
+                  </span>
+                ) : null}
+              </article>
+            ))}
+          </div>
+        </div>
+      ) : null}
+      {guide.mealFormats.length ? (
+        <div>
+          <h2 className="mb-4 text-xl font-bold text-foreground md:text-2xl">Форматы питания</h2>
+          <div className="grid gap-4 md:grid-cols-3">
+            {guide.mealFormats.map((fmt) => (
+              <article key={fmt.name} className="rounded-xl border border-border bg-card p-5">
+                <div className="mb-2 flex items-center gap-2">
+                  <h3 className="text-base font-semibold text-foreground">{fmt.name}</h3>
+                  {fmt.badge ? (
+                    <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">{fmt.badge}</span>
+                  ) : null}
+                </div>
+                <p className="text-sm leading-relaxed text-muted-foreground">{fmt.description}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }
