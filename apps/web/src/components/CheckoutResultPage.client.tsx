@@ -45,7 +45,7 @@ async function fetchOrderLookup(
   code: string,
   signal?: AbortSignal,
 ): Promise<LookupResponse | null> {
-  const response = await fetch(`/checkout/actions/order?order=${encodeURIComponent(code)}`, {
+  const response = await fetch(`/checkout/actions/order?order=${encodeURIComponent(code)}&t=${Date.now()}`, {
     cache: 'no-store',
     signal,
   });

@@ -93,7 +93,7 @@ export function AdmissionCheckoutForm({ product }: Props) {
     status: string | null;
     order: BuyerInternalOrderRecord | null;
   }> {
-    const response = await fetch(`/checkout/actions/order?order=${encodeURIComponent(code)}`, {
+    const response = await fetch(`/checkout/actions/order?order=${encodeURIComponent(code)}&t=${Date.now()}`, {
       cache: 'no-store',
       signal,
     });

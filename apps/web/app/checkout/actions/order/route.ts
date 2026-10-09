@@ -11,6 +11,8 @@ import { resolveTicketOpeningHours } from '@/lib/venue-opening-hours';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
+const PRIVATE_STATUS_HEADERS = { 'Cache-Control': 'private, no-store, max-age=0' };
+
 type VenuePublicBits = {
   address?: string | null;
   latitude?: number | null;
@@ -102,7 +104,7 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const publicCode = (url.searchParams.get('order') || url.searchParams.get('publicCode') || '').trim();
   if (!publicCode) {
-    return NextResponse.json({ error: 'publicCode_required' }, { status: 400 });
+    return NextResponse.json({ error: 'publicCode_required' }, { status: 400, headers: PRIVATE_STATUS_HEADERS });
   }
 
   const financeOrder = await lookupCheckoutOrderByPublicCode(publicCode);
@@ -115,7 +117,7 @@ export async function GET(request: Request) {
       found: false,
       publicCode,
       order: null,
-    });
+    }, { headers: PRIVATE_STATUS_HEADERS });
   }
 
   const enriched = await softEnrichTicketOrder(
@@ -127,5 +129,5 @@ export async function GET(request: Request) {
     found: true,
     publicCode: enriched.publicCode,
     order: enriched,
-  });
+  }, { headers: PRIVATE_STATUS_HEADERS });
 }

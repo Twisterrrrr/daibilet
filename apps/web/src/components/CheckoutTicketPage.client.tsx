@@ -54,7 +54,7 @@ export function CheckoutTicketView({ publicCode, demoOrder, demoBanner }: Props)
       if (!disposed && cached) setOrder(cached);
 
       try {
-        const response = await fetch(`/checkout/actions/order?order=${encodeURIComponent(code)}`, {
+        const response = await fetch(`/checkout/actions/order?order=${encodeURIComponent(code)}&t=${Date.now()}`, {
           cache: 'no-store',
         });
         const payload = (await response.json().catch(() => null)) as LookupResponse | null;
