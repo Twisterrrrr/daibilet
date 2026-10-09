@@ -365,7 +365,7 @@ function heuristicLandingFromText(input: {
   if (!hay) return null;
   if (/стендап|stand[\s-]?up|юмор|комеди/.test(hay)) return 'standup';
   if (/крыш/.test(hay)) return 'rooftops';
-  if (/теплоход|катер|речн|канал|водн/.test(hay)) return 'river-cruises';
+  if (/теплоход|(?<![а-яё])катер|речн(?!ик)|канал|водн/.test(hay)) return 'river-cruises';
   if (/пеш(ие|еход)|прогулк/.test(hay) && /экскурс/.test(hay)) return 'walking-tours';
   if (/автобус/.test(hay)) return 'bus-tours';
   if (/загород|петергоф|царск|павловск/.test(hay)) return 'country-tours';
