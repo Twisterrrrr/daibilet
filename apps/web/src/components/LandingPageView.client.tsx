@@ -138,6 +138,40 @@ type DinnerBadgeFilter = LandingCardBadgeId | 'all';
 type TimeSlotFilter = '' | 'morning' | 'day' | 'evening' | 'night';
 const MIN_DISPLAY_PRICE_RUB = 100;
 
+function topEntries(values: Record<string, number>, limit: number): Array<[string, number]> {
+  return Object.entries(values)
+    .filter(([name, count]) => Boolean(name) && count > 0)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit);
+}
+
+function resolveLandingDateChips(input: {
+  profile: LandingProfile;
+  landingSlug?: string;
+  eventWindow: LandingEventWindow | null;
+  isSeasonal: boolean;
+}): Array<{ label: string; value: DateFilter }> {
+  const chips: Array<{ label: string; value: DateFilter }> = [];
+  if (input.eventWindow) {
+    chips.push({ label: `Сезон: ${input.eventWindow.label}`, value: 'window' });
+  }
+  if (!input.isSeasonal) {
+    chips.push({ label: 'Сегодня', value: 'today' });
+    chips.push({ label: 'Завтра', value: 'tomorrow' });
+  }
+  chips.push({ label: 'Любая дата', value: 'all' });
+  return chips;
+}
+
+function resolveSeasonalCityNames(landingSlug: string, cityOptions: Array<[string, number]>): string[] {
+  const withEvents = new Set(cityOptions.filter(([, count]) => count > 0).map(([name]) => name));
+  const order = getSeasonalLanding(landingSlug)?.cityOrder || [];
+  if (order.length) return order.filter((name) => withEvents.has(name));
+  return cityOptions
+    .map(([name]) => name)
+    .filter((name) => withEvents.has(name));
+}
+
 const BUS_CITY_META: Record<string, { slug: string; duration: string; prepositional: string }> = {
   Москва: { slug: 'moscow', duration: '1.5–3 часа', prepositional: 'Москве' },
   'Санкт-Петербург': { slug: 'saint-petersburg', duration: '2–4 часа', prepositional: 'Санкт-Петербургу' },
@@ -2969,7 +3003,7 @@ function LandingFilters({
       <LandingFilterRow
         dateChips={dateChips}
         dateFilter={dateFilter}
-        setDateFilter={setDateFilter}
+        setDateFilter={(v) => setDateFilter(v as DateFilter)}
         showCityFilter={showCityFilter}
         cityChip={cityChip}
         visibleCityNames={visibleCityNames}
