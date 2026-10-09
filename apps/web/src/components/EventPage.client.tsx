@@ -38,6 +38,7 @@ import { formatPublicTitle } from '@/lib/format-public-title';
 import { splitLongTitleAtBreak } from '@/lib/split-long-title';
 import { buildEventBreadcrumbs } from '@/lib/structured-data';
 import { HeroImageWithBlur } from '@/components/HeroImageWithBlur.client';
+import { resolveEventHeroObjectPosition } from '@/lib/event-image-focus';
 import { venueHref } from '@/lib/routes';
 import { formatStreetAddress } from '@/lib/address';
 import { IMAGE_SIZES } from '@/components/SafeImage.client';
@@ -580,6 +581,12 @@ export function EventHero({
   const fallbackPrice = formatPriceRub(stats.priceFrom ?? event.priceFrom);
   const priceLabel = priceRange ? formatHeroBuyButtonPrice(priceRange) : fallbackPrice ? `от ${fallbackPrice}` : '';
   const heroImage = String(event.imageUrl || '').trim();
+  const heroFocalPoint = resolveEventHeroObjectPosition({
+    slug: event.slug,
+    sourceSlug: event.sourceSlug,
+    externalId: event.externalId,
+    id: event.id,
+  });
   const nextSession = pickRepresentativeSession((payload.sessions ?? []) as EventSession[]);
   const canOpenVenueModal = Boolean(event.venue && (event.venueId || event.venueSlug));
   const venuePageHref = canOpenVenueModal
@@ -631,6 +638,7 @@ export function EventHero({
         src={heroImage || null}
         alt={formatPublicTitle(event.title)}
         priority
+        focalPoint={heroFocalPoint}
       />
       <div
         aria-hidden
