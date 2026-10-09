@@ -2848,7 +2848,9 @@ function LandingFilters({
   const isRiver = profile === 'river';
   const isBridges = profile === 'bridges';
   const isSeasonal = profile === 'seasonal';
-  const showTimeSlot = profile === 'bus' || profile === 'river' || isSeasonal || isBridges;
+  // Hide time slot when only one slot is meaningful (e.g. bridges → night only).
+  const hasMultipleTimeSlots = !isBridges;
+  const showTimeSlot = (profile === 'bus' || profile === 'river' || isSeasonal || isBridges) && hasMultipleTimeSlots;
   const currentCityName = resolveLandingCityName(citySlug);
   const cityOptions = Object.entries(stats.cities).sort((a, b) => b[1] - a[1]).slice(0, 12);
   const switchItems =
@@ -2868,6 +2870,10 @@ function LandingFilters({
     : switchItems.length > 1
       ? true
       : !landingCity && meaningfulCityCount > 1;
+  // Show max4 city chips inline; overflow into "Ещё N" dropdown.
+  const MAX_INLINE_CITIES = 4;
+  const visibleCityNames = orderedCityNames.slice(0, MAX_INLINE_CITIES);
+  const overflowCityNames = orderedCityNames.slice(MAX_INLINE_CITIES);
   const sortTabs: Array<{ label: string; value: SortFilter }> = isBus || isRiver || isSeasonal
     ? [
         { label: 'По цене', value: 'price' },
@@ -3036,7 +3042,19 @@ function LandingFilters({
           <>
             {dateChips.length > 0 ? <div className="mx-1 h-6 w-px bg-border" /> : null}
             {cityChip('all', 'Все города', city === 'all')}
-            {orderedCityNames.map((name) => cityChip(name, name, city === name))}
+            {visibleCityNames.map((name) => cityChip(name, name, city === name))}
+            {overflowCityNames.length > 0 ? (
+              <select
+                value={overflowCityNames.includes(city) ? city : ''}
+                onChange={(e) => { if (e.target.value) selectCity(e.target.value); }}
+                className="h-9 rounded-lg border border-input bg-background px-3 text-sm text-foreground"
+              >
+                <option value="">Ещё {overflowCityNames.length}</option>
+                {overflowCityNames.map((name) => (
+                  <option key={name} value={name}>{name}</option>
+                ))}
+              </select>
+            ) : null}
           </>
         ) : null}
         {showTimeSlot ? (
@@ -3088,7 +3106,19 @@ function LandingFilters({
         {showCityFilter ? (
           <div className="flex flex-wrap items-center gap-2">
             {cityChip('all', 'Все города', city === 'all')}
-            {orderedCityNames.map((name) => cityChip(name, name, city === name))}
+            {visibleCityNames.map((name) => cityChip(name, name, city === name))}
+            {overflowCityNames.length > 0 ? (
+              <select
+                value={overflowCityNames.includes(city) ? city : ''}
+                onChange={(e) => { if (e.target.value) selectCity(e.target.value); }}
+                className="h-9 rounded-lg border border-input bg-background px-3 text-sm text-foreground"
+              >
+                <option value="">Ещё {overflowCityNames.length}</option>
+                {overflowCityNames.map((name) => (
+                  <option key={name} value={name}>{name}</option>
+                ))}
+              </select>
+            ) : null}
           </div>
         ) : null}
         {showTimeSlot ? (
@@ -3124,7 +3154,19 @@ function LandingFilters({
             aria-label="Сменить город"
           >
             {cityChip('all', 'Все города', city === 'all')}
-            {orderedCityNames.map((name) => cityChip(name, name, city === name))}
+            {visibleCityNames.map((name) => cityChip(name, name, city === name))}
+            {overflowCityNames.length > 0 ? (
+              <select
+                value={overflowCityNames.includes(city) ? city : ''}
+                onChange={(e) => { if (e.target.value) selectCity(e.target.value); }}
+                className="h-9 shrink-0 rounded-lg border border-input bg-background px-3 text-sm text-foreground"
+              >
+                <option value="">Ещё {overflowCityNames.length}</option>
+                {overflowCityNames.map((name) => (
+                  <option key={name} value={name}>{name}</option>
+                ))}
+              </select>
+            ) : null}
           </div>
         ) : null}
         {showTimeSlot ? timeSlotSelect : null}
