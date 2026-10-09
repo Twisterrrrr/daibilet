@@ -123,7 +123,7 @@ export function HomeHero({
   };
 
   // City-aware H1: personalize by detected city; national = event count.
-  const { events: totalEvents, places: totalCities } = catalogSocialStats(destinations);
+  const { events: totalEvents, places: totalCities, venues: totalVenues } = catalogSocialStats(destinations);
   const cityTitle = selectedCityName ? (
     <>
       <span className="block">Экскурсии, музеи и мероприятия</span>
@@ -153,13 +153,13 @@ export function HomeHero({
       <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-sm text-white/75 sm:gap-x-5">
         <span>{formatNumber(totalEvents)} событий</span>
         <span className="text-white/30" aria-hidden>·</span>
-        <span>{formatNumber(totalCities)} городов</span>
+        <span>{formatNumber(totalVenues)} площадок</span>
         <span className="text-white/30" aria-hidden>·</span>
-        <span>Электронные билеты</span>
+        <span>{formatNumber(totalCities)} городов</span>
       </div>
 
       {/* H2 value proposition */}
-      <p className="mx-auto mt-3 max-w-xl text-center text-sm leading-relaxed text-white/60 sm:text-base">
+      <p className="mx-auto mt-3 max-w-2xl text-center text-sm leading-relaxed text-white/60 sm:text-base">
         Сравните цены, выберите дату и купите билет онлайн без переплат и наценок.
       </p>
 
