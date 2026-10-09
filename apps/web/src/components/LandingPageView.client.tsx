@@ -20,6 +20,8 @@ import {
   resolveLandingHeroTheme,
 } from '@/components/landing/LandingHeroCtaBlock.client';
 import { BridgesScheduleSection } from '@/components/landing/BridgesScheduleSection.client';
+import { RiverScheduleSection, type RiverEventGroup } from '@/components/landing/RiverScheduleSection.client';
+import { BusScheduleSection, type BusEventGroup } from '@/components/landing/BusScheduleSection.client';
 import { LandingCityLocations } from '@/components/landing/LandingCityLocations.client';
 import { LandingPurchaseButton } from '@/components/landing/LandingPurchaseButton.client';
 import { LandingStickyHeader } from '@/components/landing/LandingStickyHeader.client';
@@ -1189,6 +1191,10 @@ export function LandingPageView({
               />
             ) : profile === 'bridges' ? (
               <BridgesScheduleSection groups={groups} sort={sort} setSort={setSort} />
+            ) : profile === 'river' ? (
+              <RiverScheduleSection groups={groups as RiverEventGroup[]} />
+            ) : profile === 'bus' ? (
+              <BusScheduleSection groups={groups as BusEventGroup[]} />
             ) : (
             <LandingScheduleList
               groups={groups}
@@ -1202,7 +1208,7 @@ export function LandingPageView({
                 setCity(cityName || 'all');
                 setCategory('all');
                 setDateFilter(defaultLandingDateFilter(profile, slug));
-                setSort(profile === 'bus' ? 'price' : 'time');
+                setSort('time');
                 setTimeSlot('');
                 setContextChip(null);
               }}
