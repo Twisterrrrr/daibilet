@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import * as React from 'react';
 import { Anchor, ArrowRight, Briefcase, Bus, Cake, CalendarDays, CheckCircle2, ChevronDown, Clock, Eye, Headphones, Heart, HelpCircle, Lightbulb, Mail, MapPin, Mic, Moon, Music, Search, Shield, Ship, Sparkles, Star, Sun, Tag, Ticket, TrendingUp, Users, UtensilsCrossed, Wallet } from 'lucide-react';
@@ -98,6 +98,7 @@ import {
   riverCityGuideBySlug,
   type RiverCitySpot,
 } from '@/data/river-landings';
+import { busCityGuide } from '@/data/bus-landings';
 import { formatMoney, formatMoneyRange, formatLandingBuyPrice, formatNumber } from '@/lib/format';
 import {
   collectSessionStartsAtTimes,
@@ -144,48 +145,6 @@ const BUS_CITY_META: Record<string, { slug: string; duration: string; prepositio
   Екатеринбург: { slug: 'ekaterinburg', duration: '2–3 часа', prepositional: 'Екатеринбургу' },
   'Ростов-на-Дону': { slug: 'rostov-on-don', duration: '2–3 часа', prepositional: 'Ростову-на-Дону' },
 };
-
-type BusCitySpot = { title: string; badge: string; badgeTone?: 'ticket' | 'free'; description: string };
-type BusCityGuide = { intro: string; heroSubtitle: string; spots: BusCitySpot[]; tips: string[] };
-
-const BUS_CITY_GUIDES: Partial<Record<string, BusCityGuide>> = {
-  'Санкт-Петербург': {
-    intro: 'Петербург — город, созданный для обзорных экскурсий. Автобусные туры охватывают Невский проспект, Дворцовую площадь, Исаакиевский собор, Петропавловскую крепость и пригороды (Петергоф, Пушкин). Ночные рейсы с разводными мостами — отдельный жанр.',
-    heroSubtitle: 'Невский проспект, Эрмитаж, Петропавловка и белые ночи — классика с комфортом.',
-    spots: [
-      { title: 'Классический обзорный', badge: 'Билет', badgeTone: 'ticket', description: 'Невский → Дворцовая → Исаакий → Петропавловка. 2.5–3 часа.' },
-      { title: 'Ночной Петербург + мосты', badge: 'Билет', badgeTone: 'ticket', description: 'Подсветка + остановка у разводного моста. После 23:00.' },
-      { title: 'Петергоф / Пушкин', badge: 'Билет', badgeTone: 'ticket', description: 'Загородная экскурсия на полдня.' },
-      { title: 'Маршрут автобуса №7', badge: 'Бесплатно', badgeTone: 'free', description: 'Общественный транспорт по Невскому — бесплатная альтернатива.' },
-    ],
-    tips: [
-      'Ночной рейс с мостами — бронируйте за неделю в сезон белых ночей',
-      'Петергоф лучше посещать в будни — меньше очередей',
-      'Двухэтажный автобус ходит по Невскому — отличные фото',
-      'Тёплая одежда нужна даже летом для ночных рейсов',
-    ],
-  },
-  Москва: {
-    intro: 'Москва за один день: от Красной площади до Москва-Сити. Автобусные туры — лучший способ увидеть масштаб столицы без долгих переходов.',
-    heroSubtitle: 'Кремль, Воробьёвы горы, Сити и Храм Христа Спасителя — всё в одной поездке.',
-    spots: [
-      { title: 'Классический обзорный', badge: 'Билет', badgeTone: 'ticket', description: 'Красная площадь → Воробьёвы горы → Сити. 3 часа.' },
-      { title: 'Hop-on/Hop-off', badge: 'Билет', badgeTone: 'ticket', description: 'Целый день по фиксированным остановкам.' },
-    ],
-    tips: ['Берите утренний рейс — меньше пробок', 'Двухэтажный автобус — лучший обзор с верхней палубы'],
-  },
-};
-
-function busCityGuide(cityName: string | null): BusCityGuide | null {
-  if (!cityName) return null;
-  return BUS_CITY_GUIDES[cityName] || {
-    intro: `Обзорные автобусные экскурсии в ${cityName}: сравните маршруты, цены и расписание на сегодня.`,
-    heroSubtitle: `Главные достопримечательности ${cityName} — с комфортом и аудиогидом.`,
-    spots: [],
-    tips: ['Бронируйте заранее в высокий сезон', 'Проверяйте точку посадки на карточке экскурсии'],
-  };
-}
-
 function riverCruiseCityHref(citySlug: string) {
   return riverLandingHref(citySlug);
 }
@@ -1011,7 +970,9 @@ export function LandingPageView({
           ? BRIDGES_LANDING.faq
           : profile === 'river' && cityName
             ? (riverCityGuide(cityName)?.faq ?? undefined)
-            : undefined,
+            : profile === 'bus' && cityName
+              ? (busCityGuide(cityName)?.faq ?? undefined)
+              : undefined,
       jsonLdExtras:
         profile === 'bridges'
           ? [
