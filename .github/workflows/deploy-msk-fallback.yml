@@ -28,6 +28,6 @@ jobs:
           install -m 600 /dev/null "$HOME/.ssh/msk_key"
           printf '%s\n' "$MSK_SSH_KEY" > "$HOME/.ssh/msk_key"
           SSH=(ssh -i "$HOME/.ssh/msk_key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o BatchMode=yes)
-          REMOTE_CMD="cd /opt/daibilet && git fetch origin $BRANCH && git reset --hard FETCH_HEAD && CI=true pnpm install --frozen-lockfile && BRANCH=$BRANCH ./deploy/scripts/deploy-prod-next.sh"
+          REMOTE_CMD="cd /opt/daibilet && git fetch origin $BRANCH && git reset --hard FETCH_HEAD && BRANCH=$BRANCH ./deploy/scripts/deploy-prod-next.sh"
           "${SSH[@]}" "${MSK_SSH_USER}@${MSK_SSH_HOST}" "$REMOTE_CMD"
           echo "Fallback deploy completed for branch $BRANCH" >> "$GITHUB_STEP_SUMMARY"
