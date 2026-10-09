@@ -18,6 +18,7 @@ import {
   homeHeroObjectPositionClass,
 } from '@/lib/home-hero-images';
 import { normalizeKnownCitySlug } from '@/lib/landing-routes';
+import { HERO_QUICK_CHIPS } from '@/lib/home-scenarios';
 
 const HERO_DATE_OPTIONS = [
   { value: 'all', label: 'Любая дата' },
@@ -158,11 +159,6 @@ export function HomeHero({
         <span>{formatNumber(totalCities)} городов</span>
       </div>
 
-      {/* H2 value proposition */}
-      <p className="mx-auto mt-3 max-w-2xl text-center text-sm leading-relaxed text-white/60 sm:text-base">
-        Сравните цены, выберите дату и купите билет онлайн без переплат и наценок.
-      </p>
-
       <form
         onSubmit={onSubmit}
         className="mt-8 w-full max-w-5xl rounded-2xl bg-white p-2 text-left shadow-2xl shadow-slate-950/30"
@@ -201,6 +197,19 @@ export function HomeHero({
           </button>
         </div>
       </form>
+
+      {/* Category chips — soft, no border, one line */}
+      <div className="mt-5 flex items-center justify-center gap-2 overflow-x-auto text-sm text-white/80 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {HERO_QUICK_CHIPS.slice(0, 7).map((chip) => (
+          <a
+            key={chip.label}
+            href={chip.href}
+            className="shrink-0 whitespace-nowrap rounded-full px-3.5 py-1.5 transition hover:bg-white/15"
+          >
+            {chip.label}
+          </a>
+        ))}
+      </div>
     </HeroLayout>
   );
 }
