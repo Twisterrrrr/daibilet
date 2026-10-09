@@ -86,7 +86,7 @@ import {
   type CityMustSeeItem,
 } from '@/lib/cityInfo';
 import { resolveCityPlaceTitleHref } from '@/lib/city-place-href';
-import { resolveVenueHeroImage } from '@/lib/city-place-images';
+import { resolveVenueHeroImage, preloadPlaceImages } from '@/lib/city-place-images';
 import {
   dayRouteHookLine,
   dayRouteItemFromMustSee,
@@ -217,6 +217,8 @@ export function CityPageView({
 
   React.useEffect(() => {
     document.documentElement.dataset.cityHydrated = '1';
+    // Preload editorial place images for venue hero resolution.
+    preloadPlaceImages();
     return () => { delete document.documentElement.dataset.cityHydrated; };
   }, []);
 
