@@ -1,22 +1,22 @@
 'use client';
 
 import { CalendarDays, Search } from 'lucide-react';
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { CityPicker } from '@/components/CityPicker.client';
 import { HeroLayout } from '@/components/HeroLayout';
 import { HeroMedia } from '@/components/HeroMedia.client';
-import { ScrollRail } from '@/components/ScrollRail.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { PublicDestinationDto, PublicLandingDto } from '@daibilet/contracts/public';
-import { buildCatalogHref, catalogHrefWithSelectedCity } from '@/lib/catalog-url';
+import { buildCatalogHref } from '@/lib/catalog-url';
+import { catalogSocialStats } from '@/lib/catalog-social-stats';
 import { cityToPrepositional } from '@/lib/city-declension';
+import { formatNumber } from '@/lib/format';
 import {
   HOME_HERO_IMAGES,
   homeHeroObjectPositionClass,
 } from '@/lib/home-hero-images';
-import { buildHomeHeroQuickChips } from '@/lib/home-scenarios';
 import { normalizeKnownCitySlug } from '@/lib/landing-routes';
 
 const HERO_DATE_OPTIONS = [
@@ -106,17 +106,6 @@ export function HomeHero({
     (destination !== 'all' ? normalizeKnownCitySlug(destination) || destination : null) ||
     (selectedCity?.cityReady === false || !selectedCity ? ssrCitySlug : null);
 
-  const quickChips = useMemo(
-    () =>
-      buildHomeHeroQuickChips({
-        citySlug,
-        landings,
-        hubTags: selectedDestination?.hubTags,
-        categories: selectedDestination?.categories,
-      }),
-    [citySlug, landings, selectedDestination?.categories, selectedDestination?.hubTags],
-  );
-
   const openCatalog = (category?: string) => {
     router.push(
       buildCatalogHref({
@@ -133,25 +122,9 @@ export function HomeHero({
     openCatalog();
   };
 
-  const resolveChipHref = (chipHref: string) => {
-    if (!chipHref.startsWith('/events')) return chipHref;
-    const params = new URLSearchParams(
-      chipHref.includes('?') ? chipHref.slice(chipHref.indexOf('?') + 1) : '',
-    );
-    return catalogHrefWithSelectedCity(destination, {
-      q: params.get('q') || undefined,
-      city: params.get('city') || undefined,
-      category: params.get('category') || undefined,
-      date: heroDate !== 'all' ? heroDate : params.get('date') || undefined,
-      sort: (params.get('sort') as 'popular' | 'time' | undefined) || undefined,
-    });
-  };
-
-  const chipClassName =
-    'inline-flex h-8 items-center rounded-full border border-white/20 bg-white/15 px-3.5 text-xs font-semibold text-white backdrop-blur-[10px] transition hover:bg-white/25';
-
-  // City and national share the same lead line so «музеи» does not disappear when a city is selected.
-  const title = selectedCityName ? (
+  // City-aware H1: personalize by detected city; national = event count.
+  const { events: totalEvents, places: totalCities } = catalogSocialStats(destinations);
+  const cityTitle = selectedCityName ? (
     <>
       <span className="block">Экскурсии, музеи и мероприятия</span>
       <span className="block bg-gradient-to-r from-sky-200 to-white bg-clip-text text-transparent">
@@ -162,7 +135,7 @@ export function HomeHero({
     <>
       <span className="block">Экскурсии, музеи и мероприятия</span>
       <span className="block bg-gradient-to-r from-sky-200 to-white bg-clip-text text-transparent">
-        в городах России
+        в {formatNumber(totalCities)} городах России
       </span>
     </>
   );
@@ -171,12 +144,25 @@ export function HomeHero({
     <HeroLayout
       variant={videoSrc ? 'video' : 'imageOverlay'}
       brand="Дайбилет"
-      title={title}
+      title={cityTitle}
       tone="dark"
-      // Base layer under images (legacy navy placeholder while frames load) - not a blue wash on top of photos.
       className="!bg-[#122868]"
       media={<HeroMedia frames={mediaFrames} videoSrc={videoSrc} />}
     >
+      {/* Social proof strip — live stats from catalog */}
+      <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-sm text-white/75 sm:gap-x-5">
+        <span>{formatNumber(totalEvents)} событий</span>
+        <span className="text-white/30" aria-hidden>·</span>
+        <span>{formatNumber(totalCities)} городов</span>
+        <span className="text-white/30" aria-hidden>·</span>
+        <span>Электронные билеты</span>
+      </div>
+
+      {/* H2 value proposition */}
+      <p className="mx-auto mt-3 max-w-xl text-center text-sm leading-relaxed text-white/60 sm:text-base">
+        Сравните цены, выберите дату и купите билет онлайн без переплат и наценок.
+      </p>
+
       <form
         onSubmit={onSubmit}
         className="mt-8 w-full max-w-5xl rounded-2xl bg-white p-2 text-left shadow-2xl shadow-slate-950/30"
@@ -215,40 +201,6 @@ export function HomeHero({
           </button>
         </div>
       </form>
-
-      {/* Mobile: swipe rail. Desktop: wrap up to ~2 rows, no side arrows. */}
-      <div className="mt-4 w-full max-w-5xl" data-home-hero-chips>
-        <ScrollRail
-          className="md:hidden"
-          viewportClassName="!overflow-x-auto overscroll-x-contain !pb-0.5"
-          hideScrollbar
-          edgeFade
-          aria-label="Быстрые подборки"
-        >
-          <div className="flex w-max flex-nowrap items-center gap-2 px-1 pb-0.5">
-            {quickChips.map((chip) => (
-              <a
-                key={chip.label}
-                href={resolveChipHref(chip.href)}
-                data-rail-item
-                className={`${chipClassName} shrink-0`}
-              >
-                {chip.label}
-              </a>
-            ))}
-          </div>
-        </ScrollRail>
-        <div
-          className="hidden flex-wrap justify-center gap-2 md:flex"
-          aria-label="Быстрые подборки"
-        >
-          {quickChips.map((chip) => (
-            <a key={chip.label} href={resolveChipHref(chip.href)} className={chipClassName}>
-              {chip.label}
-            </a>
-          ))}
-        </div>
-      </div>
     </HeroLayout>
   );
 }

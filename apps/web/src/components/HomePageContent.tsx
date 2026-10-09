@@ -153,6 +153,7 @@ async function HomePageBody() {
     <div className="overflow-x-hidden bg-neutral-50 pb-24 lg:pb-0">
       {/* Classic search-hero: rotating emotion photos + city/date/category find form */}
       <HomeHero
+        destinations={destinations}
         frames={heroFrames}
         expandStaticRotator={useStaticPoolRotator}
         landings={heroLandings}
