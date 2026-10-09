@@ -3046,51 +3046,8 @@ function LandingFilters({
         ) : null}
       </div>
 
-      <div className="hidden space-y-3 sm:block lg:hidden">
-        {dateChips.length > 0 ? (
-          <div className="flex items-center gap-1.5">
-            {dateChips.map((chip) => (
-              <button
-                key={chip.value}
-                type="button"
-                onClick={() => setDateFilter(chip.value)}
-                className={`whitespace-nowrap rounded-lg border px-3.5 py-1.5 text-sm font-medium transition-all ${
-                  dateFilter === chip.value
-                    ? 'border-primary bg-primary text-primary-foreground'
-                    : 'border-border bg-background text-foreground hover:border-primary/40 hover:text-primary'
-                }`}
-              >
-                {chip.label}
-              </button>
-            ))}
-          </div>
-        ) : null}
-        {showCityFilter ? (
-          <div className="flex flex-wrap items-center gap-2">
-            {cityChip('all', 'Все города', city === 'all')}
-            {visibleCityNames.map((name) => cityChip(name, name, city === name))}
-            {overflowCityNames.length > 0 ? (
-              <select
-                value={overflowCityNames.includes(city) ? city : ''}
-                onChange={(e) => { if (e.target.value) selectCity(e.target.value); }}
-                className="h-9 rounded-lg border border-input bg-background px-3 text-sm text-foreground"
-              >
-                <option value="">Ещё {overflowCityNames.length}</option>
-                {overflowCityNames.map((name) => (
-                  <option key={name} value={name}>{name}</option>
-                ))}
-              </select>
-            ) : null}
-          </div>
-        ) : null}
-        {showTimeSlot ? (
-          <div className="flex items-center gap-2">
-            {timeSlotSelect}
-          </div>
-        ) : null}
-      </div>
-
-      <div className="space-y-3 sm:hidden">
+      {/* Mobile + tablet: stacked filters with scrollable chips */}
+      <div className="space-y-3 lg:hidden">
         {dateChips.length > 0 ? (
           <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {dateChips.map((chip) => (
@@ -3132,7 +3089,8 @@ function LandingFilters({
           </div>
         ) : null}
         {showTimeSlot ? timeSlotSelect : null}
-        <div className="flex items-center gap-2">
+        {/* Sort dropdown: mobile only */}
+        <div className="flex items-center gap-2 sm:hidden">
           <span className="whitespace-nowrap text-sm text-muted-foreground">Сортировать:</span>
           <select
             value={sort}
