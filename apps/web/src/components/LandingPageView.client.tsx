@@ -69,6 +69,7 @@ import {
 } from '@/lib/bridges-session-utils';
 import { resolveLandingCopy, shouldUseLandingCopy } from '@/lib/landing-copy';
 import { applyLandingSeoMeta, resolveLandingSeo } from '@/lib/landing-seo';
+import { isLandingOffSeason } from '@/lib/landing-season';
 import {
   isDateInsideLandingWindow,
   isSessionInsideLandingWindow,
@@ -983,6 +984,7 @@ export function LandingPageView({
       : null;
     applyLandingSeoMeta({
       ...seoInput,
+      isOffSeason: isLandingOffSeason(slug),
       canonicalPath,
       breadcrumbItems:
         profile === 'bridges'

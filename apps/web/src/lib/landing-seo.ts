@@ -27,6 +27,8 @@ export type LandingSeoInput = {
   canonicalPath?: string | null;
   faqItems?: Array<{ question: string; answer: string }>;
   breadcrumbItems?: Array<{ name: string; path: string }>;
+  /** Off-season landing: noindex to prevent thin content indexation. */
+  isOffSeason?: boolean;
   /** Дополнительные JSON-LD блоки (Product, Event и т.д.). */
   jsonLdExtras?: Array<Record<string, unknown>>;
 };
@@ -444,7 +446,7 @@ export function applyLandingSeoMeta(input: LandingSeoInput): LandingSeo {
   const seo = resolveLandingSeo(input);
   document.title = seo.title;
   setMetaTag('description', seo.description);
-  setMetaTag('robots', 'index,follow');
+  setMetaTag('robots', input.isOffSeason ? 'noindex,follow' : 'index,follow');
   setMetaTag('og:title', seo.title);
   setMetaTag('og:description', seo.description);
   if (input.canonicalPath) {

@@ -12,6 +12,31 @@
 > Этот документ остаётся как журнал закрытых пунктов, план и карта — как
 > источники актуального состояния.
 
+## Запланировано на декабрь 2026
+
+### Revalidate webhook для лендингов (вариант 3)
+
+Текущий ISR = 3600с (час). При обновлении каталога событий лендинги обновляются
+только через час.
+
+**План:** привязать `/api/internal/revalidate` к webhook из backend при обновлении
+landing-сессий. При изменении данных → `revalidateTag('landing:' + slug)` → мгновенный
+ISR rebuild.
+
+**Связанные файлы:**
+- `apps/web/app/api/internal/revalidate/route.ts` — endpoint уже есть
+- `apps/backend/src/dto.js` — `buildPublicLandingPage`
+- `apps/web/src/server/landing-route-page.tsx` — `revalidate = 3600`
+
+**Шаги:**
+1. Добавить `revalidateTag` в `buildLandingMetadata`
+2. Backend: после обновления сессий → POST revalidate с tag
+3. Проверить stale-while-revalidate
+
+**Приоритет:** средний — текущий ISR 1ч достаточен; webhook улучшает актуальность цен.
+
+---
+
 ## Закрыто
 
 | Пункт | Коммит | Что сделано |

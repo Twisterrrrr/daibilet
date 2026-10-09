@@ -28,6 +28,7 @@ import {
   evaluateListingIndexability,
   robotsForListingIndexability,
 } from '@/lib/seo-listing-meta';
+import { isLandingOffSeason } from '@/lib/landing-season';
 import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
 import { getLandingSeo } from '@/lib/seo/get-landing-seo';
 import { isPodborkiSeoPilotCitySlug } from '@/lib/podborki-city-seo';
@@ -154,7 +155,7 @@ export async function buildLandingMetadata(pathname: string): Promise<Metadata> 
     alternates: {
       canonical,
     },
-    robots: robotsForListingIndexability(indexDecision.indexable),
+    robots: robotsForListingIndexability(indexDecision.indexable && !isLandingOffSeason(slug)),
     ...buildShareMetadata({
       title: shareTitle,
       description,
