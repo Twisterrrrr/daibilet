@@ -777,7 +777,7 @@ export function explainLandingRuleMatch(
   if (!blockers.length) {
     const fastMatchReasons = collectFastLandingMatchReasons(candidate, rule, tags);
     const hasVenueSignal = fastMatchReasons.some((reason) => reason.startsWith('площадка:'));
-    if (fastMatchReasons.length && landingRequiredSignalsSatisfied(rule, keywordFields, hasVenueSignal, candidate.subcategories, tags)) {
+    if (fastMatchReasons.length && landingRequiredSignalsSatisfied(rule, keywordFields, hasVenueSignal, candidate.subcategories ?? undefined, tags)) {
       return {
         matches: true,
         reasons: uniqueValues([...reasons, ...fastMatchReasons]).slice(0, 10),

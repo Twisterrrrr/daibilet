@@ -428,7 +428,7 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
       .filter((e) => e.id !== requestedEvent.id && e.primaryCityId !== requestedEvent.primaryCityId)
       .slice(0, 8)
       .map((e) => {
-        const nextSession = e.sessions?.[0];
+        const nextSession = sessionRows.find((session) => session.eventId === e.id);
         return {
           id: e.id,
           slug: publicSlug(e.slug),

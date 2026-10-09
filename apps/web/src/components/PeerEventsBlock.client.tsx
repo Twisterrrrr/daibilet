@@ -38,7 +38,7 @@ export function PeerEventsBlock({ peers }: { peers: PeerEvent[] }) {
 
       <div className="mt-4 space-y-3">
         {peers.map((peer) => {
-          const href = eventHref({ id: peer.id, slug: peer.slug, name: peer.title });
+          const href = eventHref({ id: peer.id, slug: peer.slug, title: peer.title });
           const dateLabel = formatPeerDate(peer.startsAt);
 
           return (
