@@ -21,6 +21,16 @@ const LANDING_CARD_IMAGES: Record<string, string> = {
   'walking-tours': '/images/landings/walking-tours.jpg',
   excursions: '/images/landings/excursions.jpg',
   'country-tours': '/images/landings/country-tours.jpg',
+  exhibitions: '/images/home/promo-museums.jpg',
+  'unusual-theatres': '/images/home/promo-party.jpg',
+  'quest-tours': '/images/home/promo-museums.jpg',
+  'show-programs': '/images/home/promo-party.jpg',
+  'self-development': '/images/home/promo-museums.jpg',
+  'intimate-concerts': '/images/home/promo-concerts.jpg',
+  'improv-tribute': '/images/home/promo-party.jpg',
+  graduation: '/images/home/promo-dinner.jpg',
+  'international-womens-day': '/images/home/promo-dinner.jpg',
+  maslenitsa: '/images/home/promo-yards.jpg',
 };
 
 const CITY_LANDING_CARD_IMAGES: Record<string, Partial<Record<string, string>>> = {
