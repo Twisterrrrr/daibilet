@@ -178,12 +178,14 @@ import {
 } from './sochi-hub';
 import { MOSCOW_LINE_DAY_ROUTE_PRESETS } from './moscow-line-presets';
 import { MOSCOW_SUBURBS } from './moscow-suburbs';
+import { MSK_FAQ, MSK_TRAVEL } from './moscow-hub';
 import { PERM_SUBURBS } from './perm-hub';
 import { NIZHNY_NOVGOROD_LINE_DAY_ROUTE_PRESETS } from './nizhny-novgorod-line-presets';
 import { SAINT_PETERSBURG_LINE_DAY_ROUTE_PRESETS } from './saint-petersburg-line-presets';
 import { buildSaintPetersburgSuburbs } from './saint-petersburg-suburbs';
 import { KALININGRAD_LINE_DAY_ROUTE_PRESETS } from './kaliningrad-line-presets';
 import { dayRoutePresetsWithLinesAtTail } from './day-route-preset-order';
+import { ULYANOVSK_SUBURBS, ULYANOVSK_DAY_ROUTE_PRESETS } from './ulyanovsk-hub';
 
 /** Ссылка на venue/location для пункта «Главные места». Без slug - заголовок не линкуем. */
 export type CityPlaceLinkFields = {
@@ -4914,6 +4916,9 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Где находится знаменитый памятник букве «Ё»?", a: "Оригинальный гранитный монумент, посвященный седьмой букве русского алфавита, которую активно использовал в печати ульяновский земляк Николай Карамзин, установлен на бульваре Новый Венец." },
     { q: "Можно ли зайти внутрь дома, где родился Владимир Ленин?", a: "Да, подлинный деревянный флигель усадьбы Ульяновых бережно сохранен и накрыт защитным стеклянно-бетонным куполом грандиозного здания Ленинского мемориала в центре города." },
     ]
+    ,
+    significantSuburbs: ULYANOVSK_SUBURBS,
+    dayRoutePresets: ULYANOVSK_DAY_ROUTE_PRESETS,
   },
   izhevsk: {
     brief:
