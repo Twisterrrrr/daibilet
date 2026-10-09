@@ -13,13 +13,13 @@ function emptyToNull(value: FormDataEntryValue | null): string | null {
 
 /** Bust public `/events/[slug]` Data Cache + HTML after admin edits. */
 function revalidatePublicEventSurfaces(formData: FormData) {
-  revalidateTag(EVENT_PAGE_CACHE_TAG);
-  revalidateTag(CATALOG_PAGE_CACHE_TAG);
+  revalidateTag(EVENT_PAGE_CACHE_TAG, 'max');
+  revalidateTag(CATALOG_PAGE_CACHE_TAG, 'max');
   revalidatePath('/events');
 
   const slug = String(formData.get('slug') || formData.get('publicSlug') || '').trim();
   if (slug) {
-    revalidateTag(eventPageCacheTag(slug));
+    revalidateTag(eventPageCacheTag(slug), 'max');
     revalidatePath(`/events/${encodeURIComponent(slug)}`);
   }
 }

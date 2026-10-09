@@ -15,7 +15,7 @@ export async function setHeroBannerActiveAction(formData: FormData) {
     data: { isActive },
   });
 
-  revalidateTag('hero-banners');
+  revalidateTag('hero-banners', 'max');
   revalidatePath('/');
   revalidatePath('/admin/hero-banners');
   redirect('/admin/hero-banners?ok=1');

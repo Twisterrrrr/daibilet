@@ -32,7 +32,7 @@ export async function moderateAdminReviewAction(formData: FormData) {
 
   // Rating JSON-LD is derived only from approved reviews. Invalidate both the
   // aggregate query and rendered PDPs when a review crosses moderation states.
-  revalidateTag(EVENT_PAGE_CACHE_TAG);
+  revalidateTag(EVENT_PAGE_CACHE_TAG, 'max');
   revalidatePath('/events/[slug]', 'page');
   revalidatePath('/admin/reviews');
   const qs =
