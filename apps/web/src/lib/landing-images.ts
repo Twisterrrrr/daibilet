@@ -26,14 +26,14 @@ const LANDING_CARD_IMAGES: Record<string, string> = {
   'country-tours': '/images/landings/country-tours.jpg',
   exhibitions: '/images/landings/exhibitions.jpg',
   'unusual-theatres': '/images/landings/unusual-theatres.jpg',
-  'quest-tours': '/images/home/promo-museums.jpg',
-  'show-programs': '/images/home/promo-party.jpg',
-  'self-development': '/images/home/promo-museums.jpg',
-  'intimate-concerts': '/images/home/promo-concerts.jpg',
-  'improv-tribute': '/images/home/promo-party.jpg',
-  graduation: '/images/home/promo-dinner.jpg',
-  'international-womens-day': '/images/home/promo-dinner.jpg',
-  maslenitsa: '/images/home/promo-yards.jpg',
+  'quest-tours': '/images/landings/quest-tours.jpg',
+  'show-programs': '/images/landings/show-programs.jpg',
+  'self-development': '/images/landings/self-development.jpg',
+  'intimate-concerts': '/images/landings/intimate-concerts.jpg',
+  'improv-tribute': '/images/landings/improv-tribute.jpg',
+  graduation: '/images/landings/graduation.jpg',
+  'international-womens-day': '/images/landings/international-womens-day.jpg',
+  maslenitsa: '/images/landings/maslenitsa.jpg',
 };
 
 /**
