@@ -12,7 +12,7 @@ const UFA_DRU = '/images/venues/ufa/monument-druzhby.jpg';
 const UFA_GOST = '/images/venues/ufa/gostinyy-dvor.jpg';
 const UFA_LAL = '/images/venues/ufa/mechet-medrese-lyalya-tyul-pan.jpg';
 const UFA_KVAD = '/images/venues/ufa/art-kvadrat.jpg';
-const UFA_FONT = '/images/venues/ufa/fontan-sem-devushek.jpg';
+const UFA_FONT = '/images/venues/ufa/fontan-sem-devushek-r20261009.jpg';
 
 export const UFA_HUB_IMAGES: Record<string, string> = {
   'ufa-aibat-hallyar': '/images/venues/ufa/aibat-hallyar.jpg',
@@ -20,17 +20,17 @@ export const UFA_HUB_IMAGES: Record<string, string> = {
   'ufa-art-obyekt-tri-shurupa': '/images/venues/ufa/art-obyekt-tri-shurupa.jpg',
   'ufa-bashkirskiy-teatr-dramy-gafuri': '/images/venues/ufa/bashkirskiy-teatr-dramy-gafuri.jpg',
   'ufa-bashkirskiy-teatr-opery-i-baleta': '/images/venues/ufa/bashkirskiy-teatr-opery-i-baleta.jpg',
-  'ufa-dom-gubernatora': '/images/venues/ufa/dom-gubernatora.jpg',
+  'ufa-dom-gubernatora': '/images/venues/ufa/dom-gubernatora-r20261009.jpg',
   'ufa-dom-kommuna': '/images/venues/ufa/dom-kommuna.jpg',
   'ufa-dom-muzey-aksakova': '/images/venues/ufa/dom-muzey-aksakova.jpg',
-  'ufa-dom-muzey-lenina': '/images/venues/ufa/dom-muzey-lenina.jpg',
-  'ufa-dom-ponosovoy-mollo': '/images/venues/ufa/dom-ponosovoy-mollo.jpg',
+  'ufa-dom-muzey-lenina': '/images/venues/ufa/dom-muzey-lenina-r20261009.jpg',
+  'ufa-dom-ponosovoy-mollo': '/images/venues/ufa/dom-ponosovoy-mollo-r20261009.jpg',
   'ufa-dom-shamovyh': '/images/venues/ufa/dom-shamovyh.jpg',
   'ufa-dom-soyuzov': '/images/venues/ufa/dom-soyuzov.jpg',
-  'ufa-fontan-sem-devushek': '/images/venues/ufa/fontan-sem-devushek.jpg',
+  'ufa-fontan-sem-devushek': '/images/venues/ufa/fontan-sem-devushek-r20261009.jpg',
   'ufa-gostinyy-dvor': '/images/venues/ufa/gostinyy-dvor.jpg',
   'ufa-hudozhestvennyy-muzey-nesterova': '/images/venues/ufa/hudozhestvennyy-muzey-nesterova.jpg',
-  'ufa-kongress-holl-toratau': '/images/venues/ufa/kongress-holl-toratau.jpg',
+  'ufa-kongress-holl-toratau': '/images/venues/ufa/kongress-holl-toratau-r20261009.jpg',
   'ufa-kumpan-cafe': '/images/venues/ufa/kumpan-cafe.jpg',
   'ufa-matcha-komnata': '/images/venues/ufa/matcha-komnata.jpg',
   'ufa-mechet-ihlas': '/images/venues/ufa/mechet-ihlas.jpg',
@@ -40,7 +40,7 @@ export const UFA_HUB_IMAGES: Record<string, string> = {
   'ufa-muzey-arheologii-i-etnografii': '/images/venues/ufa/muzey-arheologii-i-etnografii.jpg',
   'ufa-muzey-boevoy-slavy': '/images/venues/ufa/muzey-boevoy-slavy.jpg',
   'ufa-muzey-roka-kinoteatr-rodina': '/images/venues/ufa/muzey-roka-kinoteatr-rodina.jpg',
-  'ufa-natsionalnyy-muzey': '/images/venues/ufa/natsionalnyy-muzey.jpg',
+  'ufa-natsionalnyy-muzey': '/images/venues/ufa/natsionalnyy-muzey-r20261009.jpg',
   'ufa-novaya-ufimskaya-naberezhnaya': '/images/venues/ufa/novaya-ufimskaya-naberezhnaya.jpg',
   'ufa-osobnyak-kosterina-i-chernikova': '/images/venues/ufa/osobnyak-kosterina-i-chernikova.jpg',
   'ufa-pamyatnik-akmulle': '/images/venues/ufa/pamyatnik-akmulle.jpg',
@@ -57,7 +57,7 @@ export const UFA_HUB_IMAGES: Record<string, string> = {
   'ufa-pamyatnik-zemlyakam-ushedshim-na-front': '/images/venues/ufa/pamyatnik-zemlyakam-ushedshim-na-front.jpg',
   'ufa-park-mazhita-gafuri': '/images/venues/ufa/park-mazhita-gafuri.jpg',
   'ufa-park-pobedy': '/images/venues/ufa/park-pobedy.jpg',
-  'ufa-pervaya-sobornaya-mechet': '/images/venues/ufa/pervaya-sobornaya-mechet.jpg',
+  'ufa-pervaya-sobornaya-mechet': '/images/venues/ufa/pervaya-sobornaya-mechet-r20261009.jpg',
   'ufa-pokrovskiy-hram': '/images/venues/ufa/pokrovskiy-hram.jpg',
   'ufa-rozhdestvo-bogoroditskiy-hram': '/images/venues/ufa/rozhdestvo-bogoroditskiy-hram.jpg',
   'ufa-sad-aksakova': '/images/venues/ufa/sad-aksakova.jpg',

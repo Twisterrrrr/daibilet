@@ -923,7 +923,7 @@ export const OMSK_DAY_ROUTE_PRESETS: any[] = [
       'День для залов: Эрмитаж-Сибирь, музей Врубеля, Никольский казачий, кристаллы Валиханова и закат у «Сенкевича».',
     travelVector: 'Музеи центра и бульвар Валиханова',
     timingNote: 'Около 4 часов; билеты в Эрмитаж-Сибирь берите заранее на сайте Врубеля.',
-    coverImageUrl: '/images/venues/omsk/ermitazh-sibir.jpg',
+    coverImageUrl: '/images/venues/omsk/ermitazh-sibir-r20261009.jpg',
     stops: [
       {
         name: 'Эрмитаж-Сибирь',
