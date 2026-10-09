@@ -6,7 +6,7 @@
  * центрируется по высоте, где широкий кадр не требует якоря на линию глаз.
  */
 
-const DEFAULT_EVENT_HERO_OBJECT_POSITION = 'center 18%';
+const DEFAULT_EVENT_HERO_OBJECT_POSITION = 'center 25%';
 
 /** 16:9 card: типичный хедшот держит глаза+лоб лучше, чем center 50%. */
 const DEFAULT_EVENT_CARD_OBJECT_POSITION = 'center 20%';
