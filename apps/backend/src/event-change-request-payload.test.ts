@@ -4,7 +4,7 @@ import {
   assertEventChangeRequestPayload,
   EventChangeRequestPayloadValidationError,
   validateEventChangeRequestPayload,
-} from './event-change-request-payload';
+} from './event-change-request-payload.js';
 
 test('accepts and normalizes a content update payload', () => {
   const result = validateEventChangeRequestPayload('CONTENT_UPDATE', {

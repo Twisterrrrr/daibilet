@@ -4,7 +4,7 @@ import {
   resolvePublicVenuesForSessions,
   publicPublishedVenuesByCityId,
   mergeCityPageVenues,
-} from './public-venue-read';
+} from './public-venue-read.js';
 import {
   buildCityHubSeoTitle,
   buildPublicDestinationRowsFromSessions,
@@ -13,26 +13,26 @@ import {
   lookupDestinationCatalogSessions,
   matchStandaloneCityBySlug,
   publicDestinationFromSession,
-} from './public-destination';
-import { buildPublicLandings } from './public-city-landings';
-import { createDb } from './db';
-import { getPublicCatalogSessions, getPublicCatalogSessionsSoft, resolveCatalogSessionsByDestinationKeys } from './public-catalog.dto';
-import { toPublicCatalogListItem } from './public-catalog-list-item';
-import { pickCityHubFeedSessions } from './city-hub-session-rank';
-import { resolveProjectRoot } from './project-root';
+} from './public-destination.js';
+import { buildPublicLandings } from './public-city-landings.js';
+import { createDb } from './db.js';
+import { getPublicCatalogSessions, getPublicCatalogSessionsSoft, resolveCatalogSessionsByDestinationKeys } from './public-catalog.dto.js';
+import { toPublicCatalogListItem } from './public-catalog-list-item.js';
+import { pickCityHubFeedSessions } from './city-hub-session-rank.js';
+import { resolveProjectRoot } from './project-root.js';
 import {
   buildRegionHubEnrichment,
   buildCityRegionNearby,
   findRegionHubByCenterCity,
   clearRegionHubCaches,
-} from './region-hub';
-import type { DestinationType } from './types/common';
+} from './region-hub.js';
+import type { DestinationType } from './types/common.js';
 import type {
   PublicCityPageDto,
   PublicDestinationDto,
   PublicLandingDto,
   PublicSessionDto,
-} from './types/public';
+} from './types/public.js';
 
 const MIN_DISPLAY_PRICE_RUB = 100;
 const PUBLIC_CITY_CACHE_MS = 5 * 60 * 1000;

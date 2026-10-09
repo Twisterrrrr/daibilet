@@ -3,8 +3,8 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { loadCityRoutingConfig } from './city-routing-config';
-import { resolveCityRoutingPath, resolveProjectRoot } from './project-root';
+import { loadCityRoutingConfig } from './city-routing-config.js';
+import { resolveCityRoutingPath, resolveProjectRoot } from './project-root.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const expectedRoot = path.resolve(here, '../../..');

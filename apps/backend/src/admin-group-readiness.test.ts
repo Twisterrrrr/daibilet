@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { finalizeGroupedAdminReadiness } from './dto';
+import { finalizeGroupedAdminReadiness } from './dto.js';
 
 const noFutureIssue = {
   code: 'NO_FUTURE_SESSIONS',

@@ -1,4 +1,4 @@
-import type { JsonRecord, Readiness } from './common';
+import type { JsonRecord, Readiness } from './common.js';
 
 export type LandingMatchStatus = 'AUTO' | 'PINNED' | 'EXCLUDED' | 'REVIEW';
 

@@ -1,11 +1,11 @@
-import { buildPublicVenuePage, buildPublicVenuesCatalog, buildPublicVenueEventCounts } from './public-venue-read';
-import { createDb } from './db';
-import { resolveProjectRoot } from './project-root';
+import { buildPublicVenuePage, buildPublicVenuesCatalog, buildPublicVenueEventCounts } from './public-venue-read.js';
+import { createDb } from './db.js';
+import { resolveProjectRoot } from './project-root.js';
 import type {
   PublicVenueDto,
   PublicVenuePageDto,
   PublicVenuesDto,
-} from './types/public';
+} from './types/public.js';
 
 const projectRoot = resolveProjectRoot(import.meta.url);
 

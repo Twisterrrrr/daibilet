@@ -1,4 +1,4 @@
-import type { SourceCode } from './common';
+import type { SourceCode } from './common.js';
 
 export type ExternalOrderStatus =
   | 'created'

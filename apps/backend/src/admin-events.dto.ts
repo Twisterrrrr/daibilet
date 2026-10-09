@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { buildAdminEventDetail, buildAdminEventsList } from './dto';
-import { createDb } from './db';
+import { buildAdminEventDetail, buildAdminEventsList } from './dto.js';
+import { createDb } from './db.js';
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 

@@ -5,7 +5,7 @@ import {
   matchesLandingRule,
   matchesLandingSchedule,
   matchingLandingSlugs,
-} from './landing-rules';
+} from './landing-rules.js';
 
 test('matches a focused river landing and rejects unrelated transport', () => {
   const river = findLandingRule('river-cruises');

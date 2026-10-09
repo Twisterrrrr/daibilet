@@ -1,4 +1,4 @@
-import type { PurchaseFields, Readiness, ReadinessIssue, SeoFields, Severity, SourceCode } from './common';
+import type { PurchaseFields, Readiness, ReadinessIssue, SeoFields, Severity, SourceCode } from './common.js';
 
 export interface AdminDashboardLaunchMetrics {
   groupedEvents: number;

@@ -4,7 +4,7 @@ import {
   assertEventChangeRequestTransition,
   EventChangeRequestTransitionError,
   validateEventChangeRequestTransition,
-} from './event-change-request-state';
+} from './event-change-request-state.js';
 
 test('allows supplier to submit a permitted draft content change', () => {
   const result = validateEventChangeRequestTransition({

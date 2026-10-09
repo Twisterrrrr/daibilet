@@ -1,8 +1,8 @@
 import { randomBytes } from 'node:crypto';
 import { prisma } from '@daibilet/db';
 
-import { sendReviewRequestEmail } from './mail';
-import { isConfirmedOrderStatus, normalizeEmail } from './review-verification';
+import { sendReviewRequestEmail } from './mail.js';
+import { isConfirmedOrderStatus, normalizeEmail } from './review-verification.js';
 
 export type SendReviewRequestsOptions = {
   dryRun?: boolean;

@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { resolveCityTimeZone } from './city-timezone';
-import { formatDate, formatTime } from './public-datetime';
+import { resolveCityTimeZone } from './city-timezone.js';
+import { formatDate, formatTime } from './public-datetime.js';
 
 /**
  * Event page / catalog display time = local wall-clock of event city

@@ -1,5 +1,5 @@
-import { createDb } from './db';
-import { resolveProjectRoot } from './project-root';
+import { createDb } from './db.js';
+import { resolveProjectRoot } from './project-root.js';
 
 export type PublicEventFreshnessRow = { slug: string; updatedAt: Date | string };
 export type PublicEventFreshnessMap = Map<string, Date>;

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { buildPublicLandings } from './public-city-landings';
+import { buildPublicLandings } from './public-city-landings.js';
 
 test('buildPublicLandings rematches city sessions and drops Екатеринбург concert false river hits', () => {
   const sessions = [

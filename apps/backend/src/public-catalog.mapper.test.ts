@@ -5,8 +5,8 @@ import {
   mapGroupedPublicSession,
   pickCatalogSubcategories,
   type PublicCatalogMappingRow,
-} from './public-catalog.mapper';
-import { prismaWallTimeToIso } from './public-datetime';
+} from './public-catalog.mapper.js';
+import { prismaWallTimeToIso } from './public-datetime.js';
 
 function futureSlotIso(hoursFromNow = 48): string {
   return new Date(Date.now() + hoursFromNow * 3_600_000).toISOString();

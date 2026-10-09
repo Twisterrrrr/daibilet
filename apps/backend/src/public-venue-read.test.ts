@@ -14,7 +14,7 @@ import {
   resolvePublicVenueKind,
   scoreRelatedVenueCandidate,
   venueTextKeysFuzzyMatch,
-} from './public-venue-read';
+} from './public-venue-read.js';
 
 test('venue list DTO keeps future sessions distinct from all-time events', () => {
   const venue = mapPublicVenueListItem({

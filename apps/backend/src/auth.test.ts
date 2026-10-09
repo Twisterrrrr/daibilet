@@ -8,7 +8,7 @@ import {
   isAuthorizedAdminRequest,
   isProtectedPath,
   type AdminAuthConfig,
-} from './auth';
+} from './auth.js';
 
 function mockRequest(authorization?: string): IncomingMessage {
   return { headers: authorization ? { authorization } : {} } as IncomingMessage;

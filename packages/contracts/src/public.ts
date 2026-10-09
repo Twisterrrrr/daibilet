@@ -8,8 +8,8 @@ import type {
   Readiness,
   SeoFields,
   TimeBucket,
-} from './common';
-import type { LandingContentBlockDto } from './landing';
+} from './common.js';
+import type { LandingContentBlockDto } from './landing.js';
 
 export interface PublicStatsCounts {
   events: number;

@@ -1,8 +1,8 @@
-import { sendPublicJson } from './http';
-import { matchPath, type RouteContext } from './routing';
-import type { PublicCityPageDto } from './types/public';
-import type { PublicDestinationsDto } from './public-city.dto';
-import type { TypedRouteHandler } from './validated-handler';
+import { sendPublicJson } from './http.js';
+import { matchPath, type RouteContext } from './routing.js';
+import type { PublicCityPageDto } from './types/public.js';
+import type { PublicDestinationsDto } from './public-city.dto.js';
+import type { TypedRouteHandler } from './validated-handler.js';
 
 export interface PublicCityHandlerDependencies {
   enabled: boolean;

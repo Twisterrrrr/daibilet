@@ -1,29 +1,29 @@
-import { resolveCityTimeZone } from './city-timezone';
-import { matchingLandingSlugs } from './landing-rules';
+import { resolveCityTimeZone } from './city-timezone.js';
+import { matchingLandingSlugs } from './landing-rules.js';
 import {
   isFutureSlotStart,
   isOpenDateCatalogRow,
   isPublicSalesStatusBlocked,
   isPublicSessionRowOnSale,
-} from './catalog-availability';
-import { resolveEditorialEventImage } from './event-cover-images';
-import { pickFirstUsableEventImageUrl } from './event-image-url';
+} from './catalog-availability.js';
+import { resolveEditorialEventImage } from './event-cover-images.js';
+import { pickFirstUsableEventImageUrl } from './event-image-url.js';
 import {
   buildProviderWidgetUrl,
   providerForSource,
   purchaseInfo,
   resolveSessionPurchaseExternalId,
-} from './provider-purchase';
-import { normalizeStartsAt, parseSessionStartsAt } from './public-datetime';
+} from './provider-purchase.js';
+import { normalizeStartsAt, parseSessionStartsAt } from './public-datetime.js';
 import { formatPublicEventTitle } from './event-title-normalize.ts';
-import { loadCityRoutingConfig } from './city-routing-config';
+import { loadCityRoutingConfig } from './city-routing-config.js';
 import {
   PUBLIC_CATALOG_THIN_MIN_EVENTS,
   isFoldingRegionalTown,
   isSubjectCapitalCity,
-} from './public-destination';
-import type { DestinationType, TimeBucket } from './types/common';
-import type { PublicSessionDto } from './types/public';
+} from './public-destination.js';
+import type { DestinationType, TimeBucket } from './types/common.js';
+import type { PublicSessionDto } from './types/public.js';
 
 export interface PublicCatalogSlotRow {
   id?: string | null;

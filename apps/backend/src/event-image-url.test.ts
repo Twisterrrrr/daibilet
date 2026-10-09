@@ -5,7 +5,7 @@ import {
   isUsableCatalogImageUrl,
   pickFirstUsableEventImageUrl,
   stabilizeTeplohodImageUrl,
-} from './event-image-url';
+} from './event-image-url.js';
 
 const SIGNED_S3 =
   'https://s3.twcstorage.ru/teplohod-private/images/cache/Events/Event498/38b30dabbe-1.jpg'

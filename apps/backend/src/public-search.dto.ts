@@ -1,8 +1,8 @@
 import { prisma } from '@daibilet/db';
-import { publicVenueSlug } from './public-venue-read';
-import { matchSearchGeoHits } from './search-geo';
-import { expandSearchQuery } from './search-synonyms';
-import { formatPublicVenueTitle, isFortressComplexName } from './venue-normalize';
+import { publicVenueSlug } from './public-venue-read.js';
+import { matchSearchGeoHits } from './search-geo.js';
+import { expandSearchQuery } from './search-synonyms.js';
+import { formatPublicVenueTitle, isFortressComplexName } from './venue-normalize.js';
 import {
   collapsePublicSearchVenueRows,
   isMuseumLikeSearchVenue,

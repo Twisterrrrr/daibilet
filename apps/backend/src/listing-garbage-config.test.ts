@@ -9,12 +9,12 @@ import {
   textHasListingGarbage,
   sanitizePartnerVenueDisplayTitle,
   isFortressComplexName,
-} from './listing-garbage-config';
+} from './listing-garbage-config.js';
 import {
   formatListingAuditTelegramMessage,
   scanListingRows,
-} from './listing-garbage-audit';
-import { escapeTelegramHtml } from './telegram';
+} from './listing-garbage-audit.js';
+import { escapeTelegramHtml } from './telegram.js';
 
 test('STOP_WORDS_REGEXP covers CTA / HTML / encoding (not empty /[]/)', () => {
   assert.ok(STOP_WORDS_REGEXP.length >= 6);

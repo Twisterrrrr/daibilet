@@ -1,7 +1,7 @@
-import { sendPublicJson } from './http';
-import { matchPath, type RouteContext } from './routing';
-import type { PublicVenuePageDto, PublicVenuesDto } from './types/public';
-import type { TypedRouteHandler } from './validated-handler';
+import { sendPublicJson } from './http.js';
+import { matchPath, type RouteContext } from './routing.js';
+import type { PublicVenuePageDto, PublicVenuesDto } from './types/public.js';
+import type { TypedRouteHandler } from './validated-handler.js';
 
 export interface PublicVenueHandlerDependencies {
   enabled: boolean;

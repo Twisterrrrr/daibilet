@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { expandSearchQuery } from './search-synonyms';
+import { expandSearchQuery } from './search-synonyms.js';
 import {
   canonicalizeRegionChildCitySearch,
   hubHrefSlug,
   matchSearchGeoHits,
   parseRegionChildCityQuery,
-} from './search-geo';
+} from './search-geo.js';
 
 function labels(query: string, limit = 2): string[] {
   return matchSearchGeoHits(expandSearchQuery(query), limit).map((hit) => hit.label);

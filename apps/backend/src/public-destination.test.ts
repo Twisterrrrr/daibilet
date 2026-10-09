@@ -9,7 +9,7 @@ import {
   isVisibleOnCitiesCatalog,
   matchStandaloneCityBySlug,
   publicDestinationFromSession,
-} from './public-destination';
+} from './public-destination.js';
 
 test('countDistinctSessionVenues prefers venueId over slug/name', () => {
   const count = countDistinctSessionVenues([

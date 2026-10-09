@@ -8,7 +8,7 @@ import {
   matchesPublicEventSlug,
   mapTepPublicSlugIds,
   publicSlug,
-} from './public-event.dto';
+} from './public-event.dto.js';
 
 test('truncated Teplohod slugs without an ID tail resolve through the bounded map', () => {
   const rows = [

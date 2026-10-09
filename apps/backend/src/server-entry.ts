@@ -1,28 +1,28 @@
 import type { Server } from 'node:http';
-import { buildAdminEventChangeRequestDetailDto, buildAdminEventChangeRequestsDto } from './admin-event-change-requests.dto';
-import { createAdminEventChangeRequestsRouteHandler } from './admin-event-change-requests-handler';
-import { createAdminEventsRouteHandler } from './admin-events-handler';
-import { createAdminEventsReadRouteHandler } from './admin-events-read-handler';
-import { buildAdminEventDetailDto, buildAdminEventsListDto } from './admin-events.dto';
-import { applyApprovedEventChangeRequest } from './event-change-request-applier';
-import { reviewEventChangeRequest } from './event-change-request-review';
-import { createAdminLandingsRouteHandler } from './admin-landings-handler';
-import { createAdminOrdersRouteHandler } from './admin-orders-handler';
-import { createAdminOrdersReadRouteHandler } from './admin-orders-read-handler';
-import { buildAdminOrdersListDto } from './admin-orders.dto';
-import { createAdminAuthConfig } from './auth';
-import { readBackendEnv } from './env';
-import { updateAdminEventOverride, updateAdminLandingMatch, upsertAdminOrderTicket } from './dto';
-import { buildPublicCatalogDto, clearPublicCatalogDtoCache, getPublicCatalogSessions } from './public-catalog.dto';
-import { clearPublicArticlesDtoCache } from './public-articles.dto';
-import { createPublicCatalogRouteHandler } from './public-catalog-handler';
-import { buildPublicCityDto, buildPublicDestinationsDto, clearPublicCityDtoCache } from './public-city.dto';
-import { createPublicCityRouteHandler } from './public-city-handler';
-import { buildPublicEventDto, clearPublicEventDtoCache } from './public-event.dto';
-import { createPublicEventRouteHandler } from './public-event-handler';
-import { buildPublicVenueDto, buildPublicVenuesDto, buildPublicVenueEventCountsDto, clearPublicVenueDtoCache } from './public-venue.dto';
-import { createPublicVenueRouteHandler } from './public-venue-handler';
-import { createPublicReadStackWarmer } from './public-warmup';
+import { buildAdminEventChangeRequestDetailDto, buildAdminEventChangeRequestsDto } from './admin-event-change-requests.dto.js';
+import { createAdminEventChangeRequestsRouteHandler } from './admin-event-change-requests-handler.js';
+import { createAdminEventsRouteHandler } from './admin-events-handler.js';
+import { createAdminEventsReadRouteHandler } from './admin-events-read-handler.js';
+import { buildAdminEventDetailDto, buildAdminEventsListDto } from './admin-events.dto.js';
+import { applyApprovedEventChangeRequest } from './event-change-request-applier.js';
+import { reviewEventChangeRequest } from './event-change-request-review.js';
+import { createAdminLandingsRouteHandler } from './admin-landings-handler.js';
+import { createAdminOrdersRouteHandler } from './admin-orders-handler.js';
+import { createAdminOrdersReadRouteHandler } from './admin-orders-read-handler.js';
+import { buildAdminOrdersListDto } from './admin-orders.dto.js';
+import { createAdminAuthConfig } from './auth.js';
+import { readBackendEnv } from './env.js';
+import { updateAdminEventOverride, updateAdminLandingMatch, upsertAdminOrderTicket } from './dto.js';
+import { buildPublicCatalogDto, clearPublicCatalogDtoCache, getPublicCatalogSessions } from './public-catalog.dto.js';
+import { clearPublicArticlesDtoCache } from './public-articles.dto.js';
+import { createPublicCatalogRouteHandler } from './public-catalog-handler.js';
+import { buildPublicCityDto, buildPublicDestinationsDto, clearPublicCityDtoCache } from './public-city.dto.js';
+import { createPublicCityRouteHandler } from './public-city-handler.js';
+import { buildPublicEventDto, clearPublicEventDtoCache } from './public-event.dto.js';
+import { createPublicEventRouteHandler } from './public-event-handler.js';
+import { buildPublicVenueDto, buildPublicVenuesDto, buildPublicVenueEventCountsDto, clearPublicVenueDtoCache } from './public-venue.dto.js';
+import { createPublicVenueRouteHandler } from './public-venue-handler.js';
+import { createPublicReadStackWarmer } from './public-warmup.js';
 import {
   db,
   handleRequest,
@@ -30,9 +30,9 @@ import {
   registerPublicCacheInvalidator,
   registerPublicCacheWarmer,
   startServer,
-} from './server';
-import { createAdminReviewsRouteHandler, createPublicReviewsRouteHandler } from './reviews-handler';
-import { createValidatedHandler } from './validated-handler';
+} from './server.js';
+import { createAdminReviewsRouteHandler, createPublicReviewsRouteHandler } from './reviews-handler.js';
+import { createValidatedHandler } from './validated-handler.js';
 
 const env = readBackendEnv();
 const host = '127.0.0.1';

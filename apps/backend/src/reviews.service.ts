@@ -1,11 +1,11 @@
 import { randomBytes } from 'node:crypto';
 import { prisma, type ReviewStatus } from '@daibilet/db';
 
-import { sendReviewVerifyEmail } from './mail';
-import { canAcceptReviews } from './review-capability';
-import { formatReviewDisplayName, maskPurchaseRef } from './review-display';
-import { buildRatingSummary, type RatingSummary } from './review-rating';
-import { normalizeEmail, verifyPurchaseForReview } from './review-verification';
+import { sendReviewVerifyEmail } from './mail.js';
+import { canAcceptReviews } from './review-capability.js';
+import { formatReviewDisplayName, maskPurchaseRef } from './review-display.js';
+import { buildRatingSummary, type RatingSummary } from './review-rating.js';
+import { normalizeEmail, verifyPurchaseForReview } from './review-verification.js';
 
 function smtpConfigured(): boolean {
   return Boolean(process.env.SMTP_HOST && process.env.SMTP_FROM);

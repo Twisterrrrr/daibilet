@@ -1,11 +1,11 @@
-import { loadCityRoutingConfig } from './city-routing-config';
+import { loadCityRoutingConfig } from './city-routing-config.js';
 import {
   createSearchGeoMatcher,
   type CityRoutingConfig,
   type SearchGeoHit,
-} from './search-geo-match';
+} from './search-geo-match.js';
 
-export type { SearchGeoHit, SearchGeoKind } from './search-geo-match';
+export type { SearchGeoHit, SearchGeoKind } from './search-geo-match.js';
 export {
   canonicalizeRegionChildCitySearch,
   childCityScopeLabel,
@@ -16,7 +16,7 @@ export {
   parseRegionChildCityQuery,
   publicCitySlug,
   regionChildCityHref,
-} from './search-geo-match';
+} from './search-geo-match.js';
 
 const routing = loadCityRoutingConfig(import.meta.url) as CityRoutingConfig;
 const matchCached = createSearchGeoMatcher(routing);

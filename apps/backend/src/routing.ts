@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import { requestUrl, routeKey } from './http';
+import { requestUrl, routeKey } from './http.js';
 
 export interface RouteContext {
   request: IncomingMessage;

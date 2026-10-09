@@ -1,4 +1,4 @@
-import { formatPublicVenueTitle, isFortressComplexName } from './venue-normalize';
+import { formatPublicVenueTitle, isFortressComplexName } from './venue-normalize.js';
 
 export type PublicSearchVenueRow = {
   id: string;

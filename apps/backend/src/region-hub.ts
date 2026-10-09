@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import type { PublicDestinationDto, PublicSessionDto } from './types/public';
+import type { PublicDestinationDto, PublicSessionDto } from './types/public.js';
 
 /** Live region hub tier by child event count (зеркало `@daibilet/contracts/common`). */
 export type RegionLiveTier = 'A' | 'B' | 'C';

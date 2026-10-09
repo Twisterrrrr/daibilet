@@ -1,8 +1,8 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import type { AdminAuthConfig } from './auth';
-import { isAuthorizedAdminRequest, isProtectedPath } from './auth';
-import { sendAuthRequired, sendJson } from './http';
-import { createRouteContext, type RouteContext } from './routing';
+import type { AdminAuthConfig } from './auth.js';
+import { isAuthorizedAdminRequest, isProtectedPath } from './auth.js';
+import { sendAuthRequired, sendJson } from './http.js';
+import { createRouteContext, type RouteContext } from './routing.js';
 import {
   adminEventsQuerySchema,
   adminOrdersQuerySchema,
@@ -10,8 +10,8 @@ import {
   paginationQuerySchema,
   publicCatalogQuerySchema,
   searchQuerySchema,
-} from './types/schemas';
-import { isRequestValidationError, parseSearchParams } from './validation';
+} from './types/schemas.js';
+import { isRequestValidationError, parseSearchParams } from './validation.js';
 
 export type AsyncRequestHandler = (request: IncomingMessage, response: ServerResponse) => void | Promise<void>;
 export type TypedRouteHandler = (context: RouteContext) => boolean | Promise<boolean>;

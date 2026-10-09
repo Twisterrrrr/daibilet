@@ -5,8 +5,8 @@ import {
   matchesCatalogDayRange,
   sessionMatchesCatalogDayRange,
   sessionMatchesCatalogPresetDate,
-} from './public-catalog-date-filter';
-import type { PublicSessionDto } from './types/public';
+} from './public-catalog-date-filter.js';
+import type { PublicSessionDto } from './types/public.js';
 
 function baseSession(overrides: Partial<PublicSessionDto> = {}): PublicSessionDto {
   return {

@@ -5,7 +5,7 @@ import {
   adminEventGroupKeySql,
   buildAdminEventGroupKey,
   invalidateAdminEventsSqlReadModelCache,
-} from './admin-events-sql-read-model';
+} from './admin-events-sql-read-model.js';
 
 test('buildAdminEventGroupKey normalizes source/title/city/venue', () => {
   const key = buildAdminEventGroupKey({

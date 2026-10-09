@@ -1,5 +1,5 @@
 import pg from 'pg';
-import type { DbClient, QueryResult } from './types/db';
+import type { DbClient, QueryResult } from './types/db.js';
 
 interface PgPool {
   query<Row = Record<string, unknown>>(text: string, params?: readonly unknown[]): Promise<QueryResult<Row>>;

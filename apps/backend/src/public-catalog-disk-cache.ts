@@ -7,8 +7,8 @@ import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import type { PublicSessionDto } from './types/public';
-import { resolveProjectRoot } from './project-root';
+import type { PublicSessionDto } from './types/public.js';
+import { resolveProjectRoot } from './project-root.js';
 
 /** Serializable legacy indexes (session id pointers; hydrate to Maps in dto.js). */
 export type PublicCatalogDiskIndexes = {

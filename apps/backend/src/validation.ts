@@ -1,6 +1,6 @@
 import type { IncomingMessage } from 'node:http';
 import { z } from 'zod';
-import { readJsonBody } from './http';
+import { readJsonBody } from './http.js';
 
 export interface ValidationErrorDto {
   error: 'validation_error';

@@ -10,7 +10,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { isConfirmedOrderStatus } from './review-verification';
+import { isConfirmedOrderStatus } from './review-verification.js';
 
 describe('purchase verification rules', () => {
   it('accepts TC done/paid/confirmed tokens', () => {

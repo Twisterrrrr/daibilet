@@ -5,7 +5,7 @@ import {
   extractTcEventIdFromPurchaseUrl,
   pickPrimarySessionPurchase,
   shouldSynthesizeWidgetOnlySession,
-} from './public-event-widget-fallback';
+} from './public-event-widget-fallback.js';
 
 /**
  * Regression: «Особо опасен» / past dated TC must not become fake open-date.

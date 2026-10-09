@@ -1,8 +1,8 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { buildPublicArticlePage, buildPublicArticlesList } from './dto';
-import { createDb } from './db';
+import { buildPublicArticlePage, buildPublicArticlesList } from './dto.js';
+import { createDb } from './db.js';
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const ARTICLES_CACHE_MS = 5 * 60 * 1000;

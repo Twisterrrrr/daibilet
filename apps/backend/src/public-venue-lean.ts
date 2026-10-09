@@ -2,8 +2,8 @@ import type { Prisma, VenueKind } from '@daibilet/db';
 import { prisma } from '@daibilet/db';
 import { join } from '@daibilet/db/sql';
 
-import { isUsableCatalogImageUrl, pickFirstUsableEventImageUrl } from './event-image-url';
-import { CONTENT_PLACE_DB_KINDS } from './public-venue-hub-gate';
+import { isUsableCatalogImageUrl, pickFirstUsableEventImageUrl } from './event-image-url.js';
+import { CONTENT_PLACE_DB_KINDS } from './public-venue-hub-gate.js';
 
 /** Non-draft / non-hidden events for venue list tiles (no session hydrate). */
 export const ACTIVE_VENUE_EVENT_WHERE = {

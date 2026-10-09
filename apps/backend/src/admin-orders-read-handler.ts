@@ -1,6 +1,6 @@
-import { sendJson } from './http';
-import type { RouteContext } from './routing';
-import type { TypedRouteHandler } from './validated-handler';
+import { sendJson } from './http.js';
+import type { RouteContext } from './routing.js';
+import type { TypedRouteHandler } from './validated-handler.js';
 
 export interface AdminOrdersReadHandlerDependencies {
   enabled: boolean;

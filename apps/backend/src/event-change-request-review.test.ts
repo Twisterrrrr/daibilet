@@ -6,7 +6,7 @@ import {
   type EventChangeRequestReviewClient,
   type EventChangeRequestReviewRecord,
   type EventChangeRequestReviewTransaction,
-} from './event-change-request-review';
+} from './event-change-request-review.js';
 
 test('approves submitted request and writes audit log', async () => {
   const { client, calls } = createMockClient({

@@ -9,8 +9,8 @@ import {
   PUBLIC_SALES_BLOCKED_STATUS_SQL,
   isPublicSessionRowOnSale,
   isSaleableForPublicCatalog,
-} from './catalog-availability';
-import { resolveCityTimeZone } from './city-timezone';
+} from './catalog-availability.js';
+import { resolveCityTimeZone } from './city-timezone.js';
 import {
   loadPublicCatalogDiskCacheWithStat,
   resolveCatalogRebuildLockPath,
@@ -18,33 +18,33 @@ import {
   resolveCatalogRebuildScriptPath,
   writePublicCatalogDiskCache,
   type PublicCatalogDiskIndexes,
-} from './public-catalog-disk-cache';
+} from './public-catalog-disk-cache.js';
 import {
   dedupeCrossSourceCatalogSessions,
   regroupMappedPublicCatalogSessions,
   sessionHasCoverImage,
-} from './public-catalog-grouping';
-import { isPublicCatalogExcludedMuseumAdmission } from './public-catalog-exclusions';
-import { formatDate, formatTime, normalizeStartsAt, timeBucket } from './public-datetime';
-import { mapGroupedPublicSession, collectSeparateCityHubNames, pickCatalogSubcategories } from './public-catalog.mapper';
-import { findLandingRule } from './landing-rules';
+} from './public-catalog-grouping.js';
+import { isPublicCatalogExcludedMuseumAdmission } from './public-catalog-exclusions.js';
+import { formatDate, formatTime, normalizeStartsAt, timeBucket } from './public-datetime.js';
+import { mapGroupedPublicSession, collectSeparateCityHubNames, pickCatalogSubcategories } from './public-catalog.mapper.js';
+import { findLandingRule } from './landing-rules.js';
 import {
   isOpenDateCatalogSession,
   sessionMatchesCatalogDayRange,
   sessionMatchesCatalogPresetDate,
-} from './public-catalog-date-filter';
+} from './public-catalog-date-filter.js';
 import {
   dedupeCatalogNearDuplicates,
   seededNearBiasedShuffleSessions,
   spreadCatalogSessionsByCoverImage,
-} from './public-catalog-spread';
-import { LIST_SLOT_PREVIEW_LIMIT, toPublicCatalogListItem } from './public-catalog-list-item';
-import { providerForSource } from './provider-purchase';
-import { resolveProjectRoot } from './project-root';
-import type { PublicCatalogMappingRow } from './public-catalog.mapper';
-import type { PublicCatalogDto, PublicSessionDto } from './types/public';
-import type { PublicCatalogQuery } from './types/schemas';
-import type { PurchaseProvider } from './types/common';
+} from './public-catalog-spread.js';
+import { LIST_SLOT_PREVIEW_LIMIT, toPublicCatalogListItem } from './public-catalog-list-item.js';
+import { providerForSource } from './provider-purchase.js';
+import { resolveProjectRoot } from './project-root.js';
+import type { PublicCatalogMappingRow } from './public-catalog.mapper.js';
+import type { PublicCatalogDto, PublicSessionDto } from './types/public.js';
+import type { PublicCatalogQuery } from './types/schemas.js';
+import type { PurchaseProvider } from './types/common.js';
 
 const MIN_DISPLAY_PRICE_RUB = 100;
 const PUBLIC_CATALOG_CACHE_MS = 5 * 60 * 1000;

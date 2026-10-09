@@ -4,9 +4,9 @@ import {
   dedupeCrossSourceCatalogSessions,
   regroupMappedPublicCatalogSessions,
   sessionHasCoverImage,
-} from './public-catalog-grouping';
-import { isPublicCatalogExcludedMuseumAdmission } from './public-catalog-exclusions';
-import type { PublicSessionDto } from './types/public';
+} from './public-catalog-grouping.js';
+import { isPublicCatalogExcludedMuseumAdmission } from './public-catalog-exclusions.js';
+import type { PublicSessionDto } from './types/public.js';
 
 function session(overrides: Partial<PublicSessionDto>): PublicSessionDto {
   return {
