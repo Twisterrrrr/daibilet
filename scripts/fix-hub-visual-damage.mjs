@@ -1,10 +1,13 @@
 /**
- * Detect + auto-unflip upside-down venue bases; flag collage/clone suspects.
+ * Flag brightness, collage and clone suspects for visual review.
+ * Brightness is not an orientation classifier: snow, interiors and reflections
+ * can be brighter at the bottom of a correctly oriented photo.
  * Source of truth: apps/public/public/images/venues (mirrors to apps/web).
  *
- *   node scripts/fix-hub-visual-damage.mjs --cities=rostov-na-donu,omsk,tyumen,penza,chelyabinsk
+ *   node scripts/fix-hub-visual-damage.mjs --cities=rostov-na-donu,omsk,tyumen,penza,chelyabinsk --dry-run
  *   node scripts/fix-hub-visual-damage.mjs --cities=omsk --dry-run
- *   node scripts/fix-hub-visual-damage.mjs --unflip-only
+ * The script never applies pixel changes. Restore reviewed originals or install
+ * individually reviewed generated assets instead.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -43,6 +46,10 @@ const cityFilter = citiesArg
       'tver',
     ];
 const dryRun = process.argv.includes('--dry-run');
+if (!dryRun) {
+  console.error('Visual review required. Run with --dry-run; automatic brightness-based image rotation is disabled.');
+  process.exit(2);
+}
 const unflipOnly = process.argv.includes('--unflip-only');
 /** Bottom brighter than top by this much → likely upside-down outdoors. */
 const UPSIDE_DELTA = 22;
@@ -171,7 +178,6 @@ async function processCity(city) {
   const unflipped = [];
   for (const row of upside) {
     if (dryRun) {
-      unflipped.push(row.stem);
       continue;
     }
     const src = path.join(dir, `${row.stem}.jpg`);
