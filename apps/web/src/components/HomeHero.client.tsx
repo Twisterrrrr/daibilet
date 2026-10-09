@@ -18,7 +18,7 @@ import {
   homeHeroObjectPositionClass,
 } from '@/lib/home-hero-images';
 import { normalizeKnownCitySlug } from '@/lib/landing-routes';
-import { HERO_QUICK_CHIPS } from '@/lib/home-scenarios';
+import { HERO_QUICK_CHIPS, buildHomeHeroQuickChips } from '@/lib/home-scenarios';
 
 const HERO_DATE_OPTIONS = [
   { value: 'all', label: 'Любая дата' },
@@ -106,6 +106,15 @@ export function HomeHero({
     normalizeKnownCitySlug(selectedDestination?.sourceSlug) ||
     (destination !== 'all' ? normalizeKnownCitySlug(destination) || destination : null) ||
     (selectedCity?.cityReady === false || !selectedCity ? ssrCitySlug : null);
+
+  // City-specific chips: hub landings + categories with events
+  const heroChips = buildHomeHeroQuickChips({
+    citySlug,
+    landings,
+    hubTags: selectedDestination?.hubTags || null,
+    categories: selectedDestination?.categories || null,
+  });
+  const chips = heroChips.length > 0 ? heroChips : HERO_QUICK_CHIPS;
 
   const openCatalog = (category?: string) => {
     router.push(
@@ -200,7 +209,7 @@ export function HomeHero({
 
       {/* Category chips — soft, no border, one line */}
       <div className="mt-5 flex items-center justify-center gap-2 overflow-x-auto text-sm text-white/80 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {HERO_QUICK_CHIPS.slice(0, 7).map((chip) => (
+        {chips.slice(0, 7).map((chip) => (
           <a
             key={chip.label}
             href={chip.href}
