@@ -81,7 +81,7 @@ import { SuburbsCarousel } from '@/components/SuburbsCarousel.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { catalogHrefWithSelectedCity, placesHubHrefWithSelectedCity } from '@/lib/catalog-url';
 import { matchDestination } from '@/lib/selected-city';
-import { resolveCityInfo } from '@/lib/cityInfo';
+import { useCityHubData } from '@/hooks/useCityHubData';
 import { isSpbDayRouteCity } from '@/lib/day-route-boat';
 import {
   DAY_ROUTE_CHANGED_EVENT,
@@ -1212,20 +1212,19 @@ function DayRoutePanelInner() {
     return [...map.values()];
   }, [locationsCatalog, venuesCatalog]);
 
+  const cityHubData = useCityHubData(catalogCitySlug);
+
   const mustSeePlaces = useMemo(() => {
-    const info = resolveCityInfo(catalogCitySlug, catalogCitySourceSlug);
-    return info?.mustSee || [];
-  }, [catalogCitySlug, catalogCitySourceSlug]);
+    return cityHubData?.mustSee || [];
+  }, [cityHubData]);
 
   const significantSuburbs = useMemo(() => {
-    const info = resolveCityInfo(catalogCitySlug, catalogCitySourceSlug);
-    return info?.significantSuburbs?.length ? info.significantSuburbs : [];
-  }, [catalogCitySlug, catalogCitySourceSlug]);
+    return cityHubData?.significantSuburbs?.length ? cityHubData.significantSuburbs : [];
+  }, [cityHubData]);
 
   const dayRoutePresets = useMemo(() => {
-    const info = resolveCityInfo(catalogCitySlug, catalogCitySourceSlug);
-    return info?.dayRoutePresets || [];
-  }, [catalogCitySlug, catalogCitySourceSlug]);
+    return cityHubData?.dayRoutePresets || [];
+  }, [cityHubData]);
   const hasNamedPresets = dayRoutePresets.length > 0;
   /** Gate chips until match sources settle - avoids SPB 4→6 preset pop-in. */
   const presetsCatalogPending = Boolean(
