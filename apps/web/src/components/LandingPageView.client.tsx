@@ -20,15 +20,12 @@ import {
   resolveLandingHeroTheme,
 } from '@/components/landing/LandingHeroCtaBlock.client';
 import { BridgesScheduleSection } from '@/components/landing/BridgesScheduleSection.client';
-import { RiverScheduleSection, type RiverEventGroup } from '@/components/landing/RiverScheduleSection.client';
-import { BusScheduleSection, type BusEventGroup } from '@/components/landing/BusScheduleSection.client';
-import { DinnerScheduleSection, type DinnerEventGroup } from '@/components/landing/DinnerScheduleSection.client';
 import { LandingCityLocations } from '@/components/landing/LandingCityLocations.client';
 import { LandingPurchaseButton } from '@/components/landing/LandingPurchaseButton.client';
 import { LandingStickyHeader } from '@/components/landing/LandingStickyHeader.client';
 import { LandingCardBadgeRow } from '@/components/landing/LandingCardBadgeRow';
-import { LandingFilterRow } from '@/components/landing/LandingFilterRow.client';
 import { LandingContextWidget } from '@/components/landing/LandingContextWidget.client';
+import { LandingFilterRow } from '@/components/landing/LandingFilterRow.client';
 import { LandingEmptyState } from '@/components/landing/LandingEmptyState.client';
 import {
   resolveSeasonalCountdownKind,
@@ -89,7 +86,6 @@ import { LandingThinRelatedCards } from '@/components/LandingThinRelatedCards';
 import { resolveRelatedListingLinks } from '@/lib/seo-internal-links';
 import { buildBridgesProductJsonLd } from '@/lib/bridges-seo';
 import { formatLandingTodayIso, formatLandingTodayLong } from '@/lib/datetime';
-import { extractMenuLabel, extractFormatLabel, dinnerScheduleGridClass, collectDinnerMenuFacets, matchesMenuFilter } from '@/lib/dinner-helpers';
 import { BRIDGES_LANDING } from '@/data/bridges-landing';
 import {
   getSeasonalLanding,
@@ -138,40 +134,6 @@ type DinnerBadgeFilter = LandingCardBadgeId | 'all';
 type TimeSlotFilter = '' | 'morning' | 'day' | 'evening' | 'night';
 const MIN_DISPLAY_PRICE_RUB = 100;
 
-function topEntries(values: Record<string, number>, limit: number): Array<[string, number]> {
-  return Object.entries(values)
-    .filter(([name, count]) => Boolean(name) && count > 0)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, limit);
-}
-
-function resolveLandingDateChips(input: {
-  profile: LandingProfile;
-  landingSlug?: string;
-  eventWindow: LandingEventWindow | null;
-  isSeasonal: boolean;
-}): Array<{ label: string; value: DateFilter }> {
-  const chips: Array<{ label: string; value: DateFilter }> = [];
-  if (input.eventWindow) {
-    chips.push({ label: `Сезон: ${input.eventWindow.label}`, value: 'window' });
-  }
-  if (!input.isSeasonal) {
-    chips.push({ label: 'Сегодня', value: 'today' });
-    chips.push({ label: 'Завтра', value: 'tomorrow' });
-  }
-  chips.push({ label: 'Любая дата', value: 'all' });
-  return chips;
-}
-
-function resolveSeasonalCityNames(landingSlug: string, cityOptions: Array<[string, number]>): string[] {
-  const withEvents = new Set(cityOptions.filter(([, count]) => count > 0).map(([name]) => name));
-  const order = getSeasonalLanding(landingSlug)?.cityOrder || [];
-  if (order.length) return order.filter((name) => withEvents.has(name));
-  return cityOptions
-    .map(([name]) => name)
-    .filter((name) => withEvents.has(name));
-}
-
 const BUS_CITY_META: Record<string, { slug: string; duration: string; prepositional: string }> = {
   Москва: { slug: 'moscow', duration: '1.5–3 часа', prepositional: 'Москве' },
   'Санкт-Петербург': { slug: 'saint-petersburg', duration: '2–4 часа', prepositional: 'Санкт-Петербургу' },
@@ -198,6 +160,15 @@ function riverLandingRoot(landingSlug: string) {
   if (isBridgesNightLandingSlug(landingSlug)) return landingCategoryHref(CANONICAL_LANDING_SLUGS.bridges);
   return riverLandingHref();
 }
+function matchesMenuFilter(session: PublicSessionDto, menu: MenuFilter): boolean {
+  if (menu === 'all') return true;
+  const text = [session.title, session.category, ...(session.tags || []), ...(session.subcategories || [])]
+    .join(' ')
+    .toLowerCase();
+  if (menu === 'set') return /сет-?меню|set-?menu|дегустац/i.test(text);
+  if (menu === 'buffet') return /фуршет|buffet/i.test(text);
+  return true;
+}
 
 function matchesDinnerTimeFilter(session: PublicSessionDto, filter: DinnerTimeFilter): boolean {
   if (filter === 'all') return true;
@@ -206,6 +177,46 @@ function matchesDinnerTimeFilter(session: PublicSessionDto, filter: DinnerTimeFi
   if (filter === 'sunset') return hour >= 18 && hour < 21;
   if (filter === 'night') return hour >= 21;
   return true;
+}
+
+function extractMenuLabel(session: PublicSessionDto): string | null {
+  const text = [session.title, session.category, ...(session.tags || []), ...(session.subcategories || [])]
+    .join(' ')
+    .toLowerCase();
+  if (/фуршет/i.test(text)) return 'Фуршет';
+  if (/сет-?меню|дегустац|set-?menu/i.test(text)) return 'Сет-меню';
+  return null;
+}
+
+function collectDinnerMenuFacets(sessions: PublicSessionDto[]): Array<{ value: Exclude<MenuFilter, 'all'>; label: string }> {
+  const facets: Array<{ value: Exclude<MenuFilter, 'all'>; label: string }> = [
+    { value: 'set', label: 'Сет-меню' },
+    { value: 'buffet', label: 'Фуршет' },
+  ];
+  return facets.filter((facet) => {
+    const count = sessions.filter((session) => matchesMenuFilter(session, facet.value)).length;
+    return count > 0 && count < sessions.length;
+  });
+}
+
+function extractFormatLabel(tags: string[]): string {
+  const text = (tags || []).join(' ').toLowerCase();
+  if (/vip/i.test(text)) return 'VIP';
+  if (/романт/i.test(text)) return 'Романтика';
+  if (/корпоратив/i.test(text)) return 'Корпоратив';
+  return 'Стандарт';
+}
+
+function dinnerScheduleGridClass(showMenuColumn: boolean, showFormatColumn: boolean): string {
+  const titleFr = showMenuColumn && showFormatColumn ? '1.8fr'
+    : showMenuColumn || showFormatColumn ? '2.1fr' : '2.4fr';
+  const parts = [titleFr];
+  if (showMenuColumn) parts.push('0.7fr');
+  parts.push(showMenuColumn && showFormatColumn ? '0.6fr' : '0.65fr');
+  parts.push('0.55fr');
+  if (showFormatColumn) parts.push('0.6fr');
+  parts.push('auto');
+  return `md:grid-cols-[${parts.join('_')}]`;
 }
 
 function resolveLandingCityPrep(cityName: string | null, profile: LandingProfile, landingSlug: string): string | null {
@@ -1148,7 +1159,6 @@ export function LandingPageView({
               setDateFilter={setDateFilter}
               setSort={setSort}
               setTimeSlot={setTimeSlot}
-              hideSort={profile === 'river' || profile === 'bus'}
               reset={() => {
                 setCity(cityName || 'all');
                 setCategory('all');
@@ -1163,10 +1173,8 @@ export function LandingPageView({
             ) : sessionsError ? (
               <ScheduleErrorState message={sessionsError} />
             ) : profile === 'dinner' ? (
-              <DinnerScheduleSection
-                groups={groups as DinnerEventGroup[]}
-                emptyKind={allGroups.length === 0 ? 'zero' : 'filtered'}
-                cityName={cityName}
+              <LandingDinnerScheduleList
+                groups={groups}
                 onReset={() => {
                   setDateFilter('today');
                   setSort('price');
@@ -1175,13 +1183,13 @@ export function LandingPageView({
                   setDinnerBadgeFilter('all');
                   setCategory('all');
                 }}
+                emptyKind={allGroups.length === 0 ? 'zero' : 'filtered'}
+                cityName={cityName}
+                relatedSessions={thinRelatedSessions}
+                relatedLinks={citySlug ? resolveRelatedListingLinks(slug, citySlug) : []}
               />
             ) : profile === 'bridges' ? (
               <BridgesScheduleSection groups={groups} sort={sort} setSort={setSort} />
-            ) : profile === 'river' ? (
-              <RiverScheduleSection groups={groups as RiverEventGroup[]} />
-            ) : profile === 'bus' ? (
-              <BusScheduleSection groups={groups as BusEventGroup[]} />
             ) : (
             <LandingScheduleList
               groups={groups}
@@ -1195,7 +1203,7 @@ export function LandingPageView({
                 setCity(cityName || 'all');
                 setCategory('all');
                 setDateFilter(defaultLandingDateFilter(profile, slug));
-                setSort('time');
+                setSort(profile === 'bus' ? 'price' : 'time');
                 setTimeSlot('');
                 setContextChip(null);
               }}
@@ -1889,7 +1897,7 @@ function LandingDinnerFilters({
         ))}
       </div>
 
-      <div className="hidden flex-wrap items-center gap-2 max-w-fit lg:flex">
+      <div className="hidden flex-wrap items-center gap-2 lg:flex">
         <div className="flex items-center gap-1.5">
           {(['today', 'tomorrow'] as const).map((value) => (
             <button
@@ -2818,7 +2826,6 @@ function LandingFilters({
   setDateFilter,
   setSort,
   setTimeSlot,
-  hideSort = false,
 }: {
   profile: LandingProfile;
   landingSlug?: string;
@@ -2837,7 +2844,6 @@ function LandingFilters({
   setSort: (value: SortFilter) => void;
   setTimeSlot: (value: TimeSlotFilter) => void;
   reset: () => void;
-  hideSort?: boolean;
 }) {
   const isBus = profile === 'bus';
   const isRiver = profile === 'river';
@@ -2999,28 +3005,185 @@ function LandingFilters({
 
   return (
     <div className="space-y-3">
-      <div className="sticky top-[var(--site-header-height)] z-20 -mx-1 space-y-3 rounded-xl border border-border/70 bg-background/95 px-3 py-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/85 sm:space-y-4">
-      <LandingFilterRow
-        dateChips={dateChips}
-        dateFilter={dateFilter}
-        setDateFilter={(v) => setDateFilter(v as DateFilter)}
-        showCityFilter={showCityFilter}
-        cityChip={cityChip}
-        visibleCityNames={visibleCityNames}
-        overflowCityNames={overflowCityNames}
-        city={city}
-        selectCity={selectCity}
-        showTimeSlot={showTimeSlot}
-        timeSlotSelect={timeSlotSelect}
-        genreChipRow={genreChipRow}
-        category={category}
-        setCategory={setCategory}
-        categories={stats.categories}
-        sort={sort}
-        setSort={(v) => setSort(v as SortFilter)}
-        sortTabs={sortTabs}
-        hideSort={hideSort}
-      />
+      <div className="sticky top-[var(--site-header-height)] z-20 -mx-1 space-y-3 rounded-xl border border-border/70 bg-background/95 px-2 py-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/85 sm:space-y-4">
+      <div className="hidden items-center gap-1 border-b border-border sm:flex">
+        {sortTabs.map((tab) => (
+          <button
+            key={tab.value}
+            type="button"
+            onClick={() => setSort(tab.value)}
+            className={`relative px-4 py-2.5 text-sm font-medium transition-colors ${sort === tab.value ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+          >
+            {tab.label}
+            {sort === tab.value ? <span className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-primary" /> : null}
+          </button>
+        ))}
+      </div>
+
+      <div className="hidden flex-wrap items-center gap-2 lg:flex">
+        {dateChips.length > 0 ? (
+          <div className="flex items-center gap-1.5">
+            {dateChips.map((chip) => (
+              <button
+                key={chip.value}
+                type="button"
+                onClick={() => setDateFilter(chip.value)}
+                className={`whitespace-nowrap rounded-lg border px-3.5 py-1.5 text-sm font-medium transition-all ${
+                  dateFilter === chip.value
+                    ? 'border-primary bg-primary text-primary-foreground'
+                    : 'border-border bg-background text-foreground hover:border-primary/40 hover:text-primary'
+                }`}
+              >
+                {chip.label}
+              </button>
+            ))}
+          </div>
+        ) : null}
+        {showCityFilter ? (
+          <>
+            {dateChips.length > 0 ? <div className="mx-1 h-6 w-px bg-border" /> : null}
+            {cityChip('all', 'Все города', city === 'all')}
+            {visibleCityNames.map((name) => cityChip(name, name, city === name))}
+            {overflowCityNames.length > 0 ? (
+              <select
+                value={overflowCityNames.includes(city) ? city : ''}
+                onChange={(e) => { if (e.target.value) selectCity(e.target.value); }}
+                className="h-9 rounded-lg border border-input bg-background px-3 text-sm text-foreground"
+              >
+                <option value="">Ещё {overflowCityNames.length}</option>
+                {overflowCityNames.map((name) => (
+                  <option key={name} value={name}>{name}</option>
+                ))}
+              </select>
+            ) : null}
+          </>
+        ) : null}
+        {showTimeSlot ? (
+          <>
+            <div className="mx-1 h-6 w-px bg-border" />
+            {timeSlotSelect}
+          </>
+        ) : null}
+        {genreChipRow}
+        {!isBus && !isConcerts && Object.keys(stats.categories).length > 1 ? (
+          <>
+            <div className="mx-1 h-6 w-px bg-border" />
+            <select
+              value={category}
+              onChange={(event) => setCategory(event.target.value)}
+              className="h-9 w-[170px] rounded-lg border border-input bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+            >
+              <option value="all">Все форматы</option>
+              {Object.entries(stats.categories)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 8)
+                .map(([name, count]) => (
+                  <option key={name} value={name}>{name} · {count}</option>
+                ))}
+            </select>
+          </>
+        ) : null}
+      </div>
+
+      <div className="hidden space-y-3 sm:block lg:hidden">
+        {dateChips.length > 0 ? (
+          <div className="flex items-center gap-1.5">
+            {dateChips.map((chip) => (
+              <button
+                key={chip.value}
+                type="button"
+                onClick={() => setDateFilter(chip.value)}
+                className={`whitespace-nowrap rounded-lg border px-3.5 py-1.5 text-sm font-medium transition-all ${
+                  dateFilter === chip.value
+                    ? 'border-primary bg-primary text-primary-foreground'
+                    : 'border-border bg-background text-foreground hover:border-primary/40 hover:text-primary'
+                }`}
+              >
+                {chip.label}
+              </button>
+            ))}
+          </div>
+        ) : null}
+        {showCityFilter ? (
+          <div className="flex flex-wrap items-center gap-2">
+            {cityChip('all', 'Все города', city === 'all')}
+            {visibleCityNames.map((name) => cityChip(name, name, city === name))}
+            {overflowCityNames.length > 0 ? (
+              <select
+                value={overflowCityNames.includes(city) ? city : ''}
+                onChange={(e) => { if (e.target.value) selectCity(e.target.value); }}
+                className="h-9 rounded-lg border border-input bg-background px-3 text-sm text-foreground"
+              >
+                <option value="">Ещё {overflowCityNames.length}</option>
+                {overflowCityNames.map((name) => (
+                  <option key={name} value={name}>{name}</option>
+                ))}
+              </select>
+            ) : null}
+          </div>
+        ) : null}
+        {showTimeSlot ? (
+          <div className="flex items-center gap-2">
+            {timeSlotSelect}
+          </div>
+        ) : null}
+      </div>
+
+      <div className="space-y-3 sm:hidden">
+        {dateChips.length > 0 ? (
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {dateChips.map((chip) => (
+              <button
+                key={chip.value}
+                type="button"
+                onClick={() => setDateFilter(chip.value)}
+                className={`whitespace-nowrap rounded-lg border px-3.5 py-1.5 text-sm font-medium transition-all ${
+                  dateFilter === chip.value
+                    ? 'border-primary bg-primary text-primary-foreground'
+                    : 'border-border bg-background text-foreground hover:border-primary/40 hover:text-primary'
+                }`}
+              >
+                {chip.label}
+              </button>
+            ))}
+          </div>
+        ) : null}
+        {showCityFilter ? (
+          <div
+            className="flex items-center gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            role="group"
+            aria-label="Сменить город"
+          >
+            {cityChip('all', 'Все города', city === 'all')}
+            {visibleCityNames.map((name) => cityChip(name, name, city === name))}
+            {overflowCityNames.length > 0 ? (
+              <select
+                value={overflowCityNames.includes(city) ? city : ''}
+                onChange={(e) => { if (e.target.value) selectCity(e.target.value); }}
+                className="h-9 shrink-0 rounded-lg border border-input bg-background px-3 text-sm text-foreground"
+              >
+                <option value="">Ещё {overflowCityNames.length}</option>
+                {overflowCityNames.map((name) => (
+                  <option key={name} value={name}>{name}</option>
+                ))}
+              </select>
+            ) : null}
+          </div>
+        ) : null}
+        {showTimeSlot ? timeSlotSelect : null}
+        <div className="flex items-center gap-2">
+          <span className="whitespace-nowrap text-sm text-muted-foreground">Сортировать:</span>
+          <select
+            value={sort}
+            onChange={(event) => setSort(event.target.value as SortFilter)}
+            className="h-9 flex-1 rounded-lg border border-input bg-background px-3 text-sm"
+          >
+            {sortTabs.map((tab) => (
+              <option key={tab.value} value={tab.value}>{tab.label}</option>
+            ))}
+          </select>
+        </div>
+      </div>
       </div>
 
       <div className="mb-4 mt-2 flex items-center gap-3">
@@ -3029,4 +3192,963 @@ function LandingFilters({
       </div>
     </div>
   );
+}
+
+function LandingScheduleList({
+  groups,
+  profile,
+  emptyKind = 'filtered',
+  cityName,
+  relatedSessions = [],
+  relatedLinks = [],
+  onReset,
+  landingSlug,
+}: {
+  groups: EventGroup[];
+  profile: LandingProfile;
+  emptyKind?: 'zero' | 'filtered';
+  cityName?: string | null;
+  relatedSessions?: PublicSessionDto[];
+  relatedLinks?: import('@/lib/seo-internal-links').SeoLink[];
+  onReset?: () => void;
+  landingSlug?: string;
+}) {
+  if (!groups.length) {
+    const slugKey = canonicalLandingSlug(String(landingSlug || ''));
+    return (
+      <LandingEmptyState
+        kind={emptyKind}
+        cityName={cityName}
+        relatedSessions={relatedSessions}
+        relatedLinks={relatedLinks}
+        onReset={onReset}
+        offSeasonStub={profile === 'seasonal' && slugKey === 'salute-9-may'}
+      />
+    );
+  }
+  return (
+    <div className="space-y-4">
+      {groups.map((group, index) => (
+        <LandingScheduleRow key={group.key} group={group} isOptimal={index === pickOptimalIndex(groups)} profile={profile} />
+      ))}
+    </div>
+  );
+}
+
+function pickOptimalIndex(groups: EventGroup[]): number {
+  if (!groups.length) return -1;
+  let best = 0;
+  let bestScore = Number.POSITIVE_INFINITY;
+  groups.forEach((group, index) => {
+    const price = group.priceFrom ?? Number.MAX_SAFE_INTEGER;
+    const rating = group.sessions.length;
+    const score = price - rating * 50;
+    if (score < bestScore) {
+      bestScore = score;
+      best = index;
+    }
+  });
+  return best;
+}
+
+function amenityIcons(tags: string[]) {
+  const normalized = (tags || []).join(' ').toLowerCase();
+  const icons: Array<{ title: string; node: React.ReactNode }> = [];
+  if (/экскурсовод|гид|guide/i.test(normalized)) icons.push({ title: 'Экскурсовод', node: <Mic className="h-3.5 w-3.5" /> });
+  if (/аудио|audio/i.test(normalized)) icons.push({ title: 'Аудиогид', node: <Headphones className="h-3.5 w-3.5" /> });
+  if (/музык|dj|ди-джей/i.test(normalized)) icons.push({ title: 'Музыка/DJ', node: <Music className="h-3.5 w-3.5" /> });
+  if (/еда|напит|кафе|бар|ужин/i.test(normalized)) icons.push({ title: 'Еда и напитки', node: <UtensilsCrossed className="h-3.5 w-3.5" /> });
+  if (/палуб|открыт/i.test(normalized)) icons.push({ title: 'Открытая палуба', node: <Sun className="h-3.5 w-3.5" /> });
+  return icons.slice(0, 5);
+}
+
+function LandingScheduleRow({ group, isOptimal, profile }: { group: EventGroup; isOptimal: boolean; profile: LandingProfile }) {
+  const session = group.representative;
+  const slot = session.upcomingSlots?.[0];
+  const time = resolveSessionTime(session, slot);
+  const date = resolveSessionDate(session, slot);
+  const flexibleSchedule = isFlexibleScheduleSession(session);
+  const duration = extractDurationTag(session.tags);
+  const vacant = session.vacant ?? group.vacant;
+  const soldOut = typeof vacant === 'number' && vacant <= 0;
+  const badges = deriveLandingCardBadges(session);
+  const timeChips = collectScheduleTimeChips(group);
+  const isBus = profile === 'bus';
+  const cruise = isBus
+    ? null
+    : resolveCruiseDisplayTitle({ title: group.title, tags: session.tags });
+  const rawBusLabel = isBus
+    ? session.tags?.find((tag) => /city sightseeing|hop-on|оператор/i.test(tag)) || null
+    : null;
+  const shipName = isBus
+    ? rawBusLabel && !isBookingPlatformLabel(rawBusLabel) && !/^место\s+отправления/i.test(rawBusLabel)
+      ? rawBusLabel
+      : null
+    : formatShipSecondaryLabel(cruise?.shipName);
+  const displayTitle = isBus ? group.title : cruise?.excursionTitle || group.title;
+  const locationLabel = resolveEventCardLocationLabel(session);
+  const amenities = amenityIcons(session.tags);
+  const href = eventHref(session);
+  const priceLabel =
+    typeof group.priceFrom === 'number' && group.priceFrom >= MIN_DISPLAY_PRICE_RUB
+      ? formatLandingBuyPrice(group.priceFrom, group.priceTo)
+      : 'Купить';
+  const buyButtonClass =
+    'inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 active:scale-[0.98]';
+  const buyButtonClassMobile = 'inline-flex items-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground active:scale-[0.98]';
+
+  const vacantClass =
+    soldOut ? '' : typeof vacant === 'number' && vacant <= 5 ? 'text-urgency' : 'text-success';
+
+  return (
+    <div
+      className={`rounded-2xl border bg-white p-4 shadow-sm transition-all duration-200 hover:border-primary/25 hover:shadow-md md:p-5 ${
+        isOptimal ? 'best-deal-ring' : 'border-slate-200'
+      }`}
+    >
+      {isOptimal ? (
+        <div className="mb-3">
+          <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary">⭐ Оптимальный выбор</span>
+        </div>
+      ) : null}
+
+      <div className="hidden gap-4 md:flex md:items-center">
+        {!flexibleSchedule ? (
+          <div className="w-28 shrink-0">
+            <div className="text-2xl font-bold text-foreground">{time}</div>
+            <div className="text-sm text-muted-foreground">{date}</div>
+          </div>
+        ) : (
+          <div className="w-40 shrink-0 text-sm font-medium leading-snug text-foreground">{FLEXIBLE_SCHEDULE_LABEL}</div>
+        )}
+        <div className="min-w-0 flex-1 space-y-1.5">
+          <h3 className="truncate font-semibold text-foreground">
+            <a href={href} className="hover:text-primary">
+              {displayTitle}
+            </a>
+          </h3>
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
+            {duration ? (
+              <span className="flex items-center gap-1">
+                <Clock className="h-3.5 w-3.5" />
+                {duration}
+              </span>
+            ) : null}
+            {locationLabel ? (
+              <span className="flex items-center gap-1">
+                <MapPin className="h-3.5 w-3.5" />
+                {locationLabel}
+              </span>
+            ) : null}
+            {shipName ? (
+              <span className="flex items-center gap-1">
+                <Ship className="h-3.5 w-3.5" />
+                {shipName}
+              </span>
+            ) : null}
+          </div>
+          {timeChips.length > 1 ? (
+            <div className="flex flex-wrap gap-1.5 pt-0.5" aria-label="Ближайшие сеансы">
+              {timeChips.map((chip) => (
+                <span
+                  key={chip.key}
+                  className="inline-flex rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-slate-700"
+                >
+                  {chip.label}
+                </span>
+              ))}
+            </div>
+          ) : null}
+          <LandingCardBadgeRow badges={badges} />
+          {amenities.length ? (
+            <div className="flex items-center gap-1.5">
+              {amenities.map((item) => (
+                <span key={item.title} title={item.title} className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-muted text-muted-foreground transition-colors hover:text-foreground">
+                  {item.node}
+                </span>
+              ))}
+            </div>
+          ) : null}
+        </div>
+        <div className="flex shrink-0 items-center gap-4 lg:gap-[120px]">
+          {!soldOut && typeof vacant === 'number' ? (
+            <div className={`flex items-center gap-1 text-xs font-medium ${vacantClass}`}>
+              <Users className="h-3.5 w-3.5" />
+              Осталось {formatVacantSeats(vacant)}
+            </div>
+          ) : null}
+          {soldOut ? (
+            <button type="button" disabled className="inline-flex cursor-not-allowed items-center gap-1.5 whitespace-nowrap rounded-lg bg-muted px-5 py-2.5 text-sm font-semibold text-muted-foreground">
+              Распродано
+            </button>
+          ) : (
+            <LandingPurchaseButton session={session} label={priceLabel} className={buyButtonClass} showArrow />
+          )}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3 md:hidden">
+        <div className="flex items-start gap-3">
+          {!flexibleSchedule ? (
+            <div className="shrink-0">
+              <div className="text-xl font-bold text-foreground">{time}</div>
+              <div className="text-xs text-muted-foreground">{date}</div>
+            </div>
+          ) : (
+            <div className="shrink-0 text-sm font-medium text-foreground">{FLEXIBLE_SCHEDULE_LABEL}</div>
+          )}
+          <div className="min-w-0">
+            <h3 className="text-sm font-semibold leading-tight text-foreground">
+              <a href={href} className="hover:text-primary">
+                {displayTitle}
+              </a>
+            </h3>
+            {shipName ? <p className="mt-0.5 text-xs text-muted-foreground">{shipName}</p> : null}
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
+          {duration ? <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{duration}</span> : null}
+          {locationLabel ? <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{locationLabel}</span> : null}
+        </div>
+        {timeChips.length > 1 ? (
+          <div className="flex flex-wrap gap-1.5" aria-label="Ближайшие сеансы">
+            {timeChips.map((chip) => (
+              <span
+                key={chip.key}
+                className="inline-flex rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-slate-700"
+              >
+                {chip.label}
+              </span>
+            ))}
+          </div>
+        ) : null}
+        <LandingCardBadgeRow badges={badges} />
+        <div className="flex items-center justify-between gap-3">
+          {!soldOut && typeof vacant === 'number' ? (
+            <div className={`flex items-center gap-1 text-xs font-medium ${vacantClass}`}>
+              <Users className="h-3 w-3" />
+              Осталось {vacant}
+            </div>
+          ) : (
+            <div />
+          )}
+          {soldOut ? (
+            <button type="button" disabled className="inline-flex cursor-not-allowed items-center rounded-lg bg-muted px-4 py-2 text-sm font-semibold text-muted-foreground">
+              Распродано
+            </button>
+          ) : (
+            <LandingPurchaseButton session={session} label={priceLabel} className={buyButtonClassMobile} />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function collectScheduleTimeChips(group: EventGroup): Array<{ key: string; label: string }> {
+  const chips: Array<{ key: string; label: string }> = [];
+  const seen = new Set<string>();
+  for (const item of group.sessions) {
+    const slots =
+      item.upcomingSlots && item.upcomingSlots.length
+        ? item.upcomingSlots
+        : item.timeLabel || item.startsAt
+          ? [{ startsAt: item.startsAt, timeLabel: item.timeLabel }]
+          : [];
+    for (const next of slots) {
+      const label = String(next.timeLabel || resolveSessionTime(item, next) || '').trim();
+      if (!label) continue;
+      const key = String(next.startsAt || label);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      chips.push({ key, label });
+      if (chips.length >= 8) return chips;
+    }
+  }
+  return chips;
+}
+
+function extractDurationTag(tags: string[]): string | null {
+  const match = (tags || []).find((tag) => /\d+\s*(мин|ч|час)/i.test(tag));
+  return match || null;
+}
+
+function LandingReviews({
+  landing,
+  profile,
+  landingSlug,
+}: {
+  landing: PublicLandingDto;
+  profile?: LandingProfile;
+  landingSlug?: string;
+}) {
+  // CV.L-debt: hide hardcoded fake reviews until real approved Review rows exist.
+  void landing;
+  void profile;
+  void landingSlug;
+  return null;
+}
+
+function LandingSchemaJsonLd({ groups, cityName }: { groups: EventGroup[]; cityName?: string | null }) {
+  const events = groups.slice(0, 5).map((group) => {
+    const session = group.representative;
+    const slot = session.upcomingSlots?.[0];
+    const locality = cityName || group.city;
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'Event',
+      name: group.title,
+      startDate: slot?.startsAt || session.startsAt || undefined,
+      location: {
+        '@type': 'Place',
+        name: group.venue || group.city,
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: locality,
+          addressCountry: 'RU',
+        },
+      },
+      offers: group.priceFrom
+        ? {
+            '@type': 'Offer',
+            price: group.priceFrom,
+            priceCurrency: 'RUB',
+            availability: 'https://schema.org/InStock',
+          }
+        : undefined,
+      description: cityName
+        ? `Автобусная экскурсия в ${cityName} — ${group.title}`
+        : `Автобусная экскурсия — ${group.title}`,
+    };
+  }).filter((item) => item.startDate);
+
+  if (!events.length) return null;
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(events) }} />;
+}
+
+function LandingCitiesGrid({ landing }: { landing: PublicLandingDto; stats: PublicLandingPageDto['stats'] }) {
+  return (
+    <div className="py-8">
+      <div className="space-y-4 rounded-xl border border-border bg-card p-6">
+        <h3 className="text-lg font-semibold text-foreground">Автобусные экскурсии по городам</h3>
+        <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {BUS_CITY_ORDER.map((name) => {
+            const meta = BUS_CITY_META[name];
+            const slugKey = citySlugByName(name) || meta.slug;
+            const href = busLandingHref(slugKey);
+            return (
+              <a
+                key={name}
+                href={href}
+                className="flex items-center gap-2 rounded-lg border border-border p-3 transition-colors hover:border-primary/40"
+              >
+                <Bus className="h-4 w-4 shrink-0 text-primary" />
+                <div>
+                  <span className="text-sm font-medium text-foreground">{name}</span>
+                  <span className="ml-1.5 text-xs text-muted-foreground">{meta.duration}</span>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LandingOtherCitiesGrid({ landing, currentCityName }: { landing: PublicLandingDto; currentCityName: string | null }) {
+  const cities = BUS_CITY_ORDER.filter((name) => name !== currentCityName);
+  if (!cities.length) return null;
+
+  return (
+    <div className="mt-8">
+      <div className="space-y-4 rounded-xl border border-border bg-card p-6">
+        <h3 className="text-lg font-semibold text-foreground">Автобусные экскурсии в других городах</h3>
+        <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {cities.map((name) => {
+            const meta = BUS_CITY_META[name];
+            const slugKey = citySlugByName(name) || meta.slug;
+            const href = busLandingHref(slugKey);
+            return (
+              <a
+                key={name}
+                href={href}
+                className="flex items-center gap-2 rounded-lg border border-border p-3 transition-colors hover:border-primary/40"
+              >
+                <Bus className="h-4 w-4 shrink-0 text-primary" />
+                <div>
+                  <span className="text-sm font-medium text-foreground">{name}</span>
+                  <span className="ml-1.5 text-xs text-muted-foreground">{meta.duration}</span>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LandingRiverCitiesGrid({ landing }: { landing: PublicLandingDto }) {
+  return (
+    <div className="py-8">
+      <div className="space-y-4 rounded-xl border border-border bg-card p-6">
+        <h3 className="text-lg font-semibold text-foreground">Речные прогулки по городам</h3>
+        <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {RIVER_CITY_ORDER.map((name) => {
+            const guide = riverCityGuide(name);
+            if (!guide) return null;
+            const href = riverLandingHref(guide.slug);
+            return (
+              <a
+                key={name}
+                href={href}
+                className="flex items-center gap-2 rounded-lg border border-border p-3 transition-colors hover:border-primary/40"
+              >
+                <Ship className="h-4 w-4 shrink-0 text-primary" />
+                <div>
+                  <span className="text-sm font-medium text-foreground">{name}</span>
+                  <span className="ml-1.5 text-xs text-muted-foreground">{guide.riverName}</span>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LandingRiverOtherCitiesGrid({ landing, currentCityName }: { landing: PublicLandingDto; currentCityName: string | null }) {
+  const cities = RIVER_CITY_ORDER.filter((name) => name !== currentCityName);
+  if (!cities.length) return null;
+
+  return (
+    <div className="mt-8">
+      <div className="space-y-4 rounded-xl border border-border bg-card p-6">
+        <h3 className="text-lg font-semibold text-foreground">Речные прогулки в других городах</h3>
+        <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {cities.map((name) => {
+            const guide = riverCityGuide(name);
+            if (!guide) return null;
+            const href = riverLandingHref(guide.slug);
+            return (
+              <a
+                key={name}
+                href={href}
+                className="flex items-center gap-2 rounded-lg border border-border p-3 transition-colors hover:border-primary/40"
+              >
+                <Ship className="h-4 w-4 shrink-0 text-primary" />
+                <div>
+                  <span className="text-sm font-medium text-foreground">{name}</span>
+                  <span className="ml-1.5 text-xs text-muted-foreground">{guide.riverName}</span>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LandingRiverFreeAlternatives({ cityName }: { cityName: string | null }) {
+  const guide = riverCityGuide(cityName);
+  const freeSpots = guide?.spots.filter((spot) => spot.badgeTone === 'free') || [];
+  if (!freeSpots.length || !cityName) return null;
+
+  return (
+    <div className="mt-8">
+      <div className="space-y-4 rounded-xl border border-border bg-card p-6">
+        <h3 className="text-lg font-semibold text-foreground">Бесплатные альтернативы — {cityName}</h3>
+        <ul className="space-y-3">
+          {freeSpots.map((spot) => (
+            <li key={spot.title} className="flex items-start gap-3 text-sm text-muted-foreground">
+              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-green-600 dark:text-green-400" />
+              <span>
+                <span className="font-medium text-foreground">{spot.title}</span>
+                {' — '}
+                {spot.description}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+function LandingEventsTable({ groups }: { groups: EventGroup[] }) {
+  return (
+    <div className="overflow-auto rounded-xl border border-slate-200 bg-white shadow-sm">
+      <table className="w-full min-w-[980px] border-collapse text-sm">
+        <thead>
+          <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs uppercase text-slate-500">
+            <th className="px-4 py-3 font-semibold">Ближайшие слоты</th>
+            <th className="px-4 py-3 font-semibold">Событие</th>
+            <th className="px-4 py-3 font-semibold">Город</th>
+            <th className="px-4 py-3 font-semibold">Площадка</th>
+            <th className="px-4 py-3 font-semibold">Цена</th>
+            <th className="px-4 py-3 font-semibold">Места</th>
+            <th className="px-4 py-3" />
+          </tr>
+        </thead>
+        <tbody>
+          {groups.map((group) => (
+            <tr key={group.key} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
+              <td className="whitespace-nowrap px-4 py-3 align-top">
+                <div className="flex flex-wrap gap-1.5">
+                  {group.sessions.slice(0, 3).map((session) => (
+                    <span key={session.id} className="rounded-lg bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700">
+                      {session.dateLabel} · {session.timeLabel}
+                    </span>
+                  ))}
+                  {group.sessions.length > 3 ? <span className="rounded-lg bg-primary-50 px-2 py-1 text-xs font-semibold text-primary-700">+{group.sessions.length - 3}</span> : null}
+                </div>
+              </td>
+              <td className="min-w-[320px] px-4 py-3 align-top">
+                <a href={eventHref(group.representative)} className="font-medium text-slate-950 hover:text-primary-700">{group.title}</a>
+                <div className="mt-1 text-xs text-slate-500">{group.category} · {group.tags[0] ?? 'событие'}</div>
+              </td>
+              <td className="px-4 py-3 align-top">
+                {group.representative.citySlug ? <a href={`/cities/${group.representative.citySlug}`} className="font-medium text-slate-700 hover:text-primary-700">{group.city}</a> : group.city}
+              </td>
+              <td className="max-w-[240px] px-4 py-3 align-top text-slate-600">
+                {(() => {
+                  const locationLabel = resolveEventCardLocationLabel(group.representative);
+                  if (!locationLabel) return <span className="text-slate-400">—</span>;
+                  const venueLink = sessionVenueHref(group.representative);
+                  return venueLink ? (
+                    <a href={venueLink} className="hover:text-primary-700">
+                      {locationLabel}
+                    </a>
+                  ) : (
+                    locationLabel
+                  );
+                })()}
+              </td>
+              <td className="px-4 py-3 align-top font-semibold text-slate-950">{formatMoneyRange(group.priceFrom, group.priceTo)}</td>
+              <td className="px-4 py-3 align-top text-slate-600">{group.vacant ?? '-'}</td>
+              <td className="px-4 py-3 align-top"><BuyLink session={group.representative} /></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {!groups.length ? <EmptyFilteredState /> : null}
+    </div>
+  );
+}
+
+function LandingEventsGrid({ groups }: { groups: EventGroup[] }) {
+  const PAGE = 48;
+  const [visible, setVisible] = React.useState(PAGE);
+  const shown = groups.slice(0, visible);
+  const hasMore = groups.length > visible;
+
+  return (
+    <div className="space-y-4">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {shown.map((group) => (
+          <EventCard key={group.key} session={group.representative} compact landingActions />
+        ))}
+        {!groups.length ? <EmptyFilteredState /> : null}
+      </div>
+      {hasMore ? (
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={() => setVisible((current) => current + PAGE)}
+            className="inline-flex min-h-11 items-center justify-center rounded-lg border border-border bg-background px-5 text-sm font-semibold text-foreground hover:border-primary/40 hover:text-primary"
+          >
+            Показать ещё
+          </button>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function BuyLink({ session }: { session: PublicSessionDto }) {
+  return (
+    <LandingPurchaseButton
+      session={session}
+      label="Купить"
+      className="inline-flex min-h-9 items-center justify-center rounded-lg bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700"
+    />
+  );
+}
+
+function LandingContext({ landing, stats }: { landing: PublicLandingDto; stats: PublicLandingPageDto['stats'] }) {
+  const topVenues = Object.entries(stats.venues).sort((a, b) => b[1] - a[1]).slice(0, 8);
+
+  return (
+    <section className="rounded-xl bg-white p-4 shadow-[0_10px_28px_rgba(15,23,42,0.06)]">
+      <h3 className="text-sm font-semibold text-slate-950">Контекст лендинга</h3>
+      <p className="mt-2 text-sm leading-6 text-slate-600">{landing.subtitle}</p>
+      <div className="mt-4 grid gap-2">
+        {topVenues.map(([venue, count]) => (
+          <div key={venue} className="flex items-center justify-between gap-3 rounded-lg bg-slate-50 px-3 py-2 text-sm">
+            <span className="min-w-0 truncate text-slate-700">{venue}</span>
+            <span className="shrink-0 font-semibold text-slate-950">{formatNumber(count)}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function RelatedLandings({
+  landings,
+  landing,
+  stats,
+  citySlug,
+}: {
+  landings: PublicLandingDto[];
+  landing: PublicLandingDto;
+  stats: PublicLandingPageDto['stats'];
+  citySlug?: string;
+}) {
+  const cityEntries = Object.entries(stats.cities).sort((a, b) => b[1] - a[1]);
+  const citySlugByName = Object.fromEntries(
+    Object.entries(LANDING_CITY_SLUGS).map(([slugKey, name]) => [name, normalizeCitySlug(slugKey) || slugKey]),
+  );
+
+  return (
+    <div className="grid gap-8 lg:grid-cols-2">
+      {cityEntries.length > 1 && !citySlug ? (
+        <section>
+          <h3 className="text-lg font-bold text-slate-950">{landing.title} по городам</h3>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {cityEntries.map(([name, count]) => {
+              const slugKey = citySlugByName[name];
+              const href = slugKey ? landingCategoryHref(landing.slug, slugKey) : `#landing-schedule`;
+              return (
+                <a key={name} href={href} className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-primary-300 hover:text-primary-700">
+                  {name}
+                  <span className="ml-1 text-slate-400">{formatNumber(count)}</span>
+                </a>
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
+
+      {landings.length ? (
+        <section>
+          <h3 className="text-lg font-bold text-slate-950">Похожие подборки</h3>
+          <div className="mt-4 grid gap-2 sm:grid-cols-2">
+            {landings.slice(0, 6).map((item) => (
+              <a key={item.slug} href={landingPageHref(item.slug)} className="rounded-xl border border-slate-200 bg-white p-4 transition hover:border-primary-200 hover:shadow-sm">
+                <div className="text-sm font-semibold text-slate-950">{item.title}</div>
+                <div className="mt-1 text-xs text-slate-500">
+                  {formatNumber(item.events)} событий · {formatMoney(item.priceFrom)}
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
+      ) : null}
+    </div>
+  );
+}
+
+function HeroStat({ label, value, raw = false }: { label: string; value: number | string; raw?: boolean }) {
+  return (
+    <div className="rounded-xl bg-white/10 p-4">
+      <div className="text-2xl font-bold">{raw ? value : formatNumber(Number(value))}</div>
+      <div className="mt-1 text-xs font-medium text-white/60">{label}</div>
+    </div>
+  );
+}
+
+function ChipRow({ items, active, onChange }: { items: Array<{ label: string; value: string }>; active: string; onChange: (value: string) => void }) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {items.map((item) => (
+        <button
+          key={item.value}
+          type="button"
+          onClick={() => onChange(item.value)}
+          className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
+            active === item.value
+              ? 'bg-primary-600 text-white'
+              : 'border border-slate-200 bg-white text-slate-600 hover:border-primary-300 hover:text-primary-700'
+          }`}
+        >
+          {item.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function EmptyFilteredState() {
+  return <LandingEmptyState kind="filtered" />;
+}
+
+function LandingScheduleSkeleton({ profile }: { profile: LandingProfile }) {
+  const rows = profile === 'dinner' ? 4 : 6;
+  return (
+    <div className="space-y-3" aria-busy="true" aria-label="Загрузка расписания">
+      {Array.from({ length: rows }, (_, index) => (
+        <div key={index} className="animate-pulse rounded-xl border border-border bg-card p-4 md:p-5">
+          <div className="hidden gap-4 md:flex md:items-center">
+            <div className="w-28 shrink-0 space-y-2">
+              <div className="h-7 w-16 rounded bg-muted" />
+              <div className="h-4 w-20 rounded bg-muted" />
+            </div>
+            <div className="min-w-0 flex-1 space-y-2">
+              <div className="h-5 w-2/3 rounded bg-muted" />
+              <div className="h-4 w-1/2 rounded bg-muted" />
+              <div className="h-4 w-1/3 rounded bg-muted" />
+            </div>
+            <div className="h-10 w-28 rounded-lg bg-muted" />
+          </div>
+          <div className="space-y-2 md:hidden">
+            <div className="h-5 w-2/3 rounded bg-muted" />
+            <div className="h-4 w-1/2 rounded bg-muted" />
+            <div className="h-10 w-full rounded-lg bg-muted" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ScheduleErrorState({ message }: { message: string }) {
+  return (
+    <div className="rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm text-amber-900">
+      {message}
+    </div>
+  );
+}
+
+function ErrorState({ message }: { message: string }) {
+  return (
+    <section className="container-page py-12">
+      <div className="rounded-xl border border-red-100 bg-red-50 p-6 text-sm font-medium text-red-700">{message}</div>
+    </section>
+  );
+}
+
+
+function buildLandingStats(sessions: PublicSessionDto[]): PublicLandingPageDto['stats'] {
+  const { priceFrom, priceTo } = resolveSessionPriceRange(sessions);
+  return {
+    events: groupLandingSessions(sessions).length,
+    sessions: sessions.length,
+    cities: countBy(sessions.map((session) => session.city)),
+    categories: countBy(sessions.flatMap((session) => [session.category, ...session.tags.slice(0, 2)]).filter(Boolean)),
+    venues: countBy(sessions.map((session) => session.venue)),
+    priceFrom,
+    priceTo,
+  };
+}
+
+function groupLandingSessions(sessions: PublicSessionDto[]): EventGroup[] {
+  const groups = new Map<string, PublicSessionDto[]>();
+
+  for (const session of sessions) {
+    const key = session.groupKey || [session.title, session.city, session.venue].map((value) => normalizeKey(value)).join('|');
+    const list = groups.get(key) || [];
+    list.push(session);
+    groups.set(key, list);
+  }
+
+  return [...groups.entries()].map(([key, groupSessions]) => {
+    const sortedSessions = [...groupSessions].sort(
+      (a, b) => parseSessionStartsAt(a.startsAt).getTime() - parseSessionStartsAt(b.startsAt).getTime(),
+    );
+    const representative = sortedSessions[0];
+    const { priceFrom, priceTo } = resolveSessionPriceRange(sortedSessions);
+    const vacantValues = sortedSessions.map((session) => session.vacant).filter((vacant): vacant is number => Number.isFinite(vacant));
+
+    return {
+      key,
+      title: representative.title,
+      city: representative.city,
+      venue: representative.venue,
+      category: representative.category,
+      tags: representative.tags,
+      representative,
+      sessions: sortedSessions,
+      priceFrom,
+      priceTo,
+      vacant: Number.isFinite(representative.vacant) ? representative.vacant : vacantValues.length ? Math.min(...vacantValues) : null,
+      firstStartsAt: representative.startsAt,
+    };
+  });
+}
+
+function sortEventGroups(groups: EventGroup[], sort: SortFilter): EventGroup[] {
+  const sorted = [...groups];
+
+  if (sort === 'price') {
+    return sorted.sort((a, b) => (a.priceFrom || Number.MAX_SAFE_INTEGER) - (b.priceFrom || Number.MAX_SAFE_INTEGER));
+  }
+
+  if (sort === 'rating') {
+    return sorted.sort((a, b) => b.sessions.length - a.sessions.length || (a.priceFrom || 0) - (b.priceFrom || 0));
+  }
+
+  return sorted.sort((a, b) => new Date(a.firstStartsAt || 0).getTime() - new Date(b.firstStartsAt || 0).getTime());
+}
+
+function dayFilterValue(date: Date): `day:${string}` {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `day:${y}-${m}-${d}`;
+}
+
+function parseDayFilterValue(filter: DateFilter): Date | null {
+  if (!filter.startsWith('day:')) return null;
+  const raw = filter.slice(4);
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(raw);
+  if (!match) return null;
+  return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+}
+
+function formatChipDayLabel(date: Date): string {
+  return new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'short' }).format(date);
+}
+
+function resolveLandingDateChips(input: {
+  profile: LandingProfile;
+  landingSlug?: string;
+  eventWindow: LandingEventWindow | null;
+  isSeasonal: boolean;
+}): Array<{ label: string; value: DateFilter }> {
+  const { eventWindow, isSeasonal } = input;
+  if (eventWindow) {
+    const days = listLandingWindowDays(eventWindow, 14);
+    if (eventWindow.singleDay || days.length === 1) {
+      const day = days[0] || eventWindow.start;
+      return [{ label: eventWindow.label || formatChipDayLabel(day), value: dayFilterValue(day) }];
+    }
+    if (days.length <= 7) {
+      return [
+        { label: 'Все даты', value: 'window' },
+        ...days.map((day) => ({ label: formatChipDayLabel(day), value: dayFilterValue(day) })),
+      ];
+    }
+    return [{ label: `Сезон: ${eventWindow.label}`, value: 'window' }];
+  }
+
+  return [
+    { label: 'Сегодня', value: 'today' },
+    { label: 'Завтра', value: 'tomorrow' },
+    { label: 'Любая дата', value: 'all' },
+    ...(isSeasonal ? [] : [{ label: 'Вечером', value: 'evening' as DateFilter }]),
+  ];
+}
+
+function defaultLandingDateFilter(_profile: LandingProfile, landingSlug?: string): DateFilter {
+  const window = landingSlug ? resolveLandingEventWindow(landingSlug) : null;
+  if (!window) return 'all';
+  if (window.singleDay) return dayFilterValue(window.start);
+  return 'window';
+}
+
+function resolveSeasonalCityNames(landingSlug: string, cityOptions: Array<[string, number]>): string[] {
+  const withEvents = new Set(cityOptions.filter(([, count]) => count > 0).map(([name]) => name));
+  const order = getSeasonalLanding(landingSlug)?.cityOrder || [];
+  if (order.length) return order.filter((name) => withEvents.has(name));
+  return cityOptions
+    .map(([name]) => name)
+    .filter((name) => name && !/^не указан$/i.test(name.trim()));
+}
+
+function matchesDateFilter(
+  session: PublicSessionDto,
+  filter: DateFilter,
+  eventWindow: LandingEventWindow | null = null,
+  referenceDate: Date = new Date(),
+): boolean {
+  if (filter === 'all' || filter === 'window') return true;
+  if (isOpenDate(session)) return true;
+  const timeZone = resolveSessionTimeZoneForSession(session);
+  const times = collectSessionStartsAtTimes(session);
+  if (!times.length) return false;
+
+  const dayValue = parseDayFilterValue(filter);
+  if (dayValue) {
+    if (eventWindow && !isDateInsideLandingWindow(dayValue, eventWindow)) return false;
+    return times.some((startsAt) => isSameSessionDay(startsAt, dayValue, timeZone));
+  }
+
+  if (filter === 'evening') {
+    return (
+      session.timeBucket === 'evening' ||
+      session.timeBucket === 'night' ||
+      times.some((startsAt) => getSessionHour(startsAt, timeZone) >= 18)
+    );
+  }
+
+  // Relative chips only when that calendar day sits inside the holiday window (if any).
+  if (eventWindow) {
+    if (filter === 'today' && !isDateInsideLandingWindow(referenceDate, eventWindow)) return false;
+    if (filter === 'tomorrow') {
+      const tomorrow = new Date(
+        referenceDate.getFullYear(),
+        referenceDate.getMonth(),
+        referenceDate.getDate() + 1,
+      );
+      if (!isDateInsideLandingWindow(tomorrow, eventWindow)) return false;
+    }
+  }
+
+  return times.some((startsAt) => {
+    if (filter === 'today') return isSameSessionDay(startsAt, referenceDate, timeZone);
+    if (filter === 'tomorrow') return isSessionTomorrow(startsAt, timeZone);
+    if (filter === 'weekend') return isSessionWeekend(startsAt, timeZone);
+    return true;
+  });
+}
+
+function startOfDay(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function countBy(values: string[]): Record<string, number> {
+  return values.reduce<Record<string, number>>((acc, value) => {
+    if (!value) return acc;
+    acc[value] = (acc[value] || 0) + 1;
+    return acc;
+  }, {});
+}
+
+function topEntries(values: Record<string, number>, limit: number): Array<[string, number]> {
+  return Object.entries(values)
+    .filter(([name, count]) => Boolean(name) && count > 0)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit);
+}
+
+function normalizeKey(value: string): string {
+  return String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+function navigateHome(section: string) {
+  if (section === 'events') {
+    window.location.href = '/events';
+    return;
+  }
+  if (section === 'cities' || section === 'destinations') {
+    window.location.href = '/cities';
+    return;
+  }
+  if (section === 'orders') {
+    window.location.href = '/account/purchases';
+    return;
+  }
+  if (section === 'blog') {
+    window.location.href = '/blog';
+    return;
+  }
+  if (section === 'landings') {
+    window.location.href = '/podborki';
+    return;
+  }
+  window.location.href = section === 'top' ? '/' : `/#${section}`;
 }
