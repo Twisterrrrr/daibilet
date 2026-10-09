@@ -22,6 +22,7 @@ import {
 import { BridgesScheduleSection } from '@/components/landing/BridgesScheduleSection.client';
 import { RiverScheduleSection, type RiverEventGroup } from '@/components/landing/RiverScheduleSection.client';
 import { BusScheduleSection, type BusEventGroup } from '@/components/landing/BusScheduleSection.client';
+import { DinnerScheduleSection, type DinnerEventGroup } from '@/components/landing/DinnerScheduleSection.client';
 import { LandingCityLocations } from '@/components/landing/LandingCityLocations.client';
 import { LandingPurchaseButton } from '@/components/landing/LandingPurchaseButton.client';
 import { LandingStickyHeader } from '@/components/landing/LandingStickyHeader.client';
@@ -87,6 +88,7 @@ import { LandingThinRelatedCards } from '@/components/LandingThinRelatedCards';
 import { resolveRelatedListingLinks } from '@/lib/seo-internal-links';
 import { buildBridgesProductJsonLd } from '@/lib/bridges-seo';
 import { formatLandingTodayIso, formatLandingTodayLong } from '@/lib/datetime';
+import { extractMenuLabel, extractFormatLabel, dinnerScheduleGridClass, collectDinnerMenuFacets, matchesMenuFilter } from '@/lib/dinner-helpers';
 import { BRIDGES_LANDING } from '@/data/bridges-landing';
 import {
   getSeasonalLanding,
@@ -161,15 +163,6 @@ function riverLandingRoot(landingSlug: string) {
   if (isBridgesNightLandingSlug(landingSlug)) return landingCategoryHref(CANONICAL_LANDING_SLUGS.bridges);
   return riverLandingHref();
 }
-function matchesMenuFilter(session: PublicSessionDto, menu: MenuFilter): boolean {
-  if (menu === 'all') return true;
-  const text = [session.title, session.category, ...(session.tags || []), ...(session.subcategories || [])]
-    .join(' ')
-    .toLowerCase();
-  if (menu === 'set') return /сет-?меню|set-?menu|дегустац/i.test(text);
-  if (menu === 'buffet') return /фуршет|buffet/i.test(text);
-  return true;
-}
 
 function matchesDinnerTimeFilter(session: PublicSessionDto, filter: DinnerTimeFilter): boolean {
   if (filter === 'all') return true;
@@ -178,46 +171,6 @@ function matchesDinnerTimeFilter(session: PublicSessionDto, filter: DinnerTimeFi
   if (filter === 'sunset') return hour >= 18 && hour < 21;
   if (filter === 'night') return hour >= 21;
   return true;
-}
-
-function extractMenuLabel(session: PublicSessionDto): string | null {
-  const text = [session.title, session.category, ...(session.tags || []), ...(session.subcategories || [])]
-    .join(' ')
-    .toLowerCase();
-  if (/фуршет/i.test(text)) return 'Фуршет';
-  if (/сет-?меню|дегустац|set-?menu/i.test(text)) return 'Сет-меню';
-  return null;
-}
-
-function collectDinnerMenuFacets(sessions: PublicSessionDto[]): Array<{ value: Exclude<MenuFilter, 'all'>; label: string }> {
-  const facets: Array<{ value: Exclude<MenuFilter, 'all'>; label: string }> = [
-    { value: 'set', label: 'Сет-меню' },
-    { value: 'buffet', label: 'Фуршет' },
-  ];
-  return facets.filter((facet) => {
-    const count = sessions.filter((session) => matchesMenuFilter(session, facet.value)).length;
-    return count > 0 && count < sessions.length;
-  });
-}
-
-function extractFormatLabel(tags: string[]): string {
-  const text = (tags || []).join(' ').toLowerCase();
-  if (/vip/i.test(text)) return 'VIP';
-  if (/романт/i.test(text)) return 'Романтика';
-  if (/корпоратив/i.test(text)) return 'Корпоратив';
-  return 'Стандарт';
-}
-
-function dinnerScheduleGridClass(showMenuColumn: boolean, showFormatColumn: boolean): string {
-  const titleFr = showMenuColumn && showFormatColumn ? '1.8fr'
-    : showMenuColumn || showFormatColumn ? '2.1fr' : '2.4fr';
-  const parts = [titleFr];
-  if (showMenuColumn) parts.push('0.7fr');
-  parts.push(showMenuColumn && showFormatColumn ? '0.6fr' : '0.65fr');
-  parts.push('0.55fr');
-  if (showFormatColumn) parts.push('0.6fr');
-  parts.push('auto');
-  return `md:grid-cols-[${parts.join('_')}]`;
 }
 
 function resolveLandingCityPrep(cityName: string | null, profile: LandingProfile, landingSlug: string): string | null {
@@ -1175,8 +1128,10 @@ export function LandingPageView({
             ) : sessionsError ? (
               <ScheduleErrorState message={sessionsError} />
             ) : profile === 'dinner' ? (
-              <LandingDinnerScheduleList
-                groups={groups}
+              <DinnerScheduleSection
+                groups={groups as DinnerEventGroup[]}
+                emptyKind={allGroups.length === 0 ? 'zero' : 'filtered'}
+                cityName={cityName}
                 onReset={() => {
                   setDateFilter('today');
                   setSort('price');
@@ -1185,10 +1140,6 @@ export function LandingPageView({
                   setDinnerBadgeFilter('all');
                   setCategory('all');
                 }}
-                emptyKind={allGroups.length === 0 ? 'zero' : 'filtered'}
-                cityName={cityName}
-                relatedSessions={thinRelatedSessions}
-                relatedLinks={citySlug ? resolveRelatedListingLinks(slug, citySlug) : []}
               />
             ) : profile === 'bridges' ? (
               <BridgesScheduleSection groups={groups} sort={sort} setSort={setSort} />
