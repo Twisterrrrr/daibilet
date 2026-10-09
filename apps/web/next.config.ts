@@ -114,6 +114,9 @@ const nextConfig: NextConfig = {
     };
     return config;
   },
+  // Silence Turbopack warning — webpack config above is for extensionAlias
+  // which Turbopack handles natively.
+  turbopack: {},
 };
 
 export default nextConfig;
