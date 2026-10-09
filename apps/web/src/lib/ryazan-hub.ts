@@ -1029,7 +1029,7 @@ export const RYAZAN_DAY_ROUTE_PRESETS: any[] = [
     travelVector: 'Сады, музеи и наличники',
     timingNote:
       'Около 4 часов: Павлов - Пожалостин - Нижний сад - дом Морозова - «Чулан».',
-    coverImageUrl: '/images/venues/ryazan/muzey-usad-ba-akademika-i-p-pavlova.jpg',
+    coverImageUrl: '/images/venues/ryazan/muzey-usad-ba-akademika-i-p-pavlova-r20261009.jpg',
     stops: [
       {
         name: 'Музей-усадьба академика И. П. Павлова',
