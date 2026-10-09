@@ -230,6 +230,10 @@ if [[ -f "${WEB_NEXT_DIR}/prerender-manifest.json" && -f "${WEB_NEXT_DIR}/BUILD_
   cp -a "${WEB_NEXT_DIR}" "${WEB_NEXT_PREV}"
   echo "Saved healthy .next → .next.prev (BUILD_ID=$(cat "${WEB_NEXT_DIR}/BUILD_ID"))"
 fi
+# The runtime can also leave root-owned files under .next/server/route-cache.
+# Build from an empty output tree after preserving the rollback snapshot.
+rm_rf_deploy "${WEB_NEXT_DIR}"
+echo "Cleared ${WEB_NEXT_DIR} before build"
 
 # Heap cap for `next build` on MSK ~8Gi (also set in apps/web/scripts/next-build.mjs).
 # Default 5120Mi (legacy SPB 3.8Gi used 2560). Override via NODE_OPTIONS if needed.
