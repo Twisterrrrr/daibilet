@@ -12,7 +12,7 @@ import {
   yandexMapsSearchUrl,
 } from './city-hub-lifehacks.ts';
 
-const CITY_INFO_SRC = readFileSync(fileURLToPath(new URL('./cityInfo.ts', import.meta.url)), 'utf8');
+const CITY_INFO_SRC = readFileSync(fileURLToPath(new URL('./cityInfo-data.ts', import.meta.url)), 'utf8');
 const EKB_HUB_SRC = readFileSync(fileURLToPath(new URL('./ekaterinburg-hub.ts', import.meta.url)), 'utf8');
 const KAZAN_HUB_SRC = readFileSync(fileURLToPath(new URL('./kazan-hub.ts', import.meta.url)), 'utf8');
 const SAMARA_HUB_SRC = readFileSync(fileURLToPath(new URL('./samara-hub.ts', import.meta.url)), 'utf8');

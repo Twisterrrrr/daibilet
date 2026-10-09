@@ -5,7 +5,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const dir = dirname(fileURLToPath(import.meta.url));
-const webCityInfo = readFileSync(join(dir, 'cityInfo.ts'), 'utf8');
+const webCityInfo = readFileSync(join(dir, 'cityInfo-data.ts'), 'utf8');
 const publicCityInfo = readFileSync(
   join(dir, '../../../public/src/lib/cityInfo.ts'),
   'utf8',

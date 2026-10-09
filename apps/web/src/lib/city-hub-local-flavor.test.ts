@@ -39,7 +39,7 @@ const CONTENT_SOURCE_FILES = readdirSync(fileURLToPath(new URL('.', import.meta.
       /-hub\.ts$/.test(name) ||
       /-suburbs\.ts$/.test(name) ||
       /-must-see\.ts$/.test(name) ||
-      name === 'cityInfo.ts' ||
+      name === 'cityInfo-data.ts' ||
       name === 'city-destination-registry.ts' ||
       name === 'city-monuments-must-see.ts',
   )
