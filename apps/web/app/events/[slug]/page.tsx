@@ -5,6 +5,7 @@ import { EventBuyCard, EventHero } from '@/components/EventPage.client';
 import { EventPdpBody } from '@/components/EventPdpBody.client';
 import { EventTags, EventTrustStrip } from '@/components/EventPageSections';
 import { JsonLdScripts } from '@/components/JsonLdScripts';
+import { PeerEventsBlock } from '@/components/PeerEventsBlock.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
 import { toEventPageClientPayload } from '@/lib/event-page-client-props';
@@ -184,6 +185,12 @@ export default async function EventDetailPage({ params }: PageProps) {
             </div>
           </div>
         </div>
+
+        {payload.peerEvents?.length ? (
+          <div className="container-page pb-8 sm:pb-10 lg:pb-14">
+            <PeerEventsBlock peers={payload.peerEvents} />
+          </div>
+        ) : null}
 
         {related?.length ? (
           <section className="border-t border-slate-200/80 bg-surface-muted section-y">

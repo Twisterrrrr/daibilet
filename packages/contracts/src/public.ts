@@ -362,6 +362,18 @@ export interface PublicEventPageDto extends ApiEnvelope {
   purchaseOptions?: PublicPurchaseOptionDto[];
   related: PublicSessionDto[];
   landings: Array<Pick<PublicLandingDto, 'slug' | 'title' | 'subtitle' | 'chips'>>;
+  /** Same show in other cities (cross-city merge via mergeGroupKey or metaExternalId). */
+  peerEvents?: Array<{
+    id: string;
+    slug: string;
+    title: string;
+    city: string;
+    citySlug: string;
+    venue: string;
+    venueSlug: string;
+    startsAt: string | null;
+    priceFrom: number | null;
+  }>;
   stats: {
     sessions: number;
     priceFrom?: number | null;

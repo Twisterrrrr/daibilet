@@ -423,6 +423,25 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
     offers: offers.map(({ eventId: _eventId, sortOrder: _sortOrder, sourceTicketId: _sourceTicketId, payload: _payload, ...offer }) => offer),
     ticketPrices,
     ...(purchaseOptions.length >= 2 ? { purchaseOptions } : {}),
+    // Cross-city peer events: same show in different cities.
+    peerEvents: mergedGroupEvents
+      .filter((e) => e.id !== requestedEvent.id && e.primaryCityId !== requestedEvent.primaryCityId)
+      .slice(0, 8)
+      .map((e) => {
+        const nextSession = e.sessions?.[0];
+        return {
+          id: e.id,
+          slug: publicSlug(e.slug),
+          title: formatPublicEventTitle(e.override?.title || e.title),
+          city: e.primaryCity?.title || '',
+          citySlug: e.primaryCity?.slug || '',
+          venue: e.venue?.title || '',
+          venueSlug: e.venue?.slug || '',
+          startsAt: nextSession?.startsAt?.toISOString() || null,
+          priceFrom: e.priceFromRub || null,
+        };
+      })
+      .filter((p) => p.city && p.slug !== publicSlug(requestedEvent.slug)),
     related,
     landings: landingSlugs.map(findLandingRule).filter(isDefined).map((rule) => ({
       slug: rule.slug,
