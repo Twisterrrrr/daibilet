@@ -1,13 +1,13 @@
 {
   "date": "2026-10-09",
   "scope": "70 city hubs, including hidden must-see categories and suburb rails",
-  "issues": 95,
-  "restored": 17,
+  "issues": 105,
+  "restored": 27,
   "generated": 78,
   "byCity": {
-    "chelyabinsk": 4,
+    "chelyabinsk": 10,
     "krasnoyarsk": 6,
-    "omsk": 6,
+    "omsk": 8,
     "penza": 7,
     "saratov": 5,
     "tver": 5,
@@ -17,7 +17,7 @@
     "yaroslavl": 14,
     "ryazan": 7,
     "kaliningrad": 2,
-    "rostov-na-donu": 4,
+    "rostov-na-donu": 6,
     "sochi": 8,
     "novosibirsk": 1
   },
@@ -3198,6 +3198,316 @@
           "width": 480,
           "height": 320,
           "bytes": 37947
+        }
+      ]
+    },
+    {
+      "id": "missed0",
+      "city": "chelyabinsk",
+      "subject": "arkaim-poselok-mednogo-veka",
+      "defect": "upside_down",
+      "before": "/images/venues/chelyabinsk/arkaim-poselok-mednogo-veka.jpg",
+      "after": "/images/venues/chelyabinsk/arkaim-poselok-mednogo-veka-r20261009.jpg",
+      "action": "restored",
+      "sha256": "187d40e1bdd7bfd80aa777ddcf203ed6e4e9fc85c9765fa1d305ceab46a35032",
+      "restoredFrom": "8c9d42358^",
+      "variants": [
+        {
+          "path": "/images/venues/chelyabinsk/arkaim-poselok-mednogo-veka-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 252683
+        },
+        {
+          "path": "/images/venues/chelyabinsk/arkaim-poselok-mednogo-veka-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 102325
+        },
+        {
+          "path": "/images/venues/chelyabinsk/arkaim-poselok-mednogo-veka-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 26363
+        }
+      ]
+    },
+    {
+      "id": "missed1",
+      "city": "chelyabinsk",
+      "subject": "brudershaft",
+      "defect": "upside_down",
+      "before": "/images/venues/chelyabinsk/brudershaft.jpg",
+      "after": "/images/venues/chelyabinsk/brudershaft-r20261009.jpg",
+      "action": "restored",
+      "sha256": "a20351137e7efb27dfeea5c6fcce4d3f23219fd4a8906f32db7c4f43cf0b563e",
+      "restoredFrom": "8c9d42358^",
+      "variants": [
+        {
+          "path": "/images/venues/chelyabinsk/brudershaft-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 255454
+        },
+        {
+          "path": "/images/venues/chelyabinsk/brudershaft-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 114188
+        },
+        {
+          "path": "/images/venues/chelyabinsk/brudershaft-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 33445
+        }
+      ]
+    },
+    {
+      "id": "missed2",
+      "city": "chelyabinsk",
+      "subject": "experimentus",
+      "defect": "upside_down",
+      "before": "/images/venues/chelyabinsk/experimentus.jpg",
+      "after": "/images/venues/chelyabinsk/experimentus-r20261009.jpg",
+      "action": "restored",
+      "sha256": "eacba56b94198ab2dd865f40c62b97b4d69e1b6bd36bbd6c1497f9cfc24ed7b5",
+      "restoredFrom": "8c9d42358^",
+      "variants": [
+        {
+          "path": "/images/venues/chelyabinsk/experimentus-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 279720
+        },
+        {
+          "path": "/images/venues/chelyabinsk/experimentus-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 123550
+        },
+        {
+          "path": "/images/venues/chelyabinsk/experimentus-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 36228
+        }
+      ]
+    },
+    {
+      "id": "missed4",
+      "city": "chelyabinsk",
+      "subject": "kofeynya-udobno",
+      "defect": "upside_down",
+      "before": "/images/venues/chelyabinsk/kofeynya-udobno.jpg",
+      "after": "/images/venues/chelyabinsk/kofeynya-udobno-r20261009.jpg",
+      "action": "restored",
+      "sha256": "a203a90808aac72bb4e26c3bc8c36e24c776d6932b2ff4fbe0ba96ab25fca72a",
+      "restoredFrom": "8c9d42358^",
+      "variants": [
+        {
+          "path": "/images/venues/chelyabinsk/kofeynya-udobno-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 234626
+        },
+        {
+          "path": "/images/venues/chelyabinsk/kofeynya-udobno-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 99056
+        },
+        {
+          "path": "/images/venues/chelyabinsk/kofeynya-udobno-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 27283
+        }
+      ]
+    },
+    {
+      "id": "missed5",
+      "city": "chelyabinsk",
+      "subject": "pamyatnik-nishchemu",
+      "defect": "upside_down",
+      "before": "/images/venues/chelyabinsk/pamyatnik-nishchemu.jpg",
+      "after": "/images/venues/chelyabinsk/pamyatnik-nishchemu-r20261009.jpg",
+      "action": "restored",
+      "sha256": "3122206313cb73a082cf823e936d9d29619cd7f30df02d6aa24e908b1f08bdca",
+      "restoredFrom": "8c9d42358^",
+      "variants": [
+        {
+          "path": "/images/venues/chelyabinsk/pamyatnik-nishchemu-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 226316
+        },
+        {
+          "path": "/images/venues/chelyabinsk/pamyatnik-nishchemu-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 85886
+        },
+        {
+          "path": "/images/venues/chelyabinsk/pamyatnik-nishchemu-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 21115
+        }
+      ]
+    },
+    {
+      "id": "missed7",
+      "city": "chelyabinsk",
+      "subject": "taganay-belyy-klyuch",
+      "defect": "upside_down",
+      "before": "/images/venues/chelyabinsk/taganay-belyy-klyuch.jpg",
+      "after": "/images/venues/chelyabinsk/taganay-belyy-klyuch-r20261009.jpg",
+      "action": "restored",
+      "sha256": "aad70a5759e232618dab24fe10a8aa4d7acca6c2a750ad99f2c06a9342725426",
+      "restoredFrom": "8c9d42358^",
+      "variants": [
+        {
+          "path": "/images/venues/chelyabinsk/taganay-belyy-klyuch-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 463452
+        },
+        {
+          "path": "/images/venues/chelyabinsk/taganay-belyy-klyuch-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 171090
+        },
+        {
+          "path": "/images/venues/chelyabinsk/taganay-belyy-klyuch-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 38346
+        }
+      ]
+    },
+    {
+      "id": "missed23",
+      "city": "omsk",
+      "subject": "muzey-teatralnogo-iskusstva",
+      "defect": "upside_down",
+      "before": "/images/venues/omsk/muzey-teatralnogo-iskusstva.jpg",
+      "after": "/images/venues/omsk/muzey-teatralnogo-iskusstva-r20261009.jpg",
+      "action": "restored",
+      "sha256": "854dac225e167031cbf902a05536c16bc469ff4c0c15395dc3647547a97f5061",
+      "restoredFrom": "8c9d42358^",
+      "variants": [
+        {
+          "path": "/images/venues/omsk/muzey-teatralnogo-iskusstva-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 253184
+        },
+        {
+          "path": "/images/venues/omsk/muzey-teatralnogo-iskusstva-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 97873
+        },
+        {
+          "path": "/images/venues/omsk/muzey-teatralnogo-iskusstva-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 26813
+        }
+      ]
+    },
+    {
+      "id": "missed27",
+      "city": "omsk",
+      "subject": "starina-sibirskaya",
+      "defect": "upside_down",
+      "before": "/images/venues/omsk/starina-sibirskaya.jpg",
+      "after": "/images/venues/omsk/starina-sibirskaya-r20261009.jpg",
+      "action": "restored",
+      "sha256": "c83161aa2d91a95afaaf9073bd02a1c44c5b8ff6d27baa2eb58f8068b9c758aa",
+      "restoredFrom": "8c9d42358^",
+      "variants": [
+        {
+          "path": "/images/venues/omsk/starina-sibirskaya-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 337030
+        },
+        {
+          "path": "/images/venues/omsk/starina-sibirskaya-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 123475
+        },
+        {
+          "path": "/images/venues/omsk/starina-sibirskaya-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 28775
+        }
+      ]
+    },
+    {
+      "id": "missed43",
+      "city": "rostov-na-donu",
+      "subject": "msii-na-dmitrovskoy",
+      "defect": "upside_down",
+      "before": "/images/venues/rostov-na-donu/msii-na-dmitrovskoy.jpg",
+      "after": "/images/venues/rostov-na-donu/msii-na-dmitrovskoy-r20261009.jpg",
+      "action": "restored",
+      "sha256": "b2405d154d96a318e89ff6a704ce43af500a56563a049cf540238c75a42cf80e",
+      "restoredFrom": "8c9d42358^",
+      "variants": [
+        {
+          "path": "/images/venues/rostov-na-donu/msii-na-dmitrovskoy-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 341173
+        },
+        {
+          "path": "/images/venues/rostov-na-donu/msii-na-dmitrovskoy-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 126460
+        },
+        {
+          "path": "/images/venues/rostov-na-donu/msii-na-dmitrovskoy-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 31264
+        }
+      ]
+    },
+    {
+      "id": "missed49",
+      "city": "rostov-na-donu",
+      "subject": "starocherkasskaya-dvorec-efremovyh",
+      "defect": "upside_down",
+      "before": "/images/venues/rostov-na-donu/starocherkasskaya-dvorec-efremovyh.jpg",
+      "after": "/images/venues/rostov-na-donu/starocherkasskaya-dvorec-efremovyh-r20261009.jpg",
+      "action": "restored",
+      "sha256": "61d5dcd37d51c8aec44e76477b79d95cef6179c2153fb4a1281dc45bcbc12aed",
+      "restoredFrom": "8c9d42358^",
+      "variants": [
+        {
+          "path": "/images/venues/rostov-na-donu/starocherkasskaya-dvorec-efremovyh-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 224702
+        },
+        {
+          "path": "/images/venues/rostov-na-donu/starocherkasskaya-dvorec-efremovyh-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 78556
+        },
+        {
+          "path": "/images/venues/rostov-na-donu/starocherkasskaya-dvorec-efremovyh-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 18809
         }
       ]
     }
