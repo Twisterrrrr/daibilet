@@ -959,16 +959,17 @@ export function eventTitleTokenFingerprint(title: string): string {
 function resolveMultiPurchasePeers(groupEvents: EventRecord[], requestedEvent: EventRecord): EventRecord[] {
   const mergeGroupKey = normalizeMergeGroupKey(requestedEvent.override?.mergeGroupKey);
   if (mergeGroupKey) {
+    // Explicit mergeGroupKey: allow cross-city merges (admin knows what they're doing).
     return groupEvents.filter(
       (event) =>
-        normalizeMergeGroupKey(event.override?.mergeGroupKey) === mergeGroupKey &&
-        event.primaryCityId === requestedEvent.primaryCityId,
+        normalizeMergeGroupKey(event.override?.mergeGroupKey) === mergeGroupKey,
     );
   }
 
   const mergeTitle = mergedCatalogTitle(requestedEvent);
   if (!mergeTitle) return [];
 
+  // Automatic title merge: restrict to same city to avoid false positives.
   return groupEvents.filter(
     (event) =>
       mergedCatalogTitle(event) === mergeTitle &&
@@ -992,15 +993,27 @@ function buildPurchaseOptionDescription(event: EventRecord): string | null {
   const raw = cleanImportedDescription(
     event.override?.shortDescription || event.description || event.override?.description,
   );
-  if (!raw) return null;
 
-  const lines = raw
+  // Build venue + city prefix for cross-city merge context.
+  const venueName = event.venue?.title?.trim() || '';
+  const cityName = event.primaryCity?.title?.trim() || '';
+  const locationPrefix = venueName && cityName
+    ? `${venueName}, ${cityName}`
+    : venueName || cityName || '';
+
+  if (!raw && !locationPrefix) return null;
+
+  const lines = (raw || '')
     .split(/\n+/)
     .map((line) => line.replace(/^[-–—•*]\s*/, '').trim())
     .filter(Boolean);
   const snippet = lines.slice(0, 3).join(' · ');
-  if (!snippet) return null;
-  return snippet.length > 260 ? `${snippet.slice(0, 257).trim()}…` : snippet;
+
+  // Combine location prefix with description snippet.
+  const parts = [locationPrefix, snippet].filter(Boolean);
+  const combined = parts.join(' — ');
+  if (!combined) return null;
+  return combined.length > 260 ? `${combined.slice(0, 257).trim()}…` : combined;
 }
 
 function isAdultOrChildPurchaseOptionTitle(title: string): boolean {
