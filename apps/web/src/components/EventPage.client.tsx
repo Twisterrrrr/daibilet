@@ -37,10 +37,10 @@ import { dayRouteItemFromEvent } from '@/lib/day-route-from-place';
 import { formatPublicTitle } from '@/lib/format-public-title';
 import { splitLongTitleAtBreak } from '@/lib/split-long-title';
 import { buildEventBreadcrumbs } from '@/lib/structured-data';
-import { resolveEventHeroObjectPosition } from '@/lib/event-image-focus';
+import { HeroImageWithBlur } from '@/components/HeroImageWithBlur.client';
 import { venueHref } from '@/lib/routes';
 import { formatStreetAddress } from '@/lib/address';
-import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
+import { IMAGE_SIZES } from '@/components/SafeImage.client';
 import { CheckoutModalButton } from '@/components/CheckoutModal.client';
 import { EventVenueTrigger } from '@/components/EventVenueModal.client';
 import { trackSelectTickets } from '@/lib/catalog-analytics';
@@ -580,12 +580,6 @@ export function EventHero({
   const fallbackPrice = formatPriceRub(stats.priceFrom ?? event.priceFrom);
   const priceLabel = priceRange ? formatHeroBuyButtonPrice(priceRange) : fallbackPrice ? `от ${fallbackPrice}` : '';
   const heroImage = String(event.imageUrl || '').trim();
-  const heroObjectPosition = resolveEventHeroObjectPosition({
-    slug: event.slug,
-    sourceSlug: event.sourceSlug,
-    externalId: event.externalId,
-    id: event.id,
-  });
   const nextSession = pickRepresentativeSession((payload.sessions ?? []) as EventSession[]);
   const canOpenVenueModal = Boolean(event.venue && (event.venueId || event.venueSlug));
   const venuePageHref = canOpenVenueModal
@@ -630,33 +624,18 @@ export function EventHero({
     >
       <EventPageCitySync city={event.city} />
       {/*
-        Keep the photo full-bleed at every breakpoint. Event artwork is often
-        portrait-ish, so objectPosition preserves its curated focal point while
-        cover prevents narrow pillarboxed images on desktop and ultrawide screens.
+        Hero: full artwork visible, blurred background fills edges.
+        No cropping — the entire poster/image is shown.
       */}
-      <SafeImage
+      <HeroImageWithBlur
         src={heroImage || null}
         alt={formatPublicTitle(event.title)}
-        fill
         priority
-        sizes={IMAGE_SIZES.eventHero}
-        style={{ '--event-hero-mobile-position': heroObjectPosition } as React.CSSProperties}
-        className="event-page-hero-image object-cover opacity-80"
-        fallback={
-          <div className="flex h-full items-center justify-center bg-gradient-to-br from-primary-600 to-primary-900">
-            <span className="text-8xl opacity-30">🎭</span>
-          </div>
-        }
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-y-0 left-0 hidden w-[18%] bg-gradient-to-r from-slate-900 via-slate-900/70 to-transparent md:block"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent"
       />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-y-0 right-0 hidden w-[18%] bg-gradient-to-l from-slate-900 via-slate-900/70 to-transparent md:block"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/45 to-slate-900/25" />
 
       {/*
         Tablet (md…lg): taller hero + top >> bottom so copy sits low like desktop.
