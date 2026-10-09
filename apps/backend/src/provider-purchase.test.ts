@@ -5,7 +5,7 @@ import {
   buildProviderWidgetUrl,
   purchaseInfo,
   sanitizeTicketscloudPurchaseUrl,
-} from './provider-purchase.js';
+} from './provider-purchase';
 
 const originalToken = process.env.TICKETSCLOUD_WIDGET_TOKEN;
 const originalBase = process.env.TICKETSCLOUD_WIDGET_BASE_URL;

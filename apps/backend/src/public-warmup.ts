@@ -1,4 +1,4 @@
-import type { PublicSessionDto } from './types/public.js';
+import type { PublicSessionDto } from './types/public';
 
 export interface PublicWarmupFlags {
   catalog: boolean;

@@ -1,8 +1,8 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { buildPublicBuyerOrders } from './dto.js';
-import { createDb } from './db.js';
+import { buildPublicBuyerOrders } from './dto';
+import { createDb } from './db';
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 

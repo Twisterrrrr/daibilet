@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { mapEventChangeRequestDetailRow, mapEventChangeRequestRow } from './admin-event-change-requests.dto.js';
+import { mapEventChangeRequestDetailRow, mapEventChangeRequestRow } from './admin-event-change-requests.dto';
 
 test('maps event change request row for admin operations', () => {
   const row = mapEventChangeRequestRow({

@@ -7,8 +7,8 @@ import type {
   Readiness,
   SeoFields,
   TimeBucket,
-} from './common.js';
-import type { LandingContentBlockDto } from './landing.js';
+} from './common';
+import type { LandingContentBlockDto } from './landing';
 
 export interface PublicStatsDto extends ApiEnvelope {
   events: number;

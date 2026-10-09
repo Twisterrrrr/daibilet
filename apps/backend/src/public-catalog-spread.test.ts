@@ -8,7 +8,7 @@ import {
   normalizePublicSessionImageKey,
   seededNearBiasedShuffleSessions,
   spreadCatalogSessionsByCoverImage,
-} from './public-catalog-spread.js';
+} from './public-catalog-spread';
 
 test('normalizePublicSessionImageKey strips resize suffix', () => {
   assert.equal(

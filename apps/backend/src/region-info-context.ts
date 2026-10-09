@@ -1,5 +1,5 @@
-import type { PublicSessionDto } from './types/public.js';
-import type { PublicRegionChildCityDto, RegionCenterConfig } from './region-hub.js';
+import type { PublicSessionDto } from './types/public';
+import type { PublicRegionChildCityDto, RegionCenterConfig } from './region-hub';
 
 export type RegionInfoVenueHint = {
   name: string;

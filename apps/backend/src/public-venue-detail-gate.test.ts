@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { evaluateVenueDetailContentGate } from './public-venue-hub-gate.js';
-import { markVenueSitemapCanonicalSlugs, markVenueSitemapDetailAvailability } from './public-venue-read.js';
+import { evaluateVenueDetailContentGate } from './public-venue-hub-gate';
+import { markVenueSitemapCanonicalSlugs, markVenueSitemapDetailAvailability } from './public-venue-read';
 
 test('detail content gate matches the no-session venue branches', () => {
   const base = { title: 'Зал', kind: 'CONCERT_HALL', pageStatus: 'CANDIDATE', address: 'ул. 1' };

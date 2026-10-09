@@ -1,7 +1,7 @@
-import { MIN_DISPLAY_PRICE_RUB, isOpenDateCatalogRow, isPublicSalesStatusBlocked } from './catalog-availability.js';
+import { MIN_DISPLAY_PRICE_RUB, isOpenDateCatalogRow, isPublicSalesStatusBlocked } from './catalog-availability';
 import { formatPublicEventTitle } from './event-title-normalize.ts';
-import { formatPublicVenueTitle as sanitizePublicVenueTitle } from './venue-normalize.js';
-import type { PublicSessionDto } from './types/public.js';
+import { formatPublicVenueTitle as sanitizePublicVenueTitle } from './venue-normalize';
+import type { PublicSessionDto } from './types/public';
 
 type CatalogSlot = NonNullable<PublicSessionDto['upcomingSlots']>[number] & {
   eventId?: string | null;

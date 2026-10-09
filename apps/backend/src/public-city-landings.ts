@@ -1,12 +1,12 @@
-import { MIN_DISPLAY_PRICE_RUB } from './catalog-availability.js';
+import { MIN_DISPLAY_PRICE_RUB } from './catalog-availability';
 import {
   LANDING_RULES,
   LANDING_SLUG_ALIASES,
   matchingLandingSlugs,
   resolveLandingRuleBySlug,
   type LandingMatchCandidate,
-} from './landing-rules.js';
-import type { PublicLandingDto } from './types/public.js';
+} from './landing-rules';
+import type { PublicLandingDto } from './types/public';
 
 interface SessionWithLandingSlugs extends LandingMatchCandidate {
   landingSlugs?: string[] | null;

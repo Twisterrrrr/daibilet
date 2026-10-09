@@ -4,13 +4,13 @@ import type {
   AdminEventChangeRequestsListDto,
 } from '@daibilet/contracts/admin';
 import { z } from 'zod';
-import type { AdminEventChangeRequestsQuery } from './admin-event-change-requests.dto.js';
-import type { ApplyEventChangeRequestInput, ApplyEventChangeRequestResult } from './event-change-request-applier.js';
-import type { ReviewEventChangeRequestInput } from './event-change-request-review.js';
-import { sendJson } from './http.js';
-import { matchPath, type RouteContext } from './routing.js';
-import type { TypedRouteHandler } from './validated-handler.js';
-import { parseJsonBody, parseSearchParams } from './validation.js';
+import type { AdminEventChangeRequestsQuery } from './admin-event-change-requests.dto';
+import type { ApplyEventChangeRequestInput, ApplyEventChangeRequestResult } from './event-change-request-applier';
+import type { ReviewEventChangeRequestInput } from './event-change-request-review';
+import { sendJson } from './http';
+import { matchPath, type RouteContext } from './routing';
+import type { TypedRouteHandler } from './validated-handler';
+import { parseJsonBody, parseSearchParams } from './validation';
 
 export type BuildAdminEventChangeRequests = (
   query: AdminEventChangeRequestsQuery,

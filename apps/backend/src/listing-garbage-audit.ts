@@ -4,12 +4,12 @@
  */
 import { prisma } from '@daibilet/db';
 import { raw, sql } from '@daibilet/db/sql';
-import { ACTIVE_SESSION_SQL, MIN_DISPLAY_PRICE_RUB, PUBLIC_SALES_BLOCKED_STATUS_SQL } from './catalog-availability.js';
+import { ACTIVE_SESSION_SQL, MIN_DISPLAY_PRICE_RUB, PUBLIC_SALES_BLOCKED_STATUS_SQL } from './catalog-availability';
 import {
   findListingGarbageHits,
   type ListingGarbageHit,
-} from './listing-garbage-config.js';
-import { escapeTelegramHtml, sendTelegramMessage } from './telegram.js';
+} from './listing-garbage-config';
+import { escapeTelegramHtml, sendTelegramMessage } from './telegram';
 
 export interface ListingAuditEventRow {
   id: string;

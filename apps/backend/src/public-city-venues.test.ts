@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { countDistinctSessionVenues } from './public-destination.js';
+import { countDistinctSessionVenues } from './public-destination';
 import {
   mergeCityPageVenues,
   publicVenueRowMatchesCityFilter,
   publicVenuesForSessionsFromHub,
-} from './public-venue-read.js';
+} from './public-venue-read';
 
 test('countDistinctSessionVenues prefers venueId over slug/name', () => {
   const count = countDistinctSessionVenues([

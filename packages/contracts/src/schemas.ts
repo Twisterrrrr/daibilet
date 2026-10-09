@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { CATALOG_PAGE_SIZE_MAX } from './catalog.js';
+import { CATALOG_PAGE_SIZE_MAX } from './catalog';
 
 const optionalString = z.string().trim().min(1).optional();
 const nullableString = z.preprocess(

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { freshnessMapFromRows, publicFreshnessSlug } from './public-event-freshness.js';
+import { freshnessMapFromRows, publicFreshnessSlug } from './public-event-freshness';
 
 test('Cyrillic database slug matches the Latin sitemap URL', () => {
   const map = freshnessMapFromRows([

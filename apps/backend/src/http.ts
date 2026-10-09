@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import type { AdminAuthConfig } from './auth.js';
+import type { AdminAuthConfig } from './auth';
 
 export type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'DELETE' | 'OPTIONS' | string;
 

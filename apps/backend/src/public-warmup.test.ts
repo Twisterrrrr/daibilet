@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createPublicReadStackWarmer } from './public-warmup.js';
+import { createPublicReadStackWarmer } from './public-warmup';
 
 test('warms the shared catalog once and only enabled dependent read models', async () => {
   const calls: string[] = [];

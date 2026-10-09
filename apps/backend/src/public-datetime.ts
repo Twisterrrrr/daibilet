@@ -1,4 +1,4 @@
-import { localHourFromInstant } from './city-timezone.js';
+import { localHourFromInstant } from './city-timezone';
 
 export const SITE_TIME_ZONE = 'Europe/Moscow';
 

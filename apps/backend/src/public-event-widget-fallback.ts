@@ -1,4 +1,4 @@
-import { isOpenDateCatalogRow } from './catalog-availability.js';
+import { isOpenDateCatalogRow } from './catalog-availability';
 
 /**
  * Gate for synthetic "В виджете" / open-date widget slots on the event page.

@@ -7,10 +7,10 @@ import {
   resolveDisplayedRating,
   resolvePseudoRating45to50,
   shouldEmitAggregateRating,
-} from './review-rating.js';
-import { formatReviewDisplayName, maskPurchaseRef } from './review-display.js';
-import { isConfirmedOrderStatus, normalizeEmail } from './review-verification.js';
-import { canAcceptReviews, resolveReviewCapability } from './review-capability.js';
+} from './review-rating';
+import { formatReviewDisplayName, maskPurchaseRef } from './review-display';
+import { isConfirmedOrderStatus, normalizeEmail } from './review-verification';
+import { canAcceptReviews, resolveReviewCapability } from './review-capability';
 
 describe('review display', () => {
   it('formats display name as Имя Ф.', () => {

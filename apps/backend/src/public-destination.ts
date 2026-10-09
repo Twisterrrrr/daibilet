@@ -1,8 +1,8 @@
-import { LANDING_RULES } from './landing-rules.js';
-import { loadCityRoutingConfig } from './city-routing-config.js';
-import { listRegionCenterCityNames } from './region-hub.js';
-import type { DestinationType } from './types/common.js';
-import type { PublicDestinationDto, PublicSessionDto } from './types/public.js';
+import { LANDING_RULES } from './landing-rules';
+import { loadCityRoutingConfig } from './city-routing-config';
+import { listRegionCenterCityNames } from './region-hub';
+import type { DestinationType } from './types/common';
+import type { PublicDestinationDto, PublicSessionDto } from './types/public';
 
 const PUBLIC_DESTINATION_MIN_EVENTS = 1;
 /** Owner 2026-09-20: regional-town cards on /cities only if events >= 3 (was > 5 / >= 6). Adm centers stay at ≥1. */

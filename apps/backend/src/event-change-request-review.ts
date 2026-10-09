@@ -10,7 +10,7 @@ import type { AdminEventChangeRequestActionDto } from '@daibilet/contracts/admin
 import {
   type EventChangeRequestAction,
   validateEventChangeRequestTransition,
-} from './event-change-request-state.js';
+} from './event-change-request-state';
 
 export interface ReviewEventChangeRequestInput {
   requestId: string;

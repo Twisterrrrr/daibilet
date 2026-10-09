@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { publishGate } from './dto.js';
+import { publishGate } from './dto';
 
 test('publishGate blocks when high readiness issues present', () => {
   const gate = publishGate(

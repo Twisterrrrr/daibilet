@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { sendJson } from './http.js';
-import { matchPath, type RouteContext } from './routing.js';
+import { sendJson } from './http';
+import { matchPath, type RouteContext } from './routing';
 import {
   adminListReviews,
   adminModerateReview,
@@ -10,9 +10,9 @@ import {
   listApprovedReviewsByEventSlug,
   ReviewServiceError,
   verifyReviewEmail,
-} from './reviews.service.js';
-import type { TypedRouteHandler } from './validated-handler.js';
-import { parseJsonBody, parseSearchParams } from './validation.js';
+} from './reviews.service';
+import type { TypedRouteHandler } from './validated-handler';
+import { parseJsonBody, parseSearchParams } from './validation';
 
 const createBodySchema = z
   .object({

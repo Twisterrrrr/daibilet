@@ -5,30 +5,30 @@ export {
   getPublicCatalogSessionsSoft,
   resolveCatalogSessionsByDestinationKeys,
   resolveCatalogSessionsByVenueKeys,
-} from './public-catalog.dto.js';
-export { buildPublicEventDto, clearPublicEventDtoCache } from './public-event.dto.js';
-export { buildPublicEventFreshnessMap, clearPublicEventFreshnessCache } from './public-event-freshness.js';
+} from './public-catalog.dto';
+export { buildPublicEventDto, clearPublicEventDtoCache } from './public-event.dto';
+export { buildPublicEventFreshnessMap, clearPublicEventFreshnessCache } from './public-event-freshness';
 export {
   buildPublicCityDto,
   buildPublicDestinationsDto,
   clearPublicCityDtoCache,
-} from './public-city.dto.js';
+} from './public-city.dto';
 export {
   buildPublicVenueDto,
   buildPublicVenuesDto,
   clearPublicVenueDtoCache,
-} from './public-venue.dto.js';
+} from './public-venue.dto';
 export {
   buildPublicLandingPageDto,
   buildPublicLandingsCatalogDto,
   clearPublicLandingDtoCache,
-} from './public-landing.dto.js';
+} from './public-landing.dto';
 export {
   buildPublicArticlesListDto,
   buildPublicArticlePageDto,
   clearPublicArticlesDtoCache,
-} from './public-articles.dto.js';
-export { buildPublicBuyerOrdersDto } from './public-orders.dto.js';
-export { buildPublicStatsDto } from './public-stats.dto.js';
-export { buildPublicSearchDto } from './public-search.dto.js';
-export { loadVenueMapTip } from './public-venue-map-tip.js';
+} from './public-articles.dto';
+export { buildPublicBuyerOrdersDto } from './public-orders.dto';
+export { buildPublicStatsDto } from './public-stats.dto';
+export { buildPublicSearchDto } from './public-search.dto';
+export { loadVenueMapTip } from './public-venue-map-tip';

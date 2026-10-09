@@ -1,16 +1,16 @@
-import type { DbClient } from './types/db.js';
-import type { EventModerationPayload, EventOverridePayload } from './types/schemas.js';
+import type { DbClient } from './types/db';
+import type { EventModerationPayload, EventOverridePayload } from './types/schemas';
 import {
   AiRewriteError,
   normalizeScheduledDurationMinutes,
   rewriteEventDescription,
   type RewriteDescriptionResult,
-} from './ai-rewrite-description.js';
-import { sendJson } from './http.js';
-import { matchPath, type RouteContext } from './routing.js';
-import { eventModerationPayloadSchema, eventOverridePayloadSchema } from './types/schemas.js';
-import type { TypedRouteHandler } from './validated-handler.js';
-import { parseJsonBody } from './validation.js';
+} from './ai-rewrite-description';
+import { sendJson } from './http';
+import { matchPath, type RouteContext } from './routing';
+import { eventModerationPayloadSchema, eventOverridePayloadSchema } from './types/schemas';
+import type { TypedRouteHandler } from './validated-handler';
+import { parseJsonBody } from './validation';
 
 export type UpdateAdminEventOverride = (
   db: DbClient,

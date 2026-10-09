@@ -11,8 +11,8 @@ import { prisma } from '@daibilet/db';
 import {
   assertEventChangeRequestPayload,
   type EventChangeRequestPayload,
-} from './event-change-request-payload.js';
-import { validateEventChangeRequestTransition } from './event-change-request-state.js';
+} from './event-change-request-payload';
+import { validateEventChangeRequestTransition } from './event-change-request-state';
 
 export interface ApplyEventChangeRequestInput {
   requestId: string;

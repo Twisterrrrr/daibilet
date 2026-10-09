@@ -4,9 +4,9 @@ import {
   buildPublicLandingPage,
   buildPublicLandingPageManaged,
   buildPublicLandingsCatalog,
-} from './dto.js';
-import { createDb } from './db.js';
-import type { PublicLandingPageDto } from './types/public.js';
+} from './dto';
+import { createDb } from './db';
+import type { PublicLandingPageDto } from './types/public';
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const PUBLIC_LANDING_CACHE_MS = 5 * 60 * 1000;

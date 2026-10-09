@@ -1,9 +1,9 @@
-import { sendPublicJson } from './http.js';
-import { type RouteContext } from './routing.js';
-import { publicCatalogQuerySchema, type PublicCatalogQuery } from './types/schemas.js';
-import type { PublicCatalogDto } from './types/public.js';
-import type { TypedRouteHandler } from './validated-handler.js';
-import { parseSearchParams } from './validation.js';
+import { sendPublicJson } from './http';
+import { type RouteContext } from './routing';
+import { publicCatalogQuerySchema, type PublicCatalogQuery } from './types/schemas';
+import type { PublicCatalogDto } from './types/public';
+import type { TypedRouteHandler } from './validated-handler';
+import { parseSearchParams } from './validation';
 
 export interface PublicCatalogHandlerDependencies {
   enabled: boolean;

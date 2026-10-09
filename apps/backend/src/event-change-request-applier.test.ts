@@ -6,7 +6,7 @@ import {
   type EventChangeRequestApplierClient,
   type EventChangeRequestRecord,
   type EventChangeRequestTransaction,
-} from './event-change-request-applier.js';
+} from './event-change-request-applier';
 
 const eventUpdatedAt = new Date('2026-08-01T12:00:00.000Z');
 

@@ -1,10 +1,10 @@
-import type { DbClient } from './types/db.js';
-import type { LandingMatchPayload } from './types/schemas.js';
-import { sendJson } from './http.js';
-import { matchPath, type RouteContext } from './routing.js';
-import { landingMatchPayloadSchema } from './types/schemas.js';
-import type { TypedRouteHandler } from './validated-handler.js';
-import { parseJsonBody } from './validation.js';
+import type { DbClient } from './types/db';
+import type { LandingMatchPayload } from './types/schemas';
+import { sendJson } from './http';
+import { matchPath, type RouteContext } from './routing';
+import { landingMatchPayloadSchema } from './types/schemas';
+import type { TypedRouteHandler } from './validated-handler';
+import { parseJsonBody } from './validation';
 
 export type UpdateAdminLandingMatch = (
   db: DbClient,

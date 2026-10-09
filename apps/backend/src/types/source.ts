@@ -1,4 +1,4 @@
-import type { SourceCode, Severity } from './common.js';
+import type { SourceCode, Severity } from './common';
 
 export type SourceHealthStatus = 'ok' | 'warning' | 'error' | 'unknown';
 

@@ -1,5 +1,5 @@
-import type { PurchaseFields, Readiness, ReadinessIssue, SeoFields, Severity, SourceCode } from './common.js';
-import type { AdminSourceDto } from './source.js';
+import type { PurchaseFields, Readiness, ReadinessIssue, SeoFields, Severity, SourceCode } from './common';
+import type { AdminSourceDto } from './source';
 
 export interface AdminDashboardDto {
   generatedAt: string;

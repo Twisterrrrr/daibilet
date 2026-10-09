@@ -8,28 +8,28 @@ import {
   isStartedTicketcloudSlot,
   isSaleableEventForPublic,
   isWideLifetimeSession,
-} from './catalog-availability.js';
-import { resolveCityTimeZone } from './city-timezone.js';
-import { formatDate, formatTime, normalizeStartsAt, timeBucket } from './public-datetime.js';
-import { dedupePublicOffers, preferNamedTicketOffers } from './public-offers.js';
-import { findLandingRule, matchingLandingSlugs } from './landing-rules.js';
+} from './catalog-availability';
+import { resolveCityTimeZone } from './city-timezone';
+import { formatDate, formatTime, normalizeStartsAt, timeBucket } from './public-datetime';
+import { dedupePublicOffers, preferNamedTicketOffers } from './public-offers';
+import { findLandingRule, matchingLandingSlugs } from './landing-rules';
 import {
   buildProviderWidgetPayload,
   buildProviderWidgetUrl,
   providerForSource,
   purchaseInfo,
   resolveSessionPurchaseExternalId,
-} from './provider-purchase.js';
-import type { PurchaseProvider } from './types/common.js';
-import { resolveEditorialEventImage } from './event-cover-images.js';
-import { pickFirstUsableEventImageUrl } from './event-image-url.js';
+} from './provider-purchase';
+import type { PurchaseProvider } from './types/common';
+import { resolveEditorialEventImage } from './event-cover-images';
+import { pickFirstUsableEventImageUrl } from './event-image-url';
 import {
   pickPrimarySessionPurchase,
   shouldSynthesizeWidgetOnlySession,
-} from './public-event-widget-fallback.js';
-import { pickCatalogSubcategories } from './public-catalog.mapper.js';
-import { spreadCatalogSessionsByCoverImage } from './public-catalog-spread.js';
-import { pickRelatedSessions } from './event-related.js';
+} from './public-event-widget-fallback';
+import { pickCatalogSubcategories } from './public-catalog.mapper';
+import { spreadCatalogSessionsByCoverImage } from './public-catalog-spread';
+import { pickRelatedSessions } from './event-related';
 import { formatPublicEventTitle } from './event-title-normalize.ts';
 import type {
   PublicEventDto,
@@ -38,7 +38,7 @@ import type {
   PublicPurchaseOptionDto,
   PublicSessionDto,
   PublicTicketPriceDto,
-} from './types/public.js';
+} from './types/public';
 
 const MIN_DISPLAY_PRICE_RUB = 100;
 const PUBLIC_EVENT_CACHE_MS = 5 * 60 * 1000;

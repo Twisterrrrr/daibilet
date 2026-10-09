@@ -1,6 +1,6 @@
-import { sendJson } from './http.js';
-import { matchPath, type RouteContext } from './routing.js';
-import type { TypedRouteHandler } from './validated-handler.js';
+import { sendJson } from './http';
+import { matchPath, type RouteContext } from './routing';
+import type { TypedRouteHandler } from './validated-handler';
 
 export interface AdminEventsReadHandlerDependencies {
   enabled: boolean;

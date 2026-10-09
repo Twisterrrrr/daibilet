@@ -15,7 +15,7 @@ import {
   sanitizeRewriteOutput,
   truncateRewriteInput,
   AiRewriteError,
-} from './ai-rewrite-description.js';
+} from './ai-rewrite-description';
 
 test('SYSTEM_PROMPT includes safety hexagon rules', () => {
   assert.match(SYSTEM_PROMPT, /НИКАКИХ ВЫДУМАННЫХ ФАКТОВ/);

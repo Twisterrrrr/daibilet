@@ -2,7 +2,7 @@ import type {
   PurchaseMode,
   PurchaseProvider,
   PurchaseUrlSource,
-} from './types/common.js';
+} from './types/common';
 
 export interface ProviderPurchaseInput {
   sourceCode?: string | null | undefined;

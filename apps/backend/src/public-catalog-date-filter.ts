@@ -1,4 +1,4 @@
-import type { PublicSessionDto } from './types/public.js';
+import type { PublicSessionDto } from './types/public';
 
 export function startOfLocalDay(date: Date): Date {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());

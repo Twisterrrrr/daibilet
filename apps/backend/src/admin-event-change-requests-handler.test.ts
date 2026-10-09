@@ -4,8 +4,8 @@ import test from 'node:test';
 import {
   createAdminEventChangeRequestsRouteHandler,
   type AdminEventChangeRequestsHandlerDependencies,
-} from './admin-event-change-requests-handler.js';
-import type { RouteContext } from './routing.js';
+} from './admin-event-change-requests-handler';
+import type { RouteContext } from './routing';
 
 test('serves admin event change request list with filters', async () => {
   let capturedStatus: string | null | undefined;

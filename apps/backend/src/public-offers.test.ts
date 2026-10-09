@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { dedupePublicOffers, preferNamedTicketOffers } from './public-offers.js';
-import { formatDate, normalizeStartsAt, timeBucket } from './public-datetime.js';
+import { dedupePublicOffers, preferNamedTicketOffers } from './public-offers';
+import { formatDate, normalizeStartsAt, timeBucket } from './public-datetime';
 
 test('preferNamedTicketOffers drops generic widget titles when named exist', () => {
   const rows = [

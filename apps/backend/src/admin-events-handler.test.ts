@@ -4,8 +4,8 @@ import test from 'node:test';
 import {
   createAdminEventsRouteHandler,
   type AdminEventsHandlerDependencies,
-} from './admin-events-handler.js';
-import type { RouteContext } from './routing.js';
+} from './admin-events-handler';
+import type { RouteContext } from './routing';
 
 test('POST rewrite-description returns text and does not write override', async () => {
   let updateCalls = 0;

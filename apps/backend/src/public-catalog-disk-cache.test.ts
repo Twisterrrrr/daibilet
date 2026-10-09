@@ -10,7 +10,7 @@ import {
   resolveCatalogRebuildMode,
   resolvePublicCatalogDiskCachePath,
   writePublicCatalogDiskCache,
-} from './public-catalog-disk-cache.js';
+} from './public-catalog-disk-cache';
 
 test('resolveCatalogRebuildMode defaults to child for Next/web heuristics', () => {
   const prev = {

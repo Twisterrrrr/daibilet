@@ -8,7 +8,7 @@ import {
   isStartedTicketcloudSlot,
   isSaleableEventForPublic,
   isSaleableForPublicCatalog,
-} from './catalog-availability.js';
+} from './catalog-availability';
 
 test('isOpenDateCatalogRow accepts OPEN_DATE kind and open_date status', () => {
   assert.equal(isOpenDateCatalogRow({ kind: 'OPEN_DATE' }), true);

@@ -191,4 +191,4 @@ export function textHasListingGarbage(text: string): boolean {
 export {
   sanitizePartnerVenueDisplayTitle,
   isFortressComplexName,
-} from './venue-normalize.js';
+} from './venue-normalize';
