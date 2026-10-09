@@ -1028,6 +1028,7 @@ const LOCATION_PACK_IMAGES: Record<string, string> = {
   'izhevsk-izhevskiy-prud-i-naberezhnaya-zodchego-dudina': '/images/venues/izhevsk/izhevskiy-prud-i-naberezhnaya-zodchego-dudina.jpg',
   'pskov-izborskaya-krepost': '/images/venues/pskov/izborskaya-krepost.jpg',
   'ulyanovsk-imperatorskiy-most': '/images/venues/ulyanovsk/imperatorskiy-most.jpg',
+  'ulyanovsk-novoulyanovsk': '/images/venues/ulyanovsk/imperatorskiy-most.jpg',
   'tver-imperatorskiy-putevoy-dvorets': '/images/venues/tver/imperatorskiy-putevoy-dvorets.jpg',
   'omsk-irtyshskaya-naberezhnaya': '/images/venues/omsk/irtyshskaya-naberezhnaya.jpg',
   'smolensk-istoriko-arhitekturnyy-kompleks-teremok-flenovo': '/images/venues/smolensk/istoriko-arhitekturnyy-kompleks-teremok-flenovo.jpg',
