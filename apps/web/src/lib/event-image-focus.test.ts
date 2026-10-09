@@ -6,8 +6,8 @@ import {
   resolveEventHeroObjectPosition,
 } from './event-image-focus.ts';
 
-test('keeps hero default at eye-line 18%', () => {
-  assert.equal(resolveEventHeroObjectPosition({ slug: 'unknown-event' }), 'center 18%');
+test('keeps hero default at eye-line 25%', () => {
+  assert.equal(resolveEventHeroObjectPosition({ slug: 'unknown-event' }), 'center 25%');
 });
 
 test('uses card default 20% for typical catalog headshots', () => {
