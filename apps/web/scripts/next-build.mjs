@@ -15,7 +15,7 @@ if (!/\bmax-old-space-size=\d+/i.test(process.env.NODE_OPTIONS ?? '')) {
 }
 
 const nextBin = path.join(webRoot, 'node_modules', 'next', 'dist', 'bin', 'next');
-const result = spawnSync(process.execPath, [nextBin, 'build'], {
+const result = spawnSync(process.execPath, [nextBin, 'build', '--webpack'], {
   cwd: webRoot,
   env: process.env,
   stdio: 'inherit',

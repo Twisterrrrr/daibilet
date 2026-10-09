@@ -113,6 +113,12 @@ const nextConfig: NextConfig = {
   // tries these extensions in order. Placing .ts/.tsx before .js makes it
   // resolve TypeScript sources from .js import specifiers (same as the
   // webpack extensionAlias that web Dev used previously).
+  webpack: (config) => {
+    config.resolve.extensionAlias = {
+      '.js': ['.ts', '.tsx', '.js'],
+    };
+    return config;
+  },
   turbopack: {
     resolveExtensions: ['.tsx', '.ts', '.jsx', '.js', '.mjs', '.node', '.json'],
   },
