@@ -1160,6 +1160,7 @@ export function LandingPageView({
               setDateFilter={setDateFilter}
               setSort={setSort}
               setTimeSlot={setTimeSlot}
+              hideSort={profile === 'river' || profile === 'bus'}
               reset={() => {
                 setCity(cityName || 'all');
                 setCategory('all');
@@ -1902,7 +1903,7 @@ function LandingDinnerFilters({
         ))}
       </div>
 
-      <div className="hidden flex-wrap items-center gap-2 lg:flex">
+      <div className="hidden flex-wrap items-center gap-2 max-w-fit lg:flex">
         <div className="flex items-center gap-1.5">
           {(['today', 'tomorrow'] as const).map((value) => (
             <button
@@ -2831,6 +2832,7 @@ function LandingFilters({
   setDateFilter,
   setSort,
   setTimeSlot,
+  hideSort = false,
 }: {
   profile: LandingProfile;
   landingSlug?: string;
@@ -2849,6 +2851,7 @@ function LandingFilters({
   setSort: (value: SortFilter) => void;
   setTimeSlot: (value: TimeSlotFilter) => void;
   reset: () => void;
+  hideSort?: boolean;
 }) {
   const isBus = profile === 'bus';
   const isRiver = profile === 'river';
@@ -3010,7 +3013,8 @@ function LandingFilters({
 
   return (
     <div className="space-y-3">
-      <div className="sticky top-[var(--site-header-height)] z-20 -mx-1 space-y-3 rounded-xl border border-border/70 bg-background/95 px-2 py-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/85 sm:space-y-4">
+      <div className="sticky top-[var(--site-header-height)] z-20 -mx-1 space-y-3 rounded-xl border border-border/70 bg-background/95 px-3 py-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/85 sm:space-y-4">
+      {!hideSort ? (
       <div className="hidden items-center gap-1 border-b border-border sm:flex">
         {sortTabs.map((tab) => (
           <button
@@ -3024,8 +3028,9 @@ function LandingFilters({
           </button>
         ))}
       </div>
+      ) : null}
 
-      <div className="hidden flex-wrap items-center gap-2 lg:flex">
+      <div className="hidden flex-wrap items-center gap-2 max-w-fit lg:flex">
         {dateChips.length > 0 ? (
           <div className="flex items-center gap-1.5">
             {dateChips.map((chip) => (
