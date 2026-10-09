@@ -4,6 +4,7 @@
  *
  * Data maps extracted to city-place-images-data.ts for code-splitting.
  * This file exports only utility functions that reference the data from the data file.
+ * Client components should call preloadPlaceImages() on mount to ensure data is available.
  */
 
 import { CITY_IDENTITY_FALLBACK } from './city-place-images-region-packs.ts';
@@ -11,6 +12,18 @@ import {
   EDITORIAL_IMAGES_BY_SLUG,
   PLACE_IMAGE_ALIASES,
 } from './city-place-images-data.ts';
+import {
+  preloadPlaceImages,
+  getEditorialPlaceImage as _getEditorialPlaceImage,
+} from './city-place-images-lazy.ts';
+
+/** Preload lazy data — call in client component useEffect. */
+export { preloadPlaceImages };
+
+/** Sync lookup via lazy cache — returns null if data not loaded yet. */
+export function getEditorialPlaceImage(slug: string | null | undefined): string | null {
+  return _getEditorialPlaceImage(slug);
+}
 
 function normalizePlaceImageKey(slug: string | null | undefined): string {
   return String(slug || '')

@@ -81,6 +81,7 @@ import { SuburbsCarousel } from '@/components/SuburbsCarousel.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { catalogHrefWithSelectedCity, placesHubHrefWithSelectedCity } from '@/lib/catalog-url';
 import { matchDestination } from '@/lib/selected-city';
+import { preloadPlaceImages } from '@/lib/city-place-images';
 import { useCityHubData } from '@/hooks/useCityHubData';
 import { isSpbDayRouteCity } from '@/lib/day-route-boat';
 import {
@@ -436,6 +437,9 @@ function replaceMyDayUrl(path: string) {
 }
 
 function DayRoutePanelInner() {
+  // Preplace image data on mount for editorial venue covers.
+  useEffect(() => { preloadPlaceImages(); }, []);
+
   const searchParams = useSearchParams();
   const selectedCity = useSelectedCityOptional();
   const itemsParam = searchParams.get('items');
