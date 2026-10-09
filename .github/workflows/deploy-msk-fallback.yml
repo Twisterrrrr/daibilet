@@ -28,6 +28,6 @@ jobs:
           install -m 600 /dev/null "$HOME/.ssh/msk_key"
           printf '%s\n' "$MSK_SSH_KEY" > "$HOME/.ssh/msk_key"
           SSH=(ssh -i "$HOME/.ssh/msk_key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o BatchMode=yes)
-          REMOTE_CMD="cd /opt/daibilet && git fetch origin && git checkout $BRANCH && git pull --rebase origin $BRANCH && BRANCH=$BRANCH ./deploy/scripts/deploy-prod-next.sh"
+          REMOTE_CMD="cd /opt/daibilet && git fetch origin && git reset --hard origin/$BRANCH && BRANCH=$BRANCH ./deploy/scripts/deploy-prod-next.sh"
           "${SSH[@]}" "${MSK_SSH_USER}@${MSK_SSH_HOST}" "$REMOTE_CMD"
           echo "Fallback deploy completed for branch $BRANCH" >> "$GITHUB_STEP_SUMMARY"
