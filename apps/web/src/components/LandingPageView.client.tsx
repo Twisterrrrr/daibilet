@@ -991,8 +991,25 @@ export function LandingPageView({
               { name: 'Санкт-Петербург', path: '/cities/saint-petersburg' },
               { name: 'Разводные мосты', path: canonicalPath },
             ]
-          : undefined,
-      faqItems: profile === 'bridges' ? BRIDGES_LANDING.faq : undefined,
+          : profile === 'river' && citySlug
+            ? [
+                { name: 'Главная', path: '/' },
+                { name: cityName || citySlug, path: `/cities/${citySlug}` },
+                { name: 'Речные прогулки', path: canonicalPath },
+              ]
+            : profile === 'bus' && citySlug
+              ? [
+                  { name: 'Главная', path: '/' },
+                  { name: cityName || citySlug, path: `/cities/${citySlug}` },
+                  { name: 'Автобусные экскурсии', path: canonicalPath },
+                ]
+              : undefined,
+      faqItems:
+        profile === 'bridges'
+          ? BRIDGES_LANDING.faq
+          : profile === 'river' && cityName
+            ? (riverCityGuide(cityName)?.faq ?? undefined)
+            : undefined,
       jsonLdExtras:
         profile === 'bridges'
           ? [
