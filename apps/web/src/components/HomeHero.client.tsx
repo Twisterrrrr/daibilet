@@ -13,6 +13,15 @@ import { buildCatalogHref } from '@/lib/catalog-url';
 import { catalogSocialStats } from '@/lib/catalog-social-stats';
 import { cityToPrepositional } from '@/lib/city-declension';
 import { formatNumber } from '@/lib/format';
+
+/** Russian pluralization helpers */
+function pluralize(n: number, one: string, few: string, many: string): string {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return one;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return few;
+  return many;
+}
 import {
   HOME_HERO_IMAGES,
   homeHeroObjectPositionClass,
@@ -145,7 +154,7 @@ export function HomeHero({
     <>
       <span className="block">Экскурсии, музеи и мероприятия</span>
       <span className="block bg-gradient-to-r from-sky-200 to-white bg-clip-text text-transparent">
-        в {formatNumber(totalCities)} городах России
+        в {formatNumber(totalCities)} {pluralize(totalCities, 'городе', 'городах', 'городах')} России
       </span>
     </>
   );
@@ -161,11 +170,11 @@ export function HomeHero({
     >
       {/* Social proof strip — live stats from catalog */}
       <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-sm text-white/75 sm:gap-x-5">
-        <span>{formatNumber(totalEvents)} событий</span>
+        <span>{formatNumber(totalEvents)} {pluralize(totalEvents, 'событие', 'события', 'событий')}</span>
         <span className="text-white/30" aria-hidden>·</span>
-        <span>{formatNumber(totalVenues)} площадок</span>
+        <span>{formatNumber(totalVenues)} {pluralize(totalVenues, 'площадка', 'площадки', 'площадок')}</span>
         <span className="text-white/30" aria-hidden>·</span>
-        <span>{formatNumber(totalCities)} городов</span>
+        <span>{formatNumber(totalCities)} {pluralize(totalCities, 'город', 'города', 'городов')}</span>
       </div>
 
       <form
