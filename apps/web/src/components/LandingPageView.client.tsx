@@ -3005,185 +3005,27 @@ function LandingFilters({
 
   return (
     <div className="space-y-3">
-      <div className="sticky top-[var(--site-header-height)] z-20 -mx-1 space-y-3 rounded-xl border border-border/70 bg-background/95 px-2 py-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/85 sm:space-y-4">
-      <div className="hidden items-center gap-1 border-b border-border sm:flex">
-        {sortTabs.map((tab) => (
-          <button
-            key={tab.value}
-            type="button"
-            onClick={() => setSort(tab.value)}
-            className={`relative px-4 py-2.5 text-sm font-medium transition-colors ${sort === tab.value ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
-          >
-            {tab.label}
-            {sort === tab.value ? <span className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-primary" /> : null}
-          </button>
-        ))}
-      </div>
-
-      <div className="hidden flex-wrap items-center gap-2 lg:flex">
-        {dateChips.length > 0 ? (
-          <div className="flex items-center gap-1.5">
-            {dateChips.map((chip) => (
-              <button
-                key={chip.value}
-                type="button"
-                onClick={() => setDateFilter(chip.value)}
-                className={`whitespace-nowrap rounded-lg border px-3.5 py-1.5 text-sm font-medium transition-all ${
-                  dateFilter === chip.value
-                    ? 'border-primary bg-primary text-primary-foreground'
-                    : 'border-border bg-background text-foreground hover:border-primary/40 hover:text-primary'
-                }`}
-              >
-                {chip.label}
-              </button>
-            ))}
-          </div>
-        ) : null}
-        {showCityFilter ? (
-          <>
-            {dateChips.length > 0 ? <div className="mx-1 h-6 w-px bg-border" /> : null}
-            {cityChip('all', 'Все города', city === 'all')}
-            {visibleCityNames.map((name) => cityChip(name, name, city === name))}
-            {overflowCityNames.length > 0 ? (
-              <select
-                value={overflowCityNames.includes(city) ? city : ''}
-                onChange={(e) => { if (e.target.value) selectCity(e.target.value); }}
-                className="h-9 rounded-lg border border-input bg-background px-3 text-sm text-foreground"
-              >
-                <option value="">Ещё {overflowCityNames.length}</option>
-                {overflowCityNames.map((name) => (
-                  <option key={name} value={name}>{name}</option>
-                ))}
-              </select>
-            ) : null}
-          </>
-        ) : null}
-        {showTimeSlot ? (
-          <>
-            <div className="mx-1 h-6 w-px bg-border" />
-            {timeSlotSelect}
-          </>
-        ) : null}
-        {genreChipRow}
-        {!isBus && !isConcerts && Object.keys(stats.categories).length > 1 ? (
-          <>
-            <div className="mx-1 h-6 w-px bg-border" />
-            <select
-              value={category}
-              onChange={(event) => setCategory(event.target.value)}
-              className="h-9 w-[170px] rounded-lg border border-input bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-            >
-              <option value="all">Все форматы</option>
-              {Object.entries(stats.categories)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 8)
-                .map(([name, count]) => (
-                  <option key={name} value={name}>{name} · {count}</option>
-                ))}
-            </select>
-          </>
-        ) : null}
-      </div>
-
-      <div className="hidden space-y-3 sm:block lg:hidden">
-        {dateChips.length > 0 ? (
-          <div className="flex items-center gap-1.5">
-            {dateChips.map((chip) => (
-              <button
-                key={chip.value}
-                type="button"
-                onClick={() => setDateFilter(chip.value)}
-                className={`whitespace-nowrap rounded-lg border px-3.5 py-1.5 text-sm font-medium transition-all ${
-                  dateFilter === chip.value
-                    ? 'border-primary bg-primary text-primary-foreground'
-                    : 'border-border bg-background text-foreground hover:border-primary/40 hover:text-primary'
-                }`}
-              >
-                {chip.label}
-              </button>
-            ))}
-          </div>
-        ) : null}
-        {showCityFilter ? (
-          <div className="flex flex-wrap items-center gap-2">
-            {cityChip('all', 'Все города', city === 'all')}
-            {visibleCityNames.map((name) => cityChip(name, name, city === name))}
-            {overflowCityNames.length > 0 ? (
-              <select
-                value={overflowCityNames.includes(city) ? city : ''}
-                onChange={(e) => { if (e.target.value) selectCity(e.target.value); }}
-                className="h-9 rounded-lg border border-input bg-background px-3 text-sm text-foreground"
-              >
-                <option value="">Ещё {overflowCityNames.length}</option>
-                {overflowCityNames.map((name) => (
-                  <option key={name} value={name}>{name}</option>
-                ))}
-              </select>
-            ) : null}
-          </div>
-        ) : null}
-        {showTimeSlot ? (
-          <div className="flex items-center gap-2">
-            {timeSlotSelect}
-          </div>
-        ) : null}
-      </div>
-
-      <div className="space-y-3 sm:hidden">
-        {dateChips.length > 0 ? (
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {dateChips.map((chip) => (
-              <button
-                key={chip.value}
-                type="button"
-                onClick={() => setDateFilter(chip.value)}
-                className={`whitespace-nowrap rounded-lg border px-3.5 py-1.5 text-sm font-medium transition-all ${
-                  dateFilter === chip.value
-                    ? 'border-primary bg-primary text-primary-foreground'
-                    : 'border-border bg-background text-foreground hover:border-primary/40 hover:text-primary'
-                }`}
-              >
-                {chip.label}
-              </button>
-            ))}
-          </div>
-        ) : null}
-        {showCityFilter ? (
-          <div
-            className="flex items-center gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-            role="group"
-            aria-label="Сменить город"
-          >
-            {cityChip('all', 'Все города', city === 'all')}
-            {visibleCityNames.map((name) => cityChip(name, name, city === name))}
-            {overflowCityNames.length > 0 ? (
-              <select
-                value={overflowCityNames.includes(city) ? city : ''}
-                onChange={(e) => { if (e.target.value) selectCity(e.target.value); }}
-                className="h-9 shrink-0 rounded-lg border border-input bg-background px-3 text-sm text-foreground"
-              >
-                <option value="">Ещё {overflowCityNames.length}</option>
-                {overflowCityNames.map((name) => (
-                  <option key={name} value={name}>{name}</option>
-                ))}
-              </select>
-            ) : null}
-          </div>
-        ) : null}
-        {showTimeSlot ? timeSlotSelect : null}
-        <div className="flex items-center gap-2">
-          <span className="whitespace-nowrap text-sm text-muted-foreground">Сортировать:</span>
-          <select
-            value={sort}
-            onChange={(event) => setSort(event.target.value as SortFilter)}
-            className="h-9 flex-1 rounded-lg border border-input bg-background px-3 text-sm"
-          >
-            {sortTabs.map((tab) => (
-              <option key={tab.value} value={tab.value}>{tab.label}</option>
-            ))}
-          </select>
-        </div>
-      </div>
+      <div className="sticky top-[var(--site-header-height)] z-20 -mx-1 rounded-xl border border-border/70 bg-background/95 px-3 py-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/85">
+        <LandingFilterRow
+          dateChips={dateChips}
+          dateFilter={dateFilter}
+          setDateFilter={(v) => setDateFilter(v as DateFilter)}
+          showCityFilter={showCityFilter}
+          cityChip={cityChip}
+          visibleCityNames={visibleCityNames}
+          overflowCityNames={overflowCityNames}
+          city={city}
+          selectCity={selectCity}
+          showTimeSlot={showTimeSlot}
+          timeSlotSelect={timeSlotSelect}
+          genreChipRow={null}
+          category={category}
+          setCategory={setCategory}
+          categories={stats.categories}
+          sort={sort}
+          setSort={(v) => setSort(v as SortFilter)}
+          sortTabs={sortTabs}
+        />
       </div>
 
       <div className="mb-4 mt-2 flex items-center gap-3">
@@ -3193,7 +3035,6 @@ function LandingFilters({
     </div>
   );
 }
-
 function LandingScheduleList({
   groups,
   profile,
