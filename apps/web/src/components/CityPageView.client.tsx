@@ -187,7 +187,7 @@ const HUB_MOBILE_PRIMARY_IDS = [
 
 const SECTION_SCROLL_MT = HUB_SECTION_SCROLL_MT;
 const HUB_STICKY_TOP = 'top-[calc(var(--site-header-height)+env(safe-area-inset-top,0px))]';
-const FAQ_SUPPORT_EMAIL = 'hello@daibilet.ru';
+const FAQ_SUPPORT_EMAIL = 'info@daibilet.ru';
 
 export function CityPageView({
   slug,

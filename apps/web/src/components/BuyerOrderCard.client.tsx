@@ -15,7 +15,7 @@ import { buyerTicketPath, openBuyerTicketDownload } from '@/lib/buyer-ticket';
 import { formatNumber } from '@/lib/format';
 
 /** Product support inbox (ContactForm + empty-state mailto). */
-export const BUYER_SUPPORT_EMAIL = 'hello@daibilet.ru';
+export const BUYER_SUPPORT_EMAIL = 'info@daibilet.ru';
 
 export const ORDER_SUPPORT_HINT =
   'Возврат по правилам площадки. Ответим в рабочие часы.';
@@ -212,7 +212,7 @@ export function BuyerOrderCard({ order, accountEmail }: Props) {
               ) : null}
             </div>
             {supportMailto ? (
-              <p className="max-w-[18rem] text-[11px] leading-4 text-slate-400 sm:text-right">{ORDER_SUPPORT_HINT}</p>
+              <p className="max-w-[22rem] text-[11px] leading-4 text-slate-400 sm:text-right">{ORDER_SUPPORT_HINT}</p>
             ) : null}
           </div>
         ) : null}

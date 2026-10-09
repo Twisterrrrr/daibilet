@@ -28,7 +28,7 @@ export function BlogNewsletterSignup() {
       setEmail('');
     } catch {
       // Soft fallback: mailto stub when API is not ready.
-      window.location.href = `mailto:hello@daibilet.ru?subject=${encodeURIComponent('Подписка на статьи Дайбилет')}&body=${encodeURIComponent(value)}`;
+      window.location.href = `mailto:info@daibilet.ru?subject=${encodeURIComponent('Подписка на статьи Дайбилет')}&body=${encodeURIComponent(value)}`;
       setStatus('idle');
     }
   };
