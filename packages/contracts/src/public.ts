@@ -69,6 +69,8 @@ export interface PublicSessionDto extends PurchaseFields {
   groupEventIds?: string[];
   groupedEventsCount?: number;
   sessionCount?: number;
+  /** Cities count for cross-city merged events (excluding current city). */
+  peerCityCount?: number;
   upcomingSlots?: Array<DateTimeSlot & Pick<PurchaseFields, 'purchaseUrl'> & { vacant?: number | null }>;
   landingSlugs?: string[];
   title: string;
@@ -112,6 +114,8 @@ export interface PublicCatalogListItemDto extends PurchaseFields {
   groupKey?: string | null;
   groupedEventsCount?: number;
   sessionCount?: number;
+  /** Cities count for cross-city merged events (excluding current city). */
+  peerCityCount?: number;
   upcomingSlots?: Array<
     Pick<DateTimeSlot, 'id' | 'eventId' | 'startsAt' | 'dateLabel' | 'timeLabel'> &
       Partial<Pick<PurchaseFields, 'purchaseUrl'>> & { vacant?: number | null }

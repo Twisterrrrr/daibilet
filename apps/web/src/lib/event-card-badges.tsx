@@ -33,6 +33,19 @@ type EventImageBadgesProps = {
 const DATE_BADGE_CLASS =
   'bg-white/90 text-slate-950 shadow-[0_4px_12px_rgba(0,0,0,0.05)] ring-1 ring-white/60 backdrop-blur-md';
 
+/** Russian pluralization for "город": 1 город, 2-4 города, 5+ городов. */
+function pluralizeCities(n: number): string {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return 'городе';
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return 'городах';
+  return 'городах';
+}
+
+function formatPeerCityLabel(count: number): string {
+  return `Ещё в ${count} ${pluralizeCities(count)}`;
+}
+
 export function EventImageBadges({
   event,
   showSoonBadge = false,
@@ -74,6 +87,14 @@ export function EventImageBadges({
     secondary.push(
       <EventCardBadge key="date" className={DATE_BADGE_CLASS}>
         {dateBadge}
+      </EventCardBadge>,
+    );
+  }
+  // Cross-city peer events badge.
+  if ((event.peerCityCount || 0) > 0 && secondary.length < maxSecondary) {
+    secondary.push(
+      <EventCardBadge key="peer-cities" className="bg-blue-50/90 text-blue-700 ring-1 ring-blue-200/60 backdrop-blur-md">
+        {formatPeerCityLabel(event.peerCityCount!)}
       </EventCardBadge>,
     );
   }

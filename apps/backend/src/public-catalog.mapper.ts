@@ -231,6 +231,7 @@ export function mapGroupedPublicSession(
     groupEventIds,
     groupedEventsCount: row.groupedEventsCount || 1,
     sessionCount: row.sessionCount || upcomingSlots.length || 1,
+    peerCityCount: row.overrideMergeGroupKey ? Math.max(0, (row.groupedEventsCount || 1) - 1) : 0,
     upcomingSlots,
     landingSlugs: [],
     title: formatPublicEventTitle(row.overrideTitle || row.title),

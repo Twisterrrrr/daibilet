@@ -35,6 +35,7 @@ export function toPublicCatalogListItem(session: PublicSessionDto): PublicCatalo
   if (session.groupKey != null) item.groupKey = session.groupKey;
   if (session.groupedEventsCount != null) item.groupedEventsCount = session.groupedEventsCount;
   if (session.sessionCount != null) item.sessionCount = session.sessionCount;
+  if (session.peerCityCount != null) item.peerCityCount = session.peerCityCount;
   if (session.citySlug != null) item.citySlug = session.citySlug;
   if (session.venueSlug != null) item.venueSlug = session.venueSlug;
   if (session.venueAddress != null) item.venueAddress = session.venueAddress;

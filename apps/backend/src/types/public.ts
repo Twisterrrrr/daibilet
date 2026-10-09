@@ -53,6 +53,8 @@ export interface PublicSessionDto extends PurchaseFields {
   groupEventIds?: string[];
   groupedEventsCount?: number;
   sessionCount?: number;
+  /** Cities count for cross-city merged events (excluding current city). */
+  peerCityCount?: number;
   upcomingSlots?: Array<DateTimeSlot & Pick<PurchaseFields, 'purchaseUrl'>>;
   landingSlugs?: string[];
   title: string;
