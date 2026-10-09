@@ -92,6 +92,14 @@ export function mapFinanceOrderStatus(status: string | null | undefined): {
   }
 }
 
+/** An order code or a pending payment is never an admission ticket. */
+export function hasIssuedInternalTicket(order: BuyerInternalOrderRecord | null | undefined): boolean {
+  if (!order) return false;
+  const status = String(order.status || '').trim().toUpperCase();
+  return ['CONFIRMED', 'FULFILLED', 'SUCCEEDED', 'PAID'].includes(status)
+    && Boolean(String(order.ticketNumber || '').trim());
+}
+
 export function amountRubFromKopecks(kopecks: number | null | undefined): number | null {
   if (typeof kopecks !== 'number' || !Number.isFinite(kopecks)) return null;
   return Math.round(kopecks) / 100;

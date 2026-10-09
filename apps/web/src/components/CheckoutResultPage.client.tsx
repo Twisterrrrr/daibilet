@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { BuyerTicketCard } from '@/components/BuyerTicketCard.client';
 import {
   filterInternalOrdersForEmail,
+  hasIssuedInternalTicket,
   mapFinanceOrderStatus,
   mergeBuyerInternalOrders,
   readInternalOrdersFromStorage,
@@ -158,10 +159,10 @@ export function CheckoutResultView() {
           current = applyOrder(payload.order, cached);
           cached = current;
         } else if (!disposed && !cached) {
-          const mapped = mapFinanceOrderStatus(modeHint === 'STUB' ? 'CONFIRMED' : 'PENDING');
+          const mapped = mapFinanceOrderStatus('PENDING');
           current = {
             publicCode: code,
-            status: modeHint === 'STUB' ? 'CONFIRMED' : 'PENDING',
+            status: 'PENDING',
             displayStatus: mapped.displayStatus,
             statusTone: mapped.statusTone,
             title: 'Входной билет',
@@ -243,6 +244,7 @@ export function CheckoutResultView() {
   const status = order ? mapFinanceOrderStatus(order.status) : mapFinanceOrderStatus('PENDING');
   const Icon = status.statusTone === 'live' ? CheckCircle2 : Clock3;
   const ticketHref = publicCode ? buyerTicketPath(publicCode) : '/account/purchases';
+  const ticketReady = hasIssuedInternalTicket(order);
 
   return (
     <>
@@ -256,7 +258,7 @@ export function CheckoutResultView() {
             {status.statusTone === 'live' ? 'Оплата прошла' : 'Заказ принят'}
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-7 text-emerald-50/90">
-            Ниже - ваш электронный билет. Сохраните код и ссылку
+            {ticketReady ? 'Ниже - ваш электронный билет.' : 'Оплата ещё не подтверждена. Билет появится после подтверждения платежа.'} Сохраните код и ссылку
             {recoveredFromStorage ? ' (код восстановлен из этого браузера)' : ''}.
           </p>
         </div>
@@ -273,11 +275,15 @@ export function CheckoutResultView() {
               <Icon className="h-4 w-4 text-emerald-700" />
               <span>{order.displayStatus || status.displayStatus}</span>
               <span className="text-slate-300">·</span>
-              <Link href={ticketHref} className="font-semibold text-primary-700 hover:text-primary-800">
+              {ticketReady ? <Link href={ticketHref} className="font-semibold text-primary-700 hover:text-primary-800">
                 Отдельная страница билета
-              </Link>
+              </Link> : null}
             </div>
-            <BuyerTicketCard order={order} emailHint={emailHint} />
+            {ticketReady ? <BuyerTicketCard order={order} emailHint={emailHint} /> : (
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-950">
+                Заказ №{order.publicCode}: {order.displayStatus || status.displayStatus}. Показывать этот код для входа нельзя.
+              </div>
+            )}
           </div>
         ) : null}
 

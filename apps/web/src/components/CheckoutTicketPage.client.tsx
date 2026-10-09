@@ -8,7 +8,7 @@ import { BuyerTicketCard } from '@/components/BuyerTicketCard.client';
 import { BuyerTicketVenueMapPanel } from '@/components/BuyerTicketVenueMapPanel.client';
 import {
   buyerTicketVenueCoords,
-  mapFinanceOrderStatus,
+  hasIssuedInternalTicket,
   mergeBuyerInternalOrders,
   readInternalOrdersFromStorage,
   upsertInternalOrderInStorage,
@@ -63,19 +63,7 @@ export function CheckoutTicketView({ publicCode, demoOrder, demoBanner }: Props)
           setOrder(merged);
           upsertInternalOrderInStorage(merged);
         } else if (!disposed && !cached) {
-          const mapped = mapFinanceOrderStatus('CONFIRMED');
-          setOrder({
-            publicCode: code,
-            status: 'CONFIRMED',
-            displayStatus: mapped.displayStatus,
-            statusTone: mapped.statusTone,
-            title: 'Входной билет',
-            email: '',
-            purchasedAt: null,
-            amountRub: null,
-            mode: 'UNKNOWN',
-            source: 'internal',
-          });
+          setOrder(null);
         }
         if (!disposed && typeof payload?.emailSent === 'boolean') {
           setEmailHint(payload.emailSent ? 'sent' : 'skipped');
@@ -95,7 +83,7 @@ export function CheckoutTicketView({ publicCode, demoOrder, demoBanner }: Props)
 
   /* Purchases list "Скачать" → ?print=1 opens print / Save as PDF dialog once ticket is ready. */
   useEffect(() => {
-    if (loading || !order || printTriggeredRef.current) return;
+    if (loading || !hasIssuedInternalTicket(order) || printTriggeredRef.current) return;
     if (typeof window === 'undefined') return;
     const wantsPrint = new URLSearchParams(window.location.search).get('print') === '1';
     if (!wantsPrint) return;
@@ -128,9 +116,9 @@ export function CheckoutTicketView({ publicCode, demoOrder, demoBanner }: Props)
       <section className="bg-gradient-to-br from-emerald-700 via-emerald-800 to-slate-950 text-white print:hidden">
         <div className="container-page py-10 sm:py-12">
           <p className="text-sm font-semibold text-emerald-100/80">Дайбилет</p>
-          <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">Ваш билет</h1>
+          <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">{hasIssuedInternalTicket(order) ? 'Ваш билет' : 'Статус билета'}</h1>
           <p className="mt-3 max-w-2xl text-base leading-7 text-emerald-50/90">
-            Сохраните страницу или распечатайте билет перед визитом. Код заказа и QR - в карточке ниже.
+            {hasIssuedInternalTicket(order) ? 'Сохраните страницу или распечатайте билет перед визитом. Код заказа и QR - в карточке ниже.' : 'Билет появится здесь после подтверждения оплаты и выдачи номера.'}
           </p>
         </div>
       </section>
@@ -145,7 +133,7 @@ export function CheckoutTicketView({ publicCode, demoOrder, demoBanner }: Props)
           <div className="flex min-h-[30vh] items-center justify-center print:hidden">
             <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
           </div>
-        ) : order ? (
+        ) : order && hasIssuedInternalTicket(order) ? (
           <div
             className={
               venuePin
@@ -168,7 +156,7 @@ export function CheckoutTicketView({ publicCode, demoOrder, demoBanner }: Props)
             ) : null}
           </div>
         ) : (
-          <p className="text-slate-600 print:hidden">Не удалось загрузить билет. Попробуйте обновить страницу.</p>
+          <p className="text-slate-600 print:hidden">Билет пока не выдан. Оплата ещё не подтверждена или заказ не найден.</p>
         )}
       </section>
     </>

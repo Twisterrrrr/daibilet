@@ -777,7 +777,7 @@ export function explainLandingRuleMatch(
   if (!blockers.length) {
     const fastMatchReasons = collectFastLandingMatchReasons(candidate, rule, tags);
     const hasVenueSignal = fastMatchReasons.some((reason) => reason.startsWith('площадка:'));
-    if (fastMatchReasons.length && landingRequiredSignalsSatisfied(rule, keywordFields, hasVenueSignal)) {
+    if (fastMatchReasons.length && landingRequiredSignalsSatisfied(rule, keywordFields, hasVenueSignal, candidate.subcategories, tags)) {
       return {
         matches: true,
         reasons: uniqueValues([...reasons, ...fastMatchReasons]).slice(0, 10),
@@ -918,7 +918,14 @@ function landingRequiredSignalsSatisfied(
   rule: LandingRule,
   keywordFields: KeywordField[],
   allowVenueTitleOverride = false,
+  subcategories?: string[],
+  tags?: string[],
 ): boolean {
+  // requiredAnySubcategories is a hard gate: event must have at least one.
+  if (rule.requiredAnySubcategories?.length) {
+    const allLabels = uniqueValues([...(subcategories || []), ...(tags || [])]);
+    if (!rule.requiredAnySubcategories.some((label) => allLabels.includes(label))) return false;
+  }
   if (rule.requiredAnyKeywords?.length && !firstKeywordMatch(keywordFields, rule.requiredAnyKeywords)) return false;
   const titleFields = keywordFields.filter((field) => field.field === 'title');
   if (!allowVenueTitleOverride) {
