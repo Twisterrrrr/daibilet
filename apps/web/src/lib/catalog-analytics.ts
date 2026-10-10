@@ -16,6 +16,8 @@ export const METRIKA_GOALS = {
   SELECT_TICKETS: 'select_tickets',
   PURCHASE_SUCCESS: 'purchase_success',
   CATALOG_INTERSTITIAL_CLICK: 'catalog_interstitial_click',
+  EVENT_VIEW: 'event_view',
+  CITY_HUB_VIEW: 'city_hub_view',
 } as const;
 
 export type MetrikaGoalId = (typeof METRIKA_GOALS)[keyof typeof METRIKA_GOALS];
@@ -90,6 +92,30 @@ export function trackProductCardClick(params?: {
     eventId: params?.eventId ? String(params.eventId) : undefined,
     slug: params?.slug ? String(params.slug) : undefined,
     source: params?.source ? String(params.source) : undefined,
+  });
+}
+
+/** Просмотр страницы события. */
+export function trackEventView(params?: {
+  eventId?: string | null;
+  slug?: string | null;
+  city?: string | null;
+}): void {
+  trackGoal(METRIKA_GOALS.EVENT_VIEW, {
+    eventId: params?.eventId ? String(params.eventId) : undefined,
+    slug: params?.slug ? String(params.slug) : undefined,
+    city: params?.city ? String(params.city) : undefined,
+  });
+}
+
+/** Просмотр хаба города. */
+export function trackCityHubView(params?: {
+  city?: string | null;
+  slug?: string | null;
+}): void {
+  trackGoal(METRIKA_GOALS.CITY_HUB_VIEW, {
+    city: params?.city ? String(params.city) : undefined,
+    slug: params?.slug ? String(params.slug) : undefined,
   });
 }
 

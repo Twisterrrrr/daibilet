@@ -44,7 +44,7 @@ import { formatStreetAddress } from '@/lib/address';
 import { IMAGE_SIZES } from '@/components/SafeImage.client';
 import { CheckoutModalButton } from '@/components/CheckoutModal.client';
 import { EventVenueTrigger } from '@/components/EventVenueModal.client';
-import { trackSelectTickets } from '@/lib/catalog-analytics';
+import { trackEventView, trackSelectTickets } from '@/lib/catalog-analytics';
 import {
   getTeplohodWidgetIds,
   resolveTeplohodCheckoutUrl,
@@ -72,6 +72,10 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
     const timer = window.setInterval(() => setNowMs(Date.now()), 30_000);
     return () => window.clearInterval(timer);
   }, []);
+  React.useEffect(() => {
+    trackEventView({ eventId: event.id, slug: event.slug, city: event.city });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [event.id]);
   const offers = payload.offers ?? [];
   const teplohod = getTeplohodWidgetIds(event);
   const primaryOffer = offers.find((offer) => offer.active !== false) || offers[0] || null;

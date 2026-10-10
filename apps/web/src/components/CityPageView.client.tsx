@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { ArrowLeft, ChevronDown, Clock, Info, Lightbulb, MapPin, Ticket } from 'lucide-react';
+import { trackCityHubView } from '@/lib/catalog-analytics';
 import Link from 'next/link';
 
 import { CityHeroStrip } from '@/components/CityHeroStrip.client';
@@ -212,6 +213,10 @@ export function CityPageView({
   const [contentReady, setContentReady] = React.useState(() => Boolean(initialPayload?.sessions?.length));
   const [error, setError] = React.useState<string | null>(null);
   const [category, setCategory] = React.useState('all');
+  React.useEffect(() => {
+    trackCityHubView({ city: payload?.city?.name || slug, slug });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug]);
   const [placeFocus, setPlaceFocus] = React.useState<CityPlaceFocus | null>(null);
   const userPickedCategory = React.useRef(false);
 
