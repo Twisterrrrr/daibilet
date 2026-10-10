@@ -747,7 +747,7 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
       if (preferStandalone && paragraphs.length > 0) {
         nodes.push(
           <div key={`img-${index}`} className="my-10">
-            <BlogFigure image={block.image} className="mx-auto w-full max-w-2xl" />
+            <BlogFigure image={block.image} className="w-full" />
           </div>,
         );
         nodes.push(...renderParagraphNodes(paragraphs, `img-p-${index}`, isLeadParagraph));
@@ -798,7 +798,7 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
       case 'image':
         nodes.push(
           <div key={`img-${index}`} className="my-10">
-            <BlogFigure image={block.image} className="mx-auto w-full max-w-2xl" />
+            <BlogFigure image={block.image} className="w-full" />
           </div>,
         );
         bodyImagesRendered += 1;
