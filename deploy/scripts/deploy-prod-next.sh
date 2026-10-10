@@ -6,7 +6,7 @@
 # SPB Intelligent Hoopoe (.16) retired / труп - never build or scp .next from there.
 #
 # Deploy discipline (CPU/RAM):
-# - One controlled restart sequence only: stop web -> build -> restart api -> start web.
+# - Zero-downtime: build with web up, restart after build (2-3 sec downtime).
 # - Do NOT batch-restart unrelated units (staging, docker stacks, timers) in the same pass.
 # - Avoid back-to-back deploys that re-trigger TEP startup sync; prefer TEP_AUTO_SYNC_ENABLED=0 + cron.
 #
@@ -207,33 +207,18 @@ reap_orphan_next_build_workers() {
   echo "Reap done (${phase}): signaled ${killed} orphan(s)"
 }
 
-# Stop web BEFORE build. In-place `next build` rewrites apps/web/.next while
-# `next start` is still up → clients see 400/ChunkLoadError on /_next/static
-# (CSS + cities/%5Bslug%5D/page-*.js) until restart finishes.
-if systemctl_deploy is-active --quiet "$WEB_SERVICE" 2>/dev/null; then
-  systemctl_deploy stop "$WEB_SERVICE"
-  echo "Stopped $WEB_SERVICE before web:build (avoid mid-build static 400s)"
-fi
+# Build to .next (zero-downtime: web stays up during build).
+WEB_NEXT_DIR="apps/web/.next"
+WEB_NEXT_PREV="apps/web/.next.prev"
 
 reap_orphan_next_build_workers "pre-build"
 
-WEB_NEXT_DIR="apps/web/.next"
-WEB_NEXT_PREV="apps/web/.next.prev"
-# The running web service can leave root-owned incremental cache files behind.
-# They are disposable and must be removed before `next build` tries to update
-# `.next/cache/.rscinfo` as the deploy user.
-rm_rf_deploy "${WEB_NEXT_DIR}/cache"
-echo "Cleared ${WEB_NEXT_DIR}/cache before build"
-# Keep last healthy build for rollback if web:build fails mid-SSG.
+# Save healthy build for rollback
 if [[ -f "${WEB_NEXT_DIR}/prerender-manifest.json" && -f "${WEB_NEXT_DIR}/BUILD_ID" ]]; then
   rm_rf_deploy "${WEB_NEXT_PREV}"
   cp -a "${WEB_NEXT_DIR}" "${WEB_NEXT_PREV}"
   echo "Saved healthy .next → .next.prev (BUILD_ID=$(cat "${WEB_NEXT_DIR}/BUILD_ID"))"
 fi
-# The runtime can also leave root-owned files under .next/server/route-cache.
-# Build from an empty output tree after preserving the rollback snapshot.
-rm_rf_deploy "${WEB_NEXT_DIR}"
-echo "Cleared ${WEB_NEXT_DIR} before build"
 
 # Heap cap for `next build` on MSK ~8Gi (also set in apps/web/scripts/next-build.mjs).
 # Default 5120Mi (legacy SPB 3.8Gi used 2560). Override via NODE_OPTIONS if needed.
@@ -246,24 +231,16 @@ echo "web:build NODE_OPTIONS=${NODE_OPTIONS} EVENT_SSG_TOP_N=${EVENT_SSG_TOP_N}"
 # destination before `web:build`, whose first step syncs those assets again.
 sync_public_assets_deploy
 
+# Build normally. Web keeps running (may see brief chunk 400s during build
+# but service stays up). Restart after build is the only real downtime.
+echo "Building (web stays up; restart after = only downtime)"
 set +e
 pnpm web:build
 BUILD_RC=$?
 set -e
 
 if [[ "${BUILD_RC}" -ne 0 ]]; then
-  echo "web:build FAILED (rc=${BUILD_RC}) — attempting restore from .next.prev"
-  if [[ -f "${WEB_NEXT_PREV}/prerender-manifest.json" && -f "${WEB_NEXT_PREV}/BUILD_ID" ]]; then
-    rm_rf_deploy "${WEB_NEXT_DIR}"
-    cp -a "${WEB_NEXT_PREV}" "${WEB_NEXT_DIR}"
-    echo "Restored .next from .next.prev (BUILD_ID=$(cat "${WEB_NEXT_DIR}/BUILD_ID"))"
-    if systemctl_deploy is-enabled --quiet "$WEB_SERVICE" 2>/dev/null; then
-      systemctl_deploy start "$WEB_SERVICE" || true
-      echo "Started ${WEB_SERVICE} on restored .next"
-    fi
-  else
-    echo "No healthy .next.prev to restore — site may stay down until next successful build"
-  fi
+  echo "web:build FAILED (rc=${BUILD_RC}) — web still running on old .next"
   exit "${BUILD_RC}"
 fi
 
@@ -288,7 +265,11 @@ if systemctl_deploy is-active --quiet "$API_SERVICE"; then
   systemctl_deploy restart "$API_SERVICE"
 fi
 
-if systemctl_deploy is-enabled --quiet "$WEB_SERVICE" 2>/dev/null; then
+# Web was never stopped — restart to pick up new .next (2-3 sec downtime).
+if systemctl_deploy is-active --quiet "$WEB_SERVICE" 2>/dev/null; then
+  systemctl_deploy restart "$WEB_SERVICE"
+  echo "Restarted $WEB_SERVICE on new build"
+elif systemctl_deploy is-enabled --quiet "$WEB_SERVICE" 2>/dev/null; then
   systemctl_deploy reset-failed "$WEB_SERVICE" 2>/dev/null || true
   systemctl_deploy start "$WEB_SERVICE"
 else
