@@ -207,9 +207,10 @@ reap_orphan_next_build_workers() {
   echo "Reap done (${phase}): signaled ${killed} orphan(s)"
 }
 
-# Build to .next (zero-downtime: web stays up during build).
+# Build in a separate directory while the current .next keeps serving traffic.
 WEB_NEXT_DIR="apps/web/.next"
 WEB_NEXT_PREV="apps/web/.next.prev"
+WEB_NEXT_BUILD="apps/web/.next-build"
 
 reap_orphan_next_build_workers "pre-build"
 
@@ -231,35 +232,37 @@ echo "web:build NODE_OPTIONS=${NODE_OPTIONS} EVENT_SSG_TOP_N=${EVENT_SSG_TOP_N}"
 # destination before `web:build`, whose first step syncs those assets again.
 sync_public_assets_deploy
 
-# Build normally. Web keeps running (may see brief chunk 400s during build
-# but service stays up). Restart after build is the only real downtime.
-echo "Building (web stays up; restart after = only downtime)"
+# A running Next server may create root-owned cache files in .next. Never build
+# into that tree: it causes EACCES and can serve half-written manifests/chunks.
+rm_rf_deploy "${WEB_NEXT_BUILD}"
+export DAIBILET_NEXT_DIST_DIR='.next-build'
+echo "Building to ${WEB_NEXT_BUILD} while the active web stays up"
 set +e
 pnpm web:build
 BUILD_RC=$?
 set -e
+unset DAIBILET_NEXT_DIST_DIR
 
 if [[ "${BUILD_RC}" -ne 0 ]]; then
   echo "web:build FAILED (rc=${BUILD_RC}) — web still running on old .next"
+  rm_rf_deploy "${WEB_NEXT_BUILD}"
   exit "${BUILD_RC}"
 fi
 
 reap_orphan_next_build_workers "post-build"
 
-rm_rf_deploy apps/web/.next/cache
-echo "Cleared apps/web/.next/cache"
+rm_rf_deploy "${WEB_NEXT_BUILD}/cache"
+echo "Cleared ${WEB_NEXT_BUILD}/cache"
 
-if [[ ! -f "${WEB_NEXT_DIR}/prerender-manifest.json" || ! -f "${WEB_NEXT_DIR}/BUILD_ID" ]]; then
-  echo "ERROR: post-build .next incomplete (missing prerender-manifest or BUILD_ID)"
-  if [[ -f "${WEB_NEXT_PREV}/prerender-manifest.json" && -f "${WEB_NEXT_PREV}/BUILD_ID" ]]; then
-    rm_rf_deploy "${WEB_NEXT_DIR}"
-    cp -a "${WEB_NEXT_PREV}" "${WEB_NEXT_DIR}"
-    echo "Restored .next from .next.prev (BUILD_ID=$(cat "${WEB_NEXT_DIR}/BUILD_ID"))"
-  else
-    echo "No healthy .next.prev — refusing to start web"
-    exit 1
-  fi
+if [[ ! -f "${WEB_NEXT_BUILD}/prerender-manifest.json" || ! -f "${WEB_NEXT_BUILD}/BUILD_ID" ]]; then
+  echo "ERROR: post-build ${WEB_NEXT_BUILD} incomplete"
+  rm_rf_deploy "${WEB_NEXT_BUILD}"
+  exit 1
 fi
+
+systemctl_deploy stop "$WEB_SERVICE"
+rm_rf_deploy "${WEB_NEXT_DIR}"
+mv "${WEB_NEXT_BUILD}" "${WEB_NEXT_DIR}"
 
 if systemctl_deploy is-active --quiet "$API_SERVICE"; then
   systemctl_deploy restart "$API_SERVICE"

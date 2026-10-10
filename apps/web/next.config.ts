@@ -3,6 +3,7 @@ import type { NextConfig } from 'next';
 import { placeSlugAliasRedirects } from './src/lib/place-slug-aliases';
 
 const nextConfig: NextConfig = {
+  distDir: process.env.DAIBILET_NEXT_DIST_DIR || '.next',
   // MSK prod ~8Gi / 4 CPU: allow parallel build. (Legacy SPB 3.8Gi used cpus:1 + workerThreads:false.)
   // Type errors are closed (web typecheck: 0 as of 30.09), so the build may fail on them again -
   // that is the point of the TS-debt cleanup. Do not re-enable the ignore.
