@@ -4194,6 +4194,50 @@ const VLADIKAVKAZ_IMAGES: Record<string, string> = {
   'vladikavkaz-ploschad-svobody': '/images/venues/vladikavkaz/ploschad-svobody.jpg',
 };
 
+const ULYANOVSK_KIROV_MUST_SEE_IMAGES: Record<string, string> = {
+  'ulyanovsk-muzey-goncharova': '/images/venues/ulyanovsk/muzey-goncharova.jpg',
+  'ulyanovsk-uspenskiy-sobor': '/images/venues/ulyanovsk/uspenskiy-sobor.jpg',
+  'ulyanovsk-nikolskiy-sobor': '/images/venues/ulyanovsk/nikolskiy-sobor.jpg',
+  'ulyanovsk-simbirskaya-krepost': '/images/venues/ulyanovsk/simbirskaya-krepost.jpg',
+  'ulyanovsk-teatr-dramy': '/images/venues/ulyanovsk/teatr-dramy.jpg',
+  'ulyanovsk-krayevedcheskiy-muzey': '/images/venues/ulyanovsk/krayevedcheskiy-muzey.jpg',
+  'ulyanovsk-muzey-kvartira-ulianovyh': '/images/venues/ulyanovsk/muzey-kvartira-ulianovyh.jpg',
+  'ulyanovsk-park-pobedy-novoulyanovsk': '/images/venues/ulyanovsk/park-pobedy-novoulyanovsk.jpg',
+  'ulyanovsk-naberezhnaya-goncharova': '/images/venues/ulyanovsk/naberezhnaya-goncharova.jpg',
+  'ulyanovsk-sviyazhskiy-zaliv': '/images/venues/ulyanovsk/sviyazhskiy-zaliv.jpg',
+  'ulyanovsk-pamyatnik-goncharovu': '/images/venues/ulyanovsk/pamyatnik-goncharovu.jpg',
+  'ulyanovsk-osobnyak-arbuzova': '/images/venues/ulyanovsk/osobnyak-arbuzova.jpg',
+  'ulyanovsk-muzey-boevoy-slavy': '/images/venues/ulyanovsk/muzey-boevoy-slavy.jpg',
+  'ulyanovsk-naberezhnaya-sengileya': '/images/venues/ulyanovsk/naberezhnaya-sengileya.jpg',
+  'kirov-kirovskaya-oblast-naberezhnaya-grina': '/images/venues/kirov-kirovskaya-oblast/naberezhnaya-grina.jpg',
+  'kirov-kirovskaya-oblast-ulitsa-spasskaya': '/images/venues/kirov-kirovskaya-oblast/ulitsa-spasskaya.jpg',
+  'kirov-kirovskaya-oblast-aleksandrovskiy-sad': '/images/venues/kirov-kirovskaya-oblast/aleksandrovskiy-sad.jpg',
+  'kirov-kirovskaya-oblast-vyatskiy-paleontologicheskiy-muzey': '/images/venues/kirov-kirovskaya-oblast/vyatskiy-paleontologicheskiy-muzey.jpg',
+  'kirov-kirovskaya-oblast-svyato-uspenskiy-trifonov-muzhskoy-monastyr': '/images/venues/kirov-kirovskaya-oblast/svyato-uspenskiy-trifonov-muzhskoy-monastyr.jpg',
+  'kirov-kirovskaya-oblast-zapovednik-skazok': '/images/venues/kirov-kirovskaya-oblast/zapovednik-skazok.jpg',
+  'kirov-kirovskaya-oblast-muzey-dymkovskoy-igrushki': '/images/venues/kirov-kirovskaya-oblast/muzey-dymkovskoy-igrushki.jpg',
+  'kirov-kirovskaya-oblast-krayevedcheskiy-muzey': '/images/venues/kirov-kirovskaya-oblast/krayevedcheskiy-muzey.jpg',
+  'kirov-kirovskaya-oblast-muzey-istorii-goroda': '/images/venues/kirov-kirovskaya-oblast/muzey-istorii-goroda.jpg',
+  'kirov-kirovskaya-oblast-dom-muzey-grina': '/images/venues/kirov-kirovskaya-oblast/dom-muzey-grina.jpg',
+  'kirov-kirovskaya-oblast-muzey-vyatskogo-pryanika': '/images/venues/kirov-kirovskaya-oblast/muzey-vyatskogo-pryanika.jpg',
+  'kirov-kirovskaya-oblast-uspenskiy-sobor': '/images/venues/kirov-kirovskaya-oblast/uspenskiy-sobor.jpg',
+  'kirov-kirovskaya-oblast-ploschad-lenina': '/images/venues/kirov-kirovskaya-oblast/ploschad-lenina.jpg',
+  'kirov-kirovskaya-oblast-ulitsa-volodarskogo': '/images/venues/kirov-kirovskaya-oblast/ulitsa-volodarskogo.jpg',
+  'kirov-kirovskaya-oblast-park-im-kirova': '/images/venues/kirov-kirovskaya-oblast/park-im-kirova.jpg',
+  'kirov-kirovskaya-oblast-teatr-dramy': '/images/venues/kirov-kirovskaya-oblast/teatr-dramy.jpg',
+  'kirov-kirovskaya-oblast-filarmoniya': '/images/venues/kirov-kirovskaya-oblast/filarmoniya.jpg',
+  'kirov-kirovskaya-oblast-hlynovskoe-gorodische': '/images/venues/kirov-kirovskaya-oblast/hlynovskoe-gorodische.jpg',
+  'kirov-kirovskaya-oblast-dymkovskaya-sloboda': '/images/venues/kirov-kirovskaya-oblast/dymkovskaya-sloboda.jpg',
+  'kirov-kirovskaya-oblast-kirovskiy-most': '/images/venues/kirov-kirovskaya-oblast/kirovskiy-most.jpg',
+  'kirov-kirovskaya-oblast-ulitsa-spasskaya-vyatskiy-arbat': '/images/venues/kirov-kirovskaya-oblast/ulitsa-spasskaya.jpg',
+  'kirov-kirovskaya-oblast-kirovskiy-krayevedcheskiy-muzey': '/images/venues/kirov-kirovskaya-oblast/krayevedcheskiy-muzey.jpg',
+  'kirov-kirovskaya-oblast-muzey-istorii-goroda-kirova': '/images/venues/kirov-kirovskaya-oblast/muzey-istorii-goroda.jpg',
+  'kirov-kirovskaya-oblast-dom-muzey-a-s-grina': '/images/venues/kirov-kirovskaya-oblast/dom-muzey-grina.jpg',
+  'kirov-kirovskaya-oblast-uspenskiy-trifonov-sobor': '/images/venues/kirov-kirovskaya-oblast/uspenskiy-sobor.jpg',
+  'kirov-kirovskaya-oblast-teatr-dramy-pisareva': '/images/venues/kirov-kirovskaya-oblast/teatr-dramy.jpg',
+  'kirov-kirovskaya-oblast-filarmoniya-vyatki': '/images/venues/kirov-kirovskaya-oblast/filarmoniya.jpg',
+};
+
 const EDITORIAL_IMAGES_BY_SLUG: Record<string, string> = {
   ...KAZAN_IMAGES,
   ...SAMARA_IMAGES,
@@ -4225,6 +4269,7 @@ const EDITORIAL_IMAGES_BY_SLUG: Record<string, string> = {
   ...VLADIKAVKAZ_IMAGES,
   ...NOVOSIBIRSK_HUB_IMAGES,
   ...SUBURB_NESTED_AUTO_IMAGES,
+  ...ULYANOVSK_KIROV_MUST_SEE_IMAGES,
 };
 
 const PLACE_IMAGE_ALIASES: Record<string, string> = {
