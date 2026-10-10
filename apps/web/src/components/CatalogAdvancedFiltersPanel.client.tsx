@@ -371,26 +371,16 @@ export function CatalogAdvancedFiltersPanel({
         </div>
 
         <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-3 sm:px-5 sm:py-4">
-          <div className="grid gap-6 sm:gap-7">
+          <div className="space-y-7">
+            {/* Search */}
             <section>
-              <label htmlFor="catalog-advanced-search" className={labelCls}>
-                <Search aria-hidden className="h-3.5 w-3.5 text-slate-400" />
-                Поиск
-              </label>
+              <div className="mb-2.5 flex items-center gap-2">
+                <span className="grid h-7 w-7 place-items-center rounded-lg bg-blue-50 text-blue-600"><Search className="h-3.5 w-3.5" strokeWidth={2} /></span>
+                <h3 className="text-sm font-semibold text-slate-800">Поиск</h3>
+              </div>
               <div className="relative">
-                <Search
-                  aria-hidden
-                  className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
-                  strokeWidth={1.75}
-                />
-                <input
-                  id="catalog-advanced-search"
-                  type="search"
-                  value={draft.q || ''}
-                  onChange={(event) => patchDraft({ q: event.target.value })}
-                  placeholder="Название, место или артист"
-                  className={`${inputCls} pl-10`}
-                />
+                <Search aria-hidden className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" strokeWidth={1.75} />
+                <input id="catalog-advanced-search" type="search" value={draft.q || ''} onChange={(event) => patchDraft({ q: event.target.value })} placeholder="Название, место или артист" className={`${inputCls} pl-10`} />
               </div>
             </section>
 
@@ -433,99 +423,49 @@ export function CatalogAdvancedFiltersPanel({
             ) : null}
 
             <section>
-              <div className={labelCls}>
-                <CalendarIcon aria-hidden className="h-3.5 w-3.5 text-slate-400" />
-                Дата
+              <div className="mb-2.5 flex items-center gap-2">
+                <span className="grid h-7 w-7 place-items-center rounded-lg bg-amber-50 text-amber-600"><CalendarIcon className="h-3.5 w-3.5" strokeWidth={2} /></span>
+                <h3 className="text-sm font-semibold text-slate-800">Дата</h3>
               </div>
-
-              <button
-                type="button"
-                onClick={() => (dateOpen ? setDateOpen(false) : openDateRange())}
-                aria-expanded={dateOpen}
-                className={`${inputCls} flex items-center justify-between gap-3 text-left`}
-              >
-                <span className={dateLabel ? 'font-medium text-[#1A1A1A]' : 'text-[#6E6E73]'}>
-                  {dateLabel || 'Любая дата'}
-                </span>
-                <CalendarIcon aria-hidden className="h-4 w-4 shrink-0 text-[#6E6E73]" strokeWidth={1.75} />
-              </button>
-
-              {dateOpen ? (
-                <div className="mt-2.5 space-y-2.5 rounded-2xl bg-[#F5F5F7] p-3">
-                  <div className="grid grid-cols-2 gap-2">
-                    <label className="block min-w-0">
-                      <span className="mb-1 block text-[11px] font-medium text-[#6E6E73]">Начало</span>
-                      <input
-                        ref={fromInputRef}
-                        type="date"
-                        value={draft.dateFrom}
-                        aria-label="Дата начала"
-                        onChange={(event) =>
-                          patchDraft({ dateFrom: event.target.value, date: '' })
-                        }
-                        className="h-10 w-full rounded-xl border border-transparent bg-white px-3 text-sm text-[#1A1A1A] outline-none focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/30"
-                      />
-                    </label>
-                    <label className="block min-w-0">
-                      <span className="mb-1 block text-[11px] font-medium text-[#6E6E73]">Конец</span>
-                      <input
-                        type="date"
-                        value={draft.dateTo}
-                        min={draft.dateFrom || undefined}
-                        aria-label="Дата конца"
-                        onChange={(event) => patchDraft({ dateTo: event.target.value, date: '' })}
-                        className="h-10 w-full rounded-xl border border-transparent bg-white px-3 text-sm text-[#1A1A1A] outline-none focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/30"
-                      />
-                    </label>
-                  </div>
-                  {(draft.dateFrom || draft.dateTo) && (
-                    <button
-                      type="button"
-                      onClick={clearDates}
-                      className="text-xs font-medium text-primary hover:underline"
-                    >
-                      Сбросить даты
-                    </button>
-                  )}
-                </div>
-              ) : null}
-
-              <div className="mt-2.5 flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-1.5">
                 {[
                   { label: 'Сегодня', days: 0 },
                   { label: 'Завтра', days: 1 },
                   { label: 'Неделя', days: 7 },
-                  { label: '2 недели', days: 14 },
-                  { label: 'Месяц', days: 30 },
+                  { label: 'Выходные', days: 5 },
                 ].map((item) => {
                   const today = new Date();
                   const to = new Date(today);
                   to.setDate(today.getDate() + item.days);
                   const fromIso = isoDay(today);
                   const toIso = isoDay(to);
-                  const active =
-                    !draft.date && draft.dateFrom === fromIso && draft.dateTo === toIso;
+                  const active = !draft.date && draft.dateFrom === fromIso && draft.dateTo === toIso;
                   return (
-                    <button
-                      key={item.label}
-                      type="button"
-                      onClick={() => {
-                        patchDraft({ dateFrom: fromIso, dateTo: toIso, date: '' });
-                        setDateOpen(true);
-                      }}
-                      className={filterChip(active)}
-                    >
+                    <button key={item.label} type="button" onClick={() => { patchDraft({ dateFrom: fromIso, dateTo: toIso, date: '' }); setDateOpen(false); }} className={filterChip(active)}>
                       {item.label}
                     </button>
                   );
                 })}
+                <button type="button" onClick={() => (dateOpen ? clearDates() : openDateRange())} className={filterChip(dateOpen || Boolean(draft.dateFrom || draft.dateTo))}>
+                  {dateLabel || 'Свой период'}
+                </button>
               </div>
+              {dateOpen ? (
+                <div className="mt-2.5 flex items-center gap-2">
+                  <input ref={fromInputRef} type="date" value={draft.dateFrom} onChange={(e) => patchDraft({ dateFrom: e.target.value, date: '' })} aria-label="Дата начала" className={inputCls} />
+                  <span className="text-xs text-slate-400">—</span>
+                  <input type="date" value={draft.dateTo} min={draft.dateFrom || undefined} onChange={(e) => patchDraft({ dateTo: e.target.value, date: '' })} aria-label="Дата конца" className={inputCls} />
+                  {(draft.dateFrom || draft.dateTo) && (
+                    <button type="button" onClick={clearDates} className="shrink-0 rounded-lg px-2 py-1 text-xs font-medium text-slate-500 hover:bg-slate-100">Сбросить</button>
+                  )}
+                </div>
+              ) : null}
             </section>
 
             <section>
-              <div className={labelCls}>
-                <Wallet aria-hidden className="h-3.5 w-3.5 text-slate-400" />
-                Цена, ₽
+              <div className="mb-2.5 flex items-center gap-2">
+                <span className="grid h-7 w-7 place-items-center rounded-lg bg-emerald-50 text-emerald-600"><Wallet className="h-3.5 w-3.5" strokeWidth={2} /></span>
+                <h3 className="text-sm font-semibold text-slate-800">Цена, ₽</h3>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <input
@@ -575,9 +515,9 @@ export function CatalogAdvancedFiltersPanel({
 
             <section className="space-y-5">
               <div>
-                <div className={labelCls}>
-                  <Users aria-hidden className="h-3.5 w-3.5 text-slate-400" />
-                  Возраст
+                <div className="mb-2.5 flex items-center gap-2">
+                  <span className="grid h-7 w-7 place-items-center rounded-lg bg-rose-50 text-rose-600"><Users className="h-3.5 w-3.5" strokeWidth={2} /></span>
+                  <h3 className="text-sm font-semibold text-slate-800">Возраст</h3>
                 </div>
                 <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label="Возрастное ограничение">
                   <button
