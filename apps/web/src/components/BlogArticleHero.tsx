@@ -44,7 +44,7 @@ export function BlogArticleHero({
       <PageBreadcrumbBar items={breadcrumbs} hideLastOnMobile />
       <section className="relative overflow-hidden border-b border-slate-200 bg-slate-950 text-white">
         {/* Align with venue/city heroes: ~28rem desktop, not magazine 42rem. */}
-        <div className="relative aspect-[4/5] w-full sm:aspect-[16/10] md:aspect-auto md:min-h-80 lg:min-h-[28rem]">
+        <div className="relative aspect-[4/5] w-full sm:aspect-[16/10] md:h-80 lg:h-[28rem]">
           <SafeImage
             src={coverImageUrl}
             alt=""
