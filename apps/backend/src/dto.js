@@ -914,7 +914,11 @@ function matchesAdminOrderListFilters(order, { view, provider, status, q }) {
   if (view === 'pending_refunds' && !isRefundStatus(order.status)) return false;
   if (view === 'archivable' && !order.canArchive) return false;
   if (provider !== 'ALL' && order.sourceCode !== provider) return false;
-  if (status !== 'all' && String(order.status || '').toLowerCase() !== status) return false;
+  if (status === 'paid' && !isConfirmedOrderStatus(order.status)) return false;
+  else if (status === 'pending' && !isProcessingOrderStatus(order.status)) return false;
+  else if (status === 'cancelled' && !isCanceledOrderStatus(order.status)) return false;
+  else if (status === 'error' && !isProblemOrderStatus(order.status)) return false;
+  else if (!['all', 'paid', 'pending', 'cancelled', 'error'].includes(status) && String(order.status || '').toLowerCase() !== status) return false;
   if (!q) return true;
   const haystack = [
     order.externalOrderId,

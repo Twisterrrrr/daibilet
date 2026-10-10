@@ -19,6 +19,7 @@ export type AdminOrderListRow = {
   needsAttention: boolean;
   problems: string[];
   isArchived: boolean;
+  sourceKind: 'internal' | 'external';
 };
 
 export type AdminOrdersListData = {
@@ -27,6 +28,8 @@ export type AdminOrdersListData = {
   limit: number;
   total: number;
   rows: AdminOrderListRow[];
+  sources: string[];
+  statuses: string[];
   quickFilters: Array<{ id: string; count: number }>;
   metrics: {
     imported: number;
@@ -86,14 +89,17 @@ function normalizeOrderRow(raw: unknown): AdminOrderListRow {
     needsAttention: Boolean(row.needsAttention),
     problems: Array.isArray(row.problems) ? row.problems.map((item) => String(item)) : [],
     isArchived: Boolean(row.isArchived || row.archivedAt),
+    sourceKind: row.sourceKind === 'internal' ? 'internal' : 'external',
   };
 }
 
 export async function loadAdminOrdersList(searchParams: {
+  kind?: 'internal' | 'external';
   q?: string;
   view?: string;
   page?: string;
   source?: string;
+  status?: string;
 }): Promise<AdminOrdersListData> {
   const errors: string[] = [];
   const params = new URLSearchParams();
@@ -101,7 +107,13 @@ export async function loadAdminOrdersList(searchParams: {
   params.set('page', String(Math.max(1, asNumber(searchParams.page, 1))));
   if (searchParams.q?.trim()) params.set('q', searchParams.q.trim());
   if (searchParams.view && searchParams.view !== 'all') params.set('view', searchParams.view);
-  if (searchParams.source && searchParams.source !== 'all') params.set('source', searchParams.source);
+  if (searchParams.source && searchParams.source !== 'all') params.set('provider', searchParams.source);
+  if (searchParams.status && searchParams.status !== 'all') params.set('status', searchParams.status);
+
+  if (searchParams.kind === 'internal') {
+    params.set('provider', 'MANUAL');
+    return loadFinanceAdminOrders(params);
+  }
 
   try {
     const response = await adminApiFetch(`/api/admin/orders?${params.toString()}`);
@@ -126,6 +138,8 @@ export async function loadAdminOrdersList(searchParams: {
       limit: asNumber(payload.limit, DEFAULT_LIMIT),
       total: asNumber(payload.total),
       rows: Array.isArray(payload.rows) ? payload.rows.map(normalizeOrderRow) : [],
+      sources: Array.isArray(payload.sources) ? payload.sources.map(String) : [],
+      statuses: Array.isArray(payload.statuses) ? payload.statuses.map(String) : [],
       quickFilters,
       metrics: {
         imported: asNumber(metricsRaw.imported || metricsRaw.orders),
@@ -138,6 +152,46 @@ export async function loadAdminOrdersList(searchParams: {
   } catch (error) {
     errors.push(`orders: ${error instanceof Error ? error.message : 'network error'}`);
     return emptyOrders(errors);
+  }
+}
+
+async function loadFinanceAdminOrders(params: URLSearchParams): Promise<AdminOrdersListData> {
+  const base = process.env.FINANCE_API_BASE_URL || '';
+  const token = process.env.DAIBILET_FINANCE_ADMIN_READ_TOKEN || '';
+  if (!base || !token) return emptyOrders(['Внутренние заказы: защищённое подключение к финконтуру не настроено.']);
+  try {
+    const url = new URL('/api/internal/admin/orders', base);
+    url.search = params.toString();
+    const response = await fetch(url, {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: 'no-store',
+      signal: AbortSignal.timeout(8_000),
+    });
+    if (!response.ok) return emptyOrders([`Внутренние заказы: HTTP ${response.status}`]);
+    const payload = (await response.json()) as Record<string, unknown>;
+    const metricsRaw = (payload.metrics && typeof payload.metrics === 'object' ? payload.metrics : {}) as Record<string, unknown>;
+    return {
+      page: asNumber(payload.page, 1),
+      pages: Math.max(1, asNumber(payload.pages, 1)),
+      limit: asNumber(payload.limit, DEFAULT_LIMIT),
+      total: asNumber(payload.total),
+      rows: Array.isArray(payload.rows) ? payload.rows.map(normalizeOrderRow) : [],
+      sources: ['MANUAL'],
+      statuses: Array.isArray(payload.statuses) ? payload.statuses.map(String) : [],
+      quickFilters: Array.isArray(payload.quickFilters) ? payload.quickFilters.map((item) => {
+        const row = (item && typeof item === 'object' ? item : {}) as Record<string, unknown>;
+        return { id: String(row.id || ''), count: asNumber(row.count) };
+      }) : [],
+      metrics: {
+        imported: asNumber(metricsRaw.internal),
+        confirmed: asNumber(metricsRaw.confirmed),
+        processing: asNumber(metricsRaw.processing),
+        needsAttention: asNumber(metricsRaw.needsAttention),
+      },
+      errors: [],
+    };
+  } catch (error) {
+    return emptyOrders([`Внутренние заказы: ${error instanceof Error ? error.message : 'сеть недоступна'}`]);
   }
 }
 
@@ -272,6 +326,8 @@ function emptyOrders(errors: string[]): AdminOrdersListData {
     limit: DEFAULT_LIMIT,
     total: 0,
     rows: [],
+    sources: [],
+    statuses: [],
     quickFilters: [],
     metrics: { imported: 0, confirmed: 0, processing: 0, needsAttention: 0 },
     errors,

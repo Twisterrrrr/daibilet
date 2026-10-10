@@ -12,11 +12,17 @@ import { formatAdminDateTime, formatAdminNumber } from '@/lib/admin-ui';
 export const dynamic = 'force-dynamic';
 
 const QUICK_FILTERS = [
-  { id: 'all', label: 'Активные' },
+  { id: 'all', label: 'Все активные' },
   { id: 'attention', label: 'Внимание' },
   { id: 'failed_integration', label: 'Проблемы' },
   { id: 'unlinked', label: 'Без связи' },
   { id: 'archive', label: 'Архив' },
+];
+const INTERNAL_FILTERS = [
+  { id: 'all', label: 'Все' },
+  { id: 'attention', label: 'Внимание' },
+  { id: 'pending_refunds', label: 'Запросы на возврат' },
+  { id: 'failed_integration', label: 'Проблемы' },
 ];
 
 type PageProps = {
@@ -32,8 +38,11 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
   const q = first(raw.q) || '';
   const view = first(raw.view) || 'all';
   const page = first(raw.page) || '1';
-  const current = { q: q || undefined, view, page };
-  const data = await loadAdminOrdersList({ q, view, page });
+  const kind = first(raw.kind) === 'external' ? 'external' : 'internal';
+  const source = first(raw.source) || 'all';
+  const status = first(raw.status) || 'all';
+  const current = { kind, q: q || undefined, view, source, status, page };
+  const data = await loadAdminOrdersList({ kind, q, view, source, status, page });
 // A failed live API must never look like "zero orders": the counters below would
   // be taken as fact by the operator, so degrade them to an explicit dash instead.
   const degraded = data.errors.length > 0;
@@ -50,10 +59,10 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
         <div>
           <h2 className="text-xl font-semibold text-slate-900">Заказы</h2>
           <p className="mt-1 text-sm text-slate-600">
-            Зеркало TC (оплата у источника). Ticket-link / archive / delete - в detail Next.
+            {kind === 'internal' ? 'Внутренние продажи Дайбилет из финансового контура.' : 'Внешние заказы билетных систем.'}
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        {kind === 'external' ? <div className="flex flex-wrap gap-2">
           <form action={syncAdminOrdersTcAction}>
             <button
               type="submit"
@@ -70,7 +79,7 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
               Архив отменённых
             </button>
           </form>
-        </div>
+        </div> : null}
       </header>
 
       {notice ? (
@@ -81,36 +90,54 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
 
       <AdminApiErrorBanner errors={data.errors} />
 
-      <div className="grid gap-3 sm:grid-cols-4">
+      <div className="flex gap-2" role="navigation" aria-label="Тип заказов">
+        <Link href="/admin/orders?kind=internal" className={`rounded-md border px-3 py-2 text-sm ${kind === 'internal' ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 bg-white text-slate-700'}`}>Внутренние продажи</Link>
+        <Link href="/admin/orders?kind=external" className={`rounded-md border px-3 py-2 text-sm ${kind === 'external' ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 bg-white text-slate-700'}`}>Заказы партнёров</Link>
+      </div>
+
+      {kind === 'external' ? <div className="grid gap-3 sm:grid-cols-4">
         <Metric label="Импорт" value={data.metrics.imported} unavailable={degraded} />
         <Metric label="Подтверждены" value={data.metrics.confirmed} unavailable={degraded} />
         <Metric label="В обработке" value={data.metrics.processing} unavailable={degraded} />
         <Metric label="Внимание" value={data.metrics.needsAttention} unavailable={degraded} />
-      </div>
+      </div> : <p className="text-sm text-slate-600">Найдено внутренних заказов: {degraded ? '—' : formatAdminNumber(data.total)}</p>}
 
       <form className="flex flex-wrap gap-2" action="/admin/orders" method="get">
         <input type="hidden" name="view" value={view} />
+        <input type="hidden" name="kind" value={kind} />
         <input
           name="q"
           defaultValue={q}
           placeholder="Код заказа, email, событие..."
           className="min-w-[220px] flex-1 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
         />
+        {kind === 'external' ? <select name="source" defaultValue={source} aria-label="Источник заказа" className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm">
+          <option value="all">Все источники</option>
+          {data.sources.map((item) => <option key={item} value={item}>{item}</option>)}
+        </select> : null}
+        <select name="status" defaultValue={status} aria-label="Статус заказа" className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm">
+          <option value="all">Все статусы</option>
+          <option value="paid">Оплачены</option>
+          <option value="pending">В обработке</option>
+          <option value="cancelled">Отменены</option>
+          <option value="error">Ошибки</option>
+        </select>
         <button type="submit" className="rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800">
-          Найти
+          Применить
         </button>
       </form>
 
       <div className="flex flex-wrap gap-2">
-        {QUICK_FILTERS.map((filter) => {
-          const count = data.quickFilters.find((item) => item.id === filter.id)?.count;
+        {(kind === 'internal' ? INTERNAL_FILTERS : QUICK_FILTERS).map((filter) => {
+          const count = kind === 'internal' || q || source !== 'all' || status !== 'all' ? null : data.quickFilters.find((item) => item.id === filter.id)?.count;
           const active = view === filter.id;
-          const href =
-            filter.id === 'all'
-              ? q
-                ? `/admin/orders?q=${encodeURIComponent(q)}`
-                : '/admin/orders'
-              : `/admin/orders?view=${encodeURIComponent(filter.id)}${q ? `&q=${encodeURIComponent(q)}` : ''}`;
+          const params = new URLSearchParams();
+          params.set('kind', kind);
+          if (filter.id !== 'all') params.set('view', filter.id);
+          if (q) params.set('q', q);
+          if (kind === 'external' && source !== 'all') params.set('source', source);
+          if (status !== 'all') params.set('status', status);
+          const href = `/admin/orders${params.size ? `?${params.toString()}` : ''}`;
           return (
             <Link
               key={filter.id}
@@ -158,7 +185,7 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
                   <tr key={row.id} className="border-b border-slate-100 align-top">
                     <td className="px-3 py-2">
                       <Link
-                        href={`/admin/orders/${encodeURIComponent(row.id)}`}
+                        href={row.sourceKind === 'internal' && row.publicCode ? `https://daibilet.ru/checkout/ticket/${encodeURIComponent(row.publicCode)}` : `/admin/orders/${encodeURIComponent(row.id)}`}
                         className="font-medium text-sky-700 hover:underline"
                       >
                         {row.publicCode || row.externalOrderId}
