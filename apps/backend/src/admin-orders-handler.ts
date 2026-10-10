@@ -5,6 +5,9 @@ import { matchPath, type RouteContext } from './routing.js';
 import { adminOrderRefundRequestPayloadSchema, orderTicketPayloadSchema } from './types/schemas.js';
 import type { TypedRouteHandler } from './validated-handler.js';
 import { parseJsonBody } from './validation.js';
+import { safeEqualString } from './auth.js';
+import { AdminOrderOperationError } from './admin-order-operations.js';
+import { z } from 'zod';
 
 export type UpsertAdminOrderTicket = (
   db: DbClient,
@@ -16,13 +19,43 @@ export interface AdminOrdersHandlerDependencies {
   db: DbClient;
   upsertAdminOrderTicket: UpsertAdminOrderTicket;
   createRefundRequest?: (orderKey: string, payload: AdminOrderRefundRequestPayload) => Promise<unknown>;
+  internalOperationToken?: string | null;
+  operateInternalOrder?: (input: { orderKey: string; operation: 'cancel' | 'refund'; confirmCode: string; reason: string }) => Promise<unknown>;
 }
 
 export function createAdminOrdersRouteHandler(deps: AdminOrdersHandlerDependencies): TypedRouteHandler {
   return async (context) => {
+    if (await handleInternalOperation(context, deps)) return true;
     if (await handleOrderRefundRequestCreate(context, deps)) return true;
     return handleOrderTicketUpsert(context, deps);
   };
+}
+
+const operationSchema = z.object({
+  operation: z.enum(['cancel', 'refund']),
+  confirmCode: z.string().trim().min(1).max(100),
+  reason: z.string().trim().min(3).max(500),
+}).strict();
+
+async function handleInternalOperation(context: RouteContext, deps: AdminOrdersHandlerDependencies): Promise<boolean> {
+  if (context.method !== 'POST' || !deps.operateInternalOrder) return false;
+  const match = matchPath(context.pathname, /^\/api\/internal\/admin\/orders\/([^/]+)\/operation$/);
+  if (!match?.[0]) return false;
+  const expected = deps.internalOperationToken?.trim();
+  const header = String(context.request.headers.authorization || '');
+  const provided = header.startsWith('Bearer ') ? header.slice(7).trim() : '';
+  if (!expected || !provided || !safeEqualString(provided, expected)) {
+    sendJson(context.response, { error: 'admin_operation_auth_required' }, { statusCode: 401 });
+    return true;
+  }
+  const payload = await parseJsonBody(operationSchema, context.request);
+  try {
+    sendJson(context.response, await deps.operateInternalOrder({ orderKey: match[0], ...payload }));
+  } catch (error) {
+    if (!(error instanceof AdminOrderOperationError)) throw error;
+    sendJson(context.response, { error: error.code }, { statusCode: error.statusCode });
+  }
+  return true;
 }
 
 async function handleOrderRefundRequestCreate(

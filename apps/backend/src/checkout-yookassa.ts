@@ -1357,7 +1357,7 @@ async function persistCreatedYooKassaAdmissionPayment(input: {
   return created;
 }
 
-async function applyYooKassaPaymentObject(
+export async function applyYooKassaPaymentObject(
   paymentObject: YooKassaPaymentObject,
   options: { now: Date },
 ): Promise<{
@@ -1406,6 +1406,10 @@ async function applyYooKassaPaymentObject(
   });
 
   if (providerStatus === 'SUCCEEDED') {
+    // A delayed or repeated payment notification must not revive a refunded ticket.
+    if (payment.order.status === 'REFUNDED' || payment.status === 'REFUNDED') {
+      return { result: 'duplicate', paymentDbId: payment.id, paymentStatus: 'REFUNDED', orderId, publicCode };
+    }
     const updated = await prisma.$transaction(async (tx) => {
       const updatedPayment = await tx.payment.update({
         where: { id: payment.id },
@@ -1644,7 +1648,7 @@ async function failCreatedYooKassaCheckout(created: CreatedYooKassaCheckoutRows,
   });
 }
 
-async function releaseReservedCapacityInTransaction(tx: Prisma.TransactionClient, orderId: string): Promise<void> {
+export async function releaseReservedCapacityInTransaction(tx: Prisma.TransactionClient, orderId: string): Promise<void> {
   const items = await tx.checkoutItem.findMany({
     where: {
       checkoutOrderId: orderId,

@@ -20,6 +20,7 @@ import { createAdminLandingsRouteHandler } from './admin-landings-handler.js';
 import { buildAdminListingHealthOverviewDto } from './admin-listing-health.dto.js';
 import { createAdminListingHealthRouteHandler } from './admin-listing-health-handler.js';
 import { createAdminOrdersRouteHandler } from './admin-orders-handler.js';
+import { operateAdminInternalOrder } from './admin-order-operations.js';
 import { createAdminOrdersReadRouteHandler } from './admin-orders-read-handler.js';
 import { buildAdminOrderDetailDto, buildAdminOrdersListDto, createAdminOrderRefundRequestDto } from './admin-orders.dto.js';
 import { createAdminSuppliersRouteHandler } from './admin-suppliers-handler.js';
@@ -180,6 +181,8 @@ const server = startServer({
         db,
         upsertAdminOrderTicket,
         createRefundRequest: createAdminOrderRefundRequestDto,
+        internalOperationToken: env.DAIBILET_FINANCE_ADMIN_OPERATION_TOKEN || null,
+        operateInternalOrder: operateAdminInternalOrder,
       }),
       createAdminEventsRouteHandler({
         db,

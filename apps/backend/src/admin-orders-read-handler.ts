@@ -15,7 +15,7 @@ export function createAdminOrdersReadRouteHandler(
 ): TypedRouteHandler {
   return async (context: RouteContext) => {
     if (!deps.enabled || context.method !== 'GET') return false;
-    if (context.pathname === '/api/internal/admin/orders') {
+    if (context.pathname === '/api/internal/admin/orders' || context.pathname.startsWith('/api/internal/admin/orders/')) {
       const expected = deps.internalReadToken?.trim();
       const header = String(context.request.headers.authorization || '');
       const provided = header.startsWith('Bearer ') ? header.slice(7).trim() : '';
@@ -23,6 +23,13 @@ export function createAdminOrdersReadRouteHandler(
         sendJson(context.response, { error: 'admin_read_auth_required' }, { statusCode: 401 });
         return true;
       }
+      const internalDetail = matchPath(context.pathname, /^\/api\/internal\/admin\/orders\/([^/]+)$/);
+      if (internalDetail?.[0]) {
+        const detail = await deps.buildOrderDetail(internalDetail[0]);
+        sendJson(context.response, detail || { error: 'order_not_found' }, { statusCode: detail ? 200 : 404 });
+        return true;
+      }
+      if (context.pathname !== '/api/internal/admin/orders') return false;
       sendJson(context.response, await deps.buildOrdersList(context.searchParams));
       return true;
     }

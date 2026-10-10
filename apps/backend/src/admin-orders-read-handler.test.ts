@@ -44,3 +44,21 @@ test('internal admin order feed fails closed and accepts only its read token', a
   assert.equal(JSON.parse(request.result.body).rows[0].publicCode, '8558943');
   assert.equal(calls, 1);
 });
+
+test('internal admin detail requires the same read token', async () => {
+  const handler = createAdminOrdersReadRouteHandler({
+    enabled: true,
+    internalReadToken: 'read-secret',
+    buildOrdersList: async () => ({}),
+    buildOrderDetail: async (key) => ({ sourceKind: 'internal', publicCode: key }),
+  });
+  const denied = context();
+  denied.route.pathname = '/api/internal/admin/orders/8558943';
+  assert.equal(await handler(denied.route), true);
+  assert.equal(denied.result.status, 401);
+  const allowed = context('Bearer read-secret');
+  allowed.route.pathname = '/api/internal/admin/orders/8558943';
+  assert.equal(await handler(allowed.route), true);
+  assert.equal(allowed.result.status, 200);
+  assert.equal(JSON.parse(allowed.result.body).publicCode, '8558943');
+});
