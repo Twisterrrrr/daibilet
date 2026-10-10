@@ -71,6 +71,7 @@ export function mapFinanceOrderStatus(status: string | null | undefined): {
     .toUpperCase();
   switch (raw) {
     case 'CONFIRMED':
+    case 'FULFILLED':
     case 'SUCCEEDED':
     case 'PAID':
       return { displayStatus: 'Оплачен', statusTone: 'live' };
@@ -82,6 +83,8 @@ export function mapFinanceOrderStatus(status: string | null | undefined): {
     case 'CANCELLED':
     case 'EXPIRED':
       return { displayStatus: 'Отменен', statusTone: 'archived' };
+    case 'REFUNDED':
+      return { displayStatus: 'Возвращён', statusTone: 'archived' };
     case 'FAILED':
       return { displayStatus: 'Ошибка оплаты', statusTone: 'error' };
     default:

@@ -19,6 +19,7 @@ test('mapFinanceOrderStatus: human labels', () => {
   assert.equal(mapFinanceOrderStatus('CONFIRMED').displayStatus, 'Оплачен');
   assert.equal(mapFinanceOrderStatus('PENDING').statusTone, 'incomplete');
   assert.equal(mapFinanceOrderStatus('CANCELED').statusTone, 'archived');
+  assert.equal(mapFinanceOrderStatus('REFUNDED').displayStatus, 'Возвращён');
 });
 
 test('amountRubFromKopecks', () => {

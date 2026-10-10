@@ -38,6 +38,7 @@ export function CheckoutTicketView({ publicCode, demoOrder, demoBanner }: Props)
   const printTriggeredRef = useRef(false);
   const [loading, setLoading] = useState(Boolean(code) && !isDemo);
   const [order, setOrder] = useState<BuyerInternalOrderRecord | null>(demoOrder || null);
+  const [verificationFailed, setVerificationFailed] = useState(false);
   const [emailHint, setEmailHint] = useState<'sent' | 'skipped' | 'unknown'>(
     isDemo ? 'sent' : 'unknown',
   );
@@ -51,25 +52,31 @@ export function CheckoutTicketView({ publicCode, demoOrder, demoBanner }: Props)
     let disposed = false;
     const run = async () => {
       const cached = readInternalOrdersFromStorage().find((row) => row.publicCode === code) || null;
-      if (!disposed && cached) setOrder(cached);
 
       try {
         const response = await fetch(`/checkout/actions/order?order=${encodeURIComponent(code)}&t=${Date.now()}`, {
           cache: 'no-store',
         });
+        if (!response.ok) throw new Error('ticket_lookup_failed');
         const payload = (await response.json().catch(() => null)) as LookupResponse | null;
         if (!disposed && payload?.found && payload.order) {
           const merged = mergeBuyerInternalOrders(payload.order, cached);
           setOrder(merged);
+          setVerificationFailed(false);
           upsertInternalOrderInStorage(merged);
-        } else if (!disposed && !cached) {
+        } else if (!disposed) {
           setOrder(null);
+          setVerificationFailed(Boolean(cached));
         }
         if (!disposed && typeof payload?.emailSent === 'boolean') {
           setEmailHint(payload.emailSent ? 'sent' : 'skipped');
         }
       } catch {
-        // keep cache
+        // A cached paid ticket cannot prove current validity after cancellation or refund.
+        if (!disposed) {
+          setOrder(null);
+          setVerificationFailed(true);
+        }
       } finally {
         if (!disposed) setLoading(false);
       }
@@ -118,7 +125,7 @@ export function CheckoutTicketView({ publicCode, demoOrder, demoBanner }: Props)
           <p className="text-sm font-semibold text-emerald-100/80">Дайбилет</p>
           <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">{hasIssuedInternalTicket(order) ? 'Ваш билет' : 'Статус билета'}</h1>
           <p className="mt-3 max-w-2xl text-base leading-7 text-emerald-50/90">
-            {hasIssuedInternalTicket(order) ? 'Сохраните страницу или распечатайте билет перед визитом. Код заказа и QR - в карточке ниже.' : 'Билет появится здесь после подтверждения оплаты и выдачи номера.'}
+            {hasIssuedInternalTicket(order) ? 'Сохраните страницу или распечатайте билет перед визитом. Код заказа и QR - в карточке ниже.' : order?.status === 'REFUNDED' ? 'Заказ возвращён. Билет больше не действует.' : ['CANCELLED', 'CANCELED', 'EXPIRED'].includes(String(order?.status || '')) ? 'Заказ отменён. Билет больше не действует.' : verificationFailed ? 'Не удалось проверить билет. Повторите попытку позже.' : 'Билет появится здесь после подтверждения оплаты и выдачи номера.'}
           </p>
         </div>
       </section>
@@ -156,7 +163,7 @@ export function CheckoutTicketView({ publicCode, demoOrder, demoBanner }: Props)
             ) : null}
           </div>
         ) : (
-          <p className="text-slate-600 print:hidden">Билет пока не выдан. Оплата ещё не подтверждена или заказ не найден.</p>
+          <p className="text-slate-600 print:hidden">{order?.status === 'REFUNDED' ? 'Деньги возвращены. Этот билет недействителен.' : ['CANCELLED', 'CANCELED', 'EXPIRED'].includes(String(order?.status || '')) ? 'Заказ отменён. Этот билет недействителен.' : verificationFailed ? 'Статус билета сейчас не подтверждён. Не используйте сохранённую копию билета; обновите страницу позже.' : 'Билет пока не выдан. Оплата ещё не подтверждена или заказ не найден.'}</p>
         )}
       </section>
     </>
