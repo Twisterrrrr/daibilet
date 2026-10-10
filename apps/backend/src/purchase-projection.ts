@@ -1326,7 +1326,11 @@ function matchesAdminPurchaseFilters(
   if (filters.view === 'pending_refunds' && !row.hasPendingRefundRequests && !isRefundStatus(row.status)) return false;
   if (filters.view === 'archivable' && !row.canArchive) return false;
   if (filters.provider !== 'ALL' && row.sourceCode !== filters.provider) return false;
-  if (filters.status !== 'all' && String(row.status || '').toLowerCase() !== filters.status) return false;
+  if (filters.status === 'paid' && !isConfirmedOrderStatus(row.status)) return false;
+  else if (filters.status === 'pending' && !isProcessingOrderStatus(row.status)) return false;
+  else if (filters.status === 'cancelled' && !isCanceledOrderStatus(row.status)) return false;
+  else if (filters.status === 'error' && !isProblemOrderStatus(row.status)) return false;
+  else if (!['all', 'paid', 'pending', 'cancelled', 'error'].includes(filters.status) && String(row.status || '').toLowerCase() !== filters.status) return false;
   if (!filters.q) return true;
   const haystack = [
     row.id,

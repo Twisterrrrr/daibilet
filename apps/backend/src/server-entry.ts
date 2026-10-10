@@ -148,6 +148,7 @@ const server = startServer({
         enabled: adminFlags.orders,
         buildOrdersList: buildAdminOrdersListDto,
         buildOrderDetail: buildAdminOrderDetailDto,
+        internalReadToken: env.DAIBILET_FINANCE_ADMIN_READ_TOKEN || null,
       }),
       createAdminFinanceRouteHandler({
         enabled: adminFlags.orders,

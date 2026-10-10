@@ -111,7 +111,7 @@ function validateSafeRouteQuery(context: RouteContext): void {
     return;
   }
 
-  if (route === 'GET /api/admin/orders') {
+  if (route === 'GET /api/admin/orders' || route === 'GET /api/internal/admin/orders') {
     parseSearchParams(adminOrdersQuerySchema, context.searchParams);
     return;
   }
