@@ -1,0 +1,49 @@
+{
+  "city": "sochi",
+  "mustSeeCount": 82,
+  "regen": [
+    {
+      "stem": "identity-architecture",
+      "name": "identity architecture",
+      "clusterSize": 2,
+      "keeper": "fort-aleksandriya"
+    },
+    {
+      "stem": "kurort-roza-hutor",
+      "name": "kurort roza hutor",
+      "clusterSize": 2,
+      "keeper": "dom-kuptsa-hludova"
+    },
+    {
+      "stem": "letniy-teatr",
+      "name": "letniy teatr",
+      "clusterSize": 3,
+      "keeper": "identity-symbol"
+    },
+    {
+      "stem": "ornitologicheskiy-park",
+      "name": "ornitologicheskiy park",
+      "clusterSize": 3,
+      "keeper": "ahun-peshchera"
+    },
+    {
+      "stem": "park-riv-era",
+      "name": "park riv era",
+      "clusterSize": 2,
+      "keeper": "art-galereya-fort"
+    },
+    {
+      "stem": "tiso-bolshoe-koltso",
+      "name": "tiso bolshoe koltso",
+      "clusterSize": 3,
+      "keeper": "identity-symbol"
+    },
+    {
+      "stem": "tiso-samshitovaya-roscha",
+      "name": "tiso samshitovaya roscha",
+      "clusterSize": 3,
+      "keeper": "ahun-peshchera"
+    }
+  ],
+  "d0": 6
+}

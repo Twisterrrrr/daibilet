@@ -1,0 +1,47 @@
+{
+  "textsParsed": 202,
+  "matched": 201,
+  "unmatchedTexts": [],
+  "seedWithoutDesc": [],
+  "editorialCount": 201,
+  "expandReady": 40,
+  "insertReady": 142,
+  "hubOnlyReady": 19,
+  "matchedSample": [
+    {
+      "name": "Третьяковская галерея",
+      "seedName": "Третьяковская галерея",
+      "role": "expand",
+      "source": "moscow-mustsee-etalon-10.md",
+      "paragraphs": 4
+    },
+    {
+      "name": "Дарвиновский музей",
+      "seedName": "Дарвиновский музей",
+      "role": "insert",
+      "source": "moscow-mustsee-etalon-10.md",
+      "paragraphs": 3
+    },
+    {
+      "name": "Памятник Минину и Пожарскому",
+      "seedName": "Памятник Минину и Пожарскому",
+      "role": "expand",
+      "source": "moscow-mustsee-etalon-10.md",
+      "paragraphs": 2
+    },
+    {
+      "name": "Памятник Гоголю (скорбный, Никитский)",
+      "seedName": "Памятник Гоголю (скорбный, Никитский)",
+      "role": "insert",
+      "source": "moscow-mustsee-etalon-10.md",
+      "paragraphs": 2
+    },
+    {
+      "name": "Храм Николая в Хамовниках",
+      "seedName": "Храм Николая в Хамовниках",
+      "role": "insert",
+      "source": "moscow-mustsee-etalon-10.md",
+      "paragraphs": 3
+    }
+  ]
+}

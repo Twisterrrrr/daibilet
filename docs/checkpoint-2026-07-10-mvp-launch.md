@@ -19,7 +19,7 @@
 | Runtime API (prod) | `node apps/backend/src/server.js` + `dto.js` (~8k строк SQL) |
 | TS foundation (parallel) | 37 `.ts` модулей, `server-entry.ts`, typed public handlers |
 | Frontend | Vite + React SPA |
-| Infra | Timeweb 213.171.7.16, nginx, systemd |
+| Infra | Timeweb (historical MVP host `213.171.7.16`; live = MSK `.184`), nginx, systemd |
 
 ### Деплой на момент checkpoint
 

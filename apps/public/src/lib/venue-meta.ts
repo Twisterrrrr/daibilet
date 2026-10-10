@@ -1,4 +1,4 @@
-import { Anchor, Bus, Landmark, MapPin, type LucideIcon } from 'lucide-react';
+import { Anchor, Bus, Landmark, MapPin, Trees, type LucideIcon } from 'lucide-react';
 
 import { formatNumber } from '@/data';
 
@@ -15,7 +15,18 @@ export const INSTITUTION_KINDS = new Set([
 ]);
 
 /** Типы локаций — другой шаблон (причалы, площадки, открытые точки). MEETING_POINT — только на карточке события. */
-export const LOCATION_KINDS = new Set(['pier', 'bus', 'venue', 'outdoor_location', 'sport_activity_space', 'attraction', 'other']);
+export const LOCATION_KINDS = new Set([
+  'pier',
+  'bus',
+  'venue',
+  'park',
+  'monument',
+  'outdoor_location',
+  'sport_activity_space',
+  'attraction',
+  'gastro',
+  'other',
+]);
 
 export const CATALOG_EXCLUDED_KINDS = new Set(['meeting_point', 'online']);
 
@@ -28,9 +39,12 @@ const VENUE_TYPE_LABELS: Record<string, string> = {
   pier: 'Причал',
   bus: 'Автобусы',
   venue: 'Площадка',
+  park: 'Парк',
+  monument: 'Памятник',
   outdoor_location: 'Открытая локация',
   sport_activity_space: 'Спорт / активность',
   attraction: 'Достопримечательность',
+  gastro: 'Гастро',
   meeting_point: 'Точка сбора',
   online: 'Онлайн',
   other: 'Локация',
@@ -45,9 +59,12 @@ export const CATALOG_TYPE_OPTIONS: Array<{ value: string; label: string; templat
   { value: 'pier', label: 'Причал', template: 'location' },
   { value: 'bus', label: 'Автобусы', template: 'location' },
   { value: 'venue', label: 'Площадка', template: 'location' },
+  { value: 'park', label: 'Парк', template: 'location' },
+  { value: 'monument', label: 'Памятник', template: 'location' },
   { value: 'outdoor_location', label: 'Открытая локация', template: 'location' },
   { value: 'sport_activity_space', label: 'Спорт / активность', template: 'location' },
   { value: 'attraction', label: 'Достопримечательность', template: 'location' },
+  { value: 'gastro', label: 'Гастро', template: 'location' },
   { value: 'other', label: 'Другое', template: 'location' },
 ];
 
@@ -75,6 +92,8 @@ export function venueTypeIcon(type?: string | null): LucideIcon {
   const key = normalizeVenueKind(type);
   if (key === 'pier' || key === 'pier_water') return Anchor;
   if (key === 'bus') return Bus;
+  if (key === 'park') return Trees;
+  if (key === 'monument') return Landmark;
   if (INSTITUTION_KINDS.has(key)) return Landmark;
   return MapPin;
 }
@@ -93,6 +112,7 @@ export function isMeetingPointLike(input: {
 }): boolean {
   const kind = normalizeVenueKind(input.type);
   if (kind === 'meeting_point') return true;
+  if (kind === 'park' || kind === 'monument') return false;
   const name = `${input.name || input.title || ''} ${input.address || ''}`.toLowerCase();
   return /место сбора|место встречи|точка сбора|точка встречи|площадка:|^метро\b|^м\.(?:\s|«|"|')|\bм\.\s*(?:«|[а-яё])|\bу метро\b|около метро|у памятник|памятник|\bпам\.|у пам\.|\bу пам\b|пл\.\s*у пам/u.test(name);
 }
@@ -128,12 +148,15 @@ export function locationFamilyLabel(): string {
 }
 
 const WEAK_VENUE_LEAD_RE = /^(легенда|описание|текст|n\/a|нет|—|-)$/i;
+const MAP_PIN_LEAD_RE =
+  /на карте города|точка на (карте|маршруте)|ориентир в городе|жанровая точка|парковая точка|литературная точка|открытое пространство для прогулок|открытая локация для прогулок и событий/i;
 
 export function isWeakVenueLeadText(value?: string | null): boolean {
   const text = String(value || '').replace(/\s+/g, ' ').trim();
   if (!text) return true;
   if (text.length < 24) return true;
   if (WEAK_VENUE_LEAD_RE.test(text)) return true;
+  if (MAP_PIN_LEAD_RE.test(text)) return true;
   return false;
 }
 
@@ -149,18 +172,16 @@ export function resolveLocationVenueCopy(venue: {
 }) {
   const description = String(venue.description || '').replace(/\s+/g, ' ').trim();
   const shortDescription = String(venue.shortDescription || '').replace(/\s+/g, ' ').trim();
-  const fullDescription =
-    description || (!isWeakVenueLeadText(shortDescription) ? shortDescription : '');
+  const strongDescription = !isWeakVenueLeadText(description) ? description : '';
+  const strongShort = !isWeakVenueLeadText(shortDescription) ? shortDescription : '';
+  const fullDescription = strongDescription || strongShort;
   const heroLead =
-    !isWeakVenueLeadText(shortDescription) && !isTruncatedVenueLeadText(shortDescription)
-      ? shortDescription
-      : fullDescription;
-  const fallback = `Локация «${venue.name || 'точка отправления'}» в ${venue.city || 'городе'}. Адрес и время отправления уточняйте в карточке события перед покупкой.`;
+    strongShort && !isTruncatedVenueLeadText(shortDescription) ? strongShort : fullDescription;
 
   return {
-    fullDescription: fullDescription || fallback,
-    heroLead: heroLead || fallback,
-    howToFind: fullDescription || fallback,
+    fullDescription,
+    heroLead,
+    howToFind: fullDescription,
   };
 }
 
@@ -169,9 +190,12 @@ export const LOCATION_TYPE_EMOJI: Record<string, string> = {
   pier_water: '⚓',
   bus: '🚌',
   venue: '📍',
+  park: '🌳',
+  monument: '🗿',
   outdoor_location: '🌳',
   sport_activity_space: '⚡',
   attraction: '🏛',
+  gastro: '🍽',
   other: '📍',
 };
 

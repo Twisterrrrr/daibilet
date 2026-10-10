@@ -1,0 +1,37 @@
+{
+  "city": "moscow",
+  "mustSeeCount": 0,
+  "regen": [
+    {
+      "stem": "borodinskoe-pole",
+      "name": "borodinskoe pole",
+      "clusterSize": 4,
+      "keeper": "bolshoy-kamennyy-most"
+    },
+    {
+      "stem": "gmii-pushkina",
+      "name": "gmii pushkina",
+      "clusterSize": 2,
+      "keeper": "gmii-imeni-pushkina"
+    },
+    {
+      "stem": "pamyatnik-petru-i-raboty-tsereteli",
+      "name": "pamyatnik petru i raboty tsereteli",
+      "clusterSize": 2,
+      "keeper": "dom-alekseeva"
+    },
+    {
+      "stem": "smotrovaya-moskva-siti",
+      "name": "smotrovaya moskva siti",
+      "clusterSize": 4,
+      "keeper": "bolshoy-kamennyy-most"
+    },
+    {
+      "stem": "vorobevy-gory",
+      "name": "vorobevy gory",
+      "clusterSize": 4,
+      "keeper": "bolshoy-kamennyy-most"
+    }
+  ],
+  "d0": 1
+}

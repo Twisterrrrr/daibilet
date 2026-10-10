@@ -1,0 +1,73 @@
+{
+  "city": "voronezh",
+  "mustSeeCount": 86,
+  "regen": [
+    {
+      "stem": "kostenki-melovye-holmy",
+      "name": "kostenki melovye holmy",
+      "clusterSize": 9,
+      "keeper": "kostenki-ekspozitsiya-drevnih-orudiy-truda"
+    },
+    {
+      "stem": "kostenki-paleoliticheskie-veneri",
+      "name": "kostenki paleoliticheskie veneri",
+      "clusterSize": 9,
+      "keeper": "kostenki-ekspozitsiya-drevnih-orudiy-truda"
+    },
+    {
+      "stem": "kostenki-podlinnoe-zhilishche-iz-kostey-mamont",
+      "name": "kostenki podlinnoe zhilishche iz kostey mamont",
+      "clusterSize": 9,
+      "keeper": "kostenki-ekspozitsiya-drevnih-orudiy-truda"
+    },
+    {
+      "stem": "kostenki-skulptura-mamont-stepan",
+      "name": "kostenki skulptura mamont stepan",
+      "clusterSize": 9,
+      "keeper": "kostenki-ekspozitsiya-drevnih-orudiy-truda"
+    },
+    {
+      "stem": "ramon",
+      "name": "ramon",
+      "clusterSize": 3,
+      "keeper": "dvorets-oldenburgskih"
+    },
+    {
+      "stem": "ramon-dvorets-oldenburgskih",
+      "name": "ramon dvorets oldenburgskih",
+      "clusterSize": 3,
+      "keeper": "dvorets-oldenburgskih"
+    },
+    {
+      "stem": "skulptura-neznakomka",
+      "name": "skulptura neznakomka",
+      "clusterSize": 2,
+      "keeper": "prospekt-revolyutsii"
+    },
+    {
+      "stem": "venevitinovy-ampirnaya-rotonda",
+      "name": "venevitinovy ampirnaya rotonda",
+      "clusterSize": 9,
+      "keeper": "kostenki-ekspozitsiya-drevnih-orudiy-truda"
+    },
+    {
+      "stem": "venevitinovy-kuhonnyy-fligel",
+      "name": "venevitinovy kuhonnyy fligel",
+      "clusterSize": 9,
+      "keeper": "kostenki-ekspozitsiya-drevnih-orudiy-truda"
+    },
+    {
+      "stem": "venevitinovy-parternyy-usadebnyy-sad",
+      "name": "venevitinovy parternyy usadebnyy sad",
+      "clusterSize": 9,
+      "keeper": "kostenki-ekspozitsiya-drevnih-orudiy-truda"
+    },
+    {
+      "stem": "venevitinovy-poeziya-mysli",
+      "name": "venevitinovy poeziya mysli",
+      "clusterSize": 9,
+      "keeper": "kostenki-ekspozitsiya-drevnih-orudiy-truda"
+    }
+  ],
+  "d0": 6
+}

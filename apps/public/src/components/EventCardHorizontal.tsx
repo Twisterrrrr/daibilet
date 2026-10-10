@@ -2,20 +2,19 @@ import * as React from 'react';
 import { Clock, MapPin, Star, Ticket } from 'lucide-react';
 
 import { collectCatalogLabels } from '@/lib/catalog-labels';
+import { resolveEditorialEventImage } from '@/lib/event-cover-images';
 import { resolveEventCardDestinationLabel, resolveEventCardLocationLabel } from '@/lib/event-location';
 import { EventFavoriteButton } from '@/components/EventFavoriteButton';
 import { EventImageBadges } from '@/lib/event-card-badges';
 import {
   collectDisplaySlotLabels,
-  collectDisplaySlotTimes,
   formatEventNextSession,
   formatListDescription,
   formatPriceRub,
   getDepartingSoonMinutes,
-  hasMultipleCatalogSlots,
-  isEventSessionToday,
   isOpenDate,
   MIN_DISPLAY_PRICE_RUB,
+  resolveAgeBadge,
   resolvePseudoRating,
 } from '@/lib/event-card-meta';
 import { eventHref } from '@/routes';
@@ -27,7 +26,9 @@ type EventCardHorizontalProps = {
 
 export function EventCardHorizontal({ event }: EventCardHorizontalProps) {
   const [hasImageError, setHasImageError] = React.useState(false);
-  const showImage = Boolean(event.imageUrl && !hasImageError);
+  const coverImageUrl =
+    resolveEditorialEventImage(event.id, event.slug, event.imageUrl) || event.imageUrl || '';
+  const showImage = Boolean(coverImageUrl && !hasImageError);
   const detailsHref = eventHref(event);
   const hasPrice = typeof event.priceFrom === 'number' && event.priceFrom >= MIN_DISPLAY_PRICE_RUB;
   const destinationLabel = resolveEventCardDestinationLabel(event);
@@ -35,25 +36,13 @@ export function EventCardHorizontal({ event }: EventCardHorizontalProps) {
   const openDate = isOpenDate(event);
   const departingSoonMinutes = openDate ? null : getDepartingSoonMinutes(event.startsAt);
   const nextSessionLabel = openDate ? null : formatEventNextSession(event);
-  const isToday = isEventSessionToday(event);
-  const multipleSlots = hasMultipleCatalogSlots(event);
-  const displaySlotLabels = multipleSlots ? collectDisplaySlotLabels(event) : [];
-  const displaySlots = collectDisplaySlotTimes(event, { todayOnly: isToday && !multipleSlots });
-  const showSlotPills = multipleSlots
-    ? displaySlotLabels.length > 1
-    : isToday && displaySlots.length > 0;
-  const sessionMetaLabel = openDate
-    ? null
-    : multipleSlots && displaySlotLabels.length > 1
-      ? `${displaySlotLabels.length} ближайших даты`
-      : isToday && displaySlots.length > 0
-        ? displaySlots.length === 1
-          ? `Сегодня, ${displaySlots[0]}`
-          : 'Сегодня'
-        : nextSessionLabel;
+  const displaySlotLabels = collectDisplaySlotLabels(event);
+  const showSlotPills = displaySlotLabels.length > 0;
+  const sessionMetaLabel = openDate ? null : nextSessionLabel;
   const descriptionText = formatListDescription(event.description);
   const pseudoRating = resolvePseudoRating(event.groupKey || event.id);
   const locationLabel = resolveEventCardLocationLabel(event);
+  const ageLabel = resolveAgeBadge(event.tags, event.ageLimit);
 
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-slate-200/60 sm:flex-row">
@@ -75,7 +64,7 @@ export function EventCardHorizontal({ event }: EventCardHorizontalProps) {
 
         {showImage ? (
           <img
-            src={event.imageUrl || ''}
+            src={coverImageUrl}
             alt={event.title}
             loading="lazy"
             onError={() => setHasImageError(true)}
@@ -101,6 +90,11 @@ export function EventCardHorizontal({ event }: EventCardHorizontalProps) {
             <span className="font-medium text-slate-700">{pseudoRating.toFixed(1)}</span>
           </span>
           {event.category ? <span className="font-normal text-slate-600">{event.category}</span> : null}
+          {ageLabel ? (
+            <span className="font-semibold tabular-nums text-slate-600" title="Возрастное ограничение">
+              {ageLabel}
+            </span>
+          ) : null}
           {destinationLabel ? (
             <span className="inline-flex min-w-0 items-center gap-0.5 text-slate-500">
               <MapPin className="h-3 w-3 shrink-0" />
@@ -145,7 +139,7 @@ export function EventCardHorizontal({ event }: EventCardHorizontalProps) {
 
         {showSlotPills ? (
           <div className="mt-2 flex flex-wrap gap-2">
-            {(multipleSlots ? displaySlotLabels : displaySlots).map((label) => (
+            {displaySlotLabels.map((label) => (
               <span
                 key={label}
                 className="inline-flex h-[30px] min-h-[30px] shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-white px-3 text-xs leading-none text-slate-800"

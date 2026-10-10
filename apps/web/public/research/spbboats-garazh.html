@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>SPBBOATS visual - Гараж (garazh)</title>
+  <link rel="stylesheet" href="./spbboats-venue-pdp.css" />
+</head>
+<body>
+  <div class="research-banner">
+    Research mock: как <strong>SPBBOATS VenuePageView</strong> рендерит seed <code>garazh</code>
+    (беднее Эрмитажа: нет highlights / FAQ).
+    <nav aria-label="Research links">
+      <a href="./spbboats-venues.html">Индекс</a>
+      <a href="./spbboats-ermitazh.html">Эрмитаж</a>
+      <a href="./venue-seeds-hermitage-garage/index.html">Пакет сидов</a>
+    </nav>
+  </div>
+
+  <!-- 0. Hero -->
+  <header class="hero">
+    <div class="hero-wash" aria-hidden="true"></div>
+    <div class="hero-inner">
+      <nav class="crumbs" aria-label="Хлебные крошки">
+        <a href="#">Главная</a>
+        <span>›</span>
+        <a href="#">Музеи и Арт</a>
+        <span>›</span>
+        <a href="#">Москва</a>
+      </nav>
+
+      <div class="hero-row">
+        <div>
+          <div class="badges">
+            <span class="badge">Арт-пространство</span>
+            <span class="badge open" data-open-badge hidden>
+              <span class="dot" aria-hidden="true"></span> Открыто сейчас
+            </span>
+          </div>
+          <h1>Музей современного искусства «Гараж»</h1>
+          <p class="hero-lead">Современное искусство в Парке Горького</p>
+          <div class="quick-facts">
+            <span>Октябрьская</span>
+            <span>Якиманка</span>
+          </div>
+        </div>
+
+        <div class="hero-cta">
+          <div style="text-align:right">
+            <p class="price-label">Билет от</p>
+            <p class="price-value">500 ₽</p>
+          </div>
+          <a class="btn btn-primary" href="#tickets">Купить билет</a>
+          <p class="hero-today" data-today-hours></p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="page">
+    <div class="grid">
+      <div class="main">
+        <!-- 2. Tickets -->
+        <section class="section" id="tickets">
+          <div class="tickets-head">
+            <h2>🎟 Билеты</h2>
+            <span class="tickets-meta">offers: пусто в seed</span>
+          </div>
+          <div class="card" style="border-style: dashed; text-align: center; padding: 32px 20px">
+            <p class="note-empty" style="margin-bottom: 12px">Билеты скоро появятся</p>
+            <a href="https://garagemca.org" rel="noopener noreferrer" target="_blank">
+              Купить на официальном сайте
+            </a>
+          </div>
+        </section>
+
+        <!-- 3. Reviews -->
+        <section class="section" id="reviews">
+          <h2>Отзывы</h2>
+          <div class="card">
+            <div class="reviews-row">
+              <span class="stars" aria-hidden="true">☆☆☆☆☆</span>
+              <span>Блок отзывов подтягивается с API (в seed рейтинг не задан)</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. О месте (features only; highlights отсутствуют) -->
+        <section class="section">
+          <h2>О месте</h2>
+          <div class="card card-muted" style="margin-bottom: 16px">
+            <p class="note-empty">
+              В seed <code>garazh</code> нет <code>highlights</code> - сетка буллетов на PDP не рендерится.
+            </p>
+          </div>
+          <ul class="chips">
+            <li>♿ Доступная среда</li>
+            <li>✓ Есть кафе</li>
+            <li>✓ Сувенирный магазин</li>
+          </ul>
+          <p class="desc">
+            Один из важнейших центров современной культуры в Москве, расположенный в Парке Горького.
+            Выставки, образовательные программы, архив, книжный магазин.
+          </p>
+        </section>
+
+        <!-- 5. Как посетить -->
+        <section class="section">
+          <h2>Как посетить</h2>
+          <div class="visit-grid">
+            <div class="card">
+              <h3><span class="ico">🕐</span> Часы работы</h3>
+              <div class="hours" data-hours>
+                <div class="hours-row" data-day="mon"><span>Пн</span><span>11:00-22:00</span></div>
+                <div class="hours-row" data-day="tue"><span>Вт</span><span>11:00-22:00</span></div>
+                <div class="hours-row" data-day="wed"><span>Ср</span><span>11:00-22:00</span></div>
+                <div class="hours-row" data-day="thu"><span>Чт</span><span>11:00-22:00</span></div>
+                <div class="hours-row" data-day="fri"><span>Пт</span><span>11:00-22:00</span></div>
+                <div class="hours-row" data-day="sat"><span>Сб</span><span>11:00-22:00</span></div>
+                <div class="hours-row" data-day="sun"><span>Вс</span><span>11:00-22:00</span></div>
+              </div>
+            </div>
+            <div class="card">
+              <h3><span class="ico">↗</span> Как добраться</h3>
+              <p class="contact-line">ул. Крымский Вал, 9, стр. 32, Москва</p>
+              <p class="contact-line muted">🚇 м. Октябрьская</p>
+              <p class="contact-line"><a href="tel:+74956450520">+7 (495) 645-05-20</a></p>
+              <p class="contact-line">
+                <a href="https://garagemca.org" rel="noopener noreferrer" target="_blank">
+                  🌐 Официальный сайт
+                </a>
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- FAQ отсутствует -->
+        <section class="section">
+          <h2>Частые вопросы</h2>
+          <div class="card card-muted">
+            <p class="note-empty">
+              В seed нет <code>faq</code> - секция FAQ на PDP не показывается
+              (здесь оставлен поясняющий блок только для research).
+            </p>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>Заметка по slug</h2>
+          <div class="card">
+            <p class="desc" style="margin:0">
+              Канон SPBBOATS seed: <code>garazh</code>. В ссылках/линках встречаются
+              <code>muzej-garazh</code>, в каталоге Daibilet - <code>moscow-muzey-garazh</code>.
+              Демо-сценарий программы: <code>garage-moscow-demo</code> (не эта карточка).
+            </p>
+          </div>
+        </section>
+      </div>
+
+      <aside class="sidebar" aria-label="Боковая панель">
+        <div class="stack">
+          <div class="card">
+            <p class="price-label">Билет от</p>
+            <p class="price-value">500 ₽</p>
+            <a class="btn btn-primary btn-block" href="#tickets" style="margin-top: 12px">Выбрать билет</a>
+            <div class="side-meta">
+              <div class="open" data-side-open hidden>
+                <span class="dot"></span>
+                <span data-side-open-text></span>
+              </div>
+              <div class="closed" data-side-closed hidden></div>
+            </div>
+          </div>
+          <div class="card contacts">
+            <h3>Контакты</h3>
+            <p><span class="ico">📍</span> ул. Крымский Вал, 9, стр. 32, Москва</p>
+            <p><span class="ico">🚇</span> м. Октябрьская</p>
+            <p><span class="ico">☎</span> <a href="tel:+74956450520">+7 (495) 645-05-20</a></p>
+            <p>
+              <span class="ico">🌐</span>
+              <a href="https://garagemca.org" rel="noopener noreferrer" target="_blank">garagemca.org</a>
+            </p>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <p class="footer-note">
+    Источник контента: <code>SPBBOATS/packages/backend/prisma/seed-venues.ts</code> ·
+    вёрстка по <code>VenuePageView.tsx</code> ·
+    research pack: <a href="./venue-seeds-hermitage-garage/garazh.html">карточка сида</a>
+  </p>
+
+  <script>
+    (function () {
+      var order = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+      var today = order[new Date().getDay()];
+      var hours = {
+        mon: "11:00-22:00",
+        tue: "11:00-22:00",
+        wed: "11:00-22:00",
+        thu: "11:00-22:00",
+        fri: "11:00-22:00",
+        sat: "11:00-22:00",
+        sun: "11:00-22:00",
+      };
+      var row = document.querySelector('[data-day="' + today + '"]');
+      if (row) {
+        row.classList.add("today");
+        var label = row.querySelector("span");
+        if (label) label.textContent = label.textContent + " (сегодня)";
+      }
+      var h = hours[today];
+      var todayEl = document.querySelector("[data-today-hours]");
+      if (todayEl) todayEl.textContent = "Сегодня " + h;
+
+      function isOpenNow(range) {
+        var parts = range.split("-");
+        var now = new Date();
+        var cur = now.getHours() * 60 + now.getMinutes();
+        var o = parts[0].trim().split(":").map(Number);
+        var c = parts[1].trim().split(":").map(Number);
+        return cur >= o[0] * 60 + o[1] && cur < c[0] * 60 + c[1];
+      }
+
+      var open = isOpenNow(h);
+      var badge = document.querySelector("[data-open-badge]");
+      if (badge && open) badge.hidden = false;
+
+      var sideOpen = document.querySelector("[data-side-open]");
+      var sideOpenText = document.querySelector("[data-side-open-text]");
+      var sideClosed = document.querySelector("[data-side-closed]");
+      if (open && sideOpen && sideOpenText) {
+        sideOpen.hidden = false;
+        sideOpenText.textContent = "Открыто сегодня до " + h.split("-")[1];
+      } else if (sideClosed) {
+        sideClosed.hidden = false;
+        sideClosed.textContent = "Сегодня: " + h;
+      }
+    })();
+  </script>
+</body>
+</html>

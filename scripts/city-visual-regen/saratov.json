@@ -1,0 +1,43 @@
+{
+  "city": "saratov",
+  "mustSeeCount": 67,
+  "regen": [
+    {
+      "stem": "dom-kommuna-inzhener",
+      "name": "dom kommuna inzhener",
+      "clusterSize": 3,
+      "keeper": "detskiy-park"
+    },
+    {
+      "stem": "gagarin-pamyatnik-na-meste-prizemleniya",
+      "name": "gagarin pamyatnik na meste prizemleniya",
+      "clusterSize": 3,
+      "keeper": "detskiy-park"
+    },
+    {
+      "stem": "identity-architecture",
+      "name": "identity architecture",
+      "clusterSize": 2,
+      "keeper": "gagarin-memorialnaya-stena"
+    },
+    {
+      "stem": "identity-art",
+      "name": "identity art",
+      "clusterSize": 2,
+      "keeper": "art-klaster-sklady-reyneke"
+    },
+    {
+      "stem": "smotrovaya-aeroport-tsentralnyy",
+      "name": "smotrovaya aeroport tsentralnyy",
+      "clusterSize": 2,
+      "keeper": "avtodorozhnyy-most-saratov-engel-s"
+    },
+    {
+      "stem": "strit-art-stena-sgyua",
+      "name": "strit art stena sgyua",
+      "clusterSize": 2,
+      "keeper": "gagarin-memorialnaya-stela"
+    }
+  ],
+  "d0": 6
+}

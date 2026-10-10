@@ -1,0 +1,544 @@
+import {
+  buildPublicArticlesListDto,
+  buildPublicEventFreshnessMap,
+  buildPublicVenuesDto,
+} from '@daibilet/backend/public-read';
+import type { PublicCatalogDto, PublicVenueDto, PublicVenuePageDto } from '@daibilet/contracts/public';
+
+import { evaluateCityIndexability, evaluateRegionIndexability, evaluateVenueIndexability } from '@/lib/hub-indexability';
+import {
+  CITY_LANDING_PATH_BY_SLUG,
+  DEFAULT_CITY_BY_LANDING_SLUG,
+  LANDING_CATEGORY_PATH_BY_SLUG,
+  MULTI_CITY_LANDING_SLUGS,
+  PRIORITY_LISTING_CITY_SLUGS,
+  cityPathSegment,
+  isLandingCityAllowed,
+  landingCategoryHref,
+} from '@/lib/landing-routes';
+import {
+  catalogIntentFilterValues,
+  catalogIntentPath,
+  listCatalogIntents,
+} from '@/lib/catalog-intent-routes';
+import { hasSeoListingEditorial } from '@/data/seo-listing-texts';
+import { isEventsCatalogSitemapEligibleUrl } from '@/lib/events-catalog-indexing';
+import { evaluateListingIndexability, MIN_LISTING_OFFERS_FOR_INDEX } from '@/lib/seo-listing-meta';
+import { buildPodborkiCityCanonicalPath, isPodborkiSeoPilotCitySlug, PODBORKI_SEO_PILOT_CITY_SLUGS } from '@/lib/podborki-city-seo';
+import { venueCanonicalPath } from '@/lib/routes';
+import { cityPlacesCatalogHref } from '@/lib/catalog-url';
+import { getCachedCatalog } from '@/server/cached-catalog-data';
+import { getCachedDestinations } from '@/server/cached-public-surfaces';
+import { fetchPublicApiJson } from '@/server/public-api-client';
+import { parseCatalogPageQuery } from '@/server/catalog-query';
+import { finalizeLandingPayload, fetchLandingPageDto } from '@/server/landing-page';
+
+export const SITEMAP_CHUNKS = [
+  'static',
+  'events',
+  'cities',
+  'venues',
+  'landings',
+  'blog',
+] as const;
+
+export type SitemapChunk = (typeof SITEMAP_CHUNKS)[number];
+
+export type SitemapEntry = {
+  url: string;
+  lastModified?: string | Date;
+  changeFrequency?: 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never';
+  priority?: number;
+};
+
+const MAX_EVENTS = 45_000;
+const MAX_VENUES = 10_000;
+const VENUE_SITEMAP_SNAPSHOT_MS = 5 * 60 * 1000;
+let venueSitemapSnapshot: {
+  expiresAt: number;
+  payload: Awaited<ReturnType<typeof buildPublicVenuesDto>>;
+} | null = null;
+let venueSitemapRebuild: Promise<Awaited<ReturnType<typeof buildPublicVenuesDto>>> | null = null;
+
+/** Sitemap waits for one fresh rebuild per TTL; catalog pages keep their existing SWR behavior. */
+async function freshVenuesForSitemap() {
+  if (venueSitemapSnapshot && venueSitemapSnapshot.expiresAt > Date.now()) {
+    return venueSitemapSnapshot.payload;
+  }
+  if (!venueSitemapRebuild) {
+    venueSitemapRebuild = buildPublicVenuesDto(new URLSearchParams(`limit=${MAX_VENUES}`), true)
+      .then((payload) => {
+        venueSitemapSnapshot = { payload, expiresAt: Date.now() + VENUE_SITEMAP_SNAPSHOT_MS };
+        return payload;
+      })
+      .finally(() => { venueSitemapRebuild = null; });
+  }
+  return venueSitemapRebuild;
+}
+
+/** Priority listing cities + SEO pilot cities (KGD/SPB) - без дублей. */
+function listingSitemapCitySlugs(): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const city of [...PRIORITY_LISTING_CITY_SLUGS, ...PODBORKI_SEO_PILOT_CITY_SLUGS]) {
+    if (seen.has(city)) continue;
+    seen.add(city);
+    out.push(city);
+  }
+  return out;
+}
+
+const YEAR_ROUND_SITEMAP_LANDINGS = new Set<string>(['salute-9-may']);
+
+export function getSiteUrl(): string {
+  return (
+    process.env.DAIBILET_SITE_URL ||
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    'https://daibilet.ru'
+  ).replace(/\/$/, '');
+}
+
+export function isSitemapChunk(value: string): value is SitemapChunk {
+  return (SITEMAP_CHUNKS as readonly string[]).includes(value);
+}
+
+export function normalizeSitemapChunkParam(raw: string): SitemapChunk | null {
+  const key = String(raw || '')
+    .trim()
+    .toLowerCase()
+    .replace(/\.xml$/i, '');
+  return isSitemapChunk(key) ? key : null;
+}
+
+/**
+ * Resolve a sitemap `lastmod` from an entity's real `updatedAt`.
+ *
+ * Cities and venues still fall back to the build-time `now` because their
+ * public DTO exposes no `updatedAt` yet - see the `entry()` note below. Never
+ * substitute `new Date()` for a real value: a lastmod that moves on every
+ * rebuild is worse than none, because it tells crawlers the whole site changes
+ * daily and they stop trusting the field.
+ */
+export function resolveSitemapLastModified(
+  candidate: Date | string | null | undefined,
+  fallback: Date,
+): Date {
+  if (candidate == null) return fallback;
+  const parsed = candidate instanceof Date ? candidate : new Date(candidate);
+  return Number.isNaN(parsed.getTime()) ? fallback : parsed;
+}
+
+function entry(
+  path: string,
+  now: Date,
+  changeFrequency: SitemapEntry['changeFrequency'],
+  priority: number,
+  lastModified?: Date | string | null,
+): SitemapEntry {
+  const normalized = path.startsWith('/') ? path : `/${path}`;
+  return {
+    url: `${getSiteUrl()}${normalized === '/' ? '/' : normalized}`,
+    lastModified: resolveSitemapLastModified(lastModified, now),
+    changeFrequency,
+    priority,
+  };
+}
+
+async function countIntentOffers(intentSlug: string, citySlug?: string | null): Promise<number> {
+  const intent = listCatalogIntents().find((item) => item.intent === intentSlug);
+  if (!intent) return 0;
+  const filters = catalogIntentFilterValues(intent);
+  const pageQuery = parseCatalogPageQuery({
+    city: citySlug || undefined,
+    date: filters.date,
+    minPrice: filters.minPrice != null ? String(filters.minPrice) : undefined,
+    maxPrice: filters.maxPrice != null ? String(filters.maxPrice) : undefined,
+    sort: filters.sort,
+  });
+  try {
+    const catalog = await getCachedCatalog(pageQuery);
+    return catalog?.total ?? catalog?.items?.length ?? 0;
+  } catch {
+    return 0;
+  }
+}
+
+/** Intent URLs: threshold 6, except pilot city×intent (stable when offers>0 or SEO skeleton). */
+export async function buildIndexableIntentSitemapPaths(): Promise<string[]> {
+  const paths = new Set<string>();
+  const cities = listingSitemapCitySlugs();
+
+  for (const item of listCatalogIntents()) {
+    const offers = await countIntentOffers(item.intent);
+    if (evaluateListingIndexability({ offers, minOffers: MIN_LISTING_OFFERS_FOR_INDEX }).indexable) {
+      paths.add(catalogIntentPath(item.intent));
+    }
+
+    for (const city of cities) {
+      const cityOffers = await countIntentOffers(item.intent, city);
+      const pilot = isPodborkiSeoPilotCitySlug(city);
+      if (
+        evaluateListingIndexability({
+          offers: cityOffers,
+          minOffers: MIN_LISTING_OFFERS_FOR_INDEX,
+          stablePilotIndex: pilot,
+          hasSeoSkeleton: pilot,
+        }).indexable
+      ) {
+        paths.add(catalogIntentPath(item.intent, city));
+      }
+    }
+  }
+
+  return [...paths];
+}
+
+export async function buildStaticSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
+  const intentPaths = await buildIndexableIntentSitemapPaths();
+  const podborkiCityHubPaths = PODBORKI_SEO_PILOT_CITY_SLUGS.map((city) =>
+    buildPodborkiCityCanonicalPath(city),
+  );
+  return [
+    entry('/', now, 'hourly', 1),
+    entry('/events', now, 'hourly', 0.8),
+    entry('/cities', now, 'daily', 0.8),
+    entry('/places', now, 'daily', 0.85),
+    // Family facets are indexable documents in their own right since the ЧПУ
+    // transition on 2026-10-01; before that they canonicalised to /places.
+    entry('/places/institution', now, 'daily', 0.8),
+    entry('/places/location', now, 'daily', 0.8),
+    entry('/podborki', now, 'daily', 0.8),
+    ...podborkiCityHubPaths.map((path) => entry(path, now, 'daily', 0.75)),
+    ...intentPaths.map((path) => entry(path, now, 'daily', 0.7)),
+    entry('/blog', now, 'daily', 0.8),
+    entry('/help', now, 'monthly', 0.5),
+    entry('/contacts', now, 'monthly', 0.5),
+    entry('/partners', now, 'monthly', 0.6),
+    entry('/offer', now, 'yearly', 0.3),
+    entry('/privacy', now, 'yearly', 0.3),
+    entry('/legal', now, 'yearly', 0.3),
+    entry('/requisites', now, 'yearly', 0.3),
+  ];
+}
+
+export async function buildEventsSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
+  const seen = new Set<string>();
+  const entries: SitemapEntry[] = [];
+  const limit = 200;
+
+  // Real per-event `updatedAt`, keyed by the public (transliterated) slug. Without
+  // it every entry falls back to the build timestamp, so all ~4k URLs claim to
+  // change on every rebuild and crawlers stop trusting the field.
+  //
+  // The catch must stay loud. It silently returned an empty map once, which made
+  // "the query failed" and "there is no data" indistinguishable and cost a full
+  // diagnosis cycle on 30.09. An empty map is a valid outcome (zero events with
+  // a usable updatedAt); a thrown error is not, so log it and keep going.
+  const freshness = await buildPublicEventFreshnessMap().catch((error: unknown) => {
+    console.error(
+      '[sitemap] buildPublicEventFreshnessMap failed; event lastmod falls back to build time',
+      error,
+    );
+    return new Map<string, Date>();
+  });
+  if (freshness.size === 0) {
+    console.warn('[sitemap] buildPublicEventFreshnessMap returned 0 rows; all event lastmod are build time');
+  }
+
+  for (let offset = 0; offset < MAX_EVENTS; offset += limit) {
+    const page = await fetchPublicApiJson<PublicCatalogDto>('/api/public/events', {
+      searchParams: { limit, offset }, timeoutMs: 30_000,
+    });
+    for (const event of page.items || []) {
+      if (entries.length >= MAX_EVENTS) break;
+      const slug = event.slug || event.id;
+      if (!slug || seen.has(slug)) continue;
+      seen.add(slug);
+      entries.push(
+        entry(`/events/${encodeURIComponent(slug)}`, now, 'daily', 0.7, freshness.get(slug) ?? null),
+      );
+    }
+    if (!page.hasMore || !page.items?.length || entries.length >= MAX_EVENTS) break;
+  }
+
+  return entries;
+}
+
+export async function buildCitiesSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
+  const destinationsPayload = await getCachedDestinations();
+  return (destinationsPayload?.destinations || [])
+    .filter((destination) => {
+      if (!destination.slug) return false;
+      if (destination.type === 'city') {
+        return evaluateCityIndexability({
+          events: destination.events,
+          slug: destination.slug,
+          sourceSlug: destination.sourceSlug,
+        }).indexable;
+      }
+      if (destination.type === 'region') {
+        // Tier C (<3 events): noindex + вне sitemap; A/B с ≥3 - в карту.
+        return evaluateRegionIndexability({
+          childEventTotal: destination.events,
+        }).indexable;
+      }
+      return false;
+    })
+    .flatMap((destination) => [
+      entry(`/cities/${encodeURIComponent(String(destination.slug))}`, now, 'daily', destination.type === 'region' ? 0.7 : 0.75),
+      ...(destination.type === 'city' && destination.venues > 0
+        ? [entry(cityPlacesCatalogHref(String(destination.slug)), now, 'daily', 0.65)]
+        : []),
+    ]);
+}
+
+export async function buildVenuesSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
+  const venuesPayload = await freshVenuesForSitemap();
+  const eligible = (venuesPayload?.venues || [])
+    .filter((venue) => {
+      if (!venue.slug) return false;
+      return evaluateVenueIndexability({
+        // `venue` is the lean row from the backend payload, not PublicVenueDto:
+        // its inferred type omits futureSessionCount. The contract type does
+        // declare it (verified against @daibilet/contracts/public), so cast
+        // rather than duplicate the field in a third place.
+        futureSessions: (venue as PublicVenueDto).futureSessionCount ?? venue.events,
+        isIndexable: venue.isIndexable,
+        type: venue.type,
+        pageStatus: venue.pageStatus,
+      }).indexable;
+    })
+    .slice(0, MAX_VENUES);
+  const sources = new Map<string, PublicVenueDto>();
+  const entries = eligible.map((venue) => {
+    const result = entry(venueCanonicalPath(venue), now, 'weekly', 0.6);
+    sources.set(result.url, venue);
+    return result;
+  });
+  const pathCounts = new Map<string, number>();
+  for (const item of entries) pathCounts.set(item.url, (pathCounts.get(item.url) || 0) + 1);
+  const uniqueEntries = [...new Map(entries.map((item) => [item.url, item])).values()];
+  // Location types and colliding paths can resolve to a different detail row
+  // than the list DTO. Verify the final URL through the API used by HTML.
+  const checked = new Map<string, boolean>();
+  const candidates = uniqueEntries.filter((item) =>
+    new URL(item.url).pathname.startsWith('/locations/') || (pathCounts.get(item.url) || 0) > 1);
+  for (let i = 0; i < candidates.length; i += 8) {
+    const batch = await Promise.all(candidates.slice(i, i + 8).map(async (item) => {
+      const pathname = new URL(item.url).pathname;
+      const slug = decodeURIComponent(pathname.split('/').pop() || '');
+      const detail = await fetchPublicApiJson<PublicVenuePageDto | null>(
+        `/api/public/venues/${encodeURIComponent(slug)}`,
+        { timeoutMs: 15_000, notFoundAsNull: true, retries: 0 },
+      );
+      const venue = detail?.venue;
+      return [item.url, Boolean(venue &&
+        venueCanonicalPath(venue) === pathname &&
+        evaluateVenueIndexability({
+          futureSessions: venue.futureSessionCount ?? detail.stats?.events ?? 0,
+          isIndexable: venue.isIndexable,
+          type: venue.type,
+          pageStatus: venue.pageStatus,
+        }).indexable)] as const;
+    }));
+    for (const [url, indexable] of batch) checked.set(url, indexable);
+  }
+  const verifiedEntries = uniqueEntries.filter((item) => checked.get(item.url) !== false);
+  assertSitemapNoindexInvariant(verifiedEntries, sources);
+  return verifiedEntries;
+}
+
+export async function buildLandingsSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
+  const paths = new Set<string>();
+  const cities = listingSitemapCitySlugs();
+
+  for (const slug of Object.keys(LANDING_CATEGORY_PATH_BY_SLUG)) {
+    if (isLandingCityAllowed(slug, 'moscow') && isLandingCityAllowed(slug, 'saint-petersburg') && isLandingCityAllowed(slug, 'kazan')) {
+      paths.add(landingCategoryHref(slug));
+    }
+    // Year-round seasonal hubs stay in sitemap even with 0 offers (catalog may hide).
+    if (YEAR_ROUND_SITEMAP_LANDINGS.has(slug)) {
+      paths.add(landingCategoryHref(slug));
+    }
+    if (!MULTI_CITY_LANDING_SLUGS.has(slug)) continue;
+    for (const city of cities) {
+      if (!isLandingCityAllowed(slug, city)) continue;
+      try {
+        const payload = await fetchLandingPageDto(slug);
+        if (!payload?.landing) continue;
+        const finalized = finalizeLandingPayload(payload, slug, city);
+        const offers = finalized.stats?.events ?? 0;
+        const pilot = isPodborkiSeoPilotCitySlug(city);
+        if (
+          !evaluateListingIndexability({
+            offers,
+            minOffers: MIN_LISTING_OFFERS_FOR_INDEX,
+            hasEditorialSeoText: hasSeoListingEditorial(slug, city),
+            stablePilotIndex: pilot,
+            hasSeoSkeleton: YEAR_ROUND_SITEMAP_LANDINGS.has(slug),
+          }).indexable
+        ) {
+          continue;
+        }
+        paths.add(landingCategoryHref(slug, city));
+      } catch {
+        // DB unavailable at build - skip city variant rather than ship thin URL.
+      }
+    }
+  }
+
+  for (const slug of Object.keys(CITY_LANDING_PATH_BY_SLUG)) {
+    const city = DEFAULT_CITY_BY_LANDING_SLUG[slug];
+    if (!cityPathSegment(city)) continue;
+    try {
+      const payload = await fetchLandingPageDto(slug);
+      if (!payload?.landing) {
+        paths.add(landingCategoryHref(slug, city));
+        continue;
+      }
+      const finalized = finalizeLandingPayload(payload, slug, city);
+      const offers = finalized.stats?.events ?? 0;
+      if (
+        evaluateListingIndexability({
+          offers,
+          hasEditorialSeoText: hasSeoListingEditorial(slug, city),
+        }).indexable
+      ) {
+        paths.add(landingCategoryHref(slug, city));
+      }
+    } catch {
+      paths.add(landingCategoryHref(slug, city));
+    }
+  }
+
+  return [...paths].map((path) => entry(path.replace(/\/$/, '') || '/', now, 'weekly', 0.65));
+}
+
+export async function buildBlogSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
+  const payload = await buildPublicArticlesListDto();
+  const articles = (payload?.articles || []) as Array<{
+    slug?: string | null;
+    isIndexable?: boolean | null;
+    updatedAt?: string | null;
+  }>;
+  return articles
+    .filter((article) => article.slug && article.isIndexable !== false)
+    .map((article) =>
+      entry(`/blog/${encodeURIComponent(String(article.slug))}`, now, 'weekly', 0.6, article.updatedAt),
+    );
+}
+
+export async function buildSitemapChunkEntries(chunk: SitemapChunk): Promise<SitemapEntry[]> {
+  const now = new Date();
+  let entries: SitemapEntry[];
+  switch (chunk) {
+    case 'static':
+      entries = await buildStaticSitemapEntries(now);
+      break;
+    case 'events':
+      entries = await buildEventsSitemapEntries(now);
+      break;
+    case 'cities':
+      entries = await buildCitiesSitemapEntries(now);
+      break;
+    case 'venues':
+      entries = await buildVenuesSitemapEntries(now);
+      break;
+    case 'landings':
+      entries = await buildLandingsSitemapEntries(now);
+      break;
+    case 'blog':
+      entries = await buildBlogSitemapEntries(now);
+      break;
+    default:
+      entries = [];
+  }
+  assertSitemapNoindexInvariant(entries);
+  return entries;
+}
+
+export function assertSitemapNoindexInvariant(
+  entries: readonly SitemapEntry[],
+  venueSources?: ReadonlyMap<string, PublicVenueDto>,
+): void {
+  const conflicts = entries
+    .map((item) => item.url)
+    .filter((url) => !isEventsCatalogSitemapEligibleUrl(url));
+  if (conflicts.length) {
+    throw new Error(`Sitemap contains noindex events catalog URL: ${conflicts.join(', ')}`);
+  }
+  if (venueSources) {
+    const venueConflicts = entries
+      .filter((item) => /\/(venues|locations)\//.test(new URL(item.url).pathname))
+      .filter((item) => {
+        const venue = venueSources.get(item.url);
+        return !venue || !evaluateVenueIndexability({
+          futureSessions: venue.futureSessionCount ?? venue.events,
+          isIndexable: venue.isIndexable,
+          type: venue.type,
+          pageStatus: venue.pageStatus,
+        }).indexable;
+      })
+      .map((item) => item.url);
+    if (venueConflicts.length) {
+      throw new Error(`Sitemap contains noindex venue URL: ${venueConflicts.join(', ')}`);
+    }
+  }
+}
+
+function escapeXml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+function formatLastmod(value?: string | Date): string | null {
+  if (!value) return null;
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toISOString();
+}
+
+export function renderUrlsetXml(entries: SitemapEntry[]): string {
+  const body = entries
+    .map((item) => {
+      const lastmod = formatLastmod(item.lastModified);
+      const lines = [`  <url>`, `    <loc>${escapeXml(item.url)}</loc>`];
+      if (lastmod) lines.push(`    <lastmod>${lastmod}</lastmod>`);
+      if (item.changeFrequency) lines.push(`    <changefreq>${item.changeFrequency}</changefreq>`);
+      if (typeof item.priority === 'number') lines.push(`    <priority>${item.priority}</priority>`);
+      lines.push(`  </url>`);
+      return lines.join('\n');
+    })
+    .join('\n');
+
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>\n`;
+}
+
+export function renderSitemapIndexXml(now = new Date()): string {
+  const lastmod = now.toISOString();
+  const site = getSiteUrl();
+  const body = SITEMAP_CHUNKS.map(
+    (chunk) => `  <sitemap>
+    <loc>${escapeXml(`${site}/sitemaps/${chunk}.xml`)}</loc>
+    <lastmod>${lastmod}</lastmod>
+  </sitemap>`,
+  ).join('\n');
+
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</sitemapindex>\n`;
+}
+
+export const SITEMAP_RESPONSE_HEADERS = {
+  'Content-Type': 'application/xml; charset=utf-8',
+  'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+} as const;
+
+export function sitemapResponseHeaders(chunk: string): Record<string, string> {
+  return {
+    ...SITEMAP_RESPONSE_HEADERS,
+    ...(chunk === 'events' || chunk === 'venues' ? { 'Cache-Control': 'no-store' } : {}),
+  };
+}

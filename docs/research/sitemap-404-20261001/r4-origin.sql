@@ -1,0 +1,1 @@
+select id,slug,title,"pageStatus"::text,"isIndexable",left(coalesce("shortDescription",''),100) from "Venue" where id ~* '(test|fixture|demo|seed|smoke)' or slug ~* '(test|fixture|demo|seed|smoke)' or coalesce("shortDescription",'') ~* '(smoke|fixture|test|служебн|тестов)' or coalesce(description,'') ~* '(smoke|fixture|служебн|тестов)' limit 60;
