@@ -62,7 +62,7 @@ export function BlogArticleHero({
             aria-hidden
             className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-slate-950/95 via-slate-950/55 to-transparent"
           />
-          <div className="container-page relative flex h-full flex-col justify-end py-8 sm:py-10 lg:py-12">
+          <div className="container-page absolute inset-0 flex flex-col justify-end py-8 sm:py-10 lg:py-12">
             <div className="max-w-4xl motion-safe:animate-[blog-hero-rise_0.8s_ease-out_0.1s_both]">
               <div className="flex flex-wrap items-center gap-2">
                 <p className="inline-flex items-center gap-1.5 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-amber-200/85 sm:text-xs">
