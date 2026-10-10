@@ -5,6 +5,41 @@ import { redirect } from 'next/navigation';
 
 import { adminApiFetch } from '@/server/admin-api-fetch';
 
+export async function operateInternalAdminOrderAction(formData: FormData) {
+  const orderKey = String(formData.get('orderKey') || '').trim();
+  const operation = String(formData.get('operation') || '').trim();
+  const confirmCode = String(formData.get('confirmCode') || '').trim();
+  const reason = String(formData.get('reason') || '').trim();
+  if (!orderKey || !['cancel', 'refund'].includes(operation) || !confirmCode || reason.length < 3 || reason.length > 500) {
+    redirect(`/admin/orders/internal/${encodeURIComponent(orderKey)}?error=invalid_input`);
+  }
+  const base = process.env.FINANCE_API_BASE_URL || '';
+  const token = process.env.DAIBILET_FINANCE_ADMIN_OPERATION_TOKEN || '';
+  if (!base || !token) redirect(`/admin/orders/internal/${encodeURIComponent(orderKey)}?error=not_configured`);
+  const url = new URL(`/api/internal/admin/orders/${encodeURIComponent(orderKey)}/operation`, base);
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ operation, confirmCode, reason }),
+      cache: 'no-store',
+      signal: AbortSignal.timeout(20_000),
+    });
+  } catch {
+    redirect(`/admin/orders/internal/${encodeURIComponent(orderKey)}?error=network`);
+  }
+  if (!response.ok) {
+    const payload = await response.json().catch(() => ({})) as { error?: string };
+    const error = encodeURIComponent(payload.error || `http_${response.status}`);
+    redirect(`/admin/orders/internal/${encodeURIComponent(orderKey)}?error=${error}`);
+  }
+  const result = await response.json() as { status: string };
+  revalidatePath('/admin/orders');
+  revalidatePath(`/admin/orders/internal/${orderKey}`);
+  redirect(`/admin/orders/internal/${encodeURIComponent(orderKey)}?operation=${encodeURIComponent(result.status)}`);
+}
+
 export async function syncAdminOrdersTcAction() {
   const response = await adminApiFetch('/api/admin/orders/sync', { method: 'POST' });
   if (!response.ok) {

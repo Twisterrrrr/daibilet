@@ -185,7 +185,7 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
                   <tr key={row.id} className="border-b border-slate-100 align-top">
                     <td className="px-3 py-2">
                       <Link
-                        href={row.sourceKind === 'internal' && row.publicCode ? `https://daibilet.ru/checkout/ticket/${encodeURIComponent(row.publicCode)}` : `/admin/orders/${encodeURIComponent(row.id)}`}
+                        href={row.sourceKind === 'internal' && row.publicCode ? `/admin/orders/internal/${encodeURIComponent(row.publicCode)}` : `/admin/orders/${encodeURIComponent(row.id)}`}
                         className="font-medium text-sky-700 hover:underline"
                       >
                         {row.publicCode || row.externalOrderId}

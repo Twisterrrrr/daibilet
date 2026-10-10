@@ -68,6 +68,38 @@ export type AdminOrderDetailData = {
 
 const DEFAULT_LIMIT = 50;
 
+export type InternalAdminOrderDetail = {
+  id: string;
+  publicCode: string;
+  status: string;
+  displayStatus: string;
+  eventTitle: string | null;
+  amountRub: number | null;
+  ticketCount: number;
+  buyer: { name: string | null; email: string | null; phone: string | null };
+  finance: {
+    payments: Array<{ status: string; providerPaymentId: string | null; amountKopecks: number }>;
+    refunds: Array<{ status: string; amountKopecks: number; providerRefundId: string | null; createdAt: string | null }>;
+  } | null;
+};
+
+export async function loadInternalAdminOrderDetail(code: string): Promise<{ detail: InternalAdminOrderDetail | null; error: string | null }> {
+  const base = process.env.FINANCE_API_BASE_URL || '';
+  const token = process.env.DAIBILET_FINANCE_ADMIN_READ_TOKEN || '';
+  if (!base || !token) return { detail: null, error: 'Подключение к финконтуру не настроено.' };
+  try {
+    const url = new URL(`/api/internal/admin/orders/${encodeURIComponent(code)}`, base);
+    const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: AbortSignal.timeout(8_000) });
+    if (response.status === 404) return { detail: null, error: 'Заказ не найден.' };
+    if (!response.ok) return { detail: null, error: `Финконтур ответил HTTP ${response.status}.` };
+    const raw = await response.json() as Record<string, unknown>;
+    if (raw.sourceKind !== 'internal') return { detail: null, error: 'Это не внутренний заказ.' };
+    return { detail: raw as unknown as InternalAdminOrderDetail, error: null };
+  } catch {
+    return { detail: null, error: 'Не удалось получить заказ из финконтура.' };
+  }
+}
+
 function normalizeOrderRow(raw: unknown): AdminOrderListRow {
   const row = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
   const buyer = (row.buyer && typeof row.buyer === 'object' ? row.buyer : {}) as Record<string, unknown>;
