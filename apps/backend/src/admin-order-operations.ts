@@ -64,6 +64,7 @@ async function cancelUnpaidOrder(orderId: string, reason: string) {
   if (order.payments.some((payment) => payment.status === 'SUCCEEDED' || payment.status === 'REFUNDED') || order.paidAt) {
     reject('paid_order_requires_refund');
   }
+  if (order.payments.filter((item) => item.providerPaymentId && !['CANCELLED', 'FAILED'].includes(item.status)).length > 1) reject('multiple_payments_manual_review');
   if (!['DRAFT', 'PENDING_PAYMENT', 'FAILED', 'EXPIRED'].includes(order.status)) reject('order_not_cancellable');
   const payment = order.payments.find((item) => item.providerPaymentId);
   if (payment?.providerPaymentId) {
@@ -99,6 +100,7 @@ async function refundPaidOrder(orderId: string, reason: string) {
   const payment = order.payments.find((item) => item.status === 'SUCCEEDED' && item.providerPaymentId);
   if (!payment?.providerPaymentId || payment.amountKopecks !== order.totalKopecks || order.totalKopecks <= 0) reject('payment_not_fully_refundable');
   if (order.payments.filter((item) => item.status === 'SUCCEEDED').length !== 1) reject('multiple_payments_manual_review');
+  if (order.payments.some((item) => item.id !== payment.id && !['CANCELLED', 'FAILED'].includes(item.status))) reject('multiple_payments_manual_review');
   if (order.items.length !== 1 || order.fulfillmentItems.length !== 1) reject('multiple_items_manual_review');
   const suppliers = [...new Set(order.items.map((item) => item.supplierId).filter(Boolean))];
   if (suppliers.length !== 1 || !suppliers[0]) reject('multiple_suppliers_manual_review');
