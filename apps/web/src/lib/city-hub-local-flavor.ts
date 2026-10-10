@@ -24,6 +24,14 @@ import {
   VOLGOGRAD_WEATHER,
 } from './_flavor-volgograd.fragment.ts';
 import {
+  ULYANOVSK_SLIDES,
+  ULYANOVSK_WEATHER,
+} from './_flavor-ulyanovsk.fragment.ts';
+import {
+  KIROV_SLIDES,
+  KIROV_WEATHER,
+} from './_flavor-kirov.fragment.ts';
+import {
   BARNAUL_WHEN_TO_GO,
   CHELYABINSK_WHEN_TO_GO,
   EKB_WHEN_TO_GO,
@@ -51,6 +59,8 @@ import {
   VOLGOGRAD_WHEN_TO_GO,
   VORONEZH_WHEN_TO_GO,
   YAROSLAVL_WHEN_TO_GO,
+  ULYANOVSK_WHEN_TO_GO,
+  KIROV_WHEN_TO_GO,
 } from './when-to-go-packs.ts';
 import { normalizeCityHubSlug } from './city-hub-config.ts';
 import type { CityMustSeeItem, CitySuburbItem, CitySuburbPlace } from './cityInfo.ts';
@@ -2177,6 +2187,22 @@ export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
     slides: VOLGOGRAD_SLIDES,
     weather: VOLGOGRAD_WEATHER,
     whenToGo: VOLGOGRAD_WHEN_TO_GO,
+  },
+  ulyanovsk: {
+    identityHeading: 'Чем уникален Ульяновск',
+    identityLead: IDENTITY_LEAD,
+    tags: tagsFromSlides(ULYANOVSK_SLIDES),
+    slides: ULYANOVSK_SLIDES,
+    weather: ULYANOVSK_WEATHER,
+    whenToGo: ULYANOVSK_WHEN_TO_GO,
+  },
+  'kirov-kirovskaya-oblast': {
+    identityHeading: 'Чем уникален Киров',
+    identityLead: IDENTITY_LEAD,
+    tags: tagsFromSlides(KIROV_SLIDES),
+    slides: KIROV_SLIDES,
+    weather: KIROV_WEATHER,
+    whenToGo: KIROV_WHEN_TO_GO,
   },
 };
 
