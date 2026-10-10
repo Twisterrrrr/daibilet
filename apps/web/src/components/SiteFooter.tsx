@@ -230,7 +230,7 @@ export function SiteFooter({ destinations, variant = 'default' }: SiteFooterProp
         {popularDirections.length ? (
           <div className="mt-12 pt-10">
             <h3 className="text-sm font-semibold text-graphite">
-              {cityName ? `Популярные направления · ${cityName}` : 'Популярные направления'}
+              Популярные направления
             </h3>
             <div className="mt-5 grid gap-8 sm:grid-cols-2">
               {popularDirections.map((block) => (
