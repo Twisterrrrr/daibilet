@@ -177,6 +177,11 @@ export function HomeHero({
         <span>{formatNumber(totalCities)} {pluralize(totalCities, 'город', 'города', 'городов')}</span>
       </div>
 
+      {/* H2 value proposition */}
+      <p className="mx-auto mt-3 max-w-2xl text-center text-sm leading-relaxed text-white/60 sm:text-base">
+        Сравните цены, выберите дату и купите билет онлайн без переплат и наценок.
+      </p>
+
       <form
         onSubmit={onSubmit}
         className="mt-8 w-full max-w-5xl rounded-2xl bg-white p-2 text-left shadow-2xl shadow-slate-950/30"
