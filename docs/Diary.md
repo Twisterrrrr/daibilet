@@ -1,3 +1,21 @@
+## 2026-10-11 - Deploy: скрытие строк с остановленными продажами на live
+
+### Наблюдения
+- Deploy `4673bbf6e` («Deploy MSK web», run 38164017617): swap зелёный, но первый прогон smoke упал на `googlebot /events/lev-eremenko-...-10-oktyabrya... → 404`: sitemap events.xml в момент проверки ещё держал URL вчерашнего (уже прошедшего) события, чья страница 404. Живой sitemap сразу после этого уже был чист - флаки окна «событие истекло / sitemap не обновился», не регрессия кода. `gh run rerun --failed` на том же SHA: smoke + Verify зелёные.
+- Скрипт `smoke-crawler-prod.sh` живёт в отдельном deployment-tooling репо (не в этом), правка толерантности - туда, если флаки повторится.
+
+### Решения
+- Фикс «Продажи остановлены» задеплоен и проверен на live: 0 строк с мёртвым CTA на rechnye (было 4), stendap (6), improv (2), вечеринки; чипы времени чистые (0 дублей), sold-out логика не тронута.
+
+### Proof
+- Smoke3: STOPPED_ROWS 4/4 PASS, TIME_CHIPS regression PASS. Deploy run [38164017617](https://github.com/Twisterrrrr/daibilet/actions/runs/38164017617) rerun: smoke + Verify success.
+
+### Follow-ups
+- Sitemap/404 окно для истёкших событий: если флаки повторится - добавить retry/tolerance в smoke-crawler-prod (deployment tooling) или ускорить ревалидацию events.xml.
+
+---
+
+
 ## 2026-10-11 - Лендинги: прячем строки с остановленными продажами
 
 ### Наблюдения
