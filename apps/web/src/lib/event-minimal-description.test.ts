@@ -4,9 +4,13 @@ import test from 'node:test';
 import { formatEventDescriptionHtml } from './event-description-format.ts';
 import {
   buildMinimalEventDescription,
+  buildPracticalInfoBlock,
+  cityInPhrase,
   cityPrepositional,
   describeFormat,
   formatRuDate,
+  formatRuDateTime,
+  pluralizeRu,
   roundDurationMinutes,
 } from './event-minimal-description.ts';
 
@@ -23,6 +27,28 @@ test('city prepositional case', () => {
   assert.equal(cityPrepositional('Апатиты'), 'Апатитах');
   assert.equal(cityPrepositional('Чебоксары'), 'Чебоксарах');
   assert.equal(cityPrepositional('Киров (Кировская область)'), 'Кирове (Кировская область)');
+  // live-audit fixes: plural and soft-sign forms
+  assert.equal(cityPrepositional('Химки'), 'Химках');
+  assert.equal(cityPrepositional('Мытищи'), 'Мытищах');
+  assert.equal(cityPrepositional('Набережные Челны'), 'Набережных Челнах');
+  assert.equal(cityPrepositional('Рославль'), 'Рославле');
+  assert.equal(cityPrepositional('Севастополь'), 'Севастополе');
+  assert.equal(cityPrepositional('Раменское'), 'Раменском');
+  assert.equal(cityPrepositional('Екатеринбург'), 'Екатеринбурге');
+  assert.equal(cityPrepositional('Уфа'), 'Уфе');
+});
+
+test('city phrase picks во/в preposition', () => {
+  assert.equal(cityInPhrase('Владивосток'), 'во Владивостоке');
+  assert.equal(cityInPhrase('Москва'), 'в Москве');
+  assert.equal(cityInPhrase('Рославль'), 'в Рославле');
+});
+
+test('ru plural helper', () => {
+  assert.equal(pluralizeRu(1, 'сеанс', 'сеанса', 'сеансов'), '1 сеанс');
+  assert.equal(pluralizeRu(3, 'сеанс', 'сеанса', 'сеансов'), '3 сеанса');
+  assert.equal(pluralizeRu(11, 'сеанс', 'сеанса', 'сеансов'), '11 сеансов');
+  assert.equal(pluralizeRu(22, 'сеанс', 'сеанса', 'сеансов'), '22 сеанса');
 });
 
 test('format detection uses category, subcategory and title', () => {
@@ -40,6 +66,35 @@ test('ru date formatting and duration rounding', () => {
   assert.equal(roundDurationMinutes(null), null);
 });
 
+test('ru date-time adds Moscow time unless midnight', () => {
+  assert.equal(formatRuDateTime('2026-11-13T08:00:00.000Z'), '13 ноября 2026, 11:00');
+  assert.equal(formatRuDateTime('2026-11-13T21:00:00.000Z'), '14 ноября 2026');
+  assert.equal(formatRuDateTime(null), null);
+});
+
+test('practical info block lists place, address, date, price', () => {
+  const block = buildPracticalInfoBlock({
+    title: 'X',
+    city: 'Химки',
+    venue: 'Клуб «Факел»',
+    venueAddress: 'ул. Победы, 3',
+    nextSession: '2026-11-13T14:00:00.000Z',
+    futureSessions: 3,
+    durationMin: 120,
+    priceFromRub: 1500,
+    ageLimit: '16',
+  });
+  assert.match(block, /^## Практическая информация\n\n- /);
+  assert.match(block, /- Место - .*Химки/);
+  assert.match(block, /- Адрес - ул\. Победы, 3/);
+  assert.match(block, /- Ближайшая дата - 13 ноября 2026, 17:00 \(всего 3 сеанса\)/);
+  assert.match(block, /- Продолжительность - около 120 минут/);
+  assert.match(block, /- Возрастное ограничение - 16\+/);
+  assert.match(block, /- Билеты - от 1 500 ₽/);
+  assert.doesNotMatch(block, /[\u2013\u2014\u2212]/);
+  assert.equal(buildPracticalInfoBlock({ title: 'X' }), '');
+});
+
 test('minimal description is factual, structured and renders to h3/ul/p', () => {
   const text = buildMinimalEventDescription({
     title: 'Айвазовский. Ожившие полотна',
@@ -55,7 +110,7 @@ test('minimal description is factual, structured and renders to h3/ul/p', () => 
   });
   assert.match(text, /«Айвазовский\. Ожившие полотна»/);
   assert.match(text, /## Практическая информация/);
-  assert.match(text, /- Ближайшая дата - 11 декабря 2026 \(всего 6 сеансов\)/);
+  assert.match(text, /- Ближайшая дата - 11 декабря 2026, 13:00 \(всего 6 сеансов\)/);
   assert.match(text, /- Продолжительность - около 65 минут/);
   assert.match(text, /- Билеты - от 500 ₽/);
   assert.doesNotMatch(text, /Возрастное ограничение/);
@@ -66,9 +121,11 @@ test('minimal description is factual, structured and renders to h3/ul/p', () => 
 
   const html = formatEventDescriptionHtml(text);
   assert.match(html, /<h3>Практическая информация<\/h3>/);
-  assert.match(html, /<ul><li>Ближайшая дата/);
+  assert.match(html, /<ul><li>Место/);
+  assert.match(html, /<li>Ближайшая дата/);
   assert.match(html, /<p>/);
   assert.doesNotMatch(html, /##/);
+  assert.doesNotMatch(html, /<h3>Билеты продаются онлайн/);
 });
 
 test('variants differ in opener so grouped cards are not identical', () => {

@@ -75,19 +75,36 @@ const CITY_PREPOSITIONAL: Record<string, string> = {
   тольятти: 'Тольятти',
   батуми: 'Батуми',
   сухум: 'Сухуме',
+  // Plural / indeclinable forms fixed during the live audit (2026-10-11):
+  химки: 'Химках',
+  мытищи: 'Мытищах',
+  'набережные челны': 'Набережных Челнах',
+  балтаси: 'Балтасях',
+  рославль: 'Рославле',
+  севастополь: 'Севастополе',
+  раменское: 'Раменском',
+  тбилиси: 'Тбилиси',
+  дели: 'Дели',
+  кемерово: 'Кемерове',
+  самара: 'Самаре',
 };
+
+/** Cities that take the "во" preposition ("во Владивостоке"). */
+const CITY_VO_PREPOSITION = new Set(['владивосток', 'владимир']);
 
 function declinePart(part: string): string {
   const lower = part.toLowerCase();
   if (CITY_PREPOSITIONAL[lower]) return CITY_PREPOSITIONAL[lower];
-  if (/[оеуиэю]$/u.test(lower)) return part; // Сочи, Токио, Батуми
+  if (/[оеуэю]$/u.test(lower)) return part; // Сочи, Токио, Батуми
   if (/[ая]$/u.test(lower)) return `${part.slice(0, -1)}е`; // Самара -> Самаре, Сортавала -> Сортавале
   if (/ск$/u.test(lower)) return `${part}е`; // Бийск -> Бийске
   if (/(бург|град|ов|ев|ин)$/u.test(lower)) return `${part}е`; // Саратов -> Саратове
+  if (/ль$/u.test(lower)) return `${part.slice(0, -1)}е`; // Рославль -> Рославле, Ярославль -> Ярославле
+  if (/ец$/u.test(lower)) return `${part.slice(0, -2)}це`; // Череповец -> Череповце
   if (/ь$/u.test(lower)) return `${part.slice(0, -1)}и`; // Казань -> Казани
   if (/ий$/u.test(lower)) return `${part.slice(0, -2)}ем`; // Нижний -> Нижнем
   if (/ый$/u.test(lower)) return `${part.slice(0, -2)}ом`;
-  if (/ы$/u.test(lower)) return `${part.slice(0, -1)}ах`; // Апатиты -> Апатитах, Чебоксары -> Чебоксарах
+  if (/[ыи]$/u.test(lower)) return `${part.slice(0, -1)}ах`; // Апатиты -> Апатитах, Химки -> Химках
   return `${part}е`;
 }
 
@@ -109,6 +126,13 @@ export function cityPrepositional(city: string): string {
   return `${declinedHead}${tail}`;
 }
 
+
+export function cityInPhrase(city: string): string {
+  const name = String(city || '').trim();
+  if (!name) return '';
+  const preposition = CITY_VO_PREPOSITION.has(name.toLowerCase()) ? 'во' : 'в';
+  return `${preposition} ${cityPrepositional(name)}`;
+}
 
 export function describeFormat(input: MinimalDescriptionInput): string {
   const haystack = `${input.category || ''} ${input.subcategory || ''} ${input.title || ''}`;
@@ -149,9 +173,76 @@ const OPENERS = [
   (titleQuoted: string, format: string, place: string) => `${format.charAt(0).toUpperCase()}${format.slice(1)} ${titleQuoted} ждет зрителей${place}.`,
 ];
 
-/** Wrap in «guillemets» unless the provider already quoted the name. */
+/** Wrap in «guillemets» unless the name already carries quotes. */
 function quoteName(value: string): string {
-  return /^[«"']/u.test(value) ? value : `«${value}»`;
+  return /[«"']/u.test(value) ? value : `«${value}»`;
+}
+
+/** Date + Moscow time ("20 ноября 2026, 19:00"); time omitted at midnight. */
+export function formatRuDateTime(value: string | Date | null | undefined): string | null {
+  const base = formatRuDate(value);
+  if (!base || !value) return base;
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return base;
+  const parts = new Intl.DateTimeFormat('ru-RU', {
+    timeZone: 'Europe/Moscow',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).formatToParts(date);
+  const get = (type: string) => parts.find((p) => p.type === type)?.value;
+  const hour = get('hour');
+  const minute = get('minute');
+  if (!hour || !minute) return base;
+  const normalizedHour = hour === '24' ? '00' : hour;
+  if (normalizedHour === '00' && minute === '00') return base;
+  return `${base}, ${normalizedHour}:${minute}`;
+}
+
+/** Russian plural: 1 сеанс / 2 сеанса / 5 сеансов. */
+export function pluralizeRu(n: number, one: string, few: string, many: string): string {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return `${n} ${one}`;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return `${n} ${few}`;
+  return `${n} ${many}`;
+}
+
+/**
+ * Canonical "## Практическая информация" fact block: place, address, next
+ * session, duration, age, price. Built only from catalogue fields; returns an
+ * empty string when there is nothing factual to show.
+ */
+export function buildPracticalInfoBlock(input: MinimalDescriptionInput): string {
+  const city = normalizeUserFacingCopy(String(input.city || '').trim());
+  const venue = normalizeUserFacingCopy(String(input.venue || '').trim());
+  const address = normalizeUserFacingCopy(String(input.venueAddress || '').trim());
+  const facts: string[] = [];
+
+  const place: string[] = [];
+  if (venue) place.push(quoteName(venue));
+  if (city) place.push(city);
+  if (place.length) facts.push(`Место - ${place.join(', ')}`);
+  if (address) facts.push(`Адрес - ${address}`);
+
+  const next = formatRuDateTime(input.nextSession);
+  if (next) {
+    const sessions = Number(input.futureSessions || 0);
+    facts.push(sessions > 1 ? `Ближайшая дата - ${next} (всего ${pluralizeRu(sessions, 'сеанс', 'сеанса', 'сеансов')})` : `Ближайшая дата - ${next}`);
+  }
+  const duration = roundDurationMinutes(input.durationMin);
+  if (duration) facts.push(`Продолжительность - около ${duration} минут`);
+  const age = String(input.ageLimit || '').trim();
+  if (age && age !== '0') facts.push(`Возрастное ограничение - ${age}+`);
+  // Project canon: prices below MIN_DISPLAY_PRICE_RUB (100 ₽) are not shown.
+  const price = Number(input.priceFromRub || 0);
+  if (price >= 100) {
+    const formatted = price.toLocaleString('ru-RU').replace(/\u00A0/g, ' ');
+    facts.push(`Билеты - от ${formatted} ₽`);
+  }
+
+  if (!facts.length) return '';
+  return ['## Практическая информация', '', ...facts.map((fact) => `- ${fact}`)].join('\n');
 }
 
 export function buildMinimalEventDescription(input: MinimalDescriptionInput, variant = 0): string {
@@ -163,35 +254,17 @@ export function buildMinimalEventDescription(input: MinimalDescriptionInput, var
   const venue = normalizeUserFacingCopy(String(input.venue || '').trim());
   const titleHasCity = city && title.toLowerCase().includes(city.toLowerCase());
   const placeParts: string[] = [];
-  if (city && !titleHasCity) placeParts.push(`в ${cityPrepositional(city)}`);
+  if (city && !titleHasCity) placeParts.push(cityInPhrase(city));
   if (venue && venue.toLowerCase() !== city.toLowerCase()) placeParts.push(`на площадке ${quoteName(venue)}`);
   const place = placeParts.length ? ` ${placeParts.join(', ')}` : '';
 
   const opener = OPENERS[Math.abs(variant) % OPENERS.length];
   const paragraphs: string[] = [opener(quoteName(title), format, place)];
 
-  const address = normalizeUserFacingCopy(String(input.venueAddress || '').trim());
-  if (address) paragraphs.push(`Адрес: ${address}.`);
-
-  const facts: string[] = [];
-  const next = formatRuDate(input.nextSession);
-  const sessions = Number(input.futureSessions || 0);
-  if (next) {
-    facts.push(sessions > 1 ? `Ближайшая дата - ${next} (всего ${sessions} сеансов)` : `Ближайшая дата - ${next}`);
-  }
-  const duration = roundDurationMinutes(input.durationMin);
-  if (duration) facts.push(`Продолжительность - около ${duration} минут`);
-  const age = String(input.ageLimit || '').trim();
-  if (age && age !== '0') facts.push(`Возрастное ограничение - ${age}+`);
-  // Project canon: prices below MIN_DISPLAY_PRICE_RUB (100 ₽) are not shown.
-  const price = Number(input.priceFromRub || 0);
-  if (price >= 100) facts.push(`Билеты - от ${price} ₽`);
-
   const sections: string[] = [];
-  if (facts.length) {
-    sections.push(['## Практическая информация', '', ...facts.map((fact) => `- ${fact}`)].join('\n'));
-  }
-  sections.push('Билеты продаются онлайн: оплата на сайте, электронный билет приходит на почту.');
+  const factBlock = buildPracticalInfoBlock(input);
+  if (factBlock) sections.push(factBlock);
+  sections.push('Билеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.');
 
   return [paragraphs.join(' '), ...sections].join('\n\n').trim();
 }
