@@ -41,7 +41,6 @@ export const LANDING_SLUG_TO_CATEGORY: Record<string, PodborkiCategorySlug> = {
   'moscow-city-day': 'seasonal',
   'family-kids': 'for-whom',
   'river-party': 'for-whom',
-  'active-sport': 'for-whom',
   'river-cruises': 'by-type',
   'bus-tours': 'by-type',
   'walking-tours': 'by-type',

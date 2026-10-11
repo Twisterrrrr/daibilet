@@ -102,7 +102,7 @@ import {
 import { busCityGuide } from '@/data/bus-landings';
 import { dinnerCityGuide, type DinnerPier, type DinnerMealFormat } from '@/data/dinner-landings';
 import { formatMoney, formatMoneyRange, formatLandingBuyPrice, formatNumber, pluralEvents, pluralRu, PLURAL_DINNER_FORMS, PLURAL_EVENT_FORMS, PLURAL_NIGHT_TRIP_FORMS, PLURAL_PROGRAM_FORMS, PLURAL_TOUR_FORMS, PLURAL_TRIP_FORMS, PLURAL_WALK_FORMS } from '@/lib/format';
-import { LANDING_REVIEWS_ENABLED } from '@/lib/landing-features';
+import { LANDING_REVIEWS_ENABLED, isLandingInSelection } from '@/lib/landing-features';
 import {
   collectSessionStartsAtTimes,
   getSessionHour,
@@ -3634,6 +3634,7 @@ function RelatedLandings({
   stats: PublicLandingPageDto['stats'];
   citySlug?: string;
 }) {
+  const visibleLandings = landings.filter((item) => isLandingInSelection(item.slug));
   const cityEntries = Object.entries(stats.cities).sort((a, b) => b[1] - a[1]);
   const citySlugByName = Object.fromEntries(
     Object.entries(LANDING_CITY_SLUGS).map(([slugKey, name]) => [name, normalizeCitySlug(slugKey) || slugKey]),
@@ -3659,11 +3660,11 @@ function RelatedLandings({
         </section>
       ) : null}
 
-      {landings.length ? (
+      {visibleLandings.length ? (
         <section>
           <h3 className="text-lg font-bold text-slate-950">Похожие подборки</h3>
           <div className="mt-4 grid gap-2 sm:grid-cols-2">
-            {landings.slice(0, 6).map((item) => (
+            {visibleLandings.slice(0, 6).map((item) => (
               <a key={item.slug} href={landingPageHref(item.slug)} className="rounded-xl border border-slate-200 bg-white p-4 transition hover:border-primary-200 hover:shadow-sm">
                 <div className="text-sm font-semibold text-slate-950">{item.title}</div>
                 <div className="mt-1 text-xs text-slate-500">

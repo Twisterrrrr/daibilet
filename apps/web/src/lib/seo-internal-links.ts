@@ -28,7 +28,6 @@ export const LANDING_BREADCRUMB_LABELS: Record<string, string> = {
   standup: 'Стендап и юмор',
   'family-kids': 'Детям и семьям',
   'concerts-genre': 'Концерты',
-  'active-sport': 'Активный отдых',
   'walking-tours': 'Пешие экскурсии',
   'country-tours': 'Загородные экскурсии',
   exhibitions: 'Выставки и музеи',
@@ -62,7 +61,6 @@ const EVENT_LANDING_PRIORITY: string[] = [
   'unusual-theatres',
   'concerts-genre',
   'family-kids',
-  'active-sport',
   'moscow-museums',
   'excursions',
   'new-year',
@@ -455,7 +453,6 @@ export function resolveRelatedLandingCardTargets(
     'exhibitions',
     'family-kids',
     'bus-tours',
-    'active-sport',
     'unusual-theatres',
   ];
   for (const relatedSlug of fallbackLandings) {

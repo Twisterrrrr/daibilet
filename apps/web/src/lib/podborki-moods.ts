@@ -72,7 +72,6 @@ export const PODBORKI_MOOD_SLUGS: Record<PodborkiMoodId, readonly string[]> = {
     'standup',
     'concerts-genre',
     'river-party',
-    'active-sport',
     'rooftops',
     'unusual-theatres',
     'bus-tours',
@@ -122,7 +121,6 @@ export const PODBORKI_TAG_SLUGS: Record<
     'rooftops',
     'bridges-night',
     'walking-tours',
-    'active-sport',
   ],
 };
 

@@ -2,6 +2,7 @@ import { unstable_cache } from 'next/cache';
 
 import '@/lib/env';
 import { prisma } from '@/lib/db';
+import { isLandingInSelection } from '@/lib/landing-features';
 import type {
   PublicDestinationDto,
   PublicLandingDto,
@@ -87,13 +88,17 @@ export const getCachedPodborkiMeta = unstable_cache(loadPodborkiMeta, ['podborki
 export async function getCachedLandingsCatalog(city = 'all') {
   const key = city && city !== 'all' ? city : 'all';
   const cached = unstable_cache(
-    () => {
+    async () => {
       const params = new URLSearchParams();
       if (key !== 'all') params.set('city', key);
-      return fetchPublicApiJson<PublicLandingsCatalogPayload>('/api/public/landings-catalog', {
+      const payload = await fetchPublicApiJson<PublicLandingsCatalogPayload>('/api/public/landings-catalog', {
         searchParams: params,
         timeoutMs: 4_000,
       });
+      return {
+        ...payload,
+        items: (payload.items || []).filter((item) => isLandingInSelection(item.slug)),
+      };
     },
     ['public-landings-catalog-v2-http', key],
     surfaceCacheOptions,

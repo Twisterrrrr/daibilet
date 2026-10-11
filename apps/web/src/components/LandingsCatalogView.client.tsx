@@ -13,6 +13,7 @@ import { LandingDirectionCard } from '@/components/LandingDirectionCard.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { formatNumber, formatPriceFrom, pluralEvents } from '@/lib/format';
 import { resolveLandingCardImage } from '@/lib/landing-images';
+import { isLandingInSelection } from '@/lib/landing-features';
 import {
   landingCategoryHref,
   landingMatchesCatalogCity,
@@ -182,7 +183,9 @@ export function LandingsCatalogView({
         ) => {
           if (!payload?.items) return;
           const metaBySlug = new Map(initialItems.map((item) => [item.slug, item]));
-          const mapped: PodborkiCatalogItem[] = payload.items.map((item) => {
+          const mapped: PodborkiCatalogItem[] = payload.items
+            .filter((item) => isLandingInSelection(item.slug))
+            .map((item) => {
             const meta = metaBySlug.get(item.slug);
             return {
               slug: item.slug,

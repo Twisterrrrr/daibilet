@@ -20,7 +20,6 @@ const BENTO_NARROW_SLUGS = new Set<string>([
   'standup',
   'planetarium',
   'unusual-theatres',
-  'active-sport',
   'rooftops',
   'concerts-genre',
   'river-party',
