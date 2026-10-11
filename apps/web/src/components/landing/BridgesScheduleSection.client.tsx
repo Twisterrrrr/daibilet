@@ -26,6 +26,7 @@ import {
   type BridgesRouteKind,
 } from '@/lib/bridges-session-utils';
 import { parseSessionStartsAt, resolveSessionDate, resolveSessionTime } from '@/lib/datetime';
+import { collectScheduleTimeChips } from '@/lib/landing-time-chips';
 import { eventHref } from '@/lib/routes';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 
@@ -112,7 +113,7 @@ function BridgesCruiseCard({
   const soldOut = typeof vacant === 'number' && vacant <= 0;
   const urgent = typeof vacant === 'number' && vacant > 0 && vacant <= 50;
   const ship = resolveShipLabel(session);
-  const timeChips = collectBridgesTimeChips(group);
+  const timeChips = collectScheduleTimeChips(group.sessions);
   const href = eventHref(session);
   const buyClass =
     'inline-flex items-center gap-2 rounded-full bridges-cta-gradient px-5 py-2.5 text-sm font-semibold text-white transition hover:brightness-105';
@@ -334,25 +335,4 @@ export function BridgesScheduleSection({
   );
 }
 
-function collectBridgesTimeChips(group: BridgesEventGroup): Array<{ key: string; label: string }> {
-  const chips: Array<{ key: string; label: string }> = [];
-  const seen = new Set<string>();
-  for (const item of group.sessions) {
-    const slots =
-      item.upcomingSlots && item.upcomingSlots.length
-        ? item.upcomingSlots
-        : item.timeLabel || item.startsAt
-          ? [{ startsAt: item.startsAt, timeLabel: item.timeLabel }]
-          : [];
-    for (const next of slots) {
-      const label = String(next.timeLabel || resolveSessionTime(item, next) || '').trim();
-      if (!label) continue;
-      const key = String(next.startsAt || label);
-      if (seen.has(key)) continue;
-      seen.add(key);
-      chips.push({ key, label });
-      if (chips.length >= 8) return chips;
-    }
-  }
-  return chips;
-}
+

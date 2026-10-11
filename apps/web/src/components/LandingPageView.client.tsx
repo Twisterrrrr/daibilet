@@ -115,6 +115,7 @@ import {
   sessionMatchesTimeSlot,
 } from '@/lib/datetime';
 import { isOpenDate, FLEXIBLE_SCHEDULE_LABEL, isFlexibleScheduleSession, resolveSessionPriceRange } from '@/lib/event-card-meta';
+import { collectScheduleTimeChips } from '@/lib/landing-time-chips';
 import { isBookingPlatformLabel, resolveEventCardLocationLabel } from '@/lib/event-location';
 import { formatShipSecondaryLabel, resolveCruiseDisplayTitle } from '@/lib/cruise-display-title';
 import { formatVacantSeats } from '@/lib/event-page-utils';
@@ -3113,7 +3114,7 @@ function LandingScheduleRow({ group, isOptimal, profile }: { group: EventGroup; 
   const vacant = session.vacant ?? group.vacant;
   const soldOut = typeof vacant === 'number' && vacant <= 0;
   const badges = deriveLandingCardBadges(session);
-  const timeChips = collectScheduleTimeChips(group);
+  const timeChips = collectScheduleTimeChips(group.sessions);
   const isBus = profile === 'bus';
   const cruise = isBus
     ? null
@@ -3284,29 +3285,6 @@ function LandingScheduleRow({ group, isOptimal, profile }: { group: EventGroup; 
       </div>
     </div>
   );
-}
-
-function collectScheduleTimeChips(group: EventGroup): Array<{ key: string; label: string }> {
-  const chips: Array<{ key: string; label: string }> = [];
-  const seen = new Set<string>();
-  for (const item of group.sessions) {
-    const slots =
-      item.upcomingSlots && item.upcomingSlots.length
-        ? item.upcomingSlots
-        : item.timeLabel || item.startsAt
-          ? [{ startsAt: item.startsAt, timeLabel: item.timeLabel }]
-          : [];
-    for (const next of slots) {
-      const label = String(next.timeLabel || resolveSessionTime(item, next) || '').trim();
-      if (!label) continue;
-      const key = String(next.startsAt || label);
-      if (seen.has(key)) continue;
-      seen.add(key);
-      chips.push({ key, label });
-      if (chips.length >= 8) return chips;
-    }
-  }
-  return chips;
 }
 
 function extractDurationTag(tags: string[]): string | null {
