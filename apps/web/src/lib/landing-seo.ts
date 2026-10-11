@@ -400,7 +400,7 @@ export function resolveLandingSeo(input: LandingSeoInput): LandingSeo {
     lead,
     short,
     'афиша, цены и билеты',
-    `Актуальная афиша «${stripCityFromLandingTopic(rawTopic, cityName)}»${cityName ? ` в ${cityToPrepositional(cityName)}` : ''} на сегодня. ` +
+    `Актуальная афиша «${stripCityFromLandingTopic(rawTopic, cityName)}»${cityName ? ` в ${cityToPrepositional(cityName)}` : ''}${useTodayWord ? ' на сегодня' : ''}. ` +
       eventsPhrase(events, defaults.countUnit) +
       pricePhrase(priceFrom) +
       `${defaults.extras}. Покупайте онлайн на Дайбилет!`,
