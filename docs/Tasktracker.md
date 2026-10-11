@@ -3143,6 +3143,8 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | 2026-07-11 | F3 cutover prod, Codex cherry-pick |
 | 2026-07-10 | F2 SSR complete, staging Next |
 | 2026-10-11 | Описания: массовый реформат 32 370 текущих событий → EventOverride (`event-description-reformat.ts` + `format-current-event-descriptions.js`: H3/абзацы/списки, тире→дефис, идемпотентно; 12 unit-тестов, web 1033 ✅) |
+| 2026-10-11 | Описания волна 3: абзацы по 3-5 предложений (33 883 перепрогон), H3 «В программе» для лайн-апа, hero без дубля категории, чистка категорий билетов, тестовые события скрыты, мусорные цены исправлены, уникализация остатка (6 926) ✅ |
+| 2026-10-11 | Сети-клоны (24 686 карточек, 64 кластера): инструмент canonical+noindex готов (`apply-network-canonical.mjs`) ⏳ решение owner |
 | 2026-10-11 | Описания, этап 2: рерайт 54 кластеров (597 карточек) + минимальные описания для 1 656 пустых (`apply-event-description-rewrites.js` + факт-блок; данные в `scripts/data/*-2026-10-11.json`); дубли 34 184→31 591 карточка; follow-up: merge/noindex для сетей-клонов |
 
 ## Google Search Console verification
