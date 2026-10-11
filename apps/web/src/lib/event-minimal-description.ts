@@ -10,6 +10,8 @@
  * - `## Заголовок` (rendered as H3), `- item` lists, blank-line paragraphs.
  */
 
+import { normalizeUserFacingCopy } from './event-description-format.ts';
+
 export type MinimalDescriptionInput = {
   title: string;
   city?: string | null;
@@ -78,13 +80,14 @@ const CITY_PREPOSITIONAL: Record<string, string> = {
 function declinePart(part: string): string {
   const lower = part.toLowerCase();
   if (CITY_PREPOSITIONAL[lower]) return CITY_PREPOSITIONAL[lower];
-  if (/[оеыуиэю]$/u.test(lower)) return part; // Сочи, Токио, Батуми
+  if (/[оеуиэю]$/u.test(lower)) return part; // Сочи, Токио, Батуми
   if (/[ая]$/u.test(lower)) return `${part.slice(0, -1)}е`; // Самара -> Самаре, Сортавала -> Сортавале
   if (/ск$/u.test(lower)) return `${part}е`; // Бийск -> Бийске
   if (/(бург|град|ов|ев|ин)$/u.test(lower)) return `${part}е`; // Саратов -> Саратове
   if (/ь$/u.test(lower)) return `${part.slice(0, -1)}и`; // Казань -> Казани
   if (/ий$/u.test(lower)) return `${part.slice(0, -2)}ем`; // Нижний -> Нижнем
   if (/ый$/u.test(lower)) return `${part.slice(0, -2)}ом`;
+  if (/ы$/u.test(lower)) return `${part.slice(0, -1)}ах`; // Апатиты -> Апатитах, Чебоксары -> Чебоксарах
   return `${part}е`;
 }
 
@@ -93,11 +96,17 @@ export function cityPrepositional(city: string): string {
   if (!name) return '';
   const direct = CITY_PREPOSITIONAL[name.toLowerCase()];
   if (direct) return direct;
+  // Provider cities often carry a region in parentheses: "Киров (Кировская
+  // область)". Decline the head only; the parenthetical stays untouched.
+  const parenIndex = name.indexOf('(');
+  const head = parenIndex > 0 ? name.slice(0, parenIndex).trim() : name;
+  const tail = parenIndex > 0 ? name.slice(parenIndex - 1).replace(/\s+$/, '') : '';
   // Multi-word / hyphenated: decline every part (Нижний Новгород -> Нижнем Новгороде).
-  return name
+  const declinedHead = head
     .split(/(\s+|-)/)
     .map((chunk) => (/^(\s+|-)$/.test(chunk) ? chunk : declinePart(chunk)))
     .join('');
+  return `${declinedHead}${tail}`;
 }
 
 
@@ -134,29 +143,34 @@ export function roundDurationMinutes(minutes: number | null | undefined): number
 }
 
 const OPENERS = [
-  (title: string, format: string, place: string) => `«${title}» - ${format}${place}.`,
-  (title: string, format: string, place: string) => `${format.charAt(0).toUpperCase()}${format.slice(1)} «${title}»${place}.`,
-  (title: string, format: string, place: string) => `${format.charAt(0).toUpperCase()}${format.slice(1)} «${title}»${place} - билеты продаются онлайн.`,
-  (title: string, format: string, place: string) => `${format.charAt(0).toUpperCase()}${format.slice(1)} «${title}» ждет зрителей${place}.`,
+  (titleQuoted: string, format: string, place: string) => `${titleQuoted} - ${format}${place}.`,
+  (titleQuoted: string, format: string, place: string) => `${format.charAt(0).toUpperCase()}${format.slice(1)} ${titleQuoted}${place}.`,
+  (titleQuoted: string, format: string, place: string) => `${format.charAt(0).toUpperCase()}${format.slice(1)} ${titleQuoted}${place} - билеты продаются онлайн.`,
+  (titleQuoted: string, format: string, place: string) => `${format.charAt(0).toUpperCase()}${format.slice(1)} ${titleQuoted} ждет зрителей${place}.`,
 ];
 
+/** Wrap in «guillemets» unless the provider already quoted the name. */
+function quoteName(value: string): string {
+  return /^[«"']/u.test(value) ? value : `«${value}»`;
+}
+
 export function buildMinimalEventDescription(input: MinimalDescriptionInput, variant = 0): string {
-  const title = String(input.title || '').trim();
+  const title = normalizeUserFacingCopy(String(input.title || '').trim());
   if (!title) return '';
 
   const format = describeFormat(input);
-  const city = String(input.city || '').trim();
-  const venue = String(input.venue || '').trim();
+  const city = normalizeUserFacingCopy(String(input.city || '').trim());
+  const venue = normalizeUserFacingCopy(String(input.venue || '').trim());
   const titleHasCity = city && title.toLowerCase().includes(city.toLowerCase());
   const placeParts: string[] = [];
   if (city && !titleHasCity) placeParts.push(`в ${cityPrepositional(city)}`);
-  if (venue && venue.toLowerCase() !== city.toLowerCase()) placeParts.push(`на площадке «${venue}»`);
+  if (venue && venue.toLowerCase() !== city.toLowerCase()) placeParts.push(`на площадке ${quoteName(venue)}`);
   const place = placeParts.length ? ` ${placeParts.join(', ')}` : '';
 
   const opener = OPENERS[Math.abs(variant) % OPENERS.length];
-  const paragraphs: string[] = [opener(title, format, place)];
+  const paragraphs: string[] = [opener(quoteName(title), format, place)];
 
-  const address = String(input.venueAddress || '').trim();
+  const address = normalizeUserFacingCopy(String(input.venueAddress || '').trim());
   if (address) paragraphs.push(`Адрес: ${address}.`);
 
   const facts: string[] = [];

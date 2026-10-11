@@ -262,7 +262,7 @@ export function parseAttentionLine(line: string): { body: string } | null {
   return body ? { body } : null;
 }
 
-function normalizeUserFacingCopy(text: string): string {
+export function normalizeUserFacingCopy(text: string): string {
   return String(text || '')
     .replace(/[\u2013\u2014\u2212–—]/g, '-')
     .replace(/\s+-\s+/g, ' - ');

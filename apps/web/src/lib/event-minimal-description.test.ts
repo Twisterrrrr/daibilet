@@ -20,6 +20,9 @@ test('city prepositional case', () => {
   assert.equal(cityPrepositional('Казань'), 'Казани');
   assert.equal(cityPrepositional('Нижний Новгород'), 'Нижнем Новгороде');
   assert.equal(cityPrepositional('Петропавловск-Камчатский'), 'Петропавловске-Камчатском');
+  assert.equal(cityPrepositional('Апатиты'), 'Апатитах');
+  assert.equal(cityPrepositional('Чебоксары'), 'Чебоксарах');
+  assert.equal(cityPrepositional('Киров (Кировская область)'), 'Кирове (Кировская область)');
 });
 
 test('format detection uses category, subcategory and title', () => {
@@ -86,6 +89,28 @@ test('title already containing the city is not duplicated; sub-100 prices hidden
   assert.doesNotMatch(text, /в Бийске/);
   assert.doesNotMatch(text, /Билеты - от 12/);
   assert.match(text, /Цирк шапито/);
+});
+
+test('provider dashes in title/venue collapse to a hyphen', () => {
+  const text = buildMinimalEventDescription({
+    title: 'Республика Фиуме — Концерт',
+    city: 'Москва',
+    venue: 'Клуб «Правда» – основная сцена',
+    venueAddress: 'Москва, ул. Пример, 2',
+  });
+  assert.doesNotMatch(text, /[\u2013\u2014\u2212]/);
+  assert.match(text, /Республика Фиуме - Концерт/);
+  assert.match(text, /основная сцена/);
+});
+
+test('pre-quoted titles and venues are not double-quoted', () => {
+  const text = buildMinimalEventDescription({
+    title: '«Свои да Наши»',
+    city: 'Кострома',
+    venue: '«Свои да Наши»',
+  });
+  assert.doesNotMatch(text, /««/);
+  assert.match(text, /«Свои да Наши»/);
 });
 
 test('empty title produces empty output', () => {
