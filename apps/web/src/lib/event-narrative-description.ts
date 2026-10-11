@@ -18,6 +18,10 @@ export type NarrativeInput = {
   kind?: string | null;
   ageLimit?: string | null;
   futureSessions?: number | null;
+  /** Venue name - extra signal for kind detection. */
+  venue?: string | null;
+  /** Next session start - used for the "day/time" modifier. */
+  nextSession?: string | Date | null;
 };
 
 export type NarrativeKind =
@@ -37,24 +41,26 @@ export type NarrativeKind =
   | 'sport'
   | 'generic';
 
-/** Detect the narrative kind from catalogue fields (order matters). */
+/** Detect the narrative kind from catalogue fields (title/category first, then venue). */
 export function detectNarrativeKind(input: NarrativeInput): NarrativeKind {
   const haystack = `${input.title || ''} ${input.category || ''} ${input.subcategory || ''}`.toLowerCase();
+  const venue = String(input.venue || '').toLowerCase();
   const has = (re: RegExp) => re.test(haystack);
-  if (has(/стендап|стенд-ап|stand.?up|юмор|комик/iu)) return 'standup';
+  const venueHas = (re: RegExp) => venue.length > 0 && re.test(venue);
+  if (has(/стендап|стенд-ап|stand.?up|юмор|комик/iu) || venueHas(/стендап|stand.?up/iu)) return 'standup';
   if (has(/квиз|викторин|мозгобойн|интеллектуальн\w*\s+игр/iu)) return 'quiz';
-  if (has(/квест/iu)) return 'quest';
+  if (has(/квест/iu) || venueHas(/квест.?рум|лазертаг|картинг|боулинг/iu)) return 'quest';
   if (has(/фестивал/iu)) return 'festival';
-  if (has(/мастер-?класс|воркшоп|рисуем|лепим|созда\w*\s+сво|скетч|каллиграф|роспис/iu)) return 'workshop';
-  if (has(/лекц|лектори|семинар|разговор|встреча с|научпоп|научно-популярн/iu)) return 'lecture';
-  if (has(/спектакл|театр|постановк|мюзикл|опера|балет|перформанс|трагикомед|драм/iu)) return 'theatre';
-  if (has(/выставк|экспозиц|музе|галере|арт-пространств|арт-центр|полотн|живопис/iu)) return 'exhibition';
-  if (has(/теплоход|катер|речн|круиз|водн|на борту|прогулк\w*\s+по\s+(?:реке|рекам|воде|каналу|каналам)/iu)) return 'water';
+  if (has(/мастер-?класс|воркшоп|рисуем|лепим|созда\w*\s+сво|скетч|каллиграф|роспис/iu) || venueHas(/мастерская|студи|арт.?студи/iu)) return 'workshop';
+  if (has(/лекц|лектори|семинар|разговор|встреча с|научпоп|научно-популярн/iu) || venueHas(/планетари|обсерватори|библиотек|лектори/iu)) return 'lecture';
+  if (has(/спектакл|театр|постановк|мюзикл|опера|балет|перформанс|трагикомед|драм/iu) || venueHas(/театр|тюз|оперн|драматическ/iu)) return 'theatre';
+  if (has(/выставк|экспозиц|музе|галере|арт-пространств|арт-центр|полотн|живопис/iu) || venueHas(/музей|галере|арт.?пространств|выставочн|центр искусств|арт.?центр/iu)) return 'exhibition';
+  if (has(/теплоход|катер|речн|круиз|водн|на борту|прогулк\w*\s+по\s+(?:реке|рекам|воде|каналу|каналам)/iu) || venueHas(/причал|пристан|теплоход|катер|яхт|круиз/iu)) return 'water';
   if (has(/экскурс|автобусн|прогулк|пешеходн|маршрут/iu)) return 'walk';
   if (has(/вечеринк|дискотек|пати|party|рейв|танцпол|dance/iu)) return 'party';
-  if (has(/шоу|цирк|иллюзи|лазерн|ледов|светов\w*\s+шоу/iu)) return 'show';
-  if (has(/матч|турнир|чемпионат|финал|игр[аы]\s+с|спорт|забег|йог/iu)) return 'sport';
-  if (has(/концерт|филармони|оркестр|ансамбл|джаз|рок|блюз|трибьют|акустик|саксофон|фортепиан|вокал|хиты|песни/iu)) return 'concert';
+  if (has(/шоу|цирк|иллюзи|лазерн|ледов|светов\w*\s+шоу/iu) || venueHas(/цирк|шапито|дельфинари|океанариум/iu)) return 'show';
+  if (has(/матч|турнир|чемпионат|финал|игр[аы]\s+с|спорт|забег|йог/iu) || venueHas(/стадион|арен[аы]|ледов\w*\s+дворец|спорт/iu)) return 'sport';
+  if (has(/концерт|филармони|оркестр|ансамбл|джаз|рок|блюз|трибьют|акустик|саксофон|фортепиан|вокал|хиты|песни/iu) || venueHas(/филармони|консерватор|concert hall|концертный зал|органн|джаз.?клуб|клуб|бар|bar|паб|pub|loft|lounge/iu)) return 'concert';
   return 'generic';
 }
 
@@ -77,7 +83,7 @@ const COPY: Record<NarrativeKind, NarrativeCopy> = {
     details: [
       'Атмосфера концерта сильно отличается от домашнего прослушивания: звук идёт напрямую со сцены, а зал реагирует на каждую композицию.',
       'Такие вечера ценят за настроение: музыка объединяет зал и звучит объёмнее, чем в записи.',
-      'Именно живое исполнение даёт эффект присутствия, ради которого публика и приходит на концерты.',
+      'На концерте музыка звучит без обработки: то, что слышит зал, играется здесь и сейчас.',
       'Программа построена так, чтобы держать внимание: композиции сменяют друг друга, а между ними почти нет пауз.',
       'Живые концерты ценят за честность звучания: слышно каждую партию, а зал добавляет энергии исполнителям.',
       'Свет и звук настроены под программу, поэтому вечер воспринимается цельно - от первой песни до финала.',
@@ -88,7 +94,7 @@ const COPY: Record<NarrativeKind, NarrativeCopy> = {
       'Лучше приехать заранее: перед началом обычно собирается публика, а вход открывают до старта программы.',
       'Хорошо и для тех, кто знает артиста наизусть, и для тех, кто слышит его впервые.',
       'Приходите компанией или вдвоём - концерт одинаково хорошо звучит и в одиночку, и в компании.',
-      'Зал заполняется заранее, поэтому лучше приехать пораньше и без спешки занять место.',
+      'Места занимают заранее: если важно сидеть ближе к сцене, приходите пораньше.',
     ],
   },
   standup: {
@@ -128,9 +134,9 @@ const COPY: Record<NarrativeKind, NarrativeCopy> = {
     ],
     details: [
       'Театр держит внимание за счёт актёрской игры и сценографии: обстановка на сцене помогает поверить в происходящее.',
-      'Такой вечер обычно запоминается атмосферой: свет, музыка и игра актёров работают вместе.',
+      'Всё держится на сцене: свет, музыка и игра актёров работают вместе.',
       'Спектакль удобно смотреть в своём темпе - действие разворачивается постепенно и ведёт историю к развязке.',
-      'Сценография и свет помогают погрузиться: обстановка на сцене создаёт нужное настроение.',
+      'Сценография, свет и музыка работают вместе: детали на сцене поддерживают ход действия.',
       'История раскрывается постепенно, и внимание держится до финальной сцены.',
       'Постановку отличает живая игра: эмоции актёров передаются залу напрямую.',
     ],
@@ -163,7 +169,7 @@ const COPY: Record<NarrativeKind, NarrativeCopy> = {
       'Хороший повод провести вечер с пользой - в одиночку или с кем-то из близких.',
       'Приходите заранее, чтобы спокойно занять удобное место.',
       'Подойдёт и для первого знакомства с темой, и для расширения кругозора.',
-      'Хороший вариант для тех, кто любит узнавать новое без спешки.',
+      'Подойдёт тем, кто любит разбираться в теме в своём темпе.',
     ],
   },
   workshop: {
@@ -202,12 +208,12 @@ const COPY: Record<NarrativeKind, NarrativeCopy> = {
       'Такие пространства любят за тишину и атмосферу: здесь легко переключиться и посмотреть на вещи внимательно.',
       'Работы дополнены подписями и контекстом - даже без экскурсовода понятно, на что смотреть.',
       'Рядом с работами есть пояснения, поэтому контекст понятен без гида.',
-      'Пространство располагает к спокойному осмотру: без спешки и суеты.',
+      'Осмотр идёт в своём ритме: можно задержаться у тех работ, что зацепили.',
     ],
     audience: [
       'Подойдёт и подготовленным зрителям, и тем, кто заходит на выставку впервые.',
       'Хороший вариант для спокойного дня - одному, вдвоём или с семьёй.',
-      'Удобно планировать визит без спешки: осмотр занимает от сорока минут до пары часов.',
+      'Визит легко вписать в день: можно пройтись по залам бегло или задержаться подробнее.',
       'Подойдёт и для спокойного визита, и для прогулки с компанией.',
       'Хороший вариант, если хочется провести время спокойно и с интересом.',
     ],
@@ -301,7 +307,7 @@ const COPY: Record<NarrativeKind, NarrativeCopy> = {
       'Можно прийти с друзьями или присоединиться к тем, с кем познакомитесь на месте.',
       'Дресс-код чаще свободный, но часть площадок просит учитывать формат вечера.',
       'Подойдёт для компании друзей и знакомств.',
-      'Хороший вариант, чтобы отвлечься и зарядиться настроением.',
+      'Хороший вариант, чтобы отвлечься и переключиться.',
     ],
   },
   show: {
@@ -398,25 +404,25 @@ const COPY: Record<NarrativeKind, NarrativeCopy> = {
   },
   generic: {
     opening: [
-      'Это событие из тех, ради которых стоит выйти из дома: живой формат, живая публика и реальные впечатления.',
-      'Формат вечера - живые эмоции: событие проходит вживую, а зрители становятся частью атмосферы.',
-      'Такие события собирают людей, чтобы вместе провести время интересно и содержательно.',
-      'Хороший повод сменить обстановку: событие проходит вживую, а впечатления остаются надолго.',
-      'Формат, в котором время летит незаметно: всё происходит здесь и сейчас, с вниманием к деталям и настроению зала.',
-      'Событие для тех, кто ценит живые впечатления: без экрана и записи - только то, что происходит сейчас.',
+      'Событие проходит на площадке вживую: всё действие разворачивается в одном пространстве вместе со зрителями.',
+      'Формат рассчитан на живой зал: происходящее идёт своим ходом, а зрители смотрят и включаются по ходу.',
+      'Вечер проводят в зале вместе с другими зрителями: программа идёт последовательно, от начала до конца.',
+      'Хороший повод сменить обстановку: вместо экрана - площадка, сцена и другие зрители рядом.',
+      'Программа идёт от начала до конца в одном зале: зрители находятся внутри действия, а не смотрят его со стороны.',
+      'Без экрана и записи: то, что происходит в зале, происходит один раз и только для собравшихся.',
     ],
     details: [
       'Программа рассчитана на широкую аудиторию: специальная подготовка не нужна.',
-      'Впечатления здесь складываются из деталей - обстановки, общения и того, что происходит в зале.',
-      'Хорошее событие оставляет после себя настроение, которым хочется поделиться.',
-      'Обстановка и подача значат не меньше содержания: атмосфера складывается из деталей, которые замечаешь на месте.',
+      'Многое решают детали: обстановка, общение и то, что происходит в зале.',
+      'После таких вечеров обычно есть что обсудить по дороге домой.',
+      'Обстановка и подача значат не меньше содержания: часть деталей замечаешь уже на месте.',
       'Времени хватает, чтобы и включиться в происходящее, и просто отдохнуть: темп комфортный для большинства гостей.',
       'Программа идёт своим ритмом: есть время и на основное действие, и на то, чтобы осмотреться и перевести дух.',
     ],
     audience: [
       'Подойдёт и для компании, и для семейного выхода.',
       'Можно прийти и одному: в зале обычно легко найти своё место и настроение.',
-      'Рекомендуем приехать заранее, чтобы без спешки устроиться на месте.',
+      'Небольшой запас по времени помогает устроиться на месте спокойно.',
       'Подойдёт и опытным гостям, и тем, кто приходит на такое впервые.',
       'Приятный вариант и для компании, и для спокойного вечера вдвоём.',
       'Приходите немного заранее - так спокойнее устроиться и настроиться на вечер.',
@@ -426,9 +432,10 @@ const COPY: Record<NarrativeKind, NarrativeCopy> = {
 };
 
 /**
- * Two human paragraphs for a card whose copy is a technical digest. Only the
+ * One cohesive paragraph for a card whose copy is a technical digest. Only the
  * format is described - never facts. Variant rotates the phrase combinations so
- * neighbouring cards of the same kind do not read identically.
+ * neighbouring cards of the same kind do not read identically. Owner 2026-10-11:
+ * a single paragraph reads better than two stub blocks separated by a gap.
  */
 /** Avalanche mix so neighbouring variants do not correlate across slots. */
 function mix32(value: number): number {
@@ -439,6 +446,65 @@ function mix32(value: number): number {
   h = Math.imul(h, 3266489909);
   h ^= h >>> 16;
   return h >>> 0;
+}
+
+/** Wrap-up phrases that depend on the actual session day/time (new info, not a Prak repeat). */
+const DAY_MODIFIERS: Record<string, string[]> = {
+  weekdayMorning: [
+    'Хороший вариант, чтобы начать день с события.',
+    'Утренний формат: после события весь день ещё впереди.',
+    'Днём в будни проще выбрать время и не торопиться.',
+    'Если свободно утро - это удобный вариант на будний день.',
+  ],
+  weekdayDay: [
+    'Легко вписать в будний день, если вечер занят.',
+    'Днём проще выбрать время и спокойно добраться.',
+    'Хорошо в середине недели: не нужно ждать выходных.',
+    'Дневной формат удобен, если вечер буднего дня занят.',
+  ],
+  weekdayEvening: [
+    'Удобно после рабочего дня: переключиться и отдохнуть.',
+    'Вечер буднего дня - хороший способ разгрузить голову.',
+    'После работы - самое время переключиться.',
+    'Подходит для буднего вечера: не нужно ждать выходных.',
+  ],
+  weekendMorning: [
+    'Хорошо вписывается в выходное утро - день ещё свободен.',
+    'Для выходного утра подходит идеально: день только начинается.',
+    'Выходное утро оставляет весь день в запасе.',
+    'Если хочется начать выходной с события - это ваш вариант.',
+  ],
+  weekendDay: [
+    'Отличный вариант для выходного дня - можно приехать заранее.',
+    'В выходной день проще выделить время и не торопиться.',
+    'Выходной днём - удобно: вечер остаётся свободным.',
+    'Хорошо для выходного: рядом с остальными планами дня.',
+  ],
+  weekendEvening: [
+    'Приятный вариант для выходного вечера.',
+    'Для вечера выходного дня - в самый раз.',
+    'Выходной вечер под это подходит отлично.',
+    'Хорошая идея на вечер выходного дня.',
+  ],
+};
+
+function dayTimeModifier(nextSession: string | Date | null | undefined, variant: number): string | null {
+  if (!nextSession) return null;
+  const date = nextSession instanceof Date ? nextSession : new Date(nextSession);
+  if (Number.isNaN(date.getTime())) return null;
+  const parts = new Intl.DateTimeFormat('ru-RU', {
+    timeZone: 'Europe/Moscow',
+    weekday: 'short',
+    hour: '2-digit',
+    hour12: false,
+  }).formatToParts(date);
+  const weekday = (parts.find((p) => p.type === 'weekday')?.value || '').toLowerCase();
+  const hour = Number(parts.find((p) => p.type === 'hour')?.value || '0');
+  const isWeekend = weekday.startsWith('сб') || weekday.startsWith('вс');
+  const slot = hour < 12 ? 'Morning' : hour < 17 ? 'Day' : 'Evening';
+  const pool = DAY_MODIFIERS[`${isWeekend ? 'weekend' : 'weekday'}${slot}`];
+  if (!pool || !pool.length) return null;
+  return pool[Math.abs(Math.trunc(variant)) % pool.length];
 }
 
 export function buildNarrativeParagraphs(input: NarrativeInput, variant = 0): string[] {
@@ -458,7 +524,9 @@ export function buildNarrativeParagraphs(input: NarrativeInput, variant = 0): st
   const opening = openings[mix32(v + 0x9e3779b9) % openings.length];
   const details = detailsPool[mix32(v + 0x85ebca6b) % detailsPool.length];
   const audience = audiences[mix32(v + 0xc2b2ae35) % audiences.length];
-  return [opening, `${details} ${audience}`];
+  const modifier = dayTimeModifier(input.nextSession, v);
+  const second = modifier ? `${details} ${audience} ${modifier}` : `${details} ${audience}`;
+  return [`${opening} ${second}`];
 }
 
 /** True when the copy already carries a generated narrative paragraph (idempotency guard). */
@@ -466,30 +534,73 @@ export function containsNarrativeParagraph(text: string): boolean {
   return stripNarrativeParagraphs(String(text || '')) !== String(text || '');
 }
 
-const ALL_NARRATIVE_LINES = (() => {
-  const lines = new Set<string>();
+/** Phrase variants retired in earlier rounds - still recognised when stripping stored copy. */
+const LEGACY_NARRATIVE_LINES = [
+  'Зал заполняется заранее, поэтому лучше приехать пораньше и без спешки занять место.',
+  'Хороший вариант для тех, кто любит узнавать новое без спешки.',
+  'Пространство располагает к спокойному осмотру: без спешки и суеты.',
+  'Удобно планировать визит без спешки: осмотр занимает от сорока минут до пары часов.',
+  'Это событие из тех, ради которых стоит выйти из дома: живой формат, живая публика и реальные впечатления.',
+  'Формат вечера - живые эмоции: событие проходит вживую, а зрители становятся частью атмосферы.',
+  'Такие события собирают людей, чтобы вместе провести время интересно и содержательно.',
+  'Хороший повод сменить обстановку: событие проходит вживую, а впечатления остаются надолго.',
+  'Формат, в котором время летит незаметно: всё происходит здесь и сейчас, с вниманием к деталям и настроению зала.',
+  'Событие для тех, кто ценит живые впечатления: без экрана и записи - только то, что происходит сейчас.',
+  'Впечатления здесь складываются из деталей - обстановки, общения и того, что происходит в зале.',
+  'Хорошее событие оставляет после себя настроение, которым хочется поделиться.',
+  'Обстановка и подача значат не меньше содержания: атмосфера складывается из деталей, которые замечаешь на месте.',
+  'Рекомендуем приехать заранее, чтобы без спешки устроиться на месте.',
+  'Днём буднего дня проще выбрать время без суеты.',
+  'Удобно вписать в будний день - без спешки и суеты.',
+  'Для выходного утра подходит идеально: без спешки.',
+  'Выходной днём - удобно и без спешки.',
+  'Такой вечер обычно запоминается атмосферой: свет, музыка и игра актёров работают вместе.',
+  'Сценография и свет помогают погрузиться: обстановка на сцене создаёт нужное настроение.',
+  'Хороший вариант, чтобы отвлечься и зарядиться настроением.',
+  'Хороший вариант, чтобы начать день с впечатления.',
+  'Именно живое исполнение даёт эффект присутствия, ради которого публика и приходит на концерты.',
+];
+
+const NARRATIVE_SENTENCES = (() => {
+  const set = new Set<string>();
+  const add = (line: string) => {
+    const value = line.trim().replace(/\s+/gu, ' ');
+    if (value) set.add(value);
+  };
   for (const copy of Object.values(COPY)) {
-    for (const paragraph of [...copy.opening, ...copy.details, ...copy.audience]) lines.add(paragraph);
+    for (const line of [...copy.opening, ...copy.details, ...copy.audience]) add(line);
   }
-  return [...lines];
+  for (const pool of Object.values(DAY_MODIFIERS)) for (const line of pool) add(line);
+  for (const line of LEGACY_NARRATIVE_LINES) add(line);
+  return set;
 })();
 
-/** Remove previously generated narrative paragraphs (used when the copy now has real text). */
+/**
+ * Remove previously generated narrative wording (used when the copy now has real
+ * text). Sentence level, because the generated paragraph is glued onto the lead
+ * line and shares its block with it.
+ */
 export function stripNarrativeParagraphs(text: string): string {
   const value = String(text || '');
   if (!value) return value;
   const blocks = value.split(/\n{2,}/u);
-  const kept = blocks.filter((block) => {
-    const b = block.trim();
-    if (!b) return true;
-    if (b.startsWith('##')) return true;
-    if (b.startsWith('- ')) return true;
-    for (const line of ALL_NARRATIVE_LINES) {
-      if (b === line) return false;
-      if (b.startsWith(line) && ALL_NARRATIVE_LINES.some((other) => b.endsWith(other))) return false;
+  const kept: string[] = [];
+  for (const block of blocks) {
+    const trimmed = block.trim();
+    if (!trimmed) continue;
+    if (trimmed.startsWith('##') || trimmed.startsWith('- ')) {
+      kept.push(trimmed);
+      continue;
     }
-    return true;
-  });
+    const sentences = trimmed.split(/(?<=[.!?])\s+/u);
+    const rest = sentences.filter((sentence) => !NARRATIVE_SENTENCES.has(sentence.trim().replace(/\s+/gu, ' ')));
+    if (rest.length === sentences.length) {
+      kept.push(trimmed);
+      continue;
+    }
+    const rebuilt = rest.join(' ').trim();
+    if (rebuilt) kept.push(rebuilt);
+  }
   return kept.join('\n\n');
 }
 

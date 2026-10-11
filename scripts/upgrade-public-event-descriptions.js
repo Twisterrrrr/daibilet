@@ -319,9 +319,58 @@ function splitHeadBody(sectionText) {
   return { head: sectionText.trim(), body: '', glued: false };
 }
 
-function writeFileSafe(file, content) {
-  fs.mkdirSync(path.dirname(file), { recursive: true });
-  fs.writeFileSync(file, content, 'utf8');
+/** Series info: how the near-dup group looks as a run of dates/cities. */
+function formatSeriesDate(value) {
+  if (!value) return null;
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return null;
+  const parts = new Intl.DateTimeFormat('ru-RU', { timeZone: 'Europe/Moscow', day: 'numeric', month: 'numeric', year: 'numeric' }).formatToParts(d);
+  const get = (t) => parts.find((p) => p.type === t)?.value;
+  const day = Number(get('day'));
+  const month = Number(get('month'));
+  const year = Number(get('year'));
+  if (!day || !month || !year) return null;
+  return { text: `${day} ${MONTHS[month - 1]}`, year, full: `${day} ${MONTHS[month - 1]} ${year}` };
+}
+
+/** Paragraph about a run of identical-copy cards (series/tour) - new info, no Prak repeats. */
+export function buildSeriesParagraph(info, variant = 0) {
+  if (!info || info.total < 2) return null;
+  const first = formatSeriesDate(info.first);
+  const last = formatSeriesDate(info.last);
+  const v = Math.abs(Math.trunc(stableVariant(String(info.key || '')))) + Math.abs(Math.trunc(variant));
+  const sameYear = first && last ? first.year === last.year : true;
+  const range = first && last
+    ? first === last
+      ? null
+      : `${sameYear ? first.text : first.full} - ${last.full}`
+    : null;
+  const nights = `${info.total} ${pluralRu(info.total, 'вечер', 'вечера', 'вечеров')}`;
+  const dates = `${info.total} ${pluralRu(info.total, 'дата', 'даты', 'дат')}`;
+  const head = info.sameCity
+    ? [
+        `Программа идёт серией: ${nights}${range ? `, с ${range}` : ''}, и это ${info.index}-й из них.`,
+        `Это один из вечеров серии${range ? ` (${range})` : ''}: ${info.index}-й из ${info.total}.`,
+        `Серия вечеров${range ? ` с ${range}` : ''}: это ${info.index}-й из ${nights}.`,
+        `Один вечер из ${info.total}${range ? `, даты с ${range}` : ''}: это ${info.index}-й.`,
+        `Это ${info.index}-й вечер серии${range ? ` (даты с ${range})` : ''}: всего ${nights}.`,
+      ]
+    : [
+        `Программа гастролирует${range ? `: ${nights}, с ${range}` : ''}, и это ${info.index}-й из них.`,
+        `Это гастрольная серия${range ? ` (${range})` : ''}: ${info.index}-я дата из ${dates}.`,
+        `Тур по городам${range ? `, с ${range}` : ''}: это ${info.index}-й из ${nights}.`,
+        `Такая программа проходит в нескольких городах${range ? `, с ${range}` : ''}: это ${info.index}-я остановка тура.`,
+        `Это ${info.index}-й город тура${range ? ` (даты с ${range})` : ''}: всего таких городов ${info.total}.`,
+      ];
+  const tail = [
+    'Удобно, что дат несколько: можно подобрать подходящую.',
+    'Даты повторяются - выбирайте ту, что удобнее.',
+    'Если эта дата не подходит, в серии есть и другие.',
+    'Даты идут одна за другой: есть из чего выбрать.',
+    'Можно сравнить даты и остановиться на удобной.',
+    'Если не успеваете на этот вечер, будет следующий.',
+  ];
+  return `${head[v % head.length]} ${tail[v % tail.length]}`;
 }
 
 /** Stable per-card variant so re-runs keep the same phrasing (list order may shift). */
@@ -330,6 +379,75 @@ export function stableVariant(seed) {
   let h = 7;
   for (let i = 0; i < s.length; i += 1) h = (h * 31 + s.charCodeAt(i)) % 1000003;
   return h;
+}
+
+/** Fingerprint of the provider part (lead + provider sections) for near-dup grouping. */
+export function providerFingerprint(raw) {
+  const providerPart = String(raw || '')
+    .split(/(?=\n##\s)/u)
+    .filter((part) => !/^##\s*(?:Практическая информация|Где и когда|Когда и где)/iu.test(part.replace(/^\n+/u, '')))
+    .join(' ');
+  const text = stripSeriesWording(providerPart)
+    .replace(/Билеты продаются онлайн[\s\S]*$/u, '')
+    .split(/(?<=[.!?])\s+/u)
+    .filter((sentence) => !/\d/u.test(sentence)) // drop fact sentences (dates/prices differ per card)
+    .join(' ')
+    .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{1F1E6}-\u{1F1FF}]/gu, ' ')
+    .toLowerCase()
+    .replace(/[^a-zа-яё0-9]+/giu, '');
+  return text ? crypto.createHash('md5').update(text).digest('hex') : null;
+}
+
+const SERIES_SENTENCE_RES = [
+  /Программа идёт серией/u,
+  /Программа гастролирует/u,
+  /Это один из вечеров серии/u,
+  /Это гастрольная серия/u,
+  /Серия вечеров/u,
+  /Тур по городам/u,
+  /Такая программа проходит в нескольких городах/u,
+  /Один вечер из\s+\d+/u,
+  /Это\s+\d+-й\s+вечер серии/u,
+  /Это\s+\d+-й\s+город тура/u,
+  /Удобно, что дат несколько/u,
+  /Даты повторяются/u,
+  /Даты идут одна за другой/u,
+  /Можно сравнить даты/u,
+  /Если эта дата не подходит/u,
+  /Если не успеваете на этот вечер/u,
+];
+
+/** Drop generated series wording (sentence level) without touching other paragraphs. */
+function stripSeriesWording(text) {
+  let out = String(text || '');
+  for (const prefix of SERIES_SENTENCE_RES) {
+    const re = new RegExp(`(\\s)?(?:${prefix.source})[^.!?]*[.!?]`, 'gu');
+    out = out.replace(re, (match, lead) => (lead ? ' ' : ''));
+  }
+  return out
+    .replace(/[ \t]{2,}/gu, ' ')
+    .replace(/[ \t]+$/gmu, '')
+    .replace(/\n{3,}/gu, '\n\n');
+}
+
+/** Remove a previously generated series sentence. */
+export function stripSeriesParagraph(text) {
+  return stripSeriesWording(text).trim();
+}
+
+/** Russian plural form for a count: 1 вечер, 2 вечера, 5 вечеров. */
+function pluralRu(count, one, few, many) {
+  const mod100 = count % 100;
+  const mod10 = count % 10;
+  if (mod100 >= 11 && mod100 <= 14) return many;
+  if (mod10 === 1) return one;
+  if (mod10 >= 2 && mod10 <= 4) return few;
+  return many;
+}
+
+function writeFileSafe(file, content) {
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, content, 'utf8');
 }
 
 async function main() {
@@ -344,6 +462,57 @@ async function main() {
   const data = JSON.parse(fs.readFileSync(input, 'utf8'));
   const cards = limit > 0 ? data.slice(0, limit) : data;
 
+  // Near-duplicate groups: cards sharing the same provider copy (series / tour dates).
+  // Fingerprint is computed on the *cleaned* provider text so per-card fact cleanup
+  // (prices/dates differ per card) does not split a real run.
+  const cleanForFingerprint = (d) => stripFactSentences(stripDatePhrases(cleanText(stripNarrativeParagraphs(String(d.raw || '')))), d);
+  const fingerprintGroups = new Map();
+  for (const d of cards) {
+    const key = providerFingerprint(cleanForFingerprint(d));
+    if (!key) continue;
+    if (!fingerprintGroups.has(key)) fingerprintGroups.set(key, []);
+    fingerprintGroups.get(key).push(d);
+  }
+  const seriesById = new Map();
+  let seriesCards = 0;
+  const normKey = (s) => String(s || '').toLowerCase().replace(/[^a-zа-яё0-9]+/giu, '');
+  for (const [key, members] of fingerprintGroups) {
+    if (members.length < 2) continue;
+    // inside one fingerprint keep only real runs: same title, or same city+venue
+    const titleCounts = new Map();
+    for (const m of members) titleCounts.set(normKey(m.title), (titleCounts.get(normKey(m.title)) || 0) + 1);
+    const subGroups = new Map();
+    for (const m of members) {
+      const title = normKey(m.title);
+      const subKey = titleCounts.get(title) >= 2 ? `t:${title}` : `p:${normKey(m.city)}|${normKey(m.venue)}`;
+      if (!subGroups.has(subKey)) subGroups.set(subKey, []);
+      subGroups.get(subKey).push(m);
+    }
+    for (const sub of subGroups.values()) {
+      if (sub.length < 2) continue;
+      const sorted = [...sub].sort((a, b) => new Date(a.next_session || 0) - new Date(b.next_session || 0));
+      const dates = sorted.map((m) => m.next_session).filter(Boolean);
+      const sameCity = new Set(sorted.map((m) => String(m.city || ''))).size === 1;
+      // Stable group key (slug set) so the wording variant does not drift when the
+      // provider copy is cleaned between runs.
+      const groupKey = sub
+        .map((m) => String(m.slug || m.id))
+        .sort()
+        .join('|');
+      sorted.forEach((m, idx) => {
+        seriesById.set(m.id, {
+          key: groupKey,
+          index: idx + 1,
+          total: sorted.length,
+          sameCity,
+          first: dates[0] || null,
+          last: dates[dates.length - 1] || null,
+        });
+        seriesCards += 1;
+      });
+    }
+  }
+
   const plan = [];
   const quality = { hasHtml: 0, longDash: 0, stub: 0, pastDate: 0, singleParagraph: 0, tooShort: 0, brokenParenthetical: 0 };
   const marks = {
@@ -357,10 +526,13 @@ async function main() {
     dupFacts: 0,
     narrativeAdded: 0,
     narrativeStripped: 0,
+    narrativeRemovedOnly: 0,
+    seriesAdded: 0,
     sellAdded: 0,
     leadRebuilt: 0,
   };
   const samples = [];
+  const removedOnlySamples = [];
   const textIndex = new Map();
   const htmlCards = [];
   const pastDateCards = [];
@@ -382,7 +554,9 @@ async function main() {
     };
     const caseCtx = { city: d.city, cityInPhrase };
 
-    const { lead, sections } = splitSections(d.raw || '');
+    // Round 9: drop generated series wording from the whole copy first - it may sit
+    // after the provider sections, where the lead-only strip never reached it.
+    const { lead, sections } = splitSections(stripSeriesParagraph(String(d.raw || '')));
     const leadClean = cleanText(lead);
     if (leadClean !== String(lead || '').trim()) marks.stubsRemoved += 1;
 
@@ -435,23 +609,41 @@ async function main() {
     }
 
     const factBlock = buildPracticalInfoBlock(cardInput);
-    const parts = [leadText];
+    const seriesInfo = seriesById.get(d.id) || null;
+    const seriesText = seriesInfo ? buildSeriesParagraph(seriesInfo, stableVariant(d.id)) : null;
+    if (seriesText) marks.seriesAdded += 1;
+
+    let leadBlock = stripSeriesParagraph(leadText);
+    const parts = [leadBlock];
     if (kept.length) parts.push(kept.join('\n\n'));
+    if (seriesText) parts.push(seriesText);
     if (factBlock) parts.push(factBlock);
     let text = cleanText(parts.join('\n\n'));
 
     // Round 5-6: narratives only where the copy has no real description (<200 prose chars).
-    const leadStrippedNarrative = stripNarrativeParagraphs(parts[0]);
-    if (leadStrippedNarrative !== parts[0]) {
-      parts[0] = leadStrippedNarrative;
+    const strippedLead = stripNarrativeParagraphs(leadBlock);
+    const hadNarrative = strippedLead !== leadBlock;
+    if (hadNarrative) {
+      leadBlock = strippedLead;
+      parts[0] = leadBlock;
       text = cleanText(parts.join('\n\n'));
       marks.narrativeStripped += 1;
     }
     if (!containsNarrativeParagraph(text) && proseLength(text) < 200) {
       const narrative = buildNarrativeParagraphs(cardInput, stableVariant(d.id));
-      parts[0] = `${parts[0]}\n\n${narrative.join('\n\n')}`;
+      // Owner round 9: one readable paragraph - lead line + narrative (+ series sentence if any).
+      if (seriesText) {
+        const seriesIndex = parts.indexOf(seriesText);
+        if (seriesIndex > 0) parts.splice(seriesIndex, 1);
+      }
+      parts[0] = [leadBlock, ...narrative, seriesText].filter(Boolean).join(' ');
       text = cleanText(parts.join('\n\n'));
       marks.narrativeAdded += 1;
+    } else if (hadNarrative) {
+      marks.narrativeRemovedOnly += 1;
+      if (removedOnlySamples.length < 8) {
+        removedOnlySamples.push(`${d.slug} | prose=${proseLength(text)}\n${text.replace(/\s+/gu, ' ').slice(0, 240)}`);
+      }
     }
 
     if (!/Билеты продаются онлайн|Билеты на выбранную дату/iu.test(text)) {
@@ -517,7 +709,7 @@ async function main() {
   writeFileSafe(path.join(outDir, 'samples.txt'), samples.join('\n'));
   writeFileSafe(
     path.join(outDir, 'diagnostics.txt'),
-    [`hasHtml cards (${quality.hasHtml}):`, ...htmlCards, '', `past-date cards (${quality.pastDate}):`, ...pastDateCards].join('\n'),
+    [`hasHtml cards (${quality.hasHtml}):`, ...htmlCards, '', `past-date cards (${quality.pastDate}):`, ...pastDateCards, '', `stories that lost narrative without a replacement (${marks.narrativeRemovedOnly}):`, ...removedOnlySamples].join('\n'),
   );
   console.log(JSON.stringify(report, null, 2));
 
