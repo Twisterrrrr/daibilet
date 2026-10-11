@@ -1,3 +1,23 @@
+## 2026-10-11 - Лендинги: дубли времени в строке слотов + обложки подборок не доходили до live
+
+### Наблюдения
+- Owner: на `/shou-programmy/saint-petersburg` у событий в строке чипов повторяются слоты времени («18:30 19:00 18:30 19:00», «20:00 20:00 20:00 20:00», «10:00 12:00 10:00 12:00»). Причина: `collectScheduleTimeChips`/`collectBridgesTimeChips` дедуплицировали по `startsAt` (полная дата), а строка показывает только время - один и тот же час с разных дат (или копии сессий) складывался в строку как повтор. Слоты с разным временем при этом склеивались корректно - наоборот должно быть: строка = уникальные времена.
+- Owner: обложки карточек подборок (лендинги), сгенерированные через Higgsfield (seedream_v5_lite, 09.10), «пропали»: на live `/images/landings/{show-programs,maslenitsa,self-development,graduation}.jpg` и ещё 4 новых обложки отдавали 404. Обложки лежали только в `apps/web/public/images/landings` (gitignore-каталог рантайма) и не попали в эталонный источник статики `apps/public/public/images` (из него `sync-public-assets.mjs` собирает `apps/web/public/images` на сборке/деплое).
+
+### Решения
+- `apps/web/src/lib/landing-time-chips.ts`: общий `collectScheduleTimeChips` для лендингов (`LandingPageView` + `BridgesScheduleSection`), локальные дубли коллекторов удалены. Семантика строки времени как в `collectDisplaySlotTimes` каталога: склеиваются слоты с разным временем, копии одного времени дедуплицируются по нормализованной метке; порядок по возрастанию HH:mm, метки без часов («Гибкий график») в конец; лимит 8.
+- Обложки: 8 файлов (graduation, improv-tribute, international-womens-day, intimate-concerts, maslenitsa, quest-tours, self-development, show-programs) скопированы в git-источник `apps/public/public/images/landings/`; `landing-images.ts` уже содержит их в `LANDING_CARD_IMAGES`. Сверка всего дерева ассетов web↔source: расхождение только эти 8 файлов.
+
+### Proof
+- unit `landing-time-chips.test.ts` (5 кейсов: копии времени с разных дат, склейка разных времён с сортировкой, пары 10:00/12:00 x2 даты, лимит 8, гибкий график); web-тесты 1 061 pass / 0 fail; `tsc --noEmit` 0 ошибок; eslint по файлам - 0 errors.
+- Коммиты `c4fefc5eb` (код), `a4b3df6d9` (обложки в источник статики). До фикса live 404 на 8 новых обложек; эталонные от 29.09 (`river-cruises`, `new-year`, `perm/city-center`) - 200.
+
+### Follow-ups
+- Deploy batch: после выкладки проверить 200 на `/images/landings/{show-programs,maslenitsa,self-development,graduation,...}.jpg`; слоты времени - smoke на `/shou-programmy/saint-petersburg` (строки без повторов).
+
+---
+
+
 ## 2026-10-11 - Индексация событий: публичная выборка 4 271; тонкие тексты 177; ядро минимальных описаний
 
 ### Наблюдения
