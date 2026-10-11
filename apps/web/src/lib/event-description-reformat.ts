@@ -333,6 +333,33 @@ export function promotePlusLineRuns(blocks: string[]): string[] {
 }
 
 /**
+ * Merge soft-wrapped lines before block classification (same rule the renderer
+ * uses in joinSoftWrappedLines): a line starting with a lowercase letter joins
+ * the previous text line unless that line ends with sentence punctuation.
+ * Headings / bullets / blanks never participate, so visual titles survive.
+ */
+export function mergeSoftWrappedEntries(
+  entries: Array<{ type: 'text' | 'heading' | 'bullet' | 'blank'; text: string }>,
+): Array<{ type: 'text' | 'heading' | 'bullet' | 'blank'; text: string }> {
+  const merged: Array<{ type: 'text' | 'heading' | 'bullet' | 'blank'; text: string }> = [];
+  for (const entry of entries) {
+    const prev = merged[merged.length - 1];
+    if (
+      entry.type === 'text' &&
+      prev &&
+      prev.type === 'text' &&
+      /^[a-zа-яё]/u.test(entry.text) &&
+      !/[.!?…:;]$/u.test(prev.text)
+    ) {
+      prev.text = `${prev.text} ${entry.text}`;
+      continue;
+    }
+    merged.push({ ...entry });
+  }
+  return merged;
+}
+
+/**
  * Reformat a raw provider description (plain-with-<br> or HTML) into structured
  * markdown-like text for EventOverride.description.
  * Deterministic and idempotent: reformat(reformat(x)) === reformat(x).
@@ -345,30 +372,52 @@ export function reformatEventDescription(raw: string): string {
     ? htmlToPlainLines(source)
     : source.replace(/\r\n?/g, '\n').split('\n');
 
-  const blocks: string[] = [];
+  // Phase 1: normalize + classify each line.
+  const entries: Array<{ type: 'text' | 'heading' | 'bullet' | 'blank'; text: string }> = [];
   for (const rawLine of rawLines) {
     const line = normalizeReformatLine(rawLine);
     if (!line) {
-      if (blocks.length && blocks[blocks.length - 1] !== '') blocks.push('');
+      entries.push({ type: 'blank', text: '' });
       continue;
     }
     if (isDecorationLine(line)) continue;
 
     const bullet = normalizeBulletLine(line);
     if (bullet) {
-      blocks.push(bullet);
+      entries.push({ type: 'bullet', text: bullet });
       continue;
     }
 
     const title = headingTitleFromLine(line);
     if (title) {
-      if (blocks.length && blocks[blocks.length - 1] !== '') blocks.push('');
-      blocks.push(`## ${title}`);
-      blocks.push('');
+      entries.push({ type: 'heading', text: title });
       continue;
     }
 
-    blocks.push(line);
+    entries.push({ type: 'text', text: line });
+  }
+
+  // Phase 2: merge soft-wrapped text lines (provider <br> within a sentence).
+  const merged = mergeSoftWrappedEntries(entries);
+
+  // Phase 3: render blocks (blank line between blocks, "- " lists stay together).
+  const blocks: string[] = [];
+  for (const entry of merged) {
+    if (entry.type === 'blank') {
+      if (blocks.length && blocks[blocks.length - 1] !== '') blocks.push('');
+      continue;
+    }
+    if (entry.type === 'bullet') {
+      blocks.push(entry.text);
+      continue;
+    }
+    if (entry.type === 'heading') {
+      if (blocks.length && blocks[blocks.length - 1] !== '') blocks.push('');
+      blocks.push(`## ${entry.text}`);
+      blocks.push('');
+      continue;
+    }
+    blocks.push(entry.text);
   }
 
   // Split run-on paragraphs (walls without any line breaks at all).

@@ -137,6 +137,21 @@ test('typography glue fixes and plus runs', () => {
   assert.match(plus, /\+ СУПЕР БОНУС!/);
 });
 
+test('soft-wrapped provider lines merge into paragraphs; headings survive', () => {
+  const sample =
+    'Одно письмо. Один Новый год. Которого может не быть…<br>У российского деда Мороза есть братья-морозы по всему миру. Они<br>прекрасно справляются со своей работой - дарят подарки и ощущение<br>праздника каждому ребенку. Но в этом году мальчик Миша создал им<br>огромные проблемы…';
+  const out = reformatEventDescription(sample);
+  assert.match(out, /Они прекрасно справляются со своей работой/);
+  assert.doesNotMatch(out, /Они\nпрекрасно/);
+  assert.doesNotMatch(out, /миру\. Они\n/);
+
+  const withHeading = reformatEventDescription(
+    'пианист-виртуоз и композитор<br>ИЛЬЯ ГОНЧАРОВ<br>фортепианные интерпретации<br>на темы шедевров',
+  );
+  assert.match(withHeading, /## ИЛЬЯ ГОНЧАРОВ/);
+  assert.match(withHeading, /фортепианные интерпретации на темы шедевров/);
+});
+
 test('existing override rewrite style passes through with dash fix only', () => {
   const override = 'Самый громкий тур лидеров альтернативного рок-попа.\n\nПодойдёт фанатам тяжёлых гитарных риффов.\n\nВсероссийский тур — 23 города.';
   const out = reformatEventDescription(override);
