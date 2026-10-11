@@ -1465,15 +1465,9 @@ function CitySightsMustSeeList({
       : filterMeta.tabs.length >= 2
         ? filteredPlaces
         : filteredPlaces.slice(0, 6);
-  // <4 places: md+ horizontal grid (2→2 cols, 3→3). ≥4: single-row snap carousel.
-  // Cap column width so 1–3 cards stay standard size and left-aligned (no full-bleed stretch).
-  const sparseGrid = visiblePlaces.length > 0 && visiblePlaces.length < 4;
-  const sparseColsClass =
-    visiblePlaces.length <= 1
-      ? 'md:grid-cols-[minmax(0,min(22rem,calc(50vw-3rem)))]'
-      : visiblePlaces.length === 2
-        ? 'md:grid-cols-[repeat(2,minmax(0,min(22rem,calc(50vw-3rem))))]'
-        : 'md:grid-cols-[repeat(3,minmax(0,min(22rem,calc(50vw-3rem))))]';
+  // Unified card format for every tab and count: fixed-width cards in a single-row
+  // snap track (row scrolls only when it overflows). Card size must not depend on
+  // how many places the active tab shows - visual uniformity in the block first.
 
   const railRef = React.useRef<HTMLDivElement>(null);
   const [canPrev, setCanPrev] = React.useState(false);
@@ -1504,7 +1498,7 @@ function CitySightsMustSeeList({
       window.removeEventListener('resize', syncRail);
       ro?.disconnect();
     };
-  }, [syncRail, activeId, visiblePlaces.length, sparseGrid, showPlacesRail]);
+  }, [syncRail, activeId, visiblePlaces.length, showPlacesRail]);
 
   const scrollPage = (dir: -1 | 1) => {
     const el = railRef.current;
@@ -1535,7 +1529,8 @@ function CitySightsMustSeeList({
     });
   };
 
-  const showRailArrows = showPlacesRail && !sparseGrid;
+  // Arrows appear only when the row actually scrolls; short tabs stay a clean static row.
+  const showRailArrows = showPlacesRail && (canPrev || canNext);
   const routeCount = useDayRouteState().venues.length;
 
   return (
@@ -1576,7 +1571,7 @@ function CitySightsMustSeeList({
         }}
         editorial={editorial}
       />
-      {/* Mobile: 1-card ~80/20 peek swipe. md+: sparse (<4) = capped card grid; ≥4 = single-row snap carousel. */}
+      {/* Mobile: 1-card ~80/20 peek swipe. md+: same single-row snap carousel for every tab (unified card format). */}
       <HubCarouselChrome
         key={focusedMustSee.length ? `focus:${[...focusedSlugSet].join(',')}` : activeId}
         className="mt-6"
@@ -1592,25 +1587,15 @@ function CitySightsMustSeeList({
         nextDataAttr="data-city-must-see-next"
         aria-label="Главные места"
         tabIndex={0}
-        trackClassName={
-          sparseGrid
-            ? 'horizontal-snap-row flex flex-nowrap gap-2.5 snap-x snap-mandatory scroll-px-1 py-1 pe-3 md:block md:overflow-visible md:py-1 md:pe-0'
-            : 'horizontal-snap-row flex flex-nowrap gap-2.5 snap-x snap-mandatory scroll-px-1 py-1 pe-4 md:gap-6 md:pe-6 md:[scrollbar-width:none] md:[-ms-overflow-style:none] md:[&::-webkit-scrollbar]:hidden'
-        }
+        trackClassName="horizontal-snap-row flex flex-nowrap gap-2.5 snap-x snap-mandatory scroll-px-1 py-1 pe-4 md:gap-6 md:pe-6 md:[scrollbar-width:none] md:[-ms-overflow-style:none] md:[&::-webkit-scrollbar]:hidden"
         trackProps={{
           'data-city-must-see-rail': '',
-          'data-city-must-see-layout': sparseGrid ? 'sparse-grid' : 'carousel',
+          'data-city-must-see-layout': 'carousel',
         }}
       >
         {/* Mobile: contents hoists cards into the flex scrollport so % = viewport. */}
-        {/* md sparse: N-col capped grid (w-max, left). md carousel: same flex snap, one row. */}
-        <ol
-          className={
-            sparseGrid
-              ? `contents md:grid md:w-max md:max-w-full md:items-start md:justify-items-start md:gap-x-6 md:gap-y-5 ${sparseColsClass}`
-              : 'contents'
-          }
-        >
+        {/* md+: same flex snap row for every tab - the card format stays identical. */}
+        <ol className="contents">
         {visiblePlaces.map((place, index) => {
           const afficheLink = matchSightAfficheLink({
             sightName: place.name,
@@ -1648,11 +1633,7 @@ function CitySightsMustSeeList({
           return (
             <li
               key={`${place.name}:${index}`}
-              className={
-                sparseGrid
-                  ? 'flex min-w-0 shrink-0 snap-start items-stretch [flex:0_0_min(85%,22rem)] md:w-auto md:min-w-0 md:max-w-none md:[flex:none]'
-                  : 'flex min-w-0 shrink-0 snap-start items-stretch [flex:0_0_min(85%,22rem)] md:[flex:0_0_min(22rem,calc((100%-3rem)/2.35))]'
-              }
+              className="flex min-w-0 shrink-0 snap-start items-stretch [flex:0_0_min(85%,22rem)] md:[flex:0_0_min(22rem,calc((100%-3rem)/2.35))]"
               data-city-must-see-card
             >
               <article
