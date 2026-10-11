@@ -4,6 +4,13 @@ import { buildPublicApiUrl } from '@/server/public-api-client';
 
 const DEFAULT_PROXY_TIMEOUT_MS = Number(process.env.DAIBILET_PUBLIC_API_PROXY_TIMEOUT_MS || 5_000);
 
+/**
+ * Dev-only shim: on prod, nginx routes /api/public/* straight to daibilet-api,
+ * so code in these Next route handlers NEVER runs there. Business logic for the
+ * public API must live in the backend builders (apps/backend) - e.g. the landing
+ * selection exclusion is enforced in buildPublicLandingsCatalog (dto.js), with
+ * only defense-in-depth filters on the web side. See docs/qa.md (2026-10-11).
+ */
 export async function proxyPublicApiRequest(
   request: Request,
   apiPath: string,

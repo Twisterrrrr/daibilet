@@ -19,6 +19,13 @@ Finance PR-ветка `codex/stage0-admission-ticket-core` может держа
 
 ---
 
+## 2026-10-11 - Public API routing (канон): Next-роуты `/api/public/*` - dev-only шимы
+
+**LOCKED:** на prod nginx отдаёт `/api/public/*` напрямую в `daibilet-api` (`deploy/nginx/daibilet.conf.example`), мимо Next. Роль роутов в `app/api/public/*` - только dev-шимы для локальной разработки.
+- Бизнес-логика public API живёт **только** в backend-сборщиках (`apps/backend/src/dto.js` и TS-обёртки). Пример: исключение подборки из выборки фильтруется в `buildPublicLandingsCatalog`; веб-фильтры (`lib/landing-features.ts`) - defense-in-depth для dev и SSR-поверхностей.
+- Ловушка 2026-10-11: фильтр, добавленный в Next-роут, на prod молча не действовал (nginx не заходит в Next для `/api/*`). Перекрёстные комменты проставлены в `public-api-proxy.ts` и `dto.js`.
+
+
 ## 2026-09-08 - UX Catalog 2.0 (открыто)
 
 Бриф: [ux-catalog-v2-brief.md](./ux-catalog-v2-brief.md).
