@@ -116,6 +116,7 @@ import {
   sessionMatchesTimeSlot,
 } from '@/lib/datetime';
 import { isOpenDate, FLEXIBLE_SCHEDULE_LABEL, isFlexibleScheduleSession, resolveSessionPriceRange } from '@/lib/event-card-meta';
+import { isSessionPurchaseBlocked } from '@/lib/event-purchase';
 import { collectScheduleTimeChips } from '@/lib/landing-time-chips';
 import { isBookingPlatformLabel, resolveEventCardLocationLabel } from '@/lib/event-location';
 import { formatShipSecondaryLabel, resolveCruiseDisplayTitle } from '@/lib/cruise-display-title';
@@ -950,10 +951,19 @@ export function LandingPageView({
     }
   }, [payload?.landing, payload?.stats, slug, profile, citySlug, todayReference]);
 
+  // Hide rows whose purchase is blocked (sales stopped / STAND_BY / started TC
+  // session / purchaseReady=false): they render a dead "Продажи остановлены" CTA.
+  // Owner 2026-10-11: such rows have no place on landings - same decision as
+  // FIX.TC-STANDBY-RECONCILE applied to catalog cards. Sold-out rows keep showing.
+  const saleableSessions = React.useMemo(
+    () => (payload ? payload.sessions.filter((session) => !isSessionPurchaseBlocked(session)) : []),
+    [payload],
+  );
+
   const filteredSessions = React.useMemo(() => {
     if (!payload || !sessionsReady) return [];
 
-    return payload.sessions.filter((session) => {
+    return saleableSessions.filter((session) => {
       if (!session.startsAt && !isOpenDate(session)) return false;
       const eventWindow = resolveLandingEventWindow(slug, todayReference);
       if (eventWindow) {
@@ -984,23 +994,23 @@ export function LandingPageView({
       if (profile !== 'bridges' && !matchesDateFilter(session, dateFilter, eventWindow, todayReference)) return false;
       return true;
     });
-  }, [category, city, dateFilter, menuFilter, dinnerTimeFilter, dinnerBadgeFilter, contextChip, timeSlot, payload, profile, sessionsReady, slug, todayReference]);
+  }, [category, city, dateFilter, menuFilter, dinnerTimeFilter, dinnerBadgeFilter, contextChip, timeSlot, payload, profile, saleableSessions, sessionsReady, slug, todayReference]);
 
   const allGroups = React.useMemo(
-    () => (payload && sessionsReady ? groupLandingSessions(payload.sessions) : []),
-    [payload, sessionsReady],
+    () => (payload && sessionsReady ? groupLandingSessions(saleableSessions) : []),
+    [payload, sessionsReady, saleableSessions],
   );
   const dinnerMenuFacets = React.useMemo(
-    () => (profile === 'dinner' && payload ? collectDinnerMenuFacets(payload.sessions) : []),
-    [payload, profile],
+    () => (profile === 'dinner' && payload ? collectDinnerMenuFacets(saleableSessions) : []),
+    [payload, profile, saleableSessions],
   );
   const dinnerBadgeFacets = React.useMemo(() => {
-    if (profile !== 'dinner' || !payload?.sessions.length) return [];
-    return collectLandingBadgeFacets(payload.sessions, ['vip', 'live-music', 'guide', 'open-deck']).filter((facet) => {
-      const count = payload.sessions.filter((session) => sessionMatchesLandingBadge(session, facet.id)).length;
-      return count > 0 && count < payload.sessions.length;
+    if (profile !== 'dinner' || !saleableSessions.length) return [];
+    return collectLandingBadgeFacets(saleableSessions, ['vip', 'live-music', 'guide', 'open-deck']).filter((facet) => {
+      const count = saleableSessions.filter((session) => sessionMatchesLandingBadge(session, facet.id)).length;
+      return count > 0 && count < saleableSessions.length;
     });
-  }, [payload, profile]);
+  }, [payload, profile, saleableSessions]);
   const groups = React.useMemo(() => sortEventGroups(groupLandingSessions(filteredSessions), sort), [filteredSessions, sort]);
   const cityName = resolveLandingCityName(citySlug, slug);
   const contextWidget = React.useMemo(() => resolveLandingContextWidget(slug), [slug]);
@@ -1038,7 +1048,7 @@ export function LandingPageView({
             landingSlug={slug}
             citySlug={citySlug}
             visibleCount={allGroups.length}
-            sessionsCount={payload.sessions.length}
+            sessionsCount={saleableSessions.length}
             stats={payload.stats}
             sessionsReady={sessionsReady}
             todayReference={todayReference}
@@ -1049,7 +1059,7 @@ export function LandingPageView({
                   priceFrom={payload.stats.priceFrom ?? null}
                   priceTo={payload.stats.priceTo ?? null}
                   visibleCount={allGroups.length}
-                  soldEstimate={resolveLandingHeroSoldEstimate('bridges', allGroups.length, payload.sessions.length)}
+                  soldEstimate={resolveLandingHeroSoldEstimate('bridges', allGroups.length, saleableSessions.length)}
                   sessionsReady={sessionsReady}
                   onPickTour={() => scrollToSchedule()}
                   onViewSchedule={() => document.getElementById('bridges-lift-schedule')?.scrollIntoView({ behavior: 'smooth' })}
