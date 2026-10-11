@@ -46,7 +46,7 @@ export default async function AdminArticlesPage({ searchParams }: PageProps) {
         <div>
           <h2 className="text-xl font-semibold text-slate-900">Блог / статьи</h2>
           <p className="mt-1 text-sm text-slate-600">
-            Список и CRUD статей в Next. Колонка Hero - статья на баннере /blog.
+            Статусы и публикация статей блога. Колонка Hero - статья на баннере /blog.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -72,7 +72,7 @@ export default async function AdminArticlesPage({ searchParams }: PageProps) {
         <input
           name="q"
           defaultValue={first(raw.q) || ''}
-          placeholder="Поиск по title / slug / автору..."
+          placeholder="Поиск по названию, slug или автору..."
           className="min-w-[220px] flex-1 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
         />
         <button
@@ -171,7 +171,7 @@ export default async function AdminArticlesPage({ searchParams }: PageProps) {
                               : 'Поставить в Hero (сбросит другие)'
                           }
                         >
-                          {row.isFeatured ? 'В Hero · on' : 'В Hero'}
+                          {row.isFeatured ? 'В Hero · вкл' : 'В Hero'}
                         </button>
                       </form>
                     </td>

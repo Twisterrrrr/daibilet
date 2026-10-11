@@ -1,6 +1,14 @@
-import Link from 'next/link';
-import type { ReactNode } from 'react';
-
+import {
+  AdminBadge,
+  AdminButton,
+  AdminField,
+  AdminPageHeader,
+  AdminSection,
+  AdminStat,
+  adminInputClass,
+  adminMonoInputClass,
+  adminTextareaClass,
+} from '@/components/admin/AdminUi';
 import { AdminEventDescriptionRewrite } from '@/components/admin/AdminEventDescriptionRewrite.client';
 import { AdminEventTaxonomyForm } from '@/components/admin/AdminEventTaxonomyForm';
 import { AdminEventVenueLinksForm } from '@/components/admin/AdminEventVenueLinksForm';
@@ -29,39 +37,29 @@ type Props = {
 export function AdminEventEditor({ detail, taxonomy, notice }: Props) {
   const override = detail.override;
   const currentStatus = (override.editorStatus || 'REVIEW').toUpperCase();
+  const statusLabel = MODERATION_STATUSES.find((item) => item.status === currentStatus)?.label ?? currentStatus;
   const canPublish = detail.canPublish !== false && detail.publishBlockers.length === 0;
   const displayTitle = override.title || detail.sourceTitle;
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
-        <Link href="/admin/events" className="hover:underline">
-          События
-        </Link>
-        <span>/</span>
-        <span className="truncate text-slate-700">{detail.id}</span>
-      </div>
-
-      <header className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h2 className="text-xl font-semibold text-slate-900">{displayTitle}</h2>
-          <p className="mt-1 text-sm text-slate-600">
-            Override, taxonomy, moderation, расписание, продажи и source - в Next.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {detail.slug ? (
-            <a
+    <div className="space-y-5">
+      <AdminPageHeader
+        breadcrumbs={[{ label: 'События', href: '/admin/events' }, { label: detail.id }]}
+        title={displayTitle}
+        description="Правки хранятся поверх источника: пустое поле означает «как в источнике». Каждая секция сохраняется своей кнопкой."
+        badge={<AdminBadge tone={currentStatus === 'PUBLISHED' ? 'success' : 'neutral'}>сейчас: {statusLabel}</AdminBadge>}
+        actions={
+          detail.slug ? (
+            <AdminButton
               href={`${PUBLIC_SITE_BASE.replace(/\/$/, '')}/events/${encodeURIComponent(detail.slug)}`}
-              className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
               target="_blank"
               rel="noreferrer"
             >
               Public
-            </a>
-          ) : null}
-        </div>
-      </header>
+            </AdminButton>
+          ) : null
+        }
+      />
 
       {notice ? (
         <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm text-emerald-800">
@@ -70,27 +68,29 @@ export function AdminEventEditor({ detail, taxonomy, notice }: Props) {
       ) : null}
 
       <div className="grid gap-3 sm:grid-cols-4">
-        <Metric label="Слотов" value={detail.summary.slots} />
-        <Metric label="Офферов" value={detail.summary.offers} />
-        <Metric
+        <AdminStat label="Слотов" value={formatAdminNumber(detail.summary.slots)} />
+        <AdminStat label="Офферов" value={formatAdminNumber(detail.summary.offers)} />
+        <AdminStat
           label="Цена от"
-          value={detail.summary.priceFrom}
-          suffix={detail.summary.priceFrom == null ? undefined : '₽'}
+          value={detail.summary.priceFrom == null ? null : formatAdminNumber(detail.summary.priceFrom)}
+          suffix="₽"
         />
-        <Metric label="Заказов" value={detail.summary.orders} />
+        <AdminStat label="Заказов" value={formatAdminNumber(detail.summary.orders)} />
       </div>
 
       <AdminEventOpsPanels detail={detail} />
 
-      <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <h3 className="text-sm font-semibold text-slate-900">Модерация</h3>
-          <span className="rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs text-slate-600">
-            сейчас: {currentStatus}
-          </span>
-        </div>
+      <AdminSection
+        title="Модерация"
+        description="Статус определяет, видно ли событие на витрине. «Опубликовать» доступно, когда устранены блокеры."
+        actions={
+          <AdminBadge tone={currentStatus === 'PUBLISHED' ? 'success' : 'neutral'}>
+            сейчас: {statusLabel}
+          </AdminBadge>
+        }
+      >
         {detail.publishBlockers.length ? (
-          <p className="mb-3 text-xs text-amber-800">
+          <p className="mb-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
             Блокеры публикации: {detail.publishBlockers.slice(0, 4).join(' · ')}
           </p>
         ) : null}
@@ -102,25 +102,19 @@ export function AdminEventEditor({ detail, taxonomy, notice }: Props) {
                 <input type="hidden" name="id" value={detail.id} />
                 <input type="hidden" name="slug" value={detail.slug || ''} />
                 <input type="hidden" name="editorStatus" value={item.status} />
-                <button
+                <AdminButton
                   type="submit"
+                  variant={currentStatus === item.status ? 'primary' : 'secondary'}
                   disabled={disabled}
-                  className={`rounded-md border px-3 py-1.5 text-xs font-medium ${
-                    currentStatus === item.status
-                      ? 'border-slate-900 bg-slate-900 text-white'
-                      : disabled
-                        ? 'cursor-not-allowed border-slate-100 bg-slate-50 text-slate-400'
-                        : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
-                  }`}
-                  title={disabled ? 'Публикация заблокирована readiness/blockers' : undefined}
+                  title={disabled ? 'Публикация заблокирована: есть нерешённые замечания' : undefined}
                 >
                   {item.label}
-                </button>
+                </AdminButton>
               </form>
             );
           })}
         </div>
-      </section>
+      </AdminSection>
 
       <AdminEventTaxonomyForm
         eventId={detail.id}
@@ -135,160 +129,139 @@ export function AdminEventEditor({ detail, taxonomy, notice }: Props) {
         venueLinks={detail.venueLinks}
       />
 
-      <form
-        action={saveAdminEventOverrideAction}
-        className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
-      >
+      <form action={saveAdminEventOverrideAction}>
         <input type="hidden" name="id" value={detail.id} />
         <input type="hidden" name="slug" value={detail.slug || ''} />
         <input type="hidden" name="section" value="content" />
-        <h3 className="text-sm font-semibold text-slate-900">Контент (override)</h3>
-        <p className="text-xs text-slate-500">
-          Пустое поле = сброс к источнику. Source title: {detail.sourceTitle}
-        </p>
-        <Field label="Заголовок">
-          <input
-            name="title"
-            defaultValue={override.title || ''}
-            className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
-            placeholder={detail.sourceTitle}
-          />
-        </Field>
-        <Field label="Короткое описание">
-          <textarea
-            name="shortDescription"
-            rows={2}
-            defaultValue={override.shortDescription || ''}
-            className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
-          />
-        </Field>
-        <AdminEventDescriptionRewrite
-          eventId={detail.id}
-          sourceDescription={detail.sourceDescription}
-          initialDescription={override.description || ''}
-        />
-        <Field label="mergeGroupKey (опционально)">
-          <input
-            name="mergeGroupKey"
-            defaultValue={override.mergeGroupKey || ''}
-            className="w-full rounded-md border border-slate-200 px-3 py-2 font-mono text-sm"
-          />
-        </Field>
-        <button
-          type="submit"
-          className="rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800"
+        <AdminSection
+          title="Контент"
+          description={`Пустое поле - сброс к источнику. В источнике: ${detail.sourceTitle}`}
+          actions={
+            <AdminButton type="submit" variant="primary">
+              Сохранить контент
+            </AdminButton>
+          }
         >
-          Сохранить контент
-        </button>
+          <div className="space-y-3">
+            <AdminField label="Заголовок">
+              <input
+                name="title"
+                defaultValue={override.title || ''}
+                className={adminInputClass}
+                placeholder={detail.sourceTitle}
+              />
+            </AdminField>
+            <AdminField label="Короткое описание">
+              <textarea
+                name="shortDescription"
+                rows={2}
+                defaultValue={override.shortDescription || ''}
+                className={adminTextareaClass}
+              />
+            </AdminField>
+            <AdminEventDescriptionRewrite
+              eventId={detail.id}
+              sourceDescription={detail.sourceDescription}
+              initialDescription={override.description || ''}
+            />
+            <AdminField
+              label="mergeGroupKey"
+              hint="Склеивает дубли одного события (например, «Екатерина» и «Потёмкин») в одну карточку."
+            >
+              <input
+                name="mergeGroupKey"
+                defaultValue={override.mergeGroupKey || ''}
+                className={adminMonoInputClass}
+              />
+            </AdminField>
+          </div>
+        </AdminSection>
       </form>
 
-      <form
-        action={saveAdminEventOverrideAction}
-        className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
-      >
+      <form action={saveAdminEventOverrideAction}>
         <input type="hidden" name="id" value={detail.id} />
         <input type="hidden" name="slug" value={detail.slug || ''} />
         <input type="hidden" name="section" value="seo" />
-        <h3 className="text-sm font-semibold text-slate-900">SEO (override)</h3>
-        <div className="grid gap-3 md:grid-cols-2">
-          <Field label="SEO H1">
-            <input
-              name="seoH1"
-              defaultValue={override.seoH1 || ''}
-              className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
-            />
-          </Field>
-          <Field label="SEO title">
-            <input
-              name="seoTitle"
-              defaultValue={override.seoTitle || ''}
-              className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
-            />
-          </Field>
-        </div>
-        <Field label="SEO description">
-          <textarea
-            name="seoDescription"
-            rows={3}
-            defaultValue={override.seoDescription || ''}
-            className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
-          />
-        </Field>
-        <Field label="canonicalPath">
-          <input
-            name="canonicalPath"
-            defaultValue={override.canonicalPath || ''}
-            className="w-full rounded-md border border-slate-200 px-3 py-2 font-mono text-sm"
-          />
-        </Field>
-        <label className="flex items-center gap-2 text-sm text-slate-700">
-          <input
-            type="checkbox"
-            name="isIndexable"
-            defaultChecked={override.isIndexable === true}
-            className="h-4 w-4 rounded border-slate-300"
-          />
-          Индексировать (isIndexable)
-        </label>
-        <button
-          type="submit"
-          className="rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800"
+        <AdminSection
+          title="SEO"
+          description="Сниппет и индексация события. Пустое поле = сброс к источнику."
+          actions={
+            <AdminButton type="submit" variant="primary">
+              Сохранить SEO
+            </AdminButton>
+          }
         >
-          Сохранить SEO
-        </button>
+          <div className="space-y-3">
+            <div className="grid gap-3 md:grid-cols-2">
+              <AdminField label="SEO H1">
+                <input
+                  name="seoH1"
+                  defaultValue={override.seoH1 || ''}
+                  className={adminInputClass}
+                />
+              </AdminField>
+              <AdminField label="SEO title">
+                <input
+                  name="seoTitle"
+                  defaultValue={override.seoTitle || ''}
+                  className={adminInputClass}
+                />
+              </AdminField>
+            </div>
+            <AdminField label="SEO description">
+              <textarea
+                name="seoDescription"
+                rows={3}
+                defaultValue={override.seoDescription || ''}
+                className={adminTextareaClass}
+              />
+            </AdminField>
+            <AdminField label="canonicalPath">
+              <input
+                name="canonicalPath"
+                defaultValue={override.canonicalPath || ''}
+                className={adminMonoInputClass}
+              />
+            </AdminField>
+            <label className="flex items-center gap-2 text-sm text-slate-700">
+              <input
+                type="checkbox"
+                name="isIndexable"
+                defaultChecked={override.isIndexable === true}
+                className="h-4 w-4 rounded border-slate-300"
+              />
+              Индексировать (isIndexable)
+            </label>
+          </div>
+        </AdminSection>
       </form>
 
-      <form
-        action={saveAdminEventOverrideAction}
-        className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
-      >
+      <form action={saveAdminEventOverrideAction}>
         <input type="hidden" name="id" value={detail.id} />
         <input type="hidden" name="slug" value={detail.slug || ''} />
         <input type="hidden" name="section" value="media" />
-        <h3 className="text-sm font-semibold text-slate-900">Медиа</h3>
-        <Field label="imageUrl override">
-          <input
-            name="imageUrl"
-            defaultValue={override.imageUrl || ''}
-            className="w-full rounded-md border border-slate-200 px-3 py-2 font-mono text-sm"
-            placeholder={detail.sourceImageUrl || ''}
-          />
-        </Field>
-        <button
-          type="submit"
-          className="rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800"
+        <AdminSection
+          title="Медиа"
+          description="Картинка карточки. Пустое поле - использовать изображение из источника."
+          actions={
+            <AdminButton type="submit" variant="primary">
+              Сохранить медиа
+            </AdminButton>
+          }
         >
-          Сохранить медиа
-        </button>
+          <AdminField
+            label="Изображение (заменяет источник)"
+            hint={detail.sourceImageUrl ? `В источнике: ${detail.sourceImageUrl}` : undefined}
+          >
+            <input
+              name="imageUrl"
+              defaultValue={override.imageUrl || ''}
+              className={adminMonoInputClass}
+              placeholder={detail.sourceImageUrl || ''}
+            />
+          </AdminField>
+        </AdminSection>
       </form>
-    </div>
-  );
-}
-
-function Field({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <label className="block space-y-1">
-      <span className="text-xs font-medium text-slate-600">{label}</span>
-      {children}
-    </label>
-  );
-}
-
-function Metric({
-  label,
-  value,
-  suffix,
-}: {
-  label: string;
-  value: number | null;
-  suffix?: string;
-}) {
-  return (
-    <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
-      <div className="text-lg font-semibold tabular-nums text-slate-900">
-        {value == null ? '—' : `${formatAdminNumber(value)}${suffix ? ` ${suffix}` : ''}`}
-      </div>
-      <div className="text-xs text-slate-500">{label}</div>
     </div>
   );
 }

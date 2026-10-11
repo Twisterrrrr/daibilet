@@ -59,8 +59,8 @@ export function AdminDashboardView({ data }: { data: AdminDashboardPageData }) {
           <div>
             <h2 className="text-xl font-semibold text-slate-900">Готовность к продажам</h2>
             <p className="mt-1 max-w-2xl text-sm leading-relaxed text-slate-600">
-              Live-метрики с API. Контур оплат остаётся на стороне Ticketscloud и Teplohod.info.
-              Операции админки - в Next (F4.6, без `/legacy`).
+              Показатели обновляются из API в реальном времени. Оплата проходит на стороне
+              Ticketscloud и Teplohod.info.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -93,7 +93,7 @@ export function AdminDashboardView({ data }: { data: AdminDashboardPageData }) {
           className="rounded-lg border-2 border-red-400 bg-red-50 px-4 py-3 text-sm text-red-900"
         >
           <p className="text-base font-semibold">
-            Часть live-данных недоступна — показатели ниже недостоверны
+            Часть данных недоступна — показатели ниже недостоверны
           </p>
           <p className="mt-0.5">
             Нули означают «нет данных», а не «нет проблем». Проверьте доступность API и
@@ -105,7 +105,7 @@ export function AdminDashboardView({ data }: { data: AdminDashboardPageData }) {
             ))}
           </ul>
           <p className="mt-2 text-xs">
-            Нужны ADMIN_* в env процесса Next (для middleware) и доступ к legacy API
+            Нужны переменные ADMIN_* в окружении сервера и доступ к API данных
             (`DAIBILET_ADMIN_API_URL`, по умолчанию http://127.0.0.1:4000). Basic Auth браузера
             пробрасывается на API.
           </p>
@@ -201,13 +201,13 @@ export function AdminDashboardView({ data }: { data: AdminDashboardPageData }) {
             />
           </div>
           <div className="mt-3 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500">
-            Зеркало заказов из источников без внутреннего checkout и платежного контура Дайбилета.
+            Заказы приходят из источников: без внутренней корзины и оплаты на сайте.
           </div>
         </Block>
       </div>
 
       <p className="text-xs text-slate-500">
-        Канон операторки: Next `/admin` (F4.6). Vite `/legacy` hard-retired.
+        Разделы админки работают в этом интерфейсе.
       </p>
     </div>
   );
