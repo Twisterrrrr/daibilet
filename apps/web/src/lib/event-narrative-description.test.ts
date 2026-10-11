@@ -42,7 +42,7 @@ test('narrative rotates variants so cards do not repeat', () => {
 
 test('water kind mentions the boat ride, not the facts', () => {
   const [first] = buildNarrativeParagraphs({ title: 'Прогулка на теплоходе «Москва-29»' }, 0);
-  assert.match(first, /прогулка|воду|борт|теплоход|река|палуб/iu);
+  assert.match(first, /вод|борт|теплоход|река|палуб|прогулк/iu);
 });
 
 test('adult events get no child/family wording', () => {

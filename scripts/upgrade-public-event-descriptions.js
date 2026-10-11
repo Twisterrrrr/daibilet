@@ -513,6 +513,7 @@ async function main() {
   };
 
   writeFileSafe(path.join(outDir, 'report.json'), JSON.stringify(report, null, 2));
+  writeFileSafe(path.join(outDir, 'changed.json'), JSON.stringify(plan.map((p) => ({ id: p.id, slug: p.slug })), null, 1));
   writeFileSafe(path.join(outDir, 'samples.txt'), samples.join('\n'));
   writeFileSafe(
     path.join(outDir, 'diagnostics.txt'),
