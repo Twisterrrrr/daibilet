@@ -39,9 +39,9 @@ jobs:
             git reset --hard origin/feat/next-monorepo
             echo "HEAD=$(git rev-parse --short HEAD)"
             if command -v pnpm >/dev/null 2>&1; then
-              pnpm db:generate
+              CI=true pnpm db:generate
             else
-              npx --yes prisma generate --schema packages/db/prisma/schema.prisma
+              CI=true npx --yes prisma generate --schema packages/db/prisma/schema.prisma
             fi
             sudo -n systemctl restart daibilet-api
             for i in 1 2 3 4 5 6 7 8 9 10 11 12; do
