@@ -49,10 +49,26 @@ const argValue = (name) => {
   const idx = process.argv.indexOf(name);
   return idx >= 0 && process.argv[idx + 1] ? process.argv[idx + 1] : null;
 };
+
+/** Read an id list that may be a JSON array or one id per line. */
+function readIdList(file) {
+  const raw = fs.readFileSync(file, 'utf8').trim();
+  if (raw.startsWith('[')) {
+    try {
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr)) return arr.map((x) => String(x).trim()).filter(Boolean);
+    } catch {
+      // fall through to line parsing
+    }
+  }
+  return raw.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
+}
 const limit = Number(argValue('--limit') || 0) || 0;
 const sampleCount = Number(argValue('--samples') || 30) || 30;
 const outDir = argValue('--out') || path.join(rootDir, 'tmp-event-descriptions');
 const onlyFile = argValue('--only');
+const skipIdsFile = argValue('--skip-ids');
+const basis = (argValue('--basis') || 'effective').toLowerCase();
 
 /**
  * Eligible = current events, same canon as scripts/event-rewrite-audit.js:
@@ -144,14 +160,19 @@ async function main() {
     let candidates = rows;
 
     if (onlyFile) {
-      const ids = new Set(
-        fs.readFileSync(onlyFile, 'utf8').split(/\r?\n/).map((s) => s.trim()).filter(Boolean),
-      );
+      const ids = new Set(readIdList(onlyFile));
       candidates = candidates.filter((r) => ids.has(r.id));
+    }
+    if (skipIdsFile) {
+      const skip = new Set(readIdList(skipIdsFile));
+      candidates = candidates.filter((r) => !skip.has(r.id));
     }
     candidates = candidates
       .map((r) => {
-        const effective = (r.override_description || r.source_description || '').trim();
+        const effective =
+          basis === 'source'
+            ? (r.source_description || r.override_description || '').trim()
+            : (r.override_description || r.source_description || '').trim();
         return { ...r, effective };
       })
       .filter((r) => r.effective)

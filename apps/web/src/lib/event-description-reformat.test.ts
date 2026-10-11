@@ -152,11 +152,77 @@ test('soft-wrapped provider lines merge into paragraphs; headings survive', () =
   assert.match(withHeading, /фортепианные интерпретации на темы шедевров/);
 });
 
-test('existing override rewrite style passes through with dash fix only', () => {
-  const override = 'Самый громкий тур лидеров альтернативного рок-попа.\n\nПодойдёт фанатам тяжёлых гитарных риффов.\n\nВсероссийский тур — 23 города.';
+test('mid-sentence breaks merge; markerless landmark runs stay separate lines', () => {
+  const broken =
+    'Золотая джазовая лихорадка, время свинга и километровых очередей в танцевальные залы - такую атмосферу воскрешает на своих выступлениях Большой Джазовый<br>Оркестр Петра Востокова. Воссоздавая подлинное звучание музыки того времени, Оркестр представляет программы.';
+  const out = reformatEventDescription(broken);
+  assert.match(out, /Большой Джазовый Оркестр Петра Востокова\./);
+  assert.doesNotMatch(out, /Джазовый\nОркестр/);
+
+  const landmarks = reformatEventDescription('По маршруту видны:<br>Московский Кремль<br>Парк Горького<br>Лужники');
+  const lines = landmarks.split('\n');
+  assert.ok(lines.includes('Московский Кремль'));
+  assert.ok(lines.includes('Парк Горького'));
+  assert.ok(lines.includes('Лужники'));
+});
+
+test('one-sentence provider lines group into 3-5 sentence paragraphs', () => {
+  const wall = `<p>Этот концерт посетили 24000 тысячи зрителей за 7 месяцев!</p><p>Незабываемый концерт на корабле в Москве - Романтика и Музыка.</p><p>Ищете идеальное место для особенного вечера? Мечтаете совместить изысканный ужин, захватывающие виды и живую музыку?</p><p>Ресторан на теплоходе - это то, что вам нужно! Представляем уникальную возможность насладиться концертом на корабле. Наш красивый ресторан на теплоходе предлагает уникальную атмосферу.</p><p>Панорамные окна открывают завораживающие виды на достопримечательности Москвы.</p><p>Сидя за столиками, вы сможете любоваться Кремлем, Храмом Христа Спасителя и другими шедеврами архитектуры.</p><p>А с верхней палубы открывается еще более широкий обзор.</p>`;
+  const out = reformatEventDescription(wall);
+  const paragraphs = out.split(/\n\s*\n/).filter(Boolean);
+  assert.ok(paragraphs.length <= 3, `expected <=3 paragraphs, got ${paragraphs.length}`);
+  assert.match(paragraphs[0], /24000 тысячи зрителей/);
+  assert.match(paragraphs[0], /Романтика и Музыка/);
+  assert.match(paragraphs[0], /живую музыку\?/);
+
+  const html = formatEventDescriptionHtml(out);
+  const pCount = (html.match(/<p>/g) || []).length;
+  assert.ok(pCount <= 3, `expected <=3 <p>, got ${pCount}`);
+});
+
+test('concert line-up gets "В программе" heading and a list', () => {
+  const sample =
+    'В программе концерта самые популярные хиты советской и мировой эстрады 80-90 годов.\n\n' +
+    'Екатерина Французова - Вокал\nЭлина Шатская - Вокал\nМихаил Зыков - Вокал\nВедущий концерта - Максим Ратинер';
+  const out = reformatEventDescription(sample);
+  assert.match(out, /## В программе/);
+  assert.match(out, /\nЕкатерина Французова - Вокал\n/);
+  assert.match(out, /Ведущий концерта - Максим Ратинер/);
+  const html = formatEventDescriptionHtml(out);
+  assert.match(html, /<h3>В программе<\/h3>/);
+  assert.match(html, /<ul><li>Екатерина Французова - Вокал<\/li>/);
+});
+
+test('bullet line-up (already dashed) also gets "В программе" heading', () => {
+  const sample =
+    'В программе концерта хиты 80-90 годов.\n\n- Екатерина Французова - Вокал\n- Элина Шатская - Вокал\n- Михаил Зыков - Вокал';
+  const out = reformatEventDescription(sample);
+  assert.match(out, /## В программе/);
+  assert.match(out, /- Екатерина Французова - Вокал/);
+  const html = formatEventDescriptionHtml(out);
+  assert.match(html, /<h3>В программе<\/h3>/);
+  assert.match(html, /<ul><li>Екатерина Французова - Вокал<\/li><li>Элина Шатская - Вокал<\/li>/);
+});
+
+test('phrase with a dash before colon is not a false h3', () => {
+  const out = reformatEventDescription(
+    'Концерт на корабле - это: Эксклюзивные мероприятия: Уникальные концерты и тематические вечера.',
+  );
+  const html = formatEventDescriptionHtml(out);
+  assert.doesNotMatch(html, /<h3>Концерт на корабле/);
+  assert.match(html, /Концерт на корабле - это/);
+});
+
+test('existing override rewrite wording survives; dash normalized and paragraphs grouped', () => {
+  const override =
+    'Самый громкий тур лидеров альтернативного рок-попа.\n\nПодойдёт фанатам тяжёлых гитарных риффов.\n\nВсероссийский тур — 23 города.';
   const out = reformatEventDescription(override);
+  assert.doesNotMatch(out, /[\u2013\u2014\u2212]/);
+  assert.match(out, /Самый громкий тур лидеров альтернативного рок-попа\./);
+  assert.match(out, /Подойдёт фанатам тяжёлых гитарных риффов\./);
+  assert.match(out, /Всероссийский тур - 23 города\./);
   assert.equal(
     out,
-    'Самый громкий тур лидеров альтернативного рок-попа.\n\nПодойдёт фанатам тяжёлых гитарных риффов.\n\nВсероссийский тур - 23 города.',
+    'Самый громкий тур лидеров альтернативного рок-попа. Подойдёт фанатам тяжёлых гитарных риффов. Всероссийский тур - 23 города.',
   );
 });

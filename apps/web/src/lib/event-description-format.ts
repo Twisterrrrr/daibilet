@@ -248,6 +248,9 @@ export function parseLabelValueLine(line: string): { label: string; value: strin
   const label = cleanDisplayText(match[1]);
   const value = cleanDisplayText(match[2]);
   if (!label || !value || label.length > 44) return null;
+  // A dash inside the label means it is a phrase, not a section label
+  // ("Концерт на корабле - это: …"), so it must not become an <h3>.
+  if (/\s[-–—]\s/u.test(label)) return null;
   return { label, value };
 }
 

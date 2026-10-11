@@ -262,6 +262,29 @@ export function collapseBlankLines(lines: string[]): string[] {
   return out;
 }
 
+/**
+ * Blank lines inside a bullet run ("- a", "", "- b") are dropped: the renderer
+ * needs consecutive "- " lines to build a single <ul>.
+ */
+export function collapseListGaps(lines: string[]): string[] {
+  const out: string[] = [];
+  for (let i = 0; i < lines.length; i += 1) {
+    const line = lines[i];
+    if (line === '') {
+      const prev = out[out.length - 1];
+      let k = i;
+      while (k < lines.length && lines[k] === '') k += 1;
+      const next = lines[k];
+      if (prev && prev.startsWith('- ') && next && next.startsWith('- ')) {
+        i = k - 1;
+        continue;
+      }
+    }
+    out.push(line);
+  }
+  return out;
+}
+
 /** Common Russian abbreviations: "т. е." must not look like a sentence end. */
 const ABBREV_BEFORE_DOT_RE = /(?:^|\s)(?:т|е|п|г|д|им|др|ст|ул|пр|см|рис|стр|об|к|н|ред|пер|тыс|млн|руб|коп)$/iu;
 
@@ -333,30 +356,153 @@ export function promotePlusLineRuns(blocks: string[]): string[] {
 }
 
 /**
- * Merge soft-wrapped lines before block classification (same rule the renderer
- * uses in joinSoftWrappedLines): a line starting with a lowercase letter joins
- * the previous text line unless that line ends with sentence punctuation.
- * Headings / bullets / blanks never participate, so visual titles survive.
+ * Short provider line that can be a markerless list item: short, without sentence
+ * punctuation, starting with a capital/digit/quote. Runs of 2+ such lines stay as
+ * separate lines so the renderer builds a <ul> instead of one glued paragraph.
+ * Lowercase continuations are soft wraps and merge instead.
  */
-export function mergeSoftWrappedEntries(
-  entries: Array<{ type: 'text' | 'heading' | 'bullet' | 'blank'; text: string }>,
-): Array<{ type: 'text' | 'heading' | 'bullet' | 'blank'; text: string }> {
-  const merged: Array<{ type: 'text' | 'heading' | 'bullet' | 'blank'; text: string }> = [];
-  for (const entry of entries) {
-    const prev = merged[merged.length - 1];
-    if (
-      entry.type === 'text' &&
-      prev &&
-      prev.type === 'text' &&
-      /^[a-zа-яё]/u.test(entry.text) &&
-      !/[.!?…:;]$/u.test(prev.text)
-    ) {
-      prev.text = `${prev.text} ${entry.text}`;
-      continue;
+function isEnumerationRunLine(text: string): boolean {
+  const t = String(text || '').trim();
+  if (!t || t.length > 45) return false;
+  if (/^[a-zа-яё]/u.test(t)) return false;
+  // "+ item" runs are provider bullet lists handled by promotePlusLineRuns().
+  if (/^\+\s/u.test(t)) return false;
+  return !/[.!?…:;]$/u.test(t);
+}
+
+export type ReformatEntry = {
+  type: 'text' | 'heading' | 'bullet' | 'blank';
+  text: string;
+  /** Internal marker: line belongs to a markerless enumeration run. */
+  fromRun?: boolean;
+};
+
+/**
+ * Merge soft-wrapped lines before block classification (same idea as the renderer
+ * joinSoftWrappedLines, extended for provider texts broken mid-sentence).
+ * Two rules:
+ *   1. next line starts lowercase (classic soft wrap);
+ *   2. previous line is long and not finished by sentence punctuation, next line is
+ *      long and starts a new word/quote/bracket (hard <br> in the middle of a sentence).
+ * Headings / bullets / blanks and markerless enumeration runs (2+ short lines)
+ * never merge, so visual titles and landmark lists survive.
+ */
+export function mergeSoftWrappedEntries(entries: ReformatEntry[]): ReformatEntry[] {
+  // Mark markerless enumeration runs.
+  const inRun = new Array<boolean>(entries.length).fill(false);
+  let i = 0;
+  while (i < entries.length) {
+    if (entries[i].type === 'text' && isEnumerationRunLine(entries[i].text)) {
+      let j = i;
+      while (j < entries.length && entries[j].type === 'text' && isEnumerationRunLine(entries[j].text)) j += 1;
+      if (j - i >= 2) {
+        for (let k = i; k < j; k += 1) inRun[k] = true;
+      }
+      i = j;
+    } else {
+      i += 1;
     }
-    merged.push({ ...entry });
+  }
+
+  const merged: ReformatEntry[] = [];
+  for (let idx = 0; idx < entries.length; idx += 1) {
+    const entry = entries[idx];
+    const prev = merged[merged.length - 1];
+    if (entry.type === 'text' && prev && prev.type === 'text' && !inRun[idx] && !prev.fromRun) {
+      const endsSentence = /[.!?…:;]$/u.test(prev.text);
+      const startsLower = /^[a-zа-яё]/u.test(entry.text);
+      const brokenMidSentence =
+        !endsSentence &&
+        prev.text.length >= 60 &&
+        entry.text.length >= 30 &&
+        !/^[A-ZА-ЯЁ][^:]{1,24}:/u.test(entry.text) &&
+        /^[A-ZА-ЯЁ0-9«"(\[]/u.test(entry.text);
+      if ((!endsSentence && startsLower) || brokenMidSentence) {
+        prev.text = `${prev.text} ${entry.text}`;
+        continue;
+      }
+    }
+    merged.push(inRun[idx] ? { ...entry, fromRun: true } : { ...entry });
   }
   return merged;
+}
+
+/** Number of sentence-ending punctuation marks (a rough sentence counter). */
+export function countSentenceEnds(text: string): number {
+  const m = String(text || '').match(/[.!?…]+(?=\s|$)/gu);
+  return m ? m.length : 0;
+}
+
+/**
+ * Line that can join a sentence-based paragraph: ends with sentence punctuation
+ * and is not a short "Label: value" fact line (those read better as their own lines).
+ */
+export function isParagraphSentenceLine(text: string): boolean {
+  const t = String(text || '').trim();
+  if (!t || !/[.!?…]$/u.test(t)) return false;
+  if (t.length <= 60 && /^[^:]{1,40}:/u.test(t)) return false;
+  return true;
+}
+
+const PARAGRAPH_SENTENCE_TARGET = 3;
+const PARAGRAPH_SENTENCE_MAX = 5;
+const PARAGRAPH_MAX_LENGTH = 600;
+
+/**
+ * Group consecutive one-sentence lines into readable paragraphs of 3-5 sentences.
+ * Provider feeds (TC `<br>` per sentence, Teplohod `<p>` per sentence) would otherwise
+ * render as a wall of one-sentence paragraphs. Blank lines between sentences are
+ * transparent; headings / bullets / markerless enumeration runs break the group.
+ */
+export function groupParagraphs(entries: ReformatEntry[]): ReformatEntry[] {
+  const out: ReformatEntry[] = [];
+  let i = 0;
+  while (i < entries.length) {
+    const entry = entries[i];
+    if (entry.type !== 'text' || entry.fromRun || !isParagraphSentenceLine(entry.text)) {
+      out.push(entry);
+      i += 1;
+      continue;
+    }
+
+    const parts: string[] = [];
+    let sentences = 0;
+    let length = 0;
+    while (i < entries.length) {
+      const cur = entries[i];
+      if (cur.type === 'blank') {
+        let k = i;
+        while (k < entries.length && entries[k].type === 'blank') k += 1;
+        const next = entries[k];
+        const continues =
+          parts.length > 0 && next && next.type === 'text' && !next.fromRun && isParagraphSentenceLine(next.text);
+        if (!continues) break;
+        i = k;
+        continue;
+      }
+      if (cur.type !== 'text' || cur.fromRun || !isParagraphSentenceLine(cur.text)) break;
+      const curSentences = countSentenceEnds(cur.text) || 1;
+      if (parts.length && (sentences + curSentences > PARAGRAPH_SENTENCE_MAX || length + cur.text.length + 1 > PARAGRAPH_MAX_LENGTH)) {
+        break;
+      }
+      parts.push(cur.text);
+      sentences += curSentences;
+      length += cur.text.length + 1;
+      i += 1;
+      if (sentences >= PARAGRAPH_SENTENCE_TARGET) break;
+    }
+    out.push({ type: 'text', text: parts.join(' ') });
+  }
+  return out;
+}
+
+/** "Имя Фамилия - Вокал" style line: a person with a role/instrument. */
+const LINEUP_ROLE_RE =
+  / - (?:вокал|гитар|бас-|бас |барабан|ударн|скрипк|саксофон|роял|пиан|клавиш|ансамбл|оркестр|ведущ|сопровожд|дириж|солист|артист|танц|хореограф|режисс|автор|дуэт|трио|квартет|вокальн|бэк-?вокал)/iu;
+
+/** A run of markerless lines that looks like a concert line-up (2+ roles). */
+export function looksLikeLineup(lines: string[]): boolean {
+  return lines.filter((l) => LINEUP_ROLE_RE.test(l)).length >= 2;
 }
 
 /**
@@ -373,7 +519,7 @@ export function reformatEventDescription(raw: string): string {
     : source.replace(/\r\n?/g, '\n').split('\n');
 
   // Phase 1: normalize + classify each line.
-  const entries: Array<{ type: 'text' | 'heading' | 'bullet' | 'blank'; text: string }> = [];
+  const entries: ReformatEntry[] = [];
   for (const rawLine of rawLines) {
     const line = normalizeReformatLine(rawLine);
     if (!line) {
@@ -400,21 +546,56 @@ export function reformatEventDescription(raw: string): string {
   // Phase 2: merge soft-wrapped text lines (provider <br> within a sentence).
   const merged = mergeSoftWrappedEntries(entries);
 
-  // Phase 3: render blocks (blank line between blocks, "- " lists stay together).
+  // Phase 3: group one-sentence lines into readable paragraphs (3-5 sentences).
+  const grouped = groupParagraphs(merged);
+
+  // Phase 4: render blocks (blank line between blocks, "- " lists stay together).
   const blocks: string[] = [];
-  for (const entry of merged) {
+  for (let i = 0; i < grouped.length; i += 1) {
+    const entry = grouped[i];
     if (entry.type === 'blank') {
       if (blocks.length && blocks[blocks.length - 1] !== '') blocks.push('');
       continue;
     }
     if (entry.type === 'bullet') {
-      blocks.push(entry.text);
+      // Consecutive bullet lines form one list; a concert line-up gets a title.
+      const run: string[] = [];
+      let j = i;
+      while (j < grouped.length && grouped[j].type === 'bullet') {
+        run.push(grouped[j].text);
+        j += 1;
+      }
+      if (looksLikeLineup(run.map((x) => x.replace(/^-\s*/u, '')))) {
+        if (blocks.length && blocks[blocks.length - 1] !== '') blocks.push('');
+        blocks.push('## В программе');
+        blocks.push('');
+      }
+      for (const item of run) blocks.push(item);
+      i = j - 1;
       continue;
     }
     if (entry.type === 'heading') {
       if (blocks.length && blocks[blocks.length - 1] !== '') blocks.push('');
       blocks.push(`## ${entry.text}`);
       blocks.push('');
+      continue;
+    }
+    if (entry.fromRun) {
+      // Markerless enumeration run -> plain lines (renderer builds the <ul>);
+      // a concert line-up additionally gets a "В программе" title.
+      const run: string[] = [];
+      let j = i;
+      while (j < grouped.length && grouped[j].type === 'text' && grouped[j].fromRun) {
+        run.push(grouped[j].text);
+        j += 1;
+      }
+      if (looksLikeLineup(run)) {
+        if (blocks.length && blocks[blocks.length - 1] !== '') blocks.push('');
+        blocks.push('## В программе');
+        blocks.push('');
+      }
+      for (const item of run) blocks.push(item);
+      i = j - 1;
       continue;
     }
     blocks.push(entry.text);
@@ -439,6 +620,6 @@ export function reformatEventDescription(raw: string): string {
     }
   }
 
-  return collapseBlankLines(expanded).join('\n').trim();
+  return collapseListGaps(collapseBlankLines(expanded)).join('\n').trim();
 }
 
