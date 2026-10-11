@@ -30,6 +30,7 @@ import {
   getTicketPriceRange,
   buildGroupedTicketCategories,
   FLEXIBLE_SCHEDULE_LABEL,
+  isCategoryDuplicatedInBreadcrumbs,
   isFlexibleScheduleSession,
   scrollToBuyCard,
 } from '@/lib/event-page-utils';
@@ -624,6 +625,10 @@ export function EventHero({
     : null;
   const trailCrumbs = breadcrumbs.length > 1 ? breadcrumbs.slice(0, -1) : breadcrumbs;
   const currentCrumb = breadcrumbs.length > 1 ? breadcrumbs[breadcrumbs.length - 1] : null;
+  // Category is already in the breadcrumb trail -> do not repeat it under the crumbs.
+  const categoryInCrumbs = isCategoryDuplicatedInBreadcrumbs(event.category, trailCrumbs);
+  const showHeroCategory = Boolean(event.category) && !categoryInCrumbs;
+  const hasHeroMetaRow = showHeroCategory || Boolean(aggregate);
 
   return (
     <div
@@ -656,7 +661,10 @@ export function EventHero({
       <div className="container-page absolute inset-0 z-10 flex min-w-0 flex-col pb-4 pt-16 md:pb-4 md:pt-44 lg:pb-8 lg:pt-24">
         <div className="mt-auto min-w-0">
           {/* 1. Breadcrumbs without event title (last crumb sr-only for a11y; JSON-LD stays full). */}
-          <nav aria-label="Хлебные крошки" className="mb-2 flex min-w-0 flex-wrap items-center gap-1.5 text-sm text-white/70">
+          <nav
+            aria-label="Хлебные крошки"
+            className={`${hasHeroMetaRow ? 'mb-2' : 'mb-4'} flex min-w-0 flex-wrap items-center gap-1.5 text-sm text-white/70`}
+          >
             {trailCrumbs.map((crumb, index) => (
               <span key={`${crumb.path}:${index}`} className="inline-flex shrink-0 items-center gap-1.5">
                 {index > 0 ? <ChevronRight className="h-3.5 w-3.5" aria-hidden /> : null}
@@ -670,19 +678,21 @@ export function EventHero({
 
           <div className="flex min-w-0 items-end justify-between gap-4">
             <div className="min-w-0 max-w-3xl">
-              {/* 2. Category / type - readable, not full-width giant caps */}
-              <div className="mb-1.5 flex flex-wrap items-center gap-2">
-                {event.category ? (
-                  <p className="text-[11px] font-medium uppercase tracking-wide text-white/70">
-                    {event.category}
-                  </p>
-                ) : null}
-                {aggregate ? (
-                  <span className="hidden md:inline-flex">
-                    <EventRatingBadge ratingValue={aggregate.ratingValue} reviewCount={aggregate.reviewCount} />
-                  </span>
-                ) : null}
-              </div>
+              {/* 2. Category / type - only when the breadcrumbs do not already show it. */}
+              {hasHeroMetaRow ? (
+                <div className="mb-1.5 flex flex-wrap items-center gap-2">
+                  {showHeroCategory ? (
+                    <p className="text-[11px] font-medium uppercase tracking-wide text-white/70">
+                      {event.category}
+                    </p>
+                  ) : null}
+                  {aggregate ? (
+                    <span className="hidden md:inline-flex">
+                      <EventRatingBadge ratingValue={aggregate.ratingValue} reviewCount={aggregate.reviewCount} />
+                    </span>
+                  ) : null}
+                </div>
+              ) : null}
 
               {/* 3. Title */}
               <h1

@@ -10,7 +10,9 @@ import {
   formatHeroBuyButtonPrice,
   getTicketOldPrice,
   getTicketPriceRange,
+  isCategoryDuplicatedInBreadcrumbs,
   isOpenDateEvent,
+  normalizeTicketCategoryLabel,
 } from './event-page-utils.ts';
 
 function eventPayload(overrides: Partial<PublicEventPageDto> = {}): PublicEventPageDto {
@@ -154,4 +156,29 @@ test('weekday-only ticket title suffixes still merge into one category', () => {
   assert.equal(rows[0]!.name, 'Взрослый');
   assert.equal(rows[0]!.minPrice, 1_000);
   assert.equal(rows[0]!.maxPrice, 1_500);
+});
+
+test('isCategoryDuplicatedInBreadcrumbs hides hero type already present in crumbs', () => {
+  const crumbs = [{ name: 'Главная' }, { name: 'Москва' }, { name: 'Концерты' }];
+  assert.equal(isCategoryDuplicatedInBreadcrumbs('Концерты', crumbs), true);
+  assert.equal(isCategoryDuplicatedInBreadcrumbs('Музеи и арт', [{ name: 'Музеи' }]), true);
+  assert.equal(isCategoryDuplicatedInBreadcrumbs('Экскурсии', crumbs), false);
+  assert.equal(isCategoryDuplicatedInBreadcrumbs('', crumbs), false);
+  assert.equal(isCategoryDuplicatedInBreadcrumbs('Концерты', []), false);
+});
+
+test('normalizeTicketCategoryLabel drops obvious "Стоимость одного билета" and typos', () => {
+  assert.equal(
+    normalizeTicketCategoryLabel('Стоимость одного билета за столиком на 4 человека'),
+    'За столиком на 4 человека',
+  );
+  assert.equal(
+    normalizeTicketCategoryLabel('Стоимостьь одного билета за столиком на 10 человек'),
+    'За столиком на 10 человек',
+  );
+  assert.equal(normalizeTicketCategoryLabel('Стоимость билета взрослый'), 'Взрослый');
+  assert.equal(normalizeTicketCategoryLabel('стоимость одного билета детский'), 'Детский');
+  assert.equal(normalizeTicketCategoryLabel('взрослый'), 'Взрослый');
+  assert.equal(normalizeTicketCategoryLabel('Театро VIP-столик №1 (2 билета)'), 'Театро VIP-столик №1 (2 билета)');
+  assert.equal(normalizeTicketCategoryLabel(''), 'Билет');
 });

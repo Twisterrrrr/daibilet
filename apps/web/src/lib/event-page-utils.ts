@@ -21,6 +21,28 @@ export {
 
 const MIN_DISPLAY_PRICE_RUB = 100;
 
+/**
+ * True when the event category is already visible in the breadcrumb trail
+ * ("Концерты" crumb vs category "Концерты"), so the hero must not repeat it.
+ * Owner 2026-10-11: hero duplicated the type right under the breadcrumbs.
+ */
+export function isCategoryDuplicatedInBreadcrumbs(
+  category: string | null | undefined,
+  crumbs: Array<{ name: string }> | null | undefined,
+): boolean {
+  const cat = cleanDisplayText(String(category || '')).toLocaleLowerCase('ru');
+  if (!cat) return false;
+  const words = cat.split(/\s+/).filter((w) => w.length >= 4);
+  for (const crumb of crumbs || []) {
+    const name = cleanDisplayText(String(crumb?.name || '')).toLocaleLowerCase('ru');
+    if (!name) continue;
+    if (name === cat) return true;
+    if (name.includes(cat) || cat.includes(name)) return true;
+    if (words.length && words.every((w) => name.includes(w))) return true;
+  }
+  return false;
+}
+
 export const FLEXIBLE_SCHEDULE_LABEL = 'Билеты с открытой датой';
 
 export function isFlexibleScheduleSession(session: {
@@ -214,15 +236,44 @@ function isTransportBoilerplate(value?: string | null): boolean {
 }
 
 /** Убирает юридический хвост TC и расписание по дням недели, оставляет только имя категории. */
+/** Leading boilerplate in provider offer titles that is obvious from context. */
+const TICKET_LABEL_PREFIXES: RegExp[] = [
+  /^стоимостьь\s+одного\s+билета\s*/iu,
+  /^стоимость\s+одного\s+билета\s*/iu,
+  /^стоимостьь\s+билета\s*/iu,
+  /^стоимость\s+билета\s*/iu,
+  /^цена\s+одного\s+билета\s*/iu,
+  /^цена\s+билета\s*/iu,
+  /^стоимостьь\s*/iu,
+];
+
+/** Capitalize the first Cyrillic/Latin letter of a label. */
+function capitalizeFirstLetter(value: string): string {
+  const text = String(value || '').trim();
+  if (!text) return text;
+  return text.charAt(0).toLocaleUpperCase('ru') + text.slice(1);
+}
+
 export function normalizeTicketCategoryLabel(raw?: string | null): string {
   let text = cleanDisplayText(raw);
   if (!text) return 'Билет';
+
+  // "Стоимостьь" and friends are provider typos.
+  text = text.replace(/стоимостьь/giu, 'Стоимость');
+
+  for (const prefix of TICKET_LABEL_PREFIXES) {
+    const stripped = text.replace(prefix, '');
+    if (stripped !== text && stripped.trim()) {
+      text = stripped.trim();
+      break;
+    }
+  }
 
   const dashSplit = text.split(/\s[-–—]\s/);
   if (dashSplit.length > 1) {
     const head = dashSplit[0]?.trim() || '';
     const tail = dashSplit.slice(1).join(' - ').trim();
-    if (head && (!tail || isTransportBoilerplate(tail))) return head;
+    if (head && (!tail || isTransportBoilerplate(tail))) return capitalizeFirstLetter(head);
   }
 
   text = text
@@ -230,9 +281,9 @@ export function normalizeTicketCategoryLabel(raw?: string | null): string {
     .trim();
 
   const parts = splitTitlePartsWithoutWeekdays(text);
-  if (parts[0]?.trim()) return parts[0].trim();
+  if (parts[0]?.trim()) return capitalizeFirstLetter(parts[0].trim());
 
-  return text || 'Билет';
+  return capitalizeFirstLetter(text) || 'Билет';
 }
 
 function isRedundantCategoryDescription(name: string, description: string | null): boolean {
