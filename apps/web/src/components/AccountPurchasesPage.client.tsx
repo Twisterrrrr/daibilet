@@ -115,9 +115,16 @@ export function AccountPurchasesPageView() {
     const widgetRows = (payload?.rows || []).map(widgetToBuyerOrder);
     const byCode = new Map<string, BuyerOrder>();
 
-    for (const row of [...remoteInternal, ...localInternal].map(internalToBuyerOrder)) {
-      byCode.set(row.number, row);
+    // Browser storage is only a snapshot. It must not override a refunded or cancelled finance order.
+    for (const row of localInternal) {
+      byCode.set(row.publicCode, internalToBuyerOrder({
+        ...row,
+        status: 'VERIFYING',
+        displayStatus: 'Статус уточняется',
+        statusTone: 'incomplete',
+      }));
     }
+    for (const row of remoteInternal) byCode.set(row.publicCode, internalToBuyerOrder(row));
     for (const row of widgetRows) {
       if (!byCode.has(row.number)) byCode.set(row.number, row);
     }

@@ -49,6 +49,7 @@ async function fetchOrderLookup(
     cache: 'no-store',
     signal,
   });
+  if (!response.ok) throw new Error('checkout_order_lookup_failed');
   return (await response.json().catch(() => null)) as LookupResponse | null;
 }
 
@@ -64,13 +65,17 @@ export function CheckoutResultView() {
   const [publicCode, setPublicCode] = useState(publicCodeParam);
   const [emailHint, setEmailHint] = useState<'sent' | 'skipped' | 'unknown'>('unknown');
   const [recoveredFromStorage, setRecoveredFromStorage] = useState(false);
+  const [verificationFailed, setVerificationFailed] = useState(false);
 
   useEffect(() => {
     let disposed = false;
+    let lookupVerified = false;
     const pollAbort = new AbortController();
 
     const applyOrder = (next: BuyerInternalOrderRecord, cached: BuyerInternalOrderRecord | null) => {
       const merged = mergeBuyerInternalOrders(next, cached);
+      lookupVerified = true;
+      setVerificationFailed(false);
       setOrder(merged);
       setPublicCode(merged.publicCode);
       upsertInternalOrderInStorage(merged);
@@ -137,7 +142,6 @@ export function CheckoutResultView() {
           code = latest.publicCode;
           if (!disposed) {
             setPublicCode(code);
-            setOrder(latest);
             setRecoveredFromStorage(true);
           }
         }
@@ -149,7 +153,6 @@ export function CheckoutResultView() {
       }
 
       let cached = readInternalOrdersFromStorage().find((row) => row.publicCode === code) || null;
-      if (!disposed && cached) setOrder(cached);
 
       let current: BuyerInternalOrderRecord | null = cached;
 
@@ -158,6 +161,10 @@ export function CheckoutResultView() {
         if (!disposed && payload?.found && payload.order) {
           current = applyOrder(payload.order, cached);
           cached = current;
+        } else if (!disposed && cached) {
+          current = null;
+          setOrder(null);
+          setVerificationFailed(true);
         } else if (!disposed && !cached) {
           const mapped = mapFinanceOrderStatus('PENDING');
           current = {
@@ -175,7 +182,12 @@ export function CheckoutResultView() {
           setOrder(current);
         }
       } catch {
-        // keep cache / fallback - transport error must not become failed payment
+        // A saved paid status cannot prove current validity after cancellation or refund.
+        current = null;
+        if (!disposed) {
+          setOrder(null);
+          setVerificationFailed(true);
+        }
       } finally {
         if (!disposed) setLoading(false);
       }
@@ -206,7 +218,7 @@ export function CheckoutResultView() {
         });
       }
 
-      if (code && !disposed) {
+      if (code && !disposed && lookupVerified) {
         await maybeNotify(code, cached);
       }
     };
@@ -255,11 +267,11 @@ export function CheckoutResultView() {
             Спасибо за заказ
           </div>
           <h1 className="mt-4 text-4xl font-extrabold tracking-tight sm:text-5xl">
-            {status.statusTone === 'live' ? 'Оплата прошла' : 'Заказ принят'}
+            {order?.status === 'REFUNDED' ? 'Заказ возвращён' : ['CANCELLED', 'CANCELED', 'EXPIRED'].includes(String(order?.status || '')) ? 'Заказ отменён' : status.statusTone === 'live' ? 'Оплата прошла' : 'Заказ принят'}
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-7 text-emerald-50/90">
-            {ticketReady ? 'Ниже - ваш электронный билет.' : 'Оплата ещё не подтверждена. Билет появится после подтверждения платежа.'} Сохраните код и ссылку
-            {recoveredFromStorage ? ' (код восстановлен из этого браузера)' : ''}.
+            {ticketReady ? 'Ниже - ваш электронный билет. Сохраните код и ссылку.' : order?.status === 'REFUNDED' ? 'Деньги возвращены. Билет больше не действует.' : ['CANCELLED', 'CANCELED', 'EXPIRED'].includes(String(order?.status || '')) ? 'Билет больше не действует.' : verificationFailed ? 'Статус заказа сейчас не удалось проверить.' : 'Оплата ещё не подтверждена. Билет появится после подтверждения платежа. Сохраните код заказа.'}
+            {recoveredFromStorage ? ' Код восстановлен из этого браузера.' : ''}
           </p>
         </div>
       </section>
@@ -285,7 +297,7 @@ export function CheckoutResultView() {
               </div>
             )}
           </div>
-        ) : null}
+        ) : verificationFailed ? <p className="text-sm text-amber-900 print:hidden">Не удалось подтвердить статус заказа. Сохранённая в браузере копия билета не используется.</p> : null}
 
         {user?.email && filterInternalOrdersForEmail(readInternalOrdersFromStorage(), user.email).length > 1 ? (
           <p className="mt-6 text-sm text-slate-500 print:hidden">

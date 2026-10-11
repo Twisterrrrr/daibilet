@@ -81,7 +81,7 @@ export function BuyerOrderCard({ order, accountEmail }: Props) {
   const importAssessment = !isInternal ? assessImportTicket(order) : null;
   const showImportTicketActions = Boolean(importAssessment && importAssessment.richness === 'rich');
   const showEmailFallback = Boolean(importAssessment && importAssessment.richness === 'sparse');
-  const showNativeTicketActions = isInternal;
+  const showNativeTicketActions = isInternal && ['CONFIRMED', 'FULFILLED', 'SUCCEEDED', 'PAID'].includes(String(order.status || '').toUpperCase());
   const showTicketActions = showNativeTicketActions || showImportTicketActions;
 
   const reviewHref = buildOrderReviewHref(order);
