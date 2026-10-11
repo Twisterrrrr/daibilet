@@ -50,6 +50,7 @@ const argValue = (name) => {
 const input = argValue('--input') || path.join(rootDir, 'tmp-event-desc-backup', 'public-cards-full.json');
 const outDir = argValue('--out') || path.join(rootDir, 'tmp-event-desc-backup', 'upgrade-public');
 const limit = Number(argValue('--limit') || 0) || 0;
+const diffSlug = argValue('--diff');
 
 const MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
 const TODAY = Date.UTC(2026, 9, 11); // audit date: 2026-10-11
@@ -88,11 +89,11 @@ export function cleanText(value) {
   return s.trim();
 }
 
-/** Split raw copy into lead paragraphs and "## Heading" sections. */
+/** Split raw copy into lead paragraphs and "## Heading" sections (headings start a line). */
 export function splitSections(raw) {
-  const parts = String(raw || '').split(/(?=##\s)/u);
+  const parts = String(raw || '').split(/(?=\n##\s)/u);
   const lead = (parts.shift() || '').trim();
-  const sections = parts.map((p) => p.trim()).filter(Boolean);
+  const sections = parts.map((p) => p.replace(/^\n+/u, '').trim()).filter(Boolean);
   return { lead, sections };
 }
 
@@ -113,6 +114,71 @@ const ALREADY_INFLECTED_RE = /(?:е|и|ой|ах|ях|у|ю|ом|ем|ых|их|
 
 /** Declension hook, set from the web lib in main(). */
 let cityPrepositionalRef = (city) => city;
+
+/**
+ * Remove date/time phrases that duplicate the Prak block: "Ближайший сеанс -
+ * 20 октября 2026, 17:00.", "Когда: 18 октября 2026, 16:00." etc.
+ */
+export function stripDatePhrases(text) {
+  let s = String(text || '');
+  s = s.replace(/^\s*(?:Когда(?: и где)?|Дата|Время)\s*:?\s*[^.!?]*[.!?]\s*/iu, '');
+  s = s.replace(
+    /\s*(?:[:;,—-]\s*)?(?:Ближайшая дата|Ближайший сеанс|Ближайшие даты|Следующий сеанс|Ближайшее время)\s*[-:]?\s*[^.!?]*[.!?]?/giu,
+    '.',
+  );
+  s = s.replace(/[ \t]{2,}/gu, ' ').replace(/\s*[,;:]+\s*\./gu, '.').replace(/\.{2,}/gu, '.').replace(/^[\s,;:.-]+/u, '').trim();
+  s = s.replace(/[\s,;:—-]+$/u, '');
+  if (s && !/[.!?…»)]$/u.test(s)) s = `${s}.`;
+  return s;
+}
+
+/** Remove fact phrases already covered by the Prak block (age/price/date/place/address). */
+export function dedupeFacts(text, card) {
+  let s = String(text || '');
+  const age = String(card.age || '').trim();
+  if (age && age !== '0') {
+    s = s.replace(new RegExp(`\\s*(?:Возрастное ограничение|Рекомендованный возраст|Возраст)\\s*:?\\s*${escapeRe(age)}\\+?\\.?`, 'giu'), ' ');
+  }
+  const price = Number(card.price || 0);
+  if (price >= 100) {
+    const forms = [...new Set([String(price), price.toLocaleString('ru-RU'), price.toLocaleString('ru-RU').replace(/\u00A0/gu, ' ')])];
+    for (const form of forms) {
+      s = s.replace(
+        new RegExp(`\\s*(?:Билеты|Стоимость(?: билета)?|Цена)\\s*[-:]?\\s*(?:от\\s*)?${escapeRe(form)}\\s*(?:₽|р\\.?|руб\\.?)?\\.?`, 'giu'),
+        ' ',
+      );
+    }
+  }
+  const next = card.next_session ? new Date(card.next_session) : null;
+  if (next && !Number.isNaN(next.getTime())) {
+    const day = next.getUTCDate();
+    const month = MONTHS[next.getUTCMonth()];
+    s = s.replace(new RegExp(`\\s*${day}\\s+${month}(?:\\s+\\d{4}(?:\\s+года)?)?(?:,?\\s*\\d{1,2}:\\d{2})?\\.?`, 'giu'), ' ');
+  }
+  const venue = String(card.venue || '').trim();
+  if (venue) {
+    s = s.replace(new RegExp(`\\s*(?:Место|Площадка)\\s*:?\\s*${escapeRe(venue)}[^.!?\n]*[.!?]?`, 'giu'), ' ');
+  }
+  if (String(card.venue_address || '').trim()) {
+    s = s.replace(/\s*Адрес\s*:?\s*[^.!?\n]*[.!?]?/giu, ' ');
+  }
+  return s.replace(/[ \t]{2,}/gu, ' ').replace(/\s+([.,!?;:])/gu, '$1').trim();
+}
+
+/** True when a section body has no meaningful content left (venue/city only counts as blank). */
+export function isBlankBody(body, card = {}) {
+  let s = String(body || '')
+    .replace(/[^0-9a-zа-яё]+/giu, ' ')
+    .trim();
+  if (!s) return true;
+  for (const token of [card.venue, card.city]) {
+    const norm = String(token || '')
+      .replace(/[^0-9a-zа-яё]+/giu, ' ')
+      .trim();
+    if (norm) s = s.replace(new RegExp(escapeRe(norm), 'giu'), ' ');
+  }
+  return s.replace(/\s+/gu, '').length < 3;
+}
 
 /**
  * Fix templated city forms even when the copy city differs from the catalogue
@@ -182,6 +248,17 @@ export function hasPastDate(text, card) {
   return false;
 }
 
+const FACT_SECTION_HEADS_RE = /^##\s*(?:Даты и билеты|Организационные детали|ОРГАНИЗАЦИОННЫЕ ДЕТАЛИ|Место проведения концерта|Информация|Дополнительная информация|Дополнительно|Условия участия|Как добраться)$/iu;
+
+/** Split a section into head and body, tolerating glued one-line sections. */
+function splitHeadBody(sectionText) {
+  const nl = sectionText.indexOf('\n');
+  if (nl > 0) return { head: sectionText.slice(0, nl).trim(), body: sectionText.slice(nl + 1), glued: false };
+  const glue = /^(##\s*(?:Даты и билеты|Организационные детали|ОРГАНИЗАЦИОННЫЕ ДЕТАЛИ|Место проведения концерта|Информация|Дополнительная информация|Дополнительно|Условия участия|Как добраться))(?:\s+([\s\S]*))?$/iu.exec(sectionText.trim());
+  if (glue) return { head: glue[1].trim(), body: glue[2] || '', glued: true };
+  return { head: sectionText.trim(), body: '', glued: false };
+}
+
 function writeFileSafe(file, content) {
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(file, content, 'utf8');
@@ -205,6 +282,8 @@ async function main() {
     factBlockAdded: 0,
     factBlockRebuilt: 0,
     legacyBlocksDropped: 0,
+    dupPhrases: 0,
+    dupFacts: 0,
     sellAdded: 0,
     leadRebuilt: 0,
   };
@@ -234,12 +313,14 @@ async function main() {
     const leadClean = cleanText(lead);
     if (leadClean !== String(lead || '').trim()) marks.stubsRemoved += 1;
 
-    const leadDated = actualizeDates(leadClean, d);
-    if (leadDated !== leadClean) marks.datesFixed += 1;
+    const leadStripped = stripDatePhrases(leadClean);
+    if (leadStripped !== leadClean) marks.dupPhrases += 1;
+    const leadDated = actualizeDates(leadStripped, d);
+    if (leadDated !== leadStripped) marks.datesFixed += 1;
     let leadText = fixTemplatedCase(fixCityCase(leadDated, caseCtx));
     if (leadText !== leadDated) marks.cityFixed += 1;
 
-    if (leadText.replace(/##[\s\S]*$/u, '').trim().length < 40) {
+    if (leadText.replace(/(?:^|\n)##\s[\s\S]*$/u, '').trim().length < 40) {
       leadText = String(buildMinimalEventDescription(cardInput, index)).split('\n\n')[0];
       marks.leadRebuilt += 1;
     }
@@ -250,11 +331,25 @@ async function main() {
         marks.legacyBlocksDropped += 1;
         continue;
       }
-      let sectionClean = cleanText(section);
-      const sectionDated = actualizeDates(sectionClean, d);
-      if (sectionDated !== sectionClean) marks.datesFixed += 1;
-      sectionClean = fixTemplatedCase(fixCityCase(sectionDated, caseCtx));
-      kept.push(sectionClean);
+      const sectionClean = cleanText(section);
+      const { head, body, glued } = splitHeadBody(sectionClean);
+
+      let cleanedBody = stripDatePhrases(body);
+      if (cleanedBody !== body) marks.dupPhrases += 1;
+      if (glued || FACT_SECTION_HEADS_RE.test(head)) {
+        const deduped = dedupeFacts(cleanedBody, d);
+        if (deduped !== cleanedBody) marks.dupFacts += 1;
+        cleanedBody = deduped;
+      }
+      cleanedBody = cleanText(cleanedBody);
+      cleanedBody = actualizeDates(cleanedBody, d);
+      cleanedBody = fixTemplatedCase(fixCityCase(cleanedBody, caseCtx));
+
+      if (isBlankBody(cleanedBody, d)) {
+        marks.legacyBlocksDropped += 1;
+        continue;
+      }
+      kept.push(cleanedBody ? `${head}\n\n${cleanedBody}` : head);
     }
 
     const factBlock = buildPracticalInfoBlock(cardInput);
@@ -289,10 +384,19 @@ async function main() {
     textIndex.set(text, (textIndex.get(text) || 0) + 1);
 
     if (text !== String(d.raw || '').replace(/\r\n/gu, '\n').trim()) {
+      if (diffSlug && String(d.slug || '').includes(diffSlug)) {
+        const raw = String(d.raw || '').replace(/\r\n/gu, '\n').trim();
+        let pos = 0;
+        while (pos < raw.length && pos < text.length && raw[pos] === text[pos]) pos += 1;
+        writeFileSafe(
+          path.join(outDir, `diff-${diffSlug.replace(/[^a-z0-9-]/giu, '_')}.txt`),
+          `RAW len=${raw.length}\n${JSON.stringify(raw.slice(Math.max(0, pos - 90), pos + 90))}\n\nTEXT len=${text.length}\n${JSON.stringify(text.slice(Math.max(0, pos - 90), pos + 90))}\n\nRAW tail: ${JSON.stringify(raw.slice(-60))}\nTEXT tail: ${JSON.stringify(text.slice(-60))}`,
+        );
+      }
       plan.push({ id: d.id, slug: d.slug, text });
       if (samples.length < 12) {
         samples.push(
-          `\n\n===== ${d.slug} (${String(d.eff || '').length} -> ${text.length}) =====\n--- BEFORE ---\n${String(d.eff || '').slice(0, 300)}\n--- AFTER ---\n${text.slice(0, 520)}`,
+          `\n\n===== ${d.slug} (${String(d.raw || '').length} -> ${text.length}) =====\n--- BEFORE (raw) ---\n${String(d.raw || '').slice(0, 300)}\n--- AFTER ---\n${text.slice(0, 520)}`,
         );
       }
     }
