@@ -204,6 +204,15 @@ test('bullet line-up (already dashed) also gets "В программе" heading'
   assert.match(html, /<ul><li>Екатерина Французова - Вокал<\/li><li>Элина Шатская - Вокал<\/li>/);
 });
 
+test('lineup split by blank lines still gets the "В программе" heading', () => {
+  const sample =
+    'В программе концерта хиты 80-90.\n\nЕкатерина Французова - Вокал\n\nЭлина Шатская - Вокал\n\nМихаил Зыков - Вокал';
+  const out = reformatEventDescription(sample);
+  assert.match(out, /## В программе/);
+  const html = formatEventDescriptionHtml(out);
+  assert.match(html, /<h3>В программе<\/h3>/);
+});
+
 test('space before sentence dot is normalized', () => {
   const out = reformatEventDescription('Хиты эстрады под которые просто не возможно усидеть на месте . Красивые виды Москвы.');
   assert.doesNotMatch(out, /\s\./);

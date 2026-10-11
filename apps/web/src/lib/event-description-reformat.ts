@@ -389,20 +389,32 @@ export type ReformatEntry = {
  * never merge, so visual titles and landmark lists survive.
  */
 export function mergeSoftWrappedEntries(entries: ReformatEntry[]): ReformatEntry[] {
-  // Mark markerless enumeration runs.
+  // Mark markerless enumeration runs (blank lines between items are transparent).
   const inRun = new Array<boolean>(entries.length).fill(false);
   let i = 0;
   while (i < entries.length) {
-    if (entries[i].type === 'text' && isEnumerationRunLine(entries[i].text)) {
-      let j = i;
-      while (j < entries.length && entries[j].type === 'text' && isEnumerationRunLine(entries[j].text)) j += 1;
-      if (j - i >= 2) {
-        for (let k = i; k < j; k += 1) inRun[k] = true;
-      }
-      i = j;
-    } else {
+    if (entries[i].type !== 'text' || !isEnumerationRunLine(entries[i].text)) {
       i += 1;
+      continue;
     }
+    const runIdx = [i];
+    let j = i + 1;
+    while (j < entries.length) {
+      if (entries[j].type === 'blank') {
+        j += 1;
+        continue;
+      }
+      if (entries[j].type === 'text' && isEnumerationRunLine(entries[j].text)) {
+        runIdx.push(j);
+        j += 1;
+        continue;
+      }
+      break;
+    }
+    if (runIdx.length >= 2) {
+      for (const k of runIdx) inRun[k] = true;
+    }
+    i = j > i ? j : i + 1;
   }
 
   const merged: ReformatEntry[] = [];
@@ -598,12 +610,27 @@ export function reformatEventDescription(raw: string): string {
     }
     if (entry.fromRun) {
       // Markerless enumeration run -> plain lines (renderer builds the <ul>);
-      // a concert line-up additionally gets a "В программе" title.
+      // a concert line-up additionally gets a "В программе" title. Blank lines
+      // inside a run are transparent (provider emits "<p>a</p><p>b</p>").
       const run: string[] = [];
       let j = i;
-      while (j < grouped.length && grouped[j].type === 'text' && grouped[j].fromRun) {
-        run.push(grouped[j].text);
-        j += 1;
+      while (j < grouped.length) {
+        const cur = grouped[j];
+        if (cur.type === 'text' && cur.fromRun) {
+          run.push(cur.text);
+          j += 1;
+          continue;
+        }
+        if (cur.type === 'blank') {
+          let k = j;
+          while (k < grouped.length && grouped[k].type === 'blank') k += 1;
+          const next = grouped[k];
+          if (next && next.type === 'text' && next.fromRun) {
+            j = k;
+            continue;
+          }
+        }
+        break;
       }
       if (looksLikeLineup(run)) {
         if (blocks.length && blocks[blocks.length - 1] !== '') blocks.push('');
