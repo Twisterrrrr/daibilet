@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
+import { LANDING_REVIEWS_ENABLED } from './landing-features.ts';
 import {
   appendRealPriceToDescription,
   buildCategoryCityListingMeta,
@@ -89,9 +90,31 @@ test('category×city description formula (Ekaterinburg)', () => {
   });
   assert.equal(
     description,
-    'Актуальная афиша категории Стендап в Екатеринбурге на 2026 год. Удобный выбор мест, билеты без наценок и честные отзывы. Заходите и бронируйте на Daibilet.ru!',
+    'Актуальная афиша категории Стендап в Екатеринбурге на 2026 год. Удобный выбор мест, билеты без наценок. Заходите и бронируйте на Daibilet.ru!',
   );
   assert.ok(!description.includes('\u2014') && !description.includes('\u2013'));
+});
+
+test('reviews phrase follows LANDING_REVIEWS_ENABLED / explicit override', () => {
+  const base = {
+    seekCategory: 'стендап',
+    categoryTitle: 'Стендап',
+    cityName: 'Екатеринбург',
+    year: 2026,
+  } as const;
+  const disabled = buildCategoryCityMetaDescription(base);
+  const enabled = buildCategoryCityMetaDescription({ ...base, reviews: true });
+  assert.equal(disabled.includes('честные отзывы'), false);
+  assert.equal(enabled.includes('честные отзывы'), true);
+  // Default follows the shared feature flag (single switch for meta + reviews block).
+  const defaultOn = buildCategoryCityMetaDescription({ ...base, reviews: undefined });
+  assert.equal(defaultOn.includes('честные отзывы'), LANDING_REVIEWS_ENABLED);
+  const defaultCity = buildCategoryCityMetaDescription({
+    seekCategory: 'шоу-программы',
+    cityName: 'Санкт-Петербург',
+    reviews: true,
+  });
+  assert.match(defaultCity, /честные отзывы, удобный выбор мест/);
 });
 
 test('listing meta bundles labels', () => {

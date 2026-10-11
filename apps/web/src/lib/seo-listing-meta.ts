@@ -1,5 +1,6 @@
 import { cityToPrepositional, inCityPrepositional, isSeoExpansionCity } from '@/lib/city-declension';
 import { canonicalLandingSlug } from '@/lib/landing-constants';
+import { LANDING_REVIEWS_ENABLED } from '@/lib/landing-features';
 import { stripCityFromLandingTopic } from '@/lib/landing-seo';
 
 /**
@@ -189,8 +190,11 @@ export function buildCategoryCityMetaDescription(input: {
   /** Title-case ярлык категории (для шаблона Казань/Екб). */
   categoryTitle?: string;
   year?: number;
+  /** Override reviews phrase (default = LANDING_REVIEWS_ENABLED). */
+  reviews?: boolean;
 }): string {
   const cityRaw = String(input.cityName || '').trim() || 'городе';
+  const withReviews = input.reviews ?? LANDING_REVIEWS_ENABLED;
   if (isSeoExpansionCity(cityRaw)) {
     const category =
       String(input.categoryTitle || input.seekCategory || '').trim() || 'события';
@@ -198,13 +202,13 @@ export function buildCategoryCityMetaDescription(input: {
     const year = input.year ?? listingSeoYear();
     return (
       `Актуальная афиша категории ${category} в ${cityPrep} на ${year} год. ` +
-      `Удобный выбор мест, билеты без наценок и честные отзывы. Заходите и бронируйте на Daibilet.ru!`
+      `Удобный выбор мест, билеты без наценок${withReviews ? ' и честные отзывы' : ''}. Заходите и бронируйте на Daibilet.ru!`
     );
   }
   const seek = String(input.seekCategory || '').trim() || 'события';
   const inCity = inCityPrepositional(cityRaw);
   return (
-    `Ищете ${seek} ${inCity}? Актуальная афиша на Дайбилет: честные отзывы, удобный выбор мест, билеты без переплат. Заходите и бронируйте!`
+    `Ищете ${seek} ${inCity}? Актуальная афиша на Дайбилет: ${withReviews ? 'честные отзывы, ' : ''}удобный выбор мест, билеты без переплат. Заходите и бронируйте!`
   );
 }
 

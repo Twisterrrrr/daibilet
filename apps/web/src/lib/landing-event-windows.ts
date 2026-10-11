@@ -160,10 +160,10 @@ export function resolveGraduationWindow(from = new Date()): LandingEventWindow {
   const thisStart = atLocalDay(y, 5, 1);
   const thisEnd = atLocalDay(y, 5, 30);
   const today = startOfLocalDay(from).getTime();
-  if (today <= thisEnd.getTime()) return { start: thisStart, end: thisEnd, label: 'Июнь', singleDay: false };
+  if (today <= thisEnd.getTime()) return { start: thisStart, end: thisEnd, label: 'июнь', singleDay: false };
   const start = atLocalDay(y + 1, 5, 1);
   const end = atLocalDay(y + 1, 5, 30);
-  return { start, end, label: 'Июнь', singleDay: false };
+  return { start, end, label: 'июнь', singleDay: false };
 }
 
 /** International Women's Day: March 1–8. */

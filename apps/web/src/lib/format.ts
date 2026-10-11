@@ -36,13 +36,28 @@ export function formatLandingBuyPrice(from?: number | null, to?: number | null):
   return `${formatNumber(min)} ₽`;
 }
 
-export function pluralEvents(count: number): string {
+export type PluralForms = readonly [one: string, few: string, many: string];
+
+export const PLURAL_EVENT_FORMS: PluralForms = ['событие', 'события', 'событий'];
+export const PLURAL_TRIP_FORMS: PluralForms = ['рейс', 'рейса', 'рейсов'];
+export const PLURAL_NIGHT_TRIP_FORMS: PluralForms = ['рейс ночью', 'рейса ночью', 'рейсов ночью'];
+export const PLURAL_TOUR_FORMS: PluralForms = ['экскурсия', 'экскурсии', 'экскурсий'];
+export const PLURAL_WALK_FORMS: PluralForms = ['прогулка', 'прогулки', 'прогулок'];
+export const PLURAL_DINNER_FORMS: PluralForms = ['ужин', 'ужина', 'ужинов'];
+export const PLURAL_PROGRAM_FORMS: PluralForms = ['программа', 'программы', 'программ'];
+
+/** Русская плюрализация: one / few / many (1 событие, 2 события, 5 событий). */
+export function pluralRu(count: number, forms: PluralForms): string {
   const mod10 = count % 10;
   const mod100 = count % 100;
-  if (mod100 >= 11 && mod100 <= 19) return `${formatNumber(count)} событий`;
-  if (mod10 === 1) return `${formatNumber(count)} событие`;
-  if (mod10 >= 2 && mod10 <= 4) return `${formatNumber(count)} события`;
-  return `${formatNumber(count)} событий`;
+  if (mod100 >= 11 && mod100 <= 19) return forms[2];
+  if (mod10 === 1) return forms[0];
+  if (mod10 >= 2 && mod10 <= 4) return forms[1];
+  return forms[2];
+}
+
+export function pluralEvents(count: number): string {
+  return `${formatNumber(count)} ${pluralRu(count, PLURAL_EVENT_FORMS)}`;
 }
 
 export function pluralCities(count: number): string {

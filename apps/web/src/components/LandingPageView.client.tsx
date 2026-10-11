@@ -101,7 +101,8 @@ import {
 } from '@/data/river-landings';
 import { busCityGuide } from '@/data/bus-landings';
 import { dinnerCityGuide, type DinnerPier, type DinnerMealFormat } from '@/data/dinner-landings';
-import { formatMoney, formatMoneyRange, formatLandingBuyPrice, formatNumber } from '@/lib/format';
+import { formatMoney, formatMoneyRange, formatLandingBuyPrice, formatNumber, pluralEvents, pluralRu, PLURAL_DINNER_FORMS, PLURAL_EVENT_FORMS, PLURAL_NIGHT_TRIP_FORMS, PLURAL_PROGRAM_FORMS, PLURAL_TOUR_FORMS, PLURAL_TRIP_FORMS, PLURAL_WALK_FORMS } from '@/lib/format';
+import { LANDING_REVIEWS_ENABLED } from '@/lib/landing-features';
 import {
   collectSessionStartsAtTimes,
   getSessionHour,
@@ -1405,21 +1406,24 @@ function LandingHero({
             ? landing.heroSubtitle || 'От Невы до Енисея - сравните предложения речных прогулок в 12 городах России.'
             : landing.heroSubtitle || landing.subtitle;
   const soldEstimate = resolveLandingHeroSoldEstimate(profile, visibleCount, sessionsCount);
-  const countLabel = isBridges
-    ? 'рейсов ночью'
-    : countdownKind === 'new-year'
-      ? 'событий'
-      : isBus && cityName
-        ? 'рейсов'
-        : isBus
-          ? 'экскурсий'
-          : isRiver && cityName
-            ? 'прогулок'
-            : isDinner
-              ? 'ужинов'
-              : isSeasonal
-                ? 'программ'
-                : 'событий';
+  const countLabel = pluralRu(
+    visibleCount,
+    isBridges
+      ? PLURAL_NIGHT_TRIP_FORMS
+      : countdownKind === 'new-year'
+        ? PLURAL_EVENT_FORMS
+        : isBus && cityName
+          ? PLURAL_TRIP_FORMS
+          : isBus
+            ? PLURAL_TOUR_FORMS
+            : isRiver && cityName
+              ? PLURAL_WALK_FORMS
+              : isDinner
+                ? PLURAL_DINNER_FORMS
+                : isSeasonal
+                  ? PLURAL_PROGRAM_FORMS
+                  : PLURAL_EVENT_FORMS,
+  );
   const primaryLabel = resolveLandingHeroPrimaryLabel(profile, countdownKind);
   const secondaryLabel =
     countdownKind === 'new-year'
@@ -1539,7 +1543,7 @@ function LandingHero({
           <h1 className="mb-5 max-w-4xl text-3xl font-semibold leading-tight tracking-tight text-primary-foreground md:text-4xl lg:text-5xl">
             {isBridges ? (
               <>
-                <span className="block">{landingSeo.h1Lead.trim()}</span>
+                <span className="block">{landingSeo.h1Lead.trim()}</span>{' '}
                 <span className="mt-1 block text-[0.92em] md:mt-0 md:inline md:text-inherit">
                   {landingSeo.h1Today}
                   {landingSeo.h1Tail}
@@ -2044,7 +2048,7 @@ function LandingDinnerFilters({
           </span>
         ) : null}
         <span className="text-sm text-muted-foreground">
-          {groupsCount > 0 ? `${formatNumber(groupsCount)} рейсов` : 'Нет вариантов по выбранным фильтрам'}
+          {groupsCount > 0 ? `${formatNumber(groupsCount)} ${pluralRu(groupsCount, PLURAL_TRIP_FORMS)}` : 'Нет вариантов по выбранным фильтрам'}
         </span>
         {groupsCount === 0 ? (
           <button type="button" onClick={reset} className="rounded-lg border border-primary px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary/5">
@@ -2714,7 +2718,7 @@ function CityGridBlock({ block }: { block: LandingContentBlock }) {
         {items.map((item, index) => (
           <a key={`${item.title}:${index}`} href={`/?city=${encodeURIComponent(item.title)}`} className="rounded-lg bg-white/10 p-4 transition hover:bg-white/15">
             <div className="font-semibold">{item.title}</div>
-            <div className="mt-1 text-sm text-white/65">{formatNumber(Number(item.count || 0))} событий</div>
+            <div className="mt-1 text-sm text-white/65">{pluralEvents(Number(item.count || 0))}</div>
           </a>
         ))}
       </div>
@@ -2894,7 +2898,7 @@ function LandingFilters({
     eventWindow,
     isSeasonal: isSeasonal || isBus || isRiver || isBridges,
   });
-  const countLabel = isBus && currentCityName ? 'экскурсий' : isBus ? 'экскурсий' : isRiver && currentCityName ? 'прогулок' : isSeasonal ? 'программ' : 'рейсов';
+  const countLabel = pluralRu(groupsCount, isBus ? PLURAL_TOUR_FORMS : isRiver && currentCityName ? PLURAL_WALK_FORMS : isSeasonal ? PLURAL_PROGRAM_FORMS : PLURAL_TRIP_FORMS);
 
   const timeSlotSelect = (
     <select
@@ -3301,10 +3305,13 @@ function LandingReviews({
   profile?: LandingProfile;
   landingSlug?: string;
 }) {
-  // CV.L-debt: hide hardcoded fake reviews until real approved Review rows exist.
+  // CV.L-debt: no real approved Review rows yet. LANDING_REVIEWS_ENABLED flips
+  // both this block and the «честные отзывы» meta phrase (seo-listing-meta) -
+  // reviews arrive: implement the block below and flip the single flag.
   void landing;
   void profile;
   void landingSlug;
+  if (!LANDING_REVIEWS_ENABLED) return null;
   return null;
 }
 
@@ -3660,7 +3667,7 @@ function RelatedLandings({
               <a key={item.slug} href={landingPageHref(item.slug)} className="rounded-xl border border-slate-200 bg-white p-4 transition hover:border-primary-200 hover:shadow-sm">
                 <div className="text-sm font-semibold text-slate-950">{item.title}</div>
                 <div className="mt-1 text-xs text-slate-500">
-                  {formatNumber(item.events)} событий · {formatMoney(item.priceFrom)}
+                  {pluralEvents(item.events)} · {formatMoney(item.priceFrom)}
                 </div>
               </a>
             ))}
