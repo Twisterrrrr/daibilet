@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { buildNarrativeParagraphs, detectNarrativeKind } from './event-narrative-description.ts';
+import {
+  buildNarrativeParagraphs,
+  containsNarrativeParagraph,
+  detectNarrativeKind,
+  stripNarrativeParagraphs,
+} from './event-narrative-description.ts';
 
 test('detects narrative kind from title and category', () => {
   assert.equal(detectNarrativeKind({ title: 'Концерт группы X', category: 'Мероприятия' }), 'concert');
@@ -38,4 +43,24 @@ test('narrative rotates variants so cards do not repeat', () => {
 test('water kind mentions the boat ride, not the facts', () => {
   const [first] = buildNarrativeParagraphs({ title: 'Прогулка на теплоходе «Москва-29»' }, 0);
   assert.match(first, /прогулка|воду|борт|теплоход|река|палуб/iu);
+});
+
+test('adult events get no child/family wording', () => {
+  for (const kindTitle of ['Шоу «Мистика»', 'Стендап-концерт', 'Концерт группы X', 'Мастер-класс']) {
+    for (let v = 0; v < 12; v += 1) {
+      const text = buildNarrativeParagraphs({ title: kindTitle, ageLimit: '18' }, v).join(' ');
+      assert.doesNotMatch(text, /дет|ребён|ребен|подрост|семейн|семьёй|семьей/iu);
+    }
+  }
+});
+
+test('containsNarrativeParagraph detects and strips generated paragraphs', () => {
+  const [first, second] = buildNarrativeParagraphs({ title: 'Концерт группы X' }, 0);
+  const lead = '«Концерт группы X» - концерт в Москве, на площадке «Клуб».';
+  const text = `${lead}\n\n${first}\n\n${second}\n\n## Практическая информация`;
+  assert.equal(containsNarrativeParagraph(text), true);
+  const stripped = stripNarrativeParagraphs(text);
+  assert.equal(stripped, `${lead}\n\n## Практическая информация`);
+  assert.equal(containsNarrativeParagraph(stripped), false);
+  assert.equal(containsNarrativeParagraph(lead), false);
 });

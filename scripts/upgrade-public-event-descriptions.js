@@ -55,8 +55,10 @@ const diffSlug = argValue('--diff');
 const MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
 const TODAY = Date.UTC(2026, 9, 11); // audit date: 2026-10-11
 const SELL_LINE = 'Билеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.';
-const DROP_SECTION_RE = /^##\s*(?:Практическая информация|Где и когда|Когда и где)(?=\s|$)/iu;
+const DROP_SECTION_RE =
+  /^##\s*(?:Практическая информация|Даты и билеты|Место проведения концерта|Где и когда|Когда и где)(?=\s|$)/iu;
 const STUB_PHRASES = [
+  /\s*Билеты на выбранную дату[^.!?]*[.!?]?/giu,
   /\s*Детальное описание маршрута в исходных данных не указано\./giu,
   /\s*В источнике не указаны[^.]*\./giu,
   /\s*Описание отсутствует\./giu,
@@ -169,6 +171,39 @@ export function dedupeFacts(text, card, opts = {}) {
     s = s.replace(/\s*Адрес\s*:?\s*[^.!?\n]*[.!?]?/giu, ' ');
   }
   return s.replace(/[ \t]{2,}/gu, ' ').replace(/\s+([.,!?;:])/gu, '$1').trim();
+}
+
+/** True when a sentence merely restates a Prak fact (or is too short to matter). */
+function isReferenceSentence(sentence, card) {
+  const s = String(sentence || '').trim();
+  if (!s) return true;
+  if (s.replace(/[^0-9a-zа-яё]+/giu, '').length < 8) return true;
+  const lead = /^[•\-*\d.)\s]*/u;
+  if (new RegExp(`${lead.source}Продолжительность`, 'iu').test(s) && card.duration_min) return true;
+  if (new RegExp(`${lead.source}(?:Возраст(?:ное ограничение)?|Рекомендованный возраст)`, 'iu').test(s) && card.age && card.age !== '0') return true;
+  if (new RegExp(`${lead.source}(?:Билеты|Стоимость|Цена)`, 'iu').test(s) && Number(card.price) >= 100) return true;
+  if (new RegExp(`${lead.source}(?:Место|Площадка|Адрес)(?!\\s+(?:встречи|сбора|сбор))`, 'iu').test(s)) return true;
+  if (new RegExp(`${lead.source}(?:Дата|Когда|Ближайшая дата|Ближайший сеанс|Следующий сеанс)`, 'iu').test(s)) return true;
+  return false;
+}
+
+/** Drop reference-only sentences from a body; leftover facts are deduped against the Prak block. */
+export function stripFactSentences(body, card) {
+  return String(body || '')
+    .split(/\n/u)
+    .map((line) => {
+      const kept = [];
+      for (const sentence of line.split(/(?<=[.!?])\s+/u)) {
+        if (isReferenceSentence(sentence, card)) continue;
+        const cleaned = dedupeFacts(sentence, card, { dates: false });
+        if (isReferenceSentence(cleaned, card)) continue;
+        kept.push(cleaned.trim());
+      }
+      return kept.join(' ').replace(/\s+/gu, ' ').trim();
+    })
+    .join('\n')
+    .replace(/\n{3,}/gu, '\n\n')
+    .trim();
 }
 
 /** True when a section body has no meaningful content left (venue/city only counts as blank). */
@@ -289,11 +324,21 @@ function writeFileSafe(file, content) {
   fs.writeFileSync(file, content, 'utf8');
 }
 
+/** Stable per-card variant so re-runs keep the same phrasing (list order may shift). */
+export function stableVariant(seed) {
+  const s = String(seed || '');
+  let h = 7;
+  for (let i = 0; i < s.length; i += 1) h = (h * 31 + s.charCodeAt(i)) % 1000003;
+  return h;
+}
+
 async function main() {
   const lib = await import('../apps/web/src/lib/event-minimal-description.ts');
   const { buildPracticalInfoBlock, buildMinimalEventDescription, cityInPhrase, cityPrepositional } = lib;
   cityPrepositionalRef = cityPrepositional;
-  const { buildNarrativeParagraphs } = await import('../apps/web/src/lib/event-narrative-description.ts');
+  const { buildNarrativeParagraphs, containsNarrativeParagraph, stripNarrativeParagraphs } = await import(
+    '../apps/web/src/lib/event-narrative-description.ts'
+  );
 
   if (!fs.existsSync(input)) throw new Error(`Missing input ${input}`);
   const data = JSON.parse(fs.readFileSync(input, 'utf8'));
@@ -311,6 +356,7 @@ async function main() {
     dupPhrases: 0,
     dupFacts: 0,
     narrativeAdded: 0,
+    narrativeStripped: 0,
     sellAdded: 0,
     leadRebuilt: 0,
   };
@@ -350,7 +396,11 @@ async function main() {
     leadText = leadText.replace(/\s*[-—]?\s*билеты продаются онлайн\.?\s*$/iu, '.');
     const leadDeduped = dedupeFacts(leadText, d, { dates: false });
     if (leadDeduped !== leadText) marks.dupFacts += 1;
-    leadText = leadDeduped;
+    leadText = stripFactSentences(leadDeduped, d);
+    // repair the earlier artefact "… Москве с на 1 января …" left by date stripping inside a quoted title
+    if (/с на\s/iu.test(leadText) && d.title) {
+      leadText = leadText.replace(/«[^»]*с на[^»]*»/giu, `«${d.title}»`);
+    }
 
     if (leadText.replace(/(?:^|\n)##\s[\s\S]*$/u, '').trim().length < 40) {
       leadText = String(buildMinimalEventDescription(cardInput, index)).split('\n\n')[0];
@@ -371,7 +421,7 @@ async function main() {
       if (glued || FACT_SECTION_HEADS_RE.test(head)) {
         const deduped = dedupeFacts(cleanedBody, d);
         if (deduped !== cleanedBody) marks.dupFacts += 1;
-        cleanedBody = deduped;
+        cleanedBody = stripFactSentences(deduped, d);
       }
       cleanedBody = cleanText(cleanedBody);
       cleanedBody = actualizeDates(cleanedBody, d);
@@ -390,10 +440,16 @@ async function main() {
     if (factBlock) parts.push(factBlock);
     let text = cleanText(parts.join('\n\n'));
 
-    // Round 5: digest-only cards get two human narrative paragraphs after the lead.
-    if (proseLength(text) < 250) {
-      const narrative = buildNarrativeParagraphs(cardInput, index);
-      parts[0] = `${leadText}\n\n${narrative.join('\n\n')}`;
+    // Round 5-6: narratives only where the copy has no real description (<200 prose chars).
+    const leadStrippedNarrative = stripNarrativeParagraphs(parts[0]);
+    if (leadStrippedNarrative !== parts[0]) {
+      parts[0] = leadStrippedNarrative;
+      text = cleanText(parts.join('\n\n'));
+      marks.narrativeStripped += 1;
+    }
+    if (!containsNarrativeParagraph(text) && proseLength(text) < 200) {
+      const narrative = buildNarrativeParagraphs(cardInput, stableVariant(d.id));
+      parts[0] = `${parts[0]}\n\n${narrative.join('\n\n')}`;
       text = cleanText(parts.join('\n\n'));
       marks.narrativeAdded += 1;
     }

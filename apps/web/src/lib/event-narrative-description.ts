@@ -332,12 +332,52 @@ export function buildNarrativeParagraphs(input: NarrativeInput, variant = 0): st
   const kind = detectNarrativeKind(input);
   const copy = COPY[kind] || COPY.generic;
   const v = Math.abs(Math.trunc(variant));
-  const openings = copy.opening.length;
-  const detailsCount = copy.details.length;
-  const opening = copy.opening[v % openings];
-  const details = copy.details[Math.floor(v / openings) % detailsCount];
-  const audience = copy.audience[Math.floor(v / (openings * detailsCount)) % copy.audience.length];
+  const age = Number(String(input.ageLimit || '').replace(/[^0-9]/gu, '')) || 0;
+  const ageSensitive = /дет|ребён|ребен|подрост|семейн|семьёй|семьей|малыш/iu;
+  const safePool = (pool: string[]) => {
+    if (age < 12) return pool;
+    const allowed = pool.filter((line) => !ageSensitive.test(line));
+    return allowed.length ? allowed : pool;
+  };
+  const openings = safePool(copy.opening);
+  const detailsPool = safePool(copy.details);
+  const audiences = safePool(copy.audience);
+  const opening = openings[v % openings.length];
+  const details = detailsPool[Math.floor(v / openings.length) % detailsPool.length];
+  const audience = audiences[Math.floor(v / (openings.length * detailsPool.length)) % audiences.length];
   return [opening, `${details} ${audience}`];
+}
+
+/** True when the copy already carries a generated narrative paragraph (idempotency guard). */
+export function containsNarrativeParagraph(text: string): boolean {
+  return stripNarrativeParagraphs(String(text || '')) !== String(text || '');
+}
+
+const ALL_NARRATIVE_LINES = (() => {
+  const lines = new Set<string>();
+  for (const copy of Object.values(COPY)) {
+    for (const paragraph of [...copy.opening, ...copy.details, ...copy.audience]) lines.add(paragraph);
+  }
+  return [...lines];
+})();
+
+/** Remove previously generated narrative paragraphs (used when the copy now has real text). */
+export function stripNarrativeParagraphs(text: string): string {
+  const value = String(text || '');
+  if (!value) return value;
+  const blocks = value.split(/\n{2,}/u);
+  const kept = blocks.filter((block) => {
+    const b = block.trim();
+    if (!b) return true;
+    if (b.startsWith('##')) return true;
+    if (b.startsWith('- ')) return true;
+    for (const line of ALL_NARRATIVE_LINES) {
+      if (b === line) return false;
+      if (b.startsWith(line) && ALL_NARRATIVE_LINES.some((other) => b.endsWith(other))) return false;
+    }
+    return true;
+  });
+  return kept.join('\n\n');
 }
 
 
