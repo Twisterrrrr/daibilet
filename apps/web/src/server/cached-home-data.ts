@@ -10,6 +10,7 @@ import { HOME_PAGE_CACHE_TAG, PUBLIC_PAGE_REVALIDATE } from '@/server/cache-conf
 import { resolveCoverContentFingerprints } from '@/server/cover-image-fingerprint';
 import { fetchPublicApiJson } from '@/server/public-api-client';
 import { matchDestination } from '@/lib/selected-city';
+import { isLandingInSelection } from '@/lib/landing-features';
 
 export { HOME_PAGE_CACHE_TAG };
 
@@ -112,7 +113,15 @@ export const getHomeCoverFingerprints = unstable_cache(
 );
 
 export const getHomeLandings = unstable_cache(
-  () => fetchPublicApiJson<HomePageData['landingsCatalog']>('/api/public/landings-catalog', { timeoutMs: 4_000 }),
+  async () => {
+    const payload = await fetchPublicApiJson<HomePageData['landingsCatalog']>('/api/public/landings-catalog', {
+      timeoutMs: 4_000,
+    });
+    return {
+      ...payload,
+      items: (payload.items || []).filter((item) => isLandingInSelection(item.slug)),
+    };
+  },
   ['home-landings-v3-http'],
   homeCacheOptions,
 );
