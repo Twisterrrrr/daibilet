@@ -4330,7 +4330,14 @@ export async function buildPublicPromoBlocks(db, searchParams) {
 export async function buildPublicLandingsCatalog(db, searchParams) {
   const cityFilter = String(searchParams.get('city') || '').trim().toLowerCase();
   const sessions = await publicCatalogSessions(db);
-  const landings = buildSortedPublicLandings(scopePublicCatalogSessions(sessions, cityFilter), cityFilter);
+  // Podborki selection exclusion - keep in sync with
+  // apps/web/src/lib/landing-features.ts (LANDING_SELECTION_EXCLUDED_SLUGS).
+  // Excluded slugs stay out of every selection feed while their landing
+  // pages remain reachable (thin listings auto-noindex).
+  const selectionExcludedSlugs = new Set(['active-sport']);
+  const landings = buildSortedPublicLandings(scopePublicCatalogSessions(sessions, cityFilter), cityFilter).filter(
+    (landing) => !selectionExcludedSlugs.has(String(landing.slug || '').trim()),
+  );
 
   return {
     generatedAt: new Date().toISOString(),
