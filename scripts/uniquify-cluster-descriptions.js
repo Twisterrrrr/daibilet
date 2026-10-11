@@ -84,7 +84,7 @@ function buildLead(member, index) {
   const variants = [
     dateText ? `${title}${place}: ближайший сеанс - ${dateText}.` : `${title}${place}.`,
     dateText ? `«${title}»${place} - ближайшая дата ${dateText}.` : `«${title}»${place}.`,
-    dateText ? `${title}${place}. Ближайшее время - ${dateText}${priceText}.` : `${title}${place}${priceText}.`,
+    dateText ? `${title}${place}. Ближайший сеанс - ${dateText}${priceText}.` : `${title}${place}${priceText}.`,
     dateText ? `Когда: ${dateText}. ${title}${place}.` : `${title}${place}.`,
   ];
   return variants[Math.abs(index) % variants.length];
