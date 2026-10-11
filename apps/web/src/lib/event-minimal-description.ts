@@ -169,7 +169,7 @@ export function roundDurationMinutes(minutes: number | null | undefined): number
 const OPENERS = [
   (titleQuoted: string, format: string, place: string) => `${titleQuoted} - ${format}${place}.`,
   (titleQuoted: string, format: string, place: string) => `${format.charAt(0).toUpperCase()}${format.slice(1)} ${titleQuoted}${place}.`,
-  (titleQuoted: string, format: string, place: string) => `${format.charAt(0).toUpperCase()}${format.slice(1)} ${titleQuoted}${place} - билеты продаются онлайн.`,
+  (titleQuoted: string, format: string, place: string) => `${format.charAt(0).toUpperCase()}${format.slice(1)} ${titleQuoted}${place} - подробности и билеты в блоке ниже.`,
   (titleQuoted: string, format: string, place: string) => `${format.charAt(0).toUpperCase()}${format.slice(1)} ${titleQuoted} ждет зрителей${place}.`,
 ];
 

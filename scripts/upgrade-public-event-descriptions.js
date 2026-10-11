@@ -133,7 +133,7 @@ export function stripDatePhrases(text) {
 }
 
 /** Remove fact phrases already covered by the Prak block (age/price/date/place/address). */
-export function dedupeFacts(text, card) {
+export function dedupeFacts(text, card, opts = {}) {
   let s = String(text || '');
   const age = String(card.age || '').trim();
   if (age && age !== '0') {
@@ -149,16 +149,22 @@ export function dedupeFacts(text, card) {
       );
     }
   }
-  const next = card.next_session ? new Date(card.next_session) : null;
-  if (next && !Number.isNaN(next.getTime())) {
-    const day = next.getUTCDate();
-    const month = MONTHS[next.getUTCMonth()];
-    s = s.replace(new RegExp(`\\s*${day}\\s+${month}(?:\\s+\\d{4}(?:\\s+года)?)?(?:,?\\s*\\d{1,2}:\\d{2})?\\.?`, 'giu'), ' ');
+  if (opts.dates !== false) {
+    const next = card.next_session ? new Date(card.next_session) : null;
+    if (next && !Number.isNaN(next.getTime())) {
+      const day = next.getUTCDate();
+      const month = MONTHS[next.getUTCMonth()];
+      s = s.replace(new RegExp(`\\s*${day}\\s+${month}(?:\\s+\\d{4}(?:\\s+года)?)?(?:,?\\s*\\d{1,2}:\\d{2})?\\.?`, 'giu'), ' ');
+    }
   }
   const venue = String(card.venue || '').trim();
   if (venue) {
     s = s.replace(new RegExp(`\\s*(?:Место|Площадка)\\s*:?\\s*${escapeRe(venue)}[^.!?\n]*[.!?]?`, 'giu'), ' ');
   }
+  s = s.replace(/(?:^|\n)[ \t]*(?:[•\-*]\s*)?Место отправления\s*:?[^\n]*/giu, '');
+  s = s.replace(/(?:^|\n)[ \t]*(?:[•\-*]\s*)?Судно\s*:?[^\n]*/giu, '');
+  s = s.replace(/(?:^|\n)[ \t]*(?:[•\-*]\s*)?Прогулка проходит на борту[^\n]*/giu, '');
+  s = s.replace(/(?:^|\n)[ \t]*[•\-*][ \t]*(?=\n|$)/gu, '');
   if (String(card.venue_address || '').trim()) {
     s = s.replace(/\s*Адрес\s*:?\s*[^.!?\n]*[.!?]?/giu, ' ');
   }
@@ -178,6 +184,25 @@ export function isBlankBody(body, card = {}) {
     if (norm) s = s.replace(new RegExp(escapeRe(norm), 'giu'), ' ');
   }
   return s.replace(/\s+/gu, '').length < 3;
+}
+
+/** Lines that carry facts (already present in the Prak block), not narrative. */
+const FACT_LINE_RE =
+  /^(?:[•\-*]\s*)?(?:место(?: отправления)?|адрес|судно|сбор(?: группы)?|встреча|ближайшая дата|ближайший сеанс|следующий сеанс|ближайшее время|продолжительность|возраст(?:ное ограничение)?|билеты|стоимость(?: билета)?|цена|сеанс|дата|время|площадка|город|организатор|телефон|контакты|когда|где|начало|двери)(?=\s|[:\-])/iu;
+const FACT_DATE_LINE_RE =
+  /^(?:[•\-*]\s*)?(?:\d{1,2}\s+(?:января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)|\d{2}\.\d{2}(?:\.\d{2,4})?)/iu;
+
+/** Length of the descriptive prose: text minus facts, Prak lines, headings and the selling line. */
+export function proseLength(text) {
+  const keep = [];
+  for (const line of String(text || '').split(/\n/)) {
+    const l = line.trim();
+    if (!l || l.startsWith('##')) continue;
+    if (/^Билеты продаются онлайн/iu.test(l)) continue;
+    if (FACT_LINE_RE.test(l) || FACT_DATE_LINE_RE.test(l)) continue;
+    keep.push(l);
+  }
+  return keep.join(' ').replace(/\s+/gu, ' ').trim().length;
 }
 
 /**
@@ -268,6 +293,7 @@ async function main() {
   const lib = await import('../apps/web/src/lib/event-minimal-description.ts');
   const { buildPracticalInfoBlock, buildMinimalEventDescription, cityInPhrase, cityPrepositional } = lib;
   cityPrepositionalRef = cityPrepositional;
+  const { buildNarrativeParagraphs } = await import('../apps/web/src/lib/event-narrative-description.ts');
 
   if (!fs.existsSync(input)) throw new Error(`Missing input ${input}`);
   const data = JSON.parse(fs.readFileSync(input, 'utf8'));
@@ -284,6 +310,7 @@ async function main() {
     legacyBlocksDropped: 0,
     dupPhrases: 0,
     dupFacts: 0,
+    narrativeAdded: 0,
     sellAdded: 0,
     leadRebuilt: 0,
   };
@@ -319,6 +346,11 @@ async function main() {
     if (leadDated !== leadStripped) marks.datesFixed += 1;
     let leadText = fixTemplatedCase(fixCityCase(leadDated, caseCtx));
     if (leadText !== leadDated) marks.cityFixed += 1;
+    // The templated tail "- билеты продаются онлайн" duplicates the selling line below.
+    leadText = leadText.replace(/\s*[-—]?\s*билеты продаются онлайн\.?\s*$/iu, '.');
+    const leadDeduped = dedupeFacts(leadText, d, { dates: false });
+    if (leadDeduped !== leadText) marks.dupFacts += 1;
+    leadText = leadDeduped;
 
     if (leadText.replace(/(?:^|\n)##\s[\s\S]*$/u, '').trim().length < 40) {
       leadText = String(buildMinimalEventDescription(cardInput, index)).split('\n\n')[0];
@@ -357,6 +389,15 @@ async function main() {
     if (kept.length) parts.push(kept.join('\n\n'));
     if (factBlock) parts.push(factBlock);
     let text = cleanText(parts.join('\n\n'));
+
+    // Round 5: digest-only cards get two human narrative paragraphs after the lead.
+    if (proseLength(text) < 250) {
+      const narrative = buildNarrativeParagraphs(cardInput, index);
+      parts[0] = `${leadText}\n\n${narrative.join('\n\n')}`;
+      text = cleanText(parts.join('\n\n'));
+      marks.narrativeAdded += 1;
+    }
+
     if (!/Билеты продаются онлайн|Билеты на выбранную дату/iu.test(text)) {
       text = `${text}\n\n${SELL_LINE}`;
       marks.sellAdded += 1;
