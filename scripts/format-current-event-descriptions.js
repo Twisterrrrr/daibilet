@@ -169,11 +169,10 @@ async function main() {
     }
     candidates = candidates
       .map((r) => {
-        const effective =
-          basis === 'source'
-            ? (r.source_description || r.override_description || '').trim()
-            : (r.override_description || r.source_description || '').trim();
-        return { ...r, effective };
+        const stored = (r.override_description || r.source_description || '').trim();
+        const basisText =
+          basis === 'source' ? (r.source_description || stored).trim() : stored;
+        return { ...r, effective: basisText, stored };
       })
       .filter((r) => r.effective)
       .sort((a, b) => b.effective.length - a.effective.length);
@@ -203,7 +202,7 @@ async function main() {
         report.emptyResult += 1;
         continue;
       }
-      if (reformatted === row.effective) {
+      if (reformatted === row.stored) {
         report.unchanged += 1;
         continue;
       }
