@@ -204,6 +204,12 @@ test('bullet line-up (already dashed) also gets "В программе" heading'
   assert.match(html, /<ul><li>Екатерина Французова - Вокал<\/li><li>Элина Шатская - Вокал<\/li>/);
 });
 
+test('space before sentence dot is normalized', () => {
+  const out = reformatEventDescription('Хиты эстрады под которые просто не возможно усидеть на месте . Красивые виды Москвы.');
+  assert.doesNotMatch(out, /\s\./);
+  assert.match(out, /на месте\. Красивые виды/);
+});
+
 test('phrase with a dash before colon is not a false h3', () => {
   const out = reformatEventDescription(
     'Концерт на корабле - это: Эксклюзивные мероприятия: Уникальные концерты и тематические вечера.',

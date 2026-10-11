@@ -103,6 +103,7 @@ export function normalizeReformatLine(line: string): string {
     // Typography: glue fixes only ("словоСлово" style misses), no word changes.
     .replace(/([а-яёa-z])\.(?=[А-ЯЁA-Z])/gu, '$1. ')
     .replace(/\s+\.\s*(?=[А-ЯЁA-Z])/gu, '. ')
+    .replace(/([а-яёa-z0-9»")\]])\s+\.(?=\s|$)/gu, '$1.')
     .replace(/([а-яёa-z])([:;])(?=[А-ЯЁA-Z])/gu, '$1$2 ')
     .trim();
 }
@@ -558,12 +559,27 @@ export function reformatEventDescription(raw: string): string {
       continue;
     }
     if (entry.type === 'bullet') {
-      // Consecutive bullet lines form one list; a concert line-up gets a title.
+      // Consecutive bullet lines form one list; blank lines inside a run are
+      // transparent (provider emits "<p>- a</p><p>- b</p>"). A concert line-up
+      // additionally gets a "В программе" title.
       const run: string[] = [];
       let j = i;
-      while (j < grouped.length && grouped[j].type === 'bullet') {
-        run.push(grouped[j].text);
-        j += 1;
+      while (j < grouped.length) {
+        const cur = grouped[j];
+        if (cur.type === 'bullet') {
+          run.push(cur.text);
+          j += 1;
+          continue;
+        }
+        if (cur.type === 'blank') {
+          let k = j;
+          while (k < grouped.length && grouped[k].type === 'blank') k += 1;
+          if (k < grouped.length && grouped[k].type === 'bullet') {
+            j = k;
+            continue;
+          }
+        }
+        break;
       }
       if (looksLikeLineup(run.map((x) => x.replace(/^-\s*/u, '')))) {
         if (blocks.length && blocks[blocks.length - 1] !== '') blocks.push('');
