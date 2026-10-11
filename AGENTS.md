@@ -88,6 +88,9 @@ deploy-lock, VPS тратит 10-20 минут на итерацию.
   `BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh` на MSK.
 - Web build и live-каталог — только MSK `201.24.125.184`. SPB `.16` выведен из
   оборота.
+- **Перед любым деплоем/verify — `git fetch origin` и запуск на самом свежем
+  `origin/<branch>` SHA.** Бывают параллельные сессии на одном remote: деплой с
+  устаревшего локального SHA попадает в гонку, и Verify падает.
 
 **Известные gotchas** (детали и статус в `docs/pipeline-status.md`):
 
