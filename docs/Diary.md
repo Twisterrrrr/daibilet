@@ -1,3 +1,17 @@
+## 2026-10-11 - Лендинги: прячем строки с остановленными продажами
+
+### Наблюдения
+- Owner: в лендингах висят строки с мёртвым CTA «Продажи остановлены» - какой смысл их выводить? Раньше уже было решение `FIX.TC-STANDBY-RECONCILE` («hide sales-stopped cards catalog-wide»), но лендинги остались мимо: backend-выборка (`ACTIVE_SESSION_SQL`) фильтрует только `session.sourceStatus` и оставляет «сейчас идущие» сессии, а CTA блокируется шире (`isSessionPurchaseBlocked`: + `eventSourceStatus`, `purchaseReady=false`, уже начавшиеся TC-сеансы).
+
+### Решения
+- `LandingPageView`: единый `saleableSessions` (фильтр `isSessionPurchaseBlocked`) вместо `payload.sessions` в цепочке строк/групп/фасетов/счётчиков - строки с остановленными продажами исчезают со всех профилей лендингов; «Распродано» (sold-out) остаётся как было.
+
+### Proof
+- `tsc --noEmit` 0; web-тесты 1 075 pass / 0 fail; eslint 0 errors. Коммит в `feat/next-monorepo`; deploy batch/request.
+
+---
+
+
 ## 2026-10-11 - Re-audit лендингов после деплоя: 29/29, регрессий нет
 
 ### Наблюдения
