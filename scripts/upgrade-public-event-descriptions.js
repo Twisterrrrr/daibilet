@@ -578,6 +578,32 @@ async function main() {
     await pool.end();
   }
   console.log(JSON.stringify({ updated, outDir }, null, 2));
+
+  // Optional: push ISR revalidation so /events/* pages pick the new copy immediately.
+  if (process.argv.includes('--revalidate')) {
+    const secret = process.env.DAIBILET_NEXT_REVALIDATE_SECRET?.trim();
+    if (!secret) {
+      console.log('revalidate skipped: DAIBILET_NEXT_REVALIDATE_SECRET is not set');
+    } else {
+      let ok = 0;
+      let failed = 0;
+      for (const item of plan) {
+        if (!item.slug) continue;
+        try {
+          const res = await fetch('https://daibilet.ru/api/internal/revalidate', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json', 'x-revalidate-secret': secret },
+            body: JSON.stringify({ slug: item.slug, skipIndexNow: true }),
+          });
+          if (res.ok) ok += 1;
+          else failed += 1;
+        } catch {
+          failed += 1;
+        }
+      }
+      console.log(JSON.stringify({ revalidated: ok, revalidateFailed: failed }, null, 2));
+    }
+  }
 }
 
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
