@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { connection } from 'next/server';
 import { Suspense } from 'react';
 
 import { CityPageView } from '@/components/CityPageView.client';
@@ -222,6 +223,8 @@ export default async function CityPage({ params }: PageProps) {
     safeNotFound();
   }
   if (loaded.kind === 'unavailable') {
+    // A cold API timeout must not cache this empty 200 page for the route's 300s ISR window.
+    await connection();
     return <CityUnavailablePage slug={decodedSlug} />;
   }
 

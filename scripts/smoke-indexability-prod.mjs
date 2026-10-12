@@ -54,13 +54,25 @@ function schemaLinksVisible(html, type) {
 let failed = false;
 for (const [agent, userAgent] of Object.entries(agents)) {
   for (const [path, check, reason] of checks) {
-    const response = await fetch(`${base}${path}`, {
-      headers: { 'user-agent': userAgent },
-      signal: AbortSignal.timeout(30_000),
-    });
-    const html = await response.text();
-    const okay = response.status === 200 && check(html);
-    console.log(`${okay ? 'OK' : 'ERROR'}: ${agent} ${path} HTTP ${response.status}${okay ? '' : `: ${reason}`}`);
+    // A city DTO can exceed its timeout once immediately after an API restart.
+    // Retry only this readiness check; a persistent empty hub must still fail deploy.
+    const attempts = path === '/cities/moskva' ? 4 : 1;
+    let okay = false;
+    let status = 0;
+    for (let attempt = 1; attempt <= attempts; attempt += 1) {
+      const response = await fetch(`${base}${path}`, {
+        headers: { 'user-agent': userAgent },
+        signal: AbortSignal.timeout(30_000),
+      });
+      status = response.status;
+      okay = status === 200 && check(await response.text());
+      if (okay) break;
+      if (attempt < attempts) {
+        console.log(`WAIT: ${agent} ${path} HTTP ${status}: ${reason} (attempt ${attempt}/${attempts})`);
+        await new Promise((resolve) => setTimeout(resolve, 5_000));
+      }
+    }
+    console.log(`${okay ? 'OK' : 'ERROR'}: ${agent} ${path} HTTP ${status}${okay ? '' : `: ${reason}`}`);
     failed ||= !okay;
   }
 }
