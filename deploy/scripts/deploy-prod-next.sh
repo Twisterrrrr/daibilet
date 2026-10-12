@@ -211,6 +211,7 @@ reap_orphan_next_build_workers() {
 WEB_NEXT_DIR="apps/web/.next"
 WEB_NEXT_PREV="apps/web/.next.prev"
 WEB_NEXT_BUILD="apps/web/.next-build"
+WEB_NEXT_RETIRED="apps/web/.next.retired"
 
 reap_orphan_next_build_workers "pre-build"
 
@@ -260,15 +261,23 @@ if [[ ! -f "${WEB_NEXT_BUILD}/prerender-manifest.json" || ! -f "${WEB_NEXT_BUILD
   exit 1
 fi
 
+# Remove any old retired tree while the current web is still serving. Deleting
+# a populated .next after stopping the service caused minutes of 502s.
+rm_rf_deploy "${WEB_NEXT_RETIRED}"
 systemctl_deploy stop "$WEB_SERVICE"
-rm_rf_deploy "${WEB_NEXT_DIR}"
-mv "${WEB_NEXT_BUILD}" "${WEB_NEXT_DIR}"
-
-if systemctl_deploy is-active --quiet "$API_SERVICE"; then
-  systemctl_deploy restart "$API_SERVICE"
+if [[ -d "${WEB_NEXT_DIR}" ]]; then
+  mv "${WEB_NEXT_DIR}" "${WEB_NEXT_RETIRED}"
+fi
+if ! mv "${WEB_NEXT_BUILD}" "${WEB_NEXT_DIR}"; then
+  echo "ERROR: new .next swap failed; restoring previous build" >&2
+  if [[ -d "${WEB_NEXT_RETIRED}" ]]; then
+    mv "${WEB_NEXT_RETIRED}" "${WEB_NEXT_DIR}"
+  fi
+  systemctl_deploy start "$WEB_SERVICE" || true
+  exit 1
 fi
 
-# Web was never stopped — restart to pick up new .next (2-3 sec downtime).
+# Start the web immediately after the directory swap.
 if systemctl_deploy is-active --quiet "$WEB_SERVICE" 2>/dev/null; then
   systemctl_deploy restart "$WEB_SERVICE"
   echo "Restarted $WEB_SERVICE on new build"
@@ -291,6 +300,12 @@ for _i in 1 2 3 4 5 6 7 8; do
 done
 if [[ "$WEB_READY" -ne 1 ]]; then
   echo "Warning: Next /api/health not OK after start retries — check journalctl -u $WEB_SERVICE"
+else
+  # Keep rollback copy in .next.prev; clean the retired live tree after service recovery.
+  rm_rf_deploy "${WEB_NEXT_RETIRED}"
+fi
+if systemctl_deploy is-active --quiet "$API_SERVICE"; then
+  systemctl_deploy restart "$API_SERVICE"
 fi
 # Marker cleared by EXIT trap after remaining post-steps; keep it through warm/indexnow
 # so healthcheck still skips during post-deploy load spikes.

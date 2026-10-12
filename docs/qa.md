@@ -25,6 +25,12 @@ Finance PR-ветка `codex/stage0-admission-ticket-core` может держа
 - Бизнес-логика public API живёт **только** в backend-сборщиках (`apps/backend/src/dto.js` и TS-обёртки). Пример: исключение подборки из выборки фильтруется в `buildPublicLandingsCatalog`; веб-фильтры (`lib/landing-features.ts`) - defense-in-depth для dev и SSR-поверхностей.
 - Ловушка 2026-10-11: фильтр, добавленный в Next-роут, на prod молча не действовал (nginx не заходит в Next для `/api/*`). Перекрёстные комменты проставлены в `public-api-proxy.ts` и `dto.js`.
 
+## 2026-10-12 - Crawler ALERT: семь bot 502
+
+- Все семь запросов из алерта найдены в nginx access log. В nginx error log для тех же минут `connect() failed (111: Connection refused)` к Next `127.0.0.1:3001`; это недоступность web upstream, а не ошибка `/api/public/*` или отдельных карточек.
+- Окна: 10 октября 03:53-03:55 и 14:42-14:47, 11 октября около 02:40-02:41 (МСК). `journalctl -u daibilet-web` подтверждает остановку/запуск сервиса в каждом окне. В эти же минуты 502 получали и другие клиенты.
+- В fallback `deploy-prod-next.sh` удаление старой `.next` после остановки web продлевало недоступность. Теперь старое дерево переименовывается при остановленном сервисе, а удаляется после запуска и успешного healthcheck. Проверять длительность handoff на следующем fallback deploy; повторный алерт сверять с `journalctl` и nginx error log.
+
 
 ## 2026-09-08 - UX Catalog 2.0 (открыто)
 
