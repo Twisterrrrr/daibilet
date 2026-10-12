@@ -346,19 +346,18 @@ export function buildSeriesParagraph(info, variant = 0) {
       : `${sameYear ? first.text : first.full} - ${last.full}`
     : null;
   const nights = `${info.total} ${pluralRu(info.total, 'вечер', 'вечера', 'вечеров')}`;
-  const dates = `${info.total} ${pluralRu(info.total, 'дата', 'даты', 'дат')}`;
   const head = info.sameCity
     ? [
         `Программа идёт серией: ${nights}${range ? `, с ${range}` : ''}, и это ${info.index}-й из них.`,
         `Это один из вечеров серии${range ? ` (${range})` : ''}: ${info.index}-й из ${info.total}.`,
-        `Серия вечеров${range ? ` с ${range}` : ''}: это ${info.index}-й из ${nights}.`,
+        `Серия вечеров${range ? ` с ${range}` : ''}: всего ${nights}, это ${info.index}-й.`,
         `Один вечер из ${info.total}${range ? `, даты с ${range}` : ''}: это ${info.index}-й.`,
         `Это ${info.index}-й вечер серии${range ? ` (даты с ${range})` : ''}: всего ${nights}.`,
       ]
     : [
         `Программа гастролирует${range ? `: ${nights}, с ${range}` : ''}, и это ${info.index}-й из них.`,
-        `Это гастрольная серия${range ? ` (${range})` : ''}: ${info.index}-я дата из ${dates}.`,
-        `Тур по городам${range ? `, с ${range}` : ''}: это ${info.index}-й из ${nights}.`,
+        `Это гастрольная серия${range ? ` (${range})` : ''}: дата ${info.index} из ${info.total}.`,
+        `Тур по городам${range ? `, с ${range}` : ''}: всего ${nights}, это ${info.index}-й.`,
         `Такая программа проходит в нескольких городах${range ? `, с ${range}` : ''}: это ${info.index}-я остановка тура.`,
         `Это ${info.index}-й город тура${range ? ` (даты с ${range})` : ''}: всего таких городов ${info.total}.`,
       ];
@@ -476,15 +475,27 @@ async function main() {
   const seriesById = new Map();
   let seriesCards = 0;
   const normKey = (s) => String(s || '').toLowerCase().replace(/[^a-zа-яё0-9]+/giu, '');
+  // Title core: drop the city/date parts so tours titled per city still match
+  // ("Лил кидд / 6 марта / Казань" -> "лилкидд").
+  const MONTH_WORD_RE = /(?:январ|феврал|март|апрел|ма[йя]|июн|июл|август|сентябр|октябр|ноябр|декабр)\w*/giu;
+  const titleCore = (m) => {
+    const city = String(m.city || '').replace(/[.*+?^${}()|[\]\\]/gu, '\\$&');
+    return normKey(
+      String(m.title || '')
+        .replace(city ? new RegExp(city, 'giu') : /$^/u, ' ')
+        .replace(MONTH_WORD_RE, ' ')
+        .replace(/\d+/gu, ' '),
+    );
+  };
   for (const [key, members] of fingerprintGroups) {
     if (members.length < 2) continue;
-    // inside one fingerprint keep only real runs: same title, or same city+venue
+    // inside one fingerprint keep only real runs: same title core, or same city+venue
     const titleCounts = new Map();
-    for (const m of members) titleCounts.set(normKey(m.title), (titleCounts.get(normKey(m.title)) || 0) + 1);
+    for (const m of members) titleCounts.set(titleCore(m), (titleCounts.get(titleCore(m)) || 0) + 1);
     const subGroups = new Map();
     for (const m of members) {
-      const title = normKey(m.title);
-      const subKey = titleCounts.get(title) >= 2 ? `t:${title}` : `p:${normKey(m.city)}|${normKey(m.venue)}`;
+      const title = titleCore(m);
+      const subKey = title && titleCounts.get(title) >= 2 ? `t:${title}` : `p:${normKey(m.city)}|${normKey(m.venue)}`;
       if (!subGroups.has(subKey)) subGroups.set(subKey, []);
       subGroups.get(subKey).push(m);
     }
