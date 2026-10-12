@@ -445,7 +445,12 @@ export async function buildSitemapChunkEntries(chunk: SitemapChunk): Promise<Sit
       entries = await buildVenuesSitemapEntries(now);
       break;
     case 'landings':
-      entries = await buildLandingsSitemapEntries(now);
+      // Landing DTOs expose no updatedAt, and a build-time lastmod that moves on
+      // every rebuild teaches crawlers to ignore the field site-wide - a missing
+      // lastmod is strictly better (same doctrine as resolveSitemapLastModified).
+      entries = (await buildLandingsSitemapEntries(now)).map(
+        ({ lastModified: _lastModified, ...rest }) => rest,
+      );
       break;
     case 'blog':
       entries = await buildBlogSitemapEntries(now);

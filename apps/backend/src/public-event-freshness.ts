@@ -45,7 +45,15 @@ export async function buildPublicEventFreshnessMap(forceRefresh = false): Promis
   try {
     legacyDb ??= createDb(projectRoot);
     const { rows } = await legacyDb.query<PublicEventFreshnessRow>(
-      `select e.slug, e."updatedAt" from "Event" e where e.slug is not null and btrim(e.slug) <> ''`,
+      // Description rewrites live in EventOverride and never touch Event.updatedAt,
+      // so without the join a mass rewrite hides from sitemap lastmod (2026-10-12:
+      // 4118 of 4233 event URLs kept claiming the import-time date after publish).
+      `select
+         e.slug,
+         greatest(e."updatedAt", coalesce(o."updatedAt", e."updatedAt")) as "updatedAt"
+       from "Event" e
+       left join "EventOverride" o on o."eventId" = e.id
+       where e.slug is not null and btrim(e.slug) <> ''`,
     );
     const map = freshnessMapFromRows(rows || []);
     cache = { expiresAt: Date.now() + FRESHNESS_CACHE_MS, map };
