@@ -59,6 +59,8 @@ export interface YooKassaRuntimeConfig {
   returnBaseUrl: string;
   verifyWebhook: boolean;
   confirmationMode: YooKassaConfirmationMode;
+  receiptMode: string;
+  receiptVatCode: number | null;
 }
 
 export interface YooKassaPaymentObject {
@@ -147,11 +149,26 @@ export function readYooKassaRuntimeConfig(env: NodeJS.ProcessEnv = process.env):
     confirmationMode: normalizeYooKassaConfirmationMode(
       env.DAIBILET_YOOKASSA_CONFIRMATION_MODE || env.YOOKASSA_CONFIRMATION_MODE,
     ),
+    receiptMode: cleanString(env.DAIBILET_YOOKASSA_RECEIPT_MODE) || 'off',
+    receiptVatCode: /^\d+$/.test(env.DAIBILET_YOOKASSA_RECEIPT_VAT_CODE || '')
+      ? Number(env.DAIBILET_YOOKASSA_RECEIPT_VAT_CODE)
+      : null,
   };
 }
 
 export function isYooKassaCheckoutReady(config = readYooKassaRuntimeConfig()): boolean {
-  return Boolean(config.enabled && config.shopId && config.secretKey);
+  return Boolean(config.enabled && config.shopId && config.secretKey && hasValidYooKassaReceiptConfig(config));
+}
+
+function hasValidYooKassaReceiptConfig(config: YooKassaRuntimeConfig): boolean {
+  if (config.receiptMode === 'off') return true;
+  // The first rollout is deliberately confined to the known test shop. Production
+  // needs a separately approved agent/supplier fiscal policy and per-supplier VAT.
+  return config.receiptMode === 'sandbox'
+    && config.shopId === '1424801'
+    && Number.isInteger(config.receiptVatCode)
+    && (config.receiptVatCode || 0) >= 1
+    && (config.receiptVatCode || 0) <= 12;
 }
 
 export async function createYooKassaCheckoutOrder(
@@ -372,6 +389,8 @@ export async function createYooKassaCheckoutOrder(
         totals,
         returnUrl,
         confirmationMode: normalizedPayload.confirmationMode || 'redirect',
+        quantity: normalizedPayload.quantity,
+        receiptVatCode: config.receiptMode === 'sandbox' ? config.receiptVatCode : null,
       }),
     });
     const persisted = await persistCreatedYooKassaPayment({
@@ -588,6 +607,8 @@ async function createYooKassaAdmissionCheckoutOrder(
         totals,
         returnUrl,
         confirmationMode: normalizedPayload.confirmationMode || 'redirect',
+        quantity: normalizedPayload.quantity,
+        receiptVatCode: config.receiptMode === 'sandbox' ? config.receiptVatCode : null,
       }),
     });
     const persisted = await persistCreatedYooKassaAdmissionPayment({
@@ -639,6 +660,8 @@ export function validateYooKassaCheckoutReadiness(input: {
     issues.unshift(issue('YOOKASSA_CHECKOUT_DISABLED', 'YooKassa checkout выключен', 'high'));
   } else if (!input.config.shopId || !input.config.secretKey) {
     issues.unshift(issue('YOOKASSA_CONFIG_MISSING', 'Не заданы shop id или secret key YooKassa', 'high'));
+  } else if (!hasValidYooKassaReceiptConfig(input.config)) {
+    issues.unshift(issue('YOOKASSA_CONFIG_MISSING', 'Некорректная настройка тестовых чеков YooKassa', 'high'));
   }
   return issues;
 }
@@ -667,6 +690,8 @@ export function validateYooKassaAdmissionCheckoutReadiness(input: {
     issues.unshift(issue('YOOKASSA_CHECKOUT_DISABLED', 'YooKassa checkout выключен', 'high'));
   } else if (!input.config.shopId || !input.config.secretKey) {
     issues.unshift(issue('YOOKASSA_CONFIG_MISSING', 'Не заданы shop id или secret key YooKassa', 'high'));
+  } else if (!hasValidYooKassaReceiptConfig(input.config)) {
+    issues.unshift(issue('YOOKASSA_CONFIG_MISSING', 'Некорректная настройка тестовых чеков YooKassa', 'high'));
   }
   return issues;
 }
@@ -679,6 +704,8 @@ export function buildYooKassaPaymentCreatePayload(input: {
   totals: StubCheckoutTotalsDto;
   returnUrl: string;
   confirmationMode?: YooKassaConfirmationMode | null;
+  quantity?: number;
+  receiptVatCode?: number | null;
 }): Record<string, unknown> {
   const confirmationMode = normalizeYooKassaConfirmationMode(input.confirmationMode);
   return {
@@ -698,6 +725,15 @@ export function buildYooKassaPaymentCreatePayload(input: {
       offerId: input.offer.id,
       sessionId: input.session?.id || null,
     },
+    ...(input.receiptVatCode ? {
+      receipt: buildYooKassaSandboxReceipt({
+        email: input.order.buyerEmail,
+        title: `${input.event.title} - ${input.offer.title}`,
+        totalKopecks: input.totals.totalKopecks,
+        quantity: input.quantity || 1,
+        vatCode: input.receiptVatCode,
+      }),
+    } : {}),
     merchant_customer_id: input.order.buyerEmail || input.order.buyerPhone || undefined,
   };
 }
@@ -709,6 +745,8 @@ export function buildYooKassaAdmissionPaymentCreatePayload(input: {
   totals: StubCheckoutTotalsDto;
   returnUrl: string;
   confirmationMode?: YooKassaConfirmationMode | null;
+  quantity?: number;
+  receiptVatCode?: number | null;
 }): Record<string, unknown> {
   const confirmationMode = normalizeYooKassaConfirmationMode(input.confirmationMode);
   return {
@@ -730,7 +768,44 @@ export function buildYooKassaAdmissionPaymentCreatePayload(input: {
       venueId: input.product.venueId,
       cityId: input.product.cityId,
     },
+    ...(input.receiptVatCode ? {
+      receipt: buildYooKassaSandboxReceipt({
+        email: input.order.buyerEmail,
+        title: `${input.product.title} - ${input.offer.title}`,
+        totalKopecks: input.totals.totalKopecks,
+        quantity: input.quantity || 1,
+        vatCode: input.receiptVatCode,
+      }),
+    } : {}),
     merchant_customer_id: input.order.buyerEmail || input.order.buyerPhone || undefined,
+  };
+}
+
+function buildYooKassaSandboxReceipt(input: {
+  email: string | null;
+  title: string;
+  totalKopecks: number;
+  quantity: number;
+  vatCode: number;
+}) {
+  const email = cleanString(input.email);
+  const quantity = Math.trunc(input.quantity);
+  if (!email || !Number.isInteger(quantity) || quantity < 1 || quantity > 100 || input.totalKopecks < quantity) {
+    throw new YooKassaCheckoutError('YOOKASSA_PAYMENT_FAILED', 422, [], 'Invalid sandbox receipt items or customer email');
+  }
+  const baseKopecks = Math.floor(input.totalKopecks / quantity);
+  const remainder = input.totalKopecks % quantity;
+  const description = trimForYooKassaDescription(input.title);
+  return {
+    customer: { email },
+    items: Array.from({ length: quantity }, (_, index) => ({
+      description,
+      quantity: 1,
+      amount: { value: formatKopecksForYooKassa(baseKopecks + (index < remainder ? 1 : 0)), currency: 'RUB' },
+      vat_code: input.vatCode,
+      payment_mode: 'full_payment',
+      payment_subject: 'service',
+    })),
   };
 }
 
@@ -2135,6 +2210,9 @@ function assertYooKassaApiConfig(config: YooKassaRuntimeConfig): void {
   }
   if (!config.shopId || !config.secretKey) {
     throw new YooKassaCheckoutError('YOOKASSA_CONFIG_MISSING', 500);
+  }
+  if (!hasValidYooKassaReceiptConfig(config)) {
+    throw new YooKassaCheckoutError('YOOKASSA_CONFIG_MISSING', 500, [], 'Invalid YooKassa receipt configuration');
   }
 }
 

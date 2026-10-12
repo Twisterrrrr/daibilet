@@ -58,6 +58,60 @@ test('formats kopecks for YooKassa amount.value', () => {
   assert.equal(formatKopecksForYooKassa(-10), '0.00');
 });
 
+test('sandbox receipts require the designated test shop and an explicit VAT code', () => {
+  const config = readYooKassaRuntimeConfig({
+    DAIBILET_YOOKASSA_CHECKOUT: '1',
+    YOOKASSA_SHOP_ID: '1424801',
+    YOOKASSA_SECRET_KEY: 'test_secret',
+    DAIBILET_YOOKASSA_RECEIPT_MODE: 'sandbox',
+    DAIBILET_YOOKASSA_RECEIPT_VAT_CODE: '1',
+  } as NodeJS.ProcessEnv);
+  assert.equal(isYooKassaCheckoutReady(config), true);
+  assert.equal(isYooKassaCheckoutReady({ ...config, shopId: 'live_shop' }), false);
+  assert.equal(isYooKassaCheckoutReady({ ...config, receiptVatCode: null }), false);
+});
+
+test('sandbox receipt item amounts add up to payment amount after per-ticket rounding', () => {
+  const payload = buildYooKassaAdmissionPaymentCreatePayload({
+    order: { id: 'order_1', publicCode: '7654321', buyerEmail: 'buyer@daibilet.ru', buyerPhone: null },
+    product: { id: 'adp_1', slug: 'museum-entry', title: 'Museum entry', venueId: 'venue_1', cityId: 'city_1' },
+    offer: { id: 'ado_1', title: 'Adult' },
+    totals: {
+      currency: 'RUB', unitPriceKopecks: 117, subtotalKopecks: 351,
+      discountKopecks: 1, totalKopecks: 350, commissionKopecks: 42, netKopecks: 308,
+    },
+    quantity: 3,
+    receiptVatCode: 1,
+    returnUrl: 'https://daibilet.ru/checkout/result?order=7654321',
+  });
+  const receipt = payload.receipt as { customer: { email: string }; items: Array<{
+    amount: { value: string }; vat_code: number; payment_mode: string; payment_subject: string;
+  }> };
+  assert.equal(receipt.customer.email, 'buyer@daibilet.ru');
+  assert.equal(receipt.items.length, 3);
+  assert.equal(receipt.items.reduce((sum, item) => sum + Math.round(Number(item.amount.value) * 100), 0), 350);
+  assert.deepEqual(new Set(receipt.items.map((item) => item.vat_code)), new Set([1]));
+  assert.deepEqual(new Set(receipt.items.map((item) => item.payment_mode)), new Set(['full_payment']));
+  assert.deepEqual(new Set(receipt.items.map((item) => item.payment_subject)), new Set(['service']));
+});
+
+test('event payment also sends sandbox receipt only when explicitly configured', () => {
+  const base = {
+    order: { id: 'order_2', publicCode: '1234567', buyerEmail: 'buyer@daibilet.ru', buyerPhone: null },
+    event: { id: 'evt_1', slug: 'event-1', title: 'Event' },
+    offer: { id: 'offer_1', title: 'Adult' },
+    session: null,
+    totals: {
+      currency: 'RUB' as const, unitPriceKopecks: 35000, subtotalKopecks: 35000,
+      discountKopecks: 0, totalKopecks: 35000, commissionKopecks: 4200, netKopecks: 30800,
+    },
+    returnUrl: 'https://daibilet.ru/checkout/result?order=1234567',
+  };
+  assert.equal('receipt' in buildYooKassaPaymentCreatePayload(base), false);
+  const withReceipt = buildYooKassaPaymentCreatePayload({ ...base, receiptVatCode: 1 });
+  assert.equal((withReceipt.receipt as { items: Array<{ amount: { value: string } }> }).items[0]?.amount.value, '350.00');
+});
+
 test('requires idempotency key before touching checkout data', async () => {
   await assert.rejects(
     () => createYooKassaCheckoutOrder({
