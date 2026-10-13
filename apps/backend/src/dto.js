@@ -899,7 +899,7 @@ async function queryAdminOrdersLean(db, { includeArchived }) {
       ) ticket_stats on true
       where ($1::boolean and ext_order."archivedAt" is not null)
          or (not $1::boolean and ext_order."archivedAt" is null)
-      order by coalesce(ext_order."purchasedAt", ext_order."updatedAt") desc
+      order by coalesce(ext_order."purchasedAt", ext_order."updatedAt") desc, ext_order.id desc
     `,
     [includeArchived],
   );
