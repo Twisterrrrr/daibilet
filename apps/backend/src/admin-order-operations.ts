@@ -164,6 +164,10 @@ async function finalizeFullRefund(input: { orderId: string; requestId: string; p
       if (item.admissionProductId) await tx.admissionProduct.updateMany({ where: { id: item.admissionProductId, ticketsVacant: { not: null } }, data: { ticketsVacant: { increment: item.quantity } } });
     }
     await tx.checkoutOrder.update({ where: { id: input.orderId }, data: { status: 'REFUNDED', cancelledAt: new Date(), checkoutUrl: null } });
+    await tx.issuedTicket.updateMany({
+      where: { checkoutOrderId: input.orderId, cancelledAt: null },
+      data: { cancelledAt: new Date() },
+    });
     await tx.checkoutItem.updateMany({ where: { checkoutOrderId: input.orderId }, data: { status: 'REFUNDED' } });
     await tx.fulfillmentItem.updateMany({ where: { checkoutOrderId: input.orderId }, data: { status: 'REFUNDED', refundedKopecks: input.amountKopecks, refundProviderId: input.providerRefund.id } });
     await tx.payment.update({ where: { id: input.paymentId }, data: { status: 'REFUNDED' } });

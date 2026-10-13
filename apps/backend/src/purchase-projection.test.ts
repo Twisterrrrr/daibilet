@@ -306,6 +306,13 @@ test('projects internal checkout and external orders into admin, buyer and suppl
     const publicPurchases = await buildPublicCheckoutPurchasesByEmailDto(new URLSearchParams({ email, limit: '10' }));
     assert.equal(publicPurchases.total, 1);
     assert.equal(publicPurchases.items[0]?.publicCode, '9100001');
+
+    await prisma.checkoutOrder.update({ where: { id: ids.order }, data: { status: 'REFUNDED' } });
+    await prisma.payment.update({ where: { id: ids.payment }, data: { status: 'REFUNDED' } });
+    const refundedPublicOrder = await buildPublicCheckoutOrderByCodeDto('9100001');
+    assert.equal(refundedPublicOrder?.ticketNumber, null);
+    assert.deepEqual(refundedPublicOrder?.ticketNumbers, []);
+    assert.deepEqual(refundedPublicOrder?.items[0]?.ticketNumbers, []);
   } finally {
     await prisma.externalTicket.deleteMany({ where: { id: ids.externalTicket } });
     await prisma.externalOrder.deleteMany({ where: { id: ids.externalOrder } });
