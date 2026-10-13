@@ -390,6 +390,9 @@ export async function submitAdmissionCheckout(
 
   const mode = input.mode || resolveBuyerCheckoutMode(env);
   const isProduction = String(env.NODE_ENV || '').trim().toLowerCase() === 'production';
+  if (isProduction && mode === 'stub') {
+    return { ok: false, error: 'stub_checkout_disabled', detail: 'Тестовая выдача билетов недоступна', status: 403 };
+  }
   const attempts: Array<{ label: string; path: string; body: unknown }> = [];
 
   if (mode === 'yookassa' || mode === 'auto') {

@@ -1,6 +1,23 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { mapOrderFromFinancePayload } from './finance-checkout-client';
+import { mapOrderFromFinancePayload, submitAdmissionCheckout } from './finance-checkout-client';
+
+test('production refuses an explicitly requested STUB checkout', async () => {
+  const result = await submitAdmissionCheckout({
+    admissionProductSlug: 'phase-g-test-museum-entry',
+    admissionOfferId: 'test-offer',
+    quantity: 1,
+    buyer: { email: 'buyer@example.com' },
+    returnUrl: 'https://daibilet.ru/checkout/result',
+    mode: 'stub',
+  }, { NODE_ENV: 'production' } as NodeJS.ProcessEnv);
+  assert.deepEqual(result, {
+    ok: false,
+    error: 'stub_checkout_disabled',
+    detail: 'Тестовая выдача билетов недоступна',
+    status: 403,
+  });
+});
 
 test('buyer DTO keeps issued ticket number separate from order code', () => {
   const order = mapOrderFromFinancePayload({ order: {
