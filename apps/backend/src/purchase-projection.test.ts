@@ -255,6 +255,10 @@ test('projects internal checkout and external orders into admin, buyer and suppl
     assert.equal(admin.rows.some((row) => row.sourceKind === 'internal' && row.publicCode === '9100001'), true);
     assert.equal(admin.rows.some((row) => row.sourceKind === 'external' && row.publicCode === '9200001'), true);
 
+    const paid = await buildAdminPurchasesListDto(new URLSearchParams({ q: email, status: 'paid', limit: '10' }));
+    assert.equal(paid.rows.some((row) => row.sourceKind === 'internal' && row.publicCode === '9100001'), true);
+    assert.equal(paid.rows.some((row) => row.sourceKind === 'external' && row.publicCode === '9200001'), true);
+
     const adminDetail = await buildAdminPurchaseDetailDto('9100001');
     assert.equal(adminDetail?.sourceKind, 'internal');
     assert.equal(adminDetail?.finance?.payments[0]?.status, 'SUCCEEDED');
