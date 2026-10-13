@@ -1,4 +1,6 @@
 import { adminApiFetch, resolveAdminApiBase } from '@/server/admin-api-fetch';
+import { loadAdminOrdersList } from '@/server/admin-orders-data';
+import { summarizeAdminOrders, type AdminUnifiedOrderSummary } from '@/server/admin-order-summary';
 
 export type AdminLaunchMetrics = {
   groupedEvents: number;
@@ -51,6 +53,7 @@ export type AdminDashboardPageData = {
   metrics: AdminDashboardMetrics;
   sources: AdminSourceRow[];
   orders: AdminOrderMetrics;
+  orderSummary: AdminUnifiedOrderSummary | null;
   errors: string[];
 };
 
@@ -138,16 +141,6 @@ function normalizeSources(raw: unknown): AdminSourceRow[] {
   });
 }
 
-function normalizeOrders(raw: unknown): AdminOrderMetrics {
-  const row = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
-  return {
-    imported: asNumber(row.imported),
-    confirmed: asNumber(row.confirmed),
-    processing: asNumber(row.processing),
-    failedIntegration: asNumber(row.failedIntegration),
-  };
-}
-
 async function readJson(response: Response): Promise<unknown> {
   try {
     return await response.json();
@@ -160,7 +153,7 @@ export async function loadAdminDashboardPageData(): Promise<AdminDashboardPageDa
   const apiBase = resolveAdminApiBase();
   const errors: string[] = [];
 
-  const [dashboardRes, sourcesRes, ordersRes] = await Promise.all([
+  const [dashboardRes, sourcesRes, internalOrders, externalOrders] = await Promise.all([
     adminApiFetch('/api/admin/dashboard').catch((error: unknown) => {
       errors.push(`dashboard: ${error instanceof Error ? error.message : 'network error'}`);
       return null;
@@ -169,10 +162,8 @@ export async function loadAdminDashboardPageData(): Promise<AdminDashboardPageDa
       errors.push(`sources: ${error instanceof Error ? error.message : 'network error'}`);
       return null;
     }),
-    adminApiFetch('/api/admin/orders?limit=1').catch((error: unknown) => {
-      errors.push(`orders: ${error instanceof Error ? error.message : 'network error'}`);
-      return null;
-    }),
+    loadAdminOrdersList({ kind: 'internal', limit: 1 }),
+    loadAdminOrdersList({ kind: 'external', limit: 1 }),
   ]);
 
   let metrics = EMPTY_METRICS;
@@ -202,14 +193,15 @@ export async function loadAdminDashboardPageData(): Promise<AdminDashboardPageDa
     }
   }
 
-  if (ordersRes) {
-    if (!ordersRes.ok) {
-      errors.push(`orders HTTP ${ordersRes.status}`);
-    } else {
-      const payload = (await readJson(ordersRes)) as { metrics?: unknown } | null;
-      orders = normalizeOrders(payload?.metrics);
-    }
+  errors.push(...internalOrders.errors, ...externalOrders.errors);
+  if (!externalOrders.errors.length) {
+    orders = {
+      imported: externalOrders.metrics.imported,
+      confirmed: externalOrders.metrics.confirmed,
+      processing: externalOrders.metrics.processing,
+      failedIntegration: externalOrders.quickFilters.find((item) => item.id === 'failed_integration')?.count ?? 0,
+    };
   }
 
-  return { apiBase, generatedAt, metrics, sources, orders, errors };
+  return { apiBase, generatedAt, metrics, sources, orders, orderSummary: summarizeAdminOrders(internalOrders, externalOrders), errors };
 }
