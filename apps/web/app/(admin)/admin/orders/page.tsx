@@ -24,6 +24,14 @@ const INTERNAL_FILTERS = [
   { id: 'pending_refunds', label: 'Запросы на возврат' },
   { id: 'failed_integration', label: 'Проблемы' },
 ];
+const ALL_FILTERS = [
+  { id: 'all', label: 'Все активные' },
+  { id: 'attention', label: 'Внимание' },
+  { id: 'pending_refunds', label: 'Запросы на возврат' },
+  { id: 'failed_integration', label: 'Проблемы' },
+  { id: 'unlinked', label: 'Без связи' },
+  { id: 'archive', label: 'Архив' },
+];
 const STATUS_FILTERS = [
   { id: 'all', label: 'Все статусы' },
   { id: 'paid', label: 'Оплачены' },
@@ -45,7 +53,8 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
   const q = first(raw.q) || '';
   const view = first(raw.view) || 'all';
   const page = first(raw.page) || '1';
-  const kind = first(raw.kind) === 'external' ? 'external' : 'internal';
+  const requestedKind = first(raw.kind);
+  const kind = requestedKind === 'external' || requestedKind === 'internal' ? requestedKind : 'all';
   const source = first(raw.source) || 'all';
   const requestedStatus = first(raw.status) || 'all';
   const status = STATUS_FILTERS.some((filter) => filter.id === requestedStatus) ? requestedStatus : 'all';
@@ -54,6 +63,7 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
   if (status !== 'all') channelParams.set('status', status);
   const internalHref = `/admin/orders?kind=internal${channelParams.size ? `&${channelParams.toString()}` : ''}`;
   const externalHref = `/admin/orders?kind=external${channelParams.size ? `&${channelParams.toString()}` : ''}`;
+  const allHref = `/admin/orders${channelParams.size ? `?${channelParams.toString()}` : ''}`;
   const current = { kind, q: q || undefined, view, source, status, page };
   const data = await loadAdminOrdersList({ kind, q, view, source, status, page });
 // A failed live API must never look like "zero orders": the counters below would
@@ -72,7 +82,7 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
         <div>
           <h2 className="text-xl font-semibold text-slate-900">Заказы</h2>
           <p className="mt-1 text-sm text-slate-600">
-            {kind === 'internal' ? 'Внутренние продажи Дайбилет из финансового контура.' : 'Внешние заказы билетных систем.'}
+            Все продажи и заявки на возврат в одном списке.
           </p>
         </div>
         {kind === 'external' ? <div className="flex flex-wrap gap-2">
@@ -104,16 +114,12 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
       <AdminApiErrorBanner errors={data.errors} />
 
       <div className="flex gap-2" role="navigation" aria-label="Канал продажи">
+        <Link href={allHref} className={`rounded-md border px-3 py-2 text-sm ${kind === 'all' ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 bg-white text-slate-700'}`}>Все каналы</Link>
         <Link href={internalHref} className={`rounded-md border px-3 py-2 text-sm ${kind === 'internal' ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 bg-white text-slate-700'}`}>Продажи Дайбилет</Link>
         <Link href={externalHref} className={`rounded-md border px-3 py-2 text-sm ${kind === 'external' ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 bg-white text-slate-700'}`}>Внешние продажи</Link>
       </div>
 
-      {kind === 'external' ? <div className="grid gap-3 sm:grid-cols-4">
-        <Metric label="Импорт" value={data.metrics.imported} unavailable={degraded} />
-        <Metric label="Подтверждены" value={data.metrics.confirmed} unavailable={degraded} />
-        <Metric label="В обработке" value={data.metrics.processing} unavailable={degraded} />
-        <Metric label="Внимание" value={data.metrics.needsAttention} unavailable={degraded} />
-      </div> : <p className="text-sm text-slate-600">Найдено внутренних заказов: {degraded ? '—' : formatAdminNumber(data.total)}</p>}
+      <p className="text-sm text-slate-600">Найдено заказов: {degraded ? '—' : formatAdminNumber(data.total)}</p>
 
       <form className="flex flex-wrap gap-2" action="/admin/orders" method="get">
         <input type="hidden" name="view" value={view} />
@@ -124,9 +130,10 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
           placeholder="Код заказа, email, событие..."
           className="min-w-[220px] flex-1 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
         />
-        {kind === 'external' ? <select name="source" defaultValue={source} aria-label="Источник заказа" className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm">
+        {kind !== 'internal' ? <select name="source" defaultValue={source} aria-label="Источник заказа" className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm">
           <option value="all">Все источники</option>
-          {data.sources.map((item) => <option key={item} value={item}>{item}</option>)}
+          {kind === 'all' ? <option value="MANUAL">Дайбилет</option> : null}
+          {data.sources.filter((item) => item !== 'MANUAL').map((item) => <option key={item} value={item}>{item}</option>)}
         </select> : null}
         <input type="hidden" name="status" value={status} />
         <button type="submit" className="rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800">
@@ -140,7 +147,7 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
           const params = new URLSearchParams();
           params.set('kind', kind);
           if (q) params.set('q', q);
-          if (kind === 'external' && source !== 'all') params.set('source', source);
+          if (kind !== 'internal' && source !== 'all') params.set('source', source);
           if (filter.id !== 'all') params.set('status', filter.id);
           const active = status === filter.id;
           return <Link
@@ -154,14 +161,14 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
 
       <div className="flex flex-wrap items-center gap-2">
         <span className="mr-1 text-xs font-medium text-slate-500">Дополнительно:</span>
-        {(kind === 'internal' ? INTERNAL_FILTERS : QUICK_FILTERS).map((filter) => {
+        {(kind === 'internal' ? INTERNAL_FILTERS : kind === 'external' ? QUICK_FILTERS : ALL_FILTERS).map((filter) => {
           const count = kind === 'internal' || q || source !== 'all' || status !== 'all' ? null : data.quickFilters.find((item) => item.id === filter.id)?.count;
           const active = view === filter.id;
           const params = new URLSearchParams();
           params.set('kind', kind);
           if (filter.id !== 'all') params.set('view', filter.id);
           if (q) params.set('q', q);
-          if (kind === 'external' && source !== 'all') params.set('source', source);
+          if (kind !== 'internal' && source !== 'all') params.set('source', source);
           const href = `/admin/orders${params.size ? `?${params.toString()}` : ''}`;
           return (
             <Link
@@ -244,33 +251,13 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
         </div>
       </div>
 
-      <AdminPagination
+      {!degraded ? <AdminPagination
         basePath="/admin/orders"
         page={data.page}
         pages={data.pages}
         total={data.total}
         current={current}
-      />
-    </div>
-  );
-}
-
-function Metric({ label, value, unavailable = false }: { label: string; value: number; unavailable?: boolean }) {
-  return (
-    <div
-      className={`rounded-lg border bg-white p-3 shadow-sm ${
-        unavailable ? 'border-red-200' : 'border-slate-200'
-      }`}
-    >
-      <div
-        data-testid={`metric-${label}`}
-        className={`text-xl font-semibold tabular-nums ${
-          unavailable ? 'text-slate-400' : 'text-slate-900'
-        }`}
-      >
-        {unavailable ? '—' : formatAdminNumber(value)}
-      </div>
-      <div className="text-xs text-slate-500">{label}</div>
+      /> : null}
     </div>
   );
 }

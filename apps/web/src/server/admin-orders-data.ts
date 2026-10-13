@@ -1,5 +1,6 @@
 import { asNumber } from '@/lib/admin-ui';
 import { adminApiFetch } from '@/server/admin-api-fetch';
+import { mergeAdminOrderPage } from '@/server/admin-order-merge';
 
 export type AdminOrderListRow = {
   id: string;
@@ -126,16 +127,18 @@ function normalizeOrderRow(raw: unknown): AdminOrderListRow {
 }
 
 export async function loadAdminOrdersList(searchParams: {
-  kind?: 'internal' | 'external';
+  kind?: 'all' | 'internal' | 'external';
   q?: string;
   view?: string;
   page?: string;
+  limit?: number;
   source?: string;
   status?: string;
 }): Promise<AdminOrdersListData> {
+  if (searchParams.kind === 'all') return loadCombinedAdminOrders(searchParams);
   const errors: string[] = [];
   const params = new URLSearchParams();
-  params.set('limit', String(DEFAULT_LIMIT));
+  params.set('limit', String(searchParams.limit || DEFAULT_LIMIT));
   params.set('page', String(Math.max(1, asNumber(searchParams.page, 1))));
   if (searchParams.q?.trim()) params.set('q', searchParams.q.trim());
   if (searchParams.view && searchParams.view !== 'all') params.set('view', searchParams.view);
@@ -185,6 +188,70 @@ export async function loadAdminOrdersList(searchParams: {
     errors.push(`orders: ${error instanceof Error ? error.message : 'network error'}`);
     return emptyOrders(errors);
   }
+}
+
+async function loadCombinedAdminOrders(searchParams: {
+  q?: string;
+  view?: string;
+  page?: string;
+  source?: string;
+  status?: string;
+}): Promise<AdminOrdersListData> {
+  const page = Math.max(1, Math.floor(asNumber(searchParams.page, 1)));
+  const needed = page * DEFAULT_LIMIT;
+  const source = searchParams.source || 'all';
+  const includeInternal = source === 'all' || source === 'MANUAL';
+  const includeExternal = source !== 'MANUAL';
+  const perSourceLimit = 100;
+  const base = { ...searchParams, page: '1', limit: perSourceLimit };
+  const [internalFirst, externalFirst] = await Promise.all([
+    includeInternal ? loadAdminOrdersList({ ...base, kind: 'internal', source: 'all' }) : Promise.resolve(emptyOrders([])),
+    includeExternal ? loadAdminOrdersList({ ...base, kind: 'external' }) : Promise.resolve(emptyOrders([])),
+  ]);
+  const errors = [...internalFirst.errors, ...externalFirst.errors];
+  if (errors.length) return emptyOrders(errors);
+
+  async function throughPage(first: AdminOrdersListData, kind: 'internal' | 'external') {
+    const count = Math.ceil(Math.min(first.total, needed) / perSourceLimit);
+    if (count <= 1) return first.rows;
+    const later = await Promise.all(Array.from({ length: count - 1 }, (_, index) =>
+      loadAdminOrdersList({ ...base, kind, source: kind === 'internal' ? 'all' : source, page: String(index + 2) }),
+    ));
+    for (const result of later) errors.push(...result.errors);
+    return [...first.rows, ...later.flatMap((result) => result.rows)];
+  }
+
+  const [internalRows, externalRows] = await Promise.all([
+    includeInternal ? throughPage(internalFirst, 'internal') : Promise.resolve([] as AdminOrderListRow[]),
+    includeExternal ? throughPage(externalFirst, 'external') : Promise.resolve([] as AdminOrderListRow[]),
+  ]);
+  if (errors.length) return emptyOrders(errors);
+
+  const total = internalFirst.total + externalFirst.total;
+  const pages = Math.max(1, Math.ceil(total / DEFAULT_LIMIT));
+  const safePage = Math.min(page, pages);
+  const quickFilterIds = new Set([...internalFirst.quickFilters, ...externalFirst.quickFilters].map((item) => item.id));
+  return {
+    page: safePage,
+    pages,
+    limit: DEFAULT_LIMIT,
+    total,
+    rows: mergeAdminOrderPage(internalRows, externalRows, safePage, DEFAULT_LIMIT),
+    sources: [...new Set([...internalFirst.sources, ...externalFirst.sources])],
+    statuses: [...new Set([...internalFirst.statuses, ...externalFirst.statuses])],
+    quickFilters: [...quickFilterIds].map((id) => ({
+      id,
+      count: (internalFirst.quickFilters.find((item) => item.id === id)?.count || 0)
+        + (externalFirst.quickFilters.find((item) => item.id === id)?.count || 0),
+    })),
+    metrics: {
+      imported: internalFirst.metrics.imported + externalFirst.metrics.imported,
+      confirmed: internalFirst.metrics.confirmed + externalFirst.metrics.confirmed,
+      processing: internalFirst.metrics.processing + externalFirst.metrics.processing,
+      needsAttention: internalFirst.metrics.needsAttention + externalFirst.metrics.needsAttention,
+    },
+    errors: [],
+  };
 }
 
 async function loadFinanceAdminOrders(params: URLSearchParams): Promise<AdminOrdersListData> {
