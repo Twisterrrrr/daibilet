@@ -3,6 +3,7 @@ import test from 'node:test';
 import {
   classifyStubCheckoutSubject,
   computeStubCheckoutTotals,
+  createStubCheckoutOrder,
   IDEMPOTENCY_KEY_MAX_LENGTH,
   isStubCheckoutEnabled,
   isAdmissionCheckoutPayload,
@@ -25,11 +26,29 @@ test('normalizeIdempotencyKey keeps short keys and hashes long ones to YooKassa 
   assert.notEqual(normalized, longKey.slice(0, IDEMPOTENCY_KEY_MAX_LENGTH));
 });
 
-test('stub checkout is disabled in production unless explicitly enabled', () => {
+test('stub checkout cannot be enabled in production', () => {
   assert.equal(isStubCheckoutEnabled({ NODE_ENV: 'production' } as NodeJS.ProcessEnv), false);
-  assert.equal(isStubCheckoutEnabled({ NODE_ENV: 'production', DAIBILET_STUB_CHECKOUT: '1' } as NodeJS.ProcessEnv), true);
+  assert.equal(isStubCheckoutEnabled({ NODE_ENV: 'production', DAIBILET_STUB_CHECKOUT: '1' } as NodeJS.ProcessEnv), false);
   assert.equal(isStubCheckoutEnabled({ NODE_ENV: 'development' } as NodeJS.ProcessEnv), false);
   assert.equal(isStubCheckoutEnabled({ NODE_ENV: 'test' } as NodeJS.ProcessEnv), true);
+});
+
+test('production blocks STUB before an old idempotency response can be replayed', async () => {
+  const priorNodeEnv = process.env.NODE_ENV;
+  const priorStubFlag = process.env.DAIBILET_STUB_CHECKOUT;
+  process.env.NODE_ENV = 'production';
+  process.env.DAIBILET_STUB_CHECKOUT = '1';
+  try {
+    await assert.rejects(
+      createStubCheckoutOrder({} as never, { idempotencyKey: 'previously-issued-stub' }),
+      { code: 'STUB_CHECKOUT_DISABLED', statusCode: 403 },
+    );
+  } finally {
+    if (priorNodeEnv === undefined) delete process.env.NODE_ENV;
+    else process.env.NODE_ENV = priorNodeEnv;
+    if (priorStubFlag === undefined) delete process.env.DAIBILET_STUB_CHECKOUT;
+    else process.env.DAIBILET_STUB_CHECKOUT = priorStubFlag;
+  }
 });
 
 test('computes ruble totals and supplier commission in kopecks', () => {

@@ -215,6 +215,7 @@ export function isStubCheckoutError(error: unknown): error is StubCheckoutError 
 }
 
 export function isStubCheckoutEnabled(env: NodeJS.ProcessEnv = process.env): boolean {
+  if (env.NODE_ENV === 'production') return false;
   if (env.DAIBILET_STUB_CHECKOUT === '1') return true;
   if (env.DAIBILET_STUB_CHECKOUT === '0') return false;
   return env.NODE_ENV === 'test';
@@ -224,6 +225,9 @@ export async function createStubCheckoutOrder(
   payload: StubCheckoutCreateDto,
   options: { idempotencyKey?: string | null; now?: Date } = {},
 ): Promise<StubCheckoutResultDto> {
+  // Reject before idempotency replay: an old STUB response must never issue a
+  // ticket after this endpoint has been disabled on a production host.
+  if (!isStubCheckoutEnabled()) throw new StubCheckoutError('STUB_CHECKOUT_DISABLED', 403);
   const now = options.now || new Date();
   const idempotencyKey = normalizeIdempotencyKey(options.idempotencyKey || payload.idempotencyKey);
   if (idempotencyKey) {
