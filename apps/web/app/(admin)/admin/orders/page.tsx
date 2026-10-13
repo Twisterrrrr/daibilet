@@ -24,6 +24,13 @@ const INTERNAL_FILTERS = [
   { id: 'pending_refunds', label: 'Запросы на возврат' },
   { id: 'failed_integration', label: 'Проблемы' },
 ];
+const STATUS_FILTERS = [
+  { id: 'all', label: 'Все статусы' },
+  { id: 'paid', label: 'Оплачены' },
+  { id: 'pending', label: 'В обработке' },
+  { id: 'cancelled', label: 'Отменены' },
+  { id: 'error', label: 'Ошибки' },
+];
 
 type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -40,7 +47,13 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
   const page = first(raw.page) || '1';
   const kind = first(raw.kind) === 'external' ? 'external' : 'internal';
   const source = first(raw.source) || 'all';
-  const status = first(raw.status) || 'all';
+  const requestedStatus = first(raw.status) || 'all';
+  const status = STATUS_FILTERS.some((filter) => filter.id === requestedStatus) ? requestedStatus : 'all';
+  const channelParams = new URLSearchParams();
+  if (q) channelParams.set('q', q);
+  if (status !== 'all') channelParams.set('status', status);
+  const internalHref = `/admin/orders?kind=internal${channelParams.size ? `&${channelParams.toString()}` : ''}`;
+  const externalHref = `/admin/orders?kind=external${channelParams.size ? `&${channelParams.toString()}` : ''}`;
   const current = { kind, q: q || undefined, view, source, status, page };
   const data = await loadAdminOrdersList({ kind, q, view, source, status, page });
 // A failed live API must never look like "zero orders": the counters below would
@@ -90,9 +103,9 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
 
       <AdminApiErrorBanner errors={data.errors} />
 
-      <div className="flex gap-2" role="navigation" aria-label="Тип заказов">
-        <Link href="/admin/orders?kind=internal" className={`rounded-md border px-3 py-2 text-sm ${kind === 'internal' ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 bg-white text-slate-700'}`}>Внутренние продажи</Link>
-        <Link href="/admin/orders?kind=external" className={`rounded-md border px-3 py-2 text-sm ${kind === 'external' ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 bg-white text-slate-700'}`}>Заказы партнёров</Link>
+      <div className="flex gap-2" role="navigation" aria-label="Канал продажи">
+        <Link href={internalHref} className={`rounded-md border px-3 py-2 text-sm ${kind === 'internal' ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 bg-white text-slate-700'}`}>Продажи Дайбилет</Link>
+        <Link href={externalHref} className={`rounded-md border px-3 py-2 text-sm ${kind === 'external' ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 bg-white text-slate-700'}`}>Внешние продажи</Link>
       </div>
 
       {kind === 'external' ? <div className="grid gap-3 sm:grid-cols-4">
@@ -115,19 +128,32 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
           <option value="all">Все источники</option>
           {data.sources.map((item) => <option key={item} value={item}>{item}</option>)}
         </select> : null}
-        <select name="status" defaultValue={status} aria-label="Статус заказа" className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm">
-          <option value="all">Все статусы</option>
-          <option value="paid">Оплачены</option>
-          <option value="pending">В обработке</option>
-          <option value="cancelled">Отменены</option>
-          <option value="error">Ошибки</option>
-        </select>
+        <input type="hidden" name="status" value={status} />
         <button type="submit" className="rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800">
           Применить
         </button>
       </form>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap items-center gap-2" aria-label="Фильтр по статусу заказа">
+        <span className="mr-1 text-xs font-medium text-slate-500">Статус:</span>
+        {STATUS_FILTERS.map((filter) => {
+          const params = new URLSearchParams();
+          params.set('kind', kind);
+          if (q) params.set('q', q);
+          if (kind === 'external' && source !== 'all') params.set('source', source);
+          if (filter.id !== 'all') params.set('status', filter.id);
+          const active = status === filter.id;
+          return <Link
+            key={filter.id}
+            href={`/admin/orders?${params.toString()}`}
+            aria-current={active ? 'page' : undefined}
+            className={`rounded-md border px-3 py-1.5 text-sm ${active ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'}`}
+          >{filter.label}</Link>;
+        })}
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="mr-1 text-xs font-medium text-slate-500">Дополнительно:</span>
         {(kind === 'internal' ? INTERNAL_FILTERS : QUICK_FILTERS).map((filter) => {
           const count = kind === 'internal' || q || source !== 'all' || status !== 'all' ? null : data.quickFilters.find((item) => item.id === filter.id)?.count;
           const active = view === filter.id;
@@ -136,7 +162,6 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
           if (filter.id !== 'all') params.set('view', filter.id);
           if (q) params.set('q', q);
           if (kind === 'external' && source !== 'all') params.set('source', source);
-          if (status !== 'all') params.set('status', status);
           const href = `/admin/orders${params.size ? `?${params.toString()}` : ''}`;
           return (
             <Link
