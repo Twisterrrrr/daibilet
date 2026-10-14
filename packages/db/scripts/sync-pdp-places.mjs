@@ -23,6 +23,8 @@ const metersApart = (a, b) => {
   return 12742000 * Math.asin(Math.sqrt(Math.min(1, h)));
 };
 const sourceKeySet = new Set();
+const sourceKeyCounts = new Map();
+for (const item of records) sourceKeyCounts.set(item.sourceKey, (sourceKeyCounts.get(item.sourceKey) || 0) + 1);
 const summary = { sourceRows: records.length, matched: 0, createdCandidates: 0, review: 0, duplicateRows: 0, missingCity: 0, unchangedOtherVenues: true, reviewRows: [] };
 
 await db.connect();
@@ -40,6 +42,16 @@ try {
   for (const item of records) {
     if (sourceKeySet.has(item.sourceKey)) { summary.duplicateRows++; continue; }
     sourceKeySet.add(item.sourceKey);
+    if (sourceKeyCounts.get(item.sourceKey) > 1) {
+      summary.review++;
+      summary.reviewRows.push({ row: item.sourceRow, name: item.name, reason: 'duplicate_source_key' });
+      continue;
+    }
+    if (item.reviewReasons?.length) {
+      summary.review++;
+      summary.reviewRows.push({ row: item.sourceRow, name: item.name, reason: item.reviewReasons.join(',') });
+      continue;
+    }
     const cityId = cityByName.get(normalize(item.city));
     if (!cityId) { summary.missingCity++; summary.reviewRows.push({ row: item.sourceRow, name: item.name, reason: 'missing_city' }); continue; }
     const existingSource = bySource.get(item.sourceKey);
