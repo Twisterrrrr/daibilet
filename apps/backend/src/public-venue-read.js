@@ -2415,7 +2415,7 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
     const typeSource = facetSource?.typeUniverse || filteredItems;
     const scaleSource = facetSource?.scaleUniverse || filteredItems;
     const cities = countBy(citySource.map((venue) => venue.city).filter(Boolean));
-    const types = countBy(typeSource.map((venue) => venue.type).filter(Boolean));
+    const types = countBy(typeSource.map((venue) => venue.placeType || venue.type).filter(Boolean));
     const scales = countBy(
       scaleSource
         .filter((venue) => venue.template === 'institution')
@@ -2506,7 +2506,10 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
           .map((part) => String(part || '').trim().toLowerCase())
           .filter(Boolean),
       );
-      working = working.filter((venue) => typeSet.has(String(venue.type || '').toLowerCase()));
+      working = working.filter((venue) =>
+        typeSet.has(String(venue.placeType || '').toLowerCase()) ||
+        typeSet.has(String(venue.type || '').toLowerCase()),
+      );
     }
     const scaleUniverse = working;
     if (scaleFilter === 'museum' || scaleFilter === 'large_hall' || scaleFilter === 'intimate') {

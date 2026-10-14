@@ -47,17 +47,15 @@ describe('park + monument venue kinds', () => {
   });
 });
 
-describe('places hub split chips', () => {
-  it('exposes galleries, attractions, temples, gastro as separate chips', () => {
+describe('places hub parent types', () => {
+  it('uses taxonomy parents and preserves legacy catalog fallbacks', () => {
     const byId = Object.fromEntries(PLACES_HUB_CATEGORY_CHIPS.map((chip) => [chip.id, chip]));
-    assert.deepEqual(byId.galleries?.types, ['art_space']);
+    assert.deepEqual(byId.food?.types, ['food', 'gastro', 'bar', 'club_bar_restaurant']);
+    assert.deepEqual(byId.transport?.types, ['transport', 'pier', 'pier_water', 'bus']);
     assert.deepEqual(byId.attractions?.types, ['attraction']);
-    assert.deepEqual(byId.temples?.types, ['temple']);
-    assert.deepEqual(byId.monuments?.types, ['monument']);
-    assert.deepEqual(byId.gastro?.types, ['gastro']);
-    assert.ok(!byId.museums.types.includes('art_space'));
-    assert.ok(!byId.bars_restaurants.types.includes('gastro'));
-    assert.ok(!byId.outdoors.types.includes('attraction'));
+    assert.deepEqual(byId.religion?.types, ['religion', 'temple']);
+    assert.deepEqual(byId.monument?.types, ['monument']);
+    assert.ok(!byId.nature.types.includes('attraction'));
   });
 
   it('maps TEMPLE kind to temple public chip (title heuristic only for reclassify)', () => {
@@ -66,12 +64,12 @@ describe('places hub split chips', () => {
     assert.equal(resolvePublicVenueType('TEMPLE', 'Исаакиевский собор'), 'temple');
     assert.equal(resolvePublicVenueType('attraction', 'Исаакиевский собор'), 'attraction');
     assert.equal(resolvePublicVenueType('attraction', 'Бункер-42 на Таганке'), 'attraction');
-    assert.equal(resolvePlacesHubCategoryChip('temples')?.label, 'Храмы');
-    assert.equal(resolvePlacesHubCategoryChip('temple')?.id, 'temples');
+    assert.equal(resolvePlacesHubCategoryChip('temples')?.label, 'Религиозные места');
+    assert.equal(resolvePlacesHubCategoryChip('temple')?.id, 'religion');
   });
 
   it('counts temple chip from stats.types.temple', () => {
-    const chip = resolvePlacesHubCategoryChip('temples');
+    const chip = resolvePlacesHubCategoryChip('religion');
     assert.ok(chip);
     assert.equal(placesHubCategoryCount({ temple: 12, attraction: 40 }, chip), 12);
   });

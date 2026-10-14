@@ -8,16 +8,21 @@ import re
 import sys
 from collections import Counter
 
-DIRECT = {"CONCERT_HALL": ("THEATRE", "concert_hall"),
-          "PARK": ("NATURE", "park"), "MONUMENT": ("MONUMENT", "monument")}
-
-
 def propose(row):
     old = row["kind"]
     name = row["title"].casefold().replace("ё", "е")
-    if old in DIRECT:
-        kind, subtype = DIRECT[old]
-        return kind, subtype, "high", "legacy_kind"
+    if old == "CONCERT_HALL":
+        if re.search(r"концертн.{0,12}зал|филармони|дворец культуры|дом культуры|\bдк\b", name):
+            return "THEATRE", "concert_hall", "high", "name_and_legacy_kind"
+        return "VENUE", "event_venue", "medium", "mixed_legacy_concert_hall"
+    if old == "PARK":
+        if re.search(r"\bпарк\b|\bсад\b|дендрар|ботаническ", name):
+            return "NATURE", "park", "high", "name_and_legacy_kind"
+        return "NATURE", "", "medium", "subtype_review"
+    if old == "MONUMENT":
+        if re.search(r"памятник|монумент|мемориал|скульптур|стел[аы]|обелиск|бюст", name):
+            return "MONUMENT", "monument", "high", "name_and_legacy_kind"
+        return "MONUMENT", "", "medium", "subtype_review"
     if old == "TEMPLE":
         for subtype, pattern in [("mosque", r"мечет"), ("synagogue", r"синагог"),
                                  ("monastery", r"монастыр|лавра"), ("chapel", r"часовн"),

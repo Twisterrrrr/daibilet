@@ -391,30 +391,20 @@ export const LOCATION_CATALOG_TYPE_OPTIONS = CATALOG_TYPE_OPTIONS.filter((option
   }),
 );
 
-/**
- * Чипы `/places` для людей: без жаргона «площадка/локация» как семейства.
- * Логистика (причалы / автобусы) и редкие kind оставляем - иначе хаб «теряет» целые срезы.
- * `id` уходит в `?type=`; `types` - фактические kind для фильтрации.
- */
+/** Parent Places types, with legacy chips kept as fallbacks for unreviewed imports. */
 export const PLACES_HUB_CATEGORY_CHIPS: Array<{ id: string; label: string; types: string[] }> = [
-  { id: 'museums', label: 'Музеи', types: ['museum', 'museum_art_space'] },
-  { id: 'galleries', label: 'Галереи', types: ['art_space'] },
-  { id: 'theaters', label: 'Театры', types: ['theater'] },
-  { id: 'concert_halls', label: 'Концертные залы', types: ['concert_hall'] },
-  { id: 'bars_restaurants', label: 'Бары и рестораны', types: ['bar', 'club_bar_restaurant'] },
-  { id: 'gastro', label: 'Гастроточки', types: ['gastro'] },
-  {
-    id: 'outdoors',
-    label: 'Парки и открытые места',
-    types: ['park', 'outdoor_location'],
-  },
-  { id: 'attractions', label: 'Достопримечательности', types: ['attraction'] },
-  { id: 'temples', label: 'Храмы', types: ['temple'] },
-  { id: 'monuments', label: 'Памятники', types: ['monument'] },
-  { id: 'piers', label: 'Причалы', types: ['pier', 'pier_water'] },
-  { id: 'buses', label: 'Автобусы', types: ['bus'] },
-  { id: 'venues', label: 'Площадки', types: ['venue', 'other'] },
-  { id: 'sport', label: 'Спорт', types: ['sport_activity_space'] },
+  { id: 'architecture', label: 'Архитектура', types: ['architecture'] },
+  { id: 'monument', label: 'Памятники', types: ['monument'] },
+  { id: 'museum', label: 'Музеи', types: ['museum', 'art_space', 'museum_art_space'] },
+  { id: 'religion', label: 'Религиозные места', types: ['religion', 'temple'] },
+  { id: 'nature', label: 'Природа', types: ['nature', 'park'] },
+  { id: 'urban', label: 'Городские места', types: ['urban', 'outdoor_location'] },
+  { id: 'theatre', label: 'Театры и сцены', types: ['theatre', 'theater', 'concert_hall'] },
+  { id: 'entertainment', label: 'Развлечения', types: ['entertainment', 'sport_activity_space'] },
+  { id: 'food', label: 'Еда', types: ['food', 'gastro', 'bar', 'club_bar_restaurant'] },
+  { id: 'transport', label: 'Транспорт', types: ['transport', 'pier', 'pier_water', 'bus'] },
+  { id: 'venue', label: 'Площадки', types: ['venue', 'meeting_point'] },
+  { id: 'attractions', label: 'Другие достопримечательности', types: ['attraction'] },
 ];
 
 export function resolvePlacesHubCategoryChip(
@@ -426,6 +416,11 @@ export function resolvePlacesHubCategoryChip(
   if (!raw || raw === 'all') return null;
   const byId = PLACES_HUB_CATEGORY_CHIPS.find((chip) => chip.id === raw);
   if (byId) return byId;
+  const legacyIds: Record<string, string> = { museums: 'museum', galleries: 'museum', theaters: 'theatre', concert_halls: 'theatre',
+    bars_restaurants: 'food', gastro: 'food', outdoors: 'nature', temples: 'religion',
+    monuments: 'monument', piers: 'transport', buses: 'transport', venues: 'venue', sport: 'entertainment' };
+  const legacyId = legacyIds[raw];
+  if (legacyId) return PLACES_HUB_CATEGORY_CHIPS.find((chip) => chip.id === legacyId) || null;
   // Legacy `?type=theater` / `museum` from older URLs.
   return (
     PLACES_HUB_CATEGORY_CHIPS.find((chip) => chip.types.includes(normalizeVenueKind(raw))) || null
