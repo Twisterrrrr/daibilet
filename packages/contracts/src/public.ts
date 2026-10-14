@@ -186,6 +186,12 @@ export interface PublicVenueDto extends SeoFields {
   /** Короткий hook-текст для карточек локаций. */
   hookFact?: string | null;
   type: string;
+  placeType?: string | null;
+  placeSubtype?: string | null;
+  pageTemplate?: 'default' | 'pier_departures';
+  placeRoles?: string[];
+  isMainPlace?: boolean;
+  hubTags?: string[];
   pageStatus?: string | null;
   /** Result of the detail availability gate for sitemap-sized venue snapshots. */
   detailAvailable?: boolean;

@@ -1,5 +1,19 @@
 # Decision Log — Daibilet
 
+## 2026-10-14 — Places taxonomy for completed city hubs
+
+PDP.xlsx is the complete editorial source for the city hubs represented in that workbook,
+not a complete inventory of every existing PDP or venue. Missing workbook rows never
+hide unrelated site pages. Reconciliation first uses a source key, then one city/name
+match corroborated by address or coordinates; uncertain pairs require review.
+
+Places use one primary `PlaceType`, an optional precise subtype and additional roles
+or hub badges. `religion` and `urban` are primary types. `transport` covers piers,
+terminals and stations; a bus vehicle is not a place subtype. A regular departure
+pier can use `pier_departures` only when particular sessions have verified
+`TripDeparture` links. New unmatched places remain hidden and noindex until their
+identity, factual copy and object-specific imagery are reviewed.
+
 ## 2026-10-08 — R12 sandbox и R13 catalog release
 
 Владелец явно разрешил sandbox-деплой R12 на `.159` в сессии 07–08.10,
