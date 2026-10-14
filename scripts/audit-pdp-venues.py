@@ -1,7 +1,8 @@
-"""Read-only comparison of the editorial PDP snapshot with a Venue CSV export.
+"""Read-only comparison of the editorial PDP snapshot with Venue CSV exports.
 
 The CSV must have id,title,city,address,latitude,longitude,kind,pageStatus,
 isIndexable,slug columns. Matching candidates are evidence, never automatic merges.
+Pass an optional VenueAlias CSV as the fourth argument.
 """
 import csv
 import json
@@ -34,6 +35,11 @@ def name_similarity(left, right):
 snapshot = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
 with open(sys.argv[2], encoding="utf-8-sig", newline="") as source:
     venues = list(csv.DictReader(source))
+aliases = defaultdict(list)
+if len(sys.argv) > 4:
+    with open(sys.argv[4], encoding="utf-8-sig", newline="") as source:
+        for alias in csv.DictReader(source):
+            aliases[alias["venueId"]].append(alias)
 by_city = defaultdict(list)
 for venue in venues:
     by_city[normalize(venue["city"])].append(venue)
@@ -44,17 +50,21 @@ for place in snapshot:
     candidates = []
     for venue in by_city[normalize(place["city"])]:
         meters = distance(place, venue)
+        alias_match = [alias for alias in aliases[venue["id"]] if normalize(place["name"]) == normalize(alias["title"])]
         exact_name = normalize(place["name"]) == normalize(venue["title"])
-        exact_address = bool(normalize(place["address"])) and normalize(place["address"]) == normalize(venue["address"])
-        if exact_name or (meters is not None and meters <= 120) or exact_address:
+        exact_address = bool(normalize(place["address"])) and (
+            normalize(place["address"]) == normalize(venue["address"]) or
+            any(normalize(place["address"]) == normalize(alias["address"]) for alias in aliases[venue["id"]]))
+        if exact_name or alias_match or (meters is not None and meters <= 120) or exact_address:
             candidates.append({"id": venue["id"], "title": venue["title"], "kind": venue["kind"],
                                "pageStatus": venue["pageStatus"], "meters": meters,
                                "exactName": exact_name, "exactAddress": exact_address,
+                               "exactAlias": bool(alias_match),
                                "nameSimilarity": name_similarity(place["name"], venue["title"])})
-    candidates.sort(key=lambda item: (not item["exactName"], item["meters"] if item["meters"] is not None else 999999))
-    exact = [item for item in candidates if item["exactName"]]
+    candidates.sort(key=lambda item: (not (item["exactName"] or item["exactAlias"]), item["meters"] if item["meters"] is not None else 999999))
+    exact = [item for item in candidates if item["exactName"] or item["exactAlias"]]
     if len(exact) == 1 and exact[0]["id"] not in used_ids:
-        status = "exact_name_city"
+        status = "exact_name_or_alias_city"
         used_ids.add(exact[0]["id"])
     elif len(exact) > 1:
         status = "ambiguous_exact"

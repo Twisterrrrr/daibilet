@@ -38,21 +38,42 @@ def classify(name, old_type):
         "саратовский лимонарий": "NATURE", "термальный источник тюменский (верхний бор)": "NATURE",
         "круглая баня на ленина": "ARCHITECTURE", "полноразмерная копия су су сухого": "MONUMENT",
         "смотрительная площадка челябинск-сити": "URBAN",
+        "часовня святителя николая": "RELIGION", "омский цирк (обновленная площадка)": "THEATRE",
+        "летний театр парка фрунзе": "THEATRE", "юдинский сад": "NATURE",
+        "кластер «малый вгум» (дворики гума)": "URBAN", "креативный кластер «почаина»": "URBAN",
+        "литовский вал": "ARCHITECTURE", "власьевская аптека": "VENUE",
+        "смотровая площадка старого аэропорта": "URBAN",
+        "культурное пространство «дача онегина»": "VENUE",
+        "поющий фонтан чаша олимпийского огня": "URBAN",
+        "новая голландия": "URBAN", "национальная деревня народов поволжья": "ENTERTAINMENT",
     }
     if value in special:
         return special[value], "editorial_override"
+    if value.startswith("смотровая площадка бц"):
+        return "URBAN", "viewpoint_override"
+    if re.search(r"вокзал|причал|пристань|автостанция|станция метро|аэропорт|фуникулер|канатная дорога|\bмаяк\b", value):
+        return "TRANSPORT", "transport_function"
+    strong_categories = {
+        "Музеи": "MUSEUM", "Музеи и галереи": "MUSEUM",
+        "Храмы": "RELIGION", "Храмы, соборы и монастыри": "RELIGION",
+        "Парки": "NATURE", "Памятники": "MONUMENT", "Памятникими": "MONUMENT",
+        "Доходные дома и парадные": "ARCHITECTURE", "Особняки и городские усадьбы": "ARCHITECTURE",
+        "Гастро": "FOOD", "Театры и шоу": "THEATRE", "Театры": "THEATRE",
+    }
+    if old_type in strong_categories:
+        return strong_categories[old_type], "editorial_category"
     rules = [
         ("RELIGION", r"храм|собор|церк|мечет|монастыр|кирх|синагог|часовн|лавр|костел|приход"),
         ("MUSEUM", r"музей|галере|выставоч|экспозиц|пинакотек"),
         ("FOOD", r"ресторан|кафе|кофейн|гастробар|бар |бар «|бистро|столов|пекарн|кондитерск|гастромаркет|фудмолл|гастропростран"),
         ("THEATRE", r"театр|филармони|опера|цирк|кинотеатр|драматическ"),
         ("ENTERTAINMENT", r"океанари|зоопарк|планетари|аттракцион|сафари-парк|аквапарк|развлекательн"),
-        ("TRANSPORT", r"вокзал|причал|станция метро|метрополитен|железная дорога|фуникулер|канатная дорога|метротрам|аэропорт|маяк"),
+        ("TRANSPORT", r"вокзал|причал|пристань|станция метро|метрополитен|железная дорога|фуникулер|канатная дорога|метротрам|аэропорт|\bмаяк\b"),
         ("NATURE", r"парк|сад |сквер|заповедник|лес |роща|пляж|озеро|водопад|гора|хребет|ущелье|мыс |остров|пещера"),
         ("MONUMENT", r"памятник|монумент|скульптур|обелиск|стел[а-я]|бюст|мемориал|триумфальн|арт-объект|уличный арт|роспись|барельеф"),
         ("URBAN", r"улица|площадь|набережн|бульвар|проспект|переулок|\bдвор\b|дворик|квартал|променад|смотровая площадка|смотрительная площадка|лестница|аллея|рынок"),
         ("URBAN", r"слобода|стрелка|пешеходная|фонтан"),
-        ("ARCHITECTURE", r"дом |особняк|усадьб|дворец|здани|вокзал|мост|башня|крепост|форт|маяк|ворота|палат|замок|пассаж|почтамт|кремль|мельница|каланча|пакгауз|элеватор|бастион|небоскреб|штаб-квартира|склады"),
+        ("ARCHITECTURE", r"дом |особняк|усадьб|дворец|здани|вокзал|мост|башня|крепост|форт|\bмаяк\b|ворота|палат|замок|пассаж|почтамт|кремль|мельница|каланча|пакгауз|элеватор|бастион|небоскреб|штаб-квартира|склады"),
         ("VENUE", r"центр|кластер|пространство|лофт|арт-|рок-клуб|автодром|стадион|завод|санатори|консерватор|фабрика|пивоварен|курорт|аптека"),
     ]
     for kind, pattern in rules:
@@ -72,31 +93,43 @@ def classify(name, old_type):
     return "OTHER", "review"
 
 
-def subtype(name, kind):
+def subtype(name, kind, old_type="", description=""):
     value = name.casefold().replace("ё", "е")
     families = {
-        "RELIGION": [("monastery", r"монастыр|лавра"), ("mosque", r"мечет"), ("synagogue", r"синагог"),
-                     ("church", r"церк|храм|собор|кирх|костел|приход"), ("chapel", r"часовн"), ("bell_tower", r"колокольн")],
-        "URBAN": [("street", r"улица|проспект|переулок|бульвар"), ("square", r"площадь"),
-                  ("embankment", r"набережн"), ("viewpoint", r"смотровая|обзорная площадка"),
-                  ("district", r"слобода|квартал|район"), ("market", r"рынок"),
+        "RELIGION": [("monastery", r"монастыр|лавра|обитель"), ("mosque", r"мечет"), ("synagogue", r"синагог"),
+                     ("buddhist_temple", r"дацан"), ("church", r"церк|храм|собор|кирх|костел|приход|спас на крови|большой златоуст"),
+                     ("chapel", r"часовн"), ("bell_tower", r"колокольн")],
+        "URBAN": [("street", r"улица|проспект|переулок|бульвар|пешеходная"), ("square", r"площадь"),
+                  ("embankment", r"набережн"), ("viewpoint", r"смотровая|смотрительная|обзорная площадка"),
+                  ("district", r"слобода|квартал|район|деревня|городок|поселок|форштадт|москва-сити"), ("market", r"рынок"),
                   ("fountain", r"фонтан"), ("stairs", r"лестница"), ("promenade", r"променад|аллея"),
-                  ("courtyard", r"дворик|\bдвор\b")],
-        "FOOD": [("restaurant", r"ресторан"), ("cafe", r"кафе|кофейн"), ("bar", r"бар|паб"),
-                 ("bakery", r"пекарн|кондитерск"), ("food_market", r"гастромаркет|рынок"),
+                  ("courtyard", r"дворик|дворы|подворье|\bдвор\b"), ("exhibition_grounds", r"вднх"),
+                  ("waterfront", r"стрелка"), ("public_space", r"кластер|пространство|порт|экоплощадка|новая голландия"),
+                  ("walking_route", r"тропа")],
+        "FOOD": [("restaurant", r"ресторан|трактир|стейк.хаус|траттория|пиццерия|пельменная"),
+                 ("cafe", r"кафе|кофейн|чебуречная|пышечная"), ("bar", r"бар|паб|рюмочная"),
+                 ("bakery", r"пекарн|пекарен|кондитерск|булочная"), ("food_market", r"гастромаркет|рынок"),
                  ("food_hall", r"фудмолл|гастропростран")],
-        "MUSEUM": [("gallery", r"галере"), ("exhibition_space", r"выставоч"), ("museum", r"музей")],
-        "MONUMENT": [("memorial", r"мемориал"), ("sculpture", r"скульптур|бюст|арт-объект"),
-                     ("obelisk", r"обелиск|стела"), ("monument", r"памятник|монумент")],
+        "MUSEUM": [("gallery", r"галере|гмии"), ("exhibition_space", r"выставоч"),
+                   ("museum", r"музей|палата|кунсткамер|бункер|макет|дача сталина|ельцин центр")],
+        "MONUMENT": [("memorial", r"мемориал"), ("sculpture", r"скульптур|бюст|арт-объект|карета|медный всадник|нос майора|сфинкс"),
+                     ("obelisk", r"обелиск|стела"), ("monument", r"памятник|монумент|триумфальн"),
+                     ("fountain", r"фонтан"), ("replica", r"макет|копия")],
         "ARCHITECTURE": [("bridge", r"мост"), ("palace", r"дворец"), ("estate", r"усадьб|особняк"),
-                         ("tower", r"башня|каланча|небоскреб"), ("fortification", r"крепост|форт|бастион|кремль|ворота|вал"),
-                         ("historic_building", r"дом|здани|пассаж|почтамт|вокзал")],
+                         ("tower", r"башня|каланча|небоскреб"), ("fortification", r"крепост|форт|бастион|кремль|ворота|вал|замок"),
+                         ("mill", r"мельница"), ("dam", r"плотина"), ("bathhouse", r"баня"),
+                         ("warehouse", r"склад|пакгауз|элеватор"), ("arcade", r"торговые ряды|базар|гостиный двор"),
+                         ("historic_building", r"дом|здани|пассаж|почтамт|вокзал|штаб.квартира|больница|корпус|вилла|дача|приют|подстанция|клуб|палат|парадная|оранжерея|гостиница|адмиралтейство|печатный двор|культурный центр|терем")],
         "THEATRE": [("circus", r"цирк"), ("philharmonic", r"филармони"),
-                    ("cinema", r"кинотеатр"), ("concert_hall", r"концертный зал"), ("theatre", r"театр|опера")],
+                    ("cinema", r"кинотеатр"), ("concert_hall", r"концертный зал|зал органной"),
+                    ("jazz_club", r"джаз.клуб"), ("theatre", r"театр|опера|мхт|тюз")],
         "ENTERTAINMENT": [("zoo", r"зоопарк|сафари-парк"), ("aquarium", r"океанари"),
-                          ("planetarium", r"планетари"), ("amusement_park", r"аттракцион|аквапарк")],
-        "VENUE": [("stadium", r"стадион"), ("cultural_center", r"центр|пространство|кластер"),
-                  ("club", r"клуб"), ("industrial_site", r"завод|фабрика")],
+                          ("planetarium", r"планетари"), ("amusement_park", r"аттракцион|аквапарк"),
+                          ("ethnographic_park", r"национальная деревня|этнопарк")],
+        "VENUE": [("stadium", r"стадион"), ("cultural_center", r"центр|пространство|кластер|консерватор|арт.квадрат"),
+                  ("club", r"клуб"), ("industrial_site", r"завод|фабрика"),
+                  ("resort", r"курорт|санатори"), ("racetrack", r"автодром"),
+                  ("pharmacy", r"аптека"), ("loft", r"лофт")],
     }
     for code, pattern in families.get(kind, []):
         if re.search(pattern, value): return code
@@ -104,9 +137,9 @@ def subtype(name, kind):
         for code, pattern in [
             ("waterfall", r"водопад"), ("cave", r"пещер"), ("mountain", r"гора|хребет|сопка"),
             ("lake", r"озеро|пруд"), ("river", r"река|речка"), ("beach", r"пляж"),
-            ("forest", r"лес|роща"), ("hot_spring", r"термальн|источник"),
-            ("island", r"остров"), ("cape", r"мыс "), ("reserve", r"заповедник|резерват"),
-            ("park", r"парк|сквер|сад "),
+            ("forest", r"лес|роща|бор"), ("hot_spring", r"термальн|источник"),
+            ("island", r"остров"), ("cape", r"мыс "), ("reserve", r"заповедник|резерват|заказник|гавань"),
+            ("garden", r"сад|огород|липки|лимонарий"), ("park", r"парк|сквер|городок|цпкио|аллея"),
         ]:
             if re.search(pattern, value): return code
         return "natural_site"
@@ -114,16 +147,24 @@ def subtype(name, kind):
         for code, pattern in [
             ("pier", r"причал|пристань"), ("river_terminal", r"речной вокзал"),
             ("sea_terminal", r"морской вокзал|морвокзал"),
-            ("railway_station", r"железнодорожный вокзал|ж/д вокзал"),
+            ("railway_station", r"железнодорожн\w* вокзал\w*|ж/д вокзал"),
             ("bus_station", r"автовокзал|автостанция"),
             ("metro_station", r"станция метро"),
             ("cable_car_station", r"станция канатной дороги"),
             ("airport", r"аэропорт"), ("marina", r"марина|яхт-клуб"),
-            ("station", r"вокзал|станция"), ("funicular", r"фуникулер|канатная дорога"),
-            ("railway", r"железная дорога|метрополитен|метротрам"), ("lighthouse", r"маяк"),
+            ("station", r"вокзал|станция"), ("funicular", r"фуникулер"),
+            ("cable_car", r"канатная дорога"), ("metro_network", r"метрополитен"),
+            ("light_rail_system", r"метротрам"), ("tourist_railway", r"детская железная дорога"),
+            ("railway", r"железная дорога"), ("lighthouse", r"маяк"),
         ]:
             if re.search(pattern, value): return code
         return "transport_site"
+    if kind == "MUSEUM" and old_type in ("Музеи", "Музеи и галереи"):
+        return "museum"
+    if kind == "THEATRE" and old_type in ("Театры", "Театры и шоу"):
+        return "theatre"
+    if kind == "URBAN" and old_type == "Улицы / дворы":
+        return "street"
     return None
 
 
@@ -156,7 +197,7 @@ for line, row in enumerate(rows[1:], 2):
     key = hashlib.sha1(f"{city.casefold()}|{name.casefold()}".encode("utf-8")).hexdigest()[:20]
     records.append(dict(sourceKey=f"pdp:{key}", sourceRow=line, name=name, oldType=old_type,
                         city=city, address=address, latitude=latitude, longitude=longitude,
-                        description=description, placeType=kind, placeSubtype=subtype(name, kind), classificationMethod=method,
+                        description=description, placeType=kind, placeSubtype=subtype(name, kind, old_type, description), classificationMethod=method,
                         isMainPlace="main" in tags, hubTags=tags,
                         imagePrompt=(
                             f"Use case: photorealistic-natural. Asset type: PDP cover for the exact place '{name}' "
