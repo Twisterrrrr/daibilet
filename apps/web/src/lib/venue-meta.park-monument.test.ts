@@ -51,7 +51,7 @@ describe('places hub parent types', () => {
   it('uses taxonomy parents and preserves legacy catalog fallbacks', () => {
     const byId = Object.fromEntries(PLACES_HUB_CATEGORY_CHIPS.map((chip) => [chip.id, chip]));
     assert.deepEqual(byId.food?.types, ['food', 'gastro', 'bar', 'club_bar_restaurant']);
-    assert.deepEqual(byId.transport?.types, ['transport', 'pier', 'pier_water', 'bus']);
+    assert.deepEqual(byId.transport?.types, ['transport', 'pier', 'pier_water']);
     assert.deepEqual(byId.attractions?.types, ['attraction']);
     assert.deepEqual(byId.religion?.types, ['religion', 'temple']);
     assert.deepEqual(byId.monument?.types, ['monument']);

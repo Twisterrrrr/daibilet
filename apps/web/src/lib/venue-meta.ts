@@ -402,7 +402,7 @@ export const PLACES_HUB_CATEGORY_CHIPS: Array<{ id: string; label: string; types
   { id: 'theatre', label: 'Театры и сцены', types: ['theatre', 'theater', 'concert_hall'] },
   { id: 'entertainment', label: 'Развлечения', types: ['entertainment', 'sport_activity_space'] },
   { id: 'food', label: 'Еда', types: ['food', 'gastro', 'bar', 'club_bar_restaurant'] },
-  { id: 'transport', label: 'Транспорт', types: ['transport', 'pier', 'pier_water', 'bus'] },
+  { id: 'transport', label: 'Транспорт', types: ['transport', 'pier', 'pier_water'] },
   { id: 'venue', label: 'Площадки', types: ['venue', 'meeting_point'] },
   { id: 'attractions', label: 'Другие достопримечательности', types: ['attraction'] },
 ];
