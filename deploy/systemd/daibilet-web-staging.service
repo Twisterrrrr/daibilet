@@ -1,6 +1,6 @@
 [Unit]
 Description=Daibilet Next.js public (staging)
-After=network.target postgresql.service
+After=network.target daibilet-api-staging.service
 
 [Service]
 Type=simple
@@ -8,6 +8,9 @@ WorkingDirectory=/opt/daibilet-staging
 EnvironmentFile=/opt/daibilet-staging/.env
 Environment=DAIBILET_WEB_PORT=3000
 Environment=NODE_ENV=production
+Environment=NODE_OPTIONS=--max-old-space-size=768
+MemoryHigh=900M
+MemoryMax=1200M
 ExecStart=/usr/bin/env bash deploy/scripts/start-web-prod.sh
 Restart=always
 RestartSec=5
