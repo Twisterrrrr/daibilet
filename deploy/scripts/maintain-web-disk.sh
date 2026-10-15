@@ -28,7 +28,13 @@ mkdir -p "$(dirname "$LOCK")"
 exec 9>"$LOCK"
 flock -n 9 || { echo 'deploy in progress; skipping maintenance'; exit 0; }
 
-cache_mib="$(du -sm "$NEXT/cache" "$NEXT/server/route-cache" 2>/dev/null | awk '{sum += $1} END {print sum+0}')"
+cache_mib=0
+for cache_path in "$NEXT/cache" "$NEXT/server/route-cache"; do
+  if [[ -d "$cache_path" ]]; then
+    cache_size="$(du -sm "$cache_path" | awk '{print $1}')"
+    ((cache_mib += cache_size))
+  fi
+done
 echo "runtime cache: ${cache_mib} MiB; limit: ${CACHE_LIMIT_MIB} MiB"
 if (( cache_mib > CACHE_LIMIT_MIB )); then
   echo 'cache exceeds limit; a brief web restart is required'
