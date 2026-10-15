@@ -12,6 +12,10 @@
       "types": "./src/admin.ts",
       "default": "./src/admin.ts"
     },
+    "./admin-access": {
+      "types": "./src/admin-access.ts",
+      "default": "./src/admin-access.ts"
+    },
     "./common": "./src/common.ts",
     "./db": "./src/db.ts",
     "./landing": "./src/landing.ts",
