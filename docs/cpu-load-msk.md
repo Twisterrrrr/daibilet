@@ -17,8 +17,8 @@ The production host has 4 vCPU, 8 GiB RAM and a 77 GiB root filesystem. Timeweb'
 
 ## Follow-up options
 
-1. Collect process-level CPU samples (`pidstat` or a small `ps`/cgroup sampler) alongside nginx request counts before changing crawl policy. The Timeweb aggregate chart alone cannot quantify each source's share.
-2. If crawler traffic remains dominant, limit high-rate non-search crawlers at nginx or CDN while preserving Google/Yandex indexing. Decide the desired crawl policy before applying a global bot rule. Rate limiting by IP alone may have little effect on distributed crawlers.
+1. Correlate the new per-minute `pidstat` samples with nginx request counts during future peaks. The Timeweb aggregate chart alone cannot quantify each source's share.
+2. The declared `GPTBot` crawler now has one shared nginx bucket at 1 request/second, burst 30, HTTP 429 above the burst. Other User-Agents keep their existing behavior, including Google/Yandex. The key is shared across source IPs because the crawler was distributed. This is a load-control rule, not a proof of bot identity. Recheck nginx 429 counts and Timeweb CPU after a full day.
 3. Evaluate a longer catalog DTO rebuild interval only after confirming acceptable catalog freshness. The current eight-minute interval is a product freshness choice.
 
 ## Quick diagnosis
@@ -34,3 +34,9 @@ sudo journalctl -k --since '1 hour ago' --no-pager | grep -Ei 'oom|kill|memory|h
 ```
 
 When sampling for Cline, use UTC from `date -Is` to align systemd, nginx and Timeweb timestamps. Do not treat User-Agent strings as verified bot identities. Preserve production host `201.24.125.184`; the finance server is outside this runbook.
+
+## Stabilization change, 2026-10-15
+
+`deploy/nginx/patch-prod-crawler-rate.py` patched `/etc/nginx/sites-enabled/daibilet.conf` after backing it up to `/etc/nginx/daibilet.conf.pre-crawler-rate`. `nginx -t` passed and nginx was reloaded. A controlled 50-request burst to `/robots.txt` produced 31 HTTP 200 and 19 HTTP 429 for `GPTBot`; human and `Googlebot` probes returned HTTP 200. The rule is scoped to the public Next `location /`, which includes event pages and `/_next/image`. Roll back by restoring the backup, testing nginx, and reloading it. The existing public API limit stays intact.
+
+`daibilet-cpu-sample.timer` writes a one-second `pidstat` sample to the journal every minute. It records UTC, load, available RAM, free swap and processes using at least 3% of one CPU. Read with `journalctl -u daibilet-cpu-sample.service --since '1 hour ago'`. It has no database or application side effects. Use the samples for future peak attribution; each point is a one-second observation and can miss a short burst.

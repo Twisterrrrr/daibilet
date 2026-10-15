@@ -1,0 +1,9 @@
+[Unit]
+Description=Daibilet one-second process CPU sample
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/env bash /opt/daibilet/deploy/scripts/sample-cpu-load.sh
+Nice=19
+StandardOutput=journal
+StandardError=journal
