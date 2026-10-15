@@ -14,22 +14,28 @@ if source.count(marker) != 1:
 start = source.index(marker)
 end = source.find('\nserver {', start)
 block = source[start:end if end >= 0 else len(source)]
-if 'auth_basic_user_file /etc/nginx/.htpasswd-daibilet-admin;' in block:
+staging_auth = 'auth_basic_user_file /etc/nginx/.htpasswd-daibilet-staging;'
+if staging_auth in block:
     print('Staging basic auth already installed')
     sys.exit(0)
-if 'auth_basic ' in block:
+if 'auth_basic ' in block and 'auth_basic_user_file /etc/nginx/.htpasswd-daibilet-admin;' not in block:
     sys.exit('Staging has another auth_basic configuration; inspect manually')
-if not Path('/etc/nginx/.htpasswd-daibilet-admin').is_file():
-    sys.exit('Admin htpasswd file missing')
-replacement = marker + '\n    auth_basic "Daibilet staging";\n    auth_basic_user_file /etc/nginx/.htpasswd-daibilet-admin;'
+if not Path('/etc/nginx/.htpasswd-daibilet-staging').is_file():
+    sys.exit('Staging htpasswd file missing')
+replacement = marker + '\n    auth_basic "Daibilet staging";\n    ' + staging_auth
 # sites-enabled/* is included by nginx, so keep the backup outside that folder.
-backup = Path('/etc/nginx/daibilet.conf.pre-staging-auth')
+backup = Path('/etc/nginx/daibilet.conf.pre-staging-credentials')
 if backup.exists():
     if backup.read_text() != source:
         sys.exit(f'Backup differs from current config: {backup}')
 else:
     backup.write_text(source)
-path.write_text(source.replace(marker, replacement, 1))
+if 'auth_basic_user_file /etc/nginx/.htpasswd-daibilet-admin;' in block:
+    updated_block = block.replace('auth_basic_user_file /etc/nginx/.htpasswd-daibilet-admin;', staging_auth, 1)
+    updated = source[:start] + updated_block + source[end if end >= 0 else len(source):]
+else:
+    updated = source.replace(marker, replacement, 1)
+path.write_text(updated)
 check = subprocess.run(['nginx', '-t'], capture_output=True, text=True)
 if check.returncode:
     path.write_text(source)
