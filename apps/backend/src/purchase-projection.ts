@@ -181,6 +181,14 @@ export interface AdminPurchasesListDto {
     failedIntegration: number;
     needsAttention: number;
   };
+  scopedMetrics?: {
+    provider: string;
+    total: number;
+    confirmed: number;
+    processing: number;
+    problems: number;
+    refundCases: number;
+  };
 }
 
 export interface BuyerPurchasesListDto {
@@ -442,6 +450,7 @@ export async function buildAdminPurchasesListDto(
     prisma.externalOrder.count({ where: { archivedAt: { not: null } } }),
   ]);
   const activeRows = allRows.filter((row) => !row.isArchived);
+  const scopedRows = provider === 'ALL' ? allRows : allRows.filter((row) => row.sourceCode === provider);
   const filteredRows = allRows.filter((row) => matchesAdminPurchaseFilters(row, { q, view, provider, status }));
   const total = filteredRows.length;
   const pages = Math.max(1, Math.ceil(total / limit));
@@ -479,6 +488,14 @@ export async function buildAdminPurchasesListDto(
       missingArtifacts: allRows.filter((row) => row.artifactStatus === 'missing').length,
       failedIntegration: allRows.filter((row) => isProblemOrderStatus(row.status)).length,
       needsAttention: allRows.filter((row) => row.needsAttention).length,
+    },
+    scopedMetrics: {
+      provider,
+      total: scopedRows.length,
+      confirmed: scopedRows.filter((row) => isConfirmedOrderStatus(row.status)).length,
+      processing: scopedRows.filter((row) => isProcessingOrderStatus(row.status)).length,
+      problems: scopedRows.filter((row) => isProblemOrderStatus(row.status)).length,
+      refundCases: scopedRows.filter((row) => row.hasPendingRefundRequests || isRefundStatus(row.status)).length,
     },
   };
 }
