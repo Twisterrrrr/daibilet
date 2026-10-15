@@ -48,6 +48,37 @@ function first(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
 }
 
+type OrdersFilterState = {
+  kind: string;
+  q: string;
+  view: string;
+  source: string;
+  status: string;
+};
+
+/**
+ * Every filter family keeps the rest of the state, so combining filters is
+ * predictable; `page` always resets because a new selection starts at 1.
+ * `source` only exists for external rows and is dropped for the internal channel.
+ * Switching channel drops a `view` that the target channel does not offer.
+ */
+function ordersHref(state: OrdersFilterState, overrides: Partial<OrdersFilterState>): string {
+  const next = { ...state, ...overrides };
+  const viewsForKind = (kindName: string) =>
+    (kindName === 'internal' ? INTERNAL_FILTERS : kindName === 'external' ? QUICK_FILTERS : ALL_FILTERS).map(
+      (filter) => filter.id,
+    );
+  if (!viewsForKind(next.kind).includes(next.view)) next.view = 'all';
+  const params = new URLSearchParams();
+  if (next.kind !== 'all') params.set('kind', next.kind);
+  if (next.q) params.set('q', next.q);
+  if (next.view !== 'all') params.set('view', next.view);
+  if (next.source !== 'all' && next.kind !== 'internal') params.set('source', next.source);
+  if (next.status !== 'all') params.set('status', next.status);
+  const qs = params.toString();
+  return qs ? `/admin/orders?${qs}` : '/admin/orders';
+}
+
 export default async function AdminOrdersPage({ searchParams }: PageProps) {
   const raw = await searchParams;
   const q = first(raw.q) || '';
@@ -58,12 +89,7 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
   const source = first(raw.source) || 'all';
   const requestedStatus = first(raw.status) || 'all';
   const status = STATUS_FILTERS.some((filter) => filter.id === requestedStatus) ? requestedStatus : 'all';
-  const channelParams = new URLSearchParams();
-  if (q) channelParams.set('q', q);
-  if (status !== 'all') channelParams.set('status', status);
-  const internalHref = `/admin/orders?kind=internal${channelParams.size ? `&${channelParams.toString()}` : ''}`;
-  const externalHref = `/admin/orders?kind=external${channelParams.size ? `&${channelParams.toString()}` : ''}`;
-  const allHref = `/admin/orders${channelParams.size ? `?${channelParams.toString()}` : ''}`;
+  const state: OrdersFilterState = { kind, q, view, source, status };
   const current = { kind, q: q || undefined, view, source, status, page };
   const data = await loadAdminOrdersList({ kind, q, view, source, status, page });
 // A failed live API must never look like "zero orders": the counters below would
@@ -113,10 +139,10 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
 
       <AdminApiErrorBanner errors={data.errors} />
 
-      <div className="flex gap-2" role="navigation" aria-label="Канал продажи">
-        <Link href={allHref} className={`rounded-md border px-3 py-2 text-sm ${kind === 'all' ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 bg-white text-slate-700'}`}>Все каналы</Link>
-        <Link href={internalHref} className={`rounded-md border px-3 py-2 text-sm ${kind === 'internal' ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 bg-white text-slate-700'}`}>Продажи Дайбилет</Link>
-        <Link href={externalHref} className={`rounded-md border px-3 py-2 text-sm ${kind === 'external' ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 bg-white text-slate-700'}`}>Внешние продажи</Link>
+      <div className="flex flex-wrap gap-2" role="navigation" aria-label="Канал продажи">
+        <Link href={ordersHref(state, { kind: 'all' })} className={`rounded-md border px-3 py-2 text-sm ${kind === 'all' ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 bg-white text-slate-700'}`}>Все каналы</Link>
+        <Link href={ordersHref(state, { kind: 'internal', source: 'all' })} className={`rounded-md border px-3 py-2 text-sm ${kind === 'internal' ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 bg-white text-slate-700'}`}>Продажи Дайбилет</Link>
+        <Link href={ordersHref(state, { kind: 'external' })} className={`rounded-md border px-3 py-2 text-sm ${kind === 'external' ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 bg-white text-slate-700'}`}>Внешние продажи</Link>
       </div>
 
       <p className="text-sm text-slate-600">Найдено заказов: {degraded ? '—' : formatAdminNumber(data.total)}</p>
@@ -144,15 +170,10 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
       <div className="flex flex-wrap items-center gap-2" aria-label="Фильтр по статусу заказа">
         <span className="mr-1 text-xs font-medium text-slate-500">Статус:</span>
         {STATUS_FILTERS.map((filter) => {
-          const params = new URLSearchParams();
-          params.set('kind', kind);
-          if (q) params.set('q', q);
-          if (kind !== 'internal' && source !== 'all') params.set('source', source);
-          if (filter.id !== 'all') params.set('status', filter.id);
           const active = status === filter.id;
           return <Link
             key={filter.id}
-            href={`/admin/orders?${params.toString()}`}
+            href={ordersHref(state, { status: filter.id })}
             aria-current={active ? 'page' : undefined}
             className={`rounded-md border px-3 py-1.5 text-sm ${active ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'}`}
           >{filter.label}</Link>;
@@ -164,16 +185,10 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
         {(kind === 'internal' ? INTERNAL_FILTERS : kind === 'external' ? QUICK_FILTERS : ALL_FILTERS).map((filter) => {
           const count = kind === 'internal' || q || source !== 'all' || status !== 'all' ? null : data.quickFilters.find((item) => item.id === filter.id)?.count;
           const active = view === filter.id;
-          const params = new URLSearchParams();
-          params.set('kind', kind);
-          if (filter.id !== 'all') params.set('view', filter.id);
-          if (q) params.set('q', q);
-          if (kind !== 'internal' && source !== 'all') params.set('source', source);
-          const href = `/admin/orders${params.size ? `?${params.toString()}` : ''}`;
           return (
             <Link
               key={filter.id}
-              href={href}
+              href={ordersHref(state, { view: filter.id })}
               className={`rounded-md border px-2.5 py-1 text-xs ${
                 active
                   ? 'border-slate-900 bg-slate-900 text-white'
@@ -185,6 +200,14 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
             </Link>
           );
         })}
+        {q || view !== 'all' || source !== 'all' || status !== 'all' ? (
+          <Link
+            href="/admin/orders"
+            className="rounded-md border border-dashed border-slate-300 px-2.5 py-1 text-xs text-slate-500 hover:border-slate-400 hover:text-slate-700"
+          >
+            Сбросить фильтры
+          </Link>
+        ) : null}
       </div>
 
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
@@ -213,11 +236,18 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
                   </td>
                 </tr>
               ) : (
-                data.rows.map((row) => (
+                data.rows.map((row) => {
+                  const backHref = ordersHref(state, {});
+                  const detailHref =
+                    (row.sourceKind === 'internal' && row.publicCode
+                      ? `/admin/orders/internal/${encodeURIComponent(row.publicCode)}`
+                      : `/admin/orders/${encodeURIComponent(row.id)}`) +
+                    `?back=${encodeURIComponent(backHref)}`;
+                  return (
                   <tr key={row.id} className="border-b border-slate-100 align-top">
                     <td className="px-3 py-2">
                       <Link
-                        href={row.sourceKind === 'internal' && row.publicCode ? `/admin/orders/internal/${encodeURIComponent(row.publicCode)}` : `/admin/orders/${encodeURIComponent(row.id)}`}
+                        href={detailHref}
                         className="font-medium text-sky-700 hover:underline"
                       >
                         {row.publicCode || row.externalOrderId}
@@ -235,6 +265,11 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
                       <span className="rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs">
                         {row.displayStatus}
                       </span>
+                      {row.amountRub != null ? (
+                        <div className="mt-1 text-xs tabular-nums text-slate-700">
+                          {formatAdminNumber(row.amountRub)} ₽
+                        </div>
+                      ) : null}
                       {row.needsAttention ? (
                         <div className="mt-1 text-[11px] text-amber-700">внимание</div>
                       ) : null}
@@ -244,7 +279,8 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
                       {row.unlinkedTickets ? ` · unlinked ${row.unlinkedTickets}` : ''}
                     </td>
                   </tr>
-                ))
+                  );
+                })
               )}
             </tbody>
           </table>
