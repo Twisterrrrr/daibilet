@@ -2,6 +2,7 @@
 
 [Places: типизация, сверка PDP и передача Cline](./places-taxonomy-cline-handoff-2026-10.md)
 [Выпуск Places и сверка PDP - 15.10.2026](./places-release-2026-10-15.md)
+[Доступ сотрудников к админке: аудит legacy и проект RBAC](./admin-rbac-design-2026-10.md)
 
 Навигация по репозиторию `Twisterrrrr/daibilet`.
 
