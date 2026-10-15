@@ -1,5 +1,19 @@
 # Decision Log — Daibilet
 
+## 2026-10-14 — Places taxonomy for completed city hubs
+
+PDP.xlsx is the complete editorial source for the city hubs represented in that workbook,
+not a complete inventory of every existing PDP or venue. Missing workbook rows never
+hide unrelated site pages. Reconciliation first uses a source key, then one city/name
+match corroborated by address or coordinates; uncertain pairs require review.
+
+Places use one primary `PlaceType`, an optional precise subtype and additional roles
+or hub badges. `religion` and `urban` are primary types. `transport` covers piers,
+terminals and stations; a bus vehicle is not a place subtype. A regular departure
+pier can use `pier_departures` only when particular sessions have verified
+`TripDeparture` links. New unmatched places remain hidden and noindex until their
+identity, factual copy and object-specific imagery are reviewed.
+
 ## 2026-10-08 — R12 sandbox и R13 catalog release
 
 Владелец явно разрешил sandbox-деплой R12 на `.159` в сессии 07–08.10,
@@ -262,6 +276,14 @@
 ---
 
 ## Шаблон новой записи
+
+## 2026-10-15 — Places: родительский тип, подтип и безопасная сверка PDP
+
+**Решение:** `Venue.placeType` хранит один родительский тип Places, `placeSubtype` - один предметный подтип. `hubTags` и `isMainPlace` отвечают за редакционную навигацию; `pageTemplate` и роли - за поведение страницы. `transport/pier` не выводит расписание без подтверждённой связи конкретного `EventSession` с точкой отправления. Файл PDP является полным редакционным источником только для завершённых городских хабов; отсутствие записи в нём само по себе не удаляет другие PDP.
+
+**Почему:** старый `VenueKind` смешивает тип места, роль площадки и поставщицкие ярлыки. Например, в `CONCERT_HALL` встречаются пабы и открытые площадки, а в `PIER` - объекты без подтверждённой посадки. Новые записи с ошибками координат, сомнительной идентичностью или без проверенного изображения остаются на сверку и не публикуются автоматически.
+
+**Статус:** Внедрение поэтапно; массовые импорты проходят проверку идентичности и запускаются отдельно от миграции схемы.
 
 ```markdown
 ## YYYY-MM-DD — Краткое название

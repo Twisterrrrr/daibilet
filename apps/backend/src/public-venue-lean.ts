@@ -52,6 +52,10 @@ export type LeanPublicVenueRow = {
   wayToFind: string | null;
   parkingInfo: string | null;
   kind: VenueKind;
+  placeType: string | null;
+  placeSubtype: string | null;
+  isMainPlace: boolean;
+  hubTags: string[];
   proposedKind: string;
   pageStatus: string;
   isIndexable: boolean;
@@ -81,6 +85,10 @@ const venueListSelect = {
   parkingInfo: true,
   hookFact: true,
   kind: true,
+  placeType: true,
+  placeSubtype: true,
+  isMainPlace: true,
+  hubTags: true,
   pageStatus: true,
   isIndexable: true,
   cityId: true,
@@ -310,6 +318,10 @@ function mapLeanVenueRow(
     parkingInfo: row.parkingInfo,
     hookFact: leanText ? null : row.hookFact,
     kind,
+    placeType: row.placeType,
+    placeSubtype: row.placeSubtype,
+    isMainPlace: row.isMainPlace,
+    hubTags: row.hubTags,
     proposedKind: String(kind || 'OTHER').toLowerCase(),
     pageStatus,
     isIndexable: row.isIndexable,

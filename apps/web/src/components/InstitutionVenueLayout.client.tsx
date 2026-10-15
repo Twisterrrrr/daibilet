@@ -20,6 +20,7 @@ import { VenueNearbyMiniGrid } from '@/components/VenueNearbyMiniGrid.client';
 import { VenueAdmissionBlock } from '@/components/VenueAdmissionBlock';
 import { VenueBreadcrumbsNav } from '@/components/VenueBreadcrumbsNav.client';
 import { VenueEditorialTicketsBlock } from '@/components/VenueEditorialTicketsBlock';
+import { PlaceTaxonomyBadges } from '@/components/PlaceTaxonomyBadges';
 import { VenueStickyCashier } from '@/components/VenueStickyCashier.client';
 import {
   isAddressEchoWayToFind,
@@ -349,6 +350,7 @@ export function InstitutionVenueLayout({
               </div>
 
               <h1 className="font-display text-2xl font-extrabold leading-tight text-white sm:text-4xl md:text-5xl">{title}</h1>
+              <PlaceTaxonomyBadges venue={venue} />
 
               {heroAddressLine ? (
                 <p className="mt-2 flex items-start gap-1.5 text-sm text-white/90 md:hidden">

@@ -2,6 +2,8 @@
 
 Дата: 2026-10-13. Канон продукта: [admin-operations-bible-2026-10.md](./admin-operations-bible-2026-10.md). Рабочая ветка prod-каталога: `feat/next-monorepo`; Next-админка — `apps/web/app/(admin)/admin`. Финконтур находится в отдельном checkout/host и не должен меняться в UI-итерациях.
 
+Для UI Places и очереди сверки PDP использовать отдельный [словарь и handoff Places](./places-taxonomy-cline-handoff-2026-10.md).
+
 ## Когда подключать Cline
 
 Сейчас. Начать с оболочки и рабочих текстов. Единый реестр заказов уже закоммичен в каталожной ветке (`090a44ef6`, `3848e74d6`), а групповой фильтр оплаченных внутренних заказов — в finance-ветке `codex/stage0-admission-ticket-core` (`32532dc5a`). Эти изменения ещё требуют согласованного выпуска: finance API → catalog API → Next web. До выпуска проверять UI локально/в preview и не объявлять live-фильтр завершённым.

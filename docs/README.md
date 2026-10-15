@@ -1,5 +1,7 @@
 # Документация Daibilet
 
+[Places: типизация, сверка PDP и передача Cline](./places-taxonomy-cline-handoff-2026-10.md)
+
 Навигация по репозиторию `Twisterrrrr/daibilet`.
 
 ## С чего начать
