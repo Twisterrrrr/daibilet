@@ -608,6 +608,12 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
       parkingInfo: normalizeNullableString(canonicalVenue.parkingInfo),
       hookFact: normalizeNullableString(canonicalVenue.hookFact),
       type: resolvedType,
+      placeType: canonicalVenue.placeType?.toLowerCase() || null,
+      placeSubtype: canonicalVenue.placeSubtype || null,
+      pageTemplate: canonicalVenue.pageTemplate?.toLowerCase() || 'default',
+      placeRoles: canonicalVenue.placeRoles || [],
+      isMainPlace: canonicalVenue.isMainPlace === true,
+      hubTags: canonicalVenue.hubTags || [],
       template: publicVenuePageTemplate(resolvedType),
       pageStatus: canonicalVenue.pageStatus,
       description: pickPublicVenueDescriptionText(canonicalVenue.shortDescription, canonicalVenue.description),
@@ -1266,6 +1272,12 @@ const PUBLIC_VENUE_ROW_SELECT = `
     venue."parkingInfo",
     venue."hookFact",
     venue.kind,
+    venue."placeType",
+    venue."placeSubtype",
+    venue."pageTemplate",
+    venue."placeRoles",
+    venue."isMainPlace",
+    venue."hubTags",
     venue."pageStatus",
     city.id as "cityId",
     city.title as city,
@@ -2223,6 +2235,10 @@ export function mapPublicVenueListItem(row) {
     wayToFind: normalizeNullableString(normalized.wayToFind),
     hookFact: normalizeNullableString(normalized.hookFact),
     type,
+    placeType: normalized.placeType?.toLowerCase() || null,
+    placeSubtype: normalized.placeSubtype || null,
+    isMainPlace: normalized.isMainPlace === true,
+    hubTags: normalized.hubTags || [],
     template,
     pageStatus: normalized.pageStatus,
     isIndexable: decision.indexable,
@@ -2399,7 +2415,7 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
     const typeSource = facetSource?.typeUniverse || filteredItems;
     const scaleSource = facetSource?.scaleUniverse || filteredItems;
     const cities = countBy(citySource.map((venue) => venue.city).filter(Boolean));
-    const types = countBy(typeSource.map((venue) => venue.type).filter(Boolean));
+    const types = countBy(typeSource.map((venue) => venue.placeType || venue.type).filter(Boolean));
     const scales = countBy(
       scaleSource
         .filter((venue) => venue.template === 'institution')
@@ -2490,7 +2506,10 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
           .map((part) => String(part || '').trim().toLowerCase())
           .filter(Boolean),
       );
-      working = working.filter((venue) => typeSet.has(String(venue.type || '').toLowerCase()));
+      working = working.filter((venue) =>
+        typeSet.has(String(venue.placeType || '').toLowerCase()) ||
+        typeSet.has(String(venue.type || '').toLowerCase()),
+      );
     }
     const scaleUniverse = working;
     if (scaleFilter === 'museum' || scaleFilter === 'large_hall' || scaleFilter === 'intimate') {

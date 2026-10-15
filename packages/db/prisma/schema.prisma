@@ -57,6 +57,26 @@ enum VenuePageStatus {
   HIDDEN
 }
 
+enum PlaceType {
+  ARCHITECTURE
+  MONUMENT
+  MUSEUM
+  RELIGION
+  NATURE
+  URBAN
+  THEATRE
+  ENTERTAINMENT
+  FOOD
+  VENUE
+  TRANSPORT
+  OTHER
+}
+
+enum PlacePageTemplate {
+  DEFAULT
+  PIER_DEPARTURES
+}
+
 /// Role of a venue on an excursion/event route. MVP uses STOP; START/NEARBY_HUB reserved.
 enum RouteItemRole {
   STOP
@@ -686,11 +706,34 @@ model EventSession {
   providerLinks ProviderLink[]
   checkoutItems CheckoutItem[]
   tripPlanItems TripPlanItem[]
+  tripDepartures TripDeparture[]
 
   @@index([eventId, startsAt])
   @@index([startsAt])
   @@index([eventId, isActive, startsAt])
   @@index([externalId])
+}
+
+/// A verified session-specific departure point, distinct from Event.venueId.
+model TripDeparture {
+  id               String    @id @default(cuid())
+  sessionId        String
+  departurePlaceId String
+  arrivalPlaceId   String?
+  departsAt        DateTime?
+  arrivesAt        DateTime?
+  sourceCode       SourceCode?
+  verified         Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  session        EventSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  departurePlace Venue        @relation("TripDeparturePlace", fields: [departurePlaceId], references: [id])
+  arrivalPlace   Venue?       @relation("TripArrivalPlace", fields: [arrivalPlaceId], references: [id])
+
+  @@unique([sessionId, departurePlaceId])
+  @@index([departurePlaceId, departsAt])
+  @@index([arrivalPlaceId])
 }
 
 model EventOffer {
@@ -868,6 +911,15 @@ model Venue {
   /** Free text, e.g. "Tue-Sun 11:00-18:00, closed Monday". Not structured yet. */
   openingHours     String?         @db.Text
   kind             VenueKind       @default(OTHER)
+  placeType        PlaceType?
+  placeSubtype     String?
+  pageTemplate     PlacePageTemplate @default(DEFAULT)
+  placeRoles       String[]        @default([])
+  poiSourceKey     String?         @unique
+  isMainPlace      Boolean         @default(false)
+  isTouristPlace   Boolean         @default(false)
+  hubTags          String[]        @default([])
+  parentPlaceId    String?
   pageStatus       VenuePageStatus @default(NONE)
   /// Short micro-intrigue for location cards (optional).
   hookFact         String?
@@ -875,6 +927,10 @@ model Venue {
   updatedAt        DateTime        @updatedAt
 
   city            City?            @relation(fields: [cityId], references: [id])
+  parentPlace     Venue?           @relation("PlaceHierarchy", fields: [parentPlaceId], references: [id])
+  childPlaces     Venue[]          @relation("PlaceHierarchy")
+  tripDepartures  TripDeparture[]  @relation("TripDeparturePlace")
+  tripArrivals    TripDeparture[]  @relation("TripArrivalPlace")
   events          Event[]
   aliases         VenueAlias[]
   providerLinks   ProviderLink[]
@@ -885,6 +941,8 @@ model Venue {
   routeItems      EventVenueRouteItem[]
 
   @@index([title])
+  @@index([cityId, isTouristPlace, isMainPlace])
+  @@index([parentPlaceId])
 }
 
 model VenueAlias {

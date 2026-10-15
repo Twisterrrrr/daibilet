@@ -16,6 +16,7 @@ import {
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { YandexMapEmbed } from '@/components/YandexMapEmbed';
 import { VenueNearbyMiniGrid } from '@/components/VenueNearbyMiniGrid.client';
+import { PlaceTaxonomyBadges } from '@/components/PlaceTaxonomyBadges';
 import { VenueBreadcrumbsNav } from '@/components/VenueBreadcrumbsNav.client';
 import { VenueStickyCashier } from '@/components/VenueStickyCashier.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
@@ -272,6 +273,7 @@ export function LocationVenueLayout({
               <span className="rounded-full bg-slate-950/75 px-3 py-1 text-xs font-semibold">{venue.city}</span>
             </div>
             <h1 className="font-display text-2xl font-extrabold text-white sm:text-4xl md:text-5xl">{title}</h1>
+            <PlaceTaxonomyBadges venue={venue} />
             {heroAddressLine ? (
               <p className="mt-2 flex items-start gap-1.5 text-sm text-white/90 md:hidden">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
@@ -341,6 +343,7 @@ export function LocationVenueLayout({
               )}
             </div>
             <h1 className="font-display text-2xl font-extrabold text-white sm:text-4xl md:text-5xl">{title}</h1>
+            <PlaceTaxonomyBadges venue={venue} />
             {heroAddressLine ? (
               <p className="mt-2 flex items-start gap-1.5 text-sm text-white/90 md:hidden">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
