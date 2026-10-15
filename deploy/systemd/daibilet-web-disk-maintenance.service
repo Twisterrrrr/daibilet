@@ -1,0 +1,7 @@
+[Unit]
+Description=Daibilet web cache and old build maintenance
+ConditionPathExists=/opt/daibilet/apps/web/.next/BUILD_ID
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/env bash /opt/daibilet/deploy/scripts/maintain-web-disk.sh --apply

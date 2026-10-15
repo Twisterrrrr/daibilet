@@ -4,9 +4,15 @@ After=network.target
 
 [Service]
 Type=simple
+User=deploy
+Group=deploy
 WorkingDirectory=/opt/daibilet-staging
 EnvironmentFile=/opt/daibilet-staging/.env
-ExecStart=/usr/bin/env node apps/backend/src/server.js
+Environment=PORT=4001
+Environment=NODE_OPTIONS=--max-old-space-size=768
+MemoryHigh=900M
+MemoryMax=1200M
+ExecStart=/usr/bin/env npm --prefix apps/backend run start:ts
 Restart=always
 RestartSec=5
 

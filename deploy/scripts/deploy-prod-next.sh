@@ -218,7 +218,8 @@ reap_orphan_next_build_workers "pre-build"
 # Save healthy build for rollback
 if [[ -f "${WEB_NEXT_DIR}/prerender-manifest.json" && -f "${WEB_NEXT_DIR}/BUILD_ID" ]]; then
   rm_rf_deploy "${WEB_NEXT_PREV}"
-  cp -a "${WEB_NEXT_DIR}" "${WEB_NEXT_PREV}"
+  mkdir -p "${WEB_NEXT_PREV}"
+  rsync -a --exclude='/cache/' --exclude='/server/route-cache/' "${WEB_NEXT_DIR}/" "${WEB_NEXT_PREV}/"
   echo "Saved healthy .next → .next.prev (BUILD_ID=$(cat "${WEB_NEXT_DIR}/BUILD_ID"))"
 fi
 
