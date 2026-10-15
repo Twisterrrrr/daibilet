@@ -40,8 +40,8 @@ function toneClass(tone: Tone) {
 }
 
 export function AdminDashboardView({ data }: { data: AdminDashboardPageData }) {
-  const { metrics, sources, orders, errors, generatedAt, apiBase } = data;
-  const degraded = errors.length > 0;
+  const { metrics, sources, orderSummary, errors, generatedAt, apiBase } = data;
+  const catalogUnavailable = errors.some((error) => error.startsWith('dashboard') || error.startsWith('sources'));
   const launch = metrics.launch;
   const events = launch.groupedEvents || metrics.events;
   const liveSources = sources.filter((source) => source.status === 'live').length;
@@ -94,11 +94,11 @@ export function AdminDashboardView({ data }: { data: AdminDashboardPageData }) {
           className="rounded-lg border-2 border-red-400 bg-red-50 px-4 py-3 text-sm text-red-900"
         >
           <p className="text-base font-semibold">
-            Часть данных недоступна — показатели ниже недостоверны
+            Часть данных недоступна
           </p>
           <p className="mt-0.5">
-            Нули означают «нет данных», а не «нет проблем». Проверьте доступность API и
-            секреты в env.
+            Часть показателей ниже может быть недостоверной. Сводка заказов при ошибке показана
+            прочерками. Проверьте доступность API и секреты в env.
           </p>
           <ul className="mt-1 list-disc pl-5 text-xs">
             {errors.map((error) => (
@@ -114,10 +114,10 @@ export function AdminDashboardView({ data }: { data: AdminDashboardPageData }) {
       ) : null}
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <TopMetric label="Можно продавать" value={launch.readyForSales} tone="success" href={'/admin/events'} unavailable={degraded} />
-        <TopMetric label="Карточек событий" value={events} tone="default" href={'/admin/events'} unavailable={degraded} />
-        <TopMetric label="Активных источников" value={liveSources} tone="success" href={'/admin/sources'} unavailable={degraded} />
-        <TopMetric label="Площадок" value={venues} tone="info" href={'/admin/venues'} unavailable={degraded} />
+        <TopMetric label="Можно продавать" value={launch.readyForSales} tone="success" href={'/admin/events'} unavailable={catalogUnavailable} />
+        <TopMetric label="Карточек событий" value={events} tone="default" href={'/admin/events'} unavailable={catalogUnavailable} />
+        <TopMetric label="Активных источников" value={liveSources} tone="success" href={'/admin/sources'} unavailable={catalogUnavailable} />
+        <TopMetric label="Площадок" value={venues} tone="info" href={'/admin/venues'} unavailable={catalogUnavailable} />
       </div>
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
@@ -190,21 +190,20 @@ export function AdminDashboardView({ data }: { data: AdminDashboardPageData }) {
 
         <Block title="Заказы" href={'/admin/orders'} hrefLabel="К заказам" icon={Receipt}>
           <div className="grid grid-cols-2 gap-2">
-            <Metric icon={Receipt} label="Импортировано" value={orders.imported} href={'/admin/orders'} />
-            <Metric icon={CheckCircle2} label="Подтверждено" value={orders.confirmed} tone="success" href={'/admin/orders'} />
-            <Metric icon={Clock} label="В обработке" value={orders.processing} tone="info" href={'/admin/orders?view=attention'} />
+            <Metric icon={Receipt} label="Активные заказы" value={orderSummary?.total ?? '—'} href={'/admin/orders'} />
+            <Metric icon={CheckCircle2} label="Оплачены" value={orderSummary?.paid ?? '—'} tone="success" href={'/admin/orders?status=paid'} />
+            <Metric icon={Clock} label="В обработке" value={orderSummary?.processing ?? '—'} tone="info" href={'/admin/orders?status=pending'} />
             <Metric
               icon={AlertTriangle}
               label="Проблемы"
-              value={orders.failedIntegration}
+              value={orderSummary?.problems ?? '—'}
               tone="warning"
               href={'/admin/orders?view=failed_integration'}
             />
+            <Metric icon={Receipt} label="Продажи Дайбилет" value={orderSummary?.internal ?? '—'} href={'/admin/orders?kind=internal'} />
+            <Metric icon={Receipt} label="Возвраты и запросы" value={orderSummary?.refundCases ?? '—'} tone="warning" href={'/admin/orders?view=pending_refunds'} />
           </div>
-          <div className="mt-3 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500">
-            Показатели блока - по импортированным внешним заказам. Внутренние продажи Daibilet и
-            все остальные каналы смотрите в реестре заказов.
-          </div>
+          {!orderSummary ? <p className="mt-3 text-xs text-rose-700">Сводка заказов недоступна: проверьте подключение каталога и финконтура.</p> : null}
         </Block>
       </div>
 

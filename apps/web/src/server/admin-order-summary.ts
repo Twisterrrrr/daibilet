@@ -7,7 +7,7 @@ export type AdminUnifiedOrderSummary = {
   paid: number;
   processing: number;
   problems: number;
-  pendingRefunds: number;
+  refundCases: number;
 };
 
 function quickCount(data: AdminOrdersListData, id: string): number {
@@ -19,14 +19,15 @@ export function summarizeAdminOrders(
   internal: AdminOrdersListData,
   external: AdminOrdersListData,
 ): AdminUnifiedOrderSummary | null {
-  if (internal.errors.length || external.errors.length) return null;
+  const scoped = internal.scopedMetrics;
+  if (internal.errors.length || external.errors.length || !scoped || scoped.provider !== 'MANUAL') return null;
   return {
-    total: internal.total + external.total,
-    internal: internal.total,
+    total: scoped.total + external.total,
+    internal: scoped.total,
     external: external.total,
-    paid: internal.metrics.confirmed + external.metrics.confirmed,
-    processing: internal.metrics.processing + external.metrics.processing,
-    problems: quickCount(internal, 'failed_integration') + quickCount(external, 'failed_integration'),
-    pendingRefunds: quickCount(internal, 'pending_refunds') + quickCount(external, 'pending_refunds'),
+    paid: scoped.confirmed + external.metrics.confirmed,
+    processing: scoped.processing + external.metrics.processing,
+    problems: scoped.problems + quickCount(external, 'failed_integration'),
+    refundCases: scoped.refundCases + quickCount(external, 'pending_refunds'),
   };
 }

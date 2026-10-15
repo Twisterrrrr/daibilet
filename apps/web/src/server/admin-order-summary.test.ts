@@ -12,16 +12,22 @@ function source(total: number, confirmed: number, processing: number, problems: 
       { id: 'pending_refunds', count: refunds },
     ],
     metrics: { imported: total, confirmed, processing, needsAttention: problems },
+    scopedMetrics: { provider: 'MANUAL', total, confirmed, processing, problems, refundCases: refunds },
   };
 }
 
 test('dashboard summary combines internal and external counts without duplicating a channel', () => {
   assert.deepEqual(summarizeAdminOrders(source(4, 2, 1, 1, 1), source(6, 5, 1, 2, 0)), {
-    total: 10, internal: 4, external: 6, paid: 7, processing: 2, problems: 3, pendingRefunds: 1,
+    total: 10, internal: 4, external: 6, paid: 7, processing: 2, problems: 3, refundCases: 1,
   });
 });
 
 test('dashboard summary is unavailable when either API fails', () => {
   const failed = { ...source(0, 0, 0, 0, 0), errors: ['finance unavailable'] };
   assert.equal(summarizeAdminOrders(failed, source(6, 5, 1, 0, 0)), null);
+});
+
+test('dashboard summary is unavailable before the finance API sends scoped metrics', () => {
+  const legacy = { ...source(4, 2, 1, 1, 1), scopedMetrics: undefined };
+  assert.equal(summarizeAdminOrders(legacy, source(6, 5, 1, 2, 0)), null);
 });
