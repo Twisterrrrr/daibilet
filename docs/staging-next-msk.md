@@ -11,6 +11,8 @@ git -C /opt/daibilet worktree add --detach /opt/daibilet-staging origin/feat/nex
 sudo bash /opt/daibilet-staging/deploy/scripts/prepare-staging-env.sh
 cd /opt/daibilet-staging
 CI=true pnpm install --frozen-lockfile
+set -a; . ./.env; set +a
+case "$DATABASE_URL" in *"@127.0.0.1:5438/daibilet_staging") ;; *) echo 'Wrong staging DB' >&2; exit 2;; esac
 pnpm db:generate
 pnpm db:deploy
 sudo cp deploy/systemd/daibilet-{api,web}-staging.service /etc/systemd/system/
