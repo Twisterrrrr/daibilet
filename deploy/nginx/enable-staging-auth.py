@@ -22,10 +22,13 @@ if 'auth_basic ' in block:
 if not Path('/etc/nginx/.htpasswd-daibilet-admin').is_file():
     sys.exit('Admin htpasswd file missing')
 replacement = marker + '\n    auth_basic "Daibilet staging";\n    auth_basic_user_file /etc/nginx/.htpasswd-daibilet-admin;'
-backup = path.with_suffix(path.suffix + '.pre-staging-auth')
+# sites-enabled/* is included by nginx, so keep the backup outside that folder.
+backup = Path('/etc/nginx/daibilet.conf.pre-staging-auth')
 if backup.exists():
-    sys.exit(f'Backup already exists: {backup}')
-backup.write_text(source)
+    if backup.read_text() != source:
+        sys.exit(f'Backup differs from current config: {backup}')
+else:
+    backup.write_text(source)
 path.write_text(source.replace(marker, replacement, 1))
 check = subprocess.run(['nginx', '-t'], capture_output=True, text=True)
 if check.returncode:
