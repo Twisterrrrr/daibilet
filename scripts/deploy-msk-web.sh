@@ -179,6 +179,10 @@ fi
 
 finish_web_handoff
 
+# Keep rollback build files, but never retain its regenerable runtime cache.
+rm_rf_deploy "${WEB_NEXT_PREV}/cache"
+rm_rf_deploy "${WEB_NEXT_PREV}/server/route-cache"
+
 curl -fsS -o /dev/null -w "smoke / =%{http_code}\n" -H "Cache-Control: no-cache" "http://127.0.0.1:${WEB_PORT}/" || true
 
 # Drop HTML soft-404 / ISR poison from nginx proxy_cache (only caches 200).
