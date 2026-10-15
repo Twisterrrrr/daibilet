@@ -35,7 +35,7 @@ export default async function AdminChangeRequestsPage({ searchParams }: PageProp
     <div className="space-y-4">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-xl font-semibold text-slate-900">Заявки на изменения (ECR)</h2>
+          <h2 className="text-xl font-semibold text-slate-900">Заявки поставщиков</h2>
           <p className="mt-1 text-sm text-slate-600">
             Очередь правок: approve / reject / apply. Всего {formatAdminNumber(data.total)}.
           </p>

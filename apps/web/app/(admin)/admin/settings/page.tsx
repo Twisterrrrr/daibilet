@@ -49,15 +49,15 @@ export default function AdminSettingsPage() {
         <div className="flex items-start justify-between gap-3">
           <div>
             <h3 className="text-sm font-semibold text-slate-900">Импорты</h3>
-            <p className="mt-1 text-xs text-slate-500">Схема источников и ручной sync - на экране Источники.</p>
+            <p className="mt-1 text-xs text-slate-500">Схема источников и ручной sync - на экране Импорт.</p>
           </div>
           <Link href="/admin/sources" className="text-xs text-sky-700 hover:underline">
-            К источникам
+            К импорту
           </Link>
         </div>
         <div className="mt-3 grid gap-2 sm:grid-cols-2">
           <Row label="Ticketscloud" value="токен + API; полный sync вручную" />
-          <Row label="Teplohod.info" value="API с белого IP; sync из Источников" />
+          <Row label="Teplohod.info" value="API с белого IP; sync из раздела Импорт" />
           <Row label="Окно ре-импорта" value="последние 90 дней / активные события" />
           <Row label="Переопределения" value="сохраняются поверх импортных фактов" />
         </div>

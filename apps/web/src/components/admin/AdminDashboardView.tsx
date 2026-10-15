@@ -59,8 +59,9 @@ export function AdminDashboardView({ data }: { data: AdminDashboardPageData }) {
           <div>
             <h2 className="text-xl font-semibold text-slate-900">Готовность к продажам</h2>
             <p className="mt-1 max-w-2xl text-sm leading-relaxed text-slate-600">
-              Показатели обновляются из API в реальном времени. Оплата проходит на стороне
-              Ticketscloud и Teplohod.info.
+              Показатели обновляются из API в реальном времени. Продажи идут по разным каналам -
+              внутренние заказы Daibilet и внешние покупки Ticketscloud и Teplohod.info; все они
+              видны в едином реестре заказов.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -69,7 +70,7 @@ export function AdminDashboardView({ data }: { data: AdminDashboardPageData }) {
               className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
             >
               <RefreshCw className="h-3.5 w-3.5" aria-hidden />
-              Источники
+              Импорт
             </a>
             <a
               href="/admin/events?view=ready_publish"
@@ -169,7 +170,7 @@ export function AdminDashboardView({ data }: { data: AdminDashboardPageData }) {
           </div>
         </Block>
 
-        <Block title="Состояние импортов" href={'/admin/sources'} hrefLabel="К источникам" icon={RefreshCw}>
+        <Block title="Состояние импортов" href={'/admin/sources'} hrefLabel="К импорту" icon={RefreshCw}>
           <div className="space-y-2">
             {sources.length === 0 ? (
               <p className="rounded-md border border-dashed border-slate-300 bg-slate-50 px-3 py-4 text-sm text-slate-500">
@@ -201,7 +202,8 @@ export function AdminDashboardView({ data }: { data: AdminDashboardPageData }) {
             />
           </div>
           <div className="mt-3 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500">
-            Заказы приходят из источников: без внутренней корзины и оплаты на сайте.
+            Показатели блока - по импортированным внешним заказам. Внутренние продажи Daibilet и
+            все остальные каналы смотрите в реестре заказов.
           </div>
         </Block>
       </div>

@@ -27,7 +27,7 @@ export default async function AdminChangeRequestDetailPage({ params, searchParam
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
         <Link href="/admin/change-requests" className="hover:underline">
-          ECR
+          Заявки поставщиков
         </Link>
         <span>/</span>
         <span className="text-slate-700">{detail.id}</span>

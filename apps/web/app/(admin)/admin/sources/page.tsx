@@ -32,7 +32,7 @@ export default async function AdminSourcesPage({ searchParams }: PageProps) {
     <div className="space-y-4">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-xl font-semibold text-slate-900">Источники и sync-health</h2>
+          <h2 className="text-xl font-semibold text-slate-900">Импорт</h2>
           <p className="mt-1 max-w-2xl text-sm text-slate-600">
             Live `/api/admin/sources`. Ручной sync TC/Teplohod через POST endpoints.
           </p>

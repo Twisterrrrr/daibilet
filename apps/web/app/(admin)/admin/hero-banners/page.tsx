@@ -42,7 +42,7 @@ export default async function AdminHeroBannersPage({ searchParams }: PageProps) 
   return (
     <div className="space-y-4">
       <header>
-        <h2 className="text-xl font-semibold text-slate-900">Hero-баннеры главной</h2>
+        <h2 className="text-xl font-semibold text-slate-900">Баннеры главной страницы</h2>
         <p className="mt-1 text-sm text-slate-600">
           Ротатор на `/`. Toggle isActive - без CRUD картинок в этом инкременте (seed + файлы в `/images/hero`).
         </p>
