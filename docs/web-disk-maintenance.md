@@ -19,3 +19,5 @@ df -h /
 ```
 
 Observe with `journalctl -u daibilet-web-disk-maintenance.service`. Override `CACHE_LIMIT_MIB`, `BACKUP_DAYS`, or `KEEP_BACKUPS` in the service environment if capacity changes. Before changing thresholds, inspect `du -sh apps/web/.next/{cache,server/route-cache}`. Do not delete the active build or current rollback in an ad hoc cleanup.
+
+Staging has a separate timer and a 2048 MiB cache threshold. Install `daibilet-web-staging-disk-maintenance.{service,timer}` the same way after staging web is active; its configuration points to `/opt/daibilet-staging` and port 3000.

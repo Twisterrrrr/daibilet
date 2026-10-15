@@ -31,4 +31,7 @@ PATH="$fixture/bin:$PATH" APP_DIR="$fixture" WEB_SERVICE=fixture CACHE_LIMIT_MIB
 [[ -e "$web/.next/BUILD_ID" && -e "$web/.next.prev/BUILD_ID" ]]
 [[ "$(find "$web" -maxdepth 1 -type d -name '.next.bak*' | wc -l)" -eq 2 ]]
 [[ "$(cat "$TEST_LOG")" == $'stop\nstart' ]]
+rm -rf -- "$web/.next.prev"
+APP_DIR="$fixture" WEB_SERVICE=fixture CACHE_LIMIT_MIB=512 REQUIRE_ROLLBACK=0 \
+  bash "$SCRIPT_DIR/maintain-web-disk.sh" >/dev/null
 echo 'web disk maintenance fixture passed'

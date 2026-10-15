@@ -9,6 +9,7 @@ WEB_PORT="${DAIBILET_WEB_PORT:-3001}"
 CACHE_LIMIT_MIB="${CACHE_LIMIT_MIB:-4096}"
 BACKUP_DAYS="${BACKUP_DAYS:-30}"
 KEEP_BACKUPS="${KEEP_BACKUPS:-2}"
+REQUIRE_ROLLBACK="${REQUIRE_ROLLBACK:-1}"
 APPLY=false
 [[ "${1:-}" == "--apply" ]] && APPLY=true
 [[ $# -le 1 && ( $# -eq 0 || "${1:-}" == "--apply" ) ]] || { echo 'usage: maintain-web-disk.sh [--apply]' >&2; exit 2; }
@@ -20,7 +21,9 @@ WEB_DIR="$(realpath -e "$APP_DIR/apps/web")"
 NEXT="$WEB_DIR/.next"
 PREV="$WEB_DIR/.next.prev"
 [[ -f "$NEXT/BUILD_ID" && -f "$NEXT/prerender-manifest.json" ]] || { echo 'active build incomplete' >&2; exit 1; }
-[[ -f "$PREV/BUILD_ID" && -f "$PREV/prerender-manifest.json" ]] || { echo 'rollback build incomplete' >&2; exit 1; }
+if [[ "$REQUIRE_ROLLBACK" == 1 ]]; then
+  [[ -f "$PREV/BUILD_ID" && -f "$PREV/prerender-manifest.json" ]] || { echo 'rollback build incomplete' >&2; exit 1; }
+fi
 
 # Never compete with an artifact swap or fallback build.
 LOCK="$APP_DIR/var/lock/daibilet-web-deploy.lock"
