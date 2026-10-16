@@ -2372,6 +2372,8 @@ model ChatMessage {
   /// matched back to the thread by `Reply to` this id - without it the webhook
   /// cannot resolve which session an admin reply belongs to.
   telegramMessageId Int?
+  /// Telegram update_id for idempotent processing of incoming admin replies.
+  telegramUpdateId  String?          @unique
   createdAt DateTime          @default(now())
 
   @@index([sessionId, createdAt])

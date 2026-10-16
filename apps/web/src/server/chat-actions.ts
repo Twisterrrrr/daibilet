@@ -1,8 +1,10 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { headers } from 'next/headers';
 
-import { sanitizeChatText } from '@/lib/chat';
+import { isChatVisitorKey, sanitizeChatText } from '@/lib/chat';
+import { isAdminAuthConfigured, isAuthorizedAdminBasicAuth, readAdminBasicAuthConfig } from '@/lib/admin-basic-auth';
 import { prisma } from '@/lib/db';
 import { sendChatTelegramNotification } from '@/server/chat-telegram';
 
@@ -26,33 +28,61 @@ export async function sendUserChatMessage(input: {
 }): Promise<ChatSendResult> {
   const visitorKey = String(input.visitorKey || '').trim();
   const text = sanitizeChatText(input.text);
-  if (!visitorKey) return { ok: false, error: 'нет идентификатора чата' };
+  if (!isChatVisitorKey(visitorKey)) return { ok: false, error: 'нет идентификатора чата' };
   if (!text) return { ok: false, error: 'сообщение пустое' };
 
-  const session = await prisma.chatSession.upsert({
-    where: { visitorKey },
-    create: { visitorKey },
-    update: {},
-  });
-
-  const message = await prisma.chatMessage.create({
-    data: { sessionId: session.id, text, sender: 'USER' },
-  });
+  // Serializable count + insert prevents concurrent requests from bypassing
+  // the limits. Retry serialization conflicts; no Telegram call happens until
+  // the transaction has committed.
+  let saved: { sessionId: string; messageId: string } | null = null;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      saved = await prisma.$transaction(async (tx) => {
+        const since = new Date(Date.now() - 60_000);
+        const [visitorCount, globalCount] = await Promise.all([
+          tx.chatMessage.count({
+            where: { sender: 'USER', createdAt: { gte: since }, session: { visitorKey } },
+          }),
+          tx.chatMessage.count({ where: { sender: 'USER', createdAt: { gte: since } } }),
+        ]);
+        if (visitorCount >= 5 || globalCount >= 60) return null;
+        const session = await tx.chatSession.upsert({
+          where: { visitorKey },
+          create: { visitorKey },
+          update: { updatedAt: new Date() },
+        });
+        const message = await tx.chatMessage.create({
+          data: { sessionId: session.id, text, sender: 'USER' },
+        });
+        return { sessionId: session.id, messageId: message.id };
+      }, { isolationLevel: 'Serializable' });
+      break;
+    } catch (error) {
+      if ((error as { code?: string }).code === 'P2034' && attempt < 2) continue;
+      throw error;
+    }
+  }
+  if (!saved) return { ok: false, error: 'Слишком много сообщений. Повторите через минуту.' };
 
   // Telegram is best-effort: a missing bot config must not block the chat.
   const sent = await sendChatTelegramNotification({
     text,
-    sessionUrl: `${ADMIN_BASE.replace(/\/$/, '')}/admin/chats/${session.id}`,
+    sessionUrl: `${ADMIN_BASE.replace(/\/$/, '')}/admin/chats/${saved.sessionId}`,
   });
   if (sent.ok && sent.messageId != null) {
-    await prisma.chatMessage.update({
-      where: { id: message.id },
-      data: { telegramMessageId: sent.messageId },
-    });
+    try {
+      await prisma.chatMessage.update({
+        where: { id: saved.messageId },
+        data: { telegramMessageId: sent.messageId },
+      });
+    } catch {
+      // The message is already stored and visible in the admin inbox. A failed
+      // Telegram mapping must not invite the visitor to send it again.
+      console.error('[chat] failed to store Telegram reply mapping');
+    }
   }
 
-  await prisma.chatSession.update({ where: { id: session.id }, data: { updatedAt: new Date() } });
-  return { ok: true, sessionId: session.id };
+  return { ok: true, sessionId: saved.sessionId };
 }
 
 /**
@@ -64,6 +94,12 @@ export async function sendAdminChatMessage(input: {
   sessionId: string;
   text: string;
 }): Promise<ChatSendResult> {
+  const authConfig = readAdminBasicAuthConfig();
+  const requestHeaders = await headers();
+  if (!isAdminAuthConfigured(authConfig) ||
+      !(await isAuthorizedAdminBasicAuth(requestHeaders.get('authorization'), authConfig))) {
+    return { ok: false, error: 'Нет доступа к чату поддержки.' };
+  }
   const sessionId = String(input.sessionId || '').trim();
   const text = sanitizeChatText(input.text);
   if (!sessionId) return { ok: false, error: 'нет идентификатора сессии' };

@@ -2,12 +2,13 @@ import { NextResponse } from 'next/server';
 
 import { sanitizeChatText } from '@/lib/chat';
 import { prisma } from '@/lib/db';
-import { sendChatTelegramHint } from '@/server/chat-telegram';
 
 export const dynamic = 'force-dynamic';
 
 type TelegramUpdate = {
+  update_id?: number;
   message?: {
+    message_id?: number;
     chat?: { id?: number };
     text?: string;
     reply_to_message?: { message_id?: number; text?: string };
@@ -38,6 +39,13 @@ export async function POST(request: Request) {
   }
 
   const message = update.message;
+  const expectedChatId = String(process.env.TELEGRAM_CHAT_ID || '').trim();
+  if (!expectedChatId || String(message?.chat?.id ?? '') !== expectedChatId) {
+    return NextResponse.json({ ok: true, skipped: 'wrong_chat' });
+  }
+  if (!Number.isSafeInteger(update.update_id)) {
+    return NextResponse.json({ ok: false, error: 'missing_update_id' }, { status: 400 });
+  }
   const replyToId = message?.reply_to_message?.message_id;
   const text = sanitizeChatText(message?.text);
 
@@ -47,12 +55,6 @@ export async function POST(request: Request) {
   }
 
   if (replyToId == null) {
-    if (message.chat?.id != null) {
-      await sendChatTelegramHint(
-        message.chat.id,
-        'Чтобы ответить пользователю, используйте Reply на уведомление из чата.',
-      );
-    }
     return NextResponse.json({ ok: true, skipped: 'not_a_reply' });
   }
 
@@ -64,9 +66,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, skipped: 'unknown_parent' });
   }
 
-  await prisma.chatMessage.create({
-    data: { sessionId: parent.sessionId, text, sender: 'ADMIN' },
-  });
+  const updateId = String(update.update_id);
+  try {
+    await prisma.chatMessage.create({
+      data: { sessionId: parent.sessionId, text, sender: 'ADMIN', telegramUpdateId: updateId },
+    });
+  } catch (error) {
+    if ((error as { code?: string }).code === 'P2002') {
+      return NextResponse.json({ ok: true, skipped: 'duplicate_update' });
+    }
+    throw error;
+  }
   await prisma.chatSession.update({
     where: { id: parent.sessionId },
     data: { updatedAt: new Date() },

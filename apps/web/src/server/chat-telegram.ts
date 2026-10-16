@@ -28,6 +28,7 @@ export async function sendChatTelegramNotification(options: {
   try {
     const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: 'POST',
+      signal: AbortSignal.timeout(5_000),
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         chat_id: chatId,
@@ -48,15 +49,4 @@ export async function sendChatTelegramNotification(options: {
     console.warn(`[chat-telegram] sendMessage error: ${error instanceof Error ? error.message : error}`);
     return { ok: false, reason: 'network_error' };
   }
-}
-
-export async function sendChatTelegramHint(chatId: number | string, text: string): Promise<void> {
-  const token = String(process.env.TELEGRAM_BOT_TOKEN || '').trim();
-  const target = String(chatId || '').trim();
-  if (!token || !target) return;
-  await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_id: target, text, disable_web_page_preview: true }),
-  }).catch(() => undefined);
 }

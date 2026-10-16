@@ -45,10 +45,12 @@ export function ChatWidget() {
   const refresh = useCallback(async () => {
     if (!visitorKeyRef.current) return;
     try {
-      const response = await fetch(
-        `/api/chat?visitorKey=${encodeURIComponent(visitorKeyRef.current)}`,
-        { cache: 'no-store' },
-      );
+      const response = await fetch('/support/chat/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ visitorKey: visitorKeyRef.current }),
+        cache: 'no-store',
+      });
       if (!response.ok) return;
       const payload = (await response.json()) as { messages?: ChatMessageDto[] };
       setMessages(Array.isArray(payload.messages) ? payload.messages : []);

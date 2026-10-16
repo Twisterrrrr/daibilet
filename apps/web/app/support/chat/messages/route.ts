@@ -5,13 +5,10 @@ import { prisma } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
-/**
- * Widget poll endpoint: returns the visitor's own thread by visitorKey.
- * The key is the only handle - treat it as a capability token, never enumerate.
- */
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const visitorKey = searchParams.get('visitorKey') || '';
+/** The visitor key is a capability token; keep it out of URLs and access logs. */
+export async function POST(request: Request) {
+  const body = await request.json().catch(() => ({})) as { visitorKey?: unknown };
+  const visitorKey = body.visitorKey;
   if (!isChatVisitorKey(visitorKey)) {
     return NextResponse.json({ messages: [] }, { headers: { 'Cache-Control': 'no-store' } });
   }
@@ -20,7 +17,7 @@ export async function GET(request: Request) {
     where: { visitorKey },
     include: {
       messages: {
-        orderBy: { createdAt: 'asc' },
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
         take: 200,
         select: { id: true, text: true, sender: true, createdAt: true },
       },
@@ -28,7 +25,7 @@ export async function GET(request: Request) {
   });
 
   return NextResponse.json(
-    { messages: session?.messages ?? [] },
+    { messages: session?.messages.slice().reverse() ?? [] },
     { headers: { 'Cache-Control': 'no-store' } },
   );
 }

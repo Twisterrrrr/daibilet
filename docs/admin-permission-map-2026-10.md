@@ -51,6 +51,7 @@
 | `/admin/reviews` | Список отзывов | публичные | `content.read` | `GET /api/admin/reviews` | страница 403 |
 | `/admin/reviews` | Модерация (approve/reject) | публичные | `content.publish` | `POST /api/admin/reviews/:id/:action` | действие 403 |
 | `/admin/change-requests`, `/[id]` | Очередь и карточка заявок | публичные (заявка поставщика) | `suppliers.read` | `GET /api/admin/event-change-requests[/:id]` | страница 403 |
+| `/admin/chats`, `/admin/chats/[id]` | Диалоги с посетителями | контакт (текст обращения может содержать ПДн) | `support.read` | прямой Prisma-запрос в Next | страница 403 |
 | `/admin/sources`, `/admin/sync-health` (alias) | Импорт, health, manual sync | технические | `integrations.read` | `GET /api/admin/sources` | страница 403 |
 | `/admin/settings` | Доступ и API, импорты, флаги | технические | `integrations.read` | env-факты + `GET /api/admin/sources` | страница 403 |
 | `/admin/settings` | Будущий раздел сотрудников | технические | `staff.manage` | - (API ещё нет) | блок 403 |
@@ -86,6 +87,7 @@
 | `deleteAdminOrderAction` (жёсткое удаление) | admin-order-actions | финансы | штатного права нет: действие и endpoint вывести из рабочего интерфейса; исторические данные сохранять | `DELETE /api/admin/orders/:id` | закрыть, затем удалить маршрут |
 | `moderateAdminReviewAction` (approve/reject) | admin-review-actions | публичные | `content.publish` | `POST /api/admin/reviews/:id/:action` | action 403 |
 | `triggerSourceSyncAction` (TC / Teplohod) | admin-source-actions | технические | `integrations.retry` | `POST /api/admin/sources/ticketscloud/sync`, `POST /api/v1/tep/sync` | action 403 |
+| `sendAdminChatMessage` | chat-actions | контакт | `support.write` | прямой Prisma-запрос в Next | action 403; до персональных сессий отдельная повторная проверка Basic Auth |
 | `saveAdminVenueAction` | admin-venue-actions | публичные | `catalog.edit` | `PATCH /api/admin/venues/:id` | action 403 |
 
 ## 3. Экспорты
@@ -133,3 +135,4 @@
 - Инвентаризация сделана по коду Next-слоя (`apps/web`). Реальная проверка прав должна повторяться на catalog API и finance API (срезы 2-4 плана): server action сам по себе не boundary, если backend принимает общий Basic Auth.
 - Идентичность сотрудника для finance host сейчас не передаётся (сервисный токен) - см. finance bridge (срез 4).
 - `hero-banners` читает и пишет Prisma напрямую в обход API - при внедрении guards либо перенести на catalog API, либо накладывать guard в server action.
+- Чат поддержки также читает и пишет Prisma прямо из Next. Публичные `POST /support/chat/messages` и отправка посетителя через server action не получают admin-права: посетитель предъявляет случайный ключ диалога, ввод ограничен по длине и частоте. Admin страницы требуют `support.read`, ответ — `support.write`; Basic Auth остаётся временным до персональных сессий.
