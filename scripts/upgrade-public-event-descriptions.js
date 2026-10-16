@@ -449,6 +449,118 @@ function writeFileSafe(file, content) {
   fs.writeFileSync(file, content, 'utf8');
 }
 
+/** 5-gram word shingle set for near-duplicate analysis. */
+function shingleSet(text) {
+  const words = String(text || '')
+    .toLowerCase()
+    .replace(/[^a-zа-яё0-9\s]+/giu, ' ')
+    .split(/\s+/u)
+    .filter(Boolean);
+  const set = new Set();
+  for (let i = 0; i + 5 <= words.length; i += 1) set.add(words.slice(i, i + 5).join(' '));
+  return set;
+}
+
+/**
+ * Owner 2026-10-12 (item 4): cards whose final copy shares >80% of 5-grams with
+ * another card (near-dup tours/series) get a unique context paragraph built from
+ * the narrative pools. Rich cards get the paragraph as a separate block after the
+ * lead; thin cards keep the glued-lead format and only re-variant on collision.
+ * Assignment is deterministic (members sorted by id, walk from stableVariant).
+ */
+function enrichNearDupGroups(processed, { buildNarrativeParagraphs, stripNarrativeParagraphs, marks }) {
+  const cleaned = processed.map(({ text }) =>
+    String(text || '')
+      .replace(/\r\n/gu, '\n')
+      .split(/\n{2,}/u)
+      .filter((p) => !/^Билеты продаются онлайн/iu.test(p.trim()))
+      .join('\n'),
+  );
+  const shingles = cleaned.map(shingleSet);
+  const index = new Map();
+  for (let i = 0; i < shingles.length; i += 1) {
+    for (const s of shingles[i]) {
+      let arr = index.get(s);
+      if (!arr) index.set(s, (arr = []));
+      arr.push(i);
+    }
+  }
+  const pairInter = new Map();
+  for (const arr of index.values()) {
+    if (arr.length > 300) continue;
+    for (let a = 0; a < arr.length; a += 1) {
+      for (let b = a + 1; b < arr.length; b += 1) {
+        const key = arr[a] * 100000 + arr[b];
+        pairInter.set(key, (pairInter.get(key) || 0) + 1);
+      }
+    }
+  }
+  const parent = processed.map((_, i) => i);
+  const find = (x) => (parent[x] === x ? x : (parent[x] = find(parent[x])));
+  let nearPairs = 0;
+  for (const [key, inter] of pairInter) {
+    const i = Math.floor(key / 100000);
+    const j = key % 100000;
+    const denom = Math.min(shingles[i].size, shingles[j].size);
+    if (!denom || inter / denom <= 0.8) continue;
+    nearPairs += 1;
+    const ri = find(i);
+    const rj = find(j);
+    if (ri !== rj) parent[ri] = rj;
+  }
+  if (!nearPairs) return;
+  const compMap = new Map();
+  for (let i = 0; i < processed.length; i += 1) {
+    const root = find(i);
+    if (!compMap.has(root)) compMap.set(root, []);
+    compMap.get(root).push(i);
+  }
+  for (const members of compMap.values()) {
+    if (members.length < 2) continue;
+    const ordered = [...members].sort((a, b) =>
+      String(processed[a].d.id).localeCompare(String(processed[b].d.id)),
+    );
+    const used = new Set();
+    for (const idx of ordered) {
+      const item = processed[idx];
+      const stripped = stripNarrativeParagraphs(item.text);
+      const words = stripped.replace(/\s+/gu, ' ').trim().split(' ').filter(Boolean).length;
+      const thin = proseLength(item.text) < 200;
+      const budget = thin ? 60 : Math.min(180, Math.max(90, Math.round(words * 0.25)));
+      const start = Math.abs(Math.trunc(stableVariant(item.d.id)));
+      let chosen = null;
+      for (let step = 0; step < 64 && !chosen; step += 1) {
+        const seed = start + step;
+        const paragraphs = [];
+        let wcount = 0;
+        for (let p = 0; p < 4; p += 1) {
+          const [para] = buildNarrativeParagraphs(item.cardInput, seed * 31 + p * 7919);
+          if (!para) break;
+          paragraphs.push(para);
+          wcount += para.split(' ').length;
+          if (wcount >= budget) break;
+        }
+        if (!paragraphs.length) break;
+        const candidate = paragraphs.join(' ');
+        if (!used.has(candidate)) chosen = candidate;
+      }
+      if (!chosen) continue;
+      used.add(chosen);
+      const hadNarrative = stripped !== item.text;
+      const blocks = stripped.split(/\n{2,}/u).filter((b) => b.trim());
+      if (!blocks.length) {
+        item.text = chosen;
+      } else if (thin) {
+        item.text = [`${blocks[0]} ${chosen}`, ...blocks.slice(1)].join('\n\n');
+      } else {
+        item.text = [blocks[0], chosen, ...blocks.slice(1)].join('\n\n');
+      }
+      if (hadNarrative) marks.narrativeRevary += 1;
+      else marks.contextAdded += 1;
+    }
+  }
+}
+
 async function main() {
   const lib = await import('../apps/web/src/lib/event-minimal-description.ts');
   const { buildPracticalInfoBlock, buildMinimalEventDescription, cityInPhrase, cityPrepositional } = lib;
@@ -541,6 +653,8 @@ async function main() {
     seriesAdded: 0,
     sellAdded: 0,
     leadRebuilt: 0,
+    contextAdded: 0,
+    narrativeRevary: 0,
   };
   const samples = [];
   const removedOnlySamples = [];
@@ -548,6 +662,7 @@ async function main() {
   const htmlCards = [];
   const pastDateCards = [];
 
+  const processed = [];
   cards.forEach((d, index) => {
     const cardInput = {
       title: d.title,
@@ -665,6 +780,15 @@ async function main() {
     if (factBlock && !/Практическая информация/iu.test(d.raw || '')) marks.factBlockAdded += 1;
     if (factBlock && /##\s*(?:Практическая информация|Где и когда|Когда и где)/iu.test(d.raw || '')) marks.factBlockRebuilt += 1;
 
+    processed.push({ d, index, cardInput, text });
+  });
+
+  // Owner 2026-10-12 (item 4): cards sharing >80% of their 5-gram content with
+  // another card get a unique context paragraph built from the narrative pools.
+  // Pools are sentence-strippable, so the pass is idempotent.
+  enrichNearDupGroups(processed, { buildNarrativeParagraphs, stripNarrativeParagraphs, marks });
+
+  for (const { d, text } of processed) {
     if (/<[a-z][\s\S]*>/iu.test(text)) {
       quality.hasHtml += 1;
       if (htmlCards.length < 10) htmlCards.push(`${d.slug}\n    ${text.replace(/\s+/gu, ' ').slice(0, 260)}`);
@@ -700,7 +824,7 @@ async function main() {
         );
       }
     }
-  });
+  }
 
   const duplicates = [...textIndex.values()].filter((n) => n > 1).reduce((sum, n) => sum + n, 0);
   const report = {
