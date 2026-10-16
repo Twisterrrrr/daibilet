@@ -14,6 +14,7 @@ import {
   LayoutTemplate,
   MapPin,
   Menu,
+  MessageSquare,
   MessageSquareQuote,
   Receipt,
   Settings,
@@ -62,7 +63,10 @@ const NAV_GROUPS: NavGroup[] = [
   },
   {
     title: 'Входящие',
-    items: [{ href: '/admin/change-requests', label: 'Заявки поставщиков', icon: ClipboardList }],
+    items: [
+      { href: '/admin/change-requests', label: 'Заявки поставщиков', icon: ClipboardList },
+      { href: '/admin/chats', label: 'Чат поддержки', icon: MessageSquare },
+    ],
   },
   {
     title: 'Контент',
