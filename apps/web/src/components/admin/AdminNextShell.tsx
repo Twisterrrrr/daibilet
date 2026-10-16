@@ -159,7 +159,7 @@ export function AdminNextShell({ children }: Props) {
 
   return (
     <div className="flex min-h-screen bg-slate-50 text-slate-900">
-      <aside className="hidden w-60 shrink-0 border-r border-slate-200 bg-white md:flex md:flex-col">
+      <aside className="hidden w-60 shrink-0 border-r border-slate-200 bg-white md:sticky md:top-0 md:flex md:h-screen md:flex-col">
         <div className="border-b border-slate-200 px-4 py-4">
           <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Daibilet</p>
           <p className="text-sm font-semibold text-slate-900">Админка</p>
@@ -170,7 +170,7 @@ export function AdminNextShell({ children }: Props) {
         >
           <NavLinks pathname={pathname} />
         </nav>
-        <div className="border-t border-slate-200 p-2">
+        <div className="shrink-0 border-t border-slate-200 p-2">
           <Link
             href="/admin/settings"
             className="flex items-center gap-1.5 rounded-md px-2 py-1.5 text-xs text-slate-400 hover:bg-slate-50 hover:text-slate-700"
