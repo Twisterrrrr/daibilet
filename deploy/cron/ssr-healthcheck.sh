@@ -12,7 +12,6 @@ TTFB_LIMIT="${DAIBILET_SSR_TTFB_LIMIT:-5}"
 LOG="${DAIBILET_SSR_HEALTH_LOG:-/var/log/daibilet/ssr-health.log}"
 WEB_SERVICE="${DAIBILET_WEB_SERVICE:-daibilet-web}"
 APP_DIR="${APP_DIR:-/opt/daibilet}"
-APP_DIR="${APP_DIR:-/opt/daibilet}"
 _deploy_active_default="${APP_DIR}/var/lock/daibilet-web-deploy.active"
 if [[ -f "$_deploy_active_default" ]]; then
   DEPLOY_ACTIVE="${DAIBILET_WEB_DEPLOY_ACTIVE:-$_deploy_active_default}"
@@ -107,12 +106,11 @@ if [[ "$MAIN_PID" =~ ^[1-9][0-9]*$ ]]; then
 fi
 
 MSG="SSR hung (TTFB=${TTFB:-na} curl=${CODE}). Executing SIGKILL+start ${WEB_SERVICE}."
-log_msg "$MSG"
-
 if [ "${DAIBILET_SSR_HEALTH_DRY_RUN:-0}" = "1" ]; then
-  echo "DRY_RUN=1: would SIGKILL+start (skipped)"
+  echo "DRY_RUN=1: $MSG (skipped)"
   exit 0
 fi
+log_msg "$MSG"
 
 # Preserve the blocked Next process's stack before killing it. The report
 # excludes environment variables and network details; only the Next process
