@@ -27,7 +27,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Pag
   const prefillEventId = (first(rawSearch.eventId) || '').trim();
   // `back` comes from the registry and keeps the operator's filter context.
   const back = first(rawSearch.back) || '';
-  const backHref = back.startsWith('/admin/orders') ? back : '/admin/orders';
+  const backHref = /^\/admin\/orders(?:\?|$)/.test(back) ? back : '/admin/orders';
   const detail = await loadAdminOrderDetail(id);
   const candidates = cq ? await loadAdminOrderEventCandidates(cq) : { rows: [], errors: [] as string[] };
 
@@ -89,7 +89,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Pag
       <AdminApiErrorBanner errors={[...detail.errors, ...candidates.errors]} />
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Info label="Статус" value={detail.status} />
+        <Info label="Статус" value={detail.displayStatus} />
         <Info label="Источник" value={detail.sourceName} />
         <Info label="Куплено" value={formatAdminDateTime(detail.purchasedAt)} />
         <Info

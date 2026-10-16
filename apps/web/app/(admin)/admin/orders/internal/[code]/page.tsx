@@ -14,7 +14,7 @@ export default async function InternalAdminOrderPage({ params, searchParams }: P
   const { code } = await params;
   const { operation, error: operationError, back } = await searchParams;
   // `back` comes from the registry and keeps the operator's filter context.
-  const backHref = back && back.startsWith('/admin/orders') ? back : '/admin/orders';
+  const backHref = back && /^\/admin\/orders(?:\?|$)/.test(back) ? back : '/admin/orders';
   const { detail, error } = await loadInternalAdminOrderDetail(code);
   const cancellable = detail && ['DRAFT', 'PENDING_PAYMENT', 'FAILED', 'EXPIRED'].includes(detail.status);
   const refundable = detail && ['CONFIRMED', 'FULFILLED'].includes(detail.status);

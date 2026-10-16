@@ -92,6 +92,10 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
   const state: OrdersFilterState = { kind, q, view, source, status };
   const current = { kind, q: q || undefined, view, source, status, page };
   const data = await loadAdminOrdersList({ kind, q, view, source, status, page });
+  const filteredHref = ordersHref(state, {});
+  const backHref = data.page > 1
+    ? `${filteredHref}${filteredHref.includes('?') ? '&' : '?'}page=${data.page}`
+    : filteredHref;
 // A failed live API must never look like "zero orders": the counters below would
   // be taken as fact by the operator, so degrade them to an explicit dash instead.
   const degraded = data.errors.length > 0;
@@ -200,7 +204,7 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
             </Link>
           );
         })}
-        {q || view !== 'all' || source !== 'all' || status !== 'all' ? (
+        {kind !== 'all' || q || view !== 'all' || source !== 'all' || status !== 'all' ? (
           <Link
             href="/admin/orders"
             className="rounded-md border border-dashed border-slate-300 px-2.5 py-1 text-xs text-slate-500 hover:border-slate-400 hover:text-slate-700"
@@ -237,7 +241,6 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
                 </tr>
               ) : (
                 data.rows.map((row) => {
-                  const backHref = ordersHref(state, {});
                   const detailHref =
                     (row.sourceKind === 'internal' && row.publicCode
                       ? `/admin/orders/internal/${encodeURIComponent(row.publicCode)}`

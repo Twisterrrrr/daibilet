@@ -55,6 +55,7 @@ export type AdminOrderDetailData = {
   externalOrderId: string;
   publicCode: string | null;
   status: string;
+  displayStatus: string;
   sourceCode: string;
   sourceName: string;
   buyerName: string | null;
@@ -320,6 +321,7 @@ export async function loadAdminOrderDetail(orderId: string): Promise<AdminOrderD
     externalOrderId: id,
     publicCode: null,
     status: '—',
+    displayStatus: '—',
     sourceCode: '—',
     sourceName: '—',
     buyerName: null,
@@ -359,6 +361,7 @@ export async function loadAdminOrderDetail(orderId: string): Promise<AdminOrderD
       externalOrderId: String(payload.externalOrderId || id),
       publicCode: payload.publicCode != null ? String(payload.publicCode) : null,
       status: String(payload.status || '—'),
+      displayStatus: String(payload.displayStatus || payload.status || '—'),
       sourceCode: String(payload.sourceCode || '—'),
       sourceName: String(payload.sourceName || payload.sourceCode || '—'),
       buyerName: buyer.name != null ? String(buyer.name) : null,
