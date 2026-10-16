@@ -10,6 +10,12 @@ function emptyToNull(value: FormDataEntryValue | null): string | null {
   return trimmed ? trimmed : null;
 }
 
+/** Carry the list context (back) through save redirects so the operator returns to the same selection. */
+function backSuffix(formData: FormData): string {
+  const back = String(formData.get('back') || '').trim();
+  return back.startsWith('/admin/cities') ? `&back=${encodeURIComponent(back)}` : '';
+}
+
 export async function saveAdminCityAction(formData: FormData) {
   const id = String(formData.get('id') || '').trim();
   if (!id) throw new Error('missing city id');
@@ -44,12 +50,14 @@ export async function saveAdminCityAction(formData: FormData) {
   });
   const payload = (await response.json().catch(() => ({}))) as { error?: string; id?: string };
   if (!response.ok) {
-    if (payload.error === 'slug_not_unique') throw new Error('slug_not_unique');
+    if (payload.error === 'slug_not_unique') {
+      redirect(`/admin/cities/${encodeURIComponent(id)}?error=slug_not_unique${backSuffix(formData)}`);
+    }
     throw new Error(`city save failed HTTP ${response.status}${payload.error ? `: ${payload.error}` : ''}`);
   }
 
   const nextId = payload.id || id;
   revalidatePath('/admin/cities');
   revalidatePath(`/admin/cities/${nextId}`);
-  redirect(`/admin/cities/${encodeURIComponent(nextId)}?saved=1`);
+  redirect(`/admin/cities/${encodeURIComponent(nextId)}?saved=1${backSuffix(formData)}`);
 }
