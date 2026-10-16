@@ -12,7 +12,6 @@ TTFB_LIMIT="${DAIBILET_SSR_TTFB_LIMIT:-5}"
 LOG="${DAIBILET_SSR_HEALTH_LOG:-/var/log/daibilet/ssr-health.log}"
 WEB_SERVICE="${DAIBILET_WEB_SERVICE:-daibilet-web}"
 APP_DIR="${APP_DIR:-/opt/daibilet}"
-APP_DIR="${APP_DIR:-/opt/daibilet}"
 _deploy_active_default="${APP_DIR}/var/lock/daibilet-web-deploy.active"
 if [[ -f "$_deploy_active_default" ]]; then
   DEPLOY_ACTIVE="${DAIBILET_WEB_DEPLOY_ACTIVE:-$_deploy_active_default}"
@@ -107,11 +106,48 @@ if [[ "$MAIN_PID" =~ ^[1-9][0-9]*$ ]]; then
 fi
 
 MSG="SSR hung (TTFB=${TTFB:-na} curl=${CODE}). Executing SIGKILL+start ${WEB_SERVICE}."
+if [ "${DAIBILET_SSR_HEALTH_DRY_RUN:-0}" = "1" ]; then
+  echo "DRY_RUN=1: $MSG (skipped)"
+  exit 0
+fi
 log_msg "$MSG"
 
-if [ "${DAIBILET_SSR_HEALTH_DRY_RUN:-0}" = "1" ]; then
-  echo "DRY_RUN=1: would SIGKILL+start (skipped)"
-  exit 0
+# Preserve the blocked Next process's stack before killing it. The report
+# excludes environment variables and network details; only the Next process
+# with report-on-signal enabled receives SIGUSR2. A plain SIGUSR2 could
+# terminate an unconfigured Node process, so the environment check is required.
+REPORT_DIR="${DAIBILET_SSR_REPORT_DIR:-/var/log/daibilet/node-reports}"
+CONTROL_GROUP="$(systemctl show -p ControlGroup --value "$WEB_SERVICE" 2>/dev/null || true)"
+CGROUP_DIR="/sys/fs/cgroup${CONTROL_GROUP}"
+if [[ -n "$CONTROL_GROUP" && -d "$CGROUP_DIR" ]]; then
+  MEM_CURRENT="$(cat "$CGROUP_DIR/memory.current" 2>/dev/null || echo na)"
+  SWAP_CURRENT="$(cat "$CGROUP_DIR/memory.swap.current" 2>/dev/null || echo na)"
+  MEM_EVENTS="$(tr '\n' ',' <"$CGROUP_DIR/memory.events" 2>/dev/null || echo na)"
+  log_msg "HANG diagnostics: load=$(cut -d ' ' -f 1-3 /proc/loadavg) memory=${MEM_CURRENT} swap=${SWAP_CURRENT} events=${MEM_EVENTS}"
+
+  NEXT_PID=""
+  while read -r PID; do
+    [[ "$PID" =~ ^[1-9][0-9]*$ ]] || continue
+    COMM="$(ps -p "$PID" -o comm= 2>/dev/null || true)"
+    if [[ "$COMM" == next-server* ]]; then
+      NEXT_PID="$PID"
+      break
+    fi
+  done <"$CGROUP_DIR/cgroup.procs"
+
+  if [[ -n "$NEXT_PID" ]]; then
+    log_msg "HANG process: $(ps -p "$NEXT_PID" -o pid=,etime=,%cpu=,rss=,stat=,comm= 2>/dev/null | tr -s ' ' || echo unavailable)"
+    if [[ -r "/proc/$NEXT_PID/environ" ]] && tr '\0' '\n' <"/proc/$NEXT_PID/environ" | grep -Eq '^NODE_OPTIONS=.*--report-on-signal'; then
+      mkdir -p "$REPORT_DIR"
+      chmod 700 "$REPORT_DIR"
+      kill -USR2 "$NEXT_PID" 2>/dev/null || true
+      sleep 2
+      log_msg "HANG report signal sent to Next pid=${NEXT_PID}; reports=${REPORT_DIR}"
+      find "$REPORT_DIR" -maxdepth 1 -type f -name 'report.*.json' -mtime +14 -delete 2>/dev/null || true
+    else
+      log_msg "HANG report skipped: Next pid=${NEXT_PID} lacks report-on-signal"
+    fi
+  fi
 fi
 
 # Prefer hard kill: systemctl restart can hang on stuck next-server (TimeoutStopSec).

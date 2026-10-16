@@ -327,7 +327,7 @@ fi
 # Serve /images/* and /_next/static from disk (bypass Node + proxy_cache).
 # AFTER admin patch: that script rewrites daibilet.conf and would drop these aliases.
 NGINX_PATCHED=0
-for _patch in patch-prod-nginx-images-static.py patch-prod-nginx-next-static.py patch-prod-nginx-social-preview.py patch-prod-nginx-events-seo.py; do
+for _patch in patch-prod-nginx-images-static.py patch-prod-nginx-next-static.py patch-prod-nginx-social-preview.py patch-prod-nginx-events-seo.py patch-prod-image-crawlers.py; do
   if [[ -f "$APP_DIR/deploy/nginx/$_patch" ]]; then
     if python3_deploy "$APP_DIR/deploy/nginx/$_patch"; then
       NGINX_PATCHED=1
