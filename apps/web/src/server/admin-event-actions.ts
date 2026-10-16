@@ -16,8 +16,8 @@ function queueSuffix(formData: FormData): string {
   const params = new URLSearchParams();
   const back = String(formData.get('back') || '').trim();
   const next = String(formData.get('next') || '').trim();
-  if (back.startsWith('/admin/events')) params.set('back', back);
-  if (next) params.set('next', next);
+  if (/^\/admin\/events(?:\?|$)/.test(back)) params.set('back', back);
+  if (next.length <= 4_000 && /^[a-zA-Z0-9_,-]+$/.test(next)) params.set('next', next);
   return params.size ? `&${params.toString()}` : '';
 }
 

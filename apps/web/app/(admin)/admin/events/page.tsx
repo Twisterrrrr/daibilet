@@ -134,9 +134,9 @@ export default async function AdminEventsPage({ searchParams }: PageProps) {
                   if (page !== '1') queueQuery.set('page', page);
                   const qs = queueQuery.toString();
                   const backHref = qs ? `/admin/events?${qs}` : '/admin/events';
-                  const nextRow = data.rows[index + 1];
+                  const remainingIds = data.rows.slice(index + 1).map((item) => item.id);
                   const detailParams = new URLSearchParams({ back: backHref });
-                  if (nextRow) detailParams.set('next', nextRow.id);
+                  if (remainingIds.length) detailParams.set('next', remainingIds.join(','));
                   return (
                   <tr key={row.id} className="border-b border-slate-100 align-top">
                     <td className="px-3 py-2">

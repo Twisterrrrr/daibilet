@@ -33,11 +33,15 @@ export default async function AdminEventDetailPage({ params, searchParams }: Pag
   // Queue context from the events list: back keeps the selection, next opens
   // the following task without returning to the list.
   const back = first(rawSearch.back) || '';
-  const backHref = back.startsWith('/admin/events') ? back : '/admin/events';
-  const nextId = (first(rawSearch.next) || '').trim();
-  const nextHref = nextId
-    ? `/admin/events/${encodeURIComponent(nextId)}?back=${encodeURIComponent(backHref)}`
-    : null;
+  const backHref = /^\/admin\/events(?:\?|$)/.test(back) ? back : '/admin/events';
+  const remainingIds = (first(rawSearch.next) || '')
+    .split(',')
+    .filter((candidate) => /^[a-zA-Z0-9_-]{1,80}$/.test(candidate))
+    .slice(0, 50);
+  const nextId = remainingIds[0];
+  const nextParams = new URLSearchParams({ back: backHref });
+  if (remainingIds.length > 1) nextParams.set('next', remainingIds.slice(1).join(','));
+  const nextHref = nextId ? `/admin/events/${encodeURIComponent(nextId)}?${nextParams}` : null;
 
   return (
     <div className="space-y-4">
@@ -57,7 +61,7 @@ export default async function AdminEventDetailPage({ params, searchParams }: Pag
             Следующая задача →
           </Link>
         ) : (
-          <span className="text-xs text-slate-400">Конец очереди</span>
+          <span className="text-xs text-slate-400">Конец страницы очереди</span>
         )}
       </div>
       <AdminApiErrorBanner errors={[...detail.errors, ...taxonomy.errors]} />
@@ -70,7 +74,7 @@ export default async function AdminEventDetailPage({ params, searchParams }: Pag
         detail={detail}
         taxonomy={taxonomy}
         notice={noticeFromSearch(rawSearch)}
-        queue={{ back: backHref, next: nextId || undefined }}
+        queue={{ back: backHref, next: remainingIds.join(',') || undefined }}
       />
     </div>
   );

@@ -16,7 +16,9 @@ type Tab = {
 export function AdminEventTabs({ tabs }: { tabs: Tab[] }) {
   const [activeId, setActiveId] = useState<string>(() => {
     if (typeof window === 'undefined') return tabs[0].id;
-    const requested = new URLSearchParams(window.location.search).get('tab');
+    const search = new URLSearchParams(window.location.search);
+    const saved = search.get('saved');
+    const requested = search.get('tab') || (saved === 'taxonomy' || saved === 'venue-links' ? 'structure' : saved);
     return tabs.some((tab) => tab.id === requested) ? (requested as string) : tabs[0].id;
   });
 

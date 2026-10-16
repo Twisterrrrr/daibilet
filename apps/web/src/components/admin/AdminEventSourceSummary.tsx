@@ -23,7 +23,7 @@ export function AdminEventSourceSummary({ detail }: { detail: AdminEventDetailDa
     { field: 'Заголовок', source: detail.sourceTitle, override: override.title || null },
     {
       field: 'Короткое описание',
-      source: clip(detail.sourceDescription, 80),
+      source: 'не передаётся отдельно',
       override: override.shortDescription ? clip(override.shortDescription, 80) : null,
     },
     {
