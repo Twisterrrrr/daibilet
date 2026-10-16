@@ -58,7 +58,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, skipped: 'not_a_reply' });
   }
 
-  const parent = await prisma.chatMessage.findFirst({
+  const parent = await prisma.chatMessage.findUnique({
     where: { telegramMessageId: replyToId },
     select: { sessionId: true },
   });

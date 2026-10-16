@@ -30,7 +30,7 @@ function getOrCreateVisitorKey(): string {
 
 /**
  * Floating support chat widget. Anonymous: identifies the visitor by a random
- * localStorage key. Polls /api/chat for the thread; sending goes through a
+ * localStorage key. Polls POST /support/chat/messages for the thread; sending goes through a
  * server action which also forwards the message to the admin Telegram chat.
  */
 export function ChatWidget() {

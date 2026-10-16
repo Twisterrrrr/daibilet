@@ -2371,13 +2371,12 @@ model ChatMessage {
   /// Telegram message_id of the forwarded notification. Telegram replies are
   /// matched back to the thread by `Reply to` this id - without it the webhook
   /// cannot resolve which session an admin reply belongs to.
-  telegramMessageId Int?
+  telegramMessageId Int?            @unique
   /// Telegram update_id for idempotent processing of incoming admin replies.
   telegramUpdateId  String?          @unique
   createdAt DateTime          @default(now())
 
   @@index([sessionId, createdAt])
   @@index([sender, createdAt])
-  @@index([telegramMessageId])
   @@map("chat_messages")
 }
