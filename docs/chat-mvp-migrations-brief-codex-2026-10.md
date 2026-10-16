@@ -109,10 +109,10 @@ migrations have been successfully applied»):
   у твоего `apps/backend/src/telegram.ts` (missing env → warn + skip). Код
   дублируется осознанно: не трогал exports `@daibilet/backend`; если захочешь
   вынести `./telegram` в exports — перейду на импорт.
-- `GET /api/chat` — poll-история виджета по visitorKey (no-store).
-- `POST /api/telegram-webhook` — валидация `X-Telegram-Bot-Api-Secret-Token`
+- `POST /support/chat/messages` — poll-история по visitorKey в теле запроса (no-store); отдаёт последние 200 сообщений в хронологическом порядке.
+- `POST /support/chat/telegram-webhook` — валидация `X-Telegram-Bot-Api-Secret-Token`
   (env `TELEGRAM_WEBHOOK_SECRET`, fail-closed), Reply по `telegramMessageId`
-  пишет ADMIN-сообщение; не-Reply получает подсказку «ответьте через Reply».
+  пишет ADMIN-сообщение; обычные сообщения в служебном Telegram-чате игнорируются.
 - `/admin/chats` — список сессий (последнее сообщение, время), `/admin/chats/[id]` —
   **вся история переписки + форма ответа**; ответ из админки и ответ из
   Telegram Reply пишутся в одну историю и видны посетителю в виджете (poll 8 сек).
@@ -123,14 +123,16 @@ migrations have been successfully applied»):
 
 - `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` — общие с существующим backend-мостом.
 - `TELEGRAM_WEBHOOK_SECRET` — новый; вебхук без него отвечает 503.
-- Регистрация: `setWebhook` с `url=https://daibilet.ru/api/telegram-webhook` и
+- Регистрация: `setWebhook` с `url=https://daibilet.ru/support/chat/telegram-webhook` и
   `secret_token`. Без env Telegram-пересылка тихо пропускается, чат работает.
 
 ### Ограничения (сознательные, MVP)
 
-Анонимность посетителя (UUID в localStorage, без авторизации), без rate-limit,
+Анонимность посетителя (UUID в localStorage, без авторизации), ограничение отправки 5 сообщений на ключ и 60 глобально за минуту,
 poll вместо websockets, история ограничена 200 сообщениями на выдачу. При
 желании следующей итерацией можно прикрутить лимиты и привязку к заказу.
+
+Маршруты перенесены из `/api/*` в Next-пространство `/support/chat/*`: production nginx отправляет общий `/api/*` в catalog backend. Вебхук проверяет Telegram chat id и дедуплицирует повторные update по `telegramUpdateId` (дополнительная миграция `20261017130000_chat_webhook_dedupe`).
 
 ### Проверки
 
@@ -138,4 +140,14 @@ ESLint 0 (затронутые файлы), `tsc --noEmit` 0, `web:test:ci` 46 �
 Playwright-смоук на dev (виджет → админка → ответ → виджет; webhook: 401 на чужой
 секрет, Reply пишет ADMIN-сообщение в верную сессию; mobile 390px). Скриншоты
 и скрипты: `D:/coding/_scratch/2026-10-15/{shots,pw}/chat-*`.
+
+---
+
+## 3. Проверка Codex после интеграции (2026-10-16)
+
+- `prisma.config.ts` теперь читает `.env` по пути от файла конфигурации и отказывает без `DATABASE_URL`; молчаливого fallback на `daibilet` нет.
+- Добавлены `chat_webhook_dedupe` и `schema_alignment`. Diff от каталога миграций к `schema.prisma` пустой; обе новые миграции применены штатным `migrate deploy` **только** к проверенной локальной `daibilet_baseline`.
+- Проблема истории миграций остаётся: в `daibilet_baseline` записаны четыре finance-миграции, которых нет в каталоге этой ветки; в старой `daibilet` — девять. Простое копирование четырёх файлов добавляет finance-таблицы, отсутствующие в этой ветке `schema.prisma`, и снова создаёт drift. Их нужно интегрировать вместе с finance-схемой и согласовать историю обеих БД; `migrate dev` и любые reset не применять.
+- Chat endpoints перенесены в `/support/chat/*` из-за nginx `/api/*` → catalog backend. Секрет посетителя передаётся в теле POST, выдаются последние 200 сообщений. Публичная отправка ограничена в serializable-транзакции; Telegram webhook проверяет целевой chat id и `update_id`.
+- Продуктовый выпуск чата и регистрация Telegram webhook пока не выполнены.
 
