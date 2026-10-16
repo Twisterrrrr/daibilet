@@ -1,5 +1,6 @@
 ﻿# CI allowlist: stable logic tests (no hub packs / image inventory / TZ-sensitive venue slots).
 src/lib/admin-basic-auth.test.ts
+src/lib/admin-access.test.ts
 # Full suite: pnpm web:test вЂ” ~30 hub/content tests need refresh (tech debt).
 src/lib/catalog-date-rail.test.ts
 src/lib/catalog-exclude-landing-schema.test.ts
@@ -45,3 +46,5 @@ src/lib/city-suburbs-ssr.test.tsx
 src/lib/city-hub-registry.test.ts
 # Finance buyer DTO must preserve the separate issued ticket number.
 src/server/finance-checkout-client.test.ts
+# Support chat helpers: text sanitizing, visitor key guard, Telegram notification text.
+src/lib/chat.test.ts

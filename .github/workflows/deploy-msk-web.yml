@@ -108,6 +108,9 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Prisma generate
+        env:
+          # Prisma config requires a URL; generate does not connect to this DB.
+          DATABASE_URL: postgresql://daibilet:unused@127.0.0.1:5437/daibilet?schema=public
         run: pnpm db:generate
 
       - name: SSH tunnel to MSK API

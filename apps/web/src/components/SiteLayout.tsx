@@ -3,6 +3,7 @@ import type { PublicDestinationDto } from '@daibilet/contracts/public';
 import { Suspense } from 'react';
 
 import { ScrollToTopButton } from '@/components/ScrollToTop.client';
+import { ChatWidget } from '@/components/ChatWidget.client';
 import { SiteChromeSkeleton } from '@/components/SiteChromeSkeleton';
 import { SiteFooter } from '@/components/SiteFooter';
 import { SiteHeader } from '@/components/SiteHeader.client';
@@ -72,6 +73,7 @@ export async function SiteLayout({
           <div className="print:hidden pb-[calc(6rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
             <SiteFooter destinations={destinations} variant={footerVariant} />
             <ScrollToTopButton />
+            <ChatWidget />
           </div>
         </div>
       </SelectedCityProvider>

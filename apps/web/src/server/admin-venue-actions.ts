@@ -10,6 +10,12 @@ function emptyToNull(value: FormDataEntryValue | null): string | null {
   return trimmed ? trimmed : null;
 }
 
+/** Carry the list context (back) through save redirects so the operator returns to the same selection. */
+function backSuffix(formData: FormData): string {
+  const back = String(formData.get('back') || '').trim();
+  return /^\/admin\/venues(?:\?|$)/.test(back) ? `&back=${encodeURIComponent(back)}` : '';
+}
+
 export async function saveAdminVenueAction(formData: FormData) {
   const id = String(formData.get('id') || '').trim();
   if (!id) throw new Error('missing venue id');
@@ -44,5 +50,5 @@ export async function saveAdminVenueAction(formData: FormData) {
 
   revalidatePath('/admin/venues');
   revalidatePath(`/admin/venues/${id}`);
-  redirect(`/admin/venues/${encodeURIComponent(id)}?saved=1`);
+  redirect(`/admin/venues/${encodeURIComponent(id)}?saved=1${backSuffix(formData)}`);
 }

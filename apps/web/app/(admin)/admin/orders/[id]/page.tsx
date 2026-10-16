@@ -25,6 +25,9 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Pag
   const rawSearch = await searchParams;
   const cq = (first(rawSearch.cq) || '').trim();
   const prefillEventId = (first(rawSearch.eventId) || '').trim();
+  // `back` comes from the registry and keeps the operator's filter context.
+  const back = first(rawSearch.back) || '';
+  const backHref = /^\/admin\/orders(?:\?|$)/.test(back) ? back : '/admin/orders';
   const detail = await loadAdminOrderDetail(id);
   const candidates = cq ? await loadAdminOrderEventCandidates(cq) : { rows: [], errors: [] as string[] };
 
@@ -36,7 +39,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Pag
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
-        <Link href="/admin/orders" className="hover:underline">
+        <Link href={backHref} className="hover:underline">
           Заказы
         </Link>
         <span>/</span>
@@ -86,7 +89,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Pag
       <AdminApiErrorBanner errors={[...detail.errors, ...candidates.errors]} />
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Info label="Статус" value={detail.status} />
+        <Info label="Статус" value={detail.displayStatus} />
         <Info label="Источник" value={detail.sourceName} />
         <Info label="Куплено" value={formatAdminDateTime(detail.purchasedAt)} />
         <Info
@@ -244,7 +247,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Pag
                     </div>
                   </div>
                   <Link
-                    href={`/admin/orders/${encodeURIComponent(detail.id)}?cq=${encodeURIComponent(cq)}&eventId=${encodeURIComponent(row.id)}${first(rawSearch.editTicket) ? `&editTicket=${encodeURIComponent(first(rawSearch.editTicket)!)}` : ''}`}
+                    href={`/admin/orders/${encodeURIComponent(detail.id)}?cq=${encodeURIComponent(cq)}&eventId=${encodeURIComponent(row.id)}${first(rawSearch.editTicket) ? `&editTicket=${encodeURIComponent(first(rawSearch.editTicket)!)}` : ''}${backHref !== '/admin/orders' ? `&back=${encodeURIComponent(backHref)}` : ''}`}
                     className="rounded-md border border-slate-200 px-2 py-1 text-xs hover:bg-slate-50"
                   >
                     Подставить eventId

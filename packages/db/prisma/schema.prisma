@@ -7,6 +7,95 @@ datasource db {
   provider = "postgresql"
 }
 
+enum AdminUserState {
+  INVITED
+  ACTIVE
+  SUSPENDED
+}
+
+enum AdminRole {
+  SUPERADMIN
+  PRODUCT
+  SUPPORT
+  FINANCE
+  CATALOG_EDITOR
+  COPYWRITER
+  SEO
+  INTEGRATIONS
+  AUDITOR
+}
+
+model AdminUser {
+  id              String         @id @default(cuid())
+  email           String         @unique
+  displayName     String
+  passwordHash    String?
+  state           AdminUserState @default(INVITED)
+  roles           AdminRole[]    @default([])
+  permissionEpoch Int            @default(0)
+  emailVerifiedAt DateTime?
+  lastLoginAt     DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  sessions           AdminSession[]
+  invitationsSent    AdminInvitation[] @relation("AdminInvitationInviter")
+  invitation         AdminInvitation?  @relation("AdminInvitationRecipient")
+  auditEntries       AdminAuditLog[]
+
+  @@index([state])
+}
+
+model AdminInvitation {
+  id          String    @id @default(cuid())
+  userId      String    @unique
+  invitedById String?
+  tokenHash   String    @unique
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+  revokedAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  user      AdminUser  @relation("AdminInvitationRecipient", fields: [userId], references: [id], onDelete: Cascade)
+  invitedBy AdminUser? @relation("AdminInvitationInviter", fields: [invitedById], references: [id], onDelete: SetNull)
+
+  @@index([expiresAt])
+}
+
+model AdminSession {
+  id          String    @id @default(cuid())
+  userId      String
+  tokenHash   String    @unique
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  lastSeenAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  user AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revokedAt])
+  @@index([expiresAt])
+}
+
+model AdminAuditLog {
+  id            String   @id @default(cuid())
+  actorId       String?
+  action        String
+  permission    String?
+  targetType    String?
+  targetId      String?
+  outcome       String
+  correlationId String?
+  detail        Json?
+  createdAt     DateTime @default(now())
+
+  actor AdminUser? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([actorId, createdAt])
+  @@index([targetType, targetId, createdAt])
+  @@index([createdAt])
+}
+
 enum SourceCode {
   TICKETSCLOUD
   TEPLOHOD
@@ -798,6 +887,7 @@ model Category {
   events          Event[]
   subcategories   Subcategory[]
   commissionRules SupplierCommissionRule[]
+  admissionProducts AdmissionProduct[]
 }
 
 model Subcategory {
@@ -810,6 +900,7 @@ model Subcategory {
   category      Category           @relation(fields: [categoryId], references: [id])
   primaryEvents Event[]
   events        EventSubcategory[]
+  primaryAdmissionProducts AdmissionProduct[]
 }
 
 model EventSubcategory {
@@ -872,6 +963,7 @@ model City {
   landings  Landing[]
   articles  Article[]
   tripPlans TripPlan[]
+  admissionProducts AdmissionProduct[]
 }
 
 model Venue {
@@ -940,6 +1032,7 @@ model Venue {
   externalReviews ExternalReview[]
   routeItems      EventVenueRouteItem[]
 
+  admissionProducts AdmissionProduct[]
   @@index([title])
   @@index([cityId, isTouristPlace, isMainPlace])
   @@index([parentPlaceId])
@@ -1195,6 +1288,8 @@ model SiteUser {
   eventChangeLogs             EventChangeLog[]     @relation("EventChangeLogActor")
   reviews                     Review[]
   refundRequests              RefundRequest[]
+  createdAdmissionProducts    AdmissionProduct[]   @relation("AdmissionProductCreatedBy")
+  moderatedAdmissionProducts  AdmissionProduct[]   @relation("AdmissionProductModeratedBy")
 }
 
 model ExternalOrder {
@@ -1299,8 +1394,12 @@ model Supplier {
   reviewDisputes      ReviewDispute[]
   externalReviews     ExternalReview[]
 
+  integrationMode      SupplierIntegrationMode @default(IMPORTED_TICKETING_SYSTEM)
+  admissionProducts   AdmissionProduct[]       @relation("PrimarySupplierAdmissionProducts")
+  integrations        SupplierIntegration[]
   @@index([status])
   @@index([inn])
+  @@index([integrationMode])
 }
 
 model SupplierLegalProfile {
@@ -1368,9 +1467,12 @@ model SupplierUser {
   supplier Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
   siteUser SiteUser @relation(fields: [siteUserId], references: [id], onDelete: Cascade)
 
+  inviteTokenHash  String?      @unique
+  inviteExpiresAt  DateTime?
   @@unique([supplierId, siteUserId])
   @@index([siteUserId])
   @@index([supplierId, isActive])
+  @@index([inviteExpiresAt])
 }
 
 model SupplierVenue {
@@ -1485,10 +1587,13 @@ model SupplierCommissionRule {
   event    Event?    @relation(fields: [eventId], references: [id], onDelete: Cascade)
   category Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
+  admissionProductId String?
+  admissionProduct AdmissionProduct? @relation(fields: [admissionProductId], references: [id], onDelete: Cascade)
   @@index([supplierId, isActive])
   @@index([eventId, isActive])
   @@index([categoryId, isActive])
   @@index([scope, priority])
+  @@index([admissionProductId, isActive])
 }
 
 model CheckoutOrder {
@@ -1565,11 +1670,19 @@ model CheckoutItem {
   tripVoucherItems TripVoucherItem[]
   fulfillmentItem  FulfillmentItem?
 
+  subjectType        CheckoutSubjectKind @default(EVENT)
+  admissionProductId String?
+  admissionOfferId   String?
+  admissionProduct AdmissionProduct? @relation(fields: [admissionProductId], references: [id])
+  admissionOffer   AdmissionOffer?   @relation(fields: [admissionOfferId], references: [id])
   @@index([checkoutOrderId])
   @@index([supplierId, status])
   @@index([eventId])
   @@index([sessionId])
   @@index([offerId])
+  @@index([subjectType])
+  @@index([admissionProductId])
+  @@index([admissionOfferId])
 }
 
 model FulfillmentItem {
@@ -1599,12 +1712,15 @@ model FulfillmentItem {
   checkoutItem   CheckoutItem?   @relation(fields: [checkoutItemId], references: [id], onDelete: SetNull)
   refundRequests RefundRequest[]
 
+  admissionOfferId     String?
+  admissionOffer AdmissionOffer? @relation(fields: [admissionOfferId], references: [id], onDelete: SetNull)
   @@index([checkoutOrderId])
   @@index([offerId])
   @@index([purchaseFlow, status])
   @@index([provider])
   @@index([status, nextRetryAt])
   @@index([status, escalatedAt])
+  @@index([admissionOfferId])
 }
 
 model Payment {
@@ -2251,4 +2367,239 @@ model BuyerTicketEmailDelivery {
   updatedAt     DateTime  @updatedAt
 
   @@index([status, nextAttemptAt])
+}
+
+enum ChatMessageSender {
+  USER
+  ADMIN
+}
+
+/// Public support chat thread, one per anonymous widget visitor.
+model ChatSession {
+  id String @id @default(cuid())
+  /// Anonymous widget identity (random localStorage key) - the only handle the
+  /// floating widget has to fetch its own thread. Never shown in UI.
+  visitorKey String   @unique
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  messages ChatMessage[]
+
+  @@index([updatedAt])
+  @@map("chat_sessions")
+}
+
+model ChatMessage {
+  id        String            @id @default(cuid())
+  sessionId String
+  session   ChatSession       @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  text      String
+  sender    ChatMessageSender
+  /// Telegram message_id of the forwarded notification. Telegram replies are
+  /// matched back to the thread by `Reply to` this id - without it the webhook
+  /// cannot resolve which session an admin reply belongs to.
+  telegramMessageId Int?            @unique
+  /// Telegram update_id for idempotent processing of incoming admin replies.
+  telegramUpdateId  String?          @unique
+  createdAt DateTime          @default(now())
+
+  @@index([sessionId, createdAt])
+  @@index([sender, createdAt])
+  @@map("chat_messages")
+}
+
+
+enum AdmissionProductType {
+  MUSEUM_ENTRY
+  GALLERY_ENTRY
+  ART_SPACE_ENTRY
+  EXHIBITION_ENTRY
+  OBSERVATION_ENTRY
+  PARK_ENTRY
+  ATTRACTION_ENTRY
+  ZOO_ENTRY
+  AQUARIUM_ENTRY
+  COMPLEX_ENTRY
+  OTHER
+}
+
+
+enum AdmissionValidityMode {
+  OPEN_DATE
+  FIXED_WINDOW
+  VALID_DAYS_AFTER_PURCHASE
+}
+
+
+enum SupplierIntegrationMode {
+  IMPORTED_TICKETING_SYSTEM
+  INTERNAL_SALES
+  API_SYNC
+}
+
+
+enum SupplierIntegrationStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  ERROR
+  ARCHIVED
+}
+
+
+enum CheckoutSubjectKind {
+  EVENT
+  VENUE_ADMISSION
+}
+
+
+model AdmissionProduct {
+  id                     String                @id @default(cuid())
+  slug                   String                @unique
+  title                  String
+  shortTitle             String?
+  description            String?
+  shortDescription       String?
+  type                   AdmissionProductType  @default(OTHER)
+  status                 PublishStatus         @default(REVIEW)
+  purchaseFlow           PurchaseFlow          @default(PLATFORM)
+  managementMode         EventManagementMode   @default(DAIBILET_MANAGED)
+  sourceCode             SourceCode            @default(MANUAL)
+  sourceStatus           String?
+  imageUrl               String?
+  seoH1                  String?
+  seoTitle               String?
+  seoDescription         String?
+  canonicalPath          String?
+  isIndexable            Boolean               @default(true)
+  priceFromRub           Int?
+  ticketsVacant          Int?
+  defaultCapacityTotal   Int?
+  validityMode           AdmissionValidityMode @default(OPEN_DATE)
+  validFrom              DateTime?
+  validTo                DateTime?
+  validDaysAfterPurchase Int?
+  salesStartsAt          DateTime?
+  salesEndsAt            DateTime?
+  cityId                 String?
+  venueId                String
+  categoryId             String?
+  primarySubcategoryId   String?
+  supplierId             String?
+  createdByType          EventActorType        @default(SYSTEM)
+  createdBySiteUserId    String?
+  moderatedBySiteUserId  String?
+  moderatedAt            DateTime?
+  moderationComment      String?
+  createdAt              DateTime              @default(now())
+  updatedAt              DateTime              @updatedAt
+
+  city               City?                    @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  venue              Venue                    @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  category           Category?                @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  primarySubcategory Subcategory?             @relation(fields: [primarySubcategoryId], references: [id], onDelete: SetNull)
+  supplier           Supplier?                @relation("PrimarySupplierAdmissionProducts", fields: [supplierId], references: [id], onDelete: SetNull)
+  createdBy          SiteUser?                @relation("AdmissionProductCreatedBy", fields: [createdBySiteUserId], references: [id], onDelete: SetNull)
+  moderatedBy        SiteUser?                @relation("AdmissionProductModeratedBy", fields: [moderatedBySiteUserId], references: [id], onDelete: SetNull)
+  offers             AdmissionOffer[]
+  checkoutItems      CheckoutItem[]
+  commissionRules    SupplierCommissionRule[]
+
+  @@index([status])
+  @@index([type, status])
+  @@index([purchaseFlow])
+  @@index([managementMode, status])
+  @@index([cityId])
+  @@index([venueId, status])
+  @@index([categoryId])
+  @@index([supplierId, status])
+  @@index([validityMode, status])
+}
+
+
+model AdmissionOffer {
+  id                 String     @id @default(cuid())
+  admissionProductId String
+  sourceCode         SourceCode
+  title              String?
+  priceRub           Int?
+  oldPriceRub        Int?
+  capacityTotal      Int?
+  groupSize          Int        @default(1)
+  weekdayMask        Int?
+  widgetUrl          String?
+  deeplinkUrl        String?
+  payload            Json?
+  active             Boolean    @default(true)
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  admissionProduct AdmissionProduct  @relation(fields: [admissionProductId], references: [id], onDelete: Cascade)
+  checkoutItems    CheckoutItem[]
+  fulfillmentItems FulfillmentItem[]
+
+  @@index([admissionProductId, active, priceRub])
+  @@index([sourceCode])
+}
+
+
+model SupplierIntegration {
+  id                String                    @id @default(cuid())
+  supplierId        String
+  providerCode      String
+  title             String
+  status            SupplierIntegrationStatus @default(DRAFT)
+  sourceCode        SourceCode?
+  baseUrl           String?
+  capabilities      Json?
+  configJson        Json?
+  secretRef         String?
+  lastSuccessAt     DateTime?
+  lastFailureAt     DateTime?
+  consecutiveErrors Int                       @default(0)
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
+
+  supplier Supplier                   @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  runs     SupplierIntegrationRun[]
+  issues   SupplierIntegrationIssue[]
+
+  @@unique([supplierId, providerCode])
+  @@index([status])
+  @@index([sourceCode])
+  @@index([supplierId, status])
+}
+
+
+model SupplierIntegrationRun {
+  id            String     @id @default(cuid())
+  integrationId String
+  status        SyncStatus @default(RUNNING)
+  mode          String
+  startedAt     DateTime   @default(now())
+  finishedAt    DateTime?
+  stats         Json?
+  error         String?
+
+  integration SupplierIntegration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+
+  @@index([integrationId, startedAt])
+  @@index([status, startedAt])
+}
+
+
+model SupplierIntegrationIssue {
+  id            String    @id @default(cuid())
+  integrationId String
+  code          String
+  severity      String
+  message       String
+  payload       Json?
+  createdAt     DateTime  @default(now())
+  resolvedAt    DateTime?
+
+  integration SupplierIntegration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+
+  @@index([integrationId, resolvedAt])
+  @@index([severity, createdAt])
 }

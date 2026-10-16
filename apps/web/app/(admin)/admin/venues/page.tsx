@@ -2,7 +2,8 @@ import Link from 'next/link';
 
 import { AdminApiErrorBanner } from '@/components/admin/AdminApiErrorBanner';
 import { AdminPagination } from '@/components/admin/AdminPagination';
-import { formatAdminNumber } from '@/lib/admin-ui';
+import { venueKindLabel, venuePageStatusLabel } from '@/components/admin/admin-catalog-labels';
+import { buildPageHref, formatAdminNumber } from '@/lib/admin-ui';
 import { loadAdminVenuesList } from '@/server/admin-venues-data';
 
 export const dynamic = 'force-dynamic';
@@ -28,6 +29,7 @@ export default async function AdminVenuesPage({ searchParams }: PageProps) {
   const page = first(raw.page) || '1';
   const current = { q: q || undefined, family, page };
   const data = await loadAdminVenuesList({ q, family, page });
+  const backHref = buildPageHref('/admin/venues', current, {});
 
   return (
     <div className="space-y-4">
@@ -35,7 +37,7 @@ export default async function AdminVenuesPage({ searchParams }: PageProps) {
         <div>
           <h2 className="text-xl font-semibold text-slate-900">Площадки</h2>
           <p className="mt-1 text-sm text-slate-600">
-            SEO / kind / pageStatus в Next.
+            Каталог площадок и локаций: тип, статус страницы, события.
           </p>
         </div>
       </header>
@@ -111,7 +113,7 @@ export default async function AdminVenuesPage({ searchParams }: PageProps) {
                   <tr key={row.id} className="border-b border-slate-100 align-top">
                     <td className="px-3 py-2">
                       <Link
-                        href={`/admin/venues/${encodeURIComponent(row.id)}`}
+                        href={`/admin/venues/${encodeURIComponent(row.id)}?back=${encodeURIComponent(backHref)}`}
                         className="font-medium text-sky-700 hover:underline"
                       >
                         {row.name}
@@ -119,8 +121,8 @@ export default async function AdminVenuesPage({ searchParams }: PageProps) {
                       <div className="mt-0.5 text-xs text-slate-500">{row.address || row.slug || ''}</div>
                     </td>
                     <td className="px-3 py-2 text-slate-600">{row.city}</td>
-                    <td className="px-3 py-2 text-xs text-slate-600">{row.kind}</td>
-                    <td className="px-3 py-2 text-xs text-slate-600">{row.pageStatus}</td>
+                    <td className="px-3 py-2 text-xs text-slate-600">{venueKindLabel(row.kind)}</td>
+                    <td className="px-3 py-2 text-xs text-slate-600">{venuePageStatusLabel(row.pageStatus)}</td>
                     <td className="px-3 py-2 tabular-nums">{formatAdminNumber(row.events)}</td>
                   </tr>
                 ))

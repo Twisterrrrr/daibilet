@@ -38,6 +38,14 @@ export type AdminOrdersListData = {
     processing: number;
     needsAttention: number;
   };
+  scopedMetrics?: {
+    provider: string;
+    total: number;
+    confirmed: number;
+    processing: number;
+    problems: number;
+    refundCases: number;
+  };
   errors: string[];
 };
 
@@ -47,6 +55,7 @@ export type AdminOrderDetailData = {
   externalOrderId: string;
   publicCode: string | null;
   status: string;
+  displayStatus: string;
   sourceCode: string;
   sourceName: string;
   buyerName: string | null;
@@ -269,6 +278,7 @@ async function loadFinanceAdminOrders(params: URLSearchParams): Promise<AdminOrd
     if (!response.ok) return emptyOrders([`Внутренние заказы: HTTP ${response.status}`]);
     const payload = (await response.json()) as Record<string, unknown>;
     const metricsRaw = (payload.metrics && typeof payload.metrics === 'object' ? payload.metrics : {}) as Record<string, unknown>;
+    const scopedRaw = (payload.scopedMetrics && typeof payload.scopedMetrics === 'object' ? payload.scopedMetrics : {}) as Record<string, unknown>;
     return {
       page: asNumber(payload.page, 1),
       pages: Math.max(1, asNumber(payload.pages, 1)),
@@ -287,6 +297,14 @@ async function loadFinanceAdminOrders(params: URLSearchParams): Promise<AdminOrd
         processing: asNumber(metricsRaw.processing),
         needsAttention: asNumber(metricsRaw.needsAttention),
       },
+      scopedMetrics: scopedRaw.provider === 'MANUAL' ? {
+        provider: 'MANUAL',
+        total: asNumber(scopedRaw.total),
+        confirmed: asNumber(scopedRaw.confirmed),
+        processing: asNumber(scopedRaw.processing),
+        problems: asNumber(scopedRaw.problems),
+        refundCases: asNumber(scopedRaw.refundCases),
+      } : undefined,
       errors: [],
     };
   } catch (error) {
@@ -303,6 +321,7 @@ export async function loadAdminOrderDetail(orderId: string): Promise<AdminOrderD
     externalOrderId: id,
     publicCode: null,
     status: '—',
+    displayStatus: '—',
     sourceCode: '—',
     sourceName: '—',
     buyerName: null,
@@ -342,6 +361,7 @@ export async function loadAdminOrderDetail(orderId: string): Promise<AdminOrderD
       externalOrderId: String(payload.externalOrderId || id),
       publicCode: payload.publicCode != null ? String(payload.publicCode) : null,
       status: String(payload.status || '—'),
+      displayStatus: String(payload.displayStatus || payload.status || '—'),
       sourceCode: String(payload.sourceCode || '—'),
       sourceName: String(payload.sourceName || payload.sourceCode || '—'),
       buyerName: buyer.name != null ? String(buyer.name) : null,

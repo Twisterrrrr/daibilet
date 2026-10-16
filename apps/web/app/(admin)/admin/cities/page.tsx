@@ -2,7 +2,8 @@ import Link from 'next/link';
 
 import { AdminApiErrorBanner } from '@/components/admin/AdminApiErrorBanner';
 import { AdminPagination } from '@/components/admin/AdminPagination';
-import { formatAdminNumber, PUBLIC_SITE_BASE } from '@/lib/admin-ui';
+import { cityTypeLabel } from '@/components/admin/admin-catalog-labels';
+import { buildPageHref, formatAdminNumber, PUBLIC_SITE_BASE } from '@/lib/admin-ui';
 import { loadAdminCitiesList } from '@/server/admin-cities-data';
 
 export const dynamic = 'force-dynamic';
@@ -21,6 +22,7 @@ export default async function AdminCitiesPage({ searchParams }: PageProps) {
   const page = first(raw.page) || '1';
   const current = { q: q || undefined, page };
   const data = await loadAdminCitiesList({ q, page });
+  const backHref = buildPageHref('/admin/cities', current, {});
 
   return (
     <div className="space-y-4">
@@ -28,7 +30,7 @@ export default async function AdminCitiesPage({ searchParams }: PageProps) {
         <div>
           <h2 className="text-xl font-semibold text-slate-900">Города</h2>
           <p className="mt-1 text-sm text-slate-600">
-            Название, slug, SEO и intro в Next.
+            Название, slug, SEO и тексты карточек городов.
           </p>
         </div>
       </header>
@@ -63,7 +65,7 @@ export default async function AdminCitiesPage({ searchParams }: PageProps) {
                 <th className="px-3 py-2 font-medium">Тип</th>
                 <th className="px-3 py-2 font-medium">События</th>
                 <th className="px-3 py-2 font-medium">Площадки</th>
-                <th className="px-3 py-2 font-medium">Public</th>
+                <th className="px-3 py-2 font-medium">На сайте</th>
               </tr>
             </thead>
             <tbody>
@@ -78,14 +80,14 @@ export default async function AdminCitiesPage({ searchParams }: PageProps) {
                   <tr key={row.id || row.slug || row.name} className="border-b border-slate-100">
                     <td className="px-3 py-2">
                       <Link
-                        href={`/admin/cities/${encodeURIComponent(row.id)}`}
+                        href={`/admin/cities/${encodeURIComponent(row.id)}?back=${encodeURIComponent(backHref)}`}
                         className="font-medium text-sky-700 hover:underline"
                       >
                         {row.name}
                       </Link>
                       <div className="mt-0.5 text-xs text-slate-500">{row.slug || ''}</div>
                     </td>
-                    <td className="px-3 py-2 text-xs text-slate-600">{row.type}</td>
+                    <td className="px-3 py-2 text-xs text-slate-600">{cityTypeLabel(row.type)}</td>
                     <td className="px-3 py-2 tabular-nums">{formatAdminNumber(row.events)}</td>
                     <td className="px-3 py-2 tabular-nums">{formatAdminNumber(row.venues)}</td>
                     <td className="px-3 py-2 text-xs">

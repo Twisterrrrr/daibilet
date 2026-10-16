@@ -2,12 +2,14 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 
 import { AdminApiErrorBanner } from '@/components/admin/AdminApiErrorBanner';
-import { formatAdminNumber, PUBLIC_SITE_BASE } from '@/lib/admin-ui';
+import { eventStatusLabel, venueKindLabel, venuePageStatusLabel } from '@/components/admin/admin-catalog-labels';
+import { formatAdminDateTime, formatAdminNumber, PUBLIC_SITE_BASE } from '@/lib/admin-ui';
 import { saveAdminVenueAction } from '@/server/admin-venue-actions';
 import { loadAdminVenueDetail } from '@/server/admin-venues-data';
 
 export const dynamic = 'force-dynamic';
 
+// Keep in sync with backend `normalizeVenuePayload` allowed kinds (incl. GASTRO).
 const KIND_OPTIONS = [
   'VENUE',
   'MUSEUM_ART_SPACE',
@@ -18,10 +20,11 @@ const KIND_OPTIONS = [
   'MEETING_POINT',
   'PARK',
   'MONUMENT',
+  'GASTRO',
+  'TEMPLE',
   'OUTDOOR_LOCATION',
   'SPORT_ACTIVITY_SPACE',
   'ATTRACTION',
-  'TEMPLE',
   'BUS',
   'ONLINE',
   'OTHER',
@@ -47,14 +50,17 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
   const { id: rawId } = await params;
   const id = decodeURIComponent(rawId);
   const rawSearch = await searchParams;
+  // `back` comes from the venues list and keeps the operator's filter context.
+  const back = first(rawSearch.back) || '';
+  const backHref = /^\/admin\/venues(?:\?|$)/.test(back) ? back : '/admin/venues';
   const detail = await loadAdminVenueDetail(id);
   const notice = first(rawSearch.saved) === '1' ? 'Площадка сохранена.' : null;
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
-        <Link href="/admin/venues" className="hover:underline">
-          Площадки
+        <Link href={backHref} className="hover:underline">
+          ← Площадки
         </Link>
         <span>/</span>
         <span className="text-slate-700">{detail.title}</span>
@@ -67,6 +73,23 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
             {detail.city}
             {detail.address ? ` · ${detail.address}` : ''}
           </p>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            <span className="inline-flex items-center rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs text-slate-700">
+              {venueKindLabel(detail.kind)}
+            </span>
+            <span
+              className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs ${
+                detail.pageStatus.toUpperCase() === 'PUBLISHED'
+                  ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                  : 'border-slate-200 bg-slate-50 text-slate-700'
+              }`}
+            >
+              {venuePageStatusLabel(detail.pageStatus)}
+            </span>
+            <span className="inline-flex items-center rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs text-slate-700">
+              {detail.isIndexable ? 'индексируется' : 'не индексируется'}
+            </span>
+          </div>
         </div>
         <div className="flex flex-wrap gap-2">
           {detail.slug ? (
@@ -76,7 +99,7 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
               target="_blank"
               rel="noreferrer"
             >
-              Public
+              Открыть на сайте
             </a>
           ) : null}
         </div>
@@ -93,8 +116,9 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
       {detail.found ? (
         <form action={saveAdminVenueAction} className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
           <input type="hidden" name="id" value={detail.id} />
+          <input type="hidden" name="back" value={backHref} />
           <div className="grid gap-3 md:grid-cols-2">
-            <Field label="Title">
+            <Field label="Название">
               <input
                 name="title"
                 required
@@ -102,20 +126,23 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
                 className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
               />
             </Field>
-            <Field label="Kind">
+            <Field label="Тип площадки">
               <select
                 name="kind"
                 defaultValue={detail.kind}
                 className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
               >
+                {!KIND_OPTIONS.includes(detail.kind) ? (
+                  <option value={detail.kind}>{venueKindLabel(detail.kind)} (текущее значение)</option>
+                ) : null}
                 {KIND_OPTIONS.map((kind) => (
                   <option key={kind} value={kind}>
-                    {kind}
+                    {venueKindLabel(kind)}
                   </option>
                 ))}
               </select>
             </Field>
-            <Field label="Page status">
+            <Field label="Статус страницы">
               <select
                 name="pageStatus"
                 defaultValue={detail.pageStatus}
@@ -128,7 +155,7 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
                 ))}
               </select>
             </Field>
-            <Field label="Hero image URL">
+            <Field label="Обложка (URL)">
               <input
                 name="heroImageUrl"
                 defaultValue={detail.heroImageUrl || ''}
@@ -157,7 +184,7 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
               />
             </Field>
           </div>
-          <Field label="Short description">
+          <Field label="Короткое описание">
             <textarea
               name="shortDescription"
               rows={2}
@@ -165,7 +192,7 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
               className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
             />
           </Field>
-          <Field label="Hook fact (карточка локации)">
+          <Field label="Ключевой факт (карточка локации)">
             <input
               name="hookFact"
               defaultValue={detail.hookFact || ''}
@@ -173,7 +200,7 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
               className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
             />
           </Field>
-          <Field label="Description">
+          <Field label="Описание">
             <textarea
               name="description"
               rows={5}
@@ -260,7 +287,8 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
                   {event.title}
                 </Link>
                 <span className="text-xs text-slate-500">
-                  {event.status}
+                  {eventStatusLabel(event.status)}
+                  {event.startsAt ? ` · ${formatAdminDateTime(event.startsAt)}` : ''}
                   {event.priceFrom != null ? ` · от ${formatAdminNumber(event.priceFrom)} ₽` : ''}
                 </span>
               </li>
