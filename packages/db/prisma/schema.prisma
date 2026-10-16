@@ -2377,6 +2377,7 @@ model ChatMessage {
   createdAt DateTime          @default(now())
 
   @@index([sessionId, createdAt])
+  @@index([sender, createdAt])
   @@index([telegramMessageId])
   @@map("chat_messages")
 }
