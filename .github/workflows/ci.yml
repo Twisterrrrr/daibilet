@@ -9,6 +9,8 @@ on:
 jobs:
   buyer-ticket-mail-db-test:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://daibilet:daibilet@127.0.0.1:5437/daibilet?schema=public
     services:
       postgres:
         image: postgres:17-alpine
@@ -40,6 +42,8 @@ jobs:
 
   validate-build-test:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://daibilet:daibilet@127.0.0.1:5437/daibilet?schema=public
     services:
       postgres:
         image: postgres:17-alpine
