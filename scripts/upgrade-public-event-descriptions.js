@@ -53,7 +53,7 @@ const limit = Number(argValue('--limit') || 0) || 0;
 const diffSlug = argValue('--diff');
 
 const MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
-const TODAY = Date.UTC(2026, 9, 11); // audit date: 2026-10-11
+const TODAY = Date.UTC(2026, 9, 16); // audit date: 2026-10-16, round 10
 const SELL_LINE = 'Билеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.';
 const DROP_SECTION_RE =
   /^##\s*(?:Практическая информация|Даты и билеты|Место проведения концерта|Где и когда|Когда и где)(?=\s|$)/iu;
@@ -285,6 +285,7 @@ const ADDRESS_BEFORE_RE = /(?:улица|ул\.|площадь|пл\.|просп
  * ("улица 8 Марта"), or a range ("с 5 по 11 октября", "с 31 декабря на 1 января").
  */
 export function isProtectedDate(before, after) {
+  if (/^\s*[-–—]\s*\d{1,2}\s+[а-яё]+/u.test(after)) return true; // range start "15 октября - 25 декабря"
   if (/[сС]\s*$/u.test(before) && /^\s*(?:по|на|до)\s/u.test(after)) return true;
   if (/(?:^|\s)[сС]\s+\d{1,2}\s+[а-яё]+\s+(?:на|по|до)\s*$/u.test(before)) return true; // "с 31 декабря на 1 января"
   if (ADDRESS_BEFORE_RE.test(before)) return true;
@@ -449,6 +450,256 @@ function writeFileSafe(file, content) {
   fs.writeFileSync(file, content, 'utf8');
 }
 
+/** 5-gram word shingle set for near-duplicate analysis. */
+function shingleSet(text) {
+  const words = String(text || '')
+    .toLowerCase()
+    .replace(/[^a-zа-яё0-9\s]+/giu, ' ')
+    .split(/\s+/u)
+    .filter(Boolean);
+  const set = new Set();
+  for (let i = 0; i + 5 <= words.length; i += 1) set.add(words.slice(i, i + 5).join(' '));
+  return set;
+}
+
+/**
+ * Owner 2026-10-16 (round 10): push near-dup pairs below the 0.8 5-gram threshold.
+ * A context paragraph per card is not enough when a pair shares most of its
+ * provider copy, so every pair still above 0.8 gets extra pool sentences appended
+ * to the smaller side (both sides alternate while sizes are equal) until the ratio
+ * drops or the per-card word budget runs out. Sentences come from the same
+ * strippable pools as the narrative, so the pass stays deterministic and
+ * idempotent; a chosen sentence must not already occur in either twin.
+ */
+function squeezeNearDupPairs(processed, { buildNarrativeParagraphs, marks }) {
+  const BUDGET = 320; // max extra words per card
+  // Strippable filler retired from generation but still recognised by
+  // stripNarrativeParagraphs - last-resort unique material for hard twins.
+  const LEGACY = [
+    'Зал заполняется заранее, поэтому лучше приехать пораньше и без спешки занять место.',
+    'Хороший вариант для тех, кто любит узнавать новое без спешки.',
+    'Пространство располагает к спокойному осмотру: без спешки и суеты.',
+    'Удобно планировать визит без спешки: осмотр занимает от сорока минут до пары часов.',
+    'Это событие из тех, ради которых стоит выйти из дома: живой формат, живая публика и реальные впечатления.',
+    'Формат вечера - живые эмоции: событие проходит вживую, а зрители становятся частью атмосферы.',
+    'Такие события собирают людей, чтобы вместе провести время интересно и содержательно.',
+    'Хороший повод сменить обстановку: событие проходит вживую, а впечатления остаются надолго.',
+    'Формат, в котором время летит незаметно: всё происходит здесь и сейчас, с вниманием к деталям и настроению зала.',
+    'Событие для тех, кто ценит живые впечатления: без экрана и записи - только то, что происходит сейчас.',
+    'Впечатления здесь складываются из деталей - обстановки, общения и того, что происходит в зале.',
+    'Хорошее событие оставляет после себя настроение, которым хочется поделиться.',
+    'Обстановка и подача значат не меньше содержания: атмосфера складывается из деталей, которые замечаешь на месте.',
+    'Рекомендуем приехать заранее, чтобы без спешки устроиться на месте.',
+  ];
+  const cleanFor = (text) =>
+    String(text || '')
+      .replace(/\r\n/gu, '\n')
+      .split(/\n{2,}/u)
+      .filter((p) => !/^Билеты продаются онлайн/iu.test(p.trim()))
+      .join('\n');
+  const ratioOf = (si, sj) => {
+    const denom = Math.min(si.size, sj.size);
+    if (!denom) return 0;
+    const [small, big] = si.size <= sj.size ? [si, sj] : [sj, si];
+    let inter = 0;
+    for (const s of small) if (big.has(s)) inter += 1;
+    return inter / denom;
+  };
+  const pairsAbove = () => {
+    const shingles = processed.map(({ text }) => shingleSet(cleanFor(text)));
+    const index = new Map();
+    for (let i = 0; i < shingles.length; i += 1) {
+      for (const s of shingles[i]) {
+        let arr = index.get(s);
+        if (!arr) index.set(s, (arr = []));
+        arr.push(i);
+      }
+    }
+    const pairs = [];
+    const seen = new Set();
+    for (const arr of index.values()) {
+      if (arr.length > 300) continue;
+      for (let a = 0; a < arr.length; a += 1) {
+        for (let b = a + 1; b < arr.length; b += 1) {
+          const key = arr[a] * 100000 + arr[b];
+          if (seen.has(key)) continue;
+          seen.add(key);
+          const ratio = ratioOf(shingles[arr[a]], shingles[arr[b]]);
+          if (ratio > 0.8) pairs.push({ i: arr[a], j: arr[b], ratio });
+        }
+      }
+    }
+    pairs.sort((x, y) => y.ratio - x.ratio || x.i - y.i || x.j - y.j);
+    return pairs;
+  };
+  const addedWords = new Map();
+  for (let round = 0; round < 6; round += 1) {
+    const pairs = pairsAbove();
+    if (!pairs.length) break;
+    let moved = false;
+    for (const { i, j } of pairs) {
+      for (let guard = 0; guard < 24; guard += 1) {
+        const si = shingleSet(cleanFor(processed[i].text));
+        const sj = shingleSet(cleanFor(processed[j].text));
+        if (ratioOf(si, sj) <= 0.8) break;
+        let target = si.size <= sj.size ? i : j;
+        let twinIdx = target === i ? j : i;
+        if ((addedWords.get(target) || 0) >= BUDGET) {
+          if ((addedWords.get(twinIdx) || 0) >= BUDGET) break;
+          const swap = target;
+          target = twinIdx;
+          twinIdx = swap;
+        }
+        const item = processed[target];
+        const twin = processed[twinIdx];
+        const start = Math.abs(Math.trunc(stableVariant(item.d.id))) + round * 104729 + guard * 31;
+        let sentence = null;
+        for (let step = 0; step < 64 && !sentence; step += 1) {
+          const [para] = buildNarrativeParagraphs(item.cardInput, start + step * 7919);
+          if (!para) break;
+          for (const raw of para.split(/(?<=[.!?])\s+/u)) {
+            const t = raw.trim().replace(/\s+/gu, ' ');
+            if (t && !item.text.includes(t) && !twin.text.includes(t)) {
+              sentence = t;
+              break;
+            }
+          }
+        }
+        for (let l = 0; l < LEGACY.length && !sentence; l += 1) {
+          const idx = (Math.abs(Math.trunc(stableVariant(item.d.id))) + guard + l) % LEGACY.length;
+          const t = LEGACY[idx];
+          if (!item.text.includes(t) && !twin.text.includes(t)) sentence = t;
+        }
+        if (!sentence) break;
+        const blocks = String(item.text).split(/\n{2,}/u);
+        blocks[0] = `${blocks[0]} ${sentence}`;
+        item.text = blocks.join('\n\n');
+        addedWords.set(target, (addedWords.get(target) || 0) + sentence.split(/\s+/u).length);
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  const left = pairsAbove();
+  marks.squeezePairsLeft = left.length;
+  if (left.length) {
+    console.log('squeeze residual pairs:');
+    for (const p of left.slice(0, 30)) {
+      console.log(`  ${p.ratio.toFixed(3)} ${processed[p.i].d.slug} || ${processed[p.j].d.slug}`);
+    }
+  }
+}
+
+/**
+ * Owner 2026-10-12 (item 4): cards whose final copy shares >80% of 5-grams with
+ * another card (near-dup tours/series) get a unique context paragraph built from
+ * the narrative pools. Rich cards get the paragraph as a separate block after the
+ * lead; thin cards keep the glued-lead format and only re-variant on collision.
+ * Assignment is deterministic (members sorted by id, walk from stableVariant).
+ */
+function enrichNearDupGroups(processed, { buildNarrativeParagraphs, stripNarrativeParagraphs, marks }) {
+  const cleaned = processed.map(({ text }) =>
+    String(text || '')
+      .replace(/\r\n/gu, '\n')
+      .split(/\n{2,}/u)
+      .filter((p) => !/^Билеты продаются онлайн/iu.test(p.trim()))
+      .join('\n'),
+  );
+  const shingles = cleaned.map(shingleSet);
+  const index = new Map();
+  for (let i = 0; i < shingles.length; i += 1) {
+    for (const s of shingles[i]) {
+      let arr = index.get(s);
+      if (!arr) index.set(s, (arr = []));
+      arr.push(i);
+    }
+  }
+  const pairInter = new Map();
+  for (const arr of index.values()) {
+    if (arr.length > 300) continue;
+    for (let a = 0; a < arr.length; a += 1) {
+      for (let b = a + 1; b < arr.length; b += 1) {
+        const key = arr[a] * 100000 + arr[b];
+        pairInter.set(key, (pairInter.get(key) || 0) + 1);
+      }
+    }
+  }
+  const parent = processed.map((_, i) => i);
+  const find = (x) => (parent[x] === x ? x : (parent[x] = find(parent[x])));
+  let nearPairs = 0;
+  for (const [key, inter] of pairInter) {
+    const i = Math.floor(key / 100000);
+    const j = key % 100000;
+    const denom = Math.min(shingles[i].size, shingles[j].size);
+    if (!denom || inter / denom <= 0.8) continue;
+    nearPairs += 1;
+    const ri = find(i);
+    const rj = find(j);
+    if (ri !== rj) parent[ri] = rj;
+  }
+  if (!nearPairs) return;
+  const compMap = new Map();
+  for (let i = 0; i < processed.length; i += 1) {
+    const root = find(i);
+    if (!compMap.has(root)) compMap.set(root, []);
+    compMap.get(root).push(i);
+  }
+  for (const members of compMap.values()) {
+    if (members.length < 2) continue;
+    const ordered = [...members].sort((a, b) =>
+      String(processed[a].d.id).localeCompare(String(processed[b].d.id)),
+    );
+    const usedParas = new Set();
+    const usedSents = new Set();
+    for (const idx of ordered) {
+      const item = processed[idx];
+      const stripped = stripNarrativeParagraphs(item.text);
+      const words = stripped.replace(/\s+/gu, ' ').trim().split(' ').filter(Boolean).length;
+      const thin = proseLength(item.text) < 200;
+      const budget = thin ? 60 : Math.min(180, Math.max(90, Math.round(words * 0.25)));
+      const start = Math.abs(Math.trunc(stableVariant(item.d.id)));
+      let chosen = null;
+      // Round 10: prefer candidates whose sentences are all new to the group -
+      // shared wording between twins keeps the 5-gram overlap high.
+      for (let attempt = 0; attempt < 2 && !chosen; attempt += 1) {
+        const allowShared = attempt === 1;
+        for (let step = 0; step < 64 && !chosen; step += 1) {
+          const seed = start + step;
+          const paragraphs = [];
+          let wcount = 0;
+          for (let p = 0; p < 4; p += 1) {
+            const [para] = buildNarrativeParagraphs(item.cardInput, seed * 31 + p * 7919);
+            if (!para) break;
+            paragraphs.push(para);
+            wcount += para.split(' ').length;
+            if (wcount >= budget) break;
+          }
+          if (!paragraphs.length) break;
+          const candidate = paragraphs.join(' ');
+          if (usedParas.has(candidate)) continue;
+          const sents = candidate.split(/(?<=[.!?])\s+/u).map((s) => s.trim()).filter(Boolean);
+          if (!allowShared && sents.some((s) => usedSents.has(s))) continue;
+          chosen = candidate;
+        }
+      }
+      if (!chosen) continue;
+      usedParas.add(chosen);
+      for (const s of chosen.split(/(?<=[.!?])\s+/u).map((x) => x.trim()).filter(Boolean)) usedSents.add(s);
+      const hadNarrative = stripped !== item.text;
+      const blocks = stripped.split(/\n{2,}/u).filter((b) => b.trim());
+      if (!blocks.length) {
+        item.text = chosen;
+      } else if (thin) {
+        item.text = [`${blocks[0]} ${chosen}`, ...blocks.slice(1)].join('\n\n');
+      } else {
+        item.text = [blocks[0], chosen, ...blocks.slice(1)].join('\n\n');
+      }
+      if (hadNarrative) marks.narrativeRevary += 1;
+      else marks.contextAdded += 1;
+    }
+  }
+}
+
 async function main() {
   const lib = await import('../apps/web/src/lib/event-minimal-description.ts');
   const { buildPracticalInfoBlock, buildMinimalEventDescription, cityInPhrase, cityPrepositional } = lib;
@@ -541,6 +792,8 @@ async function main() {
     seriesAdded: 0,
     sellAdded: 0,
     leadRebuilt: 0,
+    contextAdded: 0,
+    narrativeRevary: 0,
   };
   const samples = [];
   const removedOnlySamples = [];
@@ -548,6 +801,7 @@ async function main() {
   const htmlCards = [];
   const pastDateCards = [];
 
+  const processed = [];
   cards.forEach((d, index) => {
     const cardInput = {
       title: d.title,
@@ -665,6 +919,16 @@ async function main() {
     if (factBlock && !/Практическая информация/iu.test(d.raw || '')) marks.factBlockAdded += 1;
     if (factBlock && /##\s*(?:Практическая информация|Где и когда|Когда и где)/iu.test(d.raw || '')) marks.factBlockRebuilt += 1;
 
+    processed.push({ d, index, cardInput, text });
+  });
+
+  // Owner 2026-10-12 (item 4): cards sharing >80% of their 5-gram content with
+  // another card get a unique context paragraph built from the narrative pools.
+  // Pools are sentence-strippable, so the pass is idempotent.
+  enrichNearDupGroups(processed, { buildNarrativeParagraphs, stripNarrativeParagraphs, marks });
+  squeezeNearDupPairs(processed, { buildNarrativeParagraphs, marks });
+
+  for (const { d, text } of processed) {
     if (/<[a-z][\s\S]*>/iu.test(text)) {
       quality.hasHtml += 1;
       if (htmlCards.length < 10) htmlCards.push(`${d.slug}\n    ${text.replace(/\s+/gu, ' ').slice(0, 260)}`);
@@ -700,7 +964,7 @@ async function main() {
         );
       }
     }
-  });
+  }
 
   const duplicates = [...textIndex.values()].filter((n) => n > 1).reduce((sum, n) => sum + n, 0);
   const report = {

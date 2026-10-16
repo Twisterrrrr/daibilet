@@ -218,7 +218,8 @@ reap_orphan_next_build_workers "pre-build"
 # Save healthy build for rollback
 if [[ -f "${WEB_NEXT_DIR}/prerender-manifest.json" && -f "${WEB_NEXT_DIR}/BUILD_ID" ]]; then
   rm_rf_deploy "${WEB_NEXT_PREV}"
-  cp -a "${WEB_NEXT_DIR}" "${WEB_NEXT_PREV}"
+  mkdir -p "${WEB_NEXT_PREV}"
+  rsync -a --exclude='/cache/' --exclude='/server/route-cache/' "${WEB_NEXT_DIR}/" "${WEB_NEXT_PREV}/"
   echo "Saved healthy .next → .next.prev (BUILD_ID=$(cat "${WEB_NEXT_DIR}/BUILD_ID"))"
 fi
 
@@ -326,7 +327,7 @@ fi
 # Serve /images/* and /_next/static from disk (bypass Node + proxy_cache).
 # AFTER admin patch: that script rewrites daibilet.conf and would drop these aliases.
 NGINX_PATCHED=0
-for _patch in patch-prod-nginx-images-static.py patch-prod-nginx-next-static.py patch-prod-nginx-social-preview.py patch-prod-nginx-events-seo.py; do
+for _patch in patch-prod-nginx-images-static.py patch-prod-nginx-next-static.py patch-prod-nginx-social-preview.py patch-prod-nginx-events-seo.py patch-prod-image-crawlers.py; do
   if [[ -f "$APP_DIR/deploy/nginx/$_patch" ]]; then
     if python3_deploy "$APP_DIR/deploy/nginx/$_patch"; then
       NGINX_PATCHED=1

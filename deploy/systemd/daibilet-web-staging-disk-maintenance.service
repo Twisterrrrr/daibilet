@@ -1,0 +1,12 @@
+[Unit]
+Description=Daibilet staging web cache maintenance
+ConditionPathExists=/opt/daibilet-staging/apps/web/.next/BUILD_ID
+
+[Service]
+Type=oneshot
+Environment=APP_DIR=/opt/daibilet-staging
+Environment=WEB_SERVICE=daibilet-web-staging
+Environment=DAIBILET_WEB_PORT=3000
+Environment=CACHE_LIMIT_MIB=2048
+Environment=REQUIRE_ROLLBACK=0
+ExecStart=/usr/bin/env bash /opt/daibilet/deploy/scripts/maintain-web-disk.sh --apply
