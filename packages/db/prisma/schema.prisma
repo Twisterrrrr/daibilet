@@ -7,6 +7,95 @@ datasource db {
   provider = "postgresql"
 }
 
+enum AdminUserState {
+  INVITED
+  ACTIVE
+  SUSPENDED
+}
+
+enum AdminRole {
+  SUPERADMIN
+  PRODUCT
+  SUPPORT
+  FINANCE
+  CATALOG_EDITOR
+  COPYWRITER
+  SEO
+  INTEGRATIONS
+  AUDITOR
+}
+
+model AdminUser {
+  id              String         @id @default(cuid())
+  email           String         @unique
+  displayName     String
+  passwordHash    String?
+  state           AdminUserState @default(INVITED)
+  roles           AdminRole[]    @default([])
+  permissionEpoch Int            @default(0)
+  emailVerifiedAt DateTime?
+  lastLoginAt     DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  sessions           AdminSession[]
+  invitationsSent    AdminInvitation[] @relation("AdminInvitationInviter")
+  invitation         AdminInvitation?  @relation("AdminInvitationRecipient")
+  auditEntries       AdminAuditLog[]
+
+  @@index([state])
+}
+
+model AdminInvitation {
+  id          String    @id @default(cuid())
+  userId      String    @unique
+  invitedById String?
+  tokenHash   String    @unique
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+  revokedAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  user      AdminUser  @relation("AdminInvitationRecipient", fields: [userId], references: [id], onDelete: Cascade)
+  invitedBy AdminUser? @relation("AdminInvitationInviter", fields: [invitedById], references: [id], onDelete: SetNull)
+
+  @@index([expiresAt])
+}
+
+model AdminSession {
+  id          String    @id @default(cuid())
+  userId      String
+  tokenHash   String    @unique
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  lastSeenAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  user AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revokedAt])
+  @@index([expiresAt])
+}
+
+model AdminAuditLog {
+  id            String   @id @default(cuid())
+  actorId       String?
+  action        String
+  permission    String?
+  targetType    String?
+  targetId      String?
+  outcome       String
+  correlationId String?
+  detail        Json?
+  createdAt     DateTime @default(now())
+
+  actor AdminUser? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([actorId, createdAt])
+  @@index([targetType, targetId, createdAt])
+  @@index([createdAt])
+}
+
 enum SourceCode {
   TICKETSCLOUD
   TEPLOHOD
