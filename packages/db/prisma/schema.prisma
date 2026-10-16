@@ -2341,3 +2341,40 @@ model BuyerTicketEmailDelivery {
 
   @@index([status, nextAttemptAt])
 }
+
+enum ChatMessageSender {
+  USER
+  ADMIN
+}
+
+/// Public support chat thread, one per anonymous widget visitor.
+model ChatSession {
+  id String @id @default(cuid())
+  /// Anonymous widget identity (random localStorage key) - the only handle the
+  /// floating widget has to fetch its own thread. Never shown in UI.
+  visitorKey String   @unique
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  messages ChatMessage[]
+
+  @@index([updatedAt])
+  @@map("chat_sessions")
+}
+
+model ChatMessage {
+  id        String            @id @default(cuid())
+  sessionId String
+  session   ChatSession       @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  text      String
+  sender    ChatMessageSender
+  /// Telegram message_id of the forwarded notification. Telegram replies are
+  /// matched back to the thread by `Reply to` this id - without it the webhook
+  /// cannot resolve which session an admin reply belongs to.
+  telegramMessageId Int?
+  createdAt DateTime          @default(now())
+
+  @@index([sessionId, createdAt])
+  @@index([telegramMessageId])
+  @@map("chat_messages")
+}
