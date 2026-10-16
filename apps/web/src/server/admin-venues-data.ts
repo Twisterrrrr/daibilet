@@ -49,7 +49,13 @@ export type AdminVenueDetailData = {
   isIndexable: boolean;
   kind: string;
   pageStatus: string;
-  events: Array<{ id: string; title: string; status: string; priceFrom: number | null }>;
+  events: Array<{
+    id: string;
+    title: string;
+    status: string;
+    priceFrom: number | null;
+    startsAt: string | null;
+  }>;
   errors: string[];
 };
 
@@ -177,6 +183,7 @@ export async function loadAdminVenueDetail(venueId: string): Promise<AdminVenueD
           title: String(row.title || 'Событие'),
           status: String(row.status || '—'),
           priceFrom: row.priceFrom == null ? null : asNumber(row.priceFrom),
+          startsAt: row.startsAt != null ? String(row.startsAt) : null,
         };
       }),
       errors,
