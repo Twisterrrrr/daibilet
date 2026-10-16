@@ -1,6 +1,6 @@
 # UI-RBAC-0: карта страниц, действий и API админки
 
-Дата: 2026-10-15. Автор: Cline (UI-инвентаризация). Статус: **на согласование Codex** - вход для server guards.
+Дата: 2026-10-15. Автор: Cline (UI-инвентаризация). Решения по GAP приняты Codex 2026-10-16; карта остаётся входом для server guards, а не свидетельством действующего RBAC.
 
 Источники: `apps/web/app/(admin)/admin`, `apps/web/src/server/admin-*.ts`, словарь прав `packages/contracts/src/admin-access.ts` (`ADMIN_PERMISSIONS`, `ADMIN_ROLES`), проект RBAC [admin-rbac-design-2026-10.md](./admin-rbac-design-2026-10.md).
 
@@ -78,12 +78,12 @@
 | `saveAdminLandingSeoAction` | admin-landing-actions | публичные | `seo.edit` | `PATCH /api/admin/landings/:slug` | action 403 |
 | `saveAdminLandingMatchAction` (матчи лендинга) | admin-landing-actions | публичные | `seo.edit` (альтернатива `catalog.edit` - на решение Codex) | `POST /api/admin/landings/:slug/matches/:eventId` | action 403 |
 | `operateInternalAdminOrderAction` (refund) | admin-order-actions | финансы | `refunds.execute` | `POST /api/internal/admin/orders/:key/operation` (finance host) | action 403 |
-| `operateInternalAdminOrderAction` (cancel неоплаченного) | admin-order-actions | финансы | **GAP**: права на отмену нет; предложение `orders.cancel` либо приравнять к `refunds.execute` | тот же POST | action 403 |
+| `operateInternalAdminOrderAction` (cancel неоплаченного) | admin-order-actions | финансы | `orders.cancel` | тот же POST | action 403 |
 | `syncAdminOrdersTcAction` | admin-order-actions | технические | `integrations.retry` | `POST /api/admin/orders/sync` | action 403 |
-| `archiveAdminOrdersBulkAction` (массовая архивация) | admin-order-actions | финансы | **GAP**: нет права на операции с заказами; предложение `orders.manage` | `POST /api/admin/orders/archive` | action 403 |
-| `archiveAdminOrderAction` / `unarchiveAdminOrderAction` | admin-order-actions | финансы | **GAP** (`orders.manage`) | `POST /api/admin/orders/:id/archive|unarchive` | action 403 |
-| `upsertAdminOrderTicketAction` (ticket-link) | admin-order-actions | финансы | **GAP** (`orders.manage`) | `POST /api/admin/orders/:id/tickets` | action 403 |
-| `deleteAdminOrderAction` (жёсткое удаление) | admin-order-actions | финансы | **GAP**: деструктивная операция; предложение `orders.delete`, только SUPERADMIN, всегда аудит | `DELETE /api/admin/orders/:id` | action 403 |
+| `archiveAdminOrdersBulkAction` (массовая архивация) | admin-order-actions | финансы | `orders.manage` | `POST /api/admin/orders/archive` | action 403 |
+| `archiveAdminOrderAction` / `unarchiveAdminOrderAction` | admin-order-actions | финансы | `orders.manage` | `POST /api/admin/orders/:id/archive|unarchive` | action 403 |
+| `upsertAdminOrderTicketAction` (ticket-link) | admin-order-actions | финансы | `orders.manage` | `POST /api/admin/orders/:id/tickets` | action 403 |
+| `deleteAdminOrderAction` (жёсткое удаление) | admin-order-actions | финансы | штатного права нет: действие и endpoint вывести из рабочего интерфейса; исторические данные сохранять | `DELETE /api/admin/orders/:id` | закрыть, затем удалить маршрут |
 | `moderateAdminReviewAction` (approve/reject) | admin-review-actions | публичные | `content.publish` | `POST /api/admin/reviews/:id/:action` | action 403 |
 | `triggerSourceSyncAction` (TC / Teplohod) | admin-source-actions | технические | `integrations.retry` | `POST /api/admin/sources/ticketscloud/sync`, `POST /api/v1/tep/sync` | action 403 |
 | `saveAdminVenueAction` | admin-venue-actions | публичные | `catalog.edit` | `PATCH /api/admin/venues/:id` | action 403 |
@@ -99,7 +99,7 @@
 | `GET /api/admin/dashboard` | публичные/технические | `catalog.read` + `seo.read` + `integrations.read` | смешанный ответ; варианты обработки - в GAP №6 |
 | `GET /api/admin/sources` | технические | `integrations.read` | |
 | `GET /api/admin/orders`, `GET /api/admin/orders/:id` | финансы | `orders.read`; поля buyer - при `orders.pii.read` | catalog API |
-| `GET /api/internal/admin/orders`, `GET /api/internal/admin/orders/:code` | финансы/контакт | `orders.read` + `finance.read`; buyer - при `orders.pii.read` | finance host; service token Next; идентичность сотрудника - через finance bridge (срез 4 плана) |
+| `GET /api/internal/admin/orders`, `GET /api/internal/admin/orders/:code` | заказ/финансы/контакт | `orders.read` для основных полей; `finance.read` для платежей, ledger и возвратов; `orders.pii.read` для buyer | finance host должен проецировать поля по правам сотрудника; сервисного токена Next недостаточно |
 | `GET /api/admin/buyers` | контакт | `orders.pii.read` | |
 | `GET /api/admin/order-event-candidates` | публичные | `catalog.read` | |
 | `GET /api/admin/events`, `GET /api/admin/events/:id`, `GET /api/admin/taxonomy` | публичные | `catalog.read` | |
@@ -109,14 +109,16 @@
 | `GET /api/admin/reviews` | публичные | `content.read` | |
 | `GET /api/admin/event-change-requests[/:id]` | публичные | `suppliers.read` | |
 
-## 5. GAP-ы словаря прав (требуют решения Codex)
+## 5. Решения по шести GAP
 
-1. **Операции с заказами** (архив/разархив/массовая архивация/ticket-link) не выражены в `ADMIN_PERMISSIONS`. Предложение: `orders.manage`. До решения guards для этих действий не реализуются.
-2. **Жёсткое удаление заказа** (`deleteAdminOrderAction`) - деструктивное. Предложение: `orders.delete`, только SUPERADMIN, всегда в аудит.
-3. **Отмена неоплаченного заказа** (`cancel` в `operateInternalAdminOrderAction`) - денежно-близкая операция без права в словаре. Предложение: `orders.cancel` либо явное решение приравнять к `refunds.execute`.
-4. **Матчи лендинга** (`saveAdminLandingMatchAction`): `seo.edit` или `catalog.edit` - требуется выбор (меняет и SEO-выдачу, и состав подборки).
-5. **Статусная семантика статей**: один `saveAdminArticleAction` может перевести статью в PUBLISHED. Для guard-а нужно либо разделить форму на «сохранить черновик» (`content.edit`) и «опубликовать» (`content.publish`), либо серверная проверка `content.publish` при целевом статусе PUBLISHED.
-6. **`GET /api/admin/dashboard`** отдаёт секции для трёх разных прав. Варианты: (а) guard по любому из прав с фильтрацией секций на сервере, (б) три отдельных endpoint. Предложение: (а) - меньше ломает текущий UI.
+1. **Операции с заказами:** добавить `orders.manage` для архива и ticket-link. На первом выпуске оно есть только у SUPERADMIN; после аудита действий его можно разделить на более узкие права.
+2. **Жёсткое удаление заказа:** не добавлять `orders.delete`. Убрать кнопку и закрыть DELETE endpoint при переходе на RBAC. Исправление ошибочного импорта делать отдельной обслуживающей процедурой с журналом, не действием из карточки.
+3. **Отмена неоплаченного:** добавить отдельное `orders.cancel` для FINANCE и SUPERADMIN. Отмена брони не равна исполнению денежного возврата; `refunds.execute` остаётся самостоятельным правом.
+4. **Матчи лендинга:** `seo.edit`. Операция управляет составом SEO-подборки, не полями исходного события.
+5. **Статьи:** при сохранении целевого состояния `PUBLISHED` или `isFeatured=true` сервер требует `content.publish`, включая редактирование уже опубликованного материала. Для черновика достаточно `content.edit`. Проверять итоговое состояние после объединения с текущими данными, а не доверять только присланным полям формы.
+6. **Dashboard:** оставить один маршрут с серверной проекцией по правам на отдельные секции. Любое доступное право открывает только свою секцию; отсутствующие секции не должны возвращаться в payload. Финансовая сводка загружается отдельно из двух API и требует оба `finance.summary.read` и `orders.read`. UI показывает 403 или недоступность блока, а не ноль.
+
+Смешанные ответы заказов также требуют серверной проекции: `orders.read` не подразумевает доступ к контактам или деталям платежа. Скрытая колонка в браузере не предотвращает утечку через прямой API-запрос.
 
 ## 6. Сводка прав по профилям (кросс-проверка сценариев RBAC-дизайна)
 
