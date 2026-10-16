@@ -19,6 +19,7 @@ type Props = {
   eventId: string;
   eventSlug?: string | null;
   venueLinks: AdminEventDetailData['venueLinks'];
+  queue?: { back?: string; next?: string };
 };
 
 function toRows(links: AdminEventDetailData['venueLinks']): LinkRow[] {
@@ -38,7 +39,7 @@ function confidenceBadgeClass(confidence: VenueLinkSuggestion['confidence']) {
   return 'bg-slate-100 text-slate-600';
 }
 
-export function AdminEventVenueLinksForm({ eventId, eventSlug, venueLinks }: Props) {
+export function AdminEventVenueLinksForm({ eventId, eventSlug, venueLinks, queue }: Props) {
   const [rows, setRows] = useState<LinkRow[]>(() => toRows(venueLinks));
   const [suggestions, setSuggestions] = useState<VenueLinkSuggestion[]>([]);
   const [selected, setSelected] = useState<Record<string, boolean>>({});
@@ -129,6 +130,8 @@ export function AdminEventVenueLinksForm({ eventId, eventSlug, venueLinks }: Pro
     >
       <input type="hidden" name="id" value={eventId} />
       <input type="hidden" name="slug" value={eventSlug || ''} />
+      <input type="hidden" name="back" value={queue?.back || ''} />
+      <input type="hidden" name="next" value={queue?.next || ''} />
       {rows.map((row, index) => (
         <div key={`link-row-${index}`}>
           <input type="hidden" name="venueIds" value={row.venueId} />

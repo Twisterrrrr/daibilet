@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 import { AdminApiErrorBanner } from '@/components/admin/AdminApiErrorBanner';
 import { AdminEventEditor } from '@/components/admin/AdminEventEditor';
 import { loadAdminEventDetail, loadAdminTaxonomy } from '@/server/admin-events-data';
@@ -28,9 +30,36 @@ export default async function AdminEventDetailPage({ params, searchParams }: Pag
   const id = decodeURIComponent(rawId);
   const rawSearch = await searchParams;
   const [detail, taxonomy] = await Promise.all([loadAdminEventDetail(id), loadAdminTaxonomy()]);
+  // Queue context from the events list: back keeps the selection, next opens
+  // the following task without returning to the list.
+  const back = first(rawSearch.back) || '';
+  const backHref = back.startsWith('/admin/events') ? back : '/admin/events';
+  const nextId = (first(rawSearch.next) || '').trim();
+  const nextHref = nextId
+    ? `/admin/events/${encodeURIComponent(nextId)}?back=${encodeURIComponent(backHref)}`
+    : null;
 
   return (
     <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+          <Link href={backHref} className="hover:underline">
+            ← К очереди
+          </Link>
+          <span>/</span>
+          <span className="text-slate-700">{detail.found ? detail.id : id}</span>
+        </div>
+        {nextHref ? (
+          <Link
+            href={nextHref}
+            className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
+          >
+            Следующая задача →
+          </Link>
+        ) : (
+          <span className="text-xs text-slate-400">Конец очереди</span>
+        )}
+      </div>
       <AdminApiErrorBanner errors={[...detail.errors, ...taxonomy.errors]} />
       {!detail.found && detail.errors.length === 0 ? (
         <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-900">
@@ -41,6 +70,7 @@ export default async function AdminEventDetailPage({ params, searchParams }: Pag
         detail={detail}
         taxonomy={taxonomy}
         notice={noticeFromSearch(rawSearch)}
+        queue={{ back: backHref, next: nextId || undefined }}
       />
     </div>
   );

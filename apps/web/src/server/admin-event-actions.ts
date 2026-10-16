@@ -11,6 +11,16 @@ function emptyToNull(value: FormDataEntryValue | null): string | null {
   return trimmed ? trimmed : null;
 }
 
+/** Carry queue context (back/next) through save redirects so the workbench flow survives. */
+function queueSuffix(formData: FormData): string {
+  const params = new URLSearchParams();
+  const back = String(formData.get('back') || '').trim();
+  const next = String(formData.get('next') || '').trim();
+  if (back.startsWith('/admin/events')) params.set('back', back);
+  if (next) params.set('next', next);
+  return params.size ? `&${params.toString()}` : '';
+}
+
 /** Bust public `/events/[slug]` Data Cache + HTML after admin edits. */
 function revalidatePublicEventSurfaces(formData: FormData) {
   revalidateTag(EVENT_PAGE_CACHE_TAG, 'max');
@@ -66,7 +76,7 @@ export async function saveAdminEventOverrideAction(formData: FormData) {
   revalidatePublicEventSurfaces(formData);
   revalidatePath('/admin/events');
   revalidatePath(`/admin/events/${id}`);
-  redirect(`/admin/events/${encodeURIComponent(id)}?saved=${encodeURIComponent(section)}`);
+  redirect(`/admin/events/${encodeURIComponent(id)}?saved=${encodeURIComponent(section)}${queueSuffix(formData)}`);
 }
 
 export async function saveAdminEventModerationAction(formData: FormData) {
@@ -89,7 +99,7 @@ export async function saveAdminEventModerationAction(formData: FormData) {
   revalidatePublicEventSurfaces(formData);
   revalidatePath('/admin/events');
   revalidatePath(`/admin/events/${id}`);
-  redirect(`/admin/events/${encodeURIComponent(id)}?moderation=1`);
+  redirect(`/admin/events/${encodeURIComponent(id)}?moderation=1${queueSuffix(formData)}`);
 }
 
 export async function saveAdminEventTaxonomyAction(formData: FormData) {
@@ -126,7 +136,7 @@ export async function saveAdminEventTaxonomyAction(formData: FormData) {
   revalidatePublicEventSurfaces(formData);
   revalidatePath('/admin/events');
   revalidatePath(`/admin/events/${id}`);
-  redirect(`/admin/events/${encodeURIComponent(id)}?saved=taxonomy`);
+  redirect(`/admin/events/${encodeURIComponent(id)}?saved=taxonomy${queueSuffix(formData)}`);
 }
 
 export async function saveAdminEventVenueLinksAction(formData: FormData) {
@@ -162,7 +172,7 @@ export async function saveAdminEventVenueLinksAction(formData: FormData) {
   revalidatePublicEventSurfaces(formData);
   revalidatePath('/admin/events');
   revalidatePath(`/admin/events/${id}`);
-  redirect(`/admin/events/${encodeURIComponent(id)}?saved=venue-links`);
+  redirect(`/admin/events/${encodeURIComponent(id)}?saved=venue-links${queueSuffix(formData)}`);
 }
 
 export type VenueLinkSuggestion = {

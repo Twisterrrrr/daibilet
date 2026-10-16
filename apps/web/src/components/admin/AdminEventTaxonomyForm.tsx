@@ -10,9 +10,10 @@ type Props = {
   eventSlug?: string | null;
   classification: AdminEventDetailData['classification'];
   taxonomy: AdminTaxonomyData;
+  queue?: { back?: string; next?: string };
 };
 
-export function AdminEventTaxonomyForm({ eventId, eventSlug, classification, taxonomy }: Props) {
+export function AdminEventTaxonomyForm({ eventId, eventSlug, classification, taxonomy, queue }: Props) {
   const [categoryId, setCategoryId] = useState(classification.categoryId || '');
   const [primarySubcategoryId, setPrimarySubcategoryId] = useState(
     classification.primarySubcategoryId || '',
@@ -73,6 +74,8 @@ export function AdminEventTaxonomyForm({ eventId, eventSlug, classification, tax
     >
       <input type="hidden" name="id" value={eventId} />
       <input type="hidden" name="slug" value={eventSlug || ''} />
+      <input type="hidden" name="back" value={queue?.back || ''} />
+      <input type="hidden" name="next" value={queue?.next || ''} />
       {subcategoryIds.map((id) => (
         <input key={`sub-${id}`} type="hidden" name="subcategoryIds" value={id} />
       ))}
