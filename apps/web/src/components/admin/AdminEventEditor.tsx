@@ -10,6 +10,9 @@ import {
   adminTextareaClass,
 } from '@/components/admin/AdminUi';
 import { AdminEventDescriptionRewrite } from '@/components/admin/AdminEventDescriptionRewrite.client';
+import { AdminQueueFields } from '@/components/admin/AdminQueueFields';
+import { AdminEventSourceSummary } from '@/components/admin/AdminEventSourceSummary';
+import { AdminEventTabs } from '@/components/admin/AdminEventTabs.client';
 import { AdminEventTaxonomyForm } from '@/components/admin/AdminEventTaxonomyForm';
 import { AdminEventVenueLinksForm } from '@/components/admin/AdminEventVenueLinksForm';
 import { AdminEventOpsPanels } from '@/components/admin/AdminEventOpsPanels';
@@ -32,9 +35,10 @@ type Props = {
   detail: AdminEventDetailData;
   taxonomy: AdminTaxonomyData;
   notice?: string | null;
+  queue?: { back?: string; next?: string };
 };
 
-export function AdminEventEditor({ detail, taxonomy, notice }: Props) {
+export function AdminEventEditor({ detail, taxonomy, notice, queue }: Props) {
   const override = detail.override;
   const currentStatus = (override.editorStatus || 'REVIEW').toUpperCase();
   const statusLabel = MODERATION_STATUSES.find((item) => item.status === currentStatus)?.label ?? currentStatus;
@@ -78,9 +82,15 @@ export function AdminEventEditor({ detail, taxonomy, notice }: Props) {
         <AdminStat label="Заказов" value={formatAdminNumber(detail.summary.orders)} />
       </div>
 
-      <AdminEventOpsPanels detail={detail} />
-
-      <AdminSection
+      <AdminEventTabs
+        tabs={[
+          {
+            id: 'overview',
+            label: 'Обзор',
+            content: (
+              <>
+                <AdminEventSourceSummary detail={detail} />
+                <AdminSection
         title="Модерация"
         description="Статус определяет, видно ли событие на витрине. «Опубликовать» доступно, когда устранены блокеры."
         actions={
@@ -102,6 +112,7 @@ export function AdminEventEditor({ detail, taxonomy, notice }: Props) {
                 <input type="hidden" name="id" value={detail.id} />
                 <input type="hidden" name="slug" value={detail.slug || ''} />
                 <input type="hidden" name="editorStatus" value={item.status} />
+                <AdminQueueFields back={queue?.back} next={queue?.next} />
                 <AdminButton
                   type="submit"
                   variant={currentStatus === item.status ? 'primary' : 'secondary'}
@@ -115,24 +126,18 @@ export function AdminEventEditor({ detail, taxonomy, notice }: Props) {
           })}
         </div>
       </AdminSection>
-
-      <AdminEventTaxonomyForm
-        eventId={detail.id}
-        eventSlug={detail.slug}
-        classification={detail.classification}
-        taxonomy={taxonomy}
-      />
-
-      <AdminEventVenueLinksForm
-        eventId={detail.id}
-        eventSlug={detail.slug}
-        venueLinks={detail.venueLinks}
-      />
-
+              </>
+            ),
+          },
+          {
+            id: 'content',
+            label: 'Контент',
+            content: (
       <form action={saveAdminEventOverrideAction}>
         <input type="hidden" name="id" value={detail.id} />
         <input type="hidden" name="slug" value={detail.slug || ''} />
         <input type="hidden" name="section" value="content" />
+        <AdminQueueFields back={queue?.back} next={queue?.next} />
         <AdminSection
           title="Контент"
           description={`Пустое поле - сброс к источнику. В источнике: ${detail.sourceTitle}`}
@@ -177,11 +182,17 @@ export function AdminEventEditor({ detail, taxonomy, notice }: Props) {
           </div>
         </AdminSection>
       </form>
-
+            ),
+          },
+          {
+            id: 'seo',
+            label: 'SEO',
+            content: (
       <form action={saveAdminEventOverrideAction}>
         <input type="hidden" name="id" value={detail.id} />
         <input type="hidden" name="slug" value={detail.slug || ''} />
         <input type="hidden" name="section" value="seo" />
+        <AdminQueueFields back={queue?.back} next={queue?.next} />
         <AdminSection
           title="SEO"
           description="Сниппет и индексация события. Пустое поле = сброс к источнику."
@@ -235,11 +246,17 @@ export function AdminEventEditor({ detail, taxonomy, notice }: Props) {
           </div>
         </AdminSection>
       </form>
-
+            ),
+          },
+          {
+            id: 'media',
+            label: 'Медиа',
+            content: (
       <form action={saveAdminEventOverrideAction}>
         <input type="hidden" name="id" value={detail.id} />
         <input type="hidden" name="slug" value={detail.slug || ''} />
         <input type="hidden" name="section" value="media" />
+        <AdminQueueFields back={queue?.back} next={queue?.next} />
         <AdminSection
           title="Медиа"
           description="Картинка карточки. Пустое поле - использовать изображение из источника."
@@ -262,6 +279,36 @@ export function AdminEventEditor({ detail, taxonomy, notice }: Props) {
           </AdminField>
         </AdminSection>
       </form>
+            ),
+          },
+          {
+            id: 'structure',
+            label: 'Таксономия и связи',
+            content: (
+              <>
+                <AdminEventTaxonomyForm
+                  eventId={detail.id}
+                  eventSlug={detail.slug}
+                  classification={detail.classification}
+                  taxonomy={taxonomy}
+                  queue={queue}
+                />
+                <AdminEventVenueLinksForm
+                  eventId={detail.id}
+                  eventSlug={detail.slug}
+                  venueLinks={detail.venueLinks}
+                  queue={queue}
+                />
+              </>
+            ),
+          },
+          {
+            id: 'data',
+            label: 'Данные и диагностика',
+            content: <AdminEventOpsPanels detail={detail} />,
+          },
+        ]}
+      />
     </div>
   );
 }
