@@ -23,12 +23,12 @@ export default async function AdminCityDetailPage({ params, searchParams }: Page
   const rawSearch = await searchParams;
   // `back` comes from the cities list and keeps the operator's filter context.
   const back = first(rawSearch.back) || '';
-  const backHref = back.startsWith('/admin/cities') ? back : '/admin/cities';
+  const backHref = /^\/admin\/cities(?:\?|$)/.test(back) ? back : '/admin/cities';
   const detail = await loadAdminCityDetail(id);
-  let notice = first(rawSearch.saved) === '1' ? 'Город сохранён.' : null;
-  if (first(rawSearch.error) === 'slug_not_unique') {
-    notice = 'Slug уже занят другим городом - выберите другой.';
-  }
+  const slugConflict = first(rawSearch.error) === 'slug_not_unique';
+  const notice = slugConflict
+    ? 'Slug уже занят другим городом - выберите другой.'
+    : first(rawSearch.saved) === '1' ? 'Город сохранён.' : null;
 
   return (
     <div className="space-y-4">
@@ -71,7 +71,7 @@ export default async function AdminCityDetailPage({ params, searchParams }: Page
       </header>
 
       {notice ? (
-        <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm text-emerald-800">
+        <div className={`rounded-lg border px-4 py-2 text-sm ${slugConflict ? 'border-red-200 bg-red-50 text-red-800' : 'border-emerald-200 bg-emerald-50 text-emerald-800'}`}>
           {notice}
         </div>
       ) : null}

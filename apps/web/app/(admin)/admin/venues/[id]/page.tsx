@@ -52,7 +52,7 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
   const rawSearch = await searchParams;
   // `back` comes from the venues list and keeps the operator's filter context.
   const back = first(rawSearch.back) || '';
-  const backHref = back.startsWith('/admin/venues') ? back : '/admin/venues';
+  const backHref = /^\/admin\/venues(?:\?|$)/.test(back) ? back : '/admin/venues';
   const detail = await loadAdminVenueDetail(id);
   const notice = first(rawSearch.saved) === '1' ? 'Площадка сохранена.' : null;
 
@@ -79,7 +79,7 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
             </span>
             <span
               className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs ${
-                detail.pageStatus === 'PUBLISHED'
+                detail.pageStatus.toUpperCase() === 'PUBLISHED'
                   ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
                   : 'border-slate-200 bg-slate-50 text-slate-700'
               }`}
@@ -132,6 +132,9 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
                 defaultValue={detail.kind}
                 className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
               >
+                {!KIND_OPTIONS.includes(detail.kind) ? (
+                  <option value={detail.kind}>{venueKindLabel(detail.kind)} (текущее значение)</option>
+                ) : null}
                 {KIND_OPTIONS.map((kind) => (
                   <option key={kind} value={kind}>
                     {venueKindLabel(kind)}
