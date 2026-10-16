@@ -127,7 +127,17 @@ export default async function AdminEventsPage({ searchParams }: PageProps) {
                   </td>
                 </tr>
               ) : (
-                data.rows.map((row) => (
+                data.rows.map((row, index) => {
+                  const queueQuery = new URLSearchParams();
+                  if (q) queueQuery.set('q', q);
+                  if (view !== 'all') queueQuery.set('view', view);
+                  if (page !== '1') queueQuery.set('page', page);
+                  const qs = queueQuery.toString();
+                  const backHref = qs ? `/admin/events?${qs}` : '/admin/events';
+                  const nextRow = data.rows[index + 1];
+                  const detailParams = new URLSearchParams({ back: backHref });
+                  if (nextRow) detailParams.set('next', nextRow.id);
+                  return (
                   <tr key={row.id} className="border-b border-slate-100 align-top">
                     <td className="px-3 py-2">
                       <div className="font-medium text-slate-900">{row.title}</div>
@@ -150,7 +160,7 @@ export default async function AdminEventsPage({ searchParams }: PageProps) {
                     </td>
                     <td className="px-3 py-2">
                       <div className="flex flex-col gap-1 text-xs">
-                        <Link href={`/admin/events/${encodeURIComponent(row.id)}`} className="text-sky-700 hover:underline">
+                        <Link href={`/admin/events/${encodeURIComponent(row.id)}?${detailParams.toString()}`} className="text-sky-700 hover:underline">
                           Открыть
                         </Link>
                         {row.slug ? (
@@ -166,7 +176,8 @@ export default async function AdminEventsPage({ searchParams }: PageProps) {
                       </div>
                     </td>
                   </tr>
-                ))
+                  );
+                })
               )}
             </tbody>
           </table>
