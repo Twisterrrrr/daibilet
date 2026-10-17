@@ -1,4 +1,3 @@
-import { cookies } from 'next/headers';
 import Link from 'next/link';
 import { Suspense } from 'react';
 import { ArrowRight, Dices } from 'lucide-react';
@@ -41,7 +40,6 @@ import {
 } from '@/lib/ssr-lean-payloads';
 import { getHomeArticles, getHomeCoverFingerprints, getHomePageData } from '@/server/cached-home-data';
 import { getActiveHeroBanners, heroFramesFromBanners } from '@/server/hero-banners';
-import { decodeSelectedCityCookie, matchDestination, SELECTED_CITY_COOKIE } from '@/lib/selected-city';
 
 /** External CDN HEAD fingerprints must not stall home TTFB on bad egress/DNS. */
 const HOME_FINGERPRINTS_TIMEOUT_MS = 800;
@@ -50,10 +48,9 @@ const HOME_ARTICLES_TIMEOUT_MS = 1_200;
 type BlogApiArticles = NonNullable<Parameters<typeof mergeBlogCards>[0]>;
 
 async function HomePageBody() {
-  const cityCookie = decodeSelectedCityCookie((await cookies()).get(SELECTED_CITY_COOKIE)?.value);
   const [{ destinationsPayload, catalogPayload, landingsCatalog }, fingerprintsRecord, articlesPayload] =
     await Promise.all([
-      getHomePageData(cityCookie),
+      getHomePageData(),
       withSoftTimeout(
         getHomeCoverFingerprints(),
         HOME_FINGERPRINTS_TIMEOUT_MS,
@@ -69,9 +66,8 @@ async function HomePageBody() {
     ]);
 
   const destinations = destinationsPayload?.destinations ?? [];
-  const ssrCity = matchDestination(destinations, cityCookie);
-  const ssrCityName = ssrCity?.name || null;
-  const ssrCitySlug = ssrCity?.slug || ssrCity?.sourceSlug || null;
+  const ssrCityName = null;
+  const ssrCitySlug = null;
   const cities = destinations.filter((item) => item.type === 'city');
   // Top by events, then pin Moscow + SPB first so the rail can center that pair on load.
   const topCities = orderPopularRailCities(cities, 16).map(toSlimCityDestination);
