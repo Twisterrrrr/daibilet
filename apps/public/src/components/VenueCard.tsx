@@ -38,16 +38,12 @@ export function VenueCard({
         )}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
 
-        <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-xs font-bold text-slate-900 shadow-sm backdrop-blur-sm">
-          {venue.events > 0 ? (
-            <>
-              <Ticket className="h-3.5 w-3.5 text-primary-600" />
-              {pluralEvents(venue.events)}
-            </>
-          ) : (
-            <span className="text-slate-500">Скоро</span>
-          )}
-        </div>
+        {venue.events > 0 ? (
+          <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-xs font-bold text-slate-900 shadow-sm backdrop-blur-sm">
+            <Ticket className="h-3.5 w-3.5 text-primary-600" />
+            {pluralEvents(venue.events)}
+          </div>
+        ) : null}
 
         <div className="relative p-4 sm:p-5">
           <div className="mb-2 inline-flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-xs font-medium text-white/90 backdrop-blur-sm">

@@ -1,0 +1,85 @@
+{
+  "city": "volgograd",
+  "mustSeeCount": 68,
+  "regen": [
+    {
+      "stem": "ges-park-gidrostroitel",
+      "name": "ges park gidrostroitel",
+      "clusterSize": 3,
+      "keeper": "dom-pavlova"
+    },
+    {
+      "stem": "ges-smotrovaya",
+      "name": "ges smotrovaya",
+      "clusterSize": 3,
+      "keeper": "dom-pavlova"
+    },
+    {
+      "stem": "mural-devochka-s-siney-ptitsey",
+      "name": "mural devochka s siney ptitsey",
+      "clusterSize": 2,
+      "keeper": "ges-park-novyy-gorod"
+    },
+    {
+      "stem": "promenad-chuikova",
+      "name": "promenad chuikova",
+      "clusterSize": 3,
+      "keeper": "hram-ioanna-predtechi"
+    },
+    {
+      "stem": "sarepta-dom-aptekaarya",
+      "name": "sarepta dom aptekaarya",
+      "clusterSize": 3,
+      "keeper": "angel-cakes"
+    },
+    {
+      "stem": "sarepta-dom-holostyh-bratyev",
+      "name": "sarepta dom holostyh bratyev",
+      "clusterSize": 2,
+      "keeper": "pamyatnik-holzunovu"
+    },
+    {
+      "stem": "sarepta-kirkha",
+      "name": "sarepta kirkha",
+      "clusterSize": 3,
+      "keeper": "pamyatnik-leninu-volgo-don"
+    },
+    {
+      "stem": "sarepta-pamyatnik-gorchichnomu-zernu",
+      "name": "sarepta pamyatnik gorchichnomu zernu",
+      "clusterSize": 3,
+      "keeper": "hram-ioanna-predtechi"
+    },
+    {
+      "stem": "sarepta-podvaly-reyngolda",
+      "name": "sarepta podvaly reyngolda",
+      "clusterSize": 2,
+      "keeper": "identity-symbol"
+    },
+    {
+      "stem": "sarepta-vinokurnya",
+      "name": "sarepta vinokurnya",
+      "clusterSize": 2,
+      "keeper": "sarepta-muzey-gorchitsy"
+    },
+    {
+      "stem": "street-art-tsaritsa",
+      "name": "street art tsaritsa",
+      "clusterSize": 3,
+      "keeper": "pamyatnik-leninu-volgo-don"
+    },
+    {
+      "stem": "suburb-staraya-sarepta",
+      "name": "suburb staraya sarepta",
+      "clusterSize": 3,
+      "keeper": "angel-cakes"
+    },
+    {
+      "stem": "suburb-volzhskaya-ges",
+      "name": "suburb volzhskaya ges",
+      "clusterSize": 2,
+      "keeper": "ges-monument-stroitelyam"
+    }
+  ],
+  "d0": 12
+}

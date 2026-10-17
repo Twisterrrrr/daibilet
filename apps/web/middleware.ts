@@ -1,0 +1,234 @@
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+import {
+  isAdminUiPath,
+  isAuthorizedAdminBasicAuth,
+  readAdminBasicAuthConfig,
+} from '@/lib/admin-basic-auth';
+import { isAdminHost, rewriteAdminHostPathname } from '@/lib/admin-host';
+import { cyrillicEventRedirectPath } from '@/lib/event-slug-redirect';
+import {
+  EVENTS_CATALOG_CANONICAL_HINT_HEADER,
+  EVENTS_CATALOG_PATH,
+  EVENTS_CATALOG_ROBOTS_HINT_HEADER,
+  absoluteEventsCatalogCanonical,
+  evaluateEventsCatalogIndexing,
+} from '@/lib/events-catalog-indexing';
+import { resolveLegacyLandingRedirect } from '@/lib/landing-routes';
+import { resolvePodborkiCityQueryRedirect } from '@/lib/podborki-city-seo';
+import { canonicalizeRegionChildCitySearch } from '../backend/src/search-geo-match.ts';
+
+function unauthorizedAdminResponse(realm: string) {
+  return new NextResponse('Authentication required', {
+    status: 401,
+    headers: {
+      'WWW-Authenticate': `Basic realm="${realm}", charset="UTF-8"`,
+      'Cache-Control': 'no-store',
+    },
+  });
+}
+
+async function enforceAdminAuth(request: NextRequest) {
+  const config = readAdminBasicAuthConfig(process.env);
+  const ok = await isAuthorizedAdminBasicAuth(request.headers.get('authorization'), config);
+  if (!ok) return unauthorizedAdminResponse(config.realm);
+  return null;
+}
+
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Static / SEO assets must skip admin host rewrite and landing redirect work.
+  if (
+    pathname.startsWith('/_next/static') ||
+    pathname.startsWith('/_next/image') ||
+    pathname === '/favicon.ico' ||
+    pathname === '/robots.txt' ||
+    pathname === '/sitemap.xml' ||
+    pathname.startsWith('/sitemaps/') ||
+    pathname.startsWith('/images/') ||
+    /\.(?:ico|png|jpe?g|gif|webp|svg|css|js|map|txt|xml|woff2?|ttf|eot)$/i.test(pathname)
+  ) {
+    return NextResponse.next();
+  }
+
+  const host = request.headers.get('host')?.toLowerCase() || '';
+  if (host === 'www.daibilet.ru' || host.startsWith('www.daibilet.ru:')) {
+    const url = request.nextUrl.clone();
+    url.host = 'daibilet.ru';
+    url.protocol = 'https:';
+    url.port = '';
+    return NextResponse.redirect(url, 301);
+  }
+
+  // F4.1c: admin.daibilet.ru → rewrite SPA paths onto /admin/*
+  if (isAdminHost(host)) {
+    if (pathname.startsWith('/_next') || pathname.startsWith('/api')) {
+      return NextResponse.next();
+    }
+
+    // F4.6: /legacy retired → rewrite to Next admin dashboard
+    if (pathname === '/legacy' || pathname.startsWith('/legacy/')) {
+      const denied = await enforceAdminAuth(request);
+      if (denied) return denied;
+      const url = request.nextUrl.clone();
+      url.pathname = '/admin';
+      return NextResponse.redirect(url, 302);
+    }
+
+    const denied = await enforceAdminAuth(request);
+    if (denied) return denied;
+
+    const rewritten = rewriteAdminHostPathname(pathname);
+    if (!rewritten) return NextResponse.next();
+
+    const url = request.nextUrl.clone();
+    url.pathname = rewritten;
+    return NextResponse.rewrite(url);
+  }
+
+  if (isAdminUiPath(pathname)) {
+    const denied = await enforceAdminAuth(request);
+    if (denied) return denied;
+    return NextResponse.next();
+  }
+
+  const eventSlugRedirect = redirectCyrillicEventSlug(request);
+  if (eventSlugRedirect) return eventSlugRedirect;
+
+  const cityQueryRedirect = redirectBrokenRegionChildCityQuery(request);
+  if (cityQueryRedirect) return cityQueryRedirect;
+
+  const podborkiCityRedirect = redirectPodborkiCityQueryToMarker(request);
+  if (podborkiCityRedirect) return podborkiCityRedirect;
+
+  const eventsCatalogResponse = handleEventsCatalogIndexing(request, host);
+  if (eventsCatalogResponse) return eventsCatalogResponse;
+
+  const redirectTarget = resolveLegacyLandingRedirect(pathname);
+  if (!redirectTarget) return NextResponse.next();
+
+  const url = request.nextUrl.clone();
+  url.pathname = redirectTarget.replace(/\/+$/, '') || '/';
+  return NextResponse.redirect(url, 301);
+}
+
+function handleEventsCatalogIndexing(
+  request: NextRequest,
+  host: string,
+): NextResponse | null {
+  if (request.nextUrl.pathname !== EVENTS_CATALOG_PATH) return null;
+  // Only the canonical production host consumes these private response hints.
+  // Staging already has a blanket noindex policy and localhost has no nginx map.
+  if (host.split(':')[0] !== 'daibilet.ru') return NextResponse.next();
+
+  const decision = evaluateEventsCatalogIndexing(request.nextUrl);
+  if (decision.redirectPath) {
+    const url = request.nextUrl.clone();
+    url.pathname = decision.redirectPath;
+    url.search = '';
+    return NextResponse.redirect(url, 301);
+  }
+
+  const siteUrl =
+    process.env.DAIBILET_SITE_URL ||
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    'https://daibilet.ru';
+  const response = NextResponse.next();
+  response.headers.set(
+    EVENTS_CATALOG_CANONICAL_HINT_HEADER,
+    absoluteEventsCatalogCanonical(decision.canonicalPath, siteUrl),
+  );
+  if (decision.robots) {
+    response.headers.set(EVENTS_CATALOG_ROBOTS_HINT_HEADER, decision.robots);
+  }
+  return response;
+}
+
+function redirectCyrillicEventSlug(request: NextRequest): NextResponse | null {
+  const targetPath = cyrillicEventRedirectPath(request.nextUrl.pathname);
+  if (!targetPath) return null;
+  const url = request.nextUrl.clone();
+  url.pathname = targetPath;
+  return NextResponse.redirect(url, 308);
+}
+
+/** Soft `/podborki?city=` → marker CHPU `/podborki/c/{city}` for meta-pilot cities. */
+function redirectPodborkiCityQueryToMarker(request: NextRequest): NextResponse | null {
+  const { pathname } = request.nextUrl;
+  if (pathname.replace(/\/+$/, '') !== '/podborki') return null;
+  const rawCity = request.nextUrl.searchParams.get('city');
+  const targetPath = resolvePodborkiCityQueryRedirect(rawCity);
+  if (!targetPath) return null;
+  const url = request.nextUrl.clone();
+  url.pathname = targetPath;
+  // Drop city= after consolidation; keep other query keys (landing, utm, …).
+  url.searchParams.delete('city');
+  return NextResponse.redirect(url, 301);
+}
+
+function redirectBrokenRegionChildCityQuery(request: NextRequest): NextResponse | null {
+  const { pathname } = request.nextUrl;
+  if (!pathname.startsWith('/cities/')) return null;
+  const next = canonicalizeRegionChildCitySearch(request.nextUrl.searchParams);
+  if (!next) return null;
+  const url = request.nextUrl.clone();
+  url.search = next.toString() ? `?${next.toString()}` : '';
+  return NextResponse.redirect(url, 302);
+}
+
+// Static matcher only — Next rejects spread/dynamic arrays in config.matcher.
+export const config = {
+  matcher: [
+    '/',
+    '/admin',
+    '/admin/:path*',
+    '/events',
+    '/events/:path*',
+    '/landings',
+    '/landings/:path*',
+    '/articles',
+    '/articles/:path*',
+    '/sources',
+    '/sources/:path*',
+    '/settings',
+    '/settings/:path*',
+    '/orders',
+    '/orders/:path*',
+    '/buyers',
+    '/buyers/:path*',
+    '/venues',
+    '/venues/:path*',
+    '/cities',
+    '/cities/:path*',
+    '/podborki',
+    '/sync-health',
+    '/sync-health/:path*',
+    '/reviews',
+    '/reviews/:path*',
+    '/change-requests',
+    '/change-requests/:path*',
+    '/legacy',
+    '/legacy/:path*',
+    '/:city/:category',
+    '/river-cruises',
+    '/river-cruises/:city',
+    '/bus-tours',
+    '/bus-tours/:city',
+    '/river-party',
+    '/river-party/:city',
+    '/standup',
+    '/standup/:city',
+    '/family-kids',
+    '/family-kids/:city',
+    '/concerts-genre',
+    '/concerts-genre/:city',
+    '/active-sport',
+    '/active-sport/:city',
+    '/new-year',
+    '/new-year/:city',
+    '/salute-9-may',
+    '/salute-9-may/:city',
+  ],
+};

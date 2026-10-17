@@ -1,0 +1,302 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+
+import {
+  formatEventDescriptionHtml,
+  parseEventDescriptionBlocks,
+  parseCommaSeparatedListAfterIntro,
+  parseInlineListAfterColon,
+} from './event-description-format.ts';
+
+const CHECKMARK_SAMPLE = `На нашей экскурсии вы узнаете:
+
+✅ Как сексуальная революция 20хх годов нацелилась разрушить брачные устои
+✅ Расскажем об экспериментах и концепции «свободной любви»
+✅ К чему привели 70 лет советского аскетизма
+
+Наш рассказ будет дополняться архивными материалами.`;
+
+const DASH_SAMPLE = `Организационные детали:
+- экскурсия полностью пешая, пожалуйста, одевайтесь по погоде.
+- обратите особое внимание, экскурсия строго 18+.
+- пожалуйста, возьмите с собой паспорт для подтверждения возраста.`;
+
+test('parses checkmark lines as a list and keeps surrounding paragraphs', () => {
+  const blocks = parseEventDescriptionBlocks(CHECKMARK_SAMPLE);
+  assert.ok(blocks[0]?.type === 'heading' || blocks[0]?.type === 'paragraph');
+  assert.match((blocks[0] as { text: string }).text, /узнаете/i);
+  assert.equal(blocks[1]?.type, 'list');
+  assert.equal((blocks[1] as { items: string[] }).items.length, 3);
+  assert.match((blocks[1] as { items: string[] }).items[0], /сексуальная революция/);
+  assert.equal(blocks[2]?.type, 'paragraph');
+  assert.match((blocks[2] as { text: string }).text, /архивными материалами/);
+});
+
+test('parses dash lines after «Организационные детали:» as a list', () => {
+  const blocks = parseEventDescriptionBlocks(DASH_SAMPLE);
+  assert.equal(blocks[0]?.type, 'heading');
+  assert.match((blocks[0] as { text: string }).text, /Организационные детали/i);
+  assert.equal(blocks[1]?.type, 'list');
+  assert.equal((blocks[1] as { items: string[] }).items.length, 3);
+  assert.match((blocks[1] as { items: string[] }).items[0], /полностью пешая/);
+});
+
+test('parses inline list after colon on one line', () => {
+  const inline = parseInlineListAfterColon(
+    'Организационные детали: - экскурсия пешая. - строго 18+. - возьмите паспорт.',
+  );
+  assert.ok(inline);
+  assert.match(inline!.intro, /Организационные детали:/i);
+  assert.equal(inline!.items.length, 3);
+
+  const html = formatEventDescriptionHtml(
+    'Организационные детали: - экскурсия пешая. - строго 18+. - возьмите паспорт.',
+  );
+  assert.match(html, /<ul>/);
+  assert.match(html, /<li>экскурсия пешая\.<\/li>/);
+  assert.match(html, /<li>строго 18\+\.<\/li>/);
+});
+
+test('formatEventDescriptionHtml renders ul/li and escapes HTML', () => {
+  const html = formatEventDescriptionHtml(`${CHECKMARK_SAMPLE}\n\n${DASH_SAMPLE}`);
+  assert.match(html, /<ul><li>Как сексуальная революция/);
+  assert.match(html, /<li>экскурсия полностью пешая/);
+  assert.doesNotMatch(html, /✅/);
+  assert.match(formatEventDescriptionHtml('Цена A < B & C'), /A &lt; B &amp; C/);
+});
+
+test('existing HTML is sanitized and not re-parsed into lists', () => {
+  const raw = '<p>Узнаете:</p><ul><li>Первый</li><li>Второй</li></ul>';
+  const html = formatEventDescriptionHtml(raw);
+  assert.equal(html, raw);
+
+  const withScript = '<p>Ok</p><script>alert(1)</script><ul><li>A</li></ul>';
+  assert.equal(formatEventDescriptionHtml(withScript), '<p>Ok</p><ul><li>A</li></ul>');
+});
+
+test('sanitizeEventHtml strips XSS vectors that old regex missed', () => {
+  const html = formatEventDescriptionHtml('<p>Ok</p><img src=x onerror=alert(1)><iframe src="javascript:alert(1)"></iframe>');
+  assert.doesNotMatch(html, /onerror/i);
+  assert.doesNotMatch(html, /<iframe/i);
+  assert.doesNotMatch(html, /<img/i);
+  assert.match(html, /<p>Ok<\/p>/);
+
+  const jsLink = formatEventDescriptionHtml('<p><a href="javascript:alert(1)">x</a></p>');
+  assert.doesNotMatch(jsLink, /javascript:/i);
+
+  const svg = formatEventDescriptionHtml('<p>Hi</p><svg/onload=alert(1)>');
+  assert.doesNotMatch(svg, /<svg/i);
+  assert.doesNotMatch(svg, /onload/i);
+});
+
+/** Teplohod-style: landmark lines without bullet markers + paragraph breaks via single newlines. */
+const KREMLIN_CRUISE_SAMPLE = `Обзорная речная прогулка от Новоспасского моста – это не просто способ увидеть Москву. За 2 час 30 минут прогулки вы сможете дважды увидеть лучшие достопримечательности Москвы:
+ Парящий мост парка Зарядье
+ Московский Кремль
+ Собор Василия Блаженного
+ Храм Христа Спасителя
+ Памятник Петру Первому
+ ЦПКиО им. Горького
+ Московский Дом Музыки
+ Прогулка на теплоходе позволит вам увидеть множество известных достопримечательностей Москвы.
+ Для вашего удобства предлагается два варианта билетов - с вкуснейшим ланчем и без питания.
+ Время в пути кругового маршрута составляет 2 часа 30 минут.`;
+
+test('marker-less landmark lines become ul/li and paragraphs stay split', () => {
+  const blocks = parseEventDescriptionBlocks(KREMLIN_CRUISE_SAMPLE);
+  assert.equal(blocks[0]?.type, 'paragraph');
+  assert.match((blocks[0] as { text: string }).text, /достопримечательности Москвы:$/);
+  assert.equal(blocks[1]?.type, 'list');
+  assert.equal((blocks[1] as { items: string[] }).items.length, 7);
+  assert.equal((blocks[1] as { items: string[] }).items[0], 'Парящий мост парка Зарядье');
+  assert.equal((blocks[1] as { items: string[] }).items[6], 'Московский Дом Музыки');
+  assert.equal(blocks[2]?.type, 'paragraph');
+  assert.match((blocks[2] as { text: string }).text, /Прогулка на теплоходе/);
+  assert.equal(blocks[3]?.type, 'paragraph');
+  assert.equal(blocks[4]?.type, 'paragraph');
+
+  const html = formatEventDescriptionHtml(KREMLIN_CRUISE_SAMPLE);
+  assert.match(html, /<ul><li>Парящий мост парка Зарядье<\/li>/);
+  assert.match(html, /<li>Московский Кремль<\/li>/);
+  assert.equal((html.match(/<p>/g) || []).length, 4);
+  assert.doesNotMatch(html, /Москвы: Парящий/);
+});
+
+test('section headings render as h3', () => {
+  const html = formatEventDescriptionHtml('Программа\nПервый абзац про маршрут.\nВключено\n- аудиогид\n- ланч');
+  assert.match(html, /<h3>Программа<\/h3>/);
+  assert.match(html, /<h3>Включено<\/h3>/);
+  assert.match(html, /<ul><li>аудиогид<\/li><li>ланч<\/li><\/ul>/);
+});
+
+/** TC/Ticketscloud: section title without colon + comma-separated landmark list. */
+const TC_RIVER_CRUISE_SAMPLE = `За время экскурсии «Реки и каналы» вы узнаете, что такое Семимостье.
+
+Такая прогулка на теплоходе может быть не только прекрасным времяпрепровождением, но и станет отличным подарком.
+
+Основные достопримечательности
+
+Во время экскурсии вы сможете увидеть Троицкий собор, Семимостье, Никольский собор, Мариинский театр, Новую Голландию, Исаакиевский собор и многие другие достопримечательности города.
+
+Экскурсия проходит на однопalubном теплоходе.
+
+Внимание! При увеличении уровня воды основной маршрут может быть изменен.
+
+Маршрут: р. Фонтанка — Крюков канал — р.Мойка — Зимняя канавка — р. Нева — р.Фонтанка
+Продолжительность прогулки: 1 час 5 мин. — 1 час 15 мин.`;
+
+test('TC-style headings, comma lists, label lines and attention', () => {
+  const comma = parseCommaSeparatedListAfterIntro(
+    'Во время экскурсии вы сможете увидеть Троицкий собор, Семимостье, Никольский собор, Мариинский театр, Новую Голландию, Исаакиевский собор и многие другие достопримечательности города.',
+  );
+  assert.ok(comma);
+  assert.equal(comma!.items.length, 6);
+  assert.match(comma!.intro, /увидеть:/i);
+
+  const blocks = parseEventDescriptionBlocks(TC_RIVER_CRUISE_SAMPLE);
+  const headings = blocks.filter((b) => b.type === 'heading');
+  assert.ok(headings.some((h) => (h as { text: string }).text === 'Основные достопримечательности'));
+  assert.ok(headings.some((h) => (h as { text: string }).text === 'Внимание'));
+  assert.ok(headings.some((h) => (h as { text: string }).text === 'Маршрут'));
+  assert.ok(blocks.some((b) => b.type === 'list'));
+
+  const html = formatEventDescriptionHtml(TC_RIVER_CRUISE_SAMPLE);
+  assert.match(html, /<h3>Основные достопримечательности<\/h3>/);
+  assert.match(html, /<h3>Внимание<\/h3>/);
+  assert.match(html, /<h3>Маршрут<\/h3>/);
+  assert.match(html, /<ul><li>Троицкий собор<\/li>/);
+  assert.match(html, /р\. Фонтанка - Крюков канал/);
+  assert.doesNotMatch(html, /[\u2013\u2014]/);
+});
+
+/** AI rewrite: bold section titles + lists (Kazan disco cruise sample). */
+const AI_MARKDOWN_REWRITE_SAMPLE = `Ночной танцевальный круиз по Волге в Казани (18+): речная прогулка с рассказом о местных достопримечательностях и культуре, кафе на борту и музыкой от ди-джеев.
+
+Репертуар охватывает композиции 80-90-х и современные треки. На теплоходе есть меню (см. карточку / блок «Меню на теплоходе»).
+
+**Организационные условия**
+
+- На причал нужно прибыть не менее чем за 10 минут до отправления; посадка заканчивается за 5 минут до времени, указанного в билете.
+- Свои продукты питания и напитки (включая алкоголь) на борт проносить запрещено.
+- Отправление и прибытие: Кремлёвская набережная.
+
+Карта маршрута - в карточке события.`;
+
+test('AI rewrite **heading** becomes h3 and raw asterisks do not leak', () => {
+  const blocks = parseEventDescriptionBlocks(AI_MARKDOWN_REWRITE_SAMPLE);
+  assert.equal(blocks[0]?.type, 'paragraph');
+  assert.equal(blocks[1]?.type, 'paragraph');
+  assert.equal(blocks[2]?.type, 'heading');
+  assert.equal((blocks[2] as { text: string }).text, 'Организационные условия');
+  assert.equal(blocks[3]?.type, 'list');
+  assert.equal((blocks[3] as { items: string[] }).items.length, 3);
+  assert.equal(blocks[4]?.type, 'paragraph');
+
+  const html = formatEventDescriptionHtml(AI_MARKDOWN_REWRITE_SAMPLE);
+  assert.match(html, /<h3>Организационные условия<\/h3>/);
+  assert.match(html, /<ul><li>На причал нужно прибыть/);
+  assert.doesNotMatch(html, /\*\*/);
+});
+
+test('hash markdown heading becomes h3 and hash markers do not leak', () => {
+  const html = formatEventDescriptionHtml('## Особенности\n- первый пункт\n- второй пункт\n- третий пункт');
+  assert.match(html, /<h3>Особенности<\/h3>/);
+  assert.match(html, /<ul><li>первый пункт<\/li><li>второй пункт<\/li><li>третий пункт<\/li><\/ul>/);
+  assert.doesNotMatch(html, /##/);
+});
+
+test('inline **bold** and *italic* render as strong/em', () => {
+  const html = formatEventDescriptionHtml('**Возраст:** рекомендуется детям 6-14 лет. Также *важно* взять паспорт.');
+  assert.match(html, /<p><strong>Возраст:<\/strong> рекомендуется детям 6-14 лет\. Также <em>важно<\/em> взять паспорт\.<\/p>/);
+  assert.doesNotMatch(html, /\*\*/);
+});
+
+test('drops stored nearest-session lines before rendering', () => {
+  const html = formatEventDescriptionHtml(
+    '## Практическая информация\n\n- Место - «Клуб», Москва\n- Ближайшая дата - 18 октября 2026, 03:00\n- Билеты - от 500 ₽',
+  );
+  assert.doesNotMatch(html, /Ближайшая дата|03:00/);
+  assert.match(html, /<li>Место/);
+  assert.match(html, /<li>Билеты/);
+});
+
+test('drops inline next-session sentence from HTML descriptions', () => {
+  const html = formatEventDescriptionHtml(
+    '<p>Следующий сеанс - 18 октября, 03:00.</p><p>Место - ТЦ «АУРА».</p>',
+  );
+  assert.doesNotMatch(html, /Следующий сеанс|03:00/);
+  assert.match(html, /Место - ТЦ/);
+});
+
+test('bus tour: schedule rows, ВАЖНО and fact sections are structured', () => {
+  const raw = [
+    'В Рускеалу на ретропоезде: Водопады и мраморный каньон в Санкт-Петербурге: ближайший сеанс - 18 октября 2026, 04:00.',
+    '',
+    'Почему стоит выбрать этот тур? Поездка на ретропоезде - стильном составе.',
+    '',
+    'Внимание! После покупки билета необходимо ЗАРЕГИСТРИРОВАТЬ участие.',
+    '',
+    '## Программа тура',
+    '',
+    '07:00 - Отправление от Казанского собора',
+    '07:40 - Отправление от ст. м. Проспект Просвещения',
+    '08:50 - 09:10 - Техническая остановка в Приозерске',
+    '09:50 - 10:20 - Крепость Корела (внешний осмотр)',
+    '11:40 - 11:55 - Посещение Музея Иван-Чая с дегустацией',
+    '12:50 - 13:30 - Обед',
+    '14:15 - 15:00 - Водопады Ахвенкоски',
+    '15:15 - 17:45 - Горный парк Рускеала (Мраморный Каньон)',
+    '17:00 - 18:45 - Самостоятельная поездка на ретропоезде «Рускеальский экспресс» от станции Рускеала до станции Сортавала (Билеты приобретаются самостоятельно, по ценам РЖД).',
+    '',
+    '## 18:45 - 22:43 - Отправление в Санкт-Петербург (два способа на выбор)',
+    '',
+    'На скоростном поезде «Ласточка» из Сортавала. Билеты приобретаются самостоятельно.',
+    'На нашем автобусе из Сортавала до Санкт-Петербурга. 19:30 - 19:50 - Магазин форелевого хозяйства. 22:43 - Прибытие в Санкт-Петербург. ВАЖНО! Билеты на ретропоезд приобретаются самостоятельно по ценам РЖД.',
+    '',
+    '## В стоимость тура входит',
+    '',
+    'Трансфер на комфортабельном автобусе экскурсионного класса Трассовая экскурсия на протяжении всей программы',
+    'Подготовленная программа тура',
+    'Услуги профессионального гида на протяжении всей поездки',
+    '⠀',
+    'Оплачивается дополнительно',
+    '',
+    '## При посадке гиду',
+    '',
+    'Входной билет в горный парк Рускеала: 750 руб./взрослый, 650 руб. студентам и лицам 60+.',
+    '',
+    '## По желанию',
+    '',
+    'Обед (комплексный) - от 600 руб. Полет на троллее в Рускеала (7+) - 2500 руб.',
+    'Экскурсия «Подземная Рускеала» (7+) - 2200 руб./взрослый.',
+  ].join('\n');
+
+  const html = formatEventDescriptionHtml(raw);
+
+  // The stored nearest-session line is gone, and the lead keeps a clean period.
+  assert.doesNotMatch(html, /ближайший сеанс/i);
+  assert.match(html, /<p>В Рускеалу на ретропоезде: Водопады/);
+  assert.doesNotMatch(html, /<h3>В Рускеалу на ретропоезде<\/h3>/);
+  assert.match(html, /Водопады и мраморный каньон в Санкт-Петербурге\.<\/p>/);
+  assert.doesNotMatch(html, /Санкт-Петербурге:\./);
+
+  // Nine schedule rows (including the long 17:00 row) form one list.
+  assert.match(html, /<h3>Программа тура<\/h3>/);
+  const schedule = html.match(/<h3>Программа тура<\/h3><ul>([\s\S]*?)<\/ul>/);
+  assert.ok(schedule, 'schedule list is missing');
+  assert.equal((schedule[1].match(/<li>/g) || []).length, 9);
+
+  // Inline ВАЖНО starts its own bold paragraph.
+  assert.match(html, /<strong>ВАЖНО!<\/strong>/);
+
+  // The two provider lines merge into one section heading.
+  assert.match(html, /<h3>Оплачивается дополнительно при посадке гиду<\/h3>/);
+  assert.doesNotMatch(html, /<h3>При посадке гиду<\/h3>/);
+
+  // Fact sections render as lists, without braille-blank items.
+  assert.match(html, /<h3>В стоимость тура входит<\/h3><ul>/);
+  assert.match(html, /<h3>По желанию<\/h3><ul>/);
+  assert.match(html, /<li>Трансфер на комфортабельном автобусе/);
+  assert.doesNotMatch(html, /<li>\s*<\/li>/);
+  assert.doesNotMatch(html, /\u2800/);
+});
