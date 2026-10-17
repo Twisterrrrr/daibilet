@@ -14,6 +14,12 @@ import { catalogSocialStats } from '@/lib/catalog-social-stats';
 import { cityToPrepositional } from '@/lib/city-declension';
 import { formatNumber } from '@/lib/format';
 
+/** Display polish: chip labels come from hub/landing data and may start lowercase. */
+function capitalizeChipLabel(label: string): string {
+  const trimmed = String(label || '').trim();
+  return trimmed ? trimmed.charAt(0).toUpperCase() + trimmed.slice(1) : trimmed;
+}
+
 /** Russian pluralization helpers */
 function pluralize(n: number, one: string, few: string, many: string): string {
   const mod10 = n % 10;
@@ -221,17 +227,21 @@ export function HomeHero({
         </div>
       </form>
 
-      {/* Category chips — soft, no border, one line */}
-      <div className="mt-5 flex items-center justify-center gap-2 overflow-x-auto text-sm text-white/80 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {chips.slice(0, 7).map((chip) => (
-          <a
-            key={chip.label}
-            href={chip.href}
-            className="shrink-0 whitespace-nowrap rounded-full px-3.5 py-1.5 transition hover:bg-white/15"
-          >
-            {chip.label}
-          </a>
-        ))}
+      {/* Category chips — soft, no border, one line. Centered when they fit,
+          horizontally swipeable when they overflow: justify-center inside a
+          plain overflow container clips the left side and breaks scrolling. */}
+      <div className="mt-5 overflow-x-auto text-sm text-white/80 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="mx-auto flex w-max min-w-full items-center justify-center gap-2">
+          {chips.slice(0, 7).map((chip) => (
+            <a
+              key={chip.label}
+              href={chip.href}
+              className="shrink-0 whitespace-nowrap rounded-full px-3.5 py-1.5 transition hover:bg-white/15"
+            >
+              {capitalizeChipLabel(chip.label)}
+            </a>
+          ))}
+        </div>
       </div>
     </HeroLayout>
   );

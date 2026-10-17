@@ -2,17 +2,18 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { CalendarDays, Compass, MapPin, Route } from 'lucide-react';
+import { CalendarDays, Compass, MapPin } from 'lucide-react';
 
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { catalogHrefWithSelectedCity } from '@/lib/catalog-url';
-import { buildMyDayHref } from '@/lib/home-guide';
 import { cityHref } from '@/lib/routes';
 
 /**
  * Mobile sticky bottom nav for personal-guide home (and soft-nav siblings).
  * Hidden on lg+. Pair with `pb-24 lg:pb-0` on page root; SiteLayout chrome
  * also pads the footer so legal links are not clipped by this bar.
+ * The rightmost slot stays empty on purpose: the floating support-chat
+ * button lands there and must not cover a real item.
  */
 export function HomeBottomNav() {
   const pathname = usePathname();
@@ -40,14 +41,6 @@ export function HomeBottomNav() {
       match: (path: string) => path === '/podborki' || path.startsWith('/podborki/'),
     },
     {
-      id: 'my-day',
-      label: 'Мой день',
-      href: buildMyDayHref(citySlug),
-      icon: Route,
-      accent: true,
-      match: (path: string) => path === '/my-day' || path.startsWith('/my-day'),
-    },
-    {
       id: 'city',
       label: 'Город',
       href:
@@ -55,7 +48,7 @@ export function HomeBottomNav() {
           ? cityHref(selectedCity.selectedDestination)
           : '/cities',
       icon: MapPin,
-      accent: false,
+      accent: true,
       match: (path: string) => path === '/cities' || path.startsWith('/cities/'),
     },
   ] as const;
@@ -112,6 +105,8 @@ export function HomeBottomNav() {
             </li>
           );
         })}
+        {/* Reserved slot for the floating support-chat button (bottom right). */}
+        <li className="flex min-w-0 flex-1" aria-hidden />
       </ul>
     </nav>
   );
