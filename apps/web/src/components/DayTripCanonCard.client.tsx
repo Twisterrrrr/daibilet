@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import { SafeImage } from '@/components/SafeImage.client';
+import { CardSafeImage } from '@/components/SafeImage.client';
 import { SuburbPlacesPhotoRail } from '@/components/SuburbPlacesPhotoRail.client';
 import type { CitySuburbGastroStop } from '@/lib/cityInfo';
 
@@ -180,13 +180,12 @@ export function DayTripCanonCard({
                 className="relative h-36 w-full shrink-0 overflow-hidden rounded-2xl bg-[#F5F5F7] sm:h-full sm:min-h-[7.5rem] sm:max-h-[11rem]"
                 data-day-trip-cover
               >
-                <SafeImage
+                <CardSafeImage
                   src={cover}
                   alt=""
                   fill
                   sizes="(max-width: 640px) 100vw, 240px"
                   className="object-cover object-[center_35%]"
-                  unoptimized
                   fallback={<div className="h-full w-full bg-slate-200" />}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/35 via-transparent to-transparent sm:bg-gradient-to-r sm:from-transparent sm:via-transparent sm:to-slate-950/10" />
@@ -397,13 +396,12 @@ export function DayTripCanonCard({
               className="relative h-44 w-full overflow-hidden rounded-2xl bg-[#F5F5F7] sm:h-full sm:min-h-0"
               data-day-trip-cover
             >
-              <SafeImage
+              <CardSafeImage
                 src={cover}
                 alt=""
                 fill
                 sizes="(max-width: 640px) 100vw, 40vw"
                 className="object-cover object-[center_35%]"
-                unoptimized
                 fallback={<div className="h-full w-full bg-slate-200" />}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/25 via-transparent to-transparent sm:bg-gradient-to-r sm:from-transparent sm:to-slate-950/10" />
