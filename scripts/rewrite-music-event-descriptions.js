@@ -86,7 +86,7 @@ async function main() {
 
   const { isMusicEvent } = await import('../apps/web/src/lib/event-music-description.ts');
   const { withConcertLead } = await import('../apps/web/src/lib/event-description-lead.ts');
-  const { stripSessionDateLines } = await import(
+  const { hasSessionDateLines, stripSessionDateLines } = await import(
     '../apps/web/src/lib/event-description-session-lines.ts'
   );
   const { normalizeUserFacingCopy } = await import(
@@ -95,7 +95,10 @@ async function main() {
 
   console.log('Fetching catalog...');
   const catalog = await fetchCatalog();
+  const byId = new Map(catalog.map((item) => [String(item.id || ''), item]));
   const bySlug = new Map(catalog.map((item) => [String(item.slug || ''), item]));
+  const catalogItem = (row) =>
+    byId.get(String(row.id || '')) || bySlug.get(String(row.slug || ''));
   console.log(`catalog items: ${catalog.length}`);
 
   const pool = new Pool({ connectionString, max: 2, application_name: 'music_desc_rewrite' });
@@ -115,11 +118,11 @@ async function main() {
       )
     ).rows;
 
-    const musicRows = rows.filter((row) => {
-      const item = bySlug.get(String(row.slug || ''));
-      return item ? isMusicEvent(item) : false;
-    });
-    console.log(`events: ${rows.length}, music events: ${musicRows.length}`);
+    const matchedRows = rows.filter((row) => Boolean(catalogItem(row)));
+    const musicRows = matchedRows.filter((row) => isMusicEvent(catalogItem(row)));
+    console.log(
+      `db events: ${rows.length}, matched catalog: ${matchedRows.length}, music events: ${musicRows.length}`,
+    );
 
     const scoped = limit > 0 ? musicRows.slice(0, limit) : musicRows;
     const changes = [];
@@ -134,7 +137,7 @@ async function main() {
     };
 
     for (const row of scoped) {
-      const item = bySlug.get(String(row.slug || ''));
+      const item = catalogItem(row);
       if (!item) continue;
       const hadOverride = Boolean(String(row.override_description || '').trim());
       const before = String(row.override_description || row.source_description || '');
