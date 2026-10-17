@@ -274,7 +274,8 @@ export function parseAttentionLine(line: string): { body: string } | null {
 export function normalizeUserFacingCopy(text: string): string {
   return String(text || '')
     .replace(/[\u2013\u2014\u2212–—]/g, '-')
-    .replace(/\s+-\s+/g, ' - ');
+    // Only horizontal whitespace: a newline before a list dash is structure.
+    .replace(/[ \t]+-[ \t]+/g, ' - ');
 }
 
 export type EventDescriptionBlock =

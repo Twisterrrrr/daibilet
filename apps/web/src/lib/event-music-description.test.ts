@@ -6,6 +6,7 @@ import {
   isMusicEvent,
   rewriteMusicEventDescription,
 } from './event-music-description.ts';
+import { normalizeUserFacingCopy } from './event-description-format.ts';
 
 const SOVA = {
   title: 'Сова',
@@ -156,6 +157,12 @@ test('a provider mention of another country does not truncate the bio', () => {
   const raw =
     'В субботу в клубе пройдёт вечеринка с резидентами, которые выступали в России и на Ибице. Гости услышат клубные хиты 2008 года.';
   assert.equal(rewriteMusicEventDescription(SOVA, raw), raw);
+});
+
+test('normalizeUserFacingCopy keeps newlines around list dashes', () => {
+  const text = '## Практическая информация\n\n- Место - Москва\n- Билеты - от 500 ₽';
+  assert.equal(normalizeUserFacingCopy(text), text);
+  assert.equal(normalizeUserFacingCopy('Москва — Питер'), 'Москва - Питер');
 });
 
 test('long dashes in a title are normalized to a hyphen', () => {
