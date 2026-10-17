@@ -1,0 +1,106 @@
+name: MSK content rewrite (event descriptions)
+
+# One-off content batches on MSK. Dry-run is the default; apply upserts
+# EventOverride.description and writes a backup next to the report.
+# Secrets: same MSK_SSH_* as Deploy MSK web.
+
+on:
+  workflow_dispatch:
+    inputs:
+      task:
+        description: "music = artist-first music leads; strip-dates = remove session dates from every override"
+        required: true
+        type: choice
+        options:
+          - music
+          - strip-dates
+        default: music
+      mode:
+        description: "dry-run writes reports only; apply updates the database"
+        required: true
+        type: choice
+        options:
+          - dry-run
+          - apply
+        default: dry-run
+      limit:
+        description: "Optional max events (empty = all)"
+        required: false
+        type: string
+        default: ""
+      base_url:
+        description: "Catalog base URL on MSK"
+        required: false
+        type: string
+        default: "http://127.0.0.1:4000"
+
+concurrency:
+  group: msk-content-rewrite
+  cancel-in-progress: false
+
+jobs:
+  rewrite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Validate inputs
+        run: |
+          set -euo pipefail
+          [[ "${{ inputs.limit }}" =~ ^[0-9]*$ ]] || { echo "::error::limit must be digits"; exit 1; }
+          [[ "${{ inputs.base_url }}" =~ ^https?://[A-Za-z0-9._:/-]+$ ]] || { echo "::error::invalid base_url"; exit 1; }
+
+      - name: Run batch on MSK
+        env:
+          MSK_SSH_HOST: ${{ secrets.MSK_SSH_HOST }}
+          MSK_SSH_USER: ${{ secrets.MSK_SSH_USER }}
+          MSK_SSH_KEY: ${{ secrets.MSK_SSH_KEY }}
+          TASK: ${{ inputs.task }}
+          MODE: ${{ inputs.mode }}
+          LIMIT: ${{ inputs.limit }}
+          BASE_URL: ${{ inputs.base_url }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${MSK_SSH_HOST:-}" || -z "${MSK_SSH_USER:-}" || -z "${MSK_SSH_KEY:-}" ]]; then
+            echo "ERROR: set secrets MSK_SSH_HOST, MSK_SSH_USER, MSK_SSH_KEY"
+            exit 2
+          fi
+          install -d -m 700 "$HOME/.ssh"
+          install -m 600 /dev/null "$HOME/.ssh/msk_key"
+          printf '%s\n' "$MSK_SSH_KEY" > "$HOME/.ssh/msk_key"
+          SSH=(ssh -i "$HOME/.ssh/msk_key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o BatchMode=yes)
+
+          if [ "$TASK" = "music" ]; then
+            SCRIPT="scripts/rewrite-music-event-descriptions.js"
+            EXTRA="--base-url $BASE_URL"
+          else
+            SCRIPT="scripts/strip-session-dates-from-descriptions.js"
+            EXTRA=""
+          fi
+          ARGS=""
+          if [ "$MODE" = "apply" ]; then ARGS="$ARGS --apply"; fi
+          if [ -n "$LIMIT" ]; then ARGS="$ARGS --limit $LIMIT"; fi
+          OUT_DIR="/tmp/daibilet-content-${GITHUB_RUN_ID}"
+          REMOTE_CMD="cd /opt/daibilet && git fetch origin feat/next-monorepo && git reset --hard origin/feat/next-monorepo && echo HEAD=\$(git rev-parse --short HEAD) && TSX=apps/web/node_modules/tsx/dist/cli.mjs && { [ -f \"\$TSX\" ] || TSX=node_modules/tsx/dist/cli.mjs; } && node \"\$TSX\" $SCRIPT $ARGS $EXTRA --out $OUT_DIR"
+          "${SSH[@]}" "${MSK_SSH_USER}@${MSK_SSH_HOST}" "$REMOTE_CMD"
+
+          mkdir -p content-report
+          for file in report.json samples.txt failures.json changes.tsv; do
+            scp -i "$HOME/.ssh/msk_key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new \
+              "${MSK_SSH_USER}@${MSK_SSH_HOST}:${OUT_DIR}/${file}" "content-report/${file}" 2>/dev/null || true
+          done
+          BACKUP="$(ssh -i "$HOME/.ssh/msk_key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new \
+            "${MSK_SSH_USER}@${MSK_SSH_HOST}" "ls -t ${OUT_DIR}/backup-*.json 2>/dev/null | head -1" || true)"
+          if [ -n "$BACKUP" ]; then
+            scp -i "$HOME/.ssh/msk_key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new \
+              "${MSK_SSH_USER}@${MSK_SSH_HOST}:${BACKUP}" "content-report/backup.json" 2>/dev/null || true
+          fi
+          ls -lh content-report || true
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: content-rewrite-${{ inputs.task }}-${{ inputs.mode }}
+          path: content-report
+          if-no-files-found: warn
+          retention-days: 14
