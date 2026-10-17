@@ -78,8 +78,6 @@ async function main() {
         category: row.category,
         subcategory: row.subcategory,
         kind: row.kind,
-        nextSession: row.next_session,
-        futureSessions: row.future_sessions,
         durationMin: row.duration_min,
         priceFromRub: row.priceFromRub ?? row.price,
         ageLimit: row.ageLimit ?? row.age,

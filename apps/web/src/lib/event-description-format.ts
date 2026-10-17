@@ -1,3 +1,5 @@
+import { stripSessionDateLines } from './event-description-session-lines.ts';
+
 /** Soft-wrap join: "Храм Христа\\nСпасителя" → one line; keep real paragraph breaks. */
 function joinSoftWrappedLines(text: string): string {
   return text.replace(/([^\n.!?…:;—–-])\n(?=[a-zа-яё])/gu, '$1 ');
@@ -136,7 +138,7 @@ export function isDescriptionSectionHeading(line: string): boolean {
   if (!text || text.length > 72) return false;
   if (/[.!?…]$/u.test(text)) return false;
   if (
-    /^(?:о маршруте|о событии|программа|включено|в стоимость входит|важно|маршрут|что вас ждёт|что вас ждет|условия|описание|подробнее|внимание|для кого|как добраться|расписание|основные достопримечательности|достопримечательности|организационные детали|организационные условия|что включено|что входит|продолжительность|продолжительность прогулки|особенности|правила на борту|на борту|в программе|формат|тайминг|памятка|посадка и отправление|что видно с воды|что видно по маршруту|что видно с борта)$/iu.test(
+    /^(?:о маршруте|о событии|программа|включено|в стоимость входит|важно|маршрут|что вас ждёт|что вас ждет|условия|описание|подробнее|внимание|для кого|как добраться|расписание|основные достопримечательности|достопримечательности|организационные детали|организационные условия|что включено|что входит|программа тура|в стоимость тура входит|оплачивается дополнительно|при посадке гиду|по желанию|дополнительно|продолжительность|продолжительность прогулки|особенности|правила на борту|на борту|в программе|формат|тайминг|памятка|посадка и отправление|что видно с воды|что видно по маршруту|что видно с борта)$/iu.test(
       text,
     )
   ) {
@@ -185,6 +187,13 @@ const INLINE_BULLET_SPLIT_RE = /\s+(?=(?:✅|•|[-–—])\s+)/u;
 
 export function isListItemLine(line: string): boolean {
   return LIST_ITEM_PREFIX_RE.test(String(line || '').trim());
+}
+
+/** `07:00 - …` / `08:50 - 09:10 - …` schedule rows from bus and boat tours. */
+const SCHEDULE_LINE_RE = /^\d{1,2}:\d{2}\s*[-–—]\s*/u;
+
+export function isScheduleLine(line: string): boolean {
+  return SCHEDULE_LINE_RE.test(String(line || '').trim());
 }
 
 export function stripListItemPrefix(line: string): string {
@@ -300,6 +309,37 @@ function pushIntroBeforeList(blocks: EventDescriptionBlock[], intro: string) {
   blocks.push({ type: 'paragraph', text: cleaned });
 }
 
+/** Sections whose body is a list even when the provider omitted bullet markers. */
+const FACT_LIST_HEADING_RE =
+  /^(?:в стоимость|что включено|что входит|включено в стоимость|по желанию|оплачивается дополнительно|дополнительно)/iu;
+
+function applyFactListSections(blocks: EventDescriptionBlock[]): EventDescriptionBlock[] {
+  const out: EventDescriptionBlock[] = [];
+  let listMode = false;
+
+  for (const block of blocks) {
+    if (block.type === 'heading') {
+      out.push(block);
+      listMode = FACT_LIST_HEADING_RE.test(block.text);
+      continue;
+    }
+    if (!listMode) {
+      out.push(block);
+      continue;
+    }
+    const items = block.type === 'list' ? block.items : [block.text];
+    const last = out[out.length - 1];
+    if (last && last.type === 'list') last.items.push(...items);
+    else out.push({ type: 'list', items: [...items] });
+  }
+
+  return out;
+}
+
+/** Generic labels that are section headings even on the first line. */
+const GENERIC_SECTION_LABEL_RE =
+  /^(?:программа|внимание|важно|в стоимость|что |как |место|адрес|билет|возраст|продолжительность|организационные|оплачивается|по желанию|дополнительно|контакты|телефон)/iu;
+
 /**
  * Parse plain-text event description into paragraphs, section headings and lists.
  * Recognizes line bullets (✅ / • / - / –), marker-less enumeration runs, and
@@ -310,7 +350,19 @@ function pushIntroBeforeList(blocks: EventDescriptionBlock[], intro: string) {
  * landmark lists and paragraph breaks into a single wall of text.
  */
 export function parseEventDescriptionBlocks(text: string): EventDescriptionBlock[] {
-  const normalized = joinSoftWrappedLines(String(text || '').replace(/\r\n?/g, '\n')).trim();
+  const normalized = joinSoftWrappedLines(String(text || '').replace(/\r\n?/g, '\n'))
+    .replace(/[\u2800\u00A0]/g, ' ')
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    // `Оплачивается дополнительно` + `## При посадке гиду` is one section.
+    .replace(
+      /^(Оплачивается дополнительно|Дополнительно)\s*\n+(?:##\s*)?При\s+([^\n]+)$/gimu,
+      '## $1 при $2',
+    )
+    // Inline `ВАЖНО!` starts its own bold paragraph instead of ending a wall of text.
+    .replace(/(?:^|\s+)(ВАЖНО!|Важно!|ВАЖНО:)\s+/gu, '\n\n**$1** ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
   if (!normalized) return [];
 
   const lines = normalized.split('\n');
@@ -322,6 +374,26 @@ export function parseEventDescriptionBlocks(text: string): EventDescriptionBlock
     if (!line) {
       i += 1;
       continue;
+    }
+
+    if (isScheduleLine(line)) {
+      const items: string[] = [];
+      let j = i;
+      while (j < lines.length) {
+        const current = lines[j].trim();
+        if (!current) {
+          j += 1;
+          continue;
+        }
+        if (!isScheduleLine(current)) break;
+        items.push(current);
+        j += 1;
+      }
+      if (items.length) {
+        blocks.push({ type: 'list', items });
+        i = j;
+        continue;
+      }
     }
 
     if (isListItemLine(line)) {
@@ -385,8 +457,16 @@ export function parseEventDescriptionBlocks(text: string): EventDescriptionBlock
 
     const labelValue = parseLabelValueLine(line);
     if (labelValue) {
-      blocks.push({ type: 'heading', text: labelValue.label });
-      blocks.push({ type: 'paragraph', text: labelValue.value });
+      // The first line is usually the lead, not a section: keep it as one
+      // paragraph so the page does not repeat its H1 as a second heading.
+      const firstLineIsLead =
+        blocks.length === 0 && !GENERIC_SECTION_LABEL_RE.test(labelValue.label);
+      if (firstLineIsLead) {
+        blocks.push({ type: 'paragraph', text: line });
+      } else {
+        blocks.push({ type: 'heading', text: labelValue.label });
+        blocks.push({ type: 'paragraph', text: labelValue.value });
+      }
       i += 1;
       continue;
     }
@@ -402,7 +482,7 @@ export function parseEventDescriptionBlocks(text: string): EventDescriptionBlock
     i += 1;
   }
 
-  return blocks;
+  return applyFactListSections(blocks);
 }
 
 function renderBlocksToHtml(blocks: EventDescriptionBlock[]): string {
@@ -422,16 +502,24 @@ function renderBlocksToHtml(blocks: EventDescriptionBlock[]): string {
     .join('');
 }
 
+function trimEmptyTags(html: string): string {
+  return html
+    .replace(/<li>\s*<\/li>/gi, '')
+    .replace(/<p>\s*<\/p>/gi, '')
+    .replace(/<ul>\s*<\/ul>/gi, '');
+}
+
 /**
  * Safe HTML for event description.
  * - Existing HTML (tags): sanitize only, do not re-parse as lists.
  * - Plain text: paragraphs + headings + `<ul>/<li>` for detected bullets.
+ * - Session date/time lines are removed: the purchase block owns the schedule.
  */
 export function formatEventDescriptionHtml(raw: string): string {
-  const text = String(raw || '').trim();
+  const text = stripSessionDateLines(String(raw || '')).trim();
   if (!text) return '';
   if (/<[a-z][\s\S]*>/i.test(text)) {
-    return sanitizeEventHtml(text);
+    return trimEmptyTags(sanitizeEventHtml(text));
   }
   return sanitizeEventHtml(renderBlocksToHtml(parseEventDescriptionBlocks(text)));
 }

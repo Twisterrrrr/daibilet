@@ -13,6 +13,7 @@ import {
   EventVenueStops,
 } from '@/components/EventPageSections';
 import { ReviewSection } from '@/components/ReviewSection';
+import { isMusicEvent } from '@/lib/event-music-description';
 import {
   formatHeroBuyButtonPrice,
   formatPriceRub,
@@ -39,7 +40,8 @@ export function EventPdpBody({
     : fallback
       ? `от ${fallback}`
       : '';
-  const hasDescription = Boolean(String(event.description || '').trim());
+  const hasDescription =
+    Boolean(String(event.description || '').trim()) || isMusicEvent(event);
   const stops = Array.isArray(event.venueStops) ? event.venueStops : [];
   const coords = hasCoords(event);
 

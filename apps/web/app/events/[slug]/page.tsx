@@ -9,6 +9,12 @@ import { PeerEventsBlock } from '@/components/PeerEventsBlock.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
 import { toEventPageClientPayload } from '@/lib/event-page-client-props';
+import {
+  buildConcertLead,
+  isConcertLikeEvent,
+  withConcertLead,
+} from '@/lib/event-description-lead';
+import { stripSessionDateLines } from '@/lib/event-description-session-lines';
 import { eventHref } from '@/lib/routes';
 import { getTicketPriceRange } from '@/lib/event-page-utils';
 import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
@@ -104,10 +110,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     });
     const title = pageTitle(expansionMeta?.title || disambiguatedTitle);
     const shareTitle = expansionMeta ? expansionMeta.title : `${title} | Дайбилет`;
+    const seoDescription = String(event.seoDescription || '').trim();
+    const genericSeo = /^Расписание, цены и билеты на /iu.test(seoDescription);
+    const concertLead = isConcertLikeEvent(event) ? buildConcertLead(event) : '';
+    const renderedLead =
+      stripSessionDateLines(withConcertLead(event)).split(/\n\s*\n/u)[0] || '';
     const description =
       expansionMeta?.description ||
-      event.seoDescription ||
-      event.description ||
+      (genericSeo ? concertLead : stripSessionDateLines(seoDescription)) ||
+      renderedLead ||
       `${event.title} - билеты на Дайбилет`;
 
     return {

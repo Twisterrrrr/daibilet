@@ -70,6 +70,7 @@
 | [myday-commercial-canon.md](./myday-commercial-canon.md) | Канон «Мой день» (planner + checklist) |
 | [mvp-spec.md](./mvp-spec.md) | Продуктовая спецификация |
 | [seo-public-mvp.md](./seo-public-mvp.md) | SEO public |
+| [artist-bios.md](./artist-bios.md) | Био исполнителей: правила, покрытие, батч |
 | [admin-lovable-v4-mvp-plan.md](./admin-lovable-v4-mvp-plan.md) | План админки |
 
 ## Интеграции

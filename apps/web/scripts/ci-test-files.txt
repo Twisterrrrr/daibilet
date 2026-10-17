@@ -48,3 +48,13 @@ src/lib/city-hub-registry.test.ts
 src/server/finance-checkout-client.test.ts
 # Support chat helpers: text sanitizing, visitor key guard, Telegram notification text.
 src/lib/chat.test.ts
+# Event copy must not store nearest-session dates (purchase block owns schedule).
+src/lib/event-description-session-lines.test.ts
+src/lib/event-description-format.test.ts
+src/lib/event-minimal-description.test.ts
+src/lib/city-timezone.test.ts
+# City-hub scenario links must point to a published blog article (no /blog 404).
+src/lib/city-hub-scenario-blog-links.test.ts
+# Concert cards lead with the artist/genre/venue instead of generated filler.
+src/lib/event-description-lead.test.ts
+src/lib/event-music-description.test.ts

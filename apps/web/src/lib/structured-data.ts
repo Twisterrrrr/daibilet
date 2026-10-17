@@ -12,6 +12,8 @@ import { cityPlacesCatalogHref } from '@/lib/catalog-url';
 import { isCityHubSectionHidden, resolveCityHubConfig } from '@/lib/city-hub-config';
 import { resolveCityInfo } from '@/lib/cityInfo';
 import { getTicketPriceRange, isFlexibleScheduleSession } from '@/lib/event-page-utils';
+import { withConcertLead } from '@/lib/event-description-lead';
+import { stripSessionDateLines } from '@/lib/event-description-session-lines';
 import { evaluateCityIndexability, evaluateRegionIndexability } from '@/lib/hub-indexability';
 import { resolveLandingCityName } from '@/lib/landing-city';
 import { landingCategoryHref } from '@/lib/landing-routes';
@@ -261,7 +263,15 @@ export function buildEventJsonLd(
   const canonical = toAbsoluteUrl(path);
   const schedule = pickEventSchedule(payload);
   const image = event.imageUrl ? toAbsoluteUrl(event.imageUrl) : undefined;
-  const description = event.seoDescription || event.description || undefined;
+  const seoDescription = String(event.seoDescription || '').trim();
+  const genericSeo = /^Расписание, цены и билеты на /iu.test(seoDescription);
+  const concertLead = withConcertLead(event).split(/\n\s*\n/u)[0] || '';
+  const description =
+    stripSessionDateLines(
+      genericSeo
+        ? concertLead || seoDescription
+        : seoDescription || concertLead || event.description || '',
+    ) || undefined;
   const price = resolveOfferPrice(payload);
 
   const locationName = event.venue || event.city || SITE_NAME;

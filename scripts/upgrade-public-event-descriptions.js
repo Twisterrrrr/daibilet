@@ -320,47 +320,29 @@ function splitHeadBody(sectionText) {
   return { head: sectionText.trim(), body: '', glued: false };
 }
 
-/** Series info: how the near-dup group looks as a run of dates/cities. */
-function formatSeriesDate(value) {
-  if (!value) return null;
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return null;
-  const parts = new Intl.DateTimeFormat('ru-RU', { timeZone: 'Europe/Moscow', day: 'numeric', month: 'numeric', year: 'numeric' }).formatToParts(d);
-  const get = (t) => parts.find((p) => p.type === t)?.value;
-  const day = Number(get('day'));
-  const month = Number(get('month'));
-  const year = Number(get('year'));
-  if (!day || !month || !year) return null;
-  return { text: `${day} ${MONTHS[month - 1]}`, year, full: `${day} ${MONTHS[month - 1]} ${year}` };
-}
-
-/** Paragraph about a run of identical-copy cards (series/tour) - new info, no Prak repeats. */
+/**
+ * Paragraph about a run of identical-copy cards (series/tour) - new info, no
+ * Prak repeats. Dates are intentionally omitted: the schedule is live in the
+ * purchase block, while a stored range goes stale.
+ */
 export function buildSeriesParagraph(info, variant = 0) {
   if (!info || info.total < 2) return null;
-  const first = formatSeriesDate(info.first);
-  const last = formatSeriesDate(info.last);
   const v = Math.abs(Math.trunc(stableVariant(String(info.key || '')))) + Math.abs(Math.trunc(variant));
-  const sameYear = first && last ? first.year === last.year : true;
-  const range = first && last
-    ? first === last
-      ? null
-      : `${sameYear ? first.text : first.full} - ${last.full}`
-    : null;
   const nights = `${info.total} ${pluralRu(info.total, 'вечер', 'вечера', 'вечеров')}`;
   const head = info.sameCity
     ? [
-        `Программа идёт серией: ${nights}${range ? `, с ${range}` : ''}, и это ${info.index}-й из них.`,
-        `Это один из вечеров серии${range ? ` (${range})` : ''}: ${info.index}-й из ${info.total}.`,
-        `Серия вечеров${range ? ` с ${range}` : ''}: всего ${nights}, это ${info.index}-й.`,
-        `Один вечер из ${info.total}${range ? `, даты с ${range}` : ''}: это ${info.index}-й.`,
-        `Это ${info.index}-й вечер серии${range ? ` (даты с ${range})` : ''}: всего ${nights}.`,
+        `Программа идёт серией: ${nights}, и это ${info.index}-й из них.`,
+        `Это один из вечеров серии: ${info.index}-й из ${info.total}.`,
+        `Серия вечеров: всего ${nights}, это ${info.index}-й.`,
+        `Один вечер из ${info.total}: это ${info.index}-й.`,
+        `Это ${info.index}-й вечер серии: всего ${nights}.`,
       ]
     : [
-        `Программа гастролирует${range ? `: ${nights}, с ${range}` : ''}, и это ${info.index}-й из них.`,
-        `Это гастрольная серия${range ? ` (${range})` : ''}: дата ${info.index} из ${info.total}.`,
-        `Тур по городам${range ? `, с ${range}` : ''}: всего ${nights}, это ${info.index}-й.`,
-        `Такая программа проходит в нескольких городах${range ? `, с ${range}` : ''}: это ${info.index}-я остановка тура.`,
-        `Это ${info.index}-й город тура${range ? ` (даты с ${range})` : ''}: всего таких городов ${info.total}.`,
+        `Программа гастролирует: ${nights}, и это ${info.index}-й из них.`,
+        `Это гастрольная серия: дата ${info.index} из ${info.total}.`,
+        `Тур по городам: всего ${nights}, это ${info.index}-й.`,
+        `Такая программа проходит в нескольких городах: это ${info.index}-я остановка тура.`,
+        `Это ${info.index}-й город тура: всего таких городов ${info.total}.`,
       ];
   const tail = [
     'Удобно, что дат несколько: можно подобрать подходящую.',
@@ -811,8 +793,6 @@ async function main() {
       category: d.category,
       subcategory: d.subcategory,
       kind: d.kind,
-      nextSession: d.next_session,
-      futureSessions: d.future_sessions,
       durationMin: d.duration_min,
       priceFromRub: d.price,
       ageLimit: d.age,
