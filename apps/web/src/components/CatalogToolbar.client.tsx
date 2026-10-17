@@ -10,6 +10,7 @@ import { createPortal } from 'react-dom';
 import { CatalogDateRail } from '@/components/CatalogDateRail.client';
 import { CatalogExcludeThemes } from '@/components/CatalogExcludeThemes.client';
 import { CatalogMobileQuickFilters } from '@/components/CatalogMobileQuickFilters.client';
+import { MobileFilterDock } from '@/components/MobileFilterDock.client';
 import { CategoryTabIcon } from '@/components/CategoryTabIcon';
 import { displayCatalogLabel } from '@/lib/catalog-labels';
 import {
@@ -342,6 +343,7 @@ export function CatalogToolbar({
               disabled={disabled}
               onClick={() => setFiltersOpen(true)}
               alwaysShowLabel
+              className="max-md:hidden"
             />
           </div>
           <div className="catalog-events-mobile-filter-rows md:hidden">
