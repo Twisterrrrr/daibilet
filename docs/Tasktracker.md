@@ -1,3 +1,12 @@
+## 2026-10-17 - Чат поддержки: выпуск на прод
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| OPS.CHAT-RELEASE | Выпуск чата: web-deploy (fb43849ba), chat env, Telegram webhook, live-смоук | Высокий | ✅ run 39016557225 success; виджет live; «Hello, world» → `telegramMessageId=18` (копия в ТГ доставлена) |
+| FIX.CHAT-TG-TRANSPORT | api.telegram.org недоступен с MSK напрямую (DNS отдаёт нерабочий edge); пин на `TELEGRAM_API_FALLBACK_IP` (149.154.167.220) в `chat-telegram.ts` + `/etc/hosts` для backend | Высокий | ✅ `fb43849ba`; без env код работает как раньше (DNS) |
+| OPS.CHAT-WEBHOOK | `setWebhook` → `https://daibilet.ru/support/chat/telegram-webhook` (secret_token из `TELEGRAM_WEBHOOK_SECRET`) | Высокий | ✅ `getWebhookInfo` подтверждает URL, pending 0 |
+
+
 ## 2026-10-16 - Рерайт событий, раунд 10: дожим near-dup пар + дежурный прогон на свежем синке
 
 | ID | Задача | Приоритет | Статус |

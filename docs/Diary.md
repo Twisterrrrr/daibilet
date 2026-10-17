@@ -1,3 +1,38 @@
+## 2026-10-17 - Чат поддержки: выпуск на прод
+
+### Что выпущено
+- Web-deploy `fb43849ba` (workflow Deploy MSK web, run 39016557225, все шаги зелёные).
+- Prod env: `TELEGRAM_WEBHOOK_SECRET` сгенерирован на MSK и добавлен в `/opt/daibilet/.env`
+  (только на сервере, мимо логов); `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` уже были.
+- Telegram webhook зарегистрирован: `https://daibilet.ru/support/chat/telegram-webhook`,
+  `secret_token` = тот же секрет, `getWebhookInfo` показывает URL, pending_update_count 0.
+
+### Транспорт до Telegram (новая находка)
+С MSK-хоста `api.telegram.org` напрямую недоступен: DNS отдаёт edge-адреса
+(149.154.166.110 / 2001:67c:4e8:f004::9), оба не отвечают по таймауту — и `curl`, и
+Node `fetch` падают. Рабочий edge: `TELEGRAM_API_FALLBACK_IP=149.154.167.220` —
+переменная лежала в `.env`, но код её не использовал (и web, и backend шли через
+обычный fetch, копии в ТГ молча терялись). Обход: `--resolve` для curl, пин lookup
+для Node (`chat-telegram.ts` переведён на `https.request` с `TELEGRAM_API_FALLBACK_IP`;
+SNI/сертификат остаются `api.telegram.org`; без env — прежний DNS-путь). Для backend
+то же закрыто через `/etc/hosts`. VPN-туннель не потребовался.
+
+### Proof
+- `web:test:ci` 260/260, `web typecheck` 0 ошибок (перегенерация Prisma-клиента убрала
+  ложный `findUnique({ telegramMessageId })` из-за устаревшего сгенерённого клиента).
+- Live-смоук: виджет → «Hello, world» → сообщение в БД и в админке, `telegramMessageId=18`
+  — Telegram принял копию и вернул message_id. Запись Reply из ТГ кладёт ADMIN-сообщение
+  в ту же сессию (проверено на dev ранее).
+
+### Остаток
+- В истории чата на проде лежит тестовое «Hello, world» — можно ответить через
+  `/admin/chats` или Reply в Telegram как смоук ответного пути.
+- Finance API обновлён Codex'ом (`bf1de5e`); прочерки в метриках дашборда должны
+  уйти после его проверки контракта — сверить при следующем заходе.
+
+---
+
+
 ## 2026-10-16 - Рерайт событий, раунд 10: дожим near-dup пар + свежий синк
 
 ### Наблюдения
