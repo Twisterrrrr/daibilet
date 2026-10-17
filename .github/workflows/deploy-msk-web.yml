@@ -162,6 +162,8 @@ jobs:
           NODE_OPTIONS: --max-old-space-size=6144
           # Skip Prisma event SSG on CI (no DATABASE_URL / no DB tunnel).
           EVENT_SSG_TOP_N: "0"
+          # web:build runs pnpm generate; Prisma CLI now requires an explicit URL.
+          DATABASE_URL: postgresql://daibilet:unused@127.0.0.1:5437/daibilet?schema=public
           DAIBILET_API_INTERNAL_URL: http://127.0.0.1:4000
           DAIBILET_PUBLIC_API_INTERNAL_URL: http://127.0.0.1:4000
           NEXT_PUBLIC_TC_WIDGET_TOKEN: ${{ secrets.NEXT_PUBLIC_TC_WIDGET_TOKEN }}
