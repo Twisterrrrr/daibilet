@@ -1,7 +1,8 @@
 import type { PublicEventDto } from '@daibilet/contracts/public';
 
 import { ARTIST_BIOS, type ArtistBio } from '../data/artist-bios.ts';
-import { normalizeUserFacingCopy } from './event-description-format.ts';
+import { normalizeUserFacingCopy, stripTitleDuplicateLead } from './event-description-format.ts';
+import { stripSessionDateLines } from './event-description-session-lines.ts';
 import {
   buildMusicEventLead,
   isMusicEvent,
@@ -90,4 +91,17 @@ export function withConcertLead(event: PublicEventDto): string {
   const rest = rewritten.slice(fullLead.length).trim();
   const bioText = bio && !rewritten.includes(bio.bio) ? bio.bio : '';
   return [lead, bioText, rest].filter(Boolean).join('\n\n');
+}
+
+/**
+ * Final description for body, meta and JSON-LD: stored date lines are gone and
+ * a lead that only repeats the H1 ("В Рускеалу… в Санкт-Петербурге." under H1
+ * "В Рускеалу…") is dropped.
+ */
+export function displayEventDescription(event: PublicEventDto): string {
+  return stripTitleDuplicateLead(
+    stripSessionDateLines(withConcertLead(event)),
+    String(event.title || ''),
+    String(event.city || ''),
+  );
 }

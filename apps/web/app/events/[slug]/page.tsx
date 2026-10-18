@@ -11,8 +11,8 @@ import '@/lib/env';
 import { toEventPageClientPayload } from '@/lib/event-page-client-props';
 import {
   buildConcertLead,
+  displayEventDescription,
   isConcertLikeEvent,
-  withConcertLead,
 } from '@/lib/event-description-lead';
 import { stripSessionDateLines } from '@/lib/event-description-session-lines';
 import { eventHref } from '@/lib/routes';
@@ -113,8 +113,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const seoDescription = String(event.seoDescription || '').trim();
     const genericSeo = /^Расписание, цены и билеты на /iu.test(seoDescription);
     const concertLead = isConcertLikeEvent(event) ? buildConcertLead(event) : '';
-    const renderedLead =
-      stripSessionDateLines(withConcertLead(event)).split(/\n\s*\n/u)[0] || '';
+    const renderedLead = displayEventDescription(event).split(/\n\s*\n/u)[0] || '';
     const description =
       expansionMeta?.description ||
       (genericSeo ? concertLead : stripSessionDateLines(seoDescription)) ||

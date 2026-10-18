@@ -231,6 +231,10 @@ const COMMA_LIST_INTRO_RE = /^(.+?(?:увидеть|узнаете|посети�
 const LABEL_VALUE_LINE_RE = /^([A-ZА-ЯЁ][^:]{1,44}):\s*(.+)$/u;
 const ATTENTION_LINE_RE = /^Внимание!\s*(.+)$/iu;
 
+/** Generic labels that are section headings even on the first line. */
+const GENERIC_SECTION_LABEL_RE =
+  /^(?:программа|внимание|важно|в стоимость|что |как |место|адрес|билет|возраст|продолжительность|организационные|оплачивается|по желанию|дополнительно|контакты|телефон)/iu;
+
 export function parseCommaSeparatedListAfterIntro(line: string): { intro: string; items: string[] } | null {
   const text = String(line || '').trim();
   const match = text.match(COMMA_LIST_INTRO_RE);
@@ -260,6 +264,10 @@ export function parseLabelValueLine(line: string): { label: string; value: strin
   // A dash inside the label means it is a phrase, not a section label
   // ("Концерт на корабле - это: …"), so it must not become an <h3>.
   if (/\s[-–—]\s/u.test(label)) return null;
+  // Only short field labels ("Место:", "Маршрут:", "Продолжительность прогулки:")
+  // are headings; "Входной билет в горный парк Рускеала: 750 руб.…" is a fact
+  // line that belongs in a list, not a section title.
+  if (label.split(/\s+/u).length > 4 || label.length > 32) return null;
   return { label, value };
 }
 
@@ -276,6 +284,90 @@ export function normalizeUserFacingCopy(text: string): string {
     .replace(/[\u2013\u2014\u2212–—]/g, '-')
     // Only horizontal whitespace: a newline before a list dash is structure.
     .replace(/[ \t]+-[ \t]+/g, ' - ');
+}
+
+/** Lowercase, punctuation-free comparison key for lead/title matching. */
+function normalizeLeadKey(value: string): string {
+  return normalizeUserFacingCopy(String(value || ''))
+    .toLocaleLowerCase('ru-RU')
+    .replace(/ё/g, 'е')
+    .replace(/[«»"'`]/g, ' ')
+    .replace(/[.,!;:…()\-–—]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Drop a lead paragraph that merely repeats the H1 title
+ * ("В Рускеалу… в Санкт-Петербурге." under H1 "В Рускеалу…"). Only a short
+ * place tail ("в Санкт-Петербурге", "в Москве") counts as part of the
+ * duplicate; a real lead with its own content ("…на примерах из мультфильмов")
+ * is kept. `place` is the event city: it guards against dropping a lead whose
+ * tail merely starts with a preposition.
+ */
+export function stripTitleDuplicateLead(text: string, title: string, place?: string): string {
+  const full = String(text || '').replace(/\r\n?/g, '\n');
+  const normalizedTitle = normalizeLeadKey(title);
+  if (!normalizedTitle) return full;
+
+  const paragraphs = full.split(/\n\s*\n/);
+  const first = normalizeLeadKey(paragraphs[0] || '');
+  if (!first || !first.startsWith(normalizedTitle)) return full;
+
+  const tail = first.slice(normalizedTitle.length).trim();
+  if (!tail) return paragraphs.slice(1).join('\n\n').trim();
+
+  const placeTail = tail.match(/^(?:в|во|на|г)\s+(\S+)(?:\s+(\S+))?$/u);
+  if (!placeTail) return full;
+
+  const placeKey = normalizeLeadKey(place || '');
+  if (placeKey) {
+    const firstPlaceWord = placeKey.split(' ')[0];
+    const stem = firstPlaceWord.length > 3 ? firstPlaceWord.slice(0, firstPlaceWord.length - 2) : firstPlaceWord;
+    if (!placeTail[1].startsWith(stem)) return full;
+    // A second tail word ("в нижнем новгороде") needs a multi-word place.
+    if (placeTail[2] && !placeKey.includes(' ')) return full;
+  } else if (placeTail[2]) {
+    return full;
+  }
+
+  return paragraphs.slice(1).join('\n\n').trim();
+}
+
+/**
+ * Provider feeds often glue several bullets into one line
+ * ("…группы) Трассовая экскурсия…", "…600 руб. Полет…"). Split at a closing
+ * parenthesis, a ruble price or a known fact-starter followed by a capital
+ * word. The boundary itself stays with the left part.
+ */
+const GLUED_AFTER_BOUNDARY_RE = /(\)|руб\.(?:\/[а-яё]+)?)\s+([А-ЯЁ][а-яё-]*)/gu;
+const GLUED_BEFORE_STARTER_RE =
+  /([а-яё]{2,})\s+((?:Осмотр|Посещение|Прогулка|Экскурсия|Трансфер|Услуги|Вход|Проход|Обед|Ужин|Завтрак|Катание|Дегустация|Мастер-класс|Билеты|Трассовая|Подъём|Подъем|Спуск)(?![а-яё]))/gu;
+
+/** Capitalized words that continue a bullet instead of starting a new one. */
+const GLUED_KEEP_TOGETHER = new Set([
+  'и', 'или', 'а', 'но', 'не', 'ни',
+  'в', 'во', 'на', 'с', 'со', 'к', 'ко', 'о', 'об', 'из', 'за', 'по', 'для', 'при',
+  'от', 'до', 'у', 'без', 'после', 'через', 'между', 'под', 'над', 'про',
+  'включает', 'включают', 'включая', 'можно', 'посетить', 'увидеть', 'услышать',
+]);
+
+function startsNewBullet(word: string): boolean {
+  return !GLUED_KEEP_TOGETHER.has(word.toLocaleLowerCase('ru-RU'));
+}
+
+export function splitGluedListItem(item: string): string[] {
+  const marked = String(item || '')
+    .replace(GLUED_AFTER_BOUNDARY_RE, (match, boundary: string, next: string) =>
+      startsNewBullet(next) ? `${boundary}\u0001${next}` : match,
+    )
+    .replace(GLUED_BEFORE_STARTER_RE, (match, prev: string, starter: string) =>
+      startsNewBullet(prev) ? `${prev}\u0001${starter}` : match,
+    );
+  return marked
+    .split('\u0001')
+    .map((part) => part.trim())
+    .filter(Boolean);
 }
 
 export type EventDescriptionBlock =
@@ -328,7 +420,7 @@ function applyFactListSections(blocks: EventDescriptionBlock[]): EventDescriptio
       out.push(block);
       continue;
     }
-    const items = block.type === 'list' ? block.items : [block.text];
+    const items = (block.type === 'list' ? block.items : [block.text]).flatMap(splitGluedListItem);
     const last = out[out.length - 1];
     if (last && last.type === 'list') last.items.push(...items);
     else out.push({ type: 'list', items: [...items] });
@@ -336,10 +428,6 @@ function applyFactListSections(blocks: EventDescriptionBlock[]): EventDescriptio
 
   return out;
 }
-
-/** Generic labels that are section headings even on the first line. */
-const GENERIC_SECTION_LABEL_RE =
-  /^(?:программа|внимание|важно|в стоимость|что |как |место|адрес|билет|возраст|продолжительность|организационные|оплачивается|по желанию|дополнительно|контакты|телефон)/iu;
 
 /**
  * Parse plain-text event description into paragraphs, section headings and lists.
@@ -355,6 +443,12 @@ export function parseEventDescriptionBlocks(text: string): EventDescriptionBlock
     .replace(/[\u2800\u00A0]/g, ' ')
     .replace(/[ \t]+\n/g, '\n')
     .replace(/\n{3,}/g, '\n\n')
+    // `## 18:45 - 22:43 - …` is a schedule row, not a section heading: drop the
+    // markdown marker so the row joins the surrounding time list.
+    .replace(/^#{1,6}\s+(?=\d{1,2}:\d{2}\s*[-–—])/gmu, '')
+    // Mid-paragraph timeline rows ("…на автобусе. 22:43 - Прибытие…") become
+    // their own lines so they render as schedule items, not one wall of text.
+    .replace(/([.)])\s+(?=\d{1,2}:\d{2}\s*[-–—])/gu, '$1\n')
     // `Оплачивается дополнительно` + `## При посадке гиду` is one section.
     .replace(
       /^(Оплачивается дополнительно|Дополнительно)\s*\n+(?:##\s*)?При\s+([^\n]+)$/gimu,
@@ -458,15 +552,17 @@ export function parseEventDescriptionBlocks(text: string): EventDescriptionBlock
 
     const labelValue = parseLabelValueLine(line);
     if (labelValue) {
-      // The first line is usually the lead, not a section: keep it as one
-      // paragraph so the page does not repeat its H1 as a second heading.
-      const firstLineIsLead =
-        blocks.length === 0 && !GENERIC_SECTION_LABEL_RE.test(labelValue.label);
-      if (firstLineIsLead) {
-        blocks.push({ type: 'paragraph', text: line });
-      } else {
+      // Only real section labels ("Место:", "Маршрут:") become headings; a long
+      // phrase label ("Входной билет в горный парк Рускеала: 750 руб…") stays a
+      // single line and joins the surrounding fact list.
+      const labelIsSection =
+        GENERIC_SECTION_LABEL_RE.test(labelValue.label) ||
+        isDescriptionSectionHeading(labelValue.label);
+      if (labelIsSection) {
         blocks.push({ type: 'heading', text: labelValue.label });
         blocks.push({ type: 'paragraph', text: labelValue.value });
+      } else {
+        blocks.push({ type: 'paragraph', text: line });
       }
       i += 1;
       continue;
@@ -483,7 +579,20 @@ export function parseEventDescriptionBlocks(text: string): EventDescriptionBlock
     i += 1;
   }
 
-  return applyFactListSections(blocks);
+  return expandGluedItems(applyFactListSections(blocks));
+}
+
+/** Split bullets the provider glued into one line; schedule rows keep shape. */
+function expandGluedItems(blocks: EventDescriptionBlock[]): EventDescriptionBlock[] {
+  return blocks.map((block) => {
+    if (block.type !== 'list') return block;
+    return {
+      ...block,
+      items: block.items.flatMap((item) =>
+        isScheduleLine(item) ? [item] : splitGluedListItem(item),
+      ),
+    };
+  });
 }
 
 function renderBlocksToHtml(blocks: EventDescriptionBlock[]): string {

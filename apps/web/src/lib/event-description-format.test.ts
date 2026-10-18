@@ -6,6 +6,9 @@ import {
   parseEventDescriptionBlocks,
   parseCommaSeparatedListAfterIntro,
   parseInlineListAfterColon,
+  parseLabelValueLine,
+  splitGluedListItem,
+  stripTitleDuplicateLead,
 } from './event-description-format.ts';
 
 const CHECKMARK_SAMPLE = `На нашей экскурсии вы узнаете:
@@ -211,6 +214,71 @@ test('inline **bold** and *italic* render as strong/em', () => {
   assert.doesNotMatch(html, /\*\*/);
 });
 
+test('title-duplicate lead is dropped, a real lead stays', () => {
+  const title = 'В Рускеалу на ретропоезде: Водопады и мраморный каньон';
+  const raw = [
+    'В Рускеалу на ретропоезде: Водопады и мраморный каньон в Санкт-Петербурге.',
+    '',
+    'Почему стоит выбрать этот тур? Поездка на ретропоезде - стильном составе.',
+  ].join('\n');
+  assert.equal(
+    stripTitleDuplicateLead(raw, title, 'Санкт-Петербург'),
+    'Почему стоит выбрать этот тур? Поездка на ретропоезде - стильном составе.',
+  );
+  // Exact title repeat without a place tail counts too.
+  assert.equal(stripTitleDuplicateLead(`${title}.\n\nВторой абзац.`, title, ''), 'Второй абзац.');
+});
+
+test('lead with its own content survives the H1-duplicate check', () => {
+  const title = 'Тайный смысл сказок';
+  const raw = [
+    'Тайный смысл сказок на примерах из любимых мультфильмов.',
+    '',
+    'Второй абзац.',
+  ].join('\n');
+  assert.equal(stripTitleDuplicateLead(raw, title, 'Москва'), raw);
+
+  // A place tail for a different city is content, not a duplicate.
+  assert.equal(
+    stripTitleDuplicateLead('Сова в Смоленске на площадке «1865».', 'Сова', 'Москва'),
+    'Сова в Смоленске на площадке «1865».',
+  );
+});
+
+test('glued fact bullets split at price and parenthesis boundaries', () => {
+  assert.deepEqual(
+    splitGluedListItem(
+      'Трансфер на комфортабельном автобусе (вместимость автобуса зависит от набора группы) Трассовая экскурсия на протяжении всей программы',
+    ),
+    [
+      'Трансфер на комфортабельном автобусе (вместимость автобуса зависит от набора группы)',
+      'Трассовая экскурсия на протяжении всей программы',
+    ],
+  );
+  assert.deepEqual(
+    splitGluedListItem('Обед (комплексный) - от 600 руб. Полет на троллее в Рускеала (7+) - 2500 руб.'),
+    ['Обед (комплексный) - от 600 руб.', 'Полет на троллее в Рускеала (7+) - 2500 руб.'],
+  );
+  // A single fact is untouched.
+  assert.deepEqual(splitGluedListItem('Подготовленная программа тура'), [
+    'Подготовленная программа тура',
+  ]);
+});
+
+test('long label:value line is a fact row, not a heading', () => {
+  assert.equal(parseLabelValueLine('Входной билет в горный парк Рускеала: 750 руб./взрослый'), null);
+  assert.deepEqual(parseLabelValueLine('Маршрут: р. Фонтанка - Крюков канал'), {
+    label: 'Маршрут',
+    value: 'р. Фонтанка - Крюков канал',
+  });
+
+  const html = formatEventDescriptionHtml(
+    '## Оплачивается дополнительно\n\nВходной билет в горный парк Рускеала: 750 руб./взрослый, 650 руб. студентам',
+  );
+  assert.doesNotMatch(html, /<h3>Входной билет/);
+  assert.match(html, /<li>Входной билет в горный парк Рускеала: 750 руб\./);
+});
+
 test('drops stored nearest-session lines before rendering', () => {
   const html = formatEventDescriptionHtml(
     '## Практическая информация\n\n- Место - «Клуб», Москва\n- Ближайшая дата - 18 октября 2026, 03:00\n- Билеты - от 500 ₽',
@@ -280,11 +348,14 @@ test('bus tour: schedule rows, ВАЖНО and fact sections are structured', () 
   assert.match(html, /Водопады и мраморный каньон в Санкт-Петербурге\.<\/p>/);
   assert.doesNotMatch(html, /Санкт-Петербурге:\./);
 
-  // Nine schedule rows (including the long 17:00 row) form one list.
+  // Ten schedule rows: the `## 18:45 - 22:43` markdown row joins the time list
+  // instead of becoming a heading.
   assert.match(html, /<h3>Программа тура<\/h3>/);
   const schedule = html.match(/<h3>Программа тура<\/h3><ul>([\s\S]*?)<\/ul>/);
   assert.ok(schedule, 'schedule list is missing');
-  assert.equal((schedule[1].match(/<li>/g) || []).length, 9);
+  assert.equal((schedule[1].match(/<li>/g) || []).length, 10);
+  assert.match(html, /<li>18:45 - 22:43 - Отправление в Санкт-Петербург/);
+  assert.doesNotMatch(html, /<h3>18:45/);
 
   // Inline ВАЖНО starts its own bold paragraph.
   assert.match(html, /<strong>ВАЖНО!<\/strong>/);

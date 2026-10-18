@@ -5,13 +5,13 @@ import type { PublicEventDto } from '@daibilet/contracts/public';
 
 import { collectCatalogLabels, extractDurationLabel } from '@/lib/catalog-labels';
 import { formatEventDescriptionHtml } from '@/lib/event-description-format';
-import { withConcertLead } from '@/lib/event-description-lead';
+import { displayEventDescription } from '@/lib/event-description-lead';
 import { formatAgeLimit } from '@/lib/event-page-utils';
 import { uniqueEventTagLabels } from '@/lib/event-tag-labels';
 import { venueHref } from '@/lib/routes';
 
 export function EventDescription({ event }: { event: PublicEventDto }) {
-  const description = withConcertLead(event).trim();
+  const description = displayEventDescription(event).trim();
   if (!description) return null;
   const html = formatEventDescriptionHtml(description);
   if (!html) return null;
@@ -29,7 +29,7 @@ export function EventDescription({ event }: { event: PublicEventDto }) {
 
 /** Compact body without its own H2 - for accordion panels. */
 export function EventDescriptionBody({ event }: { event: PublicEventDto }) {
-  const description = withConcertLead(event).trim();
+  const description = displayEventDescription(event).trim();
   if (!description) return null;
   const html = formatEventDescriptionHtml(description);
   if (!html) return null;
