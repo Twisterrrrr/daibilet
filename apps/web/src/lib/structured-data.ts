@@ -334,7 +334,14 @@ export function buildEventPageJsonLd(
   payload: PublicEventPageDto,
   options?: { aggregateRating?: { ratingValue: number; reviewCount: number } | null },
 ): Array<Record<string, unknown>> {
-  return [buildEventJsonLd(payload, options), buildBreadcrumbListJsonLd(buildEventBreadcrumbs(payload.event))];
+  const eventLd = buildEventJsonLd(payload, options);
+  // Google Rich Results require startDate (GSC: «Отсутствует поле startDate»).
+  // Undated events (open-date / no dated sessions) emit no Event block at all
+  // instead of invalid markup that blocks rich results for the whole page.
+  const blocks: Array<Record<string, unknown>> = [];
+  if (eventLd.startDate) blocks.push(eventLd);
+  blocks.push(buildBreadcrumbListJsonLd(buildEventBreadcrumbs(payload.event)));
+  return blocks;
 }
 
 export function buildFaqPageJsonLd(items: CityFaqItem[]): Record<string, unknown> | null {

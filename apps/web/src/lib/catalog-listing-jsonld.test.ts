@@ -6,6 +6,7 @@ import {
   buildCollectionPageJsonLd,
   buildCityPageJsonLd,
   buildEventJsonLd,
+  buildEventPageJsonLd,
   buildEventsCatalogItemListJsonLd,
 } from './structured-data';
 
@@ -109,6 +110,44 @@ describe('catalog listing JSON-LD', () => {
       offers: [], related: [], landings: [], stats: {},
     } as any);
     assert.equal(block.startDate, '2099-01-01T19:00:00Z');
+  });
+
+  it('omits Event markup without startDate and keeps BreadcrumbList (GSC requirement)', () => {
+    const blocks = buildEventPageJsonLd({
+      event: {
+        id: 'e2',
+        slug: 'open-date-fest',
+        title: 'Фест 2027',
+        city: 'Москва',
+        venue: 'Поле',
+        venueKind: 'location',
+        category: 'Фестивали',
+        tags: [],
+        eventType: 'open_date',
+        purchaseUrl: 'https://provider.example/widget',
+      },
+      sessions: [],
+      offers: [],
+      related: [],
+      landings: [],
+      stats: {},
+    } as any);
+
+    assert.equal(blocks.some((block) => block['@type'] === 'Event'), false);
+    const crumbs = blocks.find((block) => block['@type'] === 'BreadcrumbList');
+    assert.ok(crumbs);
+  });
+
+  it('keeps Event block on the PDP when a dated session exists', () => {
+    const blocks = buildEventPageJsonLd({
+      event: { id: 'e1', slug: 'concert-1', title: 'Концерт', city: 'Москва', tags: [] },
+      sessions: [{ id: 's1', startsAt: '2099-01-01T19:00:00Z', endsAt: '2099-01-01T21:00:00Z' }],
+      offers: [], related: [], landings: [], stats: {},
+    } as any);
+
+    const event = blocks.find((block) => block['@type'] === 'Event');
+    assert.ok(event);
+    assert.equal(event!.startDate, '2099-01-01T19:00:00Z');
   });
 
   it('describes a city and its places with structured context', () => {
