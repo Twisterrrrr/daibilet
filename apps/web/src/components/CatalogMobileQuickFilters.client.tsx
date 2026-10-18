@@ -1,6 +1,6 @@
 'use client';
 
-import { X } from 'lucide-react';
+import { MapPin, SlidersHorizontal, Ticket, Wallet, X } from 'lucide-react';
 import { useEffect, useId, useState } from 'react';
 import { createPortal } from 'react-dom';
 
