@@ -148,6 +148,20 @@ pnpm web:build              # 202 статические страницы
   `next/cache` под TypeScript 6.0.3.
 - ESLint больше не гоняется на сборке, ключ `eslint` в конфиге удалён.
 
+## Городские хабы и my-day (lazy chunks)
+
+- Городские хабы (`/cities/[slug]`) загружаются лениво через `apps/web/src/lib/city-hub-lazy.ts`
+  (`HUB_LOADERS` + `loadCityHubData`). Города без чанка (`moscow`, `moskva`,
+  `sankt-peterburg`, `perm` и др.) возвращают данные из `CITY_INFO`-реестра
+  (`cityInfo-data.ts`) как fallback — это работает, но точки и сценарии «Мой день»
+  берутся из mustSee/hub-файлов, а не из `CITY_INFO`.
+- При добавлении нового города (`*-hub.ts`) **обязательно** добавьте строку в
+  `HUB_LOADERS` в `city-hub-lazy.ts` **и** файл в `apps/web/scripts/ci-test-files.txt`
+  (стабильный тест `city-hub-lazy.test.ts` проверяет, что рост не скроет пустую
+  афишу городов: Москва, SPb, смоленск и т.д.).
+- Never hardcode `slug` variations in `loadCityHubData` — используйте только ключи
+  из `HUB_LOADERS` и `resolveCityInfo` для нормализации.
+
 ## Границы владения
 
 | Область | Кто |
