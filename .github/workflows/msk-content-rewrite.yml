@@ -8,11 +8,12 @@ on:
   workflow_dispatch:
     inputs:
       task:
-        description: "music = artist-first music leads; strip-dates = remove session dates from every override"
+        description: "music = artist-first music leads; short-music = minimal factual text for short/empty descriptions; strip-dates = remove session dates from every override"
         required: true
         type: choice
         options:
           - music
+          - short-music
           - strip-dates
         default: music
       mode:
@@ -71,6 +72,9 @@ jobs:
 
           if [ "$TASK" = "music" ]; then
             SCRIPT="scripts/rewrite-music-event-descriptions.js"
+            EXTRA="--base-url $BASE_URL"
+          elif [ "$TASK" = "short-music" ]; then
+            SCRIPT="scripts/build-short-music-descriptions.js"
             EXTRA="--base-url $BASE_URL"
           else
             SCRIPT="scripts/strip-session-dates-from-descriptions.js"
