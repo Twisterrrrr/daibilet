@@ -544,6 +544,5 @@ export const SITEMAP_RESPONSE_HEADERS = {
 export function sitemapResponseHeaders(chunk: string): Record<string, string> {
   return {
     ...SITEMAP_RESPONSE_HEADERS,
-    ...(chunk === 'events' || chunk === 'venues' ? { 'Cache-Control': 'no-store' } : {}),
   };
 }

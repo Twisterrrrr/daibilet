@@ -113,6 +113,10 @@ check_sitemap_cache_speed() {
   local url="${BASE_URL}${path}"
   local t1 t2
   t1="$(curl -sS --max-time 60 -o /dev/null -w '%{time_total}' "$url" 2>/dev/null)" || t1=999
+  # Give the first (possibly cold) generation time to settle into the ISR cache
+  # before measuring the cached response - two back-to-back hits can both be
+  # waiting on the same in-flight generation and look slow.
+  sleep 3
   t2="$(curl -sS --max-time 60 -o /dev/null -w '%{time_total}' "$url" 2>/dev/null)" || t2=999
   echo "INFO: $path timing first=${t1}s second=${t2}s"
   if awk -v t="$t2" 'BEGIN { exit !(t > 5) }'; then
