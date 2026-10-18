@@ -21,6 +21,7 @@
 | OPS.ADMIN-RBAC-IMPL | Подготовка админки: реализация RBAC по готовому дизайну (аудит legacy + роли) | Высокий | ⏳ дизайн готов |
 | OPS.FINANCE-RELEASE | Подготовка финконтура: выпуск finance schema unification (`codex/finance-schema-unification`, 47 миграций) + `schema_alignment` на прод-БД (IF NOT EXISTS готов) | Высокий | 🔄 ветка готова, ждёт развёртывания |
 | OPS.TEST-SUPPLIER-ONBOARD | Ввести тестового поставщика после готовности админки и финконтура (Stage 2 LK: supplier integrations + invites уже в схеме) | Средний | ⏳ gated: admin + finance |
+| UX.EVENTS-SHOWCASE-BANNERS | Промо-баннеры в верхней части /events (как у «Афиши») поверх журнальной витрины; можно опереться на существующий hero-banners CMS (`getActiveHeroBanners`) | Низкий | ⏳ deferred по решению владельца 2026-10-18 — после пересборки каталога (журнальная витрина, Codex) |
 
 ## 2026-10-17 - Чат поддержки: выпуск на прод
 
