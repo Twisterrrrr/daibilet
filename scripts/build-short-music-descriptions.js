@@ -209,6 +209,8 @@ async function main() {
     console.log(
       `db events: ${rows.length}, short in scope: ${shortlist.length} ` +
         `(A=${shortlist.filter((r) => r.group === 'A').length} ` +
+        `B=${shortlist.filter((r) => r.group === 'B').length}), scoped: ${scoped.length}`,
+    );
 
     const changes = [];
     const samples = [];
@@ -341,5 +343,3 @@ main().catch((err) => {
   process.exit(1);
 });
 
-        `B=${shortlist.filter((r) => r.group === 'B').length}), scoped: ${scoped.length}`,
-    );
