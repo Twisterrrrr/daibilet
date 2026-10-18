@@ -4,7 +4,9 @@ import test from 'node:test';
 import {
   buildStagingRecord,
   classifyEventTiming,
+  extractEventId,
   extractEventSlug,
+  htmlToText,
   isCatalogPhoto,
   isOrganizerSender,
   messageKey,
@@ -79,4 +81,37 @@ test('event timing: past sessions block, open dates keep it alive', () => {
   // Open-date session (null startsAt) among past dates -> not finished.
   assert.equal(classifyEventTiming(['2026-10-01T10:00:00Z', null], now), 'upcoming');
   assert.equal(classifyEventTiming([null], now), 'upcoming');
+});
+
+test('event id is pulled from the Ticketscloud subject line', () => {
+  assert.equal(
+    extractEventId('Передача материалов мероприятия 6aa04c8958ec99038f05f8e1'),
+    '6aa04c8958ec99038f05f8e1',
+  );
+  assert.equal(extractEventId('Fwd: Передать материалы для 6aba2dadc8b2b907294e76ab'), '6aba2dadc8b2b907294e76ab');
+  assert.equal(extractEventId('Просто письмо без id'), null);
+});
+
+test('htmlToText keeps readable copy from HTML-only forwards', () => {
+  const html =
+    '-------- Пересылаемое сообщение -------- <p>К нам обратился организатор<br>с просьбой передать фото: &laquo;АРЛЕКИНО&raquo;</p>';
+  const text = htmlToText(html);
+  assert.match(text, /К нам обратился организатор/);
+  assert.match(text, /«АРЛЕКИНО»/);
+  assert.doesNotMatch(text, /<p>|<br>/);
+});
+
+test('staging record falls back to html text and carries the event id', () => {
+  const rec = buildStagingRecord({
+    messageId: '<f@y>',
+    date: '2026-10-18T15:04:00Z',
+    from: 'v.butin@yandex.ru',
+    subject: 'Fwd: Передача материалов мероприятия 6aa04c8958ec99038f05f8e1',
+    text: '',
+    html: '<p>Описание: <b>спектакль</b> про детскую мечту.</p>',
+    attachments: [{ name: 'image (17).png', path: '/staging/x.png', size: 10 }],
+  });
+  assert.equal(rec.eventId, '6aa04c8958ec99038f05f8e1');
+  assert.match(rec.text, /спектакль/);
+  assert.equal(rec.attachments.length, 1);
 });

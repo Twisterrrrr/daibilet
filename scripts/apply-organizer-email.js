@@ -59,8 +59,41 @@ async function main() {
   const recordPath = path.join(inboxDir, key, 'record.json');
   if (!fs.existsSync(recordPath)) throw new Error(`No staged record at ${recordPath}`);
   const record = JSON.parse(fs.readFileSync(recordPath, 'utf8'));
-  const slug = record.eventSlug;
-  if (!slug) throw new Error('record.json has no eventSlug - match the event first (edit the record)');
+  let slug = record.eventSlug;
+
+  // Match by the TC event id from the subject when no slug is set:
+  // catalogue Event.id = 'evt_' + <24-hex TC id>.
+  if (!slug && record.eventId) {
+    if (!process.env.DATABASE_URL) {
+      throw new Error('DATABASE_URL is required to match record.eventId to an event');
+    }
+    const idPool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      max: 1,
+      application_name: 'organizer_email_apply',
+    });
+    const idc = await idPool.connect();
+    try {
+      const rows = (
+        await idc.query('select id, slug, title from "Event" where id = $1', [
+          `evt_${record.eventId}`,
+        ])
+      ).rows;
+      if (!rows.length) {
+        throw new Error(`Event evt_${record.eventId} not found in the catalogue - match manually`);
+      }
+      slug = rows[0].slug;
+      console.log(`matched by event id: ${rows[0].title} -> ${slug}`);
+    } finally {
+      idc.release();
+      await idPool.end();
+    }
+  }
+  if (!slug) throw new Error('record.json has no eventSlug/eventId - match the event first (edit the record)');
+  if (!record.eventSlug) {
+    record.eventSlug = slug;
+    fs.writeFileSync(recordPath, JSON.stringify(record, null, 2));
+  }
 
   console.log(`record: ${record.from} | ${record.subject} | slug=${slug} | photos=${record.attachments.length}`);
 

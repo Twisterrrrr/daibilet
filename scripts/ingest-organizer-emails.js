@@ -101,35 +101,47 @@ async function main() {
           console.log(`skip (sender not allowlisted): ${String(parsed.from?.text || '').slice(0, 60)}`);
           continue;
         }
-        const attachments = (parsed.attachments || []).filter((a) =>
-          isCatalogPhoto(a.filename, a.contentType),
+        // Batch forwards arrive as .eml attachments ("Fwd:" with N letters
+        // inside) - stage each nested letter as its own record.
+        const nested = (parsed.attachments || []).filter(
+          (a) => String(a.contentType || '').toLowerCase().startsWith('message/rfc822'),
         );
+        const queue = nested.length
+          ? await Promise.all(nested.map((a) => simpleParser(a.content)))
+          : [parsed];
 
-        const key = messageKey(parsed.messageId, String(parsed.date || ''));
-        const msgDir = path.join(inboxDir, key);
-        const saved = [];
-        if (!dryRun) {
-          for (const att of attachments) {
+        for (const inner of queue) {
+          const photos = (inner.attachments || []).filter((a) =>
+            isCatalogPhoto(a.filename, a.contentType),
+          );
+
+          const key = messageKey(inner.messageId, String(inner.date || ''));
+          const msgDir = path.join(inboxDir, key);
+          const saved = [];
+          for (const att of photos) {
             const name = path.basename(String(att.filename || 'photo')).replace(/[^\w.\-а-яА-ЯёЁ]/gu, '_');
             const target = path.join(msgDir, name);
-            writeFileSafe(target, att.content);
+            if (!dryRun) writeFileSafe(target, att.content);
             saved.push({ name, path: target, size: att.size || att.content.length });
           }
-        }
 
-        const record = buildStagingRecord({
-          messageId: parsed.messageId,
-          date: String(parsed.date || ''),
-          from: parsed.from?.text,
-          subject: parsed.subject,
-          text: parsed.text,
-          attachments: saved,
-        });
-        if (!dryRun) {
-          writeFileSafe(path.join(msgDir, 'record.json'), JSON.stringify(record, null, 2));
+          const record = buildStagingRecord({
+            messageId: inner.messageId,
+            date: String(inner.date || ''),
+            from: parsed.from?.text,
+            subject: inner.subject || parsed.subject,
+            text: inner.text,
+            html: inner.html,
+            attachments: saved,
+          });
+          if (!dryRun) {
+            writeFileSafe(path.join(msgDir, 'record.json'), JSON.stringify(record, null, 2));
+          }
+          staged.push(record);
+          console.log(
+            `staged ${key} | ${(inner.subject || parsed.subject || '').slice(0, 60)} | photos=${photos.length} | event=${record.eventId || '-'} | slug=${record.eventSlug || '-'}`,
+          );
         }
-        staged.push(record);
-        console.log(`staged ${key} | ${record.from.slice(0, 40)} | photos=${saved.length} | slug=${record.eventSlug || '-'}`);
       }
     } finally {
       lock.release();

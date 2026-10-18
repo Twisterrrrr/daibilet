@@ -15,6 +15,38 @@ import crypto from 'node:crypto';
 const EVENT_LINK_RE = /daibilet\.ru\/events\/([A-Za-z0-9а-яА-ЯёЁ_-]+)/u;
 
 /**
+ * Ticketscloud letters carry the event id in the subject:
+ * "Передача материалов мероприятия 6aa04c8958ec99038f05f8e1". A 24-hex token
+ * is the TC event externalId (Event.id = 'evt_' + id in the catalogue).
+ */
+export function extractEventId(subject) {
+  const m = String(subject || '').match(/\b[0-9a-f]{24}\b/iu);
+  return m ? m[0].toLowerCase() : null;
+}
+
+/**
+ * Forwarded letters are HTML-only ("-------- Пересылаемое сообщение --------").
+ * Pull readable text out of the HTML when the text part is empty.
+ */
+export function htmlToText(html) {
+  return String(html || '')
+    .replace(/<style[\s\S]*?<\/style>/giu, ' ')
+    .replace(/<script[\s\S]*?<\/script>/giu, ' ')
+    .replace(/<br\s*\/?>/giu, '\n')
+    .replace(/<\/p>/giu, '\n')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/giu, ' ')
+    .replace(/&amp;/giu, '&')
+    .replace(/&quot;/giu, '"')
+    .replace(/&#39;/gu, "'")
+    .replace(/&laquo;/giu, '«')
+    .replace(/&raquo;/giu, '»')
+    .replace(/[ \t]+/g, ' ')
+    .replace(/ *\n */g, '\n')
+    .trim();
+}
+
+/**
  * Only these senders are staged (owner task 2026-10-18):
  * - v.butin@yandex.ru - the owner forwards Ticketscloud organizer mail
  *   (agent@ticketscloud.com) to info@daibilet.ru; the forward keeps the event
@@ -66,10 +98,14 @@ export function messageKey(messageId, date) {
 
 /**
  * Normalize an organizer email into a staging record. Text is trimmed and
- * capped; attachments are referenced, not embedded.
+ * capped; attachments are referenced, not embedded. HTML-only letters fall
+ * back to htmlToText; the subject may carry the TC event id.
  */
-export function buildStagingRecord({ messageId, date, from, subject, text, attachments }) {
-  const body = String(text || '')
+export function buildStagingRecord({ messageId, date, from, subject, text, html, attachments }) {
+  const bodyRaw = String(text || '').trim()
+    ? String(text || '')
+    : htmlToText(html);
+  const body = bodyRaw
     .replace(/\r\n/g, '\n')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
@@ -79,6 +115,7 @@ export function buildStagingRecord({ messageId, date, from, subject, text, attac
     date: String(date || ''),
     from: String(from || ''),
     subject: String(subject || '').trim(),
+    eventId: extractEventId(subject),
     eventSlug: extractEventSlug(body),
     text: body.slice(0, 20000),
     attachments: (attachments || []).map((a) => ({
