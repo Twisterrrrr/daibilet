@@ -14,8 +14,13 @@
  *
  * Dry-run is the default. Photos are skipped if the slug is unknown.
  *
- * Flags: --key K (staging folder name) | --with-text | --apply
+ * Flags: --key K (staging folder name) | --with-text | --apply | --force
  *        --in DIR (default ORGANIZER_INBOX_DIR or <repo>/tmp-organizer-inbox)
+ *
+ * Past-event guard: when the event's last session is already in the past the
+ * apply is refused (stored copy would go stale) unless --force is given.
+ * Open-date sessions (null startsAt) keep the event alive. No session rows at
+ * all -> a warning, not a block.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -34,6 +39,7 @@ const argValue = (name) => {
 const key = argValue('--key');
 const apply = process.argv.includes('--apply');
 const withText = process.argv.includes('--with-text');
+const force = process.argv.includes('--force');
 const inboxDir =
   argValue('--in') || process.env.ORGANIZER_INBOX_DIR || path.join(rootDir, 'tmp-organizer-inbox');
 const imagesRoot = path.join(rootDir, 'apps', 'web', 'public', 'images', 'organizer');
@@ -57,6 +63,46 @@ async function main() {
   if (!slug) throw new Error('record.json has no eventSlug - match the event first (edit the record)');
 
   console.log(`record: ${record.from} | ${record.subject} | slug=${slug} | photos=${record.attachments.length}`);
+
+  // Past-event guard: refuse stale applies unless --force.
+  const { classifyEventTiming } = await import('./lib/organizer-email-intake.js');
+  if (!process.env.DATABASE_URL) {
+    console.warn('DATABASE_URL missing - past-event check skipped (set it for the guard)');
+  } else {
+    const guardPool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      max: 1,
+      application_name: 'organizer_email_guard',
+    });
+    const guard = await guardPool.connect();
+    try {
+      const rows = (
+        await guard.query(
+          `select s."startsAt" from "EventSession" s
+             join "Event" e on e.id = s."eventId"
+            where e.slug = $1 and s."isActive"`,
+          [slug],
+        )
+      ).rows;
+      const timing = classifyEventTiming(rows.map((r) => r.startsAt));
+      if (timing === 'past') {
+        const last = rows
+          .map((r) => (r.startsAt ? new Date(r.startsAt) : null))
+          .filter(Boolean)
+          .sort((a, b) => b - a)[0];
+        const msg = `Event ${slug} already ended (last session ${last ? last.toISOString().slice(0, 10) : '?'}) - refuse apply. Use --force to override.`;
+        if (!force) throw new Error(msg);
+        console.warn(`FORCED: ${msg}`);
+      } else if (timing === 'unknown') {
+        console.warn(`No active sessions for ${slug} - cannot verify timing, review manually`);
+      } else {
+        console.log(`timing ok (${rows.length} active sessions)`);
+      }
+    } finally {
+      guard.release();
+      await guardPool.end();
+    }
+  }
 
   const photoPlan = [];
   for (const att of record.attachments || []) {

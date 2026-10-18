@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import {
   buildStagingRecord,
+  classifyEventTiming,
   extractEventSlug,
   isCatalogPhoto,
   isOrganizerSender,
@@ -65,4 +66,15 @@ test('only the Ticketscloud agent sender is allowlisted', () => {
   assert.equal(isOrganizerSender('spammer@example.com'), false);
   assert.equal(isOrganizerSender('agent@ticketscloud.com.evil.com'), false);
   assert.equal(isOrganizerSender(''), false);
+});
+
+test('event timing: past sessions block, open dates keep it alive', () => {
+  const now = new Date('2026-10-18T12:00:00Z');
+  assert.equal(classifyEventTiming(['2026-10-01T10:00:00Z', '2026-10-05T10:00:00Z'], now), 'past');
+  assert.equal(classifyEventTiming(['2026-10-01T10:00:00Z', '2026-11-05T10:00:00Z'], now), 'upcoming');
+  assert.equal(classifyEventTiming([], now), 'unknown');
+  assert.equal(classifyEventTiming(null, now), 'unknown');
+  // Open-date session (null startsAt) among past dates -> not finished.
+  assert.equal(classifyEventTiming(['2026-10-01T10:00:00Z', null], now), 'upcoming');
+  assert.equal(classifyEventTiming([null], now), 'upcoming');
 });

@@ -30,6 +30,25 @@ export function isOrganizerSender(fromText) {
   return ORGANIZER_SENDERS.includes(email);
 }
 
+/**
+ * Review policy (owner task 2026-10-18): do not attach text/photos to an event
+ * that already ended - its stored schedule would go stale. Open-date sessions
+ * (null startsAt) keep the event alive.
+ *
+ * Returns 'past' | 'upcoming' | 'unknown' (no session rows at all).
+ */
+export function classifyEventTiming(sessionStarts, now = new Date()) {
+  const list = sessionStarts || [];
+  if (!list.length) return 'unknown';
+  const times = list
+    .map((s) => (s == null ? null : new Date(s)))
+    .filter((d) => d && Number.isFinite(d.getTime()));
+  // Any open-date session means the event is not finished.
+  if (times.length < list.length) return 'upcoming';
+  const last = Math.max(...times.map((d) => d.getTime()));
+  return last < now.getTime() ? 'past' : 'upcoming';
+}
+
 export function extractEventSlug(text) {
   const m = String(text || '').match(EVENT_LINK_RE);
   return m ? m[1] : null;
