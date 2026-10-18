@@ -26,6 +26,14 @@ test('SYSTEM_PROMPT includes safety hexagon rules', () => {
   assert.match(SYSTEM_PROMPT, /ближайших 5 минут/);
 });
 
+test('SYSTEM_PROMPT aligns with the hybrid uniqueness approach', () => {
+  assert.match(SYSTEM_PROMPT, /гибрид/i);
+  assert.match(SYSTEM_PROMPT, /редакционную обёртку/i);
+  assert.match(SYSTEM_PROMPT, /Не забудьте/);
+  assert.match(SYSTEM_PROMPT, /Практическая информация/);
+  assert.match(SYSTEM_PROMPT, /Не воспроизводите такие блоки дословно/i);
+});
+
 test('truncateRewriteInput keeps short text', () => {
   const result = truncateRewriteInput('  hello world  ');
   assert.equal(result.text, 'hello world');
