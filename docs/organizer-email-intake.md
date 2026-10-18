@@ -16,6 +16,8 @@
    (или `node scripts/ingest-organizer-emails.js --since-days 3`).
    Стейджит каждое письмо как `tmp-organizer-inbox/<key>/record.json` + фото.
    Ссылка `daibilet.ru/events/<slug>` в письме автоматически становится `eventSlug`.
+   **Фильтр отправителя**: стейджатся только письма от `agent@ticketscloud.com`
+   (Ticketscloud пересылает письма организаторов) — остальные пропускаются.
 2. **Ревью** — оператор читает `record.json`: сверяет текст, фото, событие
    (без ссылки в письме — дописать `eventSlug` в record.json вручную).
 3. **Apply** — `node scripts/apply-organizer-email.js --key <key> --with-text --apply`.

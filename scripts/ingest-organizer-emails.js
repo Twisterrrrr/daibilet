@@ -59,6 +59,7 @@ async function main() {
   const {
     buildStagingRecord,
     isCatalogPhoto,
+    isOrganizerSender,
     messageKey,
   } = await import('./lib/organizer-email-intake.js');
 
@@ -82,6 +83,7 @@ async function main() {
 
   await client.connect();
   const staged = [];
+  let skippedSenders = 0;
   try {
     const lock = await client.getMailboxLock('INBOX');
     try {
@@ -94,6 +96,11 @@ async function main() {
         const msg = await client.fetchOne(uid, { source: true }, { uid: true });
         if (!msg || !msg.source) continue;
         const parsed = await simpleParser(msg.source);
+        if (!isOrganizerSender(parsed.from?.text)) {
+          skippedSenders += 1;
+          console.log(`skip (sender not allowlisted): ${String(parsed.from?.text || '').slice(0, 60)}`);
+          continue;
+        }
         const attachments = (parsed.attachments || []).filter((a) =>
           isCatalogPhoto(a.filename, a.contentType),
         );
@@ -135,6 +142,7 @@ async function main() {
     mode: dryRun ? 'dry-run' : 'stage',
     host,
     fetched: staged.length,
+    skippedSenders,
     withSlug: staged.filter((r) => r.eventSlug).length,
     withPhotos: staged.filter((r) => r.attachments.length).length,
     inboxDir,

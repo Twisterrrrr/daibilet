@@ -5,6 +5,7 @@ import {
   buildStagingRecord,
   extractEventSlug,
   isCatalogPhoto,
+  isOrganizerSender,
   messageKey,
   scoreTitleCandidates,
 } from './organizer-email-intake.js';
@@ -55,4 +56,13 @@ test('catalog photos: images by mime or extension, docs skipped', () => {
   assert.equal(isCatalogPhoto('a.jpg', 'image/jpeg'), true);
   assert.equal(isCatalogPhoto('b.png', ''), true);
   assert.equal(isCatalogPhoto('c.pdf', 'application/pdf'), false);
+});
+
+test('only the Ticketscloud agent sender is allowlisted', () => {
+  assert.equal(isOrganizerSender('Ticketscloud <agent@ticketscloud.com>'), true);
+  assert.equal(isOrganizerSender('agent@ticketscloud.com'), true);
+  assert.equal(isOrganizerSender('AGENT@TicketsCloud.COM'), true);
+  assert.equal(isOrganizerSender('spammer@example.com'), false);
+  assert.equal(isOrganizerSender('agent@ticketscloud.com.evil.com'), false);
+  assert.equal(isOrganizerSender(''), false);
 });

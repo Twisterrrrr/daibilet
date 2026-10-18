@@ -14,6 +14,22 @@ import crypto from 'node:crypto';
 /** daibilet.ru event links inside the email body (".../events/<slug>"). */
 const EVENT_LINK_RE = /daibilet\.ru\/events\/([A-Za-z0-9а-яА-ЯёЁ_-]+)/u;
 
+/**
+ * Only these senders are staged (owner task 2026-10-18): the Ticketscloud
+ * agent forwards organizer mail - everything else is noise/spam.
+ */
+const ORGANIZER_SENDERS = ['agent@ticketscloud.com'];
+
+export function senderEmail(fromText) {
+  const m = String(fromText || '').match(/[\w.+-]+@[\w.-]+\.\w+/u);
+  return m ? m[0].toLowerCase() : '';
+}
+
+export function isOrganizerSender(fromText) {
+  const email = senderEmail(fromText);
+  return ORGANIZER_SENDERS.includes(email);
+}
+
 export function extractEventSlug(text) {
   const m = String(text || '').match(EVENT_LINK_RE);
   return m ? m[1] : null;
