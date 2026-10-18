@@ -1,9 +1,7 @@
 import type { Metadata } from 'next';
-import { cookies } from 'next/headers';
 
 import { HomePageContent } from '@/components/HomePageContent';
 import { SiteLayout } from '@/components/SiteLayout';
-import { decodeSelectedCityCookie, SELECTED_CITY_COOKIE } from '@/lib/selected-city';
 import {
   HOME_SEO_DESCRIPTION_FALLBACK,
   HOME_SEO_TITLE,
@@ -45,10 +43,9 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function HomePage() {
-  const cityCookie = decodeSelectedCityCookie((await cookies()).get(SELECTED_CITY_COOKIE)?.value);
+export default function HomePage() {
   return (
-    <SiteLayout initialCity={cityCookie}>
+    <SiteLayout>
       <HomePageContent />
     </SiteLayout>
   );
