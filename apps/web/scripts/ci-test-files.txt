@@ -59,3 +59,4 @@ src/lib/city-hub-scenario-blog-links.test.ts
 # Concert cards lead with the artist/genre/venue instead of generated filler.
 src/lib/event-description-lead.test.ts
 src/lib/event-music-description.test.ts
+src/lib/event-not-found-similar.test.ts
