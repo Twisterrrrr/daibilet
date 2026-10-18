@@ -59,12 +59,14 @@ test('catalog photos: images by mime or extension, docs skipped', () => {
   assert.equal(isCatalogPhoto('c.pdf', 'application/pdf'), false);
 });
 
-test('only the Ticketscloud agent sender is allowlisted', () => {
+test('only allowlisted senders pass: owner forwards and the TC agent', () => {
   assert.equal(isOrganizerSender('Ticketscloud <agent@ticketscloud.com>'), true);
   assert.equal(isOrganizerSender('agent@ticketscloud.com'), true);
-  assert.equal(isOrganizerSender('AGENT@TicketsCloud.COM'), true);
+  assert.equal(isOrganizerSender('Василий <v.butin@yandex.ru>'), true);
+  assert.equal(isOrganizerSender('V.BUTIN@YANDEX.RU'), true);
   assert.equal(isOrganizerSender('spammer@example.com'), false);
   assert.equal(isOrganizerSender('agent@ticketscloud.com.evil.com'), false);
+  assert.equal(isOrganizerSender('v.butin@yandex.ru.fake.com'), false);
   assert.equal(isOrganizerSender(''), false);
 });
 

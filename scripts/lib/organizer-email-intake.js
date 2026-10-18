@@ -15,10 +15,14 @@ import crypto from 'node:crypto';
 const EVENT_LINK_RE = /daibilet\.ru\/events\/([A-Za-z0-9а-яА-ЯёЁ_-]+)/u;
 
 /**
- * Only these senders are staged (owner task 2026-10-18): the Ticketscloud
- * agent forwards organizer mail - everything else is noise/spam.
+ * Only these senders are staged (owner task 2026-10-18):
+ * - v.butin@yandex.ru - the owner forwards Ticketscloud organizer mail
+ *   (agent@ticketscloud.com) to info@daibilet.ru; the forward keeps the event
+ *   link in the body, so slug matching still works;
+ * - agent@ticketscloud.com - direct letters, kept for when they arrive here too.
+ * Everything else is noise/spam.
  */
-const ORGANIZER_SENDERS = ['agent@ticketscloud.com'];
+const ORGANIZER_SENDERS = ['agent@ticketscloud.com', 'v.butin@yandex.ru'];
 
 export function senderEmail(fromText) {
   const m = String(fromText || '').match(/[\w.+-]+@[\w.-]+\.\w+/u);
