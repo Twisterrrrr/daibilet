@@ -6,7 +6,17 @@
 const { createRequire } = require("module");
 const path = require("path");
 
-const rootRequire = createRequire(path.resolve(__dirname, "..", "..", "..", "package.json"));
+// scripts/lib -> repo root (pnpm hoists nodemailer to <root>/node_modules).
+const rootRequire = createRequire(path.resolve(__dirname, "..", "..", "package.json"));
+
+function loadNodemailer() {
+  try {
+    return rootRequire("nodemailer");
+  } catch {
+    // Fallback: plain CJS resolution walks up to <root>/node_modules as well.
+    return require("nodemailer");
+  }
+}
 
 const DEFAULT_NOTIFY_TO = "info@daibilet.ru";
 /** ExternalOrder.status values that mean "buyer paid". */
@@ -108,7 +118,7 @@ function sendOwnerOrderMail(order, env = process.env) {
   const { subject, html, orderCode } = buildOwnerOrderMail(order);
   return (async () => {
     try {
-      const nodemailer = rootRequire("nodemailer");
+      const nodemailer = loadNodemailer();
       const transport = nodemailer.createTransport({
         host: env.SMTP_HOST,
         port: Number(env.SMTP_PORT || 587),
