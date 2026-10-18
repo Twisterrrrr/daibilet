@@ -7,7 +7,7 @@
  *   pnpm --filter @daibilet/worker start -- <job>
  *   pnpm worker -- <job>
  *
- * Jobs: health | list | tc-catalog | tep-catalog | tc-orders | tep-orders
+ * Jobs: health | list | tc-catalog | tep-catalog | tc-orders | tep-orders | organizer-inbox
  */
 import { JOBS, JOB_IDS } from '../src/jobs.mjs';
 import { ROOT_DIR, runJob } from '../src/run-job.mjs';
@@ -26,6 +26,7 @@ Jobs:
   tep-catalog  Teplohod catalog + revalidate
   tc-orders    Ticketscloud orders mirror
   tep-orders   Teplohod orders stub (deferred — no partner API)
+  organizer-inbox  Fetch organizer emails (Timeweb IMAP) into staging inbox
 
 Examples:
   pnpm worker -- health
