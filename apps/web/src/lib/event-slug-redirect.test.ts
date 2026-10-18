@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { cyrillicEventRedirectPath } from './event-slug-redirect.ts';
+import { cyrillicCityRedirectPath, cyrillicEventRedirectPath } from './event-slug-redirect.ts';
 
 test('cyrillicEventRedirectPath transliterates TEP Cyrillic event URLs', () => {
   const cyrillic =
@@ -29,4 +29,20 @@ test('cyrillicEventRedirectPath leaves latin event slugs alone', () => {
     null,
   );
   assert.equal(cyrillicEventRedirectPath('/events'), null);
+});
+
+test('cyrillicCityRedirectPath transliterates Cyrillic city hub URLs', () => {
+  assert.equal(cyrillicCityRedirectPath('/cities/москва'), '/cities/moskva');
+  assert.equal(cyrillicCityRedirectPath('/cities/санкт-петербург'), '/cities/sankt-peterburg');
+  assert.equal(
+    cyrillicCityRedirectPath('/cities/%D0%BC%D0%BE%D1%81%D0%BA%D0%B2%D0%B0'),
+    '/cities/moskva',
+  );
+  assert.equal(cyrillicCityRedirectPath('/places/c/казань'), '/places/c/kazan');
+});
+
+test('cyrillicCityRedirectPath leaves latin city slugs alone', () => {
+  assert.equal(cyrillicCityRedirectPath('/cities/moskva'), null);
+  assert.equal(cyrillicCityRedirectPath('/cities'), null);
+  assert.equal(cyrillicCityRedirectPath('/'), null);
 });

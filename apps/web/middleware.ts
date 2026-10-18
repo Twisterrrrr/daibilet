@@ -7,7 +7,7 @@ import {
   readAdminBasicAuthConfig,
 } from '@/lib/admin-basic-auth';
 import { isAdminHost, rewriteAdminHostPathname } from '@/lib/admin-host';
-import { cyrillicEventRedirectPath } from '@/lib/event-slug-redirect';
+import { cyrillicCityRedirectPath, cyrillicEventRedirectPath } from '@/lib/event-slug-redirect';
 import {
   EVENTS_CATALOG_CANONICAL_HINT_HEADER,
   EVENTS_CATALOG_PATH,
@@ -97,6 +97,9 @@ export async function middleware(request: NextRequest) {
   const eventSlugRedirect = redirectCyrillicEventSlug(request);
   if (eventSlugRedirect) return eventSlugRedirect;
 
+  const citySlugRedirect = redirectCyrillicCitySlug(request);
+  if (citySlugRedirect) return citySlugRedirect;
+
   const cityQueryRedirect = redirectBrokenRegionChildCityQuery(request);
   if (cityQueryRedirect) return cityQueryRedirect;
 
@@ -148,6 +151,14 @@ function handleEventsCatalogIndexing(
 
 function redirectCyrillicEventSlug(request: NextRequest): NextResponse | null {
   const targetPath = cyrillicEventRedirectPath(request.nextUrl.pathname);
+  if (!targetPath) return null;
+  const url = request.nextUrl.clone();
+  url.pathname = targetPath;
+  return NextResponse.redirect(url, 308);
+}
+
+function redirectCyrillicCitySlug(request: NextRequest): NextResponse | null {
+  const targetPath = cyrillicCityRedirectPath(request.nextUrl.pathname);
   if (!targetPath) return null;
   const url = request.nextUrl.clone();
   url.pathname = targetPath;
