@@ -6,16 +6,19 @@
 const { createRequire } = require("module");
 const path = require("path");
 
-// scripts/lib -> repo root (pnpm hoists nodemailer to <root>/node_modules).
-const rootRequire = createRequire(path.resolve(__dirname, "..", "..", "package.json"));
-
+// nodemailer is declared in apps/backend and apps/web (pnpm links it under their
+// node_modules), so resolve from those package roots - plain upward resolution
+// from scripts/lib never reaches it.
 function loadNodemailer() {
-  try {
-    return rootRequire("nodemailer");
-  } catch {
-    // Fallback: plain CJS resolution walks up to <root>/node_modules as well.
-    return require("nodemailer");
+  const rootDir = path.resolve(__dirname, "..", "..");
+  for (const pkg of ["apps/backend/package.json", "apps/web/package.json"]) {
+    try {
+      return createRequire(path.join(rootDir, pkg))("nodemailer");
+    } catch {
+      // try the next candidate
+    }
   }
+  return require("nodemailer");
 }
 
 const DEFAULT_NOTIFY_TO = "info@daibilet.ru";
