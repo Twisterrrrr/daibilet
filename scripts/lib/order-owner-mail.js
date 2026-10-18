@@ -72,7 +72,7 @@ function buildOwnerOrderMail(order) {
   const ticketCount = Number(order.ticketCount || 0);
   const amountRub = extractAmountRub(snapshot);
   // Catalog page for the purchased event: /events/{slug} (latin CHPU).
-  const eventSlug = String(order.eventSlug || order.eventSourceSlug || "").trim();
+  const eventSlug = String(order.eventSlug || "").trim();
   const eventLink = eventSlug
     ? `https://daibilet.ru/events/${encodeURIComponent(eventSlug)}`
     : null;

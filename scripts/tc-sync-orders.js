@@ -774,8 +774,6 @@ async function dispatchOwnerOrderNotifications(pool) {
               (select count(*) from "ExternalTicket" t where t."externalOrderId" = o.id) as "ticketCount",
               (select e.slug from "ExternalTicket" t join "Event" e on e.id = t."eventId"
                 where t."externalOrderId" = o.id and e.slug is not null limit 1) as "eventSlug",
-              (select e."sourceSlug" from "ExternalTicket" t join "Event" e on e.id = t."eventId"
-                where t."externalOrderId" = o.id and e."sourceSlug" is not null limit 1) as "eventSourceSlug",
               s.name as "sourceName"
        from "ExternalOrder" o
        left join "Source" s on s.id = o."sourceId"
