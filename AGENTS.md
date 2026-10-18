@@ -108,13 +108,13 @@ pnpm install --frozen-lockfile
 pnpm db:generate
 pnpm backend:typecheck      # жёсткий гейт, блокирует CI
 pnpm backend:test:ts        # 219 тестов
-pnpm --filter @daibilet/web typecheck   # см. baseline ниже, не блокирует
+pnpm --filter @daibilet/web typecheck   # 0 ошибок (гейт, не возвращать ignoreBuildErrors)
 pnpm web:test:ci            # 231 тест, только веб-пакет
 pnpm web:build              # 202 статические страницы
 ```
 
-`pnpm web:typecheck` даёт **140** ошибок и завершается с ненулевым кодом — это
-ожидаемо, гейтом не является. `web:test:ci` гоняет **только** `apps/web`;
+`pnpm --filter @daibilet/web typecheck` должен давать **0** ошибок (закрыто
+2026-09-30). `web:test:ci` гоняет **только** `apps/web`;
 общее число по монорепо выше, не искать его в выводе этой команды.
 
 `pnpm web:build` требует БД: поднять `pnpm db:up`, применить `pnpm db:deploy`.
@@ -123,16 +123,14 @@ pnpm web:build              # 202 статические страницы
 
 ### Baseline типов
 
-`apps/web` сейчас содержит **140 ошибок типов**, и они не блокируют сборку:
-в `apps/web/next.config.ts` стоит `typescript: { ignoreBuildErrors: true }`.
-Это осознанное решение, но ошибки копятся незаметно.
+`apps/web` typecheck: **0 ошибок** (закрыто 2026-09-30, перепроверено 2026-10-18).
+`typescript: { ignoreBuildErrors: true }` из `apps/web/next.config.ts` **снят** —
+ошибки типов снова ломают сборку, и это задумано.
 
-- CI считает число в job summary (шаг `Web typecheck (non-blocking baseline)`).
-- **Baseline: 140.** Если после твоей правки число выросло — ты добавил
-  регрессию, даже если сборка зелёная.
-- Снять `ignoreBuildErrors` — отдельной задачей, после того как дойдёт до нуля.
-- Основные источники: `src/lib/selected-city.test.ts` (22),
-  `src/server/day-route-match.ts` (16), `src/components/DayRoutePanel.client.tsx` (15).
+- **Не возвращай `ignoreBuildErrors`:** если сборка упала на типах — чини типы.
+- Гейт: `pnpm --filter @daibilet/web typecheck` должен оставаться на 0.
+- Зависимость `nodemailer` для `buyer-ticket-mail` остаётся отдельным вопросом
+  (это не ошибка типов, а незакрытая зависимость).
 
 ### Next.js 16
 
