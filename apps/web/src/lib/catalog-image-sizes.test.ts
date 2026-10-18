@@ -12,7 +12,7 @@ import {
 } from './catalog-image-sizes.ts';
 
 test('catalog eventCard sizes match multi-column grid (not 100vw on mobile)', () => {
-  assert.equal(CATALOG_IMAGE_QUALITY, 90);
+  assert.equal(CATALOG_IMAGE_QUALITY, 80);
   assert.equal(CARD_IMAGE_QUALITY, 88);
   assert.equal(AFFICHE_IMAGE_QUALITY, 95);
   assert.ok(AFFICHE_IMAGE_QUALITY >= CARD_IMAGE_QUALITY);
