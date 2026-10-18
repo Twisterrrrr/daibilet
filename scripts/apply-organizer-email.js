@@ -58,7 +58,7 @@ async function main() {
   if (!key) throw new Error('Usage: apply-organizer-email.js --key <staging-key> [--with-text] [--apply]');
   const recordPath = path.join(inboxDir, key, 'record.json');
   if (!fs.existsSync(recordPath)) throw new Error(`No staged record at ${recordPath}`);
-  const record = JSON.parse(fs.readFileSync(recordPath, 'utf8'));
+  const record = JSON.parse(fs.readFileSync(recordPath, 'utf8').replace(/^\uFEFF/u, ''));
   let slug = record.eventSlug;
 
   // Match by the TC event id from the subject when no slug is set:
@@ -96,7 +96,6 @@ async function main() {
   }
 
   console.log(`record: ${record.from} | ${record.subject} | slug=${slug} | photos=${record.attachments.length}`);
-
   // Past-event guard: refuse stale applies unless --force.
   const { classifyEventTiming } = await import('./lib/organizer-email-intake.js');
   if (!process.env.DATABASE_URL) {
@@ -137,17 +136,96 @@ async function main() {
     }
   }
 
-  const photoPlan = [];
+  // --- Hero photo (variant A): assess staged photos, pick the best horizontal
+  // one as the cover. Verticals / small / dark photos stay in staging for the
+  // future gallery (variant B). Watermarks are NOT auto-detected - the operator
+  // checks them at review ("better a mediocre own cover than a bad photo").
+  const { assessHeroPhoto, parseImageDimensions, pickHeroCandidate } = await import(
+    './lib/hero-photo-check.js'
+  );
+  const candidates = [];
   for (const att of record.attachments || []) {
     if (!fs.existsSync(att.path)) {
       console.warn(`missing attachment file: ${att.path}`);
       continue;
     }
+    const dims = parseImageDimensions(fs.readFileSync(att.path));
+    const assessment = assessHeroPhoto(dims, null);
     const name = path.basename(att.name).replace(/[^\w.\-а-яА-ЯёЁ]/gu, '_');
-    photoPlan.push({ from: att.path, to: path.join(imagesRoot, slug, name) });
+    candidates.push({ from: att.path, name, dims, assessment });
+    console.log(
+      `photo ${name}: ${dims ? `${dims.width}x${dims.height}` : 'unreadable'} -> ${assessment.ok ? 'hero candidate' : assessment.reason}`,
+    );
   }
-  console.log(`photos to copy: ${photoPlan.length}`);
-  for (const p of photoPlan) console.log(`  ${p.from} -> ${p.to}`);
+  const hero = pickHeroCandidate(candidates);
+  if (hero) console.log(`hero candidate: ${hero.name} (score ${hero.assessment.score})`);
+  else console.log('no hero candidate - all photos stay in staging');
+
+  // Compare with the current cover before replacing it.
+  let heroPlan = null;
+  if (hero && process.env.DATABASE_URL) {
+    const coverPool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      max: 1,
+      application_name: 'organizer_email_apply',
+    });
+    const cover = await coverPool.connect();
+    try {
+      const rows = (
+        await cover.query(
+          `select o."imageUrl" as override_image, e."imageUrl" as event_image
+             from "Event" e left join "EventOverride" o on o."eventId" = e.id
+            where e.slug = $1`,
+          [slug],
+        )
+      ).rows;
+      const currentUrl = String(rows[0]?.override_image || rows[0]?.event_image || '').trim();
+      const isPlaceholder =
+        !currentUrl || /\/images\/events\/generated\//u.test(currentUrl);
+      let replace = isPlaceholder;
+      let reason = isPlaceholder ? (currentUrl ? 'current is a generated placeholder' : 'no current cover') : '';
+      if (!replace && currentUrl) {
+        // Best-effort read of the current cover to compare shape/size.
+        try {
+          const localPath = currentUrl.startsWith('/images/')
+            ? path.join(rootDir, 'apps', 'web', 'public', currentUrl.slice(1))
+            : null;
+          const buf = localPath && fs.existsSync(localPath)
+            ? fs.readFileSync(localPath)
+            : Buffer.from(await (await fetch(currentUrl)).arrayBuffer());
+          const currentAssessment = assessHeroPhoto(parseImageDimensions(buf), null);
+          if (!currentAssessment.ok) {
+            replace = true;
+            reason = `current cover unusable: ${currentAssessment.reason}`;
+          } else if (hero.assessment.score > currentAssessment.score) {
+            replace = true;
+            reason = `organizer photo scores higher (${hero.assessment.score} > ${currentAssessment.score})`;
+          } else {
+            reason = `current cover is fine (score ${currentAssessment.score} >= ${hero.assessment.score})`;
+          }
+        } catch {
+          replace = true;
+          reason = 'current cover not readable (expired signed URL?) - replacing';
+        }
+      }
+      console.log(`hero decision: ${replace ? 'REPLACE' : 'KEEP'} - ${reason}`);
+      if (replace) {
+        const heroName = `hero-${hero.name}`;
+        heroPlan = {
+          from: hero.from,
+          to: path.join(imagesRoot, slug, heroName),
+          imageUrl: `/images/organizer/${slug}/${heroName}`,
+        };
+        console.log(`hero plan: ${hero.from} -> ${heroPlan.to}`);
+        console.log(`           EventOverride.imageUrl = ${heroPlan.imageUrl}`);
+      }
+    } finally {
+      cover.release();
+      await coverPool.end();
+    }
+  } else if (hero) {
+    console.warn('DATABASE_URL missing - hero cannot be compared/replaced');
+  }
 
   if (withText) {
     console.log('text to store as EventOverride.description:');
@@ -161,10 +239,10 @@ async function main() {
     return;
   }
 
-  for (const p of photoPlan) {
-    fs.mkdirSync(path.dirname(p.to), { recursive: true });
-    fs.copyFileSync(p.from, p.to);
-    console.log(`copied ${p.to}`);
+  if (heroPlan) {
+    fs.mkdirSync(path.dirname(heroPlan.to), { recursive: true });
+    fs.copyFileSync(heroPlan.from, heroPlan.to);
+    console.log(`copied hero ${heroPlan.to}`);
   }
 
   if (withText) {
@@ -199,6 +277,32 @@ async function main() {
     } finally {
       client.release();
       await pool.end();
+    }
+  }
+
+  if (heroPlan) {
+    if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is required to store the hero image');
+    const heroPool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      max: 1,
+      application_name: 'organizer_email_apply',
+    });
+    const hc = await heroPool.connect();
+    try {
+      const rows = (await hc.query('select id from "Event" where slug = $1', [slug])).rows;
+      if (!rows.length) throw new Error(`Event not found for slug ${slug}`);
+      await hc.query(
+        `
+        insert into "EventOverride" (id, "eventId", "imageUrl", "createdAt", "updatedAt")
+        values ($1, $2, $3, now(), now())
+        on conflict ("eventId") do update set "imageUrl" = excluded."imageUrl", "updatedAt" = now()
+        `,
+        [`eov_${crypto.randomBytes(12).toString('hex')}`, rows[0].id, heroPlan.imageUrl],
+      );
+      console.log(`hero image stored for event ${rows[0].id}`);
+    } finally {
+      hc.release();
+      await heroPool.end();
     }
   }
 
