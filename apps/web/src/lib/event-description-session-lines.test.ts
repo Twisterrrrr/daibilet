@@ -81,3 +81,39 @@ test('keeps a clean period when the session followed a colon', () => {
   );
 });
 
+test('drops a legacy lead with the date after the label, no colon or dash', () => {
+  const raw =
+    '«Новогоднее приключение Лёли и Сони» в Москве - ближайшая дата 4 января 2027, 09:00.  Эта история случилась на железнодорожном вокзале.';
+  const cleaned = stripSessionDateLines(raw);
+  assert.doesNotMatch(cleaned, /ближайшая дата/i);
+  assert.doesNotMatch(cleaned, /09:00/);
+  assert.match(cleaned, /^«Новогоднее приключение Лёли и Сони» в Москве\./);
+  assert.match(cleaned, /Эта история случилась на железнодорожном вокзале/);
+  assert.equal(hasSessionDateLines(cleaned), false);
+  assert.equal(hasSessionDateLines(raw), true);
+});
+
+test('drops a list item whose date follows the label directly', () => {
+  const raw = [
+    '## Практическая информация',
+    '',
+    '- Место - «Клуб», Москва',
+    '- Ближайшая дата 4 января 2027, 09:00',
+    '- Билеты - от 1 500 ₽',
+  ].join('\n');
+
+  const cleaned = stripSessionDateLines(raw);
+  assert.doesNotMatch(cleaned, /Ближайшая дата/);
+  assert.doesNotMatch(cleaned, /09:00/);
+  assert.match(cleaned, /- Место - «Клуб», Москва/);
+  assert.match(cleaned, /- Билеты - от 1 500 ₽/);
+  assert.equal(hasSessionDateLines(cleaned), false);
+});
+
+test('keeps prose that merely says "ближайшая дата" without a date', () => {
+  const raw = 'О ближайшей дате объявления результатов сообщим дополнительно.';
+  assert.equal(stripSessionDateLines(raw), raw);
+  assert.equal(hasSessionDateLines(raw), false);
+});
+
+

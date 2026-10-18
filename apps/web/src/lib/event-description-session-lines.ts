@@ -17,15 +17,22 @@ const SESSION_LABELS = [
 
 const LABEL_PATTERN = SESSION_LABELS.join('|');
 
+/**
+ * Delimiter between the label and its value. Either an explicit `:`/`-`, or a
+ * bare space before the date (`… - ближайшая дата 4 января 2027, 09:00.`) which
+ * legacy leads used. The digit guard stops prose like `ближайшая дата объявления`.
+ */
+const DELIM = '(?:\\s*[-:]\\s*|\\s+(?=\\d))';
+
 /** A whole list item: `- Ближайшая дата - 18 октября, 03:00`. */
 const LIST_ITEM_LINE_RE = new RegExp(
-  `^\\s*[-*]\\s*(?:${LABEL_PATTERN})\\s*[-:].*$`,
+  `^\\s*[-*]\\s*(?:${LABEL_PATTERN})${DELIM}.*$`,
   'iu',
 );
 
 /** An inline sentence: `Следующий сеанс - 18 октября, 03:00.` (never crosses a tag). */
 const INLINE_RE = new RegExp(
-  `(?:^|(?<=[\\s>]))(?:${LABEL_PATTERN})\\s*[-:]\\s*[^<\\n]*?(?:\\.(?=\\s|$|<)|$|(?=<))`,
+  `(?:^|(?<=[\\s>]))(?:${LABEL_PATTERN})${DELIM}[^<\\n]*?(?:\\.(?=\\s|$|<)|$|(?=<))`,
   'gimu',
 );
 
