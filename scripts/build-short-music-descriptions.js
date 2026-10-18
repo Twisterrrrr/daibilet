@@ -157,8 +157,12 @@ async function main() {
       const isPlaceholder = !effective || PLACEHOLDER_RE.test(effective);
       if (!isShort && !isPlaceholder) continue;
 
-      // Group A: real provider remainder after removing filler.
-      const remainder = stripSessionDateLines(effective)
+      // Group A: real provider remainder after removing filler and HTML tags.
+      const remainder = stripSessionDateLines(
+        effective
+          .replace(/<br\s*\/?>/gi, '\n')
+          .replace(/<[^>]+>/g, ' '),
+      )
         .split(/\n\s*\n/u)
         .map((part) => part.trim())
         .filter((part) => part && !PLACEHOLDER_RE.test(part))
