@@ -38,6 +38,10 @@ function escapeHtml(value) {
     .replace(/'/g, "&#39;");
 }
 
+function escapeAttr(value) {
+  return escapeHtml(value);
+}
+
 function formatRub(amount) {
   if (typeof amount !== "number" || !Number.isFinite(amount) || amount < 0) return null;
   return `${Math.round(amount).toLocaleString("ru-RU")} ₽`;
@@ -67,6 +71,11 @@ function buildOwnerOrderMail(order) {
   const eventTitle = snapshot.sourceEventTitle || "Импортированное событие";
   const ticketCount = Number(order.ticketCount || 0);
   const amountRub = extractAmountRub(snapshot);
+  // Catalog page for the purchased event: /events/{slug} (latin CHPU).
+  const eventSlug = String(order.eventSlug || order.eventSourceSlug || "").trim();
+  const eventLink = eventSlug
+    ? `https://daibilet.ru/events/${encodeURIComponent(eventSlug)}`
+    : null;
 
   const subject = `Дайбилет. Поступила оплата по заказу №${orderCode}`;
   const rows = [
@@ -75,17 +84,24 @@ function buildOwnerOrderMail(order) {
     ["E-mail", buyer.email || "—"],
     ["Телефон", buyer.phone || "—"],
     ["Мероприятие", eventTitle],
-    ["Источник", order.sourceName || "Ticketscloud"],
   ];
+  if (eventLink) {
+    rows.push([
+      "Страница события",
+      `<a href="${escapeAttr(eventLink)}" style="color:#047857;word-break:break-all;">${escapeHtml(eventLink)}</a>`,
+      true,
+    ]);
+  }
+  rows.push(["Источник", order.sourceName || "Ticketscloud"]);
   if (order.purchasedAt) rows.push(["Дата покупки", new Date(order.purchasedAt).toLocaleString("ru-RU", { timeZone: "Europe/Moscow" })]);
   rows.push(["Билетов", ticketCount > 0 ? `${ticketCount} шт.` : "—"]);
   if (amountRub != null) rows.push(["Сумма заказа", formatRub(amountRub)]);
 
   const rowsHtml = rows
     .map(
-      ([label, value]) => `<tr>
+      ([label, value, raw]) => `<tr>
         <th style="text-align:left;width:200px;padding:8px;border-bottom:1px solid #e5e5e5;color:#888;font-weight:600;">${escapeHtml(label)}</th>
-        <td style="padding:8px;border-bottom:1px solid #e5e5e5;">${escapeHtml(value)}</td>
+        <td style="padding:8px;border-bottom:1px solid #e5e5e5;">${raw ? value : escapeHtml(value)}</td>
       </tr>`,
     )
     .join("\n");

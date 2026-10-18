@@ -33,6 +33,19 @@ test('buildOwnerOrderMail renders order, buyer and event details', () => {
   assert.match(html, /2 шт\./);
 });
 
+test('buildOwnerOrderMail links the event page when slug is known', () => {
+  const order = paidOrder({ eventSlug: 'pyat-razvodnyh-mostov' });
+  const { html } = buildOwnerOrderMail(order);
+  assert.match(html, /href="https:\/\/daibilet\.ru\/events\/pyat-razvodnyh-mostov"/);
+  assert.match(html, /Страница события/);
+});
+
+test('buildOwnerOrderMail omits event link when the event is not linked', () => {
+  const { html } = buildOwnerOrderMail(paidOrder());
+  assert.ok(!html.includes('Страница события'));
+  assert.ok(!html.includes('/events/'));
+});
+
 test('buildOwnerOrderMail escapes HTML in buyer-controlled fields', () => {
   const order = paidOrder({
     buyerSnapshot: {
