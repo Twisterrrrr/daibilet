@@ -16,6 +16,9 @@
  *
  * Flags: --key K (staging folder name) | --with-text | --apply | --force
  *        --in DIR (default ORGANIZER_INBOX_DIR or <repo>/tmp-organizer-inbox)
+ *        --no-hero (keep the current cover, photos stay staged)
+ *        --hero-file NAME (force a specific staged photo as the cover, after
+ *        visual review; auto-pick only sees size/aspect, not watermarks)
  *
  * Past-event guard: when the event's last session is already in the past the
  * apply is refused (stored copy would go stale) unless --force is given.
@@ -40,6 +43,8 @@ const key = argValue('--key');
 const apply = process.argv.includes('--apply');
 const withText = process.argv.includes('--with-text');
 const force = process.argv.includes('--force');
+const noHero = process.argv.includes('--no-hero');
+const heroFile = argValue('--hero-file');
 const inboxDir =
   argValue('--in') || process.env.ORGANIZER_INBOX_DIR || path.join(rootDir, 'tmp-organizer-inbox');
 const imagesRoot = path.join(rootDir, 'apps', 'web', 'public', 'images', 'organizer');
@@ -157,9 +162,26 @@ async function main() {
       `photo ${name}: ${dims ? `${dims.width}x${dims.height}` : 'unreadable'} -> ${assessment.ok ? 'hero candidate' : assessment.reason}`,
     );
   }
-  const hero = pickHeroCandidate(candidates);
-  if (hero) console.log(`hero candidate: ${hero.name} (score ${hero.assessment.score})`);
-  else console.log('no hero candidate - all photos stay in staging');
+  let hero = null;
+  if (noHero) {
+    console.log('hero skipped: --no-hero (all photos stay in staging)');
+  } else {
+    hero = pickHeroCandidate(candidates);
+    // Manual override after visual review: --hero-file <basename> forces one file.
+    if (heroFile) {
+      const forced = candidates.find(
+        (c) => c.name === heroFile || path.basename(c.from) === heroFile,
+      );
+      if (!forced) throw new Error(`--hero-file ${heroFile} not found among staged photos`);
+      if (!forced.assessment.ok) {
+        console.warn(`WARNING: forced hero ${forced.name} fails auto checks (${forced.assessment.reason})`);
+      }
+      hero = forced;
+      console.log(`hero forced by operator: ${hero.name}`);
+    }
+    if (hero) console.log(`hero candidate: ${hero.name} (score ${hero.assessment.score})`);
+    else console.log('no hero candidate - all photos stay in staging');
+  }
 
   // Compare with the current cover before replacing it.
   let heroPlan = null;
