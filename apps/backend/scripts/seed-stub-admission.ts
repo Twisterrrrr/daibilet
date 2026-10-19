@@ -1,12 +1,9 @@
-import { randomBytes, scrypt } from 'node:crypto';
-import { promisify } from 'node:util';
 import { prisma } from '@daibilet/db';
 import { createStubCheckoutOrder } from '../src/checkout-stub.js';
 
 const citySlug = 'moskva';
 const supplierId = 'sup_phase_g_test_museum';
 const supplierSlug = 'phase-g-test-museum';
-const ownerUserId = 'usr_phase_g_supplier_owner';
 const venueId = 'ven_phase_g_test_museum';
 const venueSlug = 'phase-g-test-museum';
 const productId = 'adp_phase_g_test_museum_entry';
@@ -14,19 +11,10 @@ const productSlug = 'phase-g-test-museum-entry';
 const adultOfferId = 'ado_phase_g_test_museum_adult';
 const childOfferId = 'ado_phase_g_test_museum_child';
 
-const scryptAsync = promisify(scrypt);
-
-async function hashPassword(value: string): Promise<string> {
-  const salt = randomBytes(16).toString('hex');
-  const derived = await scryptAsync(value, salt, 64) as Buffer;
-  return `scrypt:${salt}:${derived.toString('hex')}`;
-}
-
 async function main() {
   const createOrder = process.argv.includes('--order');
   const resetCapacity = process.argv.includes('--reset-capacity');
   const validTo = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
-  const ownerPasswordHash = await hashPassword('supplier123');
 
   const city = await prisma.city.upsert({
     where: { slug: citySlug },
@@ -39,26 +27,6 @@ async function main() {
       introText: 'Тестовая городская точка для проверки входных билетов Дайбилет.',
     },
     select: { id: true, slug: true, title: true },
-  });
-
-  const owner = await prisma.siteUser.upsert({
-    where: { email: 'supplier-test@daibilet.ru' },
-    update: {
-      passwordHash: ownerPasswordHash,
-      name: 'Тестовый поставщик',
-      phone: '+79990000001',
-      isActive: true,
-    },
-    create: {
-      id: ownerUserId,
-      email: 'supplier-test@daibilet.ru',
-      passwordHash: ownerPasswordHash,
-      name: 'Тестовый поставщик',
-      phone: '+79990000001',
-      isActive: true,
-      emailVerifiedAt: new Date(),
-    },
-    select: { id: true, email: true, name: true },
   });
 
   const supplier = await prisma.supplier.upsert({
@@ -98,28 +66,6 @@ async function main() {
       notes: 'Phase G smoke supplier for admission checkout.',
     },
     select: { id: true, slug: true, title: true, status: true },
-  });
-
-  await prisma.supplierUser.upsert({
-    where: {
-      supplierId_siteUserId: {
-        supplierId: supplier.id,
-        siteUserId: owner.id,
-      },
-    },
-    update: {
-      role: 'OWNER',
-      isActive: true,
-      acceptedAt: new Date(),
-    },
-    create: {
-      supplierId: supplier.id,
-      siteUserId: owner.id,
-      role: 'OWNER',
-      isActive: true,
-      invitedAt: new Date(),
-      acceptedAt: new Date(),
-    },
   });
 
   const legalProfile = await prisma.supplierLegalProfile.upsert({
@@ -334,7 +280,6 @@ async function main() {
 
   const output: Record<string, unknown> = {
     supplier,
-    owner,
     city,
     venue,
     admissionProduct: product,
