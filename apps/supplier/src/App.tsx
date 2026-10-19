@@ -1146,17 +1146,17 @@ function OrdersPage({ supplierKey }: { supplierKey: string }) {
   const paidItems = data?.items.filter((order) => ['PAID', 'CONFIRMED', 'FULFILLED'].includes(order.status)).length ?? 0;
   const pendingItems = data?.items.filter((order) => ['PENDING_PAYMENT', 'RESERVED'].includes(order.status)).length ?? 0;
   const grossKopecks = data?.items.reduce((sum, order) => sum + order.totalKopecks, 0) ?? 0;
-  const netKopecks = data?.items.reduce((sum, order) => sum + Math.max(0, order.totalKopecks - order.commissionKopecks), 0) ?? 0;
+  const estimatedNetKopecks = data?.items.reduce((sum, order) => sum + Math.max(0, order.totalKopecks - order.commissionKopecks), 0) ?? 0;
 
   return (
     <div className="page-stack">
-      <PageTitle title="Заказы" description="Покупки через внутренний контур Дайбилет: статус оплаты, покупатель, билет и сумма." action={<RefreshButton onClick={reload} />} />
+      <PageTitle title="Заказы" description="Ваши продажи через внутренний контур Дайбилет: оплата, билеты и суммы." action={<RefreshButton onClick={reload} />} />
       {data ? (
         <div className="stats-grid">
           <StatCard label="Позиции" value={data.total} hint={`на странице ${data.items.length}`} />
           <StatCard label="Оплачено на странице" value={paidItems} hint="ожидают выдачи или уже выданы" />
           <StatCard label="Ждут оплату на странице" value={pendingItems} hint="можно сверить позже" />
-          <StatCard label="К выплате на странице" value={formatMoney(netKopecks)} hint={`оборот ${formatMoney(grossKopecks)}`} />
+          <StatCard label="После комиссии на странице" value={formatMoney(estimatedNetKopecks)} hint={`оборот ${formatMoney(grossKopecks)}; доступность к выплате смотрите в финансах`} />
         </div>
       ) : null}
       <OrderStatusFilters value={statusFilter} onChange={(value) => { setStatusFilter(value); setOffset(0); }} />
@@ -1165,7 +1165,7 @@ function OrdersPage({ supplierKey }: { supplierKey: string }) {
           <>
             <OrderWorkQueue orders={data.items} onOpen={setSelectedOrder} />
             <Table
-              columns={['Заказ', 'Покупка', 'Покупатель', 'Статус / к выплате', '']}
+              columns={['Заказ', 'Покупка', 'Покупатель', 'Статус / после комиссии', '']}
               rows={data.items.map((order) => [
                 <div key="order"><strong>№ {order.publicCode || compactCode(order.orderId || order.id)}</strong><small>{formatDateTime(order.createdAt)}</small></div>,
                 <div key="event">
@@ -1289,7 +1289,7 @@ function OrderQueueItem({ order, onOpen }: { order: SupplierPortalOrderRowDto; o
         <strong>№ {order.publicCode || compactCode(order.orderId || order.id)}</strong>
         <span>{orderSubjectTitle(order)}</span>
       </div>
-      <small>{orderActionLabel(order)} · {formatMoney(Math.max(0, order.totalKopecks - order.commissionKopecks))}</small>
+      <small>{orderActionLabel(order)} · после комиссии {formatMoney(Math.max(0, order.totalKopecks - order.commissionKopecks))}</small>
     </button>
   );
 }
@@ -1343,22 +1343,30 @@ function OrderDetailDrawer({ order, onClose }: { order: SupplierPortalOrderRowDt
               ['Цена за билет', formatMoney(order.unitPriceKopecks)],
               ['Сумма заказа', formatMoney(order.totalKopecks)],
               ['Комиссия Дайбилет', formatMoney(order.commissionKopecks)],
-              ['К выплате', formatMoney(netKopecks)],
+              ['После комиссии', formatMoney(netKopecks)],
             ]} />
+            <small>Доступность суммы к выплате зависит от подтверждения оказания услуги, возвратов и сверки.</small>
           </section>
 
           <section className="order-detail-section">
             <h3>Покупатель</h3>
-            <DefinitionList rows={[
-              ['Имя', orderBuyerLabel(order)],
-              ['Email', order.buyerEmail || '-'],
-              ['Телефон', order.buyerPhone || '-'],
-            ]} />
+            {order.buyerPiiLevel === 'omitted' ? (
+              <EmptyInline text="Контакты покупателя недоступны вашей роли." />
+            ) : (
+              <DefinitionList rows={[
+                ['Имя', orderBuyerLabel(order)],
+                ['Email', order.buyerEmail || '-'],
+                ['Телефон', order.buyerPhone || '-'],
+              ]} />
+            )}
+            <small>Контакты уже замаскированы сервером.</small>
           </section>
 
           <section className="order-detail-section">
             <h3>Билеты</h3>
-            {ticketNumbers.length ? (
+            {!order.ticketNumbersVisible ? (
+              <EmptyInline text="Номера билетов недоступны вашей роли." />
+            ) : ticketNumbers.length ? (
               <div className="ticket-number-list">
                 {ticketNumbers.map((number) => <code key={number}>{number}</code>)}
               </div>
@@ -2588,10 +2596,12 @@ function orderScheduleLabel(order: SupplierPortalOrderRowDto): string {
 }
 
 function orderBuyerLabel(order: SupplierPortalOrderRowDto): string {
+  if (order.buyerPiiLevel === 'omitted') return 'Скрыт для вашей роли';
   return order.buyerName || order.buyerEmail || order.buyerPhone || '-';
 }
 
 function orderBuyerContacts(order: SupplierPortalOrderRowDto): string {
+  if (order.buyerPiiLevel === 'omitted') return 'Контакты недоступны';
   return [order.buyerEmail, order.buyerPhone].filter(Boolean).join(' · ') || '-';
 }
 

@@ -683,6 +683,7 @@ export function mapSupplierPortalOrderRow(row: SupplierOrderRow, verifiedRole: s
     ticketNumbers: supplierOrderCanSeeTicketNumbers(verifiedRole)
       ? ticketNumbersFromProviderData(row.fulfillmentItem?.providerData)
       : [],
+    ticketNumbersVisible: supplierOrderCanSeeTicketNumbers(verifiedRole),
     fulfillmentStatus: row.fulfillmentItem?.status ? String(row.fulfillmentItem.status) : null,
     quantity: row.quantity,
     unitPriceKopecks: row.unitPriceKopecks,
