@@ -368,6 +368,11 @@ function SupplierDetailSheet({
   onOpenChange: (open: boolean) => void;
 }) {
   const hasLegalProfile = Boolean(supplier?.legal.legalName || supplier?.legal.inn);
+  const [activeTab, setActiveTab] = React.useState<'overview' | 'legal' | 'terms' | 'team'>('overview');
+
+  React.useEffect(() => {
+    setActiveTab('overview');
+  }, [supplier?.id]);
 
   return (
     <Sheet open={Boolean(supplier)} onOpenChange={onOpenChange}>
@@ -382,8 +387,30 @@ function SupplierDetailSheet({
             <h2 className="mt-3 text-xl font-semibold">{supplier.title}</h2>
             <p className="mt-1 text-sm text-muted-foreground">{supplier.legalName || 'Юрлицо не указано'}</p>
 
+            <nav aria-label="Разделы поставщика" className="mt-5 flex gap-1 overflow-x-auto border-b border-border pb-1">
+              {([
+                ['overview', 'Обзор'],
+                ['legal', 'Юрданные'],
+                ['terms', 'Договор и расчёты'],
+                ['team', 'Команда'],
+              ] as const).map(([id, label]) => (
+                <Button
+                  key={id}
+                  type="button"
+                  size="sm"
+                  variant={activeTab === id ? 'secondary' : 'ghost'}
+                  aria-current={activeTab === id ? 'page' : undefined}
+                  onClick={() => setActiveTab(id)}
+                  className="shrink-0"
+                >
+                  {label}
+                </Button>
+              ))}
+            </nav>
+
             <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
               <div className="space-y-4">
+                {activeTab === 'legal' ? (
                 <Card className="border-border p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <h3 className="text-sm font-semibold">Юридический контур</h3>
@@ -427,7 +454,9 @@ function SupplierDetailSheet({
                   </div>
                   {legalActionError ? <div className="mt-3 text-xs text-destructive">{legalActionError}</div> : null}
                 </Card>
+                ) : null}
 
+                {activeTab === 'terms' ? (
                 <Card className="border-border p-4">
                   <h3 className="text-sm font-semibold">Договор и расчёты</h3>
                   <p className="mt-2 text-xs text-muted-foreground">
@@ -459,7 +488,9 @@ function SupplierDetailSheet({
                     )}
                   </div>
                 </Card>
+                ) : null}
 
+                {activeTab === 'team' ? (
                 <Card className="border-border p-4">
                   <h3 className="text-sm font-semibold">Команда</h3>
                   <div className="mt-3 space-y-2">
@@ -482,7 +513,10 @@ function SupplierDetailSheet({
                     onInvite={onInviteUser}
                   />
                 </Card>
+                ) : null}
 
+                {activeTab === 'overview' ? (
+                <>
                 <Card className="border-border p-4">
                   <h3 className="text-sm font-semibold">Последние события</h3>
                   <div className="mt-3 space-y-2">
@@ -518,6 +552,8 @@ function SupplierDetailSheet({
                     )}
                   </div>
                 </Card>
+                </>
+                ) : null}
               </div>
 
               <div className="space-y-4">
@@ -541,7 +577,7 @@ function SupplierDetailSheet({
                   </div>
                 </Card>
 
-                <Card className="border-border p-4">
+                {activeTab === 'terms' ? <Card className="border-border p-4">
                   <h3 className="text-sm font-semibold">Финсводка</h3>
                   <dl className="mt-3 grid gap-2 text-sm">
                     <DetailTerm label="Баланс ledger" value={formatMoney(supplier.finance.ledgerBalanceKopecks)} />
@@ -550,9 +586,9 @@ function SupplierDetailSheet({
                     <DetailTerm label="Возвраты" value={formatMoney(supplier.finance.refundKopecks)} />
                     <DetailTerm label="Выплачено" value={formatMoney(supplier.finance.paidPayoutsKopecks)} />
                   </dl>
-                </Card>
+                </Card> : null}
 
-                <Card className="border-border p-4">
+                {activeTab === 'overview' ? <Card className="border-border p-4">
                   <h3 className="text-sm font-semibold">Отзывы</h3>
                   <dl className="mt-3 grid gap-2 text-sm">
                     <DetailTerm label="Всего" value={formatNumber(supplier.reviews.total)} />
@@ -560,7 +596,7 @@ function SupplierDetailSheet({
                     <DetailTerm label="На модерации" value={formatNumber(supplier.reviews.pendingModeration)} />
                     <DetailTerm label="Средняя оценка" value={supplier.reviews.averageRating ? supplier.reviews.averageRating.toFixed(1) : '-'} />
                   </dl>
-                </Card>
+                </Card> : null}
               </div>
             </div>
           </div>
