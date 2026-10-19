@@ -392,10 +392,11 @@ function SupplierDetailSheet({
                   <dl className="mt-3 grid gap-2 text-sm">
                     <DetailTerm label="Статус" value={legalStatusLabel(supplier.legal.status)} />
                     <DetailTerm label="ИНН" value={supplier.legal.inn || '-'} />
-                    <DetailTerm label="Налоговый режим" value={taxModeLabel(supplier.legal.taxMode)} />
+                    <DetailTerm label="Налоговый режим" value={supplier.legal.status === 'VERIFIED' ? taxModeLabel(supplier.legal.taxMode) : 'Не подтверждён'} />
+                    <DetailTerm label="НДС" value={supplier.legal.status === 'VERIFIED' ? (supplier.legal.isVatPayer ? 'Плательщик по профилю' : 'Не плательщик по профилю') : 'Не подтверждён'} />
                     <DetailTerm label="Основной счет" value={supplier.legal.hasPrimaryBankAccount ? 'есть' : 'нет'} />
                     <DetailTerm label="YooKassa" value={supplier.yookassaShopId || '-'} />
-                    <DetailTerm label="Комиссия по умолчанию" value={`${supplier.defaultCommissionBps / 100}%`} />
+                    <DetailTerm label="Техническая ставка по умолчанию" value={`${supplier.defaultCommissionBps / 100}% · требует сверки с договором`} />
                     {supplier.legal.verifiedAt ? <DetailTerm label="Проверено" value={formatDateTime(supplier.legal.verifiedAt)} /> : null}
                   </dl>
                   {supplier.legal.rejectionComment ? (
@@ -425,6 +426,38 @@ function SupplierDetailSheet({
                     </Button>
                   </div>
                   {legalActionError ? <div className="mt-3 text-xs text-destructive">{legalActionError}</div> : null}
+                </Card>
+
+                <Card className="border-border p-4">
+                  <h3 className="text-sm font-semibold">Договор и расчёты</h3>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Карточка и ЛК поставщика читают один профиль. Номер и версия агентского договора, а также утверждённая схема чека пока не хранятся в этом API.
+                  </p>
+                  <dl className="mt-3 grid gap-2 text-sm">
+                    <DetailTerm label="Приём платежа" value={paymentModeLabel(supplier.paymentMode)} />
+                    <DetailTerm label="Комиссия платёжного сервиса" value={pspFeeModeLabel(supplier.pspFeeMode)} />
+                    <DetailTerm label="Договор" value="Не зарегистрирован в системе" />
+                    <DetailTerm label="Агентский чек" value="Требует подтверждённой схемы фискализации" />
+                  </dl>
+                  <div className="mt-4 border-t border-border pt-3">
+                    <h4 className="text-xs font-semibold">Правила комиссии в системе</h4>
+                    {supplier.commissionRules.length ? (
+                      <div className="mt-2 space-y-2">
+                        {supplier.commissionRules.map((rule) => (
+                          <div key={rule.id} className="rounded-md bg-secondary px-3 py-2 text-xs">
+                            <div className="font-medium">{commissionScopeLabel(rule.scope)}{rule.title ? ` · ${rule.title}` : ''}</div>
+                            <div className="mt-1 text-muted-foreground">
+                              {commissionValueLabel(rule.percentBps, rule.fixedFeeKopecks)} · {rule.isActive ? 'активно в системе' : 'отключено'}
+                              {rule.startsAt ? ` · с ${formatDateTime(rule.startsAt)}` : ''}
+                              {rule.endsAt ? ` · до ${formatDateTime(rule.endsAt)}` : ''}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="mt-2 text-xs text-muted-foreground">Правил нет. Значение 0% по умолчанию не означает согласованную нулевую комиссию.</p>
+                    )}
+                  </div>
                 </Card>
 
                 <Card className="border-border p-4">
@@ -793,11 +826,32 @@ function catalogModeLabel(value: string): string {
 
 function paymentModeLabel(value: string): string {
   const labels: Record<string, string> = {
-    SINGLE_MERCHANT: 'Daibilet как продавец',
-    AGENT_SINGLE_PAYOUT: 'Агентская схема',
-    SPLIT_MERCHANT: 'Split-платежи',
+    SINGLE_MERCHANT: 'Один получатель',
+    AGENT_SINGLE_PAYOUT: 'Агентский единый платёж',
+    SPLIT_MERCHANT: 'Разделение платежа',
   };
   return labels[value] || value;
+}
+
+function pspFeeModeLabel(value: string): string {
+  const labels: Record<string, string> = {
+    PLATFORM_PAYS: 'Оплачивает Daibilet',
+    SUPPLIER_PAYS: 'Оплачивает поставщик',
+    SHARED_50_50: 'Поровну',
+    SERVICE_FEE: 'Сервисный сбор',
+  };
+  return labels[value] || value;
+}
+
+function commissionScopeLabel(value: string): string {
+  return ({ SUPPLIER: 'Поставщик', CATEGORY: 'Категория', EVENT: 'Событие' } as Record<string, string>)[value] || value;
+}
+
+function commissionValueLabel(percentBps: number, fixedFeeKopecks: number): string {
+  const parts = [];
+  if (percentBps) parts.push(`${(percentBps / 100).toLocaleString('ru-RU')}%`);
+  if (fixedFeeKopecks) parts.push(formatMoney(fixedFeeKopecks));
+  return parts.join(' + ') || '0 (сверить с договором)';
 }
 
 function formatMoney(kopecks: number): string {
