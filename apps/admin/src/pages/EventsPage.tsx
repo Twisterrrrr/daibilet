@@ -1036,10 +1036,10 @@ export function EventsPage() {
   );
 }
 
-function MetricCard(props: { value: number; label: string }) {
+function MetricCard(props: { value: number | null; label: string }) {
   return (
     <div className="rounded-lg border border-border bg-card p-4">
-      <div className="text-2xl font-semibold">{formatNumber(props.value)}</div>
+      <div className="text-2xl font-semibold">{props.value == null ? '—' : formatNumber(props.value)}</div>
       <div className="text-xs text-muted-foreground">{props.label}</div>
     </div>
   );
@@ -1580,8 +1580,12 @@ function ManagedScheduleTab(props: {
         active: offer.active,
       }));
   const activeSessions = sessions.filter((session) => session.isActive);
-  const vacant = activeSessions.reduce((sum, session) => sum + (session.ticketsVacant || 0), 0);
-  const sold = sessions.reduce((sum, session) => sum + session.capacitySold, 0);
+  const vacant = activeSessions.length && activeSessions.every((session) => session.ticketsVacant != null)
+    ? activeSessions.reduce((sum, session) => sum + Number(session.ticketsVacant), 0)
+    : null;
+  const occupiedCapacity = schedule
+    ? sessions.reduce((sum, session) => sum + session.capacitySold, 0)
+    : null;
   const prices = [
     ...offers.map((offer) => offer.priceRub),
     ...sessions.map((session) => session.priceFromRub),
@@ -1619,7 +1623,7 @@ function ManagedScheduleTab(props: {
     <div className="mt-5 space-y-4">
       <div className="grid gap-3 md:grid-cols-4">
         <MetricCard value={activeSessions.length || detail?.summary?.slots || 0} label="Активных слотов" />
-        <MetricCard value={vacant || detail?.summary?.vacant || event.vacant || 0} label="Остаток" />
+        <MetricCard value={vacant ?? detail?.summary?.vacant ?? event.vacant ?? null} label="Остаток" />
         <MetricCard value={offers.length || detail?.summary?.offers || 0} label="Категорий билетов" />
         <div className="rounded-lg border border-border bg-card p-4">
           <div className="text-2xl font-semibold">{formatMoney(priceFrom)}</div>
@@ -1695,7 +1699,7 @@ function ManagedScheduleTab(props: {
       <section className="rounded-lg border border-border">
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
           <h3 className="text-sm font-semibold">Слоты и наличие</h3>
-          <Badge variant="outline">{formatNumber(sold)} продано</Badge>
+          <Badge variant="outline">{occupiedCapacity == null ? 'Занятая квота: —' : `Занятая квота: ${formatNumber(occupiedCapacity)}`}</Badge>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
@@ -1705,7 +1709,7 @@ function ManagedScheduleTab(props: {
                 <th className="px-4 py-3 font-medium">Статус</th>
                 <th className="px-4 py-3 font-medium">Цена</th>
                 <th className="px-4 py-3 font-medium">Остаток</th>
-                <th className="px-4 py-3 font-medium">Квота / продано</th>
+                <th className="px-4 py-3 font-medium">Квота / занято</th>
                 <th className="px-4 py-3 font-medium">Действия</th>
               </tr>
             </thead>
@@ -1718,7 +1722,7 @@ function ManagedScheduleTab(props: {
                   </td>
                   <td className="px-4 py-3 font-medium">{formatMoney(session.priceFromRub)}</td>
                   <td className="px-4 py-3">{formatNumber(session.ticketsVacant)}</td>
-                  <td className="px-4 py-3">{formatNumber(session.capacityTotal)} / {formatNumber(session.capacitySold)}</td>
+                  <td className="px-4 py-3">{formatNumber(session.capacityTotal)} / {schedule ? formatNumber(session.capacitySold) : '—'}</td>
                   <td className="px-4 py-3">
                     {session.isActive ? (
                       <Button type="button" size="sm" variant="ghost" disabled={!editable || isSaving || session.hasSales} onClick={() => onSessionAction(session.id, 'cancel')}>
