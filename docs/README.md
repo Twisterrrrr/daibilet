@@ -1,5 +1,6 @@
 # Документация Daibilet
 
+[Roadmap Daibilet — сводка на 2026-10](./roadmap-2026-10.md)
 [SEO-аудит 18.10.2026: кэш sitemap, каноникал Москвы, главная no-store](./seo-audit-2026-10-18.md)
 [Подготовка schema_alignment к прод-БД - 17.10.2026](./schema-alignment-prod-fix-2026-10-17.md)
 [Сверка схемы и миграций каталога и финконтура - 17.10.2026](./finance-schema-unification-2026-10-17.md)
