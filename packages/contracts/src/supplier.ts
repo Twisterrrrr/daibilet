@@ -225,6 +225,7 @@ export interface SupplierPortalOrderRowDto {
   unitPriceKopecks: number;
   totalKopecks: number;
   commissionKopecks: number;
+  buyerPiiLevel: 'masked' | 'omitted';
   buyerName: string | null;
   buyerEmail: string | null;
   buyerPhone: string | null;
