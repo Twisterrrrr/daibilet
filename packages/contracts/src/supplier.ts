@@ -220,6 +220,7 @@ export interface SupplierPortalOrderRowDto {
   startsAt: string | null;
   ticketTitle: string | null;
   ticketNumbers: string[];
+  ticketNumbersVisible: boolean;
   fulfillmentStatus: string | null;
   quantity: number;
   unitPriceKopecks: number;
