@@ -95,6 +95,7 @@ const NAV_SECTIONS = [
     title: 'Настройки',
     items: [
       { to: '/profile', label: 'Реквизиты', icon: Building2 },
+      { to: '/terms', label: 'Условия работы', icon: FileText },
       { to: '/team', label: 'Команда', icon: UsersRound },
       { to: '/integrations', label: 'Интеграции', icon: Settings2 },
     ],
@@ -112,6 +113,7 @@ const ROUTE_TITLES: Record<string, string> = {
   '/finance': 'Финансы',
   '/documents': 'Документы',
   '/profile': 'Компания и реквизиты',
+  '/terms': 'Условия работы',
   '/team': 'Команда',
   '/integrations': 'Интеграции',
 };
@@ -292,6 +294,7 @@ export function App() {
               <Route path="documents" element={<DocumentsPage supplierKey={supplierKey} />} />
               <Route path="reviews" element={<ReviewsPage supplierKey={supplierKey} />} />
               <Route path="profile" element={<ProfilePage supplierKey={supplierKey} canEditRequisites={permissions.canEditRequisites} />} />
+              <Route path="terms" element={<SupplierTermsPage supplierKey={supplierKey} />} />
               <Route path="team" element={<TeamPage supplierKey={supplierKey} />} />
               <Route path="integrations" element={<IntegrationsPage supplierKey={supplierKey} />} />
               <Route path="*" element={<Navigate to="/" replace />} />
@@ -1625,6 +1628,89 @@ function ProfilePage({ supplierKey, canEditRequisites }: { supplierKey: string; 
       </section>
     </div>
   );
+}
+
+function SupplierTermsPage({ supplierKey }: { supplierKey: string }) {
+  const { data, loading, error, reload } = useSupplierResource<SupplierPortalProfileDto>('/api/supplier/profile', supplierKey);
+
+  if (loading && !data) return <LoadingState label="Загружаем условия работы..." />;
+  if (error && !data) return <ErrorState title="Не удалось загрузить условия" error={error} onRetry={reload} />;
+  if (!data) return null;
+
+  const legalVerified = data.legal.status === 'VERIFIED';
+  const primaryBank = data.bankAccounts.find((account) => account.isPrimary) || null;
+
+  return (
+    <div className="page-stack">
+      <PageTitle title="Условия работы" description="Сведения, которые уже есть в системе. Договорные и фискальные условия требуют отдельного подтверждения." action={<RefreshButton onClick={reload} />} />
+      <ReadOnlyNotice text="Этот экран не изменяет договор или комиссию. Для уточнения условий обратитесь к вашему менеджеру Daibilet." />
+      <div className="two-column">
+        <section className="panel">
+          <div className="panel-header"><h2>Компания и налоги</h2><StatusPill tone={legalStatusTone(data.legal.status)}>{legalStatusLabel(data.legal.status)}</StatusPill></div>
+          <DefinitionList rows={[
+            ['Юридическое имя', data.legal.legalName || 'Не указано'],
+            ['ИНН', data.legal.inn || 'Не указан'],
+            ['Налоговый режим', legalVerified ? supplierTaxModeLabel(data.legal.taxMode) : 'Не подтверждён'],
+            ['НДС', legalVerified ? (data.legal.isVatPayer ? `Плательщик${data.legal.defaultVatRate == null ? '' : ` · ставка ${data.legal.defaultVatRate}%`}` : 'Не плательщик по профилю') : 'Не подтверждён'],
+          ]} />
+          <small>Налоговый режим поставщика не определяется режимом Daibilet. Данные профиля не заменяют настройки конкретного чека.</small>
+        </section>
+        <section className="panel">
+          <div className="panel-header"><h2>Приём денег и банк</h2></div>
+          <DefinitionList rows={[
+            ['Режим платежей', supplierPaymentModeLabel(data.supplier.paymentMode)],
+            ['Комиссия платёжного сервиса', supplierPspFeeModeLabel(data.supplier.pspFeeMode)],
+            ['Основной счёт', primaryBank ? `${primaryBank.bankName || 'Банк не указан'} · ${primaryBank.accountMask || 'номер скрыт'}` : 'Не указан'],
+          ]} />
+          <small>Реквизиты счёта показываются в сокращённом виде. Изменения отправляются на проверку в разделе «Реквизиты».</small>
+        </section>
+      </div>
+      <section className="panel">
+        <div className="panel-header"><h2>Комиссия в системе</h2></div>
+        {data.commissionRules.length ? (
+          <Table
+            columns={['Область', 'Правило', 'Период', 'Состояние']}
+            rows={data.commissionRules.map((rule) => [
+              <span key="scope">{supplierCommissionScopeLabel(rule.scope)}{rule.title ? ` · ${rule.title}` : ''}</span>,
+              <span key="value">{supplierCommissionRuleLabel(rule)}</span>,
+              <span key="period">{rule.startsAt ? formatDateTime(rule.startsAt) : 'Без даты начала'} · {rule.endsAt ? formatDateTime(rule.endsAt) : 'без даты окончания'}</span>,
+              <StatusPill key="status" tone={rule.isActive ? 'success' : 'neutral'}>{rule.isActive ? 'активно в системе' : 'отключено'}</StatusPill>,
+            ])}
+          />
+        ) : (
+          <EmptyInline text="Подтверждённое правило комиссии не показано. Техническое значение 0% не означает согласованную нулевую комиссию." />
+        )}
+        <small>Действие правила и его связь с подписанным договором должны подтверждаться отдельно. Условия уже созданных заказов не меняются от новой ставки.</small>
+      </section>
+      <section className="panel">
+        <div className="panel-header"><h2>Договор и чеки</h2></div>
+        <EmptyInline text="Версия агентского договора и утверждённая схема агентского чека пока не заведены в этом API. Подтвердите действующие условия с Daibilet перед боевыми агентскими продажами." />
+      </section>
+    </div>
+  );
+}
+
+function supplierTaxModeLabel(value: string | null): string {
+  return ({ OSNO: 'ОСНО', USN_6: 'УСН 6%', USN_15: 'УСН 15%', AUSN: 'АУСН', NPD: 'НПД' } as Record<string, string>)[value || ''] || value || 'Не указан';
+}
+
+function supplierPaymentModeLabel(value: string): string {
+  return ({ SINGLE_MERCHANT: 'Один получатель', AGENT_SINGLE_PAYOUT: 'Агентский единый платёж', SPLIT_MERCHANT: 'Разделение платежа' } as Record<string, string>)[value] || value;
+}
+
+function supplierPspFeeModeLabel(value: string): string {
+  return ({ PLATFORM_PAYS: 'Оплачивает Daibilet', SUPPLIER_PAYS: 'Оплачивает поставщик', SHARED_50_50: 'Поровну', SERVICE_FEE: 'Сервисный сбор' } as Record<string, string>)[value] || value;
+}
+
+function supplierCommissionScopeLabel(value: string): string {
+  return ({ SUPPLIER: 'Поставщик', CATEGORY: 'Категория', EVENT: 'Событие' } as Record<string, string>)[value] || value;
+}
+
+function supplierCommissionRuleLabel(rule: SupplierPortalProfileDto['commissionRules'][number]): string {
+  const parts = [];
+  if (rule.percentBps) parts.push(`${(rule.percentBps / 100).toLocaleString('ru-RU')}%`);
+  if (rule.fixedFeeKopecks) parts.push(formatMoney(rule.fixedFeeKopecks));
+  return parts.join(' + ') || '0 (требует подтверждения по договору)';
 }
 
 type LegalFormState = {
