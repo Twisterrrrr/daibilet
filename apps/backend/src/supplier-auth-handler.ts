@@ -134,6 +134,7 @@ export async function resolveSupplierPortalSearchParams(context: RouteContext): 
     }
     const next = new URLSearchParams(context.searchParams);
     next.set('supplierId', session.currentSupplier.id);
+    next.set('__verifiedSupplierRole', session.currentSupplier.role);
     next.delete('supplier');
     next.delete('slug');
     return next;
@@ -143,7 +144,11 @@ export async function resolveSupplierPortalSearchParams(context: RouteContext): 
     const supplierKey = cleanString(context.searchParams.get('supplierId')) ||
       cleanString(context.searchParams.get('supplier')) ||
       cleanString(context.searchParams.get('slug'));
-    if (supplierKey) return context.searchParams;
+    if (supplierKey) {
+      const next = new URLSearchParams(context.searchParams);
+      next.set('__verifiedSupplierRole', 'VIEWER');
+      return next;
+    }
   }
 
   throwHttpError('Требуется вход поставщика.', 401);

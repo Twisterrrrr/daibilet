@@ -1,4 +1,5 @@
 import { prisma, type Prisma } from '@daibilet/db';
+import { supplierOrderBuyerFields, supplierOrderCanSeeTicketNumbers } from './supplier-order-pii.js';
 
 const DEFAULT_LIMIT = 50;
 const MAX_ADMIN_LIMIT = 100;
@@ -661,6 +662,7 @@ export async function buildPublicCheckoutPurchasesByEmailDto(
 export async function loadSupplierCheckoutPurchaseRows(
   supplierId: string,
   searchParams: URLSearchParams = new URLSearchParams(),
+  verifiedRole: string | null = null,
 ): Promise<{
   generatedAt: string;
   total: number;
@@ -713,7 +715,7 @@ export async function loadSupplierCheckoutPurchaseRows(
     offset,
     hasMore: rows.length > limit,
     filters: { status },
-    items: rows.slice(0, limit).map(mapSupplierCheckoutPurchaseItem),
+    items: rows.slice(0, limit).map((row) => mapSupplierCheckoutPurchaseItem(row, verifiedRole)),
   };
 }
 
@@ -1272,7 +1274,7 @@ function mapSupplierCheckoutPurchaseItem(row: Prisma.CheckoutItemGetPayload<{
     admissionOffer: { select: { id: true; title: true } };
     fulfillmentItem: { select: { status: true; providerData: true } };
   };
-}>) {
+}>, verifiedRole: string | null) {
   return {
     id: row.id,
     orderId: row.order.id,
@@ -1290,15 +1292,15 @@ function mapSupplierCheckoutPurchaseItem(row: Prisma.CheckoutItemGetPayload<{
     sessionId: row.session?.id || row.sessionId || null,
     startsAt: toIso(row.session?.startsAt),
     ticketTitle: row.ticketTitle || row.offer?.title || row.admissionOffer?.title || null,
-    ticketNumbers: ticketNumbersFromProviderData(row.fulfillmentItem?.providerData),
+    ticketNumbers: supplierOrderCanSeeTicketNumbers(verifiedRole)
+      ? ticketNumbersFromProviderData(row.fulfillmentItem?.providerData)
+      : [],
     fulfillmentStatus: row.fulfillmentItem?.status ? String(row.fulfillmentItem.status) : null,
     quantity: row.quantity,
     unitPriceKopecks: row.unitPriceKopecks,
     totalKopecks: row.totalKopecks,
     commissionKopecks: row.commissionKopecks,
-    buyerName: row.order.buyerName || null,
-    buyerEmail: row.order.buyerEmail || null,
-    buyerPhone: row.order.buyerPhone || null,
+    ...supplierOrderBuyerFields({ name: row.order.buyerName, email: row.order.buyerEmail, phone: row.order.buyerPhone }, verifiedRole),
     paidAt: toIso(row.order.paidAt),
     createdAt: toIso(row.createdAt) || new Date(0).toISOString(),
   };

@@ -176,7 +176,7 @@ test('maps supplier order rows with short numeric fallback code', () => {
       status: 'FULFILLED',
       providerData: { ticketNumbers: ['T-100', 'T-101'] },
     },
-  } as any);
+  } as any, 'OWNER');
 
   assert.equal(dto.publicCode, '4567890');
   assert.equal(dto.subjectType, 'EVENT');
@@ -185,4 +185,6 @@ test('maps supplier order rows with short numeric fallback code', () => {
   assert.deepEqual(dto.ticketNumbers, ['T-100', 'T-101']);
   assert.equal(dto.fulfillmentStatus, 'FULFILLED');
   assert.equal(dto.totalKopecks, 300_000);
+  assert.equal(dto.buyerPiiLevel, 'masked');
+  assert.equal(dto.buyerEmail, 'bu***@example.com');
 });

@@ -21,6 +21,7 @@ import {
   loadSupplierCheckoutPurchaseRows,
   ticketNumbersFromProviderData,
 } from './purchase-projection.js';
+import { supplierOrderBuyerFields, supplierOrderCanSeeTicketNumbers, VERIFIED_SUPPLIER_ROLE_PARAM } from './supplier-order-pii.js';
 
 const DEFAULT_LIMIT = 50;
 const MAX_LIMIT = 100;
@@ -238,7 +239,7 @@ export async function buildSupplierPortalDashboardDto(
   const [aggregates, upcomingSessions, latestOrders, attentionEvents] = await Promise.all([
     loadSupplierPortalAggregates(supplier.id),
     loadUpcomingSessions(supplier.id, 5),
-    loadSupplierCheckoutPurchaseRows(supplier.id, new URLSearchParams({ limit: '5' })),
+    loadSupplierCheckoutPurchaseRows(supplier.id, new URLSearchParams({ limit: '5' }), searchParams.get(VERIFIED_SUPPLIER_ROLE_PARAM)),
     loadSupplierEventRows(supplier.id, new URLSearchParams({ limit: '25' })),
   ]);
   const attentionAdmissions = await loadAdmissionProductsList(
@@ -335,7 +336,7 @@ export async function buildSupplierPortalOrdersListDto(
   searchParams: URLSearchParams = new URLSearchParams(),
 ): Promise<SupplierPortalOrdersListDto> {
   const supplier = await resolveSupplierPortal(searchParams);
-  return loadSupplierCheckoutPurchaseRows(supplier.id, searchParams);
+  return loadSupplierCheckoutPurchaseRows(supplier.id, searchParams, searchParams.get(VERIFIED_SUPPLIER_ROLE_PARAM));
 }
 
 export async function buildSupplierPortalFinanceDto(
@@ -661,7 +662,7 @@ export function resolveSupplierPortalEventIssues(input: {
   return issues;
 }
 
-export function mapSupplierPortalOrderRow(row: SupplierOrderRow): SupplierPortalOrderRowDto {
+export function mapSupplierPortalOrderRow(row: SupplierOrderRow, verifiedRole: string | null = null): SupplierPortalOrderRowDto {
   return {
     id: row.id,
     orderId: row.order.id,
@@ -679,15 +680,15 @@ export function mapSupplierPortalOrderRow(row: SupplierOrderRow): SupplierPortal
     sessionId: row.session?.id || row.sessionId || null,
     startsAt: toIso(row.session?.startsAt),
     ticketTitle: row.ticketTitle || row.offer?.title || row.admissionOffer?.title || null,
-    ticketNumbers: ticketNumbersFromProviderData(row.fulfillmentItem?.providerData),
+    ticketNumbers: supplierOrderCanSeeTicketNumbers(verifiedRole)
+      ? ticketNumbersFromProviderData(row.fulfillmentItem?.providerData)
+      : [],
     fulfillmentStatus: row.fulfillmentItem?.status ? String(row.fulfillmentItem.status) : null,
     quantity: row.quantity,
     unitPriceKopecks: row.unitPriceKopecks,
     totalKopecks: row.totalKopecks,
     commissionKopecks: row.commissionKopecks,
-    buyerName: row.order.buyerName || null,
-    buyerEmail: row.order.buyerEmail || null,
-    buyerPhone: row.order.buyerPhone || null,
+    ...supplierOrderBuyerFields({ name: row.order.buyerName, email: row.order.buyerEmail, phone: row.order.buyerPhone }, verifiedRole),
     paidAt: toIso(row.order.paidAt),
     createdAt: toIso(row.createdAt) || new Date(0).toISOString(),
   };
@@ -880,7 +881,7 @@ async function loadSupplierOrderRows(
     offset,
     hasMore: rows.length > limit,
     filters: { status },
-    items: rows.slice(0, limit).map(mapSupplierPortalOrderRow),
+    items: rows.slice(0, limit).map((row) => mapSupplierPortalOrderRow(row, searchParams.get(VERIFIED_SUPPLIER_ROLE_PARAM))),
   };
 }
 

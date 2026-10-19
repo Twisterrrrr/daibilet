@@ -299,6 +299,13 @@ test('projects internal checkout and external orders into admin, buyer and suppl
     assert.equal(supplier.total, 1);
     assert.equal(supplier.items[0]?.publicCode, '9100001');
     assert.equal(supplier.items[0]?.subjectType, 'VENUE_ADMISSION');
+    assert.equal(supplier.items[0]?.buyerEmail, null);
+    assert.equal(supplier.items[0]?.buyerPiiLevel, 'omitted');
+    const supplierOwner = await loadSupplierCheckoutPurchaseRows(ids.supplier, new URLSearchParams({ limit: '10' }), 'OWNER');
+    assert.equal(supplierOwner.items[0]?.buyerEmail?.includes(email), false);
+    assert.equal(supplierOwner.items[0]?.buyerEmail?.includes('***'), true);
+    assert.equal(supplierOwner.items[0]?.buyerPiiLevel, 'masked');
+    assert.equal(supplierOwner.items[0]?.buyerPhone, null);
 
     const publicOrder = await buildPublicCheckoutOrderByCodeDto('9100001');
     assert.equal(publicOrder?.publicCode, '9100001');
