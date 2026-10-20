@@ -19,6 +19,7 @@ import {
   Receipt,
   Settings,
   Users,
+  Wand2,
   X,
 } from 'lucide-react';
 
@@ -73,6 +74,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: '/admin/landings', label: 'Лендинги', icon: LayoutTemplate },
       { href: '/admin/articles', label: 'Статьи', icon: BookOpen },
+      { href: '/admin/rewrite-queue', label: 'AI-рерайт описаний', icon: Wand2 },
       { href: '/admin/hero-banners', label: 'Главная страница', icon: ImageIcon },
       { href: '/admin/reviews', label: 'Отзывы', icon: MessageSquareQuote },
     ],
