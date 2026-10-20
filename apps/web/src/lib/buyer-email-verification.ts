@@ -3,9 +3,8 @@
  *
  * Правило docs/cline-buyer-admin-ui-brief-2026-10-20.md: ясное пустое состояние
  * для неподтверждённого адреса показывается только после появления признака в
- * DTO. Пока unified buyer DTO (docs/buyer-admin-bridge-2026-10-20.md) не
- * выпускает `account.emailVerified`, статус остаётся `unknown`, и браузер не
- * угадывает его по косвенным данным (наличию строк, тексту ошибки и т.п.).
+ * DTO. Если старый сервер ещё не отдаёт `account.emailVerified`, статус
+ * остаётся `unknown`: браузер не угадывает его по наличию строк или ошибке.
  */
 
 export type BuyerEmailVerificationState = 'unknown' | 'verified' | 'unverified';

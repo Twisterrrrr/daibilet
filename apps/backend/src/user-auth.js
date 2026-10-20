@@ -248,3 +248,41 @@ export async function requireSiteUserFromRequest(db, request) {
   const profile = await getSiteUserProfile(db, payload.sub);
   return profile;
 }
+
+const EMAIL_VERIFY_TTL_SEC = 24 * 60 * 60;
+
+export function createSiteUserEmailVerificationToken(userId) {
+  const id = String(userId || '').trim();
+  if (!id) throw authError('Пользователь не найден.', 404);
+  const payload = base64UrlEncode(JSON.stringify({ id, exp: Math.floor(Date.now() / 1000) + EMAIL_VERIFY_TTL_SEC }));
+  const signature = createHmac('sha256', requireJwtSecret()).update(`email-verify:${payload}`).digest('base64url');
+  return `${payload}.${signature}`;
+}
+
+export async function verifySiteUserEmail(db, token) {
+  if (typeof token !== 'string' || token.length > 4096) throw authError('Ссылка подтверждения недействительна.', 400);
+  const parts = String(token || '').split('.');
+  if (parts.length !== 2) throw authError('Ссылка подтверждения недействительна.', 400);
+  const [payload, signature] = parts;
+  const expected = createHmac('sha256', requireJwtSecret()).update(`email-verify:${payload}`).digest('base64url');
+  const actualBytes = Buffer.from(signature);
+  const expectedBytes = Buffer.from(expected);
+  if (actualBytes.length !== expectedBytes.length || !timingSafeEqual(actualBytes, expectedBytes)) {
+    throw authError('Ссылка подтверждения недействительна.', 400);
+  }
+  let claims;
+  try {
+    claims = JSON.parse(base64UrlDecode(payload).toString('utf8'));
+  } catch {
+    throw authError('Ссылка подтверждения недействительна.', 400);
+  }
+  if (typeof claims.id !== 'string' || !claims.id || !Number.isSafeInteger(claims.exp) || claims.exp < Math.floor(Date.now() / 1000)) {
+    throw authError('Срок действия ссылки истёк.', 400);
+  }
+  const result = await db.query(
+    'update "SiteUser" set "emailVerifiedAt" = now(), "updatedAt" = now() where id = $1 and "isActive" = true and "emailVerifiedAt" is null returning id',
+    [claims.id],
+  );
+  if (!result.rows[0]) throw authError('Ссылка уже использована или аккаунт недоступен.', 400);
+  return { verified: true };
+}

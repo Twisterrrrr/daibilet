@@ -9,6 +9,7 @@ import { BuyerOrderCard, BuyerOrdersEmptyState } from '@/components/BuyerOrderCa
 import { BUYER_ACCOUNT_EMPTY_HINT, buyerAccountHero, buyerAccountListLabel } from '@/lib/buyer-account-copy';
 import { resolveBuyerEmailVerification } from '@/lib/buyer-email-verification';
 import { formatNumber } from '@/lib/format';
+import { requestUserEmailVerification } from '@/lib/user-api';
 import { useAccountPurchases, useUserAuth } from '@/hooks/useUserAuth';
 
 function formatCount(count: number, forms: [string, string, string]): string {
@@ -20,8 +21,9 @@ function formatCount(count: number, forms: [string, string, string]): string {
 
 export function AccountPurchasesPageView() {
   const router = useRouter();
-  const { user, isLoading: authLoading, isLoggedIn, logout } = useUserAuth();
+  const { user, token, isLoading: authLoading, isLoggedIn, logout } = useUserAuth();
   const [page, setPage] = useState(1);
+  const [verificationMessage, setVerificationMessage] = useState<string | null>(null);
   const { payload, isLoading, error } = useAccountPurchases(page);
 
   useEffect(() => {
@@ -79,6 +81,25 @@ export function AccountPurchasesPageView() {
       </section>
 
       <section className="container-page py-8 sm:py-10">
+        {payload?.account?.emailVerified === false ? (
+          <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
+            <p>Подтвердите email, чтобы увидеть покупки, оформленные на этот адрес без входа в аккаунт.</p>
+            <button
+              type="button"
+              disabled={!token}
+              onClick={() => {
+                if (!token) return;
+                void requestUserEmailVerification(token)
+                  .then(() => setVerificationMessage('Письмо отправлено. Проверьте почту.'))
+                  .catch(() => setVerificationMessage('Не удалось отправить письмо. Попробуйте позже.'));
+              }}
+              className="mt-2 font-semibold underline disabled:opacity-50"
+            >
+              Отправить письмо для подтверждения
+            </button>
+            {verificationMessage ? <p className="mt-2">{verificationMessage}</p> : null}
+          </div>
+        ) : null}
         {error ? (
           <div className="rounded-xl bg-red-50 p-4 text-red-800">
             <div className="font-semibold">Не удалось загрузить покупки</div>

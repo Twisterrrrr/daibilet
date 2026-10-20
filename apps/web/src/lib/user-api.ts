@@ -57,6 +57,21 @@ export function userMe(token: string) {
   });
 }
 
+export function requestUserEmailVerification(token: string) {
+  return fetchUserApi<{ sent: boolean; alreadyVerified?: boolean }>('/api/user/auth/request-email-verification', {
+    method: 'POST',
+    headers: { authorization: `Bearer ${token}` },
+    body: JSON.stringify({}),
+  });
+}
+
+export function verifyUserEmail(token: string) {
+  return fetchUserApi<{ verified: boolean }>('/api/user/auth/verify-email', {
+    method: 'POST',
+    body: JSON.stringify({ token }),
+  });
+}
+
 export type AccountPurchasesPayload = {
   total: number;
   rows: Array<{
@@ -90,9 +105,7 @@ export type AccountPurchasesPayload = {
   pages?: number;
   limit?: number;
   /**
-   * Ожидается от unified buyer DTO (docs/buyer-admin-bridge-2026-10-20.md).
-   * Пока сервер не отдаёт `account.emailVerified`, поле отсутствует и статус
-   * подтверждения адреса остаётся `unknown`: браузер его не угадывает.
+   * Отдаётся finance API; поле необязательно для совместимости со старым сервером.
    */
   account?: {
     emailVerified?: boolean | null;

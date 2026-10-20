@@ -77,6 +77,7 @@ import {
   authenticateAccessToken,
   buildClearRefreshCookie,
   buildRefreshCookie,
+  createSiteUserEmailVerificationToken,
   loginSiteUser,
   logoutSiteUser,
   parseBearerToken,
@@ -84,7 +85,9 @@ import {
   refreshSiteUserSession,
   registerSiteUser,
   requireSiteUserFromRequest,
+  verifySiteUserEmail,
 } from './user-auth.js';
+import { sendSiteUserVerifyEmail } from './user-email-mail.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(dirname, '..', '..', '..');
@@ -424,6 +427,39 @@ export async function handleRequest(request, response) {
         sendJson(response, user);
       } catch (error) {
         sendJson(response, { error: error.message || 'unauthorized' }, error.statusCode || 401);
+      }
+      return;
+    }
+
+    if (route === 'POST /api/user/auth/request-email-verification') {
+      try {
+        const user = await requireSiteUserFromRequest(db, request);
+        if (user.emailVerifiedAt) {
+          sendJson(response, { sent: false, alreadyVerified: true });
+          return;
+        }
+        assertAuthRateLimit(`verify-email:${user.id}`, 3);
+        const siteUrl = String(process.env.PUBLIC_SITE_URL || 'https://daibilet.ru').replace(/\/$/, '');
+        const token = createSiteUserEmailVerificationToken(user.id);
+        const verifyUrl = `${siteUrl}/account/verify-email?token=${encodeURIComponent(token)}`;
+        const result = await sendSiteUserVerifyEmail({ to: user.email, verifyUrl });
+        if (!result.sent) {
+          sendJson(response, { error: 'verification_email_unavailable' }, 503);
+          return;
+        }
+        sendJson(response, { sent: true });
+      } catch (error) {
+        sendJson(response, { error: error.message || 'verification_request_failed' }, error.statusCode || 400);
+      }
+      return;
+    }
+
+    if (route === 'POST /api/user/auth/verify-email') {
+      try {
+        const body = await readJsonBody(request);
+        sendJson(response, await verifySiteUserEmail(db, body?.token));
+      } catch (error) {
+        sendJson(response, { error: error.message || 'email_verification_failed' }, error.statusCode || 400);
       }
       return;
     }

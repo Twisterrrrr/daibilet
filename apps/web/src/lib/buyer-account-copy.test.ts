@@ -31,23 +31,23 @@ test('тексты ЛК описывают единый список внешн�
   assert.doesNotMatch(hero, /из Ticketscloud и Teplohod/);
 });
 
-test('ни один текст не обещает автоподтяжку гостевых покупок по email', () => {
+test('гостевые покупки появляются только после подтверждения email', () => {
   for (const text of allCopy()) {
     assert.doesNotMatch(text, /подтянут(ся|и)?\s+автоматически/i);
     assert.doesNotMatch(text, /указан тот же email/i);
     assert.doesNotMatch(text, /все заказы на вашем email/i);
     assert.doesNotMatch(text, /подтянутся автоматически/i);
   }
-  assert.match(BUYER_REGISTER_INTRO, /по email не подтягиваются/);
+  assert.match(BUYER_REGISTER_INTRO, /После подтверждения email/);
 });
 
 test('пустое состояние для неподтверждённого адреса появляется только по признаку DTO', () => {
   const unverified = buyerOrdersEmptyBody('user@example.com', 'unverified');
   assert.match(unverified, /не подтвержд/);
-  assert.match(unverified, /не подключаются/);
+  assert.match(unverified, /Отправьте письмо для подтверждения/);
 
   const unknown = buyerOrdersEmptyBody('user@example.com', 'unknown');
-  assert.doesNotMatch(unknown, /не подтвержд/);
+  assert.doesNotMatch(unknown, /Email.*не подтвержд/);
   assert.doesNotMatch(unknown, /подтверждённому/);
 
   const verified = buyerOrdersEmptyBody('user@example.com', 'verified');
