@@ -48,3 +48,5 @@ src/lib/city-hub-registry.test.ts
 src/server/finance-checkout-client.test.ts
 # Support chat helpers: text sanitizing, visitor key guard, Telegram notification text.
 src/lib/chat.test.ts
+# Post-sync description composer (sanitization canon): determinism, fixed point, section labels.
+src/lib/event-description-compose.test.ts
