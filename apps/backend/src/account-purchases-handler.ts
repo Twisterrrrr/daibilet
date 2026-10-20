@@ -24,8 +24,8 @@ export function createAccountPurchasesRouteHandler(
       context.response,
       await buildBuyerPurchasesListDto({
         siteUserId: user.id,
-        // A password-only account does not prove ownership of guest purchases.
-        email: user.emailVerifiedAt ? user.email : '',
+        email: user.email,
+        emailVerified: Boolean(user.emailVerifiedAt),
         searchParams: context.searchParams,
       }),
     );

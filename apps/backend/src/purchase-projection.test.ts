@@ -290,16 +290,20 @@ test('projects internal checkout and external orders into admin, buyer and suppl
     const buyer = await buildBuyerPurchasesListDto({
       siteUserId: ids.user,
       email,
+      emailVerified: true,
       searchParams: new URLSearchParams({ limit: '10' }),
     });
+    assert.equal(buyer.account.emailVerified, true);
     assert.equal(buyer.rows.some((row) => row.sourceKind === 'internal' && row.number === '9100001'), true);
     assert.equal(buyer.rows.some((row) => row.sourceKind === 'external' && row.number === '9200001'), true);
 
     const unrelatedUnverifiedBuyer = await buildBuyerPurchasesListDto({
       siteUserId: `unverified-${suffix}`,
-      email: '',
+      email,
+      emailVerified: false,
     });
     assert.equal(unrelatedUnverifiedBuyer.total, 0);
+    assert.equal(unrelatedUnverifiedBuyer.account.emailVerified, false);
 
     const supplier = await loadSupplierCheckoutPurchaseRows(ids.supplier, new URLSearchParams({ limit: '10' }));
     assert.equal(supplier.total, 1);

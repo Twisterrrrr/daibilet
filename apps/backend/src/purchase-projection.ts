@@ -194,6 +194,7 @@ export interface AdminPurchasesListDto {
 
 export interface BuyerPurchasesListDto {
   generatedAt: string;
+  account: { emailVerified: boolean };
   page: number;
   pages: number;
   limit: number;
@@ -602,12 +603,13 @@ async function loadCheckoutOrderLedger(checkoutOrderId: string): Promise<LedgerE
 export async function buildBuyerPurchasesListDto(input: {
   siteUserId: string;
   email: string;
+  emailVerified: boolean;
   searchParams?: URLSearchParams;
 }): Promise<BuyerPurchasesListDto> {
   const searchParams = input.searchParams || new URLSearchParams();
   const limit = clampInt(searchParams.get('limit'), 10, 1, MAX_BUYER_LIMIT);
   const page = clampInt(searchParams.get('page'), 1, 1, Number.MAX_SAFE_INTEGER);
-  const allRows = await loadBuyerPurchaseRows(input.siteUserId, input.email);
+  const allRows = await loadBuyerPurchaseRows(input.siteUserId, input.emailVerified ? input.email : '');
   const total = allRows.length;
   const pages = Math.max(1, Math.ceil(total / limit));
   const safePage = Math.min(page, pages);
@@ -615,6 +617,7 @@ export async function buildBuyerPurchasesListDto(input: {
 
   return {
     generatedAt: new Date().toISOString(),
+    account: { emailVerified: input.emailVerified },
     page: safePage,
     pages,
     limit,
