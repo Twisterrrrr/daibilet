@@ -160,12 +160,59 @@ test('generate stores QA-checked draft and never publishes', async () => {
   );
 });
 
-test('approve publishes draft to EventOverride with origin AI', async () => {
+test('approve moves the revision to APPROVED and never publishes', async () => {
+  const response = createMockResponse();
+  const db = createMockDb((sql) => {
+    if (sql.includes('sessionDurationMinutes')) {
+      return { rows: [{ ...REVISION_ROW, status: 'CHECKED', draftText: 'Черновик рерайта.' }] };
+    }
+    return { rows: [{ id: 'edr_1' }] };
+  });
+  const handler = createDescriptionRevisionRouteHandler({ db, invalidatePublicCaches() {} });
+
+  const handled = await handler(
+    createRouteContext({ method: 'POST', pathname: '/api/admin/rewrite-queue/edr_1/approve', body: {}, response }),
+  );
+  assert.equal(handled, true);
+  const body = JSON.parse(response.body);
+  assert.equal(body.ok, true);
+  assert.equal(body.status, 'APPROVED');
+
+  const approve = db.calls.find((call) => call.sql.includes("set status = 'APPROVED'"));
+  assert.ok(approve, 'approval transition must run');
+  assert.equal(approve.params[1], 'Черновик рерайта.');
+  assert.match(approve.sql, /status in \('GENERATED', 'CHECKED'\)/);
+  assert.ok(
+    !db.calls.some((call) => /insert into "EventOverride"|update "EventOverride"/.test(call.sql)),
+    'approve must not publish',
+  );
+});
+
+test('approve refuses a revision that is not GENERATED or CHECKED', async () => {
+  const response = createMockResponse();
+  const db = createMockDb((sql) => {
+    if (sql.includes('sessionDurationMinutes')) {
+      return { rows: [{ ...REVISION_ROW, status: 'QUEUED', draftText: 'Черновик.' }] };
+    }
+    // The guarded transition matches nothing: the row is not approvable.
+    return { rows: [] };
+  });
+  const handler = createDescriptionRevisionRouteHandler({ db, invalidatePublicCaches() {} });
+
+  const handled = await handler(
+    createRouteContext({ method: 'POST', pathname: '/api/admin/rewrite-queue/edr_1/approve', body: {}, response }),
+  );
+  assert.equal(handled, true);
+  assert.equal(response.statusCode, 409);
+  assert.equal(JSON.parse(response.body).error, 'revision_not_approvable');
+});
+
+test('publish writes the approved text to EventOverride and marks PUBLISHED', async () => {
   const response = createMockResponse();
   let invalidatedWith = '';
   const db = createMockDb((sql) => {
     if (sql.includes('sessionDurationMinutes')) {
-      return { rows: [{ ...REVISION_ROW, status: 'CHECKED', draftText: 'Черновик рерайта.' }] };
+      return { rows: [{ ...REVISION_ROW, status: 'APPROVED', draftText: 'Черновик.', finalText: 'Финальный текст.' }] };
     }
     return { rows: [{ id: 'edr_1' }] };
   });
@@ -177,16 +224,60 @@ test('approve publishes draft to EventOverride with origin AI', async () => {
   });
 
   const handled = await handler(
-    createRouteContext({ method: 'POST', pathname: '/api/admin/rewrite-queue/edr_1/approve', body: {}, response }),
+    createRouteContext({ method: 'POST', pathname: '/api/admin/rewrite-queue/edr_1/publish', body: {}, response }),
   );
   assert.equal(handled, true);
   const body = JSON.parse(response.body);
   assert.equal(body.ok, true);
+  assert.equal(body.status, 'PUBLISHED');
+
   const insert = db.calls.find((call) => call.sql.includes('insert into "EventOverride"'));
-  assert.ok(insert);
-  assert.equal(insert.params[2], 'Черновик рерайта.');
-  assert.ok(db.calls.some((call) => call.sql.includes("'PUBLISHED'")));
+  assert.ok(insert, 'publish must write the override');
+  assert.equal(insert.params[2], 'Финальный текст.');
+  const markPublished = db.calls.find((call) => call.sql.includes("set status = 'PUBLISHED'"));
+  assert.ok(markPublished);
+  assert.match(markPublished.sql, /status = 'APPROVED'/);
   assert.equal(invalidatedWith, 'sobytie-evt-1');
+});
+
+test('publish refuses a revision that is not approved', async () => {
+  const response = createMockResponse();
+  const db = createMockDb((sql) => {
+    if (sql.includes('sessionDurationMinutes')) {
+      return { rows: [{ ...REVISION_ROW, status: 'CHECKED', draftText: 'Черновик.' }] };
+    }
+    return { rows: [{ id: 'edr_1' }] };
+  });
+  const handler = createDescriptionRevisionRouteHandler({ db, invalidatePublicCaches() {} });
+
+  const handled = await handler(
+    createRouteContext({ method: 'POST', pathname: '/api/admin/rewrite-queue/edr_1/publish', body: {}, response }),
+  );
+  assert.equal(handled, true);
+  assert.equal(response.statusCode, 409);
+  assert.equal(JSON.parse(response.body).error, 'revision_not_approved');
+  assert.ok(!db.calls.some((call) => /insert into "EventOverride"/.test(call.sql)));
+});
+
+test('publish marks STALE when the input changed after approval', async () => {
+  const response = createMockResponse();
+  const db = createMockDb((sql) => {
+    if (sql.includes('sessionDurationMinutes')) {
+      // Approved before the price moved: the stored hash no longer matches.
+      return { rows: [{ ...REVISION_ROW, status: 'APPROVED', finalText: 'Финал.', priceFromRub: 1900 }] };
+    }
+    return { rows: [{ id: 'edr_1' }] };
+  });
+  const handler = createDescriptionRevisionRouteHandler({ db, invalidatePublicCaches() {} });
+
+  const handled = await handler(
+    createRouteContext({ method: 'POST', pathname: '/api/admin/rewrite-queue/edr_1/publish', body: {}, response }),
+  );
+  assert.equal(handled, true);
+  assert.equal(response.statusCode, 409);
+  assert.equal(JSON.parse(response.body).error, 'stale_source');
+  assert.ok(db.calls.some((call) => call.sql.includes("'STALE'")));
+  assert.ok(!db.calls.some((call) => /insert into "EventOverride"/.test(call.sql)));
 });
 
 test('approve refuses stale drafts when the source changed', async () => {

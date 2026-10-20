@@ -27,6 +27,12 @@ export interface DescriptionRevisionHandlerDependencies {
   db: DbClient;
   rewrite?: RewriteEventDescriptionFn;
   invalidatePublicCaches?: (reason: string, options?: { warm?: boolean; slug?: string }) => void;
+  /**
+   * Authenticated admin identity for the approval audit trail. Injected so the
+   * identity ticket can wire the session in without touching the SQL again; until
+   * then the stored value stays the legacy placeholder.
+   */
+  resolveActor?: (context: RouteContext) => string | null;
 }
 
 /**
@@ -242,9 +248,11 @@ async function handleGenerate(context: RouteContext, deps: DescriptionRevisionHa
 }
 
 /**
- * POST /api/admin/rewrite-queue/:id/approve - editorial confirmation. Publishes
- * the draft (or editor-supplied finalText) to EventOverride.description with
- * origin=AI. Refuses when the source changed since enqueue (stale).
+ * POST /api/admin/rewrite-queue/:id/approve - editorial confirmation.
+ *
+ * Moves GENERATED/CHECKED to APPROVED and stores the editor-supplied finalText.
+ * Does NOT touch the public page: publication is POST /publish. Refuses when the
+ * source changed since enqueue (stale).
  */
 async function handleApprove(context: RouteContext, deps: DescriptionRevisionHandlerDependencies): Promise<boolean> {
   if (context.method !== 'POST') return false;
@@ -276,7 +284,88 @@ async function handleApprove(context: RouteContext, deps: DescriptionRevisionHan
 
   const finalText = String(body.finalText || loaded.row.draftText || '').trim();
   if (!finalText) {
-    sendJson(context.response, { error: 'empty_draft', message: 'Нет черновика для публикации' }, { statusCode: 400 });
+    sendJson(context.response, { error: 'empty_draft', message: 'Нет черновика для одобрения' }, { statusCode: 400 });
+    return true;
+  }
+
+  // Editorial confirmation only. Publishing is a separate, deliberate action:
+  // approval can be batched, publication follows its own window, and the audit
+  // trail only means something when the two are different events.
+  const approved = await deps.db.query(
+    `update "EventDescriptionRevision"
+     set status = 'APPROVED', "finalText" = $2, "approvedBy" = $3, "approvedAt" = now(), "updatedAt" = now()
+     where id = $1 and status in ('GENERATED', 'CHECKED')
+     returning id`,
+    [revisionId, finalText, deps.resolveActor?.(context) || 'admin'],
+  );
+  if (!approved.rows?.length) {
+    sendJson(
+      context.response,
+      {
+        error: 'revision_not_approvable',
+        message: 'Одобрить можно только ревизию в статусе GENERATED или CHECKED',
+      },
+      { statusCode: 409 },
+    );
+    return true;
+  }
+
+  sendJson(context.response, { ok: true, status: 'APPROVED', eventId: loaded.row.eventId, slug: loaded.slug });
+  return true;
+}
+
+/**
+ * POST /api/admin/rewrite-queue/:id/publish - APPROVED -> PUBLISHED.
+ *
+ * Writes the approved text into EventOverride.description with origin=AI. Refuses
+ * anything that is not APPROVED, and re-checks the source hash: an approval made
+ * before the input changed must not reach the public page.
+ */
+async function handlePublish(context: RouteContext, deps: DescriptionRevisionHandlerDependencies): Promise<boolean> {
+  if (context.method !== 'POST') return false;
+  const match = matchPath(context.pathname, /^\/api\/admin\/rewrite-queue\/([^/]+)\/publish$/);
+  if (!match) return false;
+  const revisionId = match[0];
+  if (!revisionId) return false;
+
+  const loaded = await loadRevisionContext(deps.db, revisionId);
+  if (!loaded) {
+    sendJson(context.response, { error: 'revision_not_found', message: 'Ревизия не найдена' }, { statusCode: 404 });
+    return true;
+  }
+
+  if (loaded.row.status !== 'APPROVED') {
+    sendJson(
+      context.response,
+      {
+        error: 'revision_not_approved',
+        message: 'Опубликовать можно только одобренную ревизию (APPROVED)',
+      },
+      { statusCode: 409 },
+    );
+    return true;
+  }
+
+  const currentHash = sourceHashOf(loaded.row);
+  if (currentHash !== loaded.row.sourceHash) {
+    await deps.db.query(
+      `update "EventDescriptionRevision" set status = 'STALE', "updatedAt" = now() where id = $1`,
+      [revisionId],
+    );
+    sendJson(
+      context.response,
+      {
+        error: 'stale_source',
+        message: 'Исходное описание изменилось после одобрения - нужна новая генерация',
+      },
+      { statusCode: 409 },
+    );
+    return true;
+  }
+
+  const finalText = String(loaded.row.finalText || loaded.row.draftText || '').trim();
+  if (!finalText) {
+    sendJson(context.response, { error: 'empty_draft', message: 'Нет текста для публикации' }, { statusCode: 400 });
     return true;
   }
 
@@ -292,13 +381,18 @@ async function handleApprove(context: RouteContext, deps: DescriptionRevisionHan
   );
   await deps.db.query(
     `update "EventDescriptionRevision"
-     set status = 'PUBLISHED', "finalText" = $2, "approvedBy" = 'admin', "updatedAt" = now()
-     where id = $1`,
-    [revisionId, finalText],
+     set status = 'PUBLISHED', "updatedAt" = now()
+     where id = $1 and status = 'APPROVED'`,
+    [revisionId],
   );
-  deps.invalidatePublicCaches?.('rewrite queue approve', loaded.slug ? { slug: loaded.slug } : undefined);
+  deps.invalidatePublicCaches?.('rewrite queue publish', loaded.slug ? { slug: loaded.slug } : undefined);
 
-  sendJson(context.response, { ok: true, eventId: loaded.row.eventId, slug: loaded.slug });
+  sendJson(context.response, {
+    ok: true,
+    status: 'PUBLISHED',
+    eventId: loaded.row.eventId,
+    slug: loaded.slug,
+  });
   return true;
 }
 
@@ -336,6 +430,7 @@ export function createDescriptionRevisionRouteHandler(
     if (await handleList(context, deps)) return true;
     if (await handleGenerate(context, deps)) return true;
     if (await handleApprove(context, deps)) return true;
+    if (await handlePublish(context, deps)) return true;
     return handleReject(context, deps);
   };
 }

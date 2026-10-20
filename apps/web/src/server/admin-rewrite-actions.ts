@@ -34,7 +34,7 @@ export async function generateRewriteDraftsAction(limit: number): Promise<Rewrit
 
 export type RewriteApproveResult = { ok: boolean; error?: string };
 
-/** Editorial approval - publishes the (optionally edited) draft to the event page. */
+/** Editorial approval - moves GENERATED/CHECKED to APPROVED. Does not publish. */
 export async function approveRewriteAction(revisionId: string, finalText?: string): Promise<RewriteApproveResult> {
   const response = await adminApiFetch(`/api/admin/rewrite-queue/${encodeURIComponent(revisionId)}/approve`, {
     method: 'POST',
@@ -42,8 +42,28 @@ export async function approveRewriteAction(revisionId: string, finalText?: strin
     body: JSON.stringify(finalText ? { finalText } : {}),
   });
   if (!response.ok) {
+    return { ok: false, error: await readError(response, 'Не удалось одобрить рерайт') };
+  }
+  revalidatePath('/admin/rewrite-queue');
+  revalidatePath('/admin/rewrite-publish');
+  return { ok: true };
+}
+
+/**
+ * Publication of an APPROVED revision: the only path that writes the AI text to
+ * the public event page. Kept separate from approval so a batch of approvals can
+ * wait for its own publication window.
+ */
+export async function publishRewriteAction(revisionId: string): Promise<RewriteApproveResult> {
+  const response = await adminApiFetch(`/api/admin/rewrite-queue/${encodeURIComponent(revisionId)}/publish`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({}),
+  });
+  if (!response.ok) {
     return { ok: false, error: await readError(response, 'Не удалось опубликовать рерайт') };
   }
+  revalidatePath('/admin/rewrite-publish');
   revalidatePath('/admin/rewrite-queue');
   revalidatePath('/admin/events');
   return { ok: true };

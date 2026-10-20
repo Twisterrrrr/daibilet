@@ -34,6 +34,7 @@ const STATUS_LABELS: Record<string, string> = {
   QUEUED: 'В очереди',
   GENERATED: 'Черновик (есть флаги)',
   CHECKED: 'Черновик проверен',
+  APPROVED: 'Одобрено (ждёт публикации)',
   STALE: 'Устарел',
   PUBLISHED: 'Опубликован',
 };
