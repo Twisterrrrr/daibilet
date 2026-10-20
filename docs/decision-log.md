@@ -303,6 +303,37 @@ identity, factual copy and object-specific imagery are reviewed.
 
 **Статус:** Активно. Хук встроен в `tc-import-catalog.js` и `tep-import-fixtures.js` (все пути синка, включая TEP auto-sync и worker-джобы); ручной прогон - `npm run event:postsync`. Выкатка: миграция `pnpm db:deploy`, затем обычный deploy; catch-up по legacy-хвосту - отдельным прогоном `--repair-legacy`.
 
+## 2026-10-20 — Ревью пост-синковой линии описаний: решения и находки
+
+**Решение:** Линией фичи признана ветка `cline/e366e` (8 коммитов, все шаги плана: миграция, contracts, composer, хук, AI-очередь с QA, админ-страница, доки). Параллельная реализация в `worktrees/a8eec` снята: конфликтная миграция `20261020120000_event_description_revisions` (тот же timestamp, что у `..._event_description_revision`, оба `CREATE TYPE "DescriptionOrigin"`) удалена из worktree до коммита, чтобы исключить случайный `db:deploy`. Аддитивная часть (защита публичного текста от origin-маркера) перенесена отдельно на `feat/description-origin-marker` от `6e078fe8d`, без мержа в `cline/e366e`.
+
+**Решения по спорным точкам:** статусы ревизий — `GENERATED`/`CHECKED` (код — источник истины: миграция, `packages/contracts/src/admin.ts`, админ-очередь; канон в `docs/event-rewrite-seo-plan.md` поправлен отдельным коммитом). Таблица ревизий трактуется как **очередь AI**: колонки `origin` в ревизии нет, `@@unique([eventId, sourceHash])` остаётся — при этой трактовке она корректна, одна строка на пару (event, hash) и повторный enqueue того же входа — no-op. `approvedBy` как `String` без FK — принято как tech debt (нет ссылочной целостности, зато нет зависимости ревизии от `AdminUser`). `packages/contracts/src/admin.ts` — зона Codex: принято **без ревью Codex**, требуется sign-off или явное подтверждение владельца (DTO зависимостей от `packages/db` не тянет, проверено).
+
+**Результаты ревью по чек-листу:** миграция соответствует схеме — 8 statements идентичны выводу `prisma migrate diff` от схемы до их изменения (различие только в форматировании, statements совпадают). Composer: детерминизм и fixed point покрыты тестами (`compose is deterministic and repair(compose) is a fixed point`), идемпотентность промоушена секций — отдельным тестом, есть фикстура Лютовой. Хук: «failures never break sync» подтверждено (`scripts/lib/post-sync-hook.js` — try/catch вокруг `spawnSync`, non-zero exit и ошибки парсинга только warn, таймаут 10 минут, `POST_SYNC_DESCRIPTIONS=0` отключает); `--ids` устойчив к пустым и мусорным значениям (split по `[,;\s]+`, `filter(Boolean)`, `Set`); дедупликация enqueue на уровне БД (`on conflict ("eventId","sourceHash") do nothing`), не `create`. QA не тавтологичен: числа черновика обязаны быть прослеживаемы к исходнику/каталогу (`invented_numbers`), канон длительности (`duration_mismatch`), упоминания поставщика, тире, эмодзи, капс. Pre-migration режим не обходит правило «миграции только через Prisma» — это runtime-детект колонки через `information_schema`.
+
+**Находки, требующие правки (заведены в `docs/Tasktracker.md`):** `sourceHash` считается по одному тексту провайдера (`sourceHashOf` = md5 от `e.description`), тогда как composer пересобирает `## Практическая информация` из полей каталога, а строка AUTO пропускается при совпадении хеша — значит смена цены/даты/площадки/возраста не пересобирает описание и не даёт `STALE` (нарушает критерий приёмки «STALE при смене сеансов/цены/площадки»); `approve` обновляет ревизию без проверки статуса (`where id = $1`), хотя `reject` защищён (`status in ('GENERATED','CHECKED','STALE')`); `approvedBy` пишется литералом `'admin'`, автор подтверждения теряется; страница и эндпоинты очереди не имеют ролевого гейта — публиковать AI-текст в публичную копию может любой аутентифицированный админ; тест composer'а не зарегистрирован в `apps/web/scripts/ci-test-files.txt`, то есть не является CI-гейтом. Значение `APPROVED` в enum не используется (approve идёт сразу в `PUBLISHED`) — оставлено как зарезервированное, вреда не несёт.
+
+**Почему:** ветка сгенерирована параллельной Cline-сессией в соседнем worktree; ревью нужно было как для чужого PR, потому что автор недоступен, а зона `packages/db`/`packages/contracts` по AGENTS.md принадлежит Codex. Проверялось не «правильно ли написано», а что сломается в проде: hash-вход, гейты статусов, авторство подтверждения, авторизация, покрытие тестами в CI.
+
+**Статус:** Решения зафиксированы. Маркер-контракт — коммит `077970032` на `feat/description-origin-marker` (гейты: backend typecheck 0, backend tests 257/257, web tests 260/260), правка канона — `3a81230be`, composer-тест в CI-allowlist — `ec743f805` (47 файлов / 271 тест). Находки правятся отдельными коммитами поверх этой ветки. Общая docker-БД: lineage неизвестен (5 миграций отсутствуют в репозитории), миграции в неё не применять до выяснения; канонический dev — свежий volume.
+
+**Свежий volume (проверено 2026-10-20):** отдельный compose-проект со своим volume и портом, общий контейнер не трогается. Оверрайд обязателен с тегом `!override` для `ports`, иначе compose дополняет список и падает на занятом 5437:
+
+```yaml
+services:
+  postgres:
+    container_name: daibilet-fresh-postgres
+    ports: !override
+      - "5438:5432"
+```
+
+```bash
+docker compose -p daibilet-fresh -f docker-compose.yml -f <override.yml> up -d postgres
+DATABASE_URL=postgresql://daibilet:daibilet@localhost:5438/daibilet?schema=public pnpm db:deploy
+```
+
+Результат: 48 миграций применены от нуля, `migrate status` — «Database schema is up to date», `migrate diff --from-config-datasource --to-schema` — «No difference detected». То есть линия миграций самодостаточна, а расхождение в общей БД вызвано только её неизвестным происхождением. Снять стек: `docker compose -p daibilet-fresh -f docker-compose.yml -f <override.yml> down -v`.
+
 ## Шаблон новой записи
 
 ```markdown

@@ -1,3 +1,19 @@
+## 2026-10-20 - Пост-синковые описания: решения ревью и тикеты
+
+Ревью ветки `cline/e366e` как чужого PR (автор недоступен). Решения — в `docs/decision-log.md` (2026-10-20). Маркер-контракт перенесён на `feat/description-origin-marker` (`077970032` + `3a81230be`).
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| OPS.DB-LINEAGE | Общая docker-БД: `places_from_pdp`, `place_transport_subtypes`, `pier_departures` отсутствуют в репозитории (проверено `git log --all`) — lineage неизвестен, 5 миграций ветки не применены. Канонический dev — свежий volume; в общую БД миграции не применять до выяснения у владельца прод/шейрд-БД | Высокий | ⏳ записано, чтобы следующий не наступил |
+| DB.PRISMA-FORMAT | Выровнять `packages/db/prisma/schema.prisma` под текущий `prisma format` (файл отформатирован более старым Prisma, `format` переписывает ~337 строк). CI формат не проверяет | Низкий | ⏳ no functional change |
+| DB.APPROVEDBY-FK | `EventDescriptionRevision.approvedBy` — `String` без FK на `AdminUser`: нет ссылочной целостности. Решение: либо FK, либо явно оставить как принято | Низкий | ⏳ tech debt, принято без FK |
+| CONT.DESC-HASH-INPUT | `sourceHash` считается по одному тексту провайдера (`sourceHashOf` = md5 от `e.description`), а composer пересобирает `## Практическая информация` из каталога; AUTO-строка пропускается при совпадении хеша. Смена цены/даты/площадки/возраста не пересобирает описание и не даёт `STALE` — нарушает критерий «STALE при смене сеансов/цены/площадки». Считать хеш по значимым входам: текст + сессии/длительность + площадка/город + цена + возраст | Высокий | ⏳ дефект, правка отдельным коммитом |
+| CONT.APPROVE-STATUS-GUARD | `approve` публикует ревизию без проверки статуса (`where id = $1`), хотя `reject` защищён (`status in ('GENERATED','CHECKED','STALE')`). Разрешать approve только из `GENERATED`/`CHECKED` | Средний | ⏳ правка отдельным коммитом |
+| CONT.APPROVED-BY-IDENTITY | `approvedBy` пишется литералом `'admin'` — автор подтверждения теряется, аудит бесполезен. Передавать идентификатор аутентифицированного админа | Средний | ⏳ правка отдельным коммитом |
+| ADMIN.REWRITE-ROLE | `/admin/rewrite-queue` и эндпоинты очереди без ролевого гейта: публиковать AI-текст в публичную копию может любой аутентифицированный админ, хотя `AdminRole` в схеме есть. Нужна роль редактора | Средний | ⏳ правка отдельным коммитом |
+| TEST.COMPOSER-CI | `apps/web/src/lib/event-description-compose.test.ts` (189 строк) не зарегистрирован в `apps/web/scripts/ci-test-files.txt` → 388 строк composer'а без CI-защиты | Средний | ⏳ добавить в allowlist |
+| CONT.POSTSYNC-TSX-PATH | `scripts/lib/post-sync-hook.js` жёстко берёт `apps/web/node_modules/tsx/dist/cli.mjs` без fallback (в `post-catalog-sync-warm.mjs` — три кандидата). Падает мягко, но шаг молча не выполняется, если tsx не там | Низкий | ⏳ tech debt |
+
 ## 2026-10-17 - Чат поддержки: выпуск на прод
 
 | ID | Задача | Приоритет | Статус |
