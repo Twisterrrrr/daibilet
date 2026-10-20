@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import test from 'node:test';
 
-import { DESCRIPTION_SOURCE_HASH_VERSION, descriptionSourceHash } from './description-source-hash.js';
+import { DESCRIPTION_SOURCE_HASH_VERSION, descriptionContentHash, descriptionSourceHash } from './description-source-hash.js';
 
 const BASE = {
   sourceText: 'Живой концерт на крыше.\n\nПрограмма из хитов.',
@@ -94,4 +94,55 @@ test('descriptionSourceHash: regression - the old text-only fingerprint missed p
     descriptionSourceHash(BASE),
     'a price change must change the hash',
   );
+});
+
+/**
+ * The two hashes answer two different questions, and the difference is exactly the
+ * now()-relative session fields. `nextSession`/`futureSessions` move on their own as
+ * sessions pass, which is why they stay out of the content hash: otherwise a passing
+ * session would expire every approval (STALE) and add a queue row per day.
+ */
+test('content hash ignores the now()-relative session fields, the full hash reacts to them', () => {
+  const nextDay = {
+    ...BASE,
+    nextSession: '2026-11-20T16:00:00.000Z',
+    futureSessions: 2,
+  };
+
+  assert.equal(
+    descriptionContentHash(nextDay),
+    descriptionContentHash(BASE),
+    'a passing session must not change the content hash (no STALE, no re-queue)',
+  );
+  assert.notEqual(
+    descriptionSourceHash(nextDay),
+    descriptionSourceHash(BASE),
+    'a passing session must still change the full hash so the text is rebuilt',
+  );
+});
+
+test('content hash reacts to every real content change', () => {
+  const base = descriptionContentHash(BASE);
+  const variants: Record<string, typeof BASE> = {
+    sourceText: { ...BASE, sourceText: 'Другое описание.' },
+    title: { ...BASE, title: 'Концерт группы Y' },
+    city: { ...BASE, city: 'Санкт-Петербург' },
+    venue: { ...BASE, venue: 'Другая площадка' },
+    venueAddress: { ...BASE, venueAddress: 'другой адрес' },
+    ageLimit: { ...BASE, ageLimit: '18' },
+    price: { ...BASE, priceFromRub: 1900 },
+    duration: { ...BASE, durations: [90] },
+    category: { ...BASE, category: 'Театр' },
+    subcategory: { ...BASE, subcategory: 'Джаз' },
+    kind: { ...BASE, kind: 'OPEN_DATE' },
+  };
+  for (const [field, input] of Object.entries(variants)) {
+    assert.notEqual(descriptionContentHash(input), base, `${field} must change the content hash`);
+  }
+});
+
+test('the two fingerprints never collide for the same input', () => {
+  assert.notEqual(descriptionContentHash(BASE), descriptionSourceHash(BASE));
+  assert.notEqual(descriptionContentHash(BASE).length, 0);
+  assert.equal(descriptionContentHash(BASE).length, 32);
 });

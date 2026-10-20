@@ -2,7 +2,11 @@ import assert from 'node:assert/strict';
 import { Readable } from 'node:stream';
 import test from 'node:test';
 
-import { createDescriptionRevisionRouteHandler, sourceHashOf } from './description-revision-handler.js';
+import {
+  contentHashOf,
+  createDescriptionRevisionRouteHandler,
+  sourceHashOf,
+} from './description-revision-handler.js';
 import type { RouteContext } from './routing.js';
 
 import type { DbClient } from './types/db.js';
@@ -108,7 +112,7 @@ const REVISION_ROW = {
   sessionDurationMinutes: [65],
   ...REVISION_HASH_ROW,
 };
-REVISION_ROW.sourceHash = sourceHashOf(REVISION_ROW);
+REVISION_ROW.sourceHash = contentHashOf(REVISION_ROW);
 
 test('GET rewrite-queue lists items and counts', async () => {
   const response = createMockResponse();
@@ -322,6 +326,104 @@ test('approve refuses when a significant catalogue input changed', async () => {
   assert.equal(JSON.parse(response.body).error, 'stale_source');
   assert.ok(db.calls.some((call) => call.sql.includes("'STALE'")));
   assert.ok(!db.calls.some((call) => call.sql.includes('insert into "EventOverride"')));
+});
+
+test('approve still succeeds when only the nearest session moved', async () => {
+  const response = createMockResponse();
+  const db = createMockDb((sql) => {
+    if (sql.includes('sessionDurationMinutes')) {
+      // A session passed since the revision was queued: the now()-relative fields
+      // moved, the content did not. The approval must survive - otherwise every
+      // rolling schedule would expire once a day for no editorial reason.
+      return {
+        rows: [
+          {
+            ...REVISION_ROW,
+            status: 'CHECKED',
+            draftText: 'Черновик.',
+            next_session: '2026-11-20T16:00:00.000Z',
+            future_sessions: 2,
+          },
+        ],
+      };
+    }
+    return { rows: [{ id: 'edr_1' }] };
+  });
+  const handler = createDescriptionRevisionRouteHandler({ db, invalidatePublicCaches() {} });
+
+  const handled = await handler(
+    createRouteContext({ method: 'POST', pathname: '/api/admin/rewrite-queue/edr_1/approve', body: {}, response }),
+  );
+  assert.equal(handled, true);
+  assert.notEqual(response.statusCode, 409, 'approval must not be refused as stale');
+  assert.equal(JSON.parse(response.body).status, 'APPROVED');
+  assert.ok(!db.calls.some((call) => call.sql.includes("'STALE'")));
+});
+
+test('publish writes the full hash to EventOverride, not the revision content hash', async () => {
+  const response = createMockResponse();
+  const approvedRow = { ...REVISION_ROW, status: 'APPROVED', draftText: 'Черновик.', finalText: 'Финал.' };
+  const db = createMockDb((sql) => {
+    if (sql.includes('sessionDurationMinutes')) return { rows: [approvedRow] };
+    return { rows: [{ id: 'edr_1' }] };
+  });
+  const handler = createDescriptionRevisionRouteHandler({ db, invalidatePublicCaches() {} });
+
+  await handler(
+    createRouteContext({ method: 'POST', pathname: '/api/admin/rewrite-queue/edr_1/publish', body: {}, response }),
+  );
+  const insert = db.calls.find((call) => call.sql.includes('insert into "EventOverride"'));
+  assert.ok(insert);
+  assert.equal(insert.params[3], sourceHashOf(approvedRow), 'override keeps the full hash');
+  assert.notEqual(insert.params[3], approvedRow.sourceHash, 'content and full hashes must differ');
+});
+
+test('approve refuses when the actor cannot be resolved', async () => {
+  const response = createMockResponse();
+  const db = createMockDb((sql) => {
+    if (sql.includes('sessionDurationMinutes')) {
+      return { rows: [{ ...REVISION_ROW, status: 'CHECKED', draftText: 'Черновик.' }] };
+    }
+    return { rows: [{ id: 'edr_1' }] };
+  });
+  const handler = createDescriptionRevisionRouteHandler({
+    db,
+    invalidatePublicCaches() {},
+    resolveActor: () => null,
+  });
+
+  const handled = await handler(
+    createRouteContext({ method: 'POST', pathname: '/api/admin/rewrite-queue/edr_1/approve', body: {}, response }),
+  );
+  assert.equal(handled, true);
+  assert.equal(response.statusCode, 409);
+  assert.equal(JSON.parse(response.body).error, 'actor_unresolved');
+  assert.ok(
+    !db.calls.some((call) => call.sql.includes("set status = 'APPROVED'")),
+    'a fake approver is worse than no approval',
+  );
+});
+
+test('approve stores the resolved actor id', async () => {
+  const response = createMockResponse();
+  const db = createMockDb((sql) => {
+    if (sql.includes('sessionDurationMinutes')) {
+      return { rows: [{ ...REVISION_ROW, status: 'CHECKED', draftText: 'Черновик.' }] };
+    }
+    return { rows: [{ id: 'edr_1' }] };
+  });
+  const handler = createDescriptionRevisionRouteHandler({
+    db,
+    invalidatePublicCaches() {},
+    resolveActor: () => 'adm_42',
+  });
+
+  await handler(
+    createRouteContext({ method: 'POST', pathname: '/api/admin/rewrite-queue/edr_1/approve', body: {}, response }),
+  );
+  const approve = db.calls.find((call) => call.sql.includes("set status = 'APPROVED'"));
+  assert.ok(approve);
+  assert.equal(approve.params[2], 'adm_42');
 });
 
 test('reject sends the draft back to the queue', async () => {

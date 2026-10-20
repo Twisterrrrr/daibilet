@@ -37,7 +37,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
-import { descriptionSourceHashOfRow } from '../apps/backend/src/description-source-hash.ts';
+import { descriptionContentHashOfRow, descriptionSourceHashOfRow } from '../apps/backend/src/description-source-hash.ts';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const requireFromDb = createRequire(path.join(rootDir, 'packages', 'db', 'package.json'));
@@ -87,6 +87,15 @@ const onlyIds = idsArg
  */
 function sourceHashOf(row) {
   return descriptionSourceHashOfRow(row);
+}
+
+/**
+ * Content-only fingerprint for the queue dedup key. The full hash above includes
+ * the now()-relative session fields, so using it here would add a queue row for
+ * every rolling schedule each day the nearest session moves.
+ */
+function contentHashOf(row) {
+  return descriptionContentHashOfRow(row);
 }
 
 /**
@@ -299,7 +308,7 @@ async function enqueueRevision(client, row, priority, schema) {
     `insert into "EventDescriptionRevision" (id, "eventId", status, priority, "sourceHash", "sourceText", "createdBy", "createdAt", "updatedAt")
      values ($1, $2, 'QUEUED', $3, $4, $5, 'post-sync', now(), now())
      on conflict ("eventId", "sourceHash") do nothing`,
-    [`edr_${crypto.randomBytes(12).toString('hex')}`, row.id, priority, sourceHashOf(row), sourceText],
+    [`edr_${crypto.randomBytes(12).toString('hex')}`, row.id, priority, contentHashOf(row), sourceText],
   );
   return (result.rowCount || 0) > 0;
 }

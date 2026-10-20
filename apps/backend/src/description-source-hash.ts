@@ -28,6 +28,26 @@ import { createHash } from 'node:crypto';
 
 export const DESCRIPTION_SOURCE_HASH_VERSION = 'v2';
 
+/**
+ * Content-only variant. Two hashes exist because they answer two different
+ * questions:
+ *
+ * - `descriptionSourceHash` (full, v2) — "does the published text need to be
+ *   rebuilt?". Includes the now()-relative fields (nearest session, session
+ *   count), because the composed fact block prints them.
+ * - `descriptionContentHash` (v2c) — "did the input change?". Excludes those two
+ *   fields on purpose: they move when a session simply passes, so including them
+ *   would mark every approved revision STALE once a day and add a queue row per
+ *   day for rolling schedules. The queue dedup key and the STALE check use this
+ *   one.
+ *
+ * Accepted trade-off: the "Ближайшая дата" line inside the composed text reflects
+ * the moment of composition, not the moment of reading. The event page renders its
+ * dates from live session data (buy card, slot picker), so a lagging line in the
+ * body copy is not the only source of dates.
+ */
+export const DESCRIPTION_CONTENT_HASH_VERSION = 'v2c';
+
 export type DescriptionSourceHashInput = {
   /** Provider description (Ticketscloud plain / Teplohod HTML). */
   sourceText?: string | null;
@@ -121,7 +141,12 @@ export function descriptionSourceHashOfRow(row: DescriptionSourceHashRow): strin
   return descriptionSourceHash(descriptionSourceHashInputFromRow(row));
 }
 
-export function descriptionSourceHash(input: DescriptionSourceHashInput): string {
+/** Convenience: content hash directly from a row (queue dedup + STALE). */
+export function descriptionContentHashOfRow(row: DescriptionSourceHashRow): string {
+  return descriptionContentHash(descriptionSourceHashInputFromRow(row));
+}
+
+function buildHashParts(input: DescriptionSourceHashInput, version: string, includeTimeDerived: boolean): string[] {
   const rawDurations = input.durations?.length
     ? input.durations
     : input.durationMin != null
@@ -132,7 +157,7 @@ export function descriptionSourceHash(input: DescriptionSourceHashInput): string
     .join(',');
 
   const parts = [
-    DESCRIPTION_SOURCE_HASH_VERSION,
+    version,
     normalizeText(input.sourceText),
     normalizeText(input.title),
     normalizeText(input.city),
@@ -141,12 +166,30 @@ export function descriptionSourceHash(input: DescriptionSourceHashInput): string
     normalizeText(input.ageLimit),
     normalizeNumber(input.priceFromRub),
     durations,
-    normalizeNumber(input.futureSessions),
-    normalizeDate(input.nextSession),
     normalizeText(input.category),
     normalizeText(input.subcategory),
     normalizeText(input.kind),
   ];
+  if (includeTimeDerived) {
+    parts.push(normalizeNumber(input.futureSessions), normalizeDate(input.nextSession));
+  }
+  return parts;
+}
 
+function hashParts(parts: string[]): string {
   return createHash('md5').update(parts.join('\u001f')).digest('hex');
+}
+
+/** Full fingerprint (v2): drives recomposition of the published text. */
+export function descriptionSourceHash(input: DescriptionSourceHashInput): string {
+  return hashParts(buildHashParts(input, DESCRIPTION_SOURCE_HASH_VERSION, true));
+}
+
+/**
+ * Content fingerprint (v2c): drives queue dedup and STALE. Ignores the
+ * now()-relative fields, so a passing session neither re-queues the card nor
+ * expires an approval.
+ */
+export function descriptionContentHash(input: DescriptionSourceHashInput): string {
+  return hashParts(buildHashParts(input, DESCRIPTION_CONTENT_HASH_VERSION, false));
 }

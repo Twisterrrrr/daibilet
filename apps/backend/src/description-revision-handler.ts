@@ -10,6 +10,7 @@ import {
 import type { RewriteEventDescriptionFn } from './admin-events-handler.js';
 import { checkRewriteDraft, statusAfterQa } from './description-revision-qa.js';
 import {
+  descriptionContentHashOfRow,
   descriptionSourceHashOfRow,
   type DescriptionSourceHashRow,
 } from './description-source-hash.js';
@@ -36,14 +37,21 @@ export interface DescriptionRevisionHandlerDependencies {
 }
 
 /**
- * Source hash canon, shared with scripts/post-sync-event-descriptions.js: both the
- * formula and the row mapping live in `description-source-hash.ts`, so the hook
- * that enqueues and the handler that detects STALE can never disagree. A text-only
- * hash here silently rejected every approve once the hook moved to the full
- * formula.
+ * Full hash canon (v2), shared with scripts/post-sync-event-descriptions.js. Written
+ * to EventOverride.descriptionSourceHash: it includes the now()-relative session
+ * fields, so the post-sync hook rebuilds the text when the nearest session moves.
  */
 export function sourceHashOf(row: DescriptionSourceHashRow): string {
   return descriptionSourceHashOfRow(row);
+}
+
+/**
+ * Content hash canon (v2c): what EventDescriptionRevision.sourceHash stores and
+ * what STALE is decided by. A passing session must not expire an approval, so the
+ * now()-relative fields are excluded here.
+ */
+export function contentHashOf(row: DescriptionSourceHashRow): string {
+  return descriptionContentHashOfRow(row);
 }
 
 type RevisionRow = {
@@ -268,7 +276,7 @@ async function handleApprove(context: RouteContext, deps: DescriptionRevisionHan
     return true;
   }
 
-  const currentHash = sourceHashOf(loaded.row);
+  const currentHash = contentHashOf(loaded.row);
   if (currentHash !== loaded.row.sourceHash) {
     await deps.db.query(
       `update "EventDescriptionRevision" set status = 'STALE', "updatedAt" = now() where id = $1`,
@@ -291,12 +299,27 @@ async function handleApprove(context: RouteContext, deps: DescriptionRevisionHan
   // Editorial confirmation only. Publishing is a separate, deliberate action:
   // approval can be batched, publication follows its own window, and the audit
   // trail only means something when the two are different events.
+  //
+  // Actor policy: once `resolveActor` is wired, an unresolved actor refuses the
+  // operation instead of silently writing a placeholder - a fake approver is worse
+  // than no approval. Until the identity ticket lands, the legacy placeholder is
+  // kept so the path stays usable.
+  const actor = deps.resolveActor ? deps.resolveActor(context) : 'admin';
+  if (!actor) {
+    sendJson(
+      context.response,
+      { error: 'actor_unresolved', message: 'Не удалось определить администратора для аудита одобрения' },
+      { statusCode: 409 },
+    );
+    return true;
+  }
+
   const approved = await deps.db.query(
     `update "EventDescriptionRevision"
      set status = 'APPROVED', "finalText" = $2, "approvedBy" = $3, "approvedAt" = now(), "updatedAt" = now()
      where id = $1 and status in ('GENERATED', 'CHECKED')
      returning id`,
-    [revisionId, finalText, deps.resolveActor?.(context) || 'admin'],
+    [revisionId, finalText, actor],
   );
   if (!approved.rows?.length) {
     sendJson(
@@ -346,7 +369,7 @@ async function handlePublish(context: RouteContext, deps: DescriptionRevisionHan
     return true;
   }
 
-  const currentHash = sourceHashOf(loaded.row);
+  const currentHash = contentHashOf(loaded.row);
   if (currentHash !== loaded.row.sourceHash) {
     await deps.db.query(
       `update "EventDescriptionRevision" set status = 'STALE', "updatedAt" = now() where id = $1`,
@@ -377,7 +400,13 @@ async function handlePublish(context: RouteContext, deps: DescriptionRevisionHan
        "descriptionOrigin" = 'AI',
        "descriptionSourceHash" = excluded."descriptionSourceHash",
        "updatedAt" = now()`,
-    [`eov_${revisionId.replace(/[^a-zA-Z0-9]/g, '').slice(0, 20)}`, loaded.row.eventId, finalText, loaded.row.sourceHash],
+    [
+      `eov_${revisionId.replace(/[^a-zA-Z0-9]/g, '').slice(0, 20)}`,
+      loaded.row.eventId,
+      finalText,
+      // Full hash: the hook compares this one to decide whether to rebuild the text.
+      sourceHashOf(loaded.row),
+    ],
   );
   await deps.db.query(
     `update "EventDescriptionRevision"
