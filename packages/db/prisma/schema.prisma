@@ -38,10 +38,10 @@ model AdminUser {
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
 
-  sessions           AdminSession[]
-  invitationsSent    AdminInvitation[] @relation("AdminInvitationInviter")
-  invitation         AdminInvitation?  @relation("AdminInvitationRecipient")
-  auditEntries       AdminAuditLog[]
+  sessions        AdminSession[]
+  invitationsSent AdminInvitation[] @relation("AdminInvitationInviter")
+  invitation      AdminInvitation?  @relation("AdminInvitationRecipient")
+  auditEntries    AdminAuditLog[]
 
   @@index([state])
 }
@@ -63,13 +63,13 @@ model AdminInvitation {
 }
 
 model AdminSession {
-  id          String    @id @default(cuid())
-  userId      String
-  tokenHash   String    @unique
-  expiresAt   DateTime
-  revokedAt   DateTime?
-  lastSeenAt  DateTime?
-  createdAt   DateTime  @default(now())
+  id         String    @id @default(cuid())
+  userId     String
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  lastSeenAt DateTime?
+  createdAt  DateTime  @default(now())
 
   user AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -703,25 +703,25 @@ model Event {
   submittedBy        SiteUser?    @relation("EventSubmittedBy", fields: [submittedBySiteUserId], references: [id], onDelete: SetNull)
   moderatedBy        SiteUser?    @relation("EventModeratedBy", fields: [moderatedBySiteUserId], references: [id], onDelete: SetNull)
 
-  sessions        EventSession[]
-  offers          EventOffer[]
-  sourceLinks     EventSourceLink[]
-  providerLinks   ProviderLink[]
-  subcategories   EventSubcategory[]
-  tags            EventTag[]
-  qualityIssues   QualityIssue[]
-  landingMatches  LandingMatch[]
-  supplierLinks   SupplierEvent[]
-  checkoutItems   CheckoutItem[]
-  tripPlanItems   TripPlanItem[]
-  commissionRules SupplierCommissionRule[]
-  changeRequests  EventChangeRequest[]
-  changeLogs      EventChangeLog[]
-  reviews         Review[]
-  externalReviews ExternalReview[]
-  reviewRequests  ReviewRequest[]
-  override        EventOverride?
-  routeItems      EventVenueRouteItem[]
+  sessions             EventSession[]
+  offers               EventOffer[]
+  sourceLinks          EventSourceLink[]
+  providerLinks        ProviderLink[]
+  subcategories        EventSubcategory[]
+  tags                 EventTag[]
+  qualityIssues        QualityIssue[]
+  landingMatches       LandingMatch[]
+  supplierLinks        SupplierEvent[]
+  checkoutItems        CheckoutItem[]
+  tripPlanItems        TripPlanItem[]
+  commissionRules      SupplierCommissionRule[]
+  changeRequests       EventChangeRequest[]
+  changeLogs           EventChangeLog[]
+  reviews              Review[]
+  externalReviews      ExternalReview[]
+  reviewRequests       ReviewRequest[]
+  override             EventOverride?
+  routeItems           EventVenueRouteItem[]
   descriptionRevisions EventDescriptionRevision[]
 
   @@index([status])
@@ -755,26 +755,26 @@ model EventVenueRouteItem {
 }
 
 model EventOverride {
-  id                   String             @id @default(cuid())
-  eventId              String             @unique
-  title                String?
-  description          String?
+  id                    String             @id @default(cuid())
+  eventId               String             @unique
+  title                 String?
+  description           String?
   /// Provenance of description (AUTO/EDITORIAL/AI); null = legacy pre-2026-10-20.
-  descriptionOrigin    DescriptionOrigin?
+  descriptionOrigin     DescriptionOrigin?
   /// Hash of source Event.description the AUTO/AI text was built from.
   descriptionSourceHash String?
-  shortDescription     String?
-  imageUrl         String?
-  seoH1            String?
-  seoTitle         String?
-  seoDescription   String?
-  canonicalPath    String?
-  isIndexable      Boolean?
-  editorStatus     PublishStatus?
+  shortDescription      String?
+  imageUrl              String?
+  seoH1                 String?
+  seoTitle              String?
+  seoDescription        String?
+  canonicalPath         String?
+  isIndexable           Boolean?
+  editorStatus          PublishStatus?
   /// Admin-defined key to merge distinct ticket products into one multi-purchase hub page.
-  mergeGroupKey    String?
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
+  mergeGroupKey         String?
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
 
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
@@ -784,22 +784,22 @@ model EventOverride {
 /// AI description rewrite queue + history (event-rewrite-seo-plan.md).
 /// One row per (eventId, sourceHash); approval writes EventOverride.description.
 model EventDescriptionRevision {
-  id             String                    @id @default(cuid())
-  eventId        String
-  status         DescriptionRevisionStatus @default(QUEUED)
+  id            String                    @id @default(cuid())
+  eventId       String
+  status        DescriptionRevisionStatus @default(QUEUED)
   /// Priority bucket: A (thin/duplicate copy), B (weak structure), null = not scored.
-  priority       String?
-  sourceHash     String
-  promptVersion  String?
-  model          String?
-  sourceText     String
-  draftText      String?
-  finalText      String?
-  qaFlags        Json?
-  createdBy      String?
-  approvedBy     String?
-  createdAt      DateTime                  @default(now())
-  updatedAt      DateTime                  @updatedAt
+  priority      String?
+  sourceHash    String
+  promptVersion String?
+  model         String?
+  sourceText    String
+  draftText     String?
+  finalText     String?
+  qaFlags       Json?
+  createdBy     String?
+  approvedBy    String?
+  createdAt     DateTime                  @default(now())
+  updatedAt     DateTime                  @updatedAt
 
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
@@ -841,10 +841,10 @@ model EventSession {
   cancelReason  String?
   externalId    String?
 
-  event         Event          @relation(fields: [eventId], references: [id])
-  providerLinks ProviderLink[]
-  checkoutItems CheckoutItem[]
-  tripPlanItems TripPlanItem[]
+  event          Event           @relation(fields: [eventId], references: [id])
+  providerLinks  ProviderLink[]
+  checkoutItems  CheckoutItem[]
+  tripPlanItems  TripPlanItem[]
   tripDepartures TripDeparture[]
 
   @@index([eventId, startsAt])
@@ -855,16 +855,16 @@ model EventSession {
 
 /// A verified session-specific departure point, distinct from Event.venueId.
 model TripDeparture {
-  id               String    @id @default(cuid())
+  id               String      @id @default(cuid())
   sessionId        String
   departurePlaceId String
   arrivalPlaceId   String?
   departsAt        DateTime?
   arrivesAt        DateTime?
   sourceCode       SourceCode?
-  verified         Boolean   @default(false)
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  verified         Boolean     @default(false)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
 
   session        EventSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   departurePlace Venue        @relation("TripDeparturePlace", fields: [departurePlaceId], references: [id])
@@ -934,9 +934,9 @@ model Category {
   title    String
   position Int    @default(0)
 
-  events          Event[]
-  subcategories   Subcategory[]
-  commissionRules SupplierCommissionRule[]
+  events            Event[]
+  subcategories     Subcategory[]
+  commissionRules   SupplierCommissionRule[]
   admissionProducts AdmissionProduct[]
 }
 
@@ -947,9 +947,9 @@ model Subcategory {
   title      String
   position   Int    @default(0)
 
-  category      Category           @relation(fields: [categoryId], references: [id])
-  primaryEvents Event[]
-  events        EventSubcategory[]
+  category                 Category           @relation(fields: [categoryId], references: [id])
+  primaryEvents            Event[]
+  events                   EventSubcategory[]
   primaryAdmissionProducts AdmissionProduct[]
 }
 
@@ -1007,72 +1007,74 @@ model City {
   canonicalPath  String?
   isDestination  Boolean @default(false)
 
-  region    Region?    @relation(fields: [regionId], references: [id])
-  venues    Venue[]
-  events    Event[]
-  landings  Landing[]
-  articles  Article[]
-  tripPlans TripPlan[]
+  region            Region?            @relation(fields: [regionId], references: [id])
+  venues            Venue[]
+  events            Event[]
+  landings          Landing[]
+  articles          Article[]
+  tripPlans         TripPlan[]
   admissionProducts AdmissionProduct[]
 }
 
 model Venue {
-  id               String          @id @default(cuid())
-  slug             String          @unique
-  title            String
-  description      String?
+  id                    String            @id @default(cuid())
+  slug                  String            @unique
+  title                 String
+  description           String?
   /**
    * Set by a human (admin or supplier) when they take ownership of `description`.
    * The catalog import overwrites `description` on every sync, so without this
    * flag hand-written copy is destroyed on the next run. Whoever writes the
    * value sets this; the actor does not matter, only that a human did.
    */
-  descriptionOverridden Boolean       @default(false)
-  shortDescription String?
-  heroImageUrl     String?
-  seoH1            String?
-  seoTitle         String?
-  seoDescription   String?
-  canonicalPath    String?
-  isIndexable      Boolean         @default(true)
-  cityId           String?
-  address          String?
-  latitude         Float?
-  longitude        Float?
-  metroStation     String?
-  wayToFind        String?         @db.Text
-  parkingInfo      String?
+  descriptionOverridden Boolean           @default(false)
+  shortDescription      String?
+  heroImageUrl          String?
+  seoH1                 String?
+  seoTitle              String?
+  seoDescription        String?
+  canonicalPath         String?
+  isIndexable           Boolean           @default(true)
+  cityId                String?
+  address               String?
+  latitude              Float?
+  longitude             Float?
+  metroStation          String?
+  wayToFind             String?           @db.Text
+  parkingInfo           String?
   /**
    * Official external resources. A venue with no ticket of ours can still be
    * listed, but the page must lead somewhere: without these three fields an
    * informational venue is a dead end. Added 04.10 - nine hand-written
    * Hermitage cards carried hours, phone and website that had nowhere to go.
    */
-  websiteUrl       String?
-  phone            String?
-  /** Free text, e.g. "Tue-Sun 11:00-18:00, closed Monday". Not structured yet. */
-  openingHours     String?         @db.Text
-  kind             VenueKind       @default(OTHER)
-  placeType        PlaceType?
-  placeSubtype     String?
-  pageTemplate     PlacePageTemplate @default(DEFAULT)
-  placeRoles       String[]        @default([])
-  poiSourceKey     String?         @unique
-  isMainPlace      Boolean         @default(false)
-  isTouristPlace   Boolean         @default(false)
-  hubTags          String[]        @default([])
-  parentPlaceId    String?
-  pageStatus       VenuePageStatus @default(NONE)
+  websiteUrl            String?
+  phone                 String?
+  /**
+   * Free text, e.g. "Tue-Sun 11:00-18:00, closed Monday". Not structured yet.
+   */
+  openingHours          String?           @db.Text
+  kind                  VenueKind         @default(OTHER)
+  placeType             PlaceType?
+  placeSubtype          String?
+  pageTemplate          PlacePageTemplate @default(DEFAULT)
+  placeRoles            String[]          @default([])
+  poiSourceKey          String?           @unique
+  isMainPlace           Boolean           @default(false)
+  isTouristPlace        Boolean           @default(false)
+  hubTags               String[]          @default([])
+  parentPlaceId         String?
+  pageStatus            VenuePageStatus   @default(NONE)
   /// Short micro-intrigue for location cards (optional).
-  hookFact         String?
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
+  hookFact              String?
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
 
-  city            City?            @relation(fields: [cityId], references: [id])
-  parentPlace     Venue?           @relation("PlaceHierarchy", fields: [parentPlaceId], references: [id])
-  childPlaces     Venue[]          @relation("PlaceHierarchy")
-  tripDepartures  TripDeparture[]  @relation("TripDeparturePlace")
-  tripArrivals    TripDeparture[]  @relation("TripArrivalPlace")
+  city            City?                 @relation(fields: [cityId], references: [id])
+  parentPlace     Venue?                @relation("PlaceHierarchy", fields: [parentPlaceId], references: [id])
+  childPlaces     Venue[]               @relation("PlaceHierarchy")
+  tripDepartures  TripDeparture[]       @relation("TripDeparturePlace")
+  tripArrivals    TripDeparture[]       @relation("TripArrivalPlace")
   events          Event[]
   aliases         VenueAlias[]
   providerLinks   ProviderLink[]
@@ -1083,6 +1085,7 @@ model Venue {
   routeItems      EventVenueRouteItem[]
 
   admissionProducts AdmissionProduct[]
+
   @@index([title])
   @@index([cityId, isTouristPlace, isMainPlace])
   @@index([parentPlaceId])
@@ -1444,9 +1447,10 @@ model Supplier {
   reviewDisputes      ReviewDispute[]
   externalReviews     ExternalReview[]
 
-  integrationMode      SupplierIntegrationMode @default(IMPORTED_TICKETING_SYSTEM)
-  admissionProducts   AdmissionProduct[]       @relation("PrimarySupplierAdmissionProducts")
-  integrations        SupplierIntegration[]
+  integrationMode   SupplierIntegrationMode @default(IMPORTED_TICKETING_SYSTEM)
+  admissionProducts AdmissionProduct[]      @relation("PrimarySupplierAdmissionProducts")
+  integrations      SupplierIntegration[]
+
   @@index([status])
   @@index([inn])
   @@index([integrationMode])
@@ -1517,8 +1521,9 @@ model SupplierUser {
   supplier Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
   siteUser SiteUser @relation(fields: [siteUserId], references: [id], onDelete: Cascade)
 
-  inviteTokenHash  String?      @unique
-  inviteExpiresAt  DateTime?
+  inviteTokenHash String?   @unique
+  inviteExpiresAt DateTime?
+
   @@unique([supplierId, siteUserId])
   @@index([siteUserId])
   @@index([supplierId, isActive])
@@ -1638,7 +1643,8 @@ model SupplierCommissionRule {
   category Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   admissionProductId String?
-  admissionProduct AdmissionProduct? @relation(fields: [admissionProductId], references: [id], onDelete: Cascade)
+  admissionProduct   AdmissionProduct? @relation(fields: [admissionProductId], references: [id], onDelete: Cascade)
+
   @@index([supplierId, isActive])
   @@index([eventId, isActive])
   @@index([categoryId, isActive])
@@ -1723,8 +1729,9 @@ model CheckoutItem {
   subjectType        CheckoutSubjectKind @default(EVENT)
   admissionProductId String?
   admissionOfferId   String?
-  admissionProduct AdmissionProduct? @relation(fields: [admissionProductId], references: [id])
-  admissionOffer   AdmissionOffer?   @relation(fields: [admissionOfferId], references: [id])
+  admissionProduct   AdmissionProduct?   @relation(fields: [admissionProductId], references: [id])
+  admissionOffer     AdmissionOffer?     @relation(fields: [admissionOfferId], references: [id])
+
   @@index([checkoutOrderId])
   @@index([supplierId, status])
   @@index([eventId])
@@ -1762,8 +1769,9 @@ model FulfillmentItem {
   checkoutItem   CheckoutItem?   @relation(fields: [checkoutItemId], references: [id], onDelete: SetNull)
   refundRequests RefundRequest[]
 
-  admissionOfferId     String?
-  admissionOffer AdmissionOffer? @relation(fields: [admissionOfferId], references: [id], onDelete: SetNull)
+  admissionOfferId String?
+  admissionOffer   AdmissionOffer? @relation(fields: [admissionOfferId], references: [id], onDelete: SetNull)
+
   @@index([checkoutOrderId])
   @@index([offerId])
   @@index([purchaseFlow, status])
@@ -2426,7 +2434,7 @@ enum ChatMessageSender {
 
 /// Public support chat thread, one per anonymous widget visitor.
 model ChatSession {
-  id String @id @default(cuid())
+  id         String   @id @default(cuid())
   /// Anonymous widget identity (random localStorage key) - the only handle the
   /// floating widget has to fetch its own thread. Never shown in UI.
   visitorKey String   @unique
@@ -2440,24 +2448,23 @@ model ChatSession {
 }
 
 model ChatMessage {
-  id        String            @id @default(cuid())
-  sessionId String
-  session   ChatSession       @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  text      String
-  sender    ChatMessageSender
+  id                String            @id @default(cuid())
+  sessionId         String
+  session           ChatSession       @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  text              String
+  sender            ChatMessageSender
   /// Telegram message_id of the forwarded notification. Telegram replies are
   /// matched back to the thread by `Reply to` this id - without it the webhook
   /// cannot resolve which session an admin reply belongs to.
-  telegramMessageId Int?            @unique
+  telegramMessageId Int?              @unique
   /// Telegram update_id for idempotent processing of incoming admin replies.
-  telegramUpdateId  String?          @unique
-  createdAt DateTime          @default(now())
+  telegramUpdateId  String?           @unique
+  createdAt         DateTime          @default(now())
 
   @@index([sessionId, createdAt])
   @@index([sender, createdAt])
   @@map("chat_messages")
 }
-
 
 enum AdmissionProductType {
   MUSEUM_ENTRY
@@ -2473,20 +2480,17 @@ enum AdmissionProductType {
   OTHER
 }
 
-
 enum AdmissionValidityMode {
   OPEN_DATE
   FIXED_WINDOW
   VALID_DAYS_AFTER_PURCHASE
 }
 
-
 enum SupplierIntegrationMode {
   IMPORTED_TICKETING_SYSTEM
   INTERNAL_SALES
   API_SYNC
 }
-
 
 enum SupplierIntegrationStatus {
   DRAFT
@@ -2496,12 +2500,10 @@ enum SupplierIntegrationStatus {
   ARCHIVED
 }
 
-
 enum CheckoutSubjectKind {
   EVENT
   VENUE_ADMISSION
 }
-
 
 model AdmissionProduct {
   id                     String                @id @default(cuid())
@@ -2566,7 +2568,6 @@ model AdmissionProduct {
   @@index([validityMode, status])
 }
 
-
 model AdmissionOffer {
   id                 String     @id @default(cuid())
   admissionProductId String
@@ -2591,7 +2592,6 @@ model AdmissionOffer {
   @@index([admissionProductId, active, priceRub])
   @@index([sourceCode])
 }
-
 
 model SupplierIntegration {
   id                String                    @id @default(cuid())
@@ -2620,7 +2620,6 @@ model SupplierIntegration {
   @@index([supplierId, status])
 }
 
-
 model SupplierIntegrationRun {
   id            String     @id @default(cuid())
   integrationId String
@@ -2636,7 +2635,6 @@ model SupplierIntegrationRun {
   @@index([integrationId, startedAt])
   @@index([status, startedAt])
 }
-
 
 model SupplierIntegrationIssue {
   id            String    @id @default(cuid())
