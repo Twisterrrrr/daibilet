@@ -4,11 +4,33 @@
  * the sync - failures are warnings.
  */
 const { spawnSync } = require("child_process");
+const { existsSync } = require("node:fs");
 const path = require("path");
+
+/**
+ * Locate the tsx CLI. The script needs it to load the apps/web TS libs, and a
+ * hard-coded single path breaks for anyone whose node_modules layout differs
+ * (pnpm hoisting, node-linker settings, CI containers). Same candidate order as
+ * scripts/post-catalog-sync-warm.mjs.
+ */
+function resolveTsxCli(rootDir) {
+  const candidates = [
+    path.join(rootDir, "apps", "web", "node_modules", "tsx", "dist", "cli.mjs"),
+    path.join(rootDir, "apps", "backend", "node_modules", "tsx", "dist", "cli.mjs"),
+    path.join(rootDir, "node_modules", "tsx", "dist", "cli.mjs"),
+  ];
+  return candidates.find((candidate) => existsSync(candidate)) || null;
+}
 
 function runPostSyncDescriptions(rootDir, extraArgs = []) {
   if (process.env.POST_SYNC_DESCRIPTIONS === "0") return { skipped: true };
-  const tsxCli = path.join(rootDir, "apps", "web", "node_modules", "tsx", "dist", "cli.mjs");
+  const tsxCli = resolveTsxCli(rootDir);
+  if (!tsxCli) {
+    // Explicit skip, not a silent no-op: the sync stays green and the operator
+    // sees why descriptions were not processed.
+    console.warn("[post-sync] descriptions step skipped: tsx CLI not found in apps/web, apps/backend or root node_modules");
+    return { ok: false, reason: "tsx_missing" };
+  }
   const script = path.join(rootDir, "scripts", "post-sync-event-descriptions.js");
   const startedAt = Date.now();
   try {
