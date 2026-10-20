@@ -14,6 +14,7 @@ import type {
   YooKassaWebhookResultDto,
 } from '@daibilet/contracts/checkout';
 import { prisma, type Prisma } from '@daibilet/db';
+import { buildInternalTicketNumbers } from './internal-ticket-numbers.js';
 import {
   checkoutItemResultSelect,
   checkoutOrderResultSelect,
@@ -2143,15 +2144,7 @@ function normalizeYooKassaConfirmationMode(value: unknown): YooKassaConfirmation
   return cleanString(value)?.toLowerCase() === 'embedded' ? 'embedded' : 'redirect';
 }
 
-export function buildInternalTicketNumbers(input: {
-  publicCode: string | null;
-  orderId: string;
-  quantity: number;
-}): string[] {
-  const base = (cleanString(input.publicCode) || input.orderId.slice(-8)).replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-  const quantity = Math.max(1, Math.min(50, Math.trunc(input.quantity || 1)));
-  return Array.from({ length: quantity }, (_, index) => `TKT-${base}-${String(index + 1).padStart(2, '0')}`);
-}
+export { buildInternalTicketNumbers } from './internal-ticket-numbers.js';
 
 function withIssuedTicketNumbers(
   providerData: Prisma.JsonValue,

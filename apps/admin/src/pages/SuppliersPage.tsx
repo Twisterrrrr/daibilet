@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { AlertTriangle, Building2, CheckCircle2, Copy, RefreshCcw, Search, UserPlus, WalletCards, XCircle } from 'lucide-react';
+import { AlertTriangle, Building2, CheckCircle2, Copy, Plus, RefreshCcw, Search, UserPlus, WalletCards, XCircle } from 'lucide-react';
 
 import type {
   AdminSupplierDetailDto,
@@ -62,6 +62,14 @@ export function SuppliersPage() {
   const [inviteUserError, setInviteUserError] = React.useState<string | null>(null);
   const [inviteAccess, setInviteAccess] = React.useState<AdminSupplierInviteResultDto['access'] | null>(null);
   const [reloadTick, setReloadTick] = React.useState(0);
+  const [showCreateForm, setShowCreateForm] = React.useState(false);
+  const [createTitle, setCreateTitle] = React.useState('');
+  const [createSlug, setCreateSlug] = React.useState('');
+  const [createMode, setCreateMode] = React.useState<'INTERNAL_SALES' | 'IMPORTED_TICKETING_SYSTEM' | 'API_SYNC'>('INTERNAL_SALES');
+  const [createBusy, setCreateBusy] = React.useState(false);
+  const [createError, setCreateError] = React.useState<string | null>(null);
+  const [venueLinkBusy, setVenueLinkBusy] = React.useState(false);
+  const [venueLinkError, setVenueLinkError] = React.useState<string | null>(null);
 
   const q = params.get('q') ?? '';
   const status = params.get('status') ?? 'all';
@@ -201,6 +209,51 @@ export function SuppliersPage() {
     }
   }, []);
 
+  const createSupplier = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setCreateBusy(true);
+    setCreateError(null);
+    try {
+      const response = await adminFetch('/api/admin/suppliers', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ title: createTitle.trim(), slug: createSlug.trim(), integrationMode: createMode }),
+      });
+      const body = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(body?.error === 'supplier_slug_exists' ? 'Такой адрес поставщика уже занят.' : body?.message || body?.error || `HTTP ${response.status}`);
+      setSelected(body as AdminSupplierDetailDto);
+      setShowCreateForm(false);
+      setCreateTitle('');
+      setCreateSlug('');
+      setReloadTick((value) => value + 1);
+    } catch (error) {
+      setCreateError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setCreateBusy(false);
+    }
+  };
+
+  const linkVenue = async (supplierId: string, venueId: string) => {
+    setVenueLinkBusy(true);
+    setVenueLinkError(null);
+    try {
+      const response = await adminFetch(`/api/admin/suppliers/${encodeURIComponent(supplierId)}/venues`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ venueId }),
+      });
+      const body = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(body?.message || body?.error || `HTTP ${response.status}`);
+      setSelected(body as AdminSupplierDetailDto);
+      setReloadTick((value) => value + 1);
+    } catch (error) {
+      setVenueLinkError(error instanceof Error ? error.message : String(error));
+      throw error;
+    } finally {
+      setVenueLinkBusy(false);
+    }
+  };
+
   const quickFilters = STATUS_FILTERS.map((item) => ({
     ...item,
     count: item.id === 'all' ? payload.metrics.total : statusCount(payload, item.id),
@@ -219,12 +272,43 @@ export function SuppliersPage() {
           </>
         }
         actions={
-          <Button type="button" variant="outline" size="sm" onClick={() => setReloadTick((value) => value + 1)}>
-            <RefreshCcw className="mr-2 h-4 w-4" />
-            Обновить
-          </Button>
+          <div className="flex gap-2">
+            <Button type="button" size="sm" onClick={() => setShowCreateForm((value) => !value)}>
+              <Plus className="mr-2 h-4 w-4" />Новый поставщик
+            </Button>
+            <Button type="button" variant="outline" size="sm" onClick={() => setReloadTick((value) => value + 1)}>
+              <RefreshCcw className="mr-2 h-4 w-4" />Обновить
+            </Button>
+          </div>
         }
       />
+
+      {showCreateForm ? (
+        <Card className="border-border p-4">
+          <form onSubmit={createSupplier} className="space-y-3">
+            <div>
+              <h2 className="text-sm font-semibold">Новый поставщик</h2>
+              <p className="mt-1 text-xs text-muted-foreground">Создаётся черновик. Продажи начнутся после проверки реквизитов, договора, комиссии и товара.</p>
+            </div>
+            <div className="grid gap-3 md:grid-cols-3">
+              <label className="space-y-1 text-xs">Название<Input required minLength={2} maxLength={200} value={createTitle} onChange={(event) => setCreateTitle(event.target.value)} /></label>
+              <label className="space-y-1 text-xs">Адрес в системе<Input required maxLength={100} pattern="[a-z0-9]+(-[a-z0-9]+)*" placeholder="test-museum" value={createSlug} onChange={(event) => setCreateSlug(event.target.value)} /></label>
+              <label className="space-y-1 text-xs">Как поступают данные
+                <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={createMode} onChange={(event) => setCreateMode(event.target.value as typeof createMode)}>
+                  <option value="INTERNAL_SALES">Поставщик работает в ЛК</option>
+                  <option value="IMPORTED_TICKETING_SYSTEM">Импорт событий</option>
+                  <option value="API_SYNC">API поставщика</option>
+                </select>
+              </label>
+            </div>
+            {createError ? <p role="alert" className="text-xs text-destructive">{createError}</p> : null}
+            <div className="flex gap-2">
+              <Button type="submit" size="sm" disabled={createBusy}>{createBusy ? 'Создание...' : 'Создать черновик'}</Button>
+              <Button type="button" size="sm" variant="outline" onClick={() => setShowCreateForm(false)}>Отмена</Button>
+            </div>
+          </form>
+        </Card>
+      ) : null}
 
       <div className="grid gap-2 lg:grid-cols-4">
         <Counter title="Активные" value={payload.metrics.active} tone="success" />
@@ -335,6 +419,9 @@ export function SuppliersPage() {
         inviteAccess={inviteAccess}
         onLegalAction={reviewLegalProfile}
         onInviteUser={inviteSupplierUser}
+        onLinkVenue={linkVenue}
+        venueLinkBusy={venueLinkBusy}
+        venueLinkError={venueLinkError}
         onOpenChange={(open) => {
           if (open) return;
           setSelected(null);
@@ -355,6 +442,9 @@ function SupplierDetailSheet({
   inviteAccess,
   onLegalAction,
   onInviteUser,
+  onLinkVenue,
+  venueLinkBusy,
+  venueLinkError,
   onOpenChange,
 }: {
   supplier: AdminSupplierDetailDto | null;
@@ -365,6 +455,9 @@ function SupplierDetailSheet({
   inviteAccess: AdminSupplierInviteResultDto['access'] | null;
   onLegalAction: (supplierId: string, action: 'approve' | 'reject') => void;
   onInviteUser: (supplierId: string, input: AdminSupplierInviteRequestDto) => Promise<void>;
+  onLinkVenue: (supplierId: string, venueId: string) => Promise<void>;
+  venueLinkBusy: boolean;
+  venueLinkError: string | null;
   onOpenChange: (open: boolean) => void;
 }) {
   const hasLegalProfile = Boolean(supplier?.legal.legalName || supplier?.legal.inn);
@@ -517,6 +610,7 @@ function SupplierDetailSheet({
 
                 {activeTab === 'overview' ? (
                 <>
+                <SupplierVenueLinkForm supplierId={supplier.id} busy={venueLinkBusy} error={venueLinkError} onLink={onLinkVenue} />
                 <Card className="border-border p-4">
                   <h3 className="text-sm font-semibold">Последние события</h3>
                   <div className="mt-3 space-y-2">
@@ -603,6 +697,67 @@ function SupplierDetailSheet({
         ) : null}
       </SheetContent>
     </Sheet>
+  );
+}
+
+function SupplierVenueLinkForm({
+  supplierId,
+  busy,
+  error,
+  onLink,
+}: {
+  supplierId: string;
+  busy: boolean;
+  error: string | null;
+  onLink: (supplierId: string, venueId: string) => Promise<void>;
+}) {
+  const [query, setQuery] = React.useState('');
+  const [venues, setVenues] = React.useState<Array<{ id: string; title: string; slug: string }>>([]);
+  const [searching, setSearching] = React.useState(false);
+  const [searchError, setSearchError] = React.useState<string | null>(null);
+  const [linkedVenueId, setLinkedVenueId] = React.useState<string | null>(null);
+
+  const search = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSearching(true);
+    setSearchError(null);
+    setLinkedVenueId(null);
+    try {
+      const response = await adminFetch(`/api/admin/venues?limit=20&q=${encodeURIComponent(query.trim())}`, { cache: 'no-store' });
+      const body = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(body?.message || body?.error || `HTTP ${response.status}`);
+      setVenues(Array.isArray(body?.rows) ? body.rows : []);
+    } catch (searchFailure) {
+      setVenues([]);
+      setSearchError(searchFailure instanceof Error ? searchFailure.message : String(searchFailure));
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  return (
+    <Card className="border-border p-4">
+      <h3 className="text-sm font-semibold">Площадки поставщика</h3>
+      <p className="mt-1 text-xs text-muted-foreground">Привяжите существующую площадку, прежде чем поставщик предложит входной билет.</p>
+      <form onSubmit={search} className="mt-3 flex gap-2">
+        <Input aria-label="Найти площадку" required minLength={2} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Название площадки" />
+        <Button type="submit" size="sm" variant="outline" disabled={searching}>{searching ? 'Ищем...' : 'Найти'}</Button>
+      </form>
+      {searchError ? <p role="alert" className="mt-2 text-xs text-destructive">{searchError}</p> : null}
+      {error ? <p role="alert" className="mt-2 text-xs text-destructive">{error}</p> : null}
+      {venues.length ? (
+        <div className="mt-3 space-y-2">
+          {venues.map((venue) => (
+            <div key={venue.id} className="flex items-center justify-between gap-2 rounded-md bg-secondary px-3 py-2 text-xs">
+              <div><div className="font-medium">{venue.title}</div><div className="text-muted-foreground">{venue.slug}</div></div>
+              <Button type="button" size="sm" variant="outline" disabled={busy} onClick={() => onLink(supplierId, venue.id).then(() => setLinkedVenueId(venue.id)).catch(() => undefined)}>
+                {linkedVenueId === venue.id ? 'Привязана' : 'Привязать'}
+              </Button>
+            </div>
+          ))}
+        </div>
+      ) : null}
+    </Card>
   );
 }
 

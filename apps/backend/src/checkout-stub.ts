@@ -9,6 +9,7 @@ import type {
   StubCheckoutTotalsDto,
 } from '@daibilet/contracts/checkout';
 import { prisma, type Prisma } from '@daibilet/db';
+import { buildInternalTicketNumbers } from './internal-ticket-numbers.js';
 
 const MIN_PRICE_RUB = 100;
 const MIN_QUANTITY = 1;
@@ -387,9 +388,19 @@ export async function createStubCheckoutOrder(
             mode: 'STUB',
             publicCode,
             subjectType,
+            ticketNumbers: buildInternalTicketNumbers({ publicCode, orderId: order.id, quantity: normalizedPayload.quantity }),
           },
         },
         select: fulfillmentResultSelect,
+      });
+      await tx.issuedTicket.createMany({
+        data: buildInternalTicketNumbers({ publicCode, orderId: order.id, quantity: normalizedPayload.quantity }).map((ticketNumber, index) => ({
+          checkoutOrderId: order.id,
+          checkoutItemId: item.id,
+          fulfillmentItemId: fulfillment.id,
+          ordinal: index + 1,
+          ticketNumber,
+        })),
       });
       await writeSupplierLedgerEntries(tx, {
         supplierId: supplier.id,
@@ -547,9 +558,19 @@ async function createStubAdmissionCheckoutOrder(
             publicCode,
             subjectType,
             admissionProductId: product.id,
+            ticketNumbers: buildInternalTicketNumbers({ publicCode, orderId: order.id, quantity: normalizedPayload.quantity }),
           },
         },
         select: fulfillmentResultSelect,
+      });
+      await tx.issuedTicket.createMany({
+        data: buildInternalTicketNumbers({ publicCode, orderId: order.id, quantity: normalizedPayload.quantity }).map((ticketNumber, index) => ({
+          checkoutOrderId: order.id,
+          checkoutItemId: item.id,
+          fulfillmentItemId: fulfillment.id,
+          ordinal: index + 1,
+          ticketNumber,
+        })),
       });
       await writeSupplierLedgerEntries(tx, {
         supplierId: supplier.id,

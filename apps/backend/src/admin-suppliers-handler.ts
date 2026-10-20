@@ -5,13 +5,24 @@ import type { AdminSupplierInviteRequestDto } from '@daibilet/contracts/admin';
 import type { TypedRouteHandler } from './validated-handler.js';
 import { parseJsonBody } from './validation.js';
 import { z } from 'zod';
+import type { CreateAdminSupplierInput } from './admin-supplier-create.js';
 
 export interface AdminSuppliersRouteHandlerDependencies {
   buildSuppliersList: (searchParams: URLSearchParams) => Promise<unknown>;
   buildSupplierDetail: (idOrSlug: string) => Promise<unknown>;
   reviewSupplierLegalProfile: (input: ReviewSupplierLegalProfileInput) => Promise<unknown>;
   inviteSupplierUser: (supplierIdOrSlug: string, input: AdminSupplierInviteRequestDto) => Promise<unknown>;
+  createSupplier: (input: CreateAdminSupplierInput) => Promise<unknown>;
+  linkSupplierVenue: (supplierIdOrSlug: string, venueId: string) => Promise<unknown>;
 }
+
+const createSupplierBodySchema = z.object({
+  title: z.string().trim().min(2).max(200),
+  slug: z.string().trim().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).max(100),
+  integrationMode: z.enum(['INTERNAL_SALES', 'IMPORTED_TICKETING_SYSTEM', 'API_SYNC']),
+}).strict();
+
+const linkSupplierVenueBodySchema = z.object({ venueId: z.string().trim().min(1).max(128) }).strict();
 
 const approveLegalBodySchema = z.object({
   adminComment: z.string().trim().max(2000).nullable().optional(),
@@ -34,6 +45,21 @@ export function createAdminSuppliersRouteHandler(
     if (await handleSupplierUserInvite(context, deps)) return true;
     if (await handleLegalApprove(context, deps)) return true;
     if (await handleLegalReject(context, deps)) return true;
+
+    if (context.method === 'POST') {
+      const match = matchPath(context.pathname, /^\/api\/admin\/suppliers\/([^/]+)\/venues$/);
+      if (match?.[0]) {
+        const body = await parseJsonBody(linkSupplierVenueBodySchema, context.request);
+        sendJson(context.response, await deps.linkSupplierVenue(match[0], body.venueId));
+        return true;
+      }
+    }
+
+    if (context.method === 'POST' && context.pathname === '/api/admin/suppliers') {
+      const input = await parseJsonBody(createSupplierBodySchema, context.request);
+      sendJson(context.response, await deps.createSupplier(input), { statusCode: 201 });
+      return true;
+    }
 
     if (context.method !== 'GET') return false;
 

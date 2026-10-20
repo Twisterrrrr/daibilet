@@ -24,6 +24,9 @@ import { operateAdminInternalOrder } from './admin-order-operations.js';
 import { createAdminOrdersReadRouteHandler } from './admin-orders-read-handler.js';
 import { buildAdminOrderDetailDto, buildAdminOrdersListDto, createAdminOrderRefundRequestDto } from './admin-orders.dto.js';
 import { createAdminSuppliersRouteHandler } from './admin-suppliers-handler.js';
+import { createAdminSupplier } from './admin-supplier-create.js';
+import { linkAdminSupplierVenue } from './admin-supplier-venue-link.js';
+import { createAdminVenueRouteHandler } from './admin-venue-create-handler.js';
 import { buildAdminSupplierDetailDto, buildAdminSuppliersListDto } from './admin-suppliers.dto.js';
 import { createAdminAuthConfig } from './auth.js';
 import { createStubCheckoutRouteHandler } from './checkout-stub-handler.js';
@@ -113,6 +116,7 @@ const server = startServer({
   handler: createValidatedHandler(handleRequest, {
     adminAuth,
     routeHandlers: [
+      createAdminVenueRouteHandler,
       createPublicCatalogRouteHandler({
         enabled: publicFlags.catalog,
         buildPublicCatalog: buildPublicCatalogDto,
@@ -166,6 +170,8 @@ const server = startServer({
         buildSupplierDetail: buildAdminSupplierDetailDto,
         reviewSupplierLegalProfile,
         inviteSupplierUser,
+        createSupplier: createAdminSupplier,
+        linkSupplierVenue: linkAdminSupplierVenue,
       }),
       createAdminAdmissionProductsRouteHandler({
         buildAdmissionProductsList: buildAdminAdmissionProductsListDto,

@@ -18,7 +18,7 @@ async function main() {
     throw new Error('Order must exist and have a succeeded payment.');
   }
   for (const fulfillment of order.fulfillmentItems) {
-    if (fulfillment.status !== 'CONFIRMED' || fulfillment.provider !== 'INTERNAL' || !fulfillment.checkoutItemId) continue;
+    if (fulfillment.status !== 'CONFIRMED' || !['INTERNAL', 'STUB'].includes(fulfillment.provider) || !fulfillment.checkoutItemId) continue;
     const item = order.items.find((candidate) => candidate.id === fulfillment.checkoutItemId);
     if (!item) throw new Error(`Checkout item missing for fulfillment ${fulfillment.id}`);
     const data = fulfillment.providerData;
