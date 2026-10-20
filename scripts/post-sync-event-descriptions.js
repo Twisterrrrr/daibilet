@@ -37,6 +37,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
+import { descriptionSourceHash } from '../apps/backend/src/description-source-hash.ts';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const requireFromDb = createRequire(path.join(rootDir, 'packages', 'db', 'package.json'));
@@ -74,8 +75,31 @@ const onlyIds = idsArg
   : [];
 
 /** Source hash canon: normalized line endings + trim, md5 (matches SQL pre-filter). */
-function sourceHashOf(source) {
-  return crypto.createHash('md5').update(String(source || '').replace(/\r\n?/g, '\n').trim()).digest('hex');
+/**
+ * Fingerprint of the significant inputs the composed text depends on. The formula
+ * lives in the backend module so the script and the queue share one definition
+ * (see `descriptionSourceHash`): provider text plus the volatile catalogue facts
+ * the composer rebuilds the fact block from - price, next session, session count,
+ * venue, address, duration, age. Run metadata (ids, timestamps) is deliberately
+ * excluded, otherwise the hash would change on every run and the
+ * `(eventId, sourceHash)` dedup would stop working.
+ */
+function sourceHashOf(row) {
+  return descriptionSourceHash({
+    sourceText: row.source_description,
+    title: row.eff_title || row.title,
+    city: row.city,
+    venue: row.venue,
+    venueAddress: row.venue_address,
+    ageLimit: row.ageLimit,
+    priceFromRub: row.priceFromRub,
+    durations: Array.isArray(row.durations) ? row.durations.map(Number).filter(Boolean) : [],
+    futureSessions: Number(row.future_sessions || 0),
+    nextSession: row.next_session,
+    category: row.category,
+    subcategory: row.subcategory,
+    kind: row.kind,
+  });
 }
 
 /**
@@ -288,7 +312,7 @@ async function enqueueRevision(client, row, priority, schema) {
     `insert into "EventDescriptionRevision" (id, "eventId", status, priority, "sourceHash", "sourceText", "createdBy", "createdAt", "updatedAt")
      values ($1, $2, 'QUEUED', $3, $4, $5, 'post-sync', now(), now())
      on conflict ("eventId", "sourceHash") do nothing`,
-    [`edr_${crypto.randomBytes(12).toString('hex')}`, row.id, priority, sourceHashOf(source), sourceText],
+    [`edr_${crypto.randomBytes(12).toString('hex')}`, row.id, priority, sourceHashOf(row), sourceText],
   );
   return (result.rowCount || 0) > 0;
 }
@@ -362,13 +386,13 @@ async function main() {
       } else if (!hasText) {
         const composed = composeEventDescription(composeInputOf(row));
         if (composed.text) {
-          updates.push({ row, text: composed.text, origin: schema.origin ? 'AUTO' : null, hash: schema.origin ? sourceHashOf(source) : null, kind: 'composed' });
+          updates.push({ row, text: composed.text, origin: schema.origin ? 'AUTO' : null, hash: schema.origin ? sourceHashOf(row) : null, kind: 'composed' });
           report.composed += 1;
           if (samples.length < 20) samples.push({ id: row.id, slug: row.slug, kind: 'composed', sourceUsed: composed.sourceUsed, after: composed.text.slice(0, 400) });
         }
       } else {
         // AUTO row: recompose only when the source changed.
-        const hash = sourceHashOf(source);
+        const hash = sourceHashOf(row);
         if (row.source_hash && row.source_hash === hash) {
           report.unchanged += 1;
         } else {
