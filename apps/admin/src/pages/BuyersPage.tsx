@@ -197,7 +197,7 @@ export function BuyersPage() {
 
       <DataTableShell
         loading={loading}
-        columns={['Покупатель', 'Контакты', 'Покупки (внешние)', 'Последний заказ', 'События', 'Контакт / обращение', 'Связи']}
+        columns={['Покупатель', 'Контакты', 'Покупки (внешние)', 'Последний заказ', 'Контакт / обращение', 'Связи']}
         empty={
           !loading && payload.rows.length === 0 ? (
             <EmptyState
@@ -212,9 +212,17 @@ export function BuyersPage() {
           ) : null
         }
       >
-        {payload.rows.map((buyer) => (
+        {payload.rows.map((buyer) => {
+          const relationSource: BuyerRelationSource = {
+            email: buyer.email,
+            phone: buyer.phone,
+            lastOrderNumber: buyer.lastOrderNumber,
+            lookup: buyer.lookup,
+          };
+          const relations = buyerRelationLinks(relationSource, view === 'archive' ? 'archive' : 'active');
+          return (
           <tr key={buyer.id} className="border-b border-border last:border-0 hover:bg-secondary/40">
-            <td className="min-w-[260px] px-4 py-3 align-top">
+            <td className="min-w-[210px] px-4 py-3 align-top">
               <div className="font-medium text-foreground">{buyer.displayName}</div>
               {buyer.notes ? <div className="mt-1 max-w-[220px] truncate text-xs text-muted-foreground">{buyer.notes}</div> : null}
               <div className="mt-2 flex flex-wrap gap-1.5">
@@ -231,8 +239,29 @@ export function BuyersPage() {
                   тип: нет данных
                 </Badge>
               </div>
+              <div className="mt-2 flex flex-wrap gap-1.5 lg:hidden">
+                {relations.map((link) =>
+                  link.href ? (
+                    <a
+                      key={link.id}
+                      href={link.href}
+                      className="inline-flex h-8 items-center rounded-md border border-border bg-card px-3 text-xs font-medium text-foreground"
+                    >
+                      {link.label}
+                    </a>
+                  ) : (
+                    <span
+                      key={link.id}
+                      title={link.note}
+                      className="inline-flex h-8 items-center rounded-md border border-dashed border-border px-3 text-xs font-medium text-muted-foreground"
+                    >
+                      {link.label}
+                    </span>
+                  ),
+                )}
+              </div>
             </td>
-            <td className="min-w-[220px] px-4 py-3 align-top text-sm">
+            <td className="min-w-[170px] px-4 py-3 align-top text-sm">
               <ContactLine icon={Mail} value={buyer.email} />
               <ContactLine icon={Phone} value={buyer.phone} />
               {!buyer.hasContact ? <div className="text-xs text-muted-foreground">контакты не переданы</div> : null}
@@ -244,7 +273,7 @@ export function BuyersPage() {
               </div>
               {buyer.amountRub ? <div className="mt-1 text-xs text-muted-foreground">{formatMoneyRub(buyer.amountRub)}</div> : null}
             </td>
-            <td className="min-w-[180px] px-4 py-3 align-top text-sm">
+            <td className="min-w-[190px] px-4 py-3 align-top text-sm">
               <div className="font-mono text-xs text-foreground">№{buyer.lastOrderNumber || '-'}</div>
               <div className="mt-1 text-xs text-muted-foreground">{formatDate(buyer.lastOrderAt)}</div>
               {buyer.lastOrderStatusLabel ? (
@@ -252,18 +281,11 @@ export function BuyersPage() {
                   {buyer.lastOrderStatusLabel}
                 </Badge>
               ) : null}
+              {buyer.eventTitles.length ? (
+                <div className="mt-2 line-clamp-2 max-w-[220px] text-xs text-muted-foreground">{buyer.eventTitles.slice(0, 2).join(' · ')}</div>
+              ) : null}
             </td>
-            <td className="min-w-[280px] px-4 py-3 align-top">
-              <div className="space-y-1">
-                {buyer.eventTitles.slice(0, 3).map((title) => (
-                  <div key={title} className="line-clamp-1 text-sm text-foreground">
-                    {title}
-                  </div>
-                ))}
-                {!buyer.eventTitles.length ? <span className="text-xs text-muted-foreground">события не связаны</span> : null}
-              </div>
-            </td>
-            <td className="min-w-[150px] px-4 py-3 align-top">
+            <td className="min-w-[130px] px-4 py-3 align-top">
               <div
                 className="text-xs text-muted-foreground"
                 title="Последний контакт и обращения появятся в unified admin buyer DTO (право support.read)"
@@ -273,37 +295,30 @@ export function BuyersPage() {
             </td>
             <td className="px-4 py-3 align-top">
               <div className="flex flex-col items-start gap-1.5">
-                {(() => {
-                  const source: BuyerRelationSource = {
-                    email: buyer.email,
-                    phone: buyer.phone,
-                    lastOrderNumber: buyer.lastOrderNumber,
-                    lookup: buyer.lookup,
-                  };
-                  return buyerRelationLinks(source, view === 'archive' ? 'archive' : 'active').map((link) =>
-                    link.href ? (
-                      <a
-                        key={link.id}
-                        href={link.href}
-                        className="inline-flex h-8 items-center rounded-md border border-border bg-card px-3 text-xs font-medium text-foreground hover:bg-secondary"
-                      >
-                        {link.label}
-                      </a>
-                    ) : (
-                      <span
-                        key={link.id}
-                        title={link.note}
-                        className="inline-flex h-8 cursor-default items-center rounded-md border border-dashed border-border px-3 text-xs font-medium text-muted-foreground"
-                      >
-                        {link.label}
-                      </span>
-                    ),
-                  );
-                })()}
+                {relations.map((link) =>
+                  link.href ? (
+                    <a
+                      key={link.id}
+                      href={link.href}
+                      className="inline-flex h-8 items-center rounded-md border border-border bg-card px-3 text-xs font-medium text-foreground hover:bg-secondary"
+                    >
+                      {link.label}
+                    </a>
+                  ) : (
+                    <span
+                      key={link.id}
+                      title={link.note}
+                      className="inline-flex h-8 cursor-default items-center rounded-md border border-dashed border-border px-3 text-xs font-medium text-muted-foreground"
+                    >
+                      {link.label}
+                    </span>
+                  ),
+                )}
               </div>
             </td>
           </tr>
-        ))}
+          );
+        })}
       </DataTableShell>
 
       <div className="mt-4 flex items-center justify-end gap-2">
