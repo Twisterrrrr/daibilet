@@ -17,13 +17,15 @@ export function createAccountPurchasesRouteHandler(
     const user = await requireSiteUserFromRequest(deps.db, context.request) as {
       id: string;
       email: string;
+      emailVerifiedAt: Date | string | null;
     };
 
     sendJson(
       context.response,
       await buildBuyerPurchasesListDto({
         siteUserId: user.id,
-        email: user.email,
+        // A password-only account does not prove ownership of guest purchases.
+        email: user.emailVerifiedAt ? user.email : '',
         searchParams: context.searchParams,
       }),
     );

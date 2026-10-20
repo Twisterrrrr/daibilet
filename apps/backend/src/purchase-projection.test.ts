@@ -295,6 +295,12 @@ test('projects internal checkout and external orders into admin, buyer and suppl
     assert.equal(buyer.rows.some((row) => row.sourceKind === 'internal' && row.number === '9100001'), true);
     assert.equal(buyer.rows.some((row) => row.sourceKind === 'external' && row.number === '9200001'), true);
 
+    const unrelatedUnverifiedBuyer = await buildBuyerPurchasesListDto({
+      siteUserId: `unverified-${suffix}`,
+      email: '',
+    });
+    assert.equal(unrelatedUnverifiedBuyer.total, 0);
+
     const supplier = await loadSupplierCheckoutPurchaseRows(ids.supplier, new URLSearchParams({ limit: '10' }));
     assert.equal(supplier.total, 1);
     assert.equal(supplier.items[0]?.publicCode, '9100001');

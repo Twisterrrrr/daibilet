@@ -431,7 +431,7 @@ export async function handleRequest(request, response) {
     if (route === 'GET /api/account/purchases') {
       try {
         const user = await requireSiteUserFromRequest(db, request);
-        sendJson(response, await buildAccountPurchases(db, user.email, url.searchParams));
+        sendJson(response, await buildAccountPurchases(db, user.emailVerifiedAt ? user.email : '', url.searchParams));
       } catch (error) {
         sendJson(response, { error: error.message || 'unauthorized' }, error.statusCode || 401);
       }
@@ -442,7 +442,9 @@ export async function handleRequest(request, response) {
     if (accountOrderMatch) {
       try {
         const user = await requireSiteUserFromRequest(db, request);
-        const detail = await buildAccountOrderDetail(db, user.email, decodeURIComponent(accountOrderMatch[1]));
+        const detail = user.emailVerifiedAt
+          ? await buildAccountOrderDetail(db, user.email, decodeURIComponent(accountOrderMatch[1]))
+          : null;
         sendJson(response, detail || { error: 'order_not_found' }, detail ? 200 : 404);
       } catch (error) {
         sendJson(response, { error: error.message || 'unauthorized' }, error.statusCode || 401);

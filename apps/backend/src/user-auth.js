@@ -224,7 +224,7 @@ export async function logoutSiteUser(db, userId) {
 
 export async function getSiteUserProfile(db, userId) {
   const result = await db.query(
-    'select id, email, name, "createdAt" from "SiteUser" where id = $1 and "isActive" = true limit 1',
+    'select id, email, name, "emailVerifiedAt", "createdAt" from "SiteUser" where id = $1 and "isActive" = true limit 1',
     [userId],
   );
   const user = result.rows[0];
@@ -232,6 +232,7 @@ export async function getSiteUserProfile(db, userId) {
   return {
     id: user.id,
     email: user.email,
+    emailVerifiedAt: user.emailVerifiedAt || null,
     name: user.name || '',
     createdAt: user.createdAt,
   };
