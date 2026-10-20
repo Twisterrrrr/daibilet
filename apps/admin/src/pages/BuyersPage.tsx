@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { adminFetch } from '@/lib/admin-api';
+import { buyerRelationLinks, type BuyerRelationSource } from '@/lib/buyer-relations';
 import { useSearchParams } from 'react-router-dom';
 import { AlertTriangle, Archive, Mail, Phone, Receipt, Search, Ticket, UserRound } from 'lucide-react';
 
@@ -131,15 +132,29 @@ export function BuyersPage() {
     <div>
       <PageHeader
         title="Покупатели"
-        description="Сводка по людям из заказов: контакты, последние покупки, билеты и быстрый переход к заказам."
+        description="Реестр покупателей Daibilet: аккаунты и гостевые покупатели. Поиск по имени, контакту или номеру заказа, переходы к заказам, возвратам и обращениям."
         meta={
           <>
             <Badge variant="outline">только чтение</Badge>
-            <Badge variant="outline">данные из заказов</Badge>
+            <Badge variant="outline">источник: внешние заказы</Badge>
             <Badge variant="outline">архив отменённых через {archiveAfterDays} дн.</Badge>
           </>
         }
       />
+
+      <InfoNote>
+        <p>
+          Пока единый admin buyer DTO не выпущен, список собирается только из внешних заказов (виджеты): аккаунты
+          Daibilet, внутренние заказы и покупатели без внешних заказов в реестр не попадают, а строки могут пропадать
+          после архивации внешних заказов. Все цифры экрана охватывают только внешние заказы и на клиенте не
+          досчитываются: разделение на аккаунт и гостевого покупателя, внутренние заказы и обращения появятся после
+          выпуска DTO.
+        </p>
+        <p>
+          Контакты показаны как есть из ответа сервера. Полные контакты должна отдавать серверная проекция при праве
+          orders.pii.read; клиентское маскирование защитой персональных данных не является.
+        </p>
+      </InfoNote>
 
       <InfoNote>
         Активный список строится только по незаархивированным заказам. Отменённые и удалённые заказы старше {archiveAfterDays} дней
@@ -147,10 +162,10 @@ export function BuyersPage() {
       </InfoNote>
 
       <div className="mt-4 grid grid-cols-2 gap-2 lg:grid-cols-5">
-        <MetricCard label="покупателей" value={payload.metrics.buyers} icon={UserRound} />
+        <MetricCard label="покупателей (внешние заказы)" value={payload.metrics.buyers} icon={UserRound} />
         <MetricCard label="с контактами" value={payload.metrics.withContacts} icon={Mail} />
-        <MetricCard label="заказов" value={payload.metrics.orders} icon={Receipt} />
-        <MetricCard label="билетов" value={payload.metrics.tickets} icon={Ticket} />
+        <MetricCard label="внешние заказы" value={payload.metrics.orders} icon={Receipt} />
+        <MetricCard label="билеты внешних заказов" value={payload.metrics.tickets} icon={Ticket} />
         <MetricCard
           label={view === 'archive' ? 'в архиве' : 'требуют внимания'}
           value={view === 'archive' ? payload.metrics.buyers : payload.metrics.needsAttention}
@@ -182,7 +197,7 @@ export function BuyersPage() {
 
       <DataTableShell
         loading={loading}
-        columns={['Покупатель', 'Контакты', 'Заказы', 'Последний заказ', 'События', 'Действия']}
+        columns={['Покупатель', 'Контакты', 'Покупки (внешние)', 'Последний заказ', 'События', 'Контакт / обращение', 'Связи']}
         empty={
           !loading && payload.rows.length === 0 ? (
             <EmptyState
@@ -208,6 +223,13 @@ export function BuyersPage() {
                     {provider}
                   </Badge>
                 ))}
+                <Badge
+                  variant="outline"
+                  className="border-dashed text-muted-foreground"
+                  title="Аккаунт или гостевой покупатель определится unified admin buyer DTO"
+                >
+                  тип: нет данных
+                </Badge>
               </div>
             </td>
             <td className="min-w-[220px] px-4 py-3 align-top text-sm">
@@ -241,10 +263,44 @@ export function BuyersPage() {
                 {!buyer.eventTitles.length ? <span className="text-xs text-muted-foreground">события не связаны</span> : null}
               </div>
             </td>
+            <td className="min-w-[150px] px-4 py-3 align-top">
+              <div
+                className="text-xs text-muted-foreground"
+                title="Последний контакт и обращения появятся в unified admin buyer DTO (право support.read)"
+              >
+                нет данных до DTO
+              </div>
+            </td>
             <td className="px-4 py-3 align-top">
-              <Button variant="outline" size="sm" onClick={() => openOrders(buyer, view)}>
-                Заказы
-              </Button>
+              <div className="flex flex-col items-start gap-1.5">
+                {(() => {
+                  const source: BuyerRelationSource = {
+                    email: buyer.email,
+                    phone: buyer.phone,
+                    lastOrderNumber: buyer.lastOrderNumber,
+                    lookup: buyer.lookup,
+                  };
+                  return buyerRelationLinks(source, view === 'archive' ? 'archive' : 'active').map((link) =>
+                    link.href ? (
+                      <a
+                        key={link.id}
+                        href={link.href}
+                        className="inline-flex h-8 items-center rounded-md border border-border bg-card px-3 text-xs font-medium text-foreground hover:bg-secondary"
+                      >
+                        {link.label}
+                      </a>
+                    ) : (
+                      <span
+                        key={link.id}
+                        title={link.note}
+                        className="inline-flex h-8 cursor-default items-center rounded-md border border-dashed border-border px-3 text-xs font-medium text-muted-foreground"
+                      >
+                        {link.label}
+                      </span>
+                    ),
+                  );
+                })()}
+              </div>
             </td>
           </tr>
         ))}
@@ -297,15 +353,6 @@ function ContactLine({ icon: Icon, value }: { icon: typeof Mail; value?: string 
       <span className="max-w-[190px] truncate">{value}</span>
     </div>
   );
-}
-
-function openOrders(buyer: AdminBuyerRow, view: 'active' | 'archive') {
-  const lookup = buyer.email || buyer.phone || buyer.lastOrderNumber || buyer.lookup || '';
-  const next = new URLSearchParams();
-  if (view === 'archive') next.set('view', 'archive');
-  if (lookup) next.set('q', lookup);
-  const query = next.toString();
-  window.location.href = `/orders${query ? `?${query}` : ''}`;
 }
 
 function normalizePayload(payload: AdminBuyersPayload): AdminBuyersPayload {
