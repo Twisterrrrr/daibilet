@@ -58,7 +58,7 @@ The supplier portal is not a mock, but it is not ready for broad self-service on
 
 | Area | Current state | Broad-access requirement |
 |---|---|---|
-| Team | Admin can issue one-time invites; supplier view is read-only | Deactivate and role-change flows with audit |
+| Team | In the current development branch, admin can invite, change roles and deactivate/reactivate accepted members; changes have an append-only access log | Deploy and live-smoke; personal admin sessions and actor identity beyond shared Basic Auth |
 | Credentials | Manual provisioning | Forgot/reset/change password and email delivery |
 | Catalog editing | Moderated create flow | Clear update flow for existing admissions/events and request history |
 | Payments | Sandbox/controlled pilot | Production credentials, fiscalization and agreed merchant/agent contract |

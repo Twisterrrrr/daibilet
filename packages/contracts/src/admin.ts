@@ -572,6 +572,17 @@ export interface AdminSupplierDetailDto extends AdminSupplierRowDto {
     name?: string | null;
     acceptedAt?: string | null;
   }>;
+  accessLog: Array<{
+    id: string;
+    supplierUserId: string;
+    action: string;
+    previousRole: string;
+    newRole: string;
+    previousActive: boolean;
+    newActive: boolean;
+    actor: string;
+    createdAt: string;
+  }>;
   commissionRules: Array<{
     id: string;
     scope: string;

@@ -61,6 +61,13 @@ export async function inviteSupplierUser(
 
     const existingAccount = siteUser.passwordHash !== PENDING_PASSWORD_HASH;
     const now = new Date();
+    const existingMembership = await tx.supplierUser.findUnique({
+      where: { supplierId_siteUserId: { supplierId: supplier.id, siteUserId: siteUser.id } },
+      select: { acceptedAt: true },
+    });
+    if (existingMembership?.acceptedAt) {
+      throwHttpError('Сотрудник уже подключен. Измените его роль в разделе «Команда».', 409);
+    }
     await tx.supplierUser.upsert({
       where: {
         supplierId_siteUserId: {

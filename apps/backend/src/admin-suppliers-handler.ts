@@ -12,6 +12,7 @@ export interface AdminSuppliersRouteHandlerDependencies {
   buildSupplierDetail: (idOrSlug: string) => Promise<unknown>;
   reviewSupplierLegalProfile: (input: ReviewSupplierLegalProfileInput) => Promise<unknown>;
   inviteSupplierUser: (supplierIdOrSlug: string, input: AdminSupplierInviteRequestDto) => Promise<unknown>;
+  updateSupplierUserAccess: (supplierId: string, membershipId: string, input: { role: 'OWNER' | 'ADMIN' | 'OPERATOR' | 'ACCOUNTANT' | 'VIEWER'; isActive: boolean }, actor: string) => Promise<unknown>;
   createSupplier: (input: CreateAdminSupplierInput) => Promise<unknown>;
   linkSupplierVenue: (supplierIdOrSlug: string, venueId: string) => Promise<unknown>;
 }
@@ -38,10 +39,23 @@ const inviteSupplierUserBodySchema = z.object({
   role: z.enum(['OWNER', 'ADMIN', 'OPERATOR', 'ACCOUNTANT', 'VIEWER']),
 }).strict();
 
+const updateSupplierUserBodySchema = z.object({
+  role: z.enum(['OWNER', 'ADMIN', 'OPERATOR', 'ACCOUNTANT', 'VIEWER']),
+  isActive: z.boolean(),
+}).strict();
+
 export function createAdminSuppliersRouteHandler(
   deps: AdminSuppliersRouteHandlerDependencies,
 ): TypedRouteHandler {
   return async (context: RouteContext) => {
+    if (context.method === 'PATCH') {
+      const match = matchPath(context.pathname, /^\/api\/admin\/suppliers\/([^/]+)\/users\/([^/]+)$/);
+      if (match?.[0] && match[1]) {
+        const body = await parseJsonBody(updateSupplierUserBodySchema, context.request);
+        sendJson(context.response, await deps.updateSupplierUserAccess(match[0], match[1], body, adminActor(context)));
+        return true;
+      }
+    }
     if (await handleSupplierUserInvite(context, deps)) return true;
     if (await handleLegalApprove(context, deps)) return true;
     if (await handleLegalReject(context, deps)) return true;
@@ -77,6 +91,16 @@ export function createAdminSuppliersRouteHandler(
     sendJson(context.response, await deps.buildSupplierDetail(idOrSlug));
     return true;
   };
+}
+
+function adminActor(context: RouteContext): string {
+  const header = context.request.headers.authorization || '';
+  if (!header.startsWith('Basic ')) return 'admin-basic';
+  try {
+    return Buffer.from(header.slice(6), 'base64').toString('utf8').split(':', 1)[0]?.slice(0, 200) || 'admin-basic';
+  } catch {
+    return 'admin-basic';
+  }
 }
 
 async function handleSupplierUserInvite(

@@ -229,7 +229,7 @@ export async function buildAdminSupplierDetailDto(idOrSlug: string): Promise<Adm
 
   const aggregates = await loadSupplierAggregates([supplier.id]);
   const row = mapAdminSupplierRow(supplier, aggregates);
-  const [eventsSample, admissionProductsSample, recentLedgerEntries] = await prisma.$transaction([
+  const [eventsSample, admissionProductsSample, recentLedgerEntries, accessLog] = await prisma.$transaction([
     prisma.event.findMany({
       where: { supplierId: supplier.id },
       orderBy: { updatedAt: 'desc' },
@@ -300,6 +300,11 @@ export async function buildAdminSupplierDetailDto(idOrSlug: string): Promise<Adm
         createdAt: true,
       },
     }),
+    prisma.supplierUserAccessLog.findMany({
+      where: { supplierId: supplier.id },
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+    }),
   ]);
 
   return {
@@ -311,6 +316,17 @@ export async function buildAdminSupplierDetailDto(idOrSlug: string): Promise<Adm
       email: user.siteUser?.email || null,
       name: user.siteUser?.name || null,
       acceptedAt: toIso(user.acceptedAt),
+    })),
+    accessLog: accessLog.map((entry) => ({
+      id: entry.id,
+      supplierUserId: entry.supplierUserId,
+      action: entry.action,
+      previousRole: entry.previousRole,
+      newRole: entry.newRole,
+      previousActive: entry.previousActive,
+      newActive: entry.newActive,
+      actor: entry.actor,
+      createdAt: entry.createdAt.toISOString(),
     })),
     commissionRules: (supplier.commissionRules || []).map((rule) => ({
       id: rule.id,
@@ -465,6 +481,7 @@ const supplierListInclude = {
 
 const supplierDetailInclude = {
   ...supplierListInclude,
+  users: { select: supplierListInclude.users.select },
   commissionRules: {
     orderBy: [{ isActive: 'desc' }, { priority: 'desc' }, { createdAt: 'desc' }],
     take: 50,

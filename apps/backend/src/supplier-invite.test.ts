@@ -80,6 +80,10 @@ test('admin invite lets a new supplier user set a password once', async (t) => {
     assert.match(membership.siteUser.passwordHash, /^scrypt:/);
 
     await assert.rejects(acceptSupplierInvite({ token: token as string, password: 'another-password' }));
+    await assert.rejects(
+      inviteSupplierUser(slug, { email, role: 'VIEWER' }),
+      /уже подключен/,
+    );
   } finally {
     const user = await prisma.siteUser.findUnique({ where: { email }, select: { id: true } });
     await prisma.supplier.deleteMany({ where: { id: supplierId } });

@@ -59,6 +59,7 @@ import { createSupplierChangeRequestsRouteHandler } from './supplier-change-requ
 import { createSupplierPortalRouteHandler } from './supplier-portal-handler.js';
 import { createSupplierProfileWriteRouteHandler } from './supplier-profile-write-handler.js';
 import { inviteSupplierUser } from './supplier-invite.js';
+import { updateSupplierUserAccess } from './supplier-user-access.js';
 import {
   buildSupplierPortalDashboardDto,
   buildSupplierPortalEventsListDto,
@@ -170,6 +171,7 @@ const server = startServer({
         buildSupplierDetail: buildAdminSupplierDetailDto,
         reviewSupplierLegalProfile,
         inviteSupplierUser,
+        updateSupplierUserAccess,
         createSupplier: createAdminSupplier,
         linkSupplierVenue: linkAdminSupplierVenue,
       }),

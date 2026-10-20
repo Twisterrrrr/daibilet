@@ -1412,6 +1412,22 @@ model SupplierUser {
   @@index([inviteExpiresAt])
 }
 
+model SupplierUserAccessLog {
+  id             String   @id @default(cuid())
+  supplierId     String
+  supplierUserId String
+  action         String
+  previousRole   String
+  newRole        String
+  previousActive Boolean
+  newActive      Boolean
+  actor          String
+  createdAt      DateTime @default(now())
+
+  @@index([supplierId, createdAt])
+  @@map("supplier_user_access_logs")
+}
+
 model SupplierVenue {
   id         String   @id @default(cuid())
   supplierId String

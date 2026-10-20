@@ -60,6 +60,8 @@ export function SuppliersPage() {
   const [legalActionError, setLegalActionError] = React.useState<string | null>(null);
   const [inviteUserBusy, setInviteUserBusy] = React.useState(false);
   const [inviteUserError, setInviteUserError] = React.useState<string | null>(null);
+  const [teamBusy, setTeamBusy] = React.useState<string | null>(null);
+  const [teamError, setTeamError] = React.useState<string | null>(null);
   const [inviteAccess, setInviteAccess] = React.useState<AdminSupplierInviteResultDto['access'] | null>(null);
   const [reloadTick, setReloadTick] = React.useState(0);
   const [showCreateForm, setShowCreateForm] = React.useState(false);
@@ -173,6 +175,26 @@ export function SuppliersPage() {
       setInviteUserError(error instanceof Error ? error.message : String(error));
     } finally {
       setInviteUserBusy(false);
+    }
+  }, []);
+
+  const updateTeamMember = React.useCallback(async (supplierId: string, memberId: string, role: AdminSupplierDetailDto['users'][number]['role'], isActive: boolean) => {
+    setTeamBusy(memberId);
+    setTeamError(null);
+    try {
+      const response = await adminFetch(`/api/admin/suppliers/${encodeURIComponent(supplierId)}/users/${encodeURIComponent(memberId)}`, {
+        method: 'PATCH',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ role, isActive }),
+      });
+      const body = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(body?.message || body?.error || `HTTP ${response.status}`);
+      setSelected(body as AdminSupplierDetailDto);
+      setReloadTick((value) => value + 1);
+    } catch (error) {
+      setTeamError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setTeamBusy(null);
     }
   }, []);
 
@@ -417,6 +439,9 @@ export function SuppliersPage() {
         inviteUserBusy={inviteUserBusy}
         inviteUserError={inviteUserError}
         inviteAccess={inviteAccess}
+        teamBusy={teamBusy}
+        teamError={teamError}
+        onUpdateTeamMember={updateTeamMember}
         onLegalAction={reviewLegalProfile}
         onInviteUser={inviteSupplierUser}
         onLinkVenue={linkVenue}
@@ -440,6 +465,9 @@ function SupplierDetailSheet({
   inviteUserBusy,
   inviteUserError,
   inviteAccess,
+  teamBusy,
+  teamError,
+  onUpdateTeamMember,
   onLegalAction,
   onInviteUser,
   onLinkVenue,
@@ -453,6 +481,9 @@ function SupplierDetailSheet({
   inviteUserBusy: boolean;
   inviteUserError: string | null;
   inviteAccess: AdminSupplierInviteResultDto['access'] | null;
+  teamBusy: string | null;
+  teamError: string | null;
+  onUpdateTeamMember: (supplierId: string, memberId: string, role: string, isActive: boolean) => Promise<void>;
   onLegalAction: (supplierId: string, action: 'approve' | 'reject') => void;
   onInviteUser: (supplierId: string, input: AdminSupplierInviteRequestDto) => Promise<void>;
   onLinkVenue: (supplierId: string, venueId: string) => Promise<void>;
@@ -589,15 +620,23 @@ function SupplierDetailSheet({
                   <div className="mt-3 space-y-2">
                     {supplier.users.length ? (
                       supplier.users.map((user) => (
-                        <div key={user.id} className="rounded-md bg-secondary px-3 py-2 text-sm">
-                          <div className="font-medium">{user.email || user.name || user.id}</div>
-                          <div className="text-xs text-muted-foreground">{user.role}</div>
-                        </div>
+                        <SupplierTeamMember key={user.id} supplierId={supplier.id} user={user} busy={teamBusy === user.id} onUpdate={onUpdateTeamMember} />
                       ))
                     ) : (
                       <div className="text-sm text-muted-foreground">Пользователи не привязаны.</div>
                     )}
                   </div>
+                  {teamError ? <div className="mt-2 text-xs text-destructive">{teamError}</div> : null}
+                  {supplier.accessLog.length ? (
+                    <div className="mt-4 border-t border-border pt-3">
+                      <h4 className="text-xs font-semibold">История доступа</h4>
+                      {supplier.accessLog.map((entry) => (
+                        <div key={entry.id} className="mt-2 text-xs text-muted-foreground">
+                          {formatDateTime(entry.createdAt)} · {entry.actor} · {entry.action === 'ROLE_CHANGE' ? `${adminSupplierRoleLabel(entry.previousRole)} → ${adminSupplierRoleLabel(entry.newRole)}` : entry.newActive ? 'доступ включён' : 'доступ отключён'}
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
                   <SupplierInviteForm
                     supplierId={supplier.id}
                     busy={inviteUserBusy}
@@ -758,6 +797,33 @@ function SupplierVenueLinkForm({
         </div>
       ) : null}
     </Card>
+  );
+}
+
+function SupplierTeamMember({ supplierId, user, busy, onUpdate }: {
+  supplierId: string;
+  user: AdminSupplierDetailDto['users'][number];
+  busy: boolean;
+  onUpdate: (supplierId: string, memberId: string, role: string, isActive: boolean) => Promise<void>;
+}) {
+  const [role, setRole] = React.useState(user.role);
+  React.useEffect(() => setRole(user.role), [user.role]);
+  const changeActive = () => {
+    if (!window.confirm(user.isActive ? `Отключить доступ ${user.email || user.name || ''}?` : `Восстановить доступ ${user.email || user.name || ''}?`)) return;
+    void onUpdate(supplierId, user.id, user.role, !user.isActive);
+  };
+  return (
+    <div className="rounded-md bg-secondary px-3 py-2 text-sm">
+      <div className="font-medium">{user.email || user.name || user.id}</div>
+      <div className="mt-1 text-xs text-muted-foreground">{user.isActive ? (user.acceptedAt ? 'Доступ активен' : 'Приглашение ожидает принятия') : 'Доступ отключён'}</div>
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+        <select value={role} onChange={(event) => setRole(event.target.value)} aria-label={`Роль ${user.email || user.id}`} className="h-8 rounded-md border border-input bg-background px-2 text-xs" disabled={busy || !user.isActive}>
+          <option value="OWNER">Владелец</option><option value="ADMIN">Администратор</option><option value="OPERATOR">Оператор</option><option value="ACCOUNTANT">Бухгалтер</option><option value="VIEWER">Только просмотр</option>
+        </select>
+        <Button type="button" size="sm" variant="outline" disabled={busy || !user.isActive || role === user.role} onClick={() => void onUpdate(supplierId, user.id, role, true)}>Сохранить роль</Button>
+        <Button type="button" size="sm" variant="outline" disabled={busy || (!user.isActive && !user.acceptedAt)} onClick={changeActive}>{user.isActive ? 'Отключить' : 'Восстановить'}</Button>
+      </div>
+    </div>
   );
 }
 
