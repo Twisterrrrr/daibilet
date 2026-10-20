@@ -1,8 +1,4 @@
-import {
-  buildPublicArticlesListDto,
-  buildPublicEventFreshnessMap,
-  buildPublicVenuesDto,
-} from '@daibilet/backend/public-read';
+import { buildPublicEventFreshnessMap } from '@daibilet/backend/public-read';
 import type { PublicCatalogDto, PublicVenueDto, PublicVenuePageDto } from '@daibilet/contracts/public';
 
 import { evaluateCityIndexability, evaluateRegionIndexability, evaluateVenueIndexability } from '@/lib/hub-indexability';
@@ -54,19 +50,38 @@ export type SitemapEntry = {
 const MAX_EVENTS = 45_000;
 const MAX_VENUES = 10_000;
 const VENUE_SITEMAP_SNAPSHOT_MS = 5 * 60 * 1000;
+
+/**
+ * Lean venue row for the sitemap. The HTTP venue list envelope carries the same
+ * `buildPublicVenuesCatalog` rows the direct `public-read` call used to build.
+ */
+type SitemapVenueRow = PublicVenueDto & { events?: number | null };
+type SitemapVenuesPayload = { venues?: SitemapVenueRow[] };
+
 let venueSitemapSnapshot: {
   expiresAt: number;
-  payload: Awaited<ReturnType<typeof buildPublicVenuesDto>>;
+  payload: SitemapVenuesPayload;
 } | null = null;
-let venueSitemapRebuild: Promise<Awaited<ReturnType<typeof buildPublicVenuesDto>>> | null = null;
+let venueSitemapRebuild: Promise<SitemapVenuesPayload> | null = null;
 
-/** Sitemap waits for one fresh rebuild per TTL; catalog pages keep their existing SWR behavior. */
-async function freshVenuesForSitemap() {
+/**
+ * Sitemap waits for one fresh rebuild per TTL; catalog pages keep their existing SWR behavior.
+ *
+ * INC.504.15 / INC.504.23: this used to call `buildPublicVenuesDto(limit=10000, forceRefresh)`
+ * directly, running a 10k-venue DB query + DTO build on the Next web-process event loop.
+ * The same `buildPublicVenuesCatalog` builder serves HTTP `/api/public/venues` (backend
+ * `withPublicResponseCache`), so the sitemap now fetches over loopback HTTP: DB + DTO
+ * work stays in the API process, not in the process that renders HTML.
+ */
+async function freshVenuesForSitemap(): Promise<SitemapVenuesPayload> {
   if (venueSitemapSnapshot && venueSitemapSnapshot.expiresAt > Date.now()) {
     return venueSitemapSnapshot.payload;
   }
   if (!venueSitemapRebuild) {
-    venueSitemapRebuild = buildPublicVenuesDto(new URLSearchParams(`limit=${MAX_VENUES}`), true)
+    venueSitemapRebuild = fetchPublicApiJson<SitemapVenuesPayload>('/api/public/venues', {
+      searchParams: { limit: MAX_VENUES },
+      timeoutMs: 30_000,
+    })
       .then((payload) => {
         venueSitemapSnapshot = { payload, expiresAt: Date.now() + VENUE_SITEMAP_SNAPSHOT_MS };
         return payload;
@@ -298,11 +313,9 @@ export async function buildVenuesSitemapEntries(now = new Date()): Promise<Sitem
     .filter((venue) => {
       if (!venue.slug) return false;
       return evaluateVenueIndexability({
-        // `venue` is the lean row from the backend payload, not PublicVenueDto:
-        // its inferred type omits futureSessionCount. The contract type does
-        // declare it (verified against @daibilet/contracts/public), so cast
-        // rather than duplicate the field in a third place.
-        futureSessions: (venue as PublicVenueDto).futureSessionCount ?? venue.events,
+        // futureSessionCount drives indexability (events is an all-time count);
+        // venue.events stays as the fallback for rows without the counter.
+        futureSessions: venue.futureSessionCount ?? venue.events,
         isIndexable: venue.isIndexable,
         type: venue.type,
         pageStatus: venue.pageStatus,
@@ -415,12 +428,19 @@ export async function buildLandingsSitemapEntries(now = new Date()): Promise<Sit
 }
 
 export async function buildBlogSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
-  const payload = await buildPublicArticlesListDto();
-  const articles = (payload?.articles || []) as Array<{
-    slug?: string | null;
-    isIndexable?: boolean | null;
-    updatedAt?: string | null;
-  }>;
+  // INC.504.23: article list over loopback HTTP. Same `buildPublicArticlesList`
+  // payload the direct `public-read` call produced (the backend route wraps the
+  // identical builder with `withPublicResponseCache`); no limit param = the same
+  // default options the direct call passed. Keeps the pg/DTO work out of the
+  // web process.
+  const payload = await fetchPublicApiJson<{
+    articles?: Array<{
+      slug?: string | null;
+      isIndexable?: boolean | null;
+      updatedAt?: string | null;
+    }>;
+  }>('/api/public/articles', { timeoutMs: 10_000 });
+  const articles = payload?.articles || [];
   return articles
     .filter((article) => article.slug && article.isIndexable !== false)
     .map((article) =>
@@ -544,6 +564,18 @@ export const SITEMAP_RESPONSE_HEADERS = {
 export function sitemapResponseHeaders(chunk: string): Record<string, string> {
   return {
     ...SITEMAP_RESPONSE_HEADERS,
-    ...(chunk === 'events' || chunk === 'venues' ? { 'Cache-Control': 'no-store' } : {}),
+    // events/venues: bounded freshness window instead of `no-store`.
+    //
+    // `no-store` (ef8d3383, 2026-10-08) was added so nginx never caches a
+    // degraded sitemap (empty venue list during a backend outage) for its
+    // 30-min proxy-cache window. The cost: every crawler hit re-entered the
+    // Next process and re-rendered a 45k-entry / 10k-venue XML on the event
+    // loop, amplifying the SSR-hang class (INC.504.15, RCA 2026-10-21).
+    // A 2-min s-maxage bounds degraded-output exposure to at most 2 minutes
+    // (vs 30 min that motivated no-store) while keeping crawler pressure off
+    // the render path; SWR serves the old XML during a rebuild.
+    ...(chunk === 'events' || chunk === 'venues'
+      ? { 'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=600' }
+      : {}),
   };
 }
