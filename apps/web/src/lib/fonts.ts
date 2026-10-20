@@ -43,9 +43,11 @@ export const fontSourceSerif = localFont({
   fallback: ['Georgia', 'serif'],
 });
 
-/** Class list for `<html>`: CSS variables consumed by globals.css + Tailwind. */
-export const fontVariableClassName = [
+/** Class list for `<html>`: CSS variables for sans-serif families consumed by globals.css + Tailwind. */
+export const fontSansVariableClassName = [
   fontInter.variable,
   fontManrope.variable,
-  fontSourceSerif.variable,
 ].join(' ');
+
+/** Class injected by next/font to set `--font-source-serif` on a segment wrapper (blog / city hubs only). */
+export const fontSerifClassName = fontSourceSerif.className;
