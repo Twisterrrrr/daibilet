@@ -116,6 +116,24 @@ enum PublishStatus {
   HIDDEN
 }
 
+/// Provenance of EventOverride.description: AUTO = post-sync composer, EDITORIAL =
+/// human-written, AI = approved AI rewrite. Null = legacy (pre-2026-10-20 wave).
+enum DescriptionOrigin {
+  AUTO
+  EDITORIAL
+  AI
+}
+
+/// Lifecycle of an AI description rewrite revision (event-rewrite-seo-plan.md canon).
+enum DescriptionRevisionStatus {
+  QUEUED
+  GENERATED
+  CHECKED
+  APPROVED
+  PUBLISHED
+  STALE
+}
+
 enum VenueKind {
   VENUE
   MUSEUM_ART_SPACE
@@ -704,6 +722,7 @@ model Event {
   reviewRequests  ReviewRequest[]
   override        EventOverride?
   routeItems      EventVenueRouteItem[]
+  descriptionRevisions EventDescriptionRevision[]
 
   @@index([status])
   @@index([purchaseFlow])
@@ -736,11 +755,15 @@ model EventVenueRouteItem {
 }
 
 model EventOverride {
-  id               String         @id @default(cuid())
-  eventId          String         @unique
-  title            String?
-  description      String?
-  shortDescription String?
+  id                   String             @id @default(cuid())
+  eventId              String             @unique
+  title                String?
+  description          String?
+  /// Provenance of description (AUTO/EDITORIAL/AI); null = legacy pre-2026-10-20.
+  descriptionOrigin    DescriptionOrigin?
+  /// Hash of source Event.description the AUTO/AI text was built from.
+  descriptionSourceHash String?
+  shortDescription     String?
   imageUrl         String?
   seoH1            String?
   seoTitle         String?
@@ -756,6 +779,33 @@ model EventOverride {
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@index([mergeGroupKey])
+}
+
+/// AI description rewrite queue + history (event-rewrite-seo-plan.md).
+/// One row per (eventId, sourceHash); approval writes EventOverride.description.
+model EventDescriptionRevision {
+  id             String                    @id @default(cuid())
+  eventId        String
+  status         DescriptionRevisionStatus @default(QUEUED)
+  /// Priority bucket: A (thin/duplicate copy), B (weak structure), null = not scored.
+  priority       String?
+  sourceHash     String
+  promptVersion  String?
+  model          String?
+  sourceText     String
+  draftText      String?
+  finalText      String?
+  qaFlags        Json?
+  createdBy      String?
+  approvedBy     String?
+  createdAt      DateTime                  @default(now())
+  updatedAt      DateTime                  @updatedAt
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, sourceHash])
+  @@index([eventId])
+  @@index([status])
 }
 
 model EventSourceLink {
