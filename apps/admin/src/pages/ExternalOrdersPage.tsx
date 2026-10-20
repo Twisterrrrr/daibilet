@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { adminFetch } from '@/lib/admin-api';
+import { buyerRelationLinks, type BuyerRelationSource } from '@/lib/buyer-relations';
 import { useSearchParams } from 'react-router-dom';
 import { AlertTriangle, Archive, CheckCircle2, Clock, Copy, Plus, Receipt, RefreshCcw, Search, Ticket, Trash2 } from 'lucide-react';
 
@@ -804,6 +805,8 @@ function OrderDetailSheet({
 
             {order.finance ? <FinanceOrderSummary finance={order.finance} /> : null}
 
+            <OrderRelationsCard order={order} />
+
             <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
               <Card className="border-border p-4">
                 <h3 className="text-sm font-semibold">Билеты</h3>
@@ -939,6 +942,51 @@ function OrderDetailSheet({
         ) : null}
       </SheetContent>
     </Sheet>
+  );
+}
+
+function OrderRelationsCard({ order }: { order: AdminOrderRow }) {
+  const source: BuyerRelationSource = {
+    email: order.buyer.email,
+    phone: order.buyer.phone,
+    lastOrderNumber: order.publicCode || order.externalOrderId,
+  };
+  const links = buyerRelationLinks(source);
+  return (
+    <Card className="border-border p-4">
+      <h3 className="text-sm font-semibold">Покупатель и связи</h3>
+      <div className="mt-2 text-sm font-medium text-foreground">{order.buyer.name || 'имя не указано'}</div>
+      <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+        {order.buyer.email ? <span>{order.buyer.email}</span> : null}
+        {order.buyer.phone ? <span>{order.buyer.phone}</span> : null}
+        {!order.buyer.email && !order.buyer.phone ? <span>контакты не переданы</span> : null}
+      </div>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {links.map((link) =>
+          link.href ? (
+            <a
+              key={link.id}
+              href={link.href}
+              className="inline-flex h-8 items-center rounded-md border border-border bg-card px-3 text-xs font-medium text-foreground hover:bg-secondary"
+            >
+              {link.label}
+            </a>
+          ) : (
+            <span
+              key={link.id}
+              title={link.note}
+              className="inline-flex h-8 cursor-default items-center rounded-md border border-dashed border-border px-3 text-xs font-medium text-muted-foreground"
+            >
+              {link.label}
+            </span>
+          ),
+        )}
+      </div>
+      <p className="mt-3 text-xs text-muted-foreground">
+        Полные контакты выдаёт сервер роли с правом orders.pii.read; клиент их не маскирует и не считает маскирование
+        защитой. Завершение возврата отображается только по подтверждённому финансовому событию.
+      </p>
+    </Card>
   );
 }
 
