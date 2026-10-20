@@ -2,6 +2,7 @@ import type { Server } from 'node:http';
 import { buildAdminEventChangeRequestDetailDto, buildAdminEventChangeRequestsDto } from './admin-event-change-requests.dto.js';
 import { createAdminEventChangeRequestsRouteHandler } from './admin-event-change-requests-handler.js';
 import { createAdminEventsRouteHandler } from './admin-events-handler.js';
+import { createDescriptionRevisionRouteHandler } from './description-revision-handler.js';
 import { createAdminEventsReadRouteHandler } from './admin-events-read-handler.js';
 import { buildAdminEventDetailDto, buildAdminEventsListDto } from './admin-events.dto.js';
 import { applyApprovedEventChangeRequest } from './event-change-request-applier.js';
@@ -102,6 +103,10 @@ const server = startServer({
       createAdminEventsRouteHandler({
         db,
         updateAdminEventOverride,
+        invalidatePublicCaches,
+      }),
+      createDescriptionRevisionRouteHandler({
+        db,
         invalidatePublicCaches,
       }),
       createAdminLandingsRouteHandler({

@@ -3923,6 +3923,20 @@ export async function updateAdminEventOverride(db, eventId, payload) {
     ],
   );
 
+  // Owner rule 2026-10-20: a human save of the description marks it EDITORIAL so
+  // the post-sync composer never overwrites it. Guarded - the column ships with
+  // migration 20261020120000_event_description_revision.
+  if (typeof normalized.description === 'string' && normalized.description.trim()) {
+    try {
+      await db.query(
+        `update "EventOverride" set "descriptionOrigin" = 'EDITORIAL' where "eventId" = $1`,
+        [eventId],
+      );
+    } catch {
+      // Pre-migration database: origin tracking unavailable, save stays valid.
+    }
+  }
+
   invalidateAdminGroupedEventsCache(db, 'event override');
 
   return {

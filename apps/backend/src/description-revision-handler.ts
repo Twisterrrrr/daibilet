@@ -1,0 +1,307 @@
+import { createHash } from 'node:crypto';
+import type { DbClient } from './types/db.js';
+import { z } from 'zod';
+
+import {
+  AiRewriteError,
+  normalizeScheduledDurationMinutes,
+  rewriteEventDescription,
+  type RewriteDescriptionResult,
+} from './ai-rewrite-description.js';
+import type { RewriteEventDescriptionFn } from './admin-events-handler.js';
+import { checkRewriteDraft, statusAfterQa } from './description-revision-qa.js';
+import { sendJson } from './http.js';
+import { matchPath, type RouteContext } from './routing.js';
+import type { TypedRouteHandler } from './validated-handler.js';
+import { parseJsonBody } from './validation.js';
+
+export const REWRITE_PROMPT_VERSION = 'hexagon-v1';
+
+const generateBodySchema = z.object({ limit: z.coerce.number().int().min(1).max(50).optional() });
+const approveBodySchema = z.object({ finalText: z.string().max(20_000).optional() });
+
+export interface DescriptionRevisionHandlerDependencies {
+  db: DbClient;
+  rewrite?: RewriteEventDescriptionFn;
+  invalidatePublicCaches?: (reason: string, options?: { warm?: boolean; slug?: string }) => void;
+}
+
+/** Source hash canon of scripts/post-sync-event-descriptions.js (stale detection). */
+export function sourceHashOf(source: string | null | undefined): string {
+  return createHash('md5').update(String(source || '').replace(/\r\n?/g, '\n').trim()).digest('hex');
+}
+
+type RevisionRow = {
+  id: string;
+  eventId: string;
+  status: string;
+  priority: string | null;
+  sourceHash: string;
+  sourceText: string | null;
+  draftText: string | null;
+  finalText: string | null;
+  model: string | null;
+  qaFlags: unknown;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+  title?: string | null;
+  slug?: string | null;
+  city?: string | null;
+};
+
+function revisionDto(row: RevisionRow) {
+  return {
+    id: row.id,
+    eventId: row.eventId,
+    status: row.status,
+    priority: row.priority,
+    sourceHash: row.sourceHash,
+    sourceText: row.sourceText || '',
+    draftText: row.draftText || null,
+    finalText: row.finalText || null,
+    model: row.model || null,
+    qaFlags: Array.isArray(row.qaFlags) ? row.qaFlags : [],
+    eventTitle: row.title || null,
+    eventSlug: row.slug || null,
+    city: row.city || null,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+  };
+}
+
+async function handleList(context: RouteContext, deps: DescriptionRevisionHandlerDependencies): Promise<boolean> {
+  if (context.method !== 'GET') return false;
+  if (context.pathname !== '/api/admin/rewrite-queue') return false;
+
+  const params = context.searchParams || new URLSearchParams();
+  const status = (params.get('status') || '').trim().toUpperCase();
+  const limit = Math.min(Math.max(Number(params.get('limit') || 50) || 50, 1), 200);
+  const result = await deps.db.query(
+    `
+      select
+        r.id, r."eventId", r.status::text as status, r.priority, r."sourceHash",
+        r."sourceText", r."draftText", r."finalText", r.model, r."qaFlags",
+        r."createdAt", r."updatedAt",
+        e.title, e.slug, c.title as city
+      from "EventDescriptionRevision" r
+      join "Event" e on e.id = r."eventId"
+      left join "City" c on c.id = e."primaryCityId"
+      where ($1::text = '' or r.status::text = $1)
+      order by case r.priority when 'A' then 0 when 'B' then 1 else 2 end, r."updatedAt" desc
+      limit $2
+    `,
+    [status, limit],
+  );
+  const counts = await deps.db.query(
+    `select status::text as status, count(*)::int as n from "EventDescriptionRevision" group by status`,
+  );
+  sendJson(context.response, {
+    items: (result.rows as RevisionRow[]).map(revisionDto),
+    counts: Object.fromEntries((counts.rows as Array<{ status: string; n: number }>).map((row) => [row.status, row.n])),
+  });
+  return true;
+}
+
+async function loadRevisionContext(db: DbClient, revisionId: string) {
+  const result = await db.query(
+    `
+      select
+        r.id, r."eventId", r.status::text as status, r.priority, r."sourceHash",
+        r."sourceText", r."draftText", r."finalText", r.model, r."qaFlags",
+        r."createdAt", r."updatedAt",
+        e.title, e.slug, e.description as "sourceDescription", c.title as city,
+        coalesce(
+          array_agg(
+            distinct extract(epoch from (s."endsAt" - s."startsAt")) / 60.0
+          ) filter (
+            where s."startsAt" is not null and s."endsAt" is not null
+              and s."endsAt" > s."startsAt" and s."isActive" = true
+          ), '{}'::numeric[]
+        ) as "sessionDurationMinutes"
+      from "EventDescriptionRevision" r
+      join "Event" e on e.id = r."eventId"
+      left join "City" c on c.id = e."primaryCityId"
+      left join "EventSession" s on s."eventId" = e.id
+      where r.id = $1
+      group by r.id, e.id, c.title
+      limit 1
+    `,
+    [revisionId],
+  );
+  const row = result.rows?.[0] as
+    | (RevisionRow & { sourceDescription?: string | null; sessionDurationMinutes?: unknown[] | null })
+    | undefined;
+  if (!row) return null;
+  return {
+    row,
+    scheduledDurationMinutes: normalizeScheduledDurationMinutes(row.sessionDurationMinutes),
+    sourceDescription: row.sourceDescription ?? null,
+    slug: row.slug ?? null,
+  };
+}
+
+/**
+ * POST /api/admin/rewrite-queue/generate - draft N QUEUED revisions with the
+ * safety-hexagon prompt, run the deterministic fact-check, store results. Never
+ * publishes.
+ */
+async function handleGenerate(context: RouteContext, deps: DescriptionRevisionHandlerDependencies): Promise<boolean> {
+  if (context.method !== 'POST') return false;
+  if (context.pathname !== '/api/admin/rewrite-queue/generate') return false;
+
+  const body = await parseJsonBody(generateBodySchema, context.request);
+  const limit = body.limit || 10;
+  const rewrite = deps.rewrite || rewriteEventDescription;
+
+  const queued = await deps.db.query(
+    `
+      select r.id
+      from "EventDescriptionRevision" r
+      where r.status = 'QUEUED'
+      order by case r.priority when 'A' then 0 when 'B' then 1 else 2 end, r."updatedAt" asc
+      limit $1
+    `,
+    [limit],
+  );
+
+  const results: Array<{ id: string; status: string; flags: number; error?: string }> = [];
+  for (const item of queued.rows as Array<{ id: string }>) {
+    const loaded = await loadRevisionContext(deps.db, item.id);
+    if (!loaded) continue;
+    const sourceText = String(loaded.row.sourceText || loaded.sourceDescription || '').trim();
+    if (!sourceText) {
+      results.push({ id: item.id, status: 'QUEUED', flags: 0, error: 'empty_source' });
+      continue;
+    }
+    try {
+      const result: RewriteDescriptionResult = await rewrite({
+        eventId: loaded.row.eventId,
+        originalDescription: sourceText,
+        meta: {
+          title: loaded.row.title ?? null,
+          scheduledDurationMinutes: loaded.scheduledDurationMinutes,
+        },
+      });
+      const flags = checkRewriteDraft(result.text, {
+        sourceText,
+        title: loaded.row.title ?? null,
+        city: loaded.row.city ?? null,
+        scheduledDurationMinutes: loaded.scheduledDurationMinutes,
+      });
+      const status = statusAfterQa(flags);
+      await deps.db.query(
+        `update "EventDescriptionRevision"
+         set "draftText" = $2, model = $3, "promptVersion" = $4, "qaFlags" = $5::jsonb,
+             status = $6::"DescriptionRevisionStatus", "updatedAt" = now()
+         where id = $1`,
+        [item.id, result.text, result.model, REWRITE_PROMPT_VERSION, JSON.stringify(flags), status],
+      );
+      results.push({ id: item.id, status, flags: flags.length });
+    } catch (error) {
+      const message = error instanceof AiRewriteError ? error.message : String((error as Error)?.message || error);
+      results.push({ id: item.id, status: 'QUEUED', flags: 0, error: message.slice(0, 200) });
+    }
+  }
+
+  sendJson(context.response, { generated: results.length, results });
+  return true;
+}
+
+/**
+ * POST /api/admin/rewrite-queue/:id/approve - editorial confirmation. Publishes
+ * the draft (or editor-supplied finalText) to EventOverride.description with
+ * origin=AI. Refuses when the source changed since enqueue (stale).
+ */
+async function handleApprove(context: RouteContext, deps: DescriptionRevisionHandlerDependencies): Promise<boolean> {
+  if (context.method !== 'POST') return false;
+  const match = matchPath(context.pathname, /^\/api\/admin\/rewrite-queue\/([^/]+)\/approve$/);
+  if (!match) return false;
+  const revisionId = match[0];
+  if (!revisionId) return false;
+
+  const body = await parseJsonBody(approveBodySchema, context.request);
+  const loaded = await loadRevisionContext(deps.db, revisionId);
+  if (!loaded) {
+    sendJson(context.response, { error: 'revision_not_found', message: 'Ревизия не найдена' }, { statusCode: 404 });
+    return true;
+  }
+
+  const currentHash = sourceHashOf(loaded.sourceDescription);
+  if (currentHash !== loaded.row.sourceHash) {
+    await deps.db.query(
+      `update "EventDescriptionRevision" set status = 'STALE', "updatedAt" = now() where id = $1`,
+      [revisionId],
+    );
+    sendJson(
+      context.response,
+      { error: 'stale_source', message: 'Исходное описание изменилось - черновик устарел, нужна новая генерация' },
+      { statusCode: 409 },
+    );
+    return true;
+  }
+
+  const finalText = String(body.finalText || loaded.row.draftText || '').trim();
+  if (!finalText) {
+    sendJson(context.response, { error: 'empty_draft', message: 'Нет черновика для публикации' }, { statusCode: 400 });
+    return true;
+  }
+
+  await deps.db.query(
+    `insert into "EventOverride" (id, "eventId", description, "descriptionOrigin", "descriptionSourceHash", "createdAt", "updatedAt")
+     values ($1, $2, $3, 'AI', $4, now(), now())
+     on conflict ("eventId") do update set
+       description = excluded.description,
+       "descriptionOrigin" = 'AI',
+       "descriptionSourceHash" = excluded."descriptionSourceHash",
+       "updatedAt" = now()`,
+    [`eov_${revisionId.replace(/[^a-zA-Z0-9]/g, '').slice(0, 20)}`, loaded.row.eventId, finalText, loaded.row.sourceHash],
+  );
+  await deps.db.query(
+    `update "EventDescriptionRevision"
+     set status = 'PUBLISHED', "finalText" = $2, "approvedBy" = 'admin', "updatedAt" = now()
+     where id = $1`,
+    [revisionId, finalText],
+  );
+  deps.invalidatePublicCaches?.('rewrite queue approve', loaded.slug ? { slug: loaded.slug } : undefined);
+
+  sendJson(context.response, { ok: true, eventId: loaded.row.eventId, slug: loaded.slug });
+  return true;
+}
+
+/** POST /api/admin/rewrite-queue/:id/reject - send the draft back to the queue. */
+async function handleReject(context: RouteContext, deps: DescriptionRevisionHandlerDependencies): Promise<boolean> {
+  if (context.method !== 'POST') return false;
+  const match = matchPath(context.pathname, /^\/api\/admin\/rewrite-queue\/([^/]+)\/reject$/);
+  if (!match) return false;
+  const revisionId = match[0];
+  if (!revisionId) return false;
+
+  const result = await deps.db.query(
+    `update "EventDescriptionRevision"
+     set status = 'QUEUED', "draftText" = null, "qaFlags" = null, model = null, "updatedAt" = now()
+     where id = $1 and status in ('GENERATED', 'CHECKED', 'STALE')
+     returning id`,
+    [revisionId],
+  );
+  if (!result.rows?.length) {
+    sendJson(
+      context.response,
+      { error: 'revision_not_rejectable', message: 'Ревизия не найдена или уже опубликована' },
+      { statusCode: 404 },
+    );
+    return true;
+  }
+  sendJson(context.response, { ok: true });
+  return true;
+}
+
+export function createDescriptionRevisionRouteHandler(
+  deps: DescriptionRevisionHandlerDependencies,
+): TypedRouteHandler {
+  return async (context) => {
+    if (await handleList(context, deps)) return true;
+    if (await handleGenerate(context, deps)) return true;
+    if (await handleApprove(context, deps)) return true;
+    return handleReject(context, deps);
+  };
+}
