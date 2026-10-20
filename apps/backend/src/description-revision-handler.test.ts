@@ -69,12 +69,32 @@ interface MockResponse {
   end(body?: string): void;
 }
 
+/**
+ * Hash inputs exactly as the loader selects them (aliases match
+ * scripts/post-sync-event-descriptions.js, so both sides compute one fingerprint).
+ */
+const REVISION_HASH_ROW = {
+  source_description: 'Оригинальное описание события от провайдера.',
+  eff_title: 'Событие',
+  city: 'Москва',
+  venue: 'Клуб',
+  venue_address: 'ул. Тестовая, 1',
+  ageLimit: '12',
+  priceFromRub: 1500,
+  durations: [65],
+  future_sessions: 3,
+  next_session: '2026-11-13T16:00:00.000Z',
+  category: 'Концерты',
+  subcategory: 'Рок',
+  kind: 'RECURRING',
+};
+
 const REVISION_ROW = {
   id: 'edr_1',
   eventId: 'evt_1',
   status: 'QUEUED',
   priority: 'A',
-  sourceHash: sourceHashOf('Оригинальное описание события от провайдера.'),
+  sourceHash: '',
   sourceText: 'Оригинальное описание события от провайдера.',
   draftText: null,
   finalText: null,
@@ -84,10 +104,11 @@ const REVISION_ROW = {
   updatedAt: new Date().toISOString(),
   title: 'Событие',
   slug: 'sobytie-evt-1',
-  city: 'Москва',
   sourceDescription: 'Оригинальное описание события от провайдера.',
   sessionDurationMinutes: [65],
+  ...REVISION_HASH_ROW,
 };
+REVISION_ROW.sourceHash = sourceHashOf(REVISION_ROW);
 
 test('GET rewrite-queue lists items and counts', async () => {
   const response = createMockResponse();
@@ -133,7 +154,10 @@ test('generate stores QA-checked draft and never publishes', async () => {
   assert.equal(body.results[0].flags, 0);
   const update = db.calls.find((call) => call.sql.includes('draftText'));
   assert.ok(update, 'draft must be stored');
-  assert.ok(!db.calls.some((call) => call.sql.includes('EventOverride')), 'generate must not publish');
+  assert.ok(
+    !db.calls.some((call) => /insert into "EventOverride"|update "EventOverride"/.test(call.sql)),
+    'generate must not publish',
+  );
 });
 
 test('approve publishes draft to EventOverride with origin AI', async () => {
@@ -170,6 +194,30 @@ test('approve refuses stale drafts when the source changed', async () => {
   const db = createMockDb((sql) => {
     if (sql.includes('sessionDurationMinutes')) {
       return { rows: [{ ...REVISION_ROW, status: 'CHECKED', draftText: 'Черновик.', sourceHash: 'старый-хеш' }] };
+    }
+    return { rows: [] };
+  });
+  const handler = createDescriptionRevisionRouteHandler({ db, invalidatePublicCaches() {} });
+
+  const handled = await handler(
+    createRouteContext({ method: 'POST', pathname: '/api/admin/rewrite-queue/edr_1/approve', body: {}, response }),
+  );
+  assert.equal(handled, true);
+  assert.equal(response.statusCode, 409);
+  assert.equal(JSON.parse(response.body).error, 'stale_source');
+  assert.ok(db.calls.some((call) => call.sql.includes("'STALE'")));
+  assert.ok(!db.calls.some((call) => call.sql.includes('insert into "EventOverride"')));
+});
+
+test('approve refuses when a significant catalogue input changed', async () => {
+  const response = createMockResponse();
+  const db = createMockDb((sql) => {
+    if (sql.includes('sessionDurationMinutes')) {
+      // Same provider text, but the price moved after the revision was queued, so
+      // the stored hash no longer matches the recomputed one. This is the case the
+      // text-only formula missed: it compared the description alone and published
+      // a draft built from an outdated price.
+      return { rows: [{ ...REVISION_ROW, status: 'CHECKED', draftText: 'Черновик.', priceFromRub: 1900 }] };
     }
     return { rows: [] };
   });

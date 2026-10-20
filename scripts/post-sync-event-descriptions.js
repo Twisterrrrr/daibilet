@@ -37,7 +37,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
-import { descriptionSourceHash } from '../apps/backend/src/description-source-hash.ts';
+import { descriptionSourceHashOfRow } from '../apps/backend/src/description-source-hash.ts';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const requireFromDb = createRequire(path.join(rootDir, 'packages', 'db', 'package.json'));
@@ -77,29 +77,16 @@ const onlyIds = idsArg
 /** Source hash canon: normalized line endings + trim, md5 (matches SQL pre-filter). */
 /**
  * Fingerprint of the significant inputs the composed text depends on. The formula
- * lives in the backend module so the script and the queue share one definition
- * (see `descriptionSourceHash`): provider text plus the volatile catalogue facts
- * the composer rebuilds the fact block from - price, next session, session count,
- * venue, address, duration, age. Run metadata (ids, timestamps) is deliberately
- * excluded, otherwise the hash would change on every run and the
- * `(eventId, sourceHash)` dedup would stop working.
+ * and the row mapping live in the backend module so the script, the override write
+ * and the revision queue share one definition (see `descriptionSourceHashOfRow`):
+ * provider text plus the volatile catalogue facts the composer rebuilds the fact
+ * block from - price, next session, session count, venue, address, duration, age.
+ * Run metadata (ids, timestamps) is deliberately excluded, otherwise the hash
+ * would change on every run and the `(eventId, sourceHash)` dedup would stop
+ * working.
  */
 function sourceHashOf(row) {
-  return descriptionSourceHash({
-    sourceText: row.source_description,
-    title: row.eff_title || row.title,
-    city: row.city,
-    venue: row.venue,
-    venueAddress: row.venue_address,
-    ageLimit: row.ageLimit,
-    priceFromRub: row.priceFromRub,
-    durations: Array.isArray(row.durations) ? row.durations.map(Number).filter(Boolean) : [],
-    futureSessions: Number(row.future_sessions || 0),
-    nextSession: row.next_session,
-    category: row.category,
-    subcategory: row.subcategory,
-    kind: row.kind,
-  });
+  return descriptionSourceHashOfRow(row);
 }
 
 /**

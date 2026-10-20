@@ -1,4 +1,3 @@
-import { createHash } from 'node:crypto';
 import type { DbClient } from './types/db.js';
 import { z } from 'zod';
 
@@ -10,6 +9,10 @@ import {
 } from './ai-rewrite-description.js';
 import type { RewriteEventDescriptionFn } from './admin-events-handler.js';
 import { checkRewriteDraft, statusAfterQa } from './description-revision-qa.js';
+import {
+  descriptionSourceHashOfRow,
+  type DescriptionSourceHashRow,
+} from './description-source-hash.js';
 import { sendJson } from './http.js';
 import { matchPath, type RouteContext } from './routing.js';
 import type { TypedRouteHandler } from './validated-handler.js';
@@ -26,9 +29,15 @@ export interface DescriptionRevisionHandlerDependencies {
   invalidatePublicCaches?: (reason: string, options?: { warm?: boolean; slug?: string }) => void;
 }
 
-/** Source hash canon of scripts/post-sync-event-descriptions.js (stale detection). */
-export function sourceHashOf(source: string | null | undefined): string {
-  return createHash('md5').update(String(source || '').replace(/\r\n?/g, '\n').trim()).digest('hex');
+/**
+ * Source hash canon, shared with scripts/post-sync-event-descriptions.js: both the
+ * formula and the row mapping live in `description-source-hash.ts`, so the hook
+ * that enqueues and the handler that detects STALE can never disagree. A text-only
+ * hash here silently rejected every approve once the hook moved to the full
+ * formula.
+ */
+export function sourceHashOf(row: DescriptionSourceHashRow): string {
+  return descriptionSourceHashOfRow(row);
 }
 
 type RevisionRow = {
@@ -109,7 +118,28 @@ async function loadRevisionContext(db: DbClient, revisionId: string) {
         r.id, r."eventId", r.status::text as status, r.priority, r."sourceHash",
         r."sourceText", r."draftText", r."finalText", r.model, r."qaFlags",
         r."createdAt", r."updatedAt",
-        e.title, e.slug, e.description as "sourceDescription", c.title as city,
+        e.title, e.slug, e."priceFromRub", e."ageLimit", e.kind::text as kind,
+        e.description as source_description,
+        coalesce(o.title, e.title) as eff_title,
+        c.title as city, v.title as venue, v.address as venue_address,
+        cat.title as category, sub.title as subcategory,
+        (
+          select min(s2."startsAt") from "EventSession" s2
+          where s2."eventId" = e.id and s2."isActive" is not false
+            and s2."cancelledAt" is null and s2."startsAt" >= now()
+        ) as next_session,
+        (
+          select count(*)::int from "EventSession" s3
+          where s3."eventId" = e.id and s3."isActive" is not false
+            and s3."cancelledAt" is null and s3."startsAt" >= now()
+        ) as future_sessions,
+        (
+          select array_agg(distinct ((extract(epoch from (s4."endsAt" - s4."startsAt")) / 60))::int)
+          from "EventSession" s4
+          where s4."eventId" = e.id and s4."isActive" is not false
+            and s4."cancelledAt" is null and s4."startsAt" >= now()
+            and s4."endsAt" > s4."startsAt"
+        ) as durations,
         coalesce(
           array_agg(
             distinct extract(epoch from (s."endsAt" - s."startsAt")) / 60.0
@@ -120,22 +150,26 @@ async function loadRevisionContext(db: DbClient, revisionId: string) {
         ) as "sessionDurationMinutes"
       from "EventDescriptionRevision" r
       join "Event" e on e.id = r."eventId"
+      left join "EventOverride" o on o."eventId" = e.id
       left join "City" c on c.id = e."primaryCityId"
+      left join "Venue" v on v.id = e."venueId"
+      left join "Category" cat on cat.id = e."categoryId"
+      left join "Subcategory" sub on sub.id = e."primarySubcategoryId"
       left join "EventSession" s on s."eventId" = e.id
       where r.id = $1
-      group by r.id, e.id, c.title
+      group by r.id, e.id, o.id, c.id, v.id, cat.id, sub.id
       limit 1
     `,
     [revisionId],
   );
   const row = result.rows?.[0] as
-    | (RevisionRow & { sourceDescription?: string | null; sessionDurationMinutes?: unknown[] | null })
+    | (RevisionRow & DescriptionSourceHashRow & { sessionDurationMinutes?: unknown[] | null })
     | undefined;
   if (!row) return null;
   return {
     row,
     scheduledDurationMinutes: normalizeScheduledDurationMinutes(row.sessionDurationMinutes),
-    sourceDescription: row.sourceDescription ?? null,
+    sourceDescription: row.source_description ?? row.sourceDescription ?? null,
     slug: row.slug ?? null,
   };
 }
@@ -226,7 +260,7 @@ async function handleApprove(context: RouteContext, deps: DescriptionRevisionHan
     return true;
   }
 
-  const currentHash = sourceHashOf(loaded.sourceDescription);
+  const currentHash = sourceHashOf(loaded.row);
   if (currentHash !== loaded.row.sourceHash) {
     await deps.db.query(
       `update "EventDescriptionRevision" set status = 'STALE', "updatedAt" = now() where id = $1`,

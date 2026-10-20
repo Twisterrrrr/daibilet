@@ -70,6 +70,57 @@ function normalizeDate(value: unknown): string {
   return date.toISOString();
 }
 
+/**
+ * Map a database row (the shape both the post-sync hook and the revision handler
+ * select) to the hash input. Aliases are shared on purpose: one mapping means the
+ * script and the backend can never drift into two different formulas.
+ */
+export type DescriptionSourceHashRow = {
+  source_description?: string | null;
+  sourceDescription?: string | null;
+  eff_title?: string | null;
+  title?: string | null;
+  city?: string | null;
+  venue?: string | null;
+  venue_address?: string | null;
+  venueAddress?: string | null;
+  ageLimit?: string | null;
+  priceFromRub?: number | string | null;
+  durations?: readonly number[] | null;
+  sessionDurationMinutes?: readonly number[] | null;
+  future_sessions?: number | string | null;
+  futureSessions?: number | string | null;
+  next_session?: string | Date | null;
+  nextSession?: string | Date | null;
+  category?: string | null;
+  subcategory?: string | null;
+  kind?: string | null;
+};
+
+export function descriptionSourceHashInputFromRow(row: DescriptionSourceHashRow): DescriptionSourceHashInput {
+  const durations = row.durations ?? row.sessionDurationMinutes ?? null;
+  return {
+    sourceText: row.source_description ?? row.sourceDescription ?? null,
+    title: row.eff_title ?? row.title ?? null,
+    city: row.city ?? null,
+    venue: row.venue ?? null,
+    venueAddress: row.venue_address ?? row.venueAddress ?? null,
+    ageLimit: row.ageLimit ?? null,
+    priceFromRub: row.priceFromRub ?? null,
+    durations,
+    futureSessions: Number(row.future_sessions ?? row.futureSessions ?? 0),
+    nextSession: row.next_session ?? row.nextSession ?? null,
+    category: row.category ?? null,
+    subcategory: row.subcategory ?? null,
+    kind: row.kind ?? null,
+  };
+}
+
+/** Convenience: hash directly from a row. */
+export function descriptionSourceHashOfRow(row: DescriptionSourceHashRow): string {
+  return descriptionSourceHash(descriptionSourceHashInputFromRow(row));
+}
+
 export function descriptionSourceHash(input: DescriptionSourceHashInput): string {
   const rawDurations = input.durations?.length
     ? input.durations
