@@ -21,7 +21,12 @@ function loadNodemailer() {
   return require("nodemailer");
 }
 
-const DEFAULT_NOTIFY_TO = "info@daibilet.ru";
+const {
+  isSmtpConfigured,
+  resolveOwnerNotifyTo,
+  resolveSmtpTransportOptions,
+} = require("./smtp-config");
+
 /** ExternalOrder.status values that mean "buyer paid". */
 const PAID_ORDER_STATUSES = new Set(["done", "paid", "success", "succeeded", "confirmed"]);
 
@@ -130,23 +135,15 @@ function buildOwnerOrderMail(order) {
 
 function sendOwnerOrderMail(order, env = process.env) {
   if (notifyDisabled(env)) return Promise.resolve({ sent: false, reason: "disabled" });
-  const to = String(env.ORDER_NOTIFY_TO || DEFAULT_NOTIFY_TO).trim();
+  const to = resolveOwnerNotifyTo(env);
   if (!to.includes("@")) return Promise.resolve({ sent: false, reason: "no_recipient" });
-  if (!env.SMTP_HOST || !env.SMTP_FROM) return Promise.resolve({ sent: false, reason: "smtp_not_configured" });
+  if (!isSmtpConfigured(env)) return Promise.resolve({ sent: false, reason: "smtp_not_configured" });
 
   const { subject, html, orderCode } = buildOwnerOrderMail(order);
   return (async () => {
     try {
       const nodemailer = loadNodemailer();
-      const transport = nodemailer.createTransport({
-        host: env.SMTP_HOST,
-        port: Number(env.SMTP_PORT || 587),
-        secure: env.SMTP_SECURE === "1" || env.SMTP_SECURE === "true",
-        auth:
-          env.SMTP_USER && env.SMTP_PASS
-            ? { user: env.SMTP_USER, pass: env.SMTP_PASS }
-            : undefined,
-      });
+      const transport = nodemailer.createTransport(resolveSmtpTransportOptions(env));
       await transport.sendMail({ from: env.SMTP_FROM, to, subject, html });
       console.log(`[order-owner-mail] sent order=${orderCode} to=${to}`);
       return { sent: true };
