@@ -57,13 +57,18 @@ const argValue = (name) => {
   const idx = argv.indexOf(name);
   return idx >= 0 && argv[idx + 1] ? argv[idx + 1] : null;
 };
+const inlineValue = (name) => {
+  const prefix = `${name}=`;
+  const found = argv.find((arg) => arg.startsWith(prefix));
+  return found ? found.slice(prefix.length) : null;
+};
 const apply = argv.includes('--apply');
 const repairLegacy = argv.includes('--repair-legacy');
 const skipEnqueue = argv.includes('--skip-enqueue');
 const limit = Number(argValue('--limit') || 0) || 0;
 const enqueueLimit = Number(argValue('--enqueue-limit') || 500) || 500;
-const outDir = argValue('--out') || path.join(rootDir, 'tmp-event-descriptions', 'post-sync');
-const idsArg = argValue('--ids');
+const outDir = argValue('--out') || inlineValue('--out') || path.join(rootDir, 'tmp-event-descriptions', 'post-sync');
+const idsArg = inlineValue('--ids') || argValue('--ids');
 const onlyIds = idsArg
   ? [...new Set(idsArg.split(/[,;\s]+/).map((value) => value.trim()).filter(Boolean))]
   : [];
@@ -78,20 +83,28 @@ function sourceHashOf(source) {
  * The candidate filter limits transfers: rows with no override text, AUTO rows
  * (hash-checked in JS), and - with --repair-legacy - legacy null-origin rows.
  */
-function buildCandidateSql({ withIds, legacy }) {
+function buildCandidateSql({ withIds, legacy, schema }) {
   const conditions = [];
   if (withIds) {
     conditions.push('e.id = any($1::text[])');
   } else {
-    const parts = [
-      '(o.id is null or nullif(btrim(o.description), \'\') is null)',
-      '(o."descriptionOrigin" = \'AUTO\')',
-    ];
-    if (legacy) {
-      parts.push('(o."descriptionOrigin" is null and nullif(btrim(o.description), \'\') is not null)');
+    const parts = ['(o.id is null or nullif(btrim(o.description), \'\') is null)'];
+    if (schema?.origin) {
+      parts.push('(o."descriptionOrigin" = \'AUTO\')');
+      if (legacy) {
+        parts.push('(o."descriptionOrigin" is null and nullif(btrim(o.description), \'\') is not null)');
+      }
+    } else if (legacy) {
+      // Pre-migration: every row with text is a legacy row.
+      parts.push('(nullif(btrim(o.description), \'\') is not null)');
     }
     conditions.push(`(${parts.join(' or ')})`);
   }
+  const originSelect = schema?.origin
+    ? `o."descriptionOrigin"::text as origin,
+      o."descriptionSourceHash" as source_hash`
+    : `null::text as origin,
+      null::text as source_hash`;
   return `
     select
       e.id,
@@ -108,8 +121,7 @@ function buildCandidateSql({ withIds, legacy }) {
       cat.title as category,
       sub.title as subcategory,
       o.description as override_description,
-      o."descriptionOrigin"::text as origin,
-      o."descriptionSourceHash" as source_hash,
+      ${originSelect},
       ${SOURCE_FP_SQL} as source_fp,
       (
         select min(s."startsAt")
@@ -317,7 +329,7 @@ async function main() {
     }
     const dupCounts = skipEnqueue ? new Map() : await fetchDupCounts(client);
     const result = await client.query(
-      buildCandidateSql({ withIds: onlyIds.length > 0, legacy: repairLegacy }),
+      buildCandidateSql({ withIds: onlyIds.length > 0, legacy: repairLegacy, schema }),
       onlyIds.length ? [onlyIds] : [],
     );
     report.candidates = result.rows.length;
