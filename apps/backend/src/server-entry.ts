@@ -108,6 +108,12 @@ const server = startServer({
       createDescriptionRevisionRouteHandler({
         db,
         invalidatePublicCaches,
+        // TODO(CONT.APPROVED-BY-IDENTITY): drop this flag and pass `resolveActor`
+        // once admin staff sessions exist. Admin access is shared HTTP basic auth
+        // today (auth.ts / admin-basic-auth.ts), so no AdminUser.id can be resolved
+        // per request. The flag is the explicit, grep-able opt-in to the shared
+        // placeholder - without it an unresolved actor is refused with 409.
+        allowLegacyActor: true,
       }),
       createAdminLandingsRouteHandler({
         db,

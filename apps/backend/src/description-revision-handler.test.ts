@@ -5,6 +5,7 @@ import test from 'node:test';
 import {
   contentHashOf,
   createDescriptionRevisionRouteHandler,
+  LEGACY_ACTOR_PLACEHOLDER,
   sourceHashOf,
 } from './description-revision-handler.js';
 import type { RouteContext } from './routing.js';
@@ -120,7 +121,7 @@ test('GET rewrite-queue lists items and counts', async () => {
     if (sql.includes('group by status')) return { rows: [{ status: 'QUEUED', n: 3 }] };
     return { rows: [REVISION_ROW] };
   });
-  const handler = createDescriptionRevisionRouteHandler({ db, invalidatePublicCaches() {} });
+  const handler = createDescriptionRevisionRouteHandler({ db, invalidatePublicCaches() {}, allowLegacyActor: true });
 
   const handled = await handler(createRouteContext({ method: 'GET', pathname: '/api/admin/rewrite-queue', response }));
   assert.equal(handled, true);
@@ -172,7 +173,7 @@ test('approve moves the revision to APPROVED and never publishes', async () => {
     }
     return { rows: [{ id: 'edr_1' }] };
   });
-  const handler = createDescriptionRevisionRouteHandler({ db, invalidatePublicCaches() {} });
+  const handler = createDescriptionRevisionRouteHandler({ db, invalidatePublicCaches() {}, allowLegacyActor: true });
 
   const handled = await handler(
     createRouteContext({ method: 'POST', pathname: '/api/admin/rewrite-queue/edr_1/approve', body: {}, response }),
@@ -201,7 +202,7 @@ test('approve refuses a revision that is not GENERATED or CHECKED', async () => 
     // The guarded transition matches nothing: the row is not approvable.
     return { rows: [] };
   });
-  const handler = createDescriptionRevisionRouteHandler({ db, invalidatePublicCaches() {} });
+  const handler = createDescriptionRevisionRouteHandler({ db, invalidatePublicCaches() {}, allowLegacyActor: true });
 
   const handled = await handler(
     createRouteContext({ method: 'POST', pathname: '/api/admin/rewrite-queue/edr_1/approve', body: {}, response }),
@@ -225,6 +226,7 @@ test('publish writes the approved text to EventOverride and marks PUBLISHED', as
     invalidatePublicCaches(_reason, options) {
       invalidatedWith = options?.slug || '';
     },
+    allowLegacyActor: true,
   });
 
   const handled = await handler(
@@ -252,7 +254,7 @@ test('publish refuses a revision that is not approved', async () => {
     }
     return { rows: [{ id: 'edr_1' }] };
   });
-  const handler = createDescriptionRevisionRouteHandler({ db, invalidatePublicCaches() {} });
+  const handler = createDescriptionRevisionRouteHandler({ db, invalidatePublicCaches() {}, allowLegacyActor: true });
 
   const handled = await handler(
     createRouteContext({ method: 'POST', pathname: '/api/admin/rewrite-queue/edr_1/publish', body: {}, response }),
@@ -272,7 +274,7 @@ test('publish marks STALE when the input changed after approval', async () => {
     }
     return { rows: [{ id: 'edr_1' }] };
   });
-  const handler = createDescriptionRevisionRouteHandler({ db, invalidatePublicCaches() {} });
+  const handler = createDescriptionRevisionRouteHandler({ db, invalidatePublicCaches() {}, allowLegacyActor: true });
 
   const handled = await handler(
     createRouteContext({ method: 'POST', pathname: '/api/admin/rewrite-queue/edr_1/publish', body: {}, response }),
@@ -292,7 +294,7 @@ test('approve refuses stale drafts when the source changed', async () => {
     }
     return { rows: [] };
   });
-  const handler = createDescriptionRevisionRouteHandler({ db, invalidatePublicCaches() {} });
+  const handler = createDescriptionRevisionRouteHandler({ db, invalidatePublicCaches() {}, allowLegacyActor: true });
 
   const handled = await handler(
     createRouteContext({ method: 'POST', pathname: '/api/admin/rewrite-queue/edr_1/approve', body: {}, response }),
@@ -316,7 +318,7 @@ test('approve refuses when a significant catalogue input changed', async () => {
     }
     return { rows: [] };
   });
-  const handler = createDescriptionRevisionRouteHandler({ db, invalidatePublicCaches() {} });
+  const handler = createDescriptionRevisionRouteHandler({ db, invalidatePublicCaches() {}, allowLegacyActor: true });
 
   const handled = await handler(
     createRouteContext({ method: 'POST', pathname: '/api/admin/rewrite-queue/edr_1/approve', body: {}, response }),
@@ -349,7 +351,7 @@ test('approve still succeeds when only the nearest session moved', async () => {
     }
     return { rows: [{ id: 'edr_1' }] };
   });
-  const handler = createDescriptionRevisionRouteHandler({ db, invalidatePublicCaches() {} });
+  const handler = createDescriptionRevisionRouteHandler({ db, invalidatePublicCaches() {}, allowLegacyActor: true });
 
   const handled = await handler(
     createRouteContext({ method: 'POST', pathname: '/api/admin/rewrite-queue/edr_1/approve', body: {}, response }),
@@ -367,7 +369,7 @@ test('publish writes the full hash to EventOverride, not the revision content ha
     if (sql.includes('sessionDurationMinutes')) return { rows: [approvedRow] };
     return { rows: [{ id: 'edr_1' }] };
   });
-  const handler = createDescriptionRevisionRouteHandler({ db, invalidatePublicCaches() {} });
+  const handler = createDescriptionRevisionRouteHandler({ db, invalidatePublicCaches() {}, allowLegacyActor: true });
 
   await handler(
     createRouteContext({ method: 'POST', pathname: '/api/admin/rewrite-queue/edr_1/publish', body: {}, response }),
@@ -426,13 +428,83 @@ test('approve stores the resolved actor id', async () => {
   assert.equal(approve.params[2], 'adm_42');
 });
 
+test('approve fails closed when no actor is available and the placeholder is not opted in', async () => {
+  const response = createMockResponse();
+  const db = createMockDb((sql) => {
+    if (sql.includes('sessionDurationMinutes')) {
+      return { rows: [{ ...REVISION_ROW, status: 'CHECKED', draftText: 'Черновик.' }] };
+    }
+    return { rows: [{ id: 'edr_1' }] };
+  });
+  // No resolveActor and no allowLegacyActor: this is the production default once
+  // sessions exist, and it must refuse rather than invent an approver.
+  const handler = createDescriptionRevisionRouteHandler({ db, invalidatePublicCaches() {} });
+
+  const handled = await handler(
+    createRouteContext({ method: 'POST', pathname: '/api/admin/rewrite-queue/edr_1/approve', body: {}, response }),
+  );
+  assert.equal(handled, true);
+  assert.equal(response.statusCode, 409);
+  assert.equal(JSON.parse(response.body).error, 'actor_unresolved');
+  assert.ok(!db.calls.some((call) => call.sql.includes("set status = 'APPROVED'")));
+});
+
+test('the legacy placeholder is used only when explicitly opted in', async () => {
+  const response = createMockResponse();
+  const db = createMockDb((sql) => {
+    if (sql.includes('sessionDurationMinutes')) {
+      return { rows: [{ ...REVISION_ROW, status: 'CHECKED', draftText: 'Черновик.' }] };
+    }
+    return { rows: [{ id: 'edr_1' }] };
+  });
+  const handler = createDescriptionRevisionRouteHandler({
+    db,
+    invalidatePublicCaches() {},
+    allowLegacyActor: true,
+  });
+
+  await handler(
+    createRouteContext({ method: 'POST', pathname: '/api/admin/rewrite-queue/edr_1/approve', body: {}, response }),
+  );
+  const approve = db.calls.find((call) => call.sql.includes("set status = 'APPROVED'"));
+  assert.ok(approve);
+  assert.equal(approve.params[2], LEGACY_ACTOR_PLACEHOLDER);
+});
+
+test('publish refuses and writes nothing when the actor cannot be resolved', async () => {
+  const response = createMockResponse();
+  const db = createMockDb((sql) => {
+    if (sql.includes('sessionDurationMinutes')) {
+      return { rows: [{ ...REVISION_ROW, status: 'APPROVED', finalText: 'Финал.' }] };
+    }
+    return { rows: [{ id: 'edr_1' }] };
+  });
+  const handler = createDescriptionRevisionRouteHandler({
+    db,
+    invalidatePublicCaches() {},
+    resolveActor: () => null,
+  });
+
+  const handled = await handler(
+    createRouteContext({ method: 'POST', pathname: '/api/admin/rewrite-queue/edr_1/publish', body: {}, response }),
+  );
+  assert.equal(handled, true);
+  assert.equal(response.statusCode, 409);
+  assert.equal(JSON.parse(response.body).error, 'actor_unresolved');
+  assert.ok(
+    !db.calls.some((call) => /insert into "EventOverride"|update "EventOverride"/.test(call.sql)),
+    'publication must not happen without an accountable actor',
+  );
+  assert.ok(!db.calls.some((call) => call.sql.includes("set status = 'PUBLISHED'")));
+});
+
 test('reject sends the draft back to the queue', async () => {
   const response = createMockResponse();
   const db = createMockDb((sql) => {
     if (sql.includes("status in ('GENERATED'")) return { rows: [{ id: 'edr_1' }] };
     return { rows: [] };
   });
-  const handler = createDescriptionRevisionRouteHandler({ db, invalidatePublicCaches() {} });
+  const handler = createDescriptionRevisionRouteHandler({ db, invalidatePublicCaches() {}, allowLegacyActor: true });
 
   const handled = await handler(
     createRouteContext({ method: 'POST', pathname: '/api/admin/rewrite-queue/edr_1/reject', body: {}, response }),

@@ -24,16 +24,41 @@ export const REWRITE_PROMPT_VERSION = 'hexagon-v1';
 const generateBodySchema = z.object({ limit: z.coerce.number().int().min(1).max(50).optional() });
 const approveBodySchema = z.object({ finalText: z.string().max(20_000).optional() });
 
+/**
+ * Transitional shared actor. It exists ONLY for deployments that explicitly opt in
+ * via `allowLegacyActor`, so a placeholder can never be in effect unnoticed: the
+ * default is to refuse the operation when no identity is available.
+ */
+export const LEGACY_ACTOR_PLACEHOLDER = 'admin';
+
 export interface DescriptionRevisionHandlerDependencies {
   db: DbClient;
   rewrite?: RewriteEventDescriptionFn;
   invalidatePublicCaches?: (reason: string, options?: { warm?: boolean; slug?: string }) => void;
   /**
-   * Authenticated admin identity for the approval audit trail. Injected so the
-   * identity ticket can wire the session in without touching the SQL again; until
-   * then the stored value stays the legacy placeholder.
+   * Authenticated admin identity for the approval audit trail: the stable
+   * `AdminUser.id` (never a display name or email, so a later FK needs no backfill).
+   * Returning null means "no identity" and refuses the operation.
+   *
+   * No runtime admin session exists yet - admin access is shared HTTP basic auth
+   * (`auth.ts`, `admin-basic-auth.ts`), so this resolver cannot be wired to a real
+   * id until the staff-session layer lands. See CONT.APPROVED-BY-IDENTITY.
    */
   resolveActor?: (context: RouteContext) => string | null;
+  /**
+   * Explicit opt-in to the shared placeholder while sessions are missing. Removing
+   * this flag is the whole switch: without it an unresolved actor is refused.
+   */
+  allowLegacyActor?: boolean;
+}
+
+/**
+ * Resolve the acting admin, or null when nobody can be identified.
+ * Fail-closed: the placeholder is used only when a deployment opted in by name.
+ */
+function resolveActorForRequest(context: RouteContext, deps: DescriptionRevisionHandlerDependencies): string | null {
+  if (deps.resolveActor) return deps.resolveActor(context);
+  return deps.allowLegacyActor ? LEGACY_ACTOR_PLACEHOLDER : null;
 }
 
 /**
@@ -299,12 +324,7 @@ async function handleApprove(context: RouteContext, deps: DescriptionRevisionHan
   // Editorial confirmation only. Publishing is a separate, deliberate action:
   // approval can be batched, publication follows its own window, and the audit
   // trail only means something when the two are different events.
-  //
-  // Actor policy: once `resolveActor` is wired, an unresolved actor refuses the
-  // operation instead of silently writing a placeholder - a fake approver is worse
-  // than no approval. Until the identity ticket lands, the legacy placeholder is
-  // kept so the path stays usable.
-  const actor = deps.resolveActor ? deps.resolveActor(context) : 'admin';
+  const actor = resolveActorForRequest(context, deps);
   if (!actor) {
     sendJson(
       context.response,
@@ -364,6 +384,19 @@ async function handlePublish(context: RouteContext, deps: DescriptionRevisionHan
         error: 'revision_not_approved',
         message: 'Опубликовать можно только одобренную ревизию (APPROVED)',
       },
+      { statusCode: 409 },
+    );
+    return true;
+  }
+
+  // Publication is the external action, so it demands an accountable actor even
+  // though the schema has no publishedBy column yet: an unattributable publication
+  // to the public page is exactly what the approval trail exists to prevent.
+  const actor = resolveActorForRequest(context, deps);
+  if (!actor) {
+    sendJson(
+      context.response,
+      { error: 'actor_unresolved', message: 'Не удалось определить администратора для аудита публикации' },
       { statusCode: 409 },
     );
     return true;
