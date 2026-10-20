@@ -15,6 +15,10 @@ type BuyerStatusTone = 'draft' | 'ready' | 'live' | 'paused' | 'archived' | 'inc
 
 type AdminBuyerRow = {
   id: string;
+  kind?: 'account' | 'guest';
+  emailVerified?: boolean | null;
+  internalOrders?: number;
+  externalOrders?: number;
   displayName: string;
   name?: string | null;
   email?: string | null;
@@ -41,6 +45,7 @@ type AdminBuyerRow = {
 
 type AdminBuyersPayload = {
   generatedAt: string;
+  piiLevel?: 'masked';
   view?: 'active' | 'archive';
   page?: number;
   pages?: number;
@@ -82,7 +87,9 @@ export function BuyersPage() {
     })
       .then(async (response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        return (await response.json()) as AdminBuyersPayload;
+        const data = (await response.json()) as AdminBuyersPayload;
+        if (data.piiLevel !== 'masked') throw new Error('Серверный реестр покупателей ещё не обновлён. Контакты не показаны.');
+        return data;
       })
       .then((data) => {
         setPayload(normalizePayload(data));
@@ -124,7 +131,6 @@ export function BuyersPage() {
     setParams(next);
   };
 
-  const archiveAfterDays = payload.metrics.archiveAfterDays || 30;
   const currentPage = payload.page || page;
   const pages = payload.pages || 1;
 
@@ -136,36 +142,25 @@ export function BuyersPage() {
         meta={
           <>
             <Badge variant="outline">только чтение</Badge>
-            <Badge variant="outline">источник: внешние заказы</Badge>
-            <Badge variant="outline">архив отменённых через {archiveAfterDays} дн.</Badge>
+            <Badge variant="outline">внутренние и внешние заказы</Badge>
+            <Badge variant="outline">контакты маскируются сервером</Badge>
           </>
         }
       />
 
       <InfoNote>
-        <p>
-          Пока единый admin buyer DTO не выпущен, список собирается только из внешних заказов (виджеты): аккаунты
-          Daibilet, внутренние заказы и покупатели без внешних заказов в реестр не попадают, а строки могут пропадать
-          после архивации внешних заказов. Все цифры экрана охватывают только внешние заказы и на клиенте не
-          досчитываются: разделение на аккаунт и гостевого покупателя, внутренние заказы и обращения появятся после
-          выпуска DTO.
-        </p>
-        <p>
-          Контакты показаны как есть из ответа сервера. Полные контакты должна отдавать серверная проекция при праве
-          orders.pii.read; клиентское маскирование защитой персональных данных не является.
-        </p>
+        Аккаунты и гостевые покупатели собраны в одном реестре. Гостевой заказ связывается с аккаунтом по email только после подтверждения адреса. Полные контакты здесь недоступны до включения персональных прав.
       </InfoNote>
 
       <InfoNote>
-        Активный список строится только по незаархивированным заказам. Отменённые и удалённые заказы старше {archiveAfterDays} дней
-        уходят в архив автоматически — вместе с ними пропадают из активных и соответствующие покупатели.
+        Архив показывает архивные внешние заказы. Аккаунты без заказов и внутренние заказы видны в активном списке.
       </InfoNote>
 
       <div className="mt-4 grid grid-cols-2 gap-2 lg:grid-cols-5">
-        <MetricCard label="покупателей (внешние заказы)" value={payload.metrics.buyers} icon={UserRound} />
+        <MetricCard label="покупателей" value={payload.metrics.buyers} icon={UserRound} />
         <MetricCard label="с контактами" value={payload.metrics.withContacts} icon={Mail} />
-        <MetricCard label="внешние заказы" value={payload.metrics.orders} icon={Receipt} />
-        <MetricCard label="билеты внешних заказов" value={payload.metrics.tickets} icon={Ticket} />
+        <MetricCard label="заказы" value={payload.metrics.orders} icon={Receipt} />
+        <MetricCard label="билеты" value={payload.metrics.tickets} icon={Ticket} />
         <MetricCard
           label={view === 'archive' ? 'в архиве' : 'требуют внимания'}
           value={view === 'archive' ? payload.metrics.buyers : payload.metrics.needsAttention}
@@ -214,10 +209,8 @@ export function BuyersPage() {
       >
         {payload.rows.map((buyer) => {
           const relationSource: BuyerRelationSource = {
-            email: buyer.email,
-            phone: buyer.phone,
+            // Contacts are masked by the API; never search orders by masked text.
             lastOrderNumber: buyer.lastOrderNumber,
-            lookup: buyer.lookup,
           };
           const relations = buyerRelationLinks(relationSource, view === 'archive' ? 'archive' : 'active');
           return (
@@ -233,11 +226,10 @@ export function BuyersPage() {
                 ))}
                 <Badge
                   variant="outline"
-                  className="border-dashed text-muted-foreground"
-                  title="Аккаунт или гостевой покупатель определится unified admin buyer DTO"
                 >
-                  тип: нет данных
+                  {buyer.kind === 'account' ? 'Аккаунт' : 'Гость'}
                 </Badge>
+                {buyer.kind === 'account' ? <Badge variant="outline">{buyer.emailVerified ? 'email подтверждён' : 'email не подтверждён'}</Badge> : null}
               </div>
               <div className="mt-2 flex flex-wrap gap-1.5 lg:hidden">
                 {relations.map((link) =>
@@ -269,7 +261,7 @@ export function BuyersPage() {
             <td className="px-4 py-3 align-top">
               <StatusBadge status={buyer.statusTone} label={buyer.statusLabel} />
               <div className="mt-2 text-xs text-muted-foreground">
-                {formatNumber(buyer.orders)} зак. · {formatNumber(buyer.tickets)} бил.
+                {formatNumber(buyer.orders)} зак. · {formatNumber(buyer.tickets)} бил. · {formatNumber(buyer.internalOrders || 0)} внутренних · {formatNumber(buyer.externalOrders || 0)} внешних
               </div>
               {buyer.amountRub ? <div className="mt-1 text-xs text-muted-foreground">{formatMoneyRub(buyer.amountRub)}</div> : null}
             </td>

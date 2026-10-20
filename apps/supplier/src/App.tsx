@@ -278,7 +278,9 @@ export function App() {
         </header>
 
         <main className="content">
-          {authLoading ? (
+          {searchParams.has('reset') ? (
+            <LoginSetup onLogin={handleLogin} onDevSupplier={setSupplierKey} />
+          ) : authLoading ? (
             <LoadingState label="Проверяем сеанс..." />
           ) : !hasSupplierAccess ? (
             <LoginSetup onLogin={handleLogin} onDevSupplier={setSupplierKey} />
@@ -384,10 +386,14 @@ function LoginSetup({
   onDevSupplier: (value: string) => void;
 }) {
   const inviteToken = new URLSearchParams(window.location.search).get('invite')?.trim() || '';
+  const resetToken = new URLSearchParams(window.location.search).get('reset')?.trim() || '';
+  const [forgot, setForgot] = React.useState(false);
+  const [resetDone, setResetDone] = React.useState(false);
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [message, setMessage] = React.useState<string | null>(null);
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -404,6 +410,37 @@ function LoginSetup({
 
   if (inviteToken) {
     return <InviteSetup token={inviteToken} onAccepted={onLogin} />;
+  }
+
+  if (resetToken || forgot || resetDone) {
+    const submitReset = async (event: React.FormEvent) => {
+      event.preventDefault(); setLoading(true); setError(null); setMessage(null);
+      try {
+        if (resetToken) {
+          await supplierPost('/api/user/auth/reset-password', { token: resetToken, password });
+          window.localStorage.removeItem(SUPPLIER_ACCESS_TOKEN_STORAGE_KEY);
+          window.history.replaceState(null, '', window.location.pathname);
+          setResetDone(true);
+          setMessage('Пароль изменён. Вернитесь ко входу.');
+        } else {
+          await supplierPost('/api/user/auth/request-password-reset', { email, audience: 'supplier' });
+          setMessage('Если аккаунт с таким email существует, письмо со ссылкой отправлено.');
+        }
+      } catch (cause) { setError(cause instanceof Error ? cause.message : 'Не удалось выполнить запрос.'); }
+      finally { setLoading(false); }
+    };
+    return <div className="login-layout"><section className="login-card">
+      <div className="setup-mark">ЛК</div><h2>{resetDone ? 'Пароль изменён' : resetToken ? 'Новый пароль' : 'Забыли пароль?'}</h2>
+      {!resetDone ? <p>{resetToken ? 'Задайте новый пароль для аккаунта поставщика.' : 'Укажите email аккаунта. Ссылка действует один час.'}</p> : null}
+      {!resetDone ? <form className="login-form" onSubmit={(event) => void submitReset(event)}>
+        {resetToken ? <label><span>Новый пароль</span><input type="password" autoComplete="new-password" minLength={10} maxLength={200} required value={password} onChange={(event) => setPassword(event.target.value)} /></label>
+          : <label><span>Email</span><input type="email" autoComplete="email" required value={email} onChange={(event) => setEmail(event.target.value)} /></label>}
+        {error ? <div className="form-error">{error}</div> : null}{message ? <p role="status">{message}</p> : null}
+        <button type="submit" disabled={loading}>{loading ? 'Подождите...' : resetToken ? 'Сохранить пароль' : 'Отправить ссылку'}</button>
+      </form> : null}
+      {resetDone && message ? <p role="status">{message}</p> : null}
+      <button type="button" className="link-button" onClick={() => { window.location.href = window.location.pathname; }}>Ко входу</button>
+    </section></div>;
   }
 
   return (
@@ -424,6 +461,7 @@ function LoginSetup({
           {error ? <div className="form-error">{error}</div> : null}
           <button type="submit" disabled={loading}>{loading ? 'Проверяем...' : 'Войти'}</button>
         </form>
+        <button type="button" className="link-button" onClick={() => setForgot(true)}>Забыли пароль?</button>
       </section>
 
       {import.meta.env.DEV ? (

@@ -72,6 +72,20 @@ export function verifyUserEmail(token: string) {
   });
 }
 
+export function requestUserPasswordReset(email: string, audience: 'buyer' | 'supplier' = 'buyer') {
+  return fetchUserApi<{ accepted: boolean }>('/api/user/auth/request-password-reset', {
+    method: 'POST',
+    body: JSON.stringify({ email, audience }),
+  });
+}
+
+export function resetUserPassword(token: string, password: string) {
+  return fetchUserApi<{ reset: boolean }>('/api/user/auth/reset-password', {
+    method: 'POST',
+    body: JSON.stringify({ token, password }),
+  });
+}
+
 export type AccountPurchasesPayload = {
   total: number;
   rows: Array<{

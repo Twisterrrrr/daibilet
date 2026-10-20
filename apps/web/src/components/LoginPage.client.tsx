@@ -121,6 +121,8 @@ export function LoginPageView() {
               <button type="button" onClick={() => setMode('register')} className="font-medium text-primary-600 hover:text-primary-700">
                 Зарегистрироваться
               </button>
+              <span className="mx-2">·</span>
+              <Link href="/reset-password" className="font-medium text-primary-600 hover:text-primary-700">Забыли пароль?</Link>
             </>
           ) : (
             <>

@@ -223,6 +223,7 @@ async function loadSupplierSessions(siteUserId: string): Promise<SupplierSession
     where: {
       siteUserId,
       isActive: true,
+      acceptedAt: { not: null },
       supplier: { status: { not: 'ARCHIVED' } },
       siteUser: { isActive: true },
     },

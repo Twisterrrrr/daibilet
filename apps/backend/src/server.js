@@ -8,7 +8,6 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createDb } from './db.js';
 import {
   buildAdminDashboard,
-  buildAdminBuyersList,
   buildAdminCitiesList,
   buildAdminCityDetail,
   updateAdminCity,
@@ -87,7 +86,9 @@ import {
   requireSiteUserFromRequest,
   verifySiteUserEmail,
 } from './user-auth.js';
-import { sendSiteUserVerifyEmail } from './user-email-mail.js';
+import { sendSiteUserPasswordResetEmail, sendSiteUserVerifyEmail } from './user-email-mail.js';
+import { createSiteUserPasswordResetToken, requestSiteUserPasswordReset, resetSiteUserPassword } from './user-password-reset.js';
+import { buildUnifiedAdminBuyers } from './admin-buyers.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(dirname, '..', '..', '..');
@@ -464,6 +465,49 @@ export async function handleRequest(request, response) {
       return;
     }
 
+    if (route === 'POST /api/user/auth/request-password-reset') {
+      try {
+        if (!process.env.SMTP_HOST || !process.env.SMTP_FROM) {
+          sendJson(response, { error: 'Восстановление пароля временно недоступно.' }, 503);
+          return;
+        }
+        const clientIp = String(request.headers['x-real-ip'] || request.socket.remoteAddress || 'unknown');
+        assertAuthRateLimit(`password-reset-ip:${clientIp}`, 10);
+        const body = await readJsonBody(request);
+        const email = String(body?.email || '').trim().toLowerCase();
+        if (email.length > 254) {
+          sendJson(response, { accepted: true });
+          return;
+        }
+        assertAuthRateLimit(`password-reset-email:${email}`, 3);
+        const user = await requestSiteUserPasswordReset(db, email);
+        if (user) {
+          const siteUrl = String(process.env.PUBLIC_SITE_URL || 'https://daibilet.ru').replace(/\/$/, '');
+          const audience = body?.audience === 'supplier' ? 'supplier' : 'buyer';
+          const supplierUrl = String(process.env.SUPPLIER_PORTAL_BASE_URL || 'https://supplier.daibilet.ru').replace(/\/$/, '');
+          const baseUrl = audience === 'supplier' ? supplierUrl : siteUrl;
+          const path = audience === 'supplier' ? '/' : '/reset-password';
+          const resetUrl = `${baseUrl}${path}?reset=${encodeURIComponent(createSiteUserPasswordResetToken(user))}`;
+          const delivery = await sendSiteUserPasswordResetEmail({ to: user.email, resetUrl });
+          if (!delivery.sent) console.error('[password-reset] delivery_failed');
+        }
+        sendJson(response, { accepted: true });
+      } catch (error) {
+        sendJson(response, { error: error.message || 'password_reset_request_failed' }, error.statusCode || 400);
+      }
+      return;
+    }
+
+    if (route === 'POST /api/user/auth/reset-password') {
+      try {
+        const body = await readJsonBody(request);
+        sendJson(response, await resetSiteUserPassword(db, body?.token, body?.password));
+      } catch (error) {
+        sendJson(response, { error: error.message || 'password_reset_failed' }, error.statusCode || 400);
+      }
+      return;
+    }
+
     if (route === 'GET /api/account/purchases') {
       try {
         const user = await requireSiteUserFromRequest(db, request);
@@ -609,7 +653,7 @@ export async function handleRequest(request, response) {
     }
 
     if (route === 'GET /api/admin/buyers') {
-      sendJson(response, await buildAdminBuyersList(db, url.searchParams));
+      sendJson(response, await buildUnifiedAdminBuyers(db, url.searchParams));
       return;
     }
 

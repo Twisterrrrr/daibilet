@@ -22,3 +22,25 @@ export async function sendSiteUserVerifyEmail({ to, verifyUrl }, env = process.e
     return { sent: false, reason: 'smtp_error' };
   }
 }
+
+export async function sendSiteUserPasswordResetEmail({ to, resetUrl }, env = process.env) {
+  if (!env.SMTP_HOST || !env.SMTP_FROM) return { sent: false };
+  try {
+    const { default: nodemailer } = await import('nodemailer');
+    const transport = nodemailer.createTransport({
+      host: env.SMTP_HOST,
+      port: Number(env.SMTP_PORT || 587),
+      secure: env.SMTP_SECURE === '1' || env.SMTP_SECURE === 'true',
+      auth: env.SMTP_USER && env.SMTP_PASS ? { user: env.SMTP_USER, pass: env.SMTP_PASS } : undefined,
+    });
+    await transport.sendMail({
+      from: env.SMTP_FROM,
+      to,
+      subject: 'Восстановление пароля Дайбилет',
+      text: `Чтобы задать новый пароль, откройте ссылку: ${resetUrl}\nСсылка действует 1 час. Если вы не запрашивали восстановление, игнорируйте письмо.`,
+    });
+    return { sent: true };
+  } catch {
+    return { sent: false };
+  }
+}
