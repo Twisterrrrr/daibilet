@@ -3,12 +3,15 @@
 import Link from 'next/link';
 import { ArrowRight, CheckCircle2, Clock3, HelpCircle, XCircle } from 'lucide-react';
 
+import { BUYER_ORDERS_EMPTY_TITLE, buyerOrdersEmptyBody } from '@/lib/buyer-account-copy';
+import type { BuyerEmailVerificationState } from '@/lib/buyer-email-verification';
 import { SITE_TIME_ZONE, parseSessionStartsAt } from '@/lib/datetime';
 import { formatNumber } from '@/lib/format';
 
 export type BuyerOrder = {
   id: string;
   number: string;
+  sourceKind?: 'internal' | 'external';
   status: string;
   displayStatus: string;
   statusTone: string;
@@ -43,9 +46,13 @@ export function BuyerOrderCard({ order }: { order: BuyerOrder }) {
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <StatusPill order={order} />
-            {order.providerName ? (
+            {order.sourceKind === 'internal' ? (
+              <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800">Заказ Дайбилета</span>
+            ) : order.providerName ? (
               <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">Покупка в {order.providerName}</span>
-            ) : null}
+            ) : (
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">Внешний заказ</span>
+            )}
           </div>
           <h2 className="mt-3 text-xl font-bold text-slate-950">Заказ №{order.number}</h2>
           {order.eventTitle ? (
@@ -122,13 +129,19 @@ export function BuyerOrderCard({ order }: { order: BuyerOrder }) {
   );
 }
 
-export function BuyerOrdersEmptyState({ lookup }: { lookup: string }) {
+export function BuyerOrdersEmptyState({
+  lookup,
+  emailVerification = 'unknown',
+}: {
+  lookup: string;
+  emailVerification?: BuyerEmailVerificationState;
+}) {
   return (
     <div className="mt-8 rounded-2xl bg-slate-50 p-8 text-center">
       <HelpCircle className="mx-auto h-10 w-10 text-slate-300" />
-      <h2 className="mt-3 text-xl font-bold text-slate-950">Заказов пока нет</h2>
+      <h2 className="mt-3 text-xl font-bold text-slate-950">{BUYER_ORDERS_EMPTY_TITLE}</h2>
       <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-500">
-        По email «{lookup}» заказов не найдено. Убедитесь, что при покупке в виджете указан тот же email, что и в аккаунте.
+        {buyerOrdersEmptyBody(lookup, emailVerification)}
       </p>
       <a href="mailto:hello@daibilet.ru" className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary-700 hover:text-primary-800">
         Написать в поддержку <ArrowRight className="h-4 w-4" />

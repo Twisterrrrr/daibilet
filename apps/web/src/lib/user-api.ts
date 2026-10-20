@@ -62,6 +62,7 @@ export type AccountPurchasesPayload = {
   rows: Array<{
     id: string;
     number: string;
+    sourceKind?: 'internal' | 'external';
     status: string;
     displayStatus: string;
     statusTone: string;
@@ -88,6 +89,14 @@ export type AccountPurchasesPayload = {
   page?: number;
   pages?: number;
   limit?: number;
+  /**
+   * Ожидается от unified buyer DTO (docs/buyer-admin-bridge-2026-10-20.md).
+   * Пока сервер не отдаёт `account.emailVerified`, поле отсутствует и статус
+   * подтверждения адреса остаётся `unknown`: браузер его не угадывает.
+   */
+  account?: {
+    emailVerified?: boolean | null;
+  } | null;
 };
 
 export function accountPurchases(token: string, params?: { page?: number; limit?: number }) {

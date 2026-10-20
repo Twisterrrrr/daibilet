@@ -6,6 +6,8 @@ import { Loader2, LogOut, Receipt, Ticket } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { BuyerOrderCard, BuyerOrdersEmptyState } from '@/components/BuyerOrderCard.client';
+import { BUYER_ACCOUNT_EMPTY_HINT, buyerAccountHero, buyerAccountListLabel } from '@/lib/buyer-account-copy';
+import { resolveBuyerEmailVerification } from '@/lib/buyer-email-verification';
 import { formatNumber } from '@/lib/format';
 import { useAccountPurchases, useUserAuth } from '@/hooks/useUserAuth';
 
@@ -57,7 +59,7 @@ export function AccountPurchasesPageView() {
               </div>
               <h1 className="mt-4 text-4xl font-extrabold sm:text-5xl">Мои покупки</h1>
               <p className="mt-4 max-w-3xl text-base leading-7 text-primary-50/88">
-                Заказы на email {user?.email} из Ticketscloud и Teplohod. Покупка через виджет не требует входа — аккаунт только для удобного списка.
+                {buyerAccountHero(user?.email || '')}
               </p>
             </div>
             <button
@@ -90,13 +92,18 @@ export function AccountPurchasesPageView() {
           </div>
         ) : null}
 
-        {payload && payload.rows.length === 0 ? <BuyerOrdersEmptyState lookup={user?.email || ''} /> : null}
+        {payload && payload.rows.length === 0 ? (
+          <BuyerOrdersEmptyState
+            lookup={user?.email || ''}
+            emailVerification={resolveBuyerEmailVerification(payload)}
+          />
+        ) : null}
 
         {payload && payload.rows.length > 0 ? (
           <div>
             <div className="mb-4">
               <h2 className="text-2xl font-bold text-slate-950">{formatCount(payload.total, ['заказ', 'заказа', 'заказов'])}</h2>
-              <p className="mt-1 text-sm text-slate-500">Привязаны к email {user?.email}</p>
+              <p className="mt-1 text-sm text-slate-500">{buyerAccountListLabel(user?.email || '')}</p>
             </div>
 
             <div className="grid gap-4">
@@ -134,9 +141,7 @@ export function AccountPurchasesPageView() {
         {!payload?.rows.length && !isLoading ? (
           <div className="mt-6 rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center">
             <Ticket className="mx-auto h-10 w-10 text-slate-300" />
-            <p className="mt-3 text-sm leading-6 text-slate-500">
-              Если вы уже покупали билеты, убедитесь, что в заказе указан тот же email, что и в аккаунте.
-            </p>
+            <p className="mt-3 text-sm leading-6 text-slate-500">{BUYER_ACCOUNT_EMPTY_HINT}</p>
           </div>
         ) : null}
       </section>
