@@ -334,6 +334,8 @@ DATABASE_URL=postgresql://daibilet:daibilet@localhost:5438/daibilet?schema=publi
 
 Результат: 48 миграций применены от нуля, `migrate status` — «Database schema is up to date», `migrate diff --from-config-datasource --to-schema` — «No difference detected». То есть линия миграций самодостаточна, а расхождение в общей БД вызвано только её неизвестным происхождением. Снять стек: `docker compose -p daibilet-fresh -f docker-compose.yml -f <override.yml> down -v`.
 
+**Методическая заметка (baseline):** пустой вывод успешно завершившейся команды — это успех, а не «команда не отработала». `pnpm web:typecheck` завершается с кодом 0 и не печатает ни строки, потому что ошибок нет; дважды подряд это было прочитано как «прогон висит», и блокер был выдуман. Проверять надо код выхода, а не наличие вывода. Строгая проверка: `tsc --noEmit -p apps/web/tsconfig.json` → exit 0, 0 строк `error TS`. `ignoreBuildErrors` снят, шаг `Web typecheck` в CI блокирующий; устаревшие утверждения в AGENTS.md и комментарий в `ci.yml` приведены к факту.
+
 ## Шаблон новой записи
 
 ```markdown
