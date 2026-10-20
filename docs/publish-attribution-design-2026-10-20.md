@@ -27,6 +27,7 @@ QUEUED → GENERATED → CHECKED → APPROVED (+approvedBy, approvedAt) → PUBL
 1. Решение по размещению (см. выше) — это `packages/db`, и оно же закрывает `DB.APPROVEDBY-FK`: `publishedBy String` без FK и `approvedBy String` без FK — **один и тот же долг**, а не два.
 2. Миграция: `publishedBy TEXT`, `publishedAt TIMESTAMP` на `EventDescriptionRevision` (nullable). FK на `AdminUser` — общий пакет с `approvedBy`, решается один раз.
 3. Ответ на вопрос «заполнять ли `publishedBy` сейчас»: **нет** — без идентичности писать туда `'admin'` значит завести второй долг того же класса, что и `approvedBy`. Колонки могут появиться в миграции, но остаются NULL до staff-сессий.
+4. Перед добавлением FK — перезапись legacy-значений `approvedBy = 'admin'` в `NULL`: плейсхолдер не должен превращаться в фейкового пользователя ради ссылочной целостности. После этого FK `approvedBy`/`publishedBy` → `AdminUser(id)` с `SetNull`, а `NULL` честно означает «актор неизвестен, запись сделана до появления identity».
 
 ## Вопрос владельцу
 

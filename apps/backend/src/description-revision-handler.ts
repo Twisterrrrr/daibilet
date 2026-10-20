@@ -329,7 +329,7 @@ async function handleApprove(context: RouteContext, deps: DescriptionRevisionHan
     sendJson(
       context.response,
       { error: 'actor_unresolved', message: 'Не удалось определить администратора для аудита одобрения' },
-      { statusCode: 409 },
+      { statusCode: 403 },
     );
     return true;
   }
@@ -397,7 +397,7 @@ async function handlePublish(context: RouteContext, deps: DescriptionRevisionHan
     sendJson(
       context.response,
       { error: 'actor_unresolved', message: 'Не удалось определить администратора для аудита публикации' },
-      { statusCode: 409 },
+      { statusCode: 403 },
     );
     return true;
   }

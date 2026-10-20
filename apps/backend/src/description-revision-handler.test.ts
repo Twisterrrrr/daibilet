@@ -398,7 +398,7 @@ test('approve refuses when the actor cannot be resolved', async () => {
     createRouteContext({ method: 'POST', pathname: '/api/admin/rewrite-queue/edr_1/approve', body: {}, response }),
   );
   assert.equal(handled, true);
-  assert.equal(response.statusCode, 409);
+  assert.equal(response.statusCode, 403);
   assert.equal(JSON.parse(response.body).error, 'actor_unresolved');
   assert.ok(
     !db.calls.some((call) => call.sql.includes("set status = 'APPROVED'")),
@@ -444,7 +444,7 @@ test('approve fails closed when no actor is available and the placeholder is not
     createRouteContext({ method: 'POST', pathname: '/api/admin/rewrite-queue/edr_1/approve', body: {}, response }),
   );
   assert.equal(handled, true);
-  assert.equal(response.statusCode, 409);
+  assert.equal(response.statusCode, 403);
   assert.equal(JSON.parse(response.body).error, 'actor_unresolved');
   assert.ok(!db.calls.some((call) => call.sql.includes("set status = 'APPROVED'")));
 });
@@ -489,7 +489,7 @@ test('publish refuses and writes nothing when the actor cannot be resolved', asy
     createRouteContext({ method: 'POST', pathname: '/api/admin/rewrite-queue/edr_1/publish', body: {}, response }),
   );
   assert.equal(handled, true);
-  assert.equal(response.statusCode, 409);
+  assert.equal(response.statusCode, 403);
   assert.equal(JSON.parse(response.body).error, 'actor_unresolved');
   assert.ok(
     !db.calls.some((call) => /insert into "EventOverride"|update "EventOverride"/.test(call.sql)),
