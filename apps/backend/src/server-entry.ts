@@ -112,7 +112,8 @@ const server = startServer({
         // once admin staff sessions exist. Admin access is shared HTTP basic auth
         // today (auth.ts / admin-basic-auth.ts), so no AdminUser.id can be resolved
         // per request. The flag is the explicit, grep-able opt-in to the shared
-        // placeholder - without it an unresolved actor is refused with 409.
+        // placeholder - without it an unresolved actor is refused with 403 (409 is
+        // reserved for resource-state conflicts such as stale_source).
         allowLegacyActor: true,
       }),
       createAdminLandingsRouteHandler({
