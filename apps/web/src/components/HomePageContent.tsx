@@ -27,6 +27,7 @@ import '@/lib/env';
 import { catalogSocialStats } from '@/lib/catalog-social-stats';
 import { formatMoney, formatNumber, pluralEvents } from '@/lib/format';
 import { resolveHomePromoImage } from '@/lib/home-scenarios';
+import { orderPopularRailCities } from '@/lib/popular-cities-rail';
 import { landingCategoryHref } from '@/lib/landing-routes';
 import { withSoftTimeout } from '@/lib/soft-timeout';
 import {
@@ -71,6 +72,7 @@ async function HomePageBody() {
   const ssrCitySlug = null;
   const cities = destinations.filter((item) => item.type === 'city');
   // Top by events, then pin Moscow + SPB first so the rail can center that pair on load.
+  const topCities = orderPopularRailCities(cities, 16).map(toSlimCityDestination);
   const luckyCities = [...cities]
     .filter((c) => c.events > 0)
     .sort((a, b) => b.events - a.events || a.name.localeCompare(b.name, 'ru'))
@@ -156,7 +158,32 @@ async function HomePageBody() {
         ssrCitySlug={ssrCitySlug}
       />
 
-      {/* Featured cities rail removed — now rendered server-side above Suspense */}
+      {/* Featured cities rail — server-rendered so crawlers see city links in initial HTML */}
+      {topCities.length ? (
+        <section
+          id="destinations"
+          className="section-y pb-6 sm:pb-8"
+          data-home-band="full-bleed"
+        >
+          <div className="container-page">
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+                  Популярные города
+                </h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  Выберите город — покажем афишу и подборки
+                </p>
+              </div>
+              <Link href="/cities" className="shrink-0 text-sm font-semibold text-primary-600 hover:text-primary-700">
+                Все города →
+              </Link>
+            </div>
+          </div>
+          {/* Finite city grid + «Показать ещё» (no infinite loop). */}
+          <HomePopularCitiesRail cities={topCities} className="mt-6" />
+        </section>
+      ) : null}
 
 
       <HomeCityAwareSectionsDynamic
@@ -454,36 +481,35 @@ export interface HomePageContentProps {
 
 
 export function HomePageContent({ topCities = [] }: HomePageContentProps) {
-  return (
-    <>
-      {topCities.length ? (
-        <section
-          id="destinations"
-          className="section-y pb-6 sm:pb-8"
-          data-home-band="full-bleed"
-        >
-          <div className="container-page">
-            <div className="flex items-end justify-between gap-4">
-              <div>
-                <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-                  Popular cities
-                </h2>
-                <p className="mt-1 text-sm text-slate-500">
-                  Featured city destinations on the home page
-                </p>
-              </div>
-              <Link href="/cities" className="shrink-0 text-sm font-semibold text-primary-600 hover:text-primary-700">
-                All cities →
-              </Link>
-            </div>
+  const citiesRail = topCities.length ? (
+    <section
+      id="destinations"
+      className="section-y pb-6 sm:pb-8"
+      data-home-band="full-bleed"
+    >
+      <div className="container-page">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+              Популярные города
+            </h2>
+            <p className="mt-1 text-sm text-slate-500">
+              Выберите город — покажем афишу и подборки
+            </p>
           </div>
-          {/* Finite city grid + «Show all cities» (no infinite loop). */}
-          <HomePopularCitiesRail cities={topCities} className="mt-6" />
-        </section>
-      ) : null}
-      <Suspense fallback={<HomePageSkeleton />}>
-        <HomePageBody />
-      </Suspense>
-    </>
+          <Link href="/cities" className="shrink-0 text-sm font-semibold text-primary-600 hover:text-primary-700">
+            Все города →
+          </Link>
+        </div>
+      </div>
+      {/* Finite city grid + «Показать ещё» (no infinite loop). */}
+      <HomePopularCitiesRail cities={topCities} className="mt-6" />
+    </section>
+  ) : null;
+
+  return (
+    <Suspense fallback={<>{citiesRail}<HomePageSkeleton /></>}>
+      <HomePageBody />
+    </Suspense>
   );
 }
