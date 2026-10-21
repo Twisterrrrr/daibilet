@@ -72,6 +72,7 @@ import {
 } from './dto.js';
 import { buildPublicSearchDto } from './public-search.dto.ts';
 import { loadVenueMapTip } from './public-venue-map-tip.ts';
+import { buildPublicEventFreshnessMap, publicEventFreshnessPayload } from './public-event-freshness.ts';
 import {
   buildSocialPreviewForPath,
   isSocialPreviewAgent,
@@ -378,6 +379,11 @@ export async function handleRequest(request, response) {
     if (route === 'GET /api/public/home/preview') {
       if (url.searchParams.get('refresh') === '1') invalidatePublicCaches('public home preview refresh');
       sendPublicJson(response, await withPublicResponseCache('home:preview', () => buildPublicHomePreview(db)));
+      return;
+    }
+
+    if (route === 'GET /api/public/events/freshness') {
+      sendPublicJson(response, publicEventFreshnessPayload(await buildPublicEventFreshnessMap()));
       return;
     }
 

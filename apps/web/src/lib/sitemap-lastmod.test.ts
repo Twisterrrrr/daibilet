@@ -23,9 +23,9 @@ import { freshnessMapFromRows, publicFreshnessSlug } from '@daibilet/backend/eve
 const WEB_ROOT = path.resolve(__dirname, '../..');
 const REPO_ROOT = path.resolve(WEB_ROOT, '../..');
 
-test('time-sensitive sitemaps cannot outlive an event or retain stale venue eligibility', () => {
-  assert.equal(sitemapResponseHeaders('events')['Cache-Control'], 'no-store');
-  assert.equal(sitemapResponseHeaders('venues')['Cache-Control'], 'no-store');
+test('event and venue sitemaps have a bounded cache window', () => {
+  assert.equal(sitemapResponseHeaders('events')['Cache-Control'], 'public, s-maxage=120, stale-while-revalidate=600');
+  assert.equal(sitemapResponseHeaders('venues')['Cache-Control'], 'public, s-maxage=120, stale-while-revalidate=600');
   assert.equal(sitemapResponseHeaders('blog')['Cache-Control'], 'public, s-maxage=3600, stale-while-revalidate=86400');
 });
 
@@ -101,9 +101,10 @@ test('sitemap lastmod: a slug missing from the map falls back to the build time'
   assert.equal(resolveSitemapLastModified(null, fallback).toISOString(), fallback.toISOString());
 });
 
-test('sitemap lastmod: the events builder threads the freshness map', () => {
+test('sitemap lastmod: the events builder reads freshness over HTTP', () => {
   const source = fs.readFileSync(path.join(WEB_ROOT, 'src/lib/sitemap-data.ts'), 'utf8');
-  assert.match(source, /buildPublicEventFreshnessMap/);
-  assert.match(source, /freshness\.get\(slug\)/);
+  assert.match(source, /fetchPublicApiJson<\{ freshness: Record<string, string> \}>/);
+  assert.match(source, /freshness\[slug\]/);
+  assert.doesNotMatch(source, /@daibilet\/backend\/public-read/);
 });
 
