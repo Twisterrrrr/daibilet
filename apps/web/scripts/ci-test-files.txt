@@ -26,6 +26,7 @@ src/lib/place-slug-aliases.test.ts
 src/lib/podborki-city-seo.test.ts
 src/lib/region-child-city-scope.test.ts
 src/lib/remote-image-bypass.test.ts
+src/lib/teplohod-pdp-image-map.test.ts
 src/lib/review-rating.test.ts
 src/lib/robots-policy.test.ts
 src/lib/seo-listing-meta.test.ts
