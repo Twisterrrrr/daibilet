@@ -427,6 +427,13 @@ function RequestDetailSheet({
                 </div>
               </div>
 
+              {detail.type === 'CREATE' && detail.subject === 'EVENT' && detail.status === 'APPLIED' && detail.event ? (
+                <div className="mt-4 rounded-md border border-border bg-secondary/40 p-3 text-sm">
+                  Событие создано в статусе «{detail.event.status === 'REVIEW' ? 'на проверке' : detail.event.status}». Применение заявки не публикует его и не открывает продажи.
+                  <a className="ml-2 font-medium text-primary underline" href={`/events?q=${encodeURIComponent(detail.event.id)}`}>Открыть в событиях</a>
+                </div>
+              ) : null}
+
               {detail.diff.warnings.length ? (
                 <div className="mt-5 space-y-2">
                   {detail.diff.warnings.map((warning: string) => (
