@@ -14,7 +14,7 @@ The pilot replaces only the hero image on five event PDPs, and only while its ex
 
 Each source was downloaded from its current `cdn.teplohod.info` URL, inspected as a real supplier image, and converted to WebP with Sharp, quality 75. No generated or invented scene was used. Source byte sizes, dimensions, URLs, and SHA-256 hashes are printed by the generator script.
 
-The HTML `<picture>` source offers 750, 1125, 1280, and 1536 px candidates. At a 375 px viewport and DPR 3, 1125 px is available; at 412 px and DPR 3, 1280 px is available. The 1536 px file covers wider desktop viewports. The `<img>` fallback points to the 750 px WebP. If any bundled candidate fails to load, the component falls back to the original CDN URL.
+The HTML `<picture>` source offers 750, 1125, 1280, and 1536 px candidates. At a 375 px viewport and DPR 3, 1125 px is available; at 412 px and DPR 3, 1280 px is available. The 1536 px file covers wider desktop viewports. The `<img>` fallback points to the 750 px WebP. If any bundled candidate fails to load, the component falls back to the original CDN URL. Asset filenames include the first eight characters of the source SHA-256, so a reviewed new source produces a new cache URL.
 
 Only the event hero uses this exact-source allowlist. Listing cards, related events, social metadata, all other Teplohod images, and the global Next AVIF/WebP order are unchanged. Because these are pre-generated static assets, Sharp does not run during page rendering or when a visitor first requests a variant.
 

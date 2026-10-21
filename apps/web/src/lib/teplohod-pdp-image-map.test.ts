@@ -9,12 +9,12 @@ test('maps only the measured Teplohod PDP hero source files to responsive WebP a
   );
 
   assert.deepEqual(result, {
-    fallback: '/images/events/teplohod-pdp/event-1360-750.webp',
+    fallback: '/images/events/teplohod-pdp/event-1360-5b747728-750.webp',
     srcSet: [
-      '/images/events/teplohod-pdp/event-1360-750.webp 750w',
-      '/images/events/teplohod-pdp/event-1360-1125.webp 1125w',
-      '/images/events/teplohod-pdp/event-1360-1280.webp 1280w',
-      '/images/events/teplohod-pdp/event-1360-1536.webp 1536w',
+      '/images/events/teplohod-pdp/event-1360-5b747728-750.webp 750w',
+      '/images/events/teplohod-pdp/event-1360-5b747728-1125.webp 1125w',
+      '/images/events/teplohod-pdp/event-1360-5b747728-1280.webp 1280w',
+      '/images/events/teplohod-pdp/event-1360-5b747728-1536.webp 1536w',
     ].join(', '),
   });
 });

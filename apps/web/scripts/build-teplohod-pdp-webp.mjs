@@ -24,8 +24,10 @@ const localSourceDir = process.env.TEPLOHOD_PDP_SOURCE_DIR;
 await fs.mkdir(outputDir, { recursive: true });
 
 for (const filename of await fs.readdir(outputDir)) {
-  const match = /^event-(51|1360|1332|1402|605)-(\d+)\.webp$/u.exec(filename);
-  if (match && !widths.includes(Number(match[2]))) {
+  const match = /^event-(51|1360|1332|1402|605)(?:-([a-f0-9]{8}))?-(\d+)\.webp$/u.exec(filename);
+  const source = match && sourceImages.find(([eventId]) => eventId === match[1]);
+  const currentVersion = source?.[2].slice(0, 8);
+  if (match && (!match[2] || match[2] !== currentVersion || !widths.includes(Number(match[3])))) {
     await fs.rm(path.join(outputDir, filename));
   }
 }
@@ -51,7 +53,7 @@ for (const [eventId, sourceUrl, expectedSha256] of sourceImages) {
   const variants = [];
 
   for (const width of widths) {
-    const filename = `event-${eventId}-${width}.webp`;
+    const filename = `event-${eventId}-${expectedSha256.slice(0, 8)}-${width}.webp`;
     const outputPath = path.join(outputDir, filename);
     await sharp(original)
       .rotate()
