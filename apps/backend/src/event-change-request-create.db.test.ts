@@ -14,7 +14,10 @@ test('approved supplier event proposal creates one linked review event', async (
     const submitted = await createSupplierEventChangeRequest(new URLSearchParams({ supplierId: supplier.id }), {
       event: { title: 'Тестовый вечер', kind: 'OPEN_DATE', shortDescription: 'Описание тестового вечера' },
       schedule: { mode: 'OPEN_DATE', openDate: { validDays: 30 } },
-      offers: [{ title: 'Входной', priceRub: 350 }],
+      offers: [
+        { title: 'Взрослый', priceRub: 500 },
+        { title: 'Льготный', priceRub: 350 },
+      ],
     });
     const requestId = submitted.request.id;
     await reviewEventChangeRequest({ requestId, action: 'approve' });
@@ -31,7 +34,7 @@ test('approved supplier event proposal creates one linked review event', async (
     assert.equal(event.openDateValidDays, 30);
     assert.equal(event.priceFromRub, 350);
     assert.equal(event.supplierLinks.length, 1);
-    assert.equal(event.offers.length, 1);
+    assert.equal(event.offers.length, 2);
     assert.equal(event.changeLogs.length, 1);
   } finally {
     if (eventId) {

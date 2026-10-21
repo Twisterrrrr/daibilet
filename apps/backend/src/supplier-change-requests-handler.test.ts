@@ -250,6 +250,17 @@ test('supplier change request write-flow creates admission and event requests', 
     assert.equal(event.request.type, 'CREATE');
     assert.equal(event.request.status, 'SUBMITTED');
 
+    for (const kind of ['SINGLE', 'RECURRING'] as const) {
+      await assert.rejects(
+        () => createSupplierEventChangeRequest(searchParams, {
+          event: { title: `Неполное ${kind}`, kind, venueId },
+          schedule: { mode: kind },
+          offers: [{ title: 'Билет', priceRub: 500, active: true }],
+        }),
+        /Заявка на событие не готова/,
+      );
+    }
+
     const admissionList = await buildSupplierChangeRequestsList(searchParams, {
       subject: 'ADMISSION_PRODUCT',
       limit: 10,

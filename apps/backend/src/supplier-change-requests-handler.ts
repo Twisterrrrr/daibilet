@@ -14,6 +14,7 @@ import type {
 } from '@daibilet/contracts/supplier';
 import { z } from 'zod';
 import { sendJson } from './http.js';
+import { validateEventChangeRequestPayload } from './event-change-request-payload.js';
 import type { RouteContext } from './routing.js';
 import { authenticateAccessToken, parseBearerToken } from './user-auth.js';
 import type { TypedRouteHandler } from './validated-handler.js';
@@ -339,6 +340,14 @@ export async function createSupplierEventChangeRequest(
   const payload = event
     ? buildExistingEventPayload(type, input, event)
     : buildCreateEventPayload(input);
+
+  if (type === 'CREATE') {
+    const { subject: _subject, ...eventPayload } = payload;
+    const validation = validateEventChangeRequestPayload('CREATE', eventPayload, { mode: 'apply' });
+    if (!validation.ok) {
+      throwHttpError(`Заявка на событие не готова: ${validation.issues.map((issue) => issue.path).join(', ')}.`, 422);
+    }
+  }
 
   const request = await prisma.eventChangeRequest.create({
     data: {

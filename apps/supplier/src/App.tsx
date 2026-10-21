@@ -1045,11 +1045,8 @@ function AdmissionRequestForm({
 
 type EventRequestFormState = {
   title: string;
-  kind: string;
   venueId: string;
   description: string;
-  offerTitle: string;
-  priceRub: string;
   validDays: string;
   summary: string;
 };
@@ -1068,14 +1065,15 @@ function EventRequestForm({
   const defaultVenueId = profile?.venues[0]?.id || '';
   const [form, setForm] = React.useState<EventRequestFormState>({
     title: '',
-    kind: 'OPEN_DATE',
     venueId: defaultVenueId,
     description: '',
-    offerTitle: 'Взрослый',
-    priceRub: '700',
     validDays: '30',
     summary: '',
   });
+  const [offers, setOffers] = React.useState<AdmissionOfferFormValue[]>([
+    createAdmissionOfferFormValue({ title: 'Взрослый', priceRub: '' }),
+    createAdmissionOfferFormValue({ title: 'Льготный', priceRub: '' }),
+  ]);
   const [busy, setBusy] = React.useState(false);
 
   React.useEffect(() => {
@@ -1095,22 +1093,22 @@ function EventRequestForm({
         summary: cleanFormString(form.summary),
         event: {
           title: form.title,
-          kind: form.kind,
+          kind: 'OPEN_DATE',
           venueId: form.venueId || null,
           description: cleanFormString(form.description),
         },
         schedule: {
-          mode: form.kind,
-          openDate: form.kind === 'OPEN_DATE' ? { validDays: Number(form.validDays || 30) } : null,
+          mode: 'OPEN_DATE',
+          openDate: { validDays: Number(form.validDays) },
         },
-        offers: [{
-          title: form.offerTitle || 'Билет',
-          priceRub: Number(form.priceRub || 0),
-          active: true,
-        }],
+        offers: admissionOffersToPayload(offers),
       };
       const result = await supplierPost<SupplierPortalChangeRequestCreateResultDto>('/api/supplier/change-requests/events', payload, undefined, supplierKey);
       setForm((current) => ({ ...current, title: '', description: '', summary: '' }));
+      setOffers([
+        createAdmissionOfferFormValue({ title: 'Взрослый', priceRub: '' }),
+        createAdmissionOfferFormValue({ title: 'Льготный', priceRub: '' }),
+      ]);
       onCreated(result);
     } catch (error) {
       onError(error);
@@ -1129,43 +1127,36 @@ function EventRequestForm({
         </label>
         <label className="form-field">
           <span>Тип события</span>
-          <select value={form.kind} onChange={(event) => update('kind', event.target.value)}>
+          <select value="OPEN_DATE" disabled>
             <option value="OPEN_DATE">Открытая дата</option>
-            <option value="SINGLE">Разовое</option>
-            <option value="RECURRING">Повторяющееся</option>
           </select>
+          <small>Разовое и повторяющееся событие потребуют расписания слотов. Их форма появится следующим этапом.</small>
         </label>
         <label className="form-field">
           <span>Площадка</span>
-          <select value={form.venueId} onChange={(event) => update('venueId', event.target.value)}>
-            <option value="">Без площадки</option>
+          <select value={form.venueId} onChange={(event) => update('venueId', event.target.value)} required>
+            <option value="">Выберите площадку</option>
             {(profile?.venues || []).map((venue) => (
               <option key={venue.id} value={venue.id}>{venue.title}</option>
             ))}
           </select>
+          {!profile?.venues.length ? <small>Для первой заявки оператор должен связать площадку с вашей компанией.</small> : null}
         </label>
         <label className="form-field span-2">
           <span>Краткое описание</span>
           <input value={form.description} onChange={(event) => update('description', event.target.value)} placeholder="что увидит покупатель" />
         </label>
+        <AdmissionOffersEditor offers={offers} onChange={setOffers} disabled={busy} />
         <label className="form-field">
-          <span>Категория билета</span>
-          <input value={form.offerTitle} onChange={(event) => update('offerTitle', event.target.value)} required />
-        </label>
-        <label className="form-field">
-          <span>Цена, ₽</span>
-          <input type="number" min="0" value={form.priceRub} onChange={(event) => update('priceRub', event.target.value)} required />
-        </label>
-        <label className="form-field">
-          <span>Open date, дней</span>
-          <input type="number" min="1" value={form.validDays} onChange={(event) => update('validDays', event.target.value)} disabled={form.kind !== 'OPEN_DATE'} />
+          <span>Срок действия после покупки, дней</span>
+          <input type="number" min="1" value={form.validDays} onChange={(event) => update('validDays', event.target.value)} required />
         </label>
         <label className="form-field">
           <span>Комментарий</span>
           <input value={form.summary} onChange={(event) => update('summary', event.target.value)} placeholder="детали для модератора" />
         </label>
         <div className="form-actions span-2">
-          <button type="submit" className="primary-button" disabled={busy}>
+          <button type="submit" className="primary-button" disabled={busy || !form.venueId || !offers.some((offer) => offer.active)}>
             {busy ? 'Отправляем...' : 'Отправить заявку'}
           </button>
         </div>
