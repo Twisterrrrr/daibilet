@@ -24,6 +24,8 @@ All 750 px variants are 50-88 KB. The other candidates range from 104-166 KB at 
 
 The previous Lighthouse run identified the Event1360 hero as the mobile LCP element at viewport 412×823, DPR 1.75; it loaded a 1.526 MB JPEG. At that DPR the new source set should select a candidate around 750 px, but `currentSrc`, transferred bytes, and LCP must still be captured in a real browser after deploying to staging.
 
+An isolated Chrome probe of the same `<picture>`/`srcset` rule selected the 750 px file at a 375 px viewport and the 1280 px file at a 1280 px viewport. The probe's device scale factor remained 1 and it did not render the production PDP component, so it does not close the DPR 3 or after-change Lighthouse checks.
+
 ## Rebuild the static variants
 
 The source assets are from the supplier and are not checked into this repository. Regenerate the checked-in output with:
