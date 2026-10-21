@@ -211,7 +211,7 @@ export function BlogPostCard({
         </Link>
         <div className="relative z-10 mt-auto flex w-full max-w-3xl flex-col gap-3 p-6 sm:p-7 md:p-8">
           <TagChips tag={tag} city={post.city} citySlug={post.citySlug} citySlugs={post.citySlugs} articleType={post.articleType} />
-          <h2 className="break-words font-serif text-2xl font-semibold leading-[1.15] tracking-tight text-white md:text-3xl">
+          <h2 className="break-words font-sans text-2xl font-semibold leading-[1.15] tracking-tight text-white md:text-3xl">
             <Link href={articleHref} className="hover:text-white/90">
               {titleText}
             </Link>
