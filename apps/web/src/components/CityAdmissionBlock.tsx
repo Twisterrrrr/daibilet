@@ -22,7 +22,7 @@ export function CityAdmissionBlock({
 
   const priceLabel = formatAdmissionPriceFrom(admission.summary.priceFromRub);
   const headingClass = editorial
-    ? 'font-serif text-2xl font-semibold text-zinc-950 sm:text-3xl'
+    ? 'font-sans text-2xl font-semibold text-zinc-950 sm:text-3xl'
     : 'text-2xl font-bold text-slate-950';
 
   return (
