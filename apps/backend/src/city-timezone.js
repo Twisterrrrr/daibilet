@@ -27,7 +27,7 @@ const CITY_TIME_ZONE_OVERRIDES = {
   Омск: 'Asia/Omsk',
   Оренбург: 'Asia/Yekaterinburg',
   Пермь: 'Asia/Yekaterinburg',
-  'Петропавловск-Кamчatsky': 'Asia/Kamchatka',
+  'Петропавловск-Камчатский': 'Asia/Kamchatka',
   Самара: 'Europe/Samara',
   Тольятти: 'Europe/Samara',
   Сургут: 'Asia/Yekaterinburg',

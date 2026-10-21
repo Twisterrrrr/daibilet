@@ -38,6 +38,12 @@ export const JOBS = {
     passArgs: true,
     deferred: true,
   },
+  'organizer-inbox': {
+    id: 'organizer-inbox',
+    description: 'Fetch organizer emails (Timeweb IMAP) into the staging inbox folder',
+    scripts: ['scripts/ingest-organizer-emails.js'],
+    passArgs: true,
+  },
 };
 
 export const JOB_IDS = Object.keys(JOBS);

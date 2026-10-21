@@ -58,11 +58,14 @@ async function financeFetchJson(
   try {
     // ISR-compatible: do not use cache:'no-store' / revalidate:0 on SSG city hubs
     // (Next throws static-to-dynamic at runtime). Keep short timeout + soft empty.
+    // Next takes the MINIMUM revalidate across the page: 60 used to lower every
+    // city hub from 300 to 60 (live Cache-Control s-maxage=60). Align with the
+    // route TTL so `export const revalidate = 300` actually holds.
     const response = await fetch(url, {
       method: 'GET',
       headers: buildHeaders(env),
       signal: AbortSignal.timeout(FINANCE_PROJECTION_TIMEOUT_MS),
-      next: { revalidate: 60 },
+      next: { revalidate: 300 },
     });
     if (!response.ok) return null;
     return (await response.json()) as unknown;

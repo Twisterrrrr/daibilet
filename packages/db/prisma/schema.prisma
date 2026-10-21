@@ -1305,6 +1305,7 @@ model ExternalOrder {
   linkedAt             DateTime?
   purchasedAt          DateTime?
   archivedAt           DateTime?
+  ownerNotifiedAt      DateTime?
   updatedAt            DateTime  @updatedAt
 
   source         Source           @relation(fields: [sourceId], references: [id])

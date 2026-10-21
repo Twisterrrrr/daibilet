@@ -342,6 +342,7 @@ export function CatalogToolbar({
               disabled={disabled}
               onClick={() => setFiltersOpen(true)}
               alwaysShowLabel
+              className="max-md:hidden"
             />
           </div>
           <div className="catalog-events-mobile-filter-rows md:hidden">

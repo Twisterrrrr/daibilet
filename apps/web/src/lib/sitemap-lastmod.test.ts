@@ -23,9 +23,13 @@ import { freshnessMapFromRows, publicFreshnessSlug } from '@daibilet/backend/eve
 const WEB_ROOT = path.resolve(__dirname, '../..');
 const REPO_ROOT = path.resolve(WEB_ROOT, '../..');
 
-test('event and venue sitemaps have a bounded cache window', () => {
-  assert.equal(sitemapResponseHeaders('events')['Cache-Control'], 'public, s-maxage=120, stale-while-revalidate=600');
-  assert.equal(sitemapResponseHeaders('venues')['Cache-Control'], 'public, s-maxage=120, stale-while-revalidate=600');
+test('time-sensitive sitemaps cannot outlive an event or retain stale venue eligibility', () => {
+  // Bounded ISR cache (1h) - shorter than any event lifetime; freshness comes
+  // from hourly revalidation + IndexNow. no-store was removed on purpose: it
+  // disabled route-handler caching and rebuilt events.xml in 5-11s per hit,
+  // blowing the Googlebot ~30s fetch budget (crawler speed gate catches this).
+  assert.equal(sitemapResponseHeaders('events')['Cache-Control'], 'public, s-maxage=3600, stale-while-revalidate=86400');
+  assert.equal(sitemapResponseHeaders('venues')['Cache-Control'], 'public, s-maxage=3600, stale-while-revalidate=86400');
   assert.equal(sitemapResponseHeaders('blog')['Cache-Control'], 'public, s-maxage=3600, stale-while-revalidate=86400');
 });
 

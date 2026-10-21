@@ -22,7 +22,9 @@ async function probe(url: string, fetcher: typeof fetch): Promise<string> {
     // Do not follow unvalidated CDN redirects into private/internal hosts.
     // ISR pages may not perform no-store fetches during metadata rendering:
     // Next treats that as a static-to-dynamic transition and returns HTTP 500.
-    const response = await fetcher(url, { redirect: 'error', next: { revalidate: 900 }, signal: AbortSignal.timeout(2000) });
+    // Next takes the MINIMUM revalidate across the page: 900 used to lower
+    // /events/[slug] from 7200 to 900 (live Cache-Control s-maxage=900).
+    const response = await fetcher(url, { redirect: 'error', next: { revalidate: 7200 }, signal: AbortSignal.timeout(2000) });
     if (response.status !== 200 || !response.headers.get('content-type')?.startsWith('image/') || Number(response.headers.get('content-length')) > MAX_BYTES) {
       await response.body?.cancel();
       return DEFAULT_OG_IMAGE;

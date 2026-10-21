@@ -113,7 +113,16 @@ else
 fi
 
 mv "$WEB_NEXT_STAGE" "$WEB_NEXT_DIR"
+# Preserve the Next image optimizer cache across artifact swaps: cold AVIF/WebP
+# re-encodes cost 0.8-1.3 s per variant on the 4-CPU MSK box, so a full wipe made
+# every cover slow again after each release. Copy (not move) keeps rollback safe.
+IMAGE_CACHE_PREV="${WEB_NEXT_PREV}/cache/images"
 rm_rf_deploy "${WEB_NEXT_DIR}/cache" || true
+if [[ -d "$IMAGE_CACHE_PREV" ]]; then
+  mkdir -p "${WEB_NEXT_DIR}/cache"
+  cp -a "$IMAGE_CACHE_PREV" "${WEB_NEXT_DIR}/cache/images" 2>/dev/null || true
+  echo "Preserved Next image cache from previous build"
+fi
 echo "Swapped .next (BUILD_ID=$(cat "${WEB_NEXT_DIR}/BUILD_ID"))"
 
 # Soft-compat window: cached HTML (s-maxage / open tabs / SWR) still references

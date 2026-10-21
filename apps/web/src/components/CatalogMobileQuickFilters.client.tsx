@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  MapPin,
-  SlidersHorizontal,
-  Ticket,
-  Wallet,
-  X,
-} from 'lucide-react';
+import { MapPin, SlidersHorizontal, Ticket, Wallet, X } from 'lucide-react';
 import { useEffect, useId, useState } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -290,54 +284,65 @@ export function CatalogMobileQuickFilters({
         })}
       </div>
 
-      <div className="catalog-mobile-quick-chips">
-        <div className="flex items-center gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <button
-            type="button"
-            disabled={disabled}
-            onClick={onOpenAllFilters}
-            className={chipClass(activeCount > 0)}
-          >
-            <SlidersHorizontal className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
-            {activeCount > 0 ? `Фильтры (${activeCount})` : 'Все фильтры'}
-          </button>
-          <button
-            type="button"
-            disabled={disabled}
-            onClick={() => setSheet('price')}
-            className={chipClass(priceActive(filters))}
-          >
-            <Wallet className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
-            Цена
-          </button>
-          <button
-            type="button"
-            disabled={disabled}
-            onClick={() => setSheet('type')}
-            className={chipClass(typeActive(filters))}
-          >
-            <Ticket className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
-            Тип
-          </button>
-          <button
-            type="button"
-            disabled={disabled}
-            onClick={() => setSheet('location')}
-            className={chipClass(locationActive(filters))}
-          >
-            <MapPin className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
-            Локация
-          </button>
-          {resetCount > 0 ? (
+      {/* Mobile bottom dock: all-filters button + quick filter pictograms (price/type/location). */}
+      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40">
+        <div className="pointer-events-auto border-t border-slate-200/80 bg-white/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2.5 shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur-md supports-[backdrop-filter]:bg-white/90">
+          <div className="flex items-center gap-2">
             <button
               type="button"
               disabled={disabled}
-              onClick={resetQuick}
-              className="inline-btn shrink-0 text-xs font-semibold text-primary-700 hover:underline disabled:opacity-60"
+              onClick={onOpenAllFilters}
+              className={`inline-btn flex h-11 flex-1 items-center justify-center gap-2 rounded-full text-sm font-semibold transition disabled:opacity-60 ${
+                activeCount > 0 ? 'bg-primary text-white hover:bg-primary/90' : 'bg-[#1A1A1A] text-white hover:bg-slate-800'
+              }`}
             >
-              Сбросить
+              <SlidersHorizontal className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+              {activeCount > 0 ? `Фильтры (${activeCount})` : 'Фильтры'}
             </button>
-          ) : null}
+            <button
+              type="button"
+              disabled={disabled}
+              onClick={() => setSheet('price')}
+              aria-label="Фильтр по цене"
+              className={`inline-btn inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition disabled:opacity-60 ${
+                priceActive(filters) ? 'bg-primary/10 text-primary-700 ring-1 ring-primary/25' : 'bg-[#F5F5F7] text-graphite hover:bg-slate-200/70'
+              }`}
+            >
+              <Wallet className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+            </button>
+            <button
+              type="button"
+              disabled={disabled}
+              onClick={() => setSheet('type')}
+              aria-label="Фильтр по типу"
+              className={`inline-btn inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition disabled:opacity-60 ${
+                typeActive(filters) ? 'bg-primary/10 text-primary-700 ring-1 ring-primary/25' : 'bg-[#F5F5F7] text-graphite hover:bg-slate-200/70'
+              }`}
+            >
+              <Ticket className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+            </button>
+            <button
+              type="button"
+              disabled={disabled}
+              onClick={() => setSheet('location')}
+              aria-label="Фильтр по локации"
+              className={`inline-btn inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition disabled:opacity-60 ${
+                locationActive(filters) ? 'bg-primary/10 text-primary-700 ring-1 ring-primary/25' : 'bg-[#F5F5F7] text-graphite hover:bg-slate-200/70'
+              }`}
+            >
+              <MapPin className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+            </button>
+            {resetCount > 0 ? (
+              <button
+                type="button"
+                disabled={disabled}
+                onClick={resetQuick}
+                className="inline-btn shrink-0 text-xs font-semibold text-primary-700 hover:underline disabled:opacity-60"
+              >
+                Сбросить
+              </button>
+            ) : null}
+          </div>
         </div>
       </div>
 

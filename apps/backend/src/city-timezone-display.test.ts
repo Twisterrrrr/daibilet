@@ -32,6 +32,13 @@ test('promoted non-capitals keep oblast TZ after leaving cityToRegion', () => {
   assert.equal(resolveCityTimeZone('Сортавала'), 'Europe/Moscow');
 });
 
+test('Петропавловск-Камчатский uses Asia/Kamchatka, not the MSK default', () => {
+  assert.equal(resolveCityTimeZone('Петропавловск-Камчатский'), 'Asia/Kamchatka');
+  const startsAt = '2026-10-17T22:00:00.000Z';
+  assert.equal(formatTime(startsAt, resolveCityTimeZone('Петропавловск-Камчатский')), '10:00');
+  assert.equal(formatTime(startsAt, 'Europe/Moscow'), '01:00');
+});
+
 test('Moscow stays Europe/Moscow', () => {
   assert.equal(resolveCityTimeZone('Москва'), 'Europe/Moscow');
   assert.equal(formatTime('2026-08-02T13:00:00.000Z', resolveCityTimeZone('Москва')), '16:00');

@@ -20,7 +20,7 @@ import { hasSeoListingEditorial } from '@/data/seo-listing-texts';
 import { isEventsCatalogSitemapEligibleUrl } from '@/lib/events-catalog-indexing';
 import { evaluateListingIndexability, MIN_LISTING_OFFERS_FOR_INDEX } from '@/lib/seo-listing-meta';
 import { buildPodborkiCityCanonicalPath, isPodborkiSeoPilotCitySlug, PODBORKI_SEO_PILOT_CITY_SLUGS } from '@/lib/podborki-city-seo';
-import { venueCanonicalPath } from '@/lib/routes';
+import { venueCanonicalPath, cityHref, citySlug } from '@/lib/routes';
 import { cityPlacesCatalogHref } from '@/lib/catalog-url';
 import { getCachedCatalog } from '@/server/cached-catalog-data';
 import { getCachedDestinations } from '@/server/cached-public-surfaces';
@@ -302,9 +302,9 @@ export async function buildCitiesSitemapEntries(now = new Date()): Promise<Sitem
       return false;
     })
     .flatMap((destination) => [
-      entry(`/cities/${encodeURIComponent(String(destination.slug))}`, now, 'daily', destination.type === 'region' ? 0.7 : 0.75),
+      entry(cityHref(destination), now, 'daily', destination.type === 'region' ? 0.7 : 0.75),
       ...(destination.type === 'city' && destination.venues > 0
-        ? [entry(cityPlacesCatalogHref(String(destination.slug)), now, 'daily', 0.65)]
+        ? [entry(cityPlacesCatalogHref(citySlug(destination)), now, 'daily', 0.65)]
         : []),
     ]);
 }
@@ -566,18 +566,12 @@ export const SITEMAP_RESPONSE_HEADERS = {
 export function sitemapResponseHeaders(chunk: string): Record<string, string> {
   return {
     ...SITEMAP_RESPONSE_HEADERS,
-    // events/venues: bounded freshness window instead of `no-store`.
-    //
-    // `no-store` (ef8d3383, 2026-10-08) was added so nginx never caches a
-    // degraded sitemap (empty venue list during a backend outage) for its
-    // 30-min proxy-cache window. The cost: every crawler hit re-entered the
-    // Next process and re-rendered a 45k-entry / 10k-venue XML on the event
-    // loop, amplifying the SSR-hang class (INC.504.15, RCA 2026-10-21).
-    // A 2-min s-maxage bounds degraded-output exposure to at most 2 minutes
-    // (vs 30 min that motivated no-store) while keeping crawler pressure off
-    // the render path; SWR serves the old XML during a rebuild.
-    ...(chunk === 'events' || chunk === 'venues'
-      ? { 'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=600' }
-      : {}),
+    // All chunks share the 1h ISR window: 037dc7994 dropped the `no-store`
+    // override (ISR cache verified working; sitemap-lastmod.test asserts the
+    // policy as intentional). The 2026-10-21 SSR-hang RCA proposed a 120s
+    // window for events/venues; the shared default supersedes it - fewer
+    // rebuilds, less event-loop pressure. The rebuild cost itself is fixed
+    // separately: venues/blog/freshness now come over loopback HTTP instead
+    // of direct DB reads in the web process.
   };
 }

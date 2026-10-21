@@ -105,5 +105,30 @@ if [[ "${FULL_LANDING_AUDIT:-0}" == "1" ]]; then
   for path in "${landing_paths[@]}"; do audit_landing_links "$path"; done
 fi
 
+# Sitemap cache-speed gate: the first hit may regenerate (slow build is fine);
+# the SECOND hit must come from ISR cache in <5s. Catches force-dynamic/no-store
+# regressions that push venues.xml past the Googlebot ~30s fetch budget.
+check_sitemap_cache_speed() {
+  local path="$1"
+  local url="${BASE_URL}${path}"
+  local t1 t2
+  t1="$(curl -sS --max-time 60 -o /dev/null -w '%{time_total}' "$url" 2>/dev/null)" || t1=999
+  # Give the first (possibly cold) generation time to settle into the ISR cache
+  # before measuring the cached response - two back-to-back hits can both be
+  # waiting on the same in-flight generation and look slow.
+  sleep 3
+  t2="$(curl -sS --max-time 60 -o /dev/null -w '%{time_total}' "$url" 2>/dev/null)" || t2=999
+  echo "INFO: $path timing first=${t1}s second=${t2}s"
+  if awk -v t="$t2" 'BEGIN { exit !(t > 5) }'; then
+    echo "ERROR: $path cached response took ${t2}s (>5s) - sitemap ISR cache not working" >&2
+    return 1
+  fi
+  echo "OK: $path cached response ${t2}s (<5s)"
+}
+
+for chunk in static events cities venues landings blog; do
+  check_sitemap_cache_speed "/sitemaps/${chunk}.xml"
+done
+
 node scripts/smoke-indexability-prod.mjs
 echo 'Crawler, landing-link, and indexability smoke passed.'

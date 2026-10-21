@@ -17,11 +17,8 @@ export type NarrativeInput = {
   subcategory?: string | null;
   kind?: string | null;
   ageLimit?: string | null;
-  futureSessions?: number | null;
   /** Venue name - extra signal for kind detection. */
   venue?: string | null;
-  /** Next session start - used for the "day/time" modifier. */
-  nextSession?: string | Date | null;
 };
 
 export type NarrativeKind =
@@ -488,25 +485,6 @@ const DAY_MODIFIERS: Record<string, string[]> = {
   ],
 };
 
-function dayTimeModifier(nextSession: string | Date | null | undefined, variant: number): string | null {
-  if (!nextSession) return null;
-  const date = nextSession instanceof Date ? nextSession : new Date(nextSession);
-  if (Number.isNaN(date.getTime())) return null;
-  const parts = new Intl.DateTimeFormat('ru-RU', {
-    timeZone: 'Europe/Moscow',
-    weekday: 'short',
-    hour: '2-digit',
-    hour12: false,
-  }).formatToParts(date);
-  const weekday = (parts.find((p) => p.type === 'weekday')?.value || '').toLowerCase();
-  const hour = Number(parts.find((p) => p.type === 'hour')?.value || '0');
-  const isWeekend = weekday.startsWith('сб') || weekday.startsWith('вс');
-  const slot = hour < 12 ? 'Morning' : hour < 17 ? 'Day' : 'Evening';
-  const pool = DAY_MODIFIERS[`${isWeekend ? 'weekend' : 'weekday'}${slot}`];
-  if (!pool || !pool.length) return null;
-  return pool[Math.abs(Math.trunc(variant)) % pool.length];
-}
-
 export function buildNarrativeParagraphs(input: NarrativeInput, variant = 0): string[] {
   const kind = detectNarrativeKind(input);
   const copy = COPY[kind] || COPY.generic;
@@ -524,9 +502,9 @@ export function buildNarrativeParagraphs(input: NarrativeInput, variant = 0): st
   const opening = openings[mix32(v + 0x9e3779b9) % openings.length];
   const details = detailsPool[mix32(v + 0x85ebca6b) % detailsPool.length];
   const audience = audiences[mix32(v + 0xc2b2ae35) % audiences.length];
-  const modifier = dayTimeModifier(input.nextSession, v);
-  const second = modifier ? `${details} ${audience} ${modifier}` : `${details} ${audience}`;
-  return [`${opening} ${second}`];
+  // No nearest-session modifier: the schedule lives in the purchase block and a
+  // derived weekday/time-of-day goes stale (and used the wrong timezone).
+  return [`${opening} ${details} ${audience}`];
 }
 
 /** True when the copy already carries a generated narrative paragraph (idempotency guard). */
