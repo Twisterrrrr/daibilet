@@ -63,6 +63,7 @@ export async function buildLandingMetadata(pathname: string): Promise<Metadata> 
   const seoCitySlug =
     route.citySlug || resolveLandingBoundCitySlug(slug) || null;
   const payload = await fetchLandingPageDto(slug, route.citySlug, { revalidateSeconds: 3600 });
+  if (!payload?.landing) notFound();
 
   const finalized = finalizeLandingPayload(payload, slug, route.citySlug);
   const landing = finalized.landing;
