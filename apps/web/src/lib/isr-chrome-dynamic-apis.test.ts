@@ -44,6 +44,12 @@ test('event PDP page uses loadEventDto + safeNotFound, not getCached + notFound 
   );
 });
 
+test('event not-found suggestions use ISR-safe cached fetches', () => {
+  const source = fs.readFileSync(path.join(WEB_ROOT, 'app/events/[slug]/not-found.tsx'), 'utf8');
+  assert.match(source, /revalidateSeconds:\s*EVENT_PAGE_REVALIDATE/);
+  assert.equal(source.includes("export const dynamic = 'force-dynamic'"), false);
+});
+
 /**
  * New ISR pages must not call redirect()/permanentRedirect().
  * NEXT_REDIRECT during static gen becomes HTTP 500 (Pianissimo 2026-09-03).

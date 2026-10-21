@@ -7,9 +7,7 @@ import { fetchPublicApiJson } from '@/server/public-api-client';
 import type { PublicCatalogListItemDto } from '@daibilet/contracts/public';
 import { resolveSimilarEvents } from '@/lib/event-not-found-similar';
 import { pageTitle } from '@/lib/seo-meta';
-
-/** Not-found page is always dynamic: event slugs are not preknown at build time. */
-export const dynamic = 'force-dynamic';
+import { EVENT_PAGE_REVALIDATE } from '@/server/cache-config';
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -29,6 +27,7 @@ async function loadSimilarEvents(): Promise<PublicCatalogListItemDto[]> {
       {
         searchParams: { limit: '6' },
         notFoundAsNull: true,
+        revalidateSeconds: EVENT_PAGE_REVALIDATE,
       },
     );
     return resolveSimilarEvents(payload);
