@@ -39,7 +39,7 @@ The finance contour is not a UI mock. The database already contains separate sup
 It is nevertheless too early to call the supplier portal production-complete:
 
 - the main admin lives on catalog `.184`, while finance admin actions live in the finance branch; the operator path must be bridged or exposed as an explicitly protected finance-admin surface;
-- event creation requests can be submitted, but admin apply for `CREATE Event` returns `501`;
+- event creation requests can be submitted; `CREATE Event` apply now creates an unpublished review event in the development branch and needs release/browser verification;
 - the public order lookup exposes buyer contacts and ticket numbers using only a seven-digit `publicCode`; this requires hardening before real customer data;
 - a completed embedded YooKassa sandbox browser payment remains unverified end to end.
 
@@ -58,8 +58,8 @@ First real internal payment readiness: **red until order lookup security, paid s
 | Dashboard | supplier portal DTO | Orders, sales, reviews, readiness, next operational steps | REAL | G1: live data/empty/error/mobile smoke |
 | Readiness | listing health + legal/profile state | Actionable blockers and links to the relevant section | REAL | G1: verify `canSell` changes after legal approval and product correction |
 | Events list | `SupplierEvent`, `Event`, sessions/offers | Read supplier events, schedule summary, price and issues | READ_ONLY | G1 only if pilot supplier sells events; 20-row server pagination implemented |
-| Event request | `EventChangeRequest` | Supplier can submit a basic new open-date event request | PARTIAL | G1 for event pilot: admin cannot apply CREATE; no full slot editor; no edit-existing form |
-| Event moderation | admin request API and applier | Approve/reject/apply updates, schedule, offers, content/SEO subsets | PARTIAL | G1: CREATE unsupported; gallery/content blocks unsupported; recurrence must be materialized as sessions |
+| Event request | `EventChangeRequest` | Supplier can submit a basic new open-date event request; admin CREATE apply is implemented in the development branch | PARTIAL / UNVERIFIED_LIVE | G1 for event pilot: release and browser smoke; no full slot editor; no edit-existing form |
+| Event moderation | admin request API and applier | Approve/reject/apply updates, schedule, offers, content/SEO subsets; CREATE produces REVIEW event | PARTIAL / UNVERIFIED_LIVE | G1: test admin and supplier screens together; gallery/content blocks unsupported; recurrence must be materialized as sessions |
 | Admissions list | `AdmissionProduct`, `AdmissionOffer` | Real list, validity, offers, price and listing health | REAL | G1: pagination and role-aware create action implemented; search/detail UX remains |
 | Admission request | `EventChangeRequest` with `ADMISSION_PRODUCT` payload | Supplier creates a museum/gallery/open-date product proposal | REAL narrow path | G1: edit-existing UX, multiple offers, richer validity/image/description fields |
 | Admission moderation | admin request API and applier | Approve/reject/apply CREATE and UPDATE, replace offers | REAL | G1: smoke from supplier form through admin apply to public projection |
@@ -145,7 +145,7 @@ First real internal payment readiness: **red until order lookup security, paid s
 |---|---|---|---|
 | EVT-01 | Supplier event list | Only linked events, correct schedule/price/readiness | G1 for event suppliers |
 | EVT-02 | Submit open-date event request | Request is created, but UI clearly labels it a draft proposal | G1 |
-| EVT-03 | Admin applies new event request | Event, supplier link, offers and schedule are created atomically | G1; currently unsupported |
+| EVT-03 | Admin applies new event request | REVIEW event, supplier link, offers and schedule are created atomically; repeated apply creates no duplicate | G1; local DB test passed, release/browser smoke pending |
 | EVT-04 | Submit concrete slots | Timezone, capacity and end time preserved; max 100 validated | G1 |
 | EVT-05 | Update existing schedule | Stale base snapshot is rejected; active reservations protected | G1 |
 | EVT-06 | Imported SOURCE_MANAGED event update | Supplier cannot overwrite source schedule/offers without capability | G0 |

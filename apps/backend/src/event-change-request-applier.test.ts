@@ -10,6 +10,46 @@ import {
 
 const eventUpdatedAt = new Date('2026-08-01T12:00:00.000Z');
 
+test('applies a supplier CREATE request as an unpublished event and links it to the supplier', async () => {
+  const { client, calls } = createMockClient({
+    id: 'cr_new_event_123',
+    eventId: null,
+    supplierId: 'sup_1',
+    type: 'CREATE',
+    status: 'APPROVED',
+    createdBySiteUserId: 'user_1',
+    event: null,
+    payload: {
+      subject: 'EVENT',
+      event: { title: 'Музейный вечер', kind: 'OPEN_DATE', venueId: 'venue_1' },
+      content: { title: 'Музейный вечер', shortDescription: 'Входной билет' },
+      schedule: { mode: 'OPEN_DATE', openDate: { validDays: 30 } },
+      offers: [{ title: 'Взрослый', priceRub: 350 }],
+    },
+  });
+  const result = await applyApprovedEventChangeRequest({ requestId: 'cr_new_event_123' }, client);
+  assert.equal(result.eventId, 'evt_created');
+  assert.equal(result.status, 'APPLIED');
+  assert.equal(calls.eventCreates[0]?.data.status, 'REVIEW');
+  assert.equal(calls.eventCreates[0]?.data.purchaseFlow, 'PLATFORM');
+  assert.equal(calls.supplierEventCreates[0]?.data.supplierId, 'sup_1');
+  assert.equal(calls.offerCreates.length, 1);
+  assert.equal(calls.requestUpdates[0]?.data.eventId, 'evt_created');
+  assert.equal(calls.logs[0]?.data.action, 'CREATED');
+});
+
+test('reapplying an already-created event request does not create another event', async () => {
+  const { client, calls } = createMockClient({
+    id: 'cr_new_event_123', eventId: 'evt_created', supplierId: 'sup_1',
+    type: 'CREATE', status: 'APPLIED', appliedAt: eventUpdatedAt,
+    payload: null, event: { id: 'evt_created', updatedAt: eventUpdatedAt, managementMode: 'SUPPLIER_DRAFTS', scheduleLocked: false },
+  });
+  const result = await applyApprovedEventChangeRequest({ requestId: 'cr_new_event_123' }, client);
+  assert.equal(result.eventId, 'evt_created');
+  assert.equal(calls.eventCreates.length, 0);
+  assert.equal(calls.logs.length, 0);
+});
+
 test('applies content changes into event override and audit log', async () => {
   const { client, calls } = createMockClient({
     id: 'cr_1',
@@ -18,6 +58,7 @@ test('applies content changes into event override and audit log', async () => {
     type: 'CONTENT_UPDATE',
     status: 'APPROVED',
     payload: {
+      subject: 'EVENT',
       baseSnapshot: { eventUpdatedAt: eventUpdatedAt.toISOString() },
       title: 'Updated title',
       shortDescription: 'Short text',
@@ -248,6 +289,8 @@ function createMockClient(request: EventChangeRequestRecord): {
   calls: MockCalls;
 } {
   const calls: MockCalls = {
+    eventCreates: [],
+    supplierEventCreates: [],
     eventUpdates: [],
     eventOverrideUpserts: [],
     sessionDeletes: [],
@@ -273,8 +316,18 @@ function createMockClient(request: EventChangeRequestRecord): {
       },
     },
     event: {
+      async create(args: unknown) {
+        calls.eventCreates.push(args as MockCall);
+        return { id: 'evt_created' };
+      },
       async update(args: unknown) {
         calls.eventUpdates.push(args as MockCall);
+        return {};
+      },
+    },
+    supplierEvent: {
+      async create(args: unknown) {
+        calls.supplierEventCreates.push(args as MockCall);
         return {};
       },
     },
@@ -356,6 +409,8 @@ function createMockClient(request: EventChangeRequestRecord): {
 }
 
 interface MockCalls {
+  eventCreates: MockCall[];
+  supplierEventCreates: MockCall[];
   eventUpdates: MockCall[];
   eventOverrideUpserts: MockCall[];
   sessionDeletes: MockCall[];

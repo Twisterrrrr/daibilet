@@ -52,7 +52,11 @@ export interface EventChangeRequestTransaction {
     update(args: unknown): Promise<unknown>;
   };
   event: {
+    create(args: unknown): Promise<{ id: string }>;
     update(args: unknown): Promise<unknown>;
+  };
+  supplierEvent: {
+    create(args: unknown): Promise<unknown>;
   };
   eventOverride: {
     upsert(args: unknown): Promise<unknown>;
@@ -93,6 +97,7 @@ export interface EventChangeRequestRecord {
   status: EventChangeRequestStatus;
   payload: unknown;
   createdBySiteUserId?: string | null;
+  appliedAt?: Date | string | null;
   event: EventChangeRequestEventRecord | null;
 }
 
@@ -124,6 +129,23 @@ export async function applyApprovedEventChangeRequest(
       return applyAdmissionProductChangeRequest(tx, request, input);
     }
 
+    if (request.type === 'CREATE' && request.status === 'APPLIED' && request.eventId) {
+      return {
+        requestId: request.id,
+        eventId: request.eventId,
+        status: 'APPLIED',
+        appliedAt: new Date(request.appliedAt || Date.now()).toISOString(),
+        logAction: 'CREATED',
+      };
+    }
+
+    if (request.type === 'CREATE' && !request.eventId) {
+      return applyCreateEventChangeRequest(tx, request, input);
+    }
+    if (request.type === 'CREATE') {
+      throw new EventChangeRequestApplyError('EVENT_CREATE_ALREADY_LINKED', 'Creation request is already linked to an event.', 409);
+    }
+
     if (!request.eventId || !request.event) {
       throw new EventChangeRequestApplyError(
         'EVENT_CHANGE_REQUEST_EVENT_REQUIRED',
@@ -149,7 +171,7 @@ export async function applyApprovedEventChangeRequest(
     }
     const { transition } = transitionResult;
 
-    const payload = assertEventChangeRequestPayload(request.type, request.payload, { mode: 'apply' });
+    const payload = assertEventChangeRequestPayload(request.type, eventPayloadWithoutSubject(request.payload), { mode: 'apply' });
     assertFreshBaseSnapshot(payload, request.event.updatedAt);
 
     await applyPayload(tx, request.eventId, request.type, payload);
@@ -188,6 +210,110 @@ export async function applyApprovedEventChangeRequest(
       logAction,
     };
   });
+}
+
+async function applyCreateEventChangeRequest(
+  tx: EventChangeRequestTransaction,
+  request: EventChangeRequestRecord,
+  input: ApplyEventChangeRequestInput,
+): Promise<ApplyEventChangeRequestResult> {
+  if (!request.supplierId) {
+    throw new EventChangeRequestApplyError('EVENT_SUPPLIER_REQUIRED', 'New supplier event must have a supplier.', 409);
+  }
+  const transition = validateEventChangeRequestTransition({
+    currentStatus: request.status,
+    action: 'apply',
+    actorType: 'SYSTEM',
+    requestType: 'CREATE',
+    managementMode: 'SUPPLIER_DRAFTS',
+    scheduleLocked: false,
+  });
+  if (!transition.ok) {
+    throw new EventChangeRequestApplyError(transition.code, transition.message, 409);
+  }
+  const payload = assertEventChangeRequestPayload('CREATE', eventPayloadWithoutSubject(request.payload), { mode: 'apply' }) as CreateEventPayload;
+  const venueId = payload.event.venueId || null;
+  let venueCityId: string | null = null;
+  if (venueId) {
+    await assertSupplierVenueAccess(tx, request.supplierId, venueId);
+    const venue = await tx.venue.findUnique({ where: { id: venueId }, select: { id: true, cityId: true } });
+    if (!venue) throw new EventChangeRequestApplyError('EVENT_VENUE_NOT_FOUND', 'Event venue was not found.', 404);
+    venueCityId = venue.cityId;
+    if (venueCityId && payload.event.primaryCityId && payload.event.primaryCityId !== venueCityId) {
+      throw new EventChangeRequestApplyError('EVENT_CITY_VENUE_MISMATCH', 'Event city does not match its venue.', 422);
+    }
+  }
+
+  const appliedAt = new Date();
+  const created = await tx.event.create({
+    data: {
+      title: payload.event.title,
+      slug: `${slugify(payload.event.title).slice(0, 80) || 'event'}-${slugify(request.id).replace(/-/g, '')}`,
+      description: payload.event.description ?? null,
+      kind: payload.event.kind,
+      status: 'REVIEW',
+      purchaseFlow: 'PLATFORM',
+      managementMode: 'SUPPLIER_DRAFTS',
+      ageLimit: payload.event.ageLimit ?? null,
+      imageUrl: payload.media?.imageUrl ?? null,
+      primaryCityId: payload.event.primaryCityId || venueCityId,
+      venueId,
+      categoryId: payload.event.categoryId || null,
+      primarySubcategoryId: payload.event.primarySubcategoryId || null,
+      supplierId: request.supplierId,
+      createdByType: 'SUPPLIER',
+      createdBySiteUserId: request.createdBySiteUserId ?? null,
+      moderatedBySiteUserId: input.actorSiteUserId ?? null,
+      moderatedAt: appliedAt,
+      scheduleLocked: false,
+    },
+  });
+  await tx.supplierEvent.create({
+    data: {
+      supplierId: request.supplierId,
+      eventId: created.id,
+      catalogMode: 'INTERNAL_CHECKOUT',
+      managementMode: 'SUPPLIER_DRAFTS',
+      canEditContent: true,
+      canEditMedia: true,
+      canEditSeo: true,
+      canEditSchedule: true,
+      canEditOffers: true,
+      isPrimary: true,
+    },
+  });
+  if (payload.content) await applyContentUpdate(tx, created.id, payload.content);
+  if (payload.media) await applyMediaUpdate(tx, created.id, payload.media);
+  if (payload.seo) await applySeoUpdate(tx, created.id, payload.seo);
+  if (payload.schedule) await applyScheduleUpdate(tx, created.id, payload.schedule);
+  if (payload.offers?.length) await applyOfferUpdate(tx, created.id, { mode: 'REPLACE_ALL', offers: payload.offers });
+
+  await tx.eventChangeRequest.update({
+    where: { id: request.id },
+    data: { eventId: created.id, status: transition.transition.to, appliedAt },
+  });
+  await tx.eventChangeLog.create({
+    data: {
+      eventId: created.id,
+      supplierId: request.supplierId,
+      actorType: 'SYSTEM' satisfies EventActorType,
+      actorSiteUserId: input.actorSiteUserId ?? null,
+      action: 'CREATED',
+      diff: { requestId: request.id, requestType: 'CREATE' },
+      metaJson: { source: 'event-change-request-applier' },
+    },
+  });
+  return { requestId: request.id, eventId: created.id, status: 'APPLIED', appliedAt: appliedAt.toISOString(), logAction: 'CREATED' };
+}
+
+function eventPayloadWithoutSubject(payload: unknown): unknown {
+  const record = asRecord(payload);
+  if (!record || !('subject' in record)) return payload;
+  if (record.subject !== 'EVENT') {
+    throw new EventChangeRequestApplyError('EVENT_SUBJECT_INVALID', 'Unexpected change request subject.', 422);
+  }
+  const { subject: _subject, ...eventPayload } = record;
+  return eventPayload;
 }
 
 async function applyAdmissionProductChangeRequest(
@@ -866,6 +992,24 @@ function parseOptionalDate(value: unknown): Date | null {
 
 type BasePayload = {
   baseSnapshot?: { eventUpdatedAt?: string };
+};
+
+type CreateEventPayload = {
+  event: {
+    title: string;
+    kind: EventKind;
+    description?: string | null;
+    ageLimit?: string | null;
+    primaryCityId?: string;
+    venueId?: string | null;
+    categoryId?: string;
+    primarySubcategoryId?: string;
+  };
+  content?: ContentUpdatePayload;
+  media?: MediaUpdatePayload;
+  seo?: SeoUpdatePayload;
+  schedule?: ScheduleUpdatePayload;
+  offers?: OfferUpdatePayload['offers'];
 };
 
 type AdmissionProductChangeRequestPayload = {
