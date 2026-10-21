@@ -62,10 +62,8 @@ export async function buildLandingMetadata(pathname: string): Promise<Metadata> 
   const slug = canonicalLandingSlug(route.landingSlug);
   const seoCitySlug =
     route.citySlug || resolveLandingBoundCitySlug(slug) || null;
-  const payload = await fetchLandingPageDto(slug, route.citySlug);
-  if (!payload?.landing) notFound();
+  const payload = await fetchLandingPageDto(slug, route.citySlug, { revalidateSeconds: 3600 });
 
-  // Genre/tag live only on client (?genre=) so generateMetadata stays ISR-safe.
   const finalized = finalizeLandingPayload(payload, slug, route.citySlug);
   const landing = finalized.landing;
   const canonical = landingCategoryHref(slug, route.citySlug);
@@ -172,10 +170,9 @@ export async function LandingRoutePage({ pathname }: { pathname: string }) {
   const slug = canonicalLandingSlug(route.landingSlug);
   const seoCitySlug =
     route.citySlug || resolveLandingBoundCitySlug(slug) || null;
-  const payload = await fetchLandingPageDto(slug, route.citySlug);
+  const payload = await fetchLandingPageDto(slug, route.citySlug, { revalidateSeconds: 3600 });
   if (!payload?.landing) notFound();
 
-  // No searchParams on server: keeps revalidate/ISR (s-maxage). Genre from URL on client.
   const finalized = finalizeLandingPayload(payload, slug, route.citySlug);
   const canonical = landingCategoryHref(slug, route.citySlug);
   const offerCount = finalized.stats?.events ?? finalized.sessions?.length ?? 0;

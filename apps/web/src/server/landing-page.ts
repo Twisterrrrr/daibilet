@@ -32,6 +32,7 @@ function filterSessionsByLandingEventWindow(
 export async function fetchLandingPageDto(
   slug: string,
   citySlug?: string | null,
+  options: { revalidateSeconds?: number } = {},
 ): Promise<PublicLandingPageDto | null> {
   for (const candidate of landingFetchCandidates(slug)) {
     try {
@@ -41,6 +42,7 @@ export async function fetchLandingPageDto(
           searchParams: citySlug ? { city: citySlug } : null,
           timeoutMs: 5_000,
           notFoundAsNull: true,
+          revalidateSeconds: options.revalidateSeconds,
         },
       );
       if (!payload?.landing) continue;
