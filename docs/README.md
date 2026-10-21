@@ -9,6 +9,7 @@
 [Доступ сотрудников к админке: аудит legacy и проект RBAC](./admin-rbac-design-2026-10.md)
 [Нагрузка CPU на MSK - 15.10.2026](./cpu-load-msk.md)
 [Зависание SSR и ответы 502 роботам - 16.10.2026](./ssr-hang-crawler-2026-10-16.md)
+[Teplohod: baseline Sharp и Next Image Optimizer - 21.10.2026](./teplohod-image-optimization-experiment-2026-10-21.md)
 [Teplohod PDP: выборочные статические WebP обложки - 21.10.2026](./teplohod-pdp-webp-pilot-2026-10-21.md)
 
 Навигация по репозиторию `Twisterrrrr/daibilet`.
