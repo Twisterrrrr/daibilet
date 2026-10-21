@@ -13,6 +13,9 @@ export function createPublicEventRouteHandler(
 ): TypedRouteHandler {
   return async (context: RouteContext) => {
     if (!deps.enabled || context.method !== 'GET') return false;
+    // This collection endpoint is handled by the legacy router. Do not parse
+    // "freshness" as an event slug and turn the sitemap data request into 404.
+    if (context.pathname === '/api/public/events/freshness') return false;
     const match = matchPath(context.pathname, /^\/api\/public\/events\/([^/]+)$/);
     if (!match?.[0]) return false;
     const payload = await deps.buildPublicEvent(match[0], context.searchParams.get('refresh') === '1');
