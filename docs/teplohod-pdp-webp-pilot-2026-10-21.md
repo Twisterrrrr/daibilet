@@ -53,12 +53,12 @@ No web service restart is required for this nginx-served static path. New reques
 
 1. Run the new mapping unit test and the web CI test allowlist; confirm all 20 WebP files exist and their dimensions are correct.
 2. Build the web package so `sync-public-assets` copies the pilot files to `apps/web/public/images/events/teplohod-pdp/`.
-3. Before the first production swap (2026-10-21), the pilot HTML integration had no staging-browser verification. The production swap installed the WebP mapping and static files, but the workflow's Googlebot smoke then exposed a separate ISR 500 on expired event slugs. The web build was rolled back; see [event-not-found-ssr-regression-2026-10-21.md](./event-not-found-ssr-regression-2026-10-21.md). The static derivative files remain served from `/images/`, but current rendered pages use the previous build until a follow-up deployment passes smoke.
-4. On the next deployment, for all five routes, check HTML has the expected `<picture>`, responsive `srcset`, 200 asset response, `Content-Type: image/webp`, and current cache headers.
+3. The first production swap on 2026-10-21 exposed a separate ISR 500 on expired event slugs in the Googlebot smoke and was rolled back. PR #42 fixed the not-found fallback and deployed build `8baf2e6`; its smoke passed. See [event-not-found-ssr-regression-2026-10-21.md](./event-not-found-ssr-regression-2026-10-21.md).
+4. Post-deploy checks on 2026-10-21: all five PDP URLs returned 200; sample derivative URLs returned 200 with `Content-Type: image/webp` and `Cache-Control: public, max-age=2592000`; Event1360 HTML advertised the static WebP image. The WebP pilot is active in production.
 5. In mobile Chrome, capture `currentSrc`, natural dimensions, actual transferred bytes, viewport, DPR, and LCP node for 2-3 cold-cache runs before and after. Repeat for desktop. Event1360 is the primary comparison because its hero was previously measured as the LCP element.
-6. Compare LCP, FCP, TBT, and page bytes. Do not report the 18-25× image-byte reduction as an LCP percentage improvement.
+6. Compare LCP, FCP, TBT, and page bytes. Do not report the 18-25× image-byte reduction as an LCP percentage improvement. No post-deploy Lighthouse/WebPageTest or RUM comparison has been collected yet.
 7. Run a concurrent burst of image requests on staging or another controlled environment with warmed and empty caches. Observe CPU, RSS/cgroup memory, healthcheck, PDP TTFB, and 5xx; then verify that cache hits do not invoke Sharp again.
-8. Observe SSR health, TTFB, and 5xx after any later production release.
+8. Observe SSR health, TTFB, and 5xx after this production release.
 
 ## Cline handoff
 
@@ -68,4 +68,4 @@ No web service restart is required for this nginx-served static path. New reques
 - Regression test: `apps/web/src/lib/teplohod-pdp-image-map.test.ts`.
 - Do not add other Teplohod sources to the allowlist without storing their original URL/checksum, generating real-source WebP derivatives, and measuring the page.
 - Keep `next.config.ts` global image formats unchanged. The pilot deliberately bypasses on-demand AVIF/Sharp for these known assets.
-- No post-change browser/Lighthouse or live cgroup test has yet been run. The failed production attempt and rollback are recorded above; re-deploy only after smoke passes.
+- The production browser check confirmed the selected rails appear in the requested order and vertical scrolling continues over both event rails. No post-change Lighthouse/WebPageTest/RUM or live cgroup load test has yet been run.

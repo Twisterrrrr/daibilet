@@ -17,13 +17,15 @@ reason: revalidate: 0 fetch http://127.0.0.1:4000/api/public/events?limit=6
 
 - The deploy's atomic swap retained `apps/web/.next.prev`. The previous `.next` build was restored using the production incident runbook.
 - After rollback: `/`, `/api/health`, and a live event PDP returned 200; web and API services were active.
-- The static WebP files remain available from `/images/`; the page integration was rolled back with `.next`, so the image pilot is not currently active in rendered PDPs.
+- The first rollback restored the old `.next`, while the versioned static WebP derivatives remained available under `/images/`.
 - The follow-up fix sets `revalidateSeconds: EVENT_PAGE_REVALIDATE` on the similar-events fetch. The 404 fallback now uses a cacheable API request that is compatible with the parent ISR route.
 - Regression coverage verifies that this fallback no longer opts into `force-dynamic` or a bare no-store fetch.
+- Build `8baf2e686b5fecf3a77ad33afba5aac88a64b930` was deployed after the fix; the deploy workflow completed successfully, including Googlebot public smoke.
+- Post-deploy: unknown event slug with Googlebot returned 404; homepage, API health, and all five Teplohod PDPs returned 200. Sample WebP derivatives returned 200 with `Content-Type: image/webp` and a 30-day cache header. Web and API services were active, with no web error-level journal entries during the 10-minute post-deploy check.
 
 ## Release gate
 
-Before the follow-up build is deployed, confirm the pipeline's production smoke test returns the intended non-500 result for an unknown/expired event slug. Then check an active event PDP, homepage, API health, and one Teplohod WebP PDP. Do not interpret this incident as an image-transform or WebP failure: the exception came from the event not-found fallback.
+For future deploys, keep the pipeline smoke check for an unknown/expired event slug and verify an active event PDP, homepage, API health, and one Teplohod WebP PDP. Do not interpret this incident as an image-transform or WebP failure: the exception came from the event not-found fallback.
 
 ## Cline handoff
 
