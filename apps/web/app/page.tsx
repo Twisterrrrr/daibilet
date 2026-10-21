@@ -11,6 +11,8 @@ import {
   canonicalHref,
   ensureSeoDescription,
 } from '@/lib/seo-meta';
+import { orderPopularRailCities } from '@/lib/popular-cities-rail';
+import { toSlimCityDestination } from '@/lib/ssr-lean-payloads';
 import { getHomeDestinations } from '@/server/cached-home-data';
 
 export const revalidate = 300;
@@ -43,10 +45,18 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  let topCities: ReturnType<typeof toSlimCityDestination>[] = [];
+  try {
+    const destinationsPayload = await getHomeDestinations();
+    const cities = (destinationsPayload?.destinations ?? []).filter((item: { type?: string }) => item.type === 'city');
+    topCities = orderPopularRailCities(cities as never, 16).map(toSlimCityDestination);
+  } catch {
+    // keep empty if destinations cache/DB is unavailable
+  }
   return (
     <SiteLayout>
-      <HomePageContent />
+      <HomePageContent topCities={topCities} />
     </SiteLayout>
   );
 }
