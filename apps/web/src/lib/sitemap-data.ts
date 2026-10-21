@@ -1,4 +1,3 @@
-import { buildPublicEventFreshnessMap } from '@daibilet/backend/public-read';
 import type { PublicCatalogDto, PublicVenueDto, PublicVenuePageDto } from '@daibilet/contracts/public';
 
 import { evaluateCityIndexability, evaluateRegionIndexability, evaluateVenueIndexability } from '@/lib/hub-indexability';
@@ -249,15 +248,18 @@ export async function buildEventsSitemapEntries(now = new Date()): Promise<Sitem
   // "the query failed" and "there is no data" indistinguishable and cost a full
   // diagnosis cycle on 30.09. An empty map is a valid outcome (zero events with
   // a usable updatedAt); a thrown error is not, so log it and keep going.
-  const freshness = await buildPublicEventFreshnessMap().catch((error: unknown) => {
+  const freshnessPayload = await fetchPublicApiJson<{ freshness: Record<string, string> }>(
+    '/api/public/events/freshness', { timeoutMs: 10_000 },
+  ).catch((error: unknown) => {
     console.error(
-      '[sitemap] buildPublicEventFreshnessMap failed; event lastmod falls back to build time',
+      '[sitemap] event freshness API failed; event lastmod falls back to build time',
       error,
     );
-    return new Map<string, Date>();
+    return { freshness: {} as Record<string, string> };
   });
-  if (freshness.size === 0) {
-    console.warn('[sitemap] buildPublicEventFreshnessMap returned 0 rows; all event lastmod are build time');
+  const freshness = freshnessPayload.freshness;
+  if (Object.keys(freshness).length === 0) {
+    console.warn('[sitemap] event freshness API returned 0 rows; all event lastmod are build time');
   }
 
   for (let offset = 0; offset < MAX_EVENTS; offset += limit) {
@@ -270,7 +272,7 @@ export async function buildEventsSitemapEntries(now = new Date()): Promise<Sitem
       if (!slug || seen.has(slug)) continue;
       seen.add(slug);
       entries.push(
-        entry(`/events/${encodeURIComponent(slug)}`, now, 'daily', 0.7, freshness.get(slug) ?? null),
+        entry(`/events/${encodeURIComponent(slug)}`, now, 'daily', 0.7, freshness[slug] ?? null),
       );
     }
     if (!page.hasMore || !page.items?.length || entries.length >= MAX_EVENTS) break;

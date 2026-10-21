@@ -31,10 +31,10 @@ INC.504.22 (merge `f93b770`) увёл почти весь public SSR на HTTP �
 2. `sitemap-data.ts`: blog -> `fetchPublicApiJson('/api/public/articles')` (тот же `buildPublicArticlesList`, backend-кэш ответа).
 3. `sitemapResponseHeaders`: events/venues `no-store` -> `public, s-maxage=120, stale-while-revalidate=600`. Экспозиция деградированной карты (пустой venue-список при лежащем API) ограничена 2 минутами вместо 30-минутного кэша nginx, который мотивировал `no-store` (`ef8d3383`, 2026-10-08). Откат - вернуть `no-store` в этой функции.
 
-Осталось прямым импортом: `buildPublicEventFreshnessMap` (один bounded SQL с TTL 5 мин; отдельного HTTP-endpoint нет).
+После отдельного изменения Codex карта freshness также отдаётся backend через `/api/public/events/freshness` (публичный slug и ISO `updatedAt`, TTL 5 мин). Web sitemap читает её по HTTP с тайм-аутом 10 секунд. Прямых импортов `@daibilet/backend/public-read` в `sitemap-data.ts` больше нет. До выпуска backend и web необходимо развернуть вместе: версия web с HTTP-чтением ожидает новый endpoint.
 
 ## Что дальше
 
-- **Codex (backend):** лёгкий endpoint `/api/public/events/freshness` (slug + updatedAt), чтобы убрать последний DB-путь из веб-процесса; опционально lean `sitemap/venues` без тяжёлых полей.
+- **Codex (backend):** endpoint `/api/public/events/freshness` и HTTP-чтение в sitemap реализованы в отдельной ветке; нужен CI и совместный выпуск backend+web. Lean `sitemap/venues` без тяжёлых полей остаётся опциональным.
 - **Owner (MSK):** после деплоя проверить по чеклисту из `ssr-hang-crawler-2026-10-16.md` (journalctl `daibilet-ssr-health`, node-reports, cpu-sample) - пропало ли окно XX:43-45 hang'ов.
 - **Проверки PR:** `pnpm --filter @daibilet/web typecheck` (baseline 140), `pnpm web:test:ci`, `pnpm web:build` (с БД). Smoke: `/sitemaps/events.xml`, `/sitemaps/venues.xml`, `/sitemaps/blog.xml` - 200, валидный XML, заголовок `s-maxage=120`.
