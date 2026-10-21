@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { freshnessMapFromRows, publicFreshnessSlug } from './public-event-freshness.js';
+import { freshnessMapFromRows, publicEventFreshnessPayload, publicFreshnessSlug } from './public-event-freshness.js';
 
 test('Cyrillic database slug matches the Latin sitemap URL', () => {
   const map = freshnessMapFromRows([
@@ -17,4 +17,7 @@ test('Latin slug remains unchanged and the newest duplicate wins', () => {
     { slug: 'tc-123-planetarii-1', updatedAt: '2026-09-25T00:00:00.000Z' },
   ]);
   assert.equal(map.get('tc-123-planetarii-1')?.toISOString(), '2026-09-25T00:00:00.000Z');
+  assert.deepEqual(publicEventFreshnessPayload(map), {
+    freshness: { 'tc-123-planetarii-1': '2026-09-25T00:00:00.000Z' },
+  });
 });
