@@ -73,6 +73,31 @@ async function HomePageBody() {
   const cities = destinations.filter((item) => item.type === 'city');
   // Top by events, then pin Moscow + SPB first so the rail can center that pair on load.
   const topCities = orderPopularRailCities(cities, 16).map(toSlimCityDestination);
+  const citiesSection = topCities.length ? (
+    <section
+      id="destinations"
+      className="section-y pb-6 sm:pb-8"
+      data-home-band="full-bleed"
+    >
+      <div className="container-page">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+              Популярные города
+            </h2>
+            <p className="mt-1 text-sm text-slate-500">
+              Выберите город — покажем афишу и подборки
+            </p>
+          </div>
+          <Link href="/cities" className="shrink-0 text-sm font-semibold text-primary-600 hover:text-primary-700">
+            Все города →
+          </Link>
+        </div>
+      </div>
+      {/* Finite city grid + «Показать ещё» (no infinite loop). */}
+      <HomePopularCitiesRail cities={topCities} className="mt-6" />
+    </section>
+  ) : null;
   const luckyCities = [...cities]
     .filter((c) => c.events > 0)
     .sort((a, b) => b.events - a.events || a.name.localeCompare(b.name, 'ru'))
@@ -158,83 +183,53 @@ async function HomePageBody() {
         ssrCitySlug={ssrCitySlug}
       />
 
-      {/* Featured cities rail — server-rendered so crawlers see city links in initial HTML */}
-      {topCities.length ? (
-        <section
-          id="destinations"
-          className="section-y pb-6 sm:pb-8"
-          data-home-band="full-bleed"
-        >
-          <div className="container-page">
-            <div className="flex items-end justify-between gap-4">
-              <div>
-                <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-                  Популярные города
-                </h2>
-                <p className="mt-1 text-sm text-slate-500">
-                  Выберите город — покажем афишу и подборки
-                </p>
-              </div>
-              <Link href="/cities" className="shrink-0 text-sm font-semibold text-primary-600 hover:text-primary-700">
-                Все города →
-              </Link>
-            </div>
-          </div>
-          {/* Finite city grid + «Показать ещё» (no infinite loop). */}
-          <HomePopularCitiesRail cities={topCities} className="mt-6" />
-        </section>
-      ) : null}
-
-
       <HomeCityAwareSectionsDynamic
         editorsPick={editorsPick}
         homeNowTabs={mergedHomeNowTabs}
         sparseCatalog={sparseCatalog}
         ssrCityName={ssrCityName}
-      >
-        <>
+      />
 
+      {/* Keep city links in server HTML while placing the rail after both event rails. */}
+      {citiesSection}
 
+      {/* My Day CTA - constructor card on soft map-band */}
+      <HomeMyDayBanner />
 
-          {/* My Day CTA - constructor card on soft map-band */}
-          <HomeMyDayBanner />
-
-          {/* Popular landings (topic links) */}
-          {popularLandings.length ? (
-            <section className="section-y pb-6 sm:pb-8">
-              <div className="container-page">
-                <div className="flex items-end justify-between gap-4">
-                  <div>
-                    <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-                      Популярные подборки
-                    </h2>
-                    <p className="mt-1 text-sm text-slate-500">Выберите формат — покажем афишу и расписание</p>
-                  </div>
-                  <Link href="/podborki" className="shrink-0 text-sm font-semibold text-primary-600 hover:text-primary-700">
-                    Все подборки →
-                  </Link>
-                </div>
-                <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-3.5 md:grid-cols-4 lg:grid-cols-4">
-                  {popularLandings.map((landing) => (
-                    <Link
-                      key={landing.slug}
-                      href={landing.href}
-                      className="group flex flex-col gap-1.5 rounded-xl border border-slate-200 bg-white p-4 transition-all hover:border-primary-300 hover:shadow-md sm:p-5"
-                    >
-                      <span className="text-sm font-semibold text-slate-900 group-hover:text-primary-700">{landing.title}</span>
-                      {landing.subtitle ? <span className="text-xs text-slate-500 line-clamp-2">{landing.subtitle}</span> : null}
-                      <span className="mt-auto pt-2 text-xs font-medium text-slate-400">
-                        {pluralEvents(landing.events)}
-                        {landing.priceFrom != null ? ` · от ${formatMoney(landing.priceFrom)}` : ''}
-                      </span>
-                    </Link>
-                  ))}
-                </div>
+      {/* Popular landings (topic links) */}
+      {popularLandings.length ? (
+        <section className="section-y pb-6 sm:pb-8">
+          <div className="container-page">
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+                  Популярные подборки
+                </h2>
+                <p className="mt-1 text-sm text-slate-500">Выберите формат — покажем афишу и расписание</p>
               </div>
-            </section>
-          ) : null}
-        </>
-      </HomeCityAwareSectionsDynamic>
+              <Link href="/podborki" className="shrink-0 text-sm font-semibold text-primary-600 hover:text-primary-700">
+                Все подборки →
+              </Link>
+            </div>
+            <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-3.5 md:grid-cols-4 lg:grid-cols-4">
+              {popularLandings.map((landing) => (
+                <Link
+                  key={landing.slug}
+                  href={landing.href}
+                  className="group flex flex-col gap-1.5 rounded-xl border border-slate-200 bg-white p-4 transition-all hover:border-primary-300 hover:shadow-md sm:p-5"
+                >
+                  <span className="text-sm font-semibold text-slate-900 group-hover:text-primary-700">{landing.title}</span>
+                  {landing.subtitle ? <span className="text-xs text-slate-500 line-clamp-2">{landing.subtitle}</span> : null}
+                  <span className="mt-auto pt-2 text-xs font-medium text-slate-400">
+                    {pluralEvents(landing.events)}
+                    {landing.priceFrom != null ? ` · от ${formatMoney(landing.priceFrom)}` : ''}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       {/* Mobile formats: after event rails, away from My Day CTA */}
       <HomeCategoryStackDynamic />
@@ -508,7 +503,7 @@ export function HomePageContent({ topCities = [] }: HomePageContentProps) {
   ) : null;
 
   return (
-    <Suspense fallback={<>{citiesRail}<HomePageSkeleton /></>}>
+    <Suspense fallback={<><HomePageSkeleton />{citiesRail}</>}>
       <HomePageBody />
     </Suspense>
   );

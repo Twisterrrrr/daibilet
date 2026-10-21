@@ -88,8 +88,10 @@ function forwardVerticalWheel(from: HTMLElement, deltaY: number): void {
     }
     node = node.parentElement;
   }
-  const root = document.scrollingElement || document.documentElement;
-  root.scrollTop += deltaY;
+  // Let the browser choose the actual document scroller (html/body differs by
+  // browser and overflow-x-hidden page shells); direct scrollTop writes can be
+  // ignored there and leave the page stuck when the wheel starts over a rail.
+  window.scrollBy({ top: deltaY, left: 0, behavior: 'auto' });
 }
 
 /**
