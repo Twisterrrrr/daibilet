@@ -1876,7 +1876,7 @@ Canon: [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md).
 | # | Task | Priority | Status |
 |---|------|----------|--------|
 | INC.504.22 | Move public HTML hot path in `apps/web` off direct `@daibilet/backend/public-read`; SSR/API read through backend HTTP with bounded timeout | Critical | ✅ PR #3 merge `f93b770` MSK **BUILD_ID=`3zmDWHpY7rXAJgqu0-pnR`** |
-| INC.504.23 | Move sitemap generation off direct `public-read` or give it a separate bounded backend path | Medium | todo |
+| INC.504.23 | Move sitemap generation off direct `public-read` or give it a separate bounded backend path | Medium | 🟡 2026-10-21 code ready, deploy pending: venues+blog -> loopback HTTP, freshness -> `/api/public/events/freshness`, events/venues `s-maxage=120` вместо `no-store`. Backend+web выпускать вместе. RCA: [ssr-hang-rca-2026-10-21.md](./ssr-hang-rca-2026-10-21.md) |
 | INC.504.24 | Add staging HTTP load smoke for `/`, `/events`, `/cities`, `/venues`, `/api/public/events?limit=50` | High | todo |
 
 ---

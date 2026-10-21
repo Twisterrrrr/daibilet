@@ -105,9 +105,10 @@ test('sitemap lastmod: a slug missing from the map falls back to the build time'
   assert.equal(resolveSitemapLastModified(null, fallback).toISOString(), fallback.toISOString());
 });
 
-test('sitemap lastmod: the events builder threads the freshness map', () => {
+test('sitemap lastmod: the events builder reads freshness over HTTP', () => {
   const source = fs.readFileSync(path.join(WEB_ROOT, 'src/lib/sitemap-data.ts'), 'utf8');
-  assert.match(source, /buildPublicEventFreshnessMap/);
-  assert.match(source, /freshness\.get\(slug\)/);
+  assert.match(source, /fetchPublicApiJson<\{ freshness: Record<string, string> \}>/);
+  assert.match(source, /freshness\[slug\]/);
+  assert.doesNotMatch(source, /@daibilet\/backend\/public-read/);
 });
 

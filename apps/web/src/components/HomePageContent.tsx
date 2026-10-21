@@ -2,8 +2,11 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 import { ArrowRight, Dices } from 'lucide-react';
 
-import { HomeCityAwareSections } from '@/components/HomeCityAwareSections.client';
-import { HomeCategoryStack } from '@/components/HomeCategoryStack.client';
+import {
+  HomeCityAwareSectionsDynamic,
+  HomeCategoryStackDynamic,
+  HomePopularCitiesRailDynamic,
+} from '@/components/HomeMoreDeferredIslands.client';
 import {
   HomeBottomNav,
   HomeMyDayBanner,
@@ -11,7 +14,6 @@ import {
 } from '@/components/HomeDeferredIslands.client';
 import { HomeHero } from '@/components/HomeHero.client';
 import { HomePageSkeleton } from '@/components/HomePageSkeleton';
-import { HomePopularCitiesRail } from '@/components/HomePopularCitiesRail.client';
 import { IMAGE_SIZES, BlogCardSafeImage, BLOG_LISTING_IMAGE_QUALITY, SafeImage } from '@/components/SafeImage.client';
 import { ScrollRail } from '@/components/ScrollRail.client';
 import { blogSurfaceMeta, blogSurfaceMetaLine } from '@/lib/blog-meta';
@@ -158,7 +160,7 @@ async function HomePageBody() {
       />
 
       {/* Rhythm: editors → cities → My Day */}
-      <HomeCityAwareSections
+      <HomeCityAwareSectionsDynamic
         editorsPick={editorsPick}
         homeNowTabs={mergedHomeNowTabs}
         sparseCatalog={sparseCatalog}
@@ -185,7 +187,7 @@ async function HomePageBody() {
                 </div>
               </div>
               {/* Finite city grid + «Показать ещё» (no infinite loop). */}
-              <HomePopularCitiesRail cities={topCities} className="mt-6" />
+              <HomePopularCitiesRailDynamic cities={topCities} className="mt-6" />
             </section>
           ) : null}
 
@@ -227,10 +229,10 @@ async function HomePageBody() {
             </section>
           ) : null}
         </>
-      </HomeCityAwareSections>
+      </HomeCityAwareSectionsDynamic>
 
       {/* Mobile formats: after event rails, away from My Day CTA */}
-      <HomeCategoryStack />
+      <HomeCategoryStackDynamic />
 
       {/* 4. Lucky city - soft trips map-band (distinct motif from cities) */}
       {luckyCities.length ? (
