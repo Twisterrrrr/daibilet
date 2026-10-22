@@ -29,6 +29,7 @@ import {
   getTicketOldPrice,
   getTicketPriceRange,
   buildGroupedTicketCategories,
+  compactSectorTicketCategories,
   FLEXIBLE_SCHEDULE_LABEL,
   isCategoryDuplicatedInBreadcrumbs,
   isFlexibleScheduleSession,
@@ -82,7 +83,7 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
   const primaryOffer = offers.find((offer) => offer.active !== false) || offers[0] || null;
   const priceRange = getTicketPriceRange(payload);
   const oldPrice = getTicketOldPrice(payload, priceRange);
-  const ticketCategories = buildGroupedTicketCategories(payload);
+  const ticketCategories = compactSectorTicketCategories(buildGroupedTicketCategories(payload));
   const purchaseOptions = payload.purchaseOptions ?? [];
   const showMultiPurchase = purchaseOptions.length >= 2;
   const priceHint =

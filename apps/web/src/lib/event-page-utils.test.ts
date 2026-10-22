@@ -5,6 +5,7 @@ import type { PublicEventPageDto } from '@daibilet/contracts/public';
 
 import {
   buildGroupedTicketCategories,
+  compactSectorTicketCategories,
   formatBuyCardPrice,
   formatBuyCardPriceHint,
   formatHeroBuyButtonPrice,
@@ -156,6 +157,22 @@ test('weekday-only ticket title suffixes still merge into one category', () => {
   assert.equal(rows[0]!.name, 'Взрослый');
   assert.equal(rows[0]!.minPrice, 1_000);
   assert.equal(rows[0]!.maxPrice, 1_500);
+});
+
+test('large sector lists are compacted into price tiers', () => {
+  const rows = compactSectorTicketCategories([
+    ...Array.from({ length: 9 }, (_, index) => ({
+      key: `sector-${index}`,
+      name: `Сектор ${index + 1}`,
+      description: null,
+      minPrice: index < 5 ? 1_400 : 2_700,
+      maxPrice: index < 5 ? 1_400 : 2_700,
+    })),
+  ]);
+
+  assert.equal(rows.length, 2);
+  assert.equal(rows[0]!.name, 'Секторы 1, 2, 3, 4, 5');
+  assert.equal(rows[1]!.name, 'Секторы 6, 7, 8, 9');
 });
 
 test('isCategoryDuplicatedInBreadcrumbs hides hero type already present in crumbs', () => {
