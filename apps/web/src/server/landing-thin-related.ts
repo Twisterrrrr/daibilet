@@ -72,6 +72,7 @@ export async function loadThinRelatedCardSessions(input: {
           sort: 'popular',
         },
         timeoutMs: 5_000,
+        revalidateSeconds: 3600,
       });
       const items = (catalog.items || []) as PublicSessionDto[];
       for (const item of items) {
