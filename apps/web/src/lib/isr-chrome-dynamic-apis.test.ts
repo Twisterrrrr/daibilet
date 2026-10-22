@@ -50,6 +50,11 @@ test('event not-found suggestions use ISR-safe cached fetches', () => {
   assert.equal(source.includes("export const dynamic = 'force-dynamic'"), false);
 });
 
+test('thin landing related-session fallback uses an ISR-safe API fetch', () => {
+  const source = fs.readFileSync(path.join(WEB_ROOT, 'src/server/landing-thin-related.ts'), 'utf8');
+  assert.match(source, /fetchPublicApiJson<PublicCatalogDto>[\s\S]*?revalidateSeconds:\s*3600/);
+});
+
 /**
  * New ISR pages must not call redirect()/permanentRedirect().
  * NEXT_REDIRECT during static gen becomes HTTP 500 (Pianissimo 2026-09-03).
