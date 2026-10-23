@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { mapOrderFromFinancePayload, submitAdmissionCheckout } from './finance-checkout-client';
+import {
+  lookupCheckoutOrderByPublicCode,
+  mapOrderFromFinancePayload,
+  submitAdmissionCheckout,
+} from './finance-checkout-client';
+import type { FinanceProjectionEnv } from './finance-projection-client';
 
 test('production refuses an explicitly requested STUB checkout', async () => {
   const result = await submitAdmissionCheckout({
@@ -33,4 +38,30 @@ test('buyer DTO accepts the issued ticket list and does not invent a number', ()
   const payload = { publicCode: '4157776', status: 'CONFIRMED', ticketNumbers: ['TKT-4157776-01'] };
   assert.equal(mapOrderFromFinancePayload(payload, '', 'LOOKUP')?.ticketNumber, 'TKT-4157776-01');
   assert.equal(mapOrderFromFinancePayload({ ...payload, ticketNumbers: [] }, '', 'LOOKUP')?.ticketNumber, null);
+});
+
+test('order lookup forwards the matching buyer proof to finance server-side', async () => {
+  const previousFetch = globalThis.fetch;
+  const observed: { headers: Headers | null } = { headers: null };
+  const publicCode = '4717674';
+  const token = `oa1_${'a'.repeat(43)}`;
+  globalThis.fetch = async (_input, init) => {
+    observed.headers = new Headers(init?.headers);
+    return new Response(JSON.stringify({ order: { publicCode, status: 'PENDING_PAYMENT' } }), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    });
+  };
+
+  try {
+    const order = await lookupCheckoutOrderByPublicCode(
+      publicCode,
+      { FINANCE_API_BASE_URL: 'https://finance.example.test' } satisfies FinanceProjectionEnv,
+      token,
+    );
+    assert.equal(order?.publicCode, publicCode);
+    assert.equal(observed.headers?.get('x-daibilet-order-access'), token);
+  } finally {
+    globalThis.fetch = previousFetch;
+  }
 });
