@@ -3,7 +3,7 @@ import { Readable } from 'node:stream';
 import test from 'node:test';
 
 import { createAdminEventsRouteHandler } from './admin-events-handler.js';
-import { updateAdminEventOverride } from './dto.js';
+import { buildPublicEventPage, updateAdminEventOverride } from './dto.js';
 import type { RouteContext } from './routing.js';
 
 function publicationDb(overrides: Record<string, unknown> = {}) {
@@ -56,6 +56,23 @@ test('a supplier draft cannot be published by adding a purchase URL', async () =
     updateAdminEventOverride(db, 'event-1', { editorStatus: 'PUBLISHED' }),
     (error: Error & { statusCode?: number }) => error.statusCode === 422 && error.message.includes('checkout ещё не подключён'),
   );
+});
+
+test('public event page does not expose a PLATFORM widget as checkout', async () => {
+  const queries: string[] = [];
+  const db = {
+    async query(sql: string) {
+      queries.push(sql);
+      if (sql.startsWith('select id from "Event"')) return { rows: [{ id: 'event-1' }] };
+      if (sql.includes('from "Event" e')) return {
+        rows: [{ id: 'event-1', slug: 'pilot-event', status: 'READY', purchaseFlow: 'PLATFORM' }],
+      };
+      throw new Error(`Unexpected query: ${sql.slice(0, 80)}`);
+    },
+  };
+  assert.equal(await buildPublicEventPage(db as never, 'pilot-event'), null);
+  assert.equal(queries.length, 2);
+  assert.ok(queries[1]?.includes('e."purchaseFlow"'));
 });
 
 test('moderation endpoint returns 422 and leaves public cache untouched', async () => {

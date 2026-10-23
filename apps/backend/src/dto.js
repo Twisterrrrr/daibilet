@@ -4902,6 +4902,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
         e.description,
         e.kind,
         e.status,
+        e."purchaseFlow",
         e."ageLimit",
         e."imageUrl",
         e."seoH1",
@@ -4960,6 +4961,9 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
   };
 
   let event = await loadEventRow(resolvedEventId || eventSlugOrId);
+  // PLATFORM sales are owned by finance. A stale offer widget URL must never
+  // turn a catalog event into an unverified buyer checkout entry.
+  if (String(event?.purchaseFlow || '').toUpperCase() === 'PLATFORM') return null;
   if (!event) {
     catalogSessions = await publicCatalogSessions(db);
     resolvedEventId = await resolvePublicEventId(db, eventSlugOrId, catalogSessions);
@@ -4968,6 +4972,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
   }
 
   if (!event) return null;
+  if (String(event.purchaseFlow || '').toUpperCase() === 'PLATFORM') return null;
   if (!catalogSessions) {
     catalogSessions = await publicCatalogSessions(db);
   }
