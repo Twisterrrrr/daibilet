@@ -797,7 +797,7 @@ function validateSession(
   }
 }
 
-export async function loadStubCheckoutEvent(payload: StubCheckoutCreateDto): Promise<StubCheckoutEventRow | null> {
+export async function loadStubCheckoutEvent(payload: Pick<StubCheckoutCreateDto, 'eventId' | 'eventSlug'>): Promise<StubCheckoutEventRow | null> {
   const eventId = cleanString(payload.eventId);
   const eventSlug = cleanString(payload.eventSlug);
   if (!eventId && !eventSlug) return null;
