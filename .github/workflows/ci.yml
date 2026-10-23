@@ -119,12 +119,15 @@ jobs:
       - name: Syntax check deploy and import scripts
         run: |
           node --test scripts/crawler-infra.test.mjs
+          node --test scripts/smoke-indexability-prod.test.mjs
           python3 deploy/scripts/switch-web-upstream.test.py
           python3 deploy/scripts/test-prune-next-runtime-cache.py
           node --check deploy/scripts/start-web-shadow.mjs
           bash -n deploy/scripts/web-upstream-handoff.sh
           bash deploy/scripts/web-upstream-handoff.test.sh
           bash -n deploy/scripts/maintain-web-disk.sh
+          bash -n deploy/scripts/post-deploy-observation.sh
+          bash -n deploy/scripts/run-post-deploy-observation.sh
           bash deploy/scripts/test-maintain-web-disk.sh
           bash -n scripts/deploy-msk-web.sh
           bash -n deploy/cron/crawler-log-monitor.sh
