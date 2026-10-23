@@ -837,7 +837,14 @@ export async function handleRequest(request, response) {
     const eventOverrideMatch = request.method === 'PATCH' ? url.pathname.match(/^\/api\/admin\/events\/([^/]+)\/override$/) : null;
     if (eventOverrideMatch) {
       const eventId = decodeURIComponent(eventOverrideMatch[1]);
-      const result = await updateAdminEventOverride(db, eventId, await readJsonBody(request));
+      let result;
+      try {
+        result = await updateAdminEventOverride(db, eventId, await readJsonBody(request));
+      } catch (error) {
+        if (error?.statusCode !== 404 && error?.statusCode !== 422) throw error;
+        sendJson(response, { error: error.message }, error.statusCode);
+        return;
+      }
       const slugRow = await db.query('select slug from "Event" where id = $1 limit 1', [eventId]).catch(() => null);
       invalidatePublicCaches('event override update', { slug: slugRow?.rows?.[0]?.slug });
       sendJson(response, result);
@@ -848,7 +855,14 @@ export async function handleRequest(request, response) {
     if (eventModerationMatch) {
       const eventId = decodeURIComponent(eventModerationMatch[1]);
       const body = await readJsonBody(request);
-      const result = await updateAdminEventOverride(db, eventId, { editorStatus: body.editorStatus });
+      let result;
+      try {
+        result = await updateAdminEventOverride(db, eventId, { editorStatus: body.editorStatus });
+      } catch (error) {
+        if (error?.statusCode !== 404 && error?.statusCode !== 422) throw error;
+        sendJson(response, { error: error.message }, error.statusCode);
+        return;
+      }
       const slugRow = await db.query('select slug from "Event" where id = $1 limit 1', [eventId]).catch(() => null);
       invalidatePublicCaches('event moderation update', { slug: slugRow?.rows?.[0]?.slug });
       sendJson(response, result);

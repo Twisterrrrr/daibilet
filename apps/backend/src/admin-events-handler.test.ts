@@ -123,6 +123,29 @@ test('POST rewrite-description returns 404 for missing event', async () => {
   assert.equal(JSON.parse(response.body).error, 'event_not_found');
 });
 
+test('PATCH moderation returns 422 without cache invalidation when publication is blocked', async () => {
+  const response = createMockResponse();
+  let invalidated = false;
+  const handler = createAdminEventsRouteHandler(createDeps({
+    async updateAdminEventOverride() {
+      const error = new Error('event_publish_blocked: нет виджета') as Error & { statusCode: number };
+      error.statusCode = 422;
+      throw error;
+    },
+    invalidatePublicCaches() { invalidated = true; },
+  }));
+  const context = createRouteContext({
+    method: 'PATCH',
+    pathname: '/api/admin/events/evt_1/moderation',
+    response,
+  });
+  context.request = Readable.from([JSON.stringify({ editorStatus: 'PUBLISHED' })]) as RouteContext['request'];
+  assert.equal(await handler(context), true);
+  assert.equal(response.statusCode, 422);
+  assert.match(JSON.parse(response.body).error, /event_publish_blocked/);
+  assert.equal(invalidated, false);
+});
+
 function createDeps(overrides: Partial<AdminEventsHandlerDependencies> = {}): AdminEventsHandlerDependencies {
   return {
     db: {
