@@ -7,6 +7,7 @@ import {
 } from './checkout-yookassa.js';
 import { sendJson } from './http.js';
 import { createOrderAccessToken } from './order-access.js';
+import { buildPublicEventCheckout } from './public-event-checkout.js';
 import type { RouteContext } from './routing.js';
 import type { TypedRouteHandler } from './validated-handler.js';
 import { parseJsonBody } from './validation.js';
@@ -60,9 +61,21 @@ const yookassaCheckoutCreatePayloadSchema = z.object({
 const yookassaWebhookPayloadSchema = z.record(z.string(), z.unknown());
 
 export function createYooKassaCheckoutRouteHandler(
-  deps: { orderAccessSecret?: string | null } = {},
+  deps: { orderAccessSecret?: string | null; buildEventCheckout?: typeof buildPublicEventCheckout } = {},
 ): TypedRouteHandler {
   return async (context: RouteContext) => {
+    const eventCheckoutMatch = context.pathname.match(/^\/api\/public\/checkout\/events\/([^/]+)$/);
+    if (eventCheckoutMatch && context.method === 'GET') {
+      let slug: string;
+      try { slug = decodeURIComponent(eventCheckoutMatch[1] || ''); }
+      catch { sendJson(context.response, { error: 'invalid_event_slug' }, { statusCode: 400 }); return true; }
+      const event = await (deps.buildEventCheckout || buildPublicEventCheckout)(slug);
+      sendJson(context.response, event || { error: 'event_not_found' }, {
+        statusCode: event ? 200 : 404,
+        cacheControl: 'no-store',
+      });
+      return true;
+    }
     if (context.pathname === '/api/checkout/yookassa' && context.method === 'POST') {
       if (!isAllowedCheckoutOrigin(firstHeader(context.request.headers.origin))) {
         sendJson(context.response, { error: 'checkout_origin_forbidden' }, { statusCode: 403 });
