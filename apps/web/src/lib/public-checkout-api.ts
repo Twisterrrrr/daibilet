@@ -1,4 +1,5 @@
 import type { PublicAdmissionProductDto } from '@daibilet/contracts/admission';
+import type { PublicEventPageDto } from '@daibilet/contracts/public';
 import type { YooKassaCheckoutCreateDto, YooKassaCheckoutResultDto } from '@daibilet/contracts/checkout';
 
 export type PublicCheckoutOrder = {
@@ -60,6 +61,18 @@ export async function fetchPublicAdmissionProduct(
   if (!response.ok) {
     throw new Error(payload.error || `HTTP ${response.status}`);
   }
+  return payload;
+}
+
+export async function fetchPublicCheckoutEvent(slug: string, signal?: AbortSignal): Promise<PublicEventPageDto> {
+  const response = await fetch(`/api/public/events/${encodeURIComponent(slug)}?refresh=1&t=${Date.now()}`, {
+    cache: 'no-store',
+    credentials: 'same-origin',
+    signal,
+    headers: { accept: 'application/json' },
+  });
+  const payload = (await response.json().catch(() => ({}))) as PublicEventPageDto & { error?: string };
+  if (!response.ok || !payload?.event) throw new Error(payload?.error || `HTTP ${response.status}`);
   return payload;
 }
 

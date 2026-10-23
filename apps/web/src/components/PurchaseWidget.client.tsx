@@ -63,8 +63,7 @@ export function PurchaseWidget({
     return (
       <a
         href={purchaseUrl}
-        target="_blank"
-        rel="noopener noreferrer"
+        {...(purchaseUrl.startsWith('/checkout/events/') ? {} : { target: '_blank', rel: 'noopener noreferrer' })}
         className="inline-flex min-h-10 w-full items-center justify-center rounded-xl bg-primary px-6 py-3 text-base font-semibold text-white transition hover:bg-primary/90"
       >
         Купить билет

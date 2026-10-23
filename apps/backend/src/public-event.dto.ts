@@ -8,6 +8,7 @@ import {
 import { resolveCityTimeZone } from './city-timezone.js';
 import { dedupePublicOffers, formatDate, formatTime, isSaleableEventForPublic, normalizeStartsAt, preferNamedTicketOffers, timeBucket } from './dto.js';
 import { findLandingRule, matchingLandingSlugs } from './landing-rules.js';
+import { internalEventPurchasePath } from './internal-event-purchase.js';
 import {
   buildProviderWidgetPayload,
   buildProviderWidgetUrl,
@@ -37,6 +38,7 @@ const MIN_DISPLAY_PRICE_RUB = 100;
 const PUBLIC_EVENT_CACHE_MS = 5 * 60 * 1000;
 
 const eventInclude = {
+  supplier: { select: { status: true, legalProfile: { select: { status: true } } } },
   primaryCity: { include: { region: true } },
   venue: true,
   category: true,
@@ -208,11 +210,27 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
     }),
   ]);
 
-  const offers = preferNamedTicketOffers(
+  const offers = (preferNamedTicketOffers(
     dedupePublicOffers(offerRows.map(mapOfferRecord)),
-  ).slice(0, 32) as MappedOffer[];
+  ) as MappedOffer[]).filter((offer) => requestedEvent.purchaseFlow !== 'PLATFORM' || offer.eventId === requestedEvent.id).slice(0, 32);
   const primaryOffers = primaryOfferMap(offers);
   const representativeOffer = primaryOffers.get(representative.id) || offers[0] || null;
+  const internalPurchaseUrl = internalEventPurchasePath({
+    eventId: requestedEvent.id,
+    slug: requestedEvent.slug,
+    kind: requestedEvent.kind,
+    status: requestedEvent.status,
+    purchaseFlow: requestedEvent.purchaseFlow,
+    managementMode: requestedEvent.managementMode,
+    supplierStatus: requestedEvent.supplier?.status || null,
+    legalProfileStatus: requestedEvent.supplier?.legalProfile?.status || null,
+    ticketsVacant: requestedEvent.ticketsVacant,
+    salesStartsAt: requestedEvent.salesStartsAt,
+    salesEndsAt: requestedEvent.salesEndsAt,
+    openDateValidFrom: requestedEvent.openDateValidFrom,
+    openDateValidTo: requestedEvent.openDateValidTo,
+    offers,
+  });
   const requestedIdentity = eventIdentity(requestedEvent);
   const representativeIdentity = eventIdentity(representative);
   const eventSourceCode = requestedIdentity.sourceCode || representativeOffer?.sourceCode || null;
@@ -321,17 +339,17 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
       ...metaGroupMembers.map((member) => member.id),
     ])],
     sessionCount: targetCatalogSession?.sessionCount || sessions.length,
-    purchaseUrl: primaryPurchase.purchaseUrl,
-    widgetUrl: representativeOffer?.widgetUrl || primaryPurchase.purchaseUrl,
+    purchaseUrl: requestedEvent.purchaseFlow === 'PLATFORM' ? internalPurchaseUrl : primaryPurchase.purchaseUrl,
+    widgetUrl: requestedEvent.purchaseFlow === 'PLATFORM' ? null : representativeOffer?.widgetUrl || primaryPurchase.purchaseUrl,
     deeplinkUrl: representativeOffer?.deeplinkUrl || null,
-    purchaseReady: eventPurchase.ready || Boolean(primaryPurchase.purchaseUrl),
-    purchaseMode: eventPurchase.mode,
-    purchaseProvider: eventPurchase.provider,
+    purchaseReady: requestedEvent.purchaseFlow === 'PLATFORM' ? Boolean(internalPurchaseUrl) : eventPurchase.ready || Boolean(primaryPurchase.purchaseUrl),
+    purchaseMode: internalPurchaseUrl ? 'redirect' : eventPurchase.mode,
+    purchaseProvider: internalPurchaseUrl ? null : eventPurchase.provider,
     purchaseUrlSource: primaryPurchase.urlSource || eventPurchase.urlSource,
     seoH1: requestedEvent.override?.seoH1 || requestedEvent.seoH1 || title,
     seoTitle: requestedEvent.override?.seoTitle || requestedEvent.seoTitle || `${title}: билеты и расписание | Дайбилет`,
     seoDescription: cleanImportedDescription(requestedEvent.override?.seoDescription || requestedEvent.seoDescription) ||
-      `Расписание, цены и билеты на ${title}. Покупка через виджет билетной системы.`,
+      `Расписание, цены и билеты на ${title}. ${internalPurchaseUrl ? 'Покупка на Дайбилет.' : 'Покупка через виджет билетной системы.'}`,
     canonicalPath: requestedEvent.override?.canonicalPath || requestedEvent.canonicalPath || `/events/${publicSlug(representative.slug)}`,
     isIndexable: requestedEvent.override?.isIndexable ?? requestedEvent.isIndexable,
   };

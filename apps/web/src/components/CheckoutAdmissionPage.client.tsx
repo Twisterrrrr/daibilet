@@ -1,6 +1,6 @@
 'use client';
 
-import type { PublicAdmissionOfferDto, PublicAdmissionProductDto } from '@daibilet/contracts/admission';
+import type { PublicAdmissionProductDto } from '@daibilet/contracts/admission';
 import { AlertTriangle, ArrowRight, CheckCircle2, Loader2, MapPin, Minus, Plus, Ticket } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -10,6 +10,7 @@ import { watchCheckoutPayment } from '@/lib/checkout-payment';
 import {
   createPublicYooKassaCheckout,
   fetchPublicAdmissionProduct,
+  fetchPublicCheckoutEvent,
   fetchPublicCheckoutOrder,
 } from '@/lib/public-checkout-api';
 
@@ -46,9 +47,34 @@ const YOOKASSA_WIDGET_SCRIPT_URL = 'https://yookassa.ru/checkout-widget/v1/check
 const YOOKASSA_WIDGET_CONTAINER_ID = 'yookassa-payment-form';
 let yookassaWidgetScriptPromise: Promise<void> | null = null;
 
+type CheckoutOffer = { id: string; title: string | null; priceRub: number | null };
+type CheckoutProduct = {
+  id: string;
+  slug: string;
+  title: string;
+  shortTitle: string | null;
+  shortDescription: string | null;
+  imageUrl: string | null;
+  canSell: boolean;
+  validityText: string;
+  venueTitle: string;
+  cityTitle: string | null;
+  supplierTitle: string | null;
+  priceFromRub: number | null;
+  offers: CheckoutOffer[];
+};
+
 export function CheckoutAdmissionPageView({ slug }: { slug: string }) {
+  return <CheckoutProductPageView slug={slug} kind="admission" />;
+}
+
+export function CheckoutEventPageView({ slug }: { slug: string }) {
+  return <CheckoutProductPageView slug={slug} kind="event" />;
+}
+
+function CheckoutProductPageView({ slug, kind }: { slug: string; kind: 'admission' | 'event' }) {
   const [state, setState] = useState<LoadState>('loading');
-  const [product, setProduct] = useState<PublicAdmissionProductDto | null>(null);
+  const [product, setProduct] = useState<CheckoutProduct | null>(null);
   const [selectedOfferId, setSelectedOfferId] = useState<string>('');
   const [quantity, setQuantity] = useState(1);
   const [buyerName, setBuyerName] = useState('');
@@ -66,7 +92,7 @@ export function CheckoutAdmissionPageView({ slug }: { slug: string }) {
     const controller = new AbortController();
     setState('loading');
     setError(null);
-    fetchPublicAdmissionProduct(slug, controller.signal)
+    loadCheckoutProduct(slug, kind, controller.signal)
       .then((payload) => {
         setProduct(payload);
         setSelectedOfferId(pickDefaultOffer(payload.offers)?.id || '');
@@ -78,7 +104,7 @@ export function CheckoutAdmissionPageView({ slug }: { slug: string }) {
         setState('error');
       });
     return () => controller.abort();
-  }, [slug]);
+  }, [slug, kind]);
 
   useEffect(() => {
     if (!widgetSession) return undefined;
@@ -170,9 +196,9 @@ export function CheckoutAdmissionPageView({ slug }: { slug: string }) {
     setWidgetSession(null);
     try {
       const payload = {
-        subjectType: 'VENUE_ADMISSION' as const,
-        admissionProductSlug: product.slug,
-        admissionOfferId: selectedOffer.id,
+        ...(kind === 'event'
+          ? { subjectType: 'EVENT' as const, eventId: product.id, offerId: selectedOffer.id }
+          : { subjectType: 'VENUE_ADMISSION' as const, admissionProductSlug: product.slug, admissionOfferId: selectedOffer.id }),
         quantity,
         buyer: {
           email: buyerEmail.trim(),
@@ -221,7 +247,7 @@ export function CheckoutAdmissionPageView({ slug }: { slug: string }) {
           <div className="flex flex-wrap items-center gap-2 text-sm text-white/65">
             <Link href="/" className="hover:text-white">Главная</Link>
             <span>/</span>
-            <span className="text-white">Входной билет</span>
+            <span className="text-white">{kind === 'event' ? 'Билет на событие' : 'Входной билет'}</span>
           </div>
           <div className="mt-6 max-w-3xl">
             <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-semibold text-white/86">
@@ -229,7 +255,7 @@ export function CheckoutAdmissionPageView({ slug }: { slug: string }) {
               Daibilet checkout
             </div>
             <h1 className="mt-4 text-3xl font-extrabold sm:text-5xl">
-              {product?.shortTitle || product?.title || 'Оформление входного билета'}
+              {product?.shortTitle || product?.title || 'Оформление билета'}
             </h1>
             <p className="mt-4 text-base leading-7 text-white/75">
               Оплата проходит через YooKassa. После оплаты билет и номер заказа появятся на странице статуса.
@@ -246,7 +272,7 @@ export function CheckoutAdmissionPageView({ slug }: { slug: string }) {
         ) : null}
 
         {state === 'error' ? (
-          <ErrorPanel title="Не удалось загрузить билет" message={friendlyCheckoutError(error || 'finance_api_unavailable')} />
+            <ErrorPanel title="Не удалось загрузить билет" message={friendlyCheckoutError(error || 'finance_api_unavailable')} />
         ) : null}
 
         {state === 'ready' && product ? (
@@ -263,7 +289,7 @@ export function CheckoutAdmissionPageView({ slug }: { slug: string }) {
                     {product.canSell ? 'Доступен к продаже' : 'Продажа недоступна'}
                   </span>
                   <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-                    {validityLabel(product)}
+                    {product.validityText}
                   </span>
                 </div>
                 <h2 className="mt-4 text-2xl font-bold text-slate-950">{product.title}</h2>
@@ -273,9 +299,9 @@ export function CheckoutAdmissionPageView({ slug }: { slug: string }) {
                 <div className="mt-4 flex flex-wrap gap-3 text-sm text-slate-500">
                   <span className="inline-flex items-center gap-1.5">
                     <MapPin className="h-4 w-4" />
-                    {[product.venue.title, product.city.title].filter(Boolean).join(', ')}
+                    {[product.venueTitle, product.cityTitle].filter(Boolean).join(', ')}
                   </span>
-                  {product.supplier.title ? <span>{product.supplier.title}</span> : null}
+                  {product.supplierTitle ? <span>{product.supplierTitle}</span> : null}
                 </div>
               </div>
             </article>
@@ -414,7 +440,55 @@ export function CheckoutAdmissionPageView({ slug }: { slug: string }) {
   );
 }
 
-function pickDefaultOffer(offers: PublicAdmissionOfferDto[]): PublicAdmissionOfferDto | null {
+async function loadCheckoutProduct(
+  slug: string,
+  kind: 'admission' | 'event',
+  signal: AbortSignal,
+): Promise<CheckoutProduct> {
+  if (kind === 'admission') {
+    const product = await fetchPublicAdmissionProduct(slug, signal);
+    return {
+      id: product.id,
+      slug: product.slug,
+      title: product.title,
+      shortTitle: product.shortTitle || null,
+      shortDescription: product.shortDescription || null,
+      imageUrl: product.imageUrl || null,
+      canSell: product.canSell,
+      validityText: validityLabel(product),
+      venueTitle: product.venue.title,
+      cityTitle: product.city.title,
+      supplierTitle: product.supplier.title,
+      priceFromRub: product.priceFromRub,
+      offers: product.offers,
+    };
+  }
+
+  const { event, offers } = await fetchPublicCheckoutEvent(slug, signal);
+  const internalPath = `/checkout/events/${encodeURIComponent(event.sourceSlug || event.slug)}`;
+  if (event.purchaseUrl !== internalPath || event.eventType !== 'open_date') {
+    throw new Error('Продажа этого события ещё не открыта.');
+  }
+  const manualOffers = offers.filter((offer) => offer.active && offer.sourceCode === 'MANUAL' && Number(offer.priceRub) >= 100);
+  if (!manualOffers.length) throw new Error('Билеты этого события пока недоступны.');
+  return {
+    id: event.id,
+    slug: event.sourceSlug || event.slug,
+    title: event.title,
+    shortTitle: null,
+    shortDescription: event.description || null,
+    imageUrl: event.imageUrl || null,
+    canSell: true,
+    validityText: 'открытая дата',
+    venueTitle: event.venue,
+    cityTitle: event.city,
+    supplierTitle: null,
+    priceFromRub: event.priceFrom || null,
+    offers: manualOffers.map((offer) => ({ id: offer.id, title: offer.title || null, priceRub: offer.priceRub || null })),
+  };
+}
+
+function pickDefaultOffer(offers: CheckoutOffer[]): CheckoutOffer | null {
   return offers.find((offer) => typeof offer.priceRub === 'number' && offer.priceRub >= 100) || offers[0] || null;
 }
 

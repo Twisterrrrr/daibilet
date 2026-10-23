@@ -162,8 +162,7 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
           ) : purchaseUrl ? (
             <a
               href={normalizeTcPurchaseUrl(purchaseUrl) || purchaseUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+              {...(purchaseUrl.startsWith('/checkout/events/') ? {} : { target: '_blank', rel: 'noopener noreferrer' })}
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary-600 px-6 py-3.5 text-base font-medium text-white transition hover:bg-primary-700"
             >
               Купить билет
