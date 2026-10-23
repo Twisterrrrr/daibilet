@@ -1,5 +1,19 @@
 # qa.md — открытые вопросы
 
+## 2026-10-23 - Buyer order access proof
+
+Catalog checkout now keeps finance's per-order proof in a 30-day HttpOnly,
+SameSite=Lax cookie scoped to `/checkout/actions`. The buyer order-result and
+ticket-notification routes forward it to finance only when it matches the exact
+seven-digit order code. The proof is not returned in checkout JSON.
+
+**Do not enable `DAIBILET_REQUIRE_ORDER_ACCESS=1` yet.** The asynchronous ticket
+email worker still looks up an order without a per-order cookie, and the buyer
+purchases-by-email path is a separate access surface. Before enforcement, give
+the worker a narrowly scoped server-to-server authorization path and verify the
+purchase-list path does not disclose orders without verified buyer ownership.
+The paid YooKassa browser smoke remains owner-run.
+
 ## 2026-10-08 — Stage 0 ticket DTO and delivery contract
 
 - `publicCode` is the order code. `ticketNumber`/`ticketNumbers` are separate issued numbers (`TKT-…`); the finance branch `codex/stage0-r12` adds one durable `IssuedTicket` row per quantity unit and keeps the JSON mirror for compatibility.

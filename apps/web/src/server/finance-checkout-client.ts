@@ -17,6 +17,7 @@ import {
   pickCheckoutConfirmation,
   type CheckoutConfirmationMode,
 } from '@/lib/checkout-payment';
+import { extractOrderAccessProof } from '@/lib/order-access-cookie';
 import {
   resolveFinanceApiBaseUrl,
   resolveFinanceApiHost,
@@ -52,7 +53,8 @@ export type FinanceCheckoutSubmitResult =
       confirmationToken: string | null;
       confirmationMode: CheckoutConfirmationMode;
       order: BuyerInternalOrderRecord;
-      raw?: unknown;
+      /** Server-only capability; the route must place it in HttpOnly cookie, never JSON. */
+      orderAccessToken: string | null;
     }
   | {
       ok: false;
@@ -332,14 +334,17 @@ async function financePostJson(
 async function financeGetJson(
   apiPath: string,
   env: FinanceProjectionEnv = process.env,
+  orderAccessToken?: string | null,
 ): Promise<unknown | null> {
   const base = resolveFinanceApiBaseUrl(env);
   if (!base) return null;
   const path = apiPath.startsWith('/') ? apiPath : `/${apiPath}`;
   try {
+    const headers = buildHeaders(env);
+    if (orderAccessToken) headers.set('x-daibilet-order-access', orderAccessToken);
     const response = await fetch(`${base}${path}`, {
       method: 'GET',
-      headers: buildHeaders(env),
+      headers,
       signal: AbortSignal.timeout(FINANCE_CHECKOUT_TIMEOUT_MS),
       cache: 'no-store',
     });
@@ -437,6 +442,7 @@ export async function submitAdmissionCheckout(
     }
 
     const confirmation = resolvePaymentConfirmation(result.json);
+    const orderAccessProof = extractOrderAccessProof(result.json);
 
     return {
       ok: true,
@@ -446,11 +452,11 @@ export async function submitAdmissionCheckout(
       confirmationUrl: confirmation.confirmationUrl || order.confirmationUrl || null,
       confirmationToken: confirmation.confirmationToken,
       confirmationMode: confirmation.confirmationMode,
+      orderAccessToken: orderAccessProof?.publicCode === order.publicCode ? orderAccessProof.token : null,
       order: {
         ...order,
         confirmationUrl: confirmation.confirmationUrl || order.confirmationUrl || null,
       },
-      raw: result.json,
     };
   }
 
@@ -461,6 +467,7 @@ export async function submitAdmissionCheckout(
 export async function lookupCheckoutOrderByPublicCode(
   publicCode: string,
   env: FinanceProjectionEnv = process.env,
+  orderAccessToken?: string | null,
 ): Promise<BuyerInternalOrderRecord | null> {
   const code = publicCode.trim();
   if (!code) return null;
@@ -473,7 +480,7 @@ export async function lookupCheckoutOrderByPublicCode(
   ];
 
   for (const path of candidates) {
-    const raw = await financeGetJson(path, env);
+    const raw = await financeGetJson(path, env, orderAccessToken);
     if (!raw) continue;
     const mapped = mapOrderFromFinancePayload(raw, '', 'LOOKUP');
     if (mapped) return mapped;
