@@ -4,7 +4,7 @@
 import { UFA_LINE_DAY_ROUTE_PRESETS } from './ufa-line-presets.ts';
 
 export const UFA_MUST_SEE: any[] = [
-  // --- Памятники и уличные арт-объекты (1-15) ---
+  // --- Главные городские точки и тематические подборки ---
   {
     name: 'Памятник Салавату Юлаеву',
     desc: 'Самая большая конная статуя в России, стоящая на высоком утесе над рекой Белой.',
@@ -156,13 +156,14 @@ export const UFA_MUST_SEE: any[] = [
     longitude: 55.941901,
   },
 
-  // --- Историческое наследие (16-22) ---
+  // --- Историческое наследие ---
   {
     name: 'Гостиный двор',
     desc: 'Обновленный торговый и общественный комплекс XIX века, сердце исторического центра.',
     address: 'ул. Верхнеторговая площадь, 1',
     locationSlug: 'ufa-gostinyy-dvor',
     mustSeeFilter: 'houses',
+    alsoMain: true,
     visitMinutes: 30,
     latitude: 54.725891,
     longitude: 55.947891,
@@ -228,13 +229,14 @@ export const UFA_MUST_SEE: any[] = [
     longitude: 55.952901,
   },
 
-  // --- Музеи (23-29) ---
+  // --- Музеи ---
   {
     name: 'Национальный музей Республики Башкортостан',
     desc: 'Главный музей края с коллекцией сарматского золота и этнографии.',
     address: 'ул. Советская, 14',
     locationSlug: 'ufa-natsionalnyy-muzey',
     mustSeeFilter: 'museum',
+    alsoMain: true,
     visitMinutes: 60,
     latitude: 54.719612,
     longitude: 55.946111,
@@ -300,7 +302,7 @@ export const UFA_MUST_SEE: any[] = [
     longitude: 55.932312,
   },
 
-  // --- Храмы (30-36) ---
+  // --- Храмы ---
   {
     name: 'Мечеть-медресе «Ляля-Тюльпан»',
     desc: 'Современный исламский центр Уфы с минаретами в форме бутонов тюльпанов.',
@@ -317,6 +319,7 @@ export const UFA_MUST_SEE: any[] = [
     address: 'ул. Тукаева, 52',
     locationSlug: 'ufa-pervaya-sobornaya-mechet',
     mustSeeFilter: 'temple',
+    alsoMain: true,
     visitMinutes: 20,
     latitude: 54.713901,
     longitude: 55.935891,
@@ -372,7 +375,7 @@ export const UFA_MUST_SEE: any[] = [
     longitude: 55.965891,
   },
 
-  // --- Парки и смотровые (37-43) ---
+  // --- Парки и смотровые ---
   {
     name: 'Парк культуры и отдыха им. Мажита Гафури',
     desc: 'Сосновый бор аттракционов с гигантским колесом обозрения «Седьмое небо».',
@@ -419,6 +422,7 @@ export const UFA_MUST_SEE: any[] = [
     address: 'ул. Чернышевского, 88',
     locationSlug: 'ufa-art-kvadrat',
     mustSeeFilter: 'park',
+    alsoMain: true,
     visitMinutes: 60,
     latitude: 54.728912,
     longitude: 55.945112,
@@ -444,13 +448,14 @@ export const UFA_MUST_SEE: any[] = [
     longitude: 55.943112,
   },
 
-  // --- Гастрономия и театры (44-50) ---
+  // --- Гастрономия и театры ---
   {
     name: 'Башкирский государственный академический театр драмы им. Мажита Гафури',
     desc: 'Главная театральная сцена республики в монументальном здании.',
     address: 'ул. Заки Валиди, 34',
     venueSlug: 'ufa-bashkirskiy-teatr-dramy-gafuri',
     mustSeeFilter: 'creative',
+    alsoMain: true,
     visitMinutes: 90,
     latitude: 54.719612,
     longitude: 55.940512,
@@ -553,6 +558,7 @@ export const UFA_MUST_SEE: any[] = [
     address: 'ул. Ленина / ул. Пушкина',
     locationSlug: 'ufa-fontan-sem-devushek',
     mustSeeFilter: 'park',
+    alsoMain: true,
     visitMinutes: 20,
     latitude: 54.724811,
     longitude: 55.943112,
