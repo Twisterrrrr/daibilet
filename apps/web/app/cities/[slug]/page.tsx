@@ -172,7 +172,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   });
 
     return {
-      title: expansionAbsolute ? { absolute: hubTitle } : pageTitle(hubTitle),
+      title: expansionAbsolute ? { absolute: hubTitleFull } : pageTitle(hubTitle),
       description,
       alternates: { canonical: path },
       robots: robotsForIndexability(decision.indexable),

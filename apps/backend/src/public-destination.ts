@@ -265,7 +265,7 @@ export function buildCityHubSeoTitle(cityName: string, reference = new Date()): 
     month: 'long',
     timeZone: 'Europe/Moscow',
   }).format(reference);
-  return `${name}: афиша, экскурсии и билеты на сегодня, ${short} | Дайбилет`;
+  return `${name}: зачем ехать, что посмотреть, ближайшие события на сегодня, ${short} | Дайбилет`;
 }
 
 export function destinationPrepositional(destination: Pick<DestinationRecord, 'slug' | 'name' | 'type'>): string {

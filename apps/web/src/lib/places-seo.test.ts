@@ -23,7 +23,7 @@ test('places H1 is the fixed kinds list plus genitive city', () => {
 
   const spb = buildPlacesListingCopy('Санкт-Петербург');
   assert.equal(spb.h1, 'Музеи, театры, локации, достопримечательности Санкт-Петербурга');
-  assert.equal(spb.title, spb.h1);
+  assert.equal(spb.title, 'Места и достопримечательности Санкт-Петербурга');
 
   const moscow = buildPlacesListingCopy('Москва');
   assert.equal(moscow.h1, 'Музеи, театры, локации, достопримечательности Москвы');
@@ -70,9 +70,17 @@ test('places listing canonical: hub without family, facet path with family', () 
   const institution = buildPlacesListingSeo({ family: 'institution' });
   assert.equal(institution.canonicalPath, '/places/institution');
   assert.equal(institution.indexable, true);
+  assert.equal(institution.title, 'Площадки России: музеи, театры и концертные залы');
 
   const location = buildPlacesListingSeo({ family: 'location' });
   assert.equal(location.canonicalPath, '/places/location');
+  assert.equal(location.title, 'Локации России: парки, набережные, причалы и места встречи');
+
+  const kazaanInstitution = buildPlacesListingSeo({
+    cityName: 'Казань',
+    family: 'institution',
+  });
+  assert.equal(kazaanInstitution.title, 'Площадки Казани: музеи, театры и концертные залы');
 
   // Pagination: page 1 is the indexable document, deeper pages are not, while
   // the canonical keeps pointing at page 1.
