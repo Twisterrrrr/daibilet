@@ -9,7 +9,7 @@ import {
 } from './checkout-yookassa.js';
 
 export async function buildPublicEventCheckout(slug: string) {
-  const event = await loadStubCheckoutEvent({ eventSlug: slug } as Parameters<typeof loadStubCheckoutEvent>[0]);
+  const event = await loadStubCheckoutEvent({ eventSlug: slug });
   if (!event || !['READY', 'PUBLISHED'].includes(String(event.status))) return null;
   const offers = await prisma.eventOffer.findMany({
     where: { eventId: event.id, active: true },
