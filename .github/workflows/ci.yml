@@ -120,9 +120,12 @@ jobs:
         run: |
           node --test scripts/crawler-infra.test.mjs
           python3 deploy/scripts/switch-web-upstream.test.py
+          python3 deploy/scripts/test-prune-next-runtime-cache.py
           node --check deploy/scripts/start-web-shadow.mjs
           bash -n deploy/scripts/web-upstream-handoff.sh
           bash deploy/scripts/web-upstream-handoff.test.sh
+          bash -n deploy/scripts/maintain-web-disk.sh
+          bash deploy/scripts/test-maintain-web-disk.sh
           bash -n scripts/deploy-msk-web.sh
           bash -n deploy/cron/crawler-log-monitor.sh
           bash -n deploy/cron/indexnow-sitemaps.sh

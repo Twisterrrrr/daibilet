@@ -1,23 +1,30 @@
-# Web disk maintenance (MSK)
+# Web cache and disk maintenance (MSK)
 
-Production has a 77 GiB root filesystem. Runtime Next cache can grow by several GiB under `apps/web/.next/server/route-cache` and `apps/web/.next/cache`. The old deploy scripts also copied these caches into `.next.prev`, doubling the pressure. Historical `.next.bak*` trees from manual releases are separate from the single current rollback `.next.prev`.
+The production web app writes three regenerable caches under `apps/web/.next`:
 
-`deploy/scripts/maintain-web-disk.sh` checks the two runtime cache directories daily. When their combined disk usage exceeds 4096 MiB, it takes the same deploy lock used by the web swap, stops `daibilet-web`, moves the cache directories aside, restarts web, verifies `/api/health`, then removes the retired directories. A cache miss rebuilds data; the maintenance does not change DB or static assets. The restart briefly interrupts web service. The script skips a running deploy. It also removes `.next.bak*` directories older than 30 days beyond the two most recent valid builds. It never deletes `.next` or `.next.prev`.
+- `server/route-cache`: rendered HTML, RSC payloads and segment files for ISR pages. Event detail routes make this the largest cache.
+- `cache/fetch-cache`: cached `fetch()` results.
+- `cache/images`: generated AVIF/WebP variants.
 
-Both artifact deploy paths strip regenerable cache from `.next.prev` after the new web passes health. The on-host fallback build now copies only the rollback build files with `rsync` exclusions, avoiding a multi-GiB copy before building.
+The previous daily job stopped `daibilet-web` and deleted both route and fetch caches after they crossed 4 GiB. This caused a brief 502 window and made all dynamic routes cold. The replacement job never stops or restarts Next. Every 15 minutes it prunes least recently used entries above per-cache budgets: 5 GiB for route cache, 1 GiB for fetch cache and 1 GiB for optimized images. Event detail pages are evicted before hub pages; the home, `/events`, `/blog`, `/places`, `/podborki`, and main city hub entries are protected. Evicted entries are regenerated on demand.
 
-Install on MSK after the changes are present in the production checkout:
+Route entries are removed as complete units: HTML, metadata, RSC payload and segment directory. Fetch values are independent files; image variants are grouped by Next's per-image cache directory. The cleaner ignores symlinks, has dry-run mode, and runs with low I/O priority. `.next` and `.next.prev` are never removed.
+
+The cleaner also retains only the two newest valid `.next.bak*` builds beyond 30 days. The active build and `.next.prev` remain available for rollback.
+
+## Verify and install
 
 ```bash
-sudo cp deploy/systemd/daibilet-web-disk-maintenance.{service,timer} /etc/systemd/system/
+bash deploy/scripts/test-maintain-web-disk.sh
+sudo bash deploy/scripts/maintain-web-disk.sh       # dry run
 sudo systemctl daemon-reload
 sudo systemctl enable --now daibilet-web-disk-maintenance.timer
-sudo bash deploy/scripts/maintain-web-disk.sh       # dry run
 sudo systemctl start daibilet-web-disk-maintenance.service
 sudo systemctl status daibilet-web-disk-maintenance.service --no-pager
+sudo journalctl -u daibilet-web-disk-maintenance.service -n 30 --no-pager
 df -h /
 ```
 
-Observe with `journalctl -u daibilet-web-disk-maintenance.service`. Override `CACHE_LIMIT_MIB`, `BACKUP_DAYS`, or `KEEP_BACKUPS` in the service environment if capacity changes. Before changing thresholds, inspect `du -sh apps/web/.next/{cache,server/route-cache}`. Do not delete the active build or current rollback in an ad hoc cleanup.
+The timer unit is `OnBootSec=5m` plus `OnUnitActiveSec=15m`. Override `ROUTE_CACHE_LIMIT_MIB`, `FETCH_CACHE_LIMIT_MIB`, `IMAGE_CACHE_LIMIT_MIB`, `BACKUP_DAYS`, or `KEEP_BACKUPS` in the service environment if capacity changes. The Python pruning tool supports `--apply`; omitting it prints the proposed eviction without deleting files.
 
-Staging has a separate timer and a 2048 MiB cache threshold. Install `daibilet-web-staging-disk-maintenance.{service,timer}` the same way after staging web is active; its configuration points to `/opt/daibilet-staging` and port 3000.
+Staging uses a separate maintenance unit with its own `APP_DIR`; install and inspect that unit independently. Do not point a staging cleaner at the production `.next` directory.
