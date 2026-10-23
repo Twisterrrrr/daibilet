@@ -61,6 +61,15 @@ export type FinanceCheckoutSubmitResult =
       status?: number;
     };
 
+export type FinanceEventCheckoutInput = {
+  eventId: string;
+  offerId: string;
+  quantity: number;
+  buyer: { email: string; name?: string | null; phone?: string | null };
+  returnUrl: string;
+  idempotencyKey: string;
+};
+
 function buildHeaders(env: FinanceProjectionEnv): Headers {
   const headers = new Headers({
     Accept: 'application/json',
@@ -370,6 +379,36 @@ function buildYookassaBody(input: FinanceCheckoutSubmitInput) {
     offerId: input.admissionOfferId,
     returnUrl: input.returnUrl,
     confirmationMode: input.confirmationMode || 'redirect',
+  };
+}
+
+export async function submitEventCheckout(
+  input: FinanceEventCheckoutInput,
+  env: FinanceProjectionEnv = process.env,
+): Promise<FinanceCheckoutSubmitResult> {
+  const email = input.buyer.email.trim().toLowerCase();
+  if (!input.eventId.trim() || !input.offerId.trim() || !email.includes('@')
+    || !Number.isInteger(input.quantity) || input.quantity < 1 || input.quantity > 10
+    || !input.idempotencyKey.trim()) {
+    return { ok: false, error: 'validation_error', detail: 'Проверьте email, тариф и количество', status: 400 };
+  }
+  const result = await financePostJson('/api/checkout/yookassa', {
+    subjectType: 'EVENT', eventId: input.eventId, offerId: input.offerId,
+    quantity: input.quantity, buyer: { ...input.buyer, email },
+    returnUrl: input.returnUrl, confirmationMode: 'redirect',
+  }, env, { idempotencyKey: input.idempotencyKey });
+  if (!result.ok) return result;
+  const order = mapOrderFromFinancePayload(result.json, email, 'YOOKASSA');
+  if (!order?.publicCode) return { ok: false, error: 'invalid_finance_response', status: 502 };
+  const confirmation = resolvePaymentConfirmation(result.json);
+  if (!confirmation.confirmationUrl) {
+    return { ok: false, error: 'payment_confirmation_missing', status: 502 };
+  }
+  return {
+    ok: true, mode: 'YOOKASSA', publicCode: order.publicCode, status: order.status,
+    confirmationUrl: confirmation.confirmationUrl, confirmationToken: confirmation.confirmationToken,
+    confirmationMode: confirmation.confirmationMode,
+    order: { ...order, confirmationUrl: confirmation.confirmationUrl }, raw: result.json,
   };
 }
 

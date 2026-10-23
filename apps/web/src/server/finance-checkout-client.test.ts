@@ -1,6 +1,32 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { mapOrderFromFinancePayload, submitAdmissionCheckout } from './finance-checkout-client';
+import { mapOrderFromFinancePayload, submitAdmissionCheckout, submitEventCheckout } from './finance-checkout-client';
+
+test('event checkout sends the finance event and offer with the caller idempotency key', async () => {
+  const previousFetch = global.fetch;
+  let called = 0;
+  global.fetch = async (input, init) => {
+    called += 1;
+    assert.equal(String(input), 'https://finance.example/api/checkout/yookassa');
+    assert.equal(new Headers(init?.headers).get('Idempotency-Key'), 'event-attempt-1');
+    const body = JSON.parse(String(init?.body));
+    assert.equal(body.eventId, 'event-1');
+    assert.equal(body.offerId, 'offer-1');
+    assert.equal(body.subjectType, 'EVENT');
+    return Response.json({ order: { publicCode: '4157776', status: 'PENDING' },
+      confirmationUrl: 'https://yookassa.example/pay/1' }, { status: 201 });
+  };
+  try {
+    const result = await submitEventCheckout({
+      eventId: 'event-1', offerId: 'offer-1', quantity: 1,
+      buyer: { email: 'buyer@example.com' },
+      returnUrl: 'https://daibilet.ru/checkout/result', idempotencyKey: 'event-attempt-1',
+    }, { FINANCE_API_BASE_URL: 'https://finance.example' });
+    assert.equal(result.ok, true);
+    if (result.ok) assert.equal(result.confirmationUrl, 'https://yookassa.example/pay/1');
+    assert.equal(called, 1);
+  } finally { global.fetch = previousFetch; }
+});
 
 test('production refuses an explicitly requested STUB checkout', async () => {
   const result = await submitAdmissionCheckout({
