@@ -59,6 +59,11 @@ export interface YooKassaRuntimeConfig {
   returnBaseUrl: string;
   verifyWebhook: boolean;
   confirmationMode: YooKassaConfirmationMode;
+  receipt: {
+    vatCode: number | null;
+    paymentSubject: 'service' | 'commodity' | null;
+    paymentMode: 'full_prepayment' | 'full_payment' | null;
+  };
 }
 
 export interface YooKassaPaymentObject {
@@ -77,6 +82,7 @@ export interface YooKassaPaymentObject {
   metadata?: Record<string, unknown>;
   cancellation_details?: Record<string, unknown>;
   test?: boolean;
+  receipt_registration?: string;
   created_at?: string;
   captured_at?: string;
   expires_at?: string;
@@ -147,11 +153,16 @@ export function readYooKassaRuntimeConfig(env: NodeJS.ProcessEnv = process.env):
     confirmationMode: normalizeYooKassaConfirmationMode(
       env.DAIBILET_YOOKASSA_CONFIRMATION_MODE || env.YOOKASSA_CONFIRMATION_MODE,
     ),
+    receipt: {
+      vatCode: parseYooKassaVatCode(env.DAIBILET_YOOKASSA_RECEIPT_VAT_CODE),
+      paymentSubject: parseReceiptPaymentSubject(env.DAIBILET_YOOKASSA_RECEIPT_PAYMENT_SUBJECT),
+      paymentMode: parseReceiptPaymentMode(env.DAIBILET_YOOKASSA_RECEIPT_PAYMENT_MODE),
+    },
   };
 }
 
 export function isYooKassaCheckoutReady(config = readYooKassaRuntimeConfig()): boolean {
-  return Boolean(config.enabled && config.shopId && config.secretKey);
+  return Boolean(config.enabled && config.shopId && config.secretKey && isYooKassaReceiptConfigReady(config.receipt));
 }
 
 export async function createYooKassaCheckoutOrder(
@@ -370,6 +381,8 @@ export async function createYooKassaCheckoutOrder(
         offer,
         session,
         totals,
+        quantity: normalizedPayload.quantity,
+        receipt: config.receipt,
         returnUrl,
         confirmationMode: normalizedPayload.confirmationMode || 'redirect',
       }),
@@ -586,6 +599,8 @@ async function createYooKassaAdmissionCheckoutOrder(
         product,
         offer,
         totals,
+        quantity: normalizedPayload.quantity,
+        receipt: config.receipt,
         returnUrl,
         confirmationMode: normalizedPayload.confirmationMode || 'redirect',
       }),
@@ -639,10 +654,16 @@ export function validateYooKassaCheckoutReadiness(input: {
   if ((input.requireLegalApproval ?? process.env.NODE_ENV === 'production') && input.supplier?.legalProfile?.status !== 'VERIFIED') {
     issues.push(issue('SUPPLIER_NOT_CONFIGURED', 'Юридические и банковские реквизиты поставщика не одобрены', 'high'));
   }
+  if (input.supplier && String(input.supplier.paymentMode) !== 'SINGLE_MERCHANT') {
+    issues.push(issue('YOOKASSA_PAYMENT_MODE_UNSUPPORTED', 'Для этого checkout настроена только схема «Единый продавец»', 'high'));
+  }
   if (!input.config.enabled) {
     issues.unshift(issue('YOOKASSA_CHECKOUT_DISABLED', 'YooKassa checkout выключен', 'high'));
   } else if (!input.config.shopId || !input.config.secretKey) {
     issues.unshift(issue('YOOKASSA_CONFIG_MISSING', 'Не заданы shop id или secret key YooKassa', 'high'));
+  }
+  if (!isYooKassaReceiptConfigReady(input.config.receipt)) {
+    issues.push(issue('YOOKASSA_RECEIPT_CONFIG_MISSING', 'Не настроены параметры чека YooKassa', 'high'));
   }
   return issues;
 }
@@ -668,6 +689,12 @@ export function validateYooKassaAdmissionCheckoutReadiness(input: {
   } else if (!input.config.shopId || !input.config.secretKey) {
     issues.unshift(issue('YOOKASSA_CONFIG_MISSING', 'Не заданы shop id или secret key YooKassa', 'high'));
   }
+  if (input.supplier && String(input.supplier.paymentMode) !== 'SINGLE_MERCHANT') {
+    issues.push(issue('YOOKASSA_PAYMENT_MODE_UNSUPPORTED', 'Для этого checkout настроена только схема «Единый продавец»', 'high'));
+  }
+  if (!isYooKassaReceiptConfigReady(input.config.receipt)) {
+    issues.push(issue('YOOKASSA_RECEIPT_CONFIG_MISSING', 'Не настроены параметры чека YooKassa', 'high'));
+  }
   return issues;
 }
 
@@ -677,6 +704,8 @@ export function buildYooKassaPaymentCreatePayload(input: {
   offer: Pick<StubCheckoutOfferRow, 'id' | 'title'>;
   session: Pick<StubCheckoutSessionRow, 'id' | 'startsAt'> | null;
   totals: StubCheckoutTotalsDto;
+  quantity: number;
+  receipt: YooKassaRuntimeConfig['receipt'];
   returnUrl: string;
   confirmationMode?: YooKassaConfirmationMode | null;
 }): Record<string, unknown> {
@@ -699,6 +728,14 @@ export function buildYooKassaPaymentCreatePayload(input: {
       sessionId: input.session?.id || null,
     },
     merchant_customer_id: input.order.buyerEmail || input.order.buyerPhone || undefined,
+    receipt: buildYooKassaReceipt({
+      email: input.order.buyerEmail,
+      description: receiptItemDescription(input.event.title, input.offer.title),
+      quantity: input.quantity,
+      unitPriceKopecks: input.totals.unitPriceKopecks,
+      totalKopecks: input.totals.totalKopecks,
+      config: input.receipt,
+    }),
   };
 }
 
@@ -707,6 +744,8 @@ export function buildYooKassaAdmissionPaymentCreatePayload(input: {
   product: Pick<StubCheckoutAdmissionProductRow, 'id' | 'slug' | 'title' | 'venueId' | 'cityId'>;
   offer: Pick<StubCheckoutAdmissionOfferRow, 'id' | 'title'>;
   totals: StubCheckoutTotalsDto;
+  quantity: number;
+  receipt: YooKassaRuntimeConfig['receipt'];
   returnUrl: string;
   confirmationMode?: YooKassaConfirmationMode | null;
 }): Record<string, unknown> {
@@ -731,6 +770,14 @@ export function buildYooKassaAdmissionPaymentCreatePayload(input: {
       cityId: input.product.cityId,
     },
     merchant_customer_id: input.order.buyerEmail || input.order.buyerPhone || undefined,
+    receipt: buildYooKassaReceipt({
+      email: input.order.buyerEmail,
+      description: receiptItemDescription(input.product.title, input.offer.title),
+      quantity: input.quantity,
+      unitPriceKopecks: input.totals.unitPriceKopecks,
+      totalKopecks: input.totals.totalKopecks,
+      config: input.receipt,
+    }),
   };
 }
 
@@ -1804,6 +1851,7 @@ function mapYooKassaCheckoutResult(input: {
         confirmationUrl: paymentConfirmation.confirmationUrl,
         confirmationToken: paymentConfirmation.confirmationToken,
         confirmationMode: paymentConfirmation.confirmationMode,
+        receiptRegistration: extractYooKassaReceiptRegistration(input.created.payment),
         paidAt: toIso(input.created.payment.paidAt),
       },
       fulfillment: {
@@ -1887,6 +1935,7 @@ function mapYooKassaAdmissionCheckoutResult(input: {
         confirmationUrl: paymentConfirmation.confirmationUrl,
         confirmationToken: paymentConfirmation.confirmationToken,
         confirmationMode: paymentConfirmation.confirmationMode,
+        receiptRegistration: extractYooKassaReceiptRegistration(input.created.payment),
         paidAt: toIso(input.created.payment.paidAt),
       },
       fulfillment: {
@@ -2012,6 +2061,68 @@ function normalizeYooKassaConfirmationMode(value: unknown): YooKassaConfirmation
   return cleanString(value)?.toLowerCase() === 'embedded' ? 'embedded' : 'redirect';
 }
 
+function parseYooKassaVatCode(value: unknown): number | null {
+  const parsed = Number.parseInt(cleanString(value) || '', 10);
+  return Number.isInteger(parsed) && parsed >= 1 && parsed <= 12 ? parsed : null;
+}
+
+function parseReceiptPaymentSubject(value: unknown): 'service' | 'commodity' | null {
+  const parsed = cleanString(value)?.toLowerCase();
+  return parsed === 'service' || parsed === 'commodity' ? parsed : null;
+}
+
+function parseReceiptPaymentMode(value: unknown): 'full_prepayment' | 'full_payment' | null {
+  const parsed = cleanString(value)?.toLowerCase();
+  return parsed === 'full_prepayment' || parsed === 'full_payment' ? parsed : null;
+}
+
+function isYooKassaReceiptConfigReady(config: YooKassaRuntimeConfig['receipt']): boolean {
+  return config.vatCode != null && Boolean(config.paymentSubject && config.paymentMode);
+}
+
+function buildYooKassaReceipt(input: {
+  email: string | null;
+  description: string;
+  quantity: number;
+  unitPriceKopecks: number;
+  totalKopecks: number;
+  config: YooKassaRuntimeConfig['receipt'];
+}): Record<string, unknown> {
+  const email = cleanString(input.email)?.toLowerCase();
+  if (!email || !isYooKassaReceiptConfigReady(input.config)) {
+    throw new YooKassaCheckoutError('YOOKASSA_RECEIPT_CONFIG_MISSING', 500);
+  }
+  const quantity = Math.trunc(input.quantity);
+  if (quantity < 1 || quantity > 10 || input.unitPriceKopecks < 1) {
+    throw new YooKassaCheckoutError('YOOKASSA_RECEIPT_CONFIG_MISSING', 400, [], 'Invalid receipt item totals');
+  }
+  if (quantity * input.unitPriceKopecks !== input.totalKopecks) {
+    throw new YooKassaCheckoutError('YOOKASSA_RECEIPT_CONFIG_MISSING', 400, [], 'Receipt items do not match payment amount');
+  }
+  return {
+    customer: { email },
+    items: [{
+      description: input.description,
+      quantity,
+      amount: { value: formatKopecksForYooKassa(input.unitPriceKopecks), currency: 'RUB' },
+      vat_code: input.config.vatCode,
+      payment_mode: input.config.paymentMode,
+      payment_subject: input.config.paymentSubject,
+    }],
+    internet: 'true',
+  };
+}
+
+function extractYooKassaReceiptRegistration(payment: CreatedYooKassaCheckoutRows['payment']): string | null {
+  const rawPayload = asRecord(payment.rawPayload);
+  return cleanString(rawPayload.receipt_registration);
+}
+
+function receiptItemDescription(title: string, offerTitle: string | null): string {
+  const normalized = [cleanString(title), cleanString(offerTitle)].filter(Boolean).join(' — ');
+  return (normalized || 'Билет на мероприятие').slice(0, 128);
+}
+
 function buildInternalTicketNumbers(input: {
   publicCode: string | null;
   orderId: string;
@@ -2079,6 +2190,9 @@ function assertYooKassaApiConfig(config: YooKassaRuntimeConfig): void {
   }
   if (!config.shopId || !config.secretKey) {
     throw new YooKassaCheckoutError('YOOKASSA_CONFIG_MISSING', 500);
+  }
+  if (!isYooKassaReceiptConfigReady(config.receipt)) {
+    throw new YooKassaCheckoutError('YOOKASSA_RECEIPT_CONFIG_MISSING', 500);
   }
 }
 

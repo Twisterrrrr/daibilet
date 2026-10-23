@@ -36,6 +36,8 @@ export type StubCheckoutIssueCode =
   | 'OPEN_DATE_NOT_ACTIVE'
   | 'YOOKASSA_CHECKOUT_DISABLED'
   | 'YOOKASSA_CONFIG_MISSING'
+  | 'YOOKASSA_RECEIPT_CONFIG_MISSING'
+  | 'YOOKASSA_PAYMENT_MODE_UNSUPPORTED'
   | 'YOOKASSA_PAYMENT_FAILED'
   | 'YOOKASSA_WEBHOOK_PAYMENT_NOT_FOUND';
 
@@ -160,6 +162,7 @@ export interface YooKassaCheckoutOrderDto extends Omit<StubCheckoutOrderDto, 'pa
     confirmationUrl: string | null;
     confirmationToken: string | null;
     confirmationMode: YooKassaConfirmationMode;
+    receiptRegistration: string | null;
     paidAt: string | null;
   };
   fulfillment: {

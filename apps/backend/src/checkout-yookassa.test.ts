@@ -36,11 +36,19 @@ test('YooKassa checkout requires explicit feature flag and credentials', () => {
     YOOKASSA_SHOP_ID: 'shop_123',
     YOOKASSA_SECRET_KEY: 'test_secret',
     PUBLIC_SITE_URL: 'https://daibilet.ru/',
+    DAIBILET_YOOKASSA_RECEIPT_VAT_CODE: '1',
+    DAIBILET_YOOKASSA_RECEIPT_PAYMENT_SUBJECT: 'service',
+    DAIBILET_YOOKASSA_RECEIPT_PAYMENT_MODE: 'full_prepayment',
   } as NodeJS.ProcessEnv);
   assert.equal(enabled.enabled, true);
   assert.equal(enabled.returnBaseUrl, 'https://daibilet.ru');
   assert.equal(enabled.confirmationMode, 'redirect');
   assert.equal(isYooKassaCheckoutReady(enabled), true);
+  assert.equal(isYooKassaCheckoutReady(readYooKassaRuntimeConfig({
+    DAIBILET_YOOKASSA_CHECKOUT: '1',
+    YOOKASSA_SHOP_ID: 'shop_123',
+    YOOKASSA_SECRET_KEY: 'test_secret',
+  } as NodeJS.ProcessEnv)), false);
 
   const embedded = readYooKassaRuntimeConfig({
     NODE_ENV: 'production',
@@ -48,6 +56,9 @@ test('YooKassa checkout requires explicit feature flag and credentials', () => {
     YOOKASSA_SHOP_ID: 'shop_123',
     YOOKASSA_SECRET_KEY: 'test_secret',
     DAIBILET_YOOKASSA_CONFIRMATION_MODE: 'embedded',
+    DAIBILET_YOOKASSA_RECEIPT_VAT_CODE: '1',
+    DAIBILET_YOOKASSA_RECEIPT_PAYMENT_SUBJECT: 'service',
+    DAIBILET_YOOKASSA_RECEIPT_PAYMENT_MODE: 'full_prepayment',
   } as NodeJS.ProcessEnv);
   assert.equal(embedded.confirmationMode, 'embedded');
 });
@@ -108,10 +119,24 @@ test('builds redirect payment payload without leaking internal raw objects', () 
       commissionKopecks: 7000,
       netKopecks: 63000,
     },
+    quantity: 1,
+    receipt: { vatCode: 1, paymentSubject: 'service', paymentMode: 'full_prepayment' },
     returnUrl: 'https://daibilet.ru/checkout/result?order=1234567',
   });
 
   assert.deepEqual(payload.amount, { value: '700.00', currency: 'RUB' });
+  assert.deepEqual(payload.receipt, {
+    customer: { email: 'buyer@daibilet.ru' },
+    items: [{
+      description: 'Manual event — Adult',
+      quantity: 1,
+      amount: { value: '700.00', currency: 'RUB' },
+      vat_code: 1,
+      payment_mode: 'full_prepayment',
+      payment_subject: 'service',
+    }],
+    internet: 'true',
+  });
   assert.deepEqual(payload.confirmation, {
     type: 'redirect',
     return_url: 'https://daibilet.ru/checkout/result?order=1234567',
@@ -155,6 +180,8 @@ test('builds admission redirect payment payload with venue admission metadata', 
       commissionKopecks: 7000,
       netKopecks: 63000,
     },
+    quantity: 1,
+    receipt: { vatCode: 1, paymentSubject: 'service', paymentMode: 'full_prepayment' },
     returnUrl: 'https://daibilet.ru/checkout/result?order=7654321',
   });
 
@@ -204,6 +231,8 @@ test('builds admission embedded payment payload without provider return_url', ()
       commissionKopecks: 7000,
       netKopecks: 63000,
     },
+    quantity: 1,
+    receipt: { vatCode: 1, paymentSubject: 'service', paymentMode: 'full_prepayment' },
     returnUrl: 'https://daibilet.ru/checkout/result?order=7654321',
     confirmationMode: 'embedded',
   });
@@ -305,6 +334,22 @@ test('adds YooKassa config blockers on top of checkout readiness', () => {
     requireLegalApproval: true,
   });
   assert.ok(unverified.some((issue) => issue.label.includes('не одобрены')));
+
+  const unsupportedPaymentMode = validateYooKassaCheckoutReadiness({
+    config: readYooKassaRuntimeConfig({
+      DAIBILET_YOOKASSA_CHECKOUT: '1', YOOKASSA_SHOP_ID: 'shop_123', YOOKASSA_SECRET_KEY: 'test_secret',
+      DAIBILET_YOOKASSA_RECEIPT_VAT_CODE: '1',
+      DAIBILET_YOOKASSA_RECEIPT_PAYMENT_SUBJECT: 'service',
+      DAIBILET_YOOKASSA_RECEIPT_PAYMENT_MODE: 'full_prepayment',
+    } as NodeJS.ProcessEnv),
+    now,
+    event: eventFixture(),
+    offer: offerFixture({ priceRub: 700 }),
+    session: null,
+    supplier: supplierFixture({ paymentMode: 'SPLIT' }),
+    quantity: 1,
+  });
+  assert.ok(unsupportedPaymentMode.some((issue) => issue.code === 'YOOKASSA_PAYMENT_MODE_UNSUPPORTED'));
 });
 
 test('adds YooKassa config blockers on top of admission checkout readiness', () => {
@@ -399,6 +444,9 @@ test('YooKassa webhook rejects mismatched payment object id', async (t) => {
           DAIBILET_YOOKASSA_CHECKOUT: '1',
           YOOKASSA_SHOP_ID: 'shop_123',
           YOOKASSA_SECRET_KEY: 'test_secret',
+          DAIBILET_YOOKASSA_RECEIPT_VAT_CODE: '1',
+          DAIBILET_YOOKASSA_RECEIPT_PAYMENT_SUBJECT: 'service',
+          DAIBILET_YOOKASSA_RECEIPT_PAYMENT_MODE: 'full_prepayment',
         } as NodeJS.ProcessEnv),
         fetchImpl: async () => new Response(JSON.stringify({
           id: `pay_verified_${suffix}`,
@@ -499,6 +547,7 @@ test('YooKassa admission checkout creates pending payment and preserves idempote
       return new Response(JSON.stringify({
       id: `pay_${suffix}`,
       status: 'pending',
+      receipt_registration: 'pending',
       amount: { value: '700.00', currency: 'RUB' },
       confirmation: {
         type: 'redirect',
@@ -529,6 +578,9 @@ test('YooKassa admission checkout creates pending payment and preserves idempote
         YOOKASSA_SHOP_ID: 'shop_123',
         YOOKASSA_SECRET_KEY: 'test_secret',
         PUBLIC_SITE_URL: 'https://daibilet.ru',
+        DAIBILET_YOOKASSA_RECEIPT_VAT_CODE: '1',
+        DAIBILET_YOOKASSA_RECEIPT_PAYMENT_SUBJECT: 'service',
+        DAIBILET_YOOKASSA_RECEIPT_PAYMENT_MODE: 'full_prepayment',
       } as NodeJS.ProcessEnv),
       fetchImpl: fakeFetch,
       now,
@@ -540,12 +592,25 @@ test('YooKassa admission checkout creates pending payment and preserves idempote
     assert.equal(result.order.item.offerId, offerId);
     assert.equal(result.order.payment.status, 'PENDING');
     assert.equal(result.order.payment.providerPaymentId, `pay_${suffix}`);
+    assert.equal(result.order.payment.receiptRegistration, 'pending');
     assert.equal(result.order.payment.confirmationUrl, `https://yookassa.test/pay/${suffix}`);
     assert.ok(createPaymentRequestBody);
     const expectedReturnUrl = `https://daibilet.ru/checkout/result?order=${result.order.publicCode}`;
     assert.deepEqual((createPaymentRequestBody as Record<string, unknown>).confirmation, {
       type: 'redirect',
       return_url: expectedReturnUrl,
+    });
+    assert.deepEqual((createPaymentRequestBody as Record<string, unknown>).receipt, {
+      customer: { email: 'buyer@daibilet.ru' },
+      items: [{
+        description: 'YooKassa admission product — Adult',
+        quantity: 1,
+        amount: { value: '700.00', currency: 'RUB' },
+        vat_code: 1,
+        payment_mode: 'full_prepayment',
+        payment_subject: 'service',
+      }],
+      internet: 'true',
     });
     assert.equal(result.order.ticketNumber, null);
     assert.deepEqual(result.order.ticketNumbers, []);
@@ -591,6 +656,9 @@ test('YooKassa admission checkout creates pending payment and preserves idempote
         YOOKASSA_SHOP_ID: 'shop_123',
         YOOKASSA_SECRET_KEY: 'test_secret',
         PUBLIC_SITE_URL: 'https://daibilet.ru',
+        DAIBILET_YOOKASSA_RECEIPT_VAT_CODE: '1',
+        DAIBILET_YOOKASSA_RECEIPT_PAYMENT_SUBJECT: 'service',
+        DAIBILET_YOOKASSA_RECEIPT_PAYMENT_MODE: 'full_prepayment',
       } as NodeJS.ProcessEnv),
       fetchImpl: fakeFetch,
       now,
@@ -776,6 +844,9 @@ test('YooKassa admission checkout returns embedded confirmation token', async (t
         YOOKASSA_SHOP_ID: 'shop_123',
         YOOKASSA_SECRET_KEY: 'test_secret',
         PUBLIC_SITE_URL: 'https://daibilet.ru',
+        DAIBILET_YOOKASSA_RECEIPT_VAT_CODE: '1',
+        DAIBILET_YOOKASSA_RECEIPT_PAYMENT_SUBJECT: 'service',
+        DAIBILET_YOOKASSA_RECEIPT_PAYMENT_MODE: 'full_prepayment',
       } as NodeJS.ProcessEnv),
       fetchImpl: fakeFetch,
       now,
@@ -1007,6 +1078,7 @@ function supplierFixture(overrides: Record<string, unknown> = {}) {
     slug: 'supplier',
     title: 'Supplier',
     status: 'ACTIVE',
+    paymentMode: 'SINGLE_MERCHANT',
     defaultCommissionBps: 1000,
     ...overrides,
   } as never;
