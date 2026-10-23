@@ -1,20 +1,14 @@
-import {
-  cityToGenitive,
-  inCityPrepositional,
-} from './city-declension.ts';
+import { inCityPrepositional } from './city-declension.ts';
 import { formatLandingTodayParts } from './datetime.ts';
 
-/**
- * SEO title city hub (канон P.2d, как у Санкт-Петербурга):
- * `{City}: афиша, экскурсии и билеты на сегодня, {date} | Дайбилет`
- */
+/** SEO title for travel intent: sights and ideas for exploring the city. */
 export function buildCityHubSeoTitle(
   cityName: string,
-  reference: Date = new Date(),
+  _reference: Date = new Date(),
 ): string {
   const name = String(cityName || '').trim() || 'Город';
-  const { short } = formatLandingTodayParts(reference);
-  return `${name}: афиша, экскурсии и билеты на сегодня, ${short} | Дайбилет`;
+  const { short } = formatLandingTodayParts(_reference);
+  return `${name}: зачем ехать, что посмотреть, ближайшие события на сегодня, ${short} | Дайбилет`;
 }
 
 /** То же без суффикса бренда — для `pageTitle()` / layout template. */
@@ -26,12 +20,11 @@ export function buildCityHubSeoTitleCore(
 }
 
 /**
- * Meta description / on-page H2 core: длинные запросы в родительном падеже.
- * Пример: «Афиша, экскурсии и билеты Санкт-Петербурга»
+ * Meta description / on-page H2 core: city exploration, attractions and events.
  */
 export function buildCityHubSeoPhrase(cityName: string): string {
   const name = String(cityName || '').trim() || 'города';
-  return `Афиша, экскурсии и билеты ${cityToGenitive(name)}`;
+  return `Что посмотреть ${inCityPrepositional(name)}: главные достопримечательности, места и экскурсии`;
 }
 
 /** Fallback meta description, если в CMS нет seoDescription. */
@@ -41,5 +34,5 @@ export function buildCityHubSeoDescription(
 ): string {
   const name = String(cityName || '').trim() || 'городе';
   const inCity = inCityPrepositional(name);
-  return `${buildCityHubSeoPhrase(name)}. События, музеи и активности ${inCity}: выбор по датам, площадкам и категориям. Билеты онлайн на Дайбилете.`;
+  return `${buildCityHubSeoPhrase(name)}. Гид по главным местам ${inCity}, маршруты на день, музеи и события. Выбирайте, куда сходить, и покупайте билеты онлайн на Дайбилете.`;
 }
