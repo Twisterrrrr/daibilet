@@ -26,6 +26,7 @@ import {
   shouldResolveInstitutionFromTitle,
 } from './event-venue-context.js';
 import { formatPublicEventTitle } from './event-title-normalize.ts';
+import { publicEventCheckoutPath } from './public-event-checkout-path.js';
 import { toPublicCatalogListItem, toPublicHomeCardSession } from './public-catalog-list-item.ts';
 import { enrichBuyerOrdersWithEventLinks } from './buyer-order-event-links.js';
 import {
@@ -4948,9 +4949,9 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
   };
 
   let event = await loadEventRow(resolvedEventId || eventSlugOrId);
-  // PLATFORM sales are owned by finance. A stale offer widget URL must never
-  // turn a catalog event into an unverified buyer checkout entry.
-  if (String(event?.purchaseFlow || '').toUpperCase() === 'PLATFORM') return null;
+  const isPlatformOpenDateCheckout = String(event?.purchaseFlow || '').toUpperCase() === 'PLATFORM'
+    && String(event?.kind || '').toUpperCase() === 'OPEN_DATE';
+  if (String(event?.purchaseFlow || '').toUpperCase() === 'PLATFORM' && !isPlatformOpenDateCheckout) return null;
   if (!event) {
     catalogSessions = await publicCatalogSessions(db);
     resolvedEventId = await resolvePublicEventId(db, eventSlugOrId, catalogSessions);
@@ -4959,7 +4960,9 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
   }
 
   if (!event) return null;
-  if (String(event.purchaseFlow || '').toUpperCase() === 'PLATFORM') return null;
+  const isResolvedPlatformOpenDateCheckout = String(event.purchaseFlow || '').toUpperCase() === 'PLATFORM'
+    && String(event.kind || '').toUpperCase() === 'OPEN_DATE';
+  if (String(event.purchaseFlow || '').toUpperCase() === 'PLATFORM' && !isResolvedPlatformOpenDateCheckout) return null;
   if (!catalogSessions) {
     catalogSessions = await publicCatalogSessions(db);
   }
@@ -5096,7 +5099,10 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
     ),
   ]);
 
-  const publicOffers = preferNamedTicketOffers(dedupePublicOffers(offersResult.rows)).slice(0, 32);
+  const rawPublicOffers = preferNamedTicketOffers(dedupePublicOffers(offersResult.rows)).slice(0, 32);
+  const publicOffers = isResolvedPlatformOpenDateCheckout
+    ? rawPublicOffers.map((offer) => ({ ...offer, widgetUrl: null, deeplinkUrl: null }))
+    : rawPublicOffers;
 
   const primaryOfferByEventId = primaryOfferMap(
     sessionsResult.rows
@@ -5119,7 +5125,9 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
     ...sessionsResult.rows.map((session) => session.priceFromRub),
     ...publicOffers.map((offer) => offer.priceRub),
   );
-  const fallbackWidgetUrl = buildProviderWidgetUrl(representativeRow.externalId ? representativeRow : { ...event, externalId: event.externalId, offerSourceCode: primaryOffer?.sourceCode });
+  const fallbackWidgetUrl = isResolvedPlatformOpenDateCheckout
+    ? null
+    : buildProviderWidgetUrl(representativeRow.externalId ? representativeRow : { ...event, externalId: event.externalId, offerSourceCode: primaryOffer?.sourceCode });
   const purchase = purchaseInfo({
     ...representativeRow,
     sourceCode: event.sourceCode || primaryOffer?.sourceCode,
@@ -5128,9 +5136,12 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
     offerDeeplinkUrl: primaryOffer?.deeplinkUrl || representativeRow.offerDeeplinkUrl,
     externalId: representativeRow.externalId || event.externalId,
   });
-  const purchaseUrl = purchase.url || fallbackWidgetUrl;
-  const widgetProvider = providerWidgetProvider(event.sourceCode || primaryOffer?.sourceCode);
-  const widgetPayload = buildProviderWidgetPayload({
+  const checkoutPath = isResolvedPlatformOpenDateCheckout
+    ? publicEventCheckoutPath(publicEventSlug(event.slug))
+    : null;
+  const purchaseUrl = checkoutPath || purchase.url || fallbackWidgetUrl;
+  const widgetProvider = isResolvedPlatformOpenDateCheckout ? null : providerWidgetProvider(event.sourceCode || primaryOffer?.sourceCode);
+  const widgetPayload = isResolvedPlatformOpenDateCheckout ? null : buildProviderWidgetPayload({
     sourceCode: event.sourceCode || primaryOffer?.sourceCode,
     externalId: event.externalId,
   });
@@ -5139,8 +5150,9 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
     id: representativeRow.id || event.id,
     slug: publicEventSlug(representativeRow.sourceSlug || representativeRow.slug || event.slug),
     sourceSlug: representativeRow.sourceSlug || event.slug,
-    sourceCode: event.sourceCode,
-    externalId: event.externalId,
+    sourceCode: isResolvedPlatformOpenDateCheckout ? null : event.sourceCode,
+    externalId: isResolvedPlatformOpenDateCheckout ? null : event.externalId,
+    purchaseFlow: event.purchaseFlow || 'EXTERNAL',
     widgetProvider,
     widgetPayload,
     groupKey: targetGroupKey,
@@ -5174,12 +5186,12 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
     eventType: String(event.kind || '').toLowerCase(),
     landingSlugs: targetPublicSession?.landingSlugs || LANDING_RULES.filter((rule) => matchesLandingRule({ ...event, title: event.title, venue: event.venue, city: event.city, tags, sourceCategory: event.category }, rule)).map((rule) => rule.slug),
     purchaseUrl,
-    widgetUrl: primaryOffer?.widgetUrl || fallbackWidgetUrl,
-    deeplinkUrl: primaryOffer?.deeplinkUrl || null,
-    purchaseReady: purchase.ready,
-    purchaseMode: purchase.mode,
-    purchaseProvider: purchase.provider,
-    purchaseUrlSource: purchase.urlSource,
+    widgetUrl: isResolvedPlatformOpenDateCheckout ? null : primaryOffer?.widgetUrl || fallbackWidgetUrl,
+    deeplinkUrl: isResolvedPlatformOpenDateCheckout ? null : primaryOffer?.deeplinkUrl || null,
+    purchaseReady: isResolvedPlatformOpenDateCheckout || purchase.ready,
+    purchaseMode: isResolvedPlatformOpenDateCheckout ? 'redirect' : purchase.mode,
+    purchaseProvider: isResolvedPlatformOpenDateCheckout ? null : purchase.provider,
+    purchaseUrlSource: isResolvedPlatformOpenDateCheckout ? null : purchase.urlSource,
     seoH1: event.overrideSeoH1 || event.seoH1 || event.title,
     seoTitle: event.overrideSeoTitle || event.seoTitle || `${event.title}: билеты и расписание | Дайбилет`,
     seoDescription: cleanImportedDescription(event.overrideSeoDescription || event.seoDescription) || `Расписание, цены и билеты на ${event.title}. Покупка через виджет билетной системы.`,
@@ -5234,9 +5246,9 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
       eventSourceStatus: session.eventSourceStatus,
       priceFrom: displayPriceFrom(session.priceFromRub, baseEvent.priceFrom),
       vacant: session.ticketsVacant,
-      purchaseUrl: sessionPurchase.url,
-      purchaseReady: sessionPurchase.ready,
-      purchaseUrlSource: sessionPurchase.urlSource,
+      purchaseUrl: isResolvedPlatformOpenDateCheckout ? checkoutPath : sessionPurchase.url,
+      purchaseReady: isResolvedPlatformOpenDateCheckout || sessionPurchase.ready,
+      purchaseUrlSource: isResolvedPlatformOpenDateCheckout ? null : sessionPurchase.urlSource,
     };
   });
   const widgetOnlySessions = sessions.length === 0

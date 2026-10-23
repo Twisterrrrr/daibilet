@@ -42,6 +42,27 @@ test('uses ProviderLink SESSION identity for a Ticketscloud slot', () => {
   assert.equal(result.upcomingSlots?.[0]?.id, 'session-local-1');
 });
 
+test('Daibilet-managed open-date catalog items never expose a stale provider widget', () => {
+  const result = mapGroupedPublicSession(catalogRow({
+    slug: 'museum-entry',
+    kind: 'OPEN_DATE',
+    purchaseFlow: 'PLATFORM',
+    sourceCode: 'TEPLOHOD',
+    offerSourceCode: 'TEPLOHOD',
+    offerWidgetUrl: 'https://old-provider.example/widget',
+    offerDeeplinkUrl: 'https://old-provider.example/booking',
+    upcomingSlots: [],
+  }));
+
+  assert.ok(result);
+  assert.equal(result.purchaseUrl, '/checkout/events/museum-entry');
+  assert.equal(result.widgetUrl, null);
+  assert.equal(result.deeplinkUrl, null);
+  assert.equal(result.offerSourceCode, null);
+  assert.equal(result.purchaseReady, true);
+  assert.equal(result.purchaseProvider, null);
+});
+
 test('skips teplohod placeholder image and falls back to venue hero', () => {
   const result = mapGroupedPublicSession(catalogRow({
     sourceCode: 'TEPLOHOD',

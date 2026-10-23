@@ -31,6 +31,7 @@ import { pickCatalogSubcategories } from './public-catalog.mapper.js';
 import { spreadCatalogSessionsByCoverImage } from './public-catalog-spread.js';
 import { pickRelatedSessions } from './event-related.js';
 import { formatPublicEventTitle } from './event-title-normalize.ts';
+import { publicEventCheckoutPath } from './public-event-checkout-path.js';
 import type {
   PublicEventDto,
   PublicEventPageDto,
@@ -144,6 +145,8 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
   const requestedSlug = publicSlug(eventSlugOrId);
   const requestedEvent = await resolveEvent(eventSlugOrId);
   if (!requestedEvent) return null;
+  const isPlatformOpenDateCheckout = requestedEvent.purchaseFlow === 'PLATFORM' && requestedEvent.kind === 'OPEN_DATE';
+  if (requestedEvent.purchaseFlow === 'PLATFORM' && !isPlatformOpenDateCheckout) return null;
   const mergeGroupMembers = await loadMergeGroupMembers(requestedEvent);
   const metaGroupMembers = await loadMetaGroupMembers(requestedEvent);
   const eventsById = new Map<string, EventRecord>([[requestedEvent.id, requestedEvent]]);
@@ -246,7 +249,9 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
     offerDeeplinkUrl: representativeOffer?.deeplinkUrl,
     externalId: representativeIdentity.externalId || requestedIdentity.externalId,
   });
-  const eventPurchaseUrl = eventPurchase.url || buildProviderWidgetUrl({
+  const eventPurchaseUrl = isPlatformOpenDateCheckout
+    ? publicEventCheckoutPath(publicSlug(requestedEvent.slug))
+    : eventPurchase.url || buildProviderWidgetUrl({
     sourceCode: representativeSourceCode,
     externalId: representativeIdentity.externalId || requestedIdentity.externalId,
   });
@@ -301,10 +306,10 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
     id: representative.id,
     slug: publicSlug(representative.slug),
     sourceSlug: representative.slug,
-    sourceCode: eventSourceCode,
-    externalId: primaryPurchase.externalId,
-    widgetProvider: providerForSource(eventSourceCode),
-    widgetPayload: buildProviderWidgetPayload({
+    sourceCode: isPlatformOpenDateCheckout ? null : eventSourceCode,
+    externalId: isPlatformOpenDateCheckout ? null : primaryPurchase.externalId,
+    widgetProvider: isPlatformOpenDateCheckout ? null : providerForSource(eventSourceCode),
+    widgetPayload: isPlatformOpenDateCheckout ? null : buildProviderWidgetPayload({
       sourceCode: eventSourceCode,
       externalId: primaryPurchase.externalId,
     }),
@@ -364,13 +369,14 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
       ...metaGroupMembers.map((member) => member.id),
     ])],
     sessionCount: sessions.length,
-    purchaseUrl: primaryPurchase.purchaseUrl,
-    widgetUrl: representativeOffer?.widgetUrl || primaryPurchase.purchaseUrl,
-    deeplinkUrl: representativeOffer?.deeplinkUrl || null,
-    purchaseReady: eventPurchase.ready || Boolean(primaryPurchase.purchaseUrl),
-    purchaseMode: eventPurchase.mode,
-    purchaseProvider: eventPurchase.provider,
-    purchaseUrlSource: primaryPurchase.urlSource || eventPurchase.urlSource,
+    purchaseFlow: requestedEvent.purchaseFlow || 'EXTERNAL',
+    purchaseUrl: isPlatformOpenDateCheckout ? eventPurchaseUrl : primaryPurchase.purchaseUrl,
+    widgetUrl: isPlatformOpenDateCheckout ? null : representativeOffer?.widgetUrl || primaryPurchase.purchaseUrl,
+    deeplinkUrl: isPlatformOpenDateCheckout ? null : representativeOffer?.deeplinkUrl || null,
+    purchaseReady: isPlatformOpenDateCheckout || eventPurchase.ready || Boolean(primaryPurchase.purchaseUrl),
+    purchaseMode: isPlatformOpenDateCheckout ? 'redirect' : eventPurchase.mode,
+    purchaseProvider: isPlatformOpenDateCheckout ? null : eventPurchase.provider,
+    purchaseUrlSource: isPlatformOpenDateCheckout ? null : primaryPurchase.urlSource || eventPurchase.urlSource,
     seoH1: requestedEvent.override?.seoH1 || requestedEvent.seoH1 || title,
     seoTitle: requestedEvent.override?.seoTitle || requestedEvent.seoTitle || (() => {
       const nearest = sessions[0];
@@ -385,8 +391,13 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
     canonicalPath: requestedEvent.override?.canonicalPath || requestedEvent.canonicalPath || `/events/${publicSlug(representative.slug)}`,
     isIndexable: requestedEvent.override?.isIndexable ?? requestedEvent.isIndexable,
   };
-  const ticketPrices = buildTicketPrices(offers, sessions, event);
-  const purchaseOptions = await buildMergedPurchaseOptions(mergedGroupEvents, offers, requestedEvent, eventPurchaseUrl);
+  const publicOffers = isPlatformOpenDateCheckout
+    ? offers.map((offer) => ({ ...offer, widgetUrl: null, deeplinkUrl: null }))
+    : offers;
+  const ticketPrices = buildTicketPrices(publicOffers, sessions, event);
+  const purchaseOptions = isPlatformOpenDateCheckout
+    ? []
+    : await buildMergedPurchaseOptions(mergedGroupEvents, offers, requestedEvent, eventPurchaseUrl);
   const related = await loadRelatedSessionsFromDb(requestedEvent, groupEventIds, 12);
   const priceValues = [event.priceFrom, ...sessions.map((session) => session.priceFrom)]
     .filter((value): value is number => Number.isFinite(value) && Number(value) >= MIN_DISPLAY_PRICE_RUB);
@@ -420,7 +431,7 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
     generatedAt: new Date().toISOString(),
     event,
     sessions,
-    offers: offers.map(({ eventId: _eventId, sortOrder: _sortOrder, sourceTicketId: _sourceTicketId, payload: _payload, ...offer }) => offer),
+    offers: publicOffers.map(({ eventId: _eventId, sortOrder: _sortOrder, sourceTicketId: _sourceTicketId, payload: _payload, ...offer }) => offer),
     ticketPrices,
     ...(purchaseOptions.length >= 2 ? { purchaseOptions } : {}),
     // Cross-city peer events: same show in different cities.
@@ -598,10 +609,9 @@ function mapSession(
     offerSourceCode: offer?.sourceCode,
     externalId,
   });
-  const resolvedPurchaseUrl =
-    (providerForSource(sourceCode) === 'TICKETSCLOUD' && rebuiltPurchaseUrl) ||
-    purchase.url ||
-    eventPurchaseUrl;
+  const resolvedPurchaseUrl = requestedEvent.purchaseFlow === 'PLATFORM'
+    ? eventPurchaseUrl
+    : (providerForSource(sourceCode) === 'TICKETSCLOUD' && rebuiltPurchaseUrl) || purchase.url || eventPurchaseUrl;
   const openDate = requestedEvent.kind === 'OPEN_DATE' || session.sourceStatus?.toLowerCase() === 'open_date';
   const wideLifetime = isWideLifetimeSession(session.startsAt, session.endsAt);
   const startsAt = openDate || wideLifetime ? null : normalizeStartsAt(session.startsAt);
@@ -624,8 +634,8 @@ function mapSession(
     priceFrom: displayPriceFrom(session.priceFromRub, offer?.priceRub),
     vacant: session.ticketsVacant,
     purchaseUrl: resolvedPurchaseUrl,
-    purchaseReady: purchase.ready || Boolean(resolvedPurchaseUrl),
-    purchaseUrlSource: purchase.urlSource,
+    purchaseReady: requestedEvent.purchaseFlow === 'PLATFORM' || purchase.ready || Boolean(resolvedPurchaseUrl),
+    purchaseUrlSource: requestedEvent.purchaseFlow === 'PLATFORM' ? null : purchase.urlSource,
   };
 }
 

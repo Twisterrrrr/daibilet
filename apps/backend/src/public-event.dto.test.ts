@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { publicEventCheckoutPath } from './public-event-checkout-path.js';
 
 import {
   buildTepEventIdFromTrailingToken,
@@ -60,4 +61,8 @@ test('eventTitleTokenFingerprint matches TC/TEP twins with shuffled phrases', ()
     eventTitleTokenFingerprint(tc),
     eventTitleTokenFingerprint('Дискотека на теплоходе с разводом мостов'),
   );
+});
+
+test('PLATFORM open-date events use a same-origin checkout route', () => {
+  assert.equal(publicEventCheckoutPath('museum entry'), '/checkout/events/museum%20entry');
 });

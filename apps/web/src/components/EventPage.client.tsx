@@ -246,7 +246,17 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
           ) : null}
 
           <div className="mt-6">
-            {isTepWidget && tepCheckoutUrl ? (
+            {event.purchaseFlow === 'PLATFORM' ? (
+              event.eventType === 'open_date' && event.purchaseReady ? (
+                <Link href={`/checkout/events/${encodeURIComponent(event.slug)}`} className={buyButtonClass}>
+                  Купить билет
+                </Link>
+              ) : (
+                <button type="button" disabled className="w-full cursor-not-allowed rounded-xl bg-slate-200 px-6 py-3.5 text-base font-medium text-slate-400">
+                  Покупка пока недоступна
+                </button>
+              )
+            ) : isTepWidget && tepCheckoutUrl ? (
               <CheckoutModalButton
                 checkoutUrl={tepCheckoutUrl}
                 label="Купить билет"
@@ -512,6 +522,18 @@ export function EventHeroBuyButton({
       event.widgetUrl ||
       null
     : null;
+
+  if (event.purchaseFlow === 'PLATFORM') {
+    return event.eventType === 'open_date' && event.purchaseReady ? (
+      <Link href={`/checkout/events/${encodeURIComponent(event.slug)}`} className={heroClass}>
+        {label}
+      </Link>
+    ) : (
+      <button type="button" disabled className={`${heroClass} cursor-not-allowed opacity-60`}>
+        Покупка пока недоступна
+      </button>
+    );
+  }
 
   if (showMultiPurchase) {
     return (

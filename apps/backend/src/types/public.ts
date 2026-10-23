@@ -180,6 +180,7 @@ export interface PublicCityDto extends SeoFields {
 export interface PublicEventDto extends SeoFields, PurchaseFields {
   id: string;
   slug: string;
+  purchaseFlow?: 'EXTERNAL' | 'PLATFORM' | string | null;
   sourceSlug?: string | null;
   sourceCode?: string | null;
   externalId?: string | null;

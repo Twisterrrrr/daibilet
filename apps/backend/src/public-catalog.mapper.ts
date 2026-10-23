@@ -24,6 +24,7 @@ import {
 } from './public-destination.js';
 import type { DestinationType, TimeBucket } from './types/common.js';
 import type { PublicSessionDto } from './types/public.js';
+import { publicEventCheckoutPath } from './public-event-checkout-path.js';
 
 export interface PublicCatalogSlotRow {
   id?: string | null;
@@ -49,6 +50,7 @@ export interface PublicCatalogMappingRow {
   title: string;
   description: string | null;
   kind: string;
+  purchaseFlow?: string | null;
   sourceStatus: string | null;
   ageLimit?: string | null;
   imageUrl: string | null;
@@ -170,10 +172,13 @@ export function mapGroupedPublicSession(
   const destination = publicDestinationForCity({ ...row, city: cityName }, options?.separateCityHubs);
   if (!destination) return null;
   const timeZone = resolveCityTimeZone(cityName, destination.name);
-  const fallbackWidgetUrl = buildProviderWidgetUrl(row);
+  const platformOpenDate = row.purchaseFlow === 'PLATFORM' && row.kind === 'OPEN_DATE';
+  const fallbackWidgetUrl = platformOpenDate ? null : buildProviderWidgetUrl(row);
   if (!isPublicSessionRowOnSale({ sourceStatus: row.sourceStatus })) return null;
   const purchase = purchaseInfo(row);
-  const purchaseUrl = purchase.url || fallbackWidgetUrl;
+  const purchaseUrl = platformOpenDate
+    ? publicEventCheckoutPath(publicSlug(row.slug))
+    : purchase.url || fallbackWidgetUrl;
   const upcomingSlots = dedupeCatalogSlotsByClock(
     parseUpcomingSlots(row.upcomingSlots)
       .filter(hasSlotStart)
@@ -203,7 +208,7 @@ export function mapGroupedPublicSession(
           timeLabel: formatTime(startsAt, timeZone),
           timeBucket: timeBucket(startsAt, timeZone),
           timeZone,
-          purchaseUrl: slotPurchase.url || purchaseUrl,
+          purchaseUrl: platformOpenDate ? purchaseUrl : slotPurchase.url || purchaseUrl,
         };
       })
       .sort(
@@ -248,14 +253,14 @@ export function mapGroupedPublicSession(
     venueAddress: row.venueAddress || null,
     venueKind: row.venueKind || 'OTHER',
     offerTitle: row.offerTitle,
-    offerSourceCode: row.offerSourceCode,
+    offerSourceCode: platformOpenDate ? null : row.offerSourceCode,
     purchaseUrl,
-    widgetUrl: row.offerWidgetUrl || fallbackWidgetUrl,
-    deeplinkUrl: row.offerDeeplinkUrl,
-    purchaseReady: purchase.ready,
-    purchaseMode: purchase.mode,
-    purchaseProvider: purchase.provider,
-    purchaseUrlSource: purchase.urlSource,
+    widgetUrl: platformOpenDate ? null : row.offerWidgetUrl || fallbackWidgetUrl,
+    deeplinkUrl: platformOpenDate ? null : row.offerDeeplinkUrl,
+    purchaseReady: platformOpenDate || purchase.ready,
+    purchaseMode: platformOpenDate ? 'redirect' : purchase.mode,
+    purchaseProvider: platformOpenDate ? null : purchase.provider,
+    purchaseUrlSource: platformOpenDate ? null : purchase.urlSource,
     category: row.category || 'unknown',
     subcategories,
     tags: tags.slice(0, 4),

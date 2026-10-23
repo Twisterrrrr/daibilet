@@ -621,6 +621,7 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
         event.title,
         event.description,
         event.kind,
+        event."purchaseFlow" as "purchaseFlow",
         event."sourceStatus",
         event."ageLimit",
         event."imageUrl",
@@ -753,18 +754,21 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
           where price is not null and price >= ${MIN_DISPLAY_PRICE_RUB}
         ) as "priceTo",
         (
-          (
-            "offerWidgetUrl" is not null
-            or "offerDeeplinkUrl" is not null
-            or (
-              coalesce("sourceCode"::text, "offerSourceCode"::text, '') in ('TICKETSCLOUD', 'TEPLOHOD')
-              and "externalId" is not null
+          ("purchaseFlow" = 'PLATFORM' and kind = 'OPEN_DATE')
+          or (
+            (
+              "offerWidgetUrl" is not null
+              or "offerDeeplinkUrl" is not null
+              or (
+                coalesce("sourceCode"::text, "offerSourceCode"::text, '') in ('TICKETSCLOUD', 'TEPLOHOD')
+                and "externalId" is not null
+              )
             )
-          )
-          and (
-            coalesce("slotCount", 0) > 0
-            or kind = 'OPEN_DATE'
-            or "sourceStatus" = 'open_date'
+            and (
+              coalesce("slotCount", 0) > 0
+              or kind = 'OPEN_DATE'
+              or "sourceStatus" = 'open_date'
+            )
           )
         ) as "purchaseReady"
       from event_base

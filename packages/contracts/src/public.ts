@@ -279,6 +279,8 @@ export interface PublicRegionNearbyDto {
 export interface PublicEventDto extends SeoFields, PurchaseFields {
   id: string;
   slug: string;
+  /** PLATFORM means the buyer must use Daibilet's finance checkout, never a provider widget. */
+  purchaseFlow?: 'EXTERNAL' | 'PLATFORM' | string | null;
   sourceSlug?: string | null;
   sourceCode?: string | null;
   externalId?: string | null;
