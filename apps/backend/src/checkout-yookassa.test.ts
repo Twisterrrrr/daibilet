@@ -294,6 +294,17 @@ test('adds YooKassa config blockers on top of checkout readiness', () => {
   });
 
   assert.equal(issues[0]?.code, 'YOOKASSA_CHECKOUT_DISABLED');
+  const unverified = validateYooKassaCheckoutReadiness({
+    config: readYooKassaRuntimeConfig({ NODE_ENV: 'test' } as NodeJS.ProcessEnv),
+    now,
+    event: eventFixture({ managementMode: 'SUPPLIER_DRAFTS' }),
+    offer: offerFixture({ priceRub: 700 }),
+    session: null,
+    supplier: supplierFixture({ legalProfile: { status: 'DRAFT' } }),
+    quantity: 1,
+    requireLegalApproval: true,
+  });
+  assert.ok(unverified.some((issue) => issue.label.includes('не одобрены')));
 });
 
 test('adds YooKassa config blockers on top of admission checkout readiness', () => {

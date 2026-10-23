@@ -623,8 +623,8 @@ export function validateStubCheckoutReadiness(input: StubCheckoutValidationInput
   if (String(input.event.purchaseFlow) !== 'PLATFORM') {
     issues.push(issue('EVENT_NOT_INTERNAL_CHECKOUT', 'Событие не подключено к checkout Daibilet', 'high'));
   }
-  if (String(input.event.managementMode) !== 'DAIBILET_MANAGED') {
-    issues.push(issue('EVENT_NOT_MANAGED_BY_DAIBILET', 'Событие не ведется Daibilet вручную', 'high'));
+  if (!['DAIBILET_MANAGED', 'SUPPLIER_DRAFTS'].includes(String(input.event.managementMode))) {
+    issues.push(issue('EVENT_NOT_MANAGED_BY_DAIBILET', 'Событие не ведется в каталоге Daibilet', 'high'));
   }
   if (!input.supplier || String(input.supplier.status) !== 'ACTIVE') {
     issues.push(issue('SUPPLIER_NOT_CONFIGURED', 'Поставщик не активен или не привязан', 'high'));
