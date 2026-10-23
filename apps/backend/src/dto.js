@@ -3792,6 +3792,19 @@ export async function updateAdminEventOverride(db, eventId, payload) {
     [eventId],
   );
   const current = currentResult.rows[0] || {};
+  if (normalized.editorStatus === 'PUBLISHED' && current.editorStatus !== 'PUBLISHED') {
+    const [event] = await eventRowsByIds(db, [eventId]);
+    if (!event) {
+      const error = new Error('event_not_found');
+      error.statusCode = 404;
+      throw error;
+    }
+    if (!event.canPublish) {
+      const error = new Error(`event_publish_blocked: ${event.publishBlockers.join(', ')}`);
+      error.statusCode = 422;
+      throw error;
+    }
+  }
   const next = {
     title: current.title ?? null,
     description: current.description ?? null,
@@ -5600,6 +5613,8 @@ async function eventRows(db, limit, options = {}) {
         length(trim(coalesce(e.description, '')))::int as "descriptionLength",
         e.kind,
         e.status,
+        e."purchaseFlow",
+        e."managementMode",
         e."sourceStatus",
         e."ageLimit",
         e."imageUrl",
@@ -5744,6 +5759,8 @@ async function eventRows(db, limit, options = {}) {
       venueSlug: row.venueSlug,
       venueKind: row.venueKind || 'OTHER',
       offerSourceCode: row.offerSourceCode,
+      purchaseFlow: row.purchaseFlow,
+      managementMode: row.managementMode,
       offerTitle: row.offerTitle,
       offerPriceRub: row.offerPriceRub,
       offerWidgetUrl: row.offerWidgetUrl,
@@ -5850,6 +5867,7 @@ export function publishGate(event, reasons, readinessIssues = []) {
 
   if (event.priceFrom == null) blockers.push('нет цены / offer');
   if (!event.purchaseReady) blockers.push('нет виджета');
+  if (event.purchaseFlow === 'PLATFORM' && event.managementMode !== 'DAIBILET_MANAGED') blockers.push('внутренний checkout ещё не подключён');
   if (!event.startsAt && event.kind !== 'OPEN_DATE') blockers.push('нет даты');
   if (!event.venue) blockers.push('нет площадки');
   if (!event.city) blockers.push('нет города');

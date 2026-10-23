@@ -38,7 +38,8 @@ async function handleEventOverrideUpdate(
   if (!eventId) return false;
 
   const payload = await parseJsonBody(eventOverridePayloadSchema, context.request);
-  const result = await deps.updateAdminEventOverride(deps.db, eventId, payload);
+  const result = await updateEventOverrideOrReject(deps, eventId, payload, context);
+  if (!result) return true;
   deps.invalidatePublicCaches('event override update');
   sendJson(context.response, result);
   return true;
@@ -57,8 +58,25 @@ async function handleEventModerationUpdate(
   if (!eventId) return false;
 
   const payload = await parseJsonBody(eventModerationPayloadSchema, context.request);
-  const result = await deps.updateAdminEventOverride(deps.db, eventId, { editorStatus: payload.editorStatus });
+  const result = await updateEventOverrideOrReject(deps, eventId, { editorStatus: payload.editorStatus }, context);
+  if (!result) return true;
   deps.invalidatePublicCaches('event moderation update');
   sendJson(context.response, result);
   return true;
+}
+
+async function updateEventOverrideOrReject(
+  deps: AdminEventsHandlerDependencies,
+  eventId: string,
+  payload: EventOverridePayload | EventModerationPayload,
+  context: RouteContext,
+): Promise<unknown | null> {
+  try {
+    return await deps.updateAdminEventOverride(deps.db, eventId, payload);
+  } catch (error) {
+    const statusCode = (error as { statusCode?: unknown })?.statusCode;
+    if (statusCode !== 404 && statusCode !== 422) throw error;
+    sendJson(context.response, { error: error instanceof Error ? error.message : 'event_publish_blocked' }, { statusCode });
+    return null;
+  }
 }

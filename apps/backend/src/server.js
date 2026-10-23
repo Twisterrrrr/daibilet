@@ -791,7 +791,14 @@ export async function handleRequest(request, response) {
 
     const eventOverrideMatch = request.method === 'PATCH' ? url.pathname.match(/^\/api\/admin\/events\/([^/]+)\/override$/) : null;
     if (eventOverrideMatch) {
-      const result = await updateAdminEventOverride(db, decodeURIComponent(eventOverrideMatch[1]), await readJsonBody(request));
+      let result;
+      try {
+        result = await updateAdminEventOverride(db, decodeURIComponent(eventOverrideMatch[1]), await readJsonBody(request));
+      } catch (error) {
+        if (error?.statusCode !== 404 && error?.statusCode !== 422) throw error;
+        sendJson(response, { error: error.message }, error.statusCode);
+        return;
+      }
       invalidatePublicCaches('event override update');
       sendJson(response, result);
       return;
@@ -800,7 +807,14 @@ export async function handleRequest(request, response) {
     const eventModerationMatch = request.method === 'PATCH' ? url.pathname.match(/^\/api\/admin\/events\/([^/]+)\/moderation$/) : null;
     if (eventModerationMatch) {
       const body = await readJsonBody(request);
-      const result = await updateAdminEventOverride(db, decodeURIComponent(eventModerationMatch[1]), { editorStatus: body.editorStatus });
+      let result;
+      try {
+        result = await updateAdminEventOverride(db, decodeURIComponent(eventModerationMatch[1]), { editorStatus: body.editorStatus });
+      } catch (error) {
+        if (error?.statusCode !== 404 && error?.statusCode !== 422) throw error;
+        sendJson(response, { error: error.message }, error.statusCode);
+        return;
+      }
       invalidatePublicCaches('event moderation update');
       sendJson(response, result);
       return;
