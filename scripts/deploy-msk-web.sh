@@ -177,6 +177,24 @@ if [[ "$WEB_READY" -ne 1 ]]; then
   exit 1
 fi
 
+# The old build is still serving through the shadow upstream at this point.
+# Populate the incoming build's highest-traffic route cache before moving public
+# traffic back to it. Keep this best-effort: a slow catalog/API must not strand
+# users on the shadow or turn a successful deploy into a rollback.
+echo "Warming incoming build while shadow continues serving..."
+if [[ -f "$APP_DIR/scripts/warm-hub-pages.mjs" ]]; then
+  DAIBILET_WEB_PORT="$WEB_PORT" WARM_FETCH_TIMEOUT_MS="${DEPLOY_WARM_TIMEOUT_MS:-30000}" \
+    node "$APP_DIR/scripts/warm-hub-pages.mjs" \
+    || echo "Warning: incoming hub warm failed; continuing handoff"
+fi
+if [[ "${DEPLOY_WARM_TOP_EVENTS:-1}" == "1" && -f "$APP_DIR/scripts/warm-top-event-pages.mjs" ]]; then
+  DAIBILET_WEB_PORT="$WEB_PORT" EVENT_SSG_TOP_N="${DEPLOY_WARM_EVENT_COUNT:-40}" \
+    WARM_CONCURRENCY="${DEPLOY_WARM_EVENT_CONCURRENCY:-2}" \
+    WARM_TIMEOUT_MS="${DEPLOY_WARM_EVENT_TIMEOUT_MS:-15000}" \
+    node "$APP_DIR/scripts/warm-top-event-pages.mjs" \
+    || echo "Warning: incoming event warm failed; continuing handoff"
+fi
+
 finish_web_handoff
 
 # Keep rollback build files, but never retain its regenerable runtime cache.
