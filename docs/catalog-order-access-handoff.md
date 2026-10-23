@@ -1,6 +1,6 @@
 # Catalog handoff: buyer order access proof
 
-Status: finance foundation implemented; enforcement remains off until the catalog BFF is deployed and smoked.
+Status: finance token issuance and catalog BFF handoff are implemented in code; production enforcement remains off until compatible deployments and browser smoke are complete.
 
 ## Why
 
@@ -29,23 +29,23 @@ Status: finance foundation implemented; enforcement remains off until the catalo
 
 Do not add the proof to `return_url`, query parameters, client logs or analytics.
 
-1. In `apps/web/app/checkout/actions/admission/route.ts`, read `order.orderAccessToken` from the finance create response.
-2. Store `{ publicCode, token }` in a short-lived catalog cookie. The cookie must be `HttpOnly`, `Secure`, `SameSite=Lax`, scoped to `/checkout`, and expire after the payment/result window (recommended two hours).
-3. Remove `orderAccessToken` from the JSON returned to browser JavaScript.
-4. In the catalog order-result proxy, read the cookie, require its `publicCode` to equal the requested code, and forward the proof to finance as `x-daibilet-order-access`.
-5. Keep the visible and YooKassa return URL unchanged: `https://daibilet.ru/checkout/result?order={publicCode}`.
-6. If the cookie is absent, show a neutral order-verification state. Do not retry anonymously and do not reveal whether the code exists.
+1. **Done in code:** the catalog checkout BFF reads `order.orderAccessToken` from the finance response.
+2. **Done in code:** it stores `{ publicCode, token }` in a `HttpOnly`, production-`Secure`, `SameSite=Lax` cookie scoped to `/api/public/checkout/orders`. The cookie lasts 30 days so the buyer can revisit the ticket result; the proof is bound to one exact public code.
+3. **Done in code:** the BFF removes `orderAccessToken` from JSON returned to browser JavaScript.
+4. **Done in code:** the order-result proxy requires an exact code match before forwarding the proof as `x-daibilet-order-access`.
+5. The visible and YooKassa return URL remains unchanged: `https://daibilet.ru/checkout/result?order={publicCode}`.
+6. **Verify before enforcement:** when no matching cookie exists, the finance endpoint must return its neutral not-found response; do not retry anonymously or reveal whether the code exists. Confirm the checkout UI presents a neutral verification state.
 
-One cookie can hold the current `{publicCode, token}` pair. A list of per-order cookies is unnecessary for Stage 0; authenticated buyer account access is the long-term multi-order path.
+One cookie holds the most recently created `{publicCode, token}` pair. Starting another checkout replaces it; authenticated buyer account access is the long-term multi-order path.
 
 ## Cutover sequence
 
 1. Deploy finance issuance with `DAIBILET_REQUIRE_ORDER_ACCESS=0`.
 2. Deploy catalog BFF cookie + header forwarding.
-3. Smoke embedded and redirect flows, including a page reload after returning from YooKassa.
+3. **Pending:** smoke embedded and redirect flows, including a page reload after returning from YooKassa; confirm the token never appears in browser JSON, URLs, or logs.
 4. Verify a direct anonymous finance lookup still works only during this compatibility window.
 5. Set `DAIBILET_REQUIRE_ORDER_ACCESS=1` on finance and restart the API.
-6. Verify: valid cookie 200; no cookie 404; token for another code 404; supplier/admin projections unchanged.
+6. Verify: matching cookie 200; no cookie 404; cookie proof for another code 404; supplier/admin projections unchanged.
 
 ## Secrets
 

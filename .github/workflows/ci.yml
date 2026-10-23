@@ -165,5 +165,5 @@ jobs:
         if: ${{ startsWith(github.ref_name, 'codex/') || startsWith(github.head_ref, 'codex/') || (github.event_name == 'workflow_dispatch' && inputs.suite == 'finance') }}
         run: |
           pnpm --filter @daibilet/web typecheck
-          node --experimental-strip-types --test apps/web/src/lib/checkout-payment.test.ts
+          node --experimental-strip-types --test apps/web/src/lib/checkout-payment.test.ts apps/web/src/lib/order-access-cookie.test.ts
           pnpm web:build

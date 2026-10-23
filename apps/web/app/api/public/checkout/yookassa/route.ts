@@ -1,5 +1,12 @@
 import '@/lib/env';
 import { NextResponse } from 'next/server';
+import {
+  encodeOrderAccessProof,
+  extractOrderAccessProof,
+  ORDER_ACCESS_COOKIE_MAX_AGE_SECONDS,
+  ORDER_ACCESS_COOKIE_NAME,
+  ORDER_ACCESS_COOKIE_PATH,
+} from '@/lib/order-access-cookie';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,14 +36,36 @@ export async function POST(request: Request) {
       cache: 'no-store',
       signal: AbortSignal.timeout(25_000),
     });
-    const text = await upstream.text();
-    return new NextResponse(text || '{}', {
+    const responsePayload: unknown = await upstream.json().catch(() => null);
+    if (!responsePayload) {
+      return NextResponse.json(
+        { error: upstream.ok ? 'invalid_finance_response' : 'finance_api_error' },
+        { status: upstream.ok ? 502 : upstream.status, headers: noStoreHeaders() },
+      );
+    }
+
+    const { payload: safePayload, proof } = extractOrderAccessProof(responsePayload);
+    if (upstream.ok && !proof) {
+      return NextResponse.json(
+        { error: 'finance_order_access_proof_missing' },
+        { status: 502, headers: noStoreHeaders() },
+      );
+    }
+
+    const response = NextResponse.json(safePayload, {
       status: upstream.status,
-      headers: {
-        ...noStoreHeaders(),
-        'content-type': upstream.headers.get('content-type') || 'application/json; charset=utf-8',
-      },
+      headers: noStoreHeaders(),
     });
+    if (upstream.ok && proof) {
+      response.cookies.set(ORDER_ACCESS_COOKIE_NAME, encodeOrderAccessProof(proof), {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: ORDER_ACCESS_COOKIE_PATH,
+        maxAge: ORDER_ACCESS_COOKIE_MAX_AGE_SECONDS,
+      });
+    }
+    return response;
   } catch {
     return NextResponse.json(
       { error: 'finance_api_unavailable' },

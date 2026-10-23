@@ -3653,3 +3653,17 @@
 1. Push and deploy the paired finance API change on `.159`.
 2. Hand the admin asset change to the catalog/admin deployment owner; do not deploy catalog `.184` from the finance lane.
 3. Submit one harmless supplier update, inspect the structured admin diff and reject it; then repeat with an approved disposable change before the YooKassa paid-browser smoke.
+
+## 2026-10-23 - Catalog order-access proof handoff
+
+### Changes
+
+- The YooKassa checkout BFF now strips the finance-issued `orderAccessToken` from browser JSON and stores the proof in a scoped HttpOnly cookie.
+- The order-result BFF forwards the proof to finance only when the cookie's public order code exactly matches the requested code.
+- Added unit coverage for proof extraction, browser-response stripping, malformed cookies and cross-order mismatch.
+
+### Verification and rollout
+
+- Web typecheck and the new helper tests pass locally.
+- Finance enforcement must remain disabled until the catalog deployment is compatible and embedded/redirect browser smoke confirms the cookie handoff and neutral missing-proof behavior.
+- No deployment, payment, production environment or finance enforcement change was performed.
