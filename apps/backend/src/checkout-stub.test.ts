@@ -81,6 +81,29 @@ test('allows Daibilet-managed open-date venue admission without a session', () =
   assert.equal(classifyStubCheckoutSubject({ eventKind: 'OPEN_DATE', venueKind: 'MUSEUM_ART_SPACE' }), 'VENUE_ADMISSION');
 });
 
+test('allows a ready supplier-draft event through internal checkout validation', () => {
+  const issues = validateStubCheckoutReadiness({
+    enabled: true,
+    now,
+    event: eventFixture({ kind: 'OPEN_DATE', status: 'READY', purchaseFlow: 'PLATFORM', managementMode: 'SUPPLIER_DRAFTS' }),
+    offer: offerFixture({ priceRub: 700 }),
+    session: null,
+    supplier: supplierFixture(),
+    quantity: 1,
+  });
+  assert.deepEqual(issues, []);
+  const draftIssues = validateStubCheckoutReadiness({
+    enabled: true,
+    now,
+    event: eventFixture({ kind: 'OPEN_DATE', status: 'REVIEW', purchaseFlow: 'PLATFORM', managementMode: 'SUPPLIER_DRAFTS' }),
+    offer: offerFixture({ priceRub: 700 }),
+    session: null,
+    supplier: supplierFixture(),
+    quantity: 1,
+  });
+  assert.deepEqual(draftIssues.map((issue) => issue.code), ['EVENT_NOT_PUBLIC']);
+});
+
 test('blocks imported/source-managed events and external checkout flow', () => {
   const issues = validateStubCheckoutReadiness({
     enabled: true,
