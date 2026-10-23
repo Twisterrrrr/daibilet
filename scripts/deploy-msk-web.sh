@@ -44,6 +44,11 @@ clear_deploy_active() {
 trap clear_deploy_active EXIT
 echo "Deploy lock acquired (${DEPLOY_LOCK})"
 
+# Give the delayed post-deploy crawler monitor a bounded window beginning here.
+POST_DEPLOY_MONITOR_STATE="${APP_DIR}/var/monitor/crawler-post-deploy-${DEPLOY_SHA}.json"
+mkdir -p "$(dirname "$POST_DEPLOY_MONITOR_STATE")"
+printf '{"until":%s000}\n' "$(date +%s)" >"$POST_DEPLOY_MONITOR_STATE"
+
 # Past root deploys can leave .git/objects unwritable for deploy@.
 if ! touch .git/objects/.daibilet-write-probe 2>/dev/null; then
   if sudo -n chown -R "$(whoami):$(id -gn)" .git 2>/dev/null; then
@@ -182,18 +187,42 @@ fi
 # traffic back to it. Keep this best-effort: a slow catalog/API must not strand
 # users on the shadow or turn a successful deploy into a rollback.
 echo "Warming incoming build while shadow continues serving..."
+HUB_WARM_OUTPUT=''
+HUB_WARM_STATUS=0
 if [[ -f "$APP_DIR/scripts/warm-hub-pages.mjs" ]]; then
-  DAIBILET_WEB_PORT="$WEB_PORT" WARM_FETCH_TIMEOUT_MS="${DEPLOY_WARM_TIMEOUT_MS:-30000}" \
-    node "$APP_DIR/scripts/warm-hub-pages.mjs" \
-    || echo "Warning: incoming hub warm failed; continuing handoff"
+  if HUB_WARM_OUTPUT="$(DAIBILET_WEB_PORT="$WEB_PORT" WARM_FETCH_TIMEOUT_MS="${DEPLOY_WARM_TIMEOUT_MS:-30000}" \
+    node "$APP_DIR/scripts/warm-hub-pages.mjs" 2>&1)"; then
+    :
+  else
+    HUB_WARM_STATUS=$?
+  fi
+  printf '%s\n' "$HUB_WARM_OUTPUT"
+else
+  HUB_WARM_STATUS=127
 fi
+HUB_WARM_SUMMARY="$(printf '%s\n' "$HUB_WARM_OUTPUT" | sed -n 's/^warm-hub-pages done: /hub=/p' | tail -n 1)"
+
+EVENT_WARM_OUTPUT=''
+EVENT_WARM_STATUS=0
 if [[ "${DEPLOY_WARM_TOP_EVENTS:-1}" == "1" && -f "$APP_DIR/scripts/warm-top-event-pages.mjs" ]]; then
-  DAIBILET_WEB_PORT="$WEB_PORT" EVENT_SSG_TOP_N="${DEPLOY_WARM_EVENT_COUNT:-40}" \
+  if EVENT_WARM_OUTPUT="$(DAIBILET_WEB_PORT="$WEB_PORT" EVENT_SSG_TOP_N="${DEPLOY_WARM_EVENT_COUNT:-40}" \
     WARM_CONCURRENCY="${DEPLOY_WARM_EVENT_CONCURRENCY:-2}" \
     WARM_TIMEOUT_MS="${DEPLOY_WARM_EVENT_TIMEOUT_MS:-15000}" \
-    node "$APP_DIR/scripts/warm-top-event-pages.mjs" \
-    || echo "Warning: incoming event warm failed; continuing handoff"
+    node "$APP_DIR/scripts/warm-top-event-pages.mjs" 2>&1)"; then
+    :
+  else
+    EVENT_WARM_STATUS=$?
+  fi
+  printf '%s\n' "$EVENT_WARM_OUTPUT"
+elif [[ "${DEPLOY_WARM_TOP_EVENTS:-1}" != "1" ]]; then
+  EVENT_WARM_STATUS=0
+else
+  EVENT_WARM_STATUS=127
 fi
+EVENT_WARM_SUMMARY="$(printf '%s\n' "$EVENT_WARM_OUTPUT" | grep -E '^\{"ok":' | tail -n 1 || true)"
+echo "DEPLOY_WARMUP ${HUB_WARM_SUMMARY:-hub=unavailable} events=${EVENT_WARM_SUMMARY:-skipped} hub_status=${HUB_WARM_STATUS} event_status=${EVENT_WARM_STATUS}"
+(( HUB_WARM_STATUS == 0 )) || echo "Warning: incoming hub warm failed; continuing handoff"
+(( EVENT_WARM_STATUS == 0 )) || echo "Warning: incoming event warm failed; continuing handoff"
 
 finish_web_handoff
 
