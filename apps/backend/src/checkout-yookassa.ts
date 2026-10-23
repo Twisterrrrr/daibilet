@@ -5,7 +5,6 @@ import type {
   StubCheckoutTotalsDto,
   YooKassaCheckoutCreateDto,
   YooKassaCheckoutErrorDto,
-  YooKassaCheckoutOrderDto,
   YooKassaCheckoutResultDto,
   YooKassaConfirmationMode,
   YooKassaReconcileAction,
@@ -1651,33 +1650,6 @@ async function markYooKassaCreateAttemptErrored(
       },
     },
   }).catch(() => undefined);
-}
-
-async function failCreatedYooKassaCheckout(created: CreatedYooKassaCheckoutRows, error: unknown): Promise<void> {
-  await prisma.$transaction(async (tx) => {
-    await tx.payment.update({
-      where: { id: created.payment.id },
-      data: {
-        status: 'FAILED',
-        error: errorToMessage(error),
-      },
-    });
-    await tx.checkoutOrder.update({
-      where: { id: created.order.id },
-      data: {
-        status: 'FAILED',
-        cancelledAt: new Date(),
-      },
-    });
-    await tx.fulfillmentItem.update({
-      where: { id: created.fulfillment.id },
-      data: {
-        status: 'FAILED',
-        lastError: errorToMessage(error),
-      },
-    });
-    await releaseReservedCapacityInTransaction(tx, created.order.id);
-  });
 }
 
 async function releaseReservedCapacityInTransaction(tx: Prisma.TransactionClient, orderId: string): Promise<void> {
