@@ -5872,6 +5872,9 @@ function sanitizeTicketscloudPurchaseUrl(url) {
 }
 
 function purchaseInfo(row = {}) {
+  if (String(row.purchaseFlow || '').toUpperCase() === 'PLATFORM') {
+    return { ready: false, mode: null, provider: null, urlSource: null, url: null, status: 'finance checkout не подключён' };
+  }
   const sourceCode = row.sourceCode || row.offerSourceCode;
   const provider = providerWidgetProvider(sourceCode);
   const fallbackUrl = sanitizeTicketscloudPurchaseUrl(
