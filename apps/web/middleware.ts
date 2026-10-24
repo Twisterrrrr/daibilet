@@ -29,11 +29,47 @@ function unauthorizedAdminResponse(realm: string) {
   });
 }
 
+const ADMIN_SESSION_COOKIE = 'daibilet_admin_session';
+
+async function hasValidAdminSession(request: NextRequest): Promise<boolean> {
+  const cookie = request.headers.get('cookie') || '';
+  if (!cookie.split(';').some((part) => part.trim().startsWith(`${ADMIN_SESSION_COOKIE}=`))) return false;
+  const base = (
+    process.env.DAIBILET_ADMIN_API_URL ||
+    process.env.DAIBILET_API_INTERNAL_URL ||
+    process.env.DAIBILET_API_URL ||
+    'http://127.0.0.1:4000'
+  ).replace(/\/$/, '');
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 2500);
+  try {
+    const response = await fetch(`${base}/api/admin/auth/me`, {
+      headers: { cookie },
+      cache: 'no-store',
+      signal: controller.signal,
+    });
+    return response.ok;
+  } catch {
+    return false;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 async function enforceAdminAuth(request: NextRequest) {
+  if (request.nextUrl.pathname === '/admin/login') return null;
+  if (await hasValidAdminSession(request)) return null;
   const config = readAdminBasicAuthConfig(process.env);
-  const ok = await isAuthorizedAdminBasicAuth(request.headers.get('authorization'), config);
-  if (!ok) return unauthorizedAdminResponse(config.realm);
-  return null;
+  const authorization = request.headers.get('authorization');
+  const ok = await isAuthorizedAdminBasicAuth(authorization, config);
+  if (ok) return null;
+  if (!authorization) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/admin/login';
+    url.searchParams.set('next', request.nextUrl.pathname + request.nextUrl.search);
+    return NextResponse.redirect(url, 302);
+  }
+  return unauthorizedAdminResponse(config.realm);
 }
 
 export async function middleware(request: NextRequest) {

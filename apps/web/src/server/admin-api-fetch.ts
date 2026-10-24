@@ -2,7 +2,7 @@ import { headers } from 'next/headers';
 
 /**
  * Server-side admin API client (F4).
- * Calls legacy backend on the same VPS; forwards browser Basic Auth.
+ * Calls backend on the same VPS; forwards browser Basic Auth and staff session.
  */
 export function resolveAdminApiBase(env: NodeJS.ProcessEnv = process.env): string {
   const fromEnv =
@@ -20,9 +20,13 @@ export async function adminApiFetch(apiPath: string, init?: RequestInit): Promis
   const base = resolveAdminApiBase();
   const incoming = await headers();
   const authorization = incoming.get('authorization');
+  const cookie = incoming.get('cookie');
   const reqHeaders = new Headers(init?.headers);
   if (authorization && !reqHeaders.has('authorization')) {
     reqHeaders.set('authorization', authorization);
+  }
+  if (cookie && !reqHeaders.has('cookie')) {
+    reqHeaders.set('cookie', cookie);
   }
 
   return fetch(`${base}${path}`, {

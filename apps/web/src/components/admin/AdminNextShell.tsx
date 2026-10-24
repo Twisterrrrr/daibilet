@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, type ComponentType, type ReactNode } from 'react';
+import { AdminLogoutButton } from '@/components/admin/AdminLogoutButton.client';
 import {
   BookOpen,
   Building2,
@@ -193,15 +194,18 @@ export function AdminNextShell({ children }: Props) {
               </p>
               <h1 className="truncate text-base font-semibold text-slate-900">{title}</h1>
             </div>
-            <button
-              type="button"
-              className="rounded-md border border-slate-200 bg-white p-2 text-slate-700 hover:bg-slate-50 md:hidden"
-              aria-expanded={menuOpen}
-              aria-label={menuOpen ? 'Закрыть меню' : 'Открыть меню'}
-              onClick={() => setMenuOpen((open) => !open)}
-            >
-              {menuOpen ? <X className="h-4 w-4" aria-hidden /> : <Menu className="h-4 w-4" aria-hidden />}
-            </button>
+            <div className="flex shrink-0 items-center gap-2">
+              <AdminLogoutButton />
+              <button
+                type="button"
+                className="rounded-md border border-slate-200 bg-white p-2 text-slate-700 hover:bg-slate-50 md:hidden"
+                aria-expanded={menuOpen}
+                aria-label={menuOpen ? 'Закрыть меню' : 'Открыть меню'}
+                onClick={() => setMenuOpen((open) => !open)}
+              >
+                {menuOpen ? <X className="h-4 w-4" aria-hidden /> : <Menu className="h-4 w-4" aria-hidden />}
+              </button>
+            </div>
           </div>
           {menuOpen ? (
             <nav
