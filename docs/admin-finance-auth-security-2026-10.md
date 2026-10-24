@@ -35,3 +35,15 @@
 ## Следующий кодовый срез
 
 Начать с этапа A: реализовать персональный вход и серверные сессии поверх уже существующих `AdminUser`, `AdminInvitation`, `AdminSession`, `AdminAuditLog`. Перед этим согласовать единый auth boundary: Next middleware/proxy, `adminApiFetch`, catalog backend и finance bridge. До появления этого boundary не добавлять декоративный экран 2FA или MFA-поля, которые фактически не блокируют доступ.
+
+## Проверенная текущая граница авторизации
+
+| Путь | Текущий механизм | Что нужно изменить |
+|---|---|---|
+| `/admin/*` в Next | `apps/web/middleware.ts` проверяет общий Basic Auth | Персональная session cookie; middleware пропускает login, backend подтверждает действительность сессии |
+| `apps/web/src/server/admin-api-fetch.ts` → catalog backend | Forward входящего Basic `Authorization` | Читать HttpOnly admin session cookie и передавать серверному backend сессию, не сырой credential из браузера |
+| `/api/admin/*` в `apps/backend/src/server.js` | Один Basic Auth до dispatch маршрута | На каждом запросе проверить hash сессии, срок, отзыв, `AdminUser.state`, permission и объектную область; default deny |
+| Finance read: `admin-orders-data.ts` | Прямой fetch на finance host с `DAIBILET_FINANCE_ADMIN_READ_TOKEN` | Передавать отдельное подписанное короткоживущее утверждение сотрудника поверх service auth; finance самостоятельно проверяет audience, подпись, expiry и permission |
+| Finance operation: `admin-order-actions.ts` | Прямой POST с `DAIBILET_FINANCE_ADMIN_OPERATION_TOKEN` | Тот же подписанный actor context, отдельный permission и audit; убрать возможность превратить service token в пользовательский допуск |
+
+Это означает, что один только вход в Next или проверка меню недостаточны. Пока finance bridge не умеет проверять пользователя, финансовые страницы и действия не должны считаться защищёнными персональным RBAC. Не включать staff-сессии для рабочих финансовых ролей до закрытия этапов A-C и read/action guards на finance API.
