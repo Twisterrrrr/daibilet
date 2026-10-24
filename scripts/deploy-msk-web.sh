@@ -98,6 +98,10 @@ test "$INCOMING_BUILD_ID" = "$EXPECTED_BUILD_ID" || { echo 'ERROR: incoming BUIL
 test "$(cat "$WEB_NEXT_STAGE/DEPLOY_SHA")" = "$DEPLOY_SHA" || { echo 'ERROR: artifact SHA mismatch'; exit 1; }
 # Resolve the incoming commit independently before altering the running checkout.
 test "$(git rev-parse "$DEPLOY_SHA^{commit}")" = "$DEPLOY_SHA"
+# Next.js rewrites this tracked, generated file during builds on the host. Reset
+# only that generated drift so the subsequent checkout can switch to the artifact
+# commit; leave all other local files untouched.
+git restore --source=HEAD --staged --worktree -- apps/web/next-env.d.ts
 git checkout --detach "$DEPLOY_SHA"
 test "$(git rev-parse HEAD)" = "$DEPLOY_SHA"
 sync_public_assets_deploy
