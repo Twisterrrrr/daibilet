@@ -358,6 +358,7 @@ export interface PublicPurchaseOptionDto extends PurchaseFields {
 
 export interface PublicEventPageDto extends ApiEnvelope {
   event: PublicEventDto;
+  pdp?: PublicPdpDocumentDto | null;
   sessions: Array<Omit<DateTimeSlot, 'startsAt'> & PurchaseFields & {
     id: string;
     eventId: string;
