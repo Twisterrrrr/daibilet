@@ -704,6 +704,7 @@ model Event {
   reviewRequests  ReviewRequest[]
   override        EventOverride?
   routeItems      EventVenueRouteItem[]
+  pdpDocument     PdpDocument? @relation("EventPdpDocument")
 
   @@index([status])
   @@index([purchaseFlow])
@@ -1031,11 +1032,29 @@ model Venue {
   reviews         Review[]
   externalReviews ExternalReview[]
   routeItems      EventVenueRouteItem[]
+  pdpDocument     PdpDocument? @relation("VenuePdpDocument")
 
   admissionProducts AdmissionProduct[]
   @@index([title])
   @@index([cityId, isTouristPlace, isMainPlace])
   @@index([parentPlaceId])
+}
+
+model PdpDocument {
+  id        String   @id @default(cuid())
+  venueId   String?  @unique
+  eventId   String?  @unique
+  variant   String
+  status    String   @default("DRAFT")
+  content   Json
+  version   Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  venue Venue? @relation("VenuePdpDocument", fields: [venueId], references: [id], onDelete: Cascade)
+  event Event? @relation("EventPdpDocument", fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([variant, status])
 }
 
 model VenueAlias {
