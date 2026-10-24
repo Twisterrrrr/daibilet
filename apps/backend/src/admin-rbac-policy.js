@@ -3,6 +3,7 @@ import { adminRoleAllows } from '@daibilet/contracts/admin-access/runtime';
 const exactPolicies = new Map([
   ['GET /api/db/stats', ['integrations.read']],
   ['GET /api/db/events', ['catalog.read']],
+  ['GET /api/admin/dashboard', ['catalog.read', 'seo.read', 'integrations.read', 'finance.summary.read', 'orders.read']],
   ['GET /api/admin/sources', ['integrations.read']],
   ['GET /api/admin/orders', ['orders.read', 'orders.pii.read']],
   ['GET /api/admin/external-orders', ['orders.read', 'orders.pii.read']],
@@ -14,6 +15,10 @@ const exactPolicies = new Map([
   ['GET /api/admin/pdp/variants', ['catalog.read']],
   ['GET /api/admin/landings', ['seo.read']],
   ['GET /api/admin/articles', ['content.read']],
+  // The dashboard DTO currently combines catalog, SEO, integration and order metrics.
+  // Article writes can change publication state, so require both permissions until
+  // the endpoint performs payload-aware authorization.
+  ['POST /api/admin/articles', ['content.edit', 'content.publish']],
   ['GET /api/admin/reviews', ['content.read']],
   ['GET /api/admin/event-change-requests', ['suppliers.read']],
   ['POST /api/admin/orders/archive', ['orders.manage']],
@@ -33,23 +38,29 @@ const dynamicPolicies = [
   [/^PATCH \/api\/admin\/cities\/[^/]+$/, ['catalog.edit']],
   [/^GET \/api\/admin\/venues\/[^/]+$/, ['catalog.read']],
   [/^PATCH \/api\/admin\/venues\/[^/]+$/, ['catalog.edit']],
+  [/^GET \/api\/admin\/pdp\/variants$/, ['catalog.read']],
   [/^GET \/api\/admin\/pdp\/(?:venues|events)\/[^/]+$/, ['catalog.read']],
   [/^PUT \/api\/admin\/pdp\/(?:venues|events)\/[^/]+$/, ['catalog.edit']],
   [/^GET \/api\/admin\/landings\/[^/]+\/candidates$/, ['seo.read']],
   [/^GET \/api\/admin\/landings\/[^/]+$/, ['seo.read']],
   [/^PATCH \/api\/admin\/landings\/[^/]+$/, ['seo.edit']],
   [/^PATCH \/api\/admin\/landings\/[^/]+\/matches\/[^/]+$/, ['seo.edit']],
+  [/^PATCH \/api\/admin\/articles\/[^/]+$/, ['content.edit', 'content.publish']],
   [/^GET \/api\/admin\/articles\/[^/]+$/, ['content.read']],
+  [/^DELETE \/api\/admin\/articles\/[^/]+$/, ['content.edit']],
   [/^GET \/api\/admin\/events\/[^/]+$/, ['catalog.read']],
   [/^GET \/api\/admin\/events\/[^/]+\/venue-link-suggestions$/, ['catalog.read']],
+  // This endpoint accepts mixed override fields. Until the handler checks each
+  // submitted field, only roles with the full set can use it.
+  [/^PATCH \/api\/admin\/events\/[^/]+\/override$/, ['content.edit', 'seo.edit', 'catalog.edit', 'catalog.publish']],
   [/^PATCH \/api\/admin\/events\/[^/]+\/moderation$/, ['catalog.publish']],
   [/^PATCH \/api\/admin\/events\/[^/]+\/(?:taxonomy|venue-links)$/, ['catalog.edit']],
   [/^POST \/api\/admin\/events\/[^/]+\/rewrite-description$/, ['content.edit']],
   [/^POST \/api\/admin\/events\/[^/]+\/venue-links:apply$/, ['catalog.edit']],
-  [/^PATCH \/api\/admin\/events\/[^/]+\/venue-links$/, ['catalog.edit']],
+  [/^(?:PATCH|PUT) \/api\/admin\/events\/[^/]+\/venue-links$/, ['catalog.edit']],
   [/^GET \/api\/admin\/event-change-requests\/[^/]+$/, ['suppliers.read']],
   [/^POST \/api\/admin\/event-change-requests\/[^/]+\/(?:approve|reject)$/, ['suppliers.manage']],
-  [/^POST \/api\/admin\/event-change-requests\/[^/]+\/apply$/, ['catalog.edit']],
+  [/^POST \/api\/admin\/event-change-requests\/[^/]+\/apply$/, ['suppliers.manage', 'catalog.edit']],
   [/^POST \/api\/admin\/reviews\/[^/]+\/(?:approve|reject|hide)$/, ['content.publish']],
 ];
 
