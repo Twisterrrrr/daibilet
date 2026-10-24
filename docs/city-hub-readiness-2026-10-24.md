@@ -57,4 +57,4 @@ Counts below are the `events` field returned by `/api/public/destinations` durin
 ## Remaining SEO owner decisions
 
 - Homepage `private, no-store` behavior caused by cookie-based personalization.
-- Saint Isaac’s Cathedral currently has an explicit `isIndexable=false`; confirm whether exclusion is intentional before changing it.
+- Saint Isaac’s Cathedral intentionally remains a thin layer with `isIndexable=false` until its content is expanded (owner confirmed 2026-10-24). Do not change this flag before editorial work.

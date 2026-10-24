@@ -9,7 +9,7 @@ import test from 'node:test';
  * digest DYNAMIC_SERVER_USAGE, which Next surfaces as HTTP 500
  * (live 2026-09-03: /events/[slug], /cities/*, /venues/*, /locations/*).
  *
- * Home may read cookies in `app/page.tsx` and pass `initialCity`.
+ * Home uses one shared ISR response; selected city is applied client-side.
  */
 const WEB_ROOT = path.resolve(__dirname, '../..');
 
@@ -21,6 +21,17 @@ test('ISR chrome: SiteLayout must not call cookies/headers/connection/noStore', 
   assert.equal(source.includes('await connection('), false, 'SiteLayout calls connection()');
   assert.equal(source.includes('noStore('), false, 'SiteLayout calls noStore()');
   assert.match(source, /initialCity/);
+});
+
+test('home page remains shared ISR and does not vary server output by request cookies', () => {
+  const page = fs.readFileSync(path.join(WEB_ROOT, 'app/page.tsx'), 'utf8');
+  const content = fs.readFileSync(path.join(WEB_ROOT, 'src/components/HomePageContent.tsx'), 'utf8');
+  assert.match(page, /export const revalidate\s*=\s*300/);
+  assert.equal(page.includes("from 'next/headers'"), false, 'home page imports request-bound headers/cookies');
+  assert.equal(/\b(?:cookies|headers|connection)\s*\(/.test(page), false, 'home page reads request-bound state');
+  assert.equal(/\b(?:cookies|headers|connection)\s*\(/.test(content), false, 'home content reads request-bound state');
+  assert.match(content, /const ssrCityName = null/);
+  assert.match(content, /const ssrCitySlug = null/);
 });
 
 test('event PDP cache: ISR fetch + miss-throw, not bare no-store', () => {

@@ -6,8 +6,8 @@
 |----|--------|-----------|--------|
 | SEO.SITEMAP-CACHE | Runtime sitemap через loopback API + bounded nginx cache; `lastmod` только из реального updatedAt; короткий cache TTL для динамических карт без суточного stale окна | Критический | ✅ live `48072f1ea`, deploy run `40102589715`, BUILD_ID `t_h7TtDcnqD3tKtTftT8q`; events sitemap/API total `4401/4401`, 40/40 равномерно выбранных URL ответили 200 |
 | SEO.MOSKVA-CANONICAL | Stored Cyrillic/alias canonical для того же города нормализуется к публичному Latin route в metadata и JSON-LD; намеренный cross-city canonical сохраняется | Высокий | ✅ live `48072f1ea`: `/cities/moskva` 200 + self-canonical и City JSON-LD; старый encoded URL 308 → Latin; Moscow в sitemap один раз |
-| SEO.HOME-NOSTORE | Главная `private, no-store` из-за `await cookies()` в HomePageBody (стр. 53): город-персонализацию на клиент (ISR ○) или осознанный accept | Высокий | ⏳ решение владельца |
-| SEO.ISAINDEXABLE-FALSE | Исаакиевский собор `isIndexable: false` в БД при 5 будущих сеансах и PUBLISHED (рендер и sitemap консистентно исключают): сверить с владельцем + выборка топ-объектов СПб/Москвы | Средний | ⏳ владелец |
+| SEO.HOME-NOSTORE | Персонализация города на главной | Высокий | ✅ server output уже общий; город выбирается в клиентских островах, `app/page.tsx` имеет `revalidate=300`; regression test запрещает request-bound cookies/headers; ожидает CI/deploy live cache-header check |
+| SEO.ISAINDEXABLE-FALSE | Исаакиевский собор намеренно остаётся thin layer/noindex до появления достаточного контента | Средний | ✅ подтверждено владельцем 2026-10-24; не менять флаг до редакционного усиления страницы |
 
 ## 2026-10-18 - Roadmap: хабы городов, PDP мест, тестовый поставщик
 
