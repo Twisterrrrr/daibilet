@@ -6,6 +6,8 @@ import { eventStatusLabel, venueKindLabel, venuePageStatusLabel } from '@/compon
 import { formatAdminDateTime, formatAdminNumber, PUBLIC_SITE_BASE } from '@/lib/admin-ui';
 import { saveAdminVenueAction } from '@/server/admin-venue-actions';
 import { loadAdminVenueDetail } from '@/server/admin-venues-data';
+import { AdminVenuePdpEditor } from '@/components/admin/AdminVenuePdpEditor.client';
+import { loadAdminPdpEditorData } from '@/server/admin-pdp-data';
 
 export const dynamic = 'force-dynamic';
 
@@ -54,6 +56,22 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
   const back = first(rawSearch.back) || '';
   const backHref = /^\/admin\/venues(?:\?|$)/.test(back) ? back : '/admin/venues';
   const detail = await loadAdminVenueDetail(id);
+  const pdpData = detail.found && detail.slug
+    ? await loadAdminPdpEditorData(detail.id)
+    : { variants: {}, document: null, error: null };
+  const defaultVariantByVenueKind: Record<string, string> = {
+    MUSEUM_ART_SPACE: 'museum', THEATER: 'theater', CONCERT_HALL: 'concert_hall', CLUB_BAR_RESTAURANT: 'club',
+    PIER: 'pier', MONUMENT: 'landmark', PARK: 'park', TEMPLE: 'religion', OUTDOOR_LOCATION: 'nature',
+    SPORT_ACTIVITY_SPACE: 'sport', ATTRACTION: 'attraction', BUS: 'transport', GASTRO: 'food',
+  };
+  const defaultVariantByPlaceType: Record<string, string> = {
+    MUSEUM: 'museum', MONUMENT: 'landmark', RELIGION: 'religion', NATURE: 'nature', URBAN: 'urban_area',
+    THEATRE: 'theater', ENTERTAINMENT: 'attraction', FOOD: 'food', TRANSPORT: 'transport', VENUE: 'venue', OTHER: 'venue',
+  };
+  const initialVariant = pdpData.document?.variant
+    || defaultVariantByVenueKind[detail.kind.toUpperCase()]
+    || defaultVariantByPlaceType[String(detail.placeType || '').toUpperCase()]
+    || 'venue';
   const notice = first(rawSearch.saved) === '1' ? 'Площадка сохранена.' : null;
 
   return (
@@ -271,6 +289,17 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
             Сохранить
           </button>
         </form>
+      ) : null}
+
+      {detail.found && detail.slug ? (
+        <AdminVenuePdpEditor
+          entityId={detail.id}
+          venueSlug={detail.slug}
+          variants={pdpData.variants}
+          initialDocument={pdpData.document}
+          initialVariant={initialVariant}
+          initialError={pdpData.error}
+        />
       ) : null}
 
       <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">

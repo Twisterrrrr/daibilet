@@ -8,6 +8,7 @@ import { InstitutionVenueLayout } from '@/components/InstitutionVenueLayout.clie
 import { LocationVenueLayout } from '@/components/LocationVenueLayout.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { VenueAdmissionBlock } from '@/components/VenueAdmissionBlock';
+import { VenuePdpContent } from '@/components/VenuePdpContent.client';
 import type { PublicSessionDto, PublicVenueDto, PublicVenuePageDto } from '@daibilet/contracts/public';
 import { resolveVenueHeroImage } from '@/lib/city-place-images';
 import {
@@ -236,6 +237,7 @@ export function VenuePageView({
                 nearbyEvents={contentReady ? matchedPayload.nearbyEvents || [] : []}
                 pagePayload={matchedPayload}
               >
+                <VenuePdpContent document={matchedPayload.pdp} />
                 {admissionProducts.length > 0 ? <VenueAdmissionBlock products={admissionProducts} /> : null}
                 {baseSessions.length > 0 ? (
                   <VenueProgramBlock
@@ -259,6 +261,7 @@ export function VenuePageView({
                 pagePayload={matchedPayload}
                 admissionProducts={admissionProducts}
               >
+                <VenuePdpContent document={matchedPayload.pdp} />
                 {baseSessions.length > 0 ? (
                   <VenueProgramBlock
                     title={experience?.programTitle || 'Афиша'}
@@ -269,9 +272,12 @@ export function VenuePageView({
                   />
                 ) : null}
               </InstitutionVenueLayout>
-            ) : admissionProducts.length > 0 ? (
-              <div className="container-page py-6">
-                <VenueAdmissionBlock products={admissionProducts} />
+            ) : admissionProducts.length > 0 || matchedPayload.pdp ? (
+              <div className="py-6">
+                <VenuePdpContent document={matchedPayload.pdp} />
+                {admissionProducts.length > 0 ? (
+                  <div className="container-page"><VenueAdmissionBlock products={admissionProducts} /></div>
+                ) : null}
               </div>
             ) : null}
 

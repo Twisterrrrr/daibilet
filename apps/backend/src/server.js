@@ -6,6 +6,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createDb } from './db.js';
+import { PDP_VARIANTS, readPdpDocument, savePdpDocument } from './pdp-documents.js';
 import {
   buildAdminDashboard,
   buildAdminBuyersList,
@@ -749,6 +750,27 @@ export async function handleRequest(request, response) {
 
     if (route === 'GET /api/admin/venues') {
       sendJson(response, await buildAdminVenuesList(db, url.searchParams));
+      return;
+    }
+
+    if (route === 'GET /api/admin/pdp/variants') {
+      sendJson(response, PDP_VARIANTS);
+      return;
+    }
+
+    const pdpMatch = url.pathname.match(/^\/api\/admin\/pdp\/(venues|events)\/([^/]+)$/);
+    if (pdpMatch && (request.method === 'GET' || request.method === 'PUT')) {
+      const entity = pdpMatch[1];
+      const id = decodeURIComponent(pdpMatch[2]);
+      try {
+        const result = request.method === 'GET'
+          ? await readPdpDocument(db, entity, id)
+          : await savePdpDocument(db, entity, id, await readJsonBody(request));
+        if (request.method === 'PUT' && result) invalidatePublicCaches('pdp document update');
+        sendJson(response, result, result || request.method === 'GET' ? 200 : 404);
+      } catch (error) {
+        sendJson(response, { error: error instanceof Error ? error.message : 'invalid_pdp_document' }, 400);
+      }
       return;
     }
 

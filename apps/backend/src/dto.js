@@ -2797,6 +2797,7 @@ export async function buildAdminVenueDetail(db, venueId) {
           venue."parkingInfo",
           venue."hookFact",
           venue.kind,
+          venue."placeType",
           venue."pageStatus",
           city.title as city
         from "Venue" venue

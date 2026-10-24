@@ -344,10 +344,26 @@ export interface PublicVenuePageDto extends ApiEnvelope {
   venue: PublicVenueDto;
   sessions: PublicSessionDto[];
   relatedVenues: PublicVenueDto[];
+  pdp?: PublicPdpDocumentDto | null;
   stats: {
     events: number;
     categories: number;
     priceFrom?: number | null;
+  };
+}
+
+export interface PublicPdpDocumentDto {
+  variant: string;
+  content: {
+    summary?: string;
+    gallery?: Array<{ url: string; alt?: string; caption?: string; credit?: string }>;
+    facts?: Array<{ label: string; value: string; sourceUrl?: string; verifiedAt?: string }>;
+    sections?: Array<{
+      id: string; kind: string; title?: string; body?: string;
+      items?: Array<{ title: string; description?: string; imageUrl?: string; linkUrl?: string; meta?: string; details?: Array<{ label: string; value: string }> }>;
+    }>;
+    sources?: Array<{ title: string; url: string; checkedAt?: string }>;
+    conversion?: { mode: string; primaryAction: string; label?: string; targetEventId?: string; externalUrl?: string };
   };
 }
 
