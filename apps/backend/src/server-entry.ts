@@ -11,6 +11,7 @@ import { createAdminOrdersRouteHandler } from './admin-orders-handler.js';
 import { createAdminOrdersReadRouteHandler } from './admin-orders-read-handler.js';
 import { buildAdminOrdersListDto } from './admin-orders.dto.js';
 import { createAdminAuthConfig } from './auth.js';
+import { authorizeAdminSessionRequest } from './admin-rbac-guard.js';
 import { readBackendEnv } from './env.js';
 import { updateAdminEventOverride, updateAdminLandingMatch, upsertAdminOrderTicket } from './dto.js';
 import { buildPublicCatalogDto, clearPublicCatalogDtoCache, getPublicCatalogSessions } from './public-catalog.dto.js';
@@ -66,6 +67,8 @@ const server = startServer({
   prewarmBeforeListen: env.DAIBILET_PUBLIC_PREWARM_BEFORE_LISTEN === '1',
   handler: createValidatedHandler(handleRequest, {
     adminAuth,
+    adminRbacEnforce: env.DAIBILET_ADMIN_RBAC_ENFORCE === '1',
+    adminSessionDb: db,
     routeHandlers: [
       createPublicCatalogRouteHandler({
         enabled: publicFlags.catalog,

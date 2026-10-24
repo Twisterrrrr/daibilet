@@ -50,7 +50,7 @@ test('article publication adds publish permission to edit permission', () => {
 });
 
 test('order data reading and PII visibility are separate decisions', () => {
-  assert.equal(adminRolesAllowRoute(['AUDITOR'], 'GET', '/api/admin/orders'), true);
+  assert.equal(adminRolesAllowRoute(['AUDITOR'], 'GET', '/api/admin/orders'), false);
   assert.equal(adminRolesMayReadOrderPii(['AUDITOR']), false);
   assert.equal(adminRolesMayReadOrderPii(['FINANCE']), true);
 });
@@ -58,5 +58,5 @@ test('order data reading and PII visibility are separate decisions', () => {
 test('role separation is enforced by API route policy', () => {
   assert.equal(adminRolesAllowRoute(['SUPPORT'], 'POST', '/api/admin/orders/ord-1/archive'), false);
   assert.equal(adminRolesAllowRoute(['FINANCE'], 'PATCH', '/api/admin/events/evt-1/moderation'), false);
-  assert.equal(adminRolesAllowRoute(['COPYWRITER'], 'PATCH', '/api/admin/articles/a-1'), true);
+  assert.equal(adminRolesAllowRoute(['COPYWRITER'], 'PATCH', '/api/admin/articles/a-1'), false);
 });

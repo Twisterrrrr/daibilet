@@ -1,6 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { AdminAuthConfig } from './auth.js';
 import { isAuthorizedAdminRequest, isProtectedPath } from './auth.js';
+import { authorizeAdminSessionRequest } from './admin-rbac-guard.js';
 import { sendAuthRequired, sendJson } from './http.js';
 import { createRouteContext, type RouteContext } from './routing.js';
 import {
@@ -18,6 +19,8 @@ export type TypedRouteHandler = (context: RouteContext) => boolean | Promise<boo
 
 export interface ValidatedHandlerOptions {
   adminAuth?: AdminAuthConfig;
+  adminRbacEnforce?: boolean;
+  adminSessionDb?: { query: (sql: string, params?: unknown[]) => Promise<{ rows: unknown[] }> };
   routeHandlers?: TypedRouteHandler[];
 }
 
@@ -28,9 +31,22 @@ export function createValidatedHandler(
   return async (request, response) => {
     try {
       const context = createRouteContext(request, response);
-      if (options.adminAuth && isProtectedPath(context.pathname) && !isAuthorizedAdminRequest(request, options.adminAuth)) {
-        sendAuthRequired(response, options.adminAuth);
-        return;
+      if (options.adminAuth && isProtectedPath(context.pathname)) {
+        if (options.adminRbacEnforce) {
+          if (!options.adminSessionDb) {
+            sendJson(response, { error: 'admin_session_guard_unavailable' }, { statusCode: 503 });
+            return;
+          }
+          const authorization = await authorizeAdminSessionRequest(request, options.adminSessionDb);
+          if (!authorization.authorized) {
+            sendJson(response, { error: authorization.error }, { statusCode: authorization.statusCode ?? 401 });
+            return;
+          }
+          Object.assign(request, { adminSessionUser: authorization.actor });
+        } else if (!isAuthorizedAdminRequest(request, options.adminAuth)) {
+          sendAuthRequired(response, options.adminAuth);
+          return;
+        }
       }
 
       validateSafeRouteQuery(context);
