@@ -1,6 +1,8 @@
 import * as React from 'react';
 import type { AdminPdpDocument } from '@/server/admin-pdp-data';
 import { saveAdminPdpAction } from '@/server/admin-pdp-actions';
+import type { PublicPdpDocumentDto } from '@daibilet/contracts/public';
+import { VenuePdpContent } from '@/components/VenuePdpContent.client';
 
 type GalleryImage = { url: string; alt: string; caption: string; credit: string };
 type Fact = { label: string; value: string; sourceUrl: string; verifiedAt: string };
@@ -81,6 +83,8 @@ export function AdminPdpEditor({ entity, entityId, entitySlug, variants, initial
   const [message, setMessage] = React.useState('');
   const [jsonOpen, setJsonOpen] = React.useState(false);
   const [jsonDraft, setJsonDraft] = React.useState('');
+  const [previewOpen, setPreviewOpen] = React.useState(false);
+  const [previewDevice, setPreviewDevice] = React.useState<'desktop' | 'mobile'>('desktop');
 
   function changeContent(next: Content) { setDocument((current) => current ? { ...current, content: next } : current); setMessage(''); }
   function changeVariant(variant: string) {
@@ -143,6 +147,22 @@ export function AdminPdpEditor({ entity, entityId, entitySlug, variants, initial
         <Button type="button" variant="outline" size="sm" onClick={applyJson}>Применить JSON к форме</Button>
       </div> : null}
     </div>
+    <section className="rounded-md border border-indigo-200 bg-indigo-50/50 p-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div><h4 className="text-sm font-semibold">Предпросмотр публичной страницы</h4><p className="mt-1 text-xs text-muted-foreground">Используется тот же компонент, что и на сайте. Черновик виден здесь, но публично показывается только после статуса «Готово».</p></div>
+        <div className="flex gap-2">
+          <Button type="button" variant="outline" size="sm" onClick={() => setPreviewDevice('desktop')} aria-pressed={previewDevice === 'desktop'}>Компьютер</Button>
+          <Button type="button" variant="outline" size="sm" onClick={() => setPreviewDevice('mobile')} aria-pressed={previewDevice === 'mobile'}>Телефон</Button>
+          <Button type="button" variant="outline" size="sm" onClick={() => setPreviewOpen((open) => !open)}>{previewOpen ? 'Скрыть' : 'Открыть'}</Button>
+        </div>
+      </div>
+      {previewOpen ? <div className={`mx-auto mt-4 overflow-hidden rounded-xl border border-slate-300 bg-white ${previewDevice === 'mobile' ? 'max-w-[390px]' : 'max-w-5xl'}`}>
+        <div className="border-b bg-slate-50 px-3 py-2 text-xs text-slate-600">Предпросмотр: {previewDevice === 'mobile' ? 'мобильный экран' : 'широкий экран'} · состояние {document.status === 'READY' ? 'опубликовано' : 'черновик'}</div>
+        <div className="max-h-[70vh] overflow-y-auto px-4 sm:px-6">
+          <VenuePdpContent document={{ variant: document.variant, content: content as PublicPdpDocumentDto['content'] }} />
+        </div>
+      </div> : null}
+    </section>
     <div className="grid gap-3 sm:grid-cols-2">
       <label className="text-xs text-muted-foreground">Сценарий PDP
         <select className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground" value={document.variant} onChange={(event) => changeVariant(event.target.value)}>

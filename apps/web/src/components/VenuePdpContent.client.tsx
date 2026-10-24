@@ -4,6 +4,7 @@ import type { PublicPdpDocumentDto } from '@daibilet/contracts/public';
 import { SafeImage } from '@/components/SafeImage.client';
 
 const variantTitles: Record<string, string> = {
+  event: 'О событии',
   museum: 'О музее', theater: 'О площадке', concert_hall: 'О площадке', club: 'О площадке',
   pier: 'Причал и маршруты', landmark: 'О достопримечательности', nature: 'О месте',
   urban_area: 'О районе', food: 'О месте', attraction: 'О месте', transport: 'О маршруте',
@@ -49,7 +50,7 @@ export function VenuePdpContent({ document }: { document?: PublicPdpDocumentDto 
       ) : null}
 
       {gallery.length ? (
-        <section aria-label="Фотографии места">
+        <section aria-label={document.variant === 'event' ? 'Фотографии события' : 'Фотографии места'}>
           <div className="flex gap-3 overflow-x-auto pb-2">
             {gallery.map((image, index) => {
               const src = safePublicUrl(image.url);
