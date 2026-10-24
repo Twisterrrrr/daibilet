@@ -4,7 +4,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| SEO.SITEMAP-CACHE | Подкарты sitemap `no-store` + `force-dynamic` - генерация на каждый запрос (static 6.4с, events 6.9с, **venues.xml >25с** - граница Google-таймаута ~30с): снять no-store → `s-maxage=3600` + SWR, серверный кэш `build*SitemapEntries`, nginx proxy_cache | Критический | ⏳ |
+| SEO.SITEMAP-CACHE | Runtime sitemap через loopback API + bounded nginx cache; явный dynamic route config убирает ложные SSG ошибки. `lastmod` только из реального updatedAt; неизвестная дата опускается | Критический | ✅ code verified 2026-10-24; live check after deploy |
 | SEO.MOSKVA-CANONICAL | `/cities/moskva` canonical → encoded `/cities/%D0%BC...` (БД-slug кириллицей), обе версии 200, sitemap - латиница; у Казани самоканон. Точечный баг топ-города | Высокий | ⏳ |
 | SEO.HOME-NOSTORE | Главная `private, no-store` из-за `await cookies()` в HomePageBody (стр. 53): город-персонализацию на клиент (ISR ○) или осознанный accept | Высокий | ⏳ решение владельца |
 | SEO.ISAINDEXABLE-FALSE | Исаакиевский собор `isIndexable: false` в БД при 5 будущих сеансах и PUBLISHED (рендер и sitemap консистентно исключают): сверить с владельцем + выборка топ-объектов СПб/Москвы | Средний | ⏳ владелец |
@@ -1876,7 +1876,7 @@ Canon: [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md).
 | # | Task | Priority | Status |
 |---|------|----------|--------|
 | INC.504.22 | Move public HTML hot path in `apps/web` off direct `@daibilet/backend/public-read`; SSR/API read through backend HTTP with bounded timeout | Critical | ✅ PR #3 merge `f93b770` MSK **BUILD_ID=`3zmDWHpY7rXAJgqu0-pnR`** |
-| INC.504.23 | Move sitemap generation off direct `public-read` or give it a separate bounded backend path | Medium | 🟡 2026-10-21 code ready, deploy pending: venues+blog -> loopback HTTP, freshness -> `/api/public/events/freshness`, events/venues `s-maxage=120` вместо `no-store`. Backend+web выпускать вместе. RCA: [ssr-hang-rca-2026-10-21.md](./ssr-hang-rca-2026-10-21.md) |
+| INC.504.23 | Move sitemap generation off direct `public-read` or give it a separate bounded backend path | Medium | ✅ deployed 2026-10-24: venues/blog/freshness use loopback HTTP; live sitemap chunks 200 in 47-617ms. Follow-up removes build-time dynamic usage and false lastmod before next release. RCA: [ssr-hang-rca-2026-10-21.md](./ssr-hang-rca-2026-10-21.md) |
 | INC.504.24 | Add staging HTTP load smoke for `/`, `/events`, `/cities`, `/venues`, `/api/public/events?limit=50` | High | todo |
 
 ---

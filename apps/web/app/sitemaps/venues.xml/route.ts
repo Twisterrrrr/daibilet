@@ -6,7 +6,10 @@ import {
   renderUrlsetXml,
 } from '@/lib/sitemap-data';
 
-export const revalidate = 3600;
+// Sitemap reads are runtime API calls. Keep Next from attempting a build-time
+// static render; nginx applies the explicit public cache headers below.
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function GET() {
   try {

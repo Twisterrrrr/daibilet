@@ -1,3 +1,24 @@
+## 2026-10-24 - SEO хвост sitemap после Next 16.4
+
+### Что проверено на live до правки
+- `/sitemaps/events.xml`: 200, 4 458 URL, 49 `lastmod`, TTFB 617 мс.
+- `/sitemaps/venues.xml`: 200, 382 URL, но у всех один одинаковый `lastmod` (ложный build/runtime timestamp), TTFB 206 мс.
+- `/sitemaps/blog.xml`: 200, 46 URL с реальным разбросом дат, TTFB 47 мс.
+- В deployment log sitemap-роуты пытались SSG-рендерить `no-store` API fetch, из-за чего Next печатал `Dynamic server usage`; live endpoint при этом отвечал 200. Причина - сборочный режим маршрутов, не потеря списка URL.
+
+### Исправление в коде
+- Sitemap route handlers помечены `dynamic = 'force-dynamic'` и `revalidate = 0`: читают актуальные данные в runtime, а публичный ответ остаётся за bounded nginx proxy cache.
+- Sitemap `lastmod` теперь берётся только из реального timestamp сущности. Для static/cities/venues/landings и отсутствующей event freshness тег пропускается; sitemap index тоже не ставит общий `lastmod` на все подкарты.
+- URL-выборка и indexability-фильтры не менялись.
+
+### Проверки
+- `pnpm web:test:ci`: 343/343; web typecheck: 0; ESLint затронутых файлов: 0 errors.
+- `pnpm --filter @daibilet/web build`: exit 0; маршруты `/sitemap.xml`, `/sitemaps/[chunk]`, `/sitemaps/venues.xml` отмечены dynamic. В build log нет sitemap `Dynamic server usage`, sitemap build failure или landing soft-fail.
+- Локальная сборка проходила без API на `127.0.0.1:4000`; поэтому обычные public-page soft-fallbacks ожидаемы и не относятся к sitemap.
+- До выпуска: live URL counts и `lastmod` нужно сверить повторно; текущие live замеры выше - baseline.
+
+---
+
 ## 2026-10-17 - Чат поддержки: выпуск на прод
 
 ### Что выпущено
