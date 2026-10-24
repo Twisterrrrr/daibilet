@@ -1,4 +1,4 @@
-import { sendJson } from './http.js';
+import { sendPublicJson } from './http.js';
 import { matchPath, type RouteContext } from './routing.js';
 import type { PublicCityPageDto } from './types/public.js';
 import type { PublicDestinationsDto } from './public-city.dto.js';
@@ -17,12 +17,18 @@ export function createPublicCityRouteHandler(
     if (!deps.enabled || context.method !== 'GET') return false;
     const forceRefresh = context.searchParams.get('refresh') === '1';
     if (context.pathname === '/api/public/destinations') {
-      sendJson(context.response, await deps.buildDestinations(forceRefresh));
+      sendPublicJson(context.response, await deps.buildDestinations(forceRefresh));
       return true;
     }
     const match = matchPath(context.pathname, /^\/api\/public\/cities\/([^/]+)$/);
     if (!match?.[0]) return false;
-    sendJson(context.response, await deps.buildCity(match[0], forceRefresh));
+    const city = await deps.buildCity(match[0], forceRefresh);
+    if (!city) {
+      // Never 200+null: web generateMetadata treats thrown cache-miss as HTTP 500.
+      sendPublicJson(context.response, { error: 'not_found' }, { statusCode: 404 });
+      return true;
+    }
+    sendPublicJson(context.response, city);
     return true;
   };
 }

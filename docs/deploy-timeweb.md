@@ -1,18 +1,25 @@
 ﻿# Deploy: Timeweb Cloud MVP
 
-Дата: 2026-06-20.
+Дата: 2026-06-20.  
+**Исторический runbook** (ранний MVP на СПб). **Актуально 2026-08-07:** live catalog + web build = MSK `201.24.125.184` (`daibilet-msk`). SPB Intelligent Hoopoe `213.171.7.16` = **труп** (MIG.9.7) - см. [Project.md](./Project.md), [spb-finance-host.md](./spb-finance-host.md), `deploy/scripts/deploy-prod-next.sh`.
 
 Цель: поднять новый легкий MVP на сервере Timeweb Cloud без потери старой версии `daibilet.ru`.
 
-## Известная инфраструктура
+## Известная инфраструктура (канон)
 
-- IPv4: `213.171.7.16`.
-- IPv6: `2a03:6f01:1:2::ef11`.
-- SSH: `ssh root@213.171.7.16`.
-- Public: `https://daibilet.ru`.
+- **Prod catalog IPv4:** `201.24.125.184`
+- SSH prod: `ssh daibilet-msk` (`daibilet_msk80_key`).
+- Public: `https://daibilet.ru` (DNS → MSK).
 - Admin: `https://admin.daibilet.ru`.
 - API: `https://api.daibilet.ru`.
-- Временный admin login: `admin@daibilet.ru`.
+
+<details><summary>Legacy IP snapshot (Intelligent Hoopoe `.16` - труп, не использовать)</summary>
+
+- IPv4: `213.171.7.16` (historical MVP host).
+- IPv6: `2a03:6f01:1:2::ef11`.
+- SSH key `daibilet_staging_key` - legacy; не ops-канон.
+
+</details>
 
 ## Что не затираем
 
@@ -35,24 +42,26 @@
 
 ## GitHub
 
-Новый репозиторий: `https://github.com/Twisterrrrr/daibilet.git`.
+Репозиторий **приватный:** `git@github.com:Twisterrrrr/daibilet.git` (HTTPS без кредов на MSK падает: `could not read Username`).
 
-Локально:
+**Канон на `daibilet-msk` (`/opt/daibilet`, 2026-08-15):**
+
+- `origin` = SSH, не HTTPS
+- read-only deploy key: `/root/.ssh/daibilet_github_deploy` (+ `Host github.com` в `/root/.ssh/config`)
+- GitHub deploy key title: `daibilet-msk-readonly-20260815` (repo Settings → Deploy keys)
+- smoke: `GIT_TERMINAL_PROMPT=0 git fetch origin feat/next-monorepo`
+
+Локально (developer machine) можно HTTPS + `gh auth` / credential helper. На VPS для `swap-web-next-artifact.sh` / `deploy-prod-next.sh` - только SSH deploy key.
+
+Перевыпуск ключа (если revoke):
 
 ```bash
-git remote add origin https://github.com/Twisterrrrr/daibilet.git
-git push -u origin main
+ssh daibilet-msk 'ssh-keygen -t ed25519 -f ~/.ssh/daibilet_github_deploy -N "" -C "daibilet-msk-deploy-readonly"'
+# публичный ключ → gh repo deploy-key add --title ... (read-only)
+ssh daibilet-msk 'cd /opt/daibilet && git remote set-url origin git@github.com:Twisterrrrr/daibilet.git && git fetch origin'
 ```
 
-На сервере:
-
-```bash
-cd /opt
-git clone https://github.com/Twisterrrrr/daibilet.git daibilet
-cd /opt/daibilet
-```
-
-Если сервер будет тянуть приватный репозиторий в будущем, лучше выпустить deploy key. Сейчас репозиторий публичный.
+Не коммитить приватный ключ и не класть PAT в git / chat.
 
 ## Env
 
@@ -77,7 +86,7 @@ TICKETSCLOUD_GRPC_ENDPOINT=simple.ticketscloud.com:443
 TICKETSCLOUD_WIDGET_BASE_URL=https://ticketscloud.org/v1/widgets/common
 
 TEP_API_URL=https://api.teplohod.info/v1
-# Teplohod: токен не нужен, доступ по белому IP сервера (213.171.7.16 в allowlist)
+# Teplohod: токен не нужен, доступ по белому IP catalog-хоста (201.24.125.184 в allowlist)
 TEP_WIDGET_ID=14208
 TEP_WIDGET_BASE_URL=https://teplohod.info
 ```
@@ -202,7 +211,7 @@ curl -u "admin@daibilet.ru:<password>" -X POST https://admin.daibilet.ru/api/v1/
 curl "https://api.daibilet.ru/api/public/stats?refresh=1"
 ```
 
-Teplohod лучше проверять именно на сервере `213.171.7.16`, потому что этот IP добавлен в whitelist.
+Teplohod sync проверять на MSK `201.24.125.184` - этот IP должен быть в whitelist партнёра (не старый `.16`).
 
 ## Smoke before DNS/upstream switch
 

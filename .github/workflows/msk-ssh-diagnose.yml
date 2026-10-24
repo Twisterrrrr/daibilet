@@ -1,0 +1,76 @@
+name: MSK SSH diagnose / allow owner key
+
+# Ops helper: inspect deploy authorized_keys; optionally append owner pubkey.
+# Secrets: same MSK_SSH_* as Deploy MSK web.
+
+on:
+  workflow_dispatch:
+    inputs:
+      owner_pubkey:
+        description: "Optional full ssh-ed25519 pubkey line to append if missing"
+        required: false
+        default: ""
+      also_root:
+        description: "Also append to /root/.ssh/authorized_keys via sudo -n"
+        type: boolean
+        default: true
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Probe authorized_keys and optional install
+        env:
+          MSK_SSH_HOST: ${{ secrets.MSK_SSH_HOST }}
+          MSK_SSH_USER: ${{ secrets.MSK_SSH_USER }}
+          MSK_SSH_KEY: ${{ secrets.MSK_SSH_KEY }}
+          OWNER_PUBKEY: ${{ inputs.owner_pubkey }}
+          ALSO_ROOT: ${{ inputs.also_root }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${MSK_SSH_HOST:-}" || -z "${MSK_SSH_USER:-}" || -z "${MSK_SSH_KEY:-}" ]]; then
+            echo "ERROR: MSK_SSH_* secrets missing"
+            exit 1
+          fi
+          install -d -m 700 "$HOME/.ssh"
+          install -m 600 /dev/null "$HOME/.ssh/msk_key"
+          printf '%s\n' "$MSK_SSH_KEY" > "$HOME/.ssh/msk_key"
+          SSH=(ssh -i "$HOME/.ssh/msk_key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ConnectTimeout=20)
+
+          echo "=== whoami / host ==="
+          "${SSH[@]}" "${MSK_SSH_USER}@${MSK_SSH_HOST}" \
+            'echo OK_USER=$(whoami); hostname; date -u +%Y-%m-%dT%H:%M:%SZ; id; sudo -n true && echo SUDO_OK || echo SUDO_NO'
+
+          echo "=== deploy authorized_keys fingerprints ==="
+          "${SSH[@]}" "${MSK_SSH_USER}@${MSK_SSH_HOST}" \
+            'mkdir -p ~/.ssh; chmod 700 ~/.ssh; touch ~/.ssh/authorized_keys; chmod 600 ~/.ssh/authorized_keys; echo LINES=$(wc -l < ~/.ssh/authorized_keys); ssh-keygen -lf ~/.ssh/authorized_keys || true'
+
+          if [[ -n "${OWNER_PUBKEY// }" ]]; then
+            printf '%s\n' "$OWNER_PUBKEY" > /tmp/owner.pub
+            echo "=== owner pubkey fingerprint (local) ==="
+            ssh-keygen -lf /tmp/owner.pub
+
+            echo "=== append to deploy if missing ==="
+            scp -i "$HOME/.ssh/msk_key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o BatchMode=yes \
+              /tmp/owner.pub "${MSK_SSH_USER}@${MSK_SSH_HOST}:/tmp/owner.pub"
+            "${SSH[@]}" "${MSK_SSH_USER}@${MSK_SSH_HOST}" \
+              'grep -Fqx "$(cat /tmp/owner.pub)" ~/.ssh/authorized_keys && echo already_present_deploy || (cat /tmp/owner.pub >> ~/.ssh/authorized_keys && echo appended_deploy); ssh-keygen -lf ~/.ssh/authorized_keys; rm -f /tmp/owner.pub'
+
+            if [[ "$ALSO_ROOT" == "true" ]]; then
+              echo "=== append to root if sudo works ==="
+              scp -i "$HOME/.ssh/msk_key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o BatchMode=yes \
+                /tmp/owner.pub "${MSK_SSH_USER}@${MSK_SSH_HOST}:/tmp/owner.pub"
+              "${SSH[@]}" "${MSK_SSH_USER}@${MSK_SSH_HOST}" \
+                'if ! sudo -n true; then echo WARN_no_sudo; rm -f /tmp/owner.pub; exit 0; fi
+                 sudo mkdir -p /root/.ssh; sudo chmod 700 /root/.ssh
+                 sudo touch /root/.ssh/authorized_keys; sudo chmod 600 /root/.ssh/authorized_keys
+                 if sudo grep -Fqx "$(cat /tmp/owner.pub)" /root/.ssh/authorized_keys; then echo already_present_root
+                 else sudo tee -a /root/.ssh/authorized_keys < /tmp/owner.pub >/dev/null && echo appended_root; fi
+                 sudo ssh-keygen -lf /root/.ssh/authorized_keys
+                 rm -f /tmp/owner.pub'
+            fi
+          fi
+
+          echo "=== listen 5437/4000 ==="
+          "${SSH[@]}" "${MSK_SSH_USER}@${MSK_SSH_HOST}" 'ss -lntp 2>/dev/null | grep -E ":5437|:4000" || netstat -lntp 2>/dev/null | grep -E ":5437|:4000" || true'

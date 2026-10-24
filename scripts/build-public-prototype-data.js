@@ -1,6 +1,8 @@
 const fs = require("fs");
 const path = require("path");
 
+const { normalizeImportEventTitle } = require("./lib/event-title-normalize");
+
 const rootDir = path.resolve(__dirname, "..");
 const catalog = JSON.parse(fs.readFileSync(path.join(rootDir, "data", "ticketscloud", "catalog.public.json"), "utf8")).events;
 const routing = JSON.parse(fs.readFileSync(path.join(rootDir, "data", "ticketscloud", "city-routing.public.json"), "utf8"));
@@ -274,7 +276,7 @@ function deriveCatalogSubcategories(tags, category) {
 }
 
 function cleanTitle(title) {
-  return String(title || "").replace(/\s+/g, " ").trim();
+  return normalizeImportEventTitle(String(title || "").replace(/\s+/g, " ").trim());
 }
 
 function getDestination(cityName) {

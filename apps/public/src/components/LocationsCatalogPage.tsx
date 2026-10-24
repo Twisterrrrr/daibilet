@@ -31,10 +31,10 @@ export function LocationsCatalogPage() {
   const [isLoading, setIsLoading] = React.useState(() => !readCachedLocationVenues()?.length);
 
   React.useEffect(() => {
-    document.title = 'Локации: причалы, парки и точки старта экскурсий | Дайбилет';
+    document.title = 'Локации и точки сбора: причалы, парки, места встречи | Дайбилет';
     upsertMeta(
       'description',
-      'Куда приходить: причалы речных прогулок, парки, точки старта пеших экскурсий, автобусные остановки и встречи в аэропорту.',
+      'Каталог локаций: причалы речных прогулок, парки, точки сбора пеших экскурсий, автобусные остановки и встречи в аэропорту.',
     );
   }, []);
 
@@ -134,11 +134,11 @@ export function LocationsCatalogPage() {
       <section className="border-b border-slate-200 bg-gradient-to-br from-cyan-500 via-sky-600 to-primary-600 text-white">
         <div className="container-page py-10 md:py-14">
           <p className="text-sm font-semibold uppercase tracking-wider text-white/70">
-            {venues.length} локаций · {cityCount} {cityCount === 1 ? 'город' : cityCount >= 2 && cityCount <= 4 ? 'города' : 'городов'}
+            {formatNumber(venues.length)} локаций · {cityCount} {cityCount === 1 ? 'город' : cityCount >= 2 && cityCount <= 4 ? 'города' : 'городов'}
           </p>
-          <h1 className="mt-2 font-display text-3xl font-extrabold sm:text-4xl md:text-5xl">Локации: причалы, парки и точки старта</h1>
+          <h1 className="mt-2 font-display text-3xl font-extrabold sm:text-4xl md:text-5xl">Локации и точки сбора</h1>
           <p className="mt-3 max-w-2xl text-white/85">
-            Куда приходить, как найти, во сколько встреча — чтобы не пропустить свой рейс или экскурсию.
+            Причалы, парки и места встречи для экскурсий и событий.
           </p>
 
           <div className="mt-6 flex flex-col gap-3 rounded-2xl bg-white p-3 text-slate-900 shadow-lg sm:flex-row">

@@ -55,6 +55,7 @@ import {
 } from '@/data/river-landings';
 import {
   formatMoney,
+  formatMoneyRange,
   formatNumber,
   publicData,
 } from '@/data';
@@ -518,6 +519,7 @@ const EMPTY_LANDING_STATS: PublicLandingPage['stats'] = {
   categories: {},
   venues: {},
   priceFrom: null,
+  priceTo: null,
 };
 
 function buildLandingShellPage(slug: string, citySlug?: string): PublicLandingPage | null {
@@ -883,7 +885,6 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
                   priceFrom={payload.stats.priceFrom ?? null}
                   priceTo={payload.stats.priceTo ?? null}
                   visibleCount={allGroups.length}
-                  soldEstimate={Math.max(allGroups.length * 1850, payload.sessions.length * 420)}
                   sessionsReady={sessionsReady}
                   onPickTour={() => scrollToSchedule()}
                   onViewSchedule={() => document.getElementById('bridges-lift-schedule')?.scrollIntoView({ behavior: 'smooth' })}
@@ -1309,7 +1310,7 @@ function LandingHero({
                 </div>
                 {stats.priceFrom ? (
                   <div className="flex items-center gap-2 rounded-full bg-primary-foreground/15 px-4 py-2 text-sm font-medium text-primary-foreground backdrop-blur-sm">
-                    от {formatMoney(stats.priceFrom).replace(/^от\s+/i, '')}
+                    {formatMoneyRange(stats.priceFrom, stats.priceTo)}
                   </div>
                 ) : null}
               </>
@@ -1726,7 +1727,7 @@ function LandingDinnerScheduleRow({ group, isOptimal }: { group: EventGroup; isO
   const menu = extractMenuLabel(session.tags);
   const format = extractFormatLabel(session.tags);
   const href = eventHref(session);
-  const priceLabel = group.priceFrom ? formatMoney(group.priceFrom).replace(/^от\s+/i, '') : 'Купить';
+  const priceLabel = group.priceFrom ? formatMoneyRange(group.priceFrom, group.priceTo) : 'Купить';
   const vacant = session.vacant ?? group.vacant;
   const soldOut = typeof vacant === 'number' && vacant <= 0;
   const buyButtonClass =
@@ -1884,7 +1885,7 @@ function LandingScenarioGuide({
           <div className="mt-4 grid gap-3 text-sm leading-6 text-slate-600">
             <ScenarioFact icon={<Ticket className="h-4 w-4" />} label="Вариантов" value={formatNumber(stats.events)} />
             <ScenarioFact icon={<CalendarDays className="h-4 w-4" />} label="Ближайших сеансов" value={formatNumber(stats.sessions)} />
-            <ScenarioFact icon={<MapPin className="h-4 w-4" />} label="Цена" value={formatMoney(stats.priceFrom)} />
+            <ScenarioFact icon={<MapPin className="h-4 w-4" />} label="Цена" value={formatMoneyRange(stats.priceFrom, stats.priceTo)} />
           </div>
           {topVenues.length ? (
             <div className="mt-5">
@@ -2001,7 +2002,7 @@ function LandingEditorialIntro({
           <div className="mt-5 grid gap-3 sm:grid-cols-3">
             <EditorialFact icon={<TrendingUp className="h-5 w-5" />} title="Варианты" text={`${formatNumber(stats.events)} карточек с расписанием и ценами`} />
             <EditorialFact icon={<MapPin className="h-5 w-5" />} title="География" text={topCities.length ? topCities.map(([name]) => name).join(', ') : 'подборка по доступным городам'} />
-            <EditorialFact icon={<Ticket className="h-5 w-5" />} title="Цена" text={`от ${formatMoney(stats.priceFrom).replace(/^от\s+/i, '')}`} />
+            <EditorialFact icon={<Ticket className="h-5 w-5" />} title="Цена" text={formatMoneyRange(stats.priceFrom, stats.priceTo)} />
           </div>
         </div>
 
@@ -2081,13 +2082,13 @@ function LandingHowToChoose({ landing, stats, profile = 'default' }: { landing: 
         { icon: <Clock className="h-6 w-6 text-primary" />, title: 'Выберите время', text: 'Самые зрелищные рейсы стартуют в 23:30–00:30, когда мосты разводятся один за другим.' },
         { icon: <MapPin className="h-6 w-6 text-primary" />, title: 'Определите причал', text: topVenues ? `Популярные: ${topVenues}. Ближайший к вам причал сэкономит время.` : 'Выберите удобную точку отправления на набережной.' },
         { icon: <Ship className="h-6 w-6 text-primary" />, title: 'Сравните теплоходы', text: 'Обратите внимание на вместимость, наличие крытой палубы и бортового кафе.' },
-        { icon: <Wallet className="h-6 w-6 text-primary" />, title: 'Сравните цены', text: `Цены от ${formatMoney(stats.priceFrom).replace(/^от\s+/i, '')}. Ищите пометку «Оптимальный выбор» — лучшее соотношение цены и рейтинга.` },
+        { icon: <Wallet className="h-6 w-6 text-primary" />, title: 'Сравните цены', text: `Цены ${formatMoneyRange(stats.priceFrom, stats.priceTo)}. Ищите пометку «Оптимальный выбор» - лучшее соотношение цены и рейтинга.` },
       ]
     : [
         { icon: <Clock className="h-6 w-6 text-primary" />, title: 'Выберите дату', text: 'Используйте фильтры «сегодня», «завтра» и «вечером» для быстрого поиска.' },
         { icon: <MapPin className="h-6 w-6 text-primary" />, title: 'Уточните город', text: Object.keys(stats.cities).length > 1 ? 'Начните с города, затем сравните площадки и маршруты.' : 'Проверьте адрес старта и удобство маршрута.' },
         { icon: <Star className="h-6 w-6 text-primary" />, title: 'Сравните рейтинг', text: 'Смотрите отзывы и количество проданных билетов у организаторов.' },
-        { icon: <Wallet className="h-6 w-6 text-primary" />, title: 'Сравните цены', text: `В подборке цена от ${formatMoney(stats.priceFrom).replace(/^от\s+/i, '')}. Оплата — в виджете организатора.` },
+        { icon: <Wallet className="h-6 w-6 text-primary" />, title: 'Сравните цены', text: `В подборке ${formatMoneyRange(stats.priceFrom, stats.priceTo)}. Оплата - в виджете организатора.` },
       ];
 
   return (
@@ -2825,7 +2826,7 @@ function LandingScheduleRow({ group, isOptimal, profile }: { group: EventGroup; 
     : session.tags?.find((tag) => /теплоход|катер|яхт/i.test(tag)) || session.category;
   const amenities = amenityIcons(session.tags);
   const href = eventHref(session);
-  const priceLabel = group.priceFrom ? formatMoney(group.priceFrom).replace(/^от\s+/i, '') : 'Купить';
+  const priceLabel = group.priceFrom ? formatMoneyRange(group.priceFrom, group.priceTo) : 'Купить';
   const buyButtonClass =
     'inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 active:scale-[0.98]';
   const buyButtonClassMobile = 'inline-flex items-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground active:scale-[0.98]';
@@ -3288,7 +3289,7 @@ function LandingEventsTable({ groups }: { groups: EventGroup[] }) {
                   );
                 })()}
               </td>
-              <td className="px-4 py-3 align-top font-semibold text-slate-950">{formatMoney(group.priceFrom)}</td>
+              <td className="px-4 py-3 align-top font-semibold text-slate-950">{formatMoneyRange(group.priceFrom, group.priceTo)}</td>
               <td className="px-4 py-3 align-top text-slate-600">{group.vacant ?? '-'}</td>
               <td className="px-4 py-3 align-top"><BuyLink session={group.representative} /></td>
             </tr>
