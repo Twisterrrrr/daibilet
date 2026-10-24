@@ -94,10 +94,10 @@ function buildOwnerOrderMail(order) {
   const location = [order.venueTitle, order.cityTitle].filter(Boolean).join(" · ");
   const safeEventLink = eventLink ? escapeAttr(eventLink) : null;
   const eventImageHtml = eventImage
-    ? `<img src="${escapeAttr(eventImage)}" width="520" alt="${escapeAttr(eventTitle)}" style="display:block;width:100%;max-width:520px;height:auto;border:0;border-radius:10px;margin:0 0 18px;">`
+    ? `<img src="${escapeAttr(eventImage)}" width="600" alt="${escapeAttr(eventTitle)}" style="display:block;width:100%;max-width:600px;height:auto;border:0;">`
     : "";
   const eventLinkHtml = safeEventLink
-    ? `<a href="${safeEventLink}" style="color:#2563eb;text-decoration:none;font-weight:600;">Страница события · Открыть на Дайбилете&nbsp;→</a>`
+    ? `<a href="${safeEventLink}" style="color:#2563eb;text-decoration:none;font-weight:600;">Открыть на Дайбилет&nbsp;→</a>`
     : "";
   const detailRows = [
     ["Покупатель", buyer.name || "—"],
@@ -124,6 +124,7 @@ function buildOwnerOrderMail(order) {
     `Заказ №${orderCode}`,
     `Билетов: ${ticketCount > 0 ? ticketCount : "—"}`,
     eventLink || null,
+    "По всем вопросам пишите: info@daibilet.ru",
   ].filter(Boolean).join("\n");
 
   const html = `<!doctype html>
@@ -133,9 +134,10 @@ function buildOwnerOrderMail(order) {
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f6f7fb;width:100%;">
     <tr><td align="center" style="padding:28px 12px 40px;">
       <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="width:100%;max-width:600px;background:#fff;border:1px solid #e8e9ee;border-radius:16px;overflow:hidden;">
-        <tr><td align="center" style="padding:26px 24px;border-bottom:1px solid #e8e9ee;">
+        <tr><td align="center" style="padding:26px 24px;">
           <a href="https://daibilet.ru" style="font-family:Arial,Helvetica,sans-serif;font-size:25px;font-weight:800;letter-spacing:-1px;text-decoration:none;white-space:nowrap;"><span style="color:#0f1117;">дай</span><span style="color:#ff4757;">билет</span></a>
         </td></tr>
+        ${eventImageHtml ? `<tr><td style="padding:0 0 18px;">${eventImageHtml}</td></tr>` : ""}
         <tr><td style="padding:30px 32px 12px;">
           <div style="display:inline-block;padding:6px 11px;border-radius:20px;background:${isPreview ? "#fff3d6" : "#e9f9ef"};color:${isPreview ? "#986500" : "#16834a"};font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;">${isPreview ? "Пример письма" : "Оплата получена"}</div>
           <h1 style="margin:16px 0 8px;font-size:25px;line-height:1.25;font-weight:700;color:#0f1117;">${isPreview ? "Так выглядит уведомление" : "Новая покупка!"}</h1>
@@ -144,7 +146,6 @@ function buildOwnerOrderMail(order) {
         <tr><td style="padding:18px 32px 8px;">
           <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f6f7fb;border-radius:13px;">
             <tr><td style="padding:22px;">
-              ${eventImageHtml}
               <div style="margin:0 0 7px;color:#858a98;font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;">Событие</div>
               <h2 style="margin:0 0 12px;color:#0f1117;font-size:20px;line-height:1.35;font-weight:700;">${escapeHtml(eventTitle)}</h2>
               ${eventDate ? `<p style="margin:0 0 6px;color:#454957;font-size:14px;line-height:1.5;">📅&nbsp; ${escapeHtml(eventDate)}</p>` : ""}
@@ -166,7 +167,8 @@ function buildOwnerOrderMail(order) {
           </table>
         </td></tr>
         <tr><td align="center" style="padding:20px 24px;background:#f6f7fb;border-top:1px solid #e8e9ee;color:#9297a4;font-size:12px;line-height:1.6;">
-          Это автоматическое уведомление о продаже.<br><a href="https://daibilet.ru" style="color:#2563eb;text-decoration:none;">daibilet.ru</a>
+          По всем вопросам пишите <a href="mailto:info@daibilet.ru" style="color:#2563eb;text-decoration:none;">info@daibilet.ru</a>.<br>
+          Это автоматическое уведомление о продаже · <a href="https://daibilet.ru" style="color:#2563eb;text-decoration:none;">daibilet.ru</a>
         </td></tr>
       </table>
     </td></tr>
