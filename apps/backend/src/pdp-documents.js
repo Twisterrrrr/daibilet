@@ -110,6 +110,23 @@ export async function readPdpDocument(db, entity, id) {
   return result.rows[0] || null;
 }
 
+export async function readReadyPdpDocument(db, entity, id) {
+  const column = entity === 'venues' ? 'venueId' : entity === 'events' ? 'eventId' : null;
+  if (!column) throw new Error('Invalid PDP entity');
+  try {
+    const result = await db.query(
+      `SELECT variant, content FROM "PdpDocument" WHERE "${column}" = $1 AND status = 'READY'`,
+      [id],
+    );
+    return result.rows[0] || null;
+  } catch (error) {
+    // Keep public pages available on deployments where the additive PDP
+    // migration has not been applied yet; they simply omit editorial content.
+    if (error?.code === '42P01' || error?.cause?.code === '42P01') return null;
+    throw error;
+  }
+}
+
 export async function savePdpDocument(db, entity, id, payload) {
   const column = entity === 'venues' ? 'venueId' : entity === 'events' ? 'eventId' : null;
   if (!column) throw new Error('Invalid PDP entity');

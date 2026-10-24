@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { PDP_VARIANTS, emptyPdpContent, normalizePdpDocument, savePdpDocument } from './pdp-documents.js';
+import { PDP_VARIANTS, emptyPdpContent, normalizePdpDocument, readReadyPdpDocument, savePdpDocument } from './pdp-documents.js';
 
 test('all place scenarios and the event scenario have unique section keys', () => {
   assert.ok(Object.keys(PDP_VARIANTS).length >= 14);
@@ -63,4 +63,27 @@ test('event PDP documents persist against the event relation only', async () => 
   assert.match(calls[0].sql, /FROM "Event"/);
   assert.match(calls[1].sql, /ON CONFLICT \("eventId"\)/);
   assert.equal(calls[1].values[1], 'event-1');
+});
+
+test('public PDP reader emits READY content only and uses the requested owner relation', async () => {
+  const calls = [];
+  const db = { query: async (sql, values) => {
+    calls.push({ sql, values });
+    return { rows: [{ variant: 'event', content: { summary: 'Ready content' } }] };
+  } };
+  const document = await readReadyPdpDocument(db, 'events', 'event-1');
+  assert.deepEqual(document, { variant: 'event', content: { summary: 'Ready content' } });
+  assert.match(calls[0].sql, /"eventId" = \$1 AND status = 'READY'/);
+  assert.deepEqual(calls[0].values, ['event-1']);
+
+  const draftDb = { query: async () => ({ rows: [] }) };
+  assert.equal(await readReadyPdpDocument(draftDb, 'venues', 'venue-1'), null);
+  await assert.rejects(readReadyPdpDocument(db, 'users', 'user-1'), /Invalid PDP entity/);
+});
+
+test('public PDP reader fails soft when the optional migration is absent', async () => {
+  const missingTable = Object.assign(new Error('relation "PdpDocument" does not exist'), { code: '42P01' });
+  const db = { query: async () => { throw missingTable; } };
+  assert.equal(await readReadyPdpDocument(db, 'venues', 'venue-1'), null);
+  await assert.rejects(readReadyPdpDocument({ query: async () => { throw new Error('database unavailable'); } }, 'venues', 'venue-1'), /database unavailable/);
 });
