@@ -66,6 +66,11 @@ function extractAmountRub(snapshot) {
     const value = Number(source[key]);
     if (Number.isFinite(value) && value > 0) return value;
   }
+  const values = source.values || {};
+  for (const key of ["full", "price", "nominal"]) {
+    const value = Number(values[key]);
+    if (Number.isFinite(value) && value > 0) return value;
+  }
   return null;
 }
 
@@ -73,7 +78,7 @@ function buildOwnerOrderMail(order) {
   const snapshot = order.buyerSnapshot || {};
   const buyer = snapshot.buyer || {};
   const orderCode = snapshot.code || snapshot.number || order.publicCode || order.externalOrderId;
-  const eventTitle = snapshot.sourceEventTitle || "Импортированное событие";
+  const eventTitle = order.eventTitle || snapshot.sourceEventTitle || "Импортированное событие";
   const ticketCount = Number(order.ticketCount || 0);
   const amountRub = extractAmountRub(snapshot);
   // Catalog page for the purchased event: /events/{slug} (latin CHPU).
@@ -81,56 +86,112 @@ function buildOwnerOrderMail(order) {
   const eventLink = eventSlug
     ? `https://daibilet.ru/events/${encodeURIComponent(eventSlug)}`
     : null;
-
-  const subject = `Дайбилет. Поступила оплата по заказу №${orderCode}`;
-  const rows = [
-    ["Заказ", `№${orderCode}`],
+  const subject = `Новая покупка · ${eventTitle}`;
+  const eventImage = safeHttpsUrl(order.eventImageUrl);
+  const eventDate = formatDate(order.eventStartsAt);
+  const purchaseDate = formatDate(order.purchasedAt);
+  const location = [order.venueTitle, order.cityTitle].filter(Boolean).join(" · ");
+  const safeEventLink = eventLink ? escapeAttr(eventLink) : null;
+  const eventImageHtml = eventImage
+    ? `<img src="${escapeAttr(eventImage)}" width="520" alt="${escapeAttr(eventTitle)}" style="display:block;width:100%;max-width:520px;height:auto;border:0;border-radius:10px;margin:0 0 18px;">`
+    : "";
+  const eventLinkHtml = safeEventLink
+    ? `<a href="${safeEventLink}" style="color:#2563eb;text-decoration:none;font-weight:600;">Страница события · Открыть на Дайбилете&nbsp;→</a>`
+    : "";
+  const detailRows = [
     ["Покупатель", buyer.name || "—"],
-    ["E-mail", buyer.email || "—"],
+    ["Электронная почта", buyer.email || "—"],
     ["Телефон", buyer.phone || "—"],
-    ["Мероприятие", eventTitle],
+    ["Заказ", `№${orderCode}`],
+    ["Билеты", ticketCount > 0 ? `${ticketCount} шт.` : "—"],
+    ["Источник продажи", order.sourceName || "Ticketscloud"],
   ];
-  if (eventLink) {
-    rows.push([
-      "Страница события",
-      `<a href="${escapeAttr(eventLink)}" style="color:#047857;word-break:break-all;">${escapeHtml(eventLink)}</a>`,
-      true,
-    ]);
-  }
-  rows.push(["Источник", order.sourceName || "Ticketscloud"]);
-  if (order.purchasedAt) rows.push(["Дата покупки", new Date(order.purchasedAt).toLocaleString("ru-RU", { timeZone: "Europe/Moscow" })]);
-  rows.push(["Билетов", ticketCount > 0 ? `${ticketCount} шт.` : "—"]);
-  if (amountRub != null) rows.push(["Сумма заказа", formatRub(amountRub)]);
+  const detailRowsHtml = detailRows.map(([label, value]) => `<tr>
+    <td style="padding:12px 0;border-bottom:1px solid #e8e9ee;color:#7b8190;font-size:14px;vertical-align:top;">${escapeHtml(label)}</td>
+    <td style="padding:12px 0;border-bottom:1px solid #e8e9ee;color:#171923;font-size:14px;font-weight:600;text-align:right;vertical-align:top;">${escapeHtml(value)}</td>
+  </tr>`).join("");
+  const money = amountRub == null ? "Сумма не передана" : formatRub(amountRub);
+  const text = [
+    "Новая покупка · Дайбилет",
+    `Событие: ${eventTitle}`,
+    eventDate ? `Дата события: ${eventDate}` : null,
+    location ? `Место: ${location}` : null,
+    `Сумма: ${money}`,
+    `Покупатель: ${buyer.name || "—"}`,
+    `E-mail: ${buyer.email || "—"}`,
+    `Телефон: ${buyer.phone || "—"}`,
+    `Заказ №${orderCode}`,
+    `Билетов: ${ticketCount > 0 ? ticketCount : "—"}`,
+    eventLink || null,
+  ].filter(Boolean).join("\n");
 
-  const rowsHtml = rows
-    .map(
-      ([label, value, raw]) => `<tr>
-        <th style="text-align:left;width:200px;padding:8px;border-bottom:1px solid #e5e5e5;color:#888;font-weight:600;">${escapeHtml(label)}</th>
-        <td style="padding:8px;border-bottom:1px solid #e5e5e5;">${raw ? value : escapeHtml(value)}</td>
-      </tr>`,
-    )
-    .join("\n");
-
-  const html = `<!DOCTYPE html>
-<html lang="ru">
-<head><meta charset="UTF-8"><title>${escapeHtml(subject)}</title></head>
-<body style="margin:0;padding:0;background:#f0f0f0;font-family:Arial,sans-serif;">
-  <div style="width:700px;max-width:100%;font-size:14px;margin:0 auto;padding:30px 0;">
-    <div style="font-size:28px;padding:0 20px;color:#1B2A4A;font-weight:bold;">ДАЙБИЛЕТ</div>
-    <div style="background:#fff;padding:20px 30px 30px;margin-top:20px;border:1px solid #ccc;box-shadow:0 2px 10px rgba(0,0,0,.2);">
-      <h3 style="margin-top:0;font-size:18px;color:#888;">Поступила оплата по заказу №${escapeHtml(orderCode)}</h3>
-      <table style="border-collapse:collapse;border:1px solid #e5e5e5;margin-top:10px;width:100%;">
-        ${rowsHtml}
+  const html = `<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(subject)}</title></head>
+<body style="margin:0;padding:0;background:#f6f7fb;color:#0f1117;font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased;">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">Оплата подтверждена: ${escapeHtml(eventTitle)} · ${escapeHtml(money)}</div>
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f6f7fb;width:100%;">
+    <tr><td align="center" style="padding:28px 12px 40px;">
+      <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="width:100%;max-width:600px;background:#fff;border:1px solid #e8e9ee;border-radius:16px;overflow:hidden;">
+        <tr><td align="center" style="padding:26px 24px;border-bottom:1px solid #e8e9ee;">
+          <a href="https://daibilet.ru" style="font-family:Arial,Helvetica,sans-serif;font-size:25px;font-weight:800;letter-spacing:-1px;text-decoration:none;white-space:nowrap;"><span style="color:#0f1117;">дай</span><span style="color:#ff4757;">билет</span></a>
+        </td></tr>
+        <tr><td style="padding:30px 32px 12px;">
+          <div style="display:inline-block;padding:6px 11px;border-radius:20px;background:#e9f9ef;color:#16834a;font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;">Оплата получена</div>
+          <h1 style="margin:16px 0 8px;font-size:25px;line-height:1.25;font-weight:700;color:#0f1117;">Новая покупка!</h1>
+          <p style="margin:0;color:#6b7080;font-size:15px;line-height:1.55;">Заказ №${escapeHtml(orderCode)} оплачен через ${escapeHtml(order.sourceName || "Ticketscloud")}.</p>
+        </td></tr>
+        <tr><td style="padding:18px 32px 8px;">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f6f7fb;border-radius:13px;">
+            <tr><td style="padding:22px;">
+              ${eventImageHtml}
+              <div style="margin:0 0 7px;color:#858a98;font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;">Событие</div>
+              <h2 style="margin:0 0 12px;color:#0f1117;font-size:20px;line-height:1.35;font-weight:700;">${escapeHtml(eventTitle)}</h2>
+              ${eventDate ? `<p style="margin:0 0 6px;color:#454957;font-size:14px;line-height:1.5;">📅&nbsp; ${escapeHtml(eventDate)}</p>` : ""}
+              ${location ? `<p style="margin:0 0 14px;color:#454957;font-size:14px;line-height:1.5;">📍&nbsp; ${escapeHtml(location)}</p>` : ""}
+              ${eventLinkHtml}
+            </td></tr>
+          </table>
+        </td></tr>
+        <tr><td style="padding:16px 32px 8px;">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#10131b;border-radius:13px;">
+            <tr><td style="padding:18px 22px;color:#bfc4cf;font-size:12px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;">Сумма заказа</td>
+                <td align="right" style="padding:18px 22px;color:#fff;font-size:23px;font-weight:700;white-space:nowrap;">${escapeHtml(money)}</td></tr>
+          </table>
+        </td></tr>
+        <tr><td style="padding:22px 32px 30px;">
+          <h2 style="margin:0 0 6px;color:#0f1117;font-size:17px;font-weight:700;">Покупатель и заказ</h2>
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">${detailRowsHtml}
+            <tr><td style="padding:12px 0;color:#7b8190;font-size:14px;">Время покупки</td><td align="right" style="padding:12px 0;color:#171923;font-size:14px;font-weight:600;">${escapeHtml(purchaseDate || "—")}</td></tr>
+          </table>
+        </td></tr>
+        <tr><td align="center" style="padding:20px 24px;background:#f6f7fb;border-top:1px solid #e8e9ee;color:#9297a4;font-size:12px;line-height:1.6;">
+          Это автоматическое уведомление о продаже.<br><a href="https://daibilet.ru" style="color:#2563eb;text-decoration:none;">daibilet.ru</a>
+        </td></tr>
       </table>
-    </div>
-    <div style="margin-top:30px;text-align:center;color:#666;font-size:12px;padding:0 20px;">
-      Дайбилет — daibilet.ru · Уведомление о покупке через импортированные события
-    </div>
-  </div>
-</body>
-</html>`;
+    </td></tr>
+  </table>
+</body></html>`;
 
-  return { subject, html, orderCode };
+  return { subject, html, text, orderCode };
+}
+
+function formatDate(value) {
+  if (!value) return null;
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) return null;
+  return new Intl.DateTimeFormat("ru-RU", {
+    day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Moscow",
+  }).format(date);
+}
+
+function safeHttpsUrl(value) {
+  if (!value) return null;
+  try {
+    const url = new URL(String(value));
+    return url.protocol === "https:" ? url.toString() : null;
+  } catch {
+    return null;
+  }
 }
 
 function sendOwnerOrderMail(order, env = process.env) {
@@ -139,12 +200,12 @@ function sendOwnerOrderMail(order, env = process.env) {
   if (!to.includes("@")) return Promise.resolve({ sent: false, reason: "no_recipient" });
   if (!isSmtpConfigured(env)) return Promise.resolve({ sent: false, reason: "smtp_not_configured" });
 
-  const { subject, html, orderCode } = buildOwnerOrderMail(order);
+  const { subject, html, text, orderCode } = buildOwnerOrderMail(order);
   return (async () => {
     try {
       const nodemailer = loadNodemailer();
       const transport = nodemailer.createTransport(resolveSmtpTransportOptions(env));
-      await transport.sendMail({ from: env.SMTP_FROM, to, subject, html });
+      await transport.sendMail({ from: env.SMTP_FROM, to, subject, html, text });
       console.log(`[order-owner-mail] sent order=${orderCode} to=${to}`);
       return { sent: true };
     } catch (error) {

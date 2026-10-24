@@ -774,6 +774,18 @@ async function dispatchOwnerOrderNotifications(pool) {
               (select count(*) from "ExternalTicket" t where t."externalOrderId" = o.id) as "ticketCount",
               (select e.slug from "ExternalTicket" t join "Event" e on e.id = t."eventId"
                 where t."externalOrderId" = o.id and e.slug is not null limit 1) as "eventSlug",
+              (select e.title from "ExternalTicket" t join "Event" e on e.id = t."eventId"
+                where t."externalOrderId" = o.id limit 1) as "eventTitle",
+              (select coalesce(ov."imageUrl", e."imageUrl") from "ExternalTicket" t
+                join "Event" e on e.id = t."eventId" left join "EventOverride" ov on ov."eventId" = e.id
+                where t."externalOrderId" = o.id limit 1) as "eventImageUrl",
+              (select v.title from "ExternalTicket" t join "Event" e on e.id = t."eventId"
+                left join "Venue" v on v.id = e."venueId" where t."externalOrderId" = o.id limit 1) as "venueTitle",
+              (select c.title from "ExternalTicket" t join "Event" e on e.id = t."eventId"
+                left join "Venue" v on v.id = e."venueId" left join "City" c on c.id = v."cityId"
+                where t."externalOrderId" = o.id limit 1) as "cityTitle",
+              (select es."startsAt" from "ExternalTicket" t join "EventSession" es on es.id = t."sessionId"
+                where t."externalOrderId" = o.id and es."startsAt" is not null order by es."startsAt" asc limit 1) as "eventStartsAt",
               s.name as "sourceName"
        from "ExternalOrder" o
        left join "Source" s on s.id = o."sourceId"
