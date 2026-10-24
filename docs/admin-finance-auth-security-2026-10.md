@@ -34,7 +34,9 @@
 
 ## Следующий кодовый срез
 
-Начать с этапа A: реализовать персональный вход и серверные сессии поверх уже существующих `AdminUser`, `AdminInvitation`, `AdminSession`, `AdminAuditLog`. Перед этим согласовать единый auth boundary: Next middleware/proxy, `adminApiFetch`, catalog backend и finance bridge. До появления этого boundary не добавлять декоративный экран 2FA или MFA-поля, которые фактически не блокируют доступ.
+Подготовлен общий plain-JS runtime-контракт профилей и прав в `packages/contracts/src/admin-access-runtime.js`; TypeScript API и backend tests используют его же, чтобы список ролей не разъезжался. Он пока не включён в авторизацию маршрутов.
+
+Следующий срез: персональный вход и серверные сессии поверх `AdminUser`, `AdminInvitation`, `AdminSession`, `AdminAuditLog`; затем связать их с guards на Next/catalog и finance bridge. До появления этого boundary не добавлять декоративный экран 2FA или MFA-поля, которые фактически не блокируют доступ.
 
 ## Проверенная текущая граница авторизации
 
