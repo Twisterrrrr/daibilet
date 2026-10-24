@@ -12,6 +12,9 @@ function getLegacyDb() {
   return legacyDb;
 }
 
-export async function buildAdminOrdersListDto(searchParams: URLSearchParams = new URLSearchParams()) {
-  return buildAdminOrdersList(getLegacyDb(), searchParams);
+export async function buildAdminOrdersListDto(
+  searchParams: URLSearchParams = new URLSearchParams(),
+  options: { includePiiSearch?: boolean } = {},
+) {
+  return buildAdminOrdersList(getLegacyDb(), searchParams, { includePiiSearch: options.includePiiSearch !== false });
 }

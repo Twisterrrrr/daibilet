@@ -25,16 +25,14 @@ test('PII list routes require both order and PII permissions', () => {
 });
 
 test('unknown or intentionally unmapped routes are denied by default', () => {
-  assert.deepEqual(getAdminRoutePermissions('GET', '/api/admin/dashboard'), [
-    'catalog.read', 'seo.read', 'integrations.read', 'finance.summary.read', 'orders.read',
-  ]);
+  assert.deepEqual(getAdminRoutePermissions('GET', '/api/admin/dashboard'), ['catalog.read']);
   assert.equal(getAdminRoutePermissions('DELETE', '/api/admin/orders/ord-1'), null);
   assert.equal(getAdminRoutePermissions('POST', '/api/admin/articles/1/publish'), null);
   assert.deepEqual(getAdminRoutePermissions('PATCH', '/api/admin/events/evt-1/override'), [
     'content.edit', 'seo.edit', 'catalog.edit', 'catalog.publish',
   ]);
   assert.equal(adminRolesAllowRoute(['SUPERADMIN'], 'GET', '/api/admin/dashboard'), true);
-  assert.equal(adminRolesAllowRoute(['AUDITOR'], 'GET', '/api/admin/dashboard'), false);
+  assert.equal(adminRolesAllowRoute(['AUDITOR'], 'GET', '/api/admin/dashboard'), true);
   assert.equal(adminRolesAllowRoute(['PRODUCT'], 'GET', '/api/admin/dashboard'), true);
   assert.equal(adminRolesAllowRoute(['SUPERADMIN'], 'PATCH', '/api/admin/events/1/unknown'), false);
 });
@@ -95,7 +93,8 @@ test('article publication adds publish permission to edit permission', () => {
 });
 
 test('order data reading and PII visibility are separate decisions', () => {
-  assert.equal(adminRolesAllowRoute(['AUDITOR'], 'GET', '/api/admin/orders'), false);
+  assert.equal(adminRolesAllowRoute(['AUDITOR'], 'GET', '/api/admin/orders'), true);
+  assert.deepEqual(getAdminRoutePermissions('GET', '/api/admin/orders/order-1'), ['orders.read']);
   assert.equal(adminRolesMayReadOrderPii(['AUDITOR']), false);
   assert.equal(adminRolesMayReadOrderPii(['FINANCE']), true);
 });

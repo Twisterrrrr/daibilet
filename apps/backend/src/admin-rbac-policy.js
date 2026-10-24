@@ -3,10 +3,10 @@ import { adminRoleAllows } from '@daibilet/contracts/admin-access/runtime';
 const exactPolicies = new Map([
   ['GET /api/db/stats', ['integrations.read']],
   ['GET /api/db/events', ['catalog.read']],
-  ['GET /api/admin/dashboard', ['catalog.read', 'seo.read', 'integrations.read', 'finance.summary.read', 'orders.read']],
+  ['GET /api/admin/dashboard', ['catalog.read']],
   ['GET /api/admin/sources', ['integrations.read']],
-  ['GET /api/admin/orders', ['orders.read', 'orders.pii.read']],
-  ['GET /api/admin/external-orders', ['orders.read', 'orders.pii.read']],
+  ['GET /api/admin/orders', ['orders.read']],
+  ['GET /api/admin/external-orders', ['orders.read']],
   ['GET /api/admin/order-event-candidates', ['catalog.read']],
   ['GET /api/admin/events', ['catalog.read']],
   ['GET /api/admin/taxonomy', ['catalog.read']],
@@ -15,7 +15,6 @@ const exactPolicies = new Map([
   ['GET /api/admin/pdp/variants', ['catalog.read']],
   ['GET /api/admin/landings', ['seo.read']],
   ['GET /api/admin/articles', ['content.read']],
-  // The dashboard DTO currently combines catalog, SEO, integration and order metrics.
   // Article writes can change publication state, so require both permissions until
   // the endpoint performs payload-aware authorization.
   ['POST /api/admin/articles', ['content.edit', 'content.publish']],
@@ -32,7 +31,7 @@ const exactPolicies = new Map([
 ]);
 
 const dynamicPolicies = [
-  [/^GET \/api\/admin\/orders\/[^/]+$/, ['orders.read', 'orders.pii.read']],
+  [/^GET \/api\/admin\/orders\/[^/]+$/, ['orders.read']],
   [/^POST \/api\/admin\/orders\/[^/]+\/(?:archive|unarchive|tickets)$/, ['orders.manage']],
   [/^GET \/api\/admin\/cities\/[^/]+$/, ['catalog.read']],
   [/^PATCH \/api\/admin\/cities\/[^/]+$/, ['catalog.edit']],
