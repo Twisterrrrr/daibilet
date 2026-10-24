@@ -27,14 +27,17 @@ import { freshnessMapFromRows, publicFreshnessSlug } from '@daibilet/backend/eve
 const WEB_ROOT = path.resolve(__dirname, '../..');
 const REPO_ROOT = path.resolve(WEB_ROOT, '../..');
 
-test('time-sensitive sitemaps cannot outlive an event or retain stale venue eligibility', () => {
-  // Bounded ISR cache (1h) - shorter than any event lifetime; freshness comes
-  // from hourly revalidation + IndexNow. no-store was removed on purpose: it
-  // disabled route-handler caching and rebuilt events.xml in 5-11s per hit,
-  // blowing the Googlebot ~30s fetch budget (crawler speed gate catches this).
-  assert.equal(sitemapResponseHeaders('events')['Cache-Control'], 'public, s-maxage=3600, stale-while-revalidate=86400');
-  assert.equal(sitemapResponseHeaders('venues')['Cache-Control'], 'public, s-maxage=3600, stale-while-revalidate=86400');
-  assert.equal(sitemapResponseHeaders('blog')['Cache-Control'], 'public, s-maxage=3600, stale-while-revalidate=86400');
+test('sitemap cache does not advertise a long stale window for changing catalogs', () => {
+  // Runtime generation is still cached to protect the 22-page event query from
+  // every crawler hit, but stale-while-revalidate used to preserve deleted URLs
+  // for up to 24h after sync. Responses now advertise only a bounded s-maxage;
+  // Nginx may still serve stale briefly while its single background refresh runs.
+  assert.equal(sitemapResponseHeaders('events')['Cache-Control'], 'public, s-maxage=300');
+  assert.equal(sitemapResponseHeaders('venues')['Cache-Control'], 'public, s-maxage=300');
+  assert.equal(sitemapResponseHeaders('cities')['Cache-Control'], 'public, s-maxage=900');
+  assert.equal(sitemapResponseHeaders('landings')['Cache-Control'], 'public, s-maxage=900');
+  assert.equal(sitemapResponseHeaders('blog')['Cache-Control'], 'public, s-maxage=3600');
+  assert.equal(sitemapResponseHeaders('static')['Cache-Control'], 'public, s-maxage=3600');
 });
 
 test('sitemap lastmod: uses a real updatedAt when present', () => {

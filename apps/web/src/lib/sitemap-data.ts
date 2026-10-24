@@ -545,13 +545,21 @@ export function renderSitemapIndexXml(): string {
 
 export const SITEMAP_RESPONSE_HEADERS = {
   'Content-Type': 'application/xml; charset=utf-8',
-  'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+  'Cache-Control': 'public, s-maxage=3600',
 } as const;
 
-export function sitemapResponseHeaders(_chunk: string): Record<string, string> {
+export function sitemapResponseHeaders(chunk: string): Record<string, string> {
+  // Event and venue eligibility can change during catalog sync. Keep their
+  // advertised shared-cache freshness short; do not grant a day-long SWR window.
+  const maxAge = chunk === 'events' || chunk === 'venues'
+    ? 300
+    : chunk === 'cities' || chunk === 'landings'
+      ? 900
+      : 3600;
   return {
     ...SITEMAP_RESPONSE_HEADERS,
-    // Sitemap handlers run at request time; the shared cache header lets nginx
-    // serve the expensive XML rebuild from its bounded proxy cache.
+    'Cache-Control': `public, s-maxage=${maxAge}`,
+    // Runtime route handlers still use a bounded shared cache. Omitting
+    // stale-while-revalidate prevents deleted catalog URLs lingering for a day.
   };
 }
