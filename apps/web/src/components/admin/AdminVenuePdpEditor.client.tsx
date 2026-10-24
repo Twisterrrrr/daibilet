@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import type { AdminPdpDocument } from '@/server/admin-pdp-data';
 import { saveAdminPdpAction } from '@/server/admin-pdp-actions';
