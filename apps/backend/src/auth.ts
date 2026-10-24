@@ -31,6 +31,7 @@ export function createAdminAuthConfig(env: AdminAuthEnv): AdminAuthConfig {
 }
 
 export function isProtectedPath(pathname: string): boolean {
+  if (/^\/api\/admin\/auth\/(?:login|me|logout)$/.test(pathname)) return false;
   return (
     pathname === '/api/db/stats' ||
     pathname === '/api/db/events' ||

@@ -5,6 +5,20 @@ import { readFile } from 'node:fs/promises';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+<<<<<<< HEAD
+=======
+import { getAdminOrderDeleteGuard } from './admin-order-delete-guard.js';
+import {
+  ADMIN_SESSION_TTL_SECONDS,
+  assertAdminLoginRateLimit,
+  buildAdminSessionCookie,
+  buildClearAdminSessionCookie,
+  loginAdminUser,
+  parseAdminSessionToken,
+  resolveAdminSession,
+  revokeAdminSession,
+} from './admin-session-auth.js';
+>>>>>>> 18b1b0ff6 (feat(admin): add personal staff session endpoints)
 import { createDb } from './db.js';
 import {
   buildAdminDashboard,
@@ -145,7 +159,12 @@ function getAllowedOrigins() {
 function routeNeedsCredentials(request) {
   if (!request?.url) return false;
   const pathname = new URL(request.url, 'http://127.0.0.1').pathname;
-  return pathname.startsWith('/api/auth/') || pathname.startsWith('/api/account/') || pathname.startsWith('/api/user/auth/');
+  return (
+    pathname.startsWith('/api/auth/') ||
+    pathname.startsWith('/api/account/') ||
+    pathname.startsWith('/api/user/auth/') ||
+    pathname.startsWith('/api/admin/auth/')
+  );
 }
 
 function isCorsProtectedPath(pathname) {
@@ -226,6 +245,61 @@ export async function handleRequest(request, response) {
 
     const url = new URL(request.url || '/', `http://${request.headers.host || '127.0.0.1'}`);
     const route = `${request.method} ${url.pathname}`;
+    const isAdminIdentityRoute = /^\/(?:api\/admin\/auth\/(?:login|me|logout))$/.test(url.pathname);
+    const origin = String(request.headers.origin || '').trim();
+    if (isAdminIdentityRoute && origin && !getAllowedOrigins().includes(origin)) {
+      sendJson(response, { error: 'admin_auth_origin_denied' }, 403);
+      return;
+    }
+
+    if (route === 'POST /api/admin/auth/login') {
+      try {
+        const ip = String(request.headers['x-real-ip'] || request.socket.remoteAddress || 'unknown');
+        assertAdminLoginRateLimit(`ip:${ip}`, 30);
+        const body = await readJsonBody(request, 8192);
+        const email = String(body?.email || '').trim().toLowerCase();
+        assertAdminLoginRateLimit(`email:${email}`, 8);
+        const session = await loginAdminUser(db, body?.email, body?.password, {
+          correlationId: String(request.headers['x-request-id'] || '').slice(0, 120) || null,
+        });
+        sendJson(response, { user: session.user, expiresAt: session.expiresAt.toISOString() }, 200, {
+          'Set-Cookie': buildAdminSessionCookie(session.token, ADMIN_SESSION_TTL_SECONDS),
+        });
+      } catch (error) {
+        const statusCode = Number(error.statusCode) || 500;
+        const message = statusCode === 401 || statusCode === 429 || statusCode === 400 || statusCode === 413
+          ? error.message
+          : 'Не удалось выполнить вход.';
+        sendJson(response, { error: message }, statusCode);
+      }
+      return;
+    }
+
+    if (route === 'GET /api/admin/auth/me') {
+      try {
+        const token = parseAdminSessionToken(request.headers.cookie || '');
+        const user = await resolveAdminSession(db, token);
+        if (!user) {
+          sendJson(response, { error: 'admin_session_required' }, 401, { 'Set-Cookie': buildClearAdminSessionCookie() });
+          return;
+        }
+        sendJson(response, { user });
+      } catch {
+        sendJson(response, { error: 'admin_session_check_failed' }, 500);
+      }
+      return;
+    }
+
+    if (route === 'POST /api/admin/auth/logout') {
+      try {
+        const token = parseAdminSessionToken(request.headers.cookie || '');
+        await revokeAdminSession(db, token);
+        sendJson(response, { ok: true }, 200, { 'Set-Cookie': buildClearAdminSessionCookie() });
+      } catch {
+        sendJson(response, { error: 'admin_logout_failed' }, 500, { 'Set-Cookie': buildClearAdminSessionCookie() });
+      }
+      return;
+    }
 
     if (isProtectedPath(url.pathname) && !isAuthorizedAdminRequest(request)) {
       sendAuthRequired(response);
@@ -1180,10 +1254,22 @@ function trimPublicResponseCache() {
   }
 }
 
-async function readJsonBody(request) {
+async function readJsonBody(request, maxBytes = Number.POSITIVE_INFINITY) {
   const chunks = [];
+  let totalBytes = 0;
+  let tooLarge = false;
   for await (const chunk of request) {
+    totalBytes += Buffer.byteLength(chunk);
+    if (totalBytes > maxBytes) {
+      tooLarge = true;
+      continue;
+    }
     chunks.push(chunk);
+  }
+  if (tooLarge) {
+    const error = new Error('request_body_too_large');
+    error.statusCode = 413;
+    throw error;
   }
   if (!chunks.length) return {};
   return JSON.parse(Buffer.concat(chunks).toString('utf8'));
@@ -1728,6 +1814,7 @@ function appendCliArg(args, key, value) {
 }
 
 function isProtectedPath(pathname) {
+  if (/^\/api\/admin\/auth\/(?:login|me|logout)$/.test(pathname)) return false;
   return (
     pathname === '/api/db/stats' ||
     pathname === '/api/db/events' ||

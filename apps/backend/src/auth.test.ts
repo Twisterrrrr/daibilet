@@ -28,6 +28,13 @@ test('admin paths are protected', () => {
   assert.equal(isProtectedPath('/api/health'), false);
 });
 
+test('admin identity endpoints authenticate themselves instead of using shared Basic Auth', () => {
+  assert.equal(isProtectedPath('/api/admin/auth/login'), false);
+  assert.equal(isProtectedPath('/api/admin/auth/me'), false);
+  assert.equal(isProtectedPath('/api/admin/auth/logout'), false);
+  assert.equal(isProtectedPath('/api/admin/auth/users'), true);
+});
+
 test('production without credentials fails closed', () => {
   const config: AdminAuthConfig = {
     email: '',
