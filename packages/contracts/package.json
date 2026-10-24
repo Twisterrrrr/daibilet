@@ -16,6 +16,7 @@
       "types": "./src/admission.ts",
       "default": "./src/admission.ts"
     },
+    "./admin-access/runtime": "./src/admin-access-runtime.js",
     "./common": "./src/common.ts",
     "./db": "./src/db.ts",
     "./landing": "./src/landing.ts",
