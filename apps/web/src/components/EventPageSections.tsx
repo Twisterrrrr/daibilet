@@ -69,7 +69,6 @@ function descriptionWithPracticalInfo(event: PublicEventDto, rawDescription: str
     venueAddress: event.venueAddress,
     category: event.category,
     subcategory: event.subcategories?.join(' / '),
-    kind: event.kind,
     durationMin,
     priceFromRub: event.priceFrom,
     ageLimit: event.ageLimit,
