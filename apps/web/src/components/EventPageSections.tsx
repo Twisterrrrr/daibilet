@@ -5,13 +5,14 @@ import type { PublicEventDto } from '@daibilet/contracts/public';
 
 import { collectCatalogLabels, extractDurationLabel } from '@/lib/catalog-labels';
 import { formatEventDescriptionHtml } from '@/lib/event-description-format';
+import { buildPracticalInfoBlock } from '@/lib/event-minimal-description';
 import { displayEventDescription } from '@/lib/event-description-lead';
 import { formatAgeLimit } from '@/lib/event-page-utils';
 import { uniqueEventTagLabels } from '@/lib/event-tag-labels';
 import { venueHref } from '@/lib/routes';
 
 export function EventDescription({ event }: { event: PublicEventDto }) {
-  const description = displayEventDescription(event).trim();
+  const description = descriptionWithPracticalInfo(event, displayEventDescription(event));
   if (!description) return null;
   const html = formatEventDescriptionHtml(description);
   if (!html) return null;
@@ -29,7 +30,7 @@ export function EventDescription({ event }: { event: PublicEventDto }) {
 
 /** Compact body without its own H2 - for accordion panels. */
 export function EventDescriptionBody({ event }: { event: PublicEventDto }) {
-  const description = displayEventDescription(event).trim();
+  const description = descriptionWithPracticalInfo(event, displayEventDescription(event));
   if (!description) return null;
   const html = formatEventDescriptionHtml(description);
   if (!html) return null;
@@ -39,6 +40,42 @@ export function EventDescriptionBody({ event }: { event: PublicEventDto }) {
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );
+}
+
+function descriptionWithPracticalInfo(event: PublicEventDto, rawDescription: string): string {
+  const description = String(rawDescription || '').trim();
+  const normalizedForHeading = description
+    .replace(/<br\s*\/?\s*>/giu, '\n')
+    .replace(/<h[1-6]\b[^>]*>/giu, '\n')
+    .replace(/<\/h[1-6]\s*>/giu, '\n')
+    .replace(/<[^>]*>/gu, ' ')
+    .replace(/&nbsp;/giu, ' ');
+  const hasPracticalInfo = normalizedForHeading.split('\n').some((line) =>
+    /^(?:#{1,6}\s*)?Практическая информация\s*:?[ \t]*#*$/iu.test(line.trim()),
+  );
+  if (hasPracticalInfo) {
+    return description;
+  }
+
+  const durationLabel = extractDurationLabel(event.tags);
+  const durationMatch = durationLabel?.match(/^(\d+)\s*(минут|мин\.?|час|часа|часов)$/iu);
+  const durationMin = durationMatch
+    ? Number(durationMatch[1]) * (/^час/iu.test(durationMatch[2]) ? 60 : 1)
+    : null;
+  const practicalInfo = buildPracticalInfoBlock({
+    title: event.title,
+    city: event.city,
+    venue: event.venue,
+    venueAddress: event.venueAddress,
+    category: event.category,
+    subcategory: event.subcategories?.join(' / '),
+    kind: event.kind,
+    durationMin,
+    priceFromRub: event.priceFrom,
+    ageLimit: event.ageLimit,
+  });
+
+  return [description, practicalInfo].filter(Boolean).join('\n\n');
 }
 
 export function EventHowToGet({ event }: { event: PublicEventDto }) {

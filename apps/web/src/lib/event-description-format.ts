@@ -612,16 +612,9 @@ function renderBlocksToHtml(blocks: EventDescriptionBlock[]): string {
     .join('');
 }
 
-function trimEmptyTags(html: string): string {
-  return html
-    .replace(/<li>\s*<\/li>/gi, '')
-    .replace(/<p>\s*<\/p>/gi, '')
-    .replace(/<ul>\s*<\/ul>/gi, '');
-}
-
 /**
  * Safe HTML for event description.
- * - Existing HTML (tags): sanitize only, do not re-parse as lists.
+ * - Existing HTML (tags): sanitize, then structure paragraphs/lists like plain text.
  * - Plain text: paragraphs + headings + `<ul>/<li>` for detected bullets.
  * - Session date/time lines are removed: the purchase block owns the schedule.
  */
@@ -629,7 +622,58 @@ export function formatEventDescriptionHtml(raw: string): string {
   const text = stripSessionDateLines(String(raw || '')).trim();
   if (!text) return '';
   if (/<[a-z][\s\S]*>/i.test(text)) {
-    return trimEmptyTags(sanitizeEventHtml(text));
+    const structuredText = htmlToStructuredText(sanitizeEventHtml(text));
+    return sanitizeEventHtml(renderBlocksToHtml(parseEventDescriptionBlocks(structuredText)));
   }
   return sanitizeEventHtml(renderBlocksToHtml(parseEventDescriptionBlocks(text)));
+}
+
+/**
+ * Provider HTML is first allowlist-sanitized, then reduced to the same
+ * paragraph/heading/list input used by plain descriptions. Rendering that text
+ * through renderBlocksToHtml escapes content and prevents provider markup from
+ * bypassing our layout or introducing executable HTML.
+ */
+function htmlToStructuredText(html: string): string {
+  return decodeDescriptionEntities(
+    String(html || '')
+      .replace(/<br\s*\/?\s*>/giu, '\n')
+      .replace(/<h([2-4])>/giu, '\n\n## ')
+      .replace(/<\/h[2-4]>/giu, '\n\n')
+      .replace(/<li>/giu, '\n- ')
+      .replace(/<\/li>/giu, '\n')
+      .replace(/<a\s+href="([^"]*)">([\s\S]*?)<\/a>/giu, '$2 ($1)')
+      .replace(/<a>([\s\S]*?)<\/a>/giu, '$1')
+      .replace(/<(?:p|div|blockquote)>/giu, '\n\n')
+      .replace(/<\/(?:p|div|blockquote)>/giu, '\n\n')
+      .replace(/<(?:strong|b)>/giu, '**')
+      .replace(/<\/(?:strong|b)>/giu, '**')
+      .replace(/<(?:em|i)>/giu, '*')
+      .replace(/<\/(?:em|i)>/giu, '*')
+      .replace(/<[^>]*>/gu, '')
+      .replace(/[\t\v\f ]+/gu, ' ')
+      .replace(/ *\n */gu, '\n')
+      .replace(/\n{3,}/gu, '\n\n'),
+  ).trim();
+}
+
+function decodeDescriptionEntities(value: string): string {
+  return String(value || '')
+    .replace(/&#x([0-9a-f]+);/giu, (full, hex: string) => {
+      const code = Number.parseInt(hex, 16);
+      return Number.isFinite(code) && code > 0 && code <= 0x10ffff ? String.fromCodePoint(code) : full;
+    })
+    .replace(/&#(\d+);/gu, (full, decimal: string) => {
+      const code = Number.parseInt(decimal, 10);
+      return Number.isFinite(code) && code > 0 && code <= 0x10ffff ? String.fromCodePoint(code) : full;
+    })
+    .replace(/&nbsp;/giu, ' ')
+    .replace(/&amp;/giu, '&')
+    .replace(/&lt;/giu, '<')
+    .replace(/&gt;/giu, '>')
+    .replace(/&quot;/giu, '"')
+    .replace(/&#39;|&apos;/giu, "'")
+    .replace(/&laquo;/giu, '«')
+    .replace(/&raquo;/giu, '»')
+    .replace(/&ndash;|&mdash;|&minus;/giu, '-');
 }
