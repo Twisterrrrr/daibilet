@@ -564,14 +564,20 @@ export const SITEMAP_RESPONSE_HEADERS = {
 } as const;
 
 export function sitemapResponseHeaders(chunk: string): Record<string, string> {
+  if (chunk === 'events') {
+    return {
+      ...SITEMAP_RESPONSE_HEADERS,
+      // A grouped event can leave the public catalog as soon as its final
+      // session starts or inventory closes. Keep this document fresher than
+      // the slower-changing sitemap chunks.
+      'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=300',
+    };
+  }
   return {
     ...SITEMAP_RESPONSE_HEADERS,
-    // All chunks share the 1h ISR window: 037dc7994 dropped the `no-store`
-    // override (ISR cache verified working; sitemap-lastmod.test asserts the
-    // policy as intentional). The 2026-10-21 SSR-hang RCA proposed a 120s
-    // window for events/venues; the shared default supersedes it - fewer
-    // rebuilds, less event-loop pressure. The rebuild cost itself is fixed
-    // separately: venues/blog/freshness now come over loopback HTTP instead
-    // of direct DB reads in the web process.
+    // Slow-changing chunks share the 1h ISR window: 037dc7994 dropped the
+    // `no-store` override after verifying ISR caching. Short-lived event
+    // inventory now has its own 5m policy above. Venue/blog rebuild cost is
+    // controlled separately by reading their DTOs over loopback HTTP.
   };
 }
