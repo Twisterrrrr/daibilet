@@ -79,6 +79,7 @@ function buildOwnerOrderMail(order) {
   const buyer = snapshot.buyer || {};
   const orderCode = snapshot.code || snapshot.number || order.publicCode || order.externalOrderId;
   const eventTitle = order.eventTitle || snapshot.sourceEventTitle || "Импортированное событие";
+  const isPreview = order.preview === true;
   const ticketCount = Number(order.ticketCount || 0);
   const amountRub = extractAmountRub(snapshot);
   // Catalog page for the purchased event: /events/{slug} (latin CHPU).
@@ -86,7 +87,7 @@ function buildOwnerOrderMail(order) {
   const eventLink = eventSlug
     ? `https://daibilet.ru/events/${encodeURIComponent(eventSlug)}`
     : null;
-  const subject = `Новая покупка · ${eventTitle}`;
+  const subject = isPreview ? `Пример оформления уведомления · ${eventTitle}` : `Новая покупка · ${eventTitle}`;
   const eventImage = safeHttpsUrl(order.eventImageUrl);
   const eventDate = formatDate(order.eventStartsAt);
   const purchaseDate = formatDate(order.purchasedAt);
@@ -112,7 +113,7 @@ function buildOwnerOrderMail(order) {
   </tr>`).join("");
   const money = amountRub == null ? "Сумма не передана" : formatRub(amountRub);
   const text = [
-    "Новая покупка · Дайбилет",
+    isPreview ? "Пример оформления уведомления · Дайбилет" : "Новая покупка · Дайбилет",
     `Событие: ${eventTitle}`,
     eventDate ? `Дата события: ${eventDate}` : null,
     location ? `Место: ${location}` : null,
@@ -136,9 +137,9 @@ function buildOwnerOrderMail(order) {
           <a href="https://daibilet.ru" style="font-family:Arial,Helvetica,sans-serif;font-size:25px;font-weight:800;letter-spacing:-1px;text-decoration:none;white-space:nowrap;"><span style="color:#0f1117;">дай</span><span style="color:#ff4757;">билет</span></a>
         </td></tr>
         <tr><td style="padding:30px 32px 12px;">
-          <div style="display:inline-block;padding:6px 11px;border-radius:20px;background:#e9f9ef;color:#16834a;font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;">Оплата получена</div>
-          <h1 style="margin:16px 0 8px;font-size:25px;line-height:1.25;font-weight:700;color:#0f1117;">Новая покупка!</h1>
-          <p style="margin:0;color:#6b7080;font-size:15px;line-height:1.55;">Заказ №${escapeHtml(orderCode)} оплачен через ${escapeHtml(order.sourceName || "Ticketscloud")}.</p>
+          <div style="display:inline-block;padding:6px 11px;border-radius:20px;background:${isPreview ? "#fff3d6" : "#e9f9ef"};color:${isPreview ? "#986500" : "#16834a"};font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;">${isPreview ? "Пример письма" : "Оплата получена"}</div>
+          <h1 style="margin:16px 0 8px;font-size:25px;line-height:1.25;font-weight:700;color:#0f1117;">${isPreview ? "Так выглядит уведомление" : "Новая покупка!"}</h1>
+          <p style="margin:0;color:#6b7080;font-size:15px;line-height:1.55;">${isPreview ? "Предпросмотр письма на примере заказа Ticketscloud." : `Заказ №${escapeHtml(orderCode)} оплачен через ${escapeHtml(order.sourceName || "Ticketscloud")}.`}</p>
         </td></tr>
         <tr><td style="padding:18px 32px 8px;">
           <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f6f7fb;border-radius:13px;">
