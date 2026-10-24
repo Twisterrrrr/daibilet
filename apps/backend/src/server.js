@@ -5,11 +5,16 @@ import { readFile } from 'node:fs/promises';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { getAdminOrderDeleteGuard } from './admin-order-delete-guard.js';
+import { authorizeAdminSessionRequest } from './admin-rbac-guard.js';
 import {
   ADMIN_SESSION_TTL_SECONDS,
   assertAdminLoginRateLimit,
   buildAdminSessionCookie,
   buildClearAdminSessionCookie,
+  acceptAdminInvitation,
+  createAdminInvitation,
+  hashAdminSessionToken,
   loginAdminUser,
   parseAdminSessionToken,
   resolveAdminSession,
@@ -241,7 +246,7 @@ export async function handleRequest(request, response) {
 
     const url = new URL(request.url || '/', `http://${request.headers.host || '127.0.0.1'}`);
     const route = `${request.method} ${url.pathname}`;
-    const isAdminIdentityRoute = /^\/(?:api\/admin\/auth\/(?:login|me|logout))$/.test(url.pathname);
+    const isAdminIdentityRoute = /^\/(?:api\/admin\/auth\/(?:login|me|logout|accept-invitation|invitations))$/.test(url.pathname);
     const origin = String(request.headers.origin || '').trim();
     if (isAdminIdentityRoute && origin && !getAllowedOrigins().includes(origin)) {
       sendJson(response, { error: 'admin_auth_origin_denied' }, 403);
@@ -286,6 +291,55 @@ export async function handleRequest(request, response) {
       return;
     }
 
+    if (route === 'POST /api/admin/auth/invitations') {
+      try {
+        assertAdminLoginRateLimit(`invite-ip:${String(request.headers['x-real-ip'] || request.socket.remoteAddress || 'unknown')}`, 30);
+        const actor = await resolveAdminSession(db, parseAdminSessionToken(request.headers.cookie || ''));
+        if (!actor) {
+          sendJson(response, { error: 'admin_session_required' }, 401);
+          return;
+        }
+        const body = await readJsonBody(request, 8192);
+        const invitation = await createAdminInvitation(db, actor, body);
+        sendJson(response, {
+          ok: true,
+          invitation: {
+            id: invitation.invitationId,
+            email: invitation.email,
+            displayName: invitation.displayName,
+            roles: invitation.roles,
+            expiresAt: invitation.expiresAt.toISOString(),
+            inviteToken: invitation.token,
+          },
+          tokenHandling: 'Show this invitation token once and deliver it to the recipient through a trusted channel.',
+        }, 201);
+      } catch (error) {
+        const statusCode = Number(error.statusCode) || 500;
+        sendJson(response, {
+          error: statusCode < 500 ? error.message : 'Не удалось создать приглашение.',
+        }, statusCode);
+      }
+      return;
+    }
+
+    if (route === 'POST /api/admin/auth/accept-invitation') {
+      try {
+        assertAdminLoginRateLimit(`accept-ip:${String(request.headers['x-real-ip'] || request.socket.remoteAddress || 'unknown')}`, 20);
+        const body = await readJsonBody(request, 8192);
+        const inviteToken = String(body?.token || '');
+        assertAdminLoginRateLimit(`accept-token:${hashAdminSessionToken(inviteToken)}`, 8);
+        const accepted = await acceptAdminInvitation(db, inviteToken, body?.password);
+        sendJson(response, { user: accepted.user, expiresAt: accepted.expiresAt.toISOString() }, 201, {
+          'Set-Cookie': buildAdminSessionCookie(accepted.token, ADMIN_SESSION_TTL_SECONDS),
+        });
+      } catch (error) {
+        const statusCode = Number(error.statusCode) || 500;
+        const message = statusCode < 500 ? error.message : 'Не удалось принять приглашение.';
+        sendJson(response, { error: message }, statusCode);
+      }
+      return;
+    }
+
     if (route === 'POST /api/admin/auth/logout') {
       try {
         const token = parseAdminSessionToken(request.headers.cookie || '');
@@ -297,9 +351,19 @@ export async function handleRequest(request, response) {
       return;
     }
 
-    if (isProtectedPath(url.pathname) && !isAuthorizedAdminRequest(request)) {
-      sendAuthRequired(response);
-      return;
+    if (isProtectedPath(url.pathname)) {
+      if (process.env.DAIBILET_ADMIN_RBAC_ENFORCE === '1') {
+        const authorization = request.adminSessionUser
+          ? { authorized: true, actor: request.adminSessionUser }
+          : await authorizeAdminSessionRequest(request, db);
+        if (!authorization.authorized) {
+          sendJson(response, { error: authorization.error }, authorization.statusCode);
+          return;
+        }
+      } else if (!isAuthorizedAdminRequest(request)) {
+        sendAuthRequired(response);
+        return;
+      }
     }
 
     if (route === 'GET /api/health') {
@@ -1806,7 +1870,7 @@ function appendCliArg(args, key, value) {
 }
 
 function isProtectedPath(pathname) {
-  if (/^\/api\/admin\/auth\/(?:login|me|logout)$/.test(pathname)) return false;
+  if (/^\/api\/admin\/auth\/(?:login|me|logout|accept-invitation|invitations)$/.test(pathname)) return false;
   return (
     pathname === '/api/db/stats' ||
     pathname === '/api/db/events' ||

@@ -1,5 +1,6 @@
 import { createHash, randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
 import { promisify } from 'node:util';
+import { ADMIN_ROLES } from '@daibilet/contracts/admin-access/runtime';
 
 const scryptAsync = promisify(scrypt);
 export const ADMIN_SESSION_COOKIE = 'daibilet_admin_session';
@@ -72,12 +73,94 @@ export function assertAdminLoginRateLimit(key, limit = 8, windowMs = 60_000, now
   }
 }
 
-async function appendAdminAudit(db, { actorId = null, action, outcome, correlationId = null }) {
+async function appendAdminAudit(db, { actorId = null, action, outcome, correlationId = null, targetType = null, targetId = null }) {
   await db.query(
-    `insert into "AdminAuditLog" (id, "actorId", action, outcome, "correlationId", "createdAt")
-     values ($1, $2, $3, $4, $5, now())`,
-    [`audit_${randomBytes(16).toString('hex')}`, actorId, action, outcome, correlationId],
+    `insert into "AdminAuditLog" (id, "actorId", action, outcome, "correlationId", "targetType", "targetId", "createdAt")
+     values ($1, $2, $3, $4, $5, $6, $7, now())`,
+    [`audit_${randomBytes(16).toString('hex')}`, actorId, action, outcome, correlationId, targetType, targetId],
   );
+}
+
+function adminAuthError(message, statusCode = 400) {
+  const error = new Error(message);
+  error.statusCode = statusCode;
+  return error;
+}
+
+export async function createAdminInvitation(db, actor, input, { now = new Date(), correlationId = null } = {}) {
+  if (!actor?.roles?.includes('SUPERADMIN')) throw adminAuthError('Недостаточно прав для приглашения сотрудника.', 403);
+  const email = String(input?.email || '').trim().toLowerCase();
+  const displayName = String(input?.displayName || '').trim();
+  const roles = Array.isArray(input?.roles) ? [...new Set(input.roles)] : [];
+  if (!email.includes('@') || email.length > 254) throw adminAuthError('Укажите корректный email.');
+  if (!displayName || displayName.length > 120) throw adminAuthError('Укажите имя сотрудника.');
+  if (!roles.length || roles.some((role) => !ADMIN_ROLES.includes(role))) throw adminAuthError('Выберите допустимые роли.');
+  const token = randomBytes(32).toString('base64url');
+  const expiresAt = new Date(now.getTime() + 72 * 60 * 60 * 1000);
+
+  try {
+    const created = await db.transaction(async (tx) => {
+      await tx.query('select pg_advisory_xact_lock(hashtext($1))', [`admin-invite:${email}`]);
+      const existing = await tx.query('select id from "AdminUser" where lower(email) = $1 limit 1', [email]);
+      if (existing.rows[0]) throw adminAuthError('Сотрудник с таким email уже существует.', 409);
+      const userId = `adm_usr_${randomBytes(16).toString('hex')}`;
+      await tx.query(
+        `insert into "AdminUser" (id, email, "displayName", state, roles, "createdAt", "updatedAt")
+         values ($1, $2, $3, 'INVITED', $4::"AdminRole"[], $5, $5)`,
+        [userId, email, displayName, roles, now],
+      );
+      const invitationId = `adm_inv_${randomBytes(16).toString('hex')}`;
+      await tx.query(
+        `insert into "AdminInvitation" (id, "userId", "invitedById", "tokenHash", "expiresAt", "createdAt")
+         values ($1, $2, $3, $4, $5, $6)`,
+        [invitationId, userId, actor.id, hashAdminSessionToken(token), expiresAt, now],
+      );
+      await appendAdminAudit(tx, { actorId: actor.id, action: 'admin.staff.invite', outcome: 'success', correlationId, targetType: 'AdminUser', targetId: userId });
+      return { userId, invitationId };
+    });
+    return { ...created, token, expiresAt, email, displayName, roles };
+  } catch (error) {
+    if (error?.code === '23505') throw adminAuthError('Сотрудник с таким email уже существует.', 409);
+    throw error;
+  }
+}
+
+export async function acceptAdminInvitation(db, tokenInput, passwordInput, { now = new Date() } = {}) {
+  const token = String(tokenInput || '').trim();
+  if (token.length < 32 || token.length > 200) throw adminAuthError('Приглашение недействительно или истекло.');
+  const passwordHash = await hashAdminPassword(passwordInput);
+  const sessionToken = randomBytes(32).toString('base64url');
+  const expiresAt = new Date(now.getTime() + ADMIN_SESSION_TTL_SECONDS * 1000);
+
+  const accepted = await db.transaction(async (tx) => {
+    const invitation = await tx.query(
+      `select i.id as "invitationId", i."userId", u.email
+         from "AdminInvitation" i join "AdminUser" u on u.id = i."userId"
+        where i."tokenHash" = $1 and i."acceptedAt" is null and i."revokedAt" is null
+          and i."expiresAt" > $2 and u.state = 'INVITED'
+        for update of i, u`,
+      [hashAdminSessionToken(token), now],
+    );
+    const pending = invitation.rows[0];
+    if (!pending) throw adminAuthError('Приглашение недействительно или истекло.');
+    const userResult = await tx.query(
+      `update "AdminUser" set "passwordHash" = $2, state = 'ACTIVE', "emailVerifiedAt" = $3, "updatedAt" = $3
+        where id = $1 and state = 'INVITED'
+        returning id, email, "displayName", roles`,
+      [pending.userId, passwordHash, now],
+    );
+    const user = userResult.rows[0];
+    if (!user) throw adminAuthError('Приглашение недействительно или истекло.');
+    await tx.query('update "AdminInvitation" set "acceptedAt" = $2 where id = $1', [pending.invitationId, now]);
+    await tx.query(
+      `insert into "AdminSession" (id, "userId", "tokenHash", "expiresAt", "createdAt") values ($1, $2, $3, $4, $5)`,
+      [`adm_sess_${randomBytes(16).toString('hex')}`, user.id, hashAdminSessionToken(sessionToken), expiresAt, now],
+    );
+    await appendAdminAudit(tx, { actorId: user.id, action: 'admin.staff.invitation.accept', outcome: 'success', targetType: 'AdminUser', targetId: user.id });
+    return user;
+  });
+
+  return { token: sessionToken, expiresAt, user: { ...accepted, roles: accepted.roles || [] } };
 }
 
 export async function loginAdminUser(db, emailInput, passwordInput, { now = new Date(), correlationId = null } = {}) {

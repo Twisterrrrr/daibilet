@@ -6,6 +6,8 @@ import {
   assertAdminLoginRateLimit,
   buildAdminSessionCookie,
   buildClearAdminSessionCookie,
+  acceptAdminInvitation,
+  createAdminInvitation,
   hashAdminPassword,
   loginAdminUser,
   parseAdminSessionToken,
@@ -15,12 +17,33 @@ import {
 } from './admin-session-auth.js';
 
 function fakeDb(user) {
-  const state = { user, session: null, revokedAt: null, audit: [] };
-  return {
-    state,
-    async query(sql, params = []) {
+  const state = { user, session: null, invitation: null, revokedAt: null, audit: [] };
+  const query = async (sql, params = []) => {
+      if (sql.includes('pg_advisory_xact_lock')) return { rows: [] };
       if (sql.includes('from "AdminUser" where lower(email)')) {
         return { rows: state.user && state.user.email.toLowerCase() === params[0] ? [state.user] : [] };
+      }
+      if (sql.includes('insert into "AdminUser"')) {
+        state.user = { id: params[0], email: params[1], displayName: params[2], state: 'INVITED', roles: params[3], passwordHash: null };
+        return { rows: [] };
+      }
+      if (sql.includes('insert into "AdminInvitation"')) {
+        state.invitation = { id: params[0], userId: params[1], tokenHash: params[3], expiresAt: params[4], acceptedAt: null, revokedAt: null };
+        return { rows: [] };
+      }
+      if (sql.includes('from "AdminInvitation" i join "AdminUser"')) {
+        if (!state.invitation || state.invitation.tokenHash !== params[0] || state.invitation.acceptedAt || state.invitation.revokedAt || state.invitation.expiresAt <= params[1] || state.user.state !== 'INVITED') return { rows: [] };
+        return { rows: [{ invitationId: state.invitation.id, userId: state.user.id, email: state.user.email }] };
+      }
+      if (sql.includes('update "AdminUser" set "passwordHash"')) {
+        if (state.user?.id !== params[0] || state.user.state !== 'INVITED') return { rows: [] };
+        state.user.passwordHash = params[1];
+        state.user.state = 'ACTIVE';
+        return { rows: [{ id: state.user.id, email: state.user.email, displayName: state.user.displayName, roles: state.user.roles }] };
+      }
+      if (sql.includes('update "AdminInvitation" set "acceptedAt"')) {
+        if (state.invitation?.id === params[0]) state.invitation.acceptedAt = params[1];
+        return { rows: [] };
       }
       if (sql.includes('insert into "AdminSession"')) {
         state.session = { id: params[0], userId: params[1], tokenHash: params[2], expiresAt: params[3] };
@@ -51,7 +74,11 @@ function fakeDb(user) {
         return { rows: [{ userId: state.user.id }] };
       }
       throw new Error(`Unexpected SQL: ${sql}`);
-    },
+  };
+  return {
+    state,
+    query,
+    transaction: (operation) => operation({ query }),
   };
 }
 
@@ -118,6 +145,42 @@ test('logout revokes the session and can be repeated safely', async () => {
   assert.equal(await resolveAdminSession(db, login.token), null);
   await revokeAdminSession(db, login.token);
   assert.deepEqual(db.state.audit.map((entry) => entry.action), ['admin.auth.login', 'admin.auth.logout']);
+});
+
+test('only a SUPERADMIN can invite a staff account with valid roles', async () => {
+  const db = fakeDb(null);
+  await assert.rejects(createAdminInvitation(db, { id: 'staff-1', roles: ['PRODUCT'] }, {
+    email: 'editor@example.com', displayName: 'Editor', roles: ['COPYWRITER'],
+  }), { statusCode: 403 });
+  const invite = await createAdminInvitation(db, { id: 'owner-1', roles: ['SUPERADMIN'] }, {
+    email: ' EDITOR@example.com ', displayName: 'Editor', roles: ['COPYWRITER', 'SEO'],
+  }, { now: new Date('2026-10-24T00:00:00Z') });
+  assert.equal(invite.email, 'editor@example.com');
+  assert.equal(db.state.user.state, 'INVITED');
+  assert.equal(db.state.user.passwordHash, null);
+  assert.deepEqual(db.state.user.roles, ['COPYWRITER', 'SEO']);
+  assert.equal(db.state.invitation.expiresAt.toISOString(), '2026-10-27T00:00:00.000Z');
+  assert.notEqual(db.state.invitation.tokenHash, invite.token);
+  assert.equal(db.state.audit.at(-1).action, 'admin.staff.invite');
+  await assert.rejects(createAdminInvitation(db, { id: 'owner-1', roles: ['SUPERADMIN'] }, {
+    email: 'editor@example.com', displayName: 'Another', roles: ['SEO'],
+  }), { statusCode: 409 });
+});
+
+test('invitation acceptance activates user once and starts a personal session', async () => {
+  const db = fakeDb(null);
+  const invite = await createAdminInvitation(db, { id: 'owner-1', roles: ['SUPERADMIN'] }, {
+    email: 'editor@example.com', displayName: 'Editor', roles: ['COPYWRITER'],
+  }, { now: new Date('2026-10-24T00:00:00Z') });
+  const accepted = await acceptAdminInvitation(db, invite.token, 'new secure password', {
+    now: new Date('2026-10-24T01:00:00Z'),
+  });
+  assert.equal(accepted.user.id, db.state.user.id);
+  assert.equal(db.state.user.state, 'ACTIVE');
+  assert.equal(await verifyAdminPassword('new secure password', db.state.user.passwordHash), true);
+  assert.equal(db.state.invitation.acceptedAt.toISOString(), '2026-10-24T01:00:00.000Z');
+  assert.equal((await resolveAdminSession(db, accepted.token, { now: new Date('2026-10-24T02:00:00Z') }))?.id, db.state.user.id);
+  await assert.rejects(acceptAdminInvitation(db, invite.token, 'another secure password'), { statusCode: 400 });
 });
 
 test('login throttling is keyed without retaining raw identifiers', () => {

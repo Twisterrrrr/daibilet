@@ -118,6 +118,8 @@ const server = startServer({
   prewarmBeforeListen: env.DAIBILET_PUBLIC_PREWARM_BEFORE_LISTEN === '1',
   handler: createValidatedHandler(handleRequest, {
     adminAuth,
+    adminRbacEnforce: env.DAIBILET_ADMIN_RBAC_ENFORCE === '1',
+    adminSessionDb: db,
     routeHandlers: [
       createAdminVenueRouteHandler,
       createPublicCatalogRouteHandler({

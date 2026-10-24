@@ -6,7 +6,7 @@
 
 RBAC нужен **до** выдачи доступа к финконтру нескольким сотрудникам. Переключатели пунктов меню не защищают данные: право проверяется на сервере для страницы, каждого API-запроса, экспорта и действия. Общий Basic Auth остаётся временным доступом владельца до готовности персональных сессий; нельзя включать редакторские аккаунты через общий пароль.
 
-`@daibilet/contracts/admin-access` определяет профили и разрешения без иерархии. Схема БД содержит `AdminUser`, `AdminInvitation`, `AdminSession` и `AdminAuditLog` (миграция `20261016120000_admin_staff_identity`). Backend уже имеет базовые login/me/logout endpoints для активных учёток и route-permission policy; сами admin/catalog маршруты пока остаются под общим Basic Auth. Приглашение/первичный bootstrap, UI входа, применение session guard, маскирование PII по ролям и finance bridge остаются незакрытыми и не должны считаться действующим RBAC.
+`@daibilet/contracts/admin-access` определяет профили и разрешения без иерархии. Схема БД содержит `AdminUser`, `AdminInvitation`, `AdminSession` и `AdminAuditLog` (миграция `20261016120000_admin_staff_identity`). Backend имеет login/me/logout, SUPERADMIN-only приглашения, принятие одноразового приглашения и first-admin bootstrap. Route-permission guard действует только при `DAIBILET_ADMIN_RBAC_ENFORCE=1`; без него admin/catalog маршруты остаются на общем Basic Auth. В режиме guard неизвестные маршруты закрыты, и покрытие пока неполное. UI входа, безопасные role-scoped DTO, применение MFA и finance bridge остаются незакрытыми.
 
 ## Что показал legacy SPBBOATS
 

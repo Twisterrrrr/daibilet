@@ -32,6 +32,8 @@ test('admin identity endpoints authenticate themselves instead of using shared B
   assert.equal(isProtectedPath('/api/admin/auth/login'), false);
   assert.equal(isProtectedPath('/api/admin/auth/me'), false);
   assert.equal(isProtectedPath('/api/admin/auth/logout'), false);
+  assert.equal(isProtectedPath('/api/admin/auth/accept-invitation'), false);
+  assert.equal(isProtectedPath('/api/admin/auth/invitations'), false);
   assert.equal(isProtectedPath('/api/admin/auth/users'), true);
 });
 

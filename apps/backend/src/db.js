@@ -15,6 +15,25 @@ export function createDb(rootDir) {
       return pool.query(text, params);
     },
 
+    async transaction(operation) {
+      const client = await pool.connect();
+      try {
+        await client.query('begin');
+        const result = await operation(client);
+        await client.query('commit');
+        return result;
+      } catch (error) {
+        await client.query('rollback').catch(() => {});
+        throw error;
+      } finally {
+        client.release();
+      }
+    },
+
+    async close() {
+      await pool.end();
+    },
+
     async stats() {
       const result = await pool.query(`
         select 'events' as key, count(*)::int as value from "Event"
