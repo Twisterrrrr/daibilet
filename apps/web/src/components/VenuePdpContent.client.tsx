@@ -27,7 +27,7 @@ export function VenuePdpContent({ document }: { document?: PublicPdpDocumentDto 
   if (!content.summary?.trim() && !sections.length && !gallery.length && !facts.length) return null;
 
   return (
-    <div className="container-page space-y-12 py-10 sm:py-14" data-editorial-pdp={document.variant}>
+    <div className="space-y-10 py-6 sm:py-8" data-editorial-pdp={document.variant}>
       {content.summary?.trim() ? (
         <section className="max-w-3xl">
           <h2 className="font-display text-2xl font-extrabold tracking-tight text-slate-950 sm:text-3xl">

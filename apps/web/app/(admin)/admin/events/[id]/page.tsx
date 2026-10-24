@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { AdminApiErrorBanner } from '@/components/admin/AdminApiErrorBanner';
 import { AdminEventEditor } from '@/components/admin/AdminEventEditor';
 import { loadAdminEventDetail, loadAdminTaxonomy } from '@/server/admin-events-data';
+import { loadAdminPdpEditorData } from '@/server/admin-pdp-data';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,7 +30,9 @@ export default async function AdminEventDetailPage({ params, searchParams }: Pag
   const { id: rawId } = await params;
   const id = decodeURIComponent(rawId);
   const rawSearch = await searchParams;
-  const [detail, taxonomy] = await Promise.all([loadAdminEventDetail(id), loadAdminTaxonomy()]);
+  const [detail, taxonomy, pdpData] = await Promise.all([
+    loadAdminEventDetail(id), loadAdminTaxonomy(), loadAdminPdpEditorData('events', id),
+  ]);
   // Queue context from the events list: back keeps the selection, next opens
   // the following task without returning to the list.
   const back = first(rawSearch.back) || '';
@@ -75,6 +78,7 @@ export default async function AdminEventDetailPage({ params, searchParams }: Pag
         taxonomy={taxonomy}
         notice={noticeFromSearch(rawSearch)}
         queue={{ back: backHref, next: remainingIds.join(',') || undefined }}
+        pdpData={pdpData}
       />
     </div>
   );

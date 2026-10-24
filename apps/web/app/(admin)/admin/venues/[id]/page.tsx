@@ -6,7 +6,7 @@ import { eventStatusLabel, venueKindLabel, venuePageStatusLabel } from '@/compon
 import { formatAdminDateTime, formatAdminNumber, PUBLIC_SITE_BASE } from '@/lib/admin-ui';
 import { saveAdminVenueAction } from '@/server/admin-venue-actions';
 import { loadAdminVenueDetail } from '@/server/admin-venues-data';
-import { AdminVenuePdpEditor } from '@/components/admin/AdminVenuePdpEditor.client';
+import { AdminPdpEditor } from '@/components/admin/AdminVenuePdpEditor.client';
 import { loadAdminPdpEditorData } from '@/server/admin-pdp-data';
 
 export const dynamic = 'force-dynamic';
@@ -57,7 +57,7 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
   const backHref = /^\/admin\/venues(?:\?|$)/.test(back) ? back : '/admin/venues';
   const detail = await loadAdminVenueDetail(id);
   const pdpData = detail.found && detail.slug
-    ? await loadAdminPdpEditorData(detail.id)
+    ? await loadAdminPdpEditorData('venues', detail.id)
     : { variants: {}, document: null, error: null };
   const defaultVariantByVenueKind: Record<string, string> = {
     MUSEUM_ART_SPACE: 'museum', THEATER: 'theater', CONCERT_HALL: 'concert_hall', CLUB_BAR_RESTAURANT: 'club',
@@ -292,9 +292,10 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
       ) : null}
 
       {detail.found && detail.slug ? (
-        <AdminVenuePdpEditor
+        <AdminPdpEditor
+          entity="venues"
           entityId={detail.id}
-          venueSlug={detail.slug}
+          entitySlug={detail.slug}
           variants={pdpData.variants}
           initialDocument={pdpData.document}
           initialVariant={initialVariant}

@@ -34,6 +34,7 @@ import { formatPublicEventTitle } from './event-title-normalize.ts';
 import type {
   PublicEventDto,
   PublicEventPageDto,
+  PublicPdpDocumentDto,
   PublicOfferDto,
   PublicPurchaseOptionDto,
   PublicSessionDto,
@@ -419,6 +420,7 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
   return {
     generatedAt: new Date().toISOString(),
     event,
+    pdp: await attachReadyEventPdp(requestedEvent.id),
     sessions,
     offers: offers.map(({ eventId: _eventId, sortOrder: _sortOrder, sourceTicketId: _sourceTicketId, payload: _payload, ...offer }) => offer),
     ticketPrices,
@@ -455,6 +457,20 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
       vacant: vacantValues.length ? vacantValues.reduce((sum, value) => sum + value, 0) : null,
     },
   };
+}
+
+async function attachReadyEventPdp(eventId: string): Promise<PublicPdpDocumentDto | null> {
+  try {
+    const document = await prisma.pdpDocument.findUnique({
+      where: { eventId },
+      select: { variant: true, status: true, content: true },
+    });
+    if (!document || document.status !== 'READY') return null;
+    return { variant: document.variant, content: document.content as PublicPdpDocumentDto['content'] };
+  } catch (error) {
+    console.warn('[public-event-pdp] optional document lookup failed', error);
+    return null;
+  }
 }
 
 async function resolveEvent(eventSlugOrId: string): Promise<EventRecord | null> {

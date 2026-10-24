@@ -22,6 +22,8 @@ import {
 } from '@/server/admin-event-actions';
 import type { AdminEventDetailData, AdminTaxonomyData } from '@/server/admin-events-data';
 import { formatAdminNumber, PUBLIC_SITE_BASE } from '@/lib/admin-ui';
+import { AdminPdpEditor } from '@/components/admin/AdminVenuePdpEditor.client';
+import type { AdminPdpEditorData } from '@/server/admin-pdp-data';
 
 const MODERATION_STATUSES = [
   { status: 'DRAFT', label: 'Черновик' },
@@ -36,9 +38,10 @@ type Props = {
   taxonomy: AdminTaxonomyData;
   notice?: string | null;
   queue?: { back?: string; next?: string };
+  pdpData?: AdminPdpEditorData;
 };
 
-export function AdminEventEditor({ detail, taxonomy, notice, queue }: Props) {
+export function AdminEventEditor({ detail, taxonomy, notice, queue, pdpData }: Props) {
   const override = detail.override;
   const currentStatus = (override.editorStatus || 'REVIEW').toUpperCase();
   const statusLabel = MODERATION_STATUSES.find((item) => item.status === currentStatus)?.label ?? currentStatus;
@@ -307,6 +310,21 @@ export function AdminEventEditor({ detail, taxonomy, notice, queue }: Props) {
             label: 'Данные и диагностика',
             content: <AdminEventOpsPanels detail={detail} />,
           },
+          ...(detail.slug && pdpData ? [{
+            id: 'pdp',
+            label: 'Страница события',
+            content: (
+              <AdminPdpEditor
+                entity="events"
+                entityId={detail.id}
+                entitySlug={detail.slug}
+                variants={pdpData.variants}
+                initialDocument={pdpData.document}
+                initialVariant="event"
+                initialError={pdpData.error}
+              />
+            ),
+          }] : []),
         ]}
       />
     </div>

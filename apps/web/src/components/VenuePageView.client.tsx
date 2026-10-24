@@ -273,10 +273,10 @@ export function VenuePageView({
                 ) : null}
               </InstitutionVenueLayout>
             ) : admissionProducts.length > 0 || matchedPayload.pdp ? (
-              <div className="py-6">
+              <div className="container-page py-6">
                 <VenuePdpContent document={matchedPayload.pdp} />
                 {admissionProducts.length > 0 ? (
-                  <div className="container-page"><VenueAdmissionBlock products={admissionProducts} /></div>
+                  <VenueAdmissionBlock products={admissionProducts} />
                 ) : null}
               </div>
             ) : null}

@@ -50,3 +50,17 @@ test('save keeps the entity relation and increments document version', async () 
   assert.match(calls[1].sql, /ON CONFLICT \("venueId"\)/);
   assert.equal(calls[1].values[1], 'venue-1');
 });
+
+test('event PDP documents persist against the event relation only', async () => {
+  const calls = [];
+  const db = { query: async (sql, values) => {
+    calls.push({ sql, values });
+    if (sql.startsWith('SELECT id FROM')) return { rows: [{ id: 'event-1' }] };
+    return { rows: [{ id: 'doc-event-1', variant: 'event' }] };
+  } };
+  const saved = await savePdpDocument(db, 'events', 'event-1', { variant: 'event', content: emptyPdpContent('event') });
+  assert.equal(saved.variant, 'event');
+  assert.match(calls[0].sql, /FROM "Event"/);
+  assert.match(calls[1].sql, /ON CONFLICT \("eventId"\)/);
+  assert.equal(calls[1].values[1], 'event-1');
+});

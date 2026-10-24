@@ -1,6 +1,6 @@
 import * as React from 'react';
 import type { AdminPdpDocument } from '@/server/admin-pdp-data';
-import { saveAdminVenuePdpAction } from '@/server/admin-pdp-actions';
+import { saveAdminPdpAction } from '@/server/admin-pdp-actions';
 
 type GalleryImage = { url: string; alt: string; caption: string; credit: string };
 type Fact = { label: string; value: string; sourceUrl: string; verifiedAt: string };
@@ -66,9 +66,10 @@ function Field({ label, value, onChange, multiline = false }: { label: string; v
   </label>;
 }
 
-export function AdminVenuePdpEditor({ entityId, venueSlug, variants, initialDocument, initialVariant, initialError }: {
+export function AdminPdpEditor({ entity, entityId, entitySlug, variants, initialDocument, initialVariant, initialError }: {
+  entity: 'venues' | 'events';
   entityId: string;
-  venueSlug: string;
+  entitySlug: string;
   variants: Record<string, string[]>;
   initialDocument: AdminPdpDocument | null;
   initialVariant: string;
@@ -102,7 +103,7 @@ export function AdminVenuePdpEditor({ entityId, venueSlug, variants, initialDocu
         || !parsed.content.sections.every((section) => section && Array.isArray(section.items) && section.items.every((item) => item && Array.isArray(item.details)))) {
         throw new Error('Нужен полный документ с content.sections, gallery, facts и sources');
       }
-      if (!variants[parsed.variant] || parsed.variant === 'event') throw new Error('Неверный сценарий PDP');
+      if (!variants[parsed.variant] || (entity === 'events') !== (parsed.variant === 'event')) throw new Error('Неверный сценарий PDP');
       parsed.content.conversion ||= { mode: 'none', primaryAction: 'none', label: '', targetEventId: '', externalUrl: '' };
       setDocument(parsed);
       setJsonOpen(false);
@@ -114,7 +115,7 @@ export function AdminVenuePdpEditor({ entityId, venueSlug, variants, initialDocu
     if (!document) return;
     setSaving(true); setError(''); setMessage('');
     try {
-      const saved = await saveAdminVenuePdpAction(entityId, venueSlug, document);
+      const saved = await saveAdminPdpAction(entity, entityId, entitySlug, document);
       setDocument(saved);
       setMessage(saved.status === 'READY'
         ? 'Текст PDP опубликован. Сценарий CTA сохранён как настройка, но покупка и бронирование ещё не подключены.'
@@ -145,7 +146,7 @@ export function AdminVenuePdpEditor({ entityId, venueSlug, variants, initialDocu
     <div className="grid gap-3 sm:grid-cols-2">
       <label className="text-xs text-muted-foreground">Сценарий PDP
         <select className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground" value={document.variant} onChange={(event) => changeVariant(event.target.value)}>
-          {Object.keys(variants).filter((variant) => variant !== 'event').map((variant) => <option key={variant} value={variant}>{labels[variant] || variant}</option>)}
+          {Object.keys(variants).filter((variant) => entity === 'events' ? variant === 'event' : variant !== 'event').map((variant) => <option key={variant} value={variant}>{labels[variant] || variant}</option>)}
         </select>
       </label>
       <label className="text-xs text-muted-foreground">Статус контента

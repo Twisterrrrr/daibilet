@@ -25,10 +25,10 @@ export type AdminPdpEditorData = {
   error: string | null;
 };
 
-export async function loadAdminPdpEditorData(venueId: string): Promise<AdminPdpEditorData> {
+export async function loadAdminPdpEditorData(entity: 'venues' | 'events', entityId: string): Promise<AdminPdpEditorData> {
   const [variantsResponse, documentResponse] = await Promise.all([
     adminApiFetch('/api/admin/pdp/variants'),
-    adminApiFetch(`/api/admin/pdp/venues/${encodeURIComponent(venueId)}`),
+    adminApiFetch(`/api/admin/pdp/${entity}/${encodeURIComponent(entityId)}`),
   ]);
   if (!variantsResponse.ok || !documentResponse.ok) {
     return {
