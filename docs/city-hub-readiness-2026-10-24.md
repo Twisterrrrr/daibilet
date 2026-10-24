@@ -54,7 +54,7 @@ Counts below are the `events` field returned by `/api/public/destinations` durin
 3. Rank cities by actual demand and content readiness; start with a small batch and create useful hub content before enabling indexability.
 4. Verify rendered page, canonical, JSON-LD, sitemap inclusion, mobile quality, and crawl response for each released batch.
 
-## Remaining SEO owner decisions
+## SEO status notes
 
-- Homepage `private, no-store` behavior caused by cookie-based personalization.
+- Homepage uses one shared ISR response with client-side city selection; details are in `docs/Diary.md`.
 - Saint Isaac’s Cathedral intentionally remains a thin layer with `isIndexable=false` until its content is expanded (owner confirmed 2026-10-24). Do not change this flag before editorial work.
