@@ -5,6 +5,7 @@ import { readFile } from 'node:fs/promises';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { getAdminOrderDeleteGuard } from './admin-order-delete-guard.js';
 import { createDb } from './db.js';
 import { PDP_VARIANTS, readPdpDocument, savePdpDocument } from './pdp-documents.js';
 import {
@@ -24,7 +25,6 @@ import {
   unarchiveAdminOrder,
   archiveAdminOrdersBulk,
   archiveStaleCancelledOrders,
-  deleteAdminOrder,
   buildAdminLandingsList,
   buildAdminSources,
   buildAdminTaxonomy,
@@ -658,13 +658,9 @@ export async function handleRequest(request, response) {
       return;
     }
 
-    const orderDeleteMatch = request.method === 'DELETE' ? url.pathname.match(/^\/api\/admin\/orders\/([^/]+)$/) : null;
-    if (orderDeleteMatch) {
-      try {
-        sendJson(response, await deleteAdminOrder(db, decodeURIComponent(orderDeleteMatch[1])));
-      } catch (error) {
-        sendJson(response, { error: error.message || 'delete_failed' }, error.statusCode || 400);
-      }
+    const orderDeleteGuard = getAdminOrderDeleteGuard(request.method, url.pathname);
+    if (orderDeleteGuard) {
+      sendJson(response, orderDeleteGuard.body, orderDeleteGuard.statusCode);
       return;
     }
 

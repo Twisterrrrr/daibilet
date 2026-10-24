@@ -39,7 +39,6 @@ export async function operateInternalAdminOrderAction(formData: FormData) {
   revalidatePath(`/admin/orders/internal/${orderKey}`);
   redirect(`/admin/orders/internal/${encodeURIComponent(orderKey)}?operation=${encodeURIComponent(result.status)}`);
 }
-
 export async function syncAdminOrdersTcAction() {
   const response = await adminApiFetch('/api/admin/orders/sync', { method: 'POST' });
   if (!response.ok) {
@@ -122,20 +121,4 @@ export async function unarchiveAdminOrderAction(formData: FormData) {
   revalidatePath('/admin/orders');
   revalidatePath(`/admin/orders/${id}`);
   redirect(`/admin/orders/${encodeURIComponent(id)}?unarchived=1`);
-}
-
-export async function deleteAdminOrderAction(formData: FormData) {
-  const id = String(formData.get('id') || '').trim();
-  const confirm = String(formData.get('confirm') || '').trim();
-  if (!id) throw new Error('missing order id');
-  if (confirm !== 'DELETE') throw new Error('type DELETE to confirm');
-
-  const response = await adminApiFetch(`/api/admin/orders/${encodeURIComponent(id)}`, {
-    method: 'DELETE',
-  });
-  if (!response.ok) {
-    throw new Error(`delete failed HTTP ${response.status}`);
-  }
-  revalidatePath('/admin/orders');
-  redirect('/admin/orders?deleted=1');
 }

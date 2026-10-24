@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 import { AdminApiErrorBanner } from '@/components/admin/AdminApiErrorBanner';
-import { archiveAdminOrderAction, deleteAdminOrderAction, unarchiveAdminOrderAction, upsertAdminOrderTicketAction } from '@/server/admin-order-actions';
+import { archiveAdminOrderAction, unarchiveAdminOrderAction, upsertAdminOrderTicketAction } from '@/server/admin-order-actions';
 import {
   loadAdminOrderDetail,
   loadAdminOrderEventCandidates,
@@ -52,7 +52,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Pag
             {detail.publicCode || detail.externalOrderId}
           </h2>
           <p className="mt-1 text-sm text-slate-600">
-            Read + archive/unarchive + ticket-link + hard delete. Отдельного DELETE ticket нет (только с заказом).
+            Просмотр, архивирование и привязка билета. Финансовая и операционная история заказа сохраняется.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -191,30 +191,6 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Pag
           ''
         }
       />
-
-      <section className="rounded-xl border border-rose-200 bg-rose-50 p-4">
-        <h3 className="text-sm font-semibold text-rose-900">Опасная зона</h3>
-        <p className="mt-1 text-xs text-rose-800">
-          Hard delete заказа удалит все билеты зеркала. Для подтверждения введи DELETE.
-        </p>
-        <form action={deleteAdminOrderAction} className="mt-3 flex flex-wrap items-end gap-2">
-          <input type="hidden" name="id" value={detail.id} />
-          <label className="block space-y-1">
-            <span className="text-xs font-medium text-rose-800">Подтверждение</span>
-            <input
-              name="confirm"
-              placeholder="DELETE"
-              className="w-40 rounded-md border border-rose-200 bg-white px-3 py-2 font-mono text-sm"
-            />
-          </label>
-          <button
-            type="submit"
-            className="rounded-md border border-rose-300 bg-white px-3 py-2 text-sm font-medium text-rose-800 hover:bg-rose-100"
-          >
-            Удалить заказ
-          </button>
-        </form>
-      </section>
 
       <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
         <h3 className="text-sm font-semibold text-slate-900">Поиск события для привязки</h3>
