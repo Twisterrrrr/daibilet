@@ -23,14 +23,20 @@ import { freshnessMapFromRows, publicFreshnessSlug } from '@daibilet/backend/eve
 const WEB_ROOT = path.resolve(__dirname, '../..');
 const REPO_ROOT = path.resolve(WEB_ROOT, '../..');
 
-test('time-sensitive sitemaps cannot outlive an event or retain stale venue eligibility', () => {
-  // Bounded ISR cache (1h) - shorter than any event lifetime; freshness comes
-  // from hourly revalidation + IndexNow. no-store was removed on purpose: it
-  // disabled route-handler caching and rebuilt events.xml in 5-11s per hit,
-  // blowing the Googlebot ~30s fetch budget (crawler speed gate catches this).
-  assert.equal(sitemapResponseHeaders('events')['Cache-Control'], 'public, s-maxage=3600, stale-while-revalidate=86400');
+test('event sitemap uses a shorter cache than slow-changing sitemap chunks', () => {
+  // Event availability changes throughout the day. A short cached window keeps
+  // the sitemap aligned with the public catalog without rebuilding per hit.
+  assert.equal(sitemapResponseHeaders('events')['Cache-Control'], 'public, s-maxage=300, stale-while-revalidate=300');
   assert.equal(sitemapResponseHeaders('venues')['Cache-Control'], 'public, s-maxage=3600, stale-while-revalidate=86400');
   assert.equal(sitemapResponseHeaders('blog')['Cache-Control'], 'public, s-maxage=3600, stale-while-revalidate=86400');
+});
+
+test('event sitemap is generated at runtime on a short ISR window', () => {
+  const route = fs.readFileSync(path.join(WEB_ROOT, 'app/sitemaps/events.xml/route.ts'), 'utf8');
+  const dynamicRoute = fs.readFileSync(path.join(WEB_ROOT, 'app/sitemaps/[chunk]/route.ts'), 'utf8');
+  assert.match(route, /export const revalidate = 300/);
+  assert.match(route, /buildEventsSitemapEntries\(\)/);
+  assert.match(dynamicRoute, /chunk !== 'events'/);
 });
 
 test('sitemap lastmod: uses a real updatedAt when present', () => {

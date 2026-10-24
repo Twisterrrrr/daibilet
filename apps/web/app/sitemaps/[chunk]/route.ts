@@ -11,9 +11,9 @@ import {
 export const revalidate = 3600;
 
 export function generateStaticParams() {
-  // venues.xml has its own runtime route: it must not bake a pre-swap backend
-  // snapshot into the CI artifact.
-  return SITEMAP_CHUNKS.filter((chunk) => chunk !== 'venues')
+  // Volatile chunks have dedicated runtime routes so deployments do not bake
+  // an event or venue snapshot into the CI artifact.
+  return SITEMAP_CHUNKS.filter((chunk) => chunk !== 'venues' && chunk !== 'events')
     .flatMap((chunk) => [{ chunk }, { chunk: `${chunk}.xml` }]);
 }
 

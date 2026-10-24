@@ -40,6 +40,35 @@ first_sitemap_path() {
     | awk 'NR == 1 { first = $0 } END { print first }'
 }
 
+first_live_event_sitemap_path() {
+  local sitemap="$1"
+  local candidates=()
+  local path
+  local code
+  local stale_count=0
+  echo "Checking live event URL from $sitemap" >&2
+  mapfile -t candidates < <(
+    curl -fsSL --max-time 60 "$sitemap" \
+      | grep -oE '<loc>[^<]+' \
+      | sed 's#<loc>##' \
+      | sed -n "s#^${BASE_URL}/events/#/events/#p" \
+      | head -n 10
+  )
+  for path in "${candidates[@]}"; do
+    code="$(curl -sS --max-time 30 -A "$GOOGLEBOT" -o /dev/null -w '%{http_code}' "${BASE_URL}${path}")" || code=000
+    if [[ "$code" == "200" ]]; then
+      if [[ "$stale_count" -gt 0 ]]; then
+        echo "WARN: skipped $stale_count stale event URL(s) before finding a live sitemap entry" >&2
+      fi
+      printf '%s\n' "$path"
+      return 0
+    fi
+    stale_count=$((stale_count + 1))
+    echo "WARN: event sitemap URL $path returned HTTP $code; trying the next entry" >&2
+  done
+  return 1
+}
+
 audit_landing_links() {
   local landing_path="$1"
   local safe_name
@@ -54,7 +83,7 @@ audit_landing_links() {
   echo "OK: $landing_path (${#landing_events[@]} live event links)"
 }
 
-event_path="$(first_sitemap_path "${BASE_URL}/sitemaps/events.xml" '/events/' || true)"
+event_path="$(first_live_event_sitemap_path "${BASE_URL}/sitemaps/events.xml" || true)"
 blog_path="$(first_sitemap_path "${BASE_URL}/sitemaps/blog.xml" '/blog/' || true)"
 [[ -n "$event_path" ]] || { echo 'ERROR: no event URL in sitemap' >&2; exit 1; }
 [[ -n "$blog_path" ]] || { echo 'ERROR: no blog URL in sitemap' >&2; exit 1; }
