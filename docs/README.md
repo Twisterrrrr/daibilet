@@ -7,6 +7,7 @@
 [Places: типизация, сверка PDP и передача Cline](./places-taxonomy-cline-handoff-2026-10.md)
 [Выпуск Places и сверка PDP - 15.10.2026](./places-release-2026-10-15.md)
 [Доступ сотрудников к админке: аудит legacy и проект RBAC](./admin-rbac-design-2026-10.md)
+[Персональный доступ, 2FA и подтверждение выплат](./admin-finance-auth-security-2026-10.md)
 [Нагрузка CPU на MSK - 15.10.2026](./cpu-load-msk.md)
 [Зависание SSR и ответы 502 роботам - 16.10.2026](./ssr-hang-crawler-2026-10-16.md)
 [Teplohod: baseline Sharp и Next Image Optimizer - 21.10.2026](./teplohod-image-optimization-experiment-2026-10-21.md)
