@@ -17,6 +17,17 @@
 - Локальная сборка проходила без API на `127.0.0.1:4000`; поэтому обычные public-page soft-fallbacks ожидаемы и не относятся к sitemap.
 - До выпуска: live URL counts и `lastmod` нужно сверить повторно; текущие live замеры выше - baseline.
 
+### Live-проверка sitemap после выпуска 2026-10-24
+- Deploy MSK web `7724c16b3`, BUILD_ID `sok61MHoPzuvUfanleSFa`: workflow swap, crawler smoke, deploy verify и 5-минутное наблюдение прошли; `bot5xx=0`, `referenceErrors=0`, web/API active, рестартов 0.
+- Сразу после выпуска: events 4 457 URL / 49 уникальных реальных `lastmod`; venues 381 URL без выдуманного `lastmod`; blog 46 URL с реальными датами; static 52 URL. Все sitemap endpoints ответили 200. Число events/venues отличалось от замера до выпуска на один URL, причина не установлена; фильтры выборки в изменении кода не менялись.
+- Повторный TTFB в workflow cache gate: static 0,520 с; events 1,866 с; cities 0,692 с; venues 0,852 с; landings 0,687 с; blog 0,689 с.
+
+### Canonical города Москвы — код исправления 2026-10-24
+- Live HTML `/cities/moskva` ранее содержал canonical на encoded Cyrillic URL, который перенаправлял обратно на латинский slug. Прямой запрос во время этой итерации завершился DNS timeout, поэтому проверка текущей HTML-меты будет повторена после выпуска.
+- Добавлен `cityCanonicalPath`: путь на тот же город сверяется по slug/sourceSlug/name после транслитерации; legacy Cyrillic/percent-encoded варианты переводятся к `cityHref`. Явный canonical на другой город сохраняется.
+- Метаданные страницы, `City` JSON-LD и городские хлебные крошки используют один нормализатор. Добавлены regression tests для Москвы и намеренного cross-city canonical.
+- Проверки до выпуска: `pnpm web:test:ci` 345/345; typecheck и scoped ESLint — 0 ошибок; production build — exit 0. В локальном build отсутствовал API на `127.0.0.1:4000`, поэтому каталожные статические страницы использовали штатный soft fallback.
+
 ---
 
 ## 2026-10-17 - Чат поддержки: выпуск на прод

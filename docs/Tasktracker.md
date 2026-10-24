@@ -4,8 +4,8 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| SEO.SITEMAP-CACHE | Runtime sitemap через loopback API + bounded nginx cache; явный dynamic route config убирает ложные SSG ошибки. `lastmod` только из реального updatedAt; неизвестная дата опускается | Критический | ✅ code verified 2026-10-24; live check after deploy |
-| SEO.MOSKVA-CANONICAL | `/cities/moskva` canonical → encoded `/cities/%D0%BC...` (БД-slug кириллицей), обе версии 200, sitemap - латиница; у Казани самоканон. Точечный баг топ-города | Высокий | ⏳ |
+| SEO.SITEMAP-CACHE | Runtime sitemap через loopback API + bounded nginx cache; явный dynamic route config убирает ложные SSG ошибки. `lastmod` только из реального updatedAt; неизвестная дата опускается | Критический | ✅ live 2026-10-24, deploy `7724c16b3`, BUILD_ID `sok61MHoPzuvUfanleSFa`; crawler smoke 0 bot 5xx |
+| SEO.MOSKVA-CANONICAL | Stored Cyrillic/alias canonical для того же города нормализуется к публичному Latin route в metadata и JSON-LD; намеренный cross-city canonical сохраняется | Высокий | 🔄 code + regression test ready 2026-10-24; waiting for deploy and live verification |
 | SEO.HOME-NOSTORE | Главная `private, no-store` из-за `await cookies()` в HomePageBody (стр. 53): город-персонализацию на клиент (ISR ○) или осознанный accept | Высокий | ⏳ решение владельца |
 | SEO.ISAINDEXABLE-FALSE | Исаакиевский собор `isIndexable: false` в БД при 5 будущих сеансах и PUBLISHED (рендер и sitemap консистентно исключают): сверить с владельцем + выборка топ-объектов СПб/Москвы | Средний | ⏳ владелец |
 

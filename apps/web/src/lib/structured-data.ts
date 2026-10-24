@@ -18,7 +18,7 @@ import { stripSessionDateLines } from '@/lib/event-description-session-lines';
 import { evaluateCityIndexability, evaluateRegionIndexability } from '@/lib/hub-indexability';
 import { resolveLandingCityName } from '@/lib/landing-city';
 import { landingCategoryHref } from '@/lib/landing-routes';
-import { cityHref, eventHref, venueCanonicalPath, venueHref, venuePageTemplate } from '@/lib/routes';
+import { cityCanonicalPath, cityHref, eventHref, venueCanonicalPath, venueHref, venuePageTemplate } from '@/lib/routes';
 import { resolveVenueBreadcrumbRegion } from '@/lib/cityRegionHub';
 import {
   cityHubPathFromLandingCity,
@@ -375,7 +375,7 @@ export function buildFaqPageJsonLd(items: CityFaqItem[]): Record<string, unknown
 /** Хлебные крошки города: Главная → Города → City */
 export function buildCityBreadcrumbs(payload: PublicCityPageDto): StructuredBreadcrumb[] {
   const city = payload.city;
-  const path = city.canonicalPath || `/cities/${city.slug}`;
+  const path = cityCanonicalPath(city);
   return [
     { name: 'Главная', path: '/' },
     { name: 'Города', path: '/cities' },
@@ -390,7 +390,7 @@ export function buildCityPageJsonLd(payload: PublicCityPageDto): Array<Record<st
   }
 
   const city = payload.city;
-  const canonicalPath = city.canonicalPath || `/cities/${city.slug}`;
+  const canonicalPath = cityCanonicalPath(city);
   const blocks: Array<Record<string, unknown>> = [
     {
       '@context': 'https://schema.org',
@@ -490,7 +490,7 @@ export function buildCityPageJsonLd(payload: PublicCityPageDto): Array<Record<st
 /** Region hub: BreadcrumbList + FAQPage + ItemList(Place). */
 export function buildRegionPageJsonLd(payload: PublicCityPageDto): Array<Record<string, unknown>> {
   const city = payload.city;
-  const path = city.canonicalPath || `/cities/${city.slug}`;
+  const path = cityCanonicalPath(city);
   const childEventTotal = (payload.childCities || []).reduce(
     (sum, item) => sum + (Number(item.eventCount) || 0),
     0,
