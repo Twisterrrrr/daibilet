@@ -31,7 +31,14 @@
 ### Уточнение по свежести sitemap во время post-deploy smoke
 - Обычный `/sitemaps/events.xml` отдавал 4 413 URL, а обходной запрос с audit query - 4 399; Public Events API также сообщал `total=4399`. Из 23 URL, которые были только в закэшированной карте, 8 уже отвечали 404, остальные 15 - 200. Значит, это не падение маршрутов из-за новой версии, а слишком длинное stale-окно вокруг часто меняющегося каталога.
 - В `sitemapResponseHeaders` сокращён `s-maxage` до 5 минут для events/venues, до 15 минут для cities/landings и до 1 часа для остальных карт; заголовок `stale-while-revalidate=86400` удалён. Это сохраняет общий кэш для скорости и не рекламирует суточное stale-окно; nginx может кратко отдать старый ответ, пока выполняет одну фоновую перезагрузку.
-- Повторные URL из пересинхронизированных серий могут получать новые provider IDs; индексатор должен видеть свежий URL set как можно раньше. После следующего деплоя обязательна сверка обычного sitemap URL с API total и 404-аудитом удалённых URL.
+- Повторные URL из пересинхронизированных серий могут получать новые provider IDs; индексатор должен видеть свежий URL set как можно раньше. Для текущего выпуска выполнена сверка обычного sitemap URL с API total и 404-аудит выборки.
+
+### Выпуск свежести sitemap и canonical Москвы - 2026-10-24
+- Commit `6fa3b8d8b` нормализует canonical для одного и того же города; commit `48072f1ea` сокращает sitemap cache headers. Deploy MSK run [40102589715](https://github.com/Twisterrrrr/daibilet/actions/runs/40102589715) success, BUILD_ID `t_h7TtDcnqD3tKtTftT8q`.
+- `/cities/moskva`: Googlebot 200; `<link rel=canonical>` и City JSON-LD URL оба `https://daibilet.ru/cities/moskva`. Legacy encoded URL остаётся 308 → `/cities/moskva`; city sitemap содержит `/cities/moskva` один раз.
+- Обычный `/sitemaps/events.xml`: 200, cache header `public, s-maxage=300`, 4 401 URL. `/api/public/events?limit=1` сообщил `total=4401` во время первого замера; при повторной проверке после деплоя и cache purge количество sitemap/API совпало (`4401/4401`). Все 8 ранее проверенных удалённых 404 URL отсутствовали в текущем sitemap; равномерная выборка 40 URL по всей карте дала 40 ответов 200.
+- Первичный deploy warmup перед финальным cache purge сообщил 29/40 event pages 200 и 11/40 404; после завершения deploy публичный crawler smoke прошёл, а отдельная live выборка после purge дала 40/40 200. Это указывает на временный drift при синхронизации каталога во время warmup; не считать массовым устойчивым падением, но повторить такую выборку при следующем большом каталожном sync.
+- Post-deploy observation: `bot5xx=0`, `referenceErrors=0`, сервис активен, рестартов 0. Sitemap cache timing gate прошёл: events 2,08/2,01 с; cities 0,76/0,74 с; venues 0,95/0,94 с; остальные карты second hit <1 с.
 
 ---
 

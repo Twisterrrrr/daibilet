@@ -4,8 +4,8 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| SEO.SITEMAP-CACHE | Runtime sitemap через loopback API + bounded nginx cache; `lastmod` только из реального updatedAt; короткий cache TTL для динамических карт без stale окна | Критический | 🔄 ложный `lastmod` исправлен live (`7724c16b3`); свежая сверка нашла 8 старых 404 в sitemap-кэше, исправление TTL готово в `6fa3b8d8` + текущем worktree; ждёт live smoke |
-| SEO.MOSKVA-CANONICAL | Stored Cyrillic/alias canonical для того же города нормализуется к публичному Latin route в metadata и JSON-LD; намеренный cross-city canonical сохраняется | Высокий | 🔄 code + regression test ready 2026-10-24; waiting for deploy and live verification |
+| SEO.SITEMAP-CACHE | Runtime sitemap через loopback API + bounded nginx cache; `lastmod` только из реального updatedAt; короткий cache TTL для динамических карт без суточного stale окна | Критический | ✅ live `48072f1ea`, deploy run `40102589715`, BUILD_ID `t_h7TtDcnqD3tKtTftT8q`; events sitemap/API total `4401/4401`, 40/40 равномерно выбранных URL ответили 200 |
+| SEO.MOSKVA-CANONICAL | Stored Cyrillic/alias canonical для того же города нормализуется к публичному Latin route в metadata и JSON-LD; намеренный cross-city canonical сохраняется | Высокий | ✅ live `48072f1ea`: `/cities/moskva` 200 + self-canonical и City JSON-LD; старый encoded URL 308 → Latin; Moscow в sitemap один раз |
 | SEO.HOME-NOSTORE | Главная `private, no-store` из-за `await cookies()` в HomePageBody (стр. 53): город-персонализацию на клиент (ISR ○) или осознанный accept | Высокий | ⏳ решение владельца |
 | SEO.ISAINDEXABLE-FALSE | Исаакиевский собор `isIndexable: false` в БД при 5 будущих сеансах и PUBLISHED (рендер и sitemap консистентно исключают): сверить с владельцем + выборка топ-объектов СПб/Москвы | Средний | ⏳ владелец |
 
@@ -17,7 +17,7 @@
 |----|--------|-----------|--------|
 | UX.MY-DAY-RESTORE | My-day (сценарии/точки в городах) пропали после lazy-хабов: добавлен registry fallback (Москва, СПб, Пермь, Киров, Сочи, Ульяновск) в `city-hub-lazy.ts` + тест в `ci-test-files.txt` | Высокий | ✅ `69b9a4cb5` fix(my-day) — live Deploy MSK web |
 | OPS.MOBILE-UX-DEPLOY | Мобильная итерация `cline/8b0dd` SHA `3f0e006f5` (нижний док фильтров /events, карточка места без сдвига контента бейджем, «Город» в нижней навигации, hero-чипы скролл): мерж в `feat/next-monorepo` + деплой на MSK | Высокий | ✅ `3f0e006f5` — live Deploy MSK web |
-| CONT.CITY-HUBS-70 | Добить 70 хабов городов (контент-путь: хаб → тематические гиды → билеты) | Высокий | ⏳ |
+| CONT.CITY-HUBS-70 | Добить 70 хабов городов (контент-путь: хаб → тематические гиды → билеты) | Высокий | 🔄 readiness audit: 70 city destinations / 55 indexable by current policy / 25 missing registry; editorial validation queue in [city-hub-readiness-2026-10-24.md](./city-hub-readiness-2026-10-24.md), no public changes |
 | CONT.PLACE-PDP-3500 | Подробные PDP ~3 500 площадок и локаций - продолжение Places-выпуска 15.10 (1 383 классифицированы, 701 строка на сверке, 784 скрытых до проверки фото) | Высокий | ⏳ |
 | OPS.ADMIN-RBAC-IMPL | Подготовка админки: реализация RBAC по готовому дизайну (аудит legacy + роли) | Высокий | ⏳ дизайн готов |
 | OPS.FINANCE-RELEASE | Подготовка финконтура: выпуск finance schema unification (`codex/finance-schema-unification`, 47 миграций) + `schema_alignment` на прод-БД (IF NOT EXISTS готов) | Высокий | 🔄 ветка готова, ждёт развёртывания |
