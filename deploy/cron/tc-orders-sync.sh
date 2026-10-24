@@ -5,7 +5,9 @@ set -euo pipefail
 
 APP_DIR="${APP_DIR:-/opt/daibilet}"
 LOG_DIR="${LOG_DIR:-/var/log/daibilet}"
-LOCK_FILE="${LOCK_FILE:-/tmp/daibilet-tc-orders-sync.lock}"
+# Include the effective user ID: a stale/root-owned /tmp lock must not block
+# the deploy user's scheduled sync from opening its own lock file.
+LOCK_FILE="${LOCK_FILE:-/tmp/daibilet-tc-orders-sync-$(id -u).lock}"
 # Окно lookback: свежие заказы + overlap, без полного history pull.
 LOOKBACK_DAYS="${TC_ORDERS_LOOKBACK_DAYS:-3}"
 
