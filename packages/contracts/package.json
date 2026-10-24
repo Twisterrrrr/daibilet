@@ -16,6 +16,7 @@
       "types": "./src/admin-access.ts",
       "default": "./src/admin-access.ts"
     },
+    "./admin-access/runtime": "./src/admin-access-runtime.js",
     "./common": "./src/common.ts",
     "./db": "./src/db.ts",
     "./landing": "./src/landing.ts",
