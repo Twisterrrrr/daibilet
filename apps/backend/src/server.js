@@ -7,6 +7,8 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { getAdminOrderDeleteGuard } from './admin-order-delete-guard.js';
 import { authorizeAdminSessionRequest } from './admin-rbac-guard.js';
+import { adminRolesMayReadOrderPii } from './admin-rbac-policy.js';
+import { projectAdminOrdersPii } from './admin-order-pii.js';
 import {
   ADMIN_SESSION_TTL_SECONDS,
   assertAdminLoginRateLimit,
@@ -743,7 +745,11 @@ export async function handleRequest(request, response) {
     }
 
     if (route === 'GET /api/admin/orders' || route === 'GET /api/admin/external-orders') {
-      sendJson(response, await buildAdminOrdersList(db, url.searchParams));
+      const canReadPii = request.adminSessionUser
+        ? adminRolesMayReadOrderPii(request.adminSessionUser.roles)
+        : true;
+      const orders = await buildAdminOrdersList(db, url.searchParams, { includePiiSearch: canReadPii });
+      sendJson(response, projectAdminOrdersPii(orders, canReadPii));
       return;
     }
 
@@ -790,7 +796,10 @@ export async function handleRequest(request, response) {
     const orderDetailMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/admin\/orders\/([^/]+)$/) : null;
     if (orderDetailMatch) {
       const detail = await buildAdminOrderDetail(db, decodeURIComponent(orderDetailMatch[1]));
-      sendJson(response, detail || { error: 'order_not_found' }, detail ? 200 : 404);
+      const canReadPii = request.adminSessionUser
+        ? adminRolesMayReadOrderPii(request.adminSessionUser.roles)
+        : true;
+      sendJson(response, detail ? projectAdminOrdersPii(detail, canReadPii) : { error: 'order_not_found' }, detail ? 200 : 404);
       return;
     }
 

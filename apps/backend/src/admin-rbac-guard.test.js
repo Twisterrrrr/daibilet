@@ -35,7 +35,8 @@ test('session guard rejects role violations and unknown routes even for SUPERADM
   assert.equal((await authorizeAdminSessionRequest(request('/api/admin/unmapped'), db)).statusCode, 403);
 });
 
-test('orders require explicit PII permission until server projection is implemented', async () => {
+test('auditor can read server-masked orders without PII permission', async () => {
   const db = { query: async () => ({ rows: [{ id: 'staff-1', email: 'auditor@example.com', displayName: 'Auditor', roles: ['AUDITOR'], sessionId: 'sess-1' }] }) };
-  assert.equal((await authorizeAdminSessionRequest(request('/api/admin/orders'), db)).statusCode, 403);
+  assert.equal((await authorizeAdminSessionRequest(request('/api/admin/orders'), db)).authorized, true);
+  assert.equal((await authorizeAdminSessionRequest(request('/api/admin/orders/order-1'), db)).authorized, true);
 });

@@ -949,7 +949,7 @@ async function queryAdminOrdersLean(db, { includeArchived }) {
   return result.rows.map(mapAdminOrderRow);
 }
 
-function matchesAdminOrderListFilters(order, { view, provider, status, q }) {
+function matchesAdminOrderListFilters(order, { view, provider, status, q, includePiiSearch = true }) {
   if (view === 'attention' && !order.needsAttention) return false;
   if (view === 'missing_artifact' && order.artifactStatus !== 'missing') return false;
   if (view === 'failed_integration' && !isProblemOrderStatus(order.status)) return false;
@@ -965,10 +965,7 @@ function matchesAdminOrderListFilters(order, { view, provider, status, q }) {
     order.status,
     order.sourceName,
     order.sourceCode,
-    order.buyer.name,
-    order.buyer.phone,
-    order.buyer.email,
-    order.buyer.notes,
+    ...(includePiiSearch ? [order.buyer.name, order.buyer.phone, order.buyer.email, order.buyer.notes] : []),
     ...(order.eventTitles || []),
     order.eventTitle,
   ]
@@ -978,7 +975,7 @@ function matchesAdminOrderListFilters(order, { view, provider, status, q }) {
   return haystack.includes(q);
 }
 
-export async function buildAdminOrdersList(db, searchParams = new URLSearchParams()) {
+export async function buildAdminOrdersList(db, searchParams = new URLSearchParams(), { includePiiSearch = true } = {}) {
   const q = String(searchParams.get('q') || '').trim().toLowerCase();
   const view = String(searchParams.get('view') || 'all');
   const provider = String(searchParams.get('provider') || 'all').toUpperCase();
@@ -995,7 +992,7 @@ export async function buildAdminOrdersList(db, searchParams = new URLSearchParam
     db.query(`select count(*)::int as total from "ExternalOrder" where "archivedAt" is null`),
   ]);
 
-  const rows = allRows.filter((order) => matchesAdminOrderListFilters(order, { view, provider, status, q }));
+  const rows = allRows.filter((order) => matchesAdminOrderListFilters(order, { view, provider, status, q, includePiiSearch }));
   const total = rows.length;
   const pages = Math.max(1, Math.ceil(total / limit));
   const safePage = Math.min(page, pages);
