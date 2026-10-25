@@ -2299,3 +2299,20 @@ model QualityIssue {
 
   event Event @relation(fields: [eventId], references: [id])
 }
+
+model FinanceAdminAuditEvent {
+  id          String   @id
+  actorId     String
+  actorName   String
+  sessionId   String
+  assertionId String
+  action      String
+  resourceType String
+  resourceId  String?
+  outcome     String
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+
+  @@index([actorId, createdAt])
+  @@index([resourceType, resourceId, createdAt])
+  @@index([assertionId])
+}
