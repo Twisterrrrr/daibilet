@@ -13,6 +13,7 @@ const { ENTERTAINMENT_DISCO_TAXONOMY, isDiscoOrPartyEvent } = require("./lib/eve
 const { applyVenueAddressCanon } = require("./lib/venue-address-overrides");
 const { deactivateMissingTicketscloudEvents } = require("./lib/tc-deactivate-missing");
 const { resolveTicketscloudCityId } = require("./lib/tc-city-resolve");
+const { runPostSyncDescriptions } = require("./lib/post-sync-hook");
 
 const requireFromDbPackage = createRequire(path.join(rootDir, "packages", "db", "package.json"));
 const { Pool } = requireFromDbPackage("pg");
@@ -217,6 +218,8 @@ async function importCatalogEvents(catalog, options = {}) {
       [syncId, new Date().toISOString(), JSON.stringify(stats)],
     );
     await client.query("COMMIT");
+    // Owner rule 2026-10-20: sanitize new imported events right after sync.
+    runPostSyncDescriptions(rootDir);
     return stats;
   } catch (error) {
     await client.query("ROLLBACK");

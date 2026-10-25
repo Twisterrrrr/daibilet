@@ -13,6 +13,7 @@ const { EVENT_UPSERT_STATUS, EVENT_UPSERT_SLUG } = require("./lib/event-import-g
 const { normalizeImportEventTitle } = require("./lib/event-title-normalize");
 const { ENTERTAINMENT_DISCO_TAXONOMY, isDiscoOrPartyEvent } = require("./lib/event-taxonomy");
 const { applyVenueAddressCanon } = require("./lib/venue-address-overrides");
+const { runPostSyncDescriptions } = require("./lib/post-sync-hook");
 
 const fixturesDir = path.resolve(process.env.TEP_FIXTURES_DIR || path.join(rootDir, "data", "teplohod", "fixtures"));
 const eventsPath = path.join(fixturesDir, "events-compact.json");
@@ -293,6 +294,9 @@ async function main() {
       [syncId, new Date().toISOString(), JSON.stringify(stats)],
     );
     await client.query("COMMIT");
+    // Owner rule 2026-10-20: sanitize new imported events right after sync.
+    // Must run BEFORE the trailing stats JSON (runTeplohodSync parses /\{[\s\S]*\}\s*$/).
+    runPostSyncDescriptions(rootDir);
     console.log(JSON.stringify(stats, null, 2));
   } catch (error) {
     await client.query("ROLLBACK");
