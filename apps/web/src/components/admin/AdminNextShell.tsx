@@ -18,8 +18,10 @@ import {
   MessageSquare,
   MessageSquareQuote,
   Receipt,
+  Send,
   Settings,
   Users,
+  Wand2,
   X,
 } from 'lucide-react';
 import { adminPageAllowsPermissions, getAdminPageAccess } from '@/lib/admin-page-policy';
@@ -76,6 +78,8 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: '/admin/landings', label: 'Лендинги', icon: LayoutTemplate },
       { href: '/admin/articles', label: 'Статьи', icon: BookOpen },
+      { href: '/admin/rewrite-queue', label: 'AI-рерайт описаний', icon: Wand2 },
+      { href: '/admin/rewrite-publish', label: 'Публикация рерайтов', icon: Send },
       { href: '/admin/hero-banners', label: 'Главная страница', icon: ImageIcon },
       { href: '/admin/reviews', label: 'Отзывы', icon: MessageSquareQuote },
     ],

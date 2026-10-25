@@ -64,3 +64,6 @@ src/lib/city-hub-scenario-blog-links.test.ts
 src/lib/event-description-lead.test.ts
 src/lib/event-music-description.test.ts
 src/lib/event-not-found-similar.test.ts
+
+# Post-sync description composer (sanitization canon): determinism, fixed point, section labels.
+src/lib/event-description-compose.test.ts
