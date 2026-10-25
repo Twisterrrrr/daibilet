@@ -37,6 +37,7 @@ import type {
   SupplierPortalAuthDto,
   SupplierPortalAdmissionChangeRequestCreateDto,
   SupplierPortalChangeRequestCreateResultDto,
+  SupplierPortalChangeRequestDetailDto,
   SupplierPortalChangeRequestsListDto,
   SupplierPortalEventChangeRequestCreateDto,
   SupplierPortalEventsListDto,
@@ -817,6 +818,7 @@ function AdmissionsPage({ supplierKey, canSubmitRequests }: { supplierKey: strin
 
 function RequestsPage({ supplierKey, canSubmitRequests }: { supplierKey: string; canSubmitRequests: boolean }) {
   const [offset, setOffset] = useSupplierListOffset(supplierKey);
+  const [selectedRequestId, setSelectedRequestId] = React.useState<string | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const statusFilter = searchParams.get('status') || '';
   const subjectFilter = searchParams.get('subject') || '';
@@ -921,7 +923,7 @@ function RequestsPage({ supplierKey, canSubmitRequests }: { supplierKey: string;
           <Table
             columns={['Заявка', 'Что меняем', 'Статус', 'Комментарий']}
             rows={requests.data.items.map((request) => [
-              <div key="request"><strong>{request.title || `Заявка ${request.id.slice(-7)}`}</strong><small>{formatDateTime(request.createdAt)}</small></div>,
+              <div key="request"><button type="button" className="request-open-button" onClick={() => setSelectedRequestId(request.id)}>{request.title || `Заявка ${request.id.slice(-7)}`}</button><small>{formatDateTime(request.createdAt)}</small></div>,
               <div key="subject"><span>{changeRequestSubjectLabel(request.subject)}</span><small>{request.event?.title || request.admissionProduct?.title || request.summary || '-'}</small></div>,
               <div key="status" className="order-status-cell">
                 <StatusPill tone={changeRequestStatusTone(request.status)}>{changeRequestStatusLabel(request.status)}</StatusPill>
@@ -932,9 +934,49 @@ function RequestsPage({ supplierKey, canSubmitRequests }: { supplierKey: string;
           />
         ) : null}
       </DataState>
+      {selectedRequestId ? <SupplierRequestDetailPanel requestId={selectedRequestId} supplierKey={supplierKey} onClose={() => setSelectedRequestId(null)} /> : null}
       {requests.data ? <PaginationBar {...requests.data} onOffsetChange={setOffset} /> : null}
     </div>
   );
+}
+
+function SupplierRequestDetailPanel({ requestId, supplierKey, onClose }: { requestId: string; supplierKey: string; onClose: () => void }) {
+  const path = React.useMemo(() => `/api/supplier/change-requests/${encodeURIComponent(requestId)}`, [requestId]);
+  const { data, loading, error, reload } = useSupplierResource<SupplierPortalChangeRequestDetailDto>(path, supplierKey);
+
+  return (
+    <section className="panel request-detail-panel" aria-label="Детали заявки">
+      <div className="panel-header">
+        <div><h2>{data?.title || `Заявка ${requestId.slice(-7)}`}</h2><p>{data ? `${changeRequestSubjectLabel(data.subject)} · ${changeRequestTypeLabel(data.type)} · ${changeRequestStatusLabel(data.status)}` : 'Подробности заявки'}</p></div>
+        <div className="page-actions"><RefreshButton onClick={reload} /><button type="button" className="secondary-button" onClick={onClose}>Закрыть</button></div>
+      </div>
+      {loading && !data ? <LoadingState label="Загружаем заявку..." /> : null}
+      {error && !data ? <ErrorState title="Не удалось загрузить заявку" error={error} onRetry={reload} /> : null}
+      {data ? <>
+        {data.summary ? <p className="request-detail-summary">{data.summary}</p> : null}
+        {data.adminComment ? <div className="notice-panel neutral"><strong>Комментарий модератора</strong><span>{data.adminComment}</span></div> : null}
+        <div className="request-diff-list">
+          {data.diff.items.length ? data.diff.items.map((item) => (
+            <div className="request-diff-row" key={item.path}>
+              <strong>{item.label}</strong>
+              <span>{requestDiffValue(item.currentValue)}</span>
+              <ChevronRight size={16} aria-hidden />
+              <span>{requestDiffValue(item.proposedValue)}</span>
+              <StatusPill tone={item.changeType === 'changed' || item.changeType === 'added' ? 'warning' : 'neutral'}>{item.changeType === 'unchanged' ? 'без изменений' : item.changeType === 'removed' ? 'удаление' : item.changeType === 'added' ? 'добавлено' : 'изменено'}</StatusPill>
+            </div>
+          )) : <EmptyInline text="В заявке нет полей для сравнения." />}
+        </div>
+        {data.diff.warnings.map((warning) => <div key={warning} className="notice-panel warning"><span>{warning}</span></div>)}
+        <small className="request-detail-meta">Отправлена: {formatDateTime(data.submittedAt || data.createdAt)}{data.reviewedAt ? ` · рассмотрена: ${formatDateTime(data.reviewedAt)}` : ''}{data.appliedAt ? ` · применена: ${formatDateTime(data.appliedAt)}` : ''}</small>
+      </> : null}
+    </section>
+  );
+}
+
+function requestDiffValue(value: unknown): string {
+  if (value == null || value === '') return '—';
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') return String(value);
+  return JSON.stringify(value);
 }
 
 type AdmissionRequestFormState = {

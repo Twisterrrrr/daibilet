@@ -9,6 +9,7 @@ import {
   buildSupplierChangeRequestsList,
   createSupplierAdmissionChangeRequest,
   createSupplierEventChangeRequest,
+  mapSupplierChangeRequestDetail,
   parseSupplierChangeRequestsListQuery,
 } from './supplier-change-requests-handler.js';
 import { RequestValidationError } from './validation.js';
@@ -34,6 +35,36 @@ test('supplier change requests list query accepts SPA supplier routing keys', ()
     () => parseSupplierChangeRequestsListQuery(new URLSearchParams({ status: 'NOT_A_STATUS' })),
     RequestValidationError,
   );
+});
+
+test('supplier request detail exposes a safe projection without admin-only fields', () => {
+  const mapped = mapSupplierChangeRequestDetail({
+    id: 'request-1',
+    supplierId: 'supplier-secret-id',
+    subject: 'EVENT',
+    subjectId: 'event-1',
+    type: 'UPDATE',
+    status: 'REJECTED',
+    title: 'Обновить событие',
+    summary: 'Изменить время',
+    adminComment: 'Уточните время начала',
+    submittedAt: '2026-10-20T10:00:00.000Z',
+    reviewedAt: '2026-10-21T10:00:00.000Z',
+    appliedAt: null,
+    createdAt: '2026-10-20T10:00:00.000Z',
+    updatedAt: '2026-10-21T10:00:00.000Z',
+    event: null,
+    admissionProduct: null,
+    diff: { items: [{ path: 'schedule', label: 'Расписание', currentValue: null, proposedValue: { startsAt: '2026-10-30T12:00:00.000Z' }, changeType: 'changed' }], warnings: [] },
+    actions: { canApprove: false, canReject: false, canApply: false },
+    payloadPreview: { baseSnapshot: { eventId: 'internal' }, sections: [] },
+  } as never);
+
+  assert.equal(mapped.id, 'request-1');
+  assert.equal(mapped.diff.items[0]?.label, 'Расписание');
+  assert.equal('supplierId' in mapped, false);
+  assert.equal('actions' in mapped, false);
+  assert.equal('payloadPreview' in mapped, false);
 });
 
 test('supplier change request write-flow creates admission and event requests', async (t) => {

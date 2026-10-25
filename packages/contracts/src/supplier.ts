@@ -289,6 +289,19 @@ export interface SupplierPortalChangeRequestsListDto {
   items: SupplierPortalChangeRequestRowDto[];
 }
 
+export interface SupplierPortalChangeRequestDetailDto extends SupplierPortalChangeRequestRowDto {
+  diff: {
+    items: Array<{
+      path: string;
+      label: string;
+      currentValue?: unknown;
+      proposedValue?: unknown;
+      changeType: 'added' | 'changed' | 'removed' | 'unchanged';
+    }>;
+    warnings: string[];
+  };
+}
+
 export interface SupplierPortalChangeRequestCreateResultDto {
   request: SupplierPortalChangeRequestRowDto;
 }

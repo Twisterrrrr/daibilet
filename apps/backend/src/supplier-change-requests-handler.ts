@@ -5,6 +5,7 @@ import type {
 import { prisma } from '@daibilet/db';
 import type {
   SupplierPortalAdmissionChangeRequestCreateDto,
+  SupplierPortalChangeRequestDetailDto,
   SupplierPortalChangeRequestCreateResultDto,
   SupplierPortalChangeRequestRowDto,
   SupplierPortalChangeRequestsListDto,
@@ -14,6 +15,7 @@ import type {
 } from '@daibilet/contracts/supplier';
 import { z } from 'zod';
 import { sendJson } from './http.js';
+import { buildAdminEventChangeRequestDetailDto } from './admin-event-change-requests.dto.js';
 import { validateEventChangeRequestPayload } from './event-change-request-payload.js';
 import type { RouteContext } from './routing.js';
 import { authenticateAccessToken, parseBearerToken } from './user-auth.js';
@@ -201,6 +203,20 @@ export function createSupplierChangeRequestsRouteHandler(
       return true;
     }
 
+    const detailMatch = context.pathname.match(/^\/api\/supplier\/change-requests\/([^/]+)$/);
+    if (context.method === 'GET' && detailMatch) {
+      const supplierId = requireSupplierId(searchParams);
+      const ownedRequest = await prisma.eventChangeRequest.findFirst({
+        where: { id: detailMatch[1]!, supplierId },
+        select: { id: true },
+      });
+      if (!ownedRequest) throwHttpError('Заявка не найдена.', 404);
+      const detail = await buildAdminEventChangeRequestDetailDto(detailMatch[1]!);
+      if (!detail || detail.supplierId !== supplierId) throwHttpError('Заявка не найдена.', 404);
+      sendJson(context.response, mapSupplierChangeRequestDetail(detail));
+      return true;
+    }
+
     if (context.method === 'POST' && context.pathname === '/api/supplier/change-requests/admissions') {
       const payload = await parseJsonBody(admissionRequestSchema, context.request);
       sendJson(
@@ -222,6 +238,39 @@ export function createSupplierChangeRequestsRouteHandler(
     }
 
     return false;
+  };
+}
+
+export function mapSupplierChangeRequestDetail(
+  detail: NonNullable<Awaited<ReturnType<typeof buildAdminEventChangeRequestDetailDto>>>,
+): SupplierPortalChangeRequestDetailDto {
+  return {
+    id: detail.id,
+    subject: detail.subject,
+    subjectId: detail.subjectId ?? null,
+    type: detail.type,
+    status: detail.status,
+    title: detail.title ?? null,
+    summary: detail.summary ?? null,
+    adminComment: detail.adminComment ?? null,
+    submittedAt: detail.submittedAt ?? null,
+    reviewedAt: detail.reviewedAt ?? null,
+    appliedAt: detail.appliedAt ?? null,
+    createdAt: detail.createdAt,
+    updatedAt: detail.updatedAt,
+    event: detail.event ? {
+      id: detail.event.id,
+      slug: detail.event.slug,
+      title: detail.event.title,
+      status: detail.event.status,
+    } : null,
+    admissionProduct: detail.admissionProduct ? {
+      id: detail.admissionProduct.id,
+      slug: detail.admissionProduct.slug,
+      title: detail.admissionProduct.title,
+      status: detail.admissionProduct.status,
+    } : null,
+    diff: detail.diff,
   };
 }
 
