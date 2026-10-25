@@ -16,12 +16,15 @@ export default async function InternalAdminOrderPage({ params, searchParams }: P
   // `back` comes from the registry and keeps the operator's filter context.
   const backHref = back && /^\/admin\/orders(?:\?|$)/.test(back) ? back : '/admin/orders';
   const { detail, error } = await loadInternalAdminOrderDetail(code);
-  const cancellable = detail && ['DRAFT', 'PENDING_PAYMENT', 'FAILED', 'EXPIRED'].includes(detail.status);
-  const refundable = detail && ['CONFIRMED', 'FULFILLED'].includes(detail.status);
+  const cancellationState = detail && ['DRAFT', 'PENDING_PAYMENT', 'FAILED', 'EXPIRED'].includes(detail.status);
+  const refundState = detail && ['CONFIRMED', 'FULFILLED'].includes(detail.status);
+  const cancellable = cancellationState && detail?.permissions?.canCancel;
+  const refundable = refundState && detail?.permissions?.canExecuteRefund;
   const refund = detail?.finance?.refunds?.find((item) => ['CREATED', 'APPROVED', 'PROCESSING'].includes(item.status));
   const operationErrorLabels: Record<string, string> = {
     invalid_input: 'Укажите причину и введите код заказа.',
     not_configured: 'Операции финконтура не настроены.',
+    actor_not_configured: 'Подписанный доступ сотрудника к финконтуру не настроен.',
     network: 'Финконтур недоступен.',
     confirmation_code_mismatch: 'Код подтверждения не совпадает.',
     paid_order_requires_refund: 'Заказ оплачен. Используйте возврат.',
@@ -61,11 +64,11 @@ export default async function InternalAdminOrderPage({ params, searchParams }: P
       </section>
       <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
         <h3 className="text-sm font-semibold text-slate-900">Платёж и возврат</h3>
-        <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-3">
-          <div><dt className="text-xs text-slate-500">Платежи</dt><dd>{detail.finance?.payments?.map((item) => item.status).join(', ') || '—'}</dd></div>
-          <div><dt className="text-xs text-slate-500">Заявка на возврат</dt><dd>{detail.finance?.refunds?.map((item) => item.status).join(', ') || '—'}</dd></div>
+        {detail.finance ? <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-3">
+          <div><dt className="text-xs text-slate-500">Платежи</dt><dd>{detail.finance.payments?.map((item) => item.status).join(', ') || '—'}</dd></div>
+          <div><dt className="text-xs text-slate-500">Заявка на возврат</dt><dd>{detail.finance.refunds?.map((item) => item.status).join(', ') || '—'}</dd></div>
           <div><dt className="text-xs text-slate-500">Билет покупателя</dt><dd><Link className="text-sky-700 hover:underline" href={`https://daibilet.ru/checkout/ticket/${encodeURIComponent(detail.publicCode)}`}>Проверить билет</Link></dd></div>
-        </dl>
+        </dl> : <p className="mt-3 text-sm text-slate-600">У вашей роли нет доступа к финансовым деталям заказа.</p>}
       </section>
       {cancellable || refundable ? <section className="rounded-xl border border-amber-300 bg-amber-50 p-4">
         <h2 className="font-semibold">{cancellable ? 'Отменить неоплаченный заказ' : refund ? 'Проверить состояние возврата' : 'Вернуть всю сумму покупателю'}</h2>
@@ -82,6 +85,9 @@ export default async function InternalAdminOrderPage({ params, searchParams }: P
           <button type="submit" className="w-fit rounded-md bg-red-700 px-4 py-2 text-sm font-medium text-white hover:bg-red-800">{cancellable ? 'Отменить заказ' : refund ? 'Проверить возврат' : 'Вернуть всю сумму'}</button>
         </form>
       </section> : null}
+      {(cancellationState && !detail.permissions?.canCancel) || (refundState && !detail.permissions?.canExecuteRefund)
+        ? <p className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">У вашей роли нет права выполнять эту операцию.</p>
+        : null}
       {detail.status === 'REFUNDED' || detail.status === 'CANCELLED' ? <p className="text-sm text-slate-600">Заказ закрыт; билет покупателя должен отображаться как недействительный.</p> : null}
     </> : null}
   </div>;

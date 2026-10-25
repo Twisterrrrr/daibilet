@@ -1,6 +1,7 @@
 ﻿# CI allowlist: stable logic tests (no hub packs / image inventory / TZ-sensitive venue slots).
 src/lib/admin-basic-auth.test.ts
 src/lib/admin-order-pii.test.ts
+src/server/admin-finance-actor.test.ts
 src/lib/admin-access.test.ts
 # Full suite: pnpm web:test вЂ” ~30 hub/content tests need refresh (tech debt).
 src/lib/catalog-date-rail.test.ts

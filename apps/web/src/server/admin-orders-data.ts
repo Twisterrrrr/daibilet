@@ -1,8 +1,9 @@
 import { asNumber } from '@/lib/admin-ui';
 import { adminRoleAllows } from '@daibilet/contracts/admin-access/runtime';
-import { maskAdminOrderBuyer } from '@/lib/admin-order-pii';
+import { maskAdminOrderBuyer, projectInternalAdminOrder } from '@/lib/admin-order-pii';
 import { adminApiFetch } from '@/server/admin-api-fetch';
 import { mergeAdminOrderPage } from '@/server/admin-order-merge';
+import { createAdminFinanceActorAssertion } from '@/server/admin-finance-actor';
 import { headers } from 'next/headers';
 
 export type AdminOrderListRow = {
@@ -95,9 +96,17 @@ export type InternalAdminOrderDetail = {
     payments: Array<{ status: string; providerPaymentId: string | null; amountKopecks: number }>;
     refunds: Array<{ status: string; amountKopecks: number; providerRefundId: string | null; createdAt: string | null }>;
   } | null;
+  permissions?: { canCancel: boolean; canExecuteRefund: boolean };
 };
 
-async function currentAdminOrderPiiAccess(): Promise<{ authorized: boolean; canReadPii: boolean }> {
+async function currentAdminOrderPiiAccess(): Promise<{
+  authorized: boolean;
+  canReadPii: boolean;
+  canReadFinance: boolean;
+  canCancel: boolean;
+  canExecuteRefund: boolean;
+  financeAssertion: string | null;
+}> {
   const incoming = await headers();
   const hasSessionCookie = String(incoming.get('cookie') || '')
     .split(';')
@@ -105,56 +114,53 @@ async function currentAdminOrderPiiAccess(): Promise<{ authorized: boolean; canR
   try {
     const response = await adminApiFetch('/api/admin/auth/me');
     if (response.ok) {
-      const payload = await response.json() as { user?: { roles?: unknown } };
+      const payload = await response.json() as { user?: { id?: unknown; displayName?: unknown; sessionId?: unknown; roles?: unknown } };
       const roles = Array.isArray(payload.user?.roles) ? payload.user.roles.filter((role): role is string => typeof role === 'string') : [];
+      const secret = process.env.DAIBILET_FINANCE_ACTOR_ASSERTION_SECRET || '';
+      let financeAssertion: string | null = null;
+      if (typeof payload.user?.id === 'string' && typeof payload.user.displayName === 'string' && typeof payload.user.sessionId === 'string' && secret) {
+        try {
+          financeAssertion = createAdminFinanceActorAssertion({ id: payload.user.id, displayName: payload.user.displayName, sessionId: payload.user.sessionId, roles }, secret);
+        } catch {
+          financeAssertion = null;
+        }
+      }
       return {
         authorized: adminRoleAllows(roles, 'orders.read'),
         canReadPii: adminRoleAllows(roles, 'orders.pii.read'),
+        canReadFinance: adminRoleAllows(roles, 'finance.read'),
+        canCancel: adminRoleAllows(roles, 'orders.cancel'),
+        canExecuteRefund: adminRoleAllows(roles, 'refunds.execute'),
+        financeAssertion,
       };
     }
   } catch {
     // Resolve below using the configured authentication mode; never infer PII rights from the UI.
   }
   if (hasSessionCookie || process.env.DAIBILET_ADMIN_RBAC_ENFORCE === '1') {
-    return { authorized: false, canReadPii: false };
+    return { authorized: false, canReadPii: false, canReadFinance: false, canCancel: false, canExecuteRefund: false, financeAssertion: null };
   }
   // Compatibility path: until session RBAC is enabled, middleware-authenticated Basic users
   // retain the existing SUPERADMIN-equivalent data access.
-  return { authorized: true, canReadPii: true };
+  return { authorized: true, canReadPii: true, canReadFinance: true, canCancel: true, canExecuteRefund: true, financeAssertion: null };
 }
 
 export async function loadInternalAdminOrderDetail(code: string): Promise<{ detail: InternalAdminOrderDetail | null; error: string | null }> {
   const piiAccess = await currentAdminOrderPiiAccess();
   if (!piiAccess.authorized) return { detail: null, error: 'Требуется действующая персональная сессия.' };
+  if (!piiAccess.financeAssertion) return { detail: null, error: 'Подписанный доступ сотрудника к финконтуру не настроен.' };
   const base = process.env.FINANCE_API_BASE_URL || '';
   const token = process.env.DAIBILET_FINANCE_ADMIN_READ_TOKEN || '';
   if (!base || !token) return { detail: null, error: 'Подключение к финконтуру не настроено.' };
   try {
     const url = new URL(`/api/internal/admin/orders/${encodeURIComponent(code)}`, base);
-    const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: AbortSignal.timeout(8_000) });
+    const response = await fetch(url, { headers: { Authorization: `Bearer ${token}`, 'X-Daibilet-Admin-Assertion': piiAccess.financeAssertion }, cache: 'no-store', signal: AbortSignal.timeout(8_000) });
     if (response.status === 404) return { detail: null, error: 'Заказ не найден.' };
     if (!response.ok) return { detail: null, error: `Финконтур ответил HTTP ${response.status}.` };
     const raw = await response.json() as Record<string, unknown>;
     if (raw.sourceKind !== 'internal') return { detail: null, error: 'Это не внутренний заказ.' };
-    if (piiAccess.canReadPii) return { detail: raw as unknown as InternalAdminOrderDetail, error: null };
-    const buyer = raw.buyer && typeof raw.buyer === 'object' ? raw.buyer as Record<string, unknown> : {};
-    const masked = {
-      id: String(raw.id || ''),
-      publicCode: String(raw.publicCode || ''),
-      status: String(raw.status || ''),
-      displayStatus: String(raw.displayStatus || ''),
-      eventTitle: typeof raw.eventTitle === 'string' ? raw.eventTitle : null,
-      amountRub: typeof raw.amountRub === 'number' ? raw.amountRub : null,
-      ticketCount: asNumber(raw.ticketCount),
-      buyer: maskAdminOrderBuyer({
-        name: typeof buyer.name === 'string' ? buyer.name : null,
-        email: typeof buyer.email === 'string' ? buyer.email : null,
-        phone: typeof buyer.phone === 'string' ? buyer.phone : null,
-      }),
-      finance: raw.finance && typeof raw.finance === 'object' ? raw.finance : null,
-      piiLevel: 'masked',
-    };
-    return { detail: masked as unknown as InternalAdminOrderDetail, error: null };
+    const projected = projectInternalAdminOrder(raw, piiAccess);
+    return { detail: projected as unknown as InternalAdminOrderDetail, error: null };
   } catch {
     return { detail: null, error: 'Не удалось получить заказ из финконтура.' };
   }
@@ -316,6 +322,7 @@ async function loadCombinedAdminOrders(searchParams: {
 async function loadFinanceAdminOrders(params: URLSearchParams): Promise<AdminOrdersListData> {
   const piiAccess = await currentAdminOrderPiiAccess();
   if (!piiAccess.authorized) return emptyOrders(['Требуется действующая персональная сессия.']);
+  if (!piiAccess.financeAssertion) return emptyOrders(['Подписанный доступ сотрудника к финконтуру не настроен.']);
   if (!piiAccess.canReadPii && params.has('q')) {
     return emptyOrders(['Поиск по покупателю и контактам недоступен для этой роли.']);
   }
@@ -326,7 +333,7 @@ async function loadFinanceAdminOrders(params: URLSearchParams): Promise<AdminOrd
     const url = new URL('/api/internal/admin/orders', base);
     url.search = params.toString();
     const response = await fetch(url, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${token}`, 'X-Daibilet-Admin-Assertion': piiAccess.financeAssertion },
       cache: 'no-store',
       signal: AbortSignal.timeout(8_000),
     });
