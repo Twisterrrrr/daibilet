@@ -7,6 +7,7 @@ import {
   projectInternalAdminOrdersList,
   verifyFinanceAdminActorAssertion,
 } from './admin-finance-actor.js';
+import { resolveAdminSessionPermissions } from '@daibilet/contracts/admin-access/runtime';
 
 const secret = 'finance-actor-assertion-test-secret-32-bytes-minimum';
 const now = Date.parse('2026-10-25T12:00:00.000Z');
@@ -20,6 +21,7 @@ function sign(overrides: Record<string, unknown> = {}, key = secret) {
     name: 'Иван Финансов',
     sid: 'session-1',
     roles: ['FINANCE'],
+    mfaVerified: true,
     permissions: ['orders.read', 'orders.pii.read', 'orders.export', 'orders.cancel', 'refunds.request', 'refunds.execute', 'finance.summary.read', 'finance.read', 'payouts.approve', 'documents.read', 'suppliers.read', 'suppliers.bank.read', 'audit.read'],
     iat: Math.floor(now / 1000),
     exp: Math.floor(now / 1000) + 90,
@@ -48,6 +50,18 @@ test('finance service rejects unsigned, expired, overlong, wrong-audience, and u
   assert.equal(verifyFinanceAdminActorAssertion(sign({ aud: 'other-service' }), secret, now), null);
   assert.equal(verifyFinanceAdminActorAssertion(sign({ permissions: ['orders.read', 'root.access'] }), secret, now), null);
   assert.equal(verifyFinanceAdminActorAssertion(sign(), secret, now + 91_000), null);
+});
+
+test('actor without MFA can read orders but cannot assert finance, bank, cancellation or payout permissions', () => {
+  const roles = ['FINANCE'];
+  const permissions = [...resolveAdminSessionPermissions(roles, false)];
+  const actor = verifyFinanceAdminActorAssertion(sign({ roles, permissions, mfaVerified: false }), secret, now);
+  assert.ok(actor);
+  assert.equal(financeAdminActorHasPermission(actor, 'orders.read'), true);
+  assert.equal(financeAdminActorHasPermission(actor, 'finance.read'), false);
+  assert.equal(financeAdminActorHasPermission(actor, 'refunds.execute'), false);
+  assert.equal(financeAdminActorHasPermission(actor, 'payouts.approve'), false);
+  assert.equal(verifyFinanceAdminActorAssertion(sign({ roles, mfaVerified: false }), secret, now), null);
 });
 
 test('internal order projections independently mask buyer details and omit finance blocks', () => {

@@ -1,130 +1,127 @@
 'use client';
 
-import * as React from 'react';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { Clock } from 'lucide-react';
 
-import { cityHubArticleBadges } from '@/lib/city-hub-articles';
+import { IMAGE_SIZES, BlogCardSafeImage, BLOG_LISTING_IMAGE_QUALITY } from '@/components/SafeImage.client';
 import type { BlogCardDto } from '@/lib/blog-utils';
+import { blogListingCityBadgeLabel, blogSurfaceMeta } from '@/lib/blog-meta';
+import type { PublicSessionDto } from '@daibilet/contracts/public';
 
+function readTimeLabel(readMin: number): string {
+  const n = Math.max(1, Math.round(Number(readMin) || 1));
+  return `${n} мин чтения`;
+}
+
+/** City hub blog teaser: cover, type pill, title, excerpt, reading time. */
 export function CityHubArticleTeaser({
   article,
   editorial = false,
-  onSeeAffiche,
+  variant = 'default',
 }: {
   article: BlogCardDto;
   editorial?: boolean;
-  onSeeAffiche?: () => void;
+  /** Kept for callers; hub cards no longer attach commerce sessions. */
+  sessions?: PublicSessionDto[];
+  variant?: 'large' | 'small' | 'default';
 }) {
-  const [imageFailed, setImageFailed] = React.useState(false);
-  const [open, setOpen] = React.useState(false);
-  const badges = cityHubArticleBadges(article);
+  const articleHref = `/blog/${article.slug}`;
+  const isLarge = variant === 'large';
+  const isSmall = variant === 'small';
+  const cityLabel = blogListingCityBadgeLabel(article.citySlug, article.city, article.citySlugs);
   const excerpt = String(article.excerpt || '').trim();
+  const { typeLabel } = blogSurfaceMeta({
+    tag: article.tag,
+    articleType: article.articleType,
+    city: article.city,
+    citySlug: article.citySlug,
+    citySlugs: article.citySlugs,
+  });
 
   return (
     <article
       className={
         editorial
-          ? 'overflow-hidden rounded-2xl border border-zinc-200 bg-white'
-          : 'overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm'
+          ? `flex h-full flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm`
+          : `flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.06)]`
       }
     >
-      <div className={`relative aspect-[16/9] overflow-hidden ${editorial ? 'bg-zinc-100' : 'bg-slate-100'}`}>
-        {!imageFailed && article.coverImageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={article.coverImageUrl}
-            alt=""
-            loading="lazy"
-            onError={() => setImageFailed(true)}
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <div
-            className={`flex h-full w-full items-center justify-center text-sm ${
-              editorial ? 'bg-zinc-200 text-zinc-500' : 'bg-slate-200 text-slate-500'
-            }`}
-          >
-            Материал
-          </div>
-        )}
-      </div>
-
-      <div className="p-4 sm:p-5">
-        {badges.length ? (
-          <div className="mb-2 flex flex-wrap gap-1.5">
-            {badges.map((badge) => (
-              <span
-                key={badge}
-                className={
-                  editorial
-                    ? 'rounded-md border border-zinc-200 px-2 py-0.5 text-[11px] font-medium text-zinc-600'
-                    : 'rounded-md border border-slate-200 px-2 py-0.5 text-[11px] font-medium text-slate-600'
-                }
-              >
-                {badge}
-              </span>
-            ))}
-          </div>
-        ) : null}
-
-        <h3
-          className={`line-clamp-2 text-base font-semibold leading-snug ${
-            editorial ? 'text-zinc-950' : 'text-slate-950'
+      <Link
+        href={articleHref}
+        aria-label={article.title}
+        className="group flex h-full flex-col"
+      >
+        <span
+          className={`relative block aspect-[16/9] w-full shrink-0 overflow-hidden rounded-t-2xl ${
+            editorial ? 'bg-zinc-100' : 'bg-slate-100'
           }`}
         >
-          {article.title}
-        </h3>
+          <BlogCardSafeImage
+            slug={article.slug}
+            coverImageUrl={article.coverImageUrl}
+            alt=""
+            fill
+            sizes={isLarge ? IMAGE_SIZES.blogFeatured : IMAGE_SIZES.blogCard}
+            quality={BLOG_LISTING_IMAGE_QUALITY}
+            className="object-cover object-center transition duration-300 group-hover:scale-[1.02]"
+            fallback={
+              <div
+                className={`flex h-full w-full items-center justify-center text-sm ${
+                  editorial ? 'bg-zinc-200 text-zinc-500' : 'bg-slate-200 text-slate-500'
+                }`}
+              >
+                Материал
+              </div>
+            }
+          />
+        </span>
 
-        {excerpt ? (
-          <>
+        <span
+          className={`flex min-w-0 flex-1 flex-col ${
+            isLarge ? 'p-4 sm:p-5' : isSmall ? 'p-3 sm:p-3.5' : 'p-3.5 sm:p-4'
+          }`}
+        >
+          {(typeLabel || cityLabel) ? (
+            <span
+              className={`mb-2 inline-flex w-fit max-w-full truncate rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                editorial ? 'bg-zinc-100 text-zinc-700' : 'bg-primary-50 text-primary-800'
+              }`}
+            >
+              {typeLabel || cityLabel}
+            </span>
+          ) : null}
+          <h3
+            className={`line-clamp-3 break-words font-semibold leading-snug tracking-tight transition group-hover:text-primary-700 ${
+              isLarge
+                ? 'text-sm sm:text-[0.9375rem]'
+                : isSmall
+                  ? 'text-[0.8125rem] sm:text-sm'
+                  : 'text-[0.8125rem] sm:text-[0.9375rem]'
+            } ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}
+          >
+            {article.title}
+          </h3>
+          {excerpt ? (
             <p
-              className={`mt-2 text-sm leading-relaxed ${editorial ? 'text-zinc-600' : 'text-slate-600'} ${
-                open ? '' : 'line-clamp-3'
+              className={`mt-1.5 line-clamp-2 text-xs leading-relaxed sm:text-[0.8125rem] ${
+                editorial ? 'text-zinc-600' : 'text-slate-600'
               }`}
             >
               {excerpt}
             </p>
-            {excerpt.length > 140 ? (
-              <button
-                type="button"
-                aria-expanded={open}
-                onClick={() => setOpen((value) => !value)}
-                className={`mt-2 text-left text-xs font-semibold ${
-                  editorial ? 'text-zinc-700 hover:underline' : 'text-primary-700 hover:text-primary-800'
-                }`}
-              >
-                {open ? 'Свернуть' : 'Коротко о чём'} {open ? '▴' : '▾'}
-              </button>
-            ) : null}
-          </>
-        ) : null}
-
-        <div className="mt-4 flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => onSeeAffiche?.()}
-            className={
-              editorial
-                ? 'inline-flex min-h-10 items-center justify-center rounded-full bg-zinc-950 px-4 text-sm font-medium text-white hover:bg-zinc-800'
-                : 'inline-flex min-h-10 items-center justify-center rounded-lg bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700'
-            }
-          >
-            Смотреть в афише
-          </button>
-          <Link
-            href={`/blog/${article.slug}`}
-            className={
-              editorial
-                ? 'inline-flex min-h-10 items-center gap-1 rounded-full border border-zinc-300 px-4 text-sm font-medium text-zinc-800 hover:border-zinc-400'
-                : 'inline-flex min-h-10 items-center gap-1 rounded-lg border border-slate-200 px-4 text-sm font-semibold text-slate-700 hover:border-primary-300 hover:text-primary-700'
-            }
-          >
-            Открыть материал
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-      </div>
+          ) : null}
+          <span className="mt-auto flex flex-wrap items-center gap-x-2 gap-y-1.5 pt-3">
+            <span
+              className={`inline-flex items-center gap-1 text-xs font-medium ${
+                editorial ? 'text-zinc-500' : 'text-slate-500'
+              }`}
+            >
+              <Clock className="h-3.5 w-3.5" aria-hidden />
+              {readTimeLabel(article.readMin)}
+            </span>
+          </span>
+        </span>
+      </Link>
     </article>
   );
 }
@@ -132,21 +129,32 @@ export function CityHubArticleTeaser({
 export function CityHubArticlesGrid({
   articles,
   editorial = false,
-  onSeeAffiche,
+  layout = 'grid',
 }: {
   articles: BlogCardDto[];
   editorial?: boolean;
-  onSeeAffiche?: () => void;
+  /** Kept for callers; unused after commerce strip. */
+  sessions?: PublicSessionDto[];
+  /** `stack` - single column for FAQ+blog split. */
+  layout?: 'grid' | 'stack';
 }) {
   if (!articles.length) return null;
+  const items = articles.slice(0, 3);
+
   return (
-    <div className={`mt-5 grid gap-4 ${articles.length > 1 ? 'sm:grid-cols-2' : 'max-w-xl'}`}>
-      {articles.map((article) => (
+    <div
+      className={
+        layout === 'stack'
+          ? 'mt-5 grid grid-cols-1 items-stretch gap-4'
+          : 'mt-5 grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3'
+      }
+    >
+      {items.map((article) => (
         <CityHubArticleTeaser
           key={article.slug}
           article={article}
           editorial={editorial}
-          onSeeAffiche={onSeeAffiche}
+          variant={layout === 'stack' ? 'small' : items.length === 1 ? 'large' : 'default'}
         />
       ))}
     </div>

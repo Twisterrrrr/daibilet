@@ -27,6 +27,10 @@ test('PII list routes require both order and PII permissions', () => {
 test('unknown or intentionally unmapped routes are denied by default', () => {
   assert.deepEqual(getAdminRoutePermissions('GET', '/api/admin/dashboard'), ['catalog.read']);
   assert.equal(getAdminRoutePermissions('DELETE', '/api/admin/orders/ord-1'), null);
+  // Legacy ledger endpoints stay closed until a finance route is explicitly
+  // wired to an MFA-aware staff assertion and a dedicated permission.
+  assert.equal(getAdminRoutePermissions('GET', '/api/admin/finance/ledger'), null);
+  assert.equal(getAdminRoutePermissions('POST', '/api/admin/finance/close-period'), null);
   assert.equal(getAdminRoutePermissions('POST', '/api/admin/articles/1/publish'), null);
   assert.equal(getAdminRoutePermissions('PATCH', '/api/admin/events/evt-1/override'), null);
   assert.deepEqual(getAdminRoutePermissions('PATCH', '/api/admin/events/evt-1/override', { body: { description: 'text' } }), ['content.edit']);

@@ -1,0 +1,47 @@
+---
+description: Обложки и контент SEO-статей блога Дайбилет
+globs: scripts/data/blog*.js,apps/public/src/**/blog*,apps/public/public/images/blog/**
+alwaysApply: false
+---
+
+# Блог: обложки и изображения
+
+## Правило обложки
+
+У **каждой** статьи блога — **своя** обложка. Не переиспользовать `concert-v2.jpg`, лендинги (`/images/landings/*`) и чужие slug между статьями.
+
+| Что | Конвенция |
+|-----|-----------|
+| Файл | `apps/public/public/images/blog/{slug}.jpg` |
+| URL | `/images/blog/{slug}.jpg` |
+| Seed | `scripts/data/blog-cover-path.js` → `blogCoverPath(slug)` |
+| Public fallback | `apps/public/src/lib/blog-cover.ts` → `blogCoverUrl(slug)` |
+
+## Новая статья — чеклист
+
+1. Сгенерировать **оригинальную** обложку 16:9 под тему статьи (editorial, без текста и логотипов).
+2. Сохранить как `{slug}.jpg` в `apps/public/public/images/blog/`.
+3. В `scripts/data/blog-articles-*.js`:
+   - `coverImageUrl: '/images/blog/{slug}.jpg'`
+   - inline `[image ... src="/images/blog/{slug}.jpg"]` — та же обложка или отдельный `{slug}-inline.jpg`, если нужен второй кадр.
+4. Добавить карточку в `apps/public/src/data/blog-posts.ts` с `blogCoverUrl(slug)`.
+5. Seed: `node scripts/seed-blog-articles.js` на prod после деплоя картинок.
+6. Деплой: `scp` папки `public/images/blog/{slug}.jpg` → `/var/www/daibilet/public/images/blog/`.
+
+## Ссылки «Афиша» и город
+
+Текст «афиша», «мероприятия города», «события в …» → **`/cities/{slug}#city-schedule`**, не голая `/cities/{slug}`.
+
+| Контекст | URL |
+|----------|-----|
+| Афиша города | `/cities/ekaterinburg#city-schedule` |
+| Каталог с фильтром | `/events?city=…` или тематический лендинг |
+| Тематика (стендап, река) | соответствующий landing (`/stendap-i-yumor/…`) |
+
+Хелперы: `scripts/data/blog-links.js` → `cityEventsHref(slug)`; public → `cityEventsHref()` в `routes.ts`.
+
+## Стиль изображений
+
+- Редакционная travel/lifestyle-фотография, узнаваемый контекст города/формата.
+- Без водяных знаков, без текста на картинке.
+- Hero 16:9; вес до ~3 MB допустим, но предпочтительно JPG.

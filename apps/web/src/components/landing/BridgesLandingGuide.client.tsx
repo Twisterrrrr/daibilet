@@ -9,7 +9,9 @@ export function BridgesShipChecklist() {
     <section className="container-page py-10 md:py-12">
       <div className="mb-6 flex items-center gap-2">
         <Ship className="h-5 w-5 text-primary" />
-        <h2 className="text-2xl font-bold text-foreground">На что смотреть при выборе теплохода</h2>
+        <h2 className="text-2xl font-bold text-foreground">
+          {BRIDGES_LANDING.shipChecklistTitle || 'На что обратить внимание'}
+        </h2>
       </div>
       <div className="grid gap-4 md:grid-cols-2">
         {BRIDGES_LANDING.shipChecklist.map((item) => (

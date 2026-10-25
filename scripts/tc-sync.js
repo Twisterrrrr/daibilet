@@ -91,10 +91,29 @@ async function runIdsSync(options) {
     skipMissingFromCatalog: true,
   });
 
+  // Persist/promote/generate covers after upsert (CDN first; generate only if empty).
+  const covers = spawnSync(process.execPath, [path.join(rootDir, "scripts", "ensure-catalog-covers.js")], {
+    cwd: rootDir,
+    env: process.env,
+    stdio: "inherit",
+    windowsHide: true,
+  });
+  if (covers.status) {
+    process.exitCode = covers.status;
+    return;
+  }
+
   if (!options.skipRevalidate) {
-    const revalidate = spawnSync(process.execPath, [path.join(rootDir, "scripts", "revalidate-next-home.mjs")], {
+    const eventSlugs = await resolvePublicSlugsForExternalIds(requestedIds);
+    const revalidate = spawnSync(process.execPath, [path.join(rootDir, "scripts", "post-catalog-sync-warm.mjs")], {
       cwd: rootDir,
-      env: process.env,
+      env: {
+        ...process.env,
+        // ids upsert: always light warm (never full stack after small patch)
+        TC_CATALOG_SYNC_FULL_WARM: "0",
+        // Bust /events/[slug] ISR + nginx so STAND_BY/closed slots do not stick.
+        TC_REVALIDATE_EVENT_SLUGS: eventSlugs.join(","),
+      },
       stdio: "inherit",
       windowsHide: true,
     });
@@ -127,7 +146,10 @@ function runFullSyncPipeline() {
   const steps = [
     ["scripts/tc-full-sync.js"],
     ["scripts/tc-import-catalog.js"],
-    ["scripts/revalidate-next-home.mjs"],
+    // After import: promote CDN/event images to venues; generate only when truly empty.
+    ["scripts/ensure-catalog-covers.js"],
+    // Light revalidate/warm by default; set TC_CATALOG_SYNC_FULL_WARM=1 for nightly full warm.
+    ["scripts/post-catalog-sync-warm.mjs"],
   ];
 
   for (const [script] of steps) {
@@ -137,8 +159,13 @@ function runFullSyncPipeline() {
       stdio: "inherit",
       windowsHide: true,
     });
-    if (result.status) {
-      process.exit(result.status);
+    // OOM/SIGABRT → status=null + signal set; treat as failure (was masking false SUCCESS).
+    if (result.error || result.status || result.signal) {
+      const code = result.status ?? 1;
+      if (result.signal) {
+        console.error(`[tc-sync] ${script} killed by signal ${result.signal}`);
+      }
+      process.exit(code);
     }
   }
 }
@@ -189,19 +216,72 @@ function parseIds(raw) {
     .filter(Boolean);
 }
 
+/** Latin public slugs for /events/[slug] revalidate after ids upsert. */
+async function resolvePublicSlugsForExternalIds(externalIds) {
+  const ids = [...new Set((externalIds || []).map(String).filter(Boolean))];
+  if (!ids.length) return [];
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) return [];
+  const { createRequire } = require("module");
+  const requireFromDbPackage = createRequire(path.join(rootDir, "packages", "db", "package.json"));
+  const { Pool } = requireFromDbPackage("pg");
+  const pool = new Pool({ connectionString: databaseUrl, max: 1 });
+  try {
+    const result = await pool.query(
+      `select e.slug
+       from "EventSourceLink" l
+       join "Event" e on e.id = l."eventId"
+       where l."externalId" = any($1::text[])`,
+      [ids],
+    );
+    return [...new Set(result.rows.map((row) => inlinePublicSlug(row.slug)).filter(Boolean))];
+  } catch (error) {
+    console.warn("[tc-sync] resolvePublicSlugsForExternalIds failed:", error.message || error);
+    return [];
+  } finally {
+    try {
+      await pool.end();
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
+function inlinePublicSlug(value) {
+  const letters = {
+    а: "a", б: "b", в: "v", г: "g", д: "d", е: "e", ё: "e", ж: "zh", з: "z", и: "i", й: "y",
+    к: "k", л: "l", м: "m", н: "n", о: "o", п: "p", р: "r", с: "s", т: "t", у: "u", ф: "f",
+    х: "h", ц: "c", ч: "ch", ш: "sh", щ: "sch", ъ: "", ы: "y", ь: "", э: "e", ю: "yu", я: "ya",
+  };
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .split("")
+    .map((character) => letters[character] ?? character)
+    .join("")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .replace(/-{2,}/g, "-");
+}
+
 function printHelp() {
   console.log(`Usage:
-  npm run tc:sync                              # full PUBLIC fetch + import + revalidate
+  npm run tc:sync                              # full PUBLIC fetch + import + light revalidate/warm
   npm run tc:sync -- --ids=id1,id2,id3         # on-demand upsert by Ticketscloud event ids
   npm run tc:sync -- --ids id1,id2 --dry-run   # fetch+normalize only (no DB write)
 
 Flags:
   --ids=... | --ids ...   comma/space-separated Ticketscloud event ids
   --dry-run               with --ids: no DB writes / revalidate
-  --skip-revalidate       with --ids: skip Next home revalidate after upsert
+  --skip-revalidate       with --ids: skip Next/API warm after upsert
   -h, --help              show this help
 
-Does not replace nightly/full sync. Existing events are upserted (prices/dates/images refresh).`);
+Env:
+  TC_CATALOG_SYNC_FULL_WARM=1   full public warm after full sync (venues/cities/landings/admin)
+  (default light warm — preferred for nightly timer)
+
+Does not replace nightly/full sync. Existing events are upserted (prices/dates/images refresh).
+--ids scopes ProviderLink sync to imported Event ids only.`);
 }
 
 function loadRootEnv(projectRoot) {

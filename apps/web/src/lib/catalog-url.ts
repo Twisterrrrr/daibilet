@@ -1,12 +1,17 @@
 import { CATALOG_PAGE_SIZE_DEFAULT, CATALOG_PAGE_SIZES, type CatalogPageSize } from '@daibilet/contracts/catalog';
 
-export type CatalogSort = 'time' | 'price' | 'price_asc' | 'price_desc' | 'popular' | 'departing_soon';
+export type CatalogSort = 'time' | 'price' | 'price_asc' | 'price_desc' | 'popular' | 'departing_soon' | 'random';
+
+/** Default `/events` order: nearest session first. Matches the sort select. */
+export const CATALOG_SORT_DEFAULT: CatalogSort = 'time';
 
 export interface CatalogFilterValues {
   q?: string;
   city?: string;
   category?: string;
   landing?: string;
+  /** Hide sessions that carry these landing slugs (standup, river-cruises, …). */
+  excludeLanding?: string[] | string;
   date?: string;
   from?: string;
   to?: string;
@@ -18,14 +23,50 @@ export interface CatalogFilterValues {
   page?: number;
 }
 
+export function normalizeExcludeLandingParam(raw?: string[] | string | null): string[] {
+  if (raw == null || raw === '') return [];
+  const parts = Array.isArray(raw)
+    ? raw.flatMap((item) => String(item).split(','))
+    : String(raw).split(',');
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const part of parts) {
+    const slug = String(part || '').trim().toLowerCase();
+    if (!slug || seen.has(slug)) continue;
+    seen.add(slug);
+    out.push(slug);
+  }
+  return out.slice(0, 12);
+}
+
 export const CATALOG_SORT_OPTIONS: Array<{ value: CatalogSort; label: string }> = [
-  { value: 'time', label: 'По времени' },
-  { value: 'price_asc', label: 'Дешевле' },
+  { value: 'time', label: 'Ближайшие' },
   { value: 'popular', label: 'Популярные' },
+  { value: 'price_asc', label: 'Дешевле' },
+  { value: 'price_desc', label: 'Дороже' },
+  { value: 'departing_soon', label: 'Скоро начало' },
 ];
 
+/** Legacy `price` is cheapest-first. */
+export function normalizeCatalogSort(
+  sort: CatalogSort | string | null | undefined,
+): CatalogSort {
+  const value = String(sort || '').trim();
+  if (value === 'price') return 'price_asc';
+  if (CATALOG_SORT_OPTIONS.some((option) => option.value === value)) return value as CatalogSort;
+  return CATALOG_SORT_DEFAULT;
+}
+
+/** Resolve which option to show when URL has no sort (server default = time). */
+export function resolveCatalogSortSelectValue(
+  sort: CatalogSort | string | null | undefined,
+): CatalogSort {
+  return normalizeCatalogSort(sort);
+}
+
 export const CATALOG_DATE_OPTIONS = [
-  { value: 'all', label: 'Любая дата' },
+  /** Short label: mobile select truncates «Любая дата» to «Люб». */
+  { value: 'all', label: 'Дата' },
   { value: 'today', label: 'Сегодня' },
   { value: 'tomorrow', label: 'Завтра' },
   { value: 'weekend', label: 'На выходных' },
@@ -42,15 +83,17 @@ export const AGE_FILTER_OPTIONS = [
 ] as const;
 
 export function catalogFiltersFromQuery(query: CatalogFilterValues): CatalogFilterValues {
+  const excludeLanding = normalizeExcludeLandingParam(query.excludeLanding);
   return {
     q: query.q || undefined,
     city: query.city && query.city !== 'all' ? query.city : undefined,
     category: query.category && query.category !== 'all' ? query.category : undefined,
     landing: query.landing && query.landing !== 'all' ? query.landing : undefined,
+    excludeLanding: excludeLanding.length ? excludeLanding : undefined,
     date: query.date && query.date !== 'all' ? query.date : undefined,
     from: query.from || undefined,
     to: query.to || undefined,
-    sort: query.sort || 'time',
+    sort: normalizeCatalogSort(query.sort),
     limit: query.limit && CATALOG_PAGE_SIZES.includes(query.limit) ? query.limit : CATALOG_PAGE_SIZE_DEFAULT,
     minPrice: query.minPrice,
     maxPrice: query.maxPrice,
@@ -66,10 +109,12 @@ export function buildCatalogHref(values: CatalogFilterValues): string {
   if (values.city) params.set('city', values.city);
   if (values.category) params.set('category', values.category);
   if (values.landing) params.set('landing', values.landing);
+  const excludeLanding = normalizeExcludeLandingParam(values.excludeLanding);
+  if (excludeLanding.length) params.set('excludeLanding', excludeLanding.join(','));
   if (values.date) params.set('date', values.date);
   if (values.from) params.set('from', values.from);
   if (values.to) params.set('to', values.to);
-  if (values.sort && values.sort !== 'time') params.set('sort', values.sort);
+  if (values.sort && values.sort !== CATALOG_SORT_DEFAULT) params.set('sort', values.sort);
   if (values.limit && values.limit !== CATALOG_PAGE_SIZE_DEFAULT) params.set('limit', String(values.limit));
   if (values.minPrice != null) params.set('minPrice', String(values.minPrice));
   if (values.maxPrice != null) params.set('maxPrice', String(values.maxPrice));
@@ -89,15 +134,76 @@ export function catalogHrefWithSelectedCity(
   return buildCatalogHref({ ...values, city });
 }
 
-/** `/venues` or `/locations` href with header city when none is explicit. */
+/**
+ * Listing href for площадки / локации. Indexes 301 to `/places`; this helper
+ * writes the destination directly so internal links skip the extra hop.
+ * Pass destination slug when available - Cyrillic `?city=Пермь` soft-nav hangs catalog loading.
+ */
 export function venueCatalogHrefWithSelectedCity(
   path: '/venues' | '/locations',
   cityValue: string | null | undefined,
   explicitCity?: string | null,
 ): string {
   const city = explicitCity || (cityValue && cityValue !== 'all' ? cityValue : undefined);
-  if (!city) return path;
-  return `${path}?city=${encodeURIComponent(city)}`;
+  return placesSearchHref({
+    city,
+    family: path === '/locations' ? 'location' : 'institution',
+  });
+}
+
+export function isPlacesSectionPath(pathname: string | null | undefined): boolean {
+  const path = String(pathname || '').replace(/\/$/, '') || '/';
+  return (
+    path === '/places' ||
+    path.startsWith('/places/') ||
+    path === '/venues' ||
+    path.startsWith('/venues/') ||
+    path === '/locations' ||
+    path.startsWith('/locations/')
+  );
+}
+
+/** Unified Places search URL (mixed venues + locations). */
+export function placesSearchHref(options: {
+  city?: string | null;
+  q?: string | null;
+  page?: number | null;
+  type?: string | null;
+  /** Mixed hub filter: omit or `all` = both families. */
+  family?: 'all' | 'institution' | 'location' | null;
+}): string {
+  const params = new URLSearchParams();
+  const q = String(options.q || '').trim();
+  const city = String(options.city || '').trim();
+  const page = Number(options.page);
+  const type = String(options.type || '').trim();
+  const family = options.family;
+  if (q) params.set('q', q);
+  if (city && city !== 'all') params.set('city', city);
+  // Family facets are addressable by path (/places/institution), not query.
+  // next.config rewrites those onto this query internally, so links stay clean.
+  if (type && type !== 'all') params.set('type', type);
+  if (Number.isFinite(page) && page > 1) params.set('page', String(page));
+  const query = params.toString();
+  const isFamilyPath = family === 'institution' || family === 'location';
+  const base = isFamilyPath ? `/places/${family}` : '/places';
+  return query ? `${base}?${query}` : base;
+}
+
+/** Umbrella «Места» hub. Entity PDP stays `/venues/[slug]` and `/locations/[slug]`. */
+export function placesHubHrefWithSelectedCity(
+  cityValue: string | null | undefined,
+  explicitCity?: string | null,
+): string {
+  return placesSearchHref({
+    city: explicitCity || (cityValue && cityValue !== 'all' ? cityValue : undefined),
+  });
+}
+
+/** Indexable city catalog with its own canonical URL and server-side pagination. */
+export function cityPlacesCatalogHref(citySlug: string, page = 1): string {
+  const path = `/places/c/${encodeURIComponent(citySlug)}`;
+  return page > 1 ? `${path}?page=${page}` : path;
 }
 
 export function mergeCatalogFilters(
@@ -121,6 +227,7 @@ export function clearCatalogFilterKey(
   if (key === 'city') delete next.city;
   if (key === 'category') delete next.category;
   if (key === 'landing') delete next.landing;
+  if (key === 'excludeLanding') delete next.excludeLanding;
   if (key === 'date') delete next.date;
   if (key === 'from') {
     delete next.from;
@@ -130,8 +237,15 @@ export function clearCatalogFilterKey(
     delete next.from;
     delete next.to;
   }
-  if (key === 'minPrice') delete next.minPrice;
-  if (key === 'maxPrice') delete next.maxPrice;
+  if (key === 'minPrice') {
+    delete next.minPrice;
+    // Free preset is min=0 & max=0 - clear both together.
+    if (next.maxPrice === 0) delete next.maxPrice;
+  }
+  if (key === 'maxPrice') {
+    delete next.maxPrice;
+    if (next.minPrice === 0) delete next.minPrice;
+  }
   if (key === 'ageMax') delete next.ageMax;
   if (key === 'sort') next.sort = 'time';
   delete next.page;
@@ -144,5 +258,7 @@ export function countAdvancedFilters(values: CatalogFilterValues): number {
   if (values.minPrice != null || values.maxPrice != null) count += 1;
   if (values.ageMax != null && values.ageMax >= 0) count += 1;
   if (values.landing) count += 1;
+  const excluded = normalizeExcludeLandingParam(values.excludeLanding);
+  if (excluded.length) count += excluded.length;
   return count;
 }

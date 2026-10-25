@@ -1,4 +1,5 @@
 import type { PublicSessionDto } from '@daibilet/contracts/public';
+import { venueTemplate } from '@/lib/venue-kind-mapping';
 
 type EventRouteSource = Pick<PublicSessionDto, 'id' | 'slug' | 'sourceSlug' | 'title'>;
 type CityRouteSource = { slug?: string | null; sourceSlug?: string | null; name: string };
@@ -35,6 +36,41 @@ export function citySlug(city: CityRouteSource): string {
   return normalizeSlug(city.name) || 'city';
 }
 
+/**
+ * Keep city canonicals on the public Latin route when stored metadata points
+ * back to the same city through a legacy Cyrillic/alias URL. Explicit
+ * cross-city canonical overrides remain intact.
+ */
+export function cityCanonicalPath(
+  city: CityRouteSource & { canonicalPath?: string | null },
+): string {
+  const href = cityHref(city);
+  const stored = String(city.canonicalPath || '').trim();
+  if (!stored) return href;
+
+  let pathname = stored;
+  try {
+    pathname = new URL(stored, 'https://daibilet.ru').pathname;
+  } catch {
+    return href;
+  }
+
+  const match = pathname.match(/^\/cities\/([^/]+)\/?$/i);
+  if (!match) return stored;
+
+  let storedSlug = match[1];
+  try {
+    storedSlug = decodeURIComponent(storedSlug);
+  } catch {
+    // Keep the raw segment; normalizeSlug will safely reduce it below.
+  }
+
+  const aliases = [city.slug, city.sourceSlug, city.name]
+    .map((value) => normalizeSlug(value))
+    .filter(Boolean);
+  return aliases.includes(normalizeSlug(storedSlug)) ? href : stored;
+}
+
 /** Афиша города — расписание событий на странице CityPage. */
 export function cityEventsHref(city: CityRouteSource): string {
   return `${cityHref(city)}#affiche`;
@@ -43,6 +79,26 @@ export function cityEventsHref(city: CityRouteSource): string {
 export function venueHref(venue: VenueRouteSource): string {
   const base = venuePageTemplate(venue.type) === 'location' ? '/locations' : '/venues';
   return `${base}/${venueSlug(venue)}`;
+}
+
+/**
+ * Prefer stored canonicalPath only when its route family matches venue type.
+ * Mismatched `/locations` vs `/venues` paths caused permanentRedirect loops.
+ */
+export function venueCanonicalPath(
+  venue: VenueRouteSource & { canonicalPath?: string | null },
+): string {
+  const href = venueHref(venue);
+  const stored = String(venue.canonicalPath || '').trim();
+  if (!stored) return href;
+  const storedFamily = stored.startsWith('/locations/')
+    ? 'location'
+    : stored.startsWith('/venues/')
+      ? 'institution'
+      : null;
+  if (!storedFamily) return href;
+  if (storedFamily !== venuePageTemplate(venue.type)) return href;
+  return stored.startsWith('/') ? stored : `/${stored}`;
 }
 
 export function venueSlug(venue: VenueRouteSource): string {
@@ -57,10 +113,9 @@ export function venueSlug(venue: VenueRouteSource): string {
   return normalizeSlug(idPart) || idPart;
 }
 
+/** Family/template из единого mapping (venue-kind-mapping.ts). */
 export function venuePageTemplate(type?: string | null): 'institution' | 'location' {
-  const value = String(type || '').toLowerCase();
-  if (value.includes('location') || value.includes('причал') || value.includes('теплоход')) return 'location';
-  return 'institution';
+  return venueTemplate(type);
 }
 
 export function venueCatalogHref(template: 'institution' | 'location' = 'institution'): string {
@@ -79,7 +134,11 @@ export function sessionVenueHref(
   });
 }
 
-function normalizeSlug(value?: string | null): string {
+/**
+ * Транслитерация кириллицы → латиница для CHPU slug (import/create/href).
+ * Совместима с `publicCitySlug` в backend dto.js.
+ */
+export function transliterateSlug(value?: string | null): string {
   return String(value || '')
     .trim()
     .toLowerCase()
@@ -89,6 +148,10 @@ function normalizeSlug(value?: string | null): string {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
     .replace(/-{2,}/g, '-');
+}
+
+function normalizeSlug(value?: string | null): string {
+  return transliterateSlug(value);
 }
 
 function isOpaqueId(value: string): boolean {

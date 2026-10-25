@@ -3,13 +3,15 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Loader2, LogOut, Receipt, Ticket } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
-import { BuyerOrderCard, BuyerOrdersEmptyState } from '@/components/BuyerOrderCard.client';
-import { BUYER_ACCOUNT_EMPTY_HINT, buyerAccountHero, buyerAccountListLabel } from '@/lib/buyer-account-copy';
-import { resolveBuyerEmailVerification } from '@/lib/buyer-email-verification';
+import { BuyerOrderCard, BuyerOrdersEmptyState, ORDER_SUPPORT_HINT, type BuyerOrder } from '@/components/BuyerOrderCard.client';
+import {
+  filterInternalOrdersForEmail,
+  readInternalOrdersFromStorage,
+  type BuyerInternalOrderRecord,
+} from '@/lib/buyer-checkout';
 import { formatNumber } from '@/lib/format';
-import { requestUserEmailVerification } from '@/lib/user-api';
 import { useAccountPurchases, useUserAuth } from '@/hooks/useUserAuth';
 
 function formatCount(count: number, forms: [string, string, string]): string {
@@ -19,18 +21,122 @@ function formatCount(count: number, forms: [string, string, string]): string {
   return `${formatNumber(count)} ${form}`;
 }
 
+function internalToBuyerOrder(row: BuyerInternalOrderRecord): BuyerOrder {
+  const title = row.eventTitle || row.venueTitle || row.title || 'Входной билет';
+  const ticketCount = Array.isArray(row.lineItems)
+    ? Math.max(
+        1,
+        row.lineItems.reduce((sum, item) => sum + Math.max(1, Math.round(Number(item.quantity) || 1)), 0),
+      )
+    : 1;
+  return {
+    id: `internal:${row.publicCode}`,
+    number: row.publicCode,
+    status: row.status,
+    displayStatus: row.displayStatus,
+    statusTone: row.statusTone,
+    providerName: 'Дайбилет',
+    sourceKind: 'internal',
+    buyer: {
+      email: row.email,
+      name: row.buyerName || null,
+      phone: null,
+    },
+    eventTitle: title,
+    eventUrl: row.venueSlug ? `/venues/${encodeURIComponent(row.venueSlug)}` : null,
+    purchasedAt: row.purchasedAt,
+    amountRub: row.amountRub,
+    ticketCount,
+    message:
+      row.mode === 'STUB'
+        ? 'Тестовый заказ (STUB). Скачайте билет из списка - письмо уходит только если настроен SMTP каталога.'
+        : null,
+    tickets: [
+      {
+        id: `internal-ticket:${row.publicCode}`,
+        number: row.ticketNumber || row.publicCode,
+        displayStatus: row.displayStatus,
+        eventTitle: title,
+        startsAt: row.sessionStartsAt || null,
+      },
+    ],
+  };
+}
+
+function widgetToBuyerOrder(
+  row: Omit<BuyerOrder, 'sourceKind'> & { sourceKind?: 'widget' | 'internal' | 'external' },
+): BuyerOrder {
+  return {
+    ...row,
+    sourceKind: row.sourceKind === 'internal' ? 'internal' : 'widget',
+  };
+}
+
 export function AccountPurchasesPageView() {
   const router = useRouter();
-  const { user, token, isLoading: authLoading, isLoggedIn, logout } = useUserAuth();
+  const { user, isLoading: authLoading, isLoggedIn, logout } = useUserAuth();
   const [page, setPage] = useState(1);
-  const [verificationMessage, setVerificationMessage] = useState<string | null>(null);
   const { payload, isLoading, error } = useAccountPurchases(page);
+  const [localInternal, setLocalInternal] = useState<BuyerInternalOrderRecord[]>([]);
+  const [remoteInternal, setRemoteInternal] = useState<BuyerInternalOrderRecord[]>([]);
 
   useEffect(() => {
     if (!authLoading && !isLoggedIn) {
       router.replace(`/login?returnUrl=${encodeURIComponent('/account/purchases')}`);
     }
   }, [authLoading, isLoggedIn, router]);
+
+  useEffect(() => {
+    if (!user?.email) return;
+    setLocalInternal(filterInternalOrdersForEmail(readInternalOrdersFromStorage(), user.email));
+
+    let disposed = false;
+    const run = async () => {
+      try {
+        const response = await fetch(
+          `/checkout/actions/internal-purchases?email=${encodeURIComponent(user.email)}`,
+          { cache: 'no-store' },
+        );
+        const data = (await response.json().catch(() => null)) as {
+          rows?: BuyerInternalOrderRecord[];
+        } | null;
+        if (!disposed && Array.isArray(data?.rows)) {
+          setRemoteInternal(data.rows);
+        }
+      } catch {
+        // soft-fail
+      }
+    };
+    void run();
+    return () => {
+      disposed = true;
+    };
+  }, [user?.email]);
+
+  const mergedRows = useMemo(() => {
+    const widgetRows = (payload?.rows || []).map(widgetToBuyerOrder);
+    const byCode = new Map<string, BuyerOrder>();
+
+    // Browser storage is only a snapshot. It must not override a refunded or cancelled finance order.
+    for (const row of localInternal) {
+      byCode.set(row.publicCode, internalToBuyerOrder({
+        ...row,
+        status: 'VERIFYING',
+        displayStatus: 'Статус уточняется',
+        statusTone: 'incomplete',
+      }));
+    }
+    for (const row of remoteInternal) byCode.set(row.publicCode, internalToBuyerOrder(row));
+    for (const row of widgetRows) {
+      if (!byCode.has(row.number)) byCode.set(row.number, row);
+    }
+
+    return Array.from(byCode.values()).sort((a, b) => {
+      const aTime = a.purchasedAt ? new Date(a.purchasedAt).getTime() : 0;
+      const bTime = b.purchasedAt ? new Date(b.purchasedAt).getTime() : 0;
+      return bTime - aTime;
+    });
+  }, [payload?.rows, localInternal, remoteInternal]);
 
   if (authLoading || !isLoggedIn) {
     return (
@@ -41,6 +147,8 @@ export function AccountPurchasesPageView() {
   }
 
   const totalPages = payload?.pages || 1;
+  const internalCount = mergedRows.filter((row) => row.sourceKind === 'internal').length;
+  const widgetCount = mergedRows.filter((row) => row.sourceKind !== 'internal').length;
 
   return (
     <>
@@ -61,7 +169,8 @@ export function AccountPurchasesPageView() {
               </div>
               <h1 className="mt-4 text-4xl font-extrabold sm:text-5xl">Мои покупки</h1>
               <p className="mt-4 max-w-3xl text-base leading-7 text-primary-50/88">
-                {buyerAccountHero(user?.email || '')}
+                Заказы на email {user?.email}: скачайте билет Дайбилет прямо из списка или откройте страницу с QR и
+                картой. Также здесь покупки через виджеты Ticketscloud / Teplohod.
               </p>
             </div>
             <button
@@ -81,55 +190,39 @@ export function AccountPurchasesPageView() {
       </section>
 
       <section className="container-page py-8 sm:py-10">
-        {payload?.account?.emailVerified === false ? (
-          <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
-            <p>Подтвердите email, чтобы увидеть покупки, оформленные на этот адрес без входа в аккаунт.</p>
-            <button
-              type="button"
-              disabled={!token}
-              onClick={() => {
-                if (!token) return;
-                void requestUserEmailVerification(token)
-                  .then(() => setVerificationMessage('Письмо отправлено. Проверьте почту.'))
-                  .catch(() => setVerificationMessage('Не удалось отправить письмо. Попробуйте позже.'));
-              }}
-              className="mt-2 font-semibold underline disabled:opacity-50"
-            >
-              Отправить письмо для подтверждения
-            </button>
-            {verificationMessage ? <p className="mt-2">{verificationMessage}</p> : null}
-          </div>
-        ) : null}
         {error ? (
           <div className="rounded-xl bg-red-50 p-4 text-red-800">
-            <div className="font-semibold">Не удалось загрузить покупки</div>
+            <div className="font-semibold">Не удалось загрузить покупки из виджетов</div>
             <div className="mt-1 text-sm opacity-80">{error}</div>
           </div>
         ) : null}
 
-        {isLoading && !payload ? (
+        {isLoading && !payload && !mergedRows.length ? (
           <div className="flex min-h-[30vh] items-center justify-center">
             <Loader2 className="h-10 w-10 animate-spin text-primary-600" />
           </div>
         ) : null}
 
-        {payload && payload.rows.length === 0 ? (
-          <BuyerOrdersEmptyState
-            lookup={user?.email || ''}
-            emailVerification={resolveBuyerEmailVerification(payload)}
-          />
-        ) : null}
+        {mergedRows.length === 0 && !isLoading ? <BuyerOrdersEmptyState lookup={user?.email || ''} /> : null}
 
-        {payload && payload.rows.length > 0 ? (
+        {mergedRows.length > 0 ? (
           <div>
-            <div className="mb-4">
-              <h2 className="text-2xl font-bold text-slate-950">{formatCount(payload.total, ['заказ', 'заказа', 'заказов'])}</h2>
-              <p className="mt-1 text-sm text-slate-500">{buyerAccountListLabel(user?.email || '')}</p>
+            <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <h2 className="text-2xl font-bold text-slate-950">
+                  {formatCount(mergedRows.length, ['заказ', 'заказа', 'заказов'])}
+                </h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  Привязаны к email {user?.email}
+                  {internalCount || widgetCount ? ` · Дайбилет ${internalCount} · виджеты ${widgetCount}` : null}
+                </p>
+                <p className="mt-1.5 text-xs text-slate-400">{ORDER_SUPPORT_HINT}</p>
+              </div>
             </div>
 
-            <div className="grid gap-4">
-              {payload.rows.map((order) => (
-                <BuyerOrderCard key={order.id} order={order} />
+            <div className="grid gap-2.5">
+              {mergedRows.map((order) => (
+                <BuyerOrderCard key={order.id} order={order} accountEmail={user?.email} />
               ))}
             </div>
 
@@ -159,10 +252,12 @@ export function AccountPurchasesPageView() {
           </div>
         ) : null}
 
-        {!payload?.rows.length && !isLoading ? (
+        {!mergedRows.length && !isLoading ? (
           <div className="mt-6 rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center">
             <Ticket className="mx-auto h-10 w-10 text-slate-300" />
-            <p className="mt-3 text-sm leading-6 text-slate-500">{BUYER_ACCOUNT_EMPTY_HINT}</p>
+            <p className="mt-3 text-sm leading-6 text-slate-500">
+              Если вы уже покупали билеты, убедитесь, что в заказе указан тот же email, что и в аккаунте.
+            </p>
           </div>
         ) : null}
       </section>

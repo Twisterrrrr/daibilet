@@ -260,6 +260,17 @@ async function resolveReviewEvent(slugOrId: string): Promise<{ id: string; slug:
   });
   if (direct) return direct;
 
+  // Public URLs use transliterated slug; DB often keeps Cyrillic sourceSlug (TEP).
+  // Example: ...-peterburga-706 → evt_tep_706.
+  const tepSuffix = raw.match(/(?:^|-)(\d{2,6})$/);
+  if (tepSuffix?.[1]) {
+    const tepEvent = await prisma.event.findFirst({
+      where: { id: `evt_tep_${tepSuffix[1]}` },
+      select,
+    });
+    if (tepEvent && publicSlugLite(tepEvent.slug) === publicSlugLite(raw)) return tepEvent;
+  }
+
   const tcPrefixMatch = raw.match(/^tc-([a-f0-9]{24})-/i);
   if (tcPrefixMatch?.[1]) {
     const tcId = tcPrefixMatch[1];
@@ -287,6 +298,18 @@ async function resolveReviewEvent(slugOrId: string): Promise<{ id: string; slug:
       select,
     });
     if (like) return like;
+  }
+
+  // Last resort for Cyrillic DB slugs: match transliteration of recent candidates with same numeric tail.
+  if (tepSuffix?.[1] && normalized) {
+    const candidates = await prisma.event.findMany({
+      where: { slug: { endsWith: `-${tepSuffix[1]}` } },
+      select,
+      take: 25,
+      orderBy: { updatedAt: 'desc' },
+    });
+    const matched = candidates.find((row) => publicSlugLite(row.slug) === normalized);
+    if (matched) return matched;
   }
 
   return null;

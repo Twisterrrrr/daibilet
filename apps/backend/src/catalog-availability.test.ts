@@ -3,6 +3,10 @@ import test from 'node:test';
 import {
   hasUpcomingOrOpenSchedule,
   isOpenDateCatalogRow,
+  isPublicSalesStatusBlocked,
+  isPublicSessionRowOnSale,
+  isStartedTicketcloudSlot,
+  isSaleableEventForPublic,
   isSaleableForPublicCatalog,
 } from './catalog-availability.js';
 
@@ -12,6 +16,15 @@ test('isOpenDateCatalogRow accepts OPEN_DATE kind and open_date status', () => {
   assert.equal(isOpenDateCatalogRow({ kind: 'SINGLE' }), false);
   assert.equal(isOpenDateCatalogRow({ kind: 'RECURRING', sourceStatus: 'PUBLIC' }), false);
   assert.equal(isOpenDateCatalogRow({ kind: 'SERIES', sourceStatus: 'widget' }), false);
+});
+
+test('started Ticketscloud slots are hidden while future and open-date slots remain', () => {
+  const now = new Date('2026-09-23T10:00:00Z');
+  const past = { kind: 'SINGLE', startsAt: '2026-09-23T09:55:00Z' };
+  assert.equal(isStartedTicketcloudSlot(past, 'TICKETSCLOUD', now), true);
+  assert.equal(isStartedTicketcloudSlot(past, 'TEPLOHOD', now), false);
+  assert.equal(isStartedTicketcloudSlot({ ...past, startsAt: '2026-09-23T10:01:00Z' }, 'TICKETSCLOUD', now), false);
+  assert.equal(isStartedTicketcloudSlot({ ...past, kind: 'OPEN_DATE' }, 'TICKETSCLOUD', now), false);
 });
 
 test('hasUpcomingOrOpenSchedule rejects past TEP rows without schedule', () => {
@@ -36,14 +49,50 @@ test('hasUpcomingOrOpenSchedule rejects stale wide-lifetime rows', () => {
   assert.equal(hasUpcomingOrOpenSchedule({ kind: 'SINGLE', startsAt: started, endsAt: ends }), false);
 });
 
-test('isSaleableForPublicCatalog requires widget-ready schedule and price', () => {
+test('isPublicSalesStatusBlocked covers TC STAND_BY and closed sales', () => {
+  assert.equal(isPublicSalesStatusBlocked('STAND_BY'), true);
+  assert.equal(isPublicSalesStatusBlocked('stand_by'), true);
+  assert.equal(isPublicSalesStatusBlocked('closed'), true);
+  assert.equal(isPublicSalesStatusBlocked('sales_closed'), true);
+  assert.equal(isPublicSalesStatusBlocked('paused'), true);
+  assert.equal(isPublicSalesStatusBlocked('PUBLIC'), false);
+  assert.equal(isPublicSalesStatusBlocked(null), false);
+});
+
+test('isPublicSessionRowOnSale hides inactive and cancelled sessions', () => {
+  assert.equal(isPublicSessionRowOnSale({ isActive: true, sourceStatus: 'PUBLIC' }), true);
+  assert.equal(isPublicSessionRowOnSale({ isActive: false, sourceStatus: 'PUBLIC' }), false);
+  assert.equal(isPublicSessionRowOnSale({ isActive: true, cancelledAt: new Date(), sourceStatus: 'PUBLIC' }), false);
+  assert.equal(isPublicSessionRowOnSale({ isActive: true, sourceStatus: 'STAND_BY' }), false);
+});
+
+test('isSaleableForPublicCatalog requires widget-ready schedule; price optional; blocks closed sales', () => {
   const future = new Date(Date.now() + 3_600_000).toISOString();
   assert.equal(
     isSaleableForPublicCatalog({ kind: 'SINGLE', startsAt: future, purchaseReady: true, priceFrom: 500 }),
     true,
   );
   assert.equal(
+    isSaleableForPublicCatalog({ kind: 'SINGLE', startsAt: future, purchaseReady: true, priceFrom: null }),
+    true,
+  );
+  assert.equal(
+    isSaleableForPublicCatalog({ kind: 'SINGLE', startsAt: future, purchaseReady: true, priceFrom: 10 }),
+    true,
+  );
+  assert.equal(
     isSaleableForPublicCatalog({ kind: 'SINGLE', startsAt: future, purchaseReady: false, priceFrom: 500 }),
     false,
   );
+  assert.equal(
+    isSaleableForPublicCatalog({
+      kind: 'SINGLE',
+      startsAt: future,
+      purchaseReady: true,
+      priceFrom: 500,
+      sourceStatus: 'STAND_BY',
+    }),
+    false,
+  );
+  assert.equal(isSaleableEventForPublic, isSaleableForPublicCatalog);
 });

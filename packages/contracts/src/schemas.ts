@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { CATALOG_PAGE_SIZE_MAX } from './catalog.js';
+
 const optionalString = z.string().trim().min(1).optional();
 const nullableString = z.preprocess(
   (value) => (typeof value === 'string' ? value.trim() || null : value),
@@ -31,10 +33,12 @@ export const publicCatalogQuerySchema = paginationQuerySchema.extend({
   category: optionalString,
   tag: optionalString,
   landing: optionalString,
+  /** Comma / repeated: hide sessions tagged with these landing slugs (e.g. standup,river-cruises). */
+  excludeLanding: csvIdList,
   date: optionalString,
   from: optionalString,
   to: optionalString,
-  sort: z.enum(['time', 'price', 'popular', 'departing_soon', 'price_asc', 'price_desc']).optional(),
+  sort: z.enum(['time', 'price', 'popular', 'departing_soon', 'price_asc', 'price_desc', 'random']).optional(),
   view: z.enum(['cards', 'list', 'table']).optional(),
   minPrice: z.coerce.number().int().min(0).optional(),
   maxPrice: z.coerce.number().int().min(0).optional(),
@@ -42,7 +46,7 @@ export const publicCatalogQuerySchema = paginationQuerySchema.extend({
   ageMax: z.coerce.number().int().min(-1).max(99).optional(),
   refresh: optionalFlag,
   ids: csvIdList,
-  limit: z.coerce.number().int().min(1).max(100).optional(),
+  limit: z.coerce.number().int().min(1).max(CATALOG_PAGE_SIZE_MAX).optional(),
 });
 
 export const adminEventsQuerySchema = paginationQuerySchema.extend({

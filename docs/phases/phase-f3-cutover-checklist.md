@@ -1,16 +1,18 @@
 # F3 — Cutover public на Next.js
 
 **Предусловие:** F2 exit ✅  
-**Canonical app:** `apps/web` (не Codex `apps/public` + proxy)
+**Canonical app:** `apps/web` (не Codex `apps/public` + proxy)  
+**Статус 2026-08-07:** cutover выполнен на MSK. Блоки ниже - historical staging на SPB `.16` (труп). Prod deploy = MSK-only.
 
 ---
 
-## Staging (первый шаг)
+## Staging (исторический первый шаг - не выполнять на `.16`)
 
 ### 1. Server prep (один раз)
 
 ```bash
-ssh root@213.171.7.16
+# Historical host was root@213.171.7.16 - DO NOT use. Canon: ssh daibilet-msk
+ssh daibilet-msk
 cd /opt/daibilet-staging
 git fetch origin feat/next-monorepo
 git checkout feat/next-monorepo

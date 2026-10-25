@@ -1,4 +1,5 @@
 import { createHash, randomUUID } from 'node:crypto';
+import { isPublicCatalogExcludedMuseumAdmission } from './public-catalog-exclusions.ts';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -7,6 +8,7 @@ import {
   formatBusLocationDisplayName,
   formatPierLocationDisplayName,
   findVenueOverride,
+  formatPublicVenueTitle,
 } from './venue-normalize.js';
 import {
   resolveCityTimeZone,
@@ -16,37 +18,198 @@ import {
   localHourFromInstant,
   DEFAULT_CITY_TIME_ZONE,
 } from './city-timezone.js';
+import { loadCityRoutingConfig } from './city-routing-config.js';
+import { resolveProjectRoot } from './project-root.js';
 import {
   resolveContextInstitutionForEvent,
   resolveContextInstitutionFromTitle,
   shouldResolveInstitutionFromTitle,
 } from './event-venue-context.js';
 import { formatPublicEventTitle } from './event-title-normalize.ts';
-import { toPublicCatalogListItem } from './public-catalog-list-item.ts';
+import { toPublicCatalogListItem, toPublicHomeCardSession } from './public-catalog-list-item.ts';
 import { enrichBuyerOrdersWithEventLinks } from './buyer-order-event-links.js';
+import { readReadyPdpDocument } from './pdp-documents.js';
+import {
+  blogCityDisplayName,
+  blogCitySlugAliases,
+  canonicalBlogCitySlug,
+  isBroadBlogCitySlug,
+} from './blog-city-slug.js';
 import {
   buildAdminEventGroupKey,
   invalidateAdminEventsSqlReadModelCache,
   queryAdminEventGroupsPage,
   queryAdminLaunchMetricsSql,
 } from './admin-events-sql-read-model.js';
+import {
+  applyVenueEventFacetCounts,
+  fetchLeanPublicVenueRows,
+  fetchVenueEventFacetCounts,
+  fetchVenueHeroImageFallbacks,
+} from './public-venue-lean.ts';
+import { pickRelatedSessions } from './event-related.js';
+import {
+  isContentPlaceHubEligible,
+  isContentPlaceKind,
+} from './public-venue-hub-gate.js';
+import {
+  ACTIVE_SESSION_SQL,
+  MIN_DISPLAY_PRICE_RUB,
+  PUBLIC_SALES_BLOCKED_STATUS_SQL,
+  hasDisplayPrice,
+  hasUpcomingOrOpenSchedule,
+  isOpenDateCatalogRow,
+  isSaleableEventForPublic,
+  isWideLifetimeSession,
+} from './catalog-availability.ts';
+import {
+  SITE_TIME_ZONE,
+  formatDate,
+  formatTime,
+  normalizeStartsAt,
+  parseSessionStartsAt,
+  timeBucket,
+} from './public-datetime.ts';
+import { dedupePublicOffers, preferNamedTicketOffers } from './public-offers.ts';
 
-const MIN_DISPLAY_PRICE_RUB = 100;
-const ACTIVE_SESSION_SQL = `(
-  (
-    session."startsAt" is not null
-    and session."startsAt" >= now() - interval '15 minutes'
-  )
-  or (
-    session."startsAt" is not null
-    and session."endsAt" is not null
-    and session."startsAt" < now()
-    and session."endsAt" >= now()
-    and session."endsAt" - session."startsAt" < interval '36 hours'
-  )
-)`;
+import {
+  LANDING_RULES,
+  LANDING_SLUG_ALIASES,
+  explainLandingRuleMatch,
+  matchesLandingRule,
+  buildOffSeasonLandingSlugs,
+  resolveLandingRuleBySlug,
+  sessionMatchesLandingSlug,
+} from './landing-rules.ts';
+import { pickCatalogSubcategories } from './public-catalog.mapper.ts';
+import { buildPublicLandings as buildPublicLandingsFromSessions } from './public-city-landings.ts';
+import {
+  LANDING_PAGE_SESSION_LIMIT,
+  scopePublicCatalogSessions,
+  selectLandingPageSessions,
+} from './public-landing-page-sessions.ts';
+import {
+  canonicalSessionPierKey,
+  dedupeCrossSourceCatalogSessions,
+  isPublicSessionPurchaseBlocked,
+  maxNullableNumber,
+  minNullableNumber,
+  normalizeGroupPart,
+  regroupMappedPublicCatalogSessions,
+  resolveCatalogDisplayTitle,
+  sessionHasCoverImage,
+  shouldPromoteGroupedRepresentative,
+  sumNullableNumbers,
+  uniqueSlots,
+  uniqueValues,
+  sessionGroupIds,
+} from './public-catalog-grouping.ts';
+import { mapGroupedPublicSession, collectSeparateCityHubNames } from './public-catalog.mapper.ts';
+import {
+  buildCityHubSeoTitle,
+  buildPublicDestinationRowsFromSessions,
+  countDistinctSessionVenues,
+  destinationPrepositional,
+  isFoldingRegionalTown,
+  isSubjectCapitalCity,
+  isVisibleOnCitiesCatalog,
+  lookupDestinationCatalogSessions,
+  matchStandaloneCityBySlug,
+  publicDestinationFromSession,
+} from './public-destination.ts';
+import { dedupePublicVenueLinkedEvents } from './public-venue-linked-events.ts';
+
+import {
+  haversineMeters,
+  buildPublicVenuePage,
+  buildPublicVenuesCatalog,
+  publicVenueHubRows,
+  resolvePublicVenuesForSessions,
+  publicPublishedVenuesByCityId,
+  mergeCityPageVenues,
+  publicVenues,
+  publicVenuesForHome,
+  publicVenuesForSessionsFromHub,
+  publicVenueRowMatchesCityFilter,
+  isPublicVenueHub,
+  publicVenuePageTemplate,
+  publicVenueSlug,
+  resolvePublicVenueCoordinates,
+  isPierVenueKind,
+  clearPublicVenueReadCache,
+  warmPublicVenueCatalogCache,
+  loadPublicEventVenueStops,
+  canonicalPierLocationKey,
+  resolvePublicVenueCity,
+  applyPublicVenueNormalization,
+  normalizeVenueKindValue,
+  INSTITUTION_VENUE_KINDS,
+} from './public-venue-read.js';
+
+export {
+  haversineMeters,
+  buildPublicVenuePage,
+  buildPublicVenuesCatalog,
+  publicVenueHubRows,
+  resolvePublicVenuesForSessions,
+  publicPublishedVenuesByCityId,
+  mergeCityPageVenues,
+  publicVenues,
+  publicVenuesForHome,
+  publicVenuesForSessionsFromHub,
+  publicVenueRowMatchesCityFilter,
+  isPublicVenueHub,
+  publicVenuePageTemplate,
+  publicVenueSlug,
+  resolvePublicVenueCoordinates,
+  isPierVenueKind,
+  clearPublicVenueReadCache,
+  warmPublicVenueCatalogCache,
+  loadPublicEventVenueStops,
+  canonicalPierLocationKey,
+};
+
+
+export { pickCatalogSubcategories };
+export {
+  dedupeCrossSourceCatalogSessions,
+  mapGroupedPublicSession,
+  regroupMappedPublicCatalogSessions,
+  sessionHasCoverImage,
+  buildCityHubSeoTitle,
+  buildPublicDestinationRowsFromSessions,
+  countDistinctSessionVenues,
+  destinationPrepositional,
+  isVisibleOnCitiesCatalog,
+  lookupDestinationCatalogSessions,
+  publicDestinationFromSession,
+};
+
+export {
+  hasDisplayPrice,
+  isSaleableEventForPublic,
+  preferNamedTicketOffers,
+  dedupePublicOffers,
+  normalizeStartsAt,
+  formatDate,
+  formatTime,
+  timeBucket,
+  SITE_TIME_ZONE,
+};
+
 const PUBLIC_DESTINATION_MIN_EVENTS = 1;
 const PUBLIC_CATALOG_CACHE_MS = 5 * 60 * 1000;
+/** Stale-while-revalidate window: serve expired catalog instantly, rebuild in background. */
+const PUBLIC_CATALOG_STALE_MS = Number(process.env.PUBLIC_CATALOG_STALE_MS || 30 * 60 * 1000);
+/**
+ * INC.504.5 seam: emergency dto.js SQL must not re-enter under load.
+ * Alert P1 on log line containing `legacy inline SQL fallback`.
+ */
+const LEGACY_CATALOG_SQL_COOLDOWN_MS = Math.max(
+  60_000,
+  Number(process.env.DAIBILET_LEGACY_CATALOG_SQL_COOLDOWN_MS || 45 * 60 * 1000),
+);
+let lastLegacyCatalogSqlFallbackAt = 0;
 const CATALOG_TAG_DISPLAY_LIMIT = 4;
 
 function orderedEventTagsSql(eventIdSql = 'e.id') {
@@ -120,9 +283,16 @@ const CITY_CARD_IMAGE_SLUGS = new Set([
   'penza',
   'volgograd',
   'sortavala',
+  'surgut',
+  'tolyatti',
+  'novokuzneck',
+  'novokuznetsk',
+  'hanty-mansiysk',
+  'khanty-mansiysk',
+  'vladikavkaz',
 ]);
-const PROJECT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
-const CITY_ROUTING = loadCityRouting();
+const PROJECT_ROOT = resolveProjectRoot(import.meta.url);
+const CITY_ROUTING = loadCityRoutingConfig(import.meta.url);
 const STANDALONE_CITY_NAMES = new Set(CITY_ROUTING.standaloneCities || []);
 const CITY_TO_REGION = new Map(Object.entries(CITY_ROUTING.cityToRegion || {}));
 const FOREIGN_CITY_NAMES = new Set(CITY_ROUTING.foreignCities || []);
@@ -155,193 +325,6 @@ let publicCatalogCache = null;
 let publicStatsCache = null;
 let publicEventRowsBuildPromise = null;
 let publicCatalogBuildPromise = null;
-let publicVenueHubCache = null;
-let publicVenueCatalogLists = null;
-
-const LANDING_SLUG_ALIASES = {
-  'river-cruises': ['river-walks', 'river-cruise', 'river'],
-  'river-party': ['party-boat', 'river-disco', 'boat-party'],
-  'bridges-night': ['razvodnye-mosty', 'bridges', 'spb-bridges-night', 'bridges_night', 'night-bridges'],
-  'bus-tours': ['bus-sightseeing', 'bus'],
-  'spb-yards': ['spb-paradnye', 'yards-spb', 'dory-paradnye'],
-  'family-kids': ['kids-family', 'detyam'],
-  'concerts-genre': ['concerts', 'concerts-genres'],
-  'moscow-museums': ['moscow-museums-workshops'],
-  'active-sport': ['active-extreme', 'autosport'],
-};
-
-const LANDING_RULES = [
-  {
-    slug: 'river-cruises',
-    title: 'Речные прогулки',
-    subtitle: 'Теплоходы, катера, реки и каналы',
-    chips: ['теплоход', 'катер', 'причалы'],
-    tags: ['Водные экскурсии', 'Реки и каналы', 'На теплоходе', 'Водная экскурсия', 'На катере', 'Теплоходные экскурсии', 'Речные прогулки'],
-    keywords: ['теплоход', 'катер', 'река', 'речн', 'канал', 'причал', 'прогулк'],
-    keywordScope: 'content',
-    requiredAnySubcategories: ['Водные экскурсии', 'Речные прогулки'],
-    excludeKeywords: ['автобус', 'пешеход', 'парадн', 'двор', 'коммунал', 'мастер-класс', 'квест', 'концерт', 'вечеринк', 'дискотек', 'церк', 'храм', 'кирх', 'орган', 'музыкальн', 'аренда', 'чартер'],
-  },
-  {
-    slug: 'river-party',
-    title: 'Вечеринки и дискотеки на теплоходе',
-    subtitle: 'DJ, живая музыка и ночные речные круизы',
-    chips: ['дискотека', 'DJ', 'вечеринка', 'ночь'],
-    tags: ['Дискотека', 'Живая музыка', 'Вечеринка'],
-    keywords: ['дискотек', 'вечеринк', 'ди-джей', 'dj', 'музыкальн', 'круиз', 'теплоход', 'речн', 'катере', 'нева'],
-    keywordScope: 'content',
-    requiredTitleKeywordGroups: [
-      ['дискотек', 'вечеринк', 'ди-джей', 'dj', 'концерт', 'музыкальн'],
-    ],
-    requiredKeywordGroups: [
-      ['теплоход', 'теплоходн', 'речн', 'катере', 'катера', 'корабл', 'яхт', 'причал', 'канал', 'нева', 'круиз'],
-    ],
-    excludeKeywords: ['автобус', 'автобусн', 'пешеход'],
-    excludeKeywordFields: ['title', 'category', 'sourceCategory', 'venue', 'subcategory'],
-  },
-  {
-    slug: 'bridges-night',
-    title: 'Разводные мосты',
-    subtitle: 'Ночные прогулки к разводке мостов по Неве и каналам',
-    chips: ['ночные', 'мосты', 'теплоход'],
-    city: 'Санкт-Петербург',
-    tags: ['Разводные мосты', 'Ночные'],
-    keywords: ['мост', 'развод', 'ночн', 'нева', 'теплоход', 'катер'],
-    keywordScope: 'content',
-    requiredAnyKeywords: ['мост', 'развод'],
-    excludeKeywords: ['автобус', 'пешеход', 'парадн', 'двор', 'коммунал'],
-    minStartsAtHour: 22,
-    includeStartsAtHourUntil: 6,
-  },
-  {
-    slug: 'new-year',
-    title: 'Отмечаем Новый год',
-    subtitle: 'Елки, шоу, концерты и праздничные программы',
-    chips: ['декабрь', 'детям', 'шоу'],
-    keywords: ['новогод', 'новый год', 'елка', 'ёлка', 'рождество'],
-  },
-  {
-    slug: 'moscow-dinner-boat',
-    title: 'Ужин на теплоходе в Москве',
-    subtitle: 'Вечерние речные программы с ужином',
-    city: 'Москва',
-    chips: ['ужин', 'Москва-река', 'вечер'],
-    tags: ['На теплоходе', 'Водная экскурсия'],
-    keywords: ['ужин', 'обед', 'ланч', 'бранч', 'завтрак', 'фуршет', 'банкет', 'ресторан', 'теплоход', 'москва-река', 'речн', 'корабл', 'яхт', 'судн'],
-    keywordScope: 'content',
-    requiredTitleKeywordGroups: [
-      ['ужин', 'обед', 'ланч', 'бранч', 'завтрак', 'фуршет', 'банкет', 'ресторан'],
-    ],
-    requiredKeywordGroups: [
-      ['теплоход', 'москва-река', 'речн', 'корабл', 'яхт', 'судн'],
-    ],
-    excludeKeywords: ['автобус', 'пешеход', 'мастер-класс'],
-  },
-  {
-    slug: 'salute-9-may',
-    title: 'Салют 9 мая',
-    subtitle: 'Лучшие точки обзора и экскурсии к Дню Победы',
-    chips: ['9 мая', 'салют', 'праздник'],
-    keywords: ['салют', 'фейерверк', 'день победы', 'праздничн', 'побед'],
-    requiredAnyKeywords: ['салют', 'фейерверк'],
-    keywordScope: 'content',
-    excludeKeywords: ['новогод', 'ёлка', 'елка', 'рождеств'],
-  },
-  {
-    slug: 'bus-tours',
-    title: 'Автобусные обзорные экскурсии',
-    subtitle: 'Городские маршруты и обзорные программы',
-    chips: ['автобус', 'обзорная', 'город'],
-    tags: ['Автобусные туры', 'Автобусные экскурсии'],
-    keywords: ['автобус', 'автобусн', 'обзорн', 'сити тур', 'city tour'],
-    requiredAnySubcategories: ['Автобусные туры', 'Автобусные экскурсии'],
-    requiredAnyVenueKeywords: ['туристическ', 'city sightseeing', 'hop on', 'hop-off', 'hop off'],
-    requiredTitleKeywordGroups: [
-      ['обзорн', 'экскурс', 'двухэтажн', 'hop on', 'city tour', 'сити тур'],
-    ],
-    requiredKeywordGroups: [
-      ['автобус', 'автобусн', 'двухэтажн', 'hop on', 'city tour', 'сити тур'],
-      ['обзорн', 'экскурс', 'hop on', 'city tour', 'сити тур'],
-    ],
-    excludeTags: ['Водные экскурсии', 'На теплоходе', 'На катере', 'Реки и каналы'],
-    excludeKeywords: ['теплоход', 'катер', 'лодк', 'корабл', 'причал', 'река', 'канал', 'нева', 'мост', 'пешеход', 'пешком', 'фест', 'фестиваль'],
-    excludeKeywordFields: ['title', 'category', 'sourceCategory', 'venue', 'subcategory'],
-  },
-  {
-    slug: 'standup',
-    title: 'Стендап и юмор',
-    subtitle: 'Комедийные шоу в барах и клубах',
-    chips: ['stand up', 'юмор', 'вечер'],
-    tags: ['Юмор', 'Stand up', 'Комедия', 'Импровизация'],
-    keywords: ['стендап', 'stand up', 'юмор', 'комеди'],
-  },
-  {
-    slug: 'planetarium',
-    title: 'Планетарий 1',
-    subtitle: 'Мультимедийные шоу и концерты',
-    chips: ['шоу', 'концерты', 'СПб'],
-    venue: 'Планетарий 1',
-  },
-  {
-    slug: 'spb-yards',
-    title: 'Дворы, парадные и коммуналки',
-    subtitle: 'Авторские прогулки по скрытому Петербургу',
-    city: 'Санкт-Петербург',
-    chips: ['парадные', 'коммуналки', 'дворы'],
-    tags: ['Дворы и парадные', 'Экскурсия по парадным', 'Экскурсия по коммуналкам', 'Экскурсия по дворам', 'Интерьерная'],
-    requiredAnySubcategories: ['Дворы и парадные', 'Экскурсия по парадным', 'Экскурсия по коммуналкам', 'Экскурсия по дворам', 'Интерьерная'],
-    excludeTags: ['Водные экскурсии', 'На теплоходе', 'На катере', 'Реки и каналы'],
-    excludeKeywords: ['автобус', 'автобусн', 'теплоход', 'катер', 'речн', 'нева', 'канал', 'причал'],
-    excludeKeywordFields: ['title', 'category', 'sourceCategory', 'venue', 'subcategory'],
-  },
-  {
-    slug: 'family-kids',
-    title: 'Детям и семьям',
-    subtitle: 'Ёлки, цирк, шоу и анимация для детей',
-    chips: ['детям', 'семья', 'цирк'],
-    tags: ['Детям', 'Детская анимация', 'Шоу для детей', 'Цирк', 'Детское шоу'],
-    requiredAnySubcategories: ['Детям', 'Детская анимация', 'Шоу для детей'],
-    keywords: ['детск', 'семейн', 'цирк', 'анимац', 'для детей', 'ёлк', 'елк'],
-    keywordScope: 'content',
-    excludeKeywords: ['18+', 'stand up', 'стендап', 'комеди', 'юмор'],
-    excludeKeywordFields: ['title', 'category', 'sourceCategory'],
-  },
-  {
-    slug: 'concerts-genre',
-    title: 'Концерты',
-    subtitle: 'Рок, джаз, классика, эстрада и живые выступления',
-    chips: ['рок', 'джаз', 'классика'],
-    tags: ['Рок', 'Джаз', 'Классика', 'Поп', 'Эстрада', 'Металл', 'Альтернатива', 'Электронная музыка', 'Хип-хоп', 'Орган', 'Симфоническая музыка', 'Инди'],
-    keywords: ['концерт', 'live', 'симфон', 'оркестр', 'филармон'],
-    keywordScope: 'content',
-    excludeTags: ['Юмор', 'Stand up', 'Комедия', 'Импровизация', 'TV комики'],
-    excludeKeywords: ['стендап', 'stand up', 'комеди', 'юмор', 'импров'],
-    excludeKeywordFields: ['title', 'category', 'sourceCategory', 'subcategory'],
-  },
-  {
-    slug: 'moscow-museums',
-    title: 'Музеи и мастер-классы в Москве',
-    subtitle: 'Выставки, экскурсии и творческие занятия',
-    city: 'Москва',
-    chips: ['музеи', 'мастер-класс', 'творчество'],
-    tags: ['Музеи', 'Мастер-класс', 'Мастер-классы', 'Выставки', 'Искусство', 'Творчество'],
-    requiredAnySubcategories: ['Музеи', 'Мастер-класс', 'Мастер-классы', 'Выставки'],
-    keywords: ['мастер-класс', 'музе', 'выставк', 'эмаль'],
-    keywordScope: 'content',
-    excludeKeywords: ['автобус', 'автобусн', 'теплоход', 'речн'],
-    excludeKeywordFields: ['title', 'venue', 'subcategory'],
-  },
-  {
-    slug: 'active-sport',
-    title: 'Активный отдых и автоспорт',
-    subtitle: 'Дрифт, гонки и активные развлечения',
-    chips: ['дрифт', 'автоспорт', 'активный'],
-    tags: ['Автоспорт', 'Дрифт', 'Активный отдых'],
-    requiredAnySubcategories: ['Автоспорт', 'Дрифт', 'Активный отдых'],
-    keywords: ['дрифт', 'автоспорт', 'картинг', 'гонк', 'формул'],
-    keywordScope: 'content',
-  },
-];
 
 const CATEGORY_SUBTITLE = new Map([
   ['Экскурсии', ['экскурсии', 'уточнять по тегам', 'review']],
@@ -356,44 +339,23 @@ export function clearPublicDataCaches() {
   publicDestinationsCache = null;
   publicHomePreviewCache = null;
   publicEventRowsCache = null;
-  publicCatalogCache = null;
+  // Soft-invalidate catalog: keep last sessions for SWR while rebuild runs.
+  if (publicCatalogCache?.sessions) {
+    publicCatalogCache = { ...publicCatalogCache, expiresAt: 0 };
+  } else {
+    publicCatalogCache = null;
+  }
   publicStatsCache = null;
   publicEventRowsBuildPromise = null;
-  publicCatalogBuildPromise = null;
-  publicVenueHubCache = null;
-  publicVenueCatalogLists = null;
+  clearPublicVenueReadCache();
 }
 
 /** Прогрев тяжёлого каталога и индекса городов (вызывается при старте API). */
 export async function warmPublicCatalogCache(db) {
   await publicCatalogSessions(db);
-  const rows = await publicVenueHubRows(db, 500);
-  publicVenueCatalogLists = {
-    expiresAt: Date.now() + PUBLIC_CATALOG_CACHE_MS,
-    institution: [],
-    location: [],
-  };
-  for (const row of rows) {
-    const item = mapPublicVenueListItem(row);
-    if (item.template === 'institution') publicVenueCatalogLists.institution.push(item);
-    else publicVenueCatalogLists.location.push(item);
-  }
+  await warmPublicVenueCatalogCache(db);
 }
 
-function warmVenueCatalogList(family) {
-  if (!publicVenueCatalogLists || publicVenueCatalogLists.expiresAt <= Date.now()) return null;
-  if (family === 'institution') return publicVenueCatalogLists.institution;
-  if (family === 'location') return publicVenueCatalogLists.location;
-  return null;
-}
-
-function loadCityRouting() {
-  try {
-    return JSON.parse(readFileSync(path.join(PROJECT_ROOT, 'data', 'geo', 'city-routing.ru.json'), 'utf8'));
-  } catch {
-    return { standaloneCities: [], cityToRegion: {}, foreignCities: [] };
-  }
-}
 
 export async function buildAdminDashboard(db) {
   const [stats, categoryCountResult, destinationCountResult, launchSql] = await Promise.all([
@@ -445,15 +407,11 @@ function buildLaunchMetrics(events) {
     needsAttention: events.filter(
       (event) => event.status === 'needs_review' || event.readiness === 'review' || event.readiness === 'blocked',
     ).length,
-    priceBlocked: events.filter((event) => event.priceFrom == null).length,
+    priceBlocked: events.filter((event) => event.priceFrom == null).length, // display-price gap (<100/null), not public sale block
     purchaseBlocked: events.filter((event) => !event.purchaseReady).length,
     noImage: events.filter((event) => !event.hasImage).length,
     landingMatched: events.filter((event) => (event.landingHits || []).length > 0).length,
   };
-}
-
-export function isSaleableEventForPublic(event) {
-  return Boolean(hasUpcomingOrOpenSchedule(event) && event.purchaseReady && Number.isFinite(event.priceFrom) && event.priceFrom >= MIN_DISPLAY_PRICE_RUB);
 }
 
 export async function buildAdminCitiesList(db, searchParams = new URLSearchParams()) {
@@ -942,7 +900,7 @@ async function queryAdminOrdersLean(db, { includeArchived }) {
       ) ticket_stats on true
       where ($1::boolean and ext_order."archivedAt" is not null)
          or (not $1::boolean and ext_order."archivedAt" is null)
-      order by coalesce(ext_order."purchasedAt", ext_order."updatedAt") desc
+      order by coalesce(ext_order."purchasedAt", ext_order."updatedAt") desc, ext_order.id desc
     `,
     [includeArchived],
   );
@@ -957,7 +915,11 @@ function matchesAdminOrderListFilters(order, { view, provider, status, q, includ
   if (view === 'pending_refunds' && !isRefundStatus(order.status)) return false;
   if (view === 'archivable' && !order.canArchive) return false;
   if (provider !== 'ALL' && order.sourceCode !== provider) return false;
-  if (status !== 'all' && String(order.status || '').toLowerCase() !== status) return false;
+  if (status === 'paid' && !isConfirmedOrderStatus(order.status)) return false;
+  else if (status === 'pending' && !isProcessingOrderStatus(order.status)) return false;
+  else if (status === 'cancelled' && !isCanceledOrderStatus(order.status)) return false;
+  else if (status === 'error' && !isProblemOrderStatus(order.status)) return false;
+  else if (!['all', 'paid', 'pending', 'cancelled', 'error'].includes(status) && String(order.status || '').toLowerCase() !== status) return false;
   if (!q) return true;
   const haystack = [
     order.externalOrderId,
@@ -1760,7 +1722,10 @@ function mapAdminOrderRow(row) {
   const hasUnlinkedTickets =
     shouldExpectTicket &&
     (unlinkedTickets > 0 || tickets.some((ticket) => !ticket.eventId || !ticket.eventTitle));
-  const missingArtifact = shouldExpectTicket && ticketCount === 0;
+  // TC set/admission products often have empty tickets[] but paid sets_values - not a mirror gap.
+  const setProducts = listSetProductsFromSnapshot(row.buyerSnapshot);
+  const hasSetFulfillment = setProducts.length > 0;
+  const missingArtifact = shouldExpectTicket && ticketCount === 0 && !hasSetFulfillment;
   const sourceCode = String(row.sourceCode || '').toUpperCase();
   const eventTitlesFromRow = Array.isArray(row.eventTitles) ? row.eventTitles.filter(Boolean) : [];
   const eventTitles = Array.from(
@@ -1770,6 +1735,27 @@ function mapAdminOrderRow(row) {
   const eventTitle = eventTitles[0] || snapshotEventTitle || null;
   const sessionDates = tickets.map((ticket) => ticket.startsAt).filter(Boolean).sort();
   const eventDateLabel = row.firstStartsAt || sessionDates[0] || null;
+  const displayTickets =
+    tickets.length > 0
+      ? tickets
+      : setProducts.map((set, index) =>
+          mapAdminOrderTicket(
+            {
+              id: `set:${set.id || index + 1}`,
+              externalTicketId: firstString(set.name, set.id, `Набор ${index + 1}`),
+              status: row.status || 'done',
+              origin: 'set',
+              eventId: null,
+              sessionId: null,
+              eventTitle: snapshotEventTitle || firstString(set.name) || null,
+              eventSlug: null,
+              startsAt: null,
+            },
+            row.status,
+            row.buyerSnapshot,
+          ),
+        );
+  const displayTicketCount = ticketCount > 0 ? ticketCount : displayTickets.length;
 
   return {
     id: row.id,
@@ -1793,14 +1779,14 @@ function mapAdminOrderRow(row) {
     isArchived: Boolean(row.archivedAt),
     canArchive: !row.archivedAt && isArchivableOrderStatus(row.status),
     updatedAt: row.updatedAt || null,
-    ticketCount,
+    ticketCount: displayTicketCount,
     unlinkedTickets,
     eventTitle,
     eventTitles: eventTitles.length ? eventTitles : eventTitle ? [eventTitle] : [],
     eventDateLabel,
-    tickets,
+    tickets: displayTickets,
     amountRub: extractOrderAmountRub(row.buyerSnapshot),
-    artifactStatus: missingArtifact ? 'missing' : ticketCount > 0 ? 'tickets' : 'not_required',
+    artifactStatus: missingArtifact ? 'missing' : displayTicketCount > 0 || hasSetFulfillment ? 'tickets' : 'not_required',
     refundRequestsCount: 0,
     hasPendingRefundRequests: isRefundStatus(row.status),
     needsAttention: problemStatus || missingArtifact || hasUnlinkedTickets,
@@ -1810,6 +1796,18 @@ function mapAdminOrderRow(row) {
       ...(hasUnlinkedTickets ? ['Есть билеты без связи с событием'] : []),
     ],
   };
+}
+
+/** TicketsCloud set/admission lines live in values.sets_values when seats tickets[] is empty. */
+function listSetProductsFromSnapshot(snapshot) {
+  const payload = snapshot && typeof snapshot === 'object' ? snapshot : {};
+  const values =
+    (payload.values && typeof payload.values === 'object' && payload.values) ||
+    (payload.sourcePayload?.values && typeof payload.sourcePayload.values === 'object' && payload.sourcePayload.values) ||
+    {};
+  const sets = values.sets_values;
+  if (!sets || typeof sets !== 'object' || Array.isArray(sets)) return [];
+  return Object.values(sets).filter((item) => item && typeof item === 'object');
 }
 
 function mapAdminOrderTicket(ticket, orderStatus = null, buyerSnapshot = null) {
@@ -2341,7 +2339,7 @@ export async function buildAdminLandingsList(db, searchParams = new URLSearchPar
     const matchedEventIds = new Set();
     allRows = LANDING_RULES.map((rule) => {
       const saved = savedBySlug.get(rule.slug);
-      const matched = events.filter((event) => matchesRule(event, rule));
+      const matched = events.filter((event) => matchesLandingRule(event, rule));
       matched.forEach((event) => matchedEventIds.add(event.id));
       const prices = matched.map((event) => event.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
       const readyEvents = matched.filter((event) => event.readiness === 'ready').length;
@@ -2476,7 +2474,7 @@ export async function buildAdminLandingDetail(db, landingSlug, searchParams = ne
   const manualByEventId = new Map(manualRows.map((row) => [row.eventId, row]));
   const groupedEvents = cached.items;
   const groupIdsFor = (event) => (event.groupEventIds?.length ? event.groupEventIds : [event.id]);
-  const autoMatchedGroups = groupedEvents.filter((event) => matchesRule(event, rule));
+  const autoMatchedGroups = groupedEvents.filter((event) => matchesLandingRule(event, rule));
   const autoIds = new Set(autoMatchedGroups.flatMap((event) => groupIdsFor(event)));
   const pinnedIds = new Set(manualRows.filter((row) => row.reasons?.manualStatus === 'PINNED').map((row) => row.eventId));
   const excludedIds = new Set(manualRows.filter((row) => row.reasons?.manualStatus === 'EXCLUDED').map((row) => row.eventId));
@@ -2585,7 +2583,7 @@ export async function buildAdminLandingEventCandidates(db, landingSlug, searchPa
   const groupedEvents = cached.items;
   const autoIds = new Set(
     groupedEvents
-      .filter((event) => matchesRule(event, rule))
+      .filter((event) => matchesLandingRule(event, rule))
       .flatMap((event) => (event.groupEventIds?.length ? event.groupEventIds : [event.id])),
   );
   const filtered = groupedEvents.filter((event) => {
@@ -2732,17 +2730,19 @@ export async function buildAdminTaxonomy(db) {
 export async function buildAdminVenuesList(db, searchParams) {
   const limit = clampNumber(searchParams.get('limit'), 1, 200, 80);
   const page = clampNumber(searchParams.get('page'), 1, 100000, 1);
-  const query = String(searchParams.get('q') || '').trim().toLowerCase();
+  const query = String(searchParams.get('q') || '').trim();
   const familyFilter = String(searchParams.get('family') || '').trim().toLowerCase();
-  const rows = await venueRows(db, 2000, { lean: true });
-  const filtered = rows.filter((venue) => {
-    if (query) {
-      const haystack = [venue.name, venue.city, venue.address, venue.proposedKind, venue.pageStatus]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase();
-      if (!haystack.includes(query)) return false;
-    }
+  const rows = await fetchLeanPublicVenueRows(2000, { leanText: true, q: query || undefined });
+  const facets = await fetchVenueEventFacetCounts(rows.map((row) => row.id));
+  const enriched = applyVenueEventFacetCounts(rows, facets).map((row) => {
+    const mapped = {
+      ...row,
+      name: formatPublicVenueTitle(row.name || row.title),
+    };
+    mapped.city = resolvePublicVenueCity(mapped);
+    return applyPublicVenueNormalization(mapped);
+  });
+  const filtered = enriched.filter((venue) => {
     if (!familyFilter) return true;
     const kind = normalizeVenueKindValue(venue.kind || venue.proposedKind);
     const isInstitution = INSTITUTION_VENUE_KINDS.has(kind);
@@ -2763,10 +2763,10 @@ export async function buildAdminVenuesList(db, searchParams) {
     total,
     rows: filtered.slice((safePage - 1) * limit, safePage * limit),
     metrics: {
-      venues: rows.length,
-      candidates: rows.filter((venue) => venue.pageStatus === 'candidate').length,
-      published: rows.filter((venue) => venue.pageStatus === 'published').length,
-      withEvents: rows.filter((venue) => venue.events > 0).length,
+      venues: enriched.length,
+      candidates: enriched.filter((venue) => venue.pageStatus === 'candidate').length,
+      published: enriched.filter((venue) => venue.pageStatus === 'published').length,
+      withEvents: enriched.filter((venue) => venue.events > 0).length,
     },
   };
 }
@@ -2790,7 +2790,12 @@ export async function buildAdminVenueDetail(db, venueId) {
           venue.address,
           venue.latitude,
           venue.longitude,
+          venue."metroStation",
+          venue."wayToFind",
+          venue."parkingInfo",
+          venue."hookFact",
           venue.kind,
+          venue."placeType",
           venue."pageStatus",
           city.title as city
         from "Venue" venue
@@ -2852,6 +2857,10 @@ export async function updateAdminVenue(db, venueId, payload) {
         "isIndexable" = $10,
         kind = $11::"VenueKind",
         "pageStatus" = $12::"VenuePageStatus",
+        "metroStation" = $13,
+        "wayToFind" = $14,
+        "parkingInfo" = $15,
+        "hookFact" = $16,
         "updatedAt" = now()
       where id = $1
       returning id
@@ -2869,6 +2878,10 @@ export async function updateAdminVenue(db, venueId, payload) {
       Boolean(next.isIndexable),
       next.kind || 'OTHER',
       next.pageStatus || 'NONE',
+      next.metroStation ?? null,
+      next.wayToFind ?? null,
+      next.parkingInfo ?? null,
+      next.hookFact ?? null,
     ],
   );
 
@@ -2920,6 +2933,359 @@ export async function updateAdminEventTaxonomy(db, eventId, payload) {
   const event = (await eventRowsByIds(db, [eventId]))[0] || null;
   invalidateAdminGroupedEventsCache(db, 'event taxonomy');
   return { eventId, event };
+}
+
+/**
+ * Заменяет STOP-пункты EventVenueRouteItem. Event.venueId (точка старта) не трогаем.
+ * payload.links: [{ venueId|slug, role?: 'STOP', sortOrder?, label? }]
+ */
+export async function updateAdminEventVenueLinks(db, eventId, payload) {
+  const exists = await db.query(`select id from "Event" where id = $1 limit 1`, [eventId]);
+  if (!exists.rows[0]) return null;
+
+  const rawLinks = Array.isArray(payload?.links) ? payload.links : [];
+  const prepared = [];
+  const seenVenueIds = new Set();
+
+  for (let index = 0; index < rawLinks.length; index += 1) {
+    const item = rawLinks[index] && typeof rawLinks[index] === 'object' ? rawLinks[index] : {};
+    const role = String(item.role || 'STOP').trim().toUpperCase() || 'STOP';
+    if (role !== 'STOP') continue;
+    const locator = normalizeNullableString(item.venueId || item.slug);
+    if (!locator) continue;
+    const venueResult = await db.query(
+      `select id from "Venue" where id = $1 or slug = $1 limit 1`,
+      [locator],
+    );
+    const venueId = venueResult.rows[0]?.id;
+    if (!venueId || seenVenueIds.has(venueId)) continue;
+    seenVenueIds.add(venueId);
+    const sortOrder = Number.isFinite(Number(item.sortOrder)) ? Math.trunc(Number(item.sortOrder)) : index;
+    prepared.push({
+      venueId,
+      role: 'STOP',
+      sortOrder,
+      label: normalizeNullableString(item.label),
+    });
+  }
+
+  prepared.sort((a, b) => a.sortOrder - b.sortOrder || a.venueId.localeCompare(b.venueId));
+
+  await db.query(
+    `delete from "event_venue_route_items" where "eventId" = $1 and role = 'STOP'::"RouteItemRole"`,
+    [eventId],
+  );
+
+  for (let index = 0; index < prepared.length; index += 1) {
+    const link = prepared[index];
+    await db.query(
+      `
+        insert into "event_venue_route_items" (
+          id, "eventId", "venueId", role, "sortOrder", label, "createdAt", "updatedAt"
+        ) values (
+          $1, $2, $3, 'STOP'::"RouteItemRole", $4, $5, now(), now()
+        )
+      `,
+      [
+        `evri_${randomUUID().replace(/-/g, '').slice(0, 24)}`,
+        eventId,
+        link.venueId,
+        Number.isFinite(link.sortOrder) ? link.sortOrder : index,
+        link.label,
+      ],
+    );
+  }
+
+  const venueLinks = await loadAdminEventVenueLinks(db, eventId);
+  return { eventId, venueLinks };
+}
+
+/** Geo suggest thresholds (aligned with scripts/lib/venue-route-geo.js + public nearby 300m). */
+const SUGGEST_STOP_RADIUS_M = Number(process.env.SUGGEST_STOP_RADIUS_M || 150);
+const SUGGEST_NEARBY_RADIUS_M = Number(process.env.SUGGEST_NEARBY_RADIUS_M || 300);
+const SUGGEST_SOFT_RADIUS_M = Number(process.env.SUGGEST_SOFT_RADIUS_M || 500);
+const SUGGEST_BBOX_DEG = Number(process.env.SUGGEST_BBOX_DEG || 0.008);
+const SUGGEST_MAX_CANDIDATES = Number(process.env.MAX_CANDIDATES_PER_EVENT || 20);
+const SUGGEST_KIND_ALLOWLIST = new Set([
+  'MONUMENT',
+  'PARK',
+  'ATTRACTION',
+  'TEMPLE',
+  'MUSEUM_ART_SPACE',
+  'OUTDOOR_LOCATION',
+  'MEETING_POINT',
+  'PIER',
+  'VENUE',
+]);
+const SUGGEST_KIND_SCORE = {
+  MONUMENT: 5,
+  PARK: 5,
+  ATTRACTION: 5,
+  TEMPLE: 5,
+  OUTDOOR_LOCATION: 4,
+  MUSEUM_ART_SPACE: 3,
+  PIER: 3,
+  MEETING_POINT: 2,
+  VENUE: 2,
+};
+
+function suggestConfidenceForDistance(distanceMeters) {
+  const d = Number(distanceMeters);
+  if (!Number.isFinite(d) || d < 0) return null;
+  if (d <= SUGGEST_STOP_RADIUS_M) return 'high';
+  if (d <= SUGGEST_NEARBY_RADIUS_M) return 'medium';
+  if (d <= SUGGEST_SOFT_RADIUS_M) return 'low';
+  return null;
+}
+
+function suggestRankScore({ distanceMeters, sameCity, kind }) {
+  const kindScore = SUGGEST_KIND_SCORE[String(kind || '').toUpperCase()] || 0;
+  return (sameCity ? 10 : 0) + kindScore - Number(distanceMeters) / 1000;
+}
+
+/**
+ * Geo-кандидаты STOP от start venue события. Не пишет БД, не трогает Event.venueId.
+ * options.radiusM - cap поиска (default 300, max soft 500).
+ */
+export async function suggestAdminEventVenueLinks(db, eventId, options = {}) {
+  const radiusCap = Math.min(
+    SUGGEST_SOFT_RADIUS_M,
+    Math.max(1, Number(options.radiusM) || SUGGEST_NEARBY_RADIUS_M),
+  );
+
+  const eventResult = await db.query(
+    `
+      select
+        e.id,
+        e."venueId",
+        e."primaryCityId",
+        start_venue.latitude as "startLat",
+        start_venue.longitude as "startLng",
+        start_venue."cityId" as "startCityId"
+      from "Event" e
+      left join "Venue" start_venue on start_venue.id = e."venueId"
+      where e.id = $1
+      limit 1
+    `,
+    [eventId],
+  );
+  const event = eventResult.rows[0];
+  if (!event) return null;
+
+  const startLat = Number(event.startLat);
+  const startLng = Number(event.startLng);
+  if (!isValidVenueCoordinatePair(startLat, startLng)) {
+    return {
+      eventId,
+      startVenueId: event.venueId || null,
+      suggestions: [],
+      reason: 'start_venue_missing_coords',
+      thresholds: {
+        high: SUGGEST_STOP_RADIUS_M,
+        medium: SUGGEST_NEARBY_RADIUS_M,
+        soft: SUGGEST_SOFT_RADIUS_M,
+        radiusM: radiusCap,
+      },
+    };
+  }
+
+  const existingResult = await db.query(
+    `
+      select "venueId"
+      from "event_venue_route_items"
+      where "eventId" = $1 and role = 'STOP'::"RouteItemRole"
+    `,
+    [eventId],
+  );
+  const existingStops = new Set(existingResult.rows.map((row) => row.venueId));
+
+  const cityId = event.primaryCityId || event.startCityId;
+  const kinds = [...SUGGEST_KIND_ALLOWLIST];
+  const venueResult = await db.query(
+    `
+      select
+        v.id,
+        v.slug,
+        v.title,
+        v.kind::text as kind,
+        v."cityId",
+        v."pageStatus"::text as "pageStatus",
+        v.latitude,
+        v.longitude
+      from "Venue" v
+      where v.latitude is not null
+        and v.longitude is not null
+        and v.kind::text = any($1::text[])
+        and v.kind <> 'ONLINE'::"VenueKind"
+        and v."pageStatus" in ('PUBLISHED'::"VenuePageStatus", 'CANDIDATE'::"VenuePageStatus")
+        and abs(v.latitude - $2) <= $3
+        and abs(v.longitude - $4) <= $3
+        ${cityId ? 'and v."cityId" = $5' : ''}
+    `,
+    cityId
+      ? [kinds, startLat, SUGGEST_BBOX_DEG, startLng, cityId]
+      : [kinds, startLat, SUGGEST_BBOX_DEG, startLng],
+  );
+
+  const suggestions = [];
+  for (const row of venueResult.rows) {
+    if (row.id === event.venueId) continue;
+    if (existingStops.has(row.id)) continue;
+    const latitude = Number(row.latitude);
+    const longitude = Number(row.longitude);
+    if (!isValidVenueCoordinatePair(latitude, longitude)) continue;
+
+    const distanceMeters = haversineMeters(startLat, startLng, latitude, longitude);
+    if (distanceMeters > radiusCap) continue;
+    const confidence = suggestConfidenceForDistance(distanceMeters);
+    if (!confidence) continue;
+
+    const sameCity = Boolean(cityId && row.cityId === cityId);
+    suggestions.push({
+      venueId: row.id,
+      slug: row.slug,
+      title: row.title,
+      kind: row.kind,
+      pageStatus: row.pageStatus,
+      distanceMeters: Math.round(distanceMeters * 10) / 10,
+      confidence,
+      sameCity,
+      role: 'STOP',
+      action: confidence === 'high' && sameCity ? 'auto-apply-ok' : 'suggest-only',
+      rank: suggestRankScore({ distanceMeters, sameCity, kind: row.kind }),
+    });
+  }
+
+  suggestions.sort((a, b) => b.rank - a.rank || a.distanceMeters - b.distanceMeters);
+
+  return {
+    eventId,
+    startVenueId: event.venueId || null,
+    suggestions: suggestions.slice(0, SUGGEST_MAX_CANDIDATES).map(({ rank, ...rest }) => rest),
+    thresholds: {
+      high: SUGGEST_STOP_RADIUS_M,
+      medium: SUGGEST_NEARBY_RADIUS_M,
+      soft: SUGGEST_SOFT_RADIUS_M,
+      radiusM: radiusCap,
+      bboxDeg: SUGGEST_BBOX_DEG,
+    },
+  };
+}
+
+/**
+ * Merge-insert STOP links. Never wipe existing STOP. Never touches Event.venueId.
+ * payload: { mode?: 'merge', links: [{ venueId|slug, role?: 'STOP', sortOrder?, label? }] }
+ */
+export async function applyAdminEventVenueLinks(db, eventId, payload) {
+  const exists = await db.query(
+    `select id, "venueId" from "Event" where id = $1 limit 1`,
+    [eventId],
+  );
+  const event = exists.rows[0];
+  if (!event) return null;
+
+  const mode = String(payload?.mode || 'merge').trim().toLowerCase();
+  if (mode !== 'merge') {
+    return { error: 'unsupported_mode', message: 'Only mode=merge is allowed (no replace-all wipe).' };
+  }
+
+  const rawLinks = Array.isArray(payload?.links) ? payload.links : [];
+  const prepared = [];
+  const seenVenueIds = new Set();
+
+  for (let index = 0; index < rawLinks.length; index += 1) {
+    const item = rawLinks[index] && typeof rawLinks[index] === 'object' ? rawLinks[index] : {};
+    const role = String(item.role || 'STOP').trim().toUpperCase() || 'STOP';
+    if (role !== 'STOP') continue;
+    const locator = normalizeNullableString(item.venueId || item.slug);
+    if (!locator) continue;
+    const venueResult = await db.query(
+      `select id from "Venue" where id = $1 or slug = $1 limit 1`,
+      [locator],
+    );
+    const venueId = venueResult.rows[0]?.id;
+    if (!venueId || seenVenueIds.has(venueId)) continue;
+    if (venueId === event.venueId) continue;
+    seenVenueIds.add(venueId);
+    const sortOrder = Number.isFinite(Number(item.sortOrder))
+      ? Math.trunc(Number(item.sortOrder))
+      : 100 + index;
+    prepared.push({
+      venueId,
+      sortOrder,
+      label: normalizeNullableString(item.label),
+    });
+  }
+
+  const applied = [];
+  for (const link of prepared) {
+    const result = await db.query(
+      `
+        insert into "event_venue_route_items" (
+          id, "eventId", "venueId", role, "sortOrder", label, "createdAt", "updatedAt"
+        ) values (
+          $1, $2, $3, 'STOP'::"RouteItemRole", $4, $5, now(), now()
+        )
+        on conflict ("eventId", "venueId", role) do nothing
+        returning id, "eventId", "venueId", role, "sortOrder", label
+      `,
+      [
+        `evri_${randomUUID().replace(/-/g, '').slice(0, 24)}`,
+        eventId,
+        link.venueId,
+        link.sortOrder,
+        link.label,
+      ],
+    );
+    if (result.rows[0]) {
+      applied.push({
+        id: result.rows[0].id,
+        venueId: result.rows[0].venueId,
+        role: result.rows[0].role,
+        sortOrder: result.rows[0].sortOrder,
+        label: result.rows[0].label,
+      });
+    }
+  }
+
+  invalidateAdminGroupedEventsCache(db, 'event venue links merge');
+  const venueLinks = await loadAdminEventVenueLinks(db, eventId);
+  return { eventId, mode: 'merge', applied, venueLinks };
+}
+
+async function loadAdminEventVenueLinks(db, eventId) {
+  const result = await db.query(
+    `
+      select
+        link.id,
+        link."eventId",
+        link."venueId",
+        link.role,
+        link."sortOrder",
+        link.label,
+        venue.slug,
+        venue.title,
+        venue.kind,
+        venue."pageStatus"
+      from "event_venue_route_items" link
+      join "Venue" venue on venue.id = link."venueId"
+      where link."eventId" = $1
+      order by link."sortOrder", venue.title
+    `,
+    [eventId],
+  );
+  return result.rows.map((row) => ({
+    id: row.id,
+    eventId: row.eventId,
+    venueId: row.venueId,
+    role: row.role,
+    sortOrder: row.sortOrder,
+    label: row.label,
+    slug: row.slug,
+    title: row.title,
+    kind: row.kind,
+    pageStatus: row.pageStatus,
+  }));
 }
 
 function mergeReadinessIssues(left = [], right = []) {
@@ -3146,264 +3512,6 @@ function publicEventGroupKey(event) {
   ].join('|');
 }
 
-export function regroupMappedPublicCatalogSessions(sessions) {
-  const groups = new Map();
-
-  for (const session of sessions) {
-    const key = session.groupKey;
-    if (!key) {
-      groups.set(`id:${session.id}`, session);
-      continue;
-    }
-
-    const slotFromSession = session.startsAt
-      ? {
-          eventId: session.id,
-          startsAt: session.startsAt,
-          dateLabel: session.dateLabel,
-          timeLabel: session.timeLabel,
-          purchaseUrl: session.purchaseUrl,
-          sourceStatus: session.sourceStatus || null,
-          purchaseReady: session.purchaseReady,
-          vacant: session.vacant ?? null,
-        }
-      : null;
-    const current = groups.get(key);
-
-    if (!current) {
-      groups.set(key, {
-        ...session,
-        groupEventIds: uniqueValues(session.groupEventIds || [session.id]),
-        groupedEventsCount: session.groupedEventsCount || 1,
-        sessionCount: session.sessionCount || (slotFromSession ? 1 : 0),
-        upcomingSlots: uniqueSlots(
-          (session.upcomingSlots || []).concat(slotFromSession ? [slotFromSession] : []),
-        ),
-      });
-      continue;
-    }
-
-    current.groupEventIds = uniqueValues(current.groupEventIds.concat(session.groupEventIds || [session.id]));
-    current.groupedEventsCount = current.groupEventIds.length;
-    current.sessionCount = (current.sessionCount || 0) + (session.sessionCount || (slotFromSession ? 1 : 0));
-    current.upcomingSlots = uniqueSlots(
-      (current.upcomingSlots || []).concat(session.upcomingSlots || []).concat(slotFromSession ? [slotFromSession] : []),
-    );
-    current.priceFrom = minNullableNumber([current.priceFrom, session.priceFrom]);
-    current.priceTo = maxNullableNumber([current.priceTo, session.priceTo, session.priceFrom]);
-    current.vacant = sumNullableNumbers([current.vacant, session.vacant]);
-    current.tags = uniqueValues((current.tags || []).concat(session.tags || []));
-    current.title = mergeCatalogDisplayTitle(current.title, session.title, current.venue || session.venue);
-    if (session.manualLandingStatus === 'PINNED') current.manualLandingStatus = 'PINNED';
-
-    if (shouldPromoteGroupedRepresentative(current, session)) {
-      const merged = {
-        groupKey: key,
-        groupEventIds: current.groupEventIds,
-        groupedEventsCount: current.groupedEventsCount,
-        sessionCount: current.sessionCount,
-        upcomingSlots: current.upcomingSlots,
-        priceFrom: current.priceFrom,
-        priceTo: current.priceTo,
-        vacant: current.vacant,
-        tags: current.tags,
-        manualLandingStatus: current.manualLandingStatus,
-      };
-      Object.assign(current, session, merged);
-    }
-  }
-
-  return Array.from(groups.values())
-    .map((session) => ({
-      ...session,
-      title: resolveCatalogDisplayTitle(session.title, session.venue),
-      groupedEventsCount: session.groupEventIds?.length || session.groupedEventsCount || 1,
-      sessionCount: session.sessionCount || session.upcomingSlots?.length || 1,
-      upcomingSlots: uniqueSlots(session.upcomingSlots || []).sort(
-        (a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime(),
-      ),
-    }))
-    .sort((a, b) => {
-      const aTime = a.startsAt ? new Date(a.startsAt).getTime() : Number.POSITIVE_INFINITY;
-      const bTime = b.startsAt ? new Date(b.startsAt).getTime() : Number.POSITIVE_INFINITY;
-      return aTime - bTime || String(a.title).localeCompare(String(b.title), 'ru');
-    });
-}
-
-const KNOWN_PIER_ADDRESS_PATTERNS = [
-  { key: 'sinopskaya-10', test: (text) => /синопск/.test(text) && /\b10\b/.test(text) },
-  { key: 'fontanka-53', test: (text) => /фонтанк/.test(text) && /\b53\b/.test(text) },
-];
-
-function sessionWidgetProvider(session) {
-  const code = String(session.offerSourceCode || session.purchaseProvider || session.sourceCode || '').toUpperCase();
-  if (code.includes('TEPLOHOD')) return 'TEPLOHOD';
-  if (code.includes('TICKETSCLOUD') || code === 'TC') return 'TICKETSCLOUD';
-  const url = String(session.purchaseUrl || '').toLowerCase();
-  if (url.includes('teplohod.info')) return 'TEPLOHOD';
-  if (url.includes('ticketscloud')) return 'TICKETSCLOUD';
-  const groupKey = String(session.groupKey || '').toLowerCase();
-  if (groupKey.startsWith('teplohod')) return 'TEPLOHOD';
-  if (groupKey.startsWith('ticketscloud')) return 'TICKETSCLOUD';
-  return null;
-}
-
-function isWidgetProviderSession(session) {
-  return sessionWidgetProvider(session) != null;
-}
-
-function canonicalPierLocationKey(name, address) {
-  const text = normalizeVenueTextKey(`${name || ''} ${address || ''}`);
-  if (!text) return null;
-
-  for (const pattern of KNOWN_PIER_ADDRESS_PATTERNS) {
-    if (pattern.test(text)) return pattern.key;
-  }
-
-  if (/причал|набереж/.test(text)) {
-    const addressKey = canonicalVenueAddressKey(name, address);
-    if (addressKey.length >= 8) return `pier|${addressKey}`;
-  }
-
-  return null;
-}
-
-function canonicalSessionPierKey(session) {
-  return canonicalPierLocationKey(session.venue, session.venueAddress);
-}
-
-function normalizeCrossSourceTourTitle(title) {
-  let text = String(title || '')
-    .toLowerCase()
-    .replace(/[«»"'“”]/g, ' ')
-    .replace(
-      /^(?:(?:обзорная|ночная|утренняя|авторская|детская|вечерняя)\s+)?(?:экскурсия|развлекательно\s*-\s*познавательная\s+программа)\s+/i,
-      '',
-    )
-    .replace(/\s+с\s+гидом\b/g, '')
-    .replace(/,\s*или\s+.+/g, '')
-    .replace(/\s+\d+\+\s*$/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-
-  return normalizeVenueTextKey(text);
-}
-
-function crossSourceTitlesMatch(leftTitle, rightTitle) {
-  const left = normalizeCrossSourceTourTitle(leftTitle);
-  const right = normalizeCrossSourceTourTitle(rightTitle);
-  if (!left || !right) return false;
-  if (left === right) return true;
-  if (left.includes(right) || right.includes(left)) return true;
-
-  const leftTokens = new Set(left.split(' ').filter((token) => token.length > 3));
-  const rightTokens = new Set(right.split(' ').filter((token) => token.length > 3));
-  if (!leftTokens.size || !rightTokens.size) return false;
-
-  let overlap = 0;
-  for (const token of leftTokens) {
-    if (rightTokens.has(token)) overlap += 1;
-  }
-
-  const minSize = Math.min(leftTokens.size, rightTokens.size);
-  return overlap >= 2 && overlap / minSize >= 0.6;
-}
-
-function crossSourceProviderScore(session) {
-  let score = 0;
-  if (sessionWidgetProvider(session) === 'TEPLOHOD') score += 100;
-  if (sessionWidgetProvider(session) === 'TICKETSCLOUD') score += 10;
-  if (session.purchaseReady !== false) score += 50;
-  if ((session.upcomingSlots || []).length > 0) score += 5;
-  if (session.imageUrl) score += 3;
-  if (session.manualLandingStatus === 'PINNED') score += 1000;
-  if (!isPublicSessionPurchaseBlocked(session)) score += 20;
-  return score;
-}
-
-function preferCrossSourceRepresentative(current, candidate) {
-  return crossSourceProviderScore(candidate) > crossSourceProviderScore(current);
-}
-
-function publicCrossSourceCatalogKey(session) {
-  const city = normalizeGroupPart(resolvePublicSessionCity(session));
-  const pier = canonicalSessionPierKey(session) || normalizeGroupPart(session.venue);
-  const title = normalizeCrossSourceTourTitle(session.title);
-  return `${city}|${pier}|${title}`;
-}
-
-function mergeCrossSourceSessions(current, candidate) {
-  const winner = preferCrossSourceRepresentative(current, candidate) ? candidate : current;
-  const mergedGroupEventIds = uniqueValues(
-    sessionGroupIds(current).concat(sessionGroupIds(candidate)),
-  );
-
-  return {
-    ...winner,
-    groupKey: publicCrossSourceCatalogKey(winner),
-    groupEventIds: mergedGroupEventIds,
-    groupedEventsCount: mergedGroupEventIds.length,
-    priceFrom: minNullableNumber([current.priceFrom, candidate.priceFrom]),
-    priceTo: maxNullableNumber([current.priceTo, candidate.priceTo, current.priceFrom, candidate.priceFrom]),
-    vacant: sumNullableNumbers([current.vacant, candidate.vacant]),
-    manualLandingStatus:
-      current.manualLandingStatus === 'PINNED' || candidate.manualLandingStatus === 'PINNED' ? 'PINNED' : null,
-  };
-}
-
-export function dedupeCrossSourceCatalogSessions(sessions) {
-  const passthrough = [];
-  const pierSessions = [];
-
-  for (const session of sessions || []) {
-    if (isWidgetProviderSession(session) && canonicalSessionPierKey(session)) {
-      pierSessions.push(session);
-    } else {
-      passthrough.push(session);
-    }
-  }
-
-  const used = new Set();
-  const merged = [];
-
-  for (let index = 0; index < pierSessions.length; index += 1) {
-    if (used.has(index)) continue;
-
-    let current = pierSessions[index];
-    used.add(index);
-    const pierKey = canonicalSessionPierKey(current);
-
-    for (let otherIndex = index + 1; otherIndex < pierSessions.length; otherIndex += 1) {
-      if (used.has(otherIndex)) continue;
-      const other = pierSessions[otherIndex];
-      if (canonicalSessionPierKey(other) !== pierKey) continue;
-      if (sessionWidgetProvider(current) === sessionWidgetProvider(other)) continue;
-      if (!crossSourceTitlesMatch(current.title, other.title)) continue;
-      current = mergeCrossSourceSessions(current, other);
-      used.add(otherIndex);
-    }
-
-    merged.push(current);
-  }
-
-  return passthrough.concat(merged);
-}
-
-function uniqueSlots(slots) {
-  const seen = new Set();
-  const result = [];
-  for (const slot of slots || []) {
-    const key = `${slot.startsAt || ''}|${slot.eventId || ''}`;
-    if (!slot.startsAt || seen.has(key)) continue;
-    seen.add(key);
-    result.push(slot);
-  }
-  return result;
-}
-
-function sessionGroupIds(session) {
-  return uniqueValues([session?.id, ...(session?.groupEventIds || [])]);
-}
 
 function primaryOfferMap(offers) {
   const map = new Map();
@@ -3419,13 +3527,6 @@ function primaryOfferMap(offers) {
   }
 
   return map;
-}
-
-function normalizeGroupPart(value) {
-  return String(value || '')
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, ' ');
 }
 
 function isDateLikeCatalogTitle(title) {
@@ -3453,35 +3554,6 @@ function normalizeCatalogGroupTitle(rawTitle) {
   return text;
 }
 
-function resolveCatalogDisplayTitle(rawTitle, venue) {
-  const normalized = normalizeCatalogGroupTitle(rawTitle);
-  if (normalized.length >= 3 && !isDateLikeCatalogTitle(normalized)) {
-    return formatPublicEventTitle(normalized);
-  }
-
-  const cleanRaw = String(rawTitle || '').replace(/\s+/g, ' ').trim();
-  if (cleanRaw && !isDateLikeCatalogTitle(cleanRaw)) return formatPublicEventTitle(cleanRaw);
-
-  const venueTitle = formatPublicVenueTitle(venue) || String(venue || '').trim();
-  if (venueTitle && venueTitle !== 'Не указано') return formatPublicEventTitle(venueTitle);
-
-  return formatPublicEventTitle(cleanRaw || 'Событие');
-}
-
-function mergeCatalogDisplayTitle(currentTitle, candidateTitle, venue) {
-  const candidates = [currentTitle, candidateTitle].filter(Boolean);
-  for (const raw of candidates) {
-    const normalized = normalizeCatalogGroupTitle(raw);
-    if (normalized.length >= 3 && !isDateLikeCatalogTitle(normalized)) {
-      return formatPublicEventTitle(normalized);
-    }
-  }
-  for (const raw of candidates) {
-    if (raw && !isDateLikeCatalogTitle(raw)) return formatPublicEventTitle(String(raw).trim());
-  }
-  return resolveCatalogDisplayTitle(candidates[0], venue);
-}
-
 const CATALOG_GROUP_TITLE_SOURCE_SQL = `coalesce(nullif(trim("overrideTitle"), ''), title)`;
 
 function catalogGroupTitleSqlExpression(column = CATALOG_GROUP_TITLE_SOURCE_SQL) {
@@ -3501,27 +3573,8 @@ function catalogGroupTitleSqlExpression(column = CATALOG_GROUP_TITLE_SOURCE_SQL)
   )`;
 }
 
-function uniqueValues(values) {
-  return Array.from(new Set(values.filter(Boolean)));
-}
-
-function maxNullableNumber(values) {
-  const numbers = values.filter((value) => Number.isFinite(value) && value >= MIN_DISPLAY_PRICE_RUB);
-  return numbers.length ? Math.max(...numbers) : null;
-}
-
-function minNullableNumber(values) {
-  const numbers = values.filter((value) => Number.isFinite(value) && value >= MIN_DISPLAY_PRICE_RUB);
-  return numbers.length ? Math.min(...numbers) : null;
-}
-
 function displayPriceFrom(...values) {
   return minNullableNumber(values);
-}
-
-function sumNullableNumbers(values) {
-  const numbers = values.filter((value) => Number.isFinite(value));
-  return numbers.length ? numbers.reduce((sum, value) => sum + value, 0) : null;
 }
 
 function maxSeverity(left, right) {
@@ -3592,12 +3645,13 @@ export async function buildAdminEventDetail(db, eventId) {
         orders: 0,
         ticketStatuses: [],
       },
+      venueLinks: [],
     };
   }
 
   const primaryEventId = eventIds.includes(eventId) ? eventId : eventIds[0];
 
-  const [sessionsResult, offersResult, salesResult, orderStatusResult, contentResult] = await Promise.all([
+  const [sessionsResult, offersResult, salesResult, orderStatusResult, contentResult, venueLinks] = await Promise.all([
     db.query(
       `
         select
@@ -3685,6 +3739,7 @@ export async function buildAdminEventDetail(db, eventId) {
       `,
       [primaryEventId],
     ),
+    loadAdminEventVenueLinks(db, primaryEventId),
   ]);
 
   const sessions = sessionsResult.rows.map((row) => ({
@@ -3764,6 +3819,7 @@ export async function buildAdminEventDetail(db, eventId) {
       orders,
       ticketStatuses: orderStatusResult.rows,
     },
+    venueLinks,
   };
 }
 
@@ -3893,14 +3949,19 @@ export async function buildPublicHome(db) {
     return publicHomeCache.payload;
   }
 
-  const [stats, destinations, catalogSessions, venues] = await Promise.all([
-    db.stats(),
-    destinationRows(db),
-    publicCatalogSessions(db),
-    publicVenues(db, 36),
-  ]);
-  const sessions = catalogSessions.slice(0, 180);
-  const landings = buildPublicLandings(catalogSessions);
+  const t0 = Date.now();
+  // Catalog first (destinations/landings/venues derive from it) - avoid parallel hub SQL.
+  const [stats, catalogSessions] = await Promise.all([db.stats(), publicCatalogSessions(db)]);
+  // Soft hub or top-N from sessions - never await full publicVenueHubRows cold rebuild (~5s).
+  const venues = await publicVenuesForHome(db, catalogSessions, 36);
+  const destinations = buildPublicDestinationRowsFromSessions(catalogSessions);
+  // Compact card DTO only - full session blobs made /api/public/home ~1.2MB.
+  const sessions = catalogSessions
+    .filter(sessionHasCoverImage)
+    .slice(0, 180)
+    .map((session) => toPublicHomeCardSession(session));
+  // Prefer catalog landingSlugs - rematch of 3k sessions was ~1.5s CPU on MSK.
+  const landings = buildPublicLandings(catalogSessions, { preferCachedSlugs: true });
 
   const payload = {
     generatedAt: new Date().toISOString(),
@@ -3920,6 +3981,10 @@ export async function buildPublicHome(db) {
     expiresAt: now + PUBLIC_CATALOG_CACHE_MS,
     payload,
   };
+
+  console.log(
+    `buildPublicHome: ${catalogSessions.length} sessions, ${venues.length} venues in ${Date.now() - t0}ms`,
+  );
 
   return payload;
 }
@@ -3979,7 +4044,10 @@ export async function buildPublicHomePreview(db) {
   const catalogSessions = await publicCatalogSessions(db);
   const payload = {
     generatedAt: new Date().toISOString(),
-    sessions: catalogSessions.filter(sessionHasCoverImage).slice(0, PUBLIC_HOME_PREVIEW_LIMIT),
+    sessions: catalogSessions
+      .filter(sessionHasCoverImage)
+      .slice(0, PUBLIC_HOME_PREVIEW_LIMIT)
+      .map((session) => toPublicHomeCardSession(session)),
     landings: buildPublicLandings(catalogSessions),
   };
 
@@ -4098,7 +4166,9 @@ export async function buildPublicSearch(db, searchParams) {
   }
 
   if (items.length < 8) {
-    const landings = buildPublicLandings(sessions).filter((landing) => landing.events > 0);
+    const landings = buildPublicLandings(sessions).filter(
+      (landing) => landing.events > 0 && !buildOffSeasonLandingSlugs().has(landing.slug),
+    );
     for (const landing of landings) {
       if (items.length >= 8) break;
       const label = `${landing.title} ${landing.subtitle}`.toLowerCase();
@@ -4122,11 +4192,10 @@ export async function buildPublicSearch(db, searchParams) {
 const PROMO_LANDING_ORDER = [
   'spb-yards',
   'bridges-night',
+  'moscow-city-day',
   'moscow-dinner-boat',
-  'moscow-museums',
   'river-party',
   'concerts-genre',
-  'salute-9-may',
   'family-kids',
   'new-year',
   'bus-tours',
@@ -4134,6 +4203,7 @@ const PROMO_LANDING_ORDER = [
   'standup',
   'planetarium',
   'active-sport',
+  'moscow-museums',
 ];
 
 const PUBLIC_LANDING_CATEGORY_PATH = new Map([
@@ -4153,6 +4223,7 @@ const PUBLIC_CITY_LANDING_PATH = new Map([
   ['spb-yards', 'spb-yards'],
   ['moscow-dinner-boat', 'dinner-boat'],
   ['moscow-museums', 'moscow-museums'],
+  ['moscow-city-day', 'den-goroda'],
   ['planetarium', 'planetarium'],
 ]);
 
@@ -4163,6 +4234,7 @@ const PUBLIC_DEFAULT_CITY_BY_LANDING = new Map([
   ['spb-yards', 'saint-petersburg'],
   ['moscow-dinner-boat', 'moscow'],
   ['moscow-museums', 'moscow'],
+  ['moscow-city-day', 'moscow'],
   ['planetarium', 'saint-petersburg'],
 ]);
 
@@ -4231,25 +4303,19 @@ const PROMO_CITY_LANDING_BOOSTS = {
   'saint-petersburg': ['spb-yards', 'bridges-night'],
   'санкт-петербург': ['spb-yards', 'bridges-night'],
   'spb': ['spb-yards', 'bridges-night'],
-  'moscow': ['moscow-dinner-boat', 'moscow-museums'],
-  'moskva': ['moscow-dinner-boat', 'moscow-museums'],
-  'москва': ['moscow-dinner-boat', 'moscow-museums'],
+  // City Day first; museums/workshops deliberately not boosted into Moscow top.
+  'moscow': ['moscow-city-day', 'moscow-dinner-boat', 'river-cruises', 'concerts-genre'],
+  'moskva': ['moscow-city-day', 'moscow-dinner-boat', 'river-cruises', 'concerts-genre'],
+  'москва': ['moscow-city-day', 'moscow-dinner-boat', 'river-cruises', 'concerts-genre'],
 };
 
-function scopePublicCatalogSessions(sessions, cityFilter) {
-  const key = String(cityFilter || '').trim().toLowerCase();
-  if (!key || key === 'all') return sessions;
-  return sessions.filter((session) => {
-    const cityName = String(session.city || '').toLowerCase();
-    const destination = String(session.destination || '').toLowerCase();
-    const citySlug = String(session.citySlug || session.sourceCitySlug || '').toLowerCase();
-    return cityName === key || destination === key || citySlug === key;
-  });
-}
+export { LANDING_PAGE_SESSION_LIMIT, scopePublicCatalogSessions, selectLandingPageSessions };
 
 function buildSortedPublicLandings(sessions, cityFilter = '') {
   return sortPromoLandings(
-    buildPublicLandings(sessions).filter((landing) => landing.events > 0),
+    buildPublicLandings(sessions).filter(
+      (landing) => landing.events > 0 && !buildOffSeasonLandingSlugs().has(landing.slug),
+    ),
     cityFilter,
   );
 }
@@ -4276,7 +4342,14 @@ export async function buildPublicPromoBlocks(db, searchParams) {
 export async function buildPublicLandingsCatalog(db, searchParams) {
   const cityFilter = String(searchParams.get('city') || '').trim().toLowerCase();
   const sessions = await publicCatalogSessions(db);
-  const landings = buildSortedPublicLandings(scopePublicCatalogSessions(sessions, cityFilter), cityFilter);
+  // Podborki selection exclusion - keep in sync with
+  // apps/web/src/lib/landing-features.ts (LANDING_SELECTION_EXCLUDED_SLUGS).
+  // Excluded slugs stay out of every selection feed while their landing
+  // pages remain reachable (thin listings auto-noindex).
+  const selectionExcludedSlugs = new Set(['active-sport']);
+  const landings = buildSortedPublicLandings(scopePublicCatalogSessions(sessions, cityFilter), cityFilter).filter(
+    (landing) => !selectionExcludedSlugs.has(String(landing.slug || '').trim()),
+  );
 
   return {
     generatedAt: new Date().toISOString(),
@@ -4299,12 +4372,30 @@ function resolveCityCardImageFromSlug(slug) {
 
 export async function buildCatalogSessions(db, searchParams) {
   const limit = clampNumber(searchParams.get('limit'), 1, 300, 100);
-  const offset = clampNumber(searchParams.get('offset'), 0, 100000, 0);
+  const page = clampNumber(searchParams.get('page'), 1, 100000, 1);
+  const offsetRaw = searchParams.get('offset');
+  const offset =
+    offsetRaw != null && String(offsetRaw).trim() !== ''
+      ? clampNumber(offsetRaw, 0, 100000, 0)
+      : page > 1
+        ? (page - 1) * limit
+        : 0;
   const query = String(searchParams.get('q') || '').trim().toLowerCase();
   const destination = searchParams.get('destination');
   const city = searchParams.get('city');
   const category = searchParams.get('category');
   const landing = searchParams.get('landing');
+  const excludeLandingSet = new Set(
+    [
+      ...searchParams.getAll('excludeLanding'),
+      ...String(searchParams.get('excludeLanding') || '')
+        .split(',')
+        .map((item) => item.trim())
+        .filter(Boolean),
+    ]
+      .map((slug) => String(slug || '').trim().toLowerCase())
+      .filter(Boolean),
+  );
   const date = searchParams.get('date');
   const sort = searchParams.get('sort') || 'time';
   const maxPriceRaw = searchParams.get('maxPrice');
@@ -4328,6 +4419,12 @@ export async function buildCatalogSessions(db, searchParams) {
     if (city && city !== 'all' && session.city !== city && session.destination !== city) return false;
     if (category && category !== 'all' && session.category !== category && !pickCatalogSubcategories(session).includes(category)) return false;
     if (landing && landing !== 'all' && !(session.landingSlugs || []).includes(landing)) return false;
+    if (excludeLandingSet.size) {
+      const sessionLandings = (session.landingSlugs || []).map((slug) =>
+        String(slug || '').trim().toLowerCase(),
+      );
+      if (sessionLandings.some((slug) => excludeLandingSet.has(slug))) return false;
+    }
     if (dateFrom || dateTo) {
       if (!matchesCatalogDateRange(session, dateFrom, dateTo)) return false;
     } else if (date && date !== 'all' && !matchesCatalogDate(session, date)) return false;
@@ -4342,7 +4439,14 @@ export async function buildCatalogSessions(db, searchParams) {
     });
 
   const sorted = sortCatalogSessions(rows, sort);
-  const arranged = sort === 'price' || sort === 'time' ? sorted : spreadCatalogSessionsByCoverImage(sorted);
+  const arranged =
+    sort === 'price' ||
+    sort === 'price_asc' ||
+    sort === 'price_desc' ||
+    sort === 'time' ||
+    sort === 'departing_soon'
+      ? sorted
+      : spreadCatalogSessionsByCoverImage(sorted);
   return { total: arranged.length, offset, limit, items: arranged.slice(offset, offset + limit), facets };
 }
 
@@ -4366,37 +4470,74 @@ function buildCatalogFacets(sessions) {
   };
 }
 
-export function sessionHasCoverImage(session) {
-  const url = String(session?.imageUrl || '').trim();
-  if (!url) return false;
-  if (url.startsWith('/images/cities/')) return false;
-  return true;
-}
-
 function normalizePublicSessionImageKey(imageUrl) {
   const raw = String(imageUrl || '').trim();
   if (!raw) return null;
 
+  if (raw.includes('/_next/image') && /[?&]url=/.test(raw)) {
+    try {
+      const proxy = new URL(raw.replace(/&amp;/g, '&'), 'https://daibilet.ru');
+      const inner = proxy.searchParams.get('url');
+      if (inner) return normalizePublicSessionImageKey(inner);
+    } catch {
+      // fall through
+    }
+  }
+
   let pathname = raw;
-  let hostname = '';
+  let search = '';
   try {
-    const parsed = new URL(raw, 'https://daibilet.ru');
+    const parsed = new URL(raw.replace(/&amp;/g, '&'), 'https://daibilet.ru');
+    if (parsed.port === '443' || parsed.port === '80') parsed.port = '';
     pathname = parsed.pathname;
-    hostname = parsed.hostname.toLowerCase();
+    search = parsed.search || '';
   } catch {
-    pathname = raw.split('?')[0]?.split('#')[0] || raw;
+    const bare = raw.split('#')[0] || raw;
+    const q = bare.indexOf('?');
+    pathname = q >= 0 ? bare.slice(0, q) : bare;
+    search = q >= 0 ? bare.slice(q) : '';
   }
 
   const normalizedPath = pathname.replace(/\/$/, '').toLowerCase();
-  const file = normalizedPath.split('/').filter(Boolean).pop() || '';
-  if (file && /\.(jpe?g|png|webp|gif|avif|bmp|svg)$/i.test(file)) {
-    if (/^[a-f0-9-]{16,}$/i.test(file.replace(/\.[^.]+$/, '')) || file.length >= 16) {
-      return `img:${file}`;
+  const file = decodeURIComponent(normalizedPath.split('/').filter(Boolean).pop() || '').toLowerCase();
+  const sizeSuffixRe =
+    /(?:[-_](?:\d{2,4}x\d{2,4}|w\d{2,4}|h\d{2,4}|q\d{2,3}|thumb|small|medium|large|cover|card|preview|resized?))+(?=\.[a-z0-9]+$)/i;
+
+  if (search) {
+    try {
+      const params = new URLSearchParams(search.startsWith('?') ? search.slice(1) : search);
+      const dirtyAlias = params.get('dirtyAlias') || params.get('dirty_alias');
+      if (dirtyAlias && dirtyAlias.trim()) {
+        const aliasFile = decodeURIComponent(dirtyAlias.trim()).toLowerCase().split('/').pop() || '';
+        if (aliasFile) {
+          const stripped = aliasFile.replace(sizeSuffixRe, '');
+          return `img:${stripped}`;
+        }
+      }
+    } catch {
+      // fall through
     }
-    if (hostname) return `img:${hostname}/${file}`;
   }
 
-  if (hostname) return `${hostname}${normalizedPath}`;
+  if (file && /\.(jpe?g|png|webp|gif|avif|bmp|svg)$/i.test(file)) {
+    const stripped = file.replace(sizeSuffixRe, '');
+    const oid = stripped.match(/^([a-f0-9]{24})\.(jpe?g|png|webp|gif|avif)$/i);
+    if (oid) return `tc-asset:${oid[1].toLowerCase()}`;
+    const teploVariant = stripped.match(/^([a-f0-9]{8,})-\d+\.(jpe?g|png|webp|gif|avif|bmp|svg)$/i);
+    if (teploVariant) return `stem:${teploVariant[1].toLowerCase()}`;
+    return `img:${stripped}`;
+  }
+
+  if (search) {
+    try {
+      const params = new URLSearchParams(search.startsWith('?') ? search.slice(1) : search);
+      const item = params.get('item') || params.get('id') || params.get('key');
+      if (item && item.trim()) return `img:q:${item.trim().toLowerCase()}`;
+    } catch {
+      // fall through
+    }
+  }
+
   return normalizedPath || null;
 }
 
@@ -4429,11 +4570,18 @@ export function spreadCatalogSessionsByCoverImage(sessions) {
 
 function sortCatalogSessions(sessions, sort) {
   const sorted = [...sessions];
-  if (sort === 'price') {
+  if (sort === 'price' || sort === 'price_asc') {
     return sorted.sort((a, b) => {
       const aPrice = Number.isFinite(a.priceFrom) ? a.priceFrom : Number.POSITIVE_INFINITY;
       const bPrice = Number.isFinite(b.priceFrom) ? b.priceFrom : Number.POSITIVE_INFINITY;
       return aPrice - bPrice || compareSessionTime(a, b);
+    });
+  }
+  if (sort === 'price_desc') {
+    return sorted.sort((a, b) => {
+      const aPrice = Number.isFinite(a.priceFrom) ? a.priceFrom : Number.POSITIVE_INFINITY;
+      const bPrice = Number.isFinite(b.priceFrom) ? b.priceFrom : Number.POSITIVE_INFINITY;
+      return bPrice - aPrice || compareSessionTime(a, b);
     });
   }
   if (sort === 'popular') {
@@ -4477,154 +4625,7 @@ function humanizeSlug(slug) {
     .join(' ');
 }
 
-export async function buildPublicVenuePage(db, venueSlugOrId) {
-  const venue = await resolvePublicVenueRow(db, venueSlugOrId);
-  if (!venue || venue.pageStatus === 'HIDDEN') return null;
-
-  const [catalogSessions, hubRows] = await Promise.all([
-    publicCatalogSessions(db),
-    publicVenueHubRows(db, 500, { requireEvents: false }),
-  ]);
-  const venueHeroImageFallbacks = buildActiveVenueEventCounts(catalogSessions).heroImageFallbacks;
-  const mergedGroup = findMergedVenueGroup(hubRows, venue.id);
-  const venueIds = mergedGroup?.mergedVenueIds || [venue.id];
-  const venueContexts = collectVenueSessionLookupContexts(venue, mergedGroup);
-  const sessions = lookupVenueCatalogSessions(venueIds, catalogSessions, venueContexts).slice(0, 120);
-  if (!sessions.length) {
-    const hasProfile =
-      Boolean(String(venue.address || '').trim()) &&
-      Boolean(String(venue.description || venue.shortDescription || '').trim());
-    const status = String(venue.pageStatus || '').toUpperCase();
-    const isLocationPage = publicVenuePageTemplate(resolvePublicVenueKindFromRow(venue)) === 'location';
-    if (!(isLocationPage && hasProfile && status !== 'NONE' && status !== 'HIDDEN')) {
-      return null;
-    }
-  }
-  const waterEvents = sessions.filter(isWaterCatalogSession).length;
-  const busEvents = sessions.filter(isBusCatalogSession).length;
-  const canonicalVenue =
-    mergedGroup && mergedGroup.id !== venue.id ? (await resolvePublicVenueRow(db, mergedGroup.id)) || venue : venue;
-  const relatedVenues = await publicRelatedVenues(db, venue.id, venue.city, 6, hubRows);
-  const hubGateRow = {
-    title: canonicalVenue.title,
-    name: canonicalVenue.title,
-    kind: canonicalVenue.kind,
-    pageStatus: canonicalVenue.pageStatus,
-    address: canonicalVenue.address,
-    description: canonicalVenue.description,
-    shortDescription: canonicalVenue.shortDescription,
-    events: sessions.length,
-    busEvents,
-    waterEvents,
-    totalEvents: sessions.length,
-  };
-  const inPublicHub = isPublicVenueHub(hubGateRow, { requireEvents: false });
-  const curatedMeetingPointPage =
-    !inPublicHub &&
-    resolvePublicVenueKindFromRow(hubGateRow) === 'meeting_point' &&
-    Boolean(String(canonicalVenue.address || '').trim()) &&
-    Boolean(String(canonicalVenue.description || canonicalVenue.shortDescription || '').trim()) &&
-    sessions.length > 0 &&
-    !['NONE', 'HIDDEN'].includes(String(canonicalVenue.pageStatus || '').toUpperCase());
-  if (!inPublicHub && !curatedMeetingPointPage) {
-    return null;
-  }
-  const prices = sessions.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
-  const categories = countBy(sessions.map((event) => event.category).filter(Boolean));
-  const routeCount = new Set(sessions.map((session) => session.groupKey || session.id).filter(Boolean)).size || sessions.length;
-  const resolvedType = resolvePublicVenueKind(canonicalVenue.kind, canonicalVenue.title, canonicalVenue.address, {
-    shortDescription: mergedGroup?.shortDescription || canonicalVenue.shortDescription,
-    description: canonicalVenue.description,
-    waterEvents,
-    busEvents,
-    totalEvents: sessions.length,
-  });
-  const displayName = applyPublicVenueDisplayName(
-    {
-      name: formatPublicVenueTitle(canonicalVenue.title),
-      address: mergedGroup?.address || canonicalVenue.address,
-      city: canonicalVenue.city || 'Не указан',
-    },
-    resolvedType,
-  );
-  const normalizedVenue = applyPublicVenueNormalization({
-    name: displayName,
-    title: displayName,
-    address: mergedGroup?.address || canonicalVenue.address,
-    city: canonicalVenue.city || 'Не указан',
-  });
-  const hasDescription = Boolean(String(canonicalVenue.description || mergedGroup?.shortDescription || canonicalVenue.shortDescription || '').trim());
-  const hasAddress = Boolean(String(normalizedVenue.address || '').trim());
-  const hasHeroImage = Boolean(resolveVenueHeroImageUrl(
-    {
-      id: canonicalVenue.id,
-      heroImageUrl: mergedGroup?.heroImageUrl || canonicalVenue.heroImageUrl,
-      mergedVenueIds: venueIds,
-    },
-    venueHeroImageFallbacks,
-  ));
-  const pageTemplate = publicVenuePageTemplate(resolvedType);
-  const sessionCount = sessions.length;
-  const weakVenuePage =
-    pageTemplate === 'location'
-      ? !hasAddress || (!hasDescription && !hasHeroImage) || sessionCount < 1
-      : routeCount < 3 || (!hasDescription && !hasHeroImage) || !hasAddress;
-  const isIndexable = canonicalVenue.isIndexable !== false && !weakVenuePage;
-
-  const venueCoordinates = resolvePublicVenueCoordinates(canonicalVenue, { resolvedType });
-
-  return {
-    generatedAt: new Date().toISOString(),
-    venue: {
-      id: canonicalVenue.id,
-      slug: publicVenueSlug(canonicalVenue.slug, normalizedVenue.name, canonicalVenue.id),
-      name: normalizedVenue.name,
-      title: normalizedVenue.name,
-      city: normalizedVenue.city || 'Не указан',
-      address: normalizedVenue.address,
-      latitude: venueCoordinates?.latitude ?? null,
-      longitude: venueCoordinates?.longitude ?? null,
-      type: resolvedType,
-      template: publicVenuePageTemplate(resolvedType),
-      pageStatus: canonicalVenue.pageStatus,
-      description: pickPublicVenueDescriptionText(canonicalVenue.shortDescription, canonicalVenue.description),
-      shortDescription: pickPublicVenueLeadText(canonicalVenue.shortDescription, canonicalVenue.description),
-      heroImageUrl: resolveVenueHeroImageUrl(
-        {
-          id: canonicalVenue.id,
-          heroImageUrl: mergedGroup?.heroImageUrl || canonicalVenue.heroImageUrl,
-          mergedVenueIds: venueIds,
-        },
-        venueHeroImageFallbacks,
-      ),
-      seoH1: canonicalVenue.seoH1,
-      seoTitle: canonicalVenue.seoTitle,
-      seoDescription: canonicalVenue.seoDescription,
-      canonicalPath: canonicalVenue.canonicalPath || `/${publicVenuePageTemplate(resolvedType) === 'location' ? 'locations' : 'venues'}/${publicVenueSlug(canonicalVenue.slug, normalizedVenue.name, canonicalVenue.id)}`,
-      isIndexable,
-      events: routeCount,
-      categories,
-    },
-    sessions,
-    relatedVenues,
-    stats: {
-      events: routeCount,
-      categories: Object.keys(categories).length,
-      priceFrom: prices.length ? Math.min(...prices) : null,
-    },
-  };
-}
-
-/** «Санкт-Петербург: афиша, экскурсии и билеты на сегодня, 19 июля | Дайбилет» */
-export function buildCityHubSeoTitle(cityName, reference = new Date()) {
-  const name = String(cityName || '').trim() || 'Город';
-  const short = new Intl.DateTimeFormat('ru-RU', {
-    day: 'numeric',
-    month: 'long',
-    timeZone: 'Europe/Moscow',
-  }).format(reference);
-  return `${name}: афиша, экскурсии и билеты на сегодня, ${short} | Дайбилет`;
-}
+/** Расстояние между двумя WGS84 точками в метрах. */
 
 export async function buildPublicCityPage(db, citySlugOrId) {
   const requestedSlug = String(citySlugOrId || '').toLowerCase();
@@ -4633,15 +4634,63 @@ export async function buildPublicCityPage(db, citySlugOrId) {
     publicVenueHubRows(db, 500),
   ]);
   const matchedSessions = lookupDestinationCatalogSessions(citySlugOrId, requestedSlug, catalogSessions);
-  if (!matchedSessions.length) return null;
+  if (!matchedSessions.length) {
+    const standaloneName = matchStandaloneCityBySlug(requestedSlug) || matchStandaloneCityBySlug(citySlugOrId);
+    if (!standaloneName) return null;
+    const destination = publicDestinationFromSession({
+      destination: standaloneName,
+      destinationType: 'city',
+      city: standaloneName,
+    });
+    let cityVenues = [];
+    try {
+      const found = await db.query('select id from "City" where title = $1 limit 1', [standaloneName]);
+      const cityId = found?.rows?.[0]?.id;
+      if (cityId) cityVenues = await publicPublishedVenuesByCityId(db, cityId, 250);
+    } catch {
+      cityVenues = [];
+    }
+    const entityLabel = destinationPrepositional(destination);
+    return {
+      generatedAt: new Date().toISOString(),
+      city: {
+        id: destination.id,
+        slug: destination.slug,
+        sourceSlug: destination.sourceSlug,
+        name: destination.name,
+        title: destination.name,
+        type: 'city',
+        isDestination: true,
+        events: 0,
+        venues: cityVenues.length,
+        categories: {},
+        seoTitle: buildCityHubSeoTitle(destination.name),
+        seoDescription: `Афиша событий, экскурсий, музеев и активностей ${entityLabel}. Быстрый выбор по датам, площадкам и категориям.`,
+      },
+      sessions: [],
+      venues: cityVenues,
+      landings: [],
+      stats: {
+        events: 0,
+        venues: cityVenues.length,
+        categories: 0,
+        priceFrom: null,
+      },
+    };
+  }
 
   const destination = publicDestinationFromSession(matchedSessions[0]);
   const sessions = matchedSessions.slice(0, 160);
-  const cityVenues = await resolvePublicVenuesForSessions(db, matchedSessions, venueHubRows, 24);
+  const sessionVenues = await resolvePublicVenuesForSessions(db, matchedSessions, venueHubRows, 24);
+  const cityId = matchedSessions[0]?.cityId || null;
+  const contentVenues = cityId ? await publicPublishedVenuesByCityId(db, cityId, 250) : [];
+  const cityVenues = mergeCityPageVenues(sessionVenues, contentVenues, 250);
   const venueCount = countDistinctSessionVenues(matchedSessions);
   const prices = sessions.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
   const categories = countBy(sessions.map((event) => event.category).filter(Boolean));
-  const landings = buildPublicLandings(sessions).filter((landing) => landing.events > 0);
+  const landings = buildPublicLandings(sessions).filter(
+    (landing) => landing.events > 0 && !buildOffSeasonLandingSlugs().has(landing.slug),
+  );
   const entityLabel = destinationPrepositional(destination);
 
   return {
@@ -4672,16 +4721,23 @@ export async function buildPublicCityPage(db, citySlugOrId) {
   };
 }
 
-export async function buildPublicLandingPage(db, landingSlug) {
-  const rule = resolveLandingRule(landingSlug);
+export async function buildPublicLandingPage(db, landingSlug, cityFilter = '') {
+  const rule = resolveLandingRuleBySlug(landingSlug);
   if (!rule) return null;
 
   const catalogSessions = await publicCatalogSessions(db);
-  const sessions = filterSessionsForLandingRule(catalogSessions, rule);
-  const prices = sessions.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
-  const cities = countBy(sessions.map((event) => event.destination || event.city).filter(Boolean));
-  const categories = countBy(sessions.map((event) => event.category).filter(Boolean));
-  const venues = countBy(sessions.map((event) => event.venue).filter(Boolean));
+  const { matchedSessions, pageSessions, matchCount } = selectLandingPageSessions(
+    filterSessionsForLandingRule(catalogSessions.filter((session) => !isPublicCatalogExcludedMuseumAdmission(session)), rule),
+    cityFilter,
+  );
+  // Lean SSR: city-scoped first, then card budget - avoid national top-N starving city URLs.
+  const sessions = pageSessions.map((session) => toPublicCatalogListItem(session));
+  const prices = matchedSessions
+    .flatMap((session) => [session.priceFrom, session.priceTo])
+    .filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
+  const cities = countBy(matchedSessions.map((event) => event.destination || event.city).filter(Boolean));
+  const categories = countBy(matchedSessions.map((event) => event.category).filter(Boolean));
+  const venues = countBy(matchedSessions.map((event) => event.venue).filter(Boolean));
 
   return {
     generatedAt: new Date().toISOString(),
@@ -4691,11 +4747,11 @@ export async function buildPublicLandingPage(db, landingSlug) {
       subtitle: rule.subtitle,
       city: rule.city || null,
       chips: rule.chips || [],
-      events: sessions.length,
+      events: matchCount,
       venues: Object.keys(venues).length,
       priceFrom: prices.length ? Math.min(...prices) : null,
       imageUrl: null,
-      strength: sessions.length >= 20 ? 'ready' : sessions.length > 0 ? 'seed' : 'empty',
+      strength: matchCount >= 20 ? 'ready' : matchCount > 0 ? 'seed' : 'empty',
       seoTitle: `${rule.title}: афиша, расписание и билеты | Дайбилет`,
       seoDescription: `${rule.subtitle}. Табличный выбор по датам, городам, площадкам и цене.`,
     },
@@ -4703,18 +4759,19 @@ export async function buildPublicLandingPage(db, landingSlug) {
     relatedLandings: buildPublicLandings(sessions).filter((landing) => landing.slug !== rule.slug && landing.events > 0),
     blocks: buildDefaultLandingBlocks(rule, sessions),
     stats: {
-      events: sessions.length,
-      sessions: sessions.length,
+      events: matchCount,
+      sessions: matchCount,
       cities,
       categories,
       venues,
       priceFrom: prices.length ? Math.min(...prices) : null,
+      priceTo: prices.length ? Math.max(...prices) : null,
     },
   };
 }
 
-export async function buildPublicLandingPageManaged(db, landingSlug) {
-  const rule = resolveLandingRule(landingSlug);
+export async function buildPublicLandingPageManaged(db, landingSlug, cityFilter = '') {
+  const rule = resolveLandingRuleBySlug(landingSlug);
   if (!rule) return null;
 
   const [catalogSessions, landingResult] = await Promise.all([
@@ -4759,31 +4816,37 @@ export async function buildPublicLandingPageManaged(db, landingSlug) {
   const pinnedIds = new Set(manualRows.filter((row) => row.reasons?.manualStatus === 'PINNED').map((row) => row.eventId));
   const excludedIds = new Set(manualRows.filter((row) => row.reasons?.manualStatus === 'EXCLUDED').map((row) => row.eventId));
   const manualByEventId = new Map(manualRows.map((row) => [row.eventId, row]));
-  const sessions = catalogSessions
+  const ruleMatchedSessions = catalogSessions
     .filter((session) => {
+      // Global catalog exclusions win over PINNED, including stale cache reads.
+      if (isPublicCatalogExcludedMuseumAdmission(session)) return false;
       const ids = sessionGroupIds(session);
       if (ids.some((id) => excludedIds.has(id))) return false;
       if (ids.some((id) => pinnedIds.has(id))) return true;
-      return sessionMatchesLandingSlug(session, rule.slug) && sessionMatchesLandingSchedule(session, rule);
+      return matchesLandingRule(session, rule) && sessionMatchesLandingSchedule(session, rule);
     })
-    .slice(0, 48)
     .map((session) => {
       const pinned = sessionGroupIds(session).some((id) => pinnedIds.has(id));
-      const scheduled = pinned ? session : applyLandingScheduleToSession(session, rule);
+      return pinned ? session : applyLandingScheduleToSession(session, rule) || session;
+    });
+  const { matchedSessions, pageSessions, matchCount } = selectLandingPageSessions(ruleMatchedSessions, cityFilter);
+  const sessions = pageSessions.map((session) => {
       const base = {
-        ...(scheduled || session),
+        ...session,
         manualLandingStatus: sessionGroupIds(session).map((id) => manualByEventId.get(id)?.reasons?.manualStatus).find(Boolean) || null,
       };
-      // Lean SSR card for landing grids (keeps purchaseProvider; strips widget URLs / heavy slots).
+      // Lean SSR card for landing grids (keeps purchase URLs for CTA; truncates slots/description).
       return {
         ...toPublicCatalogListItem(base),
         manualLandingStatus: base.manualLandingStatus,
       };
     });
-  const prices = sessions.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
-  const cities = countBy(sessions.map((event) => event.destination || event.city).filter(Boolean));
-  const categories = countBy(sessions.map((event) => event.category).filter(Boolean));
-  const venues = countBy(sessions.map((event) => event.venue).filter(Boolean));
+  const prices = matchedSessions
+    .flatMap((session) => [session.priceFrom, session.priceTo])
+    .filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
+  const cities = countBy(matchedSessions.map((event) => event.destination || event.city).filter(Boolean));
+  const categories = countBy(matchedSessions.map((event) => event.category).filter(Boolean));
+  const venues = countBy(matchedSessions.map((event) => event.venue).filter(Boolean));
   const landing = mapLandingRecord(landingRecord, rule);
   const seo = mapLandingSeo(landingRecord, rule);
 
@@ -4796,11 +4859,11 @@ export async function buildPublicLandingPageManaged(db, landingSlug) {
       subtitle: landing.subtitle,
       city: rule.city || null,
       chips: rule.chips || [],
-      events: sessions.length,
+      events: matchCount,
       venues: Object.keys(venues).length,
       priceFrom: prices.length ? Math.min(...prices) : null,
       imageUrl: null,
-      strength: sessions.length >= 20 ? 'ready' : sessions.length > 0 ? 'seed' : 'empty',
+      strength: matchCount >= 20 ? 'ready' : matchCount > 0 ? 'seed' : 'empty',
       seoH1: seo.h1,
       seoTitle: seo.title,
       seoDescription: seo.description,
@@ -4811,12 +4874,13 @@ export async function buildPublicLandingPageManaged(db, landingSlug) {
     relatedLandings: buildPublicLandings(sessions).filter((landingItem) => landingItem.slug !== rule.slug && landingItem.events > 0),
     blocks: blockRows.length ? blockRows.map(mapLandingBlock) : buildDefaultLandingBlocks(rule, sessions),
     stats: {
-      events: sessions.length,
-      sessions: sessions.length,
+      events: matchCount,
+      sessions: matchCount,
       cities,
       categories,
       venues,
       priceFrom: prices.length ? Math.min(...prices) : null,
+      priceTo: prices.length ? Math.max(...prices) : null,
     },
   };
 }
@@ -4859,6 +4923,11 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
         venue.title as venue,
         venue.address as "venueAddress",
         venue.kind as "venueKind",
+        venue.latitude as "venueLatitude",
+        venue.longitude as "venueLongitude",
+        venue."metroStation" as "venueMetroStation",
+        venue."wayToFind" as "venueWayToFind",
+        venue."parkingInfo" as "venueParkingInfo",
         source.code as "sourceCode",
         source.name as "sourceName",
         source_link."externalId",
@@ -4878,7 +4947,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
       left join "Source" source on source.id = source_link."sourceId"
       left join "EventOverride" override on override."eventId" = e.id
       where e.id = $1 or e.slug = $1
-      group by e.id, cat.title, city.id, city.title, city.slug, city."isDestination", region.id, region.slug, region.title, venue.id, venue.slug, venue.title, venue.address, venue.kind, source.code, source.name, source_link."externalId", override.id
+      group by e.id, cat.title, city.id, city.title, city.slug, city."isDestination", region.id, region.slug, region.title, venue.id, venue.slug, venue.title, venue.address, venue.kind, venue.latitude, venue.longitude, venue."metroStation", venue."wayToFind", venue."parkingInfo", source.code, source.name, source_link."externalId", override.id
       limit 1
     `,
       [eventLocator],
@@ -4901,7 +4970,9 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
   if (!catalogSessions) {
     catalogSessions = await publicCatalogSessions(db);
   }
-  const eventDestination = publicDestinationForCity(event);
+  const eventCity = cleanDisplayName(event.city);
+  const eventHubs = STANDALONE_CITY_NAMES.has(eventCity) ? new Set([eventCity]) : undefined;
+  const eventDestination = publicDestinationForCity(event, eventHubs);
 
   const requestedSlug = publicEventSlug(eventSlugOrId);
   if (!targetPublicSession && catalogSessions?.length) {
@@ -4951,6 +5022,14 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
       ...metaResult.rows.map((row) => row.id),
     ]);
   }
+
+  // Ticket tariffs must be loaded from the page event (and merge peers), not from
+  // the entire dated TC sibling group. price ASC + limit 32 across hundreds of
+  // slots only returns child tariffs and hides adult/other categories.
+  const tariffOfferEventIds = uniqueValues([
+    event.id,
+    representativeRow.id || event.id,
+  ]);
 
   const [sessionsResult, offersResult] = await Promise.all([
     db.query(
@@ -5018,9 +5097,9 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
           coalesce((offer.payload->>'sortOrder')::int, 9999),
           offer."priceRub" asc nulls last,
           offer.id asc
-        limit 32
+        limit 64
       `,
-      [groupEventIds, MIN_DISPLAY_PRICE_RUB],
+      [tariffOfferEventIds, MIN_DISPLAY_PRICE_RUB],
     ),
   ]);
 
@@ -5091,11 +5170,16 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
     venue: event.venue || 'Не указано',
     venueAddress: event.venueAddress,
     venueKind: event.venueKind || 'OTHER',
+    venueLatitude: event.venueLatitude == null || !Number.isFinite(Number(event.venueLatitude)) ? null : Number(event.venueLatitude),
+    venueLongitude: event.venueLongitude == null || !Number.isFinite(Number(event.venueLongitude)) ? null : Number(event.venueLongitude),
+    venueMetroStation: normalizeNullableString(event.venueMetroStation),
+    venueWayToFind: normalizeNullableString(event.venueWayToFind),
+    venueParkingInfo: normalizeNullableString(event.venueParkingInfo),
     ageLimit: event.ageLimit,
     priceFrom: eventPriceFrom,
     vacant: targetPublicSession?.vacant ?? event.ticketsVacant,
     eventType: String(event.kind || '').toLowerCase(),
-    landingSlugs: targetPublicSession?.landingSlugs || LANDING_RULES.filter((rule) => matchesRule({ ...event, title: event.title, venue: event.venue, city: event.city, tags, sourceCategory: event.category }, rule)).map((rule) => rule.slug),
+    landingSlugs: targetPublicSession?.landingSlugs || LANDING_RULES.filter((rule) => matchesLandingRule({ ...event, title: event.title, venue: event.venue, city: event.city, tags, sourceCategory: event.category }, rule)).map((rule) => rule.slug),
     purchaseUrl,
     widgetUrl: primaryOffer?.widgetUrl || fallbackWidgetUrl,
     deeplinkUrl: primaryOffer?.deeplinkUrl || null,
@@ -5120,6 +5204,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
     baseEvent.institutionVenueId = institutionContext.id;
     baseEvent.institutionVenueSlug = institutionContext.slug;
   }
+  baseEvent.venueStops = await loadPublicEventVenueStops(db, event.id);
   const sessions = sessionsResult.rows.map((session) => {
     const sessionOffer = primaryOfferByEventId.get(session.eventId) || primaryOffer;
     const sourceRow = targetPublicSession && sessionGroupIds(targetPublicSession).includes(session.eventId) ? targetPublicSession : null;
@@ -5181,26 +5266,22 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
       }]
     : [];
   const publicSessions = sessions.length ? sessions : widgetOnlySessions;
+  if (!event.overrideSeoTitle && !event.seoTitle) {
+    const nearest = publicSessions[0];
+    const dateBit = [nearest?.dateLabel, nearest?.timeLabel].filter(Boolean).join(', ');
+    if (dateBit && nearest?.dateLabel && !String(event.title || '').includes(String(nearest.dateLabel))) {
+      baseEvent.seoTitle = `${event.title} (${dateBit}): билеты и расписание | Дайбилет`;
+    }
+  }
   applyEventPrimaryPurchase(baseEvent, publicSessions, event.sourceCode || primaryOffer?.sourceCode);
   const ticketPrices = buildPublicTicketPrices(publicOffers, publicSessions, baseEvent);
-  const relatedCandidates = catalogSessions.filter((session) => {
-    if (sessionGroupIds(session).some((id) => groupEventIds.includes(id))) return false;
-    if (event.cityId && session.cityId) return session.cityId === event.cityId;
-    return normalizeGroupPart(session.city) === normalizeGroupPart(event.city);
-  });
-  relatedCandidates.sort((left, right) => {
-    const score = (session) => {
-      let value = 0;
-      if (session.category === event.category) value += 2;
-      if (session.venueKind && session.venueKind === event.venueKind) value += 1;
-      if (session.venueId && session.venueId === event.venueId) value += 3;
-      return value;
-    };
-    const byScore = score(right) - score(left);
-    if (byScore !== 0) return byScore;
-    return String(left.startsAt || '').localeCompare(String(right.startsAt || ''));
-  });
-  const related = relatedCandidates.slice(0, 12);
+  const related = pickRelatedSessions(
+    event,
+    catalogSessions,
+    groupEventIds,
+    sessionGroupIds,
+    12,
+  );
   const priceValues = [baseEvent.priceFrom, ...publicSessions.map((session) => session.priceFrom)].filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
   const vacantValues = publicSessions.map((session) => session.vacant).filter((value) => Number.isFinite(value));
 
@@ -5236,45 +5317,13 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
       priceFrom: priceValues.length ? Math.min(...priceValues) : null,
       vacant: vacantValues.length ? vacantValues.reduce((sum, value) => sum + value, 0) : null,
     },
+    pdp: await readReadyPdpDocument(db, 'events', event.id),
   };
 }
 
 function readOfferSortOrder(value) {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : null;
-}
-
-export function preferNamedTicketOffers(rows) {
-  const list = rows || [];
-  const named = list.filter((row) => !isGenericTcOfferTitle(row.title));
-  return named.length ? named : list;
-}
-
-function isGenericTcOfferTitle(title) {
-  const key = normalizeGroupPart(title);
-  return !key || key === 'widget' || key.includes('ticketscloud widget');
-}
-
-export function dedupePublicOffers(rows) {
-  const unique = new Map();
-  for (const row of rows || []) {
-    const key = `${String(row.sourceCode || '')}|${normalizeGroupPart(row.title)}|${row.priceRub}`;
-    const sortOrder = readOfferSortOrder(row.sortOrder);
-    const existing = unique.get(key);
-    if (!existing) {
-      unique.set(key, row);
-      continue;
-    }
-    const existingOrder = readOfferSortOrder(existing.sortOrder) ?? 9999;
-    const nextOrder = sortOrder ?? 9999;
-    if (nextOrder < existingOrder) unique.set(key, row);
-  }
-
-  return Array.from(unique.values()).sort((a, b) => {
-    const aOrder = readOfferSortOrder(a.sortOrder) ?? 9999;
-    const bOrder = readOfferSortOrder(b.sortOrder) ?? 9999;
-    return aOrder - bOrder || Number(a.priceRub || 0) - Number(b.priceRub || 0) || String(a.title || '').localeCompare(String(b.title || ''), 'ru');
-  });
 }
 
 function buildPublicTicketPrices(offers, sessions, event) {
@@ -5355,6 +5404,27 @@ function splitTitlePartsWithoutWeekdays(title) {
   }
 
   return parts;
+}
+
+export function cleanImportedDescription(value) {
+  const cleaned = String(value || '')
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<\s*br\s*\/?>/gi, '\n')
+    .replace(/<\/\s*(p|div|li|h[1-6])\s*>/gi, '\n')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;|&apos;/gi, "'")
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n[ \t]+/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/[ \t]{2,}/g, ' ')
+    .trim();
+  return cleaned || null;
 }
 
 function isGenericPublicTicketDescription(value) {
@@ -5483,36 +5553,6 @@ function extractTcExternalIdFromPurchaseUrl(url) {
   return match ? decodeURIComponent(match[1]) : null;
 }
 
-function isPublicSessionPurchaseBlocked(session) {
-  const statuses = [session.sourceStatus, session.eventSourceStatus].map((value) => String(value || '').toLowerCase());
-  if (!session.startsAt && !isOpenDateCatalogRow(session)) return true;
-  if (statuses.some((status) => ['paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden'].includes(status))) {
-    return true;
-  }
-  if (session.purchaseReady === false) return true;
-  const purchaseUrl = session.purchaseUrl || session.widgetUrl || session.offerWidgetUrl || null;
-  const provider = String(session.purchaseProvider || session.offerSourceCode || session.sourceCode || '').toUpperCase();
-  if (
-    (provider.includes('TEPLOHOD') || provider.includes('TEP') || String(purchaseUrl).includes('teplohod.info')) &&
-    session.purchaseReady !== false &&
-    purchaseUrl
-  ) {
-    return false;
-  }
-  if (session.vacant === 0) return true;
-  return false;
-}
-
-function shouldPromoteGroupedRepresentative(current, candidate) {
-  if (!candidate?.startsAt) return false;
-  const currentBlocked = isPublicSessionPurchaseBlocked(current);
-  const candidateBlocked = isPublicSessionPurchaseBlocked(candidate);
-  if (currentBlocked && !candidateBlocked) return true;
-  if (!currentBlocked && candidateBlocked) return false;
-  if (!current.startsAt) return true;
-  return new Date(candidate.startsAt) < new Date(current.startsAt);
-}
-
 function pickPrimaryPurchasableSession(sessions) {
   for (const session of sessions || []) {
     if (isPublicSessionPurchaseBlocked(session)) continue;
@@ -5550,7 +5590,7 @@ function buildProviderWidgetPayload(row) {
     return {
       provider,
       tepEventId,
-      tepWidgetId: process.env.TEP_WIDGET_ID || '14208',
+      tepWidgetId: process.env.TEP_WIDGET_ID || '14460',
     };
   }
 
@@ -5716,9 +5756,10 @@ async function eventRows(db, limit, options = {}) {
     params,
   );
 
+  const separateCityHubs = collectSeparateCityHubNames(result.rows);
   return result.rows.map((row) => {
     const tags = row.tags || [];
-    const destination = publicDestinationForCity(row);
+    const destination = publicDestinationForCity(row, separateCityHubs);
     const fallbackDestinationName = cleanDisplayName(row.city) || 'Не указан';
     const priceFrom = displayPriceFrom(row.priceFromRub, row.sessionPriceFromRub, row.offerPriceRub);
     const purchase = purchaseInfo(row);
@@ -5793,7 +5834,7 @@ async function eventRows(db, limit, options = {}) {
         mergeGroupKey: row.overrideMergeGroupKey,
       },
       tags,
-      landingHits: LANDING_RULES.filter((rule) => matchesRule({ ...row, tags }, rule)).map((rule) => rule.title).slice(0, 3),
+      landingHits: LANDING_RULES.filter((rule) => matchesLandingRule({ ...row, tags }, rule)).map((rule) => rule.title).slice(0, 3),
       reasons,
       readinessCodes: readinessIssues.map((issue) => issue.code),
       readinessIssues,
@@ -5809,12 +5850,31 @@ async function eventRows(db, limit, options = {}) {
   });
 }
 
+/** TicketsCloud widget page rejects `token=r:…` with HTTPForbidden/bad token. */
+function sanitizeTicketscloudPurchaseUrl(url) {
+  const raw = String(url || '').trim();
+  if (!raw) return null;
+  if (!/ticketscloud/i.test(raw)) return raw;
+  try {
+    const parsed = new URL(raw);
+    const token = parsed.searchParams.get('token');
+    if (token && token.startsWith('r:')) parsed.searchParams.set('token', token.slice(2));
+    if (parsed.hostname === 'ticketscloud.org') parsed.hostname = 'ticketscloud.com';
+    return parsed.toString();
+  } catch {
+    return raw;
+  }
+}
+
 function purchaseInfo(row = {}) {
   const sourceCode = row.sourceCode || row.offerSourceCode;
   const provider = providerWidgetProvider(sourceCode);
-  const fallbackUrl = buildProviderWidgetUrl({ ...row, offerSourceCode: sourceCode });
+  const fallbackUrl = sanitizeTicketscloudPurchaseUrl(
+    buildProviderWidgetUrl({ ...row, offerSourceCode: sourceCode }),
+  );
   // Prefer rebuilt TEP checkout: stored teplohod.info/event/* deeplinks currently 404.
-  const explicitUrl = provider === 'TEPLOHOD' ? null : row.offerWidgetUrl || row.offerDeeplinkUrl || null;
+  const explicitRaw = provider === 'TEPLOHOD' ? null : row.offerWidgetUrl || row.offerDeeplinkUrl || null;
+  const explicitUrl = sanitizeTicketscloudPurchaseUrl(explicitRaw);
   const url = explicitUrl || fallbackUrl || null;
   const mode = provider === 'TEPLOHOD' || provider === 'TICKETSCLOUD' ? 'widget' : url ? 'redirect' : null;
   const urlSource = explicitUrl ? 'offer' : fallbackUrl ? 'fallback' : null;
@@ -5931,7 +5991,20 @@ function normalizeVenuePayload(payload) {
   }
 
   const normalized = {};
-  for (const key of ['title', 'description', 'shortDescription', 'heroImageUrl', 'seoH1', 'seoTitle', 'seoDescription', 'canonicalPath']) {
+  for (const key of [
+    'title',
+    'description',
+    'shortDescription',
+    'heroImageUrl',
+    'seoH1',
+    'seoTitle',
+    'seoDescription',
+    'canonicalPath',
+    'metroStation',
+    'wayToFind',
+    'parkingInfo',
+    'hookFact',
+  ]) {
     if (!Object.prototype.hasOwnProperty.call(payload, key)) continue;
     normalized[key] = normalizeNullableString(payload[key]);
   }
@@ -5942,7 +6015,7 @@ function normalizeVenuePayload(payload) {
 
   if (Object.prototype.hasOwnProperty.call(payload, 'kind')) {
     const value = normalizeNullableString(payload.kind);
-    const allowed = new Set(['VENUE', 'MUSEUM_ART_SPACE', 'THEATER', 'CONCERT_HALL', 'CLUB_BAR_RESTAURANT', 'PIER', 'MEETING_POINT', 'OUTDOOR_LOCATION', 'SPORT_ACTIVITY_SPACE', 'ATTRACTION', 'ONLINE', 'OTHER']);
+    const allowed = new Set(['VENUE', 'MUSEUM_ART_SPACE', 'THEATER', 'CONCERT_HALL', 'CLUB_BAR_RESTAURANT', 'PIER', 'MEETING_POINT', 'OUTDOOR_LOCATION', 'SPORT_ACTIVITY_SPACE', 'ATTRACTION', 'PARK', 'MONUMENT', 'GASTRO', 'TEMPLE', 'BUS', 'ONLINE', 'OTHER']);
     normalized.kind = value && allowed.has(value) ? value : null;
   }
 
@@ -5959,246 +6032,6 @@ function normalizeNullableString(value) {
   if (value == null) return null;
   const text = String(value).trim();
   return text ? text : null;
-}
-
-function formatPublicVenueTitle(value) {
-  if (value == null) return value;
-  return String(value)
-    .replace(/\s*\(\s*-?\d+(?:\.\d+)?\s*,\s*-?\d+(?:\.\d+)?\s*\)\s*$/u, '')
-    .trim();
-}
-
-function isValidVenueCoordinatePair(latitude, longitude) {
-  return Number.isFinite(latitude) && Number.isFinite(longitude) && Math.abs(latitude) <= 90 && Math.abs(longitude) <= 180;
-}
-
-function extractEmbeddedVenueCoordinates(...parts) {
-  const text = parts.filter(Boolean).join(' ');
-
-  const parenMatch = text.match(/\(\s*(-?\d{1,2}(?:\.\d+)?)\s*,\s*(-?\d{1,3}(?:\.\d+)?)\s*\)/u);
-  if (parenMatch) {
-    const latitude = Number(parenMatch[1]);
-    const longitude = Number(parenMatch[2]);
-    if (isValidVenueCoordinatePair(latitude, longitude)) return { latitude, longitude };
-  }
-
-  const decimalSlugMatch = text.match(/(?:^|[-_/])(-?\d{1,2}\.\d{3,})[-_/](-?\d{1,3}\.\d{3,})(?:[-_/]|$)/u);
-  if (decimalSlugMatch) {
-    const latitude = Number(decimalSlugMatch[1]);
-    const longitude = Number(decimalSlugMatch[2]);
-    if (isValidVenueCoordinatePair(latitude, longitude)) return { latitude, longitude };
-  }
-
-  const dashedSlugMatch = text.match(/(?:^|[-_/])(\d{1,2})-(\d{4,7})-(\d{1,3})-(\d{4,7})(?:[-_/]|$)/u);
-  if (dashedSlugMatch) {
-    const latitude = Number(`${dashedSlugMatch[1]}.${dashedSlugMatch[2]}`);
-    const longitude = Number(`${dashedSlugMatch[3]}.${dashedSlugMatch[4]}`);
-    if (isValidVenueCoordinatePair(latitude, longitude)) return { latitude, longitude };
-  }
-
-  return null;
-}
-
-export function resolvePublicVenueCoordinates(venue = {}, options = {}) {
-  const embedded = extractEmbeddedVenueCoordinates(venue.title, venue.name, venue.slug, venue.address);
-  if (embedded) return embedded;
-
-  const kind = options.resolvedType || venue.type || venue.kind;
-  const override = lookupLocationDescriptionCoordinates(
-    venue.slug,
-    venue.title || venue.name,
-    venue.id,
-  );
-  let latitude = override?.latitude ?? Number(venue.latitude);
-  let longitude = override?.longitude ?? Number(venue.longitude);
-  if (!isValidVenueCoordinatePair(latitude, longitude)) return null;
-
-  if (isPierVenueKind(kind) && !override) {
-    return adjustPierCoordinatesToWater(latitude, longitude, venue);
-  }
-
-  return { latitude, longitude };
-}
-
-let locationDescriptionCoordinatesCache = null;
-
-function getLocationDescriptionCoordinatesMap() {
-  if (locationDescriptionCoordinatesCache) return locationDescriptionCoordinatesCache;
-  const map = new Map();
-  try {
-    const filePath = path.resolve(
-      path.dirname(fileURLToPath(import.meta.url)),
-      '../../../scripts/data/location-descriptions.json',
-    );
-    const items = JSON.parse(readFileSync(filePath, 'utf8'));
-    for (const item of items) {
-      if (typeof item.latitude !== 'number' || typeof item.longitude !== 'number') continue;
-      const slug = String(item.slug || '').trim().toLowerCase();
-      if (!slug) continue;
-      const coords = { latitude: item.latitude, longitude: item.longitude };
-      map.set(slug, coords);
-      const shortSlug = slug.replace(/-[a-f0-9]{20,}$/i, '');
-      if (shortSlug !== slug) map.set(shortSlug, coords);
-    }
-  } catch {
-    // optional curated overrides
-  }
-  locationDescriptionCoordinatesCache = map;
-  return map;
-}
-
-function lookupLocationDescriptionCoordinates(slug, title, id) {
-  const candidates = [];
-  const add = (value) => {
-    const key = String(value || '').trim().toLowerCase();
-    if (!key) return;
-    candidates.push(key);
-    const transliterated = publicCitySlug(key);
-    if (transliterated && transliterated !== key) candidates.push(transliterated);
-    const deduped = dedupeVenueSlugSuffix(transliterated || key);
-    if (deduped && !candidates.includes(deduped)) candidates.push(deduped);
-  };
-
-  add(slug);
-  add(publicVenueSlug(slug, title, id));
-
-  const map = getLocationDescriptionCoordinatesMap();
-  for (const value of candidates) {
-    if (map.has(value)) return map.get(value);
-    const withoutHash = value.replace(/-[a-f0-9]{20,}$/i, '');
-    if (map.has(withoutHash)) return map.get(withoutHash);
-    for (const [key, coords] of map) {
-      if (value.startsWith(`${key}-`) || key.startsWith(`${value}-`)) return coords;
-    }
-  }
-  return null;
-}
-
-export function isPierVenueKind(kindOrType) {
-  const key = String(kindOrType || '')
-    .trim()
-    .toLowerCase()
-    .replace(/-/g, '_');
-  return key === 'pier' || key === 'pier_water';
-}
-
-function detectPierWaterOffset(venue = {}) {
-  const city = String(venue.city || '').toLowerCase();
-  const text = `${venue.address || ''} ${venue.title || ''} ${venue.name || ''}`.toLowerCase();
-  if (city.includes('петербург') || text.includes('санкт-петербург') || text.includes('спб')) {
-    return { dLat: -0.00094, dLng: 0.00116 };
-  }
-  if (city.includes('москва') || text.includes('москва')) {
-    return { dLat: -0.00072, dLng: 0.00042 };
-  }
-  if (city.includes('казан') || text.includes('казань')) {
-    return { dLat: -0.00055, dLng: 0.00035 };
-  }
-  if (/наб(?:ережн)?|причал|речн/i.test(text)) {
-    return { dLat: -0.00065, dLng: 0.0005 };
-  }
-  return null;
-}
-
-function adjustPierCoordinatesToWater(latitude, longitude, venue = {}) {
-  const offset = detectPierWaterOffset(venue);
-  if (!offset) return { latitude, longitude };
-  return {
-    latitude: latitude + offset.dLat,
-    longitude: longitude + offset.dLng,
-  };
-}
-
-function isVenueHallSuffix(suffix) {
-  const key = normalizeVenueTextKey(suffix);
-  if (!key) return true;
-  if (
-    /^(основной|малый|большой|маленький|верхний|нижний|концертный|выставочный|камерный|банкетный|театральный|красный|черный|белый|синий|зеленый|vip)(\s+зал)?$/.test(
-      key,
-    )
-  ) {
-    return true;
-  }
-  if (/^зал(\s+[a-zа-яё0-9\-]+)?$/i.test(key)) return true;
-  return false;
-}
-
-function canonicalVenueMergeTitle(name) {
-  let title = String(formatPublicVenueTitle(name) || '').trim();
-  if (!title) return title;
-
-  const segments = title.split(/\s*\|\s*/).map((part) => part.trim()).filter(Boolean);
-  if (segments.length <= 1) return title;
-  if (segments.slice(1).every((part) => isVenueHallSuffix(part))) return segments[0];
-  return title;
-}
-
-function applyPublicVenueNormalization(row = {}) {
-  const normalized = normalizePublicVenueRecord({
-    id: row.id,
-    title: row.name || row.title,
-    name: row.name || row.title,
-    address: row.address,
-    city: row.city,
-  });
-  return {
-    ...row,
-    name: normalized.title,
-    title: normalized.title,
-    address: normalized.address,
-    city: normalized.city || row.city,
-  };
-}
-
-function normalizeVenueTextKey(value) {
-  return String(value || '')
-    .toLowerCase()
-    .replace(/ё/g, 'е')
-    .replace(/[^a-z0-9а-я]+/gi, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-function venueTitleLooksLikeAddress(name) {
-  const text = String(name || '').toLowerCase();
-  return /(?:\bul\.|\bпр\.|\bпер\.|наб\.|,\s*с\.|,\s*д\.|,\s*дом\b|район,|область,|республик)/i.test(text);
-}
-
-function canonicalVenueAddressKey(name, address) {
-  let text = normalizeVenueTextKey(`${canonicalVenueMergeTitle(name) || formatPublicVenueTitle(name) || ''} ${address || ''}`);
-  text = text
-    .replace(/(?:^|\s)причал(?:\s|$)/g, ' ')
-    .replace(/(?:^|\s)наб(?:\s|$)/g, ' набережная ')
-    .replace(/(?:^|\s)ул(?:\s|$)/g, ' улица ')
-    .replace(/\s+/g, ' ')
-    .trim();
-  return text;
-}
-
-function normalizePublicVenueMergeKey(name, city, address) {
-  const title = normalizeVenueTextKey(canonicalVenueMergeTitle(name));
-  const cityKey = normalizeVenueTextKey(city || 'не указан');
-
-  if (/причал|набереж/i.test(`${name || ''} ${address || ''}`)) {
-    const pierKey = canonicalPierLocationKey(name, address);
-    if (pierKey) return `pier|${cityKey}|${pierKey}`;
-    return `pier|${cityKey}|${title}`;
-  }
-
-  if (hasBusLikeText(name, address)) {
-    return `bus|${cityKey}|${title}`;
-  }
-
-  if (venueTitleLooksLikeAddress(name)) {
-    return `geo|${title}`;
-  }
-
-  const addressKey = canonicalVenueAddressKey(name, address);
-  if (addressKey.length >= 10) {
-    return `addr|${cityKey}|${addressKey}`;
-  }
-
-  return `city|${cityKey}|${title}`;
 }
 
 function capitalizeLocality(value) {
@@ -6271,6 +6104,16 @@ const CITY_BOGUS_ALIASES = new Map([
   ['троение', 'Тольятти'],
 ]);
 
+
+function normalizeVenueTextKey(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/ё/g, 'е')
+    .replace(/[^a-z0-9а-я]+/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function canonicalizePublicCityName(value) {
   const raw = cleanDisplayName(value);
   if (!raw || raw === 'Не указан') return null;
@@ -6315,258 +6158,8 @@ function venueLocationContradictsCity(name, address, dbCity) {
   return false;
 }
 
-function resolvePublicVenueCity(row) {
-  const dbCity = cleanDisplayName(row.city);
-  const name = row.name || row.title || '';
-  const address = row.address || '';
-  const inferred = inferCityNameFromText(name, address);
-  const canonicalDb = canonicalizePublicCityName(dbCity);
 
-  if (inferred) return routeCityToPublicDisplayName(inferred);
-  if (canonicalDb) return routeCityToPublicDisplayName(canonicalDb);
-  if (dbCity && dbCity !== 'Не указан') return routeCityToPublicDisplayName(dbCity);
-  const locality = inferVenueLocalityLabel(name, address);
-  return locality ? routeCityToPublicDisplayName(locality) : 'Не указан';
-}
 
-function venueRowMergeScore(row) {
-  let score = (Number(row.events) || 0) * 1000;
-  if (row.heroImageUrl) score += 500;
-  if (String(row.pageStatus || '').toUpperCase() === 'PUBLISHED') score += 200;
-  if (row.address) score += 50;
-  if (row.shortDescription) score += 25;
-  return score;
-}
-
-function mergePublicVenueHubRows(rows) {
-  const groups = new Map();
-
-  for (const row of rows) {
-    const key = normalizePublicVenueMergeKey(row.name || row.title, row.city, row.address);
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key).push(row);
-  }
-
-  const merged = [];
-  for (const items of groups.values()) {
-    if (items.length === 1) {
-      const only = items[0];
-      const canonicalName = canonicalVenueMergeTitle(only.name || only.title) || only.name;
-      merged.push({ ...only, name: canonicalName, title: canonicalName, mergedVenueIds: [only.id] });
-      continue;
-    }
-
-    const sorted = [...items].sort((a, b) => venueRowMergeScore(b) - venueRowMergeScore(a));
-    const primary = sorted[0];
-    const canonicalName = canonicalVenueMergeTitle(primary.name || primary.title) || primary.name;
-    merged.push({
-      ...primary,
-      name: canonicalName,
-      title: canonicalName,
-      city: resolvePublicVenueCity(primary),
-      events: items.reduce((sum, item) => sum + (Number(item.events) || 0), 0),
-      waterEvents: items.reduce((sum, item) => sum + (Number(item.waterEvents) || 0), 0),
-      busEvents: items.reduce((sum, item) => sum + (Number(item.busEvents) || 0), 0),
-      heroImageUrl: sorted.find((item) => item.heroImageUrl)?.heroImageUrl || primary.heroImageUrl,
-      shortDescription: sorted.find((item) => item.shortDescription)?.shortDescription || primary.shortDescription,
-      description: sorted.find((item) => item.description)?.description || primary.description,
-      address: sorted.find((item) => item.address)?.address || primary.address,
-      mergedVenueIds: items.map((item) => item.id),
-    });
-  }
-
-  return merged.sort((a, b) => (b.events - a.events) || String(a.name || '').localeCompare(String(b.name || ''), 'ru'));
-}
-
-function findMergedVenueGroup(rows, venueId) {
-  if (!venueId) return null;
-  return rows.find((row) => row.id === venueId || (row.mergedVenueIds || []).includes(venueId)) || null;
-}
-
-function venueGroupsOverlap(a, b) {
-  const left = new Set(a?.mergedVenueIds || (a?.id ? [a.id] : []));
-  return (b?.mergedVenueIds || (b?.id ? [b.id] : [])).some((id) => left.has(id));
-}
-
-export async function publicVenueHubRows(db, limit = 500, options = {}) {
-  const now = Date.now();
-  const cacheKey = `${limit}:${options.requireEvents === false ? 'all' : 'hub'}`;
-  if (publicVenueHubCache?.cacheKey === cacheKey && publicVenueHubCache.expiresAt > now) {
-    return publicVenueHubCache.rows;
-  }
-
-  const [rows, sessions] = await Promise.all([venueRows(db, limit), publicCatalogSessions(db)]);
-  const { activeCounts, waterCounts, busCounts, heroImageFallbacks, nextSessionStartsAt } = buildActiveVenueEventCounts(sessions);
-  const enriched = rows.map((row) => ({
-    ...row,
-    events: activeCounts.get(row.id) || 0,
-    waterEvents: waterCounts.get(row.id) || 0,
-    busEvents: busCounts.get(row.id) || 0,
-    heroImageUrl: resolveVenueHeroImageUrl(row, heroImageFallbacks),
-    nextSessionStartsAt: nextSessionStartsAt.get(row.id) || null,
-  }));
-  const merged = mergePublicVenueHubRows(enriched.filter((row) => isPublicVenueHub(row, options)));
-  publicVenueHubCache = {
-    cacheKey,
-    expiresAt: now + PUBLIC_CATALOG_CACHE_MS,
-    rows: merged,
-  };
-  if (!publicVenueCatalogLists || publicVenueCatalogLists.expiresAt <= now) {
-    if (options.requireEvents !== false) {
-      publicVenueCatalogLists = {
-        expiresAt: now + PUBLIC_CATALOG_CACHE_MS,
-        institution: [],
-        location: [],
-      };
-      for (const row of merged) {
-        const item = mapPublicVenueListItem(row);
-        if (item.template === 'institution') publicVenueCatalogLists.institution.push(item);
-        else publicVenueCatalogLists.location.push(item);
-      }
-    }
-  }
-  return merged;
-}
-
-const PUBLIC_VENUE_ROW_SELECT = `
-  select
-    venue.id,
-    venue.slug,
-    venue.title,
-    venue.description,
-    venue."shortDescription",
-    venue."heroImageUrl",
-    venue."seoH1",
-    venue."seoTitle",
-    venue."seoDescription",
-    venue."canonicalPath",
-    venue."isIndexable",
-    venue.address,
-    venue.latitude,
-    venue.longitude,
-    venue.kind,
-    venue."pageStatus",
-    city.title as city
-  from "Venue" venue
-  left join "City" city on city.id = venue."cityId"
-`;
-
-async function resolvePublicVenueRow(db, venueSlugOrId) {
-  const value = String(venueSlugOrId || '').trim();
-  if (!value) return null;
-
-  const candidates = new Set([value]);
-  try {
-    candidates.add(decodeURIComponent(value));
-  } catch {
-    // ignore malformed URI sequences
-  }
-  candidates.add(publicCitySlug(value));
-  candidates.add(stripOpaqueVenueIdSuffix(publicCitySlug(value)));
-  for (const candidate of [...candidates]) {
-    const result = await db.query(`${PUBLIC_VENUE_ROW_SELECT} where venue.slug = $1 or venue.id = $1 limit 1`, [candidate]);
-    if (result.rows[0]) return result.rows[0];
-  }
-
-  const suffix = extractOpaqueIdSuffix(value);
-  if (suffix) {
-    const suffixResult = await db.query(`${PUBLIC_VENUE_ROW_SELECT} where venue.id = $1 or venue.id = $2 limit 1`, [`venue_${suffix}`, suffix]);
-    if (suffixResult.rows[0]) return suffixResult.rows[0];
-  }
-
-  return resolvePublicVenueRowByComputedSlug(db, value);
-}
-
-function normalizePublicVenueSlugKey(value) {
-  return dedupeVenueSlugSuffix(stripOpaqueVenueIdSuffix(publicCitySlug(value) || value));
-}
-
-async function resolvePublicVenueRowByComputedSlug(db, requestedSlug) {
-  const normalized = normalizePublicVenueSlugKey(requestedSlug);
-  if (!normalized) return null;
-
-  const numericSuffix = normalized.match(/-(\d+)$/);
-  if (numericSuffix) {
-    for (const venueId of [`venue_tep_${numericSuffix[1]}`, `venue_${numericSuffix[1]}`]) {
-      const result = await db.query(`${PUBLIC_VENUE_ROW_SELECT} where venue.id = $1 limit 1`, [venueId]);
-      const row = result.rows[0];
-      if (row && publicVenueSlug(row.slug, row.title, row.id) === normalized) return row;
-    }
-  }
-
-  const prefixResult = await db.query(
-    `${PUBLIC_VENUE_ROW_SELECT}
-     where venue.slug = $1
-        or venue.slug like $2
-     order by length(venue.slug) asc
-     limit 24`,
-    [normalized, `${normalized}-%`],
-  );
-  for (const row of prefixResult.rows) {
-    if (publicVenueSlug(row.slug, row.title, row.id) === normalized) return row;
-  }
-
-  const cyrillicResult = await db.query(
-    `${PUBLIC_VENUE_ROW_SELECT} where venue.slug ~ '[А-Яа-яЁё]' order by venue."updatedAt" desc nulls last limit 1200`,
-  );
-  for (const row of cyrillicResult.rows) {
-    if (publicVenueSlug(row.slug, row.title, row.id) === normalized) return row;
-  }
-
-  return null;
-}
-
-function cleanImportedDescription(value) {
-  if (value == null) return null;
-  const text = String(value)
-    .replace(/<\s*br\s*\/?>/gi, '\n')
-    .replace(/<\/\s*(p|div|li|h[1-6])\s*>/gi, '\n')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/&nbsp;/gi, ' ')
-    .replace(/&amp;/gi, '&')
-    .replace(/&quot;/gi, '"')
-    .replace(/&#39;|&apos;/gi, "'")
-    .replace(/&lt;/gi, '<')
-    .replace(/&gt;/gi, '>')
-    .replace(/[ \t]+\n/g, '\n')
-    .replace(/\n{3,}/g, '\n\n')
-    .replace(/[ \t]{2,}/g, ' ')
-    .trim();
-  return text ? text : null;
-}
-
-function isWeakVenueLeadText(value) {
-  const text = String(cleanImportedDescription(value) || '').trim();
-  if (!text) return true;
-  if (text.length < 24) return true;
-  if (/^(легенда|описание|текст|n\/a|нет|—|-)$/i.test(text)) return true;
-  return false;
-}
-
-function pickPublicVenueDescriptionText(shortDescription, description) {
-  const full = cleanImportedDescription(description);
-  if (full) return full;
-  const short = cleanImportedDescription(shortDescription);
-  if (short && !isWeakVenueLeadText(short)) return short;
-  return null;
-}
-
-function truncateVenueLeadText(text, maxLength = 220) {
-  const value = String(text || '').trim();
-  if (value.length <= maxLength) return value;
-  const slice = value.slice(0, maxLength - 1).trimEnd();
-  const lastSpace = slice.lastIndexOf(' ');
-  const clipped = lastSpace > Math.floor(maxLength * 0.55) ? slice.slice(0, lastSpace) : slice;
-  return `${clipped}...`;
-}
-
-function pickPublicVenueLeadText(shortDescription, description) {
-  const full = cleanImportedDescription(description);
-  const short = cleanImportedDescription(shortDescription);
-  if (short && !isWeakVenueLeadText(short)) return short;
-  if (!full) return null;
-  return truncateVenueLeadText(full);
-}
 
 function normalizePublishStatus(value, fallback = 'REVIEW') {
   const normalized = normalizeNullableString(value);
@@ -6783,7 +6376,7 @@ function buildDefaultLandingBlocks(rule, matchedEvents) {
 
 function mapLandingAdminEvent(event, manualRow, isAutoMatch, rule = null) {
   const manual = manualRow?.reasons || null;
-  const ruleExplanation = rule ? explainRuleMatch(event, rule) : { reasons: [], blockers: [] };
+  const ruleExplanation = rule ? explainLandingRuleMatch(event, rule) : { reasons: [], blockers: [] };
   const manualStatus = manual?.manualStatus || null;
   return {
     id: event.id,
@@ -6844,555 +6437,58 @@ function mapOverrideRow(row) {
   };
 }
 
-async function venueRows(db, limit, options = {}) {
-  const lean = Boolean(options.lean);
-  const result = await db.query(
-    `
-      select
-        venue.id,
-        venue.slug,
-        venue.title as name,
-        ${lean ? 'null::text as "shortDescription",' : 'venue."shortDescription",'}
-        ${lean ? 'null::text as description,' : 'venue.description,'}
-        venue."heroImageUrl",
-        city.title as city,
-        venue.address,
-        venue.kind,
-        venue."pageStatus",
-        count(event.id)::int as events,
-        count(event.id) filter (where ${PUBLIC_WATER_EVENT_SQL})::int as "waterEvents"
-      from "Venue" venue
-      left join "City" city on city.id = venue."cityId"
-      left join "Event" event on event."venueId" = venue.id
-      left join "Category" cat on cat.id = event."categoryId"
-      left join "Subcategory" sub on sub.id = event."primarySubcategoryId"
-      group by venue.id, city.title
-      order by events desc, venue.title asc
-      limit $1
-    `,
-    [limit],
-  );
 
-  return result.rows.map((row) => {
-    const name = formatPublicVenueTitle(row.name);
-    const mapped = {
-      id: row.id,
-      slug: row.slug,
-      name,
-      city: row.city || 'Не указан',
-      address: row.address,
-      shortDescription: row.shortDescription,
-      heroImageUrl: row.heroImageUrl,
-      proposedKind: String(row.kind || 'OTHER').toLowerCase(),
-      kind: String(row.kind || 'OTHER').toUpperCase(),
-      pageStatus: String(row.pageStatus || 'NONE').toLowerCase(),
-      reason: row.pageStatus === 'CANDIDATE' ? 'кандидат на public-страницу' : 'пока только локация',
-      events: row.events,
-      waterEvents: row.waterEvents,
-    };
-    mapped.city = resolvePublicVenueCity(mapped);
-    return applyPublicVenueNormalization(mapped);
-  });
-}
 
-const PUBLIC_VENUE_HUB_EXCLUDED_KINDS = new Set(['MEETING_POINT', 'ONLINE']);
+/** Short hub chips on `/cities` cards (CHPU landings). */
+const CITY_HUB_LANDING_SHORT = {
+  'river-cruises': 'Речные',
+  'bus-tours': 'Автобусные',
+  'river-party': 'Вечеринки',
+  'bridges-night': 'Мосты',
+  'moscow-dinner-boat': 'Ужин',
+  'moscow-museums': 'Музеи',
+  'moscow-city-day': 'День города',
+  'spb-yards': 'Дворы',
+  standup: 'Стендап',
+  'family-kids': 'Семьям',
+  'concerts-genre': 'Концерты',
+  'walking-tours': 'Пешие',
+  'country-tours': 'Загород',
+  exhibitions: 'Выставки',
+  'active-sport': 'Активный',
+  rooftops: 'Смотровые',
+  planetarium: 'Планетарий',
+  excursions: 'Экскурсии',
+  'unusual-theatres': 'Театр',
+  'new-year': 'Новый год',
+  'salute-9-may': 'Салют',
+};
 
-const INSTITUTION_VENUE_KINDS = new Set(['MUSEUM_ART_SPACE', 'THEATER', 'CONCERT_HALL', 'CLUB_BAR_RESTAURANT', 'BAR']);
-
-function normalizeVenueKindValue(value) {
-  return String(value || 'OTHER')
-    .trim()
-    .toUpperCase()
-    .replace(/-/g, '_');
-}
-
-export function publicVenuePageTemplate(kind) {
-  const normalized = normalizeVenueKindValue(kind);
-  return INSTITUTION_VENUE_KINDS.has(normalized) ? 'institution' : 'location';
-}
-
-const MEETING_POINT_TEXT_RE =
-  /место сбора|место встречи|точка сбора|точка встречи|площадка:|^метро\b|^м\.(?:\s|«|"|')|\bм\.\s*(?:«|[а-яё])|\bу метро\b|около метро|у памятник|памятник|\bпам\.|\bу пам\b|пл\.\s*у\s*пам/iu;
-
-function hasMeetingPointSignals(name, address, shortDescription, description) {
-  const text = `${venueNameAddressText(name, address)} ${shortDescription || ''} ${description || ''}`.toLowerCase();
-  return MEETING_POINT_TEXT_RE.test(text);
-}
-
-function isMeetingPointLikeRow(row) {
-  const resolved = resolvePublicVenueKindFromRow(row);
-  if (resolved === 'bus') return false;
-  if (resolved === 'meeting_point') return true;
-  const name = `${row.name || row.title || ''} ${row.address || ''}`.toLowerCase();
-  return MEETING_POINT_TEXT_RE.test(name);
-}
-
-function venueNameAddressText(name, address) {
-  return `${name || ''} ${address || ''}`.toLowerCase();
-}
-
-const PUBLIC_WATER_EVENT_TEXT_RE =
-  /водн|речн|теплоход|катер|яхт|корабл|судн|лодк|канал|круиз|развод.*мост|мост.*развод|прогулк/i;
-
-const PUBLIC_WATER_EVENT_SQL = `
-  (
-    coalesce(cat.title, '') ~* 'водн|речн|теплоход|катер'
-    or coalesce(sub.title, '') ~* 'водн|речн|теплоход|катер'
-    or coalesce(event.title, '') ~* 'теплоход|катер|яхт|корабл|судн|лодк|речн|река|канал|круиз|развод.*мост|мост.*развод|прогулк'
-    or exists (
-      select 1
-      from "EventTag" event_tag
-      join "Tag" tag on tag.id = event_tag."tagId"
-      where event_tag."eventId" = event.id
-        and tag.title ~* 'водн|речн|теплоход|катер|яхт|корабл'
-    )
-    or exists (
-      select 1
-      from "EventOffer" event_offer
-      where event_offer."eventId" = event.id
-        and event_offer.active = true
-        and event_offer."sourceCode"::text = 'TEPLOHOD'
-    )
-  )
-`;
-
-function isWaterCatalogSession(session) {
-  if (!session) return false;
-  if (String(session.sourceCode || '').toUpperCase().includes('TEPLOHOD')) return true;
-  const text = [session.category, session.title, ...(session.tags || []), session.sourceCode].filter(Boolean).join(' ').toLowerCase();
-  return PUBLIC_WATER_EVENT_TEXT_RE.test(text);
-}
-
-function hasWaterOnlyEvents(waterEvents, totalEvents) {
-  const water = Number(waterEvents || 0);
-  const total = Number(totalEvents || 0);
-  return total > 0 && water >= total;
-}
-
-const PUBLIC_BUS_EVENT_TEXT_RE =
-  /автобус|автобусн|hop[\s-]?on|hop[\s-]?off|city[\s-]?sightseeing|city[\s-]?tour|сити[\s-]?тур|двухэтажн|садись[\s-]?руляй/i;
-
-function isBusCatalogSession(session) {
-  if (!session) return false;
-  const text = [session.category, session.title, ...(session.tags || []), ...(session.subcategories || [])]
+function buildCityHubTags(bucket) {
+  const landingTags = Array.from(bucket.landings.entries())
+    .map(([slug, events]) => {
+      const rule = LANDING_RULES.find((item) => item.slug === slug);
+      const label = CITY_HUB_LANDING_SHORT[slug] || rule?.chips?.[0] || rule?.title || null;
+      if (!label) return null;
+      return { slug, label, events, kind: 'landing' };
+    })
     .filter(Boolean)
-    .join(' ')
-    .toLowerCase();
-  return PUBLIC_BUS_EVENT_TEXT_RE.test(text);
-}
+    .sort((a, b) => b.events - a.events || a.label.localeCompare(b.label, 'ru'))
+    .slice(0, 3);
 
-function hasBusOnlyEvents(busEvents, totalEvents) {
-  const bus = Number(busEvents || 0);
-  const total = Number(totalEvents || 0);
-  return total > 0 && bus >= total;
-}
+  if (landingTags.length >= 2) return landingTags;
 
-function hasActiveBusCatalogEvents(busEvents) {
-  return Number(busEvents || 0) > 0;
-}
-
-function hasBusLikeText(name, address) {
-  const text = venueNameAddressText(name, address);
-  if (
-    /автобус|bus[\s-]?stop|авт\.?\s*остан|автобусн(?:ая|ой)?\s+останов|остановк.*автобус|hop[\s-]?on|hop[\s-]?off|city[\s-]?sightseeing|city[\s-]?tour|сити[\s-]?тур|двухэтажн|маршрут.*автобус|садись[\s-]?руляй|^автобус$/i.test(
-      text,
-    )
-  ) {
-    return true;
-  }
-  if (/\bсектор\s*[«"'][A-ZBCАВСЕ]/i.test(text)) {
-    if (/причал|пристань|набереж|речн|канал|фонтанк|мойк|нев|мост|устьин|китай/i.test(text)) return false;
-    return true;
-  }
-  return false;
-}
-
-function isTransportVehicleVenueName(name) {
-  const text = String(name || '').trim();
-  if (!text) return false;
-  if (/^yutong\b|^маз\b|^паз\b|^hyundai\b|^mercedes\b|^volvo\b|^man\b|^ikarus\b/i.test(text)) return true;
-  if (/^[a-zа-яё][a-zа-яё\s-]{0,20}\d{3,5}$/i.test(text) && text.length <= 28) return true;
-  return false;
-}
-
-function isJunkPublicVenueRow(row) {
-  const name = String(row?.name || row?.title || '').trim();
-  const address = String(row?.address || '').trim();
-  const text = venueNameAddressText(name, address);
-
-  if (isTransportVehicleVenueName(name)) return true;
-  if (/^на парковке\b|парковк.*турист|турист.*транспорт|парковка.*(?:трц|торгов|молл)/i.test(text)) {
-    if (Number(row?.busEvents || 0) <= 0) return true;
-  }
-  if (/^wc\b|^туалет\b|^кондиционер\b/i.test(name)) return true;
-
-  const resolved = resolvePublicVenueKindFromRow(row);
-  if (resolved === 'meeting_point' && !hasActiveBusCatalogEvents(row?.busEvents)) return true;
-
-  return false;
-}
-
-function buildActiveVenueEventCounts(sessions) {
-  const activeCounts = new Map();
-  const waterCounts = new Map();
-  const busCounts = new Map();
-  const heroImageFallbacks = new Map();
-  const nextSessionStartsAt = new Map();
-  const seen = new Map();
-  const now = Date.now();
-
-  for (const session of sessions || []) {
-    if (!session?.venueId) continue;
-    if (!seen.has(session.venueId)) seen.set(session.venueId, new Set());
-    const keys = seen.get(session.venueId);
-    const key = session.groupKey || session.id;
-    if (!key || keys.has(key)) continue;
-    keys.add(key);
-    activeCounts.set(session.venueId, (activeCounts.get(session.venueId) || 0) + 1);
-    if (isWaterCatalogSession(session)) {
-      waterCounts.set(session.venueId, (waterCounts.get(session.venueId) || 0) + 1);
-    }
-    if (isBusCatalogSession(session)) {
-      busCounts.set(session.venueId, (busCounts.get(session.venueId) || 0) + 1);
-    }
-    if (!heroImageFallbacks.has(session.venueId)) {
-      const imageUrl = pickRealPublicImageUrl(session.imageUrl);
-      if (imageUrl) heroImageFallbacks.set(session.venueId, imageUrl);
-    }
-    if (session.startsAt) {
-      const at = parseSessionStartsAt(session.startsAt).getTime();
-      if (Number.isFinite(at) && at >= now - 30 * 60 * 1000) {
-        const previous = nextSessionStartsAt.get(session.venueId);
-        if (!previous || at < previous) nextSessionStartsAt.set(session.venueId, session.startsAt);
-      }
-    }
-  }
-
-  return { activeCounts, waterCounts, busCounts, heroImageFallbacks, nextSessionStartsAt };
-}
-
-function pickRealPublicImageUrl(value) {
-  const url = String(value || '').trim();
-  if (!url) return null;
-  if (url.startsWith('/images/cities/')) return null;
-  return /^https?:\/\//i.test(url) ? url : null;
-}
-
-function resolveVenueHeroImageUrl(row, heroImageFallbacks = null) {
-  const stored = pickRealPublicImageUrl(row?.heroImageUrl);
-  if (stored) return stored;
-
-  const venueIds = row?.mergedVenueIds || (row?.id ? [row.id] : []);
-  for (const venueId of venueIds) {
-    const fallback = heroImageFallbacks?.get(venueId);
-    if (fallback) return fallback;
-  }
-
-  return row?.heroImageUrl || null;
-}
-
-function hasStrongPierLocationText(name, address) {
-  const text = venueNameAddressText(name, address);
-  if (/смотров(?:ая|ой|ую|ые)\s+площадк/i.test(text)) return false;
-  if (/пассажирск(?:ий|ого|ая|ые)\s+терминал/i.test(text)) return true;
-  if (/морск(?:ой|ого|ая|ые)\s+вокзал/i.test(text)) return true;
-  if (/речн(?:ой|ая|ого|ые)?\s+(?:вокзал|порт)/i.test(text)) return true;
-  if (/причал|пристань/i.test(text)) return true;
-  if (/набереж/i.test(text) && /(?:терминал|вокзал|порт)/i.test(text)) return true;
-  return false;
-}
-
-function hasPierLikeText(name, address) {
-  return hasStrongPierLocationText(name, address);
-}
-
-function isViewingPlatformLikeVenue(name, address, shortDescription, description) {
-  const text = [name, address, shortDescription, description].filter(Boolean).join(' ');
-  return /смотров(?:ая|ой|ую|ые)\s+площадк|smotrovaya|viewing platform|observation deck/i.test(text);
-}
-
-function isBarLikeFromText(text) {
-  const t = String(text || '').trim().toLowerCase();
-  if (!t) return false;
-  if (/(?:^|[\s«"'(\[]|-)(?:бар|паб)(?:[\s"'»)\],!.]|$)/u.test(t)) return true;
-  if (/\bpub\b|(?:^|[\s-])bar(?:[\s.-]|$)|-bar\b|\bbar\b|barrock|music\s*bar|lounge[\s-]?bar|bar$/iu.test(t)) return true;
-  if (/концертный бар|рок-бар|коктейльн(?:ый|ого) бар|музыкальн(?:ый|ого) бар|ночной бар/iu.test(t)) return true;
-  return false;
-}
-
-function isClubRestaurantLikeFromText(text) {
-  const t = String(text || '').trim().toLowerCase();
-  if (!t || isBarLikeFromText(t)) return false;
-  if (
-    /ресторан|кафе|гастроном|пивной ресторан|ресторан-клуб|музыкальн(?:ый|ого) ресторан|баварск|грузинск|хачапури|хинкали|гостеприимств|oktoberfest|пивоварен/iu.test(
-      t,
-    )
-  ) {
-    return true;
-  }
-  if (
-    /ночной клуб|музыкальн(?:ый|ого) клуб|концертный клуб|клубный ресторан|арт-пространств[^\n]{0,48}клуб|клуб[^\n]{0,24}арт-пространств|(?:^|[\s«"'(\[]|-)(?:клуб)(?:[\s"'»)\],!.]|$)/u.test(
-      t,
-    )
-  ) {
-    return true;
-  }
-  return /\bclub\b/i.test(t) && !/concert hall|concert-hall/i.test(t);
-}
-
-function inferBarOrClubFromContent(name, address, shortDescription, description) {
-  const content = [name, address, shortDescription, description].filter(Boolean).join(' ');
-  if (isBarLikeVenue(name, address) || isBarLikeFromText(content)) return 'bar';
-  if (isClubRestaurantLikeFromText(content)) return 'club_bar_restaurant';
-  return null;
-}
-
-function isBarLikeVenue(name, address) {
-  const nameText = String(name || '').trim().toLowerCase();
-  if (!nameText) return false;
-  if (/(?:^|[\s«"'(\[]|-)(?:бар|паб)(?:[\s"'»)\],!.]|$)/u.test(nameText)) return true;
-  return /\bpub\b|(?:^|[\s-])bar(?:[\s.-]|$)|-bar\b|\bbar\b|barrock|music\s*bar|lounge[\s-]?bar|bar$/iu.test(nameText);
-}
-
-function inferPublicVenueKindFromName(name, address) {
-  const text = venueNameAddressText(name, address);
-  if (MEETING_POINT_TEXT_RE.test(text)) return 'meeting_point';
-  if (/смотров(?:ая|ой|ую|ые)\s+площадк/i.test(text)) return 'museum_art_space';
-  if (hasBusLikeText(name, address)) return 'bus';
-  if (hasStrongPierLocationText(name, address)) return 'pier';
-  if (/турбаз|база отдыха|глэмпинг/i.test(text)) return 'outdoor_location';
-  if (/театр|teatr/i.test(text)) return 'theater';
-  if (/музей|галере|выстав/i.test(text)) return 'museum_art_space';
-  if (isBarLikeVenue(name, address)) return 'bar';
-  if (/банкет|\bзал\b|hall|концерт|филармони|дворец/i.test(text)) return 'concert_hall';
-  if (/клуб|\bclub\b|ресторан|кафе/i.test(text)) return 'club_bar_restaurant';
-  if (/стадион|арена|спорт|каток/i.test(text)) return 'sport_activity_space';
-  if (/\bпарк\b|сквер/i.test(text)) return 'outdoor_location';
-  return 'venue';
-}
-
-function canonicalStoredVenueKind(storedKind) {
-  const stored = normalizeVenueKindValue(storedKind).toLowerCase();
-  if (stored === 'pier_water' || stored === 'pier') return 'pier';
-  return stored;
-}
-
-function resolvePublicVenueKind(storedKind, name, address, options = {}) {
-  const stored = canonicalStoredVenueKind(storedKind);
-  const inferred = inferPublicVenueKindFromName(name, address);
-  const { shortDescription, description, waterEvents = 0, busEvents = 0, totalEvents = 0 } = options;
-  const text = venueNameAddressText(name, address);
-  const busByAllEvents =
-    hasBusOnlyEvents(busEvents, totalEvents) && !/teplohod|теплоход|причал|пристань/i.test(text);
-  const busByCatalogEvents = hasActiveBusCatalogEvents(busEvents);
-
-  if (inferred === 'bus' || hasBusLikeText(name, address) || busByAllEvents || busByCatalogEvents) {
-    return 'bus';
-  }
-
-  if (
-    inferred === 'meeting_point' ||
-    stored === 'meeting_point' ||
-    hasMeetingPointSignals(name, address, shortDescription, description)
-  ) {
-    return 'meeting_point';
-  }
-
-  const barOrClub = inferBarOrClubFromContent(name, address, shortDescription, description);
-  if (barOrClub) return barOrClub;
-
-  if (isViewingPlatformLikeVenue(name, address, shortDescription, description)) {
-    return 'museum_art_space';
-  }
-
-  if (
-    stored === 'pier' ||
-    hasStrongPierLocationText(name, address) ||
-    hasPierLikeText(name, address) ||
-    inferred === 'pier' ||
-    (hasWaterOnlyEvents(waterEvents, totalEvents) && !isViewingPlatformLikeVenue(name, address, shortDescription, description))
-  ) {
-    return 'pier';
-  }
-
-  if (INSTITUTION_VENUE_KINDS.has(normalizeVenueKindValue(storedKind))) {
-    return stored;
-  }
-
-  if (stored === 'other' || stored === 'venue') {
-    return inferred;
-  }
-
-  if (stored === 'theater' && inferred !== 'theater') {
-    return inferred;
-  }
-
-  return stored;
-}
-
-function resolvePublicVenueKindFromRow(row) {
-  const override = findVenueOverride({
-    id: row.id,
-    title: row.name || row.title,
-    name: row.name || row.title,
-  });
-  const storedKind = override?.kind || row.kind || row.proposedKind;
-  return resolvePublicVenueKind(storedKind, row.name || row.title, row.address, {
-    shortDescription: row.shortDescription,
-    description: row.description,
-    waterEvents: Number(row.waterEvents || 0),
-    busEvents: Number(row.busEvents || 0),
-    totalEvents: Number(row.events || 0),
-  });
-}
-
-function isPublicVenueHub(row, options = {}) {
-  const requireEvents = options.requireEvents !== false;
-  if (!row) return false;
-  const kind = normalizeVenueKindValue(row.kind || row.proposedKind);
-  if (PUBLIC_VENUE_HUB_EXCLUDED_KINDS.has(kind)) {
-    if (!(kind === 'MEETING_POINT' && hasActiveBusCatalogEvents(row.busEvents))) return false;
-  }
-  if (isMeetingPointLikeRow(row)) return false;
-  if (isJunkPublicVenueRow(row)) return false;
-  if (String(row.pageStatus || '').toUpperCase() === 'HIDDEN') return false;
-  if (requireEvents && Number(row.events) <= 0) return false;
-  return true;
-}
-
-function applyPublicVenueDisplayName(row, type) {
-  const name = row.name || row.title;
-  if (type === 'bus') return formatBusLocationDisplayName(name, row.address, row.city);
-  if (type === 'pier') return formatPierLocationDisplayName(name, row.address, row.city);
-  return name;
-}
-
-function mapPublicVenueListItem(row) {
-  const normalized = applyPublicVenueNormalization(row);
-  const type = resolvePublicVenueKindFromRow(normalized);
-  const name = applyPublicVenueDisplayName(normalized, type);
-  const shortDescription = pickPublicVenueLeadText(normalized.shortDescription, normalized.description);
-  return {
-    id: normalized.id,
-    slug: publicVenueSlug(normalized.slug, name, normalized.id),
-    name,
-    city: normalized.city,
-    address: normalized.address,
-    type,
-    template: publicVenuePageTemplate(type),
-    pageStatus: normalized.pageStatus,
-    shortDescription,
-    heroImageUrl: normalized.heroImageUrl,
-    events: normalized.events,
-    categories: {},
-    nextSlot: normalized.nextSessionStartsAt ? formatTime(normalized.nextSessionStartsAt) : null,
-  };
-}
-
-export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchParams()) {
-  const limit = clampNumber(searchParams.get('limit'), 1, 500, 240);
-  const query = String(searchParams.get('q') || '').trim().toLowerCase();
-  const cityFilter = String(searchParams.get('city') || '').trim().toLowerCase();
-  const typeFilter = String(searchParams.get('type') || '').trim().toLowerCase();
-  const familyFilter = String(searchParams.get('family') || '').trim().toLowerCase();
-
-  if (!query && !cityFilter && !typeFilter && familyFilter) {
-    const warmList = warmVenueCatalogList(familyFilter);
-    if (warmList) {
-      const venues = warmList.slice(0, limit);
-      const cities = countBy(venues.map((venue) => venue.city).filter(Boolean));
-      const types = countBy(venues.map((venue) => venue.type).filter(Boolean));
-      return {
-        generatedAt: new Date().toISOString(),
-        total: venues.length,
-        venues,
-        stats: {
-          venues: venues.length,
-          cities,
-          types,
-        },
-      };
-    }
-  }
-
-  const rows = await publicVenueHubRows(db, 500);
-  const venues = rows
-    .filter((row) => {
-      if (!query) return true;
-      return [row.name, row.city, row.address, row.proposedKind].filter(Boolean).join(' ').toLowerCase().includes(query);
-    })
-    .filter((row) => {
-      if (!cityFilter) return true;
-      const citySlug = publicCitySlug(row.city || '');
-      return citySlug === cityFilter || String(row.city || '').toLowerCase().includes(cityFilter);
-    })
-    .filter((row) => {
-      if (!typeFilter) return true;
-      return resolvePublicVenueKindFromRow(row) === typeFilter;
-    })
-    .filter((row) => {
-      if (!familyFilter) return true;
-      const template = publicVenuePageTemplate(resolvePublicVenueKindFromRow(row));
-      return template === familyFilter;
-    })
-    .slice(0, limit)
-    .map(mapPublicVenueListItem);
-
-  const cities = countBy(venues.map((venue) => venue.city).filter(Boolean));
-  const types = countBy(venues.map((venue) => venue.type).filter(Boolean));
-  return {
-    generatedAt: new Date().toISOString(),
-    total: venues.length,
-    venues,
-    stats: {
-      venues: venues.length,
-      cities,
-      types,
-    },
-  };
-}
-
-export function buildPublicDestinationRowsFromSessions(sessions) {
-  const buckets = new Map();
-
-  for (const session of sessions) {
-    const destination = publicDestinationFromSession(session);
-    if (!destination.name || destination.name === 'Не указан') continue;
-    if (!buckets.has(destination.name)) {
-      buckets.set(destination.name, {
-        id: destination.id,
-        slug: destination.slug,
-        sourceSlug: destination.sourceSlug,
-        name: destination.name,
-        type: destination.type,
-        events: 0,
-        venueIds: new Set(),
-        categories: new Map(),
-      });
-    }
-
-    const bucket = buckets.get(destination.name);
-    bucket.events += 1;
-    if (session.venueId) bucket.venueIds.add(session.venueId);
-    if (session.category) bucket.categories.set(session.category, (bucket.categories.get(session.category) || 0) + 1);
-  }
-
-  return Array.from(buckets.values())
-    .map((bucket) => ({
-      id: bucket.id,
-      slug: bucket.slug,
-      sourceSlug: bucket.sourceSlug,
-      name: bucket.name,
-      type: bucket.type,
-      events: bucket.events,
-      venues: bucket.venueIds.size,
-      categories: Array.from(bucket.categories.entries())
-        .map(([name, events]) => ({ name, events }))
-        .sort((a, b) => b.events - a.events || a.name.localeCompare(b.name, 'ru')),
+  const categoryTags = Array.from(bucket.categories.entries())
+    .map(([name, events]) => ({
+      slug: null,
+      label: name,
+      events,
+      kind: 'category',
     }))
-    .filter((bucket) => bucket.events >= PUBLIC_DESTINATION_MIN_EVENTS)
-    .filter(isAllowedPublicDestination)
-    .sort(destinationSort);
+    .sort((a, b) => b.events - a.events || a.label.localeCompare(b.label, 'ru'))
+    .slice(0, 3 - landingTags.length);
+
+  return [...landingTags, ...categoryTags].slice(0, 3);
 }
 
 async function destinationRows(db) {
@@ -7504,9 +6600,8 @@ async function destinationSummaryRowsFast(db) {
             lower(regexp_replace(trim(coalesce(venue, '')), '\\s+', ' ', 'g'))
           ) as "groupKey"
         from normalized
-        where "priceFrom" >= $1
-          and "purchaseReady" = true
-          and lower(coalesce("sourceStatus", '')) not in ('widget_blocked', 'paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden')
+        where "purchaseReady" = true
+          and lower(coalesce("sourceStatus", '')) not in (${PUBLIC_SALES_BLOCKED_STATUS_SQL})
           and (
             "startsAt" is not null
             or kind = 'OPEN_DATE'
@@ -7536,8 +6631,9 @@ async function destinationSummaryRowsFast(db) {
   );
 
   const buckets = new Map();
+  const separateCityHubs = collectSeparateCityHubNames(result.rows);
   for (const row of result.rows) {
-    const destination = publicDestinationForCity(row);
+    const destination = publicDestinationForCity(row, separateCityHubs);
     // Foreign / unroutable cities return null — skip without crashing /api/public/stats.
     if (!destination?.name || destination.name === 'Не указан') continue;
     if (!buckets.has(destination.name)) {
@@ -7567,19 +6663,25 @@ async function destinationSummaryRowsFast(db) {
       events: bucket.events,
       venues: bucket.venueIds.size,
     }))
-    .filter((bucket) => bucket.events >= PUBLIC_DESTINATION_MIN_EVENTS)
+    .filter(isVisibleOnCitiesCatalog)
     .filter(isAllowedPublicDestination)
     .sort(destinationSort);
 }
 
-function publicDestinationForCity(row) {
+function publicDestinationForCity(row, separateCityHubs) {
   const cityName = cleanDisplayName(row.city) || 'Не указан';
 
   if (isForeignPublicCity(cityName)) {
     return null;
   }
 
-  if (STANDALONE_CITY_NAMES.has(cityName)) {
+  const mappedRegion = CITY_TO_REGION.get(cityName);
+  const keepAsSeparateCity =
+    isSubjectCapitalCity(cityName) ||
+    (isFoldingRegionalTown(cityName) && separateCityHubs && separateCityHubs.has(cityName)) ||
+    (STANDALONE_CITY_NAMES.has(cityName) && !mappedRegion);
+
+  if (keepAsSeparateCity) {
     return buildPublicDestinationRecord(row, cityName);
   }
 
@@ -7587,7 +6689,6 @@ function publicDestinationForCity(row) {
     return buildPublicDestinationRecord(row, cityName);
   }
 
-  const mappedRegion = CITY_TO_REGION.get(cityName);
   if (mappedRegion) {
     return buildPublicDestinationRecord(row, mappedRegion);
   }
@@ -7601,33 +6702,24 @@ function publicDestinationForCity(row) {
   return buildPublicDestinationRecord(row, routed);
 }
 
-export function publicDestinationFromSession(session) {
-  const name = cleanDisplayName(session.destination) || cleanDisplayName(session.city) || 'Не указан';
-  let type = session.destinationType === 'region' ? 'region' : 'city';
-  if (type === 'city' && isPublicRegionName(name)) type = 'region';
-  if (type === 'region' && STANDALONE_CITY_NAMES.has(name)) type = 'city';
-  const slug = publicCitySlug(name);
-  return {
-    id: type === 'region' ? `region_${slug}` : session.cityId || `city_${slug}`,
-    slug,
-    sourceSlug: type === 'region' ? slug : session.sourceCitySlug || slug,
-    name,
-    type,
-  };
-}
-
 const CITY_SLUG_CANONICAL = {
   moscow: 'moskva',
   moskva: 'moskva',
   'saint-petersburg': 'sankt-peterburg',
   'sankt-peterburg': 'sankt-peterburg',
+  // latin SEO slug, destination slug, and Cyrillic DB slug (и→i → nizhnii-…)
   'nizhny-novgorod': 'nizhniy-novgorod',
   'nizhniy-novgorod': 'nizhniy-novgorod',
+  'nizhnii-novgorod': 'nizhniy-novgorod',
   'veliky-novgorod': 'velikiy-novgorod',
   'velikiy-novgorod': 'velikiy-novgorod',
   rostov: 'rostov-na-donu',
   'rostov-on-don': 'rostov-na-donu',
   'rostov-na-donu': 'rostov-na-donu',
+  'hanty-mansiysk': 'hanty-mansiysk',
+  'khanty-mansiysk': 'hanty-mansiysk',
+  novokuzneck: 'novokuzneck',
+  novokuznetsk: 'novokuzneck',
 };
 
 function canonicalCitySlug(value) {
@@ -7708,70 +6800,6 @@ function buildCatalogSlugIndex(sessions) {
   return index;
 }
 
-function collectVenueSessionLookupContexts(venue, mergedGroup) {
-  const contexts = [];
-  const seen = new Set();
-  const add = (row) => {
-    if (!row) return;
-    const key = `${row.name || row.title || ''}|${row.address || ''}`;
-    if (seen.has(key)) return;
-    seen.add(key);
-    contexts.push(row);
-  };
-
-  add(venue);
-  add(mergedGroup);
-  return contexts;
-}
-
-function pierKeysForVenueContexts(venueContexts = []) {
-  const keys = new Set();
-  for (const context of venueContexts) {
-    const pierKey = canonicalPierLocationKey(context.name || context.title, context.address);
-    if (pierKey) keys.add(pierKey);
-  }
-  return keys;
-}
-
-function sortVenueCatalogSessions(sessions) {
-  return sessions.sort((a, b) => {
-    const aTime = Date.parse(a.startsAt || '') || Number.POSITIVE_INFINITY;
-    const bTime = Date.parse(b.startsAt || '') || Number.POSITIVE_INFINITY;
-    return aTime - bTime || String(a.title || '').localeCompare(String(b.title || ''), 'ru');
-  });
-}
-
-function lookupVenueCatalogSessions(venueIds, catalogSessions, venueContexts = []) {
-  if (!venueIds?.length && !venueContexts.length) return [];
-
-  const pierKeys = pierKeysForVenueContexts(venueContexts);
-  const index = publicCatalogCache?.venueIndex;
-  if (index) {
-    const seen = new Set();
-    const result = [];
-    const collect = (session) => {
-      if (!session || seen.has(session.id)) return;
-      seen.add(session.id);
-      result.push(session);
-    };
-
-    for (const venueId of venueIds || []) {
-      for (const session of index.get(String(venueId).toLowerCase()) || []) collect(session);
-    }
-    for (const pierKey of pierKeys) {
-      for (const session of index.get(`pier:${pierKey}`) || []) collect(session);
-    }
-    if (result.length) return sortVenueCatalogSessions(result);
-  }
-
-  const idSet = new Set(venueIds || []);
-  const matched = catalogSessions.filter((session) => {
-    if (idSet.has(session.venueId)) return true;
-    const pierKey = canonicalSessionPierKey(session);
-    return pierKey && pierKeys.has(pierKey);
-  });
-  return sortVenueCatalogSessions(matched);
-}
 
 function lookupCatalogSessionBySlug(slugOrId, catalogSessions = null) {
   const value = String(slugOrId || '').trim();
@@ -7800,169 +6828,6 @@ function lookupCatalogSessionBySlug(slugOrId, catalogSessions = null) {
   );
 }
 
-export function lookupDestinationCatalogSessions(citySlugOrId, requestedSlug, catalogSessions) {
-  const index = publicCatalogCache?.destinationIndex;
-  if (index) {
-    for (const key of [requestedSlug, String(citySlugOrId || '').toLowerCase(), canonicalCitySlug(citySlugOrId)].filter(Boolean)) {
-      const hit = index.get(String(key).toLowerCase());
-      if (hit?.length) return hit;
-    }
-  }
-
-  return catalogSessions.filter((session) => matchesPublicDestinationPage(session, citySlugOrId, requestedSlug));
-}
-
-export function countDistinctSessionVenues(sessions) {
-  const keys = new Set();
-  for (const session of sessions || []) {
-    if (session?.venueId) {
-      keys.add(`id:${session.venueId}`);
-      continue;
-    }
-    const slug = normalizePublicVenueSlugKey(session?.venueSlug || '');
-    if (slug) {
-      keys.add(`slug:${slug}`);
-      continue;
-    }
-    const name = cleanDisplayName(session?.venue);
-    if (name && name !== 'Не указано') {
-      keys.add(`name:${cleanDisplayName(session?.city) || ''}|${name.toLowerCase()}`);
-    }
-  }
-  return keys.size;
-}
-
-function sessionVenueIds(sessions) {
-  return [...new Set((sessions || []).map((session) => session.venueId).filter(Boolean))];
-}
-
-function sessionVenueSlugKeys(sessions) {
-  return new Set(
-    (sessions || [])
-      .map((session) => normalizePublicVenueSlugKey(session?.venueSlug || session?.venue || ''))
-      .filter(Boolean),
-  );
-}
-
-function hubRowMatchesSessionVenues(row, venueIds, venueSlugKeys) {
-  const ids = row?.mergedVenueIds || (row?.id ? [row.id] : []);
-  if (ids.some((id) => venueIds.has(id))) return true;
-  if (!venueSlugKeys.size) return false;
-  const slug = normalizePublicVenueSlugKey(publicVenueSlug(row.slug, row.name || row.title, row.id));
-  return Boolean(slug && venueSlugKeys.has(slug));
-}
-
-export function publicVenuesForSessionsFromHub(sessions, hubRows, limit) {
-  const venueIds = new Set(sessionVenueIds(sessions));
-  const venueSlugKeys = sessionVenueSlugKeys(sessions);
-  if (!venueIds.size && !venueSlugKeys.size) return [];
-
-  const matched = [];
-  const usedIds = new Set();
-  for (const row of hubRows || []) {
-    if (!hubRowMatchesSessionVenues(row, venueIds, venueSlugKeys)) continue;
-    const ids = row.mergedVenueIds || [row.id];
-    if (ids.some((id) => usedIds.has(id))) continue;
-    ids.forEach((id) => usedIds.add(id));
-    matched.push(row);
-    if (matched.length >= limit) break;
-  }
-  return matched.map(mapPublicVenueListItem);
-}
-
-/**
- * City hubs must show venues from city events even when the venue is outside the
- * global top-N hub window (publicVenueHubRows limit). Murmansk "Мега Кружка" was
- * rank ~511 with hub limit 500 → events>0 but venues=0.
- */
-export async function resolvePublicVenuesForSessions(db, sessions, hubRows, limit = 24) {
-  const fromHub = publicVenuesForSessionsFromHub(sessions, hubRows, limit);
-  if (fromHub.length >= limit) return fromHub;
-
-  const venueIds = new Set(sessionVenueIds(sessions));
-  if (!venueIds.size) return fromHub;
-
-  const coveredIds = new Set();
-  for (const row of hubRows || []) {
-    if (!hubRowMatchesSessionVenues(row, venueIds, new Set())) continue;
-    for (const id of row.mergedVenueIds || [row.id]) coveredIds.add(id);
-  }
-  for (const item of fromHub) {
-    if (item?.id) coveredIds.add(item.id);
-  }
-
-  const missingIds = [...venueIds].filter((id) => !coveredIds.has(id));
-  if (!missingIds.length) return fromHub;
-
-  const { activeCounts, waterCounts, busCounts, heroImageFallbacks, nextSessionStartsAt } =
-    buildActiveVenueEventCounts(sessions);
-  const missingRows = (await venueRowsByIds(db, missingIds))
-    .map((row) => ({
-      ...row,
-      events: activeCounts.get(row.id) || Number(row.events) || 0,
-      waterEvents: waterCounts.get(row.id) || Number(row.waterEvents) || 0,
-      busEvents: busCounts.get(row.id) || 0,
-      heroImageUrl: resolveVenueHeroImageUrl(row, heroImageFallbacks),
-      nextSessionStartsAt: nextSessionStartsAt.get(row.id) || null,
-      mergedVenueIds: [row.id],
-    }))
-    .filter((row) => isPublicVenueHub(row));
-
-  const remaining = Math.max(0, limit - fromHub.length);
-  return [...fromHub, ...missingRows.slice(0, remaining).map(mapPublicVenueListItem)];
-}
-
-async function venueRowsByIds(db, ids) {
-  const venueIds = [...new Set((ids || []).map((id) => String(id || '').trim()).filter(Boolean))];
-  if (!venueIds.length) return [];
-
-  const result = await db.query(
-    `
-      select
-        venue.id,
-        venue.slug,
-        venue.title as name,
-        venue."shortDescription",
-        venue.description,
-        venue."heroImageUrl",
-        city.title as city,
-        venue.address,
-        venue.kind,
-        venue."pageStatus",
-        count(event.id)::int as events,
-        count(event.id) filter (where ${PUBLIC_WATER_EVENT_SQL})::int as "waterEvents"
-      from "Venue" venue
-      left join "City" city on city.id = venue."cityId"
-      left join "Event" event on event."venueId" = venue.id
-      left join "Category" cat on cat.id = event."categoryId"
-      left join "Subcategory" sub on sub.id = event."primarySubcategoryId"
-      where venue.id = any($1::text[])
-      group by venue.id, city.title
-    `,
-    [venueIds],
-  );
-
-  return result.rows.map((row) => {
-    const name = formatPublicVenueTitle(row.name);
-    const mapped = {
-      id: row.id,
-      slug: row.slug,
-      name,
-      city: row.city || 'Не указан',
-      address: row.address,
-      shortDescription: row.shortDescription,
-      heroImageUrl: row.heroImageUrl,
-      proposedKind: String(row.kind || 'OTHER').toLowerCase(),
-      kind: String(row.kind || 'OTHER').toUpperCase(),
-      pageStatus: String(row.pageStatus || 'NONE').toLowerCase(),
-      reason: row.pageStatus === 'CANDIDATE' ? 'кандидат на public-страницу' : 'пока только локация',
-      events: row.events,
-      waterEvents: row.waterEvents,
-    };
-    mapped.city = resolvePublicVenueCity(mapped);
-    return applyPublicVenueNormalization(mapped);
-  });
-}
 
 function matchesPublicDestinationPage(session, citySlugOrId, requestedSlug) {
   const destination = publicDestinationFromSession(session);
@@ -8029,69 +6894,6 @@ function destinationSortGroup(name, type) {
   return groups[name] || `90-${type}-${name}`;
 }
 
-export function destinationPrepositional(destination) {
-  const bySlug = {
-    'sankt-peterburg': 'в Санкт-Петербурге',
-    'saint-petersburg': 'в Санкт-Петербурге',
-    moscow: 'в Москве',
-    moskva: 'в Москве',
-    'moskovskaya-oblast': 'в Московской области',
-    'leningradskaya-oblast': 'в Ленинградской области',
-    'krasnodarskiy-kray': 'в Краснодарском крае',
-    'krasnoyarskiy-kray': 'в Красноярском крае',
-    'respublika-tatarstan': 'в Республике Татарстан',
-    'respublika-hakasiya': 'в Республике Хакасии',
-    'respublika-bashkortostan': 'в Республике Башкортостан',
-    'respublika-kareliya': 'в Республике Карелия',
-    'ulyanovskaya-oblast': 'в Ульяновской области',
-    'habarovskiy-kray': 'в Хабаровском крае',
-    'primorskiy-kray': 'в Приморском крае',
-    'altayskiy-kray': 'в Алтайском крае',
-    'samarskaya-oblast': 'в Самарской области',
-    'chelyabinskaya-oblast': 'в Челябинской области',
-    'kemerovskaya-oblast': 'в Кемеровской области',
-    'rostovskaya-oblast': 'в Ростовской области',
-    'sverdlovskaya-oblast': 'в Свердловской области',
-    'nizhegorodskaya-oblast': 'в Нижегородской области',
-    'orenburgskaya-oblast': 'в Оренбургской области',
-    'tulskaya-oblast': 'в Тульской области',
-    'vologodskaya-oblast': 'в Вологодской области',
-    'stavropolskiy-kray': 'в Ставропольском крае',
-    'kaliningradskaya-oblast': 'в Калининградской области',
-    'kaluzhskaya-oblast': 'в Калужской области',
-    'yaroslavskaya-oblast': 'в Ярославской области',
-    'amurskaya-oblast': 'в Амурской области',
-    'hanty-mansiyskiy-avtonomnyy-okrug': 'в Ханты-Мансийском автономном округе',
-  };
-  if (bySlug[destination.slug]) return bySlug[destination.slug];
-
-  const name = cleanDisplayName(destination.name);
-  if (!name) return 'в выбранном направлении';
-  if (destination.type === 'region') return `в регионе ${name}`;
-  // Предложный падеж: «в Мурманске», не «в городе Мурманск»
-  if (name.endsWith('ы')) return `в ${name.slice(0, -1)}ах`;
-  if (name.endsWith('а')) return `в ${name.slice(0, -1)}е`;
-  if (name.endsWith('я')) return `в ${name.slice(0, -1)}е`;
-  if (name.endsWith('ь')) return `в ${name.slice(0, -1)}и`;
-  if (name.endsWith('о')) return `в ${name.slice(0, -1)}е`;
-  if (/[еуюэ]$/i.test(name)) return `в ${name}`;
-  const known = {
-    Москва: 'в Москве',
-    'Санкт-Петербург': 'в Санкт-Петербурге',
-    Мурманск: 'в Мурманске',
-    Орёл: 'в Орле',
-    Орел: 'в Орле',
-    Казань: 'в Казани',
-    Сочи: 'в Сочи',
-    'Нижний Новгород': 'в Нижнем Новгороде',
-    'Ростов-на-Дону': 'в Ростове-на-Дону',
-    'Улан-Удэ': 'в Улан-Удэ',
-    Чебоксары: 'в Чебоксарах',
-  };
-  if (known[name]) return known[name];
-  return `в ${name}е`;
-}
-
 async function publicSessions(db, limit) {
   const rows = await publicCatalogSessions(db);
   return rows.slice(0, limit);
@@ -8099,41 +6901,225 @@ async function publicSessions(db, limit) {
 
 export async function publicCatalogSessions(db, forceRefresh = false) {
   const now = Date.now();
-  if (!forceRefresh && publicCatalogCache && publicCatalogCache.expiresAt > now) {
-    return publicCatalogCache.sessions;
-  }
-  if (!forceRefresh && publicCatalogBuildPromise) {
-    return publicCatalogBuildPromise;
-  }
+  const cached = publicCatalogCache;
 
   if (forceRefresh) {
-    publicCatalogCache = null;
-    publicCatalogBuildPromise = null;
+    if (cached?.sessions) {
+      publicCatalogCache = { ...cached, expiresAt: 0, staleUntil: 0 };
+    }
+    return schedulePublicCatalogRebuild(db, 'force-refresh');
   }
 
-  const buildPromise = (async () => {
-    const rows = await publicCatalogSessionsFast(db);
+  // Fresh hit.
+  if (cached?.sessions && now < cached.expiresAt) {
+    return cached.sessions;
+  }
 
-    publicCatalogCache = {
-      expiresAt: Date.now() + PUBLIC_CATALOG_CACHE_MS,
-      sessions: rows,
-      destinationIndex: buildDestinationSessionIndex(rows),
-      venueIndex: buildVenueSessionIndex(rows),
-      slugIndex: buildCatalogSlugIndex(rows),
-      catalogFacets: buildCatalogFacets(rows.filter(sessionHasCoverImage)),
-    };
+  // INC.504.4 / INC.504.5: serve ANY previous sessions immediately; refresh only via
+  // canonical public-catalog.dto (child/disk/single-flight) - never a second SQL rebuild.
+  if (cached?.sessions?.length) {
+    void schedulePublicCatalogRebuild(db, now < (cached.staleUntil || 0) ? 'swr' : 'soft-expire');
+    return cached.sessions;
+  }
 
-    return rows;
-  })();
+  return schedulePublicCatalogRebuild(db, 'cold');
+}
 
-  publicCatalogBuildPromise = buildPromise;
+/**
+ * INC.504.5: legacy dto.js catalog is an adopt/index layer over public-catalog.dto.ts.
+ * Heavy rebuild (SQL + map) lives only in the DTO path / child process.
+ */
+function schedulePublicCatalogRebuild(db, reason = 'refresh') {
+  if (publicCatalogBuildPromise) return publicCatalogBuildPromise;
+
+  publicCatalogBuildPromise = (async () => {
+    const startedAt = Date.now();
+    try {
+      const rows = await loadCanonicalPublicCatalogSessions(db, reason);
+      await adoptCanonicalCatalogSessions(rows, reason);
+      console.log(
+        `Public catalog legacy cache adopted from DTO (${reason}): ${rows.length} sessions in ${Date.now() - startedAt}ms`,
+      );
+      return rows;
+    } finally {
+      publicCatalogBuildPromise = null;
+    }
+  })().catch((error) => {
+    publicCatalogBuildPromise = null;
+    console.warn(
+      `Public catalog legacy cache adopt failed (${reason}): ${error instanceof Error ? error.message : String(error)}`,
+    );
+    throw error;
+  });
+
+  return publicCatalogBuildPromise;
+}
+
+async function loadCanonicalPublicCatalogSessions(db, reason) {
+  const forceRefresh = reason === 'force-refresh';
   try {
-    return await buildPromise;
-  } finally {
-    if (publicCatalogBuildPromise === buildPromise) publicCatalogBuildPromise = null;
+    const { getPublicCatalogSessions } = await import('./public-catalog.dto.js');
+    return await getPublicCatalogSessions(forceRefresh, { hydrateSlots: false });
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    const stale = publicCatalogCache?.sessions;
+    // Prefer forever-stale over uncontrolled SQL on the API event loop.
+    if (stale?.length) {
+      console.warn(
+        `Canonical catalog load failed (${reason}), serving stale legacy cache (${stale.length} sessions): ${detail}`,
+      );
+      return stale;
+    }
+
+    const now = Date.now();
+    const since = now - lastLegacyCatalogSqlFallbackAt;
+    if (lastLegacyCatalogSqlFallbackAt && since < LEGACY_CATALOG_SQL_COOLDOWN_MS) {
+      const waitSec = Math.ceil((LEGACY_CATALOG_SQL_COOLDOWN_MS - since) / 1000);
+      console.error(
+        `CRITICAL P1: legacy inline SQL fallback SKIPPED (rate-limited ${waitSec}s left) after canonical failure (${reason}): ${detail}`,
+      );
+      throw error;
+    }
+
+    lastLegacyCatalogSqlFallbackAt = now;
+    // Alert string (P1): keep "legacy inline SQL fallback" verbatim for log monitors.
+    console.error(
+      `CRITICAL P1: Canonical catalog load failed (${reason}), legacy inline SQL fallback: ${detail}`,
+    );
+    return publicCatalogSessionsFast(db);
   }
 }
 
+function yieldEventLoop() {
+  return new Promise((resolve) => setImmediate(resolve));
+}
+
+function mapIndexListsToIds(index) {
+  const out = Object.create(null);
+  for (const [key, list] of index.entries()) {
+    out[key] = (list || []).map((session) => session?.id).filter(Boolean);
+  }
+  return out;
+}
+
+function mapIndexOneToId(index) {
+  const out = Object.create(null);
+  for (const [key, session] of index.entries()) {
+    if (session?.id) out[key] = session.id;
+  }
+  return out;
+}
+
+/** INC.504.5c: serialize Maps → id pointers for disk artifact v2 (built in Catalog Worker). */
+export function serializePublicCatalogLegacyIndexes(sessions) {
+  const destinationIndex = buildDestinationSessionIndex(sessions);
+  const venueIndex = buildVenueSessionIndex(sessions);
+  const slugIndex = buildCatalogSlugIndex(sessions);
+  const catalogFacets = buildCatalogFacets(sessions.filter(sessionHasCoverImage));
+  return {
+    destinationIndex: mapIndexListsToIds(destinationIndex),
+    venueIndex: mapIndexListsToIds(venueIndex),
+    slugIndex: mapIndexOneToId(slugIndex),
+    catalogFacets,
+  };
+}
+
+/** Hydrate id-pointer indexes back to Maps of session object refs. */
+export function hydratePublicCatalogLegacyIndexes(sessions, serialized) {
+  if (!serialized || typeof serialized !== 'object') return null;
+  const byId = new Map((sessions || []).map((session) => [String(session.id), session]));
+  const hydrateList = (record) => {
+    const map = new Map();
+    for (const [key, ids] of Object.entries(record || {})) {
+      const list = (Array.isArray(ids) ? ids : [])
+        .map((id) => byId.get(String(id)))
+        .filter(Boolean);
+      if (list.length) map.set(key, list);
+    }
+    return map;
+  };
+  const hydrateOne = (record) => {
+    const map = new Map();
+    for (const [key, id] of Object.entries(record || {})) {
+      const session = byId.get(String(id));
+      if (session) map.set(key, session);
+    }
+    return map;
+  };
+  return {
+    destinationIndex: hydrateList(serialized.destinationIndex),
+    venueIndex: hydrateList(serialized.venueIndex),
+    slugIndex: hydrateOne(serialized.slugIndex),
+    catalogFacets: serialized.catalogFacets || buildCatalogFacets(sessions.filter(sessionHasCoverImage)),
+  };
+}
+
+async function adoptCanonicalCatalogSessions(rows, _reason) {
+  const now = Date.now();
+  const prev = publicCatalogCache;
+  const sameBlob = Boolean(prev?.sessions && rows === prev.sessions);
+
+  let destinationIndex;
+  let venueIndex;
+  let slugIndex;
+  let catalogFacets;
+  let builtAt;
+
+  if (sameBlob && prev?.destinationIndex && prev?.venueIndex && prev?.slugIndex && prev?.catalogFacets) {
+    destinationIndex = prev.destinationIndex;
+    venueIndex = prev.venueIndex;
+    slugIndex = prev.slugIndex;
+    catalogFacets = prev.catalogFacets;
+    builtAt = prev.builtAt || now;
+  } else {
+    // Prefer prebuilt indexes from disk v2 (Catalog Worker) - no Map rebuild on API.
+    let hydrated = null;
+    try {
+      const { loadPublicCatalogDiskCache } = await import('./public-catalog-disk-cache.js');
+      const disk = loadPublicCatalogDiskCache();
+      if (disk?.version === 2 && disk.indexes && (disk.sessions === rows || disk.sessions?.length === rows.length)) {
+        hydrated = hydratePublicCatalogLegacyIndexes(rows, disk.indexes);
+      }
+    } catch {
+      hydrated = null;
+    }
+
+    if (hydrated?.destinationIndex && hydrated?.venueIndex && hydrated?.slugIndex) {
+      destinationIndex = hydrated.destinationIndex;
+      venueIndex = hydrated.venueIndex;
+      slugIndex = hydrated.slugIndex;
+      catalogFacets = hydrated.catalogFacets;
+      builtAt = now;
+      console.log(
+        `Public catalog legacy indexes hydrated from disk v2 (${rows.length} sessions)`,
+      );
+    } else {
+      // Yield between heavy index maps so health/HTTP can run mid-adopt.
+      await yieldEventLoop();
+      destinationIndex = buildDestinationSessionIndex(rows);
+      await yieldEventLoop();
+      venueIndex = buildVenueSessionIndex(rows);
+      await yieldEventLoop();
+      slugIndex = buildCatalogSlugIndex(rows);
+      await yieldEventLoop();
+      catalogFacets = buildCatalogFacets(rows.filter(sessionHasCoverImage));
+      builtAt = now;
+    }
+  }
+
+  publicCatalogCache = {
+    expiresAt: now + Math.max(30_000, PUBLIC_CATALOG_CACHE_MS),
+    staleUntil: now + Math.max(60_000, PUBLIC_CATALOG_STALE_MS),
+    sessions: rows,
+    destinationIndex,
+    venueIndex,
+    slugIndex,
+    catalogFacets,
+    builtAt,
+  };
+}
+
+/** Emergency fallback only (INC.504.5): prefer public-catalog.dto / child / disk. */
 async function publicCatalogSessionsFast(db) {
   const [result, pinnedResult] = await Promise.all([
     db.query(
@@ -8223,6 +7209,14 @@ async function publicCatalogSessionsFast(db) {
           primary_offer."deeplinkUrl" as "offerDeeplinkUrl",
           min(session."startsAt") filter (where ${ACTIVE_SESSION_SQL}) as "startsAt",
           min(session."priceFromRub") filter (where ${ACTIVE_SESSION_SQL} and session."priceFromRub" >= $1) as "sessionPriceFromRub",
+          max(session."priceFromRub") filter (where ${ACTIVE_SESSION_SQL} and session."priceFromRub" >= $1) as "sessionPriceToRub",
+          (
+            select max(offer."priceRub")
+            from "EventOffer" offer
+            where offer."eventId" = e.id
+              and offer.active = true
+              and offer."priceRub" >= $1
+          ) as "offerPriceMaxRub",
           count(distinct session.id) filter (where ${ACTIVE_SESSION_SQL})::int as "slotCount",
           ${orderedEventTagsSql('e.id')} as tags,
           (
@@ -8285,6 +7279,13 @@ async function publicCatalogSessionsFast(db) {
             where price is not null and price >= $1
           ) as "priceFrom",
           (
+            select max(price)
+            from (
+              values ("priceFromRub"), ("sessionPriceFromRub"), ("sessionPriceToRub"), ("offerPriceRub"), ("offerPriceMaxRub")
+            ) as prices(price)
+            where price is not null and price >= $1
+          ) as "priceTo",
+          (
             (
               "offerWidgetUrl" is not null
               or "offerDeeplinkUrl" is not null
@@ -8315,9 +7316,8 @@ async function publicCatalogSessionsFast(db) {
             lower(regexp_replace(trim(coalesce(venue, '')), '\\s+', ' ', 'g'))
           ) as "groupKey"
         from normalized
-        where "priceFrom" >= $1
-          and "purchaseReady" = true
-          and lower(coalesce("sourceStatus", '')) not in ('widget_blocked', 'paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden')
+        where "purchaseReady" = true
+          and lower(coalesce("sourceStatus", '')) not in (${PUBLIC_SALES_BLOCKED_STATUS_SQL})
           and (
             "startsAt" is not null
             or kind = 'OPEN_DATE'
@@ -8329,7 +7329,7 @@ async function publicCatalogSessionsFast(db) {
           *,
           row_number() over (
             partition by "groupKey"
-            order by case when lower(coalesce("sourceStatus", '')) in ('paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden') then 1 else 0 end,
+            order by case when lower(coalesce("sourceStatus", '')) in (${PUBLIC_SALES_BLOCKED_STATUS_SQL}) then 1 else 0 end,
               case when kind = 'OPEN_DATE' or "sourceStatus" = 'open_date' then 1 else 0 end desc,
               "startsAt" asc nulls last,
               title asc
@@ -8343,7 +7343,7 @@ async function publicCatalogSessionsFast(db) {
           count(*)::int as "groupedEventsCount",
           sum(coalesce("slotCount", 0))::int as "sessionCount",
           min("priceFrom")::int as "priceFrom",
-          max("priceFrom")::int as "priceTo",
+          max("priceTo")::int as "priceTo",
           nullif(sum(coalesce("ticketsVacant", 0)), 0)::int as vacant,
           jsonb_agg(
             jsonb_build_object(
@@ -8357,7 +7357,7 @@ async function publicCatalogSessionsFast(db) {
               'offerDeeplinkUrl', "offerDeeplinkUrl",
               'vacant', "ticketsVacant"
             )
-            order by case when lower(coalesce("sourceStatus", '')) in ('paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden') then 1 else 0 end,
+            order by case when lower(coalesce("sourceStatus", '')) in (${PUBLIC_SALES_BLOCKED_STATUS_SQL}) then 1 else 0 end,
               "startsAt" asc nulls last
           ) as "upcomingSlots"
         from ranked
@@ -8426,8 +7426,9 @@ async function publicCatalogSessionsFast(db) {
   ]);
 
   const pinnedEventIds = new Set(pinnedResult.rows.map((row) => row.eventId));
+  const separateCityHubs = collectSeparateCityHubNames(result.rows);
   const sessions = result.rows
-    .map((row) => mapGroupedPublicSession(row, pinnedEventIds))
+    .map((row) => mapGroupedPublicSession(row, pinnedEventIds, { separateCityHubs }))
     .filter(Boolean);
   return dedupeCrossSourceCatalogSessions(regroupMappedPublicCatalogSessions(sessions));
 }
@@ -8437,42 +7438,6 @@ function publicListDescription(row) {
     cleanImportedDescription(row.overrideDescription || row.description) ||
     cleanImportedDescription(row.overrideShortDescription)
   );
-}
-
-function isOpenDateCatalogRow(row) {
-  const kind = String(row?.kind || '').toUpperCase();
-  const sourceStatus = String(row?.sourceStatus || '').toLowerCase();
-  return kind === 'OPEN_DATE' || sourceStatus === 'open_date';
-}
-
-function hasUpcomingOrOpenSchedule(row = {}) {
-  if (String(row?.sourceStatus || '').toLowerCase() === 'widget') return true;
-  if (isOpenDateCatalogRow(row)) return true;
-
-  const now = Date.now();
-  const startsAtMs = row?.startsAt ? Date.parse(String(row.startsAt)) : NaN;
-  const endsAtMs = row?.endsAt ? Date.parse(String(row.endsAt)) : NaN;
-
-  if (Number.isFinite(startsAtMs) && startsAtMs >= now - 15 * 60 * 1000) return true;
-
-  if (Number.isFinite(startsAtMs) && Number.isFinite(endsAtMs) && startsAtMs < now && endsAtMs >= now) {
-    const duration = endsAtMs - startsAtMs;
-    if (duration <= 36 * 60 * 60 * 1000) return true;
-    if (isWideLifetimeSession(row.startsAt, row.endsAt)) return false;
-    const kind = String(row?.kind || '').toUpperCase();
-    if (kind === 'RECURRING' || kind === 'SERIES') return true;
-    return false;
-  }
-
-  return false;
-}
-
-function isWideLifetimeSession(startsAt, endsAt) {
-  if (!startsAt || !endsAt) return false;
-  const startMs = Date.parse(String(startsAt));
-  const endMs = Date.parse(String(endsAt));
-  if (!Number.isFinite(startMs) || !Number.isFinite(endMs) || endMs <= startMs) return false;
-  return endMs - startMs >= 36 * 60 * 60 * 1000;
 }
 
 function publicSessionScheduleLabels(row) {
@@ -8546,6 +7511,22 @@ function isPlaceholderEventImageUrl(imageUrl) {
   const lower = raw.toLowerCase();
   if (lower.includes('placeholder.gif')) return true;
   if (/api\.teplohod\.info\/v1\/image\?item=&/i.test(raw)) return true;
+  // Without dirtyAlias upstream returns HTML 400; next/image then fails.
+  if (/api\.teplohod\.info\/v1\/image\?/i.test(raw) && !/dirtyAlias=/i.test(raw)) return true;
+  return false;
+}
+
+function isEphemeralAutoGeneratedCoverUrl(imageUrl) {
+  const raw = String(imageUrl || '').trim();
+  return /\/images\/(?:events|venues)\/generated\/(?:evt|venue)-auto-/i.test(raw);
+}
+
+function isUsableCatalogImageUrl(imageUrl) {
+  const raw = String(imageUrl || '').trim();
+  if (!raw || isPlaceholderEventImageUrl(raw)) return false;
+  if (raw.startsWith('/images/cities/')) return false;
+  if (/^https?:\/\//i.test(raw)) return true;
+  if (/^\/images\/(events|venues)\//i.test(raw)) return true;
   return false;
 }
 
@@ -8554,7 +7535,7 @@ function stabilizeTeplohodImageUrl(imageUrl) {
   const raw = String(imageUrl || '').trim();
   if (!raw) return null;
   const signedMatch = raw.match(
-    /teplohod-private\/images\/cache\/Events\/(Event\d+)\/([^/?#]+)/i,
+    /teplohod-(?:private|public)\/images\/cache\/Events\/(Event\d+)\/([^/?#]+)/i,
   );
   if (signedMatch) {
     const item = signedMatch[1];
@@ -8565,12 +7546,16 @@ function stabilizeTeplohodImageUrl(imageUrl) {
 }
 
 function pickFirstUsableEventImageUrl(...candidates) {
+  const durable = [];
+  const ephemeral = [];
   for (const candidate of candidates) {
-    if (!candidate || isPlaceholderEventImageUrl(candidate)) continue;
+    if (!candidate || !isUsableCatalogImageUrl(candidate)) continue;
     const stabilized = stabilizeTeplohodImageUrl(candidate);
-    if (stabilized && !isPlaceholderEventImageUrl(stabilized)) return stabilized;
+    if (!stabilized || !isUsableCatalogImageUrl(stabilized)) continue;
+    if (isEphemeralAutoGeneratedCoverUrl(stabilized)) ephemeral.push(stabilized);
+    else durable.push(stabilized);
   }
-  return null;
+  return durable[0] || ephemeral[0] || null;
 }
 
 const KNOWN_SESSION_CITIES = [
@@ -8605,6 +7590,10 @@ function inferCityNameFromText(...parts) {
     .filter(Boolean)
     .join(' ')
     .toLowerCase()
+    // Ship hull titles like «Теплоход «Москва-99»» must not imply city Москва.
+    .replace(/(?:теплоход|катер|яхт[аы]?|судно|пароход|корабль)\s*[«"'][^»"']+[»"']/giu, ' ')
+    .replace(/(?:теплоход|катер|яхт[аы]?|судно|пароход|корабль)\s+[а-яёa-z][\p{L}\d.\s-]*[-–—]\s*\d{1,4}/giu, ' ')
+    .replace(/\b[а-яёa-z]+[-–—]\d{1,4}\b/giu, ' ')
     .replace(/\s+/g, ' ');
   if (!haystack) return null;
 
@@ -8612,7 +7601,9 @@ function inferCityNameFromText(...parts) {
     const needle = city.toLowerCase();
     if (haystack.includes(needle)) return city;
     const stem = cityNameStem(city);
-    if (stem.length >= 4 && haystack.includes(stem)) return city;
+    // Word-boundary stem only: bare includes(«казан») false-positives
+    // «Казанский собор» / «Казанская площадь» in Saint Petersburg.
+    if (stem.length >= 4 && haystackIncludesCityToken(haystack, stem)) return city;
   }
 
   const match = haystack.match(/(?:^|\s)г\.?\s*([а-яё][а-яё\s-]{2,40})/i);
@@ -8650,107 +7641,8 @@ function resolvePublicSessionCity(row) {
   return routeCityToPublicDisplayName(inferred || raw || 'Не указан');
 }
 
-export function mapGroupedPublicSession(row, pinnedEventIds = new Set()) {
-  const tags = row.tags || [];
-  const displayCity = resolvePublicSessionDisplayCity(row);
-  if (isForeignPublicCity(displayCity) || isForeignPublicCity(row.city)) return null;
-  const groupCity = resolvePublicSessionCity(row);
-  if (!groupCity) return null;
-  const destination = publicDestinationForCity({ ...row, city: row.city || displayCity });
-  if (!destination) return null;
-  const fallbackWidgetUrl = buildProviderWidgetUrl(row);
-  const purchase = purchaseInfo(row);
-  const purchaseUrl = purchase.url || fallbackWidgetUrl;
-  const groupEventIds = (row.groupEventIds || [row.id]).slice(0, 12);
-  const manualLandingStatus = groupEventIds.some((id) => pinnedEventIds.has(id)) ? 'PINNED' : null;
-  const schedule = publicSessionScheduleLabels(row);
-  const timeZone = schedule.timeZone || resolveCityTimeZone(displayCity, destination?.name);
-  const upcomingSlots = (Array.isArray(row.upcomingSlots) ? row.upcomingSlots : [])
-    .filter((slot) => slot?.startsAt)
-    .slice(0, 12)
-    .map((slot) => {
-      const slotPurchase = purchaseInfo({
-        sourceCode: slot.sourceCode || row.sourceCode,
-        offerSourceCode: slot.offerSourceCode || row.offerSourceCode || row.sourceCode,
-        offerWidgetUrl: slot.offerWidgetUrl,
-        offerDeeplinkUrl: slot.offerDeeplinkUrl,
-        externalId: slot.externalId || row.externalId,
-      });
-      return {
-        eventId: slot.eventId,
-        startsAt: normalizeStartsAt(slot.startsAt),
-        dateLabel: formatDate(slot.startsAt, timeZone),
-        timeLabel: formatTime(slot.startsAt, timeZone),
-        purchaseUrl: slotPurchase.url || purchaseUrl,
-        sourceStatus: slot.sourceStatus || row.sourceStatus || null,
-        purchaseReady: slotPurchase.ready,
-        vacant: slot.vacant ?? row.vacant ?? null,
-      };
-    });
-
-  const ruleEvent = buildLandingRuleEvent({ ...row, city: displayCity }, tags, destination, row.category || 'unknown');
-  const institutionContext = shouldResolveInstitutionFromTitle({ venueKind: row.venueKind, venue: row.venue })
-    ? resolveContextInstitutionFromTitle(row.overrideTitle || row.title)
-    : null;
-  const session = {
-    id: row.id,
-    slug: publicEventSlug(row.slug),
-    sourceSlug: row.slug,
-    groupKey: publicEventGroupKey({ ...row, city: groupCity }),
-    groupEventIds,
-    groupedEventsCount: row.groupedEventsCount || 1,
-    sessionCount: row.sessionCount || upcomingSlots.length || 1,
-    upcomingSlots,
-    title: resolveCatalogDisplayTitle(row.overrideTitle || row.title, row.venue),
-    cityId: row.cityId,
-    citySlug: destination.slug,
-    sourceCitySlug: row.citySlug,
-    city: displayCity,
-    destination: destination.name,
-    destinationType: destination.type,
-    venueId: row.venueId,
-    venueSlug: row.venueId ? publicVenueSlug(row.venueSlug, row.venue, row.venueId) : row.venueSlug,
-    venue: formatPublicVenueTitle(row.venue) || 'Не указано',
-    venueAddress: row.venueAddress || null,
-    venueKind: row.venueKind || 'OTHER',
-    institutionVenue: institutionContext?.displayName || null,
-    offerTitle: row.offerTitle,
-    offerSourceCode: row.offerSourceCode,
-    purchaseUrl,
-    widgetUrl: row.offerWidgetUrl || fallbackWidgetUrl,
-    deeplinkUrl: row.offerDeeplinkUrl || null,
-    purchaseReady: purchase.ready,
-    purchaseMode: purchase.mode,
-    purchaseProvider: purchase.provider,
-    purchaseUrlSource: purchase.urlSource,
-    category: row.category || 'unknown',
-    sourceCategory: row.category || 'unknown',
-    kind: row.kind || null,
-    sourceStatus: row.sourceStatus || null,
-    subcategories: ruleEvent.subcategories,
-    tags: sliceCatalogTags(tags),
-    startsAt: schedule.startsAt || '',
-    dateLabel: schedule.dateLabel,
-    timeLabel: schedule.timeLabel,
-    timeBucket: schedule.timeBucket,
-    timeZone,
-    priceFrom: row.priceFrom,
-    priceTo: row.priceTo ?? row.priceFrom,
-    vacant: row.vacant,
-    ageLimit: row.ageLimit ?? null,
-    imageUrl: resolvePublicSessionImageUrl(row),
-    description: publicListDescription(row),
-  };
-
-  return {
-    ...session,
-    landingSlugs: resolveLandingSlugsForSession(ruleEvent, { startsAt: row.startsAt, upcomingSlots }),
-    manualLandingStatus,
-  };
-}
-
 function isSaleablePublicSession(session) {
-  return Boolean(session.purchaseReady && Number.isFinite(session.priceFrom) && session.priceFrom >= MIN_DISPLAY_PRICE_RUB);
+  return Boolean(session.purchaseReady);
 }
 
 async function publicEventRows(db, forceRefresh = false) {
@@ -8765,7 +7657,11 @@ async function publicEventRows(db, forceRefresh = false) {
   if (forceRefresh) {
     publicEventRowsCache = null;
     publicEventRowsBuildPromise = null;
-    publicCatalogCache = null;
+    if (publicCatalogCache?.sessions) {
+      publicCatalogCache = { ...publicCatalogCache, expiresAt: 0 };
+    } else {
+      publicCatalogCache = null;
+    }
     publicHomeCache = null;
   }
 
@@ -8879,10 +7775,11 @@ async function publicEventRowsLean(db, limit) {
     [limit],
   );
 
+  const separateCityHubs = collectSeparateCityHubNames(result.rows);
   return result.rows
     .map((row) => {
       const tags = row.tags || [];
-      const destination = publicDestinationForCity(row);
+      const destination = publicDestinationForCity(row, separateCityHubs);
       const fallbackDestinationName = cleanDisplayName(row.city) || 'Не указан';
       const priceFrom = displayPriceFrom(row.priceFromRub, row.sessionPriceFromRub, row.offerPriceRub);
       const purchase = purchaseInfo(row);
@@ -8931,7 +7828,7 @@ async function publicEventRowsLean(db, limit) {
         tags,
       };
     })
-    .filter((row) => hasUpcomingOrOpenSchedule(row) && row.purchaseReady && Number.isFinite(row.priceFrom) && row.priceFrom >= MIN_DISPLAY_PRICE_RUB);
+    .filter((row) => hasUpcomingOrOpenSchedule(row) && row.purchaseReady);
 }
 
 function parseCatalogAgeLimit(value) {
@@ -9097,7 +7994,7 @@ function buildTeplohodUrl(eventExternalId) {
   if (!eventExternalId) return null;
   const eventId = String(eventExternalId).replace(/^tep-/i, '').trim();
   if (!/^\d+$/.test(eventId)) return null;
-  const widgetId = String(process.env.TEP_WIDGET_ID || '14208').trim() || '14208';
+  const widgetId = String(process.env.TEP_WIDGET_ID || '14460').trim() || '14460';
   // teplohod.info/event/{id} currently returns "Ошибка!"; working checkout is account.teplohod.info.
   const checkoutBase = (process.env.TEP_CHECKOUT_BASE_URL || 'https://account.teplohod.info').replace(/\/+$/, '');
   const url = new URL(`${checkoutBase}/order/event-order`);
@@ -9106,38 +8003,6 @@ function buildTeplohodUrl(eventExternalId) {
   return url.toString();
 }
 
-async function publicVenues(db, limit) {
-  return (await publicVenueHubRows(db, 500)).slice(0, limit).map(mapPublicVenueListItem);
-}
-
-async function publicRelatedVenues(db, venueId, city, limit, hubRows = null) {
-  if (!city) return [];
-  const rows = hubRows || (await publicVenueHubRows(db, 500));
-  const current = findMergedVenueGroup(rows, venueId);
-  const currentTemplate = publicVenuePageTemplate(resolvePublicVenueKindFromRow(current || {}));
-  return rows
-    .filter((row) => row.city === city && isPublicVenueHub(row) && !venueGroupsOverlap(current, row))
-    .filter((row) => publicVenuePageTemplate(resolvePublicVenueKindFromRow(row)) === currentTemplate)
-    .slice(0, limit)
-    .map(mapPublicVenueListItem);
-}
-
-async function publicVenuesForCity(db, city, limit) {
-  if (!city) return [];
-  return (await publicVenueHubRows(db, 500))
-    .filter((row) => row.city === city)
-    .slice(0, limit)
-    .map(mapPublicVenueListItem);
-}
-
-async function publicVenuesForSessions(db, sessions, limit) {
-  const venueIds = new Set(sessions.map((session) => session.venueId).filter(Boolean));
-  if (!venueIds.size) return [];
-  return (await publicVenueHubRows(db, 500))
-    .filter((row) => (row.mergedVenueIds || [row.id]).some((id) => venueIds.has(id)))
-    .slice(0, limit)
-    .map(mapPublicVenueListItem);
-}
 
 async function resolvePublicEventId(db, eventSlugOrId, catalogSessions = null) {
   const value = String(eventSlugOrId || '').trim();
@@ -9177,47 +8042,6 @@ function publicEventSlug(value) {
   return publicCitySlug(value);
 }
 
-function extractOpaqueIdSuffix(value) {
-  const match = String(value || '').match(/(?:^|[-_])([a-f0-9]{20,})$/i);
-  return match ? match[1].toLowerCase() : null;
-}
-
-function stripOpaqueVenueIdSuffix(slug) {
-  const suffix = extractOpaqueIdSuffix(slug);
-  if (!suffix) return slug;
-  const trimmed = String(slug || '').replace(new RegExp(`[-_]${suffix}$`, 'i'), '');
-  return trimmed || slug;
-}
-
-function dedupeVenueSlugSuffix(slug) {
-  const parts = String(slug || '')
-    .split('-')
-    .filter(Boolean);
-  if (parts.length < 2) return slug;
-  if (parts[parts.length - 1] === parts[parts.length - 2]) {
-    return parts.slice(0, -1).join('-');
-  }
-  return slug;
-}
-
-function buildPublicVenueSlug(title, id) {
-  const titleSlug = publicCitySlug(title) || 'venue';
-  const rawId = String(id || '').replace(/^venue_/, '');
-  const idSlug = publicCitySlug(rawId) || rawId;
-  if (!idSlug) return dedupeVenueSlugSuffix(titleSlug);
-  if (titleSlug.endsWith(`-${idSlug}`)) return dedupeVenueSlugSuffix(titleSlug);
-  return dedupeVenueSlugSuffix(`${titleSlug}-${idSlug}`);
-}
-
-export function publicVenueSlug(slug, title, id) {
-  const raw = String(slug || '').trim();
-  const normalized = publicCitySlug(raw);
-  if (normalized && !/^[a-f0-9]{20,}$/i.test(normalized)) {
-    return dedupeVenueSlugSuffix(stripOpaqueVenueIdSuffix(normalized));
-  }
-  if (title && id) return buildPublicVenueSlug(title, id);
-  return dedupeVenueSlugSuffix(stripOpaqueVenueIdSuffix(normalized || raw));
-}
 
 function publicCitySlug(value) {
   const letters = {
@@ -9269,7 +8093,7 @@ function publicCitySlug(value) {
 
 function buildLandingRows(events) {
   return LANDING_RULES.map((rule) => {
-    const matched = events.filter((event) => matchesRule(event, rule));
+    const matched = events.filter((event) => matchesLandingRule(event, rule));
     const prices = matched.map((event) => event.priceFrom).filter((price) => Number.isFinite(price) && price > 0);
     return {
       slug: rule.slug,
@@ -9282,37 +8106,7 @@ function buildLandingRows(events) {
   });
 }
 
-export function buildPublicLandings(sessions) {
-  return LANDING_RULES.map((rule) => {
-    const matched = sessions.filter((session) => sessionMatchesLandingSlug(session, rule.slug));
-    const prices = matched.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
-    return {
-      slug: rule.slug,
-      title: rule.title,
-      subtitle: rule.subtitle,
-      chips: rule.chips,
-      events: matched.length,
-      venues: new Set(matched.map((session) => session.venue).filter(Boolean)).size,
-      priceFrom: prices.length ? Math.min(...prices) : null,
-      imageUrl: null,
-      strength: matched.length >= 20 ? 'ready' : matched.length > 0 ? 'seed' : 'empty',
-    };
-  });
-}
-
-function resolveLandingRule(landingSlug) {
-  const key = String(landingSlug || '').trim().toLowerCase().replace(/_/g, '-');
-  const direct = LANDING_RULES.find((item) => item.slug === key);
-  if (direct) return direct;
-  return (
-    LANDING_RULES.find((item) => (LANDING_SLUG_ALIASES[item.slug] || []).includes(key)) || null
-  );
-}
-
-function sessionMatchesLandingSlug(session, canonicalSlug) {
-  const slugs = new Set([canonicalSlug, ...(LANDING_SLUG_ALIASES[canonicalSlug] || [])]);
-  return (session.landingSlugs || []).some((value) => slugs.has(String(value || '').toLowerCase()));
-}
+export const buildPublicLandings = buildPublicLandingsFromSessions;
 
 function sortPromoLandings(landings, cityFilter = '') {
   const cityKey = String(cityFilter || '').trim().toLowerCase();
@@ -9399,221 +8193,15 @@ function applyLandingScheduleToSession(session, rule) {
 
 function filterSessionsForLandingRule(sessions, rule) {
   return sessions
-    .filter((session) => sessionMatchesLandingSlug(session, rule.slug) && sessionMatchesLandingSchedule(session, rule))
+    .filter((session) => matchesLandingRule(session, rule) && sessionMatchesLandingSchedule(session, rule))
     .map((session) => applyLandingScheduleToSession(session, rule))
-    .filter(Boolean)
-    .slice(0, 48);
+    .filter(Boolean);
 }
 
 function resolveLandingSlugsForSession(ruleEvent, sessionDraft, rules = LANDING_RULES) {
   return rules
-    .filter((rule) => matchesRule(ruleEvent, rule) && sessionMatchesLandingSchedule(sessionDraft, rule))
+    .filter((rule) => matchesLandingRule(ruleEvent, rule) && sessionMatchesLandingSchedule(sessionDraft, rule))
     .map((rule) => rule.slug);
-}
-
-function matchesRule(event, rule) {
-  return explainRuleMatch(event, rule).matches;
-}
-
-function landingRequiredSignalsSatisfied(rule, keywordFields) {
-  if (rule.requiredAnyKeywords?.length && !firstKeywordMatch(keywordFields, rule.requiredAnyKeywords)) return false;
-
-  const titleKeywordFields = keywordFields.filter((field) => field.field === 'title');
-  for (const group of rule.requiredTitleKeywordGroups || []) {
-    if (!firstKeywordMatch(titleKeywordFields, group)) return false;
-  }
-
-  for (const group of rule.requiredKeywordGroups || []) {
-    if (!firstKeywordMatch(keywordFields, group)) return false;
-  }
-
-  return true;
-}
-
-function explainRuleMatch(event, rule) {
-  const tags = event.tags || [];
-  const keywordFields = keywordFieldsForEvent(event, tags, rule.keywordScope || 'full');
-  const fullKeywordFields = keywordFieldsForEvent(event, tags, 'full');
-  const excludeKeywordFields = rule.excludeKeywordFields?.length
-    ? fullKeywordFields.filter((field) => rule.excludeKeywordFields.includes(field.field))
-    : fullKeywordFields;
-
-  const reasons = [];
-  const blockers = [];
-  if (rule.city) {
-    if (matchesRuleCity(event, rule.city)) reasons.push(`город: ${rule.city}`);
-    else blockers.push(`другой город: ${event.city || event.destination || 'не указан'}`);
-  }
-  if (rule.venue) {
-    if (event.venue === rule.venue) reasons.push(`площадка: ${rule.venue}`);
-    else blockers.push(`другая площадка: ${event.venue || 'не указана'}`);
-  }
-
-  const excludedTag = rule.excludeTags?.find((tag) => tags.includes(tag));
-  if (excludedTag) blockers.push(`исключающий тег: ${excludedTag}`);
-  const excludedKeyword = firstKeywordMatch(excludeKeywordFields, rule.excludeKeywords || []);
-  if (excludedKeyword) blockers.push(`исключающее слово(${excludedKeyword.field}): ${excludedKeyword.keyword}`);
-
-  if (rule.requiredAnySubcategories?.length) {
-    const subcategories = eventSubcategoriesForLanding(event, tags);
-    const hit = rule.requiredAnySubcategories.find((label) => subcategories.includes(label));
-    if (hit) reasons.push(`подкатегория: ${hit}`);
-    else blockers.push(`нет подкатегории: ${rule.requiredAnySubcategories.join(' / ')}`);
-  }
-
-  if (!blockers.length) {
-    const fastMatchReasons = collectFastLandingMatchReasons(event, rule, tags);
-    if (fastMatchReasons.length && landingRequiredSignalsSatisfied(rule, keywordFields)) {
-      return { matches: true, reasons: uniqueValues([...reasons, ...fastMatchReasons]).slice(0, 10), blockers: [] };
-    }
-  }
-
-  const requiredAnyTag = rule.requiredAnyTags?.find((tag) => tags.includes(tag));
-  if (rule.requiredAnyTags?.length) {
-    if (requiredAnyTag) reasons.push(`обязательный тег: ${requiredAnyTag}`);
-    else blockers.push(`нет обязательного тега: ${rule.requiredAnyTags.join(' / ')}`);
-  }
-
-  const requiredAnyKeyword = firstKeywordMatch(keywordFields, rule.requiredAnyKeywords || []);
-  if (rule.requiredAnyKeywords?.length) {
-    if (requiredAnyKeyword) reasons.push(`обязательное слово(${requiredAnyKeyword.field}): ${requiredAnyKeyword.keyword}`);
-    else blockers.push(`нет обязательного слова: ${rule.requiredAnyKeywords.join(' / ')}`);
-  }
-
-  for (const keyword of rule.requiredKeywords || []) {
-    const found = firstKeywordMatch(keywordFields, [keyword]);
-    if (found) reasons.push(`обязательное слово(${found.field}): ${keyword}`);
-    else blockers.push(`нет обязательного слова: ${keyword}`);
-  }
-
-  const titleKeywordFields = keywordFields.filter((field) => field.field === 'title');
-  for (const group of rule.requiredTitleKeywordGroups || []) {
-    const found = firstKeywordMatch(titleKeywordFields, group);
-    if (found) reasons.push(`группа(title): ${found.keyword}`);
-    else blockers.push(`нет слова в названии: ${group.join(' / ')}`);
-  }
-
-  for (const group of rule.requiredKeywordGroups || []) {
-    const found = firstKeywordMatch(keywordFields, group);
-    if (found) reasons.push(`группа(${found.field}): ${found.keyword}`);
-    else blockers.push(`нет слова из группы: ${group.join(' / ')}`);
-  }
-
-  if (blockers.length) {
-    return { matches: false, reasons: uniqueValues(reasons).slice(0, 10), blockers: uniqueValues(blockers).slice(0, 10) };
-  }
-
-  const tagSignals = (rule.tags || []).filter((tag) => tags.includes(tag));
-  const keywordSignals = matchingKeywordMatches(keywordFields, rule.keywords || []);
-  for (const tag of tagSignals.slice(0, 4)) reasons.push(`тег: ${tag}`);
-  for (const match of keywordSignals.slice(0, 4)) reasons.push(`слово(${match.field}): ${match.keyword}`);
-
-  const hasTagSignal = tagSignals.length > 0;
-  const hasKeywordSignal = keywordSignals.length > 0;
-  const hasRequiredSignal = Boolean(rule.requiredAnyTags || rule.requiredAnyKeywords || rule.requiredKeywords || rule.requiredTitleKeywordGroups || rule.requiredKeywordGroups);
-  const venueMatched = rule.venue ? event.venue === rule.venue : false;
-  const matches = Boolean(hasTagSignal || hasKeywordSignal || hasRequiredSignal || venueMatched);
-  return { matches, reasons: uniqueValues(reasons).slice(0, 10), blockers: [] };
-}
-
-function eventSubcategoriesForLanding(event, tags) {
-  return uniqueValues([
-    ...(event.subcategories || []),
-    ...pickCatalogSubcategories({
-      subcategories: event.subcategories || [],
-      tags,
-      category: event.category || event.sourceCategory || '',
-    }),
-  ]);
-}
-
-function collectFastLandingMatchReasons(event, rule, tags) {
-  const reasons = [];
-
-  if (rule.requiredAnySubcategories?.length) {
-    const subcategories = eventSubcategoriesForLanding(event, tags);
-    const hit = rule.requiredAnySubcategories.find((label) => subcategories.includes(label));
-    if (hit) reasons.push(`подкатегория: ${hit}`);
-  }
-
-  if (!reasons.length && rule.requiredAnyVenueKeywords?.length && event.venue) {
-    const venue = String(event.venue).toLowerCase();
-    const hit = rule.requiredAnyVenueKeywords.find((keyword) => venue.includes(String(keyword).toLowerCase()));
-    if (hit) reasons.push(`площадка: ${hit}`);
-  }
-
-  if (!reasons.length && rule.tags?.length) {
-    const hit = rule.tags.find((tag) => tags.includes(tag));
-    if (hit) reasons.push(`тег: ${hit}`);
-  }
-
-  return reasons;
-}
-
-function matchesRuleCity(event, expectedCity) {
-  const candidates = [event.city, event.destination].filter(Boolean).map((value) => String(value).toLowerCase());
-  return candidates.includes(String(expectedCity).toLowerCase());
-}
-
-function keywordFieldsForEvent(event, tags, scope = 'full') {
-  const fields = [
-    { field: 'title', value: event.title },
-    { field: 'category', value: event.category },
-    { field: 'sourceCategory', value: event.sourceCategory },
-    { field: 'tag', value: tags.join(' ') },
-  ];
-  if (scope !== 'content') {
-    fields.push(
-      { field: 'venue', value: event.venue },
-      { field: 'city', value: event.city },
-      { field: 'destination', value: event.destination },
-      { field: 'subcategory', value: (event.subcategories || []).join(' ') },
-    );
-  }
-  return fields
-    .filter((item) => item.value)
-    .map((item) => ({ ...item, text: String(item.value).toLowerCase() }));
-}
-
-const CYRILLIC_WORD_CHAR = /[a-z0-9а-яё]/i;
-
-/** Подстрока с границей слова слева — «катер» не матчится внутри «екатеринбург». */
-function keywordOccursInText(text, keyword) {
-  const haystack = String(text || '').toLowerCase();
-  const needle = String(keyword || '').toLowerCase();
-  if (!haystack || !needle) return false;
-
-  let from = 0;
-  while (from <= haystack.length - needle.length) {
-    const index = haystack.indexOf(needle, from);
-    if (index === -1) return false;
-    const before = index === 0 ? '' : haystack[index - 1];
-    if (!before || !CYRILLIC_WORD_CHAR.test(before)) return true;
-    from = index + 1;
-  }
-  return false;
-}
-
-function firstKeywordMatch(fields, keywords) {
-  for (const keyword of keywords) {
-    const field = fields.find((item) => keywordOccursInText(item.text, keyword));
-    if (field) return { keyword, field: field.field };
-  }
-  return null;
-}
-
-function matchingKeywordMatches(fields, keywords) {
-  const matches = [];
-  const seen = new Set();
-  for (const keyword of keywords) {
-    const field = fields.find((item) => keywordOccursInText(item.text, keyword));
-    if (!field) continue;
-    const key = `${field.field}:${keyword}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    matches.push({ keyword, field: field.field });
-  }
-  return matches;
 }
 
 const READINESS_ISSUE_META = {
@@ -9680,8 +8268,6 @@ function plainReadinessText(value) {
     .replace(/\s+/g, ' ')
     .trim();
 }
-
-const SITE_TIME_ZONE = 'Europe/Moscow';
 
 const PUBLIC_CATALOG_CATEGORIES = new Set([
   'экскурсии',
@@ -9780,83 +8366,6 @@ function isCatalogSubcategoryLabel(label, category) {
   return true;
 }
 
-export function pickCatalogSubcategories(session, limit = 4) {
-  const category = session.category || session.sourceCategory || '';
-  const transport = resolveCatalogTransportHint(session);
-  const labels = [];
-  const seen = new Set();
-
-  for (const label of session.subcategories || []) {
-    const value = String(label || '').trim();
-    if (!isCatalogSubcategoryLabel(value, category) || seen.has(value)) continue;
-    if (isConflictingTransportCatalogLabel(value, transport)) continue;
-    seen.add(value);
-    labels.push(value);
-    if (labels.length >= limit) return labels;
-  }
-
-  for (const tag of session.tags || []) {
-    const value = String(tag || '').trim();
-    if (!isCatalogSubcategoryLabel(value, category) || seen.has(value)) continue;
-    if (isConflictingTransportCatalogLabel(value, transport)) continue;
-    seen.add(value);
-    labels.push(value);
-    if (labels.length >= limit) break;
-  }
-
-  return labels;
-}
-
-function parseSessionStartsAt(value) {
-  if (value instanceof Date) return value;
-  const raw = String(value || '').trim();
-  if (!raw) return new Date(NaN);
-  if (/[zZ]$/.test(raw) || /[+-]\d{2}(:\d{2}|\d{2})$/.test(raw)) {
-    return new Date(raw.replace(/([+-]\d{2})(\d{2})$/, '$1:$2'));
-  }
-  if (/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}/.test(raw)) {
-    return new Date(`${raw.replace(' ', 'T')}Z`);
-  }
-  return new Date(raw);
-}
-
-export function normalizeStartsAt(value) {
-  const date = parseSessionStartsAt(value);
-  if (!Number.isFinite(date.getTime())) return null;
-  return date.toISOString();
-}
-
-export function formatDate(value, timeZone = SITE_TIME_ZONE) {
-  const date = parseSessionStartsAt(value);
-  if (!Number.isFinite(date.getTime())) return '';
-  return new Intl.DateTimeFormat('ru-RU', {
-    day: 'numeric',
-    month: 'short',
-    weekday: 'short',
-    timeZone,
-  }).format(date);
-}
-
-export function formatTime(value, timeZone = SITE_TIME_ZONE) {
-  const date = parseSessionStartsAt(value);
-  if (!Number.isFinite(date.getTime())) return '';
-  return new Intl.DateTimeFormat('ru-RU', {
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone,
-  }).format(date);
-}
-
-export function timeBucket(value, timeZone = SITE_TIME_ZONE) {
-  const date = parseSessionStartsAt(value);
-  if (!Number.isFinite(date.getTime())) return 'night';
-  const hour = localHourFromInstant(date, timeZone);
-  if (hour >= 6 && hour < 12) return 'morning';
-  if (hour >= 12 && hour < 17) return 'day';
-  if (hour >= 17 && hour < 23) return 'evening';
-  return 'night';
-}
-
 function clampNumber(value, min, max, fallback) {
   const parsed = Number(value);
   if (!Number.isFinite(parsed)) return fallback;
@@ -9913,7 +8422,7 @@ export async function runLandingAudit(db, rootDir = path.resolve(path.dirname(fi
             }),
           }
         : null;
-      const ruleMatch = matchEvent ? explainRuleMatch(matchEvent, rule) : { matches: false, reasons: [], blockers: ['событие не найдено в БД'] };
+      const ruleMatch = matchEvent ? explainLandingRuleMatch(matchEvent, rule) : { matches: false, reasons: [], blockers: ['событие не найдено в БД'] };
       const inCatalog = Boolean(catalogSession);
       const onLanding = catalogSession?.landingSlugs?.includes(landingSlug) || false;
       const futureSessions = Number(auditRow?.futureSessionCount || 0);
@@ -9996,19 +8505,22 @@ async function fetchLandingAuditEventRow(db, eventId) {
 }
 
 function mapPublicArticleRow(row) {
+  const citySlug = canonicalBlogCitySlug(row.citySlug) || row.citySlug || null;
   return {
     id: row.id,
     slug: row.slug,
     title: row.title,
     excerpt: row.excerpt || null,
     coverImageUrl: row.coverImageUrl || null,
-    city: row.city || null,
-    citySlug: row.citySlug || null,
+    city: blogCityDisplayName(citySlug, row.city),
+    citySlug,
     authorId: row.authorId || null,
     authorName: row.authorName || null,
     articleType: row.articleType || null,
     publishedAt: row.publishedAt ? new Date(row.publishedAt).toISOString() : null,
+    updatedAt: row.updatedAt ? new Date(row.updatedAt).toISOString() : null,
     isIndexable: row.isIndexable !== false,
+    isFeatured: row.isFeatured === true,
     seoTitle: row.seoTitle || row.title,
     seoDescription: row.seoDescription || row.excerpt || null,
   };
@@ -10023,8 +8535,34 @@ function mapPublicArticleDetail(row) {
   };
 }
 
-export async function buildPublicArticlesList(db) {
-  const { rows } = await db.query(`
+export async function buildPublicArticlesList(db, options = {}) {
+  const citySlugFilter = canonicalBlogCitySlug(options.citySlug);
+  const rankCitySlug = canonicalBlogCitySlug(options.rankCitySlug);
+  const includeBroad = options.includeBroad === true;
+  const excludeFeatured = options.excludeFeatured === true;
+  const pageLimit = Math.min(Math.max(Number(options.limit) || 100, 1), 200);
+  const cursorRaw = String(options.cursor || '').trim();
+  const aliases = citySlugFilter && !isBroadBlogCitySlug(citySlugFilter)
+    ? blogCitySlugAliases(citySlugFilter)
+    : [];
+
+  const params = [];
+  let whereExtra = '';
+  if (aliases.length) {
+    params.push(aliases);
+    const aliasIdx = params.length;
+    whereExtra += ` and (
+      coalesce(nullif(a."citySlug", ''), c.slug) = any($${aliasIdx}::text[])
+      ${includeBroad ? ` or coalesce(nullif(a."citySlug", ''), '') in ('multi', 'regions')` : ''}
+    )`;
+  }
+  // Wider window for in-memory rank/cursor (blog corpus is small).
+  const fetchLimit = Math.min(200, Math.max(pageLimit * 4, pageLimit + 20));
+  params.push(fetchLimit);
+  const limitIdx = params.length;
+
+  const { rows } = await db.query(
+    `
     select
       a.id,
       a.slug,
@@ -10032,32 +8570,93 @@ export async function buildPublicArticlesList(db) {
       a.excerpt,
       a."coverImageUrl",
       a."publishedAt",
+      a."updatedAt",
       a."isIndexable",
+      a."isFeatured",
       a."seoTitle",
       a."seoDescription",
       a."authorId",
       a."authorName",
       a."articleType",
       case
-        when a.slug = 'afisha-regionalnye-goroda' then 'Регионы'
-        when a.slug = 'myuzikly-teatr-novichok-msk-spb' then 'Несколько городов'
-        else c.title
+        when a.slug = 'afisha-regionalnye-goroda' then 'Екатеринбург, Нижний Новгород и Уфа'
+        when coalesce(nullif(a."citySlug", ''), '') = 'regions' then 'Регионы'
+        when coalesce(nullif(a."citySlug", ''), '') = 'multi' then 'Несколько городов'
+        else coalesce(c.title, null)
       end as city,
       case
-        when a.slug = 'afisha-regionalnye-goroda' then 'regions'
-        when a.slug = 'myuzikly-teatr-novichok-msk-spb' then 'multi'
-        else c.slug
+        when a.slug = 'afisha-regionalnye-goroda' then 'multi'
+        else coalesce(
+          nullif(a."citySlug", ''),
+          case
+            when a.slug = 'myuzikly-teatr-novichok-msk-spb' then 'multi'
+            else c.slug
+          end
+        )
       end as "citySlug"
     from "Article" a
     left join "City" c on c.id = a."cityId"
     where a.status = 'PUBLISHED'
       and coalesce(a."isIndexable", true) = true
-    order by a."publishedAt" desc nulls last, a."updatedAt" desc
-  `);
+      and (a."publishedAt" is null or a."publishedAt" <= now())
+      ${whereExtra}
+    order by a."isFeatured" desc, a."publishedAt" desc nulls last, a."updatedAt" desc
+    limit $${limitIdx}
+  `,
+    params,
+  );
+
+  let articles = rows.map(mapPublicArticleRow);
+  if (excludeFeatured) {
+    articles = articles.filter((article) => article.isFeatured !== true);
+  }
+
+  if (rankCitySlug && !isBroadBlogCitySlug(rankCitySlug) && !aliases.length) {
+    const target = rankCitySlug;
+    const score = (slug) => {
+      const value = String(slug || '').trim().toLowerCase();
+      if (value === target) return 100;
+      if (value === 'multi' || value === 'regions') return 40;
+      return 0;
+    };
+    articles = [...articles].sort((a, b) => {
+      const diff = score(b.citySlug) - score(a.citySlug);
+      if (diff !== 0) return diff;
+      const ta = Date.parse(String(a.publishedAt || '')) || 0;
+      const tb = Date.parse(String(b.publishedAt || '')) || 0;
+      if (tb !== ta) return tb - ta;
+      return String(a.title || '').localeCompare(String(b.title || ''), 'ru');
+    });
+  }
+
+  let start = 0;
+  if (cursorRaw) {
+    try {
+      const json = Buffer.from(cursorRaw, 'base64url').toString('utf8');
+      const parsed = JSON.parse(json);
+      const cursorSlug = String(parsed.s || '').trim();
+      if (cursorSlug) {
+        const idx = articles.findIndex((article) => article.slug === cursorSlug);
+        start = idx >= 0 ? idx + 1 : articles.length;
+      }
+    } catch {
+      start = 0;
+    }
+  }
+
+  const page = articles.slice(start, start + pageLimit);
+  const last = page[page.length - 1];
+  const hasMore = start + page.length < articles.length;
+  const nextCursor =
+    hasMore && last
+      ? Buffer.from(JSON.stringify({ p: last.publishedAt || null, s: last.slug }), 'utf8').toString('base64url')
+      : null;
+
   return {
     generatedAt: new Date().toISOString(),
-    total: rows.length,
-    articles: rows.map(mapPublicArticleRow),
+    total: articles.length,
+    nextCursor,
+    articles: page,
   };
 }
 
@@ -10072,6 +8671,7 @@ export async function buildPublicArticlePage(db, slug) {
         a.content,
         a."coverImageUrl",
         a."publishedAt",
+        a."updatedAt",
         a."isIndexable",
         a."seoH1",
         a."seoTitle",
@@ -10081,28 +8681,53 @@ export async function buildPublicArticlePage(db, slug) {
         a."authorName",
         a."articleType",
         case
-          when a.slug = 'afisha-regionalnye-goroda' then 'Регионы'
-          when a.slug = 'myuzikly-teatr-novichok-msk-spb' then 'Несколько городов'
-          else c.title
+          when a.slug = 'afisha-regionalnye-goroda' then 'Екатеринбург, Нижний Новгород и Уфа'
+          when coalesce(nullif(a."citySlug", ''), '') = 'regions' then 'Регионы'
+          when coalesce(nullif(a."citySlug", ''), '') = 'multi' then 'Несколько городов'
+          else coalesce(c.title, null)
         end as city,
         case
-          when a.slug = 'afisha-regionalnye-goroda' then 'regions'
-          when a.slug = 'myuzikly-teatr-novichok-msk-spb' then 'multi'
-          else c.slug
+          when a.slug = 'afisha-regionalnye-goroda' then 'multi'
+          else coalesce(
+            nullif(a."citySlug", ''),
+            case
+              when a.slug = 'myuzikly-teatr-novichok-msk-spb' then 'multi'
+              else c.slug
+            end
+          )
         end as "citySlug"
       from "Article" a
       left join "City" c on c.id = a."cityId"
       where a.slug = $1
         and a.status = 'PUBLISHED'
+        and (a."publishedAt" is null or a."publishedAt" <= now())
       limit 1
     `,
     [slug],
   );
-  if (!rows[0]) return null;
-  return {
-    generatedAt: new Date().toISOString(),
-    article: mapPublicArticleDetail(rows[0]),
-  };
+  if (rows[0]) {
+    return {
+      generatedAt: new Date().toISOString(),
+      article: mapPublicArticleDetail(rows[0]),
+      cmsOwned: true,
+    };
+  }
+
+  // Article exists in CMS but is not public (draft/review/archive) - do not fall back to static body.
+  const { rows: ownedRows } = await db.query(
+    `select status::text as status from "Article" where slug = $1 limit 1`,
+    [slug],
+  );
+  if (ownedRows[0]) {
+    return {
+      generatedAt: new Date().toISOString(),
+      article: null,
+      cmsOwned: true,
+      cmsStatus: String(ownedRows[0].status || '').toLowerCase(),
+    };
+  }
+
+  return null;
 }
 
 export async function buildAdminArticlesList(db) {
@@ -10116,11 +8741,16 @@ export async function buildAdminArticlesList(db) {
       a."coverImageUrl",
       a."publishedAt",
       a."isIndexable",
+      a."isFeatured",
       a."updatedAt",
+      a."citySlug",
+      a."authorId",
+      a."authorName",
+      a."articleType",
       c.title as city
     from "Article" a
     left join "City" c on c.id = a."cityId"
-    order by a."updatedAt" desc
+    order by a."isFeatured" desc, a."updatedAt" desc
   `);
   return {
     generatedAt: new Date().toISOString(),
@@ -10133,8 +8763,13 @@ export async function buildAdminArticlesList(db) {
       excerpt: row.excerpt || '',
       coverImageUrl: row.coverImageUrl || null,
       city: row.city || null,
+      citySlug: canonicalBlogCitySlug(row.citySlug) || row.citySlug || null,
+      authorId: row.authorId || null,
+      authorName: row.authorName || null,
+      articleType: row.articleType || null,
       publishedAt: row.publishedAt ? new Date(row.publishedAt).toISOString() : null,
       isIndexable: row.isIndexable !== false,
+      isFeatured: row.isFeatured === true,
       updatedAt: row.updatedAt ? new Date(row.updatedAt).toISOString() : null,
     })),
   };
@@ -10146,7 +8781,7 @@ export async function buildAdminArticleDetail(db, articleId) {
       select
         a.*,
         c.title as city,
-        c.slug as "citySlug"
+        c.slug as "joinedCitySlug"
       from "Article" a
       left join "City" c on c.id = a."cityId"
       where a.id = $1
@@ -10156,6 +8791,12 @@ export async function buildAdminArticleDetail(db, articleId) {
   );
   const row = rows[0];
   if (!row) return null;
+  const citySlug =
+    canonicalBlogCitySlug(row.citySlug) ||
+    canonicalBlogCitySlug(row.joinedCitySlug) ||
+    row.citySlug ||
+    row.joinedCitySlug ||
+    null;
   return {
     id: row.id,
     slug: row.slug,
@@ -10166,7 +8807,7 @@ export async function buildAdminArticleDetail(db, articleId) {
     coverImageUrl: row.coverImageUrl || null,
     cityId: row.cityId || null,
     city: row.city || null,
-    citySlug: row.citySlug || null,
+    citySlug,
     authorId: row.authorId || null,
     authorName: row.authorName || null,
     articleType: row.articleType || null,
@@ -10175,9 +8816,17 @@ export async function buildAdminArticleDetail(db, articleId) {
     seoDescription: row.seoDescription || null,
     canonicalPath: row.canonicalPath || null,
     isIndexable: row.isIndexable !== false,
+    isFeatured: row.isFeatured === true,
     publishedAt: row.publishedAt ? new Date(row.publishedAt).toISOString() : null,
     updatedAt: row.updatedAt ? new Date(row.updatedAt).toISOString() : null,
   };
+}
+
+async function resolveArticleCityId(db, citySlug) {
+  const aliases = blogCitySlugAliases(citySlug);
+  if (!aliases.length) return null;
+  const { rows } = await db.query(`select id from "City" where slug = any($1::text[]) limit 1`, [aliases]);
+  return rows[0]?.id || null;
 }
 
 function normalizeArticleStatus(value) {
@@ -10204,7 +8853,18 @@ export async function upsertAdminArticle(db, articleId, payload = {}) {
   const excerpt = payload.excerpt ?? current?.excerpt ?? null;
   const content = payload.content ?? current?.content ?? null;
   const coverImageUrl = payload.coverImageUrl ?? current?.coverImageUrl ?? null;
-  const cityId = payload.cityId ?? current?.cityId ?? null;
+  const finalCitySlug =
+    payload.citySlug !== undefined
+      ? canonicalBlogCitySlug(payload.citySlug)
+      : canonicalBlogCitySlug(current?.citySlug) || current?.citySlug || null;
+  let cityId = current?.cityId ?? null;
+  if (payload.cityId !== undefined) {
+    cityId = payload.cityId || null;
+  } else if (payload.citySlug !== undefined) {
+    cityId = finalCitySlug ? await resolveArticleCityId(db, finalCitySlug) : null;
+  } else if (!cityId && finalCitySlug) {
+    cityId = await resolveArticleCityId(db, finalCitySlug);
+  }
   const authorId = payload.authorId ?? current?.authorId ?? null;
   const authorName = payload.authorName ?? current?.authorName ?? null;
   const articleType = payload.articleType ?? current?.articleType ?? null;
@@ -10213,12 +8873,22 @@ export async function upsertAdminArticle(db, articleId, payload = {}) {
   const seoDescription = payload.seoDescription ?? current?.seoDescription ?? excerpt;
   const canonicalPath = payload.canonicalPath ?? current?.canonicalPath ?? `/blog/${slug}`;
   const isIndexable = payload.isIndexable ?? current?.isIndexable ?? status === 'PUBLISHED';
+  const isFeatured =
+    payload.isFeatured !== undefined
+      ? Boolean(payload.isFeatured)
+      : Boolean(current?.isFeatured);
   const publishedAt =
     status === 'PUBLISHED'
       ? payload.publishedAt || current?.publishedAt || new Date().toISOString()
       : payload.publishedAt ?? current?.publishedAt ?? null;
 
   if (current) {
+    if (isFeatured) {
+      await db.query(
+        `update "Article" set "isFeatured" = false where "isFeatured" = true and id <> $1`,
+        [current.id],
+      );
+    }
     const { rows } = await db.query(
       `
         update "Article"
@@ -10230,15 +8900,17 @@ export async function upsertAdminArticle(db, articleId, payload = {}) {
           content = $6,
           "coverImageUrl" = $7,
           "cityId" = $8,
-          "authorId" = $9,
-          "authorName" = $10,
-          "articleType" = $11,
-          "seoH1" = $12,
-          "seoTitle" = $13,
-          "seoDescription" = $14,
-          "canonicalPath" = $15,
-          "isIndexable" = $16,
-          "publishedAt" = $17,
+          "citySlug" = $9,
+          "authorId" = $10,
+          "authorName" = $11,
+          "articleType" = $12,
+          "seoH1" = $13,
+          "seoTitle" = $14,
+          "seoDescription" = $15,
+          "canonicalPath" = $16,
+          "isIndexable" = $17,
+          "isFeatured" = $18,
+          "publishedAt" = $19,
           "updatedAt" = now()
         where id = $1
         returning id
@@ -10252,6 +8924,7 @@ export async function upsertAdminArticle(db, articleId, payload = {}) {
         content,
         coverImageUrl,
         cityId,
+        finalCitySlug,
         authorId,
         authorName,
         articleType,
@@ -10260,6 +8933,7 @@ export async function upsertAdminArticle(db, articleId, payload = {}) {
         seoDescription,
         canonicalPath,
         isIndexable,
+        isFeatured,
         publishedAt,
       ],
     );
@@ -10267,19 +8941,22 @@ export async function upsertAdminArticle(db, articleId, payload = {}) {
   }
 
   const id = `article_${randomUUID().replace(/-/g, '').slice(0, 24)}`;
+  if (isFeatured) {
+    await db.query(`update "Article" set "isFeatured" = false where "isFeatured" = true`);
+  }
   await db.query(
     `
       insert into "Article" (
-        id, slug, status, title, excerpt, content, "coverImageUrl", "cityId",
+        id, slug, status, title, excerpt, content, "coverImageUrl", "cityId", "citySlug",
         "authorId", "authorName", "articleType",
-        "seoH1", "seoTitle", "seoDescription", "canonicalPath", "isIndexable",
+        "seoH1", "seoTitle", "seoDescription", "canonicalPath", "isIndexable", "isFeatured",
         "publishedAt", "createdAt", "updatedAt"
       )
       values (
-        $1, $2, $3::"ArticleStatus", $4, $5, $6, $7, $8,
-        $9, $10, $11,
-        $12, $13, $14, $15, $16,
-        $17, now(), now()
+        $1, $2, $3::"ArticleStatus", $4, $5, $6, $7, $8, $9,
+        $10, $11, $12,
+        $13, $14, $15, $16, $17, $18,
+        $19, now(), now()
       )
     `,
     [
@@ -10291,6 +8968,7 @@ export async function upsertAdminArticle(db, articleId, payload = {}) {
       content,
       coverImageUrl,
       cityId,
+      finalCitySlug,
       authorId,
       authorName,
       articleType,
@@ -10299,8 +8977,16 @@ export async function upsertAdminArticle(db, articleId, payload = {}) {
       seoDescription,
       canonicalPath,
       isIndexable,
+      isFeatured,
       publishedAt,
     ],
   );
   return buildAdminArticleDetail(db, id);
+}
+
+export async function deleteAdminArticle(db, articleId) {
+  const current = await buildAdminArticleDetail(db, articleId);
+  if (!current) return null;
+  await db.query(`delete from "Article" where id = $1`, [articleId]);
+  return current;
 }

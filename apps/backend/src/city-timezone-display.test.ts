@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { resolveCityTimeZone } from './city-timezone.js';
-import { formatDate, formatTime } from './dto.js';
+import { formatDate, formatTime } from './public-datetime.js';
 
 /**
  * Event page / catalog display time = local wall-clock of event city
@@ -19,6 +19,24 @@ test('Ufa session labels use YEKT, not MSK', () => {
   assert.equal(formatTime(startsAt, timeZone), '18:00');
   assert.equal(formatTime(startsAt, 'Europe/Moscow'), '16:00');
   assert.match(formatDate(startsAt, timeZone), /2/);
+});
+
+test('Ханты-Мансийск uses YEKT, not MSK default', () => {
+  assert.equal(resolveCityTimeZone('Ханты-Мансийск'), 'Asia/Yekaterinburg');
+});
+
+test('promoted non-capitals keep oblast TZ after leaving cityToRegion', () => {
+  assert.equal(resolveCityTimeZone('Тольятти'), 'Europe/Samara');
+  assert.equal(resolveCityTimeZone('Сургут'), 'Asia/Yekaterinburg');
+  assert.equal(resolveCityTimeZone('Новокузнецк'), 'Asia/Novokuznetsk');
+  assert.equal(resolveCityTimeZone('Сортавала'), 'Europe/Moscow');
+});
+
+test('Петропавловск-Камчатский uses Asia/Kamchatka, not the MSK default', () => {
+  assert.equal(resolveCityTimeZone('Петропавловск-Камчатский'), 'Asia/Kamchatka');
+  const startsAt = '2026-10-17T22:00:00.000Z';
+  assert.equal(formatTime(startsAt, resolveCityTimeZone('Петропавловск-Камчатский')), '10:00');
+  assert.equal(formatTime(startsAt, 'Europe/Moscow'), '01:00');
 });
 
 test('Moscow stays Europe/Moscow', () => {

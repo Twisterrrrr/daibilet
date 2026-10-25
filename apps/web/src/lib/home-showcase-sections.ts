@@ -1,17 +1,61 @@
-import { parseSessionStartsAt } from '@/lib/datetime';
-import { normalizeSessionImageKey, sessionHasCoverImage, spreadCatalogSessionsByCoverImage, spreadSessionsForGrid } from '@/lib/session-cover-image';
+import { parseSessionStartsAt } from './datetime';
+import { isHomeRailTabooSession } from './home-rail-taboos';
+import {
+  collectSessionImageDedupeKeys,
+  sessionHasCoverImage,
+  spreadCatalogSessionsByCoverImage,
+  spreadSessionsForGrid,
+} from './session-cover-image';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 
 type PublicSession = PublicSessionDto;
 
+export type SessionFamilySource = {
+  groupKey?: string | null;
+  venueId?: string | null;
+  venueSlug?: string | null;
+  venue?: string | null;
+  title?: string | null;
+};
+
+export function isComboSessionTitle(title: string | null | undefined): boolean {
+  const value = String(title || '').trim().toLowerCase();
+  if (!value) return false;
+  if (/^комбо(?:\s|$|[-–—\d])/i.test(value) || /(?:^|[\s([{«"'])комбо\s*\d+/i.test(value)) {
+    return true;
+  }
+  if (/\d/.test(value)) {
+    const stem = value.replace(/\d+/g, '#').replace(/\s+/g, ' ').trim();
+    return /^комбо(?:\s*#|\s|$)/.test(stem);
+  }
+  return false;
+}
+
 export const HOME_SHOWCASE_LIMIT = 8;
 export const HOME_POPULAR_LIMIT = 6;
+
+/** Soft mix so «Мероприятия» / museums are not drowned by excursion clones. */
+const EDITORS_CATEGORY_CYCLE = [
+  'Мероприятия',
+  'Экскурсии',
+  'Музеи и арт',
+  'Концерты',
+  'Театр',
+  'Речные прогулки',
+  'Активный отдых',
+  'Развлечения',
+] as const;
+
+const EDITORS_MAX_PER_CATEGORY = 3;
 
 export type HomePickState = {
   seenIds: Set<string>;
   seenTitles: Set<string>;
   seenImages: Set<string>;
   seenFamilies: Set<string>;
+  seenThemes: Set<string>;
+  /** URL → content fingerprint (etag:...), from HEAD at home build time. */
+  fingerprints: Map<string, string>;
 };
 
 function isFeaturedEvent(event: PublicSession): boolean {
@@ -37,7 +81,7 @@ function sessionDedupeKey(event: PublicSession): string {
  * Family key for showcase rails: collapse near-duplicate ticket products
  * (e.g. «Комбо 1/2/5/7» at the same venue) into one card.
  */
-export function sessionFamilyKey(event: PublicSession): string {
+export function sessionFamilyKey(event: SessionFamilySource): string {
   const groupKey = String(event.groupKey || '').trim().toLowerCase();
   if (groupKey.startsWith('merge|')) return `merge:${groupKey}`;
 
@@ -45,23 +89,30 @@ export function sessionFamilyKey(event: PublicSession): string {
     .trim()
     .toLowerCase()
     .replace(/\s+/g, ' ');
-  const title = String(event.title || '').trim().toLowerCase();
 
   // «Комбо 1», «Комбо 7», «Комбо …» на одной площадке → одна карточка
-  // Не используем \b: в JS граница слова не работает с кириллицей.
-  if (venueKey && (/^комбо(?:\s|$|[-–—\d])/i.test(title) || /(?:^|[\s([{«"'])комбо\s*\d+/i.test(title))) {
+  if (venueKey && isComboSessionTitle(event.title)) {
     return `combo-venue:${venueKey}`;
   }
 
-  // Одинаковая площадка + «комбо #» после нормализации цифр
-  if (venueKey && title && /\d/.test(title)) {
-    const stem = title.replace(/\d+/g, '#').replace(/\s+/g, ' ').trim();
-    if (/^комбо(?:\s*#|\s|$)/.test(stem)) {
-      return `combo-venue:${venueKey}`;
-    }
-  }
+  return sessionDedupeKey(event as PublicSession);
+}
 
-  return sessionDedupeKey(event);
+/** Keep the first combo ticket per venue; leave unrelated events untouched. */
+export function collapseCatalogComboFamilies<T extends SessionFamilySource>(items: T[]): T[] {
+  const seen = new Set<string>();
+  const out: T[] = [];
+  for (const item of items) {
+    const key = sessionFamilyKey(item);
+    if (!key.startsWith('combo-venue:')) {
+      out.push(item);
+      continue;
+    }
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(item);
+  }
+  return out;
 }
 
 export function createHomePickState(seed?: Partial<HomePickState>): HomePickState {
@@ -70,26 +121,162 @@ export function createHomePickState(seed?: Partial<HomePickState>): HomePickStat
     seenTitles: new Set(seed?.seenTitles),
     seenImages: new Set(seed?.seenImages),
     seenFamilies: new Set(seed?.seenFamilies),
+    seenThemes: new Set(seed?.seenThemes),
+    fingerprints: seed?.fingerprints ?? new Map(),
   };
+}
+
+/**
+ * Collapse near-identical tourist products that reuse the same stock Hermitage /
+ * night-city flyer under different CDN asset ids (fingerprints often missing client-side).
+ *
+ * 29.09: the matcher was dead for every Russian title. In JavaScript `\w` is
+ * `[A-Za-z0-9_]` and never matches Cyrillic, so `ночн\w*\s+петербург` reduced to
+ * `ночн` followed by zero ASCII word chars, and could not match "Ночной Петербург"
+ * for any input. The two titles the test expected to bucket only matched by
+ * accident, through unrelated hardcoded literals ("от классики до футури",
+ * "магия огней"). Anything phrased differently fell through as its own theme, so
+ * two night excursions landed next to each other in the editors rail.
+ *
+ * Now the night signal and the city signal are tested independently rather than
+ * requiring them adjacent, and the letter class is unicode-aware. The literal
+ * phrases are kept as a safety net for titles with no city in them at all.
+ */
+export function sessionEditorsThemeKey(event: Pick<PublicSession, 'title' | 'category'>): string | null {
+  const title = String(event.title || '')
+    .toLowerCase()
+    .replace(/[«»""„]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!title) return null;
+
+  // The `u` flag is required: without it \p{L} is a literal "p{L}", not a
+  // letter class, and isNight silently matches nothing.
+  //
+  // Only two alternatives survive, and both are roots. Measured over a 385-case
+  // corpus: `ночно` and `\p{L}*\s+ночн` never matched a title that `ночн\p{L}*`
+  // did not already match, so they were dead weight. `ночн\p{L}*` already covers
+  // "ночной", "ночного", "ночное", "ночную" (the root is a prefix of all of
+  // them), and it matches anywhere in the string, so word adjacency cannot add
+  // anything. Keep the matcher to the two roots it actually needs.
+  const isNight = /ночн\p{L}*|вечерн\p{L}*/u.test(title);
+  const isSights = /магия огней|от классики до футури/.test(title);
+  const isLakhta = /лахат|васильевск/u.test(title);
+  const isPushkin = /пушкин|царск\p{L}*\s+сел/u.test(title);
+  const isSivers = /ситив\p{L}*\s+огнях/u.test(title);
+
+  if ((isNight && /петербург/.test(title)) || isLakhta || isSights) {
+    return 'theme:spb-night-tour';
+  }
+  if (isPushkin) {
+    return 'theme:spb-pushkin-tour';
+  }
+  if ((isNight && /москв/.test(title)) || isSivers) {
+    return 'theme:msk-night-tour';
+  }
+  return null;
+}
+
+function sessionCategoryKey(event: PublicSession): string {
+  const raw = String(event.category || '').trim();
+  return raw || 'Прочее';
+}
+
+function sessionCoverKeys(event: PublicSession, state: HomePickState): string[] {
+  const keys = collectSessionImageDedupeKeys(event.imageUrl);
+  const url = String(event.imageUrl || '').trim();
+  const fingerprint = url ? state.fingerprints.get(url) : undefined;
+  if (fingerprint) keys.push(fingerprint);
+  return keys;
+}
+
+function canTakeSession(event: PublicSession, state: HomePickState): boolean {
+  if (!sessionHasCoverImage(event)) return false;
+  if (isHomeRailTabooSession(event)) return false;
+  const dedupeKey = sessionDedupeKey(event);
+  const familyKey = sessionFamilyKey(event);
+  if (state.seenIds.has(event.id) || state.seenTitles.has(dedupeKey) || state.seenFamilies.has(familyKey)) {
+    return false;
+  }
+  const themeKey = sessionEditorsThemeKey(event);
+  if (themeKey && state.seenThemes.has(themeKey)) return false;
+  const imageKeys = sessionCoverKeys(event, state);
+  if (imageKeys.some((key) => state.seenImages.has(key))) return false;
+  return true;
+}
+
+function markTaken(event: PublicSession, state: HomePickState): void {
+  state.seenIds.add(event.id);
+  state.seenTitles.add(sessionDedupeKey(event));
+  state.seenFamilies.add(sessionFamilyKey(event));
+  const themeKey = sessionEditorsThemeKey(event);
+  if (themeKey) state.seenThemes.add(themeKey);
+  for (const key of sessionCoverKeys(event, state)) state.seenImages.add(key);
 }
 
 function takeUnique(events: PublicSession[], max: number, state: HomePickState): PublicSession[] {
   const result: PublicSession[] = [];
   for (const event of events) {
-    if (!sessionHasCoverImage(event)) continue;
-    const dedupeKey = sessionDedupeKey(event);
-    const familyKey = sessionFamilyKey(event);
-    if (state.seenIds.has(event.id) || state.seenTitles.has(dedupeKey) || state.seenFamilies.has(familyKey)) continue;
-    const imageKey = normalizeSessionImageKey(event.imageUrl);
-    if (imageKey && state.seenImages.has(imageKey)) continue;
-
-    state.seenIds.add(event.id);
-    state.seenTitles.add(dedupeKey);
-    state.seenFamilies.add(familyKey);
-    if (imageKey) state.seenImages.add(imageKey);
+    if (!canTakeSession(event, state)) continue;
+    markTaken(event, state);
     result.push(event);
     if (result.length >= max) break;
   }
+  return result;
+}
+
+function takeCategoryDiverse(
+  events: PublicSession[],
+  max: number,
+  state: HomePickState,
+): PublicSession[] {
+  if (max <= 0) return [];
+
+  const byCategory = new Map<string, PublicSession[]>();
+  for (const event of events) {
+    if (!canTakeSession(event, state)) continue;
+    const key = sessionCategoryKey(event);
+    const list = byCategory.get(key) || [];
+    list.push(event);
+    byCategory.set(key, list);
+  }
+  for (const list of byCategory.values()) {
+    list.sort((a, b) => popularScore(b) - popularScore(a));
+  }
+
+  const categoryCounts = new Map<string, number>();
+  const result: PublicSession[] = [];
+  const preferred = new Set<string>(EDITORS_CATEGORY_CYCLE);
+  const cycle = [
+    ...EDITORS_CATEGORY_CYCLE.filter((name) => byCategory.has(name)),
+    ...[...byCategory.keys()].filter((name) => !preferred.has(name)),
+  ];
+
+  let guard = 0;
+  while (result.length < max && guard < max * cycle.length + 8) {
+    guard += 1;
+    let progressed = false;
+    for (const category of cycle) {
+      if (result.length >= max) break;
+      const used = categoryCounts.get(category) || 0;
+      if (used >= EDITORS_MAX_PER_CATEGORY) continue;
+      const bucket = byCategory.get(category);
+      if (!bucket?.length) continue;
+      const next = bucket.find((event) => canTakeSession(event, state));
+      if (!next) continue;
+      markTaken(next, state);
+      categoryCounts.set(category, used + 1);
+      result.push(next);
+      progressed = true;
+    }
+    if (!progressed) break;
+  }
+
+  if (result.length < max) {
+    const rest = [...events].sort((a, b) => popularScore(b) - popularScore(a));
+    result.push(...takeUnique(rest, max - result.length, state));
+  }
+
   return result;
 }
 
@@ -108,12 +295,13 @@ export function buildEditorsPickEvents(
   limit = HOME_SHOWCASE_LIMIT,
   state = createHomePickState(),
 ): PublicSession[] {
-  const pinned = sessions.filter(isFeaturedEvent);
-  const pool =
-    pinned.length > 0
-      ? [...pinned].sort((a, b) => popularScore(b) - popularScore(a))
-      : [...sessions].sort((a, b) => popularScore(b) - popularScore(a));
-  return takeUnique(pool, limit, state);
+  // Pin first (taboo / standup / image-dupes skipped), then category-diverse fill.
+  const pinned = [...sessions.filter(isFeaturedEvent)].sort((a, b) => popularScore(b) - popularScore(a));
+  const picked = takeUnique(pinned, limit, state);
+  if (picked.length >= limit) return picked;
+
+  const rest = [...sessions].sort((a, b) => popularScore(b) - popularScore(a));
+  return picked.concat(takeCategoryDiverse(rest, limit - picked.length, state));
 }
 
 export function buildThisWeekEvents(
@@ -139,13 +327,20 @@ export function buildPopularEvents(
 }
 
 export function buildHomeShowcaseBundles(sessions: PublicSession[], state = createHomePickState()) {
+  const fingerprints = state.fingerprints;
   const editorsPick = spreadCatalogSessionsByCoverImage(
     buildEditorsPickEvents(sessions, HOME_SHOWCASE_LIMIT, state),
+    fingerprints,
   );
   const thisWeek = spreadCatalogSessionsByCoverImage(
     buildThisWeekEvents(sessions, HOME_SHOWCASE_LIMIT, state),
+    fingerprints,
   );
-  const popular = spreadSessionsForGrid(buildPopularEvents(sessions, HOME_POPULAR_LIMIT, state), 3);
+  const popular = spreadSessionsForGrid(
+    buildPopularEvents(sessions, HOME_POPULAR_LIMIT, state),
+    3,
+    fingerprints,
+  );
   return { editorsPick, thisWeek, popular };
 }
 

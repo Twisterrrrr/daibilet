@@ -3,10 +3,46 @@
 import * as React from 'react';
 
 import { BlogArticleCta, parseCtaBlock } from '@/components/BlogArticleCta';
+import { BlogArticleNote, parseNoteBlock } from '@/components/BlogArticleNote';
+import { BlogArticleRoute, parseRouteBlock } from '@/components/BlogArticleRoute';
 import { BlogBuyButton, parseBuyBlock } from '@/components/BlogBuyButton.client';
+import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
+import {
+  SHORTCODE_ATTRS,
+  isUsableBlogHref,
+  parseHeadingLine,
+  slugifyBlogHeading,
+  tokenizeInlineMarkdown,
+  type InlineToken,
+} from '@/lib/blog-markdown';
 import { handleBlogLinkClick } from '@/lib/blog-navigate';
 
 const IMAGE_BLOCK_REGEX = /^\[image\s+side=(left|right)\s+src="([^"]+)"(?:\s+alt="([^"]*)")?\]$/i;
+const MD_IMAGE_LINE_REGEX = /^!\[([^\]]*)\]\(([^)]+)\)$/;
+const QUOTE_REGEX = new RegExp(String.raw`^\[QUOTE\s+${SHORTCODE_ATTRS}\]$`, 'i');
+
+const BODY_LINK_CLASS =
+  'font-semibold text-primary-700 underline decoration-primary/40 underline-offset-[3px] transition hover:text-primary-800 hover:decoration-primary/70';
+const PRICE_CLASS =
+  'whitespace-nowrap rounded-sm bg-primary/8 px-1 py-0.5 font-semibold tabular-nums text-primary-800';
+
+export type ParsedQuote = { text: string; cite?: string };
+
+export function parseQuoteBlock(block: string): ParsedQuote | null {
+  const trimmed = block.trim();
+  const match = trimmed.match(QUOTE_REGEX);
+  if (!match?.[1]) return null;
+  const attrs: Record<string, string> = {};
+  const attrRegex = /(\w+)="([^"]*)"/g;
+  let attrMatch: RegExpExecArray | null;
+  while ((attrMatch = attrRegex.exec(match[1])) !== null) {
+    attrs[attrMatch[1]] = attrMatch[2];
+  }
+  const text = String(attrs.text || '').trim();
+  if (!text) return null;
+  const cite = String(attrs.cite || '').trim();
+  return cite ? { text, cite } : { text };
+}
 
 export type ParsedImageBlock = {
   side: 'left' | 'right';
@@ -15,58 +51,116 @@ export type ParsedImageBlock = {
 };
 
 export function parseImageBlock(block: string): ParsedImageBlock | null {
-  const match = block.trim().match(IMAGE_BLOCK_REGEX);
-  if (!match) return null;
-  return {
-    side: match[1].toLowerCase() as 'left' | 'right',
-    src: match[2],
-    alt: match[3] || '',
-  };
+  const trimmed = block.trim();
+  const match = trimmed.match(IMAGE_BLOCK_REGEX);
+  if (match) {
+    return {
+      side: match[1].toLowerCase() as 'left' | 'right',
+      src: match[2],
+      alt: match[3] || '',
+    };
+  }
+  const md = trimmed.match(MD_IMAGE_LINE_REGEX);
+  if (md) {
+    return {
+      side: 'left',
+      src: md[2],
+      alt: md[1] || '',
+    };
+  }
+  return null;
 }
 
 type ContentBlock =
   | { type: 'paragraph'; text: string }
+  | { type: 'tagline'; text: string }
   | { type: 'h2'; text: string }
   | { type: 'h3'; text: string }
   | { type: 'ul'; items: string[] }
   | { type: 'ol'; items: string[] }
   | { type: 'table'; lines: string[] }
   | { type: 'image'; image: ParsedImageBlock }
+  | { type: 'quote'; data: ParsedQuote }
+  | { type: 'callout'; label: string; text: string }
+  | { type: 'hr' }
   | { type: 'cta'; data: ReturnType<typeof parseCtaBlock> & object }
-  | { type: 'buy'; data: NonNullable<ReturnType<typeof parseBuyBlock>> };
+  | { type: 'buy'; data: NonNullable<ReturnType<typeof parseBuyBlock>> }
+  | { type: 'note'; data: NonNullable<ReturnType<typeof parseNoteBlock>> }
+  | { type: 'route'; data: NonNullable<ReturnType<typeof parseRouteBlock>> };
 
-function renderInline(text: string, keyPrefix = ''): React.ReactNode[] {
-  const nodes: React.ReactNode[] = [];
-  const regex = /\[([^\]]+)\]\(([^)]+)\)|\*\*([^*]+)\*\*/g;
-  let last = 0;
-  let match: RegExpExecArray | null;
-  let key = 0;
+/**
+ * The `/s` (dotAll) flag needs an es2018 target and this package compiles to
+ * es2017, so spell the same behaviour out with a character class instead.
+ * `[\s\S]` matches any character including newlines, exactly like dotAll.
+ */
+const CALLOUT_LABEL_RE =
+    /^\*\*(Атмосферная деталь|Практический совет|Лайфхак|Адрес):\*\*\s*([\s\S]+)$/;
 
-  while ((match = regex.exec(text)) !== null) {
-    if (match.index > last) nodes.push(text.slice(last, match.index));
-    if (match[1] && match[2]) {
-      const linkHref = match[2];
-      nodes.push(
+export function parseCalloutText(text: string): { label: string; body: string } | null {
+  const match = String(text || '').trim().match(CALLOUT_LABEL_RE);
+  if (!match?.[1] || !match[2]) return null;
+  return { label: match[1], body: match[2].trim() };
+}
+
+function renderInlineToken(token: InlineToken, key: string): React.ReactNode {
+  switch (token.type) {
+    case 'link':
+      if (!isUsableBlogHref(token.href)) return token.text;
+      return (
         <a
-          key={`${keyPrefix}lnk-${key++}`}
-          href={linkHref}
-          onClick={(event) => handleBlogLinkClick(event, linkHref)}
-          className="font-medium text-primary-600 underline decoration-primary/30 underline-offset-[3px] transition hover:text-primary-700 hover:decoration-primary/60"
+          key={key}
+          href={token.href}
+          onClick={(event) => handleBlogLinkClick(event, token.href)}
+          className={BODY_LINK_CLASS}
         >
-          {match[1]}
-        </a>,
+          {token.text}
+        </a>
       );
-    } else if (match[3]) {
-      nodes.push(
-        <strong key={`${keyPrefix}strong-${key++}`} className="font-semibold text-slate-900">
-          {match[3]}
-        </strong>,
+    case 'strong':
+      return (
+        <strong key={key} className="font-bold text-slate-900">
+          {token.value}
+        </strong>
       );
-    }
-    last = regex.lastIndex;
+    case 'em':
+      return (
+        <em key={key} className="italic text-slate-700">
+          {token.value}
+        </em>
+      );
+    case 'price':
+      return (
+        <span key={key} className={PRICE_CLASS}>
+          {token.value}
+        </span>
+      );
+    default:
+      return token.value;
   }
+}
 
-  if (last < text.length) nodes.push(text.slice(last));
+/** Inline markdown на одной строке (без \\n). */
+function renderInlineLine(text: string, keyPrefix = ''): React.ReactNode[] {
+  return tokenizeInlineMarkdown(text).map((token, index) =>
+    renderInlineToken(token, `${keyPrefix}t${index}`),
+  );
+}
+
+/**
+ * Как в админском textarea: одиночный Enter → перенос (<br>),
+ * пустая строка (\\n\\n) → новый абзац (см. parseContentBlocks).
+ */
+function renderInline(text: string, keyPrefix = ''): React.ReactNode[] {
+  const lines = String(text || '').split('\n');
+  if (lines.length <= 1) return renderInlineLine(text, keyPrefix);
+
+  const nodes: React.ReactNode[] = [];
+  lines.forEach((line, lineIndex) => {
+    if (lineIndex > 0) {
+      nodes.push(<br key={`${keyPrefix}br-${lineIndex}`} />);
+    }
+    nodes.push(...renderInlineLine(line, `${keyPrefix}l${lineIndex}-`));
+  });
   return nodes;
 }
 
@@ -86,9 +180,13 @@ function parseTableRow(line: string): string[] {
     .map((cell) => cell.trim());
 }
 
-function isStandaloneBoldHeading(line: string): boolean {
+function isStandaloneBoldTagline(line: string): boolean {
   const trimmed = line.trim();
   return trimmed.startsWith('**') && trimmed.endsWith('**') && !trimmed.includes('[');
+}
+
+function isHrLine(line: string): boolean {
+  return /^(-{3,}|\*{3,}|_{3,})$/.test(line.trim());
 }
 
 function isOrderedListLine(line: string): boolean {
@@ -99,15 +197,24 @@ function isUnorderedListLine(line: string): boolean {
   return line.trim().startsWith('- ');
 }
 
+function isBlockquoteLine(line: string): boolean {
+  return line.trim().startsWith('>');
+}
+
 function isSpecialLine(line: string): boolean {
   const trimmed = line.trim();
   if (!trimmed) return true;
   if (parseCtaBlock(trimmed)) return true;
+  if (parseNoteBlock(trimmed)) return true;
+  if (parseRouteBlock(trimmed)) return true;
+  if (parseQuoteBlock(trimmed)) return true;
   if (parseBuyBlock(trimmed)) return true;
   if (parseImageBlock(trimmed)) return true;
   if (isTableLine(trimmed)) return true;
-  if (trimmed.startsWith('## ') || trimmed.startsWith('### ')) return true;
-  if (isStandaloneBoldHeading(trimmed)) return true;
+  if (isBlockquoteLine(trimmed)) return true;
+  if (trimmed.startsWith('## ') || trimmed.startsWith('### ') || trimmed.startsWith('# ')) return true;
+  if (isStandaloneBoldTagline(trimmed)) return true;
+  if (isHrLine(trimmed)) return true;
   if (isOrderedListLine(trimmed) || isUnorderedListLine(trimmed)) return true;
   return false;
 }
@@ -144,6 +251,64 @@ export function parseContentBlocks(content: string): ContentBlock[] {
       continue;
     }
 
+    const note = parseNoteBlock(line);
+    if (note) {
+      flushParagraph();
+      blocks.push({ type: 'note', data: note });
+      index += 1;
+      continue;
+    }
+
+    const route = parseRouteBlock(line);
+    if (route) {
+      flushParagraph();
+      blocks.push({ type: 'route', data: route });
+      index += 1;
+      continue;
+    }
+
+    const quoteShort = parseQuoteBlock(line);
+    if (quoteShort) {
+      flushParagraph();
+      blocks.push({ type: 'quote', data: quoteShort });
+      index += 1;
+      continue;
+    }
+
+    const plainCallout = parseCalloutText(line);
+    if (plainCallout) {
+      flushParagraph();
+      blocks.push({ type: 'callout', label: plainCallout.label, text: plainCallout.body });
+      index += 1;
+      continue;
+    }
+
+    if (isBlockquoteLine(line)) {
+      flushParagraph();
+      const quoteLines: string[] = [];
+      while (index < lines.length) {
+        const quoteLine = lines[index].trim();
+        if (!isBlockquoteLine(quoteLine)) break;
+        quoteLines.push(quoteLine.replace(/^>\s?/, ''));
+        index += 1;
+      }
+      const text = quoteLines.join('\n').trim();
+      const callout = parseCalloutText(text);
+      if (callout) {
+        blocks.push({ type: 'callout', label: callout.label, text: callout.body });
+      } else if (text) {
+        blocks.push({ type: 'paragraph', text });
+      }
+      continue;
+    }
+
+    if (isHrLine(line)) {
+      flushParagraph();
+      blocks.push({ type: 'hr' });
+      index += 1;
+      continue;
+    }
+
     const buy = parseBuyBlock(line);
     if (buy) {
       flushParagraph();
@@ -160,23 +325,22 @@ export function parseContentBlocks(content: string): ContentBlock[] {
       continue;
     }
 
-    if (line.startsWith('## ')) {
+    const heading = parseHeadingLine(line);
+    if (heading) {
       flushParagraph();
-      blocks.push({ type: 'h2', text: line.replace(/^##\s+/, '') });
+      // В теле статьи один H1 уже в hero - `#` / `##` → h2, `###` → h3.
+      if (heading.level === 3) {
+        blocks.push({ type: 'h3', text: heading.text });
+      } else {
+        blocks.push({ type: 'h2', text: heading.text });
+      }
       index += 1;
       continue;
     }
 
-    if (line.startsWith('### ')) {
+    if (isStandaloneBoldTagline(line)) {
       flushParagraph();
-      blocks.push({ type: 'h3', text: line.replace(/^###\s+/, '') });
-      index += 1;
-      continue;
-    }
-
-    if (isStandaloneBoldHeading(line)) {
-      flushParagraph();
-      blocks.push({ type: 'h2', text: line.replace(/^\*\*|\*\*$/g, '') });
+      blocks.push({ type: 'tagline', text: line.replace(/^\*\*|\*\*$/g, '') });
       index += 1;
       continue;
     }
@@ -243,7 +407,7 @@ function BlogTable({ rows, className = '' }: { rows: string[][]; className?: str
 
   return (
     <div className={`overflow-x-auto rounded-xl border border-slate-200/90 bg-white shadow-sm ${className}`}>
-      <table className="w-full min-w-[28rem] border-collapse text-sm">
+      <table className="w-full min-w-[28rem] border-collapse text-base">
         <thead>
           <tr className="border-b border-slate-200 bg-slate-100/90">
             {header.map((cell, cellIndex) => (
@@ -279,6 +443,11 @@ function BlogTable({ rows, className = '' }: { rows: string[][]; className?: str
   );
 }
 
+function isTodoPhotoSrc(src: string): boolean {
+  const value = String(src || '').trim().toLowerCase();
+  return value === 'todo-photo' || value.startsWith('todo-photo');
+}
+
 function BlogFigure({
   image,
   className = 'w-full max-w-md',
@@ -286,24 +455,36 @@ function BlogFigure({
   image: ParsedImageBlock;
   className?: string;
 }) {
-  const [hasImageError, setHasImageError] = React.useState(false);
-  if (hasImageError) return null;
+  if (isTodoPhotoSrc(image.src)) {
+    return (
+      <figure className={className}>
+        <div className="flex aspect-[4/3] w-full items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 text-center">
+          <p className="text-sm leading-6 text-slate-500">
+            <span className="font-semibold text-slate-700">Фото TODO</span>
+            {image.alt ? (
+              <>
+                <br />
+                {image.alt}
+              </>
+            ) : null}
+          </p>
+        </div>
+      </figure>
+    );
+  }
 
   return (
     <figure className={className}>
-      <img
-        src={image.src}
-        alt={image.alt}
-        loading="lazy"
-        decoding="async"
-        onError={() => setHasImageError(true)}
-        className="aspect-[4/3] w-full rounded-xl border border-slate-200/80 object-cover shadow-md"
-      />
-      {image.alt ? (
-        <figcaption className="mt-2.5 text-center text-xs leading-snug text-slate-500 sm:text-sm">
-          {image.alt}
-        </figcaption>
-      ) : null}
+      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border border-slate-200/80 bg-slate-100 shadow-md">
+        <SafeImage
+          src={image.src}
+          alt={image.alt}
+          title={image.alt || undefined}
+          fill
+          sizes={IMAGE_SIZES.blogInline}
+          className="object-cover"
+        />
+      </div>
     </figure>
   );
 }
@@ -322,8 +503,9 @@ function BlogFloatedSection({
 
   return (
     <div className="my-8 clearfix">
-      <BlogFigure image={image} className={`mb-4 w-full max-w-md ${floatClass}`} />
-      <div className="min-w-0">{children}</div>
+      {/* ~md, не magazine-thumb 14.5rem: иначе inline «пропадает» рядом с hero */}
+      <BlogFigure image={image} className={`mb-4 w-full max-w-md sm:max-w-[20rem] md:max-w-md ${floatClass}`} />
+      <div className="min-w-0 [&>p+p]:mt-[1.275em]">{children}</div>
     </div>
   );
 }
@@ -351,14 +533,42 @@ function renderParagraphNodes(
       className={
         paragraphIndex === 0 && isLead
           ? LEAD_PARAGRAPH_CLASS
-          : paragraphIndex === 0
-            ? PARAGRAPH_CLASS
-            : `${PARAGRAPH_CLASS} mt-4`
+          : PARAGRAPH_CLASS
       }
     >
       {renderInline(text, `${keyPrefix}-${paragraphIndex}-`)}
     </p>
   ));
+}
+
+function BlogPullQuote({ text, cite }: ParsedQuote) {
+  return (
+    <blockquote className="my-8 border-l-2 border-slate-300 pl-4 sm:my-10">
+      <p className={BODY_TEXT_CLASS}>
+        {renderInline(text, 'quote-')}
+      </p>
+      {cite ? <cite className={`mt-2 block not-italic text-slate-500 ${BODY_TEXT_CLASS}`}>- {cite}</cite> : null}
+    </blockquote>
+  );
+}
+
+/** Left-rail tips only. «Адрес» = plain body line (owner longread canon). */
+const TIP_CALLOUT_LABELS = new Set(['Атмосферная деталь', 'Практический совет', 'Лайфхак']);
+
+function BlogCallout({ label, text }: { label: string; text: string }) {
+  const isTip = TIP_CALLOUT_LABELS.has(label);
+  return (
+    <p
+      className={
+        isTip
+          ? `${BODY_TEXT_CLASS} my-4 border-l-2 border-slate-300 py-0.5 pl-4`
+          : `${BODY_TEXT_CLASS} my-2`
+      }
+    >
+      <strong className="font-bold text-slate-900">{label}:</strong>{' '}
+      {renderInline(text, `callout-${label}-`)}
+    </p>
+  );
 }
 
 function BlogFlexRow({
@@ -371,10 +581,10 @@ function BlogFlexRow({
   imageSide: 'left' | 'right';
 }) {
   const imageNode = <BlogFigure image={image} className="w-full shrink-0 sm:w-[42%] md:w-72 lg:w-80" />;
-  const contentNode = <div className="min-w-0 flex-1">{children}</div>;
+  const contentNode = <div className="min-w-0 flex-1 [&>p+p]:mt-[1.275em]">{children}</div>;
 
   return (
-    <div className="my-8 flex flex-col gap-6 rounded-2xl border border-slate-200/80 bg-slate-50/60 p-4 sm:flex-row sm:items-start sm:gap-8 sm:p-6">
+    <div className="my-8 flex flex-col gap-6 border border-slate-200/70 bg-slate-50/40 p-4 sm:flex-row sm:items-start sm:gap-8 sm:p-5">
       {imageSide === 'left' ? (
         <>
           {imageNode}
@@ -394,10 +604,24 @@ function tableRowsFromBlock(block: Extract<ContentBlock, { type: 'table' }>): st
   return block.lines.filter((line) => !isTableSeparator(line)).map(parseTableRow);
 }
 
-const PARAGRAPH_CLASS =
-  'text-[1.0625rem] leading-[1.8] text-slate-700 [overflow-wrap:anywhere] [&+&]:mt-4';
-const LEAD_PARAGRAPH_CLASS =
-  'text-lg leading-[1.75] text-slate-600 [overflow-wrap:anywhere]';
+/**
+ * Owner longread canon (Top-100): one body size/weight for prose, catchphrase,
+ * tip callouts and address. Bold only on labels / catchphrase / headings.
+ * Do not invent smaller taglines or giant pull-quotes for labeled tips.
+ */
+const BODY_TEXT_CLASS =
+  'text-base font-normal leading-[1.65] text-pretty text-slate-800 [overflow-wrap:break-word] sm:text-[1.0625rem] sm:leading-[1.65]';
+const PARAGRAPH_CLASS = BODY_TEXT_CLASS;
+const LEAD_PARAGRAPH_CLASS = BODY_TEXT_CLASS;
+/** Same metrics as body; bold only (do not mix font-normal + font-bold in one className). */
+const TAGLINE_CLASS =
+  'mb-3 text-base font-bold leading-[1.65] text-pretty text-slate-900 [overflow-wrap:break-word] sm:text-[1.0625rem] sm:leading-[1.65]';
+const H2_CLASS =
+  'scroll-mt-24 mb-5 text-[1.35rem] font-bold leading-snug tracking-tight text-slate-950 sm:text-[1.5rem] [&:not(:first-child)]:mt-12';
+const H3_CLASS =
+  'scroll-mt-24 mb-2 text-[1.125rem] font-bold leading-snug tracking-tight text-slate-900 sm:text-[1.25rem] [&:not(:first-child)]:mt-10';
+const HR_CLASS = 'my-8 border-0 border-t border-slate-200/90';
+const LIST_CLASS = `my-5 space-y-2.5 pl-6 ${BODY_TEXT_CLASS}`;
 
 function normalizeImageSrc(src: string): string {
   const trimmed = src.trim();
@@ -468,6 +692,10 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
   );
   const nodes: React.ReactNode[] = [];
   let isLeadParagraph = true;
+  let bodyImagesRendered = 0;
+  const totalImageBlocks = blocks.filter((b) => b.type === 'image').length;
+  // Dense longreads (≥3 inline): float all. Short articles: first stays full-width break.
+  const denseInlineGallery = totalImageBlocks >= 3;
 
   for (let index = 0; index < blocks.length; index += 1) {
     const block = blocks[index];
@@ -480,6 +708,7 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
         </BlogFlexRow>,
       );
       index += 1;
+      bodyImagesRendered += 1;
       isLeadParagraph = false;
       continue;
     }
@@ -491,6 +720,7 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
         </BlogFlexRow>,
       );
       index += 1;
+      bodyImagesRendered += 1;
       isLeadParagraph = false;
       continue;
     }
@@ -500,13 +730,29 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
 
     if (block.type === 'image') {
       const { paragraphs, endIndex } = collectParagraphBlocks(blocks, index + 1);
-      if (paragraphs.length > 0) {
+      // Первое inline - полноширинный break (удержание внимания); дальше можно float.
+      // Dense (≥3): все float, включая первое - иначе Top-100 с 15 фото ломает макет.
+      const preferStandalone = bodyImagesRendered === 0 && !denseInlineGallery;
+      if (paragraphs.length > 0 && !preferStandalone) {
         nodes.push(
           <BlogFloatedSection key={`img-p-${index}`} image={block.image}>
             {renderParagraphNodes(paragraphs, `img-p-${index}`, isLeadParagraph)}
           </BlogFloatedSection>,
         );
         index = endIndex;
+        bodyImagesRendered += 1;
+        isLeadParagraph = false;
+        continue;
+      }
+      if (preferStandalone && paragraphs.length > 0) {
+        nodes.push(
+          <div key={`img-${index}`} className="my-10">
+            <BlogFigure image={block.image} className="w-full" />
+          </div>,
+        );
+        nodes.push(...renderParagraphNodes(paragraphs, `img-p-${index}`, isLeadParagraph));
+        index = endIndex;
+        bodyImagesRendered += 1;
         isLeadParagraph = false;
         continue;
       }
@@ -517,25 +763,55 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
         nodes.push(<BlogArticleCta key={`cta-${index}`} {...block.data} />);
         isLeadParagraph = false;
         break;
+      case 'note':
+        nodes.push(<BlogArticleNote key={`note-${index}`} {...block.data} />);
+        isLeadParagraph = false;
+        break;
+      case 'route':
+        nodes.push(<BlogArticleRoute key={`route-${index}`} {...block.data} />);
+        isLeadParagraph = false;
+        break;
+      case 'quote':
+        nodes.push(<BlogPullQuote key={`quote-${index}`} {...block.data} />);
+        isLeadParagraph = false;
+        break;
+      case 'callout':
+        nodes.push(<BlogCallout key={`callout-${index}`} label={block.label} text={block.text} />);
+        isLeadParagraph = false;
+        break;
+      case 'hr':
+        nodes.push(<hr key={`hr-${index}`} className={HR_CLASS} />);
+        isLeadParagraph = false;
+        break;
+      case 'tagline':
+        nodes.push(
+          <p key={`tagline-${index}`} className={TAGLINE_CLASS}>
+            {renderInline(block.text, `tagline-${index}-`)}
+          </p>,
+        );
+        isLeadParagraph = false;
+        break;
       case 'buy':
         nodes.push(<BlogBuyButton key={`buy-${index}`} {...block.data} />);
         isLeadParagraph = false;
         break;
       case 'image':
         nodes.push(
-          <div key={`img-${index}`} className="my-8">
-            <BlogFigure image={block.image} className="mx-auto w-full max-w-2xl" />
+          <div key={`img-${index}`} className="my-10">
+            <BlogFigure image={block.image} className="w-full" />
           </div>,
         );
+        bodyImagesRendered += 1;
         isLeadParagraph = false;
         break;
       case 'h2':
         nodes.push(
           <h2
             key={`h2-${index}`}
-            className="scroll-mt-24 mb-4 font-display text-2xl font-bold tracking-tight text-slate-950 sm:text-[1.75rem] lg:text-3xl [&:not(:first-child)]:mt-12 [&:not(:first-child)]:border-t [&:not(:first-child)]:border-slate-200/80 [&:not(:first-child)]:pt-10"
+            id={slugifyBlogHeading(block.text)}
+            className={H2_CLASS}
           >
-            {block.text}
+            {renderInline(block.text, `h2-${index}-`)}
           </h2>,
         );
         isLeadParagraph = false;
@@ -544,9 +820,10 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
         nodes.push(
           <h3
             key={`h3-${index}`}
-            className="scroll-mt-24 mb-4 border-l-4 border-primary-500 pl-4 font-display text-xl font-bold tracking-tight text-slate-950 sm:pl-5 sm:text-2xl [&:not(:first-child)]:mt-10"
+            id={slugifyBlogHeading(block.text)}
+            className={H3_CLASS}
           >
-            {block.text}
+            {renderInline(block.text, `h3-${index}-`)}
           </h3>,
         );
         isLeadParagraph = false;
@@ -555,10 +832,10 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
         nodes.push(
           <ol
             key={`ol-${index}`}
-            className="my-5 list-decimal space-y-2.5 pl-6 text-[1.0625rem] leading-relaxed text-slate-700 marker:font-semibold marker:text-primary-600"
+            className={`${LIST_CLASS} list-decimal marker:font-semibold marker:text-primary-600`}
           >
             {block.items.map((item, itemIndex) => (
-              <li key={itemIndex} className="pl-1">
+              <li key={itemIndex} className="pl-1.5">
                 {renderInline(item, `ol-${index}-${itemIndex}-`)}
               </li>
             ))}
@@ -570,10 +847,10 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
         nodes.push(
           <ul
             key={`ul-${index}`}
-            className="my-5 list-disc space-y-2.5 pl-6 text-[1.0625rem] leading-relaxed text-slate-700 marker:text-primary-500"
+            className={`${LIST_CLASS} list-disc marker:text-primary-500`}
           >
             {block.items.map((item, itemIndex) => (
-              <li key={itemIndex} className="pl-1">
+              <li key={itemIndex} className="pl-1.5">
                 {renderInline(item, `ul-${index}-${itemIndex}-`)}
               </li>
             ))}
@@ -591,7 +868,10 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
         break;
       case 'paragraph':
         nodes.push(
-          <p key={`p-${index}`} className={isLeadParagraph ? `${LEAD_PARAGRAPH_CLASS} mb-1` : `${PARAGRAPH_CLASS} mt-4`}>
+          <p
+            key={`p-${index}`}
+            className={isLeadParagraph ? LEAD_PARAGRAPH_CLASS : PARAGRAPH_CLASS}
+          >
             {renderInline(block.text, `p-${index}-`)}
           </p>,
         );
@@ -602,7 +882,7 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
     }
   }
 
-  return <div className="blog-article-prose">{nodes}</div>;
+  return <div className="blog-article-prose [&>p+p]:mt-[1.275em]">{nodes}</div>;
 }
 
 export function BlogArticleContent({

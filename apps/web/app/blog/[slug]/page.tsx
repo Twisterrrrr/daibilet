@@ -2,19 +2,37 @@ import type { Metadata } from 'next';
 import { notFound, permanentRedirect } from 'next/navigation';
 
 import { BlogArticleView } from '@/components/BlogArticleView';
+import { BLOG_POSTS } from '@/data/blog-posts';
 import '@/lib/env';
 import { buildBlogArticleJsonLd, buildBlogArticleMetadata } from '@/lib/blog-article-seo';
-import { resolveStaticArticle } from '@/lib/blog-utils';
-import { buildPublicArticlePageDto } from '@daibilet/backend/public-read';
+import { getCachedBlogArticle, getCachedBlogRelated } from '@/server/cached-blog-data';
 
 export const revalidate = 300;
+export const dynamicParams = true;
 
 /** Старые slug → каноническая статья (объединения / переезды). */
-const BLOG_SLUG_REDIRECTS: Record<string, string> = {};
+const BLOG_SLUG_REDIRECTS: Record<string, string> = {
+  // Дубль колонки Макса (HIDDEN) → live канон
+  'bylinnyy-bereg-fentezi-fest': '/blog/fentezi-fest-bylinnyy-bereg',
+  // Тот же дубль, но с "-volhov" в слаге. Остался отдельной индексируемой
+  // страницей: 200, self-canonical, isIndexable=true, присутствует в blog.xml.
+  // Тема та же (Былинный берег + Фэнтези Фест на Волхове), тела разные,
+  // поэтому это каннибализация ключа, а не побайтовый дубль.
+  'bylinnyy-bereg-fentezi-fest-volhov': '/blog/fentezi-fest-bylinnyy-bereg',
+  // Старый open-air Макса (HIDDEN) → актуальная колонка про парки
+  'open-air-festy-vyhodnoi-ru': '/blog/moskva-parki-open-air-vyhodnye',
+};
 
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
+
+/** Prebuild the editorial catalog; CMS-only slugs still use on-demand ISR. */
+export function generateStaticParams() {
+  return BLOG_POSTS.filter((post) => post.slug && !BLOG_SLUG_REDIRECTS[post.slug]).map((post) => ({
+    slug: post.slug,
+  }));
+}
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -22,20 +40,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (BLOG_SLUG_REDIRECTS[decoded]) {
     return { title: 'Переезд статьи' };
   }
-  const article = await loadArticle(decoded);
-  if (!article) return { title: 'Статья не найдена' };
+  const article = await getCachedBlogArticle(decoded);
+  if (!article) notFound();
 
   return buildBlogArticleMetadata(article);
-}
-
-async function loadArticle(slug: string) {
-  try {
-    const payload = await buildPublicArticlePageDto(slug);
-    if (payload?.article) return payload.article;
-  } catch {
-    // fallback below
-  }
-  return resolveStaticArticle(slug);
 }
 
 export default async function BlogArticlePage({ params }: PageProps) {
@@ -44,9 +52,10 @@ export default async function BlogArticlePage({ params }: PageProps) {
   const redirectTo = BLOG_SLUG_REDIRECTS[decoded];
   if (redirectTo) permanentRedirect(redirectTo);
 
-  const article = await loadArticle(decoded);
+  const article = await getCachedBlogArticle(decoded);
   if (!article) notFound();
 
+  const related = await getCachedBlogRelated(article);
   const jsonLdBlocks = buildBlogArticleJsonLd(article);
 
   return (
@@ -58,7 +67,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(block) }}
         />
       ))}
-      <BlogArticleView article={article} />
+      <BlogArticleView article={article} related={related} />
     </>
   );
 }

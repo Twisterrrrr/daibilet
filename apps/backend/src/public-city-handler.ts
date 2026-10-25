@@ -22,7 +22,13 @@ export function createPublicCityRouteHandler(
     }
     const match = matchPath(context.pathname, /^\/api\/public\/cities\/([^/]+)$/);
     if (!match?.[0]) return false;
-    sendPublicJson(context.response, await deps.buildCity(match[0], forceRefresh));
+    const city = await deps.buildCity(match[0], forceRefresh);
+    if (!city) {
+      // Never 200+null: web generateMetadata treats thrown cache-miss as HTTP 500.
+      sendPublicJson(context.response, { error: 'not_found' }, { statusCode: 404 });
+      return true;
+    }
+    sendPublicJson(context.response, city);
     return true;
   };
 }

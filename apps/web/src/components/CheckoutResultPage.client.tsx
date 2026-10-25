@@ -1,282 +1,310 @@
 'use client';
 
 import Link from 'next/link';
-import { AlertTriangle, ArrowRight, CheckCircle2, Clock3, Loader2, RefreshCw, Ticket, XCircle } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { CheckCircle2, Clock3, Loader2, Receipt } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
-import { formatNumber } from '@/lib/format';
-import { fetchPublicCheckoutOrder, type PublicCheckoutOrder } from '@/lib/public-checkout-api';
+import { BuyerTicketCard } from '@/components/BuyerTicketCard.client';
+import {
+  filterInternalOrdersForEmail,
+  hasIssuedInternalTicket,
+  mapFinanceOrderStatus,
+  mergeBuyerInternalOrders,
+  readInternalOrdersFromStorage,
+  upsertInternalOrderInStorage,
+  type BuyerInternalOrderRecord,
+} from '@/lib/buyer-checkout';
+import { buyerTicketPath } from '@/lib/buyer-ticket';
+import {
+  isPendingCheckoutOrderStatus,
+  isTerminalCheckoutOrderStatus,
+  pollCheckoutOrderUntilTerminal,
+} from '@/lib/checkout-payment';
+import { useUserAuth } from '@/hooks/useUserAuth';
 
-type LoadState = 'idle' | 'loading' | 'ready' | 'error';
+type LookupResponse = {
+  ok: boolean;
+  found: boolean;
+  publicCode: string;
+  order: BuyerInternalOrderRecord | null;
+};
 
-const POLL_INTERVAL_MS = 6000;
+function pickLatestStoredOrder(email?: string | null): BuyerInternalOrderRecord | null {
+  const rows = readInternalOrdersFromStorage();
+  const scoped = email ? filterInternalOrdersForEmail(rows, email) : rows;
+  if (!scoped.length) return rows[0] || null;
+  return [...scoped].sort((a, b) => {
+    const aTime = a.purchasedAt ? new Date(a.purchasedAt).getTime() : 0;
+    const bTime = b.purchasedAt ? new Date(b.purchasedAt).getTime() : 0;
+    return bTime - aTime;
+  })[0];
+}
 
-export function CheckoutResultPageView({ initialOrderCode }: { initialOrderCode: string }) {
-  const orderCode = initialOrderCode.trim();
-  const [state, setState] = useState<LoadState>(orderCode ? 'loading' : 'error');
-  const [order, setOrder] = useState<PublicCheckoutOrder | null>(null);
-  const [error, setError] = useState<string | null>(orderCode ? null : 'Не найден номер заказа.');
+async function fetchOrderLookup(
+  code: string,
+  signal?: AbortSignal,
+): Promise<LookupResponse | null> {
+  const response = await fetch(`/checkout/actions/order?order=${encodeURIComponent(code)}&t=${Date.now()}`, {
+    cache: 'no-store',
+    signal,
+  });
+  if (!response.ok) throw new Error('checkout_order_lookup_failed');
+  return (await response.json().catch(() => null)) as LookupResponse | null;
+}
+
+export function CheckoutResultView() {
+  const searchParams = useSearchParams();
+  const publicCodeParam = (searchParams.get('order') || searchParams.get('publicCode') || '').trim();
+  const modeHint = (searchParams.get('mode') || '').trim();
+  const fromYookassa = (searchParams.get('from') || '').toLowerCase() === 'yookassa';
+  const { user } = useUserAuth();
+
+  const [loading, setLoading] = useState(true);
+  const [order, setOrder] = useState<BuyerInternalOrderRecord | null>(null);
+  const [publicCode, setPublicCode] = useState(publicCodeParam);
+  const [emailHint, setEmailHint] = useState<'sent' | 'skipped' | 'unknown'>('unknown');
+  const [recoveredFromStorage, setRecoveredFromStorage] = useState(false);
+  const [verificationFailed, setVerificationFailed] = useState(false);
 
   useEffect(() => {
-    if (!orderCode) return;
-    const controller = new AbortController();
-    void loadOrder(orderCode, controller.signal, { quiet: false });
-    return () => controller.abort();
-  }, [orderCode]);
+    let disposed = false;
+    let lookupVerified = false;
+    const pollAbort = new AbortController();
 
-  useEffect(() => {
-    if (!orderCode || !order || !shouldPollOrder(order)) return;
-    const timer = window.setInterval(() => {
-      const controller = new AbortController();
-      void loadOrder(orderCode, controller.signal, { quiet: true });
-    }, POLL_INTERVAL_MS);
-    return () => window.clearInterval(timer);
-  }, [orderCode, order?.status, order?.payment.status]);
+    const applyOrder = (next: BuyerInternalOrderRecord, cached: BuyerInternalOrderRecord | null) => {
+      const merged = mergeBuyerInternalOrders(next, cached);
+      lookupVerified = true;
+      setVerificationFailed(false);
+      setOrder(merged);
+      setPublicCode(merged.publicCode);
+      upsertInternalOrderInStorage(merged);
+      return merged;
+    };
 
-  const status = useMemo(() => statusView(order), [order]);
-  const ticketNumbers = order?.ticketNumbers || [];
+    const maybeNotify = async (code: string, cached: BuyerInternalOrderRecord | null) => {
+      const mailFlagKey = `daibilet.ticketMailSent.${code}`;
+      let already = false;
+      try {
+        already = window.sessionStorage.getItem(mailFlagKey) === '1';
+      } catch {
+        already = false;
+      }
+      if (already) {
+        if (!disposed) setEmailHint('sent');
+        return;
+      }
+      try {
+        const notify = await fetch('/checkout/actions/notify-ticket', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            publicCode: code,
+            email: cached?.email || user?.email || undefined,
+            title: cached?.title,
+            amountRub: cached?.amountRub,
+            mode: cached?.mode || modeHint || undefined,
+            status: cached?.status || (modeHint === 'STUB' ? 'CONFIRMED' : undefined),
+          }),
+        });
+        const notifyPayload = (await notify.json().catch(() => null)) as {
+          sent?: boolean;
+          reason?: string;
+        } | null;
+        if (!disposed) {
+          if (notifyPayload?.sent) {
+            setEmailHint('sent');
+            try {
+              window.sessionStorage.setItem(mailFlagKey, '1');
+            } catch {
+              // ignore
+            }
+          } else if (
+            notifyPayload?.reason === 'smtp_not_configured' ||
+            notifyPayload?.reason === 'nodemailer_missing' ||
+            notifyPayload?.reason === 'email_missing' ||
+            (notify.ok && notifyPayload && notifyPayload.sent === false)
+          ) {
+            setEmailHint('skipped');
+          }
+        }
+      } catch {
+        if (!disposed) setEmailHint('skipped');
+      }
+    };
 
-  async function loadOrder(code: string, signal?: AbortSignal, options: { quiet: boolean } = { quiet: false }) {
-    if (!options.quiet) setState('loading');
-    setError(null);
-    try {
-      const payload = await fetchPublicCheckoutOrder(code, signal);
-      setOrder(payload);
-      setState('ready');
-    } catch (requestError) {
-      if (signal?.aborted) return;
-      setError(requestError instanceof Error ? requestError.message : String(requestError));
-      setState('error');
-    }
+    const run = async () => {
+      let code = publicCodeParam;
+
+      if (!code) {
+        const latest = pickLatestStoredOrder(user?.email);
+        if (latest?.publicCode) {
+          code = latest.publicCode;
+          if (!disposed) {
+            setPublicCode(code);
+            setRecoveredFromStorage(true);
+          }
+        }
+      }
+
+      if (!code) {
+        if (!disposed) setLoading(false);
+        return;
+      }
+
+      let cached = readInternalOrdersFromStorage().find((row) => row.publicCode === code) || null;
+
+      let current: BuyerInternalOrderRecord | null = cached;
+
+      try {
+        const payload = await fetchOrderLookup(code);
+        if (!disposed && payload?.found && payload.order) {
+          current = applyOrder(payload.order, cached);
+          cached = current;
+        } else if (!disposed && cached) {
+          current = null;
+          setOrder(null);
+          setVerificationFailed(true);
+        } else if (!disposed && !cached) {
+          const mapped = mapFinanceOrderStatus('PENDING');
+          current = {
+            publicCode: code,
+            status: 'PENDING',
+            displayStatus: mapped.displayStatus,
+            statusTone: mapped.statusTone,
+            title: 'Входной билет',
+            email: user?.email || '',
+            purchasedAt: null,
+            amountRub: null,
+            mode: modeHint || (fromYookassa ? 'YOOKASSA' : 'UNKNOWN'),
+            source: 'internal',
+          };
+          setOrder(current);
+        }
+      } catch {
+        // A saved paid status cannot prove current validity after cancellation or refund.
+        current = null;
+        if (!disposed) {
+          setOrder(null);
+          setVerificationFailed(true);
+        }
+      } finally {
+        if (!disposed) setLoading(false);
+      }
+
+      // YooKassa may land buyer before webhook is visible: keep polling while pending.
+      if (
+        code &&
+        !disposed &&
+        (!current || isPendingCheckoutOrderStatus(current.status)) &&
+        !isTerminalCheckoutOrderStatus(current?.status)
+      ) {
+        await pollCheckoutOrderUntilTerminal({
+          publicCode: code,
+          signal: pollAbort.signal,
+          lookup: async (publicCodeValue, signal) => {
+            const payload = await fetchOrderLookup(publicCodeValue, signal);
+            const row = payload?.found && payload.order ? payload.order : null;
+            if (row && !disposed) {
+              current = applyOrder(row, cached);
+              cached = current;
+            }
+            return {
+              found: Boolean(row),
+              status: row?.status || null,
+              order: row,
+            };
+          },
+        });
+      }
+
+      if (code && !disposed && lookupVerified) {
+        await maybeNotify(code, cached);
+      }
+    };
+
+    void run();
+    return () => {
+      disposed = true;
+      pollAbort.abort();
+    };
+  }, [publicCodeParam, modeHint, fromYookassa, user?.email]);
+
+  if (!publicCode && !loading) {
+    return (
+      <section className="container-page py-16">
+        <h1 className="text-3xl font-extrabold text-slate-950">Код заказа не найден</h1>
+        <p className="mt-3 max-w-xl text-slate-600">
+          Откройте ссылку из письма или раздела «Мои покупки», либо оформите билет заново. Если вы только что оплатили в
+          ЮKassa, а сюда попали без кода - откройте «Мои покупки» в том же браузере.
+        </p>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link
+            href="/account/purchases"
+            className="inline-flex rounded-full bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-700"
+          >
+            Мои покупки
+          </Link>
+          <Link href="/" className="inline-flex rounded-full border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700">
+            На главную
+          </Link>
+        </div>
+      </section>
+    );
   }
+
+  const status = order ? mapFinanceOrderStatus(order.status) : mapFinanceOrderStatus('PENDING');
+  const Icon = status.statusTone === 'live' ? CheckCircle2 : Clock3;
+  const ticketHref = publicCode ? buyerTicketPath(publicCode) : '/account/purchases';
+  const ticketReady = hasIssuedInternalTicket(order);
 
   return (
     <>
-      <section className="bg-slate-950 text-white">
-        <div className="container-page py-10 sm:py-14">
-          <div className="flex flex-wrap items-center gap-2 text-sm text-white/65">
-            <Link href="/" className="hover:text-white">Главная</Link>
-            <span>/</span>
-            <span className="text-white">Статус заказа</span>
+      <section className="bg-gradient-to-br from-emerald-700 via-emerald-800 to-slate-950 text-white print:hidden">
+        <div className="container-page py-12 sm:py-16">
+          <div className="inline-flex items-center gap-2 rounded-full bg-white/12 px-3 py-1 text-sm font-semibold text-white/88">
+            <Receipt className="h-4 w-4" />
+            Спасибо за заказ
           </div>
-          <div className="mt-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-semibold text-white/86">
-                <Ticket className="h-4 w-4" />
-                Заказ {orderCode || '-'}
-              </div>
-              <h1 className="mt-4 text-3xl font-extrabold sm:text-5xl">Статус оплаты и билеты</h1>
-              <p className="mt-4 max-w-3xl text-base leading-7 text-white/75">
-                После успешной оплаты билеты появятся здесь автоматически. Если оплата еще открыта в YooKassa, можно вернуться к форме оплаты.
-              </p>
-            </div>
-            <button
-              type="button"
-              disabled={!orderCode || state === 'loading'}
-              onClick={() => void loadOrder(orderCode)}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white hover:bg-white/15 disabled:opacity-55"
-            >
-              {state === 'loading' ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-              Обновить
-            </button>
-          </div>
+          <h1 className="mt-4 text-4xl font-extrabold tracking-tight sm:text-5xl">
+            {order?.status === 'REFUNDED' ? 'Заказ возвращён' : ['CANCELLED', 'CANCELED', 'EXPIRED'].includes(String(order?.status || '')) ? 'Заказ отменён' : status.statusTone === 'live' ? 'Оплата прошла' : 'Заказ принят'}
+          </h1>
+          <p className="mt-4 max-w-2xl text-base leading-7 text-emerald-50/90">
+            {ticketReady ? 'Ниже - ваш электронный билет. Сохраните код и ссылку.' : order?.status === 'REFUNDED' ? 'Деньги возвращены. Билет больше не действует.' : ['CANCELLED', 'CANCELED', 'EXPIRED'].includes(String(order?.status || '')) ? 'Билет больше не действует.' : verificationFailed ? 'Статус заказа сейчас не удалось проверить.' : 'Оплата ещё не подтверждена. Билет появится после подтверждения платежа. Сохраните код заказа.'}
+            {recoveredFromStorage ? ' Код восстановлен из этого браузера.' : ''}
+          </p>
         </div>
       </section>
 
-      <section className="container-page py-8 sm:py-10">
-        {state === 'loading' && !order ? (
-          <div className="flex min-h-[30vh] items-center justify-center rounded-2xl bg-white shadow-[0_14px_40px_rgba(15,23,42,0.08)]">
-            <Loader2 className="h-10 w-10 animate-spin text-primary-600" />
+      <section className="container-page py-8 sm:py-10 print:max-w-none print:px-0 print:py-0">
+        {loading ? (
+          <div className="flex min-h-[20vh] items-center justify-center print:hidden">
+            <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
           </div>
-        ) : null}
-
-        {error ? (
-          <div className="rounded-2xl border border-red-100 bg-red-50 p-5 text-red-800">
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
-              <div>
-                <div className="font-semibold">Не удалось загрузить заказ</div>
-                <div className="mt-1 text-sm opacity-80">{friendlyError(error)}</div>
-              </div>
+        ) : order ? (
+          <div className="grid gap-6">
+            <div className="mb-0 flex flex-wrap items-center gap-2 text-sm text-slate-600 print:hidden">
+              <Icon className="h-4 w-4 text-emerald-700" />
+              <span>{order.displayStatus || status.displayStatus}</span>
+              <span className="text-slate-300">·</span>
+              {ticketReady ? <Link href={ticketHref} className="font-semibold text-primary-700 hover:text-primary-800">
+                Отдельная страница билета
+              </Link> : null}
             </div>
+            {ticketReady ? <BuyerTicketCard order={order} emailHint={emailHint} /> : (
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-950">
+                Заказ №{order.publicCode}: {order.displayStatus || status.displayStatus}. Показывать этот код для входа нельзя.
+              </div>
+            )}
           </div>
-        ) : null}
+        ) : verificationFailed ? <p className="text-sm text-amber-900 print:hidden">Не удалось подтвердить статус заказа. Сохранённая в браузере копия билета не используется.</p> : null}
 
-        {order ? (
-          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
-            <article className="overflow-hidden rounded-2xl bg-white shadow-[0_14px_40px_rgba(15,23,42,0.08)]">
-              <div className="border-b border-slate-100 p-5 sm:p-6">
-                <div className="flex flex-wrap items-center gap-2">
-                  <StatusPill status={status} />
-                  {order.payment.status ? (
-                    <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-                      Оплата: {paymentStatusLabel(order.payment.status)}
-                    </span>
-                  ) : null}
-                </div>
-                <h2 className="mt-4 text-2xl font-bold text-slate-950">{order.title}</h2>
-                {order.venueTitle || order.venueAddress ? (
-                  <p className="mt-2 text-sm leading-6 text-slate-500">
-                    {[order.venueTitle, order.venueAddress].filter(Boolean).join(', ')}
-                  </p>
-                ) : null}
-              </div>
-
-              <div className="grid gap-4 p-5 sm:p-6">
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <InfoPanel label="Номер заказа" value={order.publicCode} />
-                  <InfoPanel label="Сумма" value={formatKopecks(order.totals.totalKopecks, order.totals.currency)} />
-                  <InfoPanel label="Покупатель" value={order.buyer.name || 'не указан'} />
-                  <InfoPanel label="Email" value={order.buyer.email || '-'} />
-                </div>
-
-                {status.kind === 'pending' && order.payment.confirmationUrl ? (
-                  <a
-                    href={order.payment.confirmationUrl}
-                    className="inline-flex w-fit items-center gap-2 rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-700"
-                  >
-                    Вернуться к оплате
-                    <ArrowRight className="h-4 w-4" />
-                  </a>
-                ) : null}
-
-                {status.kind === 'pending' ? (
-                  <p className="rounded-xl bg-amber-50 p-4 text-sm leading-6 text-amber-900">
-                    Платеж еще не подтвержден. Когда YooKassa пришлет статус оплаты, билеты появятся в этом заказе.
-                  </p>
-                ) : null}
-
-                {status.kind === 'success' && !ticketNumbers.length ? (
-                  <p className="rounded-xl bg-sky-50 p-4 text-sm leading-6 text-sky-900">
-                    Оплата подтверждена. Билеты готовятся, обновите страницу через несколько секунд.
-                  </p>
-                ) : null}
-              </div>
-            </article>
-
-            <aside className="rounded-2xl bg-white p-5 shadow-[0_14px_40px_rgba(15,23,42,0.08)]">
-              <h2 className="text-lg font-bold text-slate-950">Билеты</h2>
-              {ticketNumbers.length ? (
-                <div className="mt-4 grid gap-3">
-                  {ticketNumbers.map((ticketNumber) => (
-                    <div key={ticketNumber} className="rounded-xl border border-emerald-100 bg-emerald-50 p-4">
-                      <div className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Номер билета</div>
-                      <div className="mt-1 break-words font-mono text-lg font-bold text-emerald-950">{ticketNumber}</div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="mt-3 rounded-xl bg-slate-50 p-4 text-sm leading-6 text-slate-500">
-                  Номера билетов появятся после подтверждения оплаты.
-                </p>
-              )}
-
-              {order.items.length ? (
-                <div className="mt-5 border-t border-slate-100 pt-4">
-                  <div className="text-sm font-semibold text-slate-800">Состав заказа</div>
-                  <div className="mt-3 grid gap-3">
-                    {order.items.map((item) => (
-                      <div key={item.id} className="rounded-xl bg-slate-50 p-3 text-sm">
-                        <div className="font-semibold text-slate-900">{item.ticketTitle || item.title}</div>
-                        <div className="mt-1 text-slate-500">
-                          {item.quantity} шт. - {formatKopecks(item.totalKopecks, order.totals.currency)}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-
-              <div className="mt-5 border-t border-slate-100 pt-4">
-                <Link href="/account/purchases" className="inline-flex items-center gap-2 text-sm font-semibold text-primary-700 hover:text-primary-800">
-                  Перейти в мои покупки
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-                {order.supplierSupportPhone ? (
-                  <div className="mt-3 text-sm text-slate-500">
-                    Поддержка площадки: <span className="font-semibold text-slate-800">{order.supplierSupportPhone}</span>
-                  </div>
-                ) : null}
-              </div>
-            </aside>
-          </div>
+        {user?.email && filterInternalOrdersForEmail(readInternalOrdersFromStorage(), user.email).length > 1 ? (
+          <p className="mt-6 text-sm text-slate-500 print:hidden">
+            В этом браузере сохранены и другие заказы Дайбилет для {user.email} - они появятся в «Мои покупки».
+          </p>
         ) : null}
       </section>
     </>
   );
-}
-
-function shouldPollOrder(order: PublicCheckoutOrder): boolean {
-  return ['DRAFT', 'PENDING_PAYMENT', 'PAID'].includes(order.status) || ['CREATED', 'PENDING', 'WAITING_FOR_CAPTURE'].includes(order.payment.status || '');
-}
-
-function statusView(order: PublicCheckoutOrder | null): { kind: 'pending' | 'success' | 'error' | 'neutral'; label: string } {
-  if (!order) return { kind: 'neutral', label: 'Загрузка' };
-  if (['CONFIRMED', 'FULFILLED'].includes(order.status)) return { kind: 'success', label: 'Билеты готовы' };
-  if (['CANCELLED', 'EXPIRED', 'FAILED', 'REFUNDED'].includes(order.status)) return { kind: 'error', label: orderStatusLabel(order.status) };
-  return { kind: 'pending', label: orderStatusLabel(order.status) };
-}
-
-function StatusPill({ status }: { status: ReturnType<typeof statusView> }) {
-  const styles = {
-    pending: 'bg-amber-100 text-amber-800',
-    success: 'bg-emerald-100 text-emerald-800',
-    error: 'bg-red-100 text-red-800',
-    neutral: 'bg-slate-100 text-slate-600',
-  };
-  const Icon = status.kind === 'success' ? CheckCircle2 : status.kind === 'error' ? XCircle : Clock3;
-  return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${styles[status.kind]}`}>
-      <Icon className="h-3.5 w-3.5" />
-      {status.label}
-    </span>
-  );
-}
-
-function InfoPanel({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-xl bg-slate-50 p-4">
-      <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">{label}</div>
-      <div className="mt-1 break-words text-sm font-semibold text-slate-900">{value}</div>
-    </div>
-  );
-}
-
-function orderStatusLabel(status: string): string {
-  const labels: Record<string, string> = {
-    DRAFT: 'Черновик',
-    PENDING_PAYMENT: 'Ожидает оплату',
-    PAID: 'Оплачен',
-    CONFIRMED: 'Подтвержден',
-    FULFILLED: 'Выдан',
-    CANCELLED: 'Отменен',
-    REFUNDED: 'Возвращен',
-    EXPIRED: 'Истек',
-    FAILED: 'Ошибка оплаты',
-  };
-  return labels[status] || status;
-}
-
-function paymentStatusLabel(status: string): string {
-  const labels: Record<string, string> = {
-    CREATED: 'создана',
-    PENDING: 'ожидает оплату',
-    WAITING_FOR_CAPTURE: 'ожидает подтверждения',
-    SUCCEEDED: 'успешно',
-    CANCELLED: 'отменена',
-    FAILED: 'ошибка',
-  };
-  return labels[status] || status.toLowerCase();
-}
-
-function formatKopecks(value: number, currency: string): string {
-  const amount = Math.max(0, Math.round(value || 0)) / 100;
-  const suffix = currency === 'RUB' ? '₽' : currency;
-  return `${formatNumber(amount)} ${suffix}`;
-}
-
-function friendlyError(error: string): string {
-  if (error === 'not_found') return 'Проверьте номер заказа в ссылке.';
-  if (error === 'finance_api_unavailable') return 'Сервис оплаты временно недоступен. Попробуйте обновить страницу.';
-  return error;
 }

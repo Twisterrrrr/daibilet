@@ -82,9 +82,14 @@ export function LandingCityLocations({ cityName, profile }: LandingCityLocations
         </a>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        {venues.map((venue) => (
-          <LocationCard key={venue.id} venue={venue} href={venueHref(venue)} />
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {venues.map((venue, index) => (
+          <LocationCard
+            key={venue.id}
+            venue={venue}
+            href={venueHref(venue)}
+            priority={index < 3}
+          />
         ))}
       </div>
     </section>

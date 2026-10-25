@@ -1,82 +1,172 @@
 'use client';
 
 import Link from 'next/link';
-import { SlidersHorizontal, X } from 'lucide-react';
+import { X } from 'lucide-react';
 
+import { displayCatalogLabel } from '@/lib/catalog-labels';
+import { formatCatalogDateRangeLabel } from '@/lib/catalog-date-rail';
+import {
+  catalogExcludeThemeChip,
+  normalizeExcludeLandingList,
+  removeExcludeLanding,
+} from '@/lib/catalog-exclude-themes';
 import {
   AGE_FILTER_OPTIONS,
   buildCatalogHref,
   clearCatalogFilterKey,
   type CatalogFilterValues,
 } from '@/lib/catalog-url';
-import { persistSelectedCity } from '@/lib/selected-city';
 
-export function CatalogActiveFilters({ values }: { values: CatalogFilterValues }) {
-  const chips: Array<{ key: keyof CatalogFilterValues; label: string }> = [];
+const DATE_CHIP_LABELS: Record<string, string> = {
+  today: 'Сегодня',
+  tomorrow: 'Завтра',
+  weekend: 'На выходных',
+  evening: 'Вечером',
+};
 
-  if (values.q?.trim()) chips.push({ key: 'q', label: `«${values.q.trim()}»` });
-  if (values.city) chips.push({ key: 'city', label: values.city });
-  if (values.category) chips.push({ key: 'category', label: values.category });
-  if (values.landing) chips.push({ key: 'landing', label: values.landing });
-  if (values.date) {
-    const dateLabels: Record<string, string> = {
-      today: 'Сегодня',
-      tomorrow: 'Завтра',
-      weekend: 'На выходных',
-      evening: 'Вечером',
-    };
-    chips.push({ key: 'date', label: dateLabels[values.date] || values.date });
+function humanDateChipLabel(raw: string): string | null {
+  const key = String(raw || '').trim().toLowerCase();
+  if (!key) return null;
+  if (DATE_CHIP_LABELS[key]) return DATE_CHIP_LABELS[key];
+  if (/^\d{4}-\d{2}-\d{2}$/.test(key)) {
+    return formatCatalogDateRangeLabel(key, key)?.replace(/\u2014/g, '-') || key;
   }
-  if (values.from || values.to) {
+  return raw.trim();
+}
+
+/**
+ * Removable chips for the active catalog slice.
+ * Category / search / date always surface here so the H1 is not the only signal.
+ * City stays in the header picker (not duplicated as a chip).
+ */
+export function CatalogActiveFilters({
+  values,
+  className = '',
+}: {
+  values: CatalogFilterValues;
+  className?: string;
+}) {
+  const chips: Array<{ key: string; label: string; href: string }> = [];
+
+  if (values.q?.trim()) {
     chips.push({
-      key: 'from',
-      label: values.from && values.to ? `${values.from} — ${values.to}` : values.from || values.to || '',
+      key: 'q',
+      label: `«${values.q.trim()}»`,
+      href: buildCatalogHref(clearCatalogFilterKey(values, 'q')),
     });
   }
-  if (values.minPrice === 0 && values.maxPrice === 0) {
-    chips.push({ key: 'minPrice', label: 'Бесплатно' });
-  } else {
-    if (values.minPrice != null) chips.push({ key: 'minPrice', label: `от ${values.minPrice} ₽` });
-    if (values.maxPrice != null) chips.push({ key: 'maxPrice', label: `до ${values.maxPrice} ₽` });
+  if (values.category) {
+    chips.push({
+      key: 'category',
+      label: displayCatalogLabel(values.category),
+      href: buildCatalogHref(clearCatalogFilterKey(values, 'category')),
+    });
   }
-  if (values.ageMax != null && values.ageMax >= 0) {
+  if (values.landing) {
+    chips.push({
+      key: 'landing',
+      label: values.landing,
+      href: buildCatalogHref(clearCatalogFilterKey(values, 'landing')),
+    });
+  }
+
+  for (const slug of normalizeExcludeLandingList(values.excludeLanding)) {
+    chips.push({
+      key: `exclude:${slug}`,
+      label: `без ${catalogExcludeThemeChip(slug)}`,
+      href: buildCatalogHref({
+        ...values,
+        // values.excludeLanding may arrive as a bare string, but removeExcludeLanding
+        // only takes the list form, so normalise it first.
+        excludeLanding: removeExcludeLanding(normalizeExcludeLandingList(values.excludeLanding), slug),
+        page: undefined,
+      }),
+    });
+  }
+
+  if (values.from || values.to) {
+    const rangeLabel = formatCatalogDateRangeLabel(values.from, values.to)?.replace(/\u2014/g, '-');
+    chips.push({
+      key: 'from',
+      label: rangeLabel || [values.from, values.to].filter(Boolean).join(' - '),
+      href: buildCatalogHref(clearCatalogFilterKey(values, 'from')),
+    });
+  } else if (values.date) {
+    const dateLabel = humanDateChipLabel(values.date);
+    if (dateLabel) {
+      chips.push({
+        key: 'date',
+        label: dateLabel,
+        href: buildCatalogHref(clearCatalogFilterKey(values, 'date')),
+      });
+    }
+  }
+
+  // «Бесплатно» lives on the quick chip row.
+  if (!(values.minPrice === 0 && values.maxPrice === 0)) {
+    if (values.minPrice != null) {
+      chips.push({
+        key: 'minPrice',
+        label: `от ${values.minPrice} ₽`,
+        href: buildCatalogHref(clearCatalogFilterKey(values, 'minPrice')),
+      });
+    }
+    if (values.maxPrice != null) {
+      chips.push({
+        key: 'maxPrice',
+        label: `до ${values.maxPrice} ₽`,
+        href: buildCatalogHref(clearCatalogFilterKey(values, 'maxPrice')),
+      });
+    }
+  }
+  // «С детьми» (ageMax=12) lives on the quick chip row.
+  if (values.ageMax != null && values.ageMax >= 0 && values.ageMax !== 12) {
     const ageLabel = AGE_FILTER_OPTIONS.find((item) => item.value === values.ageMax)?.label;
-    chips.push({ key: 'ageMax', label: ageLabel ? `Возраст ${ageLabel}` : `до ${values.ageMax}+` });
+    chips.push({
+      key: 'ageMax',
+      label: ageLabel ? `Возраст ${ageLabel}` : `до ${values.ageMax}+`,
+      href: buildCatalogHref(clearCatalogFilterKey(values, 'ageMax')),
+    });
   }
 
   if (!chips.length) return null;
 
   return (
     <div
-      className="mb-4 flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm"
+      className={`flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm text-graphite-muted ${className}`}
       role="region"
       aria-label="Активные фильтры"
     >
-      <span className="inline-flex items-center gap-1.5 pl-1 pr-1 text-xs font-bold uppercase tracking-wider text-slate-500">
-        <SlidersHorizontal aria-hidden className="h-3.5 w-3.5" />
-        Активно · {chips.length}
-      </span>
       {chips.map((chip) => (
         <Link
           key={`${chip.key}:${chip.label}`}
-          href={buildCatalogHref(clearCatalogFilterKey(values, chip.key))}
-          onClick={() => {
-            if (chip.key === 'city') persistSelectedCity('all');
-          }}
-          className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary-700 ring-1 ring-primary/20 transition hover:bg-primary/20"
+          href={chip.href}
+          className="inline-flex items-center gap-1 text-graphite transition hover:text-primary"
         >
-          {chip.label}
-          <X className="h-3 w-3" aria-hidden />
+          <span>{chip.label}</span>
+          <X className="h-3.5 w-3.5 shrink-0 opacity-70" aria-hidden strokeWidth={2} />
+          <span className="sr-only">Убрать фильтр</span>
         </Link>
       ))}
       <Link
-        href="/events"
-        onClick={() => persistSelectedCity('all')}
-        className="ml-auto inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700"
+        href={buildCatalogHref({
+          city: values.city,
+          sort: values.sort,
+          limit: values.limit,
+        })}
+        className="inline-flex items-center gap-1 text-graphite-muted/80 transition hover:text-graphite"
       >
-        <X className="h-3.5 w-3.5" aria-hidden />
-        Сбросить фильтры
+        Сбросить все
       </Link>
     </div>
   );
+}
+
+/** Resolve a short date label for H1 (presets + ISO day/range). */
+export function catalogActiveDateHeadingLabel(values: CatalogFilterValues): string | null {
+  if (values.from || values.to) {
+    return formatCatalogDateRangeLabel(values.from, values.to)?.replace(/\u2014/g, '-') || null;
+  }
+  if (values.date) return humanDateChipLabel(values.date);
+  return null;
 }

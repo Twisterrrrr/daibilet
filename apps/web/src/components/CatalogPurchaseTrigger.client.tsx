@@ -4,6 +4,7 @@ import * as React from 'react';
 
 import {
   getTcWidgetIds,
+  normalizeTcPurchaseUrl,
   openTcWidget,
   resolveTcWidgetToken,
 } from '@/components/TcWidget.client';
@@ -17,6 +18,7 @@ import {
   canOpenCatalogPurchase,
   resolvePurchaseSessionForSlot,
 } from '@/lib/event-card-meta';
+import { trackSelectTickets } from '@/lib/catalog-analytics';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 
 function stopCardNavigation(event: React.MouseEvent) {
@@ -55,6 +57,17 @@ export function useCatalogPurchase(session: PublicSessionDto) {
       const targetPurchaseUrl = target.widgetUrl || target.purchaseUrl || target.deeplinkUrl || null;
       const targetTeplohod = getTeplohodWidgetIdsFromSession(target) || teplohod;
 
+      trackSelectTickets({
+        eventId: target.id || session.id,
+        slug: target.slug || session.slug,
+        provider: targetTeplohod?.tepEventId
+          ? 'teplohod'
+          : extractTcEventIdFromSession(target) || getTcWidgetIds(target)?.tcEventId
+            ? 'ticketscloud'
+            : 'external',
+        source: 'catalog_purchase',
+      });
+
       if (targetTeplohod?.tepEventId) {
         setTeplohodEventId(String(targetTeplohod.tepEventId));
         window.setTimeout(() => openTeplohodWidget(teplohodWrapperId), 120);
@@ -62,7 +75,9 @@ export function useCatalogPurchase(session: PublicSessionDto) {
       }
 
       const eventId = extractTcEventIdFromSession(target) || getTcWidgetIds(target)?.tcEventId || '';
-      const purchaseUrl = targetPurchaseUrl || session.widgetUrl || session.purchaseUrl || session.deeplinkUrl || null;
+      const purchaseUrlRaw =
+        targetPurchaseUrl || session.widgetUrl || session.purchaseUrl || session.deeplinkUrl || null;
+      const purchaseUrl = normalizeTcPurchaseUrl(purchaseUrlRaw) || purchaseUrlRaw;
       const token = resolveTcWidgetToken(purchaseUrl);
 
       if (!eventId || !token) {

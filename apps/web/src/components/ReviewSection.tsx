@@ -250,7 +250,7 @@ export function ReviewSection({
     async (page = 1) => {
       try {
         const key = eventSlug || eventId;
-        const res = await fetch(`/api/reviews/events/${encodeURIComponent(key)}?page=${page}&limit=10`, {
+        const res = await fetch(`/api/reviews/events/${encodeURIComponent(key)}?page=${page}&limit=3`, {
           cache: 'no-store',
         });
         if (!res.ok) return;

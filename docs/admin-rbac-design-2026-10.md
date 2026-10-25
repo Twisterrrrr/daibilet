@@ -63,3 +63,9 @@ RBAC нужен **до** выдачи доступа к финконтру не�
 4. Инженер видит ошибку адаптера и повторяет безопасный обмен; не видит реквизиты и платёжные данные.
 5. Смена профиля или блокировка сотрудника отзывает действующие сессии на Next, catalog и finance. Журнал содержит владельца изменения.
 6. Суперадмин не может отключить последнего активного суперадмина. Отказ и успех денежного действия отражаются в аудите без секретов.
+
+## Реализованный срез 2026-10-25
+
+В `codex/rbac-finance-unified` выполнены персональный вход/выход Next, page permission guard, отбор навигации, guards на server actions/direct Prisma, forwarding HttpOnly session cookie в backend и signed actor assertion для внутренних finance read/operation endpoints. Backend order DTO применяет серверное PII-маскирование по permission. RBAC включается только явно через `DAIBILET_ADMIN_RBAC_ENFORCE=1`; при выключенном флаге остаётся Basic Auth переходный режим.
+
+TOTP enrollment и verification ещё отсутствуют. Поэтому чувствительные финансовые permissions удаляются из session permission set до подтверждения MFA и не попадают в finance actor assertion. Это fail-closed подготовительная граница, а не завершённый RBAC rollout или готовность к реальным выплатам. Smoke и тесты на production не выполнялись; перед включением флага нужны MFA, route/action inventory audit и проверка согласованной схемы БД.

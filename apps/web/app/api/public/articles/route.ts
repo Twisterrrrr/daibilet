@@ -1,11 +1,8 @@
-import '@/lib/env';
-import { buildPublicArticlesListDto } from '@daibilet/backend/public-read';
-import { publicJsonResponse } from '@/server/public-json-response';
+import { proxyPublicApiRequest } from '@/server/public-api-proxy';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 300;
 
-export async function GET() {
-  const payload = await buildPublicArticlesListDto();
-  return publicJsonResponse(payload);
+export async function GET(request: Request) {
+  return proxyPublicApiRequest(request, '/api/public/articles');
 }

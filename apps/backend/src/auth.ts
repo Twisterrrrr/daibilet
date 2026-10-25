@@ -26,7 +26,10 @@ export function createAdminAuthConfig(env: AdminAuthEnv): AdminAuthConfig {
     password: env.ADMIN_PASSWORD || '',
     passwordHash: env.ADMIN_PASSWORD_SHA256 || env.ADMIN_PASSWORD_HASH || '',
     realm: env.ADMIN_AUTH_REALM,
-    requireAuth: env.NODE_ENV === 'production' || env.DAIBILET_REQUIRE_ADMIN_AUTH === '1',
+    // Fail closed by default. This mirrored the web middleware rule: deriving it
+    // from NODE_ENV meant a restart with NODE_ENV=development silently opened
+    // /api/admin - orders and buyer data. Only an explicit opt-out disables it.
+    requireAuth: env.DAIBILET_REQUIRE_ADMIN_AUTH !== '0',
   };
 }
 

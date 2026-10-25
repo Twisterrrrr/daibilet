@@ -1,85 +1,220 @@
 import assert from 'node:assert/strict';
-import { setTimeout as delay } from 'node:timers/promises';
-import test from 'node:test';
-import { checkoutPaymentSettled, watchCheckoutPayment } from './checkout-payment.ts';
+import { describe, it } from 'node:test';
 
-const pending = { status: 'PENDING_PAYMENT', payment: { status: 'PENDING' } };
+import {
+  buildAdmissionCheckoutIdempotencyKey,
+  isPendingCheckoutOrderStatus,
+  isTerminalCheckoutOrderStatus,
+  pickCheckoutConfirmation,
+  pollCheckoutOrderUntilTerminal,
+  watchCheckoutPayment,
+} from './checkout-payment.ts';
 
-test('only terminal backend status completes checkout; authorization is not payment', () => {
-  assert.equal(checkoutPaymentSettled(pending), false);
-  assert.equal(checkoutPaymentSettled({ status: 'PENDING_PAYMENT', payment: { status: 'WAITING_FOR_CAPTURE' } }), false);
-  for (const status of ['SUCCEEDED', 'CANCELED', 'CANCELLED', 'REFUNDED']) {
-    assert.equal(checkoutPaymentSettled({ ...pending, payment: { status } }), true);
-  }
-  assert.equal(checkoutPaymentSettled({ ...pending, status: 'CONFIRMED' }), true);
-});
-
-test('polling retries transport errors sequentially and stops on confirmation', async () => {
-  let reads = 0;
-  let active = 0;
-  let peak = 0;
-  let finished = 0;
-  let resolve!: () => void;
-  const done = new Promise<void>((r) => { resolve = r; });
-  const stop = watchCheckoutPayment({
-    intervalMs: 1,
-    maxDurationMs: 1000,
-    read: async () => {
-      peak = Math.max(peak, ++active);
-      reads++;
-      await delay(5);
-      active--;
-      if (reads === 1) throw new Error('network');
-      return reads < 3 ? pending : { ...pending, status: 'CONFIRMED' };
-    },
-    onSettled: () => { finished++; resolve(); },
-    onTimeout: resolve,
+describe('checkout-payment', () => {
+  it('reuses the same idempotency key for the same checkout payload', () => {
+    const a = buildAdmissionCheckoutIdempotencyKey({
+      admissionProductSlug: 'phase-g-test-museum-entry',
+      admissionOfferId: 'offer-1',
+      quantity: 1,
+      email: 'Buyer@Example.com',
+      confirmationMode: 'embedded',
+    });
+    const b = buildAdmissionCheckoutIdempotencyKey({
+      admissionProductSlug: 'phase-g-test-museum-entry',
+      admissionOfferId: 'offer-1',
+      quantity: 1,
+      email: 'buyer@example.com',
+      confirmationMode: 'embedded',
+    });
+    assert.equal(a, b);
+    assert.match(a, /embedded$/);
   });
-  try {
-    await done;
-    await delay(15);
-    assert.equal(reads, 3);
-    assert.equal(peak, 1);
-    assert.equal(finished, 1);
-  } finally { stop(); }
-});
 
-test('unmount aborts an in-flight poll and never navigates', async () => {
-  let signal!: AbortSignal;
-  let settle!: (value: typeof pending) => void;
-  let completed = false;
-  const stop = watchCheckoutPayment({
-    read: (s) => { signal = s; return new Promise((r) => { settle = r; }); },
-    onSettled: () => { completed = true; },
-    onTimeout: () => { completed = true; },
+  it('changes idempotency key when confirmation mode differs', () => {
+    const embedded = buildAdmissionCheckoutIdempotencyKey({
+      admissionProductSlug: 'phase-g-test-museum-entry',
+      admissionOfferId: 'offer-1',
+      quantity: 1,
+      email: 'buyer@example.com',
+      confirmationMode: 'embedded',
+    });
+    const redirect = buildAdmissionCheckoutIdempotencyKey({
+      admissionProductSlug: 'phase-g-test-museum-entry',
+      admissionOfferId: 'offer-1',
+      quantity: 1,
+      email: 'buyer@example.com',
+      confirmationMode: 'redirect',
+    });
+    assert.notEqual(embedded, redirect);
   });
-  stop();
-  settle({ ...pending, status: 'CONFIRMED' });
-  await delay(5);
-  assert.equal(signal.aborted, true);
-  assert.equal(completed, false);
-});
 
-test('hung requests abort; overall deadline stops polling without marking payment failed', async () => {
-  const signals: AbortSignal[] = [];
-  let settled = false;
-  let resolve!: () => void;
-  const done = new Promise<void>((r) => { resolve = r; });
-  const stop = watchCheckoutPayment({
-    intervalMs: 1,
-    requestTimeoutMs: 5,
-    maxDurationMs: 40,
-    read: (signal) => { signals.push(signal); return new Promise(() => {}); },
-    onSettled: () => { settled = true; },
-    onTimeout: resolve,
+  it('detects terminal and pending statuses', () => {
+    assert.equal(isTerminalCheckoutOrderStatus('CONFIRMED'), true);
+    assert.equal(isTerminalCheckoutOrderStatus('canceled'), true);
+    assert.equal(isTerminalCheckoutOrderStatus('PENDING'), false);
+    assert.equal(isPendingCheckoutOrderStatus('PENDING'), true);
+    assert.equal(isPendingCheckoutOrderStatus('CONFIRMED'), false);
   });
-  try {
-    await done;
-    const count = signals.length;
-    await delay(10);
-    assert.ok(count >= 1);
-    assert.equal(signals.length, count);
-    assert.ok(signals.every((signal) => signal.aborted));
-    assert.equal(settled, false);
-  } finally { stop(); }
+
+  it('settles the embedded checkout watcher from the server payment state', async () => {
+    let settled = false;
+    await new Promise<void>((resolve, reject) => {
+      let stop = () => {};
+      stop = watchCheckoutPayment({
+        read: async () => ({ status: 'PENDING', payment: { status: 'SUCCEEDED' } }),
+        onSettled: () => { settled = true; stop(); resolve(); },
+        onTimeout: () => reject(new Error('unexpected checkout timeout')),
+        intervalMs: 1,
+      });
+    });
+    assert.equal(settled, true);
+  });
+
+  it('falls back to redirect when confirmationToken is missing', () => {
+    const picked = pickCheckoutConfirmation({
+      confirmationMode: 'embedded',
+      confirmationToken: null,
+      confirmationUrl: 'https://yookassa.ru/checkout/pay',
+    });
+    assert.equal(picked.confirmationMode, 'redirect');
+    assert.equal(picked.confirmationToken, null);
+    assert.equal(picked.confirmationUrl, 'https://yookassa.ru/checkout/pay');
+  });
+
+  it('prefers embedded when confirmationToken is present', () => {
+    const picked = pickCheckoutConfirmation({
+      confirmationMode: 'embedded',
+      confirmationToken: 'ct_test',
+      confirmationUrl: null,
+    });
+    assert.equal(picked.confirmationMode, 'embedded');
+    assert.equal(picked.confirmationToken, 'ct_test');
+  });
+
+  it('polls sequentially, is abortable, and stops on terminal state', async () => {
+    const calls: string[] = [];
+    let ticks = 0;
+    const controller = new AbortController();
+
+    const result = await pollCheckoutOrderUntilTerminal({
+      publicCode: '1234567',
+      intervalMs: 1,
+      requestTimeoutMs: 50,
+      maxDurationMs: 5_000,
+      signal: controller.signal,
+      now: () => {
+        ticks += 1;
+        return ticks;
+      },
+      sleep: async () => {
+        calls.push('sleep');
+      },
+      lookup: async (code) => {
+        calls.push(`lookup:${code}`);
+        if (calls.filter((row) => row.startsWith('lookup:')).length >= 2) {
+          return { found: true, status: 'CONFIRMED' };
+        }
+        return { found: true, status: 'PENDING' };
+      },
+    });
+
+    assert.equal(result.ok, true);
+    if (result.ok) {
+      assert.equal(result.reason, 'terminal');
+      assert.equal(result.lookup.status, 'CONFIRMED');
+    }
+    assert.deepEqual(
+      calls.filter((row) => row.startsWith('lookup:')),
+      ['lookup:1234567', 'lookup:1234567'],
+    );
+    assert.ok(calls.includes('sleep'));
+  });
+
+  it('keeps pending and retries after a transport error', async () => {
+    let attempts = 0;
+    const result = await pollCheckoutOrderUntilTerminal({
+      publicCode: '999',
+      intervalMs: 1,
+      requestTimeoutMs: 50,
+      maxDurationMs: 5_000,
+      now: (() => {
+        let t = 0;
+        return () => {
+          t += 1;
+          return t;
+        };
+      })(),
+      sleep: async () => undefined,
+      lookup: async () => {
+        attempts += 1;
+        if (attempts === 1) throw new Error('network');
+        return { found: true, status: 'CONFIRMED' };
+      },
+    });
+
+    assert.equal(result.ok, true);
+    assert.equal(attempts, 2);
+  });
+
+  it('result-page style: pending lookup later becomes CONFIRMED without failing', async () => {
+    const statuses = ['PENDING', 'PENDING', 'CONFIRMED'];
+    let index = 0;
+    const updates: string[] = [];
+
+    const result = await pollCheckoutOrderUntilTerminal({
+      publicCode: 'pending-then-ok',
+      intervalMs: 1,
+      requestTimeoutMs: 50,
+      maxDurationMs: 5_000,
+      now: (() => {
+        let t = 0;
+        return () => {
+          t += 1;
+          return t;
+        };
+      })(),
+      sleep: async () => undefined,
+      onUpdate: (lookup) => {
+        if (lookup.status) updates.push(String(lookup.status));
+      },
+      lookup: async () => {
+        const status = statuses[Math.min(index, statuses.length - 1)];
+        index += 1;
+        return { found: true, status };
+      },
+    });
+
+    assert.equal(result.ok, true);
+    if (result.ok) assert.equal(result.lookup.status, 'CONFIRMED');
+    assert.deepEqual(updates, ['PENDING', 'PENDING', 'CONFIRMED']);
+  });
+
+  it('stops polling when aborted before terminal state', async () => {
+    const controller = new AbortController();
+    let lookups = 0;
+    const resultPromise = pollCheckoutOrderUntilTerminal({
+      publicCode: 'abort-me',
+      intervalMs: 5,
+      requestTimeoutMs: 50,
+      maxDurationMs: 5_000,
+      signal: controller.signal,
+      sleep: async (_ms, signal) => {
+        controller.abort();
+        if (signal?.aborted) {
+          const err = new Error('aborted');
+          err.name = 'AbortError';
+          throw err;
+        }
+      },
+      lookup: async () => {
+        lookups += 1;
+        return { found: true, status: 'PENDING' };
+      },
+    });
+
+    const result = await resultPromise;
+    assert.equal(result.ok, false);
+    if (!result.ok) assert.equal(result.reason, 'aborted');
+    assert.ok(lookups >= 1);
+  });
 });

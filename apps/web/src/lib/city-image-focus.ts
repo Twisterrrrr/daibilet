@@ -3,7 +3,9 @@ import { citySlug } from '@/lib/routes';
 /** Вертикальное (и при необходимости горизонтальное) кадрирование карточек городов. */
 const CITY_IMAGE_OBJECT_POSITION: Record<string, string> = {
   chelyabinsk: '65% 57%',
-  ekaterinburg: '54% 56%',
+  // Небоскрёбы (Исеть и др.) у верхнего края кадра - якорим к top, иначе hero их срезает.
+  ekaterinburg: '72% 0%',
+  'hanty-mansiysk': '48% 52%',
   irkutsk: '59% 52%',
   izhevsk: '60% 52%',
   kaliningrad: '65% 49%',
@@ -13,6 +15,7 @@ const CITY_IMAGE_OBJECT_POSITION: Record<string, string> = {
   moscow: '56% 54%',
   'nizhny-novgorod': 'center 54%',
   novosibirsk: '58% 56%',
+  novokuznetsk: '52% 48%',
   omsk: '65% 50%',
   orel: '62% 50%',
   orenburg: '65% 55%',
@@ -26,8 +29,10 @@ const CITY_IMAGE_OBJECT_POSITION: Record<string, string> = {
   sochi: '65% 51%',
   sortavala: '54% 50%',
   stavropol: '65% 57%',
+  surgut: '56% 48%',
   suzdal: '65% 49%',
   tomsk: '61% 53%',
+  tolyatti: '58% 48%',
   tula: '59% 57%',
   tver: '60% 50%',
   tyumen: '65% 56%',
@@ -35,6 +40,7 @@ const CITY_IMAGE_OBJECT_POSITION: Record<string, string> = {
   'ulan-ude': '60% 54%',
   ulyanovsk: '65% 53%',
   'veliky-novgorod': '65% 49%',
+  vladikavkaz: '58% 42%',
   vladivostok: 'center 56%',
   volgograd: '57% 53%',
   vologda: '65% 53%',
@@ -51,6 +57,9 @@ const SLUG_ALIASES: Record<string, string> = {
   'velikiy-novgorod': 'veliky-novgorod',
   'rostov-na-donu': 'rostov-on-don',
   rostov: 'rostov-on-don',
+  // Destination canon (ц→c) vs asset filenames
+  novokuzneck: 'novokuznetsk',
+  'khanty-mansiysk': 'hanty-mansiysk',
 };
 
 type CityFocusSource = {
@@ -62,7 +71,7 @@ type CityFocusSource = {
 export function resolveCityImageObjectPosition(city: CityFocusSource): string {
   const slug = citySlug(city);
   const key = SLUG_ALIASES[slug] || slug;
-  return CITY_IMAGE_OBJECT_POSITION[key] || 'center 45%';
+  return CITY_IMAGE_OBJECT_POSITION[key] || 'center 32%';
 }
 
 export function cityImageObjectPositionClass(city: CityFocusSource): string {

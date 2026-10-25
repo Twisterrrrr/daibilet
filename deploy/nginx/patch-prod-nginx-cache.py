@@ -6,7 +6,7 @@ CONF = Path("/etc/nginx/sites-enabled/daibilet.conf")
 text = CONF.read_text()
 
 cache_path = """
-proxy_cache_path /var/cache/nginx/daibilet levels=1:2 keys_zone=daibilet_web:16m max_size=256m inactive=30m use_temp_path=off;
+proxy_cache_path /var/cache/nginx/daibilet levels=1:2 keys_zone=daibilet_web:16m max_size=256m inactive=120m use_temp_path=off;
 """
 
 if "keys_zone=daibilet_web:" not in text:
@@ -21,9 +21,12 @@ if marker not in text:
 
 cache_directives = """
         proxy_cache daibilet_web;
-        proxy_cache_valid 200 5m;
+        # 30m fresh; on expiry nginx serves stale while one background refresh runs.
+        proxy_cache_valid 200 30m;
         proxy_cache_use_stale error timeout updating http_500 http_502 http_503 http_504;
+        proxy_cache_background_update on;
         proxy_cache_lock on;
+        proxy_cache_lock_timeout 5s;
         proxy_cache_bypass $http_authorization;
         proxy_no_cache $http_authorization;
         add_header X-Cache-Status $upstream_cache_status always;

@@ -375,7 +375,7 @@ function HomeHero({
   onOpenCatalog: (extra?: Record<string, string>) => void;
 }) {
   return (
-    <section className="relative overflow-hidden bg-slate-900">
+    <section className="relative overflow-hidden bg-[#122868]">
       <HomeHeroBackground />
       <div className="container-page relative pb-12 pt-12 sm:pb-16 sm:pt-16">
         <div className="mx-auto max-w-3xl text-center drop-shadow-[0_2px_14px_rgba(15,23,42,0.55)]">
@@ -387,7 +387,7 @@ function HomeHero({
           <h1 className="font-display text-3xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
             {selectedCityName ? (
               <>
-                Экскурсии и события
+                Экскурсии, музеи и мероприятия
                 <span className="block bg-gradient-to-r from-sky-200 to-white bg-clip-text text-transparent">
                   в {cityToPrepositional(selectedCityName)}
                 </span>
@@ -779,7 +779,7 @@ function HomeBlogSection() {
             <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
               Идеи для поездок и отдыха
             </h2>
-            <p className="mt-1 text-sm text-slate-500">Гайды и советы перед выбором события</p>
+            <p className="mt-1 text-sm text-slate-500">Статьи и советы перед выбором события</p>
           </div>
           <a href="/blog" className="inline-flex items-center gap-1 text-sm font-semibold text-primary-600 hover:text-primary-700">
             Все материалы <ArrowRight className="h-4 w-4" />

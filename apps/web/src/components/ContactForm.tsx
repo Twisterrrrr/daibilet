@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { CheckCircle, Loader2, Send } from 'lucide-react';
 
-const SUPPORT_EMAIL = 'hello@daibilet.ru';
+const SUPPORT_EMAIL = 'info@daibilet.ru';
 
 const CATEGORY_LABELS: Record<string, string> = {
   ORDER: 'Вопрос по заказу',

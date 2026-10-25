@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { Clock, MapPin, Star, Ticket } from 'lucide-react';
+import { Clock, Star, Ticket } from 'lucide-react';
 
-import { collectCatalogLabels } from '@/lib/catalog-labels';
+import { resolveEditorialEventImage } from '@/lib/event-cover-images';
 import { resolveEventCardDestinationLabel, resolveEventCardLocationLabel } from '@/lib/event-location';
 import { EventFavoriteButton } from '@/components/EventFavoriteButton';
 import { LandingPurchaseButton } from '@/components/landing/LandingPurchaseButton';
@@ -16,6 +16,7 @@ import {
   getDepartingSoonMinutes,
   isOpenDate,
   MIN_DISPLAY_PRICE_RUB,
+  resolveAgeBadge,
   resolvePseudoRating,
 } from '@/lib/event-card-meta';
 import { eventHref } from '@/routes';
@@ -46,11 +47,11 @@ export function EventCard({
     return <ShowcaseEventCard event={event} rail={showcaseRail} editorsPickBadge={editorsPickBadge} />;
   }
   const [hasImageError, setHasImageError] = React.useState(false);
-  const showImage = Boolean(event.imageUrl && !hasImageError);
+  const coverImageUrl =
+    resolveEditorialEventImage(event.id, event.slug, event.imageUrl) || event.imageUrl || '';
+  const showImage = Boolean(coverImageUrl && !hasImageError);
   const detailsHref = eventHref(event);
   const hasPrice = typeof event.priceFrom === 'number' && event.priceFrom >= MIN_DISPLAY_PRICE_RUB;
-  const destinationLabel = resolveEventCardDestinationLabel(event);
-  const highlights = collectCatalogLabels(event);
   const openDate = isOpenDate(event);
   const departingSoonMinutes = openDate ? null : getDepartingSoonMinutes(event.startsAt);
   const nextSessionLabel = openDate ? null : formatEventNextSession(event);
@@ -60,6 +61,7 @@ export function EventCard({
   const pseudoRating = resolvePseudoRating(event.groupKey || event.id);
   const locationLabel = resolveEventCardLocationLabel(event);
   const showSoonBadge = !hasPrice && !openDate && !departingSoonMinutes;
+  const ageLabel = resolveAgeBadge(event.tags, event.ageLimit);
   const cardClassName =
     'group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg hover:shadow-slate-200/60';
 
@@ -81,7 +83,7 @@ export function EventCard({
 
         {showImage ? (
           <img
-            src={event.imageUrl || ''}
+            src={coverImageUrl}
             alt={event.title}
             loading="lazy"
             onError={() => setHasImageError(true)}
@@ -115,10 +117,9 @@ export function EventCard({
               {event.category}
             </span>
           ) : null}
-          {destinationLabel ? (
-            <span className="inline-flex min-w-0 max-w-full items-center gap-0.5 text-slate-500">
-              <MapPin className="h-3 w-3 shrink-0" />
-              <span className="truncate">{destinationLabel}</span>
+          {ageLabel ? (
+            <span className="font-semibold tabular-nums text-slate-600" title="Возрастное ограничение">
+              {ageLabel}
             </span>
           ) : null}
         </div>
@@ -147,19 +148,8 @@ export function EventCard({
           {locationLabel ? <span className="line-clamp-1">{locationLabel}</span> : null}
         </div>
 
-        {highlights.length > 0 ? (
-          <ul className="mt-2 space-y-0.5 text-[10px] leading-relaxed text-slate-600 sm:text-xs">
-            {highlights.map((highlight) => (
-              <li key={highlight} className="flex gap-1.5">
-                <span className="text-primary-500">•</span>
-                <span className="line-clamp-1">{highlight}</span>
-              </li>
-            ))}
-          </ul>
-        ) : null}
-
         {showSlotPills ? (
-          <div className="mt-2 flex flex-wrap items-start gap-1.5">
+          <div className="mt-2 flex flex-wrap items-center justify-center gap-1.5">
             {displaySlotLabels.map((label) => (
               <span
                 key={label}
@@ -216,7 +206,9 @@ function ShowcaseEventCard({
   editorsPickBadge?: boolean;
 }) {
   const [hasImageError, setHasImageError] = React.useState(false);
-  const showImage = Boolean(event.imageUrl && !hasImageError);
+  const coverImageUrl =
+    resolveEditorialEventImage(event.id, event.slug, event.imageUrl) || event.imageUrl || '';
+  const showImage = Boolean(coverImageUrl && !hasImageError);
   const detailsHref = eventHref(event);
   const hasPrice = typeof event.priceFrom === 'number' && event.priceFrom >= MIN_DISPLAY_PRICE_RUB;
   const pseudoRating = resolvePseudoRating(event.groupKey || event.id);
@@ -249,7 +241,7 @@ function ShowcaseEventCard({
         </div>
         {showImage ? (
           <img
-            src={event.imageUrl || ''}
+            src={coverImageUrl}
             alt={event.title}
             loading="lazy"
             onError={() => setHasImageError(true)}

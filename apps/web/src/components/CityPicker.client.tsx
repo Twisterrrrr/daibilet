@@ -1,10 +1,13 @@
 'use client';
 
 import * as React from 'react';
+import Link from 'next/link';
 import { createPortal } from 'react-dom';
 import { Check, ChevronDown, MapPin } from 'lucide-react';
 
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
+import { OPEN_HEADER_CITY_PICKER_EVENT } from '@/lib/first-visit-city';
+import { matchDestination } from '@/lib/selected-city';
 
 type CityPickerVariant = 'hero' | 'header' | 'compact';
 
@@ -15,6 +18,8 @@ type CityPickerProps = {
   allLabel?: string;
   variant?: CityPickerVariant;
   className?: string;
+  /** Open the dropdown on mount (e.g. /my-day «или сменить город»). */
+  defaultOpen?: boolean;
 };
 
 const MENU_MAX_HEIGHT = 360;
@@ -26,42 +31,53 @@ export function CityPicker({
   allLabel = 'Все города',
   variant = 'hero',
   className = '',
+  defaultOpen = false,
 }: CityPickerProps) {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(defaultOpen);
   const [menuStyle, setMenuStyle] = React.useState<React.CSSProperties>({ visibility: 'hidden' });
   const buttonRef = React.useRef<HTMLButtonElement>(null);
   const menuRef = React.useRef<HTMLDivElement>(null);
+  const rootRef = React.useRef<HTMLDivElement>(null);
 
   const cityOptions = React.useMemo(
     () => cities.filter((item) => item.type === 'city').sort((a, b) => b.events - a.events || a.name.localeCompare(b.name, 'ru')),
     [cities],
   );
 
-  const selectedLabel = value === 'all' ? allLabel : value;
-  const isAllSelected = value === 'all';
+  // Show the picked name immediately; parent cityLabel can lag one frame behind
+  // URL/searchParams (saint-petersburg vs sankt-peterburg) and look stale.
+  const [optimisticValue, setOptimisticValue] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (optimisticValue == null) return;
+    if (value === optimisticValue) {
+      setOptimisticValue(null);
+      return;
+    }
+    const current = matchDestination(cityOptions, value);
+    const pending = matchDestination(cityOptions, optimisticValue);
+    if (current && pending && current.name === pending.name) {
+      setOptimisticValue(null);
+    }
+  }, [value, optimisticValue, cityOptions]);
+
+  const displayValue = optimisticValue ?? value;
+  const selectedMatch = displayValue === 'all' ? null : matchDestination(cityOptions, displayValue);
+  const selectedLabel =
+    displayValue === 'all' ? allLabel : selectedMatch?.name || displayValue;
+  const isAllSelected = displayValue === 'all';
 
   const updatePosition = React.useCallback(() => {
     const button = buttonRef.current;
     if (!button) return;
 
     const rect = button.getBoundingClientRect();
-    const menuWidth = variant === 'compact' ? rect.width : Math.max(rect.width, 256);
-    const left = rect.left;
-    const spaceBelow = window.innerHeight - rect.bottom - 8;
-    const spaceAbove = rect.top - 8;
-    const openUp = spaceBelow < 220 && spaceAbove > spaceBelow;
-
-    if (openUp) {
-      setMenuStyle({
-        position: 'fixed',
-        left,
-        width: menuWidth,
-        bottom: window.innerHeight - rect.top + 4,
-        maxHeight: Math.min(MENU_MAX_HEIGHT, spaceAbove),
-        visibility: 'visible',
-      });
-      return;
-    }
+    const menuWidth =
+      variant === 'compact' ? Math.max(rect.width, 256) : Math.max(rect.width, 256);
+    const pad = 8;
+    const left = Math.min(Math.max(pad, rect.left), Math.max(pad, window.innerWidth - menuWidth - pad));
+    // Always open downward (owner: no flip-up). Scroll inside menu if viewport is short.
+    const spaceBelow = Math.max(120, window.innerHeight - rect.bottom - pad);
 
     setMenuStyle({
       position: 'fixed',
@@ -96,17 +112,29 @@ export function CityPicker({
     return () => document.removeEventListener('mousedown', close);
   }, [open]);
 
+  React.useEffect(() => {
+    if (variant !== 'header') return;
+    const openPicker = () => {
+      setMenuStyle({ visibility: 'hidden' });
+      setOpen(true);
+    };
+    window.addEventListener(OPEN_HEADER_CITY_PICKER_EVENT, openPicker);
+    return () => window.removeEventListener(OPEN_HEADER_CITY_PICKER_EVENT, openPicker);
+  }, [variant]);
+
   const selectCity = (name: string) => {
+    setOptimisticValue(name);
     setOpen(false);
     onChange(name);
   };
 
   const buttonClassName =
     variant === 'hero'
-      ? 'relative h-11 w-full rounded-xl bg-slate-50 pl-10 pr-8 text-left text-sm font-medium text-slate-800 outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/25'
+      ? 'relative flex h-11 w-full items-center gap-2 rounded-xl border border-slate-300/90 bg-white px-3 pr-9 text-left text-sm font-medium text-slate-800 outline-none transition hover:border-slate-400 hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-primary/25'
       : variant === 'compact'
         ? 'relative flex w-full items-center gap-2 rounded-lg py-3 pl-10 pr-10 text-left text-base font-medium text-slate-700 hover:bg-slate-100'
-        : 'inline-flex items-center gap-1 rounded-full px-2 py-1 text-sm font-medium text-slate-600 transition hover:bg-slate-100';
+        : // Header: mobile = MapPin icon (same chrome as search/heart); lg+ named chip.
+          'inline-flex h-10 w-10 items-center justify-center rounded-lg text-graphite-muted outline-none transition hover:bg-surface-muted hover:text-graphite focus-visible:ring-2 focus-visible:ring-primary/25 lg:w-full lg:min-w-10 lg:justify-start lg:gap-2 lg:rounded-full lg:border lg:border-primary-200/80 lg:bg-primary-50/70 lg:px-3.5 lg:text-sm lg:font-semibold lg:text-primary-900 lg:hover:border-primary-300 lg:hover:bg-primary-50 lg:hover:text-primary-950';
 
   const menu = open
     ? createPortal(
@@ -137,7 +165,11 @@ export function CityPicker({
               </button>
             </li>
             {cityOptions.map((city) => {
-              const active = value === city.name;
+              const active = Boolean(
+                selectedMatch
+                  ? selectedMatch.name === city.name && selectedMatch.slug === city.slug
+                  : displayValue === city.name,
+              );
               return (
                 <li key={city.name}>
                   <button
@@ -160,6 +192,17 @@ export function CityPicker({
                 </li>
               );
             })}
+            <li className="mt-1 border-t border-slate-100 pt-1">
+              <Link
+                href="/cities"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => setOpen(false)}
+                className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-primary-700 hover:bg-primary-50"
+              >
+                <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                Все города
+              </Link>
+            </li>
           </ul>
         </div>,
         document.body,
@@ -167,16 +210,15 @@ export function CityPicker({
     : null;
 
   return (
-    <div className={`relative ${className}`}>
-      <MapPin
-        className={`pointer-events-none absolute text-slate-400 ${
-          variant === 'hero' ? 'left-3 top-1/2 h-4 w-4 -translate-y-1/2' : variant === 'compact' ? 'left-4 top-1/2 h-4 w-4 -translate-y-1/2' : 'hidden'
-        }`}
-      />
+    <div ref={rootRef} className={`relative ${className}`}>
+      {variant === 'compact' ? (
+        <MapPin className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+      ) : null}
       <button
         ref={buttonRef}
         type="button"
         aria-label={`Выбрать город: ${selectedLabel}`}
+        title={variant === 'header' ? selectedLabel : undefined}
         aria-expanded={open}
         aria-haspopup="listbox"
         onClick={() => {
@@ -188,8 +230,21 @@ export function CityPicker({
         }}
         className={buttonClassName}
       >
-        {variant === 'header' ? <MapPin className="h-4 w-4 shrink-0" /> : null}
-        <span className={variant === 'header' ? 'truncate' : 'block truncate'}>{selectedLabel}</span>
+        {variant === 'hero' ? (
+          <MapPin className={`h-4 w-4 shrink-0 ${open ? 'text-primary-600' : 'text-slate-500'}`} aria-hidden />
+        ) : null}
+        {variant === 'header' ? (
+          <MapPin
+            className={`h-5 w-5 shrink-0 lg:h-4 lg:w-4 ${open ? 'text-primary-600' : ''}`}
+            strokeWidth={1.75}
+            aria-hidden
+          />
+        ) : null}
+        {variant === 'header' ? (
+          <span className="hidden min-w-0 truncate lg:inline">{selectedLabel}</span>
+        ) : (
+          <span className="min-w-0 flex-1 truncate whitespace-nowrap text-left">{selectedLabel}</span>
+        )}
         {variant === 'hero' || variant === 'compact' ? (
           <ChevronDown
             className={`pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 shrink-0 text-slate-400 transition ${
@@ -197,7 +252,10 @@ export function CityPicker({
             } ${variant === 'compact' ? 'right-4' : ''}`}
           />
         ) : (
-          <ChevronDown className={`h-3.5 w-3.5 shrink-0 opacity-60 transition ${open ? 'rotate-180' : ''}`} />
+          <ChevronDown
+            className={`hidden h-3.5 w-3.5 shrink-0 opacity-60 transition lg:inline ${open ? 'rotate-180' : ''}`}
+            aria-hidden
+          />
         )}
       </button>
       {menu}

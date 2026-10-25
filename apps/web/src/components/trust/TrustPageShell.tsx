@@ -9,7 +9,7 @@ export function TrustPageShell({
 }) {
   return (
     <SiteLayout>
-      <main className="bg-white text-slate-900">{children}</main>
+      <div className="bg-white text-slate-900">{children}</div>
     </SiteLayout>
   );
 }

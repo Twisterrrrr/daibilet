@@ -2,7 +2,7 @@ import * as React from 'react';
 
 const DEFAULT_TEP_WIDGET_ID =
   ((import.meta as ImportMeta & { env?: { VITE_TEP_WIDGET_ID?: string } }).env?.VITE_TEP_WIDGET_ID as string | undefined) ||
-  '14208';
+  '14460';
 
 const TEP_WIDGET_SCRIPT_URL = 'https://api.teplohod.info/v1/widget/widget.js';
 
@@ -98,7 +98,6 @@ export function TeplohodWidgetEmbed({
         data-id={String(tepWidgetId || DEFAULT_TEP_WIDGET_ID)}
         data-event-id={eventId}
       />
-      <p className="mt-2 text-xs leading-5 text-slate-500">Выберите дату и категорию билета в виджете Teplohod.info.</p>
     </div>
   );
 }

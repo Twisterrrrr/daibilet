@@ -1,18 +1,16 @@
 'use client';
 
 import { Search, X } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
-import { buildCatalogHref } from '@/lib/catalog-url';
+import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
+import { buildCatalogHref, isPlacesSectionPath, placesSearchHref } from '@/lib/catalog-url';
+import { mergeHeaderSearchItems, type HeaderSearchItem } from '@/lib/header-search-results';
+import { venueHref, venuePageTemplate } from '@/lib/routes';
+import { mapVenueCatalogFeedPage } from '@/lib/venue-catalog-feed';
 
-type SearchItem = {
-  type: 'event' | 'city' | 'landing';
-  label: string;
-  sublabel?: string | null;
-  href: string;
-  imageUrl?: string | null;
-};
+type SearchItem = HeaderSearchItem;
 
 type HeaderSearchProps = {
   className?: string;
@@ -27,12 +25,17 @@ type HeaderSearchProps = {
 export function HeaderSearch({
   className = '',
   inputClassName = '',
-  placeholder = 'Поиск событий, городов, подборок…',
+  placeholder,
   initialQuery = '',
   cityFilter,
   variant = 'inline',
 }: HeaderSearchProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const placesSection = isPlacesSectionPath(pathname);
+  const resolvedPlaceholder =
+    placeholder ||
+    (placesSection ? 'Музей, театр, парк, набережная…' : 'Поиск событий, городов, подборок…');
   const [query, setQuery] = useState(initialQuery);
   const [items, setItems] = useState<SearchItem[]>([]);
   const [resultsOpen, setResultsOpen] = useState(false);
@@ -85,24 +88,55 @@ export function HeaderSearch({
     window.clearTimeout(debounceRef.current ?? undefined);
     debounceRef.current = window.setTimeout(async () => {
       try {
+        if (placesSection) {
+          const params = new URLSearchParams({ q: normalized, limit: '8' });
+          if (cityFilter && cityFilter !== 'all') params.set('city', cityFilter);
+          const response = await fetch(`/api/public/venues?${params.toString()}`);
+          if (!response.ok) return;
+          const page = mapVenueCatalogFeedPage(await response.json());
+          const mapped: SearchItem[] = page.venues.map((venue) => {
+            const family = venuePageTemplate(venue.type) === 'institution' ? 'Площадка' : 'Локация';
+            return {
+              type: 'venue',
+              label: venue.name,
+              sublabel: [family, venue.city].filter(Boolean).join(' · '),
+              href: venueHref(venue),
+              imageUrl: venue.heroImageUrl || null,
+            };
+          });
+          setItems(mapped);
+          setResultsOpen(mapped.length > 0);
+          setActiveIndex(-1);
+          return;
+        }
         const params = new URLSearchParams({ q: normalized });
         if (cityFilter && cityFilter !== 'all') params.set('city', cityFilter);
-        const response = await fetch(`/api/public/search?${params.toString()}`);
-        if (!response.ok) return;
-        const payload = (await response.json()) as { items?: SearchItem[] };
-        setItems(payload.items || []);
-        setResultsOpen(Boolean(payload.items?.length));
+        let apiItems: SearchItem[] = [];
+        try {
+          const response = await fetch(`/api/public/search?${params.toString()}`);
+          if (response.ok) {
+            const payload = (await response.json()) as { items?: SearchItem[] };
+            apiItems = payload.items || [];
+          }
+        } catch {
+          apiItems = [];
+        }
+        const merged = mergeHeaderSearchItems(normalized, apiItems);
+        setItems(merged);
+        setResultsOpen(merged.length > 0);
         setActiveIndex(-1);
       } catch {
-        setItems([]);
-        setResultsOpen(false);
+        const fallback = mergeHeaderSearchItems(normalized, []);
+        setItems(fallback);
+        setResultsOpen(fallback.length > 0);
+        setActiveIndex(-1);
       }
     }, 220);
 
     return () => {
       if (debounceRef.current) window.clearTimeout(debounceRef.current);
     };
-  }, [cityFilter, query]);
+  }, [cityFilter, query, placesSection]);
 
   const closeOverlay = () => {
     setOverlayOpen(false);
@@ -119,6 +153,15 @@ export function HeaderSearch({
 
   const submit = (value?: string) => {
     const normalized = (value ?? query).trim();
+    if (placesSection) {
+      navigate(
+        placesSearchHref({
+          q: normalized || undefined,
+          city: cityFilter && cityFilter !== 'all' ? cityFilter : undefined,
+        }),
+      );
+      return;
+    }
     navigate(
       buildCatalogHref({
         q: normalized || undefined,
@@ -158,7 +201,7 @@ export function HeaderSearch({
     }
   };
 
-  const inputClasses = `w-full bg-white pl-10 pr-3 text-base text-slate-900 outline-none placeholder:text-slate-400 ${inputClassName}`;
+  const inputClasses = `w-full bg-white text-base text-graphite outline-none placeholder:text-graphite-muted ${inputClassName}`;
 
   const resultsList =
     resultsOpen && items.length ? (
@@ -166,7 +209,7 @@ export function HeaderSearch({
         className={
           variant === 'overlay'
             ? 'max-h-[min(50vh,24rem)] overflow-y-auto py-1'
-            : 'absolute left-0 right-0 top-full z-50 mt-1 max-h-80 overflow-y-auto rounded-xl border border-slate-200 bg-white py-1 shadow-lg'
+            : 'absolute left-0 right-0 top-full z-50 mt-1.5 max-h-80 overflow-y-auto rounded-card bg-white py-1 shadow-card-hover'
         }
         role="listbox"
       >
@@ -177,19 +220,33 @@ export function HeaderSearch({
               onMouseDown={(event) => event.preventDefault()}
               onClick={() => navigate(item.href)}
               className={`flex w-full items-center gap-3 px-4 py-3 text-left transition-colors ${
-                index === activeIndex ? 'bg-primary-50' : 'hover:bg-slate-50'
+                index === activeIndex ? 'bg-primary-50' : 'hover:bg-surface-muted'
               }`}
             >
               {item.imageUrl ? (
-                <img src={item.imageUrl} alt="" className="h-10 w-10 flex-shrink-0 rounded-lg object-cover" loading="lazy" />
+                <span className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg">
+                  <SafeImage
+                    src={item.imageUrl}
+                    alt=""
+                    fill
+                    sizes={IMAGE_SIZES.searchThumb}
+                    className="object-cover"
+                  />
+                </span>
               ) : (
-                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-slate-100 text-xs font-semibold uppercase text-slate-500">
-                  {item.type === 'city' ? 'Г' : item.type === 'landing' ? 'П' : 'E'}
+                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-surface-muted text-xs font-semibold uppercase text-graphite-muted">
+                  {item.type === 'city' || item.type === 'suburb'
+                    ? 'Г'
+                    : item.type === 'landing'
+                      ? 'П'
+                      : item.type === 'venue'
+                        ? 'М'
+                        : 'E'}
                 </div>
               )}
               <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-medium text-slate-900">{item.label}</span>
-                {item.sublabel ? <span className="block truncate text-xs text-slate-500">{item.sublabel}</span> : null}
+                <span className="block truncate text-sm font-medium text-graphite">{item.label}</span>
+                {item.sublabel ? <span className="block truncate text-xs text-graphite-muted">{item.sublabel}</span> : null}
               </span>
             </button>
           </li>
@@ -203,11 +260,10 @@ export function HeaderSearch({
         <button
           type="button"
           onClick={() => setOverlayOpen(true)}
-          className={`inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500 transition hover:border-slate-300 hover:bg-white hover:text-slate-700 ${className}`}
+          className={`inline-flex h-10 w-10 items-center justify-center rounded-lg text-graphite-muted transition hover:bg-surface-muted hover:text-graphite ${className}`}
           aria-label="Открыть поиск"
         >
-          <Search className="h-4 w-4 shrink-0" />
-          <span className="hidden min-[1180px]:inline">Поиск</span>
+          <Search className="h-5 w-5 shrink-0" strokeWidth={1.75} />
         </button>
 
         {overlayOpen ? (
@@ -215,45 +271,54 @@ export function HeaderSearch({
             <button
               type="button"
               aria-label="Закрыть поиск"
-              className="absolute inset-0 bg-slate-900/55 backdrop-blur-[2px]"
+              className="absolute inset-0 bg-slate-900/50 backdrop-blur-[2px]"
               onClick={closeOverlay}
             />
             <div
               ref={rootRef}
-              className="relative w-full max-w-2xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
+              className="relative w-full max-w-2xl overflow-hidden rounded-card bg-white shadow-card-hover"
               role="dialog"
               aria-modal="true"
               aria-label="Поиск"
             >
-              <div className="relative border-b border-slate-100">
-                <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                <input
-                  ref={inputRef}
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  onKeyDown={onKeyDown}
-                  placeholder={placeholder}
-                  className={`${inputClasses} py-4 pr-12 text-lg`}
-                  aria-label="Поиск событий"
-                  aria-expanded={resultsOpen}
-                  aria-autocomplete="list"
-                  role="combobox"
-                />
+              <div className="flex items-center gap-1 border-b border-slate-100 px-3 py-2 sm:px-4 sm:py-2.5">
+                <div className="relative min-w-0 flex-1">
+                  <Search
+                    className="pointer-events-none absolute left-2.5 top-1/2 h-5 w-5 -translate-y-1/2 text-graphite-muted sm:left-3"
+                    strokeWidth={1.75}
+                  />
+                  <input
+                    ref={inputRef}
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                    onKeyDown={onKeyDown}
+                    placeholder={resolvedPlaceholder}
+                    className={`${inputClasses} rounded-lg py-2.5 pl-10 pr-2 text-lg sm:pl-11 sm:pr-3`}
+                    aria-label={placesSection ? 'Поиск мест' : 'Поиск событий'}
+                    aria-expanded={resultsOpen}
+                    aria-autocomplete="list"
+                    role="combobox"
+                  />
+                </div>
                 <button
                   type="button"
                   onClick={closeOverlay}
                   aria-label="Закрыть"
-                  className="absolute right-3 top-1/2 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100"
+                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-graphite-muted transition hover:bg-surface-muted hover:text-graphite"
                 >
-                  <X className="h-5 w-5" />
+                  <X className="h-5 w-5" strokeWidth={1.75} />
                 </button>
               </div>
               {resultsList}
               {query.trim().length >= 2 && !items.length ? (
-                <p className="px-4 py-6 text-center text-sm text-slate-500">Ничего не найдено. Нажмите Enter для поиска в каталоге.</p>
+                <p className="px-4 py-5 text-center text-sm text-graphite-muted sm:px-5">
+                  Ничего не найдено. Нажмите Enter для поиска в каталоге.
+                </p>
               ) : null}
               {query.trim().length < 2 ? (
-                <p className="px-4 py-4 text-sm text-slate-400">Введите минимум 2 символа или нажмите Enter для каталога.</p>
+                <p className="px-4 py-3.5 text-sm text-graphite-muted sm:px-5 sm:py-4">
+                  Введите минимум 2 символа или нажмите Enter для каталога.
+                </p>
               ) : null}
             </div>
           </div>
@@ -273,9 +338,9 @@ export function HeaderSearch({
           if (items.length) setResultsOpen(true);
         }}
         onKeyDown={onKeyDown}
-        placeholder={placeholder}
-        className={`${inputClasses} py-2 text-sm`}
-        aria-label="Поиск событий"
+        placeholder={resolvedPlaceholder}
+        className={`${inputClasses} py-2 pl-10 pr-3 text-sm`}
+        aria-label={placesSection ? 'Поиск мест' : 'Поиск событий'}
         aria-expanded={resultsOpen}
         aria-autocomplete="list"
         role="combobox"

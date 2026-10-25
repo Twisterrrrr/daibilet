@@ -1,14 +1,16 @@
 import { unstable_cache } from 'next/cache';
 
 import '@/lib/env';
-import {
-  buildPublicCatalogDto,
-  buildPublicDestinationsDto,
-  buildPublicLandingsCatalogDto,
-  buildPublicStatsDto,
-  buildPublicVenuesDto,
-} from '@daibilet/backend/public-read';
+import type {
+  PublicCatalogDto,
+  PublicDestinationDto,
+  PublicLandingDto,
+} from '@daibilet/contracts/public';
 import { HOME_PAGE_CACHE_TAG, PUBLIC_PAGE_REVALIDATE } from '@/server/cache-config';
+import { resolveCoverContentFingerprints } from '@/server/cover-image-fingerprint';
+import { fetchPublicApiJson } from '@/server/public-api-client';
+import { matchDestination } from '@/lib/selected-city';
+import { isLandingInSelection } from '@/lib/landing-features';
 
 export { HOME_PAGE_CACHE_TAG };
 
@@ -18,12 +20,12 @@ const homeCacheOptions = {
 };
 
 type HomePageData = {
-  destinationsPayload: Awaited<ReturnType<typeof buildPublicDestinationsDto>>;
-  catalogPayload: Awaited<ReturnType<typeof buildPublicCatalogDto>>;
-  landingsCatalog: Awaited<ReturnType<typeof buildPublicLandingsCatalogDto>>;
-  venuesPayload: Awaited<ReturnType<typeof buildPublicVenuesDto>>;
-  statsPayload: Awaited<ReturnType<typeof buildPublicStatsDto>>;
+  destinationsPayload: { generatedAt?: string; destinations: PublicDestinationDto[] };
+  catalogPayload: PublicCatalogDto;
+  landingsCatalog: { generatedAt?: string; city?: string; items: PublicLandingDto[] };
 };
+
+type HomeArticlesPayload = { articles?: unknown } | null;
 
 function emptyHomePageData(): HomePageData {
   const generatedAt = new Date().toISOString();
@@ -45,62 +47,123 @@ function emptyHomePageData(): HomePageData {
       },
     },
     landingsCatalog: { generatedAt, city: 'all', items: [] },
-    venuesPayload: { generatedAt, total: 0, venues: [] },
-    statsPayload: {
-      generatedAt,
-      stats: { events: 0, destinations: 0, venues: 0, landings: 0 },
-    },
   };
 }
 
 export const getHomeDestinations = unstable_cache(
-  () => buildPublicDestinationsDto(),
-  ['home-destinations-v3-statsfix'],
+  () => fetchPublicApiJson<HomePageData['destinationsPayload']>('/api/public/destinations', { timeoutMs: 3_000 }),
+  ['home-destinations-v4-http'],
   homeCacheOptions,
 );
 
+function homeCatalogSearchParams(citySlug?: string | null) {
+  const city = String(citySlug || '').trim();
+  // 40 is enough for editors + now-tabs + popular after cover dedupe; sections are
+  // built on the server so the client island no longer carries the full pool.
+  return city
+    ? { limit: 40, sort: 'popular' as const, city }
+    : { limit: 40, sort: 'popular' as const };
+}
+
 export const getHomeCatalog = unstable_cache(
-  () => buildPublicCatalogDto({ limit: 50, sort: 'popular' }),
-  ['home-catalog-v4-statsfix'],
+  () =>
+    fetchPublicApiJson<PublicCatalogDto>('/api/public/events', {
+      searchParams: homeCatalogSearchParams(),
+      timeoutMs: 5_000,
+    }),
+  ['home-catalog-v10-http'],
+  homeCacheOptions,
+);
+
+export async function getHomeCatalogForCity(citySlug?: string | null): Promise<PublicCatalogDto> {
+  const city = String(citySlug || '').trim();
+  if (!city) return getHomeCatalog();
+  const cached = unstable_cache(
+    () =>
+      fetchPublicApiJson<PublicCatalogDto>('/api/public/events', {
+        searchParams: homeCatalogSearchParams(city),
+        timeoutMs: 5_000,
+      }),
+    ['home-catalog-v10-http', city],
+    homeCacheOptions,
+  );
+  return cached();
+}
+
+/**
+ * S3 HEAD ETag fingerprints for home rails dedupe.
+ * Kept off the per-request path: same 300s tag/revalidate as catalog.
+ * Returns a plain object (JSON-serializable for unstable_cache).
+ */
+export const getHomeCoverFingerprints = unstable_cache(
+  async (): Promise<Record<string, string>> => {
+    try {
+      const catalog = await getHomeCatalog();
+      const map = await resolveCoverContentFingerprints(
+        (catalog.items ?? []).map((item) => item.imageUrl),
+      );
+      return Object.fromEntries(map);
+    } catch (error) {
+      console.warn('[home-cover-fingerprints] unavailable during SSG, skipping:', error);
+      return {};
+    }
+  },
+  ['home-cover-fingerprints-v1'],
   homeCacheOptions,
 );
 
 export const getHomeLandings = unstable_cache(
-  () => buildPublicLandingsCatalogDto(new URLSearchParams()),
-  ['home-landings-v2'],
+  async () => {
+    const payload = await fetchPublicApiJson<HomePageData['landingsCatalog']>('/api/public/landings-catalog', {
+      timeoutMs: 4_000,
+    });
+    return {
+      ...payload,
+      items: (payload.items || []).filter((item) => isLandingInSelection(item.slug)),
+    };
+  },
+  ['home-landings-v3-http'],
   homeCacheOptions,
 );
 
-export const getHomeVenues = unstable_cache(
-  () => buildPublicVenuesDto(new URLSearchParams({ family: 'institution', limit: '200' })),
-  ['home-venues-v2'],
+/**
+ * Blog promo strip on home. Must stay inside unstable_cache: a raw
+ * fetchPublicApiJson (cache: 'no-store') in the RSC tree forces the whole `/`
+ * route to private/no-store and disables nginx ISR HIT for Yandex/crawlers.
+ */
+export const getHomeArticles = unstable_cache(
+  async () => {
+    try {
+      // Home UI only renders 4 cards - avoid a 20-article JSON blob in Data Cache/RSC.
+      return await fetchPublicApiJson<Exclude<HomeArticlesPayload, null>>('/api/public/articles', {
+        searchParams: { limit: 8 },
+        timeoutMs: 1_200,
+      });
+    } catch {
+      return null;
+    }
+  },
+  ['home-articles-v3-http'],
   homeCacheOptions,
 );
 
-export const getHomeStats = unstable_cache(
-  () => buildPublicStatsDto(),
-  ['home-stats-v2-statsfix'],
-  homeCacheOptions,
-);
-
-/** Partial failure (e.g. stats) must not wipe the whole home — use allSettled + empty fallbacks. */
-export async function getHomePageData(): Promise<HomePageData> {
+/** Partial failure must not wipe the whole home — use allSettled + empty fallbacks. */
+export async function getHomePageData(cityHint?: string | null): Promise<HomePageData> {
   const empty = emptyHomePageData();
-  const [destinationsResult, catalogResult, landingsResult, venuesResult, statsResult] =
-    await Promise.allSettled([
-      getHomeDestinations(),
-      getHomeCatalog(),
-      getHomeLandings(),
-      getHomeVenues(),
-      getHomeStats(),
-    ]);
+  const destinationsResult = await Promise.allSettled([getHomeDestinations()]);
+  const destinationsPayload =
+    destinationsResult[0]?.status === 'fulfilled' ? destinationsResult[0].value : empty.destinationsPayload;
+  const matched = matchDestination(destinationsPayload.destinations, cityHint);
+  const citySlug = matched?.slug || matched?.sourceSlug || null;
+
+  const [catalogResult, landingsResult] = await Promise.allSettled([
+    getHomeCatalogForCity(citySlug),
+    getHomeLandings(),
+  ]);
 
   return {
-    destinationsPayload:
-      destinationsResult.status === 'fulfilled' ? destinationsResult.value : empty.destinationsPayload,
+    destinationsPayload,
     catalogPayload: catalogResult.status === 'fulfilled' ? catalogResult.value : empty.catalogPayload,
     landingsCatalog: landingsResult.status === 'fulfilled' ? landingsResult.value : empty.landingsCatalog,
-    venuesPayload: venuesResult.status === 'fulfilled' ? venuesResult.value : empty.venuesPayload,
-    statsPayload: statsResult.status === 'fulfilled' ? statsResult.value : empty.statsPayload,
   };
 }

@@ -36,6 +36,7 @@ import { createYooKassaCheckoutRouteHandler } from './checkout-yookassa-handler.
 import { readBackendEnv } from './env.js';
 import { updateAdminEventOverride, updateAdminLandingMatch, upsertAdminOrderTicket } from './dto.js';
 import { buildPublicCatalogDto, clearPublicCatalogDtoCache, getPublicCatalogSessions } from './public-catalog.dto.js';
+import { clearPublicArticlesDtoCache } from './public-articles.dto.js';
 import { createPublicCatalogRouteHandler } from './public-catalog-handler.js';
 import { buildPublicCityDto, buildPublicDestinationsDto, clearPublicCityDtoCache } from './public-city.dto.js';
 import { createPublicCityRouteHandler } from './public-city-handler.js';
@@ -50,7 +51,7 @@ import {
   buildPublicVenueAdmissionProductsDto,
 } from './public-finance-projection.dto.js';
 import { createPublicFinanceProjectionRouteHandler } from './public-finance-projection-handler.js';
-import { buildPublicVenueDto, buildPublicVenuesDto, clearPublicVenueDtoCache } from './public-venue.dto.js';
+import { buildPublicVenueDto, buildPublicVenuesDto, buildPublicVenueEventCountsDto, clearPublicVenueDtoCache } from './public-venue.dto.js';
 import { createPublicVenueRouteHandler } from './public-venue-handler.js';
 import { createPublicReadStackWarmer } from './public-warmup.js';
 import { buildPublicCheckoutOrderByCodeDto, buildPublicCheckoutPurchasesByEmailDto } from './purchase-projection.js';
@@ -105,6 +106,7 @@ registerPublicCacheInvalidator(() => {
   clearPublicCityDtoCache();
   clearPublicEventDtoCache();
   clearPublicVenueDtoCache();
+  clearPublicArticlesDtoCache();
 });
 registerPublicCacheWarmer(createPublicReadStackWarmer({
   flags: publicFlags,
@@ -139,6 +141,7 @@ const server = startServer({
         enabled: publicFlags.venue,
         buildVenues: buildPublicVenuesDto,
         buildVenue: buildPublicVenueDto,
+        buildVenueEventCounts: buildPublicVenueEventCountsDto,
       }),
       createPublicFinanceProjectionRouteHandler({
         projectionToken: env.DAIBILET_FINANCE_PROJECTION_TOKEN || env.FINANCE_PROJECTION_TOKEN || null,

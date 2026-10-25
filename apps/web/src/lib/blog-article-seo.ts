@@ -1,17 +1,39 @@
 import type { Metadata } from 'next';
 
 import { resolveBlogCityHref } from '@/lib/blog-article-city';
-import type { BlogArticleDto } from '@/lib/blog-utils';
+import { stripColumnMetaPrefix } from '@/lib/blog-meta';
+import type { BlogArticleDto, BlogCardDto } from '@/lib/blog-utils';
+import { resolveBlogShareImage } from '@/lib/blog-og-image';
+import {
+  BLOG_HUB_DESCRIPTION,
+  BLOG_LIST_OG_IMAGE,
+  INDEX_FOLLOW_ROBOTS,
+  buildShareMetadata,
+  canonicalHref,
+  ensureSeoDescription,
+  pageTitle,
+} from '@/lib/seo-meta';
+
+export { publicAssetExists, resolveBlogShareImage } from '@/lib/blog-og-image';
+
+function resolveBlogMetaDescription(article: BlogArticleDto): string {
+  return (
+    stripColumnMetaPrefix(article.seoDescription) ||
+    stripColumnMetaPrefix(article.excerpt) ||
+    article.title
+  );
+}
 
 const SITE_URL = (process.env.DAIBILET_SITE_URL || 'https://daibilet.ru').replace(/\/$/, '');
+const SITE_NAME = 'Дайбилет';
 
-function absoluteUrl(path: string): string {
-  if (/^https?:\/\//i.test(path)) return path;
-  return `${SITE_URL}${path.startsWith('/') ? path : `/${path}`}`;
+function absoluteUrl(pathName: string): string {
+  if (/^https?:\/\//i.test(pathName)) return pathName;
+  return `${SITE_URL}${pathName.startsWith('/') ? pathName : `/${pathName}`}`;
 }
 
 export function buildBlogArticleBreadcrumbs(article: BlogArticleDto): Array<{ name: string; path: string }> {
-  const canonicalPath = article.canonicalPath || `/blog/${article.slug}`;
+  const canonicalPath = resolveBlogArticleCanonicalPath(article);
   const cityLink = resolveBlogCityHref(article.city, article.citySlug);
   return [
     { name: 'Главная', path: '/' },
@@ -21,42 +43,75 @@ export function buildBlogArticleBreadcrumbs(article: BlogArticleDto): Array<{ na
   ];
 }
 
+/**
+ * Single canonical for article pages: always `/blog/{slug}`.
+ * Ignores city-scoped query duplicates and non-blog canonicalPath overrides
+ * that would split link equity across city mirrors.
+ */
+export function resolveBlogArticleCanonicalPath(article: Pick<BlogArticleDto, 'slug' | 'canonicalPath'>): string {
+  const slug = String(article.slug || '')
+    .trim()
+    .replace(/^\/+|\/+$/g, '');
+  if (!slug) return '/blog';
+  const raw = String(article.canonicalPath || '').trim();
+  if (raw) {
+    try {
+      const path = raw.startsWith('http') ? new URL(raw).pathname : raw;
+      const normalized = path.replace(/\/+$/, '') || '/';
+      // Accept only same-slug blog paths (no /blog/city/... mirrors).
+      if (normalized === `/blog/${slug}` || normalized === `/blog/${encodeURIComponent(slug)}`) {
+        return `/blog/${slug}`;
+      }
+    } catch {
+      // fall through
+    }
+  }
+  return `/blog/${slug}`;
+}
+
 export function buildBlogArticleMetadata(article: BlogArticleDto): Metadata {
-  const title = article.seoTitle || `${article.title} | Блог Дайбилет`;
-  const description = article.seoDescription || article.excerpt || article.title;
-  const canonicalPath = article.canonicalPath || `/blog/${article.slug}`;
-  const canonical = absoluteUrl(canonicalPath);
-  const image = article.coverImageUrl ? absoluteUrl(article.coverImageUrl) : undefined;
+  // layout title template adds "| Дайбилет" - strip brand from seoTitle to avoid double suffix
+  const title = pageTitle(article.seoTitle || article.title);
+  const shareTitle = `${title} | ${SITE_NAME}`;
+  const description = resolveBlogMetaDescription(article);
+  const canonicalPath = resolveBlogArticleCanonicalPath(article);
+  const image = resolveBlogShareImage(article.coverImageUrl, article.slug);
   const indexable = article.isIndexable !== false;
+  const share = buildShareMetadata({
+    title: shareTitle,
+    description,
+    path: canonicalPath,
+    image,
+    imageWidth: 1200,
+    imageHeight: 630,
+    type: 'article',
+  });
 
   return {
     title,
     description,
     alternates: { canonical: canonicalPath },
     robots: indexable ? { index: true, follow: true } : { index: false, follow: false },
+    // `share.openGraph` is the OpenGraph union, so spreading it and adding article
+    // fields leaves TS unable to pick a variant. Pin the discriminant
+    // explicitly - buildShareMetadata was called with type: 'article' above, so
+    // this matches what it returns and lets TS select the article variant.
     openGraph: {
+      ...share.openGraph,
       type: 'article',
-      url: canonical,
-      title: article.seoTitle || article.title,
-      description: article.seoDescription || article.excerpt || undefined,
       publishedTime: article.publishedAt || undefined,
-      images: image ? [{ url: image }] : undefined,
+      modifiedTime: article.publishedAt || undefined,
     },
-    twitter: {
-      card: image ? 'summary_large_image' : 'summary',
-      title: article.seoTitle || article.title,
-      description: article.seoDescription || article.excerpt || undefined,
-      images: image ? [image] : undefined,
-    },
+    twitter: share.twitter,
   };
 }
 
 export function buildBlogArticleJsonLd(article: BlogArticleDto): Array<Record<string, unknown>> {
-  const title = article.seoTitle || article.title;
-  const description = article.seoDescription || article.excerpt || article.title;
-  const canonicalPath = article.canonicalPath || `/blog/${article.slug}`;
+  const title = pageTitle(article.seoTitle || article.title);
+  const description = resolveBlogMetaDescription(article);
+  const canonicalPath = resolveBlogArticleCanonicalPath(article);
   const canonical = absoluteUrl(canonicalPath);
-  const image = article.coverImageUrl ? absoluteUrl(article.coverImageUrl) : undefined;
+  const image = resolveBlogShareImage(article.coverImageUrl, article.slug);
   const breadcrumbs = buildBlogArticleBreadcrumbs(article);
 
   const blocks: Array<Record<string, unknown>> = [
@@ -82,12 +137,12 @@ export function buildBlogArticleJsonLd(article: BlogArticleDto): Array<Record<st
       dateModified: article.publishedAt || undefined,
       author: {
         '@type': 'Organization',
-        name: 'Дайбилет',
+        name: SITE_NAME,
         url: SITE_URL,
       },
       publisher: {
         '@type': 'Organization',
-        name: 'Дайбилет',
+        name: SITE_NAME,
         url: SITE_URL,
       },
     },
@@ -97,25 +152,47 @@ export function buildBlogArticleJsonLd(article: BlogArticleDto): Array<Record<st
 }
 
 export function buildBlogListMetadata(): Metadata {
-  const canonical = `${SITE_URL}/blog`;
-  const title = 'Блог — гайды и советы о событиях | Дайбилет';
-  const description =
-    'Гайды по концертам, театру и городским прогулкам. Как выбрать билет, куда пойти с детьми, что смотреть на этой неделе.';
+  const title = pageTitle('Блог - статьи и советы о событиях');
+  const description = ensureSeoDescription(BLOG_HUB_DESCRIPTION, BLOG_HUB_DESCRIPTION);
 
   return {
     title,
     description,
-    alternates: { canonical: '/blog' },
-    openGraph: {
-      type: 'website',
-      url: canonical,
-      title,
+    alternates: { canonical: canonicalHref('/blog') },
+    robots: INDEX_FOLLOW_ROBOTS,
+    ...buildShareMetadata({
+      title: `${title} | ${SITE_NAME}`,
       description,
-    },
-    twitter: {
-      card: 'summary',
-      title,
-      description,
+      path: '/blog',
+      image: BLOG_LIST_OG_IMAGE,
+      imageWidth: 1200,
+      imageHeight: 630,
+    }),
+  };
+}
+
+export function buildBlogListJsonLd(posts: BlogCardDto[]): Record<string, unknown> {
+  const items = posts.filter((post) => post.slug && post.title).slice(0, 48);
+  const canonical = absoluteUrl('/blog');
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    name: 'Блог Дайбилет',
+    description: BLOG_HUB_DESCRIPTION,
+    url: canonical,
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: items.length,
+      itemListElement: items.map((post, index) => {
+        const url = absoluteUrl(`/blog/${post.slug}`);
+        return {
+          '@type': 'ListItem',
+          position: index + 1,
+          name: post.title,
+          url,
+          item: url,
+        };
+      }),
     },
   };
 }

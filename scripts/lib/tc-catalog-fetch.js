@@ -40,7 +40,7 @@ function createTicketscloudClient() {
 }
 
 function streamAll(client, metadata, method, request, options = {}) {
-  const streamTimeoutMs = Number(options.timeoutMs || process.env.TICKETSCLOUD_FULL_SYNC_TIMEOUT_MS || 360000);
+  const streamTimeoutMs = Number(options.timeoutMs || process.env.TICKETSCLOUD_FULL_SYNC_TIMEOUT_MS || 900000);
   return new Promise((resolve, reject) => {
     const items = [];
     const stream = client[method](request, metadata);
@@ -67,27 +67,48 @@ function streamAll(client, metadata, method, request, options = {}) {
 }
 
 /**
- * @param {{ ids?: string[], status?: string, progressEvery?: number, timeoutMs?: number }} options
- * @returns {Promise<{ catalog: object[], endpoint: string, requestedIds: string[], missingIds: string[] }>}
+ * @param {{ ids?: string[], status?: string, statuses?: string[], progressEvery?: number, timeoutMs?: number, includeRaw?: boolean }} options
+ * @returns {Promise<{ catalog: object[], endpoint: string, requestedIds: string[], missingIds: string[], dictionaries: object, byStatus: Record<string, number> }>}
  */
 async function fetchNormalizedCatalog(options = {}) {
   const { client, metadata, endpoint } = createTicketscloudClient();
   const requestedIds = unique((options.ids || []).map(String).filter(Boolean));
-  const status = options.status || "PUBLIC";
+  const statuses = unique(
+    (options.statuses && options.statuses.length
+      ? options.statuses
+      : [options.status || "PUBLIC"]
+    ).map((value) => String(value || "").trim().toUpperCase()).filter(Boolean),
+  );
 
-  const eventsRequest = requestedIds.length ? { ids: requestedIds } : { status };
-  const progressEvery = options.progressEvery ?? (requestedIds.length ? 0 : 1000);
+  let events = [];
+  const byStatus = {};
 
-  const label = requestedIds.length
-    ? `Loading events by ids (${requestedIds.length})...`
-    : `Loading ${status} events...`;
-  console.log(label);
-
-  const events = await streamAll(client, metadata, "Events", eventsRequest, {
-    progressEvery,
-    timeoutMs: options.timeoutMs,
-  });
-  console.log(`Loaded ${events.length} events`);
+  if (requestedIds.length) {
+    console.log(`Loading events by ids (${requestedIds.length})...`);
+    events = await streamAll(client, metadata, "Events", { ids: requestedIds }, {
+      progressEvery: options.progressEvery ?? 0,
+      timeoutMs: options.timeoutMs,
+    });
+    console.log(`Loaded ${events.length} events`);
+  } else {
+    const seen = new Set();
+    for (const status of statuses) {
+      console.log(`Loading ${status} events...`);
+      const batch = await streamAll(client, metadata, "Events", { status }, {
+        progressEvery: options.progressEvery ?? 1000,
+        timeoutMs: options.timeoutMs,
+      });
+      byStatus[status] = batch.length;
+      console.log(`Loaded ${batch.length} ${status} events`);
+      for (const event of batch) {
+        const id = String(event.id || "");
+        if (!id || seen.has(id)) continue;
+        seen.add(id);
+        events.push(event);
+      }
+    }
+    console.log(`Merged unique events: ${events.length}`);
+  }
 
   const categoryIds = unique(events.map((event) => event.category).filter(Boolean));
   const venueIds = unique(events.map((event) => event.venue).filter(Boolean));
@@ -119,6 +140,8 @@ async function fetchNormalizedCatalog(options = {}) {
       tagsById,
       citiesById,
       metaEventsById,
+    }, {
+      includeRaw: options.includeRaw !== false,
     }),
   );
 
@@ -131,10 +154,11 @@ async function fetchNormalizedCatalog(options = {}) {
     dictionaries: { categories, venues, cities, tags, metaEvents },
     requestedIds,
     missingIds,
+    byStatus,
   };
 }
 
-function normalizeEvent(event, dictionaries) {
+function normalizeEvent(event, dictionaries, options = {}) {
   const { categoriesById, venuesById, tagsById, citiesById, metaEventsById } = dictionaries;
   const venue = venuesById.get(event.venue);
   const city = venue ? citiesById.get(String(venue.city)) : undefined;
@@ -198,7 +222,9 @@ function normalizeEvent(event, dictionaries) {
     ticketsAmount: event.ticketsAmount,
     ticketsAmountVacant: event.ticketsAmountVacant,
     priceFrom: ticketPrices.length ? Math.min(...ticketPrices) : null,
-    raw: event,
+    // Full snapshots contain tens of thousands of records. Repeating the full
+    // protobuf object here pushed catalog.public.json beyond V8's string limit.
+    ...(options.includeRaw === false ? {} : { raw: event }),
   };
 }
 
@@ -230,17 +256,33 @@ function timestampToIso(timestamp) {
 }
 
 function guessVenueType(venue, category, tags, event) {
+  const venueText = [venue.name, venue.description, venue.address].filter(Boolean).join(" ").toLowerCase();
   const text = [venue.name, venue.description, venue.address, category.name, event.name, ...tags.map((tag) => tag.name)]
     .filter(Boolean)
     .join(" ")
     .toLowerCase();
 
   if (matches(text, ["театр", "teatr"])) return "theater";
-  if (matches(text, ["музей", "галере", "выстав"])) return "museum_art";
+  if (matches(text, ["музей", "галере", "выстав", "арт-пространств", "art space", "lumiere", "люмьер", "иммерсив", "мультимедиа"])) {
+    return "museum_art";
+  }
   if (matches(text, ["клуб", "club", "бар", "ресторан", "cafe", "кафе"])) return "club_restaurant";
   if (matches(text, ["концерт", "филармони", "зал", "дом музыки", "дк ", "дворец культуры"])) return "concert_hall";
-  if (matches(text, ["причал", "набереж", "теплоход", "катер", "канал", "река"])) return "pier_water";
-  if (matches(text, ["стадион", "арена", "спорт", "каток", "скалодром", "парк"])) return "sport_outdoor";
+  // Pier only from venue place text, or event water words when the venue itself looks water-side.
+  // Otherwise "Водная прогулка на катерах…" wrongly marks land boarding points (пл. Восстания) as piers.
+  const venueLooksLikeLandBoarding =
+    /\bпл\.|\bплощад|\bметро\b|\bм\.\s|вокзал|место посадки|точка сбора|автобус/i.test(venueText) &&
+    !/(?:^|\s)(?:причал|пристань|набереж)/i.test(venueText);
+  if (
+    !venueLooksLikeLandBoarding &&
+    (matches(venueText, ["причал", "набереж", "пристань"]) ||
+      (matches(text, ["причал", "набереж", "теплоход", "катер", "канал", "река"]) &&
+        !/\bпл\.|\bплощад|\bметро\b|\bм\.\s/i.test(venueText)))
+  ) {
+    return "pier_water";
+  }
+  if (/\bпарк\b|сквер/i.test(text) && !/парковк/i.test(text)) return "park";
+  if (matches(text, ["стадион", "арена", "спорт", "каток", "скалодром"])) return "sport_outdoor";
   if (matches(text, ["онлайн", "online"])) return "online";
   return "generic_location";
 }

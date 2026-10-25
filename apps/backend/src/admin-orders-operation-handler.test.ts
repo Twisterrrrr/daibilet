@@ -11,7 +11,7 @@ const assertionSecret = 'finance-actor-assertion-test-secret-32-bytes-minimum';
 function actorAssertion(roles = ['FINANCE'], permissions = ['orders.read', 'orders.pii.read', 'orders.export', 'orders.cancel', 'refunds.request', 'refunds.execute', 'finance.summary.read', 'finance.read', 'payouts.approve', 'documents.read', 'suppliers.read', 'suppliers.bank.read', 'audit.read']) {
   const now = Math.floor(Date.now() / 1000);
   const payload = {
-    v: 1, iss: 'daibilet-web-admin', aud: 'daibilet-finance-admin', sub: 'staff-1', name: 'Иван Финансов', sid: 'session-1',
+    v: 1, iss: 'daibilet-web-admin', aud: 'daibilet-finance-admin', sub: 'staff-1', name: 'Иван Финансов', sid: 'session-1', mfaVerified: true,
     roles, permissions, iat: now, exp: now + 90, jti: `test-${now}`,
   };
   const encoded = Buffer.from(JSON.stringify(payload)).toString('base64url');

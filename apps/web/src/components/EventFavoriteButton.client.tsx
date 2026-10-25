@@ -1,11 +1,21 @@
 'use client';
 
 import { Heart } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { FAVORITES_CHANGED_EVENT, readFavoriteIds, toggleFavoriteId } from '@/lib/favorites';
+import type { PublicCatalogListItemDto } from '@daibilet/contracts/public';
+import {
+  FAVORITES_CHANGED_EVENT,
+  readFavoriteIds,
+  rememberFavoriteEvent,
+  toggleFavoriteEvent,
+  toggleFavoriteId,
+  type FavoriteEventItem,
+} from '@/lib/favorites';
+import { resolveEventCardFallbackImage, resolveEventCardPrimaryImage } from '@/lib/event-card-image';
+import { eventHref } from '@/lib/routes';
 
-export function useEventFavorite(eventId: string) {
+export function useEventFavorite(eventId: string, event?: FavoriteEventItem) {
   const [favorite, setFavorite] = useState(() => readFavoriteIds().has(eventId));
 
   useEffect(() => {
@@ -19,20 +29,58 @@ export function useEventFavorite(eventId: string) {
     };
   }, [eventId]);
 
+  useEffect(() => {
+    if (favorite && event) rememberFavoriteEvent(event);
+  }, [event, favorite]);
+
   const toggleFavorite = useCallback(
     (clickEvent: React.MouseEvent) => {
       clickEvent.preventDefault();
       clickEvent.stopPropagation();
-      setFavorite(toggleFavoriteId(eventId).has(eventId));
+      const prev = favorite;
+      // Optimistic UI: heart flips immediately; localStorage sync in same tick.
+      setFavorite(!prev);
+      try {
+        const next = event ? toggleFavoriteEvent(event) : toggleFavoriteId(eventId);
+        setFavorite(next.has(eventId));
+      } catch {
+        setFavorite(prev);
+      }
     },
-    [eventId],
+    [event, eventId, favorite],
   );
 
   return { favorite, toggleFavorite };
 }
 
-export function EventFavoriteButton({ eventId, className = '' }: { eventId: string; className?: string }) {
-  const { favorite, toggleFavorite } = useEventFavorite(eventId);
+export function EventFavoriteButton({
+  eventId,
+  session,
+  className = '',
+}: {
+  eventId: string;
+  session?: PublicCatalogListItemDto;
+  className?: string;
+}) {
+  const event = useMemo<FavoriteEventItem | undefined>(
+    () =>
+      session
+        ? {
+            id: session.id,
+            groupKey: session.groupKey || undefined,
+            title: session.title,
+            city: session.city || undefined,
+            imageUrl:
+              resolveEventCardPrimaryImage(session) ||
+              resolveEventCardFallbackImage(session) ||
+              undefined,
+            priceFrom: typeof session.priceFrom === 'number' ? session.priceFrom : undefined,
+            href: eventHref(session),
+          }
+        : undefined,
+    [session],
+  );
+  const { favorite, toggleFavorite } = useEventFavorite(eventId, event);
 
   return (
     <button
@@ -50,7 +98,7 @@ export function EventFavoriteButton({ eventId, className = '' }: { eventId: stri
 }
 
 const CARD_BADGE_CLASS =
-  'inline-flex w-fit items-center rounded-full px-2 py-0.5 text-[10px] font-semibold leading-none shadow-sm backdrop-blur-sm sm:px-2.5 sm:py-1 sm:text-[11px]';
+  'inline-flex w-fit items-center rounded-full px-2.5 py-1 text-[11px] font-bold leading-none shadow-sm backdrop-blur-sm sm:px-3 sm:py-1.5 sm:text-xs';
 
 export function EventCardBadge({
   children,

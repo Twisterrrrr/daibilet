@@ -21,6 +21,28 @@ export {
 
 const MIN_DISPLAY_PRICE_RUB = 100;
 
+/**
+ * True when the event category is already visible in the breadcrumb trail
+ * ("Концерты" crumb vs category "Концерты"), so the hero must not repeat it.
+ * Owner 2026-10-11: hero duplicated the type right under the breadcrumbs.
+ */
+export function isCategoryDuplicatedInBreadcrumbs(
+  category: string | null | undefined,
+  crumbs: Array<{ name: string }> | null | undefined,
+): boolean {
+  const cat = cleanDisplayText(String(category || '')).toLocaleLowerCase('ru');
+  if (!cat) return false;
+  const words = cat.split(/\s+/).filter((w) => w.length >= 4);
+  for (const crumb of crumbs || []) {
+    const name = cleanDisplayText(String(crumb?.name || '')).toLocaleLowerCase('ru');
+    if (!name) continue;
+    if (name === cat) return true;
+    if (name.includes(cat) || cat.includes(name)) return true;
+    if (words.length && words.every((w) => name.includes(w))) return true;
+  }
+  return false;
+}
+
 export const FLEXIBLE_SCHEDULE_LABEL = 'Билеты с открытой датой';
 
 export function isFlexibleScheduleSession(session: {
@@ -32,11 +54,13 @@ export function isFlexibleScheduleSession(session: {
 }): boolean {
   const kind = String(session.kind || '').toUpperCase();
   if (kind === 'OPEN_DATE') return true;
-  if (!session.startsAt) return true;
   const sourceStatus = String(session.sourceStatus || '').toLowerCase();
   if (sourceStatus === 'widget' || sourceStatus === 'open_date') return true;
   const label = `${session.dateLabel || ''} ${session.timeLabel || ''}`.toLowerCase();
-  return label.includes('виджет') || label.includes('выберите время') || label.includes('при покупке');
+  if (label.includes('открыт')) return true;
+  if (label.includes('виджет') || label.includes('выберите время') || label.includes('при покупке')) return true;
+  if (!session.startsAt) return true;
+  return false;
 }
 
 export function formatVacantSeats(count: number): string {
@@ -62,51 +86,99 @@ export function formatPriceRub(value?: number | null): string | null {
   return `${formatNumber(Math.round(value))} ₽`;
 }
 
-export function getTicketPriceRange(payload: PublicEventPageDto): { min: number; max: number } | null {
-  const values: number[] = [];
+export type TicketPriceRange = {
+  min: number;
+  max: number;
+};
 
-  if (Array.isArray(payload.purchaseOptions) && payload.purchaseOptions.length) {
-    for (const option of payload.purchaseOptions) {
-      if (typeof option.priceFrom === 'number' && option.priceFrom >= MIN_DISPLAY_PRICE_RUB) {
-        values.push(option.priceFrom);
-      }
-    }
-  }
+function knownPrice(value?: number | null): value is number {
+  return typeof value === 'number' && value >= MIN_DISPLAY_PRICE_RUB;
+}
 
-  if (Array.isArray(payload.ticketPrices) && payload.ticketPrices.length) {
-    for (const item of payload.ticketPrices) {
-      if (item.priceRub >= MIN_DISPLAY_PRICE_RUB) values.push(item.priceRub);
-    }
-  } else {
-    for (const offer of payload.offers ?? []) {
-      if (offer.active !== false && typeof offer.priceRub === 'number' && offer.priceRub >= MIN_DISPLAY_PRICE_RUB) {
-        values.push(offer.priceRub);
-      }
-    }
-    if (typeof payload.stats.priceFrom === 'number' && payload.stats.priceFrom >= MIN_DISPLAY_PRICE_RUB) {
-      values.push(payload.stats.priceFrom);
-    }
-    if (typeof payload.event.priceFrom === 'number' && payload.event.priceFrom >= MIN_DISPLAY_PRICE_RUB) {
-      values.push(payload.event.priceFrom);
-    }
-  }
-
-  for (const session of payload.sessions ?? []) {
-    if (typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB) {
-      values.push(session.priceFrom);
-    }
-  }
-
+function rangeFromExactPrices(values: number[]): TicketPriceRange | null {
   if (!values.length) return null;
   return { min: Math.min(...values), max: Math.max(...values) };
 }
 
-export function formatBuyCardPrice(range: { min: number; max: number }): string {
+export function getTicketPriceRange(payload: PublicEventPageDto): TicketPriceRange | null {
+  const exactValues: number[] = [];
+
+  if (Array.isArray(payload.ticketPrices) && payload.ticketPrices.length) {
+    for (const item of payload.ticketPrices) {
+      if (knownPrice(item.priceRub)) exactValues.push(item.priceRub);
+    }
+  }
+
+  // `ticketPrices` are the canonical, exact categories on the event page.
+  // They take precedence over summary `priceFrom` fields.
+  const ticketPriceRange = rangeFromExactPrices(exactValues);
+  if (ticketPriceRange) return ticketPriceRange;
+
+  for (const offer of payload.offers ?? []) {
+    if (offer.active !== false && knownPrice(offer.priceRub)) {
+      exactValues.push(offer.priceRub);
+    }
+  }
+  const offerPriceRange = rangeFromExactPrices(exactValues);
+  if (offerPriceRange) return offerPriceRange;
+
+  const sessionPrices: number[] = [];
+  for (const session of payload.sessions ?? []) {
+    if (knownPrice(session.priceFrom)) sessionPrices.push(session.priceFrom);
+  }
+  const sessionPriceRange = rangeFromExactPrices(sessionPrices);
+  if (sessionPriceRange) return sessionPriceRange;
+
+  const fallbackPrices: number[] = [];
+  for (const option of payload.purchaseOptions ?? []) {
+    if (knownPrice(option.priceFrom)) fallbackPrices.push(option.priceFrom);
+  }
+  if (knownPrice(payload.stats.priceFrom)) fallbackPrices.push(payload.stats.priceFrom);
+  if (knownPrice(payload.event.priceFrom)) fallbackPrices.push(payload.event.priceFrom);
+
+  return rangeFromExactPrices(fallbackPrices);
+}
+
+export function formatBuyCardPrice(range: TicketPriceRange): string {
   const min = Math.round(range.min);
   const max = Math.round(range.max);
-  // Одна цена (одна категория / один тариф) — без «от».
   if (min === max) return `${formatNumber(min)} ₽`;
-  return `${formatNumber(min)} – ${formatNumber(max)} ₽`;
+  return `${formatNumber(min)} - ${formatNumber(max)} ₽`;
+}
+
+/** Secondary line under the buy-card price when categories are not listed yet. */
+export function formatBuyCardPriceHint(range: TicketPriceRange): string | null {
+  const min = Math.round(range.min);
+  const max = Math.round(range.max);
+  if (min === max) return null;
+  return 'Вилка по категориям билетов';
+}
+
+/** Hero CTA intentionally advertises only the minimum available price. */
+export function formatHeroBuyButtonPrice(range: TicketPriceRange): string {
+  return `от ${formatNumber(Math.round(range.min))} ₽`;
+}
+
+/** Highest valid oldPrice above the current min - for strikethrough when discount exists. */
+export function getTicketOldPrice(payload: PublicEventPageDto, range?: TicketPriceRange | null): number | null {
+  const min = range?.min ?? getTicketPriceRange(payload)?.min;
+  if (min == null) return null;
+  let best: number | null = null;
+  for (const item of payload.ticketPrices ?? []) {
+    const old = item.oldPriceRub;
+    if (typeof old === 'number' && old > min && old >= MIN_DISPLAY_PRICE_RUB) {
+      best = best == null ? old : Math.max(best, old);
+    }
+  }
+  return best;
+}
+
+export function isOpenDateEvent(payload: PublicEventPageDto): boolean {
+  const eventType = String(payload.event.eventType || '').toLowerCase();
+  if (eventType === 'open_date') return true;
+  const sessions = payload.sessions ?? [];
+  if (!sessions.length) return false;
+  return sessions.every((session) => isFlexibleScheduleSession(session));
 }
 
 export type TicketCategoryRow = {
@@ -164,15 +236,44 @@ function isTransportBoilerplate(value?: string | null): boolean {
 }
 
 /** Убирает юридический хвост TC и расписание по дням недели, оставляет только имя категории. */
+/** Leading boilerplate in provider offer titles that is obvious from context. */
+const TICKET_LABEL_PREFIXES: RegExp[] = [
+  /^стоимостьь\s+одного\s+билета\s*/iu,
+  /^стоимость\s+одного\s+билета\s*/iu,
+  /^стоимостьь\s+билета\s*/iu,
+  /^стоимость\s+билета\s*/iu,
+  /^цена\s+одного\s+билета\s*/iu,
+  /^цена\s+билета\s*/iu,
+  /^стоимостьь\s*/iu,
+];
+
+/** Capitalize the first Cyrillic/Latin letter of a label. */
+function capitalizeFirstLetter(value: string): string {
+  const text = String(value || '').trim();
+  if (!text) return text;
+  return text.charAt(0).toLocaleUpperCase('ru') + text.slice(1);
+}
+
 export function normalizeTicketCategoryLabel(raw?: string | null): string {
   let text = cleanDisplayText(raw);
   if (!text) return 'Билет';
+
+  // "Стоимостьь" and friends are provider typos.
+  text = text.replace(/стоимостьь/giu, 'Стоимость');
+
+  for (const prefix of TICKET_LABEL_PREFIXES) {
+    const stripped = text.replace(prefix, '');
+    if (stripped !== text && stripped.trim()) {
+      text = stripped.trim();
+      break;
+    }
+  }
 
   const dashSplit = text.split(/\s[-–—]\s/);
   if (dashSplit.length > 1) {
     const head = dashSplit[0]?.trim() || '';
     const tail = dashSplit.slice(1).join(' - ').trim();
-    if (head && (!tail || isTransportBoilerplate(tail))) return head;
+    if (head && (!tail || isTransportBoilerplate(tail))) return capitalizeFirstLetter(head);
   }
 
   text = text
@@ -180,9 +281,9 @@ export function normalizeTicketCategoryLabel(raw?: string | null): string {
     .trim();
 
   const parts = splitTitlePartsWithoutWeekdays(text);
-  if (parts[0]?.trim()) return parts[0].trim();
+  if (parts[0]?.trim()) return capitalizeFirstLetter(parts[0].trim());
 
-  return text || 'Билет';
+  return capitalizeFirstLetter(text) || 'Билет';
 }
 
 function isRedundantCategoryDescription(name: string, description: string | null): boolean {
@@ -250,6 +351,17 @@ function collectRawTicketPrices(payload: PublicEventPageDto): RawTicketPrice[] {
     .sort((a, b) => (a.sortOrder ?? 9999) - (b.sortOrder ?? 9999));
 }
 
+/**
+ * Group key must keep TEP package variants distinct.
+ * Titles like "Взрослый, в одну сторону…" / "Взрослый, с ланчем…" share the same
+ * first comma segment; collapsing on name alone hid those tariffs on the buy card.
+ * Weekday-only suffixes are already stripped in parseTicketCategory, so genuine
+ * "Взрослый, ПН—ЧТ" vs "Взрослый, ПТ—ВС" still merge into one row with a price fork.
+ */
+function ticketCategoryGroupKey(name: string, description: string | null): string {
+  return `${name}|${description || ''}`.toLowerCase().replace(/\s+/g, ' ');
+}
+
 export function buildGroupedTicketCategories(payload: PublicEventPageDto): TicketCategoryRow[] {
   const order: string[] = [];
   const groupSortOrder = new Map<string, number>();
@@ -257,7 +369,7 @@ export function buildGroupedTicketCategories(payload: PublicEventPageDto): Ticke
 
   for (const item of collectRawTicketPrices(payload)) {
     const { name, description } = parseTicketCategory(item);
-    const key = name.toLowerCase().replace(/\s+/g, ' ');
+    const key = ticketCategoryGroupKey(name, description);
     const itemOrder = item.sortOrder ?? 9999;
     const existing = groups.get(key);
     if (!existing) {
@@ -277,9 +389,31 @@ export function buildGroupedTicketCategories(payload: PublicEventPageDto): Ticke
     .sort((a, b) => (groupSortOrder.get(a.key) ?? 9999) - (groupSortOrder.get(b.key) ?? 9999));
 }
 
+/** Consolidate large venue sector lists into price tiers while retaining every sector label. */
+export function compactSectorTicketCategories(rows: TicketCategoryRow[]): TicketCategoryRow[] {
+  if (rows.length <= 8 || !rows.every((row) => /^сектор\s+\d+$/i.test(row.name))) return rows;
+
+  const tiers = new Map<string, TicketCategoryRow>();
+  for (const row of rows) {
+    const key = `${row.minPrice}:${row.maxPrice}`;
+    const current = tiers.get(key);
+    if (current) {
+      current.name += `, ${row.name.replace(/^сектор\s+/i, '')}`;
+      continue;
+    }
+    tiers.set(key, {
+      ...row,
+      key: `sector-tier-${key}`,
+      name: `Секторы ${row.name.replace(/^сектор\s+/i, '')}`,
+    });
+  }
+
+  return [...tiers.values()].sort((a, b) => a.minPrice - b.minPrice || a.maxPrice - b.maxPrice);
+}
+
 export function formatCategoryPrice(minPrice: number, maxPrice: number): string {
   if (minPrice === maxPrice) return `${formatNumber(Math.round(minPrice))} ₽`;
-  return `${formatNumber(Math.round(minPrice))} – ${formatNumber(Math.round(maxPrice))} ₽`;
+  return `${formatNumber(Math.round(minPrice))} - ${formatNumber(Math.round(maxPrice))} ₽`;
 }
 
 export function scrollToBuyCard() {

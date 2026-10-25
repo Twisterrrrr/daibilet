@@ -1,21 +1,27 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { Clock, MapPin, Star, Ticket } from 'lucide-react';
-import { useState } from 'react';
+import { Clock, MapPin, Ticket } from 'lucide-react';
 
 import { EventFavoriteButton } from '@/components/EventFavoriteButton.client';
+import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import {
   CatalogPurchaseAnchors,
   CatalogPurchaseChip,
   useCatalogPurchase,
 } from '@/components/CatalogPurchaseTrigger.client';
 import { LandingPurchaseButton } from '@/components/landing/LandingPurchaseButton.client';
+import { AFFICHE_IMAGE_QUALITY, CARD_IMAGE_QUALITY, CATALOG_IMAGE_QUALITY, IMAGE_SIZES, CardSafeImage } from '@/components/SafeImage.client';
 import type { PublicCatalogListItemDto, PublicSessionDto } from '@daibilet/contracts/public';
-import { collectCatalogLabels } from '@/lib/catalog-labels';
+import { extractDurationLabel } from '@/lib/catalog-labels';
+import { LandingCardBadgeRow } from '@/components/landing/LandingCardBadgeRow';
 import { EventImageBadges } from '@/lib/event-card-badges';
+import { deriveLandingCardBadges } from '@/lib/landing-card-badges';
 import {
-  collectDisplaySlotLabels,
+  collectAllDisplaySlotLabels,
+  COMPACT_MOBILE_SLOT_LIMIT,
+  CATALOG_DISPLAY_SLOT_LIMIT,
   formatEventNextSession,
   formatPriceRub,
   formatShowcasePriceLabel,
@@ -24,23 +30,38 @@ import {
   getDepartingSoonMinutes,
   isOpenDate,
   MIN_DISPLAY_PRICE_RUB,
-  resolvePseudoRating,
+  WIDE_DISPLAY_SLOT_LIMIT,
 } from '@/lib/event-card-meta';
-import { resolveEventCardDestinationLabel, resolveEventCardLocationLabel } from '@/lib/event-location';
+import { resolveEventCardObjectPosition } from '@/lib/event-image-focus';
+import { resolveEventCardFallbackImage, resolveEventCardPrimaryImage } from '@/lib/event-card-image';
+import {
+  resolveEventCardDestinationLabel,
+  resolveEventCardLocationLabel,
+} from '@/lib/event-location';
+import { dayRouteItemFromEvent } from '@/lib/day-route-from-place';
 import { formatMoneyRange, formatPriceFrom } from '@/lib/format';
+import { formatAgeLimit } from '@/lib/event-page-utils';
+import { trackProductCardClick } from '@/lib/catalog-analytics';
+import { formatPublicTitle } from '@/lib/format-public-title';
 import { eventHref } from '@/lib/routes';
 
 const SLOT_CHIP_CLASS =
-  'inline-btn inline-flex h-6 min-h-6 shrink-0 items-center justify-center rounded-full bg-slate-100 px-2.5 text-[10px] font-medium leading-none text-slate-700';
+  'inline-btn inline-flex h-6 min-h-6 shrink-0 items-center justify-center rounded-md bg-surface-muted px-2.5 text-ui-xs font-medium leading-none text-graphite-muted';
 
 const SLOT_CHIP_PURCHASE_CLASS =
   'transition hover:bg-primary/10 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40';
 
 const DETAILS_LINK_CLASS =
-  'relative z-[2] inline-flex items-center gap-1 text-[10px] font-medium text-primary-600 transition hover:text-primary-700 sm:text-xs';
+  'event-card__buy-btn relative z-[2] inline-flex min-h-8 shrink-0 items-center justify-center gap-1 whitespace-nowrap rounded-lg px-3 py-2 text-xs font-semibold sm:min-h-9 sm:px-3.5 sm:text-sm';
+
+/** Rail / city-hub cards: wider horizontal padding so label is not flush to pill edges. */
+const SHOWCASE_BUY_CTA_CLASS =
+  'event-card__buy-btn inline-flex shrink-0 items-center justify-center gap-0.5 whitespace-nowrap rounded-lg px-2.5 py-[5px] text-[11px] font-semibold leading-none';
 
 const TITLE_LINK_CLASS =
-  'relative z-[2] line-clamp-4 text-sm font-semibold leading-relaxed text-slate-900 transition-colors hover:text-primary-600 sm:text-base';
+  'relative z-[2] font-display text-ui-sm font-bold leading-snug text-graphite transition-colors hover:text-primary-600 sm:text-base';
+
+const SLOT_MORE_CHIP_CLASS = `${SLOT_CHIP_CLASS} text-graphite-muted`;
 
 type CatalogCardSession = PublicSessionDto | PublicCatalogListItemDto;
 
@@ -48,8 +69,14 @@ type EventCardProps = {
   session: CatalogCardSession;
   compact?: boolean;
   showcaseRail?: boolean;
+  /** City hub context: city already known - drop category·city and address noise. */
+  cityHub?: boolean;
   editorsPickBadge?: boolean;
   landingActions?: boolean;
+  /** LCP: eager load + priority for first visible catalog cards. */
+  imagePriority?: boolean;
+  /** Dense `/events` grid: tighter sizes + lower quality. */
+  catalogDense?: boolean;
   /** Скрыть скрытые anchor-виджеты (каталог-слоты) — на странице события в related. */
   suppressPurchaseAnchors?: boolean;
 };
@@ -58,149 +85,234 @@ export function EventCard({
   session,
   compact = false,
   showcaseRail = false,
+  cityHub = false,
   editorsPickBadge = false,
   landingActions = false,
   suppressPurchaseAnchors = true,
+  imagePriority = false,
+  catalogDense = false,
 }: EventCardProps) {
+  const purchase = useCatalogPurchase(session);
   if (showcaseRail || editorsPickBadge) {
-    return <ShowcaseEventCard session={session} rail={showcaseRail} editorsPickBadge={editorsPickBadge} />;
+    return (
+      <ShowcaseEventCard
+        session={session}
+        rail={showcaseRail}
+        cityHub={cityHub}
+        editorsPickBadge={editorsPickBadge}
+        imagePriority={imagePriority}
+      />
+    );
   }
 
   const href = eventHref(session);
-  const [hasImageError, setHasImageError] = useState(false);
-  const showImage = Boolean(session.imageUrl && !hasImageError);
-  const hasPrice = typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB;
-  const destinationLabel = resolveEventCardDestinationLabel(session);
-  const highlights = collectCatalogLabels(session);
+  const imageObjectPosition = resolveEventCardObjectPosition({
+    slug: session.slug,
+    sourceSlug: 'sourceSlug' in session ? session.sourceSlug : undefined,
+    id: session.id,
+  });
+  const imagePrimarySrc = resolveEventCardPrimaryImage(session);
+  const imageFallbackSrc = resolveEventCardFallbackImage(session);
+  const cardImageSizes = catalogDense ? IMAGE_SIZES.eventCardCatalog : IMAGE_SIZES.eventCard;
+  const cardImageQuality = catalogDense ? CATALOG_IMAGE_QUALITY : CARD_IMAGE_QUALITY;
+  const emptyImageFallback = (
+    <div className="flex h-full w-full items-center justify-center bg-surface-muted">
+      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/70 shadow-sm">
+        <div className="h-3.5 w-3.5 rotate-45 rounded-[6px] border border-slate-300/90 bg-slate-200/90" />
+      </div>
+    </div>
+  );
+  const priceValue =
+    typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB
+      ? session.priceFrom
+      : null;
+  const hasPrice = priceValue != null;
+  const priceTo =
+    'priceTo' in session && typeof session.priceTo === 'number' ? session.priceTo : null;
+  const priceRangeLabel = hasPrice ? formatMoneyRange(priceValue, priceTo) : null;
   const openDate = isOpenDate(session);
   const departingSoonMinutes = openDate ? null : getDepartingSoonMinutes(session.startsAt);
   const nextSessionLabel = openDate ? null : formatEventNextSession(session);
-  const displaySlotLabels = collectDisplaySlotLabels(session);
-  const showSlotPills = displaySlotLabels.length > 0;
+  const allSlotLabels = collectAllDisplaySlotLabels(session);
+  const showSlotPills = allSlotLabels.length > 0;
   const sessionMetaLabel = openDate ? null : nextSessionLabel;
-  const pseudoRating = resolvePseudoRating(session.groupKey || session.id);
-  const locationLabel = resolveEventCardLocationLabel(session);
-  const showSoonBadge = !hasPrice && !openDate && !departingSoonMinutes;
-  const priceBadgeLabel = formatPriceFrom(session.priceFrom);
-  const priceFooterLabel = formatMoneyRange(session.priceFrom, session.priceTo);
-  const purchase = useCatalogPurchase(session);
-  // Catalog list: no hidden widget DOM. Purchase UX lives on event page / landing CTA.
+  // List DTO has no real rating / visit counts - never invent ★ 4.9.
+  const landingBadges = landingActions ? deriveLandingCardBadges(session) : [];
+  const cityLabel = resolveEventCardDestinationLabel(session);
+  const rawLocation = resolveEventCardLocationLabel(session);
+  const locationLabel =
+    rawLocation && cityLabel && rawLocation.trim().toLowerCase() === cityLabel.trim().toLowerCase()
+      ? null
+      : rawLocation;
+  const durationLabel = extractDurationLabel(session.tags);
+  const ageLabel = formatAgeLimit(session.ageLimit);
+  const showCategory = Boolean(session.category && !landingActions);
+  // Missing display price (<100 / null) is not "soon" - event can still be on sale.
+  const showSoonBadge = false;
+  const displayTitle = formatPublicTitle(session.title);
   const showPurchaseWidgets = landingActions && !suppressPurchaseAnchors && purchase.purchaseEnabled;
-
-  const cardClassName =
-    'group flex h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg hover:shadow-slate-200/60';
+  const dayRouteVenue = dayRouteItemFromEvent({
+    id: session.id,
+    slug: session.slug,
+    title: session.title,
+    city: session.city,
+    cityId: 'cityId' in session ? session.cityId : undefined,
+    citySlug: session.citySlug,
+    venueId: 'venueId' in session ? session.venueId : undefined,
+    venueSlug: session.venueSlug,
+    venue: session.venue,
+    venueKind: session.venueKind,
+    venueAddress: session.venueAddress,
+    venueLatitude: 'venueLatitude' in session ? (session as { venueLatitude?: number | null }).venueLatitude : undefined,
+    venueLongitude:
+      'venueLongitude' in session ? (session as { venueLongitude?: number | null }).venueLongitude : undefined,
+    startsAt: session.startsAt,
+    dateLabel: session.dateLabel,
+    timeLabel: session.timeLabel,
+    imageUrl: session.imageUrl,
+  });
 
   const cardBody = (
     <>
-      <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-100">
+      <div className="relative aspect-[16/10] w-full overflow-hidden bg-surface-muted">
         {landingActions ? (
-          <Link href={href} className="absolute inset-0 z-[1] rounded-t-xl" aria-label={`Страница события: ${session.title}`} />
-        ) : null}
-        {!showImage ? (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-300/80 bg-white/60 shadow-sm">
-              <div className="h-3.5 w-3.5 rotate-45 rounded-[6px] border border-slate-300/90 bg-slate-200/90" />
-            </div>
-          </div>
-        ) : (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={session.imageUrl || ''}
-            alt={session.title}
-            loading="lazy"
-            onError={() => setHasImageError(true)}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+          <Link
+            href={href}
+            className="absolute inset-0 z-[1]"
+            aria-label={`Страница события: ${displayTitle}`}
+            onClick={() =>
+              trackProductCardClick({
+                eventId: session.id,
+                slug: session.slug,
+                source: 'landing_card',
+              })
+            }
           />
-        )}
+        ) : null}
+        <CardSafeImage
+          src={imagePrimarySrc}
+          alt={displayTitle}
+          fill
+          sizes={cardImageSizes}
+          quality={cardImageQuality}
+          priority={imagePriority}
+          loading={imagePriority ? undefined : 'lazy'}
+          style={{ objectPosition: imageObjectPosition }}
+          className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+          fallback={
+            imageFallbackSrc && imageFallbackSrc !== imagePrimarySrc ? (
+              <CardSafeImage
+                src={imageFallbackSrc}
+                alt={displayTitle}
+                fill
+                sizes={cardImageSizes}
+                quality={cardImageQuality}
+                className="object-cover"
+                fallback={emptyImageFallback}
+              />
+            ) : (
+              emptyImageFallback
+            )
+          }
+        />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-        <EventImageBadges event={session} showSoonBadge={showSoonBadge} />
-        <EventFavoriteButton eventId={session.id} className="right-2 top-2 sm:right-3 sm:top-3" />
-
-        {hasPrice ? (
-          <div className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3">
-            <span className="rounded-full bg-primary-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm sm:px-4 sm:py-2 sm:text-sm">
-              {priceBadgeLabel}
-            </span>
-          </div>
+        <EventImageBadges event={session} showSoonBadge={showSoonBadge} hideRelativeCoverDate />
+        <EventFavoriteButton eventId={session.id} session={session} className="right-2 top-2 sm:right-3 sm:top-3" />
+        {!landingActions && dayRouteVenue ? (
+          <AddToDayRouteButton
+            intent="day"
+            compact
+            variant="overlay"
+            className="!absolute !z-[3] !bottom-2 !right-2 !min-h-8 !gap-1 !px-2.5 !py-1.5 !text-[11px] sm:!bottom-3 sm:!right-3"
+            venue={dayRouteVenue}
+          />
         ) : null}
       </div>
 
-      <div className={`flex flex-1 flex-col ${compact ? 'p-3' : 'p-3 sm:p-4'}`}>
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] text-slate-500 sm:text-xs">
-          <span className="inline-flex shrink-0 items-center gap-0.5">
-            <Star className="h-3 w-3 fill-amber-400 text-amber-400 sm:h-3.5 sm:w-3.5" />
-            <span className="font-medium text-slate-700">{pseudoRating.toFixed(1)}</span>
-          </span>
-          {session.category ? (
-            <span className="truncate rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-normal text-slate-600 sm:text-xs">
-              {session.category}
+      <div className={`flex flex-1 flex-col ${compact ? 'gap-2 p-3.5 sm:gap-2.5 sm:p-4' : 'gap-2.5 p-4'}`}>
+        {/* Category left, duration + age right — one row, no extra duration line. */}
+        {showCategory || ageLabel || durationLabel ? (
+          <div className="flex w-full items-center justify-between gap-2">
+            {showCategory ? (
+              <p className="min-w-0 truncate text-[10px] font-semibold uppercase tracking-[0.14em] text-graphite-muted sm:text-[11px]">
+                {session.category}
+              </p>
+            ) : (
+              <span className="min-w-0" />
+            )}
+            <span className="inline-flex shrink-0 items-center gap-2 text-[10px] font-semibold tabular-nums text-graphite-muted sm:text-[11px]">
+              {durationLabel ? (
+                <span className="inline-flex items-center gap-1" title="Длительность">
+                  <Clock className="event-card-meta-icon" />
+                  <span>{durationLabel}</span>
+                </span>
+              ) : null}
+              {ageLabel ? (
+                <span title="Возрастное ограничение">{ageLabel}</span>
+              ) : null}
             </span>
-          ) : null}
-          {destinationLabel ? (
-            <span className="inline-flex min-w-0 max-w-full items-center gap-0.5 text-slate-500">
-              <MapPin className="h-3 w-3 shrink-0" />
-              <span className="truncate">{destinationLabel}</span>
-            </span>
-          ) : null}
-        </div>
+          </div>
+        ) : null}
 
-        <h2 className="mt-2">
-          <Link href={href} className={TITLE_LINK_CLASS}>
-            {session.title}
+        <h2>
+          <Link
+            href={href}
+            className={TITLE_LINK_CLASS}
+            onClick={() =>
+              trackProductCardClick({
+                eventId: session.id,
+                slug: session.slug,
+                source: landingActions ? 'landing_card_title' : 'event_card_title',
+              })
+            }
+          >
+            {displayTitle}
           </Link>
         </h2>
 
-        <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] text-slate-500 sm:gap-x-3 sm:text-xs">
-          {openDate ? (
-            <span className="font-medium text-emerald-600">Билет с открытой датой</span>
-          ) : departingSoonMinutes ? (
-            <span className="inline-flex animate-pulse items-center gap-1 font-medium text-orange-600">
-              <Clock className="h-3 w-3" />
-              Через {departingSoonMinutes} мин
-            </span>
-          ) : sessionMetaLabel ? (
-            <span className="font-medium text-primary-600">{sessionMetaLabel}</span>
-          ) : (
-            <span>
-              {session.dateLabel}
-              {session.timeLabel ? ` · ${session.timeLabel}` : ''}
-            </span>
-          )}
-          {locationLabel ? <span className="line-clamp-1">{locationLabel}</span> : null}
-        </div>
+        {landingBadges.length > 0 ? <LandingCardBadgeRow badges={landingBadges} /> : null}
 
-        {highlights.length > 0 ? (
-          <ul className="mt-2 space-y-0.5 text-[10px] leading-relaxed text-slate-600 sm:text-xs">
-            {highlights.map((highlight) => (
-              <li key={highlight} className="flex gap-1.5">
-                <span className="text-primary-500">•</span>
-                <span className="line-clamp-1">{highlight}</span>
-              </li>
-            ))}
-          </ul>
-        ) : null}
-
-        {showSlotPills ? (
-          <div className="mt-2 flex flex-wrap items-start gap-1.5">
-            {displaySlotLabels.map((label) =>
-              showPurchaseWidgets ? (
-                <CatalogPurchaseChip
-                  key={label}
-                  session={session}
-                  label={label}
-                  className={`${SLOT_CHIP_CLASS} ${SLOT_CHIP_PURCHASE_CLASS}`}
-                  onOpen={purchase.openPurchase}
-                >
-                  {label}
-                </CatalogPurchaseChip>
-              ) : (
-                <span key={label} className={SLOT_CHIP_CLASS}>
-                  {label}
-                </span>
-              ),
+        {/* Primary schedule line */}
+        <div className="flex flex-col gap-1">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-ui-xs sm:text-ui-sm">
+            {openDate ? (
+              <span className="font-semibold text-success">Билет с открытой датой</span>
+            ) : departingSoonMinutes ? (
+              <span className="inline-flex items-center gap-1 font-semibold text-urgency">
+                <Clock className="event-card-meta-icon" />
+                Скоро начало · через {departingSoonMinutes} мин
+              </span>
+            ) : sessionMetaLabel ? (
+              <span className="inline-flex items-center gap-1 font-semibold text-graphite">
+                <Clock className="event-card-meta-icon" />
+                {sessionMetaLabel}
+              </span>
+            ) : (
+              <span className="font-semibold text-graphite">
+                {session.dateLabel}
+                {session.timeLabel ? `, ${session.timeLabel}` : ''}
+              </span>
             )}
           </div>
+          {locationLabel ? (
+            <p className="line-clamp-1 text-ui-xs text-graphite-muted">
+              <span className="inline-flex max-w-full items-center gap-1">
+                <MapPin className="event-card-meta-icon shrink-0" />
+                <span className="truncate">{locationLabel}</span>
+              </span>
+            </p>
+          ) : null}
+        </div>
+
+        {/* Catalog cards: no alt slots (confusing). Landing purchase chips only. */}
+        {showSlotPills && landingActions ? (
+          <EventCardSlotChips
+            session={session}
+            labels={allSlotLabels}
+            narrow={compact}
+            showPurchaseWidgets={showPurchaseWidgets}
+            onOpenPurchase={purchase.openPurchase}
+          />
         ) : null}
 
         {showPurchaseWidgets ? (
@@ -216,19 +328,35 @@ export function EventCard({
           />
         ) : null}
 
-        <div className="mt-auto flex items-center justify-between gap-2 pt-3">
+        <div className="mt-auto flex items-center justify-between gap-2 pt-1">
           {landingActions ? (
             <LandingPurchaseButton
               session={session}
               label={hasPrice ? `Купить от ${formatPriceRub(session.priceFrom)} ₽` : 'Купить'}
-              className="relative z-[2] inline-flex w-full items-center justify-center rounded-lg bg-primary-600 px-3 py-2 text-xs font-semibold text-white hover:bg-primary-700 sm:text-sm"
+              className="event-card__buy-btn relative z-[2] inline-flex w-full items-center justify-center rounded-xl px-3 py-2.5 text-ui-sm font-semibold"
             />
           ) : (
             <>
-              <span className="text-sm font-semibold text-slate-900">{priceFooterLabel}</span>
-              <Link href={href} className={DETAILS_LINK_CLASS}>
-                <Ticket className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                Подробнее →
+              {priceRangeLabel ? (
+                <span className="relative z-[2] min-w-0 flex-1 whitespace-nowrap text-left text-base font-extrabold tabular-nums tracking-tight text-primary-700 sm:text-xl">
+                  {priceRangeLabel}
+                </span>
+              ) : (
+                <span />
+              )}
+              <Link
+                href={href}
+                className={`${DETAILS_LINK_CLASS} max-sm:hidden`}
+                onClick={() =>
+                  trackProductCardClick({
+                    eventId: session.id,
+                    slug: session.slug,
+                    source: 'event_card_cta',
+                  })
+                }
+              >
+                <Ticket className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
+                Купить
               </Link>
             </>
           )}
@@ -238,108 +366,312 @@ export function EventCard({
   );
 
   if (landingActions) {
-    return <article className={`relative ${cardClassName}`}>{cardBody}</article>;
+    return <article className="group event-card">{cardBody}</article>;
   }
 
+  const onCardNavigate = () => {
+    trackProductCardClick({
+      eventId: session.id,
+      slug: session.slug,
+      source: 'event_card',
+    });
+  };
+
   return (
-    <article className={`relative ${cardClassName}`}>
-      <Link href={href} className="absolute inset-0 z-[1] rounded-xl" aria-label={`Событие: ${session.title}`} />
+    <article className="group event-card">
+      <Link
+        href={href}
+        className="absolute inset-0 z-[1] rounded-2xl"
+        aria-label={`Событие: ${displayTitle}`}
+        onClick={onCardNavigate}
+      />
       {cardBody}
     </article>
   );
 }
 
+function EventCardSlotChips({
+  session,
+  labels,
+  narrow,
+  showPurchaseWidgets,
+  onOpenPurchase,
+}: {
+  session: CatalogCardSession;
+  labels: string[];
+  narrow: boolean;
+  showPurchaseWidgets: boolean;
+  onOpenPurchase: (slotLabel: string) => void;
+}) {
+  const renderChip = (label: string) => {
+    const chipClass = `${SLOT_CHIP_CLASS}${showPurchaseWidgets ? ` ${SLOT_CHIP_PURCHASE_CLASS}` : ''}`;
+    if (showPurchaseWidgets) {
+      return (
+        <CatalogPurchaseChip
+          key={label}
+          session={session}
+          label={label}
+          className={chipClass}
+          onOpen={onOpenPurchase}
+        >
+          {label}
+        </CatalogPurchaseChip>
+      );
+    }
+    return (
+      <span key={label} className={chipClass}>
+        {label}
+      </span>
+    );
+  };
+
+  /** 2-up grid: fill L→R; odd remainder / single stay in left column (same inset as left of a pair). */
+  const renderSlotGrid = (sliceLabels: string[], moreCount: number, className: string) => {
+    const items: Array<{ key: string; node: ReactNode }> = sliceLabels.map((label) => ({
+      key: label,
+      node: renderChip(label),
+    }));
+    if (moreCount > 0) {
+      items.push({
+        key: `__more_${moreCount}`,
+        node: <span className={SLOT_MORE_CHIP_CLASS}>ещё {moreCount}</span>,
+      });
+    }
+    return (
+      <div className={`grid grid-cols-2 gap-1.5 ${className}`}>
+        {items.map((item) => (
+          <div key={item.key} className="flex justify-center">
+            {item.node}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  if (narrow) {
+    const mobileLabels = labels.slice(0, COMPACT_MOBILE_SLOT_LIMIT);
+    const mobileMore = Math.max(0, labels.length - COMPACT_MOBILE_SLOT_LIMIT);
+    const gridLabels = labels.slice(0, CATALOG_DISPLAY_SLOT_LIMIT);
+    const gridMore = Math.max(0, labels.length - CATALOG_DISPLAY_SLOT_LIMIT);
+
+    return (
+      <>
+        {renderSlotGrid(mobileLabels, mobileMore, 'sm:hidden')}
+        {renderSlotGrid(gridLabels, gridMore, 'hidden sm:grid')}
+      </>
+    );
+  }
+
+  const wideLabels = labels.slice(0, WIDE_DISPLAY_SLOT_LIMIT);
+  const wideMore = Math.max(0, labels.length - WIDE_DISPLAY_SLOT_LIMIT);
+
+  return (
+    <div className="flex flex-nowrap items-center gap-1.5 overflow-hidden">
+      {wideLabels.map((label) => renderChip(label))}
+      {wideMore > 0 ? <span className={SLOT_MORE_CHIP_CLASS}>ещё {wideMore}</span> : null}
+    </div>
+  );
+}
+
+function normalizeCardLabel(value: string): string {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ');
+}
+
+/** Venue/pier for showcase cards - never city alone and never a title duplicate. */
+function resolveShowcaseLocationLine(session: CatalogCardSession, cityLabel: string | null): string | null {
+  const locationLabel = resolveEventCardLocationLabel(session);
+  if (!locationLabel) return null;
+  const locationNorm = normalizeCardLabel(locationLabel);
+  if (!locationNorm) return null;
+  if (cityLabel && locationNorm === normalizeCardLabel(cityLabel)) return null;
+  if (locationNorm === normalizeCardLabel(session.title)) return null;
+  return locationLabel;
+}
+
 function ShowcaseEventCard({
   session,
   rail = false,
+  cityHub = false,
   editorsPickBadge = false,
+  imagePriority = false,
 }: {
   session: CatalogCardSession;
   rail?: boolean;
+  cityHub?: boolean;
   editorsPickBadge?: boolean;
+  imagePriority?: boolean;
 }) {
   const href = eventHref(session);
-  const [hasImageError, setHasImageError] = useState(false);
-  const showImage = Boolean(session.imageUrl && !hasImageError);
+  const imageObjectPosition = resolveEventCardObjectPosition({
+    slug: session.slug,
+    sourceSlug: 'sourceSlug' in session ? session.sourceSlug : undefined,
+    id: session.id,
+  });
+  const imagePrimarySrc = resolveEventCardPrimaryImage(session);
+  const imageFallbackSrc = resolveEventCardFallbackImage(session);
+  const emptyImageFallback = (
+    <div className="flex h-full w-full items-center justify-center bg-surface-muted text-3xl text-graphite-muted">
+      ·
+    </div>
+  );
   const hasPrice = typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB;
-  const pseudoRating = resolvePseudoRating(session.groupKey || session.id);
-  const cityLabel = resolveEventCardDestinationLabel(session);
   const dateLabel = rail ? formatShowcaseSessionDateCompact(session) : formatShowcaseSessionDate(session);
-  const locationLabel = resolveEventCardLocationLabel(session);
-  const venueLine = [locationLabel, cityLabel].filter(Boolean).join(' · ');
-  const categoryLabel = session.category?.trim() || null;
+  const cityLabel = resolveEventCardDestinationLabel(session) || null;
+  // cityHub rails (/events «Стоит увидеть», hub affiche): whole card is the CTA -
+  // no address line and no secondary «Купить билет» chrome.
+  const locationLine = cityHub
+    ? null
+    : resolveShowcaseLocationLine(session, cityLabel);
+  const categoryLabel = cityHub ? null : session.category?.trim() || null;
+  const showCityMeta = !cityHub && Boolean(categoryLabel || cityLabel);
+  const priceLabel = hasPrice
+    ? cityHub
+      ? formatPriceFrom(session.priceFrom)
+      : formatShowcasePriceLabel(session.priceFrom, 'priceTo' in session ? session.priceTo : null)
+    : null;
+  const imageSizes = cityHub ? IMAGE_SIZES.affichePoster : IMAGE_SIZES.eventCard;
+  const imageQuality = cityHub ? AFFICHE_IMAGE_QUALITY : CARD_IMAGE_QUALITY;
+  const displayTitle = formatPublicTitle(session.title);
 
   return (
-    <article
-      className={`group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg hover:shadow-slate-200/60 ${
-        rail ? 'min-h-[340px]' : ''
-      }`}
-    >
-      <Link href={href} className="absolute inset-0 z-[1] rounded-xl" aria-label={`Событие: ${session.title}`} />
-      <div className="relative aspect-[16/9] w-full shrink-0 overflow-hidden bg-slate-100">
-        {!showImage ? (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-3xl">
-            🎫
-          </div>
-        ) : (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={session.imageUrl || ''}
-            alt={session.title}
-            loading="lazy"
-            onError={() => setHasImageError(true)}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+    <article className="group event-card">
+      <Link
+        href={href}
+        className="absolute inset-0 z-[1] rounded-2xl"
+        aria-label={`Событие: ${displayTitle}`}
+        onClick={() =>
+          trackProductCardClick({
+            eventId: session.id,
+            slug: session.slug,
+            source: rail ? 'showcase_rail' : 'showcase_card',
+          })
+        }
+      />
+      <div
+        className={`relative w-full shrink-0 overflow-hidden bg-surface-muted ${
+          cityHub ? 'aspect-[3/4]' : 'aspect-[16/9]'
+        }`}
+      >
+        <CardSafeImage
+          src={imagePrimarySrc}
+          alt={displayTitle}
+          fill
+          sizes={imageSizes}
+          quality={imageQuality}
+          priority={imagePriority}
+          loading={imagePriority ? undefined : 'lazy'}
+          style={{ objectPosition: imageObjectPosition }}
+          className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+          fallback={
+            imageFallbackSrc && imageFallbackSrc !== imagePrimarySrc ? (
+              <CardSafeImage
+                src={imageFallbackSrc}
+                alt={displayTitle}
+                fill
+                sizes={imageSizes}
+                quality={imageQuality}
+                className="object-cover"
+                fallback={emptyImageFallback}
+              />
+            ) : (
+              emptyImageFallback
+            )
+          }
+        />
+
+        {cityHub ? null : (
+          <EventImageBadges
+            event={session}
+            rail={rail}
+            editorsPick={editorsPickBadge}
           />
         )}
-
-        <EventImageBadges event={session} rail={rail} editorsPick={editorsPickBadge} />
-        <EventFavoriteButton eventId={session.id} className="right-2 top-2 sm:right-3 sm:top-3" />
-
-        <div className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3">
-          <span className="rounded-full bg-primary-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm sm:px-4 sm:py-2 sm:text-sm">
-            {hasPrice ? formatShowcasePriceLabel(session.priceFrom) : 'Скоро'}
-          </span>
-        </div>
+        {cityHub ? null : (
+          <EventFavoriteButton eventId={session.id} session={session} className="right-2 top-2 sm:right-3 sm:top-3" />
+        )}
       </div>
 
-      <div className={`flex min-h-0 flex-1 flex-col text-left ${rail ? 'gap-1.5 p-3' : 'gap-2 p-3 sm:p-4'}`}>
-        {rail ? (
-          <>
-            <div className="flex w-full flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-slate-500">
-              <span className="inline-flex items-center gap-0.5">
-                <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                <span className="font-medium text-slate-700">{pseudoRating.toFixed(1)}</span>
-              </span>
-              {categoryLabel ? <span className="font-normal text-slate-600">{categoryLabel}</span> : null}
-            </div>
-            <p className="text-[11px] leading-snug text-slate-500">{dateLabel}</p>
-          </>
-        ) : (
-          <div className="flex w-full items-start justify-between gap-2 text-[10px] text-slate-500 sm:text-xs">
-            <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-              <span className="inline-flex shrink-0 items-center gap-0.5">
-                <Star className="h-3 w-3 fill-amber-400 text-amber-400 sm:h-3.5 sm:w-3.5" />
-                <span className="font-medium text-slate-700">{pseudoRating.toFixed(1)}</span>
-              </span>
-              {categoryLabel ? <span className="truncate font-normal text-slate-600">{categoryLabel}</span> : null}
-            </div>
-            <span className="shrink-0 text-right font-medium text-slate-500">{dateLabel}</span>
-          </div>
-        )}
+      <div
+        className={`flex min-h-0 flex-1 flex-col text-left ${
+          cityHub || rail ? 'gap-1.5 p-3' : 'gap-2 p-4 sm:p-5'
+        }`}
+      >
         <h3
-          className={`font-display font-bold leading-snug ${
-            rail ? 'line-clamp-4 text-sm' : 'line-clamp-4 text-sm sm:text-base'
+          className={`font-display font-bold leading-snug text-graphite ${
+            cityHub
+              ? 'line-clamp-4 break-words text-[13px] sm:text-ui-sm'
+              : rail
+                ? 'line-clamp-2 text-ui-sm'
+                : 'line-clamp-2 text-ui-sm sm:text-base'
           }`}
         >
-          <Link href={href} className={`${TITLE_LINK_CLASS} font-display font-bold`}>
-            {session.title}
+          <Link
+            href={href}
+            className="relative z-[2] transition-colors hover:text-primary-600"
+          >
+            {displayTitle}
           </Link>
         </h3>
-        {venueLine ? (
-          <p className={`mt-auto text-slate-500 ${rail ? 'line-clamp-2 text-[11px] leading-snug' : 'truncate text-xs sm:text-sm'}`}>
-            {venueLine}
-          </p>
+
+        {showCityMeta ? (
+          <div className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1">
+            {categoryLabel ? (
+              <span className="rounded-md bg-surface-muted px-2 py-0.5 text-ui-xs font-medium text-graphite-muted">
+                {categoryLabel}
+              </span>
+            ) : null}
+            {cityLabel ? (
+              <>
+                {categoryLabel ? (
+                  <span className="text-ui-xs text-graphite-muted" aria-hidden>
+                    ·
+                  </span>
+                ) : null}
+                <span className="truncate text-ui-xs text-graphite-muted">{cityLabel}</span>
+              </>
+            ) : null}
+          </div>
         ) : null}
+
+        <div className="flex min-w-0 flex-col gap-0.5">
+          <p className="event-card-meta">
+            <Clock className="event-card-meta-icon" />
+            <span className="truncate font-medium text-graphite">{dateLabel}</span>
+          </p>
+          {locationLine ? (
+            <p className="event-card-meta">
+              <MapPin className="event-card-meta-icon shrink-0" />
+              <span className="truncate">{locationLine}</span>
+            </p>
+          ) : null}
+        </div>
+
+        <div
+          className={`mt-auto flex items-center gap-1.5 pt-1 ${
+            cityHub ? 'justify-start' : 'justify-between'
+          }`}
+        >
+          {priceLabel ? (
+            <span
+              className={`min-w-0 whitespace-nowrap font-extrabold tracking-tight text-graphite ${
+                cityHub ? 'text-[1.3125rem] leading-none sm:text-[1.375rem]' : 'text-ui-sm'
+              }`}
+            >
+              {priceLabel}
+            </span>
+          ) : cityHub ? null : (
+            <span />
+          )}
+          {cityHub ? null : (
+            <span className={SHOWCASE_BUY_CTA_CLASS}>
+              <Ticket className="h-3 w-3 shrink-0" strokeWidth={1.75} />
+              Купить билет
+            </span>
+          )}
+        </div>
       </div>
     </article>
   );

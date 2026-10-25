@@ -12,6 +12,16 @@ interface CachedPayload<T> {
   payload: T;
 }
 
+export type PublicArticlesListOptions = {
+  citySlug?: string | null;
+  /** Rank city posts first, then multi/regions, then others (no hard filter). */
+  rankCitySlug?: string | null;
+  includeBroad?: boolean;
+  excludeFeatured?: boolean;
+  cursor?: string | null;
+  limit?: number;
+};
+
 const listCache = new Map<string, CachedPayload<Awaited<ReturnType<typeof buildPublicArticlesList>>>>();
 const pageCache = new Map<string, CachedPayload<Awaited<ReturnType<typeof buildPublicArticlePage>>>>();
 
@@ -22,17 +32,35 @@ function getLegacyDb() {
   return legacyDb;
 }
 
+function listCacheKey(options: PublicArticlesListOptions = {}): string {
+  const city = String(options.citySlug || '').trim().toLowerCase() || 'all';
+  const rank = String(options.rankCitySlug || '').trim().toLowerCase() || 'none';
+  const broad = options.includeBroad ? '1' : '0';
+  const featured = options.excludeFeatured ? '0' : '1';
+  const cursor = String(options.cursor || '').trim() || 'start';
+  const limit = Number(options.limit) || 100;
+  return `list:${city}:${rank}:${broad}:${featured}:${cursor}:${limit}`;
+}
+
 export function clearPublicArticlesDtoCache(): void {
   listCache.clear();
   pageCache.clear();
 }
 
-export async function buildPublicArticlesListDto(forceRefresh = false) {
-  const cacheKey = 'list';
+export async function buildPublicArticlesListDto(
+  forceRefreshOrOptions: boolean | PublicArticlesListOptions = false,
+  maybeOptions?: PublicArticlesListOptions,
+) {
+  const forceRefresh = typeof forceRefreshOrOptions === 'boolean' ? forceRefreshOrOptions : false;
+  const options =
+    typeof forceRefreshOrOptions === 'object' && forceRefreshOrOptions
+      ? forceRefreshOrOptions
+      : maybeOptions || {};
+  const cacheKey = listCacheKey(options);
   const cached = listCache.get(cacheKey);
   if (!forceRefresh && cached && cached.expiresAt > Date.now()) return cached.payload;
 
-  const payload = await buildPublicArticlesList(getLegacyDb());
+  const payload = await buildPublicArticlesList(getLegacyDb(), options);
   listCache.set(cacheKey, { expiresAt: Date.now() + ARTICLES_CACHE_MS, payload });
   return payload;
 }

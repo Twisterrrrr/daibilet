@@ -1,9 +1,12 @@
-import { readFileSync } from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { resolveCityTimeZone } from './city-timezone.js';
 import { matchingLandingSlugs } from './landing-rules.js';
-import { isFutureSlotStart, isOpenDateCatalogRow } from './catalog-availability.js';
+import {
+  isFutureSlotStart,
+  isOpenDateCatalogRow,
+  isPublicSalesStatusBlocked,
+  isPublicSessionRowOnSale,
+} from './catalog-availability.js';
+import { resolveEditorialEventImage } from './event-cover-images.js';
 import { pickFirstUsableEventImageUrl } from './event-image-url.js';
 import {
   buildProviderWidgetUrl,
@@ -11,8 +14,14 @@ import {
   purchaseInfo,
   resolveSessionPurchaseExternalId,
 } from './provider-purchase.js';
-import { prismaWallTimeToIso } from './public-datetime.js';
+import { normalizeStartsAt, parseSessionStartsAt } from './public-datetime.js';
 import { formatPublicEventTitle } from './event-title-normalize.ts';
+import { loadCityRoutingConfig } from './city-routing-config.js';
+import {
+  PUBLIC_CATALOG_THIN_MIN_EVENTS,
+  isFoldingRegionalTown,
+  isSubjectCapitalCity,
+} from './public-destination.js';
 import type { DestinationType, TimeBucket } from './types/common.js';
 import type { PublicSessionDto } from './types/public.js';
 
@@ -20,6 +29,7 @@ export interface PublicCatalogSlotRow {
   id?: string | null;
   eventId?: string | null;
   startsAt?: string | Date | null;
+  sourceStatus?: string | null;
   sourceCode?: string | null;
   offerSourceCode?: string | null;
   offerWidgetUrl?: string | null;
@@ -54,6 +64,7 @@ export interface PublicCatalogMappingRow {
   venueId: string | null;
   venueSlug: string | null;
   venue: string | null;
+  venueAddress: string | null;
   venueHeroImageUrl: string | null;
   venueKind: string | null;
   overrideTitle: string | null;
@@ -93,8 +104,7 @@ interface PublicDestination {
   type: DestinationType;
 }
 
-const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
-const cityRouting = loadCityRouting();
+const cityRouting = loadCityRoutingConfig(import.meta.url) as CityRoutingConfig;
 const standaloneCityNames = new Set(cityRouting.standaloneCities || []);
 const cityToRegion = new Map(Object.entries(cityRouting.cityToRegion || {}));
 const foreignCityNames = new Set(cityRouting.foreignCities || []);
@@ -120,7 +130,33 @@ const knownSessionCities = [
   'Владимир', 'Пермь', 'Тверь', 'Сочи', 'Тула',
 ].sort((left, right) => right.length - left.length);
 
-export function mapGroupedPublicSession(row: PublicCatalogMappingRow): PublicSessionDto | null {
+export type MapGroupedPublicSessionOptions = {
+  /** Towns with saleable events >= 3: keep type=city instead of folding to the subject. */
+  separateCityHubs?: ReadonlySet<string>;
+};
+
+export function collectSeparateCityHubNames(
+  rows: Array<{ city?: string | null; sourceStatus?: string | null }>,
+): Set<string> {
+  const counts = new Map<string, number>();
+  for (const row of rows || []) {
+    if (!isPublicSessionRowOnSale({ sourceStatus: row.sourceStatus })) continue;
+    const cityName = cleanDisplayName(row.city);
+    if (!isFoldingRegionalTown(cityName)) continue;
+    counts.set(cityName, (counts.get(cityName) || 0) + 1);
+  }
+  const hubs = new Set<string>();
+  for (const [cityName, count] of counts) {
+    if (count >= PUBLIC_CATALOG_THIN_MIN_EVENTS) hubs.add(cityName);
+  }
+  return hubs;
+}
+
+export function mapGroupedPublicSession(
+  row: PublicCatalogMappingRow,
+  pinnedEventIds: Set<string> = new Set(),
+  options?: MapGroupedPublicSessionOptions,
+): PublicSessionDto | null {
   const tags = row.tags || [];
   const subcategories = pickCatalogSubcategories({
     category: row.category,
@@ -131,54 +167,71 @@ export function mapGroupedPublicSession(row: PublicCatalogMappingRow): PublicSes
   });
   const cityName = resolvePublicSessionCity(row);
   if (isForeignPublicCity(cityName) || isForeignPublicCity(row.city)) return null;
-  const destination = publicDestinationForCity({ ...row, city: cityName });
+  const destination = publicDestinationForCity({ ...row, city: cityName }, options?.separateCityHubs);
   if (!destination) return null;
   const timeZone = resolveCityTimeZone(cityName, destination.name);
   const fallbackWidgetUrl = buildProviderWidgetUrl(row);
+  if (!isPublicSessionRowOnSale({ sourceStatus: row.sourceStatus })) return null;
   const purchase = purchaseInfo(row);
   const purchaseUrl = purchase.url || fallbackWidgetUrl;
-  const upcomingSlots = parseUpcomingSlots(row.upcomingSlots)
-    .filter(hasSlotStart)
-    .filter((slot) => isFutureSlotStart(slot.startsAt))
-    .slice(0, 8)
-    .map((slot) => {
-      const sourceCode = slot.sourceCode || slot.offerSourceCode || row.sourceCode || row.offerSourceCode;
-      const slotExternalId = resolveSessionPurchaseExternalId({
-        sourceCode,
-        providerSessionId: slot.providerSessionId || slot.externalId,
-        providerEventId: slot.providerEventId,
-        fallbackEventId: row.externalId,
-      });
-      const slotPurchase = purchaseInfo({
-        sourceCode,
-        offerSourceCode: slot.offerSourceCode || row.offerSourceCode,
-        offerWidgetUrl: slot.offerWidgetUrl,
-        offerDeeplinkUrl: slot.offerDeeplinkUrl,
-        externalId: slotExternalId,
-      });
-      const startsAt = toIsoString(slot.startsAt);
-      return {
-        ...(slot.id ? { id: slot.id } : {}),
-        ...(slot.eventId ? { eventId: slot.eventId } : {}),
-        startsAt,
-        dateLabel: formatDate(startsAt, timeZone),
-        timeLabel: formatTime(startsAt, timeZone),
-        timeBucket: timeBucket(startsAt, timeZone),
-        timeZone,
-        purchaseUrl: slotPurchase.url || purchaseUrl,
-      };
-    });
+  const upcomingSlots = dedupeCatalogSlotsByClock(
+    parseUpcomingSlots(row.upcomingSlots)
+      .filter(hasSlotStart)
+      .filter((slot) => isFutureSlotStart(slot.startsAt))
+      .filter((slot) => !isPublicSalesStatusBlocked(slot.sourceStatus))
+      .map((slot) => {
+        const sourceCode = slot.sourceCode || slot.offerSourceCode || row.sourceCode || row.offerSourceCode;
+        const slotExternalId = resolveSessionPurchaseExternalId({
+          sourceCode,
+          providerSessionId: slot.providerSessionId || slot.externalId,
+          providerEventId: slot.providerEventId,
+          fallbackEventId: row.externalId,
+        });
+        const slotPurchase = purchaseInfo({
+          sourceCode,
+          offerSourceCode: slot.offerSourceCode || row.offerSourceCode,
+          offerWidgetUrl: slot.offerWidgetUrl,
+          offerDeeplinkUrl: slot.offerDeeplinkUrl,
+          externalId: slotExternalId,
+        });
+        const startsAt = toIsoString(slot.startsAt);
+        return {
+          ...(slot.id ? { id: slot.id } : {}),
+          ...(slot.eventId ? { eventId: slot.eventId } : {}),
+          startsAt,
+          dateLabel: formatDate(startsAt, timeZone),
+          timeLabel: formatTime(startsAt, timeZone),
+          timeBucket: timeBucket(startsAt, timeZone),
+          timeZone,
+          purchaseUrl: slotPurchase.url || purchaseUrl,
+        };
+      })
+      .sort(
+        (left, right) =>
+          parseSessionStartsAt(left.startsAt).getTime() - parseSessionStartsAt(right.startsAt).getTime(),
+      ),
+    timeZone,
+  ).slice(0, 8);
 
   const openDate = isOpenDateCatalogRow(row);
-  const startsAt = openDate || !row.startsAt ? '' : toIsoString(row.startsAt);
+  // Primary must share the same instant path as upcomingSlots (jsonb strings vs SQL Date
+  // used to diverge when Date-only got prismaWallTime −3h). Prefer earliest unique slot.
+  const primarySlot = upcomingSlots[0];
+  const startsAt =
+    openDate || !row.startsAt
+      ? ''
+      : primarySlot?.startsAt || toIsoString(row.startsAt);
+  const groupEventIds = (row.groupEventIds || [row.id]).slice(0, 12);
+  const manualLandingStatus = groupEventIds.some((id) => pinnedEventIds.has(id)) ? 'PINNED' : null;
   const session: PublicSessionDto = {
     id: row.id,
     slug: publicSlug(row.slug),
     sourceSlug: row.slug,
     groupKey: row.groupKey,
-    groupEventIds: (row.groupEventIds || [row.id]).slice(0, 12),
+    groupEventIds,
     groupedEventsCount: row.groupedEventsCount || 1,
     sessionCount: row.sessionCount || upcomingSlots.length || 1,
+    peerCityCount: row.overrideMergeGroupKey ? Math.max(0, (row.groupedEventsCount || 1) - 1) : 0,
     upcomingSlots,
     landingSlugs: [],
     title: formatPublicEventTitle(row.overrideTitle || row.title),
@@ -192,6 +245,7 @@ export function mapGroupedPublicSession(row: PublicCatalogMappingRow): PublicSes
     venueId: row.venueId,
     venueSlug: row.venueSlug,
     venue: row.venue || 'Не указано',
+    venueAddress: row.venueAddress || null,
     venueKind: row.venueKind || 'OTHER',
     offerTitle: row.offerTitle,
     offerSourceCode: row.offerSourceCode,
@@ -210,9 +264,15 @@ export function mapGroupedPublicSession(row: PublicCatalogMappingRow): PublicSes
     ageLimit: row.ageLimit ?? null,
     description: cleanImportedDescription(row.overrideDescription || row.description || row.overrideShortDescription),
     startsAt,
-    dateLabel: openDate ? 'Открытая дата' : formatDate(startsAt, timeZone),
-    timeLabel: openDate ? 'В виджете' : formatTime(startsAt, timeZone),
-    timeBucket: openDate ? 'day' : timeBucket(startsAt, timeZone),
+    dateLabel: openDate
+      ? 'Открытая дата'
+      : primarySlot?.dateLabel || formatDate(startsAt, timeZone),
+    timeLabel: openDate
+      ? 'В виджете'
+      : primarySlot?.timeLabel || formatTime(startsAt, timeZone),
+    timeBucket: openDate
+      ? 'day'
+      : primarySlot?.timeBucket || timeBucket(startsAt, timeZone),
     priceFrom: row.priceFrom,
     priceTo: row.priceTo ?? row.priceFrom,
     vacant: row.vacant,
@@ -231,6 +291,7 @@ export function mapGroupedPublicSession(row: PublicCatalogMappingRow): PublicSes
     startsAt: session.startsAt,
     upcomingSlots,
   });
+  session.manualLandingStatus = manualLandingStatus;
   return session;
 }
 
@@ -323,22 +384,31 @@ function isAmenityCatalogTag(tag: string): boolean {
     /тё?плые?\s+плед|^панорамн|детск(ие|ая)\s+стуль|^с\s+(обедом|ужином|питанием)|^ледовый\s+класс/i.test(lower);
 }
 
-function loadCityRouting(): CityRoutingConfig {
-  try {
-    return JSON.parse(
-      readFileSync(path.join(projectRoot, 'data', 'geo', 'city-routing.ru.json'), 'utf8'),
-    ) as CityRoutingConfig;
-  } catch {
-    return {};
-  }
-}
-
-function publicDestinationForCity(row: PublicCatalogMappingRow): PublicDestination | null {
+function publicDestinationForCity(
+  row: PublicCatalogMappingRow,
+  separateCityHubs?: ReadonlySet<string>,
+): PublicDestination | null {
   const cityName = cleanDisplayName(row.city) || 'Не указан';
   if (isForeignPublicCity(cityName)) return null;
 
   const mappedRegion = cityToRegion.get(cityName);
-  if (mappedRegion && !standaloneCityNames.has(cityName)) {
+  const keepAsSeparateCity =
+    isSubjectCapitalCity(cityName) ||
+    (isFoldingRegionalTown(cityName) && Boolean(separateCityHubs?.has(cityName))) ||
+    (standaloneCityNames.has(cityName) && !mappedRegion);
+
+  if (keepAsSeparateCity) {
+    const slug = publicSlug(cityName);
+    return {
+      id: row.cityId || `city_${slug}`,
+      slug,
+      sourceSlug: row.citySlug || slug,
+      name: cityName,
+      type: 'city',
+    };
+  }
+
+  if (mappedRegion) {
     // Fold into standalone city when mapped target is itself a public city (Зеленоград→Москва).
     if (standaloneCityNames.has(mappedRegion)) {
       const slug = publicSlug(mappedRegion);
@@ -399,6 +469,9 @@ function cityNameStem(city: string): string {
 }
 
 function resolvePublicSessionImageUrl(row: PublicCatalogMappingRow): string | null {
+  const editorial = resolveEditorialEventImage(row.id, row.slug, null);
+  if (editorial) return editorial;
+
   const direct = pickFirstUsableEventImageUrl(row.overrideImageUrl, row.imageUrl, row.venueHeroImageUrl, row.cityHeroImageUrl);
   if (direct) return direct;
 
@@ -444,7 +517,7 @@ function cleanDisplayName(value?: string | null): string {
 }
 
 function formatDate(value: string | Date, timeZone: string): string {
-  const date = new Date(value);
+  const date = parseSessionStartsAt(value);
   if (!Number.isFinite(date.getTime())) return '';
   return new Intl.DateTimeFormat('ru-RU', {
     day: 'numeric',
@@ -455,7 +528,7 @@ function formatDate(value: string | Date, timeZone: string): string {
 }
 
 function formatTime(value: string | Date, timeZone: string): string {
-  const date = new Date(value);
+  const date = parseSessionStartsAt(value);
   if (!Number.isFinite(date.getTime())) return '';
   return new Intl.DateTimeFormat('ru-RU', {
     hour: '2-digit',
@@ -465,7 +538,7 @@ function formatTime(value: string | Date, timeZone: string): string {
 }
 
 function timeBucket(value: string | Date, timeZone: string): TimeBucket {
-  const date = new Date(value);
+  const date = parseSessionStartsAt(value);
   if (!Number.isFinite(date.getTime())) return 'day';
   const hourPart = new Intl.DateTimeFormat('en-GB', {
     timeZone,
@@ -481,10 +554,72 @@ function timeBucket(value: string | Date, timeZone: string): TimeBucket {
   return 'night';
 }
 
+/**
+ * One clock for SQL Date and jsonb string slots.
+ * Do NOT apply prismaWallTime only to Date: that made primary −3h vs upcomingSlots
+ * (e.g. bridges main 20:55 / chips 23:55 for the same sailing).
+ */
 function toIsoString(value: string | Date): string {
-  if (value instanceof Date) return prismaWallTimeToIso(value) || '';
-  const date = new Date(value);
-  return Number.isFinite(date.getTime()) ? date.toISOString() : '';
+  return normalizeStartsAt(value) || '';
+}
+
+function catalogSlotClockKey(startsAt: string, timeZone: string): string {
+  const date = parseSessionStartsAt(startsAt);
+  if (!Number.isFinite(date.getTime())) return startsAt;
+  const day = new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(date);
+  const time = formatTime(startsAt, timeZone);
+  return `${day}|${time}`;
+}
+
+const MSK_OFFSET_MS = 3 * 60 * 60 * 1000;
+
+/**
+ * Drop same-eventId sessions that are exactly −3h before another session
+ * (legacy wall-shift duplicate: 17:55Z phantom next to real 20:55Z = 23:55 MSK).
+ * Different eventIds 3h apart (real 12:00 / 15:00 sailings) are kept.
+ */
+function dropMinus3hSameEventPhantoms<T extends { startsAt: string; eventId?: string | null }>(
+  slots: T[],
+): T[] {
+  const byEvent = new Map<string, number[]>();
+  for (const slot of slots) {
+    const eventId = String(slot.eventId || '').trim();
+    if (!eventId) continue;
+    const ms = parseSessionStartsAt(slot.startsAt).getTime();
+    if (!Number.isFinite(ms)) continue;
+    const bucket = byEvent.get(eventId) || [];
+    bucket.push(ms);
+    byEvent.set(eventId, bucket);
+  }
+  return slots.filter((slot) => {
+    const eventId = String(slot.eventId || '').trim();
+    if (!eventId) return true;
+    const ms = parseSessionStartsAt(slot.startsAt).getTime();
+    if (!Number.isFinite(ms)) return true;
+    const siblings = byEvent.get(eventId) || [];
+    return !siblings.some((other) => other === ms + MSK_OFFSET_MS);
+  });
+}
+
+function dedupeCatalogSlotsByClock<T extends { startsAt: string; eventId?: string | null }>(
+  slots: T[],
+  timeZone: string,
+): T[] {
+  const cleaned = dropMinus3hSameEventPhantoms(slots);
+  const seen = new Set<string>();
+  const out: T[] = [];
+  for (const slot of cleaned) {
+    const key = catalogSlotClockKey(slot.startsAt, timeZone);
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    out.push(slot);
+  }
+  return out;
 }
 
 function publicSlug(value?: string | null): string {

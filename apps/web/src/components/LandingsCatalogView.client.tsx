@@ -1,46 +1,64 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { ArrowRight } from 'lucide-react';
 
-import { CityPicker } from '@/components/CityPicker.client';
-import { SectionPageHero } from '@/components/PageBreadcrumbs';
-import { buildCatalogPresetHref, buildCatalogTagHref } from '@/lib/catalog-links';
-import { CATALOG_PRESETS } from '@/lib/catalog-presets';
+import { CatalogCityGate } from '@/components/EventsCityGate.client';
+import { ExpandableBlurb } from '@/components/ExpandableBlurb.client';
+import { HeroLayout } from '@/components/HeroLayout';
+import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
+import { LandingDirectionCard } from '@/components/LandingDirectionCard.client';
+import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { formatNumber, formatPriceFrom, pluralEvents } from '@/lib/format';
 import { resolveLandingCardImage } from '@/lib/landing-images';
-import { landingCategoryHref } from '@/lib/landing-routes';
+import { isLandingInSelection } from '@/lib/landing-features';
+import {
+  landingCategoryHref,
+  landingMatchesCatalogCity,
+  mergePodborkiCityCatalogItems,
+} from '@/lib/landing-routes';
+import { filterInSeasonLandings } from '@/lib/landing-season';
+import {
+  PODBORKI_BENTO_GRID_CLASS,
+  podborkiBentoCellClass,
+  podborkiBentoSpan,
+} from '@/lib/podborki-bento';
+import {
+  groupPodborkiByCategory,
+  resolvePodborkiCategorySlug,
+  type PodborkiCatalogItem,
+  type PodborkiCategoryMeta,
+  type PodborkiCategorySlug,
+} from '@/lib/podborki-categories';
+import { parsePodborkiCityHubPath } from '@/lib/podborki-city-seo';
+import { pickPodborkiFeatured, pickPodborkiTrending } from '@/lib/podborki-hero';
+import {
+  filterPodborkiByTag,
+  landingMatchesTag,
+  PODBORKI_CATEGORY_TAGS,
+  PODBORKI_MOODS,
+  type PodborkiTagId,
+  type PodborkiTagMeta,
+} from '@/lib/podborki-moods';
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
 
-type LandingCatalogItem = {
-  slug: string;
-  title: string;
-  subtitle: string;
-  events: number;
-  priceFrom?: number | null;
-};
+const PODBORKI_SEO_TEXT =
+  'Подборки Дайбилет собирают готовые маршруты и события по типу, аудитории и сезону: речные прогулки, автобусные обзоры, музеи, стендап, семейные программы и праздничные даты. В каждой карточке видно число актуальных сеансов и цену от, чтобы сразу перейти к билетам без долгого поиска по афише. Фильтр города в шапке сужает каталог под ваш маршрут.';
 
-const LANDING_EMOJI: Record<string, string> = {
-  'river-cruises': '🚢',
-  'bus-tours': '🚌',
-  'river-party': '🎉',
-  'bridges-night': '🌉',
-  'moscow-dinner-boat': '🍽',
-  'moscow-museums': '🏛',
-  'spb-yards': '🏛',
-  standup: '🎤',
-  'new-year': '🎄',
-  'salute-9-may': '🎆',
-  'family-kids': '🎪',
-  'concerts-genre': '🎸',
-  'active-sport': '🏎',
-};
+const EMPTY_CITY_COPY = {
+  title: 'Пока готовых подборок по выбранному городу еще нет',
+  hint: 'Город уже в афише, а подборка еще на разогреве - загляните позже или смените город в шапке.',
+} as const;
 
-function formatLandingPrice(value?: number | null): string {
-  if (!value || value <= 0) return '—';
-  return formatPriceFrom(value);
-}
+/** Soft tags on the default «Все» tab (moods across the whole city catalog). */
+const PODBORKI_ALL_TAB_TAGS: readonly PodborkiTagMeta[] = PODBORKI_MOODS.map((mood) => ({
+  id: mood.id,
+  label: mood.label,
+}));
+
+const TRENDING_LIMIT = 5;
 
 function resolveCitySlug(cities: PublicDestinationDto[], filter: string): string {
   if (!filter || filter === 'all') return 'all';
@@ -58,210 +76,507 @@ function resolveCityName(cities: PublicDestinationDto[], filter: string): string
   return byName?.name || filter;
 }
 
-function landingGradient(slug: string): string {
-  if (slug.includes('yard') || slug.includes('paradn') || slug.includes('museum')) {
-    return 'from-amber-700 via-orange-800 to-stone-900';
+function featuredPriceLine(item: PodborkiCatalogItem): string {
+  if (typeof item.priceFrom === 'number' && item.priceFrom === 0) return 'Бесплатно';
+  if (typeof item.priceFrom === 'number' && item.priceFrom > 0) {
+    return formatPriceFrom(item.priceFrom);
   }
-  if (slug.includes('river') || slug.includes('bridge') || slug.includes('boat')) {
-    return 'from-sky-600 via-primary-700 to-slate-900';
-  }
-  if (slug.includes('bus')) return 'from-amber-500 via-orange-600 to-rose-600';
-  if (slug.includes('salute') || slug.includes('new-year')) {
-    return 'from-violet-700 via-fuchsia-600 to-indigo-900';
-  }
-  if (slug.includes('standup')) return 'from-emerald-600 via-teal-600 to-cyan-800';
-  if (slug.includes('family') || slug.includes('kids')) {
-    return 'from-pink-500 via-rose-500 to-orange-500';
-  }
-  if (slug.includes('concert')) return 'from-red-600 via-rose-700 to-purple-900';
-  if (slug.includes('active') || slug.includes('sport')) {
-    return 'from-slate-700 via-zinc-800 to-black';
-  }
-  return 'from-indigo-600 via-primary to-fuchsia-700';
+  return '';
 }
 
-function LandingDirectionCard({
-  landing,
-  citySlug,
-}: {
-  landing: LandingCatalogItem;
-  citySlug: string;
-}) {
-  const emoji = LANDING_EMOJI[landing.slug] || '✨';
-  const imageUrl = resolveLandingCardImage(landing.slug);
-  const href = landingCategoryHref(landing.slug, citySlug !== 'all' ? citySlug : undefined);
-
-  return (
-    <Link
-      href={href}
-      className="group relative flex h-56 flex-col justify-end overflow-hidden rounded-2xl bg-slate-900 shadow-sm ring-1 ring-slate-900/10 transition hover:-translate-y-0.5 hover:shadow-xl sm:h-60"
-    >
-      {imageUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={imageUrl}
-          alt=""
-          loading="lazy"
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-      ) : (
-        <div className={`absolute inset-0 bg-gradient-to-br ${landingGradient(landing.slug)} opacity-90`} />
-      )}
-      <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/20 to-transparent" />
-      <div className="relative p-4 text-white sm:p-5">
-        <span className="text-xl" aria-hidden>
-          {emoji}
-        </span>
-        <h3 className="font-display mt-1 text-lg font-bold sm:text-xl">{landing.title}</h3>
-        {landing.subtitle ? (
-          <p className="mt-1 line-clamp-2 text-xs text-white/80 sm:text-sm">{landing.subtitle}</p>
-        ) : null}
-        <p className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-white/90 group-hover:text-white sm:text-sm">
-          {pluralEvents(landing.events)} · {formatLandingPrice(landing.priceFrom)}
-          <ArrowRight className="h-3.5 w-3.5" />
-        </p>
-      </div>
-    </Link>
-  );
+function featuredMetaLine(item: PodborkiCatalogItem): string {
+  const parts = [pluralEvents(item.events)];
+  const price = featuredPriceLine(item);
+  if (price) parts.push(price);
+  return parts.join(' · ');
 }
 
 export function LandingsCatalogView({
-  items,
-  city,
+  items: initialItems,
+  city: initialCity,
   cities,
-  tags,
+  categories,
   totalEvents,
+  heroTitle,
+  heroDescription,
 }: {
-  items: LandingCatalogItem[];
+  items: PodborkiCatalogItem[];
   city: string;
   cities: PublicDestinationDto[];
-  tags: Array<{ name: string; events: number }>;
+  categories: PodborkiCategoryMeta[];
   totalEvents: number;
+  /** SSR SEO H1 override (pilot city meta). */
+  heroTitle?: string;
+  heroDescription?: string;
 }) {
-  const router = useRouter();
-  const citySlug = resolveCitySlug(cities, city);
-  const cityName = resolveCityName(cities, city);
-  const pickerValue = citySlug === 'all' ? 'all' : cityName;
+  useEffect(() => {
+    document.documentElement.dataset.podborkiHydrated = '1';
+    return () => { delete document.documentElement.dataset.podborkiHydrated; };
+  }, []);
 
-  const handleCityChange = (value: string) => {
-    if (value === 'all') {
-      router.push('/podborki');
+  const urlSearchParams = useSearchParams();
+  const pathname = usePathname();
+  const selectedCity = useSelectedCityOptional();
+  const pathCity = parsePodborkiCityHubPath(pathname)?.trim() || '';
+  const urlCity = urlSearchParams.get('city')?.trim() || '';
+  const urlCityIsAll = !pathCity && urlCity.toLowerCase() === 'all';
+  const cityReady = selectedCity?.cityReady ?? true;
+  const geoBootstrapPending = selectedCity?.geoBootstrapPending ?? false;
+  /** Wait for storage resolve when URL has no city - avoids national flash then city. */
+  const cityBootstrapPending = !pathCity && !urlCity && Boolean(selectedCity) && !cityReady;
+
+  const headerCityFilter =
+    cityReady && selectedCity && selectedCity.cityValue !== 'all'
+      ? selectedCity.selectedDestination?.slug ||
+        selectedCity.selectedDestination?.sourceSlug ||
+        selectedCity.cityValue
+      : '';
+
+  // Marker CHPU path wins; then soft ?city=; then header / SSR initial.
+  const cityRaw = pathCity
+    ? pathCity
+    : urlCity && !urlCityIsAll
+      ? urlCity
+      : headerCityFilter || initialCity || 'all';
+  const citySlug = resolveCitySlug(cities, cityRaw === 'all' ? 'all' : cityRaw);
+  const cityName = resolveCityName(cities, cityRaw === 'all' ? 'all' : cityRaw);
+  const citySelected = citySlug !== 'all';
+  const needsCityGate =
+    !cityBootstrapPending &&
+    !geoBootstrapPending &&
+    cityReady &&
+    !pathCity &&
+    (urlCityIsAll || !citySelected);
+  const apiCityParam = citySelected
+    ? (cityName !== 'all' ? cityName : citySlug)
+    : '';
+
+  const [cityScopedItems, setCityScopedItems] = useState<PodborkiCatalogItem[] | null>(null);
+  const [cityCatalogLoading, setCityCatalogLoading] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<PodborkiCategorySlug | null>(null);
+  const [activeTag, setActiveTag] = useState<PodborkiTagId | null>(null);
+
+  useEffect(() => {
+    if (!citySelected || !apiCityParam) {
+      setCityScopedItems(null);
+      setCityCatalogLoading(false);
       return;
     }
-    const next = cities.find((item) => item.name === value);
-    const slug = next?.slug || value;
-    router.push(`/podborki?city=${encodeURIComponent(slug)}`);
+
+    const controller = new AbortController();
+    setCityCatalogLoading(true);
+    const params = new URLSearchParams({ city: apiCityParam });
+
+    fetch(`/api/public/landings-catalog?${params}`, { signal: controller.signal })
+      .then((response) => (response.ok ? response.json() : null))
+      .then(
+        (
+          payload: {
+            items?: Array<{
+              slug: string;
+              title: string;
+              subtitle?: string | null;
+              events: number;
+              priceFrom?: number | null;
+            }>;
+          } | null,
+        ) => {
+          if (!payload?.items) return;
+          const metaBySlug = new Map(initialItems.map((item) => [item.slug, item]));
+          const mapped: PodborkiCatalogItem[] = payload.items
+            .filter((item) => isLandingInSelection(item.slug))
+            .map((item) => {
+            const meta = metaBySlug.get(item.slug);
+            return {
+              slug: item.slug,
+              title: item.title,
+              subtitle: item.subtitle ?? meta?.subtitle ?? null,
+              events: item.events,
+              priceFrom: item.priceFrom ?? meta?.priceFrom ?? null,
+              layoutVariant: meta?.layoutVariant ?? null,
+              categorySlug: meta?.categorySlug ?? null,
+            };
+          });
+          setCityScopedItems(mergePodborkiCityCatalogItems(initialItems, mapped, citySlug));
+        },
+      )
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === 'AbortError') return;
+        // Keep multi-city landings (concerts/standup/…) visible; do not collapse to city-bound only.
+        setCityScopedItems(
+          initialItems.filter((item) => landingMatchesCatalogCity(item.slug, citySlug, { events: item.events })),
+        );
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setCityCatalogLoading(false);
+      });
+
+    return () => controller.abort();
+  }, [apiCityParam, citySelected, citySlug, initialItems]);
+
+  const cityItems = useMemo(() => {
+    const base = (() => {
+      if (!citySelected) return initialItems;
+      if (cityScopedItems) return cityScopedItems;
+      // While city catalog loads: show multi+bound landings allowed for this city (not bound-only).
+      return initialItems.filter((item) =>
+        landingMatchesCatalogCity(item.slug, citySlug, { events: item.events }),
+      );
+    })();
+    return filterInSeasonLandings(base);
+  }, [cityScopedItems, citySelected, citySlug, initialItems]);
+
+  const categoryMeta = categories.length ? categories : undefined;
+  const sections = useMemo(
+    () => groupPodborkiByCategory(cityItems, categoryMeta),
+    [categoryMeta, cityItems],
+  );
+
+  // Default tab is «Все» (null). Never auto-pick the first sense-block:
+  // with Moscow City Day, «Сезонное» floats first and only has 1-3 landings,
+  // which emptied the grid and left «В тренде» with a single row.
+  useEffect(() => {
+    setActiveCategory((prev) => {
+      if (prev == null) return null;
+      if (sections.some((section) => section.slug === prev)) return prev;
+      return null;
+    });
+  }, [sections]);
+
+  const resolvedCategory =
+    activeCategory && sections.some((s) => s.slug === activeCategory) ? activeCategory : null;
+
+  const categoryTags: readonly PodborkiTagMeta[] = resolvedCategory
+    ? PODBORKI_CATEGORY_TAGS[resolvedCategory]
+    : PODBORKI_ALL_TAB_TAGS;
+
+  useEffect(() => {
+    setActiveTag(null);
+  }, [resolvedCategory]);
+
+  const categoryItems = useMemo(() => {
+    if (!resolvedCategory) return cityItems;
+    return cityItems.filter(
+      (item) => resolvePodborkiCategorySlug(item.slug, item.categorySlug) === resolvedCategory,
+    );
+  }, [cityItems, resolvedCategory]);
+
+  const visibleTags = useMemo(
+    () => categoryTags.filter((tag) => categoryItems.some((item) => landingMatchesTag(item, tag.id))),
+    [categoryItems, categoryTags],
+  );
+
+  const items = useMemo(
+    () => filterPodborkiByTag(categoryItems, activeTag),
+    [activeTag, categoryItems],
+  );
+
+  useEffect(() => {
+    if (activeTag && !visibleTags.some((tag) => tag.id === activeTag)) {
+      setActiveTag(null);
+    }
+  }, [activeTag, visibleTags]);
+
+  // Hero roles always come from the full city catalog so «В тренде» stays 3-5
+  // even when a narrow tab (e.g. Сезонное) is selected. Grid still follows tab+tag.
+  const featured = pickPodborkiFeatured(cityItems);
+  const trending = pickPodborkiTrending(cityItems, featured?.slug, TRENDING_LIMIT);
+  const featuredImage = featured ? resolveLandingCardImage(featured.slug, citySelected ? citySlug : null) : null;
+  const featuredHref = featured
+    ? landingCategoryHref(featured.slug, citySelected ? citySlug : undefined)
+    : '/events';
+
+  const gridItems = useMemo(() => {
+    // Only drop the featured tile (already huge above). Trending stays in the grid
+    // so the catalog still lists every landing for the city / active tab.
+    if (!featured) return items;
+    return items.filter((item) => item.slug !== featured.slug);
+  }, [featured, items]);
+
+  const activeSection = sections.find((section) => section.slug === resolvedCategory) ?? null;
+  const allTabCount = cityItems.length;
+
+  const toggleTag = (id: PodborkiTagId) => {
+    setActiveTag((prev) => (prev === id ? null : id));
   };
+
+  if (cityBootstrapPending) {
+    return (
+      <div className="container-page py-10 sm:py-14" aria-busy="true" aria-label="Загрузка подборок">
+        <div className="h-48 animate-pulse rounded-3xl bg-slate-200/80" />
+      </div>
+    );
+  }
+
+  if (needsCityGate) {
+    return (
+      <div className="container-page py-8 sm:py-10">
+        <CatalogCityGate
+          dataAttr="podborki"
+          title="Выберите город"
+          subtitle="Покажем готовые подборки и билеты только для вашего города - без мешанины из других регионов."
+        />
+      </div>
+    );
+  }
 
   return (
     <>
-      <SectionPageHero
-        breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Подборки' }]}
-        gradientClass="from-fuchsia-500 via-primary to-indigo-700"
-        eyebrow={
-          <p className="inline-flex items-center gap-1.5 text-sm font-semibold uppercase tracking-wider text-white/80">
-            <Sparkles className="h-4 w-4" />
-            Тематические подборки
-          </p>
+      <HeroLayout
+        variant="minimal"
+        title={heroTitle || 'Готовые планы на вечер и выходные'}
+        description={
+          heroDescription ||
+          'Подборки под настроение: для двоих, с детьми, бюджетно или культурно - сразу к билетам.'
         }
-        title="Подборки событий"
-        description="Готовые списки под настроение и повод: вечер, выходные, бюджет или редкие премьеры."
-      />
-
-      <main className="container-page bg-slate-50 py-10 sm:py-12">
-        <section>
-          <h2 className="font-display text-xl font-bold text-slate-900">Быстрые подборки</h2>
-          <div className="mt-3 flex flex-nowrap gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {CATALOG_PRESETS.map((preset) => (
-              <Link
-                key={preset.slug}
-                href={buildCatalogPresetHref(preset.slug, citySlug !== 'all' ? citySlug : undefined)}
-                className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm transition hover:border-primary/40 hover:bg-primary/5 hover:text-primary-700"
+      >
+        {sections.length ? (
+          <div className="mt-5 space-y-3">
+            <div
+              className="flex flex-wrap items-center gap-2"
+              role="group"
+              aria-label="Категории подборок"
+            >
+              <button
+                type="button"
+                onClick={() => setActiveCategory(null)}
+                aria-pressed={resolvedCategory == null}
+                className={
+                  resolvedCategory == null
+                    ? 'inline-flex items-center rounded-full bg-slate-900 px-3.5 py-2 text-sm font-semibold text-white shadow-sm transition'
+                    : 'inline-flex items-center rounded-full bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50'
+                }
               >
-                <span className="text-base leading-none" aria-hidden>
-                  {preset.emoji}
-                </span>
-                {preset.label}
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        <section className="mt-12">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            <div className="min-w-0">
-              <h2 className="font-display flex items-center gap-2 text-xl font-bold text-slate-900">
-                <Sparkles className="h-5 w-5 text-primary" />
-                Популярные запросы
-              </h2>
-              <p className="mt-1 text-sm text-slate-500">
-                Речные прогулки, развод мостов, стендап, автобусные экскурсии и тематические подборки — выберите город
-                для актуального списка.
-              </p>
-            </div>
-            <div className="w-full shrink-0 sm:w-auto sm:min-w-[220px]">
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-                <CityPicker
-                  cities={cities}
-                  value={pickerValue}
-                  onChange={handleCityChange}
-                  variant="compact"
-                  className="w-full"
-                />
-              </div>
-            </div>
-          </div>
-          {items.length ? (
-            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {items.map((landing) => (
-                <LandingDirectionCard key={landing.slug} landing={landing} citySlug={citySlug} />
-              ))}
-            </div>
-          ) : (
-            <div className="mt-4 rounded-2xl border border-dashed border-slate-300 bg-white py-12 text-center">
-              <p className="text-lg text-slate-500">
-                {citySlug === 'all'
-                  ? 'Популярные запросы скоро появятся'
-                  : `В ${cityName} пока нет подборок с событиями`}
-              </p>
-              <p className="mt-1 text-sm text-slate-400">
-                {citySlug === 'all'
-                  ? 'Пока доступны быстрые фильтры и теги ниже'
-                  : 'Попробуйте другой город или смотрите каталог целиком'}
-              </p>
-            </div>
-          )}
-        </section>
-
-        {tags.length ? (
-          <section className="mt-12">
-            <h2 className="font-display text-xl font-bold text-slate-900">По тегам</h2>
-            <p className="mt-1 text-sm text-slate-500">Уточните тему — откроется каталог с фильтром по тегу</p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {tags.map((tag) => (
-                <Link
-                  key={tag.name}
-                  href={buildCatalogTagHref(tag.name, citySlug !== 'all' ? citySlug : undefined)}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:border-primary/40 hover:text-primary-700"
+                Все
+                <span
+                  className={
+                    resolvedCategory == null
+                      ? 'ml-1.5 text-xs font-medium text-white/70'
+                      : 'ml-1.5 text-xs font-medium text-slate-400'
+                  }
                 >
-                  #{tag.name}
-                  <span className="text-xs text-slate-400">{formatNumber(tag.events)}</span>
-                </Link>
-              ))}
+                  {allTabCount}
+                </span>
+              </button>
+              {sections.map((section) => {
+                const active = section.slug === resolvedCategory;
+                return (
+                  <button
+                    key={section.slug}
+                    type="button"
+                    onClick={() => setActiveCategory(section.slug)}
+                    aria-pressed={active}
+                    className={
+                      active
+                        ? 'inline-flex items-center rounded-full bg-slate-900 px-3.5 py-2 text-sm font-semibold text-white shadow-sm transition'
+                        : 'inline-flex items-center rounded-full bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50'
+                    }
+                  >
+                    {section.title}
+                    <span
+                      className={
+                        active
+                          ? 'ml-1.5 text-xs font-medium text-white/70'
+                          : 'ml-1.5 text-xs font-medium text-slate-400'
+                      }
+                    >
+                      {section.items.length}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
-          </section>
+
+            {visibleTags.length ? (
+              <div
+                className="flex flex-wrap items-center gap-2 border-t border-slate-200/80 pt-3"
+                role="group"
+                aria-label="Фильтры подборки"
+              >
+                {visibleTags.map((tag) => {
+                  const active = activeTag === tag.id;
+                  return (
+                    <button
+                      key={tag.id}
+                      type="button"
+                      onClick={() => toggleTag(tag.id)}
+                      aria-pressed={active}
+                      className={
+                        active
+                          ? 'inline-flex items-center rounded-full bg-slate-200 px-3 py-1.5 text-sm font-medium text-slate-900 transition'
+                          : 'inline-flex items-center rounded-full bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-200/80 hover:text-slate-800'
+                      }
+                    >
+                      {tag.label}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
+          </div>
         ) : null}
 
-        <p className="mt-12 text-sm text-slate-500">
-          Всего в каталоге{' '}
-          <span className="font-semibold text-slate-900">{formatNumber(totalEvents)}</span> событий. Ищите подходящее
-          по фильтрам в{' '}
+        <div
+          className={
+            trending.length
+              ? 'mt-6 grid w-full items-stretch gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(14rem,1fr)] lg:gap-5'
+              : 'mt-6'
+          }
+        >
+          {featured ? (
+            <Link
+              href={featuredHref}
+              className="group flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-900/10"
+            >
+              <div className="relative flex min-h-[14rem] flex-1 flex-col justify-end overflow-hidden bg-slate-900 sm:min-h-[16rem]">
+                {featuredImage ? (
+                  <SafeImage
+                    src={featuredImage}
+                    alt=""
+                    fill
+                    priority
+                    sizes={IMAGE_SIZES.landingBanner}
+                    className="object-cover transition-transform duration-700 group-hover:scale-[1.08]"
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary-700 via-sky-700 to-cyan-950" />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-900/35 to-transparent" />
+                <div className="relative z-10 flex flex-col gap-3 p-5">
+                  <span className="font-display text-2xl font-extrabold leading-tight text-white sm:text-3xl">
+                    {featured.title}
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-sm font-semibold text-white">
+                    Смотреть
+                    <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+                  </span>
+                </div>
+              </div>
+              <p className="mt-auto shrink-0 px-3 py-2 text-xs text-slate-500">
+                {featuredMetaLine(featured)}
+              </p>
+            </Link>
+          ) : (
+            <div className="flex min-h-[12rem] h-full items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white px-6 text-center text-sm text-slate-500">
+              {cityCatalogLoading
+                ? 'Подбираем подборки по городу…'
+                : citySelected
+                  ? EMPTY_CITY_COPY.title
+                  : activeTag
+                    ? 'Нет подборок под этот фильтр - снимите тег или выберите другой.'
+                    : 'Подборки скоро появятся'}
+            </div>
+          )}
+
+          {trending.length ? (
+            <div className="flex h-full min-h-[14rem] flex-col justify-center self-stretch rounded-2xl border border-slate-200 bg-white px-5 py-5 shadow-sm sm:min-h-[16rem]">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">В тренде</p>
+              <ul className="w-full space-y-2">
+                {trending.map((item, index) => (
+                  <li key={item.slug}>
+                    <Link
+                      href={landingCategoryHref(item.slug, citySelected ? citySlug : undefined)}
+                      className="flex items-start gap-2.5 rounded-xl px-2.5 py-2 transition hover:bg-slate-50"
+                    >
+                      <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-600">
+                        {index + 1}
+                      </span>
+                      <span className="min-w-0">
+                        <span className="truncate text-sm font-semibold text-slate-900">{item.title}</span>
+                        <span className="block text-xs text-slate-500">{pluralEvents(item.events)}</span>
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+        </div>
+      </HeroLayout>
+
+      <div className="container-page bg-slate-50 py-8 sm:py-10">
+        {gridItems.length ? (
+          <section>
+            {activeSection?.subtitle ? (
+              <p className="mb-4 text-sm text-slate-500">{activeSection.subtitle}</p>
+            ) : null}
+            <ul className={PODBORKI_BENTO_GRID_CLASS}>
+              {gridItems.map((landing) => {
+                const span = podborkiBentoSpan(landing);
+                return (
+                  <li key={landing.slug} className={podborkiBentoCellClass(span)}>
+                    <LandingDirectionCard
+                      landing={landing}
+                      citySlug={citySlug}
+                      featured={span === 2}
+                    />
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        ) : (
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-white py-12 text-center">
+            <p className="text-lg text-slate-600">
+              {cityCatalogLoading
+                ? 'Подбираем подборки по городу…'
+                : activeTag
+                  ? 'Нет подборок под этот фильтр'
+                  : resolvedCategory && items.length > 0
+                    ? 'Подборки этой категории уже в блоке выше'
+                    : citySelected && !cityItems.length
+                      ? EMPTY_CITY_COPY.title
+                      : 'Популярные запросы скоро появятся'}
+            </p>
+            <p className="mt-1 text-sm text-slate-400">
+              {cityCatalogLoading
+                ? 'Считаем события в выбранном городе'
+                : activeTag
+                  ? 'Снимите тег или выберите другой'
+                  : resolvedCategory && items.length > 0
+                    ? 'Или откройте вкладку «Все», чтобы увидеть полный каталог'
+                    : citySelected && !cityItems.length
+                      ? EMPTY_CITY_COPY.hint
+                      : 'Пока доступны фильтры выше'}
+            </p>
+            {activeTag || resolvedCategory ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTag(null);
+                  setActiveCategory(null);
+                }}
+                className="mt-4 inline-flex rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white"
+              >
+                {activeTag ? 'Сбросить фильтр' : 'Показать все подборки'}
+              </button>
+            ) : null}
+          </div>
+        )}
+
+        <div className="mt-12 rounded-2xl border border-slate-200 bg-white px-4 py-5 shadow-sm sm:px-6">
+          <h2 className="font-display text-base font-bold text-slate-900 sm:text-lg">
+            Как выбирать подборку на Дайбилете
+          </h2>
+          <ExpandableBlurb
+            text={PODBORKI_SEO_TEXT}
+            className="mt-2 text-sm leading-relaxed text-slate-600"
+            clampClassName="line-clamp-3 md:line-clamp-none"
+            moreLabel="Развернуть"
+            lessLabel="Свернуть"
+            buttonClassName="mt-2 text-sm font-semibold text-primary-700 underline-offset-2 hover:underline md:hidden"
+          />
+        </div>
+
+        <p className="mt-8 text-sm text-slate-500">
+          Всего в каталоге <span className="font-semibold text-slate-900">{formatNumber(totalEvents)}</span> событий. Ищите
+          подходящее по фильтрам в{' '}
           <Link href="/events" className="font-medium text-primary-600 hover:text-primary-700">
             каталоге
           </Link>
           .
         </p>
-      </main>
+      </div>
     </>
   );
 }

@@ -14,6 +14,7 @@ export type PurchaseSession = {
   eventSourceStatus?: string | null;
   purchaseProvider?: string | null;
   offerSourceCode?: string | null;
+  kind?: string | null;
   startsAt?: string | null;
   dateLabel?: string | null;
   timeLabel?: string | null;
@@ -34,17 +35,20 @@ export function extractTcEventIdFromSession(session: {
   eventId?: string | null;
   purchaseUrl?: string | null;
 }) {
+  // Prefer session/event id: meta-group siblings may inherit a sibling's offer widget URL
+  // (same ?event=), which would collapse distinct slots to one TicketsCloud id.
+  const raw = String(session.eventId || session.id || '').trim();
+  const fromId = raw.match(/^(?:evt_|sess_)?([a-f0-9]{20,})$/i);
+  if (fromId) return fromId[1];
+
   const purchaseUrl = String(session.purchaseUrl || '');
   const fromTcQuery = purchaseUrl.match(/[?&]event=([^&]+)/)?.[1];
   if (fromTcQuery) return decodeURIComponent(fromTcQuery);
 
-  const fromTepPath = purchaseUrl.match(/teplohod\.info\/event\/(\d+)/i)?.[1];
-  if (fromTepPath) return fromTepPath;
+  // Teplohod ids must not be treated as TicketsCloud event ids (breaks landings /events buy).
+  if (/teplohod\.info/i.test(purchaseUrl)) return null;
+  if (/^evt_tep_/i.test(raw)) return null;
 
-  const fromTepId = String(session.eventId || session.id || '').match(/^evt_tep_(\d+)$/i)?.[1];
-  if (fromTepId) return fromTepId;
-
-  const raw = String(session.eventId || session.id || '').trim();
   const match = raw.match(/^(?:evt_|sess_)?([a-f0-9]+)$/i);
   return match ? match[1] : raw || null;
 }
@@ -52,18 +56,42 @@ export function extractTcEventIdFromSession(session: {
 function isTeplohodPurchaseSession(session: PurchaseSession): boolean {
   const purchaseUrl = String(session.purchaseUrl || session.widgetUrl || '');
   const provider = String(session.purchaseProvider || session.offerSourceCode || '').toUpperCase();
-  return provider.includes('TEPLOHOD') || provider.includes('TEP') || purchaseUrl.includes('teplohod.info');
+  return (
+    provider.includes('TEPLOHOD') ||
+    provider.includes('TEP') ||
+    purchaseUrl.includes('teplohod.info') ||
+    /^evt_tep_/i.test(String(session.id || session.eventId || ''))
+  );
+}
+
+export function isStartedTcSession(
+  session: PurchaseSession,
+  nowMs = Date.now(),
+  fallbackProvider?: string | null,
+): boolean {
+  const provider = String(session.purchaseProvider || session.offerSourceCode || fallbackProvider || '').toUpperCase();
+  const url = String(session.purchaseUrl || session.widgetUrl || '');
+  if (!provider.includes('TICKETSCLOUD') && provider !== 'TC' && !/ticketscloud/i.test(url)) return false;
+  if (String(session.kind || '').toUpperCase() === 'OPEN_DATE') return false;
+  if (['open_date', 'widget'].includes(String(session.sourceStatus || '').toLowerCase())) return false;
+  const startMs = session.startsAt ? Date.parse(session.startsAt) : NaN;
+  return Number.isFinite(startMs) && startMs < nowMs;
 }
 
 export function isSessionPurchaseBlocked(session: PurchaseSession): boolean {
+  if (isStartedTcSession(session)) return true;
   const statuses = [session.sourceStatus, session.eventSourceStatus].map((value) =>
     String(value || '').toLowerCase(),
   );
-  if (statuses.some((status) => ['paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden'].includes(status))) {
+  if (statuses.some((status) =>
+    ['paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden', 'stand_by', 'closed', 'sales_closed', 'sale_closed', 'not_for_sale', 'widget_blocked'].includes(status),
+  )) {
     return true;
   }
   if (session.purchaseReady === false) return true;
-  if (isTeplohodPurchaseSession(session) && Boolean(session.purchaseUrl || session.widgetUrl)) return false;
+  if (isTeplohodPurchaseSession(session) && Boolean(session.purchaseUrl || session.widgetUrl || /^evt_tep_/i.test(String(session.id || session.eventId || '')))) {
+    return false;
+  }
   if (session.vacant === 0) return true;
   if (!session.purchaseUrl && session.purchaseReady !== true) return true;
   return false;
@@ -114,10 +142,23 @@ export function pickPurchasableTcSession<T extends PurchaseSession>(sessions: T[
   return null;
 }
 
+/** First day key that still has a buyable slot; else first day (all closed). */
+export function pickDefaultSessionDayKey<T extends PurchaseSession & { dateLabel?: string | null }>(
+  days: Array<{ key: string; sessions: T[] }>,
+): string {
+  if (!days.length) return '';
+  for (const day of days) {
+    if (day.sessions.some((session) => !isSessionPurchaseBlocked(session))) {
+      return day.key;
+    }
+  }
+  return days[0]?.key || '';
+}
+
 export function listPurchasableSessionVariants<T extends PurchaseSession>(sessions: T[]): T[] {
   const expanded = sessions.flatMap((session) => expandSessionPurchaseVariants(session));
-  const purchasable = expanded.filter((session) => !isSessionPurchaseBlocked(session));
-  return purchasable.length ? purchasable : expanded;
+  // Never fall back to STAND_BY/closed/paused slots - empty rail is better than a dead CTA.
+  return expanded.filter((session) => !isSessionPurchaseBlocked(session));
 }
 
 export function buildTcPurchaseTargets(sessions: PurchaseSession[]): TcPurchaseTarget[] {
@@ -148,6 +189,32 @@ export function pickRepresentativeSession<T extends PurchaseSession>(sessions: T
   return pickPurchasableTcSession(ranked) || ranked[0] || sessions[0];
 }
 
+/** Event-level cancel / all sessions unsaleable → do not open TC widget. */
+export function isEventPurchaseBlocked(
+  event: {
+    sourceStatus?: string | null;
+    purchaseReady?: boolean;
+    purchaseUrl?: string | null;
+    widgetUrl?: string | null;
+  },
+  sessions: PurchaseSession[],
+): boolean {
+  if (
+    isSessionPurchaseBlocked({
+      sourceStatus: event.sourceStatus,
+      eventSourceStatus: event.sourceStatus,
+      purchaseReady: event.purchaseReady,
+      purchaseUrl: event.purchaseUrl || event.widgetUrl,
+    })
+  ) {
+    return true;
+  }
+
+  const expanded = sessions.flatMap((session) => expandSessionPurchaseVariants(session));
+  if (!expanded.length) return false;
+  return !expanded.some((session) => !isSessionPurchaseBlocked(session));
+}
+
 export function resolveTcPurchaseTarget(
   event: {
     externalId?: string | number | null;
@@ -155,6 +222,8 @@ export function resolveTcPurchaseTarget(
     widgetUrl?: string | null;
     deeplinkUrl?: string | null;
     widgetProvider?: string | null;
+    sourceStatus?: string | null;
+    purchaseReady?: boolean;
     widgetPayload?: { provider?: string | null; tcEventId?: string | number | null } | null;
   },
   sessions: PurchaseSession[],
@@ -165,36 +234,44 @@ export function resolveTcPurchaseTarget(
   isTcWidget: boolean;
   purchaseTargets: TcPurchaseTarget[];
 } {
+  // Stale event-level widget URL must not open TC when sales are gone/cancelled.
+  if (isEventPurchaseBlocked(event, sessions)) {
+    return {
+      tcEventId: null,
+      purchaseUrl: null,
+      isTcWidget: false,
+      purchaseTargets: [],
+    };
+  }
+
   const purchaseTargets = buildTcPurchaseTargets(sessions);
   const primaryTarget = purchaseTargets[0] || null;
-  const purchasableSession = pickPurchasableTcSession(sessions.flatMap((session) => expandSessionPurchaseVariants(session)));
+  const purchasableSession = pickPurchasableTcSession(
+    sessions.flatMap((session) => expandSessionPurchaseVariants(session)),
+  );
   const ticketscloud = resolveTcWidgetIds(event);
   const tcEventId =
     primaryTarget?.tcEventId ||
     (purchasableSession ? extractTcEventIdFromSession(purchasableSession) : null) ||
-    ticketscloud?.tcEventId ||
-    extractTcEventIdFromSession(sessions[0] || {}) ||
+    (purchasableSession ? ticketscloud?.tcEventId : null) ||
     null;
   const purchaseUrl =
     primaryTarget?.purchaseUrl ||
     purchasableSession?.purchaseUrl ||
-    primaryOffer?.widgetUrl ||
-    primaryOffer?.deeplinkUrl ||
-    event.purchaseUrl ||
-    event.widgetUrl ||
-    event.deeplinkUrl ||
-    sessions[0]?.purchaseUrl ||
+    (purchasableSession
+      ? primaryOffer?.widgetUrl ||
+        primaryOffer?.deeplinkUrl ||
+        event.purchaseUrl ||
+        event.widgetUrl ||
+        event.deeplinkUrl
+      : null) ||
     null;
 
   return {
     tcEventId,
     purchaseUrl,
     isTcWidget: Boolean(ticketscloud && tcEventId),
-    purchaseTargets: purchaseTargets.length
-      ? purchaseTargets
-      : tcEventId
-        ? [{ tcEventId, purchaseUrl }]
-        : [],
+    purchaseTargets,
   };
 }
 

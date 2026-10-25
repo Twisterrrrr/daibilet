@@ -1,49 +1,38 @@
-import Link from 'next/link';
-import { BookOpen } from 'lucide-react';
-
-import { BlogListFiltered } from '@/components/BlogListFiltered.client';
-import { SectionPageHero } from '@/components/PageBreadcrumbs';
+import { BlogListingBody } from '@/components/BlogListingBody.client';
 import { SiteLayout } from '@/components/SiteLayout';
+import type { BlogSidebarPromoDto } from '@/lib/blog-sidebar-promo';
 import type { BlogCardDto } from '@/lib/blog-utils';
+import type { BreadcrumbItem } from '@/components/PageBreadcrumbs';
 
 export type BlogListFilters = {
   city?: string;
   author?: string;
+  topic?: string;
+  q?: string;
 };
 
 export function BlogListView({
   posts,
   filters,
+  hotMinPrices = {},
+  afishaPromos = {},
 }: {
   posts: BlogCardDto[];
   filters?: BlogListFilters;
+  hotMinPrices?: Record<string, number>;
+  afishaPromos?: Record<string, BlogSidebarPromoDto>;
 }) {
+  const breadcrumbs: BreadcrumbItem[] = [{ label: 'Главная', href: '/' }, { label: 'Блог' }];
+
   return (
     <SiteLayout>
-      <SectionPageHero
-        breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Блог' }]}
-        gradientClass="from-amber-500 via-rose-500 to-primary-700"
-        eyebrow={
-          <p className="inline-flex items-center gap-1.5 text-sm font-semibold uppercase tracking-wider text-white/85">
-            <BookOpen className="h-4 w-4" />
-            Блог Дайбилет
-          </p>
-        }
-        title="Гайды, обзоры и советы"
-        description="Как выбирать события, где сидеть, куда идти с детьми и что послушать в этом сезоне."
+      <BlogListingBody
+        posts={posts}
+        breadcrumbs={breadcrumbs}
+        initialFilters={filters}
+        hotMinPrices={hotMinPrices}
+        afishaPromos={afishaPromos}
       />
-
-      <main className="container-page py-10 sm:py-12">
-        <BlogListFiltered posts={posts} initialFilters={filters} />
-
-        <p className="mt-10 text-sm text-slate-500">
-          Новые материалы выходят каждую неделю. А готовые списки событий — в{' '}
-          <Link href="/podborki" className="font-medium text-primary-600 hover:text-primary-700">
-            подборках
-          </Link>
-          .
-        </p>
-      </main>
     </SiteLayout>
   );
 }

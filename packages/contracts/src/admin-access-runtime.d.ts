@@ -10,6 +10,8 @@ export const ADMIN_PERMISSIONS: readonly [
 export const ADMIN_ROLES: readonly [
   'SUPERADMIN', 'PRODUCT', 'SUPPORT', 'FINANCE', 'CATALOG_EDITOR', 'COPYWRITER', 'SEO', 'INTEGRATIONS', 'AUDITOR'
 ];
+export const ADMIN_MFA_REQUIRED_PERMISSIONS: readonly string[];
 export const ADMIN_ROLE_PERMISSIONS: Readonly<Record<(typeof ADMIN_ROLES)[number], readonly (typeof ADMIN_PERMISSIONS)[number][]>>;
 export function resolveAdminPermissions(roles: readonly string[]): ReadonlySet<(typeof ADMIN_PERMISSIONS)[number]>;
+export function resolveAdminSessionPermissions(roles: readonly string[], mfaVerified?: boolean): ReadonlySet<(typeof ADMIN_PERMISSIONS)[number]>;
 export function adminRoleAllows(roles: readonly string[], permission: string): boolean;

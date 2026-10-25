@@ -1,0 +1,3515 @@
+{
+  "date": "2026-10-09",
+  "scope": "70 city hubs, including hidden must-see categories and suburb rails",
+  "issues": 105,
+  "restored": 27,
+  "generated": 78,
+  "byCity": {
+    "chelyabinsk": 10,
+    "krasnoyarsk": 6,
+    "omsk": 8,
+    "penza": 7,
+    "saratov": 5,
+    "tver": 5,
+    "tyumen": 10,
+    "ufa": 9,
+    "volgograd": 7,
+    "yaroslavl": 14,
+    "ryazan": 7,
+    "kaliningrad": 2,
+    "rostov-na-donu": 6,
+    "sochi": 8,
+    "novosibirsk": 1
+  },
+  "images": [
+    {
+      "id": "s31",
+      "city": "chelyabinsk",
+      "subject": "taganay-usadba",
+      "defect": "upside_down",
+      "before": "/images/venues/chelyabinsk/taganay-usadba.jpg",
+      "after": "/images/venues/chelyabinsk/taganay-usadba-r20261009.jpg",
+      "action": "restored",
+      "sha256": "37b0e6032e030e8d7f00b36adc1518ce98bedec8d99affee13beca7d0dc8abd5",
+      "restoredFrom": "1c236b9100a0c4405149a5b5f22470b4480643f8",
+      "variants": [
+        {
+          "path": "/images/venues/chelyabinsk/taganay-usadba-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 276986
+        },
+        {
+          "path": "/images/venues/chelyabinsk/taganay-usadba-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 99349
+        },
+        {
+          "path": "/images/venues/chelyabinsk/taganay-usadba-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 22570
+        }
+      ]
+    },
+    {
+      "id": "s36",
+      "city": "chelyabinsk",
+      "subject": "turgoyak-plyazh",
+      "defect": "upside_down",
+      "before": "/images/venues/chelyabinsk/turgoyak-plyazh.jpg",
+      "after": "/images/venues/chelyabinsk/turgoyak-plyazh-r20261009.jpg",
+      "action": "restored",
+      "sha256": "11e940216a4fc001c7b11ff9c2498424d91c379adcdf5d7155cf6eeff8b7066b",
+      "restoredFrom": "1c236b9100a0c4405149a5b5f22470b4480643f8",
+      "variants": [
+        {
+          "path": "/images/venues/chelyabinsk/turgoyak-plyazh-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 305004
+        },
+        {
+          "path": "/images/venues/chelyabinsk/turgoyak-plyazh-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 114160
+        },
+        {
+          "path": "/images/venues/chelyabinsk/turgoyak-plyazh-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 27065
+        }
+      ]
+    },
+    {
+      "id": "s50",
+      "city": "chelyabinsk",
+      "subject": "zyuratkul-reka-bolshaya-satka",
+      "defect": "upside_down",
+      "before": "/images/venues/chelyabinsk/zyuratkul-reka-bolshaya-satka.jpg",
+      "after": "/images/venues/chelyabinsk/zyuratkul-reka-bolshaya-satka-r20261009.jpg",
+      "action": "restored",
+      "sha256": "aafc650afe43e3fb6000307db08f8ae60e53df82b17c7fc9f52ae36a3ca9ea24",
+      "restoredFrom": "1c236b9100a0c4405149a5b5f22470b4480643f8",
+      "variants": [
+        {
+          "path": "/images/venues/chelyabinsk/zyuratkul-reka-bolshaya-satka-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 334320
+        },
+        {
+          "path": "/images/venues/chelyabinsk/zyuratkul-reka-bolshaya-satka-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 123638
+        },
+        {
+          "path": "/images/venues/chelyabinsk/zyuratkul-reka-bolshaya-satka-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 27908
+        }
+      ]
+    },
+    {
+      "id": "s143",
+      "city": "krasnoyarsk",
+      "subject": "Административная площадь",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/krasnoyarsk/administrativnaya-ploschad.jpg",
+      "after": "/images/venues/krasnoyarsk/administrativnaya-ploschad-r20261009.jpg",
+      "action": "generated",
+      "sha256": "31c941b39e081cc3d6a60f8417fbdc440b8fa5e23f86a2513b16e8feaebf7e1b",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Административная площадь, in or near krasnoyarsk, Russia. Scene information from the guide: Центральная площадь Дивногорска.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/krasnoyarsk/administrativnaya-ploschad.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/krasnoyarsk/administrativnaya-ploschad-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 377933
+        },
+        {
+          "path": "/images/venues/krasnoyarsk/administrativnaya-ploschad-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 135040
+        },
+        {
+          "path": "/images/venues/krasnoyarsk/administrativnaya-ploschad-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 32779
+        }
+      ]
+    },
+    {
+      "id": "s144",
+      "city": "krasnoyarsk",
+      "subject": "Дивногорская набережная",
+      "defect": "upside_down",
+      "before": "/images/venues/krasnoyarsk/divnogorskaya-naberezhnaya.jpg",
+      "after": "/images/venues/krasnoyarsk/divnogorskaya-naberezhnaya-r20261009.jpg",
+      "action": "generated",
+      "sha256": "c6c80d0a180f2b96d2dd6f01cc1239e276ac1df20d7ed4c60d43394c3c58f35f",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Дивногорская набережная, in or near krasnoyarsk, Russia. Scene information from the guide: Променад вдоль Енисея с видами на скалы.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/krasnoyarsk/divnogorskaya-naberezhnaya.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/krasnoyarsk/divnogorskaya-naberezhnaya-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 363344
+        },
+        {
+          "path": "/images/venues/krasnoyarsk/divnogorskaya-naberezhnaya-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 127752
+        },
+        {
+          "path": "/images/venues/krasnoyarsk/divnogorskaya-naberezhnaya-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 31175
+        }
+      ]
+    },
+    {
+      "id": "s146",
+      "city": "krasnoyarsk",
+      "subject": "Лесная тропа по гребню",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/krasnoyarsk/lesnaya-tropa-po-grebnyu.jpg",
+      "after": "/images/venues/krasnoyarsk/lesnaya-tropa-po-grebnyu-r20261009.jpg",
+      "action": "generated",
+      "sha256": "1a4cc7a4f0131678d9af1f62e43b79fccb629219b88147d4b1343d8fefd8e413",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Лесная тропа по гребню, in or near krasnoyarsk, Russia. Scene information from the guide: Неспешный хайкинг без музеев и лишних поводов торопиться.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/krasnoyarsk/lesnaya-tropa-po-grebnyu.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/krasnoyarsk/lesnaya-tropa-po-grebnyu-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 429791
+        },
+        {
+          "path": "/images/venues/krasnoyarsk/lesnaya-tropa-po-grebnyu-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 151852
+        },
+        {
+          "path": "/images/venues/krasnoyarsk/lesnaya-tropa-po-grebnyu-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 34948
+        }
+      ]
+    },
+    {
+      "id": "s148",
+      "city": "krasnoyarsk",
+      "subject": "Набережная Овсянки",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/krasnoyarsk/naberezhnaya-ovsyanki.jpg",
+      "after": "/images/venues/krasnoyarsk/naberezhnaya-ovsyanki-r20261009.jpg",
+      "action": "generated",
+      "sha256": "1bd0579048a573d01e832d017f5578bc6a0dd2d2148301b3b8042b8ef1467f46",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Набережная Овсянки, in or near krasnoyarsk, Russia. Scene information from the guide: Спокойный Енисей без городской суеты.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/krasnoyarsk/naberezhnaya-ovsyanki.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/krasnoyarsk/naberezhnaya-ovsyanki-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 313077
+        },
+        {
+          "path": "/images/venues/krasnoyarsk/naberezhnaya-ovsyanki-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 112373
+        },
+        {
+          "path": "/images/venues/krasnoyarsk/naberezhnaya-ovsyanki-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 27547
+        }
+      ]
+    },
+    {
+      "id": "s149",
+      "city": "krasnoyarsk",
+      "subject": "Овсянка, музей Астафьева",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/krasnoyarsk/ovsyanka-muzey-astafeva.jpg",
+      "after": "/images/venues/krasnoyarsk/ovsyanka-muzey-astafeva-r20261009.jpg",
+      "action": "generated",
+      "sha256": "8a3d483738a78728eede88962639e2e20446a3dd263e3a681a6f4fd3547f446d",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Овсянка, музей Астафьева, in or near krasnoyarsk, Russia. Scene information from the guide: Дом-музей писателя в родном селе.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/krasnoyarsk/ovsyanka-muzey-astafeva.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/krasnoyarsk/ovsyanka-muzey-astafeva-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 430360
+        },
+        {
+          "path": "/images/venues/krasnoyarsk/ovsyanka-muzey-astafeva-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 153414
+        },
+        {
+          "path": "/images/venues/krasnoyarsk/ovsyanka-muzey-astafeva-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 35438
+        }
+      ]
+    },
+    {
+      "id": "s151",
+      "city": "krasnoyarsk",
+      "subject": "Скальные выходы хребта",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/krasnoyarsk/skalnye-vyhody-hrebta.jpg",
+      "after": "/images/venues/krasnoyarsk/skalnye-vyhody-hrebta-r20261009.jpg",
+      "action": "generated",
+      "sha256": "59017ec0da317ed3f3fdd0119caf3dc38bd2da1802a84e7a8013cb48367b7779",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Скальные выходы хребта, in or near krasnoyarsk, Russia. Scene information from the guide: Пейзажная часть маршрута выше городской кромки.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/krasnoyarsk/skalnye-vyhody-hrebta.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/krasnoyarsk/skalnye-vyhody-hrebta-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 433213
+        },
+        {
+          "path": "/images/venues/krasnoyarsk/skalnye-vyhody-hrebta-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 156827
+        },
+        {
+          "path": "/images/venues/krasnoyarsk/skalnye-vyhody-hrebta-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 37062
+        }
+      ]
+    },
+    {
+      "id": "s262",
+      "city": "omsk",
+      "subject": "Тропа здоровья в Чернолучье, Омская область",
+      "defect": "upside_down",
+      "before": "/images/venues/omsk/chernoluchye-tropa-zdorovya.jpg",
+      "after": "/images/venues/omsk/chernoluchye-tropa-zdorovya-r20261009.jpg",
+      "action": "generated",
+      "sha256": "386b949e49e56d52d53234f25e29b9aec9970fb1ff02ac3a2d4db2bed3ef0d24",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Create a realistic travel editorial illustration of the health walking trail in Chernoluchye, near Omsk, Russia. Required horizontal landscape 1536x1024 aspect 3:2. A peaceful broad sandy footpath winding through a tall Siberian pine and birch forest, green undergrowth, natural daylight, tranquil recreational woodland. No urban buildings or streets. Path and tree trunks upright, single coherent scene, no collage, no added text."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/omsk/chernoluchye-tropa-zdorovya-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 557715
+        },
+        {
+          "path": "/images/venues/omsk/chernoluchye-tropa-zdorovya-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 202133
+        },
+        {
+          "path": "/images/venues/omsk/chernoluchye-tropa-zdorovya-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 46182
+        }
+      ]
+    },
+    {
+      "id": "s265",
+      "city": "omsk",
+      "subject": "starina-ohotniche-zimovye",
+      "defect": "upside_down",
+      "before": "/images/venues/omsk/starina-ohotniche-zimovye.jpg",
+      "after": "/images/venues/omsk/starina-ohotniche-zimovye-r20261009.jpg",
+      "action": "restored",
+      "sha256": "ae71fe2264f064189c68d84ca1fa07872cfc40a33563cc89a958cecbbabc2cb9",
+      "restoredFrom": "df5a0dbf111ea0c3a1dd8fd451da1d8c24ab621c",
+      "variants": [
+        {
+          "path": "/images/venues/omsk/starina-ohotniche-zimovye-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 228085
+        },
+        {
+          "path": "/images/venues/omsk/starina-ohotniche-zimovye-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 85925
+        },
+        {
+          "path": "/images/venues/omsk/starina-ohotniche-zimovye-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 23193
+        }
+      ]
+    },
+    {
+      "id": "s280",
+      "city": "penza",
+      "subject": "Преображенская церковь в селе Радищево, Пензенская область",
+      "defect": "upside_down",
+      "before": "/images/venues/penza/radishchevo-preobrazhenskaya-cerkov.jpg",
+      "after": "/images/venues/penza/radishchevo-preobrazhenskaya-cerkov-r20261009.jpg",
+      "action": "generated",
+      "sha256": "6af78b466deceeb256ff76cb16ad539b3a44a4d494dcb785521ba46a3735675c",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Преображенская церковь в селе Радищево, Пензенская область, in or near penza, Russia. Scene information from the guide: Historic white Transfiguration church in the Radishchev estate village, with trees and paths.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/penza/radishchevo-preobrazhenskaya-cerkov.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/penza/radishchevo-preobrazhenskaya-cerkov-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 404889
+        },
+        {
+          "path": "/images/venues/penza/radishchevo-preobrazhenskaya-cerkov-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 145039
+        },
+        {
+          "path": "/images/venues/penza/radishchevo-preobrazhenskaya-cerkov-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 34621
+        }
+      ]
+    },
+    {
+      "id": "s418",
+      "city": "saratov",
+      "subject": "Капсула «Восток-1»",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/saratov/gagarin-kapsula-vostok-1.jpg",
+      "after": "/images/venues/saratov/gagarin-kapsula-vostok-1-r20261009.jpg",
+      "action": "generated",
+      "sha256": "0cf63dff6808598ade0339b102695cbea4cbdfb82856da93bbb37cfe3714ad95",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Капсула «Восток-1», in or near saratov, Russia. Scene information from the guide: Точная копия спускаемого аппарата, в котором Гагарин вернулся на Землю.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/saratov/gagarin-kapsula-vostok-1.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/saratov/gagarin-kapsula-vostok-1-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 276773
+        },
+        {
+          "path": "/images/venues/saratov/gagarin-kapsula-vostok-1-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 101925
+        },
+        {
+          "path": "/images/venues/saratov/gagarin-kapsula-vostok-1-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 26915
+        }
+      ]
+    },
+    {
+      "id": "s419",
+      "city": "saratov",
+      "subject": "Мемориальная стела",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/saratov/gagarin-memorialnaya-stela.jpg",
+      "after": "/images/venues/saratov/gagarin-memorialnaya-stela-r20261009.jpg",
+      "action": "generated",
+      "sha256": "c16e53f21965948d95d116e11f94bcc7d8e7c81eb3bd15fb22e6c2d785313142",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Create a realistic travel editorial illustration of the commemorative rocket-trail obelisk at Gagarin's landing site, Saratov region, Russia. Horizontal landscape image 1536 by 1024 pixels, aspect 3:2. Wide distant view of the entire tall slim silver rocket-trail stela, its base, open grassy memorial park, low landscaping and blue sky. The monument takes at most half the image height. Camera well back, straight upright horizon. Single coherent scene, no panels, no montage, no text, no portrait framing."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/saratov/gagarin-memorialnaya-stela-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 195127
+        },
+        {
+          "path": "/images/venues/saratov/gagarin-memorialnaya-stela-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 67395
+        },
+        {
+          "path": "/images/venues/saratov/gagarin-memorialnaya-stela-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 17340
+        }
+      ]
+    },
+    {
+      "id": "s428",
+      "city": "saratov",
+      "subject": "Поворот «Старая Волга»",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/saratov/razin-povorot-staraya-volga.jpg",
+      "after": "/images/venues/saratov/razin-povorot-staraya-volga-r20261009.jpg",
+      "action": "generated",
+      "sha256": "98e64ba5ef7d3d619915abd8f7a291c752e97f7cf0908ebd52256f5fc7e1b6ba",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Поворот «Старая Волга», in or near saratov, Russia. Scene information from the guide: Место максимального разлива реки - иллюзия бескрайнего океана.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/saratov/razin-povorot-staraya-volga.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/saratov/razin-povorot-staraya-volga-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 290764
+        },
+        {
+          "path": "/images/venues/saratov/razin-povorot-staraya-volga-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 97274
+        },
+        {
+          "path": "/images/venues/saratov/razin-povorot-staraya-volga-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 22447
+        }
+      ]
+    },
+    {
+      "id": "s518",
+      "city": "tver",
+      "subject": "Чайная «В Домотканово», Тверская область",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/tver/domotkanovo-chaynaya.jpg",
+      "after": "/images/venues/tver/domotkanovo-chaynaya-r20261009.jpg",
+      "action": "generated",
+      "sha256": "032bc6ece8b2e09e8463e8372e223387253fb536106e8c755d4bbf83f7b4700b",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Чайная «В Домотканово», Тверская область, in or near tver, Russia. Scene information from the guide: Cozy tea room in a wooden estate setting, samovar and traditional pastries.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/tver/domotkanovo-chaynaya.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/tver/domotkanovo-chaynaya-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 330279
+        },
+        {
+          "path": "/images/venues/tver/domotkanovo-chaynaya-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 130681
+        },
+        {
+          "path": "/images/venues/tver/domotkanovo-chaynaya-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 36383
+        }
+      ]
+    },
+    {
+      "id": "s519",
+      "city": "tver",
+      "subject": "Господский дом усадьбы Домотканово, Тверская область",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/tver/domotkanovo-gospodskiy-dom.jpg",
+      "after": "/images/venues/tver/domotkanovo-gospodskiy-dom-r20261009.jpg",
+      "action": "generated",
+      "sha256": "c89950b8a5a66b8a1fb6f0131f397c4abe40cc8c1a98524d5882595b42a4445c",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Господский дом усадьбы Домотканово, Тверская область, in or near tver, Russia. Scene information from the guide: Historic two-storey manor house and leafy landscaped estate garden.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/tver/domotkanovo-gospodskiy-dom.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/tver/domotkanovo-gospodskiy-dom-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 477334
+        },
+        {
+          "path": "/images/venues/tver/domotkanovo-gospodskiy-dom-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 172218
+        },
+        {
+          "path": "/images/venues/tver/domotkanovo-gospodskiy-dom-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 40837
+        }
+      ]
+    },
+    {
+      "id": "s523",
+      "city": "tver",
+      "subject": "Земская школа в Домотканово, Тверская область",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/tver/domotkanovo-zemskaya-shkola.jpg",
+      "after": "/images/venues/tver/domotkanovo-zemskaya-shkola-r20261009.jpg",
+      "action": "generated",
+      "sha256": "b6ab38b391f983fce2d18438e48d1beeca8999912701c45c0d17f3c34db085a1",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Земская школа в Домотканово, Тверская область, in or near tver, Russia. Scene information from the guide: Modest historic rural school building in an estate village, natural setting.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/tver/domotkanovo-zemskaya-shkola.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/tver/domotkanovo-zemskaya-shkola-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 455388
+        },
+        {
+          "path": "/images/venues/tver/domotkanovo-zemskaya-shkola-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 159718
+        },
+        {
+          "path": "/images/venues/tver/domotkanovo-zemskaya-shkola-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 36058
+        }
+      ]
+    },
+    {
+      "id": "s542",
+      "city": "tyumen",
+      "subject": "Ермаково поле",
+      "defect": "upside_down",
+      "before": "/images/venues/tyumen/tobolsk-ermakovo-pole.jpg",
+      "after": "/images/venues/tyumen/tobolsk-ermakovo-pole-r20261009.jpg",
+      "action": "generated",
+      "sha256": "8525a7091118f7bfc4f77776a60d56df11955e751ff69126e1bb0e9b809ee920",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Ермаково поле, in or near tyumen, Russia. Scene information from the guide: Поле Ермака: финал дня 2 до вечернего поезда в Тюмень.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/tyumen/tobolsk-ermakovo-pole.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/tyumen/tobolsk-ermakovo-pole-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 254290
+        },
+        {
+          "path": "/images/venues/tyumen/tobolsk-ermakovo-pole-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 90143
+        },
+        {
+          "path": "/images/venues/tyumen/tobolsk-ermakovo-pole-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 23050
+        }
+      ]
+    },
+    {
+      "id": "s543",
+      "city": "tyumen",
+      "subject": "Губернский музей",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/tyumen/tobolsk-gubernskiy-muzey.jpg",
+      "after": "/images/venues/tyumen/tobolsk-gubernskiy-muzey-r20261009.jpg",
+      "action": "generated",
+      "sha256": "5d8b3a72cfdf4af2541306b17d686f3d5f59d47a27027aa3804d9e73932b5dc2",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Губернский музей, in or near tyumen, Russia. Scene information from the guide: День 2 утром: один из старейших музеев Сибири у кремля.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/tyumen/tobolsk-gubernskiy-muzey.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/tyumen/tobolsk-gubernskiy-muzey-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 298195
+        },
+        {
+          "path": "/images/venues/tyumen/tobolsk-gubernskiy-muzey-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 105964
+        },
+        {
+          "path": "/images/venues/tyumen/tobolsk-gubernskiy-muzey-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 26568
+        }
+      ]
+    },
+    {
+      "id": "s546",
+      "city": "tyumen",
+      "subject": "Музей семьи Николая II",
+      "defect": "upside_down",
+      "before": "/images/venues/tyumen/tobolsk-muzey-semi-nikolaya-ii.jpg",
+      "after": "/images/venues/tyumen/tobolsk-muzey-semi-nikolaya-ii-r20261009.jpg",
+      "action": "generated",
+      "sha256": "8c1a0ab3354a87a661c66daab45e824e8d75164b8fd32654e0bc406692ad21b4",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Музей семьи Николая II, in or near tyumen, Russia. Scene information from the guide: Дом, где жила царская семья в тобольской ссылке.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/tyumen/tobolsk-muzey-semi-nikolaya-ii.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/tyumen/tobolsk-muzey-semi-nikolaya-ii-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 347991
+        },
+        {
+          "path": "/images/venues/tyumen/tobolsk-muzey-semi-nikolaya-ii-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 127725
+        },
+        {
+          "path": "/images/venues/tyumen/tobolsk-muzey-semi-nikolaya-ii-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 32466
+        }
+      ]
+    },
+    {
+      "id": "s550",
+      "city": "tyumen",
+      "subject": "Троицкая церковь",
+      "defect": "upside_down",
+      "before": "/images/venues/tyumen/tobolsk-troitskaya-tserkov.jpg",
+      "after": "/images/venues/tyumen/tobolsk-troitskaya-tserkov-r20261009.jpg",
+      "action": "generated",
+      "sha256": "c40406083e564a6f723f1961c9bf8637a6a9939266968861ab578b7e2ac5d601",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Троицкая церковь, in or near tyumen, Russia. Scene information from the guide: Нижний посад: Троицкая церковь после спуска.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/tyumen/tobolsk-troitskaya-tserkov.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/tyumen/tobolsk-troitskaya-tserkov-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 331821
+        },
+        {
+          "path": "/images/venues/tyumen/tobolsk-troitskaya-tserkov-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 120586
+        },
+        {
+          "path": "/images/venues/tyumen/tobolsk-troitskaya-tserkov-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 30543
+        }
+      ]
+    },
+    {
+      "id": "s566",
+      "city": "ufa",
+      "subject": "Береговая поляна",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/ufa/beregovaya-polyana.jpg",
+      "after": "/images/venues/ufa/beregovaya-polyana-r20261009.jpg",
+      "action": "generated",
+      "sha256": "d3a3180274b19bc1568dcd31cc69f00df10085b5ca510697240fe1120fc4e94f",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Береговая поляна, in or near ufa, Russia. Scene information from the guide: Тихая остановка у воды перед дорогой обратно.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/ufa/beregovaya-polyana.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/ufa/beregovaya-polyana-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 486692
+        },
+        {
+          "path": "/images/venues/ufa/beregovaya-polyana-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 177561
+        },
+        {
+          "path": "/images/venues/ufa/beregovaya-polyana-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 42303
+        }
+      ]
+    },
+    {
+      "id": "s568",
+      "city": "ufa",
+      "subject": "Главное ущелье",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/ufa/glavnoe-uschele.jpg",
+      "after": "/images/venues/ufa/glavnoe-uschele-r20261009.jpg",
+      "action": "generated",
+      "sha256": "94d51a7702e6991d157b672a665bfb5711fea2fc113679b65816060c34f52861",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Главное ущелье, in or near ufa, Russia. Scene information from the guide: Ключевой ландшафт с известняковыми бортами и рекой Бол. Ик.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/ufa/glavnoe-uschele.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/ufa/glavnoe-uschele-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 368319
+        },
+        {
+          "path": "/images/venues/ufa/glavnoe-uschele-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 129934
+        },
+        {
+          "path": "/images/venues/ufa/glavnoe-uschele-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 31548
+        }
+      ]
+    },
+    {
+      "id": "s588",
+      "city": "volgograd",
+      "subject": "Дворец культуры ВГС",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/volgograd/ges-dvorets-kultury-vgs.jpg",
+      "after": "/images/venues/volgograd/ges-dvorets-kultury-vgs-r20261009.jpg",
+      "action": "generated",
+      "sha256": "7238fceadf1860d6566f824303b1bf39bd480ac0a8b2867d0bfa184ec820b1bd",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Дворец культуры ВГС, in or near volgograd, Russia. Scene information from the guide: Шедевр дворцового советского классицизма в старой части Волжского.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/volgograd/ges-dvorets-kultury-vgs.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/volgograd/ges-dvorets-kultury-vgs-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 248123
+        },
+        {
+          "path": "/images/venues/volgograd/ges-dvorets-kultury-vgs-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 89109
+        },
+        {
+          "path": "/images/venues/volgograd/ges-dvorets-kultury-vgs-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 23825
+        }
+      ]
+    },
+    {
+      "id": "s593",
+      "city": "volgograd",
+      "subject": "Шлюзы Волго-Донского канала",
+      "defect": "upside_down",
+      "before": "/images/venues/volgograd/ges-shlyuzy-volgo-don.jpg",
+      "after": "/images/venues/volgograd/ges-shlyuzy-volgo-don-r20261009.jpg",
+      "action": "generated",
+      "sha256": "3e23d35a0261aa7e0369bc82afe0e761683585aa2f571c48e99501fce4e34c1b",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Create a realistic travel editorial illustration of the Volga-Don Canal locks in Volgograd, Russia. Required horizontal landscape 1536 by 1024 pixels, aspect 3:2. Wide distant view across the water from the bank of the long canal lock, pale monumental gateway towers on each side, lock gates and a small barge. Entire towers fit comfortably within a wide horizontal composition with generous water foreground and blue sky. Upright horizon. Single coherent scene, no collage, no text, no portrait image."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/volgograd/ges-shlyuzy-volgo-don-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 308114
+        },
+        {
+          "path": "/images/venues/volgograd/ges-shlyuzy-volgo-don-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 112253
+        },
+        {
+          "path": "/images/venues/volgograd/ges-shlyuzy-volgo-don-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 28597
+        }
+      ]
+    },
+    {
+      "id": "s598",
+      "city": "volgograd",
+      "subject": "Музей горчицы",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/volgograd/sarepta-muzey-gorchitsy.jpg",
+      "after": "/images/venues/volgograd/sarepta-muzey-gorchitsy-r20261009.jpg",
+      "action": "generated",
+      "sha256": "cbf602eae1a37adc76882fd01a503b1b84d4359a899bcaad6b482f3d101f0186",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Музей горчицы, in or near volgograd, Russia. Scene information from the guide: Экспозиция об истории первой русской горчицы и отжиме масла.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/volgograd/sarepta-muzey-gorchitsy.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/volgograd/sarepta-muzey-gorchitsy-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 343856
+        },
+        {
+          "path": "/images/venues/volgograd/sarepta-muzey-gorchitsy-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 124415
+        },
+        {
+          "path": "/images/venues/volgograd/sarepta-muzey-gorchitsy-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 31974
+        }
+      ]
+    },
+    {
+      "id": "s638",
+      "city": "yaroslavl",
+      "subject": "Большой господский дом",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/yaroslavl/karabikha-bolshoy-gospodskiy-dom.jpg",
+      "after": "/images/venues/yaroslavl/karabikha-bolshoy-gospodskiy-dom-r20261009.jpg",
+      "action": "generated",
+      "sha256": "2dc16581c2fa115cd157bde41bd82293cc6ec5fae55cda4e1800d0e9437169b2",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Большой господский дом, in or near yaroslavl, Russia. Scene information from the guide: Двухэтажный классический дворец с бельведером и сохранившимися интерьерами поэта.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/yaroslavl/karabikha-bolshoy-gospodskiy-dom.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/yaroslavl/karabikha-bolshoy-gospodskiy-dom-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 432874
+        },
+        {
+          "path": "/images/venues/yaroslavl/karabikha-bolshoy-gospodskiy-dom-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 151583
+        },
+        {
+          "path": "/images/venues/yaroslavl/karabikha-bolshoy-gospodskiy-dom-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 35217
+        }
+      ]
+    },
+    {
+      "id": "s639",
+      "city": "yaroslavl",
+      "subject": "Восточный и Западный флигели",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/yaroslavl/karabikha-fligeli.jpg",
+      "after": "/images/venues/yaroslavl/karabikha-fligeli-r20261009.jpg",
+      "action": "generated",
+      "sha256": "c85bd52bb6ed3ce4e74a4eb4a433cfd4eeffb2f73a553c88a63e746b4c7d0727",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Восточный и Западный флигели, in or near yaroslavl, Russia. Scene information from the guide: Жилые постройки усадьбы с личными вещами семьи писателя.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/yaroslavl/karabikha-fligeli.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/yaroslavl/karabikha-fligeli-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 456454
+        },
+        {
+          "path": "/images/venues/yaroslavl/karabikha-fligeli-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 160593
+        },
+        {
+          "path": "/images/venues/yaroslavl/karabikha-fligeli-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 37372
+        }
+      ]
+    },
+    {
+      "id": "s640",
+      "city": "yaroslavl",
+      "subject": "Каскад трех родниковых прудов",
+      "defect": "upside_down",
+      "before": "/images/venues/yaroslavl/karabikha-kaskad-prudov.jpg",
+      "after": "/images/venues/yaroslavl/karabikha-kaskad-prudov-r20261009.jpg",
+      "action": "generated",
+      "sha256": "a4fe1eff4fe666ef2042ce48892786ff3c6d60bed529ef46118f50732806ad96",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Каскад трех родниковых прудов, in or near yaroslavl, Russia. Scene information from the guide: Живописная водная система в низине парковой зоны.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/yaroslavl/karabikha-kaskad-prudov.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/yaroslavl/karabikha-kaskad-prudov-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 448663
+        },
+        {
+          "path": "/images/venues/yaroslavl/karabikha-kaskad-prudov-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 155442
+        },
+        {
+          "path": "/images/venues/yaroslavl/karabikha-kaskad-prudov-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 36711
+        }
+      ]
+    },
+    {
+      "id": "s645",
+      "city": "yaroslavl",
+      "subject": "Еретьевский источник",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/yaroslavl/vyatskoe-eretievskiy-istochnik.jpg",
+      "after": "/images/venues/yaroslavl/vyatskoe-eretievskiy-istochnik-r20261009.jpg",
+      "action": "generated",
+      "sha256": "4b5dab3c25186a55ac277dca502f9134cadd327f6ca757e72f433bf512cbd92e",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Еретьевский источник, in or near yaroslavl, Russia. Scene information from the guide: Старинная купель-ротонда с минеральной целебной водой.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/yaroslavl/vyatskoe-eretievskiy-istochnik.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/yaroslavl/vyatskoe-eretievskiy-istochnik-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 496250
+        },
+        {
+          "path": "/images/venues/yaroslavl/vyatskoe-eretievskiy-istochnik-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 176505
+        },
+        {
+          "path": "/images/venues/yaroslavl/vyatskoe-eretievskiy-istochnik-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 40427
+        }
+      ]
+    },
+    {
+      "id": "c252",
+      "city": "penza",
+      "subject": "spasskiy-kafedralnyy-sobor",
+      "defect": "upside_down",
+      "before": "/images/venues/penza/spasskiy-kafedralnyy-sobor.jpg",
+      "after": "/images/venues/penza/spasskiy-kafedralnyy-sobor-r20261009.jpg",
+      "action": "restored",
+      "sha256": "db7759bcc8c66a319ba517e3d49c0fed33b287da15e72b3a72e73a24ef129fa0",
+      "restoredFrom": "df5a0dbf111ea0c3a1dd8fd451da1d8c24ab621c",
+      "variants": [
+        {
+          "path": "/images/venues/penza/spasskiy-kafedralnyy-sobor-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 212460
+        },
+        {
+          "path": "/images/venues/penza/spasskiy-kafedralnyy-sobor-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 82277
+        },
+        {
+          "path": "/images/venues/penza/spasskiy-kafedralnyy-sobor-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 23448
+        }
+      ]
+    },
+    {
+      "id": "c507",
+      "city": "yaroslavl",
+      "subject": "Памятник Федору Волкову",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/yaroslavl/pamyatnik-fedoru-volkovu.jpg",
+      "after": "/images/venues/yaroslavl/pamyatnik-fedoru-volkovu-r20261009.jpg",
+      "action": "generated",
+      "sha256": "bc209db333f0b99b1b04b16f4e0a64efdd7733e61e0cd4b87b13f9318c47978d",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Памятник Федору Волкову, in or near yaroslavl, Russia. Scene information from the guide: Монумент основателю первого русского профессионального театра в сквере перед его детищем.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/yaroslavl/pamyatnik-fedoru-volkovu.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/yaroslavl/pamyatnik-fedoru-volkovu-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 370189
+        },
+        {
+          "path": "/images/venues/yaroslavl/pamyatnik-fedoru-volkovu-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 132701
+        },
+        {
+          "path": "/images/venues/yaroslavl/pamyatnik-fedoru-volkovu-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 32890
+        }
+      ]
+    },
+    {
+      "id": "o251",
+      "city": "omsk",
+      "subject": "ermitazh-sibir",
+      "defect": "upside_down",
+      "before": "/images/venues/omsk/ermitazh-sibir.jpg",
+      "after": "/images/venues/omsk/ermitazh-sibir-r20261009.jpg",
+      "action": "restored",
+      "sha256": "6c1805b7cafa425d29000da887cf8c9f0d685e5287ad2565b28f955be369bbff",
+      "restoredFrom": "81a27bbffb7b25db7c6e7cd5cef233227a004d88",
+      "variants": [
+        {
+          "path": "/images/venues/omsk/ermitazh-sibir-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 203872
+        },
+        {
+          "path": "/images/venues/omsk/ermitazh-sibir-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 77868
+        },
+        {
+          "path": "/images/venues/omsk/ermitazh-sibir-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 20670
+        }
+      ]
+    },
+    {
+      "id": "o269",
+      "city": "ryazan",
+      "subject": "Музей-усадьба академика И. П. Павлова",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/ryazan/muzey-usad-ba-akademika-i-p-pavlova.jpg",
+      "after": "/images/venues/ryazan/muzey-usad-ba-akademika-i-p-pavlova-r20261009.jpg",
+      "action": "generated",
+      "sha256": "4db1e68e38df82062de4f520962eda66560dc941bb890271c2e08098c415a006",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Музей-усадьба академика И. П. Павлова, in or near ryazan, Russia. Scene information from the guide: 50 минут на прогулку по подлинной деревянной городской усадьбе с яблоневым садом.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/ryazan/muzey-usad-ba-akademika-i-p-pavlova.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/ryazan/muzey-usad-ba-akademika-i-p-pavlova-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 464122
+        },
+        {
+          "path": "/images/venues/ryazan/muzey-usad-ba-akademika-i-p-pavlova-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 166395
+        },
+        {
+          "path": "/images/venues/ryazan/muzey-usad-ba-akademika-i-p-pavlova-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 38384
+        }
+      ]
+    },
+    {
+      "id": "r70",
+      "city": "chelyabinsk",
+      "subject": "po-chesnoku",
+      "defect": "upside_down",
+      "before": "/images/venues/chelyabinsk/po-chesnoku.jpg",
+      "after": "/images/venues/chelyabinsk/po-chesnoku-r20261009.jpg",
+      "action": "restored",
+      "sha256": "87c61fa662eb0077bcd11387623898f5341fe0dc47df128bd992447878fcff78",
+      "restoredFrom": "0443c0c16d321541bf7b220d84aa415feadeaa5e",
+      "variants": [
+        {
+          "path": "/images/venues/chelyabinsk/po-chesnoku-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 222955
+        },
+        {
+          "path": "/images/venues/chelyabinsk/po-chesnoku-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 93620
+        },
+        {
+          "path": "/images/venues/chelyabinsk/po-chesnoku-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 25686
+        }
+      ]
+    },
+    {
+      "id": "r93",
+      "city": "kaliningrad",
+      "subject": "Гастробар «Соль»",
+      "defect": "upside_down",
+      "before": "/images/venues/kaliningrad/gastrobar-sol.jpg",
+      "after": "/images/venues/kaliningrad/gastrobar-sol-r20261009.jpg",
+      "action": "generated",
+      "sha256": "987d72b1399551a77eb292e2501b93bd6089bf07376135506b40f0f4547428aa",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Гастробар «Соль», in or near kaliningrad, Russia. Scene information from the guide: Стильное заведение с современной авторской кухней и сильным акцентом на локальные морепродукты. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/kaliningrad/gastrobar-sol.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/kaliningrad/gastrobar-sol-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 333764
+        },
+        {
+          "path": "/images/venues/kaliningrad/gastrobar-sol-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 124276
+        },
+        {
+          "path": "/images/venues/kaliningrad/gastrobar-sol-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 32192
+        }
+      ]
+    },
+    {
+      "id": "r421",
+      "city": "omsk",
+      "subject": "pamyatnik-van-gogu",
+      "defect": "upside_down",
+      "before": "/images/venues/omsk/pamyatnik-van-gogu.jpg",
+      "after": "/images/venues/omsk/pamyatnik-van-gogu-r20261009.jpg",
+      "action": "restored",
+      "sha256": "2323b4829b265445b909107ae5353c04fffb18c75b1d07b3f3a7d8f82feb0307",
+      "restoredFrom": "df5a0dbf111ea0c3a1dd8fd451da1d8c24ab621c",
+      "variants": [
+        {
+          "path": "/images/venues/omsk/pamyatnik-van-gogu-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 306513
+        },
+        {
+          "path": "/images/venues/omsk/pamyatnik-van-gogu-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 124923
+        },
+        {
+          "path": "/images/venues/omsk/pamyatnik-van-gogu-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 34318
+        }
+      ]
+    },
+    {
+      "id": "r435",
+      "city": "omsk",
+      "subject": "ulitsa-chokana-valihanova",
+      "defect": "upside_down",
+      "before": "/images/venues/omsk/ulitsa-chokana-valihanova.jpg",
+      "after": "/images/venues/omsk/ulitsa-chokana-valihanova-r20261009.jpg",
+      "action": "restored",
+      "sha256": "528b6a069c1943a7bcb5982ffbd4eb41f52e31ac32d397e6047ffcf430ffb771",
+      "restoredFrom": "df5a0dbf111ea0c3a1dd8fd451da1d8c24ab621c",
+      "variants": [
+        {
+          "path": "/images/venues/omsk/ulitsa-chokana-valihanova-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 332071
+        },
+        {
+          "path": "/images/venues/omsk/ulitsa-chokana-valihanova-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 132044
+        },
+        {
+          "path": "/images/venues/omsk/ulitsa-chokana-valihanova-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 33589
+        }
+      ]
+    },
+    {
+      "id": "r446",
+      "city": "penza",
+      "subject": "dama-s-sobachkoy",
+      "defect": "upside_down",
+      "before": "/images/venues/penza/dama-s-sobachkoy.jpg",
+      "after": "/images/venues/penza/dama-s-sobachkoy-r20261009.jpg",
+      "action": "restored",
+      "sha256": "13b3355c39481ab58a16f6691a859a7b5007d9f48fc709eeb6dc027cfc2fd58a",
+      "restoredFrom": "df5a0dbf111ea0c3a1dd8fd451da1d8c24ab621c",
+      "variants": [
+        {
+          "path": "/images/venues/penza/dama-s-sobachkoy-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 299728
+        },
+        {
+          "path": "/images/venues/penza/dama-s-sobachkoy-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 121087
+        },
+        {
+          "path": "/images/venues/penza/dama-s-sobachkoy-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 32381
+        }
+      ]
+    },
+    {
+      "id": "r453",
+      "city": "penza",
+      "subject": "narodnyy dom",
+      "defect": "upside_down",
+      "before": "/images/venues/penza/narodnyy-dom.jpg",
+      "after": "/images/venues/penza/narodnyy-dom-r20261009.jpg",
+      "action": "generated",
+      "sha256": "461305b4ef349a2e572bd37add2cf18611a42251e42e3026db21cd72268b245f",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: narodnyy dom, in or near penza, Russia. Scene information from the guide: . Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/penza/narodnyy-dom.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/penza/narodnyy-dom-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 346441
+        },
+        {
+          "path": "/images/venues/penza/narodnyy-dom-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 125462
+        },
+        {
+          "path": "/images/venues/penza/narodnyy-dom-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 32098
+        }
+      ]
+    },
+    {
+      "id": "r469",
+      "city": "penza",
+      "subject": "restoran-lokalnoy-kuhni",
+      "defect": "upside_down",
+      "before": "/images/venues/penza/restoran-lokalnoy-kuhni.jpg",
+      "after": "/images/venues/penza/restoran-lokalnoy-kuhni-r20261009.jpg",
+      "action": "restored",
+      "sha256": "f099fcfd3f99523db549e324be62e127b7b758b299dafbb19101599d167185ee",
+      "restoredFrom": "54b00483b6719edb37c2e9e285b18ad565364a23",
+      "variants": [
+        {
+          "path": "/images/venues/penza/restoran-lokalnoy-kuhni-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 222912
+        },
+        {
+          "path": "/images/venues/penza/restoran-lokalnoy-kuhni-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 98590
+        },
+        {
+          "path": "/images/venues/penza/restoran-lokalnoy-kuhni-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 29613
+        }
+      ]
+    },
+    {
+      "id": "r472",
+      "city": "penza",
+      "subject": "skver-slavy",
+      "defect": "upside_down",
+      "before": "/images/venues/penza/skver-slavy.jpg",
+      "after": "/images/venues/penza/skver-slavy-r20261009.jpg",
+      "action": "restored",
+      "sha256": "599e2925131844a904d82046ce2438c07580668464f4aa7ad643a1f38d63b11f",
+      "restoredFrom": "df5a0dbf111ea0c3a1dd8fd451da1d8c24ab621c",
+      "variants": [
+        {
+          "path": "/images/venues/penza/skver-slavy-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 301597
+        },
+        {
+          "path": "/images/venues/penza/skver-slavy-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 109790
+        },
+        {
+          "path": "/images/venues/penza/skver-slavy-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 25902
+        }
+      ]
+    },
+    {
+      "id": "r522",
+      "city": "rostov-na-donu",
+      "subject": "pamyatnik-santehniku",
+      "defect": "upside_down",
+      "before": "/images/venues/rostov-na-donu/pamyatnik-santehniku.jpg",
+      "after": "/images/venues/rostov-na-donu/pamyatnik-santehniku-r20261009.jpg",
+      "action": "restored",
+      "sha256": "90b47b2786fb7ebb98c730fd0749431b472f9d6c5f5e5972eee6f6c96b2f9bff",
+      "restoredFrom": "df5a0dbf111ea0c3a1dd8fd451da1d8c24ab621c",
+      "variants": [
+        {
+          "path": "/images/venues/rostov-na-donu/pamyatnik-santehniku-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 228534
+        },
+        {
+          "path": "/images/venues/rostov-na-donu/pamyatnik-santehniku-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 90690
+        },
+        {
+          "path": "/images/venues/rostov-na-donu/pamyatnik-santehniku-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 25811
+        }
+      ]
+    },
+    {
+      "id": "r524",
+      "city": "rostov-na-donu",
+      "subject": "Памятник ростовскому водопроводу, Ростов-на-Дону",
+      "defect": "upside_down",
+      "before": "/images/venues/rostov-na-donu/pamyatnik-vodoprovodu.jpg",
+      "after": "/images/venues/rostov-na-donu/pamyatnik-vodoprovodu-r20261009.jpg",
+      "action": "generated",
+      "sha256": "0ed38b5f3533c2e1c01a0d72eeb7bf2f520d3777c4d52d6e8161b4be907f14b3",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Памятник ростовскому водопроводу, Ростов-на-Дону, in or near rostov-na-donu, Russia. Scene information from the guide: Street monument with a bronze woman at a water standpipe on a pedestrian street.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/rostov-na-donu/pamyatnik-vodoprovodu.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/rostov-na-donu/pamyatnik-vodoprovodu-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 351513
+        },
+        {
+          "path": "/images/venues/rostov-na-donu/pamyatnik-vodoprovodu-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 137678
+        },
+        {
+          "path": "/images/venues/rostov-na-donu/pamyatnik-vodoprovodu-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 36190
+        }
+      ]
+    },
+    {
+      "id": "r533",
+      "city": "rostov-na-donu",
+      "subject": "skulptura-kupec-korobeynik",
+      "defect": "upside_down",
+      "before": "/images/venues/rostov-na-donu/skulptura-kupec-korobeynik.jpg",
+      "after": "/images/venues/rostov-na-donu/skulptura-kupec-korobeynik-r20261009.jpg",
+      "action": "restored",
+      "sha256": "231caaa97b8d25d13897b6ee640f04446ee43bda87d201a431d41ceb26a4e014",
+      "restoredFrom": "ff1738d449d4b890683acc2b32549c3da7709fbc",
+      "variants": [
+        {
+          "path": "/images/venues/rostov-na-donu/skulptura-kupec-korobeynik-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 320388
+        },
+        {
+          "path": "/images/venues/rostov-na-donu/skulptura-kupec-korobeynik-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 122577
+        },
+        {
+          "path": "/images/venues/rostov-na-donu/skulptura-kupec-korobeynik-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 31001
+        }
+      ]
+    },
+    {
+      "id": "r548",
+      "city": "ryazan",
+      "subject": "Гриб-Мудрец",
+      "defect": "upside_down",
+      "before": "/images/venues/ryazan/grib-mudrets.jpg",
+      "after": "/images/venues/ryazan/grib-mudrets-r20261009.jpg",
+      "action": "generated",
+      "sha256": "d0e6a72df1337f451e65eb90ff0335983e56eb6fbe47f3e48adea5578aa5eddc",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Гриб-Мудрец, in or near ryazan, Russia. Scene information from the guide: 10 минут на подпорной стенке у областной библиотеки имени Горького.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/ryazan/grib-mudrets.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/ryazan/grib-mudrets-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 390020
+        },
+        {
+          "path": "/images/venues/ryazan/grib-mudrets-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 144303
+        },
+        {
+          "path": "/images/venues/ryazan/grib-mudrets-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 35826
+        }
+      ]
+    },
+    {
+      "id": "r876",
+      "city": "sochi",
+      "subject": "Кафе «Белые Ночи»",
+      "defect": "upside_down",
+      "before": "/images/venues/sochi/belye-nochi.jpg",
+      "after": "/images/venues/sochi/belye-nochi-r20261009.jpg",
+      "action": "generated",
+      "sha256": "f797b7b07de6de6864dc7cd23486ec7096693c9fb52cbea3c107ea50453a7952",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Кафе «Белые Ночи», in or near sochi, Russia. Scene information from the guide: Легендарное городское заведение, знаменитое лучшими хинкали на всем побережье.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/sochi/belye-nochi.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/sochi/belye-nochi-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 430879
+        },
+        {
+          "path": "/images/venues/sochi/belye-nochi-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 160343
+        },
+        {
+          "path": "/images/venues/sochi/belye-nochi-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 40021
+        }
+      ]
+    },
+    {
+      "id": "r882",
+      "city": "sochi",
+      "subject": "Нижний Дендрарий",
+      "defect": "upside_down",
+      "before": "/images/venues/sochi/dendrariy-nizhniy.jpg",
+      "after": "/images/venues/sochi/dendrariy-nizhniy-r20261009.jpg",
+      "action": "generated",
+      "sha256": "117d80e667cd88f12bf3a8a927dc2198c55f0e5e9168f0ca16e32dfcd7509659",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Нижний Дендрарий, in or near sochi, Russia. Scene information from the guide: Живописная равнинная часть парка с утиными прудами, розарием и бамбуковыми рощами.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/sochi/dendrariy-nizhniy.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/sochi/dendrariy-nizhniy-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 477707
+        },
+        {
+          "path": "/images/venues/sochi/dendrariy-nizhniy-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 172308
+        },
+        {
+          "path": "/images/venues/sochi/dendrariy-nizhniy-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 40531
+        }
+      ]
+    },
+    {
+      "id": "r904",
+      "city": "sochi",
+      "subject": "Памятник сочинскому учителю",
+      "defect": "upside_down",
+      "before": "/images/venues/sochi/pamyatnik-sochinskomu-uchitelyu.jpg",
+      "after": "/images/venues/sochi/pamyatnik-sochinskomu-uchitelyu-r20261009.jpg",
+      "action": "generated",
+      "sha256": "ef813d1ebb2cfe2b0fb5423f051e02d369893732a39bf7a6400c1180d0e3657e",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Памятник сочинскому учителю, in or near sochi, Russia. Scene information from the guide: Трогательный монумент первой учительнице и ее ученикам - символ преемственности поколений.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/sochi/pamyatnik-sochinskomu-uchitelyu.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/sochi/pamyatnik-sochinskomu-uchitelyu-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 315142
+        },
+        {
+          "path": "/images/venues/sochi/pamyatnik-sochinskomu-uchitelyu-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 122445
+        },
+        {
+          "path": "/images/venues/sochi/pamyatnik-sochinskomu-uchitelyu-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 32342
+        }
+      ]
+    },
+    {
+      "id": "r908",
+      "city": "sochi",
+      "subject": "ploschad iskusstv hub",
+      "defect": "upside_down",
+      "before": "/images/venues/sochi/ploschad-iskusstv-hub.jpg",
+      "after": "/images/venues/sochi/ploschad-iskusstv-hub-r20261009.jpg",
+      "action": "generated",
+      "sha256": "51b8aa9fa42d185b3144edd0601c9b5808dbdf8d183f32a597591b9630f93f2d",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: ploschad iskusstv hub, in or near sochi, Russia. Scene information from the guide: . Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/sochi/ploschad-iskusstv-hub.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/sochi/ploschad-iskusstv-hub-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 380612
+        },
+        {
+          "path": "/images/venues/sochi/ploschad-iskusstv-hub-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 137364
+        },
+        {
+          "path": "/images/venues/sochi/ploschad-iskusstv-hub-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 33774
+        }
+      ]
+    },
+    {
+      "id": "r1034",
+      "city": "tyumen",
+      "subject": "Копилка бездомной собаки",
+      "defect": "upside_down",
+      "before": "/images/venues/tyumen/pamyatnik-bezdomnoy-sobake.jpg",
+      "after": "/images/venues/tyumen/pamyatnik-bezdomnoy-sobake-r20261009.jpg",
+      "action": "generated",
+      "sha256": "8ec549d1a4ebfb2c1b49022adc6262596176de407c1754e694468489ac94a157",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Копилка бездомной собаки, in or near tyumen, Russia. Scene information from the guide: Скульптура-копилка на Республике и Орджоникидзе: бросают монеты в пользу приютов.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/tyumen/pamyatnik-bezdomnoy-sobake.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/tyumen/pamyatnik-bezdomnoy-sobake-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 335371
+        },
+        {
+          "path": "/images/venues/tyumen/pamyatnik-bezdomnoy-sobake-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 127104
+        },
+        {
+          "path": "/images/venues/tyumen/pamyatnik-bezdomnoy-sobake-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 33769
+        }
+      ]
+    },
+    {
+      "id": "r1039",
+      "city": "tyumen",
+      "subject": "pamyatnik-leninu",
+      "defect": "upside_down",
+      "before": "/images/venues/tyumen/pamyatnik-leninu.jpg",
+      "after": "/images/venues/tyumen/pamyatnik-leninu-r20261009.jpg",
+      "action": "restored",
+      "sha256": "33cdf75276a651901146d31c0fa829ae765529b502b0038a4e9e26981a002954",
+      "restoredFrom": "df5a0dbf111ea0c3a1dd8fd451da1d8c24ab621c",
+      "variants": [
+        {
+          "path": "/images/venues/tyumen/pamyatnik-leninu-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 209074
+        },
+        {
+          "path": "/images/venues/tyumen/pamyatnik-leninu-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 78602
+        },
+        {
+          "path": "/images/venues/tyumen/pamyatnik-leninu-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 21390
+        }
+      ]
+    },
+    {
+      "id": "r1046",
+      "city": "tyumen",
+      "subject": "ploschad-bortsov-revolyutsii",
+      "defect": "upside_down",
+      "before": "/images/venues/tyumen/ploschad-bortsov-revolyutsii.jpg",
+      "after": "/images/venues/tyumen/ploschad-bortsov-revolyutsii-r20261009.jpg",
+      "action": "restored",
+      "sha256": "4b218ef2643abb950c5e1b1f937b9ec25446fd72d248e126cddba8e549623595",
+      "restoredFrom": "df5a0dbf111ea0c3a1dd8fd451da1d8c24ab621c",
+      "variants": [
+        {
+          "path": "/images/venues/tyumen/ploschad-bortsov-revolyutsii-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 224219
+        },
+        {
+          "path": "/images/venues/tyumen/ploschad-bortsov-revolyutsii-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 83768
+        },
+        {
+          "path": "/images/venues/tyumen/ploschad-bortsov-revolyutsii-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 22844
+        }
+      ]
+    },
+    {
+      "id": "r1050",
+      "city": "tyumen",
+      "subject": "restoran-karavella",
+      "defect": "upside_down",
+      "before": "/images/venues/tyumen/restoran-karavella.jpg",
+      "after": "/images/venues/tyumen/restoran-karavella-r20261009.jpg",
+      "action": "restored",
+      "sha256": "d0ff1806fc00505652632778c237637937c2b01b2c439202ee096f264f06ea08",
+      "restoredFrom": "df5a0dbf111ea0c3a1dd8fd451da1d8c24ab621c",
+      "variants": [
+        {
+          "path": "/images/venues/tyumen/restoran-karavella-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 245703
+        },
+        {
+          "path": "/images/venues/tyumen/restoran-karavella-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 92552
+        },
+        {
+          "path": "/images/venues/tyumen/restoran-karavella-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 24266
+        }
+      ]
+    },
+    {
+      "id": "r1055",
+      "city": "tyumen",
+      "subject": "spasskaya tserkov",
+      "defect": "upside_down",
+      "before": "/images/venues/tyumen/spasskaya-tserkov.jpg",
+      "after": "/images/venues/tyumen/spasskaya-tserkov-r20261009.jpg",
+      "action": "generated",
+      "sha256": "6bd654bf404a0cfab214daf84715803d64703e77c377088c0485b177c8cf4fbb",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: spasskaya tserkov, in or near tyumen, Russia. Scene information from the guide: . Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/tyumen/spasskaya-tserkov.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/tyumen/spasskaya-tserkov-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 254253
+        },
+        {
+          "path": "/images/venues/tyumen/spasskaya-tserkov-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 94333
+        },
+        {
+          "path": "/images/venues/tyumen/spasskaya-tserkov-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 25389
+        }
+      ]
+    },
+    {
+      "id": "r1067",
+      "city": "ufa",
+      "subject": "dom gubernatora",
+      "defect": "upside_down",
+      "before": "/images/venues/ufa/dom-gubernatora.jpg",
+      "after": "/images/venues/ufa/dom-gubernatora-r20261009.jpg",
+      "action": "generated",
+      "sha256": "5f9b358ef724021ef62eb1b050b28d9fd557bf4396e9a631de615ea2264993d2",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: dom gubernatora, in or near ufa, Russia. Scene information from the guide: . Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/ufa/dom-gubernatora.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/ufa/dom-gubernatora-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 327199
+        },
+        {
+          "path": "/images/venues/ufa/dom-gubernatora-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 117852
+        },
+        {
+          "path": "/images/venues/ufa/dom-gubernatora-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 30766
+        }
+      ]
+    },
+    {
+      "id": "r1069",
+      "city": "ufa",
+      "subject": "Дом-музей В. И. Ленина",
+      "defect": "upside_down",
+      "before": "/images/venues/ufa/dom-muzey-lenina.jpg",
+      "after": "/images/venues/ufa/dom-muzey-lenina-r20261009.jpg",
+      "action": "generated",
+      "sha256": "64f1544f0ed924131d6d4c008d93f87c6bbb4320cef770cdd200092a7edc6c7f",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Дом-музей В. И. Ленина, in or near ufa, Russia. Scene information from the guide: Мемориальная усадьба, воссоздающая быт Уфы начала XX века.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/ufa/dom-muzey-lenina.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/ufa/dom-muzey-lenina-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 411920
+        },
+        {
+          "path": "/images/venues/ufa/dom-muzey-lenina-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 144640
+        },
+        {
+          "path": "/images/venues/ufa/dom-muzey-lenina-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 34323
+        }
+      ]
+    },
+    {
+      "id": "r1084",
+      "city": "ufa",
+      "subject": "Национальный музей Республики Башкортостан",
+      "defect": "upside_down",
+      "before": "/images/venues/ufa/natsionalnyy-muzey.jpg",
+      "after": "/images/venues/ufa/natsionalnyy-muzey-r20261009.jpg",
+      "action": "generated",
+      "sha256": "52fa0e5e958977cf6cf4d0d8d807e6d2ce5ef8b4a84f470877c67342c0a6cb58",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Национальный музей Республики Башкортостан, in or near ufa, Russia. Scene information from the guide: Главный музей края с коллекцией сарматского золота и этнографии.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/ufa/natsionalnyy-muzey.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/ufa/natsionalnyy-muzey-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 295675
+        },
+        {
+          "path": "/images/venues/ufa/natsionalnyy-muzey-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 105591
+        },
+        {
+          "path": "/images/venues/ufa/natsionalnyy-muzey-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 26890
+        }
+      ]
+    },
+    {
+      "id": "r1201",
+      "city": "yaroslavl",
+      "subject": "Демидовский столп",
+      "defect": "upside_down",
+      "before": "/images/venues/yaroslavl/demidovskiy-stolp.jpg",
+      "after": "/images/venues/yaroslavl/demidovskiy-stolp-r20261009.jpg",
+      "action": "generated",
+      "sha256": "3249671e02a8a74005fed80f05fade2dbcccf42aebe6a8abb5e80d3b01aaea60",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Демидовский столп, in or near yaroslavl, Russia. Scene information from the guide: Высокая гранитная дорическая колонна с бронзовым орлом в центре старого плац-парада.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/yaroslavl/demidovskiy-stolp.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/yaroslavl/demidovskiy-stolp-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 224120
+        },
+        {
+          "path": "/images/venues/yaroslavl/demidovskiy-stolp-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 79014
+        },
+        {
+          "path": "/images/venues/yaroslavl/demidovskiy-stolp-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 20143
+        }
+      ]
+    },
+    {
+      "id": "r1229",
+      "city": "yaroslavl",
+      "subject": "Церковь Иоанна Предтечи в Толчкове",
+      "defect": "upside_down",
+      "before": "/images/venues/yaroslavl/tserkov-ioanna-predtechi-tolchkovo.jpg",
+      "after": "/images/venues/yaroslavl/tserkov-ioanna-predtechi-tolchkovo-r20261009.jpg",
+      "action": "generated",
+      "sha256": "057107f8290f8c84c9f913a2d2d0a58987aa9d07f2ebfcf594e8d2dbfa0cd3b5",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Церковь Иоанна Предтечи в Толчкове, in or near yaroslavl, Russia. Scene information from the guide: Уникальный 15-главый изразцовый храм, изображенный на оборотной стороне 1000-рублевой купюры.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/yaroslavl/tserkov-ioanna-predtechi-tolchkovo.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/yaroslavl/tserkov-ioanna-predtechi-tolchkovo-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 374087
+        },
+        {
+          "path": "/images/venues/yaroslavl/tserkov-ioanna-predtechi-tolchkovo-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 129715
+        },
+        {
+          "path": "/images/venues/yaroslavl/tserkov-ioanna-predtechi-tolchkovo-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 30789
+        }
+      ]
+    },
+    {
+      "id": "r105",
+      "city": "kaliningrad",
+      "subject": "ostrov kanta",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/kaliningrad/ostrov-kanta.jpg",
+      "after": "/images/venues/kaliningrad/ostrov-kanta-r20261009.jpg",
+      "action": "generated",
+      "sha256": "41aaa2d38132d0dcff979fd4b05e0f2cefd57b2d7c1fbd17ae32f9a1d6cef9c6",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: ostrov kanta, in or near kaliningrad, Russia. Scene information from the guide: . Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/kaliningrad/ostrov-kanta.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/kaliningrad/ostrov-kanta-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 309289
+        },
+        {
+          "path": "/images/venues/kaliningrad/ostrov-kanta-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 107307
+        },
+        {
+          "path": "/images/venues/kaliningrad/ostrov-kanta-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 25373
+        }
+      ]
+    },
+    {
+      "id": "r346",
+      "city": "novosibirsk",
+      "subject": "art el",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/novosibirsk/art-el.jpg",
+      "after": "/images/venues/novosibirsk/art-el-r20261009.jpg",
+      "action": "generated",
+      "sha256": "38c5565148fab236451194b41d22204deaf94473f5304d5e5a02b5545b284c0d",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: art el, in or near novosibirsk, Russia. Scene information from the guide: . Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/novosibirsk/art-el.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/novosibirsk/art-el-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 309758
+        },
+        {
+          "path": "/images/venues/novosibirsk/art-el-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 110113
+        },
+        {
+          "path": "/images/venues/novosibirsk/art-el-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 27776
+        }
+      ]
+    },
+    {
+      "id": "r412",
+      "city": "omsk",
+      "subject": "Особняк Шаниной",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/omsk/osobnyak-shaninoy.jpg",
+      "after": "/images/venues/omsk/osobnyak-shaninoy-r20261009.jpg",
+      "action": "generated",
+      "sha256": "0580d8cb4df9e8ef4a9c06d98e94618db2a120359a8316229cc11f5aa22869d8",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Особняк Шаниной, in or near omsk, Russia. Scene information from the guide: Купеческий особняк на Любинском с богатой лепниной и витринным первым этажом.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/omsk/osobnyak-shaninoy.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/omsk/osobnyak-shaninoy-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 308057
+        },
+        {
+          "path": "/images/venues/omsk/osobnyak-shaninoy-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 111339
+        },
+        {
+          "path": "/images/venues/omsk/osobnyak-shaninoy-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 28881
+        }
+      ]
+    },
+    {
+      "id": "r467",
+      "city": "penza",
+      "subject": "pokrovskaya cerkov",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/penza/pokrovskaya-cerkov.jpg",
+      "after": "/images/venues/penza/pokrovskaya-cerkov-r20261009.jpg",
+      "action": "generated",
+      "sha256": "f081312d78994b5c8656867d63d7d58433635216f934cf3c38d9509df3797e4d",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: pokrovskaya cerkov, in or near penza, Russia. Scene information from the guide: . Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/penza/pokrovskaya-cerkov.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/penza/pokrovskaya-cerkov-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 270529
+        },
+        {
+          "path": "/images/venues/penza/pokrovskaya-cerkov-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 97347
+        },
+        {
+          "path": "/images/venues/penza/pokrovskaya-cerkov-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 25052
+        }
+      ]
+    },
+    {
+      "id": "r536",
+      "city": "rostov-na-donu",
+      "subject": "Соборный переулок, Ростов-на-Дону",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/rostov-na-donu/sobornyy-pereulok.jpg",
+      "after": "/images/venues/rostov-na-donu/sobornyy-pereulok-r20261009.jpg",
+      "action": "generated",
+      "sha256": "7964a9319b6bb617b54d89cb91aac296cbc867a9f558f814512bc348f8af5780",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Соборный переулок, Ростов-на-Дону, in or near rostov-na-donu, Russia. Scene information from the guide: Single coherent view of the pedestrian Soborny lane, old city buildings, paving, street trees.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/rostov-na-donu/sobornyy-pereulok.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/rostov-na-donu/sobornyy-pereulok-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 435935
+        },
+        {
+          "path": "/images/venues/rostov-na-donu/sobornyy-pereulok-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 156312
+        },
+        {
+          "path": "/images/venues/rostov-na-donu/sobornyy-pereulok-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 37571
+        }
+      ]
+    },
+    {
+      "id": "r544",
+      "city": "ryazan",
+      "subject": "bar chervyachok",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/ryazan/bar-chervyachok.jpg",
+      "after": "/images/venues/ryazan/bar-chervyachok-r20261009.jpg",
+      "action": "generated",
+      "sha256": "0a65ff76545d2e5942fca7151a04ecf05400ef6caf92fba32ff3e128c5ca20ef",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: bar chervyachok, in or near ryazan, Russia. Scene information from the guide: . Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/ryazan/bar-chervyachok.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/ryazan/bar-chervyachok-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 334675
+        },
+        {
+          "path": "/images/venues/ryazan/bar-chervyachok-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 118388
+        },
+        {
+          "path": "/images/venues/ryazan/bar-chervyachok-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 28713
+        }
+      ]
+    },
+    {
+      "id": "r546",
+      "city": "ryazan",
+      "subject": "Грибники (Отец и сын)",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/ryazan/grib-gribniki.jpg",
+      "after": "/images/venues/ryazan/grib-gribniki-r20261009.jpg",
+      "action": "generated",
+      "sha256": "50344563e485719955a8dcd1e23bad1c94c6b30e0fc3c63ddec0dd393c56adcb",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Create a realistic travel editorial illustration of a small public bronze sculpture called Mushroom Pickers, Father and Son, in Ryazan, Russia. It depicts TWO ANTHROPOMORPHIC MUSHROOM CHARACTERS, an older mushroom father with broad mushroom cap and beard, and a little mushroom son with smaller cap, both with baskets. Both are visibly cast bronze sculptures with patina, sitting on a low stone plinth in a leafy pedestrian street. No living human father or child. Required landscape 1536x1024 aspect 3:2. Entire sculpture pair fits in the central frame with generous surrounding space. One coherent photograph-style scene, upright horizon, no collage, no text."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/ryazan/grib-gribniki-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 389861
+        },
+        {
+          "path": "/images/venues/ryazan/grib-gribniki-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 151829
+        },
+        {
+          "path": "/images/venues/ryazan/grib-gribniki-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 41696
+        }
+      ]
+    },
+    {
+      "id": "r547",
+      "city": "ryazan",
+      "subject": "Гриб-Коробейник",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/ryazan/grib-korobeynik.jpg",
+      "after": "/images/venues/ryazan/grib-korobeynik-r20261009.jpg",
+      "action": "generated",
+      "sha256": "a8b49658faa6ffd8d2dab57617a4687a02403ff03afc40df92c52af941c68f6f",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Гриб-Коробейник, in or near ryazan, Russia. Scene information from the guide: 10 минут у входа в Музей истории рязанского леденца.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/ryazan/grib-korobeynik.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/ryazan/grib-korobeynik-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 302463
+        },
+        {
+          "path": "/images/venues/ryazan/grib-korobeynik-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 114432
+        },
+        {
+          "path": "/images/venues/ryazan/grib-korobeynik-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 30332
+        }
+      ]
+    },
+    {
+      "id": "r550",
+      "city": "ryazan",
+      "subject": "Гриб-Рыбак",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/ryazan/grib-rybak.jpg",
+      "after": "/images/venues/ryazan/grib-rybak-r20261009.jpg",
+      "action": "generated",
+      "sha256": "7a1f6c244016ebc8bbea7d46f9cc1f389443c215b0a63b8e6000835d044d2f5f",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Гриб-Рыбак, in or near ryazan, Russia. Scene information from the guide: 10 минут на перилах моста Лыбедского бульвара со стороны улицы Горького.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/ryazan/grib-rybak.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/ryazan/grib-rybak-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 317696
+        },
+        {
+          "path": "/images/venues/ryazan/grib-rybak-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 123605
+        },
+        {
+          "path": "/images/venues/ryazan/grib-rybak-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 34236
+        }
+      ]
+    },
+    {
+      "id": "r554",
+      "city": "ryazan",
+      "subject": "lybedskiy bulvar",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/ryazan/lybedskiy-bulvar.jpg",
+      "after": "/images/venues/ryazan/lybedskiy-bulvar-r20261009.jpg",
+      "action": "generated",
+      "sha256": "03c4dc052dd05802f4e95d329470309774c11141ab8cee8db24ea3d6ab88f7c7",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: lybedskiy bulvar, in or near ryazan, Russia. Scene information from the guide: . Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/ryazan/lybedskiy-bulvar.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/ryazan/lybedskiy-bulvar-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 431231
+        },
+        {
+          "path": "/images/venues/ryazan/lybedskiy-bulvar-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 151831
+        },
+        {
+          "path": "/images/venues/ryazan/lybedskiy-bulvar-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 35170
+        }
+      ]
+    },
+    {
+      "id": "r781",
+      "city": "saratov",
+      "subject": "Детский парк",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/saratov/detskiy-park.jpg",
+      "after": "/images/venues/saratov/detskiy-park-r20261009.jpg",
+      "action": "generated",
+      "sha256": "58c14d35b32c41075f0649cf0ac9432b474804bd8433389de1d1745450a6d92d",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Детский парк, in or near saratov, Russia. Scene information from the guide: Уютная зеленая зона в центре с детскими городками, фонтанами и спортивными треками.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/saratov/detskiy-park.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/saratov/detskiy-park-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 480879
+        },
+        {
+          "path": "/images/venues/saratov/detskiy-park-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 174018
+        },
+        {
+          "path": "/images/venues/saratov/detskiy-park-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 41920
+        }
+      ]
+    },
+    {
+      "id": "r804",
+      "city": "saratov",
+      "subject": "Бронзовый памятник первой учительнице",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/saratov/pamyatnik-pervoy-uchitelnitse.jpg",
+      "after": "/images/venues/saratov/pamyatnik-pervoy-uchitelnitse-r20261009.jpg",
+      "action": "generated",
+      "sha256": "1db329ff561408987f40835c990ec7c39c7255fec92159d963f7908ac6d3eb9c",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Бронзовый памятник первой учительнице, in or near saratov, Russia. Scene information from the guide: Изящная скульптура царских времен в сквере у министерства образования.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/saratov/pamyatnik-pervoy-uchitelnitse.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/saratov/pamyatnik-pervoy-uchitelnitse-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 372907
+        },
+        {
+          "path": "/images/venues/saratov/pamyatnik-pervoy-uchitelnitse-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 148223
+        },
+        {
+          "path": "/images/venues/saratov/pamyatnik-pervoy-uchitelnitse-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 39514
+        }
+      ]
+    },
+    {
+      "id": "r875",
+      "city": "sochi",
+      "subject": "Смотрительная башня на горе Ахун",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/sochi/bashnya-ahun.jpg",
+      "after": "/images/venues/sochi/bashnya-ahun-r20261009.jpg",
+      "action": "generated",
+      "sha256": "d98789c73fd5b310326fed9498e1a1198e56e9918cd3988169cacc1510cfb136",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Смотрительная башня на горе Ахун, in or near sochi, Russia. Scene information from the guide: Высотная смотровая точка в романском стиле с панорамой Кавказского хребта и побережья.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/sochi/bashnya-ahun.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/sochi/bashnya-ahun-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 404181
+        },
+        {
+          "path": "/images/venues/sochi/bashnya-ahun-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 142063
+        },
+        {
+          "path": "/images/venues/sochi/bashnya-ahun-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 33072
+        }
+      ]
+    },
+    {
+      "id": "r878",
+      "city": "sochi",
+      "subject": "Чебуречная «У Кристины»",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/sochi/cheburechnaya-u-kristiny.jpg",
+      "after": "/images/venues/sochi/cheburechnaya-u-kristiny-r20261009.jpg",
+      "action": "generated",
+      "sha256": "b6732ecef9718c387ded9edb46c3fe2d0a5b33bce2682585696ffbd106604b93",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Чебуречная «У Кристины», in or near sochi, Russia. Scene information from the guide: Аутентичное гастрономическое место с многолетней историей и сочными кавказскими чебуреками.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/sochi/cheburechnaya-u-kristiny.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/sochi/cheburechnaya-u-kristiny-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 396455
+        },
+        {
+          "path": "/images/venues/sochi/cheburechnaya-u-kristiny-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 142179
+        },
+        {
+          "path": "/images/venues/sochi/cheburechnaya-u-kristiny-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 34597
+        }
+      ]
+    },
+    {
+      "id": "r901",
+      "city": "sochi",
+      "subject": "Памятник В. И. Ленину",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/sochi/pamyatnik-leninu.jpg",
+      "after": "/images/venues/sochi/pamyatnik-leninu-r20261009.jpg",
+      "action": "generated",
+      "sha256": "a03186ebb7e8d4628ac0bc41a4e9ee99e797a37c06631dba330b96ba57329198",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Памятник В. И. Ленину, in or near sochi, Russia. Scene information from the guide: Монументальная историческая точка на одноименной площади из темного гранита.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/sochi/pamyatnik-leninu.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/sochi/pamyatnik-leninu-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 311943
+        },
+        {
+          "path": "/images/venues/sochi/pamyatnik-leninu-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 111151
+        },
+        {
+          "path": "/images/venues/sochi/pamyatnik-leninu-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 27916
+        }
+      ]
+    },
+    {
+      "id": "r906",
+      "city": "sochi",
+      "subject": "Парк «Южные культуры»",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/sochi/park-yuzhnye-kultury.jpg",
+      "after": "/images/venues/sochi/park-yuzhnye-kultury-r20261009.jpg",
+      "action": "generated",
+      "sha256": "944f19fc62b298c9afde50ff523cea3128db6b93d2071da4df1054f65a9977eb",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Парк «Южные культуры», in or near sochi, Russia. Scene information from the guide: Староместный ботанический сад в Адлере с вековыми магнолиями и прудами с черными лебедями.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/sochi/park-yuzhnye-kultury.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/sochi/park-yuzhnye-kultury-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 490970
+        },
+        {
+          "path": "/images/venues/sochi/park-yuzhnye-kultury-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 183421
+        },
+        {
+          "path": "/images/venues/sochi/park-yuzhnye-kultury-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 44676
+        }
+      ]
+    },
+    {
+      "id": "r971",
+      "city": "tver",
+      "subject": "armyanskaya tserkov surb arutyun",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/tver/armyanskaya-tserkov-surb-arutyun.jpg",
+      "after": "/images/venues/tver/armyanskaya-tserkov-surb-arutyun-r20261009.jpg",
+      "action": "generated",
+      "sha256": "2327d27a60dc36800ded54092cb2e26d5ee702138731369b1061c72e42e15c25",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: armyanskaya tserkov surb arutyun, in or near tver, Russia. Scene information from the guide: . Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/tver/armyanskaya-tserkov-surb-arutyun.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/tver/armyanskaya-tserkov-surb-arutyun-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 282929
+        },
+        {
+          "path": "/images/venues/tver/armyanskaya-tserkov-surb-arutyun-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 100808
+        },
+        {
+          "path": "/images/venues/tver/armyanskaya-tserkov-surb-arutyun-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 25961
+        }
+      ]
+    },
+    {
+      "id": "r998",
+      "city": "tver",
+      "subject": "pamyatnik simeonu tverskomu",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/tver/pamyatnik-simeonu-tverskomu.jpg",
+      "after": "/images/venues/tver/pamyatnik-simeonu-tverskomu-r20261009.jpg",
+      "action": "generated",
+      "sha256": "3d7bdad42cc8f8ce91120109e7c8b004bb40a7f5ab06bff5f1b80a8b5bda1435",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: pamyatnik simeonu tverskomu, in or near tver, Russia. Scene information from the guide: . Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/tver/pamyatnik-simeonu-tverskomu.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/tver/pamyatnik-simeonu-tverskomu-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 272724
+        },
+        {
+          "path": "/images/venues/tver/pamyatnik-simeonu-tverskomu-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 101311
+        },
+        {
+          "path": "/images/venues/tver/pamyatnik-simeonu-tverskomu-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 26807
+        }
+      ]
+    },
+    {
+      "id": "r1020",
+      "city": "tyumen",
+      "subject": "Дом Чиралова",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/tyumen/dom-chiralova.jpg",
+      "after": "/images/venues/tyumen/dom-chiralova-r20261009.jpg",
+      "action": "generated",
+      "sha256": "5ca029fd714f36a9afc01e131ee1d78797cea4513692187809bb67633bdbd121",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Дом Чиралова, in or near tyumen, Russia. Scene information from the guide: Деревянный дом на Володарского, 9 рядом с домом Поповой.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/tyumen/dom-chiralova.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/tyumen/dom-chiralova-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 428522
+        },
+        {
+          "path": "/images/venues/tyumen/dom-chiralova-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 148725
+        },
+        {
+          "path": "/images/venues/tyumen/dom-chiralova-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 34000
+        }
+      ]
+    },
+    {
+      "id": "r1070",
+      "city": "ufa",
+      "subject": "Дом жилой Поносовой-Молло",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/ufa/dom-ponosovoy-mollo.jpg",
+      "after": "/images/venues/ufa/dom-ponosovoy-mollo-r20261009.jpg",
+      "action": "generated",
+      "sha256": "dccd2110b7835941f938535e0093714ca964436c001a3a9c665fea9d5ec3e11e",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Дом жилой Поносовой-Молло, in or near ufa, Russia. Scene information from the guide: Изящный особняк начала XX века, первый образец чистого модерна в Уфе.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/ufa/dom-ponosovoy-mollo.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/ufa/dom-ponosovoy-mollo-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 321033
+        },
+        {
+          "path": "/images/venues/ufa/dom-ponosovoy-mollo-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 117731
+        },
+        {
+          "path": "/images/venues/ufa/dom-ponosovoy-mollo-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 30295
+        }
+      ]
+    },
+    {
+      "id": "r1073",
+      "city": "ufa",
+      "subject": "Театральный сквер",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/ufa/fontan-sem-devushek.jpg",
+      "after": "/images/venues/ufa/fontan-sem-devushek-r20261009.jpg",
+      "action": "generated",
+      "sha256": "83d57cdb9e9562285bb1d84e76235a8e1f8c4b92e719063520cc44c9a9f965c9",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Театральный сквер, in or near ufa, Russia. Scene information from the guide: Зеленая аллея с каскадом светомузыкальных фонтанов «Семь девушек» перед Оперным театром.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/ufa/fontan-sem-devushek.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/ufa/fontan-sem-devushek-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 383748
+        },
+        {
+          "path": "/images/venues/ufa/fontan-sem-devushek-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 145091
+        },
+        {
+          "path": "/images/venues/ufa/fontan-sem-devushek-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 36028
+        }
+      ]
+    },
+    {
+      "id": "r1075",
+      "city": "ufa",
+      "subject": "Конгресс-холл «Торатау»",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/ufa/kongress-holl-toratau.jpg",
+      "after": "/images/venues/ufa/kongress-holl-toratau-r20261009.jpg",
+      "action": "generated",
+      "sha256": "2bb6a56aa0d28fea087373d35134069e4a71a31c97c12bde46d2a8869a778d93",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Конгресс-холл «Торатау», in or near ufa, Russia. Scene information from the guide: Современное здание из стекла, напоминающее каплю или щит, у склонов парка «Ватан».. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/ufa/kongress-holl-toratau.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/ufa/kongress-holl-toratau-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 323835
+        },
+        {
+          "path": "/images/venues/ufa/kongress-holl-toratau-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 112639
+        },
+        {
+          "path": "/images/venues/ufa/kongress-holl-toratau-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 27564
+        }
+      ]
+    },
+    {
+      "id": "r1096",
+      "city": "ufa",
+      "subject": "pervaya sobornaya mechet",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/ufa/pervaya-sobornaya-mechet.jpg",
+      "after": "/images/venues/ufa/pervaya-sobornaya-mechet-r20261009.jpg",
+      "action": "generated",
+      "sha256": "d9055680e055916594468a6ba9c6aed58320f336e3727231d0d52e4efc5b6761",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: pervaya sobornaya mechet, in or near ufa, Russia. Scene information from the guide: . Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/ufa/pervaya-sobornaya-mechet.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/ufa/pervaya-sobornaya-mechet-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 245824
+        },
+        {
+          "path": "/images/venues/ufa/pervaya-sobornaya-mechet-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 88036
+        },
+        {
+          "path": "/images/venues/ufa/pervaya-sobornaya-mechet-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 23492
+        }
+      ]
+    },
+    {
+      "id": "r1111",
+      "city": "volgograd",
+      "subject": "Аллея Героев",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/volgograd/alleya-geroev.jpg",
+      "after": "/images/venues/volgograd/alleya-geroev-r20261009.jpg",
+      "action": "generated",
+      "sha256": "26a6a745096780bf09dc0ffe6d1535567cff4b8296f4c5d1dd24e3dfcc584d9b",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Аллея Героев, in or near volgograd, Russia. Scene information from the guide: Широкий пешеходный бульвар с тополем-героем и светящимся небом.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/volgograd/alleya-geroev.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/volgograd/alleya-geroev-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 415292
+        },
+        {
+          "path": "/images/venues/volgograd/alleya-geroev-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 145462
+        },
+        {
+          "path": "/images/venues/volgograd/alleya-geroev-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 33833
+        }
+      ]
+    },
+    {
+      "id": "r1117",
+      "city": "volgograd",
+      "subject": "hram ioanna predtechi",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/volgograd/hram-ioanna-predtechi.jpg",
+      "after": "/images/venues/volgograd/hram-ioanna-predtechi-r20261009.jpg",
+      "action": "generated",
+      "sha256": "0975f1e4c52569e89ce0da9678764668f5fc873e9e0dafaa337fb0559b0ba08b",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: hram ioanna predtechi, in or near volgograd, Russia. Scene information from the guide: . Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/volgograd/hram-ioanna-predtechi.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/volgograd/hram-ioanna-predtechi-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 319596
+        },
+        {
+          "path": "/images/venues/volgograd/hram-ioanna-predtechi-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 114333
+        },
+        {
+          "path": "/images/venues/volgograd/hram-ioanna-predtechi-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 28630
+        }
+      ]
+    },
+    {
+      "id": "r1129",
+      "city": "volgograd",
+      "subject": "Памятник Хользунову",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/volgograd/pamyatnik-holzunovu.jpg",
+      "after": "/images/venues/volgograd/pamyatnik-holzunovu-r20261009.jpg",
+      "action": "generated",
+      "sha256": "f9695f2ef2503c65d187b8b3f43f23b488286fdd3297eee44b205d274e905465",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Памятник Хользунову, in or near volgograd, Russia. Scene information from the guide: Бронзовый монумент летчику-герою Гражданской войны у центральной набережной.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/volgograd/pamyatnik-holzunovu.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/volgograd/pamyatnik-holzunovu-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 245703
+        },
+        {
+          "path": "/images/venues/volgograd/pamyatnik-holzunovu-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 88025
+        },
+        {
+          "path": "/images/venues/volgograd/pamyatnik-holzunovu-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 23089
+        }
+      ]
+    },
+    {
+      "id": "r1130",
+      "city": "volgograd",
+      "subject": "Памятник Ленину у Волго-Донского канала",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/volgograd/pamyatnik-leninu-volgo-don.jpg",
+      "after": "/images/venues/volgograd/pamyatnik-leninu-volgo-don-r20261009.jpg",
+      "action": "generated",
+      "sha256": "d4610f76dd22f7d4da75fb5d00f0df0bd403cb8aa39480c0623a32c4c22a0886",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Памятник Ленину у Волго-Донского канала, in or near volgograd, Russia. Scene information from the guide: Крупнейший в мире памятник реально жившему человеку у шлюзов канала.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/volgograd/pamyatnik-leninu-volgo-don.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/volgograd/pamyatnik-leninu-volgo-don-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 238522
+        },
+        {
+          "path": "/images/venues/volgograd/pamyatnik-leninu-volgo-don-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 88151
+        },
+        {
+          "path": "/images/venues/volgograd/pamyatnik-leninu-volgo-don-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 24217
+        }
+      ]
+    },
+    {
+      "id": "r1198",
+      "city": "yaroslavl",
+      "subject": "Бульвар на Первомайской (Казанский бульвар)",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/yaroslavl/bulvar-pervomayskaya.jpg",
+      "after": "/images/venues/yaroslavl/bulvar-pervomayskaya-r20261009.jpg",
+      "action": "generated",
+      "sha256": "b5b996f3c919e6854296fd454f4baaf332815c1b7d6ae9b2ec4d2bcb36417a0a",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Бульвар на Первомайской (Казанский бульвар), in or near yaroslavl, Russia. Scene information from the guide: Длинный зеленый сквер на месте старинного оборонительного рва.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/yaroslavl/bulvar-pervomayskaya.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/yaroslavl/bulvar-pervomayskaya-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 543887
+        },
+        {
+          "path": "/images/venues/yaroslavl/bulvar-pervomayskaya-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 196250
+        },
+        {
+          "path": "/images/venues/yaroslavl/bulvar-pervomayskaya-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 45293
+        }
+      ]
+    },
+    {
+      "id": "r1202",
+      "city": "yaroslavl",
+      "subject": "Дом Болконского",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/yaroslavl/dom-bolkonskogo.jpg",
+      "after": "/images/venues/yaroslavl/dom-bolkonskogo-r20261009.jpg",
+      "action": "generated",
+      "sha256": "aca561210955d14325ebbf1cea5e67a6e872605c36f6886013b86aaa6ebe1d9b",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Дом Болконского, in or near yaroslavl, Russia. Scene information from the guide: Особняк на набережной, описанный Львом Толстым в «Войне и мире» как место кончины героя.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/yaroslavl/dom-bolkonskogo.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/yaroslavl/dom-bolkonskogo-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 441717
+        },
+        {
+          "path": "/images/venues/yaroslavl/dom-bolkonskogo-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 157527
+        },
+        {
+          "path": "/images/venues/yaroslavl/dom-bolkonskogo-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 37938
+        }
+      ]
+    },
+    {
+      "id": "r1208",
+      "city": "yaroslavl",
+      "subject": "Которосльная набережная",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/yaroslavl/kotoroslnaya-naberezhnaya.jpg",
+      "after": "/images/venues/yaroslavl/kotoroslnaya-naberezhnaya-r20261009.jpg",
+      "action": "generated",
+      "sha256": "87ba6e1a03437f898bf2a986265266bc325943d52ca061f119fcd6305916a0c5",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Которосльная набережная, in or near yaroslavl, Russia. Scene information from the guide: Уединенный променад вдоль малой реки с видами на старинные монастыри.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/yaroslavl/kotoroslnaya-naberezhnaya.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/yaroslavl/kotoroslnaya-naberezhnaya-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 399877
+        },
+        {
+          "path": "/images/venues/yaroslavl/kotoroslnaya-naberezhnaya-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 146138
+        },
+        {
+          "path": "/images/venues/yaroslavl/kotoroslnaya-naberezhnaya-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 36281
+        }
+      ]
+    },
+    {
+      "id": "r1213",
+      "city": "yaroslavl",
+      "subject": "Памятник святым Петру и Февронии",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/yaroslavl/pamyatnik-petru-i-fevronii.jpg",
+      "after": "/images/venues/yaroslavl/pamyatnik-petru-i-fevronii-r20261009.jpg",
+      "action": "generated",
+      "sha256": "37e401f60dd074e10ecc9a15a4f69eb6b7038e84c3ce926a313c5d9883100a76",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Памятник святым Петру и Февронии, in or near yaroslavl, Russia. Scene information from the guide: Парковый памятник покровителям семьи и верности у Которосльной набережной.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/yaroslavl/pamyatnik-petru-i-fevronii.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/yaroslavl/pamyatnik-petru-i-fevronii-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 380734
+        },
+        {
+          "path": "/images/venues/yaroslavl/pamyatnik-petru-i-fevronii-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 146048
+        },
+        {
+          "path": "/images/venues/yaroslavl/pamyatnik-petru-i-fevronii-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 36838
+        }
+      ]
+    },
+    {
+      "id": "r1215",
+      "city": "yaroslavl",
+      "subject": "Памятник Леониду Собинову",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/yaroslavl/pamyatnik-sobinovu.jpg",
+      "after": "/images/venues/yaroslavl/pamyatnik-sobinovu-r20261009.jpg",
+      "action": "generated",
+      "sha256": "61aff8a545a2bfc0cc281617eea52b2b689b2e1e3b350daec788db8d2a7d885f",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Памятник Леониду Собинову, in or near yaroslavl, Russia. Scene information from the guide: Памятник оперному тенору, уроженцу Ярославля, у филармонии.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/yaroslavl/pamyatnik-sobinovu.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/yaroslavl/pamyatnik-sobinovu-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 345464
+        },
+        {
+          "path": "/images/venues/yaroslavl/pamyatnik-sobinovu-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 136388
+        },
+        {
+          "path": "/images/venues/yaroslavl/pamyatnik-sobinovu-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 36762
+        }
+      ]
+    },
+    {
+      "id": "r1225",
+      "city": "yaroslavl",
+      "subject": "Скульптурная композиция «Троица»",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/yaroslavl/skulptura-troitsa.jpg",
+      "after": "/images/venues/yaroslavl/skulptura-troitsa-r20261009.jpg",
+      "action": "generated",
+      "sha256": "0bea7d8f3744e06a2fdb85381f197a53e37fe5ea612d6666133f189d4959e965",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Скульптурная композиция «Троица», in or near yaroslavl, Russia. Scene information from the guide: Единственный в России скульптурный памятник, визуализирующий икону Андрея Рублева у стен Стрелки.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/yaroslavl/skulptura-troitsa.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/yaroslavl/skulptura-troitsa-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 345448
+        },
+        {
+          "path": "/images/venues/yaroslavl/skulptura-troitsa-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 124242
+        },
+        {
+          "path": "/images/venues/yaroslavl/skulptura-troitsa-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 30204
+        }
+      ]
+    },
+    {
+      "id": "r1234",
+      "city": "yaroslavl",
+      "subject": "Историко-культурный комплекс Вятское",
+      "defect": "collage_or_wrong_scene",
+      "before": "/images/venues/yaroslavl/vyatskoe.jpg",
+      "after": "/images/venues/yaroslavl/vyatskoe-r20261009.jpg",
+      "action": "generated",
+      "sha256": "fd8581b9f3bfceb24d7c20dac510b518e454529c7d1085baf3798a65756df230",
+      "generation": {
+        "tool": "built-in image_gen",
+        "prompt": "Use case: photorealistic-natural. Asset type: landscape photograph for a Russian city travel guide on daibilet.ru. Generate ONE single continuous upright 3:2 photograph. Subject: Историко-культурный комплекс Вятское, in or near yaroslavl, Russia. Scene information from the guide: «Самая красивая деревня России»: полностью отреставрированное торгово-промысловое село XIX века, превращенное в живой музейный кластер без заброшенных зданий.. Realistic documentary travel photography, natural materials and proportions, natural daylight, clear subject and sufficient breathing room around important edges for responsive card cropping. No embedded text, logos or watermark. Avoid collage, grid, repeated panels, seams, merged unrelated scenes, flipped orientation, surreal color shifts. Depict this named place or object rather than unrelated attractions. Filename intent: /images/venues/yaroslavl/vyatskoe.jpg."
+      },
+      "variants": [
+        {
+          "path": "/images/venues/yaroslavl/vyatskoe-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 417626
+        },
+        {
+          "path": "/images/venues/yaroslavl/vyatskoe-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 154115
+        },
+        {
+          "path": "/images/venues/yaroslavl/vyatskoe-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 37947
+        }
+      ]
+    },
+    {
+      "id": "missed0",
+      "city": "chelyabinsk",
+      "subject": "arkaim-poselok-mednogo-veka",
+      "defect": "upside_down",
+      "before": "/images/venues/chelyabinsk/arkaim-poselok-mednogo-veka.jpg",
+      "after": "/images/venues/chelyabinsk/arkaim-poselok-mednogo-veka-r20261009.jpg",
+      "action": "restored",
+      "sha256": "187d40e1bdd7bfd80aa777ddcf203ed6e4e9fc85c9765fa1d305ceab46a35032",
+      "restoredFrom": "8c9d42358^",
+      "variants": [
+        {
+          "path": "/images/venues/chelyabinsk/arkaim-poselok-mednogo-veka-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 252683
+        },
+        {
+          "path": "/images/venues/chelyabinsk/arkaim-poselok-mednogo-veka-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 102325
+        },
+        {
+          "path": "/images/venues/chelyabinsk/arkaim-poselok-mednogo-veka-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 26363
+        }
+      ]
+    },
+    {
+      "id": "missed1",
+      "city": "chelyabinsk",
+      "subject": "brudershaft",
+      "defect": "upside_down",
+      "before": "/images/venues/chelyabinsk/brudershaft.jpg",
+      "after": "/images/venues/chelyabinsk/brudershaft-r20261009.jpg",
+      "action": "restored",
+      "sha256": "a20351137e7efb27dfeea5c6fcce4d3f23219fd4a8906f32db7c4f43cf0b563e",
+      "restoredFrom": "8c9d42358^",
+      "variants": [
+        {
+          "path": "/images/venues/chelyabinsk/brudershaft-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 255454
+        },
+        {
+          "path": "/images/venues/chelyabinsk/brudershaft-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 114188
+        },
+        {
+          "path": "/images/venues/chelyabinsk/brudershaft-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 33445
+        }
+      ]
+    },
+    {
+      "id": "missed2",
+      "city": "chelyabinsk",
+      "subject": "experimentus",
+      "defect": "upside_down",
+      "before": "/images/venues/chelyabinsk/experimentus.jpg",
+      "after": "/images/venues/chelyabinsk/experimentus-r20261009.jpg",
+      "action": "restored",
+      "sha256": "eacba56b94198ab2dd865f40c62b97b4d69e1b6bd36bbd6c1497f9cfc24ed7b5",
+      "restoredFrom": "8c9d42358^",
+      "variants": [
+        {
+          "path": "/images/venues/chelyabinsk/experimentus-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 279720
+        },
+        {
+          "path": "/images/venues/chelyabinsk/experimentus-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 123550
+        },
+        {
+          "path": "/images/venues/chelyabinsk/experimentus-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 36228
+        }
+      ]
+    },
+    {
+      "id": "missed4",
+      "city": "chelyabinsk",
+      "subject": "kofeynya-udobno",
+      "defect": "upside_down",
+      "before": "/images/venues/chelyabinsk/kofeynya-udobno.jpg",
+      "after": "/images/venues/chelyabinsk/kofeynya-udobno-r20261009.jpg",
+      "action": "restored",
+      "sha256": "a203a90808aac72bb4e26c3bc8c36e24c776d6932b2ff4fbe0ba96ab25fca72a",
+      "restoredFrom": "8c9d42358^",
+      "variants": [
+        {
+          "path": "/images/venues/chelyabinsk/kofeynya-udobno-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 234626
+        },
+        {
+          "path": "/images/venues/chelyabinsk/kofeynya-udobno-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 99056
+        },
+        {
+          "path": "/images/venues/chelyabinsk/kofeynya-udobno-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 27283
+        }
+      ]
+    },
+    {
+      "id": "missed5",
+      "city": "chelyabinsk",
+      "subject": "pamyatnik-nishchemu",
+      "defect": "upside_down",
+      "before": "/images/venues/chelyabinsk/pamyatnik-nishchemu.jpg",
+      "after": "/images/venues/chelyabinsk/pamyatnik-nishchemu-r20261009.jpg",
+      "action": "restored",
+      "sha256": "3122206313cb73a082cf823e936d9d29619cd7f30df02d6aa24e908b1f08bdca",
+      "restoredFrom": "8c9d42358^",
+      "variants": [
+        {
+          "path": "/images/venues/chelyabinsk/pamyatnik-nishchemu-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 226316
+        },
+        {
+          "path": "/images/venues/chelyabinsk/pamyatnik-nishchemu-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 85886
+        },
+        {
+          "path": "/images/venues/chelyabinsk/pamyatnik-nishchemu-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 21115
+        }
+      ]
+    },
+    {
+      "id": "missed7",
+      "city": "chelyabinsk",
+      "subject": "taganay-belyy-klyuch",
+      "defect": "upside_down",
+      "before": "/images/venues/chelyabinsk/taganay-belyy-klyuch.jpg",
+      "after": "/images/venues/chelyabinsk/taganay-belyy-klyuch-r20261009.jpg",
+      "action": "restored",
+      "sha256": "aad70a5759e232618dab24fe10a8aa4d7acca6c2a750ad99f2c06a9342725426",
+      "restoredFrom": "8c9d42358^",
+      "variants": [
+        {
+          "path": "/images/venues/chelyabinsk/taganay-belyy-klyuch-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 463452
+        },
+        {
+          "path": "/images/venues/chelyabinsk/taganay-belyy-klyuch-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 171090
+        },
+        {
+          "path": "/images/venues/chelyabinsk/taganay-belyy-klyuch-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 38346
+        }
+      ]
+    },
+    {
+      "id": "missed23",
+      "city": "omsk",
+      "subject": "muzey-teatralnogo-iskusstva",
+      "defect": "upside_down",
+      "before": "/images/venues/omsk/muzey-teatralnogo-iskusstva.jpg",
+      "after": "/images/venues/omsk/muzey-teatralnogo-iskusstva-r20261009.jpg",
+      "action": "restored",
+      "sha256": "854dac225e167031cbf902a05536c16bc469ff4c0c15395dc3647547a97f5061",
+      "restoredFrom": "8c9d42358^",
+      "variants": [
+        {
+          "path": "/images/venues/omsk/muzey-teatralnogo-iskusstva-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 253184
+        },
+        {
+          "path": "/images/venues/omsk/muzey-teatralnogo-iskusstva-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 97873
+        },
+        {
+          "path": "/images/venues/omsk/muzey-teatralnogo-iskusstva-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 26813
+        }
+      ]
+    },
+    {
+      "id": "missed27",
+      "city": "omsk",
+      "subject": "starina-sibirskaya",
+      "defect": "upside_down",
+      "before": "/images/venues/omsk/starina-sibirskaya.jpg",
+      "after": "/images/venues/omsk/starina-sibirskaya-r20261009.jpg",
+      "action": "restored",
+      "sha256": "c83161aa2d91a95afaaf9073bd02a1c44c5b8ff6d27baa2eb58f8068b9c758aa",
+      "restoredFrom": "8c9d42358^",
+      "variants": [
+        {
+          "path": "/images/venues/omsk/starina-sibirskaya-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 337030
+        },
+        {
+          "path": "/images/venues/omsk/starina-sibirskaya-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 123475
+        },
+        {
+          "path": "/images/venues/omsk/starina-sibirskaya-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 28775
+        }
+      ]
+    },
+    {
+      "id": "missed43",
+      "city": "rostov-na-donu",
+      "subject": "msii-na-dmitrovskoy",
+      "defect": "upside_down",
+      "before": "/images/venues/rostov-na-donu/msii-na-dmitrovskoy.jpg",
+      "after": "/images/venues/rostov-na-donu/msii-na-dmitrovskoy-r20261009.jpg",
+      "action": "restored",
+      "sha256": "b2405d154d96a318e89ff6a704ce43af500a56563a049cf540238c75a42cf80e",
+      "restoredFrom": "8c9d42358^",
+      "variants": [
+        {
+          "path": "/images/venues/rostov-na-donu/msii-na-dmitrovskoy-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 341173
+        },
+        {
+          "path": "/images/venues/rostov-na-donu/msii-na-dmitrovskoy-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 126460
+        },
+        {
+          "path": "/images/venues/rostov-na-donu/msii-na-dmitrovskoy-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 31264
+        }
+      ]
+    },
+    {
+      "id": "missed49",
+      "city": "rostov-na-donu",
+      "subject": "starocherkasskaya-dvorec-efremovyh",
+      "defect": "upside_down",
+      "before": "/images/venues/rostov-na-donu/starocherkasskaya-dvorec-efremovyh.jpg",
+      "after": "/images/venues/rostov-na-donu/starocherkasskaya-dvorec-efremovyh-r20261009.jpg",
+      "action": "restored",
+      "sha256": "61d5dcd37d51c8aec44e76477b79d95cef6179c2153fb4a1281dc45bcbc12aed",
+      "restoredFrom": "8c9d42358^",
+      "variants": [
+        {
+          "path": "/images/venues/rostov-na-donu/starocherkasskaya-dvorec-efremovyh-r20261009.jpg",
+          "width": 1600,
+          "height": 1067,
+          "bytes": 224702
+        },
+        {
+          "path": "/images/venues/rostov-na-donu/starocherkasskaya-dvorec-efremovyh-r20261009-card.jpg",
+          "width": 960,
+          "height": 640,
+          "bytes": 78556
+        },
+        {
+          "path": "/images/venues/rostov-na-donu/starocherkasskaya-dvorec-efremovyh-r20261009-thumb.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 18809
+        }
+      ]
+    }
+  ]
+}

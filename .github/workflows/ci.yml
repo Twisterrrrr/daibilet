@@ -35,25 +35,57 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  validate-build-test:
-    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.suite == 'all') || github.event_name == 'pull_request' || github.ref_name == 'integrate/mvp-launch' || github.ref_name == 'feat/next-monorepo' || github.ref_name == 'main' || github.ref_name == 'master' }}
+  buyer-ticket-mail-db-test:
     runs-on: ubuntu-latest
     env:
-      DATABASE_URL: postgresql://daibilet:daibilet@127.0.0.1:5437/daibilet
+      DATABASE_URL: postgresql://daibilet:daibilet@127.0.0.1:5437/daibilet?schema=public
     services:
       postgres:
-        image: postgres:16
+        image: postgres:17-alpine
         env:
+          POSTGRES_DB: daibilet
           POSTGRES_USER: daibilet
           POSTGRES_PASSWORD: daibilet
-          POSTGRES_DB: daibilet
         ports:
           - 5437:5432
         options: >-
           --health-cmd "pg_isready -U daibilet -d daibilet"
-          --health-interval 10s
+          --health-interval 5s
           --health-timeout 5s
-          --health-retries 5
+          --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.7.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm db:generate
+      - run: pnpm db:deploy
+      - name: Verify mail retry against PostgreSQL
+        run: pnpm --filter @daibilet/web exec tsx --test src/server/buyer-ticket-delivery.test.ts
+
+  validate-build-test:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://daibilet:daibilet@127.0.0.1:5437/daibilet?schema=public
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: daibilet
+          POSTGRES_USER: daibilet
+          POSTGRES_PASSWORD: daibilet
+        ports:
+          - 5437:5432
+        options: >-
+          --health-cmd "pg_isready -U daibilet -d daibilet"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
     steps:
       - uses: actions/checkout@v4
 
@@ -70,17 +102,38 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Hub image map guard (scan cities)
+        run: pnpm hub:check-image-map
+
+      - name: Hub image quality guard (scan cities)
+        run: pnpm hub:check-image-quality
+
       - name: Prisma validate and generate
         run: |
           pnpm db:validate
           pnpm db:generate
-          pnpm db:deploy
           pnpm db:typecheck
+          pnpm db:deploy
 
       - name: Backend typecheck and unit tests
         run: |
           pnpm backend:typecheck
           pnpm backend:test:ts
+
+      - name: Web lib unit tests (CI allowlist)
+        run: pnpm web:test:ci
+
+      # 29.09. Non-blocking on purpose. apps/web had ~140 type errors and
+      # next.config.ts sets typescript.ignoreBuildErrors, so nothing checked
+      # them and the drift was invisible - that is how a temporal-dead-zone
+      # ReferenceError in the my-day stop row reached production. This step does
+      # not gate merges; it makes the number visible so growth or shrinkage is
+      # observable. Promote it to blocking once the count reaches zero, in the
+      # same change that removes ignoreBuildErrors.
+      # Baseline 29.09: 140. 01.10: 90 (CitySuburbPlace.mustSeeFilter, surface import,
+      # destinations fixture, day-route Prisma fragments, catalog cityId).
+      - name: Web typecheck
+        run: pnpm web:typecheck
 
       - name: Next web build
         run: pnpm web:build
@@ -93,15 +146,36 @@ jobs:
 
       - name: Syntax check deploy and import scripts
         run: |
+          node --test scripts/crawler-infra.test.mjs
+          node --test scripts/smoke-indexability-prod.test.mjs
+          python3 deploy/scripts/switch-web-upstream.test.py
+          python3 deploy/scripts/test-prune-next-runtime-cache.py
+          node --check deploy/scripts/start-web-shadow.mjs
+          bash -n deploy/scripts/web-upstream-handoff.sh
+          bash deploy/scripts/web-upstream-handoff.test.sh
+          bash -n deploy/scripts/maintain-web-disk.sh
+          bash -n deploy/scripts/post-deploy-observation.sh
+          bash -n deploy/scripts/run-post-deploy-observation.sh
+          bash deploy/scripts/test-maintain-web-disk.sh
+          bash -n scripts/deploy-msk-web.sh
+          bash -n deploy/cron/crawler-log-monitor.sh
+          bash -n deploy/cron/indexnow-sitemaps.sh
           node --check scripts/tc-import-catalog.js
           node --check scripts/sync-invariants-check.js
           node --check scripts/lib/provider-link-sync.js
           node --check scripts/lib/event-import-guard.js
+          bash -n deploy/scripts/deploy-runtime.sh
           bash -n deploy/scripts/deploy-from-git.sh
           bash -n deploy/scripts/deploy-staging.sh
+          bash -n deploy/scripts/deploy-prod-next.sh
+          bash -n deploy/scripts/smoke-crawler-prod.sh
+          bash -n deploy/scripts/swap-web-next-artifact.sh
+          bash -n deploy/scripts/postgres-backup-common.sh
+          bash -n deploy/cron/postgres-backup.sh
+          bash -n deploy/scripts/postgres-restore-drill.sh
+          bash -n deploy/scripts/install-postgres-backup-cron.sh
           bash -n scripts/post-deploy-check.sh
           bash -n scripts/run-parity-check.sh
-
   finance-supplier-check:
     if: ${{ (github.event_name == 'workflow_dispatch' && (inputs.suite == 'all' || inputs.suite == 'finance')) || startsWith(github.ref_name, 'codex/') || startsWith(github.ref_name, 'cursor/') || startsWith(github.ref_name, 'feat/') || startsWith(github.head_ref, 'codex/') || startsWith(github.head_ref, 'cursor/') || startsWith(github.head_ref, 'feat/') }}
     runs-on: ubuntu-latest
@@ -109,7 +183,7 @@ jobs:
       DATABASE_URL: postgresql://daibilet:daibilet@127.0.0.1:5437/daibilet
     services:
       postgres:
-        image: postgres:16
+        image: postgres:17-alpine
         env:
           POSTGRES_USER: daibilet
           POSTGRES_PASSWORD: daibilet
@@ -118,9 +192,9 @@ jobs:
           - 5437:5432
         options: >-
           --health-cmd "pg_isready -U daibilet -d daibilet"
-          --health-interval 10s
+          --health-interval 5s
           --health-timeout 5s
-          --health-retries 5
+          --health-retries 20
     steps:
       - uses: actions/checkout@v4
 
@@ -167,3 +241,4 @@ jobs:
           pnpm --filter @daibilet/web typecheck
           node --experimental-strip-types --test apps/web/src/lib/checkout-payment.test.ts
           pnpm web:build
+

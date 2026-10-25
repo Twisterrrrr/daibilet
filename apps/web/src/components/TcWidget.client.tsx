@@ -4,6 +4,7 @@ import * as React from 'react';
 
 import {
   extractTcEventIdFromSession,
+  isStartedTcSession,
   type TcPurchaseTarget,
 } from '@/lib/event-purchase';
 import {
@@ -11,7 +12,13 @@ import {
   formatVacantSeats,
   isFlexibleScheduleSession,
 } from '@/lib/event-page-utils';
-import { TeplohodWidgetButton, getTeplohodWidgetIdsFromSession } from '@/components/TeplohodWidget.client';
+import { trackSelectTickets } from '@/lib/catalog-analytics';
+import {
+  beginPurchaseOpening,
+  completePurchaseOpening,
+  failPurchaseOpening,
+  isPurchaseOpeningActive,
+} from '@/components/PurchaseOpeningFeedback.client';
 
 const TC_WIDGET_SCRIPT_URL = 'https://ticketscloud.com/static/scripts/widget/tcwidget.js';
 const TC_WIDGET_TOKEN = process.env.NEXT_PUBLIC_TC_WIDGET_TOKEN?.trim() || '';
@@ -171,30 +178,159 @@ function openTcPurchaseUrl(purchaseUrl?: string | null) {
   const popup = window.open(normalized, 'tc_widget', 'width=960,height=760,scrollbars=yes,resizable=yes');
   return Boolean(popup);
 }
+
+const TC_FRAME_Z = '2147483000';
+const TC_OVERLAY_Z = '2147482990';
+
+/** Keep TC backdrop under the iframe shell; both above Daibilet chrome (z-99990). */
+function liftTcWidgetLayers() {
+  if (typeof document === 'undefined') return;
+
+  const overlay = document.getElementById('tc-widget-overlay');
+  if (overlay instanceof HTMLElement) {
+    overlay.style.setProperty('z-index', TC_OVERLAY_Z, 'important');
+  }
+
+  const frames = document.querySelectorAll<HTMLElement>(
+    'iframe.tc-widget-frame_popup, iframe[src*="ticketscloud"]',
+  );
+  frames.forEach((frame) => {
+    let node: HTMLElement | null = frame.parentElement;
+    while (node && node !== document.body) {
+      const position = window.getComputedStyle(node).position;
+      if (position === 'fixed' || position === 'absolute') {
+        if (node.id === 'tc-widget-overlay') {
+          node.style.setProperty('z-index', TC_OVERLAY_Z, 'important');
+        } else {
+          node.style.setProperty('z-index', TC_FRAME_Z, 'important');
+        }
+      }
+      node = node.parentElement;
+    }
+  });
+}
+
+function isTcWidgetVisible() {
+  if (typeof document === 'undefined') return false;
+  return Boolean(
+    document.querySelector('.tc-widget-frame_popup') ||
+      document.getElementById('tc-widget-overlay') ||
+      document.querySelector('.tc-widget-container iframe') ||
+      document.querySelector('iframe[src*="ticketscloud"]'),
+  );
+}
+
+function waitForTcWidgetVisible(timeoutMs = 2500) {
+  return new Promise<boolean>((resolve) => {
+    if (isTcWidgetVisible()) {
+      liftTcWidgetLayers();
+      resolve(true);
+      return;
+    }
+
+    const deadline = Date.now() + timeoutMs;
+    const observer = new MutationObserver(() => {
+      if (isTcWidgetVisible()) {
+        liftTcWidgetLayers();
+        observer.disconnect();
+        resolve(true);
+      } else if (Date.now() >= deadline) {
+        observer.disconnect();
+        resolve(false);
+      }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+    window.setTimeout(() => {
+      observer.disconnect();
+      if (isTcWidgetVisible()) liftTcWidgetLayers();
+      resolve(isTcWidgetVisible());
+    }, timeoutMs);
+  });
+}
+
+export type OpenTcWidgetResult = 'widget' | 'popup' | 'none';
+
 export async function openTcWidget(options: {
   trigger: HTMLButtonElement | null;
   purchaseUrl?: string | null;
-}) {
+}): Promise<OpenTcWidgetResult> {
   const { trigger, purchaseUrl } = options;
 
   if (purchaseUrl && !trigger) {
-    openTcPurchaseUrl(purchaseUrl);
-    return;
+    return openTcPurchaseUrl(purchaseUrl) ? 'popup' : 'none';
   }
 
   try {
     await ensureTcWidgetScript();
   } catch {
-    openTcPurchaseUrl(purchaseUrl);
-    return;
+    return openTcPurchaseUrl(purchaseUrl) ? 'popup' : 'none';
   }
 
   if (trigger) {
     trigger.click();
-    return;
+    if (await waitForTcWidgetVisible(2800)) {
+      liftTcWidgetLayers();
+      // Vendor may rewrite inline z-index after paint - re-lift briefly.
+      window.setTimeout(liftTcWidgetLayers, 50);
+      window.setTimeout(liftTcWidgetLayers, 300);
+      return 'widget';
+    }
+    // Second attempt: some TC builds ignore the first synthetic click after late script bind.
+    trigger.click();
+    if (await waitForTcWidgetVisible(1600)) {
+      liftTcWidgetLayers();
+      window.setTimeout(liftTcWidgetLayers, 50);
+      window.setTimeout(liftTcWidgetLayers, 300);
+      return 'widget';
+    }
   }
 
-  openTcPurchaseUrl(purchaseUrl);
+  return openTcPurchaseUrl(purchaseUrl) ? 'popup' : 'none';
+}
+
+async function runTcPurchaseFlow(options: {
+  trigger: HTMLButtonElement | null;
+  purchaseUrl?: string | null;
+  eventId: string;
+  source: string;
+}) {
+  if (isPurchaseOpeningActive()) return;
+
+  const fallbackUrl = normalizeTcPurchaseUrl(options.purchaseUrl) || options.purchaseUrl || null;
+  const run = async () => {
+    const result = await openTcWidget({
+      trigger: options.trigger,
+      purchaseUrl: options.purchaseUrl,
+    });
+    if (result === 'widget' || result === 'popup') {
+      completePurchaseOpening();
+      return;
+    }
+    failPurchaseOpening({
+      message: 'Открываем оплату… Не вышло автоматически. Нажмите «Открыть оплату» или повторите.',
+      fallbackUrl,
+      onRetry: () => {
+        void run();
+      },
+    });
+  };
+
+  beginPurchaseOpening({
+    message: 'Открываем оплату…',
+    fallbackUrl,
+    onRetry: () => {
+      void run();
+    },
+  });
+
+  trackSelectTickets({
+    eventId: options.eventId,
+    provider: 'ticketscloud',
+    source: options.source,
+  });
+
+  await run();
 }
 
 function formatSessionLabels(session: {
@@ -265,9 +401,15 @@ export function TcSessionSlot({
     <>
       <button
         type="button"
-        className="tc-session-slot flex w-full items-center justify-between rounded-lg bg-slate-50 px-3 py-2.5 text-left transition hover:bg-slate-100"
+        className="tc-session-slot relative z-[2] flex w-full items-center justify-between rounded-lg bg-slate-50 px-3 py-2.5 text-left transition hover:bg-slate-100 active:scale-[0.99]"
         onClick={() => {
-          void openTcWidget({ trigger: hiddenTriggerRef.current, purchaseUrl: session.purchaseUrl });
+          if (isStartedTcSession({ ...session, purchaseProvider: 'TICKETSCLOUD' })) return;
+          void runTcPurchaseFlow({
+            trigger: hiddenTriggerRef.current,
+            purchaseUrl: session.purchaseUrl,
+            eventId,
+            source: 'tc_session_slot',
+          });
         }}
       >
         <div className="flex items-center gap-3">
@@ -296,7 +438,7 @@ export function TcSessionSlot({
         type="button"
         data-tc-event={eventId}
         data-tc-token={widgetToken}
-        className="tc-widget-trigger"
+        className="tc-widget-trigger pointer-events-none fixed -left-[9999px] top-0 h-px w-px overflow-hidden opacity-0"
         aria-hidden="true"
         tabIndex={-1}
       >
@@ -384,6 +526,7 @@ export function TcWidgetButton({
   className?: string;
 }) {
   const hiddenButtonRef = React.useRef<HTMLButtonElement | null>(null);
+  const [busy, setBusy] = React.useState(false);
   const eventId = String(tcEventId || '').trim();
   const widgetToken = resolveTcWidgetToken(purchaseUrl);
   const targets = React.useMemo(() => {
@@ -398,10 +541,10 @@ export function TcWidgetButton({
 
   const fallbackLinkClass =
     variant === 'hero'
-      ? `inline-flex min-h-10 items-center justify-center rounded-xl bg-amber-500 px-5 py-3 text-base font-semibold text-white shadow-md shadow-amber-700/30 transition hover:bg-amber-600 active:bg-amber-700 sm:px-6 sm:py-2.5 ${wide ? 'w-full' : ''}`
+      ? `btn-primary min-h-10 px-5 py-3 text-base font-semibold sm:px-6 sm:py-2.5 ${wide ? 'w-full' : ''}`
       : wide
-        ? 'flex w-full items-center justify-center gap-2 rounded-xl bg-primary-600 px-6 py-3.5 text-base font-medium text-white transition hover:bg-primary-700'
-        : 'inline-flex min-h-10 items-center justify-center rounded-xl bg-primary-600 px-6 py-3.5 text-base font-medium text-white transition hover:bg-primary-700';
+        ? 'btn-primary w-full py-3.5 text-base'
+        : 'btn-primary min-h-10 px-6 py-3.5 text-base';
 
   if (!eventId || !widgetToken) {
     if (purchaseUrl) {
@@ -417,26 +560,29 @@ export function TcWidgetButton({
 
   const sizeClasses =
     variant === 'hero'
-      ? `rounded-xl px-5 py-3 text-base font-semibold shadow-md shadow-amber-700/30 sm:px-6 sm:py-2.5 ${wide ? 'w-full' : ''}`
+      ? `rounded-xl px-5 py-3 text-base font-semibold sm:px-6 sm:py-2.5 ${wide ? 'w-full' : ''}`
       : compact
         ? 'rounded-lg px-3.5 py-2 text-sm font-semibold'
         : wide
           ? 'w-full rounded-xl px-6 py-3.5 text-base font-medium'
           : 'rounded-xl px-6 py-3.5 text-base font-medium';
 
-  const colorClasses =
-    variant === 'hero'
-      ? 'bg-amber-500 text-white transition hover:bg-amber-600 active:bg-amber-700'
-      : 'bg-primary-600 text-white transition hover:bg-primary-700';
+  const colorClasses = 'bg-primary-600 text-white transition hover:bg-primary-700';
 
   const buttonClassName =
     className ||
     `tc-buy-btn inline-flex min-h-10 items-center justify-center gap-2 ${colorClasses} ${sizeClasses} ${wide ? 'w-full' : ''}`;
 
   const handleClick = () => {
-    void openTcWidget({
+    if (busy || isPurchaseOpeningActive()) return;
+    setBusy(true);
+    void runTcPurchaseFlow({
       trigger: hiddenButtonRef.current,
       purchaseUrl: targets[0]?.purchaseUrl || purchaseUrl,
+      eventId,
+      source: 'tc_widget_button',
+    }).finally(() => {
+      window.setTimeout(() => setBusy(false), 400);
     });
   };
 
@@ -444,17 +590,19 @@ export function TcWidgetButton({
     <>
       <button
         type="button"
-        className={buttonClassName}
+        className={`${buttonClassName}${busy ? ' pointer-events-none opacity-80' : ''}`}
         onClick={handleClick}
+        aria-busy={busy}
+        disabled={busy}
       >
-        {label}
+        {busy ? 'Открываем…' : label}
       </button>
       <button
         ref={hiddenButtonRef}
         type="button"
         data-tc-event={eventId}
         data-tc-token={widgetToken}
-        className="tc-widget-trigger"
+        className="tc-widget-trigger pointer-events-none fixed -left-[9999px] top-0 h-px w-px overflow-hidden opacity-0"
         aria-hidden="true"
         tabIndex={-1}
       >

@@ -1,5 +1,18 @@
 # Документация Daibilet
 
+[Roadmap Daibilet — сводка на 2026-10](./roadmap-2026-10.md)
+[SEO-аудит 18.10.2026: кэш sitemap, каноникал Москвы, главная no-store](./seo-audit-2026-10-18.md)
+[Подготовка schema_alignment к прод-БД - 17.10.2026](./schema-alignment-prod-fix-2026-10-17.md)
+[Сверка схемы и миграций каталога и финконтура - 17.10.2026](./finance-schema-unification-2026-10-17.md)
+[Places: типизация, сверка PDP и передача Cline](./places-taxonomy-cline-handoff-2026-10.md)
+[Выпуск Places и сверка PDP - 15.10.2026](./places-release-2026-10-15.md)
+[Доступ сотрудников к админке: аудит legacy и проект RBAC](./admin-rbac-design-2026-10.md)
+[Нагрузка CPU на MSK - 15.10.2026](./cpu-load-msk.md)
+[Зависание SSR и ответы 502 роботам - 16.10.2026](./ssr-hang-crawler-2026-10-16.md)
+[Teplohod: baseline Sharp и Next Image Optimizer - 21.10.2026](./teplohod-image-optimization-experiment-2026-10-21.md)
+[Teplohod PDP: выборочные статические WebP обложки - 21.10.2026](./teplohod-pdp-webp-pilot-2026-10-21.md)
+[ISR 500 на удалённых событиях - 21.10.2026](./event-not-found-ssr-regression-2026-10-21.md)
+
 Навигация по репозиторию `Twisterrrrr/daibilet`.
 
 ## С чего начать
@@ -12,6 +25,14 @@
 3. **[launch-qa-and-deploy.md](./launch-qa-and-deploy.md)** — smoke перед продажами
 4. **[deploy-timeweb.md](./deploy-timeweb.md)** — prod на Timeweb
 5. **[deploy-staging.md](./deploy-staging.md)** — staging `/opt/daibilet-staging`
+
+## Ops / production readiness
+
+| Документ | Описание |
+|----------|----------|
+| **[production-readiness-checklist.md](./production-readiness-checklist.md)** | Чеклист «демо vs prod» (Habr), owners, ROI |
+| **[incident-runbook.md](./incident-runbook.md)** | Быстрая диагностика и rollback MSK |
+| **[codex-prod-readiness-handoff.md](./codex-prod-readiness-handoff.md)** | CODEX: cron на prod, auth audit, backup drill |
 
 ## Checkpoint / аудит
 
@@ -50,14 +71,22 @@
 
 | Документ | Описание |
 |----------|----------|
+| [catalog-location-venue-canon.md](./catalog-location-venue-canon.md) | **Канон:** Локация vs Площадка / антидубли |
+| [myday-commercial-canon.md](./myday-commercial-canon.md) | Канон «Мой день» (planner + checklist) |
 | [mvp-spec.md](./mvp-spec.md) | Продуктовая спецификация |
 | [seo-public-mvp.md](./seo-public-mvp.md) | SEO public |
+| [artist-bios.md](./artist-bios.md) | Био исполнителей: правила, покрытие, батч |
+| [organizer-email-intake.md](./organizer-email-intake.md) | Приём писем организаторов: IMAP → staging → apply |
 | [admin-lovable-v4-mvp-plan.md](./admin-lovable-v4-mvp-plan.md) | План админки |
 
 ## Интеграции
 
 | Документ | Описание |
 |----------|----------|
+| [catalog-finance-projection.md](./catalog-finance-projection.md) | **Lock:** граница catalog ↔ finance, projection matrix, PurchaseProjection gap |
+| [museum-contract-readiness.md](./museum-contract-readiness.md) | **Museum-1:** роли/функции, Stage 0 Codex brief, Stage 1 schedule, Stage 2 LK |
+| [spb-finance-host.md](./spb-finance-host.md) | Host roles `.184` / `.159` / `.16` |
+| [phase-2-finance-supplier-blueprint.md](./phase-2-finance-supplier-blueprint.md) | Phase G product / checkout / supplier LC |
 | [integrations.md](./integrations.md) | Ticketscloud, Teplohod |
 | [ticketscloud-import.md](./ticketscloud-import.md) | TC import |
 | [event-extraction.md](./event-extraction.md) | Правила извлечения событий |

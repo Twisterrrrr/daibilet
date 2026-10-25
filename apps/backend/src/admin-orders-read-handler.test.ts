@@ -10,7 +10,7 @@ const assertionSecret = 'finance-actor-assertion-test-secret-32-bytes-minimum';
 function actorAssertion(permissions = ['orders.read', 'orders.pii.read', 'orders.export', 'orders.cancel', 'refunds.request', 'refunds.execute', 'finance.summary.read', 'finance.read', 'payouts.approve', 'documents.read', 'suppliers.read', 'suppliers.bank.read', 'audit.read'], roles = ['FINANCE']) {
   const now = Math.floor(Date.now() / 1000);
   const payload = {
-    v: 1, iss: 'daibilet-web-admin', aud: 'daibilet-finance-admin', sub: 'staff-1', name: 'Иван Финансов', sid: 'session-1',
+    v: 1, iss: 'daibilet-web-admin', aud: 'daibilet-finance-admin', sub: 'staff-1', name: 'Иван Финансов', sid: 'session-1', mfaVerified: true,
     roles, permissions, iat: now, exp: now + 90, jti: `test-${now}`,
   };
   const encoded = Buffer.from(JSON.stringify(payload)).toString('base64url');
@@ -146,5 +146,28 @@ test('external admin order API masks PII and excludes contact fields from search
   assert.equal(includePiiSearch, false);
   assert.equal(body.rows[0].buyer.name, 'А. К.');
   assert.equal(body.rows[0].buyerSnapshot, null);
+  assert.equal(JSON.stringify(body).includes('anna@example.com'), false);
+});
+
+test('external admin order API masks PII by default when no staff session is attached', async () => {
+  let includePiiSearch: boolean | undefined;
+  const handler = createAdminOrdersReadRouteHandler({
+    enabled: true,
+    buildOrdersList: async (_params, options) => {
+      includePiiSearch = options?.includePiiSearch;
+      return { rows: [{ buyer: { name: 'Анна Константинова', email: 'anna@example.com', phone: '+79991234567' } }] };
+    },
+    buildOrderDetail: async () => null,
+  });
+  const fixture = context();
+  fixture.route.pathname = '/api/admin/orders';
+  fixture.route.route = 'GET /api/admin/orders';
+  fixture.route.url = new URL('http://localhost/api/admin/orders');
+  fixture.route.searchParams = new URLSearchParams();
+
+  assert.equal(await handler(fixture.route), true);
+  const body = JSON.parse(fixture.result.body);
+  assert.equal(includePiiSearch, false);
+  assert.equal(body.rows[0].buyer.name, 'А. К.');
   assert.equal(JSON.stringify(body).includes('anna@example.com'), false);
 });

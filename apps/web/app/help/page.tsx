@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import { HelpPageView } from '@/components/HelpPage.client';
+import { JsonLdScripts } from '@/components/JsonLdScripts';
 import { SiteLayout } from '@/components/SiteLayout';
 import { helpFaqJsonLd } from '@/data/help-faq';
 
@@ -12,9 +13,11 @@ export const metadata: Metadata = {
 
 export default function HelpPage() {
   return (
-    <SiteLayout>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(helpFaqJsonLd()) }} />
-      <HelpPageView />
-    </SiteLayout>
+    <>
+      <JsonLdScripts blocks={[helpFaqJsonLd()]} idPrefix="help-jsonld" />
+      <SiteLayout>
+        <HelpPageView />
+      </SiteLayout>
+    </>
   );
 }

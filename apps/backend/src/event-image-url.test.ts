@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   isPlaceholderEventImageUrl,
+  isUsableCatalogImageUrl,
   pickFirstUsableEventImageUrl,
   stabilizeTeplohodImageUrl,
 } from './event-image-url.js';
@@ -63,6 +64,15 @@ test('stabilizeTeplohodImageUrl matches path without query string', () => {
   );
 });
 
+test('stabilizeTeplohodImageUrl converts teplohod-public cache URLs', () => {
+  const input =
+    'https://s3.twcstorage.ru/teplohod-public/images/cache/Events/Event1250/42ade58be1-1.jpg';
+  assert.equal(
+    stabilizeTeplohodImageUrl(input),
+    'https://api.teplohod.info/v1/image?item=Event1250&dirtyAlias=42ade58be1-1.jpg',
+  );
+});
+
 test('pickFirstUsableEventImageUrl prefers stabilized cover over placeholder', () => {
   assert.equal(
     pickFirstUsableEventImageUrl(
@@ -75,6 +85,16 @@ test('pickFirstUsableEventImageUrl prefers stabilized cover over placeholder', (
   assert.equal(
     isPlaceholderEventImageUrl('https://api.teplohod.info/v1/image?item=&dirtyAlias=x.gif'),
     true,
+  );
+  assert.equal(
+    isPlaceholderEventImageUrl('https://api.teplohod.info/v1/image?item=Event1111'),
+    true,
+  );
+  assert.equal(
+    isPlaceholderEventImageUrl(
+      'https://api.teplohod.info/v1/image?item=Event706&dirtyAlias=3d8c76e5e4-1.png',
+    ),
+    false,
   );
 });
 
@@ -92,5 +112,34 @@ test('pickFirstUsableEventImageUrl returns null when only placeholders remain', 
       'https://api.teplohod.info/v1/image?item=&dirtyAlias=placeHolder.gif',
     ),
     null,
+  );
+});
+
+test('isUsableCatalogImageUrl accepts CDN and local events/venues, rejects cities', () => {
+  assert.equal(
+    isUsableCatalogImageUrl(
+      'https://ticketscloud-prod.storage.yandexcloud.net/production/image/x.jpg',
+    ),
+    true,
+  );
+  assert.equal(
+    isUsableCatalogImageUrl('/images/events/tc-6a3cdc3f5ac2fefed3240b7c-sortavala-ussr-museum.jpg'),
+    true,
+  );
+  assert.equal(isUsableCatalogImageUrl('/images/venues/generated/venue-auto-abc.jpg'), true);
+  assert.equal(isUsableCatalogImageUrl('/images/cities/moscow.png'), false);
+  assert.equal(isUsableCatalogImageUrl(''), false);
+  assert.equal(isUsableCatalogImageUrl(null), false);
+});
+
+test('pickFirstUsableEventImageUrl prefers venue CDN over ephemeral evt-auto stub', () => {
+  const venue =
+    'https://api.teplohod.info/v1/image?item=Event172&dirtyAlias=25a679c595-1.jpg';
+  assert.equal(
+    pickFirstUsableEventImageUrl(
+      '/images/events/generated/evt-auto-3287bba11438.jpg',
+      venue,
+    ),
+    venue,
   );
 });

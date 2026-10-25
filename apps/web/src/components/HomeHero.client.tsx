@@ -1,25 +1,39 @@
 'use client';
 
-import { CalendarDays, Landmark, MapPin, Search, Ticket } from 'lucide-react';
-import { FormEvent, useState } from 'react';
+import { CalendarDays, Search } from 'lucide-react';
+import { FormEvent, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { CityPicker } from '@/components/CityPicker.client';
-import { HomeHeroBackground } from '@/components/HomeHeroBackground.client';
+import { HeroLayout } from '@/components/HeroLayout';
+import { HeroMedia } from '@/components/HeroMedia.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
-import type { PublicDestinationDto } from '@daibilet/contracts/public';
-import { buildCatalogHref, catalogHrefWithSelectedCity } from '@/lib/catalog-url';
+import type { PublicDestinationDto, PublicLandingDto } from '@daibilet/contracts/public';
+import { buildCatalogHref } from '@/lib/catalog-url';
+import { catalogSocialStats } from '@/lib/catalog-social-stats';
 import { cityToPrepositional } from '@/lib/city-declension';
+import { formatNumber } from '@/lib/format';
+
+/** Display polish: chip labels come from hub/landing data and may start lowercase. */
+function capitalizeChipLabel(label: string): string {
+  const trimmed = String(label || '').trim();
+  return trimmed ? trimmed.charAt(0).toUpperCase() + trimmed.slice(1) : trimmed;
+}
+
+/** Russian pluralization helpers */
+function pluralize(n: number, one: string, few: string, many: string): string {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return one;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return few;
+  return many;
+}
 import {
-  formatNumber,
-  formatStatCount,
-  isMeaningfulStatCount,
-  pluralCities,
-  pluralEvents,
-  pluralVenues,
-  roundStatToTen,
-} from '@/lib/format';
-import { HERO_QUICK_CHIPS } from '@/lib/home-scenarios';
+  HOME_HERO_IMAGES,
+  homeHeroObjectPositionClass,
+} from '@/lib/home-hero-images';
+import { normalizeKnownCitySlug } from '@/lib/landing-routes';
+import { HERO_QUICK_CHIPS, buildHomeHeroQuickChips } from '@/lib/home-scenarios';
 
 const HERO_DATE_OPTIONS = [
   { value: 'all', label: 'Любая дата' },
@@ -28,235 +42,207 @@ const HERO_DATE_OPTIONS = [
   { value: 'weekend', label: 'Выходные' },
 ] as const;
 
+export type HomeHeroFrame = { src: string; alt: string; objectPosition?: string };
+
 type HomeHeroProps = {
-  destinations: PublicDestinationDto[];
-  totalEvents: number;
-  totalVenues: number;
-  cityCount: number;
+  /** Prefer SelectedCityProvider destinations to avoid duplicating the layout payload. */
+  destinations?: PublicDestinationDto[];
+  /** LCP frame(s) for SSR; rotator may expand client-side from the static pool. */
+  frames: HomeHeroFrame[];
+  /**
+   * When true (default), after mount append the static emotion pool if SSR only
+   * sent one frame (WEB.LIGHT.A2 - keep residual frames out of RSC HTML).
+   */
+  expandStaticRotator?: boolean;
+  landings?: Array<Pick<PublicLandingDto, 'slug' | 'title' | 'events' | 'priceFrom'> & { subtitle?: string }>;
+  videoSrc?: string | null;
+  /** Cookie city so H1 / chips match SSR and do not jump after hydrate. */
+  ssrCityName?: string | null;
+  ssrCitySlug?: string | null;
 };
 
-export function HomeHero({ destinations, totalEvents, totalVenues, cityCount }: HomeHeroProps) {
+export function HomeHero({
+  destinations,
+  frames,
+  expandStaticRotator = true,
+  landings = [],
+  videoSrc,
+  ssrCityName = null,
+  ssrCitySlug = null,
+}: HomeHeroProps) {
   const router = useRouter();
   const selectedCity = useSelectedCityOptional();
   const destination = selectedCity?.cityValue ?? 'all';
   const setDestination = selectedCity?.setCity ?? (() => {});
   const selectedDestination = selectedCity?.selectedDestination ?? null;
-  const [heroQuery, setHeroQuery] = useState('');
+  const pickerDestinations = destinations?.length
+    ? destinations
+    : selectedCity?.destinations ?? [];
   const [heroDate, setHeroDate] = useState('all');
+  const [mediaFrames, setMediaFrames] = useState(frames);
 
-  const selectedCityName = selectedDestination?.name || null;
+  useEffect(() => {
+    setMediaFrames(frames);
+  }, [frames]);
 
-  const openCatalog = (extra?: Record<string, string>) => {
+  useEffect(() => {
+    if (!expandStaticRotator || videoSrc || frames.length !== 1) return;
+    const lcpSrc = frames[0]?.src?.trim();
+    if (!lcpSrc) return;
+    // Idle: grow rotator from the static pool without bloating SSR flight.
+    const expand = () => {
+      const poolFrames: HomeHeroFrame[] = HOME_HERO_IMAGES.map((image) => ({
+        src: image.landscape,
+        alt: image.alt,
+        objectPosition: homeHeroObjectPositionClass(image),
+      }));
+      const rest = poolFrames.filter((frame) => frame.src !== lcpSrc);
+      if (!rest.length) return;
+      setMediaFrames([
+        frames[0]!,
+        ...rest,
+      ]);
+    };
+    if (typeof window === 'undefined') return;
+    // Keep the LCP photo on screen; expanding the pool immediately looks like a glitch.
+    const timer = window.setTimeout(expand, 8000);
+    return () => window.clearTimeout(timer);
+  }, [expandStaticRotator, frames, videoSrc]);
+
+  const selectedCityName =
+    selectedDestination?.name ||
+    (destination !== 'all' && selectedCity?.cityLabel && selectedCity.cityLabel !== 'Все города'
+      ? selectedCity.cityLabel
+      : null) ||
+    (selectedCity?.cityReady === false ? ssrCityName : null) ||
+    (!selectedCity ? ssrCityName : null);
+  const citySlug =
+    normalizeKnownCitySlug(selectedDestination?.slug) ||
+    normalizeKnownCitySlug(selectedDestination?.sourceSlug) ||
+    (destination !== 'all' ? normalizeKnownCitySlug(destination) || destination : null) ||
+    (selectedCity?.cityReady === false || !selectedCity ? ssrCitySlug : null);
+
+  // City-specific chips: hub landings + categories with events
+  const heroChips = buildHomeHeroQuickChips({
+    citySlug,
+    landings,
+    hubTags: selectedDestination?.hubTags || null,
+    categories: selectedDestination?.categories || null,
+  });
+  const chips = heroChips.length > 0 ? heroChips : HERO_QUICK_CHIPS;
+
+  const openCatalog = (category?: string) => {
     router.push(
       buildCatalogHref({
-        q: heroQuery.trim() || undefined,
         city: destination !== 'all' ? destination : undefined,
         date: heroDate !== 'all' ? heroDate : undefined,
-        sort: extra?.sort as 'popular' | 'time' | undefined,
-        ...extra,
+        category: category || undefined,
+        sort: 'popular',
       }),
     );
   };
 
   const onSubmit = (event: FormEvent) => {
     event.preventDefault();
-    openCatalog({ sort: 'popular' });
+    openCatalog();
   };
 
+  // City-aware H1: personalize by detected city; national = event count.
+  const { events: totalEvents, places: totalCities, venues: totalVenues } = catalogSocialStats(destinations);
+  const cityTitle = selectedCityName ? (
+    <>
+      <span className="block">Экскурсии, музеи и мероприятия</span>
+      <span className="block bg-gradient-to-r from-sky-200 to-white bg-clip-text text-transparent">
+        в {cityToPrepositional(selectedCityName)}
+      </span>
+    </>
+  ) : (
+    <>
+      <span className="block">Экскурсии, музеи и мероприятия</span>
+      <span className="block bg-gradient-to-r from-sky-200 to-white bg-clip-text text-transparent">
+        в {formatNumber(totalCities)} {pluralize(totalCities, 'городе', 'городах', 'городах')} России
+      </span>
+    </>
+  );
+
   return (
-    <section className="relative overflow-hidden bg-slate-900">
-      <HomeHeroBackground />
-      <div className="container-page relative pb-12 pt-12 sm:pb-16 sm:pt-16">
-        <div className="mx-auto max-w-3xl text-center drop-shadow-[0_2px_14px_rgba(15,23,42,0.55)]">
-          <HomeHeroStats
-            selectedCityName={selectedCityName}
-            selectedDestination={selectedDestination}
-            totalEvents={totalEvents}
-            totalVenues={totalVenues}
-            cityCount={cityCount}
+    <HeroLayout
+      variant={videoSrc ? 'video' : 'imageOverlay'}
+      brand="Дайбилет"
+      title={cityTitle}
+      tone="dark"
+      className="!bg-[#122868]"
+      media={<HeroMedia frames={mediaFrames} videoSrc={videoSrc} />}
+    >
+      {/* Social proof strip — live stats from catalog */}
+      <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-sm text-white/75 sm:gap-x-5">
+        <span>{formatNumber(totalEvents)} {pluralize(totalEvents, 'событие', 'события', 'событий')}</span>
+        <span className="text-white/30" aria-hidden>·</span>
+        <span>{formatNumber(totalVenues)} {pluralize(totalVenues, 'площадка', 'площадки', 'площадок')}</span>
+        <span className="text-white/30" aria-hidden>·</span>
+        <span>{formatNumber(totalCities)} {pluralize(totalCities, 'город', 'города', 'городов')}</span>
+      </div>
+
+      {/* H2 value proposition */}
+      <p className="mx-auto mt-3 max-w-2xl text-center text-sm leading-relaxed text-white/60 sm:text-base">
+        Сравните цены, выберите дату и купите билет онлайн без переплат и наценок.
+      </p>
+
+      <form
+        onSubmit={onSubmit}
+        className="mt-8 w-full max-w-5xl rounded-2xl bg-white p-2 text-left shadow-2xl shadow-slate-950/30"
+        aria-label="Поиск билетов"
+      >
+        {/* City + date + find on all breakpoints. Category lives in soft chip rail. */}
+        <div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1.4fr)_minmax(120px,0.9fr)_auto]">
+          <CityPicker
+            cities={pickerDestinations}
+            value={destination}
+            onChange={setDestination}
+            allLabel="Город"
+            variant="hero"
           />
-          <h1 className="font-display text-3xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
-            {selectedCityName ? (
-              <>
-                Экскурсии и события
-                <span className="block bg-gradient-to-r from-sky-200 to-white bg-clip-text text-transparent">
-                  в {cityToPrepositional(selectedCityName)}
-                </span>
-              </>
-            ) : (
-              <>
-                Экскурсии, музеи и мероприятия
-                <span className="block bg-gradient-to-r from-sky-200 to-white bg-clip-text text-transparent">
-                  в городах России
-                </span>
-              </>
-            )}
-          </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-base text-white/85 sm:text-lg">
-            Найдите, куда сходить сегодня, завтра или на выходных — от речных прогулок и музеев до концертов и авторских экскурсий.
-          </p>
-        </div>
-
-        <form onSubmit={onSubmit} className="mx-auto mt-8 max-w-5xl rounded-2xl bg-white p-2 shadow-2xl shadow-slate-950/30">
-          <div className="grid grid-cols-1 gap-2 md:grid-cols-[minmax(140px,1fr)_minmax(130px,0.8fr)_minmax(0,1.6fr)_auto]">
-            <CityPicker
-              cities={destinations}
-              value={destination}
-              onChange={setDestination}
-              allLabel="Куда поедете?"
-              variant="hero"
-            />
-            <div className="relative">
-              <CalendarDays className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <select
-                value={heroDate}
-                onChange={(event) => setHeroDate(event.target.value)}
-                aria-label="Дата"
-                className="h-11 w-full appearance-none rounded-xl bg-slate-50 pl-10 pr-8 text-sm font-medium text-slate-800 outline-none hover:bg-slate-100 focus:ring-2 focus:ring-primary/25"
-              >
-                {HERO_DATE_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <label className="relative flex items-center">
-              <Search className="pointer-events-none absolute left-3 h-4 w-4 text-slate-400" />
-              <input
-                type="search"
-                value={heroQuery}
-                onChange={(event) => setHeroQuery(event.target.value)}
-                placeholder="Экскурсия, музей, теплоход, концерт..."
-                className="h-11 w-full rounded-xl bg-slate-50 pl-10 pr-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-primary/25"
-              />
-            </label>
-            <button
-              type="submit"
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-slate-800 active:scale-[0.98]"
+          <div className="relative">
+            <CalendarDays className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <select
+              value={heroDate}
+              onChange={(event) => setHeroDate(event.target.value)}
+              aria-label="Дата"
+              className="h-11 w-full appearance-none rounded-xl bg-slate-50 pl-10 pr-8 text-sm font-medium text-slate-800 outline-none hover:bg-slate-100 focus:ring-2 focus:ring-primary/25"
             >
-              <Search className="h-4 w-4" />
-              Найти
-            </button>
+              {HERO_DATE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
           </div>
-        </form>
+          <button
+            type="submit"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-slate-800 active:scale-[0.98]"
+          >
+            <Search className="h-4 w-4" />
+            Найти билеты
+          </button>
+        </div>
+      </form>
 
-        <div className="mx-auto mt-4 flex max-w-5xl flex-wrap items-center justify-center gap-2">
-          {HERO_QUICK_CHIPS.map((chip) => {
-            let href = chip.href;
-            if (chip.href.startsWith('/events')) {
-              const params = new URLSearchParams(chip.href.includes('?') ? chip.href.slice(chip.href.indexOf('?') + 1) : '');
-              href = catalogHrefWithSelectedCity(destination, {
-                q: params.get('q') || undefined,
-                city: params.get('city') || undefined,
-                category: params.get('category') || undefined,
-                date: params.get('date') || undefined,
-                sort: (params.get('sort') as 'popular' | 'time' | undefined) || undefined,
-              });
-            }
-            return (
-              <a
-                key={chip.label}
-                href={href}
-                className="rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm transition hover:bg-white/20"
-              >
-                {chip.label}
-              </a>
-            );
-          })}
+      {/* Category chips — soft, no border, one line. Centered when they fit,
+          horizontally swipeable when they overflow: outer w-full guarantees
+          bounded width so inner w-max actually overflows and scrolls. */}
+      <div className="mt-5 w-full overflow-x-auto text-sm text-white/80 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="mx-auto flex w-max min-w-full items-center justify-center gap-2">
+          {chips.slice(0, 7).map((chip) => (
+            <a
+              key={chip.label}
+              href={chip.href}
+              className="shrink-0 whitespace-nowrap rounded-full px-3.5 py-1.5 transition hover:bg-white/15"
+            >
+              {capitalizeChipLabel(chip.label)}
+            </a>
+          ))}
         </div>
       </div>
-    </section>
+    </HeroLayout>
   );
-}
-
-function HomeHeroStats({
-  selectedCityName,
-  selectedDestination,
-  totalEvents,
-  totalVenues,
-  cityCount,
-}: {
-  selectedCityName?: string | null;
-  selectedDestination?: PublicDestinationDto | null;
-  totalEvents: number;
-  totalVenues: number;
-  cityCount: number;
-}) {
-  if (selectedCityName && selectedDestination) {
-    const cityEvents = roundStatToTen(selectedDestination.events);
-    const cityVenues = roundStatToTen(selectedDestination.venues);
-    if (!isMeaningfulStatCount(cityEvents, 1)) return null;
-    return (
-      <div className="mx-auto mb-4 flex flex-wrap items-center justify-center gap-3">
-        <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-sm font-semibold text-white backdrop-blur-sm">
-          <Ticket className="h-4 w-4 shrink-0" />
-          {formatStatCount(cityEvents)} {pluralEventsLabel(cityEvents)} в {cityToPrepositional(selectedCityName)}
-        </span>
-        {isMeaningfulStatCount(cityVenues, 1) ? (
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-sm font-semibold text-white backdrop-blur-sm">
-            <Landmark className="h-4 w-4 shrink-0" />
-            {formatStatCount(cityVenues)} {pluralVenuesLabel(cityVenues)}
-          </span>
-        ) : null}
-      </div>
-    );
-  }
-
-  const roundedEvents = roundStatToTen(totalEvents);
-  const roundedVenues = roundStatToTen(totalVenues);
-  const showEvents = isMeaningfulStatCount(roundedEvents, 1);
-  const showVenues = isMeaningfulStatCount(roundedVenues, 1);
-  const showCities = cityCount >= 3;
-  if (!showEvents && !showVenues && !showCities) return null;
-
-  return (
-    <div className="mx-auto mb-4 flex flex-wrap items-center justify-center gap-3">
-      {showEvents ? (
-        <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-sm font-semibold text-white backdrop-blur-sm">
-          <Ticket className="h-4 w-4 shrink-0" />
-          {formatStatCount(roundedEvents)} {pluralEventsLabel(roundedEvents)}
-        </span>
-      ) : null}
-      {showVenues ? (
-        <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-sm font-semibold text-white backdrop-blur-sm">
-          <Landmark className="h-4 w-4 shrink-0" />
-          {formatStatCount(roundedVenues)} {pluralVenuesLabel(roundedVenues)}
-        </span>
-      ) : null}
-      {showCities ? (
-        <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-sm font-semibold text-white backdrop-blur-sm">
-          <MapPin className="h-4 w-4 shrink-0" />
-          {formatNumber(cityCount)} {pluralCitiesLabel(cityCount)}
-        </span>
-      ) : null}
-    </div>
-  );
-}
-
-function pluralEventsLabel(count: number): string {
-  const mod10 = count % 10;
-  const mod100 = count % 100;
-  if (mod100 >= 11 && mod100 <= 19) return 'событий';
-  if (mod10 === 1) return 'событие';
-  if (mod10 >= 2 && mod10 <= 4) return 'события';
-  return 'событий';
-}
-
-function pluralCitiesLabel(count: number): string {
-  const mod10 = count % 10;
-  const mod100 = count % 100;
-  if (mod100 >= 11 && mod100 <= 19) return 'городов';
-  if (mod10 === 1) return 'город';
-  if (mod10 >= 2 && mod10 <= 4) return 'города';
-  return 'городов';
-}
-
-function pluralVenuesLabel(count: number): string {
-  const mod10 = count % 10;
-  const mod100 = count % 100;
-  if (mod100 >= 11 && mod100 <= 19) return 'площадок';
-  if (mod10 === 1) return 'площадка';
-  if (mod10 >= 2 && mod10 <= 4) return 'площадки';
-  return 'площадок';
 }

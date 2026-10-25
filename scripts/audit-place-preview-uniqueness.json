@@ -1,0 +1,157 @@
+{
+  "cities": {
+    "chelyabinsk": {
+      "mustSeeVisible": 20,
+      "nullOrMissingSlug": [],
+      "sharedPaths": [],
+      "identityShared": []
+    },
+    "tver": {
+      "mustSeeVisible": 20,
+      "nullOrMissingSlug": [],
+      "sharedPaths": [],
+      "identityShared": []
+    },
+    "penza": {
+      "mustSeeVisible": 20,
+      "nullOrMissingSlug": [],
+      "sharedPaths": [],
+      "identityShared": []
+    },
+    "omsk": {
+      "mustSeeVisible": 20,
+      "nullOrMissingSlug": [],
+      "sharedPaths": [],
+      "identityShared": []
+    },
+    "rostov-na-donu": {
+      "mustSeeVisible": 20,
+      "nullOrMissingSlug": [],
+      "sharedPaths": [],
+      "identityShared": []
+    },
+    "tyumen": {
+      "mustSeeVisible": 20,
+      "nullOrMissingSlug": [],
+      "sharedPaths": [],
+      "identityShared": []
+    },
+    "ufa": {
+      "mustSeeVisible": 20,
+      "nullOrMissingSlug": [],
+      "sharedPaths": [],
+      "identityShared": []
+    },
+    "voronezh": {
+      "mustSeeVisible": 20,
+      "nullOrMissingSlug": [],
+      "sharedPaths": [],
+      "identityShared": []
+    },
+    "ryazan": {
+      "mustSeeVisible": 20,
+      "nullOrMissingSlug": [],
+      "sharedPaths": [],
+      "identityShared": []
+    },
+    "novosibirsk": {
+      "mustSeeVisible": 20,
+      "nullOrMissingSlug": [],
+      "sharedPaths": [],
+      "identityShared": []
+    },
+    "samara": {
+      "mustSeeVisible": 20,
+      "nullOrMissingSlug": [],
+      "sharedPaths": [],
+      "identityShared": []
+    },
+    "krasnoyarsk": {
+      "mustSeeVisible": 20,
+      "nullOrMissingSlug": [],
+      "sharedPaths": [],
+      "identityShared": []
+    },
+    "tolyatti": {
+      "mustSeeVisible": 8,
+      "nullOrMissingSlug": [],
+      "sharedPaths": [],
+      "identityShared": []
+    },
+    "surgut": {
+      "mustSeeVisible": 8,
+      "nullOrMissingSlug": [],
+      "sharedPaths": [],
+      "identityShared": []
+    },
+    "vladikavkaz": {
+      "mustSeeVisible": 8,
+      "nullOrMissingSlug": [],
+      "sharedPaths": [],
+      "identityShared": []
+    }
+  },
+  "scenarios": {
+    "chelyabinsk": {
+      "presets": 4,
+      "dupCovers": []
+    },
+    "tver": {
+      "presets": 4,
+      "dupCovers": []
+    },
+    "penza": {
+      "presets": 4,
+      "dupCovers": []
+    },
+    "omsk": {
+      "presets": 4,
+      "dupCovers": []
+    },
+    "rostov-na-donu": {
+      "presets": 4,
+      "dupCovers": []
+    },
+    "tyumen": {
+      "presets": 4,
+      "dupCovers": []
+    },
+    "ufa": {
+      "presets": 4,
+      "dupCovers": []
+    },
+    "voronezh": {
+      "presets": 4,
+      "dupCovers": []
+    },
+    "ryazan": {
+      "presets": 5,
+      "dupCovers": []
+    },
+    "novosibirsk": {
+      "presets": 5,
+      "dupCovers": []
+    },
+    "samara": {
+      "presets": 4,
+      "dupCovers": []
+    },
+    "krasnoyarsk": {
+      "presets": 4,
+      "dupCovers": []
+    },
+    "tolyatti": {
+      "presets": 0,
+      "dupCovers": []
+    },
+    "surgut": {
+      "presets": 0,
+      "dupCovers": []
+    },
+    "vladikavkaz": {
+      "presets": 0,
+      "dupCovers": []
+    }
+  },
+  "failures": []
+}

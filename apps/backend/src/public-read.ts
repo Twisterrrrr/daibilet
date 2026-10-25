@@ -2,8 +2,12 @@ export {
   buildPublicCatalogDto,
   clearPublicCatalogDtoCache,
   getPublicCatalogSessions,
+  getPublicCatalogSessionsSoft,
+  resolveCatalogSessionsByDestinationKeys,
+  resolveCatalogSessionsByVenueKeys,
 } from './public-catalog.dto.js';
 export { buildPublicEventDto, clearPublicEventDtoCache } from './public-event.dto.js';
+export { buildPublicEventFreshnessMap, clearPublicEventFreshnessCache } from './public-event-freshness.js';
 export {
   buildPublicCityDto,
   buildPublicDestinationsDto,
@@ -27,3 +31,4 @@ export {
 export { buildPublicBuyerOrdersDto } from './public-orders.dto.js';
 export { buildPublicStatsDto } from './public-stats.dto.js';
 export { buildPublicSearchDto } from './public-search.dto.js';
+export { loadVenueMapTip } from './public-venue-map-tip.js';

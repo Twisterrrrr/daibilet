@@ -5,8 +5,18 @@ import type { ReactNode } from 'react';
 import { EditorsPickBadge, EventCardBadge } from '@/components/EventFavoriteButton.client';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 import { isHitEvent, isRecommendBadgeEvent } from '@/lib/home-showcase-sections';
-import { LOW_TICKETS_THRESHOLD, resolveAgeBadge } from '@/lib/event-card-meta';
-import { formatVacantSeats } from '@/lib/event-page-utils';
+import {
+  formatCoverDateBadge,
+  getDepartingSoonMinutes,
+  isOpenDate,
+  LOW_TICKETS_THRESHOLD,
+} from '@/lib/event-card-meta';
+
+function isTodayTomorrowCoverBadge(label: string | null): boolean {
+  if (!label) return false;
+  const lower = label.toLocaleLowerCase('ru-RU');
+  return lower === 'сегодня' || lower === 'завтра' || lower.startsWith('сегодня') || lower.startsWith('завтра');
+}
 
 type EventImageBadgesProps = {
   event: PublicSessionDto;
@@ -14,57 +24,115 @@ type EventImageBadgesProps = {
   rail?: boolean;
   recommendVariant?: 'text' | 'compact';
   editorsPick?: boolean;
+  /** Cover: only compact date (city hub / cleaned rails). */
+  dateOnly?: boolean;
+  /** Grid catalog: drop Сегодня/Завтра on the photo; Hit and other signals stay. */
+  hideRelativeCoverDate?: boolean;
 };
+
+const DATE_BADGE_CLASS =
+  'bg-white/90 text-slate-950 shadow-[0_4px_12px_rgba(0,0,0,0.05)] ring-1 ring-white/60 backdrop-blur-md';
+
+/** Russian pluralization for "город": 1 город, 2-4 города, 5+ городов. */
+function pluralizeCities(n: number): string {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return 'городе';
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return 'городах';
+  return 'городах';
+}
+
+function formatPeerCityLabel(count: number): string {
+  return `Ещё в ${count} ${pluralizeCities(count)}`;
+}
 
 export function EventImageBadges({
   event,
   showSoonBadge = false,
   rail = false,
   editorsPick = false,
+  dateOnly = false,
+  hideRelativeCoverDate = false,
 }: EventImageBadgesProps) {
-  const showLowTickets =
+  const dateBadge = formatCoverDateBadge(event);
+  const showCoverDate = Boolean(dateBadge) && !(hideRelativeCoverDate && isTodayTomorrowCoverBadge(dateBadge));
+
+  // Rails / date-only: clean cover - date in top-left, no Hit/FOMO/age pile.
+  if (rail || dateOnly) {
+    if (!dateBadge) return null;
+    return (
+      <div className="absolute left-2 top-2 z-[2] flex max-w-[70%] flex-col items-start gap-1 sm:left-3 sm:top-3">
+        <EventCardBadge key="date" className={DATE_BADGE_CLASS}>
+          {dateBadge}
+        </EventCardBadge>
+      </div>
+    );
+  }
+
+  const hasLowTicketCount =
     typeof event.vacant === 'number' && event.vacant > 0 && event.vacant <= LOW_TICKETS_THRESHOLD;
+  const departingSoonMinutes =
+    !isOpenDate(event) && event.startsAt ? getDepartingSoonMinutes(event.startsAt) : null;
   const recommend = editorsPick || isRecommendBadgeEvent(event);
   const recommendLabel = editorsPick ? 'Выбор редакции' : 'Рекомендуем';
   const hit = editorsPick
     ? (event.sessionCount || 0) >= 4 || (event.landingSlugs?.length || 0) > 0
     : isHitEvent(event);
-  const ageBadge = resolveAgeBadge(event.tags || [], event.ageLimit);
-  const maxSecondary = rail ? 2 : 4;
+  const maxSecondary = 4;
+  const todayOnCover = dateBadge === 'Сегодня';
 
   const secondary: ReactNode[] = [];
-  if (showLowTickets) {
+  // Age stays in text meta only - date takes the former age slot on cover.
+  if (showCoverDate && dateBadge) {
     secondary.push(
-      <EventCardBadge key="vacant" className="bg-rose-500/95 text-white">
-        {formatVacantSeats(event.vacant ?? 0)}
+      <EventCardBadge key="date" className={DATE_BADGE_CLASS}>
+        {dateBadge}
       </EventCardBadge>,
     );
-  } else if (hit) {
+  }
+  // Cross-city peer events badge.
+  if ((event.peerCityCount || 0) > 0 && secondary.length < maxSecondary) {
     secondary.push(
-      <EventCardBadge key="hit" className="bg-primary-600 text-white">
+      <EventCardBadge key="peer-cities" className="bg-blue-50/90 text-blue-700 ring-1 ring-blue-200/60 backdrop-blur-md">
+        {formatPeerCityLabel(event.peerCityCount!)}
+      </EventCardBadge>,
+    );
+  }
+  // Exact availability belongs in purchase UI; repeating it on every catalog card adds noise.
+  if (!hasLowTicketCount && hit && secondary.length < maxSecondary) {
+    secondary.push(
+      <EventCardBadge key="hit" className="bg-white/90 text-slate-950 shadow-[0_4px_12px_rgba(0,0,0,0.05)] ring-1 ring-white/60 backdrop-blur-md">
         Хит
       </EventCardBadge>,
     );
   }
-  if (ageBadge && secondary.length < maxSecondary) {
+  // Cover «Сегодня» is enough - do not stack «Скоро начало» on the photo (it stays in the body).
+  if (departingSoonMinutes && !todayOnCover && secondary.length < maxSecondary) {
     secondary.push(
-      <EventCardBadge key="age" className="bg-white/90 text-slate-900">
-        {ageBadge}
+      <EventCardBadge key="departing" className="bg-amber-500 text-white shadow-md ring-1 ring-white/30">
+        Скоро начало · {departingSoonMinutes} мин
       </EventCardBadge>,
     );
-  }
-  if (showSoonBadge && secondary.length < maxSecondary) {
+  } else if (showSoonBadge && secondary.length < maxSecondary) {
     secondary.push(
-      <EventCardBadge key="soon" className="bg-slate-900/85 text-white">
+      <EventCardBadge key="soon" className="bg-slate-900/90 text-white">
         Скоро в продаже
       </EventCardBadge>,
     );
   }
 
+  if (!recommend && secondary.length === 0) return null;
+
   return (
-    <div className={`absolute left-2 top-2 z-[2] flex max-w-[70%] flex-col items-start gap-1 ${rail ? '' : 'sm:left-3 sm:top-3'}`}>
+    <div className="absolute left-2 top-2 z-[2] flex max-w-[70%] flex-col items-start gap-1 sm:left-3 sm:top-3">
       {recommend ? <EditorsPickBadge label={recommendLabel} /> : null}
       {secondary}
     </div>
   );
+}
+
+/** True when card has a real social/urgency signal (no invented counts). */
+export function catalogItemHasLiveSignal(event: PublicSessionDto): boolean {
+  const departingSoon = Boolean(event.startsAt && getDepartingSoonMinutes(event.startsAt));
+  return departingSoon || isRecommendBadgeEvent(event) || isHitEvent(event);
 }

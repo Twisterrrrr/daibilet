@@ -3,71 +3,228 @@ import { notFound } from 'next/navigation';
 
 import { LandingPageView } from '@/components/LandingPageView.client';
 import { SiteLayout } from '@/components/SiteLayout';
+import { getSeasonalLanding } from '@/data/seasonal-landings';
 import '@/lib/env';
-import { canonicalLandingSlug } from '@/lib/landing-constants';
-import { landingCategoryHref, resolveLandingRouteFromLocation } from '@/lib/landing-routes';
-import { pageTitle, routeOpenGraph } from '@/lib/seo-meta';
+import type { LandingProfileKind } from '@/lib/landing-copy';
+import { resolveLandingCityName } from '@/lib/landing-city';
+import {
+  canonicalLandingSlug,
+  isBridgesNightLandingSlug,
+  isRiverCruisesLandingSlug,
+  isRiverPartyLandingSlug,
+} from '@/lib/landing-constants';
+import { resolveLandingCardImage } from '@/lib/landing-images';
+import { resolveLandingFaqItems } from '@/lib/landing-faq-items';
+import {
+  landingCategoryHref,
+  resolveLandingBoundCitySlug,
+  resolveLandingRouteFromLocation,
+} from '@/lib/landing-routes';
+import { resolveLandingSeo } from '@/lib/landing-seo';
+import { hasSeoListingEditorial } from '@/data/seo-listing-texts';
+import {
+  appendRealPriceToDescription,
+  buildCategoryCityListingMeta,
+  evaluateListingIndexability,
+  robotsForListingIndexability,
+} from '@/lib/seo-listing-meta';
+import { isLandingOffSeason } from '@/lib/landing-season';
+import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
+import { getLandingSeo } from '@/lib/seo/get-landing-seo';
+import { isPodborkiSeoPilotCitySlug } from '@/lib/podborki-city-seo';
+import { buildFaqPageJsonLd, buildLandingPageJsonLd } from '@/lib/structured-data';
 import { fetchLandingPageDto, finalizeLandingPayload } from '@/server/landing-page';
+import { loadThinRelatedCardSessions } from '@/server/landing-thin-related';
+import { findSeoOverride } from '@/server/seo-override';
 
 export const revalidate = 3600;
 
-type SearchParams = Record<string, string | string[] | undefined>;
+/** Year-round indexable seasonal hubs (catalog may hide off-season; URL stays 200 + index). */
+const YEAR_ROUND_SEO_SKELETON_LANDINGS = new Set<string>(['salute-9-may']);
 
-function readSearchParam(params: SearchParams, key: string): string | undefined {
-  const value = params[key];
-  if (typeof value === 'string') return value;
-  if (Array.isArray(value) && value[0]) return value[0];
-  return undefined;
+/** Профиль SEO/UI для лендинга - зеркало LandingPageView.getLandingProfile. */
+function resolveLandingProfileKind(slug: string): LandingProfileKind {
+  const key = canonicalLandingSlug(slug);
+  if (isBridgesNightLandingSlug(key)) return 'bridges';
+  if (getSeasonalLanding(key)) return 'seasonal';
+  if (isRiverPartyLandingSlug(key)) return 'default';
+  if (key.includes('bus')) return 'bus';
+  if (key.includes('dinner') || key.includes('ужин')) return 'dinner';
+  if (isRiverCruisesLandingSlug(key)) return 'river';
+  return 'default';
 }
 
 export async function buildLandingMetadata(pathname: string): Promise<Metadata> {
   const route = resolveLandingRouteFromLocation(pathname);
-  if (!route) return { title: pageTitle('Подборка') };
+  // Call notFound() here too so crawlers get HTTP 404 (not soft-404 title with 200).
+  if (!route) notFound();
 
   const slug = canonicalLandingSlug(route.landingSlug);
-  const payload = await fetchLandingPageDto(slug);
-  if (!payload?.landing) return { title: pageTitle('Подборка') };
+  const seoCitySlug =
+    route.citySlug || resolveLandingBoundCitySlug(slug) || null;
+  const payload = await fetchLandingPageDto(slug, route.citySlug, { revalidateSeconds: 3600 });
+  if (!payload?.landing) notFound();
 
-  const landing = payload.landing;
+  const finalized = finalizeLandingPayload(payload, slug, route.citySlug);
+  const landing = finalized.landing;
   const canonical = landingCategoryHref(slug, route.citySlug);
+  const cityName = resolveLandingCityName(route.citySlug || seoCitySlug);
+  const offers = finalized.stats?.events ?? 0;
+  const priceFrom = finalized.stats?.priceFrom ?? null;
+  const hasEditorialSeoText = Boolean(
+    seoCitySlug && hasSeoListingEditorial(slug, seoCitySlug),
+  );
+  const dbOverride =
+    seoCitySlug && isPodborkiSeoPilotCitySlug(seoCitySlug)
+      ? await findSeoOverride(seoCitySlug, slug)
+      : null;
+  const matrixSeo =
+    seoCitySlug && isPodborkiSeoPilotCitySlug(seoCitySlug)
+      ? getLandingSeo({ citySlug: seoCitySlug, landingSlug: slug, dbOverride })
+      : null;
+  const hasOverrideSeo = Boolean(
+    matrixSeo && (matrixSeo.source === 'override' || matrixSeo.source === 'template'),
+  );
+  const indexDecision = evaluateListingIndexability({
+    offers,
+    hasEditorialSeoText: hasEditorialSeoText || Boolean(dbOverride?.customText),
+    stablePilotIndex: Boolean(seoCitySlug && isPodborkiSeoPilotCitySlug(seoCitySlug)),
+    hasSeoSkeleton: YEAR_ROUND_SEO_SKELETON_LANDINGS.has(slug),
+  });
+  const profile = resolveLandingProfileKind(slug);
+
+  let title: string;
+  let description: string | undefined;
+  let shareTitle: string;
+
+  if (cityName) {
+    const seo = resolveLandingSeo({
+      slug,
+      profile,
+      landingTitle: landing.title,
+      cityName,
+      stats: finalized.stats,
+      landingEvents: landing.events,
+    });
+    const listingMeta = buildCategoryCityListingMeta({
+      landingSlug: slug,
+      cityName,
+      fallbackTitle: landing.title,
+      priceFrom,
+    });
+    if (hasOverrideSeo && matrixSeo) {
+      title = pageTitle(matrixSeo.title);
+      shareTitle = matrixSeo.title.includes('Дайбилет')
+        ? matrixSeo.title
+        : `${title} | Дайбилет`;
+      description = matrixSeo.description;
+    } else {
+      title = seo.title;
+      description = listingMeta.description;
+      shareTitle = seo.title;
+    }
+  } else {
+    const seo = resolveLandingSeo({
+      slug,
+      profile,
+      landingTitle: landing.title,
+      stats: finalized.stats,
+      landingEvents: landing.events,
+    });
+    // CMS overrides when present; иначе шаблон resolveLandingSeo (с реальной ценой).
+    const cmsTitle = String(landing.seoTitle || '').trim();
+    const cmsDescription = String(landing.seoDescription || '').trim();
+    title = pageTitle(cmsTitle || seo.title);
+    shareTitle = cmsTitle.includes('Дайбилет')
+      ? cmsTitle
+      : seo.title.includes('Дайбилет')
+        ? seo.title
+        : `${title} | Дайбилет`;
+    description = appendRealPriceToDescription(
+      cmsDescription || seo.description || landing.subtitle || '',
+      cmsDescription ? priceFrom : null,
+    );
+  }
+
+  const image = landing.imageUrl || resolveLandingCardImage(slug);
+
   return {
-    title: pageTitle(landing.seoTitle || landing.title),
-    description: landing.seoDescription || landing.subtitle || undefined,
+    title: cityName ? { absolute: title } : title,
+    description: description || undefined,
     alternates: {
       canonical,
     },
-    openGraph: routeOpenGraph(canonical, {
-      title: landing.seoTitle || landing.title,
-      description: landing.seoDescription || landing.subtitle || undefined,
-      images: landing.imageUrl ? [{ url: landing.imageUrl }] : undefined,
+    robots: robotsForListingIndexability(indexDecision.indexable && !isLandingOffSeason(slug)),
+    ...buildShareMetadata({
+      title: shareTitle,
+      description,
+      path: canonical,
+      image,
     }),
   };
 }
 
-export async function LandingRoutePage({
-  pathname,
-  searchParams,
-}: {
-  pathname: string;
-  searchParams: SearchParams;
-}) {
+export async function LandingRoutePage({ pathname }: { pathname: string }) {
   const route = resolveLandingRouteFromLocation(pathname);
   if (!route) notFound();
 
   const slug = canonicalLandingSlug(route.landingSlug);
-  const payload = await fetchLandingPageDto(slug);
+  const seoCitySlug =
+    route.citySlug || resolveLandingBoundCitySlug(slug) || null;
+  const payload = await fetchLandingPageDto(slug, route.citySlug, { revalidateSeconds: 3600 });
   if (!payload?.landing) notFound();
 
-  const genre = readSearchParam(searchParams, 'genre') || readSearchParam(searchParams, 'tag');
-  const finalized = finalizeLandingPayload(payload, slug, route.citySlug, genre);
+  const finalized = finalizeLandingPayload(payload, slug, route.citySlug);
+  const canonical = landingCategoryHref(slug, route.citySlug);
+  const offerCount = finalized.stats?.events ?? finalized.sessions?.length ?? 0;
+  const thinRelatedSessions = route.citySlug
+    ? await loadThinRelatedCardSessions({
+        landingSlug: slug,
+        citySlug: route.citySlug,
+        offerCount,
+        excludeSessions: finalized.sessions,
+      })
+    : [];
+  const jsonLdBlocks = buildLandingPageJsonLd({
+    landingSlug: slug,
+    citySlug: route.citySlug,
+    landingTitle: finalized.landing.title,
+    canonicalPath: canonical,
+    sessions: finalized.sessions,
+  });
+  const faq = buildFaqPageJsonLd(resolveLandingFaqItems({
+    slug,
+    profile: resolveLandingProfileKind(slug),
+    citySlug: route.citySlug,
+    blocks: finalized.blocks || [],
+  }));
+  if (faq) jsonLdBlocks.push(faq);
+
+  const dbOverride =
+    seoCitySlug && isPodborkiSeoPilotCitySlug(seoCitySlug)
+      ? await findSeoOverride(seoCitySlug, slug)
+      : null;
+  const matrixSeo =
+    seoCitySlug && isPodborkiSeoPilotCitySlug(seoCitySlug)
+      ? getLandingSeo({ citySlug: seoCitySlug, landingSlug: slug, dbOverride })
+      : null;
 
   return (
     <SiteLayout>
+      {jsonLdBlocks.map((block, index) => (
+        <script
+          key={`landing-jsonld-${index}`}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(block) }}
+        />
+      ))}
       <LandingPageView
         slug={slug}
         citySlug={route.citySlug}
         initialPayload={finalized}
-        genre={genre}
+        thinRelatedSessions={thinRelatedSessions}
+        seoOverrideHtml={matrixSeo?.seoText || null}
+        seoOverrideHeading={matrixSeo?.h1 || null}
       />
     </SiteLayout>
   );

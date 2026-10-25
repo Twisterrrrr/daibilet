@@ -42,6 +42,16 @@ export const ADMIN_ROLES = Object.freeze([
   'AUDITOR',
 ]);
 
+export const ADMIN_MFA_REQUIRED_PERMISSIONS = Object.freeze([
+  'orders.cancel',
+  'refunds.execute',
+  'finance.summary.read',
+  'finance.read',
+  'payouts.approve',
+  'documents.read',
+  'suppliers.bank.read',
+]);
+
 export const ADMIN_ROLE_PERMISSIONS = Object.freeze({
   SUPERADMIN: ADMIN_PERMISSIONS,
   PRODUCT: Object.freeze(['orders.read', 'finance.summary.read', 'suppliers.read', 'suppliers.manage', 'catalog.read', 'catalog.edit', 'catalog.publish', 'content.read', 'content.edit', 'content.publish', 'seo.read', 'seo.edit', 'integrations.read', 'audit.read']),
@@ -60,6 +70,15 @@ export function resolveAdminPermissions(roles) {
     if (!Object.hasOwn(ADMIN_ROLE_PERMISSIONS, role)) continue;
     const rolePermissions = ADMIN_ROLE_PERMISSIONS[role];
     for (const permission of rolePermissions) permissions.add(permission);
+  }
+  return permissions;
+}
+
+/** Financial/bank rights are withheld until the current staff session proves MFA. */
+export function resolveAdminSessionPermissions(roles, mfaVerified = false) {
+  const permissions = resolveAdminPermissions(roles);
+  if (!mfaVerified) {
+    for (const permission of ADMIN_MFA_REQUIRED_PERMISSIONS) permissions.delete(permission);
   }
   return permissions;
 }

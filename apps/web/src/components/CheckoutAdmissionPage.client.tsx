@@ -6,7 +6,10 @@ import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { formatNumber } from '@/lib/format';
-import { watchCheckoutPayment } from '@/lib/checkout-payment';
+import {
+  watchCheckoutPayment,
+  type YooKassaWidgetInstance,
+} from '@/lib/checkout-payment';
 import {
   createPublicYooKassaCheckout,
   fetchPublicAdmissionProduct,
@@ -19,29 +22,6 @@ type WidgetSession = {
   publicCode: string;
   confirmationToken: string;
 };
-
-type YooKassaWidgetInstance = {
-  render: (containerId: string) => Promise<void> | void;
-  destroy: () => void;
-  on: (eventName: 'complete' | 'success' | 'fail' | 'modal_close', callback: () => void) => void;
-};
-
-type YooKassaWidgetConstructor = new (config: {
-  confirmation_token: string;
-  error_callback?: (error: unknown) => void;
-  customization?: {
-    colors?: {
-      control_primary?: string;
-      background?: string;
-    };
-  };
-}) => YooKassaWidgetInstance;
-
-declare global {
-  interface Window {
-    YooMoneyCheckoutWidget?: YooKassaWidgetConstructor;
-  }
-}
 
 const YOOKASSA_WIDGET_SCRIPT_URL = 'https://yookassa.ru/checkout-widget/v1/checkout-widget.js';
 const YOOKASSA_WIDGET_CONTAINER_ID = 'yookassa-payment-form';

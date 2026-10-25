@@ -4,6 +4,8 @@ export const CATALOG_VIEW_MODE_STORAGE_KEY = 'catalog:viewMode';
 
 export function parseCatalogViewMode(value?: string | null): CatalogViewMode {
   if (value === 'list' || value === 'table') return value;
+  // legacy alias from older Vite catalog
+  if (value === 'grid' || value === 'cards') return 'cards';
   return 'cards';
 }
 
@@ -30,6 +32,7 @@ const CATEGORY_EMOJI: Record<string, string> = {
   Экскурсии: '🚌',
   'Музеи и арт': '🏛',
   Музеи: '🏛',
+  Залы: '🏛',
   Мероприятия: '🎭',
   Развлечения: '🎡',
   'Активный отдых': '🏃',

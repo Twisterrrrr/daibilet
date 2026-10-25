@@ -23,6 +23,7 @@ import {
   revokeAdminSession,
 } from './admin-session-auth.js';
 import { createDb } from './db.js';
+import { PDP_VARIANTS, readPdpDocument, savePdpDocument } from './pdp-documents.js';
 import {
   buildAdminDashboard,
   buildAdminCitiesList,
@@ -60,7 +61,6 @@ import {
   buildPublicHomePreview,
   buildPublicDestinations,
   buildPublicStats,
-  buildPublicSearch,
   buildPublicPromoBlocks,
   buildPublicLandingsCatalog,
   buildPublicArticlesList,
@@ -68,6 +68,7 @@ import {
   buildAdminArticlesList,
   buildAdminArticleDetail,
   upsertAdminArticle,
+  deleteAdminArticle,
   publicVenueSlug,
   publicVenuePageTemplate,
   clearPublicDataCaches,
@@ -75,6 +76,9 @@ import {
   runLandingAudit,
   updateAdminEventOverride,
   updateAdminEventTaxonomy,
+  updateAdminEventVenueLinks,
+  suggestAdminEventVenueLinks,
+  applyAdminEventVenueLinks,
   upsertAdminOrderTicket,
   updateAdminLanding,
   updateAdminLandingMatch,
@@ -82,11 +86,16 @@ import {
   warmAdminGroupedEventsCache,
   invalidateAdminGroupedEventsCache,
 } from './dto.js';
+import { buildPublicSearchDto } from './public-search.dto.ts';
+import { loadVenueMapTip } from './public-venue-map-tip.ts';
+import { buildPublicEventFreshnessMap, publicEventFreshnessPayload } from './public-event-freshness.ts';
 import {
   buildSocialPreviewForPath,
   isSocialPreviewAgent,
   renderSocialPreviewHtml,
 } from './social-preview.js';
+import { clearPublicArticlesDtoCache } from './public-articles.dto.js';
+import { revalidateNextBlogArticle } from './revalidate-next-blog.js';
 import {
   assertAuthRateLimit,
   authenticateAccessToken,
@@ -119,7 +128,8 @@ const adminAuth = {
 };
 
 // Default 12h (was 6h) to reduce CPU/RAM peaks on 3.8Gi hosts; override via env.
-// Prefer out-of-process cron (deploy/cron/tep-catalog-sync.sh) on small hosts: set TEP_AUTO_SYNC_ENABLED=0.
+// Prefer out-of-process worker (apps/worker + deploy/cron/*-sync.sh) on small hosts: set TEP_AUTO_SYNC_ENABLED=0.
+// Admin Sources POST still spawns the same root scripts/* as worker jobs (compatible pipeline).
 const TEP_AUTO_SYNC_ENABLED = !['0', 'false', 'off', 'no'].includes(
   String(process.env.TEP_AUTO_SYNC_ENABLED ?? '1').trim().toLowerCase(),
 );
@@ -145,6 +155,8 @@ const PUBLIC_RESPONSE_CACHE_MS = 5 * 60 * 1000;
 const PUBLIC_HTTP_CACHE_CONTROL = 'public, max-age=60, s-maxage=300, stale-while-revalidate=600';
 const MAX_PUBLIC_RESPONSE_CACHE_ENTRIES = 80;
 const publicResponseCache = new Map();
+/** @type {Map<string, Promise<unknown>>} */
+const publicResponseCacheBuilds = new Map();
 const publicCacheInvalidators = new Set();
 const publicCacheWarmers = new Set();
 let activeCorsRequest = null;
@@ -403,6 +415,12 @@ export async function handleRequest(request, response) {
     }
 
     if (route === 'GET /api/health') {
+      try {
+        const { logCatalogDiskStalenessIfNeeded } = await import('./public-catalog-disk-cache.js');
+        logCatalogDiskStalenessIfNeeded();
+      } catch {
+        /* ignore health side-checks */
+      }
       sendJson(response, {
         ok: true,
         service: 'daibilet-backend',
@@ -410,6 +428,27 @@ export async function handleRequest(request, response) {
         db: 'configured',
         generatedAt: new Date().toISOString(),
       });
+      return;
+    }
+
+    if (route === 'POST /api/internal/public-cache') {
+      const secret = String(process.env.DAIBILET_NEXT_REVALIDATE_SECRET || '').trim();
+      const auth = String(request.headers.authorization || '');
+      const token = auth.startsWith('Bearer ') ? auth.slice(7).trim() : '';
+      if (!secret || token !== secret) {
+        sendJson(response, { error: 'unauthorized' }, 401);
+        return;
+      }
+      const body = await readJsonBody(request).catch(() => ({}));
+      const warmRaw = String(body?.warm ?? body?.mode ?? 'light').toLowerCase();
+      const warm = warmRaw === 'full' || warmRaw === 'true' || warmRaw === '1'
+        ? 'full'
+        : warmRaw === 'false' || warmRaw === '0' || warmRaw === 'none'
+          ? false
+          : 'light';
+      const reason = String(body?.reason || 'internal public-cache').slice(0, 120);
+      invalidatePublicCaches(reason, { warm });
+      sendJson(response, { ok: true, warm: warm || 'none', reason });
       return;
     }
 
@@ -426,8 +465,20 @@ export async function handleRequest(request, response) {
     }
 
     if (route === 'GET /api/public/home') {
-      if (url.searchParams.get('refresh') === '1') invalidatePublicCaches('public home refresh');
-      sendJson(response, await withDataFallback(() => buildPublicHome(db), 'apps/public/data.js', 'PUBLIC_DATA'));
+      if (url.searchParams.get('refresh') === '1') {
+        invalidatePublicCaches('public home refresh');
+        sendPublicJson(
+          response,
+          await withDataFallback(() => buildPublicHome(db), 'apps/public/data.js', 'PUBLIC_DATA'),
+        );
+        return;
+      }
+      sendPublicJson(
+        response,
+        await withPublicResponseCache('home', () =>
+          withDataFallback(() => buildPublicHome(db), 'apps/public/data.js', 'PUBLIC_DATA'),
+        ),
+      );
       return;
     }
 
@@ -460,7 +511,20 @@ export async function handleRequest(request, response) {
     }
 
     if (route === 'GET /api/public/articles') {
-      sendPublicJson(response, await withPublicResponseCache('articles:list', () => buildPublicArticlesList(db)));
+      const citySlug = url.searchParams.get('citySlug') || undefined;
+      const includeBroad = url.searchParams.get('includeBroad') === '1';
+      const limitRaw = Number(url.searchParams.get('limit') || 0);
+      const cacheKey = `articles:list:${citySlug || 'all'}:${includeBroad ? 1 : 0}:${limitRaw || 100}`;
+      sendPublicJson(
+        response,
+        await withPublicResponseCache(cacheKey, () =>
+          buildPublicArticlesList(db, {
+            citySlug,
+            includeBroad,
+            limit: limitRaw > 0 ? limitRaw : undefined,
+          }),
+        ),
+      );
       return;
     }
 
@@ -493,6 +557,11 @@ export async function handleRequest(request, response) {
       return;
     }
 
+    if (route === 'GET /api/public/events/freshness') {
+      sendPublicJson(response, publicEventFreshnessPayload(await buildPublicEventFreshnessMap()));
+      return;
+    }
+
     if (route === 'GET /api/public/events') {
       if (url.searchParams.get('refresh') === '1') {
         publicResponseCache.clear();
@@ -511,7 +580,12 @@ export async function handleRequest(request, response) {
     }
 
     if (route === 'GET /api/public/search') {
-      sendPublicJson(response, await withPublicResponseCache(`search:${canonicalSearchParams(url.searchParams)}`, () => buildPublicSearch(db, url.searchParams)));
+      sendPublicJson(
+        response,
+        await withPublicResponseCache(`search-trgm:${canonicalSearchParams(url.searchParams)}`, () =>
+          buildPublicSearchDto(url.searchParams),
+        ),
+      );
       return;
     }
 
@@ -702,6 +776,17 @@ export async function handleRequest(request, response) {
       return;
     }
 
+    if (route === 'GET /api/public/venues/map-tip') {
+      const tipId = String(url.searchParams.get('id') || url.searchParams.get('slug') || '').trim();
+      const tip = await loadVenueMapTip(tipId);
+      if (!tip) {
+        sendPublicJson(response, { error: 'not_found' }, { statusCode: 404 });
+        return;
+      }
+      sendPublicJson(response, { tip });
+      return;
+    }
+
     const publicVenueMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/public\/venues\/([^/]+)$/) : null;
     if (publicVenueMatch) {
       const venueSlug = decodeURIComponent(publicVenueMatch[1]);
@@ -713,21 +798,30 @@ export async function handleRequest(request, response) {
     const publicCityMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/public\/cities\/([^/]+)$/) : null;
     if (publicCityMatch) {
       const citySlug = decodeURIComponent(publicCityMatch[1]);
-      sendPublicJson(response, await withPublicResponseCache(`city:${citySlug}`, () => buildPublicCityPage(db, citySlug)));
+      const payload = await withPublicResponseCache(`city:${citySlug}`, () => buildPublicCityPage(db, citySlug));
+      // Never 200+null: web generateMetadata treats miss as HTTP 500.
+      sendPublicJson(response, payload || { error: 'city_not_found' }, payload ? 200 : 404);
       return;
     }
 
     const publicLandingMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/public\/landings\/([^/]+)$/) : null;
     if (publicLandingMatch) {
       const landingSlug = decodeURIComponent(publicLandingMatch[1]);
-      sendPublicJson(response, await withPublicResponseCache(`landing:${landingSlug}`, () => buildPublicLandingPageWithFallback(db, landingSlug)));
+      const cityFilter = String(url.searchParams.get('city') || '').trim().toLowerCase();
+      const cacheKey = cityFilter && cityFilter !== 'all' ? `landing:${landingSlug}:${cityFilter}` : `landing:${landingSlug}`;
+      sendPublicJson(
+        response,
+        await withPublicResponseCache(cacheKey, () => buildPublicLandingPageWithFallback(db, landingSlug, cityFilter)),
+      );
       return;
     }
 
     const publicEventMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/public\/events\/([^/]+)$/) : null;
     if (publicEventMatch) {
       const eventSlug = decodeURIComponent(publicEventMatch[1]);
-      sendPublicJson(response, await withPublicResponseCache(`event:${eventSlug}`, () => buildPublicEventPage(db, eventSlug)));
+      const payload = await withPublicResponseCache(`event:${eventSlug}`, () => buildPublicEventPage(db, eventSlug));
+      // Never 200+null: web generateMetadata treats miss as HTTP 500.
+      sendPublicJson(response, payload || { error: 'event_not_found' }, payload ? 200 : 404);
       return;
     }
 
@@ -751,7 +845,11 @@ export async function handleRequest(request, response) {
 
     if (route === 'POST /api/v1/tc/sync' || route === 'POST /api/admin/sources/ticketscloud/sync') {
       const result = await runTicketscloudCatalogSync(url.searchParams);
-      invalidatePublicCaches('ticketscloud catalog sync', { warm: true });
+      // Light warm by default — full warm stacks CPU with import; nightly cron can request full.
+      const warmMode = ['1', 'true', 'full'].includes(String(url.searchParams.get('fullWarm') || '').toLowerCase())
+        ? 'full'
+        : 'light';
+      invalidatePublicCaches('ticketscloud catalog sync', { warm: warmMode });
       sendJson(response, result);
       return;
     }
@@ -781,7 +879,7 @@ export async function handleRequest(request, response) {
     if (route === 'GET /api/admin/orders' || route === 'GET /api/admin/external-orders') {
       const canReadPii = request.adminSessionUser
         ? adminRolesMayReadOrderPii(request.adminSessionUser.roles)
-        : true;
+        : false;
       const orders = await buildAdminOrdersList(db, url.searchParams, { includePiiSearch: canReadPii });
       sendJson(response, projectAdminOrdersPii(orders, canReadPii));
       return;
@@ -832,7 +930,7 @@ export async function handleRequest(request, response) {
       const detail = await buildAdminOrderDetail(db, decodeURIComponent(orderDetailMatch[1]));
       const canReadPii = request.adminSessionUser
         ? adminRolesMayReadOrderPii(request.adminSessionUser.roles)
-        : true;
+        : false;
       sendJson(response, detail ? projectAdminOrdersPii(detail, canReadPii) : { error: 'order_not_found' }, detail ? 200 : 404);
       return;
     }
@@ -910,6 +1008,27 @@ export async function handleRequest(request, response) {
       return;
     }
 
+    if (route === 'GET /api/admin/pdp/variants') {
+      sendJson(response, PDP_VARIANTS);
+      return;
+    }
+
+    const pdpMatch = url.pathname.match(/^\/api\/admin\/pdp\/(venues|events)\/([^/]+)$/);
+    if (pdpMatch && (request.method === 'GET' || request.method === 'PUT')) {
+      const entity = pdpMatch[1];
+      const id = decodeURIComponent(pdpMatch[2]);
+      try {
+        const result = request.method === 'GET'
+          ? await readPdpDocument(db, entity, id)
+          : await savePdpDocument(db, entity, id, await readJsonBody(request));
+        if (request.method === 'PUT' && result) invalidatePublicCaches('pdp document update');
+        sendJson(response, result, result || request.method === 'GET' ? 200 : 404);
+      } catch (error) {
+        sendJson(response, { error: error instanceof Error ? error.message : 'invalid_pdp_document' }, 400);
+      }
+      return;
+    }
+
     if (route === 'GET /api/admin/taxonomy') {
       sendJson(response, await buildAdminTaxonomy(db));
       return;
@@ -937,6 +1056,11 @@ export async function handleRequest(request, response) {
     if (route === 'POST /api/admin/articles') {
       const result = await upsertAdminArticle(db, null, await readJsonBody(request));
       invalidatePublicCaches('article create');
+      void revalidateNextBlogArticle({
+        slug: result?.slug,
+        citySlug: result?.citySlug,
+        reason: 'article create',
+      });
       sendJson(response, result, 201);
       return;
     }
@@ -950,9 +1074,34 @@ export async function handleRequest(request, response) {
 
     const articleUpdateMatch = request.method === 'PATCH' ? url.pathname.match(/^\/api\/admin\/articles\/([^/]+)$/) : null;
     if (articleUpdateMatch) {
-      const result = await upsertAdminArticle(db, decodeURIComponent(articleUpdateMatch[1]), await readJsonBody(request));
+      const articleId = decodeURIComponent(articleUpdateMatch[1]);
+      const before = await buildAdminArticleDetail(db, articleId);
+      const result = await upsertAdminArticle(db, articleId, await readJsonBody(request));
       invalidatePublicCaches('article update');
+      void revalidateNextBlogArticle({
+        slug: result?.slug,
+        previousSlug: before?.slug,
+        citySlug: result?.citySlug || before?.citySlug,
+        reason: 'article update',
+      });
       sendJson(response, result);
+      return;
+    }
+
+    const articleDeleteMatch = request.method === 'DELETE' ? url.pathname.match(/^\/api\/admin\/articles\/([^/]+)$/) : null;
+    if (articleDeleteMatch) {
+      const deleted = await deleteAdminArticle(db, decodeURIComponent(articleDeleteMatch[1]));
+      if (!deleted) {
+        sendJson(response, { error: 'article_not_found' }, 404);
+        return;
+      }
+      invalidatePublicCaches('article delete');
+      void revalidateNextBlogArticle({
+        slug: deleted.slug,
+        citySlug: deleted.citySlug,
+        reason: 'article delete',
+      });
+      sendJson(response, { ok: true, deleted });
       return;
     }
 
@@ -964,39 +1113,105 @@ export async function handleRequest(request, response) {
 
     const eventOverrideMatch = request.method === 'PATCH' ? url.pathname.match(/^\/api\/admin\/events\/([^/]+)\/override$/) : null;
     if (eventOverrideMatch) {
+      const eventId = decodeURIComponent(eventOverrideMatch[1]);
       let result;
       try {
-        result = await updateAdminEventOverride(db, decodeURIComponent(eventOverrideMatch[1]), await readJsonBody(request));
+        result = await updateAdminEventOverride(db, eventId, await readJsonBody(request));
       } catch (error) {
         if (error?.statusCode !== 404 && error?.statusCode !== 422) throw error;
         sendJson(response, { error: error.message }, error.statusCode);
         return;
       }
-      invalidatePublicCaches('event override update');
+      const slugRow = await db.query('select slug from "Event" where id = $1 limit 1', [eventId]).catch(() => null);
+      invalidatePublicCaches('event override update', { slug: slugRow?.rows?.[0]?.slug });
       sendJson(response, result);
       return;
     }
 
     const eventModerationMatch = request.method === 'PATCH' ? url.pathname.match(/^\/api\/admin\/events\/([^/]+)\/moderation$/) : null;
     if (eventModerationMatch) {
+      const eventId = decodeURIComponent(eventModerationMatch[1]);
       const body = await readJsonBody(request);
       let result;
       try {
-        result = await updateAdminEventOverride(db, decodeURIComponent(eventModerationMatch[1]), { editorStatus: body.editorStatus });
+        result = await updateAdminEventOverride(db, eventId, { editorStatus: body.editorStatus });
       } catch (error) {
         if (error?.statusCode !== 404 && error?.statusCode !== 422) throw error;
         sendJson(response, { error: error.message }, error.statusCode);
         return;
       }
-      invalidatePublicCaches('event moderation update');
+      const slugRow = await db.query('select slug from "Event" where id = $1 limit 1', [eventId]).catch(() => null);
+      invalidatePublicCaches('event moderation update', { slug: slugRow?.rows?.[0]?.slug });
       sendJson(response, result);
       return;
     }
 
     const eventTaxonomyMatch = request.method === 'PATCH' ? url.pathname.match(/^\/api\/admin\/events\/([^/]+)\/taxonomy$/) : null;
     if (eventTaxonomyMatch) {
-      const result = await updateAdminEventTaxonomy(db, decodeURIComponent(eventTaxonomyMatch[1]), await readJsonBody(request));
-      invalidatePublicCaches('event taxonomy update');
+      const eventId = decodeURIComponent(eventTaxonomyMatch[1]);
+      const result = await updateAdminEventTaxonomy(db, eventId, await readJsonBody(request));
+      const slugRow = await db.query('select slug from "Event" where id = $1 limit 1', [eventId]).catch(() => null);
+      invalidatePublicCaches('event taxonomy update', { slug: slugRow?.rows?.[0]?.slug });
+      sendJson(response, result);
+      return;
+    }
+
+    const eventVenueLinkSuggestionsMatch =
+      request.method === 'GET'
+        ? url.pathname.match(/^\/api\/admin\/events\/([^/]+)\/venue-link-suggestions$/)
+        : null;
+    if (eventVenueLinkSuggestionsMatch) {
+      const result = await suggestAdminEventVenueLinks(
+        db,
+        decodeURIComponent(eventVenueLinkSuggestionsMatch[1]),
+        { radiusM: url.searchParams.get('radiusM') },
+      );
+      if (!result) {
+        sendJson(response, { error: 'not_found' }, 404);
+        return;
+      }
+      sendJson(response, result);
+      return;
+    }
+
+    const eventVenueLinksApplyMatch =
+      request.method === 'POST'
+        ? url.pathname.match(/^\/api\/admin\/events\/([^/]+)\/venue-links:apply$/)
+        : null;
+    if (eventVenueLinksApplyMatch) {
+      const result = await applyAdminEventVenueLinks(
+        db,
+        decodeURIComponent(eventVenueLinksApplyMatch[1]),
+        await readJsonBody(request),
+      );
+      if (!result) {
+        sendJson(response, { error: 'not_found' }, 404);
+        return;
+      }
+      if (result.error) {
+        sendJson(response, result, 400);
+        return;
+      }
+      invalidatePublicCaches('event venue links merge apply');
+      sendJson(response, result);
+      return;
+    }
+
+    const eventVenueLinksMatch =
+      request.method === 'PATCH' || request.method === 'PUT'
+        ? url.pathname.match(/^\/api\/admin\/events\/([^/]+)\/venue-links$/)
+        : null;
+    if (eventVenueLinksMatch) {
+      const result = await updateAdminEventVenueLinks(
+        db,
+        decodeURIComponent(eventVenueLinksMatch[1]),
+        await readJsonBody(request),
+      );
+      if (!result) {
+        sendJson(response, { error: 'not_found' }, 404);
+        return;
+      }
+      invalidatePublicCaches('event venue links update');
       sendJson(response, result);
       return;
     }
@@ -1209,10 +1424,12 @@ function scheduleStaleOrderArchive() {
   console.log('Stale cancelled-order archive enabled: every 6h, threshold 30d');
 }
 
-async function buildPublicLandingPageWithFallback(db, landingSlug) {
-  const managed = await buildPublicLandingPageManaged(db, landingSlug);
+async function buildPublicLandingPageWithFallback(db, landingSlug, cityFilter = '') {
+  const city = String(cityFilter || '').trim().toLowerCase();
+  const cityArg = city && city !== 'all' ? city : '';
+  const managed = await buildPublicLandingPageManaged(db, landingSlug, cityArg);
   if (managed) return managed;
-  return buildPublicLandingPage(db, landingSlug);
+  return buildPublicLandingPage(db, landingSlug, cityArg);
 }
 
 export async function warmPublicCaches(reason) {
@@ -1228,11 +1445,11 @@ export async function warmPublicCaches(reason) {
       Promise.all([...publicCacheWarmers].map((warmer) => Promise.resolve().then(() => warmer(reason)))),
     ]);
     await Promise.all([
-      withPublicResponseCache('venues:family=institution&limit=500', () =>
-        buildPublicVenuesCatalog(db, new URLSearchParams({ family: 'institution', limit: '500' })),
+      withPublicResponseCache('venues:family=institution&limit=36', () =>
+        buildPublicVenuesCatalog(db, new URLSearchParams({ family: 'institution', limit: '36' })),
       ),
-      withPublicResponseCache('venues:family=location&limit=500', () =>
-        buildPublicVenuesCatalog(db, new URLSearchParams({ family: 'location', limit: '500' })),
+      withPublicResponseCache('venues:family=location&limit=36', () =>
+        buildPublicVenuesCatalog(db, new URLSearchParams({ family: 'location', limit: '36' })),
       ),
       // Key SSR routes: top cities + landings after deploy/sync.
       withPublicResponseCache('city:sankt-peterburg', () => buildPublicCityPage(db, 'sankt-peterburg').catch(() => null)),
@@ -1253,9 +1470,33 @@ export async function warmPublicCaches(reason) {
     void warmAdminGroupedEventsCache(db, `after:${reason}`).catch((error) => {
       console.warn(`Admin cache warm failed after ${reason}: ${error instanceof Error ? error.message : String(error)}`);
     });
-    return { elapsedMs: elapsed, typed };
+    return { elapsedMs: elapsed, typed, mode: 'full' };
   } catch (error) {
     console.warn(`Public cache warm failed after ${reason}: ${error instanceof Error ? error.message : String(error)}`);
+    return null;
+  }
+}
+
+/** Light warm after catalog sync: core home/catalog only (no venues/cities/landings/admin full rebuild). */
+export async function warmPublicCachesLight(reason) {
+  const startedAt = Date.now();
+  try {
+    const [destinations, preview, stats] = await Promise.all([
+      buildPublicDestinations(db),
+      buildPublicHomePreview(db),
+      buildPublicStats(db),
+    ]);
+    await warmPublicCatalogCache(db);
+    await withPublicResponseCache('events:limit=50', () =>
+      buildCatalogSessions(db, new URLSearchParams({ limit: '50', sort: 'time' })).catch(() => null),
+    );
+    const elapsed = Date.now() - startedAt;
+    console.log(
+      `Public cache light-warmed after ${reason}: ${stats?.stats?.events || preview?.sessions?.length || 0} events, ${destinations?.destinations?.length || 0} destinations in ${elapsed}ms`,
+    );
+    return { elapsedMs: elapsed, mode: 'light' };
+  } catch (error) {
+    console.warn(`Public cache light warm failed after ${reason}: ${error instanceof Error ? error.message : String(error)}`);
     return null;
   }
 }
@@ -1270,11 +1511,20 @@ export function invalidatePublicCaches(reason, options = {}) {
       console.warn(`Public cache invalidator failed: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
-  if (options.warm) {
-    // Soft-expire admin list so UI stays fast (SWR) while rebuild catches import changes.
+  const warmMode = resolveWarmMode(options);
+  if (warmMode === 'full') {
     invalidateAdminGroupedEventsCache(db, `public:${reason}`);
     void warmPublicCaches(reason);
+  } else if (warmMode === 'light') {
+    void warmPublicCachesLight(reason);
   }
+}
+
+function resolveWarmMode(options = {}) {
+  if (options.warm === 'light' || options.warmMode === 'light') return 'light';
+  if (options.warm === 'full' || options.warmMode === 'full') return 'full';
+  if (options.warm === true) return 'full';
+  return 'none';
 }
 
 export function registerPublicCacheInvalidator(invalidator) {
@@ -1288,6 +1538,37 @@ export function registerPublicCacheWarmer(warmer) {
 }
 
 registerPublicCacheInvalidator((reason, options = {}) => {
+  clearPublicArticlesDtoCache();
+  const reasonText = String(reason || '');
+  const isEventUpdate = /event\s+(override|moderation|taxonomy|venue|change)/i.test(reasonText);
+  // Admin city PATCH: always bust Next destinations Data Cache (TTL 86400), not only on warm.
+  const isCityOrDestinationsUpdate =
+    /city\s+update|destinations?\s+refresh/i.test(reasonText);
+  // Catalog sync / warm: full home revalidate. Event admin edits: always bust Next event ISR
+  // (even without warm) so price/schedule changes are not stuck for EVENT_PAGE_REVALIDATE=7200.
+  if (isEventUpdate) {
+    const eventSlug = String(options?.slug || '').trim() || undefined;
+    import('./revalidate-next-blog.js')
+      .then(({ revalidateNextEventPage }) =>
+        revalidateNextEventPage({ slug: eventSlug, reason: reasonText }),
+      )
+      .catch((error) => {
+        console.warn(`Next event revalidate failed: ${error instanceof Error ? error.message : String(error)}`);
+      });
+    return;
+  }
+  if (isCityOrDestinationsUpdate) {
+    import('./revalidate-next-blog.js')
+      .then(({ revalidateNextDestinations }) =>
+        revalidateNextDestinations({ reason: reasonText }),
+      )
+      .catch((error) => {
+        console.warn(
+          `Next destinations revalidate failed: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      });
+    return;
+  }
   if (!options?.warm) return;
   import('./revalidate-next-home.js')
     .then(({ revalidateNextHome }) => revalidateNextHome(reason))
@@ -1336,13 +1617,25 @@ async function withPublicResponseCache(key, factory) {
   const cached = publicResponseCache.get(key);
   if (cached && cached.expiresAt > now) return cached.payload;
 
-  const payload = await factory();
-  publicResponseCache.set(key, {
-    expiresAt: now + PUBLIC_RESPONSE_CACHE_MS,
-    payload,
-  });
-  trimPublicResponseCache();
-  return payload;
+  const inflight = publicResponseCacheBuilds.get(key);
+  if (inflight) return inflight;
+
+  const build = Promise.resolve()
+    .then(() => factory())
+    .then((payload) => {
+      publicResponseCache.set(key, {
+        expiresAt: Date.now() + PUBLIC_RESPONSE_CACHE_MS,
+        payload,
+      });
+      trimPublicResponseCache();
+      return payload;
+    })
+    .finally(() => {
+      if (publicResponseCacheBuilds.get(key) === build) publicResponseCacheBuilds.delete(key);
+    });
+
+  publicResponseCacheBuilds.set(key, build);
+  return build;
 }
 
 function trimPublicResponseCache() {
@@ -1383,6 +1676,17 @@ function filterSessions(sessions, searchParams) {
   const city = searchParams.get('city');
   const category = searchParams.get('category');
   const landing = searchParams.get('landing');
+  const excludeLandingSet = new Set(
+    [
+      ...searchParams.getAll('excludeLanding'),
+      ...String(searchParams.get('excludeLanding') || '')
+        .split(',')
+        .map((item) => item.trim())
+        .filter(Boolean),
+    ]
+      .map((slug) => String(slug || '').trim().toLowerCase())
+      .filter(Boolean),
+  );
   const date = searchParams.get('date');
   const sort = searchParams.get('sort') || 'time';
   const maxPrice = Number(searchParams.get('maxPrice'));
@@ -1398,6 +1702,12 @@ function filterSessions(sessions, searchParams) {
     if (city && city !== 'all' && session.city !== city && session.destination !== city) return false;
     if (category && category !== 'all' && session.category !== category && !(session.tags || []).includes(category)) return false;
     if (landing && landing !== 'all' && !(session.landingSlugs || []).includes(landing)) return false;
+    if (excludeLandingSet.size) {
+      const sessionLandings = (session.landingSlugs || []).map((slug) =>
+        String(slug || '').trim().toLowerCase(),
+      );
+      if (sessionLandings.some((slug) => excludeLandingSet.has(slug))) return false;
+    }
     if (dateFrom || dateTo) {
       if (!matchesFallbackCatalogDateRange(session, dateFrom, dateTo)) return false;
     } else if (date && date !== 'all' && !matchesSessionDate(session, date)) return false;
@@ -1419,7 +1729,14 @@ function filterSessions(sessions, searchParams) {
   });
 
   const sorted = sortPublicSessions(rows, sort);
-  const arranged = sort === 'price' || sort === 'time' ? sorted : spreadCatalogSessionsByCoverImage(sorted);
+  const arranged =
+    sort === 'price' ||
+    sort === 'price_asc' ||
+    sort === 'price_desc' ||
+    sort === 'time' ||
+    sort === 'departing_soon'
+      ? sorted
+      : spreadCatalogSessionsByCoverImage(sorted);
   return {
     total: arranged.length,
     offset,
@@ -1445,11 +1762,18 @@ function buildFallbackFacets(sessions) {
 
 function sortPublicSessions(sessions, sort) {
   const sorted = [...sessions];
-  if (sort === 'price') {
+  if (sort === 'price' || sort === 'price_asc') {
     return sorted.sort((a, b) => {
       const aPrice = Number.isFinite(a.priceFrom) ? a.priceFrom : Number.POSITIVE_INFINITY;
       const bPrice = Number.isFinite(b.priceFrom) ? b.priceFrom : Number.POSITIVE_INFINITY;
       return aPrice - bPrice || comparePublicSessionTime(a, b);
+    });
+  }
+  if (sort === 'price_desc') {
+    return sorted.sort((a, b) => {
+      const aPrice = Number.isFinite(a.priceFrom) ? a.priceFrom : Number.POSITIVE_INFINITY;
+      const bPrice = Number.isFinite(b.priceFrom) ? b.priceFrom : Number.POSITIVE_INFINITY;
+      return bPrice - aPrice || comparePublicSessionTime(a, b);
     });
   }
   if (sort === 'popular') {

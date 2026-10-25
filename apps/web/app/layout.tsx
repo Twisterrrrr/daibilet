@@ -1,12 +1,18 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
+import { Suspense } from 'react';
 
 import { ChunkLoadRecovery } from '@/components/ChunkLoadRecovery';
-import { HOME_SEO_DESCRIPTION_FALLBACK, HOME_SEO_TITLE } from '@/lib/seo-meta';
+import { NavigationProgress } from '@/components/NavigationProgress.client';
+import { PurchaseOpeningHost } from '@/components/PurchaseOpeningFeedback.client';
+import { YandexMetrika } from '@/components/YandexMetrika.client';
+import { fontSansVariableClassName } from '@/lib/fonts';
+import { DEFAULT_OG_IMAGE, HOME_SEO_DESCRIPTION_FALLBACK, HOME_SEO_TITLE, INDEX_FOLLOW_ROBOTS, getOpenGraphMediaTags } from '@/lib/seo-meta';
 
 import './globals.css';
 
-const SITE_URL = process.env.DAIBILET_SITE_URL || 'https://daibilet.ru';
+const SITE_URL = process.env.DAIBILET_SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || 'https://daibilet.ru';
 const SITE_NAME = 'Дайбилет';
+const ROOT_OG = getOpenGraphMediaTags(DEFAULT_OG_IMAGE, HOME_SEO_TITLE);
 
 /** Favicon / PWA: силуэт билета ~90% кадра (мало padding во вкладке). */
 const ICON_32 = '/favicon-32x32.png';
@@ -26,6 +32,7 @@ export const metadata: Metadata = {
     template: '%s | Дайбилет',
   },
   description: HOME_SEO_DESCRIPTION_FALLBACK,
+  robots: INDEX_FOLLOW_ROBOTS,
   manifest: '/site.webmanifest',
   icons: {
     icon: [
@@ -46,15 +53,23 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     title: HOME_SEO_TITLE,
     description: HOME_SEO_DESCRIPTION_FALLBACK,
+    images: ROOT_OG.images,
   },
   twitter: {
-    card: 'summary_large_image',
+    card: ROOT_OG.twitterCard,
     title: HOME_SEO_TITLE,
     description: HOME_SEO_DESCRIPTION_FALLBACK,
+    images: ROOT_OG.twitterImages,
   },
   other: {
     'apple-mobile-web-app-title': SITE_NAME,
   },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
 };
 
 const siteJsonLd = {
@@ -88,7 +103,11 @@ const siteJsonLd = {
           '@type': 'EntryPoint',
           urlTemplate: `${SITE_URL}/events?q={search_term_string}`,
         },
-        'query-input': 'required name=search_term_string',
+        'query-input': {
+          '@type': 'PropertyValueSpecification',
+          valueRequired: true,
+          valueName: 'search_term_string',
+        },
       },
     },
   ],
@@ -96,15 +115,22 @@ const siteJsonLd = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ru">
+    <html lang="ru" className={fontSansVariableClassName}>
       <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }}
         />
       </head>
-      <body>
+      <body className="font-sans">
         <ChunkLoadRecovery />
+        <PurchaseOpeningHost />
+        <Suspense fallback={null}>
+          <NavigationProgress />
+        </Suspense>
+        <Suspense fallback={null}>
+          <YandexMetrika />
+        </Suspense>
         {children}
       </body>
     </html>

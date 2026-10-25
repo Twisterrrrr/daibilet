@@ -93,7 +93,7 @@ export function createAdminOrdersReadRouteHandler(
     }
     if (context.pathname === '/api/admin/orders' || context.pathname === '/api/admin/external-orders') {
       const sessionUser = (context.request as typeof context.request & { adminSessionUser?: { roles?: string[] } }).adminSessionUser;
-      const canReadPii = sessionUser ? adminRolesMayReadOrderPii(sessionUser.roles || []) : true;
+      const canReadPii = sessionUser ? adminRolesMayReadOrderPii(sessionUser.roles || []) : false;
       const orders = await deps.buildOrdersList(context.searchParams, { includePiiSearch: canReadPii });
       sendJson(context.response, projectAdminOrdersPii(orders, canReadPii));
       return true;

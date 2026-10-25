@@ -1,4 +1,4 @@
-import { canonicalLandingSlug, CANONICAL_LANDING_SLUGS } from '@/lib/landing-constants';
+import { canonicalLandingSlug, CANONICAL_LANDING_SLUGS } from './landing-constants';
 
 export const LANDING_CATEGORY_PATH_BY_SLUG: Record<string, string> = {
   'river-cruises': 'rechnye-progulki',
@@ -8,8 +8,22 @@ export const LANDING_CATEGORY_PATH_BY_SLUG: Record<string, string> = {
   'family-kids': 'detyam-i-semyam',
   'concerts-genre': 'kontserty',
   'active-sport': 'aktivnyj-otdyh',
+  'quest-tours': 'kvest-ekskursii',
+  'show-programs': 'shou-programmy',
+  'self-development': 'samorazvitie',
+  'intimate-concerts': 'kvartirniki',
+  'improv-tribute': 'improv-i-tribyut',
+  'walking-tours': 'peshie-ekskursii',
+  'country-tours': 'zagorodnye-ekskursii',
+  exhibitions: 'vystavki-i-muzei',
+  'unusual-theatres': 'neobychnye-teatry',
+  excursions: 'ekskursii',
+  rooftops: 'progulki-po-krysham',
   'new-year': 'novyj-god',
   'salute-9-may': 'salut-9-maya',
+  graduation: 'vypusknye',
+  'international-womens-day': '8-marta',
+  maslenitsa: 'maslenica',
 };
 
 export const CITY_LANDING_PATH_BY_SLUG: Record<string, string> = {
@@ -17,6 +31,7 @@ export const CITY_LANDING_PATH_BY_SLUG: Record<string, string> = {
   'spb-yards': 'spb-yards',
   'moscow-dinner-boat': 'dinner-boat',
   'moscow-museums': 'moscow-museums',
+  'moscow-city-day': 'den-goroda',
   planetarium: 'planetarium',
 };
 
@@ -28,13 +43,45 @@ export const LANDING_SLUG_BY_CITY_LANDING_PATH: Record<string, string> = Object.
   Object.entries(CITY_LANDING_PATH_BY_SLUG).map(([slug, path]) => [path, slug]),
 );
 
+/** Категории с ЧПУ `/{categoryPath}/{city}` (не `/{city}/…`). */
 export const MULTI_CITY_LANDING_SLUGS = new Set<string>([
   CANONICAL_LANDING_SLUGS.river,
   CANONICAL_LANDING_SLUGS.bus,
   CANONICAL_LANDING_SLUGS.party,
+  'standup',
+  'family-kids',
+  'concerts-genre',
+  'active-sport',
+  'walking-tours',
+  'country-tours',
+  'exhibitions',
+  'unusual-theatres',
+  'quest-tours',
+  'show-programs',
+  'self-development',
+  'intimate-concerts',
+  'improv-tribute',
+  'excursions',
+  'rooftops',
   'salute-9-may',
   'new-year',
+  'graduation',
+  'international-womens-day',
+  'maslenitsa',
 ]);
+
+/** Приоритетные города для sitemap / static params SEO-листингов. */
+export const PRIORITY_LISTING_CITY_SLUGS = [
+  'moscow',
+  'saint-petersburg',
+  'kazan',
+  'ekaterinburg',
+] as const;
+
+/** Ограничения городов для узких SEO-посадок. rooftops - national (СПб крыши + Мск смотровые). */
+export const LANDING_ALLOWED_CITY_SLUGS: Partial<Record<string, readonly string[]>> = {
+  'country-tours': ['saint-petersburg'],
+};
 
 export const CITY_SCOPED_LANDING_SLUGS = new Set<string>(Object.keys(CITY_LANDING_PATH_BY_SLUG));
 
@@ -43,6 +90,7 @@ export const DEFAULT_CITY_BY_LANDING_SLUG: Record<string, string> = {
   'spb-yards': 'saint-petersburg',
   'moscow-dinner-boat': 'moscow',
   'moscow-museums': 'moscow',
+  'moscow-city-day': 'moscow',
   planetarium: 'saint-petersburg',
 };
 
@@ -72,7 +120,46 @@ const CITY_SLUG_ALIASES: Record<string, string> = {
   ekaterinburg: 'ekaterinburg',
 };
 
-const KNOWN_CITY_SLUGS = new Set<string>([...Object.values(CITY_SLUG_ALIASES), ...Object.keys(CITY_SLUG_ALIASES)]);
+/** App / landing path segments that must never be treated as a city slug. */
+const RESERVED_PATH_SEGMENTS = new Set<string>([
+  ...Object.values(LANDING_CATEGORY_PATH_BY_SLUG),
+  ...Object.values(CITY_LANDING_PATH_BY_SLUG),
+  ...Object.keys(LANDING_CATEGORY_PATH_BY_SLUG),
+  ...Object.keys(CITY_LANDING_PATH_BY_SLUG),
+  'events',
+  'cities',
+  'venues',
+  'locations',
+  'places',
+  'blog',
+  'podborki',
+  'admin',
+  'help',
+  'about',
+  'login',
+  'account',
+  'checkout',
+  'my-day',
+  'my-orders',
+  'offer',
+  'privacy',
+  'legal',
+  'contacts',
+  'reviews',
+  'requisites',
+  'landings',
+  'articles',
+  'api',
+  'images',
+  'sitemaps',
+  'sitemap.xml',
+  'robots.txt',
+  'favicon.ico',
+  '_next',
+  'all',
+]);
+
+const CITY_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 const CITY_URL_SEGMENT: Record<string, string> = {
   moscow: 'moscow',
@@ -98,12 +185,19 @@ export function normalizeCitySlug(segment: string | null | undefined): string | 
   return CITY_SLUG_ALIASES[key] || key;
 }
 
+/**
+ * Resolve a city slug for multi-city landings / hub filters.
+ * Accepts all destination-like slugs (ufa, krasnodar, …), not only the old
+ * priority allowlist - otherwise city hubs hide concerts/standup and
+ * `/kontserty/{city}` is parsed as a subcategory instead of a city.
+ */
 export function normalizeKnownCitySlug(segment: string | null | undefined): string | null {
   const key = String(segment || '').trim().toLowerCase();
   if (!key) return null;
   if (key in CITY_SLUG_ALIASES) return CITY_SLUG_ALIASES[key];
-  if (KNOWN_CITY_SLUGS.has(key)) return key;
-  return null;
+  if (RESERVED_PATH_SEGMENTS.has(key)) return null;
+  if (!CITY_SLUG_PATTERN.test(key)) return null;
+  return key;
 }
 
 export function cityPathSegment(citySlug: string | null | undefined): string | null {
@@ -114,6 +208,85 @@ export function cityPathSegment(citySlug: string | null | undefined): string | n
 
 export function isCityScopedLanding(slug: string): boolean {
   return CITY_SCOPED_LANDING_SLUGS.has(canonicalLandingSlug(slug));
+}
+
+export function isLandingCityAllowed(landingSlug: string, citySlug: string): boolean {
+  const allowed = LANDING_ALLOWED_CITY_SLUGS[canonicalLandingSlug(landingSlug)];
+  if (!allowed) return true;
+  const normalized = normalizeCitySlug(citySlug) || String(citySlug || '').trim().toLowerCase();
+  return allowed.includes(normalized) || allowed.includes(String(citySlug || '').trim().toLowerCase());
+}
+
+/**
+ * City permanently tied to a landing (CITY-scoped path or single-city allowlist).
+ * Used for card badges and strict `/podborki` city filter.
+ */
+export function resolveLandingBoundCitySlug(landingSlug: string): string | null {
+  const slug = canonicalLandingSlug(landingSlug);
+  if (CITY_SCOPED_LANDING_SLUGS.has(slug)) {
+    return normalizeKnownCitySlug(DEFAULT_CITY_BY_LANDING_SLUG[slug]) || null;
+  }
+  const allowed = LANDING_ALLOWED_CITY_SLUGS[slug];
+  if (allowed?.length === 1) {
+    return normalizeKnownCitySlug(allowed[0]) || null;
+  }
+  return null;
+}
+
+/** True when landing is city-bound and matches the selected header/catalog city. */
+export function landingMatchesBoundCity(landingSlug: string, citySlug: string | null | undefined): boolean {
+  const selected = normalizeKnownCitySlug(citySlug);
+  if (!selected) return false;
+  const bound = resolveLandingBoundCitySlug(landingSlug);
+  return Boolean(bound && bound === selected);
+}
+
+/**
+ * Catalog visibility for a selected city:
+ * - city-bound → only that city;
+ * - national/multi → city allowlist + (≥1 event when `events` is provided).
+ */
+export function landingMatchesCatalogCity(
+  landingSlug: string,
+  citySlug: string | null | undefined,
+  options?: { events?: number },
+): boolean {
+  const selected = normalizeKnownCitySlug(citySlug);
+  if (!selected) return false;
+
+  const bound = resolveLandingBoundCitySlug(landingSlug);
+  if (bound) return bound === selected;
+
+  if (!isLandingCityAllowed(landingSlug, selected)) return false;
+
+  if (options && Object.prototype.hasOwnProperty.call(options, 'events')) {
+    return (options.events ?? 0) > 0;
+  }
+
+  return true;
+}
+
+/** Merge city-scoped API items with city-bound cards from the national SSR list. */
+export function mergePodborkiCityCatalogItems<T extends { slug: string; events: number }>(
+  nationalItems: T[],
+  cityScopedItems: T[],
+  citySlug: string | null | undefined,
+): T[] {
+  const selected = normalizeKnownCitySlug(citySlug);
+  if (!selected) return nationalItems;
+
+  const bySlug = new Map<string, T>();
+  for (const item of cityScopedItems) {
+    if (landingMatchesCatalogCity(item.slug, selected, { events: item.events })) {
+      bySlug.set(item.slug, item);
+    }
+  }
+  for (const item of nationalItems) {
+    if (landingMatchesBoundCity(item.slug, selected) && !bySlug.has(item.slug)) {
+      bySlug.set(item.slug, item);
+    }
+  }
+  return [...bySlug.values()];
 }
 
 export type LandingRouteTarget = {
@@ -147,6 +320,7 @@ function resolveCategoryFirstRoute(segment1: string, segment2?: string, segment3
 
   const cityFromPath = normalizeKnownCitySlug(segment2);
   if (cityFromPath) {
+    if (!isLandingCityAllowed(landingSlug, cityFromPath)) return null;
     return {
       landingSlug,
       citySlug: cityFromPath,
@@ -191,17 +365,17 @@ export function landingCategoryHref(
   if (isCityScopedLanding(slug)) {
     const city = DEFAULT_CITY_BY_LANDING_SLUG[slug] || citySlug;
     const citySegment = cityPathSegment(city);
-    if (!citySegment) return `/${CITY_LANDING_PATH_BY_SLUG[slug] || slug}/`;
+    if (!citySegment) return `/${CITY_LANDING_PATH_BY_SLUG[slug] || slug}`;
     const topic = CITY_LANDING_PATH_BY_SLUG[slug] || slug;
     const segments = [citySegment, topic];
     if (options?.subcategory) segments.push(options.subcategory.replace(/^\/+|\/+$/g, ''));
-    return `/${segments.join('/')}/`;
+    return `/${segments.join('/')}`;
   }
 
   const categoryPath = LANDING_CATEGORY_PATH_BY_SLUG[slug] || slug;
   const segments = [categoryPath];
 
-  if (citySlug && MULTI_CITY_LANDING_SLUGS.has(slug)) {
+  if (citySlug && MULTI_CITY_LANDING_SLUGS.has(slug) && isLandingCityAllowed(slug, citySlug)) {
     const citySegment = cityPathSegment(citySlug);
     if (citySegment) segments.push(citySegment);
   }
@@ -210,7 +384,7 @@ export function landingCategoryHref(
     segments.push(options.subcategory.replace(/^\/+|\/+$/g, ''));
   }
 
-  return `/${segments.join('/')}/`;
+  return `/${segments.join('/')}`;
 }
 
 export function resolveMisorderedLandingRedirect(pathname: string): string | null {
@@ -222,6 +396,7 @@ export function resolveMisorderedLandingRedirect(pathname: string): string | nul
   const categoryPath = match[2].toLowerCase();
   const landingSlug = LANDING_SLUG_BY_CATEGORY_PATH[categoryPath];
   if (!citySlug || !landingSlug || !MULTI_CITY_LANDING_SLUGS.has(landingSlug)) return null;
+  if (!isLandingCityAllowed(landingSlug, citySlug)) return null;
 
   return landingCategoryHref(landingSlug, citySlug);
 }
@@ -269,14 +444,19 @@ export function resolveLegacyLandingRedirect(pathname: string): string | null {
 }
 
 export function listLandingStaticParamsOne(): Array<{ segment: string }> {
-  return Object.values(LANDING_CATEGORY_PATH_BY_SLUG).map((segment) => ({ segment }));
+  return Object.entries(LANDING_CATEGORY_PATH_BY_SLUG)
+    .filter(([slug]) => !LANDING_ALLOWED_CITY_SLUGS[slug])
+    .map(([, segment]) => ({ segment }));
 }
 
 export function listLandingStaticParamsTwo(): Array<{ segment: string; segment2: string }> {
   const paths: Array<{ segment: string; segment2: string }> = [];
-  for (const categoryPath of Object.values(LANDING_CATEGORY_PATH_BY_SLUG)) {
-    paths.push({ segment: categoryPath, segment2: 'moscow' });
-    paths.push({ segment: categoryPath, segment2: 'saint-petersburg' });
+  for (const [landingSlug, categoryPath] of Object.entries(LANDING_CATEGORY_PATH_BY_SLUG)) {
+    if (!MULTI_CITY_LANDING_SLUGS.has(landingSlug)) continue;
+    for (const city of PRIORITY_LISTING_CITY_SLUGS) {
+      if (!isLandingCityAllowed(landingSlug, city)) continue;
+      paths.push({ segment: categoryPath, segment2: city });
+    }
   }
   for (const slug of Object.keys(CITY_LANDING_PATH_BY_SLUG)) {
     const citySegment = cityPathSegment(DEFAULT_CITY_BY_LANDING_SLUG[slug]);
@@ -332,10 +512,10 @@ export function resolveConcertGenreTag(value?: string | null): string | null {
   return exact || null;
 }
 
-/** /kontserty/moscow/?genre=Джаз — лендинг концертов с городом и жанром. */
+/** /kontserty/moscow?genre=Джаз — лендинг концертов с городом и жанром. */
 export function concertsLandingHref(citySlug?: string | null, genre?: string | null): string {
   const citySegment = citySlug ? cityPathSegment(citySlug) || citySlug : null;
-  const base = citySegment ? `/kontserty/${citySegment}/` : '/kontserty/';
+  const base = citySegment ? `/kontserty/${citySegment}` : '/kontserty';
   const genreTag = resolveConcertGenreTag(genre);
   if (!genreTag) return base;
   return `${base}?genre=${encodeURIComponent(genreTag)}`;

@@ -1,13 +1,12 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
-import { ADMIN_PERMISSIONS, ADMIN_ROLES, resolveAdminPermissions } from '@daibilet/contracts/admin-access/runtime';
+import { ADMIN_PERMISSIONS, ADMIN_ROLES, resolveAdminSessionPermissions } from '@daibilet/contracts/admin-access/runtime';
+import type { AdminPermission } from '@daibilet/contracts/admin-access';
 
 export const ADMIN_FINANCE_ACTOR_ASSERTION_ISSUER = 'daibilet-web-admin';
 export const ADMIN_FINANCE_ACTOR_ASSERTION_AUDIENCE = 'daibilet-finance-admin';
 export const ADMIN_FINANCE_ACTOR_ASSERTION_MAX_TTL_SECONDS = 90;
 
-const FINANCE_ADMIN_PERMISSIONS = Object.freeze(['orders.read', 'orders.pii.read', 'orders.cancel', 'refunds.execute', 'finance.read', 'audit.read'] as const);
-
-export type FinanceAdminPermission = typeof FINANCE_ADMIN_PERMISSIONS[number];
+export type FinanceAdminPermission = AdminPermission;
 
 export type FinanceAdminActor = {
   id: string;
@@ -15,6 +14,7 @@ export type FinanceAdminActor = {
   sessionId: string;
   roles: string[];
   permissions: FinanceAdminPermission[];
+  mfaVerified: boolean;
   issuedAt: number;
   expiresAt: number;
   assertionId: string;
@@ -29,6 +29,7 @@ type FinanceAdminActorClaims = {
   sid: string;
   roles: string[];
   permissions: string[];
+  mfaVerified: boolean;
   iat: number;
   exp: number;
   jti: string;
@@ -65,11 +66,12 @@ export function verifyFinanceAdminActorAssertion(
   if (typeof claims.name !== 'string' || !claims.name.trim() || claims.name.length > 120) return null;
   if (typeof claims.jti !== 'string' || !claims.jti || claims.jti.length > 128) return null;
   if (!Array.isArray(claims.roles) || claims.roles.some((role) => typeof role !== 'string' || !ADMIN_ROLES.includes(role as typeof ADMIN_ROLES[number]))) return null;
+  if (typeof claims.mfaVerified !== 'boolean') return null;
   if (!Array.isArray(claims.permissions) || claims.permissions.some((permission) => typeof permission !== 'string' || !ADMIN_PERMISSIONS.includes(permission as typeof ADMIN_PERMISSIONS[number]))) return null;
   if (typeof claims.iat !== 'number' || typeof claims.exp !== 'number') return null;
   if (claims.iat > nowSeconds + 15 || claims.exp <= nowSeconds || claims.exp <= claims.iat || claims.exp - claims.iat > ADMIN_FINANCE_ACTOR_ASSERTION_MAX_TTL_SECONDS) return null;
   if (new Set(claims.permissions).size !== claims.permissions.length || new Set(claims.roles).size !== claims.roles.length) return null;
-  const expectedPermissions = resolveAdminPermissions(claims.roles);
+  const expectedPermissions = resolveAdminSessionPermissions(claims.roles, claims.mfaVerified);
   if (expectedPermissions.size !== claims.permissions.length || claims.permissions.some((permission) => !expectedPermissions.has(permission as typeof ADMIN_PERMISSIONS[number]))) return null;
 
   return {
@@ -78,6 +80,7 @@ export function verifyFinanceAdminActorAssertion(
     sessionId: claims.sid,
     roles: claims.roles,
     permissions: claims.permissions as FinanceAdminPermission[],
+    mfaVerified: claims.mfaVerified,
     issuedAt: claims.iat,
     expiresAt: claims.exp,
     assertionId: claims.jti,

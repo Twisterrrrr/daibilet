@@ -23,6 +23,14 @@ export interface PublicStatsDto extends ApiEnvelope {
   stats: PublicStatsCounts;
 }
 
+/** Mini-tags on `/cities` cards (CHPU landings or top event categories). */
+export interface PublicDestinationHubTag {
+  slug?: string | null;
+  label: string;
+  events: number;
+  kind: 'landing' | 'category';
+}
+
 export interface PublicDestinationDto {
   id?: string;
   slug?: string;
@@ -32,6 +40,8 @@ export interface PublicDestinationDto {
   events: number;
   venues: number;
   categories: FacetCount[];
+  /** 2-3 popular directions for city micro-hub cards. */
+  hubTags?: PublicDestinationHubTag[];
 }
 
 export interface PublicLandingDto extends SeoFields {
@@ -59,6 +69,8 @@ export interface PublicSessionDto extends PurchaseFields {
   groupEventIds?: string[];
   groupedEventsCount?: number;
   sessionCount?: number;
+  /** Cities count for cross-city merged events (excluding current city). */
+  peerCityCount?: number;
   upcomingSlots?: Array<DateTimeSlot & Pick<PurchaseFields, 'purchaseUrl'> & { vacant?: number | null }>;
   landingSlugs?: string[];
   title: string;
@@ -71,6 +83,8 @@ export interface PublicSessionDto extends PurchaseFields {
   venueId?: string | null;
   venueSlug?: string | null;
   venue: string;
+  /** Street address of venue / meeting point for card pin. */
+  venueAddress?: string | null;
   venueKind: string;
   offerTitle?: string | null;
   offerSourceCode?: string | null;
@@ -100,9 +114,11 @@ export interface PublicCatalogListItemDto extends PurchaseFields {
   groupKey?: string | null;
   groupedEventsCount?: number;
   sessionCount?: number;
+  /** Cities count for cross-city merged events (excluding current city). */
+  peerCityCount?: number;
   upcomingSlots?: Array<
     Pick<DateTimeSlot, 'id' | 'eventId' | 'startsAt' | 'dateLabel' | 'timeLabel'> &
-      Pick<PurchaseFields, 'purchaseUrl'> & { vacant?: number | null }
+      Partial<Pick<PurchaseFields, 'purchaseUrl'>> & { vacant?: number | null }
   >;
   title: string;
   citySlug?: string | null;
@@ -111,6 +127,8 @@ export interface PublicCatalogListItemDto extends PurchaseFields {
   destinationType: DestinationType;
   venueSlug?: string | null;
   venue: string;
+  /** Street address for card pin (not venue marketing name). */
+  venueAddress?: string | null;
   venueKind: string;
   category: string;
   subcategories?: string[];
@@ -153,15 +171,43 @@ export interface PublicVenueDto extends SeoFields {
   name: string;
   title?: string;
   city: string;
+  /** CHPU города для крошек / ссылок. */
+  citySlug?: string | null;
+  /** Область / край / республика из City.region (для мелких городов в крошках). */
+  regionSlug?: string | null;
+  regionTitle?: string | null;
   address?: string | null;
   latitude?: number | null;
   longitude?: number | null;
+  metroStation?: string | null;
+  wayToFind?: string | null;
+  phone?: string | null;
+  parkingInfo?: string | null;
+  /** Короткий hook-текст для карточек локаций. */
+  hookFact?: string | null;
   type: string;
+  placeType?: string | null;
+  placeSubtype?: string | null;
+  pageTemplate?: 'default' | 'pier_departures';
+  placeRoles?: string[];
+  isMainPlace?: boolean;
+  hubTags?: string[];
   pageStatus?: string | null;
+  /** Result of the detail availability gate for sitemap-sized venue snapshots. */
+  detailAvailable?: boolean;
   description?: string | null;
   shortDescription?: string | null;
   heroImageUrl?: string | null;
+  
+  /**
+   * Distinct logical events that still have an upcoming session.
+   * events is an ALL-TIME count. Only this one may drive indexability:
+   * a venue whose last event happened months ago must not stay indexable.
+   */
+  futureSessionCount?: number;
   events: number;
+  /** Явные STOP-связи EventVenueRouteItem на эту площадку. */
+  stopEventCount?: number;
   categories: Record<string, number>;
 }
 
@@ -176,6 +222,58 @@ export interface PublicCityDto extends SeoFields {
   events: number;
   venues: number;
   categories: Record<string, number>;
+}
+
+/** Адм. центр субъекта для region hub (мост в city hub). */
+export interface PublicRegionCenterCityDto {
+  slug: string;
+  name: string;
+  eventCount: number;
+}
+
+/** Город внутри субъекта (reverse cityToRegion + сессии региона). */
+export interface PublicRegionChildCityDto {
+  slug: string;
+  name: string;
+  eventCount: number;
+}
+
+/** Редакционный / AI слой region hub (тир A). */
+export interface PublicRegionInfoDto {
+  brief?: string | null;
+  topPlaces?: Array<{
+    name: string;
+    desc: string;
+    /** Города каталога для фильтра афиши (сквозная связь Place → sessions). */
+    cityNames?: string[] | null;
+    /** Опциональная редакционная обложка; иначе web берёт city/session cover. */
+    imageUrl?: string | null;
+  }> | null;
+  faq?: Array<{ q: string; a: string }> | null;
+}
+
+/** Событие региона на стрипе city hub адмцентра. */
+export interface PublicRegionNearbyEventDto {
+  id: string;
+  slug: string;
+  title: string;
+  startsAt?: string | null;
+  dateLabel?: string | null;
+  city: string;
+  venue?: string | null;
+  priceFrom?: number | null;
+  url: string;
+}
+
+/** Блок «Рядом с городом: события {region genitive}» на хабе адмцентра. */
+export interface PublicRegionNearbyDto {
+  regionSlug: string;
+  regionName: string;
+  title: string;
+  subtitle: string;
+  /** Live tier субъекта на момент сборки (стрип только при C). */
+  tier: 'A' | 'B' | 'C';
+  events: PublicRegionNearbyEventDto[];
 }
 
 export interface PublicEventDto extends SeoFields, PurchaseFields {
@@ -205,6 +303,12 @@ export interface PublicEventDto extends SeoFields, PurchaseFields {
   venue: string;
   venueAddress?: string | null;
   venueKind: string;
+  /** Slim logistics from linked Venue - event modal SSR (CV.9d), no fetch on click. */
+  venueLatitude?: number | null;
+  venueLongitude?: number | null;
+  venueMetroStation?: string | null;
+  venueWayToFind?: string | null;
+  venueParkingInfo?: string | null;
   ageLimit?: string | null;
   priceFrom?: number | null;
   vacant?: number | null;
@@ -213,6 +317,33 @@ export interface PublicEventDto extends SeoFields, PurchaseFields {
   groupKey?: string | null;
   groupEventIds?: string[];
   sessionCount?: number;
+  /** Остановки маршрута (EventVenueRouteItem STOP); Event.venueId = только старт. */
+  venueStops?: PublicEventVenueStopDto[];
+}
+
+/** Slim-карточка события на странице локации (STOP / Рядом). */
+export interface PublicVenueLinkedEventDto {
+  id: string;
+  slug: string;
+  title: string;
+  imageUrl?: string | null;
+  priceFrom?: number | null;
+  venue?: string | null;
+  venueId?: string | null;
+  venueSlug?: string | null;
+  venueKind?: string | null;
+  /** Подпись остановки из EventVenueRouteItem.label. */
+  routeLabel?: string | null;
+}
+
+export interface PublicEventVenueStopDto {
+  venueId: string;
+  slug: string;
+  title: string;
+  kind: string;
+  label?: string | null;
+  /** Канонический path `/venues/…` или `/locations/…`. */
+  href?: string | null;
 }
 
 export interface PublicPurchaseOptionDto extends PurchaseFields {
@@ -227,6 +358,7 @@ export interface PublicPurchaseOptionDto extends PurchaseFields {
 
 export interface PublicEventPageDto extends ApiEnvelope {
   event: PublicEventDto;
+  pdp?: PublicPdpDocumentDto | null;
   sessions: Array<Omit<DateTimeSlot, 'startsAt'> & PurchaseFields & {
     id: string;
     eventId: string;
@@ -241,6 +373,18 @@ export interface PublicEventPageDto extends ApiEnvelope {
   purchaseOptions?: PublicPurchaseOptionDto[];
   related: PublicSessionDto[];
   landings: Array<Pick<PublicLandingDto, 'slug' | 'title' | 'subtitle' | 'chips'>>;
+  /** Same show in other cities (cross-city merge via mergeGroupKey or metaExternalId). */
+  peerEvents?: Array<{
+    id: string;
+    slug: string;
+    title: string;
+    city: string;
+    citySlug: string;
+    venue: string;
+    venueSlug: string;
+    startsAt: string | null;
+    priceFrom: number | null;
+  }>;
   stats: {
     sessions: number;
     priceFrom?: number | null;
@@ -253,6 +397,7 @@ export interface PublicOfferDto extends PurchaseFields {
   sourceCode: string;
   title?: string | null;
   priceRub?: number | null;
+  oldPriceRub?: number | null;
   active: boolean;
 }
 
@@ -281,12 +426,31 @@ export interface PublicCityPageDto extends ApiEnvelope {
     categories: number;
     priceFrom?: number | null;
   };
+  /** Только при `city.type === 'region'`. */
+  centerCity?: PublicRegionCenterCityDto | null;
+  childCities?: PublicRegionChildCityDto[];
+  regionInfo?: PublicRegionInfoDto | null;
+  /**
+   * Live tier по сумме child-events (A≥10, B≥3, C<3).
+   * Задаётся на region page; на city page - внутри `regionNearby.tier` если стрип есть.
+   */
+  regionTier?: 'A' | 'B' | 'C' | null;
+  /** Tier A без topPlaces → сигнал для AI/редактора. */
+  regionInfoNeedsGeneration?: boolean;
+  /** На city hub адмцентра: загородные события субъекта (strip) - только live Tier C. */
+  regionNearby?: PublicRegionNearbyDto | null;
 }
 
 export interface PublicVenuePageDto extends ApiEnvelope {
   venue: PublicVenueDto;
+  /** Published editorial page content. Prices and availability remain in offers/sessions. */
+  pdp?: PublicPdpDocumentDto | null;
   sessions: PublicSessionDto[];
   relatedVenues: PublicVenueDto[];
+  /** Экскурсии с явной STOP-связью на эту локацию. */
+  stopEvents?: PublicVenueLinkedEventDto[];
+  /** Geo-fallback (~300м), только если stopEvents пуст. Подпись UI: «Рядом». */
+  nearbyEvents?: PublicVenueLinkedEventDto[];
   stats: {
     events: number;
     categories: number;
@@ -294,9 +458,75 @@ export interface PublicVenuePageDto extends ApiEnvelope {
   };
 }
 
+export interface PublicPdpDocumentDto {
+  variant: string;
+  content: {
+    summary?: string;
+    gallery?: Array<{ url: string; alt?: string; caption?: string; credit?: string }>;
+    facts?: Array<{ label: string; value: string; sourceUrl?: string; verifiedAt?: string }>;
+    sections?: Array<{
+      id: string;
+      kind: string;
+      title?: string;
+      body?: string;
+      items?: Array<{
+        title: string;
+        description?: string;
+        imageUrl?: string;
+        linkUrl?: string;
+        meta?: string;
+        details?: Array<{ label: string; value: string }>;
+      }>;
+    }>;
+    sources?: Array<{ title: string; url: string; checkedAt?: string }>;
+    conversion?: {
+      mode: string;
+      primaryAction: string;
+      label?: string;
+      targetEventId?: string;
+      externalUrl?: string;
+    };
+  };
+}
+
 export interface PublicVenuesDto extends ApiEnvelope {
   total: number;
   venues: PublicVenueDto[];
+  /** 1-based page index when using ?page= pagination. */
+  page?: number;
+  /** Opaque cursor for legacy infinite scroll; null when no more pages. */
+  nextCursor?: string | null;
+  hasMore?: boolean;
+  limit?: number;
+  /**
+   * Progressive /venues: shell list omitted distinct product counts.
+   * Client should call `/api/public/venues/event-counts?ids=` and patch cards.
+   */
+  countsPending?: boolean;
+  /** Lazy map pins (`mode=pins`) - slug/name/lat/lng/kind only. */
+  pins?: PublicVenueMapPinDto[];
+  stats?: {
+    /** Filtered catalog size (includes 0-event content places). */
+    venues: number;
+    /** Venues in filtered universe with at least one distinct product (event≠slots). */
+    venuesWithEvents?: number;
+    /** Distinct-product event total for the filtered universe (not page slice). */
+    events?: number;
+    cities: Record<string, number>;
+    types: Record<string, number>;
+    scales?: Record<string, number>;
+    logistics?: Record<string, number>;
+  };
+}
+
+/** Lean pin for `/locations` map - fetched only when map is visible. */
+export interface PublicVenueMapPinDto {
+  id: string;
+  slug?: string | null;
+  name: string;
+  latitude: number;
+  longitude: number;
+  kind: string;
 }
 
 export interface PublicLandingPageDto extends ApiEnvelope {

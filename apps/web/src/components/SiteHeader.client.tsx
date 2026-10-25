@@ -1,32 +1,42 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useSearchParams } from 'next/navigation';
-import { Heart, HelpCircle, LogIn, Menu, User, X } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { Heart, HelpCircle, LogIn, User } from 'lucide-react';
 import { forwardRef, useEffect, useRef, useState } from 'react';
 
 import { CityPicker } from '@/components/CityPicker.client';
 import { DaibiletLogo } from '@/components/DaibiletLogo';
+import { DayRouteBadge } from '@/components/DayRouteBadge.client';
 import { FavoritesPanel } from '@/components/FavoritesPanel.client';
 import { HeaderSearch } from '@/components/HeaderSearch.client';
+import { MobileNavLayer, MobileNavTrigger, useMobileNavId } from '@/components/MobileNavMenu.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
 import { useUserAuthOptional } from '@/hooks/useUserAuth';
-import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
+import { catalogHrefWithSelectedCity } from '@/lib/catalog-url';
+import { FAVORITES_CHANGED_EVENT, readFavoriteIds } from '@/lib/favorites';
+import { PLACE_FAVORITES_CHANGED_EVENT, readPlaceFavorites } from '@/lib/place-favorites';
+import { cityHref } from '@/lib/routes';
 
+/** Primary IA: Афиша · Город · Подборки · Блог. Места stay in footer / secondary. */
 const NAV_LINKS = [
-  { label: 'События', href: '/events', catalog: true },
-  { label: 'Города', href: '/cities' },
-  { label: 'Площадки', href: '/venues', venueCatalog: 'venues' as const },
-  { label: 'Локации', href: '/locations', venueCatalog: 'locations' as const },
+  { label: 'Афиша', href: '/events', catalog: true },
+  { label: 'Город', href: '/cities', cityHub: true },
   { label: 'Подборки', href: '/podborki' },
   { label: 'Блог', href: '/blog' },
 ] as const;
 
-function isNavActive(pathname: string, href: string): boolean {
+function isNavActive(pathname: string, href: string, label?: string): boolean {
   const path = pathname.replace(/\/$/, '') || '/';
-  const normalized = href.replace(/\/$/, '') || '/';
+  const normalized = href.replace(/\/$/, '').split('?')[0] || '/';
   if (normalized === '/') return path === '/';
+  if (label === 'Афиша') {
+    return path === '/events' || path.startsWith('/events/');
+  }
+  if (label === 'Город') {
+    return path === '/cities' || path.startsWith('/cities/');
+  }
   return path === normalized || path.startsWith(`${normalized}/`);
 }
 
@@ -36,35 +46,46 @@ type SiteHeaderProps = {
 
 export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const mobileNavId = useMobileNavId();
   const [favoritesOpen, setFavoritesOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [authMounted, setAuthMounted] = useState(false);
+  const [searchInitialQuery, setSearchInitialQuery] = useState('');
   const userMenuRef = useRef<HTMLDivElement>(null);
   const auth = useUserAuthOptional();
   const selectedCity = useSelectedCityOptional();
-
-  const urlCity = searchParams.get('city');
 
   useEffect(() => {
     setAuthMounted(true);
   }, []);
 
+  // Avoid useSearchParams here: it CSR-bailouts the whole SiteLayout tree.
+  useEffect(() => {
+    if (!pathname.startsWith('/events')) {
+      setSearchInitialQuery('');
+      return;
+    }
+    setSearchInitialQuery(new URLSearchParams(window.location.search).get('q') || '');
+  }, [pathname]);
+
   const cityLabel = selectedCity?.cityLabel ?? 'Все города';
   const cityValue = selectedCity?.cityValue ?? 'all';
   const cityReady = selectedCity?.cityReady ?? false;
+  const cityQuery =
+    cityReady && cityValue !== 'all'
+      ? selectedCity?.selectedDestination?.slug || cityValue
+      : 'all';
   const onCityChange = selectedCity?.setCity ?? (() => undefined);
   const navLinks = NAV_LINKS.map((item) => {
     if ('catalog' in item && item.catalog) {
-      return { ...item, href: catalogHrefWithSelectedCity(cityReady ? cityValue : 'all') };
+      return { ...item, href: catalogHrefWithSelectedCity(cityQuery) };
     }
-    if ('venueCatalog' in item && item.venueCatalog) {
-      const path = item.venueCatalog === 'venues' ? '/venues' : '/locations';
-      return {
-        ...item,
-        href: venueCatalogHrefWithSelectedCity(path, cityReady ? cityValue : 'all'),
-      };
+    if ('cityHub' in item && item.cityHub) {
+      const dest = selectedCity?.selectedDestination;
+      if (cityReady && dest?.slug) {
+        return { ...item, href: cityHref(dest) };
+      }
+      return { ...item, href: '/cities' };
     }
     return { ...item, href: item.href };
   });
@@ -79,60 +100,61 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
   }, [userMenuOpen]);
 
   useEffect(() => {
-    if (!mobileOpen && !favoritesOpen) return;
+    if (!favoritesOpen) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => {
       document.body.style.overflow = prev;
     };
-  }, [favoritesOpen, mobileOpen]);
+  }, [favoritesOpen]);
 
   const isLoggedIn = authMounted && Boolean(auth?.isLoggedIn);
-  const searchCityFilter = urlCity || (cityValue !== 'all' ? cityValue : undefined);
-  const searchInitialQuery = pathname.startsWith('/events') ? searchParams.get('q') || '' : '';
+  const searchCityFilter = cityValue !== 'all' ? cityValue : undefined;
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200 bg-white/85 pt-[env(safe-area-inset-top,0px)] backdrop-blur-md">
-        <div className="container-page flex min-h-[var(--site-header-height)] items-center justify-between gap-2 py-2.5 sm:gap-3 sm:py-3 lg:py-3.5">
-          <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3 lg:flex-none lg:gap-5">
-            <button
-              type="button"
-              aria-label="Открыть меню"
-              onClick={() => setMobileOpen(true)}
-              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100 lg:hidden"
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200/60 bg-white/80 pt-[env(safe-area-inset-top,0px)] shadow-[0_1px_0_hsl(210_9%_11%/0.04)] backdrop-blur-xl supports-[backdrop-filter]:bg-white/70">
+        {/* Same width as page content (.container-page). */}
+        <div className="container-page relative flex min-h-[var(--site-header-height)] items-center justify-between py-2.5 sm:py-3 lg:py-3.5">
+          <div className="flex min-w-0 flex-1 flex-nowrap items-center gap-2 sm:gap-3 lg:flex-none lg:gap-6 xl:gap-8">
+            {/* Mobile: burger left (owner); desktop nav stays centered. */}
+            <div className="lg:hidden">
+              <MobileNavTrigger id={mobileNavId} />
+            </div>
+            <Link
+              href="/"
+              className="inline-flex shrink-0 items-center overflow-visible"
+              aria-label="Дайбилет"
             >
-              <Menu className="h-5 w-5" />
-            </button>
-
-            <Link href="/" className="min-w-0 shrink truncate">
               <DaibiletLogo textClassName="text-lg sm:text-xl lg:text-2xl" />
             </Link>
-
+            {/* City next to logo (desktop); modest gap, not flush. */}
             <CityPicker
               cities={destinations}
               value={cityValue}
               onChange={onCityChange}
-              allLabel="Все города"
+              allLabel="Город"
               variant="header"
-              className="hidden max-w-[9.5rem] shrink-0 lg:block xl:max-w-none"
+              className="hidden shrink-0 lg:block lg:min-w-0 lg:max-w-[13rem] xl:max-w-[15rem]"
             />
           </div>
 
-          <nav aria-label="Основная навигация" className="hidden min-w-0 items-center gap-0.5 lg:flex">
+          <nav
+            aria-label="Основная навигация"
+            className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-[var(--header-menu-gap)] lg:flex"
+          >
             {navLinks.map((item) => {
-              const active = isNavActive(pathname, item.href.split('?')[0] || item.href);
-              const secondary = item.href.startsWith('/venues') || item.href.startsWith('/locations') || item.href.startsWith('/blog');
+              const active = isNavActive(pathname, item.href, item.label);
               return (
                 <Link
                   key={item.label}
                   href={item.href}
                   className={
                     [
-                      secondary ? 'hidden xl:inline-flex' : 'inline-flex',
+                      'inline-flex items-center rounded-full px-3 py-1.5 text-sm font-medium transition xl:px-3.5',
                       active
-                        ? 'rounded-full bg-primary/10 px-2.5 py-1.5 text-sm font-semibold text-primary-600 xl:px-3'
-                        : 'rounded-full px-2.5 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 xl:px-3',
+                        ? 'bg-surface-muted text-graphite shadow-[inset_0_0_0_1px_hsl(210_9%_11%/0.08)]'
+                        : 'text-graphite-muted hover:bg-surface-muted/70 hover:text-graphite',
                     ].join(' ')
                   }
                 >
@@ -142,15 +164,36 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
             })}
           </nav>
 
-          <div className="flex shrink-0 items-center gap-0.5 sm:gap-1.5">
+          <div className="flex shrink-0 items-center gap-[var(--header-icons-gap)]">
+            {/* Mobile: city stays with actions (desktop city is by logo). */}
+            <CityPicker
+              cities={destinations}
+              value={cityValue}
+              onChange={onCityChange}
+              allLabel="Город"
+              variant="header"
+              className="shrink-0 lg:hidden"
+            />
+
             <HeaderSearch
               variant="overlay"
               cityFilter={searchCityFilter}
               initialQuery={searchInitialQuery}
-              className="hidden lg:inline-flex"
             />
 
-            <div className="hidden lg:contents">
+            <DayRouteBadge />
+            <FavoritesHeaderButton onClick={() => setFavoritesOpen(true)} />
+
+            <div className="hidden items-center gap-[var(--header-icons-gap)] lg:flex">
+              <Link
+                href="/help"
+                title="Помощь и FAQ"
+                aria-label="Помощь и FAQ"
+                className="site-header-icon-link h-10 w-10"
+              >
+                <HelpCircle className="h-5 w-5" strokeWidth={1.75} />
+              </Link>
+
               <HeaderAuthControls
                 ref={userMenuRef}
                 auth={auth}
@@ -159,52 +202,67 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
                 onToggleUserMenu={() => setUserMenuOpen((value) => !value)}
                 onCloseUserMenu={() => setUserMenuOpen(false)}
               />
-
-              <Link
-                href="/help"
-                title="Помощь и FAQ"
-                aria-label="Помощь и FAQ"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100"
-              >
-                <HelpCircle className="h-5 w-5" />
-              </Link>
-
-              <button
-                type="button"
-                aria-label="Избранное"
-                title="Избранное"
-                onClick={() => setFavoritesOpen(true)}
-                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800"
-              >
-                <Heart className="h-5 w-5" />
-              </button>
             </div>
           </div>
         </div>
       </header>
       <div aria-hidden="true" className="site-header-spacer" />
 
-      {mobileOpen ? (
-        <MobileNavSheet
-          pathname={pathname}
-          navLinks={navLinks}
-          cityLabel={cityLabel}
-          cityValue={cityValue}
-          destinations={destinations}
-          isLoggedIn={isLoggedIn}
-          auth={auth}
-          searchCityFilter={searchCityFilter}
-          searchInitialQuery={searchInitialQuery}
-          onClose={() => setMobileOpen(false)}
-          onCityChange={onCityChange}
-          onOpenFavorites={() => {
-            setMobileOpen(false);
-            setFavoritesOpen(true);
-          }}
-        />
-      ) : null}
+      {/* Outside header: fixed sheet must not sit under backdrop-filter containing block. */}
+      <MobileNavLayer
+        id={mobileNavId}
+        navLinks={navLinks}
+        cityLabel={cityLabel}
+        cityValue={cityValue}
+        destinations={destinations}
+        isLoggedIn={isLoggedIn}
+        auth={auth}
+        searchCityFilter={searchCityFilter}
+        searchInitialQuery={searchInitialQuery}
+        onCityChange={onCityChange}
+        onOpenFavorites={() => setFavoritesOpen(true)}
+      />
+
       {favoritesOpen ? <FavoritesPanel onClose={() => setFavoritesOpen(false)} /> : null}
     </>
+  );
+}
+
+function FavoritesHeaderButton({ onClick }: { onClick: () => void }) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    const sync = () => setCount(readFavoriteIds().size + readPlaceFavorites().length);
+    sync();
+    window.addEventListener(FAVORITES_CHANGED_EVENT, sync);
+    window.addEventListener(PLACE_FAVORITES_CHANGED_EVENT, sync);
+    window.addEventListener('storage', sync);
+    return () => {
+      window.removeEventListener(FAVORITES_CHANGED_EVENT, sync);
+      window.removeEventListener(PLACE_FAVORITES_CHANGED_EVENT, sync);
+      window.removeEventListener('storage', sync);
+    };
+  }, []);
+
+  return (
+    <button
+      type="button"
+      aria-label={count ? `Избранное, ${count}` : 'Избранное'}
+      title="Избранное"
+      data-favorites-count={count}
+      onClick={onClick}
+      className="site-header-icon-link relative h-10 w-10 shrink-0"
+    >
+      <Heart className="h-5 w-5" strokeWidth={1.75} />
+      {count > 0 ? (
+        <span
+          data-favorites-badge
+          className="absolute -right-0.5 -top-0.5 inline-flex min-w-[1.1rem] items-center justify-center rounded-full bg-rose-600 px-1 text-[10px] font-bold leading-4 text-white"
+        >
+          {count}
+        </span>
+      ) : null}
+    </button>
   );
 }
 
@@ -225,24 +283,24 @@ const HeaderAuthControls = forwardRef<
           type="button"
           aria-label="Личный кабинет"
           onClick={onToggleUserMenu}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100 xl:hidden"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-graphite-muted transition hover:bg-surface-muted hover:text-graphite xl:hidden"
         >
-          <User className="h-5 w-5" />
+          <User className="h-5 w-5" strokeWidth={1.75} />
         </button>
         <button
           type="button"
           onClick={onToggleUserMenu}
-          className="hidden items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 xl:inline-flex xl:px-4"
+          className="hidden items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium text-graphite-muted transition hover:bg-surface-muted hover:text-graphite xl:inline-flex"
         >
-          <User className="h-4 w-4" />
+          <User className="h-4 w-4" strokeWidth={1.75} />
           {auth?.user?.name || 'Кабинет'}
         </button>
         {userMenuOpen ? (
-          <div className="absolute right-0 z-50 mt-1 w-56 rounded-xl border border-slate-200 bg-white py-1 shadow-lg">
+          <div className="absolute right-0 z-50 mt-1.5 w-56 overflow-hidden rounded-card bg-white py-1 shadow-card-hover">
             {auth?.user?.name ? (
-              <div className="border-b border-slate-100 px-3 py-2 text-sm font-medium text-slate-900">{auth.user.name}</div>
+              <div className="border-b border-slate-100/80 px-3 py-2 text-sm font-medium text-graphite">{auth.user.name}</div>
             ) : null}
-            <Link href="/account/purchases" onClick={onCloseUserMenu} className="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
+            <Link href="/account/purchases" onClick={onCloseUserMenu} className="block px-3 py-2 text-sm text-graphite-muted hover:bg-surface-muted hover:text-graphite">
               Мои покупки
             </Link>
             <button
@@ -252,7 +310,7 @@ const HeaderAuthControls = forwardRef<
                 onCloseUserMenu();
                 window.location.href = '/';
               }}
-              className="block w-full px-3 py-2 text-left text-sm text-slate-600 hover:bg-slate-50"
+              className="block w-full px-3 py-2 text-left text-sm text-graphite-muted hover:bg-surface-muted hover:text-graphite"
             >
               Выйти
             </button>
@@ -263,149 +321,12 @@ const HeaderAuthControls = forwardRef<
   }
 
   return (
-    <>
-      <Link
-        href="/login?returnUrl=/account/purchases"
-        aria-label="Войти"
-        className="inline-flex h-10 w-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100 xl:hidden"
-      >
-        <User className="h-5 w-5" />
-      </Link>
-      <Link
-        href="/login?returnUrl=/account/purchases"
-        className="hidden items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 xl:inline-flex xl:px-4"
-      >
-        <LogIn className="h-4 w-4" />
-        Войти
-      </Link>
-    </>
+    <Link
+      href="/login?returnUrl=/account/purchases"
+      className="inline-flex h-10 items-center gap-2 rounded-xl bg-primary-600 px-3.5 text-sm font-semibold text-white transition hover:bg-primary-700"
+    >
+      <LogIn className="h-4 w-4" strokeWidth={1.75} />
+      Войти
+    </Link>
   );
 });
-
-function MobileNavSheet({
-  pathname,
-  navLinks,
-  cityLabel,
-  cityValue,
-  destinations,
-  isLoggedIn,
-  auth,
-  searchCityFilter,
-  searchInitialQuery,
-  onClose,
-  onCityChange,
-  onOpenFavorites,
-}: {
-  pathname: string;
-  navLinks: Array<{ label: string; href: string }>;
-  cityLabel: string;
-  cityValue: string;
-  destinations: PublicDestinationDto[];
-  isLoggedIn: boolean;
-  auth: ReturnType<typeof useUserAuthOptional>;
-  searchCityFilter?: string;
-  searchInitialQuery?: string;
-  onClose: () => void;
-  onCityChange: (name: string) => void;
-  onOpenFavorites: () => void;
-}) {
-  return (
-    <div className="fixed inset-0 z-[60] lg:hidden">
-      <button type="button" aria-label="Закрыть меню" className="absolute inset-0 bg-slate-900/40" onClick={onClose} />
-      <aside className="relative flex h-full w-[min(20rem,88vw)] flex-col bg-white shadow-xl">
-        <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4">
-          <DaibiletLogo textClassName="text-xl" />
-          <button type="button" aria-label="Закрыть" onClick={onClose} className="rounded-full p-2 text-slate-500 hover:bg-slate-100">
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-        <div className="border-b border-slate-200 px-4 py-3">
-          <HeaderSearch
-            variant="inline"
-            cityFilter={searchCityFilter}
-            initialQuery={searchInitialQuery}
-            className="rounded-xl border border-slate-200 bg-slate-50 py-2.5"
-          />
-        </div>
-        <nav aria-label="Мобильная навигация" className="flex-1 overflow-y-auto p-2">
-          {navLinks.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              onClick={onClose}
-              className={`block w-full rounded-lg px-4 py-3 text-left text-base font-medium ${
-                isNavActive(pathname, item.href.split('?')[0] || item.href)
-                  ? 'bg-primary/10 font-semibold text-primary-600'
-                  : 'text-slate-700 hover:bg-slate-100'
-              }`}
-            >
-              {item.label}
-            </Link>
-          ))}
-          <div className="my-2 border-t border-slate-200" />
-          <button
-            type="button"
-            onClick={onOpenFavorites}
-            className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-left text-base font-medium text-slate-700 hover:bg-slate-100"
-          >
-            <Heart className="h-4 w-4" />
-            Избранное
-          </button>
-          <Link
-            href="/help"
-            onClick={onClose}
-            className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-left text-base font-medium text-slate-700 hover:bg-slate-100"
-          >
-            <HelpCircle className="h-4 w-4" />
-            Помощь и FAQ
-          </Link>
-          <div className="my-2 border-t border-slate-200" />
-          <div className="px-2 py-2">
-            <p className="mb-2 px-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Город</p>
-            <CityPicker
-              cities={destinations}
-              value={cityValue}
-              onChange={(name) => {
-                onCityChange(name);
-                onClose();
-              }}
-              allLabel={cityLabel === 'Все города' ? 'Все города' : cityLabel}
-              variant="compact"
-              className="w-full"
-            />
-          </div>
-          <div className="my-2 border-t border-slate-200" />
-          {isLoggedIn ? (
-            <>
-              {auth?.user?.name ? <div className="px-4 py-2 text-sm text-slate-500">{auth.user.name}</div> : null}
-              <Link href="/account/purchases" onClick={onClose} className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-left text-base font-medium text-slate-700 hover:bg-slate-100">
-                <User className="h-4 w-4" />
-                Мои покупки
-              </Link>
-              <button
-                type="button"
-                onClick={async () => {
-                  await auth?.logout();
-                  onClose();
-                  window.location.href = '/';
-                }}
-                className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-left text-base font-medium text-rose-600 hover:bg-rose-50"
-              >
-                Выйти
-              </button>
-            </>
-          ) : (
-            <Link
-              href="/login?returnUrl=/account/purchases"
-              onClick={onClose}
-              className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-left text-base font-medium text-slate-700 hover:bg-slate-100"
-            >
-              <User className="h-4 w-4" />
-              Войти
-            </Link>
-          )}
-        </nav>
-      </aside>
-    </div>
-  );
-}

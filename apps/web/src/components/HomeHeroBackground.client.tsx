@@ -2,34 +2,40 @@
 
 import * as React from 'react';
 
-const HERO_IMAGES = {
-  landscape: '/images/hero/home-hero-friends-selfie.jpg',
-  portrait: '/images/hero/home-hero-friends-selfie-mobile.jpg',
-} as const;
+import { homeHeroObjectPositionClass, type HomeHeroImageSet } from '@/lib/home-hero-images';
 
-export function HomeHeroBackground() {
+type HomeHeroBackgroundProps = {
+  image: HomeHeroImageSet;
+};
+
+/**
+ * One LCP fetch: native picture picks mobile or desktop. Do not priority both.
+ * Filenames come from HOME_HERO_IMAGES (existing /images/home/hero-emotion-*.jpg).
+ */
+export function HomeHeroBackground({ image }: HomeHeroBackgroundProps) {
   const [loaded, setLoaded] = React.useState(false);
+  const position = homeHeroObjectPositionClass(image);
+  const mobile = image.portrait;
+  const desktop = image.landscape;
 
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
       <picture>
-        <source media="(min-width: 768px)" srcSet={HERO_IMAGES.landscape} />
+        <source media="(max-width: 768px)" srcSet={mobile} />
         <img
-          src={HERO_IMAGES.portrait}
-          alt=""
-          width={1200}
-          height={900}
-          decoding="async"
+          src={desktop}
+          alt={image.alt}
           fetchPriority="high"
+          decoding="async"
           onLoad={() => setLoaded(true)}
-          className={`h-full w-full object-cover transition-opacity duration-700 md:object-[58%_42%] lg:object-[52%_40%] 2xl:object-[48%_38%] ${
+          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${position} ${
             loaded ? 'opacity-100' : 'opacity-0'
           }`}
         />
       </picture>
-      <div className="absolute inset-0 bg-slate-900/15" />
-      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-slate-900/30 to-slate-900/5" />
-      <div className="absolute inset-0 bg-gradient-to-br from-sky-900/25 via-transparent to-primary-900/20" />
+      <div className="absolute inset-0 bg-slate-950/40" />
+      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-900/45 to-slate-950/25" />
+      <div className="absolute inset-0 bg-gradient-to-br from-sky-900/20 via-transparent to-primary-900/15" />
     </div>
   );
 }

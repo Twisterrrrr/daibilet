@@ -1,11 +1,14 @@
-import '@/lib/env';
-import { buildPublicLandingsCatalogDto } from '@daibilet/backend/public-read';
-import { publicJsonResponse } from '@/server/public-json-response';
+import { isLandingInSelection } from '@/lib/landing-features';
+import { proxyPublicApiRequest } from '@/server/public-api-proxy';
 export const dynamic = 'force-dynamic';
 export const revalidate = 300;
 
 export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const payload = await buildPublicLandingsCatalogDto(url.searchParams);
-  return publicJsonResponse(payload);
+  const response = await proxyPublicApiRequest(request, '/api/public/landings-catalog');
+  if (!response.ok) return response;
+  const payload = (await response.json()) as { items?: Array<{ slug: string }> };
+  return Response.json(
+    { ...payload, items: (payload.items || []).filter((item) => isLandingInSelection(item.slug)) },
+    { status: response.status },
+  );
 }

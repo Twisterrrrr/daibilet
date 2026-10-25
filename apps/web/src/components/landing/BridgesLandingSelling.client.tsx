@@ -4,7 +4,7 @@ import { ArrowRight, Clock, Compass, Heart, MapPin, Sparkles, Star, Wallet } fro
 import * as React from 'react';
 
 import { BRIDGES_LANDING } from '@/data/bridges-landing';
-import { formatMoneyRange, formatNumber } from '@/lib/format';
+import { formatMoneyRange, formatNumber, formatLandingBuyPrice, formatPriceFrom } from '@/lib/format';
 import type { BridgesScheduleRow } from '@/lib/bridges-session-utils';
 
 const PALACE_BRIDGE_LIFT_HOUR = 1;
@@ -90,40 +90,42 @@ export function BridgesHeroBlock({
   onViewSchedule: () => void;
 }) {
   const countdown = usePalaceBridgeCountdown();
-  const priceLabel = priceFrom ? formatMoneyRange(priceFrom, priceTo) : null;
+  // Hero CTA: «от min»; stats cell keeps min-max.
+  const priceCtaLabel = priceFrom ? formatPriceFrom(priceFrom) : null;
+  const priceRangeLabel = priceFrom ? formatMoneyRange(priceFrom, priceTo) : null;
 
   return (
-    <div className="space-y-0">
-      <div className="grid gap-4 md:grid-cols-[auto_1fr_auto] md:items-center">
+    <div>
+      <div className="mb-8 grid gap-4 md:grid-cols-[auto_1fr_auto] md:items-center">
         <BridgesCountdownCard hours={countdown.hours} minutes={countdown.minutes} inSeason={countdown.inSeason} />
         <div className="hidden h-px bg-gradient-to-r from-primary-foreground/25 to-transparent md:block" aria-hidden />
         <div className="flex flex-wrap items-center gap-3">
           <button
             type="button"
             onClick={onPickTour}
-            className="inline-btn inline-flex items-center gap-2 rounded-full bridges-cta-gradient px-6 py-3 text-sm font-semibold text-white transition hover:brightness-105"
+            className="inline-btn inline-flex items-center gap-2 rounded-full bridges-cta-gradient px-6 py-3 text-sm font-semibold text-white transition hover:brightness-105 active:scale-[0.98]"
           >
-            {priceLabel ? `Выбрать рейс · ${priceLabel}` : 'Выбрать рейс'}
+            {priceCtaLabel ? `Выбрать рейс · ${priceCtaLabel}` : 'Выбрать рейс'}
             <ArrowRight className="h-4 w-4" />
           </button>
           <button
             type="button"
             onClick={onViewSchedule}
-            className="inline-btn rounded-full border border-primary-foreground/25 px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary-foreground/10"
+            className="inline-btn rounded-full border border-primary-foreground/25 px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary-foreground/10 active:scale-[0.98]"
           >
             Смотреть график разводки
           </button>
         </div>
       </div>
 
-      <dl className="mt-12 grid grid-cols-2 gap-4 border-t border-primary-foreground/15 pt-6 md:grid-cols-4">
+      <dl className="grid grid-cols-2 gap-4 border-t border-primary-foreground/15 pt-6 md:grid-cols-4">
         {sessionsReady ? (
           <>
             {[
               { value: formatNumber(visibleCount), label: 'рейсов ночью', nowrap: false },
               { value: `${formatNumber(soldEstimate)}+`, label: 'билетов продано', nowrap: false },
               { value: '4.7', label: 'средний рейтинг', nowrap: false },
-              { value: priceLabel || '—', label: 'диапазон цен', nowrap: true },
+              { value: priceRangeLabel || '—', label: 'диапазон цен', nowrap: true },
             ].map((item) => (
               <div key={item.label}>
                 <dt
@@ -187,12 +189,10 @@ export function BridgesScheduleStrip() {
 }
 
 export function BridgesTonightTips() {
-  const tips = [
-    { id: 'warm' as const, text: 'Берите тёплую одежду — на воде холоднее' },
-    { id: 'pier' as const, text: 'Приходите на причал за 20–30 минут' },
-    { id: 'book' as const, text: 'Бронируйте заранее в сезон белых ночей' },
-    { id: 'shore' as const, text: 'Проверьте в описании рейса, на какой берег вернётесь после разводки' },
-  ];
+  const tips = BRIDGES_LANDING.tonightTips.map((text, index) => ({
+    id: `tip-${index}`,
+    text,
+  }));
 
   return (
     <section className="container-page py-10 md:py-14">
@@ -204,20 +204,9 @@ export function BridgesTonightTips() {
         </p>
       </div>
       <div className="rounded-2xl border border-[oklch(0.72_0.17_55/0.2)] bg-[oklch(0.72_0.17_55/0.05)] p-6 md:p-8">
-        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:grid-rows-2 sm:gap-x-6 sm:gap-y-4">
+        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-4">
           {tips.map((tip) => (
-            <li
-              key={tip.id}
-              className={`flex items-start gap-3 text-sm text-foreground/90 ${
-                tip.id === 'warm'
-                  ? 'sm:col-start-1 sm:row-start-1'
-                  : tip.id === 'pier'
-                    ? 'sm:col-start-2 sm:row-start-1'
-                    : tip.id === 'book'
-                      ? 'sm:col-start-2 sm:row-start-2'
-                      : 'sm:col-start-1 sm:row-start-2'
-              }`}
-            >
+            <li key={tip.id} className="flex items-start gap-3 text-sm text-foreground/90">
               <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-[oklch(0.72_0.17_55)]" />
               {tip.text}
             </li>
@@ -259,7 +248,7 @@ export function BridgesScenarioPicker({ onScrollToSchedule }: { onScrollToSchedu
   return (
     <section id="bridges-scenarios" className="container-page py-10">
       <h2 className="mb-2 text-2xl font-bold text-foreground md:text-3xl">Какой рейс выбрать?</h2>
-      <p className="mb-6 max-w-2xl text-muted-foreground">Не все ночные прогулки одинаковы — выберите сценарий, затем сравните конкретные рейсы в расписании.</p>
+      <p className="mb-6 max-w-2xl text-muted-foreground">Не все ночные прогулки одинаковы - выберите сценарий, затем сравните конкретные рейсы в расписании.</p>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {SCENARIOS.map((item) => (
           <button
@@ -354,7 +343,7 @@ export function BridgesFeaturedSection({
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 className="text-2xl font-bold text-foreground md:text-3xl">Популярные рейсы</h2>
-          <p className="mt-1 text-muted-foreground">Проверенные варианты для быстрого выбора — полный каталог ниже.</p>
+          <p className="mt-1 text-muted-foreground">Проверенные варианты для быстрого выбора - полный каталог ниже.</p>
         </div>
         <a href="#variants" className="text-sm font-semibold text-primary hover:text-primary/80">
           Все билеты →
@@ -432,7 +421,7 @@ export function BridgesMobileStickyCta({
         className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground"
       >
         <Star className="h-4 w-4" />
-        {priceFrom ? `Показать рейсы ${formatMoneyRange(priceFrom, priceTo)}` : 'Выбрать рейс'}
+        {priceFrom ? `Показать рейсы ${formatLandingBuyPrice(priceFrom, priceTo)}` : 'Выбрать рейс'}
       </a>
     </div>
   );

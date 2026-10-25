@@ -1,62 +1,255 @@
+import Link from 'next/link';
+import { Clock, HelpCircle, MapPin, RotateCcw, ShieldCheck, Ticket, Users } from 'lucide-react';
+
 import type { PublicEventDto } from '@daibilet/contracts/public';
 
+import { collectCatalogLabels, extractDurationLabel } from '@/lib/catalog-labels';
 import { formatEventDescriptionHtml } from '@/lib/event-description-format';
+import { buildPracticalInfoBlock } from '@/lib/event-minimal-description';
+import { displayEventDescription } from '@/lib/event-description-lead';
+import { formatAgeLimit } from '@/lib/event-page-utils';
 import { uniqueEventTagLabels } from '@/lib/event-tag-labels';
+import { venueHref } from '@/lib/routes';
 
 export function EventDescription({ event }: { event: PublicEventDto }) {
-  const description = String(event.description || '').trim();
+  const description = descriptionWithPracticalInfo(event, displayEventDescription(event));
   if (!description) return null;
   const html = formatEventDescriptionHtml(description);
   if (!html) return null;
 
   return (
     <div>
-      <h2 className="text-lg font-bold text-slate-900">О событии</h2>
+      <h2 className="text-lg font-bold text-graphite">О событии</h2>
       <div
-        className="prose prose-slate mt-4 max-w-none text-sm leading-7 text-slate-600 [&_h3]:mt-5 [&_h3]:mb-2 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-slate-900 [&_li+li]:mt-2 [&_p+p]:mt-5 [&_ul]:mt-3 [&_ul]:list-disc [&_ul]:pl-5 [&_h3+ul]:mt-2"
+        className="prose prose-slate mt-5 max-w-none text-sm leading-7 text-graphite-muted [&_h3]:mt-5 [&_h3]:mb-3 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-graphite [&_li+li]:mt-2 [&_p+p]:mt-5 [&_ul]:mb-4 [&_ul]:mt-3 [&_ul]:list-disc [&_ul]:pl-5 [&_h3+ul]:mt-2"
         dangerouslySetInnerHTML={{ __html: html }}
       />
     </div>
   );
 }
 
+/** Compact body without its own H2 - for accordion panels. */
+export function EventDescriptionBody({ event }: { event: PublicEventDto }) {
+  const description = descriptionWithPracticalInfo(event, displayEventDescription(event));
+  if (!description) return null;
+  const html = formatEventDescriptionHtml(description);
+  if (!html) return null;
+  return (
+    <div
+      className="prose prose-slate max-w-none text-sm leading-7 text-graphite-muted [&_h3]:mt-5 [&_h3]:mb-3 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-graphite [&_li+li]:mt-2 [&_p+p]:mt-5 [&_ul]:mb-4 [&_ul]:mt-3 [&_ul]:list-disc [&_ul]:pl-5 [&_h3+ul]:mt-2"
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
+  );
+}
+
+function descriptionWithPracticalInfo(event: PublicEventDto, rawDescription: string): string {
+  const description = String(rawDescription || '').trim();
+  const normalizedForHeading = description
+    .replace(/<br\s*\/?\s*>/giu, '\n')
+    .replace(/<h[1-6]\b[^>]*>/giu, '\n')
+    .replace(/<\/h[1-6]\s*>/giu, '\n')
+    .replace(/<[^>]*>/gu, ' ')
+    .replace(/&nbsp;/giu, ' ');
+  const hasPracticalInfo = normalizedForHeading.split('\n').some((line) =>
+    /^(?:#{1,6}\s*)?Практическая информация\s*:?[ \t]*#*$/iu.test(line.trim()),
+  );
+  if (hasPracticalInfo) {
+    return description;
+  }
+
+  const durationLabel = extractDurationLabel(event.tags);
+  const durationMatch = durationLabel?.match(/^(\d+)\s*(минут|мин\.?|час|часа|часов)$/iu);
+  const durationMin = durationMatch
+    ? Number(durationMatch[1]) * (/^час/iu.test(durationMatch[2]) ? 60 : 1)
+    : null;
+  const practicalInfo = buildPracticalInfoBlock({
+    title: event.title,
+    city: event.city,
+    venue: event.venue,
+    venueAddress: event.venueAddress,
+    category: event.category,
+    subcategory: event.subcategories?.join(' / '),
+    durationMin,
+    priceFromRub: event.priceFrom,
+    ageLimit: event.ageLimit,
+  });
+
+  return [description, practicalInfo].filter(Boolean).join('\n\n');
+}
+
+export function EventHowToGet({ event }: { event: PublicEventDto }) {
+  const wayToFind = String(event.venueWayToFind || '').trim();
+  const metro = String(event.venueMetroStation || '').trim();
+  const parking = String(event.venueParkingInfo || '').trim();
+  const address = String(event.venueAddress || '').trim();
+  if (!wayToFind && !metro && !parking && !address) return null;
+
+  return (
+    <div className="space-y-3 text-sm text-graphite">
+      {address ? (
+        <p>
+          <span className="font-medium text-graphite-muted">Адрес: </span>
+          {address}
+        </p>
+      ) : null}
+      {metro ? (
+        <p>
+          <span className="font-medium text-graphite-muted">Метро: </span>
+          {metro}
+        </p>
+      ) : null}
+      {wayToFind ? (
+        <p className="leading-relaxed">
+          <span className="font-medium text-graphite-muted">Как найти: </span>
+          {wayToFind}
+        </p>
+      ) : null}
+      {parking ? (
+        <p className="leading-relaxed">
+          <span className="font-medium text-graphite-muted">Парковка: </span>
+          {parking}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+/** Soft tips when purchase is widget/e-ticket ready - not CAPS spam. */
+export function EventTicketTips({ event }: { event: PublicEventDto }) {
+  if (!event.purchaseReady && !event.purchaseUrl && !event.widgetUrl) return null;
+  return (
+    <div className="rounded-xl bg-sky-50 px-4 py-3 text-sm leading-relaxed text-sky-950 ring-1 ring-sky-100">
+      <p className="font-semibold">Электронный билет</p>
+      <p className="mt-1 text-sky-900/80">
+        После оплаты код придёт на email. Покажите его с телефона. Лучше подойти за 15 минут до начала.
+      </p>
+    </div>
+  );
+}
+
 export function EventQuickInfo({ event }: { event: PublicEventDto }) {
-  const items: string[] = [];
-  if (event.venueAddress) items.push(event.venueAddress);
-  if (event.venue && !items.includes(event.venue)) items.push(event.venue);
-  if (event.ageLimit) items.push(`${event.ageLimit}+`);
+  const ageLimit = formatAgeLimit(event.ageLimit);
+  const durationLabel = extractDurationLabel(event.tags);
+  const items: Array<{ icon: typeof MapPin; label: string }> = [];
+
+  if (event.venueAddress) items.push({ icon: MapPin, label: event.venueAddress });
+  else if (event.venue) items.push({ icon: MapPin, label: event.venue });
+  if (durationLabel) items.push({ icon: Clock, label: durationLabel });
+  if (ageLimit) items.push({ icon: Users, label: ageLimit });
 
   if (!items.length) return null;
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-      <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500">Кратко</h2>
-      <ul className="mt-3 space-y-2 text-sm text-slate-700">
-        {items.map((item) => (
-          <li key={item}>{item}</li>
-        ))}
+    <div className="rounded-card border border-slate-200 bg-white p-4 shadow-card sm:p-5">
+      <h2 className="text-sm font-semibold uppercase tracking-wider text-graphite-muted">Кратко</h2>
+      <ul className="mt-4 space-y-3">
+        {items.map((item) => {
+          const Icon = item.icon;
+          return (
+            <li key={item.label} className="flex items-start gap-2.5 text-sm text-graphite">
+              <Icon className="mt-0.5 h-4 w-4 shrink-0 text-graphite-muted" strokeWidth={1.75} />
+              <span>{item.label}</span>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
 }
 
 export function EventTags({ event }: { event: PublicEventDto }) {
-  const rawTags = Array.isArray(event.tags) ? event.tags : [];
-  const rawSubcategories = Array.isArray(event.subcategories) ? event.subcategories : [];
-  // API often mirrors genre labels into both tags and subcategories — merge without dupes.
-  const tags = uniqueEventTagLabels([...rawTags, ...rawSubcategories], 12);
+  const labels = collectCatalogLabels(
+    {
+      category: event.category,
+      subcategories: Array.isArray(event.subcategories) ? event.subcategories : [],
+      tags: Array.isArray(event.tags) ? event.tags : [],
+      title: event.title,
+      venue: event.venue,
+    },
+    6,
+  );
+  const tags = uniqueEventTagLabels(labels, 6);
   if (!tags.length) return null;
 
   return (
     <div>
-      <h2 className="text-lg font-bold text-slate-900">Теги</h2>
-      <div className="mt-3 flex flex-wrap gap-2">
+      <h2 className="text-lg font-bold text-graphite">Теги</h2>
+      <div className="mt-4 flex flex-wrap gap-2">
         {tags.map((tag) => (
-          <span key={tag.toLocaleLowerCase('ru')} className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600">
+          <span
+            key={tag.toLocaleLowerCase('ru')}
+            className="rounded-lg bg-surface-muted px-3 py-1.5 text-xs font-medium text-graphite-muted"
+          >
             {tag}
           </span>
         ))}
       </div>
     </div>
+  );
+}
+
+/** Остановки маршрута (EventVenueRouteItem STOP). Event.venueId = только старт. */
+export function EventVenueStops({ event, hideTitle = false }: { event: PublicEventDto; hideTitle?: boolean }) {
+  const stops = Array.isArray(event.venueStops) ? event.venueStops : [];
+  if (!stops.length) return null;
+
+  return (
+    <div>
+      {hideTitle ? null : <h2 className="text-lg font-bold text-graphite">Маршрут / места</h2>}
+      <ol className={hideTitle ? 'space-y-2' : 'mt-4 space-y-2'}>
+        {stops.map((stop, index) => {
+          const href =
+            stop.href ||
+            venueHref({
+              id: stop.venueId,
+              slug: stop.slug,
+              name: stop.title,
+              type: stop.kind,
+            });
+          return (
+            <li key={`${stop.venueId}-${index}`} className="flex items-start gap-3 text-sm text-graphite">
+              <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-surface-muted text-xs font-semibold text-graphite-muted">
+                {index + 1}
+              </span>
+              <div className="min-w-0">
+                <Link href={href} className="font-medium text-graphite hover:text-primary-700">
+                  {stop.title}
+                </Link>
+                {stop.label ? <p className="text-xs text-graphite-muted">{stop.label}</p> : null}
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+    </div>
+  );
+}
+
+const TRUST_LINKS = [
+  { href: '/help', label: 'Как купить и получить билет', icon: Ticket },
+  { href: '/legal#refunds', label: 'Правила возврата', icon: RotateCcw },
+  { href: '/contacts', label: 'Поддержка и контакты', icon: HelpCircle },
+  { href: '/offer', label: 'Оферта и условия', icon: ShieldCheck },
+] as const;
+
+/** Trust / E-E-A-T strip: полезные ссылки по покупке и поддержке без middleman-формулировок. */
+export function EventTrustStrip() {
+  return (
+    <section>
+      <h2 className="text-sm font-semibold uppercase tracking-wider text-graphite-muted">Покупка и поддержка</h2>
+      <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+        {TRUST_LINKS.map(({ href, label, icon: Icon }) => (
+          <li key={href}>
+            <Link
+              href={href}
+              className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium text-graphite transition hover:bg-surface-muted hover:text-primary-700"
+            >
+              <Icon className="h-4 w-4 shrink-0 text-graphite-muted" strokeWidth={1.75} />
+              {label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
