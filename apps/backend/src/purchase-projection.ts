@@ -440,6 +440,7 @@ interface SessionLookupRow {
 
 export async function buildAdminPurchasesListDto(
   searchParams: URLSearchParams = new URLSearchParams(),
+  options: { includePiiSearch?: boolean } = {},
 ): Promise<AdminPurchasesListDto> {
   const q = cleanString(searchParams.get('q'))?.toLowerCase() || '';
   const view = cleanString(searchParams.get('view'))?.toLowerCase() || 'all';
@@ -455,7 +456,9 @@ export async function buildAdminPurchasesListDto(
   ]);
   const activeRows = allRows.filter((row) => !row.isArchived);
   const scopedRows = provider === 'ALL' ? allRows : allRows.filter((row) => row.sourceCode === provider);
-  const filteredRows = allRows.filter((row) => matchesAdminPurchaseFilters(row, { q, view, provider, status }));
+  const filteredRows = allRows.filter((row) => matchesAdminPurchaseFilters(row, {
+    q, view, provider, status, includePiiSearch: options.includePiiSearch !== false,
+  }));
   const total = filteredRows.length;
   const pages = Math.max(1, Math.ceil(total / limit));
   const safePage = Math.min(page, pages);
@@ -1340,7 +1343,7 @@ async function loadExternalTicketLookups(externalRows: ExternalOrderRow[]): Prom
 
 function matchesAdminPurchaseFilters(
   row: AdminPurchaseRowDto,
-  filters: { q: string; view: string; provider: string; status: string },
+  filters: { q: string; view: string; provider: string; status: string; includePiiSearch?: boolean },
 ): boolean {
   if (filters.view === 'archive' && !row.isArchived) return false;
   if (filters.view !== 'archive' && row.isArchived) return false;
@@ -1364,9 +1367,7 @@ function matchesAdminPurchaseFilters(
     row.status,
     row.sourceCode,
     row.sourceLabel,
-    row.buyer.name,
-    row.buyer.email,
-    row.buyer.phone,
+    ...(filters.includePiiSearch === false ? [] : [row.buyer.name, row.buyer.email, row.buyer.phone]),
     row.eventTitle,
     ...row.eventTitles,
     ...row.tickets.flatMap((ticket) => [ticket.externalTicketId, ticket.eventTitle]),

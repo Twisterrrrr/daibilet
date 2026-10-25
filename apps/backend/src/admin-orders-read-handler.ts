@@ -6,13 +6,15 @@ import {
   verifyFinanceAdminActorAssertion,
 } from './admin-finance-actor.js';
 import { sendJson } from './http.js';
+import { adminRolesMayReadOrderPii } from './admin-rbac-policy.js';
+import { projectAdminOrdersPii } from './admin-order-pii.js';
 import type { FinanceAdminAuditEntry } from './admin-finance-audit.js';
 import { matchPath, type RouteContext } from './routing.js';
 import type { TypedRouteHandler } from './validated-handler.js';
 
 export interface AdminOrdersReadHandlerDependencies {
   enabled: boolean;
-  buildOrdersList: (searchParams: URLSearchParams) => Promise<unknown>;
+  buildOrdersList: (searchParams: URLSearchParams, options?: { includePiiSearch: boolean }) => Promise<unknown>;
   buildOrderDetail: (orderKey: string) => Promise<unknown | null>;
   internalReadToken?: string | null;
   actorAssertionSecret?: string | null;
@@ -90,14 +92,19 @@ export function createAdminOrdersReadRouteHandler(
       return true;
     }
     if (context.pathname === '/api/admin/orders' || context.pathname === '/api/admin/external-orders') {
-      sendJson(context.response, await deps.buildOrdersList(context.searchParams));
+      const sessionUser = (context.request as typeof context.request & { adminSessionUser?: { roles?: string[] } }).adminSessionUser;
+      const canReadPii = sessionUser ? adminRolesMayReadOrderPii(sessionUser.roles || []) : true;
+      const orders = await deps.buildOrdersList(context.searchParams, { includePiiSearch: canReadPii });
+      sendJson(context.response, projectAdminOrdersPii(orders, canReadPii));
       return true;
     }
 
     const detailMatch = matchPath(context.pathname, /^\/api\/admin\/(?:orders|external-orders)\/([^/]+)$/);
     if (detailMatch?.[0]) {
       const detail = await deps.buildOrderDetail(detailMatch[0]);
-      sendJson(context.response, detail || { error: 'order_not_found' }, { statusCode: detail ? 200 : 404 });
+      const sessionUser = (context.request as typeof context.request & { adminSessionUser?: { roles?: string[] } }).adminSessionUser;
+      const canReadPii = sessionUser ? adminRolesMayReadOrderPii(sessionUser.roles || []) : true;
+      sendJson(context.response, detail ? projectAdminOrdersPii(detail, canReadPii) : { error: 'order_not_found' }, { statusCode: detail ? 200 : 404 });
       return true;
     }
 

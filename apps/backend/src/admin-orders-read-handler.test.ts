@@ -122,3 +122,29 @@ test('internal finance reads fail closed when the audit store is unavailable', a
   assert.equal(request.result.status, 503);
   assert.equal(JSON.parse(request.result.body).error, 'admin_audit_unavailable');
 });
+
+test('external admin order API masks PII and excludes contact fields from search for roles without PII permission', async () => {
+  let includePiiSearch: boolean | undefined;
+  const handler = createAdminOrdersReadRouteHandler({
+    enabled: true,
+    buildOrdersList: async (_params, options) => {
+      includePiiSearch = options?.includePiiSearch;
+      return { rows: [{ buyer: { name: 'Анна Константинова', email: 'anna@example.com', phone: '+79991234567', notes: 'call me' }, buyerSnapshot: { email: 'anna@example.com' } }] };
+    },
+    buildOrderDetail: async () => null,
+  });
+  const fixture = context();
+  const request = fixture.route;
+  request.pathname = '/api/admin/orders';
+  request.route = 'GET /api/admin/orders';
+  request.url = new URL('http://localhost/api/admin/orders');
+  request.searchParams = new URLSearchParams();
+  Object.assign(request.request, { adminSessionUser: { roles: ['AUDITOR'] } });
+
+  assert.equal(await handler(request), true);
+  const body = JSON.parse(fixture.result.body);
+  assert.equal(includePiiSearch, false);
+  assert.equal(body.rows[0].buyer.name, 'А. К.');
+  assert.equal(body.rows[0].buyerSnapshot, null);
+  assert.equal(JSON.stringify(body).includes('anna@example.com'), false);
+});

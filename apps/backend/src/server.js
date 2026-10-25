@@ -22,7 +22,6 @@ import {
   resolveAdminSession,
   revokeAdminSession,
 } from './admin-session-auth.js';
-import { getAdminOrderDeleteGuard } from './admin-order-delete-guard.js';
 import { createDb } from './db.js';
 import {
   buildAdminDashboard,
