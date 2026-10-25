@@ -21428,3 +21428,18 @@ evalidateNextBlogArticle (/blog, slug, city hub).
 - Ask Timeweb about intermittent SSH banner/TLS connect stalls with timestamps; app loopback is healthy while outside connections sometimes do not reach nginx.
 - Decide later whether to clean archived `.next.bak-*` and generated media on prod; no cleanup was done in this pass.
 
+## 2026-10-23 - Buyer order access proof BFF
+
+### Changes
+
+- Checkout admission API extracts the finance order proof and stores it in a scoped HttpOnly cookie; it never includes the proof in the browser response.
+- Order result and ticket notification routes pass the cookie proof to finance only when its public order code matches the requested code.
+- Added tests for proof format, exact code binding, malformed cookies, and server-side header forwarding.
+
+### Verification and remaining gate
+
+- `pnpm web:typecheck` and `pnpm web:test:ci` passed on current `origin/feat/next-monorepo`.
+- Targeted ESLint passed for all changed TypeScript files. Production build compiled and generated pages, but exited non-zero at Next.js's security-version gate; static generation also logged expected soft fallbacks because local catalog API `127.0.0.1:4000` was not running.
+- Production deployment remains pending; finance `.159` SSH was unreachable from this session, though its health endpoint answered over HTTPS.
+- Keep finance access enforcement disabled until asynchronous ticket-email lookup has a server-only credential and buyer purchase listing has verified ownership. The owner will run the paid YooKassa smoke.
+

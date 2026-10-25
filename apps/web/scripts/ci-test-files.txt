@@ -48,6 +48,7 @@ src/lib/city-hub-lazy.test.ts
 src/lib/city-hub-registry.test.ts
 # Finance buyer DTO must preserve the separate issued ticket number.
 src/server/finance-checkout-client.test.ts
+src/lib/order-access-cookie.test.ts
 # Support chat helpers: text sanitizing, visitor key guard, Telegram notification text.
 src/lib/chat.test.ts
 # Event copy must not store nearest-session dates (purchase block owns schedule).
