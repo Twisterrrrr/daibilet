@@ -74,6 +74,7 @@ async function enforceAdminAuth(request: NextRequest, adminPath: string) {
     }
     if (!response.ok) return adminLoginRedirect(request);
     const payload = await response.json().catch(() => null) as { user?: { roles?: unknown; mfaVerified?: unknown } } | null;
+    if (adminPath === '/admin/security/mfa') return null;
     const roles = Array.isArray(payload?.user?.roles) ? payload.user.roles.filter((role): role is string => typeof role === 'string') : [];
     if (!adminPageAllowsSession(adminPath, roles, payload?.user?.mfaVerified === true)) return adminForbiddenResponse();
     return null;

@@ -34,6 +34,11 @@ model AdminUser {
   roles           AdminRole[]    @default([])
   permissionEpoch Int            @default(0)
   emailVerifiedAt DateTime?
+  mfaSecretCiphertext String?
+  mfaEnabledAt    DateTime?
+  mfaLastTotpStep  BigInt?
+  mfaPendingSecretCiphertext String?
+  mfaPendingExpiresAt DateTime?
   lastLoginAt     DateTime?
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
@@ -42,6 +47,7 @@ model AdminUser {
   invitationsSent AdminInvitation[] @relation("AdminInvitationInviter")
   invitation      AdminInvitation?  @relation("AdminInvitationRecipient")
   auditEntries    AdminAuditLog[]
+  mfaRecoveryCodes AdminMfaRecoveryCode[]
 
   @@index([state])
 }
@@ -69,12 +75,25 @@ model AdminSession {
   expiresAt  DateTime
   revokedAt  DateTime?
   lastSeenAt DateTime?
+  mfaVerifiedAt DateTime?
   createdAt  DateTime  @default(now())
 
   user AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, revokedAt])
   @@index([expiresAt])
+}
+
+model AdminMfaRecoveryCode {
+  id        String    @id @default(cuid())
+  userId    String
+  codeHash  String    @unique
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, usedAt])
 }
 
 model AdminAuditLog {

@@ -21428,3 +21428,11 @@ evalidateNextBlogArticle (/blog, slug, city hub).
 - Ask Timeweb about intermittent SSH banner/TLS connect stalls with timestamps; app loopback is healthy while outside connections sometimes do not reach nginx.
 - Decide later whether to clean archived `.next.bak-*` and generated media on prod; no cleanup was done in this pass.
 
+## 2026-10-25 - MFA/TOTP для RBAC и финансовых ролей
+
+- В ветке `codex/ai-rewrite-rbac-integration` добавлены TOTP enrollment/verification, AES-256-GCM для секрета, replay guard по последнему TOTP step, одноразовые хешированные recovery-коды, аудит и ограничение попыток. Финансовые права по-прежнему появляются только в `mfaVerified` сессии.
+- Добавлена страница `/admin/security/mfa`; FINANCE и SUPERADMIN направляются туда после пароля. Ключ шифрования не задан автоматически: перед использованием требуется отдельный `DAIBILET_ADMIN_MFA_ENCRYPTION_KEY` (32 байта в hex/base64url) в секретах окружения.
+- Миграция `20261025120000_admin_mfa` проверена на новой отдельной `daibilet_admin_mfa_test_20261025` в `daibilet-fresh-postgres`; smoke подтвердил enrollment, выдачу MFA-сессии, отклонение повторного кода и single-use recovery.
+- Backend suite завершился с exit 0, web CI 373/373, web/backend typecheck прошли; ESLint web-файлов чистый. Прод, рабочие БД и env не менялись.
+- Остаток: payout-specific step-up challenge, execution/dual control/bank evidence, независимый security audit всех guards и rollout acceptance. Этот срез не готов для production rollout.
+

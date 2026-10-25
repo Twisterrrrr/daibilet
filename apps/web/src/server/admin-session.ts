@@ -11,6 +11,7 @@ export type CurrentAdminUser = {
   sessionId: string;
   roles: string[];
   mfaVerified: boolean;
+  mfaEnabled: boolean;
 };
 
 export async function getCurrentAdminUser(): Promise<CurrentAdminUser | null> {
@@ -27,6 +28,7 @@ export async function getCurrentAdminUser(): Promise<CurrentAdminUser | null> {
       sessionId: user.sessionId,
       roles: user.roles.filter((role): role is string => typeof role === 'string'),
       mfaVerified: user.mfaVerified === true,
+      mfaEnabled: user.mfaEnabled === true,
     };
   } catch {
     return null;

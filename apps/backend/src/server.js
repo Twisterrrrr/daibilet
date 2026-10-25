@@ -7,6 +7,7 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { getAdminOrderDeleteGuard } from './admin-order-delete-guard.js';
 import { authorizeAdminSessionRequest } from './admin-rbac-guard.js';
+import { beginAdminMfaEnrollment, clearAdminMfaForSession, confirmAdminMfaEnrollment, verifyAdminMfaForSession } from './admin-mfa.js';
 import { adminRolesMayReadOrderPii } from './admin-rbac-policy.js';
 import { projectAdminOrdersPii } from './admin-order-pii.js';
 import {
@@ -260,7 +261,7 @@ export async function handleRequest(request, response) {
 
     const url = new URL(request.url || '/', `http://${request.headers.host || '127.0.0.1'}`);
     const route = `${request.method} ${url.pathname}`;
-    const isAdminIdentityRoute = /^\/(?:api\/admin\/auth\/(?:login|me|logout|accept-invitation|invitations))$/.test(url.pathname);
+    const isAdminIdentityRoute = /^\/(?:api\/admin\/auth\/(?:login|me|logout|accept-invitation|invitations|mfa\/enroll|mfa\/confirm|mfa\/verify|mfa\/lock))$/.test(url.pathname);
     const origin = String(request.headers.origin || '').trim();
     if (isAdminIdentityRoute && origin && !getAllowedOrigins().includes(origin)) {
       sendJson(response, { error: 'admin_auth_origin_denied' }, 403);
@@ -301,6 +302,44 @@ export async function handleRequest(request, response) {
         sendJson(response, { user });
       } catch {
         sendJson(response, { error: 'admin_session_check_failed' }, 500);
+      }
+      return;
+    }
+
+    if (route.startsWith('POST /api/admin/auth/mfa/')) {
+      try {
+        const ip = String(request.headers['x-real-ip'] || request.socket.remoteAddress || 'unknown');
+        assertAdminLoginRateLimit(`mfa-ip:${ip}`, 30);
+        const actor = await resolveAdminSession(db, parseAdminSessionToken(request.headers.cookie || ''));
+        if (!actor) {
+          sendJson(response, { error: 'admin_session_required' }, 401);
+          return;
+        }
+        assertAdminLoginRateLimit(`mfa-user:${actor.id}`, 8);
+        if (route === 'POST /api/admin/auth/mfa/enroll') {
+          const enrollment = await beginAdminMfaEnrollment(db, actor);
+          sendJson(response, { enrollment });
+          return;
+        }
+        if (route === 'POST /api/admin/auth/mfa/confirm') {
+          const body = await readJsonBody(request, 4096);
+          const result = await confirmAdminMfaEnrollment(db, actor, body?.code);
+          sendJson(response, result);
+          return;
+        }
+        if (route === 'POST /api/admin/auth/mfa/verify') {
+          const body = await readJsonBody(request, 4096);
+          const result = await verifyAdminMfaForSession(db, actor, body?.code);
+          sendJson(response, result);
+          return;
+        }
+        if (route === 'POST /api/admin/auth/mfa/lock') {
+          sendJson(response, await clearAdminMfaForSession(db, actor));
+          return;
+        }
+      } catch (error) {
+        const statusCode = Number(error.statusCode) || 500;
+        sendJson(response, { error: statusCode < 500 ? error.message : 'Не удалось выполнить операцию двухфакторной защиты.' }, statusCode);
       }
       return;
     }

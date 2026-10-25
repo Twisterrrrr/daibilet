@@ -167,7 +167,7 @@ export async function loginAdminUser(db, emailInput, passwordInput, { now = new 
   const email = String(emailInput || '').trim().toLowerCase();
   const password = String(passwordInput || '');
   const result = await db.query(
-    `select id, email, "displayName", "passwordHash", state, roles
+    `select id, email, "displayName", "passwordHash", state, roles, "mfaEnabledAt"
        from "AdminUser" where lower(email) = $1 order by "createdAt" asc limit 2`,
     [email],
   );
@@ -193,14 +193,14 @@ export async function loginAdminUser(db, emailInput, passwordInput, { now = new 
   return {
     token,
     expiresAt,
-    user: { id: user.id, email: user.email, displayName: user.displayName, roles: user.roles || [] },
+    user: { id: user.id, email: user.email, displayName: user.displayName, roles: user.roles || [], mfaEnabled: Boolean(user.mfaEnabledAt) },
   };
 }
 
 export async function resolveAdminSession(db, token, { now = new Date() } = {}) {
   if (!token) return null;
   const result = await db.query(
-    `select u.id, u.email, u."displayName", u.roles, u.state, s.id as "sessionId", s."expiresAt"
+    `select u.id, u.email, u."displayName", u.roles, u.state, u."mfaEnabledAt", s."mfaVerifiedAt", s.id as "sessionId", s."expiresAt"
        from "AdminSession" s
        join "AdminUser" u on u.id = s."userId"
       where s."tokenHash" = $1 and s."revokedAt" is null and s."expiresAt" > $2
@@ -211,7 +211,11 @@ export async function resolveAdminSession(db, token, { now = new Date() } = {}) 
   const row = result.rows[0];
   if (!row) return null;
   await db.query('update "AdminSession" set "lastSeenAt" = $2 where id = $1', [row.sessionId, now]);
-  return { id: row.id, email: row.email, displayName: row.displayName, roles: row.roles || [], sessionId: row.sessionId };
+  return {
+    id: row.id, email: row.email, displayName: row.displayName, roles: row.roles || [], sessionId: row.sessionId,
+    mfaVerified: Boolean(row.mfaEnabledAt && row.mfaVerifiedAt),
+    mfaEnabled: Boolean(row.mfaEnabledAt),
+  };
 }
 
 export async function revokeAdminSession(db, token, { correlationId = null } = {}) {
