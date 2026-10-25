@@ -45,7 +45,6 @@ import { venueHref } from '@/lib/routes';
 import { formatStreetAddress } from '@/lib/address';
 import { IMAGE_SIZES } from '@/components/SafeImage.client';
 import { CheckoutModalButton } from '@/components/CheckoutModal.client';
-import { EventVenueTrigger } from '@/components/EventVenueModal.client';
 import { trackEventView, trackSelectTickets } from '@/lib/catalog-analytics';
 import {
   getTeplohodWidgetIds,
@@ -607,7 +606,7 @@ export function EventHero({
       })
     : null;
   const breadcrumbs = buildEventBreadcrumbs(event);
-  const placeLabel = event.venue || event.city || null;
+  const placeLabel = !event.venueAddress ? event.venue || event.city || null : null;
   const venueAddressRaw = String(event.venueAddress || '').trim();
   const venueStreetAddress =
     formatStreetAddress(venueAddressRaw, { city: event.city }) || venueAddressRaw;
@@ -769,18 +768,20 @@ export function EventHero({
                 </div>
               ) : null}
 
-              {/* 7. Street + house, own left-aligned line (not the full index address). */}
+              {/* 7. Link the venue name and street address together to its internal PDP. */}
               {venueStreetAddress ? (
-                canOpenVenueModal ? (
-                  <EventVenueTrigger
-                    event={event}
+                venuePageHref ? (
+                  <Link
+                    href={venuePageHref}
                     className={`flex w-full min-w-0 items-start justify-start gap-1.5 text-left text-sm text-white/85 underline decoration-white/30 underline-offset-2 hover:text-white ${
                       nearestLabel ? 'mt-1.5' : 'mt-3 sm:mt-4'
                     }`}
                   >
                     <MapPin className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.75} />
-                    <span className="min-w-0 break-words">{venueStreetAddress}</span>
-                  </EventVenueTrigger>
+                    <span className="min-w-0 break-words">
+                      {[event.venue, venueStreetAddress].filter(Boolean).join(', ')}
+                    </span>
+                  </Link>
                 ) : (
                   <span
                     className={`flex w-full min-w-0 items-start justify-start gap-1.5 text-left text-sm text-white/85 ${
@@ -788,18 +789,21 @@ export function EventHero({
                     }`}
                   >
                     <MapPin className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.75} />
-                    <span className="min-w-0 break-words">{venueStreetAddress}</span>
+                    <span className="min-w-0 break-words">
+                      {[event.venue, venueStreetAddress].filter(Boolean).join(', ')}
+                    </span>
                   </span>
                 )
               ) : null}
             </div>
 
-            {/* Sticky bar covers mobile; buy CTA only where sticky is hidden */}
+            {/* Keep the desktop hero CTA; the mobile sticky bar covers that viewport. */}
             {priceLabel ? (
               <div className="hidden shrink-0 lg:block">
                 <EventHeroBuyButton payload={payload} priceLabel={priceLabel} />
               </div>
             ) : null}
+
           </div>
         </div>
       </div>

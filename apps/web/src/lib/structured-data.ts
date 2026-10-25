@@ -77,6 +77,18 @@ export function buildEventBreadcrumbs(event: PublicEventDto): StructuredBreadcru
     crumbs.push({ name: landingCrumb.label, path: landingCrumb.href });
   }
 
+  if (event.venue && (event.venueId || event.venueSlug)) {
+    crumbs.push({
+      name: event.venue,
+      path: venueHref({
+        id: event.venueId || event.venueSlug || event.venue,
+        slug: event.venueSlug,
+        name: event.venue,
+        type: event.venueKind,
+      }),
+    });
+  }
+
   crumbs.push({ name: event.seoH1 || event.title, path });
   return crumbs;
 }

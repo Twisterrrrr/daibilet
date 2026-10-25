@@ -12,6 +12,10 @@ export const dynamicParams = true;
 
 /** Старые slug → каноническая статья (объединения / переезды). */
 const BLOG_SLUG_REDIRECTS: Record<string, string> = {
+  // Seasonal/specific offers ended and the current catalog has no matching alternatives.
+  'kazan-na-vkus-master-klassy': '/cities/kazan',
+  'kazan-rechnye-progulki': '/cities/kazan',
+  'voronezh-zhatva-gorod-sad': '/cities/voronezh',
   // Дубль колонки Макса (HIDDEN) → live канон
   'bylinnyy-bereg-fentezi-fest': '/blog/fentezi-fest-bylinnyy-bereg',
   // Тот же дубль, но с "-volhov" в слаге. Остался отдельной индексируемой
