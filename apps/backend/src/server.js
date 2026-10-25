@@ -5,7 +5,6 @@ import { readFile } from 'node:fs/promises';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-<<<<<<< HEAD
 import {
   ADMIN_SESSION_TTL_SECONDS,
   assertAdminLoginRateLimit,
@@ -16,9 +15,7 @@ import {
   resolveAdminSession,
   revokeAdminSession,
 } from './admin-session-auth.js';
-=======
 import { getAdminOrderDeleteGuard } from './admin-order-delete-guard.js';
->>>>>>> 410229c50 (fix(admin): disable hard delete for orders)
 import { createDb } from './db.js';
 import {
   buildAdminDashboard,
