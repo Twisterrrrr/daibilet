@@ -88,9 +88,35 @@ export interface AdminEventRowDto extends SeoFields, PurchaseFields {
 export interface AdminEventOverrideDto extends SeoFields {
   title?: string | null;
   description?: string | null;
+  /// Provenance of description: AUTO (post-sync composer) | EDITORIAL | AI; null = legacy.
+  descriptionOrigin?: 'AUTO' | 'EDITORIAL' | 'AI' | null;
   shortDescription?: string | null;
   imageUrl?: string | null;
   editorStatus?: string | null;
+}
+
+/** AI description rewrite queue item (/api/admin/rewrite-queue). */
+export interface AdminRewriteRevisionDto {
+  id: string;
+  eventId: string;
+  status: 'QUEUED' | 'GENERATED' | 'CHECKED' | 'APPROVED' | 'PUBLISHED' | 'STALE' | string;
+  priority: 'A' | 'B' | null;
+  sourceHash: string;
+  sourceText: string;
+  draftText: string | null;
+  finalText: string | null;
+  model: string | null;
+  qaFlags: Array<{ code: string; message: string }>;
+  eventTitle: string | null;
+  eventSlug: string | null;
+  city: string | null;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+}
+
+export interface AdminRewriteQueueDto {
+  items: AdminRewriteRevisionDto[];
+  counts: Record<string, number>;
 }
 
 export interface AdminEventDetailDto extends AdminEventRowDto {
