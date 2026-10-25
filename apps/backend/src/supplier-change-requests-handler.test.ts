@@ -30,6 +30,10 @@ test('supplier change requests list query accepts SPA supplier routing keys', ()
     () => parseSupplierChangeRequestsListQuery(new URLSearchParams({ limit: '50', unexpected: '1' })),
     RequestValidationError,
   );
+  assert.throws(
+    () => parseSupplierChangeRequestsListQuery(new URLSearchParams({ status: 'NOT_A_STATUS' })),
+    RequestValidationError,
+  );
 });
 
 test('supplier change request write-flow creates admission and event requests', async (t) => {

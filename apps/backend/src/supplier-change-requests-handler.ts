@@ -54,7 +54,7 @@ const listQuerySchema = z.object({
   supplier: z.string().trim().optional(),
   supplierId: z.string().trim().optional(),
   slug: z.string().trim().optional(),
-  status: z.string().trim().optional(),
+  status: z.enum(['DRAFT', 'SUBMITTED', 'APPROVED', 'APPLY_FAILED', 'REJECTED', 'CANCELLED', 'APPLIED']).optional(),
   subject: z.enum(['EVENT', 'ADMISSION_PRODUCT']).optional(),
   limit: z.coerce.number().int().min(1).max(100).optional(),
   offset: z.coerce.number().int().min(0).optional(),
@@ -233,40 +233,44 @@ export async function buildSupplierChangeRequestsList(
   const limit = query.limit ?? 50;
   const offset = query.offset ?? 0;
   const subject = query.subject ?? null;
-  const rows = await prisma.eventChangeRequest.findMany({
-    where: {
-      supplierId,
-      ...(query.status ? { status: query.status as never } : {}),
-    },
-    include: {
-      event: {
-        select: {
-          id: true,
-          slug: true,
-          title: true,
-          status: true,
-          updatedAt: true,
+  const where: Prisma.EventChangeRequestWhereInput = {
+    supplierId,
+    ...(query.status ? { status: query.status } : {}),
+    ...(subject ? { payload: { path: ['subject'], equals: subject } } : {}),
+  };
+  const [total, rows] = await Promise.all([
+    prisma.eventChangeRequest.count({ where }),
+    prisma.eventChangeRequest.findMany({
+      where,
+      include: {
+        event: {
+          select: {
+            id: true,
+            slug: true,
+            title: true,
+            status: true,
+            updatedAt: true,
+          },
         },
       },
-    },
-    orderBy: [{ updatedAt: 'desc' }, { createdAt: 'desc' }],
-    take: 500,
-  });
-  const filtered = subject ? rows.filter((row) => payloadSubject(row.payload) === subject) : rows;
-  const page = filtered.slice(offset, offset + limit);
-  const admissionProducts = await loadAdmissionProductsForRows(page);
+      orderBy: [{ updatedAt: 'desc' }, { createdAt: 'desc' }],
+      skip: offset,
+      take: limit,
+    }),
+  ]);
+  const admissionProducts = await loadAdmissionProductsForRows(rows);
 
   return {
     generatedAt: new Date().toISOString(),
-    total: filtered.length,
+    total,
     limit,
     offset,
-    hasMore: offset + page.length < filtered.length,
+    hasMore: offset + rows.length < total,
     filters: {
       status: query.status ?? null,
       subject,
     },
-    items: page.map((row) => mapSupplierChangeRequestRow(row, admissionProducts)),
+    items: rows.map((row) => mapSupplierChangeRequestRow(row, admissionProducts)),
   };
 }
 

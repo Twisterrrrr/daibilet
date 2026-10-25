@@ -817,9 +817,17 @@ function AdmissionsPage({ supplierKey, canSubmitRequests }: { supplierKey: strin
 
 function RequestsPage({ supplierKey, canSubmitRequests }: { supplierKey: string; canSubmitRequests: boolean }) {
   const [offset, setOffset] = useSupplierListOffset(supplierKey);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const statusFilter = searchParams.get('status') || '';
+  const subjectFilter = searchParams.get('subject') || '';
   const requestsPath = React.useMemo(
-    () => `/api/supplier/change-requests?limit=${SUPPLIER_LIST_PAGE_SIZE}&offset=${offset}`,
-    [offset],
+    () => {
+      const query = new URLSearchParams({ limit: String(SUPPLIER_LIST_PAGE_SIZE), offset: String(offset) });
+      if (statusFilter) query.set('status', statusFilter);
+      if (subjectFilter) query.set('subject', subjectFilter);
+      return `/api/supplier/change-requests?${query.toString()}`;
+    },
+    [offset, statusFilter, subjectFilter],
   );
   const requests = useSupplierResource<SupplierPortalChangeRequestsListDto>(requestsPath, supplierKey);
   const profile = useSupplierResource<SupplierPortalProfileDto>('/api/supplier/profile', supplierKey);
@@ -842,6 +850,16 @@ function RequestsPage({ supplierKey, canSubmitRequests }: { supplierKey: string;
     });
   }, []);
 
+  const setRequestFilter = (key: 'status' | 'subject', value: string) => {
+    const next = new URLSearchParams(searchParams);
+    if (value) next.set(key, value);
+    else next.delete(key);
+    setSearchParams(next, { replace: true });
+    setOffset(0);
+  };
+
+  const hasFilters = Boolean(statusFilter || subjectFilter);
+
   return (
     <div className="page-stack">
       <PageTitle
@@ -863,6 +881,41 @@ function RequestsPage({ supplierKey, canSubmitRequests }: { supplierKey: string;
       ) : (
         <ReadOnlyNotice text="Ваша роль позволяет просматривать заявки, но не отправлять изменения." />
       )}
+      <section className="panel request-filters" aria-label="Фильтры заявок">
+        <div className="request-filter-group">
+          <span className="request-filter-label">Предмет</span>
+          <div className="order-filter-bar">
+            {[
+              { value: '', label: 'Все' },
+              { value: 'EVENT', label: 'События' },
+              { value: 'ADMISSION_PRODUCT', label: 'Входные билеты' },
+            ].map((filter) => (
+              <button key={filter.value || 'all'} type="button" className={subjectFilter === filter.value ? 'is-active' : ''} aria-pressed={subjectFilter === filter.value} onClick={() => setRequestFilter('subject', filter.value)}>
+                {filter.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="request-filter-group">
+          <span className="request-filter-label">Статус</span>
+          <div className="order-filter-bar">
+            {[
+              { value: '', label: 'Все' },
+              { value: 'SUBMITTED', label: 'На проверке' },
+              { value: 'APPROVED', label: 'Одобрены' },
+              { value: 'APPLIED', label: 'Применены' },
+              { value: 'REJECTED', label: 'Нужны правки' },
+              { value: 'APPLY_FAILED', label: 'Ошибка применения' },
+              { value: 'CANCELLED', label: 'Отменены' },
+            ].map((filter) => (
+              <button key={filter.value || 'all'} type="button" className={statusFilter === filter.value ? 'is-active' : ''} aria-pressed={statusFilter === filter.value} onClick={() => setRequestFilter('status', filter.value)}>
+                {filter.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        {hasFilters ? <button type="button" className="link-button request-filter-reset" onClick={() => { const next = new URLSearchParams(searchParams); next.delete('status'); next.delete('subject'); setSearchParams(next, { replace: true }); setOffset(0); }}>Сбросить фильтры</button> : null}
+      </section>
       <DataState loading={requests.loading} error={requests.error} onRetry={requests.reload} hasData={Boolean(requests.data?.items.length)}>
         {requests.data ? (
           <Table

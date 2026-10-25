@@ -933,6 +933,26 @@ td div {
   color: var(--accent);
 }
 
+.request-filters {
+  display: grid;
+  gap: 14px;
+}
+
+.request-filter-group {
+  display: grid;
+  gap: 8px;
+}
+
+.request-filter-label {
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.request-filter-reset {
+  justify-self: start;
+}
+
 .order-work-panel {
   display: grid;
   gap: 14px;
