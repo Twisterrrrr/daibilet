@@ -51,6 +51,13 @@ export function createValidatedHandler(
         }
       }
 
+      // The rewrite queue is a new, audited workflow. Keep it unavailable to
+      // shared Basic Auth until the personal-session RBAC guard is enabled.
+      if (/^\/api\/admin\/rewrite-queue(?:\/|$)/.test(context.pathname) && !options.adminRbacEnforce) {
+        sendJson(response, { error: 'admin_rbac_required' }, { statusCode: 503 });
+        return;
+      }
+
       validateSafeRouteQuery(context);
 
       for (const routeHandler of options.routeHandlers || []) {

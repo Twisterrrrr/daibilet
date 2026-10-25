@@ -218,8 +218,14 @@ const server = startServer({
       createDescriptionRevisionRouteHandler({
         db,
         invalidatePublicCaches,
-        // Fail closed until the per-user admin-session guard is integrated.
-        // Shared Basic Auth must never be used as an approval/publish identity.
+        // Use only the authenticated staff session for audit attribution.
+        // Basic Auth and client-supplied actor fields are never audit identities.
+        resolveActor: (context) => {
+          const user = (context.request as typeof context.request & {
+            adminSessionUser?: { id?: string };
+          }).adminSessionUser;
+          return typeof user?.id === 'string' && user.id ? user.id : null;
+        },
       }),
       createAdminLandingsRouteHandler({
         db,

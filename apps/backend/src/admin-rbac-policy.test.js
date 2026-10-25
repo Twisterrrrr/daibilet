@@ -12,10 +12,24 @@ test('read and mutation routes map to distinct permissions', () => {
   assert.deepEqual(getAdminRoutePermissions('GET', '/api/admin/events'), ['catalog.read']);
   assert.deepEqual(getAdminRoutePermissions('PATCH', '/api/admin/events/evt-1/moderation'), ['catalog.publish']);
   assert.deepEqual(getAdminRoutePermissions('POST', '/api/admin/events/evt-1/rewrite-description'), ['content.edit']);
+  assert.deepEqual(getAdminRoutePermissions('GET', '/api/admin/rewrite-queue'), ['content.read']);
+  assert.deepEqual(getAdminRoutePermissions('POST', '/api/admin/rewrite-queue/generate'), ['content.edit']);
+  assert.deepEqual(getAdminRoutePermissions('POST', '/api/admin/rewrite-queue/rev-1/approve'), ['content.edit']);
+  assert.deepEqual(getAdminRoutePermissions('POST', '/api/admin/rewrite-queue/rev-1/publish'), ['content.publish']);
+  assert.deepEqual(getAdminRoutePermissions('POST', '/api/admin/rewrite-queue/rev-1/reject'), ['content.edit']);
   assert.deepEqual(getAdminRoutePermissions('POST', '/api/admin/orders/ord-1/archive'), ['orders.manage']);
   assert.deepEqual(getAdminRoutePermissions('POST', '/api/admin/orders/sync'), ['integrations.retry']);
   assert.deepEqual(getAdminRoutePermissions('PUT', '/api/admin/events/evt-1/venue-links'), ['catalog.edit']);
   assert.deepEqual(getAdminRoutePermissions('DELETE', '/api/admin/articles/article-1'), ['content.edit']);
+});
+
+test('rewrite queue approval and publication are separated by staff role', () => {
+  assert.equal(adminRolesAllowRoute(['COPYWRITER'], 'POST', '/api/admin/rewrite-queue/rev-1/approve'), true);
+  assert.equal(adminRolesAllowRoute(['COPYWRITER'], 'POST', '/api/admin/rewrite-queue/rev-1/publish'), false);
+  assert.equal(adminRolesAllowRoute(['CATALOG_EDITOR'], 'POST', '/api/admin/rewrite-queue/rev-1/approve'), true);
+  assert.equal(adminRolesAllowRoute(['CATALOG_EDITOR'], 'POST', '/api/admin/rewrite-queue/rev-1/publish'), true);
+  assert.equal(adminRolesAllowRoute(['FINANCE'], 'POST', '/api/admin/rewrite-queue/rev-1/approve'), false);
+  assert.equal(adminRolesAllowRoute(['AUDITOR'], 'GET', '/api/admin/rewrite-queue'), true);
 });
 
 test('PII list routes require both order and PII permissions', () => {
@@ -70,6 +84,9 @@ test('currently implemented backend admin routes are mapped or explicitly kept o
     ['PATCH', '/api/admin/events/event-1/taxonomy'], ['PATCH', '/api/admin/events/event-1/venue-links'],
     ['PUT', '/api/admin/events/event-1/venue-links'], ['POST', '/api/admin/events/event-1/venue-links:apply'],
     ['GET', '/api/admin/events/event-1/venue-link-suggestions'], ['POST', '/api/admin/events/event-1/rewrite-description'],
+    ['GET', '/api/admin/rewrite-queue'], ['POST', '/api/admin/rewrite-queue/generate'],
+    ['POST', '/api/admin/rewrite-queue/rev-1/approve'], ['POST', '/api/admin/rewrite-queue/rev-1/publish'],
+    ['POST', '/api/admin/rewrite-queue/rev-1/reject'],
   ];
   for (const [method, path] of routes) {
     const policyContext = path === '/api/admin/articles'
