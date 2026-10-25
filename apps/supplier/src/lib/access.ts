@@ -16,7 +16,8 @@ export function resolveSupplierPortalRole(
   const membership = session.suppliers.find(
     (supplier) => supplier.id === key || supplier.slug === key,
   );
-  return String(membership?.role || session.currentSupplier.role || '').trim().toUpperCase();
+  if (key) return String(membership?.role || '').trim().toUpperCase();
+  return String(session.currentSupplier.role || '').trim().toUpperCase();
 }
 
 export function supplierPortalPermissions(roleInput?: string | null): SupplierPortalPermissions {

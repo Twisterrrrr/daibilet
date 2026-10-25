@@ -16,6 +16,8 @@ test('resolves role for the supplier selected in the portal', () => {
   assert.equal(resolveSupplierPortalRole(session, 'supplier-b'), 'VIEWER');
   assert.equal(resolveSupplierPortalRole(session, 'second'), 'VIEWER');
   assert.equal(resolveSupplierPortalRole(session, ''), 'OWNER');
+  assert.equal(resolveSupplierPortalRole(session, 'not-a-member'), '');
+  assert.equal(supplierPortalPermissions(resolveSupplierPortalRole(session, 'not-a-member')).canSubmitRequests, false);
 });
 
 test('mirrors backend role capabilities in the UI', () => {
