@@ -18,6 +18,7 @@ export const backendEnvSchema = z.object({
   FINANCE_PROJECTION_TOKEN: z.string().optional(),
   DAIBILET_FINANCE_ADMIN_READ_TOKEN: z.string().optional(),
   DAIBILET_FINANCE_ADMIN_OPERATION_TOKEN: z.string().optional(),
+  DAIBILET_FINANCE_ACTOR_ASSERTION_SECRET: z.string().optional(),
   DAIBILET_ORDER_ACCESS_SECRET: z.string().optional(),
   DAIBILET_REQUIRE_ORDER_ACCESS: z.string().optional(),
   USER_JWT_SECRET: z.string().optional(),

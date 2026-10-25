@@ -8,6 +8,8 @@ import { parseJsonBody } from './validation.js';
 import { safeEqualString } from './auth.js';
 import { AdminOrderOperationError } from './admin-order-operations.js';
 import { z } from 'zod';
+import type { FinanceAdminAuditEntry } from './admin-finance-audit.js';
+import { financeAdminActorHasPermission, verifyFinanceAdminActorAssertion } from './admin-finance-actor.js';
 
 export type UpsertAdminOrderTicket = (
   db: DbClient,
@@ -20,6 +22,8 @@ export interface AdminOrdersHandlerDependencies {
   upsertAdminOrderTicket: UpsertAdminOrderTicket;
   createRefundRequest?: (orderKey: string, payload: AdminOrderRefundRequestPayload) => Promise<unknown>;
   internalOperationToken?: string | null;
+  actorAssertionSecret?: string | null;
+  auditActorAccess?: (entry: FinanceAdminAuditEntry) => Promise<void>;
   operateInternalOrder?: (input: { orderKey: string; operation: 'cancel' | 'refund'; confirmCode: string; reason: string }) => Promise<unknown>;
 }
 
@@ -48,7 +52,41 @@ async function handleInternalOperation(context: RouteContext, deps: AdminOrdersH
     sendJson(context.response, { error: 'admin_operation_auth_required' }, { statusCode: 401 });
     return true;
   }
+  const assertion = String(context.request.headers['x-daibilet-admin-assertion'] || '');
+  const actor = verifyFinanceAdminActorAssertion(assertion, deps.actorAssertionSecret);
+  if (!actor) {
+    sendJson(context.response, { error: 'admin_actor_assertion_required' }, { statusCode: 401 });
+    return true;
+  }
   const payload = await parseJsonBody(operationSchema, context.request);
+  const requiredPermission = payload.operation === 'refund' ? 'refunds.execute' : 'orders.cancel';
+  if (!deps.auditActorAccess) {
+    sendJson(context.response, { error: 'admin_audit_unavailable' }, { statusCode: 503 });
+    return true;
+  }
+  const auditEntry = {
+    actorId: actor.id,
+    actorName: actor.displayName,
+    sessionId: actor.sessionId,
+    assertionId: actor.assertionId,
+    action: requiredPermission,
+    resourceType: 'order',
+    resourceId: match[0],
+  };
+  if (!financeAdminActorHasPermission(actor, requiredPermission)) {
+    try { await deps.auditActorAccess({ ...auditEntry, outcome: 'denied' }); } catch {
+      sendJson(context.response, { error: 'admin_audit_unavailable' }, { statusCode: 503 });
+      return true;
+    }
+    sendJson(context.response, { error: 'admin_permission_denied' }, { statusCode: 403 });
+    return true;
+  }
+  try {
+    await deps.auditActorAccess({ ...auditEntry, outcome: 'allowed' });
+  } catch {
+    sendJson(context.response, { error: 'admin_audit_unavailable' }, { statusCode: 503 });
+    return true;
+  }
   try {
     sendJson(context.response, await deps.operateInternalOrder({ orderKey: match[0], ...payload }));
   } catch (error) {

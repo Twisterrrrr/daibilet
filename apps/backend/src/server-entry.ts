@@ -22,6 +22,8 @@ import { createAdminListingHealthRouteHandler } from './admin-listing-health-han
 import { createAdminOrdersRouteHandler } from './admin-orders-handler.js';
 import { operateAdminInternalOrder } from './admin-order-operations.js';
 import { createAdminOrdersReadRouteHandler } from './admin-orders-read-handler.js';
+import { recordFinanceAdminAudit } from './admin-finance-audit.js';
+import { createAdminFinanceAuditRouteHandler } from './admin-finance-audit-handler.js';
 import { buildAdminOrderDetailDto, buildAdminOrdersListDto, createAdminOrderRefundRequestDto } from './admin-orders.dto.js';
 import { createAdminSuppliersRouteHandler } from './admin-suppliers-handler.js';
 import { createAdminSupplier } from './admin-supplier-create.js';
@@ -150,11 +152,19 @@ const server = startServer({
         buildOrderByCode: buildPublicCheckoutOrderByCodeDto,
         buildPurchasesByEmail: buildPublicCheckoutPurchasesByEmailDto,
       }),
+      createAdminFinanceAuditRouteHandler({
+        db,
+        internalReadToken: env.DAIBILET_FINANCE_ADMIN_READ_TOKEN || null,
+        actorAssertionSecret: env.DAIBILET_FINANCE_ACTOR_ASSERTION_SECRET || null,
+        auditActorAccess: (entry) => recordFinanceAdminAudit(db, entry),
+      }),
       createAdminOrdersReadRouteHandler({
         enabled: adminFlags.orders,
         buildOrdersList: buildAdminOrdersListDto,
         buildOrderDetail: buildAdminOrderDetailDto,
         internalReadToken: env.DAIBILET_FINANCE_ADMIN_READ_TOKEN || null,
+        actorAssertionSecret: env.DAIBILET_FINANCE_ACTOR_ASSERTION_SECRET || null,
+        auditActorAccess: (entry) => recordFinanceAdminAudit(db, entry),
       }),
       createAdminFinanceRouteHandler({
         enabled: adminFlags.orders,
@@ -190,6 +200,8 @@ const server = startServer({
         upsertAdminOrderTicket,
         createRefundRequest: createAdminOrderRefundRequestDto,
         internalOperationToken: env.DAIBILET_FINANCE_ADMIN_OPERATION_TOKEN || null,
+        actorAssertionSecret: env.DAIBILET_FINANCE_ACTOR_ASSERTION_SECRET || null,
+        auditActorAccess: (entry) => recordFinanceAdminAudit(db, entry),
         operateInternalOrder: operateAdminInternalOrder,
       }),
       createAdminEventsRouteHandler({
