@@ -40,3 +40,36 @@ test('auditor can read server-masked orders without PII permission', async () =>
   assert.equal((await authorizeAdminSessionRequest(request('/api/admin/orders'), db)).authorized, true);
   assert.equal((await authorizeAdminSessionRequest(request('/api/admin/orders/order-1'), db)).authorized, true);
 });
+
+test('payload-aware guards allow draft and section-specific edits but protect publication', async () => {
+  const copywriter = { roles: ['COPYWRITER'] };
+  const catalogEditor = { roles: ['CATALOG_EDITOR'] };
+  const db = {};
+  const article = request('/api/admin/articles/article-1', 'PATCH');
+  assert.equal((await authorizeAdminSessionRequest(article, db, {
+    actor: copywriter,
+    policyContext: { body: { title: 'Draft', status: 'DRAFT' }, existingArticle: { status: 'DRAFT', isFeatured: false } },
+  })).authorized, true);
+  assert.equal((await authorizeAdminSessionRequest(article, db, {
+    actor: copywriter,
+    policyContext: { body: { title: 'Live', status: 'PUBLISHED' }, existingArticle: { status: 'DRAFT', isFeatured: false } },
+  })).statusCode, 403);
+  assert.equal((await authorizeAdminSessionRequest(article, db, {
+    actor: copywriter,
+    policyContext: { body: { title: 'Changed' }, existingArticle: { status: 'PUBLISHED', isFeatured: false } },
+  })).statusCode, 403);
+
+  const override = request('/api/admin/events/ev-1/override', 'PATCH');
+  assert.equal((await authorizeAdminSessionRequest(override, db, {
+    actor: catalogEditor,
+    policyContext: { body: { imageUrl: '/event.jpg' } },
+  })).authorized, true);
+  assert.equal((await authorizeAdminSessionRequest(override, db, {
+    actor: catalogEditor,
+    policyContext: { body: { seoTitle: 'SEO' } },
+  })).statusCode, 403);
+  assert.equal((await authorizeAdminSessionRequest(override, db, {
+    actor: catalogEditor,
+    policyContext: { body: { unknown: 'value' } },
+  })).statusCode, 403);
+});

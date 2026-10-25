@@ -141,6 +141,7 @@ let tepAutoSyncInFlight = false;
 let tepAutoSyncWarmTimer = null;
 
 const jsonCache = new Map();
+const prefetchedAdminJsonBodies = new WeakMap();
 const PUBLIC_RESPONSE_CACHE_MS = 5 * 60 * 1000;
 const PUBLIC_HTTP_CACHE_CONTROL = 'public, max-age=60, s-maxage=300, stale-while-revalidate=600';
 const MAX_PUBLIC_RESPONSE_CACHE_ENTRIES = 80;
@@ -355,9 +356,43 @@ export async function handleRequest(request, response) {
 
     if (isProtectedPath(url.pathname)) {
       if (process.env.DAIBILET_ADMIN_RBAC_ENFORCE === '1') {
-        const authorization = request.adminSessionUser
-          ? { authorized: true, actor: request.adminSessionUser }
-          : await authorizeAdminSessionRequest(request, db);
+        const payloadAwareArticleWrite = route === 'POST /api/admin/articles' || /^PATCH \/api\/admin\/articles\/[^/]+$/.test(route);
+        const payloadAwareEventOverride = /^PATCH \/api\/admin\/events\/[^/]+\/override$/.test(route);
+        let authenticatedActor = request.adminSessionUser || null;
+        let policyContext;
+        if (payloadAwareArticleWrite || payloadAwareEventOverride) {
+          if (!authenticatedActor) {
+            const identity = await authorizeAdminSessionRequest(request, db, { skipPolicy: true });
+            if (!identity.authorized) {
+              sendJson(response, { error: identity.error }, identity.statusCode);
+              return;
+            }
+            authenticatedActor = identity.actor;
+          }
+          try {
+            const parsedBody = await readJsonBody(request);
+            const body = parsedBody && typeof parsedBody === 'object' && !Array.isArray(parsedBody)
+              ? parsedBody
+              : {};
+            prefetchedAdminJsonBodies.set(request, body);
+            policyContext = { body };
+            if (payloadAwareArticleWrite && request.method === 'PATCH') {
+              const articleId = decodeURIComponent(url.pathname.slice('/api/admin/articles/'.length));
+              const current = await db.query(
+                'select status, "isFeatured" from "Article" where id = $1 limit 1',
+                [articleId],
+              );
+              policyContext.existingArticle = current.rows[0] || null;
+            }
+          } catch {
+            sendJson(response, { error: 'invalid_json' }, 400);
+            return;
+          }
+        }
+        const authorization = await authorizeAdminSessionRequest(request, db, {
+          policyContext,
+          actor: authenticatedActor || undefined,
+        });
         if (!authorization.authorized) {
           sendJson(response, { error: authorization.error }, authorization.statusCode);
           return;
@@ -1320,6 +1355,7 @@ function trimPublicResponseCache() {
 }
 
 async function readJsonBody(request, maxBytes = Number.POSITIVE_INFINITY) {
+  if (prefetchedAdminJsonBodies.has(request)) return prefetchedAdminJsonBodies.get(request);
   const chunks = [];
   let totalBytes = 0;
   let tooLarge = false;
