@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 import { adminApiFetch } from '@/server/admin-api-fetch';
+import { issueCurrentAdminFinanceAssertion } from '@/server/admin-finance-actor';
 
 export async function operateInternalAdminOrderAction(formData: FormData) {
   const orderKey = String(formData.get('orderKey') || '').trim();
@@ -13,6 +14,8 @@ export async function operateInternalAdminOrderAction(formData: FormData) {
   if (!orderKey || !['cancel', 'refund'].includes(operation) || !confirmCode || reason.length < 3 || reason.length > 500) {
     redirect(`/admin/orders/internal/${encodeURIComponent(orderKey)}?error=invalid_input`);
   }
+  const admin = await issueCurrentAdminFinanceAssertion();
+  if (!admin) redirect(`/admin/orders/internal/${encodeURIComponent(orderKey)}?error=staff_session_required`);
   const base = process.env.FINANCE_API_BASE_URL || '';
   const token = process.env.DAIBILET_FINANCE_ADMIN_OPERATION_TOKEN || '';
   if (!base || !token) redirect(`/admin/orders/internal/${encodeURIComponent(orderKey)}?error=not_configured`);
@@ -21,7 +24,11 @@ export async function operateInternalAdminOrderAction(formData: FormData) {
   try {
     response = await fetch(url, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'X-Daibilet-Admin-Assertion': admin.assertion,
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({ operation, confirmCode, reason }),
       cache: 'no-store',
       signal: AbortSignal.timeout(20_000),

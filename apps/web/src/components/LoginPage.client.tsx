@@ -6,6 +6,7 @@ import { Loader2 } from 'lucide-react';
 import { FormEvent, useEffect, useState } from 'react';
 
 import { useUserAuth } from '@/hooks/useUserAuth';
+import { BUYER_LOGIN_INTRO, BUYER_REGISTER_INTRO } from '@/lib/buyer-account-copy';
 
 function resolveReturnUrl(searchParams: URLSearchParams) {
   const value = searchParams.get('returnUrl') || '/account/purchases';
@@ -57,9 +58,7 @@ export function LoginPageView() {
       <div className="mx-auto max-w-sm">
         <h1 className="text-2xl font-bold text-slate-900">{mode === 'login' ? 'История покупок' : 'Регистрация'}</h1>
         <p className="mt-2 text-sm leading-6 text-slate-500">
-          {mode === 'login'
-            ? 'Вход не обязателен для покупки билета. Зарегистрируйтесь или войдите, если хотите видеть все заказы на вашем email без повторного поиска.'
-            : 'Укажите тот же email, что при покупке в виджете — заказы из Ticketscloud и Teplohod подтянутся автоматически.'}
+          {mode === 'login' ? BUYER_LOGIN_INTRO : BUYER_REGISTER_INTRO}
         </p>
 
         <form onSubmit={submit} className="mt-8 space-y-4">
@@ -122,6 +121,8 @@ export function LoginPageView() {
               <button type="button" onClick={() => setMode('register')} className="font-medium text-primary-600 hover:text-primary-700">
                 Зарегистрироваться
               </button>
+              <span className="mx-2">·</span>
+              <Link href="/reset-password" className="font-medium text-primary-600 hover:text-primary-700">Забыли пароль?</Link>
             </>
           ) : (
             <>

@@ -6,7 +6,7 @@
 
 RBAC нужен **до** выдачи доступа к финконтру нескольким сотрудникам. Переключатели пунктов меню не защищают данные: право проверяется на сервере для страницы, каждого API-запроса, экспорта и действия. Общий Basic Auth остаётся временным доступом владельца до готовности персональных сессий; нельзя включать редакторские аккаунты через общий пароль.
 
-Первый кодовый срез: `@daibilet/contracts/admin-access` определяет профили и разрешения без иерархии. Схема БД теперь также содержит `AdminUser`, `AdminInvitation`, `AdminSession` и `AdminAuditLog` (миграция `20261016120000_admin_staff_identity`). Ни контракт, ни таблицы пока не подключены к маршрутам и не выдают доступ. Следующий backend-срез — вход и отзыв сессии, затем server guards и finance bridge.
+`@daibilet/contracts/admin-access` определяет профили и разрешения без иерархии. Схема БД содержит `AdminUser`, `AdminInvitation`, `AdminSession` и `AdminAuditLog` (миграция `20261016120000_admin_staff_identity`). Backend имеет login/me/logout, SUPERADMIN-only приглашения, принятие одноразового приглашения и first-admin bootstrap. Route-permission guard действует только при `DAIBILET_ADMIN_RBAC_ENFORCE=1`; без него admin/catalog маршруты остаются на общем Basic Auth. В режиме guard неизвестные маршруты закрыты, и покрытие пока неполное. UI входа, безопасные role-scoped DTO, применение MFA и finance bridge остаются незакрытыми.
 
 ## Что показал legacy SPBBOATS
 
@@ -63,3 +63,9 @@ RBAC нужен **до** выдачи доступа к финконтру не�
 4. Инженер видит ошибку адаптера и повторяет безопасный обмен; не видит реквизиты и платёжные данные.
 5. Смена профиля или блокировка сотрудника отзывает действующие сессии на Next, catalog и finance. Журнал содержит владельца изменения.
 6. Суперадмин не может отключить последнего активного суперадмина. Отказ и успех денежного действия отражаются в аудите без секретов.
+
+## Реализованный срез 2026-10-25
+
+В `codex/rbac-finance-unified` выполнены персональный вход/выход Next, page permission guard, отбор навигации, guards на server actions/direct Prisma, forwarding HttpOnly session cookie в backend и signed actor assertion для внутренних finance read/operation endpoints. Backend order DTO применяет серверное PII-маскирование по permission. RBAC включается только явно через `DAIBILET_ADMIN_RBAC_ENFORCE=1`; при выключенном флаге остаётся Basic Auth переходный режим.
+
+TOTP enrollment и verification ещё отсутствуют. Поэтому чувствительные финансовые permissions удаляются из session permission set до подтверждения MFA и не попадают в finance actor assertion. Это fail-closed подготовительная граница, а не завершённый RBAC rollout или готовность к реальным выплатам. Smoke и тесты на production не выполнялись; перед включением флага нужны MFA, route/action inventory audit и проверка согласованной схемы БД.

@@ -220,7 +220,15 @@ jobs:
           "${SCP[@]}" .deploy-control/scripts/deploy-msk-web.sh "${MSK_SSH_USER}@${MSK_SSH_HOST}:${REMOTE_SCRIPT}"
           "${SCP[@]}" /tmp/daibilet-web-build-id "${MSK_SSH_USER}@${MSK_SSH_HOST}:${REMOTE_TGZ}.build-id"
           printf -v REMOTE_COMMAND 'CI=true DEPLOY_HANDOFF_DIR=%q ARTIFACT=%q EXPECTED_BUILD_ID_FILE=%q DEPLOY_MARKER=%q DEPLOY_MARKER_URL=%q bash %q %q %q' "$REMOTE_HANDOFF_DIR" "$REMOTE_TGZ" "$REMOTE_TGZ.build-id" "$DEPLOY_MARKER" "$DEPLOY_MARKER_URL" "$REMOTE_SCRIPT" "$DEPLOY_SHA" "$EXPECTED_REF"
-          "${SSH[@]}" "${MSK_SSH_USER}@${MSK_SSH_HOST}" "$REMOTE_COMMAND"
+          REMOTE_LOG="$(mktemp)"
+          if "${SSH[@]}" "${MSK_SSH_USER}@${MSK_SSH_HOST}" "$REMOTE_COMMAND" 2>&1 | tee "$REMOTE_LOG"; then
+            grep '^DEPLOY_WARMUP ' "$REMOTE_LOG" >> "$GITHUB_STEP_SUMMARY" || true
+          else
+            remote_status=$?
+            rm -f "$REMOTE_LOG"
+            exit "$remote_status"
+          fi
+          rm -f "$REMOTE_LOG"
           echo "Swap succeeded: DEPLOY_SHA=$DEPLOY_SHA BUILD_ID=$BUILD_ID" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Warm venue sitemap after restart
@@ -253,3 +261,51 @@ jobs:
           MSK_SSH_USER: ${{ secrets.MSK_SSH_USER }}
           MSK_SSH_KEY_FILE: /home/runner/.ssh/msk_key
         run: bash .deploy-control/infra/deploy-verify.sh "$DEPLOY_SHA" "$DEPLOY_MARKER" "$DEPLOY_MARKER_URL"
+
+      - name: Post-deploy observation (5 minutes after handoff)
+        if: ${{ inputs.skip_swap != true && always() && !cancelled() }}
+        env:
+          DEPLOY_SHA: ${{ env.DEPLOY_SHA }}
+          MSK_SSH_HOST: ${{ secrets.MSK_SSH_HOST }}
+          MSK_SSH_USER: ${{ secrets.MSK_SSH_USER }}
+          MSK_SSH_KEY: ${{ secrets.MSK_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          sleep 300
+          SMOKE_LOG="$(mktemp)"
+          REMOTE_LOG="$(mktemp)"
+          REMOTE_OBS_DIR="/tmp/daibilet-postdeploy-${DEPLOY_SHA}"
+          install -d -m 700 "$HOME/.ssh"
+          install -m 600 /dev/null "$HOME/.ssh/msk_key"
+          printf '%s\n' "$MSK_SSH_KEY" > "$HOME/.ssh/msk_key"
+          SSH=(ssh -i "$HOME/.ssh/msk_key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o BatchMode=yes)
+          SCP=(scp -i "$HOME/.ssh/msk_key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o BatchMode=yes)
+
+          "${SSH[@]}" "${MSK_SSH_USER}@${MSK_SSH_HOST}" "mkdir -p '$REMOTE_OBS_DIR'"
+          "${SCP[@]}" \
+            .deploy-control/deploy/scripts/run-post-deploy-observation.sh \
+            .deploy-control/deploy/scripts/post-deploy-observation.sh \
+            "${MSK_SSH_USER}@${MSK_SSH_HOST}:${REMOTE_OBS_DIR}/"
+
+          set +e
+          node scripts/smoke-indexability-prod.mjs 2>&1 | tee "$SMOKE_LOG"
+          smoke_status=${PIPESTATUS[0]}
+          printf -v REMOTE_COMMAND 'sudo -n env APP_DIR=/opt/daibilet POST_DEPLOY_SNAPSHOT_SCRIPT=%q bash %q %q; status=$?; rm -rf %q; exit "$status"' \
+            "$REMOTE_OBS_DIR/post-deploy-observation.sh" \
+            "$REMOTE_OBS_DIR/run-post-deploy-observation.sh" \
+            "$DEPLOY_SHA" \
+            "$REMOTE_OBS_DIR"
+          "${SSH[@]}" "${MSK_SSH_USER}@${MSK_SSH_HOST}" "$REMOTE_COMMAND" 2>&1 | tee "$REMOTE_LOG"
+          remote_status=${PIPESTATUS[0]}
+          set -e
+
+          {
+            echo '### Delayed production observation'
+            grep '^POST_DEPLOY_OBSERVATION ' "$REMOTE_LOG" || echo 'Server snapshot was unavailable.'
+            grep '^\{"at":' "$REMOTE_LOG" || true
+          } >> "$GITHUB_STEP_SUMMARY"
+          rm -f "$SMOKE_LOG" "$REMOTE_LOG"
+          if (( smoke_status != 0 || remote_status != 0 )); then
+            echo "Post-deploy observation failed (smoke=$smoke_status remote=$remote_status)." >&2
+            exit 1
+          fi

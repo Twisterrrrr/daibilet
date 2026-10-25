@@ -8,8 +8,12 @@
  * Home / related / venue / hub cards use CARD_IMAGE_QUALITY.
  */
 
-/** Catalog grid (`/events`) preview quality for `/_next/image` (TC CDN etc.). */
-export const CATALOG_IMAGE_QUALITY = 90;
+/**
+ * Catalog grid (`/events`) preview quality for `/_next/image` (TC CDN etc.).
+ * q90 encoded 300-360 KB per card at w=1080-1920 and cold-started the optimizer
+ * for 0.8-1.3 s per variant; q80 keeps the tile sharp at a fraction of the weight.
+ */
+export const CATALOG_IMAGE_QUALITY = 80;
 
 /** Default card quality outside the dense catalog grid (hub / PDP / home / related). */
 export const CARD_IMAGE_QUALITY = 88;

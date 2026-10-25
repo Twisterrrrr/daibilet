@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { pathToFileURL } from 'node:url';
 
 /** Guard against Suspense/client tab regressions that leave HTTP 200 pages empty for crawlers. */
 const base = (process.env.PUBLIC_SITE_URL || 'https://daibilet.ru').replace(/\/$/, '');
@@ -51,29 +52,60 @@ function schemaLinksVisible(html, type) {
   });
 }
 
-let failed = false;
-for (const [agent, userAgent] of Object.entries(agents)) {
-  for (const [path, check, reason] of checks) {
-    // A city DTO can exceed its timeout once immediately after an API restart.
-    // Retry only this readiness check; a persistent empty hub must still fail deploy.
-    const attempts = path === '/cities/moskva' ? 4 : 1;
-    let okay = false;
-    let status = 0;
-    for (let attempt = 1; attempt <= attempts; attempt += 1) {
-      const response = await fetch(`${base}${path}`, {
+export async function fetchCheckedPage({
+  url,
+  userAgent,
+  check,
+  attempts = 1,
+  backoffMs = 3_000,
+  fetchImpl = fetch,
+  wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+}) {
+  let status = 0;
+  let error = '';
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      const response = await fetchImpl(url, {
         headers: { 'user-agent': userAgent },
         signal: AbortSignal.timeout(30_000),
       });
       status = response.status;
-      okay = status === 200 && check(await response.text());
-      if (okay) break;
-      if (attempt < attempts) {
-        console.log(`WAIT: ${agent} ${path} HTTP ${status}: ${reason} (attempt ${attempt}/${attempts})`);
-        await new Promise((resolve) => setTimeout(resolve, 5_000));
-      }
+      const html = await response.text();
+      if (status === 200 && check(html)) return { okay: true, status, attempt };
+      error = status === 200 ? 'content assertion failed' : `HTTP ${status}`;
+    } catch (cause) {
+      status = 0;
+      error = cause instanceof Error ? cause.message : String(cause);
     }
-    console.log(`${okay ? 'OK' : 'ERROR'}: ${agent} ${path} HTTP ${status}${okay ? '' : `: ${reason}`}`);
-    failed ||= !okay;
+    if (attempt < attempts) await wait(backoffMs * attempt);
   }
+  return { okay: false, status, attempt: attempts, error };
 }
-if (failed) process.exitCode = 1;
+
+export async function main() {
+  let failed = false;
+  for (const [agent, userAgent] of Object.entries(agents)) {
+    for (const [path, check, reason] of checks) {
+      // Dynamic catalogs can time out briefly while the backend is restarting.
+      // Retry these routes only; persistent 5xx or empty HTML still fails the gate.
+      const dynamicCatalog = /^\/(?:cities\/[^/]+|places(?:\/c\/[^/]+)?|venues|locations)$/.test(path);
+      const attempts = dynamicCatalog ? 4 : 1;
+      const result = await fetchCheckedPage({
+        url: `${base}${path}`,
+        userAgent,
+        check,
+        attempts,
+      });
+      if (result.attempt > 1 && result.okay) {
+        console.log(`RECOVERED: ${agent} ${path} after ${result.attempt} attempts`);
+      }
+      console.log(`${result.okay ? 'OK' : 'ERROR'}: ${agent} ${path} HTTP ${result.status}${result.okay ? '' : `: ${reason}${result.error ? ` (${result.error})` : ''}`}`);
+      failed ||= !result.okay;
+    }
+  }
+  if (failed) process.exitCode = 1;
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch((error) => { console.error(error); process.exitCode = 1; });
+}

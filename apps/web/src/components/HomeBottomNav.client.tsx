@@ -48,7 +48,7 @@ export function HomeBottomNav() {
           ? cityHref(selectedCity.selectedDestination)
           : '/cities',
       icon: MapPin,
-      accent: true,
+      accent: false,
       match: (path: string) => path === '/cities' || path.startsWith('/cities/'),
     },
   ] as const;

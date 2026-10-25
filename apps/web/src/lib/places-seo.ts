@@ -75,6 +75,18 @@ export function buildPlacesListingCopy(
   const h1 = gen ? `${PLACES_H1} ${gen}` : PLACES_H1;
   const fam = normalizePlacesFamily(family);
 
+  const title = fam === 'institution'
+    ? city
+      ? `Площадки ${gen}: музеи, театры и концертные залы`
+      : 'Площадки России: музеи, театры и концертные залы'
+    : fam === 'location'
+      ? city
+        ? `Локации ${gen}: парки, набережные, причалы и места встречи`
+        : 'Локации России: парки, набережные, причалы и места встречи'
+      : city
+        ? `Места и достопримечательности ${gen}`
+        : 'Места и достопримечательности России';
+
   let description: string;
   if (fam === 'institution') {
     description = gen
@@ -93,7 +105,7 @@ export function buildPlacesListingCopy(
   const prep = city ? cityToPrepositional(city) : '';
   description = ensureSeoDescription(description, placesCityDescriptionFallback(prep));
 
-  return { h1, title: h1, description };
+  return { h1, title, description };
 }
 
 export function resolvePlacesCitySlug(raw?: string | null): string {

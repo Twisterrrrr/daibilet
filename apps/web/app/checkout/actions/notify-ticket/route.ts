@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { buyerTicketAbsoluteUrl } from '@/lib/buyer-ticket';
+import { CHECKOUT_ORDER_ACCESS_COOKIE, readCheckoutOrderAccessProof } from '@/server/checkout-order-access';
 import { lookupCheckoutOrderByPublicCode } from '@/server/finance-checkout-client';
 import { enqueueBuyerTicketEmail } from '@/server/buyer-ticket-delivery';
 
@@ -31,7 +32,14 @@ export async function POST(request: Request) {
     'https://daibilet.ru'
   ).replace(/\/$/, '');
 
-  const order = await lookupCheckoutOrderByPublicCode(publicCode);
+  const proof = readCheckoutOrderAccessProof(
+    request.headers.get('cookie'),
+    publicCode,
+    CHECKOUT_ORDER_ACCESS_COOKIE,
+  );
+  const order = proof
+    ? await lookupCheckoutOrderByPublicCode(publicCode, process.env, proof.token)
+    : null;
   const email = String(order?.email || '')
     .trim()
     .toLowerCase();

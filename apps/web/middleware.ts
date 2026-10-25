@@ -7,7 +7,8 @@ import {
   readAdminBasicAuthConfig,
 } from '@/lib/admin-basic-auth';
 import { isAdminHost, rewriteAdminHostPathname } from '@/lib/admin-host';
-import { cyrillicEventRedirectPath } from '@/lib/event-slug-redirect';
+import { adminPageAllowsSession } from '@/lib/admin-page-policy';
+import { cyrillicCityRedirectPath, cyrillicEventRedirectPath } from '@/lib/event-slug-redirect';
 import {
   EVENTS_CATALOG_CANONICAL_HINT_HEADER,
   EVENTS_CATALOG_PATH,
@@ -29,7 +30,55 @@ function unauthorizedAdminResponse(realm: string) {
   });
 }
 
-async function enforceAdminAuth(request: NextRequest) {
+function adminApiBase(): string {
+  return (process.env.DAIBILET_ADMIN_API_URL || process.env.DAIBILET_API_INTERNAL_URL || process.env.DAIBILET_API_URL || 'http://127.0.0.1:4000').replace(/\/$/u, '');
+}
+
+function adminSessionCookie(request: NextRequest): string | null {
+  const value = request.cookies.get('daibilet_admin_session')?.value;
+  return value ? `daibilet_admin_session=${encodeURIComponent(value)}` : null;
+}
+
+function adminLoginRedirect(request: NextRequest): NextResponse {
+  const url = request.nextUrl.clone();
+  const isAdminSubdomain = isAdminHost(request.headers.get('host') || '');
+  url.pathname = isAdminSubdomain ? '/login' : '/admin/login';
+  url.search = '';
+  url.searchParams.set('returnUrl', `${request.nextUrl.pathname}${request.nextUrl.search}`);
+  return NextResponse.redirect(url, 302);
+}
+
+function adminForbiddenResponse() {
+  return new NextResponse('Недостаточно прав для этого раздела.', {
+    status: 403,
+    headers: { 'Cache-Control': 'no-store', 'Content-Type': 'text/plain; charset=utf-8' },
+  });
+}
+
+async function enforceAdminAuth(request: NextRequest, adminPath: string) {
+  if (process.env.DAIBILET_ADMIN_RBAC_ENFORCE === '1') {
+    const cookie = adminSessionCookie(request);
+    if (!cookie) return adminLoginRedirect(request);
+    let response: Response;
+    try {
+      response = await fetch(`${adminApiBase()}/api/admin/auth/me`, {
+        headers: { cookie, accept: 'application/json' },
+        cache: 'no-store',
+        signal: AbortSignal.timeout(4_000),
+      });
+    } catch {
+      return new NextResponse('Сервис проверки сессии временно недоступен.', {
+        status: 503,
+        headers: { 'Cache-Control': 'no-store' },
+      });
+    }
+    if (!response.ok) return adminLoginRedirect(request);
+    const payload = await response.json().catch(() => null) as { user?: { roles?: unknown; mfaVerified?: unknown } } | null;
+    if (adminPath === '/admin/security/mfa') return null;
+    const roles = Array.isArray(payload?.user?.roles) ? payload.user.roles.filter((role): role is string => typeof role === 'string') : [];
+    if (!adminPageAllowsSession(adminPath, roles, payload?.user?.mfaVerified === true)) return adminForbiddenResponse();
+    return null;
+  }
   const config = readAdminBasicAuthConfig(process.env);
   const ok = await isAuthorizedAdminBasicAuth(request.headers.get('authorization'), config);
   if (!ok) return unauthorizedAdminResponse(config.realm);
@@ -53,6 +102,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // The staff sign-in screen is public so it can establish the HttpOnly staff session.
+  if (pathname === '/admin/login') return NextResponse.next();
+
   const host = request.headers.get('host')?.toLowerCase() || '';
   if (host === 'www.daibilet.ru' || host.startsWith('www.daibilet.ru:')) {
     const url = request.nextUrl.clone();
@@ -70,18 +122,29 @@ export async function middleware(request: NextRequest) {
 
     // F4.6: /legacy retired → rewrite to Next admin dashboard
     if (pathname === '/legacy' || pathname.startsWith('/legacy/')) {
-      const denied = await enforceAdminAuth(request);
+      const denied = await enforceAdminAuth(request, '/admin');
       if (denied) return denied;
       const url = request.nextUrl.clone();
       url.pathname = '/admin';
       return NextResponse.redirect(url, 302);
     }
 
-    const denied = await enforceAdminAuth(request);
-    if (denied) return denied;
+    if (pathname === '/login') {
+      const url = request.nextUrl.clone();
+      url.pathname = '/admin/login';
+      return NextResponse.rewrite(url);
+    }
 
     const rewritten = rewriteAdminHostPathname(pathname);
     if (!rewritten) return NextResponse.next();
+
+    if (rewritten === '/admin/login') {
+      const url = request.nextUrl.clone();
+      url.pathname = rewritten;
+      return NextResponse.rewrite(url);
+    }
+    const denied = await enforceAdminAuth(request, rewritten);
+    if (denied) return denied;
 
     const url = request.nextUrl.clone();
     url.pathname = rewritten;
@@ -89,13 +152,16 @@ export async function middleware(request: NextRequest) {
   }
 
   if (isAdminUiPath(pathname)) {
-    const denied = await enforceAdminAuth(request);
+    const denied = await enforceAdminAuth(request, pathname);
     if (denied) return denied;
     return NextResponse.next();
   }
 
   const eventSlugRedirect = redirectCyrillicEventSlug(request);
   if (eventSlugRedirect) return eventSlugRedirect;
+
+  const citySlugRedirect = redirectCyrillicCitySlug(request);
+  if (citySlugRedirect) return citySlugRedirect;
 
   const cityQueryRedirect = redirectBrokenRegionChildCityQuery(request);
   if (cityQueryRedirect) return cityQueryRedirect;
@@ -148,6 +214,14 @@ function handleEventsCatalogIndexing(
 
 function redirectCyrillicEventSlug(request: NextRequest): NextResponse | null {
   const targetPath = cyrillicEventRedirectPath(request.nextUrl.pathname);
+  if (!targetPath) return null;
+  const url = request.nextUrl.clone();
+  url.pathname = targetPath;
+  return NextResponse.redirect(url, 308);
+}
+
+function redirectCyrillicCitySlug(request: NextRequest): NextResponse | null {
+  const targetPath = cyrillicCityRedirectPath(request.nextUrl.pathname);
   if (!targetPath) return null;
   const url = request.nextUrl.clone();
   url.pathname = targetPath;

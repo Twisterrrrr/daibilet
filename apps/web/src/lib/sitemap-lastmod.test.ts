@@ -3,7 +3,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 
-import { resolveSitemapLastModified, sitemapResponseHeaders } from '@/lib/sitemap-data';
+import {
+  renderSitemapIndexXml,
+  renderUrlsetXml,
+  resolveSitemapLastModified,
+  sitemapResponseHeaders,
+} from '@/lib/sitemap-data';
 
 // The pure helpers are tested through their own module: public-read only
 // re-exports buildPublicEventFreshnessMap, not the row mapper.
@@ -16,40 +21,46 @@ import { freshnessMapFromRows, publicFreshnessSlug } from '@daibilet/backend/eve
  * is worse than an absent one: crawlers stop trusting the field, so real updates
  * stop earning the re-crawl.
  *
- * Cities and venues deliberately still fall back - their public DTO has no
- * `updatedAt` and their backend queries would need new aggregates. Articles are
- * the first entity carried end to end.
+ * Unknown timestamps are omitted instead of being replaced by a build-time
+ * value. Articles and events carry real timestamps; other DTOs do not yet.
  */
 const WEB_ROOT = path.resolve(__dirname, '../..');
 const REPO_ROOT = path.resolve(WEB_ROOT, '../..');
 
-test('time-sensitive sitemaps cannot outlive an event or retain stale venue eligibility', () => {
-  assert.equal(sitemapResponseHeaders('events')['Cache-Control'], 'no-store');
-  assert.equal(sitemapResponseHeaders('venues')['Cache-Control'], 'no-store');
-  assert.equal(sitemapResponseHeaders('blog')['Cache-Control'], 'public, s-maxage=3600, stale-while-revalidate=86400');
+test('sitemap cache does not advertise a long stale window for changing catalogs', () => {
+  // Runtime generation is still cached to protect the 22-page event query from
+  // every crawler hit, but stale-while-revalidate used to preserve deleted URLs
+  // for up to 24h after sync. Responses now advertise only a bounded s-maxage;
+  // Nginx may still serve stale briefly while its single background refresh runs.
+  assert.equal(sitemapResponseHeaders('events')['Cache-Control'], 'public, s-maxage=300');
+  assert.equal(sitemapResponseHeaders('venues')['Cache-Control'], 'public, s-maxage=300');
+  assert.equal(sitemapResponseHeaders('cities')['Cache-Control'], 'public, s-maxage=900');
+  assert.equal(sitemapResponseHeaders('landings')['Cache-Control'], 'public, s-maxage=900');
+  assert.equal(sitemapResponseHeaders('blog')['Cache-Control'], 'public, s-maxage=3600');
+  assert.equal(sitemapResponseHeaders('static')['Cache-Control'], 'public, s-maxage=3600');
 });
 
 test('sitemap lastmod: uses a real updatedAt when present', () => {
-  const fallback = new Date('2026-09-29T12:00:00.000Z');
   const real = '2026-03-14T08:30:00.000Z';
-  assert.equal(resolveSitemapLastModified(real, fallback).toISOString(), real);
-  assert.equal(resolveSitemapLastModified(new Date(real), fallback).toISOString(), real);
+  assert.equal(resolveSitemapLastModified(real)?.toISOString(), real);
+  assert.equal(resolveSitemapLastModified(new Date(real))?.toISOString(), real);
 });
 
-test('sitemap lastmod: falls back to now when absent or unparseable', () => {
-  const fallback = new Date('2026-09-29T12:00:00.000Z');
-  const iso = fallback.toISOString();
-  assert.equal(resolveSitemapLastModified(null, fallback).toISOString(), iso);
-  assert.equal(resolveSitemapLastModified(undefined, fallback).toISOString(), iso);
-  assert.equal(resolveSitemapLastModified('', fallback).toISOString(), iso);
-  assert.equal(resolveSitemapLastModified('not-a-date', fallback).toISOString(), iso);
+test('sitemap lastmod: missing or invalid freshness omits the tag', () => {
+  assert.equal(resolveSitemapLastModified(null), undefined);
+  assert.equal(resolveSitemapLastModified(undefined), undefined);
+  assert.equal(resolveSitemapLastModified(''), undefined);
+  assert.equal(resolveSitemapLastModified('not-a-date'), undefined);
   // A Date instance that is Invalid Date must not leak into the XML.
-  assert.equal(resolveSitemapLastModified(new Date('nope'), fallback).toISOString(), iso);
+  assert.equal(resolveSitemapLastModified(new Date('nope')), undefined);
+  const xml = renderUrlsetXml([{ url: 'https://daibilet.ru/venues/example', changeFrequency: 'weekly' }]);
+  assert.doesNotMatch(xml, /<lastmod>/);
+  assert.doesNotMatch(renderSitemapIndexXml(), /<lastmod>/);
 });
 
 test('sitemap lastmod: blog builder threads the real article updatedAt', () => {
   const source = fs.readFileSync(path.join(WEB_ROOT, 'src/lib/sitemap-data.ts'), 'utf8');
-  assert.match(source, /entry\(\s*`\/blog\/\$\{[^}]+\}`,\s*now,\s*'weekly',\s*0\.6,\s*article\.updatedAt,?\s*\)/);
+  assert.match(source, /entry\(\s*`\/blog\/\$\{[^}]+\}`,\s*'weekly',\s*0\.6,\s*article\.updatedAt,?\s*\)/);
 });
 
 test('sitemap lastmod: backend selects and maps article updatedAt', () => {
@@ -96,14 +107,14 @@ test('sitemap lastmod: the newest duplicate row wins', () => {
   assert.equal(map.get('tc-123-planetarii-1')?.toISOString(), '2026-09-25T00:00:00.000Z');
 });
 
-test('sitemap lastmod: a slug missing from the map falls back to the build time', () => {
-  const fallback = new Date('2026-09-29T12:00:00.000Z');
-  assert.equal(resolveSitemapLastModified(null, fallback).toISOString(), fallback.toISOString());
+test('sitemap lastmod: a slug missing from the freshness map has no timestamp', () => {
+  assert.equal(resolveSitemapLastModified(null), undefined);
 });
 
-test('sitemap lastmod: the events builder threads the freshness map', () => {
+test('sitemap lastmod: the events builder reads freshness over HTTP', () => {
   const source = fs.readFileSync(path.join(WEB_ROOT, 'src/lib/sitemap-data.ts'), 'utf8');
-  assert.match(source, /buildPublicEventFreshnessMap/);
-  assert.match(source, /freshness\.get\(slug\)/);
+  assert.match(source, /fetchPublicApiJson<\{ freshness: Record<string, string> \}>/);
+  assert.match(source, /freshness\[slug\]/);
+  assert.doesNotMatch(source, /@daibilet\/backend\/public-read/);
 });
 

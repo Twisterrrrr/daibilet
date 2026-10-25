@@ -45,6 +45,8 @@ test('serves admin event change request detail', async () => {
       capturedRequestId = requestId;
       return {
         id: requestId,
+        subject: 'EVENT',
+        subjectId: 'evt_1',
         eventId: 'evt_1',
         supplierId: null,
         type: 'CONTENT_UPDATE',

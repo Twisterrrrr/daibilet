@@ -23,8 +23,19 @@ test('admin paths are protected', () => {
   assert.equal(isProtectedPath('/api/admin/articles/x'), true);
   assert.equal(isProtectedPath('/api/db/stats'), true);
   assert.equal(isProtectedPath('/api/v1/tc/sync'), true);
+  assert.equal(isProtectedPath('/api/supplier/dashboard'), false);
+  assert.equal(isProtectedPath('/api/supplier/auth/login'), false);
   assert.equal(isProtectedPath('/api/public/events'), false);
   assert.equal(isProtectedPath('/api/health'), false);
+});
+
+test('admin identity endpoints authenticate themselves instead of using shared Basic Auth', () => {
+  assert.equal(isProtectedPath('/api/admin/auth/login'), false);
+  assert.equal(isProtectedPath('/api/admin/auth/me'), false);
+  assert.equal(isProtectedPath('/api/admin/auth/logout'), false);
+  assert.equal(isProtectedPath('/api/admin/auth/accept-invitation'), false);
+  assert.equal(isProtectedPath('/api/admin/auth/invitations'), false);
+  assert.equal(isProtectedPath('/api/admin/auth/users'), true);
 });
 
 test('production without credentials fails closed', () => {

@@ -5,7 +5,7 @@ import { ChunkLoadRecovery } from '@/components/ChunkLoadRecovery';
 import { NavigationProgress } from '@/components/NavigationProgress.client';
 import { PurchaseOpeningHost } from '@/components/PurchaseOpeningFeedback.client';
 import { YandexMetrika } from '@/components/YandexMetrika.client';
-import { fontVariableClassName } from '@/lib/fonts';
+import { fontSansVariableClassName } from '@/lib/fonts';
 import { DEFAULT_OG_IMAGE, HOME_SEO_DESCRIPTION_FALLBACK, HOME_SEO_TITLE, INDEX_FOLLOW_ROBOTS, getOpenGraphMediaTags } from '@/lib/seo-meta';
 
 import './globals.css';
@@ -115,7 +115,7 @@ const siteJsonLd = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ru" className={fontVariableClassName}>
+    <html lang="ru" className={fontSansVariableClassName}>
       <head>
         <script
           type="application/ld+json"

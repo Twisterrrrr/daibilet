@@ -51,7 +51,6 @@ export const ROSTOV_NA_DONU_MUST_SEE: any[] = [
     locationSlug: 'rostov-na-donu-pamyatnik-sholohovu',
     mustSeeFilter: 'monument',
     visitMinutes: 15,
-    alsoMain: true,
   }),
   place('Скульптура «Нахаленок и Дед Щукарь»', 'Контактная бронза по мотивам Шолохова - веселая и фотогеничная.', 47.217812, 39.712312, {
     address: 'ул. Береговая, 23А',
@@ -158,7 +157,6 @@ export const ROSTOV_NA_DONU_MUST_SEE: any[] = [
     locationSlug: 'rostov-na-donu-osobnyak-sarieva',
     mustSeeFilter: 'mansions',
     visitMinutes: 15,
-    alsoMain: true,
   }),
   place('Дом Врангеля', 'Сдержанный исторический особняк, связанный с биографией барона Петра Врангеля.', 47.218912, 39.714902, {
     address: 'пер. Газетный, 8',
@@ -312,14 +310,12 @@ export const ROSTOV_NA_DONU_MUST_SEE: any[] = [
     locationSlug: 'rostov-na-donu-park-revolyutsii',
     mustSeeFilter: 'park',
     visitMinutes: '1-2 ч',
-    alsoMain: true,
   }),
   place('Смотровая на Седова', 'Высокий берег с лучшей городской панорамой порта, моста и Левбердона.', 47.219612, 39.728912, {
     address: 'ул. Седова / ул. Нижнебульварная',
     locationSlug: 'rostov-na-donu-smotrovaya-na-sedova',
     mustSeeFilter: 'views',
     visitMinutes: 30,
-    alsoMain: true,
   }),
 
   // --- Театры, гастро и креатив (46-50) ---
@@ -328,14 +324,12 @@ export const ROSTOV_NA_DONU_MUST_SEE: any[] = [
     venueSlug: 'rostov-na-donu-teatr-dramy-im-gorkogo',
     mustSeeFilter: 'creative',
     visitMinutes: 45,
-    alsoMain: true,
   }),
   place('Центральный рынок (Старый базар)', 'Южный гастро-хаб с рыбой, овощами, раками и характером старого торгового города.', 47.217912, 39.710912, {
     address: 'Буденновский проспект, 12',
     locationSlug: 'rostov-na-donu-tsentral-nyy-rynok-staryy-bazar',
     mustSeeFilter: 'gastro',
     visitMinutes: 60,
-    alsoMain: true,
   }),
   place('Ресторан «Раки и Гады»', 'Один из самых известных адресов для донских раков и черноморской кухни.', 47.219112, 39.711891, {
     address: 'ул. Шаумяна, 39',

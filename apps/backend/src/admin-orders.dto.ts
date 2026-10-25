@@ -1,17 +1,16 @@
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { buildAdminOrdersList } from './dto.js';
-import { createDb } from './db.js';
+import { buildAdminPurchaseDetailDto, buildAdminPurchasesListDto, createAdminPurchaseRefundRequest, type AdminCreateRefundRequestInput } from './purchase-projection.js';
 
-const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
-
-let legacyDb: ReturnType<typeof createDb> | null = null;
-
-function getLegacyDb() {
-  if (!legacyDb) legacyDb = createDb(projectRoot);
-  return legacyDb;
+export async function buildAdminOrdersListDto(
+  searchParams: URLSearchParams = new URLSearchParams(),
+  options: { includePiiSearch?: boolean } = {},
+) {
+  return buildAdminPurchasesListDto(searchParams, options);
 }
 
-export async function buildAdminOrdersListDto(searchParams: URLSearchParams = new URLSearchParams()) {
-  return buildAdminOrdersList(getLegacyDb(), searchParams);
+export async function buildAdminOrderDetailDto(orderKey: string) {
+  return buildAdminPurchaseDetailDto(orderKey);
+}
+
+export async function createAdminOrderRefundRequestDto(orderKey: string, input: AdminCreateRefundRequestInput) {
+  return createAdminPurchaseRefundRequest(orderKey, input);
 }

@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 
 import { mergeBuyerInternalOrders, type BuyerInternalOrderRecord } from '@/lib/buyer-checkout';
-import { lookupBuyerPurchasesSeedByPublicCode } from '@/lib/buyer-purchases-seed';
 import { isOpenDateValidity } from '@/lib/finance-projection';
+import { CHECKOUT_ORDER_ACCESS_COOKIE, readCheckoutOrderAccessProof } from '@/server/checkout-order-access';
 import { lookupCheckoutOrderByPublicCode } from '@/server/finance-checkout-client';
 import { fetchAdmissionProductBySlug } from '@/server/finance-projection-client';
 import { fetchPublicApiJson } from '@/server/public-api-client';
@@ -107,9 +107,15 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'publicCode_required' }, { status: 400, headers: PRIVATE_STATUS_HEADERS });
   }
 
-  const financeOrder = await lookupCheckoutOrderByPublicCode(publicCode);
-  const seedOrder = lookupBuyerPurchasesSeedByPublicCode(publicCode);
-  const order = financeOrder || seedOrder;
+  const proof = readCheckoutOrderAccessProof(
+    request.headers.get('cookie'),
+    publicCode,
+    CHECKOUT_ORDER_ACCESS_COOKIE,
+  );
+  const financeOrder = proof
+    ? await lookupCheckoutOrderByPublicCode(publicCode, process.env, proof.token)
+    : null;
+  const order = financeOrder;
   if (!order) {
     // Soft empty: UI still shows thank-you from query/local cache.
     return NextResponse.json({
@@ -120,9 +126,7 @@ export async function GET(request: Request) {
     }, { headers: PRIVATE_STATUS_HEADERS });
   }
 
-  const enriched = await softEnrichTicketOrder(
-    financeOrder && seedOrder ? mergeBuyerInternalOrders(financeOrder, seedOrder) : order,
-  );
+  const enriched = await softEnrichTicketOrder(order);
 
   return NextResponse.json({
     ok: true,

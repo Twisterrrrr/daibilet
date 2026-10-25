@@ -1,3 +1,5 @@
+import { stripSessionDateLines } from './event-description-session-lines.ts';
+
 /** Soft-wrap join: "Храм Христа\\nСпасителя" → one line; keep real paragraph breaks. */
 function joinSoftWrappedLines(text: string): string {
   return text.replace(/([^\n.!?…:;—–-])\n(?=[a-zа-яё])/gu, '$1 ');
@@ -136,7 +138,7 @@ export function isDescriptionSectionHeading(line: string): boolean {
   if (!text || text.length > 72) return false;
   if (/[.!?…]$/u.test(text)) return false;
   if (
-    /^(?:о маршруте|о событии|программа|включено|в стоимость входит|важно|маршрут|что вас ждёт|что вас ждет|условия|описание|подробнее|внимание|для кого|как добраться|расписание|основные достопримечательности|достопримечательности|организационные детали|организационные условия|что включено|что входит|продолжительность|продолжительность прогулки|особенности|правила на борту|на борту|в программе|формат|тайминг|памятка|посадка и отправление|что видно с воды|что видно по маршруту|что видно с борта)$/iu.test(
+    /^(?:о маршруте|о событии|программа|включено|в стоимость входит|важно|маршрут|что вас ждёт|что вас ждет|условия|описание|подробнее|внимание|для кого|как добраться|расписание|основные достопримечательности|достопримечательности|организационные детали|организационные условия|что включено|что входит|программа тура|в стоимость тура входит|оплачивается дополнительно|при посадке гиду|по желанию|дополнительно|продолжительность|продолжительность прогулки|особенности|правила на борту|на борту|в программе|формат|тайминг|памятка|посадка и отправление|что видно с воды|что видно по маршруту|что видно с борта)$/iu.test(
       text,
     )
   ) {
@@ -187,6 +189,13 @@ export function isListItemLine(line: string): boolean {
   return LIST_ITEM_PREFIX_RE.test(String(line || '').trim());
 }
 
+/** `07:00 - …` / `08:50 - 09:10 - …` schedule rows from bus and boat tours. */
+const SCHEDULE_LINE_RE = /^\d{1,2}:\d{2}\s*[-–—]\s*/u;
+
+export function isScheduleLine(line: string): boolean {
+  return SCHEDULE_LINE_RE.test(String(line || '').trim());
+}
+
 export function stripListItemPrefix(line: string): string {
   return String(line || '').trim().replace(LIST_ITEM_PREFIX_RE, '').trim();
 }
@@ -222,6 +231,10 @@ const COMMA_LIST_INTRO_RE = /^(.+?(?:увидеть|узнаете|посети�
 const LABEL_VALUE_LINE_RE = /^([A-ZА-ЯЁ][^:]{1,44}):\s*(.+)$/u;
 const ATTENTION_LINE_RE = /^Внимание!\s*(.+)$/iu;
 
+/** Generic labels that are section headings even on the first line. */
+const GENERIC_SECTION_LABEL_RE =
+  /^(?:программа|внимание|важно|в стоимость|что |как |место|адрес|билет|возраст|продолжительность|организационные|оплачивается|по желанию|дополнительно|контакты|телефон)/iu;
+
 export function parseCommaSeparatedListAfterIntro(line: string): { intro: string; items: string[] } | null {
   const text = String(line || '').trim();
   const match = text.match(COMMA_LIST_INTRO_RE);
@@ -251,6 +264,10 @@ export function parseLabelValueLine(line: string): { label: string; value: strin
   // A dash inside the label means it is a phrase, not a section label
   // ("Концерт на корабле - это: …"), so it must not become an <h3>.
   if (/\s[-–—]\s/u.test(label)) return null;
+  // Only short field labels ("Место:", "Маршрут:", "Продолжительность прогулки:")
+  // are headings; "Входной билет в горный парк Рускеала: 750 руб.…" is a fact
+  // line that belongs in a list, not a section title.
+  if (label.split(/\s+/u).length > 4 || label.length > 32) return null;
   return { label, value };
 }
 
@@ -265,7 +282,92 @@ export function parseAttentionLine(line: string): { body: string } | null {
 export function normalizeUserFacingCopy(text: string): string {
   return String(text || '')
     .replace(/[\u2013\u2014\u2212–—]/g, '-')
-    .replace(/\s+-\s+/g, ' - ');
+    // Only horizontal whitespace: a newline before a list dash is structure.
+    .replace(/[ \t]+-[ \t]+/g, ' - ');
+}
+
+/** Lowercase, punctuation-free comparison key for lead/title matching. */
+function normalizeLeadKey(value: string): string {
+  return normalizeUserFacingCopy(String(value || ''))
+    .toLocaleLowerCase('ru-RU')
+    .replace(/ё/g, 'е')
+    .replace(/[«»"'`]/g, ' ')
+    .replace(/[.,!;:…()\-–—]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Drop a lead paragraph that merely repeats the H1 title
+ * ("В Рускеалу… в Санкт-Петербурге." under H1 "В Рускеалу…"). Only a short
+ * place tail ("в Санкт-Петербурге", "в Москве") counts as part of the
+ * duplicate; a real lead with its own content ("…на примерах из мультфильмов")
+ * is kept. `place` is the event city: it guards against dropping a lead whose
+ * tail merely starts with a preposition.
+ */
+export function stripTitleDuplicateLead(text: string, title: string, place?: string): string {
+  const full = String(text || '').replace(/\r\n?/g, '\n');
+  const normalizedTitle = normalizeLeadKey(title);
+  if (!normalizedTitle) return full;
+
+  const paragraphs = full.split(/\n\s*\n/);
+  const first = normalizeLeadKey(paragraphs[0] || '');
+  if (!first || !first.startsWith(normalizedTitle)) return full;
+
+  const tail = first.slice(normalizedTitle.length).trim();
+  if (!tail) return paragraphs.slice(1).join('\n\n').trim();
+
+  const placeTail = tail.match(/^(?:в|во|на|г)\s+(\S+)(?:\s+(\S+))?$/u);
+  if (!placeTail) return full;
+
+  const placeKey = normalizeLeadKey(place || '');
+  if (placeKey) {
+    const firstPlaceWord = placeKey.split(' ')[0];
+    const stem = firstPlaceWord.length > 3 ? firstPlaceWord.slice(0, firstPlaceWord.length - 2) : firstPlaceWord;
+    if (!placeTail[1].startsWith(stem)) return full;
+    // A second tail word ("в нижнем новгороде") needs a multi-word place.
+    if (placeTail[2] && !placeKey.includes(' ')) return full;
+  } else if (placeTail[2]) {
+    return full;
+  }
+
+  return paragraphs.slice(1).join('\n\n').trim();
+}
+
+/**
+ * Provider feeds often glue several bullets into one line
+ * ("…группы) Трассовая экскурсия…", "…600 руб. Полет…"). Split at a closing
+ * parenthesis, a ruble price or a known fact-starter followed by a capital
+ * word. The boundary itself stays with the left part.
+ */
+const GLUED_AFTER_BOUNDARY_RE = /(\)|руб\.(?:\/[а-яё]+)?)\s+([А-ЯЁ][а-яё-]*)/gu;
+const GLUED_BEFORE_STARTER_RE =
+  /([а-яё]{2,})\s+((?:Осмотр|Посещение|Прогулка|Экскурсия|Трансфер|Услуги|Вход|Проход|Обед|Ужин|Завтрак|Катание|Дегустация|Мастер-класс|Билеты|Трассовая|Подъём|Подъем|Спуск)(?![а-яё]))/gu;
+
+/** Capitalized words that continue a bullet instead of starting a new one. */
+const GLUED_KEEP_TOGETHER = new Set([
+  'и', 'или', 'а', 'но', 'не', 'ни',
+  'в', 'во', 'на', 'с', 'со', 'к', 'ко', 'о', 'об', 'из', 'за', 'по', 'для', 'при',
+  'от', 'до', 'у', 'без', 'после', 'через', 'между', 'под', 'над', 'про',
+  'включает', 'включают', 'включая', 'можно', 'посетить', 'увидеть', 'услышать',
+]);
+
+function startsNewBullet(word: string): boolean {
+  return !GLUED_KEEP_TOGETHER.has(word.toLocaleLowerCase('ru-RU'));
+}
+
+export function splitGluedListItem(item: string): string[] {
+  const marked = String(item || '')
+    .replace(GLUED_AFTER_BOUNDARY_RE, (match, boundary: string, next: string) =>
+      startsNewBullet(next) ? `${boundary}\u0001${next}` : match,
+    )
+    .replace(GLUED_BEFORE_STARTER_RE, (match, prev: string, starter: string) =>
+      startsNewBullet(prev) ? `${prev}\u0001${starter}` : match,
+    );
+  return marked
+    .split('\u0001')
+    .map((part) => part.trim())
+    .filter(Boolean);
 }
 
 export type EventDescriptionBlock =
@@ -300,6 +402,33 @@ function pushIntroBeforeList(blocks: EventDescriptionBlock[], intro: string) {
   blocks.push({ type: 'paragraph', text: cleaned });
 }
 
+/** Sections whose body is a list even when the provider omitted bullet markers. */
+const FACT_LIST_HEADING_RE =
+  /^(?:в стоимость|что включено|что входит|включено в стоимость|по желанию|оплачивается дополнительно|дополнительно)/iu;
+
+function applyFactListSections(blocks: EventDescriptionBlock[]): EventDescriptionBlock[] {
+  const out: EventDescriptionBlock[] = [];
+  let listMode = false;
+
+  for (const block of blocks) {
+    if (block.type === 'heading') {
+      out.push(block);
+      listMode = FACT_LIST_HEADING_RE.test(block.text);
+      continue;
+    }
+    if (!listMode) {
+      out.push(block);
+      continue;
+    }
+    const items = (block.type === 'list' ? block.items : [block.text]).flatMap(splitGluedListItem);
+    const last = out[out.length - 1];
+    if (last && last.type === 'list') last.items.push(...items);
+    else out.push({ type: 'list', items: [...items] });
+  }
+
+  return out;
+}
+
 /**
  * Parse plain-text event description into paragraphs, section headings and lists.
  * Recognizes line bullets (✅ / • / - / –), marker-less enumeration runs, and
@@ -310,7 +439,25 @@ function pushIntroBeforeList(blocks: EventDescriptionBlock[], intro: string) {
  * landmark lists and paragraph breaks into a single wall of text.
  */
 export function parseEventDescriptionBlocks(text: string): EventDescriptionBlock[] {
-  const normalized = joinSoftWrappedLines(String(text || '').replace(/\r\n?/g, '\n')).trim();
+  const normalized = joinSoftWrappedLines(String(text || '').replace(/\r\n?/g, '\n'))
+    .replace(/[\u2800\u00A0]/g, ' ')
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    // `## 18:45 - 22:43 - …` is a schedule row, not a section heading: drop the
+    // markdown marker so the row joins the surrounding time list.
+    .replace(/^#{1,6}\s+(?=\d{1,2}:\d{2}\s*[-–—])/gmu, '')
+    // Mid-paragraph timeline rows ("…на автобусе. 22:43 - Прибытие…") become
+    // their own lines so they render as schedule items, not one wall of text.
+    .replace(/([.)])\s+(?=\d{1,2}:\d{2}\s*[-–—])/gu, '$1\n')
+    // `Оплачивается дополнительно` + `## При посадке гиду` is one section.
+    .replace(
+      /^(Оплачивается дополнительно|Дополнительно)\s*\n+(?:##\s*)?При\s+([^\n]+)$/gimu,
+      '## $1 при $2',
+    )
+    // Inline `ВАЖНО!` starts its own bold paragraph instead of ending a wall of text.
+    .replace(/(?:^|\s+)(ВАЖНО!|Важно!|ВАЖНО:)\s+/gu, '\n\n**$1** ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
   if (!normalized) return [];
 
   const lines = normalized.split('\n');
@@ -322,6 +469,26 @@ export function parseEventDescriptionBlocks(text: string): EventDescriptionBlock
     if (!line) {
       i += 1;
       continue;
+    }
+
+    if (isScheduleLine(line)) {
+      const items: string[] = [];
+      let j = i;
+      while (j < lines.length) {
+        const current = lines[j].trim();
+        if (!current) {
+          j += 1;
+          continue;
+        }
+        if (!isScheduleLine(current)) break;
+        items.push(current);
+        j += 1;
+      }
+      if (items.length) {
+        blocks.push({ type: 'list', items });
+        i = j;
+        continue;
+      }
     }
 
     if (isListItemLine(line)) {
@@ -385,8 +552,18 @@ export function parseEventDescriptionBlocks(text: string): EventDescriptionBlock
 
     const labelValue = parseLabelValueLine(line);
     if (labelValue) {
-      blocks.push({ type: 'heading', text: labelValue.label });
-      blocks.push({ type: 'paragraph', text: labelValue.value });
+      // Only real section labels ("Место:", "Маршрут:") become headings; a long
+      // phrase label ("Входной билет в горный парк Рускеала: 750 руб…") stays a
+      // single line and joins the surrounding fact list.
+      const labelIsSection =
+        GENERIC_SECTION_LABEL_RE.test(labelValue.label) ||
+        isDescriptionSectionHeading(labelValue.label);
+      if (labelIsSection) {
+        blocks.push({ type: 'heading', text: labelValue.label });
+        blocks.push({ type: 'paragraph', text: labelValue.value });
+      } else {
+        blocks.push({ type: 'paragraph', text: line });
+      }
       i += 1;
       continue;
     }
@@ -402,7 +579,20 @@ export function parseEventDescriptionBlocks(text: string): EventDescriptionBlock
     i += 1;
   }
 
-  return blocks;
+  return expandGluedItems(applyFactListSections(blocks));
+}
+
+/** Split bullets the provider glued into one line; schedule rows keep shape. */
+function expandGluedItems(blocks: EventDescriptionBlock[]): EventDescriptionBlock[] {
+  return blocks.map((block) => {
+    if (block.type !== 'list') return block;
+    return {
+      ...block,
+      items: block.items.flatMap((item) =>
+        isScheduleLine(item) ? [item] : splitGluedListItem(item),
+      ),
+    };
+  });
 }
 
 function renderBlocksToHtml(blocks: EventDescriptionBlock[]): string {
@@ -424,11 +614,12 @@ function renderBlocksToHtml(blocks: EventDescriptionBlock[]): string {
 
 /**
  * Safe HTML for event description.
- * - Existing HTML (tags): sanitize only, do not re-parse as lists.
+ * - Existing HTML (tags): preserve its allowed structure after sanitizing.
  * - Plain text: paragraphs + headings + `<ul>/<li>` for detected bullets.
+ * - Session date/time lines are removed: the purchase block owns the schedule.
  */
 export function formatEventDescriptionHtml(raw: string): string {
-  const text = String(raw || '').trim();
+  const text = stripSessionDateLines(String(raw || '')).trim();
   if (!text) return '';
   if (/<[a-z][\s\S]*>/i.test(text)) {
     return sanitizeEventHtml(text);

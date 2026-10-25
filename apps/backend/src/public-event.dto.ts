@@ -12,7 +12,9 @@ import {
 import { resolveCityTimeZone } from './city-timezone.js';
 import { formatDate, formatTime, normalizeStartsAt, timeBucket } from './public-datetime.js';
 import { dedupePublicOffers, preferNamedTicketOffers } from './public-offers.js';
+import { stripDescriptionOriginMarkers } from './description-origin.js';
 import { findLandingRule, matchingLandingSlugs } from './landing-rules.js';
+import { internalEventPurchasePath } from './internal-event-purchase.js';
 import {
   buildProviderWidgetPayload,
   buildProviderWidgetUrl,
@@ -34,6 +36,7 @@ import { formatPublicEventTitle } from './event-title-normalize.ts';
 import type {
   PublicEventDto,
   PublicEventPageDto,
+  PublicPdpDocumentDto,
   PublicOfferDto,
   PublicPurchaseOptionDto,
   PublicSessionDto,
@@ -48,6 +51,7 @@ const PUBLIC_EVENT_SESSION_FETCH_LIMIT = 64;
 const PUBLIC_EVENT_SESSION_DISPLAY_LIMIT = 32;
 
 const eventInclude = {
+  supplier: { select: { status: true, legalProfile: { select: { status: true } } } },
   primaryCity: { include: { region: true } },
   venue: true,
   category: true,
@@ -230,11 +234,27 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
     }),
   ]);
 
-  const offers = preferNamedTicketOffers(
+  const offers = (preferNamedTicketOffers(
     dedupePublicOffers(offerRows.map(mapOfferRecord)),
-  ).slice(0, 32) as MappedOffer[];
+  ) as MappedOffer[]).filter((offer) => requestedEvent.purchaseFlow !== 'PLATFORM' || offer.eventId === requestedEvent.id).slice(0, 32);
   const primaryOffers = primaryOfferMap(offers);
   const representativeOffer = primaryOffers.get(representative.id) || offers[0] || null;
+  const internalPurchaseUrl = internalEventPurchasePath({
+    eventId: requestedEvent.id,
+    slug: requestedEvent.slug,
+    kind: requestedEvent.kind,
+    status: requestedEvent.status,
+    purchaseFlow: requestedEvent.purchaseFlow,
+    managementMode: requestedEvent.managementMode,
+    supplierStatus: requestedEvent.supplier?.status || null,
+    legalProfileStatus: requestedEvent.supplier?.legalProfile?.status || null,
+    ticketsVacant: requestedEvent.ticketsVacant,
+    salesStartsAt: requestedEvent.salesStartsAt,
+    salesEndsAt: requestedEvent.salesEndsAt,
+    openDateValidFrom: requestedEvent.openDateValidFrom,
+    openDateValidTo: requestedEvent.openDateValidTo,
+    offers,
+  });
   const requestedIdentity = eventIdentity(requestedEvent);
   const representativeIdentity = eventIdentity(representative);
   const eventSourceCode = requestedIdentity.sourceCode || representativeOffer?.sourceCode || null;
@@ -364,12 +384,12 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
       ...metaGroupMembers.map((member) => member.id),
     ])],
     sessionCount: sessions.length,
-    purchaseUrl: primaryPurchase.purchaseUrl,
-    widgetUrl: representativeOffer?.widgetUrl || primaryPurchase.purchaseUrl,
+    purchaseUrl: requestedEvent.purchaseFlow === 'PLATFORM' ? internalPurchaseUrl : primaryPurchase.purchaseUrl,
+    widgetUrl: requestedEvent.purchaseFlow === 'PLATFORM' ? null : representativeOffer?.widgetUrl || primaryPurchase.purchaseUrl,
     deeplinkUrl: representativeOffer?.deeplinkUrl || null,
-    purchaseReady: eventPurchase.ready || Boolean(primaryPurchase.purchaseUrl),
-    purchaseMode: eventPurchase.mode,
-    purchaseProvider: eventPurchase.provider,
+    purchaseReady: requestedEvent.purchaseFlow === 'PLATFORM' ? Boolean(internalPurchaseUrl) : eventPurchase.ready || Boolean(primaryPurchase.purchaseUrl),
+    purchaseMode: internalPurchaseUrl ? 'redirect' : eventPurchase.mode,
+    purchaseProvider: internalPurchaseUrl ? null : eventPurchase.provider,
     purchaseUrlSource: primaryPurchase.urlSource || eventPurchase.urlSource,
     seoH1: requestedEvent.override?.seoH1 || requestedEvent.seoH1 || title,
     seoTitle: requestedEvent.override?.seoTitle || requestedEvent.seoTitle || (() => {
@@ -381,7 +401,7 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
       return `${core}: билеты и расписание | Дайбилет`;
     })(),
     seoDescription: cleanImportedDescription(requestedEvent.override?.seoDescription || requestedEvent.seoDescription) ||
-      `Расписание, цены и билеты на ${title}. Покупка через виджет билетной системы.`,
+      `Расписание, цены и билеты на ${title}. ${internalPurchaseUrl ? 'Покупка на Дайбилет.' : 'Покупка через виджет билетной системы.'}`,
     canonicalPath: requestedEvent.override?.canonicalPath || requestedEvent.canonicalPath || `/events/${publicSlug(representative.slug)}`,
     isIndexable: requestedEvent.override?.isIndexable ?? requestedEvent.isIndexable,
   };
@@ -419,6 +439,7 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
   return {
     generatedAt: new Date().toISOString(),
     event,
+    pdp: await attachReadyEventPdp(requestedEvent.id),
     sessions,
     offers: offers.map(({ eventId: _eventId, sortOrder: _sortOrder, sourceTicketId: _sourceTicketId, payload: _payload, ...offer }) => offer),
     ticketPrices,
@@ -455,6 +476,20 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
       vacant: vacantValues.length ? vacantValues.reduce((sum, value) => sum + value, 0) : null,
     },
   };
+}
+
+async function attachReadyEventPdp(eventId: string): Promise<PublicPdpDocumentDto | null> {
+  try {
+    const document = await prisma.pdpDocument.findUnique({
+      where: { eventId },
+      select: { variant: true, status: true, content: true },
+    });
+    if (!document || document.status !== 'READY') return null;
+    return { variant: document.variant, content: document.content as PublicPdpDocumentDto['content'] };
+  } catch (error) {
+    console.warn('[public-event-pdp] optional document lookup failed', error);
+    return null;
+  }
 }
 
 async function resolveEvent(eventSlugOrId: string): Promise<EventRecord | null> {
@@ -1440,7 +1475,8 @@ function sourceLabel(sourceCode: string): string | null {
 }
 
 function cleanImportedDescription(value?: string | null): string | null {
-  const cleaned = String(value || '')
+  // Origin markers are internal pipeline artifacts; they never belong to public copy.
+  const cleaned = stripDescriptionOriginMarkers(value)
     .replace(/<script[\s\S]*?<\/script>/gi, ' ')
     .replace(/<style[\s\S]*?<\/style>/gi, ' ')
     .replace(/<\s*br\s*\/?>/gi, '\n')

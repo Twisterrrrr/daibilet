@@ -1,6 +1,9 @@
 ﻿# CI allowlist: stable logic tests (no hub packs / image inventory / TZ-sensitive venue slots).
 src/lib/admin-basic-auth.test.ts
 src/lib/admin-access.test.ts
+src/lib/admin-page-policy.test.ts
+src/lib/checkout-payment.test.ts
+src/server/admin-finance-actor.test.ts
 # Full suite: pnpm web:test вЂ” ~30 hub/content tests need refresh (tech debt).
 src/lib/catalog-date-rail.test.ts
 src/lib/catalog-exclude-landing-schema.test.ts
@@ -26,6 +29,7 @@ src/lib/place-slug-aliases.test.ts
 src/lib/podborki-city-seo.test.ts
 src/lib/region-child-city-scope.test.ts
 src/lib/remote-image-bypass.test.ts
+src/lib/teplohod-pdp-image-map.test.ts
 src/lib/review-rating.test.ts
 src/lib/robots-policy.test.ts
 src/lib/seo-listing-meta.test.ts
@@ -43,8 +47,27 @@ src/lib/venue-meta.park-monument.test.ts
 src/lib/og-image.test.ts
 src/lib/city-faq-ssr.test.tsx
 src/lib/city-suburbs-ssr.test.tsx
+src/lib/city-hub-lazy.test.ts
 src/lib/city-hub-registry.test.ts
 # Finance buyer DTO must preserve the separate issued ticket number.
 src/server/finance-checkout-client.test.ts
+src/server/checkout-order-access.test.ts
+app/api/public/checkout/yookassa/route.test.ts
+app/api/public/checkout/orders/[publicCode]/route.test.ts
+app/checkout/actions/order/route.test.ts
 # Support chat helpers: text sanitizing, visitor key guard, Telegram notification text.
 src/lib/chat.test.ts
+# Event copy must not store nearest-session dates (purchase block owns schedule).
+src/lib/event-description-session-lines.test.ts
+src/lib/event-description-format.test.ts
+src/lib/event-minimal-description.test.ts
+src/lib/city-timezone.test.ts
+# City-hub scenario links must point to a published blog article (no /blog 404).
+src/lib/city-hub-scenario-blog-links.test.ts
+# Concert cards lead with the artist/genre/venue instead of generated filler.
+src/lib/event-description-lead.test.ts
+src/lib/event-music-description.test.ts
+src/lib/event-not-found-similar.test.ts
+
+# Post-sync description composer (sanitization canon): determinism, fixed point, section labels.
+src/lib/event-description-compose.test.ts

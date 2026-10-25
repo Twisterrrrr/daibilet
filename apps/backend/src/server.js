@@ -5,10 +5,28 @@ import { readFile } from 'node:fs/promises';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { getAdminOrderDeleteGuard } from './admin-order-delete-guard.js';
+import { authorizeAdminSessionRequest } from './admin-rbac-guard.js';
+import { beginAdminMfaEnrollment, clearAdminMfaForSession, confirmAdminMfaEnrollment, verifyAdminMfaForSession } from './admin-mfa.js';
+import { adminRolesMayReadOrderPii } from './admin-rbac-policy.js';
+import { projectAdminOrdersPii } from './admin-order-pii.js';
+import {
+  ADMIN_SESSION_TTL_SECONDS,
+  assertAdminLoginRateLimit,
+  buildAdminSessionCookie,
+  buildClearAdminSessionCookie,
+  acceptAdminInvitation,
+  createAdminInvitation,
+  hashAdminSessionToken,
+  loginAdminUser,
+  parseAdminSessionToken,
+  resolveAdminSession,
+  revokeAdminSession,
+} from './admin-session-auth.js';
 import { createDb } from './db.js';
+import { PDP_VARIANTS, readPdpDocument, savePdpDocument } from './pdp-documents.js';
 import {
   buildAdminDashboard,
-  buildAdminBuyersList,
   buildAdminCitiesList,
   buildAdminCityDetail,
   updateAdminCity,
@@ -23,7 +41,6 @@ import {
   unarchiveAdminOrder,
   archiveAdminOrdersBulk,
   archiveStaleCancelledOrders,
-  deleteAdminOrder,
   buildAdminLandingsList,
   buildAdminSources,
   buildAdminTaxonomy,
@@ -72,6 +89,7 @@ import {
 } from './dto.js';
 import { buildPublicSearchDto } from './public-search.dto.ts';
 import { loadVenueMapTip } from './public-venue-map-tip.ts';
+import { buildPublicEventFreshnessMap, publicEventFreshnessPayload } from './public-event-freshness.ts';
 import {
   buildSocialPreviewForPath,
   isSocialPreviewAgent,
@@ -84,6 +102,7 @@ import {
   authenticateAccessToken,
   buildClearRefreshCookie,
   buildRefreshCookie,
+  createSiteUserEmailVerificationToken,
   loginSiteUser,
   logoutSiteUser,
   parseBearerToken,
@@ -91,7 +110,11 @@ import {
   refreshSiteUserSession,
   registerSiteUser,
   requireSiteUserFromRequest,
+  verifySiteUserEmail,
 } from './user-auth.js';
+import { sendSiteUserPasswordResetEmail, sendSiteUserVerifyEmail } from './user-email-mail.js';
+import { createSiteUserPasswordResetToken, requestSiteUserPasswordReset, resetSiteUserPassword } from './user-password-reset.js';
+import { buildUnifiedAdminBuyers } from './admin-buyers.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(dirname, '..', '..', '..');
@@ -128,6 +151,7 @@ let tepAutoSyncInFlight = false;
 let tepAutoSyncWarmTimer = null;
 
 const jsonCache = new Map();
+const prefetchedAdminJsonBodies = new WeakMap();
 const PUBLIC_RESPONSE_CACHE_MS = 5 * 60 * 1000;
 const PUBLIC_HTTP_CACHE_CONTROL = 'public, max-age=60, s-maxage=300, stale-while-revalidate=600';
 const MAX_PUBLIC_RESPONSE_CACHE_ENTRIES = 80;
@@ -151,7 +175,12 @@ function getAllowedOrigins() {
 function routeNeedsCredentials(request) {
   if (!request?.url) return false;
   const pathname = new URL(request.url, 'http://127.0.0.1').pathname;
-  return pathname.startsWith('/api/auth/') || pathname.startsWith('/api/account/') || pathname.startsWith('/api/user/auth/');
+  return (
+    pathname.startsWith('/api/auth/') ||
+    pathname.startsWith('/api/account/') ||
+    pathname.startsWith('/api/user/auth/') ||
+    pathname.startsWith('/api/admin/auth/')
+  );
 }
 
 function isCorsProtectedPath(pathname) {
@@ -232,10 +261,196 @@ export async function handleRequest(request, response) {
 
     const url = new URL(request.url || '/', `http://${request.headers.host || '127.0.0.1'}`);
     const route = `${request.method} ${url.pathname}`;
-
-    if (isProtectedPath(url.pathname) && !isAuthorizedAdminRequest(request)) {
-      sendAuthRequired(response);
+    const isAdminIdentityRoute = /^\/(?:api\/admin\/auth\/(?:login|me|logout|accept-invitation|invitations|mfa\/enroll|mfa\/confirm|mfa\/verify|mfa\/lock))$/.test(url.pathname);
+    const origin = String(request.headers.origin || '').trim();
+    if (isAdminIdentityRoute && origin && !getAllowedOrigins().includes(origin)) {
+      sendJson(response, { error: 'admin_auth_origin_denied' }, 403);
       return;
+    }
+
+    if (route === 'POST /api/admin/auth/login') {
+      try {
+        const ip = String(request.headers['x-real-ip'] || request.socket.remoteAddress || 'unknown');
+        assertAdminLoginRateLimit(`ip:${ip}`, 30);
+        const body = await readJsonBody(request, 8192);
+        const email = String(body?.email || '').trim().toLowerCase();
+        assertAdminLoginRateLimit(`email:${email}`, 8);
+        const session = await loginAdminUser(db, body?.email, body?.password, {
+          correlationId: String(request.headers['x-request-id'] || '').slice(0, 120) || null,
+        });
+        sendJson(response, { user: session.user, expiresAt: session.expiresAt.toISOString() }, 200, {
+          'Set-Cookie': buildAdminSessionCookie(session.token, ADMIN_SESSION_TTL_SECONDS),
+        });
+      } catch (error) {
+        const statusCode = Number(error.statusCode) || 500;
+        const message = statusCode === 401 || statusCode === 429 || statusCode === 400 || statusCode === 413
+          ? error.message
+          : 'Не удалось выполнить вход.';
+        sendJson(response, { error: message }, statusCode);
+      }
+      return;
+    }
+
+    if (route === 'GET /api/admin/auth/me') {
+      try {
+        const token = parseAdminSessionToken(request.headers.cookie || '');
+        const user = await resolveAdminSession(db, token);
+        if (!user) {
+          sendJson(response, { error: 'admin_session_required' }, 401, { 'Set-Cookie': buildClearAdminSessionCookie() });
+          return;
+        }
+        sendJson(response, { user });
+      } catch {
+        sendJson(response, { error: 'admin_session_check_failed' }, 500);
+      }
+      return;
+    }
+
+    if (route.startsWith('POST /api/admin/auth/mfa/')) {
+      try {
+        const ip = String(request.headers['x-real-ip'] || request.socket.remoteAddress || 'unknown');
+        assertAdminLoginRateLimit(`mfa-ip:${ip}`, 30);
+        const actor = await resolveAdminSession(db, parseAdminSessionToken(request.headers.cookie || ''));
+        if (!actor) {
+          sendJson(response, { error: 'admin_session_required' }, 401);
+          return;
+        }
+        assertAdminLoginRateLimit(`mfa-user:${actor.id}`, 8);
+        if (route === 'POST /api/admin/auth/mfa/enroll') {
+          const enrollment = await beginAdminMfaEnrollment(db, actor);
+          sendJson(response, { enrollment });
+          return;
+        }
+        if (route === 'POST /api/admin/auth/mfa/confirm') {
+          const body = await readJsonBody(request, 4096);
+          const result = await confirmAdminMfaEnrollment(db, actor, body?.code);
+          sendJson(response, result);
+          return;
+        }
+        if (route === 'POST /api/admin/auth/mfa/verify') {
+          const body = await readJsonBody(request, 4096);
+          const result = await verifyAdminMfaForSession(db, actor, body?.code);
+          sendJson(response, result);
+          return;
+        }
+        if (route === 'POST /api/admin/auth/mfa/lock') {
+          sendJson(response, await clearAdminMfaForSession(db, actor));
+          return;
+        }
+      } catch (error) {
+        const statusCode = Number(error.statusCode) || 500;
+        sendJson(response, { error: statusCode < 500 ? error.message : 'Не удалось выполнить операцию двухфакторной защиты.' }, statusCode);
+      }
+      return;
+    }
+
+    if (route === 'POST /api/admin/auth/invitations') {
+      try {
+        assertAdminLoginRateLimit(`invite-ip:${String(request.headers['x-real-ip'] || request.socket.remoteAddress || 'unknown')}`, 30);
+        const actor = await resolveAdminSession(db, parseAdminSessionToken(request.headers.cookie || ''));
+        if (!actor) {
+          sendJson(response, { error: 'admin_session_required' }, 401);
+          return;
+        }
+        const body = await readJsonBody(request, 8192);
+        const invitation = await createAdminInvitation(db, actor, body);
+        sendJson(response, {
+          ok: true,
+          invitation: {
+            id: invitation.invitationId,
+            email: invitation.email,
+            displayName: invitation.displayName,
+            roles: invitation.roles,
+            expiresAt: invitation.expiresAt.toISOString(),
+            inviteToken: invitation.token,
+          },
+          tokenHandling: 'Show this invitation token once and deliver it to the recipient through a trusted channel.',
+        }, 201);
+      } catch (error) {
+        const statusCode = Number(error.statusCode) || 500;
+        sendJson(response, {
+          error: statusCode < 500 ? error.message : 'Не удалось создать приглашение.',
+        }, statusCode);
+      }
+      return;
+    }
+
+    if (route === 'POST /api/admin/auth/accept-invitation') {
+      try {
+        assertAdminLoginRateLimit(`accept-ip:${String(request.headers['x-real-ip'] || request.socket.remoteAddress || 'unknown')}`, 20);
+        const body = await readJsonBody(request, 8192);
+        const inviteToken = String(body?.token || '');
+        assertAdminLoginRateLimit(`accept-token:${hashAdminSessionToken(inviteToken)}`, 8);
+        const accepted = await acceptAdminInvitation(db, inviteToken, body?.password);
+        sendJson(response, { user: accepted.user, expiresAt: accepted.expiresAt.toISOString() }, 201, {
+          'Set-Cookie': buildAdminSessionCookie(accepted.token, ADMIN_SESSION_TTL_SECONDS),
+        });
+      } catch (error) {
+        const statusCode = Number(error.statusCode) || 500;
+        const message = statusCode < 500 ? error.message : 'Не удалось принять приглашение.';
+        sendJson(response, { error: message }, statusCode);
+      }
+      return;
+    }
+
+    if (route === 'POST /api/admin/auth/logout') {
+      try {
+        const token = parseAdminSessionToken(request.headers.cookie || '');
+        await revokeAdminSession(db, token);
+        sendJson(response, { ok: true }, 200, { 'Set-Cookie': buildClearAdminSessionCookie() });
+      } catch {
+        sendJson(response, { error: 'admin_logout_failed' }, 500, { 'Set-Cookie': buildClearAdminSessionCookie() });
+      }
+      return;
+    }
+
+    if (isProtectedPath(url.pathname)) {
+      if (process.env.DAIBILET_ADMIN_RBAC_ENFORCE === '1') {
+        const payloadAwareArticleWrite = route === 'POST /api/admin/articles' || /^PATCH \/api\/admin\/articles\/[^/]+$/.test(route);
+        const payloadAwareEventOverride = /^PATCH \/api\/admin\/events\/[^/]+\/override$/.test(route);
+        let authenticatedActor = request.adminSessionUser || null;
+        let policyContext;
+        if (payloadAwareArticleWrite || payloadAwareEventOverride) {
+          if (!authenticatedActor) {
+            const identity = await authorizeAdminSessionRequest(request, db, { skipPolicy: true });
+            if (!identity.authorized) {
+              sendJson(response, { error: identity.error }, identity.statusCode);
+              return;
+            }
+            authenticatedActor = identity.actor;
+          }
+          try {
+            const parsedBody = await readJsonBody(request);
+            const body = parsedBody && typeof parsedBody === 'object' && !Array.isArray(parsedBody)
+              ? parsedBody
+              : {};
+            prefetchedAdminJsonBodies.set(request, body);
+            policyContext = { body };
+            if (payloadAwareArticleWrite && request.method === 'PATCH') {
+              const articleId = decodeURIComponent(url.pathname.slice('/api/admin/articles/'.length));
+              const current = await db.query(
+                'select status, "isFeatured" from "Article" where id = $1 limit 1',
+                [articleId],
+              );
+              policyContext.existingArticle = current.rows[0] || null;
+            }
+          } catch {
+            sendJson(response, { error: 'invalid_json' }, 400);
+            return;
+          }
+        }
+        const authorization = await authorizeAdminSessionRequest(request, db, {
+          policyContext,
+          actor: authenticatedActor || undefined,
+        });
+        if (!authorization.authorized) {
+          sendJson(response, { error: authorization.error }, authorization.statusCode);
+          return;
+        }
+      } else if (!isAuthorizedAdminRequest(request)) {
+        sendAuthRequired(response);
+        return;
+      }
     }
 
     if (route === 'GET /api/health') {
@@ -381,6 +596,11 @@ export async function handleRequest(request, response) {
       return;
     }
 
+    if (route === 'GET /api/public/events/freshness') {
+      sendPublicJson(response, publicEventFreshnessPayload(await buildPublicEventFreshnessMap()));
+      return;
+    }
+
     if (route === 'GET /api/public/events') {
       if (url.searchParams.get('refresh') === '1') {
         publicResponseCache.clear();
@@ -495,10 +715,86 @@ export async function handleRequest(request, response) {
       return;
     }
 
+    if (route === 'POST /api/user/auth/request-email-verification') {
+      try {
+        const user = await requireSiteUserFromRequest(db, request);
+        if (user.emailVerifiedAt) {
+          sendJson(response, { sent: false, alreadyVerified: true });
+          return;
+        }
+        assertAuthRateLimit(`verify-email:${user.id}`, 3);
+        const siteUrl = String(process.env.PUBLIC_SITE_URL || 'https://daibilet.ru').replace(/\/$/, '');
+        const token = createSiteUserEmailVerificationToken(user.id);
+        const verifyUrl = `${siteUrl}/account/verify-email?token=${encodeURIComponent(token)}`;
+        const result = await sendSiteUserVerifyEmail({ to: user.email, verifyUrl });
+        if (!result.sent) {
+          sendJson(response, { error: 'verification_email_unavailable' }, 503);
+          return;
+        }
+        sendJson(response, { sent: true });
+      } catch (error) {
+        sendJson(response, { error: error.message || 'verification_request_failed' }, error.statusCode || 400);
+      }
+      return;
+    }
+
+    if (route === 'POST /api/user/auth/verify-email') {
+      try {
+        const body = await readJsonBody(request);
+        sendJson(response, await verifySiteUserEmail(db, body?.token));
+      } catch (error) {
+        sendJson(response, { error: error.message || 'email_verification_failed' }, error.statusCode || 400);
+      }
+      return;
+    }
+
+    if (route === 'POST /api/user/auth/request-password-reset') {
+      try {
+        if (!process.env.SMTP_HOST || !process.env.SMTP_FROM) {
+          sendJson(response, { error: 'Восстановление пароля временно недоступно.' }, 503);
+          return;
+        }
+        const clientIp = String(request.headers['x-real-ip'] || request.socket.remoteAddress || 'unknown');
+        assertAuthRateLimit(`password-reset-ip:${clientIp}`, 10);
+        const body = await readJsonBody(request);
+        const email = String(body?.email || '').trim().toLowerCase();
+        if (email.length > 254) {
+          sendJson(response, { accepted: true });
+          return;
+        }
+        assertAuthRateLimit(`password-reset-email:${email}`, 3);
+        const user = await requestSiteUserPasswordReset(db, email);
+        if (user) {
+          const siteUrl = String(process.env.PUBLIC_SITE_URL || 'https://daibilet.ru').replace(/\/$/, '');
+          const audience = body?.audience === 'supplier' ? 'supplier' : 'buyer';
+          const supplierUrl = String(process.env.SUPPLIER_PORTAL_BASE_URL || 'https://supplier.daibilet.ru').replace(/\/$/, '');
+          const baseUrl = audience === 'supplier' ? supplierUrl : siteUrl;
+          const path = audience === 'supplier' ? '/' : '/reset-password';
+          const resetUrl = `${baseUrl}${path}?reset=${encodeURIComponent(createSiteUserPasswordResetToken(user))}`;
+          const delivery = await sendSiteUserPasswordResetEmail({ to: user.email, resetUrl });
+          if (!delivery.sent) console.error('[password-reset] delivery_failed');
+        }
+        sendJson(response, { accepted: true });
+      } catch (error) {
+        sendJson(response, { error: error.message || 'password_reset_request_failed' }, error.statusCode || 400);
+      }
+      return;
+    }
+
+    if (route === 'POST /api/user/auth/reset-password') {
+      try {
+        const body = await readJsonBody(request);
+        sendJson(response, await resetSiteUserPassword(db, body?.token, body?.password));
+      } catch (error) {
+        sendJson(response, { error: error.message || 'password_reset_failed' }, error.statusCode || 400);
+      }
+      return;
+    }
+
     if (route === 'GET /api/account/purchases') {
       try {
         const user = await requireSiteUserFromRequest(db, request);
-        sendJson(response, await buildAccountPurchases(db, user.email, url.searchParams));
+        sendJson(response, await buildAccountPurchases(db, user.emailVerifiedAt ? user.email : '', url.searchParams));
       } catch (error) {
         sendJson(response, { error: error.message || 'unauthorized' }, error.statusCode || 401);
       }
@@ -509,7 +805,9 @@ export async function handleRequest(request, response) {
     if (accountOrderMatch) {
       try {
         const user = await requireSiteUserFromRequest(db, request);
-        const detail = await buildAccountOrderDetail(db, user.email, decodeURIComponent(accountOrderMatch[1]));
+        const detail = user.emailVerifiedAt
+          ? await buildAccountOrderDetail(db, user.email, decodeURIComponent(accountOrderMatch[1]))
+          : null;
         sendJson(response, detail || { error: 'order_not_found' }, detail ? 200 : 404);
       } catch (error) {
         sendJson(response, { error: error.message || 'unauthorized' }, error.statusCode || 401);
@@ -618,7 +916,11 @@ export async function handleRequest(request, response) {
     }
 
     if (route === 'GET /api/admin/orders' || route === 'GET /api/admin/external-orders') {
-      sendJson(response, await buildAdminOrdersList(db, url.searchParams));
+      const canReadPii = request.adminSessionUser
+        ? adminRolesMayReadOrderPii(request.adminSessionUser.roles)
+        : false;
+      const orders = await buildAdminOrdersList(db, url.searchParams, { includePiiSearch: canReadPii });
+      sendJson(response, projectAdminOrdersPii(orders, canReadPii));
       return;
     }
 
@@ -651,25 +953,24 @@ export async function handleRequest(request, response) {
       return;
     }
 
-    const orderDeleteMatch = request.method === 'DELETE' ? url.pathname.match(/^\/api\/admin\/orders\/([^/]+)$/) : null;
-    if (orderDeleteMatch) {
-      try {
-        sendJson(response, await deleteAdminOrder(db, decodeURIComponent(orderDeleteMatch[1])));
-      } catch (error) {
-        sendJson(response, { error: error.message || 'delete_failed' }, error.statusCode || 400);
-      }
+    const orderDeleteGuard = getAdminOrderDeleteGuard(request.method, url.pathname);
+    if (orderDeleteGuard) {
+      sendJson(response, orderDeleteGuard.body, orderDeleteGuard.statusCode);
       return;
     }
 
     if (route === 'GET /api/admin/buyers') {
-      sendJson(response, await buildAdminBuyersList(db, url.searchParams));
+      sendJson(response, await buildUnifiedAdminBuyers(db, url.searchParams));
       return;
     }
 
     const orderDetailMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/admin\/orders\/([^/]+)$/) : null;
     if (orderDetailMatch) {
       const detail = await buildAdminOrderDetail(db, decodeURIComponent(orderDetailMatch[1]));
-      sendJson(response, detail || { error: 'order_not_found' }, detail ? 200 : 404);
+      const canReadPii = request.adminSessionUser
+        ? adminRolesMayReadOrderPii(request.adminSessionUser.roles)
+        : false;
+      sendJson(response, detail ? projectAdminOrdersPii(detail, canReadPii) : { error: 'order_not_found' }, detail ? 200 : 404);
       return;
     }
 
@@ -743,6 +1044,27 @@ export async function handleRequest(request, response) {
 
     if (route === 'GET /api/admin/venues') {
       sendJson(response, await buildAdminVenuesList(db, url.searchParams));
+      return;
+    }
+
+    if (route === 'GET /api/admin/pdp/variants') {
+      sendJson(response, PDP_VARIANTS);
+      return;
+    }
+
+    const pdpMatch = url.pathname.match(/^\/api\/admin\/pdp\/(venues|events)\/([^/]+)$/);
+    if (pdpMatch && (request.method === 'GET' || request.method === 'PUT')) {
+      const entity = pdpMatch[1];
+      const id = decodeURIComponent(pdpMatch[2]);
+      try {
+        const result = request.method === 'GET'
+          ? await readPdpDocument(db, entity, id)
+          : await savePdpDocument(db, entity, id, await readJsonBody(request));
+        if (request.method === 'PUT' && result) invalidatePublicCaches('pdp document update');
+        sendJson(response, result, result || request.method === 'GET' ? 200 : 404);
+      } catch (error) {
+        sendJson(response, { error: error instanceof Error ? error.message : 'invalid_pdp_document' }, 400);
+      }
       return;
     }
 
@@ -831,7 +1153,14 @@ export async function handleRequest(request, response) {
     const eventOverrideMatch = request.method === 'PATCH' ? url.pathname.match(/^\/api\/admin\/events\/([^/]+)\/override$/) : null;
     if (eventOverrideMatch) {
       const eventId = decodeURIComponent(eventOverrideMatch[1]);
-      const result = await updateAdminEventOverride(db, eventId, await readJsonBody(request));
+      let result;
+      try {
+        result = await updateAdminEventOverride(db, eventId, await readJsonBody(request));
+      } catch (error) {
+        if (error?.statusCode !== 404 && error?.statusCode !== 422) throw error;
+        sendJson(response, { error: error.message }, error.statusCode);
+        return;
+      }
       const slugRow = await db.query('select slug from "Event" where id = $1 limit 1', [eventId]).catch(() => null);
       invalidatePublicCaches('event override update', { slug: slugRow?.rows?.[0]?.slug });
       sendJson(response, result);
@@ -842,7 +1171,14 @@ export async function handleRequest(request, response) {
     if (eventModerationMatch) {
       const eventId = decodeURIComponent(eventModerationMatch[1]);
       const body = await readJsonBody(request);
-      const result = await updateAdminEventOverride(db, eventId, { editorStatus: body.editorStatus });
+      let result;
+      try {
+        result = await updateAdminEventOverride(db, eventId, { editorStatus: body.editorStatus });
+      } catch (error) {
+        if (error?.statusCode !== 404 && error?.statusCode !== 422) throw error;
+        sendJson(response, { error: error.message }, error.statusCode);
+        return;
+      }
       const slugRow = await db.query('select slug from "Event" where id = $1 limit 1', [eventId]).catch(() => null);
       invalidatePublicCaches('event moderation update', { slug: slugRow?.rows?.[0]?.slug });
       sendJson(response, result);
@@ -1349,10 +1685,23 @@ function trimPublicResponseCache() {
   }
 }
 
-async function readJsonBody(request) {
+async function readJsonBody(request, maxBytes = Number.POSITIVE_INFINITY) {
+  if (prefetchedAdminJsonBodies.has(request)) return prefetchedAdminJsonBodies.get(request);
   const chunks = [];
+  let totalBytes = 0;
+  let tooLarge = false;
   for await (const chunk of request) {
+    totalBytes += Buffer.byteLength(chunk);
+    if (totalBytes > maxBytes) {
+      tooLarge = true;
+      continue;
+    }
     chunks.push(chunk);
+  }
+  if (tooLarge) {
+    const error = new Error('request_body_too_large');
+    error.statusCode = 413;
+    throw error;
   }
   if (!chunks.length) return {};
   return JSON.parse(Buffer.concat(chunks).toString('utf8'));
@@ -1928,6 +2277,7 @@ function appendCliArg(args, key, value) {
 }
 
 function isProtectedPath(pathname) {
+  if (/^\/api\/admin\/auth\/(?:login|me|logout|accept-invitation|invitations)$/.test(pathname)) return false;
   return (
     pathname === '/api/db/stats' ||
     pathname === '/api/db/events' ||

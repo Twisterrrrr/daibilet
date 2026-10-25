@@ -1,5 +1,5 @@
 [Unit]
-Description=Daily Daibilet staging web disk maintenance
+Description=Daily Daibilet staging web cache maintenance
 
 [Timer]
 OnCalendar=*-*-* 04:20:00

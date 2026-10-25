@@ -1,6 +1,6 @@
 # UI-RBAC-0: карта страниц, действий и API админки
 
-Дата: 2026-10-15. Автор: Cline (UI-инвентаризация). Решения по GAP приняты Codex 2026-10-16; карта остаётся входом для server guards, а не свидетельством действующего RBAC.
+Дата: 2026-10-15. Автор: Cline (UI-инвентаризация). Решения по GAP приняты Codex 2026-10-16. С 2026-10-25 Next server actions проверяют перечисленные права через персональную сессию; direct-Prisma страницы чата и hero-banners также ограничены на сервере. Backend endpoint enforcement остаётся opt-in до закрытия оставшихся gaps.
 
 Источники: `apps/web/app/(admin)/admin`, `apps/web/src/server/admin-*.ts`, словарь прав `packages/contracts/src/admin-access.ts` (`ADMIN_PERMISSIONS`, `ADMIN_ROLES`), проект RBAC [admin-rbac-design-2026-10.md](./admin-rbac-design-2026-10.md).
 
@@ -90,6 +90,12 @@
 | `sendAdminChatMessage` | chat-actions | контакт | `support.write` | прямой Prisma-запрос в Next | action 403; до персональных сессий отдельная повторная проверка Basic Auth |
 | `saveAdminVenueAction` | admin-venue-actions | публичные | `catalog.edit` | `PATCH /api/admin/venues/:id` | action 403 |
 
+### Реализация server guards (2026-10-25)
+
+Все перечисленные Next server actions вызывают общий `requireAdminPermissions` до сетевого вызова или записи. Проверяется актуальная персональная сессия через backend `/api/admin/auth/me`; invalid session закрывает операцию. Когда `DAIBILET_ADMIN_RBAC_ENFORCE` выключен, действующий legacy Basic Auth временно считается SUPERADMIN. Прямые Prisma-экраны чата и hero-banners проверяют права до чтения: `support.read` и `content.read`; ответ в чате требует `support.write`, переключение hero-баннера — `content.publish`.
+
+Backend guard для article save и event override использует фактический payload: для override permission определяется отдельно для каждого поля; для статьи проверяются итоговые status/featured и текущие значения записи. Next action для override также проверяет право выбранной секции. Archive читает текущий статус и требует `content.publish`, если снимает опубликованную или featured статью.
+
 ## 3. Экспорты
 
 В текущем UI экспортов нет. Право `orders.export` зарезервировано под будущий экспорт заказов: при появлении кнопки экспорт получает собственную строку в таблице 2 и проверку на server action/endpoint (кнопка без права скрывается, прямой вызов - 403).
@@ -114,7 +120,7 @@
 ## 5. Решения по шести GAP
 
 1. **Операции с заказами:** добавить `orders.manage` для архива и ticket-link. На первом выпуске оно есть только у SUPERADMIN; после аудита действий его можно разделить на более узкие права.
-2. **Жёсткое удаление заказа:** не добавлять `orders.delete`. Убрать кнопку и закрыть DELETE endpoint при переходе на RBAC. Исправление ошибочного импорта делать отдельной обслуживающей процедурой с журналом, не действием из карточки.
+2. **Жёсткое удаление заказа:** не добавлять `orders.delete`. Кнопка и server action удалены; backend отвечает 403 на DELETE endpoint. Исправление ошибочного импорта делать отдельной обслуживающей процедурой с журналом, не действием из карточки.
 3. **Отмена неоплаченного:** добавить отдельное `orders.cancel` для FINANCE и SUPERADMIN. Отмена брони не равна исполнению денежного возврата; `refunds.execute` остаётся самостоятельным правом.
 4. **Матчи лендинга:** `seo.edit`. Операция управляет составом SEO-подборки, не полями исходного события.
 5. **Статьи:** при сохранении целевого состояния `PUBLISHED` или `isFeatured=true` сервер требует `content.publish`, включая редактирование уже опубликованного материала. Для черновика достаточно `content.edit`. Проверять итоговое состояние после объединения с текущими данными, а не доверять только присланным полям формы.
@@ -132,7 +138,7 @@
 
 ## 7. Ограничения карты
 
-- Инвентаризация сделана по коду Next-слоя (`apps/web`). Реальная проверка прав должна повторяться на catalog API и finance API (срезы 2-4 плана): server action сам по себе не boundary, если backend принимает общий Basic Auth.
+- Инвентаризация сделана по коду Next-слоя (`apps/web`). Реальная проверка прав должна повторяться на catalog API и finance API: server actions теперь проверяют права до вызова, но backend endpoints должны оставаться самостоятельной границей, в том числе при прямых запросах.
 - Идентичность сотрудника для finance host сейчас не передаётся (сервисный токен) - см. finance bridge (срез 4).
-- `hero-banners` читает и пишет Prisma напрямую в обход API - при внедрении guards либо перенести на catalog API, либо накладывать guard в server action.
-- Чат поддержки также читает и пишет Prisma прямо из Next. Публичные `POST /support/chat/messages` и отправка посетителя через server action не получают admin-права: посетитель предъявляет случайный ключ диалога, ввод ограничен по длине и частоте. Admin страницы требуют `support.read`, ответ — `support.write`; Basic Auth остаётся временным до персональных сессий.
+- `hero-banners` читает и пишет Prisma напрямую в обход API; Next server page/action теперь проверяют соответственно `content.read` и `content.publish`. Перенос на backend API остаётся желательным для единой audit boundary.
+- Чат поддержки читает и пишет Prisma прямо из Next; страницы требуют `support.read`, ответ — `support.write`. Публичные `POST /support/chat/messages` и отправка посетителя через server action не получают admin-права: посетитель предъявляет случайный ключ диалога, ввод ограничен по длине и частоте. Backend enforcement всё ещё требуется, чтобы прямые запросы и любые обходы Next имели ту же политику.

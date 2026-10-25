@@ -63,10 +63,12 @@ function internalToBuyerOrder(row: BuyerInternalOrderRecord): BuyerOrder {
   };
 }
 
-function widgetToBuyerOrder(row: BuyerOrder): BuyerOrder {
+function widgetToBuyerOrder(
+  row: Omit<BuyerOrder, 'sourceKind'> & { sourceKind?: 'widget' | 'internal' | 'external' },
+): BuyerOrder {
   return {
     ...row,
-    sourceKind: row.sourceKind || 'widget',
+    sourceKind: row.sourceKind === 'internal' ? 'internal' : 'widget',
   };
 }
 

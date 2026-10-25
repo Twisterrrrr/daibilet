@@ -1,5 +1,6 @@
 import { asNumber } from '@/lib/admin-ui';
 import { adminApiFetch } from '@/server/admin-api-fetch';
+import { issueCurrentAdminFinanceAssertion } from '@/server/admin-finance-actor';
 import { mergeAdminOrderPage } from '@/server/admin-order-merge';
 
 export type AdminOrderListRow = {
@@ -94,12 +95,14 @@ export type InternalAdminOrderDetail = {
 };
 
 export async function loadInternalAdminOrderDetail(code: string): Promise<{ detail: InternalAdminOrderDetail | null; error: string | null }> {
+  const admin = await issueCurrentAdminFinanceAssertion();
+  if (!admin) return { detail: null, error: 'Требуется действующая персональная сессия сотрудника.' };
   const base = process.env.FINANCE_API_BASE_URL || '';
   const token = process.env.DAIBILET_FINANCE_ADMIN_READ_TOKEN || '';
   if (!base || !token) return { detail: null, error: 'Подключение к финконтуру не настроено.' };
   try {
     const url = new URL(`/api/internal/admin/orders/${encodeURIComponent(code)}`, base);
-    const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: AbortSignal.timeout(8_000) });
+    const response = await fetch(url, { headers: { Authorization: `Bearer ${token}`, 'X-Daibilet-Admin-Assertion': admin.assertion }, cache: 'no-store', signal: AbortSignal.timeout(8_000) });
     if (response.status === 404) return { detail: null, error: 'Заказ не найден.' };
     if (!response.ok) return { detail: null, error: `Финконтур ответил HTTP ${response.status}.` };
     const raw = await response.json() as Record<string, unknown>;
@@ -264,6 +267,8 @@ async function loadCombinedAdminOrders(searchParams: {
 }
 
 async function loadFinanceAdminOrders(params: URLSearchParams): Promise<AdminOrdersListData> {
+  const admin = await issueCurrentAdminFinanceAssertion();
+  if (!admin) return emptyOrders(['Внутренние заказы доступны по персональной сессии сотрудника.']);
   const base = process.env.FINANCE_API_BASE_URL || '';
   const token = process.env.DAIBILET_FINANCE_ADMIN_READ_TOKEN || '';
   if (!base || !token) return emptyOrders(['Внутренние заказы: защищённое подключение к финконтуру не настроено.']);
@@ -271,7 +276,7 @@ async function loadFinanceAdminOrders(params: URLSearchParams): Promise<AdminOrd
     const url = new URL('/api/internal/admin/orders', base);
     url.search = params.toString();
     const response = await fetch(url, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${token}`, 'X-Daibilet-Admin-Assertion': admin.assertion },
       cache: 'no-store',
       signal: AbortSignal.timeout(8_000),
     });

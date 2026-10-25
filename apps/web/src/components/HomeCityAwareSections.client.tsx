@@ -1,7 +1,5 @@
 'use client';
 
-import type { ReactNode } from 'react';
-
 import { HomeEventRail, HomeNowSection } from '@/components/HomeNowSection.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { PublicCatalogListItemDto, PublicSessionDto } from '@daibilet/contracts/public';
@@ -20,15 +18,12 @@ export function HomeCityAwareSections({
   homeNowTabs,
   sparseCatalog,
   ssrCityName = null,
-  children,
 }: {
   editorsPick: PublicSession[];
   homeNowTabs: HomeNowTab[];
   sparseCatalog: boolean;
   /** Cookie city used for the SSR catalog - keep copy stable until header catches up. */
   ssrCityName?: string | null;
-  /** Inserted after «Выбор редакции» (e.g. popular cities). Must be ReactNode - not a render prop (RSC). */
-  children?: ReactNode;
 }) {
   const selectedCity = useSelectedCityOptional();
   const cityReady = selectedCity?.cityReady ?? true;
@@ -60,18 +55,6 @@ export function HomeCityAwareSections({
         sectionClassName={showEditorsPick ? 'max-sm:!pt-[calc(var(--space-section)/2)]' : undefined}
       />
 
-      {children ? (
-        <div
-          className={
-            showEditorsPick
-              ? undefined
-              : '[&_[data-home-band=full-bleed]]:!pt-[calc(var(--space-section)/2)] sm:[&_[data-home-band=full-bleed]]:!pt-[calc(var(--space-section-lg)/2)]'
-          }
-        >
-          {children}
-        </div>
-      ) : null}
-
       {homeNowTabs.length ? (
         <HomeNowSection
           tabs={homeNowTabs}
@@ -79,6 +62,7 @@ export function HomeCityAwareSections({
           sectionSubtitle={`События с фото и ближайшими датами${cityHint}`}
         />
       ) : null}
+
     </>
   );
 }

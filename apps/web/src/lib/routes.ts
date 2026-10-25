@@ -36,6 +36,41 @@ export function citySlug(city: CityRouteSource): string {
   return normalizeSlug(city.name) || 'city';
 }
 
+/**
+ * Keep city canonicals on the public Latin route when stored metadata points
+ * back to the same city through a legacy Cyrillic/alias URL. Explicit
+ * cross-city canonical overrides remain intact.
+ */
+export function cityCanonicalPath(
+  city: CityRouteSource & { canonicalPath?: string | null },
+): string {
+  const href = cityHref(city);
+  const stored = String(city.canonicalPath || '').trim();
+  if (!stored) return href;
+
+  let pathname = stored;
+  try {
+    pathname = new URL(stored, 'https://daibilet.ru').pathname;
+  } catch {
+    return href;
+  }
+
+  const match = pathname.match(/^\/cities\/([^/]+)\/?$/i);
+  if (!match) return stored;
+
+  let storedSlug = match[1];
+  try {
+    storedSlug = decodeURIComponent(storedSlug);
+  } catch {
+    // Keep the raw segment; normalizeSlug will safely reduce it below.
+  }
+
+  const aliases = [city.slug, city.sourceSlug, city.name]
+    .map((value) => normalizeSlug(value))
+    .filter(Boolean);
+  return aliases.includes(normalizeSlug(storedSlug)) ? href : stored;
+}
+
 /** Афиша города — расписание событий на странице CityPage. */
 export function cityEventsHref(city: CityRouteSource): string {
   return `${cityHref(city)}#affiche`;

@@ -6,7 +6,7 @@ import { ArrowUpRight, MapPin, Route } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import { CollectRouteCtaHint } from '@/components/CollectRouteCtaHint.client';
-import { SafeImage } from '@/components/SafeImage.client';
+import { BlogCardSafeImage, CardSafeImage, SafeImage } from '@/components/SafeImage.client';
 import type { CityDayRoutePreset, CityMustSeeItem } from '@/lib/cityInfo';
 import { blogCoverUrl } from '@/lib/blog-cover';
 import { isLabelCardVenueStub } from '@/lib/city-place-images';
@@ -472,13 +472,31 @@ export function CityDayPresetBlock({
                 }
               >
                 {cover ? (
-                  <SafeImage
-                    src={cover}
-                    alt=""
-                    fill
-                    sizes={hubMagazine ? '15rem' : '11rem'}
-                    className="object-cover"
-                  />
+                  cover.startsWith('/images/blog/') ? (
+                    <BlogCardSafeImage
+                      coverImageUrl={cover}
+                      alt=""
+                      fill
+                      sizes={hubMagazine ? '15rem' : '11rem'}
+                      className="object-cover"
+                    />
+                  ) : cover.startsWith('/images/venues/') ? (
+                    <CardSafeImage
+                      src={cover}
+                      alt=""
+                      fill
+                      sizes={hubMagazine ? '15rem' : '11rem'}
+                      className="object-cover"
+                    />
+                  ) : (
+                    <SafeImage
+                      src={cover}
+                      alt=""
+                      fill
+                      sizes={hubMagazine ? '15rem' : '11rem'}
+                      className="object-cover"
+                    />
+                  )
                 ) : (
                   <span
                     className={`absolute inset-0 bg-gradient-to-br ${gradient}`}

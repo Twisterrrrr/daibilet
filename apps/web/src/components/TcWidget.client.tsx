@@ -606,7 +606,6 @@ export function TcWidgetButton({
         aria-hidden="true"
         tabIndex={-1}
       >
-        {label}
       </button>
     </>
   );

@@ -24,6 +24,11 @@ export async function adminApiFetch(apiPath: string, init?: RequestInit): Promis
   if (authorization && !reqHeaders.has('authorization')) {
     reqHeaders.set('authorization', authorization);
   }
+  const adminSession = String(incoming.get('cookie') || '')
+    .split(';')
+    .map((part) => part.trim())
+    .find((part) => part.startsWith('daibilet_admin_session='));
+  if (adminSession && !reqHeaders.has('cookie')) reqHeaders.set('cookie', adminSession);
 
   return fetch(`${base}${path}`, {
     ...init,

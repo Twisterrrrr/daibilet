@@ -160,6 +160,38 @@ export async function pollCheckoutOrderUntilTerminal(
   }
 }
 
+/** Start background polling while an embedded checkout widget is open. */
+export function watchCheckoutPayment(options: {
+  read: (signal: AbortSignal) => Promise<{ status?: string | null; payment?: { status?: string | null } | null }>;
+  onSettled: () => void;
+  onTimeout: () => void;
+  intervalMs?: number;
+  requestTimeoutMs?: number;
+  maxDurationMs?: number;
+}): () => void {
+  const controller = new AbortController();
+  void pollCheckoutOrderUntilTerminal({
+    publicCode: '',
+    lookup: async (_publicCode, signal) => {
+      const order = await options.read(signal);
+      return {
+        found: true,
+        status: order.payment?.status || order.status || null,
+        order,
+      };
+    },
+    intervalMs: options.intervalMs,
+    requestTimeoutMs: options.requestTimeoutMs,
+    maxDurationMs: options.maxDurationMs,
+    signal: controller.signal,
+  }).then((result) => {
+    if (controller.signal.aborted) return;
+    if (result.ok) options.onSettled();
+    else if (result.reason === 'deadline') options.onTimeout();
+  });
+  return () => controller.abort();
+}
+
 export function pickCheckoutConfirmation(payment: {
   confirmationMode?: string | null;
   confirmationToken?: string | null;
@@ -192,17 +224,21 @@ export function pickCheckoutConfirmation(payment: {
   };
 }
 
+export type YooKassaWidgetInstance = {
+  render: (elementId: string) => Promise<void> | void;
+  destroy: () => void;
+  on: (event: string, handler: (...args: unknown[]) => void) => void;
+};
+
+export type YooKassaWidgetConstructor = new (options: {
+  confirmation_token: string;
+  error_callback?: (error: unknown) => void;
+  customization?: { colors?: { control_primary?: string; background?: string } };
+}) => YooKassaWidgetInstance;
+
 declare global {
   interface Window {
-    YooMoneyCheckoutWidget?: new (options: {
-      confirmation_token: string;
-      error_callback?: (error: unknown) => void;
-      customization?: Record<string, unknown>;
-    }) => {
-      render: (elementId: string) => Promise<void> | void;
-      destroy?: () => void;
-      on?: (event: string, handler: (...args: unknown[]) => void) => void;
-    };
+    YooMoneyCheckoutWidget?: YooKassaWidgetConstructor;
   }
 }
 

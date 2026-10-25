@@ -1,4 +1,13 @@
 # Текущее состояние Daibilet
+## Очередь рерайта событий — интеграция с RBAC (2026-10-25)
+
+Работа перенесена в отдельную интеграционную ветку от свежего production head и персональной RBAC-сессии. Схема, backend очередь, пост-синковый хук и админские экраны включены; миграция не применена. Серверная ролевая политика маршрутов и actor identity подключены в интеграционной ветке; targeted тесты проходят. При выключенном DAIBILET_ADMIN_RBAC_ENFORCE rewrite API целиком отвечает 503. Не деплоить и не отправлять миграцию в БД до проверки миграционной линии и smoke с реальными ролями. Отчёт: [проверка интеграции](./ai-rewrite-integration-review-2026-10-25.md).
+
+## RBAC и финконтур - локальная итерация 2026-10-25
+
+В `codex/ai-rewrite-rbac-integration` собраны персональные сессии сотрудников, Next page/action guards, серверное маскирование PII, подписанный actor bridge и MFA/TOTP для финансовых ролей. Финансовые права выдаются только после MFA; TOTP-секрет зашифрован, recovery-коды одноразовые и хранятся в виде хешей. Изолированная тестовая БД обновлена до текущих 55 миграций; отдельный STUB-заказ проверен в admin, buyer и supplier проекциях, включая маскирование для поставщика и сокрытие контактов/номера билета у VIEWER. Тесты и сборка пройдены. Ветка запушена, но **не смержена в production branch и не развернута**.
+
+Заказный proof bridge также реализован локально: web BFF сохраняет order token только в узкие HttpOnly-cookie, result/poll передают его для совпадающего publicCode, а билетная почта использует server-authenticated purchases projection. Не закрыты: browser smoke на полном Next+backend окружении, настройка `DAIBILET_ADMIN_MFA_ENCRYPTION_KEY`, настройка `DAIBILET_ORDER_ACCESS_SECRET` и включение `DAIBILET_REQUIRE_ORDER_ACCESS=1` после выпуска обеих сторон, завершённая YooKassa sandbox-оплата в браузере с webhook/reconcile и подтверждением на всех трёх интерфейсах, а также отдельные payout workflow, step-up challenge на выплату, dual control и подтверждение банковского перевода. Для текущего branch status и критериев релиза см. [RBAC/finance security](./admin-finance-auth-security-2026-10.md), [order access handoff](./catalog-order-access-handoff.md) и [Tasktracker](./Tasktracker.md). Полный независимый аудит оставлен на финальный этап.
 
 ## Places - выпуск 15.10.2026
 

@@ -1,6 +1,7 @@
 # Документация Daibilet
 
 [Roadmap Daibilet — сводка на 2026-10](./roadmap-2026-10.md)
+[SEO-аудит 18.10.2026: кэш sitemap, каноникал Москвы, главная no-store](./seo-audit-2026-10-18.md)
 [Подготовка schema_alignment к прод-БД - 17.10.2026](./schema-alignment-prod-fix-2026-10-17.md)
 [Сверка схемы и миграций каталога и финконтура - 17.10.2026](./finance-schema-unification-2026-10-17.md)
 [Places: типизация, сверка PDP и передача Cline](./places-taxonomy-cline-handoff-2026-10.md)
@@ -8,6 +9,9 @@
 [Доступ сотрудников к админке: аудит legacy и проект RBAC](./admin-rbac-design-2026-10.md)
 [Нагрузка CPU на MSK - 15.10.2026](./cpu-load-msk.md)
 [Зависание SSR и ответы 502 роботам - 16.10.2026](./ssr-hang-crawler-2026-10-16.md)
+[Teplohod: baseline Sharp и Next Image Optimizer - 21.10.2026](./teplohod-image-optimization-experiment-2026-10-21.md)
+[Teplohod PDP: выборочные статические WebP обложки - 21.10.2026](./teplohod-pdp-webp-pilot-2026-10-21.md)
+[ISR 500 на удалённых событиях - 21.10.2026](./event-not-found-ssr-regression-2026-10-21.md)
 
 Навигация по репозиторию `Twisterrrrr/daibilet`.
 
@@ -71,6 +75,8 @@
 | [myday-commercial-canon.md](./myday-commercial-canon.md) | Канон «Мой день» (planner + checklist) |
 | [mvp-spec.md](./mvp-spec.md) | Продуктовая спецификация |
 | [seo-public-mvp.md](./seo-public-mvp.md) | SEO public |
+| [artist-bios.md](./artist-bios.md) | Био исполнителей: правила, покрытие, батч |
+| [organizer-email-intake.md](./organizer-email-intake.md) | Приём писем организаторов: IMAP → staging → apply |
 | [admin-lovable-v4-mvp-plan.md](./admin-lovable-v4-mvp-plan.md) | План админки |
 
 ## Интеграции

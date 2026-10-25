@@ -1,14 +1,17 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { AdminAuthConfig } from './auth.js';
 import { isAuthorizedAdminRequest, isProtectedPath } from './auth.js';
+import { authorizeAdminSessionRequest } from './admin-rbac-guard.js';
 import { sendAuthRequired, sendJson } from './http.js';
 import { createRouteContext, type RouteContext } from './routing.js';
 import {
   adminEventsQuerySchema,
+  adminFinanceQuerySchema,
   adminOrdersQuerySchema,
   lookupQuerySchema,
   paginationQuerySchema,
   publicCatalogQuerySchema,
+  publicFinanceProjectionQuerySchema,
   searchQuerySchema,
 } from './types/schemas.js';
 import { isRequestValidationError, parseSearchParams } from './validation.js';
@@ -18,6 +21,8 @@ export type TypedRouteHandler = (context: RouteContext) => boolean | Promise<boo
 
 export interface ValidatedHandlerOptions {
   adminAuth?: AdminAuthConfig;
+  adminRbacEnforce?: boolean;
+  adminSessionDb?: { query: (sql: string, params?: unknown[]) => Promise<{ rows: unknown[] }> };
   routeHandlers?: TypedRouteHandler[];
 }
 
@@ -28,8 +33,28 @@ export function createValidatedHandler(
   return async (request, response) => {
     try {
       const context = createRouteContext(request, response);
-      if (options.adminAuth && isProtectedPath(context.pathname) && !isAuthorizedAdminRequest(request, options.adminAuth)) {
-        sendAuthRequired(response, options.adminAuth);
+      if (options.adminAuth && isProtectedPath(context.pathname)) {
+        if (options.adminRbacEnforce) {
+          if (!options.adminSessionDb) {
+            sendJson(response, { error: 'admin_session_guard_unavailable' }, { statusCode: 503 });
+            return;
+          }
+          const authorization = await authorizeAdminSessionRequest(request, options.adminSessionDb);
+          if (!authorization.authorized) {
+            sendJson(response, { error: authorization.error }, { statusCode: authorization.statusCode ?? 401 });
+            return;
+          }
+          Object.assign(request, { adminSessionUser: authorization.actor });
+        } else if (!isAuthorizedAdminRequest(request, options.adminAuth)) {
+          sendAuthRequired(response, options.adminAuth);
+          return;
+        }
+      }
+
+      // The rewrite queue is a new, audited workflow. Keep it unavailable to
+      // shared Basic Auth until the personal-session RBAC guard is enabled.
+      if (/^\/api\/admin\/rewrite-queue(?:\/|$)/.test(context.pathname) && !options.adminRbacEnforce) {
+        sendJson(response, { error: 'admin_rbac_required' }, { statusCode: 503 });
         return;
       }
 
@@ -88,6 +113,17 @@ function validateSafeRouteQuery(context: RouteContext): void {
     return;
   }
 
+  if (
+    route === 'GET /api/public/admission-products' ||
+    route === 'GET /api/public/finance/admission-products' ||
+    /^GET \/api\/public(?:\/finance)?\/admission-products\/[^/]+$/.test(route) ||
+    /^GET \/api\/public(?:\/finance)?\/venues\/[^/]+\/admission-products$/.test(route) ||
+    /^GET \/api\/public(?:\/finance)?\/suppliers\/[^/]+$/.test(route)
+  ) {
+    parseSearchParams(publicFinanceProjectionQuerySchema, context.searchParams);
+    return;
+  }
+
   if (route === 'GET /api/public/orders') {
     parseSearchParams(lookupQuerySchema, context.searchParams);
     return;
@@ -98,14 +134,20 @@ function validateSafeRouteQuery(context: RouteContext): void {
     return;
   }
 
-  if (route === 'GET /api/admin/orders') {
+  if (route === 'GET /api/admin/orders' || route === 'GET /api/internal/admin/orders') {
     parseSearchParams(adminOrdersQuerySchema, context.searchParams);
+    return;
+  }
+
+  if (route === 'GET /api/admin/finance/ledger' || route === 'GET /api/admin/finance/reconcile') {
+    parseSearchParams(adminFinanceQuerySchema, context.searchParams);
     return;
   }
 
   if (
     route === 'GET /api/admin/venues' ||
     route === 'GET /api/admin/buyers' ||
+    route === 'GET /api/admin/suppliers' ||
     route === 'GET /api/admin/order-event-candidates'
   ) {
     parseSearchParams(searchQuerySchema, context.searchParams);

@@ -45,6 +45,9 @@ const HUB_LOADERS: Record<string, HubLoader> = {
   'volgograd': () => import('./volgograd-hub'),
   'yaroslavl': () => import('./yaroslavl-hub'),
   'saratov': () => import('./saratov-hub'),
+  'kirov': () => import('./kirov-hub'),
+  'sochi': () => import('./sochi-hub'),
+  'ulyanovsk': () => import('./ulyanovsk-hub'),
 };
 
 const hubCache = new Map<string, CityHubData>();
@@ -54,33 +57,73 @@ export async function loadCityHubData(citySlug: string): Promise<CityHubData | n
   const normalized = citySlug.trim().toLowerCase();
   if (hubCache.has(normalized)) return hubCache.get(normalized)!;
 
+  let data: CityHubData = {
+    mustSee: [],
+    significantSuburbs: [],
+    faq: [],
+    travel: undefined,
+    dayRoutePresets: [],
+  };
+  let loaded = false;
+
   const loader = HUB_LOADERS[normalized];
-  if (!loader) return null;
+  if (loader) {
+    try {
+      const mod = await loader();
+      // Extract the city-specific data from the module.
+      // Hub files export constants like EKB_MUST_SEE, KAZAN_FAQ, etc.
+      const prefix = normalized.replace(/-/g, '_').toUpperCase();
+      const mustSee = (mod[`${prefix}_MUST_SEE`] || mod.EKB_MUST_SEE || []) as CityHubData['mustSee'];
+      const suburbs = (mod[`${prefix}_SUBURBS`] || []) as CityHubData['significantSuburbs'];
+      const faq = (mod[`${prefix}_FAQ`] || []) as CityHubData['faq'];
+      const travel = (mod[`${prefix}_TRAVEL`] || '') as string;
+      const presets = (mod[`${prefix}_DAY_ROUTE_PRESETS`] || []) as CityHubData['dayRoutePresets'];
 
-  try {
-    const mod = await loader();
-    // Extract the city-specific data from the module.
-    // Hub files export constants like EKB_MUST_SEE, KAZAN_FAQ, etc.
-    const prefix = normalized.replace(/-/g, '_').toUpperCase();
-    const mustSee = (mod[`${prefix}_MUST_SEE`] || mod.EKB_MUST_SEE || []) as CityHubData['mustSee'];
-    const suburbs = (mod[`${prefix}_SUBURBS`] || []) as CityHubData['significantSuburbs'];
-    const faq = (mod[`${prefix}_FAQ`] || []) as CityHubData['faq'];
-    const travel = (mod[`${prefix}_TRAVEL`] || '') as string;
-    const presets = (mod[`${prefix}_DAY_ROUTE_PRESETS`] || []) as CityHubData['dayRoutePresets'];
-
-    const data: CityHubData = {
-      mustSee: mustSee || [],
-      significantSuburbs: suburbs || [],
-      faq: faq || [],
-      travel: travel || undefined,
-      dayRoutePresets: presets || [],
-    };
-
-    hubCache.set(normalized, data);
-    return data;
-  } catch {
-    return null;
+      data = {
+        mustSee: mustSee || [],
+        significantSuburbs: suburbs || [],
+        faq: faq || [],
+        travel: travel || undefined,
+        dayRoutePresets: presets || [],
+      };
+      loaded = true;
+    } catch {
+      // fall through to the CITY_INFO registry below
+    }
   }
+
+  // Registry fallback: CITY_INFO covers every hub city, including capitals
+  // (moscow/spb), cities whose packs still live in cityInfo-data (perm) and
+  // any city without a lazy hub chunk. Imported lazily so the perf split of
+  // hub chunks is preserved for the cities that have them.
+  const needsRegistry =
+    !loaded || !data.mustSee.length || !data.dayRoutePresets?.length || !data.significantSuburbs?.length;
+  if (needsRegistry) {
+    try {
+      const { resolveCityInfo } = await import('./cityInfo');
+      const entry = resolveCityInfo(normalized);
+      if (entry) {
+        data = {
+          mustSee: data.mustSee.length ? data.mustSee : ((entry.mustSee as CityHubData['mustSee']) || []),
+          significantSuburbs: data.significantSuburbs?.length
+            ? data.significantSuburbs
+            : ((entry.significantSuburbs as CityHubData['significantSuburbs']) || []),
+          faq: data.faq?.length ? data.faq : ((entry.faq as CityHubData['faq']) || []),
+          travel: data.travel || (entry.travel as string | undefined) || undefined,
+          dayRoutePresets: data.dayRoutePresets?.length
+            ? data.dayRoutePresets
+            : ((entry.dayRoutePresets as CityHubData['dayRoutePresets']) || []),
+        };
+      }
+    } catch {
+      // registry unavailable - keep whatever the hub module provided
+    }
+  }
+
+  if (!data.mustSee.length && !data.dayRoutePresets?.length) return null;
+
+  hubCache.set(normalized, data);
+  return data;
 }
 
 /** Check if a city slug has a hub available. */

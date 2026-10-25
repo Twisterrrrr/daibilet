@@ -1,3 +1,53 @@
+## 2026-10-24 - SEO хвост sitemap после Next 16.4
+
+### Что проверено на live до правки
+- `/sitemaps/events.xml`: 200, 4 458 URL, 49 `lastmod`, TTFB 617 мс.
+- `/sitemaps/venues.xml`: 200, 382 URL, но у всех один одинаковый `lastmod` (ложный build/runtime timestamp), TTFB 206 мс.
+- `/sitemaps/blog.xml`: 200, 46 URL с реальным разбросом дат, TTFB 47 мс.
+- В deployment log sitemap-роуты пытались SSG-рендерить `no-store` API fetch, из-за чего Next печатал `Dynamic server usage`; live endpoint при этом отвечал 200. Причина - сборочный режим маршрутов, не потеря списка URL.
+
+### Исправление в коде
+- Sitemap route handlers помечены `dynamic = 'force-dynamic'` и `revalidate = 0`: читают актуальные данные в runtime, а публичный ответ остаётся за bounded nginx proxy cache.
+- Sitemap `lastmod` теперь берётся только из реального timestamp сущности. Для static/cities/venues/landings и отсутствующей event freshness тег пропускается; sitemap index тоже не ставит общий `lastmod` на все подкарты.
+- URL-выборка и indexability-фильтры не менялись.
+
+### Проверки
+- `pnpm web:test:ci`: 343/343; web typecheck: 0; ESLint затронутых файлов: 0 errors.
+- `pnpm --filter @daibilet/web build`: exit 0; маршруты `/sitemap.xml`, `/sitemaps/[chunk]`, `/sitemaps/venues.xml` отмечены dynamic. В build log нет sitemap `Dynamic server usage`, sitemap build failure или landing soft-fail.
+- Локальная сборка проходила без API на `127.0.0.1:4000`; поэтому обычные public-page soft-fallbacks ожидаемы и не относятся к sitemap.
+- До выпуска: live URL counts и `lastmod` нужно сверить повторно; текущие live замеры выше - baseline.
+
+### Live-проверка sitemap после выпуска 2026-10-24
+- Deploy MSK web `7724c16b3`, BUILD_ID `sok61MHoPzuvUfanleSFa`: workflow swap, crawler smoke, deploy verify и 5-минутное наблюдение прошли; `bot5xx=0`, `referenceErrors=0`, web/API active, рестартов 0.
+- Сразу после выпуска: events 4 457 URL / 49 уникальных реальных `lastmod`; venues 381 URL без выдуманного `lastmod`; blog 46 URL с реальными датами; static 52 URL. Все sitemap endpoints ответили 200. Число events/venues отличалось от замера до выпуска на один URL, причина не установлена; фильтры выборки в изменении кода не менялись.
+- Повторный TTFB в workflow cache gate: static 0,520 с; events 1,866 с; cities 0,692 с; venues 0,852 с; landings 0,687 с; blog 0,689 с.
+
+### Canonical города Москвы — код исправления 2026-10-24
+- Live HTML `/cities/moskva` ранее содержал canonical на encoded Cyrillic URL, который перенаправлял обратно на латинский slug. Прямой запрос во время этой итерации завершился DNS timeout, поэтому проверка текущей HTML-меты будет повторена после выпуска.
+- Добавлен `cityCanonicalPath`: путь на тот же город сверяется по slug/sourceSlug/name после транслитерации; legacy Cyrillic/percent-encoded варианты переводятся к `cityHref`. Явный canonical на другой город сохраняется.
+- Метаданные страницы, `City` JSON-LD и городские хлебные крошки используют один нормализатор. Добавлены regression tests для Москвы и намеренного cross-city canonical.
+- Проверки до выпуска: `pnpm web:test:ci` 345/345; typecheck и scoped ESLint — 0 ошибок; production build — exit 0. В локальном build отсутствовал API на `127.0.0.1:4000`, поэтому каталожные статические страницы использовали штатный soft fallback.
+
+### Уточнение по свежести sitemap во время post-deploy smoke
+- Обычный `/sitemaps/events.xml` отдавал 4 413 URL, а обходной запрос с audit query - 4 399; Public Events API также сообщал `total=4399`. Из 23 URL, которые были только в закэшированной карте, 8 уже отвечали 404, остальные 15 - 200. Значит, это не падение маршрутов из-за новой версии, а слишком длинное stale-окно вокруг часто меняющегося каталога.
+- В `sitemapResponseHeaders` сокращён `s-maxage` до 5 минут для events/venues, до 15 минут для cities/landings и до 1 часа для остальных карт; заголовок `stale-while-revalidate=86400` удалён. Это сохраняет общий кэш для скорости и не рекламирует суточное stale-окно; nginx может кратко отдать старый ответ, пока выполняет одну фоновую перезагрузку.
+- Повторные URL из пересинхронизированных серий могут получать новые provider IDs; индексатор должен видеть свежий URL set как можно раньше. Для текущего выпуска выполнена сверка обычного sitemap URL с API total и 404-аудит выборки.
+
+### Выпуск свежести sitemap и canonical Москвы - 2026-10-24
+- Commit `6fa3b8d8b` нормализует canonical для одного и того же города; commit `48072f1ea` сокращает sitemap cache headers. Deploy MSK run [40102589715](https://github.com/Twisterrrrr/daibilet/actions/runs/40102589715) success, BUILD_ID `t_h7TtDcnqD3tKtTftT8q`.
+- `/cities/moskva`: Googlebot 200; `<link rel=canonical>` и City JSON-LD URL оба `https://daibilet.ru/cities/moskva`. Legacy encoded URL остаётся 308 → `/cities/moskva`; city sitemap содержит `/cities/moskva` один раз.
+- Обычный `/sitemaps/events.xml`: 200, cache header `public, s-maxage=300`, 4 401 URL. `/api/public/events?limit=1` сообщил `total=4401` во время первого замера; при повторной проверке после деплоя и cache purge количество sitemap/API совпало (`4401/4401`). Все 8 ранее проверенных удалённых 404 URL отсутствовали в текущем sitemap; равномерная выборка 40 URL по всей карте дала 40 ответов 200.
+- Первичный deploy warmup перед финальным cache purge сообщил 29/40 event pages 200 и 11/40 404; после завершения deploy публичный crawler smoke прошёл, а отдельная live выборка после purge дала 40/40 200. Это указывает на временный drift при синхронизации каталога во время warmup; не считать массовым устойчивым падением, но повторить такую выборку при следующем большом каталожном sync.
+- Post-deploy observation: `bot5xx=0`, `referenceErrors=0`, сервис активен, рестартов 0. Sitemap cache timing gate прошёл: events 2,08/2,01 с; cities 0,76/0,74 с; venues 0,95/0,94 с; остальные карты second hit <1 с.
+
+### Главная: общий ISR вместо cookie-bound SSR - 2026-10-24
+- Проверка кода показала, что серверная персонализация города уже была удалена: `HomePageBody` задаёт `ssrCityName/ssrCitySlug = null`, а выбор города применяется через клиентские острова. В `app/page.tsx` уже объявлен `revalidate = 300`; request-bound API на главной не используются.
+- Решение: оставить один SEO-ответ для всех посетителей и поисковых роботов, восстанавливать выбор пользователя на клиенте. Не передавать cookie в SSR и не создавать варианты кэша по городу: это сохраняет общий ISR и исключает разный canonical/metadata/HTML для робота и пользователя.
+- Добавлен regression test в `isr-chrome-dynamic-apis.test.ts`: запрещает request-bound cookies/headers/connection в главной и её body, проверяет `revalidate=300` и нейтральный SSR city context. CI-набор включает этот файл.
+- Владелец подтвердил, что Исаакиевский собор намеренно остаётся thin layer/noindex до расширения контента; флаг индексации не менять до редакционного усиления.
+
+---
+
 ## 2026-10-17 - Чат поддержки: выпуск на прод
 
 ### Что выпущено
@@ -21377,4 +21427,12 @@ evalidateNextBlogArticle (/blog, slug, city hub).
 ### Follow-ups
 - Ask Timeweb about intermittent SSH banner/TLS connect stalls with timestamps; app loopback is healthy while outside connections sometimes do not reach nginx.
 - Decide later whether to clean archived `.next.bak-*` and generated media on prod; no cleanup was done in this pass.
+
+## 2026-10-25 - MFA/TOTP для RBAC и финансовых ролей
+
+- В ветке `codex/ai-rewrite-rbac-integration` добавлены TOTP enrollment/verification, AES-256-GCM для секрета, replay guard по последнему TOTP step, одноразовые хешированные recovery-коды, аудит и ограничение попыток. Финансовые права по-прежнему появляются только в `mfaVerified` сессии.
+- Добавлена страница `/admin/security/mfa`; FINANCE и SUPERADMIN направляются туда после пароля. Ключ шифрования не задан автоматически: перед использованием требуется отдельный `DAIBILET_ADMIN_MFA_ENCRYPTION_KEY` (32 байта в hex/base64url) в секретах окружения.
+- Миграция `20261025120000_admin_mfa` проверена на новой отдельной `daibilet_admin_mfa_test_20261025` в `daibilet-fresh-postgres`; smoke подтвердил enrollment, выдачу MFA-сессии, отклонение повторного кода и single-use recovery.
+- Backend suite завершился с exit 0, web CI 373/373, web/backend typecheck прошли; ESLint web-файлов чистый. Прод, рабочие БД и env не менялись.
+- Остаток: payout-specific step-up challenge, execution/dual control/bank evidence, независимый security audit всех guards и rollout acceptance. Этот срез не готов для production rollout.
 

@@ -12,7 +12,7 @@ function cityHubSeoTitleFallback(cityName) {
     month: 'long',
     timeZone: 'Europe/Moscow',
   }).format(new Date());
-  return `${name}: афиша, экскурсии и билеты на сегодня, ${short} | ${SITE_NAME}`;
+  return `${name}: зачем ехать, что посмотреть, ближайшие события на сегодня, ${short} | ${SITE_NAME}`;
 }
 
 /** Убирает «Колонка Имя:» из meta description статей. */

@@ -1,0 +1,13 @@
+[Unit]
+Description=Run Daibilet finance YooKassa reconcile every 5 minutes
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=5min
+RandomizedDelaySec=30s
+Persistent=true
+Unit=daibilet-finance-yookassa-reconcile.service
+
+[Install]
+WantedBy=timers.target
+

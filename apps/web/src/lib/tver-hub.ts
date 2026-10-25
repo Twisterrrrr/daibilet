@@ -33,8 +33,8 @@ function place(
 }
 
 export const TVER_MUST_SEE: any[] = [
-  place('Памятник Афанасию Никитину', 'Тверской купец-путешественник на ладьевидном постаменте над Волгой.', 56.866112, 35.906112, { address: 'наб. Афанасия Никитина', locationSlug: 'tver-pamyatnik-afanasiyu-nikitinu', mustSeeFilter: 'monument', visitMinutes: 20, alsoMain: true }),
-  place('Памятник Михаилу Кругу', 'Самая известная контактная скульптура города: шансонье с гитарой на скамейке.', 56.858912, 35.911112, { address: 'бульвар Радищева, 21', locationSlug: 'tver-pamyatnik-mihailu-krugu', mustSeeFilter: 'monument', visitMinutes: 15, alsoMain: true }),
+  place('Памятник Афанасию Никитину', 'Тверской купец-путешественник на ладьевидном постаменте над Волгой.', 56.866112, 35.906112, { address: 'наб. Афанасия Никитина', locationSlug: 'tver-pamyatnik-afanasiyu-nikitinu', mustSeeFilter: 'monument', visitMinutes: 20 }),
+  place('Памятник Михаилу Кругу', 'Самая известная контактная скульптура города: шансонье с гитарой на скамейке.', 56.858912, 35.911112, { address: 'бульвар Радищева, 21', locationSlug: 'tver-pamyatnik-mihailu-krugu', mustSeeFilter: 'monument', visitMinutes: 15 }),
   place('Памятник А. С. Пушкину', 'Бронзовый поэт у чугунной решетки набережной в Городском саду.', 56.861912, 35.904912, { address: 'наб. Михаила Ярославича, Городской сад', locationSlug: 'tver-pamyatnik-pushkinu', mustSeeFilter: 'monument', visitMinutes: 15 }),
   place('Памятник Михаилу Ярославичу Тверскому', 'Конный монумент святому князю-защитнику на главной площади.', 56.858112, 35.915891, { address: 'пл. Святого Благоверного Князя Михаила Тверского', locationSlug: 'tver-pamyatnik-mihailu-yaroslavichu', mustSeeFilter: 'monument', visitMinutes: 15 }),
   place('Памятник И. А. Крылову', 'Баснописец детских тверских лет, окруженный бронзовыми рельефами басен.', 56.856912, 35.901112, { address: 'сквер Крылова, ул. Советская', locationSlug: 'tver-pamyatnik-krylovu', mustSeeFilter: 'monument', visitMinutes: 15 }),
@@ -84,11 +84,11 @@ export const TVER_MUST_SEE: any[] = [
 
   place('Тверской Городской сад', 'Парадный парк на набережной с дубами, аттракционами и видами на Волгу.', 56.859812, 35.908912, { address: 'ул. Советская / наб. Михаила Ярославича', locationSlug: 'tver-gorodskoy-sad', mustSeeFilter: 'park', visitMinutes: 45, alsoMain: true }),
   place('Пешеходная Трехсвятская улица', 'Главный променад города, тверской Арбат с лавками и уличными музыкантами.', 56.856912, 35.911112, { address: 'ул. Трехсвятская', locationSlug: 'tver-peshehodnaya-trehsvyatskaya-ulitsa', mustSeeFilter: 'street', visitMinutes: 45, alsoMain: true }),
-  place('Набережная Степана Разина', 'Двухъярусный променад с купеческой застройкой единой фасадой XVIII века.', 56.861112, 35.918912, { address: 'наб. Степана Разина', locationSlug: 'tver-naberezhnaya-stepana-razina', mustSeeFilter: 'park', visitMinutes: 40, alsoMain: true }),
+  place('Набережная Степана Разина', 'Двухъярусный променад с купеческой застройкой единой фасадой XVIII века.', 56.861112, 35.918912, { address: 'наб. Степана Разина', locationSlug: 'tver-naberezhnaya-stepana-razina', mustSeeFilter: 'park', visitMinutes: 40 }),
   place('Ландшафтный парк «Тьмака»', 'Благоустроенная пойма с деревянными экотропами и велодорожками.', 56.851212, 35.894912, { address: 'ул. Набережная Тьмаки', locationSlug: 'tver-landshaftnyy-park-tmaka', mustSeeFilter: 'park', visitMinutes: 50 }),
   place('Ботанический сад ТвГУ', 'Северный ботанический сад с коллекцией орхидей и тропическими прудами.', 56.871112, 35.911112, { address: 'пер. Шевченко, 16', locationSlug: 'tver-botanicheskiy-sad-tvgu', mustSeeFilter: 'park', visitMinutes: 45 }),
   place('Сквер Казакова', 'Небольшой сад с фонтанами у площади Ленина.', 56.858412, 35.910912, { address: 'площадь Ленина', locationSlug: 'tver-skver-kazakova', mustSeeFilter: 'park', visitMinutes: 20 }),
-  place('Набережная Афанасия Никитина', 'Широкий заволжский променад с пляжем и лучшим видом на Путевой дворец.', 56.865112, 35.901112, { address: 'наб. Афанасия Никитина', locationSlug: 'tver-naberezhnaya-afanasiya-nikitina', mustSeeFilter: 'park', visitMinutes: 40, alsoMain: true }),
+  place('Набережная Афанасия Никитина', 'Широкий заволжский променад с пляжем и лучшим видом на Путевой дворец.', 56.865112, 35.901112, { address: 'наб. Афанасия Никитина', locationSlug: 'tver-naberezhnaya-afanasiya-nikitina', mustSeeFilter: 'park', visitMinutes: 40 }),
   place('Смотровая у бизнес-центра «Тверь»', 'Панорама города с высоты 22-го этажа здания «Рюмки».', 56.851912, 35.924912, { address: 'Смоленский переулок, 29', locationSlug: 'tver-smotrovaya-biznes-tsentr-tver', mustSeeFilter: 'views', visitMinutes: 25 }),
   place('Бульвар Радищева', 'Тенистая аллея через Трехсвятскую с книжными развалами и памятником Кругу.', 56.858412, 35.908912, { address: 'бульвар Радищева', locationSlug: 'tver-bulvar-radishcheva', mustSeeFilter: 'street', visitMinutes: 30 }),
 

@@ -34,15 +34,23 @@ export function CityPicker({
   defaultOpen = false,
 }: CityPickerProps) {
   const [open, setOpen] = React.useState(defaultOpen);
+  const [searchTerm, setSearchTerm] = React.useState('');
   const [menuStyle, setMenuStyle] = React.useState<React.CSSProperties>({ visibility: 'hidden' });
   const buttonRef = React.useRef<HTMLButtonElement>(null);
   const menuRef = React.useRef<HTMLDivElement>(null);
+  const searchRef = React.useRef<HTMLInputElement>(null);
   const rootRef = React.useRef<HTMLDivElement>(null);
 
   const cityOptions = React.useMemo(
     () => cities.filter((item) => item.type === 'city').sort((a, b) => b.events - a.events || a.name.localeCompare(b.name, 'ru')),
     [cities],
   );
+  const filteredCityOptions = React.useMemo(() => {
+    const query = searchTerm.trim().toLocaleLowerCase('ru');
+    return query
+      ? cityOptions.filter((city) => city.name.toLocaleLowerCase('ru').includes(query))
+      : cityOptions;
+  }, [cityOptions, searchTerm]);
 
   // Show the picked name immediately; parent cityLabel can lag one frame behind
   // URL/searchParams (saint-petersburg vs sankt-peterburg) and look stale.
@@ -92,6 +100,7 @@ export function CityPicker({
   React.useEffect(() => {
     if (!open) return;
     updatePosition();
+    searchRef.current?.focus();
     const sync = () => updatePosition();
     window.addEventListener('scroll', sync, true);
     window.addEventListener('resize', sync);
@@ -124,6 +133,7 @@ export function CityPicker({
 
   const selectCity = (name: string) => {
     setOptimisticValue(name);
+    setSearchTerm('');
     setOpen(false);
     onChange(name);
   };
@@ -142,10 +152,26 @@ export function CityPicker({
           ref={menuRef}
           style={menuStyle}
           className="z-[120] overflow-y-auto overflow-x-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-lg"
-          role="listbox"
-          aria-label="Города"
         >
-          <ul>
+          <div className="sticky top-0 z-10 bg-white p-1">
+            <input
+              ref={searchRef}
+              type="search"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Escape') {
+                  event.preventDefault();
+                  setOpen(false);
+                }
+              }}
+              placeholder="Найти город"
+              aria-label="Найти город"
+              autoComplete="off"
+              className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
+            />
+          </div>
+          <ul role="listbox" aria-label="Города">
             <li>
               <button
                 type="button"
@@ -164,7 +190,7 @@ export function CityPicker({
                 {isAllSelected ? <Check className="h-4 w-4 text-primary-600" /> : null}
               </button>
             </li>
-            {cityOptions.map((city) => {
+            {filteredCityOptions.map((city) => {
               const active = Boolean(
                 selectedMatch
                   ? selectedMatch.name === city.name && selectedMatch.slug === city.slug
@@ -192,6 +218,9 @@ export function CityPicker({
                 </li>
               );
             })}
+            {filteredCityOptions.length === 0 ? (
+              <li className="px-3 py-3 text-sm text-slate-500" role="status">Город не найден</li>
+            ) : null}
             <li className="mt-1 border-t border-slate-100 pt-1">
               <Link
                 href="/cities"
@@ -224,6 +253,7 @@ export function CityPicker({
         onClick={() => {
           setOpen((current) => {
             if (current) return false;
+              setSearchTerm('');
             setMenuStyle({ visibility: 'hidden' });
             return true;
           });

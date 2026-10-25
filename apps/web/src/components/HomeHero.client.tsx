@@ -228,9 +228,9 @@ export function HomeHero({
       </form>
 
       {/* Category chips — soft, no border, one line. Centered when they fit,
-          horizontally swipeable when they overflow: justify-center inside a
-          plain overflow container clips the left side and breaks scrolling. */}
-      <div className="mt-5 overflow-x-auto text-sm text-white/80 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          horizontally swipeable when they overflow: outer w-full guarantees
+          bounded width so inner w-max actually overflows and scrolls. */}
+      <div className="mt-5 w-full overflow-x-auto text-sm text-white/80 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <div className="mx-auto flex w-max min-w-full items-center justify-center gap-2">
           {chips.slice(0, 7).map((chip) => (
             <a

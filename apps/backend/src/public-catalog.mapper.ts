@@ -1,4 +1,5 @@
 import { resolveCityTimeZone } from './city-timezone.js';
+import { stripDescriptionOriginMarkers } from './description-origin.js';
 import { matchingLandingSlugs } from './landing-rules.js';
 import {
   isFutureSlotStart,
@@ -482,7 +483,8 @@ function resolvePublicSessionImageUrl(row: PublicCatalogMappingRow): string | nu
 }
 
 function cleanImportedDescription(value?: string | null): string | null {
-  const cleaned = String(value || '')
+  // Origin markers are internal pipeline artifacts; they never belong to public copy.
+  const cleaned = stripDescriptionOriginMarkers(value)
     .replace(/<script[\s\S]*?<\/script>/gi, ' ')
     .replace(/<style[\s\S]*?<\/style>/gi, ' ')
     .replace(/<\s*br\s*\/?>/gi, '\n')

@@ -3,12 +3,19 @@ import type { Metadata } from 'next';
 import { EventCard } from '@/components/EventCard';
 import { EventBuyCard, EventHero } from '@/components/EventPage.client';
 import { EventPdpBody } from '@/components/EventPdpBody.client';
+import { VenuePdpContent } from '@/components/VenuePdpContent.client';
 import { EventTags, EventTrustStrip } from '@/components/EventPageSections';
 import { JsonLdScripts } from '@/components/JsonLdScripts';
 import { PeerEventsBlock } from '@/components/PeerEventsBlock.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
 import { toEventPageClientPayload } from '@/lib/event-page-client-props';
+import {
+  buildConcertLead,
+  displayEventDescription,
+  isConcertLikeEvent,
+} from '@/lib/event-description-lead';
+import { stripSessionDateLines } from '@/lib/event-description-session-lines';
 import { eventHref } from '@/lib/routes';
 import { getTicketPriceRange } from '@/lib/event-page-utils';
 import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
@@ -104,10 +111,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     });
     const title = pageTitle(expansionMeta?.title || disambiguatedTitle);
     const shareTitle = expansionMeta ? expansionMeta.title : `${title} | Дайбилет`;
+    const seoDescription = String(event.seoDescription || '').trim();
+    const genericSeo = /^Расписание, цены и билеты на /iu.test(seoDescription);
+    const concertLead = isConcertLikeEvent(event) ? buildConcertLead(event) : '';
+    const renderedLead = displayEventDescription(event).split(/\n\s*\n/u)[0] || '';
     const description =
       expansionMeta?.description ||
-      event.seoDescription ||
-      event.description ||
+      (genericSeo ? concertLead : stripSessionDateLines(seoDescription)) ||
+      renderedLead ||
       `${event.title} - билеты на Дайбилет`;
 
     return {
@@ -174,6 +185,7 @@ export default async function EventDetailPage({ params }: PageProps) {
           <div className="grid min-w-0 gap-8 lg:grid-cols-3 lg:gap-12">
             <div className="min-w-0 space-y-6 lg:col-span-2">
               <EventPdpBody event={event} payload={clientPayload} />
+              <VenuePdpContent document={payload.pdp} />
               <EventTags event={event} />
               <EventTrustStrip />
             </div>

@@ -7,6 +7,7 @@ import {
   isTerminalCheckoutOrderStatus,
   pickCheckoutConfirmation,
   pollCheckoutOrderUntilTerminal,
+  watchCheckoutPayment,
 } from './checkout-payment.ts';
 
 describe('checkout-payment', () => {
@@ -53,6 +54,20 @@ describe('checkout-payment', () => {
     assert.equal(isTerminalCheckoutOrderStatus('PENDING'), false);
     assert.equal(isPendingCheckoutOrderStatus('PENDING'), true);
     assert.equal(isPendingCheckoutOrderStatus('CONFIRMED'), false);
+  });
+
+  it('settles the embedded checkout watcher from the server payment state', async () => {
+    let settled = false;
+    await new Promise<void>((resolve, reject) => {
+      let stop = () => {};
+      stop = watchCheckoutPayment({
+        read: async () => ({ status: 'PENDING', payment: { status: 'SUCCEEDED' } }),
+        onSettled: () => { settled = true; stop(); resolve(); },
+        onTimeout: () => reject(new Error('unexpected checkout timeout')),
+        intervalMs: 1,
+      });
+    });
+    assert.equal(settled, true);
   });
 
   it('falls back to redirect when confirmationToken is missing', () => {

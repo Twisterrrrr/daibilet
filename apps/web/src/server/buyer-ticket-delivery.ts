@@ -1,12 +1,12 @@
 import { prisma } from '@daibilet/db';
 import type { BuyerInternalOrderRecord } from '@/lib/buyer-checkout';
 import { buyerTicketAbsoluteUrl } from '@/lib/buyer-ticket';
-import { lookupCheckoutOrderByPublicCode } from '@/server/finance-checkout-client';
+import { lookupBuyerTicketDeliveryOrder } from '@/server/finance-checkout-client';
 import { sendBuyerTicketEmail, type BuyerTicketMailPayload, type BuyerTicketMailResult } from '@/server/buyer-ticket-mail';
 
 type Dependencies = {
   code?: string;
-  lookup?: (code: string) => Promise<BuyerInternalOrderRecord | null>;
+  lookup?: (code: string, email: string) => Promise<BuyerInternalOrderRecord | null>;
   send?: (payload: BuyerTicketMailPayload) => Promise<BuyerTicketMailResult>;
   now?: Date;
 };
@@ -24,9 +24,11 @@ export async function enqueueBuyerTicketEmail(publicCode: string, email: string)
 
 export async function requestBuyerTicketEmailResend(publicCode: string, deps: Dependencies = {}): Promise<void> {
   const code = publicCode.trim();
-  const order = await (deps.lookup || lookupCheckoutOrderByPublicCode)(code);
   const prior = await prisma.buyerTicketEmailDelivery.findUnique({ where: { publicCode: code } });
-  const email = order?.email?.includes('@') ? order.email.toLowerCase() : prior?.email;
+  const email = prior?.email?.trim().toLowerCase() || '';
+  const order = email
+    ? await (deps.lookup || lookupBuyerTicketDeliveryOrder)(code, email)
+    : null;
   if (!order || !isPaid(order.status) || !email) throw new Error('Paid order with buyer email was not found.');
   await prisma.buyerTicketEmailDelivery.upsert({
     where: { publicCode: code },
@@ -65,7 +67,7 @@ export async function processDueBuyerTicketEmails(limit = 50, deps: Dependencies
     let status = 'RETRY';
     let reason: string | null = null;
     try {
-      const order = await (deps.lookup || lookupCheckoutOrderByPublicCode)(row.publicCode);
+      const order = await (deps.lookup || lookupBuyerTicketDeliveryOrder)(row.publicCode, row.email);
       if (!order) throw new Error('finance_lookup_unavailable');
       if (!isPaid(order.status)) {
         if (['CANCELLED', 'CANCELED', 'EXPIRED', 'FAILED'].includes(order.status.toUpperCase())) {

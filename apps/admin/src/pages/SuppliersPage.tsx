@@ -1,0 +1,1116 @@
+import * as React from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { AlertTriangle, Building2, CheckCircle2, Copy, Plus, RefreshCcw, Search, UserPlus, WalletCards, XCircle } from 'lucide-react';
+
+import type {
+  AdminSupplierDetailDto,
+  AdminSupplierInviteRequestDto,
+  AdminSupplierInviteResultDto,
+  AdminSupplierRowDto,
+  AdminSuppliersListDto,
+} from '@daibilet/contracts/admin';
+import { DataTableShell, EmptyState, PageHeader, QuickFilterBar, StatusBadge } from '@/components/admin/primitives';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { adminFetch } from '@/lib/admin-api';
+import { formatDateTime, formatNumber } from '@/data';
+
+const PAGE_SIZE = 50;
+
+const STATUS_FILTERS = [
+  { id: 'all', label: 'Все' },
+  { id: 'ACTIVE', label: 'Активные' },
+  { id: 'REVIEW', label: 'Проверка' },
+  { id: 'DRAFT', label: 'Черновики' },
+  { id: 'PAUSED', label: 'Пауза' },
+];
+
+function emptyPayload(): AdminSuppliersListDto {
+  return {
+    generatedAt: new Date().toISOString(),
+    total: 0,
+    limit: PAGE_SIZE,
+    offset: 0,
+    hasMore: false,
+    filters: {},
+    metrics: {
+      total: 0,
+      active: 0,
+      review: 0,
+      draft: 0,
+      paused: 0,
+      checkoutReady: 0,
+      needsAttention: 0,
+    },
+    items: [],
+  };
+}
+
+export function SuppliersPage() {
+  const [params, setParams] = useSearchParams();
+  const [payload, setPayload] = React.useState<AdminSuppliersListDto>(emptyPayload);
+  const [loading, setLoading] = React.useState(true);
+  const [loadError, setLoadError] = React.useState<string | null>(null);
+  const [selected, setSelected] = React.useState<AdminSupplierDetailDto | null>(null);
+  const [detailLoading, setDetailLoading] = React.useState(false);
+  const [legalActionBusy, setLegalActionBusy] = React.useState<'approve' | 'reject' | null>(null);
+  const [legalActionError, setLegalActionError] = React.useState<string | null>(null);
+  const [inviteUserBusy, setInviteUserBusy] = React.useState(false);
+  const [inviteUserError, setInviteUserError] = React.useState<string | null>(null);
+  const [teamBusy, setTeamBusy] = React.useState<string | null>(null);
+  const [teamError, setTeamError] = React.useState<string | null>(null);
+  const [inviteAccess, setInviteAccess] = React.useState<AdminSupplierInviteResultDto['access'] | null>(null);
+  const [reloadTick, setReloadTick] = React.useState(0);
+  const [showCreateForm, setShowCreateForm] = React.useState(false);
+  const [createTitle, setCreateTitle] = React.useState('');
+  const [createSlug, setCreateSlug] = React.useState('');
+  const [createMode, setCreateMode] = React.useState<'INTERNAL_SALES' | 'IMPORTED_TICKETING_SYSTEM' | 'API_SYNC'>('INTERNAL_SALES');
+  const [createBusy, setCreateBusy] = React.useState(false);
+  const [createError, setCreateError] = React.useState<string | null>(null);
+  const [venueLinkBusy, setVenueLinkBusy] = React.useState(false);
+  const [venueLinkError, setVenueLinkError] = React.useState<string | null>(null);
+
+  const q = params.get('q') ?? '';
+  const status = params.get('status') ?? 'all';
+  const page = Math.max(1, Number(params.get('page') || 1) || 1);
+  const offset = (page - 1) * PAGE_SIZE;
+  const pages = Math.max(1, Math.ceil(payload.total / PAGE_SIZE));
+
+  const setParam = React.useCallback(
+    (key: string, value: string) => {
+      const next = new URLSearchParams(params);
+      if (!value || value === 'all') next.delete(key);
+      else next.set(key, value);
+      next.delete('page');
+      setParams(next);
+    },
+    [params, setParams],
+  );
+
+  const setPage = React.useCallback(
+    (nextPage: number) => {
+      const next = new URLSearchParams(params);
+      if (nextPage <= 1) next.delete('page');
+      else next.set('page', String(nextPage));
+      setParams(next);
+    },
+    [params, setParams],
+  );
+
+  React.useEffect(() => {
+    const controller = new AbortController();
+    const query = new URLSearchParams({
+      limit: String(PAGE_SIZE),
+      offset: String(offset),
+    });
+    if (q.trim()) query.set('q', q.trim());
+    if (status !== 'all') query.set('status', status);
+
+    setLoading(true);
+    adminFetch(`/api/admin/suppliers?${query.toString()}`, { cache: 'no-store', signal: controller.signal })
+      .then(async (response) => {
+        const body = await response.json().catch(() => null);
+        if (!response.ok) throw new Error(body?.message || body?.error || `HTTP ${response.status}`);
+        return body as AdminSuppliersListDto;
+      })
+      .then((data) => {
+        setPayload({ ...emptyPayload(), ...data, items: Array.isArray(data.items) ? data.items : [] });
+        setLoadError(null);
+      })
+      .catch((error) => {
+        if (controller.signal.aborted) return;
+        setPayload(emptyPayload());
+        setLoadError(error instanceof Error ? error.message : String(error));
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+
+    return () => controller.abort();
+  }, [q, status, offset, reloadTick]);
+
+  const openSupplier = React.useCallback((supplier: AdminSupplierRowDto) => {
+    setDetailLoading(true);
+    setInviteAccess(null);
+    setInviteUserError(null);
+    adminFetch(`/api/admin/suppliers/${encodeURIComponent(supplier.id)}`, { cache: 'no-store' })
+      .then(async (response) => {
+        const body = await response.json().catch(() => null);
+        if (!response.ok) throw new Error(body?.message || body?.error || `HTTP ${response.status}`);
+        return body as AdminSupplierDetailDto;
+      })
+      .then((detail) => {
+        setLegalActionError(null);
+        setSelected(detail);
+      })
+      .catch((error) => {
+        window.alert(error instanceof Error ? error.message : String(error));
+      })
+      .finally(() => setDetailLoading(false));
+  }, []);
+
+  const inviteSupplierUser = React.useCallback(async (
+    supplierId: string,
+    input: AdminSupplierInviteRequestDto,
+  ) => {
+    setInviteUserBusy(true);
+    setInviteUserError(null);
+    setInviteAccess(null);
+    try {
+      const response = await adminFetch(`/api/admin/suppliers/${encodeURIComponent(supplierId)}/users/invite`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(input),
+      });
+      const body = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(body?.message || body?.error || `HTTP ${response.status}`);
+      const result = body as AdminSupplierInviteResultDto;
+      setSelected(result.supplier);
+      setInviteAccess(result.access);
+      setReloadTick((value) => value + 1);
+    } catch (error) {
+      setInviteUserError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setInviteUserBusy(false);
+    }
+  }, []);
+
+  const updateTeamMember = React.useCallback(async (supplierId: string, memberId: string, role: AdminSupplierDetailDto['users'][number]['role'], isActive: boolean) => {
+    setTeamBusy(memberId);
+    setTeamError(null);
+    try {
+      const response = await adminFetch(`/api/admin/suppliers/${encodeURIComponent(supplierId)}/users/${encodeURIComponent(memberId)}`, {
+        method: 'PATCH',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ role, isActive }),
+      });
+      const body = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(body?.message || body?.error || `HTTP ${response.status}`);
+      setSelected(body as AdminSupplierDetailDto);
+      setReloadTick((value) => value + 1);
+    } catch (error) {
+      setTeamError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setTeamBusy(null);
+    }
+  }, []);
+
+  const reviewLegalProfile = React.useCallback(async (supplierId: string, action: 'approve' | 'reject') => {
+    let adminComment: string | null = null;
+    if (action === 'reject') {
+      const value = window.prompt('Комментарий для поставщика: что нужно исправить в реквизитах?');
+      if (value === null) return;
+      adminComment = value.trim();
+      if (!adminComment) {
+        window.alert('Для отклонения нужен короткий комментарий.');
+        return;
+      }
+    }
+
+    setLegalActionBusy(action);
+    setLegalActionError(null);
+    try {
+      const response = await adminFetch(`/api/admin/suppliers/${encodeURIComponent(supplierId)}/legal/${action}`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(adminComment ? { adminComment } : {}),
+      });
+      const body = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(body?.message || body?.error || `HTTP ${response.status}`);
+      setSelected(body as AdminSupplierDetailDto);
+      setReloadTick((value) => value + 1);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      setLegalActionError(message);
+      window.alert(message);
+    } finally {
+      setLegalActionBusy(null);
+    }
+  }, []);
+
+  const createSupplier = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setCreateBusy(true);
+    setCreateError(null);
+    try {
+      const response = await adminFetch('/api/admin/suppliers', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ title: createTitle.trim(), slug: createSlug.trim(), integrationMode: createMode }),
+      });
+      const body = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(body?.error === 'supplier_slug_exists' ? 'Такой адрес поставщика уже занят.' : body?.message || body?.error || `HTTP ${response.status}`);
+      setSelected(body as AdminSupplierDetailDto);
+      setShowCreateForm(false);
+      setCreateTitle('');
+      setCreateSlug('');
+      setReloadTick((value) => value + 1);
+    } catch (error) {
+      setCreateError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setCreateBusy(false);
+    }
+  };
+
+  const linkVenue = async (supplierId: string, venueId: string) => {
+    setVenueLinkBusy(true);
+    setVenueLinkError(null);
+    try {
+      const response = await adminFetch(`/api/admin/suppliers/${encodeURIComponent(supplierId)}/venues`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ venueId }),
+      });
+      const body = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(body?.message || body?.error || `HTTP ${response.status}`);
+      setSelected(body as AdminSupplierDetailDto);
+      setReloadTick((value) => value + 1);
+    } catch (error) {
+      setVenueLinkError(error instanceof Error ? error.message : String(error));
+      throw error;
+    } finally {
+      setVenueLinkBusy(false);
+    }
+  };
+
+  const quickFilters = STATUS_FILTERS.map((item) => ({
+    ...item,
+    count: item.id === 'all' ? payload.metrics.total : statusCount(payload, item.id),
+  }));
+
+  return (
+    <div className="space-y-4">
+      <PageHeader
+        title="Поставщики"
+        description="Юридическая готовность, режим продаж, события, заказы и финсводка. Реальные платежи не включаются без readiness."
+        meta={
+          <>
+            <Badge variant="outline">{formatNumber(payload.metrics.total)} всего</Badge>
+            <Badge variant="outline">{formatNumber(payload.metrics.checkoutReady)} готовы к продаже</Badge>
+            <Badge variant="outline">{formatNumber(payload.metrics.needsAttention)} требуют внимания</Badge>
+          </>
+        }
+        actions={
+          <div className="flex gap-2">
+            <Button type="button" size="sm" onClick={() => setShowCreateForm((value) => !value)}>
+              <Plus className="mr-2 h-4 w-4" />Новый поставщик
+            </Button>
+            <Button type="button" variant="outline" size="sm" onClick={() => setReloadTick((value) => value + 1)}>
+              <RefreshCcw className="mr-2 h-4 w-4" />Обновить
+            </Button>
+          </div>
+        }
+      />
+
+      {showCreateForm ? (
+        <Card className="border-border p-4">
+          <form onSubmit={createSupplier} className="space-y-3">
+            <div>
+              <h2 className="text-sm font-semibold">Новый поставщик</h2>
+              <p className="mt-1 text-xs text-muted-foreground">Создаётся черновик. Продажи начнутся после проверки реквизитов, договора, комиссии и товара.</p>
+            </div>
+            <div className="grid gap-3 md:grid-cols-3">
+              <label className="space-y-1 text-xs">Название<Input required minLength={2} maxLength={200} value={createTitle} onChange={(event) => setCreateTitle(event.target.value)} /></label>
+              <label className="space-y-1 text-xs">Адрес в системе<Input required maxLength={100} pattern="[a-z0-9]+(-[a-z0-9]+)*" placeholder="test-museum" value={createSlug} onChange={(event) => setCreateSlug(event.target.value)} /></label>
+              <label className="space-y-1 text-xs">Как поступают данные
+                <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={createMode} onChange={(event) => setCreateMode(event.target.value as typeof createMode)}>
+                  <option value="INTERNAL_SALES">Поставщик работает в ЛК</option>
+                  <option value="IMPORTED_TICKETING_SYSTEM">Импорт событий</option>
+                  <option value="API_SYNC">API поставщика</option>
+                </select>
+              </label>
+            </div>
+            {createError ? <p role="alert" className="text-xs text-destructive">{createError}</p> : null}
+            <div className="flex gap-2">
+              <Button type="submit" size="sm" disabled={createBusy}>{createBusy ? 'Создание...' : 'Создать черновик'}</Button>
+              <Button type="button" size="sm" variant="outline" onClick={() => setShowCreateForm(false)}>Отмена</Button>
+            </div>
+          </form>
+        </Card>
+      ) : null}
+
+      <div className="grid gap-2 lg:grid-cols-4">
+        <Counter title="Активные" value={payload.metrics.active} tone="success" />
+        <Counter title="На проверке" value={payload.metrics.review} tone="warning" />
+        <Counter title="Готовы к продаже" value={payload.metrics.checkoutReady} tone="info" />
+        <Counter title="Блокеры" value={payload.metrics.needsAttention} tone="danger" />
+      </div>
+
+      <QuickFilterBar items={quickFilters} activeId={status} onChange={(id) => setParam('status', id)} />
+
+      <Card className="border-border p-3">
+        <div className="grid gap-3 lg:grid-cols-[minmax(280px,1fr)_auto] lg:items-center">
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={q}
+              onChange={(event) => setParam('q', event.target.value)}
+              placeholder="Название, юрлицо, ИНН, email или телефон"
+              className="h-9 border-border bg-background pl-8 text-sm"
+            />
+          </div>
+          <div className="text-xs text-muted-foreground">
+            {loading ? 'загрузка...' : `${formatNumber(payload.total)} найдено`}
+          </div>
+        </div>
+        {loadError ? (
+          <div className="mt-2 rounded-md border border-warning/30 bg-warning/10 px-3 py-2 text-xs text-warning-foreground">
+            Backend недоступен: {loadError}
+          </div>
+        ) : null}
+      </Card>
+
+      <DataTableShell
+        loading={loading}
+        columns={['Поставщик', 'Статус', 'События', 'Заказы', 'Финансы', 'Готовность', '']}
+        empty={
+          !loading && payload.items.length === 0 ? (
+            <EmptyState icon={Building2} title="Поставщиков пока нет" description="Добавим первого поставщика после подключения внутреннего checkout." />
+          ) : null
+        }
+      >
+        {payload.items.map((supplier) => (
+          <tr key={supplier.id} className="border-b border-border align-top last:border-0 hover:bg-secondary/40">
+            <td className="min-w-[260px] px-4 py-3">
+              <button type="button" className="text-left" onClick={() => openSupplier(supplier)}>
+                <div className="font-medium text-foreground">{supplier.title}</div>
+                <div className="mt-1 font-mono text-[11px] text-muted-foreground">{supplier.slug}</div>
+                {supplier.legalName ? <div className="mt-1 text-xs text-muted-foreground">{supplier.legalName}</div> : null}
+              </button>
+            </td>
+            <td className="px-4 py-3">
+              <StatusBadge status={supplierStatusTone(supplier.status)} label={supplierStatusLabel(supplier.status)} />
+              <div className="mt-2 text-xs text-muted-foreground">{catalogModeLabel(supplier.defaultCatalogMode)}</div>
+            </td>
+            <td className="px-4 py-3 text-sm">
+              <div>{formatNumber(supplier.events.total)} всего</div>
+              <div className="mt-1 text-xs text-muted-foreground">
+                {formatNumber(supplier.events.internalCheckout + supplier.events.hybrid)} с checkout
+              </div>
+              {supplier.admissions.total ? (
+                <div className="mt-1 text-xs text-muted-foreground">
+                  {formatNumber(supplier.admissions.total)} входных билетов
+                </div>
+              ) : null}
+            </td>
+            <td className="px-4 py-3 text-sm">
+              <div>{formatNumber(supplier.orders.totalItems)} позиций</div>
+              <div className="mt-1 text-xs text-muted-foreground">{formatMoney(supplier.orders.grossKopecks)}</div>
+            </td>
+            <td className="px-4 py-3 text-sm">
+              <div>{formatMoney(supplier.finance.ledgerBalanceKopecks)}</div>
+              <div className="mt-1 text-xs text-muted-foreground">
+                комиссия {formatMoney(supplier.finance.commissionKopecks)}
+              </div>
+            </td>
+            <td className="min-w-[220px] px-4 py-3">
+              <ReadinessPills supplier={supplier} />
+            </td>
+            <td className="px-4 py-3 text-right">
+              <Button type="button" size="sm" variant="outline" disabled={detailLoading} onClick={() => openSupplier(supplier)}>
+                Открыть
+              </Button>
+            </td>
+          </tr>
+        ))}
+      </DataTableShell>
+
+      <div className="flex items-center justify-between text-sm text-muted-foreground">
+        <span>
+          Стр. {formatNumber(page)} / {formatNumber(pages)}
+        </span>
+        <div className="flex gap-2">
+          <Button type="button" variant="outline" size="sm" disabled={page <= 1 || loading} onClick={() => setPage(page - 1)}>
+            Назад
+          </Button>
+          <Button type="button" variant="outline" size="sm" disabled={!payload.hasMore || loading} onClick={() => setPage(page + 1)}>
+            Вперед
+          </Button>
+        </div>
+      </div>
+
+      <SupplierDetailSheet
+        supplier={selected}
+        legalActionBusy={legalActionBusy}
+        legalActionError={legalActionError}
+        inviteUserBusy={inviteUserBusy}
+        inviteUserError={inviteUserError}
+        inviteAccess={inviteAccess}
+        teamBusy={teamBusy}
+        teamError={teamError}
+        onUpdateTeamMember={updateTeamMember}
+        onLegalAction={reviewLegalProfile}
+        onInviteUser={inviteSupplierUser}
+        onLinkVenue={linkVenue}
+        venueLinkBusy={venueLinkBusy}
+        venueLinkError={venueLinkError}
+        onOpenChange={(open) => {
+          if (open) return;
+          setSelected(null);
+          setInviteAccess(null);
+          setInviteUserError(null);
+        }}
+      />
+    </div>
+  );
+}
+
+function SupplierDetailSheet({
+  supplier,
+  legalActionBusy,
+  legalActionError,
+  inviteUserBusy,
+  inviteUserError,
+  inviteAccess,
+  teamBusy,
+  teamError,
+  onUpdateTeamMember,
+  onLegalAction,
+  onInviteUser,
+  onLinkVenue,
+  venueLinkBusy,
+  venueLinkError,
+  onOpenChange,
+}: {
+  supplier: AdminSupplierDetailDto | null;
+  legalActionBusy: 'approve' | 'reject' | null;
+  legalActionError: string | null;
+  inviteUserBusy: boolean;
+  inviteUserError: string | null;
+  inviteAccess: AdminSupplierInviteResultDto['access'] | null;
+  teamBusy: string | null;
+  teamError: string | null;
+  onUpdateTeamMember: (supplierId: string, memberId: string, role: string, isActive: boolean) => Promise<void>;
+  onLegalAction: (supplierId: string, action: 'approve' | 'reject') => void;
+  onInviteUser: (supplierId: string, input: AdminSupplierInviteRequestDto) => Promise<void>;
+  onLinkVenue: (supplierId: string, venueId: string) => Promise<void>;
+  venueLinkBusy: boolean;
+  venueLinkError: string | null;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const hasLegalProfile = Boolean(supplier?.legal.legalName || supplier?.legal.inn);
+  const [activeTab, setActiveTab] = React.useState<'overview' | 'legal' | 'terms' | 'team'>('overview');
+
+  React.useEffect(() => {
+    setActiveTab('overview');
+  }, [supplier?.id]);
+
+  return (
+    <Sheet open={Boolean(supplier)} onOpenChange={onOpenChange}>
+      <SheetContent className="w-[min(920px,96vw)] overflow-y-auto sm:max-w-[920px]">
+        {supplier ? (
+          <div className="pr-8">
+            <div className="flex flex-wrap items-center gap-2">
+              <StatusBadge status={supplierStatusTone(supplier.status)} label={supplierStatusLabel(supplier.status)} />
+              <Badge variant="outline">{catalogModeLabel(supplier.defaultCatalogMode)}</Badge>
+              <Badge variant="outline">{paymentModeLabel(supplier.paymentMode)}</Badge>
+            </div>
+            <h2 className="mt-3 text-xl font-semibold">{supplier.title}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{supplier.legalName || 'Юрлицо не указано'}</p>
+
+            <nav aria-label="Разделы поставщика" className="mt-5 flex gap-1 overflow-x-auto border-b border-border pb-1">
+              {([
+                ['overview', 'Обзор'],
+                ['legal', 'Юрданные'],
+                ['terms', 'Договор и расчёты'],
+                ['team', 'Команда'],
+              ] as const).map(([id, label]) => (
+                <Button
+                  key={id}
+                  type="button"
+                  size="sm"
+                  variant={activeTab === id ? 'secondary' : 'ghost'}
+                  aria-current={activeTab === id ? 'page' : undefined}
+                  onClick={() => setActiveTab(id)}
+                  className="shrink-0"
+                >
+                  {label}
+                </Button>
+              ))}
+            </nav>
+
+            <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+              <div className="space-y-4">
+                {activeTab === 'legal' ? (
+                <Card className="border-border p-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <h3 className="text-sm font-semibold">Юридический контур</h3>
+                    <StatusBadge status={legalStatusTone(supplier.legal.status)} label={legalStatusLabel(supplier.legal.status)} />
+                  </div>
+                  <dl className="mt-3 grid gap-2 text-sm">
+                    <DetailTerm label="Статус" value={legalStatusLabel(supplier.legal.status)} />
+                    <DetailTerm label="ИНН" value={supplier.legal.inn || '-'} />
+                    <DetailTerm label="Налоговый режим" value={supplier.legal.status === 'VERIFIED' ? taxModeLabel(supplier.legal.taxMode) : 'Не подтверждён'} />
+                    <DetailTerm label="НДС" value={supplier.legal.status === 'VERIFIED' ? (supplier.legal.isVatPayer ? 'Плательщик по профилю' : 'Не плательщик по профилю') : 'Не подтверждён'} />
+                    <DetailTerm label="Основной счет" value={supplier.legal.hasPrimaryBankAccount ? 'есть' : 'нет'} />
+                    <DetailTerm label="YooKassa" value={supplier.yookassaShopId || '-'} />
+                    <DetailTerm label="Техническая ставка по умолчанию" value={`${supplier.defaultCommissionBps / 100}% · требует сверки с договором`} />
+                    {supplier.legal.verifiedAt ? <DetailTerm label="Проверено" value={formatDateTime(supplier.legal.verifiedAt)} /> : null}
+                  </dl>
+                  {supplier.legal.rejectionComment ? (
+                    <div className="mt-3 rounded-md border border-destructive/20 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                      {supplier.legal.rejectionComment}
+                    </div>
+                  ) : null}
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      disabled={!hasLegalProfile || legalActionBusy !== null || supplier.legal.status === 'VERIFIED'}
+                      onClick={() => onLegalAction(supplier.id, 'approve')}
+                    >
+                      <CheckCircle2 className="h-4 w-4" />
+                      {legalActionBusy === 'approve' ? 'Одобряем...' : 'Одобрить реквизиты'}
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      disabled={!hasLegalProfile || legalActionBusy !== null}
+                      onClick={() => onLegalAction(supplier.id, 'reject')}
+                    >
+                      <XCircle className="h-4 w-4" />
+                      {legalActionBusy === 'reject' ? 'Отклоняем...' : 'Отклонить'}
+                    </Button>
+                  </div>
+                  {legalActionError ? <div className="mt-3 text-xs text-destructive">{legalActionError}</div> : null}
+                </Card>
+                ) : null}
+
+                {activeTab === 'terms' ? (
+                <Card className="border-border p-4">
+                  <h3 className="text-sm font-semibold">Договор и расчёты</h3>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Карточка и ЛК поставщика читают один профиль. Номер и версия агентского договора, а также утверждённая схема чека пока не хранятся в этом API.
+                  </p>
+                  <dl className="mt-3 grid gap-2 text-sm">
+                    <DetailTerm label="Приём платежа" value={paymentModeLabel(supplier.paymentMode)} />
+                    <DetailTerm label="Комиссия платёжного сервиса" value={pspFeeModeLabel(supplier.pspFeeMode)} />
+                    <DetailTerm label="Договор" value="Не зарегистрирован в системе" />
+                    <DetailTerm label="Агентский чек" value="Требует подтверждённой схемы фискализации" />
+                  </dl>
+                  <div className="mt-4 border-t border-border pt-3">
+                    <h4 className="text-xs font-semibold">Правила комиссии в системе</h4>
+                    {supplier.commissionRules.length ? (
+                      <div className="mt-2 space-y-2">
+                        {supplier.commissionRules.map((rule) => (
+                          <div key={rule.id} className="rounded-md bg-secondary px-3 py-2 text-xs">
+                            <div className="font-medium">{commissionScopeLabel(rule.scope)}{rule.title ? ` · ${rule.title}` : ''}</div>
+                            <div className="mt-1 text-muted-foreground">
+                              {commissionValueLabel(rule.percentBps, rule.fixedFeeKopecks)} · {rule.isActive ? 'активно в системе' : 'отключено'}
+                              {rule.startsAt ? ` · с ${formatDateTime(rule.startsAt)}` : ''}
+                              {rule.endsAt ? ` · до ${formatDateTime(rule.endsAt)}` : ''}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="mt-2 text-xs text-muted-foreground">Правил нет. Значение 0% по умолчанию не означает согласованную нулевую комиссию.</p>
+                    )}
+                  </div>
+                </Card>
+                ) : null}
+
+                {activeTab === 'team' ? (
+                <Card className="border-border p-4">
+                  <h3 className="text-sm font-semibold">Команда</h3>
+                  <div className="mt-3 space-y-2">
+                    {supplier.users.length ? (
+                      supplier.users.map((user) => (
+                        <SupplierTeamMember key={user.id} supplierId={supplier.id} user={user} busy={teamBusy === user.id} onUpdate={onUpdateTeamMember} />
+                      ))
+                    ) : (
+                      <div className="text-sm text-muted-foreground">Пользователи не привязаны.</div>
+                    )}
+                  </div>
+                  {teamError ? <div className="mt-2 text-xs text-destructive">{teamError}</div> : null}
+                  {supplier.accessLog.length ? (
+                    <div className="mt-4 border-t border-border pt-3">
+                      <h4 className="text-xs font-semibold">История доступа</h4>
+                      {supplier.accessLog.map((entry) => (
+                        <div key={entry.id} className="mt-2 text-xs text-muted-foreground">
+                          {formatDateTime(entry.createdAt)} · {entry.actor} · {entry.action === 'ROLE_CHANGE' ? `${adminSupplierRoleLabel(entry.previousRole)} → ${adminSupplierRoleLabel(entry.newRole)}` : entry.newActive ? 'доступ включён' : 'доступ отключён'}
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
+                  <SupplierInviteForm
+                    supplierId={supplier.id}
+                    busy={inviteUserBusy}
+                    error={inviteUserError}
+                    access={inviteAccess}
+                    onInvite={onInviteUser}
+                  />
+                </Card>
+                ) : null}
+
+                {activeTab === 'overview' ? (
+                <>
+                <SupplierVenueLinkForm supplierId={supplier.id} busy={venueLinkBusy} error={venueLinkError} onLink={onLinkVenue} />
+                <Card className="border-border p-4">
+                  <h3 className="text-sm font-semibold">Последние события</h3>
+                  <div className="mt-3 space-y-2">
+                    {supplier.eventsSample.length ? (
+                      supplier.eventsSample.slice(0, 8).map((event) => (
+                        <div key={event.id} className="rounded-md bg-secondary px-3 py-2 text-sm">
+                          <div className="font-medium">{event.title}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {supplierStatusLabel(event.status)} · {purchaseFlowLabel(event.purchaseFlow)} · {managementModeLabel(event.managementMode)}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-sm text-muted-foreground">Событий пока нет.</div>
+                    )}
+                  </div>
+                </Card>
+
+                <Card className="border-border p-4">
+                  <h3 className="text-sm font-semibold">Входные билеты</h3>
+                  <div className="mt-3 space-y-2">
+                    {supplier.admissionProductsSample.length ? (
+                      supplier.admissionProductsSample.slice(0, 8).map((product) => (
+                        <div key={product.id} className="rounded-md bg-secondary px-3 py-2 text-sm">
+                          <div className="font-medium">{product.title}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {supplierStatusLabel(product.status)} · {purchaseFlowLabel(product.purchaseFlow)} · {product.priceFromRub != null ? `от ${formatMoney(product.priceFromRub * 100)}` : 'цена не задана'}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-sm text-muted-foreground">Входных билетов пока нет.</div>
+                    )}
+                  </div>
+                </Card>
+                </>
+                ) : null}
+              </div>
+
+              <div className="space-y-4">
+                <Card className="border-border p-4">
+                  <h3 className="text-sm font-semibold">Готовность checkout</h3>
+                  <ReadinessPills supplier={supplier} />
+                  <div className="mt-3 space-y-2">
+                    {[...supplier.readiness.blockers, ...supplier.readiness.warnings].map((issue) => (
+                      <div key={issue.code} className="flex items-start gap-2 text-sm">
+                        {issue.severity === 'high' ? (
+                          <AlertTriangle className="mt-0.5 h-4 w-4 text-destructive" />
+                        ) : (
+                          <CheckCircle2 className="mt-0.5 h-4 w-4 text-warning-foreground" />
+                        )}
+                        <span>{issue.label}</span>
+                      </div>
+                    ))}
+                    {supplier.readiness.blockers.length === 0 && supplier.readiness.warnings.length === 0 ? (
+                      <div className="text-sm text-muted-foreground">Блокеров нет.</div>
+                    ) : null}
+                  </div>
+                </Card>
+
+                {activeTab === 'terms' ? <Card className="border-border p-4">
+                  <h3 className="text-sm font-semibold">Финсводка</h3>
+                  <dl className="mt-3 grid gap-2 text-sm">
+                    <DetailTerm label="Баланс ledger" value={formatMoney(supplier.finance.ledgerBalanceKopecks)} />
+                    <DetailTerm label="Продажи" value={formatMoney(supplier.finance.saleKopecks)} />
+                    <DetailTerm label="Комиссия" value={formatMoney(supplier.finance.commissionKopecks)} />
+                    <DetailTerm label="Возвраты" value={formatMoney(supplier.finance.refundKopecks)} />
+                    <DetailTerm label="Выплачено" value={formatMoney(supplier.finance.paidPayoutsKopecks)} />
+                  </dl>
+                </Card> : null}
+
+                {activeTab === 'overview' ? <Card className="border-border p-4">
+                  <h3 className="text-sm font-semibold">Отзывы</h3>
+                  <dl className="mt-3 grid gap-2 text-sm">
+                    <DetailTerm label="Всего" value={formatNumber(supplier.reviews.total)} />
+                    <DetailTerm label="Одобрено" value={formatNumber(supplier.reviews.approved)} />
+                    <DetailTerm label="На модерации" value={formatNumber(supplier.reviews.pendingModeration)} />
+                    <DetailTerm label="Средняя оценка" value={supplier.reviews.averageRating ? supplier.reviews.averageRating.toFixed(1) : '-'} />
+                  </dl>
+                </Card> : null}
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+function SupplierVenueLinkForm({
+  supplierId,
+  busy,
+  error,
+  onLink,
+}: {
+  supplierId: string;
+  busy: boolean;
+  error: string | null;
+  onLink: (supplierId: string, venueId: string) => Promise<void>;
+}) {
+  const [query, setQuery] = React.useState('');
+  const [venues, setVenues] = React.useState<Array<{ id: string; title: string; slug: string }>>([]);
+  const [searching, setSearching] = React.useState(false);
+  const [searchError, setSearchError] = React.useState<string | null>(null);
+  const [linkedVenueId, setLinkedVenueId] = React.useState<string | null>(null);
+
+  const search = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSearching(true);
+    setSearchError(null);
+    setLinkedVenueId(null);
+    try {
+      const response = await adminFetch(`/api/admin/venues?limit=20&q=${encodeURIComponent(query.trim())}`, { cache: 'no-store' });
+      const body = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(body?.message || body?.error || `HTTP ${response.status}`);
+      setVenues(Array.isArray(body?.rows) ? body.rows : []);
+    } catch (searchFailure) {
+      setVenues([]);
+      setSearchError(searchFailure instanceof Error ? searchFailure.message : String(searchFailure));
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  return (
+    <Card className="border-border p-4">
+      <h3 className="text-sm font-semibold">Площадки поставщика</h3>
+      <p className="mt-1 text-xs text-muted-foreground">Привяжите существующую площадку, прежде чем поставщик предложит входной билет.</p>
+      <form onSubmit={search} className="mt-3 flex gap-2">
+        <Input aria-label="Найти площадку" required minLength={2} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Название площадки" />
+        <Button type="submit" size="sm" variant="outline" disabled={searching}>{searching ? 'Ищем...' : 'Найти'}</Button>
+      </form>
+      {searchError ? <p role="alert" className="mt-2 text-xs text-destructive">{searchError}</p> : null}
+      {error ? <p role="alert" className="mt-2 text-xs text-destructive">{error}</p> : null}
+      {venues.length ? (
+        <div className="mt-3 space-y-2">
+          {venues.map((venue) => (
+            <div key={venue.id} className="flex items-center justify-between gap-2 rounded-md bg-secondary px-3 py-2 text-xs">
+              <div><div className="font-medium">{venue.title}</div><div className="text-muted-foreground">{venue.slug}</div></div>
+              <Button type="button" size="sm" variant="outline" disabled={busy} onClick={() => onLink(supplierId, venue.id).then(() => setLinkedVenueId(venue.id)).catch(() => undefined)}>
+                {linkedVenueId === venue.id ? 'Привязана' : 'Привязать'}
+              </Button>
+            </div>
+          ))}
+        </div>
+      ) : null}
+    </Card>
+  );
+}
+
+function SupplierTeamMember({ supplierId, user, busy, onUpdate }: {
+  supplierId: string;
+  user: AdminSupplierDetailDto['users'][number];
+  busy: boolean;
+  onUpdate: (supplierId: string, memberId: string, role: string, isActive: boolean) => Promise<void>;
+}) {
+  const [role, setRole] = React.useState(user.role);
+  React.useEffect(() => setRole(user.role), [user.role]);
+  const changeActive = () => {
+    if (!window.confirm(user.isActive ? `Отключить доступ ${user.email || user.name || ''}?` : `Восстановить доступ ${user.email || user.name || ''}?`)) return;
+    void onUpdate(supplierId, user.id, user.role, !user.isActive);
+  };
+  return (
+    <div className="rounded-md bg-secondary px-3 py-2 text-sm">
+      <div className="font-medium">{user.email || user.name || user.id}</div>
+      <div className="mt-1 text-xs text-muted-foreground">{user.isActive ? (user.acceptedAt ? 'Доступ активен' : 'Приглашение ожидает принятия') : 'Доступ отключён'}</div>
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+        <select value={role} onChange={(event) => setRole(event.target.value)} aria-label={`Роль ${user.email || user.id}`} className="h-8 rounded-md border border-input bg-background px-2 text-xs" disabled={busy || !user.isActive}>
+          <option value="OWNER">Владелец</option><option value="ADMIN">Администратор</option><option value="OPERATOR">Оператор</option><option value="ACCOUNTANT">Бухгалтер</option><option value="VIEWER">Только просмотр</option>
+        </select>
+        <Button type="button" size="sm" variant="outline" disabled={busy || !user.isActive || role === user.role} onClick={() => void onUpdate(supplierId, user.id, role, true)}>Сохранить роль</Button>
+        <Button type="button" size="sm" variant="outline" disabled={busy || (!user.isActive && !user.acceptedAt)} onClick={changeActive}>{user.isActive ? 'Отключить' : 'Восстановить'}</Button>
+      </div>
+    </div>
+  );
+}
+
+function SupplierInviteForm({
+  supplierId,
+  busy,
+  error,
+  access,
+  onInvite,
+}: {
+  supplierId: string;
+  busy: boolean;
+  error: string | null;
+  access: AdminSupplierInviteResultDto['access'] | null;
+  onInvite: (supplierId: string, input: AdminSupplierInviteRequestDto) => Promise<void>;
+}) {
+  const [email, setEmail] = React.useState('');
+  const [name, setName] = React.useState('');
+  const [role, setRole] = React.useState<AdminSupplierInviteRequestDto['role']>('OWNER');
+  const [copied, setCopied] = React.useState(false);
+
+  React.useEffect(() => {
+    setEmail('');
+    setName('');
+    setRole('OWNER');
+    setCopied(false);
+  }, [supplierId]);
+
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    await onInvite(supplierId, {
+      email: email.trim(),
+      name: name.trim() || null,
+      role,
+    });
+  }
+
+  async function copyInviteUrl() {
+    if (!access?.inviteUrl) return;
+    await navigator.clipboard.writeText(access.inviteUrl);
+    setCopied(true);
+  }
+
+  return (
+    <div className="mt-4 border-t border-border pt-4">
+      <div className="flex items-center gap-2 text-sm font-semibold">
+        <UserPlus className="h-4 w-4" />
+        Выдать доступ
+      </div>
+      <form className="mt-3 grid gap-2" onSubmit={(event) => void submit(event)}>
+        <Input
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          type="email"
+          autoComplete="off"
+          placeholder="Email сотрудника"
+          required
+        />
+        <Input
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+          autoComplete="off"
+          placeholder="Имя, необязательно"
+        />
+        <select
+          value={role}
+          onChange={(event) => setRole(event.target.value as AdminSupplierInviteRequestDto['role'])}
+          className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+          aria-label="Роль в кабинете поставщика"
+        >
+          <option value="OWNER">Владелец</option>
+          <option value="ADMIN">Администратор</option>
+          <option value="OPERATOR">Оператор</option>
+          <option value="ACCOUNTANT">Бухгалтер</option>
+          <option value="VIEWER">Только просмотр</option>
+        </select>
+        <Button type="submit" size="sm" disabled={busy}>
+          <UserPlus className="h-4 w-4" />
+          {busy ? 'Создаем доступ...' : 'Создать приглашение'}
+        </Button>
+      </form>
+      {error ? <div className="mt-2 text-xs text-destructive">{error}</div> : null}
+      {access ? (
+        <div className="mt-3 rounded-md bg-secondary p-3 text-xs">
+          <div className="font-medium text-foreground">
+            {access.existingAccount ? 'Доступ подключен к существующему аккаунту.' : 'Одноразовая ссылка готова.'}
+          </div>
+          <div className="mt-1 text-muted-foreground">{access.email} · {adminSupplierRoleLabel(access.role)}</div>
+          {access.inviteUrl ? (
+            <div className="mt-2 flex gap-2">
+              <Input value={access.inviteUrl} readOnly aria-label="Ссылка приглашения" className="h-8 text-xs" />
+              <Button type="button" size="sm" variant="outline" onClick={() => void copyInviteUrl()} title="Скопировать ссылку">
+                <Copy className="h-4 w-4" />
+                {copied ? 'Готово' : 'Копировать'}
+              </Button>
+            </div>
+          ) : null}
+          {access.expiresAt ? <div className="mt-2 text-muted-foreground">Действует до {formatDateTime(access.expiresAt)}</div> : null}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function adminSupplierRoleLabel(role: string): string {
+  return ({
+    OWNER: 'владелец',
+    ADMIN: 'администратор',
+    OPERATOR: 'оператор',
+    ACCOUNTANT: 'бухгалтер',
+    VIEWER: 'только просмотр',
+  } as Record<string, string>)[role] || role;
+}
+
+function ReadinessPills({ supplier }: { supplier: AdminSupplierRowDto }) {
+  if (supplier.readiness.canEnableInternalCheckout) {
+    return (
+      <div className="flex flex-wrap gap-1.5">
+        <Badge variant="outline" className="border-success/30 bg-success/10 text-success">
+          продажи можно
+        </Badge>
+        {supplier.readiness.warnings.map((issue) => (
+          <Badge key={issue.code} variant="outline" className="border-warning/30 bg-warning/10 text-warning-foreground">
+            {issue.label}
+          </Badge>
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {supplier.readiness.blockers.slice(0, 3).map((issue) => (
+        <Badge key={issue.code} variant="outline" className="border-destructive/30 bg-destructive/10 text-destructive">
+          {issue.label}
+        </Badge>
+      ))}
+      {supplier.readiness.blockers.length > 3 ? <Badge variant="outline">+{supplier.readiness.blockers.length - 3}</Badge> : null}
+    </div>
+  );
+}
+
+function Counter({ title, value, tone }: { title: string; value: number; tone: 'success' | 'warning' | 'info' | 'danger' }) {
+  const toneClass =
+    tone === 'success' ? 'text-success' : tone === 'warning' ? 'text-warning-foreground' : tone === 'danger' ? 'text-destructive' : 'text-info';
+  return (
+    <Card className="border-border p-4">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <div className="text-xs text-muted-foreground">{title}</div>
+          <div className="mt-1 text-2xl font-semibold tabular-nums">{formatNumber(value)}</div>
+        </div>
+        <WalletCards className={`h-5 w-5 ${toneClass}`} />
+      </div>
+    </Card>
+  );
+}
+
+function DetailTerm({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="flex items-start justify-between gap-3 border-b border-border/60 pb-2 last:border-0 last:pb-0">
+      <dt className="text-muted-foreground">{label}</dt>
+      <dd className="text-right font-medium text-foreground">{value}</dd>
+    </div>
+  );
+}
+
+function statusCount(payload: AdminSuppliersListDto, status: string): number {
+  if (status === 'ACTIVE') return payload.metrics.active;
+  if (status === 'REVIEW') return payload.metrics.review;
+  if (status === 'DRAFT') return payload.metrics.draft;
+  if (status === 'PAUSED') return payload.metrics.paused;
+  return 0;
+}
+
+function supplierStatusTone(status: string): 'draft' | 'ready' | 'live' | 'paused' | 'archived' | 'incomplete' | 'error' {
+  if (status === 'ACTIVE') return 'live';
+  if (status === 'REVIEW') return 'ready';
+  if (status === 'PUBLISHED') return 'live';
+  if (status === 'HIDDEN') return 'paused';
+  if (status === 'PAUSED') return 'paused';
+  if (status === 'ARCHIVED') return 'archived';
+  return 'draft';
+}
+
+function supplierStatusLabel(status: string): string {
+  const labels: Record<string, string> = {
+    DRAFT: 'Черновик',
+    REVIEW: 'На проверке',
+    READY: 'Готово',
+    PUBLISHED: 'Опубликовано',
+    HIDDEN: 'Скрыто',
+    ACTIVE: 'Активен',
+    PAUSED: 'Пауза',
+    ARCHIVED: 'Архив',
+  };
+  return labels[status] || status;
+}
+
+function legalStatusTone(status?: string | null): 'draft' | 'ready' | 'live' | 'paused' | 'archived' | 'incomplete' | 'error' {
+  if (status === 'VERIFIED') return 'live';
+  if (status === 'REJECTED') return 'error';
+  if (status === 'INCOMPLETE') return 'incomplete';
+  return 'draft';
+}
+
+function legalStatusLabel(status?: string | null): string {
+  const labels: Record<string, string> = {
+    DRAFT: 'Черновик',
+    INCOMPLETE: 'На проверке',
+    VERIFIED: 'Проверено',
+    REJECTED: 'Нужны правки',
+  };
+  if (!status) return 'Не заполнено';
+  return labels[status] || status;
+}
+
+function taxModeLabel(value?: string | null): string {
+  const labels: Record<string, string> = {
+    OSNO: 'ОСНО',
+    USN_6: 'УСН 6%',
+    USN_15: 'УСН 15%',
+    AUSN: 'АУСН',
+    NPD: 'Самозанятый',
+  };
+  if (!value) return '-';
+  return labels[value] || value;
+}
+
+function purchaseFlowLabel(value: string): string {
+  const labels: Record<string, string> = {
+    WIDGET: 'Виджет',
+    PLATFORM: 'Daibilet',
+    HYBRID: 'Гибрид',
+  };
+  return labels[value] || value;
+}
+
+function managementModeLabel(value: string): string {
+  const labels: Record<string, string> = {
+    SOURCE_MANAGED: 'Источник',
+    DAIBILET_MANAGED: 'Daibilet',
+    SUPPLIER_DRAFTS: 'Черновики поставщика',
+    SUPPLIER_SELF_SERVICE: 'Поставщик',
+  };
+  return labels[value] || value;
+}
+
+function catalogModeLabel(value: string): string {
+  const labels: Record<string, string> = {
+    WIDGET_ONLY: 'Только виджеты',
+    INTERNAL_CHECKOUT: 'Внутренний checkout',
+    HYBRID: 'Гибрид',
+  };
+  return labels[value] || value;
+}
+
+function paymentModeLabel(value: string): string {
+  const labels: Record<string, string> = {
+    SINGLE_MERCHANT: 'Один получатель',
+    AGENT_SINGLE_PAYOUT: 'Агентский единый платёж',
+    SPLIT_MERCHANT: 'Разделение платежа',
+  };
+  return labels[value] || value;
+}
+
+function pspFeeModeLabel(value: string): string {
+  const labels: Record<string, string> = {
+    PLATFORM_PAYS: 'Оплачивает Daibilet',
+    SUPPLIER_PAYS: 'Оплачивает поставщик',
+    SHARED_50_50: 'Поровну',
+    SERVICE_FEE: 'Сервисный сбор',
+  };
+  return labels[value] || value;
+}
+
+function commissionScopeLabel(value: string): string {
+  return ({ SUPPLIER: 'Поставщик', CATEGORY: 'Категория', EVENT: 'Событие' } as Record<string, string>)[value] || value;
+}
+
+function commissionValueLabel(percentBps: number, fixedFeeKopecks: number): string {
+  const parts = [];
+  if (percentBps) parts.push(`${(percentBps / 100).toLocaleString('ru-RU')}%`);
+  if (fixedFeeKopecks) parts.push(formatMoney(fixedFeeKopecks));
+  return parts.join(' + ') || '0 (сверить с договором)';
+}
+
+function formatMoney(kopecks: number): string {
+  return `${formatNumber(Math.round((kopecks || 0) / 100))} ₽`;
+}

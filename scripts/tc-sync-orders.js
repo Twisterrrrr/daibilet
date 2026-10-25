@@ -8,6 +8,11 @@ loadRootEnv(rootDir);
 
 const requireFromDbPackage = createRequire(path.join(rootDir, "packages", "db", "package.json"));
 const { Pool } = requireFromDbPackage("pg");
+const {
+  PAID_ORDER_STATUSES,
+  sendOwnerOrderMail,
+  notifyDisabled,
+} = require("./lib/order-owner-mail");
 
 const SOURCE_ID = "src_ticketscloud";
 const SOURCE_CODE = "TICKETSCLOUD";
@@ -55,6 +60,7 @@ async function main() {
   try {
     const payload = await fetchAllOrders(token, options);
     const stats = await persistOrders(payload.orders, payload.refs, syncId, startedAt, options);
+    stats.ownerNotifications = await dispatchOwnerOrderNotifications(pool);
     console.log(JSON.stringify(stats, null, 2));
   } catch (error) {
     await markSyncFailed(syncId, error);
@@ -131,7 +137,7 @@ async function persistOrders(orders, refs, syncId, startedAt, options) {
       if (!linked.eventId) stats.withoutEventLink += 1;
 
       const snapshot = buildBuyerSnapshot(order, refs);
-      const orderDbId = await upsertExternalOrder(client, {
+      const upsertedOrder = await upsertExternalOrder(client, {
         externalOrderId,
         status,
         purchasedAt: parseTcDate(order.done_at || order.created_at),
@@ -141,6 +147,7 @@ async function persistOrders(orders, refs, syncId, startedAt, options) {
         publicCode: preferredProviderOrderNumber(order),
         archivedAt: shouldAutoArchiveTcOrder(order, status) ? new Date().toISOString() : null,
       });
+      const orderDbId = upsertedOrder.id;
 
       await upsertRawOrder(client, externalOrderId, order, refs);
       await client.query(
@@ -253,7 +260,7 @@ async function upsertExternalOrder(client, order) {
         "purchasedAt" = excluded."purchasedAt",
         "archivedAt" = coalesce("ExternalOrder"."archivedAt", excluded."archivedAt"),
         "updatedAt" = excluded."updatedAt"
-      returning id
+      returning id, (xmax = 0) as inserted
     `,
     [
       stableId("extord_tc", order.externalOrderId),
@@ -268,7 +275,7 @@ async function upsertExternalOrder(client, order) {
       order.archivedAt || null,
     ],
   );
-  return result.rows[0].id;
+  return { id: result.rows[0].id, inserted: Boolean(result.rows[0].inserted) };
 }
 
 /** Prefer human-readable Ticketscloud order number over our hashed code. */
@@ -744,4 +751,80 @@ function loadRootEnv(projectRoot) {
     const value = trimmed.slice(separatorIndex + 1).trim().replace(/^['"]|['"]$/g, "");
     if (key && process.env[key] == null) process.env[key] = value;
   }
+}
+
+/**
+ * Owner notifications for paid external orders (idempotent via ownerNotifiedAt).
+ * Runs after the sync transaction commits; failed sends are retried on next run
+ * (order stays in the pending set until ownerNotifiedAt is stamped).
+ */
+async function dispatchOwnerOrderNotifications(pool) {
+  const summary = { pending: 0, sent: 0, failed: 0, reason: null };
+  if (notifyDisabled(process.env)) {
+    summary.reason = "disabled";
+    return summary;
+  }
+  const client = await pool.connect();
+  let pending;
+  try {
+    const paidStatuses = [...PAID_ORDER_STATUSES];
+    const result = await client.query(
+      `select o.id, o.status, o."buyerSnapshot", o."publicCode", o."externalOrderId",
+              o."purchasedAt", o."updatedAt",
+              (select count(*) from "ExternalTicket" t where t."externalOrderId" = o.id) as "ticketCount",
+              (select e.slug from "ExternalTicket" t join "Event" e on e.id = t."eventId"
+                where t."externalOrderId" = o.id and e.slug is not null limit 1) as "eventSlug",
+              (select e.title from "ExternalTicket" t join "Event" e on e.id = t."eventId"
+                where t."externalOrderId" = o.id limit 1) as "eventTitle",
+              (select coalesce(ov."imageUrl", e."imageUrl") from "ExternalTicket" t
+                join "Event" e on e.id = t."eventId" left join "EventOverride" ov on ov."eventId" = e.id
+                where t."externalOrderId" = o.id limit 1) as "eventImageUrl",
+              (select v.title from "ExternalTicket" t join "Event" e on e.id = t."eventId"
+                left join "Venue" v on v.id = e."venueId" where t."externalOrderId" = o.id limit 1) as "venueTitle",
+              (select c.title from "ExternalTicket" t join "Event" e on e.id = t."eventId"
+                left join "Venue" v on v.id = e."venueId" left join "City" c on c.id = v."cityId"
+                where t."externalOrderId" = o.id limit 1) as "cityTitle",
+              (select es."startsAt" from "ExternalTicket" t join "EventSession" es on es.id = t."sessionId"
+                where t."externalOrderId" = o.id and es."startsAt" is not null order by es."startsAt" asc limit 1) as "eventStartsAt",
+              s.name as "sourceName"
+       from "ExternalOrder" o
+       left join "Source" s on s.id = o."sourceId"
+       where o."ownerNotifiedAt" is null
+         and o."archivedAt" is null
+         and lower(o.status) = any($1::text[])
+         and o."updatedAt" >= now() - interval '3 days'
+       order by o."updatedAt" asc
+       limit 25`,
+      [paidStatuses.map((value) => value.toLowerCase())],
+    );
+    pending = result.rows;
+    summary.pending = pending.length;
+  } finally {
+    client.release();
+  }
+
+  for (const row of pending) {
+    const outcome = await sendOwnerOrderMail(row, process.env);
+    if (outcome.sent) {
+      summary.sent += 1;
+      const clientUpdate = await pool.connect();
+      try {
+        await clientUpdate.query(
+          'update "ExternalOrder" set "ownerNotifiedAt" = now() where id = $1 and "ownerNotifiedAt" is null',
+          [row.id],
+        );
+      } finally {
+        clientUpdate.release();
+      }
+    } else {
+      // Retry on the next run unless the mail module is unavailable/misconfigured -
+      // permanent skips would otherwise be retried every 10 minutes forever.
+      summary.failed += 1;
+      if (outcome.reason === "disabled" || outcome.reason === "no_recipient") {
+        summary.reason = outcome.reason;
+        break;
+      }
+    }
+  }
+  return summary;
 }

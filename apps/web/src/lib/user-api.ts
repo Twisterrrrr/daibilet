@@ -57,11 +57,41 @@ export function userMe(token: string) {
   });
 }
 
+export function requestUserEmailVerification(token: string) {
+  return fetchUserApi<{ sent: boolean; alreadyVerified?: boolean }>('/api/user/auth/request-email-verification', {
+    method: 'POST',
+    headers: { authorization: `Bearer ${token}` },
+    body: JSON.stringify({}),
+  });
+}
+
+export function verifyUserEmail(token: string) {
+  return fetchUserApi<{ verified: boolean }>('/api/user/auth/verify-email', {
+    method: 'POST',
+    body: JSON.stringify({ token }),
+  });
+}
+
+export function requestUserPasswordReset(email: string, audience: 'buyer' | 'supplier' = 'buyer') {
+  return fetchUserApi<{ accepted: boolean }>('/api/user/auth/request-password-reset', {
+    method: 'POST',
+    body: JSON.stringify({ email, audience }),
+  });
+}
+
+export function resetUserPassword(token: string, password: string) {
+  return fetchUserApi<{ reset: boolean }>('/api/user/auth/reset-password', {
+    method: 'POST',
+    body: JSON.stringify({ token, password }),
+  });
+}
+
 export type AccountPurchasesPayload = {
   total: number;
   rows: Array<{
     id: string;
     number: string;
+    sourceKind?: 'internal' | 'external';
     status: string;
     displayStatus: string;
     statusTone: string;
@@ -88,6 +118,12 @@ export type AccountPurchasesPayload = {
   page?: number;
   pages?: number;
   limit?: number;
+  /**
+   * Отдаётся finance API; поле необязательно для совместимости со старым сервером.
+   */
+  account?: {
+    emailVerified?: boolean | null;
+  } | null;
 };
 
 export function accountPurchases(token: string, params?: { page?: number; limit?: number }) {

@@ -39,27 +39,25 @@ const dryRun = !process.argv.includes('--apply');
 const limit = Number(argValue('--limit') || 0) || 0;
 const outDir = argValue('--out') || path.join(rootDir, 'tmp-event-desc-rewrites');
 
-const TZ = { timeZone: 'Europe/Moscow' };
-const fmtDate = (d) => new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', ...TZ }).format(d);
-const fmtTime = (d) => new Intl.DateTimeFormat('ru-RU', { hour: '2-digit', minute: '2-digit', ...TZ }).format(d);
-
-/** Four rotated phrasings keep the fact block from looking machine-stamped. */
-function factBlock(card, dates, variant) {
+/**
+ * Four rotated phrasings keep the fact block from looking machine-stamped.
+ * Schedule is intentionally absent: the purchase block renders live slots, and
+ * a stored date goes stale (and used to pin the UTC clock as local time).
+ */
+function factBlock(card, variant) {
   const place = [card.venue, card.city].filter(Boolean).join(', ');
   const price = card.price ? `Билеты от ${card.price} ₽.` : '';
   const age = card.age && String(card.age) !== '0' ? `Возраст: ${card.age}+.` : '';
-  const dateLine = dates.length
-    ? `${fmtDate(dates[0])}, ${fmtTime(dates[0])}${dates.length > 1 ? ` (и ещё ${dates.length - 1} сеанс${dates.length - 1 === 1 ? '' : 'а'})` : ''}`
-    : 'билеты с открытой датой';
-  const dateList = dates.length ? dates.map((d) => `${fmtDate(d)}, ${fmtTime(d)}`).join('; ') : '';
-
+  const heads = ['Практическая информация', 'Где проходит', 'Организационные детали', 'Билеты'];
   const variants = [
-    `## Практическая информация\n\nБлижайший сеанс - ${dateLine}.${place ? ` Площадка: ${place}.` : ''}${price ? ` ${price}` : ''}${age ? ` ${age}` : ''}`,
-    `## Когда и где\n\n${dateList ? `Ближайшие даты: ${dateList}.` : 'Билеты с открытой датой.'}${place ? `\n\nАдрес: ${place}.` : ''}${price ? `\n\n${price}` : ''}${age ? ` ${age}` : ''}`,
-    `## Организационные детали\n\nСледующий сеанс - ${dateLine}.${place ? `\n\nМесто: ${place}.` : ''}${price ? `\n\n${price}` : ''}${age ? ` ${age}` : ''}`,
-    `## Даты и билеты\n\n${dateLine}${place ? `\n\n${place}.` : ''}${price ? `\n\n${price}` : ''}${age ? ` ${age}` : ''}`,
+    [place ? `Площадка: ${place}.` : '', price, age],
+    [price, place ? `Локация: ${place}.` : '', age],
+    [place ? `Место: ${place}.` : '', age, price],
+    [place ? `Адрес: ${place}.` : '', price, age],
   ];
-  return variants[variant % variants.length];
+  const body = variants[variant % variants.length].filter(Boolean).join(' ');
+  if (!body) return '';
+  return `## ${heads[variant % heads.length]}\n\n${body}`;
 }
 
 
@@ -76,30 +74,11 @@ async function main() {
   const pool = new Pool({ connectionString, max: 2, application_name: 'event_rewrite_apply' });
   const client = await pool.connect();
   try {
-    const sessionRows = (await client.query(
-      `
-      select "eventId", "startsAt"
-      from "EventSession"
-      where "eventId" = any($1::text[])
-        and "isActive" is not false and "cancelledAt" is null
-        and "startsAt" >= now() - interval '2 hours'
-      order by "startsAt"
-      `,
-      [[...limitedIds]],
-    )).rows;
-    const sessionsByEvent = new Map();
-    for (const r of sessionRows) {
-      if (!sessionsByEvent.has(r.eventId)) sessionsByEvent.set(r.eventId, []);
-      const list = sessionsByEvent.get(r.eventId);
-      if (list.length < 3) list.push(r.startsAt);
-    }
-
     const changes = [];
     for (const cluster of clusters) {
       cluster.members.forEach((member, i) => {
         if (!limitedIds.has(member.id)) return;
-        const dates = (sessionsByEvent.get(member.id) || []).map((d) => new Date(d));
-        const text = `${cluster.rewrite}\n\n${factBlock(member, dates, i)}`.trim();
+        const text = [cluster.rewrite, factBlock(member, i)].filter(Boolean).join('\n\n').trim();
         changes.push({ id: member.id, slug: member.slug, cluster: cluster.title, text });
       });
     }

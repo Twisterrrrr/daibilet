@@ -73,6 +73,27 @@
 - Батчи рерайтов версионируются в репозитории рядом с каноном, который они
   меняют: `data/teplohod/editorial/`, `data/ticketscloud/editorial/`.
 
+## Импорт событий и описания
+
+Правило владельца (2026-10-20): **новые импортированные события санитайзятся сразу
+после синка**. Пост-синковый хук (`scripts/post-sync-event-descriptions.js`,
+встроен в `tc-import-catalog.js` и `tep-import-fixtures.js`) собирает каноничное
+описание: структура H3/абзацы/списки, тире→дефис, `## Практическая информация`
+из полей каталога + продающая строка. Детали: `docs/decision-log.md` (2026-10-20),
+composer: `apps/web/src/lib/event-description-compose.ts`.
+
+- Тексты с `EventOverride.descriptionOrigin` = `EDITORIAL` или `AI` не перезаписываются
+  никогда. Ручное сохранение описания в админке ставит `EDITORIAL`.
+- Legacy-строки без маркера трогает только явный repair-прогон (`--repair-legacy`),
+  и только структурно - формулировки провайдера сохраняются.
+- AI-рерайт идёт через очередь `EventDescriptionRevision` и страницу
+  `/admin/rewrite-queue`: черновик публикуется **только после подтверждения
+  редактором**, автоматической публикации AI нет. Ошибка AI не останавливает sync.
+- До подключения персональной admin-сессии и RBAC-gate операции approve/publish
+  должны оставаться fail-closed; общий Basic Auth нельзя использовать как автора
+  или замену проверке роли.
+- Ручной прогон: `npm run event:postsync` (по умолчанию dry-run, `--apply` пишет).
+
 ## Git и деплой
 
 Cadence владельца (2026-08-05): работаем локально, **commit + push** после
@@ -108,13 +129,13 @@ pnpm install --frozen-lockfile
 pnpm db:generate
 pnpm backend:typecheck      # жёсткий гейт, блокирует CI
 pnpm backend:test:ts        # 219 тестов
-pnpm --filter @daibilet/web typecheck   # см. baseline ниже, не блокирует
+pnpm --filter @daibilet/web typecheck   # 0 ошибок (гейт, не возвращать ignoreBuildErrors)
 pnpm web:test:ci            # 231 тест, только веб-пакет
 pnpm web:build              # 202 статические страницы
 ```
 
-`pnpm web:typecheck` даёт **140** ошибок и завершается с ненулевым кодом — это
-ожидаемо, гейтом не является. `web:test:ci` гоняет **только** `apps/web`;
+`pnpm --filter @daibilet/web typecheck` должен давать **0** ошибок (закрыто
+2026-09-30). `web:test:ci` гоняет **только** `apps/web`;
 общее число по монорепо выше, не искать его в выводе этой команды.
 
 `pnpm web:build` требует БД: поднять `pnpm db:up`, применить `pnpm db:deploy`.
@@ -123,16 +144,14 @@ pnpm web:build              # 202 статические страницы
 
 ### Baseline типов
 
-`apps/web` сейчас содержит **140 ошибок типов**, и они не блокируют сборку:
-в `apps/web/next.config.ts` стоит `typescript: { ignoreBuildErrors: true }`.
-Это осознанное решение, но ошибки копятся незаметно.
+`apps/web` typecheck: **0 ошибок** (закрыто 2026-09-30, перепроверено 2026-10-18).
+`typescript: { ignoreBuildErrors: true }` из `apps/web/next.config.ts` **снят** —
+ошибки типов снова ломают сборку, и это задумано.
 
-- CI считает число в job summary (шаг `Web typecheck (non-blocking baseline)`).
-- **Baseline: 140.** Если после твоей правки число выросло — ты добавил
-  регрессию, даже если сборка зелёная.
-- Снять `ignoreBuildErrors` — отдельной задачей, после того как дойдёт до нуля.
-- Основные источники: `src/lib/selected-city.test.ts` (22),
-  `src/server/day-route-match.ts` (16), `src/components/DayRoutePanel.client.tsx` (15).
+- **Не возвращай `ignoreBuildErrors`:** если сборка упала на типах — чини типы.
+- Гейт: `pnpm --filter @daibilet/web typecheck` должен оставаться на 0.
+- Зависимость `nodemailer` для `buyer-ticket-mail` остаётся отдельным вопросом
+  (это не ошибка типов, а незакрытая зависимость).
 
 ### Next.js 16
 
@@ -149,6 +168,20 @@ pnpm web:build              # 202 статические страницы
   stale-while-revalidate. `updateTag()` документирован, но не виден в типах
   `next/cache` под TypeScript 6.0.3.
 - ESLint больше не гоняется на сборке, ключ `eslint` в конфиге удалён.
+
+## Городские хабы и my-day (lazy chunks)
+
+- Городские хабы (`/cities/[slug]`) загружаются лениво через `apps/web/src/lib/city-hub-lazy.ts`
+  (`HUB_LOADERS` + `loadCityHubData`). Города без чанка (`moscow`, `moskva`,
+  `sankt-peterburg`, `perm` и др.) возвращают данные из `CITY_INFO`-реестра
+  (`cityInfo-data.ts`) как fallback — это работает, но точки и сценарии «Мой день»
+  берутся из mustSee/hub-файлов, а не из `CITY_INFO`.
+- При добавлении нового города (`*-hub.ts`) **обязательно** добавьте строку в
+  `HUB_LOADERS` в `city-hub-lazy.ts` **и** файл в `apps/web/scripts/ci-test-files.txt`
+  (стабильный тест `city-hub-lazy.test.ts` проверяет, что рост не скроет пустую
+  афишу городов: Москва, SPb, смоленск и т.д.).
+- Never hardcode `slug` variations in `loadCityHubData` — используйте только ключи
+  из `HUB_LOADERS` и `resolveCityInfo` для нормализации.
 
 ## Границы владения
 

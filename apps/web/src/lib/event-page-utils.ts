@@ -389,6 +389,28 @@ export function buildGroupedTicketCategories(payload: PublicEventPageDto): Ticke
     .sort((a, b) => (groupSortOrder.get(a.key) ?? 9999) - (groupSortOrder.get(b.key) ?? 9999));
 }
 
+/** Consolidate large venue sector lists into price tiers while retaining every sector label. */
+export function compactSectorTicketCategories(rows: TicketCategoryRow[]): TicketCategoryRow[] {
+  if (rows.length <= 8 || !rows.every((row) => /^сектор\s+\d+$/i.test(row.name))) return rows;
+
+  const tiers = new Map<string, TicketCategoryRow>();
+  for (const row of rows) {
+    const key = `${row.minPrice}:${row.maxPrice}`;
+    const current = tiers.get(key);
+    if (current) {
+      current.name += `, ${row.name.replace(/^сектор\s+/i, '')}`;
+      continue;
+    }
+    tiers.set(key, {
+      ...row,
+      key: `sector-tier-${key}`,
+      name: `Секторы ${row.name.replace(/^сектор\s+/i, '')}`,
+    });
+  }
+
+  return [...tiers.values()].sort((a, b) => a.minPrice - b.minPrice || a.maxPrice - b.maxPrice);
+}
+
 export function formatCategoryPrice(minPrice: number, maxPrice: number): string {
   if (minPrice === maxPrice) return `${formatNumber(Math.round(minPrice))} ₽`;
   return `${formatNumber(Math.round(minPrice))} - ${formatNumber(Math.round(maxPrice))} ₽`;

@@ -6,6 +6,9 @@ import {
   parseEventDescriptionBlocks,
   parseCommaSeparatedListAfterIntro,
   parseInlineListAfterColon,
+  parseLabelValueLine,
+  splitGluedListItem,
+  stripTitleDuplicateLead,
 } from './event-description-format.ts';
 
 const CHECKMARK_SAMPLE = `На нашей экскурсии вы узнаете:
@@ -65,7 +68,7 @@ test('formatEventDescriptionHtml renders ul/li and escapes HTML', () => {
   assert.match(formatEventDescriptionHtml('Цена A < B & C'), /A &lt; B &amp; C/);
 });
 
-test('existing HTML is sanitized and not re-parsed into lists', () => {
+test('existing HTML is sanitized and its safe structure is preserved', () => {
   const raw = '<p>Узнаете:</p><ul><li>Первый</li><li>Второй</li></ul>';
   const html = formatEventDescriptionHtml(raw);
   assert.equal(html, raw);
@@ -209,4 +212,162 @@ test('inline **bold** and *italic* render as strong/em', () => {
   const html = formatEventDescriptionHtml('**Возраст:** рекомендуется детям 6-14 лет. Также *важно* взять паспорт.');
   assert.match(html, /<p><strong>Возраст:<\/strong> рекомендуется детям 6-14 лет\. Также <em>важно<\/em> взять паспорт\.<\/p>/);
   assert.doesNotMatch(html, /\*\*/);
+});
+
+test('title-duplicate lead is dropped, a real lead stays', () => {
+  const title = 'В Рускеалу на ретропоезде: Водопады и мраморный каньон';
+  const raw = [
+    'В Рускеалу на ретропоезде: Водопады и мраморный каньон в Санкт-Петербурге.',
+    '',
+    'Почему стоит выбрать этот тур? Поездка на ретропоезде - стильном составе.',
+  ].join('\n');
+  assert.equal(
+    stripTitleDuplicateLead(raw, title, 'Санкт-Петербург'),
+    'Почему стоит выбрать этот тур? Поездка на ретропоезде - стильном составе.',
+  );
+  // Exact title repeat without a place tail counts too.
+  assert.equal(stripTitleDuplicateLead(`${title}.\n\nВторой абзац.`, title, ''), 'Второй абзац.');
+});
+
+test('lead with its own content survives the H1-duplicate check', () => {
+  const title = 'Тайный смысл сказок';
+  const raw = [
+    'Тайный смысл сказок на примерах из любимых мультфильмов.',
+    '',
+    'Второй абзац.',
+  ].join('\n');
+  assert.equal(stripTitleDuplicateLead(raw, title, 'Москва'), raw);
+
+  // A place tail for a different city is content, not a duplicate.
+  assert.equal(
+    stripTitleDuplicateLead('Сова в Смоленске на площадке «1865».', 'Сова', 'Москва'),
+    'Сова в Смоленске на площадке «1865».',
+  );
+});
+
+test('glued fact bullets split at price and parenthesis boundaries', () => {
+  assert.deepEqual(
+    splitGluedListItem(
+      'Трансфер на комфортабельном автобусе (вместимость автобуса зависит от набора группы) Трассовая экскурсия на протяжении всей программы',
+    ),
+    [
+      'Трансфер на комфортабельном автобусе (вместимость автобуса зависит от набора группы)',
+      'Трассовая экскурсия на протяжении всей программы',
+    ],
+  );
+  assert.deepEqual(
+    splitGluedListItem('Обед (комплексный) - от 600 руб. Полет на троллее в Рускеала (7+) - 2500 руб.'),
+    ['Обед (комплексный) - от 600 руб.', 'Полет на троллее в Рускеала (7+) - 2500 руб.'],
+  );
+  // A single fact is untouched.
+  assert.deepEqual(splitGluedListItem('Подготовленная программа тура'), [
+    'Подготовленная программа тура',
+  ]);
+});
+
+test('long label:value line is a fact row, not a heading', () => {
+  assert.equal(parseLabelValueLine('Входной билет в горный парк Рускеала: 750 руб./взрослый'), null);
+  assert.deepEqual(parseLabelValueLine('Маршрут: р. Фонтанка - Крюков канал'), {
+    label: 'Маршрут',
+    value: 'р. Фонтанка - Крюков канал',
+  });
+
+  const html = formatEventDescriptionHtml(
+    '## Оплачивается дополнительно\n\nВходной билет в горный парк Рускеала: 750 руб./взрослый, 650 руб. студентам',
+  );
+  assert.doesNotMatch(html, /<h3>Входной билет/);
+  assert.match(html, /<li>Входной билет в горный парк Рускеала: 750 руб\./);
+});
+
+test('drops stored nearest-session lines before rendering', () => {
+  const html = formatEventDescriptionHtml(
+    '## Практическая информация\n\n- Место - «Клуб», Москва\n- Ближайшая дата - 18 октября 2026, 03:00\n- Билеты - от 500 ₽',
+  );
+  assert.doesNotMatch(html, /Ближайшая дата|03:00/);
+  assert.match(html, /<li>Место/);
+  assert.match(html, /<li>Билеты/);
+});
+
+test('drops inline next-session sentence from HTML descriptions', () => {
+  const html = formatEventDescriptionHtml(
+    '<p>Следующий сеанс - 18 октября, 03:00.</p><p>Место - ТЦ «АУРА».</p>',
+  );
+  assert.doesNotMatch(html, /Следующий сеанс|03:00/);
+  assert.match(html, /Место - ТЦ/);
+});
+
+test('bus tour: schedule rows, ВАЖНО and fact sections are structured', () => {
+  const raw = [
+    'В Рускеалу на ретропоезде: Водопады и мраморный каньон в Санкт-Петербурге: ближайший сеанс - 18 октября 2026, 04:00.',
+    '',
+    'Почему стоит выбрать этот тур? Поездка на ретропоезде - стильном составе.',
+    '',
+    'Внимание! После покупки билета необходимо ЗАРЕГИСТРИРОВАТЬ участие.',
+    '',
+    '## Программа тура',
+    '',
+    '07:00 - Отправление от Казанского собора',
+    '07:40 - Отправление от ст. м. Проспект Просвещения',
+    '08:50 - 09:10 - Техническая остановка в Приозерске',
+    '09:50 - 10:20 - Крепость Корела (внешний осмотр)',
+    '11:40 - 11:55 - Посещение Музея Иван-Чая с дегустацией',
+    '12:50 - 13:30 - Обед',
+    '14:15 - 15:00 - Водопады Ахвенкоски',
+    '15:15 - 17:45 - Горный парк Рускеала (Мраморный Каньон)',
+    '17:00 - 18:45 - Самостоятельная поездка на ретропоезде «Рускеальский экспресс» от станции Рускеала до станции Сортавала (Билеты приобретаются самостоятельно, по ценам РЖД).',
+    '',
+    '## 18:45 - 22:43 - Отправление в Санкт-Петербург (два способа на выбор)',
+    '',
+    'На скоростном поезде «Ласточка» из Сортавала. Билеты приобретаются самостоятельно.',
+    'На нашем автобусе из Сортавала до Санкт-Петербурга. 19:30 - 19:50 - Магазин форелевого хозяйства. 22:43 - Прибытие в Санкт-Петербург. ВАЖНО! Билеты на ретропоезд приобретаются самостоятельно по ценам РЖД.',
+    '',
+    '## В стоимость тура входит',
+    '',
+    'Трансфер на комфортабельном автобусе экскурсионного класса Трассовая экскурсия на протяжении всей программы',
+    'Подготовленная программа тура',
+    'Услуги профессионального гида на протяжении всей поездки',
+    '⠀',
+    'Оплачивается дополнительно',
+    '',
+    '## При посадке гиду',
+    '',
+    'Входной билет в горный парк Рускеала: 750 руб./взрослый, 650 руб. студентам и лицам 60+.',
+    '',
+    '## По желанию',
+    '',
+    'Обед (комплексный) - от 600 руб. Полет на троллее в Рускеала (7+) - 2500 руб.',
+    'Экскурсия «Подземная Рускеала» (7+) - 2200 руб./взрослый.',
+  ].join('\n');
+
+  const html = formatEventDescriptionHtml(raw);
+
+  // The stored nearest-session line is gone, and the lead keeps a clean period.
+  assert.doesNotMatch(html, /ближайший сеанс/i);
+  assert.match(html, /<p>В Рускеалу на ретропоезде: Водопады/);
+  assert.doesNotMatch(html, /<h3>В Рускеалу на ретропоезде<\/h3>/);
+  assert.match(html, /Водопады и мраморный каньон в Санкт-Петербурге\.<\/p>/);
+  assert.doesNotMatch(html, /Санкт-Петербурге:\./);
+
+  // Ten schedule rows: the `## 18:45 - 22:43` markdown row joins the time list
+  // instead of becoming a heading.
+  assert.match(html, /<h3>Программа тура<\/h3>/);
+  const schedule = html.match(/<h3>Программа тура<\/h3><ul>([\s\S]*?)<\/ul>/);
+  assert.ok(schedule, 'schedule list is missing');
+  assert.equal((schedule[1].match(/<li>/g) || []).length, 10);
+  assert.match(html, /<li>18:45 - 22:43 - Отправление в Санкт-Петербург/);
+  assert.doesNotMatch(html, /<h3>18:45/);
+
+  // Inline ВАЖНО starts its own bold paragraph.
+  assert.match(html, /<strong>ВАЖНО!<\/strong>/);
+
+  // The two provider lines merge into one section heading.
+  assert.match(html, /<h3>Оплачивается дополнительно при посадке гиду<\/h3>/);
+  assert.doesNotMatch(html, /<h3>При посадке гиду<\/h3>/);
+
+  // Fact sections render as lists, without braille-blank items.
+  assert.match(html, /<h3>В стоимость тура входит<\/h3><ul>/);
+  assert.match(html, /<h3>По желанию<\/h3><ul>/);
+  assert.match(html, /<li>Трансфер на комфортабельном автобусе/);
+  assert.doesNotMatch(html, /<li>\s*<\/li>/);
+  assert.doesNotMatch(html, /\u2800/);
 });

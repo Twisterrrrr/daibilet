@@ -44,7 +44,7 @@ export async function loadThinRelatedCardSessions(input: {
   for (const target of targets) {
     if (next.length >= 4) break;
     try {
-      const payload = await fetchLandingPageDto(target.slug, citySlug);
+      const payload = await fetchLandingPageDto(target.slug, citySlug, { revalidateSeconds: 3600 });
       if (!payload?.sessions?.length) continue;
       const citySessions = filterSessionsByCity(payload.sessions, cityLabel, citySlug).filter(
         (session) => !seen.has(sessionKey(session)),
@@ -72,6 +72,7 @@ export async function loadThinRelatedCardSessions(input: {
           sort: 'popular',
         },
         timeoutMs: 5_000,
+        revalidateSeconds: 3600,
       });
       const items = (catalog.items || []) as PublicSessionDto[];
       for (const item of items) {

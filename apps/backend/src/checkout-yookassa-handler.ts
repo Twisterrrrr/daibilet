@@ -1,0 +1,163 @@
+import type { YooKassaCheckoutCreateDto } from '@daibilet/contracts/checkout';
+import { z } from 'zod';
+import {
+  applyYooKassaWebhookPayload,
+  createYooKassaCheckoutOrder,
+  isYooKassaCheckoutError,
+} from './checkout-yookassa.js';
+import { sendJson } from './http.js';
+import { createOrderAccessToken } from './order-access.js';
+import { buildPublicEventCheckout } from './public-event-checkout.js';
+import type { RouteContext } from './routing.js';
+import type { TypedRouteHandler } from './validated-handler.js';
+import { parseJsonBody } from './validation.js';
+
+const CHECKOUT_RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const CHECKOUT_RATE_LIMIT_MAX = 20;
+const checkoutRateBuckets = new Map<string, { count: number; resetAt: number }>();
+
+const nullableString = z.preprocess(
+  (value) => (typeof value === 'string' ? value.trim() || null : value),
+  z.string().nullable().optional(),
+);
+
+const yookassaCheckoutCreatePayloadSchema = z.object({
+  subjectType: z.enum(['EVENT', 'VENUE_ADMISSION']).nullable().optional(),
+  eventId: nullableString,
+  eventSlug: nullableString,
+  admissionProductId: nullableString,
+  admissionProductSlug: nullableString,
+  offerId: nullableString,
+  admissionOfferId: nullableString,
+  sessionId: nullableString,
+  quantity: z.coerce.number().int().min(1).max(10),
+  buyer: z.object({
+    email: z.string().trim().email(),
+    name: nullableString,
+    phone: nullableString,
+  }),
+  attendee: z.object({
+    name: nullableString,
+    phone: nullableString,
+  }).nullable().optional(),
+  idempotencyKey: nullableString,
+  returnUrl: nullableString,
+  confirmationMode: z.enum(['redirect', 'embedded']).nullable().optional(),
+}).refine((payload) => {
+  if (
+    payload.subjectType === 'VENUE_ADMISSION' ||
+    payload.admissionProductId ||
+    payload.admissionProductSlug ||
+    payload.admissionOfferId
+  ) {
+    return Boolean((payload.admissionProductId || payload.admissionProductSlug) && payload.admissionOfferId);
+  }
+  return Boolean((payload.eventId || payload.eventSlug) && payload.offerId);
+}, {
+  path: ['eventId'],
+  message: 'event/admission product and offer are required',
+});
+
+const yookassaWebhookPayloadSchema = z.record(z.string(), z.unknown());
+
+export function createYooKassaCheckoutRouteHandler(
+  deps: { orderAccessSecret?: string | null; buildEventCheckout?: typeof buildPublicEventCheckout } = {},
+): TypedRouteHandler {
+  return async (context: RouteContext) => {
+    const eventCheckoutMatch = context.pathname.match(/^\/api\/public\/checkout\/events\/([^/]+)$/);
+    if (eventCheckoutMatch && context.method === 'GET') {
+      let slug: string;
+      try { slug = decodeURIComponent(eventCheckoutMatch[1] || ''); }
+      catch { sendJson(context.response, { error: 'invalid_event_slug' }, { statusCode: 400 }); return true; }
+      const event = await (deps.buildEventCheckout || buildPublicEventCheckout)(slug);
+      sendJson(context.response, event || { error: 'event_not_found' }, {
+        statusCode: event ? 200 : 404,
+        cacheControl: 'no-store',
+      });
+      return true;
+    }
+    if (context.pathname === '/api/checkout/yookassa' && context.method === 'POST') {
+      if (!isAllowedCheckoutOrigin(firstHeader(context.request.headers.origin))) {
+        sendJson(context.response, { error: 'checkout_origin_forbidden' }, { statusCode: 403 });
+        return true;
+      }
+      if (!consumeCheckoutRateLimit(getClientIp(context))) {
+        sendJson(context.response, { error: 'checkout_rate_limited' }, { statusCode: 429 });
+        return true;
+      }
+      const payload = await parseJsonBody(
+        yookassaCheckoutCreatePayloadSchema,
+        context.request,
+      ) as YooKassaCheckoutCreateDto;
+      try {
+        const idempotencyKey = firstHeader(context.request.headers['idempotency-key']) || payload.idempotencyKey || null;
+        const result = await createYooKassaCheckoutOrder(payload, { idempotencyKey });
+        sendJson(context.response, {
+          ...result,
+          order: {
+            ...result.order,
+            orderAccessToken: createOrderAccessToken(deps.orderAccessSecret, result.order.publicCode),
+          },
+        }, { statusCode: 201 });
+      } catch (error) {
+        if (!isYooKassaCheckoutError(error)) throw error;
+        sendJson(context.response, error.toDto(), { statusCode: error.statusCode });
+      }
+      return true;
+    }
+
+    if (context.pathname === '/api/checkout/yookassa/webhook' && context.method === 'POST') {
+      const payload = await parseJsonBody(yookassaWebhookPayloadSchema, context.request);
+      try {
+        const result = await applyYooKassaWebhookPayload(payload);
+        sendJson(context.response, result);
+      } catch (error) {
+        if (!isYooKassaCheckoutError(error)) throw error;
+        sendJson(context.response, error.toDto(), { statusCode: error.statusCode });
+      }
+      return true;
+    }
+
+    return false;
+  };
+}
+
+function firstHeader(value: string | string[] | undefined): string | null {
+  if (Array.isArray(value)) return value[0] || null;
+  return value || null;
+}
+
+function isAllowedCheckoutOrigin(origin: string | null): boolean {
+  if (!origin) return true;
+  try {
+    const hostname = new URL(origin).hostname.toLowerCase();
+    return (
+      hostname === 'daibilet.ru'
+      || hostname === 'www.daibilet.ru'
+      || hostname === 'admin.daibilet.ru'
+      || hostname.endsWith('.daibilet.ru')
+      || hostname === 'localhost'
+      || hostname === '127.0.0.1'
+    );
+  } catch {
+    return false;
+  }
+}
+
+function getClientIp(context: RouteContext): string {
+  const forwarded = firstHeader(context.request.headers['x-forwarded-for']);
+  if (forwarded) return forwarded.split(',')[0]?.trim() || 'unknown';
+  return context.request.socket.remoteAddress || 'unknown';
+}
+
+function consumeCheckoutRateLimit(key: string): boolean {
+  const now = Date.now();
+  const existing = checkoutRateBuckets.get(key);
+  if (!existing || existing.resetAt <= now) {
+    checkoutRateBuckets.set(key, { count: 1, resetAt: now + CHECKOUT_RATE_LIMIT_WINDOW_MS });
+    return true;
+  }
+  if (existing.count >= CHECKOUT_RATE_LIMIT_MAX) return false;
+  existing.count += 1;
+  return true;
+}

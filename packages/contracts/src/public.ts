@@ -358,6 +358,7 @@ export interface PublicPurchaseOptionDto extends PurchaseFields {
 
 export interface PublicEventPageDto extends ApiEnvelope {
   event: PublicEventDto;
+  pdp?: PublicPdpDocumentDto | null;
   sessions: Array<Omit<DateTimeSlot, 'startsAt'> & PurchaseFields & {
     id: string;
     eventId: string;
@@ -442,6 +443,8 @@ export interface PublicCityPageDto extends ApiEnvelope {
 
 export interface PublicVenuePageDto extends ApiEnvelope {
   venue: PublicVenueDto;
+  /** Published editorial page content. Prices and availability remain in offers/sessions. */
+  pdp?: PublicPdpDocumentDto | null;
   sessions: PublicSessionDto[];
   relatedVenues: PublicVenueDto[];
   /** Экскурсии с явной STOP-связью на эту локацию. */
@@ -452,6 +455,37 @@ export interface PublicVenuePageDto extends ApiEnvelope {
     events: number;
     categories: number;
     priceFrom?: number | null;
+  };
+}
+
+export interface PublicPdpDocumentDto {
+  variant: string;
+  content: {
+    summary?: string;
+    gallery?: Array<{ url: string; alt?: string; caption?: string; credit?: string }>;
+    facts?: Array<{ label: string; value: string; sourceUrl?: string; verifiedAt?: string }>;
+    sections?: Array<{
+      id: string;
+      kind: string;
+      title?: string;
+      body?: string;
+      items?: Array<{
+        title: string;
+        description?: string;
+        imageUrl?: string;
+        linkUrl?: string;
+        meta?: string;
+        details?: Array<{ label: string; value: string }>;
+      }>;
+    }>;
+    sources?: Array<{ title: string; url: string; checkedAt?: string }>;
+    conversion?: {
+      mode: string;
+      primaryAction: string;
+      label?: string;
+      targetEventId?: string;
+      externalUrl?: string;
+    };
   };
 }
 

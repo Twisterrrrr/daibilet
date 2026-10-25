@@ -12,10 +12,13 @@ import { cityPlacesCatalogHref } from '@/lib/catalog-url';
 import { isCityHubSectionHidden, resolveCityHubConfig } from '@/lib/city-hub-config';
 import { resolveCityInfo } from '@/lib/cityInfo';
 import { getTicketPriceRange, isFlexibleScheduleSession } from '@/lib/event-page-utils';
+import { displayEventDescription } from '@/lib/event-description-lead';
+import { stripTitleDuplicateLead } from '@/lib/event-description-format';
+import { stripSessionDateLines } from '@/lib/event-description-session-lines';
 import { evaluateCityIndexability, evaluateRegionIndexability } from '@/lib/hub-indexability';
 import { resolveLandingCityName } from '@/lib/landing-city';
 import { landingCategoryHref } from '@/lib/landing-routes';
-import { cityHref, eventHref, venueCanonicalPath, venueHref, venuePageTemplate } from '@/lib/routes';
+import { cityCanonicalPath, cityHref, eventHref, venueCanonicalPath, venueHref, venuePageTemplate } from '@/lib/routes';
 import { resolveVenueBreadcrumbRegion } from '@/lib/cityRegionHub';
 import {
   cityHubPathFromLandingCity,
@@ -72,6 +75,18 @@ export function buildEventBreadcrumbs(event: PublicEventDto): StructuredBreadcru
   });
   if (landingCrumb) {
     crumbs.push({ name: landingCrumb.label, path: landingCrumb.href });
+  }
+
+  if (event.venue && (event.venueId || event.venueSlug)) {
+    crumbs.push({
+      name: event.venue,
+      path: venueHref({
+        id: event.venueId || event.venueSlug || event.venue,
+        slug: event.venueSlug,
+        name: event.venue,
+        type: event.venueKind,
+      }),
+    });
   }
 
   crumbs.push({ name: event.seoH1 || event.title, path });
@@ -261,7 +276,16 @@ export function buildEventJsonLd(
   const canonical = toAbsoluteUrl(path);
   const schedule = pickEventSchedule(payload);
   const image = event.imageUrl ? toAbsoluteUrl(event.imageUrl) : undefined;
-  const description = event.seoDescription || event.description || undefined;
+  const seoDescription = String(event.seoDescription || '').trim();
+  const genericSeo = /^Расписание, цены и билеты на /iu.test(seoDescription);
+  const concertLead = displayEventDescription(event).split(/\n\s*\n/u)[0] || '';
+  const description =
+    genericSeo
+      ? concertLead || stripSessionDateLines(seoDescription)
+      : stripSessionDateLines(seoDescription) ||
+        concertLead ||
+        stripTitleDuplicateLead(String(event.description || ''), event.title, event.city) ||
+        undefined;
   const price = resolveOfferPrice(payload);
 
   const locationName = event.venue || event.city || SITE_NAME;
@@ -334,7 +358,14 @@ export function buildEventPageJsonLd(
   payload: PublicEventPageDto,
   options?: { aggregateRating?: { ratingValue: number; reviewCount: number } | null },
 ): Array<Record<string, unknown>> {
-  return [buildEventJsonLd(payload, options), buildBreadcrumbListJsonLd(buildEventBreadcrumbs(payload.event))];
+  const eventLd = buildEventJsonLd(payload, options);
+  // Google Rich Results require startDate (GSC: «Отсутствует поле startDate»).
+  // Undated events (open-date / no dated sessions) emit no Event block at all
+  // instead of invalid markup that blocks rich results for the whole page.
+  const blocks: Array<Record<string, unknown>> = [];
+  if (eventLd.startDate) blocks.push(eventLd);
+  blocks.push(buildBreadcrumbListJsonLd(buildEventBreadcrumbs(payload.event)));
+  return blocks;
 }
 
 export function buildFaqPageJsonLd(items: CityFaqItem[]): Record<string, unknown> | null {
@@ -356,7 +387,7 @@ export function buildFaqPageJsonLd(items: CityFaqItem[]): Record<string, unknown
 /** Хлебные крошки города: Главная → Города → City */
 export function buildCityBreadcrumbs(payload: PublicCityPageDto): StructuredBreadcrumb[] {
   const city = payload.city;
-  const path = city.canonicalPath || `/cities/${city.slug}`;
+  const path = cityCanonicalPath(city);
   return [
     { name: 'Главная', path: '/' },
     { name: 'Города', path: '/cities' },
@@ -371,7 +402,7 @@ export function buildCityPageJsonLd(payload: PublicCityPageDto): Array<Record<st
   }
 
   const city = payload.city;
-  const canonicalPath = city.canonicalPath || `/cities/${city.slug}`;
+  const canonicalPath = cityCanonicalPath(city);
   const blocks: Array<Record<string, unknown>> = [
     {
       '@context': 'https://schema.org',
@@ -471,7 +502,7 @@ export function buildCityPageJsonLd(payload: PublicCityPageDto): Array<Record<st
 /** Region hub: BreadcrumbList + FAQPage + ItemList(Place). */
 export function buildRegionPageJsonLd(payload: PublicCityPageDto): Array<Record<string, unknown>> {
   const city = payload.city;
-  const path = city.canonicalPath || `/cities/${city.slug}`;
+  const path = cityCanonicalPath(city);
   const childEventTotal = (payload.childCities || []).reduce(
     (sum, item) => sum + (Number(item.eventCount) || 0),
     0,

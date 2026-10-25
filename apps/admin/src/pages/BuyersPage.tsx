@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { adminFetch } from '@/lib/admin-api';
+import { buyerRelationLinks, type BuyerRelationSource } from '@/lib/buyer-relations';
 import { useSearchParams } from 'react-router-dom';
 import { AlertTriangle, Archive, Mail, Phone, Receipt, Search, Ticket, UserRound } from 'lucide-react';
 
@@ -14,6 +15,10 @@ type BuyerStatusTone = 'draft' | 'ready' | 'live' | 'paused' | 'archived' | 'inc
 
 type AdminBuyerRow = {
   id: string;
+  kind?: 'account' | 'guest';
+  emailVerified?: boolean | null;
+  internalOrders?: number;
+  externalOrders?: number;
   displayName: string;
   name?: string | null;
   email?: string | null;
@@ -40,6 +45,7 @@ type AdminBuyerRow = {
 
 type AdminBuyersPayload = {
   generatedAt: string;
+  piiLevel?: 'masked';
   view?: 'active' | 'archive';
   page?: number;
   pages?: number;
@@ -81,7 +87,9 @@ export function BuyersPage() {
     })
       .then(async (response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        return (await response.json()) as AdminBuyersPayload;
+        const data = (await response.json()) as AdminBuyersPayload;
+        if (data.piiLevel !== 'masked') throw new Error('Серверный реестр покупателей ещё не обновлён. Контакты не показаны.');
+        return data;
       })
       .then((data) => {
         setPayload(normalizePayload(data));
@@ -123,7 +131,6 @@ export function BuyersPage() {
     setParams(next);
   };
 
-  const archiveAfterDays = payload.metrics.archiveAfterDays || 30;
   const currentPage = payload.page || page;
   const pages = payload.pages || 1;
 
@@ -131,26 +138,29 @@ export function BuyersPage() {
     <div>
       <PageHeader
         title="Покупатели"
-        description="Сводка по людям из заказов: контакты, последние покупки, билеты и быстрый переход к заказам."
+        description="Реестр покупателей Daibilet: аккаунты и гостевые покупатели. Поиск по имени, контакту или номеру заказа, переходы к заказам, возвратам и обращениям."
         meta={
           <>
             <Badge variant="outline">только чтение</Badge>
-            <Badge variant="outline">данные из заказов</Badge>
-            <Badge variant="outline">архив отменённых через {archiveAfterDays} дн.</Badge>
+            <Badge variant="outline">внутренние и внешние заказы</Badge>
+            <Badge variant="outline">контакты маскируются сервером</Badge>
           </>
         }
       />
 
       <InfoNote>
-        Активный список строится только по незаархивированным заказам. Отменённые и удалённые заказы старше {archiveAfterDays} дней
-        уходят в архив автоматически — вместе с ними пропадают из активных и соответствующие покупатели.
+        Аккаунты и гостевые покупатели собраны в одном реестре. Гостевой заказ связывается с аккаунтом по email только после подтверждения адреса. Полные контакты здесь недоступны до включения персональных прав.
+      </InfoNote>
+
+      <InfoNote>
+        Архив показывает архивные внешние заказы. Аккаунты без заказов и внутренние заказы видны в активном списке.
       </InfoNote>
 
       <div className="mt-4 grid grid-cols-2 gap-2 lg:grid-cols-5">
         <MetricCard label="покупателей" value={payload.metrics.buyers} icon={UserRound} />
         <MetricCard label="с контактами" value={payload.metrics.withContacts} icon={Mail} />
-        <MetricCard label="заказов" value={payload.metrics.orders} icon={Receipt} />
-        <MetricCard label="билетов" value={payload.metrics.tickets} icon={Ticket} />
+        <MetricCard label="заказы" value={payload.metrics.orders} icon={Receipt} />
+        <MetricCard label="билеты" value={payload.metrics.tickets} icon={Ticket} />
         <MetricCard
           label={view === 'archive' ? 'в архиве' : 'требуют внимания'}
           value={view === 'archive' ? payload.metrics.buyers : payload.metrics.needsAttention}
@@ -182,7 +192,7 @@ export function BuyersPage() {
 
       <DataTableShell
         loading={loading}
-        columns={['Покупатель', 'Контакты', 'Заказы', 'Последний заказ', 'События', 'Действия']}
+        columns={['Покупатель', 'Контакты', 'Покупки (внешние)', 'Последний заказ', 'Контакт / обращение', 'Связи']}
         empty={
           !loading && payload.rows.length === 0 ? (
             <EmptyState
@@ -197,9 +207,15 @@ export function BuyersPage() {
           ) : null
         }
       >
-        {payload.rows.map((buyer) => (
+        {payload.rows.map((buyer) => {
+          const relationSource: BuyerRelationSource = {
+            // Contacts are masked by the API; never search orders by masked text.
+            lastOrderNumber: buyer.lastOrderNumber,
+          };
+          const relations = buyerRelationLinks(relationSource, view === 'archive' ? 'archive' : 'active');
+          return (
           <tr key={buyer.id} className="border-b border-border last:border-0 hover:bg-secondary/40">
-            <td className="min-w-[260px] px-4 py-3 align-top">
+            <td className="min-w-[210px] px-4 py-3 align-top">
               <div className="font-medium text-foreground">{buyer.displayName}</div>
               {buyer.notes ? <div className="mt-1 max-w-[220px] truncate text-xs text-muted-foreground">{buyer.notes}</div> : null}
               <div className="mt-2 flex flex-wrap gap-1.5">
@@ -208,9 +224,36 @@ export function BuyersPage() {
                     {provider}
                   </Badge>
                 ))}
+                <Badge
+                  variant="outline"
+                >
+                  {buyer.kind === 'account' ? 'Аккаунт' : 'Гость'}
+                </Badge>
+                {buyer.kind === 'account' ? <Badge variant="outline">{buyer.emailVerified ? 'email подтверждён' : 'email не подтверждён'}</Badge> : null}
+              </div>
+              <div className="mt-2 flex flex-wrap gap-1.5 lg:hidden">
+                {relations.map((link) =>
+                  link.href ? (
+                    <a
+                      key={link.id}
+                      href={link.href}
+                      className="inline-flex h-8 items-center rounded-md border border-border bg-card px-3 text-xs font-medium text-foreground"
+                    >
+                      {link.label}
+                    </a>
+                  ) : (
+                    <span
+                      key={link.id}
+                      title={link.note}
+                      className="inline-flex h-8 items-center rounded-md border border-dashed border-border px-3 text-xs font-medium text-muted-foreground"
+                    >
+                      {link.label}
+                    </span>
+                  ),
+                )}
               </div>
             </td>
-            <td className="min-w-[220px] px-4 py-3 align-top text-sm">
+            <td className="min-w-[170px] px-4 py-3 align-top text-sm">
               <ContactLine icon={Mail} value={buyer.email} />
               <ContactLine icon={Phone} value={buyer.phone} />
               {!buyer.hasContact ? <div className="text-xs text-muted-foreground">контакты не переданы</div> : null}
@@ -218,11 +261,11 @@ export function BuyersPage() {
             <td className="px-4 py-3 align-top">
               <StatusBadge status={buyer.statusTone} label={buyer.statusLabel} />
               <div className="mt-2 text-xs text-muted-foreground">
-                {formatNumber(buyer.orders)} зак. · {formatNumber(buyer.tickets)} бил.
+                {formatNumber(buyer.orders)} зак. · {formatNumber(buyer.tickets)} бил. · {formatNumber(buyer.internalOrders || 0)} внутренних · {formatNumber(buyer.externalOrders || 0)} внешних
               </div>
               {buyer.amountRub ? <div className="mt-1 text-xs text-muted-foreground">{formatMoneyRub(buyer.amountRub)}</div> : null}
             </td>
-            <td className="min-w-[180px] px-4 py-3 align-top text-sm">
+            <td className="min-w-[190px] px-4 py-3 align-top text-sm">
               <div className="font-mono text-xs text-foreground">№{buyer.lastOrderNumber || '-'}</div>
               <div className="mt-1 text-xs text-muted-foreground">{formatDate(buyer.lastOrderAt)}</div>
               {buyer.lastOrderStatusLabel ? (
@@ -230,24 +273,44 @@ export function BuyersPage() {
                   {buyer.lastOrderStatusLabel}
                 </Badge>
               ) : null}
+              {buyer.eventTitles.length ? (
+                <div className="mt-2 line-clamp-2 max-w-[220px] text-xs text-muted-foreground">{buyer.eventTitles.slice(0, 2).join(' · ')}</div>
+              ) : null}
             </td>
-            <td className="min-w-[280px] px-4 py-3 align-top">
-              <div className="space-y-1">
-                {buyer.eventTitles.slice(0, 3).map((title) => (
-                  <div key={title} className="line-clamp-1 text-sm text-foreground">
-                    {title}
-                  </div>
-                ))}
-                {!buyer.eventTitles.length ? <span className="text-xs text-muted-foreground">события не связаны</span> : null}
+            <td className="min-w-[130px] px-4 py-3 align-top">
+              <div
+                className="text-xs text-muted-foreground"
+                title="Последний контакт и обращения появятся в unified admin buyer DTO (право support.read)"
+              >
+                нет данных до DTO
               </div>
             </td>
             <td className="px-4 py-3 align-top">
-              <Button variant="outline" size="sm" onClick={() => openOrders(buyer, view)}>
-                Заказы
-              </Button>
+              <div className="flex flex-col items-start gap-1.5">
+                {relations.map((link) =>
+                  link.href ? (
+                    <a
+                      key={link.id}
+                      href={link.href}
+                      className="inline-flex h-8 items-center rounded-md border border-border bg-card px-3 text-xs font-medium text-foreground hover:bg-secondary"
+                    >
+                      {link.label}
+                    </a>
+                  ) : (
+                    <span
+                      key={link.id}
+                      title={link.note}
+                      className="inline-flex h-8 cursor-default items-center rounded-md border border-dashed border-border px-3 text-xs font-medium text-muted-foreground"
+                    >
+                      {link.label}
+                    </span>
+                  ),
+                )}
+              </div>
             </td>
           </tr>
-        ))}
+          );
+        })}
       </DataTableShell>
 
       <div className="mt-4 flex items-center justify-end gap-2">
@@ -297,15 +360,6 @@ function ContactLine({ icon: Icon, value }: { icon: typeof Mail; value?: string 
       <span className="max-w-[190px] truncate">{value}</span>
     </div>
   );
-}
-
-function openOrders(buyer: AdminBuyerRow, view: 'active' | 'archive') {
-  const lookup = buyer.email || buyer.phone || buyer.lastOrderNumber || buyer.lookup || '';
-  const next = new URLSearchParams();
-  if (view === 'archive') next.set('view', 'archive');
-  if (lookup) next.set('q', lookup);
-  const query = next.toString();
-  window.location.href = `/orders${query ? `?${query}` : ''}`;
 }
 
 function normalizePayload(payload: AdminBuyersPayload): AdminBuyersPayload {

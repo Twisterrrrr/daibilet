@@ -4,4 +4,7 @@ ConditionPathExists=/opt/daibilet/apps/web/.next/BUILD_ID
 
 [Service]
 Type=oneshot
+Nice=15
+IOSchedulingClass=idle
+IOSchedulingPriority=7
 ExecStart=/usr/bin/env bash /opt/daibilet/deploy/scripts/maintain-web-disk.sh --apply

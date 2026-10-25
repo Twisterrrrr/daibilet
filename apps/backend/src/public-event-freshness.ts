@@ -3,6 +3,7 @@ import { resolveProjectRoot } from './project-root.js';
 
 export type PublicEventFreshnessRow = { slug: string; updatedAt: Date | string };
 export type PublicEventFreshnessMap = Map<string, Date>;
+export type PublicEventFreshnessPayload = { freshness: Record<string, string> };
 
 const projectRoot = resolveProjectRoot(import.meta.url);
 const FRESHNESS_CACHE_MS = 5 * 60 * 1000;
@@ -37,6 +38,12 @@ export function freshnessMapFromRows(rows: PublicEventFreshnessRow[]): PublicEve
 
 export function clearPublicEventFreshnessCache(): void {
   cache = null;
+}
+
+export function publicEventFreshnessPayload(map: PublicEventFreshnessMap): PublicEventFreshnessPayload {
+  return {
+    freshness: Object.fromEntries([...map].map(([slug, updatedAt]) => [slug, updatedAt.toISOString()])),
+  };
 }
 
 /** Supplies sitemap lastmod dates without changing which URLs the sitemap lists. */

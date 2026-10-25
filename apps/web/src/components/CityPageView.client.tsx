@@ -1683,51 +1683,51 @@ function CitySightsMustSeeList({
                         {place.name}
                       </div>
                     )}
-                    {blurb ? (
-                      <p
-                        className={`mt-1.5 text-sm leading-6 break-words ${
-                          editorial ? 'text-zinc-600' : 'text-slate-600'
-                        }`}
-                      >
-                        {blurb}
-                      </p>
-                    ) : null}
-                    <div className="mt-3 flex flex-wrap items-center gap-1.5">
-                      <span
-                        className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium ${
-                          editorial ? 'bg-zinc-100 text-zinc-600' : 'bg-slate-100 text-slate-600'
-                        }`}
-                      >
-                        <MapPin className="h-3 w-3 shrink-0" aria-hidden />
-                        {categoryLabel}
-                      </span>
-                      {visitLabel ? (
-                        <span
-                          className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium ${
-                            editorial ? 'bg-zinc-100 text-zinc-600' : 'bg-slate-100 text-slate-600'
-                          }`}
-                          data-city-visit-duration
-                        >
-                          <Clock className="h-3 w-3 shrink-0" aria-hidden />
-                          {visitLabel}
-                        </span>
-                      ) : null}
-                      {priceLabel ? (
-                        <span
-                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${
-                            editorial ? 'bg-zinc-100 text-zinc-600' : 'bg-slate-100 text-slate-600'
-                          }`}
-                        >
-                          {priceLabel}
-                        </span>
-                      ) : null}
-                      {place.seasonLabel ? (
-                        <span className="inline-flex rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-medium text-sky-800">
-                          {place.seasonLabel}
-                        </span>
-                      ) : null}
-                    </div>
                   </div>
+                </div>
+                {blurb ? (
+                  <p
+                    className={`mt-2 text-sm leading-6 break-words ${
+                      editorial ? 'text-zinc-600' : 'text-slate-600'
+                    }`}
+                  >
+                    {blurb}
+                  </p>
+                ) : null}
+                <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                  <span
+                    className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                      editorial ? 'bg-zinc-100 text-zinc-600' : 'bg-slate-100 text-slate-600'
+                    }`}
+                  >
+                    <MapPin className="h-3 w-3 shrink-0" aria-hidden />
+                    {categoryLabel}
+                  </span>
+                  {visitLabel ? (
+                    <span
+                      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                        editorial ? 'bg-zinc-100 text-zinc-600' : 'bg-slate-100 text-slate-600'
+                      }`}
+                      data-city-visit-duration
+                    >
+                      <Clock className="h-3 w-3 shrink-0" aria-hidden />
+                      {visitLabel}
+                    </span>
+                  ) : null}
+                  {priceLabel ? (
+                    <span
+                      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                        editorial ? 'bg-zinc-100 text-zinc-600' : 'bg-slate-100 text-slate-600'
+                      }`}
+                    >
+                      {priceLabel}
+                    </span>
+                  ) : null}
+                  {place.seasonLabel ? (
+                    <span className="inline-flex rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-medium text-sky-800">
+                      {place.seasonLabel}
+                    </span>
+                  ) : null}
                 </div>
                 <div className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-3">
                   {afficheLink ? (

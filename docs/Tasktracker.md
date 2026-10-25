@@ -1,3 +1,47 @@
+## 2026-10-20 - Пост-синковые описания: решения ревью и тикеты
+
+Ревью ветки `cline/e366e` как чужого PR (автор недоступен). Решения — в `docs/decision-log.md` (2026-10-20). Маркер-контракт перенесён на `feat/description-origin-marker` (`077970032` + `3a81230be`).
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| OPS.DB-LINEAGE | Общая docker-БД: `places_from_pdp`, `place_transport_subtypes`, `pier_departures` отсутствуют в репозитории (проверено `git log --all`) — lineage неизвестен, 5 миграций ветки не применены. Канонический dev — свежий volume; в общую БД миграции не применять до выяснения у владельца прод/шейрд-БД | Высокий | ⏳ owner: владелец прод/шейрд-БД; пересмотр 2026-11-03, иначе станет висящим тикетом |
+| DB.PRISMA-FORMAT | Выровнять `packages/db/prisma/schema.prisma` под текущий `prisma format` (файл отформатирован более старым Prisma, `format` переписывает ~337 строк). CI формат не проверяет | Низкий | ⏳ no functional change |
+| DB.APPROVEDBY-FK | `EventDescriptionRevision.approvedBy` — `String` без FK на `AdminUser`: нет ссылочной целостности. Решение: либо FK, либо явно оставить как принято | Низкий | ⏳ не трогать до слоя staff-сессий: блокирован той же идентичностью, что ADMIN.REWRITE-ROLE |
+| CONT.DESC-HASH-INPUT | `sourceHash` считался по одному тексту провайдера (`sourceHashOf` = md5 от `e.description`), а composer пересобирает `## Практическая информация` из каталога; AUTO-строка пропускается при совпадении хеша. Смена цены/даты/площадки/возраста не пересобирала описание и не давала `STALE`. Формула вынесена в `apps/backend/src/description-source-hash.ts` (один источник, версия `v2`), покрывает текст провайдера + название/город/площадку/адрес/возраст/цену/длительности/число сеансов/ближайший сеанс; метаданные прогона (id, timestamp) исключены, чтобы не убить дедуп. Миграция и backfill не нужны | Высокий | ✅ `67a091c69`; проверено на БД от нуля: смена цены → `refreshedAuto=1`, хеш `29bcc7fc…` → `a847edf8…`, вторая строка очереди, в тексте новая цена |
+| CONT.DESC-HASH-NOW | `next_session` и `future_sessions` в SQL считаются относительно `now()` (`where s."startsAt" >= now()`), поэтому хеш меняется **сам по себе**: прошёл сеанс → «ближайший» стал другим → re-compose и новая строка очереди, хотя данные не менялись. Для роллинг-расписаний (ежедневные прогулки) это ежедневный прирост очереди; неодобренная ревизия может уйти в `STALE` просто от времени. Варианты: (a) оставить как есть — текст всегда свежий, но очередь шумит; (b) исключить оба now-относительных поля из формулы — «Ближайшая дата» в тексте обновится при следующем реальном изменении; (c) разделить хеши: полный (с now-полями) для пересборки описания, контентный (без них) для дедупа очереди и STALE. Рекомендация: (c) | Средний | ✅ вариант (c) реализован: полный `descriptionSourceHash` (v2) для пересборки, контентный `descriptionContentHash` (v2c) для дедупа и `STALE`; на БД от нуля override `cb001b7f…` ≠ ревизия `40bd0c8e…` |
+| CONT.APPROVE-STATUS-GUARD | `approve` публикует ревизию без проверки статуса (`where id = $1`), хотя `reject` защищён (`status in ('GENERATED','CHECKED','STALE')`). Решение владельца: `APPROVED` — **реальная стадия**, approve → `APPROVED` (+`approvedBy`/`approvedAt`), публикация — отдельное действие `APPROVED` → `PUBLISHED`; гейт на оба перехода; `STALE` цепляется к `APPROVED` (одобрено, но вход изменился) | Средний | ✅ `547022341`: approve → `APPROVED` (+`approvedBy`/`approvedAt`), publish отдельным действием `APPROVED` → `PUBLISHED` с перепроверкой хеша, оба перехода с гейтом в SQL, отдельный список `/admin/rewrite-publish` |
+| CONT.APPROVED-BY-IDENTITY | Автор действия должен быть реальным `AdminUser.id`; shared Basic нельзя использовать как identity. На этой ветке approve/publish закрыты fail-closed: без `resolveActor` backend отвечает 403 `actor_unresolved`, без записи. Персональные сессии и RBAC реализованы отдельно в `origin/codex/rbac-finance-unified`, но ещё не интегрированы в `origin/feat/next-monorepo`; после интеграции требуется передавать session actor в handler | Высокий | ⏳ ждёт состыковки с RBAC/session guard |
+| ADMIN.REWRITE-ROLE | Для approve: `CATALOG_EDITOR`, `COPYWRITER`, `SUPERADMIN`; для publish: `CATALOG_EDITOR`, `SUPERADMIN`. На основной ветке серверный route-policy пока не содержит rewrite-маршруты; до его интеграции approve/publish должны оставаться запрещены. При стыковке проверить точный путь и метод каждого endpoint | Высокий | ⏳ вместе с session/RBAC интеграцией |
+| TEST.COMPOSER-CI | `apps/web/src/lib/event-description-compose.test.ts` (189 строк) не был зарегистрирован в `apps/web/scripts/ci-test-files.txt` → 388 строк composer'а без CI-защиты | Средний | ✅ `ec743f805`; allowlist 47 файлов / 271 тест |
+| CONT.POSTSYNC-TSX-PATH | `scripts/lib/post-sync-hook.js` жёстко берёт `apps/web/node_modules/tsx/dist/cli.mjs` без fallback (в `post-catalog-sync-warm.mjs` — три кандидата). Падает мягко, но шаг молча не выполняется, если tsx не там | Низкий | ⏳ tech debt |
+| PROC.CODEX-CONTRACTS | Sign-off по `packages/contracts` (`AdminRewriteRevisionDto`, `AdminRewriteQueueDto`, `descriptionOrigin`): issue [#31](https://github.com/Twisterrrrr/daibilet/issues/31) + `docs/codex-handoff-2026-10-20-description-contracts.md` | Средний | ⏳ ждёт Codex; ветка не мержится без ответа или явного «ок» |
+
+## 2026-10-18 - SEO-аудит: кэш sitemap, каноникал Москвы, главная no-store
+
+Аудит live 18.10: [seo-audit-2026-10-18.md](./seo-audit-2026-10-18.md). Ядро зелёное (robots/sitemap/canonical/JSON-LD/404/СПб-308); блокеры ниже. Замеры шли во время параллельного деплоя - тайминги перепроверить на спокойном проде.
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| SEO.SITEMAP-CACHE | Runtime sitemap через loopback API + bounded nginx cache; `lastmod` только из реального updatedAt; короткий cache TTL для динамических карт без суточного stale окна | Критический | ✅ live `48072f1ea`, deploy run `40102589715`, BUILD_ID `t_h7TtDcnqD3tKtTftT8q`; events sitemap/API total `4401/4401`, 40/40 равномерно выбранных URL ответили 200 |
+| SEO.MOSKVA-CANONICAL | Stored Cyrillic/alias canonical для того же города нормализуется к публичному Latin route в metadata и JSON-LD; намеренный cross-city canonical сохраняется | Высокий | ✅ live `48072f1ea`: `/cities/moskva` 200 + self-canonical и City JSON-LD; старый encoded URL 308 → Latin; Moscow в sitemap один раз |
+| SEO.HOME-NOSTORE | Персонализация города на главной | Высокий | ✅ server output уже общий; город выбирается в клиентских островах, `app/page.tsx` имеет `revalidate=300`; regression test запрещает request-bound cookies/headers; ожидает CI/deploy live cache-header check |
+| SEO.ISAINDEXABLE-FALSE | Исаакиевский собор намеренно остаётся thin layer/noindex до появления достаточного контента | Средний | ✅ подтверждено владельцем 2026-10-24; не менять флаг до редакционного усиления страницы |
+
+## 2026-10-18 - Roadmap: хабы городов, PDP мест, тестовый поставщик
+
+Приоритеты владельца (2026-10-18). Порядок после текущего параллельного деплоя:
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| UX.MY-DAY-RESTORE | My-day (сценарии/точки в городах) пропали после lazy-хабов: добавлен registry fallback (Москва, СПб, Пермь, Киров, Сочи, Ульяновск) в `city-hub-lazy.ts` + тест в `ci-test-files.txt` | Высокий | ✅ `69b9a4cb5` fix(my-day) — live Deploy MSK web |
+| OPS.MOBILE-UX-DEPLOY | Мобильная итерация `cline/8b0dd` SHA `3f0e006f5` (нижний док фильтров /events, карточка места без сдвига контента бейджем, «Город» в нижней навигации, hero-чипы скролл): мерж в `feat/next-monorepo` + деплой на MSK | Высокий | ✅ `3f0e006f5` — live Deploy MSK web |
+| CONT.CITY-HUBS-70 | Добить 70 хабов городов (контент-путь: хаб → тематические гиды → билеты) | Высокий | 🔄 readiness audit: 70 city destinations / 55 indexable by current policy / 25 missing registry; editorial validation queue in [city-hub-readiness-2026-10-24.md](./city-hub-readiness-2026-10-24.md), no public changes |
+| CONT.PLACE-PDP-3500 | Подробные PDP ~3 500 площадок и локаций - продолжение Places-выпуска 15.10 (1 383 классифицированы, 701 строка на сверке, 784 скрытых до проверки фото) | Высокий | ⏳ |
+| OPS.ADMIN-RBAC-IMPL | Персональный вход, RBAC страницы/API, PII-маскирование, signed finance actor, MFA/TOTP | Высокий | 🔄 `codex/ai-rewrite-rbac-integration`: TOTP/recovery backend + Next enrollment/verify screen, migration 20261025120000; локальные тесты пройдены; независимый boundary audit и безопасный rollout остаются |
+| OPS.FINANCE-RELEASE | Finance schema unification и внутренние order/refund reads/actions | Высокий | 🔄 backend bridge проверяет signed actor + MFA; buyer order-proof BFF cookies реализованы, production enforcement/YooKassa sandbox E2E не пройдены; per-payout step-up, payout execution, dual control и банковское подтверждение не готовы; отдельная миграционная и production приёмка обязательны |
+| OPS.TEST-SUPPLIER-ONBOARD | Ввести тестового поставщика после готовности админки и финконтура (Stage 2 LK: supplier integrations + invites уже в схеме) | Средний | ⏳ gated: admin + finance |
+| UX.EVENTS-SHOWCASE-BANNERS | Промо-баннеры в верхней части /events (как у «Афиши») поверх журнальной витрины; можно опереться на существующий hero-banners CMS (`getActiveHeroBanners`) | Низкий | ⏳ deferred по решению владельца 2026-10-18 — после пересборки каталога (журнальная витрина, Codex) |
+
 ## 2026-10-17 - Чат поддержки: выпуск на прод
 
 | ID | Задача | Приоритет | Статус |
@@ -1850,7 +1894,7 @@ Canon: [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md).
 | # | Task | Priority | Status |
 |---|------|----------|--------|
 | INC.504.22 | Move public HTML hot path in `apps/web` off direct `@daibilet/backend/public-read`; SSR/API read through backend HTTP with bounded timeout | Critical | ✅ PR #3 merge `f93b770` MSK **BUILD_ID=`3zmDWHpY7rXAJgqu0-pnR`** |
-| INC.504.23 | Move sitemap generation off direct `public-read` or give it a separate bounded backend path | Medium | todo |
+| INC.504.23 | Move sitemap generation off direct `public-read` or give it a separate bounded backend path | Medium | ✅ deployed 2026-10-24: venues/blog/freshness use loopback HTTP; live sitemap chunks 200 in 47-617ms. Follow-up removes build-time dynamic usage and false lastmod before next release. RCA: [ssr-hang-rca-2026-10-21.md](./ssr-hang-rca-2026-10-21.md) |
 | INC.504.24 | Add staging HTTP load smoke for `/`, `/events`, `/cities`, `/venues`, `/api/public/events?limit=50` | High | todo |
 
 ---

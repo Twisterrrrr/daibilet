@@ -8,8 +8,10 @@ import {
   renderUrlsetXml,
 } from '@/lib/sitemap-data';
 
+// Sitemap reads are runtime API calls. Keep Next from attempting a build-time
+// static render; nginx applies the explicit public cache headers below.
 export const dynamic = 'force-dynamic';
-export const revalidate = 3600;
+export const revalidate = 0;
 
 export function generateStaticParams() {
   // venues.xml has its own runtime route: it must not bake a pre-swap backend

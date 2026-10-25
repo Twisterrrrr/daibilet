@@ -18,9 +18,11 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@daibilet/contracts/admin": ["../../packages/contracts/src/admin.ts"]
+      "@daibilet/contracts/admin": ["../../packages/contracts/src/admin.ts"],
+      "@daibilet/contracts/admission": ["../../packages/contracts/src/admission.ts"]
     }
   },
   "include": ["src"],
+  "exclude": ["src/**/*.test.ts"],
   "references": []
 }

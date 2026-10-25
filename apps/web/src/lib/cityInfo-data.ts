@@ -786,7 +786,6 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           'Маршрут по «Золотому треугольнику»: дуга от Сенатской вдоль Невы через Исаакий и Большую Морскую к Дворцовой, затем дворы и Конюшенные к Невскому.',
         timingNote:
           'Старт утром у Медного всадника. Один большой интерьер (Исаакий или Эрмитаж) - 2-3 часа; второй оставьте на другой день.',
-        blogSlug: 'spb-zolotoy-treugolnik-za-1-den',
         travelVector: 'Пешеходная дуга центра',
         travelVectorBlurb:
           'Сенатская - Нева/Адмиралтейство - сад - Исаакий - Синий мост - Большая Морская - Дворцовая - дворы Капеллы - Конюшенная - Невский у Зингера.',
@@ -867,7 +866,6 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         id: 'spb-2',
         title: 'Васильевский остров',
         description: 'Музеи, набережные и гастрономия Васильевского острова.',
-        blogSlug: 'spb-vasilevskiy-ostrov-marshrut',
         stops: [
           spbPresetStop('Стрелка Васильевского острова', {
             desc: 'Один из главных архитектурных ансамблей города со знаменитыми Ростральными колоннами и величественным зданием Биржи.',
@@ -965,7 +963,6 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           'По часовой: Троицкий мост - Аврора - мечеть/Кшесинская - Каменноостровский - парк - артиллерия - крепость - Корюшка.',
         timingNote:
           'Начинать с Авроры утром; крепость и ужин у воды - вечер.',
-        blogSlug: 'spb-petrogradskaya-storona',
         travelVector: 'По часовой от Авроры к крепости',
         travelVectorBlurb:
           'Троицкий мост - Петроградская набережная / Аврора - мечеть и Кшесинская (~10 мин по Куйбышева) - Каменноостровский - парк/зоопарк - Артиллерия - крепость - Корюшка у пляжа.',
@@ -1037,7 +1034,6 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           'Линия Сенная - каналы Коломны - Новая Голландия; вечером такси к El Copitas.',
         timingNote:
           'Линия Сенная - каналы - Новая Голландия; бар такси вечером.',
-        blogSlug: 'spb-kolomna-kanaly',
         travelVector: 'Сенная - каналы - Новая Голландия',
         travelVectorBlurb:
           'Бертгольд у Сенной/Садовой - Грибоедова / Львиный - Никольский / Семимостье / Коломна - Крюков / ВММ - Поцелуев / Юсуповский - Новая Голландия на закат; El Copitas - такси ~15 мин к Владимирской.',
@@ -1133,7 +1129,6 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           'Достоевский и Пять углов утром - Рубинштейна и Фонтанка днём - Ахматова и «Бродячая собака» вечером.',
         timingNote:
           'Достоевский утром - Рубинштейна / Фонтанка днём - «Бродячая собака» вечером.',
-        blogSlug: 'spb-vladimirskaya-gastro',
         travelVector: 'Владимирская - Рубинштейна - Фонтанка - пл. Искусств',
         travelVectorBlurb:
           'Кузнечный - Владимирский - Пять углов - Рубинштейна (Довлатов) - Толстовский дом на Фонтанку - Ахматова - Итальянская к «Бродячей собаке».',
@@ -3237,13 +3232,15 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         locationSlug: 'kaliningrad-kafedral-nyy-sobor',
         latitude: 54.706487,
         longitude: 20.512025,
-        mustSeeFilter: 'main'
+        mustSeeFilter: 'main',
+        alsoMain: true,
       },
       { name: 'Музей Мирового океана', desc: 'Масштабный маринистический центр с аквариумами, глубоководными аппаратами и научно-исследовательским судном «Витязь»',
         venueSlug: 'kaliningrad-muzey-mirovogo-okeana',
         latitude: 54.706112,
         longitude: 20.500214,
-        mustSeeFilter: 'museum'
+        mustSeeFilter: 'museum',
+        alsoMain: true,
       },
       { name: 'Музей янтаря', desc: 'Уникальная экспозиция в крепостной башне Дона, хранящая многотонные самородки и шедевры ювелирного искусства',
         venueSlug: 'kaliningrad-muzey-yantarya',
@@ -3297,55 +3294,60 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         locationSlug: 'kaliningrad-rybnaya-derevnya',
         latitude: 54.704511,
         longitude: 20.514912,
-        mustSeeFilter: 'main'
+        mustSeeFilter: 'main',
+        alsoMain: true,
       },
       { name: 'Район Амалиенау', desc: 'Чудом уцелевший в войну престижный немецкий квартал роскошных вилл эпохи модерна, построенный по концепции «город-сад»',
         locationSlug: 'kaliningrad-rayon-vill-amalienau',
         latitude: 54.721411,
         longitude: 20.465112,
-        mustSeeFilter: 'main'
+        mustSeeFilter: 'main',
+        alsoMain: true,
       },
       { name: 'Район Марауненхоф', desc: 'Еще один старинный жилой квартал у Верхнего озера с самобытной немецкой застройкой начала XX века',
         locationSlug: 'kaliningrad-rayon-maraunenhof',
         latitude: 54.7322,
         longitude: 20.5135,
-        mustSeeFilter: 'main'
+        mustSeeFilter: 'houses'
         },
       { name: 'Королевские ворота', desc: 'Самые нарядные городские ворота Кёнигсберга в стиле неоготики, украшенные горельефами великих правителей',
         locationSlug: 'kaliningrad-korolevskie-vorota',
         latitude: 54.7136,
         longitude: 20.5342,
-        mustSeeFilter: 'main'
+        mustSeeFilter: 'main',
+        alsoMain: true,
         },
       { name: 'Бранденбургские ворота', desc: 'Единственные из семи сохранившихся городских ворот, которые до сих пор используются по прямому назначению - через них ездят машины и трамваи',
         locationSlug: 'kaliningrad-brandenburgskie-vorota',
         latitude: 54.6978,
         longitude: 20.4947,
-        mustSeeFilter: 'main'
+        mustSeeFilter: 'main',
+        alsoMain: true,
         },
       { name: 'Фридландские ворота', desc: 'Готические ворота, внутри которых работает интерактивный музей с виртуальной прогулкой по улицам старого Кёнигсберга',
         locationSlug: 'kaliningrad-fridlandskie-vorota',
         latitude: 54.6955,
         longitude: 20.5128,
-        mustSeeFilter: 'main'
+        mustSeeFilter: 'houses'
         },
       { name: 'Росгартенские ворота', desc: 'Исторические ворота с оборонительным рвом, в которых сегодня открыт знаменитый рыбный ресторан',
         locationSlug: 'kaliningrad-rosgartenskie-vorota',
         latitude: 54.7228,
         longitude: 20.5239,
-        mustSeeFilter: 'main'
+        mustSeeFilter: 'houses'
         },
       { name: 'Здание Кёнигсбергской биржи', desc: 'Шедевр неоренессанса на берегу Преголи, построенный по проекту знаменитого архитектора Генриха Мюллера',
         locationSlug: 'kaliningrad-kenigsbergskaya-birzha',
         latitude: 54.705075,
         longitude: 20.50724,
-        mustSeeFilter: 'main'
+        mustSeeFilter: 'main',
+        alsoMain: true,
       },
       { name: 'Дом Советов', desc: 'Легендарный и монументальный долгострой в стиле брутализма, возведенный на месте разрушенного Королевского замка (главный символ советского периода)',
         locationSlug: 'kaliningrad-dom-sovetov',
         latitude: 54.7102,
         longitude: 20.5121,
-        mustSeeFilter: 'main'
+        mustSeeFilter: 'houses'
         },
       { name: 'Остров Канта (Кнайпхоф)', desc: 'Зеленый остров-парк посреди реки Преголи, где похоронен великий философ Иммануил Кант',
         locationSlug: 'kaliningrad-ostrov-kanta',
@@ -4287,10 +4289,11 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         venueSlug: 'irkutsk-muzey-dekabristy', address: 'переулок Волконского, 10', latitude: 52.288889, longitude: 104.300556 },
       { name: 'Казанская церковь', desc: 'Яркий храм сибирского барокко - символ Иркутска',
         locationSlug: 'irkutsk-kazanskaya-tserkov', address: 'ул. Баррикад, 34', latitude: 52.294124, longitude: 104.305142 },
-      { name: 'Листвянка', desc: 'Посёлок у Байкала - ворота к озеру и музею Байкала',
-        locationSlug: 'irkutsk-listvyanka', address: 'Листвянка, Иркутский муниципальный округ', latitude: 51.85693, longitude: 104.86058 },
       { name: 'Усадьба В. П. Сукачева', desc: 'Деревянный особняк мецената с садом и музеем быта',
         venueSlug: 'irkutsk-usadba-sukacheva', address: 'ул. Декабрьских Событий, 112', latitude: 52.2897, longitude: 104.2811 },
+    ],
+    significantSuburbs: [
+      { name: 'Листвянка', desc: 'Поселок на берегу Байкала с музеем озера и прогулками у воды.', locationSlug: 'irkutsk-listvyanka', address: 'Листвянка, Иркутский муниципальный округ', travelVector: 'Автобус или автомобиль около 1 часа', travelVectorBlurb: 'Ближайший выезд из Иркутска к Байкалу.' },
     ],
     travel:
       "Прямой перелет из Москвы в международный аэропорт Иркутска занимает около 5,5–6 часов, а поезда, следующие по Транссибирской магистрали, доезжают сюда из столицы за 3,5–4 суток. Лучшее время для посещения Иркутска в сочетании с поездкой на озеро Байкал зависит от ваших целей: для летнего отдыха, походов и круизов идеально подходит период с июля по август, когда вода максимально прогревается. За знаменитым чистейшим прозрачным байкальским льдом и катанием на коньках по бескрайним просторам нужно приезжать строго с середины февраля по конец марта.",

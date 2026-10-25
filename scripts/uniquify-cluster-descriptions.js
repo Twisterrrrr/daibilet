@@ -50,42 +50,22 @@ function writeFileSafe(file, content) {
   fs.writeFileSync(file, content, 'utf8');
 }
 
-const MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
-
-function ruDate(value) {
-  if (!value) return null;
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return null;
-  const parts = new Intl.DateTimeFormat('ru-RU', {
-    timeZone: 'Europe/Moscow', day: 'numeric', month: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit',
-  }).formatToParts(d);
-  const get = (t) => parts.find((p) => p.type === t)?.value;
-  const day = Number(get('day'));
-  const month = Number(get('month'));
-  const year = get('year');
-  const hour = get('hour');
-  const minute = get('minute');
-  if (!day || !month || !year) return null;
-  return { date: `${day} ${MONTHS[month - 1]} ${year}`, time: hour && minute ? `${hour}:${minute}` : null };
-}
-
 const DASH_RE = /[\u2013\u2014\u2212]/g;
 const dash = (s) => String(s || '').replace(DASH_RE, '-');
 
 function buildLead(member, index) {
   const title = dash(member.title).trim();
   const city = dash(member.city).trim();
-  const when = ruDate(member.next);
   const price = Number(member.price || 0);
   const titleHasCity = city && title.toLowerCase().includes(city.toLowerCase());
   const place = titleHasCity || !city ? '' : ` в ${cityPrepositional(city)}`;
-  const dateText = when ? `${when.date}${when.time ? `, ${when.time}` : ''}` : null;
   const priceText = price > 0 ? ` от ${price} ₽` : '';
+  // No dates in the lead: the schedule is live in the purchase block.
   const variants = [
-    dateText ? `${title}${place}: ближайший сеанс - ${dateText}.` : `${title}${place}.`,
-    dateText ? `«${title}»${place} - ближайшая дата ${dateText}.` : `«${title}»${place}.`,
-    dateText ? `${title}${place}. Ближайший сеанс - ${dateText}${priceText}.` : `${title}${place}${priceText}.`,
-    dateText ? `Когда: ${dateText}. ${title}${place}.` : `${title}${place}.`,
+    `${title}${place}.`,
+    `«${title}»${place}.`,
+    `${title}${place}${priceText}.`,
+    `${title}${place} - подробности и билеты ниже.`,
   ];
   return variants[Math.abs(index) % variants.length];
 }
@@ -94,17 +74,15 @@ function buildFactBlock(member) {
   const lines = [];
   const city = dash(member.city).trim();
   const venue = dash(member.venue).trim();
-  const when = ruDate(member.next);
   const price = Number(member.price || 0);
   const age = String(member.age || '').trim();
   if (city && venue) lines.push(`${city}, ${venue}`);
   else if (city) lines.push(city);
   else if (venue) lines.push(venue);
-  if (when) lines.push(`Ближайший сеанс: ${when.date}${when.time ? `, ${when.time}` : ''}`);
   if (price > 0) lines.push(`Билеты: от ${price} ₽`);
   if (age && age !== '0') lines.push(`Возраст: ${age}+`);
   if (!lines.length) return '';
-  return ['## Где и когда', '', ...lines.map((l) => `- ${l}`)].join('\n');
+  return ['## Где проходит', '', ...lines.map((l) => `- ${l}`)].join('\n');
 }
 
 

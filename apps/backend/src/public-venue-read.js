@@ -37,6 +37,7 @@ import { loadCityRoutingConfig } from './city-routing-config.js';
 import { resolveProjectRoot } from './project-root.js';
 import { resolvePlaceSlugAlias } from './place-slug-aliases.js';
 import { publicVenueEditorialFlags } from './public-venue-editorial-flags.js';
+import { readReadyPdpDocument } from './pdp-documents.js';
 
 const PUBLIC_CATALOG_CACHE_MS = 5 * 60 * 1000;
 /** Soft TTL: serve expired hub while single-flight rebuild runs (INC.504 venues hang). */
@@ -587,6 +588,7 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
   const pageSlug = publicVenueSlug(canonicalVenue.slug, normalizedVenue.name, canonicalVenue.id);
   return {
     generatedAt: new Date().toISOString(),
+    pdp: await readReadyPdpDocument(db, 'venues', canonicalVenue.id),
     venue: {
       id: canonicalVenue.id,
       slug: pageSlug,
@@ -1362,9 +1364,32 @@ async function resolvePublicVenueRowByComputedSlug(db, requestedSlug) {
   return null;
 }
 
+/**
+ * Mirror of `apps/backend/src/description-origin.ts` origin-marker guard.
+ * Inline on purpose: this legacy entrypoint is loaded by plain node and cannot
+ * import the TypeScript module.
+ */
+const ORIGIN_MARKER_TEST_RE =
+  /<!--\s*daibilet:origin\s*=\s*(?:AUTO|EDITORIAL|AI)\s*-->|\[\[\s*origin\s*:\s*(?:AUTO|EDITORIAL|AI)\s*\]\]/i;
+const ORIGIN_MARKER_LINE_RE =
+  /^[ \t]*(?:<!--\s*daibilet:origin\s*=\s*(?:AUTO|EDITORIAL|AI)\s*-->|\[\[\s*origin\s*:\s*(?:AUTO|EDITORIAL|AI)\s*\]\])[ \t]*$/gim;
+const ORIGIN_MARKER_INLINE_RE =
+  /<!--\s*daibilet:origin\s*=\s*(?:AUTO|EDITORIAL|AI)\s*-->|\[\[\s*origin\s*:\s*(?:AUTO|EDITORIAL|AI)\s*\]\]/gi;
+
+function stripDescriptionOriginMarkers(value) {
+  const source = String(value || '');
+  if (!source || !ORIGIN_MARKER_TEST_RE.test(source)) return source;
+  return source
+    .replace(ORIGIN_MARKER_LINE_RE, '')
+    .replace(ORIGIN_MARKER_INLINE_RE, ' ')
+    .replace(/[ \t]+$/gm, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
 function cleanImportedDescription(value) {
   if (value == null) return null;
-  const text = String(value)
+  const text = stripDescriptionOriginMarkers(value)
     .replace(/<\s*br\s*\/?>/gi, '\n')
     .replace(/<\/\s*(p|div|li|h[1-6])\s*>/gi, '\n')
     .replace(/<[^>]+>/g, ' ')

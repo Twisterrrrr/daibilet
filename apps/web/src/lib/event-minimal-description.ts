@@ -20,27 +20,10 @@ export type MinimalDescriptionInput = {
   category?: string | null;
   subcategory?: string | null;
   kind?: string | null;
-  nextSession?: string | Date | null;
-  futureSessions?: number | null;
   durationMin?: number | null;
   priceFromRub?: number | null;
   ageLimit?: string | null;
 };
-
-const MONTHS_GENITIVE = [
-  'января',
-  'февраля',
-  'марта',
-  'апреля',
-  'мая',
-  'июня',
-  'июля',
-  'августа',
-  'сентября',
-  'октября',
-  'ноября',
-  'декабря',
-];
 
 /** Category -> neutral noun phrase about the format. Never a fact claim. */
 const CATEGORY_FORMAT: Array<[RegExp, string]> = [
@@ -142,24 +125,6 @@ export function describeFormat(input: MinimalDescriptionInput): string {
   return 'мероприятие';
 }
 
-export function formatRuDate(value: string | Date | null | undefined): string | null {
-  if (!value) return null;
-  const date = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(date.getTime())) return null;
-  const parts = new Intl.DateTimeFormat('ru-RU', {
-    timeZone: 'Europe/Moscow',
-    day: 'numeric',
-    month: 'numeric',
-    year: 'numeric',
-  }).formatToParts(date);
-  const day = parts.find((p) => p.type === 'day')?.value;
-  const month = parts.find((p) => p.type === 'month')?.value;
-  const year = parts.find((p) => p.type === 'year')?.value;
-  if (!day || !month || !year) return null;
-  const monthName = MONTHS_GENITIVE[Number(month) - 1] || month;
-  return `${Number(day)} ${monthName} ${year}`;
-}
-
 /** Duration from sessions rounded to the nearest 5 minutes (project canon). */
 export function roundDurationMinutes(minutes: number | null | undefined): number | null {
   if (!minutes || !Number.isFinite(minutes) || minutes <= 0) return null;
@@ -178,40 +143,12 @@ function quoteName(value: string): string {
   return /[«"']/u.test(value) ? value : `«${value}»`;
 }
 
-/** Date + Moscow time ("20 ноября 2026, 19:00"); time omitted at midnight. */
-export function formatRuDateTime(value: string | Date | null | undefined): string | null {
-  const base = formatRuDate(value);
-  if (!base || !value) return base;
-  const date = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(date.getTime())) return base;
-  const parts = new Intl.DateTimeFormat('ru-RU', {
-    timeZone: 'Europe/Moscow',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  }).formatToParts(date);
-  const get = (type: string) => parts.find((p) => p.type === type)?.value;
-  const hour = get('hour');
-  const minute = get('minute');
-  if (!hour || !minute) return base;
-  const normalizedHour = hour === '24' ? '00' : hour;
-  if (normalizedHour === '00' && minute === '00') return base;
-  return `${base}, ${normalizedHour}:${minute}`;
-}
-
-/** Russian plural: 1 сеанс / 2 сеанса / 5 сеансов. */
-export function pluralizeRu(n: number, one: string, few: string, many: string): string {
-  const mod10 = n % 10;
-  const mod100 = n % 100;
-  if (mod10 === 1 && mod100 !== 11) return `${n} ${one}`;
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return `${n} ${few}`;
-  return `${n} ${many}`;
-}
-
 /**
- * Canonical "## Практическая информация" fact block: place, address, next
- * session, duration, age, price. Built only from catalogue fields; returns an
- * empty string when there is nothing factual to show.
+ * Canonical "## Практическая информация" fact block: place, address, duration,
+ * age, price. The schedule is intentionally absent: the purchase block renders
+ * live slots, while a stored date goes stale and pins the wrong timezone.
+ * Built only from catalogue fields; returns an empty string when there is
+ * nothing factual to show.
  */
 export function buildPracticalInfoBlock(input: MinimalDescriptionInput): string {
   const city = normalizeUserFacingCopy(String(input.city || '').trim());
@@ -225,11 +162,6 @@ export function buildPracticalInfoBlock(input: MinimalDescriptionInput): string 
   if (place.length) facts.push(`Место - ${place.join(', ')}`);
   if (address) facts.push(`Адрес - ${address}`);
 
-  const next = formatRuDateTime(input.nextSession);
-  if (next) {
-    const sessions = Number(input.futureSessions || 0);
-    facts.push(sessions > 1 ? `Ближайшая дата - ${next} (всего ${pluralizeRu(sessions, 'сеанс', 'сеанса', 'сеансов')})` : `Ближайшая дата - ${next}`);
-  }
   const duration = roundDurationMinutes(input.durationMin);
   if (duration) facts.push(`Продолжительность - около ${duration} минут`);
   const age = String(input.ageLimit || '').trim();

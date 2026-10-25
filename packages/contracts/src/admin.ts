@@ -1,4 +1,6 @@
+import type { AdmissionProductDto } from './admission.js';
 import type { PurchaseFields, Readiness, ReadinessIssue, SeoFields, Severity, SourceCode } from './common.js';
+import type { ListingHealthDto } from './listing-health.js';
 
 export interface AdminDashboardLaunchMetrics {
   groupedEvents: number;
@@ -86,9 +88,35 @@ export interface AdminEventRowDto extends SeoFields, PurchaseFields {
 export interface AdminEventOverrideDto extends SeoFields {
   title?: string | null;
   description?: string | null;
+  /// Provenance of description: AUTO (post-sync composer) | EDITORIAL | AI; null = legacy.
+  descriptionOrigin?: 'AUTO' | 'EDITORIAL' | 'AI' | null;
   shortDescription?: string | null;
   imageUrl?: string | null;
   editorStatus?: string | null;
+}
+
+/** AI description rewrite queue item (/api/admin/rewrite-queue). */
+export interface AdminRewriteRevisionDto {
+  id: string;
+  eventId: string;
+  status: 'QUEUED' | 'GENERATED' | 'CHECKED' | 'APPROVED' | 'PUBLISHED' | 'STALE' | string;
+  priority: 'A' | 'B' | null;
+  sourceHash: string;
+  sourceText: string;
+  draftText: string | null;
+  finalText: string | null;
+  model: string | null;
+  qaFlags: Array<{ code: string; message: string }>;
+  eventTitle: string | null;
+  eventSlug: string | null;
+  city: string | null;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+}
+
+export interface AdminRewriteQueueDto {
+  items: AdminRewriteRevisionDto[];
+  counts: Record<string, number>;
 }
 
 export interface AdminEventDetailDto extends AdminEventRowDto {
@@ -109,6 +137,99 @@ export interface AdminEventDetailDto extends AdminEventRowDto {
     deeplinkUrl?: string | null;
     active: boolean;
   }>;
+}
+
+export type AdminEventScheduleLockCode =
+  | 'SOURCE_MANAGED'
+  | 'SCHEDULE_LOCKED';
+
+export interface AdminEventScheduleSessionDto {
+  id: string;
+  startsAt?: string | null;
+  endsAt?: string | null;
+  sourceStatus?: string | null;
+  priceFromRub?: number | null;
+  ticketsVacant?: number | null;
+  capacityTotal?: number | null;
+  capacitySold: number;
+  isActive: boolean;
+  cancelledAt?: string | null;
+  cancelReason?: string | null;
+  externalId?: string | null;
+  hasSales: boolean;
+}
+
+export interface AdminEventScheduleOfferDto {
+  id: string;
+  sourceCode: SourceCode;
+  title?: string | null;
+  priceRub?: number | null;
+  oldPriceRub?: number | null;
+  capacityTotal?: number | null;
+  groupSize: number;
+  weekdayMask?: number | null;
+  active: boolean;
+}
+
+export interface AdminEventScheduleDto {
+  eventId: string;
+  slug: string;
+  title: string;
+  kind: 'SINGLE' | 'RECURRING' | 'OPEN_DATE' | string;
+  status: string;
+  purchaseFlow: string;
+  managementMode: string;
+  scheduleLocked: boolean;
+  editable: boolean;
+  lockCode?: AdminEventScheduleLockCode | null;
+  lockReason?: string | null;
+  defaultCapacityTotal?: number | null;
+  openDate: {
+    validFrom?: string | null;
+    validTo?: string | null;
+    validDays?: number | null;
+  };
+  salesPolicy: {
+    startsAt?: string | null;
+    endsAt?: string | null;
+  };
+  sessions: AdminEventScheduleSessionDto[];
+  offers: AdminEventScheduleOfferDto[];
+  updatedAt: string;
+}
+
+export interface AdminEventScheduleModePatchDto {
+  kind?: 'SINGLE' | 'RECURRING' | 'OPEN_DATE';
+  scheduleLocked?: boolean;
+  defaultCapacityTotal?: number | null;
+  openDateValidFrom?: string | null;
+  openDateValidTo?: string | null;
+  openDateValidDays?: number | null;
+  salesStartsAt?: string | null;
+  salesEndsAt?: string | null;
+}
+
+export interface AdminEventScheduleSessionCreateDto {
+  startsAt: string;
+  endsAt?: string | null;
+  priceFromRub?: number | null;
+  ticketsVacant?: number | null;
+  capacityTotal?: number | null;
+  isActive?: boolean;
+}
+
+export interface AdminEventScheduleSessionPatchDto {
+  startsAt?: string;
+  endsAt?: string | null;
+  priceFromRub?: number | null;
+  ticketsVacant?: number | null;
+  capacityTotal?: number | null;
+  isActive?: boolean;
+  cancelReason?: string | null;
+}
+
+export interface AdminEventScheduleSessionCancelDto {
+  reason?: string | null;
 }
 
 export interface AdminEventsListDto {
@@ -187,8 +308,46 @@ export interface AdminEventChangeRequestActionsDto {
   canApply: boolean;
 }
 
+export type AdminEventChangeRequestSubject = 'EVENT' | 'ADMISSION_PRODUCT';
+
+export interface AdminEventChangeRequestAdmissionOfferDto {
+  id: string;
+  title?: string | null;
+  priceRub?: number | null;
+  oldPriceRub?: number | null;
+  capacityTotal?: number | null;
+  groupSize: number;
+  active: boolean;
+}
+
+export interface AdminEventChangeRequestAdmissionProductDto {
+  id: string;
+  slug: string;
+  title: string;
+  shortTitle?: string | null;
+  description?: string | null;
+  shortDescription?: string | null;
+  type: string;
+  status: string;
+  imageUrl?: string | null;
+  priceFromRub?: number | null;
+  ticketsVacant?: number | null;
+  validityMode: string;
+  validFrom?: string | null;
+  validTo?: string | null;
+  validDaysAfterPurchase?: number | null;
+  venueId: string;
+  cityId?: string | null;
+  venue?: { id: string; title: string } | null;
+  city?: { id: string; title: string } | null;
+  offers: AdminEventChangeRequestAdmissionOfferDto[];
+  updatedAt: string;
+}
+
 export interface AdminEventChangeRequestRowDto {
   id: string;
+  subject: AdminEventChangeRequestSubject;
+  subjectId?: string | null;
   eventId?: string | null;
   supplierId?: string | null;
   type: string;
@@ -245,6 +404,7 @@ export interface AdminEventChangeRequestPayloadPreviewSectionDto {
 }
 
 export interface AdminEventChangeRequestDetailDto extends AdminEventChangeRequestRowDto {
+  admissionProduct?: AdminEventChangeRequestAdmissionProductDto | null;
   payloadPreview: {
     baseSnapshot?: Record<string, unknown> | null;
     sections: AdminEventChangeRequestPayloadPreviewSectionDto[];
@@ -301,3 +461,220 @@ export interface AdminReviewsListDto {
   pendingCount: number;
 }
 
+export type AdminSupplierReadinessCode =
+  | 'SUPPLIER_NOT_ACTIVE'
+  | 'MISSING_OWNER_USER'
+  | 'MISSING_LEGAL_PROFILE'
+  | 'LEGAL_PROFILE_NOT_VERIFIED'
+  | 'MISSING_PRIMARY_BANK_ACCOUNT'
+  | 'MISSING_COMMISSION_RULE'
+  | 'MISSING_YOOKASSA_SHOP'
+  | 'NO_INTERNAL_CHECKOUT_EVENTS';
+
+export interface AdminSupplierReadinessDto {
+  status: Readiness;
+  canEnableInternalCheckout: boolean;
+  blockers: ReadinessIssue[];
+  warnings: ReadinessIssue[];
+}
+
+export interface AdminSupplierEventsSummaryDto {
+  total: number;
+  active: number;
+  published: number;
+  internalCheckout: number;
+  hybrid: number;
+  widgetOnly: number;
+  sourceManaged: number;
+  daibiletManaged: number;
+  supplierDrafts: number;
+  supplierSelfService: number;
+}
+
+export interface AdminSupplierAdmissionsSummaryDto {
+  total: number;
+  published: number;
+  platform: number;
+  canSell: number;
+  needsAttention: number;
+}
+
+export interface AdminSupplierOrdersSummaryDto {
+  totalItems: number;
+  reserved: number;
+  confirmed: number;
+  fulfilled: number;
+  cancelled: number;
+  refunded: number;
+  grossKopecks: number;
+  commissionKopecks: number;
+}
+
+export interface AdminSupplierFinanceSummaryDto {
+  ledgerBalanceKopecks: number;
+  saleKopecks: number;
+  commissionKopecks: number;
+  refundKopecks: number;
+  payoutKopecks: number;
+  pendingPayoutsKopecks: number;
+  paidPayoutsKopecks: number;
+  openRefundRequests: number;
+  openDisputes: number;
+}
+
+export interface AdminSupplierReviewSummaryDto {
+  total: number;
+  pendingModeration: number;
+  approved: number;
+  hidden: number;
+  averageRating?: number | null;
+}
+
+export interface AdminSupplierLegalSummaryDto {
+  status?: string | null;
+  legalName?: string | null;
+  inn?: string | null;
+  taxMode?: string | null;
+  isVatPayer?: boolean | null;
+  verifiedAt?: string | null;
+  rejectionComment?: string | null;
+  hasPrimaryBankAccount: boolean;
+}
+
+export interface AdminSupplierRowDto {
+  id: string;
+  slug: string;
+  title: string;
+  legalName?: string | null;
+  kind: string;
+  status: string;
+  email?: string | null;
+  phone?: string | null;
+  websiteUrl?: string | null;
+  integrationMode: string;
+  defaultCatalogMode: string;
+  paymentMode: string;
+  pspFeeMode: string;
+  defaultCommissionBps: number;
+  yookassaShopId?: string | null;
+  usersCount: number;
+  ownerUsersCount: number;
+  legal: AdminSupplierLegalSummaryDto;
+  events: AdminSupplierEventsSummaryDto;
+  admissions: AdminSupplierAdmissionsSummaryDto;
+  orders: AdminSupplierOrdersSummaryDto;
+  finance: AdminSupplierFinanceSummaryDto;
+  reviews: AdminSupplierReviewSummaryDto;
+  readiness: AdminSupplierReadinessDto;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminSuppliersListDto {
+  generatedAt: string;
+  total: number;
+  limit: number;
+  offset: number;
+  hasMore: boolean;
+  filters: {
+    q?: string | null;
+    status?: string | null;
+  };
+  metrics: {
+    total: number;
+    active: number;
+    review: number;
+    draft: number;
+    paused: number;
+    checkoutReady: number;
+    needsAttention: number;
+  };
+  items: AdminSupplierRowDto[];
+}
+
+export interface AdminSupplierDetailDto extends AdminSupplierRowDto {
+  users: Array<{
+    id: string;
+    role: string;
+    isActive: boolean;
+    email?: string | null;
+    name?: string | null;
+    acceptedAt?: string | null;
+  }>;
+  accessLog: Array<{
+    id: string;
+    supplierUserId: string;
+    action: string;
+    previousRole: string;
+    newRole: string;
+    previousActive: boolean;
+    newActive: boolean;
+    actor: string;
+    createdAt: string;
+  }>;
+  commissionRules: Array<{
+    id: string;
+    scope: string;
+    title?: string | null;
+    percentBps: number;
+    fixedFeeKopecks: number;
+    priority: number;
+    startsAt?: string | null;
+    endsAt?: string | null;
+    isActive: boolean;
+  }>;
+  eventsSample: Array<{
+    id: string;
+    slug: string;
+    title: string;
+    status: string;
+    purchaseFlow: string;
+    managementMode: string;
+    priceFromRub?: number | null;
+  }>;
+  admissionProductsSample: AdmissionProductDto[];
+  recentLedgerEntries: Array<{
+    id: string;
+    type: string;
+    amountKopecks: number;
+    note?: string | null;
+    createdAt: string;
+  }>;
+}
+
+export type AdminSupplierInviteRole = 'OWNER' | 'ADMIN' | 'OPERATOR' | 'ACCOUNTANT' | 'VIEWER';
+
+export interface AdminSupplierInviteRequestDto {
+  email: string;
+  name?: string | null;
+  role: AdminSupplierInviteRole;
+}
+
+export interface AdminSupplierInviteResultDto {
+  supplier: AdminSupplierDetailDto;
+  access: {
+    email: string;
+    role: AdminSupplierInviteRole;
+    existingAccount: boolean;
+    inviteUrl: string | null;
+    expiresAt: string | null;
+  };
+}
+
+export interface AdminListingHealthOverviewDto {
+  generatedAt: string;
+  metrics: {
+    total: number;
+    ready: number;
+    review: number;
+    blocked: number;
+    averageScore: number;
+  };
+  items: Array<{
+    entityType: 'EVENT' | 'VENUE' | 'ADMISSION_PRODUCT';
+    entityId: string;
+    title: string;
+    slug: string | null;
+    health: ListingHealthDto;
+  }>;
+}

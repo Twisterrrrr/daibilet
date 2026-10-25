@@ -36,6 +36,7 @@ import { hubBlogCardExcerpt, mergeBlogCards } from '@/lib/blog-utils';
 import { safeNotFound } from '@/lib/safe-not-found';
 import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
 import { buildCityPageJsonLd } from '@/lib/structured-data';
+import { cityCanonicalPath } from '@/lib/routes';
 import {
   getCachedCityHubArticles,
   listTopCitySlugsForSsg,
@@ -113,7 +114,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   try {
     const payload = loaded.payload;
     const city = payload.city;
-    const path = city.canonicalPath || `/cities/${city.slug}`;
+    const path = cityCanonicalPath(city);
 
   if (city.type === 'region') {
     const childEventTotal = (payload.childCities || []).reduce(
@@ -172,7 +173,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   });
 
     return {
-      title: expansionAbsolute ? { absolute: hubTitle } : pageTitle(hubTitle),
+      title: expansionAbsolute ? { absolute: hubTitleFull } : pageTitle(hubTitle),
       description,
       alternates: { canonical: path },
       robots: robotsForIndexability(decision.indexable),

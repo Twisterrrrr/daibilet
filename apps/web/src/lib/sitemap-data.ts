@@ -1,8 +1,3 @@
-import {
-  buildPublicArticlesListDto,
-  buildPublicEventFreshnessMap,
-  buildPublicVenuesDto,
-} from '@daibilet/backend/public-read';
 import type { PublicCatalogDto, PublicVenueDto, PublicVenuePageDto } from '@daibilet/contracts/public';
 
 import { evaluateCityIndexability, evaluateRegionIndexability, evaluateVenueIndexability } from '@/lib/hub-indexability';
@@ -25,7 +20,7 @@ import { hasSeoListingEditorial } from '@/data/seo-listing-texts';
 import { isEventsCatalogSitemapEligibleUrl } from '@/lib/events-catalog-indexing';
 import { evaluateListingIndexability, MIN_LISTING_OFFERS_FOR_INDEX } from '@/lib/seo-listing-meta';
 import { buildPodborkiCityCanonicalPath, isPodborkiSeoPilotCitySlug, PODBORKI_SEO_PILOT_CITY_SLUGS } from '@/lib/podborki-city-seo';
-import { venueCanonicalPath } from '@/lib/routes';
+import { venueCanonicalPath, cityHref, citySlug } from '@/lib/routes';
 import { cityPlacesCatalogHref } from '@/lib/catalog-url';
 import { getCachedCatalog } from '@/server/cached-catalog-data';
 import { getCachedDestinations } from '@/server/cached-public-surfaces';
@@ -54,19 +49,38 @@ export type SitemapEntry = {
 const MAX_EVENTS = 45_000;
 const MAX_VENUES = 10_000;
 const VENUE_SITEMAP_SNAPSHOT_MS = 5 * 60 * 1000;
+
+/**
+ * Lean venue row for the sitemap. The HTTP venue list envelope carries the same
+ * `buildPublicVenuesCatalog` rows the direct `public-read` call used to build.
+ */
+type SitemapVenueRow = PublicVenueDto & { events?: number | null };
+type SitemapVenuesPayload = { venues?: SitemapVenueRow[] };
+
 let venueSitemapSnapshot: {
   expiresAt: number;
-  payload: Awaited<ReturnType<typeof buildPublicVenuesDto>>;
+  payload: SitemapVenuesPayload;
 } | null = null;
-let venueSitemapRebuild: Promise<Awaited<ReturnType<typeof buildPublicVenuesDto>>> | null = null;
+let venueSitemapRebuild: Promise<SitemapVenuesPayload> | null = null;
 
-/** Sitemap waits for one fresh rebuild per TTL; catalog pages keep their existing SWR behavior. */
-async function freshVenuesForSitemap() {
+/**
+ * Sitemap waits for one fresh rebuild per TTL; catalog pages keep their existing SWR behavior.
+ *
+ * INC.504.15 / INC.504.23: this used to call `buildPublicVenuesDto(limit=10000, forceRefresh)`
+ * directly, running a 10k-venue DB query + DTO build on the Next web-process event loop.
+ * The same `buildPublicVenuesCatalog` builder serves HTTP `/api/public/venues` (backend
+ * `withPublicResponseCache`), so the sitemap now fetches over loopback HTTP: DB + DTO
+ * work stays in the API process, not in the process that renders HTML.
+ */
+async function freshVenuesForSitemap(): Promise<SitemapVenuesPayload> {
   if (venueSitemapSnapshot && venueSitemapSnapshot.expiresAt > Date.now()) {
     return venueSitemapSnapshot.payload;
   }
   if (!venueSitemapRebuild) {
-    venueSitemapRebuild = buildPublicVenuesDto(new URLSearchParams(`limit=${MAX_VENUES}`), true)
+    venueSitemapRebuild = fetchPublicApiJson<SitemapVenuesPayload>('/api/public/venues', {
+      searchParams: { limit: MAX_VENUES },
+      timeoutMs: 30_000,
+    })
       .then((payload) => {
         venueSitemapSnapshot = { payload, expiresAt: Date.now() + VENUE_SITEMAP_SNAPSHOT_MS };
         return payload;
@@ -111,26 +125,19 @@ export function normalizeSitemapChunkParam(raw: string): SitemapChunk | null {
 }
 
 /**
- * Resolve a sitemap `lastmod` from an entity's real `updatedAt`.
- *
- * Cities and venues still fall back to the build-time `now` because their
- * public DTO exposes no `updatedAt` yet - see the `entry()` note below. Never
- * substitute `new Date()` for a real value: a lastmod that moves on every
- * rebuild is worse than none, because it tells crawlers the whole site changes
- * daily and they stop trusting the field.
+ * Resolve a sitemap lastmod only when an entity provides a real timestamp.
+ * Unknown freshness is represented by omitting the tag, never by build time.
  */
 export function resolveSitemapLastModified(
   candidate: Date | string | null | undefined,
-  fallback: Date,
-): Date {
-  if (candidate == null) return fallback;
+): Date | undefined {
+  if (candidate == null || candidate === '') return undefined;
   const parsed = candidate instanceof Date ? candidate : new Date(candidate);
-  return Number.isNaN(parsed.getTime()) ? fallback : parsed;
+  return Number.isNaN(parsed.getTime()) ? undefined : parsed;
 }
 
 function entry(
   path: string,
-  now: Date,
   changeFrequency: SitemapEntry['changeFrequency'],
   priority: number,
   lastModified?: Date | string | null,
@@ -138,7 +145,7 @@ function entry(
   const normalized = path.startsWith('/') ? path : `/${path}`;
   return {
     url: `${getSiteUrl()}${normalized === '/' ? '/' : normalized}`,
-    lastModified: resolveSitemapLastModified(lastModified, now),
+    lastModified: resolveSitemapLastModified(lastModified),
     changeFrequency,
     priority,
   };
@@ -193,35 +200,35 @@ export async function buildIndexableIntentSitemapPaths(): Promise<string[]> {
   return [...paths];
 }
 
-export async function buildStaticSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
+export async function buildStaticSitemapEntries(): Promise<SitemapEntry[]> {
   const intentPaths = await buildIndexableIntentSitemapPaths();
   const podborkiCityHubPaths = PODBORKI_SEO_PILOT_CITY_SLUGS.map((city) =>
     buildPodborkiCityCanonicalPath(city),
   );
   return [
-    entry('/', now, 'hourly', 1),
-    entry('/events', now, 'hourly', 0.8),
-    entry('/cities', now, 'daily', 0.8),
-    entry('/places', now, 'daily', 0.85),
+    entry('/', 'hourly', 1),
+    entry('/events', 'hourly', 0.8),
+    entry('/cities', 'daily', 0.8),
+    entry('/places', 'daily', 0.85),
     // Family facets are indexable documents in their own right since the ЧПУ
     // transition on 2026-10-01; before that they canonicalised to /places.
-    entry('/places/institution', now, 'daily', 0.8),
-    entry('/places/location', now, 'daily', 0.8),
-    entry('/podborki', now, 'daily', 0.8),
-    ...podborkiCityHubPaths.map((path) => entry(path, now, 'daily', 0.75)),
-    ...intentPaths.map((path) => entry(path, now, 'daily', 0.7)),
-    entry('/blog', now, 'daily', 0.8),
-    entry('/help', now, 'monthly', 0.5),
-    entry('/contacts', now, 'monthly', 0.5),
-    entry('/partners', now, 'monthly', 0.6),
-    entry('/offer', now, 'yearly', 0.3),
-    entry('/privacy', now, 'yearly', 0.3),
-    entry('/legal', now, 'yearly', 0.3),
-    entry('/requisites', now, 'yearly', 0.3),
+    entry('/places/institution', 'daily', 0.8),
+    entry('/places/location', 'daily', 0.8),
+    entry('/podborki', 'daily', 0.8),
+    ...podborkiCityHubPaths.map((path) => entry(path, 'daily', 0.75)),
+    ...intentPaths.map((path) => entry(path, 'daily', 0.7)),
+    entry('/blog', 'daily', 0.8),
+    entry('/help', 'monthly', 0.5),
+    entry('/contacts', 'monthly', 0.5),
+    entry('/partners', 'monthly', 0.6),
+    entry('/offer', 'yearly', 0.3),
+    entry('/privacy', 'yearly', 0.3),
+    entry('/legal', 'yearly', 0.3),
+    entry('/requisites', 'yearly', 0.3),
   ];
 }
 
-export async function buildEventsSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
+export async function buildEventsSitemapEntries(): Promise<SitemapEntry[]> {
   const seen = new Set<string>();
   const entries: SitemapEntry[] = [];
   const limit = 200;
@@ -234,15 +241,18 @@ export async function buildEventsSitemapEntries(now = new Date()): Promise<Sitem
   // "the query failed" and "there is no data" indistinguishable and cost a full
   // diagnosis cycle on 30.09. An empty map is a valid outcome (zero events with
   // a usable updatedAt); a thrown error is not, so log it and keep going.
-  const freshness = await buildPublicEventFreshnessMap().catch((error: unknown) => {
+  const freshnessPayload = await fetchPublicApiJson<{ freshness: Record<string, string> }>(
+    '/api/public/events/freshness', { timeoutMs: 10_000 },
+  ).catch((error: unknown) => {
     console.error(
-      '[sitemap] buildPublicEventFreshnessMap failed; event lastmod falls back to build time',
+      '[sitemap] event freshness API failed; event lastmod will be omitted',
       error,
     );
-    return new Map<string, Date>();
+    return { freshness: {} as Record<string, string> };
   });
-  if (freshness.size === 0) {
-    console.warn('[sitemap] buildPublicEventFreshnessMap returned 0 rows; all event lastmod are build time');
+  const freshness = freshnessPayload.freshness;
+  if (Object.keys(freshness).length === 0) {
+    console.warn('[sitemap] event freshness API returned 0 rows; event lastmod will be omitted');
   }
 
   for (let offset = 0; offset < MAX_EVENTS; offset += limit) {
@@ -255,7 +265,7 @@ export async function buildEventsSitemapEntries(now = new Date()): Promise<Sitem
       if (!slug || seen.has(slug)) continue;
       seen.add(slug);
       entries.push(
-        entry(`/events/${encodeURIComponent(slug)}`, now, 'daily', 0.7, freshness.get(slug) ?? null),
+        entry(`/events/${encodeURIComponent(slug)}`, 'daily', 0.7, freshness[slug] ?? null),
       );
     }
     if (!page.hasMore || !page.items?.length || entries.length >= MAX_EVENTS) break;
@@ -264,7 +274,7 @@ export async function buildEventsSitemapEntries(now = new Date()): Promise<Sitem
   return entries;
 }
 
-export async function buildCitiesSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
+export async function buildCitiesSitemapEntries(): Promise<SitemapEntry[]> {
   const destinationsPayload = await getCachedDestinations();
   return (destinationsPayload?.destinations || [])
     .filter((destination) => {
@@ -285,24 +295,22 @@ export async function buildCitiesSitemapEntries(now = new Date()): Promise<Sitem
       return false;
     })
     .flatMap((destination) => [
-      entry(`/cities/${encodeURIComponent(String(destination.slug))}`, now, 'daily', destination.type === 'region' ? 0.7 : 0.75),
+      entry(cityHref(destination), 'daily', destination.type === 'region' ? 0.7 : 0.75),
       ...(destination.type === 'city' && destination.venues > 0
-        ? [entry(cityPlacesCatalogHref(String(destination.slug)), now, 'daily', 0.65)]
+        ? [entry(cityPlacesCatalogHref(citySlug(destination)), 'daily', 0.65)]
         : []),
     ]);
 }
 
-export async function buildVenuesSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
+export async function buildVenuesSitemapEntries(): Promise<SitemapEntry[]> {
   const venuesPayload = await freshVenuesForSitemap();
   const eligible = (venuesPayload?.venues || [])
     .filter((venue) => {
       if (!venue.slug) return false;
       return evaluateVenueIndexability({
-        // `venue` is the lean row from the backend payload, not PublicVenueDto:
-        // its inferred type omits futureSessionCount. The contract type does
-        // declare it (verified against @daibilet/contracts/public), so cast
-        // rather than duplicate the field in a third place.
-        futureSessions: (venue as PublicVenueDto).futureSessionCount ?? venue.events,
+        // futureSessionCount drives indexability (events is an all-time count);
+        // venue.events stays as the fallback for rows without the counter.
+        futureSessions: venue.futureSessionCount ?? venue.events,
         isIndexable: venue.isIndexable,
         type: venue.type,
         pageStatus: venue.pageStatus,
@@ -311,7 +319,7 @@ export async function buildVenuesSitemapEntries(now = new Date()): Promise<Sitem
     .slice(0, MAX_VENUES);
   const sources = new Map<string, PublicVenueDto>();
   const entries = eligible.map((venue) => {
-    const result = entry(venueCanonicalPath(venue), now, 'weekly', 0.6);
+    const result = entry(venueCanonicalPath(venue), 'weekly', 0.6);
     sources.set(result.url, venue);
     return result;
   });
@@ -348,7 +356,7 @@ export async function buildVenuesSitemapEntries(now = new Date()): Promise<Sitem
   return verifiedEntries;
 }
 
-export async function buildLandingsSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
+export async function buildLandingsSitemapEntries(): Promise<SitemapEntry[]> {
   const paths = new Set<string>();
   const cities = listingSitemapCitySlugs();
 
@@ -411,49 +419,50 @@ export async function buildLandingsSitemapEntries(now = new Date()): Promise<Sit
     }
   }
 
-  return [...paths].map((path) => entry(path.replace(/\/$/, '') || '/', now, 'weekly', 0.65));
+  return [...paths].map((path) => entry(path.replace(/\/$/, '') || '/', 'weekly', 0.65));
 }
 
-export async function buildBlogSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
-  const payload = await buildPublicArticlesListDto();
-  const articles = (payload?.articles || []) as Array<{
-    slug?: string | null;
-    isIndexable?: boolean | null;
-    updatedAt?: string | null;
-  }>;
+export async function buildBlogSitemapEntries(): Promise<SitemapEntry[]> {
+  // INC.504.23: article list over loopback HTTP. Same `buildPublicArticlesList`
+  // payload the direct `public-read` call produced (the backend route wraps the
+  // identical builder with `withPublicResponseCache`); no limit param = the same
+  // default options the direct call passed. Keeps the pg/DTO work out of the
+  // web process.
+  const payload = await fetchPublicApiJson<{
+    articles?: Array<{
+      slug?: string | null;
+      isIndexable?: boolean | null;
+      updatedAt?: string | null;
+    }>;
+  }>('/api/public/articles', { timeoutMs: 10_000 });
+  const articles = payload?.articles || [];
   return articles
     .filter((article) => article.slug && article.isIndexable !== false)
     .map((article) =>
-      entry(`/blog/${encodeURIComponent(String(article.slug))}`, now, 'weekly', 0.6, article.updatedAt),
+      entry(`/blog/${encodeURIComponent(String(article.slug))}`, 'weekly', 0.6, article.updatedAt),
     );
 }
 
 export async function buildSitemapChunkEntries(chunk: SitemapChunk): Promise<SitemapEntry[]> {
-  const now = new Date();
   let entries: SitemapEntry[];
   switch (chunk) {
     case 'static':
-      entries = await buildStaticSitemapEntries(now);
+      entries = await buildStaticSitemapEntries();
       break;
     case 'events':
-      entries = await buildEventsSitemapEntries(now);
+      entries = await buildEventsSitemapEntries();
       break;
     case 'cities':
-      entries = await buildCitiesSitemapEntries(now);
+      entries = await buildCitiesSitemapEntries();
       break;
     case 'venues':
-      entries = await buildVenuesSitemapEntries(now);
+      entries = await buildVenuesSitemapEntries();
       break;
     case 'landings':
-      // Landing DTOs expose no updatedAt, and a build-time lastmod that moves on
-      // every rebuild teaches crawlers to ignore the field site-wide - a missing
-      // lastmod is strictly better (same doctrine as resolveSitemapLastModified).
-      entries = (await buildLandingsSitemapEntries(now)).map(
-        ({ lastModified: _lastModified, ...rest }) => rest,
-      );
+      entries = await buildLandingsSitemapEntries();
       break;
     case 'blog':
-      entries = await buildBlogSitemapEntries(now);
+      entries = await buildBlogSitemapEntries();
       break;
     default:
       entries = [];
@@ -523,13 +532,11 @@ export function renderUrlsetXml(entries: SitemapEntry[]): string {
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>\n`;
 }
 
-export function renderSitemapIndexXml(now = new Date()): string {
-  const lastmod = now.toISOString();
+export function renderSitemapIndexXml(): string {
   const site = getSiteUrl();
   const body = SITEMAP_CHUNKS.map(
     (chunk) => `  <sitemap>
     <loc>${escapeXml(`${site}/sitemaps/${chunk}.xml`)}</loc>
-    <lastmod>${lastmod}</lastmod>
   </sitemap>`,
   ).join('\n');
 
@@ -538,12 +545,21 @@ export function renderSitemapIndexXml(now = new Date()): string {
 
 export const SITEMAP_RESPONSE_HEADERS = {
   'Content-Type': 'application/xml; charset=utf-8',
-  'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+  'Cache-Control': 'public, s-maxage=3600',
 } as const;
 
 export function sitemapResponseHeaders(chunk: string): Record<string, string> {
+  // Event and venue eligibility can change during catalog sync. Keep their
+  // advertised shared-cache freshness short; do not grant a day-long SWR window.
+  const maxAge = chunk === 'events' || chunk === 'venues'
+    ? 300
+    : chunk === 'cities' || chunk === 'landings'
+      ? 900
+      : 3600;
   return {
     ...SITEMAP_RESPONSE_HEADERS,
-    ...(chunk === 'events' || chunk === 'venues' ? { 'Cache-Control': 'no-store' } : {}),
+    'Cache-Control': `public, s-maxage=${maxAge}`,
+    // Runtime route handlers still use a bounded shared cache. Omitting
+    // stale-while-revalidate prevents deleted catalog URLs lingering for a day.
   };
 }

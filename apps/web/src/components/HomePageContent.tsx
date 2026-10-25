@@ -1,10 +1,12 @@
-import { cookies } from 'next/headers';
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import { Suspense } from 'react';
 import { ArrowRight, Dices } from 'lucide-react';
 
-import { HomeCityAwareSections } from '@/components/HomeCityAwareSections.client';
-import { HomeCategoryStack } from '@/components/HomeCategoryStack.client';
+import {
+  HomeCityAwareSectionsDynamic,
+  HomeCategoryStackDynamic,
+} from '@/components/HomeMoreDeferredIslands.client';
+import { HomePopularCitiesRail } from '@/components/HomePopularCitiesRail.client';
 import {
   HomeBottomNav,
   HomeMyDayBanner,
@@ -12,7 +14,6 @@ import {
 } from '@/components/HomeDeferredIslands.client';
 import { HomeHero } from '@/components/HomeHero.client';
 import { HomePageSkeleton } from '@/components/HomePageSkeleton';
-import { HomePopularCitiesRail } from '@/components/HomePopularCitiesRail.client';
 import { IMAGE_SIZES, BlogCardSafeImage, BLOG_LISTING_IMAGE_QUALITY, SafeImage } from '@/components/SafeImage.client';
 import { ScrollRail } from '@/components/ScrollRail.client';
 import { blogSurfaceMeta, blogSurfaceMetaLine } from '@/lib/blog-meta';
@@ -26,8 +27,8 @@ import '@/lib/env';
 import { catalogSocialStats } from '@/lib/catalog-social-stats';
 import { formatMoney, formatNumber, pluralEvents } from '@/lib/format';
 import { resolveHomePromoImage } from '@/lib/home-scenarios';
-import { landingCategoryHref } from '@/lib/landing-routes';
 import { orderPopularRailCities } from '@/lib/popular-cities-rail';
+import { landingCategoryHref } from '@/lib/landing-routes';
 import { withSoftTimeout } from '@/lib/soft-timeout';
 import {
   buildHomePageSectionsSync,
@@ -41,7 +42,6 @@ import {
 } from '@/lib/ssr-lean-payloads';
 import { getHomeArticles, getHomeCoverFingerprints, getHomePageData } from '@/server/cached-home-data';
 import { getActiveHeroBanners, heroFramesFromBanners } from '@/server/hero-banners';
-import { decodeSelectedCityCookie, matchDestination, SELECTED_CITY_COOKIE } from '@/lib/selected-city';
 
 /** External CDN HEAD fingerprints must not stall home TTFB on bad egress/DNS. */
 const HOME_FINGERPRINTS_TIMEOUT_MS = 800;
@@ -50,10 +50,9 @@ const HOME_ARTICLES_TIMEOUT_MS = 1_200;
 type BlogApiArticles = NonNullable<Parameters<typeof mergeBlogCards>[0]>;
 
 async function HomePageBody() {
-  const cityCookie = decodeSelectedCityCookie((await cookies()).get(SELECTED_CITY_COOKIE)?.value);
   const [{ destinationsPayload, catalogPayload, landingsCatalog }, fingerprintsRecord, articlesPayload] =
     await Promise.all([
-      getHomePageData(cityCookie),
+      getHomePageData(),
       withSoftTimeout(
         getHomeCoverFingerprints(),
         HOME_FINGERPRINTS_TIMEOUT_MS,
@@ -69,13 +68,36 @@ async function HomePageBody() {
     ]);
 
   const destinations = destinationsPayload?.destinations ?? [];
-  const ssrCity = matchDestination(destinations, cityCookie);
-  const ssrCityName = ssrCity?.name || null;
-  const ssrCitySlug = ssrCity?.slug || ssrCity?.sourceSlug || null;
+  const ssrCityName = null;
+  const ssrCitySlug = null;
   const cities = destinations.filter((item) => item.type === 'city');
   // Top by events, then pin Moscow + SPB first so the rail can center that pair on load.
   const topCities = orderPopularRailCities(cities, 16).map(toSlimCityDestination);
-  // Roulette does not need the full destination tree - top live cities are enough.
+  const citiesSection = topCities.length ? (
+    <section
+      id="destinations"
+      className="section-y pb-6 sm:pb-8"
+      data-home-band="full-bleed"
+    >
+      <div className="container-page">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+              Популярные города
+            </h2>
+            <p className="mt-1 text-sm text-slate-500">
+              Выберите город — покажем афишу и подборки
+            </p>
+          </div>
+          <Link href="/cities" className="shrink-0 text-sm font-semibold text-primary-600 hover:text-primary-700">
+            Все города →
+          </Link>
+        </div>
+      </div>
+      {/* Finite city grid + «Показать ещё» (no infinite loop). */}
+      <HomePopularCitiesRail cities={topCities} className="mt-6" />
+    </section>
+  ) : null;
   const luckyCities = [...cities]
     .filter((c) => c.events > 0)
     .sort((a, b) => b.events - a.events || a.name.localeCompare(b.name, 'ru'))
@@ -161,80 +183,56 @@ async function HomePageBody() {
         ssrCitySlug={ssrCitySlug}
       />
 
-      {/* Rhythm: editors → cities → My Day */}
-      <HomeCityAwareSections
+      <HomeCityAwareSectionsDynamic
         editorsPick={editorsPick}
         homeNowTabs={mergedHomeNowTabs}
         sparseCatalog={sparseCatalog}
         ssrCityName={ssrCityName}
-      >
-        <>
-          {topCities.length ? (
-            <section
-              id="destinations"
-              className="section-y pb-6 sm:pb-8"
-              data-home-band="full-bleed"
-            >
-              <div className="container-page">
-                <div className="flex items-end justify-between gap-4">
-                  <div>
-                    <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-                      Популярные города
-                    </h2>
-                    <p className="mt-1 text-sm text-slate-500">Выберите город - покажем афишу и подборки</p>
-                  </div>
-                  <Link href="/cities" className="shrink-0 text-sm font-semibold text-primary-600 hover:text-primary-700">
-                    Все города →
-                  </Link>
-                </div>
-              </div>
-              {/* Finite city grid + «Показать ещё» (no infinite loop). */}
-              <HomePopularCitiesRail cities={topCities} className="mt-6" />
-            </section>
-          ) : null}
+      />
 
-          {/* My Day CTA - constructor card on soft map-band */}
-          <HomeMyDayBanner />
+      {/* Keep city links in server HTML while placing the rail after both event rails. */}
+      {citiesSection}
 
-          {/* Popular landings (topic links) */}
-          {popularLandings.length ? (
-            <section className="section-y pb-6 sm:pb-8">
-              <div className="container-page">
-                <div className="flex items-end justify-between gap-4">
-                  <div>
-                    <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-                      Популярные подборки
-                    </h2>
-                    <p className="mt-1 text-sm text-slate-500">Выберите формат — покажем афишу и расписание</p>
-                  </div>
-                  <Link href="/podborki" className="shrink-0 text-sm font-semibold text-primary-600 hover:text-primary-700">
-                    Все подборки →
-                  </Link>
-                </div>
-                <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-3.5 md:grid-cols-4 lg:grid-cols-4">
-                  {popularLandings.map((landing) => (
-                    <Link
-                      key={landing.slug}
-                      href={landing.href}
-                      className="group flex flex-col gap-1.5 rounded-xl border border-slate-200 bg-white p-4 transition-all hover:border-primary-300 hover:shadow-md sm:p-5"
-                    >
-                      <span className="text-sm font-semibold text-slate-900 group-hover:text-primary-700">{landing.title}</span>
-                      {landing.subtitle ? <span className="text-xs text-slate-500 line-clamp-2">{landing.subtitle}</span> : null}
-                      <span className="mt-auto pt-2 text-xs font-medium text-slate-400">
-                        {pluralEvents(landing.events)}
-                        {landing.priceFrom != null ? ` · от ${formatMoney(landing.priceFrom)}` : ''}
-                      </span>
-                    </Link>
-                  ))}
-                </div>
+      {/* My Day CTA - constructor card on soft map-band */}
+      <HomeMyDayBanner />
+
+      {/* Popular landings (topic links) */}
+      {popularLandings.length ? (
+        <section className="section-y pb-6 sm:pb-8">
+          <div className="container-page">
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+                  Популярные подборки
+                </h2>
+                <p className="mt-1 text-sm text-slate-500">Выберите формат — покажем афишу и расписание</p>
               </div>
-            </section>
-          ) : null}
-        </>
-      </HomeCityAwareSections>
+              <Link href="/podborki" className="shrink-0 text-sm font-semibold text-primary-600 hover:text-primary-700">
+                Все подборки →
+              </Link>
+            </div>
+            <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-3.5 md:grid-cols-4 lg:grid-cols-4">
+              {popularLandings.map((landing) => (
+                <Link
+                  key={landing.slug}
+                  href={landing.href}
+                  className="group flex flex-col gap-1.5 rounded-xl border border-slate-200 bg-white p-4 transition-all hover:border-primary-300 hover:shadow-md sm:p-5"
+                >
+                  <span className="text-sm font-semibold text-slate-900 group-hover:text-primary-700">{landing.title}</span>
+                  {landing.subtitle ? <span className="text-xs text-slate-500 line-clamp-2">{landing.subtitle}</span> : null}
+                  <span className="mt-auto pt-2 text-xs font-medium text-slate-400">
+                    {pluralEvents(landing.events)}
+                    {landing.priceFrom != null ? ` · от ${formatMoney(landing.priceFrom)}` : ''}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       {/* Mobile formats: after event rails, away from My Day CTA */}
-      <HomeCategoryStack />
+      <HomeCategoryStackDynamic />
 
       {/* 4. Lucky city - soft trips map-band (distinct motif from cities) */}
       {luckyCities.length ? (
@@ -471,10 +469,41 @@ async function HomePageBody() {
     </div>
   );
 }
+export interface HomePageContentProps {
+  topCities?: ReturnType<typeof toSlimCityDestination>[];
+}
 
-export function HomePageContent() {
+
+
+export function HomePageContent({ topCities = [] }: HomePageContentProps) {
+  const citiesRail = topCities.length ? (
+    <section
+      id="destinations"
+      className="section-y pb-6 sm:pb-8"
+      data-home-band="full-bleed"
+    >
+      <div className="container-page">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+              Популярные города
+            </h2>
+            <p className="mt-1 text-sm text-slate-500">
+              Выберите город — покажем афишу и подборки
+            </p>
+          </div>
+          <Link href="/cities" className="shrink-0 text-sm font-semibold text-primary-600 hover:text-primary-700">
+            Все города →
+          </Link>
+        </div>
+      </div>
+      {/* Finite city grid + «Показать ещё» (no infinite loop). */}
+      <HomePopularCitiesRail cities={topCities} className="mt-6" />
+    </section>
+  ) : null;
+
   return (
-    <Suspense fallback={<HomePageSkeleton />}>
+    <Suspense fallback={<><HomePageSkeleton />{citiesRail}</>}>
       <HomePageBody />
     </Suspense>
   );

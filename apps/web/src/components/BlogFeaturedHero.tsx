@@ -124,7 +124,7 @@ export function BlogFeaturedHero({
             ) : null}
           </div>
 
-          <h2 className="font-serif text-xl font-semibold leading-[1.12] tracking-tight text-slate-900 sm:text-2xl md:text-[1.65rem] lg:text-3xl">
+          <h2 className="font-sans text-xl font-semibold leading-[1.12] tracking-tight text-slate-900 sm:text-2xl md:text-[1.65rem] lg:text-3xl">
             <Link href={articleHref} className="hover:text-primary-700">
               {featured.title}
             </Link>

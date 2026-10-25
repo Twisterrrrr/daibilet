@@ -1,6 +1,25 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { venueCanonicalPath, venueHref, venuePageTemplate } from './routes.ts';
+import { cityCanonicalPath, venueCanonicalPath, venueHref, venuePageTemplate } from './routes.ts';
+
+test('cityCanonicalPath normalizes a stored Cyrillic path for the same Latin city route', () => {
+  const city = {
+    slug: 'moskva',
+    sourceSlug: 'москва',
+    name: 'Москва',
+    canonicalPath: '/cities/%D0%BC%D0%BE%D1%81%D0%BA%D0%B2%D0%B0',
+  };
+  assert.equal(cityCanonicalPath(city), '/cities/moskva');
+});
+
+test('cityCanonicalPath keeps intentional canonical paths to another city', () => {
+  const city = {
+    slug: 'moskva',
+    name: 'Москва',
+    canonicalPath: '/cities/another-city',
+  };
+  assert.equal(cityCanonicalPath(city), '/cities/another-city');
+});
 
 test('venueCanonicalPath ignores stored path from the other family', () => {
   const venue = {

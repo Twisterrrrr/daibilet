@@ -53,6 +53,7 @@
     "tc:import": "node scripts/tc-import-catalog.js",
     "event:rewrite:audit": "node scripts/event-rewrite-audit.js",
     "event:descriptions:reformat": "node apps/web/node_modules/tsx/dist/cli.mjs scripts/format-current-event-descriptions.js",
+    "event:postsync": "node apps/web/node_modules/tsx/dist/cli.mjs scripts/post-sync-event-descriptions.js",
     "tc:sync": "node scripts/tc-sync.js",
     "tc:sync:help": "node scripts/tc-sync.js --help",
     "check:widgets": "node scripts/widget-readiness-check.mjs",
@@ -105,6 +106,8 @@
   "dependencies": {
     "@grpc/grpc-js": "^1.14.4",
     "@grpc/proto-loader": "^0.8.1",
-    "dotenv": "^17.4.2"
+    "dotenv": "^17.4.2",
+    "imapflow": "^2.5.2",
+    "mailparser": "^3.9.40"
   }
 }

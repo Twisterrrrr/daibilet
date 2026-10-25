@@ -94,7 +94,7 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
       ) : null}
 
       <div className="flex min-w-0 flex-1 flex-col py-2.5 pr-3 sm:py-3 sm:pr-4">
-        <h2 className="break-words font-serif text-base font-semibold leading-snug tracking-tight text-slate-900 sm:text-lg md:text-xl">
+        <h2 className="break-words font-sans text-base font-semibold leading-snug tracking-tight text-slate-900 sm:text-lg md:text-xl">
           <Link href={articleHref} className="transition-colors duration-300 hover:text-primary-700">
             {post.title}
           </Link>

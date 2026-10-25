@@ -1,7 +1,9 @@
 import { buildPublicVenuePage, buildPublicVenuesCatalog, buildPublicVenueEventCounts } from './public-venue-read.js';
 import { createDb } from './db.js';
 import { resolveProjectRoot } from './project-root.js';
+import { prisma } from '@daibilet/db';
 import type {
+  PublicPdpDocumentDto,
   PublicVenueDto,
   PublicVenuePageDto,
   PublicVenuesDto,
@@ -102,7 +104,7 @@ export async function buildPublicVenueDto(
   if (forceRefresh) pageCache.delete(cacheKey);
 
   const payload = (await buildPublicVenuePage(getLegacyDb(), venueSlugOrId)) as PublicVenuePageDto | null;
-  const normalized = payload ? withTypedVenueSeoFallbacks(payload) : null;
+  const normalized = payload ? withTypedVenueSeoFallbacks(await attachReadyPdp(payload)) : null;
   const builtAt = Date.now();
   pageCache.set(cacheKey, {
     expiresAt: builtAt + PUBLIC_VENUE_CACHE_MS,
@@ -110,6 +112,29 @@ export async function buildPublicVenueDto(
     payload: normalized,
   });
   return normalized;
+}
+
+async function attachReadyPdp(payload: PublicVenuePageDto): Promise<PublicVenuePageDto> {
+  let document;
+  try {
+    document = await prisma.pdpDocument.findUnique({
+      where: { venueId: payload.venue.id },
+      select: { variant: true, status: true, content: true },
+    });
+  } catch (error) {
+    // Rollouts must not take existing public venue pages down if the editorial table
+    // has not been migrated yet. The optional PDP stays hidden until the schema is ready.
+    console.warn('[public-venue-pdp] optional document lookup failed', error);
+    return { ...payload, pdp: null };
+  }
+  if (!document || document.status !== 'READY') return { ...payload, pdp: null };
+  return {
+    ...payload,
+    pdp: {
+      variant: document.variant,
+      content: document.content as PublicPdpDocumentDto['content'],
+    },
+  };
 }
 
 function withTypedVenueSeoFallbacks(payload: PublicVenuePageDto): PublicVenuePageDto {

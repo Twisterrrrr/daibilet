@@ -28,6 +28,7 @@ import {
 import { formatPublicEventTitle } from './event-title-normalize.ts';
 import { toPublicCatalogListItem, toPublicHomeCardSession } from './public-catalog-list-item.ts';
 import { enrichBuyerOrdersWithEventLinks } from './buyer-order-event-links.js';
+import { readReadyPdpDocument } from './pdp-documents.js';
 import {
   blogCityDisplayName,
   blogCitySlugAliases,
@@ -906,7 +907,7 @@ async function queryAdminOrdersLean(db, { includeArchived }) {
   return result.rows.map(mapAdminOrderRow);
 }
 
-function matchesAdminOrderListFilters(order, { view, provider, status, q }) {
+function matchesAdminOrderListFilters(order, { view, provider, status, q, includePiiSearch = true }) {
   if (view === 'attention' && !order.needsAttention) return false;
   if (view === 'missing_artifact' && order.artifactStatus !== 'missing') return false;
   if (view === 'failed_integration' && !isProblemOrderStatus(order.status)) return false;
@@ -926,10 +927,7 @@ function matchesAdminOrderListFilters(order, { view, provider, status, q }) {
     order.status,
     order.sourceName,
     order.sourceCode,
-    order.buyer.name,
-    order.buyer.phone,
-    order.buyer.email,
-    order.buyer.notes,
+    ...(includePiiSearch ? [order.buyer.name, order.buyer.phone, order.buyer.email, order.buyer.notes] : []),
     ...(order.eventTitles || []),
     order.eventTitle,
   ]
@@ -939,7 +937,7 @@ function matchesAdminOrderListFilters(order, { view, provider, status, q }) {
   return haystack.includes(q);
 }
 
-export async function buildAdminOrdersList(db, searchParams = new URLSearchParams()) {
+export async function buildAdminOrdersList(db, searchParams = new URLSearchParams(), { includePiiSearch = true } = {}) {
   const q = String(searchParams.get('q') || '').trim().toLowerCase();
   const view = String(searchParams.get('view') || 'all');
   const provider = String(searchParams.get('provider') || 'all').toUpperCase();
@@ -956,7 +954,7 @@ export async function buildAdminOrdersList(db, searchParams = new URLSearchParam
     db.query(`select count(*)::int as total from "ExternalOrder" where "archivedAt" is null`),
   ]);
 
-  const rows = allRows.filter((order) => matchesAdminOrderListFilters(order, { view, provider, status, q }));
+  const rows = allRows.filter((order) => matchesAdminOrderListFilters(order, { view, provider, status, q, includePiiSearch }));
   const total = rows.length;
   const pages = Math.max(1, Math.ceil(total / limit));
   const safePage = Math.min(page, pages);
@@ -2797,6 +2795,7 @@ export async function buildAdminVenueDetail(db, venueId) {
           venue."parkingInfo",
           venue."hookFact",
           venue.kind,
+          venue."placeType",
           venue."pageStatus",
           city.title as city
         from "Venue" venue
@@ -3846,6 +3845,19 @@ export async function updateAdminEventOverride(db, eventId, payload) {
     [eventId],
   );
   const current = currentResult.rows[0] || {};
+  if (normalized.editorStatus === 'PUBLISHED' && current.editorStatus !== 'PUBLISHED') {
+    const [event] = await eventRowsByIds(db, [eventId]);
+    if (!event) {
+      const error = new Error('event_not_found');
+      error.statusCode = 404;
+      throw error;
+    }
+    if (!event.canPublish) {
+      const error = new Error(`event_publish_blocked: ${event.publishBlockers.join(', ')}`);
+      error.statusCode = 422;
+      throw error;
+    }
+  }
   const next = {
     title: current.title ?? null,
     description: current.description ?? null,
@@ -3922,6 +3934,20 @@ export async function updateAdminEventOverride(db, eventId, payload) {
       next.mergeGroupKey,
     ],
   );
+
+  // Owner rule 2026-10-20: a human save of the description marks it EDITORIAL so
+  // the post-sync composer never overwrites it. Guarded - the column ships with
+  // migration 20261020120000_event_description_revision.
+  if (typeof normalized.description === 'string' && normalized.description.trim()) {
+    try {
+      await db.query(
+        `update "EventOverride" set "descriptionOrigin" = 'EDITORIAL' where "eventId" = $1`,
+        [eventId],
+      );
+    } catch {
+      // Pre-migration database: origin tracking unavailable, save stays valid.
+    }
+  }
 
   invalidateAdminGroupedEventsCache(db, 'event override');
 
@@ -5305,6 +5331,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
       priceFrom: priceValues.length ? Math.min(...priceValues) : null,
       vacant: vacantValues.length ? vacantValues.reduce((sum, value) => sum + value, 0) : null,
     },
+    pdp: await readReadyPdpDocument(db, 'events', event.id),
   };
 }
 
@@ -5393,8 +5420,31 @@ function splitTitlePartsWithoutWeekdays(title) {
   return parts;
 }
 
+/**
+ * Mirror of `apps/backend/src/description-origin.ts` origin-marker guard.
+ * Inline on purpose: this legacy entrypoint is loaded by plain node and cannot
+ * import the TypeScript module.
+ */
+const ORIGIN_MARKER_TEST_RE =
+  /<!--\s*daibilet:origin\s*=\s*(?:AUTO|EDITORIAL|AI)\s*-->|\[\[\s*origin\s*:\s*(?:AUTO|EDITORIAL|AI)\s*\]\]/i;
+const ORIGIN_MARKER_LINE_RE =
+  /^[ \t]*(?:<!--\s*daibilet:origin\s*=\s*(?:AUTO|EDITORIAL|AI)\s*-->|\[\[\s*origin\s*:\s*(?:AUTO|EDITORIAL|AI)\s*\]\])[ \t]*$/gim;
+const ORIGIN_MARKER_INLINE_RE =
+  /<!--\s*daibilet:origin\s*=\s*(?:AUTO|EDITORIAL|AI)\s*-->|\[\[\s*origin\s*:\s*(?:AUTO|EDITORIAL|AI)\s*\]\]/gi;
+
+function stripDescriptionOriginMarkers(value) {
+  const source = String(value || '');
+  if (!source || !ORIGIN_MARKER_TEST_RE.test(source)) return source;
+  return source
+    .replace(ORIGIN_MARKER_LINE_RE, '')
+    .replace(ORIGIN_MARKER_INLINE_RE, ' ')
+    .replace(/[ \t]+$/gm, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
 export function cleanImportedDescription(value) {
-  const cleaned = String(value || '')
+  const cleaned = stripDescriptionOriginMarkers(value)
     .replace(/<script[\s\S]*?<\/script>/gi, ' ')
     .replace(/<style[\s\S]*?<\/style>/gi, ' ')
     .replace(/<\s*br\s*\/?>/gi, '\n')
@@ -5637,6 +5687,8 @@ async function eventRows(db, limit, options = {}) {
         length(trim(coalesce(e.description, '')))::int as "descriptionLength",
         e.kind,
         e.status,
+        e."purchaseFlow",
+        e."managementMode",
         e."sourceStatus",
         e."ageLimit",
         e."imageUrl",
@@ -5782,6 +5834,8 @@ async function eventRows(db, limit, options = {}) {
       venueSlug: row.venueSlug,
       venueKind: row.venueKind || 'OTHER',
       offerSourceCode: row.offerSourceCode,
+      purchaseFlow: row.purchaseFlow,
+      managementMode: row.managementMode,
       offerTitle: row.offerTitle,
       offerPriceRub: row.offerPriceRub,
       offerWidgetUrl: row.offerWidgetUrl,
@@ -5907,6 +5961,7 @@ export function publishGate(event, reasons, readinessIssues = []) {
 
   if (event.priceFrom == null) blockers.push('нет цены / offer');
   if (!event.purchaseReady) blockers.push('нет виджета');
+  if (event.purchaseFlow === 'PLATFORM' && event.managementMode !== 'DAIBILET_MANAGED') blockers.push('внутренний checkout ещё не подключён');
   if (!event.startsAt && event.kind !== 'OPEN_DATE') blockers.push('нет даты');
   if (!event.venue) blockers.push('нет площадки');
   if (!event.city) blockers.push('нет города');
