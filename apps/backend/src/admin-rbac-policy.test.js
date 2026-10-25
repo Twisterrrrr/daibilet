@@ -28,9 +28,8 @@ test('unknown or intentionally unmapped routes are denied by default', () => {
   assert.deepEqual(getAdminRoutePermissions('GET', '/api/admin/dashboard'), ['catalog.read']);
   assert.equal(getAdminRoutePermissions('DELETE', '/api/admin/orders/ord-1'), null);
   assert.equal(getAdminRoutePermissions('POST', '/api/admin/articles/1/publish'), null);
-  assert.deepEqual(getAdminRoutePermissions('PATCH', '/api/admin/events/evt-1/override'), [
-    'content.edit', 'seo.edit', 'catalog.edit', 'catalog.publish',
-  ]);
+  assert.equal(getAdminRoutePermissions('PATCH', '/api/admin/events/evt-1/override'), null);
+  assert.deepEqual(getAdminRoutePermissions('PATCH', '/api/admin/events/evt-1/override', { body: { description: 'text' } }), ['content.edit']);
   assert.equal(adminRolesAllowRoute(['SUPERADMIN'], 'GET', '/api/admin/dashboard'), true);
   assert.equal(adminRolesAllowRoute(['AUDITOR'], 'GET', '/api/admin/dashboard'), true);
   assert.equal(adminRolesAllowRoute(['PRODUCT'], 'GET', '/api/admin/dashboard'), true);
@@ -69,7 +68,14 @@ test('currently implemented backend admin routes are mapped or explicitly kept o
     ['GET', '/api/admin/events/event-1/venue-link-suggestions'], ['POST', '/api/admin/events/event-1/rewrite-description'],
   ];
   for (const [method, path] of routes) {
-    assert.ok(getAdminRoutePermissions(method, path), `unmapped backend route: ${method} ${path}`);
+    const policyContext = path === '/api/admin/articles'
+      ? { body: { status: 'DRAFT' } }
+      : path.startsWith('/api/admin/articles/') && method === 'PATCH'
+        ? { body: { status: 'DRAFT' }, existingArticle: { status: 'DRAFT', isFeatured: false } }
+        : path.endsWith('/override')
+          ? { body: { description: 'text' } }
+          : undefined;
+    assert.ok(getAdminRoutePermissions(method, path, policyContext), `unmapped backend route: ${method} ${path}`);
   }
 });
 
@@ -83,6 +89,7 @@ test('event override requires permissions based on every submitted field', () =>
     getAdminEventOverridePermissions(['description', 'editorStatus']),
     ['content.edit', 'catalog.publish'],
   );
+  assert.equal(getAdminEventOverridePermissions([]), null);
   assert.equal(getAdminEventOverridePermissions(['unexpectedField']), null);
 });
 
@@ -90,6 +97,8 @@ test('article publication adds publish permission to edit permission', () => {
   assert.deepEqual(getAdminArticleSavePermissions({ status: 'DRAFT' }), ['content.edit']);
   assert.deepEqual(getAdminArticleSavePermissions({ status: 'published' }), ['content.edit', 'content.publish']);
   assert.deepEqual(getAdminArticleSavePermissions({ isFeatured: true }), ['content.edit', 'content.publish']);
+  assert.deepEqual(getAdminArticleSavePermissions({ status: 'DRAFT', existingStatus: 'PUBLISHED' }), ['content.edit', 'content.publish']);
+  assert.deepEqual(getAdminArticleSavePermissions({ status: 'DRAFT', existingStatus: 'DRAFT' }), ['content.edit']);
 });
 
 test('order data reading and PII visibility are separate decisions', () => {
@@ -102,8 +111,16 @@ test('order data reading and PII visibility are separate decisions', () => {
 test('role separation is enforced by API route policy', () => {
   assert.equal(adminRolesAllowRoute(['SUPPORT'], 'POST', '/api/admin/orders/ord-1/archive'), false);
   assert.equal(adminRolesAllowRoute(['FINANCE'], 'PATCH', '/api/admin/events/evt-1/moderation'), false);
-  assert.equal(adminRolesAllowRoute(['COPYWRITER'], 'PATCH', '/api/admin/articles/a-1'), false);
+  assert.equal(adminRolesAllowRoute(['COPYWRITER'], 'PATCH', '/api/admin/articles/a-1', {
+    body: { title: 'draft', status: 'DRAFT' },
+    existingArticle: { status: 'DRAFT', isFeatured: false },
+  }), true);
+  assert.equal(adminRolesAllowRoute(['COPYWRITER'], 'PATCH', '/api/admin/articles/a-1', {
+    body: { title: 'live', status: 'PUBLISHED' },
+    existingArticle: { status: 'DRAFT', isFeatured: false },
+  }), false);
   assert.equal(adminRolesAllowRoute(['PRODUCT'], 'POST', '/api/admin/event-change-requests/r-1/apply'), true);
   assert.equal(adminRolesAllowRoute(['SUPPORT'], 'POST', '/api/admin/event-change-requests/r-1/apply'), false);
-  assert.equal(adminRolesAllowRoute(['CATALOG_EDITOR'], 'PATCH', '/api/admin/events/e-1/override'), false);
+  assert.equal(adminRolesAllowRoute(['CATALOG_EDITOR'], 'PATCH', '/api/admin/events/e-1/override', { body: { description: 'copy' } }), true);
+  assert.equal(adminRolesAllowRoute(['CATALOG_EDITOR'], 'PATCH', '/api/admin/events/e-1/override', { body: { seoTitle: 'seo' } }), false);
 });

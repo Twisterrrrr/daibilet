@@ -94,7 +94,7 @@
 
 Все перечисленные Next server actions вызывают общий `requireAdminPermissions` до сетевого вызова или записи. Проверяется актуальная персональная сессия через backend `/api/admin/auth/me`; invalid session закрывает операцию. Когда `DAIBILET_ADMIN_RBAC_ENFORCE` выключен, действующий legacy Basic Auth временно считается SUPERADMIN. Прямые Prisma-экраны чата и hero-banners проверяют права до чтения: `support.read` и `content.read`; ответ в чате требует `support.write`, переключение hero-баннера — `content.publish`.
 
-Исключение по текущей возможности ролей: event override пока проверяет на Next стороне полный набор `content.edit + seo.edit + catalog.edit + catalog.publish`, поскольку backend endpoint ещё не разрешает права по конкретным переданным полям. Article save проверяет `content.edit`, а для публикации или featured — дополнительно `content.publish`; backend route guard пока может быть строже, пока не подключён его payload-aware вариант.
+Backend guard для article save и event override использует фактический payload: для override permission определяется отдельно для каждого поля; для статьи проверяются итоговые status/featured и текущие значения записи. Next action для override также проверяет право выбранной секции. Archive читает текущий статус и требует `content.publish`, если снимает опубликованную или featured статью.
 
 ## 3. Экспорты
 

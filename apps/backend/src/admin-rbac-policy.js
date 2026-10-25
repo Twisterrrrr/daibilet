@@ -15,9 +15,6 @@ const exactPolicies = new Map([
   ['GET /api/admin/pdp/variants', ['catalog.read']],
   ['GET /api/admin/landings', ['seo.read']],
   ['GET /api/admin/articles', ['content.read']],
-  // Article writes can change publication state, so require both permissions until
-  // the endpoint performs payload-aware authorization.
-  ['POST /api/admin/articles', ['content.edit', 'content.publish']],
   ['GET /api/admin/reviews', ['content.read']],
   ['GET /api/admin/event-change-requests', ['suppliers.read']],
   ['POST /api/admin/orders/archive', ['orders.manage']],
@@ -68,8 +65,18 @@ const multiPermissionPolicies = new Map([
 ]);
 
 /** Returns null for unmapped/sensitive routes; callers must deny those by default. */
-export function getAdminRoutePermissions(method, pathname) {
+export function getAdminRoutePermissions(method, pathname, context = {}) {
   const route = `${String(method || '').toUpperCase()} ${String(pathname || '')}`;
+  if (route === 'POST /api/admin/articles' || /^PATCH \/api\/admin\/articles\/[^/]+$/.test(route)) {
+    return getAdminArticleSavePermissions({
+      ...context.body,
+      existingStatus: context.existingArticle?.status,
+      existingIsFeatured: context.existingArticle?.isFeatured,
+    });
+  }
+  if (/^PATCH \/api\/admin\/events\/[^/]+\/override$/.test(route)) {
+    return getAdminEventOverridePermissions(Object.keys(context.body || {}));
+  }
   const exact = exactPolicies.get(route) || multiPermissionPolicies.get(route);
   if (exact) return exact;
 
@@ -80,8 +87,8 @@ export function getAdminRoutePermissions(method, pathname) {
   return null;
 }
 
-export function adminRolesAllowRoute(roles, method, pathname) {
-  const requiredPermissions = getAdminRoutePermissions(method, pathname);
+export function adminRolesAllowRoute(roles, method, pathname, context) {
+  const requiredPermissions = getAdminRoutePermissions(method, pathname, context);
   if (!requiredPermissions) return false;
   return requiredPermissions.every((permission) => adminRoleAllows(roles, permission));
 }
@@ -102,6 +109,7 @@ const eventOverrideFieldPermissions = Object.freeze({
 
 export function getAdminEventOverridePermissions(fieldNames) {
   const fields = Array.isArray(fieldNames) ? fieldNames : [];
+  if (!fields.length) return null;
   const permissions = new Set();
   for (const field of fields) {
     if (!Object.hasOwn(eventOverrideFieldPermissions, field)) return null;
@@ -110,9 +118,15 @@ export function getAdminEventOverridePermissions(fieldNames) {
   return [...permissions];
 }
 
-export function getAdminArticleSavePermissions({ status, isFeatured } = {}) {
+export function getAdminArticleSavePermissions({ status, isFeatured, existingStatus, existingIsFeatured } = {}) {
   const permissions = ['content.edit'];
-  if (String(status || '').toUpperCase() === 'PUBLISHED' || isFeatured === true) {
+  const finalStatus = String(status || existingStatus || 'DRAFT').toUpperCase();
+  if (
+    finalStatus === 'PUBLISHED' ||
+    String(existingStatus || '').toUpperCase() === 'PUBLISHED' ||
+    isFeatured === true ||
+    existingIsFeatured === true
+  ) {
     permissions.push('content.publish');
   }
   return permissions;

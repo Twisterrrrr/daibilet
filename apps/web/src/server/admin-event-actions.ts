@@ -37,9 +37,9 @@ function revalidatePublicEventSurfaces(formData: FormData) {
 
 export async function saveAdminEventOverrideAction(formData: FormData) {
   const section = String(formData.get('section') || 'content').trim();
-  // The backend route remains deliberately conservative until it has a
-  // payload-aware guard, so enforce the same combined set here.
-  await requireAdminPermissions(['content.edit', 'seo.edit', 'catalog.edit', 'catalog.publish']);
+  const sectionPermission = section === 'seo' ? 'seo.edit' : section === 'media' ? 'catalog.edit' : 'content.edit';
+  if (!['seo', 'media', 'content'].includes(section)) throw new Error('unknown event override section');
+  await requireAdminPermissions([sectionPermission]);
   const id = String(formData.get('id') || '').trim();
   if (!id) throw new Error('missing event id');
 

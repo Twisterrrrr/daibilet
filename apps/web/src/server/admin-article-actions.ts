@@ -92,6 +92,13 @@ export async function archiveAdminArticleAction(formData: FormData) {
   const id = String(formData.get('id') || '').trim();
   if (!id || id === 'new') throw new Error('missing article id');
 
+  const currentResponse = await adminApiFetch(`/api/admin/articles/${encodeURIComponent(id)}`);
+  if (!currentResponse.ok) throw new Error(`article read failed HTTP ${currentResponse.status}`);
+  const current = await currentResponse.json() as { status?: string; isFeatured?: boolean };
+  if (String(current.status || '').toUpperCase() === 'PUBLISHED' || current.isFeatured === true) {
+    await requireAdminPermissions(['content.publish']);
+  }
+
   const body = { ...readDraft(formData), status: 'hidden', isFeatured: false };
   const response = await adminApiFetch(`/api/admin/articles/${encodeURIComponent(id)}`, {
     method: 'PATCH',
@@ -109,7 +116,7 @@ export async function archiveAdminArticleAction(formData: FormData) {
 
 /** Toggle «В Hero» from list: last-wins clears other featured on API. */
 export async function setAdminArticleFeaturedAction(formData: FormData) {
-  await requireAdminPermissions(['content.publish']);
+  await requireAdminPermissions(['content.edit', 'content.publish']);
   const id = String(formData.get('id') || '').trim();
   if (!id || id === 'new') throw new Error('missing article id');
   const isFeatured = formData.get('isFeatured') === 'on' || formData.get('isFeatured') === 'true';
