@@ -23,6 +23,7 @@ import {
   formatBuyCardPrice,
   formatBuyCardPriceHint,
   formatCategoryPrice,
+  formatHeroBuyButtonPrice,
   formatPriceRub,
   formatVacantSeats,
   getTicketOldPrice,
@@ -583,6 +584,7 @@ export function EventHero({
   const priceRange = getTicketPriceRange(payload);
   const oldPrice = getTicketOldPrice(payload, priceRange);
   const fallbackPrice = formatPriceRub(stats.priceFrom ?? event.priceFrom);
+  const priceLabel = priceRange ? formatHeroBuyButtonPrice(priceRange) : fallbackPrice ? `от ${fallbackPrice}` : '';
   const heroImage = String(event.imageUrl || '').trim();
   const heroFocalPoint = resolveEventHeroObjectPosition({
     slug: event.slug,
@@ -791,6 +793,13 @@ export function EventHero({
                 )
               ) : null}
             </div>
+
+            {/* Keep the desktop hero CTA; the mobile sticky bar covers that viewport. */}
+            {priceLabel ? (
+              <div className="hidden shrink-0 lg:block">
+                <EventHeroBuyButton payload={payload} priceLabel={priceLabel} />
+              </div>
+            ) : null}
 
           </div>
         </div>
