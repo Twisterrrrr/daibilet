@@ -1,6 +1,6 @@
 # Catalog handoff: buyer order access proof
 
-Status: finance foundation implemented; enforcement remains off until the catalog BFF is deployed and smoked.
+Status: finance proof foundation and catalog BFF bridge are implemented in `codex/ai-rewrite-rbac-integration`; production enforcement remains off until both sides are released and smoke-tested.
 
 ## Why
 
@@ -29,24 +29,25 @@ Status: finance foundation implemented; enforcement remains off until the catalo
 
 Do not add the proof to `return_url`, query parameters, client logs or analytics.
 
-1. In `apps/web/app/checkout/actions/admission/route.ts`, read `order.orderAccessToken` from the finance create response.
-2. Store `{ publicCode, token }` in a short-lived catalog cookie. The cookie must be `HttpOnly`, `Secure`, `SameSite=Lax`, scoped to `/checkout`, and expire after the payment/result window (recommended two hours).
-3. Remove `orderAccessToken` from the JSON returned to browser JavaScript.
-4. In the catalog order-result proxy, read the cookie, require its `publicCode` to equal the requested code, and forward the proof to finance as `x-daibilet-order-access`.
-5. Keep the visible and YooKassa return URL unchanged: `https://daibilet.ru/checkout/result?order={publicCode}`.
-6. If the cookie is absent, show a neutral order-verification state. Do not retry anonymously and do not reveal whether the code exists.
+1. `apps/web/app/checkout/actions/admission/route.ts` and the direct YooKassa BFF read the proof from the finance create response.
+2. Store `{ publicCode, token }` in two short-lived cookies: `HttpOnly`, `Secure` in production, `SameSite=Lax`, max age two hours. The result cookie is scoped to `/checkout`; the polling cookie is scoped to `/api/public/checkout/orders`.
+3. Remove `orderAccessToken` from JSON returned to browser JavaScript.
+4. The catalog result and payment-poll proxies require the cookie's `publicCode` to match the requested code and forward the proof as `x-daibilet-order-access`.
+5. The buyer email worker reads the order through the server-authenticated purchases-by-email projection; it does not depend on a browser cookie or public order number.
+6. Keep the visible and YooKassa return URL unchanged: `https://daibilet.ru/checkout/result?order={publicCode}`.
+7. If the cookie is absent, the result proxy returns a neutral empty state. It does not retry anonymously or reveal whether the code exists.
 
 One cookie can hold the current `{publicCode, token}` pair. A list of per-order cookies is unnecessary for Stage 0; authenticated buyer account access is the long-term multi-order path.
 
 ## Cutover sequence
 
-1. Deploy finance issuance with `DAIBILET_REQUIRE_ORDER_ACCESS=0`.
-2. Deploy catalog BFF cookie + header forwarding.
-3. Smoke embedded and redirect flows, including a page reload after returning from YooKassa.
-4. Verify a direct anonymous finance lookup still works only during this compatibility window.
-5. Set `DAIBILET_REQUIRE_ORDER_ACCESS=1` on finance and restart the API.
-6. Verify: valid cookie 200; no cookie 404; token for another code 404; supplier/admin projections unchanged.
+1. Configure a dedicated finance `DAIBILET_ORDER_ACCESS_SECRET` of at least 32 characters and verify finance returns an order proof; do not expose the secret to catalog.
+2. Deploy finance issuance with `DAIBILET_REQUIRE_ORDER_ACCESS=0` only for the short migration window.
+3. Deploy catalog BFF cookie + header forwarding.
+4. Smoke embedded and redirect flows, including a page reload after returning from YooKassa and ticket email delivery.
+5. Set `DAIBILET_REQUIRE_ORDER_ACCESS=1` on finance and restart the API immediately after smoke.
+6. Verify: valid cookie 200; no cookie 404; token for another code 404; supplier/admin projections unchanged. Keep first-payment gate closed until this cutover is complete.
 
 ## Secrets
 
-Finance reads `DAIBILET_ORDER_ACCESS_SECRET`; during migration it falls back to `USER_JWT_SECRET`. Use a dedicated random value of at least 32 characters before enforcement. Do not copy this secret to catalog: catalog stores only the per-order opaque proof returned by finance.
+Finance reads `DAIBILET_ORDER_ACCESS_SECRET`; during migration it may fall back to `USER_JWT_SECRET`. Use a dedicated random value of at least 32 characters before enabling checkout. Do not copy this secret to catalog: catalog stores only the per-order opaque proof returned by finance.

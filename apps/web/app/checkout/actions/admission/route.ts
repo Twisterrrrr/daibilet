@@ -9,6 +9,13 @@ import { buyerTicketAbsoluteUrl } from '@/lib/buyer-ticket';
 import { submitAdmissionCheckout } from '@/server/finance-checkout-client';
 import { isBuyerTicketSmtpConfigured } from '@/server/buyer-ticket-mail';
 import { enqueueBuyerTicketEmail } from '@/server/buyer-ticket-delivery';
+import {
+  CHECKOUT_ORDER_ACCESS_COOKIE,
+  CHECKOUT_ORDER_ACCESS_MAX_AGE_SECONDS,
+  CHECKOUT_ORDER_POLL_ACCESS_COOKIE,
+  extractCheckoutOrderAccessProof,
+  serializeCheckoutOrderAccessProof,
+} from '@/server/checkout-order-access';
 import { fetchAdmissionProductBySlug } from '@/server/finance-projection-client';
 import { fetchPublicApiJson } from '@/server/public-api-client';
 
@@ -190,7 +197,7 @@ export async function POST(request: Request) {
     emailReason = 'email_missing';
   }
 
-  return NextResponse.json(
+  const response = NextResponse.json(
     {
       ok: true,
       mode: result.mode,
@@ -210,4 +217,22 @@ export async function POST(request: Request) {
     },
     { status: 201 },
   );
+  const accessProof = extractCheckoutOrderAccessProof(result.raw, result.publicCode);
+  if (accessProof) {
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax' as const,
+      maxAge: CHECKOUT_ORDER_ACCESS_MAX_AGE_SECONDS,
+    };
+    response.cookies.set(CHECKOUT_ORDER_ACCESS_COOKIE, serializeCheckoutOrderAccessProof(accessProof), {
+      ...cookieOptions,
+      path: '/checkout',
+    });
+    response.cookies.set(CHECKOUT_ORDER_POLL_ACCESS_COOKIE, serializeCheckoutOrderAccessProof(accessProof), {
+      ...cookieOptions,
+      path: '/api/public/checkout/orders',
+    });
+  }
+  return response;
 }

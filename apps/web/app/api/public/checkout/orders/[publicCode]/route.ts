@@ -1,5 +1,9 @@
 import '@/lib/env';
 import { NextResponse } from 'next/server';
+import {
+  CHECKOUT_ORDER_POLL_ACCESS_COOKIE,
+  readCheckoutOrderAccessProof,
+} from '@/server/checkout-order-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -7,7 +11,7 @@ type RouteContext = { params: Promise<{ publicCode: string }> };
 
 const DEFAULT_FINANCE_API_BASE_URL = 'https://finance-api.daibilet.ru';
 
-export async function GET(_request: Request, context: RouteContext) {
+export async function GET(request: Request, context: RouteContext) {
   const { publicCode } = await context.params;
   const code = cleanPublicCode(publicCode);
   if (!code) {
@@ -18,7 +22,12 @@ export async function GET(_request: Request, context: RouteContext) {
   const headers = new Headers({ accept: 'application/json' });
   const projectionToken = financeProjectionToken();
   if (projectionToken) headers.set('x-daibilet-projection-token', projectionToken);
-
+  const proof = readCheckoutOrderAccessProof(
+    request.headers.get('cookie'),
+    code,
+    CHECKOUT_ORDER_POLL_ACCESS_COOKIE,
+  );
+  if (proof) headers.set('x-daibilet-order-access', proof.token);
   try {
     const upstream = await fetch(target, {
       headers,

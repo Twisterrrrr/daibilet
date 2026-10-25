@@ -1,5 +1,13 @@
 import '@/lib/env';
 import { NextResponse } from 'next/server';
+import {
+  CHECKOUT_ORDER_ACCESS_COOKIE,
+  CHECKOUT_ORDER_ACCESS_MAX_AGE_SECONDS,
+  CHECKOUT_ORDER_POLL_ACCESS_COOKIE,
+  extractCheckoutOrderAccessProof,
+  serializeCheckoutOrderAccessProof,
+  stripCheckoutOrderAccessToken,
+} from '@/server/checkout-order-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,13 +38,40 @@ export async function POST(request: Request) {
       signal: AbortSignal.timeout(25_000),
     });
     const text = await upstream.text();
-    return new NextResponse(text || '{}', {
+    let upstreamPayload: unknown;
+    try { upstreamPayload = JSON.parse(text); } catch { upstreamPayload = null; }
+    if (!upstreamPayload || typeof upstreamPayload !== 'object' || Array.isArray(upstreamPayload)) {
+      return new NextResponse(text || '{}', {
+        status: upstream.status,
+        headers: {
+          ...noStoreHeaders(),
+          'content-type': upstream.headers.get('content-type') || 'application/json; charset=utf-8',
+        },
+      });
+    }
+
+    const proof = upstream.ok ? extractCheckoutOrderAccessProof(upstreamPayload) : null;
+    const response = NextResponse.json(stripCheckoutOrderAccessToken(upstreamPayload), {
       status: upstream.status,
-      headers: {
-        ...noStoreHeaders(),
-        'content-type': upstream.headers.get('content-type') || 'application/json; charset=utf-8',
-      },
+      headers: noStoreHeaders(),
     });
+    if (proof) {
+      const cookieOptions = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax' as const,
+        maxAge: CHECKOUT_ORDER_ACCESS_MAX_AGE_SECONDS,
+      };
+      response.cookies.set(CHECKOUT_ORDER_ACCESS_COOKIE, serializeCheckoutOrderAccessProof(proof), {
+        ...cookieOptions,
+        path: '/checkout',
+      });
+      response.cookies.set(CHECKOUT_ORDER_POLL_ACCESS_COOKIE, serializeCheckoutOrderAccessProof(proof), {
+        ...cookieOptions,
+        path: '/api/public/checkout/orders',
+      });
+    }
+    return response;
   } catch {
     return NextResponse.json(
       { error: 'finance_api_unavailable' },

@@ -332,14 +332,17 @@ async function financePostJson(
 async function financeGetJson(
   apiPath: string,
   env: FinanceProjectionEnv = process.env,
+  orderAccessToken?: string | null,
 ): Promise<unknown | null> {
   const base = resolveFinanceApiBaseUrl(env);
   if (!base) return null;
   const path = apiPath.startsWith('/') ? apiPath : `/${apiPath}`;
   try {
+    const headers = buildHeaders(env);
+    if (orderAccessToken) headers.set('x-daibilet-order-access', orderAccessToken);
     const response = await fetch(`${base}${path}`, {
       method: 'GET',
-      headers: buildHeaders(env),
+      headers,
       signal: AbortSignal.timeout(FINANCE_CHECKOUT_TIMEOUT_MS),
       cache: 'no-store',
     });
@@ -461,24 +464,14 @@ export async function submitAdmissionCheckout(
 export async function lookupCheckoutOrderByPublicCode(
   publicCode: string,
   env: FinanceProjectionEnv = process.env,
+  orderAccessToken?: string | null,
 ): Promise<BuyerInternalOrderRecord | null> {
   const code = publicCode.trim();
   if (!code) return null;
 
-  const candidates = [
-    `/api/public/checkout/orders/${encodeURIComponent(code)}`,
-    `/api/checkout/orders/${encodeURIComponent(code)}`,
-    `/api/public/orders/${encodeURIComponent(code)}`,
-    `/api/checkout/order?publicCode=${encodeURIComponent(code)}`,
-  ];
-
-  for (const path of candidates) {
-    const raw = await financeGetJson(path, env);
-    if (!raw) continue;
-    const mapped = mapOrderFromFinancePayload(raw, '', 'LOOKUP');
-    if (mapped) return mapped;
-  }
-  return null;
+  const path = `/api/public/checkout/orders/${encodeURIComponent(code)}`;
+  const raw = await financeGetJson(path, env, orderAccessToken);
+  return raw ? mapOrderFromFinancePayload(raw, '', 'LOOKUP') : null;
 }
 
 /** Soft buyer internal purchases by email - fail empty without inventing APIs. */
@@ -513,4 +506,16 @@ export async function fetchInternalPurchasesByEmail(
     if (mapped.length) return mapped;
   }
   return [];
+}
+
+/** Server-to-server email delivery lookup. Uses the finance projection credential, never a public order code alone. */
+export async function lookupBuyerTicketDeliveryOrder(
+  publicCode: string,
+  email: string,
+  env: FinanceProjectionEnv = process.env,
+): Promise<BuyerInternalOrderRecord | null> {
+  const code = publicCode.trim();
+  if (!code || !email.trim().includes('@')) return null;
+  const rows = await fetchInternalPurchasesByEmail(email, env);
+  return rows.find((row) => row.publicCode === code) || null;
 }

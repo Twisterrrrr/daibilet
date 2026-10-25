@@ -40,7 +40,7 @@ It is nevertheless too early to call the supplier portal production-complete:
 
 - the main admin lives on catalog `.184`, while finance admin actions live in the finance branch; the operator path must be bridged or exposed as an explicitly protected finance-admin surface;
 - event creation requests can be submitted; `CREATE Event` apply now creates an unpublished review event in the development branch and needs release/browser verification;
-- the public order lookup exposes buyer contacts and ticket numbers using only a seven-digit `publicCode`; this requires hardening before real customer data;
+- finance order-proof and catalog BFF code now protect buyer contacts/ticket numbers with short-lived HttpOnly cookies, but the production cutover flag remains unverified/off; direct lookup is still unsafe until `DAIBILET_REQUIRE_ORDER_ACCESS=1` is enabled after both deploys;
 - a completed embedded YooKassa sandbox browser payment remains unverified end to end.
 
 Closed pilot readiness: **yellow; authentication, invite migration and supplier read paths are live, while role/browser acceptance and operator access still need closure**.
@@ -239,7 +239,7 @@ Recommended fix for `ORD-07`: keep the human-friendly seven-digit `publicCode` a
 
 ### P0 before real customer data
 
-1. **Public order enumeration.** `GET /api/checkout/orders/{publicCode}` has no authentication or rate limit, while `PublicCheckoutOrderDto` contains email, phone, ticket numbers, totals and provider confirmation URL. A seven-digit code is not sufficient authorization. Add a high-entropy access token or authenticated buyer session and return a minimized DTO.
+1. **Public order enumeration.** The finance route can require a per-order HMAC proof; the catalog create/result/poll BFF now stores and forwards it without exposing it to browser JavaScript. Until the finance cutover flag is enabled, `GET /api/checkout/orders/{publicCode}` can still return email, phone, ticket numbers, totals and provider confirmation URL to anyone who knows or guesses the seven-digit code. Enable enforcement only after deploying both sides and completing the browser smoke.
 2. **Admin boundary.** Finance admin routes use Basic auth and are not automatically the same surface as the production admin on `.184`. Document and enforce where Basic credentials terminate; prefer a server-to-server finance proxy from admin rather than exposing credentials to browser JavaScript.
 3. **Role UX.** Backend RBAC exists, but the portal renders the same write forms for every role. Hide unauthorized actions and test 403 as defense in depth.
 4. **Production flags.** Confirm supplier query fallback and supplier checkout smoke flags are off in production.
