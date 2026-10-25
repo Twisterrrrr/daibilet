@@ -1364,9 +1364,32 @@ async function resolvePublicVenueRowByComputedSlug(db, requestedSlug) {
   return null;
 }
 
+/**
+ * Mirror of `apps/backend/src/description-origin.ts` origin-marker guard.
+ * Inline on purpose: this legacy entrypoint is loaded by plain node and cannot
+ * import the TypeScript module.
+ */
+const ORIGIN_MARKER_TEST_RE =
+  /<!--\s*daibilet:origin\s*=\s*(?:AUTO|EDITORIAL|AI)\s*-->|\[\[\s*origin\s*:\s*(?:AUTO|EDITORIAL|AI)\s*\]\]/i;
+const ORIGIN_MARKER_LINE_RE =
+  /^[ \t]*(?:<!--\s*daibilet:origin\s*=\s*(?:AUTO|EDITORIAL|AI)\s*-->|\[\[\s*origin\s*:\s*(?:AUTO|EDITORIAL|AI)\s*\]\])[ \t]*$/gim;
+const ORIGIN_MARKER_INLINE_RE =
+  /<!--\s*daibilet:origin\s*=\s*(?:AUTO|EDITORIAL|AI)\s*-->|\[\[\s*origin\s*:\s*(?:AUTO|EDITORIAL|AI)\s*\]\]/gi;
+
+function stripDescriptionOriginMarkers(value) {
+  const source = String(value || '');
+  if (!source || !ORIGIN_MARKER_TEST_RE.test(source)) return source;
+  return source
+    .replace(ORIGIN_MARKER_LINE_RE, '')
+    .replace(ORIGIN_MARKER_INLINE_RE, ' ')
+    .replace(/[ \t]+$/gm, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
 function cleanImportedDescription(value) {
   if (value == null) return null;
-  const text = String(value)
+  const text = stripDescriptionOriginMarkers(value)
     .replace(/<\s*br\s*\/?>/gi, '\n')
     .replace(/<\/\s*(p|div|li|h[1-6])\s*>/gi, '\n')
     .replace(/<[^>]+>/g, ' ')

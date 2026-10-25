@@ -10,6 +10,7 @@ import { buildAdminEventChangeRequestDetailDto, buildAdminEventChangeRequestsDto
 import { createAdminEventChangeRequestsRouteHandler } from './admin-event-change-requests-handler.js';
 import { createAdminEventScheduleRouteHandler } from './admin-event-schedule-handler.js';
 import { createAdminEventsRouteHandler } from './admin-events-handler.js';
+import { createDescriptionRevisionRouteHandler } from './description-revision-handler.js';
 import { createAdminEventsReadRouteHandler } from './admin-events-read-handler.js';
 import { buildAdminEventDetailDto, buildAdminEventsListDto } from './admin-events.dto.js';
 import { buildAdminFinanceLedgerDto, closeAdminFinancePeriod } from './admin-finance.dto.js';
@@ -213,6 +214,12 @@ const server = startServer({
         db,
         updateAdminEventOverride,
         invalidatePublicCaches,
+      }),
+      createDescriptionRevisionRouteHandler({
+        db,
+        invalidatePublicCaches,
+        // Fail closed until the per-user admin-session guard is integrated.
+        // Shared Basic Auth must never be used as an approval/publish identity.
       }),
       createAdminLandingsRouteHandler({
         db,

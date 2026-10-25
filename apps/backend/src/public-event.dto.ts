@@ -12,6 +12,7 @@ import {
 import { resolveCityTimeZone } from './city-timezone.js';
 import { formatDate, formatTime, normalizeStartsAt, timeBucket } from './public-datetime.js';
 import { dedupePublicOffers, preferNamedTicketOffers } from './public-offers.js';
+import { stripDescriptionOriginMarkers } from './description-origin.js';
 import { findLandingRule, matchingLandingSlugs } from './landing-rules.js';
 import { internalEventPurchasePath } from './internal-event-purchase.js';
 import {
@@ -1474,7 +1475,8 @@ function sourceLabel(sourceCode: string): string | null {
 }
 
 function cleanImportedDescription(value?: string | null): string | null {
-  const cleaned = String(value || '')
+  // Origin markers are internal pipeline artifacts; they never belong to public copy.
+  const cleaned = stripDescriptionOriginMarkers(value)
     .replace(/<script[\s\S]*?<\/script>/gi, ' ')
     .replace(/<style[\s\S]*?<\/style>/gi, ' ')
     .replace(/<\s*br\s*\/?>/gi, '\n')

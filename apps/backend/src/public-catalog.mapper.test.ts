@@ -361,3 +361,20 @@ function catalogRow(overrides: Partial<PublicCatalogMappingRow> = {}): PublicCat
     ...overrides,
   } as PublicCatalogMappingRow;
 }
+
+test('origin marker never reaches the public catalogue description', () => {
+  const result = mapGroupedPublicSession(catalogRow({
+    overrideDescription: '<!-- daibilet:origin=AUTO -->\n\nClean public text.',
+  }));
+  assert.ok(result);
+
+  assert.equal(result.description, 'Clean public text.');
+  assert.doesNotMatch(String(result.description || ''), /daibilet:origin|\[\[origin:/u);
+
+  const inline = mapGroupedPublicSession(catalogRow({
+    overrideDescription: 'First paragraph. [[origin:AI]] Second paragraph.',
+  }));
+  assert.ok(inline);
+  assert.equal(inline.description, 'First paragraph. Second paragraph.');
+  assert.doesNotMatch(String(inline.description || ''), /daibilet:origin|\[\[origin:/u);
+});
