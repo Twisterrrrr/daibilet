@@ -2,10 +2,12 @@
 
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { adminApiFetch } from '@/server/admin-api-fetch';
+import { requireAdminPermissions } from '@/server/admin-authorization';
 import type { AdminPdpDocument } from '@/server/admin-pdp-data';
 import { EVENT_PAGE_CACHE_TAG, VENUE_PAGE_CACHE_TAG, eventPageCacheTag } from '@/server/cache-config';
 
 export async function saveAdminPdpAction(entity: 'venues' | 'events', entityId: string, entitySlug: string, document: AdminPdpDocument) {
+  await requireAdminPermissions(['catalog.edit']);
   if (entity !== 'venues' && entity !== 'events') throw new Error('Неподдерживаемый тип PDP.');
   const id = String(entityId || '').trim();
   if (!id || !entitySlug) throw new Error('Не указана сущность для PDP.');

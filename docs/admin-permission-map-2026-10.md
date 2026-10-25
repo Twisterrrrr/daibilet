@@ -1,6 +1,6 @@
 # UI-RBAC-0: карта страниц, действий и API админки
 
-Дата: 2026-10-15. Автор: Cline (UI-инвентаризация). Решения по GAP приняты Codex 2026-10-16; карта остаётся входом для server guards, а не свидетельством действующего RBAC.
+Дата: 2026-10-15. Автор: Cline (UI-инвентаризация). Решения по GAP приняты Codex 2026-10-16. С 2026-10-25 Next server actions проверяют перечисленные права через персональную сессию; direct-Prisma страницы чата и hero-banners также ограничены на сервере. Backend endpoint enforcement остаётся opt-in до закрытия оставшихся gaps.
 
 Источники: `apps/web/app/(admin)/admin`, `apps/web/src/server/admin-*.ts`, словарь прав `packages/contracts/src/admin-access.ts` (`ADMIN_PERMISSIONS`, `ADMIN_ROLES`), проект RBAC [admin-rbac-design-2026-10.md](./admin-rbac-design-2026-10.md).
 
@@ -90,6 +90,12 @@
 | `sendAdminChatMessage` | chat-actions | контакт | `support.write` | прямой Prisma-запрос в Next | action 403; до персональных сессий отдельная повторная проверка Basic Auth |
 | `saveAdminVenueAction` | admin-venue-actions | публичные | `catalog.edit` | `PATCH /api/admin/venues/:id` | action 403 |
 
+### Реализация server guards (2026-10-25)
+
+Все перечисленные Next server actions вызывают общий `requireAdminPermissions` до сетевого вызова или записи. Проверяется актуальная персональная сессия через backend `/api/admin/auth/me`; invalid session закрывает операцию. Когда `DAIBILET_ADMIN_RBAC_ENFORCE` выключен, действующий legacy Basic Auth временно считается SUPERADMIN. Прямые Prisma-экраны чата и hero-banners проверяют права до чтения: `support.read` и `content.read`; ответ в чате требует `support.write`, переключение hero-баннера — `content.publish`.
+
+Исключение по текущей возможности ролей: event override пока проверяет на Next стороне полный набор `content.edit + seo.edit + catalog.edit + catalog.publish`, поскольку backend endpoint ещё не разрешает права по конкретным переданным полям. Article save проверяет `content.edit`, а для публикации или featured — дополнительно `content.publish`; backend route guard пока может быть строже, пока не подключён его payload-aware вариант.
+
 ## 3. Экспорты
 
 В текущем UI экспортов нет. Право `orders.export` зарезервировано под будущий экспорт заказов: при появлении кнопки экспорт получает собственную строку в таблице 2 и проверку на server action/endpoint (кнопка без права скрывается, прямой вызов - 403).
@@ -132,7 +138,7 @@
 
 ## 7. Ограничения карты
 
-- Инвентаризация сделана по коду Next-слоя (`apps/web`). Реальная проверка прав должна повторяться на catalog API и finance API (срезы 2-4 плана): server action сам по себе не boundary, если backend принимает общий Basic Auth.
+- Инвентаризация сделана по коду Next-слоя (`apps/web`). Реальная проверка прав должна повторяться на catalog API и finance API: server actions теперь проверяют права до вызова, но backend endpoints должны оставаться самостоятельной границей, в том числе при прямых запросах.
 - Идентичность сотрудника для finance host сейчас не передаётся (сервисный токен) - см. finance bridge (срез 4).
-- `hero-banners` читает и пишет Prisma напрямую в обход API - при внедрении guards либо перенести на catalog API, либо накладывать guard в server action.
-- Чат поддержки также читает и пишет Prisma прямо из Next. Публичные `POST /support/chat/messages` и отправка посетителя через server action не получают admin-права: посетитель предъявляет случайный ключ диалога, ввод ограничен по длине и частоте. Admin страницы требуют `support.read`, ответ — `support.write`; Basic Auth остаётся временным до персональных сессий.
+- `hero-banners` читает и пишет Prisma напрямую в обход API; Next server page/action теперь проверяют соответственно `content.read` и `content.publish`. Перенос на backend API остаётся желательным для единой audit boundary.
+- Чат поддержки читает и пишет Prisma прямо из Next; страницы требуют `support.read`, ответ — `support.write`. Публичные `POST /support/chat/messages` и отправка посетителя через server action не получают admin-права: посетитель предъявляет случайный ключ диалога, ввод ограничен по длине и частоте. Backend enforcement всё ещё требуется, чтобы прямые запросы и любые обходы Next имели ту же политику.

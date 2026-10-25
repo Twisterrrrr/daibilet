@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 import { adminApiFetch } from '@/server/admin-api-fetch';
+import { requireAdminPermissions } from '@/server/admin-authorization';
 
 const SYNC_ENDPOINTS = {
   TICKETSCLOUD: '/api/admin/sources/ticketscloud/sync',
@@ -24,6 +25,7 @@ function formatSyncStats(stats?: Record<string, unknown> | null): string {
 }
 
 export async function triggerSourceSyncAction(formData: FormData) {
+  await requireAdminPermissions(['integrations.retry']);
   const source = String(formData.get('source') || '').toUpperCase() as SyncSource;
   const endpoint = SYNC_ENDPOINTS[source];
   if (!endpoint) {

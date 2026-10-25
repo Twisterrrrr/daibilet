@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 import { adminApiFetch } from '@/server/admin-api-fetch';
+import { requireAdminPermissions } from '@/server/admin-authorization';
 
 export async function operateInternalAdminOrderAction(formData: FormData) {
   const orderKey = String(formData.get('orderKey') || '').trim();
@@ -13,6 +14,7 @@ export async function operateInternalAdminOrderAction(formData: FormData) {
   if (!orderKey || !['cancel', 'refund'].includes(operation) || !confirmCode || reason.length < 3 || reason.length > 500) {
     redirect(`/admin/orders/internal/${encodeURIComponent(orderKey)}?error=invalid_input`);
   }
+  await requireAdminPermissions(operation === 'refund' ? ['refunds.execute'] : ['orders.cancel']);
   const base = process.env.FINANCE_API_BASE_URL || '';
   const token = process.env.DAIBILET_FINANCE_ADMIN_OPERATION_TOKEN || '';
   if (!base || !token) redirect(`/admin/orders/internal/${encodeURIComponent(orderKey)}?error=not_configured`);
@@ -40,6 +42,7 @@ export async function operateInternalAdminOrderAction(formData: FormData) {
   redirect(`/admin/orders/internal/${encodeURIComponent(orderKey)}?operation=${encodeURIComponent(result.status)}`);
 }
 export async function syncAdminOrdersTcAction() {
+  await requireAdminPermissions(['integrations.retry']);
   const response = await adminApiFetch('/api/admin/orders/sync', { method: 'POST' });
   if (!response.ok) {
     const text = await response.text().catch(() => '');
@@ -50,6 +53,7 @@ export async function syncAdminOrdersTcAction() {
 }
 
 export async function archiveAdminOrdersBulkAction() {
+  await requireAdminPermissions(['orders.manage']);
   const response = await adminApiFetch('/api/admin/orders/archive', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -64,6 +68,7 @@ export async function archiveAdminOrdersBulkAction() {
 }
 
 export async function archiveAdminOrderAction(formData: FormData) {
+  await requireAdminPermissions(['orders.manage']);
   const id = String(formData.get('id') || '').trim();
   if (!id) throw new Error('missing order id');
   const response = await adminApiFetch(`/api/admin/orders/${encodeURIComponent(id)}/archive`, {
@@ -78,6 +83,7 @@ export async function archiveAdminOrderAction(formData: FormData) {
 }
 
 export async function upsertAdminOrderTicketAction(formData: FormData) {
+  await requireAdminPermissions(['orders.manage']);
   const id = String(formData.get('id') || '').trim();
   const externalTicketId = String(formData.get('externalTicketId') || '').trim();
   const status = String(formData.get('status') || 'issued').trim() || 'issued';
@@ -110,6 +116,7 @@ export async function upsertAdminOrderTicketAction(formData: FormData) {
 }
 
 export async function unarchiveAdminOrderAction(formData: FormData) {
+  await requireAdminPermissions(['orders.manage']);
   const id = String(formData.get('id') || '').trim();
   if (!id) throw new Error('missing order id');
   const response = await adminApiFetch(`/api/admin/orders/${encodeURIComponent(id)}/unarchive`, {

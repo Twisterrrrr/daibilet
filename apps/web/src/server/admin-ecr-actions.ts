@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 import { adminApiFetch } from '@/server/admin-api-fetch';
+import { requireAdminPermissions } from '@/server/admin-authorization';
 
 export async function runAdminEcrAction(formData: FormData) {
   const id = String(formData.get('id') || '').trim();
@@ -16,6 +17,7 @@ export async function runAdminEcrAction(formData: FormData) {
   if (action === 'reject' && !adminComment) {
     throw new Error('reject requires adminComment');
   }
+  await requireAdminPermissions(action === 'apply' ? ['suppliers.manage', 'catalog.edit'] : ['suppliers.manage']);
 
   const init: RequestInit = { method: 'POST' };
   if (action !== 'apply') {

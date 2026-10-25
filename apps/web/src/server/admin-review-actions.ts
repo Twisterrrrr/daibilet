@@ -4,9 +4,11 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 import { adminApiFetch } from '@/server/admin-api-fetch';
+import { requireAdminPermissions } from '@/server/admin-authorization';
 import { EVENT_PAGE_CACHE_TAG } from '@/server/cache-config';
 
 export async function moderateAdminReviewAction(formData: FormData) {
+  await requireAdminPermissions(['content.publish']);
   const id = String(formData.get('id') || '').trim();
   const action = String(formData.get('action') || '').trim().toLowerCase();
   const statusFilter = String(formData.get('statusFilter') || 'PENDING_MODERATION').trim();

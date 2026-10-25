@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 import { adminApiFetch } from '@/server/admin-api-fetch';
+import { requireAdminPermissions } from '@/server/admin-authorization';
 
 function emptyToNull(value: FormDataEntryValue | null): string | null {
   const trimmed = String(value || '').trim();
@@ -17,6 +18,7 @@ function backSuffix(formData: FormData): string {
 }
 
 export async function saveAdminVenueAction(formData: FormData) {
+  await requireAdminPermissions(['catalog.edit']);
   const id = String(formData.get('id') || '').trim();
   if (!id) throw new Error('missing venue id');
 

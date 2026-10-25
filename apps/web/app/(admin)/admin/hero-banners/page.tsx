@@ -1,5 +1,7 @@
 import { setHeroBannerActiveAction } from '@/server/admin-hero-banner-actions';
 import { prisma } from '@/lib/db';
+import { AdminAccessDenied } from '@/components/admin/AdminAccessDenied';
+import { adminHasPermissions } from '@/server/admin-authorization';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,6 +14,8 @@ function first(value: string | string[] | undefined): string | undefined {
 }
 
 export default async function AdminHeroBannersPage({ searchParams }: PageProps) {
+  if (!(await adminHasPermissions(['content.read']))) return <AdminAccessDenied section="Баннеры главной страницы" />;
+
   const raw = await searchParams;
   let rows: Array<{
     id: string;

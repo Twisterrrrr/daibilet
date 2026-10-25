@@ -2,9 +2,11 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { AdminApiErrorBanner } from '@/components/admin/AdminApiErrorBanner';
+import { AdminAccessDenied } from '@/components/admin/AdminAccessDenied';
 import { AdminChatReplyForm } from '@/components/admin/AdminChatReplyForm.client';
 import { formatAdminDateTime } from '@/lib/admin-ui';
 import { prisma } from '@/lib/db';
+import { adminHasPermissions } from '@/server/admin-authorization';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,6 +15,8 @@ type PageProps = {
 };
 
 export default async function AdminChatDetailPage({ params }: PageProps) {
+  if (!(await adminHasPermissions(['support.read']))) return <AdminAccessDenied section="Чат поддержки" />;
+
   const { id: rawId } = await params;
   const id = decodeURIComponent(rawId);
   const errors: string[] = [];

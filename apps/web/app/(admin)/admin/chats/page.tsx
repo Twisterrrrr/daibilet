@@ -1,12 +1,16 @@
 import Link from 'next/link';
 
 import { AdminApiErrorBanner } from '@/components/admin/AdminApiErrorBanner';
+import { AdminAccessDenied } from '@/components/admin/AdminAccessDenied';
 import { formatAdminDateTime } from '@/lib/admin-ui';
 import { prisma } from '@/lib/db';
+import { adminHasPermissions } from '@/server/admin-authorization';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminChatsPage() {
+  if (!(await adminHasPermissions(['support.read']))) return <AdminAccessDenied section="Чат поддержки" />;
+
   let sessions: Array<{
     id: string;
     createdAt: Date;

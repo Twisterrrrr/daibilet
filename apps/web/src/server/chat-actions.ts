@@ -1,12 +1,10 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { headers } from 'next/headers';
-
 import { isChatVisitorKey, sanitizeChatText } from '@/lib/chat';
-import { isAdminAuthConfigured, isAuthorizedAdminBasicAuth, readAdminBasicAuthConfig } from '@/lib/admin-basic-auth';
 import { prisma } from '@/lib/db';
 import { sendChatTelegramNotification } from '@/server/chat-telegram';
+import { requireAdminPermissions } from '@/server/admin-authorization';
 
 const ADMIN_BASE = process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.daibilet.ru';
 
@@ -94,10 +92,9 @@ export async function sendAdminChatMessage(input: {
   sessionId: string;
   text: string;
 }): Promise<ChatSendResult> {
-  const authConfig = readAdminBasicAuthConfig();
-  const requestHeaders = await headers();
-  if (!isAdminAuthConfigured(authConfig) ||
-      !(await isAuthorizedAdminBasicAuth(requestHeaders.get('authorization'), authConfig))) {
+  try {
+    await requireAdminPermissions(['support.write']);
+  } catch {
     return { ok: false, error: 'Нет доступа к чату поддержки.' };
   }
   const sessionId = String(input.sessionId || '').trim();

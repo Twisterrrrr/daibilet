@@ -4,6 +4,7 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 import { adminApiFetch } from '@/server/admin-api-fetch';
+import { requireAdminPermissions } from '@/server/admin-authorization';
 import { CATALOG_PAGE_CACHE_TAG, EVENT_PAGE_CACHE_TAG, eventPageCacheTag } from '@/server/cache-config';
 
 function emptyToNull(value: FormDataEntryValue | null): string | null {
@@ -35,10 +36,13 @@ function revalidatePublicEventSurfaces(formData: FormData) {
 }
 
 export async function saveAdminEventOverrideAction(formData: FormData) {
+  const section = String(formData.get('section') || 'content').trim();
+  // The backend route remains deliberately conservative until it has a
+  // payload-aware guard, so enforce the same combined set here.
+  await requireAdminPermissions(['content.edit', 'seo.edit', 'catalog.edit', 'catalog.publish']);
   const id = String(formData.get('id') || '').trim();
   if (!id) throw new Error('missing event id');
 
-  const section = String(formData.get('section') || 'content').trim();
   let body: Record<string, unknown>;
 
   if (section === 'seo') {
@@ -80,6 +84,7 @@ export async function saveAdminEventOverrideAction(formData: FormData) {
 }
 
 export async function saveAdminEventModerationAction(formData: FormData) {
+  await requireAdminPermissions(['catalog.publish']);
   const id = String(formData.get('id') || '').trim();
   const editorStatus = String(formData.get('editorStatus') || '').trim().toUpperCase();
   if (!id) throw new Error('missing event id');
@@ -103,6 +108,7 @@ export async function saveAdminEventModerationAction(formData: FormData) {
 }
 
 export async function saveAdminEventTaxonomyAction(formData: FormData) {
+  await requireAdminPermissions(['catalog.edit']);
   const id = String(formData.get('id') || '').trim();
   if (!id) throw new Error('missing event id');
 
@@ -140,6 +146,7 @@ export async function saveAdminEventTaxonomyAction(formData: FormData) {
 }
 
 export async function saveAdminEventVenueLinksAction(formData: FormData) {
+  await requireAdminPermissions(['catalog.edit']);
   const id = String(formData.get('id') || '').trim();
   if (!id) throw new Error('missing event id');
 
@@ -195,6 +202,7 @@ export async function rewriteAdminEventDescriptionAction(eventId: string): Promi
   truncatedInput?: boolean;
   sourceUsed?: string;
 }> {
+  await requireAdminPermissions(['content.edit']);
   const id = String(eventId || '').trim();
   if (!id) return { ok: false, error: 'missing event id' };
 
@@ -241,6 +249,7 @@ export async function fetchAdminVenueLinkSuggestionsAction(
   suggestions: VenueLinkSuggestion[];
   reason?: string;
 }> {
+  await requireAdminPermissions(['catalog.read']);
   const id = String(eventId || '').trim();
   if (!id) return { ok: false, error: 'missing event id', suggestions: [] };
 

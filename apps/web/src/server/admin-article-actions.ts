@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 import { adminApiFetch } from '@/server/admin-api-fetch';
+import { requireAdminPermissions } from '@/server/admin-authorization';
 import { ARTICLE_AUTHOR_OPTIONS } from '@/server/admin-articles-data';
 
 function authorLabel(authorId: string): string {
@@ -60,6 +61,11 @@ export async function saveAdminArticleAction(formData: FormData) {
   const id = String(formData.get('id') || '').trim();
   const isNew = !id || id === 'new';
   const body = readDraft(formData);
+  await requireAdminPermissions(
+    body.status.toUpperCase() === 'PUBLISHED' || body.isFeatured
+      ? ['content.edit', 'content.publish']
+      : ['content.edit'],
+  );
 
   const response = await adminApiFetch(isNew ? '/api/admin/articles' : `/api/admin/articles/${encodeURIComponent(id)}`, {
     method: isNew ? 'POST' : 'PATCH',
@@ -82,6 +88,7 @@ export async function saveAdminArticleAction(formData: FormData) {
 }
 
 export async function archiveAdminArticleAction(formData: FormData) {
+  await requireAdminPermissions(['content.edit']);
   const id = String(formData.get('id') || '').trim();
   if (!id || id === 'new') throw new Error('missing article id');
 
@@ -102,6 +109,7 @@ export async function archiveAdminArticleAction(formData: FormData) {
 
 /** Toggle «В Hero» from list: last-wins clears other featured on API. */
 export async function setAdminArticleFeaturedAction(formData: FormData) {
+  await requireAdminPermissions(['content.publish']);
   const id = String(formData.get('id') || '').trim();
   if (!id || id === 'new') throw new Error('missing article id');
   const isFeatured = formData.get('isFeatured') === 'on' || formData.get('isFeatured') === 'true';

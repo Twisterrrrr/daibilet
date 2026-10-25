@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 import { adminApiFetch } from '@/server/admin-api-fetch';
+import { requireAdminPermissions } from '@/server/admin-authorization';
 
 function emptyToNull(value: FormDataEntryValue | null): string | null {
   const trimmed = String(value || '').trim();
@@ -11,6 +12,7 @@ function emptyToNull(value: FormDataEntryValue | null): string | null {
 }
 
 export async function saveAdminLandingSeoAction(formData: FormData) {
+  await requireAdminPermissions(['seo.edit']);
   const slug = String(formData.get('slug') || '').trim();
   if (!slug) throw new Error('missing landing slug');
 
@@ -43,6 +45,7 @@ export async function saveAdminLandingSeoAction(formData: FormData) {
 }
 
 export async function saveAdminLandingMatchAction(formData: FormData) {
+  await requireAdminPermissions(['seo.edit']);
   const slug = String(formData.get('slug') || '').trim();
   const eventId = String(formData.get('eventId') || '').trim();
   const status = String(formData.get('status') || '').trim().toUpperCase();
