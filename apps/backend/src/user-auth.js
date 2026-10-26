@@ -196,6 +196,32 @@ export async function loginSiteUser(db, emailInput, password) {
   return tokens;
 }
 
+export async function changeSiteUserPassword(db, userIdInput, currentPassword, newPassword) {
+  const userId = String(userIdInput || '').trim();
+  if (!userId) throw authError('Требуется авторизация.', 401);
+  if (typeof newPassword !== 'string' || newPassword.length < 10 || newPassword.length > 200) {
+    throw authError('Новый пароль должен содержать от 10 до 200 символов.', 422);
+  }
+  if (newPassword === currentPassword) throw authError('Новый пароль должен отличаться от текущего.', 422);
+
+  const result = await db.query(
+    'select id, "passwordHash", "isActive" from "SiteUser" where id = $1 limit 1',
+    [userId],
+  );
+  const user = result.rows[0];
+  if (!user || !user.isActive || !await verifyPassword(currentPassword, user.passwordHash)) {
+    throw authError('Текущий пароль указан неверно.', 401);
+  }
+
+  const passwordHash = await hashPassword(newPassword);
+  const updated = await db.query(
+    'update "SiteUser" set "passwordHash" = $2, "refreshTokenHash" = null, "updatedAt" = now() where id = $1 and "passwordHash" = $3 and "isActive" = true returning id',
+    [userId, passwordHash, user.passwordHash],
+  );
+  if (!updated.rows[0]) throw authError('Пароль изменился параллельно. Войдите снова и повторите попытку.', 409);
+  return { changed: true };
+}
+
 export async function refreshSiteUserSession(db, refreshToken) {
   const payload = verifyJwt(refreshToken);
   if (!payload || payload.tokenType !== 'refresh') throw authError('Невалидный refresh token.', 401);

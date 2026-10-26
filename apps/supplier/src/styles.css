@@ -1445,6 +1445,18 @@ td span {
   gap: 12px;
 }
 
+.password-change-form > p,
+.password-change-form .form-error,
+.password-change-form .form-actions {
+  grid-column: 1 / -1;
+}
+
+.password-change-form > p {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
 .settings-fieldset {
   display: grid;
   min-width: 0;

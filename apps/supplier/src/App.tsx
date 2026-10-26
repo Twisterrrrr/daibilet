@@ -131,6 +131,7 @@ export function App() {
   const [accessToken, setAccessToken] = React.useState(() => window.localStorage.getItem(SUPPLIER_ACCESS_TOKEN_STORAGE_KEY) || '');
   const [authSession, setAuthSession] = React.useState<SupplierPortalMeDto | null>(null);
   const [authLoading, setAuthLoading] = React.useState(true);
+  const [loginNotice, setLoginNotice] = React.useState<string | null>(null);
   const bootstrapRefreshAttempted = React.useRef(false);
   const [supplierKey, setSupplierKeyState] = React.useState(() => {
     const fromUrl = searchParams.get('supplier') || searchParams.get('slug') || searchParams.get('supplierId');
@@ -203,6 +204,7 @@ export function App() {
   }, [accessToken, clearAuthSession, supplierKey]);
 
   const handleLogin = React.useCallback((payload: SupplierPortalAuthDto) => {
+    setLoginNotice(null);
     window.localStorage.setItem(SUPPLIER_ACCESS_TOKEN_STORAGE_KEY, payload.accessToken);
     setAccessToken(payload.accessToken);
     setAuthSession({
@@ -212,6 +214,12 @@ export function App() {
     });
     setSupplierKey(payload.currentSupplier.id);
   }, [setSupplierKey]);
+
+  const handlePasswordChanged = React.useCallback(() => {
+    setLoginNotice('Пароль изменён. Войдите с новым паролем.');
+    clearAuthSession();
+    setSupplierKey('');
+  }, [clearAuthSession, setSupplierKey]);
 
   const handleLogout = React.useCallback(() => {
     const token = accessToken;
@@ -280,11 +288,11 @@ export function App() {
 
         <main className="content">
           {searchParams.has('reset') ? (
-            <LoginSetup onLogin={handleLogin} onDevSupplier={setSupplierKey} />
+            <LoginSetup onLogin={handleLogin} onDevSupplier={setSupplierKey} statusMessage={loginNotice} />
           ) : authLoading ? (
             <LoadingState label="Проверяем сеанс..." />
           ) : !hasSupplierAccess ? (
-            <LoginSetup onLogin={handleLogin} onDevSupplier={setSupplierKey} />
+            <LoginSetup onLogin={handleLogin} onDevSupplier={setSupplierKey} statusMessage={loginNotice} />
           ) : (
             <Routes>
               <Route index element={<DashboardPage supplierKey={supplierKey} />} />
@@ -296,7 +304,7 @@ export function App() {
               <Route path="finance" element={<FinancePage supplierKey={supplierKey} />} />
               <Route path="documents" element={<DocumentsPage supplierKey={supplierKey} />} />
               <Route path="reviews" element={<ReviewsPage supplierKey={supplierKey} />} />
-              <Route path="profile" element={<ProfilePage supplierKey={supplierKey} canEditRequisites={permissions.canEditRequisites} />} />
+              <Route path="profile" element={<ProfilePage supplierKey={supplierKey} canEditRequisites={permissions.canEditRequisites} onPasswordChanged={handlePasswordChanged} />} />
               <Route path="terms" element={<SupplierTermsPage supplierKey={supplierKey} />} />
               <Route path="team" element={<TeamPage supplierKey={supplierKey} />} />
               <Route path="integrations" element={<IntegrationsPage supplierKey={supplierKey} />} />
@@ -382,9 +390,11 @@ function SupplierAccessControl({
 function LoginSetup({
   onLogin,
   onDevSupplier,
+  statusMessage,
 }: {
   onLogin: (payload: SupplierPortalAuthDto) => void;
   onDevSupplier: (value: string) => void;
+  statusMessage?: string | null;
 }) {
   const inviteToken = new URLSearchParams(window.location.search).get('invite')?.trim() || '';
   const resetToken = new URLSearchParams(window.location.search).get('reset')?.trim() || '';
@@ -450,6 +460,7 @@ function LoginSetup({
         <div className="setup-mark">ЛК</div>
         <h2>Вход поставщика</h2>
         <p>Используйте email пользователя, которому администратор выдал доступ к поставщику.</p>
+        {statusMessage ? <div className="form-note success" role="status">{statusMessage}</div> : null}
         <form className="login-form" onSubmit={submit}>
           <label>
             <span>Email</span>
@@ -1718,7 +1729,7 @@ function ReviewsPage({ supplierKey }: { supplierKey: string }) {
   );
 }
 
-function ProfilePage({ supplierKey, canEditRequisites }: { supplierKey: string; canEditRequisites: boolean }) {
+function ProfilePage({ supplierKey, canEditRequisites, onPasswordChanged }: { supplierKey: string; canEditRequisites: boolean; onPasswordChanged: () => void }) {
   const { data, loading, error, reload } = useSupplierResource<SupplierPortalProfileDto>('/api/supplier/profile', supplierKey);
 
   if (loading && !data) return <LoadingState label="Загружаем реквизиты..." />;
@@ -1750,7 +1761,46 @@ function ProfilePage({ supplierKey, canEditRequisites }: { supplierKey: string; 
           {data.venues.length ? data.venues.map((venue) => <span key={venue.id} className="chip">{venue.title} · {venue.cityTitle || 'город не указан'}</span>) : <EmptyInline text="Площадки не привязаны." />}
         </div>
       </section>
+      <section className="panel">
+        <div className="panel-header"><h2>Безопасность аккаунта</h2></div>
+        <PasswordChangeForm onPasswordChanged={onPasswordChanged} />
+      </section>
     </div>
+  );
+}
+
+function PasswordChangeForm({ onPasswordChanged }: { onPasswordChanged: () => void }) {
+  const [currentPassword, setCurrentPassword] = React.useState('');
+  const [newPassword, setNewPassword] = React.useState('');
+  const [confirmation, setConfirmation] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError(null);
+    if (newPassword !== confirmation) { setError('Новые пароли не совпадают.'); return; }
+    if (newPassword === currentPassword) { setError('Новый пароль должен отличаться от текущего.'); return; }
+    setLoading(true);
+    try {
+      await supplierPost('/api/user/auth/change-password', { currentPassword, newPassword });
+      onPasswordChanged();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Не удалось изменить пароль.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <form className="settings-form password-change-form" onSubmit={(event) => void submit(event)}>
+      <p>После смены пароля потребуется войти заново. Обновление пароля закрывает refresh-сессию.</p>
+      <label><span>Текущий пароль</span><input type="password" autoComplete="current-password" required value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} /></label>
+      <label><span>Новый пароль</span><input type="password" autoComplete="new-password" minLength={10} maxLength={200} required value={newPassword} onChange={(event) => setNewPassword(event.target.value)} /></label>
+      <label><span>Повторите новый пароль</span><input type="password" autoComplete="new-password" minLength={10} maxLength={200} required value={confirmation} onChange={(event) => setConfirmation(event.target.value)} /></label>
+      {error ? <div className="form-error" role="alert">{error}</div> : null}
+      <div className="form-actions"><button type="submit" disabled={loading}>{loading ? 'Сохраняем...' : 'Изменить пароль'}</button></div>
+    </form>
   );
 }
 

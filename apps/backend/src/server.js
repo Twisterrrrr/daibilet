@@ -102,6 +102,7 @@ import {
   authenticateAccessToken,
   buildClearRefreshCookie,
   buildRefreshCookie,
+  changeSiteUserPassword,
   createSiteUserEmailVerificationToken,
   loginSiteUser,
   logoutSiteUser,
@@ -701,6 +702,20 @@ export async function handleRequest(request, response) {
         sendJson(response, { ok: true }, 200, { 'Set-Cookie': buildClearRefreshCookie() });
       } catch {
         sendJson(response, { ok: true }, 200, { 'Set-Cookie': buildClearRefreshCookie() });
+      }
+      return;
+    }
+
+    if (route === 'POST /api/user/auth/change-password') {
+      try {
+        const user = await requireSiteUserFromRequest(db, request);
+        assertAuthRateLimit(`password-change:${user.id}`, 5, 15 * 60_000);
+        const body = await readJsonBody(request);
+        sendJson(response, await changeSiteUserPassword(db, user.id, body?.currentPassword, body?.newPassword), 200, {
+          'Set-Cookie': buildClearRefreshCookie(),
+        });
+      } catch (error) {
+        sendJson(response, { error: error.message || 'password_change_failed' }, error.statusCode || 400);
       }
       return;
     }
