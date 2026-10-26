@@ -3,6 +3,41 @@
   "shelfN": 12,
   "summary": [
     {
+      "city": "kirov",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 11
+    },
+    {
+      "city": "yaroslavl",
+      "d0": 3,
+      "clusters": 3,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "omsk",
+      "d0": 2,
+      "clusters": 2,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "rostov-na-donu",
+      "d0": 1,
+      "clusters": 1,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "sochi",
+      "d0": 1,
+      "clusters": 1,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
       "city": "abakan",
       "d0": 0,
       "clusters": 0,
@@ -61,7 +96,7 @@
     {
       "city": "chelyabinsk",
       "d0": 0,
-      "clusters": 0,
+      "clusters": 1,
       "shelfPairs": 0,
       "regen": 0
     },
@@ -75,7 +110,7 @@
     {
       "city": "ekaterinburg",
       "d0": 0,
-      "clusters": 1,
+      "clusters": 0,
       "shelfPairs": 0,
       "regen": 0
     },
@@ -124,19 +159,12 @@
     {
       "city": "kazan",
       "d0": 0,
-      "clusters": 1,
-      "shelfPairs": 0,
-      "regen": 0
-    },
-    {
-      "city": "kemerovo",
-      "d0": 0,
       "clusters": 0,
       "shelfPairs": 0,
       "regen": 0
     },
     {
-      "city": "kirov",
+      "city": "kemerovo",
       "d0": 0,
       "clusters": 0,
       "shelfPairs": 0,
@@ -220,13 +248,6 @@
       "regen": 0
     },
     {
-      "city": "omsk",
-      "d0": 0,
-      "clusters": 0,
-      "shelfPairs": 0,
-      "regen": 0
-    },
-    {
       "city": "orel",
       "d0": 0,
       "clusters": 0,
@@ -256,13 +277,6 @@
     },
     {
       "city": "pskov",
-      "d0": 0,
-      "clusters": 0,
-      "shelfPairs": 0,
-      "regen": 0
-    },
-    {
-      "city": "rostov-na-donu",
       "d0": 0,
       "clusters": 0,
       "shelfPairs": 0,
@@ -319,13 +333,6 @@
     },
     {
       "city": "smolensk",
-      "d0": 0,
-      "clusters": 0,
-      "shelfPairs": 0,
-      "regen": 0
-    },
-    {
-      "city": "sochi",
       "d0": 0,
       "clusters": 0,
       "shelfPairs": 0,
@@ -473,13 +480,6 @@
     },
     {
       "city": "vyborg",
-      "d0": 0,
-      "clusters": 0,
-      "shelfPairs": 0,
-      "regen": 0
-    },
-    {
-      "city": "yaroslavl",
       "d0": 0,
       "clusters": 0,
       "shelfPairs": 0,
@@ -638,11 +638,11 @@
     },
     "chelyabinsk": {
       "city": "chelyabinsk",
-      "files": 111,
+      "files": 121,
       "d0": 0,
-      "pairs": 0,
-      "clusters": 0,
-      "topCluster": 0,
+      "pairs": 1,
+      "clusters": 1,
+      "topCluster": 2,
       "mustSeeCount": 65,
       "shelfFiles": [
         "skaz-ob-urale.jpg",
@@ -691,9 +691,9 @@
       "city": "ekaterinburg",
       "files": 101,
       "d0": 0,
-      "pairs": 1,
-      "clusters": 1,
-      "topCluster": 2,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
       "mustSeeCount": 66,
       "shelfFiles": [
         "plotinka-istoricheskiy-skver.jpg",
@@ -783,7 +783,7 @@
     },
     "kaliningrad": {
       "city": "kaliningrad",
-      "files": 91,
+      "files": 93,
       "d0": 0,
       "pairs": 0,
       "clusters": 0,
@@ -816,9 +816,9 @@
       "city": "kazan",
       "files": 79,
       "d0": 0,
-      "pairs": 1,
-      "clusters": 1,
-      "topCluster": 2,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
       "mustSeeCount": 51,
       "shelfFiles": [
         "kazanskiy-kreml.jpg",
@@ -868,16 +868,107 @@
       "pairs": 0,
       "clusters": 0,
       "topCluster": 0,
-      "mustSeeCount": 0,
-      "shelfFiles": [],
+      "mustSeeCount": 20,
+      "shelfFiles": [
+        "kirovskaya-oblast-naberezhnaya-grina.jpg",
+        "kirovskaya-oblast-ulitsa-spasskaya-vyatskiy-arbat.jpg",
+        "kirovskaya-oblast-aleksandrovskiy-sad.jpg",
+        "kirovskaya-oblast-vyatskiy-paleontologicheskiy-muzey.jpg",
+        "kirovskaya-oblast-svyato-uspenskiy-trifonov-muzhskoy-monastyr.jpg",
+        "kirovskaya-oblast-zapovednik-skazok.jpg",
+        "kirovskaya-oblast-muzey-dymkovskoy-igrushki.jpg",
+        "kirovskaya-oblast-kirovskiy-krayevedcheskiy-muzey.jpg",
+        "kirovskaya-oblast-muzey-istorii-goroda-kirova.jpg",
+        "kirovskaya-oblast-dom-muzey-a-s-grina.jpg",
+        "kirovskaya-oblast-muzey-vyatskogo-pryanika.jpg",
+        "kirovskaya-oblast-uspenskiy-trifonov-sobor.jpg"
+      ],
       "identity": [],
       "scenarioCovers": [],
       "shelfPairs": 0,
-      "regen": []
+      "regen": [
+        {
+          "stem": "kirovskaya-oblast-aleksandrovskiy-sad",
+          "file": "kirovskaya-oblast-aleksandrovskiy-sad.jpg",
+          "cluster": [],
+          "keeper": null,
+          "reason": "small"
+        },
+        {
+          "stem": "kirovskaya-oblast-dom-muzey-a-s-grina",
+          "file": "kirovskaya-oblast-dom-muzey-a-s-grina.jpg",
+          "cluster": [],
+          "keeper": null,
+          "reason": "small"
+        },
+        {
+          "stem": "kirovskaya-oblast-kirovskiy-krayevedcheskiy-muzey",
+          "file": "kirovskaya-oblast-kirovskiy-krayevedcheskiy-muzey.jpg",
+          "cluster": [],
+          "keeper": null,
+          "reason": "small"
+        },
+        {
+          "stem": "kirovskaya-oblast-muzey-dymkovskoy-igrushki",
+          "file": "kirovskaya-oblast-muzey-dymkovskoy-igrushki.jpg",
+          "cluster": [],
+          "keeper": null,
+          "reason": "small"
+        },
+        {
+          "stem": "kirovskaya-oblast-muzey-istorii-goroda-kirova",
+          "file": "kirovskaya-oblast-muzey-istorii-goroda-kirova.jpg",
+          "cluster": [],
+          "keeper": null,
+          "reason": "small"
+        },
+        {
+          "stem": "kirovskaya-oblast-muzey-vyatskogo-pryanika",
+          "file": "kirovskaya-oblast-muzey-vyatskogo-pryanika.jpg",
+          "cluster": [],
+          "keeper": null,
+          "reason": "small"
+        },
+        {
+          "stem": "kirovskaya-oblast-naberezhnaya-grina",
+          "file": "kirovskaya-oblast-naberezhnaya-grina.jpg",
+          "cluster": [],
+          "keeper": null,
+          "reason": "small"
+        },
+        {
+          "stem": "kirovskaya-oblast-svyato-uspenskiy-trifonov-muzhskoy-monastyr",
+          "file": "kirovskaya-oblast-svyato-uspenskiy-trifonov-muzhskoy-monastyr.jpg",
+          "cluster": [],
+          "keeper": null,
+          "reason": "small"
+        },
+        {
+          "stem": "kirovskaya-oblast-ulitsa-spasskaya-vyatskiy-arbat",
+          "file": "kirovskaya-oblast-ulitsa-spasskaya-vyatskiy-arbat.jpg",
+          "cluster": [],
+          "keeper": null,
+          "reason": "small"
+        },
+        {
+          "stem": "kirovskaya-oblast-uspenskiy-trifonov-sobor",
+          "file": "kirovskaya-oblast-uspenskiy-trifonov-sobor.jpg",
+          "cluster": [],
+          "keeper": null,
+          "reason": "small"
+        },
+        {
+          "stem": "kirovskaya-oblast-zapovednik-skazok",
+          "file": "kirovskaya-oblast-zapovednik-skazok.jpg",
+          "cluster": [],
+          "keeper": null,
+          "reason": "small"
+        }
+      ]
     },
     "kirov-kirovskaya-oblast": {
       "city": "kirov-kirovskaya-oblast",
-      "files": 5,
+      "files": 22,
       "d0": 0,
       "pairs": 0,
       "clusters": 0,
@@ -942,7 +1033,7 @@
     },
     "krasnoyarsk": {
       "city": "krasnoyarsk",
-      "files": 71,
+      "files": 77,
       "d0": 0,
       "pairs": 0,
       "clusters": 0,
@@ -1021,7 +1112,7 @@
     },
     "moscow": {
       "city": "moscow",
-      "files": 243,
+      "files": 263,
       "d0": 0,
       "pairs": 0,
       "clusters": 0,
@@ -1071,7 +1162,7 @@
     },
     "novosibirsk": {
       "city": "novosibirsk",
-      "files": 101,
+      "files": 102,
       "d0": 0,
       "pairs": 0,
       "clusters": 0,
@@ -1109,11 +1200,11 @@
     },
     "omsk": {
       "city": "omsk",
-      "files": 86,
-      "d0": 0,
-      "pairs": 0,
-      "clusters": 0,
-      "topCluster": 0,
+      "files": 94,
+      "d0": 2,
+      "pairs": 2,
+      "clusters": 2,
+      "topCluster": 2,
       "mustSeeCount": 65,
       "shelfFiles": [
         "pamyatnik-slesar-stepanych.jpg",
@@ -1137,7 +1228,7 @@
       ],
       "scenarioCovers": [
         "rechnoy-vokzal.jpg",
-        "ermitazh-sibir.jpg",
+        "ermitazh-sibir-r20261009.jpg",
         "voskresenskiy-voennyy-sobor.jpg",
         "moskovskie-torgovye-ryady.jpg"
       ],
@@ -1174,7 +1265,7 @@
     },
     "penza": {
       "city": "penza",
-      "files": 74,
+      "files": 81,
       "d0": 0,
       "pairs": 0,
       "clusters": 0,
@@ -1234,11 +1325,11 @@
     },
     "rostov-na-donu": {
       "city": "rostov-na-donu",
-      "files": 86,
-      "d0": 0,
-      "pairs": 0,
-      "clusters": 0,
-      "topCluster": 0,
+      "files": 92,
+      "d0": 1,
+      "pairs": 1,
+      "clusters": 1,
+      "topCluster": 2,
       "mustSeeCount": 50,
       "shelfFiles": [
         "tachanka-rostovchanka.jpg",
@@ -1266,7 +1357,7 @@
     },
     "ryazan": {
       "city": "ryazan",
-      "files": 94,
+      "files": 101,
       "d0": 0,
       "pairs": 0,
       "clusters": 0,
@@ -1281,7 +1372,7 @@
       ],
       "scenarioCovers": [
         "uspenskiy-sobor.jpg",
-        "muzey-usad-ba-akademika-i-p-pavlova.jpg",
+        "muzey-usad-ba-akademika-i-p-pavlova-r20261009.jpg",
         "grib-borovik.jpg",
         "ryazanskiy-kreml.jpg",
         "tyuz-teatr-na-sobornoy.jpg"
@@ -1291,7 +1382,7 @@
     },
     "saint-petersburg": {
       "city": "saint-petersburg",
-      "files": 322,
+      "files": 323,
       "d0": 0,
       "pairs": 8,
       "clusters": 1,
@@ -1356,7 +1447,7 @@
     },
     "saratov": {
       "city": "saratov",
-      "files": 77,
+      "files": 82,
       "d0": 0,
       "pairs": 0,
       "clusters": 0,
@@ -1458,11 +1549,11 @@
     },
     "sochi": {
       "city": "sochi",
-      "files": 98,
-      "d0": 0,
-      "pairs": 0,
-      "clusters": 0,
-      "topCluster": 0,
+      "files": 106,
+      "d0": 1,
+      "pairs": 1,
+      "clusters": 1,
+      "topCluster": 2,
       "mustSeeCount": 50,
       "shelfFiles": [
         "pamyatnik-arhangelu-mihailu.jpg",
@@ -1632,10 +1723,10 @@
         "pamyatnik-rudnevu.jpg"
       ],
       "identity": [
-        "identity-symbol.jpg",
         "identity-architecture.jpg",
         "identity-art.jpg",
-        "identity-gastro.jpg"
+        "identity-gastro.jpg",
+        "identity-symbol.jpg"
       ],
       "scenarioCovers": [
         "tul-skiy-kreml.jpg",
@@ -1647,7 +1738,7 @@
     },
     "tver": {
       "city": "tver",
-      "files": 90,
+      "files": 95,
       "d0": 0,
       "pairs": 0,
       "clusters": 0,
@@ -1679,7 +1770,7 @@
     },
     "tyumen": {
       "city": "tyumen",
-      "files": 102,
+      "files": 112,
       "d0": 0,
       "pairs": 0,
       "clusters": 0,
@@ -1716,7 +1807,7 @@
     },
     "ufa": {
       "city": "ufa",
-      "files": 85,
+      "files": 94,
       "d0": 0,
       "pairs": 0,
       "clusters": 0,
@@ -1767,13 +1858,26 @@
     },
     "ulyanovsk": {
       "city": "ulyanovsk",
-      "files": 6,
+      "files": 23,
       "d0": 0,
       "pairs": 0,
       "clusters": 0,
       "topCluster": 0,
-      "mustSeeCount": 0,
-      "shelfFiles": [],
+      "mustSeeCount": 19,
+      "shelfFiles": [
+        "bul-var-novyy-venets.jpg",
+        "muzey-zapovednik-rodina-v-i-lenina.jpg",
+        "golovnoy-muzey-istorii-grazhdanskoy-aviatsii.jpg",
+        "imperatorskiy-most.jpg",
+        "pamyatnik-bukve-e.jpg",
+        "leninskiy-memorial.jpg",
+        "muzey-goncharova.jpg",
+        "uspenskiy-sobor.jpg",
+        "simbirskaya-krepost.jpg",
+        "teatr-dramy.jpg",
+        "krayevedcheskiy-muzey.jpg",
+        "muzey-kvartira-ulianovyh.jpg"
+      ],
       "identity": [],
       "scenarioCovers": [],
       "shelfPairs": 0,
@@ -1846,7 +1950,7 @@
     },
     "volgograd": {
       "city": "volgograd",
-      "files": 75,
+      "files": 82,
       "d0": 0,
       "pairs": 0,
       "clusters": 0,
@@ -1948,11 +2052,11 @@
     },
     "yaroslavl": {
       "city": "yaroslavl",
-      "files": 74,
-      "d0": 0,
-      "pairs": 0,
-      "clusters": 0,
-      "topCluster": 0,
+      "files": 88,
+      "d0": 3,
+      "pairs": 3,
+      "clusters": 3,
+      "topCluster": 2,
       "mustSeeCount": 54,
       "shelfFiles": [
         "pamyatnik-yaroslavu-mudromu.jpg",

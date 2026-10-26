@@ -68,10 +68,10 @@ test('formatEventDescriptionHtml renders ul/li and escapes HTML', () => {
   assert.match(formatEventDescriptionHtml('Цена A < B & C'), /A &lt; B &amp; C/);
 });
 
-test('existing HTML is sanitized and not re-parsed into lists', () => {
+test('existing HTML is normalized into safe heading and list structure', () => {
   const raw = '<p>Узнаете:</p><ul><li>Первый</li><li>Второй</li></ul>';
   const html = formatEventDescriptionHtml(raw);
-  assert.equal(html, raw);
+  assert.equal(html, '<h3>Узнаете</h3><ul><li>Первый</li></ul><ul><li>Второй</li></ul>');
 
   const withScript = '<p>Ok</p><script>alert(1)</script><ul><li>A</li></ul>';
   assert.equal(formatEventDescriptionHtml(withScript), '<p>Ok</p><ul><li>A</li></ul>');

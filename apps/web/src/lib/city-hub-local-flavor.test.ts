@@ -93,7 +93,7 @@ test('Perm identity slides map only to cityInfo slugs', () => {
   assert.equal(slides.length, 4);
   assert.deepEqual(
     slides.map((slide) => slide.id),
-    ['medved', 'bogi', 'posikunchiki', 'schaste'],
+    ['kungur-merchant-town', 'bogi', 'posikunchiki', 'schaste'],
   );
   assert.equal(resolveCityLocalFlavor('perm')?.identityHeading, 'Чем уникальна Пермь');
   assert.equal(
@@ -102,7 +102,7 @@ test('Perm identity slides map only to cityInfo slugs', () => {
   );
   assert.deepEqual(
     slides.map((slide) => slide.badge),
-    ['Символ', 'Искусство', 'Гастро', 'Арт-объект'],
+    ['История', 'Искусство', 'Гастро', 'Арт-объект'],
   );
   for (const slide of slides) {
     assert.equal(slide.text.includes('\u2014'), false, slide.id);
@@ -148,8 +148,8 @@ test('Moscow SPB NN Kaliningrad identity packs have 4 slides', () => {
     {
       slug: 'ekaterinburg',
       heading: 'Чем уникален Екатеринбург',
-      ids: ['ural-rock', 'stenograffia', 'posikunchiki', 'avangard'],
-      badges: ['Символ', 'Искусство', 'Гастро', 'Архитектура'],
+      ids: ['ural-rock', 'stenograffia', 'posikunchiki', 'ural-gold'],
+      badges: ['Символ', 'Искусство', 'Гастро', 'История'],
     },
     {
       slug: 'kazan',
@@ -190,8 +190,8 @@ test('Moscow SPB NN Kaliningrad identity packs have 4 slides', () => {
     {
       slug: 'penza',
       heading: 'Чем уникальна Пенза',
-      ids: ['old-fortress', 'meyerhold-city', 'quiet-moscow', 'lermontov-tarhany'],
-      badges: ['Символ', 'Искусство', 'Гастро', 'Архитектура'],
+      ids: ['narovchat', 'radishchevo-estate', 'ahuny', 'lermontov-tarhany'],
+      badges: ['История', 'Архитектура', 'Природа', 'Архитектура'],
     },
     {
       slug: 'tver',

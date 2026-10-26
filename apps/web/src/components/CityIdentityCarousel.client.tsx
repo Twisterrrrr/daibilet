@@ -11,17 +11,12 @@ import {
   type CityIdentitySlide,
   type CityPlaceFocus,
 } from '@/lib/city-hub-local-flavor';
-import { isLabelCardVenueStub, resolveVenueHeroImage } from '@/lib/city-place-images';
+import { isLabelCardVenueStub } from '@/lib/city-place-images';
 
-/** Prefer real photo: skip label-card gradient stubs, fall back to editorial place cover. */
+/** Identity photos must stay in their own set; never borrow a «Что посмотреть» cover. */
 function resolveIdentitySlideImage(slide: CityIdentitySlide): string {
   const primary = String(slide.imageSrc || '').trim();
-  if (primary && !isLabelCardVenueStub(primary)) return primary;
-  for (const slug of slide.slugs) {
-    const editorial = resolveVenueHeroImage(slug, null);
-    if (editorial && !isLabelCardVenueStub(editorial)) return editorial;
-  }
-  return primary;
+  return primary && !isLabelCardVenueStub(primary) ? primary : '';
 }
 
 type Props = {

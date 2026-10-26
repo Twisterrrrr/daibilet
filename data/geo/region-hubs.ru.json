@@ -114,6 +114,15 @@
       "tier": "C"
     },
     {
+      "regionName": "Омская область",
+      "regionSlug": "omskaya-oblast",
+      "centerCity": "Омск",
+      "centerSlugs": [
+        "omsk"
+      ],
+      "tier": "C"
+    },
+    {
       "regionName": "Челябинская область",
       "regionSlug": "chelyabinskaya-oblast",
       "centerCity": "Челябинск",
