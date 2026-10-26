@@ -6,11 +6,6 @@ import { Loader2, LogOut, Receipt, Ticket } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 import { BuyerOrderCard, BuyerOrdersEmptyState, ORDER_SUPPORT_HINT, type BuyerOrder } from '@/components/BuyerOrderCard.client';
-import {
-  filterInternalOrdersForEmail,
-  readInternalOrdersFromStorage,
-  type BuyerInternalOrderRecord,
-} from '@/lib/buyer-checkout';
 import { formatNumber } from '@/lib/format';
 import { useAccountPurchases, useUserAuth } from '@/hooks/useUserAuth';
 import { changeUserPassword } from '@/lib/user-api';
@@ -20,48 +15,6 @@ function formatCount(count: number, forms: [string, string, string]): string {
   const mod100 = Math.abs(count) % 100;
   const form = mod100 >= 11 && mod100 <= 19 ? forms[2] : mod10 === 1 ? forms[0] : mod10 >= 2 && mod10 <= 4 ? forms[1] : forms[2];
   return `${formatNumber(count)} ${form}`;
-}
-
-function internalToBuyerOrder(row: BuyerInternalOrderRecord): BuyerOrder {
-  const title = row.eventTitle || row.venueTitle || row.title || 'Входной билет';
-  const ticketCount = Array.isArray(row.lineItems)
-    ? Math.max(
-        1,
-        row.lineItems.reduce((sum, item) => sum + Math.max(1, Math.round(Number(item.quantity) || 1)), 0),
-      )
-    : 1;
-  return {
-    id: `internal:${row.publicCode}`,
-    number: row.publicCode,
-    status: row.status,
-    displayStatus: row.displayStatus,
-    statusTone: row.statusTone,
-    providerName: 'Дайбилет',
-    sourceKind: 'internal',
-    buyer: {
-      email: row.email,
-      name: row.buyerName || null,
-      phone: null,
-    },
-    eventTitle: title,
-    eventUrl: row.venueSlug ? `/venues/${encodeURIComponent(row.venueSlug)}` : null,
-    purchasedAt: row.purchasedAt,
-    amountRub: row.amountRub,
-    ticketCount,
-    message:
-      row.mode === 'STUB'
-        ? 'Тестовый заказ (STUB). Скачайте билет из списка - письмо уходит только если настроен SMTP каталога.'
-        : null,
-    tickets: [
-      {
-        id: `internal-ticket:${row.publicCode}`,
-        number: row.ticketNumber || row.publicCode,
-        displayStatus: row.displayStatus,
-        eventTitle: title,
-        startsAt: row.sessionStartsAt || null,
-      },
-    ],
-  };
 }
 
 function widgetToBuyerOrder(
@@ -78,8 +31,6 @@ export function AccountPurchasesPageView() {
   const { user, token, isLoading: authLoading, isLoggedIn, logout } = useUserAuth();
   const [page, setPage] = useState(1);
   const { payload, isLoading, error } = useAccountPurchases(page);
-  const [localInternal, setLocalInternal] = useState<BuyerInternalOrderRecord[]>([]);
-  const [remoteInternal, setRemoteInternal] = useState<BuyerInternalOrderRecord[]>([]);
 
   useEffect(() => {
     if (!authLoading && !isLoggedIn) {
@@ -87,57 +38,10 @@ export function AccountPurchasesPageView() {
     }
   }, [authLoading, isLoggedIn, router]);
 
-  useEffect(() => {
-    if (!user?.email) return;
-    setLocalInternal(filterInternalOrdersForEmail(readInternalOrdersFromStorage(), user.email));
-
-    let disposed = false;
-    const run = async () => {
-      try {
-        const response = await fetch(
-          `/checkout/actions/internal-purchases?email=${encodeURIComponent(user.email)}`,
-          { cache: 'no-store' },
-        );
-        const data = (await response.json().catch(() => null)) as {
-          rows?: BuyerInternalOrderRecord[];
-        } | null;
-        if (!disposed && Array.isArray(data?.rows)) {
-          setRemoteInternal(data.rows);
-        }
-      } catch {
-        // soft-fail
-      }
-    };
-    void run();
-    return () => {
-      disposed = true;
-    };
-  }, [user?.email]);
-
   const mergedRows = useMemo(() => {
     const widgetRows = (payload?.rows || []).map(widgetToBuyerOrder);
-    const byCode = new Map<string, BuyerOrder>();
-
-    // Browser storage is only a snapshot. It must not override a refunded or cancelled finance order.
-    for (const row of localInternal) {
-      byCode.set(row.publicCode, internalToBuyerOrder({
-        ...row,
-        status: 'VERIFYING',
-        displayStatus: 'Статус уточняется',
-        statusTone: 'incomplete',
-      }));
-    }
-    for (const row of remoteInternal) byCode.set(row.publicCode, internalToBuyerOrder(row));
-    for (const row of widgetRows) {
-      if (!byCode.has(row.number)) byCode.set(row.number, row);
-    }
-
-    return Array.from(byCode.values()).sort((a, b) => {
-      const aTime = a.purchasedAt ? new Date(a.purchasedAt).getTime() : 0;
-      const bTime = b.purchasedAt ? new Date(b.purchasedAt).getTime() : 0;
-      return bTime - aTime;
-    });
-  }, [payload?.rows, localInternal, remoteInternal]);
+    return widgetRows;
+  }, [payload?.rows]);
 
   if (authLoading || !isLoggedIn) {
     return (
@@ -148,8 +52,7 @@ export function AccountPurchasesPageView() {
   }
 
   const totalPages = payload?.pages || 1;
-  const internalCount = mergedRows.filter((row) => row.sourceKind === 'internal').length;
-  const widgetCount = mergedRows.filter((row) => row.sourceKind !== 'internal').length;
+  const totalOrders = payload?.total ?? mergedRows.length;
 
   return (
     <>
@@ -221,11 +124,10 @@ export function AccountPurchasesPageView() {
             <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
               <div>
                 <h2 className="text-2xl font-bold text-slate-950">
-                  {formatCount(mergedRows.length, ['заказ', 'заказа', 'заказов'])}
+                  {formatCount(totalOrders, ['заказ', 'заказа', 'заказов'])}
                 </h2>
                 <p className="mt-1 text-sm text-slate-500">
                   Привязаны к email {user?.email}
-                  {internalCount || widgetCount ? ` · Дайбилет ${internalCount} · виджеты ${widgetCount}` : null}
                 </p>
                 <p className="mt-1.5 text-xs text-slate-400">{ORDER_SUPPORT_HINT}</p>
               </div>
