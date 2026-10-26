@@ -90,7 +90,7 @@ export type InternalAdminOrderDetail = {
   buyer: { name: string | null; email: string | null; phone: string | null };
   finance: {
     payments: Array<{ status: string; providerPaymentId: string | null; amountKopecks: number }>;
-    refunds: Array<{ status: string; amountKopecks: number; providerRefundId: string | null; createdAt: string | null }>;
+    refunds: Array<{ status: string; amountKopecks: number; reasonNote?: string | null; providerRefundId: string | null; createdAt: string | null }>;
   } | null;
 };
 

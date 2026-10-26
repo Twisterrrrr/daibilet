@@ -5,14 +5,14 @@ import {
   releaseReservedCapacityInTransaction,
   type YooKassaPaymentObject,
 } from './checkout-yookassa.js';
+import { finalizeYooKassaFullRefund, type YooKassaRefund } from './yookassa-refunds.js';
 
 type Operation = 'cancel' | 'refund';
-type ProviderRefund = { id: string; status: string; payment_id: string; amount?: { value?: string; currency?: string }; receipt_registration?: string };
+type ProviderRefund = YooKassaRefund;
 
 export class AdminOrderOperationError extends Error {
   constructor(readonly statusCode: number, readonly code: string) { super(code); }
 }
-
 function reject(code: string, statusCode = 409): never { throw new AdminOrderOperationError(statusCode, code); }
 
 function money(kopecks: number): string { return (kopecks / 100).toFixed(2); }
@@ -146,32 +146,6 @@ async function refundPaidOrder(orderId: string, reason: string) {
     return { status: 'FAILED', orderId };
   }
   if (remote.status !== 'succeeded') return { status: 'PROCESSING', orderId, refundId: remote.id };
-  await finalizeFullRefund({ orderId, requestId: request.id, paymentId: payment.id, supplierId: suppliers[0], amountKopecks: order.totalKopecks, commissionKopecks: order.commissionKopecks, providerRefund: remote });
+  await finalizeYooKassaFullRefund({ orderId, requestId: request.id, paymentId: payment.id, supplierId: suppliers[0], amountKopecks: order.totalKopecks, commissionKopecks: order.commissionKopecks, providerRefund: remote });
   return { status: 'REFUNDED', orderId, refundId: remote.id };
-}
-
-async function finalizeFullRefund(input: { orderId: string; requestId: string; paymentId: string; supplierId: string; amountKopecks: number; commissionKopecks: number; providerRefund: ProviderRefund }) {
-  await prisma.$transaction(async (tx) => {
-    const claimed = await tx.refundRequest.updateMany({ where: { id: input.requestId, status: { not: 'COMPLETED' } }, data: {
-      status: 'COMPLETED', processedAt: new Date(), providerRefundId: input.providerRefund.id,
-      providerPayload: input.providerRefund as unknown as Prisma.InputJsonValue,
-    } });
-    if (claimed.count !== 1) return;
-    const items = await tx.checkoutItem.findMany({ where: { checkoutOrderId: input.orderId, status: { in: ['CONFIRMED', 'FULFILLED'] } }, select: { id: true, eventId: true, sessionId: true, admissionProductId: true, quantity: true } });
-    for (const item of items) {
-      if (item.sessionId) await tx.eventSession.updateMany({ where: { id: item.sessionId, ticketsVacant: { not: null } }, data: { ticketsVacant: { increment: item.quantity }, capacitySold: { decrement: item.quantity } } });
-      if (item.eventId) await tx.event.updateMany({ where: { id: item.eventId, ticketsVacant: { not: null } }, data: { ticketsVacant: { increment: item.quantity } } });
-      if (item.admissionProductId) await tx.admissionProduct.updateMany({ where: { id: item.admissionProductId, ticketsVacant: { not: null } }, data: { ticketsVacant: { increment: item.quantity } } });
-    }
-    await tx.checkoutOrder.update({ where: { id: input.orderId }, data: { status: 'REFUNDED', cancelledAt: new Date(), checkoutUrl: null } });
-    await tx.issuedTicket.updateMany({
-      where: { checkoutOrderId: input.orderId, cancelledAt: null },
-      data: { cancelledAt: new Date() },
-    });
-    await tx.checkoutItem.updateMany({ where: { checkoutOrderId: input.orderId }, data: { status: 'REFUNDED' } });
-    await tx.fulfillmentItem.updateMany({ where: { checkoutOrderId: input.orderId }, data: { status: 'REFUNDED', refundedKopecks: input.amountKopecks, refundProviderId: input.providerRefund.id } });
-    await tx.payment.update({ where: { id: input.paymentId }, data: { status: 'REFUNDED' } });
-    await tx.supplierLedgerEntry.create({ data: { supplierId: input.supplierId, type: 'REFUND', amountKopecks: -input.amountKopecks, checkoutOrderId: input.orderId, paymentId: input.paymentId, referenceType: 'REFUND_REQUEST', referenceId: input.requestId, note: 'Полный возврат покупателю через ЮKassa' } });
-    if (input.commissionKopecks > 0) await tx.supplierLedgerEntry.create({ data: { supplierId: input.supplierId, type: 'COMMISSION', amountKopecks: input.commissionKopecks, checkoutOrderId: input.orderId, paymentId: input.paymentId, referenceType: 'REFUND_REQUEST', referenceId: input.requestId, note: 'Сторнирование комиссии по полному возврату' } });
-  });
 }

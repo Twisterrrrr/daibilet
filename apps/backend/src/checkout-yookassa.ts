@@ -15,6 +15,7 @@ import type {
 } from '@daibilet/contracts/checkout';
 import { prisma, type Prisma } from '@daibilet/db';
 import { buildInternalTicketNumbers } from './internal-ticket-numbers.js';
+import { confirmYooKassaRefundSucceeded, YooKassaRefundError } from './yookassa-refunds.js';
 import {
   checkoutItemResultSelect,
   checkoutOrderResultSelect,
@@ -936,7 +937,8 @@ export async function applyYooKassaWebhookPayload(
   const now = options.now || new Date();
   const config = options.config || readYooKassaRuntimeConfig();
   const event = extractYooKassaWebhookEvent(payload);
-  if (!event.paymentId) {
+  const isRefundSucceeded = event.eventType === 'refund.succeeded';
+  if (isRefundSucceeded ? !event.objectId : !event.paymentId) {
     return {
       generatedAt: now.toISOString(),
       event: event.eventType,
@@ -956,11 +958,43 @@ export async function applyYooKassaWebhookPayload(
   if (duplicateResult) return duplicateResult;
 
   try {
+    if (isRefundSucceeded) {
+      let confirmed;
+      try {
+        confirmed = await confirmYooKassaRefundSucceeded({
+          refundId: event.objectId!,
+          config,
+          ...(options.fetchImpl ? { fetchImpl: options.fetchImpl } : {}),
+          now,
+        });
+      } catch (error) {
+        if (error instanceof YooKassaRefundError) {
+          throw new YooKassaCheckoutError('YOOKASSA_PAYMENT_FAILED', error.statusCode, [], error.code);
+        }
+        throw error;
+      }
+      if (confirmed.remote.status !== 'succeeded') {
+        throw new YooKassaCheckoutError('YOOKASSA_PAYMENT_FAILED', 502, [], 'YooKassa refund is not yet succeeded');
+      }
+      await prisma.processedWebhookEvent.update({
+        where: { dedupeKey },
+        data: { paymentId: confirmed.paymentId, result: confirmed.result },
+      });
+      return {
+        generatedAt: now.toISOString(),
+        event: event.eventType,
+        providerPaymentId: confirmed.remote.payment_id,
+        paymentStatus: confirmed.remote.status,
+        orderId: confirmed.orderId,
+        publicCode: confirmed.publicCode,
+        result: 'processed',
+      };
+    }
     const paymentObject = config.verifyWebhook
       ? await getYooKassaPayment({
           config,
           ...(options.fetchImpl ? { fetchImpl: options.fetchImpl } : {}),
-          paymentId: event.paymentId,
+          paymentId: event.paymentId!,
         })
       : event.paymentObject;
     assertYooKassaWebhookPaymentMatches(event, paymentObject);
@@ -2039,6 +2073,7 @@ function mapYooKassaAdmissionCheckoutResult(input: {
 function extractYooKassaWebhookEvent(payload: unknown): {
   providerEventId: string | null;
   eventType: string;
+  objectId: string | null;
   paymentId: string | null;
   status: string | null;
   paymentObject: YooKassaPaymentObject;
@@ -2050,7 +2085,10 @@ function extractYooKassaWebhookEvent(payload: unknown): {
   return {
     providerEventId: cleanString(rawPayload.id) || cleanString(rawPayload.event_id) || cleanString(rawPayload.notification_id),
     eventType: cleanString(rawPayload.event) || 'payment.unknown',
-    paymentId: cleanString(object.id),
+    objectId: cleanString(object.id),
+    paymentId: cleanString(rawPayload.event) === 'refund.succeeded'
+      ? cleanString(object.payment_id)
+      : cleanString(object.id),
     status: cleanString(object.status),
     paymentObject,
     rawPayload,
@@ -2059,7 +2097,7 @@ function extractYooKassaWebhookEvent(payload: unknown): {
 
 function buildYooKassaWebhookDedupeKey(event: ReturnType<typeof extractYooKassaWebhookEvent>): string {
   if (event.providerEventId) return `yookassa:event:${event.providerEventId}`;
-  return `yookassa:${event.eventType}:${event.paymentId}:${event.status || 'unknown'}`;
+  return `yookassa:${event.eventType}:${event.objectId || event.paymentId}:${event.status || 'unknown'}`;
 }
 
 function assertYooKassaWebhookPaymentMatches(

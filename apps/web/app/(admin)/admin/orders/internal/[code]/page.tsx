@@ -63,13 +63,13 @@ export default async function InternalAdminOrderPage({ params, searchParams }: P
         <h3 className="text-sm font-semibold text-slate-900">Платёж и возврат</h3>
         <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-3">
           <div><dt className="text-xs text-slate-500">Платежи</dt><dd>{detail.finance?.payments?.map((item) => item.status).join(', ') || '—'}</dd></div>
-          <div><dt className="text-xs text-slate-500">Заявка на возврат</dt><dd>{detail.finance?.refunds?.map((item) => item.status).join(', ') || '—'}</dd></div>
+          <div><dt className="text-xs text-slate-500">Заявка на возврат</dt><dd>{detail.finance?.refunds?.map((item) => item.status).join(', ') || '—'}</dd>{detail.finance?.refunds?.[0]?.reasonNote ? <p className="mt-1 text-xs text-slate-600">Причина: {detail.finance.refunds[0].reasonNote}</p> : null}</div>
           <div><dt className="text-xs text-slate-500">Билет покупателя</dt><dd><Link className="text-sky-700 hover:underline" href={`https://daibilet.ru/checkout/ticket/${encodeURIComponent(detail.publicCode)}`}>Проверить билет</Link></dd></div>
         </dl>
       </section>
       {cancellable || refundable ? <section className="rounded-xl border border-amber-300 bg-amber-50 p-4">
-        <h2 className="font-semibold">{cancellable ? 'Отменить неоплаченный заказ' : refund ? 'Проверить состояние возврата' : 'Вернуть всю сумму покупателю'}</h2>
-        <p className="mt-1 text-sm text-slate-700">{cancellable ? 'ЮKassa отменит незавершённый платёж, бронь освободится, билет станет недействительным.' : 'Полный возврат через ЮKassa. После успешного возврата билет погасится, баланс поставщика пересчитается.'}</p>
+        <h2 className="font-semibold">{cancellable ? 'Отменить неоплаченный заказ' : refund?.status === 'PROCESSING' ? 'Проверить состояние возврата' : refund ? 'Подтвердить и отправить возврат' : 'Вернуть всю сумму покупателю'}</h2>
+        <p className="mt-1 text-sm text-slate-700">{cancellable ? 'ЮKassa отменит незавершённый платёж, бронь освободится, билет станет недействительным.' : refund?.status === 'PROCESSING' ? 'ЮKassa уже получила запрос. Повторная проверка использует тот же ключ идемпотентности.' : 'Покупатель запросил возврат. Подтверждение отправит полный возврат в ЮKassa; билет и ledger изменятся только после подтверждённого успеха.'}</p>
         <form action={operateInternalAdminOrderAction} className="mt-4 grid max-w-lg gap-3">
           <input type="hidden" name="orderKey" value={detail.publicCode} />
           <input type="hidden" name="operation" value={cancellable ? 'cancel' : 'refund'} />
@@ -79,7 +79,7 @@ export default async function InternalAdminOrderPage({ params, searchParams }: P
           <label className="grid gap-1 text-sm">Введите код заказа {detail.publicCode} для подтверждения
             <input name="confirmCode" required autoComplete="off" className="rounded-md border border-slate-300 bg-white p-2" />
           </label>
-          <button type="submit" className="w-fit rounded-md bg-red-700 px-4 py-2 text-sm font-medium text-white hover:bg-red-800">{cancellable ? 'Отменить заказ' : refund ? 'Проверить возврат' : 'Вернуть всю сумму'}</button>
+          <button type="submit" className="w-fit rounded-md bg-red-700 px-4 py-2 text-sm font-medium text-white hover:bg-red-800">{cancellable ? 'Отменить заказ' : refund?.status === 'PROCESSING' ? 'Проверить статус' : refund ? 'Подтвердить и отправить в ЮKassa' : 'Вернуть всю сумму'}</button>
         </form>
       </section> : null}
       {detail.status === 'REFUNDED' || detail.status === 'CANCELLED' ? <p className="text-sm text-slate-600">Заказ закрыт; билет покупателя должен отображаться как недействительный.</p> : null}

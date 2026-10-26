@@ -13,6 +13,8 @@ import {
 import { upsertInternalOrderInStorage } from '@/lib/buyer-checkout';
 import { buyerTicketPath, openBuyerTicketDownload } from '@/lib/buyer-ticket';
 import { formatNumber } from '@/lib/format';
+import { requestBuyerRefund } from '@/lib/user-api';
+import { useState } from 'react';
 
 /** Product support inbox (ContactForm + empty-state mailto). */
 export const BUYER_SUPPORT_EMAIL = 'info@daibilet.ru';
@@ -41,6 +43,17 @@ export type BuyerOrder = {
   amountRub?: number | null;
   ticketCount: number;
   message?: string | null;
+  refundRequests?: Array<{
+    id: string;
+    status: string;
+    amountKopecks: number;
+    currency: string;
+    reason: string;
+    reasonNote?: string | null;
+    createdAt?: string | null;
+    updatedAt?: string | null;
+    processedAt?: string | null;
+  }>;
   tickets: Array<{
     id: string;
     number?: string | null;
@@ -56,9 +69,16 @@ type Props = {
   order: BuyerOrder;
   /** Unmasked account email (API masks buyer.email on widget rows). */
   accountEmail?: string | null;
+  accessToken?: string | null;
 };
 
-export function BuyerOrderCard({ order, accountEmail }: Props) {
+export function BuyerOrderCard({ order, accountEmail, accessToken }: Props) {
+  const [refundFormOpen, setRefundFormOpen] = useState(false);
+  const [refundConfirm, setRefundConfirm] = useState(false);
+  const [refundReason, setRefundReason] = useState('');
+  const [refundLoading, setRefundLoading] = useState(false);
+  const [refundError, setRefundError] = useState<string | null>(null);
+  const [submittedRefund, setSubmittedRefund] = useState<{ status: string; amountKopecks: number } | null>(null);
   const isInternal = order.sourceKind === 'internal';
   const title = order.eventTitle || (isInternal ? 'Входной билет' : 'Заказ');
   const purchaseLabel = formatPurchaseDateTime(order.purchasedAt);
@@ -83,6 +103,13 @@ export function BuyerOrderCard({ order, accountEmail }: Props) {
   const showEmailFallback = Boolean(importAssessment && importAssessment.richness === 'sparse');
   const showNativeTicketActions = isInternal && ['CONFIRMED', 'FULFILLED', 'SUCCEEDED', 'PAID'].includes(String(order.status || '').toUpperCase());
   const showTicketActions = showNativeTicketActions || showImportTicketActions;
+  const latestRefund = order.refundRequests?.[0] || null;
+  const displayedRefund = submittedRefund || latestRefund;
+  const refundIsOpen = Boolean(displayedRefund && ['CREATED', 'APPROVED', 'PROCESSING'].includes(displayedRefund.status));
+  const hasCompletedRefund = Boolean(displayedRefund && displayedRefund.status === 'COMPLETED');
+  const canRequestRefund = Boolean(
+    accessToken && isInternal && (!displayedRefund || ['REJECTED', 'FAILED'].includes(displayedRefund.status)) && ['CONFIRMED', 'FULFILLED', 'SUCCEEDED', 'PAID'].includes(String(order.status).toUpperCase()),
+  );
 
   const reviewHref = buildOrderReviewHref(order);
   const showReview = Boolean(reviewHref && orderEventHasStarted(order));
@@ -116,6 +143,23 @@ export function BuyerOrderCard({ order, accountEmail }: Props) {
     const code = openImportTicket();
     if (!code) {
       event.preventDefault();
+    }
+  };
+
+  const submitRefundRequest = async () => {
+    if (!accessToken || !order.number) return;
+    setRefundLoading(true);
+    setRefundError(null);
+    try {
+      const result = await requestBuyerRefund(accessToken, order.number, refundReason.trim());
+      setSubmittedRefund({ status: result.status, amountKopecks: result.amountKopecks });
+      setRefundFormOpen(false);
+      setRefundConfirm(false);
+      setRefundReason('');
+    } catch (error) {
+      setRefundError(refundRequestErrorLabel(error instanceof Error ? error.message : String(error)));
+    } finally {
+      setRefundLoading(false);
     }
   };
 
@@ -255,8 +299,74 @@ export function BuyerOrderCard({ order, accountEmail }: Props) {
           Билеты по этому заказу пока не найдены. Для отмененных или истекших заказов это нормально.
         </p>
       ) : null}
+
+      {displayedRefund ? (
+        <div className="border-t border-amber-100 bg-amber-50/70 px-4 py-3 text-xs leading-5 text-amber-950">
+          <span className="font-semibold">Заявка на возврат: {refundStatusLabel(displayedRefund.status)}.</span>{' '}
+          {displayedRefund.amountKopecks > 0 ? `Сумма ${formatNumber(displayedRefund.amountKopecks / 100)} ₽. ` : ''}
+          {refundIsOpen ? 'Это запрос на рассмотрение, деньги ещё не возвращены.' : hasCompletedRefund ? 'Возврат подтверждён, билет недействителен.' : 'Можно отправить новый запрос.'}
+        </div>
+      ) : null}
+
+      {canRequestRefund ? (
+        <div className="border-t border-slate-100 px-4 py-3">
+          {!refundFormOpen ? (
+            <button type="button" onClick={() => setRefundFormOpen(true)} className="text-sm font-semibold text-primary-700 hover:text-primary-800">
+              Запросить полный возврат
+            </button>
+          ) : (
+            <div className="max-w-xl rounded-xl border border-slate-200 bg-white p-4">
+              <h3 className="text-sm font-semibold text-slate-900">Запрос на полный возврат</h3>
+              <p className="mt-1 text-xs leading-5 text-slate-600">
+                Сумма заказа: {amountLabel || 'не рассчитана'}. Запрос уйдёт на рассмотрение; деньги не списываются и не возвращаются этой формой.
+              </p>
+              <label className="mt-3 grid gap-1 text-xs font-medium text-slate-700">
+                Причина запроса
+                <textarea value={refundReason} onChange={(event) => setRefundReason(event.target.value)} maxLength={500} minLength={5} className="min-h-20 rounded-lg border border-slate-300 p-2 text-sm font-normal" placeholder="Опишите причину (от 5 до 500 символов)" />
+              </label>
+              {refundError ? <p role="alert" className="mt-2 text-xs text-red-700">{refundError}</p> : null}
+              {refundConfirm ? (
+                <div className="mt-3 rounded-lg bg-amber-50 p-3 text-xs leading-5 text-amber-950">
+                  Подтвердите отправку запроса на полный возврат. После рассмотрения статус обновится в этом заказе.
+                </div>
+              ) : null}
+              <div className="mt-3 flex flex-wrap gap-2">
+                {refundConfirm ? (
+                  <button type="button" disabled={refundLoading} onClick={() => void submitRefundRequest()} className="rounded-lg bg-primary-700 px-3 py-2 text-xs font-semibold text-white disabled:opacity-50">
+                    {refundLoading ? 'Отправляем…' : 'Отправить запрос'}
+                  </button>
+                ) : (
+                  <button type="button" disabled={refundReason.trim().length < 5} onClick={() => setRefundConfirm(true)} className="rounded-lg bg-primary-700 px-3 py-2 text-xs font-semibold text-white disabled:opacity-50">
+                    Продолжить
+                  </button>
+                )}
+                <button type="button" disabled={refundLoading} onClick={() => { setRefundFormOpen(false); setRefundConfirm(false); setRefundError(null); }} className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-700 disabled:opacity-50">Отмена</button>
+              </div>
+            </div>
+          )}
+        </div>
+      ) : null}
     </article>
   );
+}
+
+function refundStatusLabel(status: string): string {
+  switch (status) {
+    case 'CREATED': return 'на рассмотрении';
+    case 'APPROVED': return 'одобрена, ожидает исполнения';
+    case 'PROCESSING': return 'обрабатывается';
+    case 'COMPLETED': return 'завершена';
+    case 'REJECTED': return 'отклонена';
+    case 'FAILED': return 'не выполнена';
+    default: return 'обновляется';
+  }
+}
+
+function refundRequestErrorLabel(error: string): string {
+  if (error === 'refund_request_blocked') return 'Этот заказ сейчас нельзя отправить на возврат. Обратитесь в поддержку.';
+  if (error === 'checkout_order_not_found') return 'Заказ не найден или недоступен для этого аккаунта.';
+  if (error === 'refund_reason_note_invalid') return 'Укажите причину длиной от 5 до 500 символов.';
+  return 'Не удалось отправить запрос. Попробуйте позже.';
 }
 
 export function BuyerOrdersEmptyState({ lookup }: { lookup: string }) {

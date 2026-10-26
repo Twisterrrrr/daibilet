@@ -284,6 +284,17 @@ export interface BuyerPurchaseRowDto {
   ticketCount: number;
   artifactStatus: string;
   message: string | null;
+  refundRequests: Array<{
+    id: string;
+    status: string;
+    amountKopecks: number;
+    currency: string;
+    reason: string;
+    reasonNote: string | null;
+    createdAt: string | null;
+    updatedAt: string | null;
+    processedAt: string | null;
+  }>;
   tickets: Array<{
     id: string;
     number: string | null;
@@ -581,6 +592,105 @@ export async function createAdminPurchaseRefundRequest(
   return mapCheckoutOrderToAdminPurchaseDetail(updated, await loadCheckoutOrderLedger(updated.id));
 }
 
+export async function createBuyerPurchaseRefundRequest(input: {
+  publicCode: string;
+  siteUserId: string;
+  email: string;
+  emailVerified: boolean;
+  reasonNote: string;
+}): Promise<{ requestId: string; status: string; amountKopecks: number; currency: string; createdAt: string }> {
+  const publicCode = cleanString(input.publicCode);
+  const siteUserId = cleanString(input.siteUserId);
+  const email = normalizeEmail(input.email);
+  const reasonNote = cleanString(input.reasonNote) || '';
+  if (!publicCode || !siteUserId) throw statusError(400, 'refund_request_invalid');
+  if (reasonNote.length < 5 || reasonNote.length > 500) throw statusError(400, 'refund_reason_note_invalid');
+
+  try {
+    return await prisma.$transaction(async (tx) => {
+      const ownershipWhere = buyerCheckoutOrderOwnershipWhere({
+        publicCode,
+        siteUserId,
+        email,
+        emailVerified: input.emailVerified,
+      });
+      const row = await tx.checkoutOrder.findFirst({ where: ownershipWhere, include: checkoutOrderInclude });
+      if (!row) throw statusError(404, 'checkout_order_not_found');
+
+      const ledgerRows = await tx.supplierLedgerEntry.findMany({
+        where: { checkoutOrderId: row.id },
+        orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+        include: { supplier: { select: { id: true, title: true } } },
+      });
+      const decision = resolveRefundRequestDecision(row, ledgerRows, { reason: 'USER_REQUEST' });
+      const blockers = [
+        ...decision.blockers,
+        ...(row.items.length !== 1 ? ['multi_item_refund_requires_manual_review'] : []),
+        ...(row.fulfillmentItems.length !== 1 ? ['multi_fulfillment_refund_requires_manual_review'] : []),
+        ...(ledgerRows.some((entry) => String(entry.type) === 'PAYOUT') ? ['supplier_already_paid_manual_review'] : []),
+        ...(decision.amountKopecks !== row.totalKopecks ? ['full_refund_only'] : []),
+        ...(row.payments.filter((payment) => String(payment.status) === 'SUCCEEDED').length !== 1 ? ['multiple_payments_manual_review'] : []),
+      ];
+      if (blockers.length) {
+        const error = statusError(409, 'refund_request_blocked');
+        (error as Error & { blockers?: string[] }).blockers = uniqueSorted(blockers);
+        throw error;
+      }
+
+      const created = await tx.refundRequest.create({
+        data: {
+          checkoutOrderId: row.id,
+          fulfillmentItemId: decision.fulfillmentItemId,
+          paymentId: decision.paymentId,
+          supplierId: decision.supplierId,
+          createdByUserId: siteUserId,
+          amountKopecks: row.totalKopecks,
+          currency: row.currency,
+          reason: 'USER_REQUEST',
+          reasonNote,
+          createdByType: 'USER',
+          status: 'CREATED',
+        },
+        select: { id: true, status: true, amountKopecks: true, currency: true, createdAt: true },
+      });
+      return {
+        requestId: created.id,
+        status: String(created.status),
+        amountKopecks: created.amountKopecks,
+        currency: created.currency,
+        createdAt: created.createdAt.toISOString(),
+      };
+    }, { isolationLevel: 'Serializable' });
+  } catch (error) {
+    if ((error as { code?: string }).code === 'P2034') {
+      const conflict = statusError(409, 'refund_already_open');
+      (conflict as Error & { blockers?: string[] }).blockers = ['refund_already_open'];
+      throw conflict;
+    }
+    throw error;
+  }
+}
+
+export function buyerCheckoutOrderOwnershipWhere(input: {
+  publicCode: string;
+  siteUserId: string;
+  email: string;
+  emailVerified: boolean;
+}): Prisma.CheckoutOrderWhereInput {
+  const publicCode = cleanString(input.publicCode);
+  const siteUserId = cleanString(input.siteUserId);
+  const email = normalizeEmail(input.email);
+  return {
+    publicCode,
+    OR: [
+      { siteUserId },
+      ...(input.emailVerified && email
+        ? [{ siteUserId: null, buyerEmail: { equals: email, mode: 'insensitive' as const } }]
+        : []),
+    ],
+  };
+}
+
 async function loadCheckoutOrderForAdminDetail(orderKey: string): Promise<CheckoutOrderRow | null> {
   const checkoutRow = await prisma.checkoutOrder.findFirst({
     where: {
@@ -616,7 +726,34 @@ export async function buildBuyerPurchasesListDto(input: {
   const total = allRows.length;
   const pages = Math.max(1, Math.ceil(total / limit));
   const safePage = Math.min(page, pages);
-  const rows = allRows.slice((safePage - 1) * limit, safePage * limit).map(mapBuyerPurchaseRow);
+  const pageRows = allRows.slice((safePage - 1) * limit, safePage * limit);
+  const internalOrderIds = pageRows.filter((row) => row.sourceKind === 'internal').map((row) => row.id);
+  const refundRows = internalOrderIds.length
+    ? await prisma.refundRequest.findMany({
+      where: { checkoutOrderId: { in: internalOrderIds } },
+      orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+      select: {
+        id: true,
+        checkoutOrderId: true,
+        status: true,
+        amountKopecks: true,
+        currency: true,
+        reason: true,
+        reasonNote: true,
+        createdAt: true,
+        updatedAt: true,
+        processedAt: true,
+      },
+    })
+    : [];
+  const refundsByOrder = new Map<string, typeof refundRows>();
+  for (const refund of refundRows) {
+    if (!refund.checkoutOrderId) continue;
+    const existing = refundsByOrder.get(refund.checkoutOrderId) || [];
+    existing.push(refund);
+    refundsByOrder.set(refund.checkoutOrderId, existing);
+  }
+  const rows = pageRows.map((row) => mapBuyerPurchaseRow(row, refundsByOrder.get(row.id) || []));
 
   return {
     generatedAt: new Date().toISOString(),
@@ -1145,7 +1282,20 @@ function mapExternalOrderToAdminPurchaseRow(
   };
 }
 
-function mapBuyerPurchaseRow(row: AdminPurchaseRowDto): BuyerPurchaseRowDto {
+function mapBuyerPurchaseRow(
+  row: AdminPurchaseRowDto,
+  refundRows: Array<{
+    id: string;
+    status: string;
+    amountKopecks: number;
+    currency: string;
+    reason: string;
+    reasonNote: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+    processedAt: Date | null;
+  }> = [],
+): BuyerPurchaseRowDto {
   const primaryTicket = row.tickets.find((ticket) => ticket.eventTitle || ticket.eventId) || row.tickets[0] || null;
   const eventUrl = primaryTicket?.eventSlug
     ? `/events/${encodeURIComponent(primaryTicket.eventSlug)}`
@@ -1177,6 +1327,17 @@ function mapBuyerPurchaseRow(row: AdminPurchaseRowDto): BuyerPurchaseRowDto {
     ticketCount: row.ticketCount,
     artifactStatus: row.artifactStatus,
     message: buyerPurchaseMessage(row),
+    refundRequests: refundRows.map((refund) => ({
+      id: refund.id,
+      status: String(refund.status),
+      amountKopecks: refund.amountKopecks,
+      currency: refund.currency,
+      reason: String(refund.reason),
+      reasonNote: refund.reasonNote,
+      createdAt: toIso(refund.createdAt),
+      updatedAt: toIso(refund.updatedAt),
+      processedAt: toIso(refund.processedAt),
+    })),
     tickets: row.tickets.map((ticket) => ({
       id: ticket.id,
       number: ticket.externalTicketId,

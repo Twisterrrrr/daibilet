@@ -492,6 +492,37 @@ test('YooKassa webhook rejects mismatched payment object id', async (t) => {
   }
 });
 
+test('refund.succeeded webhook verifies provider refund object before processing', async (t) => {
+  if (!await canReachDatabase()) {
+    t.skip('database is not available');
+    return;
+  }
+  const suffix = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  const providerEventId = `refund_notif_${suffix}`;
+  const refundId = `refund_${suffix}`;
+  try {
+    await assert.rejects(() => applyYooKassaWebhookPayload({
+      id: providerEventId,
+      event: 'refund.succeeded',
+      object: { id: refundId, payment_id: `payment_${suffix}`, status: 'succeeded' },
+    }, {
+      config: readYooKassaRuntimeConfig({
+        NODE_ENV: 'test', DAIBILET_YOOKASSA_CHECKOUT: '1',
+        YOOKASSA_SHOP_ID: 'shop_123', YOOKASSA_SECRET_KEY: 'test_secret',
+      } as NodeJS.ProcessEnv),
+      fetchImpl: async () => new Response(JSON.stringify({
+        id: `different_${refundId}`, payment_id: `payment_${suffix}`, status: 'succeeded',
+        amount: { value: '1.00', currency: 'RUB' },
+      }), { status: 200, headers: { 'content-type': 'application/json' } }),
+      now,
+    }), (error: unknown) => isYooKassaCheckoutError(error) && error.statusCode === 502);
+    const journal = await prisma.processedWebhookEvent.findUnique({ where: { dedupeKey: `yookassa:event:${providerEventId}` }, select: { result: true } });
+    assert.equal(journal?.result, 'FAILED');
+  } finally {
+    await prisma.processedWebhookEvent.deleteMany({ where: { providerEventId } });
+  }
+});
+
 test('YooKassa admission checkout creates pending payment and preserves idempotency', async (t) => {
   if (!await canReachDatabase()) {
     t.skip('database is not available');

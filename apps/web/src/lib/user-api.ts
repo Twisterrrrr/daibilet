@@ -115,6 +115,17 @@ export type AccountPurchasesPayload = {
     amountRub?: number | null;
     ticketCount: number;
     message?: string | null;
+    refundRequests?: Array<{
+      id: string;
+      status: string;
+      amountKopecks: number;
+      currency: string;
+      reason: string;
+      reasonNote?: string | null;
+      createdAt?: string | null;
+      updatedAt?: string | null;
+      processedAt?: string | null;
+    }>;
     tickets: Array<{
       id: string;
       number?: string | null;
@@ -133,6 +144,20 @@ export type AccountPurchasesPayload = {
     emailVerified?: boolean | null;
   } | null;
 };
+
+export function requestBuyerRefund(token: string, publicCode: string, reasonNote: string) {
+  return fetchUserApi<{
+    requestId: string;
+    status: string;
+    amountKopecks: number;
+    currency: string;
+    createdAt: string;
+  }>(`/api/account/purchases/${encodeURIComponent(publicCode)}/refunds`, {
+    method: 'POST',
+    headers: { authorization: `Bearer ${token}` },
+    body: JSON.stringify({ reasonNote }),
+  });
+}
 
 export function accountPurchases(token: string, params?: { page?: number; limit?: number }) {
   const search = new URLSearchParams();
