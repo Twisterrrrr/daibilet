@@ -51,6 +51,7 @@ src/lib/city-hub-lazy.test.ts
 src/lib/city-hub-registry.test.ts
 # Finance buyer DTO must preserve the separate issued ticket number.
 src/server/finance-checkout-client.test.ts
+src/lib/user-api.test.ts
 src/server/checkout-order-access.test.ts
 app/api/public/checkout/yookassa/route.test.ts
 app/api/public/checkout/orders/[publicCode]/route.test.ts

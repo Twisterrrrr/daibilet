@@ -86,6 +86,14 @@ export function resetUserPassword(token: string, password: string) {
   });
 }
 
+export function changeUserPassword(token: string, currentPassword: string, newPassword: string) {
+  return fetchUserApi<{ changed: boolean }>('/api/user/auth/change-password', {
+    method: 'POST',
+    headers: { authorization: `Bearer ${token}` },
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+}
+
 export type AccountPurchasesPayload = {
   total: number;
   rows: Array<{

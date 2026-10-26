@@ -16,6 +16,7 @@ function resolveReturnUrl(searchParams: URLSearchParams) {
 export function LoginPageView() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const passwordChangedNotice = searchParams.get('passwordChanged') === '1';
   const { login, register, isLoggedIn, isLoading: authLoading } = useUserAuth();
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
@@ -60,6 +61,11 @@ export function LoginPageView() {
         <p className="mt-2 text-sm leading-6 text-slate-500">
           {mode === 'login' ? BUYER_LOGIN_INTRO : BUYER_REGISTER_INTRO}
         </p>
+        {passwordChangedNotice && mode === 'login' ? (
+          <div className="mt-5 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800" role="status">
+            Пароль изменён. Войдите с новым паролем.
+          </div>
+        ) : null}
 
         <form onSubmit={submit} className="mt-8 space-y-4">
           {error ? (

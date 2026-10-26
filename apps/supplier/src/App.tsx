@@ -304,7 +304,7 @@ export function App() {
               <Route path="finance" element={<FinancePage supplierKey={supplierKey} />} />
               <Route path="documents" element={<DocumentsPage supplierKey={supplierKey} />} />
               <Route path="reviews" element={<ReviewsPage supplierKey={supplierKey} />} />
-              <Route path="profile" element={<ProfilePage supplierKey={supplierKey} canEditRequisites={permissions.canEditRequisites} onPasswordChanged={handlePasswordChanged} />} />
+              <Route path="profile" element={<ProfilePage supplierKey={supplierKey} accessToken={accessToken} canEditRequisites={permissions.canEditRequisites} onPasswordChanged={handlePasswordChanged} />} />
               <Route path="terms" element={<SupplierTermsPage supplierKey={supplierKey} />} />
               <Route path="team" element={<TeamPage supplierKey={supplierKey} />} />
               <Route path="integrations" element={<IntegrationsPage supplierKey={supplierKey} />} />
@@ -1729,7 +1729,7 @@ function ReviewsPage({ supplierKey }: { supplierKey: string }) {
   );
 }
 
-function ProfilePage({ supplierKey, canEditRequisites, onPasswordChanged }: { supplierKey: string; canEditRequisites: boolean; onPasswordChanged: () => void }) {
+function ProfilePage({ supplierKey, accessToken, canEditRequisites, onPasswordChanged }: { supplierKey: string; accessToken: string; canEditRequisites: boolean; onPasswordChanged: () => void }) {
   const { data, loading, error, reload } = useSupplierResource<SupplierPortalProfileDto>('/api/supplier/profile', supplierKey);
 
   if (loading && !data) return <LoadingState label="Загружаем реквизиты..." />;
@@ -1763,13 +1763,13 @@ function ProfilePage({ supplierKey, canEditRequisites, onPasswordChanged }: { su
       </section>
       <section className="panel">
         <div className="panel-header"><h2>Безопасность аккаунта</h2></div>
-        <PasswordChangeForm onPasswordChanged={onPasswordChanged} />
+        <PasswordChangeForm accessToken={accessToken} onPasswordChanged={onPasswordChanged} />
       </section>
     </div>
   );
 }
 
-function PasswordChangeForm({ onPasswordChanged }: { onPasswordChanged: () => void }) {
+function PasswordChangeForm({ accessToken, onPasswordChanged }: { accessToken: string; onPasswordChanged: () => void }) {
   const [currentPassword, setCurrentPassword] = React.useState('');
   const [newPassword, setNewPassword] = React.useState('');
   const [confirmation, setConfirmation] = React.useState('');
@@ -1783,7 +1783,7 @@ function PasswordChangeForm({ onPasswordChanged }: { onPasswordChanged: () => vo
     if (newPassword === currentPassword) { setError('Новый пароль должен отличаться от текущего.'); return; }
     setLoading(true);
     try {
-      await supplierPost('/api/user/auth/change-password', { currentPassword, newPassword });
+      await supplierPost('/api/user/auth/change-password', { currentPassword, newPassword }, accessToken);
       onPasswordChanged();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Не удалось изменить пароль.');
