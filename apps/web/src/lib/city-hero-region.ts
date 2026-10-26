@@ -23,6 +23,7 @@ const REGION_MACRO_LABEL: Record<string, string> = {
   'krasnoyarskiy-kray': 'Сибирь',
   'irkutskaya-oblast': 'Сибирь',
   'kemerovskaya-oblast': 'Сибирь',
+  'omskaya-oblast': 'Сибирь',
   'altayskiy-kray': 'Сибирь',
   'tomskaya-oblast': 'Сибирь',
   'habarovskiy-kray': 'Дальний Восток',
