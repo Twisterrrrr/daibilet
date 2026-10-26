@@ -736,7 +736,7 @@ const SAMARA_SLIDES: CityIdentitySlide[] = [
     title: 'Песни Жигулей',
     text: 'Колыбель бардовской песни, палаточного романтизма и гитарных фестивалей. Дух свободы, костров, уличных музыкантов на набережной и локального стрит-арта.',
     imageSrc: '/images/venues/samara/identity-art.jpg',
-    imageAlt: 'Музыканты и бардовский дух на самарской набережной',
+    imageAlt: 'Палаточный городок Грушинского фестиваля на Мастрюковских озёрах',
     slugs: [
       'samara-samarskaya-naberezhnaya',
       'samara-shiryaevo-samarskaya-luka',
