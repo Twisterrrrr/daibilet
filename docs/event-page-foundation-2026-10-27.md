@@ -139,23 +139,26 @@ order, and is placed after the main event description. In preview, the dynamic
 placeholder; dates and prices remain sourced from catalog/session data. This is
 editor behavior is connected to the public runtime after explicit publication.
 
-### ID-free EventPage slug rule (2026-10-27)
+### EventPage slug rule (2026-10-27)
 
-New EventPage drafts now start with a candidate slug that removes a recognized
+New EventPage drafts start with a candidate slug that removes a recognized
 Ticketscloud 24-character source ID or a numeric Teplohod ID only when it
-matches the internal `evt_tep_<id>` identity. The provider identity remains on
-the Event/slot records. The EventPage slug is currently internal and does not
-change the public URL, canonical, or sitemap.
+matches the internal `evt_tep_<id>` identity. For a single-Event page, creation
+appends the transliterated catalog city name (for example `-ufa` or `-perm`) unless it is
+already present. A same-city collision gets the first free `-2`, `-3`, etc.
+suffix; existing allocations are never renumbered. A multi-Event page does not
+get a city suffix because it may cover multiple cities; its slug remains an
+editor-reviewed choice. The provider identity remains on the Event/slot
+records. These candidate slugs are internal and do not change public URLs,
+canonical tags, or sitemap.
 
 A dry-run over the 27.10 event-sitemap snapshot found 4,250 matched records with
 an active session and offer. Removing source IDs yields 219 candidate-slug
 collision groups covering 809 Event IDs. Adding the city would still leave 89
 groups covering 222 IDs. Therefore slug equality is not enough to merge records.
-When separate drafts request the same candidate slug, allocate the first free
-`-2`, `-3`, etc. suffix under a transaction lock and keep the Events separate.
-The allocated suffix is stored and never renumbered. The admin can later review
-whether exact slots belong on one EventPage. The 78 current sitemap URLs without
-a catalog match are outside this current-sale drafting pass.
+The admin can later review whether exact slots belong on one EventPage. The 78
+current sitemap URLs without a catalog match are outside this current-sale
+drafting pass.
 
 ## Next implementation slice
 

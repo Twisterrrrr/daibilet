@@ -84,7 +84,7 @@ export function AdminEventPageEditor({ eventId, eventSlug, eventTitle, sourceDes
       setPage(created);
       setSlug(created.slug);
       setTitle(created.title);
-      setSlugNotice(created.slug === slug ? '' : `Кандидат slug уже занят. Создан отдельный черновик «${created.slug}»; события не объединялись. Проверь связь перед дальнейшей работой.`);
+      setSlugNotice(created.slug === slug ? '' : `Для черновика выделен безопасный slug «${created.slug}». Город добавляется автоматически; при совпадении в этом городе используется суффикс -2, -3 и далее. События не объединялись.`);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Не удалось создать страницу события.');
     } finally {
@@ -175,9 +175,9 @@ export function AdminEventPageEditor({ eventId, eventSlug, eventTitle, sourceDes
       <p className="mt-1 text-xs text-slate-600">Существующий текст PDP будет скопирован в черновик, если он уже есть. Исходное описание и текущая публичная страница останутся нетронутыми.</p>
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <AdminField label="Название страницы"><input className={adminInputClass} value={title} onChange={(event) => setTitle(event.target.value)} /></AdminField>
-        <AdminField label="Кандидат slug EventPage"><input className={adminInputClass} value={slug} onChange={(event) => setSlug(event.target.value)} /></AdminField>
+        <AdminField label="Кандидат slug EventPage"><input className={adminInputClass} value={slug} onChange={(event) => setSlug(event.target.value)} /><small>Для одиночного события город добавится при создании; коллизия в том же городе получит -2, -3 и далее.</small></AdminField>
       </div>
-      <p className="mt-2 text-xs text-slate-600">Код источника убирается, только если совпадает с ID Event. Это пока внутренний slug: публичный URL, canonical и sitemap не меняются. Если кандидат занят, система выдаст следующий суффикс, например -2; записи останутся раздельными для проверки.</p>
+      <p className="mt-2 text-xs text-slate-600">Код источника убирается, только если совпадает с ID Event. К одиночному событию добавится город; при совпадении в том же городе — -2, -3 и далее. Это внутренний slug: публичный URL, canonical и sitemap не меняются.</p>
       <button
         type="button"
         className="inline-flex items-center rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
@@ -189,7 +189,7 @@ export function AdminEventPageEditor({ eventId, eventSlug, eventTitle, sourceDes
     </div> : <>
       <div className="grid gap-3 sm:grid-cols-2">
         <AdminField label="Название страницы"><input className={adminInputClass} value={title} onChange={(event) => setTitle(event.target.value)} /></AdminField>
-        <AdminField label="Кандидат slug EventPage"><input className={adminInputClass} value={slug} onChange={(event) => setSlug(event.target.value)} /></AdminField>
+        <AdminField label="Кандидат slug EventPage"><input className={adminInputClass} value={slug} onChange={(event) => setSlug(event.target.value)} /><small>Slug черновика включает город, если это одиночное событие; одинаковые названия в одном городе получают -2, -3 и далее.</small></AdminField>
         <AdminField label="SEO H1"><input className={adminInputClass} value={seoH1} onChange={(event) => setSeoH1(event.target.value)} /></AdminField>
         <AdminField label="SEO title"><input className={adminInputClass} value={seoTitle} onChange={(event) => setSeoTitle(event.target.value)} /></AdminField>
         <div className="sm:col-span-2"><AdminField label="SEO description"><textarea className={`${adminInputClass} min-h-20`} value={seoDescription} onChange={(event) => setSeoDescription(event.target.value)} /></AdminField></div>

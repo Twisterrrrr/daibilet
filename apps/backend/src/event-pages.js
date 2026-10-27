@@ -3,6 +3,17 @@ import { randomUUID } from 'node:crypto';
 const EDITORIAL_STATUSES = new Set(['DRAFT', 'REVIEW', 'READY']);
 const ROUTE_KINDS = new Set(['CANDIDATE', 'HISTORICAL', 'CURRENT']);
 const MAX_CONTENT_BYTES = 200_000;
+const CITY_TRANSLITERATION = {
+  а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z', и: 'i', й: 'y',
+  к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f',
+  х: 'h', ц: 'c', ч: 'ch', ш: 'sh', щ: 'sch', ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya',
+};
+
+function citySlug(value) {
+  return String(value || '').trim().toLowerCase().split('')
+    .map((char) => CITY_TRANSLITERATION[char] ?? char).join('')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').replace(/-{2,}/g, '-');
+}
 
 function requiredText(value, field, max = 500) {
   if (typeof value !== 'string') throw new Error(`${field} is required`);
@@ -166,17 +177,6 @@ export async function publishAdminEventPage(db, id, actorId = null) {
 export async function createAdminEventPage(db, payload, actorId = null) {
   const page = normalizePage(payload, { creating: true });
   return db.transaction(async ({ query }) => {
-    const slugFamily = page.slug.replace(/-\d+$/u, '') || page.slug;
-    await query('SELECT pg_advisory_xact_lock(hashtext($1))', [`event-page-slug:${slugFamily}`]);
-    let allocatedSlug = page.slug;
-    let suffix = 2;
-    while (true) {
-      const existingSlug = await query('SELECT 1 FROM "EventPage" WHERE slug = $1 LIMIT 1', [allocatedSlug]);
-      if (!existingSlug.rows.length) break;
-      allocatedSlug = `${page.slug}-${suffix}`;
-      suffix += 1;
-    }
-
     const sourceResult = await query(`
       SELECT event.id, event.title, event.slug, event.description, event_override."shortDescription",
         event."imageUrl", event."seoH1", event."seoTitle", event."seoDescription",
@@ -190,6 +190,24 @@ export async function createAdminEventPage(db, payload, actorId = null) {
       WHERE event.id = ANY($1::text[])
     `, [page.eventIds]);
     if (sourceResult.rows.length !== page.eventIds.length) throw new Error('One or more Event ids do not exist');
+
+    // EventPage is the stable editorial page candidate. City-qualified slugs
+    // distinguish independent local events and tour stops without changing
+    // public Event routes or inferring that records belong to one page.
+    const primaryCitySlug = page.eventIds.length === 1 ? citySlug(sourceResult.rows[0]?.cityTitle) : '';
+    const cityQualifiedSlug = primaryCitySlug && !page.slug.endsWith(`-${primaryCitySlug}`)
+      ? `${page.slug}-${primaryCitySlug}`
+      : page.slug;
+    const slugFamily = cityQualifiedSlug.replace(/-\d+$/u, '') || cityQualifiedSlug;
+    await query('SELECT pg_advisory_xact_lock(hashtext($1))', [`event-page-slug:${slugFamily}`]);
+    let allocatedSlug = cityQualifiedSlug;
+    let suffix = 2;
+    while (true) {
+      const existingSlug = await query('SELECT 1 FROM "EventPage" WHERE slug = $1 LIMIT 1', [allocatedSlug]);
+      if (!existingSlug.rows.length) break;
+      allocatedSlug = `${cityQualifiedSlug}-${suffix}`;
+      suffix += 1;
+    }
 
     const insert = await query(`
       INSERT INTO "EventPage" (id, slug, title, summary, content, "seoH1", "seoTitle", "seoDescription", "canonicalPath", status, "isIndexable", "updatedAt")

@@ -13,6 +13,14 @@ unique internal draft slug with `-2`, `-3`, etc.; the suffix is persisted and
 never reassigned. The admin reviews whether to keep pages separate or link true
 slots to one EventPage. Public routes remain unchanged until URL mapping review.
 
+For a single-Event draft, append the transliterated catalog city name (e.g. `-ufa`,
+`-perm`) when it is not already present. This separates same-title events in
+different cities. Same-city collisions receive `-2`, `-3`, etc. Multi-Event
+pages do not get a city suffix because they may span cities. The current-sale
+collision review is recorded in
+[`eventpage-slug-collision-review-2026-10-27.csv`](./eventpage-slug-collision-review-2026-10-27.csv);
+these are review candidates, not merge instructions.
+
 ## 2026-10-27 — Stable EventPage identity is separate from catalog inventory
 
 `Event` remains the inventory/purchasing entity and `EventSession` remains its
