@@ -13,3 +13,5 @@ These images were generated on 2026-10-24 for city identity slides. They are ill
 | `perm/identity-posikunchiki.jpg` | Perm posikunchiki pies |
 | `tula/identity-samovar.jpg` | A Tula samovar and tea setting |
 | `ulyanovsk/identity-civil-aviation.jpg` | A Soviet passenger aircraft in a museum |
+| `ryazan/solotcha-chernoe-ozero.jpg` | Illustrative view of a dark peat-water lake in the Meshchera pine forest; generated 2026-10-27, not a documentary photo |
+| `ryazan/solotcha-larin-prud.jpg` | Illustrative view of a small forest pond on the Paustovsky Trail; generated 2026-10-27, not a documentary photo |

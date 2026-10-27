@@ -146,7 +146,6 @@ export const PENZA_SUBURBS: any[] = [
       place('Барский дом', 'Главный мемориальный корпус и основа рассказа о семье Радищевых.', 52.987112, 46.061112, { address: 'территория музея', locationSlug: 'penza-radishchevo-barskiy-dom', mustSeeFilter: 'museum', visitMinutes: 40 }),
       place('Преображенская церковь', 'Сельский храм и архитектурный акцент ансамбля.', 52.986812, 46.060712, { address: 'с. Радищево', locationSlug: 'penza-radishchevo-preobrazhenskaya-cerkov', mustSeeFilter: 'temple', visitMinutes: 20 }),
       place('Парк усадьбы', 'Тихий прогулочный слой без музейной спешки.', 52.987412, 46.060412, { address: 'территория музея', locationSlug: 'penza-radishchevo-park-usadby', mustSeeFilter: 'park', visitMinutes: 30 }),
-      place('Сельская панорама', 'Лучшая точка, чтобы почувствовать масштаб тихой провинции.', 52.987612, 46.061512, { address: 'окрестности села', locationSlug: 'penza-radishchevo-panorama', mustSeeFilter: 'views', visitMinutes: 20 }),
     ],
   },
   {
