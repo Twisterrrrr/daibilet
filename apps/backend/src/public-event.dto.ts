@@ -545,7 +545,7 @@ async function resolvePersistedEventPage(slug: string): Promise<PersistedEventPa
       series: {
         include: {
           pages: {
-            where: { status: 'PUBLISHED' },
+            where: { status: { in: ['CANDIDATE', 'PUBLISHED'] }, isIndexable: true },
             include: { city: true, venue: true },
             orderBy: [{ cityId: 'asc' }, { slug: 'asc' }],
           },

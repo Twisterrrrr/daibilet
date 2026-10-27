@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 import { EventCard } from '@/components/EventCard';
-import { EventBuyCard, EventHero } from '@/components/EventPage.client';
+import { EventBuyCard, EventHero, EventSeriesCitySwitcher } from '@/components/EventPage.client';
 import { EventPdpBody } from '@/components/EventPdpBody.client';
 import { VenuePdpContent } from '@/components/VenuePdpContent.client';
 import { EventTags, EventTrustStrip } from '@/components/EventPageSections';
@@ -185,6 +185,7 @@ export default async function EventDetailPage({ params }: PageProps) {
         <EventHero payload={clientPayload} aggregate={aggregate} />
 
         <div className="container-page py-8 sm:py-10 lg:py-14">
+          <EventSeriesCitySwitcher event={event} />
           {isArchivedPage ? (
             <div className="mb-8 rounded-xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm leading-relaxed text-slate-700">
               Это мероприятие завершилось. Покупка билетов на этой странице недоступна.

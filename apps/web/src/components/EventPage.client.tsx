@@ -65,6 +65,35 @@ type EventSession = PublicEventPageDto['sessions'][number] & {
 /** Buy card: nearest upcoming slots only - not the full day dump. */
 const EVENT_PAGE_NEAREST_SLOTS = 5;
 
+export function EventSeriesCitySwitcher({ event }: { event: PublicEventPageDto['event'] }) {
+  if (!event.seriesCities?.length) return null;
+  return (
+    <nav aria-label="Города гастролей" className="mb-8 rounded-card border border-slate-200 bg-white p-4 shadow-card sm:p-5">
+      <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+        <h2 className="text-sm font-semibold text-graphite sm:text-base">Выберите город</h2>
+        <p className="text-xs text-graphite-muted">Расписание и билеты зависят от города</p>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <span aria-current="page" className="rounded-full border border-primary bg-primary/5 px-3 py-1.5 text-sm font-semibold text-primary">
+          {event.city}
+          {event.venue ? <span className="ml-1 font-normal text-graphite-muted">· {event.venue}</span> : null}
+        </span>
+        {event.seriesCities.map((tourCity) => (
+          <Link
+            key={tourCity.slug}
+            href={`/events/${encodeURIComponent(tourCity.slug)}`}
+            prefetch
+            className="rounded-full border border-slate-200 px-3 py-1.5 text-sm font-medium text-graphite transition hover:border-primary hover:text-primary"
+          >
+            {tourCity.city}
+            {tourCity.venue ? <span className="ml-1 text-graphite-muted">· {tourCity.venue}</span> : null}
+          </Link>
+        ))}
+      </div>
+    </nav>
+  );
+}
+
 export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
   const { event } = payload;
   const sessions = payload.sessions ?? [];
@@ -137,26 +166,6 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
 
   return (
     <div className="min-w-0 w-full overflow-hidden rounded-card border border-slate-200 bg-white p-4 shadow-card sm:p-6 lg:p-7">
-      {event.seriesCities?.length ? (
-        <nav aria-label="Другие города гастролей" className="mb-5 border-b border-slate-100 pb-4">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-graphite-muted">
-            Другие города гастролей
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {event.seriesCities.map((tourCity) => (
-              <Link
-                key={tourCity.slug}
-                href={`/events/${encodeURIComponent(tourCity.slug)}`}
-                prefetch
-                className="rounded-full border border-slate-200 px-3 py-1.5 text-xs font-medium text-graphite transition hover:border-primary hover:text-primary"
-              >
-                {tourCity.city}
-                {tourCity.venue ? <span className="ml-1 text-graphite-muted">· {tourCity.venue}</span> : null}
-              </Link>
-            ))}
-          </div>
-        </nav>
-      ) : null}
       {priceRange ? (
         <div className="min-w-0">
           <div className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">

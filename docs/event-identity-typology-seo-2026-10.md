@@ -15,6 +15,16 @@ Read-only просмотрено 4 360 элементов `/api/public/events` �
 
 `EventKind` в API: `SINGLE` - 3 714, `RECURRING` - 637, `OPEN_DATE` - 9. Это поле описывает исходную запись; его нельзя использовать как идентификатор публичной страницы: в каталоге повторяются группы, состоящие из многих source records и sessions. Срез подтверждает необходимость независимых типов, стабильной page identity и URL aliases.
 
+### Mobile PDP images
+
+Read-only sample of current production catalog images (2026-10-27): three `cdn.teplohod.info` originals returned `1,499,766`, `1,526,004`, and `1,572,682` bytes. A separate Ticketscloud image sample included a `12,610,099`-byte PNG. `SafeImage` currently bypasses the Next optimizer for `teplohod.info` and several other hosts; `cdn.teplohod.info` is not currently an optimizer allowlist entry. Production `/_next/image` for that TEP URL returns 400. This is expected under the current bypass policy, which was added after server egress/timeouts; do not remove the bypass without an origin-connectivity check.
+
+Measured locally with Sharp on the 1,499,766-byte TEP source: `640w WebP q78 = 65,392 bytes`, `1280w WebP q78 = 202,562 bytes`. The planned remedy is a background/import-time image asset pipeline that keeps the provider URL as provenance, writes immutable local responsive derivatives keyed to stable page identity + source checksum, and renders the mobile/desktop `srcset` from the PDP. The original can remain the fallback and for social previews. No mass image files were generated or deployed in this iteration.
+
+### Backfill dry-run on local Docker snapshot
+
+Read-only SQL `scripts/event-page-backfill-dry-run.sql` was run against `daibilet-tours-postgres` (`daibilet`, 8,762 Event rows). It found 8,575 Ticketscloud source records → 567 proposed city/venue-scoped identities (145 groups with multiple records, maximum 830; 8 groups have title variants), and 186 Teplohod records → 186 source-record identities. Exact TEP title+city+venue repeats produce 3 review candidates (6 records), not automatic merges. This is a local snapshot, not a production backfill or a reviewed merge map. Production mapping must run read-only against the current production catalog/DB and report every source group, slug collision, old URL and candidate PDP before any write.
+
 ## Текущее устройство
 
 - `EventKind` — **форма расписания**: `SINGLE`, `RECURRING`, `OPEN_DATE`.
