@@ -441,6 +441,7 @@ export async function buildAdminPurchasesListDto(
   const view = cleanString(searchParams.get('view'))?.toLowerCase() || 'all';
   const provider = cleanString(searchParams.get('provider'))?.toUpperCase() || cleanString(searchParams.get('source'))?.toUpperCase() || 'ALL';
   const status = cleanString(searchParams.get('status'))?.toLowerCase() || 'all';
+  const eventId = cleanString(searchParams.get('eventId')) || '';
   const limit = clampInt(searchParams.get('limit'), DEFAULT_LIMIT, 1, MAX_ADMIN_LIMIT);
   const page = clampInt(searchParams.get('page'), 1, 1, Number.MAX_SAFE_INTEGER);
   const includeArchived = view === 'archive';
@@ -451,7 +452,7 @@ export async function buildAdminPurchasesListDto(
   ]);
   const activeRows = allRows.filter((row) => !row.isArchived);
   const scopedRows = provider === 'ALL' ? allRows : allRows.filter((row) => row.sourceCode === provider);
-  const filteredRows = allRows.filter((row) => matchesAdminPurchaseFilters(row, { q, view, provider, status }));
+  const filteredRows = allRows.filter((row) => matchesAdminPurchaseFilters(row, { q, view, provider, status, eventId }));
   const total = filteredRows.length;
   const pages = Math.max(1, Math.ceil(total / limit));
   const safePage = Math.min(page, pages);
@@ -1325,8 +1326,9 @@ async function loadExternalTicketLookups(externalRows: ExternalOrderRow[]): Prom
 
 function matchesAdminPurchaseFilters(
   row: AdminPurchaseRowDto,
-  filters: { q: string; view: string; provider: string; status: string },
+  filters: { q: string; view: string; provider: string; status: string; eventId: string },
 ): boolean {
+  if (filters.eventId && !row.tickets.some((ticket) => ticket.eventId === filters.eventId)) return false;
   if (filters.view === 'archive' && !row.isArchived) return false;
   if (filters.view !== 'archive' && row.isArchived) return false;
   if (filters.view === 'attention' && !row.needsAttention) return false;
