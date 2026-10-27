@@ -239,13 +239,13 @@ export const TYUMEN_MUST_SEE: any[] = [
   },
   {
     name: 'Дворянское собрание',
-    desc: 'Губернский особняк на Республике, 16 рядом с Колокольниковыми.',
-    address: 'ул. Республики, 16',
+    desc: 'Бывший Народный дом на берегу Туры, где в XIX веке собиралось Благородное собрание.',
+    address: 'ул. 25 Октября, 13',
     locationSlug: 'tyumen-dvoryanskoe-sobranie',
     mustSeeFilter: 'houses',
     visitMinutes: 15,
-    latitude: 57.1575,
-    longitude: 65.5335,
+    latitude: 57.18263,
+    longitude: 65.558412,
   },
   {
     name: 'Дом Шайчика',
