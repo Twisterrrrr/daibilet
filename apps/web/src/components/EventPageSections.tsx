@@ -29,8 +29,8 @@ export function EventDescription({ event }: { event: PublicEventDto }) {
 }
 
 /** Compact body without its own H2 - for accordion panels. */
-export function EventDescriptionBody({ event }: { event: PublicEventDto }) {
-  const description = descriptionWithPracticalInfo(event, displayEventDescription(event));
+export function EventDescriptionBody({ event, description: editorialDescription }: { event: PublicEventDto; description?: string }) {
+  const description = descriptionWithPracticalInfo(event, editorialDescription ?? displayEventDescription(event));
   if (!description) return null;
   const html = formatEventDescriptionHtml(description);
   if (!html) return null;

@@ -187,7 +187,9 @@ export default async function EventDetailPage({ params }: PageProps) {
           <div className="grid min-w-0 gap-8 lg:grid-cols-3 lg:gap-12">
             <div className="min-w-0 space-y-6 lg:col-span-2">
               <EventPdpBody event={event} payload={clientPayload} />
-              <VenuePdpContent document={payload.pdp} />
+              {payload.eventPage
+                ? <VenuePdpContent document={{ variant: 'event', content: payload.eventPage.content }} showSummary={false} showSections={false} />
+                : <VenuePdpContent document={payload.pdp} />}
               <EventTags event={event} />
               <EventTrustStrip />
             </div>

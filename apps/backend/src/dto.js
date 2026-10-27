@@ -29,6 +29,7 @@ import { formatPublicEventTitle } from './event-title-normalize.ts';
 import { toPublicCatalogListItem, toPublicHomeCardSession } from './public-catalog-list-item.ts';
 import { enrichBuyerOrdersWithEventLinks } from './buyer-order-event-links.js';
 import { readReadyPdpDocument } from './pdp-documents.js';
+import { readPublishedEventPageForEvent } from './event-pages.js';
 import {
   blogCityDisplayName,
   blogCitySlugAliases,
@@ -5316,6 +5317,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
       vacant: vacantValues.length ? vacantValues.reduce((sum, value) => sum + value, 0) : null,
     },
     pdp: await readReadyPdpDocument(db, 'events', event.id),
+    eventPage: await readPublishedEventPageForEvent(db, event.id),
   };
 }
 

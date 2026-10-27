@@ -330,6 +330,8 @@ export function AdminEventEditor({ detail, taxonomy, notice, queue, pdpData, eve
                 eventId={detail.id}
                 eventSlug={detail.slug}
                 eventTitle={displayTitle}
+                sourceDescription={detail.sourceDescription}
+                currentOverrideDescription={override.description}
                 pageData={eventPageData || { page: null, error: 'EventPage API недоступен.' }}
                 pdpData={pdpData}
               />

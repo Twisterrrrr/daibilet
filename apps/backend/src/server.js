@@ -12,6 +12,7 @@ import {
   deleteAdminEventPageRoute,
   findAdminEventPageByEvent,
   getAdminEventPage,
+  publishAdminEventPage,
   replaceAdminEventPageEvents,
   updateAdminEventPage,
 } from './event-pages.js';
@@ -819,6 +820,21 @@ export async function handleRequest(request, response) {
       return;
     }
 
+    const eventPagePublishMatch = request.method === 'POST'
+      ? url.pathname.match(/^\/api\/admin\/event-pages\/([^/]+)\/publish$/)
+      : null;
+    if (eventPagePublishMatch) {
+      try {
+        const result = await publishAdminEventPage(db, decodeURIComponent(eventPagePublishMatch[1]));
+        if (result) invalidatePublicCaches('event page published');
+        sendJson(response, result, result ? 200 : 404);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'event_page_publish_failed';
+        sendJson(response, { error: message }, 400);
+      }
+      return;
+    }
+
     const eventPageRouteMatch = request.method === 'DELETE'
       ? url.pathname.match(/^\/api\/admin\/event-pages\/([^/]+)\/routes\/([^/]+)$/)
       : null;
@@ -832,9 +848,11 @@ export async function handleRequest(request, response) {
     if (eventPageMatch && (request.method === 'GET' || request.method === 'PUT')) {
       const id = decodeURIComponent(eventPageMatch[1]);
       try {
+        const wasPublished = request.method === 'PUT' && Boolean((await getAdminEventPage(db, id))?.publishedAt);
         const result = request.method === 'GET'
           ? await getAdminEventPage(db, id)
           : await updateAdminEventPage(db, id, await readJsonBody(request));
+        if (request.method === 'PUT' && (wasPublished || result?.publishedAt)) invalidatePublicCaches('event page content updated');
         sendJson(response, result, result ? 200 : 404);
       } catch (error) {
         const message = error instanceof Error ? error.message : 'invalid_event_page';
@@ -1357,7 +1375,7 @@ export function registerPublicCacheWarmer(warmer) {
 registerPublicCacheInvalidator((reason, options = {}) => {
   clearPublicArticlesDtoCache();
   const reasonText = String(reason || '');
-  const isEventUpdate = /event\s+(override|moderation|taxonomy|venue|change)/i.test(reasonText);
+  const isEventUpdate = /event\s+(override|moderation|taxonomy|venue|change|page)/i.test(reasonText);
   // Admin city PATCH: always bust Next destinations Data Cache (TTL 86400), not only on warm.
   const isCityOrDestinationsUpdate =
     /city\s+update|destinations?\s+refresh/i.test(reasonText);

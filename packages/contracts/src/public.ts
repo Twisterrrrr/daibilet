@@ -359,6 +359,14 @@ export interface PublicPurchaseOptionDto extends PurchaseFields {
 export interface PublicEventPageDto extends ApiEnvelope {
   event: PublicEventDto;
   pdp?: PublicPdpDocumentDto | null;
+  /** Editorial copy published on the existing Event URL; URL/canonical stay owned by Event. */
+  eventPage?: {
+    slug: string;
+    title: string;
+    summary: string | null;
+    content: PublicPdpDocumentDto['content'];
+    seoH1: string | null;
+  } | null;
   /** Context of the requested slot URL, used for a past-date notice when sibling sessions remain. */
   requestedSessionContext?: {
     startsAt: string;

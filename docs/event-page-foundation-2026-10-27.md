@@ -27,11 +27,16 @@
 
 ## Safe rollout contract
 
-The migration is additive and creates no EventPage rows. Existing event pages,
+The migration is additive and creates no EventPage rows. Existing event routes,
 old URLs, canonicals, sitemap, fallback lookup, ticket widgets, and indexing
-remain unchanged. New rows default to `DRAFT` and `isIndexable=false`; a future
-sync/backfill workflow must explicitly create a page and apply the agreed
-availability/indexing policy. Do not infer a multi-Event page from title
+remain unchanged. New rows default to `DRAFT` and `isIndexable=false`. The
+public event DTO may expose editorial content only after an authenticated admin
+explicitly publishes a `READY` EventPage (`publishedAt` is set); it is then
+rendered on the existing Event URL for its explicitly linked Event. Publication
+does not create a route, change canonical/robots/sitemap, or remove the legacy
+fallback for Events without a published EventPage. If a published page is moved
+back to `DRAFT` or `REVIEW`, the public text is withdrawn and the legacy
+description is used again. Do not infer a multi-Event page from title
 similarity, supplier identity, or a provider meta id alone.
 
 Before any route switch, build the owner-reviewed URL map from current sitemap
@@ -52,6 +57,9 @@ The backend has authenticated admin endpoints for the foundation:
 - `GET /api/admin/event-pages/by-event/:eventId` looks up the page for an Event.
 - `PUT /api/admin/event-pages/:id` saves editorial fields and appends an
   immutable content revision. It cannot publish or turn indexing on.
+- `POST /api/admin/event-pages/:id/publish` publishes only a `READY` page with
+  editorial text. This affects the rendered text on the existing Event route;
+  it does not enable EventPage indexing or route/canonical/sitemap changes.
 - `PUT /api/admin/event-pages/:id/events` replaces the linked Event set
   transactionally and records the new source snapshot as a revision.
 - `POST /api/admin/event-pages/:id/routes` stores a candidate/current/historical
@@ -108,9 +116,14 @@ production database was touched.
 
 The existing `/admin/events/:id` workbench now has a **Подробности** tab. It can
 create a single-Event draft, edit page title/slug/SEO and content, preview the
-content on desktop/mobile, and save immutable revisions. It seeds a new draft
-from an existing single-Event PdpDocument when one exists. The tab explicitly
-shows that public URL and indexing have not changed.
+content on desktop/mobile, save immutable revisions, and explicitly publish a
+READY text to the existing Event route. It seeds a new draft from an existing
+single-Event PdpDocument when one exists. Source description is shown as
+read-only provenance; the legacy EventOverride is a collapsed transition
+reference, while EventPage is the sole new rewrite editor. After publication,
+the EventPage text replaces the public description and old Event PdpDocument
+sections/media are not rendered as a second content source. Existing route,
+canonical, sitemap, and event/ticket inventory remain unchanged.
 
 The same workbench also has a **Продажи** tab. It loads on demand and filters
 orders server-side by this Event ID in both the catalog API and the separate
@@ -131,7 +144,7 @@ editor and preview behavior only until EventPage is connected to public runtime.
 1. Add an EventPage event selector in the tab for reviewed multi-Event pages.
 2. Build a dry-run sync/backfill that creates one page per eligible Event and
    reports missing/duplicate slugs without changing public routes.
-3. Join EventPage to existing public DTO only after exact URL mapping and
-   PDP rendering behavior are approved.
-4. Switch sitemap/canonical/redirect behavior as a separate SEO release with
-   URL-level smoke and rollback data.
+3. Production rollout of the additive migration and EventPage runtime/editor.
+4. Switch sitemap/canonical/redirect behavior only after exact URL mapping,
+   Search Console/Webmaster history, URL-level smoke, and rollback data are
+   reviewed as a separate SEO release.

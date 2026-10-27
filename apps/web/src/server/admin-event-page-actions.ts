@@ -49,3 +49,11 @@ export async function saveAdminEventPageAction(id: string, input: {
   if (!response.ok) throw await readError(response, 'Не удалось сохранить подробности страницы события');
   return await response.json() as AdminEventPage;
 }
+
+export async function publishAdminEventPageAction(id: string) {
+  const response = await adminApiFetch(`/api/admin/event-pages/${encodeURIComponent(id)}/publish`, {
+    method: 'POST',
+  });
+  if (!response.ok) throw await readError(response, 'Не удалось опубликовать EventPage');
+  return await response.json() as AdminEventPage;
+}

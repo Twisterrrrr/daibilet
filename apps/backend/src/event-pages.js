@@ -126,6 +126,43 @@ export async function findAdminEventPageByEvent(db, eventId) {
   return result.rows[0] ? getAdminEventPage(db, result.rows[0].id) : null;
 }
 
+/** Public content is activated explicitly; READY drafts remain private until publishedAt is set. */
+export async function readPublishedEventPageForEvent(db, eventId) {
+  try {
+    const result = await db.query(`
+      SELECT page.slug, page.title, page.summary, page.content, page."seoH1", page."publishedAt"
+      FROM "EventPage" page
+      JOIN "EventPageEvent" link ON link."eventPageId" = page.id
+      WHERE link."eventId" = $1 AND page.status = 'READY' AND page."publishedAt" IS NOT NULL
+      LIMIT 1
+    `, [eventId]);
+    return result.rows[0] || null;
+  } catch (error) {
+    // Keep old production databases and public event pages working before migration rollout.
+    if (error?.code === '42P01' || error?.cause?.code === '42P01') return null;
+    throw error;
+  }
+}
+
+export async function publishAdminEventPage(db, id, actorId = null) {
+  return db.transaction(async ({ query }) => {
+    const existing = await query(`SELECT * FROM "EventPage" WHERE id = $1 FOR UPDATE`, [id]);
+    const page = existing.rows[0];
+    if (!page) return null;
+    if (page.status !== 'READY') throw new Error('EventPage must be READY before publishing');
+    const content = page.content && typeof page.content === 'object' ? page.content : {};
+    const sections = Array.isArray(content.sections) ? content.sections : [];
+    const hasText = Boolean(String(page.summary || content.summary || '').trim()) || sections.some((section) =>
+      String(section?.body || '').trim() || (Array.isArray(section?.items) && section.items.some((item) => String(item?.title || '').trim() || String(item?.description || '').trim())),
+    );
+    if (!hasText) throw new Error('EventPage needs editorial text before publishing');
+    await query(`UPDATE "EventPage" SET "publishedAt" = COALESCE("publishedAt", now()), "updatedAt" = now() WHERE id = $1`, [id]);
+    const sourceState = await currentSourceState(query, id);
+    await appendPageRevision(query, id, page, { changeNote: 'Опубликован текст EventPage', actorId, sourceState });
+    return readPage(query, id);
+  });
+}
+
 export async function createAdminEventPage(db, payload, actorId = null) {
   const page = normalizePage(payload, { creating: true });
   return db.transaction(async ({ query }) => {
@@ -182,7 +219,9 @@ export async function updateAdminEventPage(db, id, payload, actorId = null) {
     const updated = await query(`
       UPDATE "EventPage" SET slug = $2, title = $3, summary = $4, content = $5::jsonb,
         "seoH1" = $6, "seoTitle" = $7, "seoDescription" = $8, "canonicalPath" = $9,
-        status = COALESCE($10, status), "updatedAt" = now()
+        status = COALESCE($10, status),
+        "publishedAt" = CASE WHEN COALESCE($10, status) = 'READY' THEN "publishedAt" ELSE NULL END,
+        "updatedAt" = now()
       WHERE id = $1 RETURNING *
     `, [id, page.slug, page.title, page.summary, JSON.stringify(page.content), page.seoH1, page.seoTitle, page.seoDescription, page.canonicalPath, page.status ?? null]);
     const sourceState = await currentSourceState(query, id);

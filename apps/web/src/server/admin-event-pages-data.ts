@@ -11,6 +11,7 @@ export type AdminEventPage = {
   seoTitle: string | null;
   seoDescription: string | null;
   canonicalPath: string | null;
+  publishedAt: string | null;
   status: 'DRAFT' | 'REVIEW' | 'READY';
   isIndexable: false;
   events: Array<{ eventId: string; position: number; role: string; eventTitle: string; eventSlug: string; cityTitle: string | null }>;

@@ -17,19 +17,23 @@ function safePublicUrl(value?: string | null): string | null {
   return /^https:\/\//i.test(url) ? url : null;
 }
 
-export function VenuePdpContent({ document }: { document?: PublicPdpDocumentDto | null }) {
+export function VenuePdpContent({ document, showSummary = true, showSections = true }: {
+  document?: PublicPdpDocumentDto | null;
+  showSummary?: boolean;
+  showSections?: boolean;
+}) {
   if (!document) return null;
   const content = document.content;
-  const sections = (content.sections || []).filter((section) =>
+  const sections = showSections ? (content.sections || []).filter((section) =>
     Boolean(section.title?.trim() || section.body?.trim() || section.items?.length),
-  );
+  ) : [];
   const gallery = (content.gallery || []).filter((image) => safePublicUrl(image.url));
   const facts = (content.facts || []).filter((fact) => fact.label.trim() && fact.value.trim());
-  if (!content.summary?.trim() && !sections.length && !gallery.length && !facts.length) return null;
+  if (!(showSummary && content.summary?.trim()) && !sections.length && !gallery.length && !facts.length) return null;
 
   return (
     <div className="space-y-10 py-6 sm:py-8" data-editorial-pdp={document.variant}>
-      {content.summary?.trim() ? (
+      {showSummary && content.summary?.trim() ? (
         <section className="max-w-3xl">
           <h2 className="font-display text-2xl font-extrabold tracking-tight text-slate-950 sm:text-3xl">
             {variantTitles[document.variant] || 'О месте'}
