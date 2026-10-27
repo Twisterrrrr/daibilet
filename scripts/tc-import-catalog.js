@@ -13,6 +13,7 @@ const { ENTERTAINMENT_DISCO_TAXONOMY, isDiscoOrPartyEvent } = require("./lib/eve
 const { applyVenueAddressCanon } = require("./lib/venue-address-overrides");
 const { deactivateMissingTicketscloudEvents } = require("./lib/tc-deactivate-missing");
 const { resolveTicketscloudCityId } = require("./lib/tc-city-resolve");
+const { ensureImportedEventPageCandidate } = require("./lib/event-page-candidate");
 
 const requireFromDbPackage = createRequire(path.join(rootDir, "packages", "db", "package.json"));
 const { Pool } = requireFromDbPackage("pg");
@@ -463,6 +464,21 @@ async function importCatalogEvent(client, event, summary, cityIdCache) {
     priceFromRub,
     widgetUrl,
     rowStats,
+  });
+
+  await ensureImportedEventPageCandidate(client, {
+    sourceCode: "TICKETSCLOUD",
+    eventId,
+    externalId,
+    metaExternalId: event.metaExternalId || null,
+    sourceSlug: buildEventSlug(event.title || "event", externalId),
+    slugBase: slugify(`${event.title || "event"}-${city.name || ""}`),
+    title: normalizeImportEventTitle(event.title) || "Событие без названия",
+    kind,
+    imageUrl: event.imageUrl || null,
+    categoryId,
+    cityId: resolvedCityId,
+    venueId: resolvedVenueId,
   });
 
   return rowStats;

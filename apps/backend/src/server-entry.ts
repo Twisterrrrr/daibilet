@@ -18,7 +18,7 @@ import { clearPublicArticlesDtoCache } from './public-articles.dto.js';
 import { createPublicCatalogRouteHandler } from './public-catalog-handler.js';
 import { buildPublicCityDto, buildPublicDestinationsDto, clearPublicCityDtoCache } from './public-city.dto.js';
 import { createPublicCityRouteHandler } from './public-city-handler.js';
-import { buildPublicEventDto, clearPublicEventDtoCache } from './public-event.dto.js';
+import { buildPublicEventDto, buildPublicEventPagesSitemap, clearPublicEventDtoCache } from './public-event.dto.js';
 import { createPublicEventRouteHandler } from './public-event-handler.js';
 import { buildPublicVenueDto, buildPublicVenuesDto, buildPublicVenueEventCountsDto, clearPublicVenueDtoCache } from './public-venue.dto.js';
 import { createPublicVenueRouteHandler } from './public-venue-handler.js';
@@ -79,6 +79,7 @@ const server = startServer({
       createPublicEventRouteHandler({
         enabled: publicFlags.event,
         buildPublicEvent: buildPublicEventDto,
+        buildEventPagesSitemap: buildPublicEventPagesSitemap,
       }),
       createPublicVenueRouteHandler({
         enabled: publicFlags.venue,

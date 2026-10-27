@@ -13,6 +13,7 @@ const { EVENT_UPSERT_STATUS, EVENT_UPSERT_SLUG } = require("./lib/event-import-g
 const { normalizeImportEventTitle } = require("./lib/event-title-normalize");
 const { ENTERTAINMENT_DISCO_TAXONOMY, isDiscoOrPartyEvent } = require("./lib/event-taxonomy");
 const { applyVenueAddressCanon } = require("./lib/venue-address-overrides");
+const { ensureImportedEventPageCandidate } = require("./lib/event-page-candidate");
 
 const fixturesDir = path.resolve(process.env.TEP_FIXTURES_DIR || path.join(rootDir, "data", "teplohod", "fixtures"));
 const eventsPath = path.join(fixturesDir, "events-compact.json");
@@ -151,6 +152,19 @@ async function main() {
 
       await upsertRawRecord(client, externalId, sourceEvent);
       await upsertSourceLink(client, eventId, externalId);
+      await ensureImportedEventPageCandidate(client, {
+        sourceCode: "TEPLOHOD",
+        eventId,
+        externalId,
+        sourceSlug: slugify(`${sourceEvent.title || "teplohod"}-${externalId}`),
+        slugBase: slugify(`${cleanTitle(sourceEvent.title) || "Событие Teplohod"}-${cityName}`),
+        title: cleanTitle(sourceEvent.title) || "Событие Teplohod",
+        kind: eventKind,
+        imageUrl: firstImage(sourceEvent.images),
+        categoryId: taxonomy.categoryId,
+        cityId,
+        venueId,
+      });
       await refreshSubcategory(client, eventId, taxonomy.subcategoryId);
 
       for (const tagTitle of eventTags(sourceEvent, features)) {

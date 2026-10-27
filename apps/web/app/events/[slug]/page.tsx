@@ -124,6 +124,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {
       title: expansionMeta ? { absolute: expansionMeta.title } : title,
       description,
+      ...(event.isIndexable === false ? { robots: { index: false, follow: true } } : {}),
       alternates: {
         canonical: path,
       },
@@ -155,6 +156,8 @@ export default async function EventDetailPage({ params }: PageProps) {
 
   const payload = loaded.payload;
   const { event, related } = payload;
+  const isArchivedPage = event.publicPageStatus === 'archived';
+  const isUnavailablePage = event.publicPageAvailability === 'unavailable';
   // Alias slugs stay on this ISR page. NEXT_REDIRECT during static gen becomes HTTP 500.
   // Cyrillic URLs 308 in middleware; metadata canonical covers SEO.
   const clientPayload = toEventPageClientPayload(payload);
@@ -182,6 +185,15 @@ export default async function EventDetailPage({ params }: PageProps) {
         <EventHero payload={clientPayload} aggregate={aggregate} />
 
         <div className="container-page py-8 sm:py-10 lg:py-14">
+          {isArchivedPage ? (
+            <div className="mb-8 rounded-xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm leading-relaxed text-slate-700">
+              Это мероприятие завершилось. Покупка билетов на этой странице недоступна.
+            </div>
+          ) : isUnavailablePage ? (
+            <div className="mb-8 rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm leading-relaxed text-amber-950">
+              Сейчас информация о сеансах и покупке билетов недоступна.
+            </div>
+          ) : null}
           <div className="grid min-w-0 gap-8 lg:grid-cols-3 lg:gap-12">
             <div className="min-w-0 space-y-6 lg:col-span-2">
               <EventPdpBody event={event} payload={clientPayload} />
@@ -192,7 +204,11 @@ export default async function EventDetailPage({ params }: PageProps) {
 
             <div className="min-w-0 lg:col-span-1">
               <div className="min-w-0 lg:sticky lg:top-[calc(var(--site-header-height)+1.25rem)]" id="buy-card">
-                <EventBuyCard payload={clientPayload} />
+                {isArchivedPage ? (
+                  <div className="rounded-card border border-slate-200 bg-slate-50 p-5 text-sm leading-relaxed text-slate-600">
+                    Билеты на это мероприятие больше не продаются.
+                  </div>
+                ) : <EventBuyCard payload={clientPayload} />}
               </div>
             </div>
           </div>

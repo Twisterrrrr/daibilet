@@ -84,6 +84,23 @@ const offerInclude = {
 } as const satisfies Prisma.EventOfferInclude;
 
 type EventRecord = Prisma.EventGetPayload<{ include: typeof eventInclude }>;
+type PersistedEventPage = Prisma.EventPageGetPayload<{
+  include: {
+    series: {
+      include: {
+        pages: {
+          include: {
+            city: true;
+            venue: true;
+          };
+        };
+      };
+    };
+    city: true;
+    venue: true;
+    members: { include: { event: { include: typeof eventInclude } } };
+  };
+}>;
 type SessionRecord = Prisma.EventSessionGetPayload<{ include: typeof sessionInclude }>;
 type OfferRecord = Prisma.EventOfferGetPayload<{ include: typeof offerInclude }>;
 
@@ -143,11 +160,29 @@ export async function buildPublicEventDto(
 async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = true): Promise<PublicEventPageDto | null> {
   // PERF.E5: resolve by slug/id via Prisma - do NOT load full public catalog (~2600 rows).
   const requestedSlug = publicSlug(eventSlugOrId);
-  const requestedEvent = await resolveEvent(eventSlugOrId);
+  const candidatePage = await resolvePersistedEventPage(requestedSlug);
+  const pageMembers = (candidatePage?.members || []).filter(({ event }) => {
+    const sourceIsCancelled = ['cancelled', 'canceled', 'deleted'].includes(String(event.sourceStatus || '').toLowerCase());
+    if (candidatePage?.status !== 'ARCHIVED' && event.status === 'HIDDEN' && !sourceIsCancelled) return false;
+    const candidateIsPublicSource = candidatePage?.status !== 'CANDIDATE' ||
+      // Imported REVIEW records remain user-accessible before an editorial
+      // team exists; editorial readiness controls indexability, not visibility.
+      event.status === 'REVIEW' ||
+      event.status === 'READY' ||
+      event.status === 'PUBLISHED' ||
+      sourceIsCancelled;
+    return candidateIsPublicSource &&
+      (!candidatePage?.cityId || event.primaryCityId === candidatePage.cityId) &&
+      (!candidatePage?.venueId || event.venueId === candidatePage.venueId);
+  });
+  const publicPage = pageMembers.length ? candidatePage : null;
+  const requestedEvent = pageMembers[0]?.event || await resolveEvent(eventSlugOrId);
   if (!requestedEvent) return null;
+  const isArchivedPage = publicPage?.status === 'ARCHIVED';
   const mergeGroupMembers = await loadMergeGroupMembers(requestedEvent);
   const metaGroupMembers = await loadMetaGroupMembers(requestedEvent);
   const eventsById = new Map<string, EventRecord>([[requestedEvent.id, requestedEvent]]);
+  for (const member of pageMembers) eventsById.set(member.event.id, member.event);
   for (const member of mergeGroupMembers) eventsById.set(member.id, member);
   for (const member of metaGroupMembers) eventsById.set(member.id, member);
   const mergedGroupEvents = [...eventsById.values()];
@@ -161,6 +196,7 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
   );
   const offerScopeEventIds = [...new Set([
     ...purchaseGroupEventIds,
+    ...pageMembers.map((member) => member.event.id),
     ...mergeGroupMembers.map((member) => member.id),
     ...metaGroupMembers.map((member) => member.id),
   ])];
@@ -171,6 +207,7 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
   const tariffOfferEventIds = [...new Set([
     requestedEvent.id,
     representative.id,
+    ...pageMembers.map((member) => member.event.id),
     ...mergeGroupMembers.map((member) => member.id),
   ])];
 
@@ -178,6 +215,7 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
   // Prefer live sibling when the opened slug itself is STAND_BY/closed (meta TC children).
   if (
     allowSoftRedirect &&
+    !publicPage &&
     !isPublicSessionRowOnSale({ sourceStatus: requestedEvent.sourceStatus })
   ) {
     const nearestSibling =
@@ -267,9 +305,29 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
     eventPurchaseUrl,
     undefined,
   );
-  const sessions = dedupePublicEventSessionsByStartsAt(
+  const resolvedSessions = dedupePublicEventSessionsByStartsAt(
     publicSessions.length ? publicSessions : widgetOnlySessions,
   );
+  const potentialPriceFrom = displayPriceFrom(
+    requestedEvent.priceFromRub,
+    ...resolvedSessions.map((session) => session.priceFrom),
+    ...offers.map((offer) => offer.priceRub),
+  );
+  const scheduleSource = sessionRows[0] || resolvedSessions[0];
+  const scheduleSourceStatus = scheduleSource && 'sourceStatus' in scheduleSource
+    ? scheduleSource.sourceStatus
+    : requestedEvent.sourceStatus;
+  const isSaleable = isSaleableEventForPublic({
+    kind: requestedEvent.kind,
+    sourceStatus: scheduleSourceStatus,
+    startsAt: scheduleSource && 'startsAt' in scheduleSource ? scheduleSource.startsAt : null,
+    endsAt: sessionRows[0]?.endsAt || resolvedSessions.find((session) => session.endsAt)?.endsAt || null,
+    purchaseReady: eventPurchase.ready || Boolean(eventPurchaseUrl),
+    priceFrom: potentialPriceFrom,
+  });
+  const isUnavailablePage = Boolean(publicPage) && !isArchivedPage && !isSaleable;
+  const noPurchase = isArchivedPage || isUnavailablePage;
+  const sessions = noPurchase ? [] : resolvedSessions;
   const primaryPurchase = pickPrimarySessionPurchase(sessions, eventPurchaseUrl, requestedIdentity.externalId);
   const tags = orderedEventTags(requestedEvent);
   const subcategories = pickCatalogSubcategories({
@@ -280,12 +338,8 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
     venue: requestedEvent.venue?.title || null,
   });
   const destination = eventDestination(requestedEvent);
-  const priceFrom = displayPriceFrom(
-    requestedEvent.priceFromRub,
-    ...sessions.map((session) => session.priceFrom),
-    ...offers.map((offer) => offer.priceRub),
-  );
-  const title = formatPublicEventTitle(requestedEvent.override?.title || requestedEvent.title);
+  const priceFrom = noPurchase ? null : potentialPriceFrom;
+  const title = formatPublicEventTitle(publicPage?.title || publicPage?.series?.title || requestedEvent.override?.title || requestedEvent.title);
   const landingSlugs = matchingLandingSlugs({
     title,
     category: requestedEvent.category?.title || null,
@@ -300,38 +354,54 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
   });
   const event: PublicEventDto = {
     id: representative.id,
-    slug: publicSlug(representative.slug),
+    slug: publicPage?.slug || publicSlug(representative.slug),
+    publicPageId: publicPage?.id || null,
+    publicPageStatus: publicPage ? publicPage.status.toLowerCase() as 'candidate' | 'published' | 'archived' : null,
+    publicPageAvailability: publicPage
+      ? isArchivedPage ? 'archived' : isUnavailablePage ? 'unavailable' : 'available'
+      : null,
+    seriesCities: publicPage?.series?.pages
+      .filter((page) => page.slug !== publicPage.slug)
+      .map((page) => ({
+        slug: page.slug,
+        city: page.city?.title || page.title,
+        citySlug: page.city?.slug || null,
+        venue: page.venue?.title || null,
+      })) || [],
     sourceSlug: representative.slug,
     sourceCode: eventSourceCode,
-    externalId: primaryPurchase.externalId,
-    widgetProvider: providerForSource(eventSourceCode),
-    widgetPayload: buildProviderWidgetPayload({
+    externalId: noPurchase ? null : primaryPurchase.externalId,
+    widgetProvider: noPurchase ? null : providerForSource(eventSourceCode),
+    widgetPayload: noPurchase ? null : buildProviderWidgetPayload({
       sourceCode: eventSourceCode,
       externalId: primaryPurchase.externalId,
     }),
     title,
-    description: cleanImportedDescription(requestedEvent.override?.description || requestedEvent.description),
+    description: cleanImportedDescription(
+      requestedEvent.override?.description || requestedEvent.description || publicPage?.series?.description,
+    ),
     imageUrl:
       resolveEditorialEventImage(requestedEvent.id, requestedEvent.slug, null) ||
       pickFirstUsableEventImageUrl(
         requestedEvent.override?.imageUrl,
         requestedEvent.imageUrl,
+        publicPage?.series?.imageUrl,
         requestedEvent.venue?.heroImageUrl,
         requestedEvent.primaryCity?.heroImageUrl,
       ),
     category: requestedEvent.category?.title || 'События',
     tags,
     subcategories,
-    city: requestedEvent.primaryCity?.title || 'Не указан',
-    cityId: requestedEvent.primaryCity?.id || null,
-    citySlug: destination.slug,
+    city: publicPage?.city?.title || requestedEvent.primaryCity?.title || 'Не указан',
+    cityId: publicPage?.city?.id || requestedEvent.primaryCity?.id || null,
+    citySlug: publicPage?.city?.slug || destination.slug,
     sourceCitySlug: requestedEvent.primaryCity?.slug || null,
     destination: destination.name,
     destinationType: destination.type,
     timeZone: resolveCityTimeZone(requestedEvent.primaryCity?.title, destination.name),
-    venueId: requestedEvent.venue?.id || null,
-    venueSlug: requestedEvent.venue?.slug || null,
-    venue: requestedEvent.venue?.title || 'Не указано',
+    venueId: publicPage?.venue?.id || requestedEvent.venue?.id || null,
+    venueSlug: publicPage?.venue?.slug || requestedEvent.venue?.slug || null,
+    venue: publicPage?.venue?.title || requestedEvent.venue?.title || 'Не указано',
     venueAddress: requestedEvent.venue?.address || null,
     venueKind: requestedEvent.venue?.kind || 'OTHER',
     venueLatitude:
@@ -356,7 +426,7 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
     })(),
     ageLimit: requestedEvent.ageLimit,
     priceFrom,
-    vacant: requestedEvent.ticketsVacant,
+    vacant: noPurchase ? null : requestedEvent.ticketsVacant,
     eventType: requestedEvent.kind.toLowerCase(),
     landingSlugs,
     groupKey: eventGroupKey(requestedEvent, requestedIdentity),
@@ -365,15 +435,15 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
       ...metaGroupMembers.map((member) => member.id),
     ])],
     sessionCount: sessions.length,
-    purchaseUrl: primaryPurchase.purchaseUrl,
-    widgetUrl: representativeOffer?.widgetUrl || primaryPurchase.purchaseUrl,
-    deeplinkUrl: representativeOffer?.deeplinkUrl || null,
-    purchaseReady: eventPurchase.ready || Boolean(primaryPurchase.purchaseUrl),
-    purchaseMode: eventPurchase.mode,
-    purchaseProvider: eventPurchase.provider,
-    purchaseUrlSource: primaryPurchase.urlSource || eventPurchase.urlSource,
-    seoH1: requestedEvent.override?.seoH1 || requestedEvent.seoH1 || title,
-    seoTitle: requestedEvent.override?.seoTitle || requestedEvent.seoTitle || (() => {
+    purchaseUrl: noPurchase ? null : primaryPurchase.purchaseUrl,
+    widgetUrl: noPurchase ? null : representativeOffer?.widgetUrl || primaryPurchase.purchaseUrl,
+    deeplinkUrl: noPurchase ? null : representativeOffer?.deeplinkUrl || null,
+    purchaseReady: !noPurchase && (eventPurchase.ready || Boolean(primaryPurchase.purchaseUrl)),
+    purchaseMode: noPurchase ? null : eventPurchase.mode,
+    purchaseProvider: noPurchase ? null : eventPurchase.provider,
+    purchaseUrlSource: noPurchase ? null : primaryPurchase.urlSource || eventPurchase.urlSource,
+    seoH1: publicPage?.seoH1 || requestedEvent.override?.seoH1 || requestedEvent.seoH1 || title,
+    seoTitle: publicPage?.seoTitle || requestedEvent.override?.seoTitle || requestedEvent.seoTitle || (() => {
       const nearest = sessions[0];
       const dateBit = [nearest?.dateLabel, nearest?.timeLabel].filter(Boolean).join(', ');
       const core = dateBit && !String(title).includes(String(nearest?.dateLabel || ''))
@@ -381,31 +451,26 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
         : title;
       return `${core}: билеты и расписание | Дайбилет`;
     })(),
-    seoDescription: cleanImportedDescription(requestedEvent.override?.seoDescription || requestedEvent.seoDescription) ||
+    seoDescription: publicPage?.seoDescription || cleanImportedDescription(requestedEvent.override?.seoDescription || requestedEvent.seoDescription) ||
       `Расписание, цены и билеты на ${title}. Покупка через виджет билетной системы.`,
-    canonicalPath: requestedEvent.override?.canonicalPath || requestedEvent.canonicalPath || `/events/${publicSlug(representative.slug)}`,
-    isIndexable: requestedEvent.override?.isIndexable ?? requestedEvent.isIndexable,
+    canonicalPath: publicPage
+      ? publicPage.canonicalPath || `/events/${publicPage.slug}`
+      : requestedEvent.override?.canonicalPath || requestedEvent.canonicalPath || `/events/${publicSlug(representative.slug)}`,
+    isIndexable: publicPage
+      ? publicPage.isIndexable
+      : requestedEvent.override?.isIndexable ?? requestedEvent.isIndexable,
   };
-  const ticketPrices = buildTicketPrices(offers, sessions, event);
-  const purchaseOptions = await buildMergedPurchaseOptions(mergedGroupEvents, offers, requestedEvent, eventPurchaseUrl);
+  const ticketPrices = noPurchase ? [] : buildTicketPrices(offers, sessions, event);
+  const purchaseOptions = noPurchase
+    ? []
+    : await buildMergedPurchaseOptions(mergedGroupEvents, offers, requestedEvent, eventPurchaseUrl);
   const related = await loadRelatedSessionsFromDb(requestedEvent, groupEventIds, 12);
   const priceValues = [event.priceFrom, ...sessions.map((session) => session.priceFrom)]
     .filter((value): value is number => Number.isFinite(value) && Number(value) >= MIN_DISPLAY_PRICE_RUB);
   const vacantValues = sessions.map((session) => session.vacant)
     .filter((value): value is number => Number.isFinite(value));
 
-  const scheduleSource = sessionRows[0] || sessions[0];
-  const scheduleSourceStatus = scheduleSource && 'sourceStatus' in scheduleSource
-    ? scheduleSource.sourceStatus
-    : requestedEvent.sourceStatus;
-  if (!isSaleableEventForPublic({
-    kind: requestedEvent.kind,
-    sourceStatus: scheduleSourceStatus,
-    startsAt: scheduleSource && 'startsAt' in scheduleSource ? scheduleSource.startsAt : null,
-    endsAt: sessionRows[0]?.endsAt || sessions.find((session) => session.endsAt)?.endsAt || null,
-    purchaseReady: event.purchaseReady,
-    priceFrom: event.priceFrom,
-  })) {
+  if (!isSaleable && !publicPage) {
     if (allowSoftRedirect) {
       const nearestSibling =
         (await findNearestSaleableSiblingSlug(requestedEvent, metaGroupMembers, mergeGroupMembers)) ||
@@ -422,7 +487,7 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
     event,
     pdp: await attachReadyEventPdp(requestedEvent.id),
     sessions,
-    offers: offers.map(({ eventId: _eventId, sortOrder: _sortOrder, sourceTicketId: _sourceTicketId, payload: _payload, ...offer }) => offer),
+    offers: (noPurchase ? [] : offers).map(({ eventId: _eventId, sortOrder: _sortOrder, sourceTicketId: _sourceTicketId, payload: _payload, ...offer }) => offer),
     ticketPrices,
     ...(purchaseOptions.length >= 2 ? { purchaseOptions } : {}),
     // Cross-city peer events: same show in different cities.
@@ -470,6 +535,83 @@ async function attachReadyEventPdp(eventId: string): Promise<PublicPdpDocumentDt
   } catch (error) {
     console.warn('[public-event-pdp] optional document lookup failed', error);
     return null;
+  }
+}
+
+async function resolvePersistedEventPage(slug: string): Promise<PersistedEventPage | null> {
+  if (!slug) return null;
+  try {
+    const include = {
+      series: {
+        include: {
+          pages: {
+            where: { status: 'PUBLISHED' },
+            include: { city: true, venue: true },
+            orderBy: [{ cityId: 'asc' }, { slug: 'asc' }],
+          },
+        },
+      },
+      city: true,
+      venue: true,
+      members: {
+        include: { event: { include: eventInclude } },
+        orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+      },
+    } as const satisfies Prisma.EventPageInclude;
+    const visibleStatus: Prisma.EventPageWhereInput['status'] = { in: ['CANDIDATE', 'PUBLISHED', 'ARCHIVED'] };
+    const exactPage = await prisma.eventPage.findFirst({
+      where: { status: visibleStatus, slug },
+      include,
+    });
+    const page = exactPage || await prisma.eventPage.findFirst({
+      where: { status: visibleStatus, aliases: { some: { slug } } },
+      include,
+    });
+    return page?.members.length ? page : null;
+  } catch (error) {
+    // Keep old deployments usable until the additive migration is applied.
+    // Do not hide unrelated database failures.
+    if (error && typeof error === 'object' && 'code' in error && error.code === 'P2021') return null;
+    throw error;
+  }
+}
+
+export async function buildPublicEventPagesSitemap() {
+  try {
+    const pages = await prisma.eventPage.findMany({
+      where: {
+        status: { in: ['CANDIDATE', 'PUBLISHED', 'ARCHIVED'] },
+        isIndexable: true,
+        members: { some: {} },
+      },
+      select: {
+        slug: true,
+        canonicalPath: true,
+        updatedAt: true,
+        aliases: { select: { slug: true } },
+        members: { select: { event: { select: { slug: true } } } },
+      },
+      orderBy: { slug: 'asc' },
+      take: 45_000,
+    });
+    return {
+      available: true,
+      pages: pages.map((page) => ({
+        slug: page.slug,
+        canonicalPath: page.canonicalPath,
+        updatedAt: page.updatedAt.toISOString(),
+        legacySlugs: [...new Set([
+          ...page.aliases.map((alias) => alias.slug),
+          ...page.members.map((member) => member.event.slug),
+        ])],
+      })),
+    };
+  } catch (error) {
+    // Additive rollout: old DBs keep the legacy catalog sitemap until migration.
+    if (error && typeof error === 'object' && 'code' in error && error.code === 'P2021') {
+      return { available: false, pages: [] };
+    }
+    throw error;
   }
 }
 

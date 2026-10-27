@@ -6,6 +6,7 @@ import type { TypedRouteHandler } from './validated-handler.js';
 export interface PublicEventHandlerDependencies {
   enabled: boolean;
   buildPublicEvent: (slugOrId: string, forceRefresh?: boolean) => Promise<PublicEventPageDto | null>;
+  buildEventPagesSitemap?: () => Promise<unknown>;
 }
 
 export function createPublicEventRouteHandler(
@@ -13,6 +14,10 @@ export function createPublicEventRouteHandler(
 ): TypedRouteHandler {
   return async (context: RouteContext) => {
     if (!deps.enabled || context.method !== 'GET') return false;
+    if (context.pathname === '/api/public/event-pages/sitemap' && deps.buildEventPagesSitemap) {
+      sendPublicJson(context.response, await deps.buildEventPagesSitemap());
+      return true;
+    }
     // This collection endpoint is handled by the legacy router. Do not parse
     // "freshness" as an event slug and turn the sitemap data request into 404.
     if (context.pathname === '/api/public/events/freshness') return false;

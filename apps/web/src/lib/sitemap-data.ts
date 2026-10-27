@@ -56,6 +56,15 @@ const VENUE_SITEMAP_SNAPSHOT_MS = 5 * 60 * 1000;
  */
 type SitemapVenueRow = PublicVenueDto & { events?: number | null };
 type SitemapVenuesPayload = { venues?: SitemapVenueRow[] };
+type EventPagesSitemapPayload = {
+  available?: boolean;
+  pages?: Array<{
+    slug: string;
+    canonicalPath?: string | null;
+    updatedAt?: string | null;
+    legacySlugs?: string[];
+  }>;
+};
 
 let venueSitemapSnapshot: {
   expiresAt: number;
@@ -232,6 +241,28 @@ export async function buildEventsSitemapEntries(): Promise<SitemapEntry[]> {
   const seen = new Set<string>();
   const entries: SitemapEntry[] = [];
   const limit = 200;
+  const pagePayload = await fetchPublicApiJson<EventPagesSitemapPayload>(
+    '/api/public/event-pages/sitemap', { timeoutMs: 30_000 },
+  ).catch((error: unknown) => {
+    console.warn('[sitemap] event-page identity API unavailable; retaining catalog URLs', error);
+    return { available: false, pages: [] };
+  });
+  const stablePageSlugs = new Set<string>();
+  const mappedLegacySlugs = new Set<string>();
+  if (pagePayload.available) {
+    for (const page of pagePayload.pages || []) {
+      const slug = String(page.slug || '').trim();
+      if (!slug) continue;
+      const expectedPath = `/events/${encodeURIComponent(slug)}`;
+      if (page.canonicalPath && page.canonicalPath !== expectedPath) continue;
+      stablePageSlugs.add(slug);
+      for (const legacySlug of page.legacySlugs || []) {
+        if (legacySlug && legacySlug !== slug) mappedLegacySlugs.add(legacySlug);
+      }
+      entries.push(entry(expectedPath, 'daily', 0.7, page.updatedAt));
+      seen.add(slug);
+    }
+  }
 
   // Real per-event `updatedAt`, keyed by the public (transliterated) slug. Without
   // it every entry falls back to the build timestamp, so all ~4k URLs claim to
@@ -262,7 +293,7 @@ export async function buildEventsSitemapEntries(): Promise<SitemapEntry[]> {
     for (const event of page.items || []) {
       if (entries.length >= MAX_EVENTS) break;
       const slug = event.slug || event.id;
-      if (!slug || seen.has(slug)) continue;
+      if (!slug || seen.has(slug) || mappedLegacySlugs.has(slug) || stablePageSlugs.has(slug)) continue;
       seen.add(slug);
       entries.push(
         entry(`/events/${encodeURIComponent(slug)}`, 'daily', 0.7, freshness[slug] ?? null),

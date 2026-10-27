@@ -180,6 +180,16 @@ export interface PublicCityDto extends SeoFields {
 export interface PublicEventDto extends SeoFields, PurchaseFields {
   id: string;
   slug: string;
+  /** Stable public identity; source Event IDs remain separate for operations and reviews. */
+  publicPageId?: string | null;
+  publicPageStatus?: 'candidate' | 'published' | 'archived' | null;
+  publicPageAvailability?: 'available' | 'unavailable' | 'archived' | null;
+  seriesCities?: Array<{
+    slug: string;
+    city: string;
+    citySlug?: string | null;
+    venue?: string | null;
+  }>;
   sourceSlug?: string | null;
   sourceCode?: string | null;
   externalId?: string | null;

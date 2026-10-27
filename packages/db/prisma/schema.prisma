@@ -120,8 +120,15 @@ enum EventPageType {
   SERIES
 }
 
+enum EventPageEditorialStatus {
+  NEEDS_EDITORIAL
+  IN_REVIEW
+  READY
+}
+
 /// How an imported/managed Event was associated with a public page.
 enum EventPageMatchMethod {
+  SOURCE_RECORD
   SOURCE_GROUP_ID
   MANUAL
   REVIEWED_MATCH
@@ -744,26 +751,48 @@ model EventPage {
   title           String
   pageType        EventPageType   @default(EVENT)
   status          EventPageStatus @default(CANDIDATE)
-  isIndexable     Boolean         @default(false)
+  editorialStatus EventPageEditorialStatus @default(NEEDS_EDITORIAL)
+  editorialIssues Json?
+  isIndexable     Boolean         @default(true)
   cityId          String?
   venueId         String?
   seoH1           String?
   seoTitle        String?
   seoDescription  String?
   canonicalPath   String?
+  seriesId        String?
   archivedAt      DateTime?
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
 
   city     City?                 @relation(fields: [cityId], references: [id], onDelete: SetNull)
   venue    Venue?                @relation(fields: [venueId], references: [id], onDelete: SetNull)
+  series   EventSeries?          @relation(fields: [seriesId], references: [id], onDelete: SetNull)
   members  EventPageMember[]
   aliases  EventPageSlugAlias[]
 
   @@index([status, isIndexable])
+  @@index([editorialStatus, status])
   @@index([cityId, status])
   @@index([venueId, status])
+  @@index([seriesId])
   @@map("event_pages")
+}
+
+/// Shared editorial identity/content for related local event pages, e.g. a tour.
+/// Each city page keeps its own URL, venue, schedule, SEO and purchase options.
+model EventSeries {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  @db.Text
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  pages EventPage[]
+
+  @@index([title])
+  @@map("event_series")
 }
 
 /// A source or managed event record represented by one stable public page.
@@ -776,7 +805,7 @@ model EventPageMember {
   createdAt   DateTime              @default(now())
 
   page  EventPage @relation(fields: [pageId], references: [id], onDelete: Cascade)
-  event Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event Event     @relation(fields: [eventId], references: [id], onDelete: Restrict)
 
   @@index([pageId])
   @@map("event_page_members")

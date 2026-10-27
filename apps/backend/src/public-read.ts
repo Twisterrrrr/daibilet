@@ -6,7 +6,7 @@ export {
   resolveCatalogSessionsByDestinationKeys,
   resolveCatalogSessionsByVenueKeys,
 } from './public-catalog.dto.js';
-export { buildPublicEventDto, clearPublicEventDtoCache } from './public-event.dto.js';
+export { buildPublicEventDto, buildPublicEventPagesSitemap, clearPublicEventDtoCache } from './public-event.dto.js';
 export { buildPublicEventFreshnessMap, clearPublicEventFreshnessCache } from './public-event-freshness.js';
 export {
   buildPublicCityDto,

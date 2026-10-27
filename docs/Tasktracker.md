@@ -4,7 +4,7 @@ Production-примеры цирка в Мелеузе, цирка в Гудер
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| SEO.EVENT-PAGE-IDENTITY | Ввести persisted public-page identity отдельно от provider events/sessions; закрепить старые slugs alias/redirect; sitemap и canonical строить по странице, не по импортной строке | Критический | 🔄 Контракт + live snapshot + additive Prisma foundation/migration готовы в `codex/event-series-lifecycle`; runtime resolver, sitemap switch и production migration не выполнялись |
+| SEO.EVENT-PAGE-IDENTITY | Ввести persisted public-page identity отдельно от provider events/sessions; закрепить старые slugs alias/redirect; sitemap и canonical строить по странице, не по импортной строке | Критический | 🔄 Schema/resolver + TC/TEP candidate hooks; PDP canonical/indexing and transition sitemap added in `codex/event-series-lifecycle`; admin editorial queue, manual/API hooks, verified redirect map, backfill and production migration remain |
 | DATA.EVENT-TYPE-AXES | Развести смысловую категорию/подтип, формат расписания, управление/канал продажи и identity публичной страницы; `EventKind` оставить только `SINGLE/RECURRING/OPEN_DATE` | Высокий | ✅ Контракт зафиксирован; не добавлять enum для каждого вида мероприятия, переиспользовать `Category/Subcategory/EventTag` |
 | SEO.EVENT-EXPIRED-URL | Для expired recurring occurrence redirect только на подтверждённую series/city page; разовые события показывать архивом, если не удалены модератором | Высокий | ⏳ Ждёт persisted page identity; не включать массово до проверки redirect map |
 
