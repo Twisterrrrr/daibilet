@@ -19,7 +19,7 @@ export const PDP_VARIANTS = {
   religion: ['about', 'visit_facts', 'gallery', 'history', 'highlights', 'entry_rules', 'ticket_guide', 'accessibility', 'location', 'faq'],
   sport: ['about', 'visit_facts', 'gallery', 'upcoming_events', 'spaces', 'equipment', 'entry_rules', 'ticket_guide', 'accessibility', 'location', 'faq'],
   venue: ['about', 'visit_facts', 'gallery', 'spaces', 'entry_rules', 'services', 'accessibility', 'location', 'faq'],
-  event: ['about', 'highlights', 'program', 'participants', 'ticket_notes', 'entry_rules', 'accessibility', 'location', 'faq'],
+  event: ['about', 'custom', 'highlights', 'program', 'participants', 'ticket_notes', 'entry_rules', 'accessibility', 'location', 'faq'],
 };
 
 const EVENT_VARIANTS = new Set(['event']);

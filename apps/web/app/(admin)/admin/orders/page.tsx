@@ -50,6 +50,7 @@ function first(value: string | string[] | undefined): string | undefined {
 
 type OrdersFilterState = {
   kind: string;
+  eventId: string;
   q: string;
   view: string;
   source: string;
@@ -71,6 +72,7 @@ function ordersHref(state: OrdersFilterState, overrides: Partial<OrdersFilterSta
   if (!viewsForKind(next.kind).includes(next.view)) next.view = 'all';
   const params = new URLSearchParams();
   if (next.kind !== 'all') params.set('kind', next.kind);
+  if (next.eventId) params.set('eventId', next.eventId);
   if (next.q) params.set('q', next.q);
   if (next.view !== 'all') params.set('view', next.view);
   if (next.source !== 'all' && next.kind !== 'internal') params.set('source', next.source);
@@ -88,10 +90,11 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
   const kind = requestedKind === 'external' || requestedKind === 'internal' ? requestedKind : 'all';
   const source = first(raw.source) || 'all';
   const requestedStatus = first(raw.status) || 'all';
+  const eventId = first(raw.eventId) || '';
   const status = STATUS_FILTERS.some((filter) => filter.id === requestedStatus) ? requestedStatus : 'all';
-  const state: OrdersFilterState = { kind, q, view, source, status };
-  const current = { kind, q: q || undefined, view, source, status, page };
-  const data = await loadAdminOrdersList({ kind, q, view, source, status, page });
+  const state: OrdersFilterState = { kind, eventId, q, view, source, status };
+  const current = { kind, eventId: eventId || undefined, q: q || undefined, view, source, status, page };
+  const data = await loadAdminOrdersList({ kind, eventId, q, view, source, status, page });
   const filteredHref = ordersHref(state, {});
   const backHref = data.page > 1
     ? `${filteredHref}${filteredHref.includes('?') ? '&' : '?'}page=${data.page}`
@@ -154,6 +157,7 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
       <form className="flex flex-wrap gap-2" action="/admin/orders" method="get">
         <input type="hidden" name="view" value={view} />
         <input type="hidden" name="kind" value={kind} />
+        {eventId ? <input type="hidden" name="eventId" value={eventId} /> : null}
         <input
           name="q"
           defaultValue={q}
@@ -204,7 +208,7 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
             </Link>
           );
         })}
-        {kind !== 'all' || q || view !== 'all' || source !== 'all' || status !== 'all' ? (
+        {kind !== 'all' || eventId || q || view !== 'all' || source !== 'all' || status !== 'all' ? (
           <Link
             href="/admin/orders"
             className="rounded-md border border-dashed border-slate-300 px-2.5 py-1 text-xs text-slate-500 hover:border-slate-400 hover:text-slate-700"

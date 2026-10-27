@@ -866,7 +866,7 @@ function sourceHealthStatus(status, issues) {
   return 'ok';
 }
 
-async function queryAdminOrdersLean(db, { includeArchived }) {
+async function queryAdminOrdersLean(db, { includeArchived, eventId = null }) {
   const result = await db.query(
     `
       select
@@ -898,11 +898,18 @@ async function queryAdminOrdersLean(db, { includeArchived }) {
         left join "EventSession" session on session.id = ticket."sessionId"
         where ticket."externalOrderId" = ext_order.id
       ) ticket_stats on true
-      where ($1::boolean and ext_order."archivedAt" is not null)
-         or (not $1::boolean and ext_order."archivedAt" is null)
+      where (($1::boolean and ext_order."archivedAt" is not null)
+         or (not $1::boolean and ext_order."archivedAt" is null))
+        and ($2::text is null or exists (
+          select 1
+          from "ExternalTicket" event_ticket
+          left join "EventSession" event_session on event_session.id = event_ticket."sessionId"
+          where event_ticket."externalOrderId" = ext_order.id
+            and (event_ticket."eventId" = $2 or event_session."eventId" = $2)
+        ))
       order by coalesce(ext_order."purchasedAt", ext_order."updatedAt") desc, ext_order.id desc
     `,
-    [includeArchived],
+    [includeArchived, eventId],
   );
   return result.rows.map(mapAdminOrderRow);
 }
@@ -945,6 +952,7 @@ export async function buildAdminOrdersList(db, searchParams = new URLSearchParam
   const view = String(searchParams.get('view') || 'all');
   const provider = String(searchParams.get('provider') || 'all').toUpperCase();
   const status = String(searchParams.get('status') || 'all').toLowerCase();
+  const eventId = String(searchParams.get('eventId') || '').trim() || null;
   const limit = clampNumber(searchParams.get('limit'), 1, 100, 50);
   const page = clampNumber(searchParams.get('page'), 1, 100000, 1);
   const includeArchived = view === 'archive';
@@ -952,7 +960,7 @@ export async function buildAdminOrdersList(db, searchParams = new URLSearchParam
   await archiveStaleCancelledOrders(db).catch(() => undefined);
 
   const [allRows, archiveCountResult, activeCountResult] = await Promise.all([
-    queryAdminOrdersLean(db, { includeArchived }),
+    queryAdminOrdersLean(db, { includeArchived, eventId }),
     db.query(`select count(*)::int as total from "ExternalOrder" where "archivedAt" is not null`),
     db.query(`select count(*)::int as total from "ExternalOrder" where "archivedAt" is null`),
   ]);

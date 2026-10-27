@@ -36,6 +36,7 @@ const labels: Record<string, string> = {
   booking: 'Бронирование', zones: 'Зоны', visit_routes: 'Маршруты посещения', schedule_notes: 'Особенности расписания',
   chef: 'Шеф-повар', dining_events: 'Гастроужины', reasons_to_visit: 'За что сюда идут',
   program: 'Программа', participants: 'Участники', ticket_notes: 'Условия билета', ticket_guide: 'Билеты и посещение', equipment: 'Оборудование',
+  custom: 'Дополнительный блок',
   shows: 'Шоу', feeding_schedule: 'Показательные кормления', stations: 'Станции', destination: 'На месте назначения', alternatives: 'Другие способы добраться',
   map: 'Карта территории', tours: 'Экскурсии', rentals: 'Прокат', food_spots: 'Где поесть', activities: 'Что можно сделать', places_inside: 'Точки внутри',
   upcoming_events: 'Ближайшие матчи и события', services: 'Услуги и события',
@@ -70,7 +71,7 @@ function Field({ label, value, onChange, multiline = false }: { label: string; v
   </label>;
 }
 
-export function AdminPdpEditor({ entity, entityId, entitySlug, variants, initialDocument, initialVariant, initialError }: {
+export function AdminPdpEditor({ entity, entityId, entitySlug, variants, initialDocument, initialVariant, initialError, saveDocument, heading = 'Редакционный PDP', saveButtonLabel = 'Сохранить PDP' }: {
   entity: 'venues' | 'events';
   entityId: string;
   entitySlug: string;
@@ -78,6 +79,9 @@ export function AdminPdpEditor({ entity, entityId, entitySlug, variants, initial
   initialDocument: AdminPdpDocument | null;
   initialVariant: string;
   initialError: string | null;
+  saveDocument?: (document: AdminPdpDocument) => Promise<AdminPdpDocument>;
+  heading?: string;
+  saveButtonLabel?: string;
 }) {
   const [document, setDocument] = React.useState<Document | null>(() => initialDocument || emptyDocument(initialVariant, variants[initialVariant] || []));
   const [saving, setSaving] = React.useState(false);
@@ -89,6 +93,22 @@ export function AdminPdpEditor({ entity, entityId, entitySlug, variants, initial
   const [previewDevice, setPreviewDevice] = React.useState<'desktop' | 'mobile'>('desktop');
 
   function changeContent(next: Content) { setDocument((current) => current ? { ...current, content: next } : current); setMessage(''); }
+  function addCustomSection() {
+    const section: Section = { id: `custom-${crypto.randomUUID()}`, kind: 'custom', title: 'Новый раздел', body: '', items: [] };
+    const firstNonDescription = content.sections.findIndex((item) => item.kind !== 'about');
+    const lastCustom = content.sections.reduce((last, item, index) => item.kind === 'custom' ? index : last, -1);
+    const insertionIndex = lastCustom >= 0 ? lastCustom + 1 : firstNonDescription >= 0 ? firstNonDescription : content.sections.length;
+    const sections = [...content.sections];
+    sections.splice(insertionIndex, 0, section);
+    changeContent({ ...content, sections });
+  }
+  function moveSection(index: number, direction: -1 | 1) {
+    const target = index + direction;
+    if (index === 0 || target < 1 || target >= content.sections.length) return;
+    const sections = [...content.sections];
+    [sections[index], sections[target]] = [sections[target], sections[index]];
+    changeContent({ ...content, sections });
+  }
   function changeVariant(variant: string) {
     setDocument((current) => current ? { ...current, variant, content: {
       ...current.content,
@@ -113,7 +133,7 @@ export function AdminPdpEditor({ entity, entityId, entitySlug, variants, initial
       parsed.content.conversion ||= { mode: 'none', primaryAction: 'none', label: '', targetEventId: '', externalUrl: '' };
       setDocument(parsed);
       setJsonOpen(false);
-      setMessage('JSON загружен в редактор. Нажми «Сохранить PDP», чтобы записать его в базу.');
+      setMessage(`JSON загружен в редактор. Нажми «${saveButtonLabel}», чтобы записать его в базу.`);
       setError('');
     } catch (cause) { setError(cause instanceof Error ? cause.message : String(cause)); }
   }
@@ -121,11 +141,15 @@ export function AdminPdpEditor({ entity, entityId, entitySlug, variants, initial
     if (!document) return;
     setSaving(true); setError(''); setMessage('');
     try {
-      const saved = await saveAdminPdpAction(entity, entityId, entitySlug, document);
+      const saved = saveDocument
+        ? await saveDocument(document)
+        : await saveAdminPdpAction(entity, entityId, entitySlug, document);
       setDocument(saved);
-      setMessage(saved.status === 'READY'
-        ? 'Текст PDP опубликован. Сценарий CTA сохранён как настройка, но покупка и бронирование ещё не подключены.'
-        : 'Редакционный контент сохранён; публичная страница его пока не показывает.');
+      setMessage(saveDocument
+        ? 'Черновик EventPage сохранён. Публичные URL и индексация не изменены.'
+        : saved.status === 'READY'
+          ? 'Текст PDP опубликован. Сценарий CTA сохранён как настройка, но покупка и бронирование ещё не подключены.'
+          : 'Редакционный контент сохранён; публичная страница его пока не показывает.');
     } catch (cause) { setError(cause instanceof Error ? cause.message : String(cause)); }
     finally { setSaving(false); }
   }
@@ -140,7 +164,7 @@ export function AdminPdpEditor({ entity, entityId, entitySlug, variants, initial
   if (!document) return <div className="mt-4 text-sm text-destructive">{error || 'PDP недоступен'}</div>;
   const content = document.content;
   return <div className="mt-5 space-y-5 rounded-lg border border-border p-4">
-    <div><h3 className="text-base font-semibold">Редакционный PDP</h3><p className="mt-1 text-xs text-muted-foreground">Контент хранится отдельно от шаблона сайта. Цены, сеансы и наличие билетов берутся из событий.</p></div>
+    <div><h3 className="text-base font-semibold">{heading}</h3><p className="mt-1 text-xs text-muted-foreground">Текст и практические сведения редактируются отдельно. Цены, сеансы и наличие билетов берутся из каталожных данных.</p></div>
     <div className="space-y-2">
       <Button type="button" variant="outline" size="sm" onClick={() => jsonOpen ? setJsonOpen(false) : openJson()}>{jsonOpen ? 'Закрыть JSON' : 'Импорт / экспорт JSON'}</Button>
       {jsonOpen ? <div className="space-y-2">
@@ -159,9 +183,13 @@ export function AdminPdpEditor({ entity, entityId, entitySlug, variants, initial
         </div>
       </div>
       {previewOpen ? <div className={`mx-auto mt-4 overflow-hidden rounded-xl border border-slate-300 bg-white ${previewDevice === 'mobile' ? 'max-w-[390px]' : 'max-w-5xl'}`}>
-        <div className="border-b bg-slate-50 px-3 py-2 text-xs text-slate-600">Предпросмотр: {previewDevice === 'mobile' ? 'мобильный экран' : 'широкий экран'} · состояние {document.status === 'READY' ? 'опубликовано' : 'черновик'}</div>
+        <div className="border-b bg-slate-50 px-3 py-2 text-xs text-slate-600">Предпросмотр: {previewDevice === 'mobile' ? 'мобильный экран' : 'широкий экран'} · состояние {document.status === 'READY' ? (saveDocument ? 'готово к проверке, публично не включено' : 'опубликовано') : 'черновик'}</div>
         <div className="max-h-[70vh] overflow-y-auto px-4 sm:px-6">
           <VenuePdpContent document={{ variant: document.variant, content: content as PublicPdpDocumentDto['content'] }} />
+          {entity === 'events' && saveDocument ? <section className="mt-8 max-w-4xl border-t border-dashed border-slate-300 pt-5" data-pdp-section="practical-info-preview">
+            <h2 className="font-display text-xl font-bold text-slate-900">Практическая информация</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">Системный блок после редакционных разделов. При публичном подключении будет собираться из актуальных данных площадки, расписания и билетов. Даты и цены здесь вручную не дублируются.</p>
+          </section> : null}
         </div>
       </div> : null}
     </section>
@@ -215,12 +243,24 @@ export function AdminPdpEditor({ entity, entityId, entitySlug, variants, initial
       </div>)}
       <Button type="button" variant="outline" size="sm" onClick={() => changeContent({ ...content, gallery: [...content.gallery, emptyImage()] })}>Добавить фото</Button>
     </section>
-    <section className="space-y-3"><h4 className="text-sm font-semibold">Разделы сценария</h4>
+    <section className="space-y-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h4 className="text-sm font-semibold">Разделы сценария</h4>
+          {entity === 'events' && saveDocument ? <p className="mt-1 text-xs text-muted-foreground">Контекстные блоки идут после описания и перед системной практической информацией.</p> : null}
+        </div>
+        {entity === 'events' && saveDocument ? <Button type="button" variant="outline" size="sm" onClick={addCustomSection}>Добавить контекстный блок</Button> : null}
+      </div>
       {content.sections.map((section, index) => <details key={section.id} className="rounded-md border p-3" open={Boolean(section.body || section.items.length)}>
-        <summary className="cursor-pointer text-sm font-medium">{labels[section.kind] || section.kind} {section.body || section.items.length ? '●' : ''}</summary>
+        <summary className="cursor-pointer text-sm font-medium">{section.kind === 'custom' ? section.title || labels.custom : labels[section.kind] || section.kind} {section.body || section.items.length ? '●' : ''}</summary>
         <div className="mt-3 space-y-3">
-          <Field label="Заголовок" value={section.title} onChange={(title) => changeContent({ ...content, sections: content.sections.map((item, i) => i === index ? { ...item, title } : item) })} />
-          <Field label="Текст" value={section.body} onChange={(body) => changeContent({ ...content, sections: content.sections.map((item, i) => i === index ? { ...item, body } : item) })} multiline />
+          {section.kind === 'custom' ? <div className="flex flex-wrap gap-2">
+            <Button type="button" variant="outline" size="sm" disabled={index <= 1} onClick={() => moveSection(index, -1)}>Выше</Button>
+            <Button type="button" variant="outline" size="sm" disabled={index === content.sections.length - 1} onClick={() => moveSection(index, 1)}>Ниже</Button>
+            <Button type="button" variant="outline" size="sm" onClick={() => changeContent({ ...content, sections: content.sections.filter((_, i) => i !== index) })}>Удалить блок</Button>
+          </div> : null}
+          <Field label={section.kind === 'custom' ? 'Заголовок H3' : 'Заголовок'} value={section.title} onChange={(title) => changeContent({ ...content, sections: content.sections.map((item, i) => i === index ? { ...item, title } : item) })} />
+          <Field label={section.kind === 'custom' ? 'Текст блока' : 'Текст'} value={section.body} onChange={(body) => changeContent({ ...content, sections: content.sections.map((item, i) => i === index ? { ...item, body } : item) })} multiline />
           {section.items.map((item, itemIndex) => <div key={itemIndex} className="grid gap-2 rounded-md bg-secondary/40 p-3 sm:grid-cols-2">
             {(['title', 'description', 'imageUrl', 'linkUrl', 'meta', 'sourceUrl'] as const).map((key) => <Field key={key} label={key} value={item[key]} multiline={key === 'description'} onChange={(value) => changeContent({ ...content, sections: content.sections.map((entry, i) => i === index ? { ...entry, items: entry.items.map((card, j) => j === itemIndex ? { ...card, [key]: value } : card) } : entry) })} />)}
             {item.details.map((detail, detailIndex) => <div key={detailIndex} className="grid gap-2 sm:col-span-2 sm:grid-cols-2">
@@ -244,6 +284,6 @@ export function AdminPdpEditor({ entity, entityId, entitySlug, variants, initial
     </section>
     {error ? <div className="text-sm text-destructive">{error}</div> : null}
     {message ? <div className="text-sm text-success">{message}</div> : null}
-    <div className="flex items-center justify-between gap-3 border-t pt-3"><span className="text-xs text-muted-foreground">Версия {document.version || 0}</span><Button type="button" onClick={save} disabled={saving}>{saving ? 'Сохраняю…' : 'Сохранить PDP'}</Button></div>
+    <div className="flex items-center justify-between gap-3 border-t pt-3"><span className="text-xs text-muted-foreground">Версия {document.version || 0}</span><Button type="button" onClick={save} disabled={saving}>{saving ? 'Сохраняю…' : saveButtonLabel}</Button></div>
   </div>;
 }

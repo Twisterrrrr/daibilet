@@ -22,8 +22,11 @@ import {
 } from '@/server/admin-event-actions';
 import type { AdminEventDetailData, AdminTaxonomyData } from '@/server/admin-events-data';
 import { formatAdminNumber, PUBLIC_SITE_BASE } from '@/lib/admin-ui';
-import { AdminPdpEditor } from '@/components/admin/AdminVenuePdpEditor.client';
 import type { AdminPdpEditorData } from '@/server/admin-pdp-data';
+import { AdminEventPageEditor } from '@/components/admin/AdminEventPageEditor.client';
+import type { AdminEventPageEditorData } from '@/server/admin-event-pages-data';
+import { AdminEventSalesPanel } from '@/components/admin/AdminEventSalesPanel';
+import type { AdminOrdersListData } from '@/server/admin-orders-data';
 
 const MODERATION_STATUSES = [
   { status: 'DRAFT', label: 'Черновик' },
@@ -39,9 +42,13 @@ type Props = {
   notice?: string | null;
   queue?: { back?: string; next?: string };
   pdpData?: AdminPdpEditorData;
+  eventPageData?: AdminEventPageEditorData;
+  salesData?: AdminOrdersListData | null;
+  salesChannel?: string;
+  salesStatus?: string;
 };
 
-export function AdminEventEditor({ detail, taxonomy, notice, queue, pdpData }: Props) {
+export function AdminEventEditor({ detail, taxonomy, notice, queue, pdpData, eventPageData, salesData, salesChannel = 'all', salesStatus = 'all' }: Props) {
   const override = detail.override;
   const currentStatus = (override.editorStatus || 'REVIEW').toUpperCase();
   const statusLabel = MODERATION_STATUSES.find((item) => item.status === currentStatus)?.label ?? currentStatus;
@@ -131,6 +138,11 @@ export function AdminEventEditor({ detail, taxonomy, notice, queue, pdpData }: P
       </AdminSection>
               </>
             ),
+          },
+          {
+            id: 'sales',
+            label: 'Продажи',
+            content: <AdminEventSalesPanel eventId={detail.id} data={salesData || null} channel={salesChannel} status={salesStatus} />,
           },
           {
             id: 'content',
@@ -312,16 +324,14 @@ export function AdminEventEditor({ detail, taxonomy, notice, queue, pdpData }: P
           },
           ...(detail.slug && pdpData ? [{
             id: 'pdp',
-            label: 'Страница события',
+            label: 'Подробности',
             content: (
-              <AdminPdpEditor
-                entity="events"
-                entityId={detail.id}
-                entitySlug={detail.slug}
-                variants={pdpData.variants}
-                initialDocument={pdpData.document}
-                initialVariant="event"
-                initialError={pdpData.error}
+              <AdminEventPageEditor
+                eventId={detail.id}
+                eventSlug={detail.slug}
+                eventTitle={displayTitle}
+                pageData={eventPageData || { page: null, error: 'EventPage API недоступен.' }}
+                pdpData={pdpData}
               />
             ),
           }] : []),

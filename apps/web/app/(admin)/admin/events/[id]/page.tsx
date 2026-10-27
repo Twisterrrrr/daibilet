@@ -4,6 +4,8 @@ import { AdminApiErrorBanner } from '@/components/admin/AdminApiErrorBanner';
 import { AdminEventEditor } from '@/components/admin/AdminEventEditor';
 import { loadAdminEventDetail, loadAdminTaxonomy } from '@/server/admin-events-data';
 import { loadAdminPdpEditorData } from '@/server/admin-pdp-data';
+import { loadAdminEventPageForEvent } from '@/server/admin-event-pages-data';
+import { loadAdminOrdersList } from '@/server/admin-orders-data';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,8 +32,16 @@ export default async function AdminEventDetailPage({ params, searchParams }: Pag
   const { id: rawId } = await params;
   const id = decodeURIComponent(rawId);
   const rawSearch = await searchParams;
-  const [detail, taxonomy, pdpData] = await Promise.all([
-    loadAdminEventDetail(id), loadAdminTaxonomy(), loadAdminPdpEditorData('events', id),
+  const tab = first(rawSearch.tab) || '';
+  const requestedChannel = first(rawSearch.salesChannel) || 'all';
+  const salesChannel = requestedChannel === 'internal' || requestedChannel === 'external' ? requestedChannel : 'all';
+  const requestedStatus = first(rawSearch.salesStatus) || 'all';
+  const salesStatus = ['paid', 'pending', 'cancelled', 'error'].includes(requestedStatus) ? requestedStatus : 'all';
+  const salesPageRaw = first(rawSearch.salesPage) || '1';
+  const salesPage = /^\d{1,6}$/.test(salesPageRaw) ? salesPageRaw : '1';
+  const [detail, taxonomy, pdpData, eventPageData, salesData] = await Promise.all([
+    loadAdminEventDetail(id), loadAdminTaxonomy(), loadAdminPdpEditorData('events', id), loadAdminEventPageForEvent(id),
+    tab === 'sales' ? loadAdminOrdersList({ kind: salesChannel, eventId: id, status: salesStatus, page: salesPage }) : Promise.resolve(null),
   ]);
   // Queue context from the events list: back keeps the selection, next opens
   // the following task without returning to the list.
@@ -79,6 +89,10 @@ export default async function AdminEventDetailPage({ params, searchParams }: Pag
         notice={noticeFromSearch(rawSearch)}
         queue={{ back: backHref, next: remainingIds.join(',') || undefined }}
         pdpData={pdpData}
+        eventPageData={eventPageData}
+        salesData={salesData}
+        salesChannel={salesChannel}
+        salesStatus={salesStatus}
       />
     </div>
   );

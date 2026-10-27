@@ -137,6 +137,7 @@ function normalizeOrderRow(raw: unknown): AdminOrderListRow {
 
 export async function loadAdminOrdersList(searchParams: {
   kind?: 'all' | 'internal' | 'external';
+  eventId?: string;
   q?: string;
   view?: string;
   page?: string;
@@ -150,6 +151,7 @@ export async function loadAdminOrdersList(searchParams: {
   params.set('limit', String(searchParams.limit || DEFAULT_LIMIT));
   params.set('page', String(Math.max(1, asNumber(searchParams.page, 1))));
   if (searchParams.q?.trim()) params.set('q', searchParams.q.trim());
+  if (searchParams.eventId?.trim()) params.set('eventId', searchParams.eventId.trim());
   if (searchParams.view && searchParams.view !== 'all') params.set('view', searchParams.view);
   if (searchParams.source && searchParams.source !== 'all') params.set('provider', searchParams.source);
   if (searchParams.status && searchParams.status !== 'all') params.set('status', searchParams.status);
@@ -200,6 +202,7 @@ export async function loadAdminOrdersList(searchParams: {
 }
 
 async function loadCombinedAdminOrders(searchParams: {
+  eventId?: string;
   q?: string;
   view?: string;
   page?: string;

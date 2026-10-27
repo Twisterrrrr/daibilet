@@ -74,9 +74,15 @@ export function VenuePdpContent({ document }: { document?: PublicPdpDocumentDto 
 
       {sections.map((section) => (
         <section key={section.id} className="max-w-4xl scroll-mt-24" data-pdp-section={section.kind}>
-          <h2 className="font-display text-xl font-bold tracking-tight text-slate-950 sm:text-2xl">
-            {section.title?.trim() || variantTitles[document.variant] || 'Подробнее'}
-          </h2>
+          {section.kind === 'custom' ? (
+            <h3 className="font-display text-lg font-bold tracking-tight text-slate-950 sm:text-xl">
+              {section.title?.trim() || 'Дополнительный раздел'}
+            </h3>
+          ) : (
+            <h2 className="font-display text-xl font-bold tracking-tight text-slate-950 sm:text-2xl">
+              {section.title?.trim() || variantTitles[document.variant] || 'Подробнее'}
+            </h2>
+          )}
           {section.body?.trim() ? (
             <div className="mt-4 whitespace-pre-line text-sm leading-7 text-slate-700">{section.body}</div>
           ) : null}
