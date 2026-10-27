@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import { EventCard } from '@/components/EventCard';
+import { ExpiredEventSessionNotice } from '@/components/ExpiredEventSessionNotice.client';
 import { EventBuyCard, EventHero } from '@/components/EventPage.client';
 import { EventPdpBody } from '@/components/EventPdpBody.client';
 import { VenuePdpContent } from '@/components/VenuePdpContent.client';
@@ -180,6 +181,7 @@ export default async function EventDetailPage({ params }: PageProps) {
       <JsonLdScripts blocks={jsonLdBlocks} idPrefix="event-jsonld" />
       <SiteLayout>
         <EventHero payload={clientPayload} aggregate={aggregate} />
+        <ExpiredEventSessionNotice context={clientPayload.requestedSessionContext} />
 
         <div className="container-page py-8 sm:py-10 lg:py-14">
           <div className="grid min-w-0 gap-8 lg:grid-cols-3 lg:gap-12">

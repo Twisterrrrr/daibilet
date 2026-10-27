@@ -6,6 +6,7 @@ export function toEventPageClientPayload(payload: PublicEventPageDto): PublicEve
     JSON.stringify({
       generatedAt: payload.generatedAt,
       event: payload.event,
+      requestedSessionContext: payload.requestedSessionContext ?? null,
       sessions: payload.sessions ?? [],
       offers: payload.offers ?? [],
       ticketPrices: payload.ticketPrices ?? [],

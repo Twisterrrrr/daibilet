@@ -107,6 +107,7 @@ interface MappedOffer extends PublicOfferDto {
 }
 
 type PublicEventSession = PublicEventPageDto['sessions'][number];
+type RequestedSessionContext = NonNullable<PublicEventPageDto['requestedSessionContext']>;
 
 const eventCache = new Map<string, CachedEventPage>();
 const eventBuilds = new Map<string, Promise<PublicEventPageDto | null>>();
@@ -140,13 +141,22 @@ export async function buildPublicEventDto(
   }
 }
 
-async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = true): Promise<PublicEventPageDto | null> {
+async function loadPublicEventDto(
+  eventSlugOrId: string,
+  allowSoftRedirect = true,
+  inheritedSessionContext?: RequestedSessionContext | null,
+): Promise<PublicEventPageDto | null> {
   // PERF.E5: resolve by slug/id via Prisma - do NOT load full public catalog (~2600 rows).
   const requestedSlug = publicSlug(eventSlugOrId);
   const requestedEvent = await resolveEvent(eventSlugOrId);
   if (!requestedEvent) return null;
   const mergeGroupMembers = await loadMergeGroupMembers(requestedEvent);
   const metaGroupMembers = await loadMetaGroupMembers(requestedEvent);
+  const requestedSessionContext = inheritedSessionContext === undefined
+    ? mergeGroupMembers.length || metaGroupMembers.length
+      ? await loadRequestedSessionContext(requestedEvent)
+      : null
+    : inheritedSessionContext;
   const eventsById = new Map<string, EventRecord>([[requestedEvent.id, requestedEvent]]);
   for (const member of mergeGroupMembers) eventsById.set(member.id, member);
   for (const member of metaGroupMembers) eventsById.set(member.id, member);
@@ -184,7 +194,7 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
       (await findNearestSaleableSiblingSlug(requestedEvent, metaGroupMembers, mergeGroupMembers)) ||
       (await findSaleableTitleTwinSlug(requestedEvent));
     if (nearestSibling && publicSlug(nearestSibling) !== requestedSlug) {
-      return loadPublicEventDto(nearestSibling, false);
+      return loadPublicEventDto(nearestSibling, false, requestedSessionContext);
     }
   }
   const [sessionRows, offerRows] = await Promise.all([
@@ -411,7 +421,7 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
         (await findNearestSaleableSiblingSlug(requestedEvent, metaGroupMembers, mergeGroupMembers)) ||
         (await findSaleableTitleTwinSlug(requestedEvent));
       if (nearestSibling && publicSlug(nearestSibling) !== requestedSlug) {
-        return loadPublicEventDto(nearestSibling, false);
+        return loadPublicEventDto(nearestSibling, false, requestedSessionContext);
       }
     }
     return null;
@@ -421,6 +431,9 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
     generatedAt: new Date().toISOString(),
     event,
     pdp: await attachReadyEventPdp(requestedEvent.id),
+    ...(requestedSessionContext && sessions.some((session) => session.eventId !== requestedEvent.id)
+      ? { requestedSessionContext }
+      : {}),
     sessions,
     offers: offers.map(({ eventId: _eventId, sortOrder: _sortOrder, sourceTicketId: _sourceTicketId, payload: _payload, ...offer }) => offer),
     ticketPrices,
@@ -456,6 +469,32 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
       priceFrom: priceValues.length ? Math.min(...priceValues) : null,
       vacant: vacantValues.length ? vacantValues.reduce((sum, value) => sum + value, 0) : null,
     },
+  };
+}
+
+async function loadRequestedSessionContext(event: EventRecord): Promise<RequestedSessionContext | null> {
+  const sessions = await prisma.eventSession.findMany({
+    where: {
+      eventId: event.id,
+      isActive: true,
+      cancelledAt: null,
+      startsAt: { not: null },
+    },
+    select: { startsAt: true, endsAt: true },
+    orderBy: { startsAt: 'asc' },
+    take: 2,
+  });
+  if (sessions.length !== 1 || !sessions[0]?.startsAt) return null;
+
+  const destination = eventDestination(event);
+  const timeZone = resolveCityTimeZone(event.primaryCity?.title, destination.name);
+  return {
+    startsAt: normalizeStartsAt(sessions[0].startsAt) || sessions[0].startsAt.toISOString(),
+    endsAt: normalizeStartsAt(sessions[0].endsAt),
+    dateLabel: formatDate(sessions[0].startsAt, timeZone),
+    timeLabel: formatTime(sessions[0].startsAt, timeZone),
+    cityName: event.primaryCity?.title || destination.name,
+    citySlug: destination.slug,
   };
 }
 
