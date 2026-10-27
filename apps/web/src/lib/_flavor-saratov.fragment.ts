@@ -78,7 +78,7 @@ export const SARATOV_SLIDES: CityIdentitySlide[] = [
     id: 'saratov-bridge',
     title: 'Автодорожный мост Саратов-Энгельс',
     text: 'Почти трехкилометровый мост с узнаваемыми «горбами» - инженерный триумф 1965 года и главный романтический силуэт региона у закатов на Волге.',
-    imageSrc: '/images/venues/saratov/identity-architecture.jpg',
+    imageSrc: '/images/venues/saratov/identity-bridge.jpg',
     imageAlt: 'Автодорожный мост Саратов-Энгельс через Волгу',
     slugs: [
       'saratov-avtodorozhnyy-most-saratov-engel-s',

@@ -765,6 +765,23 @@ export const RYAZAN_MUST_SEE: any[] = [
   ),
 ];
 
+const RYAZAN_CURATED_MAIN = new Set([
+  'ryazan-dvorets-olega',
+  'ryazan-uspenskiy-sobor',
+  'ryazan-muzey-istorii-vdv',
+  'ryazan-muzey-usad-ba-akademika-i-p-pavlova',
+  'ryazan-pamyatnik-evpatiyu-kolovratu',
+  'ryazan-pamyatnik-eseninu',
+  'ryazan-pamyatnik-griby-s-glazami',
+  'ryazan-sobornyy-park',
+]);
+
+for (const place of RYAZAN_MUST_SEE) {
+  if (RYAZAN_CURATED_MAIN.has(place.locationSlug || place.venueSlug)) {
+    place.alsoMain = true;
+  }
+}
+
 export const RYAZAN_SUBURBS: any[] = [
   {
     name: 'Константиново',
@@ -930,12 +947,12 @@ export const RYAZAN_SUBURBS: any[] = [
         39.831112,
       ),
       loc(
-        'Студеный колодец',
-        'Оборудованный родник с чистейшей ледяной водой посреди соснового леса на экотропе.',
+        'Ларин пруд',
+        'Небольшой лесной пруд на маршруте Тропы Паустовского среди сосен и мещерских болот.',
         'г. Рязань, Курортный поселок Солотча',
-        'ryazan-solotcha-studenyy-kolodets',
+        'ryazan-solotcha-larin-prud',
         'park',
-        15,
+        20,
         54.793112,
         39.831112,
       ),
