@@ -32,6 +32,19 @@ function asEditorDocument(page: AdminEventPage | null, seed: AdminPdpDocument | 
   };
 }
 
+function proposeEventPageSlug(eventSlug: string, eventId: string): string {
+  let slug = String(eventSlug || '').trim();
+  const tcId = String(eventId || '').match(/^evt_([a-f\d]{24})$/i)?.[1];
+  const tepId = String(eventId || '').match(/^evt_tep_(\d{2,6})$/i)?.[1];
+
+  if (tcId) {
+    slug = slug.replace(new RegExp(`^tc-${tcId}-`, 'i'), '').replace(new RegExp(`-${tcId}$`, 'i'), '');
+  }
+  if (tepId && slug.endsWith(`-${tepId}`)) slug = slug.slice(0, -(tepId.length + 1));
+
+  return slug || String(eventSlug || '').trim();
+}
+
 export function AdminEventPageEditor({ eventId, eventSlug, eventTitle, sourceDescription, currentOverrideDescription, pageData, pdpData }: {
   eventId: string;
   eventSlug: string;
@@ -43,10 +56,11 @@ export function AdminEventPageEditor({ eventId, eventSlug, eventTitle, sourceDes
 }) {
   const [page, setPage] = useState<AdminEventPage | null>(pageData.page);
   const [title, setTitle] = useState(pageData.page?.title ?? eventTitle);
-  const [slug, setSlug] = useState(pageData.page?.slug ?? eventSlug);
+  const [slug, setSlug] = useState(pageData.page?.slug ?? proposeEventPageSlug(eventSlug, eventId));
   const [seoH1, setSeoH1] = useState(pageData.page?.seoH1 ?? '');
   const [seoTitle, setSeoTitle] = useState(pageData.page?.seoTitle ?? '');
   const [seoDescription, setSeoDescription] = useState(pageData.page?.seoDescription ?? '');
+  const [slugNotice, setSlugNotice] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
@@ -70,6 +84,7 @@ export function AdminEventPageEditor({ eventId, eventSlug, eventTitle, sourceDes
       setPage(created);
       setSlug(created.slug);
       setTitle(created.title);
+      setSlugNotice(created.slug === slug ? '' : `Кандидат slug уже занят. Создан отдельный черновик «${created.slug}»; события не объединялись. Проверь связь перед дальнейшей работой.`);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Не удалось создать страницу события.');
     } finally {
@@ -130,6 +145,7 @@ export function AdminEventPageEditor({ eventId, eventSlug, eventTitle, sourceDes
 
     {pageData.error ? <div role="alert" className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">{pageData.error}</div> : null}
     {error ? <div role="alert" className="rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-900">{error}</div> : null}
+    {slugNotice ? <div role="status" className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950">{slugNotice}</div> : null}
 
     <section className="rounded-md border border-slate-200 bg-slate-50 p-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
@@ -159,8 +175,9 @@ export function AdminEventPageEditor({ eventId, eventSlug, eventTitle, sourceDes
       <p className="mt-1 text-xs text-slate-600">Существующий текст PDP будет скопирован в черновик, если он уже есть. Исходное описание и текущая публичная страница останутся нетронутыми.</p>
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <AdminField label="Название страницы"><input className={adminInputClass} value={title} onChange={(event) => setTitle(event.target.value)} /></AdminField>
-        <AdminField label="Внутренний slug страницы"><input className={adminInputClass} value={slug} onChange={(event) => setSlug(event.target.value)} /></AdminField>
+        <AdminField label="Кандидат slug EventPage"><input className={adminInputClass} value={slug} onChange={(event) => setSlug(event.target.value)} /></AdminField>
       </div>
+      <p className="mt-2 text-xs text-slate-600">Код источника убирается, только если совпадает с ID Event. Это пока внутренний slug: публичный URL, canonical и sitemap не меняются. Если кандидат занят, система выдаст следующий суффикс, например -2; записи останутся раздельными для проверки.</p>
       <button
         type="button"
         className="inline-flex items-center rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
@@ -172,7 +189,7 @@ export function AdminEventPageEditor({ eventId, eventSlug, eventTitle, sourceDes
     </div> : <>
       <div className="grid gap-3 sm:grid-cols-2">
         <AdminField label="Название страницы"><input className={adminInputClass} value={title} onChange={(event) => setTitle(event.target.value)} /></AdminField>
-        <AdminField label="Внутренний slug"><input className={adminInputClass} value={slug} onChange={(event) => setSlug(event.target.value)} /></AdminField>
+        <AdminField label="Кандидат slug EventPage"><input className={adminInputClass} value={slug} onChange={(event) => setSlug(event.target.value)} /></AdminField>
         <AdminField label="SEO H1"><input className={adminInputClass} value={seoH1} onChange={(event) => setSeoH1(event.target.value)} /></AdminField>
         <AdminField label="SEO title"><input className={adminInputClass} value={seoTitle} onChange={(event) => setSeoTitle(event.target.value)} /></AdminField>
         <div className="sm:col-span-2"><AdminField label="SEO description"><textarea className={`${adminInputClass} min-h-20`} value={seoDescription} onChange={(event) => setSeoDescription(event.target.value)} /></AdminField></div>

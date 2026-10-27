@@ -83,8 +83,9 @@ Example create body:
 }
 ```
 
-These endpoints require the existing admin authentication and the additive
-EventPage migration to be applied. They do not change the public runtime.
+These endpoints require the existing admin authentication. The additive
+EventPage migration and public runtime are deployed on production. Drafts remain
+private; only explicit publication exposes their text on the existing Event URL.
 
 ## For ongoing rewrites
 
@@ -99,20 +100,19 @@ snapshots remain intact.
 ### Editorial staging check (2026-10-27)
 
 `data/editorial/eventpage-draft-staging-2026-10-27.json` contains 27 staged
-single-Event copy records. A read-only check against local
-`127.0.0.1:5437/daibilet_baseline` found 0 of those Event IDs and 0 exact-title
-matches; the database currently has 0 EventPage rows. No staging payload was
-posted to the API and no production write was made. Editors may continue
-preparing copy in the staging file, but must not attach it to another local
-Event by title similarity. Resume API attachment only after the intended
-catalog snapshot contains the exact IDs, or after a verified ID map is reviewed.
+single-Event copy records. The original local check found 0 target Event IDs in
+`127.0.0.1:5437/daibilet_baseline`; this was a different catalog snapshot from
+production. A later read-only production API check returned exact Event IDs for
+20 records, 404 for 1, and 429 for 6 (retry needed). Four records are marked
+`review_required`. No staging payload was posted and no EventPage draft was
+created. Do not attach a rewrite to a different Event by title similarity.
 
 ## Local development status
 
 The six migration files already recorded by `daibilet_baseline` were restored
-from their original Git commits. `20261027120000_event_pages` was then applied
-to local `daibilet_baseline`; Prisma reports the database up to date. No
-production database was touched.
+from their original Git commits. `20261027120000_event_pages` was applied to
+local `daibilet_baseline` and production `daibilet`; the production deploy
+completed at commit `024172154`.
 
 The existing `/admin/events/:id` workbench now has a **Подробности** tab. It can
 create a single-Event draft, edit page title/slug/SEO and content, preview the
@@ -137,14 +137,35 @@ each has an H3 heading and text field, can be removed or moved in the editorial
 order, and is placed after the main event description. In preview, the dynamic
 "Практическая информация" block is shown below them as a separate, read-only
 placeholder; dates and prices remain sourced from catalog/session data. This is
-editor and preview behavior only until EventPage is connected to public runtime.
+editor behavior is connected to the public runtime after explicit publication.
+
+### ID-free EventPage slug rule (2026-10-27)
+
+New EventPage drafts now start with a candidate slug that removes a recognized
+Ticketscloud 24-character source ID or a numeric Teplohod ID only when it
+matches the internal `evt_tep_<id>` identity. The provider identity remains on
+the Event/slot records. The EventPage slug is currently internal and does not
+change the public URL, canonical, or sitemap.
+
+A dry-run over the 27.10 event-sitemap snapshot found 4,250 matched records with
+an active session and offer. Removing source IDs yields 219 candidate-slug
+collision groups covering 809 Event IDs. Adding the city would still leave 89
+groups covering 222 IDs. Therefore slug equality is not enough to merge records.
+When separate drafts request the same candidate slug, allocate the first free
+`-2`, `-3`, etc. suffix under a transaction lock and keep the Events separate.
+The allocated suffix is stored and never renumbered. The admin can later review
+whether exact slots belong on one EventPage. The 78 current sitemap URLs without
+a catalog match are outside this current-sale drafting pass.
 
 ## Next implementation slice
 
-1. Add an EventPage event selector in the tab for reviewed multi-Event pages.
-2. Build a dry-run sync/backfill that creates one page per eligible Event and
-   reports missing/duplicate slugs without changing public routes.
-3. Production rollout of the additive migration and EventPage runtime/editor.
+1. Recheck the 6 HTTP 429 staged records. Keep the 1 API 404 and 4 `review_required`
+   records out of production draft creation unless current-sale status and exact
+   Event identity are verified.
+2. Create private DRAFT pages only for exact, currently selling, single-Event
+   records. Never publish them or change routes in the batch operation.
+3. Add an explicit reviewed Event selector for multi-Event EventPages and report
+   slug collisions before saving.
 4. Switch sitemap/canonical/redirect behavior only after exact URL mapping,
    Search Console/Webmaster history, URL-level smoke, and rollback data are
    reviewed as a separate SEO release.

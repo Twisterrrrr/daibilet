@@ -1,5 +1,18 @@
 # Decision Log — Daibilet
 
+## 2026-10-27 — EventPage candidate slug drops the provider slot ID
+
+When preparing an EventPage slug, remove the Ticketscloud 24-character ID only
+when it matches that Event's internal ID; remove a Teplohod numeric suffix only
+when it matches `evt_tep_<id>`. Keep provider IDs on Event/EventSession for
+inventory and purchase. The EventPage slug is an internal candidate until URL
+mapping is approved; it does not change the public URL, canonical, sitemap, or
+redirects. Identical candidate slugs are collision warnings, never an automatic
+instruction to merge Events. Keep each unresolved Event separate and allocate a
+unique internal draft slug with `-2`, `-3`, etc.; the suffix is persisted and
+never reassigned. The admin reviews whether to keep pages separate or link true
+slots to one EventPage. Public routes remain unchanged until URL mapping review.
+
 ## 2026-10-27 — Stable EventPage identity is separate from catalog inventory
 
 `Event` remains the inventory/purchasing entity and `EventSession` remains its

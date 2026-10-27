@@ -166,6 +166,17 @@ export async function publishAdminEventPage(db, id, actorId = null) {
 export async function createAdminEventPage(db, payload, actorId = null) {
   const page = normalizePage(payload, { creating: true });
   return db.transaction(async ({ query }) => {
+    const slugFamily = page.slug.replace(/-\d+$/u, '') || page.slug;
+    await query('SELECT pg_advisory_xact_lock(hashtext($1))', [`event-page-slug:${slugFamily}`]);
+    let allocatedSlug = page.slug;
+    let suffix = 2;
+    while (true) {
+      const existingSlug = await query('SELECT 1 FROM "EventPage" WHERE slug = $1 LIMIT 1', [allocatedSlug]);
+      if (!existingSlug.rows.length) break;
+      allocatedSlug = `${page.slug}-${suffix}`;
+      suffix += 1;
+    }
+
     const sourceResult = await query(`
       SELECT event.id, event.title, event.slug, event.description, event_override."shortDescription",
         event."imageUrl", event."seoH1", event."seoTitle", event."seoDescription",
@@ -184,8 +195,9 @@ export async function createAdminEventPage(db, payload, actorId = null) {
       INSERT INTO "EventPage" (id, slug, title, summary, content, "seoH1", "seoTitle", "seoDescription", "canonicalPath", status, "isIndexable", "updatedAt")
       VALUES ($1, $2, $3, $4, $5::jsonb, $6, $7, $8, $9, 'DRAFT', false, now())
       RETURNING id
-    `, [randomUUID(), page.slug, page.title, page.summary, JSON.stringify(page.content), page.seoH1, page.seoTitle, page.seoDescription, page.canonicalPath]);
+    `, [randomUUID(), allocatedSlug, page.title, page.summary, JSON.stringify(page.content), page.seoH1, page.seoTitle, page.seoDescription, page.canonicalPath]);
     const id = insert.rows[0].id;
+    const allocatedPage = { ...page, slug: allocatedSlug };
 
     for (const [position, eventId] of page.eventIds.entries()) {
       const source = sourceResult.rows.find((row) => row.id === eventId);
@@ -194,7 +206,7 @@ export async function createAdminEventPage(db, payload, actorId = null) {
         VALUES ($1, $2, $3, $4, $5, $6::jsonb)
       `, [randomUUID(), id, eventId, position, position === 0 ? 'PRIMARY' : 'PURCHASE_OPTION', JSON.stringify(source)]);
     }
-    await appendPageRevision(query, id, page, {
+    await appendPageRevision(query, id, allocatedPage, {
       changeNote: page.changeNote,
       actorId,
       sourceState: {
