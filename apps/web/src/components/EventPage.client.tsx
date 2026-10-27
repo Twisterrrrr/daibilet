@@ -675,6 +675,7 @@ export function EventHero({
       <HeroImageWithBlur
         src={heroImage || null}
         alt={formatPublicTitle(event.title)}
+        optimizeRemote
         priority
         focalPoint={heroFocalPoint}
       />

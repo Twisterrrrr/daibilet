@@ -47,6 +47,9 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'ticketscloud-prod.storage.googleapis.com' },
       { protocol: 'https', hostname: 's3.twcstorage.ru' },
       { protocol: 'https', hostname: 'api.teplohod.info' },
+      // TEP event covers are served from this CDN. Event PDP heroes opt into
+      // the responsive optimizer; SafeImage retries the original on proxy error.
+      { protocol: 'https', hostname: 'cdn.teplohod.info' },
       { protocol: 'https', hostname: 'daibilet.ru' },
       { protocol: 'https', hostname: 'www.daibilet.ru' },
       { protocol: 'https', hostname: 'staging.daibilet.ru' },

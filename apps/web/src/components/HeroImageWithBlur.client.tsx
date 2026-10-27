@@ -15,6 +15,7 @@ export function HeroImageWithBlur({
   style,
   priority = false,
   focalPoint = 'center 25%',
+  optimizeRemote = false,
 }: {
   src: string | null;
   alt: string;
@@ -22,6 +23,7 @@ export function HeroImageWithBlur({
   style?: React.CSSProperties;
   priority?: boolean;
   focalPoint?: string;
+  optimizeRemote?: boolean;
 }) {
   const [failedTeplohodSrc, setFailedTeplohodSrc] = React.useState<string | null>(null);
   if (!src) return null;
@@ -43,6 +45,7 @@ export function HeroImageWithBlur({
           className={`object-cover ${className}`}
           style={{ objectPosition: focalPoint, opacity: 0.8, ...style }}
           priority={priority}
+          optimizeRemote={optimizeRemote}
           onError={() => setFailedTeplohodSrc(src)}
         />
       </picture>
@@ -58,6 +61,7 @@ export function HeroImageWithBlur({
       className={`object-cover ${className}`}
       style={{ objectPosition: focalPoint, opacity: 0.8, ...style }}
       priority={priority}
+      optimizeRemote={optimizeRemote}
     />
   );
 }

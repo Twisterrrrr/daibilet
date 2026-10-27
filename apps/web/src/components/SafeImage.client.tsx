@@ -57,6 +57,8 @@ type SafeImageProps = Omit<ImageProps, 'src' | 'alt'> & {
   alt?: string;
   /** Shown when src empty or load fails */
   fallback?: React.ReactNode;
+  /** Opt a single image into Next's responsive proxy even for normally bypassed CDNs. */
+  optimizeRemote?: boolean;
 };
 
 function mergeImageClassName(
@@ -89,16 +91,19 @@ export function SafeImage({
   onLoad,
   className,
   unoptimized,
+  optimizeRemote = false,
   priority,
   ...props
 }: SafeImageProps) {
   const [failed, setFailed] = React.useState(false);
+  const [retryDirect, setRetryDirect] = React.useState(false);
   const normalized = typeof src === 'string' ? src.trim() : '';
   // LCP / priority: visible immediately. Lazy cards: skeleton parent + fade in.
   const [loaded, setLoaded] = React.useState(() => Boolean(priority));
 
   React.useEffect(() => {
     setFailed(false);
+    setRetryDirect(false);
     setLoaded(Boolean(priority));
   }, [normalized, priority]);
 
@@ -106,23 +111,26 @@ export function SafeImage({
     return <>{fallback}</>;
   }
 
-  // Local /images/* and external CDNs (teplohod, ticketscloud): browser fetches directly.
-  // Listing cards: CardSafeImage tries -card then -thumb; this bypass cannot resize originals.
-  const bypassOptimizer = shouldBypassNextImageOptimizer(normalized);
+  // Local /images/* and most external CDNs still bypass the optimizer. Event PDP
+  // heroes can explicitly opt in; on proxy failure they retry the original URL.
+  const bypassOptimizer = !optimizeRemote && shouldBypassNextImageOptimizer(normalized);
 
   return (
     <Image
       src={normalized}
       alt={alt}
       className={mergeImageClassName(className, loaded)}
-      unoptimized={bypassOptimizer || unoptimized}
+      unoptimized={bypassOptimizer || retryDirect || unoptimized}
       priority={priority}
       onLoad={(event) => {
         setLoaded(true);
         onLoad?.(event);
       }}
       onError={(event) => {
-        setFailed(true);
+        // A failed Next image proxy should not blank the hero. Retry the source
+        // directly once; this preserves the old behavior if origin egress fails.
+        if (optimizeRemote && !retryDirect) setRetryDirect(true);
+        else setFailed(true);
         onError?.(event);
       }}
       {...props}
