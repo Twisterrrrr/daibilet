@@ -7,7 +7,7 @@ const rootDir = path.resolve(__dirname, "..");
 loadRootEnv(rootDir);
 
 const { syncProviderLinksForSource } = require("./lib/provider-link-sync");
-const { EVENT_UPSERT_STATUS, EVENT_UPSERT_SLUG } = require("./lib/event-import-guard");
+const { EVENT_UPSERT_STATUS, EVENT_UPSERT_SLUG, EVENT_UPSERT_CATEGORY } = require("./lib/event-import-guard");
 const { normalizeImportEventTitle } = require("./lib/event-title-normalize");
 const { ENTERTAINMENT_DISCO_TAXONOMY, isDiscoOrPartyEvent } = require("./lib/event-taxonomy");
 const { applyVenueAddressCanon } = require("./lib/venue-address-overrides");
@@ -360,7 +360,7 @@ async function importCatalogEvent(client, event, summary, cityIdCache) {
         "ticketsVacant" = excluded."ticketsVacant",
         "primaryCityId" = excluded."primaryCityId",
         "venueId" = excluded."venueId",
-        "categoryId" = excluded."categoryId",
+        ${EVENT_UPSERT_CATEGORY},
         "updatedAt" = now()
     `,
     [
@@ -385,7 +385,11 @@ async function importCatalogEvent(client, event, summary, cityIdCache) {
     await client.query(
       `
         insert into "EventTag" ("eventId", "tagId")
-        values ($1, $2)
+        select $1, $2
+        where not exists (
+          select 1 from "EventOverride" eo
+          where eo."eventId" = $1 and eo."taxonomyManaged" = true
+        )
         on conflict ("eventId", "tagId") do nothing
       `,
       [link.eventId, link.tagId],

@@ -751,6 +751,8 @@ model EventOverride {
   editorStatus     PublishStatus?
   /// Admin-defined key to merge distinct ticket products into one multi-purchase hub page.
   mergeGroupKey    String?
+  /// When true, taxonomy on Event/EventSubcategory/EventTag is curated locally and import syncs must preserve it.
+  taxonomyManaged  Boolean        @default(false)
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
 

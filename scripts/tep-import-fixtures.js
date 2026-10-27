@@ -9,7 +9,12 @@ loadRootEnv(rootDir);
 const requireFromDbPackage = createRequire(path.join(rootDir, "packages", "db", "package.json"));
 const { Pool } = requireFromDbPackage("pg");
 const { syncProviderLinksForSource } = require("./lib/provider-link-sync");
-const { EVENT_UPSERT_STATUS, EVENT_UPSERT_SLUG } = require("./lib/event-import-guard");
+const {
+  EVENT_UPSERT_STATUS,
+  EVENT_UPSERT_SLUG,
+  EVENT_UPSERT_CATEGORY,
+  EVENT_UPSERT_PRIMARY_SUBCATEGORY,
+} = require("./lib/event-import-guard");
 const { normalizeImportEventTitle } = require("./lib/event-title-normalize");
 const { ENTERTAINMENT_DISCO_TAXONOMY, isDiscoOrPartyEvent } = require("./lib/event-taxonomy");
 const { applyVenueAddressCanon } = require("./lib/venue-address-overrides");
@@ -90,7 +95,15 @@ async function main() {
     );
     const existingEventIds = existingTeplohodEvents.rows.map((row) => row.eventId);
     if (existingEventIds.length) {
-      await client.query('delete from "EventTag" where "eventId" = any($1)', [existingEventIds]);
+      await client.query(
+        `delete from "EventTag" et
+         where et."eventId" = any($1)
+           and not exists (
+             select 1 from "EventOverride" eo
+             where eo."eventId" = et."eventId" and eo."taxonomyManaged" = true
+           )`,
+        [existingEventIds],
+      );
       await client.query('delete from "EventSession" where "eventId" = any($1)', [existingEventIds]);
       await client.query('delete from "EventOffer" where "eventId" = any($1) and "sourceCode" = $2', [existingEventIds, "TEPLOHOD"]);
     }
@@ -156,7 +169,13 @@ async function main() {
       for (const tagTitle of eventTags(sourceEvent, features)) {
         const tagId = await upsertTag(client, tagTitle);
         await client.query(
-          'insert into "EventTag" ("eventId", "tagId") values ($1, $2) on conflict ("eventId", "tagId") do nothing',
+          `insert into "EventTag" ("eventId", "tagId")
+           select $1, $2
+           where not exists (
+             select 1 from "EventOverride" eo
+             where eo."eventId" = $1 and eo."taxonomyManaged" = true
+           )
+           on conflict ("eventId", "tagId") do nothing`,
           [eventId, tagId],
         );
         stats.tags += 1;
@@ -483,8 +502,8 @@ async function upsertEvent(client, event) {
         "ticketsVacant" = excluded."ticketsVacant",
         "primaryCityId" = excluded."primaryCityId",
         "venueId" = excluded."venueId",
-        "categoryId" = excluded."categoryId",
-        "primarySubcategoryId" = excluded."primarySubcategoryId",
+        ${EVENT_UPSERT_CATEGORY},
+        ${EVENT_UPSERT_PRIMARY_SUBCATEGORY},
         "updatedAt" = now()
       returning id
     `,
@@ -543,7 +562,11 @@ async function refreshSubcategory(client, eventId, subcategoryId) {
   await client.query(
     `
       insert into "EventSubcategory" ("eventId", "subcategoryId", "isPrimary")
-      values ($1, $2, true)
+      select $1, $2, true
+      where not exists (
+        select 1 from "EventOverride" eo
+        where eo."eventId" = $1 and eo."taxonomyManaged" = true
+      )
       on conflict ("eventId", "subcategoryId") do update set "isPrimary" = true
     `,
     [eventId, subcategoryId],

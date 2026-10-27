@@ -2899,6 +2899,9 @@ export async function updateAdminEventTaxonomy(db, eventId, payload) {
   const tagIds = Array.isArray(payload?.tagIds) ? payload.tagIds.map(normalizeNullableString).filter(Boolean) : [];
   const allSubcategoryIds = Array.from(new Set([primarySubcategoryId, ...subcategoryIds].filter(Boolean)));
 
+  const exists = await db.query('select id from "Event" where id = $1 limit 1', [eventId]);
+  if (!exists.rows[0]) return null;
+
   await db.query(
     `
       update "Event"
@@ -2932,6 +2935,17 @@ export async function updateAdminEventTaxonomy(db, eventId, payload) {
       [eventId, tagId],
     );
   }
+
+  await db.query(
+    `
+      insert into "EventOverride" (id, "eventId", "taxonomyManaged", "createdAt", "updatedAt")
+      values ($1, $2, true, now(), now())
+      on conflict ("eventId") do update
+      set "taxonomyManaged" = true,
+          "updatedAt" = now()
+    `,
+    [`eov_${randomUUID().replace(/-/g, '').slice(0, 24)}`, eventId],
+  );
 
   const event = (await eventRowsByIds(db, [eventId]))[0] || null;
   invalidateAdminGroupedEventsCache(db, 'event taxonomy');
