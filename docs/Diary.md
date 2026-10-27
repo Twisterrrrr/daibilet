@@ -6,6 +6,13 @@
 - Добавлена миграция `20261027120000_event_taxonomy_override`. В этой итерации миграция к базе не применялась.
 - Проверки: Prisma validate, backend typecheck, web typecheck, `node --check` трёх import-скриптов и `git diff --check` прошли. ESLint в worktree недоступен (команда не установлена); тесты не запускались.
 
+## 2026-10-27 - ESLint 10 и очистка новых lint errors
+
+- ESLint обновлён до 10.13.0, `@eslint/js` до 10.0.1, `eslint-plugin-react-hooks` до 7.1.1 и `typescript-eslint` до 8.72.1; удалён неиспользуемый `eslint-config-next` (проект использует собственный flat config с `@next/eslint-plugin-next`).
+- Root-команда `pnpm lint:web` запускает веб-lинтер. В конфиге сохранены исходные проверки Hooks; диагностики React Compiler вынесены в отдельную миграцию.
+- Новое правило ESLint 10 выявило 33 избыточных начальных присваивания. Они переписаны без смены fallback-логики.
+- Проверки: web lint - 0 ошибок / 240 предупреждений; web typecheck - 0 ошибок; `pnpm peers check` оставил только ранее существовавший peer warning `tailwindcss-animate` / Tailwind 3.4.
+
 ## 2026-10-24 - SEO хвост sitemap после Next 16.4
 
 ### Что проверено на live до правки

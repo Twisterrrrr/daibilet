@@ -385,7 +385,7 @@ export function dayRouteItemFromEvent(event: DayRouteEventSource): DayRouteVenue
       title,
     });
     const eventPath = ticketUrl.replace(/^\/events\//i, '').split('/')[0] || '';
-    let eventPathDecoded = eventPath;
+    let eventPathDecoded: string;
     try {
       eventPathDecoded = decodeURIComponent(eventPath);
     } catch {

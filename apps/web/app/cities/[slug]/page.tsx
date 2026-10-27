@@ -93,7 +93,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  let decodedSlug = slug;
+  let decodedSlug: string;
   try {
     decodedSlug = decodeURIComponent(slug);
   } catch {
@@ -205,7 +205,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function CityPage({ params }: PageProps) {
   const pageStartedAt = Date.now();
   const { slug } = await params;
-  let decodedSlug = slug;
+  let decodedSlug: string;
   try {
     decodedSlug = decodeURIComponent(slug);
   } catch {

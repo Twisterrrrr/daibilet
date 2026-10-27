@@ -688,7 +688,7 @@ export function pickNearbyUpsellsForStop(
     const hit = coveredIncludes(match.covered, keys);
     if (!hit.stop && !hit.start && !hit.nearby) continue;
     if (matchIsSingleVenueAdmission(match) && hit.start && !matchLooksLikeShowOffer(match)) continue;
-    let roleScore = 0;
+    let roleScore: number;
     if (hit.stop) roleScore = 3;
     else if (hit.start) roleScore = 2;
     else roleScore = 1;

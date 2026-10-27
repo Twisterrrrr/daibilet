@@ -35,7 +35,7 @@ export const revalidate = 300;
  */
 export default async function EventsCatalogPage() {
   const pageQuery = parseCatalogPageQuery({});
-  let initialCatalog: Awaited<ReturnType<typeof getCachedCatalog>> | null = null;
+  let initialCatalog: Awaited<ReturnType<typeof getCachedCatalog>> | null;
 
   try {
     const raw = await getCachedCatalog(pageQuery);

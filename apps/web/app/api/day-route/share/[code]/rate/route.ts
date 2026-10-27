@@ -32,7 +32,7 @@ export async function POST(request: Request, { params }: RouteParams) {
     return NextResponse.json({ ok: false, error: 'already_rated' }, { status: 429 });
   }
 
-  let body: RateBody = {};
+  let body: RateBody;
   try {
     body = (await request.json()) as RateBody;
   } catch {

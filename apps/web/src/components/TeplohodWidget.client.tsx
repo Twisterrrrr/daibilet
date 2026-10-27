@@ -110,7 +110,7 @@ function resetStuckTeplohodContainers() {
 function findTeplohodBuyButton(wrapperId?: string | null) {
   if (typeof document === 'undefined') return null;
   if (wrapperId) {
-    let safeId = wrapperId;
+    let safeId: string;
     try {
       safeId = CSS.escape(wrapperId);
     } catch {

@@ -41,7 +41,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
 
-  let body: RevalidateBody = {};
+  let body: RevalidateBody;
   try {
     body = (await request.json()) as RevalidateBody;
   } catch {

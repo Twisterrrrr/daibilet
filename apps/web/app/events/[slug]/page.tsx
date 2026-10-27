@@ -158,7 +158,7 @@ export default async function EventDetailPage({ params }: PageProps) {
   // Alias slugs stay on this ISR page. NEXT_REDIRECT during static gen becomes HTTP 500.
   // Cyrillic URLs 308 in middleware; metadata canonical covers SEO.
   const clientPayload = toEventPageClientPayload(payload);
-  let aggregate = null;
+  let aggregate: Awaited<ReturnType<typeof getCachedEventAggregateRating>> | null;
   try {
     aggregate = await getCachedEventAggregateRating(event.id);
   } catch {

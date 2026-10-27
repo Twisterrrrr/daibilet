@@ -13,7 +13,7 @@ type NewsletterBody = {
  * Wire to ESP / CRM later; until then client also has mailto fallback.
  */
 export async function POST(request: Request) {
-  let body: NewsletterBody = {};
+  let body: NewsletterBody;
   try {
     body = (await request.json()) as NewsletterBody;
   } catch {

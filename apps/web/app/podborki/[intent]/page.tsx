@@ -59,7 +59,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     sort: filters.sort,
   });
 
-  let offers = 0;
+  let offers: number;
   try {
     const catalog = await getCachedCatalog(pageQuery);
     offers = catalog?.total ?? catalog?.items?.length ?? 0;

@@ -47,15 +47,10 @@ export function buildDayRouteShortPath(
     .toLowerCase();
   if (!normalizedCode) return '/my-day';
 
-  let citySlug: string | null = null;
-  let titleSlug: string | null = null;
-  if (citySlugOrOptions && typeof citySlugOrOptions === 'object') {
-    citySlug = citySlugOrOptions.citySlug ?? null;
-    titleSlug = citySlugOrOptions.titleSlug ?? null;
-  } else {
-    citySlug = citySlugOrOptions ?? null;
-    titleSlug = titleSlugArg ?? null;
-  }
+  const { citySlug, titleSlug } =
+    citySlugOrOptions && typeof citySlugOrOptions === 'object'
+      ? citySlugOrOptions
+      : { citySlug: citySlugOrOptions ?? null, titleSlug: titleSlugArg ?? null };
 
   const city = String(citySlug || '')
     .trim()

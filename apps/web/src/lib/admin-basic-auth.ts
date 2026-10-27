@@ -71,7 +71,7 @@ export async function isAuthorizedAdminBasicAuth(
   const header = String(authorizationHeader || '');
   if (!header.startsWith('Basic ')) return false;
 
-  let decoded = '';
+  let decoded: string;
   try {
     decoded = atob(header.slice('Basic '.length));
   } catch {

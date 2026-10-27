@@ -264,7 +264,7 @@ export async function buildShareStopSummaries(items: string): Promise<DayRouteSh
   const titles = await resolveCatalogTitles(catalogKeys);
 
   return tokens.map((token, index) => {
-    let title = '';
+    let title: string;
     if (token.isNote) {
       title = dayRouteShareNoteBody(token.id) || 'Заметка';
     } else if (token.isText) {

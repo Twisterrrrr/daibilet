@@ -26,7 +26,7 @@ export const revalidate = 86400;
 const CITIES_DESTINATIONS_TIMEOUT_MS = 2500;
 
 export default async function CitiesIndexPage() {
-  let destinations: Awaited<ReturnType<typeof getCachedDestinations>>['destinations'] = [];
+  let destinations: Awaited<ReturnType<typeof getCachedDestinations>>['destinations'];
   try {
     const payload = await withSoftTimeout(
       getCachedDestinations(),

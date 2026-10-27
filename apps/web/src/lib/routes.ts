@@ -48,7 +48,7 @@ export function cityCanonicalPath(
   const stored = String(city.canonicalPath || '').trim();
   if (!stored) return href;
 
-  let pathname = stored;
+  let pathname: string;
   try {
     pathname = new URL(stored, 'https://daibilet.ru').pathname;
   } catch {

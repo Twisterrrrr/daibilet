@@ -112,7 +112,7 @@ export default async function PlacesIndexPage({ searchParams }: PageProps) {
   const family = normalizePlacesFamily(firstPlacesQueryValue(params.family)) || 'all';
   const cityRaw = firstPlacesQueryValue(params.city);
   const city = cityRaw && !isAllCitiesQuery(cityRaw) ? cityRaw : '';
-  let initialPage = EMPTY_FEED;
+  let initialPage: typeof EMPTY_FEED;
   try {
     const emptyPayload = {
       generatedAt: new Date(0).toISOString(),

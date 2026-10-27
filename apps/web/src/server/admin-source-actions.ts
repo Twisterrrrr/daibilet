@@ -30,7 +30,7 @@ export async function triggerSourceSyncAction(formData: FormData) {
     redirect('/admin/sources?error=unknown_source');
   }
 
-  let nextUrl = '/admin/sources';
+  let nextUrl: string;
   try {
     const response = await adminApiFetch(endpoint, { method: 'POST' });
     const body = (await response.json().catch(() => null)) as {

@@ -84,7 +84,7 @@ export function CheckoutResultView() {
 
     const maybeNotify = async (code: string, cached: BuyerInternalOrderRecord | null) => {
       const mailFlagKey = `daibilet.ticketMailSent.${code}`;
-      let already = false;
+      let already: boolean;
       try {
         already = window.sessionStorage.getItem(mailFlagKey) === '1';
       } catch {

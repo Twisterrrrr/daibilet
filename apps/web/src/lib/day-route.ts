@@ -621,7 +621,7 @@ export function getDayRouteSnapshot(): DayRouteState {
   const empty = getStableServerDayRouteSnapshot();
   if (typeof window === 'undefined') return empty;
   const runtime = getDayRouteRuntime();
-  let raw: string | null = null;
+  let raw: string | null;
   try {
     raw = localStorage.getItem(DAY_ROUTE_STORAGE_KEY);
   } catch {
@@ -912,7 +912,7 @@ export function venueMatchesRouteSlug(
   if (!venue) return false;
   const route = String(routeSlug || '').trim();
   if (!route) return false;
-  let decoded = route;
+  let decoded: string;
   try {
     decoded = decodeURIComponent(route);
   } catch {

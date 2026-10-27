@@ -80,7 +80,7 @@ export function MyDayPickerSheet({
   function onKeyNav(e: KeyboardEvent) {
     const i = tabs.findIndex((t) => t.value === section);
     if (i < 0) return;
-    let next = i;
+    let next: number;
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (i + 1) % tabs.length;
     else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (i - 1 + tabs.length) % tabs.length;
     else if (e.key === 'Home') next = 0;

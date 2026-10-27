@@ -26,7 +26,7 @@ type ShareBody = {
  * Short links: `/d/{code}` or readable `/m/{city}-{titleSlug}-{code}`.
  */
 export async function POST(request: Request) {
-  let body: ShareBody = {};
+  let body: ShareBody;
   try {
     body = (await request.json()) as ShareBody;
   } catch {

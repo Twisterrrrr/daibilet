@@ -174,7 +174,7 @@ export async function POST(request: Request) {
   const catalogReturnWithOrder = `${siteUrl}/checkout/result?order=${encodeURIComponent(result.publicCode)}`;
 
   const emailSent = false;
-  let emailReason: string | null = null;
+  let emailReason: string | null;
 
   // Queue persists while payment is pending; the worker sends only after finance confirms payment.
   const buyerEmail = order.email || String(body.buyer?.email || '');

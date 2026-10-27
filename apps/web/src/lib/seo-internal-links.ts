@@ -389,7 +389,7 @@ export function resolveRelatedListingLinks(
 
   for (const spec of specs) {
     if (links.length >= limit) break;
-    let href: string | null = null;
+    let href: string | null;
     let label = spec.label;
 
     if (spec.type === 'landing') {

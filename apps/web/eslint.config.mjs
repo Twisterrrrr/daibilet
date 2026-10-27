@@ -29,7 +29,11 @@ export default [
     plugins: { '@next/next': nextPlugin, 'react-hooks': reactHooks },
     rules: {
       ...nextPlugin.configs.recommended.rules,
-      ...reactHooks.configs.recommended.rules,
+      // Keep the repository's established Hooks checks. React Hooks v7's
+      // recommended preset also enables React Compiler diagnostics, which are
+      // a separate migration and need their own review.
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
 
       // Correctness (errors): things that are almost always real bugs.
       'no-cond-assign': ['error', 'except-parens'],

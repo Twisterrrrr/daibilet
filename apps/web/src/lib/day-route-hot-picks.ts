@@ -154,7 +154,7 @@ export function resolveHotPickTicketTarget(
       // back to the id the same way the id field above already does.
       title: String(event.title || eventSlug || eventId || event.id),
     });
-    let pathSlug = '';
+    let pathSlug: string;
     try {
       pathSlug = decodeURIComponent(
         String(ticketUrl.replace(/^\/events\//i, '').split('/')[0] || '').trim(),

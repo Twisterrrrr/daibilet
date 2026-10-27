@@ -111,6 +111,6 @@
     "mailparser": "^3.9.40"
   },
   "devDependencies": {
-    "eslint": "^9.39.5"
+    "eslint": "^10.13.0"
   }
 }

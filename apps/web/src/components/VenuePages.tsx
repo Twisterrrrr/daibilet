@@ -112,7 +112,7 @@ export async function generateVenueListMetadata(
 }
 
 export async function generateVenueDetailMetadata(slug: string): Promise<Metadata> {
-  let decoded = slug;
+  let decoded: string;
   try {
     decoded = decodeURIComponent(slug);
   } catch {
@@ -160,7 +160,7 @@ export async function generateVenueDetailMetadata(slug: string): Promise<Metadat
 }
 
 export async function VenueListPage({ family }: Pick<PageProps, 'family'>) {
-  let initialPage = EMPTY_FEED;
+  let initialPage: typeof EMPTY_FEED;
   try {
     const emptyPayload = {
       generatedAt: new Date(0).toISOString(),

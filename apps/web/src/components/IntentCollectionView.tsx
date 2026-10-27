@@ -30,7 +30,7 @@ export async function IntentCollectionView({
   /** Optional DB customText (HTML) below catalog. */
   seoText?: string | null;
 }) {
-  let initialCatalog: Awaited<ReturnType<typeof getCachedCatalog>> | null = null;
+  let initialCatalog: Awaited<ReturnType<typeof getCachedCatalog>> | null;
   try {
     initialCatalog = await getCachedCatalog(pageQuery);
   } catch {

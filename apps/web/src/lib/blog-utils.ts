@@ -287,12 +287,16 @@ function enrichCardFields(slug: string, partial: Partial<BlogCardDto>): Pick<
   ]);
   const partialSlug = normalizeBlogCitySlug(partial.citySlug, partial.city);
   const metaSlug = normalizeBlogCitySlug(meta.citySlug, meta.city);
-  let citySlug: string | null = null;
-  if (tagged.length > 1) citySlug = 'multi';
-  else if (tagged.length === 1) citySlug = tagged[0];
-  else if (partialSlug && !isBroadBlogCitySlug(partialSlug)) citySlug = partialSlug;
-  else if (metaSlug && !isBroadBlogCitySlug(metaSlug)) citySlug = metaSlug;
-  else citySlug = partialSlug || metaSlug || meta.citySlug || null;
+  const citySlug =
+    tagged.length > 1
+      ? 'multi'
+      : tagged.length === 1
+        ? tagged[0]
+        : partialSlug && !isBroadBlogCitySlug(partialSlug)
+          ? partialSlug
+          : metaSlug && !isBroadBlogCitySlug(metaSlug)
+            ? metaSlug
+            : partialSlug || metaSlug || meta.citySlug || null;
 
   const genericCityLabels = new Set(['', 'Без города', 'Несколько городов', 'Регионы']);
   const partialCity = String(partial.city || '').trim();
