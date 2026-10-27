@@ -108,6 +108,25 @@ enum EventKind {
   OPEN_DATE
 }
 
+/// Lifecycle of a stable public event page, separate from source Event status.
+enum EventPageStatus {
+  CANDIDATE
+  PUBLISHED
+  ARCHIVED
+}
+
+enum EventPageType {
+  EVENT
+  SERIES
+}
+
+/// How an imported/managed Event was associated with a public page.
+enum EventPageMatchMethod {
+  SOURCE_GROUP_ID
+  MANUAL
+  REVIEWED_MATCH
+}
+
 enum PublishStatus {
   DRAFT
   REVIEW
@@ -705,6 +724,7 @@ model Event {
   override        EventOverride?
   routeItems      EventVenueRouteItem[]
   pdpDocument     PdpDocument? @relation("EventPdpDocument")
+  publicPageMembership EventPageMember?
 
   @@index([status])
   @@index([purchaseFlow])
@@ -714,6 +734,66 @@ model Event {
   @@index([categoryId])
   @@index([supplierId, status])
   @@index([title])
+}
+
+/// Stable public identity for an event, series, or a local tour stop.
+/// Provider Event rows and sessions can change without changing this URL.
+model EventPage {
+  id              String          @id @default(cuid())
+  slug            String          @unique
+  title           String
+  pageType        EventPageType   @default(EVENT)
+  status          EventPageStatus @default(CANDIDATE)
+  isIndexable     Boolean         @default(false)
+  cityId          String?
+  venueId         String?
+  seoH1           String?
+  seoTitle        String?
+  seoDescription  String?
+  canonicalPath   String?
+  archivedAt      DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  city     City?                 @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  venue    Venue?                @relation(fields: [venueId], references: [id], onDelete: SetNull)
+  members  EventPageMember[]
+  aliases  EventPageSlugAlias[]
+
+  @@index([status, isIndexable])
+  @@index([cityId, status])
+  @@index([venueId, status])
+  @@map("event_pages")
+}
+
+/// A source or managed event record represented by one stable public page.
+model EventPageMember {
+  id          String                @id @default(cuid())
+  pageId      String
+  eventId     String                @unique
+  matchMethod EventPageMatchMethod
+  confidence  Float?
+  createdAt   DateTime              @default(now())
+
+  page  EventPage @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  event Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([pageId])
+  @@map("event_page_members")
+}
+
+/// Previously public URLs that are explicitly known to refer to this page.
+model EventPageSlugAlias {
+  id        String   @id @default(cuid())
+  pageId    String
+  slug      String   @unique
+  reason    String?
+  createdAt DateTime @default(now())
+
+  page EventPage @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@index([pageId])
+  @@map("event_page_slug_aliases")
 }
 
 /// Route stops / hubs on an excursion. Event.venueId remains the start point.
@@ -965,6 +1045,7 @@ model City {
   articles  Article[]
   tripPlans TripPlan[]
   admissionProducts AdmissionProduct[]
+  eventPages EventPage[]
 }
 
 model Venue {
@@ -1033,6 +1114,7 @@ model Venue {
   externalReviews ExternalReview[]
   routeItems      EventVenueRouteItem[]
   pdpDocument     PdpDocument? @relation("VenuePdpDocument")
+  eventPages      EventPage[]
 
   admissionProducts AdmissionProduct[]
   @@index([title])
