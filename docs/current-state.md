@@ -1,5 +1,16 @@
 # Текущее состояние Daibilet
 
+## 2026-10-27 - PDP событий и мобильные обложки
+
+Ветка `codex/event-series-lifecycle` содержит persisted identity для PDP/серий,
+TC/TEP candidate hooks, alias resolver и переходный sitemap. В этой же ветке
+PDP hero обрабатывается responsive Next Image Optimizer с прямым fallback.
+Production не обновлён: миграции и backfill не запускались. Live mobile Lighthouse
+на действующей PDP (`rechnaya-progulka-po-reke-neve-...-1075`): 44/100, LCP 17.1s,
+FCP 1.5s, CLS 0, TBT 930ms; исходный hero 698,701 bytes. Локальный production
+build выдал 31,296 bytes для 640w и 47,917 bytes для 828w. Проверка .184 egress,
+production DB backfill preview, миграции, integration и deploy остаются release gates.
+
 ## Places - выпуск 15.10.2026
 
 На MSK выпущена модель родительского типа и подтипа Places, обновлены `/places` и бейджи PDP. Применены 1 383 уверенно классифицированные импортированные Venue; 112 строк редакционного Excel связаны с существующими Venue, 784 созданы скрытыми. 701 строка остаётся на сверке; новые PDP с непроверенными изображениями не публиковались. Детали, smoke, ограничения и инструкция Cline: [отчёт о выпуске](./places-release-2026-10-15.md) и [handoff Places](./places-taxonomy-cline-handoff-2026-10.md).
