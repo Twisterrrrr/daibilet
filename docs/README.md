@@ -2,6 +2,7 @@
 
 [Roadmap Daibilet — сводка на 2026-10](./roadmap-2026-10.md)
 [SEO-аудит 18.10.2026: кэш sitemap, каноникал Москвы, главная no-store](./seo-audit-2026-10-18.md)
+[Карта соответствий PDP событий, слотов и legacy URL - 27.10.2026](./event-pdp-url-correspondence-audit-2026-10-27.md)
 [Подготовка schema_alignment к прод-БД - 17.10.2026](./schema-alignment-prod-fix-2026-10-17.md)
 [Сверка схемы и миграций каталога и финконтура - 17.10.2026](./finance-schema-unification-2026-10-17.md)
 [Places: типизация, сверка PDP и передача Cline](./places-taxonomy-cline-handoff-2026-10.md)
