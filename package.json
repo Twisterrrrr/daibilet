@@ -17,6 +17,7 @@
     "web:dev": "pnpm --filter @daibilet/web dev",
     "web:build": "pnpm generate && pnpm --filter @daibilet/web build",
     "web:typecheck": "pnpm --filter @daibilet/web typecheck",
+    "lint:web": "pnpm --filter @daibilet/web lint",
     "web:test": "pnpm --filter @daibilet/web test",
     "web:test:ci": "pnpm --filter @daibilet/web test:ci",
     "typecheck": "pnpm -r --if-present typecheck",
@@ -108,5 +109,8 @@
     "dotenv": "^17.4.2",
     "imapflow": "^2.5.2",
     "mailparser": "^3.9.40"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.5"
   }
 }
