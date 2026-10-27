@@ -1147,8 +1147,8 @@ const VORONEZH_SLIDES: CityIdentitySlide[] = [
     id: 'literary-city',
     title: 'Платонов, Бим и неформальный город',
     text: 'Литературный и рок-Воронеж: Платонов на проспекте, Белый Бим у театра «Шут» и память Юрия Хоя на левом берегу.',
-    imageSrc: '/images/venues/voronezh/identity-art.jpg',
-    imageAlt: 'Памятник Белому Биму у театра кукол «Шут»',
+    imageSrc: '/images/venues/voronezh/identity-literary-r20261027.jpg',
+    imageAlt: 'Книги и гитара у окна на фоне улицы в Воронеже',
     slugs: [
       'voronezh-pamyatnik-belomu-bimu',
       'voronezh-pamyatnik-platonovu',
@@ -1173,10 +1173,10 @@ const VORONEZH_SLIDES: CityIdentitySlide[] = [
   },
   {
     id: 'merchant-spire',
-    title: 'Шпиль ЮВЖД и замок в Рамони',
-    text: 'Купеческий классицизм, 68-метровый шпиль ЮВЖД и модерн «Бристоля». В часе езды - неоготический дворец Ольденбургских.',
-    imageSrc: '/images/venues/voronezh/identity-architecture.jpg',
-    imageAlt: 'Шпиль здания Управления ЮВЖД на проспекте Революции',
+    title: 'Шпиль ЮВЖД и панорама центра',
+    text: 'Белая башня со шпилем и часами — один из ориентиров центра Воронежа. Рядом возвышается Благовещенский собор, а проспект Революции хранит купеческую застройку.',
+    imageSrc: '/images/venues/voronezh/identity-yuvzhd-commons.jpg',
+    imageAlt: 'Шпиль здания управления ЮВЖД и Благовещенский собор с высоты',
     slugs: [
       'voronezh-zdanie-upravleniya-yuvzhd',
       'voronezh-gostinitsa-bristol',
