@@ -14,8 +14,8 @@ function clip(value: string | null, limit = 140): string {
 
 /**
  * Source vs override comparison: shows what the import brought and what the
- * operator changed on top. An empty override means "same as source" - imported
- * facts are never overwritten by the edit form.
+ * operator changed on top. An empty override means "same as source" for these
+ * content fields; taxonomy and other catalog data are managed in their own panels.
  */
 export function AdminEventSourceSummary({ detail }: { detail: AdminEventDetailData }) {
   const override = detail.override;
@@ -48,7 +48,7 @@ export function AdminEventSourceSummary({ detail }: { detail: AdminEventDetailDa
         </span>
       </div>
       <p className="mt-1 text-xs text-slate-500">
-        Пустая правка означает «как в источнике» - импортные данные не перетираются.
+        Пустая правка означает «как в источнике». Таблица сравнивает только текст и изображение.
       </p>
       <div className="mt-3 overflow-x-auto">
         <table className="min-w-full text-left text-sm">

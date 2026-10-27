@@ -33,9 +33,23 @@ const MODERATION_STATUSES = [
   { status: 'DRAFT', label: 'Черновик' },
   { status: 'REVIEW', label: 'На проверке' },
   { status: 'READY', label: 'Готово' },
-  { status: 'PUBLISHED', label: 'Опубликовать' },
-  { status: 'HIDDEN', label: 'Скрыть' },
 ] as const;
+
+const EVENT_STATUS_LABELS: Record<string, string> = {
+  DRAFT: 'Черновик',
+  REVIEW: 'На проверке',
+  READY: 'Готово к публикации',
+  PUBLISHED: 'Опубликовано на сайте',
+  HIDDEN: 'Скрыто на сайте',
+};
+
+const EDITOR_STATUS_LABELS: Record<string, string> = {
+  DRAFT: 'Черновик',
+  REVIEW: 'На проверке',
+  READY: 'Готово к проверке',
+  PUBLISHED: 'Старая служебная отметка «Опубликовано»',
+  HIDDEN: 'Старая служебная отметка «Скрыто»',
+};
 
 type Props = {
   detail: AdminEventDetailData;
@@ -48,8 +62,9 @@ type Props = {
 export function AdminEventEditor({ detail, taxonomy, notice, queue, pdpData }: Props) {
   const override = detail.override;
   const currentStatus = (override.editorStatus || 'REVIEW').toUpperCase();
-  const statusLabel = MODERATION_STATUSES.find((item) => item.status === currentStatus)?.label ?? currentStatus;
-  const canPublish = detail.canPublish !== false && detail.publishBlockers.length === 0;
+  const statusLabel = EDITOR_STATUS_LABELS[currentStatus] || 'Не указано';
+  const eventStatus = (detail.event.status || '').toUpperCase();
+  const eventStatusLabel = EVENT_STATUS_LABELS[eventStatus] || 'Статус события не передан';
   const displayTitle = override.title || detail.sourceTitle;
   const isImported = detail.event.managementMode === 'SOURCE_MANAGED'
     || /TICKETSCLOUD|TEPLOHOD/i.test(detail.source.sourceLabel || '');
@@ -62,7 +77,7 @@ export function AdminEventEditor({ detail, taxonomy, notice, queue, pdpData }: P
         description={isImported
           ? 'Импортированное событие. Источник управляет расписанием и продажей; правки здесь относятся только к карточке Дайбилет.'
           : 'Поля события сгруппированы по задачам. Каждая доступная секция сохраняется отдельно.'}
-        badge={<AdminBadge tone={currentStatus === 'PUBLISHED' ? 'success' : 'neutral'}>сейчас: {statusLabel}</AdminBadge>}
+        badge={<AdminBadge tone={eventStatus === 'PUBLISHED' ? 'success' : eventStatus === 'HIDDEN' ? 'danger' : 'neutral'}>Статус события: {eventStatusLabel}</AdminBadge>}
         actions={
           detail.slug ? (
             <AdminButton
@@ -70,7 +85,7 @@ export function AdminEventEditor({ detail, taxonomy, notice, queue, pdpData }: P
               target="_blank"
               rel="noreferrer"
             >
-              Public
+              Открыть на сайте
             </AdminButton>
           ) : null
         }
@@ -84,7 +99,7 @@ export function AdminEventEditor({ detail, taxonomy, notice, queue, pdpData }: P
 
       {isImported ? (
         <div className="rounded-lg border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-950">
-          <strong>Данные поставщика только для чтения.</strong> Расписание, доступность, тарифы и квоты приходят из источника. Контентные правки, классификация, связи, SEO и видимость меняют представление события на Дайбилет и не отправляют изменения обратно поставщику.
+          <strong>Импортированное событие.</strong> Источник управляет расписанием, доступностью, тарифами и квотами. Контент, классификация, связи и SEO редактируются только в каталоге Дайбилет. Эти изменения не отправляются поставщику. Фактическая видимость на сайте определяется статусом события выше; в этой карточке менять его нельзя.
         </div>
       ) : null}
 
@@ -108,24 +123,21 @@ export function AdminEventEditor({ detail, taxonomy, notice, queue, pdpData }: P
               <>
                 <AdminEventSourceSummary detail={detail} />
                 <AdminSection
-        title="Модерация"
-        description={isImported
-          ? 'Управляет видимостью карточки на витрине Дайбилет. Этот статус не меняет публикацию у поставщика.'
-          : 'Статус определяет видимость карточки на витрине. «Опубликовать» доступно, когда устранены блокеры.'}
+        title="Отметка контентной проверки"
+        description="Служебная отметка в EventOverride. Она не меняет фактический статус события, видимость на сайте или данные поставщика."
         actions={
-          <AdminBadge tone={currentStatus === 'PUBLISHED' ? 'success' : 'neutral'}>
-            сейчас: {statusLabel}
+          <AdminBadge tone={currentStatus === 'PUBLISHED' || currentStatus === 'HIDDEN' ? 'warning' : 'neutral'}>
+            Служебная отметка: {statusLabel}
           </AdminBadge>
         }
       >
         {detail.publishBlockers.length ? (
           <p className="mb-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
-            Блокеры публикации: {detail.publishBlockers.slice(0, 4).join(' · ')}
+            Замечания к готовности карточки: {detail.publishBlockers.slice(0, 4).join(' · ')}
           </p>
         ) : null}
         <div className="flex flex-wrap gap-2">
           {MODERATION_STATUSES.map((item) => {
-            const disabled = item.status === 'PUBLISHED' && !canPublish;
             return (
               <form key={item.status} action={saveAdminEventModerationAction}>
                 <input type="hidden" name="id" value={detail.id} />
@@ -135,8 +147,6 @@ export function AdminEventEditor({ detail, taxonomy, notice, queue, pdpData }: P
                 <AdminButton
                   type="submit"
                   variant={currentStatus === item.status ? 'primary' : 'secondary'}
-                  disabled={disabled}
-                  title={disabled ? 'Публикация заблокирована: есть нерешённые замечания' : undefined}
                 >
                   {item.label}
                 </AdminButton>
@@ -214,7 +224,7 @@ export function AdminEventEditor({ detail, taxonomy, notice, queue, pdpData }: P
         <AdminQueueFields back={queue?.back} next={queue?.next} />
         <AdminSection
           title="SEO"
-          description="Сниппет и индексация события. Пустое поле = сброс к источнику."
+          description="Поля сохраняются как SEO-правка Дайбилет. Пустое поле = сброс к источнику; данные поставщика не меняются."
           actions={
             <AdminButton type="submit" variant="primary">
               Сохранить SEO
@@ -278,7 +288,7 @@ export function AdminEventEditor({ detail, taxonomy, notice, queue, pdpData }: P
         <AdminQueueFields back={queue?.back} next={queue?.next} />
         <AdminSection
           title="Медиа"
-          description="Картинка карточки. Пустое поле - использовать изображение из источника."
+          description="Изображение карточки Дайбилет. Пустое поле использует фото источника; файл поставщика не изменяется."
           actions={
             <AdminButton type="submit" variant="primary">
               Сохранить медиа
@@ -311,6 +321,7 @@ export function AdminEventEditor({ detail, taxonomy, notice, queue, pdpData }: P
                   classification={detail.classification}
                   taxonomy={taxonomy}
                   queue={queue}
+                  sourceManaged={isImported}
                 />
                 <AdminEventVenueLinksForm
                   eventId={detail.id}

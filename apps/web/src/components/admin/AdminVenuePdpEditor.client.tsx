@@ -124,7 +124,7 @@ export function AdminPdpEditor({ entity, entityId, entitySlug, variants, initial
       const saved = await saveAdminPdpAction(entity, entityId, entitySlug, document);
       setDocument(saved);
       setMessage(saved.status === 'READY'
-        ? 'Текст PDP опубликован. Сценарий CTA сохранён как настройка, но покупка и бронирование ещё не подключены.'
+        ? 'Редакционный контент PDP переведён в состояние «Готово» и доступен публичному шаблону. Видимость самой карточки определяется её статусом отдельно.'
         : 'Редакционный контент сохранён; публичная страница его пока не показывает.');
     } catch (cause) { setError(cause instanceof Error ? cause.message : String(cause)); }
     finally { setSaving(false); }
