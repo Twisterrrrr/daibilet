@@ -152,7 +152,13 @@ for (const city of cityFolders) {
   if (!fs.existsSync(dir)) continue;
   const byHash = new Map();
   for (const f of fs.readdirSync(dir)) {
-    if (!f.endsWith('.jpg') || f.includes('-card') || f.includes('-thumb')) continue;
+    // Date-stamped files are cache-busted URLs for the same corrected place image.
+    if (
+      !f.endsWith('.jpg') ||
+      f.includes('-card') ||
+      f.includes('-thumb') ||
+      /-r\d{8}\.jpg$/i.test(f)
+    ) continue;
     const abs = path.join(dir, f);
     if (fs.statSync(abs).size < 10000) continue;
     const h = crypto.createHash('md5').update(fs.readFileSync(abs)).digest('hex');

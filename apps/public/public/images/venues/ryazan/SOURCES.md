@@ -1,6 +1,7 @@
 # Image sources
 
 The card and thumbnail variants are resized derivatives of the listed base files.
+Files with the `-r20261027` suffix are cache-busted copies of corrected assets.
 
 - `identity-kremlin.jpg` — “Рязань. Кремль.jpg”, photo by Sergey Lemtal, [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/), [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:%D0%A0%D1%8F%D0%B7%D0%B0%D0%BD%D1%8C._%D0%9A%D1%80%D0%B5%D0%BC%D0%BB%D1%8C.jpg).
 - `ryazanskiy-kreml.jpg` — “Ryazan Kremlin..jpg”, photo by Максим Шанин, [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/), [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Ryazan_Kremlin..jpg).
