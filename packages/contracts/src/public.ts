@@ -359,9 +359,12 @@ export interface PublicPurchaseOptionDto extends PurchaseFields {
 export interface PublicEventPageDto extends ApiEnvelope {
   event: PublicEventDto;
   pdp?: PublicPdpDocumentDto | null;
-  /** Set when a legacy slot URL points to a completed date but the page has current sibling sessions. */
-  expiredRequestContext?: {
+  /** Context of the requested slot URL, used for a past-date notice when sibling sessions remain. */
+  requestedSessionContext?: {
+    startsAt: string;
+    endsAt?: string | null;
     dateLabel: string;
+    timeLabel?: string | null;
     cityName: string;
     citySlug?: string | null;
   } | null;
