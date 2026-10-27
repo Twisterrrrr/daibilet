@@ -1,3 +1,13 @@
+## 2026-10-27 - Типизация событий и стабильная идентичность публичной страницы
+
+Production-пример `cirk-shapito-zvezdy-manezha-v-g-meleuz-6ac10b122e31a101a629b183` сейчас отдаёт 404. Live sitemap и `/api/public/events` содержат по 4 360 записей; API snapshot показывает 825 сгруппированных строк, 4 010 URL с длинным ID-подобным хвостом, `kind`: 3 714 SINGLE / 637 RECURRING / 9 OPEN_DATE. Каталог группирует повторы, но слотовые записи, стабильная публичная страница и SEO lifecycle ещё не разделены. Контракт и безопасная последовательность зафиксированы в [event identity / typology](./event-identity-typology-seo-2026-10.md).
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| SEO.EVENT-PAGE-IDENTITY | Ввести persisted public-page identity отдельно от provider events/sessions; закрепить старые slugs alias/redirect; sitemap и canonical строить по странице, не по импортной строке | Критический | 🔄 Контракт + live API snapshot готовы; schema/API design следующий. Миграции и записи в prod не было |
+| DATA.EVENT-TYPE-AXES | Развести смысловую категорию/подтип, формат расписания, управление/канал продажи и identity публичной страницы; `EventKind` оставить только `SINGLE/RECURRING/OPEN_DATE` | Высокий | ✅ Контракт зафиксирован; не добавлять enum для каждого вида мероприятия, переиспользовать `Category/Subcategory/EventTag` |
+| SEO.EVENT-EXPIRED-URL | Для expired recurring occurrence redirect только на подтверждённую series/city page; разовые события показывать архивом, если не удалены модератором | Высокий | ⏳ Ждёт persisted page identity; не включать массово до проверки redirect map |
+
 ## 2026-10-18 - SEO-аудит: кэш sitemap, каноникал Москвы, главная no-store
 
 Аудит live 18.10: [seo-audit-2026-10-18.md](./seo-audit-2026-10-18.md). Ядро зелёное (robots/sitemap/canonical/JSON-LD/404/СПб-308); блокеры ниже. Замеры шли во время параллельного деплоя - тайминги перепроверить на спокойном проде.
