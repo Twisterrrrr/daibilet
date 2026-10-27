@@ -15,7 +15,11 @@ import { AdminEventSourceSummary } from '@/components/admin/AdminEventSourceSumm
 import { AdminEventTabs } from '@/components/admin/AdminEventTabs.client';
 import { AdminEventTaxonomyForm } from '@/components/admin/AdminEventTaxonomyForm';
 import { AdminEventVenueLinksForm } from '@/components/admin/AdminEventVenueLinksForm';
-import { AdminEventOpsPanels } from '@/components/admin/AdminEventOpsPanels';
+import {
+  AdminEventSalesPanel,
+  AdminEventSchedulePanel,
+  AdminEventSourcePanel,
+} from '@/components/admin/AdminEventOpsPanels';
 import {
   saveAdminEventModerationAction,
   saveAdminEventOverrideAction,
@@ -134,7 +138,7 @@ export function AdminEventEditor({ detail, taxonomy, notice, queue, pdpData }: P
           },
           {
             id: 'content',
-            label: 'Контент',
+            label: 'Описание и информация',
             content: (
       <form action={saveAdminEventOverrideAction}>
         <input type="hidden" name="id" value={detail.id} />
@@ -286,7 +290,7 @@ export function AdminEventEditor({ detail, taxonomy, notice, queue, pdpData }: P
           },
           {
             id: 'structure',
-            label: 'Таксономия и связи',
+            label: 'Площадка и классификация',
             content: (
               <>
                 <AdminEventTaxonomyForm
@@ -306,9 +310,19 @@ export function AdminEventEditor({ detail, taxonomy, notice, queue, pdpData }: P
             ),
           },
           {
+            id: 'schedule',
+            label: 'Расписание',
+            content: <AdminEventSchedulePanel detail={detail} />,
+          },
+          {
+            id: 'tickets',
+            label: 'Тарифы и квоты',
+            content: <AdminEventSalesPanel detail={detail} />,
+          },
+          {
             id: 'data',
-            label: 'Данные и диагностика',
-            content: <AdminEventOpsPanels detail={detail} />,
+            label: 'Источник и диагностика',
+            content: <AdminEventSourcePanel detail={detail} />,
           },
           ...(detail.slug && pdpData ? [{
             id: 'pdp',

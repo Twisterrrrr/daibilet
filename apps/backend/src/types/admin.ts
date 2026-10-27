@@ -77,6 +77,19 @@ export interface AdminEventOverrideDto extends SeoFields {
 }
 
 export interface AdminEventDetailDto extends AdminEventRowDto {
+  event?: {
+    kind?: 'SINGLE' | 'RECURRING' | 'OPEN_DATE' | null;
+    status?: string | null;
+    purchaseFlow?: 'PLATFORM' | 'EXTERNAL' | null;
+    managementMode?: string | null;
+    scheduleLocked?: boolean | null;
+    defaultCapacityTotal?: number | null;
+    openDateValidFrom?: string | null;
+    openDateValidTo?: string | null;
+    openDateValidDays?: number | null;
+    salesStartsAt?: string | null;
+    salesEndsAt?: string | null;
+  } | null;
   sessions: Array<{
     id: string;
     startsAt?: string | null;
@@ -84,12 +97,21 @@ export interface AdminEventDetailDto extends AdminEventRowDto {
     sourceStatus?: string | null;
     priceFrom?: number | null;
     vacant?: number | null;
+    capacityTotal?: number | null;
+    capacitySold?: number | null;
+    isActive?: boolean;
+    cancelledAt?: string | null;
+    cancelReason?: string | null;
   }>;
   offers: Array<{
     id: string;
     sourceCode: SourceCode;
     title?: string | null;
     priceRub?: number | null;
+    oldPriceRub?: number | null;
+    capacityTotal?: number | null;
+    groupSize?: number | null;
+    weekdayMask?: number | null;
     widgetUrl?: string | null;
     deeplinkUrl?: string | null;
     active: boolean;

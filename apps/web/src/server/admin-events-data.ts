@@ -145,6 +145,19 @@ export type AdminEventDetailData = {
   sourceDescription: string | null;
   sourceImageUrl: string | null;
   slug: string | null;
+  event: {
+    kind: 'SINGLE' | 'RECURRING' | 'OPEN_DATE' | null;
+    status: string | null;
+    purchaseFlow: 'PLATFORM' | 'EXTERNAL' | null;
+    managementMode: string | null;
+    scheduleLocked: boolean | null;
+    defaultCapacityTotal: number | null;
+    openDateValidFrom: string | null;
+    openDateValidTo: string | null;
+    openDateValidDays: number | null;
+    salesStartsAt: string | null;
+    salesEndsAt: string | null;
+  };
   override: AdminEventOverride;
   summary: {
     slots: number;
@@ -160,6 +173,12 @@ export type AdminEventDetailData = {
     sourceStatus: string | null;
     priceFrom: number | null;
     vacant: number;
+    endsAt: string | null;
+    capacityTotal: number | null;
+    capacitySold: number | null;
+    isActive: boolean | null;
+    cancelledAt: string | null;
+    cancelReason: string | null;
     externalId: string | null;
   }>;
   offers: Array<{
@@ -167,6 +186,10 @@ export type AdminEventDetailData = {
     title: string | null;
     sourceCode: string | null;
     priceRub: number | null;
+    oldPriceRub: number | null;
+    capacityTotal: number | null;
+    groupSize: number | null;
+    weekdayMask: number | null;
     active: boolean;
     widgetUrl: string | null;
     deeplinkUrl: string | null;
@@ -264,6 +287,43 @@ function emptySummary() {
   };
 }
 
+function emptyEventConfig(): AdminEventDetailData['event'] {
+  return {
+    kind: null,
+    status: null,
+    purchaseFlow: null,
+    managementMode: null,
+    scheduleLocked: null,
+    defaultCapacityTotal: null,
+    openDateValidFrom: null,
+    openDateValidTo: null,
+    openDateValidDays: null,
+    salesStartsAt: null,
+    salesEndsAt: null,
+  };
+}
+
+function normalizeEventKind(value: unknown): AdminEventDetailData['event']['kind'] {
+  const kind = String(value || '').toUpperCase();
+  return kind === 'SINGLE' || kind === 'RECURRING' || kind === 'OPEN_DATE' ? kind : null;
+}
+
+function normalizeEventConfig(raw: Record<string, unknown>): AdminEventDetailData['event'] {
+  return {
+    kind: normalizeEventKind(raw.kind),
+    status: raw.status != null ? String(raw.status) : null,
+    purchaseFlow: raw.purchaseFlow === 'PLATFORM' || raw.purchaseFlow === 'EXTERNAL' ? raw.purchaseFlow : null,
+    managementMode: raw.managementMode != null ? String(raw.managementMode) : null,
+    scheduleLocked: typeof raw.scheduleLocked === 'boolean' ? raw.scheduleLocked : null,
+    defaultCapacityTotal: raw.defaultCapacityTotal == null ? null : asNumber(raw.defaultCapacityTotal),
+    openDateValidFrom: raw.openDateValidFrom != null ? String(raw.openDateValidFrom) : null,
+    openDateValidTo: raw.openDateValidTo != null ? String(raw.openDateValidTo) : null,
+    openDateValidDays: raw.openDateValidDays == null ? null : asNumber(raw.openDateValidDays),
+    salesStartsAt: raw.salesStartsAt != null ? String(raw.salesStartsAt) : null,
+    salesEndsAt: raw.salesEndsAt != null ? String(raw.salesEndsAt) : null,
+  };
+}
+
 function emptySales() {
   return {
     soldTickets: 0,
@@ -349,6 +409,7 @@ export async function loadAdminEventDetail(eventId: string): Promise<AdminEventD
       sourceDescription: null,
       sourceImageUrl: null,
       slug: null,
+      event: emptyEventConfig(),
       override: emptyOverride(),
       summary: emptySummary(),
       sessions: [],
@@ -367,6 +428,7 @@ export async function loadAdminEventDetail(eventId: string): Promise<AdminEventD
   let canPublish: boolean | null = null;
   let publishBlockers: string[] = [];
   let slug: string | null = null;
+  let eventConfig = emptyEventConfig();
   let classification = emptyClassification();
   let source = emptySource();
 
@@ -385,6 +447,7 @@ export async function loadAdminEventDetail(eventId: string): Promise<AdminEventD
           ? match.publishBlockers.map((item) => String(item))
           : [];
         slug = match.slug != null ? String(match.slug) : null;
+        eventConfig.kind = normalizeEventKind(match.eventType || match.kind);
         classification = {
           categoryId: match.categoryId != null ? String(match.categoryId) : null,
           primarySubcategoryId:
@@ -427,6 +490,7 @@ export async function loadAdminEventDetail(eventId: string): Promise<AdminEventD
         sourceDescription: null,
         sourceImageUrl: null,
         slug,
+        event: eventConfig,
         override: emptyOverride(),
         summary: emptySummary(),
         sessions: [],
@@ -455,6 +519,7 @@ export async function loadAdminEventDetail(eventId: string): Promise<AdminEventD
       ? payload.eventIds.map((item) => String(item))
       : [];
     const venueLinks = normalizeVenueLinks(payload.venueLinks);
+    eventConfig = normalizeEventConfig(event);
 
     const sessions = Array.isArray(payload.sessions)
       ? payload.sessions.map((item) => {
@@ -462,9 +527,15 @@ export async function loadAdminEventDetail(eventId: string): Promise<AdminEventD
           return {
             id: String(row.id || ''),
             startsAt: row.startsAt != null ? String(row.startsAt) : null,
+            endsAt: row.endsAt != null ? String(row.endsAt) : null,
             sourceStatus: row.sourceStatus != null ? String(row.sourceStatus) : null,
             priceFrom: row.priceFrom == null ? null : asNumber(row.priceFrom),
             vacant: asNumber(row.vacant),
+            capacityTotal: row.capacityTotal == null ? null : asNumber(row.capacityTotal),
+            capacitySold: row.capacitySold == null ? null : asNumber(row.capacitySold),
+            isActive: typeof row.isActive === 'boolean' ? row.isActive : null,
+            cancelledAt: row.cancelledAt != null ? String(row.cancelledAt) : null,
+            cancelReason: row.cancelReason != null ? String(row.cancelReason) : null,
             externalId: row.externalId != null ? String(row.externalId) : null,
           };
         })
@@ -478,6 +549,10 @@ export async function loadAdminEventDetail(eventId: string): Promise<AdminEventD
             title: row.title != null ? String(row.title) : null,
             sourceCode: row.sourceCode != null ? String(row.sourceCode) : null,
             priceRub: row.priceRub == null ? null : asNumber(row.priceRub),
+            oldPriceRub: row.oldPriceRub == null ? null : asNumber(row.oldPriceRub),
+            capacityTotal: row.capacityTotal == null ? null : asNumber(row.capacityTotal),
+            groupSize: row.groupSize == null ? null : asNumber(row.groupSize),
+            weekdayMask: row.weekdayMask == null ? null : asNumber(row.weekdayMask),
             active: row.active !== false,
             widgetUrl: row.widgetUrl != null ? String(row.widgetUrl) : null,
             deeplinkUrl: row.deeplinkUrl != null ? String(row.deeplinkUrl) : null,
@@ -502,6 +577,7 @@ export async function loadAdminEventDetail(eventId: string): Promise<AdminEventD
       sourceDescription: event.description != null ? String(event.description) : null,
       sourceImageUrl: event.imageUrl != null ? String(event.imageUrl) : null,
       slug,
+      event: eventConfig,
       override: normalizeOverride(payload.override),
       summary: {
         slots: asNumber(summaryRaw.slots, sessions.length),
@@ -535,6 +611,7 @@ export async function loadAdminEventDetail(eventId: string): Promise<AdminEventD
       sourceDescription: null,
       sourceImageUrl: null,
       slug,
+      event: eventConfig,
       override: emptyOverride(),
       summary: emptySummary(),
       sessions: [],
