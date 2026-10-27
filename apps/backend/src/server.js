@@ -6,6 +6,15 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createDb } from './db.js';
+import {
+  addAdminEventPageRoute,
+  createAdminEventPage,
+  deleteAdminEventPageRoute,
+  findAdminEventPageByEvent,
+  getAdminEventPage,
+  replaceAdminEventPageEvents,
+  updateAdminEventPage,
+} from './event-pages.js';
 import { PDP_VARIANTS, readPdpDocument, savePdpDocument } from './pdp-documents.js';
 import {
   buildAdminDashboard,
@@ -755,6 +764,83 @@ export async function handleRequest(request, response) {
 
     if (route === 'GET /api/admin/pdp/variants') {
       sendJson(response, PDP_VARIANTS);
+      return;
+    }
+
+    if (route === 'POST /api/admin/event-pages') {
+      try {
+        const result = await createAdminEventPage(db, await readJsonBody(request));
+        sendJson(response, result, 201);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'invalid_event_page';
+        const status = /unique|duplicate/i.test(message) ? 409 : 400;
+        sendJson(response, { error: message }, status);
+      }
+      return;
+    }
+
+    const eventPageByEventMatch = request.method === 'GET'
+      ? url.pathname.match(/^\/api\/admin\/event-pages\/by-event\/([^/]+)$/)
+      : null;
+    if (eventPageByEventMatch) {
+      const result = await findAdminEventPageByEvent(db, decodeURIComponent(eventPageByEventMatch[1]));
+      sendJson(response, result, result ? 200 : 404);
+      return;
+    }
+
+    const eventPageEventsMatch = request.method === 'PUT'
+      ? url.pathname.match(/^\/api\/admin\/event-pages\/([^/]+)\/events$/)
+      : null;
+    if (eventPageEventsMatch) {
+      const id = decodeURIComponent(eventPageEventsMatch[1]);
+      try {
+        const result = await replaceAdminEventPageEvents(db, id, await readJsonBody(request));
+        sendJson(response, result, result ? 200 : 404);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'invalid_event_page_events';
+        const status = /unique|duplicate/i.test(message) ? 409 : 400;
+        sendJson(response, { error: message }, status);
+      }
+      return;
+    }
+
+    const eventPageRoutesMatch = request.method === 'POST'
+      ? url.pathname.match(/^\/api\/admin\/event-pages\/([^/]+)\/routes$/)
+      : null;
+    if (eventPageRoutesMatch) {
+      try {
+        const result = await addAdminEventPageRoute(db, decodeURIComponent(eventPageRoutesMatch[1]), await readJsonBody(request));
+        sendJson(response, result, result ? 201 : 404);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'invalid_event_page_route';
+        const status = /unique|duplicate/i.test(message) ? 409 : 400;
+        sendJson(response, { error: message }, status);
+      }
+      return;
+    }
+
+    const eventPageRouteMatch = request.method === 'DELETE'
+      ? url.pathname.match(/^\/api\/admin\/event-pages\/([^/]+)\/routes\/([^/]+)$/)
+      : null;
+    if (eventPageRouteMatch) {
+      const deleted = await deleteAdminEventPageRoute(db, decodeURIComponent(eventPageRouteMatch[1]), decodeURIComponent(eventPageRouteMatch[2]));
+      sendJson(response, { deleted }, deleted ? 200 : 404);
+      return;
+    }
+
+    const eventPageMatch = url.pathname.match(/^\/api\/admin\/event-pages\/([^/]+)$/);
+    if (eventPageMatch && (request.method === 'GET' || request.method === 'PUT')) {
+      const id = decodeURIComponent(eventPageMatch[1]);
+      try {
+        const result = request.method === 'GET'
+          ? await getAdminEventPage(db, id)
+          : await updateAdminEventPage(db, id, await readJsonBody(request));
+        sendJson(response, result, result ? 200 : 404);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'invalid_event_page';
+        const status = /unique|duplicate/i.test(message) ? 409 : 400;
+        sendJson(response, { error: message }, status);
+      }
       return;
     }
 

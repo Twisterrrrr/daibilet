@@ -1,5 +1,20 @@
 # Decision Log — Daibilet
 
+## 2026-10-27 — Stable EventPage identity is separate from catalog inventory
+
+`Event` remains the inventory/purchasing entity and `EventSession` remains its
+dated slot. `PdpDocument` remains an optional editorial document attached to a
+single Event or Venue. A new additive `EventPage` represents the stable public
+editorial identity and may link multiple explicitly reviewed Events through
+`EventPageEvent`; it does not replace Event, sessions, offers, or provider IDs.
+
+`EventPageRoute` records candidate and historical paths only. This schema
+foundation does not alter runtime routing, canonical tags, sitemap, redirects,
+fallback lookup, or indexing. New pages default to draft/non-indexable until
+the sync policy and URL correspondence map are approved. Never infer a merge
+from title similarity or provider grouping alone. See
+[EventPage foundation](./event-page-foundation-2026-10-27.md).
+
 ## 2026-10-14 — Places taxonomy for completed city hubs
 
 PDP.xlsx is the complete editorial source for the city hubs represented in that workbook,
