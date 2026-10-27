@@ -51,13 +51,17 @@ export function AdminEventEditor({ detail, taxonomy, notice, queue, pdpData }: P
   const statusLabel = MODERATION_STATUSES.find((item) => item.status === currentStatus)?.label ?? currentStatus;
   const canPublish = detail.canPublish !== false && detail.publishBlockers.length === 0;
   const displayTitle = override.title || detail.sourceTitle;
+  const isImported = detail.event.managementMode === 'SOURCE_MANAGED'
+    || /TICKETSCLOUD|TEPLOHOD/i.test(detail.source.sourceLabel || '');
 
   return (
     <div className="space-y-5">
       <AdminPageHeader
         breadcrumbs={[{ label: 'События', href: '/admin/events' }, { label: detail.id }]}
         title={displayTitle}
-        description="Правки хранятся поверх источника: пустое поле означает «как в источнике». Каждая секция сохраняется своей кнопкой."
+        description={isImported
+          ? 'Импортированное событие. Источник управляет расписанием и продажей; правки здесь относятся только к карточке Дайбилет.'
+          : 'Поля события сгруппированы по задачам. Каждая доступная секция сохраняется отдельно.'}
         badge={<AdminBadge tone={currentStatus === 'PUBLISHED' ? 'success' : 'neutral'}>сейчас: {statusLabel}</AdminBadge>}
         actions={
           detail.slug ? (
@@ -75,6 +79,12 @@ export function AdminEventEditor({ detail, taxonomy, notice, queue, pdpData }: P
       {notice ? (
         <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm text-emerald-800">
           {notice}
+        </div>
+      ) : null}
+
+      {isImported ? (
+        <div className="rounded-lg border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-950">
+          <strong>Данные поставщика только для чтения.</strong> Расписание, доступность, тарифы и квоты приходят из источника. Контентные правки, классификация, связи, SEO и видимость меняют представление события на Дайбилет и не отправляют изменения обратно поставщику.
         </div>
       ) : null}
 
@@ -99,7 +109,9 @@ export function AdminEventEditor({ detail, taxonomy, notice, queue, pdpData }: P
                 <AdminEventSourceSummary detail={detail} />
                 <AdminSection
         title="Модерация"
-        description="Статус определяет, видно ли событие на витрине. «Опубликовать» доступно, когда устранены блокеры."
+        description={isImported
+          ? 'Управляет видимостью карточки на витрине Дайбилет. Этот статус не меняет публикацию у поставщика.'
+          : 'Статус определяет видимость карточки на витрине. «Опубликовать» доступно, когда устранены блокеры.'}
         actions={
           <AdminBadge tone={currentStatus === 'PUBLISHED' ? 'success' : 'neutral'}>
             сейчас: {statusLabel}
@@ -147,7 +159,7 @@ export function AdminEventEditor({ detail, taxonomy, notice, queue, pdpData }: P
         <AdminQueueFields back={queue?.back} next={queue?.next} />
         <AdminSection
           title="Контент"
-          description={`Пустое поле - сброс к источнику. В источнике: ${detail.sourceTitle}`}
+          description={`Это контентный override Дайбилет. Пустое поле использует значение источника. В источнике: ${detail.sourceTitle}`}
           actions={
             <AdminButton type="submit" variant="primary">
               Сохранить контент
