@@ -48,7 +48,16 @@ function eventIdFromUrl(url) {
   const last = new URL(url).pathname.split('/').filter(Boolean).at(-1) || '';
   return last.match(/^tc-([a-f\d]{24})-/i)?.[1]?.toLowerCase()
     || last.match(/([a-f\d]{24})$/i)?.[1]?.toLowerCase()
+    || last.match(/-(\d{2,6})$/)?.[1]
     || '';
+}
+function internalEventIdFromUrl(url) {
+  const last = new URL(url).pathname.split('/').filter(Boolean).at(-1) || '';
+  // A hexadecimal Ticketscloud ID takes precedence; a numeric ending can be
+  // part of its title (e.g. a tour/date) and must not be treated as Teplohod.
+  if (/^tc-[a-f\d]{24}-/i.test(last) || /[a-f\d]{24}$/i.test(last)) return '';
+  const tepId = last.match(/-(\d{2,6})$/)?.[1];
+  return tepId ? `evt_tep_${tepId}` : '';
 }
 function eventSlugFromUrl(url) {
   let slug = decodeURIComponent(new URL(url).pathname.split('/').filter(Boolean).at(-1) || '');
@@ -70,10 +79,12 @@ const sitemapUrls = [...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map((match) => match
 const urlRecords = [...new Set([...sitemapUrls, ...knownLegacy.map(([url]) => url)])].map((url) => ({
   url,
   externalId: eventIdFromUrl(url),
+  internalEventId: internalEventIdFromUrl(url),
   slug: eventSlugFromUrl(url),
   isHistoricalExample: knownLegacy.some(([legacy]) => legacy === url),
 }));
 const ids = [...new Set(urlRecords.map((record) => record.externalId).filter(Boolean))];
+const internalEventIds = [...new Set(urlRecords.map((record) => record.internalEventId).filter(Boolean))];
 const slugs = [...new Set(urlRecords.map((record) => record.slug))];
 const paths = [...new Set(urlRecords.map((record) => new URL(record.url).pathname))];
 
@@ -106,7 +117,14 @@ try {
           SELECT array_agg(DISTINCT source.code::text) AS codes,
                  array_agg(DISTINCT link."externalId") AS external_ids,
                  array_agg(DISTINCT link."metaExternalId") FILTER (WHERE link."metaExternalId" IS NOT NULL) AS meta_ids
-          FROM "EventSourceLink" link
+          FROM (
+            SELECT link."eventId", link."sourceId", link."externalId", link."metaExternalId"
+            FROM "EventSourceLink" link
+            UNION ALL
+            SELECT link."eventId", link."sourceId", link."externalId", NULL::text AS "metaExternalId"
+            FROM "ProviderLink" link
+            WHERE link."entityKind" = 'EVENT' AND link."eventId" IS NOT NULL
+          ) link
           JOIN "Source" source ON source.id = link."sourceId"
           WHERE link."eventId" = e.id
         ) sources ON TRUE
@@ -119,12 +137,14 @@ try {
         LEFT JOIN LATERAL (
           SELECT count(*) AS total FROM "EventOffer" offer WHERE offer."eventId" = e.id AND offer.active
         ) offers ON TRUE
-        WHERE e.slug = ANY($1::text[])
+        WHERE e.id = ANY($4::text[])
+           OR e.slug = ANY($1::text[])
            OR e."canonicalPath" = ANY($2::text[])
            OR EXISTS (SELECT 1 FROM "EventSourceLink" link WHERE link."eventId" = e.id AND link."externalId" = ANY($3::text[]))
+           OR EXISTS (SELECT 1 FROM "ProviderLink" link WHERE link."eventId" = e.id AND link."entityKind" = 'EVENT' AND link."externalId" = ANY($3::text[]))
         ORDER BY e.id
       `,
-      values: [slugs, paths, ids],
+      values: [slugs, paths, ids, internalEventIds],
     });
     rows = result.rows;
     await client.query('ROLLBACK');
@@ -139,16 +159,21 @@ try {
 }
 
 const byExternalId = new Map();
+const byInternalEventId = new Map();
 const bySlug = new Map();
 const byPath = new Map();
 for (const row of rows) {
+  byInternalEventId.set(row.eventId, row);
   for (const externalId of row.sourceExternalIds) byExternalId.set(externalId.toLowerCase(), row);
   bySlug.set(row.slug, row);
   for (const path of [row.canonicalPath, row.overrideCanonicalPath].filter(Boolean)) byPath.set(path, row);
 }
 const urlCountsByMeta = new Map();
 for (const record of urlRecords) {
-  const row = byExternalId.get(record.externalId) || bySlug.get(record.slug) || byPath.get(new URL(record.url).pathname);
+  const row = byInternalEventId.get(record.internalEventId)
+    || byExternalId.get(record.externalId)
+    || bySlug.get(record.slug)
+    || byPath.get(new URL(record.url).pathname);
   record.row = row || null;
   const meta = row?.metaExternalIds?.[0];
   record.metaGroup = meta || '';
