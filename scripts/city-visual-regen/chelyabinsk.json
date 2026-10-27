@@ -1,0 +1,163 @@
+{
+  "city": "chelyabinsk",
+  "mustSeeCount": 105,
+  "regen": [
+    {
+      "stem": "arkaim-muzey-prirody-i-cheloveka",
+      "name": "arkaim muzey prirody i cheloveka",
+      "clusterSize": 24,
+      "keeper": "arkaim-gora-shamanka-lysaya"
+    },
+    {
+      "stem": "arkaim-muzey-vosssozdanogo-poseleniya",
+      "name": "arkaim muzey vosssozdanogo poseleniya",
+      "clusterSize": 24,
+      "keeper": "arkaim-gora-shamanka-lysaya"
+    },
+    {
+      "stem": "arkaim-poselok-mednogo-veka",
+      "name": "arkaim poselok mednogo veka",
+      "clusterSize": 3,
+      "keeper": "arkaim-gora-razuma"
+    },
+    {
+      "stem": "arkaim-vetryanaya-melnitsa",
+      "name": "arkaim vetryanaya melnitsa",
+      "clusterSize": 24,
+      "keeper": "arkaim-gora-shamanka-lysaya"
+    },
+    {
+      "stem": "taganay-belyy-klyuch",
+      "name": "taganay belyy klyuch",
+      "clusterSize": 24,
+      "keeper": "arkaim-gora-shamanka-lysaya"
+    },
+    {
+      "stem": "taganay-kamennaya-reka",
+      "name": "taganay kamennaya reka",
+      "clusterSize": 24,
+      "keeper": "arkaim-gora-shamanka-lysaya"
+    },
+    {
+      "stem": "taganay-lestnitsa",
+      "name": "taganay lestnitsa",
+      "clusterSize": 24,
+      "keeper": "arkaim-gora-shamanka-lysaya"
+    },
+    {
+      "stem": "taganay-perya",
+      "name": "taganay perya",
+      "clusterSize": 24,
+      "keeper": "arkaim-gora-shamanka-lysaya"
+    },
+    {
+      "stem": "taganay-usadba",
+      "name": "taganay usadba",
+      "clusterSize": 24,
+      "keeper": "arkaim-gora-shamanka-lysaya"
+    },
+    {
+      "stem": "turgoyak-buhta-trimaranov",
+      "name": "turgoyak buhta trimaranov",
+      "clusterSize": 24,
+      "keeper": "arkaim-gora-shamanka-lysaya"
+    },
+    {
+      "stem": "turgoyak-ekotropa",
+      "name": "turgoyak ekotropa",
+      "clusterSize": 24,
+      "keeper": "arkaim-gora-shamanka-lysaya"
+    },
+    {
+      "stem": "turgoyak-simvol-very",
+      "name": "turgoyak simvol very",
+      "clusterSize": 24,
+      "keeper": "arkaim-gora-shamanka-lysaya"
+    },
+    {
+      "stem": "uvildy-ekotropa-uvildinskie-zori",
+      "name": "uvildy ekotropa uvildinskie zori",
+      "clusterSize": 3,
+      "keeper": "arkaim-gora-razuma"
+    },
+    {
+      "stem": "uvildy-lesnoe-ozero-maloe-uvildy",
+      "name": "uvildy lesnoe ozero maloe uvildy",
+      "clusterSize": 2,
+      "keeper": "arkaim-kurgan-temir"
+    },
+    {
+      "stem": "uvildy-mys-krasnyy",
+      "name": "uvildy mys krasnyy",
+      "clusterSize": 24,
+      "keeper": "arkaim-gora-shamanka-lysaya"
+    },
+    {
+      "stem": "uvildy-ostrov-golodai",
+      "name": "uvildy ostrov golodai",
+      "clusterSize": 24,
+      "keeper": "arkaim-gora-shamanka-lysaya"
+    },
+    {
+      "stem": "uvildy-ostrov-vyazovyy",
+      "name": "uvildy ostrov vyazovyy",
+      "clusterSize": 24,
+      "keeper": "arkaim-gora-shamanka-lysaya"
+    },
+    {
+      "stem": "uvildy-radonovyy-byuvet",
+      "name": "uvildy radonovyy byuvet",
+      "clusterSize": 24,
+      "keeper": "arkaim-gora-shamanka-lysaya"
+    },
+    {
+      "stem": "uvildy-tsentralnyy-plyazh",
+      "name": "uvildy tsentralnyy plyazh",
+      "clusterSize": 24,
+      "keeper": "arkaim-gora-shamanka-lysaya"
+    },
+    {
+      "stem": "zyuratkul-ekotropa-na-hrebet",
+      "name": "zyuratkul ekotropa na hrebet",
+      "clusterSize": 24,
+      "keeper": "arkaim-gora-shamanka-lysaya"
+    },
+    {
+      "stem": "zyuratkul-gora-lukash",
+      "name": "zyuratkul gora lukash",
+      "clusterSize": 24,
+      "keeper": "arkaim-gora-shamanka-lysaya"
+    },
+    {
+      "stem": "zyuratkul-kipyashchiy-klyuch",
+      "name": "zyuratkul kipyashchiy klyuch",
+      "clusterSize": 24,
+      "keeper": "arkaim-gora-shamanka-lysaya"
+    },
+    {
+      "stem": "zyuratkul-maralovaya-ferma",
+      "name": "zyuratkul maralovaya ferma",
+      "clusterSize": 24,
+      "keeper": "arkaim-gora-shamanka-lysaya"
+    },
+    {
+      "stem": "zyuratkul-reka-bolshaya-satka",
+      "name": "zyuratkul reka bolshaya satka",
+      "clusterSize": 24,
+      "keeper": "arkaim-gora-shamanka-lysaya"
+    },
+    {
+      "stem": "zyuratkul-skaly-medvedi",
+      "name": "zyuratkul skaly medvedi",
+      "clusterSize": 24,
+      "keeper": "arkaim-gora-shamanka-lysaya"
+    },
+    {
+      "stem": "zyuratkul-vysokogornoe-ozero",
+      "name": "zyuratkul vysokogornoe ozero",
+      "clusterSize": 24,
+      "keeper": "arkaim-gora-shamanka-lysaya"
+    }
+  ],
+  "d0": 21
+}

@@ -15,6 +15,7 @@ import { InstitutionCard } from '@/components/InstitutionCard';
 import { OsmMapEmbed } from '@/components/OsmMapEmbed';
 import { formatMoney, formatNumber } from '@/data';
 import { formatStreetAddress } from '@/lib/address';
+import { build2gisRouteUrl } from '@/lib/maps';
 import { institutionTypeEmoji, normalizeVenueKind, venueTypeLabel } from '@/lib/venue-meta';
 import { eventHref, venueHref } from '@/routes';
 import type { PublicSession, PublicVenue, PublicVenuePage } from '@/types';
@@ -293,13 +294,13 @@ export function InstitutionVenueLayout({
                     Яндекс.Карты
                   </a>
                   <a
-                    href={`https://www.google.com/maps/dir/?api=1&destination=${venue.latitude},${venue.longitude}`}
+                    href={build2gisRouteUrl(venue.latitude!, venue.longitude!)}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
                   >
                     <Car className="h-3.5 w-3.5" />
-                    Маршрут
+                    Маршрут в 2ГИС
                   </a>
                 </div>
               </div>
