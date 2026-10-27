@@ -50,7 +50,7 @@ export const SARATOV_SLIDES: CityIdentitySlide[] = [
     id: 'radischev-museum',
     title: 'Радищевский музей',
     text: 'Первый общедоступный художественный музей в Российской империи - «Поволжский Эрмитаж» с подлинниками от Рокотова и Брюллова до авангарда Малевича.',
-    imageSrc: '/images/venues/saratov/identity-art.jpg',
+    imageSrc: '/images/venues/saratov/identity-art-r20261027.jpg',
     imageAlt: 'Саратовский художественный музей имени А. Н. Радищева',
     slugs: [
       'saratov-hudozhestvennyy-muzey-radischeva',

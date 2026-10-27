@@ -121,7 +121,7 @@ export const PENZA_LINE_DAY_ROUTE_PRESETS: any[] = [
     description: 'Старая крепость, классический центр и парк на холме: спокойный обзорный трек по главной Пензе.',
     travelVector: '6 точек · пешком по центру',
     timingNote: 'Маршрут от смотровой старой крепости к парку Белинского.',
-    coverImageUrl: '/images/venues/penza/park-imeni-v-g-belinskogo.jpg',
+    coverImageUrl: '/images/venues/penza/park-imeni-v-g-belinskogo-r20261027.jpg',
     stops: PENZA_GREEN_LINE_STOPS,
   },
   {
