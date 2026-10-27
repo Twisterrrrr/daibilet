@@ -35,6 +35,25 @@ function readinessLabel(value: string) {
   return value || '—';
 }
 
+function eventTypeLabel(value: string | null) {
+  if (value === 'single') return 'Разовое';
+  if (value === 'recurring') return 'Повторяющееся';
+  if (value === 'open_date') return 'С открытой датой';
+  if (value === 'mixed') return 'Несколько форматов';
+  return 'Формат не указан';
+}
+
+function managementLabel(mode: string | null, source: string) {
+  if (mode === 'MIXED') return 'В группе смешаны режимы управления';
+  if (mode === 'SOURCE_MANAGED' || /TICKETSCLOUD|TEPLOHOD/i.test(source)) {
+    return 'Импорт · изменения только в Дайбилет';
+  }
+  if (mode === 'DAIBILET_MANAGED') return 'Управляется Дайбилет';
+  if (mode === 'SUPPLIER_DRAFTS') return 'Черновик поставщика';
+  if (mode === 'SUPPLIER_SELF_SERVICE') return 'Кабинет поставщика';
+  return 'Режим управления не указан';
+}
+
 export default async function AdminEventsPage({ searchParams }: PageProps) {
   const raw = await searchParams;
   const q = first(raw.q) || '';
@@ -50,7 +69,7 @@ export default async function AdminEventsPage({ searchParams }: PageProps) {
         <div>
           <h2 className="text-xl font-semibold text-slate-900">События</h2>
           <p className="mt-1 text-sm text-slate-600">
-            Список + detail (override, taxonomy, schedule, sales, source) в Next.
+            Каталог событий с раздельными статусами карточки, источника и готовности.
           </p>
         </div>
       </header>
@@ -142,14 +161,20 @@ export default async function AdminEventsPage({ searchParams }: PageProps) {
                     <td className="px-3 py-2">
                       <div className="font-medium text-slate-900">{row.title}</div>
                       <div className="mt-0.5 text-xs text-slate-500">
-                        {row.venue} · {row.slotCount} слот(ов)
+                        <span className="text-slate-700">{eventTypeLabel(row.eventType)}</span>
+                        {' · '}{row.venue} · {row.slotCount} слотов
                         {!row.hasImage ? ' · без фото' : ''}
                         {!row.purchaseReady ? ' · покупка не готова' : ''}
                         {row.landingHits.length ? ` · лендинги: ${row.landingHits.length}` : ''}
                       </div>
                     </td>
                     <td className="px-3 py-2 text-slate-600">{row.city}</td>
-                    <td className="px-3 py-2 text-xs text-slate-600">{row.source}</td>
+                    <td className="px-3 py-2">
+                      <div className="text-xs text-slate-700">{row.source}</div>
+                      <div className={`mt-1 text-[11px] ${row.managementMode === 'SOURCE_MANAGED' || /TICKETSCLOUD|TEPLOHOD/i.test(row.source) ? 'text-amber-800' : 'text-slate-500'}`}>
+                        {managementLabel(row.managementMode, row.source)}
+                      </div>
+                    </td>
                     <td className="px-3 py-2">
                       <span className="rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs">
                         {readinessLabel(row.readiness)}
@@ -170,7 +195,7 @@ export default async function AdminEventsPage({ searchParams }: PageProps) {
                             target="_blank"
                             rel="noreferrer"
                           >
-                            Public
+                            Открыть на сайте
                           </a>
                         ) : null}
                       </div>

@@ -7,6 +7,9 @@ export type AdminEventListRow = {
   city: string;
   venue: string;
   source: string;
+  eventType: 'single' | 'recurring' | 'open_date' | 'mixed' | null;
+  managementMode: string | null;
+  purchaseFlow: string | null;
   readiness: string;
   status: string;
   priceFrom: number | null;
@@ -44,7 +47,10 @@ function normalizeRow(raw: unknown): AdminEventListRow {
     title: String(row.title || 'Без названия'),
     city: String(row.city || row.destination || '—'),
     venue: String(row.venue || '—'),
-    source: String(row.sourceCode || row.source || '—'),
+    source: String(row.source || row.sourceCode || '—'),
+    eventType: normalizeListEventType(row.eventType),
+    managementMode: row.managementMode != null ? String(row.managementMode) : null,
+    purchaseFlow: row.purchaseFlow != null ? String(row.purchaseFlow) : null,
     readiness: String(row.readiness || row.status || '—'),
     status: String(row.status || '—'),
     priceFrom: row.priceFrom == null ? null : asNumber(row.priceFrom, 0),
@@ -306,6 +312,11 @@ function emptyEventConfig(): AdminEventDetailData['event'] {
 function normalizeEventKind(value: unknown): AdminEventDetailData['event']['kind'] {
   const kind = String(value || '').toUpperCase();
   return kind === 'SINGLE' || kind === 'RECURRING' || kind === 'OPEN_DATE' ? kind : null;
+}
+
+function normalizeListEventType(value: unknown): AdminEventListRow['eventType'] {
+  const kind = String(value || '').toLowerCase();
+  return kind === 'single' || kind === 'recurring' || kind === 'open_date' || kind === 'mixed' ? kind : null;
 }
 
 function normalizeEventConfig(raw: Record<string, unknown>): AdminEventDetailData['event'] {

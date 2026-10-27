@@ -27,6 +27,8 @@ export interface AdminEventRowDto extends SeoFields, PurchaseFields {
   slotCount?: number;
   source: string;
   sourceCode?: SourceCode | null;
+  managementMode?: string | null;
+  purchaseFlow?: string | null;
   externalId?: string | null;
   title: string;
   description?: string | null;
@@ -44,7 +46,7 @@ export interface AdminEventRowDto extends SeoFields, PurchaseFields {
   offerSourceCode?: string | null;
   offerTitle?: string | null;
   offerPriceRub?: number | null;
-  eventType: string;
+  eventType: 'single' | 'recurring' | 'open_date' | string;
   startsAt?: string | null;
   ageLimit?: string | null;
   priceFrom?: number | null;

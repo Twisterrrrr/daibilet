@@ -3355,12 +3355,16 @@ function groupAdminEventRows(events) {
         readinessCodes: [...(event.readinessCodes || [])],
         readinessIssues: [...(event.readinessIssues || [])],
         _groupHasFutureSession: eventHasFuture,
+        _groupEventTypeMixed: false,
       });
       continue;
     }
 
     current.groupEventIds.push(event.id);
     current.groupedEventsCount += 1;
+    if (current.kind !== event.kind) current._groupEventTypeMixed = true;
+    if (current.managementMode !== event.managementMode) current.managementMode = 'MIXED';
+    if (current.purchaseFlow !== event.purchaseFlow) current.purchaseFlow = 'MIXED';
     current.slotCount += event.slotCount || (event.startsAt ? 1 : 0);
     current.landingHits = uniqueValues(current.landingHits.concat(event.landingHits || []));
     current.tags = uniqueValues(current.tags.concat(event.tags || []));
@@ -3408,7 +3412,8 @@ function groupAdminEventRows(events) {
 
   return Array.from(groups.values())
     .map((group) => {
-      const { _groupHasFutureSession, ...rest } = group;
+      const { _groupHasFutureSession, _groupEventTypeMixed, ...rest } = group;
+      rest.eventType = _groupEventTypeMixed ? 'mixed' : String(rest.kind || '').toLowerCase();
       return finalizeGroupedAdminReadiness(rest, Boolean(_groupHasFutureSession));
     })
     .sort((a, b) => {
@@ -5680,6 +5685,8 @@ async function eventRows(db, limit, options = {}) {
         length(trim(coalesce(e.description, '')))::int as "descriptionLength",
         e.kind,
         e.status,
+        e."managementMode",
+        e."purchaseFlow",
         e."sourceStatus",
         e."ageLimit",
         e."imageUrl",
@@ -5833,7 +5840,9 @@ async function eventRows(db, limit, options = {}) {
       purchaseMode: purchase.mode,
       purchaseProvider: purchase.provider,
       purchaseUrlSource: purchase.urlSource,
-      eventType: String(row.kind || '').toLowerCase(),
+      eventType: row.eventType || String(row.kind || '').toLowerCase(),
+      managementMode: row.managementMode || null,
+      purchaseFlow: row.purchaseFlow || null,
       startsAt: row.nextStartsAt || row.startsAt,
       slotCount: row.slotCount || 0,
       ageLimit: row.ageLimit,
