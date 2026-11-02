@@ -2602,7 +2602,7 @@ const SUBURB_NESTED_AUTO_IMAGES: Record<string, string> = {
   'ekaterinburg-yuzhnyy-sklon-gorodishche': '/images/venues/ekaterinburg/yuzhnyy-sklon-gorodishche.jpg',
   'ekaterinburg-zmeeed': '/images/venues/ekaterinburg/zmeeed.jpg',
   'ekaterinburg-zona-bureniya-russkoe-zoloto': '/images/venues/ekaterinburg/zona-bureniya-russkoe-zoloto.jpg',
-  'kaliningrad-baltiysk-mayak-pillau-i-pamyatnik-petru-i': '/images/venues/kaliningrad/baltiysk-mayak-pillau-i-pamyatnik-petru-i.jpg',
+  'kaliningrad-baltiysk-mayak-pillau-i-pamyatnik-petru-i': '/images/venues/kaliningrad/baltiysk-mayak-pillau-i-pamyatnik-petru-i-r20261102.jpg',
   'kaliningrad-baltiysk-nemetskiy-aerodrom-noytif': '/images/venues/kaliningrad/baltiysk-nemetskiy-aerodrom-noytif.jpg',
   'kaliningrad-baltiysk-pamyatnik-elizavete-petrovne': '/images/venues/kaliningrad/baltiysk-pamyatnik-elizavete-petrovne.jpg',
   'kaliningrad-baltiysk-pehotnye-kazarmy': '/images/venues/kaliningrad/baltiysk-pehotnye-kazarmy.jpg',

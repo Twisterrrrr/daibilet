@@ -3403,7 +3403,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         longitude: 20.5026,
         mustSeeFilter: 'temple'
         },
-      { name: 'Кирха Святой Семейства', desc: 'Неоготический шедевр архитектора Фридриха Хайтманна, в здании которого сейчас работает концертный зал филармонии',
+      { name: 'Кирха Святого Семейства', desc: 'Неоготический шедевр архитектора Фридриха Хайтманна, в здании которого сейчас работает концертный зал филармонии',
         venueSlug: 'kaliningrad-kirkha-svyatogo-semeystva',
         latitude: 54.7098,
         longitude: 20.5149,
