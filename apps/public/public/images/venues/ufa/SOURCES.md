@@ -1,5 +1,7 @@
 # Ufa photo sources
 
+- `dom-kommuna-r20261103.png` — AI-generated editorial visualization based on a reference photograph of the actual 1930 House-Commune facade at Lenina St. 9/11; reference page: https://www.art-kvadrat.com/commune
+
 - `natsionalnyy-muzey.jpg` — photo of the National Museum of the Republic of Bashkortostan (former Peasants' Land Bank), author Mir76-ghost, public domain, https://commons.wikimedia.org/wiki/File:UfaNationalMuseum.jpg
 - `pervaya-sobornaya-mechet.jpg` — photo of the First Cathedral Mosque of Ufa, author Mandarin839, CC0 1.0, https://commons.wikimedia.org/wiki/File:Первая_Соборная_мечеть_Уфы.jpg
 - `pamyatnik-kunitse-r20261025.jpg` — AI-generated image based on the documented appearance of Ufa’s bronze “House of the Marten” sculpture; visual reference: https://xcourse.me/images/showplaces/870/22efb8378d86caffb22bb7f9144f3f8f.jpg (description: https://xcourse.me/ufa/sight/skulptura-dom-kunitsy)

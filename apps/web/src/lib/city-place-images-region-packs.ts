@@ -22,7 +22,7 @@ export const UFA_HUB_IMAGES: Record<string, string> = {
   'ufa-bashkirskiy-teatr-opery-i-baleta': '/images/venues/ufa/bashkirskiy-teatr-opery-i-baleta.jpg',
   'ufa-beregovaya-polyana': '/images/venues/ufa/beregovaya-polyana-r20261009.jpg',
   'ufa-dom-gubernatora': '/images/venues/ufa/dom-gubernatora-r20261009.jpg',
-  'ufa-dom-kommuna': '/images/venues/ufa/dom-kommuna.jpg',
+  'ufa-dom-kommuna': '/images/venues/ufa/dom-kommuna-r20261103.png',
   'ufa-dom-muzey-aksakova': '/images/venues/ufa/dom-muzey-aksakova.jpg',
   'ufa-dom-muzey-lenina': '/images/venues/ufa/dom-muzey-lenina-r20261009.jpg',
   'ufa-dom-ponosovoy-mollo': '/images/venues/ufa/dom-ponosovoy-mollo-r20261009.jpg',

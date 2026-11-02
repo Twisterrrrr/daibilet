@@ -228,7 +228,7 @@ export const UFA_LINE_DAY_ROUTE_PRESETS: any[] = [
       blurb:
         '«Матча комната» во дворах Арт-квадрата и живые концерты в MusicHall27 закрывают неформальный трек.',
     },
-    coverImageUrl: '/images/venues/ufa/dom-kommuna.jpg',
+    coverImageUrl: '/images/venues/ufa/pamyatnik-mustayu-karimu-wikimedia.jpg',
     stops: UFA_RED_LINE_STOPS,
   },
 ];
