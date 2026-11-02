@@ -109,9 +109,9 @@ export { pickCatalogZenSpotlightItems } from '@/lib/catalog-zen-spotlight';
 
 export function CatalogZenSpotlight({ items }: { items: PublicCatalogListItemDto[] }) {
   return (
-    <section className="mt-6 border-b border-slate-200 pb-6 sm:mt-7 sm:pb-8" aria-labelledby="catalog-zen-title">
-      <div className="mb-4 sm:mb-5">
-        <h2 id="catalog-zen-title" className="font-display text-xl font-bold text-graphite sm:text-2xl">
+    <section className="mt-4 border-b border-slate-200 pb-5 sm:mt-7 sm:pb-8" aria-labelledby="catalog-zen-title">
+      <div className="mb-3 sm:mb-5">
+        <h2 id="catalog-zen-title" className="font-display text-lg font-bold text-graphite sm:text-2xl">
           Стоит увидеть
         </h2>
       </div>
@@ -126,7 +126,7 @@ export function CatalogZenSpotlight({ items }: { items: PublicCatalogListItemDto
         {items.map((session) => (
           <div
             key={`zen-${session.id}-${session.startsAt}`}
-            className="w-[min(72%,14rem)] shrink-0 snap-start sm:w-[15rem] md:w-[15.5rem] lg:w-[16rem]"
+            className="w-[min(62%,13rem)] shrink-0 snap-start sm:w-[15rem] md:w-[15.5rem] lg:w-[16rem]"
             data-rail-item
             data-catalog-zen-card
           >
@@ -341,7 +341,7 @@ export function CatalogResults({
               eventOrdinal += 1;
               return (
                 <li key={`${entry.session.id}-${entry.session.startsAt}`}>
-                  <EventCard session={entry.session} compact catalogDense imagePriority={priority} />
+                  <EventCard session={entry.session} compact catalogDense showDayRouteAction={false} imagePriority={priority} />
                 </li>
               );
             });

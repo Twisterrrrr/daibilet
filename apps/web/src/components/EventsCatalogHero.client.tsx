@@ -70,6 +70,9 @@ export function EventsCatalogHero() {
       }),
     [filterValues.q, filterValues.category, cityName, dateLabel],
   );
+  // Keep the Russian preposition with the first word of the city when the
+  // mobile heading wraps, instead of leaving «в» stranded at line end.
+  const mobileSafeTitle = title.replace(/\sв\s+/iu, ' в\u00a0');
 
   const chipValues = useMemo((): CatalogFilterValues => {
     // Prefer resolved city name slug from URL/header so "Сбросить" keeps city context.
@@ -81,15 +84,9 @@ export function EventsCatalogHero() {
 
   return (
     <div className="border-b border-slate-100 bg-white max-sm:border-0 max-sm:bg-transparent">
-      <div className={`container-page ${filtered ? 'py-3 sm:py-5' : 'sm:py-5'}`}>
-          <h1
-            className={
-              filtered
-                ? 'font-display text-xl font-bold tracking-tight text-graphite sm:text-3xl'
-                : 'max-sm:sr-only font-display text-2xl font-bold tracking-tight text-graphite sm:text-3xl'
-            }
-          >
-            {title}
+      <div className="container-page py-3 sm:py-5">
+          <h1 className="font-display text-2xl font-bold tracking-tight text-graphite sm:text-3xl">
+            {mobileSafeTitle}
           </h1>
           {/* Filtered: chips with × replace marketing subtitle. Hub-only keeps a short hint. */}
           {!filtered && subtitle ? (

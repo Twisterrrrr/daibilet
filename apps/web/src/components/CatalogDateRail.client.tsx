@@ -270,8 +270,9 @@ export function CatalogDateRail({
       aria-haspopup="dialog"
       aria-pressed={dateFilterOn || pickerOpen}
       onClick={() => setPickerOpen((open) => !open)}
+      data-catalog-calendar-trigger
       className={[
-        'catalog-date-rail-calendar inline-btn inline-flex h-[3.25rem] max-w-[10rem] shrink-0 items-center gap-1.5 rounded-2xl border px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-60',
+        'catalog-date-rail-calendar inline-btn inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-60 sm:h-[3.25rem] sm:w-auto sm:max-w-[10rem] sm:justify-start sm:gap-1.5 sm:px-3',
         dateFilterOn || pickerOpen
           ? 'border-primary/60 bg-primary text-white hover:bg-primary/90'
           : 'border-slate-200 bg-[#F0F1F3] text-graphite/80 hover:border-primary/40 hover:bg-primary/10 hover:text-primary',
@@ -279,7 +280,6 @@ export function CatalogDateRail({
     >
       <CalendarIcon className="size-4" strokeWidth={2.25} aria-hidden />
       <span className="hidden max-w-[7.25rem] truncate sm:inline">{rangeLabel || 'Календарь'}</span>
-      <span className="sm:hidden">{rangeLabel ? 'Период' : 'Даты'}</span>
     </button>
   );
 

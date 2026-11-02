@@ -75,6 +75,8 @@ type EventCardProps = {
   landingActions?: boolean;
   /** LCP: eager load + priority for first visible catalog cards. */
   imagePriority?: boolean;
+  /** The main catalog prioritizes opening the EventPage over route-planning chrome. */
+  showDayRouteAction?: boolean;
   /** Dense `/events` grid: tighter sizes + lower quality. */
   catalogDense?: boolean;
   /** Скрыть скрытые anchor-виджеты (каталог-слоты) — на странице события в related. */
@@ -88,6 +90,7 @@ export function EventCard({
   cityHub = false,
   editorsPickBadge = false,
   landingActions = false,
+  showDayRouteAction = true,
   suppressPurchaseAnchors = true,
   imagePriority = false,
   catalogDense = false,
@@ -218,7 +221,7 @@ export function EventCard({
 
         <EventImageBadges event={session} showSoonBadge={showSoonBadge} hideRelativeCoverDate />
         <EventFavoriteButton eventId={session.id} session={session} className="right-2 top-2 sm:right-3 sm:top-3" />
-        {!landingActions && dayRouteVenue ? (
+        {showDayRouteAction && !landingActions && dayRouteVenue ? (
           <AddToDayRouteButton
             intent="day"
             compact

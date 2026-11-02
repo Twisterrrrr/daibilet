@@ -474,6 +474,13 @@ function StaticSessionRow({
   );
 }
 
+function stripVenuePrefixFromAddress(address: string, venue: string): string {
+  const name = String(venue || '').trim();
+  if (!address || !name) return address;
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return address.replace(new RegExp(`^\\s*[«"']?${escaped}[»"']?(?:\\s*[,·—–-]\\s*|\\s+)`, 'iu'), '').trim();
+}
+
 export function EventHeroBuyButton({
   payload,
   priceLabel,
@@ -603,10 +610,17 @@ export function EventHero({
       })
     : null;
   const breadcrumbs = buildEventBreadcrumbs(event);
+  const normalizedVenueName = String(event.venue || '').trim().replace(/[«»"']/g, '').toLocaleLowerCase('ru');
+  const venueAlreadyInBreadcrumbs = Boolean(normalizedVenueName) && breadcrumbs.some((crumb) =>
+    String(crumb.name || '').trim().replace(/[«»"']/g, '').toLocaleLowerCase('ru') === normalizedVenueName,
+  );
   const placeLabel = !event.venueAddress ? event.venue || event.city || null : null;
   const venueAddressRaw = String(event.venueAddress || '').trim();
-  const venueStreetAddress =
+  const venueStreetAddressRaw =
     formatStreetAddress(venueAddressRaw, { city: event.city }) || venueAddressRaw;
+  const venueStreetAddress = venueAlreadyInBreadcrumbs
+    ? stripVenuePrefixFromAddress(venueStreetAddressRaw, String(event.venue || ''))
+    : venueStreetAddressRaw;
   // Skip venue/place chip when it duplicates the address line in the same overlay.
   const placeDuplicatesAddress =
     Boolean(placeLabel && venueStreetAddress) &&
@@ -658,24 +672,23 @@ export function EventHero({
         Tablet (md…lg): taller hero + top >> bottom so copy sits low like desktop.
         mt-auto (not justify-end): pt-* remains a real top inset when the block is tall.
       */}
-      <div className="container-page absolute inset-0 z-10 flex min-w-0 flex-col pb-4 pt-16 md:pb-4 md:pt-44 lg:pb-8 lg:pt-24">
+      <div className="container-page absolute inset-0 z-10 flex min-w-0 flex-col pb-4 pt-4 md:pb-4 md:pt-6 lg:pb-8 lg:pt-8">
+        {/* Keep navigation at the top edge of the artwork, with matching hero inset. */}
+        <nav
+          aria-label="Хлебные крошки"
+          className="flex min-w-0 flex-wrap items-center gap-1.5 text-sm text-white/70"
+        >
+          {trailCrumbs.map((crumb, index) => (
+            <span key={`${crumb.path}:${index}`} className="inline-flex shrink-0 items-center gap-1.5">
+              {index > 0 ? <ChevronRight className="h-3.5 w-3.5" aria-hidden /> : null}
+              <Link href={crumb.path} className="transition hover:text-white">
+                {crumb.name}
+              </Link>
+            </span>
+          ))}
+          {currentCrumb ? <span className="sr-only">{currentCrumb.name}</span> : null}
+        </nav>
         <div className="mt-auto min-w-0">
-          {/* 1. Breadcrumbs without event title (last crumb sr-only for a11y; JSON-LD stays full). */}
-          <nav
-            aria-label="Хлебные крошки"
-            className={`${hasHeroMetaRow ? 'mb-2' : 'mb-4'} flex min-w-0 flex-wrap items-center gap-1.5 text-sm text-white/70`}
-          >
-            {trailCrumbs.map((crumb, index) => (
-              <span key={`${crumb.path}:${index}`} className="inline-flex shrink-0 items-center gap-1.5">
-                {index > 0 ? <ChevronRight className="h-3.5 w-3.5" aria-hidden /> : null}
-                <Link href={crumb.path} className="transition hover:text-white">
-                  {crumb.name}
-                </Link>
-              </span>
-            ))}
-            {currentCrumb ? <span className="sr-only">{currentCrumb.name}</span> : null}
-          </nav>
-
           <div className="flex min-w-0 items-end justify-between gap-4">
             <div className="min-w-0 max-w-3xl">
               {/* 2. Category / type - only when the breadcrumbs do not already show it. */}
@@ -776,7 +789,7 @@ export function EventHero({
                   >
                     <MapPin className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.75} />
                     <span className="min-w-0 break-words">
-                      {[event.venue, venueStreetAddress].filter(Boolean).join(', ')}
+                      {[venueAlreadyInBreadcrumbs ? null : event.venue, venueStreetAddress].filter(Boolean).join(', ')}
                     </span>
                   </Link>
                 ) : (
@@ -787,7 +800,7 @@ export function EventHero({
                   >
                     <MapPin className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.75} />
                     <span className="min-w-0 break-words">
-                      {[event.venue, venueStreetAddress].filter(Boolean).join(', ')}
+                      {[venueAlreadyInBreadcrumbs ? null : event.venue, venueStreetAddress].filter(Boolean).join(', ')}
                     </span>
                   </span>
                 )
