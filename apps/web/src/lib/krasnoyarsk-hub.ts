@@ -362,9 +362,9 @@ export const KRASNOYARSK_MUST_SEE: any[] = [
     longitude: 92.839711,
   },
   {
-    name: 'Электротехзавод (Гостиный двор)',
+    name: 'Гостиный двор',
     desc: 'Классицизм XIX века на Карла Маркса.',
-    address: 'ул. Карла Маркса, 96',
+    address: 'ул. Карла Маркса, 6',
     locationSlug: 'krasnoyarsk-elektrotehzavod-gostinyy-dvor',
     mustSeeFilter: 'houses',
     visitMinutes: 20,
