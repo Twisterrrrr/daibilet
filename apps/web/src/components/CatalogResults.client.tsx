@@ -111,7 +111,7 @@ export function CatalogZenSpotlight({ items }: { items: PublicCatalogListItemDto
   return (
     <section className="mt-4 border-b border-slate-200 pb-5 sm:mt-7 sm:pb-8" aria-labelledby="catalog-zen-title">
       <div className="mb-3 sm:mb-5">
-        <h2 id="catalog-zen-title" className="font-display text-lg font-bold text-graphite sm:text-2xl">
+        <h2 id="catalog-zen-title" className="font-display text-2xl font-bold text-graphite">
           Стоит увидеть
         </h2>
       </div>
@@ -126,7 +126,7 @@ export function CatalogZenSpotlight({ items }: { items: PublicCatalogListItemDto
         {items.map((session) => (
           <div
             key={`zen-${session.id}-${session.startsAt}`}
-            className="w-[min(62%,13rem)] shrink-0 snap-start sm:w-[15rem] md:w-[15.5rem] lg:w-[16rem]"
+            className="w-[min(56%,12rem)] shrink-0 snap-start sm:w-[15rem] md:w-[15.5rem] lg:w-[16rem]"
             data-rail-item
             data-catalog-zen-card
           >

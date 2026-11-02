@@ -329,7 +329,7 @@ export function CatalogToolbar({
       <>
         <div className="catalog-content">
           <div className="catalog-events-sticky-controls">
-            <div className="min-w-0 flex-1">
+            <div className="w-full min-w-0 flex-1">
               <CatalogDateRail
                 disabled={disabled}
                 className="min-w-0 w-full"
@@ -342,7 +342,7 @@ export function CatalogToolbar({
               disabled={disabled}
               onClick={() => setFiltersOpen(true)}
               alwaysShowLabel
-              className="max-md:hidden"
+              className="hidden md:inline-flex"
             />
           </div>
           <div className="catalog-events-mobile-filter-rows md:hidden">
@@ -468,7 +468,7 @@ export function CatalogToolbar({
               count={advancedCount}
               disabled={disabled}
               onClick={() => setFiltersOpen(true)}
-              className="max-md:hidden"
+              className="hidden md:inline-flex"
             />
           </div>
 

@@ -292,7 +292,7 @@ export function CatalogMobileQuickFilters({
               type="button"
               disabled={disabled}
               onClick={onOpenAllFilters}
-              className={`inline-btn flex h-11 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-full px-2 text-sm font-semibold transition disabled:opacity-60 ${
+              className={`inline-btn flex h-11 basis-[42%] grow-0 min-w-0 items-center justify-center gap-1.5 rounded-full px-1.5 text-sm font-semibold transition disabled:opacity-60 ${
                 activeCount > 0 ? 'bg-primary text-white hover:bg-primary/90' : 'bg-[#1A1A1A] text-white hover:bg-slate-800'
               }`}
             >
