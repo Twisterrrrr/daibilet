@@ -129,6 +129,9 @@ function createDeps(overrides: Partial<AdminEventsHandlerDependencies> = {}): Ad
       async query() {
         return { rows: [] };
       },
+      async transaction(callback) {
+        return callback({ async query() { return { rows: [] }; } });
+      },
       async stats() {
         return {};
       },

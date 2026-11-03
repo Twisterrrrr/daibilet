@@ -3,6 +3,12 @@ import type { DbClient, QueryResult } from './types/db.js';
 
 interface PgPool {
   query<Row = Record<string, unknown>>(text: string, params?: readonly unknown[]): Promise<QueryResult<Row>>;
+  connect(): Promise<PgClient>;
+}
+
+interface PgClient {
+  query<Row = Record<string, unknown>>(text: string, params?: readonly unknown[]): Promise<QueryResult<Row>>;
+  release(): void;
 }
 
 export interface DbStatsRow {
@@ -34,6 +40,23 @@ export function createDb(_rootDir?: string): DbClient {
   return {
     query<Row = Record<string, unknown>>(text: string, params?: readonly unknown[]) {
       return getPool().query<Row>(text, params);
+    },
+
+    async transaction<T>(callback: (client: {
+      query<Row = Record<string, unknown>>(text: string, params?: readonly unknown[]): Promise<QueryResult<Row>>;
+    }) => Promise<T>) {
+      const client = await getPool().connect();
+      try {
+        await client.query('BEGIN');
+        const result = await callback({ query: (text, params) => client.query(text, params) });
+        await client.query('COMMIT');
+        return result;
+      } catch (error) {
+        await client.query('ROLLBACK');
+        throw error;
+      } finally {
+        client.release();
+      }
     },
 
     async stats() {
