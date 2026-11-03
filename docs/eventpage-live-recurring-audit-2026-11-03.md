@@ -20,8 +20,8 @@ Read-only snapshot from the production database. The full matrix, including ever
 4. TEPLOHOD records without that Ticketscloud identity are not title-merged. Each remains a separate page candidate.
 5. Candidate pages remain `DRAFT`, `noindex`, and without canonical paths. This audit did not change canonical tags, sitemap membership, redirects, articles, or public URLs.
 
-## Checks still required before provisioning and SEO cutover
+## Provisioning and checks
 
-- Deploy the group resolver to isolated staging and test a representative linked slot from a multi-ID Ticketscloud group, including its city boundary and conflict fallback.
-- Verify catalog, search, article-link mapping, and public EventPage route on staging.
-- Only after staging passes, create the unambiguous candidate shells on production and review the 11 exceptions. Publishing, canonicals, sitemap changes, and redirects remain separate steps after the URL map and article links are reconciled.
+- The resolver was deployed to isolated staging release `8ba1bc930`. API/web health, catalog, search, home, robots, and a legacy slot fallback passed HTTP smoke checks. A staging EventPage fixture had already passed the draft route/noindex smoke. The staging DB is smaller and older than production, so production EventIDs absent from staging are not valid route probes there.
+- The 604 unambiguous recurring shells have since been created on production as private DRAFT/noindex EventPages. Together with 1,558 live SINGLE drafts and four pre-existing recurring pages, there are now 2,166 direct EventPages for 2,167 Event IDs. See [the current rollout status](./eventpage-rollout-status-2026-11-03.md) and [the direct EventID export](./eventpage-live-direct-eventid-links-2026-11-03.csv).
+- The 11 exceptional Ticketscloud groups remain out of auto-grouping. Production code deployment, the full historical URL map, editorial review/publication, and any canonical/sitemap/redirect change remain separate open steps.

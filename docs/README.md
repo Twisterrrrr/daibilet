@@ -5,6 +5,7 @@
 [Карта соответствий PDP событий, слотов и legacy URL - 27.10.2026](./event-pdp-url-correspondence-audit-2026-10-27.md)
 [EventPage: схема, API, редактор, продажи и блокер Event ID - 27.10.2026](./event-page-foundation-2026-10-27.md)
 [Матрица Event ID → EventPage и решения по типам событий - 03.11.2026](./eventpage-event-matrix-2026-11-03.md)
+[Статус rollout EventPage: production drafts, staging, CI и оставшиеся SEO-шаги - 03.11.2026](./eventpage-rollout-status-2026-11-03.md)
 [Партия: Музей матрёшки и речные маршруты - 03.11.2026](./eventpage-museum-river-review-2026-11-03.md)
 [Построчные решения по 19 Event ID этой партии](./eventpage-museum-river-decisions-2026-11-03.csv)
 [Стендап и музыканты: полная очередь проверки EventPage](./eventpage-performer-review-2026-11-03.md)

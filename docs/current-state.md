@@ -1,5 +1,17 @@
 # Текущее состояние Daibilet
 
+## EventPage rollout - 03.11.2026
+
+Production contains 2,166 private EventPage drafts with direct links to 2,167
+Event IDs (1,558 SINGLE pages and 608 RECURRING pages; one North Venice page
+links two event records). All are noindex and have no canonical or publication
+timestamp. Code SHA `8ba1bc930` passed full CI and isolated staging smoke, but is
+not yet enabled in production. The staging catalog is smaller/staler than prod;
+do not use a production-only EventID slug there as a route parity check.
+Production deployment must preserve the dirty `/opt/daibilet` worktree; the
+standard web workflow uses `git reset --hard` and is therefore not safe for that
+worktree. Full status and remaining gates: [EventPage rollout report](./eventpage-rollout-status-2026-11-03.md).
+
 ## EventPage и карточка события - 27.10.2026
 
 Коммит `d641b54e3` выложен на каталог MSK. Additive-миграция применена.
