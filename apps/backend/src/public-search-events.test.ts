@@ -17,6 +17,7 @@ test('maps a dated slot through its same-city Ticketscloud parent only when one 
     async query(sql: string, params: unknown[]) {
       assert.deepEqual(params, [['slot-event-id']]);
       assert.match(sql, /source\.code::text\) = 'TICKETSCLOUD'/);
+      assert.match(sql, /trim\(sibling\."metaExternalId"\) = requested_meta\."metaExternalId"/);
       assert.match(sql, /sibling_event\."primaryCityId" IS NOT DISTINCT FROM requested_event\."primaryCityId"/);
       assert.match(sql, /HAVING count\(DISTINCT page\.id\) = 1/);
       return { rows: [{ eventId: 'slot-event-id', slug: 'stable-tour-moscow' }] };

@@ -1062,7 +1062,7 @@ async function loadMergeGroupMembers(requestedEvent: EventRecord): Promise<Event
 async function loadMetaGroupMembers(requestedEvent: EventRecord): Promise<EventRecord[]> {
   const tcMetaLinks = requestedEvent.sourceLinks
     .filter((link) => link.source.code.toUpperCase() === 'TICKETSCLOUD' && link.metaExternalId)
-    .map((link) => ({ sourceId: link.sourceId, metaExternalId: link.metaExternalId! }));
+    .map((link) => ({ sourceId: link.sourceId, metaExternalId: link.metaExternalId!.trim() }));
   const sourceIds = [...new Set(tcMetaLinks.map((link) => link.sourceId))];
   const metaIds = [...new Set(tcMetaLinks.map((link) => link.metaExternalId))];
   if (!sourceIds.length || !metaIds.length) return [];
@@ -1076,7 +1076,7 @@ async function loadMetaGroupMembers(requestedEvent: EventRecord): Promise<EventR
     INNER JOIN "EventSourceLink" sl ON sl."eventId" = s."eventId"
     INNER JOIN "Event" e ON e.id = s."eventId"
     WHERE sl."sourceId" IN (${join(sourceIds)})
-      AND sl."metaExternalId" IN (${join(metaIds)})
+      AND trim(sl."metaExternalId") IN (${join(metaIds)})
       AND e.status NOT IN ('HIDDEN', 'DRAFT')
       AND e."primaryCityId" IS NOT DISTINCT FROM ${requestedEvent.primaryCityId}
       AND s."eventId" <> ${requestedEvent.id}
@@ -1094,7 +1094,7 @@ async function loadMetaGroupMembers(requestedEvent: EventRecord): Promise<EventR
       FROM "EventSourceLink" sl
       INNER JOIN "Event" e ON e.id = sl."eventId"
       WHERE sl."sourceId" IN (${join(sourceIds)})
-        AND sl."metaExternalId" IN (${join(metaIds)})
+        AND trim(sl."metaExternalId") IN (${join(metaIds)})
         AND e.status NOT IN ('HIDDEN', 'DRAFT')
         AND e."primaryCityId" IS NOT DISTINCT FROM ${requestedEvent.primaryCityId}
         AND sl."eventId" <> ${requestedEvent.id}

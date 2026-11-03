@@ -186,7 +186,7 @@ async function readPage(query, id) {
     JOIN "EventSourceLink" current_source_link ON current_source_link."eventId" = current_event.id
     JOIN "Source" source ON source.id = current_source_link."sourceId"
     JOIN "EventSourceLink" candidate_link ON candidate_link."sourceId" = current_source_link."sourceId"
-      AND candidate_link."metaExternalId" = current_source_link."metaExternalId"
+      AND trim(candidate_link."metaExternalId") = trim(current_source_link."metaExternalId")
       AND candidate_link."eventId" <> current_event.id
     JOIN "Event" candidate_event ON candidate_event.id = candidate_link."eventId"
       AND candidate_event."primaryCityId" = current_event."primaryCityId"
@@ -503,11 +503,12 @@ export async function ensureDraftEventPageForEvent(client, eventId) {
   // only inside the same city, and only when it currently points to exactly one
   // EventPage. Cross-city tour stops remain separate pages.
   const explicitGroup = await client.query(`
-    SELECT source_link."sourceId", source_link."metaExternalId"
+    SELECT source_link."sourceId", trim(source_link."metaExternalId") AS "metaExternalId"
     FROM "EventSourceLink" source_link
     JOIN "Source" source ON source.id = source_link."sourceId"
     WHERE source_link."eventId" = $1 AND upper(source.code::text) = 'TICKETSCLOUD'
       AND NULLIF(trim(source_link."metaExternalId"), '') IS NOT NULL
+    GROUP BY source_link."sourceId", trim(source_link."metaExternalId")
     LIMIT 2
   `, [eventId]);
   if (explicitGroup.rows.length === 1 && event.primaryCityId) {
@@ -518,7 +519,7 @@ export async function ensureDraftEventPageForEvent(client, eventId) {
       JOIN "Event" sibling_event ON sibling_event.id = sibling_link."eventId"
       JOIN "EventPageEvent" page_link ON page_link."eventId" = sibling_event.id
       JOIN "EventPage" page ON page.id = page_link."eventPageId"
-      WHERE sibling_link."sourceId" = $1 AND sibling_link."metaExternalId" = $2
+      WHERE sibling_link."sourceId" = $1 AND trim(sibling_link."metaExternalId") = $2
         AND sibling_event."primaryCityId" = $3
         AND sibling_event.id <> $4
       ORDER BY page.id

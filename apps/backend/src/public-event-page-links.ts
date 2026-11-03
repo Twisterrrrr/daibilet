@@ -25,14 +25,14 @@ export async function resolveEventPageSlugsForEventIds(
         FROM requested
       ),
       unique_tc_meta AS (
-        SELECT sl."eventId", sl."sourceId", min(sl."metaExternalId") AS "metaExternalId"
+        SELECT sl."eventId", sl."sourceId", min(trim(sl."metaExternalId")) AS "metaExternalId"
         FROM "EventSourceLink" sl
         JOIN "Source" source ON source.id = sl."sourceId"
         JOIN requested ON requested."requestedEventId" = sl."eventId"
         WHERE upper(source.code::text) = 'TICKETSCLOUD'
           AND NULLIF(trim(sl."metaExternalId"), '') IS NOT NULL
         GROUP BY sl."eventId", sl."sourceId"
-        HAVING count(DISTINCT sl."metaExternalId") = 1
+          HAVING count(DISTINCT trim(sl."metaExternalId")) = 1
       ),
       meta_members AS (
         SELECT requested."requestedEventId", sibling."eventId" AS "memberEventId"
@@ -40,7 +40,7 @@ export async function resolveEventPageSlugsForEventIds(
         JOIN "Event" requested_event ON requested_event.id = requested."requestedEventId"
         JOIN unique_tc_meta requested_meta ON requested_meta."eventId" = requested_event.id
         JOIN "EventSourceLink" sibling ON sibling."sourceId" = requested_meta."sourceId"
-          AND sibling."metaExternalId" = requested_meta."metaExternalId"
+          AND trim(sibling."metaExternalId") = requested_meta."metaExternalId"
         JOIN "Event" sibling_event ON sibling_event.id = sibling."eventId"
           AND sibling_event."primaryCityId" IS NOT DISTINCT FROM requested_event."primaryCityId"
         WHERE requested_meta."metaExternalId" IS NOT NULL
