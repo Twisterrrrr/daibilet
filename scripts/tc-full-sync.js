@@ -8,6 +8,7 @@ const rootDir = path.resolve(__dirname, "..");
 const outDir = path.join(rootDir, "data", "ticketscloud");
 const catalogPath = path.join(outDir, "catalog.public.json");
 const summaryPath = path.join(outDir, "summary.public.json");
+const providerMetadataPath = path.join(outDir, "provider-metadata.private.json");
 
 main().catch((error) => {
   console.error(error);
@@ -16,9 +17,10 @@ main().catch((error) => {
 
 async function main() {
   const startedAt = Date.now();
+  const snapshotId = `${new Date(startedAt).toISOString()}-${process.pid}`;
   fs.mkdirSync(outDir, { recursive: true });
 
-  const { catalog, endpoint, dictionaries, byStatus } = await fetchNormalizedCatalog({
+  const { catalog, providerMetadata, endpoint, dictionaries, byStatus } = await fetchNormalizedCatalog({
     // PUBLIC alone leaves stale cards when TC moves an event to STAND_BY
     // (sales stopped) - we never re-fetched those ids. Import both.
     statuses: ["PUBLIC", "STAND_BY"],
@@ -37,12 +39,14 @@ async function main() {
     byStatus,
   });
 
-  writeJsonAtomic(catalogPath, { events: catalog });
+  writeJsonAtomic(catalogPath, { snapshotId, events: catalog });
   writeJsonAtomic(summaryPath, summary, 2);
+  writeJsonAtomic(providerMetadataPath, { snapshotId, events: providerMetadata });
 
   printSummary(summary);
   console.log(`Saved catalog to ${catalogPath}`);
   console.log(`Saved summary to ${summaryPath}`);
+  console.log(`Saved private provider metadata to ${providerMetadataPath}`);
 }
 
 function writeJsonAtomic(targetPath, value, indent = 0) {

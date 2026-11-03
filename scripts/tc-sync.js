@@ -49,7 +49,7 @@ async function main() {
 async function runIdsSync(options) {
   const { importCatalogEvents, TICKETSCLOUD_SOURCE_ID } = require("./tc-import-catalog");
   const startedAt = Date.now();
-  const { catalog, endpoint, missingIds, requestedIds } = await fetchNormalizedCatalog({
+  const { catalog, providerMetadata, endpoint, missingIds, requestedIds } = await fetchNormalizedCatalog({
     ids: options.ids,
     timeoutMs: Number(process.env.TICKETSCLOUD_IDS_SYNC_TIMEOUT_MS || 120000),
   });
@@ -88,6 +88,7 @@ async function runIdsSync(options) {
 
   const importStats = await importCatalogEvents(catalog, {
     mode: `ids upsert (${requestedIds.length})`,
+    providerMetadata,
     skipMissingFromCatalog: true,
   });
 

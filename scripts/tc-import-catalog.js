@@ -20,6 +20,7 @@ const { Pool } = requireFromDbPackage("pg");
 
 const catalogPath = path.join(rootDir, "data", "ticketscloud", "catalog.public.json");
 const summaryPath = path.join(rootDir, "data", "ticketscloud", "summary.public.json");
+const providerMetadataPath = path.join(rootDir, "data", "ticketscloud", "provider-metadata.private.json");
 const connectionString = process.env.DATABASE_URL || "postgresql://daibilet:daibilet@127.0.0.1:5437/daibilet";
 const pool = new Pool({ connectionString, max: 3 });
 
@@ -51,16 +52,45 @@ async function main() {
     throw new Error(`Missing catalog file: ${catalogPath}. Run npm run tc:full-sync first.`);
   }
 
-  const catalog = JSON.parse(fs.readFileSync(catalogPath, "utf8")).events || [];
+  const catalogSnapshot = JSON.parse(fs.readFileSync(catalogPath, "utf8"));
+  const catalog = catalogSnapshot.events || [];
+  if (!fs.existsSync(providerMetadataPath)) {
+    throw new Error(`Missing private Ticketscloud metadata file: ${providerMetadataPath}. Run npm run tc:full-sync first.`);
+  }
+  const providerMetadataSnapshot = JSON.parse(fs.readFileSync(providerMetadataPath, "utf8"));
+  const providerMetadata = providerMetadataSnapshot.events || [];
   const summary = fs.existsSync(summaryPath) ? JSON.parse(fs.readFileSync(summaryPath, "utf8")) : null;
   assertCatalogSnapshot(catalog, summary);
+  assertProviderMetadataSnapshot(catalog, providerMetadata, catalogSnapshot.snapshotId, providerMetadataSnapshot.snapshotId);
   const stats = await importCatalogEvents(catalog, {
     mode: "catalog JSON upsert import",
     summary,
+    providerMetadata,
     skipMissingFromCatalog: false,
     endPool: true,
   });
   console.log(JSON.stringify(stats, null, 2));
+}
+
+function assertProviderMetadataSnapshot(catalog, providerMetadata, catalogSnapshotId, metadataSnapshotId) {
+  if (!catalogSnapshotId || catalogSnapshotId !== metadataSnapshotId) {
+    throw new Error("Ticketscloud catalog/private metadata snapshot IDs differ; import aborted");
+  }
+  if (!Array.isArray(providerMetadata) || providerMetadata.length !== catalog.length) {
+    throw new Error(
+      `Ticketscloud provider metadata count mismatch: catalog=${catalog.length}, metadata=${providerMetadata?.length ?? "invalid"}`,
+    );
+  }
+  const catalogIds = new Set(catalog.map((event) => String(event.externalId)));
+  const metadataIds = providerMetadata.map((item) => String(item?.externalId || "").trim());
+  const uniqueMetadataIds = new Set(metadataIds.filter(Boolean));
+  if (
+    metadataIds.some((id) => !id || !catalogIds.has(id)) ||
+    uniqueMetadataIds.size !== providerMetadata.length ||
+    uniqueMetadataIds.size !== catalogIds.size
+  ) {
+    throw new Error("Ticketscloud provider metadata identity check failed; import aborted");
+  }
 }
 
 function assertCatalogSnapshot(catalog, summary) {
@@ -88,7 +118,7 @@ function assertCatalogSnapshot(catalog, summary) {
 /**
  * Upsert normalized catalog events into Postgres (same path as full import).
  * @param {object[]} catalog
- * @param {{ mode?: string, summary?: object|null, skipMissingFromCatalog?: boolean, endPool?: boolean }} options
+ * @param {{ mode?: string, summary?: object|null, providerMetadata?: object[], skipMissingFromCatalog?: boolean, endPool?: boolean }} options
  */
 async function importCatalogEvents(catalog, options = {}) {
   const startedAt = new Date();
@@ -97,6 +127,9 @@ async function importCatalogEvents(catalog, options = {}) {
   const importedExternalIds = new Set();
   const skipMissingFromCatalog = Boolean(options.skipMissingFromCatalog);
   const summary = options.summary ?? null;
+  const metadataByExternalId = new Map(
+    (options.providerMetadata || []).map((item) => [String(item.externalId), item]),
+  );
 
   const stats = {
     sourceEvents: catalog.length,
@@ -119,6 +152,7 @@ async function importCatalogEvents(catalog, options = {}) {
     eventPagesExisting: 0,
     eventPagesSkipped: 0,
     eventPageSchemaAvailable: null,
+    providerMetadataRows: 0,
   };
 
   try {
@@ -151,6 +185,11 @@ async function importCatalogEvents(catalog, options = {}) {
     for (const event of catalog) {
       importedExternalIds.add(String(event.externalId));
       const rowStats = await importCatalogEvent(client, event, summary, cityIdCache);
+      const providerMetadata = metadataByExternalId.get(String(event.externalId));
+      if (providerMetadata) {
+        await upsertTicketscloudProviderMetadata(client, providerMetadata);
+        stats.providerMetadataRows += 1;
+      }
       if (rowStats.eventId) importedEventIds.push(rowStats.eventId);
       stats.importedEvents += 1;
       stats.sessions += rowStats.sessions;
@@ -704,8 +743,30 @@ function sha256(value) {
   return crypto.createHash("sha256").update(value).digest("hex");
 }
 
+async function upsertTicketscloudProviderMetadata(client, metadata) {
+  const externalId = String(metadata.externalId);
+  const payloadText = JSON.stringify({
+    organizerId: metadata.organizerId || null,
+    seller: metadata.seller || null,
+    artistIds: Array.isArray(metadata.artistIds) ? metadata.artistIds : [],
+  });
+  await client.query(
+    `
+      insert into "RawImportRecord" (id, "sourceId", "entityType", "externalId", payload, "payloadHash", "importedAt")
+      values ($1, $2, 'event_provider_metadata', $3, $4::jsonb, $5, now())
+      on conflict ("sourceId", "entityType", "externalId") do update set
+        payload = excluded.payload,
+        "payloadHash" = excluded."payloadHash",
+        "importedAt" = excluded."importedAt"
+      where "RawImportRecord"."payloadHash" is distinct from excluded."payloadHash"
+    `,
+    [`raw_tc_provider_meta_${externalId}`, TICKETSCLOUD_SOURCE_ID, externalId, payloadText, sha256(payloadText)],
+  );
+}
+
 module.exports = {
   assertCatalogSnapshot,
+  assertProviderMetadataSnapshot,
   importCatalogEvent,
   importCatalogEvents,
   upsertTicketscloudOffers,

@@ -68,7 +68,7 @@ function streamAll(client, metadata, method, request, options = {}) {
 
 /**
  * @param {{ ids?: string[], status?: string, statuses?: string[], progressEvery?: number, timeoutMs?: number, includeRaw?: boolean }} options
- * @returns {Promise<{ catalog: object[], endpoint: string, requestedIds: string[], missingIds: string[], dictionaries: object, byStatus: Record<string, number> }>}
+ * @returns {Promise<{ catalog: object[], providerMetadata: object[], endpoint: string, requestedIds: string[], missingIds: string[], dictionaries: object, byStatus: Record<string, number> }>}
  */
 async function fetchNormalizedCatalog(options = {}) {
   const { client, metadata, endpoint } = createTicketscloudClient();
@@ -144,17 +144,38 @@ async function fetchNormalizedCatalog(options = {}) {
       includeRaw: options.includeRaw !== false,
     }),
   );
+  // Seller legal details and organizer/artist identifiers are deliberately
+  // kept out of the public catalog snapshot and normalized event DTO.
+  const providerMetadata = events.map(normalizeProviderMetadata);
 
   const loadedIds = new Set(catalog.map((event) => String(event.externalId)));
   const missingIds = requestedIds.filter((id) => !loadedIds.has(id));
 
   return {
     catalog,
+    providerMetadata,
     endpoint,
     dictionaries: { categories, venues, cities, tags, metaEvents },
     requestedIds,
     missingIds,
     byStatus,
+  };
+}
+
+function normalizeProviderMetadata(event) {
+  const legal = event.legalRu || {};
+  return {
+    externalId: String(event.id),
+    organizerId: event.org ? String(event.org) : null,
+    seller: event.legalRu
+      ? {
+          id: legal.id ? String(legal.id) : null,
+          type: legal.type || null,
+          name: legal.name || null,
+          inn: legal.inn || null,
+        }
+      : null,
+    artistIds: unique((event.artists || []).filter(Boolean)),
   };
 }
 
