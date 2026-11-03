@@ -1,6 +1,13 @@
 import type { NextConfig } from 'next';
+import placeSlugAliases from './src/lib/place-slug-aliases.json';
 
-import { placeSlugAliasRedirects } from './src/lib/place-slug-aliases';
+const placeSlugAliasRedirects = Object.entries(placeSlugAliases).flatMap(([from, to]) => {
+  const destination = `${to.family === 'location' ? '/locations' : '/venues'}/${to.slug}`;
+  return [
+    { source: `/locations/${from}`, destination, permanent: true },
+    { source: `/venues/${from}`, destination, permanent: true },
+  ];
+});
 
 const nextConfig: NextConfig = {
   distDir: process.env.DAIBILET_NEXT_DIST_DIR || '.next',
@@ -89,7 +96,7 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       // Smoke/typo slugs → live catalog twins (Salavat, Kramskoy, Ryazan kremlin).
-      ...placeSlugAliasRedirects(),
+      ...placeSlugAliasRedirects,
       // Listing indexes → unified `/places`. Entity `/venues/:slug` and `/locations/:slug` stay.
       {
         source: '/venues',
