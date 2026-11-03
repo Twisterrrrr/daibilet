@@ -286,13 +286,13 @@ export function CatalogMobileQuickFilters({
 
       {/* Mobile bottom dock: all-filters button + quick filter pictograms (price/type/location). */}
       <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40">
-        <div className="pointer-events-auto border-t border-slate-200/80 bg-white/95 pl-4 pr-[4.5rem] pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2.5 shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur-md supports-[backdrop-filter]:bg-white/90">
-          <div className="flex min-w-0 items-center gap-1.5">
+        <div className="catalog-mobile-bottom-dock-inner pointer-events-auto border-t border-slate-200/80 bg-white/95 pl-4 pr-[4.5rem] pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2.5 shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur-md supports-[backdrop-filter]:bg-white/90">
+          <div className="catalog-mobile-bottom-dock-row flex min-w-0 items-center gap-1.5">
             <button
               type="button"
               disabled={disabled}
               onClick={onOpenAllFilters}
-              className={`inline-btn flex h-11 basis-[42%] grow-0 min-w-0 items-center justify-center gap-1.5 rounded-full px-1.5 text-sm font-semibold transition disabled:opacity-60 ${
+              className={`catalog-mobile-bottom-dock-filters inline-btn flex h-11 basis-[42%] grow-0 min-w-0 items-center justify-center gap-1.5 rounded-full px-1.5 text-sm font-semibold transition disabled:opacity-60 ${
                 activeCount > 0 ? 'bg-primary text-white hover:bg-primary/90' : 'bg-[#1A1A1A] text-white hover:bg-slate-800'
               }`}
             >
@@ -304,7 +304,7 @@ export function CatalogMobileQuickFilters({
               disabled={disabled}
               onClick={() => setSheet('price')}
               aria-label="Фильтр по цене"
-              className={`inline-btn inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition disabled:opacity-60 ${
+              className={`catalog-mobile-bottom-dock-action inline-btn inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition disabled:opacity-60 ${
                 priceActive(filters) ? 'bg-primary/10 text-primary-700 ring-1 ring-primary/25' : 'bg-[#F5F5F7] text-graphite hover:bg-slate-200/70'
               }`}
             >
@@ -315,7 +315,7 @@ export function CatalogMobileQuickFilters({
               disabled={disabled}
               onClick={() => setSheet('type')}
               aria-label="Фильтр по типу"
-              className={`inline-btn inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition disabled:opacity-60 ${
+              className={`catalog-mobile-bottom-dock-action inline-btn inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition disabled:opacity-60 ${
                 typeActive(filters) ? 'bg-primary/10 text-primary-700 ring-1 ring-primary/25' : 'bg-[#F5F5F7] text-graphite hover:bg-slate-200/70'
               }`}
             >
@@ -326,7 +326,7 @@ export function CatalogMobileQuickFilters({
               disabled={disabled}
               onClick={() => setSheet('location')}
               aria-label="Фильтр по локации"
-              className={`inline-btn inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition disabled:opacity-60 ${
+              className={`catalog-mobile-bottom-dock-action inline-btn inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition disabled:opacity-60 ${
                 locationActive(filters) ? 'bg-primary/10 text-primary-700 ring-1 ring-primary/25' : 'bg-[#F5F5F7] text-graphite hover:bg-slate-200/70'
               }`}
             >

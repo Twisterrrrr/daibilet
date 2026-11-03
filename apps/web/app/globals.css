@@ -1473,6 +1473,44 @@ html[data-nav-pending='1'] {
     }
   }
 
+  @media (max-width: 639px) {
+    .catalog-date-rail-track {
+      width: 100%;
+    }
+
+    .catalog-date-rail-track .catalog-date-rail-scroller {
+      width: 100%;
+      max-width: 100%;
+      flex: 1 1 auto;
+    }
+
+    .catalog-date-rail-track .catalog-date-day-card {
+      width: calc((100vw - 4.5rem) / 6);
+      min-width: 3rem;
+    }
+
+    .catalog-mobile-bottom-dock-inner {
+      padding-right: 4.5rem;
+    }
+
+    .catalog-mobile-bottom-dock-row {
+      gap: 0.5rem;
+    }
+
+    .catalog-mobile-bottom-dock-filters {
+      flex: 1 1 0%;
+      min-width: 0;
+      height: 2.75rem;
+      padding-inline: 0.75rem;
+      font-size: 0.9375rem;
+    }
+
+    .catalog-mobile-bottom-dock-action {
+      width: 2.75rem;
+      height: 2.75rem;
+    }
+  }
+
   @media (min-width: 768px) {
     .catalog-events-sticky-controls {
       margin-right: 0;
