@@ -4,6 +4,9 @@ import { placeSlugAliasRedirects } from './src/lib/place-slug-aliases';
 
 const nextConfig: NextConfig = {
   distDir: process.env.DAIBILET_NEXT_DIST_DIR || '.next',
+  // The dev server is usually opened as localhost, but some local tools and
+  // browser tabs resolve it through 127.0.0.1. Allow that dev origin for HMR.
+  allowedDevOrigins: ['127.0.0.1'],
   // MSK prod ~8Gi / 4 CPU: allow parallel build. (Legacy SPB 3.8Gi used cpus:1 + workerThreads:false.)
   // Type errors are closed (web typecheck: 0 as of 30.09), so the build may fail on them again -
   // that is the point of the TS-debt cleanup. Do not re-enable the ignore.
@@ -35,8 +38,8 @@ const nextConfig: NextConfig = {
   // Image optimizer: WebP/AVIF + long cache to avoid re-encode CPU spikes on small VPS.
   images: {
     formats: ['image/avif', 'image/webp'],
-    // Allow sharp catalog/affiche q=90/92/95 (Next 16 will require this list).
-    qualities: [75, 85, 88, 90, 92, 95],
+    // Allow the image budgets used by blog cards (q70), catalog cards, and affiche.
+    qualities: [70, 75, 85, 88, 90, 92, 95],
     minimumCacheTTL: 60 * 60 * 24 * 7,
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     // 480 bridges card tiles (~480 CSS x retina) before jumping to deviceSizes 640.

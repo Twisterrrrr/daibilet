@@ -6,11 +6,13 @@ import { dirname } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 export function botFailure(line) {
-  const match = line.match(/\[([^\]]+)\]\s+"[^"]*"\s+(5\d\d)\s+\S+\s+"[^"]*"\s+"([^"]*)"/);
-  if (!match || !/(?:Googlebot|YandexBot)/i.test(match[3])) return null;
+  const match = line.match(/\[([^\]]+)\]\s+"\S+\s+([^"\s]+)[^"]*"\s+(5\d\d)\s+\S+\s+"[^"]*"\s+"([^"]*)"/);
+  if (!match || !/(?:Googlebot|YandexBot)/i.test(match[4])) return null;
   const time = Date.parse(match[1].replace(/^(\d+)\/(\w+)\/(\d+):/, '$2 $1 $3 '));
   if (!Number.isFinite(time)) throw new Error('Unparseable nginx timestamp');
-  return { time, status: Number(match[2]), agent: /Googlebot/i.test(match[3]) ? 'Googlebot' : 'YandexBot' };
+  // Keep only the path so query-string tokens or user data never enter alerts.
+  const path = match[2].split(/[?#]/, 1)[0];
+  return { time, status: Number(match[3]), agent: /Googlebot/i.test(match[4]) ? 'Googlebot' : 'YandexBot', path };
 }
 
 export function referenceFailure(message) {

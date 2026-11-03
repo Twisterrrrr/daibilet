@@ -33,7 +33,8 @@ test('sitemaps decode XML and dedupe but reject foreign or empty payloads', () =
 
 test('bot 5xx uses actual UA and status, never a user-supplied URL/referrer', () => {
   const line = '1.2.3.4 - - [22/Sep/2026:15:00:00 +0000] "GET /events/a HTTP/1.1" 502 123 "-" "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"';
-  assert.deepEqual(botFailure(line), { time: Date.parse('2026-09-22T15:00:00Z'), status: 502, agent: 'Googlebot' });
+  assert.deepEqual(botFailure(line), { time: Date.parse('2026-09-22T15:00:00Z'), status: 502, agent: 'Googlebot', path: '/events/a' });
+  assert.equal(botFailure(line.replace('/events/a ', '/events/a?token=private '))?.path, '/events/a');
   assert.equal(botFailure(line.replace('502 123', '200 123')), null);
   assert.equal(botFailure(line.replace('Googlebot/2.1', 'YandexBot/3.0'))?.agent, 'YandexBot');
   assert.equal(botFailure('1.2.3.4 - - [22/Sep/2026:15:00:00 +0000] "GET /Googlebot HTTP/1.1" 500 123 "YandexBot" "Mozilla"'), null);
