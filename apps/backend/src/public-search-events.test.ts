@@ -33,7 +33,7 @@ test('published article links for a slot use its stable EventPage path', async (
     async query(sql: string, params: unknown[]) {
       call += 1;
       if (sql.includes('FROM "Event" event')) {
-        assert.deepEqual(params, [['old-slot'], ['/events/old-slot']]);
+        assert.deepEqual(params, [['old-slot'], ['/events/old-slot'], []]);
         return { rows: [{ id: 'slot-event-id', slug: 'old-slot', canonicalPath: '/events/old-slot' }] };
       }
       assert.deepEqual(params, [['slot-event-id']]);
@@ -41,6 +41,30 @@ test('published article links for a slot use its stable EventPage path', async (
     },
   };
   assert.equal(await rewriteArticleEventLinks('Text [event](/events/old-slot).', db), 'Text [event](/events/stable-event-moscow).');
+  assert.equal(call, 2);
+});
+
+test('article links with an exact Event ID use the stable EventPage even when the legacy slug differs', async () => {
+  let call = 0;
+  const eventId = 'evt_6ab3b9552dce1463cb54a570';
+  const content = 'Text [event](/events/old-slot-6ab3b9552dce1463cb54a570).';
+  const db = {
+    async query(sql: string, params: unknown[]) {
+      call += 1;
+      if (sql.includes('FROM "Event" event')) {
+        assert.deepEqual(params, [
+          ['old-slot-6ab3b9552dce1463cb54a570'],
+          ['/events/old-slot-6ab3b9552dce1463cb54a570'],
+          [eventId],
+        ]);
+        return { rows: [{ id: eventId, slug: 'current-event-slug', canonicalPath: '/events/current-event-slug' }] };
+      }
+      assert.deepEqual(params, [[eventId]]);
+      return { rows: [{ eventId, slug: 'stable-event-page' }] };
+    },
+  };
+
+  assert.equal(await rewriteArticleEventLinks(content, db), 'Text [event](/events/stable-event-page).');
   assert.equal(call, 2);
 });
 
