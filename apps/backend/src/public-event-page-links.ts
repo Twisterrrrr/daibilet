@@ -54,6 +54,12 @@ export async function resolveEventPageSlugsForEventIds(
       FROM members
       JOIN "EventPageEvent" page_link ON page_link."eventId" = members."memberEventId"
       JOIN "EventPage" page ON page.id = page_link."eventPageId"
+      WHERE EXISTS (
+        SELECT 1 FROM "EventPageEvent" route_link
+        JOIN "Event" route_event ON route_event.id = route_link."eventId"
+        WHERE route_link."eventPageId" = page.id
+          AND upper(coalesce(route_event.status::text, '')) <> 'HIDDEN'
+      )
       GROUP BY members."requestedEventId"
       HAVING count(DISTINCT page.id) = 1
     `, [ids]);

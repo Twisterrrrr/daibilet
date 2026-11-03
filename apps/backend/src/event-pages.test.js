@@ -21,13 +21,39 @@ test('public stable route returns identity and keeps draft page non-indexable', 
       assert.deepEqual(params, ['stable-show-perm']);
       return { rows: [{
         slug: 'stable-show-perm', status: 'DRAFT', isIndexable: false,
-        publishedAt: null, eventIds: ['evt-1'], eventStatus: 'READY',
+        publishedAt: null, eventIds: ['evt-1'], publicEventId: 'evt-1', eventStatus: 'READY',
       }] };
     },
   };
   assert.deepEqual(await readPublicEventPageRouteBySlug(db, 'Stable-Show-Perm'), {
     slug: 'stable-show-perm', eventId: 'evt-1', eventIds: ['evt-1'], status: 'DRAFT', published: false, isIndexable: false,
   });
+});
+
+test('public stable route selects a visible event when an earlier linked slot is hidden', async () => {
+  const db = {
+    async query() {
+      return { rows: [{
+        slug: 'stable-show-perm', status: 'DRAFT', isIndexable: false,
+        publishedAt: null, eventIds: ['evt-hidden', 'evt-live'], publicEventId: 'evt-live', eventStatus: 'READY',
+      }] };
+    },
+  };
+  assert.deepEqual(await readPublicEventPageRouteBySlug(db, 'stable-show-perm'), {
+    slug: 'stable-show-perm', eventId: 'evt-live', eventIds: ['evt-hidden', 'evt-live'], status: 'DRAFT', published: false, isIndexable: false,
+  });
+});
+
+test('public stable route does not expose a draft linked only to hidden events', async () => {
+  const db = {
+    async query() {
+      return { rows: [{
+        slug: 'stable-show-perm', status: 'DRAFT', isIndexable: false,
+        publishedAt: null, eventIds: ['evt-hidden'], publicEventId: null, eventStatus: null,
+      }] };
+    },
+  };
+  assert.equal(await readPublicEventPageRouteBySlug(db, 'stable-show-perm'), null);
 });
 
 test('public stable route returns null before EventPage migration is present', async () => {

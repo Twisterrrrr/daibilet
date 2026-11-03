@@ -392,10 +392,20 @@ export async function readPublicEventPageRouteBySlug(db, slug) {
           ORDER BY link.position ASC, link."createdAt" ASC
         ) AS "eventIds",
         (
+          SELECT link."eventId"
+          FROM "EventPageEvent" link
+          JOIN "Event" event ON event.id = link."eventId"
+          WHERE link."eventPageId" = page.id
+            AND upper(coalesce(event.status::text, '')) <> 'HIDDEN'
+          ORDER BY link.position ASC, link."createdAt" ASC
+          LIMIT 1
+        ) AS "publicEventId",
+        (
           SELECT event.status
           FROM "EventPageEvent" link
           JOIN "Event" event ON event.id = link."eventId"
           WHERE link."eventPageId" = page.id
+            AND upper(coalesce(event.status::text, '')) <> 'HIDDEN'
           ORDER BY link.position ASC, link."createdAt" ASC
           LIMIT 1
         ) AS "eventStatus"
@@ -408,10 +418,10 @@ export async function readPublicEventPageRouteBySlug(db, slug) {
     if (!row) return null;
     const eventIds = Array.isArray(row.eventIds) ? row.eventIds : [];
     const published = row.status === 'READY' && row.publishedAt != null;
-    if (String(row.eventStatus || '').toUpperCase() === 'HIDDEN' && !published) return null;
+    if (!row.publicEventId) return null;
     return {
       slug: row.slug,
-      eventId: eventIds[0],
+      eventId: row.publicEventId,
       eventIds,
       status: row.status,
       published,
