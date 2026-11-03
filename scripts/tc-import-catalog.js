@@ -549,7 +549,31 @@ async function importCatalogEvent(client, event, summary, cityIdCache) {
           "sourceStatus" = excluded."sourceStatus",
           "priceFromRub" = excluded."priceFromRub",
           "ticketsVacant" = excluded."ticketsVacant",
-          "externalId" = excluded."externalId"
+          "externalId" = excluded."externalId",
+          "isActive" = case
+            when "EventSession"."archivedAt" is not null
+              and excluded."startsAt" >= now()
+              and excluded."sourceStatus" in ('PUBLIC', 'STAND_BY')
+              and "EventSession"."cancelledAt" is null
+            then true
+            else "EventSession"."isActive"
+          end,
+          "archivedAt" = case
+            when "EventSession"."archivedAt" is not null
+              and excluded."startsAt" >= now()
+              and excluded."sourceStatus" in ('PUBLIC', 'STAND_BY')
+              and "EventSession"."cancelledAt" is null
+            then null
+            else "EventSession"."archivedAt"
+          end,
+          "archiveReason" = case
+            when "EventSession"."archivedAt" is not null
+              and excluded."startsAt" >= now()
+              and excluded."sourceStatus" in ('PUBLIC', 'STAND_BY')
+              and "EventSession"."cancelledAt" is null
+            then null
+            else "EventSession"."archiveReason"
+          end
       `,
       [
         id("sess", externalId),

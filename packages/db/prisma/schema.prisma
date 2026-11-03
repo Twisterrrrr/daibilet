@@ -804,6 +804,8 @@ model EventSession {
   isActive      Boolean   @default(true)
   cancelledAt   DateTime?
   cancelReason  String?
+  archivedAt    DateTime?
+  archiveReason String?
   externalId    String?
 
   event         Event          @relation(fields: [eventId], references: [id])
@@ -816,6 +818,7 @@ model EventSession {
   @@index([startsAt])
   @@index([eventId, isActive, startsAt])
   @@index([externalId])
+  @@index([archivedAt, endsAt])
 }
 
 /// A verified session-specific departure point, distinct from Event.venueId.
