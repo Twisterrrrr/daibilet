@@ -5,6 +5,7 @@ import { useEffect, useId, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { CategoryTabIcon } from '@/components/CategoryTabIcon';
+import { shouldShowCatalogCategoryCount } from '@/lib/catalog-category-rail';
 import { displayCatalogLabel } from '@/lib/catalog-labels';
 import type { CatalogCategoryFacet } from '@/lib/catalog-category-rail';
 import {
@@ -188,7 +189,7 @@ export function CatalogMobileQuickFilters({
                 <CategoryTabIcon name={label} className={active ? 'text-white/85' : 'text-graphite-muted'} />
                 <span className="truncate font-medium">{label}</span>
               </span>
-              {item.events > 0 ? (
+              {shouldShowCatalogCategoryCount(item.events, filters.limit) ? (
                 <span className={`shrink-0 text-xs ${active ? 'text-white/70' : 'text-graphite-muted'}`}>
                   {item.events}
                 </span>

@@ -1,8 +1,16 @@
 import { displayCatalogLabel } from '@/lib/catalog-labels';
+import { CATALOG_PAGE_SIZE_DEFAULT } from '@daibilet/contracts/catalog';
 
 export type CatalogCategoryFacet = { name: string; events: number };
 
 const PRIMARY_CAP = 7;
+/** Show a catalog category count only when all of its results fit on one page. */
+export function shouldShowCatalogCategoryCount(
+  events: number,
+  pageSize?: number,
+): boolean {
+  return Number.isFinite(events) && events > 0 && events <= (pageSize ?? CATALOG_PAGE_SIZE_DEFAULT);
+}
 
 /** Prefer these names at the front of the rail when present in facets (case-sensitive catalog names). */
 const PIN_EXACT = ['Экскурсии', 'Музеи и арт'] as const;

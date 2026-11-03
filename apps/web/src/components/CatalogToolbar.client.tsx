@@ -14,6 +14,7 @@ import { CategoryTabIcon } from '@/components/CategoryTabIcon';
 import { displayCatalogLabel } from '@/lib/catalog-labels';
 import {
   catalogSearchHintsFromFacets,
+  shouldShowCatalogCategoryCount,
   splitCatalogCategories,
   type CatalogCategoryFacet,
 } from '@/lib/catalog-category-rail';
@@ -598,7 +599,7 @@ function MobileCategoryIconRail({
             href={buildCatalogHref(withQ(active ? undefined : item.name))}
             role="tab"
             aria-selected={active}
-            title={item.events > 0 ? `${label}: ${item.events}` : label}
+            title={shouldShowCatalogCategoryCount(item.events, filters.limit) ? `${label}: ${item.events}` : label}
             aria-disabled={disabled || undefined}
             className={`inline-flex min-w-[4.25rem] shrink-0 flex-col items-center gap-1 rounded-2xl px-2 py-2 text-center transition ${
               active
@@ -613,7 +614,14 @@ function MobileCategoryIconRail({
             >
               <CategoryTabIcon name={label} className={active ? 'text-white' : 'text-graphite-muted'} />
             </span>
-            <span className="max-w-[4.5rem] truncate text-[11px] font-medium leading-tight">{label}</span>
+            <span className="inline-flex max-w-[4.5rem] items-center gap-1 truncate text-[11px] font-medium leading-tight">
+              <span className="truncate">{label}</span>
+              {shouldShowCatalogCategoryCount(item.events, filters.limit) ? (
+                <span className={`shrink-0 text-[10px] ${active ? 'text-white/70' : 'text-graphite-muted'}`}>
+                  {item.events}
+                </span>
+              ) : null}
+            </span>
           </Link>
         );
       })}
@@ -758,13 +766,18 @@ function CategoryTabs({
             })}
             role="tab"
             aria-selected={active}
-            title={item.events > 0 ? `${label}: ${item.events}` : label}
+            title={shouldShowCatalogCategoryCount(item.events, filters.limit) ? `${label}: ${item.events}` : label}
             className={`catalog-chip snap-start ${
               active ? 'catalog-chip-on' : empty ? 'catalog-chip-idle opacity-50' : 'catalog-chip-idle'
             }`}
           >
             <CategoryTabIcon name={label} className={active ? 'text-white/85' : 'text-graphite-muted'} />
             <span className="whitespace-nowrap">{label}</span>
+            {shouldShowCatalogCategoryCount(item.events, filters.limit) ? (
+              <span className={`text-[10px] ${active ? 'text-white/70' : 'text-graphite-muted'}`}>
+                {item.events}
+              </span>
+            ) : null}
           </Link>
         );
       })}
@@ -859,9 +872,11 @@ function MoreCategoriesSheet({
                     <CategoryTabIcon name={label} className={active ? 'text-white/85' : 'text-graphite-muted'} />
                     <span className="truncate font-medium">{label}</span>
                   </span>
-                  <span className={`shrink-0 text-xs ${active ? 'text-white/70' : 'text-graphite-muted'}`}>
-                    {item.events}
-                  </span>
+                  {shouldShowCatalogCategoryCount(item.events, filters.limit) ? (
+                    <span className={`shrink-0 text-xs ${active ? 'text-white/70' : 'text-graphite-muted'}`}>
+                      {item.events}
+                    </span>
+                  ) : null}
                 </Link>
               </li>
             );
