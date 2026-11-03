@@ -2,7 +2,8 @@
 Description=Run the past-event audit daily after catalog synchronization
 
 [Timer]
-# The catalog sync is scheduled for ~03:20 MSK; audit shortly after it.
+# The host timezone is Etc/UTC: TC sync runs at 03:20 UTC (06:20 MSK).
+# Run the read-only audit after it, at 04:30 UTC (07:30 MSK).
 OnCalendar=*-*-* 04:30:00
 Persistent=true
 Unit=daibilet-past-event-audit.service
