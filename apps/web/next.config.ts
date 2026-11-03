@@ -65,6 +65,8 @@ const nextConfig: NextConfig = {
       { source: '/places', has: [{ type: 'query', key: 'family', value: 'location' }], destination: '/places/location', permanent: true },
       // English alias should resolve to the imported/canonical city slug used by catalog DTOs.
       { source: '/cities/saint-petersburg', destination: '/cities/sankt-peterburg', permanent: true },
+      // Moscow has one city record (city_524901); use the stable English slug everywhere.
+      { source: '/cities/moskva', destination: '/cities/moscow', permanent: true },
       { source: '/my-orders', destination: '/account/purchases', permanent: true },
       { source: '/river-cruises', destination: '/rechnye-progulki', permanent: true },
       { source: '/river-cruises/:city', destination: '/rechnye-progulki/:city', permanent: true },

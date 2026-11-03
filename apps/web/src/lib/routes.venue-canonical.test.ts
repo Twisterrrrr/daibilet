@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { cityCanonicalPath, venueCanonicalPath, venueHref, venuePageTemplate } from './routes.ts';
+import { cityCanonicalPath, cityHref, venueCanonicalPath, venueHref, venuePageTemplate } from './routes.ts';
 
 test('cityCanonicalPath normalizes a stored Cyrillic path for the same Latin city route', () => {
   const city = {
@@ -9,7 +9,8 @@ test('cityCanonicalPath normalizes a stored Cyrillic path for the same Latin cit
     name: 'Москва',
     canonicalPath: '/cities/%D0%BC%D0%BE%D1%81%D0%BA%D0%B2%D0%B0',
   };
-  assert.equal(cityCanonicalPath(city), '/cities/moskva');
+  assert.equal(cityCanonicalPath(city), '/cities/moscow');
+  assert.equal(cityHref(city), '/cities/moscow');
 });
 
 test('cityCanonicalPath keeps intentional canonical paths to another city', () => {
