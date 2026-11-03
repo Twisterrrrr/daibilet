@@ -1,0 +1,11 @@
+[Unit]
+Description=Run the past-event audit daily after catalog synchronization
+
+[Timer]
+# The catalog sync is scheduled for ~03:20 MSK; audit shortly after it.
+OnCalendar=*-*-* 04:30:00
+Persistent=true
+Unit=daibilet-past-event-audit.service
+
+[Install]
+WantedBy=timers.target
