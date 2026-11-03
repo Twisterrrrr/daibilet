@@ -84,8 +84,10 @@ Example create body:
 ```
 
 These endpoints require the existing admin authentication. The additive
-EventPage migration and public runtime are deployed on production. Drafts remain
-private; only explicit publication exposes their text on the existing Event URL.
+EventPage migration and editor/public-text runtime on existing Event URLs are
+deployed on production. The stable-slug resolver and automatic sync provisioning
+described below are local implementation changes and are not deployed yet.
+Draft copy remains private; only explicit publication exposes its text.
 
 ## For ongoing rewrites
 
@@ -160,15 +162,111 @@ The admin can later review whether exact slots belong on one EventPage. The 78
 current sitemap URLs without a catalog match are outside this current-sale
 drafting pass.
 
+## Stable public-route gap closure (2026-11-02)
+
+The earlier foundation left a gap: EventPage rows had no public slug resolver,
+and provider sync did not provision a shell. The implementation now adds a
+read-only public lookup by EventPage slug and makes that path load the linked
+catalog Event DTO. Candidate DRAFT routes therefore render current event and
+purchase data without exposing draft editorial copy. The metadata stays
+`noindex,follow` until the page is explicitly publishable and indexable.
+
+Ticketscloud and Teplohod imports now provision one DRAFT EventPage per
+currently saleable Event when the additive tables exist. This is idempotent,
+does not group Events, and ignores events with no active offer/saleable future
+session. Candidate slugs strip only a provider identity suffix that matches
+the Event's internal ID; city suffixes and `-2`, `-3` collision allocation
+remain in the existing admin creation path. Sync stats report created,
+existing, skipped, and schema-unavailable counts. No import should restore a
+past event or activate the source system's finance flow. Public event API misses
+are no longer retained in the process cache, so a 404 seen before a separate
+catalog sync cannot hide a newly provisioned route for the cache TTL.
+
+This closes stable page provisioning and route resolution. It does not change
+canonical tags, robots policy for legacy slot URLs, sitemap membership, or
+redirects. Blog href updates require a confirmed EventPage mapping for each
+target; historical/past Events remain excluded from the current-sale batch.
+Keep the 78 unresolved historical URLs and all existing legacy fallback
+behavior unchanged until the owner-reviewed URL map is ready.
+
+### Current-sale provisioning and link delivery (2026-11-02)
+
+`scripts/provision-current-event-pages.mjs` performs an idempotent local
+backfill. It refuses non-local database hosts, defaults to dry-run, and requires
+`--apply` to create private DRAFT shells. Eligibility is the same as provider
+sync (active offer plus an active future/current session or valid open-date
+window); `evt_stub_*` fixtures are excluded. On `daibilet_baseline`, dry-run
+found 50 current saleable Events and `--apply` created 50 private shells. None
+was published or made indexable. Production was not changed.
+
+Header search now resolves `EventPageEvent` by exact Event ID and returns the
+stable `/events/{eventPage.slug}` href. It still uses the old event URL when a
+page is not provisioned or the EventPage schema is absent during rollout; it
+does not infer page membership from title, city, venue, or provider group id.
+
+The EventPage admin view shows each linked Event's supplier/organizer, venue
+name and address, and import source with external ID. Supplier, venue, address,
+and external slot ID are review evidence only. The sole automatic grouping key
+is an exact Ticketscloud `metaExternalId` within the same city, and only when it
+resolves to one unambiguous EventPage; cross-city tour dates are not joined.
+New candidate slugs use the readable event name plus city; a provider token is
+removed only when it matches that Event's identity. Same-city slug collisions
+receive `-2`, `-3`, etc. until an editor reviews whether records should share an
+EventPage.
+
+When all sessions on a stable EventPage have ended, keep the EventPage URL
+returning HTTP 200. The page shows no stale ticket CTA or price and explains
+that published sessions ended; related current events remain available. A
+published/indexable seasonal EventPage stays indexable through the off-season.
+New sessions attached to its existing EventPage restore the schedule and
+purchase UI automatically. A newly imported Event with a new source ID is not
+auto-merged by title: an editor must explicitly link it to the durable page.
+
+The EventPage editor now provides a server-backed candidate search by event
+title, city, venue, address, supplier, or source ID. It displays provenance and
+allows explicit attach, move, or split with confirmation. Moving a slot from a
+multi-Event page preserves its source page; moving from a single-Event page is
+allowed only for a provably untouched private sync shell. Splitting creates a
+private draft and records enough history to move the Event back. The editor
+also lists same-city Ticketscloud `metaExternalId` matches already attached
+elsewhere; ambiguous matches stay separate until an operator reviews them.
+Sync may group only when one exact Ticketscloud meta ID and city resolve to one
+unambiguous existing EventPage. It does not merge across cities; tour dates stay
+on separate city pages with matching page-level editorial content where an
+editor chooses to reuse it.
+
+The public CMS article response rewrites an event href only when its exact
+legacy Event slug or canonical path maps to an EventPage. This makes rendered
+article links use the stable page URL without editing the stored article text.
+Unmatched links, including unresolved historical/past URLs, remain unchanged.
+The same rule takes effect in production after this code is deployed and the
+current-sale shell backfill has run against production data. It does not switch
+canonical tags, sitemap entries, or redirects.
+
+After the EventPage relation map is finalized, rebuild and reconcile
+collections (landings): retain membership from currently saleable catalog
+Events/sessions, but ensure each event card links to its EventPage rather than
+an individual slot URL. Check city-specific and multi-city collections,
+duplicates caused by grouping, and seasonal collections against future
+saleable inventory for their city. Do not hide a collection based only on the
+calendar month if future departures are available (for example winter boat
+rides in Moscow or Saint Petersburg). This review does not itself change
+collection canonicals or sitemap policy.
+
 ## Next implementation slice
 
 1. Recheck the 6 HTTP 429 staged records. Keep the 1 API 404 and 4 `review_required`
    records out of production draft creation unless current-sale status and exact
    Event identity are verified.
-2. Create private DRAFT pages only for exact, currently selling, single-Event
-   records. Never publish them or change routes in the batch operation.
-3. Add an explicit reviewed Event selector for multi-Event EventPages and report
+2. Run a reviewed current-sale backfill for private DRAFT shells. Never publish
+   them or change routes in the batch operation.
+3. Update article links only where the target EventPage is confirmed; do not
+   leave new article hrefs pointing at an individual slot URL.
+4. Rebuild/reconcile collections after EventPage relations are finalized; verify
+   event-card links, city/multi-city membership, grouped-slot duplicates and
+   seasonal inventory before changing collection visibility.
+5. Add an explicit reviewed Event selector for multi-Event EventPages and report
    slug collisions before saving.
-4. Switch sitemap/canonical/redirect behavior only after exact URL mapping,
+6. Switch sitemap/canonical/redirect behavior only after exact URL mapping,
    Search Console/Webmaster history, URL-level smoke, and rollback data are
    reviewed as a separate SEO release.

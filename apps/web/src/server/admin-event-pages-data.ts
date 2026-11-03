@@ -14,9 +14,43 @@ export type AdminEventPage = {
   publishedAt: string | null;
   status: 'DRAFT' | 'REVIEW' | 'READY';
   isIndexable: false;
-  events: Array<{ eventId: string; position: number; role: string; eventTitle: string; eventSlug: string; cityTitle: string | null }>;
+  events: Array<{
+    eventId: string;
+    position: number;
+    role: string;
+    eventTitle: string;
+    eventSlug: string;
+    cityTitle: string | null;
+    venueTitle: string | null;
+    venueAddress: string | null;
+    supplierTitle: string | null;
+    sources: Array<{ code: string; name: string; externalId: string; metaExternalId: string | null; sourceUrl: string | null }>;
+  }>;
+  reviewCandidates: Array<{
+    eventId: string;
+    eventTitle: string;
+    eventSlug: string;
+    cityTitle: string | null;
+    venueTitle: string | null;
+    venueAddress: string | null;
+    supplierTitle: string | null;
+    pageId: string;
+    pageSlug: string;
+    pageTitle: string;
+    sourceCode: string;
+    sourceName: string;
+    externalId: string;
+    metaExternalId: string;
+    canMove: boolean;
+  }>;
   routes: Array<{ id: string; path: string; kind: string; source: string | null; createdAt: string }>;
-  revisions: Array<{ id: string; version: number; changeNote: string | null; createdAt: string }>;
+  revisions: Array<{
+    id: string;
+    version: number;
+    changeNote: string | null;
+    createdAt: string;
+    sourceSnapshot?: { membershipMove?: { eventId: string; fromPageId: string; fromPageSlug: string } } | null;
+  }>;
 };
 
 export type AdminEventPageEditorData = {

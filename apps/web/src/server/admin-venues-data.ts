@@ -49,6 +49,7 @@ export type AdminVenueDetailData = {
   isIndexable: boolean;
   kind: string;
   placeType: string | null;
+  placeSubtype: string | null;
   pageStatus: string;
   events: Array<{
     id: string;
@@ -143,6 +144,7 @@ export async function loadAdminVenueDetail(venueId: string): Promise<AdminVenueD
     isIndexable: false,
     kind: 'VENUE',
     placeType: null,
+    placeSubtype: null,
     pageStatus: 'NONE',
     events: [],
     errors,
@@ -178,6 +180,7 @@ export async function loadAdminVenueDetail(venueId: string): Promise<AdminVenueD
       isIndexable: Boolean(payload.isIndexable),
       kind: String(payload.kind || 'VENUE'),
       placeType: payload.placeType != null ? String(payload.placeType) : null,
+      placeSubtype: payload.placeSubtype != null ? String(payload.placeSubtype) : null,
       pageStatus: String(payload.pageStatus || 'NONE'),
       events: eventsRaw.slice(0, 30).map((item) => {
         const row = (item && typeof item === 'object' ? item : {}) as Record<string, unknown>;

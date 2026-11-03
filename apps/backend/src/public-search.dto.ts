@@ -8,7 +8,7 @@ import {
   isMuseumLikeSearchVenue,
   searchVenueTextKey,
 } from './public-search-venues.ts';
-import { collapsePublicSearchEventRows } from './public-search-events.ts';
+import { collapsePublicSearchEventRows, publicSearchEventHref } from './public-search-events.ts';
 
 const LANDING_CATEGORY_PATH: Record<string, string> = {
   'river-cruises': 'rechnye-progulki',
@@ -61,6 +61,7 @@ export type PublicSearchDto = {
 type TrgmRow = {
   id: string;
   slug: string;
+  eventPageSlug?: string | null;
   title: string;
   score?: number;
   city?: string | null;
@@ -169,7 +170,7 @@ export async function buildPublicSearchDto(
     searchVenuesTrgm(primary, like, cityFilter, 4),
     searchLandingsIlike(terms, 3),
   ]);
-  const events = collapsePublicSearchEventRows(eventRows, 6);
+  const events = collapsePublicSearchEventRows(await attachEventPageSlugs(eventRows), 6);
 
   for (const row of events) {
     push(
@@ -177,7 +178,7 @@ export async function buildPublicSearchDto(
         type: 'event',
         label: row.title,
         sublabel: [row.city, row.venue].filter(Boolean).join(' · '),
-        href: `/events/${row.slug}`,
+        href: publicSearchEventHref(row),
         imageUrl: row.imageUrl || null,
       },
       `event:${row.id}`,
@@ -207,6 +208,27 @@ export async function buildPublicSearchDto(
     query: q,
     items: items.slice(0, 8),
   };
+}
+
+/** Resolve stable page URLs by exact Event ID; keep search operational during rolling migrations. */
+async function attachEventPageSlugs<T extends TrgmRow>(rows: T[]): Promise<T[]> {
+  const ids = [...new Set(rows.map((row) => row.id).filter(Boolean))];
+  if (!ids.length) return rows;
+  const placeholders = ids.map((_, index) => `$${index + 1}`).join(', ');
+  try {
+    const pages = await prisma.$queryRawUnsafe<Array<{ eventId: string; slug: string }>>(
+      `select link."eventId" as "eventId", page.slug
+       from "EventPageEvent" link
+       join "EventPage" page on page.id = link."eventPageId"
+       where link."eventId" in (${placeholders})`,
+      ...ids,
+    );
+    const slugByEventId = new Map(pages.map((page) => [page.eventId, page.slug]));
+    return rows.map((row) => ({ ...row, eventPageSlug: slugByEventId.get(row.id) ?? null }));
+  } catch {
+    // EventPage migration may be absent during a rolling deploy; old links remain valid.
+    return rows;
+  }
 }
 
 /**

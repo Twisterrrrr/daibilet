@@ -3,7 +3,16 @@
 import { useState } from 'react';
 import { AdminPdpEditor } from '@/components/admin/AdminVenuePdpEditor.client';
 import { AdminField, adminInputClass } from '@/components/admin/AdminUi';
-import { createAdminEventPageAction, publishAdminEventPageAction, saveAdminEventPageAction } from '@/server/admin-event-page-actions';
+import {
+  attachEventToAdminEventPageAction,
+  createAdminEventPageAction,
+  publishAdminEventPageAction,
+  saveAdminEventPageAction,
+  searchAdminEventPageEventCandidatesAction,
+  moveEventToAdminEventPageAction,
+  splitEventFromAdminEventPageAction,
+  type AdminEventPageEventCandidate,
+} from '@/server/admin-event-page-actions';
 import type { AdminEventPage, AdminEventPageEditorData } from '@/server/admin-event-pages-data';
 import type { AdminPdpDocument, AdminPdpEditorData } from '@/server/admin-pdp-data';
 
@@ -63,6 +72,10 @@ export function AdminEventPageEditor({ eventId, eventSlug, eventTitle, sourceDes
   const [slugNotice, setSlugNotice] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [eventSearchQuery, setEventSearchQuery] = useState('');
+  const [eventCandidates, setEventCandidates] = useState<AdminEventPageEventCandidate[]>([]);
+  const [searchingCandidates, setSearchingCandidates] = useState(false);
+  const [linkingEventId, setLinkingEventId] = useState('');
 
   const initialDocument = asEditorDocument(page, pdpData.document);
   const documentForEditor: AdminPdpDocument = {
@@ -125,6 +138,76 @@ export function AdminEventPageEditor({ eventId, eventSlug, eventTitle, sourceDes
       setError(cause instanceof Error ? cause.message : 'Не удалось опубликовать EventPage.');
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function searchEventCandidates() {
+    setSearchingCandidates(true);
+    setError('');
+    try {
+      setEventCandidates(await searchAdminEventPageEventCandidatesAction(eventSearchQuery));
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Не удалось найти события-кандидаты.');
+    } finally {
+      setSearchingCandidates(false);
+    }
+  }
+
+  async function attachEvent(candidate: AdminEventPageEventCandidate) {
+    if (!page || (candidate.linkedPageId && !candidate.linkedPageCanMove) || page.events.some((item) => item.eventId === candidate.id)) return;
+    const summary = `${candidate.title}${candidate.cityTitle ? ` · ${candidate.cityTitle}` : ''}`;
+    const action = candidate.linkedPageId
+      ? `Перенести слот «${summary}» из EventPage «${candidate.linkedPageTitle || candidate.linkedPageSlug}» в эту страницу? Операция будет записана в историю и её можно будет отменить переносом обратно.`
+      : `Добавить «${summary}» к этой EventPage? Расписание и билеты будут показываться на общей странице; тексты событий автоматически не объединяются.`;
+    if (!window.confirm(action)) return;
+    setLinkingEventId(candidate.id);
+    setError('');
+    try {
+      const updated = candidate.linkedPageId
+        ? (await moveEventToAdminEventPageAction(page.id, candidate.id)).target
+        : await attachEventToAdminEventPageAction(page.id, [...page.events.map((item) => item.eventId), candidate.id]);
+      setPage(updated);
+      setEventCandidates((current) => current.map((item) => item.id === candidate.id
+          ? { ...item, linkedPageId: updated.id, linkedPageSlug: updated.slug, linkedPageTitle: updated.title, linkedPageCanMove: false }
+        : item));
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Не удалось связать событие с EventPage.');
+    } finally {
+      setLinkingEventId('');
+    }
+  }
+
+  async function splitEvent(eventIdToSplit: string) {
+    if (!page || page.events.length < 2) return;
+    const item = page.events.find((candidate) => candidate.eventId === eventIdToSplit);
+    if (!item) return;
+    if (!window.confirm(`Отделить «${item.eventTitle}» в отдельную EventPage? Будет создан приватный черновик без публикации; исходная страница и её slug сохранятся.`)) return;
+    setLinkingEventId(eventIdToSplit);
+    setError('');
+    try {
+      const result = await splitEventFromAdminEventPageAction(page.id, eventIdToSplit);
+      setPage(eventIdToSplit === eventId ? result.separated : result.source);
+      setEventCandidates([]);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Не удалось отделить событие.');
+    } finally {
+      setLinkingEventId('');
+    }
+  }
+
+  async function undoLastMove() {
+    const movement = page?.revisions[0]?.sourceSnapshot?.membershipMove;
+    if (!page || !movement?.eventId || !movement.fromPageId) return;
+    if (!window.confirm(`Вернуть событие «${movement.eventId}» в EventPage «${movement.fromPageSlug || movement.fromPageId}»?`)) return;
+    setLinkingEventId(movement.eventId);
+    setError('');
+    try {
+      const result = await moveEventToAdminEventPageAction(movement.fromPageId, movement.eventId);
+      setPage(result.target);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Не удалось отменить перенос.');
+    } finally {
+      setLinkingEventId('');
     }
   }
 
@@ -194,10 +277,117 @@ export function AdminEventPageEditor({ eventId, eventSlug, eventTitle, sourceDes
         <AdminField label="SEO title"><input className={adminInputClass} value={seoTitle} onChange={(event) => setSeoTitle(event.target.value)} /></AdminField>
         <div className="sm:col-span-2"><AdminField label="SEO description"><textarea className={`${adminInputClass} min-h-20`} value={seoDescription} onChange={(event) => setSeoDescription(event.target.value)} /></AdminField></div>
       </div>
-      <div className="rounded-md bg-slate-50 p-3 text-xs text-slate-700">
-        <strong>Связанные события:</strong> {page.events.map((item) => `${item.eventTitle}${item.cityTitle ? ` · ${item.cityTitle}` : ''}`).join(' / ')}
-        <span className="ml-2 text-slate-500">· версия {page.revisions[0]?.version ?? 1}</span>
+      <div className="rounded-md border border-slate-200 bg-slate-50 p-3 text-xs text-slate-700">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <strong>Связанные события и основания для объединения</strong>
+          <span className="text-slate-500">версия {page.revisions[0]?.version ?? 1}</span>
+        </div>
+        <div className="mt-2 space-y-2">
+          {page.events.map((item) => <div key={item.eventId} className="rounded border border-slate-200 bg-white p-2">
+            <p className="font-medium">{item.eventTitle}{item.cityTitle ? ` · ${item.cityTitle}` : ''}</p>
+            <dl className="mt-1 grid gap-x-4 gap-y-1 sm:grid-cols-2">
+              <div><dt className="inline text-slate-500">Поставщик/организатор: </dt><dd className="inline">{item.supplierTitle || 'не указан в каталоге'}</dd></div>
+              <div><dt className="inline text-slate-500">Площадка: </dt><dd className="inline">{item.venueTitle || 'не указана'}{item.venueAddress ? ` · ${item.venueAddress}` : ''}</dd></div>
+              <div className="sm:col-span-2"><dt className="inline text-slate-500">Источник данных: </dt><dd className="inline">{item.sources?.length
+                ? item.sources.map((source) => `${source.name} (${source.code}, ID ${source.externalId})`).join(' · ')
+                : 'не указан в каталоге'}</dd></div>
+            </dl>
+            {page.events.length > 1 ? <button
+              type="button"
+              disabled={Boolean(linkingEventId)}
+              onClick={() => void splitEvent(item.eventId)}
+              className="mt-2 rounded border border-amber-300 px-2.5 py-1.5 font-medium text-amber-900 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {linkingEventId === item.eventId ? 'Отделяю…' : 'Отделить в новую EventPage'}
+            </button> : null}
+          </div>)}
+        </div>
+        <p className="mt-2 text-slate-500">Поставщик, адрес и источник помогают редактору проверить связь. Сами по себе они не объединяют события.</p>
       </div>
+      {page.reviewCandidates?.length ? <section className="rounded-md border border-amber-300 bg-amber-50/60 p-3">
+        <h4 className="text-sm font-semibold text-amber-950">Проверить неоднозначные совпадения</h4>
+        <p className="mt-1 text-xs text-amber-900">
+          Совпадает явный Ticketscloud meta ID и город, но записи уже относятся к разным EventPage. Автоматически не объединяли.
+        </p>
+        <ul className="mt-3 space-y-2">
+          {page.reviewCandidates.map((candidate) => <li key={`${candidate.pageId}:${candidate.eventId}`} className="flex flex-wrap items-start justify-between gap-3 rounded-md border border-amber-200 bg-white p-3 text-xs">
+            <div className="min-w-0 flex-1">
+              <p className="font-semibold text-slate-900">{candidate.eventTitle}{candidate.cityTitle ? ` · ${candidate.cityTitle}` : ''}</p>
+              <p className="mt-1 text-slate-700">Источник: {candidate.sourceName} · meta ID {candidate.metaExternalId} · слот ID {candidate.externalId}</p>
+              <p className="mt-1 text-slate-700">Поставщик: {candidate.supplierTitle || 'не указан'} · Площадка: {candidate.venueTitle || 'не указана'}{candidate.venueAddress ? ` · ${candidate.venueAddress}` : ''}</p>
+              <p className="mt-1 text-slate-500">Сейчас в EventPage «{candidate.pageTitle}» · /events/{candidate.pageSlug}</p>
+            </div>
+            <button type="button" disabled={!candidate.canMove || Boolean(linkingEventId)} onClick={() => void attachEvent({
+              id: candidate.eventId,
+              title: candidate.eventTitle,
+              slug: candidate.eventSlug,
+              kind: 'single',
+              status: 'REVIEW',
+              cityTitle: candidate.cityTitle,
+              venueTitle: candidate.venueTitle,
+              venueAddress: candidate.venueAddress,
+              supplierTitle: candidate.supplierTitle,
+              sources: [{ code: candidate.sourceCode, name: candidate.sourceName, externalId: candidate.externalId, metaExternalId: candidate.metaExternalId, sourceUrl: null }],
+              linkedPageId: candidate.pageId,
+              linkedPageSlug: candidate.pageSlug,
+              linkedPageTitle: candidate.pageTitle,
+              linkedPageStatus: 'DRAFT',
+              linkedPageCanMoveFromDraftShell: candidate.canMove,
+              linkedPageCanMove: candidate.canMove,
+            })} className="shrink-0 rounded-md bg-amber-800 px-3 py-2 font-medium text-white disabled:cursor-not-allowed disabled:opacity-50">
+              {candidate.canMove ? 'Перенести сюда' : 'Сначала разделите исходную страницу'}
+            </button>
+          </li>)}
+        </ul>
+      </section> : null}
+      {page.revisions[0]?.sourceSnapshot?.membershipMove ? <div className="flex flex-wrap items-center gap-3 rounded-md border border-blue-200 bg-blue-50 p-3 text-xs text-blue-950">
+        <span>Последний перенос слота: {page.revisions[0].sourceSnapshot.membershipMove.eventId} из «{page.revisions[0].sourceSnapshot.membershipMove.fromPageSlug || page.revisions[0].sourceSnapshot.membershipMove.fromPageId}».</span>
+        <button type="button" disabled={Boolean(linkingEventId)} onClick={() => void undoLastMove()} className="rounded-md border border-blue-300 bg-white px-3 py-2 font-semibold disabled:opacity-50">Откатить перенос</button>
+      </div> : null}
+      <section className="rounded-md border border-slate-200 p-3">
+        <h4 className="text-sm font-semibold">Добавить запись расписания к этой странице</h4>
+        <p className="mt-1 text-xs text-slate-600">
+          Используйте для нового Event ID того же события, например при возвращении сезонной программы. Сверьте город, поставщика, площадку и источник. Событие, уже привязанное к другой EventPage, нельзя добавить отсюда.
+        </p>
+        <form className="mt-3 flex flex-wrap gap-2" onSubmit={(event) => { event.preventDefault(); void searchEventCandidates(); }}>
+          <input
+            className={`${adminInputClass} min-w-[16rem] flex-1`}
+            value={eventSearchQuery}
+            onChange={(event) => setEventSearchQuery(event.target.value)}
+            placeholder="Название, город, площадка или ID источника"
+            aria-label="Поиск события для привязки к EventPage"
+            minLength={2}
+          />
+          <button type="submit" disabled={searchingCandidates || Boolean(linkingEventId) || eventSearchQuery.trim().length < 2} className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-800 disabled:opacity-50">
+            {searchingCandidates ? 'Ищу…' : 'Найти'}
+          </button>
+        </form>
+        {eventCandidates.length ? <ul className="mt-3 space-y-2">
+          {eventCandidates.map((candidate) => {
+            const alreadyLinkedHere = page.events.some((item) => item.eventId === candidate.id);
+            const canReassignDraftShell = Boolean(candidate.linkedPageCanMove && candidate.linkedPageId !== page.id);
+            const linkedElsewhere = Boolean(candidate.linkedPageId && candidate.linkedPageId !== page.id && !canReassignDraftShell);
+            return <li key={candidate.id} className="flex flex-wrap items-start justify-between gap-3 rounded-md border border-slate-200 p-3 text-xs">
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold text-slate-900">{candidate.title}{candidate.cityTitle ? ` · ${candidate.cityTitle}` : ''}</p>
+                <p className="mt-1 text-slate-700">Поставщик: {candidate.supplierTitle || 'не указан'} · Площадка: {candidate.venueTitle || 'не указана'}{candidate.venueAddress ? ` · ${candidate.venueAddress}` : ''}</p>
+                <p className="mt-1 text-slate-500">Источник: {candidate.sources?.length ? candidate.sources.map((source) => `${source.name} · ${source.externalId}`).join('; ') : 'не указан'} · ID события: {candidate.id}</p>
+                {linkedElsewhere ? <p className="mt-1 text-amber-800">Уже связано с «{candidate.linkedPageTitle || candidate.linkedPageSlug}».</p> : null}
+                {canReassignDraftShell ? <p className="mt-1 text-amber-800">Сейчас связано с «{candidate.linkedPageTitle || candidate.linkedPageSlug}»; слот можно перенести с сохранением истории.</p> : null}
+              </div>
+              <button
+                type="button"
+                disabled={busy || Boolean(linkingEventId) || alreadyLinkedHere || linkedElsewhere}
+                onClick={() => void attachEvent(candidate)}
+                className="shrink-0 rounded-md bg-slate-900 px-3 py-2 font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {alreadyLinkedHere ? 'Уже связано' : linkedElsewhere ? 'Связано с другой страницей' : linkingEventId === candidate.id ? 'Связываю…' : canReassignDraftShell ? 'Перенести сюда' : 'Добавить к EventPage'}
+              </button>
+            </li>;
+          })}
+        </ul> : null}
+        {eventSearchQuery.trim().length >= 2 && !searchingCandidates && eventCandidates.length === 0 ? <p className="mt-3 text-xs text-slate-500">События по этому запросу не найдены.</p> : null}
+      </section>
       <div className="flex flex-wrap items-center gap-3 rounded-md border border-slate-200 p-3">
         <p className="min-w-0 flex-1 text-xs text-slate-600">
           {page.publishedAt

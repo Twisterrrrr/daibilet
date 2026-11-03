@@ -43,7 +43,6 @@ import { HeroImageWithBlur } from '@/components/HeroImageWithBlur.client';
 import { resolveEventHeroObjectPosition } from '@/lib/event-image-focus';
 import { venueHref } from '@/lib/routes';
 import { formatStreetAddress } from '@/lib/address';
-import { IMAGE_SIZES } from '@/components/SafeImage.client';
 import { CheckoutModalButton } from '@/components/CheckoutModal.client';
 import { trackEventView, trackSelectTickets } from '@/lib/catalog-analytics';
 import {
@@ -56,6 +55,7 @@ import {
   TcSessionSlot,
   TcWidgetButton,
 } from '@/components/TcWidget.client';
+import { isSafeExternalPurchaseUrl, isTicketscloudProvider } from '@/lib/external-provider-purchase';
 
 type EventSession = PublicEventPageDto['sessions'][number] & {
   dateLabel?: string | null;
@@ -102,16 +102,13 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
     primaryOffer,
   );
   const isTepWidget = Boolean(teplohod);
+  const isTcProvider = isTcWidget || isTicketscloudProvider(event.purchaseProvider, event.widgetProvider);
   const tepCheckoutUrl = teplohod
     ? resolveTeplohodCheckoutUrl({
         purchaseUrl: purchaseUrl || event.purchaseUrl || event.widgetUrl,
         tepEventId: teplohod.tepEventId,
         tepWidgetId: teplohod.tepWidgetId,
-      }) ||
-      purchaseUrl ||
-      event.purchaseUrl ||
-      event.widgetUrl ||
-      null
+      })
     : null;
   const buyButtonClass = 'btn-primary w-full py-3.5 text-base';
   const nextSession = pickRepresentativeSession(sessions as EventSession[]);
@@ -258,7 +255,7 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
                   })
                 }
               />
-            ) : isTcWidget && tcEventId ? (
+            ) : isTcProvider && isTcWidget && tcEventId ? (
               <TcWidgetButton
                 tcEventId={tcEventId}
                 purchaseUrl={purchaseUrl}
@@ -266,9 +263,13 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
                 label="Купить билет"
                 wide
               />
-            ) : purchaseUrl ? (
+            ) : isTcProvider && normalizeTcPurchaseUrl(purchaseUrl) ? (
+              <a href={normalizeTcPurchaseUrl(purchaseUrl)!} target="_blank" rel="noopener noreferrer" className={buyButtonClass}>
+                Купить билет
+              </a>
+            ) : !isTepWidget && !isTcProvider && isSafeExternalPurchaseUrl(purchaseUrl) ? (
               <a
-                href={normalizeTcPurchaseUrl(purchaseUrl) || purchaseUrl}
+                href={purchaseUrl!}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={buyButtonClass}
@@ -297,7 +298,11 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
       <div className="mt-5 flex items-center justify-center gap-2 rounded-xl bg-surface-muted px-3 py-2.5 text-center">
         <Shield className="h-4 w-4 shrink-0 text-graphite-muted" strokeWidth={1.75} />
         <span className="text-xs text-graphite-muted">
-          Безопасная покупка через виджет
+          {isTepWidget
+            ? 'Покупка и оплата проходят на стороне Teplohod.'
+            : isTcProvider
+              ? 'Покупка и оплата проходят на стороне Ticketscloud.'
+              : 'Покупка и оплата проходят на стороне билетной системы организатора.'}
         </span>
       </div>
     </div>
@@ -512,12 +517,9 @@ export function EventHeroBuyButton({
         purchaseUrl: purchaseUrl || event.purchaseUrl || event.widgetUrl,
         tepEventId: teplohod.tepEventId,
         tepWidgetId: teplohod.tepWidgetId,
-      }) ||
-      purchaseUrl ||
-      event.purchaseUrl ||
-      event.widgetUrl ||
-      null
+      })
     : null;
+  const isTcProvider = isTcWidget || isTicketscloudProvider(event.purchaseProvider, event.widgetProvider);
 
   if (showMultiPurchase) {
     return (
@@ -541,7 +543,7 @@ export function EventHeroBuyButton({
     );
   }
 
-  if (tepCheckoutUrl) {
+  if (teplohod && tepCheckoutUrl) {
     return (
       <CheckoutModalButton
         checkoutUrl={tepCheckoutUrl}
@@ -558,10 +560,19 @@ export function EventHeroBuyButton({
     );
   }
 
-  if (purchaseUrl) {
-    const href = normalizeTcPurchaseUrl(purchaseUrl) || purchaseUrl;
+  if (teplohod || isTcProvider) {
+    const href = isTcProvider ? normalizeTcPurchaseUrl(purchaseUrl) : null;
+    if (!href) return <button type="button" disabled className={`${heroClass} cursor-not-allowed opacity-60`}>Билеты недоступны</button>;
     return (
       <a href={href} target="_blank" rel="noopener noreferrer" className={heroClass}>
+        {label}
+      </a>
+    );
+  }
+
+  if (isSafeExternalPurchaseUrl(purchaseUrl)) {
+    return (
+      <a href={purchaseUrl!} target="_blank" rel="noopener noreferrer" className={heroClass}>
         {label}
       </a>
     );

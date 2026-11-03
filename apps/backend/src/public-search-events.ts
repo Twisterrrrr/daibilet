@@ -1,10 +1,16 @@
 export type PublicSearchEventRow = {
   id: string;
   slug: string;
+  eventPageSlug?: string | null;
   title: string;
   city?: string | null;
   venue?: string | null;
 };
+
+export function publicSearchEventHref(row: PublicSearchEventRow): string {
+  const stableSlug = String(row.eventPageSlug || '').trim();
+  return `/events/${stableSlug || row.slug}`;
+}
 
 function normalizeSearchEventPart(value?: string | null): string {
   return String(value || '')
@@ -19,6 +25,8 @@ function normalizeSearchEventPart(value?: string | null): string {
 
 /** TC can store one Event row per slot. Search should expose the logical event once. */
 export function publicSearchEventContextKey(row: PublicSearchEventRow): string {
+  const pageSlug = String(row.eventPageSlug || '').trim().toLowerCase();
+  if (pageSlug) return `page:${pageSlug}`;
   const title = normalizeSearchEventPart(row.title);
   const city = normalizeSearchEventPart(row.city);
   const venue = normalizeSearchEventPart(row.venue);

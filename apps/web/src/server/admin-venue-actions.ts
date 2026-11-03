@@ -35,6 +35,8 @@ export async function saveAdminVenueAction(formData: FormData) {
     hookFact: emptyToNull(formData.get('hookFact')),
     isIndexable: formData.get('isIndexable') === 'on' || formData.get('isIndexable') === 'true',
     kind: String(formData.get('kind') || 'VENUE').trim(),
+    placeType: emptyToNull(formData.get('placeType')),
+    placeSubtype: emptyToNull(formData.get('placeSubtype')),
     pageStatus: String(formData.get('pageStatus') || 'NONE').trim(),
   };
 

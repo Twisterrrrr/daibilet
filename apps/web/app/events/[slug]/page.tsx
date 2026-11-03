@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { EventCard } from '@/components/EventCard';
 import { ExpiredEventSessionNotice } from '@/components/ExpiredEventSessionNotice.client';
 import { EventBuyCard, EventHero } from '@/components/EventPage.client';
+import { EventPageScheduleNotice } from '@/components/EventPageScheduleNotice';
 import { EventPdpBody } from '@/components/EventPdpBody.client';
 import { VenuePdpContent } from '@/components/VenuePdpContent.client';
 import { EventTags, EventTrustStrip } from '@/components/EventPageSections';
@@ -125,6 +126,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {
       title: expansionMeta ? { absolute: expansionMeta.title } : title,
       description,
+      ...(loaded.payload.eventPageRoute && !loaded.payload.eventPageRoute.isIndexable
+        ? { robots: { index: false, follow: true } }
+        : {}),
       alternates: {
         canonical: path,
       },
@@ -182,6 +186,11 @@ export default async function EventDetailPage({ params }: PageProps) {
       <SiteLayout>
         <EventHero payload={clientPayload} aggregate={aggregate} />
         <ExpiredEventSessionNotice context={clientPayload.requestedSessionContext} />
+        <EventPageScheduleNotice
+          availability={payload.eventPageRoute?.availability}
+          city={event.city || ''}
+          citySlug={event.citySlug || ''}
+        />
 
         <div className="container-page py-8 sm:py-10 lg:py-14">
           <div className="grid min-w-0 gap-8 lg:grid-cols-3 lg:gap-12">

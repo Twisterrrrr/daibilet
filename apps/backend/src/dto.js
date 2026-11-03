@@ -1,4 +1,5 @@
 import { createHash, randomUUID } from 'node:crypto';
+import { isPlaceType } from '@daibilet/contracts/place-pdp';
 import { isPublicCatalogExcludedMuseumAdmission } from './public-catalog-exclusions.ts';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -28,8 +29,9 @@ import {
 import { formatPublicEventTitle } from './event-title-normalize.ts';
 import { toPublicCatalogListItem, toPublicHomeCardSession } from './public-catalog-list-item.ts';
 import { enrichBuyerOrdersWithEventLinks } from './buyer-order-event-links.js';
+import { rewriteArticleEventLinks } from './public-event-page-links.ts';
 import { readReadyPdpDocument } from './pdp-documents.js';
-import { readPublishedEventPageForEvent } from './event-pages.js';
+import { readPublicEventPageRouteBySlug, readPublishedEventPageForEvent } from './event-pages.js';
 import {
   blogCityDisplayName,
   blogCitySlugAliases,
@@ -78,7 +80,6 @@ import {
   LANDING_SLUG_ALIASES,
   explainLandingRuleMatch,
   matchesLandingRule,
-  buildOffSeasonLandingSlugs,
   resolveLandingRuleBySlug,
   sessionMatchesLandingSlug,
 } from './landing-rules.ts';
@@ -2808,6 +2809,7 @@ export async function buildAdminVenueDetail(db, venueId) {
           venue."hookFact",
           venue.kind,
           venue."placeType",
+          venue."placeSubtype",
           venue."pageStatus",
           city.title as city
         from "Venue" venue
@@ -2873,6 +2875,8 @@ export async function updateAdminVenue(db, venueId, payload) {
         "wayToFind" = $14,
         "parkingInfo" = $15,
         "hookFact" = $16,
+        "placeType" = $17::"PlaceType",
+        "placeSubtype" = $18,
         "updatedAt" = now()
       where id = $1
       returning id
@@ -2894,6 +2898,8 @@ export async function updateAdminVenue(db, venueId, payload) {
       next.wayToFind ?? null,
       next.parkingInfo ?? null,
       next.hookFact ?? null,
+      next.placeType ?? null,
+      next.placeSubtype ?? null,
     ],
   );
 
@@ -4165,9 +4171,10 @@ export async function buildPublicSearch(db, searchParams) {
   }
 
   if (items.length < 8) {
-    const landings = buildPublicLandings(sessions).filter(
-      (landing) => landing.events > 0 && !buildOffSeasonLandingSlugs().has(landing.slug),
-    );
+    // Discovery follows the actual upcoming inventory. A calendar-wide season
+    // switch hides winter departures that are available in cities such as
+    // Moscow and Saint Petersburg.
+    const landings = buildPublicLandings(sessions).filter((landing) => landing.events > 0);
     for (const landing of landings) {
       if (items.length >= 8) break;
       const label = `${landing.title} ${landing.subtitle}`.toLowerCase();
@@ -4312,9 +4319,7 @@ export { LANDING_PAGE_SESSION_LIMIT, scopePublicCatalogSessions, selectLandingPa
 
 function buildSortedPublicLandings(sessions, cityFilter = '') {
   return sortPromoLandings(
-    buildPublicLandings(sessions).filter(
-      (landing) => landing.events > 0 && !buildOffSeasonLandingSlugs().has(landing.slug),
-    ),
+    buildPublicLandings(sessions).filter((landing) => landing.events > 0),
     cityFilter,
   );
 }
@@ -4687,9 +4692,7 @@ export async function buildPublicCityPage(db, citySlugOrId) {
   const venueCount = countDistinctSessionVenues(matchedSessions);
   const prices = sessions.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
   const categories = countBy(sessions.map((event) => event.category).filter(Boolean));
-  const landings = buildPublicLandings(sessions).filter(
-    (landing) => landing.events > 0 && !buildOffSeasonLandingSlugs().has(landing.slug),
-  );
+  const landings = buildPublicLandings(sessions).filter((landing) => landing.events > 0);
   const entityLabel = destinationPrepositional(destination);
 
   return {
@@ -4887,7 +4890,8 @@ export async function buildPublicLandingPageManaged(db, landingSlug, cityFilter 
 export async function buildPublicEventPage(db, eventSlugOrId) {
   const cachedCatalogSessions = publicCatalogCache?.sessions || null;
   let catalogSessions = cachedCatalogSessions;
-  let resolvedEventId = await resolvePublicEventId(db, eventSlugOrId, catalogSessions);
+  const eventPageRoute = await readPublicEventPageRouteBySlug(db, eventSlugOrId);
+  let resolvedEventId = eventPageRoute?.eventId || await resolvePublicEventId(db, eventSlugOrId, catalogSessions);
   let targetPublicSession = lookupCatalogSessionBySlug(eventSlugOrId, catalogSessions);
 
   const loadEventRow = async (eventLocator) => {
@@ -4997,7 +5001,11 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
     venue: event.venue,
   };
   const targetGroupKey = targetPublicSession?.groupKey || publicEventGroupKey(fallbackPublicRow);
-  let groupEventIds = targetPublicSession?.groupEventIds?.length ? targetPublicSession.groupEventIds : [event.id];
+  let groupEventIds = eventPageRoute?.eventIds?.length
+    ? eventPageRoute.eventIds
+    : targetPublicSession?.groupEventIds?.length
+      ? targetPublicSession.groupEventIds
+      : [event.id];
   const representativeRow = targetPublicSession || fallbackPublicRow;
 
   // Expand TicketsCloud meta siblings so a past dated slug still shows future slots.
@@ -5015,7 +5023,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
     `,
     [event.id],
   );
-  if (metaResult.rows.length) {
+  if (!eventPageRoute && metaResult.rows.length) {
     groupEventIds = uniqueValues([
       ...groupEventIds,
       ...metaResult.rows.map((row) => row.id),
@@ -5265,6 +5273,19 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
       }]
     : [];
   const publicSessions = sessions.length ? sessions : widgetOnlySessions;
+  let eventPageAvailability = eventPageRoute && publicSessions.length ? 'AVAILABLE' : null;
+  if (eventPageRoute && publicSessions.length === 0) {
+    const scheduleHistory = await db.query(
+      `select max(coalesce(session."endsAt", session."startsAt")) as "lastSessionAt"
+       from "EventSession" session
+       where session."eventId" = any($1::text[]) and session."cancelledAt" is null`,
+      [groupEventIds],
+    );
+    const lastSessionAt = scheduleHistory.rows[0]?.lastSessionAt;
+    eventPageAvailability = lastSessionAt && new Date(lastSessionAt).getTime() < Date.now()
+      ? 'ENDED'
+      : 'NO_UPCOMING';
+  }
   if (!event.overrideSeoTitle && !event.seoTitle) {
     const nearest = publicSessions[0];
     const dateBit = [nearest?.dateLabel, nearest?.timeLabel].filter(Boolean).join(', ');
@@ -5273,7 +5294,19 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
     }
   }
   applyEventPrimaryPurchase(baseEvent, publicSessions, event.sourceCode || primaryOffer?.sourceCode);
-  const ticketPrices = buildPublicTicketPrices(publicOffers, publicSessions, baseEvent);
+  const hasExpiredEventPage = eventPageAvailability === 'ENDED' || eventPageAvailability === 'NO_UPCOMING';
+  if (hasExpiredEventPage) {
+    publicOffers.length = 0;
+    baseEvent.priceFrom = null;
+    baseEvent.vacant = null;
+    baseEvent.purchaseUrl = null;
+    baseEvent.widgetUrl = null;
+    baseEvent.deeplinkUrl = null;
+    baseEvent.purchaseReady = false;
+    baseEvent.purchaseMode = 'unavailable';
+    baseEvent.purchaseProvider = null;
+  }
+  const ticketPrices = hasExpiredEventPage ? [] : buildPublicTicketPrices(publicOffers, publicSessions, baseEvent);
   const related = pickRelatedSessions(
     event,
     catalogSessions,
@@ -5285,13 +5318,20 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
   const vacantValues = publicSessions.map((session) => session.vacant).filter((value) => Number.isFinite(value));
 
   if (!isSaleableEventForPublic({ ...baseEvent, kind: event.kind, sourceStatus: publicSessions.find((session) => session.sourceStatus === 'widget')?.sourceStatus || event.sourceStatus, startsAt: publicSessions.find((session) => session.startsAt)?.startsAt || null,
-      endsAt: publicSessions.find((session) => session.endsAt)?.endsAt || null })) {
+      endsAt: publicSessions.find((session) => session.endsAt)?.endsAt || null }) && !hasExpiredEventPage) {
     return null;
   }
 
   return {
     generatedAt: new Date().toISOString(),
     event: baseEvent,
+    eventPageRoute: eventPageRoute ? {
+      slug: eventPageRoute.slug,
+      status: eventPageRoute.status,
+      published: eventPageRoute.published,
+      isIndexable: eventPageRoute.isIndexable,
+      availability: eventPageAvailability,
+    } : null,
     sessions: publicSessions,
     offers: publicOffers.map((offer) => ({
       id: offer.id,
@@ -6018,6 +6058,18 @@ function normalizeVenuePayload(payload) {
     const value = normalizeNullableString(payload.pageStatus);
     const allowed = new Set(['NONE', 'CANDIDATE', 'PUBLISHED', 'HIDDEN']);
     normalized.pageStatus = value && allowed.has(value) ? value : null;
+  }
+
+  if (Object.prototype.hasOwnProperty.call(payload, 'placeType')) {
+    const value = normalizeNullableString(payload.placeType)?.toUpperCase() || null;
+    if (value != null && !isPlaceType(value)) throw new Error('Invalid placeType');
+    normalized.placeType = value;
+  }
+
+  if (Object.prototype.hasOwnProperty.call(payload, 'placeSubtype')) {
+    const value = normalizeNullableString(payload.placeSubtype)?.toLowerCase() || null;
+    if (value && !/^[a-z0-9_-]{1,64}$/u.test(value)) throw new Error('Invalid placeSubtype');
+    normalized.placeSubtype = value;
   }
 
   return normalized;
@@ -8701,9 +8753,11 @@ export async function buildPublicArticlePage(db, slug) {
     [slug],
   );
   if (rows[0]) {
+    const article = mapPublicArticleDetail(rows[0]);
+    article.content = await rewriteArticleEventLinks(article.content, db);
     return {
       generatedAt: new Date().toISOString(),
-      article: mapPublicArticleDetail(rows[0]),
+      article,
       cmsOwned: true,
     };
   }

@@ -12,11 +12,21 @@ import {
   deleteAdminEventPageRoute,
   findAdminEventPageByEvent,
   getAdminEventPage,
+  moveAdminEventPageEvent,
   publishAdminEventPage,
   replaceAdminEventPageEvents,
+  searchAdminEventPageEventCandidates,
+  splitAdminEventPageEvent,
   updateAdminEventPage,
 } from './event-pages.js';
 import { PDP_VARIANTS, readPdpDocument, savePdpDocument } from './pdp-documents.js';
+import {
+  buildAdminSupplierPlaceRequests,
+  buildSupplierPlaceWorkspace,
+  getAdminSupplierPlaceRequest,
+  reviewSupplierPlaceRequest,
+  submitSupplierPlaceRequest,
+} from './supplier-place-requests.js';
 import {
   buildAdminDashboard,
   buildAdminBuyersList,
@@ -522,6 +532,29 @@ export async function handleRequest(request, response) {
       return;
     }
 
+    if (route === 'GET /api/supplier/places') {
+      try {
+        const user = await requireSiteUserFromRequest(db, request);
+        sendJson(response, await buildSupplierPlaceWorkspace(db, user.id));
+      } catch (error) {
+        sendJson(response, { error: error.message || 'unauthorized' }, error.statusCode || 401);
+      }
+      return;
+    }
+
+    if (route === 'POST /api/supplier/place-requests') {
+      try {
+        const user = await requireSiteUserFromRequest(db, request);
+        const result = await submitSupplierPlaceRequest(db, user.id, await readJsonBody(request));
+        sendJson(response, result, 201);
+      } catch (error) {
+        const message = error.message || 'place_request_failed';
+        const status = /access denied|cannot submit/i.test(message) ? 403 : 400;
+        sendJson(response, { error: message }, status);
+      }
+      return;
+    }
+
     const accountOrderMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/account\/orders\/([^/]+)$/) : null;
     if (accountOrderMatch) {
       try {
@@ -577,7 +610,11 @@ export async function handleRequest(request, response) {
     const publicEventMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/public\/events\/([^/]+)$/) : null;
     if (publicEventMatch) {
       const eventSlug = decodeURIComponent(publicEventMatch[1]);
-      const payload = await withPublicResponseCache(`event:${eventSlug}`, () => buildPublicEventPage(db, eventSlug));
+      const cacheKey = `event:${eventSlug}`;
+      const payload = await withPublicResponseCache(cacheKey, () => buildPublicEventPage(db, eventSlug));
+      // Catalog syncs happen in a separate process. Do not keep a 404/miss in
+      // this process cache: a newly imported EventPage must resolve immediately.
+      if (!payload) publicResponseCache.delete(cacheKey);
       // Never 200+null: web generateMetadata treats miss as HTTP 500.
       sendPublicJson(response, payload || { error: 'event_not_found' }, payload ? 200 : 404);
       return;
@@ -763,6 +800,37 @@ export async function handleRequest(request, response) {
       return;
     }
 
+    if (route === 'GET /api/admin/supplier-place-requests') {
+      const status = String(url.searchParams.get('status') || '').trim().toUpperCase();
+      try {
+        sendJson(response, await buildAdminSupplierPlaceRequests(db, status));
+      } catch (error) {
+        sendJson(response, { error: error.message || 'place_requests_failed' }, 400);
+      }
+      return;
+    }
+
+    const supplierPlaceRequestMatch = url.pathname.match(/^\/api\/admin\/supplier-place-requests\/([^/]+)$/);
+    if (supplierPlaceRequestMatch && request.method === 'GET') {
+      const result = await getAdminSupplierPlaceRequest(db, decodeURIComponent(supplierPlaceRequestMatch[1]));
+      sendJson(response, result || { error: 'place_request_not_found' }, result ? 200 : 404);
+      return;
+    }
+
+    if (supplierPlaceRequestMatch && request.method === 'PATCH') {
+      try {
+        const result = await reviewSupplierPlaceRequest(
+          db,
+          decodeURIComponent(supplierPlaceRequestMatch[1]),
+          await readJsonBody(request),
+        );
+        sendJson(response, result || { error: 'place_request_not_found' }, result ? 200 : 404);
+      } catch (error) {
+        sendJson(response, { error: error.message || 'place_request_review_failed' }, 400);
+      }
+      return;
+    }
+
     if (route === 'GET /api/admin/pdp/variants') {
       sendJson(response, PDP_VARIANTS);
       return;
@@ -777,6 +845,12 @@ export async function handleRequest(request, response) {
         const status = /unique|duplicate/i.test(message) ? 409 : 400;
         sendJson(response, { error: message }, status);
       }
+      return;
+    }
+
+    if (route === 'GET /api/admin/event-page-event-candidates') {
+      const q = url.searchParams.get('q') || '';
+      sendJson(response, await searchAdminEventPageEventCandidates(db, q));
       return;
     }
 
@@ -801,6 +875,34 @@ export async function handleRequest(request, response) {
         const message = error instanceof Error ? error.message : 'invalid_event_page_events';
         const status = /unique|duplicate/i.test(message) ? 409 : 400;
         sendJson(response, { error: message }, status);
+      }
+      return;
+    }
+
+    const eventPageMoveMatch = request.method === 'POST'
+      ? url.pathname.match(/^\/api\/admin\/event-pages\/([^/]+)\/events\/move$/)
+      : null;
+    if (eventPageMoveMatch) {
+      try {
+        const body = await readJsonBody(request);
+        const result = await moveAdminEventPageEvent(db, decodeURIComponent(eventPageMoveMatch[1]), body.eventId);
+        sendJson(response, result, result ? 200 : 404);
+      } catch (error) {
+        sendJson(response, { error: error instanceof Error ? error.message : 'event_move_failed' }, 409);
+      }
+      return;
+    }
+
+    const eventPageSplitMatch = request.method === 'POST'
+      ? url.pathname.match(/^\/api\/admin\/event-pages\/([^/]+)\/events\/split$/)
+      : null;
+    if (eventPageSplitMatch) {
+      try {
+        const body = await readJsonBody(request);
+        const result = await splitAdminEventPageEvent(db, decodeURIComponent(eventPageSplitMatch[1]), body.eventId);
+        sendJson(response, result, result ? 200 : 404);
+      } catch (error) {
+        sendJson(response, { error: error instanceof Error ? error.message : 'event_split_failed' }, 409);
       }
       return;
     }

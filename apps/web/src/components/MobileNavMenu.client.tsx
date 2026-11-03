@@ -190,6 +190,14 @@ export function MobileNavLayer({
                   <User className="h-4 w-4" strokeWidth={1.75} aria-hidden />
                   Мои покупки
                 </Link>
+                <Link
+                  href="/supplier/places"
+                  onClick={close}
+                  className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-left text-base font-medium text-graphite-muted hover:bg-surface-muted hover:text-graphite"
+                >
+                  <User className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+                  Кабинет поставщика
+                </Link>
                 <button
                   type="button"
                   onClick={async () => {

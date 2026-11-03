@@ -71,13 +71,14 @@ function Field({ label, value, onChange, multiline = false }: { label: string; v
   </label>;
 }
 
-export function AdminPdpEditor({ entity, entityId, entitySlug, variants, initialDocument, initialVariant, initialError, saveDocument, heading = 'Редакционный PDP', saveButtonLabel = 'Сохранить PDP' }: {
+export function AdminPdpEditor({ entity, entityId, entitySlug, variants, initialDocument, initialVariant, suggestedVariant, initialError, saveDocument, heading = 'Редакционный PDP', saveButtonLabel = 'Сохранить PDP' }: {
   entity: 'venues' | 'events';
   entityId: string;
   entitySlug: string;
   variants: Record<string, string[]>;
   initialDocument: AdminPdpDocument | null;
   initialVariant: string;
+  suggestedVariant?: string;
   initialError: string | null;
   saveDocument?: (document: AdminPdpDocument) => Promise<AdminPdpDocument>;
   heading?: string;
@@ -198,6 +199,7 @@ export function AdminPdpEditor({ entity, entityId, entitySlug, variants, initial
         <select className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground" value={document.variant} onChange={(event) => changeVariant(event.target.value)}>
           {Object.keys(variants).filter((variant) => entity === 'events' ? variant === 'event' : variant !== 'event').map((variant) => <option key={variant} value={variant}>{labels[variant] || variant}</option>)}
         </select>
+        {entity === 'venues' && suggestedVariant ? <span className="mt-1 block text-xs text-indigo-700">Рекомендуемый профиль по типу места: {labels[suggestedVariant] || suggestedVariant}. Выбор другого профиля остаётся решением редактора.</span> : null}
       </label>
       <label className="text-xs text-muted-foreground">Статус контента
         <select className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground" value={document.status} onChange={(event) => setDocument({ ...document, status: event.target.value as Document['status'] })}>

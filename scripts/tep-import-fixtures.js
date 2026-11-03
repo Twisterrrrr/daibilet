@@ -13,6 +13,7 @@ const { EVENT_UPSERT_STATUS, EVENT_UPSERT_SLUG } = require("./lib/event-import-g
 const { normalizeImportEventTitle } = require("./lib/event-title-normalize");
 const { ENTERTAINMENT_DISCO_TAXONOMY, isDiscoOrPartyEvent } = require("./lib/event-taxonomy");
 const { applyVenueAddressCanon } = require("./lib/venue-address-overrides");
+const { ensureEventPageShells } = require("./lib/event-page-provision");
 
 const fixturesDir = path.resolve(process.env.TEP_FIXTURES_DIR || path.join(rootDir, "data", "teplohod", "fixtures"));
 const eventsPath = path.join(fixturesDir, "events-compact.json");
@@ -58,8 +59,13 @@ async function main() {
     withoutEventTimes: 0,
     missingFromCatalog: 0,
     providerLinks: 0,
+    eventPagesCreated: 0,
+    eventPagesExisting: 0,
+    eventPagesSkipped: 0,
+    eventPageSchemaAvailable: null,
   };
   const importedExternalIds = new Set();
+  const importedEventIds = [];
 
   try {
     await client.query("BEGIN");
@@ -148,6 +154,7 @@ async function main() {
         primarySubcategoryId: taxonomy.subcategoryId,
       });
       stats.importedEvents += 1;
+      importedEventIds.push(eventId);
 
       await upsertRawRecord(client, externalId, sourceEvent);
       await upsertSourceLink(client, eventId, externalId);
@@ -273,6 +280,12 @@ async function main() {
       [TEPL0HOD_SOURCE_ID, [...importedExternalIds]],
     );
     stats.missingFromCatalog = missingResult.rows[0]?.count ?? 0;
+
+    const eventPageStats = await ensureEventPageShells(client, importedEventIds);
+    stats.eventPageSchemaAvailable = eventPageStats.available;
+    stats.eventPagesCreated = eventPageStats.created;
+    stats.eventPagesExisting = eventPageStats.existing;
+    stats.eventPagesSkipped = eventPageStats.skipped;
 
     const providerLinkStats = await syncProviderLinksForSource(client, TEPL0HOD_SOURCE_ID);
     stats.providerLinks = providerLinkStats.total;

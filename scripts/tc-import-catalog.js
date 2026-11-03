@@ -13,6 +13,7 @@ const { ENTERTAINMENT_DISCO_TAXONOMY, isDiscoOrPartyEvent } = require("./lib/eve
 const { applyVenueAddressCanon } = require("./lib/venue-address-overrides");
 const { deactivateMissingTicketscloudEvents } = require("./lib/tc-deactivate-missing");
 const { resolveTicketscloudCityId } = require("./lib/tc-city-resolve");
+const { ensureEventPageShells } = require("./lib/event-page-provision");
 
 const requireFromDbPackage = createRequire(path.join(rootDir, "packages", "db", "package.json"));
 const { Pool } = requireFromDbPackage("pg");
@@ -114,6 +115,10 @@ async function importCatalogEvents(catalog, options = {}) {
     providerLinks: 0,
     snapshotLinkedEvents: 0,
     snapshotMissingLinks: 0,
+    eventPagesCreated: 0,
+    eventPagesExisting: 0,
+    eventPagesSkipped: 0,
+    eventPageSchemaAvailable: null,
   };
 
   try {
@@ -191,6 +196,12 @@ async function importCatalogEvents(catalog, options = {}) {
       stats.missingDeactivatedSessions = deactivated.sessionsMarked;
       stats.missingDeactivatedOffers = deactivated.offersMarked;
     }
+
+    const eventPageStats = await ensureEventPageShells(client, importedEventIds);
+    stats.eventPageSchemaAvailable = eventPageStats.available;
+    stats.eventPagesCreated = eventPageStats.created;
+    stats.eventPagesExisting = eventPageStats.existing;
+    stats.eventPagesSkipped = eventPageStats.skipped;
 
     const providerLinkStats = await syncProviderLinksForSource(
       client,

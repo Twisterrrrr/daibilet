@@ -30,6 +30,12 @@ export function createDb(rootDir) {
       }
     },
 
+    async close() {
+      if (!pool) return;
+      await pool.end();
+      pool = undefined;
+    },
+
     async stats() {
       const result = await pool.query(`
         select 'events' as key, count(*)::int as value from "Event"

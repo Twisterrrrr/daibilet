@@ -18,6 +18,7 @@ src/lib/event-image-focus.test.ts
 src/lib/event-location.test.ts
 src/lib/first-visit-city.test.ts
 src/lib/isr-chrome-dynamic-apis.test.ts
+src/lib/landing-season.test.ts
 src/lib/location-venue-hero.test.ts
 src/lib/format-money-range.test.ts
 src/lib/must-see-filters.test.ts

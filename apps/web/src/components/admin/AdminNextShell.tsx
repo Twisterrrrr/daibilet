@@ -65,6 +65,7 @@ const NAV_GROUPS: NavGroup[] = [
     title: 'Входящие',
     items: [
       { href: '/admin/change-requests', label: 'Заявки поставщиков', icon: ClipboardList },
+      { href: '/admin/place-requests', label: 'Заявки на места', icon: Building2 },
       { href: '/admin/chats', label: 'Чат поддержки', icon: MessageSquare },
     ],
   },

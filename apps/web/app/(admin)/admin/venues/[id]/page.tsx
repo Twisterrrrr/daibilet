@@ -8,6 +8,7 @@ import { saveAdminVenueAction } from '@/server/admin-venue-actions';
 import { loadAdminVenueDetail } from '@/server/admin-venues-data';
 import { AdminPdpEditor } from '@/components/admin/AdminVenuePdpEditor.client';
 import { loadAdminPdpEditorData } from '@/server/admin-pdp-data';
+import { PLACE_TYPE_OPTIONS, suggestedPlacePdpVariant } from '@daibilet/contracts/place-pdp';
 
 export const dynamic = 'force-dynamic';
 
@@ -64,13 +65,10 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
     PIER: 'pier', MONUMENT: 'landmark', PARK: 'park', TEMPLE: 'religion', OUTDOOR_LOCATION: 'nature',
     SPORT_ACTIVITY_SPACE: 'sport', ATTRACTION: 'attraction', BUS: 'transport', GASTRO: 'food',
   };
-  const defaultVariantByPlaceType: Record<string, string> = {
-    MUSEUM: 'museum', MONUMENT: 'landmark', RELIGION: 'religion', NATURE: 'nature', URBAN: 'urban_area',
-    THEATRE: 'theater', ENTERTAINMENT: 'attraction', FOOD: 'food', TRANSPORT: 'transport', VENUE: 'venue', OTHER: 'venue',
-  };
+  const suggestedVariant = detail.placeType ? suggestedPlacePdpVariant(detail.placeType, detail.placeSubtype) : null;
   const initialVariant = pdpData.document?.variant
+    || suggestedVariant
     || defaultVariantByVenueKind[detail.kind.toUpperCase()]
-    || defaultVariantByPlaceType[String(detail.placeType || '').toUpperCase()]
     || 'venue';
   const notice = first(rawSearch.saved) === '1' ? 'Площадка сохранена.' : null;
 
@@ -159,6 +157,15 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
                   </option>
                 ))}
               </select>
+            </Field>
+            <Field label="Тип места для каталога">
+              <select name="placeType" defaultValue={detail.placeType || ''} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm">
+                <option value="">Не определён</option>
+                {PLACE_TYPE_OPTIONS.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+              </select>
+            </Field>
+            <Field label="Подтип места">
+              <input name="placeSubtype" defaultValue={detail.placeSubtype || ''} maxLength={64} pattern="[a-z0-9_-]*" placeholder="Например: pier, planetarium" className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" />
             </Field>
             <Field label="Статус страницы">
               <select
@@ -299,6 +306,7 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
           variants={pdpData.variants}
           initialDocument={pdpData.document}
           initialVariant={initialVariant}
+          suggestedVariant={suggestedVariant || initialVariant}
           initialError={pdpData.error}
         />
       ) : null}
