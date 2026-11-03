@@ -1,4 +1,5 @@
 import type { Server } from 'node:http';
+import './bootstrap-env.js';
 import { buildAdminEventChangeRequestDetailDto, buildAdminEventChangeRequestsDto } from './admin-event-change-requests.dto.js';
 import { createAdminEventChangeRequestsRouteHandler } from './admin-event-change-requests-handler.js';
 import { createAdminEventsRouteHandler } from './admin-events-handler.js';
