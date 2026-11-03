@@ -291,6 +291,65 @@ async function importCatalogEvents(catalog, options = {}) {
   }
 }
 
+async function importProviderMetadata(providerMetadata, options = {}) {
+  if (!Array.isArray(providerMetadata) || !providerMetadata.length) {
+    throw new Error("Ticketscloud provider metadata is empty or malformed; import aborted");
+  }
+  const client = await pool.connect();
+  const batchSize = 500;
+  let imported = 0;
+  try {
+    await client.query("BEGIN");
+    const source = await client.query(`select id from "Source" where id = $1`, [TICKETSCLOUD_SOURCE_ID]);
+    if (!source.rowCount) {
+      throw new Error("Ticketscloud source is missing; run the catalog import before metadata-only import");
+    }
+
+    for (let offset = 0; offset < providerMetadata.length; offset += batchSize) {
+      const batch = providerMetadata.slice(offset, offset + batchSize).map((metadata) => {
+        const payload = {
+          organizerId: metadata.organizerId || null,
+          seller: metadata.seller || null,
+          artistIds: Array.isArray(metadata.artistIds) ? metadata.artistIds : [],
+        };
+        const payloadText = JSON.stringify(payload);
+        return {
+          externalId: String(metadata.externalId),
+          payload,
+          payloadHash: sha256(payloadText),
+        };
+      });
+      await client.query(
+        `
+          with batch as (
+            select *
+            from jsonb_to_recordset($2::jsonb) as item("externalId" text, payload jsonb, "payloadHash" text)
+          )
+          insert into "RawImportRecord" (id, "sourceId", "entityType", "externalId", payload, "payloadHash", "importedAt")
+          select 'raw_tc_provider_meta_' || batch."externalId", $1, 'event_provider_metadata', batch."externalId",
+            batch.payload, batch."payloadHash", now()
+          from batch
+          on conflict ("sourceId", "entityType", "externalId") do update set
+            payload = excluded.payload,
+            "payloadHash" = excluded."payloadHash",
+            "importedAt" = excluded."importedAt"
+          where "RawImportRecord"."payloadHash" is distinct from excluded."payloadHash"
+        `,
+        [TICKETSCLOUD_SOURCE_ID, JSON.stringify(batch)],
+      );
+      imported += batch.length;
+    }
+    await client.query("COMMIT");
+    return { source: TICKETSCLOUD_SOURCE_ID, providerMetadataRows: imported, batchSize };
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+    if (options.endPool !== false) await pool.end();
+  }
+}
+
 async function importCatalogEvent(client, event, summary, cityIdCache) {
   const rowStats = { eventId: null, sessions: 0, offers: 0, tags: 0, venue: false, city: false, hasWidgetUrl: false };
   const externalId = String(event.externalId);
@@ -769,6 +828,7 @@ module.exports = {
   assertProviderMetadataSnapshot,
   importCatalogEvent,
   importCatalogEvents,
+  importProviderMetadata,
   upsertTicketscloudOffers,
   TICKETSCLOUD_SOURCE_ID,
 };

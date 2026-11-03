@@ -51,6 +51,7 @@
     "tc:count": "node scripts/tc-count-events.js",
     "tc:full-sync": "node scripts/tc-full-sync.js",
     "tc:import": "node scripts/tc-import-catalog.js",
+    "tc:import-provider-metadata": "node scripts/tc-import-provider-metadata.js",
     "event:rewrite:audit": "node scripts/event-rewrite-audit.js",
     "event:descriptions:reformat": "node apps/web/node_modules/tsx/dist/cli.mjs scripts/format-current-event-descriptions.js",
     "tc:sync": "node scripts/tc-sync.js",
