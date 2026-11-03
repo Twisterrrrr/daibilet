@@ -25,6 +25,36 @@ server_start = text.rfind("\nserver {", 0, text.index(marker))
 block_end = text.index("\n}\n", text.index(marker)) + 2
 old_block = text[server_start:block_end]
 
+# The current admin UI is part of the Next application. Keep staging's admin
+# route on the same upstream instead of aliasing an obsolete Vite directory.
+admin_location = """    location /admin/ {
+        proxy_pass http://daibilet_web_staging;
+        proxy_http_version 1.1;
+        proxy_set_header Authorization $http_authorization;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        add_header X-Robots-Tag "noindex, nofollow" always;
+    }
+"""
+if "location /admin/ {" in old_block:
+    import re
+
+    old_block, count = re.subn(
+        r"    location /admin/ \{.*?\n    \}\n",
+        admin_location,
+        old_block,
+        count=1,
+        flags=re.DOTALL,
+    )
+    if count != 1:
+        raise SystemExit("could not safely replace staging /admin location")
+    text = text[:server_start] + old_block + text[block_end:]
+    block_end = server_start + len(old_block)
+
 if "proxy_pass http://daibilet_web_staging" in old_block:
     print("staging Next proxy already configured")
     CONF.write_text(text)
@@ -56,8 +86,15 @@ server {
     }
 
     location /admin/ {
-        alias /var/www/daibilet/staging-admin/;
-        try_files $uri $uri/ /admin/index.html;
+        proxy_pass http://daibilet_web_staging;
+        proxy_http_version 1.1;
+        proxy_set_header Authorization $http_authorization;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
         add_header X-Robots-Tag "noindex, nofollow" always;
     }
 
