@@ -842,6 +842,7 @@ export async function handleRequest(request, response) {
     if (route === 'POST /api/admin/event-pages') {
       try {
         const result = await createAdminEventPage(db, await readJsonBody(request));
+        if (result) invalidatePublicCaches('event page links created');
         sendJson(response, result, 201);
       } catch (error) {
         const message = error instanceof Error ? error.message : 'invalid_event_page';
@@ -887,6 +888,7 @@ export async function handleRequest(request, response) {
       const id = decodeURIComponent(eventPageEventsMatch[1]);
       try {
         const result = await replaceAdminEventPageEvents(db, id, await readJsonBody(request));
+        if (result) invalidatePublicCaches('event page links updated');
         sendJson(response, result, result ? 200 : 404);
       } catch (error) {
         const message = error instanceof Error ? error.message : 'invalid_event_page_events';
@@ -907,6 +909,7 @@ export async function handleRequest(request, response) {
           decodeURIComponent(eventPageTourGroupMatch[1]),
           body?.tourGroupId ?? null,
         );
+        if (result) invalidatePublicCaches('event page tour group updated');
         sendJson(response, result || { error: 'event_page_not_found' }, result ? 200 : 404);
       } catch (error) {
         sendJson(response, { error: error instanceof Error ? error.message : 'tour_group_assign_failed' }, 400);
@@ -921,6 +924,7 @@ export async function handleRequest(request, response) {
       try {
         const body = await readJsonBody(request);
         const result = await moveAdminEventPageEvent(db, decodeURIComponent(eventPageMoveMatch[1]), body.eventId);
+        if (result) invalidatePublicCaches('event page links moved');
         sendJson(response, result, result ? 200 : 404);
       } catch (error) {
         sendJson(response, { error: error instanceof Error ? error.message : 'event_move_failed' }, 409);
@@ -935,6 +939,7 @@ export async function handleRequest(request, response) {
       try {
         const body = await readJsonBody(request);
         const result = await splitAdminEventPageEvent(db, decodeURIComponent(eventPageSplitMatch[1]), body.eventId);
+        if (result) invalidatePublicCaches('event page links split');
         sendJson(response, result, result ? 200 : 404);
       } catch (error) {
         sendJson(response, { error: error instanceof Error ? error.message : 'event_split_failed' }, 409);
@@ -948,6 +953,7 @@ export async function handleRequest(request, response) {
     if (eventPageRoutesMatch) {
       try {
         const result = await addAdminEventPageRoute(db, decodeURIComponent(eventPageRoutesMatch[1]), await readJsonBody(request));
+        if (result) invalidatePublicCaches('event page route added');
         sendJson(response, result, result ? 201 : 404);
       } catch (error) {
         const message = error instanceof Error ? error.message : 'invalid_event_page_route';
@@ -977,6 +983,7 @@ export async function handleRequest(request, response) {
       : null;
     if (eventPageRouteMatch) {
       const deleted = await deleteAdminEventPageRoute(db, decodeURIComponent(eventPageRouteMatch[1]), decodeURIComponent(eventPageRouteMatch[2]));
+      if (deleted) invalidatePublicCaches('event page route deleted');
       sendJson(response, { deleted }, deleted ? 200 : 404);
       return;
     }
@@ -985,11 +992,10 @@ export async function handleRequest(request, response) {
     if (eventPageMatch && (request.method === 'GET' || request.method === 'PUT')) {
       const id = decodeURIComponent(eventPageMatch[1]);
       try {
-        const wasPublished = request.method === 'PUT' && Boolean((await getAdminEventPage(db, id))?.publishedAt);
         const result = request.method === 'GET'
           ? await getAdminEventPage(db, id)
           : await updateAdminEventPage(db, id, await readJsonBody(request));
-        if (request.method === 'PUT' && (wasPublished || result?.publishedAt)) invalidatePublicCaches('event page content updated');
+        if (request.method === 'PUT' && result) invalidatePublicCaches('event page content updated');
         sendJson(response, result, result ? 200 : 404);
       } catch (error) {
         const message = error instanceof Error ? error.message : 'invalid_event_page';
