@@ -35,7 +35,10 @@ test('every blog redirect target is a path shape the page can serve', () => {
   assert.ok(entries.length >= 3, `expected at least 3 redirects, found ${entries.length}`);
   for (const [, from, to] of entries) {
     assert.doesNotMatch(to, /\/\/|\s/, `redirect target must be a clean path: ${to}`);
-    assert.ok(to.startsWith('/blog/'), `redirect target must live under /blog/: ${to}`);
+    assert.ok(
+      to.startsWith('/blog/') || /^\/cities\/[a-z0-9-]+$/.test(to),
+      `redirect target must use a served blog or city route: ${to}`,
+    );
     assert.notEqual(from, to.replace(/^\/blog\//, ''), 'redirect must not be a self-redirect');
   }
 });

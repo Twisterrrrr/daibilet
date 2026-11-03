@@ -21,7 +21,7 @@ test('Ufa hub slugs resolve to real venue stills, not cities placeholders', () =
   );
   assert.equal(
     resolveVenueHeroImage('ufa-aibat-hallyar', '/images/cities/ufa.png'),
-    '/images/venues/ufa/aibat-hallyar.jpg',
+    '/images/venues/ufa/aibat-hallyar-r20261026.png',
   );
 });
 
@@ -43,7 +43,7 @@ test('resolveVenueHeroImage uses city identity pack when slug is unmapped', () =
   );
   assert.equal(
     resolveVenueHeroImage('chelyabinsk-brand-new-spot', '/images/venues/generated/venue-auto-stub.jpg'),
-    '/images/venues/chelyabinsk/identity-symbol.jpg',
+    '/images/venues/chelyabinsk/chelyabinsk-meteorite-wikimedia.jpg',
   );
 });
 

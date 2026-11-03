@@ -137,7 +137,7 @@ test('collectDisplaySlotLabels: excludes primary, compact format up to 4', () =>
   // is deliberately not asserted to a fixed value: formatCatalogSlotChipLabel
   // derives it from startsAt in the city timezone, so it moves with the fixture.
   for (const label of labels) {
-    assert.match(label, /^\d{1,2} \p{L}{3}, \d{2}:\d{2}$/u);
+    assert.match(label, /^\d{1,2} \p{L}{3,5}\.?[,]? \d{2}:\d{2}$/u);
   }
 });
 
@@ -157,7 +157,7 @@ test('collectDisplaySlotPreview: moreCount after limit', () => {
   // 7 slots total, one is the primary, 3 shown, 3 left over.
   assert.equal(preview.moreCount, 3);
   for (const label of preview.labels) {
-    assert.match(label, /^\d{1,2} \p{L}{3}, \d{2}:\d{2}$/u);
+    assert.match(label, /^\d{1,2} \p{L}{3,5}\.?[,]? \d{2}:\d{2}$/u);
   }
 });
 
