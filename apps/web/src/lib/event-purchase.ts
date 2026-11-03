@@ -1,3 +1,9 @@
+import {
+  isTicketscloudProvider,
+  isTrustedTeplohodPurchaseUrl,
+  normalizeTicketscloudPurchaseUrl,
+} from '@/lib/external-provider-purchase';
+
 export type TcPurchaseTarget = {
   tcEventId: string;
   purchaseUrl?: string | null;
@@ -34,20 +40,26 @@ export function extractTcEventIdFromSession(session: {
   id?: string | null;
   eventId?: string | null;
   purchaseUrl?: string | null;
+  widgetUrl?: string | null;
+  purchaseProvider?: string | null;
+  offerSourceCode?: string | null;
 }) {
   // Prefer session/event id: meta-group siblings may inherit a sibling's offer widget URL
   // (same ?event=), which would collapse distinct slots to one TicketsCloud id.
   const raw = String(session.eventId || session.id || '').trim();
+  const purchaseUrl = String(session.purchaseUrl || session.widgetUrl || '');
+  const provider = String(session.purchaseProvider || session.offerSourceCode || '');
+  if (
+    /^evt_tep_/i.test(raw) ||
+    isTrustedTeplohodPurchaseUrl(purchaseUrl) ||
+    (isTeplohodPurchaseSession({ ...session, purchaseUrl }) && !isTicketscloudProvider(provider))
+  ) return null;
   const fromId = raw.match(/^(?:evt_|sess_)?([a-f0-9]{20,})$/i);
   if (fromId) return fromId[1];
 
-  const purchaseUrl = String(session.purchaseUrl || '');
-  const fromTcQuery = purchaseUrl.match(/[?&]event=([^&]+)/)?.[1];
+  const trustedTcUrl = normalizeTicketscloudPurchaseUrl(purchaseUrl);
+  const fromTcQuery = trustedTcUrl ? new URL(trustedTcUrl).searchParams.get('event') : null;
   if (fromTcQuery) return decodeURIComponent(fromTcQuery);
-
-  // Teplohod ids must not be treated as TicketsCloud event ids (breaks landings /events buy).
-  if (/teplohod\.info/i.test(purchaseUrl)) return null;
-  if (/^evt_tep_/i.test(raw)) return null;
 
   const match = raw.match(/^(?:evt_|sess_)?([a-f0-9]+)$/i);
   return match ? match[1] : raw || null;
@@ -59,7 +71,7 @@ function isTeplohodPurchaseSession(session: PurchaseSession): boolean {
   return (
     provider.includes('TEPLOHOD') ||
     provider.includes('TEP') ||
-    purchaseUrl.includes('teplohod.info') ||
+    isTrustedTeplohodPurchaseUrl(purchaseUrl) ||
     /^evt_tep_/i.test(String(session.id || session.eventId || ''))
   );
 }
@@ -71,7 +83,7 @@ export function isStartedTcSession(
 ): boolean {
   const provider = String(session.purchaseProvider || session.offerSourceCode || fallbackProvider || '').toUpperCase();
   const url = String(session.purchaseUrl || session.widgetUrl || '');
-  if (!provider.includes('TICKETSCLOUD') && provider !== 'TC' && !/ticketscloud/i.test(url)) return false;
+  if (!isTicketscloudProvider(provider) && !normalizeTicketscloudPurchaseUrl(url)) return false;
   if (String(session.kind || '').toUpperCase() === 'OPEN_DATE') return false;
   if (['open_date', 'widget'].includes(String(session.sourceStatus || '').toLowerCase())) return false;
   const startMs = session.startsAt ? Date.parse(session.startsAt) : NaN;
@@ -284,10 +296,7 @@ function resolveTcWidgetIds(event: {
 }) {
   const provider = String(event.widgetProvider || event.widgetPayload?.provider || '').toUpperCase();
   const purchaseUrl = String(event.purchaseUrl || event.widgetUrl || '');
-  const isTc =
-    provider.includes('TC') ||
-    provider.includes('TICKETSCLOUD') ||
-    /ticketscloud/i.test(purchaseUrl);
+  const isTc = isTicketscloudProvider(provider) || Boolean(normalizeTicketscloudPurchaseUrl(purchaseUrl));
   if (!isTc) return null;
 
   const tcEventId = String(event.widgetPayload?.tcEventId ?? event.externalId ?? '').trim();

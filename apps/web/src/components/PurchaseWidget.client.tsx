@@ -4,6 +4,7 @@ import type { PublicEventDto } from '@daibilet/contracts/public';
 
 import { getTcWidgetIds, TcWidgetButton } from '@/components/TcWidget.client';
 import { getTeplohodWidgetIds, TeplohodWidgetButton } from '@/components/TeplohodWidget.client';
+import { isSafeExternalPurchaseUrl } from '@/lib/external-provider-purchase';
 
 type PurchaseSession = {
   id?: string;
@@ -59,10 +60,10 @@ export function PurchaseWidget({
     return <TcWidgetButton tcEventId={ticketscloud.tcEventId} purchaseUrl={purchaseUrl} label="Купить билет" />;
   }
 
-  if (purchaseUrl) {
+  if (isSafeExternalPurchaseUrl(purchaseUrl)) {
     return (
       <a
-        href={purchaseUrl}
+        href={purchaseUrl!}
         target="_blank"
         rel="noopener noreferrer"
         className="inline-flex min-h-10 w-full items-center justify-center rounded-xl bg-primary px-6 py-3 text-base font-semibold text-white transition hover:bg-primary/90"

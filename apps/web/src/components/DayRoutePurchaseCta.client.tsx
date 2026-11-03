@@ -10,14 +10,15 @@ import {
   resolveTcWidgetToken,
 } from '@/components/TcWidget.client';
 import { extractTcEventIdFromSession } from '@/lib/event-purchase';
+import { isTrustedProviderPurchaseUrl } from '@/lib/external-provider-purchase';
 
 function isVendorCheckoutUrl(url: string): boolean {
-  return /ticketscloud|teplohod\.info/i.test(url);
+  return isTrustedProviderPurchaseUrl(url);
 }
 
 export function isDayRouteVendorCheckoutUrl(url?: string | null): boolean {
   const href = String(url || '').trim();
-  return Boolean(href && /^https?:\/\//i.test(href) && isVendorCheckoutUrl(href));
+  return Boolean(href && isVendorCheckoutUrl(href));
 }
 
 /**
@@ -46,7 +47,7 @@ export function DayRoutePurchaseCta({
   title?: string;
   'data-day-buy-ticket'?: string | boolean;
 }) {
-  const href = normalizeTcPurchaseUrl(purchaseUrl) || String(purchaseUrl || '').trim() || null;
+  const href = normalizeTcPurchaseUrl(purchaseUrl) || (isTrustedProviderPurchaseUrl(purchaseUrl) ? String(purchaseUrl).trim() : null);
   const tcTriggerRef = React.useRef<HTMLButtonElement | null>(null);
   const [iframeOpen, setIframeOpen] = React.useState(false);
   const [busy, setBusy] = React.useState(false);

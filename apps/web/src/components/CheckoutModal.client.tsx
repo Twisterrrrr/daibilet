@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { createPortal } from 'react-dom';
 import { ExternalLink, Loader2, X } from 'lucide-react';
+import { isTrustedProviderPurchaseUrl } from '@/lib/external-provider-purchase';
 
 type CheckoutModalProps = {
   open: boolean;
@@ -12,11 +13,11 @@ type CheckoutModalProps = {
 };
 
 /**
- * Iframe shell for full-page vendor checkout (TEP account.teplohod.info).
+ * Iframe shell for an allow-listed external provider purchase page (TC or TEP).
  * Do NOT wrap TicketsCloud widgets/common here - TC already ships a complete modal via tcwidget.js.
- * Footer deep-link stays as fallback when X-Frame-Options / CSP blocks embed.
+ * It never accepts Daibilet checkout URLs. Footer deep-link stays as fallback when embedding is blocked.
  */
-export function CheckoutModal({ open, onClose, checkoutUrl, title = 'Покупка билета' }: CheckoutModalProps) {
+export function CheckoutModal({ open, onClose, checkoutUrl, title = 'Покупка у поставщика' }: CheckoutModalProps) {
   const [mounted, setMounted] = React.useState(false);
   const [iframePhase, setIframePhase] = React.useState<'loading' | 'ready' | 'slow'>('loading');
 
@@ -46,7 +47,7 @@ export function CheckoutModal({ open, onClose, checkoutUrl, title = 'Покуп�
     };
   }, [open, onClose, checkoutUrl]);
 
-  if (!mounted || !open || !checkoutUrl) return null;
+  if (!mounted || !open || !isTrustedProviderPurchaseUrl(checkoutUrl)) return null;
 
   const openExternal = () => {
     window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
@@ -87,22 +88,22 @@ export function CheckoutModal({ open, onClose, checkoutUrl, title = 'Покуп�
           {iframePhase === 'loading' ? (
             <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-white p-6 text-center">
               <Loader2 className="h-8 w-8 animate-spin text-primary-600" aria-hidden />
-              <p className="text-sm font-semibold text-slate-900">Открываем оплату…</p>
-              <p className="text-xs text-slate-500">Окно оплаты загружается</p>
+              <p className="text-sm font-semibold text-slate-900">Открываем страницу покупки у поставщика…</p>
+              <p className="text-xs text-slate-500">Покупка и оплата проходят на стороне поставщика</p>
             </div>
           ) : null}
 
           {iframePhase === 'slow' ? (
             <div className="absolute inset-x-0 top-0 z-10 flex flex-col items-center gap-2 border-b border-amber-200 bg-amber-50 px-4 py-3 text-center">
               <p className="text-xs text-slate-700">
-                Если оплата не появилась, откройте её в новой вкладке - часть билетных систем блокирует встраивание.
+                Если страница покупки не появилась, откройте сайт поставщика в новой вкладке.
               </p>
               <button
                 type="button"
                 onClick={openExternal}
                 className="inline-flex min-h-9 items-center justify-center rounded-xl bg-primary-600 px-4 text-sm font-semibold text-white transition hover:bg-primary-700"
               >
-                Открыть оплату
+                Открыть сайт поставщика
               </button>
             </div>
           ) : null}
@@ -149,13 +150,13 @@ export function CheckoutModalButton({
   label,
   children,
   className,
-  title = 'Покупка билета',
+  title = 'Покупка у поставщика',
   onOpen,
 }: CheckoutModalButtonProps) {
   const [open, setOpen] = React.useState(false);
   const href = String(checkoutUrl || '').trim();
 
-  if (!href) return null;
+  if (!isTrustedProviderPurchaseUrl(href)) return null;
 
   return (
     <>

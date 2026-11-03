@@ -55,8 +55,13 @@ function parseArgs(argv) {
 
 function extractTcEventIdFromUrl(url) {
   if (!url) return null;
-  const match = String(url).match(/[?&]event=([^&]+)/);
-  return match ? decodeURIComponent(match[1]) : null;
+  try {
+    const parsed = new URL(String(url));
+    if (parsed.protocol !== "https:" || !/(^|\.)ticketscloud\.(com|org|ru)$/i.test(parsed.hostname)) return null;
+    return parsed.searchParams.get("event");
+  } catch {
+    return null;
+  }
 }
 
 async function sleep(ms) {
@@ -92,7 +97,7 @@ function checkTcEvent(event, sessions) {
   }
   const purchaseUrl = event.purchaseUrl || sessions[0]?.purchaseUrl;
   if (!purchaseUrl) issues.push("missing purchaseUrl");
-  else if (!extractTcEventIdFromUrl(purchaseUrl)) issues.push("purchaseUrl without event=");
+  else if (!extractTcEventIdFromUrl(purchaseUrl)) issues.push("purchaseUrl is not a Ticketscloud HTTPS URL with event=");
   else if (!/token=/.test(purchaseUrl)) issues.push("purchaseUrl without token=");
   if (event.purchaseReady === false) issues.push("purchaseReady=false");
   const purchasable = sessions.filter((s) => s.purchaseReady !== false && s.purchaseUrl);
@@ -111,7 +116,8 @@ function checkTepEvent(event, sessions) {
   }
   const purchaseUrl = event.purchaseUrl || sessions[0]?.purchaseUrl;
   if (!purchaseUrl) issues.push("missing purchaseUrl");
-  else if (!/account\.teplohod\.info\/order\/event-order|teplohod\.info\/event\/\d+/i.test(purchaseUrl)) {
+  else if (!/^https:\/\/(?:[^/]+\.)?teplohod\.info\//i.test(purchaseUrl) ||
+      !/account\.teplohod\.info\/order\/event-order|teplohod\.info\/event\/\d+/i.test(purchaseUrl)) {
     issues.push("purchaseUrl not teplohod checkout");
   }
   if (event.purchaseReady === false) issues.push("purchaseReady=false");
@@ -134,23 +140,27 @@ async function fetchEvent(base, slug) {
 }
 
 function inferProvider(item) {
-  const values = [
+  const declaredValues = [
     item?.widgetProvider,
     item?.purchaseProvider,
     item?.offerSourceCode,
     item?.provider,
     item?.source,
     item?.sourceCode,
-    item?.id,
-    item?.slug,
   ]
     .filter(Boolean)
     .map((value) => String(value).toUpperCase());
 
-  if (values.some((value) => value.includes("TEP"))) return "TEPLOHOD";
-  if (values.some((value) => value.includes("TICKETSCLOUD") || value.startsWith("TC-"))) {
+  if (declaredValues.some((value) => value === "TEP" || value.includes("TEPLOHOD"))) return "TEPLOHOD";
+  if (declaredValues.some((value) => value === "TC" || value.includes("TICKETSCLOUD"))) {
     return "TICKETSCLOUD";
   }
+
+  const purchaseUrl = item?.purchaseUrl || item?.widgetUrl || item?.deeplinkUrl;
+  if (/^https:\/\/(?:[^/]+\.)?teplohod\.info\//i.test(String(purchaseUrl || ""))) return "TEPLOHOD";
+  if (/^https:\/\/(?:[^/]+\.)?ticketscloud\.(?:com|org|ru)\//i.test(String(purchaseUrl || ""))) return "TICKETSCLOUD";
+  if (/^TC-/i.test(String(item?.slug || ""))) return "TICKETSCLOUD";
+  if (/^evt_tep_\d+$/i.test(String(item?.id || ""))) return "TEPLOHOD";
   return null;
 }
 
@@ -218,10 +228,16 @@ async function main() {
       const provider =
         activeTarget.provider ||
         String(event.widgetProvider || event.widgetPayload?.provider || "").toUpperCase();
-      const issues =
+      const actualProvider = String(event.widgetProvider || event.widgetPayload?.provider || "").toUpperCase();
+      const issues = [];
+      if (activeTarget.provider && actualProvider && activeTarget.provider !== actualProvider) {
+        issues.push(`provider mismatch: expected ${activeTarget.provider}, API returned ${actualProvider}`);
+      }
+      issues.push(...(
         provider.includes("TEP") || provider === "TEPLOHOD"
           ? checkTepEvent(event, sessions)
-          : checkTcEvent(event, sessions);
+          : checkTcEvent(event, sessions)
+      ));
       const ok = issues.length === 0;
       if (!ok) failed += 1;
       rows.push({

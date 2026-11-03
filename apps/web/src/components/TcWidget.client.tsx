@@ -13,6 +13,7 @@ import {
   isFlexibleScheduleSession,
 } from '@/lib/event-page-utils';
 import { trackSelectTickets } from '@/lib/catalog-analytics';
+import { normalizeTicketscloudPurchaseUrl } from '@/lib/external-provider-purchase';
 import {
   beginPurchaseOpening,
   completePurchaseOpening,
@@ -29,9 +30,10 @@ type TcWidgetWindow = Window & {
 };
 
 export function extractTcWidgetTokenFromPurchaseUrl(purchaseUrl?: string | null): string {
-  if (!purchaseUrl) return '';
+  const trustedUrl = normalizeTicketscloudPurchaseUrl(purchaseUrl);
+  if (!trustedUrl) return '';
   try {
-    const token = new URL(purchaseUrl).searchParams.get('token');
+    const token = new URL(trustedUrl).searchParams.get('token');
     return token ? decodeURIComponent(token).trim() : '';
   } catch {
     return '';
@@ -49,17 +51,7 @@ export function resolveTcWidgetToken(purchaseUrl?: string | null): string {
 }
 
 export function normalizeTcPurchaseUrl(purchaseUrl?: string | null): string | null {
-  if (!purchaseUrl) return null;
-  try {
-    const url = new URL(purchaseUrl);
-    if (!/ticketscloud/i.test(url.hostname)) return purchaseUrl;
-    const token = url.searchParams.get('token');
-    if (token?.startsWith('r:')) url.searchParams.set('token', token.slice(2));
-    if (url.hostname === 'ticketscloud.org') url.hostname = 'ticketscloud.com';
-    return url.toString();
-  } catch {
-    return purchaseUrl;
-  }
+  return normalizeTicketscloudPurchaseUrl(purchaseUrl);
 }
 
 export function buildTcCheckoutUrl(options: {
@@ -71,7 +63,7 @@ export function buildTcCheckoutUrl(options: {
 
   const eventId = String(options.tcEventId || '').trim();
   const token = resolveTcWidgetToken(options.purchaseUrl);
-  if (!eventId || !token) return null;
+  if (!/^\d+$/.test(eventId) || !token) return null;
 
   const url = new URL('https://ticketscloud.com/v1/widgets/common');
   url.searchParams.set('token', token);
@@ -179,6 +171,53 @@ function openTcPurchaseUrl(purchaseUrl?: string | null) {
   return Boolean(popup);
 }
 
+/** Open checkout during the original click gesture, before async widget loading can lose it. */
+function openTcPurchaseFallback(purchaseUrl?: string | null) {
+  const normalized = normalizeTcPurchaseUrl(purchaseUrl);
+  if (!normalized) return false;
+  if (!openTcPurchaseUrl(normalized)) window.location.assign(normalized);
+  return true;
+}
+
+/** Open a TC purchase from the current user gesture; imported purchases stay on Ticketscloud. */
+export function openTcPurchaseFromGesture(options: {
+  trigger?: HTMLButtonElement | null;
+  eventId?: string | null;
+  purchaseUrl?: string | null;
+}): boolean {
+  const eventId = String(options.eventId || '').trim();
+  const checkoutUrl = buildTcCheckoutUrl({ tcEventId: eventId, purchaseUrl: options.purchaseUrl });
+  if (!checkoutUrl) return false;
+  if (isPurchaseOpeningActive()) return false;
+
+  const trigger = options.trigger;
+  const triggerMatches = Boolean(
+    trigger &&
+      trigger.dataset.tcEvent === eventId &&
+      trigger.dataset.tcToken === resolveTcWidgetToken(options.purchaseUrl),
+  );
+  if (!isTcWidgetReady() || !triggerMatches || !trigger) {
+    const opened = openTcPurchaseFallback(checkoutUrl);
+    if (opened) completePurchaseOpening();
+    return opened;
+  }
+
+  // The vendor widget opens synchronously from the click gesture. Its fallback remains
+  // available in the purchase-opening feedback if the embedded widget fails to appear.
+  beginPurchaseOpening({
+    message: 'Открываем виджет Ticketscloud…',
+    fallbackUrl: checkoutUrl,
+    onRetry: () => { openTcPurchaseFallback(checkoutUrl); },
+  });
+  trigger.click();
+  window.setTimeout(() => failPurchaseOpening({
+    message: 'Виджет Ticketscloud не открылся. Перейдите на страницу покупки поставщика.',
+    fallbackUrl: checkoutUrl,
+    onRetry: () => { openTcPurchaseFallback(checkoutUrl); },
+  }), 2800);
+  return true;
+}
+
 const TC_FRAME_Z = '2147483000';
 const TC_OVERLAY_Z = '2147482990';
 
@@ -256,15 +295,34 @@ export async function openTcWidget(options: {
   purchaseUrl?: string | null;
 }): Promise<OpenTcWidgetResult> {
   const { trigger, purchaseUrl } = options;
+  const directCheckoutUrl = buildTcCheckoutUrl({
+    tcEventId: trigger?.dataset.tcEvent,
+    purchaseUrl,
+  });
+
+  if (!isTcWidgetReady() && directCheckoutUrl) {
+    return openTcPurchaseFallback(directCheckoutUrl) ? 'popup' : 'none';
+  }
+
+  if (isTcWidgetReady() && trigger) {
+    trigger.click();
+    if (await waitForTcWidgetVisible(2800)) {
+      liftTcWidgetLayers();
+      window.setTimeout(liftTcWidgetLayers, 50);
+      window.setTimeout(liftTcWidgetLayers, 300);
+      return 'widget';
+    }
+    return openTcPurchaseFallback(directCheckoutUrl) ? 'popup' : 'none';
+  }
 
   if (purchaseUrl && !trigger) {
-    return openTcPurchaseUrl(purchaseUrl) ? 'popup' : 'none';
+    return openTcPurchaseFallback(purchaseUrl) ? 'popup' : 'none';
   }
 
   try {
     await ensureTcWidgetScript();
   } catch {
-    return openTcPurchaseUrl(purchaseUrl) ? 'popup' : 'none';
+    return openTcPurchaseFallback(directCheckoutUrl || purchaseUrl) ? 'popup' : 'none';
   }
 
   if (trigger) {
@@ -286,7 +344,7 @@ export async function openTcWidget(options: {
     }
   }
 
-  return openTcPurchaseUrl(purchaseUrl) ? 'popup' : 'none';
+  return openTcPurchaseFallback(directCheckoutUrl || purchaseUrl) ? 'popup' : 'none';
 }
 
 async function runTcPurchaseFlow(options: {
@@ -297,18 +355,21 @@ async function runTcPurchaseFlow(options: {
 }) {
   if (isPurchaseOpeningActive()) return;
 
-  const fallbackUrl = normalizeTcPurchaseUrl(options.purchaseUrl) || options.purchaseUrl || null;
+  const fallbackUrl =
+    buildTcCheckoutUrl({ tcEventId: options.eventId, purchaseUrl: options.purchaseUrl }) ||
+    normalizeTcPurchaseUrl(options.purchaseUrl) ||
+    null;
   const run = async () => {
     const result = await openTcWidget({
       trigger: options.trigger,
-      purchaseUrl: options.purchaseUrl,
+      purchaseUrl: options.purchaseUrl || fallbackUrl,
     });
     if (result === 'widget' || result === 'popup') {
       completePurchaseOpening();
       return;
     }
     failPurchaseOpening({
-      message: 'Открываем оплату… Не вышло автоматически. Нажмите «Открыть оплату» или повторите.',
+      message: 'Открываем страницу покупки Ticketscloud… Не вышло автоматически. Откройте её по ссылке или повторите.',
       fallbackUrl,
       onRetry: () => {
         void run();
@@ -317,7 +378,7 @@ async function runTcPurchaseFlow(options: {
   };
 
   beginPurchaseOpening({
-    message: 'Открываем оплату…',
+    message: 'Открываем страницу покупки Ticketscloud…',
     fallbackUrl,
     onRetry: () => {
       void run();
@@ -489,11 +550,11 @@ function StaticSessionRow({
     </>
   );
 
-  if (purchaseUrl) {
-    const href = normalizeTcPurchaseUrl(purchaseUrl) || purchaseUrl;
+  const safePurchaseUrl = normalizeTcPurchaseUrl(purchaseUrl);
+  if (safePurchaseUrl) {
     return (
       <a
-        href={href}
+        href={safePurchaseUrl}
         target="_blank"
         rel="noopener noreferrer"
         className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2.5 transition hover:bg-slate-100"
@@ -547,15 +608,19 @@ export function TcWidgetButton({
         : 'btn-primary min-h-10 px-6 py-3.5 text-base';
 
   if (!eventId || !widgetToken) {
-    if (purchaseUrl) {
-      const href = normalizeTcPurchaseUrl(purchaseUrl) || purchaseUrl;
+    const safePurchaseUrl = normalizeTcPurchaseUrl(purchaseUrl);
+    if (safePurchaseUrl) {
       return (
-        <a href={href} target="_blank" rel="noopener noreferrer" className={className || fallbackLinkClass}>
+        <a href={safePurchaseUrl} target="_blank" rel="noopener noreferrer" className={className || fallbackLinkClass}>
           {label}
         </a>
       );
     }
-    return null;
+    return (
+      <button type="button" disabled className={`${className || fallbackLinkClass} cursor-not-allowed opacity-60`}>
+        Билеты у Ticketscloud недоступны
+      </button>
+    );
   }
 
   const sizeClasses =

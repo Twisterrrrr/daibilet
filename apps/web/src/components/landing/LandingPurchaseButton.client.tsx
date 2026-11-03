@@ -1,13 +1,14 @@
 'use client';
 
 import { CheckoutModalButton } from '@/components/CheckoutModal.client';
-import { TcWidgetButton, getTcWidgetIds } from '@/components/TcWidget.client';
+import { TcWidgetButton, getTcWidgetIds, normalizeTcPurchaseUrl } from '@/components/TcWidget.client';
 import {
   getTeplohodWidgetIdsFromSession,
   resolveTeplohodCheckoutUrl,
 } from '@/components/TeplohodWidget.client';
 import { trackSelectTickets } from '@/lib/catalog-analytics';
 import { extractTcEventIdFromSession, isSessionPurchaseBlocked } from '@/lib/event-purchase';
+import { isSafeExternalPurchaseUrl, isTicketscloudProvider, isTeplohodProvider } from '@/lib/external-provider-purchase';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 
 const DEFAULT_BUTTON_CLASS =
@@ -57,7 +58,8 @@ export function LandingPurchaseButton({
       purchaseUrl,
       tepEventId: teplohod?.tepEventId,
       tepWidgetId: teplohod?.tepWidgetId,
-    }) || purchaseUrl;
+    });
+  const isTeplohod = Boolean(teplohod) || isTeplohodProvider(session.purchaseProvider, session.offerSourceCode);
 
   // TEP first: extractTcEventIdFromSession can return tep numeric ids, which must not
   // steal the CTA into a broken TicketsCloud path on river/landings.
@@ -85,6 +87,7 @@ export function LandingPurchaseButton({
     widgetProvider: session.purchaseProvider || session.offerSourceCode,
     purchaseUrl: session.purchaseUrl,
   });
+  const isTicketscloud = Boolean(ticketscloud) || isTicketscloudProvider(session.purchaseProvider, session.offerSourceCode);
 
   // TC: native tcwidget.js modal only - never wrap widgets/common in CheckoutModal.
   if (ticketscloud?.tcEventId && tcEventId) {
@@ -98,26 +101,21 @@ export function LandingPurchaseButton({
     );
   }
 
-  if (teplohodCheckoutUrl) {
-    return (
-      <CheckoutModalButton
-        checkoutUrl={teplohodCheckoutUrl}
-        label={resolvedLabel}
-        className={resolvedClassName}
-        onOpen={() =>
-          trackSelectTickets({
-            eventId: session.id,
-            provider: 'teplohod',
-            source: 'landing_purchase_button_fallback',
-          })
-        }
-      />
-    );
+  if (isTicketscloud) {
+    const safeTcUrl = normalizeTcPurchaseUrl(purchaseUrl);
+    if (safeTcUrl) {
+      return <a href={safeTcUrl} target="_blank" rel="noopener noreferrer" className={resolvedClassName}>{resolvedLabel}</a>;
+    }
+    return <button type="button" disabled className={SOLD_OUT_CLASS}>Билеты у Ticketscloud недоступны</button>;
   }
 
-  if (purchaseUrl) {
+  if (isTeplohod) {
+    return <button type="button" disabled className={SOLD_OUT_CLASS}>Билеты у поставщика недоступны</button>;
+  }
+
+  if (isSafeExternalPurchaseUrl(purchaseUrl)) {
     return (
-      <a href={purchaseUrl} target="_blank" rel="noopener noreferrer" className={resolvedClassName}>
+      <a href={purchaseUrl!} target="_blank" rel="noopener noreferrer" className={resolvedClassName}>
         {resolvedLabel}
       </a>
     );

@@ -4,6 +4,12 @@ import * as React from 'react';
 
 import { trackSelectTickets } from '@/lib/catalog-analytics';
 import {
+  buildTeplohodPurchaseUrl,
+  extractTeplohodEventId,
+  isTrustedTeplohodPurchaseUrl,
+  normalizeTeplohodEventId as normalizeProviderEventId,
+} from '@/lib/external-provider-purchase';
+import {
   beginPurchaseOpening,
   completePurchaseOpening,
   failPurchaseOpening,
@@ -75,17 +81,11 @@ let widgetScriptPromise: Promise<void> | null = null;
 let bootstrapPromise: Promise<boolean> | null = null;
 
 function normalizeTeplohodEventId(value?: string | number | null) {
-  const raw = String(value ?? '').trim();
-  if (!raw) return null;
-  const match = raw.match(/(?:^tep-)?(\d+)$/i);
-  return match ? match[1] : raw;
+  return normalizeProviderEventId(value);
 }
 
 function extractTeplohodEventIdFromUrl(url: string) {
-  return (
-    normalizeTeplohodEventId(url.match(/[?&]event_id=(\d+)/i)?.[1]) ||
-    normalizeTeplohodEventId(url.match(/teplohod\.info\/event\/(\d+)/i)?.[1])
-  );
+  return extractTeplohodEventId(url);
 }
 
 function isTeplohodScriptInjected() {
@@ -263,12 +263,12 @@ export function getTeplohodWidgetIds(event: {
   const provider = String(
     event.widgetProvider || event.purchaseProvider || event.offerSourceCode || payload?.provider || '',
   ).toUpperCase();
-  const purchaseUrl = String(event.purchaseUrl || event.widgetUrl || '').toLowerCase();
+  const purchaseUrl = String(event.purchaseUrl || event.widgetUrl || '');
   const fromEntityId = String(event.id || '').match(/^evt_tep_(\d+)$/i)?.[1];
   const isTeplohod =
     provider.includes('TEPLOHOD') ||
     provider.includes('TEP') ||
-    purchaseUrl.includes('teplohod.info') ||
+    isTrustedTeplohodPurchaseUrl(purchaseUrl) ||
     Boolean(fromEntityId);
   if (!isTeplohod) return null;
 
@@ -312,33 +312,19 @@ export function resolveTeplohodCheckoutUrl(options: {
 }) {
   const eventId =
     normalizeTeplohodEventId(options.tepEventId) || extractTeplohodEventIdFromUrl(String(options.purchaseUrl || ''));
-  if (!eventId) return options.purchaseUrl || null;
+  if (!eventId) return null;
 
-  const widgetId = String(options.tepWidgetId || DEFAULT_TEP_WIDGET_ID).trim() || DEFAULT_TEP_WIDGET_ID;
-  const url = new URL('https://account.teplohod.info/order/event-order');
-  url.searchParams.set('widget_id', widgetId);
-  url.searchParams.set('event_id', eventId);
-  return url.toString();
+  return buildTeplohodPurchaseUrl({ eventId, widgetId: options.tepWidgetId || DEFAULT_TEP_WIDGET_ID });
 }
 
-function bindTeplohodBuyFallback(container: HTMLElement, purchaseUrl?: string | null) {
-  if (!purchaseUrl) return () => {};
-
-  const onClick = (event: Event) => {
-    const target = event.target;
-    if (!(target instanceof Element)) return;
-    const buyButton = target.closest('.ti-tickets-event-tickets-buy');
-    if (!buyButton || !container.contains(buyButton)) return;
-
-    window.setTimeout(() => {
-      if (!isTeplohodCheckoutOpen()) {
-        window.open(purchaseUrl, '_blank', 'noopener,noreferrer');
-      }
-    }, 700);
-  };
-
-  container.addEventListener('click', onClick, true);
-  return () => container.removeEventListener('click', onClick, true);
+/** Open the provider checkout during the original tap, with a same-tab fallback if popups are blocked. */
+export function openTeplohodCheckoutFallback(checkoutUrl?: string | null) {
+  const href = String(checkoutUrl || '').trim();
+  if (!isTrustedTeplohodPurchaseUrl(href)) return false;
+  const popup = window.open(href, '_blank');
+  if (popup) popup.opener = null;
+  else window.location.assign(href);
+  return true;
 }
 
 export function TeplohodWidgetEmbed({
@@ -359,25 +345,21 @@ export function TeplohodWidgetEmbed({
   const containerRef = React.useRef<HTMLDivElement>(null);
   const [needsFallback, setNeedsFallback] = React.useState(false);
   const eventId = normalizeTeplohodEventId(tepEventId ?? externalEventId);
-  const checkoutUrl =
-    purchaseUrl ||
-    resolveTeplohodCheckoutUrl({
-      tepEventId: eventId,
-      tepWidgetId,
-    });
+  const checkoutUrl = resolveTeplohodCheckoutUrl({
+    purchaseUrl,
+    tepEventId: eventId,
+    tepWidgetId,
+  });
 
   React.useEffect(() => {
     if (!eventId || !containerRef.current) return;
 
     let cancelled = false;
     const container = containerRef.current;
-    let removeFallbackListener = () => {};
-
     const waitForMarkup = (attempt = 0) => {
       if (cancelled) return;
       if (containerHasWidgetMarkup(container)) {
         setNeedsFallback(false);
-        removeFallbackListener = bindTeplohodBuyFallback(container, checkoutUrl);
         return;
       }
       if (attempt > 0 && attempt % 8 === 0) {
@@ -399,7 +381,6 @@ export function TeplohodWidgetEmbed({
 
     return () => {
       cancelled = true;
-      removeFallbackListener();
     };
   }, [eventId, tepWidgetId, checkoutUrl]);
 
@@ -425,30 +406,27 @@ export function TeplohodWidgetEmbed({
           Купить билет
         </a>
       ) : null}
+      {!needsFallback && showFallbackButton && checkoutUrl ? (
+        <a
+          href={checkoutUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2 inline-flex text-xs text-slate-500 underline decoration-slate-300 underline-offset-2 hover:text-primary-700"
+        >
+          Если форма не открылась — перейти к покупке напрямую
+        </a>
+      ) : null}
     </div>
   );
 }
 
-export function openTeplohodWidget(wrapperId = 'teplohod-widget') {
-  const tryClick = (attempt = 0) => {
-    const button = findTeplohodBuyButton(wrapperId);
-    if (button) {
-      button.click();
-      return true;
-    }
-    if (attempt < 24) window.setTimeout(() => tryClick(attempt + 1), 100);
-    return false;
-  };
-
-  const existing = findTeplohodBuyButton(wrapperId);
-  if (existing) {
-    existing.click();
-    return;
-  }
-
-  void ensureTeplohodWidgetScript()
-    .then(() => bootstrapTeplohodWidgets())
-    .finally(() => window.setTimeout(() => tryClick(), 50));
+export function openTeplohodWidget(wrapperId = 'teplohod-widget', expectedEventId?: string | null) {
+  const button = findTeplohodBuyButton(wrapperId);
+  const expectedId = normalizeTeplohodEventId(expectedEventId);
+  const actualId = document.getElementById(wrapperId)?.querySelector<HTMLElement>('.teplohod-info-wrapper')?.dataset.eventId;
+  if (!button || (expectedId && actualId !== expectedId)) return false;
+  button.click();
+  return true;
 }
 
 export type OpenTeplohodPurchaseResult = 'widget' | 'popup' | 'none';
@@ -464,6 +442,9 @@ export async function openTeplohodPurchase(options: {
 
   let button = findTeplohodBuyButton(wrapperId);
   if (!button) {
+    if (options.purchaseUrl) {
+      return openTeplohodCheckoutFallback(options.purchaseUrl) ? 'popup' : 'none';
+    }
     try {
       await ensureTeplohodWidgetScript();
       await bootstrapTeplohodWidgets();
@@ -487,10 +468,6 @@ export async function openTeplohodPurchase(options: {
   if (isTeplohodCheckoutOpen()) return 'widget';
 
   // Popup only when nothing is visible. Never dismiss an open Fancybox.
-  if (options.purchaseUrl) {
-    const popup = window.open(options.purchaseUrl, '_blank', 'noopener,noreferrer');
-    return popup ? 'popup' : 'none';
-  }
   return 'none';
 }
 
@@ -525,12 +502,11 @@ export function TeplohodWidgetButton({
   const [embedMounted, setEmbedMounted] = React.useState(!lazyEmbed);
   const embedMountedRef = React.useRef(!lazyEmbed);
   const eventId = normalizeTeplohodEventId(tepEventId);
-  const checkoutUrl =
-    purchaseUrl ||
-    resolveTeplohodCheckoutUrl({
-      tepEventId: eventId,
-      tepWidgetId,
-    });
+  const checkoutUrl = resolveTeplohodCheckoutUrl({
+    purchaseUrl,
+    tepEventId: eventId,
+    tepWidgetId,
+  });
 
   React.useEffect(() => {
     if (!eventId || lazyEmbed) return;
@@ -557,6 +533,16 @@ export function TeplohodWidgetButton({
   const handleClick = () => {
     if (busy || isPurchaseOpeningActive()) return;
 
+    if (!findTeplohodBuyButton(containerId) && checkoutUrl) {
+      trackSelectTickets({
+        eventId,
+        provider: 'teplohod',
+        source: 'teplohod_widget_button',
+      });
+      openTeplohodCheckoutFallback(checkoutUrl);
+      return;
+    }
+
     const run = async () => {
       await ensureEmbedMounted();
       // Scope to outer host id (contains `#…__embed .teplohod-info-wrapper`).
@@ -569,7 +555,7 @@ export function TeplohodWidgetButton({
         return;
       }
       failPurchaseOpening({
-        message: 'Открываем оплату… Не вышло автоматически. Нажмите «Открыть оплату» или повторите.',
+        message: 'Открываем страницу покупки поставщика… Не вышло автоматически. Откройте её по ссылке или повторите.',
         fallbackUrl: checkoutUrl || null,
         onRetry: () => {
           void run();
@@ -579,7 +565,7 @@ export function TeplohodWidgetButton({
 
     setBusy(true);
     beginPurchaseOpening({
-      message: 'Открываем оплату…',
+      message: 'Открываем страницу покупки поставщика…',
       fallbackUrl: checkoutUrl || null,
       onRetry: () => {
         void run();
@@ -616,6 +602,11 @@ export function TeplohodWidgetButton({
         type="button"
         onClick={handleClick}
         onPointerEnter={() => {
+          void ensureEmbedMounted();
+          void prefetchTeplohodWidgetScript();
+        }}
+        onFocus={() => {
+          void ensureEmbedMounted();
           void prefetchTeplohodWidgetScript();
         }}
         className={`${className}${busy ? ' pointer-events-none opacity-80' : ''}`}

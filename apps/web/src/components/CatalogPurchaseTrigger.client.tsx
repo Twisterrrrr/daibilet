@@ -5,12 +5,14 @@ import * as React from 'react';
 import {
   getTcWidgetIds,
   normalizeTcPurchaseUrl,
-  openTcWidget,
+  openTcPurchaseFromGesture,
   resolveTcWidgetToken,
 } from '@/components/TcWidget.client';
 import {
   getTeplohodWidgetIdsFromSession,
+  openTeplohodCheckoutFallback,
   openTeplohodWidget,
+  resolveTeplohodCheckoutUrl,
   TeplohodWidgetEmbed,
 } from '@/components/TeplohodWidget.client';
 import { extractTcEventIdFromSession } from '@/lib/event-purchase';
@@ -70,7 +72,14 @@ export function useCatalogPurchase(session: PublicSessionDto) {
 
       if (targetTeplohod?.tepEventId) {
         setTeplohodEventId(String(targetTeplohod.tepEventId));
-        window.setTimeout(() => openTeplohodWidget(teplohodWrapperId), 120);
+        const tepCheckoutUrl = resolveTeplohodCheckoutUrl({
+          purchaseUrl: targetPurchaseUrl,
+          tepEventId: targetTeplohod.tepEventId,
+          tepWidgetId: targetTeplohod.tepWidgetId,
+        });
+        if (!openTeplohodWidget(teplohodWrapperId, targetTeplohod.tepEventId)) {
+          openTeplohodCheckoutFallback(tepCheckoutUrl);
+        }
         return;
       }
 
@@ -81,17 +90,21 @@ export function useCatalogPurchase(session: PublicSessionDto) {
       const token = resolveTcWidgetToken(purchaseUrl);
 
       if (!eventId || !token) {
-        if (purchaseUrl) window.open(purchaseUrl, '_blank', 'noopener,noreferrer');
+        const trustedPurchaseUrl = normalizeTcPurchaseUrl(purchaseUrlRaw);
+        if (trustedPurchaseUrl) {
+          const popup = window.open(trustedPurchaseUrl, '_blank', 'noopener,noreferrer');
+          if (popup) popup.opener = null;
+          else window.location.assign(trustedPurchaseUrl);
+        }
         return;
       }
 
       setTcPayload({ eventId: String(eventId), token, purchaseUrl });
-      window.setTimeout(() => {
-        void openTcWidget({
-          trigger: tcTriggerRef.current,
-          purchaseUrl,
-        });
-      }, 0);
+      openTcPurchaseFromGesture({
+        trigger: tcTriggerRef.current,
+        eventId: String(eventId),
+        purchaseUrl,
+      });
     },
     [session, teplohod, teplohodWrapperId],
   );
