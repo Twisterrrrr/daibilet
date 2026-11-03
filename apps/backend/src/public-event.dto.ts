@@ -1060,12 +1060,12 @@ async function loadMergeGroupMembers(requestedEvent: EventRecord): Promise<Event
 
 /** Same TicketsCloud meta product → sibling dated events with future slots. */
 async function loadMetaGroupMembers(requestedEvent: EventRecord): Promise<EventRecord[]> {
-  const metaIds = [...new Set(
-    requestedEvent.sourceLinks
-      .map((link) => link.metaExternalId)
-      .filter((value): value is string => Boolean(value)),
-  )];
-  if (!metaIds.length) return [];
+  const tcMetaLinks = requestedEvent.sourceLinks
+    .filter((link) => link.source.code.toUpperCase() === 'TICKETSCLOUD' && link.metaExternalId)
+    .map((link) => ({ sourceId: link.sourceId, metaExternalId: link.metaExternalId! }));
+  const sourceIds = [...new Set(tcMetaLinks.map((link) => link.sourceId))];
+  const metaIds = [...new Set(tcMetaLinks.map((link) => link.metaExternalId))];
+  if (!sourceIds.length || !metaIds.length) return [];
 
   // Critical: do NOT take an arbitrary 200 EventSourceLink rows - for large meta products
   // (600+ dated TC children) that sample often has zero upcoming sessions, so the event
@@ -1075,8 +1075,10 @@ async function loadMetaGroupMembers(requestedEvent: EventRecord): Promise<EventR
     FROM "EventSession" s
     INNER JOIN "EventSourceLink" sl ON sl."eventId" = s."eventId"
     INNER JOIN "Event" e ON e.id = s."eventId"
-    WHERE sl."metaExternalId" IN (${join(metaIds)})
+    WHERE sl."sourceId" IN (${join(sourceIds)})
+      AND sl."metaExternalId" IN (${join(metaIds)})
       AND e.status NOT IN ('HIDDEN', 'DRAFT')
+      AND e."primaryCityId" IS NOT DISTINCT FROM ${requestedEvent.primaryCityId}
       AND s."eventId" <> ${requestedEvent.id}
       AND (
         s."startsAt" >= NOW() - INTERVAL '15 minutes'
@@ -1087,15 +1089,19 @@ async function loadMetaGroupMembers(requestedEvent: EventRecord): Promise<EventR
   `;
   let eventIds = [...new Set(upcomingRows.map((row) => row.eventId))];
   if (!eventIds.length) {
-    const links = await prisma.eventSourceLink.findMany({
-      where: {
-        metaExternalId: { in: metaIds },
-        eventId: { not: requestedEvent.id },
-      },
-      select: { eventId: true },
-      take: 48,
-    });
-    eventIds = [...new Set(links.map((link) => link.eventId))];
+    const siblingRows = await prisma.$queryRaw<Array<{ eventId: string }>>`
+      SELECT sl."eventId" AS "eventId"
+      FROM "EventSourceLink" sl
+      INNER JOIN "Event" e ON e.id = sl."eventId"
+      WHERE sl."sourceId" IN (${join(sourceIds)})
+        AND sl."metaExternalId" IN (${join(metaIds)})
+        AND e.status NOT IN ('HIDDEN', 'DRAFT')
+        AND e."primaryCityId" IS NOT DISTINCT FROM ${requestedEvent.primaryCityId}
+        AND sl."eventId" <> ${requestedEvent.id}
+      ORDER BY sl."eventId"
+      LIMIT 48
+    `;
+    eventIds = [...new Set(siblingRows.map((row) => row.eventId))];
   }
   if (!eventIds.length) return [];
 

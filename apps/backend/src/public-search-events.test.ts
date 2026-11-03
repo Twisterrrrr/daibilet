@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { collapsePublicSearchEventRows, publicSearchEventHref } from './public-search-events.ts';
-import { rewriteArticleEventLinks } from './public-event-page-links.ts';
+import { resolveEventPageSlugsForEventIds, rewriteArticleEventLinks } from './public-event-page-links.ts';
 
 test('search links to the stable EventPage route when mapped', () => {
   assert.equal(publicSearchEventHref({ id: 'slot-a', slug: 'slot-a-123', eventPageSlug: 'event-page-moscow', title: 'Event' }), '/events/event-page-moscow');
@@ -12,14 +12,35 @@ test('search keeps the current event route as fallback without an EventPage', ()
   assert.equal(publicSearchEventHref({ id: 'slot-a', slug: 'slot-a-123', title: 'Event' }), '/events/slot-a-123');
 });
 
-test('published article links use EventPage paths when an exact Event mapping exists', async () => {
+test('maps a dated slot through its same-city Ticketscloud parent only when one page is linked', async () => {
   const db = {
-    async query(_sql: string, params: unknown[]) {
-      assert.deepEqual(params, [['old-slot'], ['/events/old-slot']]);
-      return { rows: [{ slug: 'old-slot', canonicalPath: '/events/old-slot', eventPageSlug: 'stable-event-moscow' }] };
+    async query(sql: string, params: unknown[]) {
+      assert.deepEqual(params, [['slot-event-id']]);
+      assert.match(sql, /source\.code::text\) = 'TICKETSCLOUD'/);
+      assert.match(sql, /sibling_event\."primaryCityId" IS NOT DISTINCT FROM requested_event\."primaryCityId"/);
+      assert.match(sql, /HAVING count\(DISTINCT page\.id\) = 1/);
+      return { rows: [{ eventId: 'slot-event-id', slug: 'stable-tour-moscow' }] };
+    },
+  };
+  const result = await resolveEventPageSlugsForEventIds(['slot-event-id'], db);
+  assert.equal(result.get('slot-event-id'), 'stable-tour-moscow');
+});
+
+test('published article links for a slot use its stable EventPage path', async () => {
+  let call = 0;
+  const db = {
+    async query(sql: string, params: unknown[]) {
+      call += 1;
+      if (sql.includes('FROM "Event" event')) {
+        assert.deepEqual(params, [['old-slot'], ['/events/old-slot']]);
+        return { rows: [{ id: 'slot-event-id', slug: 'old-slot', canonicalPath: '/events/old-slot' }] };
+      }
+      assert.deepEqual(params, [['slot-event-id']]);
+      return { rows: [{ eventId: 'slot-event-id', slug: 'stable-event-moscow' }] };
     },
   };
   assert.equal(await rewriteArticleEventLinks('Text [event](/events/old-slot).', db), 'Text [event](/events/stable-event-moscow).');
+  assert.equal(call, 2);
 });
 
 test('article links without an exact EventPage mapping retain their original destination', async () => {

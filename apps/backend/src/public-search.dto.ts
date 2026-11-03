@@ -9,6 +9,7 @@ import {
   searchVenueTextKey,
 } from './public-search-venues.ts';
 import { collapsePublicSearchEventRows, publicSearchEventHref } from './public-search-events.ts';
+import { resolveEventPageSlugsForEventIds } from './public-event-page-links.ts';
 
 const LANDING_CATEGORY_PATH: Record<string, string> = {
   'river-cruises': 'rechnye-progulki',
@@ -210,25 +211,16 @@ export async function buildPublicSearchDto(
   };
 }
 
-/** Resolve stable page URLs by exact Event ID; keep search operational during rolling migrations. */
+/** Resolve stable page URLs by Event ID or exact same-city Ticketscloud parent group. */
 async function attachEventPageSlugs<T extends TrgmRow>(rows: T[]): Promise<T[]> {
   const ids = [...new Set(rows.map((row) => row.id).filter(Boolean))];
   if (!ids.length) return rows;
-  const placeholders = ids.map((_, index) => `$${index + 1}`).join(', ');
-  try {
-    const pages = await prisma.$queryRawUnsafe<Array<{ eventId: string; slug: string }>>(
-      `select link."eventId" as "eventId", page.slug
-       from "EventPageEvent" link
-       join "EventPage" page on page.id = link."eventPageId"
-       where link."eventId" in (${placeholders})`,
-      ...ids,
-    );
-    const slugByEventId = new Map(pages.map((page) => [page.eventId, page.slug]));
-    return rows.map((row) => ({ ...row, eventPageSlug: slugByEventId.get(row.id) ?? null }));
-  } catch {
-    // EventPage migration may be absent during a rolling deploy; old links remain valid.
-    return rows;
-  }
+  const slugByEventId = await resolveEventPageSlugsForEventIds(ids, {
+    query: async (query, params) => ({
+      rows: await prisma.$queryRawUnsafe<Array<{ eventId: string; slug: string }>>(query, ...params),
+    }),
+  });
+  return rows.map((row) => ({ ...row, eventPageSlug: slugByEventId.get(row.id) ?? null }));
 }
 
 /**

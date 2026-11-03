@@ -97,10 +97,14 @@ export function resolveCatalogEventPageSlug(
 ): string | null {
   if (!groupEventIds.length) return null;
   const pageByEventId = new Map(pageLinks.map((link) => [link.eventId, link]));
-  const links = groupEventIds.map((eventId) => pageByEventId.get(eventId));
-  if (links.some((link) => !link)) return null;
-  const pageIds = new Set(links.map((link) => link!.eventPageId));
-  return pageIds.size === 1 ? links[0]!.slug : null;
+  // A provider-native product can have many dated Event IDs. One linked
+  // representative is enough; conflicting page links keep the slot fallback.
+  const linked = groupEventIds
+    .map((eventId) => pageByEventId.get(eventId))
+    .filter((link): link is NonNullable<typeof link> => Boolean(link));
+  if (!linked.length) return null;
+  const pageIds = new Set(linked.map((link) => link.eventPageId));
+  return pageIds.size === 1 ? linked[0]!.slug : null;
 }
 
 interface CityRoutingConfig {

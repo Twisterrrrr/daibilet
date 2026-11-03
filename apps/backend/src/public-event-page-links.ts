@@ -1,12 +1,68 @@
-type EventPageLinkRow = {
-  slug: string;
-  canonicalPath: string | null;
-  eventPageSlug: string;
+type QueryClient = {
+  query: (sql: string, params: unknown[]) => Promise<{ rows: Array<Record<string, any>> }>;
 };
 
-type QueryClient = {
-  query: (sql: string, params: unknown[]) => Promise<{ rows: EventPageLinkRow[] }>;
-};
+type EventPageSlugRow = { eventId: string; slug: string };
+
+/**
+ * Resolve direct EventPage links and one-page Ticketscloud product groups.
+ * Meta groups are exact by source + metaExternalId + city; conflicting pages
+ * intentionally return no mapping so callers keep the existing Event URL.
+ */
+export async function resolveEventPageSlugsForEventIds(
+  eventIds: string[],
+  db: QueryClient,
+): Promise<Map<string, string>> {
+  const ids = [...new Set(eventIds.map((id) => String(id || '').trim()).filter(Boolean))];
+  if (!ids.length) return new Map();
+  try {
+    const result = await db.query(`
+      WITH requested AS (
+        SELECT unnest($1::text[]) AS "requestedEventId"
+      ),
+      direct_members AS (
+        SELECT requested."requestedEventId", requested."requestedEventId" AS "memberEventId"
+        FROM requested
+      ),
+      unique_tc_meta AS (
+        SELECT sl."eventId", sl."sourceId", min(sl."metaExternalId") AS "metaExternalId"
+        FROM "EventSourceLink" sl
+        JOIN "Source" source ON source.id = sl."sourceId"
+        JOIN requested ON requested."requestedEventId" = sl."eventId"
+        WHERE upper(source.code::text) = 'TICKETSCLOUD'
+          AND NULLIF(trim(sl."metaExternalId"), '') IS NOT NULL
+        GROUP BY sl."eventId", sl."sourceId"
+        HAVING count(DISTINCT sl."metaExternalId") = 1
+      ),
+      meta_members AS (
+        SELECT requested."requestedEventId", sibling."eventId" AS "memberEventId"
+        FROM requested
+        JOIN "Event" requested_event ON requested_event.id = requested."requestedEventId"
+        JOIN unique_tc_meta requested_meta ON requested_meta."eventId" = requested_event.id
+        JOIN "EventSourceLink" sibling ON sibling."sourceId" = requested_meta."sourceId"
+          AND sibling."metaExternalId" = requested_meta."metaExternalId"
+        JOIN "Event" sibling_event ON sibling_event.id = sibling."eventId"
+          AND sibling_event."primaryCityId" IS NOT DISTINCT FROM requested_event."primaryCityId"
+        WHERE requested_meta."metaExternalId" IS NOT NULL
+      ),
+      members AS (
+        SELECT * FROM direct_members
+        UNION
+        SELECT * FROM meta_members
+      )
+      SELECT members."requestedEventId" AS "eventId", min(page.slug) AS slug
+      FROM members
+      JOIN "EventPageEvent" page_link ON page_link."eventId" = members."memberEventId"
+      JOIN "EventPage" page ON page.id = page_link."eventPageId"
+      GROUP BY members."requestedEventId"
+      HAVING count(DISTINCT page.id) = 1
+    `, [ids]);
+    return new Map(result.rows.map((row) => [String(row.eventId), String(row.slug)]));
+  } catch {
+    // EventPage migrations may be absent during a rolling deploy.
+    return new Map();
+  }
+}
 
 const EVENT_LINK_PATTERN = /(?:https?:\/\/(?:www\.)?daibilet\.ru)?\/events\/([^\s\])<>"']+)/giu;
 
@@ -30,26 +86,29 @@ export async function rewriteArticleEventLinks(content: string, db: QueryClient)
     return (path.split(/[?#]/u, 1)[0] || '').toLowerCase();
   }))];
   const slugKeys = [...new Set(matches.map((match) => decodeSlug(String(match[1] || '').split(/[?#]/u, 1)[0] || '').toLowerCase()))];
-  let rows: EventPageLinkRow[];
+  let rows: Array<{ id: string; slug: string; canonicalPath: string | null }>;
   try {
     const result = await db.query(`
-      SELECT event.slug, event."canonicalPath", page.slug AS "eventPageSlug"
+      SELECT event.id, event.slug, event."canonicalPath"
       FROM "Event" event
-      JOIN "EventPageEvent" link ON link."eventId" = event.id
-      JOIN "EventPage" page ON page.id = link."eventPageId"
       WHERE lower(event.slug) = ANY($1::text[])
          OR lower(coalesce(event."canonicalPath", '')) = ANY($2::text[])
     `, [slugKeys, pathKeys]);
-    rows = result.rows;
+    rows = result.rows as Array<{ id: string; slug: string; canonicalPath: string | null }>;
   } catch {
     // The EventPage migration may not yet be applied on every catalog database.
     return source;
   }
 
-  const pageBySlug = new Map(rows.map((row) => [String(row.slug || '').toLowerCase(), row.eventPageSlug]));
+  const eventPageSlugById = await resolveEventPageSlugsForEventIds(rows.map((row) => row.id), db);
+
+  const pageBySlug = new Map(rows.map((row) => [
+    String(row.slug || '').toLowerCase(),
+    eventPageSlugById.get(row.id),
+  ]));
   const pageByPath = new Map(rows
     .filter((row) => row.canonicalPath)
-    .map((row) => [String(row.canonicalPath).toLowerCase(), row.eventPageSlug]));
+    .map((row) => [String(row.canonicalPath).toLowerCase(), eventPageSlugById.get(row.id)]));
 
   return source.replace(EVENT_LINK_PATTERN, (url, capturedSlug: string) => {
     const path = url.replace(/^https?:\/\/(?:www\.)?daibilet\.ru/iu, '');

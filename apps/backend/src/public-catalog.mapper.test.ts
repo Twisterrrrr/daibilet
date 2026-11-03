@@ -48,13 +48,13 @@ test('exposes a stable EventPage slug on catalog sessions when the mapping is un
   assert.equal(result?.eventPageSlug, 'regular-concert-moscow');
 });
 
-test('uses an EventPage URL only when every grouped event maps to that same page', () => {
+test('uses one representative EventPage URL for the whole group unless links conflict', () => {
   const samePage = [
     { eventId: 'event-a', eventPageId: 'page-1', slug: 'stable-event' },
     { eventId: 'event-b', eventPageId: 'page-1', slug: 'stable-event' },
   ];
   assert.equal(resolveCatalogEventPageSlug(['event-a', 'event-b'], samePage), 'stable-event');
-  assert.equal(resolveCatalogEventPageSlug(['event-a', 'event-c'], samePage), null);
+  assert.equal(resolveCatalogEventPageSlug(['event-a', 'event-c'], samePage), 'stable-event');
   assert.equal(resolveCatalogEventPageSlug(['event-a', 'event-b'], [
     samePage[0]!,
     { eventId: 'event-b', eventPageId: 'page-2', slug: 'another-page' },

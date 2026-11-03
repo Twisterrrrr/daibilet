@@ -592,6 +592,16 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
       ) identity
       order by identity."eventId", identity.priority, identity."updatedAt" desc
     ),
+    tc_meta_identity as (
+      select
+        link."eventId",
+        min(nullif(trim(link."metaExternalId"), '')) as "metaExternalId",
+        count(distinct nullif(trim(link."metaExternalId"), ''))::int as "metaCount"
+      from "EventSourceLink" link
+      join "Source" tc_source on tc_source.id = link."sourceId"
+      where upper(tc_source.code::text) = 'TICKETSCLOUD'
+      group by link."eventId"
+    ),
     session_identity as (
       select distinct on (link."sessionId")
         link."sessionId",
@@ -624,6 +634,8 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
         source.code as "sourceCode",
         source.name as "sourceName",
         coalesce(source.name, source.code::text, primary_offer."sourceCode"::text, '') as "sourceLabel",
+        tc_meta."metaExternalId" as "tcMetaExternalId",
+        tc_meta."metaCount" as "tcMetaCount",
         event.title,
         event.description,
         event.kind,
@@ -712,6 +724,7 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
       left join "Venue" venue on venue.id = event."venueId"
       left join event_identity identity on identity."eventId" = event.id
       left join "Source" source on source.id = identity."sourceId"
+      left join tc_meta_identity tc_meta on tc_meta."eventId" = event.id
       left join "EventOverride" override on override."eventId" = event.id
       left join "EventSession" session on session."eventId" = event.id
       left join primary_offer on primary_offer."eventId" = event.id
@@ -721,6 +734,8 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
         identity."externalId",
         source.code,
         source.name,
+        tc_meta."metaExternalId",
+        tc_meta."metaCount",
         override.id,
         category.title,
         city.id,
@@ -786,6 +801,13 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
             lower(regexp_replace(trim(coalesce(city, '')), '\\s+', ' ', 'g')),
             lower(regexp_replace(trim(coalesce(venue, '')), '\\s+', ' ', 'g'))
           )
+          when nullif(trim("tcMetaExternalId"), '') is not null then concat_ws(
+            '|',
+            'tc-meta',
+            trim("tcMetaExternalId"),
+            coalesce("cityId"::text, lower(regexp_replace(trim(coalesce(city, '')), '\\s+', ' ', 'g')))
+          )
+          when "tcMetaCount" is not null then concat_ws('|', 'tc-unresolved', id)
           else concat_ws(
             '|',
             lower(regexp_replace(trim(coalesce("sourceLabel", '')), '\\s+', ' ', 'g')),
