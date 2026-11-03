@@ -72,9 +72,15 @@ export function HomeHero({
 }: HomeHeroProps) {
   const router = useRouter();
   const selectedCity = useSelectedCityOptional();
-  const destination = selectedCity?.cityValue ?? 'all';
+  // Storage-backed city state is synchronized in the provider's layout effect.
+  // Keep the first client render identical to the server snapshot, then reveal
+  // the stored city after hydration to avoid changing the H1 during hydration.
+  const [cityHydrated, setCityHydrated] = useState(false);
+  useEffect(() => setCityHydrated(true), []);
+
+  const destination = cityHydrated ? selectedCity?.cityValue ?? 'all' : 'all';
   const setDestination = selectedCity?.setCity ?? (() => {});
-  const selectedDestination = selectedCity?.selectedDestination ?? null;
+  const selectedDestination = cityHydrated ? selectedCity?.selectedDestination ?? null : null;
   const pickerDestinations = destinations?.length
     ? destinations
     : selectedCity?.destinations ?? [];
@@ -110,17 +116,16 @@ export function HomeHero({
   }, [expandStaticRotator, frames, videoSrc]);
 
   const selectedCityName =
-    selectedDestination?.name ||
-    (destination !== 'all' && selectedCity?.cityLabel && selectedCity.cityLabel !== 'Все города'
+    (cityHydrated ? selectedDestination?.name : null) ||
+    (cityHydrated && destination !== 'all' && selectedCity?.cityLabel && selectedCity.cityLabel !== 'Все города'
       ? selectedCity.cityLabel
       : null) ||
-    (selectedCity?.cityReady === false ? ssrCityName : null) ||
-    (!selectedCity ? ssrCityName : null);
+    (!cityHydrated || selectedCity?.cityReady === false || !selectedCity ? ssrCityName : null);
   const citySlug =
-    normalizeKnownCitySlug(selectedDestination?.slug) ||
-    normalizeKnownCitySlug(selectedDestination?.sourceSlug) ||
-    (destination !== 'all' ? normalizeKnownCitySlug(destination) || destination : null) ||
-    (selectedCity?.cityReady === false || !selectedCity ? ssrCitySlug : null);
+    (cityHydrated ? normalizeKnownCitySlug(selectedDestination?.slug) : null) ||
+    (cityHydrated ? normalizeKnownCitySlug(selectedDestination?.sourceSlug) : null) ||
+    (cityHydrated && destination !== 'all' ? normalizeKnownCitySlug(destination) || destination : null) ||
+    (!cityHydrated || selectedCity?.cityReady === false || !selectedCity ? ssrCitySlug : null);
 
   // City-specific chips: hub landings + categories with events
   const heroChips = buildHomeHeroQuickChips({
