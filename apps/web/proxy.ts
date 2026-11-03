@@ -36,7 +36,7 @@ async function enforceAdminAuth(request: NextRequest) {
   return null;
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Static / SEO assets must skip admin host rewrite and landing redirect work.
