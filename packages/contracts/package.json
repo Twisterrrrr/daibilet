@@ -26,7 +26,11 @@
       "types": "./src/schemas.ts",
       "default": "./src/schemas.ts"
     },
-    "./source": "./src/source.ts"
+    "./source": "./src/source.ts",
+    "./place-pdp": {
+      "types": "./src/place-pdp.ts",
+      "default": "./src/place-pdp.ts"
+    }
   },
   "scripts": {
     "typecheck": "tsc --noEmit"

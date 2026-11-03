@@ -263,6 +263,19 @@ enum SupplierRole {
   VIEWER
 }
 
+enum SupplierPlaceRequestType {
+  CREATE
+  UPDATE
+}
+
+enum SupplierPlaceRequestStatus {
+  SUBMITTED
+  NEEDS_INFO
+  APPROVED
+  REJECTED
+  APPLIED
+}
+
 enum SupplierCatalogMode {
   WIDGET_ONLY
   INTERNAL_CHECKOUT
@@ -1029,6 +1042,7 @@ model Venue {
   aliases         VenueAlias[]
   providerLinks   ProviderLink[]
   supplierLinks   SupplierVenue[]
+  supplierPlaceRequests SupplierPlaceRequest[]
   tripPlanItems   TripPlanItem[]
   reviews         Review[]
   externalReviews ExternalReview[]
@@ -1381,6 +1395,7 @@ model SiteUser {
   submittedEvents             Event[]              @relation("EventSubmittedBy")
   moderatedEvents             Event[]              @relation("EventModeratedBy")
   createdEventChangeRequests  EventChangeRequest[] @relation("EventChangeRequestCreatedBy")
+  createdSupplierPlaceRequests SupplierPlaceRequest[] @relation("SupplierPlaceRequestCreator")
   reviewedEventChangeRequests EventChangeRequest[] @relation("EventChangeRequestReviewedBy")
   eventChangeLogs             EventChangeLog[]     @relation("EventChangeLogActor")
   reviews                     Review[]
@@ -1471,6 +1486,7 @@ model Supplier {
 
   users               SupplierUser[]
   venues              SupplierVenue[]
+  placeRequests       SupplierPlaceRequest[]
   events              SupplierEvent[]
   ownedEvents         Event[]                  @relation("PrimarySupplierEvents")
   eventChangeRequests EventChangeRequest[]
@@ -1587,6 +1603,32 @@ model SupplierVenue {
 
   @@unique([supplierId, venueId])
   @@index([venueId, isActive])
+}
+
+model SupplierPlaceRequest {
+  id                  String                     @id @default(cuid())
+  supplierId          String
+  venueId             String?
+  createdBySiteUserId String?
+  type                SupplierPlaceRequestType
+  status              SupplierPlaceRequestStatus @default(SUBMITTED)
+  title               String
+  payload             Json
+  sourceSnapshot      Json?
+  adminComment        String?
+  submittedAt         DateTime                   @default(now())
+  reviewedAt          DateTime?
+  appliedAt           DateTime?
+  createdAt           DateTime                   @default(now())
+  updatedAt           DateTime                   @default(now()) @updatedAt
+
+  supplier  Supplier  @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  venue     Venue?    @relation(fields: [venueId], references: [id], onDelete: SetNull)
+  createdBy SiteUser? @relation("SupplierPlaceRequestCreator", fields: [createdBySiteUserId], references: [id], onDelete: SetNull)
+
+  @@index([supplierId, status, submittedAt])
+  @@index([venueId, status])
+  @@index([createdBySiteUserId, submittedAt])
 }
 
 model SupplierEvent {

@@ -367,6 +367,14 @@ export interface PublicEventPageDto extends ApiEnvelope {
     content: PublicPdpDocumentDto['content'];
     seoH1: string | null;
   } | null;
+  /** Stable EventPage route identity. Draft shells serve source Event data but stay noindex until editorially approved. */
+  eventPageRoute?: {
+    slug: string;
+    status: string;
+    published: boolean;
+    isIndexable: boolean;
+    availability?: 'AVAILABLE' | 'ENDED' | 'NO_UPCOMING' | null;
+  } | null;
   /** Context of the requested slot URL, used for a past-date notice when sibling sessions remain. */
   requestedSessionContext?: {
     startsAt: string;
