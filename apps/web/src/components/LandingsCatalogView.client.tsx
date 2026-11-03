@@ -19,7 +19,6 @@ import {
   landingMatchesCatalogCity,
   mergePodborkiCityCatalogItems,
 } from '@/lib/landing-routes';
-import { filterInSeasonLandings } from '@/lib/landing-season';
 import {
   PODBORKI_BENTO_GRID_CLASS,
   podborkiBentoCellClass,
@@ -223,7 +222,10 @@ export function LandingsCatalogView({
         landingMatchesCatalogCity(item.slug, citySlug, { events: item.events }),
       );
     })();
-    return filterInSeasonLandings(base);
+    // The API has already applied the city scope and only returns current
+    // saleable inventory. Do not apply a second calendar-only season filter:
+    // that would hide winter offers in cities where they are available.
+    return base;
   }, [cityScopedItems, citySelected, citySlug, initialItems]);
 
   const categoryMeta = categories.length ? categories : undefined;
