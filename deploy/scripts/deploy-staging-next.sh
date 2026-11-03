@@ -7,6 +7,7 @@ ADMIN_DIR="${ADMIN_DIR:-/var/www/daibilet/staging-admin}"
 API_SERVICE="${API_SERVICE:-daibilet-api-staging}"
 WEB_SERVICE="${WEB_SERVICE:-daibilet-web-staging}"
 BRANCH="${BRANCH:-feat/next-monorepo}"
+DEPLOY_SHA="${DEPLOY_SHA:-}"
 
 cd "$APP_DIR"
 
@@ -19,8 +20,15 @@ if [[ -f ".env" ]]; then
 fi
 
 git fetch origin "$BRANCH"
-git checkout "$BRANCH"
-git pull --ff-only origin "$BRANCH"
+TARGET_REF="origin/$BRANCH"
+if [[ -n "$DEPLOY_SHA" ]]; then
+  git merge-base --is-ancestor "$DEPLOY_SHA" "$TARGET_REF" || {
+    echo "Refusing: DEPLOY_SHA is not contained in origin/$BRANCH" >&2
+    exit 1
+  }
+  TARGET_REF="$DEPLOY_SHA"
+fi
+git checkout --detach "$TARGET_REF"
 
 corepack enable 2>/dev/null || true
 corepack prepare pnpm@11.7.0 --activate 2>/dev/null || true
