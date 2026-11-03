@@ -93,7 +93,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   try {
     const event = loaded.payload.event;
-    const path = event.canonicalPath || eventHref(event);
+    const stableRoute = loaded.payload.eventPageRoute;
+    const hasPublishedStablePage = Boolean(stableRoute?.published);
+    const stablePageTitle = String(loaded.payload.eventPage?.seoTitle || loaded.payload.eventPage?.title || '').trim();
+    const path = stableRoute?.published
+      ? `/events/${encodeURIComponent(stableRoute.slug)}`
+      : event.canonicalPath || eventHref(event);
     const priceRange = getTicketPriceRange(loaded.payload);
     const expansionMeta = buildEventListingMeta({
       eventTitle: event.title,
@@ -111,22 +116,22 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       dateLabel: nextSession?.dateLabel,
       timeLabel: nextSession?.timeLabel,
     });
-    const title = pageTitle(expansionMeta?.title || disambiguatedTitle);
-    const shareTitle = expansionMeta ? expansionMeta.title : `${title} | Дайбилет`;
-    const seoDescription = String(event.seoDescription || '').trim();
+    const title = pageTitle(hasPublishedStablePage ? stablePageTitle || disambiguatedTitle : expansionMeta?.title || disambiguatedTitle);
+    const shareTitle = !hasPublishedStablePage && expansionMeta ? expansionMeta.title : `${title} | Дайбилет`;
+    const seoDescription = String(loaded.payload.eventPage?.seoDescription || event.seoDescription || '').trim();
     const genericSeo = /^Расписание, цены и билеты на /iu.test(seoDescription);
     const concertLead = isConcertLikeEvent(event) ? buildConcertLead(event) : '';
     const renderedLead = displayEventDescription(event).split(/\n\s*\n/u)[0] || '';
     const description =
-      expansionMeta?.description ||
+      (!hasPublishedStablePage ? expansionMeta?.description : '') ||
       (genericSeo ? concertLead : stripSessionDateLines(seoDescription)) ||
       renderedLead ||
       `${event.title} - билеты на Дайбилет`;
 
     return {
-      title: expansionMeta ? { absolute: expansionMeta.title } : title,
+      title: !hasPublishedStablePage && expansionMeta ? { absolute: expansionMeta.title } : title,
       description,
-      ...(loaded.payload.eventPageRoute && !loaded.payload.eventPageRoute.isIndexable
+      ...(stableRoute && ((stableRoute.published && !stableRoute.isIndexable) || (!stableRoute.published && stableRoute.slug === decodedSlug))
         ? { robots: { index: false, follow: true } }
         : {}),
       alternates: {

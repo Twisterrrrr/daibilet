@@ -5,7 +5,9 @@ import { AdminPdpEditor } from '@/components/admin/AdminVenuePdpEditor.client';
 import { AdminField, adminInputClass } from '@/components/admin/AdminUi';
 import {
   attachEventToAdminEventPageAction,
+  assignAdminEventPageTourGroupAction,
   createAdminEventPageAction,
+  createAdminEventTourGroupAction,
   publishAdminEventPageAction,
   saveAdminEventPageAction,
   searchAdminEventPageEventCandidatesAction,
@@ -76,6 +78,10 @@ export function AdminEventPageEditor({ eventId, eventSlug, eventTitle, sourceDes
   const [eventCandidates, setEventCandidates] = useState<AdminEventPageEventCandidate[]>([]);
   const [searchingCandidates, setSearchingCandidates] = useState(false);
   const [linkingEventId, setLinkingEventId] = useState('');
+  const [tourGroups, setTourGroups] = useState(pageData.tourGroups);
+  const [selectedTourGroupId, setSelectedTourGroupId] = useState(pageData.page?.tourGroup?.id || '');
+  const [newTourGroupTitle, setNewTourGroupTitle] = useState('');
+  const [savingTourGroup, setSavingTourGroup] = useState(false);
 
   const initialDocument = asEditorDocument(page, pdpData.document);
   const documentForEditor: AdminPdpDocument = {
@@ -138,6 +144,40 @@ export function AdminEventPageEditor({ eventId, eventSlug, eventTitle, sourceDes
       setError(cause instanceof Error ? cause.message : 'Не удалось опубликовать EventPage.');
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function assignTourGroup(tourGroupId: string | null) {
+    if (!page) return;
+    setSavingTourGroup(true);
+    setError('');
+    try {
+      const updated = await assignAdminEventPageTourGroupAction(page.id, tourGroupId);
+      setPage(updated);
+      setSelectedTourGroupId(updated.tourGroup?.id || '');
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Не удалось изменить связь с гастрольной группой.');
+    } finally {
+      setSavingTourGroup(false);
+    }
+  }
+
+  async function createTourGroup() {
+    const value = newTourGroupTitle.trim();
+    if (!value || !page) return;
+    setSavingTourGroup(true);
+    setError('');
+    try {
+      const created = await createAdminEventTourGroupAction(value);
+      setTourGroups((current) => [...current, created].sort((a, b) => a.title.localeCompare(b.title, 'ru')));
+      setNewTourGroupTitle('');
+      setSelectedTourGroupId(created.id);
+      const updated = await assignAdminEventPageTourGroupAction(page.id, created.id);
+      setPage(updated);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Не удалось создать гастрольную группу.');
+    } finally {
+      setSavingTourGroup(false);
     }
   }
 
@@ -304,6 +344,27 @@ export function AdminEventPageEditor({ eventId, eventSlug, eventTitle, sourceDes
         </div>
         <p className="mt-2 text-slate-500">Поставщик, адрес и источник помогают редактору проверить связь. Сами по себе они не объединяют события.</p>
       </div>
+      {page ? <section className="rounded-md border border-indigo-200 bg-indigo-50/50 p-3">
+        <h4 className="text-sm font-semibold text-indigo-950">Гастрольная группа</h4>
+        <p className="mt-1 text-xs text-slate-700">Связывает самостоятельные EventPage разных городов. События, расписание и покупка остаются локальными. В публичном блоке появятся только опубликованные страницы группы.</p>
+        <div className="mt-3 flex flex-wrap items-end gap-2">
+          <label className="min-w-[15rem] flex-1 text-xs font-medium text-slate-700">
+            Назначить существующую группу
+            <select className={`${adminInputClass} mt-1`} value={selectedTourGroupId} onChange={(event) => setSelectedTourGroupId(event.target.value)} disabled={savingTourGroup}>
+              <option value="">Без группы</option>
+              {tourGroups.map((group) => <option key={group.id} value={group.id}>{group.title} · {group.pageCount} стр.</option>)}
+            </select>
+          </label>
+          <button type="button" disabled={savingTourGroup || selectedTourGroupId === (page.tourGroup?.id || '')} onClick={() => void assignTourGroup(selectedTourGroupId || null)} className="rounded-md border border-indigo-300 bg-white px-3 py-2 text-xs font-semibold text-indigo-950 disabled:opacity-50">
+            {savingTourGroup ? 'Сохраняю…' : 'Применить группу'}
+          </button>
+        </div>
+        <form className="mt-3 flex flex-wrap gap-2" onSubmit={(event) => { event.preventDefault(); void createTourGroup(); }}>
+          <input className={`${adminInputClass} min-w-[15rem] flex-1`} value={newTourGroupTitle} onChange={(event) => setNewTourGroupTitle(event.target.value)} placeholder="Название подтверждённого тура" aria-label="Название новой гастрольной группы" maxLength={160} />
+          <button type="submit" disabled={savingTourGroup || !newTourGroupTitle.trim()} className="rounded-md bg-indigo-700 px-3 py-2 text-xs font-semibold text-white disabled:opacity-50">Создать и привязать</button>
+        </form>
+        {page.tourGroup ? <p className="mt-2 text-xs text-indigo-950">Сейчас: <strong>{page.tourGroup.title}</strong></p> : null}
+      </section> : null}
       {page.reviewCandidates?.length ? <section className="rounded-md border border-amber-300 bg-amber-50/60 p-3">
         <h4 className="text-sm font-semibold text-amber-950">Проверить неоднозначные совпадения</h4>
         <p className="mt-1 text-xs text-amber-900">

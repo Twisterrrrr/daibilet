@@ -8,6 +8,7 @@ import { formatMoneyRange } from '@/lib/format';
 type PeerEvent = {
   id: string;
   slug: string;
+  eventPageSlug?: string | null;
   title: string;
   city: string;
   citySlug: string;
@@ -31,14 +32,16 @@ export function PeerEventsBlock({ peers }: { peers: PeerEvent[] }) {
 
   return (
     <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6">
-      <h2 className="text-lg font-bold text-slate-900">Также выступает в других городах</h2>
+      <h2 className="text-lg font-bold text-slate-900">Другие города тура</h2>
       <p className="mt-1 text-sm text-slate-500">
-        Тот же спектакль в ближайших городах — выберите удобную дату и площадку.
+        Выберите город: расписание, площадка и покупка билета будут местными.
       </p>
 
       <div className="mt-4 space-y-3">
         {peers.map((peer) => {
-          const href = eventHref({ id: peer.id, slug: peer.slug, title: peer.title });
+          const href = peer.eventPageSlug
+            ? `/events/${encodeURIComponent(peer.eventPageSlug)}`
+            : eventHref({ id: peer.id, slug: peer.slug, title: peer.title });
           const dateLabel = formatPeerDate(peer.startsAt);
 
           return (

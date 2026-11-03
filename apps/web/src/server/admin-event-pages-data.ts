@@ -14,6 +14,7 @@ export type AdminEventPage = {
   publishedAt: string | null;
   status: 'DRAFT' | 'REVIEW' | 'READY';
   isIndexable: false;
+  tourGroup: { id: string; title: string } | null;
   events: Array<{
     eventId: string;
     position: number;
@@ -55,16 +56,22 @@ export type AdminEventPage = {
 
 export type AdminEventPageEditorData = {
   page: AdminEventPage | null;
+  tourGroups: Array<{ id: string; title: string; pageCount: number; publishedPageCount: number }>;
   error: string | null;
 };
 
 export async function loadAdminEventPageForEvent(eventId: string): Promise<AdminEventPageEditorData> {
   try {
-    const response = await adminApiFetch(`/api/admin/event-pages/by-event/${encodeURIComponent(eventId)}`);
-    if (response.status === 404) return { page: null, error: null };
-    if (!response.ok) return { page: null, error: `EventPage API вернул HTTP ${response.status}.` };
-    return { page: await response.json() as AdminEventPage, error: null };
+    const [pageResponse, groupsResponse] = await Promise.all([
+      adminApiFetch(`/api/admin/event-pages/by-event/${encodeURIComponent(eventId)}`),
+      adminApiFetch('/api/admin/event-tour-groups'),
+    ]);
+    if (!groupsResponse.ok) return { page: null, tourGroups: [], error: `API гастрольных групп вернул HTTP ${groupsResponse.status}.` };
+    const tourGroups = await groupsResponse.json() as AdminEventPageEditorData['tourGroups'];
+    if (pageResponse.status === 404) return { page: null, tourGroups, error: null };
+    if (!pageResponse.ok) return { page: null, tourGroups, error: `EventPage API вернул HTTP ${pageResponse.status}.` };
+    return { page: await pageResponse.json() as AdminEventPage, tourGroups, error: null };
   } catch (error) {
-    return { page: null, error: error instanceof Error ? error.message : 'Не удалось загрузить подробности страницы события.' };
+    return { page: null, tourGroups: [], error: error instanceof Error ? error.message : 'Не удалось загрузить подробности страницы события.' };
   }
 }

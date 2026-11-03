@@ -8,10 +8,13 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createDb } from './db.js';
 import {
   addAdminEventPageRoute,
+  assignAdminEventPageTourGroup,
   createAdminEventPage,
+  createAdminEventTourGroup,
   deleteAdminEventPageRoute,
   findAdminEventPageByEvent,
   getAdminEventPage,
+  listAdminEventTourGroups,
   moveAdminEventPageEvent,
   publishAdminEventPage,
   replaceAdminEventPageEvents,
@@ -854,6 +857,20 @@ export async function handleRequest(request, response) {
       return;
     }
 
+    if (route === 'GET /api/admin/event-tour-groups') {
+      sendJson(response, await listAdminEventTourGroups(db));
+      return;
+    }
+
+    if (route === 'POST /api/admin/event-tour-groups') {
+      try {
+        sendJson(response, await createAdminEventTourGroup(db, await readJsonBody(request)), 201);
+      } catch (error) {
+        sendJson(response, { error: error instanceof Error ? error.message : 'tour_group_create_failed' }, 400);
+      }
+      return;
+    }
+
     const eventPageByEventMatch = request.method === 'GET'
       ? url.pathname.match(/^\/api\/admin\/event-pages\/by-event\/([^/]+)$/)
       : null;
@@ -875,6 +892,24 @@ export async function handleRequest(request, response) {
         const message = error instanceof Error ? error.message : 'invalid_event_page_events';
         const status = /unique|duplicate/i.test(message) ? 409 : 400;
         sendJson(response, { error: message }, status);
+      }
+      return;
+    }
+
+    const eventPageTourGroupMatch = request.method === 'PUT'
+      ? url.pathname.match(/^\/api\/admin\/event-pages\/([^/]+)\/tour-group$/)
+      : null;
+    if (eventPageTourGroupMatch) {
+      try {
+        const body = await readJsonBody(request);
+        const result = await assignAdminEventPageTourGroup(
+          db,
+          decodeURIComponent(eventPageTourGroupMatch[1]),
+          body?.tourGroupId ?? null,
+        );
+        sendJson(response, result || { error: 'event_page_not_found' }, result ? 200 : 404);
+      } catch (error) {
+        sendJson(response, { error: error instanceof Error ? error.message : 'tour_group_assign_failed' }, 400);
       }
       return;
     }

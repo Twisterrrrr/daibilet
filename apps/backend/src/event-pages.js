@@ -114,7 +114,8 @@ function pageSnapshot(page) {
 async function currentSourceState(query, id) {
   const events = await query(`SELECT "eventId", position, role, "sourceSnapshot" FROM "EventPageEvent" WHERE "eventPageId" = $1 ORDER BY position`, [id]);
   const routes = await query(`SELECT path, kind, source, "createdAt" FROM "EventPageRoute" WHERE "eventPageId" = $1 ORDER BY "createdAt"`, [id]);
-  return { events: events.rows, routes: routes.rows };
+  const tourGroup = await query(`SELECT "tourGroupId" FROM "EventPage" WHERE id = $1`, [id]);
+  return { events: events.rows, routes: routes.rows, tourGroupId: tourGroup.rows[0]?.tourGroupId ?? null };
 }
 
 async function appendPageRevision(query, id, page, { changeNote = null, actorId = null, sourceState = null } = {}) {
@@ -129,10 +130,13 @@ async function appendPageRevision(query, id, page, { changeNote = null, actorId 
 async function readPage(query, id) {
   const pageResult = await query(`
     SELECT id, slug, title, summary, content, "seoH1", "seoTitle", "seoDescription",
-      "canonicalPath", status, "isIndexable", "publishedAt", "createdAt", "updatedAt"
+      "canonicalPath", status, "isIndexable", "publishedAt", "tourGroupId", "createdAt", "updatedAt"
     FROM "EventPage" WHERE id = $1
   `, [id]);
   if (!pageResult.rows[0]) return null;
+  const tourGroupResult = pageResult.rows[0].tourGroupId
+    ? await query(`SELECT id, title FROM "EventTourGroup" WHERE id = $1`, [pageResult.rows[0].tourGroupId])
+    : { rows: [] };
   const events = await query(`
       SELECT link.id, link."eventId", link.position, link.role, link."sourceSnapshot", link."createdAt",
         event.title AS "eventTitle", event.slug AS "eventSlug", event.kind AS "eventKind",
@@ -166,7 +170,7 @@ async function readPage(query, id) {
       supplier.title AS "supplierTitle", candidate_page.id AS "pageId",
       candidate_page.slug AS "pageSlug", candidate_page.title AS "pageTitle",
       source.code AS "sourceCode", source.name AS "sourceName",
-      candidate_link.externalId AS "externalId", candidate_link."metaExternalId" AS "metaExternalId",
+      candidate_link."externalId" AS "externalId", candidate_link."metaExternalId" AS "metaExternalId",
       ((SELECT count(*) FROM "EventPageEvent" owned WHERE owned."eventPageId" = candidate_page.id) > 1
         OR candidate_page.status = 'DRAFT' AND candidate_page."publishedAt" IS NULL
           AND candidate_page."isIndexable" IS FALSE AND candidate_page.summary IS NULL
@@ -203,7 +207,78 @@ async function readPage(query, id) {
   `, [id]);
   const routes = await query(`SELECT id, path, kind, source, "createdAt" FROM "EventPageRoute" WHERE "eventPageId" = $1 ORDER BY "createdAt"`, [id]);
   const revisions = await query(`SELECT id, version, content, "sourceSnapshot", "changeNote", "createdBy", "createdAt" FROM "EventPageRevision" WHERE "eventPageId" = $1 ORDER BY version DESC`, [id]);
-  return { ...pageResult.rows[0], events: events.rows, reviewCandidates: reviewCandidates.rows, routes: routes.rows, revisions: revisions.rows };
+  return {
+    ...pageResult.rows[0],
+    tourGroup: tourGroupResult.rows[0] || null,
+    events: events.rows,
+    reviewCandidates: reviewCandidates.rows,
+    routes: routes.rows,
+    revisions: revisions.rows,
+  };
+}
+
+export async function listAdminEventTourGroups(db) {
+  const result = await db.query(`
+    SELECT group_row.id, group_row.title, count(page.id)::int AS "pageCount",
+      count(page.id) FILTER (WHERE page.status = 'READY' AND page."publishedAt" IS NOT NULL)::int AS "publishedPageCount"
+    FROM "EventTourGroup" group_row
+    LEFT JOIN "EventPage" page ON page."tourGroupId" = group_row.id
+    GROUP BY group_row.id, group_row.title
+    ORDER BY lower(group_row.title), group_row.id
+  `);
+  return result.rows;
+}
+
+export async function createAdminEventTourGroup(db, payload) {
+  const title = requiredText(payload?.title, 'title', 160);
+  const id = randomUUID();
+  const result = await db.query(`
+    INSERT INTO "EventTourGroup" (id, title, "updatedAt") VALUES ($1, $2, now())
+    RETURNING id, title, 0::int AS "pageCount", 0::int AS "publishedPageCount"
+  `, [id, title]);
+  return result.rows[0];
+}
+
+/** Assign one local EventPage to a confirmed tour group; never merges pages or Events. */
+export async function assignAdminEventPageTourGroup(db, pageId, rawTourGroupId) {
+  const tourGroupId = rawTourGroupId == null || rawTourGroupId === ''
+    ? null
+    : requiredText(rawTourGroupId, 'tourGroupId', 100);
+  return db.transaction(async ({ query }) => {
+    const pageResult = await query(`SELECT id, "tourGroupId" FROM "EventPage" WHERE id = $1 FOR UPDATE`, [pageId]);
+    const page = pageResult.rows[0];
+    if (!page) return null;
+    if (tourGroupId) {
+      const group = await query(`SELECT id FROM "EventTourGroup" WHERE id = $1 FOR UPDATE`, [tourGroupId]);
+      if (!group.rows[0]) throw new Error('Tour group not found');
+      const cities = await query(`
+        SELECT DISTINCT event."primaryCityId" AS "cityId"
+        FROM "EventPageEvent" link JOIN "Event" event ON event.id = link."eventId"
+        WHERE link."eventPageId" = $1
+      `, [pageId]);
+      if (cities.rows.length !== 1 || !cities.rows[0].cityId) {
+        throw new Error('A tour group can contain only local EventPages with exactly one known city');
+      }
+      const duplicateCity = await query(`
+        SELECT other_page.id
+        FROM "EventPage" other_page
+        JOIN "EventPageEvent" other_link ON other_link."eventPageId" = other_page.id
+        JOIN "Event" other_event ON other_event.id = other_link."eventId"
+        WHERE other_page."tourGroupId" = $1 AND other_page.id <> $2
+          AND other_event."primaryCityId" = $3
+        LIMIT 1
+      `, [tourGroupId, pageId, cities.rows[0].cityId]);
+      if (duplicateCity.rows[0]) throw new Error('This tour group already has an EventPage for this city');
+    }
+    if (page.tourGroupId === tourGroupId) return readPage(query, pageId);
+    await query(`UPDATE "EventPage" SET "tourGroupId" = $2, "updatedAt" = now() WHERE id = $1`, [pageId, tourGroupId]);
+    const sourceState = await currentSourceState(query, pageId);
+    await appendPageRevision(query, pageId, { ...page, tourGroupId }, {
+      changeNote: tourGroupId ? 'Изменена связь с гастрольной группой' : 'Страница исключена из гастрольной группы',
+      sourceState,
+    });
+    return readPage(query, pageId);
+  });
 }
 
 export async function getAdminEventPage(db, id) {

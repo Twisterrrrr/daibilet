@@ -13,6 +13,7 @@ export function toEventPageClientPayload(payload: PublicEventPageDto): PublicEve
       ticketPrices: payload.ticketPrices ?? [],
       purchaseOptions: payload.purchaseOptions ?? [],
       related: payload.related ?? [],
+      peerEvents: payload.peerEvents ?? [],
       landings: payload.landings ?? [],
       stats: payload.stats ?? { sessions: 0 },
     }),

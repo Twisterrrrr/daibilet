@@ -58,6 +58,26 @@ export async function publishAdminEventPageAction(id: string) {
   return await response.json() as AdminEventPage;
 }
 
+export async function createAdminEventTourGroupAction(title: string) {
+  const response = await adminApiFetch('/api/admin/event-tour-groups', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title }),
+  });
+  if (!response.ok) throw await readError(response, 'Не удалось создать гастрольную группу');
+  return await response.json() as { id: string; title: string; pageCount: number; publishedPageCount: number };
+}
+
+export async function assignAdminEventPageTourGroupAction(pageId: string, tourGroupId: string | null) {
+  const response = await adminApiFetch(`/api/admin/event-pages/${encodeURIComponent(pageId)}/tour-group`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ tourGroupId }),
+  });
+  if (!response.ok) throw await readError(response, 'Не удалось изменить гастрольную группу EventPage');
+  return await response.json() as AdminEventPage;
+}
+
 export async function searchAdminEventPageEventCandidatesAction(query: string) {
   const response = await adminApiFetch(`/api/admin/event-page-event-candidates?q=${encodeURIComponent(query)}`);
   if (!response.ok) throw await readError(response, 'Не удалось найти события-кандидаты');

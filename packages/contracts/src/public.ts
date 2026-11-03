@@ -370,6 +370,8 @@ export interface PublicEventPageDto extends ApiEnvelope {
     summary: string | null;
     content: PublicPdpDocumentDto['content'];
     seoH1: string | null;
+    seoTitle?: string | null;
+    seoDescription?: string | null;
   } | null;
   /** Stable EventPage route identity. Draft shells serve source Event data but stay noindex until editorially approved. */
   eventPageRoute?: {
@@ -391,6 +393,8 @@ export interface PublicEventPageDto extends ApiEnvelope {
   sessions: Array<Omit<DateTimeSlot, 'startsAt'> & PurchaseFields & {
     id: string;
     eventId: string;
+    venueTitle?: string | null;
+    venueAddress?: string | null;
     startsAt: string | null;
     timeZone?: string | null;
     priceFrom?: number | null;
@@ -406,6 +410,8 @@ export interface PublicEventPageDto extends ApiEnvelope {
   peerEvents?: Array<{
     id: string;
     slug: string;
+    /** Stable local EventPage path for explicit tour links; absent for inferred legacy peers. */
+    eventPageSlug?: string | null;
     title: string;
     city: string;
     citySlug: string;

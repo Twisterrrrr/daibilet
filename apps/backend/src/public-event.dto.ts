@@ -112,6 +112,147 @@ type RequestedSessionContext = NonNullable<PublicEventPageDto['requestedSessionC
 const eventCache = new Map<string, CachedEventPage>();
 const eventBuilds = new Map<string, Promise<PublicEventPageDto | null>>();
 
+type PublicTourPeer = NonNullable<PublicEventPageDto['peerEvents']>[number];
+
+async function loadPublishedTourPeers(eventId: string): Promise<{ assigned: boolean; peers: PublicTourPeer[] }> {
+  try {
+    const result = await prisma.$queryRawUnsafe<Array<PublicTourPeer & { eventPageSlug: string | null }>>(`
+      SELECT peer_event.id,
+        peer_event.slug,
+        peer_page.slug AS "eventPageSlug",
+        peer_event.title,
+        city.title AS city,
+        city.slug AS "citySlug",
+        COALESCE(venue.title, '') AS venue,
+        COALESCE(venue.slug, '') AS "venueSlug",
+        next_session."startsAt" AS "startsAt",
+        peer_event."priceFromRub" AS "priceFrom"
+      FROM "EventPageEvent" current_link
+      JOIN "EventPage" current_page ON current_page.id = current_link."eventPageId"
+      JOIN "EventTourGroup" tour_group ON tour_group.id = current_page."tourGroupId"
+      JOIN "Event" current_event ON current_event.id = current_link."eventId"
+      JOIN "EventPage" peer_page ON peer_page."tourGroupId" = tour_group.id AND peer_page.id <> current_page.id
+      JOIN LATERAL (
+        SELECT event.id, event.slug, event.title, event."primaryCityId", event."venueId", event."priceFromRub"
+        FROM "EventPageEvent" peer_link
+        JOIN "Event" event ON event.id = peer_link."eventId"
+        WHERE peer_link."eventPageId" = peer_page.id
+          AND event."primaryCityId" IS NOT NULL
+          AND event.status <> 'HIDDEN'
+          AND EXISTS (
+            SELECT 1 FROM "EventOffer" offer
+            WHERE offer."eventId" = event.id AND offer.active IS NOT FALSE
+              AND (
+                (upper(event.kind::text) = 'OPEN_DATE'
+                  AND (event."openDateValidTo" IS NULL OR event."openDateValidTo" >= now()))
+                OR EXISTS (
+                  SELECT 1 FROM "EventSession" available_session
+                  WHERE available_session."eventId" = event.id
+                    AND available_session."isActive" IS NOT FALSE
+                    AND available_session."cancelledAt" IS NULL
+                    AND lower(coalesce(available_session."sourceStatus", '')) NOT IN
+                      ('widget_blocked', 'paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden', 'stand_by', 'closed', 'sales_closed', 'sale_closed', 'not_for_sale')
+                    AND (
+                      (available_session."startsAt" IS NOT NULL AND available_session."startsAt" >= now() - interval '15 minutes')
+                      OR (available_session."startsAt" IS NOT NULL AND available_session."endsAt" IS NOT NULL
+                        AND available_session."startsAt" < now() AND available_session."endsAt" >= now()
+                        AND available_session."endsAt" - available_session."startsAt" < interval '36 hours')
+                      OR lower(coalesce(available_session."sourceStatus", '')) IN ('open_date', 'widget')
+                    )
+                )
+              )
+          )
+        ORDER BY peer_link.position, peer_link."createdAt", event.id
+        LIMIT 1
+      ) peer_event ON peer_event."primaryCityId" <> current_event."primaryCityId"
+      JOIN "City" city ON city.id = peer_event."primaryCityId"
+      LEFT JOIN "Venue" venue ON venue.id = peer_event."venueId"
+      LEFT JOIN LATERAL (
+        SELECT min(session."startsAt") AS "startsAt"
+        FROM "EventPageEvent" peer_link
+        JOIN "EventSession" session ON session."eventId" = peer_link."eventId"
+        WHERE peer_link."eventPageId" = peer_page.id
+          AND session."isActive" IS TRUE
+          AND session."cancelledAt" IS NULL
+          AND session."startsAt" >= now()
+      ) next_session ON true
+      WHERE current_link."eventId" = $1
+        AND current_page.status = 'READY' AND current_page."publishedAt" IS NOT NULL
+        AND peer_page.status = 'READY' AND peer_page."publishedAt" IS NOT NULL
+      ORDER BY next_session."startsAt" NULLS LAST, city.title, peer_page.slug
+      LIMIT 8
+    `, eventId);
+    const assigned = await prisma.$queryRawUnsafe<Array<{ assigned: boolean }>>(`
+      SELECT EXISTS (
+        SELECT 1 FROM "EventPageEvent" link
+        JOIN "EventPage" page ON page.id = link."eventPageId"
+        WHERE link."eventId" = $1 AND page."tourGroupId" IS NOT NULL
+      ) AS assigned
+    `, eventId);
+    return {
+      assigned: assigned[0]?.assigned === true,
+      peers: result.map((peer) => ({
+        id: peer.id,
+        slug: peer.slug,
+        eventPageSlug: peer.eventPageSlug,
+        title: peer.title,
+        city: peer.city,
+        citySlug: peer.citySlug,
+        venue: peer.venue,
+        venueSlug: peer.venueSlug,
+        startsAt: peer.startsAt,
+        priceFrom: peer.priceFrom,
+      })),
+    };
+  } catch (error) {
+    // Keep the public event read path compatible during rolling migration rollout.
+    if ((error as { code?: string })?.code === 'P2021' || (error as { code?: string })?.code === '42P01') {
+      return { assigned: false, peers: [] };
+    }
+    throw error;
+  }
+}
+
+type StableEventPageRecord = {
+  id: string;
+  slug: string;
+  title: string;
+  summary: string | null;
+  content: unknown;
+  seoH1: string | null;
+  seoTitle: string | null;
+  seoDescription: string | null;
+  status: string;
+  isIndexable: boolean;
+  publishedAt: Date | null;
+  eventId: string;
+  eventIds: string[];
+};
+
+async function loadStableEventPage(where: 'slug' | 'eventId', value: string): Promise<StableEventPageRecord | null> {
+  try {
+    const condition = where === 'slug' ? 'lower(page.slug) = lower($1)' : 'link."eventId" = $1';
+    const result = await prisma.$queryRawUnsafe<StableEventPageRecord[]>(`
+      SELECT page.id, page.slug, page.title, page.summary, page.content, page."seoH1", page."seoTitle", page."seoDescription",
+        page.status, page."isIndexable", page."publishedAt", link."eventId",
+        ARRAY(
+          SELECT page_link."eventId" FROM "EventPageEvent" page_link
+          WHERE page_link."eventPageId" = page.id
+          ORDER BY page_link.position, page_link."createdAt", page_link."eventId"
+        ) AS "eventIds"
+      FROM "EventPage" page
+      JOIN "EventPageEvent" link ON link."eventPageId" = page.id
+      WHERE ${condition}
+      ORDER BY link.position, link."createdAt"
+      LIMIT 1
+    `, value);
+    return result[0] || null;
+  } catch (error) {
+    if ((error as { code?: string })?.code === 'P2021' || (error as { code?: string })?.code === '42P01') return null;
+    throw error;
+  }
+}
+
 export function clearPublicEventDtoCache(): void {
   eventCache.clear();
   eventBuilds.clear();
@@ -148,8 +289,20 @@ async function loadPublicEventDto(
 ): Promise<PublicEventPageDto | null> {
   // PERF.E5: resolve by slug/id via Prisma - do NOT load full public catalog (~2600 rows).
   const requestedSlug = publicSlug(eventSlugOrId);
-  const requestedEvent = await resolveEvent(eventSlugOrId);
+  const stablePageBySlug = await loadStableEventPage('slug', requestedSlug);
+  const requestedEvent = stablePageBySlug
+    ? await prisma.event.findUnique({ where: { id: stablePageBySlug.eventId }, include: eventInclude })
+    : await resolveEvent(eventSlugOrId);
   if (!requestedEvent) return null;
+  const stablePage = stablePageBySlug || await loadStableEventPage('eventId', requestedEvent.id);
+  const stablePagePublished = stablePage?.status === 'READY' && stablePage.publishedAt != null;
+  const stablePageEventIds = stablePagePublished ? stablePage.eventIds : [];
+  const stablePageEvents = stablePageEventIds.length
+    ? await prisma.event.findMany({
+        where: { id: { in: stablePageEventIds }, status: { notIn: ['HIDDEN', 'DRAFT'] } },
+        include: eventInclude,
+      })
+    : [];
   const mergeGroupMembers = await loadMergeGroupMembers(requestedEvent);
   const metaGroupMembers = await loadMetaGroupMembers(requestedEvent);
   const requestedSessionContext = inheritedSessionContext === undefined
@@ -158,17 +311,29 @@ async function loadPublicEventDto(
       : null
     : inheritedSessionContext;
   const eventsById = new Map<string, EventRecord>([[requestedEvent.id, requestedEvent]]);
+  const stablePageEventsById = new Map(stablePageEvents.map((event) => [event.id, event]));
+  for (const eventId of stablePageEventIds) {
+    const event = stablePageEventsById.get(eventId);
+    if (event) eventsById.set(event.id, event);
+  }
   for (const member of mergeGroupMembers) eventsById.set(member.id, member);
   for (const member of metaGroupMembers) eventsById.set(member.id, member);
   const mergedGroupEvents = [...eventsById.values()];
   const groupEventIds = [...eventsById.keys()];
   const purchaseProvider = pickGroupPurchaseProvider(undefined, mergedGroupEvents, requestedEvent);
-  const purchaseGroupEventIds = filterGroupEventIdsByPurchaseProvider(
+  const providerFilteredEventIds = filterGroupEventIdsByPurchaseProvider(
     groupEventIds,
     eventsById,
     purchaseProvider,
     requestedEvent.id,
   );
+  // Explicit EventPage membership is an editor-confirmed relationship, so include
+  // those local product records even when their providers differ. Their own
+  // sessions and offer URLs remain attached to the source Event.
+  const purchaseGroupEventIds = [...new Set([
+    ...providerFilteredEventIds,
+    ...stablePageEventIds.filter((eventId) => eventsById.has(eventId)),
+  ])];
   const offerScopeEventIds = [...new Set([
     ...purchaseGroupEventIds,
     ...mergeGroupMembers.map((member) => member.id),
@@ -181,6 +346,7 @@ async function loadPublicEventDto(
   const tariffOfferEventIds = [...new Set([
     requestedEvent.id,
     representative.id,
+    ...stablePageEventIds,
     ...mergeGroupMembers.map((member) => member.id),
   ])];
 
@@ -188,6 +354,7 @@ async function loadPublicEventDto(
   // Prefer live sibling when the opened slug itself is STAND_BY/closed (meta TC children).
   if (
     allowSoftRedirect &&
+    !stablePagePublished &&
     !isPublicSessionRowOnSale({ sourceStatus: requestedEvent.sourceStatus })
   ) {
     const nearestSibling =
@@ -399,6 +566,25 @@ async function loadPublicEventDto(
   const ticketPrices = buildTicketPrices(offers, sessions, event);
   const purchaseOptions = await buildMergedPurchaseOptions(mergedGroupEvents, offers, requestedEvent, eventPurchaseUrl);
   const related = await loadRelatedSessionsFromDb(requestedEvent, groupEventIds, 12);
+  const explicitTour = await loadPublishedTourPeers(requestedEvent.id);
+  const inferredPeers: PublicTourPeer[] = mergedGroupEvents
+    .filter((peer) => peer.id !== requestedEvent.id && peer.primaryCityId !== requestedEvent.primaryCityId)
+    .slice(0, 8)
+    .map((peer) => {
+      const nextSession = sessionRows.find((session) => session.eventId === peer.id);
+      return {
+        id: peer.id,
+        slug: publicSlug(peer.slug),
+        title: formatPublicEventTitle(peer.override?.title || peer.title),
+        city: peer.primaryCity?.title || '',
+        citySlug: peer.primaryCity?.slug || '',
+        venue: peer.venue?.title || '',
+        venueSlug: peer.venue?.slug || '',
+        startsAt: nextSession?.startsAt?.toISOString() || null,
+        priceFrom: peer.priceFromRub || null,
+      };
+    })
+    .filter((peer) => peer.city && peer.slug !== publicSlug(requestedEvent.slug));
   const priceValues = [event.priceFrom, ...sessions.map((session) => session.priceFrom)]
     .filter((value): value is number => Number.isFinite(value) && Number(value) >= MIN_DISPLAY_PRICE_RUB);
   const vacantValues = sessions.map((session) => session.vacant)
@@ -408,7 +594,7 @@ async function loadPublicEventDto(
   const scheduleSourceStatus = scheduleSource && 'sourceStatus' in scheduleSource
     ? scheduleSource.sourceStatus
     : requestedEvent.sourceStatus;
-  if (!isSaleableEventForPublic({
+  if (!stablePagePublished && !isSaleableEventForPublic({
     kind: requestedEvent.kind,
     sourceStatus: scheduleSourceStatus,
     startsAt: scheduleSource && 'startsAt' in scheduleSource ? scheduleSource.startsAt : null,
@@ -430,6 +616,24 @@ async function loadPublicEventDto(
   return {
     generatedAt: new Date().toISOString(),
     event,
+    ...(stablePage ? {
+      eventPageRoute: {
+        slug: stablePage.slug,
+        status: stablePage.status,
+        published: stablePage.status === 'READY' && stablePage.publishedAt != null,
+        isIndexable: stablePage.status === 'READY' && stablePage.publishedAt != null && stablePage.isIndexable,
+        availability: sessions.length ? 'AVAILABLE' : 'NO_UPCOMING',
+      },
+      eventPage: stablePage.status === 'READY' && stablePage.publishedAt != null ? {
+        slug: stablePage.slug,
+        title: stablePage.title,
+        summary: stablePage.summary,
+        content: stablePage.content as NonNullable<PublicEventPageDto['eventPage']>['content'],
+        seoH1: stablePage.seoH1,
+        seoTitle: stablePage.seoTitle,
+        seoDescription: stablePage.seoDescription,
+      } : null,
+    } : { eventPageRoute: null, eventPage: null }),
     pdp: await attachReadyEventPdp(requestedEvent.id),
     ...(requestedSessionContext && sessions.some((session) => session.eventId !== requestedEvent.id)
       ? { requestedSessionContext }
@@ -438,25 +642,8 @@ async function loadPublicEventDto(
     offers: offers.map(({ eventId: _eventId, sortOrder: _sortOrder, sourceTicketId: _sourceTicketId, payload: _payload, ...offer }) => offer),
     ticketPrices,
     ...(purchaseOptions.length >= 2 ? { purchaseOptions } : {}),
-    // Cross-city peer events: same show in different cities.
-    peerEvents: mergedGroupEvents
-      .filter((e) => e.id !== requestedEvent.id && e.primaryCityId !== requestedEvent.primaryCityId)
-      .slice(0, 8)
-      .map((e) => {
-        const nextSession = sessionRows.find((session) => session.eventId === e.id);
-        return {
-          id: e.id,
-          slug: publicSlug(e.slug),
-          title: formatPublicEventTitle(e.override?.title || e.title),
-          city: e.primaryCity?.title || '',
-          citySlug: e.primaryCity?.slug || '',
-          venue: e.venue?.title || '',
-          venueSlug: e.venue?.slug || '',
-          startsAt: nextSession?.startsAt?.toISOString() || null,
-          priceFrom: e.priceFromRub || null,
-        };
-      })
-      .filter((p) => p.city && p.slug !== publicSlug(requestedEvent.slug)),
+    // Explicit manual tour grouping wins; inferred source groups remain fallback only.
+    peerEvents: explicitTour.assigned ? explicitTour.peers : inferredPeers,
     related,
     landings: landingSlugs.map(findLandingRule).filter(isDefined).map((rule) => ({
       slug: rule.slug,
@@ -669,6 +856,8 @@ function mapSession(
   return {
     id: session.id,
     eventId: session.eventId,
+    venueTitle: event.venue?.title || null,
+    venueAddress: event.venue?.address || null,
     startsAt,
     endsAt: normalizeStartsAt(session.endsAt),
     dateLabel: openDate ? 'Открытая дата' : wideLifetime ? 'Даты в виджете' : formatDate(session.startsAt, timeZone),
@@ -827,7 +1016,10 @@ function dedupePublicEventSessionsByStartsAt(sessions: PublicEventSession[]): Pu
   const ranked = new Map<string, PublicEventSession>();
 
   for (const session of sessions) {
-    const key = session.startsAt || session.id;
+    // Keep simultaneous sessions at different departure points. Dated source
+    // duplicates at the same time and venue can still collapse to one row.
+    const venueKey = `${session.venueAddress || ''}|${session.venueTitle || ''}`.trim().toLocaleLowerCase('ru');
+    const key = session.startsAt ? `${session.startsAt}|${venueKey}` : session.id;
     const current = ranked.get(key);
     if (!current || scorePublicEventSession(session) > scorePublicEventSession(current)) {
       ranked.set(key, session);

@@ -235,6 +235,22 @@ export interface PublicPurchaseOptionDto extends PurchaseFields {
 export interface PublicEventPageDto extends ApiEnvelope {
   event: PublicEventDto;
   pdp?: PublicPdpDocumentDto | null;
+  eventPage?: {
+    slug: string;
+    title: string;
+    summary: string | null;
+    content: PublicPdpDocumentDto['content'];
+    seoH1: string | null;
+    seoTitle?: string | null;
+    seoDescription?: string | null;
+  } | null;
+  eventPageRoute?: {
+    slug: string;
+    status: string;
+    published: boolean;
+    isIndexable: boolean;
+    availability?: 'AVAILABLE' | 'ENDED' | 'NO_UPCOMING' | null;
+  } | null;
   requestedSessionContext?: {
     startsAt: string;
     endsAt?: string | null;
@@ -246,6 +262,8 @@ export interface PublicEventPageDto extends ApiEnvelope {
   sessions: Array<Omit<DateTimeSlot, 'startsAt'> & PurchaseFields & {
     id: string;
     eventId: string;
+    venueTitle?: string | null;
+    venueAddress?: string | null;
     startsAt: string | null;
     timeZone?: string | null;
     priceFrom?: number | null;
@@ -260,6 +278,7 @@ export interface PublicEventPageDto extends ApiEnvelope {
   peerEvents?: Array<{
     id: string;
     slug: string;
+    eventPageSlug?: string | null;
     title: string;
     city: string;
     citySlug: string;

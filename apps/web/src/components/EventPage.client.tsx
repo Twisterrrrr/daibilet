@@ -78,6 +78,10 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [event.id]);
   const offers = payload.offers ?? [];
+  const distinctSessionVenues = new Set((sessions as EventSession[])
+    .map((session) => String(session.venueAddress || session.venueTitle || '').trim().toLocaleLowerCase('ru'))
+    .filter(Boolean));
+  const showSessionVenue = distinctSessionVenues.size > 1;
   const teplohod = getTeplohodWidgetIds(event);
   const primaryOffer = offers.find((offer) => offer.active !== false) || offers[0] || null;
   const priceRange = getTicketPriceRange(payload);
@@ -237,6 +241,7 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
                 sessions={scheduleSessions}
                 isTcWidget={isTcWidget && !isTepWidget}
                 tcEventId={tcEventId}
+                showSessionVenue={showSessionVenue}
               />
             )
           ) : null}
@@ -323,10 +328,12 @@ function SessionDayStrip({
   sessions,
   isTcWidget,
   tcEventId,
+  showSessionVenue,
 }: {
   sessions: EventSession[];
   isTcWidget: boolean;
   tcEventId: string | null;
+  showSessionVenue: boolean;
 }) {
   const days = React.useMemo(() => {
     const map = new Map<string, { key: string; label: string; sessions: EventSession[] }>();
@@ -417,21 +424,26 @@ function SessionDayStrip({
       <div className="min-w-0 space-y-1.5">
         {daySessions.map((session) => {
           const blocked = isSessionPurchaseBlocked(session);
-          if (isTcWidget && !blocked) {
-            return (
-              <TcSessionSlot
-                key={`${session.id}-${session.startsAt}`}
+          const venueLabel = session.venueAddress || session.venueTitle || '';
+          const sessionRow = isTcWidget && !blocked
+            ? <TcSessionSlot
                 tcEventId={extractTcEventIdFromSession(session) || tcEventId || ''}
                 session={session}
               />
+            : <StaticSessionRow session={session} blocked={blocked} />;
+          if (isTcWidget && !blocked) {
+            return (
+              <div key={`${session.id}-${session.startsAt}`}>
+                {showSessionVenue && venueLabel ? <p className="mb-1 px-1 text-xs text-graphite-muted">Место: {venueLabel}</p> : null}
+                {sessionRow}
+              </div>
             );
           }
           return (
-            <StaticSessionRow
-              key={`${session.id}-${session.startsAt}`}
-              session={session}
-              blocked={blocked}
-            />
+            <div key={`${session.id}-${session.startsAt}`}>
+              {showSessionVenue && venueLabel ? <p className="mb-1 px-1 text-xs text-graphite-muted">Место: {venueLabel}</p> : null}
+              {sessionRow}
+            </div>
           );
         })}
       </div>
@@ -611,7 +623,12 @@ export function EventHero({
     id: event.id,
   });
   const nextSession = pickRepresentativeSession((payload.sessions ?? []) as EventSession[]);
-  const canOpenVenueModal = Boolean(event.venue && (event.venueId || event.venueSlug));
+  const distinctSessionVenues = new Set((payload.sessions ?? [])
+    .map((session) => String(session.venueAddress || session.venueTitle || '').trim().toLocaleLowerCase('ru'))
+    .filter(Boolean));
+  const hasMultipleSessionVenues = distinctSessionVenues.size > 1;
+  const hasMultipleDeparturePiers = hasMultipleSessionVenues && [...distinctSessionVenues].every((value) => /причал|набережн|теплоход|речного вокзала/u.test(value));
+  const canOpenVenueModal = !hasMultipleSessionVenues && Boolean(event.venue && (event.venueId || event.venueSlug));
   const venuePageHref = canOpenVenueModal
     ? venueHref({
         id: event.venueId || event.venueSlug || event.venue,
@@ -625,8 +642,10 @@ export function EventHero({
   const venueAlreadyInBreadcrumbs = Boolean(normalizedVenueName) && breadcrumbs.some((crumb) =>
     String(crumb.name || '').trim().replace(/[«»"']/g, '').toLocaleLowerCase('ru') === normalizedVenueName,
   );
-  const placeLabel = !event.venueAddress ? event.venue || event.city || null : null;
-  const venueAddressRaw = String(event.venueAddress || '').trim();
+  const placeLabel = hasMultipleSessionVenues
+    ? hasMultipleDeparturePiers ? 'Несколько причалов отправления' : 'Несколько мест проведения'
+    : !event.venueAddress ? event.venue || event.city || null : null;
+  const venueAddressRaw = hasMultipleSessionVenues ? '' : String(event.venueAddress || '').trim();
   const venueStreetAddressRaw =
     formatStreetAddress(venueAddressRaw, { city: event.city }) || venueAddressRaw;
   const venueStreetAddress = venueAlreadyInBreadcrumbs
@@ -640,7 +659,7 @@ export function EventHero({
     'inline-flex max-w-full items-center gap-1 rounded-full bg-slate-950/75 px-2.5 py-1 text-[11px] font-medium text-white';
   const solidChipLinkClassName = `${solidChipClassName} cursor-pointer transition hover:bg-slate-950/90 hover:underline hover:decoration-white/50 hover:underline-offset-2`;
 
-  const heroTitle = formatPublicTitle(String(event.seoH1 || event.title || '').trim());
+  const heroTitle = formatPublicTitle(String(payload.eventPage?.seoH1 || payload.eventPage?.title || event.seoH1 || event.title || '').trim());
   const titleSplit = splitLongTitleAtBreak(heroTitle);
   const longHeroTitle = Boolean(titleSplit) || heroTitle.length > 48;
   const nearestLabel = nextSession

@@ -332,7 +332,7 @@ export function AdminEventEditor({ detail, taxonomy, notice, queue, pdpData, eve
                 eventTitle={displayTitle}
                 sourceDescription={detail.sourceDescription}
                 currentOverrideDescription={override.description}
-                pageData={eventPageData || { page: null, error: 'EventPage API недоступен.' }}
+                pageData={eventPageData || { page: null, tourGroups: [], error: 'EventPage API недоступен.' }}
                 pdpData={pdpData}
               />
             ),
