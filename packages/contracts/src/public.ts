@@ -64,6 +64,8 @@ export interface PublicLandingDto extends SeoFields {
 export interface PublicSessionDto extends PurchaseFields {
   id: string;
   slug?: string | null;
+  /** Stable editorial EventPage URL when the entire catalog group maps unambiguously. */
+  eventPageSlug?: string | null;
   sourceSlug?: string | null;
   groupKey?: string | null;
   groupEventIds?: string[];
@@ -111,6 +113,8 @@ export interface PublicSessionDto extends PurchaseFields {
 export interface PublicCatalogListItemDto extends PurchaseFields {
   id: string;
   slug?: string | null;
+  /** Stable editorial EventPage URL when the entire catalog group maps unambiguously. */
+  eventPageSlug?: string | null;
   groupKey?: string | null;
   groupedEventsCount?: number;
   sessionCount?: number;

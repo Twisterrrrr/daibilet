@@ -4,6 +4,7 @@ import {
   collectSeparateCityHubNames,
   mapGroupedPublicSession,
   pickCatalogSubcategories,
+  resolveCatalogEventPageSlug,
   type PublicCatalogMappingRow,
 } from './public-catalog.mapper.js';
 import { prismaWallTimeToIso } from './public-datetime.js';
@@ -40,6 +41,24 @@ test('uses ProviderLink SESSION identity for a Ticketscloud slot', () => {
   assert.ok(purchaseUrl);
   assert.equal(new URL(purchaseUrl).searchParams.get('event'), 'tc-session-42');
   assert.equal(result.upcomingSlots?.[0]?.id, 'session-local-1');
+});
+
+test('exposes a stable EventPage slug on catalog sessions when the mapping is unambiguous', () => {
+  const result = mapGroupedPublicSession(catalogRow({ eventPageSlug: 'regular-concert-moscow' }));
+  assert.equal(result?.eventPageSlug, 'regular-concert-moscow');
+});
+
+test('uses an EventPage URL only when every grouped event maps to that same page', () => {
+  const samePage = [
+    { eventId: 'event-a', eventPageId: 'page-1', slug: 'stable-event' },
+    { eventId: 'event-b', eventPageId: 'page-1', slug: 'stable-event' },
+  ];
+  assert.equal(resolveCatalogEventPageSlug(['event-a', 'event-b'], samePage), 'stable-event');
+  assert.equal(resolveCatalogEventPageSlug(['event-a', 'event-c'], samePage), null);
+  assert.equal(resolveCatalogEventPageSlug(['event-a', 'event-b'], [
+    samePage[0]!,
+    { eventId: 'event-b', eventPageId: 'page-2', slug: 'another-page' },
+  ]), null);
 });
 
 test('skips teplohod placeholder image and falls back to venue hero', () => {

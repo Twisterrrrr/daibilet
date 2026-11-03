@@ -26,7 +26,12 @@ import {
 } from './public-catalog-grouping.js';
 import { isPublicCatalogExcludedMuseumAdmission } from './public-catalog-exclusions.js';
 import { formatDate, formatTime, normalizeStartsAt, timeBucket } from './public-datetime.js';
-import { mapGroupedPublicSession, collectSeparateCityHubNames, pickCatalogSubcategories } from './public-catalog.mapper.js';
+import {
+  mapGroupedPublicSession,
+  collectSeparateCityHubNames,
+  pickCatalogSubcategories,
+  resolveCatalogEventPageSlug,
+} from './public-catalog.mapper.js';
 import { findLandingRule } from './landing-rules.js';
 import {
   isOpenDateCatalogSession,
@@ -488,6 +493,7 @@ function scheduleInlineCatalogRebuild(reason: string): Promise<PublicSessionDto[
       const sessions = filterCatalogSessions(
         dedupeCrossSourceCatalogSessions(regroupMappedPublicCatalogSessions(mapped)),
       );
+      const sessionsWithEventPages = await attachUnambiguousEventPageSlugs(sessions);
       const now = Date.now();
       const expiresAt = now + Math.max(30_000, PUBLIC_CATALOG_CACHE_MS);
       const staleUntil = now + Math.max(60_000, PUBLIC_CATALOG_STALE_MS);
@@ -495,7 +501,7 @@ function scheduleInlineCatalogRebuild(reason: string): Promise<PublicSessionDto[
       try {
         const dto = await import('./dto.js');
         if (typeof dto.serializePublicCatalogLegacyIndexes === 'function') {
-          indexes = dto.serializePublicCatalogLegacyIndexes(sessions);
+          indexes = dto.serializePublicCatalogLegacyIndexes(sessionsWithEventPages);
         }
       } catch (error) {
         console.warn(
@@ -507,7 +513,7 @@ function scheduleInlineCatalogRebuild(reason: string): Promise<PublicSessionDto[
       adoptCatalogCache({
         expiresAt,
         staleUntil,
-        sessions,
+        sessions: sessionsWithEventPages,
         builtAt: now,
         ...(indexes ? { indexes } : {}),
       });
@@ -516,13 +522,13 @@ function scheduleInlineCatalogRebuild(reason: string): Promise<PublicSessionDto[
         builtAt: now,
         expiresAt,
         staleUntil,
-        sessions,
+        sessions: sessionsWithEventPages,
         ...(indexes ? { indexes } : {}),
       });
       console.log(
         `Public catalog DTO cache rebuilt (${reason}): ${sessions.length} sessions in ${now - startedAt}ms indexes=${indexes ? 'v2' : 'none'}`,
       );
-      return sessions;
+      return sessionsWithEventPages;
     } finally {
       catalogBuildPromise = null;
     }
@@ -554,7 +560,7 @@ async function loadPinnedEventIds(): Promise<Set<string>> {
 }
 
 async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
-  return prisma.$queryRaw<PublicCatalogRow[]>(sql`
+  const rows = await prisma.$queryRaw<PublicCatalogRow[]>(sql`
     with event_identity as (
       select distinct on (identity."eventId")
         identity."eventId",
@@ -893,6 +899,38 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
      and representative.rank = 1
     order by representative."startsAt" asc nulls last, representative.title asc
   `);
+
+  return rows;
+}
+
+async function attachUnambiguousEventPageSlugs(sessions: PublicSessionDto[]): Promise<PublicSessionDto[]> {
+  // Run after all provider/override grouping so a group can never inherit the
+  // representative's page when another member points elsewhere.
+  const eventIds = [...new Set(sessions.flatMap((session) => session.groupEventIds?.length
+    ? session.groupEventIds
+    : [session.id]))];
+  if (!eventIds.length) return sessions;
+  try {
+    const pageLinks = await prisma.$queryRawUnsafe<Array<{
+      eventId: string;
+      eventPageId: string;
+      slug: string;
+    }>>(
+      `select link."eventId" as "eventId", link."eventPageId" as "eventPageId", page.slug
+       from "EventPageEvent" link
+       join "EventPage" page on page.id = link."eventPageId"
+       where link."eventId" = any($1::text[])`,
+      eventIds,
+    );
+    return sessions.map((session) => {
+      const groupIds = session.groupEventIds?.length ? session.groupEventIds : [session.id];
+      const eventPageSlug = resolveCatalogEventPageSlug(groupIds, pageLinks);
+      return eventPageSlug ? { ...session, eventPageSlug } : session;
+    });
+  } catch {
+    // EventPage migration may not be present on an older instance yet.
+    return sessions;
+  }
 }
 
 function matchesCatalogCity(session: PublicSessionDto, city: string): boolean {

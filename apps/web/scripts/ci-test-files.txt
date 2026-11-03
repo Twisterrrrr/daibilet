@@ -40,6 +40,8 @@ src/lib/venue-kind-mapping.test.ts
 src/lib/canon-invariants.test.ts
 src/lib/cruise-display-title.test.ts
 src/lib/routes.venue-canonical.test.ts
+src/lib/routes.test.ts
+src/lib/ssr-lean-payloads.test.ts
 src/lib/venue-meta.museum-art.test.ts
 src/lib/venue-meta.park-monument.test.ts
 src/lib/og-image.test.ts

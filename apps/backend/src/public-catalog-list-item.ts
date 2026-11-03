@@ -32,6 +32,7 @@ export function toPublicCatalogListItem(session: PublicSessionDto): PublicCatalo
   };
 
   if (session.slug != null) item.slug = session.slug;
+  if (session.eventPageSlug != null) item.eventPageSlug = session.eventPageSlug;
   if (session.groupKey != null) item.groupKey = session.groupKey;
   if (session.groupedEventsCount != null) item.groupedEventsCount = session.groupedEventsCount;
   if (session.sessionCount != null) item.sessionCount = session.sessionCount;
@@ -88,6 +89,7 @@ export function toPublicHomeCardSession(session: PublicSessionDto): PublicCatalo
       ...(slot.vacant != null ? { vacant: slot.vacant } : {}),
     })),
     ...(base.slug != null ? { slug: base.slug } : {}),
+    ...(base.eventPageSlug != null ? { eventPageSlug: base.eventPageSlug } : {}),
     ...(base.citySlug != null ? { citySlug: base.citySlug } : {}),
     ...(base.venueSlug != null ? { venueSlug: base.venueSlug } : {}),
     ...(base.venueAddress != null ? { venueAddress: base.venueAddress } : {}),

@@ -52,6 +52,7 @@ export function toHomeSsrSession(session: CatalogCardSession): PublicCatalogList
   };
 
   if (session.slug != null) item.slug = session.slug;
+  if (session.eventPageSlug != null) item.eventPageSlug = session.eventPageSlug;
   if (session.groupKey != null) item.groupKey = session.groupKey;
   if (session.groupedEventsCount != null) item.groupedEventsCount = session.groupedEventsCount;
   if (session.sessionCount != null) item.sessionCount = session.sessionCount;
@@ -104,6 +105,7 @@ export function toCatalogSsrItem(session: PublicCatalogListItemDto): PublicCatal
   };
 
   if (session.slug != null) item.slug = session.slug;
+  if (session.eventPageSlug != null) item.eventPageSlug = session.eventPageSlug;
   if (session.groupKey != null) item.groupKey = session.groupKey;
   if (session.groupedEventsCount != null) item.groupedEventsCount = session.groupedEventsCount;
   if (session.sessionCount != null) item.sessionCount = session.sessionCount;

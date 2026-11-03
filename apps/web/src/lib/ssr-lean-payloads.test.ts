@@ -45,6 +45,7 @@ describe('ssr-lean-payloads', () => {
   it('toHomeSsrSession drops description and caps slots', () => {
     const lean = toHomeSsrSession(
       sampleSession({
+        eventPageSlug: 'stable-event-page',
         landingSlugs: ['a', 'b', 'c'],
         manualLandingStatus: 'PINNED',
       } as Partial<PublicCatalogListItemDto>),
@@ -53,6 +54,7 @@ describe('ssr-lean-payloads', () => {
     assert.equal(lean.deeplinkUrl, undefined);
     assert.equal(lean.purchaseUrl, 'https://example.com/buy');
     assert.equal(lean.upcomingSlots?.length, 3);
+    assert.equal(lean.eventPageSlug, 'stable-event-page');
     assert.equal(lean.tags.length, 4);
     assert.equal((lean as { landingSlugs?: string[] }).landingSlugs, undefined);
     assert.equal((lean as { manualLandingStatus?: string }).manualLandingStatus, undefined);
@@ -61,10 +63,11 @@ describe('ssr-lean-payloads', () => {
   it('toCatalogSsrItem keeps full blurb and purchase CTA', () => {
     const long =
       'Три опытных комика проверят свои шутки. Состав: Глеб Капелюх, Влад Васильев, Юля Чеснокова. Приобретая билет и посещая мероприятие, вы даете согласие на осуществление организатором и третьими лицами фото- и видеосъемки.';
-    const lean = toCatalogSsrItem(sampleSession({ description: long }));
+    const lean = toCatalogSsrItem(sampleSession({ description: long, eventPageSlug: 'stable-event-page' }));
     assert.equal(lean.description, long);
     assert.equal(lean.deeplinkUrl, undefined);
     assert.equal(lean.purchaseUrl, 'https://example.com/buy');
+    assert.equal(lean.eventPageSlug, 'stable-event-page');
     assert.ok((lean.upcomingSlots?.length || 0) <= 4);
   });
 

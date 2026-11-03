@@ -42,6 +42,7 @@ export interface PublicCatalogSlotRow {
 export interface PublicCatalogMappingRow {
   id: string;
   slug: string;
+  eventPageSlug?: string | null;
   externalId: string | null;
   sourceCode: string | null;
   sourceName: string | null;
@@ -88,6 +89,18 @@ export interface PublicCatalogMappingRow {
   priceTo?: number | null;
   vacant: number | null;
   upcomingSlots: unknown;
+}
+
+export function resolveCatalogEventPageSlug(
+  groupEventIds: string[],
+  pageLinks: Array<{ eventId: string; eventPageId: string; slug: string }>,
+): string | null {
+  if (!groupEventIds.length) return null;
+  const pageByEventId = new Map(pageLinks.map((link) => [link.eventId, link]));
+  const links = groupEventIds.map((eventId) => pageByEventId.get(eventId));
+  if (links.some((link) => !link)) return null;
+  const pageIds = new Set(links.map((link) => link!.eventPageId));
+  return pageIds.size === 1 ? links[0]!.slug : null;
 }
 
 interface CityRoutingConfig {
@@ -226,6 +239,7 @@ export function mapGroupedPublicSession(
   const session: PublicSessionDto = {
     id: row.id,
     slug: publicSlug(row.slug),
+    ...(row.eventPageSlug ? { eventPageSlug: publicSlug(row.eventPageSlug) } : {}),
     sourceSlug: row.slug,
     groupKey: row.groupKey,
     groupEventIds,

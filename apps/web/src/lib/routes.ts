@@ -1,7 +1,7 @@
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 import { venueTemplate } from '@/lib/venue-kind-mapping';
 
-type EventRouteSource = Pick<PublicSessionDto, 'id' | 'slug' | 'sourceSlug' | 'title'>;
+type EventRouteSource = Pick<PublicSessionDto, 'id' | 'slug' | 'sourceSlug' | 'eventPageSlug' | 'title'>;
 type CityRouteSource = { slug?: string | null; sourceSlug?: string | null; name: string };
 type VenueRouteSource = { id: string; slug?: string | null; name: string; type?: string | null };
 
@@ -11,11 +11,17 @@ const CYRILLIC_MAP: Record<string, string> = {
   х: 'h', ц: 'c', ч: 'ch', ш: 'sh', щ: 'sch', ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya',
 };
 
+const CITY_SLUG_ALIASES: Record<string, string> = {
+  moskva: 'moscow',
+};
+
 export function eventHref(event: EventRouteSource): string {
   return `/events/${eventSlug(event)}`;
 }
 
 export function eventSlug(event: EventRouteSource): string {
+  const stablePageSlug = normalizeSlug(event.eventPageSlug);
+  if (stablePageSlug && !isOpaqueId(stablePageSlug)) return stablePageSlug;
   const explicitSlug = normalizeSlug(event.slug);
   if (explicitSlug && !isOpaqueId(explicitSlug)) return explicitSlug;
   const sourceSlug = normalizeSlug(event.sourceSlug);
@@ -31,7 +37,7 @@ export function cityHref(city: CityRouteSource): string {
 export function citySlug(city: CityRouteSource): string {
   for (const candidate of [city.slug, city.sourceSlug]) {
     const normalized = normalizeSlug(candidate);
-    if (normalized && !isOpaqueId(normalized)) return normalized;
+    if (normalized && !isOpaqueId(normalized)) return CITY_SLUG_ALIASES[normalized] || normalized;
   }
   return normalizeSlug(city.name) || 'city';
 }
