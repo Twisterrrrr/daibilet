@@ -66,6 +66,6 @@ Automated checks cover stable URL resolution, slot expansion, conflicting target
 
 1. Refresh or seed isolated staging with a current sanitized Ticketscloud snapshot; verify representative TC product groups, sibling slots, multi-venue displays, and old-slot fallback against current data. The real TEP route and metadata smoke is green.
 2. Provision the three missing representative EventPage drafts, verify exact EventID mapping, and keep them non-indexable.
-3. Reconcile legacy and historical URLs (78 current unmatched URLs and 1,305 Search Console/Webmaster historical URLs) with the full EventID/EventPage map. Preserve fallback for unresolved addresses.
+3. The available 1,521-row Search Console inventory now has an exact-ID crosswalk (see [`eventpage-search-console-crosswalk-2026-11-04.md`](./eventpage-search-console-crosswalk-2026-11-04.md)). Separately reconcile the 78 current unmatched URLs and 1,305 historical Search Console/Webmaster URLs; those are not claimed to be covered by this inventory. Preserve fallback for unresolved addresses.
 4. After staging is green, deploy the runtime code and draft assignments. Do not change production canonical/sitemap or issue redirects as part of this step.
 5. Owner/other agent supplies rewrites to EventPages. Then review and separately cut over indexing, sitemap, canonicals, and redirects with rollback coverage.
