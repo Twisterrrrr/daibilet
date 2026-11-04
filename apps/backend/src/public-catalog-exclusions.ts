@@ -17,6 +17,11 @@ const HARRY_POTTER_MUSEUM_SLUG_RE =
 export function isPublicCatalogExcludedMuseumAdmission(
   session: PublicCatalogExclusionFields,
 ): boolean {
+  const groupParts = String(session.groupKey || '').trim().toLowerCase().split('|');
+  // The merged EventPage is the single event-listing card for the Potter museum.
+  // Exclude the individual admission/slot records, but keep that canonical group.
+  if (groupParts[0] === 'merge' && groupParts[1] === 'harry-potter-spb') return false;
+
   const displayIdentity = [session.title, session.venue]
     .map((value) => String(value || '').trim())
     .filter(Boolean)

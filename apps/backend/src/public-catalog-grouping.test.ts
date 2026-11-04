@@ -92,6 +92,16 @@ test('catalog excludes Harry Potter museum admissions without hiding themed show
   assert.equal(
     isPublicCatalogExcludedMuseumAdmission(
       session({
+        title: 'Музей Гарри Поттера',
+        venue: 'Музей Гарри Поттера',
+        groupKey: 'merge|harry-potter-spb|санкт-петербург|музей гарри поттера',
+      }),
+    ),
+    false,
+  );
+  assert.equal(
+    isPublicCatalogExcludedMuseumAdmission(
+      session({
         title: 'Гарри Поттер: музыкальное шоу в планетарии',
         venue: 'Планетарий 1',
         slug: 'garri-potter-muzykalnoe-shou',
