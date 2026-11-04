@@ -111,7 +111,9 @@ sync_public_assets_deploy
 # `kind: { in: […, TEMPLE] }` 500s the whole /api/public/venues surface.
 if [[ -f package.json ]]; then
   if command -v pnpm >/dev/null 2>&1; then
-    pnpm db:generate
+    # Production node_modules are root-owned; run pnpm as root so it does not
+    # try to relink the workspace as deploy and fail on EACCES.
+    sudo -n env CI=true pnpm db:generate
   else
     npx --yes prisma generate --schema packages/db/prisma/schema.prisma
   fi
