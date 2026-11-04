@@ -13,9 +13,22 @@ Every affected page remains `DRAFT`, `isIndexable=false`, and unpublished. No ca
 
 ## Editorial editor change
 
-The EventPage editor now shows the archived source description under each linked Event, explicitly labeled “Оригинальный текст источника · не используется в EventPage”. The EventPage content editor is labeled as the active rewrite saved to the draft page. This UI change is local until its deployment completes.
+The EventPage editor now shows the archived source description under each linked Event, explicitly labeled “Оригинальный текст источника · не используется в EventPage”. The EventPage content editor is labeled as the active rewrite saved to the draft page. This UI change is deployed.
 
 Validation: `pnpm --filter @daibilet/web typecheck` and targeted ESLint on the two changed files both passed.
+
+## Expired legacy event URL fallback
+
+Production's active TypeScript public-event read model now retains an event page after its final session disappears from the saleable schedule. It returns `availability=ENDED` (or `NO_UPCOMING` when the last source date is still in the future), with no ticket offers or purchase action. The page stays available as a non-indexable fallback; published stable EventPages retain their own publication/indexability rules.
+
+Deployed in commit `9e0de8071e77bffe3f3ee5086d91c4471e3a96e5` through [CI run 41905438199](https://github.com/Twisterrrrr/daibilet/actions/runs/41905438199) and [production deploy run 41906122798](https://github.com/Twisterrrrr/daibilet/actions/runs/41906122798).
+
+Production verification for the sitemap-reported example `/events/kvartet-olgi-vesninoi-dzhazovye-divy-izmenivshie-mir-6ae313555b438d3f3e7245f5`:
+
+- API and page return HTTP 200.
+- API reports `ENDED`, 0 sessions, 0 offers, and `purchaseReady=false`.
+- HTML includes the ended-session notice, `noindex, follow`, and no Event JSON-LD.
+- Deploy smoke and delayed post-deploy observation passed. At 2026-11-04 20:35 UTC the crawler monitor reported `bot5xx=0`, `referenceErrors=0`; web/API services were active with zero restarts and local health probes returned HTTP 200.
 
 ## Still excluded
 
