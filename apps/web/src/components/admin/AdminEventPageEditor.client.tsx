@@ -332,6 +332,13 @@ export function AdminEventPageEditor({ eventId, eventSlug, eventTitle, sourceDes
                 ? item.sources.map((source) => `${source.name} (${source.code}, ID ${source.externalId})`).join(' · ')
                 : 'не указан в каталоге'}</dd></div>
             </dl>
+            <details className="mt-2 rounded border border-slate-200 bg-slate-50 p-2">
+              <summary className="cursor-pointer font-medium text-slate-700">Оригинальный текст источника · не используется в EventPage</summary>
+              <div className="mt-2 max-h-56 overflow-y-auto whitespace-pre-wrap rounded border border-slate-200 bg-white p-2 text-xs text-slate-700">
+                {item.sourceSnapshot?.description?.trim() || 'В исходной карточке описания не было.'}
+              </div>
+              {item.sourceSnapshot?.title && item.sourceSnapshot.title !== item.eventTitle ? <p className="mt-2 text-[11px] text-slate-500">Исходное название: {item.sourceSnapshot.title}</p> : null}
+            </details>
             {page.events.length > 1 ? <button
               type="button"
               disabled={Boolean(linkingEventId)}

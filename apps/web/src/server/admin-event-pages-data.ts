@@ -19,6 +19,11 @@ export type AdminEventPage = {
     eventId: string;
     position: number;
     role: string;
+    sourceSnapshot: {
+      title?: string | null;
+      slug?: string | null;
+      description?: string | null;
+    } | null;
     eventTitle: string;
     eventSlug: string;
     cityTitle: string | null;
