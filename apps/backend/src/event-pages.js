@@ -3,6 +3,8 @@ import { randomUUID } from 'node:crypto';
 const EDITORIAL_STATUSES = new Set(['DRAFT', 'REVIEW', 'READY']);
 const ROUTE_KINDS = new Set(['CANDIDATE', 'HISTORICAL', 'CURRENT']);
 const MAX_CONTENT_BYTES = 200_000;
+const MAX_EVENT_PAGE_BATCH_APPEND_IDS = 5_000;
+const EVENT_PAGE_BATCH_INSERT_SIZE = 500;
 const CITY_TRANSLITERATION = {
   а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z', и: 'i', й: 'y',
   к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f',
@@ -84,6 +86,15 @@ function normalizeEventIds(value) {
   if (!Array.isArray(value) || value.length < 1 || value.length > 50) throw new Error('eventIds must contain 1-50 Event ids');
   const ids = value.map((id) => requiredText(id, 'eventId', 120));
   if (new Set(ids).size !== ids.length) throw new Error('eventIds must be unique');
+  return ids;
+}
+
+function normalizeEventPageBatchAppendIds(value) {
+  if (!Array.isArray(value) || value.length < 1 || value.length > MAX_EVENT_PAGE_BATCH_APPEND_IDS) {
+    throw new Error(`eventIds must contain 1-${MAX_EVENT_PAGE_BATCH_APPEND_IDS} Event ids for batch append`);
+  }
+  const ids = value.map((id) => requiredText(id, 'eventId', 120));
+  if (new Set(ids).size !== ids.length) throw new Error('eventIds must be unique within the batch');
   return ids;
 }
 
@@ -963,6 +974,147 @@ export async function replaceAdminEventPageEvents(db, id, payload, actorId = nul
       sourceState,
     });
     return readPage(query, id);
+  });
+}
+
+/**
+ * Append a large, explicitly reviewed Event ID batch without replacing existing links.
+ * The request is atomic; up to 5,000 IDs are accepted and inserted in SQL chunks of 500.
+ * Repeating a successful request is safe: IDs already linked to this page are reported,
+ * while IDs owned by another page reject the whole transaction.
+ */
+export async function appendAdminEventPageEventsBatch(db, id, payload, actorId = null) {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) throw new Error('Invalid EventPage batch payload');
+  const eventIds = normalizeEventPageBatchAppendIds(payload.eventIds);
+  const changeNote = optionalText(payload.changeNote, 'changeNote', 1000);
+
+  return db.transaction(async ({ query }) => {
+    const pageResult = await query(`SELECT * FROM "EventPage" WHERE id = $1 FOR UPDATE`, [id]);
+    const page = pageResult.rows[0];
+    if (!page) return null;
+    if (page.publishedAt != null || page.isIndexable === true) {
+      throw new Error('Batch EventPage links can only be changed before publication');
+    }
+
+    const sourceResult = await query(`
+      SELECT event.id, event.title, event.slug, event.description, event_override."shortDescription",
+        event."imageUrl", event."seoH1", event."seoTitle", event."seoDescription",
+        event."canonicalPath", event."isIndexable", event.kind, event."purchaseFlow",
+        event."managementMode", event."primaryCityId", city.title AS "cityTitle", event."venueId",
+        venue.title AS "venueTitle", venue.address AS "venueAddress", supplier.title AS "supplierTitle",
+        COALESCE(source_data.sources, '[]'::jsonb) AS sources
+      FROM "Event" event
+      LEFT JOIN "EventOverride" event_override ON event_override."eventId" = event.id
+      LEFT JOIN "City" city ON city.id = event."primaryCityId"
+      LEFT JOIN "Venue" venue ON venue.id = event."venueId"
+      LEFT JOIN "Supplier" supplier ON supplier.id = COALESCE(event."supplierId", (
+        SELECT supplier_event."supplierId" FROM "SupplierEvent" supplier_event
+        WHERE supplier_event."eventId" = event.id AND supplier_event."isActive" IS TRUE
+        ORDER BY supplier_event."isPrimary" DESC, supplier_event."createdAt" ASC LIMIT 1
+      ))
+      LEFT JOIN LATERAL (
+        SELECT jsonb_agg(jsonb_build_object(
+          'code', source.code, 'name', source.name,
+          'externalId', source_link."externalId", 'metaExternalId', source_link."metaExternalId",
+          'sourceUrl', source_link."sourceUrl"
+        ) ORDER BY source.code, source_link."externalId") AS sources
+        FROM "EventSourceLink" source_link JOIN "Source" source ON source.id = source_link."sourceId"
+        WHERE source_link."eventId" = event.id
+      ) source_data ON true
+      WHERE event.id = ANY($1::text[])
+    `, [eventIds]);
+    if (sourceResult.rows.length !== eventIds.length) throw new Error('One or more Event ids do not exist');
+
+    const existingLinks = await query(`
+      SELECT "eventId", "eventPageId"
+      FROM "EventPageEvent"
+      WHERE "eventId" = ANY($1::text[])
+      FOR UPDATE
+    `, [eventIds]);
+    const existingByEvent = new Map(existingLinks.rows.map((row) => [row.eventId, row.eventPageId]));
+    const conflicts = existingLinks.rows.filter((row) => row.eventPageId !== id).map((row) => row.eventId);
+    if (conflicts.length) {
+      throw new Error(`Event ids already belong to another EventPage: ${conflicts.slice(0, 20).join(', ')}${conflicts.length > 20 ? '…' : ''}`);
+    }
+
+    const alreadyLinkedEventIds = eventIds.filter((eventId) => existingByEvent.get(eventId) === id);
+    const newEventIds = eventIds.filter((eventId) => !existingByEvent.has(eventId));
+    if (!newEventIds.length) {
+      const countResult = await query(`SELECT count(*)::int AS "eventCount" FROM "EventPageEvent" WHERE "eventPageId" = $1`, [id]);
+      return {
+        id: page.id,
+        slug: page.slug,
+        status: page.status,
+        addedCount: 0,
+        alreadyLinkedCount: alreadyLinkedEventIds.length,
+        eventCount: countResult.rows[0]?.eventCount ?? 0,
+        addedEventIds: [],
+        alreadyLinkedEventIds,
+      };
+    }
+
+    const sourceByEvent = new Map(sourceResult.rows.map((row) => [row.id, row]));
+    const existingCountResult = await query(`
+      SELECT count(*)::int AS "eventCount", COALESCE(max(position), -1)::int AS "maxPosition"
+      FROM "EventPageEvent" WHERE "eventPageId" = $1
+    `, [id]);
+    const previousEventCount = Number(existingCountResult.rows[0]?.eventCount ?? 0);
+    const firstPosition = Number(existingCountResult.rows[0]?.maxPosition ?? -1) + 1;
+
+    for (let offset = 0; offset < newEventIds.length; offset += EVENT_PAGE_BATCH_INSERT_SIZE) {
+      const chunk = newEventIds.slice(offset, offset + EVENT_PAGE_BATCH_INSERT_SIZE);
+      const values = [];
+      const params = [];
+      for (const [chunkPosition, eventId] of chunk.entries()) {
+        const position = firstPosition + offset + chunkPosition;
+        const source = sourceByEvent.get(eventId);
+        const base = params.length;
+        params.push(randomUUID(), id, eventId, position, position === 0 ? 'PRIMARY' : 'PURCHASE_OPTION', JSON.stringify(source));
+        values.push(`($${base + 1}, $${base + 2}, $${base + 3}, $${base + 4}, $${base + 5}, $${base + 6}::jsonb)`);
+      }
+      await query(`
+        INSERT INTO "EventPageEvent" (id, "eventPageId", "eventId", position, role, "sourceSnapshot")
+        VALUES ${values.join(', ')}
+      `, params);
+    }
+
+    await query(`UPDATE "EventPage" SET "updatedAt" = now() WHERE id = $1`, [id]);
+    const membershipResult = await query(`
+      SELECT "eventId", position, role FROM "EventPageEvent"
+      WHERE "eventPageId" = $1 ORDER BY position, "createdAt"
+    `, [id]);
+    const routesResult = await query(`
+      SELECT path, kind, source, "createdAt" FROM "EventPageRoute"
+      WHERE "eventPageId" = $1 ORDER BY "createdAt"
+    `, [id]);
+    const tourGroupResult = await query(`SELECT "tourGroupId" FROM "EventPage" WHERE id = $1`, [id]);
+    const sourceState = {
+      events: membershipResult.rows,
+      routes: routesResult.rows,
+      tourGroupId: tourGroupResult.rows[0]?.tourGroupId ?? null,
+      batchAppend: {
+        addedEventIds: newEventIds,
+        alreadyLinkedEventIds,
+        previousEventCount,
+        eventCount: previousEventCount + newEventIds.length,
+      },
+    };
+    await appendPageRevision(query, id, page, {
+      changeNote: changeNote || `Пакетно добавлено Event ID: ${newEventIds.length}`,
+      actorId,
+      sourceState,
+    });
+
+    return {
+      id: page.id,
+      slug: page.slug,
+      status: page.status,
+      addedCount: newEventIds.length,
+      alreadyLinkedCount: alreadyLinkedEventIds.length,
+      eventCount: previousEventCount + newEventIds.length,
+      addedEventIds: newEventIds,
+      alreadyLinkedEventIds,
+    };
   });
 }
 

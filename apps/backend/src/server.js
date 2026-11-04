@@ -8,6 +8,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createDb } from './db.js';
 import {
   addAdminEventPageRoute,
+  appendAdminEventPageEventsBatch,
   assignAdminEventPageTourGroup,
   createAdminEventPage,
   createAdminEventTourGroup,
@@ -847,6 +848,26 @@ export async function handleRequest(request, response) {
       } catch (error) {
         const message = error instanceof Error ? error.message : 'invalid_event_page';
         const status = /unique|duplicate/i.test(message) ? 409 : 400;
+        sendJson(response, { error: message }, status);
+      }
+      return;
+    }
+
+    const eventPageBatchAppendMatch = request.method === 'POST'
+      ? url.pathname.match(/^\/api\/admin\/event-pages\/([^/]+)\/events\/batch$/)
+      : null;
+    if (eventPageBatchAppendMatch) {
+      try {
+        const result = await appendAdminEventPageEventsBatch(
+          db,
+          decodeURIComponent(eventPageBatchAppendMatch[1]),
+          await readJsonBody(request),
+        );
+        if (result?.addedCount) invalidatePublicCaches('event page event batch appended');
+        sendJson(response, result || { error: 'event_page_not_found' }, result ? 200 : 404);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'invalid_event_page_batch';
+        const status = /already belong|published|unique|duplicate/i.test(message) ? 409 : 400;
         sendJson(response, { error: message }, status);
       }
       return;
