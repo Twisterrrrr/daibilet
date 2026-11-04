@@ -43,6 +43,57 @@ test('maps a dated slot through its same-city Ticketscloud product title only wh
   assert.equal(call, 2);
 });
 
+test('maps explicitly grouped Events to their unique same-city same-venue EventPage without TC metadata', async () => {
+  const pageRows = [{ groupKey: JSON.stringify(['harry-potter-spb', 'spb', 'museum']), pageId: 'page-hp', slug: 'muzei-garri-pottera-sankt-peterburg' }];
+  let call = 0;
+  const db = {
+    async query(sql: string, params: unknown[]) {
+      call += 1;
+      if (call === 1) {
+        assert.deepEqual(params, [['combo-1-slot', 'combo-2-slot']]);
+        return { rows: [1, 2].map((number) => ({
+          eventId: `combo-${number}-slot`, title: `Комбо ${number}`, cityId: 'spb', venueId: 'museum',
+          mergeGroupKey: 'harry-potter-spb', directPageId: null, directPageSlug: null,
+          metaCount: 0, sourceId: null, metaExternalId: null,
+        })) };
+      }
+      assert.match(sql, /EventOverride/);
+      assert.match(sql, /EventPageEvent/);
+      assert.deepEqual(JSON.parse(String(params[0])), [{
+        groupKey: JSON.stringify(['harry-potter-spb', 'spb', 'museum']),
+        mergeGroupKey: 'harry-potter-spb', cityId: 'spb', venueId: 'museum', eventIds: ['combo-1-slot', 'combo-2-slot'],
+      }]);
+      return { rows: pageRows };
+    },
+  };
+
+  const result = await resolveEventPageSlugsForEventIds(['combo-1-slot', 'combo-2-slot'], db);
+  assert.equal(result.get('combo-1-slot'), 'muzei-garri-pottera-sankt-peterburg');
+  assert.equal(result.get('combo-2-slot'), 'muzei-garri-pottera-sankt-peterburg');
+  assert.equal(call, 2);
+});
+
+test('does not map an explicit merge group when its Events point to multiple EventPages', async () => {
+  let call = 0;
+  const db = {
+    async query() {
+      call += 1;
+      if (call === 1) return { rows: [{
+        eventId: 'combo-slot', title: 'Комбо 1', cityId: 'spb', venueId: 'museum',
+        mergeGroupKey: 'harry-potter-spb', directPageId: null, directPageSlug: null,
+        metaCount: 0, sourceId: null, metaExternalId: null,
+      }] };
+      return { rows: [
+        { groupKey: JSON.stringify(['harry-potter-spb', 'spb', 'museum']), pageId: 'page-1', slug: 'potter-a' },
+        { groupKey: JSON.stringify(['harry-potter-spb', 'spb', 'museum']), pageId: 'page-2', slug: 'potter-b' },
+      ] };
+    },
+  };
+  const result = await resolveEventPageSlugsForEventIds(['combo-slot'], db);
+  assert.equal(result.has('combo-slot'), false);
+  assert.equal(call, 2);
+});
+
 test('published article links for a slot use its stable EventPage path', async () => {
   let call = 0;
   const db = {

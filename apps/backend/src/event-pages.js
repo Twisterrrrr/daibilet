@@ -5,6 +5,11 @@ const ROUTE_KINDS = new Set(['CANDIDATE', 'HISTORICAL', 'CURRENT']);
 const MAX_CONTENT_BYTES = 200_000;
 const MAX_EVENT_PAGE_BATCH_APPEND_IDS = 5_000;
 const EVENT_PAGE_BATCH_INSERT_SIZE = 500;
+const HARRY_POTTER_SPB_CITY_ID = 'city_498817';
+const HARRY_POTTER_SPB_VENUE_ID = 'venue_683e8e0935b8fc7a60f565d3';
+const HARRY_POTTER_SPB_MERGE_KEY = 'harry-potter-spb';
+const HARRY_POTTER_SPB_TITLE = 'Музей Гарри Поттера';
+const HARRY_POTTER_SPB_SLUG = 'muzei-garri-pottera-sankt-peterburg';
 const CITY_TRANSLITERATION = {
   а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z', и: 'i', й: 'y',
   к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f',
@@ -42,6 +47,149 @@ export function eventPageCandidateSlug(eventSlug, eventId) {
     }
   }
   return transliterateEventSlug(withoutIdentity) || transliterateEventSlug(eventId) || 'event';
+}
+
+function isHarryPotterNumberedCombo(event) {
+  if (String(event?.status || '').toUpperCase() === 'HIDDEN') return false;
+  return String(event?.primaryCityId || '') === HARRY_POTTER_SPB_CITY_ID &&
+    String(event?.venueId || '') === HARRY_POTTER_SPB_VENUE_ID &&
+    /^комбо\s+[1-7]\s*$/iu.test(String(event?.title || '').trim());
+}
+
+async function markHarryPotterComboForMerge(client, eventId) {
+  const result = await client.query(`
+    INSERT INTO "EventOverride" ("id", "eventId", title, "mergeGroupKey", "updatedAt")
+    VALUES ($1, $2, $3, $4, now())
+    ON CONFLICT ("eventId") DO UPDATE SET
+      title = EXCLUDED.title,
+      "mergeGroupKey" = EXCLUDED."mergeGroupKey",
+      "updatedAt" = now()
+    WHERE "EventOverride"."mergeGroupKey" IS NULL
+      OR "EventOverride"."mergeGroupKey" = EXCLUDED."mergeGroupKey"
+    RETURNING "eventId"
+  `, [randomUUID(), eventId, HARRY_POTTER_SPB_TITLE, HARRY_POTTER_SPB_MERGE_KEY]);
+  return result.rows.length === 1;
+}
+
+async function isEmptyHarryPotterDraftShell(client, pageId) {
+  const result = await client.query(`
+    SELECT page.id
+    FROM "EventPage" page
+    WHERE page.id = $1 AND page.status = 'DRAFT' AND page."publishedAt" IS NULL
+      AND page."isIndexable" IS FALSE AND page.summary IS NULL
+      AND page.content = '{"sections":[]}'::jsonb
+      AND (SELECT count(*) FROM "EventPageEvent" link WHERE link."eventPageId" = page.id) = 1
+      AND (SELECT count(*) FROM "EventPageRevision" revision WHERE revision."eventPageId" = page.id) = 1
+      AND (SELECT count(*) FROM "EventPageRoute" route WHERE route."eventPageId" = page.id) = 1
+      AND EXISTS (
+        SELECT 1 FROM "EventPageRoute" route
+        WHERE route."eventPageId" = page.id AND route.kind = 'CANDIDATE'
+          AND route.source = 'event-page-draft' AND route.path = '/events/' || page.slug
+      )
+  `, [pageId]);
+  return result.rows.length === 1;
+}
+
+async function isSafeHarryPotterDraftTarget(client, pageId) {
+  const result = await client.query(`
+    SELECT page.id
+    FROM "EventPage" page
+    WHERE page.id = $1 AND page.status = 'DRAFT' AND page."publishedAt" IS NULL
+      AND page."isIndexable" IS FALSE AND page.summary IS NULL
+      AND page.content = '{"sections":[]}'::jsonb
+  `, [pageId]);
+  return result.rows.length === 1;
+}
+
+async function renameHarryPotterDraftPage(client, pageId) {
+  const currentResult = await client.query(`SELECT * FROM "EventPage" WHERE id = $1 FOR UPDATE`, [pageId]);
+  const current = currentResult.rows[0];
+  if (!current) return null;
+  if (current.slug === HARRY_POTTER_SPB_SLUG) return { id: current.id, slug: current.slug };
+  if (!(await isEmptyHarryPotterDraftShell(client, pageId))) return { id: current.id, slug: current.slug };
+
+  const newPath = `/events/${HARRY_POTTER_SPB_SLUG}`;
+  const pathConflict = await client.query(`
+    SELECT 1 FROM "EventPage" WHERE slug = $1 AND id <> $2
+    UNION ALL
+    SELECT 1 FROM "EventPageRoute" WHERE path = $3 AND "eventPageId" <> $2
+    LIMIT 1
+  `, [HARRY_POTTER_SPB_SLUG, pageId, newPath]);
+  if (pathConflict.rows.length) return { id: current.id, slug: current.slug };
+
+  await client.query(`
+    UPDATE "EventPageRoute" SET source = 'reused-draft-shell'
+    WHERE "eventPageId" = $1 AND path = '/events/' || $2 AND kind = 'CANDIDATE'
+  `, [pageId, current.slug]);
+  await client.query(`
+    UPDATE "EventPage" SET slug = $2, title = $3, "seoH1" = $3, "seoTitle" = $4, "updatedAt" = now()
+    WHERE id = $1
+  `, [pageId, HARRY_POTTER_SPB_SLUG, HARRY_POTTER_SPB_TITLE, `${HARRY_POTTER_SPB_TITLE} | Дайбилет`]);
+  await client.query(`
+    INSERT INTO "EventPageRoute" (id, "eventPageId", path, kind, source)
+    VALUES ($1, $2, $3, 'CANDIDATE', 'event-page-draft')
+    ON CONFLICT (path) DO NOTHING
+  `, [randomUUID(), pageId, newPath]);
+  const query = (text, params) => client.query(text, params);
+  const sourceState = await currentSourceState(query, pageId);
+  await appendPageRevision(query, pageId, { ...current, slug: HARRY_POTTER_SPB_SLUG, title: HARRY_POTTER_SPB_TITLE }, {
+    changeNote: 'Черновик комбо объединён в EventPage Музея Гарри Поттера',
+    sourceState,
+  });
+  return { id: pageId, slug: HARRY_POTTER_SPB_SLUG };
+}
+
+async function consolidateHarryPotterDraftPages(client, eventId) {
+  const group = await client.query(`
+    SELECT DISTINCT page.id, page.slug, page."createdAt"
+    FROM "EventPageEvent" page_link
+    JOIN "EventPage" page ON page.id = page_link."eventPageId"
+    JOIN "Event" linked_event ON linked_event.id = page_link."eventId"
+    JOIN "EventOverride" linked_override ON linked_override."eventId" = linked_event.id
+    WHERE linked_override."mergeGroupKey" = $1
+      AND linked_event."primaryCityId" = $2 AND linked_event."venueId" = $3
+    ORDER BY page."createdAt", page.id
+  `, [HARRY_POTTER_SPB_MERGE_KEY, HARRY_POTTER_SPB_CITY_ID, HARRY_POTTER_SPB_VENUE_ID]);
+  if (!group.rows.length) return null;
+
+  const canonical = group.rows.find((page) => page.slug === HARRY_POTTER_SPB_SLUG);
+  let target = canonical || group.rows[0];
+  if (!(await isSafeHarryPotterDraftTarget(client, target.id))) return null;
+  if (!canonical && !(await isEmptyHarryPotterDraftShell(client, target.id))) return null;
+  for (const page of group.rows) {
+    if (page.id !== target.id && !(await isEmptyHarryPotterDraftShell(client, page.id))) return null;
+  }
+
+  if (!canonical && await isEmptyHarryPotterDraftShell(client, target.id)) {
+    const renamed = await renameHarryPotterDraftPage(client, target.id);
+    if (renamed?.slug === HARRY_POTTER_SPB_SLUG) target = { ...target, slug: renamed.slug };
+  }
+
+  const linked = await client.query(`
+    SELECT DISTINCT page_link."eventId", linked_event.title
+    FROM "EventPageEvent" page_link
+    JOIN "Event" linked_event ON linked_event.id = page_link."eventId"
+    JOIN "EventOverride" linked_override ON linked_override."eventId" = linked_event.id
+    WHERE linked_override."mergeGroupKey" = $1
+      AND linked_event."primaryCityId" = $2 AND linked_event."venueId" = $3
+    ORDER BY page_link."eventId"
+  `, [HARRY_POTTER_SPB_MERGE_KEY, HARRY_POTTER_SPB_CITY_ID, HARRY_POTTER_SPB_VENUE_ID]);
+  const currentEvent = await client.query(`SELECT id, title FROM "Event" WHERE id = $1`, [eventId]);
+  const currentProductKey = normalizeEventProductTitle(currentEvent.rows[0]?.title);
+  const alreadyLinkedProduct = linked.rows.some((row) => normalizeEventProductTitle(row.title) === currentProductKey);
+  const eventIds = [...new Set([
+    ...linked.rows.map((row) => row.eventId),
+    ...(!alreadyLinkedProduct && currentProductKey ? [eventId] : []),
+  ])];
+  if (group.rows.length > 1 || (!alreadyLinkedProduct && currentProductKey)) {
+    const adapter = { transaction: (callback) => callback({ query: (sql, params) => client.query(sql, params) }) };
+    await replaceAdminEventPageEvents(adapter, target.id, {
+      eventIds,
+      changeNote: 'Одна EventPage на музей; каждый вид комбо представлен одной билетной опцией, слоты остаются у поставщика',
+    });
+  }
+
+  return { id: target.id, slug: target.slug };
 }
 
 function requiredText(value, field, max = 500) {
@@ -615,17 +763,32 @@ export async function ensureDraftEventPageForEvent(client, eventId) {
     FROM "EventPageEvent" link JOIN "EventPage" page ON page.id = link."eventPageId"
     WHERE link."eventId" = $1 LIMIT 1
   `, [eventId]);
-  if (existing.rows[0]) return { created: false, ...existing.rows[0] };
+  if (existing.rows[0]) {
+    const linkedEvent = await client.query(`
+      SELECT id, title, status, "primaryCityId", "venueId"
+      FROM "Event" WHERE id = $1 LIMIT 1
+    `, [eventId]);
+    if (isHarryPotterNumberedCombo(linkedEvent.rows[0])) {
+      if (await markHarryPotterComboForMerge(client, eventId)) {
+        await client.query('SELECT pg_advisory_xact_lock(hashtext($1))', [`event-page-merge:${HARRY_POTTER_SPB_MERGE_KEY}`]);
+        const consolidated = await consolidateHarryPotterDraftPages(client, eventId);
+        if (consolidated) return { created: false, grouped: true, ...consolidated };
+      }
+    }
+    return { created: false, ...existing.rows[0] };
+  }
 
   const source = await client.query(`
     SELECT event.id, event.slug, event.title, event.status, event.kind,
       event.description, event."imageUrl", event."seoH1", event."seoTitle",
       event."seoDescription", event."primaryCityId", city.title AS "cityTitle",
       event."venueId", venue.title AS "venueTitle", venue.address AS "venueAddress", supplier.title AS "supplierTitle",
+      event_override.title AS "overrideTitle",
       COALESCE(source_data.sources, '[]'::jsonb) AS sources
     FROM "Event" event
     LEFT JOIN "City" city ON city.id = event."primaryCityId"
     LEFT JOIN "Venue" venue ON venue.id = event."venueId"
+    LEFT JOIN "EventOverride" event_override ON event_override."eventId" = event.id
     LEFT JOIN "Supplier" supplier ON supplier.id = COALESCE(event."supplierId", (
       SELECT supplier_event."supplierId" FROM "SupplierEvent" supplier_event
       WHERE supplier_event."eventId" = event.id AND supplier_event."isActive" IS TRUE
@@ -649,6 +812,7 @@ export async function ensureDraftEventPageForEvent(client, eventId) {
     String(event.id || '').toLowerCase().startsWith('evt_stub_')
   ) return null;
 
+  const isHarryPotterCombo = isHarryPotterNumberedCombo(event);
   const availability = await client.query(`
     SELECT EXISTS (
       SELECT 1 FROM "EventOffer" offer
@@ -675,6 +839,23 @@ export async function ensureDraftEventPageForEvent(client, eventId) {
     FROM "Event" event WHERE event.id = $1
   `, [eventId]);
   if (availability.rows[0]?.available !== true) return null;
+
+  if (isHarryPotterCombo) {
+    if (!(await markHarryPotterComboForMerge(client, eventId))) return null;
+    await client.query('SELECT pg_advisory_xact_lock(hashtext($1))', [`event-page-merge:${HARRY_POTTER_SPB_MERGE_KEY}`]);
+    const consolidated = await consolidateHarryPotterDraftPages(client, eventId);
+    if (consolidated) return { created: false, grouped: true, ...consolidated };
+    const existingGroupPage = await client.query(`
+      SELECT 1
+      FROM "EventPageEvent" page_link
+      JOIN "Event" linked_event ON linked_event.id = page_link."eventId"
+      JOIN "EventOverride" linked_override ON linked_override."eventId" = linked_event.id
+      WHERE linked_override."mergeGroupKey" = $1
+        AND linked_event."primaryCityId" = $2 AND linked_event."venueId" = $3
+      LIMIT 1
+    `, [HARRY_POTTER_SPB_MERGE_KEY, HARRY_POTTER_SPB_CITY_ID, HARRY_POTTER_SPB_VENUE_ID]);
+    if (existingGroupPage.rows.length) return null;
+  }
 
   // TC metaExternalId is an explicit parent/product identity. Group automatically
   // only inside the same city, and only when it currently points to exactly one
@@ -717,15 +898,18 @@ export async function ensureDraftEventPageForEvent(client, eventId) {
     }
   }
 
-  const candidate = eventPageCandidateSlug(event.slug, event.id);
+  const candidate = isHarryPotterCombo
+    ? HARRY_POTTER_SPB_SLUG
+    : eventPageCandidateSlug(event.slug, event.id);
+  const pageTitle = String(event.overrideTitle || event.title || 'Событие').trim();
   const adapter = { transaction: (callback) => callback({ query: (sql, params) => client.query(sql, params) }) };
   const page = await createAdminEventPage(adapter, {
     slug: candidate,
-    title: String(event.title || 'Событие').trim(),
+    title: pageTitle,
     summary: null,
     content: { sections: [] },
-    seoH1: String(event.title || 'Событие').trim(),
-    seoTitle: `${String(event.title || 'Событие').trim()} | Дайбилет`,
+    seoH1: pageTitle,
+    seoTitle: `${pageTitle} | Дайбилет`,
     seoDescription: null,
     canonicalPath: null,
     eventIds: [eventId],

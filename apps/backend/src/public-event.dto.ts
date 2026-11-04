@@ -303,7 +303,7 @@ async function loadPublicEventDto(
         include: eventInclude,
       })
     : [];
-  const mergeGroupMembers = await loadMergeGroupMembers(requestedEvent);
+  const mergeGroupMembers = await loadMergeGroupMembers([requestedEvent, ...stablePageEvents]);
   const metaGroupMembers = await loadMetaGroupMembers(requestedEvent);
   const requestedSessionContext = inheritedSessionContext === undefined
     ? mergeGroupMembers.length || metaGroupMembers.length
@@ -1044,15 +1044,24 @@ function normalizeMergeGroupKey(value: string | null | undefined): string | null
   return normalized || null;
 }
 
-async function loadMergeGroupMembers(requestedEvent: EventRecord): Promise<EventRecord[]> {
-  const mergeGroupKey = normalizeMergeGroupKey(requestedEvent.override?.mergeGroupKey);
-  if (!mergeGroupKey) return [];
-
+async function loadMergeGroupMembers(requestedEvents: EventRecord[]): Promise<EventRecord[]> {
+  const groups = new Map<string, { mergeGroupKey: string; cityId: string; venueId: string | null }>();
+  for (const event of requestedEvents) {
+    const mergeGroupKey = normalizeMergeGroupKey(event.override?.mergeGroupKey);
+    const cityId = event.primaryCityId;
+    if (!mergeGroupKey || !cityId) continue;
+    const venueId = event.venueId || null;
+    groups.set(JSON.stringify([mergeGroupKey, cityId, venueId]), { mergeGroupKey, cityId, venueId });
+  }
+  if (!groups.size) return [];
   return prisma.event.findMany({
     where: {
       status: { notIn: ['HIDDEN', 'DRAFT'] },
-      primaryCityId: requestedEvent.primaryCityId,
-      override: { mergeGroupKey },
+      OR: [...groups.values()].map(({ mergeGroupKey, cityId, venueId }) => ({
+        primaryCityId: cityId,
+        venueId,
+        override: { mergeGroupKey },
+      })),
     },
     include: eventInclude,
   });

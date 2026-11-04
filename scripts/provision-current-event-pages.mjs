@@ -17,25 +17,39 @@ const eligibleEvents = await db.query(`
   FROM "Event" event
   WHERE upper(coalesce(event.status::text, '')) <> 'HIDDEN'
     AND lower(event.id) NOT LIKE 'evt_stub_%'
-    AND EXISTS (
-      SELECT 1 FROM "EventOffer" offer
-      WHERE offer."eventId" = event.id AND offer.active IS NOT FALSE
-        AND (
-          (upper(event.kind::text) = 'OPEN_DATE'
-            AND (event."openDateValidTo" IS NULL OR event."openDateValidTo" >= now()))
-          OR EXISTS (
-            SELECT 1 FROM "EventSession" session
-            WHERE session."eventId" = event.id AND session."isActive" IS NOT FALSE
-              AND session."cancelledAt" IS NULL
-              AND lower(coalesce(session."sourceStatus", '')) NOT IN
-                ('widget_blocked', 'paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden', 'stand_by', 'closed', 'sales_closed', 'sale_closed', 'not_for_sale')
-              AND (
-                (session."startsAt" IS NOT NULL AND session."startsAt" >= now() - interval '15 minutes')
-                OR (session."startsAt" IS NOT NULL AND session."endsAt" IS NOT NULL
-                  AND session."startsAt" < now() AND session."endsAt" >= now()
-                  AND session."endsAt" - session."startsAt" < interval '36 hours')
-                OR lower(coalesce(session."sourceStatus", '')) IN ('open_date', 'widget')
-              )
+    AND (
+      EXISTS (
+        SELECT 1
+        FROM "EventPageEvent" page_link
+        JOIN "EventPage" page ON page.id = page_link."eventPageId"
+        WHERE page_link."eventId" = event.id
+          AND page.status = 'DRAFT' AND page."publishedAt" IS NULL
+          AND page."isIndexable" IS FALSE AND page.summary IS NULL
+          AND page.content = '{"sections":[]}'::jsonb
+          AND event."primaryCityId" = 'city_498817'
+          AND event."venueId" = 'venue_683e8e0935b8fc7a60f565d3'
+          AND event.title ~* '^комбо[[:space:]]+[1-7][[:space:]]*$'
+      )
+      OR EXISTS (
+        SELECT 1 FROM "EventOffer" offer
+        WHERE offer."eventId" = event.id AND offer.active IS NOT FALSE
+          AND (
+            (upper(event.kind::text) = 'OPEN_DATE'
+              AND (event."openDateValidTo" IS NULL OR event."openDateValidTo" >= now()))
+            OR EXISTS (
+              SELECT 1 FROM "EventSession" session
+              WHERE session."eventId" = event.id AND session."isActive" IS NOT FALSE
+                AND session."cancelledAt" IS NULL
+                AND lower(coalesce(session."sourceStatus", '')) NOT IN
+                  ('widget_blocked', 'paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden', 'stand_by', 'closed', 'sales_closed', 'sale_closed', 'not_for_sale')
+                AND (
+                  (session."startsAt" IS NOT NULL AND session."startsAt" >= now() - interval '15 minutes')
+                  OR (session."startsAt" IS NOT NULL AND session."endsAt" IS NOT NULL
+                    AND session."startsAt" < now() AND session."endsAt" >= now()
+                    AND session."endsAt" - session."startsAt" < interval '36 hours')
+                  OR lower(coalesce(session."sourceStatus", '')) IN ('open_date', 'widget')
+                )
+            )
           )
         )
     )

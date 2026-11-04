@@ -38,12 +38,15 @@ export async function resolveEventPageSlugsForEventIds(
     const directResult = await db.query(`
       SELECT requested_event.id AS "eventId", requested_event.title,
         requested_event."primaryCityId" AS "cityId",
+        requested_event."venueId" AS "venueId",
+        event_override."mergeGroupKey" AS "mergeGroupKey",
         direct_page.id AS "directPageId", direct_page.slug AS "directPageSlug",
         tc_meta."sourceId", tc_meta."metaExternalId", tc_meta."metaCount",
         provider_identity."organizerId", provider_identity."sellerId"
       FROM "Event" requested_event
       LEFT JOIN "EventPageEvent" direct_link ON direct_link."eventId" = requested_event.id
       LEFT JOIN "EventPage" direct_page ON direct_page.id = direct_link."eventPageId"
+      LEFT JOIN "EventOverride" event_override ON event_override."eventId" = requested_event.id
       LEFT JOIN LATERAL (
         SELECT min(link."sourceId") AS "sourceId",
           min(trim(link."metaExternalId")) AS "metaExternalId",
@@ -70,6 +73,53 @@ export async function resolveEventPageSlugsForEventIds(
     const eventPageByEventId = new Map<string, string>();
     for (const row of directResult.rows) {
       if (row.directPageId && row.directPageSlug) eventPageByEventId.set(String(row.eventId), String(row.directPageSlug));
+    }
+
+    const mergeGroups = new Map<string, { mergeGroupKey: string; cityId: string | null; venueId: string | null; eventIds: string[] }>();
+    for (const row of directResult.rows) {
+      if (eventPageByEventId.has(String(row.eventId))) continue;
+      const mergeGroupKey = String(row.mergeGroupKey || '').trim();
+      if (!mergeGroupKey) continue;
+      const cityId = row.cityId == null ? null : String(row.cityId);
+      const venueId = row.venueId == null ? null : String(row.venueId);
+      const groupKey = JSON.stringify([mergeGroupKey, cityId, venueId]);
+      const group = mergeGroups.get(groupKey) || { mergeGroupKey, cityId, venueId, eventIds: [] };
+      group.eventIds.push(String(row.eventId));
+      mergeGroups.set(groupKey, group);
+    }
+    if (mergeGroups.size) {
+      const mergeGroupRows = await db.query(`
+        WITH requested_groups AS (
+          SELECT * FROM jsonb_to_recordset($1::jsonb) AS item(
+            "groupKey" text, "mergeGroupKey" text, "cityId" text, "venueId" text
+          )
+        )
+        SELECT groups."groupKey", page.id AS "pageId", page.slug
+        FROM requested_groups groups
+        JOIN "Event" linked_event
+          ON linked_event."primaryCityId" IS NOT DISTINCT FROM groups."cityId"
+         AND linked_event."venueId" IS NOT DISTINCT FROM groups."venueId"
+        JOIN "EventOverride" linked_override
+          ON linked_override."eventId" = linked_event.id
+         AND linked_override."mergeGroupKey" = groups."mergeGroupKey"
+        JOIN "EventPageEvent" page_link ON page_link."eventId" = linked_event.id
+        JOIN "EventPage" page ON page.id = page_link."eventPageId"
+      `, [JSON.stringify([...mergeGroups.entries()].map(([groupKey, group]) => ({ groupKey, ...group })))]);
+      const pagesByMergeGroup = new Map<string, Map<string, string>>();
+      for (const row of mergeGroupRows.rows) {
+        const groupKey = String(row.groupKey);
+        if (!row.pageId || !row.slug) continue;
+        const pages = pagesByMergeGroup.get(groupKey) || new Map<string, string>();
+        pages.set(String(row.pageId), String(row.slug));
+        pagesByMergeGroup.set(groupKey, pages);
+      }
+      for (const [groupKey, group] of mergeGroups) {
+        const pages = pagesByMergeGroup.get(groupKey);
+        if (pages?.size !== 1) continue;
+        const slug = [...pages.values()][0];
+        if (!slug) continue;
+        for (const eventId of group.eventIds) eventPageByEventId.set(eventId, slug);
+      }
     }
 
     const groupRows = directResult.rows.filter((row) =>
