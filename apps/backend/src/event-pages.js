@@ -55,6 +55,19 @@ function optionalText(value, field, max = 2000) {
   return value.trim() || null;
 }
 
+function normalizeEventProductTitle(value) {
+  return String(value || '')
+    .replace(/^\s*(?:\d{1,2}[./-]\d{1,2}(?:[./-]\d{2,4})?|\d{1,2}\s+[а-яё]+(?:\s+\d{4})?)\s*[/|—–:-]+\s*/iu, '')
+    .replace(/(?<!\d)\d{1,2}[./-]\d{1,2}(?:[./-]\d{2,4})?(?!\d)|(?<!\d)\d{1,2}\s+[а-яё]+(?:\s+\d{4})?(?!\w)/giu, ' ')
+    .replace(/\(\s*(?:пн|вт|ср|чт|пт|сб|вс|понедельник|вторник|среда|четверг|пятница|суббота|воскресенье)\s*\)/giu, ' ')
+    .replace(/[-\s]+(?:[0-9a-f]{24}|[0-9a-f]{32})\s*$/iu, '')
+    .toLocaleLowerCase('ru')
+    .replace(/ё/gu, 'е')
+    .replace(/[^\p{L}\p{N}_]+/gu, ' ')
+    .replace(/\s+/gu, ' ')
+    .trim();
+}
+
 function normalizeSlug(value) {
   const slug = requiredText(value, 'slug', 180).toLowerCase();
   if (!/^[a-z0-9а-яё]+(?:-[a-z0-9а-яё]+)*$/i.test(slug)) throw new Error('slug has invalid format');
@@ -385,7 +398,7 @@ export async function readPublicEventPageRouteBySlug(db, slug) {
   if (!key) return null;
   try {
     const result = await db.query(`
-      SELECT page.slug, page.status, page."isIndexable", page."publishedAt",
+      SELECT page.id, page.slug, page.status, page."isIndexable", page."publishedAt",
         ARRAY(
           SELECT link."eventId" FROM "EventPageEvent" link
           WHERE link."eventPageId" = page.id
@@ -420,6 +433,7 @@ export async function readPublicEventPageRouteBySlug(db, slug) {
     const published = row.status === 'READY' && row.publishedAt != null;
     if (!row.publicEventId) return null;
     return {
+      id: row.id,
       slug: row.slug,
       eventId: row.publicEventId,
       eventIds,
@@ -432,6 +446,148 @@ export async function readPublicEventPageRouteBySlug(db, slug) {
     if (error?.code === '42P01' || error?.cause?.code === '42P01') return null;
     throw error;
   }
+}
+
+/**
+ * Resolve verified Ticketscloud product siblings for a stable EventPage route.
+ * A TC parent ID alone is insufficient: city, normalized product title,
+ * matching organizer/seller identity, and a single linked page are required.
+ * Event IDs explicitly moved to another page remain excluded from this group.
+ */
+export async function resolvePublicEventPageEventIds(db, eventPageId, directEventIds) {
+  const directIds = [...new Set((directEventIds || []).map((id) => String(id || '').trim()).filter(Boolean))];
+  if (!directIds.length || !eventPageId) return directIds;
+
+  const directGroups = await db.query(`
+    SELECT owned."eventId", event.title, event."primaryCityId" AS "cityId",
+      tc_meta."sourceId", tc_meta."metaExternalId", tc_meta."externalId", tc_meta."metaCount",
+      provider_identity."organizerId", provider_identity."sellerId"
+    FROM "EventPageEvent" owned
+    JOIN "Event" event ON event.id = owned."eventId"
+    LEFT JOIN LATERAL (
+      SELECT min(link."sourceId") AS "sourceId",
+        min(trim(link."metaExternalId")) AS "metaExternalId",
+        min(link."externalId") AS "externalId",
+        count(DISTINCT trim(link."metaExternalId"))::int AS "metaCount"
+      FROM "EventSourceLink" link
+      JOIN "Source" source ON source.id = link."sourceId"
+      WHERE link."eventId" = event.id
+        AND upper(source.code::text) = 'TICKETSCLOUD'
+        AND NULLIF(trim(link."metaExternalId"), '') IS NOT NULL
+    ) tc_meta ON true
+    LEFT JOIN LATERAL (
+      SELECT record.payload->>'organizerId' AS "organizerId",
+        record.payload #>> '{seller,id}' AS "sellerId"
+      FROM "RawImportRecord" record
+      WHERE record."sourceId" = tc_meta."sourceId"
+        AND record."entityType" = 'event_provider_metadata'
+        AND record."externalId" = tc_meta."externalId"
+      LIMIT 1
+    ) provider_identity ON true
+    WHERE owned."eventPageId" = $1 AND owned."eventId" = ANY($2::text[])
+  `, [eventPageId, directIds]);
+
+  const groups = new Map();
+  for (const row of directGroups.rows) {
+    if (Number(row.metaCount) !== 1 || !row.sourceId || !row.metaExternalId || !row.organizerId || !row.sellerId) continue;
+    const productKey = normalizeEventProductTitle(row.title);
+    if (!productKey) continue;
+    const cityId = row.cityId == null ? null : String(row.cityId);
+    const sourceId = String(row.sourceId);
+    const metaExternalId = String(row.metaExternalId);
+    const organizerId = String(row.organizerId);
+    const sellerId = String(row.sellerId);
+    const key = JSON.stringify([sourceId, metaExternalId, cityId, productKey]);
+    const group = groups.get(key) || { sourceId, metaExternalId, cityId, productKey, organizerId, sellerId, directIds: [], identityConflict: false };
+    if (group.organizerId !== organizerId || group.sellerId !== sellerId) {
+      group.identityConflict = true;
+      groups.set(key, group);
+      continue;
+    }
+    group.directIds.push(String(row.eventId));
+    groups.set(key, group);
+  }
+  if (!groups.size) return directIds;
+
+  const candidates = await db.query(`
+    WITH product_groups AS (
+      SELECT * FROM jsonb_to_recordset($1::jsonb) AS item(
+        "groupKey" text, "sourceId" text, "metaExternalId" text, "cityId" text,
+        "productKey" text, "organizerId" text, "sellerId" text
+      )
+    )
+    SELECT groups."groupKey", event.id, event.title, event.status, event."venueId",
+      page_link."eventPageId" AS "linkedPageId",
+      provider_identity."organizerId", provider_identity."sellerId",
+      EXISTS (
+        SELECT 1 FROM "EventOffer" offer
+        WHERE offer."eventId" = event.id AND offer.active IS NOT FALSE
+      ) AND EXISTS (
+        SELECT 1 FROM "EventSession" session
+        WHERE session."eventId" = event.id AND session."isActive" IS NOT FALSE
+          AND session."cancelledAt" IS NULL AND session."startsAt" >= now() - interval '15 minutes'
+      ) AS "isSaleable"
+    FROM product_groups groups
+    JOIN "EventSourceLink" source_link ON source_link."sourceId" = groups."sourceId"
+      AND trim(source_link."metaExternalId") = groups."metaExternalId"
+    JOIN "Event" event ON event.id = source_link."eventId"
+      AND event."primaryCityId" IS NOT DISTINCT FROM groups."cityId"
+    LEFT JOIN "EventPageEvent" page_link ON page_link."eventId" = event.id
+    LEFT JOIN LATERAL (
+      SELECT record.payload->>'organizerId' AS "organizerId",
+        record.payload #>> '{seller,id}' AS "sellerId"
+      FROM "RawImportRecord" record
+      WHERE record."sourceId" = source_link."sourceId"
+        AND record."entityType" = 'event_provider_metadata'
+        AND record."externalId" = source_link."externalId"
+      LIMIT 1
+    ) provider_identity ON true
+    WHERE NULLIF(trim(source_link."metaExternalId"), '') IS NOT NULL
+      AND upper(coalesce(event.status::text, '')) <> 'HIDDEN'
+  `, [JSON.stringify([...groups.entries()].map(([groupKey, group]) => ({ groupKey, ...group })))]);
+
+  const candidatesByGroup = new Map();
+  for (const row of candidates.rows) {
+    const groupKey = String(row.groupKey);
+    const group = groups.get(groupKey);
+    if (!group || normalizeEventProductTitle(row.title) !== group.productKey) continue;
+    const entry = candidatesByGroup.get(groupKey) || {
+      ids: new Set(), pages: new Set(), liveIdentities: new Set(), liveIdentityRows: 0, liveRows: 0,
+      allIdentities: new Set(), allIdentityRows: 0, venues: new Set(), rows: 0,
+    };
+    entry.ids.add(String(row.id));
+    entry.rows += 1;
+    if (row.linkedPageId) entry.pages.add(String(row.linkedPageId));
+    if (row.venueId) entry.venues.add(String(row.venueId));
+    const organizerId = String(row.organizerId || '').trim();
+    const sellerId = String(row.sellerId || '').trim();
+    if (organizerId && sellerId) {
+      entry.allIdentityRows += 1;
+      entry.allIdentities.add(`${organizerId}:${sellerId}`);
+    }
+    if (row.isSaleable) {
+      entry.liveRows += 1;
+      if (organizerId && sellerId) {
+        entry.liveIdentityRows += 1;
+        entry.liveIdentities.add(`${organizerId}:${sellerId}`);
+      }
+    }
+    candidatesByGroup.set(groupKey, entry);
+  }
+
+  const resultIds = new Set(directIds);
+  for (const [groupKey, group] of groups) {
+    if (group.identityConflict) continue;
+    const entry = candidatesByGroup.get(groupKey);
+    if (!entry || entry.pages.size !== 1 || !entry.pages.has(String(eventPageId))) continue;
+    const identities = entry.liveRows ? entry.liveIdentities : entry.allIdentities;
+    const identityRows = entry.liveRows ? entry.liveIdentityRows : entry.allIdentityRows;
+    const rowCount = entry.liveRows || entry.rows;
+    if (identityRows !== rowCount || identities.size !== 1) continue;
+    if (!identities.has(`${group.organizerId}:${group.sellerId}`)) continue;
+    for (const eventId of entry.ids) resultIds.add(eventId);
+  }
+  return [...resultIds];
 }
 
 /**

@@ -30,7 +30,6 @@ import {
   mapGroupedPublicSession,
   collectSeparateCityHubNames,
   pickCatalogSubcategories,
-  resolveCatalogEventPageSlug,
 } from './public-catalog.mapper.js';
 import { findLandingRule } from './landing-rules.js';
 import {
@@ -45,6 +44,7 @@ import {
 } from './public-catalog-spread.js';
 import { LIST_SLOT_PREVIEW_LIMIT, toPublicCatalogListItem } from './public-catalog-list-item.js';
 import { providerForSource } from './provider-purchase.js';
+import { resolveEventPageSlugsForEventIds } from './public-event-page-links.ts';
 import { resolveProjectRoot } from './project-root.js';
 import type { PublicCatalogMappingRow } from './public-catalog.mapper.js';
 import type { PublicCatalogDto, PublicSessionDto } from './types/public.js';
@@ -926,27 +926,19 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
 }
 
 async function attachUnambiguousEventPageSlugs(sessions: PublicSessionDto[]): Promise<PublicSessionDto[]> {
-  // Run after all provider/override grouping so a group can never inherit the
-  // representative's page when another member points elsewhere.
-  const eventIds = [...new Set(sessions.flatMap((session) => session.groupEventIds?.length
-    ? session.groupEventIds
-    : [session.id]))];
+  // Resolve the representative Event through the same verified product key as
+  // header search. Do not require every dated TC slot to be written to the
+  // EventPageEvent relation; old slot routes remain the fallback.
+  const eventIds = [...new Set(sessions.map((session) => session.id).filter(Boolean))];
   if (!eventIds.length) return sessions;
   try {
-    const pageLinks = await prisma.$queryRawUnsafe<Array<{
-      eventId: string;
-      eventPageId: string;
-      slug: string;
-    }>>(
-      `select link."eventId" as "eventId", link."eventPageId" as "eventPageId", page.slug
-       from "EventPageEvent" link
-       join "EventPage" page on page.id = link."eventPageId"
-       where link."eventId" = any($1::text[])`,
-      eventIds,
-    );
+    const pageSlugByEventId = await resolveEventPageSlugsForEventIds(eventIds, {
+      query: async (query, params) => ({
+        rows: await prisma.$queryRawUnsafe<Array<{ eventId: string; slug: string }>>(query, ...params),
+      }),
+    });
     return sessions.map((session) => {
-      const groupIds = session.groupEventIds?.length ? session.groupEventIds : [session.id];
-      const eventPageSlug = resolveCatalogEventPageSlug(groupIds, pageLinks);
+      const eventPageSlug = pageSlugByEventId.get(session.id);
       return eventPageSlug ? { ...session, eventPageSlug } : session;
     });
   } catch {

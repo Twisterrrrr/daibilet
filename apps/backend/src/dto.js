@@ -31,7 +31,7 @@ import { toPublicCatalogListItem, toPublicHomeCardSession } from './public-catal
 import { enrichBuyerOrdersWithEventLinks } from './buyer-order-event-links.js';
 import { rewriteArticleEventLinks } from './public-event-page-links.ts';
 import { readReadyPdpDocument } from './pdp-documents.js';
-import { readPublicEventPageRouteBySlug, readPublishedEventPageForEvent } from './event-pages.js';
+import { readPublicEventPageRouteBySlug, readPublishedEventPageForEvent, resolvePublicEventPageEventIds } from './event-pages.js';
 import {
   blogCityDisplayName,
   blogCitySlugAliases,
@@ -5007,6 +5007,9 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
       ? targetPublicSession.groupEventIds
       : [event.id];
   const representativeRow = targetPublicSession || fallbackPublicRow;
+  if (eventPageRoute?.id) {
+    groupEventIds = await resolvePublicEventPageEventIds(db, eventPageRoute.id, groupEventIds);
+  }
 
   // Expand TicketsCloud meta siblings so a past dated slug still shows future slots.
   const metaResult = await db.query(
@@ -5038,7 +5041,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
     representativeRow.id || event.id,
   ]);
 
-  const [sessionsResult, offersResult] = await Promise.all([
+  const [sessionsResult, offersResult, sessionCountResult] = await Promise.all([
     db.query(
       `
         select
@@ -5051,6 +5054,8 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
           session."ticketsVacant",
           session."externalId",
           session_event."sourceStatus" as "eventSourceStatus",
+          session_venue.title as "venueTitle",
+          session_venue.address as "venueAddress",
           session_source_link."externalId" as "eventExternalId",
           session_source.code as "eventSourceCode",
           session_offer."sourceCode" as "offerSourceCode",
@@ -5061,6 +5066,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
           session_offer.active as "offerActive"
         from "EventSession" session
         left join "Event" session_event on session_event.id = session."eventId"
+        left join "Venue" session_venue on session_venue.id = session_event."venueId"
         left join "EventSourceLink" session_source_link on session_source_link."eventId" = session."eventId"
         left join "Source" session_source on session_source.id = session_source_link."sourceId"
         left join lateral (
@@ -5108,6 +5114,15 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
       `,
       [tariffOfferEventIds, MIN_DISPLAY_PRICE_RUB],
     ),
+    db.query(
+      `
+        select count(*)::int as count
+        from "EventSession" session
+        where session."eventId" = any($1::text[])
+          and ${ACTIVE_SESSION_SQL}
+      `,
+      [groupEventIds],
+    ),
   ]);
 
   const publicOffers = preferNamedTicketOffers(dedupePublicOffers(offersResult.rows)).slice(0, 32);
@@ -5126,7 +5141,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
       .filter((offer) => offer.sourceCode || offer.priceRub != null || offer.widgetUrl || offer.deeplinkUrl),
   );
   const primaryOffer = primaryOfferByEventId.get(representativeRow.id) || publicOffers.find((offer) => offer.active) || publicOffers[0] || null;
-  const totalSessionCount = targetPublicSession?.sessionCount || sessionsResult.rows.length;
+  const totalSessionCount = targetPublicSession?.sessionCount || Number(sessionCountResult.rows[0]?.count || 0) || sessionsResult.rows.length;
   const eventPriceFrom = displayPriceFrom(
     targetPublicSession?.priceFrom,
     event.priceFromRub,
@@ -5238,6 +5253,8 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
     return {
       id: session.id,
       eventId: session.eventId,
+      venueTitle: session.venueTitle || null,
+      venueAddress: session.venueAddress || null,
       startsAt: schedule.startsAt || null,
       endsAt: session.endsAt,
       dateLabel: schedule.dateLabel,

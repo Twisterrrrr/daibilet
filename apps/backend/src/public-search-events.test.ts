@@ -12,19 +12,35 @@ test('search keeps the current event route as fallback without an EventPage', ()
   assert.equal(publicSearchEventHref({ id: 'slot-a', slug: 'slot-a-123', title: 'Event' }), '/events/slot-a-123');
 });
 
-test('maps a dated slot through its same-city Ticketscloud parent only when one page is linked', async () => {
+test('maps a dated slot through its same-city Ticketscloud product title only when one page is linked', async () => {
+  let call = 0;
   const db = {
     async query(sql: string, params: unknown[]) {
-      assert.deepEqual(params, [['slot-event-id']]);
-      assert.match(sql, /source\.code::text\) = 'TICKETSCLOUD'/);
-      assert.match(sql, /trim\(sibling\."metaExternalId"\) = requested_meta\."metaExternalId"/);
-      assert.match(sql, /sibling_event\."primaryCityId" IS NOT DISTINCT FROM requested_event\."primaryCityId"/);
-      assert.match(sql, /HAVING count\(DISTINCT page\.id\) = 1/);
-      return { rows: [{ eventId: 'slot-event-id', slug: 'stable-tour-moscow' }] };
+      call += 1;
+      if (call === 1) {
+        assert.deepEqual(params, [['slot-event-id']]);
+        assert.match(sql, /source\.code::text\) = 'TICKETSCLOUD'/);
+        return { rows: [{
+          eventId: 'slot-event-id', title: '25.11.2026 — River Jazz', cityId: 'moscow',
+          sourceId: 'tc', metaExternalId: 'parent-1', metaCount: 1, directPageId: null, directPageSlug: null,
+          organizerId: 'organizer-1', sellerId: 'seller-1',
+        }] };
+      }
+      assert.match(sql, /jsonb_to_recordset/);
+      const groupKey = JSON.stringify(['tc', 'parent-1', 'moscow', 'river jazz']);
+      assert.deepEqual(JSON.parse(String(params[0])), [{
+        groupKey, sourceId: 'tc', metaExternalId: 'parent-1', cityId: 'moscow', productKey: 'river jazz',
+      }]);
+      return { rows: [
+        { groupKey, memberEventId: 'slot-event-id', title: '25.11.2026 — River Jazz', venueId: 'pier-a', pageId: 'page-1', slug: 'stable-tour-moscow', status: 'READY', organizerId: 'organizer-1', sellerId: 'seller-1', isSaleable: true },
+        { groupKey, memberEventId: 'slot-sibling', title: '26.11.2026 — River Jazz', venueId: 'pier-b', pageId: null, slug: null, status: 'READY', organizerId: 'organizer-1', sellerId: 'seller-1', isSaleable: true },
+        { groupKey, memberEventId: 'different-program', title: 'Christmas Jazz', venueId: 'pier-c', pageId: 'page-2', slug: 'christmas-jazz', status: 'READY', organizerId: 'organizer-1', sellerId: 'seller-1', isSaleable: true },
+      ] };
     },
   };
   const result = await resolveEventPageSlugsForEventIds(['slot-event-id'], db);
   assert.equal(result.get('slot-event-id'), 'stable-tour-moscow');
+  assert.equal(call, 2);
 });
 
 test('published article links for a slot use its stable EventPage path', async () => {
@@ -37,7 +53,10 @@ test('published article links for a slot use its stable EventPage path', async (
         return { rows: [{ id: 'slot-event-id', slug: 'old-slot', canonicalPath: '/events/old-slot' }] };
       }
       assert.deepEqual(params, [['slot-event-id']]);
-      return { rows: [{ eventId: 'slot-event-id', slug: 'stable-event-moscow' }] };
+      return { rows: [{
+        eventId: 'slot-event-id', directPageId: 'page-1', directPageSlug: 'stable-event-moscow',
+        title: 'Show', cityId: 'moscow', metaCount: 0,
+      }] };
     },
   };
   assert.equal(await rewriteArticleEventLinks('Text [event](/events/old-slot).', db), 'Text [event](/events/stable-event-moscow).');
@@ -60,7 +79,10 @@ test('article links with an exact Event ID use the stable EventPage even when th
         return { rows: [{ id: eventId, slug: 'current-event-slug', canonicalPath: '/events/current-event-slug' }] };
       }
       assert.deepEqual(params, [[eventId]]);
-      return { rows: [{ eventId, slug: 'stable-event-page' }] };
+      return { rows: [{
+        eventId, directPageId: 'page-1', directPageSlug: 'stable-event-page',
+        title: 'Current show', cityId: 'moscow', metaCount: 0,
+      }] };
     },
   };
 

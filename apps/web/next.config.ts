@@ -46,7 +46,7 @@ const nextConfig: NextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'],
     // Allow the image budgets used by blog cards (q70), catalog cards, and affiche.
-    qualities: [70, 75, 85, 88, 90, 92, 95],
+    qualities: [70, 75, 80, 85, 88, 90, 92, 95],
     minimumCacheTTL: 60 * 60 * 24 * 7,
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     // 480 bridges card tiles (~480 CSS x retina) before jumping to deviceSizes 640.
