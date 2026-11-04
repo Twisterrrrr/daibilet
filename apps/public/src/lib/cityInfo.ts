@@ -223,6 +223,8 @@ export type CityMustSeeItem = CityPlaceLinkFields & {
   stationName?: string;
   /** Станция / причал выхода (блок «Логистика»). */
   logisticsExit?: string;
+  /** Подпись к logisticsExit. По умолчанию «Где выходить». */
+  logisticsExitLabel?: string;
   /**
    * Legacy one-line gastro («Название - текст»).
    * Prefer structured gastroStop for suburb cards.

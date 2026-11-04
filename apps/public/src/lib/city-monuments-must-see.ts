@@ -16,6 +16,7 @@ export type MonumentMustSeeItem = {
   mustSeeFilter: 'main' | 'creative';
   latitude?: number | null;
   longitude?: number | null;
+  visitMinutes?: number | string;
 };
 
 export const CITY_MONUMENTS_MUST_SEE: Record<string, MonumentMustSeeItem[]> = {

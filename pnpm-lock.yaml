@@ -124,6 +124,9 @@ importers:
 
   apps/public:
     dependencies:
+      '@daibilet/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
       clsx:
         specifier: ^2.1.0
         version: 2.1.1

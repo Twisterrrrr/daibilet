@@ -12,6 +12,7 @@ function stop(
     address?: string;
     mustSeeFilter?: string;
     visitMinutes?: number;
+    transitTip?: string;
   } = {},
 ): any {
   return {
@@ -24,6 +25,7 @@ function stop(
     ...(opts.locationSlug ? { locationSlug: opts.locationSlug } : {}),
     ...(opts.dayRouteId ? { dayRouteId: opts.dayRouteId } : {}),
     ...(opts.address ? { address: opts.address } : {}),
+    ...(opts.transitTip ? { transitTip: opts.transitTip } : {}),
   };
 }
 
