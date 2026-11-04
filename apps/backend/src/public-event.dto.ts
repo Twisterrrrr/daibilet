@@ -8,6 +8,7 @@ import {
   isStartedTicketcloudSlot,
   isSaleableEventForPublic,
   isWideLifetimeSession,
+  resolvePublicEventAvailability,
 } from './catalog-availability.js';
 import { resolveCityTimeZone } from './city-timezone.js';
 import { formatDate, formatTime, normalizeStartsAt, timeBucket } from './public-datetime.js';
@@ -446,6 +447,17 @@ async function loadPublicEventDto(
   const sessions = dedupePublicEventSessionsByStartsAt(
     publicSessions.length ? publicSessions : widgetOnlySessions,
   );
+  const sessionHistory = sessions.length ? null : await prisma.eventSession.aggregate({
+    where: { eventId: { in: groupEventIds }, cancelledAt: null },
+    _max: { startsAt: true, endsAt: true },
+  });
+  const historyDates = [sessionHistory?._max.startsAt, sessionHistory?._max.endsAt]
+    .filter((value): value is Date => value instanceof Date && Number.isFinite(value.getTime()));
+  const lastSessionAt = historyDates.length
+    ? historyDates.reduce((latest, value) => value > latest ? value : latest)
+    : null;
+  const availability = resolvePublicEventAvailability(sessions.length > 0, lastSessionAt);
+  const hasEndedFallback = sessions.length === 0 && lastSessionAt != null;
   const primaryPurchase = pickPrimarySessionPurchase(sessions, eventPurchaseUrl, requestedIdentity.externalId);
   const tags = orderedEventTags(requestedEvent);
   const subcategories = pickCatalogSubcategories({
@@ -562,13 +574,24 @@ async function loadPublicEventDto(
     canonicalPath: requestedEvent.override?.canonicalPath || requestedEvent.canonicalPath || `/events/${publicSlug(representative.slug)}`,
     isIndexable: requestedEvent.override?.isIndexable ?? requestedEvent.isIndexable,
   };
-  const ticketPrices = buildTicketPrices(offers, sessions, event);
+  if (hasEndedFallback) {
+    event.priceFrom = null;
+    event.vacant = null;
+    event.purchaseUrl = null;
+    event.widgetUrl = null;
+    event.deeplinkUrl = null;
+    event.purchaseReady = false;
+    event.purchaseMode = 'unavailable';
+    event.purchaseProvider = null;
+  }
+  const publicOffers = hasEndedFallback ? [] : offers;
+  const ticketPrices = hasEndedFallback ? [] : buildTicketPrices(publicOffers, sessions, event);
   const purchaseOptionEvents = stablePagePublished && stablePageEvents.length > 1
     ? stablePageEvents
     : mergedGroupEvents;
   const purchaseOptions = await buildMergedPurchaseOptions(
     purchaseOptionEvents,
-    offers,
+    publicOffers,
     requestedEvent,
     eventPurchaseUrl,
   );
@@ -601,7 +624,7 @@ async function loadPublicEventDto(
   const scheduleSourceStatus = scheduleSource && 'sourceStatus' in scheduleSource
     ? scheduleSource.sourceStatus
     : requestedEvent.sourceStatus;
-  if (!stablePagePublished && !isSaleableEventForPublic({
+  if (!stablePagePublished && !hasEndedFallback && !isSaleableEventForPublic({
     kind: requestedEvent.kind,
     sourceStatus: scheduleSourceStatus,
     startsAt: scheduleSource && 'startsAt' in scheduleSource ? scheduleSource.startsAt : null,
@@ -623,13 +646,14 @@ async function loadPublicEventDto(
   return {
     generatedAt: new Date().toISOString(),
     event,
+    availability,
     ...(stablePage ? {
       eventPageRoute: {
         slug: stablePage.slug,
         status: stablePage.status,
         published: stablePage.status === 'READY' && stablePage.publishedAt != null,
         isIndexable: stablePage.status === 'READY' && stablePage.publishedAt != null && stablePage.isIndexable,
-        availability: sessions.length ? 'AVAILABLE' : 'NO_UPCOMING',
+        availability,
       },
       eventPage: stablePage.status === 'READY' && stablePage.publishedAt != null ? {
         slug: stablePage.slug,
@@ -646,9 +670,9 @@ async function loadPublicEventDto(
       ? { requestedSessionContext }
       : {}),
     sessions,
-    offers: offers.map(({ eventId: _eventId, sortOrder: _sortOrder, sourceTicketId: _sourceTicketId, payload: _payload, ...offer }) => offer),
+    offers: publicOffers.map(({ eventId: _eventId, sortOrder: _sortOrder, sourceTicketId: _sourceTicketId, payload: _payload, ...offer }) => offer),
     ticketPrices,
-    ...(purchaseOptions.length >= 2 ? { purchaseOptions } : {}),
+    ...(!hasEndedFallback && purchaseOptions.length >= 2 ? { purchaseOptions } : {}),
     // Explicit manual tour grouping wins; inferred source groups remain fallback only.
     peerEvents: explicitTour.assigned ? explicitTour.peers : inferredPeers,
     related,
