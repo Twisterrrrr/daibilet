@@ -470,15 +470,21 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
       cityReady={cityReady || urlHasCity}
       layout="split"
     >
+      {({ filtersButton, quickSelectors }) => <>
       {spotlightItems.length ? <CatalogZenSpotlight items={spotlightItems} /> : null}
 
       {/* Count on sm+; sort + page size + view stay on one row.
           Active filter chips live under H1 in EventsCatalogHero. */}
       <div
         id="catalog-results"
-        className="catalog-meta-row mt-3 scroll-mt-[calc(var(--site-header-height)+5.5rem)] flex flex-col gap-2 sm:mt-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between"
+        className="catalog-meta-row mt-3 scroll-mt-[calc(var(--site-header-height)+5.5rem)] flex flex-col gap-2 sm:mt-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between"
       >
-        <p className="hidden min-w-0 text-sm text-graphite-muted sm:block">
+        <div className="hidden min-w-0 items-center gap-3 md:flex">
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
+            {filtersButton}
+            {quickSelectors}
+          </div>
+          <p className="min-w-0 text-sm text-graphite-muted">
           {loading && !catalog ? 'Загрузка…' : null}
           {loading && catalog ? 'Обновляем… · ' : null}
           {catalog ? (
@@ -488,7 +494,8 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
             </>
           ) : null}
           {error ? error : null}
-        </p>
+          </p>
+        </div>
         {error ? <p className="text-sm text-rose-600 sm:hidden">{error}</p> : null}
 
         <div className="flex w-full min-w-0 flex-nowrap items-center justify-end gap-2 sm:ml-auto sm:w-auto">
@@ -529,6 +536,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
                         limit: size as CatalogPageSize,
                         page: undefined,
                       }),
+                      { scroll: false },
                     );
                   }}
                   className={`inline-btn inline-flex h-7 min-w-[2.5rem] items-center justify-center rounded-lg px-2 text-xs font-semibold tabular-nums leading-none transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 disabled:opacity-60 ${
@@ -611,6 +619,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
           Подборки
         </Link>
       </nav>
+      </>}
     </CatalogToolbar>
   );
 }

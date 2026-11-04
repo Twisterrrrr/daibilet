@@ -1446,6 +1446,25 @@ html[data-nav-pending='1'] {
   .catalog-date-rail-scroller {
     width: 100%;
     max-width: 100%;
+    padding-block: 0.25rem;
+  }
+
+  .catalog-desktop-quick-select select {
+    min-width: 9.5rem;
+    height: 2.5rem;
+    max-width: 14rem;
+    border: 1px solid rgb(226 232 240 / 0.9);
+    border-radius: 0.75rem;
+    background: #fff;
+    padding: 0 2rem 0 0.75rem;
+    color: #1f2937;
+    font-size: 0.8125rem;
+    font-weight: 600;
+  }
+
+  .catalog-desktop-quick-select select:focus-visible {
+    outline: 2px solid rgb(59 130 246 / 0.4);
+    outline-offset: 2px;
   }
 
   .catalog-events-sticky-controls {
@@ -1791,15 +1810,15 @@ html[data-nav-pending='1'] {
   }
 
   .catalog-date-day-card-idle {
-    @apply bg-[#F0F1F3] text-graphite/80 hover:-translate-y-0.5 hover:border-primary/40 hover:bg-primary/10 hover:text-primary hover:shadow-sm;
+    @apply bg-[#F0F1F3] text-graphite/80 hover:border-primary/40 hover:bg-primary/10 hover:text-primary;
   }
 
   .catalog-date-day-card-weekend {
-    @apply bg-[#F0F1F3] text-urgency hover:-translate-y-0.5 hover:border-primary/40 hover:bg-primary/10 hover:shadow-sm;
+    @apply bg-[#F0F1F3] text-urgency hover:border-primary/40 hover:bg-primary/10;
   }
 
   .catalog-date-day-card-on {
-    @apply border-primary/60 bg-primary text-white hover:-translate-y-0.5 hover:bg-primary/90 hover:text-white hover:shadow-sm;
+    @apply border-primary/60 bg-primary text-white hover:bg-primary/90 hover:text-white;
   }
 
   .catalog-date-day-card-weekday {
@@ -1815,7 +1834,7 @@ html[data-nav-pending='1'] {
   }
 
   .catalog-date-day-card-dates {
-    @apply h-auto gap-0 bg-[#F0F1F3] text-graphite/80 hover:-translate-y-0.5 hover:border-primary/40 hover:bg-primary/10 hover:text-primary hover:shadow-sm;
+    @apply h-auto gap-0 bg-[#F0F1F3] text-graphite/80 hover:border-primary/40 hover:bg-primary/10 hover:text-primary;
   }
 
   .catalog-date-day-card-dates.catalog-date-day-card-on {

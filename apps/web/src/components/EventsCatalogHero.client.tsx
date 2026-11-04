@@ -83,7 +83,7 @@ export function EventsCatalogHero() {
 
   return (
     <div className="border-b border-slate-100 bg-white max-sm:border-0 max-sm:bg-transparent">
-      <div className="container-page py-3 sm:py-5">
+      <div className="container-page pb-2 pt-3 sm:pb-3 sm:pt-5">
           <h1 className="font-display text-[clamp(1rem,5vw,1.5rem)] max-sm:whitespace-nowrap font-bold tracking-tight text-graphite sm:text-3xl">
             {mobileSafeTitle}
           </h1>

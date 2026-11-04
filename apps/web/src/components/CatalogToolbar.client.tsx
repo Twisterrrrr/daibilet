@@ -44,7 +44,7 @@ type CatalogToolbarProps = {
   compact?: boolean;
   /** Sidebar + main column on lg+; children render in main column. */
   layout?: 'default' | 'split';
-  children?: ReactNode;
+  children?: ReactNode | ((controls: { filtersButton: ReactNode; quickSelectors: ReactNode }) => ReactNode);
 };
 
 const SEARCH_DEBOUNCE_MS = 350;
@@ -110,7 +110,7 @@ export function CatalogToolbar({
   }, [showSearchHints]);
 
   const navigate = (next: CatalogFilterValues) => {
-    router.push(buildCatalogHref(next));
+    router.push(buildCatalogHref(next), { scroll: false });
   };
 
   // Desktop search settles after a short pause; mobile commits on submit.
@@ -241,6 +241,78 @@ export function CatalogToolbar({
     (filters.category ? 1 : 0) +
     (qDraft.trim() ? 1 : 0);
 
+  const splitFiltersButton = (
+    <FiltersButton
+      open={filtersOpen}
+      count={sidebarActiveCount}
+      disabled={disabled}
+      onClick={() => setFiltersOpen(true)}
+      alwaysShowLabel
+    />
+  );
+  const splitQuickSelectors = (
+    <>
+      <label className="catalog-desktop-quick-select">
+        <span className="sr-only">Категория события</span>
+        <select
+          aria-label="Категория события"
+          value={filters.category || ''}
+          disabled={disabled}
+          onChange={(event) => navigate({ ...filters, category: event.target.value || undefined, page: undefined })}
+        >
+          <option value="">Все категории</option>
+          {facets.categories.map((item) => (
+            <option key={item.name} value={item.name} disabled={item.events <= 0 && filters.category !== item.name}>
+              {displayCatalogLabel(item.name)}{shouldShowCatalogCategoryCount(item.events, filters.limit) ? ` (${item.events})` : ''}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="catalog-desktop-quick-select">
+        <span className="sr-only">Быстрый фильтр</span>
+        <select
+          aria-label="Быстрый фильтр"
+          value={
+            filters.date === 'evening' && !filters.from && !filters.to
+              ? 'evening'
+              : filters.minPrice === 0 && filters.maxPrice === 0
+                ? 'free'
+                : filters.ageMax === KIDS_AGE_MAX
+                  ? 'kids'
+                  : ''
+          }
+          disabled={disabled}
+          onChange={(event) => {
+            const selected = event.target.value;
+            const next = { ...filters, page: undefined };
+            if (next.date === 'evening' && !next.from && !next.to) next.date = undefined;
+            if (next.minPrice === 0 && next.maxPrice === 0) {
+              next.minPrice = undefined;
+              next.maxPrice = undefined;
+            }
+            if (next.ageMax === KIDS_AGE_MAX) next.ageMax = undefined;
+            if (selected === 'evening') {
+              next.date = 'evening';
+              next.from = undefined;
+              next.to = undefined;
+            } else if (selected === 'free') {
+              next.minPrice = 0;
+              next.maxPrice = 0;
+            } else if (selected === 'kids') {
+              next.ageMax = KIDS_AGE_MAX;
+            }
+            navigate(next);
+          }}
+        >
+          <option value="">Быстрые фильтры</option>
+          <option value="evening">Сегодня вечером</option>
+          <option value="free">Бесплатные</option>
+          <option value="kids">С детьми</option>
+        </select>
+      </label>
+    </>
+  );
+
   const catalogSearchField = (
     <div ref={searchWrapRef} className="catalog-toolbar-search-field max-w-none md:max-w-none">
       <label className="relative block min-w-0 flex-1">
@@ -326,6 +398,9 @@ export function CatalogToolbar({
   );
 
   if (layout === 'split') {
+    const splitChildren = typeof children === 'function'
+      ? children({ filtersButton: splitFiltersButton, quickSelectors: splitQuickSelectors })
+      : children;
     return (
       <>
         <div className="catalog-content">
@@ -337,14 +412,6 @@ export function CatalogToolbar({
                 showCalendarButton={false}
               />
             </div>
-            <FiltersButton
-              open={filtersOpen}
-              count={sidebarActiveCount}
-              disabled={disabled}
-              onClick={() => setFiltersOpen(true)}
-              alwaysShowLabel
-              className="hidden md:inline-flex"
-            />
           </div>
           <div className="catalog-events-mobile-filter-rows md:hidden">
             <CatalogMobileQuickFilters
@@ -356,7 +423,7 @@ export function CatalogToolbar({
               onOpenAllFilters={() => setFiltersOpen(true)}
             />
           </div>
-          {children}
+          {splitChildren}
         </div>
 
         {advancedPanel}
