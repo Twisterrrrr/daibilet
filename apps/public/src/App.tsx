@@ -43,7 +43,7 @@ import { BLOG_POSTS } from '@/data/blog-posts';
 import { cityToPrepositional } from '@/lib/city-declension';
 import { filterSessionsWithCoverImage } from '@/lib/session-cover-image';
 import { resolveCityCardImage } from '@/lib/city-images';
-import { buildHomeShowcaseBundles } from '@/lib/home-showcase-sections';
+import { buildHomePageSections } from '@/lib/home-page-sections';
 import { buildHomeNowTabs, pickDefaultHomeNowTab, type HomeNowTabKey } from '@/lib/home-now-section';
 import {
   HERO_QUICK_CHIPS,
@@ -200,11 +200,11 @@ export function App({ dataVersion = 0 }: { dataVersion?: number }) {
     );
   }, [dataVersion, destination]);
 
-  const homeShowcase = React.useMemo(() => buildHomeShowcaseBundles(filteredSessions), [filteredSessions]);
-  const homeNowTabs = React.useMemo(
-    () => buildHomeNowTabs(filteredSessions, { cityName: selectedCityName }),
+  const homePageSections = React.useMemo(
+    () => buildHomePageSections(filteredSessions, { cityName: selectedCityName }),
     [filteredSessions, selectedCityName],
   );
+  const { editorsPick: homeEditorsPick, homeNowTabs, popular: homePopular } = homePageSections;
 
   const openCatalog = React.useCallback(
     (extra: Record<string, string> = {}) => {
@@ -276,9 +276,9 @@ export function App({ dataVersion = 0 }: { dataVersion?: number }) {
           onOpenCatalog={openCatalog}
         />
 
-        {homeShowcase.editorsPick.length > 0 ? (
+        {homeEditorsPick.length > 0 ? (
           <EditorsPickSection
-            events={homeShowcase.editorsPick}
+            events={homeEditorsPick}
             onOpenCatalog={() => openCatalog({ sort: 'popular' })}
           />
         ) : null}
@@ -289,9 +289,9 @@ export function App({ dataVersion = 0 }: { dataVersion?: number }) {
           <HomeNowSection tabs={homeNowTabs} onOpenCatalog={openCatalog} />
         ) : null}
 
-        {homeShowcase.popular.length > 0 ? (
+        {homePopular.length > 0 ? (
           <PopularNowSection
-            events={homeShowcase.popular}
+            events={homePopular}
             sparseCatalog={filteredSessions.length < 12}
             onOpenCatalog={() => openCatalog({ sort: 'popular' })}
           />
@@ -375,7 +375,7 @@ function HomeHero({
   onOpenCatalog: (extra?: Record<string, string>) => void;
 }) {
   return (
-    <section className="relative overflow-hidden bg-slate-900">
+    <section className="relative overflow-hidden bg-[#122868]">
       <HomeHeroBackground />
       <div className="container-page relative pb-12 pt-12 sm:pb-16 sm:pt-16">
         <div className="mx-auto max-w-3xl text-center drop-shadow-[0_2px_14px_rgba(15,23,42,0.55)]">
@@ -387,7 +387,7 @@ function HomeHero({
           <h1 className="font-display text-3xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
             {selectedCityName ? (
               <>
-                Экскурсии и события
+                Экскурсии, музеи и мероприятия
                 <span className="block bg-gradient-to-r from-sky-200 to-white bg-clip-text text-transparent">
                   в {cityToPrepositional(selectedCityName)}
                 </span>
@@ -779,7 +779,7 @@ function HomeBlogSection() {
             <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
               Идеи для поездок и отдыха
             </h2>
-            <p className="mt-1 text-sm text-slate-500">Гайды и советы перед выбором события</p>
+            <p className="mt-1 text-sm text-slate-500">Статьи и советы перед выбором события</p>
           </div>
           <a href="/blog" className="inline-flex items-center gap-1 text-sm font-semibold text-primary-600 hover:text-primary-700">
             Все материалы <ArrowRight className="h-4 w-4" />

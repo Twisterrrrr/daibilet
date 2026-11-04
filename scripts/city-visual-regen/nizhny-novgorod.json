@@ -1,0 +1,13 @@
+{
+  "city": "nizhny-novgorod",
+  "mustSeeCount": 0,
+  "regen": [
+    {
+      "stem": "pamyatnik-valeriyu-chkalovu",
+      "name": "pamyatnik valeriyu chkalovu",
+      "clusterSize": 2,
+      "keeper": "arsenal-gtsisi"
+    }
+  ],
+  "d0": 1
+}

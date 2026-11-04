@@ -1,0 +1,13 @@
+[Unit]
+Description=Read-only audit for events whose sessions have passed
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=deploy
+Group=deploy
+WorkingDirectory=/home/deploy/daibilet-tc-archive-runtime
+ExecStart=/bin/bash -lc "set -a; source /opt/daibilet/.env; set +a; exec /usr/bin/node /home/deploy/daibilet-tc-archive-runtime/scripts/audit-past-events.js"
+StandardOutput=journal
+StandardError=journal

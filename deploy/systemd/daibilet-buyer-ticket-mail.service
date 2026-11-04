@@ -1,0 +1,12 @@
+[Unit]
+Description=Daibilet buyer ticket email delivery
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=deploy
+WorkingDirectory=/opt/daibilet/apps/web
+EnvironmentFile=/opt/daibilet/.env
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node node_modules/tsx/dist/cli.mjs --tsconfig tsconfig.json scripts/process-ticket-delivery.ts --limit=50

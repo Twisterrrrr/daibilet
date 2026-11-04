@@ -1,0 +1,49 @@
+{
+  "city": "ufa",
+  "mustSeeCount": 55,
+  "regen": [
+    {
+      "stem": "dom-soyuzov",
+      "name": "Уфимский Дом Союзов",
+      "clusterSize": 2,
+      "keeper": "art-kvadrat"
+    },
+    {
+      "stem": "identity-art",
+      "name": "identity art",
+      "clusterSize": 2,
+      "keeper": "bashkirskiy-teatr-opery-i-baleta"
+    },
+    {
+      "stem": "monument-druzhby",
+      "name": "Монумент Дружбы",
+      "clusterSize": 2,
+      "keeper": "hudozhestvennyy-muzey-nesterova"
+    },
+    {
+      "stem": "osobnyak-kosterina-i-chernikova",
+      "name": "Особняк Костерина и Черникова",
+      "clusterSize": 2,
+      "keeper": "glavnoe-uschele"
+    },
+    {
+      "stem": "pamyatnik-generalu-shaymuratovu",
+      "name": "Памятник генералу Шаймуратову",
+      "clusterSize": 4,
+      "keeper": "identity-symbol"
+    },
+    {
+      "stem": "pamyatnik-leninu",
+      "name": "Памятник В. И. Ленину",
+      "clusterSize": 4,
+      "keeper": "identity-symbol"
+    },
+    {
+      "stem": "pamyatnik-pushkinu",
+      "name": "Памятник А. С. Пушкину",
+      "clusterSize": 4,
+      "keeper": "identity-symbol"
+    }
+  ],
+  "d0": 5
+}

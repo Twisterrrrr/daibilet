@@ -1,0 +1,129 @@
+import Link from 'next/link';
+
+import { DaibiletLogo } from '@/components/DaibiletLogo';
+import {
+  MobileNavDisclosureLayer,
+  MobileNavDisclosureTrigger,
+} from '@/components/MobileNavDisclosure';
+import { CITY_NIGHT_HERO } from '@/lib/city-night-hero';
+
+const SKELETON_NAV_ID = 'site-chrome-skeleton-nav';
+
+/**
+ * Paintable chrome for Suspense / route loading.
+ * Must stay free of useSearchParams / city context so static HTML can include it
+ * (CSR bailout fallback previously rendered only site-header-spacer = blank 2-3s).
+ *
+ * `city` variant: fixed night-hero shell matching CityPageView (no CLS on soft-nav).
+ * Hamburger uses zero-JS checkbox disclosure - clickable while SSR/loading (not a dead pulse span).
+ */
+export function SiteChromeSkeleton({
+  variant = 'page',
+  omitHeader = false,
+}: {
+  variant?: 'page' | 'header-only' | 'city';
+  /** When SiteHeader is already painted (SiteLayout), skip duplicate fixed chrome. */
+  omitHeader?: boolean;
+}) {
+  return (
+    <div className="flex min-h-screen flex-col bg-background">
+      {omitHeader ? null : (
+        <>
+          <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200/70 bg-white/95 pt-[env(safe-area-inset-top,0px)] shadow-[0_1px_0_hsl(210_9%_11%/0.03)] backdrop-blur-md supports-[backdrop-filter]:bg-white/90">
+            <div className="container-page flex min-h-[var(--site-header-height)] items-center justify-between gap-2 py-2.5 sm:gap-3 sm:py-3 lg:py-3.5">
+              <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+                <MobileNavDisclosureTrigger id={SKELETON_NAV_ID} />
+                <Link href="/" className="inline-flex shrink-0 items-center" aria-label="Дайбилет">
+                  <DaibiletLogo textClassName="text-lg sm:text-xl lg:text-2xl" animated={false} />
+                </Link>
+                <span className="h-10 w-10 shrink-0 rounded-lg bg-slate-100 sm:h-9 sm:w-28" aria-hidden />
+              </div>
+              <nav aria-hidden className="hidden items-center gap-2 lg:flex">
+                <span className="h-4 w-14 rounded bg-slate-100" />
+                <span className="h-4 w-14 rounded bg-slate-100" />
+                <span className="h-4 w-16 rounded bg-slate-100" />
+                <span className="h-4 w-16 rounded bg-slate-100" />
+              </nav>
+              <div className="flex shrink-0 items-center gap-1.5" aria-hidden>
+                <span className="h-10 w-10 rounded-lg bg-slate-100" />
+                <span className="h-10 w-10 rounded-lg bg-slate-100" />
+                <span className="h-10 w-10 rounded-lg bg-slate-100" />
+                <span className="hidden h-10 w-10 rounded-lg bg-slate-100 lg:block" />
+              </div>
+            </div>
+          </header>
+          <div aria-hidden="true" className="site-header-spacer" />
+          <MobileNavDisclosureLayer id={SKELETON_NAV_ID} />
+        </>
+      )}
+      {variant === 'header-only' ? null : (
+        <main className="flex-1" aria-busy="true" aria-label="Загрузка">
+          {variant === 'city' ? <CityNightHeroSkeleton /> : <GenericPageSkeleton />}
+        </main>
+      )}
+    </div>
+  );
+}
+
+function CityNightHeroSkeleton() {
+  return (
+    <>
+      <section className={CITY_NIGHT_HERO.section}>
+        <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
+          <div className={CITY_NIGHT_HERO.mediaShell}>
+            <div className={`${CITY_NIGHT_HERO.photoFrame} bg-navy-foreground/[0.06]`} />
+            <div className={CITY_NIGHT_HERO.surfaceOverlay} />
+          </div>
+        </div>
+        <div className={CITY_NIGHT_HERO.content}>
+          <div className={CITY_NIGHT_HERO.contentInner}>
+            <div className="mb-4 h-4 w-48 animate-pulse rounded bg-navy-foreground/20" />
+            <div className="h-10 max-w-md animate-pulse rounded bg-navy-foreground/22 sm:h-12" />
+            <div className="mt-3 h-4 max-w-xl animate-pulse rounded bg-navy-foreground/16" />
+            <div className="mt-5 flex gap-2">
+              <span className="h-8 w-24 animate-pulse rounded-full bg-navy-foreground/18" />
+              <span className="h-8 w-28 animate-pulse rounded-full bg-navy-foreground/14" />
+            </div>
+            <div className="mt-6 flex gap-3">
+              <span className="h-11 w-44 animate-pulse rounded-full bg-card/90" />
+              <span className="h-11 w-36 animate-pulse rounded-full bg-navy-foreground/12" />
+            </div>
+          </div>
+        </div>
+      </section>
+      <div className="container-page section-y">
+        <div className="h-6 w-48 animate-pulse rounded bg-slate-200/80" />
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <div key={index} className="aspect-[4/3] animate-pulse rounded-2xl bg-slate-200/70" />
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
+function GenericPageSkeleton() {
+  return (
+    <>
+      <div className="border-b border-slate-100 bg-slate-50/80">
+        <div className="container-page py-10 sm:py-14">
+          <div className="h-8 w-2/3 max-w-md animate-pulse rounded-lg bg-slate-200/90 sm:h-10" />
+          <div className="mt-3 h-4 w-1/2 max-w-sm animate-pulse rounded bg-slate-200/70" />
+          <div className="mt-8 flex flex-wrap gap-2">
+            <span className="h-10 w-28 animate-pulse rounded-lg bg-slate-200/80" />
+            <span className="h-10 w-36 animate-pulse rounded-lg bg-slate-200/60" />
+          </div>
+        </div>
+      </div>
+      <div className="container-page section-y">
+        <div className="h-6 w-48 animate-pulse rounded bg-slate-200/80" />
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <div key={index} className="aspect-[4/3] animate-pulse rounded-2xl bg-slate-200/70" />
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}

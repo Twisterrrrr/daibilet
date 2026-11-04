@@ -1,0 +1,3 @@
+# Kaliningrad image sources
+
+- `baltiysk-mayak-pillau-i-pamyatnik-petru-i-r20261102.jpg` — AI-generated editorial image of the Baltiysk lighthouse and Peter I monument, created 2026-11-02 using the real landmark photo [“Baltiysk, Kaliningrad Oblast, Russia - panoramio - Anton Yefimov (28).jpg”](https://commons.wikimedia.org/wiki/File:Baltiysk,_Kaliningrad_Oblast,_Russia_-_panoramio_-_Anton_Yefimov_(28).jpg) as factual visual reference. The reference photo is by Anton Yefimov, licensed [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). The generated image is a derivative visual interpretation, not the original documentary photograph. The `-card` and `-thumb` files are resized derivatives of the generated image.

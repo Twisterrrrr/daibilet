@@ -1,0 +1,121 @@
+{
+  "cityCount": 29,
+  "cities": [
+    "saint-petersburg",
+    "moscow",
+    "kazan",
+    "kaliningrad",
+    "yaroslavl",
+    "ekaterinburg",
+    "nizhny-novgorod",
+    "novosibirsk",
+    "krasnoyarsk",
+    "tula",
+    "samara",
+    "omsk",
+    "ufa",
+    "tver",
+    "krasnodar",
+    "sochi",
+    "tyumen",
+    "voronezh",
+    "rostov-na-donu",
+    "perm",
+    "saratov",
+    "chelyabinsk",
+    "ryazan",
+    "ulyanovsk",
+    "penza",
+    "volgograd",
+    "smolensk",
+    "kirov-kirovskaya-oblast",
+    "barnaul"
+  ],
+  "slideCount": 116,
+  "threshold": 3,
+  "overlapCount": 10,
+  "unprotectedOverlapCount": 0,
+  "missing": [],
+  "overlaps": [
+    {
+      "city": "saint-petersburg",
+      "slide": "razvod-mostov",
+      "identityImage": "/images/venues/saint-petersburg/dvortsovyy-most.jpg",
+      "place": "saint-petersburg-dvortsovyy-most",
+      "placeImage": "/images/venues/saint-petersburg/dvortsovyy-most.jpg",
+      "distance": 0
+    },
+    {
+      "city": "saint-petersburg",
+      "slide": "dvory",
+      "identityImage": "/images/venues/saint-petersburg/otkrytye-dvory-kolodtsy-ekskursii-po-dvoram.jpg",
+      "place": "saint-petersburg-otkrytye-dvory-kolodtsy-ekskursii-po-dvoram",
+      "placeImage": "/images/venues/saint-petersburg/otkrytye-dvory-kolodtsy-ekskursii-po-dvoram.jpg",
+      "distance": 0
+    },
+    {
+      "city": "saint-petersburg",
+      "slide": "pyshki",
+      "identityImage": "/images/venues/saint-petersburg/pyshechnaya-na-bolshoy-konyushennoy.jpg",
+      "place": "saint-petersburg-pyshechnaya-na-bolshoy-konyushennoy",
+      "placeImage": "/images/venues/saint-petersburg/pyshechnaya-na-bolshoy-konyushennoy.jpg",
+      "distance": 0
+    },
+    {
+      "city": "saint-petersburg",
+      "slide": "sevkabel",
+      "identityImage": "/images/venues/saint-petersburg/sevkabel-port.jpg",
+      "place": "saint-petersburg-sevkabel-port",
+      "placeImage": "/images/venues/saint-petersburg/sevkabel-port.jpg",
+      "distance": 0
+    },
+    {
+      "city": "moscow",
+      "slide": "moskva-siti",
+      "identityImage": "/images/venues/moscow/moskva-siti.jpg",
+      "place": "moscow-moskva-siti",
+      "placeImage": "/images/venues/moscow/moskva-siti.jpg",
+      "distance": 0
+    },
+    {
+      "city": "moscow",
+      "slide": "usadby",
+      "identityImage": "/images/venues/moscow/tsaritsyno.jpg",
+      "place": "moscow-tsaritsyno",
+      "placeImage": "/images/venues/moscow/tsaritsyno.jpg",
+      "distance": 0
+    },
+    {
+      "city": "moscow",
+      "slide": "usadby",
+      "identityImage": "/images/venues/moscow/tsaritsyno.jpg",
+      "place": "moscow-tsaritsyno",
+      "placeImage": "/images/venues/moscow/tsaritsyno.jpg",
+      "distance": 0
+    },
+    {
+      "city": "moscow",
+      "slide": "usadby",
+      "identityImage": "/images/venues/moscow/tsaritsyno.jpg",
+      "place": "moscow-tsaritsyno",
+      "placeImage": "/images/venues/moscow/tsaritsyno.jpg",
+      "distance": 0
+    },
+    {
+      "city": "moscow",
+      "slide": "foodmalls",
+      "identityImage": "/images/venues/moscow/depo-lesnaya.jpg",
+      "place": "moscow-depo-lesnaya",
+      "placeImage": "/images/venues/moscow/depo-lesnaya.jpg",
+      "distance": 0
+    },
+    {
+      "city": "moscow",
+      "slide": "vysotki",
+      "identityImage": "/images/venues/moscow/kotelnicheskaya-naberezhnaya.jpg",
+      "place": "moscow-kotelnicheskaya-naberezhnaya",
+      "placeImage": "/images/venues/moscow/kotelnicheskaya-naberezhnaya.jpg",
+      "distance": 0
+    }
+  ]
+}

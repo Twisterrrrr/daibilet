@@ -1,14 +1,23 @@
 import { parseSessionStartsAt } from '@/lib/datetime';
-import { normalizeSessionImageKey, sessionHasCoverImage, spreadCatalogSessionsByCoverImage, spreadSessionsForGrid } from '@/lib/session-cover-image';
+import { isHomeRailTabooSession } from '@/lib/home-rail-taboos';
+import {
+  collectSessionImageDedupeKeys,
+  sessionHasCoverImage,
+  spreadCatalogSessionsByCoverImage,
+  spreadSessionsForGrid,
+} from '@/lib/session-cover-image';
 import type { PublicSession } from '@/types';
 
 export const HOME_SHOWCASE_LIMIT = 8;
 export const HOME_POPULAR_LIMIT = 6;
 
-type HomePickState = {
+export type HomePickState = {
   seenIds: Set<string>;
   seenTitles: Set<string>;
   seenImages: Set<string>;
+  seenFamilies: Set<string>;
+  /** URL → content fingerprint (etag:...), from HEAD at home build time. */
+  fingerprints: Map<string, string>;
 };
 
 function isFeaturedEvent(event: PublicSession): boolean {
@@ -27,28 +36,73 @@ function popularScore(event: PublicSession): number {
 function sessionDedupeKey(event: PublicSession): string {
   const groupKey = String(event.groupKey || '').trim().toLowerCase();
   if (groupKey) return `group:${groupKey}`;
-  return `title:${event.title.trim().toLowerCase()}`;
+  return `title:${String(event.title || '').trim().toLowerCase()}`;
 }
 
-function createPickState(seed?: Partial<HomePickState>): HomePickState {
+/**
+ * Family key for showcase rails: collapse near-duplicate ticket products
+ * (e.g. «Комбо 1/2/5/7» at the same venue) into one card.
+ */
+export function sessionFamilyKey(event: PublicSession): string {
+  const groupKey = String(event.groupKey || '').trim().toLowerCase();
+  if (groupKey.startsWith('merge|')) return `merge:${groupKey}`;
+
+  const venueKey = String(event.venueId || event.venueSlug || event.venue || '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ');
+  const title = String(event.title || '').trim().toLowerCase();
+
+  // «Комбо 1», «Комбо 7», «Комбо …» на одной площадке → одна карточка
+  // Не используем \b: в JS граница слова не работает с кириллицей.
+  if (venueKey && (/^комбо(?:\s|$|[-–—\d])/i.test(title) || /(?:^|[\s([{«"'])комбо\s*\d+/i.test(title))) {
+    return `combo-venue:${venueKey}`;
+  }
+
+  // Одинаковая площадка + «комбо #» после нормализации цифр
+  if (venueKey && title && /\d/.test(title)) {
+    const stem = title.replace(/\d+/g, '#').replace(/\s+/g, ' ').trim();
+    if (/^комбо(?:\s*#|\s|$)/.test(stem)) {
+      return `combo-venue:${venueKey}`;
+    }
+  }
+
+  return sessionDedupeKey(event);
+}
+
+export function createHomePickState(seed?: Partial<HomePickState>): HomePickState {
   return {
     seenIds: new Set(seed?.seenIds),
     seenTitles: new Set(seed?.seenTitles),
     seenImages: new Set(seed?.seenImages),
+    seenFamilies: new Set(seed?.seenFamilies),
+    fingerprints: seed?.fingerprints ?? new Map(),
   };
+}
+
+function sessionCoverKeys(event: PublicSession, state: HomePickState): string[] {
+  const keys = collectSessionImageDedupeKeys(event.imageUrl);
+  const url = String(event.imageUrl || '').trim();
+  const fingerprint = url ? state.fingerprints.get(url) : undefined;
+  if (fingerprint) keys.push(fingerprint);
+  return keys;
 }
 
 function takeUnique(events: PublicSession[], max: number, state: HomePickState): PublicSession[] {
   const result: PublicSession[] = [];
   for (const event of events) {
     if (!sessionHasCoverImage(event)) continue;
-    if (state.seenIds.has(event.id) || state.seenTitles.has(sessionDedupeKey(event))) continue;
-    const imageKey = normalizeSessionImageKey(event.imageUrl);
-    if (imageKey && state.seenImages.has(imageKey)) continue;
+    if (isHomeRailTabooSession(event)) continue;
+    const dedupeKey = sessionDedupeKey(event);
+    const familyKey = sessionFamilyKey(event);
+    if (state.seenIds.has(event.id) || state.seenTitles.has(dedupeKey) || state.seenFamilies.has(familyKey)) continue;
+    const imageKeys = sessionCoverKeys(event, state);
+    if (imageKeys.some((key) => state.seenImages.has(key))) continue;
 
     state.seenIds.add(event.id);
-    state.seenTitles.add(sessionDedupeKey(event));
-    if (imageKey) state.seenImages.add(imageKey);
+    state.seenTitles.add(dedupeKey);
+    state.seenFamilies.add(familyKey);
+    for (const key of imageKeys) state.seenImages.add(key);
     result.push(event);
     if (result.length >= max) break;
   }
@@ -68,20 +122,21 @@ function isWithinNextDays(event: PublicSession, days: number): boolean {
 export function buildEditorsPickEvents(
   sessions: PublicSession[],
   limit = HOME_SHOWCASE_LIMIT,
-  state = createPickState(),
+  state = createHomePickState(),
 ): PublicSession[] {
-  const pinned = sessions.filter(isFeaturedEvent);
-  const pool =
-    pinned.length > 0
-      ? [...pinned].sort((a, b) => popularScore(b) - popularScore(a))
-      : [...sessions].sort((a, b) => popularScore(b) - popularScore(a));
-  return takeUnique(pool, limit, state);
+  // Pin first (taboo / image-dupes skipped), then fill from the rest so rails stay full.
+  const pinned = [...sessions.filter(isFeaturedEvent)].sort((a, b) => popularScore(b) - popularScore(a));
+  const picked = takeUnique(pinned, limit, state);
+  if (picked.length >= limit) return picked;
+
+  const rest = [...sessions].sort((a, b) => popularScore(b) - popularScore(a));
+  return picked.concat(takeUnique(rest, limit - picked.length, state));
 }
 
 export function buildThisWeekEvents(
   sessions: PublicSession[],
   limit = HOME_SHOWCASE_LIMIT,
-  state = createPickState(),
+  state = createHomePickState(),
 ): PublicSession[] {
   const candidates = [...sessions]
     .filter((event) => !state.seenIds.has(event.id) && isWithinNextDays(event, 7))
@@ -92,7 +147,7 @@ export function buildThisWeekEvents(
 export function buildPopularEvents(
   sessions: PublicSession[],
   limit = HOME_POPULAR_LIMIT,
-  state = createPickState(),
+  state = createHomePickState(),
 ): PublicSession[] {
   const candidates = [...sessions]
     .filter((event) => !state.seenIds.has(event.id))
@@ -100,15 +155,21 @@ export function buildPopularEvents(
   return takeUnique(candidates, limit, state);
 }
 
-export function buildHomeShowcaseBundles(sessions: PublicSession[]) {
-  const state = createPickState();
+export function buildHomeShowcaseBundles(sessions: PublicSession[], state = createHomePickState()) {
+  const fingerprints = state.fingerprints;
   const editorsPick = spreadCatalogSessionsByCoverImage(
     buildEditorsPickEvents(sessions, HOME_SHOWCASE_LIMIT, state),
+    fingerprints,
   );
   const thisWeek = spreadCatalogSessionsByCoverImage(
     buildThisWeekEvents(sessions, HOME_SHOWCASE_LIMIT, state),
+    fingerprints,
   );
-  const popular = spreadSessionsForGrid(buildPopularEvents(sessions, HOME_POPULAR_LIMIT, state), 3);
+  const popular = spreadSessionsForGrid(
+    buildPopularEvents(sessions, HOME_POPULAR_LIMIT, state),
+    3,
+    fingerprints,
+  );
   return { editorsPick, thisWeek, popular };
 }
 
@@ -128,10 +189,10 @@ function recommendBadgeBucket(eventId: string): number {
 export function isRecommendBadgeEvent(event: PublicSession): boolean {
   if (recommendBadgeBucket(event.id) !== 0) return false;
   if (isFeaturedEvent(event)) return true;
-  return (event.sessionCount || 0) >= 8 && event.landingSlugs.length > 0;
+  return (event.sessionCount || 0) >= 8 && (event.landingSlugs?.length || 0) > 0;
 }
 
 export function isHitEvent(event: PublicSession): boolean {
   if (isRecommendBadgeEvent(event)) return false;
-  return (event.sessionCount || 0) >= 4 || event.landingSlugs.length > 0;
+  return (event.sessionCount || 0) >= 4 || (event.landingSlugs?.length || 0) > 0;
 }

@@ -1,0 +1,33 @@
+name: Deploy MSK web (fallback script)
+
+# Simple deploy via deploy-prod-next.sh on MSK server.
+# No shadow service — stops web, deploys, starts web.
+# Use when the atomic swap workflow fails.
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to deploy"
+        required: true
+        default: "feat/next-monorepo"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        env:
+          MSK_SSH_HOST: ${{ secrets.MSK_SSH_HOST }}
+          MSK_SSH_USER: ${{ secrets.MSK_SSH_USER }}
+          MSK_SSH_KEY: ${{ secrets.MSK_SSH_KEY }}
+          BRANCH: ${{ inputs.branch }}
+        run: |
+          set -euo pipefail
+          install -d -m 700 "$HOME/.ssh"
+          install -m 600 /dev/null "$HOME/.ssh/msk_key"
+          printf '%s\n' "$MSK_SSH_KEY" > "$HOME/.ssh/msk_key"
+          SSH=(ssh -i "$HOME/.ssh/msk_key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o BatchMode=yes)
+          REMOTE_CMD="cd /opt/daibilet && git fetch origin $BRANCH && git reset --hard FETCH_HEAD && export CI=true && BRANCH=$BRANCH ./deploy/scripts/deploy-prod-next.sh"
+          "${SSH[@]}" "${MSK_SSH_USER}@${MSK_SSH_HOST}" "$REMOTE_CMD"
+          echo "Fallback deploy completed for branch $BRANCH" >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,10 @@
+# Samara hub image credits
+
+These Wikimedia Commons photographs are used in the Samara city hub and are cropped/resized to 960×640 and 480×320 JPEG derivatives. Their original subjects and attribution are preserved below.
+
+- `botanicheskiy-sad*.jpg` — “Botanical Garden of Samara State University, Russia. View on the Nizhny pond”, Atgnclk, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Botanical_Garden_of_Samara_State_University,_Russia._View_on_the_Nizhny_pond.jpg), [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/). Cropped and resized.
+- `identity-architecture*.jpg` — “Samara embankment (April 2026) - 0 7”, Vyacheslav Bukharov, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Samara_embankment_(April_2026)_-_0_7.jpg), [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Cropped and resized.
+- `zamok-garibaldi*.jpg` — “Замок Гарибальди и прилегающий к нему фонтан, вид с северо-запада, 2025 год”, U51N433, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Замок_Гарибальди_и_прилегающий_к_нему_фонтан,_вид_с_северо-запада,_2025_год.jpg), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Cropped and resized.
+- `fasad-zamka-garibaldi*.jpg` — “Восточная часть южных ворот Замка Гарибальди в селе Хрящёвка, 2025 год”, U51N433, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Восточная_часть_южных_ворот_Замка_Гарибальди_в_селе_Хрящёвка,_2025_год.jpg), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Cropped and resized.
+- `dvor-zamka-garibaldi*.jpg` — “Архитектурный ансамбль Замка Гарибальди в селе Хрящёвка, вид с востока от замка, 2025 год”, U51N433, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Архитектурный_ансамбль_Замка_Гарибальди_в_селе_Хрящёвка,_вид_с_востока_от_замка,_2025_год.jpg), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Cropped and resized.
+- `identity-art*.jpg` — “Grushinsky festival 2023”, Nyuhn, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Grushinsky_festival_2023.jpg), [CC0](https://creativecommons.org/publicdomain/zero/1.0/). Cropped and resized.

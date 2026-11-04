@@ -1,0 +1,15 @@
+# Tver hub image credits
+
+The photographs below replace incorrect or repeated hub images. The generated `-card` and `-thumb` derivatives use the same source photograph and preserve its attribution and license.
+
+- `imperatorskiy-putevoy-dvorets*.jpg` — “Тверь. Императорский путевой дворец. 2025”, Ветер Тверских Крыш, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Тверь._Императорский_путевой_дворец._2025.jpg), [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+- `starovolzhskiy-most*.jpg` — “Starovolzhsky bridge Tver 2010”, Bibikoff, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Starovolzhsky_bridge_Tver_2010.JPG), public domain.
+- `peshehodnaya-trehsvyatskaya-ulitsa*.jpg` — “Тверь. Пешеходная улица Трёхсвятская”, Sergey Sebelev, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Тверь._Пешеходная_улица_Трёхсвятская.jpg), [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+- `spaso-preobrazhenskiy-sobor*.jpg` — “Тверь. Спасо-Преображенский кафедральный собор”, Ветер Тверских Крыш, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Тверь._Спасо-Преображенский_кафедральный_собор.jpg), [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+- `morozovskiy-gorodok-dvor-proletarki*.jpg` — “Ансамбль Морозовского городка. Фото 10”, Наталья Гудкова, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Ансамбль_Морозовского_городка._Фото_10.jpg), [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+- `oblastnaya-kartinnaya-galereya*.jpg` — “Тверь, Тверская областная картинная галерея - panoramio”, Smart Vombat, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Тверь,_Тверская_областная_картинная_галерея_-_panoramio.jpg), [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/).
+- `identity-bridge*.jpg` — “Starovolzhsky Bridge in Tver”, Florstein, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Starovolzhsky_Bridge_in_Tver.jpg), [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/).
+- `identity-domotkanovo*.jpg` — “Главный дом усадьбы Домотканово”, Галина Кудряшова, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Главный_дом_усадьбы_Домотканово.jpg), [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+- `identity-pozharskie*.jpg` — “Pojarskie with Sauteed Green Beans and Cucumber Salad”, Michele Frazier, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Pojarskie_with_Sauteed_Green_Beans_and_Cucumber_Salad_(10501345043).jpg), [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/).
+- `identity-staritsa*.jpg` — “Staritsa 2026-08-08 049”, Perituss, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Staritsa_2026-08-08_049.jpg), [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+- `bar-kalinin*.jpg` — “4714. Tver. Trekhsvyatskaya street, 25”, GAlexandrova, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:4714.Tver._Trekhsvyatskaya_street,_25.jpg), [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). The venue is at Trekhsvyatskaya 25/29; the image shows its street address, not the bar interior.
