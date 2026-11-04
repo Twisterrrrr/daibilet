@@ -6,6 +6,21 @@ export const MIN_DISPLAY_PRICE_RUB = 100;
 export const START_GRACE_MS = 15 * 60 * 1000;
 export const RUNNING_SESSION_MAX_MS = 36 * 60 * 60 * 1000;
 
+export type PublicEventAvailability = 'AVAILABLE' | 'ENDED' | 'NO_UPCOMING';
+
+/** Availability of an event page, including the useful fallback after all dates pass. */
+export function resolvePublicEventAvailability(
+  hasUpcomingSessions: boolean,
+  lastSessionAt: string | Date | null | undefined,
+  now = new Date(),
+): PublicEventAvailability | null {
+  if (hasUpcomingSessions) return 'AVAILABLE';
+  if (!lastSessionAt) return null;
+  const timestamp = new Date(lastSessionAt).getTime();
+  if (!Number.isFinite(timestamp)) return 'NO_UPCOMING';
+  return timestamp < now.getTime() ? 'ENDED' : 'NO_UPCOMING';
+}
+
 /**
  * Event/session `sourceStatus` values that mean sales are closed or suspended.
  * Keep in sync across catalog SQL, mapper slot filter, and event-page sessions.

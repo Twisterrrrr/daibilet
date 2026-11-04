@@ -234,6 +234,7 @@ export interface PublicPurchaseOptionDto extends PurchaseFields {
 
 export interface PublicEventPageDto extends ApiEnvelope {
   event: PublicEventDto;
+  availability?: 'AVAILABLE' | 'ENDED' | 'NO_UPCOMING' | null;
   pdp?: PublicPdpDocumentDto | null;
   eventPage?: {
     slug: string;

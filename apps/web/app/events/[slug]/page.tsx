@@ -131,7 +131,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {
       title: !hasPublishedStablePage && expansionMeta ? { absolute: expansionMeta.title } : title,
       description,
-      ...(stableRoute && ((stableRoute.published && !stableRoute.isIndexable) || (!stableRoute.published && stableRoute.slug === decodedSlug))
+      ...((stableRoute && ((stableRoute.published && !stableRoute.isIndexable) || (!stableRoute.published && stableRoute.slug === decodedSlug))) ||
+      (!hasPublishedStablePage && (loaded.payload.availability === 'ENDED' || loaded.payload.availability === 'NO_UPCOMING'))
         ? { robots: { index: false, follow: true } }
         : {}),
       alternates: {
@@ -176,7 +177,9 @@ export default async function EventDetailPage({ params }: PageProps) {
   }
   let jsonLdBlocks: Array<Record<string, unknown>> = [];
   try {
-    jsonLdBlocks = buildEventPageJsonLd(payload, { aggregateRating: aggregate });
+    jsonLdBlocks = payload.availability === 'ENDED' || payload.availability === 'NO_UPCOMING'
+      ? []
+      : buildEventPageJsonLd(payload, { aggregateRating: aggregate });
   } catch (error) {
     console.warn(
       `[event-jsonld] skip for ${decodedSlug}:`,
@@ -192,7 +195,7 @@ export default async function EventDetailPage({ params }: PageProps) {
         <EventHero payload={clientPayload} aggregate={aggregate} />
         <ExpiredEventSessionNotice context={clientPayload.requestedSessionContext} />
         <EventPageScheduleNotice
-          availability={payload.eventPageRoute?.availability}
+          availability={payload.availability || payload.eventPageRoute?.availability}
           city={event.city || ''}
           citySlug={event.citySlug || ''}
         />

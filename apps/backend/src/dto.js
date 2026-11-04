@@ -64,6 +64,7 @@ import {
   isOpenDateCatalogRow,
   isSaleableEventForPublic,
   isWideLifetimeSession,
+  resolvePublicEventAvailability,
 } from './catalog-availability.ts';
 import {
   SITE_TIME_ZONE,
@@ -5290,19 +5291,18 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
       }]
     : [];
   const publicSessions = sessions.length ? sessions : widgetOnlySessions;
-  let eventPageAvailability = eventPageRoute && publicSessions.length ? 'AVAILABLE' : null;
-  if (eventPageRoute && publicSessions.length === 0) {
+  let lastSessionAt = null;
+  if (publicSessions.length === 0) {
     const scheduleHistory = await db.query(
       `select max(coalesce(session."endsAt", session."startsAt")) as "lastSessionAt"
        from "EventSession" session
        where session."eventId" = any($1::text[]) and session."cancelledAt" is null`,
       [groupEventIds],
     );
-    const lastSessionAt = scheduleHistory.rows[0]?.lastSessionAt;
-    eventPageAvailability = lastSessionAt && new Date(lastSessionAt).getTime() < Date.now()
-      ? 'ENDED'
-      : 'NO_UPCOMING';
+    lastSessionAt = scheduleHistory.rows[0]?.lastSessionAt || null;
   }
+  const eventAvailability = resolvePublicEventAvailability(publicSessions.length > 0, lastSessionAt);
+  const eventPageAvailability = eventPageRoute ? eventAvailability : null;
   if (!event.overrideSeoTitle && !event.seoTitle) {
     const nearest = publicSessions[0];
     const dateBit = [nearest?.dateLabel, nearest?.timeLabel].filter(Boolean).join(', ');
@@ -5311,8 +5311,8 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
     }
   }
   applyEventPrimaryPurchase(baseEvent, publicSessions, event.sourceCode || primaryOffer?.sourceCode);
-  const hasExpiredEventPage = eventPageAvailability === 'ENDED' || eventPageAvailability === 'NO_UPCOMING';
-  if (hasExpiredEventPage) {
+  const hasExpiredEvent = eventAvailability === 'ENDED' || eventAvailability === 'NO_UPCOMING';
+  if (hasExpiredEvent) {
     publicOffers.length = 0;
     baseEvent.priceFrom = null;
     baseEvent.vacant = null;
@@ -5323,7 +5323,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
     baseEvent.purchaseMode = 'unavailable';
     baseEvent.purchaseProvider = null;
   }
-  const ticketPrices = hasExpiredEventPage ? [] : buildPublicTicketPrices(publicOffers, publicSessions, baseEvent);
+  const ticketPrices = hasExpiredEvent ? [] : buildPublicTicketPrices(publicOffers, publicSessions, baseEvent);
   const related = pickRelatedSessions(
     event,
     catalogSessions,
@@ -5335,7 +5335,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
   const vacantValues = publicSessions.map((session) => session.vacant).filter((value) => Number.isFinite(value));
 
   if (!isSaleableEventForPublic({ ...baseEvent, kind: event.kind, sourceStatus: publicSessions.find((session) => session.sourceStatus === 'widget')?.sourceStatus || event.sourceStatus, startsAt: publicSessions.find((session) => session.startsAt)?.startsAt || null,
-      endsAt: publicSessions.find((session) => session.endsAt)?.endsAt || null }) && !hasExpiredEventPage) {
+      endsAt: publicSessions.find((session) => session.endsAt)?.endsAt || null }) && !hasExpiredEvent) {
     return null;
   }
 
@@ -5349,6 +5349,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
       isIndexable: eventPageRoute.isIndexable,
       availability: eventPageAvailability,
     } : null,
+    availability: eventAvailability,
     sessions: publicSessions,
     offers: publicOffers.map((offer) => ({
       id: offer.id,

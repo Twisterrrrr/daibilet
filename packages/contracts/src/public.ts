@@ -362,6 +362,8 @@ export interface PublicPurchaseOptionDto extends PurchaseFields {
 
 export interface PublicEventPageDto extends ApiEnvelope {
   event: PublicEventDto;
+  /** Current schedule state; populated for both stable EventPages and legacy event URL fallbacks. */
+  availability?: 'AVAILABLE' | 'ENDED' | 'NO_UPCOMING' | null;
   pdp?: PublicPdpDocumentDto | null;
   /** Editorial copy published on the existing Event URL; URL/canonical stay owned by Event. */
   eventPage?: {

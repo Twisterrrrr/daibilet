@@ -8,7 +8,16 @@ import {
   isStartedTicketcloudSlot,
   isSaleableEventForPublic,
   isSaleableForPublicCatalog,
+  resolvePublicEventAvailability,
 } from './catalog-availability.js';
+
+test('event availability preserves an ended fallback after its final session', () => {
+  const now = new Date('2026-11-04T12:00:00Z');
+  assert.equal(resolvePublicEventAvailability(true, null, now), 'AVAILABLE');
+  assert.equal(resolvePublicEventAvailability(false, '2026-11-03T12:00:00Z', now), 'ENDED');
+  assert.equal(resolvePublicEventAvailability(false, '2026-11-05T12:00:00Z', now), 'NO_UPCOMING');
+  assert.equal(resolvePublicEventAvailability(false, null, now), null);
+});
 
 test('isOpenDateCatalogRow accepts OPEN_DATE kind and open_date status', () => {
   assert.equal(isOpenDateCatalogRow({ kind: 'OPEN_DATE' }), true);
