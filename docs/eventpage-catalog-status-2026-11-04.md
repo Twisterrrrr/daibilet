@@ -52,7 +52,7 @@ The controlled vocabulary and classification rules are in [`event-subtype-taxono
 
 The code now resolves a slot to a stable EventPage by product identity rather than only a direct EventPageEvent row or a Ticketscloud parent. Catalog, search, and article-link resolution share the same resolver. An EventPage route also expands to matching current slots, checks for page conflicts and provider identity, and returns each session’s venue name/address so multi-pier and multi-venue products can display the actual departure/venue per session.
 
-Automated checks cover stable URL resolution, slot expansion, conflicting target pages, search links, article-link fallback, and venue fields in EventPage sessions. The staging-only resolver smoke passes against temporary fixture tables and rolls back. The available staging snapshot has no public-saleable EventPage fixture, so it cannot validate the complete real API → web route → catalog/search chain; an HTTP probe against its existing draft pages returns the expected miss for this stale/non-saleable data. Refresh or seed a current sanitized staging catalog before calling that check green.
+Automated checks cover stable URL resolution, slot expansion, conflicting target pages, search links, article-link fallback, and venue fields in EventPage sessions. The staging-only resolver smoke passes against temporary fixture tables and rolls back. I also verified the full API → web route → catalog/search chain with the staging TEP Event `evt_tep_1049`: catalog and search return the EventPage URL, its draft route returns HTTP 200 with `noindex,follow` and canonical to the legacy slot URL, and the old slot URL still returns HTTP 200 with its existing self-canonical. This validates route/fallback behavior for a real saleable staging EventPage. It does not validate the full Ticketscloud group matrix because staging lacks a current production-equivalent TC snapshot; TC grouping/conflict behavior is covered by rollback-only staging SQL fixtures and the backend suite.
 
 ## Explicitly not changed
 
@@ -64,7 +64,7 @@ Automated checks cover stable URL resolution, slot expansion, conflicting target
 
 ## Remaining before EventPage work is closed
 
-1. Refresh or seed isolated staging with a sanitized, currently saleable EventPage fixture; verify representative pages from each provider/product pattern, catalog/search URLs, past slot URL fallback, multi-venue displays, and page response/SEO metadata.
+1. Refresh or seed isolated staging with a current sanitized Ticketscloud snapshot; verify representative TC product groups, sibling slots, multi-venue displays, and old-slot fallback against current data. The real TEP route and metadata smoke is green.
 2. Provision the three missing representative EventPage drafts, verify exact EventID mapping, and keep them non-indexable.
 3. Reconcile legacy and historical URLs (78 current unmatched URLs and 1,305 Search Console/Webmaster historical URLs) with the full EventID/EventPage map. Preserve fallback for unresolved addresses.
 4. After staging is green, deploy the runtime code and draft assignments. Do not change production canonical/sitemap or issue redirects as part of this step.
