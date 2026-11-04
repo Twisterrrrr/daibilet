@@ -4,6 +4,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const apply = process.argv.includes('--apply');
 const production = process.argv.includes('--production');
+const staging = process.argv.includes('--staging');
 const expectedGroupsArg = process.argv.find((arg) => arg.startsWith('--expected-groups='));
 const expectedEventsArg = process.argv.find((arg) => arg.startsWith('--expected-eventids='));
 const expectedGroups = expectedGroupsArg ? Number(expectedGroupsArg.split('=')[1]) : null;
@@ -19,8 +20,12 @@ const database = new URL(databaseUrl);
 if (production && (database.hostname !== '127.0.0.1' || database.port !== '5437' || database.pathname !== '/daibilet')) {
   throw new Error(`Production mode refused unexpected database target: ${database.hostname}:${database.port}${database.pathname}`);
 }
-if (apply && (!production || !Number.isInteger(expectedGroups) || !Number.isInteger(expectedEventIds))) {
-  throw new Error('Writes require --apply --production --expected-groups=N --expected-eventids=N');
+if (staging && (database.hostname !== '127.0.0.1' || database.port !== '5438' || database.pathname !== '/daibilet_staging')) {
+  throw new Error(`Staging mode refused unexpected database target: ${database.hostname}:${database.port}${database.pathname}`);
+}
+if (production && staging) throw new Error('Choose exactly one target mode: --production or --staging');
+if (apply && (!(production || staging) || !Number.isInteger(expectedGroups) || !Number.isInteger(expectedEventIds))) {
+  throw new Error('Writes require --apply, --production or --staging, and --expected-groups=N --expected-eventids=N');
 }
 
 const rows = parseCsv(readFileSync(inputPath, 'utf8'));
@@ -140,7 +145,7 @@ try {
     }
   }
 
-  const output = { mode: apply ? 'apply' : 'dry-run', database: database.pathname, groups: candidates.length,
+  const output = { mode: apply ? 'apply' : 'dry-run', environment: staging ? 'staging' : production ? 'production' : 'unspecified', database: database.pathname, groups: candidates.length,
     eventIds: allIds.length, attachPages: targetPages.size, newPages: prepared.length,
     attachEventIds: 0,
     inferredExistingPageEventIds: [...targetPages.values()].reduce((sum, item) => sum + item.inferredEventIds.length, 0),
