@@ -347,7 +347,6 @@ async function loadPublicEventDto(
     requestedEvent.id,
     representative.id,
     ...stablePageEventIds,
-    ...mergeGroupMembers.map((member) => member.id),
   ])];
 
   const now = new Date();
@@ -564,7 +563,15 @@ async function loadPublicEventDto(
     isIndexable: requestedEvent.override?.isIndexable ?? requestedEvent.isIndexable,
   };
   const ticketPrices = buildTicketPrices(offers, sessions, event);
-  const purchaseOptions = await buildMergedPurchaseOptions(mergedGroupEvents, offers, requestedEvent, eventPurchaseUrl);
+  const purchaseOptionEvents = stablePagePublished && stablePageEvents.length > 1
+    ? stablePageEvents
+    : mergedGroupEvents;
+  const purchaseOptions = await buildMergedPurchaseOptions(
+    purchaseOptionEvents,
+    offers,
+    requestedEvent,
+    eventPurchaseUrl,
+  );
   const related = await loadRelatedSessionsFromDb(requestedEvent, groupEventIds, 12);
   const explicitTour = await loadPublishedTourPeers(requestedEvent.id);
   const inferredPeers: PublicTourPeer[] = mergedGroupEvents
