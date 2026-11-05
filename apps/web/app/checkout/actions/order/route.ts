@@ -7,6 +7,7 @@ import { lookupCheckoutOrderByPublicCode } from '@/server/finance-checkout-clien
 import { fetchAdmissionProductBySlug } from '@/server/finance-projection-client';
 import { fetchPublicApiJson } from '@/server/public-api-client';
 import { resolveTicketOpeningHours } from '@/lib/venue-opening-hours';
+import { readOrderAccessToken } from '@/lib/order-access-cookie';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -107,7 +108,8 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'publicCode_required' }, { status: 400, headers: PRIVATE_STATUS_HEADERS });
   }
 
-  const financeOrder = await lookupCheckoutOrderByPublicCode(publicCode);
+  const orderAccessToken = readOrderAccessToken(request.headers.get('cookie'), publicCode);
+  const financeOrder = await lookupCheckoutOrderByPublicCode(publicCode, process.env, orderAccessToken);
   const seedOrder = lookupBuyerPurchasesSeedByPublicCode(publicCode);
   const order = financeOrder || seedOrder;
   if (!order) {
