@@ -4197,6 +4197,8 @@ const VLADIKAVKAZ_IMAGES: Record<string, string> = {
 };
 
 const ULYANOVSK_KIROV_MUST_SEE_IMAGES: Record<string, string> = {
+  'dvorec-knigi': '/images/venues/ulyanovsk/dvorec-knigi.jpg',
+  'evangelichesko-lyuteranskaya-cerkov-svyatoi-marii': '/images/venues/ulyanovsk/evangelichesko-lyuteranskaya-cerkov-svyatoi-marii.jpg',
   'ulyanovsk-muzey-goncharova': '/images/venues/ulyanovsk/muzey-goncharova.jpg',
   'ulyanovsk-uspenskiy-sobor': '/images/venues/ulyanovsk/uspenskiy-sobor.jpg',
   'ulyanovsk-nikolskiy-sobor': '/images/venues/ulyanovsk/nikolskiy-sobor.jpg',
