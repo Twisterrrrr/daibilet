@@ -1141,7 +1141,7 @@ const LOCATION_PACK_IMAGES: Record<string, string> = {
   'tomsk-pamyatnik-a-p-chehovu': '/images/venues/tomsk/pamyatnik-a-p-chehovu.jpg',
   'tver-pamyatnik-afanasiyu-nikitinu': '/images/venues/tver/pamyatnik-afanasiyu-nikitinu.jpg',
   'voronezh-pamyatnik-belomu-bimu': '/images/venues/voronezh/pamyatnik-belomu-bimu.jpg',
-  'ulyanovsk-pamyatnik-bukve-e': '/images/venues/ulyanovsk/pamyatnik-bukve-e.jpg',
+  'ulyanovsk-pamyatnik-bukve-e': '/images/venues/ulyanovsk/pamyatnik-bukve-e-20261110.jpg',
   'vologda-pamyatnik-bukve-o': '/images/venues/vologda/pamyatnik-bukve-o.jpg',
   'krasnodar-pamyatnik-ekaterine-ii': '/images/venues/krasnodar/pamyatnik-ekaterine-ii.jpg',
   'sevastopol-pamyatnik-zatoplennym-korablyam-i-grafskaya-pristan': '/images/venues/sevastopol/pamyatnik-zatoplennym-korablyam-i-grafskaya-pristan.jpg',
