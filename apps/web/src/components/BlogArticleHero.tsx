@@ -150,7 +150,7 @@ export function BlogArticleHero({
     <>
       <PageBreadcrumbBar items={breadcrumbs} hideLastOnMobile />
       <section className="border-b border-slate-200 bg-slate-50">
-        <div className="relative aspect-video w-full overflow-hidden bg-slate-100 lg:aspect-[2.15/1]">
+        <div className="relative hidden w-full overflow-hidden bg-slate-100 lg:block lg:aspect-[2.15/1]">
           <SafeImage
             src={coverImageUrl}
             alt=""
@@ -171,7 +171,22 @@ export function BlogArticleHero({
           </div>
         </div>
 
-        <div className="container-page py-6 sm:py-8 lg:hidden">{details(false)}</div>
+        <div className="container-page py-4 sm:py-6 lg:hidden">
+          <div className="grid overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div className="relative aspect-[16/9] bg-slate-100">
+              <SafeImage
+                src={coverImageUrl}
+                alt=""
+                fill
+                priority
+                sizes={IMAGE_SIZES.homeHero}
+                className="object-contain object-center"
+                fallback={<div className="absolute inset-0 bg-slate-100" />}
+              />
+            </div>
+            <div className="p-5 sm:p-8">{details(false)}</div>
+          </div>
+        </div>
       </section>
     </>
   );
