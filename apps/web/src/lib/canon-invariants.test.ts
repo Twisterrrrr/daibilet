@@ -25,6 +25,7 @@ type VenueFixture = {
   slug: string;
   name: string;
   type: string;
+  publicSlug?: string | null;
   canonicalPath?: string | null;
 };
 
@@ -172,6 +173,29 @@ describe('canon invariants', () => {
     };
     assert.equal(venueCanonicalPath(venue), '/venues/ermitage');
     assert.equal(venueHref(venue), '/venues/ermitage');
+  });
+
+  it('publicSlug wins over legacy slug and id-suffix is dropped', () => {
+    const venue: VenueFixture = {
+      id: 'venue_tep_1552',
+      slug: 'banketnyi-zal-triumf-1552',
+      publicSlug: 'banketnyi-zal-triumf',
+      name: 'Банкетный зал «Триумф»',
+      type: 'club_bar_restaurant',
+    };
+    assert.equal(venueHref(venue), '/venues/banketnyi-zal-triumf');
+    assert.equal(venueCanonicalPath(venue), '/venues/banketnyi-zal-triumf');
+  });
+
+  it('missing publicSlug falls back to legacy slug', () => {
+    const venue: VenueFixture = {
+      id: 'venue_tep_1049',
+      slug: 'banketnyi-zal-arbat-hall-1049',
+      publicSlug: null,
+      name: 'Банкетный зал Arbat Hall',
+      type: 'club_bar_restaurant',
+    };
+    assert.equal(venueHref(venue), '/venues/banketnyi-zal-arbat-hall-1049');
   });
 });
 

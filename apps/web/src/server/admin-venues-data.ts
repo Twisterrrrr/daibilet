@@ -33,6 +33,7 @@ export type AdminVenueDetailData = {
   found: boolean;
   title: string;
   slug: string | null;
+  publicSlug: string | null;
   city: string;
   cityId: string | null;
   address: string | null;
@@ -150,6 +151,7 @@ export async function loadAdminVenueDetail(venueId: string): Promise<AdminVenueD
     found: false,
     title: id,
     slug: null,
+    publicSlug: null,
     city: '—',
     cityId: null,
     address: null,
@@ -192,6 +194,7 @@ export async function loadAdminVenueDetail(venueId: string): Promise<AdminVenueD
       found: true,
       title: String(payload.title || payload.name || id),
       slug: payload.slug != null ? String(payload.slug) : null,
+      publicSlug: payload.publicSlug != null ? String(payload.publicSlug) : null,
       city: String(payload.city || '—'),
       cityId: payload.cityId != null ? String(payload.cityId) : null,
       address: payload.address != null ? String(payload.address) : null,

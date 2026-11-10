@@ -122,9 +122,9 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          {detail.slug ? (
+          {detail.publicSlug || detail.slug ? (
             <a
-              href={`${PUBLIC_SITE_BASE.replace(/\/$/, '')}/venues/${encodeURIComponent(detail.slug)}`}
+              href={`${PUBLIC_SITE_BASE.replace(/\/$/, '')}/venues/${encodeURIComponent(String(detail.publicSlug || detail.slug))}`}
               className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
               target="_blank"
               rel="noreferrer"
@@ -220,6 +220,14 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
               <input
                 name="canonicalPath"
                 defaultValue={detail.canonicalPath || ''}
+                className="w-full rounded-md border border-slate-200 px-3 py-2 font-mono text-sm"
+              />
+            </Field>
+            <Field label="Публичный slug (чистый, без id) · admin-проверка уникальности">
+              <input
+                name="publicSlug"
+                defaultValue={detail.publicSlug || ''}
+                placeholder="banketnyi-zal-triumf"
                 className="w-full rounded-md border border-slate-200 px-3 py-2 font-mono text-sm"
               />
             </Field>
