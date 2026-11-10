@@ -30,7 +30,17 @@ function hasCoords(event: PublicEventDto) {
 function eventPageDescription(page: NonNullable<PublicEventPageDto['eventPage']>): string {
   const content = page.content && typeof page.content === 'object' ? page.content : {};
   const sections = Array.isArray(content.sections) ? content.sections : [];
-  const parts = [String(page.summary || content.summary || '').trim()].filter(Boolean);
+  const summary = String(page.summary || content.summary || '').trim();
+  const firstAboutBody = String(sections.find((section) => section.kind === 'about')?.body || '').trim();
+  const normalizeForComparison = (value: string) => value.replace(/\s+/gu, ' ').trim();
+  // Editorial summaries are also used for cards and metadata. When the summary
+  // is already the opening of the first section, render the full section once
+  // instead of showing the same (often 240-character truncated) text twice.
+  const summaryIsAlreadyInAbout = Boolean(
+    summary && firstAboutBody &&
+    normalizeForComparison(firstAboutBody).startsWith(normalizeForComparison(summary)),
+  );
+  const parts = summary && !summaryIsAlreadyInAbout ? [summary] : [];
   for (const section of sections) {
     const body = String(section.body || '').trim();
     const items = Array.isArray(section.items) ? section.items : [];
