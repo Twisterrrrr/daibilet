@@ -9,7 +9,7 @@ export const SELECTED_CITY_COOKIE = 'daibilet-city';
 export const CITY_PROMPT_STORAGE_KEY = 'daibilet:city-prompted';
 
 /** Paths whose `?city=` syncs with the header city picker. */
-export const CITY_FILTER_PATHS = ['/events', '/venues', '/locations', '/places', '/podborki'] as const;
+export const CITY_FILTER_PATHS = ['/events', '/venues', '/locations', '/places', '/podborki', '/search'] as const;
 
 export function isCityFilterPath(pathname: string | null | undefined): boolean {
   const path = String(pathname || '').replace(/\/$/, '') || '/';

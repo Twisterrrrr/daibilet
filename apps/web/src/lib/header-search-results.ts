@@ -8,7 +8,7 @@ const matchGeo = createSearchGeoMatcher({
 });
 
 export type HeaderSearchItem = {
-  type: 'event' | 'city' | 'landing' | 'venue' | 'suburb';
+  type: 'event' | 'city' | 'landing' | 'venue' | 'article' | 'suburb';
   label: string;
   sublabel?: string | null;
   href: string;

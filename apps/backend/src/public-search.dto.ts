@@ -46,7 +46,7 @@ function landingSearchHref(slug: string): string {
 }
 
 export type PublicSearchItem = {
-  type: 'event' | 'venue' | 'city' | 'landing' | 'suburb';
+  type: 'event' | 'venue' | 'article' | 'city' | 'landing' | 'suburb';
   label: string;
   sublabel: string;
   href: string;
@@ -69,6 +69,16 @@ type TrgmRow = {
   venue?: string | null;
   imageUrl?: string | null;
   kind?: string | null;
+};
+
+export type PublicSearchResultsDto = {
+  generatedAt: string;
+  query: string;
+  city: string | null;
+  type: 'all' | 'events' | 'venues' | 'articles' | 'cities' | 'collections';
+  page: number;
+  pageSize: number;
+  sections: Record<string, { items: PublicSearchItem[]; hasMore: boolean }>;
 };
 
 const CITY_CARD_SLUGS = new Set([
@@ -166,12 +176,28 @@ export async function buildPublicSearchDto(
     );
   }
 
-  const [eventRows, venues, landings] = await Promise.all([
+  const [eventRows, venues, landings, articles] = await Promise.all([
     searchEventsTrgm(primary, like, cityFilter, 24),
     searchVenuesTrgm(primary, like, cityFilter, 4),
     searchLandingsIlike(terms, 3),
+    prisma.article.findMany({
+      where: {
+        status: 'PUBLISHED',
+        OR: terms.flatMap((term) => [
+          { title: { contains: term, mode: 'insensitive' as const } },
+          { excerpt: { contains: term, mode: 'insensitive' as const } },
+        ]),
+        AND: [{ OR: [{ publishedAt: null }, { publishedAt: { lte: new Date() } }] }],
+      },
+      select: { slug: true, title: true, excerpt: true, coverImageUrl: true, authorName: true },
+      orderBy: [{ isFeatured: 'desc' }, { publishedAt: 'desc' }, { title: 'asc' }],
+      take: 3,
+    }),
   ]);
-  const events = collapsePublicSearchEventRows(await attachEventPageSlugs(eventRows), 6);
+  const events = collapsePublicSearchEventRows(
+    (await attachEventPageSlugs(eventRows)).filter((row) => Boolean(row.eventPageSlug)),
+    6,
+  );
 
   for (const row of events) {
     push(
@@ -189,6 +215,19 @@ export async function buildPublicSearchDto(
   for (const row of collapsePublicSearchVenueRows(venues)) {
     const item = mapPublicSearchVenueItem(row);
     push(item, `venue:${searchVenueTextKey(item.label)}|${searchVenueTextKey(row.city)}`);
+  }
+
+  for (const article of articles) {
+    push(
+      {
+        type: 'article',
+        label: article.title,
+        sublabel: article.authorName || String(article.excerpt || '').slice(0, 100),
+        href: `/blog/${article.slug}`,
+        imageUrl: article.coverImageUrl || null,
+      },
+      `article:${article.slug}`,
+    );
   }
 
   for (const row of landings) {
@@ -209,6 +248,133 @@ export async function buildPublicSearchDto(
     query: q,
     items: items.slice(0, 8),
   };
+}
+
+/** Full search results for /search. Header autocomplete remains intentionally small. */
+export async function buildPublicSearchResultsDto(
+  searchParams: URLSearchParams,
+): Promise<PublicSearchResultsDto> {
+  const rawQ = String(searchParams.get('q') || '').trim();
+  const q = rawQ.toLowerCase();
+  const rawType = String(searchParams.get('type') || 'all').trim().toLowerCase();
+  const allowedTypes = ['all', 'events', 'venues', 'articles', 'cities', 'collections'] as const;
+  const type = (allowedTypes as readonly string[]).includes(rawType)
+    ? rawType as PublicSearchResultsDto['type']
+    : 'all';
+  const page = Math.min(20, Math.max(1, Number.parseInt(searchParams.get('page') || '1', 10) || 1));
+  const pageSize = 16;
+  const city = String(searchParams.get('city') || '').trim().toLowerCase() || null;
+  const empty: PublicSearchResultsDto = {
+    generatedAt: new Date().toISOString(), query: q, city, type, page, pageSize, sections: {},
+  };
+  if (q.length < 2) return empty;
+
+  const terms = expandSearchQuery(q).slice(0, 5);
+  const primary = terms[0] || q;
+  const like = likePattern(primary);
+  const offset = (page - 1) * pageSize;
+  const take = offset + pageSize + 1;
+  const requested = (key: PublicSearchResultsDto['type']) => type === 'all' || type === key;
+  const sections: PublicSearchResultsDto['sections'] = {};
+
+  if (requested('cities')) {
+    const hits = matchSearchGeoHits(terms, type === 'all' ? 6 : take);
+    const geoItems: PublicSearchItem[] = hits.map((hit) => ({
+      type: hit.kind === 'suburb' ? 'suburb' : 'city',
+      label: hit.label,
+      sublabel: hit.sublabel,
+      href: hit.href,
+      imageUrl: cityCardImage(hit.slug),
+    }));
+    const pageItems = type === 'all' ? geoItems.slice(0, 6) : geoItems.slice(offset, offset + pageSize);
+    sections.cities = { items: pageItems, hasMore: type === 'all' ? geoItems.length > 6 : geoItems.length > offset + pageSize };
+  }
+
+  if (requested('events')) {
+    const eventCandidateLimit = type === 'all' ? 80 : Math.min(take * 4, 400);
+    const eventRows = await searchEventsTrgm(primary, like, city || '', eventCandidateLimit);
+    const events = collapsePublicSearchEventRows(
+      (await attachEventPageSlugs(eventRows)).filter((row) => Boolean(row.eventPageSlug)),
+      take,
+    );
+    const eventItems: PublicSearchItem[] = events.map((row) => ({
+      type: 'event',
+      label: row.title,
+      sublabel: [row.city, row.venue].filter(Boolean).join(' · '),
+      href: publicSearchEventHref(row),
+      imageUrl: row.imageUrl || null,
+    }));
+    sections.events = {
+      items: type === 'all' ? eventItems.slice(0, 8) : eventItems.slice(offset, offset + pageSize),
+      hasMore: type === 'all'
+        ? eventItems.length > 8 || eventRows.length >= eventCandidateLimit
+        : eventItems.length > offset + pageSize || eventRows.length >= eventCandidateLimit,
+    };
+  }
+
+  if (requested('venues')) {
+    const venueRows = await searchVenuesTrgm(primary, like, city || '', type === 'all' ? 20 : take);
+    const venueItems = collapsePublicSearchVenueRows(venueRows).map(mapPublicSearchVenueItem);
+    sections.venues = {
+      items: type === 'all' ? venueItems.slice(0, 8) : venueItems.slice(offset, offset + pageSize),
+      hasMore: type === 'all' ? venueItems.length > 8 : venueItems.length > offset + pageSize,
+    };
+  }
+
+  if (requested('articles')) {
+    const searchOr = terms.flatMap((term) => [
+      { title: { contains: term, mode: 'insensitive' as const } },
+      { excerpt: { contains: term, mode: 'insensitive' as const } },
+      { slug: { contains: term, mode: 'insensitive' as const } },
+    ]);
+    const cityWhere = city && city !== 'all' ? {
+      OR: [
+        { citySlug: { equals: city, mode: 'insensitive' as const } },
+        { city: { slug: { equals: city, mode: 'insensitive' as const } } },
+        { city: { title: { equals: city, mode: 'insensitive' as const } } },
+      ],
+    } : {};
+    const articles = await prisma.article.findMany({
+      where: {
+        status: 'PUBLISHED',
+        AND: [cityWhere, { OR: searchOr }],
+        OR: [{ publishedAt: null }, { publishedAt: { lte: new Date() } }],
+      },
+      select: {
+        slug: true, title: true, excerpt: true, coverImageUrl: true,
+        citySlug: true, city: { select: { title: true } },
+        articleType: true, authorName: true, publishedAt: true,
+      },
+      orderBy: [{ isFeatured: 'desc' }, { publishedAt: 'desc' }, { title: 'asc' }],
+      take: type === 'all' ? 10 : take,
+    });
+    const articleItems: PublicSearchItem[] = articles.map((article) => ({
+      type: 'article',
+      label: article.title,
+      sublabel: [article.articleType, article.city?.title || article.citySlug, article.authorName].filter(Boolean).join(' · ')
+        || String(article.excerpt || '').slice(0, 120),
+      href: `/blog/${article.slug}`,
+      imageUrl: article.coverImageUrl || null,
+    }));
+    sections.articles = {
+      items: type === 'all' ? articleItems.slice(0, 6) : articleItems.slice(offset, offset + pageSize),
+      hasMore: type === 'all' ? articleItems.length > 6 : articleItems.length > offset + pageSize,
+    };
+  }
+
+  if (requested('collections')) {
+    const rows = await searchLandingsIlike(terms, type === 'all' ? 10 : take);
+    const items: PublicSearchItem[] = rows.map((row) => ({
+      type: 'landing', label: row.title, sublabel: row.city || 'Подборка',
+      href: landingSearchHref(row.slug), imageUrl: null,
+    }));
+    sections.collections = {
+      items: type === 'all' ? items.slice(0, 6) : items.slice(offset, offset + pageSize),
+      hasMore: type === 'all' ? items.length > 6 : items.length > offset + pageSize,
+    };
+  }
+
+  return { ...empty, sections };
 }
 
 /** Resolve stable page URLs by Event ID or exact same-city Ticketscloud parent group. */

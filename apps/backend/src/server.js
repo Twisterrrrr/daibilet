@@ -98,7 +98,7 @@ import {
   warmAdminGroupedEventsCache,
   invalidateAdminGroupedEventsCache,
 } from './dto.js';
-import { buildPublicSearchDto } from './public-search.dto.ts';
+import { buildPublicSearchDto, buildPublicSearchResultsDto } from './public-search.dto.ts';
 import { loadVenueMapTip } from './public-venue-map-tip.ts';
 import { buildPublicEventFreshnessMap, publicEventFreshnessPayload } from './public-event-freshness.ts';
 import {
@@ -437,6 +437,16 @@ export async function handleRequest(request, response) {
         response,
         await withPublicResponseCache(`search-trgm:${canonicalSearchParams(url.searchParams)}`, () =>
           buildPublicSearchDto(url.searchParams),
+        ),
+      );
+      return;
+    }
+
+    if (route === 'GET /api/public/search/results') {
+      sendPublicJson(
+        response,
+        await withPublicResponseCache(`search-results:${canonicalSearchParams(url.searchParams)}`, () =>
+          buildPublicSearchResultsDto(url.searchParams),
         ),
       );
       return;

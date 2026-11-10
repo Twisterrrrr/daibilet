@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
-import { buildCatalogHref, isPlacesSectionPath, placesSearchHref } from '@/lib/catalog-url';
+import { isPlacesSectionPath, placesSearchHref } from '@/lib/catalog-url';
 import { mergeHeaderSearchItems, type HeaderSearchItem } from '@/lib/header-search-results';
 import { venueHref, venuePageTemplate } from '@/lib/routes';
 import { mapVenueCatalogFeedPage } from '@/lib/venue-catalog-feed';
@@ -35,7 +35,7 @@ export function HeaderSearch({
   const placesSection = isPlacesSectionPath(pathname);
   const resolvedPlaceholder =
     placeholder ||
-    (placesSection ? 'Музей, театр, парк, набережная…' : 'Поиск событий, городов, подборок…');
+    (placesSection ? 'Музей, театр, парк, набережная…' : 'События, места, статьи и города…');
   const [query, setQuery] = useState(initialQuery);
   const [items, setItems] = useState<SearchItem[]>([]);
   const [resultsOpen, setResultsOpen] = useState(false);
@@ -153,22 +153,10 @@ export function HeaderSearch({
 
   const submit = (value?: string) => {
     const normalized = (value ?? query).trim();
-    if (placesSection) {
-      navigate(
-        placesSearchHref({
-          q: normalized || undefined,
-          city: cityFilter && cityFilter !== 'all' ? cityFilter : undefined,
-        }),
-      );
-      return;
-    }
-    navigate(
-      buildCatalogHref({
-        q: normalized || undefined,
-        city: cityFilter && cityFilter !== 'all' ? cityFilter : undefined,
-        sort: 'popular',
-      }),
-    );
+    const params = new URLSearchParams();
+    if (normalized) params.set('q', normalized);
+    if (cityFilter && cityFilter !== 'all') params.set('city', cityFilter);
+    navigate(`/search${params.size ? `?${params.toString()}` : ''}`);
   };
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -241,6 +229,8 @@ export function HeaderSearch({
                       ? 'П'
                       : item.type === 'venue'
                         ? 'М'
+                      : item.type === 'article'
+                        ? 'С'
                         : 'E'}
                 </div>
               )}
@@ -253,6 +243,17 @@ export function HeaderSearch({
         ))}
       </ul>
     ) : null;
+
+  const allResultsLink = query.trim().length >= 2 ? (
+    <button
+      type="button"
+      onMouseDown={(event) => event.preventDefault()}
+      onClick={() => submit()}
+      className="flex w-full items-center justify-center border-t border-slate-100 px-4 py-3 text-sm font-medium text-primary hover:bg-surface-muted"
+    >
+      Все результаты по запросу «{query.trim()}»
+    </button>
+  ) : null;
 
   if (variant === 'overlay') {
     return (
@@ -294,7 +295,7 @@ export function HeaderSearch({
                     onKeyDown={onKeyDown}
                     placeholder={resolvedPlaceholder}
                     className={`${inputClasses} rounded-lg py-2.5 pl-10 pr-2 text-lg sm:pl-11 sm:pr-3`}
-                    aria-label={placesSection ? 'Поиск мест' : 'Поиск событий'}
+                    aria-label={placesSection ? 'Поиск мест' : 'Поиск по сайту'}
                     aria-expanded={resultsOpen}
                     aria-autocomplete="list"
                     role="combobox"
@@ -310,14 +311,16 @@ export function HeaderSearch({
                 </button>
               </div>
               {resultsList}
+              {items.length ? allResultsLink : null}
               {query.trim().length >= 2 && !items.length ? (
                 <p className="px-4 py-5 text-center text-sm text-graphite-muted sm:px-5">
-                  Ничего не найдено. Нажмите Enter для поиска в каталоге.
+                  Ничего не найдено. Откройте расширенный поиск.
                 </p>
               ) : null}
+              {query.trim().length >= 2 && !items.length ? allResultsLink : null}
               {query.trim().length < 2 ? (
                 <p className="px-4 py-3.5 text-sm text-graphite-muted sm:px-5 sm:py-4">
-                  Введите минимум 2 символа или нажмите Enter для каталога.
+                  Введите минимум 2 символа или нажмите Enter для поиска по сайту.
                 </p>
               ) : null}
             </div>
@@ -340,7 +343,7 @@ export function HeaderSearch({
         onKeyDown={onKeyDown}
         placeholder={resolvedPlaceholder}
         className={`${inputClasses} py-2 pl-10 pr-3 text-sm`}
-        aria-label={placesSection ? 'Поиск мест' : 'Поиск событий'}
+        aria-label={placesSection ? 'Поиск мест' : 'Поиск по сайту'}
         aria-expanded={resultsOpen}
         aria-autocomplete="list"
         role="combobox"
