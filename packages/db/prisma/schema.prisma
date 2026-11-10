@@ -1033,6 +1033,8 @@ model DestinationPdpRevision {
 model Venue {
   id               String          @id @default(cuid())
   slug             String          @unique
+  /// Чистый публичный slug без id-хвоста импортного источника (adm/редактура; null => slug).
+  publicSlug       String?         @unique
   title            String
   description      String?
   /**
