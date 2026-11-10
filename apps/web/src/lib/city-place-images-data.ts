@@ -4167,9 +4167,9 @@ const TOLYATTI_IMAGES: Record<string, string> = {
   'tolyatti-tehnicheskiy-muzey-vaz': '/images/venues/tolyatti/tehnicheskiy-muzey-vaz.jpg',
   'tolyatti-park-pobedy': '/images/venues/tolyatti/park-pobedy.jpg',
   'tolyatti-naberezhnaya-volgi': '/images/venues/tolyatti/naberezhnaya-volgi.jpg',
-  'tolyatti-skulptura-voskhischenie': '/images/venues/tolyatti/skulptura-voskhischenie.jpg',
-  'tolyatti-troitskiy-sobor': '/images/venues/tolyatti/troitskiy-sobor.jpg',
-  'tolyatti-ploschad-svobody': '/images/venues/tolyatti/ploschad-svobody.jpg',
+  'tolyatti-pamyatnik-tatischevu': '/images/venues/tolyatti/pamyatnik-tatischevu.jpg',
+  'tolyatti-spaso-preobrazhenskiy-sobor': '/images/venues/tolyatti/troitskiy-sobor.jpg',
+  'tolyatti-ploschad-svobody': '/images/venues/tolyatti/obelisk-slavy.jpg',
   'tolyatti-portposelok': '/images/venues/tolyatti/portposelok.jpg',
   'tolyatti-muzey-istorii-avtovaza': '/images/venues/tolyatti/muzey-istorii-avtovaza.jpg',
 };

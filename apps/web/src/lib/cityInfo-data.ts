@@ -141,7 +141,7 @@ import {
   TVER_SUBURBS,
   TVER_TRAVEL,
 } from './tver-hub';
-import { TOLYATTI_FAQ, TOLYATTI_MUST_SEE, TOLYATTI_TRAVEL } from './tolyatti-hub';
+import { TOLYATTI_DAY_ROUTE_PRESETS, TOLYATTI_FAQ, TOLYATTI_MUST_SEE, TOLYATTI_SIGHTS, TOLYATTI_TRAVEL } from './tolyatti-hub';
 import { SURGUT_FAQ, SURGUT_MUST_SEE, SURGUT_TRAVEL } from './surgut-hub';
 import {
   VLADIKAVKAZ_FAQ,
@@ -5954,10 +5954,12 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
   },
   tolyatti: {
     brief:
-      'Автоград на Волге: Технический музей, набережная и зелёные парки Автозаводского района.',
+      'Тольятти вырос на берегу Волги и известен как Автоград: здесь соседствуют открытый музей техники, широкие водные панорамы и районы с разной историей.',
     hookFact:
-      'Тольятти вырос вокруг АвтоВАЗа и хранит одну из самых больших открытых коллекций техники в России - Технический музей.',
+      'В Тольятти находится Парковый комплекс истории техники имени К. Г. Сахарова - открытая коллекция автомобилей, самолётов, поездов и военной техники.',
     mustSee: TOLYATTI_MUST_SEE as CityMustSeeItem[],
+    sights: TOLYATTI_SIGHTS,
+    dayRoutePresets: TOLYATTI_DAY_ROUTE_PRESETS as CityDayRoutePreset[],
     travel: TOLYATTI_TRAVEL,
     faq: TOLYATTI_FAQ,
   },

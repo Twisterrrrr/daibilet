@@ -61,6 +61,7 @@ import {
   YAROSLAVL_WHEN_TO_GO,
   ULYANOVSK_WHEN_TO_GO,
   KIROV_WHEN_TO_GO,
+  TOLYATTI_WHEN_TO_GO,
 } from './when-to-go-packs.ts';
 import { normalizeCityHubSlug } from './city-hub-config.ts';
 import type { CityMustSeeItem, CitySuburbItem, CitySuburbPlace } from './cityInfo.ts';
@@ -358,6 +359,46 @@ function tagsFromSlides(slides: CityIdentitySlide[]): CityIdentityTag[] {
 }
 
 const IDENTITY_LEAD = 'Четыре вещи, за которыми сюда едут в первую очередь';
+
+const TOLYATTI_WEATHER: CityWeatherFlavor = {
+  latitude: 53.51,
+  longitude: 49.42,
+  timezone: 'Europe/Samara',
+  outdoorSlugs: [
+    'tolyatti-pamyatnik-tatischevu',
+    'tolyatti-naberezhnaya-volgi',
+    'tolyatti-park-pobedy',
+    'tolyatti-portposelok',
+  ],
+  indoorSlugs: ['tolyatti-tehnicheskiy-muzey-vaz', 'tolyatti-muzey-istorii-avtovaza'],
+  outdoorCta: 'Погода позволяет: выбирайте набережную Волги или Портпосёлок',
+  indoorCtaOvercast: 'Пасмурно: технический музей или музей истории АвтоВАЗа',
+  indoorCtaRain: 'Дождь: запланируйте музей и проверьте часы работы перед выездом',
+  indoorCtaSnow: 'Снег: сократите прогулку у воды и проверьте зимний режим музеев',
+};
+
+const TOLYATTI_SLIDES: CityIdentitySlide[] = [
+  {
+    id: 'tolyatti-volga',
+    title: 'Город у большой воды',
+    text: 'Тольятти вытянут вдоль Волги и Куйбышевского водохранилища. Береговые прогулки здесь задают городской масштаб и открывают виды на Жигулёвские горы.',
+    imageSrc: '/images/venues/tolyatti/identity-volga-city.jpg',
+    imageAlt: 'Вид через Куйбышевское водохранилище на Тольятти и дальний берег',
+    slugs: ['tolyatti-naberezhnaya-volgi', 'tolyatti-portposelok'],
+    target: 'places',
+    badge: 'Волга',
+  },
+  {
+    id: 'tolyatti-autograd',
+    title: 'Сосновые берега Волги',
+    text: 'У водохранилища городские прогулки сменяются сосновым берегом и видами на Жигулёвские горы.',
+    imageSrc: '/images/venues/tolyatti/identity-pine-volga.jpg',
+    imageAlt: 'Сосновый берег и вода Куйбышевского водохранилища возле Тольятти',
+    slugs: ['tolyatti-naberezhnaya-volgi', 'tolyatti-park-pobedy'],
+    target: 'places',
+    badge: 'Природа',
+  },
+];
 
 const MSK_SLIDES: CityIdentitySlide[] = [
   {
@@ -2195,6 +2236,14 @@ export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
     slides: KIROV_SLIDES,
     weather: KIROV_WEATHER,
     whenToGo: KIROV_WHEN_TO_GO,
+  },
+  tolyatti: {
+    identityHeading: 'Чем уникален Тольятти',
+    identityLead: 'Автоград на Волге: вода, промышленная история и сосновые берега',
+    tags: tagsFromSlides(TOLYATTI_SLIDES),
+    slides: TOLYATTI_SLIDES,
+    weather: TOLYATTI_WEATHER,
+    whenToGo: TOLYATTI_WHEN_TO_GO,
   },
 };
 
