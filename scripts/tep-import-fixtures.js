@@ -106,7 +106,9 @@ async function main() {
       importedExternalIds.add(externalId);
       const places = Array.isArray(sourceEvent.eventPlaces) ? sourceEvent.eventPlaces : [];
       const primaryPlace = places[0] || {};
+      const placeCanon = resolvePlaceCanon(sourceEvent, primaryPlace);
       const cityName =
+        placeCanon.canon.city ||
         cityById.get(Number(primaryPlace.city_id)) ||
         cityFromAddress(primaryPlace.address) ||
         cityFromTitle(sourceEvent.title) ||
@@ -382,12 +384,17 @@ async function upsertCity(client, cityName, sourceCityId) {
   return result.rows[0].id;
 }
 
-async function upsertVenue(client, event, place, cityId) {
+/**
+ * Durable venue canon (scripts/data/venue-address-overrides.json) для TEP-места.
+ * Канон — единственный источник title/address/city/kind, переживающий повторный
+ * импорт: фикстура Teplohod для этих мест не содержит ни города, ни адреса, а
+ * раньше импорт штамповал kind='PIER' для всего подряд (банкетные залы и автобусы
+ * попадали в «Причалы»).
+ */
+function resolvePlaceCanon(event, place) {
   const rawTitle = cleanTitle(place.name) || cleanTitle(event.place) || "Место отправления Teplohod";
   const externalPlaceId = place.id || event.id;
   const slug = slugify(`${rawTitle}-${externalPlaceId}`);
-  const latitude = floatOrNull(place.lat);
-  const longitude = floatOrNull(place.lng);
   const canonVenueId = TEP_PLACE_CANON_VENUE_IDS.get(String(externalPlaceId)) || null;
   const canon = applyVenueAddressCanon({
     id: canonVenueId || `venue_tep_${externalPlaceId}`,
@@ -396,22 +403,33 @@ async function upsertVenue(client, event, place, cityId) {
     address: place.address || null,
     slug,
   });
+  return { rawTitle, externalPlaceId, slug, canonVenueId, canon };
+}
+
+async function upsertVenue(client, event, place, cityId) {
+  const { rawTitle, externalPlaceId, slug, canonVenueId, canon } = resolvePlaceCanon(event, place);
+  const latitude = floatOrNull(place.lat);
+  const longitude = floatOrNull(place.lng);
   const venueTitle = canon.title || rawTitle;
   const venueAddress = canon.address || place.address || null;
+  const venueKind = canon.kind || "PIER";
   const result = await client.query(
     `
       insert into "Venue" (id, slug, title, description, "shortDescription", "heroImageUrl", "cityId", address, latitude, longitude, kind, "pageStatus", "createdAt", "updatedAt")
-      values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'PIER', 'CANDIDATE', now(), now())
+      values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 'CANDIDATE', now(), now())
       on conflict (id) do update set
         title = excluded.title,
         description = coalesce(excluded.description, "Venue".description),
         "shortDescription" = coalesce(excluded."shortDescription", "Venue"."shortDescription"),
         "heroImageUrl" = coalesce("Venue"."heroImageUrl", excluded."heroImageUrl"),
         "cityId" = excluded."cityId",
-        address = excluded.address,
+        address = coalesce(excluded.address, "Venue".address),
         latitude = excluded.latitude,
         longitude = excluded.longitude,
-        kind = excluded.kind,
+        kind = case
+          when excluded.kind = 'PIER' and "Venue".kind <> 'PIER' then "Venue".kind
+          else excluded.kind
+        end,
         "pageStatus" = case
           when "Venue"."pageStatus" in ('PUBLISHED', 'HIDDEN') then "Venue"."pageStatus"
           else excluded."pageStatus"
@@ -430,6 +448,7 @@ async function upsertVenue(client, event, place, cityId) {
       venueAddress,
       latitude,
       longitude,
+      venueKind,
     ],
   );
 
@@ -449,10 +468,10 @@ async function upsertVenue(client, event, place, cityId) {
     await client.query(
       `
         update "Venue"
-        set title = $2, address = $3, kind = 'PIER', "updatedAt" = now()
+        set title = $2, address = coalesce($3, address), kind = coalesce($4, kind), "updatedAt" = now()
         where id = $1
       `,
-      [canonVenueId, venueTitle, venueAddress],
+      [canonVenueId, venueTitle, venueAddress, venueKind],
     );
   }
 

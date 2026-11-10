@@ -41,6 +41,15 @@ export const LANDING_BREADCRUMB_LABELS: Record<string, string> = {
   'moscow-dinner-boat': 'Ужин на теплоходе',
   'spb-yards': 'Экскурсии по дворам',
   planetarium: 'Планетарий',
+  'show-programs': 'Шоу-программы',
+  'quest-tours': 'Квест-экскурсии',
+  'self-development': 'Саморазвитие и лекции',
+  'intimate-concerts': 'Квартирники и камерные вечера',
+  'improv-tribute': 'Импровизация и трибьют-шоу',
+  graduation: 'Выпускные',
+  maslenitsa: 'Масленица',
+  'international-womens-day': '8 Марта',
+  'active-sport': 'Активный отдых и автоспорт',
 };
 
 /** Приоритет matching landing для крошки события (сначала более узкие). */

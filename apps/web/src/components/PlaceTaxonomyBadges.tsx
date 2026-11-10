@@ -12,6 +12,15 @@ const subtypeLabels: Record<string, string> = {
   airport: 'Аэропорт', marina: 'Марина', waterfall: 'Водопад', cave: 'Пещера',
   mountain: 'Гора', lake: 'Озеро', river: 'Река', beach: 'Пляж', forest: 'Лес',
   hot_spring: 'Термальный источник', island: 'Остров', cape: 'Мыс', reserve: 'Заповедник', park: 'Парк',
+  banquet_hall: 'Банкетный зал', restaurant: 'Ресторан', cafe: 'Кафе', bar: 'Бар',
+  square: 'Площадь', viewpoint: 'Смотровая площадка', embankment: 'Набережная',
+  street: 'Улица', gallery: 'Галерея', museum: 'Музей', theatre: 'Театр',
+  concert_hall: 'Концертный зал', philharmonic: 'Филармония', cinema: 'Кинотеатр',
+  circus: 'Цирк', church: 'Храм', chapel: 'Часовня', monastery: 'Монастырь',
+  mosque: 'Мечеть', synagogue: 'Синагога', monument: 'Памятник',
+  zoo: 'Зоопарк', aquarium: 'Океанариум', planetarium: 'Планетарий',
+  amusement_park: 'Парк развлечений', ethnographic_park: 'Этнопарк', stadium: 'Стадион',
+  cultural_center: 'Культурный центр', club: 'Клуб', resort: 'Курорт', loft: 'Лофт',
 };
 
 export function PlaceTaxonomyBadges({ venue }: { venue: PublicVenueDto }) {
