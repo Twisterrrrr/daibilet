@@ -22,7 +22,7 @@ export function publicAssetExists(urlPath: string): boolean {
 
 /**
  * Prefer 1200x630 `/images/blog/{slug}-og.jpg` (Telegram/VK).
- * Missing file → default-og.jpg, never a 2MB cover and never a 404 image.
+ * Missing file → the generic site OG image, never a 2MB cover and never a 404 image.
  */
 export function resolveBlogShareImage(coverImageUrl?: string | null, slug?: string | null): string {
   const fromSlug = String(slug || '').trim();

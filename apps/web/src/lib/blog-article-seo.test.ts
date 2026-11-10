@@ -26,13 +26,13 @@ describe('resolveBlogShareImage', () => {
     }
   });
 
-  it('falls back to default-og.jpg when *-og.jpg is missing', () => {
+  it('falls back to the generic site OG image when *-og.jpg is missing', () => {
     const url = resolveBlogShareImage(
       '/images/blog/definitely-missing-og-slug-xyz.jpg',
       'definitely-missing-og-slug-xyz',
     );
     assert.equal(url, DEFAULT_OG_IMAGE);
-    assert.ok(url.endsWith('/images/og/default-og.jpg'));
+    assert.ok(url.endsWith('/images/og/site-default-v2.jpg'));
   });
 
   it('returns default OG for empty cover', () => {

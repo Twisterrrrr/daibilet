@@ -16,7 +16,7 @@ export const OG_IMAGE_HEIGHT = 630;
 export const OG_IMAGE_TYPE = 'image/jpeg';
 
 /** Relative path on disk (apps/public/public + synced web/public). */
-export const DEFAULT_OG_IMAGE_PATH = '/images/og/default-og.jpg';
+export const DEFAULT_OG_IMAGE_PATH = '/images/og/site-default-v2.jpg';
 
 /** Site-wide OG fallback. Absolute JPEG 1200x630 - never the 2.5MB home-hero selfie. */
 export const DEFAULT_OG_IMAGE = `${SITE_URL}${DEFAULT_OG_IMAGE_PATH}`;
@@ -180,7 +180,7 @@ function toHttps(url: string): string {
 
 /**
  * Full OG + Twitter image pack: absolute https URL, 1200x630, image/jpeg, alt.
- * No custom path → default-og.jpg. Already-absolute URLs are kept.
+ * No custom path → the generic site OG asset. Already-absolute URLs are kept.
  */
 export function getOpenGraphMediaTags(
   customImagePath?: string | null,

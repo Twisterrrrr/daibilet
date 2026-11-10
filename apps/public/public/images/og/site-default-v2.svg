@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#123b82"/>
+      <stop offset="1" stop-color="#2878dd"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#e9f2ff"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#08295d" flood-opacity=".3"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="1040" cy="42" r="250" fill="#70b6ff" opacity=".14"/>
+  <circle cx="1080" cy="630" r="310" fill="#a6d1ff" opacity=".12"/>
+  <path d="M0 500C210 420 390 635 640 520v110H0z" fill="#0a3171" opacity=".23"/>
+
+  <g transform="translate(76 72)">
+    <path d="M14 14h56a17 17 0 0 1 17 17v7a14 14 0 0 0 0 28v7a17 17 0 0 1-17 17H14A17 17 0 0 1-3 73v-7a14 14 0 0 0 0-28v-7A17 17 0 0 1 14 14z" fill="#fff"/>
+    <path d="M32 28v12m0 8v12m0 8v11" stroke="#2468c9" stroke-width="5" stroke-linecap="round" stroke-dasharray="1 4"/>
+    <circle cx="67" cy="31" r="7" fill="#2468c9"/>
+  </g>
+  <text x="174" y="139" fill="#d5e8ff" font-family="Arial, DejaVu Sans, sans-serif" font-size="21" font-weight="700" letter-spacing="3">ДАИБИЛЕТ</text>
+  <text x="76" y="295" fill="#fff" font-family="Arial, DejaVu Sans, sans-serif" font-size="82" font-weight="700">Дайбилет</text>
+  <text x="80" y="366" fill="#eaf4ff" font-family="Arial, DejaVu Sans, sans-serif" font-size="31">Билеты на события и впечатления</text>
+  <text x="80" y="414" fill="#eaf4ff" font-family="Arial, DejaVu Sans, sans-serif" font-size="31">в городах России</text>
+  <rect x="80" y="475" width="220" height="4" rx="2" fill="#9bd0ff" opacity=".8"/>
+  <text x="80" y="526" fill="#d5e8ff" font-family="Arial, DejaVu Sans, sans-serif" font-size="21">Экскурсии · концерты · музеи</text>
+
+  <g filter="url(#shadow)" transform="rotate(5 907 326)">
+    <rect x="705" y="90" width="390" height="470" rx="30" fill="url(#card)"/>
+    <rect x="735" y="122" width="330" height="188" rx="20" fill="#dcecff"/>
+    <circle cx="976" cy="177" r="46" fill="#ffc75e"/>
+    <path d="M755 276l86-78 65 55 54-45 84 68z" fill="#77a9e8"/>
+    <path d="M755 276l63-54 43 37 37-29 91 46z" fill="#4b83ce"/>
+    <rect x="742" y="343" width="16" height="16" rx="8" fill="#3576d2"/>
+    <rect x="774" y="343" width="254" height="13" rx="6" fill="#234d89" opacity=".86"/>
+    <rect x="774" y="368" width="202" height="10" rx="5" fill="#89a8d1"/>
+    <rect x="742" y="407" width="16" height="16" rx="8" fill="#83b9f4"/>
+    <rect x="774" y="408" width="230" height="13" rx="6" fill="#234d89" opacity=".72"/>
+    <rect x="774" y="433" width="176" height="10" rx="5" fill="#89a8d1"/>
+    <rect x="742" y="472" width="16" height="16" rx="8" fill="#ffbf53"/>
+    <rect x="774" y="473" width="212" height="13" rx="6" fill="#234d89" opacity=".72"/>
+    <rect x="774" y="498" width="148" height="10" rx="5" fill="#89a8d1"/>
+  </g>
+</svg>

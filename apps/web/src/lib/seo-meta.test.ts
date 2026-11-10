@@ -21,11 +21,11 @@ import {
   placesCityDescriptionFallback,
 } from './seo-meta.ts';
 
-const SAMPLE_DEFAULT_OG = 'https://daibilet.ru/images/og/default-og.jpg';
+const SAMPLE_DEFAULT_OG = 'https://daibilet.ru/images/og/site-default-v2.jpg';
 
 test('DEFAULT_OG_IMAGE is absolute JPEG on canonical host', () => {
-  assert.equal(DEFAULT_OG_IMAGE_PATH, '/images/og/default-og.jpg');
-  assert.ok(DEFAULT_OG_IMAGE.endsWith('/images/og/default-og.jpg'));
+  assert.equal(DEFAULT_OG_IMAGE_PATH, '/images/og/site-default-v2.jpg');
+  assert.ok(DEFAULT_OG_IMAGE.endsWith('/images/og/site-default-v2.jpg'));
   assert.match(DEFAULT_OG_IMAGE, /^https:\/\//);
   assert.doesNotMatch(DEFAULT_OG_IMAGE, /home-hero-friends-selfie/);
   assert.doesNotMatch(DEFAULT_OG_IMAGE, /your-domain\.com/i);
@@ -34,7 +34,7 @@ test('DEFAULT_OG_IMAGE is absolute JPEG on canonical host', () => {
   }
 });
 
-test('getOpenGraphMediaTags with no args uses default-og.jpg pack', () => {
+test('getOpenGraphMediaTags with no args uses the generic site OG image', () => {
   const media = getOpenGraphMediaTags();
   assert.equal(media.url, DEFAULT_OG_IMAGE);
   assert.equal(media.twitterCard, 'summary_large_image');
