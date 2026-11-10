@@ -21,7 +21,6 @@ import {
   venueTextKeysFuzzyMatch,
 } from './public-venue-read.js';
 import { createAdminVenue } from './dto.js';
-
 test('place type filtering prefers reviewed taxonomy and supports exact club subtype', () => {
   const reviewedClub = { placeType: 'venue', placeSubtype: 'club', type: 'club_bar_restaurant' };
   const reviewedRestaurant = { placeType: 'food', placeSubtype: 'restaurant', type: 'club_bar_restaurant' };
