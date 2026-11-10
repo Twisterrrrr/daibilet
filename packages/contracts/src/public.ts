@@ -176,6 +176,8 @@ export interface PublicCatalogDto extends ApiEnvelope {
 export interface PublicVenueDto extends SeoFields {
   id: string;
   slug?: string | null;
+  /** Чистый канонический slug PDP без id-хвоста; null => fallback на `slug`. */
+  publicSlug?: string | null;
   name: string;
   title?: string;
   city: string;
