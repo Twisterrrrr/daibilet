@@ -585,13 +585,19 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
   const stopEventCount = stopEvents.length;
   const displayEventCount = routeCount > 0 ? routeCount : stopEventCount;
 
-  const pageSlug = publicVenueSlug(canonicalVenue.slug, normalizedVenue.name, canonicalVenue.id);
+  const pageSlug = resolvePublicVenueRouteSlug({
+    slug: canonicalVenue.slug,
+    publicSlug: canonicalVenue.publicSlug,
+    title: normalizedVenue.name,
+    id: canonicalVenue.id,
+  });
   return {
     generatedAt: new Date().toISOString(),
     pdp: await readReadyPdpDocument(db, 'venues', canonicalVenue.id),
     venue: {
       id: canonicalVenue.id,
       slug: pageSlug,
+      publicSlug: normalizeNullableString(canonicalVenue.publicSlug) || null,
       ...publicVenueEditorialFlags(pageSlug, canonicalVenue.citySlug, normalizedVenue.city),
       name: normalizedVenue.name,
       title: normalizedVenue.name,
@@ -634,7 +640,12 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
       canonicalPath: resolvePublicVenueCanonicalPath(
         canonicalVenue.canonicalPath,
         pageTemplate,
-        publicVenueSlug(canonicalVenue.slug, normalizedVenue.name, canonicalVenue.id),
+        resolvePublicVenueRouteSlug({
+          slug: canonicalVenue.slug,
+          publicSlug: canonicalVenue.publicSlug,
+          title: normalizedVenue.name,
+          id: canonicalVenue.id,
+        }),
       ),
       isIndexable,
       events: displayEventCount,
@@ -1256,6 +1267,7 @@ const PUBLIC_VENUE_ROW_SELECT = `
   select
     venue.id,
     venue.slug,
+    venue."publicSlug",
     venue.title,
     venue.description,
     venue."shortDescription",
@@ -1307,7 +1319,7 @@ async function resolvePublicVenueRow(db, venueSlugOrId) {
     // A slug can belong to several imported Venue rows. Keep route resolution
     // stable across plans/restarts so sitemap checks and page metadata agree.
     const result = await db.query(`${PUBLIC_VENUE_ROW_SELECT}
-      where venue.slug = $1 or venue.id = $1
+      where venue.slug = $1 or venue.id = $1 or venue."publicSlug" = $1
       order by venue."isIndexable" desc nulls last,
         case when upper(venue."pageStatus"::text) = 'PUBLISHED' then 1 else 0 end desc,
         venue."updatedAt" desc nulls last, venue.id asc
@@ -1337,7 +1349,7 @@ async function resolvePublicVenueRowByComputedSlug(db, requestedSlug) {
     for (const venueId of [`venue_tep_${numericSuffix[1]}`, `venue_${numericSuffix[1]}`]) {
       const result = await db.query(`${PUBLIC_VENUE_ROW_SELECT} where venue.id = $1 limit 1`, [venueId]);
       const row = result.rows[0];
-      if (row && publicVenueSlug(row.slug, row.title, row.id) === normalized) return row;
+      if (row && resolvePublicVenueRouteSlug(row) === normalized) return row;
     }
   }
 
@@ -1351,14 +1363,14 @@ async function resolvePublicVenueRowByComputedSlug(db, requestedSlug) {
     [normalized, `${normalized}-%`],
   );
   for (const row of prefixResult.rows) {
-    if (publicVenueSlug(row.slug, row.title, row.id) === normalized) return row;
+    if (resolvePublicVenueRouteSlug(row) === normalized) return row;
   }
 
   const cyrillicResult = await db.query(
     `${PUBLIC_VENUE_ROW_SELECT} where venue.slug ~ '[А-Яа-яЁё]' order by venue."updatedAt" desc nulls last limit 1200`,
   );
   for (const row of cyrillicResult.rows) {
-    if (publicVenueSlug(row.slug, row.title, row.id) === normalized) return row;
+    if (resolvePublicVenueRouteSlug(row) === normalized) return row;
   }
 
   return null;
@@ -2209,7 +2221,12 @@ export function mapPublicVenueListItem(row) {
     normalizeNullableString(normalized.citySlug) ||
     (normalized.city && normalized.city !== 'Не указан' ? publicCitySlug(normalized.city) : null);
   // Lean list DTO: no sessions / mini-affiche / empty categories blob.
-  const slug = publicVenueSlug(normalized.slug, name, normalized.id);
+  const slug = resolvePublicVenueRouteSlug({
+    slug: normalized.slug,
+    publicSlug: normalized.publicSlug,
+    title: name,
+    id: normalized.id,
+  });
   const template = publicVenuePageTemplate(type);
   const decision = indexabilityDecision({
     futureSessions: normalized.futureSessionCount,
@@ -2225,6 +2242,7 @@ export function mapPublicVenueListItem(row) {
   return {
     id: normalized.id,
     slug,
+    publicSlug: normalizeNullableString(normalized.publicSlug) || null,
     ...publicVenueEditorialFlags(slug, citySlug, normalized.city),
     name,
     city: normalized.city,
@@ -3295,6 +3313,22 @@ export function publicVenueSlug(slug, title, id) {
   }
   if (title && id) return buildPublicVenueSlug(title, id);
   return dedupeVenueSlugSuffix(stripOpaqueVenueIdSuffix(normalized || raw));
+}
+
+/**
+ * Канонический публичный slug маршрута PDP: `publicSlug` (чистый, без id-хвоста)
+ * в приоритете; при его отсутствии - legacy `slug` → `title+id`.
+ * Семья (/venues|/locations) живёт в publicVenuePageTemplate(type), не в slug.
+ */
+export function resolvePublicVenueRouteSlug(row = {}) {
+  const explicit = String(row.publicSlug || '').trim();
+  if (explicit) {
+    const normalized = publicCitySlug(explicit);
+    if (normalized && !/^[a-f0-9]{20,}$/i.test(normalized)) {
+      return dedupeVenueSlugSuffix(stripOpaqueVenueIdSuffix(normalized));
+    }
+  }
+  return publicVenueSlug(row.slug, row.title || row.name, row.id);
 }
 
 function publicEventSlug(value) {

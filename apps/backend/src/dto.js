@@ -2792,6 +2792,7 @@ export async function buildAdminVenueDetail(db, venueId) {
         select
           venue.id,
           venue.slug,
+          venue."publicSlug",
           venue.title,
           venue.description,
           venue."shortDescription",
@@ -2865,6 +2866,13 @@ export async function updateAdminVenue(db, venueId, payload) {
     const city = await db.query(`SELECT id FROM "City" WHERE id = $1 LIMIT 1`, [next.cityId]);
     if (!city.rows[0]) throw new Error('Unknown city');
   }
+  if (next.publicSlug) {
+    const taken = await db.query(
+      `SELECT id FROM "Venue" WHERE "publicSlug" = $1 AND id <> $2 LIMIT 1`,
+      [next.publicSlug, venueId],
+    );
+    if (taken.rows[0]) throw new Error('Этот публичный slug уже занят другой площадкой');
+  }
   const result = await db.query(
     `
       update "Venue"
@@ -2894,6 +2902,7 @@ export async function updateAdminVenue(db, venueId, payload) {
         "websiteUrl" = $23,
         phone = $24,
         "openingHours" = $25,
+        "publicSlug" = $26,
         "updatedAt" = now()
       where id = $1
       returning id
@@ -2924,6 +2933,7 @@ export async function updateAdminVenue(db, venueId, payload) {
       next.websiteUrl ?? null,
       next.phone ?? null,
       next.openingHours ?? null,
+      next.publicSlug ?? null,
     ],
   );
 
@@ -6138,6 +6148,12 @@ function normalizeVenuePayload(payload) {
   ]) {
     if (!Object.prototype.hasOwnProperty.call(payload, key)) continue;
     normalized[key] = normalizeNullableString(payload[key]);
+  }
+
+  if (Object.prototype.hasOwnProperty.call(payload, 'publicSlug')) {
+    const value = normalizeNullableString(payload.publicSlug)?.toLowerCase() || null;
+    if (value && !/^[a-z0-9-]{1,128}$/u.test(value)) throw new Error('Invalid publicSlug');
+    normalized.publicSlug = value;
   }
 
   for (const key of ['latitude', 'longitude']) {
