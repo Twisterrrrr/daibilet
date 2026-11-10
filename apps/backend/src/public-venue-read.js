@@ -1574,7 +1574,7 @@ export function publicVenuePageTemplate(kind) {
   return INSTITUTION_VENUE_KINDS.has(normalized) ? 'institution' : 'location';
 }
 
-/** Drop stored canonicalPath when it points at the wrong /locations|/venues family. */
+/** Drop stale/import-era canonical paths while preserving intentional canonical aliases. */
 export function resolvePublicVenueCanonicalPath(storedPath, pageTemplate, slug) {
   const fallback = `/${pageTemplate === 'location' ? 'locations' : 'venues'}/${slug}`;
   const stored = String(storedPath || '').trim();
@@ -1589,6 +1589,12 @@ export function resolvePublicVenueCanonicalPath(storedPath, pageTemplate, slug) 
   // Provider-era canonical paths can append the opaque venue id to the public
   // slug. Those URLs redirect back to the clean slug, so they cannot be canonicals.
   if (/-[a-f0-9]{20,}$/i.test(normalized)) {
+    return fallback;
+  }
+  const storedSlug = normalized.split('/').filter(Boolean).at(-1) || '';
+  // TEP import slugs often append a numeric source id. When publicSlug has
+  // removed that suffix, the stored path must not keep the old URL canonical.
+  if (storedSlug.replace(/-\d+$/u, '') === slug && storedSlug !== slug) {
     return fallback;
   }
   return normalized;

@@ -16,6 +16,7 @@ import {
   scoreRelatedVenueCandidate,
   venueTextKeysFuzzyMatch,
 } from './public-venue-read.js';
+import { createAdminVenue } from './dto.js';
 
 test('venue list DTO keeps future sessions distinct from all-time events', () => {
   const venue = mapPublicVenueListItem({
@@ -181,6 +182,55 @@ test('resolvePublicVenueCanonicalPath drops a hashed path that redirects to the 
     ),
     '/venues/other-real-canonical',
   );
+});
+
+test('resolvePublicVenueCanonicalPath drops a TEP numeric suffix after public slug cleanup', () => {
+  assert.equal(
+    resolvePublicVenueCanonicalPath(
+      '/venues/banketnyi-zal-triumf-1552',
+      'institution',
+      'banketnyi-zal-triumf',
+    ),
+    '/venues/banketnyi-zal-triumf',
+  );
+});
+
+test('createAdminVenue persists an explicitly supplied publicSlug', async () => {
+  const calls = [];
+  const db = {
+    async query(sql, params = []) {
+      calls.push({ sql: String(sql), params });
+      if (String(sql).includes('SELECT id FROM "Venue" WHERE "publicSlug"')) return { rows: [] };
+      if (String(sql).includes('INSERT INTO "Venue"')) return { rows: [{ id: 'venue_test' }] };
+      if (String(sql).includes('from "Venue" venue')) {
+        return { rows: [{ id: 'venue_test', slug: 'test-venue', publicSlug: 'test-venue', title: 'Test venue', kind: 'OTHER', pageStatus: 'CANDIDATE' }] };
+      }
+      if (String(sql).includes('from "Event" event')) return { rows: [] };
+      throw new Error(`Unexpected query: ${sql}`);
+    },
+  };
+
+  await createAdminVenue(db, { title: 'Test venue', publicSlug: 'test-venue' });
+  const insert = calls.find(({ sql }) => sql.includes('INSERT INTO "Venue"'));
+  assert.ok(insert.sql.includes('"publicSlug"'));
+  assert.ok(insert.params.includes('test-venue'));
+});
+
+test('createAdminVenue rejects a duplicate publicSlug before inserting', async () => {
+  const calls = [];
+  const db = {
+    async query(sql) {
+      calls.push(String(sql));
+      if (String(sql).includes('SELECT id FROM "Venue" WHERE "publicSlug"')) return { rows: [{ id: 'venue_existing' }] };
+      throw new Error(`Unexpected query: ${sql}`);
+    },
+  };
+
+  await assert.rejects(
+    createAdminVenue(db, { title: 'Another venue', publicSlug: 'taken-slug' }),
+    /публичный slug уже занят/u,
+  );
+  assert.equal(calls.some((sql) => sql.includes('INSERT INTO "Venue"')), false);
 });
 
 test('venueTextKeysFuzzyMatch rejects bare Музей against longer museum titles', () => {

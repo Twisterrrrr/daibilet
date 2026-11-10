@@ -2945,6 +2945,13 @@ export async function createAdminVenue(db, payload = {}) {
   const normalized = normalizeVenuePayload(payload);
   const title = normalized.title?.trim();
   if (!title) throw new Error('Название площадки обязательно');
+  if (normalized.publicSlug) {
+    const taken = await db.query(
+      `SELECT id FROM "Venue" WHERE "publicSlug" = $1 LIMIT 1`,
+      [normalized.publicSlug],
+    );
+    if (taken.rows[0]) throw new Error('Этот публичный slug уже занят другой площадкой');
+  }
   const cityId = normalized.cityId || null;
   let citySlug = '';
   if (cityId) {
@@ -2958,18 +2965,18 @@ export async function createAdminVenue(db, payload = {}) {
   const result = await db.query(`
     INSERT INTO "Venue" (
       id, slug, title, description, "descriptionOverridden", "shortDescription", "heroImageUrl",
-      "seoH1", "seoTitle", "seoDescription", "canonicalPath", "isIndexable", "cityId", address,
+      "seoH1", "seoTitle", "seoDescription", "canonicalPath", "isIndexable", "publicSlug", "cityId", address,
       latitude, longitude, "metroStation", "wayToFind", "parkingInfo", "websiteUrl", phone,
       "openingHours", kind, "placeType", "placeSubtype", "pageStatus", "createdAt", "updatedAt"
     ) VALUES (
       $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, false, $12, $13,
-      $14, $15, $16, $17, $18, $19, $20, $21, $22::"VenueKind", $23::"PlaceType", $24, 'CANDIDATE', now(), now()
+      $14, $15, $16, $17, $18, $19, $20, $21, $22, $23::"VenueKind", $24::"PlaceType", $25, 'CANDIDATE', now(), now()
     ) RETURNING id
   `, [
     id, slug, title, normalized.description ?? null, Boolean(normalized.description),
     normalized.shortDescription ?? null, normalized.heroImageUrl ?? null,
     normalized.seoH1 ?? null, normalized.seoTitle ?? null, normalized.seoDescription ?? null,
-    normalized.canonicalPath ?? null, cityId, normalized.address ?? null,
+    normalized.canonicalPath ?? null, normalized.publicSlug ?? null, cityId, normalized.address ?? null,
     normalized.latitude ?? null, normalized.longitude ?? null, normalized.metroStation ?? null,
     normalized.wayToFind ?? null, normalized.parkingInfo ?? null, normalized.websiteUrl ?? null,
     normalized.phone ?? null, normalized.openingHours ?? null, normalized.kind || venueKindForPlaceType(normalized.placeType, normalized.placeSubtype),

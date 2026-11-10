@@ -104,7 +104,14 @@ export function venueCanonicalPath(
       : null;
   if (!storedFamily) return href;
   if (storedFamily !== venuePageTemplate(venue.type)) return href;
-  return stored.startsWith('/') ? stored : `/${stored}`;
+  const normalized = stored.startsWith('/') ? stored : `/${stored}`;
+  const storedSlug = normalized.split('/').filter(Boolean).at(-1) || '';
+  // Keep deliberate canonical aliases, but discard import-era numeric suffixes
+  // when the venue now has an explicit publicSlug.
+  if (venue.publicSlug && storedSlug.replace(/-\d+$/u, '') === venueSlug(venue) && storedSlug !== venueSlug(venue)) {
+    return href;
+  }
+  return normalized;
 }
 
 export function venueSlug(venue: VenueRouteSource): string {

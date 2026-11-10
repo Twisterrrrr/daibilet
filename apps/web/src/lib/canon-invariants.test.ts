@@ -187,6 +187,18 @@ describe('canon invariants', () => {
     assert.equal(venueCanonicalPath(venue), '/venues/banketnyi-zal-triumf');
   });
 
+  it('publicSlug also replaces a stale numeric-id canonicalPath', () => {
+    const venue: VenueFixture = {
+      id: 'venue_tep_1552',
+      slug: 'banketnyi-zal-triumf-1552',
+      publicSlug: 'banketnyi-zal-triumf',
+      name: 'Банкетный зал «Триумф»',
+      type: 'club_bar_restaurant',
+      canonicalPath: '/venues/banketnyi-zal-triumf-1552',
+    };
+    assert.equal(venueCanonicalPath(venue), '/venues/banketnyi-zal-triumf');
+  });
+
   it('missing publicSlug falls back to legacy slug', () => {
     const venue: VenueFixture = {
       id: 'venue_tep_1049',
