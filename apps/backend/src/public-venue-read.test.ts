@@ -16,6 +16,7 @@ import {
   resolvePublicVenuesForSessions,
   resolvePublicVenueCanonicalPath,
   resolvePublicVenueKind,
+  resolvePublicVenueRouteSlug,
   scoreRelatedVenueCandidate,
   venueTextKeysFuzzyMatch,
 } from './public-venue-read.js';
@@ -432,5 +433,28 @@ test('saleable museum-like attraction moves to museum, plain sight stays attract
   assert.equal(
     resolvePublicVenueKind('ATTRACTION', 'Исаакиевский собор', 'СПб', { totalEvents: 0 }),
     'museum',
+  );
+});
+
+test('route slug prefers publicSlug and drops the import id-suffix', () => {
+  assert.equal(
+    resolvePublicVenueRouteSlug({
+      id: 'venue_tep_1552',
+      slug: 'banketnyi-zal-triumf-1552',
+      publicSlug: 'banketnyi-zal-triumf',
+      title: 'Банкетный зал «Триумф»',
+    }),
+    'banketnyi-zal-triumf',
+  );
+});
+
+test('route slug falls back to the legacy slug when publicSlug is absent', () => {
+  assert.equal(
+    resolvePublicVenueRouteSlug({
+      id: 'venue_tep_1049',
+      slug: 'banketnyi-zal-arbat-hall-1049',
+      title: 'Банкетный зал Arbat Hall',
+    }),
+    'banketnyi-zal-arbat-hall-1049',
   );
 });
