@@ -4,6 +4,7 @@ import * as React from 'react';
 import type { AdminPdpDocument } from '@/server/admin-pdp-data';
 import { saveAdminPdpAction } from '@/server/admin-pdp-actions';
 import type { PublicPdpDocumentDto } from '@daibilet/contracts/public';
+import { PDP_SECTION_EDITOR_SCHEMA, PDP_VARIANT_READINESS, pdpSectionRequirement, pdpSubtypeContentHint } from '@daibilet/contracts/place-pdp';
 import { VenuePdpContent } from '@/components/VenuePdpContent.client';
 
 type GalleryImage = { url: string; alt: string; caption: string; credit: string };
@@ -64,14 +65,14 @@ const emptyDocument = (variant: string, kinds: string[]): Document => ({
   variant, status: 'DRAFT', content: { summary: '', conversion: { mode: 'none', primaryAction: 'none', label: '', targetEventId: '', externalUrl: '' }, gallery: [], facts: [], sections: kinds.map(emptySection), sources: [] },
 });
 
-function Field({ label, value, onChange, multiline = false }: { label: string; value: string; onChange: (value: string) => void; multiline?: boolean }) {
+function Field({ label, value, onChange, multiline = false, list }: { label: string; value: string; onChange: (value: string) => void; multiline?: boolean; list?: string }) {
   return <label className="block text-xs text-muted-foreground">{label}
     {multiline ? <textarea value={value} onChange={(event) => onChange(event.target.value)} className="mt-1 min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground" />
-      : <Input className="mt-1" value={value} onChange={(event) => onChange(event.target.value)} />}
+      : <Input className="mt-1" list={list} value={value} onChange={(event) => onChange(event.target.value)} />}
   </label>;
 }
 
-export function AdminPdpEditor({ entity, entityId, entitySlug, variants, initialDocument, initialVariant, suggestedVariant, initialError, saveDocument, heading = 'Редакционный PDP', saveButtonLabel = 'Сохранить PDP' }: {
+export function AdminPdpEditor({ entity, entityId, entitySlug, variants, initialDocument, initialVariant, suggestedVariant, placeType, placeSubtype, initialError, saveDocument, heading = 'Редакционный PDP', saveButtonLabel = 'Сохранить PDP' }: {
   entity: 'venues' | 'events';
   entityId: string;
   entitySlug: string;
@@ -79,6 +80,8 @@ export function AdminPdpEditor({ entity, entityId, entitySlug, variants, initial
   initialDocument: AdminPdpDocument | null;
   initialVariant: string;
   suggestedVariant?: string;
+  placeType?: string;
+  placeSubtype?: string;
   initialError: string | null;
   saveDocument?: (document: AdminPdpDocument) => Promise<AdminPdpDocument>;
   heading?: string;
@@ -111,6 +114,11 @@ export function AdminPdpEditor({ entity, entityId, entitySlug, variants, initial
     changeContent({ ...content, sections });
   }
   function changeVariant(variant: string) {
+    if (document && document.variant !== variant) {
+      const nextKinds = new Set(variants[variant] || []);
+      const populatedSections = document.content.sections.filter((section) => !nextKinds.has(section.kind) && (section.body.trim() || section.items.some((item) => item.title.trim() || item.description.trim())));
+      if (populatedSections.length && !window.confirm(`При смене профиля эти заполненные блоки не войдут в новый документ: ${populatedSections.map((section) => labels[section.kind] || section.title || section.kind).join(', ')}. Сначала экспортируй JSON, если хочешь сохранить их отдельно. Продолжить?`)) return;
+    }
     setDocument((current) => current ? { ...current, variant, content: {
       ...current.content,
       sections: (variants[variant] || []).map((kind) => current.content.sections.find((section) => section.kind === kind) || emptySection(kind)),
@@ -164,6 +172,18 @@ export function AdminPdpEditor({ entity, entityId, entitySlug, variants, initial
   }
   if (!document) return <div className="mt-4 text-sm text-destructive">{error || 'PDP недоступен'}</div>;
   const content = document.content;
+  const readinessRequirements = entity === 'venues' ? PDP_VARIANT_READINESS[document.variant as keyof typeof PDP_VARIANT_READINESS] || [] : [];
+  const readinessItems = [
+    { label: 'Краткая подводка', complete: Boolean(content.summary.trim()) },
+    ...readinessRequirements.map((item) => {
+      const matching = content.sections.filter((section) => item.anyOf.includes(section.kind));
+      const complete = matching.some((section) => {
+        const hasItems = section.items.some((entry) => Boolean(entry.title.trim() && (entry.description.trim() || entry.details.some((detail) => detail.label.trim() && detail.value.trim()))));
+        return item.mode === 'body' ? Boolean(section.body.trim()) : item.mode === 'items' ? hasItems : Boolean(section.body.trim()) || hasItems;
+      });
+      return { label: item.label, complete };
+    }),
+  ];
   return <div className="mt-5 space-y-5 rounded-lg border border-border p-4">
     <div><h3 className="text-base font-semibold">{heading}</h3><p className="mt-1 text-xs text-muted-foreground">Текст и практические сведения редактируются отдельно. Цены, сеансы и наличие билетов берутся из каталожных данных.</p></div>
     <div className="space-y-2">
@@ -207,6 +227,10 @@ export function AdminPdpEditor({ entity, entityId, entitySlug, variants, initial
         </select>
       </label>
     </div>
+    {entity === 'venues' ? <section className="rounded-md border border-amber-200 bg-amber-50/70 p-3">
+      <div className="flex flex-wrap items-center justify-between gap-2"><h4 className="text-sm font-semibold">Материалы для готовности профиля «{labels[document.variant] || document.variant}»</h4><span className="text-xs text-amber-900">Подсказка, не блокирует решение редактора</span></div>
+      <ul className="mt-2 grid gap-1.5 sm:grid-cols-2">{readinessItems.map((item) => <li key={item.label} className={`text-xs ${item.complete ? 'text-emerald-800' : 'text-amber-900'}`}>{item.complete ? '✓' : '○'} {item.label}</li>)}</ul>
+    </section> : null}
     <Field label="Краткая редакционная подводка" value={content.summary} onChange={(summary) => changeContent({ ...content, summary })} multiline />
     <section className="space-y-3 rounded-md border p-3"><h4 className="text-sm font-semibold">Покупка и бронирование</h4>
       <p className="text-xs text-muted-foreground">Здесь хранится намерение для будущего CTA. Кнопки покупки и бронирования пока не подключены; цены и наличие должны поступать только из активного предложения.</p>
@@ -253,29 +277,38 @@ export function AdminPdpEditor({ entity, entityId, entitySlug, variants, initial
         </div>
         {entity === 'events' && saveDocument ? <Button type="button" variant="outline" size="sm" onClick={addCustomSection}>Добавить контекстный блок</Button> : null}
       </div>
-      {content.sections.map((section, index) => <details key={section.id} className="rounded-md border p-3" open={Boolean(section.body || section.items.length)}>
-        <summary className="cursor-pointer text-sm font-medium">{section.kind === 'custom' ? section.title || labels.custom : labels[section.kind] || section.kind} {section.body || section.items.length ? '●' : ''}</summary>
+      {content.sections.map((section, index) => {
+        const editorSchema = PDP_SECTION_EDITOR_SCHEMA[section.kind];
+        const requirement = entity === 'venues' ? pdpSectionRequirement(document.variant, section.kind) : null;
+        const subtypeHint = entity === 'venues' ? pdpSubtypeContentHint(placeType, placeSubtype, section.kind) : null;
+        return <details key={section.id} className="rounded-md border p-3" open={Boolean(section.body || section.items.length)}>
+        <summary className="cursor-pointer text-sm font-medium">{section.kind === 'custom' ? section.title || labels.custom : labels[section.kind] || section.kind} {requirement ? <span className={`ml-2 rounded px-1.5 py-0.5 text-[10px] font-normal ${requirement === 'core' ? 'bg-indigo-100 text-indigo-800' : 'bg-slate-100 text-slate-600'}`}>{requirement === 'core' ? 'Основной' : 'По ситуации'}</span> : null} {section.body || section.items.length ? '●' : ''}</summary>
         <div className="mt-3 space-y-3">
+          {requirement === 'conditional' ? <p className="text-xs text-muted-foreground">Заполняй, если для этой площадки есть подтверждённые сведения; иначе блок можно оставить пустым.</p> : null}
           {section.kind === 'custom' ? <div className="flex flex-wrap gap-2">
             <Button type="button" variant="outline" size="sm" disabled={index <= 1} onClick={() => moveSection(index, -1)}>Выше</Button>
             <Button type="button" variant="outline" size="sm" disabled={index === content.sections.length - 1} onClick={() => moveSection(index, 1)}>Ниже</Button>
             <Button type="button" variant="outline" size="sm" onClick={() => changeContent({ ...content, sections: content.sections.filter((_, i) => i !== index) })}>Удалить блок</Button>
           </div> : null}
           <Field label={section.kind === 'custom' ? 'Заголовок H3' : 'Заголовок'} value={section.title} onChange={(title) => changeContent({ ...content, sections: content.sections.map((item, i) => i === index ? { ...item, title } : item) })} />
-          <Field label={section.kind === 'custom' ? 'Текст блока' : 'Текст'} value={section.body} onChange={(body) => changeContent({ ...content, sections: content.sections.map((item, i) => i === index ? { ...item, body } : item) })} multiline />
+          <Field label={editorSchema?.bodyLabel || (section.kind === 'custom' ? 'Текст блока' : 'Текст')} value={section.body} onChange={(body) => changeContent({ ...content, sections: content.sections.map((item, i) => i === index ? { ...item, body } : item) })} multiline />
+          {editorSchema?.bodyHint ? <p className="-mt-2 text-xs text-muted-foreground">{editorSchema.bodyHint}</p> : null}
+          {subtypeHint ? <p className="rounded-md bg-violet-50 px-2 py-1.5 text-xs text-violet-900">Подтип «{placeSubtype}»: {subtypeHint}</p> : null}
           {section.items.map((item, itemIndex) => <div key={itemIndex} className="grid gap-2 rounded-md bg-secondary/40 p-3 sm:grid-cols-2">
-            {(['title', 'description', 'imageUrl', 'linkUrl', 'meta', 'sourceUrl'] as const).map((key) => <Field key={key} label={key} value={item[key]} multiline={key === 'description'} onChange={(value) => changeContent({ ...content, sections: content.sections.map((entry, i) => i === index ? { ...entry, items: entry.items.map((card, j) => j === itemIndex ? { ...card, [key]: value } : card) } : entry) })} />)}
+            {(['title', 'description', 'imageUrl', 'linkUrl', 'meta', 'sourceUrl'] as const).filter((key) => !editorSchema || editorSchema.itemFields[key] !== undefined).map((key) => <Field key={key} label={editorSchema?.itemFields[key] || key} value={item[key]} multiline={key === 'description'} onChange={(value) => changeContent({ ...content, sections: content.sections.map((entry, i) => i === index ? { ...entry, items: entry.items.map((card, j) => j === itemIndex ? { ...card, [key]: value } : card) } : entry) })} />)}
             {item.details.map((detail, detailIndex) => <div key={detailIndex} className="grid gap-2 sm:col-span-2 sm:grid-cols-2">
-              <Field label="Параметр" value={detail.label} onChange={(label) => changeContent({ ...content, sections: content.sections.map((entry, i) => i === index ? { ...entry, items: entry.items.map((card, j) => j === itemIndex ? { ...card, details: card.details.map((pair, k) => k === detailIndex ? { ...pair, label } : pair) } : card) } : entry) })} />
+              <Field label="Параметр" value={detail.label} list={editorSchema?.detailSuggestions.length ? `pdp-detail-suggestions-${index}` : undefined} onChange={(label) => changeContent({ ...content, sections: content.sections.map((entry, i) => i === index ? { ...entry, items: entry.items.map((card, j) => j === itemIndex ? { ...card, details: card.details.map((pair, k) => k === detailIndex ? { ...pair, label } : pair) } : card) } : entry) })} />
               <Field label="Значение" value={detail.value} onChange={(value) => changeContent({ ...content, sections: content.sections.map((entry, i) => i === index ? { ...entry, items: entry.items.map((card, j) => j === itemIndex ? { ...card, details: card.details.map((pair, k) => k === detailIndex ? { ...pair, value } : pair) } : card) } : entry) })} />
               <Button type="button" variant="outline" size="sm" onClick={() => changeContent({ ...content, sections: content.sections.map((entry, i) => i === index ? { ...entry, items: entry.items.map((card, j) => j === itemIndex ? { ...card, details: card.details.filter((_, k) => k !== detailIndex) } : card) } : entry) })}>Удалить параметр</Button>
             </div>)}
             <Button type="button" variant="outline" size="sm" onClick={() => changeContent({ ...content, sections: content.sections.map((entry, i) => i === index ? { ...entry, items: entry.items.map((card, j) => j === itemIndex ? { ...card, details: [...card.details, { label: '', value: '' }] } : card) } : entry) })}>Добавить параметр</Button>
             <Button type="button" variant="outline" size="sm" onClick={() => changeContent({ ...content, sections: content.sections.map((entry, i) => i === index ? { ...entry, items: entry.items.filter((_, j) => j !== itemIndex) } : entry) })}>Удалить элемент</Button>
           </div>)}
-          <Button type="button" variant="outline" size="sm" onClick={() => changeContent({ ...content, sections: content.sections.map((entry, i) => i === index ? { ...entry, items: [...entry.items, emptyItem()] } : entry) })}>Добавить элемент</Button>
+          {editorSchema?.detailSuggestions.length ? <datalist id={`pdp-detail-suggestions-${index}`}>{editorSchema.detailSuggestions.map((suggestion) => <option key={suggestion} value={suggestion}/>)}</datalist> : null}
+          <Button type="button" variant="outline" size="sm" onClick={() => changeContent({ ...content, sections: content.sections.map((entry, i) => i === index ? { ...entry, items: [...entry.items, emptyItem()] } : entry) })}>Добавить: {editorSchema?.itemLabel || 'элемент'}</Button>
         </div>
-      </details>)}
+      </details>;
+      })}
     </section>
     <section className="space-y-3"><h4 className="text-sm font-semibold">Источники</h4>
       {content.sources.map((source, index) => <div key={index} className="grid gap-2 rounded-md border p-3 sm:grid-cols-3">

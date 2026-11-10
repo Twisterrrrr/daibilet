@@ -395,9 +395,9 @@ async function importCatalogEvent(client, event, summary, cityIdCache) {
     const venueResult = await client.query(
       `
         insert into "Venue" (
-          id, slug, title, description, "cityId", address, latitude, longitude, kind, "pageStatus", "createdAt", "updatedAt"
+          id, slug, title, description, "cityId", address, latitude, longitude, kind, "pageStatus", "isIndexable", "createdAt", "updatedAt"
         )
-        values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, now(), now())
+        values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, false, now(), now())
         on conflict (id) do update set
           title = excluded.title,
           description = case
@@ -413,7 +413,8 @@ async function importCatalogEvent(client, event, summary, cityIdCache) {
             then "Venue".kind
             else excluded.kind
           end,
-          "pageStatus" = case when "Venue"."pageStatus" = 'PUBLISHED' then "Venue"."pageStatus" else excluded."pageStatus" end,
+          "pageStatus" = case when "Venue"."pageStatus" in ('PUBLISHED', 'HIDDEN') then "Venue"."pageStatus" else 'CANDIDATE'::"VenuePageStatus" end,
+          "isIndexable" = case when "Venue"."pageStatus" = 'PUBLISHED' then "Venue"."isIndexable" else false end,
           "updatedAt" = now()
         returning id
       `,
@@ -787,13 +788,8 @@ function venueKind(input) {
 }
 
 function venuePageStatus(input, events) {
-  // generic_location → MEETING_POINT: still allow public page when venue has events
-  // (hub escape hatch curatedMeetingPointPage). Force NONE only when no event signal.
-  if (input === "generic_location") return events >= 1 ? "CANDIDATE" : "NONE";
-  if (events >= 5 || ["pier_water", "museum_art", "theater", "concert_hall", "park", "monument", "club_restaurant"].includes(input)) {
-    return "CANDIDATE";
-  }
-  return "NONE";
+  // Imported venue rows start as candidates; publication and indexing are editorial decisions.
+  return "CANDIDATE";
 }
 
 function resolveCatalogCategoryId(event) {
