@@ -261,11 +261,11 @@ export async function buildEventsSitemapEntries(): Promise<SitemapEntry[]> {
     });
     for (const event of page.items || []) {
       if (entries.length >= MAX_EVENTS) break;
-      const slug = event.slug || event.id;
+      const slug = event.eventPageIndexableSlug || event.slug || event.id;
       if (!slug || seen.has(slug)) continue;
       seen.add(slug);
       entries.push(
-        entry(`/events/${encodeURIComponent(slug)}`, 'daily', 0.7, freshness[slug] ?? null),
+        entry(`/events/${encodeURIComponent(slug)}`, 'daily', 0.7, freshness[slug] ?? freshness[event.slug || ''] ?? null),
       );
     }
     if (!page.hasMore || !page.items?.length || entries.length >= MAX_EVENTS) break;

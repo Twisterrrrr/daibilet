@@ -257,6 +257,7 @@ function normalizePage(payload, { creating = false } = {}) {
     seoTitle: optionalText(payload.seoTitle, 'seoTitle', 500),
     seoDescription: optionalText(payload.seoDescription, 'seoDescription', 2000),
     canonicalPath: optionalText(payload.canonicalPath, 'canonicalPath', 1000),
+    isIndexable: payload.isIndexable == null ? undefined : Boolean(payload.isIndexable),
     changeNote: optionalText(payload.changeNote, 'changeNote', 1000),
   };
   if (page.canonicalPath && (!page.canonicalPath.startsWith('/events/') || page.canonicalPath.includes('?') || page.canonicalPath.includes('#'))) {
@@ -266,6 +267,9 @@ function normalizePage(payload, { creating = false } = {}) {
   else if (payload.status != null) {
     if (!EDITORIAL_STATUSES.has(payload.status)) throw new Error('Invalid EventPage status');
     page.status = payload.status;
+  }
+  if (page.isIndexable === true && page.status && page.status !== 'READY') {
+    throw new Error('Only READY EventPages can be indexable');
   }
   return page;
 }
@@ -1037,16 +1041,20 @@ export async function createAdminEventPage(db, payload, actorId = null) {
 export async function updateAdminEventPage(db, id, payload, actorId = null) {
   const page = normalizePage(payload);
   return db.transaction(async ({ query }) => {
-    const existing = await query(`SELECT id FROM "EventPage" WHERE id = $1 FOR UPDATE`, [id]);
+    const existing = await query(`SELECT id, status FROM "EventPage" WHERE id = $1 FOR UPDATE`, [id]);
     if (!existing.rows.length) return null;
+    if (page.isIndexable === true && page.status !== 'READY' && existing.rows[0].status !== 'READY') {
+      throw new Error('Only READY EventPages can be indexable');
+    }
     const updated = await query(`
       UPDATE "EventPage" SET slug = $2, title = $3, summary = $4, content = $5::jsonb,
         "seoH1" = $6, "seoTitle" = $7, "seoDescription" = $8, "canonicalPath" = $9,
         status = COALESCE($10, status),
         "publishedAt" = CASE WHEN COALESCE($10, status) = 'READY' THEN "publishedAt" ELSE NULL END,
+        "isIndexable" = COALESCE($11, "isIndexable"),
         "updatedAt" = now()
       WHERE id = $1 RETURNING *
-    `, [id, page.slug, page.title, page.summary, JSON.stringify(page.content), page.seoH1, page.seoTitle, page.seoDescription, page.canonicalPath, page.status ?? null]);
+    `, [id, page.slug, page.title, page.summary, JSON.stringify(page.content), page.seoH1, page.seoTitle, page.seoDescription, page.canonicalPath, page.status ?? null, page.isIndexable ?? null]);
     const sourceState = await currentSourceState(query, id);
     await appendPageRevision(query, id, updated.rows[0], { changeNote: page.changeNote, actorId, sourceState });
     return readPage(query, id);

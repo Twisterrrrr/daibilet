@@ -937,9 +937,23 @@ async function attachUnambiguousEventPageSlugs(sessions: PublicSessionDto[]): Pr
         rows: await prisma.$queryRawUnsafe<Array<{ eventId: string; slug: string }>>(query, ...params),
       }),
     });
+    const indexablePageSlugs = [...new Set(pageSlugByEventId.values())];
+    const indexablePageSlugSet = new Set<string>();
+    if (indexablePageSlugs.length) {
+      const publishedIndexablePages = await prisma.$queryRawUnsafe<Array<{ slug: string }>>(`
+        SELECT slug FROM "EventPage"
+        WHERE slug = ANY($1::text[]) AND status = 'READY'
+          AND "publishedAt" IS NOT NULL AND "isIndexable" IS TRUE
+      `, indexablePageSlugs);
+      for (const page of publishedIndexablePages) indexablePageSlugSet.add(String(page.slug));
+    }
     return sessions.map((session) => {
       const eventPageSlug = pageSlugByEventId.get(session.id);
-      return eventPageSlug ? { ...session, eventPageSlug } : session;
+      return eventPageSlug ? {
+        ...session,
+        eventPageSlug,
+        ...(indexablePageSlugSet.has(eventPageSlug) ? { eventPageIndexableSlug: eventPageSlug } : {}),
+      } : session;
     });
   } catch {
     // EventPage migration may not be present on an older instance yet.

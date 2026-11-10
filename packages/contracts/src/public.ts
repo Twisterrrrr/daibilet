@@ -66,6 +66,8 @@ export interface PublicSessionDto extends PurchaseFields {
   slug?: string | null;
   /** Stable editorial EventPage URL when the entire catalog group maps unambiguously. */
   eventPageSlug?: string | null;
+  /** Stable EventPage slug only when published and explicitly indexable. */
+  eventPageIndexableSlug?: string | null;
   sourceSlug?: string | null;
   groupKey?: string | null;
   groupEventIds?: string[];
@@ -115,6 +117,8 @@ export interface PublicCatalogListItemDto extends PurchaseFields {
   slug?: string | null;
   /** Stable editorial EventPage URL when the entire catalog group maps unambiguously. */
   eventPageSlug?: string | null;
+  /** Stable EventPage slug only when published and explicitly indexable. */
+  eventPageIndexableSlug?: string | null;
   groupKey?: string | null;
   groupedEventsCount?: number;
   sessionCount?: number;
