@@ -3,7 +3,7 @@ import { venueTemplate } from '@/lib/venue-kind-mapping';
 
 type EventRouteSource = Pick<PublicSessionDto, 'id' | 'slug' | 'sourceSlug' | 'eventPageSlug' | 'title'>;
 type CityRouteSource = { slug?: string | null; sourceSlug?: string | null; name: string };
-type VenueRouteSource = { id: string; slug?: string | null; name: string; type?: string | null };
+type VenueRouteSource = { id: string; slug?: string | null; publicSlug?: string | null; name: string; type?: string | null };
 
 const CYRILLIC_MAP: Record<string, string> = {
   а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z', и: 'i', й: 'y',
@@ -108,6 +108,11 @@ export function venueCanonicalPath(
 }
 
 export function venueSlug(venue: VenueRouteSource): string {
+  const publicRaw = String(venue.publicSlug || '').trim();
+  if (publicRaw) {
+    const publicNormalized = normalizeSlug(publicRaw);
+    if (publicNormalized && !isOpaqueId(publicNormalized)) return publicNormalized;
+  }
   const rawSlug = String(venue.slug || '').trim();
   if (rawSlug) {
     const normalized = normalizeSlug(rawSlug);
