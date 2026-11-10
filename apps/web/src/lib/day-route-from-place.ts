@@ -279,7 +279,8 @@ export function dayRouteItemFromMustSee(
   const href = catalogHref;
 
   // Hub often stores dark /venues/generated stubs; curated /images/venues/{city}/ wins.
-  const imageUrl = resolveVenueHeroImage(slug, matched?.heroImageUrl);
+  const imageUrl =
+    String(place.imageUrl || '').trim() || resolveVenueHeroImage(slug, matched?.heroImageUrl);
   const transitTip = String(place.transitTip || '').trim() || null;
   const placeAddress = String(place.address || '').trim();
   const matchedAddress = String(matched?.address || '').trim();

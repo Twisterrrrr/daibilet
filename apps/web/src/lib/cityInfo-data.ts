@@ -213,6 +213,10 @@ export type CityMustSeeItem = CityPlaceLinkFields & {
   address?: string | null;
   /** Стабильный editorial id для остановки без публичной entity-карточки. */
   dayRouteId?: string;
+  /** Curated local photo for editorial stops without a catalog page. */
+  imageUrl?: string | null;
+  /** Visible attribution for locally curated third-party photos. */
+  imageCredit?: { author: string; sourceUrl: string; license: string; licenseUrl: string };
   /** Optional day-route coords when hub venues omit the place. */
   latitude?: number | null;
   longitude?: number | null;

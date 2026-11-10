@@ -1624,6 +1624,7 @@ function CitySightsMustSeeList({
             ? dayRouteStopPriceChipLabel(dayRouteItem, categoryLabel)
             : '';
           const coverSrc =
+            place.imageUrl ||
             dayRouteItem?.imageUrl ||
             resolveVenueHeroImage(
               String(place.venueSlug || place.locationSlug || '').trim(),
@@ -1659,6 +1660,16 @@ function CitySightsMustSeeList({
                       />
                     }
                   />
+                  {place.imageCredit ? (
+                    <div className="absolute inset-x-2 bottom-2 z-10 flex justify-end gap-1 text-[10px] leading-none text-white drop-shadow [text-shadow:0_1px_3px_rgba(0,0,0,0.95)]">
+                      <a href={place.imageCredit.sourceUrl} target="_blank" rel="noreferrer" className="rounded bg-black/55 px-1.5 py-1 hover:bg-black/75">
+                        {place.imageCredit.author}
+                      </a>
+                      <a href={place.imageCredit.licenseUrl} target="_blank" rel="noreferrer" className="rounded bg-black/55 px-1.5 py-1 hover:bg-black/75">
+                        {place.imageCredit.license}
+                      </a>
+                    </div>
+                  ) : null}
                 </div>
                 <div className="flex min-h-0 flex-1 flex-col p-4 sm:p-5">
                 <div className="flex items-start gap-3">
