@@ -55,6 +55,19 @@ export const TOLYATTI_MUST_SEE: any[] = [
     visitMinutes: 60,
     alsoMain: true,
   }),
+  place('Тольяттинский краеведческий музей', 'Экспозиции об истории Ставрополя-на-Волге и Тольятти, природе и культуре Самарского края.', 53.502001, 49.420755, {
+    address: 'б-р Ленина, 22',
+    venueSlug: 'tolyatti-kraevedcheskiy-muzey',
+    imageUrl: '/images/venues/tolyatti/kraevedcheskiy-muzey.jpg',
+    imageCredit: {
+      author: 'ShinePhantom',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Tolyatti_local_history_museum_20210414.jpg',
+      license: 'CC BY-SA 4.0',
+      licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0',
+    },
+    mustSeeFilter: 'museum',
+    visitMinutes: 60,
+  }),
   place('Набережная Автозаводского района', 'Прогулочная береговая территория у Куйбышевского водохранилища с открытым видом на воду.', 53.504124, 49.261241, {
     address: 'Прибрежный парк, Автозаводский район',
     locationSlug: 'tolyatti-naberezhnaya-volgi',
@@ -111,9 +124,10 @@ export const TOLYATTI_SIGHTS = [
 export const TOLYATTI_DAY_ROUTE_PRESETS = [
   {
     id: 'tolyatti-volga-and-old-stavropol',
-    title: 'Волга и старый Ставрополь',
-    description: 'Памятник Татищеву и прогулка по историческому Портпосёлку.',
+    title: 'История Ставрополя и Волга',
+    description: 'Краеведческий музей, памятник Татищеву и прогулка по историческому Портпосёлку.',
     stops: [
+      { name: 'Тольяттинский краеведческий музей', venueSlug: 'tolyatti-kraevedcheskiy-muzey' },
       { name: 'Памятник Василию Татищеву', locationSlug: 'tolyatti-pamyatnik-tatischevu' },
       { name: 'Портпосёлок', locationSlug: 'tolyatti-portposelok' },
     ],
