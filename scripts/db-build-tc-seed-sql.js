@@ -76,6 +76,7 @@ for (const event of catalog) {
       longitude: venue.coordinates?.longitude ?? null,
       kind: venueKind(venue.typeGuess),
       pageStatus: venuePageStatus(venue.typeGuess, summary.topVenues?.find((item) => item.id === venue.id)?.events || 0),
+      isIndexable: false,
     });
   }
 
@@ -148,7 +149,7 @@ sql.push(`INSERT INTO "SourceSyncRun" ("id","sourceId","status","mode","startedA
 
 insertRows("Category", ["id", "slug", "title", "position"], CATEGORIES.map(([categoryId, slug, title, position]) => ({ id: categoryId, slug, title, position })), ["slug"]);
 insertRows("City", ["id", "slug", "title", "sourceTitle", "isDestination"], [...cities.values()], ["slug"]);
-insertRows("Venue", ["id", "slug", "title", "description", "cityId", "address", "latitude", "longitude", "kind", "pageStatus", "createdAt", "updatedAt"], [...venues.values()].map((row) => ({ ...row, createdAt: now, updatedAt: now })), ["slug"]);
+insertRows("Venue", ["id", "slug", "title", "description", "cityId", "address", "latitude", "longitude", "kind", "pageStatus", "isIndexable", "createdAt", "updatedAt"], [...venues.values()].map((row) => ({ ...row, createdAt: now, updatedAt: now })), ["slug"]);
 insertRows("Tag", ["id", "slug", "title"], [...tags.values()], ["slug"]);
 insertRows("Event", ["id", "title", "slug", "description", "kind", "status", "sourceStatus", "ageLimit", "imageUrl", "priceFromRub", "ticketsVacant", "primaryCityId", "venueId", "categoryId", "createdAt", "updatedAt"], [...events.values()].map((row) => ({ ...row, createdAt: now, updatedAt: now })), ["id"]);
 insertRows("EventSourceLink", ["id", "eventId", "sourceId", "externalId", "metaExternalId", "updatedAt"], sourceLinks.map((row) => ({ ...row, updatedAt: now })), ["sourceId", "externalId"]);
@@ -234,12 +235,8 @@ function venueKind(input) {
 }
 
 function venuePageStatus(input, events) {
-  // Keep in sync with scripts/tc-import-catalog.js venuePageStatus.
-  if (input === "generic_location") return events >= 1 ? "CANDIDATE" : "NONE";
-  if (events >= 5 || ["pier_water", "museum_art", "theater", "concert_hall", "park", "monument", "club_restaurant"].includes(input)) {
-    return "CANDIDATE";
-  }
-  return "NONE";
+  // Keep in sync with scripts/tc-import-catalog.js: imported venue rows start as editorial candidates.
+  return "CANDIDATE";
 }
 
 function slugify(input) {

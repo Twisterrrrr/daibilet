@@ -34,7 +34,13 @@ export type AdminVenueDetailData = {
   title: string;
   slug: string | null;
   city: string;
+  cityId: string | null;
   address: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  websiteUrl: string | null;
+  phone: string | null;
+  openingHours: string | null;
   metroStation: string | null;
   wayToFind: string | null;
   parkingInfo: string | null;
@@ -60,6 +66,22 @@ export type AdminVenueDetailData = {
   }>;
   errors: string[];
 };
+
+export type AdminVenueCityOption = { id: string; title: string; slug: string | null };
+
+export async function loadAdminVenueCityOptions(): Promise<{ rows: AdminVenueCityOption[]; error: string }> {
+  try {
+    const response = await adminApiFetch('/api/admin/cities?limit=200&page=1');
+    if (!response.ok) return { rows: [], error: `cities HTTP ${response.status}` };
+    const payload = await response.json() as { rows?: unknown[] };
+    return { rows: (payload.rows || []).map((item) => {
+      const row = (item && typeof item === 'object' ? item : {}) as Record<string, unknown>;
+      return { id: String(row.id || ''), title: String(row.name || row.title || ''), slug: row.slug == null ? null : String(row.slug) };
+    }).filter((row) => row.id && row.title), error: '' };
+  } catch (error) {
+    return { rows: [], error: error instanceof Error ? error.message : 'city options unavailable' };
+  }
+}
 
 const DEFAULT_LIMIT = 80;
 
@@ -129,7 +151,13 @@ export async function loadAdminVenueDetail(venueId: string): Promise<AdminVenueD
     title: id,
     slug: null,
     city: '—',
+    cityId: null,
     address: null,
+    latitude: null,
+    longitude: null,
+    websiteUrl: null,
+    phone: null,
+    openingHours: null,
     metroStation: null,
     wayToFind: null,
     parkingInfo: null,
@@ -165,7 +193,13 @@ export async function loadAdminVenueDetail(venueId: string): Promise<AdminVenueD
       title: String(payload.title || payload.name || id),
       slug: payload.slug != null ? String(payload.slug) : null,
       city: String(payload.city || '—'),
+      cityId: payload.cityId != null ? String(payload.cityId) : null,
       address: payload.address != null ? String(payload.address) : null,
+      latitude: payload.latitude == null ? null : asNumber(payload.latitude),
+      longitude: payload.longitude == null ? null : asNumber(payload.longitude),
+      websiteUrl: payload.websiteUrl != null ? String(payload.websiteUrl) : null,
+      phone: payload.phone != null ? String(payload.phone) : null,
+      openingHours: payload.openingHours != null ? String(payload.openingHours) : null,
       metroStation: payload.metroStation != null ? String(payload.metroStation) : null,
       wayToFind: payload.wayToFind != null ? String(payload.wayToFind) : null,
       parkingInfo: payload.parkingInfo != null ? String(payload.parkingInfo) : null,

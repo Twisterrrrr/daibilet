@@ -40,6 +40,7 @@ export default async function AdminVenuesPage({ searchParams }: PageProps) {
             Каталог площадок и локаций: тип, статус страницы, события.
           </p>
         </div>
+        <Link href="/admin/venues/new" className="rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800">Создать площадку</Link>
       </header>
 
       <AdminApiErrorBanner errors={data.errors} />

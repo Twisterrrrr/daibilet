@@ -2801,9 +2801,13 @@ export async function buildAdminVenueDetail(db, venueId) {
           venue."seoDescription",
           venue."canonicalPath",
           venue."isIndexable",
+          venue."cityId",
           venue.address,
           venue.latitude,
           venue.longitude,
+          venue."websiteUrl",
+          venue.phone,
+          venue."openingHours",
           venue."metroStation",
           venue."wayToFind",
           venue."parkingInfo",
@@ -2857,12 +2861,17 @@ export async function updateAdminVenue(db, venueId, payload) {
   const current = await buildAdminVenueDetail(db, venueId);
   if (!current) return null;
   const next = { ...current, ...normalized };
+  if (Object.prototype.hasOwnProperty.call(normalized, 'cityId') && next.cityId) {
+    const city = await db.query(`SELECT id FROM "City" WHERE id = $1 LIMIT 1`, [next.cityId]);
+    if (!city.rows[0]) throw new Error('Unknown city');
+  }
   const result = await db.query(
     `
       update "Venue"
       set
         title = $2,
         description = $3,
+        "descriptionOverridden" = CASE WHEN $3 IS DISTINCT FROM "Venue".description THEN true ELSE "Venue"."descriptionOverridden" END,
         "shortDescription" = $4,
         "heroImageUrl" = $5,
         "seoH1" = $6,
@@ -2878,6 +2887,13 @@ export async function updateAdminVenue(db, venueId, payload) {
         "hookFact" = $16,
         "placeType" = $17::"PlaceType",
         "placeSubtype" = $18,
+        "cityId" = $19,
+        address = $20,
+        latitude = $21,
+        longitude = $22,
+        "websiteUrl" = $23,
+        phone = $24,
+        "openingHours" = $25,
         "updatedAt" = now()
       where id = $1
       returning id
@@ -2901,11 +2917,68 @@ export async function updateAdminVenue(db, venueId, payload) {
       next.hookFact ?? null,
       next.placeType ?? null,
       next.placeSubtype ?? null,
+      next.cityId ?? null,
+      next.address ?? null,
+      next.latitude ?? null,
+      next.longitude ?? null,
+      next.websiteUrl ?? null,
+      next.phone ?? null,
+      next.openingHours ?? null,
     ],
   );
 
   if (!result.rows[0]) return null;
   return buildAdminVenueDetail(db, venueId);
+}
+
+export async function createAdminVenue(db, payload = {}) {
+  const normalized = normalizeVenuePayload(payload);
+  const title = normalized.title?.trim();
+  if (!title) throw new Error('Название площадки обязательно');
+  const cityId = normalized.cityId || null;
+  let citySlug = '';
+  if (cityId) {
+    const city = await db.query(`SELECT id, slug, title FROM "City" WHERE id = $1 LIMIT 1`, [cityId]);
+    if (!city.rows[0]) throw new Error('Unknown city');
+    citySlug = city.rows[0].slug || city.rows[0].title || '';
+  }
+  const id = `venue_${randomUUID().replaceAll('-', '').slice(0, 24)}`;
+  const baseSlug = publicCitySlug([citySlug, title].filter(Boolean).join(' ')) || 'venue';
+  const slug = `${baseSlug}-${id.slice(-8)}`;
+  const result = await db.query(`
+    INSERT INTO "Venue" (
+      id, slug, title, description, "descriptionOverridden", "shortDescription", "heroImageUrl",
+      "seoH1", "seoTitle", "seoDescription", "canonicalPath", "isIndexable", "cityId", address,
+      latitude, longitude, "metroStation", "wayToFind", "parkingInfo", "websiteUrl", phone,
+      "openingHours", kind, "placeType", "placeSubtype", "pageStatus", "createdAt", "updatedAt"
+    ) VALUES (
+      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, false, $12, $13,
+      $14, $15, $16, $17, $18, $19, $20, $21, $22::"VenueKind", $23::"PlaceType", $24, 'CANDIDATE', now(), now()
+    ) RETURNING id
+  `, [
+    id, slug, title, normalized.description ?? null, Boolean(normalized.description),
+    normalized.shortDescription ?? null, normalized.heroImageUrl ?? null,
+    normalized.seoH1 ?? null, normalized.seoTitle ?? null, normalized.seoDescription ?? null,
+    normalized.canonicalPath ?? null, cityId, normalized.address ?? null,
+    normalized.latitude ?? null, normalized.longitude ?? null, normalized.metroStation ?? null,
+    normalized.wayToFind ?? null, normalized.parkingInfo ?? null, normalized.websiteUrl ?? null,
+    normalized.phone ?? null, normalized.openingHours ?? null, normalized.kind || venueKindForPlaceType(normalized.placeType, normalized.placeSubtype),
+    normalized.placeType ?? null, normalized.placeSubtype ?? null,
+  ]);
+  if (!result.rows[0]) throw new Error('Не удалось создать площадку');
+  return buildAdminVenueDetail(db, id);
+}
+
+function venueKindForPlaceType(placeType, placeSubtype) {
+  if (String(placeType || '').toUpperCase() === 'TRANSPORT') {
+    return ['pier', 'river_terminal', 'sea_terminal', 'marina'].includes(String(placeSubtype || '').toLowerCase()) ? 'PIER' : 'MEETING_POINT';
+  }
+  return ({
+    ARCHITECTURE: 'MONUMENT', MONUMENT: 'MONUMENT', MUSEUM: 'MUSEUM_ART_SPACE',
+    RELIGION: 'TEMPLE', NATURE: 'OUTDOOR_LOCATION', URBAN: 'PARK',
+    THEATRE: 'THEATER', ENTERTAINMENT: 'ATTRACTION', FOOD: 'GASTRO',
+    VENUE: 'VENUE', OTHER: 'OTHER',
+  })[String(placeType || '').toUpperCase()] || 'OTHER';
 }
 
 export async function updateAdminEventTaxonomy(db, eventId, payload) {
@@ -6057,9 +6130,23 @@ function normalizeVenuePayload(payload) {
     'wayToFind',
     'parkingInfo',
     'hookFact',
+    'cityId',
+    'address',
+    'websiteUrl',
+    'phone',
+    'openingHours',
   ]) {
     if (!Object.prototype.hasOwnProperty.call(payload, key)) continue;
     normalized[key] = normalizeNullableString(payload[key]);
+  }
+
+  for (const key of ['latitude', 'longitude']) {
+    if (!Object.prototype.hasOwnProperty.call(payload, key)) continue;
+    if (payload[key] == null || payload[key] === '') { normalized[key] = null; continue; }
+    const value = Number(payload[key]);
+    const valid = Number.isFinite(value) && (key === 'latitude' ? value >= -90 && value <= 90 : value >= -180 && value <= 180);
+    if (!valid) throw new Error(`Invalid ${key}`);
+    normalized[key] = value;
   }
 
   if (Object.prototype.hasOwnProperty.call(payload, 'isIndexable')) {

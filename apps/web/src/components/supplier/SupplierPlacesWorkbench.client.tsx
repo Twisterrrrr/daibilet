@@ -2,7 +2,8 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { PLACE_TYPE_OPTIONS } from '@daibilet/contracts/place-pdp';
+import { PlaceClassificationFields } from '@/components/admin/PlaceClassificationFields.client';
+import { PDP_SECTION_EDITOR_SCHEMA, pdpSectionRequirement, pdpSubtypeContentHint } from '@daibilet/contracts/place-pdp';
 import { useUserAuth } from '@/hooks/useUserAuth';
 
 type Workspace = {
@@ -22,8 +23,8 @@ export function SupplierPlacesWorkbench() {
   const [venueId, setVenueId] = React.useState('');
   const [supplierId, setSupplierId] = React.useState('');
   const [type, setType] = React.useState<'CREATE' | 'UPDATE'>('CREATE');
-  const [candidate, setCandidate] = React.useState({ title: '', cityId: '', address: '', placeType: 'MUSEUM', placeSubtype: '', description: '', websiteUrl: '', sourceUrl: '', imageUrl: '', imageRights: '', latitude: '', longitude: '' });
-  const [fields, setFields] = React.useState({ shortDescription: '', description: '', metroStation: '', wayToFind: '', parkingInfo: '' });
+  const [candidate, setCandidate] = React.useState({ title: '', cityId: '', address: '', placeType: 'MUSEUM', placeSubtype: '', description: '', websiteUrl: '', phone: '', openingHours: '', sourceUrl: '', imageUrl: '', imageRights: '', latitude: '', longitude: '' });
+  const [fields, setFields] = React.useState({ title: '', address: '', latitude: '', longitude: '', placeType: '', placeSubtype: '', websiteUrl: '', phone: '', openingHours: '', shortDescription: '', description: '', metroStation: '', wayToFind: '', parkingInfo: '' });
   const [pdpContent, setPdpContent] = React.useState<{ summary: string; sections: Array<{ id: string; kind: string; title: string; body: string }> } | null>(null);
 
   const load = React.useCallback(async () => {
@@ -63,8 +64,8 @@ export function SupplierPlacesWorkbench() {
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || `HTTP ${response.status}`);
       setMessage(`Заявка ${payload.id} отправлена редакции. Публичная страница не менялась.`);
-      setCandidate({ title: '', cityId: '', address: '', placeType: 'MUSEUM', placeSubtype: '', description: '', websiteUrl: '', sourceUrl: '', imageUrl: '', imageRights: '', latitude: '', longitude: '' });
-      setFields({ shortDescription: '', description: '', metroStation: '', wayToFind: '', parkingInfo: '' });
+      setCandidate({ title: '', cityId: '', address: '', placeType: 'MUSEUM', placeSubtype: '', description: '', websiteUrl: '', phone: '', openingHours: '', sourceUrl: '', imageUrl: '', imageRights: '', latitude: '', longitude: '' });
+      setFields({ title: '', address: '', latitude: '', longitude: '', placeType: '', placeSubtype: '', websiteUrl: '', phone: '', openingHours: '', shortDescription: '', description: '', metroStation: '', wayToFind: '', parkingInfo: '' });
       await load();
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Не удалось отправить заявку'); }
   }
@@ -74,6 +75,7 @@ export function SupplierPlacesWorkbench() {
   if (!workspace) return <div className="mx-auto max-w-5xl p-6 text-red-700">{error || 'Не удалось загрузить кабинет.'}</div>;
 
   const linked = workspace.venues.filter((row) => row.editable && row.supplierId === supplierId);
+  const selectedLinked = linked.find((place) => place.venueId === venueId);
   return <main className="mx-auto max-w-5xl space-y-6 px-4 py-8">
     <header><h1 className="text-2xl font-semibold text-slate-950">Места и страницы</h1><p className="mt-2 max-w-3xl text-sm text-slate-600">Здесь можно предложить новое место или изменение связанного места. Публикация, тип страницы и SEO остаются за редакцией Daibilet.</p></header>
     {error && <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</div>}
@@ -82,7 +84,7 @@ export function SupplierPlacesWorkbench() {
     <section className="rounded-xl border border-slate-200 bg-white p-4"><h2 className="text-lg font-semibold">Связанные места</h2>
       {workspace.venues.length ? <ul className="mt-3 divide-y divide-slate-100">{workspace.venues.map((place) => <li key={`${place.supplierId}-${place.venueId}`} className="flex flex-wrap justify-between gap-2 py-3 text-sm"><span><strong>{String(place.title || 'Место')}</strong><span className="ml-2 text-slate-500">{String(place.city || 'Город не указан')} · PDP: {String(place.suggestedVariant)}</span></span><span className="text-slate-500">{place.editable ? 'Можно предложить изменение' : 'Просмотр'}</span></li>)}</ul> : <p className="mt-3 text-sm text-slate-600">Связанных мест пока нет. Новое место можно предложить ниже.</p>}
     </section>
-    <section className="rounded-xl border border-slate-200 bg-white p-4"><h2 className="text-lg font-semibold">Мои заявки</h2>{workspace.requests.length ? <ul className="mt-3 divide-y divide-slate-100">{workspace.requests.map((request) => <li key={String(request.id)} className="py-3 text-sm"><strong>{String(request.title)}</strong><span className="ml-2 rounded bg-slate-100 px-2 py-1">{String(request.status)}</span>{request.adminComment ? <p className="mt-1 text-slate-600">Комментарий редакции: {String(request.adminComment)}</p> : null}</li>)}</ul> : <p className="mt-3 text-sm text-slate-600">Заявок пока нет.</p>}</section>
+    <section className="rounded-xl border border-slate-200 bg-white p-4"><h2 className="text-lg font-semibold">Мои заявки</h2>{workspace.requests.length ? <ul className="mt-3 divide-y divide-slate-100">{workspace.requests.map((request) => <li key={String(request.id)} className="py-3 text-sm"><strong>{String(request.title)}</strong><span className="ml-2 rounded bg-slate-100 px-2 py-1">{request.rolledBack ? 'Откат редакции' : String(request.status)}</span>{request.adminComment ? <p className="mt-1 text-slate-600">Комментарий редакции: {String(request.adminComment)}</p> : null}</li>)}</ul> : <p className="mt-3 text-sm text-slate-600">Заявок пока нет.</p>}</section>
     <form onSubmit={submit} className="space-y-4 rounded-xl border border-slate-200 bg-white p-4">
       <h2 className="text-lg font-semibold">Предложить изменение или новое место</h2>
       <div className="grid gap-3 sm:grid-cols-3">
@@ -94,8 +96,9 @@ export function SupplierPlacesWorkbench() {
         <TextField label="Название" required value={candidate.title} onChange={(title) => setCandidate({ ...candidate, title })}/>
         <Field label="Город"><select required className={control} value={candidate.cityId} onChange={(event) => setCandidate({ ...candidate, cityId: event.target.value })}><option value="">Выберите существующий город</option>{workspace.cities.map((city) => <option key={city.id} value={city.id}>{city.title}</option>)}</select></Field>
         <TextField label="Адрес" required value={candidate.address} onChange={(address) => setCandidate({ ...candidate, address })}/>
-        <Field label="Предлагаемый тип"><select className={control} value={candidate.placeType} onChange={(event) => setCandidate({ ...candidate, placeType: event.target.value })}>{PLACE_TYPE_OPTIONS.filter(([value]) => value !== 'OTHER').map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></Field>
-        <TextField label="Подтип (необязательно)" value={candidate.placeSubtype} onChange={(placeSubtype) => setCandidate({ ...candidate, placeSubtype })}/>
+        <PlaceClassificationFields typeLabel="Предлагаемый тип" typePlaceholder="Выберите тип" subtypeLabel="Предлагаемый подтип" placeType={candidate.placeType} placeSubtype={candidate.placeSubtype} onChange={(value) => setCandidate({ ...candidate, ...value })} />
+        <TextField label="Телефон" value={candidate.phone} onChange={(phone) => setCandidate({ ...candidate, phone })}/>
+        <TextField label="Часы работы" value={candidate.openingHours} onChange={(openingHours) => setCandidate({ ...candidate, openingHours })}/>
         <TextField label="Сайт / источник фактов" value={candidate.sourceUrl} onChange={(sourceUrl) => setCandidate({ ...candidate, sourceUrl })}/>
         <TextField label="Ссылка на сайт места" value={candidate.websiteUrl} onChange={(websiteUrl) => setCandidate({ ...candidate, websiteUrl })}/>
         <TextField label="Ссылка на изображение" value={candidate.imageUrl} onChange={(imageUrl) => setCandidate({ ...candidate, imageUrl })}/>
@@ -104,10 +107,27 @@ export function SupplierPlacesWorkbench() {
         <TextField label="Долгота" value={candidate.longitude} onChange={(longitude) => setCandidate({ ...candidate, longitude })}/>
         <TextField label="Краткое описание" multiline value={candidate.description} onChange={(description) => setCandidate({ ...candidate, description })}/>
       </div> : <div className="grid gap-3 sm:grid-cols-2">
-        {(['shortDescription', 'description', 'metroStation', 'wayToFind', 'parkingInfo'] as const).map((key) => <TextField key={key} label={{ shortDescription: 'Краткое описание', description: 'Описание', metroStation: 'Метро', wayToFind: 'Как найти', parkingInfo: 'Парковка' }[key]} multiline={key === 'description' || key === 'wayToFind'} value={fields[key]} onChange={(value) => setFields({ ...fields, [key]: value })}/>)}
+        <TextField label="Предлагаемое название" value={fields.title} onChange={(title) => setFields({ ...fields, title })}/>
+        <TextField label="Предлагаемый адрес" value={fields.address} onChange={(address) => setFields({ ...fields, address })}/>
+        <PlaceClassificationFields typeLabel="Предлагаемый тип" typePlaceholder="Не менять тип" subtypeLabel="Предлагаемый подтип" placeType={fields.placeType} placeSubtype={fields.placeSubtype} suggestionPlaceType={String(selectedLinked?.placeType || '')} onChange={(value) => setFields({ ...fields, ...value })} />
+        <TextField label="Широта" value={fields.latitude} onChange={(latitude) => setFields({ ...fields, latitude })}/>
+        <TextField label="Долгота" value={fields.longitude} onChange={(longitude) => setFields({ ...fields, longitude })}/>
+        {(['websiteUrl', 'phone', 'openingHours', 'shortDescription', 'description', 'metroStation', 'wayToFind', 'parkingInfo'] as const).map((key) => <TextField key={key} label={{ websiteUrl: 'Сайт', phone: 'Телефон', openingHours: 'Часы работы', shortDescription: 'Краткое описание', description: 'Описание', metroStation: 'Метро', wayToFind: 'Как найти', parkingInfo: 'Парковка' }[key]} multiline={key === 'description' || key === 'wayToFind' || key === 'openingHours'} value={fields[key]} onChange={(value) => setFields({ ...fields, [key]: value })}/>)}
         {pdpContent && <div className="space-y-3 rounded-lg border border-slate-200 p-3 sm:col-span-2"><div><h3 className="text-sm font-medium text-slate-900">Предложить правки текста PDP</h3><p className="mt-1 text-xs text-slate-500">Профиль: {String(workspace.venues.find((place) => place.venueId === venueId)?.suggestedVariant)}. Поля соответствуют разделам текущего шаблона. Редактор решает, какие изменения применить.</p></div>
           <TextField label="Краткое описание страницы" multiline value={pdpContent.summary} onChange={(summary) => setPdpContent({ ...pdpContent, summary })}/>
-          {pdpContent.sections.map((section, index) => <div key={section.id || index} className="grid gap-2 sm:grid-cols-[minmax(150px,0.4fr)_1fr]"><TextField label={`Заголовок · ${section.kind}`} value={section.title} onChange={(title) => setPdpContent({ ...pdpContent, sections: pdpContent.sections.map((item, itemIndex) => itemIndex === index ? { ...item, title } : item) })}/><TextField label="Текст раздела" multiline value={section.body} onChange={(body) => setPdpContent({ ...pdpContent, sections: pdpContent.sections.map((item, itemIndex) => itemIndex === index ? { ...item, body } : item) })}/></div>)}
+          {pdpContent.sections.map((section, index) => {
+            const profile = String(selectedLinked?.suggestedVariant || '');
+            const requirement = pdpSectionRequirement(profile, section.kind);
+            const subtypeHint = pdpSubtypeContentHint(String(selectedLinked?.placeType || ''), String(selectedLinked?.placeSubtype || ''), section.kind);
+            return <div key={section.id || index} className="grid gap-2 rounded-md border border-slate-100 p-3 sm:grid-cols-[minmax(150px,0.4fr)_1fr]">
+              <div className="flex items-center gap-2 text-xs font-medium text-slate-700 sm:col-span-2">{section.title || PDP_SECTION_EDITOR_SCHEMA[section.kind]?.bodyLabel || section.kind}{requirement ? <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px]">{requirement === 'core' ? 'Основной блок' : 'По ситуации'}</span> : null}</div>
+              <TextField label={`Заголовок · ${PDP_SECTION_EDITOR_SCHEMA[section.kind]?.bodyLabel || section.kind}`} value={section.title} onChange={(title) => setPdpContent({ ...pdpContent, sections: pdpContent.sections.map((item, itemIndex) => itemIndex === index ? { ...item, title } : item) })}/>
+              <TextField label={PDP_SECTION_EDITOR_SCHEMA[section.kind]?.bodyLabel || 'Текст раздела'} multiline value={section.body} onChange={(body) => setPdpContent({ ...pdpContent, sections: pdpContent.sections.map((item, itemIndex) => itemIndex === index ? { ...item, body } : item) })}/>
+              {PDP_SECTION_EDITOR_SCHEMA[section.kind]?.bodyHint ? <p className="text-xs text-slate-500 sm:col-span-2">{PDP_SECTION_EDITOR_SCHEMA[section.kind].bodyHint}</p> : null}
+              {requirement === 'conditional' ? <p className="text-xs text-slate-500 sm:col-span-2">Заполняйте блок только при наличии подтверждённых сведений; редактор может оставить его пустым.</p> : null}
+              {subtypeHint ? <p className="rounded bg-violet-50 p-2 text-xs text-violet-900 sm:col-span-2">Подтип «{String(selectedLinked?.placeSubtype)}»: {subtypeHint}</p> : null}
+            </div>;
+          })}
         </div>}
       </div>}
       <p className="text-xs text-slate-500">Отправка создаёт заявку на проверку. Она не изменяет опубликованную PDP, публичный URL или индексируемость.</p>

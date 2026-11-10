@@ -27,7 +27,9 @@ import { PDP_VARIANTS, readPdpDocument, savePdpDocument } from './pdp-documents.
 import {
   buildAdminSupplierPlaceRequests,
   buildSupplierPlaceWorkspace,
+  applySupplierPlaceRequest,
   getAdminSupplierPlaceRequest,
+  rollbackSupplierPlaceRequest,
   reviewSupplierPlaceRequest,
   submitSupplierPlaceRequest,
 } from './supplier-place-requests.js';
@@ -54,6 +56,7 @@ import {
   buildAdminTaxonomy,
   buildAdminVenueDetail,
   buildAdminVenuesList,
+  createAdminVenue,
   buildCatalogSessions,
   sessionHasCoverImage,
   spreadCatalogSessionsByCoverImage,
@@ -95,7 +98,7 @@ import {
   warmAdminGroupedEventsCache,
   invalidateAdminGroupedEventsCache,
 } from './dto.js';
-import { buildPublicSearchDto } from './public-search.dto.ts';
+import { buildPublicSearchDto, buildPublicSearchResultsDto } from './public-search.dto.ts';
 import { loadVenueMapTip } from './public-venue-map-tip.ts';
 import { buildPublicEventFreshnessMap, publicEventFreshnessPayload } from './public-event-freshness.ts';
 import {
@@ -434,6 +437,16 @@ export async function handleRequest(request, response) {
         response,
         await withPublicResponseCache(`search-trgm:${canonicalSearchParams(url.searchParams)}`, () =>
           buildPublicSearchDto(url.searchParams),
+        ),
+      );
+      return;
+    }
+
+    if (route === 'GET /api/public/search/results') {
+      sendPublicJson(
+        response,
+        await withPublicResponseCache(`search-results:${canonicalSearchParams(url.searchParams)}`, () =>
+          buildPublicSearchResultsDto(url.searchParams),
         ),
       );
       return;
@@ -804,6 +817,17 @@ export async function handleRequest(request, response) {
       return;
     }
 
+    if (route === 'POST /api/admin/venues') {
+      try {
+        const result = await createAdminVenue(db, await readJsonBody(request));
+        invalidatePublicCaches('venue create');
+        sendJson(response, result, 201);
+      } catch (error) {
+        sendJson(response, { error: error.message || 'venue_create_failed' }, 400);
+      }
+      return;
+    }
+
     if (route === 'GET /api/admin/supplier-place-requests') {
       const status = String(url.searchParams.get('status') || '').trim().toUpperCase();
       try {
@@ -823,11 +847,15 @@ export async function handleRequest(request, response) {
 
     if (supplierPlaceRequestMatch && request.method === 'PATCH') {
       try {
-        const result = await reviewSupplierPlaceRequest(
-          db,
-          decodeURIComponent(supplierPlaceRequestMatch[1]),
-          await readJsonBody(request),
-        );
+        const requestId = decodeURIComponent(supplierPlaceRequestMatch[1]);
+        const input = await readJsonBody(request);
+        const action = String(input.action || '').toUpperCase();
+        const result = action === 'APPLY'
+          ? await applySupplierPlaceRequest(db, requestId, input)
+          : action === 'ROLLBACK'
+            ? await rollbackSupplierPlaceRequest(db, requestId, input)
+            : await reviewSupplierPlaceRequest(db, requestId, input);
+        if (result?.status === 'APPLIED' || result?.rolledBack) invalidatePublicCaches('supplier place request updated');
         sendJson(response, result || { error: 'place_request_not_found' }, result ? 200 : 404);
       } catch (error) {
         sendJson(response, { error: error.message || 'place_request_review_failed' }, 400);

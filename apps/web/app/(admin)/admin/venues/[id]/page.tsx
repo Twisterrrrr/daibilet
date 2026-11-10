@@ -2,13 +2,14 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 
 import { AdminApiErrorBanner } from '@/components/admin/AdminApiErrorBanner';
+import { PlaceClassificationFields } from '@/components/admin/PlaceClassificationFields.client';
 import { eventStatusLabel, venueKindLabel, venuePageStatusLabel } from '@/components/admin/admin-catalog-labels';
 import { formatAdminDateTime, formatAdminNumber, PUBLIC_SITE_BASE } from '@/lib/admin-ui';
 import { saveAdminVenueAction } from '@/server/admin-venue-actions';
-import { loadAdminVenueDetail } from '@/server/admin-venues-data';
+import { loadAdminVenueCityOptions, loadAdminVenueDetail } from '@/server/admin-venues-data';
 import { AdminPdpEditor } from '@/components/admin/AdminVenuePdpEditor.client';
 import { loadAdminPdpEditorData } from '@/server/admin-pdp-data';
-import { PLACE_TYPE_OPTIONS, suggestedPlacePdpVariant } from '@daibilet/contracts/place-pdp';
+import { placeSubtypeIssue, suggestedPlacePdpVariant } from '@daibilet/contracts/place-pdp';
 
 export const dynamic = 'force-dynamic';
 
@@ -57,6 +58,7 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
   const back = first(rawSearch.back) || '';
   const backHref = /^\/admin\/venues(?:\?|$)/.test(back) ? back : '/admin/venues';
   const detail = await loadAdminVenueDetail(id);
+  const cityOptions = detail.found ? await loadAdminVenueCityOptions() : { rows: [], error: '' };
   const pdpData = detail.found && detail.slug
     ? await loadAdminPdpEditorData('venues', detail.id)
     : { variants: {}, document: null, error: null };
@@ -66,11 +68,23 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
     SPORT_ACTIVITY_SPACE: 'sport', ATTRACTION: 'attraction', BUS: 'transport', GASTRO: 'food',
   };
   const suggestedVariant = detail.placeType ? suggestedPlacePdpVariant(detail.placeType, detail.placeSubtype) : null;
+  const subtypeIssue = placeSubtypeIssue(detail.placeType, detail.placeSubtype);
   const initialVariant = pdpData.document?.variant
     || suggestedVariant
     || defaultVariantByVenueKind[detail.kind.toUpperCase()]
     || 'venue';
-  const notice = first(rawSearch.saved) === '1' ? 'Площадка сохранена.' : null;
+  const notice = first(rawSearch.created) === '1' ? 'Создан кандидат площадки. Страница скрыта от индексации.' : first(rawSearch.saved) === '1' ? 'Площадка сохранена.' : null;
+  const readinessChecks = [
+    ['Город', Boolean(detail.cityId)],
+    ['Адрес', Boolean(detail.address)],
+    ['Тип места уточнён', Boolean(detail.placeType && detail.placeType !== 'OTHER')],
+    ['Подтип согласуется с типом места', !subtypeIssue],
+    ['Есть описание', Boolean(detail.shortDescription || detail.description)],
+    ['Есть изображение', Boolean(detail.heroImageUrl)],
+    ['Редакционный PDP заполнен и готов', pdpData.document?.status === 'READY'],
+    ['Шаблон PDP соответствует рекомендации', !pdpData.document || !suggestedVariant || pdpData.document.variant === suggestedVariant],
+    ['SEO title и description заполнены', Boolean(detail.seoTitle && detail.seoDescription)],
+  ] as const;
 
   return (
     <div className="space-y-4">
@@ -128,6 +142,12 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
       ) : null}
 
       <AdminApiErrorBanner errors={detail.errors} />
+      {cityOptions.error ? <AdminApiErrorBanner errors={[cityOptions.error]} /> : null}
+
+      {detail.found ? <section className="rounded-xl border border-slate-200 bg-white p-4">
+        <div className="flex flex-wrap items-start justify-between gap-2"><div><h3 className="font-semibold text-slate-900">Подсказки перед публикацией</h3><p className="mt-1 text-xs text-slate-600">Это чек-лист полноты карточки, а не автоматическая публикация или индексация.</p></div><span className="text-sm text-slate-600">Готово: {readinessChecks.filter(([, done]) => done).length} / {readinessChecks.length}</span></div>
+        <ul className="mt-3 grid gap-2 sm:grid-cols-2">{readinessChecks.map(([label, done]) => <li key={label} className={`rounded-md px-3 py-2 text-sm ${done ? 'bg-emerald-50 text-emerald-800' : 'bg-amber-50 text-amber-900'}`}>{done ? '✓' : '•'} {label}{done ? '' : ' — заполнить'}</li>)}</ul>
+      </section> : null}
 
       {detail.found ? (
         <form action={saveAdminVenueAction} className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -141,6 +161,9 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
                 defaultValue={detail.title}
                 className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
               />
+            </Field>
+            <Field label="Город">
+              <select name="cityId" defaultValue={detail.cityId || ''} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"><option value="">Не выбран</option>{cityOptions.rows.map((city) => <option key={city.id} value={city.id}>{city.title}</option>)}</select>
             </Field>
             <Field label="Тип площадки">
               <select
@@ -158,15 +181,7 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
                 ))}
               </select>
             </Field>
-            <Field label="Тип места для каталога">
-              <select name="placeType" defaultValue={detail.placeType || ''} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm">
-                <option value="">Не определён</option>
-                {PLACE_TYPE_OPTIONS.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
-              </select>
-            </Field>
-            <Field label="Подтип места">
-              <input name="placeSubtype" defaultValue={detail.placeSubtype || ''} maxLength={64} pattern="[a-z0-9_-]*" placeholder="Например: pier, planetarium" className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" />
-            </Field>
+            <PlaceClassificationFields defaultPlaceType={detail.placeType || ''} defaultPlaceSubtype={detail.placeSubtype || ''} typeLabel="Тип места для каталога" />
             <Field label="Статус страницы">
               <select
                 name="pageStatus"
@@ -236,14 +251,10 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
 
           <fieldset className="space-y-3 rounded-lg border border-slate-200 bg-slate-50/60 p-3">
             <legend className="px-1 text-sm font-semibold text-slate-900">Логистика</legend>
-            {detail.address ? (
-              <div className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700">
-                <div className="text-xs font-medium text-slate-500">Адрес (только sync, не редактируется)</div>
-                <div className="mt-1">{detail.address}</div>
-              </div>
-            ) : (
-              <p className="text-xs text-slate-500">Адрес приходит из sync и здесь не редактируется.</p>
-            )}
+            <Field label="Адрес"><input name="address" defaultValue={detail.address || ''} className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"/></Field>
+            <div className="grid gap-3 sm:grid-cols-2"><Field label="Широта"><input name="latitude" type="number" step="any" min="-90" max="90" defaultValue={detail.latitude ?? ''} className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"/></Field><Field label="Долгота"><input name="longitude" type="number" step="any" min="-180" max="180" defaultValue={detail.longitude ?? ''} className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"/></Field></div>
+            <div className="grid gap-3 sm:grid-cols-2"><Field label="Сайт"><input name="websiteUrl" type="url" defaultValue={detail.websiteUrl || ''} placeholder="https://" className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"/></Field><Field label="Телефон"><input name="phone" defaultValue={detail.phone || ''} className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"/></Field></div>
+            <Field label="Часы работы"><textarea name="openingHours" rows={2} defaultValue={detail.openingHours || ''} className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"/></Field>
             <Field label="Метро">
               <input
                 name="metroStation"
@@ -289,6 +300,7 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
             />
             Индексировать
           </label>
+          <p className="text-xs text-slate-500">Новые карточки-кандидаты создаются с noindex. Для индексации редактор отдельно проверяет страницу, меняет статус на «Опубликована» и включает этот флажок.</p>
           <button
             type="submit"
             className="rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800"
@@ -307,6 +319,8 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
           initialDocument={pdpData.document}
           initialVariant={initialVariant}
           suggestedVariant={suggestedVariant || initialVariant}
+          placeType={detail.placeType || ''}
+          placeSubtype={detail.placeSubtype || ''}
           initialError={pdpData.error}
         />
       ) : null}

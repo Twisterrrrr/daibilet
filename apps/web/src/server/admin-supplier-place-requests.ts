@@ -9,6 +9,7 @@ export type AdminSupplierPlaceRequest = {
   venueSlug?: string | null;
   type: string;
   status: string;
+  rolledBack?: boolean;
   title: string;
   payload: unknown;
   sourceSnapshot: unknown;
