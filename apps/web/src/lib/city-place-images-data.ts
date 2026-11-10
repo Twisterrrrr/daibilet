@@ -1147,6 +1147,7 @@ const LOCATION_PACK_IMAGES: Record<string, string> = {
   'sevastopol-pamyatnik-zatoplennym-korablyam-i-grafskaya-pristan': '/images/venues/sevastopol/pamyatnik-zatoplennym-korablyam-i-grafskaya-pristan.jpg',
   'orel-pamyatnik-ivanu-groznomu': '/images/venues/orel/pamyatnik-ivanu-groznomu.jpg',
   'izhevsk-pamyatnik-izhiku': '/images/venues/izhevsk/pamyatnik-izhiku.jpg',
+  'izhevsk-ludorvay': '/images/venues/izhevsk/ludorvay.jpg',
   'belgorod-pamyatnik-knyazyu-vladimiru-krestitelyu-rusi': '/images/venues/belgorod/pamyatnik-knyazyu-vladimiru-krestitelyu-rusi.jpg',
   'syktyvkar-pamyatnik-kupecheskomu-sunduku': '/images/venues/syktyvkar/pamyatnik-kupecheskomu-sunduku.jpg',
   'tver-pamyatnik-mihailu-krugu': '/images/venues/tver/pamyatnik-mihailu-krugu.jpg',

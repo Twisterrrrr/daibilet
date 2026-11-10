@@ -46,6 +46,7 @@ const HUB_LOADERS: Record<string, HubLoader> = {
   'yaroslavl': () => import('./yaroslavl-hub'),
   'saratov': () => import('./saratov-hub'),
   'kirov': () => import('./kirov-hub'),
+  'izhevsk': () => import('./izhevsk-hub'),
   'sochi': () => import('./sochi-hub'),
   'ulyanovsk': () => import('./ulyanovsk-hub'),
 };

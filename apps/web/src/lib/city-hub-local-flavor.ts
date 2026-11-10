@@ -62,6 +62,7 @@ import {
   ULYANOVSK_WHEN_TO_GO,
   KIROV_WHEN_TO_GO,
   TOLYATTI_WHEN_TO_GO,
+  IZHEVSK_WHEN_TO_GO,
 } from './when-to-go-packs.ts';
 import { normalizeCityHubSlug } from './city-hub-config.ts';
 import type { CityMustSeeItem, CitySuburbItem, CitySuburbPlace } from './cityInfo.ts';
@@ -376,6 +377,49 @@ const TOLYATTI_WEATHER: CityWeatherFlavor = {
   indoorCtaRain: 'Дождь: запланируйте музей и проверьте часы работы перед выездом',
   indoorCtaSnow: 'Снег: сократите прогулку у воды и проверьте зимний режим музеев',
 };
+
+const IZHEVSK_WEATHER: CityWeatherFlavor = {
+  latitude: 56.85,
+  longitude: 53.2,
+  timezone: 'Europe/Samara',
+  outdoorSlugs: [
+    'izhevsk-izhevskiy-prud-i-naberezhnaya-zodchego-dudina',
+    'izhevsk-pamyatnik-izhiku',
+    'izhevsk-mihaylovskaya-kolonna',
+    'izhevsk-ludorvay',
+  ],
+  indoorSlugs: [
+    'izhevsk-muzey-strelkovogo-oruzhiya-imeni-m-t-kalashnikova',
+    'izhevsk-svyato-mihaylovskiy-sobor',
+  ],
+  outdoorCta: 'Сухо: пройдитесь по набережной Ижевского пруда',
+  indoorCtaOvercast: 'Пасмурно: музей Калашникова или Свято-Михайловский собор',
+  indoorCtaRain: 'Дождь: оставьте прогулку у пруда и выберите музей',
+  indoorCtaSnow: 'Снег: проверьте зимний режим музеев и состояние дорожек',
+};
+
+const IZHEVSK_SLIDES: CityIdentitySlide[] = [
+  {
+    id: 'izhevsk-arms-city',
+    title: 'Город оружейников',
+    text: 'Ижевск развивался вокруг оружейного производства. Историю отрасли и Михаила Калашникова рассказывает городской музей стрелкового оружия.',
+    imageSrc: '/images/venues/izhevsk/identity-arms-heritage.jpg',
+    imageAlt: 'Исторический краснокирпичный промышленный корпус в Ижевске',
+    slugs: ['izhevsk-muzey-strelkovogo-oruzhiya-imeni-m-t-kalashnikova'],
+    target: 'places',
+    badge: 'История',
+  },
+  {
+    id: 'izhevsk-udmurt-culture',
+    title: 'Традиции Удмуртии',
+    text: 'Республика узнаётся по деревянной архитектуре, ремёслам и тканым орнаментам. В «Лудорвае» можно увидеть усадьбы и предметы традиционного уклада.',
+    imageSrc: '/images/venues/izhevsk/identity-udmurt-textile.jpg',
+    imageAlt: 'Льняное полотно с красным геометрическим узором и прялка',
+    slugs: ['izhevsk-ludorvay'],
+    target: 'suburbs',
+    badge: 'Культура',
+  },
+];
 
 const TOLYATTI_SLIDES: CityIdentitySlide[] = [
   {
@@ -2244,6 +2288,14 @@ export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
     slides: TOLYATTI_SLIDES,
     weather: TOLYATTI_WEATHER,
     whenToGo: TOLYATTI_WHEN_TO_GO,
+  },
+  izhevsk: {
+    identityHeading: 'Чем уникален Ижевск',
+    identityLead: 'Оружейная история города и традиционная культура Удмуртии',
+    tags: tagsFromSlides(IZHEVSK_SLIDES),
+    slides: IZHEVSK_SLIDES,
+    weather: IZHEVSK_WEATHER,
+    whenToGo: IZHEVSK_WHEN_TO_GO,
   },
 };
 
