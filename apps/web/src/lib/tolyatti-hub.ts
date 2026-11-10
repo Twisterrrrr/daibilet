@@ -10,6 +10,8 @@ function place(
     address: string;
     locationSlug?: string;
     venueSlug?: string;
+    imageUrl?: string;
+    imageCredit?: { author: string; sourceUrl: string; license: string; licenseUrl: string };
     mustSeeFilter?: string;
     visitMinutes?: number | string;
     alsoMain?: boolean;
@@ -25,60 +27,69 @@ function place(
     visitMinutes: opts.visitMinutes ?? 30,
     ...(opts.locationSlug ? { locationSlug: opts.locationSlug } : {}),
     ...(opts.venueSlug ? { venueSlug: opts.venueSlug } : {}),
+    ...(opts.imageUrl ? { imageUrl: opts.imageUrl } : {}),
+    ...(opts.imageCredit ? { imageCredit: opts.imageCredit } : {}),
     ...(typeof opts.alsoMain === 'boolean' ? { alsoMain: opts.alsoMain } : {}),
   };
 }
 
 export const TOLYATTI_MUST_SEE: any[] = [
-  place('Парковый комплекс истории техники имени К. Г. Сахарова', 'Открытая коллекция автомобилей, авиационной, железнодорожной и военной техники.', 53.4805, 49.4872, {
-    address: 'Южное шоссе, 121',
+  place('Парковый комплекс истории техники имени К. Г. Сахарова', 'Открытая коллекция авиационной, железнодорожной, автомобильной и военной техники; среди экспонатов - подводная лодка Б-307.', 53.55309, 49.250004, {
+    address: 'Южное шоссе, 137',
     venueSlug: 'tolyatti-tehnicheskiy-muzey-vaz',
     mustSeeFilter: 'museum',
     visitMinutes: 90,
     alsoMain: true,
   }),
-  place('Парк Победы', 'Главный зелёный каркас города с аллеями и мемориалами.', 53.5072, 49.4181, {
-    address: 'ул. Революционная',
+  place('Парк Победы', 'Парк Автозаводского района с мемориалом в честь 40-летия Победы и памятником воинам-афганцам.', 53.5104991, 49.2748616, {
+    address: 'между ул. Фрунзе и Приморским бульваром',
+    imageUrl: '/images/venues/tolyatti/park-pobedy-memorial.jpg',
+    imageCredit: {
+      author: 'Александр Байдуков',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Togliatti._Memorial_in_honor_of_the_40th_anniversary_of_the_Victory._Victory_Park.jpg',
+      license: 'CC BY-SA 4.0',
+      licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0',
+    },
     locationSlug: 'tolyatti-park-pobedy',
     mustSeeFilter: 'park',
     visitMinutes: 60,
     alsoMain: true,
   }),
-  place('Набережная Волги', 'Променад с видами на водохранилище и вечерними прогулками.', 53.4931, 49.5124, {
-    address: 'набережная Волги',
+  place('Набережная Автозаводского района', 'Прогулочная береговая территория у Куйбышевского водохранилища с открытым видом на воду.', 53.504124, 49.261241, {
+    address: 'Прибрежный парк, Автозаводский район',
     locationSlug: 'tolyatti-naberezhnaya-volgi',
     mustSeeFilter: 'views',
     visitMinutes: 45,
     alsoMain: true,
   }),
-  place('Памятник Василию Татищеву', 'Конная статуя основателя Ставрополя-на-Волге на высоком берегу водохранилища.', 53.4735, 49.5062, {
-    address: 'Комзина, 1А',
+  place('Памятник Василию Татищеву', 'Конная статуя основателя Ставрополя-на-Волге на высоком берегу Волги.', 53.474598, 49.3483, {
+    address: 'ул. Комзина, 1А',
     locationSlug: 'tolyatti-pamyatnik-tatischevu',
     mustSeeFilter: 'monument',
     visitMinutes: 15,
     alsoMain: true,
   }),
-  place('Спасо-Преображенский кафедральный собор', 'Кафедральный собор Автозаводского района.', 53.5186, 49.4152, {
+  place('Спасо-Преображенский кафедральный собор', 'Кафедральный собор Тольяттинской епархии в Автозаводском районе.', 53.521056, 49.278154, {
     address: 'ул. Революционная, 19',
     locationSlug: 'tolyatti-spaso-preobrazhenskiy-sobor',
     mustSeeFilter: 'temple',
     visitMinutes: 30,
   }),
-  place('Площадь Свободы и Обелиск Славы', 'Центральная площадь с мемориалом четырём тольяттинцам - героям Великой Отечественной войны.', 53.5078, 49.4204, {
-    address: 'пл. Свободы',
+  place('Обелиск Славы на площади Свободы', 'Мемориал в память о тольяттинцах - героях Великой Отечественной войны.', 53.512966, 49.409622, {
+    address: 'площадь Свободы',
     locationSlug: 'tolyatti-ploschad-svobody',
     mustSeeFilter: 'main',
     visitMinutes: 25,
     alsoMain: true,
   }),
-  place('Портпосёлок', 'Тихий берег и исторический слой раннего Ставрополя-на-Волге.', 53.4821, 49.5233, {
-    address: 'район Портпосёлка',
+  place('Портпосёлок', 'Исторический микрорайон у Волги, связанный с переселением Ставрополя при строительстве Куйбышевской ГЭС.', 53.4802, 49.3684, {
+    address: 'микрорайон Портовый, ул. Комзина',
     locationSlug: 'tolyatti-portposelok',
     mustSeeFilter: 'views',
     visitMinutes: 40,
   }),
-  place('Музей истории АвтоВАЗа', 'Заводская история города и автомобильный код Тольятти.', 53.5581, 49.2624, {
-    address: 'Южное шоссе, 36',
+  place('Музей истории АвтоВАЗа', 'Экспозиция об истории Волжского автомобильного завода и его автомобилях.', 53.555412, 49.26412, {
+    address: 'Южное шоссе, 121',
     venueSlug: 'tolyatti-muzey-istorii-avtovaza',
     mustSeeFilter: 'museum',
     visitMinutes: 60,
@@ -101,17 +112,16 @@ export const TOLYATTI_DAY_ROUTE_PRESETS = [
   {
     id: 'tolyatti-volga-and-old-stavropol',
     title: 'Волга и старый Ставрополь',
-    description: 'Памятник Татищеву, прогулка по Портпосёлку и виды на водохранилище.',
+    description: 'Памятник Татищеву и прогулка по историческому Портпосёлку.',
     stops: [
       { name: 'Памятник Василию Татищеву', locationSlug: 'tolyatti-pamyatnik-tatischevu' },
       { name: 'Портпосёлок', locationSlug: 'tolyatti-portposelok' },
-      { name: 'Набережная Волги', locationSlug: 'tolyatti-naberezhnaya-volgi' },
     ],
   },
   {
     id: 'tolyatti-avtograd-day',
     title: 'Автоград за один день',
-    description: 'Технический музей, парк Победы и Спасо-Преображенский собор.',
+    description: 'Технический музей, прогулка по Парку Победы и Спасо-Преображенский собор.',
     stops: [
       { name: 'Парковый комплекс истории техники имени К. Г. Сахарова', venueSlug: 'tolyatti-tehnicheskiy-muzey-vaz' },
       { name: 'Парк Победы', locationSlug: 'tolyatti-park-pobedy' },

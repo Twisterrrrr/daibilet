@@ -88,6 +88,7 @@ const CITY_SLUG_ALIASES = {
   tomsk: ['tomsk', 'томск'],
   ulyanovsk: ['ulyanovsk', 'ульяновск'],
   izhevsk: ['izhevsk', 'ижевск'],
+  tolyatti: ['tolyatti', 'тольятти'],
   orel: ['orel', 'орел', 'орёл'],
   orenburg: ['orenburg', 'оренбург'],
   abakan: ['abakan', 'абакан'],
@@ -168,6 +169,7 @@ const CITY_TITLE_ALIASES = {
   tomsk: ['Томск'],
   ulyanovsk: ['Ульяновск'],
   izhevsk: ['Ижевск'],
+  tolyatti: ['Тольятти'],
   orel: ['Орёл', 'Орел'],
   orenburg: ['Оренбург'],
   abakan: ['Абакан'],
@@ -460,6 +462,7 @@ function parseHubModuleMustSee() {
       exportName: 'VORONEZH_MUST_SEE',
     },
     { cityKey: 'ryazan', file: 'apps/web/src/lib/ryazan-hub.ts', exportName: 'RYAZAN_MUST_SEE' },
+    { cityKey: 'tolyatti', file: 'apps/web/src/lib/tolyatti-hub.ts', exportName: 'TOLYATTI_MUST_SEE' },
   ];
   const rows = [];
   for (const hub of hubs) {
