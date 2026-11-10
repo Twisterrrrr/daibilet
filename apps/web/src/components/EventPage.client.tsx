@@ -683,10 +683,7 @@ export function EventHero({
       }`}
     >
       <EventPageCitySync city={event.city} />
-      {/*
-        Hero: full artwork visible, blurred background fills edges.
-        No cropping — the entire poster/image is shown.
-      */}
+      {/* Keep the artwork inside the page container; monochrome blur fills the side bleed. */}
       <HeroImageWithBlur
         src={heroImage || null}
         alt={formatPublicTitle(event.title)}
