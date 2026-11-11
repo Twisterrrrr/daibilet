@@ -8,7 +8,7 @@ import { pageTitle } from '@/lib/seo-meta';
 export const metadata: Metadata = {
   title: pageTitle('Страница не найдена - превью'),
   robots: { index: false, follow: false },
-  alternates: { canonical: '/404' },
+  alternates: { canonical: '/notfound' },
 };
 
 export default function NotFoundPreviewPage() {
