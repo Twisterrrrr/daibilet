@@ -3,6 +3,7 @@
 [Roadmap Daibilet — сводка на 2026-10](./roadmap-2026-10.md)
 [SEO-аудит 18.10.2026: кэш sitemap, каноникал Москвы, главная no-store](./seo-audit-2026-10-18.md)
 [Карта соответствий PDP событий, слотов и legacy URL - 27.10.2026](./event-pdp-url-correspondence-audit-2026-10-27.md)
+[Редакторские вкладки городских и региональных хабов - 11.11.2026](./city-region-hub-editorial-tabs.md)
 [EventPage: схема, API, редактор, продажи и блокер Event ID - 27.10.2026](./event-page-foundation-2026-10-27.md)
 [Матрица Event ID → EventPage и решения по типам событий - 03.11.2026](./eventpage-event-matrix-2026-11-03.md)
 [Статус rollout EventPage: production drafts, staging, CI и оставшиеся SEO-шаги - 03.11.2026](./eventpage-rollout-status-2026-11-03.md)
