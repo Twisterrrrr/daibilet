@@ -104,6 +104,9 @@ test "$(git rev-parse "$DEPLOY_SHA^{commit}")" = "$DEPLOY_SHA"
 git restore --source=HEAD --staged --worktree -- apps/web/next-env.d.ts
 git checkout --detach "$DEPLOY_SHA"
 test "$(git rev-parse HEAD)" = "$DEPLOY_SHA"
+# A prior legacy asset sync may have overwritten tracked Next venue images.
+# Restore the curated copies from this release before syncing any missing legacy assets.
+git restore --source="$DEPLOY_SHA" --staged --worktree -- apps/web/public/images/venues
 sync_public_assets_deploy
 
 # Enum expands (TEMPLE/BUS …) require a fresh Prisma client on MSK before API restart.
