@@ -29,7 +29,7 @@ export default async function Perm2Page() {
 
   return (
     <SiteLayout chromeVariant="v2">
-      <CityHubPreview city={loaded.payload.city} stats={loaded.payload.stats} guide={guide} />
+      <CityHubPreview payload={loaded.payload} guide={guide} />
     </SiteLayout>
   );
 }

@@ -1,29 +1,45 @@
 import Link from 'next/link';
-import { ArrowRight, Clock, Info, MapPin } from 'lucide-react';
+import {
+  ArrowRight,
+  CalendarDays,
+  Clock,
+  Headphones,
+  Info,
+  MapPin,
+  RotateCcw,
+  ShieldCheck,
+} from 'lucide-react';
 
+import { CityRegionalEvents } from '@/components/CityRegionalEvents.client';
 import { CityWeatherWidget } from '@/components/CityWeatherWidget.client';
 import { SafeImage } from '@/components/SafeImage.client';
 import { fontUnbounded } from '@/lib/fonts';
 import { resolveCityHeroRegionBadge } from '@/lib/city-hero-region';
 import { resolveCityImage } from '@/lib/city-images';
 import { resolveCityPlaceHref, type CityInfoEntry } from '@/lib/cityInfo';
-import { pluralEvents, pluralPoints, pluralVenues } from '@/lib/format';
-import type { PublicCityDto, PublicCityPageDto } from '@daibilet/contracts/public';
+import { formatPriceFrom, pluralEvents, pluralPoints, pluralVenues } from '@/lib/format';
+import { landingCategoryHref } from '@/lib/landing-routes';
+import type { PublicCityPageDto } from '@daibilet/contracts/public';
 
 /** Превью хаба города в новом дизайне (подмножество блоков, без афиши/табов). */
 export function CityHubPreview({
-  city,
-  stats,
+  payload,
   guide,
 }: {
-  city: PublicCityDto;
-  stats: PublicCityPageDto['stats'];
+  payload: PublicCityPageDto;
   guide: CityInfoEntry;
 }) {
+  const city = payload.city;
+  const stats = payload.stats;
+  const sessions = payload.sessions ?? [];
+  const venues = payload.venues ?? [];
+  const landings = payload.landings ?? [];
+  const nearby = payload.regionNearby ?? null;
   const heroImage = resolveCityImage({ slug: city.slug, sourceSlug: city.sourceSlug, name: city.name });
   const places = guide.mustSee ?? [];
   const routes = guide.dayRoutePresets ?? [];
   const faq = guide.faq ?? [];
+  const suburbs = guide.significantSuburbs ?? [];
   const regionBadge = resolveCityHeroRegionBadge(city);
 
   return (
@@ -78,6 +94,28 @@ export function CityHubPreview({
           </div>
         </div>
       </section>
+
+      <div className="sticky top-[var(--site-header-height)] z-40 border-b border-line bg-white">
+        <div className="container-page flex gap-1 overflow-x-auto py-3">
+          {[
+            { href: '#places', label: 'Что посмотреть' },
+            { href: '#routes', label: 'Маршруты' },
+            { href: '#events', label: 'События' },
+            { href: '#collections', label: 'Подборки' },
+            { href: '#locations', label: 'Площадки' },
+            { href: '#suburbs', label: 'Пригороды' },
+            { href: '#faq', label: 'FAQ' },
+          ].map((tab) => (
+            <a
+              key={tab.href}
+              href={tab.href}
+              className="shrink-0 rounded-full px-4 py-2 text-sm font-semibold text-ink-muted transition hover:bg-surface-alt hover:text-ink"
+            >
+              {tab.label}
+            </a>
+          ))}
+        </div>
+      </div>
 
       <div className="container-page py-12 sm:py-16">
         <div className={guide.hookFact ? 'grid gap-4 md:grid-cols-[1.2fr_1fr]' : ''}>
@@ -176,6 +214,196 @@ export function CityHubPreview({
           </section>
         ) : null}
 
+        {sessions.length ? (
+          <section id="events" className="scroll-mt-28 pt-12">
+            <div>
+              <h2 className={`${fontUnbounded.className} text-2xl font-bold tracking-tight text-ink sm:text-3xl`}>
+                Ближайшие события
+              </h2>
+              <p className="mt-2 text-sm text-ink-muted">Концерты, спектакли и экскурсии на ближайшие дни</p>
+            </div>
+            <div className="mt-8 flex gap-4 overflow-x-auto pb-2">
+              {sessions.slice(0, 8).map((session) => {
+                const href = session.eventPageSlug
+                  ? `/events/${session.eventPageSlug}`
+                  : session.slug
+                    ? `/events/${session.slug}`
+                    : null;
+                const content = (
+                  <>
+                    <div className="relative aspect-[3/4] w-full overflow-hidden bg-surface-alt">
+                      {session.imageUrl ? (
+                        <SafeImage src={session.imageUrl} alt="" fill sizes="12rem" className="object-cover" />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center text-ink-muted-2">
+                          <CalendarDays className="h-8 w-8" aria-hidden />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex flex-1 flex-col gap-2 p-3.5">
+                      <h3 className="line-clamp-2 text-sm font-bold leading-snug text-ink">{session.title}</h3>
+                      <div className="flex items-center gap-1 text-xs text-ink-muted">
+                        <Clock className="h-3.5 w-3.5 shrink-0 opacity-70" aria-hidden />
+                        {session.dateLabel}
+                        {session.timeLabel ? ` · ${session.timeLabel}` : ''}
+                      </div>
+                      {session.priceFrom ? (
+                        <div className="mt-auto pt-2 text-base font-extrabold text-ink">
+                          {formatPriceFrom(session.priceFrom)}
+                        </div>
+                      ) : null}
+                    </div>
+                  </>
+                );
+                const cardClass =
+                  'flex w-44 shrink-0 flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-card transition hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-card-hover';
+                return href ? (
+                  <Link key={session.id} href={href} className={`${cardClass} group`}>
+                    {content}
+                  </Link>
+                ) : (
+                  <div key={session.id} className={cardClass}>
+                    {content}
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        ) : null}
+
+        {landings.length ? (
+          <section id="collections" className="scroll-mt-28 pt-12">
+            <div>
+              <h2 className={`${fontUnbounded.className} text-2xl font-bold tracking-tight text-ink sm:text-3xl`}>
+                Подборки
+              </h2>
+            </div>
+            <div className="mt-8 flex gap-4 overflow-x-auto pb-2">
+              {landings.slice(0, 6).map((landing) => {
+                const image = landing.imageUrl || landing.heroImageUrl;
+                return (
+                  <Link
+                    key={landing.slug}
+                    href={landingCategoryHref(landing.slug, city.slug)}
+                    className="group relative aspect-[16/10] w-80 shrink-0 overflow-hidden rounded-2xl bg-surface-alt"
+                  >
+                    {image ? (
+                      <SafeImage
+                        src={image}
+                        alt=""
+                        fill
+                        sizes="20rem"
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : null}
+                    <span className="absolute inset-0 bg-gradient-to-b from-transparent to-ink/90" />
+                    <span className="absolute inset-x-0 bottom-0 flex flex-col gap-2 p-4 text-white">
+                      <span className="w-fit rounded-full bg-white/90 px-2.5 py-0.5 text-[11px] font-bold text-ink">
+                        {city.name}
+                      </span>
+                      <span className={`${fontUnbounded.className} text-lg font-bold leading-tight`}>{landing.title}</span>
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        ) : null}
+
+        {venues.length ? (
+          <section id="locations" className="scroll-mt-28 pt-12">
+            <div>
+              <h2 className={`${fontUnbounded.className} text-2xl font-bold tracking-tight text-ink sm:text-3xl`}>
+                Площадки и локации
+              </h2>
+              <p className="mt-2 text-sm text-ink-muted">Театры, музеи, бары и клубы города</p>
+            </div>
+            <div className="mt-6 overflow-hidden rounded-2xl border border-line bg-white">
+              {venues.slice(0, 7).map((venue) => (
+                <Link
+                  key={venue.id}
+                  href={`/venues/${venue.slug || ''}`}
+                  className="flex items-center justify-between gap-4 border-b border-line px-5 py-4 transition last:border-b-0 hover:bg-surface-alt"
+                >
+                  <div className="min-w-0">
+                    <div className="truncate font-semibold text-ink">{venue.name}</div>
+                    {venue.address ? <div className="truncate text-sm text-ink-muted">{venue.address}</div> : null}
+                  </div>
+                  <span className="shrink-0 text-sm text-ink-muted">{pluralEvents(venue.events || 0)}</span>
+                </Link>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        {suburbs.length ? (
+          <section id="suburbs" className="scroll-mt-28 pt-12">
+            <div>
+              <h2 className={`${fontUnbounded.className} text-2xl font-bold tracking-tight text-ink sm:text-3xl`}>
+                Значимые пригороды
+              </h2>
+              <p className="mt-2 text-sm text-ink-muted">Куда съездить из {city.name} на день или выходные</p>
+            </div>
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {suburbs.map((suburb) => (
+                <div
+                  key={suburb.name}
+                  className="flex flex-col gap-2 rounded-2xl border border-line bg-white p-5 shadow-card"
+                >
+                  <h3 className="text-base font-bold leading-snug text-ink">{suburb.name}</h3>
+                  {suburb.desc ? (
+                    <p className="line-clamp-3 text-sm leading-relaxed text-ink-muted">{suburb.desc}</p>
+                  ) : null}
+                  {suburb.places?.length ? (
+                    <span className="mt-auto pt-2 text-xs font-semibold uppercase tracking-[0.08em] text-accent">
+                      {suburb.places.length} мест
+                    </span>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        {nearby?.events?.length ? (
+          <section id="nearby" className="scroll-mt-28 pt-12">
+            <div>
+              <h2 className={`${fontUnbounded.className} text-2xl font-bold tracking-tight text-ink sm:text-3xl`}>
+                Рядом с городом: события края
+              </h2>
+            </div>
+            {(() => {
+              const event = nearby.events[0];
+              return (
+                <div className="mt-6 flex flex-col gap-4 rounded-2xl border border-line bg-white p-6 shadow-card sm:flex-row sm:items-center sm:justify-between">
+                  <div className="min-w-0">
+                    <h3 className="text-lg font-bold leading-snug text-ink">{event.title}</h3>
+                    <p className="mt-1 text-sm text-ink-muted">
+                      {event.dateLabel}
+                      {event.city ? ` · ${event.city}` : ''}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-3">
+                    {event.priceFrom ? (
+                      <span className="font-display text-xl font-bold text-ink">{formatPriceFrom(event.priceFrom)}</span>
+                    ) : null}
+                    <a
+                      href={event.url}
+                      className="rounded-xl bg-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-accent-dark"
+                    >
+                      Купить билет
+                    </a>
+                  </div>
+                </div>
+              );
+            })()}
+          </section>
+        ) : null}
+
+        <section className="scroll-mt-28 pt-12">
+          <CityRegionalEvents citySlug={city.slug} />
+        </section>
+
         {faq.length ? (
           <section id="faq" className="scroll-mt-24 pt-12">
             <div className="max-w-3xl">
@@ -196,6 +424,27 @@ export function CityHubPreview({
             </div>
           </section>
         ) : null}
+
+        <section className="mt-16 border-t border-line">
+          <div className="grid gap-6 py-8 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { strong: `${stats.events} событий`, span: 'в афише города', key: 'events', icon: <CalendarDays className="h-5 w-5" aria-hidden /> },
+              { strong: 'Без скрытых сборов', span: 'Цена, которую видите', key: 'fees', icon: <ShieldCheck className="h-5 w-5" aria-hidden /> },
+              { strong: 'Возврат билетов', span: 'По правилам площадок', key: 'refund', icon: <RotateCcw className="h-5 w-5" aria-hidden /> },
+              { strong: 'Поддержка 24/7', span: 'В чате и на почте', key: 'support', icon: <Headphones className="h-5 w-5" aria-hidden /> },
+            ].map((item) => (
+              <div key={item.key} className="flex items-center gap-3">
+                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-surface-alt text-ink-2">
+                  {item.icon}
+                </span>
+                <span>
+                  <span className="block text-sm font-bold text-ink">{item.strong}</span>
+                  <span className="block text-sm text-ink-muted">{item.span}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
     </>
   );
