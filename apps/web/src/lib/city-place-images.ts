@@ -181,6 +181,35 @@ function isSharedVenueFallback(
 
 const IDENTITY_CITY_SET = new Set<string>(IDENTITY_CITY_PREFIXES);
 
+// Visual audit 2026-11: these legacy Kirov assets are generated or mismatched.
+// Block their slug aliases; verified replacements use different exact slugs.
+const KIROV_UNVERIFIED_IMAGE_SLUGS = new Set<string>([
+  // This slug was previously assigned the unrelated “Семья” sculpture photo.
+  'kirov-kirovskaya-oblast-skulptura-mesto-vstrechi',
+  'kirov-kirovskaya-oblast-vyatskiy-paleontologicheskiy-muzey',
+  'kirov-kirovskaya-oblast-zapovednik-skazok',
+  'kirov-kirovskaya-oblast-zapovednik-skazok-interaktivnyy-park-rezidentsiya-kikimory-vyatskoy',
+  'kirov-kirovskaya-oblast-muzey-istorii-goroda',
+  'kirov-kirovskaya-oblast-muzey-istorii-goroda-kirova',
+  'kirov-kirovskaya-oblast-muzey-vyatskogo-pryanika',
+  'kirov-kirovskaya-oblast-uspenskiy-sobor',
+  'kirov-kirovskaya-oblast-uspenskiy-trifonov-sobor',
+  'kirov-kirovskaya-oblast-ploschad-lenina',
+  'kirov-kirovskaya-oblast-ulitsa-volodarskogo',
+  'kirov-kirovskaya-oblast-park-im-kirova',
+  'kirov-kirovskaya-oblast-filarmoniya',
+  'kirov-kirovskaya-oblast-filarmoniya-vyatki',
+  'kirov-kirovskaya-oblast-hlynovskoe-gorodische',
+  'kirov-kirovskaya-oblast-dymkovskaya-sloboda',
+  'kirov-kirovskaya-oblast-kotelnich',
+  'kirov-kirovskaya-oblast-kotelnicheskoe-pariazavry',
+  'kirov-kirovskaya-oblast-kirovskiy-most',
+  'kirov-kirovskaya-oblast-nizhneivkino',
+  'kirov-kirovskaya-oblast-velikoretskoe',
+  'kirov-kirovskaya-oblast-velikoretskiy-monastyr',
+  'kirov-kirovskaya-oblast-lezhninskoe-ozero',
+]);
+
 /** Conventional `{city}/{stem}.jpg` when the city has no identity pack (e.g. Kaliningrad). */
 function shouldPreferConventionalWithoutEditorial(slug: string | null | undefined): boolean {
   const key = normalizePlaceImageKey(slug);
@@ -257,6 +286,7 @@ export function editorialVenueImageMatchesSlug(
  */
 export function resolveEditorialVenueCover(slug: string | null | undefined): string | null {
   const key = normalizePlaceImageKey(slug);
+  if (key && KIROV_UNVERIFIED_IMAGE_SLUGS.has(key)) return null;
   const direct = key ? EDITORIAL_IMAGES_BY_SLUG[key] : null;
 
   if (direct && editorialVenueImageMatchesSlug(direct, slug)) return direct;

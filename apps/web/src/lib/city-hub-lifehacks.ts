@@ -2146,6 +2146,49 @@ const TYUMEN_ITEMS: CityLifehackItem[] = [
   },
 ];
 
+const KIROV_ITEMS: CityLifehackItem[] = [
+  {
+    id: 'kirov-historic-centre-on-foot',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Планируйте центр пешком',
+    body: body('Спасская улица, краеведческий музей и набережная собираются в прогулочный маршрут. На набережной и у монастыря есть перепады высоты, поэтому оставьте запас времени.'),
+    cta: { kind: 'places', label: 'Исторический центр', slugs: ['kirov-kirovskaya-oblast-ulitsa-spasskaya-vyatskiy-arbat', 'kirov-kirovskaya-oblast-naberezhnaya-grina', 'kirov-kirovskaya-oblast-svyato-uspenskiy-trifonov-muzhskoy-monastyr'], scrollTo: 'places' },
+  },
+  {
+    id: 'kirov-museum-hours',
+    tabId: 'walk',
+    icon: 'museum',
+    title: 'Сначала проверьте расписание музеев',
+    body: body('У музеев и экскурсионных площадок разные выходные, сеансы и правила записи. Проверьте официальную страницу каждой экспозиции в день планирования.'),
+    cta: { kind: 'places', label: 'Музеи Кирова', slugs: ['kirov-kirovskaya-oblast-krayevedcheskiy-muzey', 'kirov-kirovskaya-oblast-vyatskiy-paleontologicheskiy-muzey', 'kirov-kirovskaya-oblast-muzey-dymkovskoy-igrushki', 'kirov-kirovskaya-oblast-muzey-tsiolkovskogo-aviatsii-i-kosmonavtiki'], scrollTo: 'places' },
+  },
+  {
+    id: 'kirov-dymkovo-makers',
+    tabId: 'food',
+    icon: 'food',
+    title: 'Покупайте дымковскую игрушку у мастеров',
+    body: body('Если берёте игрушку как сувенир, ищите информацию об авторе и месте изготовления. Для знакомства с промыслом начните с профильного музея или площадки народного художественного промысла.'),
+    cta: { kind: 'link', label: 'Музеи и промыслы Кирова', href: 'https://www.rkirov.ru/catalog/muzei_kirova/' },
+  },
+  {
+    id: 'kirov-grin-embankment-access',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Проверьте доступ на набережную',
+    body: body('После сильных дождей отдельные участки берега или лестницы могут закрывать на ремонт. Проверьте городские новости и не обходите временные ограждения.'),
+    cta: { kind: 'places', label: 'Набережная Грина', slugs: ['kirov-kirovskaya-oblast-naberezhnaya-grina'], scrollTo: 'places' },
+  },
+  {
+    id: 'kirov-regional-day-trips',
+    tabId: 'transit',
+    icon: 'transit',
+    title: 'Пригороды планируйте как отдельные поездки',
+    body: body('Великорецкое, Нижнеивкино, Лежнинское озеро и местонахождение у Котельнича находятся в разных направлениях. Перед выездом сверяйте транспорт, состояние подъездов и сезонный доступ.'),
+    cta: { kind: 'places', label: 'Пригороды Кирова', slugs: ['kirov-kirovskaya-oblast-velikoretskoe', 'kirov-kirovskaya-oblast-nizhneivkino', 'kirov-kirovskaya-oblast-lezhninskoe-ozero', 'kirov-kirovskaya-oblast-kotelnicheskoe-pariazavry'], scrollTo: 'suburbs' },
+  },
+];
+
 const CITY_HUB_LIFEHACKS: Record<string, CityLifehackPack> = {
   perm: lifehackPack(PERM_ITEMS),
   moscow: lifehackPack(MOSCOW_ITEMS),
@@ -2174,6 +2217,7 @@ const CITY_HUB_LIFEHACKS: Record<string, CityLifehackPack> = {
   saratov: lifehackPack(SARATOV_ITEMS),
   yaroslavl: lifehackPack(YAROSLAVL_ITEMS),
   volgograd: lifehackPack(VOLGOGRAD_ITEMS),
+  'kirov-kirovskaya-oblast': lifehackPack(KIROV_ITEMS),
 };
 
 export function resolveCityLifehacks(slug: string | null | undefined): CityLifehackPack | null {
