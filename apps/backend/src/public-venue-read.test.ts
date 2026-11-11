@@ -196,9 +196,9 @@ test('resolvePublicVenueCanonicalPath drops a TEP numeric suffix after public sl
 });
 
 test('createAdminVenue persists an explicitly supplied publicSlug', async () => {
-  const calls = [];
+  const calls: Array<{ sql: string; params: unknown[] }> = [];
   const db = {
-    async query(sql, params = []) {
+    async query(sql: string, params: unknown[] = []) {
       calls.push({ sql: String(sql), params });
       if (String(sql).includes('SELECT id FROM "Venue" WHERE "publicSlug"')) return { rows: [] };
       if (String(sql).includes('INSERT INTO "Venue"')) return { rows: [{ id: 'venue_test' }] };
@@ -211,15 +211,15 @@ test('createAdminVenue persists an explicitly supplied publicSlug', async () => 
   };
 
   await createAdminVenue(db, { title: 'Test venue', publicSlug: 'test-venue' });
-  const insert = calls.find(({ sql }) => sql.includes('INSERT INTO "Venue"'));
+  const insert = calls.find(({ sql }) => sql.includes('INSERT INTO "Venue"'))!;
   assert.ok(insert.sql.includes('"publicSlug"'));
   assert.ok(insert.params.includes('test-venue'));
 });
 
 test('createAdminVenue rejects a duplicate publicSlug before inserting', async () => {
-  const calls = [];
+  const calls: string[] = [];
   const db = {
-    async query(sql) {
+    async query(sql: string) {
       calls.push(String(sql));
       if (String(sql).includes('SELECT id FROM "Venue" WHERE "publicSlug"')) return { rows: [{ id: 'venue_existing' }] };
       throw new Error(`Unexpected query: ${sql}`);

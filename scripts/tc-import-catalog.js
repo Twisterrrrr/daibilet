@@ -414,7 +414,8 @@ async function importCatalogEvent(client, event, summary, cityIdCache) {
             else excluded.kind
           end,
           "pageStatus" = case when "Venue"."pageStatus" in ('PUBLISHED', 'HIDDEN') then "Venue"."pageStatus" else 'CANDIDATE'::"VenuePageStatus" end,
-          "isIndexable" = case when "Venue"."pageStatus" = 'PUBLISHED' then "Venue"."isIndexable" else false end,
+          -- Indexability is an editorial decision. Keep the existing value on
+          -- conflict; only newly inserted supplier venues default to noindex.
           "updatedAt" = now()
         returning id
       `,
