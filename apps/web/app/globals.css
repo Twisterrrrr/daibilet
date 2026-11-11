@@ -948,7 +948,7 @@ html[data-nav-pending='1'] {
   .event-page-editorial-copy > p:first-child {
     border-left: 2px solid hsl(var(--border));
     padding-left: 1rem;
-    color: hsl(var(--graphite));
+    color: hsl(var(--graphite-muted));
     font-weight: 500;
   }
 
