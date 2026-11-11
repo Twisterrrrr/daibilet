@@ -1,8 +1,10 @@
 import Link from 'next/link';
 import { ArrowRight, Clock, Info, MapPin } from 'lucide-react';
 
+import { CityWeatherWidget } from '@/components/CityWeatherWidget.client';
 import { SafeImage } from '@/components/SafeImage.client';
 import { fontUnbounded } from '@/lib/fonts';
+import { resolveCityHeroRegionBadge } from '@/lib/city-hero-region';
 import { resolveCityImage } from '@/lib/city-images';
 import { resolveCityPlaceHref, type CityInfoEntry } from '@/lib/cityInfo';
 import { pluralEvents, pluralPoints, pluralVenues } from '@/lib/format';
@@ -22,6 +24,7 @@ export function CityHubPreview({
   const places = guide.mustSee ?? [];
   const routes = guide.dayRoutePresets ?? [];
   const faq = guide.faq ?? [];
+  const regionBadge = resolveCityHeroRegionBadge(city);
 
   return (
     <>
@@ -37,7 +40,7 @@ export function CityHubPreview({
           )}
         </div>
         <div className="container-page relative z-10 w-full py-12">
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/70">Каталог · город</p>
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/70">{regionBadge || 'Город'}</p>
           <h1 className={`${fontUnbounded.className} mt-2 text-4xl font-bold leading-none sm:text-5xl md:text-6xl`}>
             {city.name}
           </h1>
@@ -77,15 +80,20 @@ export function CityHubPreview({
       </section>
 
       <div className="container-page py-12 sm:py-16">
-        {guide.hookFact ? (
-          <section className="rounded-2xl border border-accent/20 bg-accent-soft px-6 py-5">
-            <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.08em] text-accent">
-              <Info className="h-4 w-4" aria-hidden />
-              Интересный факт
-            </div>
-            <p className="mt-2 text-[15px] leading-6 text-ink-2">{guide.hookFact}</p>
-          </section>
-        ) : null}
+        <div className={guide.hookFact ? 'grid gap-4 md:grid-cols-[1.2fr_1fr]' : ''}>
+          {guide.hookFact ? (
+            <section className="rounded-2xl border border-[#e8dab8] bg-[#faf6ee] px-6 py-5">
+              <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.08em] text-[#a88740]">
+                <Info className="h-4 w-4" aria-hidden />
+                Интересный факт
+              </div>
+              <p className="mt-2 text-[15px] leading-6 text-ink-2">{guide.hookFact}</p>
+            </section>
+          ) : null}
+          <div className="rounded-2xl border border-line bg-white p-6 shadow-card">
+            <CityWeatherWidget citySlug={city.slug || city.sourceSlug || ''} />
+          </div>
+        </div>
 
         {places.length ? (
           <section id="places" className="scroll-mt-24 pt-12">
