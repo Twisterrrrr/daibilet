@@ -15,13 +15,13 @@ export async function buildSupplierPlaceWorkspace(db, siteUserId) {
         venue.id AS "venueId", venue.title, venue.slug, venue."placeType", venue."placeSubtype",
         venue.kind, venue.address, venue."shortDescription", venue."description", venue."metroStation",
         venue."wayToFind", venue."parkingInfo", city.title AS city,
-        page.variant AS "pdpVariant", page.content AS "pdpContent"
+        page.variant AS "pdpVariant", page.status AS "pdpStatus", page.content AS "pdpContent"
       FROM "SupplierUser" su
       JOIN "Supplier" supplier ON supplier.id = su."supplierId"
       JOIN "SupplierVenue" sv ON sv."supplierId" = su."supplierId" AND sv."isActive" = true
       JOIN "Venue" venue ON venue.id = sv."venueId"
       LEFT JOIN "City" city ON city.id = venue."cityId"
-      LEFT JOIN "PdpDocument" page ON page."venueId" = venue.id AND page.status = 'READY'
+      LEFT JOIN "PdpDocument" page ON page."venueId" = venue.id
       WHERE su."siteUserId" = $1 AND su."isActive" = true
       ORDER BY supplier.title, venue.title
     `, [siteUserId]),
@@ -54,6 +54,7 @@ export async function buildSupplierPlaceWorkspace(db, siteUserId) {
       ...row,
       editable: EDIT_ROLES.has(String(row.supplierRole || '').toUpperCase()),
       suggestedVariant: row.pdpVariant || suggestedPlacePdpVariant(row.placeType, row.placeSubtype),
+      pdpStatus: row.pdpStatus || null,
       pdpContent: row.pdpContent || null,
     })),
     cities: cities.rows.map((row) => ({ id: row.id, slug: row.slug, title: row.title })),
@@ -418,14 +419,28 @@ function stableJson(value) {
 function normalizeSupplierPdp(input, currentDocument, variant) {
   if (input == null) return null;
   const base = currentDocument?.content || emptyPdpContent(variant);
+  const baseSections = Array.isArray(base.sections) ? base.sections : [];
+  const sectionById = new Map(baseSections.map((section) => [String(section.id || section.kind), section]));
+  const editedIds = new Set();
+  const editedSections = new Map((Array.isArray(input.sections) ? input.sections : []).map((edited) => {
+    const id = normalizeText(edited?.id || edited?.kind, 100);
+    const original = sectionById.get(id);
+    if (!original || editedIds.has(id)) throw new Error(`Unknown or duplicate PDP section: ${id}`);
+    editedIds.add(id);
+    return [id, edited];
+  }));
+  const sections = baseSections.map((section) => {
+    const edited = editedSections.get(String(section.id || section.kind));
+    return edited ? { ...section, title: edited.title, body: edited.body } : section;
+  });
   const proposed = {
     ...base,
-    ...input,
+    summary: input.summary,
     conversion: base.conversion,
-    sections: Array.isArray(input.sections) ? input.sections : base.sections,
-    gallery: Array.isArray(input.gallery) ? input.gallery : base.gallery,
-    facts: Array.isArray(input.facts) ? input.facts : base.facts,
-    sources: Array.isArray(input.sources) ? input.sources : base.sources,
+    sections,
+    gallery: base.gallery,
+    facts: base.facts,
+    sources: base.sources,
   };
   return normalizePdpDocument('venues', { variant, status: 'DRAFT', content: proposed });
 }

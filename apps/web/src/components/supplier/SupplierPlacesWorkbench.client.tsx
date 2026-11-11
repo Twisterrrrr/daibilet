@@ -7,7 +7,7 @@ import { PDP_SECTION_EDITOR_SCHEMA, pdpSectionRequirement, pdpSubtypeContentHint
 import { useUserAuth } from '@/hooks/useUserAuth';
 
 type Workspace = {
-  venues: Array<Record<string, unknown> & { supplierId: string; supplierTitle: string; editable: boolean; suggestedVariant: string }>;
+  venues: Array<Record<string, unknown> & { supplierId: string; supplierTitle: string; editable: boolean; suggestedVariant: string; pdpStatus: string | null }>;
   cities: Array<{ id: string; title: string }>;
   suppliers: Array<{ id: string; title: string; role: string; canSubmit: boolean }>;
   requests: Array<Record<string, unknown>>;
@@ -56,9 +56,16 @@ export function SupplierPlacesWorkbench() {
   async function submit(event: React.FormEvent) {
     event.preventDefault(); setError(''); setMessage('');
     if (!token || !supplierId) { setError('Нет активной связи кабинета с поставщиком. Обратитесь к оператору Daibilet.'); return; }
+    const selected = workspace?.venues.find((row) => row.venueId === venueId);
+    const originalContent = selected?.pdpContent as { summary?: string; sections?: Array<{ id?: string; kind?: string; title?: string; body?: string }> } | null | undefined;
+    const originalProjection = originalContent ? {
+      summary: String(originalContent.summary || ''),
+      sections: Array.isArray(originalContent.sections) ? originalContent.sections.map((section) => ({ id: String(section.id || section.kind || ''), kind: String(section.kind || ''), title: String(section.title || ''), body: String(section.body || '') })) : [],
+    } : null;
+    const pdpChanged = pdpContent && JSON.stringify(pdpContent) !== JSON.stringify(originalProjection);
     const body = type === 'CREATE'
       ? { type, supplierId, candidate: { ...candidate, latitude: candidate.latitude || null, longitude: candidate.longitude || null } }
-      : { type, supplierId, venueId, fields: Object.fromEntries(Object.entries(fields).filter(([, value]) => value.trim())), ...(pdpContent ? { pdpContent } : {}) };
+      : { type, supplierId, venueId, fields: Object.fromEntries(Object.entries(fields).filter(([, value]) => value.trim())), ...(pdpChanged ? { pdpContent } : {}) };
     try {
       const response = await fetch('/api/supplier/place-requests', { method: 'POST', headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' }, body: JSON.stringify(body) });
       const payload = await response.json();
@@ -82,7 +89,7 @@ export function SupplierPlacesWorkbench() {
     {message && <div role="status" className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">{message}</div>}
     {!workspace.suppliers.length && <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">Для этого аккаунта пока не назначена компания-поставщик. Доступ выдаётся оператором по приглашению.</div>}
     <section className="rounded-xl border border-slate-200 bg-white p-4"><h2 className="text-lg font-semibold">Связанные места</h2>
-      {workspace.venues.length ? <ul className="mt-3 divide-y divide-slate-100">{workspace.venues.map((place) => <li key={`${place.supplierId}-${place.venueId}`} className="flex flex-wrap justify-between gap-2 py-3 text-sm"><span><strong>{String(place.title || 'Место')}</strong><span className="ml-2 text-slate-500">{String(place.city || 'Город не указан')} · PDP: {String(place.suggestedVariant)}</span></span><span className="text-slate-500">{place.editable ? 'Можно предложить изменение' : 'Просмотр'}</span></li>)}</ul> : <p className="mt-3 text-sm text-slate-600">Связанных мест пока нет. Новое место можно предложить ниже.</p>}
+      {workspace.venues.length ? <ul className="mt-3 divide-y divide-slate-100">{workspace.venues.map((place) => <li key={`${place.supplierId}-${place.venueId}`} className="flex flex-wrap justify-between gap-2 py-3 text-sm"><span><strong>{String(place.title || 'Место')}</strong><span className="ml-2 text-slate-500">{String(place.city || 'Город не указан')} · PDP: {String(place.suggestedVariant)} · {pdpStatusLabel(place.pdpStatus)}</span></span><span className="text-slate-500">{place.editable ? 'Можно предложить изменение' : 'Просмотр'}</span></li>)}</ul> : <p className="mt-3 text-sm text-slate-600">Связанных мест пока нет. Новое место можно предложить ниже.</p>}
     </section>
     <section className="rounded-xl border border-slate-200 bg-white p-4"><h2 className="text-lg font-semibold">Мои заявки</h2>{workspace.requests.length ? <ul className="mt-3 divide-y divide-slate-100">{workspace.requests.map((request) => <li key={String(request.id)} className="py-3 text-sm"><strong>{String(request.title)}</strong><span className="ml-2 rounded bg-slate-100 px-2 py-1">{request.rolledBack ? 'Откат редакции' : String(request.status)}</span>{request.adminComment ? <p className="mt-1 text-slate-600">Комментарий редакции: {String(request.adminComment)}</p> : null}</li>)}</ul> : <p className="mt-3 text-sm text-slate-600">Заявок пока нет.</p>}</section>
     <form onSubmit={submit} className="space-y-4 rounded-xl border border-slate-200 bg-white p-4">
@@ -113,7 +120,7 @@ export function SupplierPlacesWorkbench() {
         <TextField label="Широта" value={fields.latitude} onChange={(latitude) => setFields({ ...fields, latitude })}/>
         <TextField label="Долгота" value={fields.longitude} onChange={(longitude) => setFields({ ...fields, longitude })}/>
         {(['websiteUrl', 'phone', 'openingHours', 'shortDescription', 'description', 'metroStation', 'wayToFind', 'parkingInfo'] as const).map((key) => <TextField key={key} label={{ websiteUrl: 'Сайт', phone: 'Телефон', openingHours: 'Часы работы', shortDescription: 'Краткое описание', description: 'Описание', metroStation: 'Метро', wayToFind: 'Как найти', parkingInfo: 'Парковка' }[key]} multiline={key === 'description' || key === 'wayToFind' || key === 'openingHours'} value={fields[key]} onChange={(value) => setFields({ ...fields, [key]: value })}/>)}
-        {pdpContent && <div className="space-y-3 rounded-lg border border-slate-200 p-3 sm:col-span-2"><div><h3 className="text-sm font-medium text-slate-900">Предложить правки текста PDP</h3><p className="mt-1 text-xs text-slate-500">Профиль: {String(workspace.venues.find((place) => place.venueId === venueId)?.suggestedVariant)}. Поля соответствуют разделам текущего шаблона. Редактор решает, какие изменения применить.</p></div>
+        {pdpContent && <div className="space-y-3 rounded-lg border border-slate-200 p-3 sm:col-span-2"><div><h3 className="text-sm font-medium text-slate-900">Предложить правки текста PDP</h3><p className="mt-1 text-xs text-slate-500">Профиль: {String(selectedLinked?.suggestedVariant)}. Статус страницы: {pdpStatusLabel(selectedLinked?.pdpStatus)}. Поля соответствуют разделам шаблона. Предложение проверит редакция; страница не публикуется автоматически.</p></div>
           <TextField label="Краткое описание страницы" multiline value={pdpContent.summary} onChange={(summary) => setPdpContent({ ...pdpContent, summary })}/>
           {pdpContent.sections.map((section, index) => {
             const profile = String(selectedLinked?.suggestedVariant || '');
@@ -137,5 +144,11 @@ export function SupplierPlacesWorkbench() {
 }
 
 const control = 'mt-1 h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm';
+function pdpStatusLabel(status: unknown) {
+  if (status === 'READY') return 'опубликована';
+  if (status === 'REVIEW') return 'на проверке';
+  if (status === 'DRAFT') return 'черновик';
+  return 'страница ещё не создана';
+}
 function Field({ label, children }: { label: string; children: React.ReactNode }) { return <label className="block text-xs text-slate-600">{label}{children}</label>; }
 function TextField({ label, value, onChange, multiline = false, required = false }: { label: string; value: string; onChange: (value: string) => void; multiline?: boolean; required?: boolean }) { return <label className="block text-xs text-slate-600">{label}{multiline ? <textarea required={required} className="mt-1 min-h-24 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" value={value} onChange={(event) => onChange(event.target.value)}/> : <input required={required} className={control} value={value} onChange={(event) => onChange(event.target.value)}/>}</label>; }
