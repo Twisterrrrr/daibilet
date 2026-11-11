@@ -153,6 +153,7 @@ export type CityIdentitySlide = {
   text: string;
   imageSrc: string;
   imageAlt: string;
+  imageCredit?: { author: string; sourceUrl: string; license: string; licenseUrl: string };
   slugs: string[];
   target: 'places' | 'suburbs' | 'mixed';
   /** Short category pill on the photo (Символ, Гастро, …). */
@@ -2275,7 +2276,7 @@ export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
   },
   'kirov-kirovskaya-oblast': {
     identityHeading: 'Чем уникален Киров',
-    identityLead: IDENTITY_LEAD,
+    identityLead: 'Дымковский промысел, Вятка, купеческая архитектура и палеонтология региона',
     tags: tagsFromSlides(KIROV_SLIDES),
     slides: KIROV_SLIDES,
     weather: KIROV_WEATHER,
@@ -2397,11 +2398,12 @@ export function cityIdentityTags(slug: string | null | undefined): CityIdentityT
 }
 
 export function placeSlugKey(
-  place: Pick<CityMustSeeItem, 'venueSlug' | 'locationSlug'> | null | undefined,
+  place: Pick<CityMustSeeItem, 'venueSlug' | 'locationSlug' | 'dayRouteId'> | null | undefined,
 ): string {
   const venue = String(place?.venueSlug || '').trim().toLowerCase();
   if (venue) return venue;
-  return String(place?.locationSlug || '').trim().toLowerCase();
+  const location = String(place?.locationSlug || '').trim().toLowerCase();
+  return location || String(place?.dayRouteId || '').trim().toLowerCase();
 }
 
 function suburbNameFocusKeys(name: string): string[] {

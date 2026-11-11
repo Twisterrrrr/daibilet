@@ -98,6 +98,16 @@ export function CityIdentityCarousel({ citySlug, editorial = false, sectionId, o
                 </p>
               </div>
             </button>
+            {slide.imageCredit ? (
+              <div className="flex items-center gap-2 px-4 pb-3 text-[11px] text-slate-500">
+                <a href={slide.imageCredit.sourceUrl} target="_blank" rel="noreferrer" className="underline underline-offset-2">
+                  Фото: {slide.imageCredit.author}
+                </a>
+                <a href={slide.imageCredit.licenseUrl} target="_blank" rel="noreferrer" className="underline underline-offset-2">
+                  {slide.imageCredit.license}
+                </a>
+              </div>
+            ) : null}
           </article>
         ))}
       </HubCarouselChrome>
