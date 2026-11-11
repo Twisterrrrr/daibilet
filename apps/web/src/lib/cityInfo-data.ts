@@ -289,6 +289,8 @@ export type CitySuburbGastroStop = {
 /** Вложенная точка внутри significantSuburb (мини-локация day-trip). */
 export type CitySuburbPlace = CityPlaceLinkFields & {
   name: string;
+  /** Direct editorial cover for this nested suburb point. */
+  imageUrl?: string | null;
   /** Краткое описание для блока «Что посмотреть». */
   desc?: string;
   address?: string | null;

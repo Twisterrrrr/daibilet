@@ -47,10 +47,10 @@ function resolveRailCover(
   place: SuburbPlaceRailItem,
   fallbackImageUrl?: string | null,
 ): string | null {
-  const cover = resolveEditorialVenueCover(place.imageSlug);
-  if (cover) return cover;
   const direct = String(place.imageUrl || '').trim();
   if (direct) return direct;
+  const cover = resolveEditorialVenueCover(place.imageSlug);
+  if (cover) return cover;
   const ownSlug = String(place.imageSlug || '').trim();
   if (ownSlug) return null;
   const fallback = String(fallbackImageUrl || '').trim();
