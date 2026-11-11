@@ -1,4 +1,5 @@
 import type { PublicCatalogDto, PublicVenueDto, PublicVenuePageDto } from '@daibilet/contracts/public';
+import { prisma } from '@daibilet/db';
 
 import { evaluateCityIndexability, evaluateRegionIndexability, evaluateVenueIndexability } from '@/lib/hub-indexability';
 import {
@@ -269,6 +270,32 @@ export async function buildEventsSitemapEntries(): Promise<SitemapEntry[]> {
       );
     }
     if (!page.hasMore || !page.items?.length || entries.length >= MAX_EVENTS) break;
+  }
+
+  // Some rewritten EventPages are intentionally not the representative row of
+  // a grouped catalog card (for example, a specific dated product in a series).
+  // The catalog list alone can therefore omit their stable, indexable URLs.
+  try {
+    const pages = await prisma.eventPage.findMany({
+      where: { status: 'READY', publishedAt: { not: null }, isIndexable: true },
+      select: { slug: true, updatedAt: true, publishedAt: true },
+      orderBy: { slug: 'asc' },
+    });
+    for (const page of pages) {
+      const slug = String(page.slug || '').trim();
+      if (!slug || seen.has(slug) || entries.length >= MAX_EVENTS) continue;
+      seen.add(slug);
+      entries.push(
+        entry(
+          `/events/${encodeURIComponent(slug)}`,
+          'daily',
+          0.7,
+          page.updatedAt ?? page.publishedAt,
+        ),
+      );
+    }
+  } catch (error) {
+    console.error('[sitemap] indexable EventPage lookup failed', error);
   }
 
   return entries;
