@@ -25,6 +25,15 @@ import {
 } from './event-pages.js';
 import { PDP_VARIANTS, readPdpDocument, savePdpDocument } from './pdp-documents.js';
 import {
+  addAdminSupplierUser,
+  addAdminSupplierVenue,
+  createAdminSupplier,
+  listAdminSuppliers,
+  setAdminSupplierStatus,
+  setAdminSupplierUser,
+  setAdminSupplierVenue,
+} from './admin-suppliers.js';
+import {
   buildAdminSupplierPlaceRequests,
   buildSupplierPlaceWorkspace,
   applySupplierPlaceRequest,
@@ -824,6 +833,85 @@ export async function handleRequest(request, response) {
         sendJson(response, result, 201);
       } catch (error) {
         sendJson(response, { error: error.message || 'venue_create_failed' }, 400);
+      }
+      return;
+    }
+
+    if (route === 'GET /api/admin/suppliers') {
+      sendJson(response, await listAdminSuppliers(db, url.searchParams.get('q') || ''));
+      return;
+    }
+
+    if (route === 'POST /api/admin/suppliers') {
+      try {
+        sendJson(response, await createAdminSupplier(db, await readJsonBody(request)), 201);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'supplier_create_failed';
+        sendJson(response, { error: message }, /unique|duplicate/i.test(message) ? 409 : 400);
+      }
+      return;
+    }
+
+    const supplierMembershipRoute = url.pathname.match(/^\/api\/admin\/suppliers\/([^/]+)\/users(?:\/([^/]+))?$/);
+    if (supplierMembershipRoute && request.method === 'POST' && !supplierMembershipRoute[2]) {
+      try {
+        const result = await addAdminSupplierUser(db, decodeURIComponent(supplierMembershipRoute[1]), await readJsonBody(request));
+        sendJson(response, result || { error: 'supplier_not_found' }, result ? 201 : 404);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'supplier_user_assignment_failed';
+        sendJson(response, { error: message }, /unique|duplicate/i.test(message) ? 409 : /not found/i.test(message) ? 404 : 400);
+      }
+      return;
+    }
+    if (supplierMembershipRoute && request.method === 'PATCH' && supplierMembershipRoute[2]) {
+      try {
+        const result = await setAdminSupplierUser(
+          db,
+          decodeURIComponent(supplierMembershipRoute[1]),
+          decodeURIComponent(supplierMembershipRoute[2]),
+          await readJsonBody(request),
+        );
+        sendJson(response, result || { error: 'supplier_membership_not_found' }, result ? 200 : 404);
+      } catch (error) {
+        sendJson(response, { error: error instanceof Error ? error.message : 'supplier_user_update_failed' }, 400);
+      }
+      return;
+    }
+
+    const supplierVenueRoute = url.pathname.match(/^\/api\/admin\/suppliers\/([^/]+)\/venues(?:\/([^/]+))?$/);
+    if (supplierVenueRoute && request.method === 'POST' && !supplierVenueRoute[2]) {
+      try {
+        const result = await addAdminSupplierVenue(db, decodeURIComponent(supplierVenueRoute[1]), await readJsonBody(request));
+        sendJson(response, result || { error: 'supplier_not_found' }, result ? 201 : 404);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'supplier_venue_link_failed';
+        sendJson(response, { error: message }, /unique|duplicate/i.test(message) ? 409 : /not found/i.test(message) ? 404 : 400);
+      }
+      return;
+    }
+    if (supplierVenueRoute && request.method === 'PATCH' && supplierVenueRoute[2]) {
+      try {
+        const body = await readJsonBody(request);
+        const result = await setAdminSupplierVenue(
+          db,
+          decodeURIComponent(supplierVenueRoute[1]),
+          decodeURIComponent(supplierVenueRoute[2]),
+          body.isActive,
+        );
+        sendJson(response, result || { error: 'supplier_venue_link_not_found' }, result ? 200 : 404);
+      } catch (error) {
+        sendJson(response, { error: error instanceof Error ? error.message : 'supplier_venue_update_failed' }, 400);
+      }
+      return;
+    }
+
+    const supplierStatusRoute = url.pathname.match(/^\/api\/admin\/suppliers\/([^/]+)$/);
+    if (supplierStatusRoute && request.method === 'PATCH') {
+      try {
+        const result = await setAdminSupplierStatus(db, decodeURIComponent(supplierStatusRoute[1]), (await readJsonBody(request)).status);
+        sendJson(response, result || { error: 'supplier_not_found' }, result ? 200 : 404);
+      } catch (error) {
+        sendJson(response, { error: error instanceof Error ? error.message : 'supplier_update_failed' }, 400);
       }
       return;
     }
