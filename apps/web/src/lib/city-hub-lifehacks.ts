@@ -2146,6 +2146,49 @@ const TYUMEN_ITEMS: CityLifehackItem[] = [
   },
 ];
 
+const ULYANOVSK_ITEMS: CityLifehackItem[] = [
+  {
+    id: 'ulyanovsk-new-venets-free-view',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Волжская панорама без билета',
+    body: body('На бульвар Новый Венец можно прийти ради открытого вида на Волгу и водохранилище; смотровая прогулка не требует музейного билета.'),
+    cta: { kind: 'places', label: 'Новый Венец', slugs: ['ulyanovsk-bul-var-novyy-venets'], scrollTo: 'places' },
+  },
+  {
+    id: 'ulyanovsk-museum-quarter-walk',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Соберите музейный центр пешком',
+    body: body('Ленинский мемориал, Новый Венец и исторические кварталы удобно объединить в отдельный день. Перед визитом проверьте расписание каждой экспозиции.'),
+    cta: { kind: 'places', label: 'Музеи и мемориал', slugs: ['ulyanovsk-leninskiy-memorial', 'ulyanovsk-muzey-zapovednik-rodina-v-i-lenina', 'ulyanovsk-golovnoy-muzey-istorii-grazhdanskoy-aviatsii'], scrollTo: 'places' },
+  },
+  {
+    id: 'ulyanovsk-check-transit',
+    tabId: 'transit',
+    icon: 'transit',
+    title: 'Проверьте трамваи перед поездкой',
+    body: body('Маршруты и расписание могут меняться из-за ремонта путей. Сверяйте актуальную схему на сайте городского организатора перевозок.'),
+    cta: { kind: 'link', label: 'Расписание транспорта', href: 'https://transport73.ru/ofitsialnaya-informatsiya' },
+  },
+  {
+    id: 'ulyanovsk-aviation-museum-transit',
+    tabId: 'transit',
+    icon: 'fly',
+    title: 'Заранее спланируйте музей авиации',
+    body: body('Экспозиция находится на улице Авиационной, 20а. На официальной странице музея указаны часы работы и маршрутные такси № 12, 66 и 91; перепроверьте их перед выездом.'),
+    cta: { kind: 'link', label: 'Схема проезда и часы', href: 'https://www.uvauga.ru/museum/museum-3' },
+  },
+  {
+    id: 'ulyanovsk-museum-hours',
+    tabId: 'walk',
+    icon: 'museum',
+    title: 'Не планируйте музеи наугад',
+    body: body('У музеев разные выходные и режимы работы. Сначала выберите открытую экспозицию, затем стройте пеший маршрут по соседним точкам.'),
+    cta: { kind: 'places', label: 'Музеи Ульяновска', slugs: ['ulyanovsk-leninskiy-memorial', 'ulyanovsk-muzey-zapovednik-rodina-v-i-lenina', 'ulyanovsk-golovnoy-muzey-istorii-grazhdanskoy-aviatsii'], scrollTo: 'places' },
+  },
+];
+
 const KIROV_ITEMS: CityLifehackItem[] = [
   {
     id: 'kirov-historic-centre-on-foot',
@@ -2217,6 +2260,7 @@ const CITY_HUB_LIFEHACKS: Record<string, CityLifehackPack> = {
   saratov: lifehackPack(SARATOV_ITEMS),
   yaroslavl: lifehackPack(YAROSLAVL_ITEMS),
   volgograd: lifehackPack(VOLGOGRAD_ITEMS),
+  ulyanovsk: lifehackPack(ULYANOVSK_ITEMS),
   'kirov-kirovskaya-oblast': lifehackPack(KIROV_ITEMS),
 };
 
