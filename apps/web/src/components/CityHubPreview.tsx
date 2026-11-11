@@ -5,6 +5,7 @@ import {
   Clock,
   Headphones,
   Info,
+  Landmark,
   MapPin,
   RotateCcw,
   ShieldCheck,
@@ -23,6 +24,7 @@ import { resolveCityHeroRegionBadge } from '@/lib/city-hero-region';
 import { resolveCityImage } from '@/lib/city-images';
 import { resolveCityPlaceHref, type CityInfoEntry } from '@/lib/cityInfo';
 import { isLabelCardVenueStub, resolveVenueHeroImage } from '@/lib/city-place-images';
+import { classifyMustSeePlace, mustSeeFilterStopTypeTag } from '@/lib/must-see-filters';
 import { resolveDestinationRegionLinkForSuburb } from '@/lib/city-destination-registry';
 import { cityIdentitySlides, resolveCityLocalFlavor } from '@/lib/city-hub-local-flavor';
 import { resolveLandingCardImage } from '@/lib/landing-images';
@@ -198,6 +200,7 @@ export function CityHubPreview({
               {places.map((place, index) => {
                 const href = resolveCityPlaceHref(place);
                 const image = resolveVenueHeroImage(place.venueSlug || place.locationSlug || null, place.imageUrl);
+                const typeLabel = mustSeeFilterStopTypeTag(classifyMustSeePlace(place));
                 const inner = (
                   <>
                     <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-alt">
@@ -217,25 +220,30 @@ export function CityHubPreview({
                       <span className="absolute left-3 top-3 grid size-7 place-items-center rounded-full bg-white text-sm font-bold text-ink shadow-sm">
                         {index + 1}
                       </span>
+                      <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-ink/85 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.04em] text-white backdrop-blur">
+                        {typeLabel}
+                      </span>
                     </div>
-                    <div className="flex flex-1 flex-col gap-1.5 p-4">
-                      <h3 className="text-base font-bold leading-snug tracking-tight text-ink">{place.name}</h3>
+                    <div className="flex flex-1 flex-col gap-2 p-4">
+                      <div className="flex items-center gap-2">
+                        <span className="grid size-6 shrink-0 place-items-center rounded-md bg-[#eaf0f7] text-[#1e3a5f]">
+                          <Landmark className="h-3.5 w-3.5" aria-hidden />
+                        </span>
+                        <h3 className="text-base font-bold leading-snug tracking-tight text-ink">{place.name}</h3>
+                      </div>
                       {place.desc ? (
                         <p className="line-clamp-2 text-sm leading-relaxed text-ink-muted">{place.desc}</p>
                       ) : null}
-                      <div className="mt-auto flex flex-wrap gap-x-3 gap-y-1 pt-2 text-xs text-ink-muted-2">
+                      <div className="mt-auto flex flex-wrap gap-1.5 pt-2">
                         {place.visitMinutes ? (
-                          <span className="inline-flex items-center gap-1">
-                            <Clock className="h-3.5 w-3.5" aria-hidden />
+                          <span className="inline-flex items-center gap-1 rounded-full border border-line bg-surface-alt px-2 py-0.5 text-[11px] font-semibold text-ink-2">
+                            <Clock className="h-3 w-3 opacity-70" aria-hidden />
                             {place.visitMinutes}
                           </span>
                         ) : null}
-                        {place.address ? (
-                          <span className="inline-flex items-center gap-1">
-                            <MapPin className="h-3.5 w-3.5" aria-hidden />
-                            {place.address}
-                          </span>
-                        ) : null}
+                        <span className="inline-flex items-center rounded-full border border-line bg-surface-alt px-2 py-0.5 text-[11px] font-semibold text-ink-2">
+                          {typeLabel}
+                        </span>
                       </div>
                     </div>
                   </>
