@@ -5,12 +5,19 @@ import { useMemo, useState } from 'react';
 import { ArrowRight, Search } from 'lucide-react';
 
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
+import { SafeImage } from '@/components/SafeImage.client';
 import { fontUnbounded } from '@/lib/fonts';
-import { pluralCities, pluralEvents } from '@/lib/format';
+import { resolveCityCardImage } from '@/lib/city-images';
+import { pluralCities, pluralEvents, pluralVenues } from '@/lib/format';
 import { cityHref } from '@/lib/routes';
 
 function sortCities(list: PublicDestinationDto[]): PublicDestinationDto[] {
   return [...list].sort((a, b) => b.events - a.events || a.name.localeCompare(b.name, 'ru'));
+}
+
+function initialOf(name: string): string {
+  const value = name.trim();
+  return value ? value[0].toUpperCase() : '•';
 }
 
 /** Превью каталога городов в новом дизайне. Не production - упрощённый поиск без router/URL-sync. */
@@ -31,6 +38,7 @@ export function CitiesIndexPreview({ destinations }: { destinations: PublicDesti
   const trimmed = query.trim().toLowerCase();
   const filtered = trimmed ? cities.filter((city) => city.name.toLowerCase().includes(trimmed)) : cities;
   const totalEvents = cities.reduce((sum, city) => sum + city.events, 0);
+  const totalVenues = cities.reduce((sum, city) => sum + (city.venues || 0), 0);
 
   return (
     <>
@@ -48,6 +56,9 @@ export function CitiesIndexPreview({ destinations }: { destinations: PublicDesti
           <div className="mt-6 flex flex-wrap gap-2">
             <span className="inline-flex rounded-full bg-accent-soft px-3 py-1.5 text-sm font-semibold text-accent">
               {pluralCities(cities.length)}
+            </span>
+            <span className="inline-flex rounded-full bg-surface-alt px-3 py-1.5 text-sm font-semibold text-ink-2">
+              {pluralVenues(totalVenues)}
             </span>
             <span className="inline-flex rounded-full bg-surface-alt px-3 py-1.5 text-sm font-semibold text-ink-2">
               {pluralEvents(totalEvents)}
@@ -74,18 +85,41 @@ export function CitiesIndexPreview({ destinations }: { destinations: PublicDesti
 
         {filtered.length ? (
           <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            {filtered.map((city) => (
-              <Link
-                key={`${city.type}:${city.id || city.slug || city.name}`}
-                href={cityHref(city)}
-                className="group flex flex-col gap-1.5 rounded-2xl border border-line bg-white p-5 shadow-card transition hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-card-hover"
-              >
-                <span className="font-display text-lg font-bold tracking-tight text-ink group-hover:text-accent">
-                  {city.name}
-                </span>
-                <span className="text-sm text-ink-muted">{pluralEvents(city.events)}</span>
-              </Link>
-            ))}
+            {filtered.map((city) => {
+              const image = resolveCityCardImage(city);
+              return (
+                <Link
+                  key={`${city.type}:${city.id || city.slug || city.name}`}
+                  href={cityHref(city)}
+                  className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-card transition hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-card-hover"
+                >
+                  <div className="relative aspect-[16/10] overflow-hidden bg-surface-alt">
+                    {image ? (
+                      <SafeImage
+                        src={image}
+                        alt=""
+                        fill
+                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                        loading="lazy"
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-accent-soft to-surface-alt">
+                        <span className={`${fontUnbounded.className} text-3xl font-bold text-accent/35`}>
+                          {initialOf(city.name)}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex flex-1 flex-col gap-1 p-4">
+                    <span className="text-base font-bold leading-snug tracking-tight text-ink group-hover:text-accent">
+                      {city.name}
+                    </span>
+                    <span className="text-sm text-ink-muted">{pluralEvents(city.events)}</span>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         ) : (
           <div className="mt-8 rounded-2xl border border-dashed border-line py-16 text-center">
@@ -113,9 +147,17 @@ export function CitiesIndexPreview({ destinations }: { destinations: PublicDesti
                 <Link
                   key={`region:${region.slug || region.name}`}
                   href={cityHref(region)}
-                  className="group flex items-center justify-between gap-3 rounded-2xl border border-line bg-white p-4 shadow-card transition hover:border-accent/40 hover:shadow-card-hover"
+                  className="group flex items-center gap-3 rounded-2xl border border-line bg-white p-4 shadow-card transition hover:border-accent/40 hover:shadow-card-hover"
                 >
-                  <span className="min-w-0 truncate font-semibold text-ink-2 group-hover:text-ink">
+                  <span
+                    className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#1e3a5f] text-white ring-1 ring-[#1e3a5f]/20"
+                    aria-hidden
+                  >
+                    <span className={`${fontUnbounded.className} text-sm font-bold`}>
+                      {initialOf(region.name)}
+                    </span>
+                  </span>
+                  <span className="min-w-0 flex-1 truncate font-semibold text-ink-2 group-hover:text-ink">
                     {region.name}
                   </span>
                   <span className="flex shrink-0 items-center gap-1.5 text-sm text-ink-muted">
