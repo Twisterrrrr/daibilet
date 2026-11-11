@@ -12,23 +12,34 @@ import {
 
 import { CityRegionalEvents } from '@/components/CityRegionalEvents.client';
 import { CityWeatherWidget } from '@/components/CityWeatherWidget.client';
-import { SafeImage } from '@/components/SafeImage.client';
+import {
+  BLOG_LISTING_IMAGE_QUALITY,
+  BlogCardSafeImage,
+  IMAGE_SIZES,
+  SafeImage,
+} from '@/components/SafeImage.client';
 import { fontUnbounded } from '@/lib/fonts';
 import { resolveCityHeroRegionBadge } from '@/lib/city-hero-region';
 import { resolveCityImage } from '@/lib/city-images';
 import { resolveCityPlaceHref, type CityInfoEntry } from '@/lib/cityInfo';
-import { resolveVenueHeroImage } from '@/lib/city-place-images';
+import { isLabelCardVenueStub, resolveVenueHeroImage } from '@/lib/city-place-images';
+import { resolveDestinationRegionLinkForSuburb } from '@/lib/city-destination-registry';
+import { cityIdentitySlides, resolveCityLocalFlavor } from '@/lib/city-hub-local-flavor';
+import { resolveLandingCardImage } from '@/lib/landing-images';
 import { formatPriceFrom, pluralEvents, pluralPoints, pluralVenues } from '@/lib/format';
 import { landingCategoryHref } from '@/lib/landing-routes';
+import type { BlogCardDto } from '@/lib/blog-utils';
 import type { PublicCityPageDto } from '@daibilet/contracts/public';
 
 /** Превью хаба города в новом дизайне (подмножество блоков, без афиши/табов). */
 export function CityHubPreview({
   payload,
   guide,
+  articles = [],
 }: {
   payload: PublicCityPageDto;
   guide: CityInfoEntry;
+  articles?: BlogCardDto[];
 }) {
   const city = payload.city;
   const stats = payload.stats;
@@ -42,6 +53,8 @@ export function CityHubPreview({
   const faq = guide.faq ?? [];
   const suburbs = guide.significantSuburbs ?? [];
   const regionBadge = resolveCityHeroRegionBadge(city);
+  const identitySlides = cityIdentitySlides(city.slug);
+  const flavor = resolveCityLocalFlavor(city.slug);
 
   return (
     <>
@@ -133,6 +146,45 @@ export function CityHubPreview({
             <CityWeatherWidget citySlug={city.slug || city.sourceSlug || ''} />
           </div>
         </div>
+
+        {identitySlides.length ? (
+          <section id="identity" className="scroll-mt-28 pt-12">
+            <div>
+              <h2 className={`${fontUnbounded.className} text-2xl font-bold tracking-tight text-ink sm:text-3xl`}>
+                {flavor?.identityHeading || `Чем уникален ${city.name}`}
+              </h2>
+              {flavor?.identityLead?.trim() ? (
+                <p className="mt-2 max-w-2xl text-sm text-ink-muted">{flavor.identityLead}</p>
+              ) : null}
+            </div>
+            <div className="mt-8 flex gap-4 overflow-x-auto pb-2">
+              {identitySlides.map((slide) => {
+                const raw = String(slide.imageSrc || '').trim();
+                const image = raw && !isLabelCardVenueStub(raw) ? raw : '';
+                return (
+                  <div key={slide.id} className="w-72 shrink-0 overflow-hidden rounded-2xl border border-line bg-white shadow-card">
+                    <div className="relative aspect-[16/10] overflow-hidden bg-surface-alt">
+                      {image ? (
+                        <SafeImage src={image} alt={slide.imageAlt || ''} fill sizes="18rem" className="object-cover" />
+                      ) : (
+                        <div className="h-full w-full bg-surface-alt" />
+                      )}
+                      {slide.badge ? (
+                        <span className="absolute left-3 top-3 inline-flex rounded-full bg-ink px-2.5 py-1 text-[11px] font-semibold text-white">
+                          {slide.badge}
+                        </span>
+                      ) : null}
+                    </div>
+                    <div className="p-4">
+                      <h3 className="text-base font-bold leading-snug text-ink">{slide.title}</h3>
+                      {slide.text ? <p className="mt-2 text-sm leading-6 text-ink-muted">{slide.text}</p> : null}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        ) : null}
 
         {places.length ? (
           <section id="places" className="scroll-mt-24 pt-12">
@@ -297,7 +349,7 @@ export function CityHubPreview({
             </div>
             <div className="mt-8 flex gap-4 overflow-x-auto pb-2">
               {landings.slice(0, 6).map((landing) => {
-                const image = landing.imageUrl || landing.heroImageUrl;
+                const image = resolveLandingCardImage(landing.slug, city.slug);
                 return (
                   <Link
                     key={landing.slug}
@@ -367,8 +419,10 @@ export function CityHubPreview({
                   suburb.locationSlug || suburb.venueSlug || suburb.dayRouteId || null,
                   suburb.imageUrl,
                 );
-                return (
-                  <div key={suburb.name} className="flex flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-card">
+                const regionLink = resolveDestinationRegionLinkForSuburb(city.slug, suburb.name);
+                const href = regionLink?.href || resolveCityPlaceHref(suburb);
+                const body = (
+                  <>
                     <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-alt">
                       {image ? (
                         <SafeImage src={image} alt="" fill sizes="16rem" className="object-cover" />
@@ -383,12 +437,27 @@ export function CityHubPreview({
                       {suburb.desc ? (
                         <p className="line-clamp-3 text-sm leading-relaxed text-ink-muted">{suburb.desc}</p>
                       ) : null}
-                      {suburb.places?.length ? (
+                      {href ? (
+                        <span className="mt-auto inline-flex items-center gap-1 pt-2 text-xs font-semibold uppercase tracking-[0.08em] text-accent">
+                          Перейти <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+                        </span>
+                      ) : suburb.places?.length ? (
                         <span className="mt-auto pt-2 text-xs font-semibold uppercase tracking-[0.08em] text-accent">
                           {suburb.places.length} мест
                         </span>
                       ) : null}
                     </div>
+                  </>
+                );
+                const cardClass =
+                  'flex flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-card transition hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-card-hover';
+                return href ? (
+                  <Link key={suburb.name} href={href} className={`${cardClass} group`}>
+                    {body}
+                  </Link>
+                ) : (
+                  <div key={suburb.name} className={cardClass}>
+                    {body}
                   </div>
                 );
               })}
@@ -452,6 +521,44 @@ export function CityHubPreview({
                   </details>
                 ))}
               </div>
+            </div>
+          </section>
+        ) : null}
+
+        {articles.length ? (
+          <section id="blog" className="scroll-mt-28 pt-12">
+            <div className="flex items-baseline justify-between gap-4">
+              <h2 className={`${fontUnbounded.className} text-2xl font-bold tracking-tight text-ink sm:text-3xl`}>
+                Из блога о {city.name}
+              </h2>
+              <Link href="/blog" className="shrink-0 text-sm font-semibold text-accent hover:text-accent-dark">
+                Все записи →
+              </Link>
+            </div>
+            <div className="mt-8 grid gap-6 sm:grid-cols-2">
+              {articles.slice(0, 4).map((post) => (
+                <Link key={post.slug} href={`/blog/${post.slug}`} className="group flex flex-col gap-3">
+                  <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl bg-surface-alt">
+                    <BlogCardSafeImage
+                      slug={post.slug}
+                      coverImageUrl={post.coverImageUrl}
+                      alt=""
+                      fill
+                      sizes={IMAGE_SIZES.blogCard}
+                      quality={BLOG_LISTING_IMAGE_QUALITY}
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </div>
+                  <div>
+                    {post.tag ? (
+                      <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-accent">{post.tag}</span>
+                    ) : null}
+                    <h3 className="mt-1 text-base font-bold leading-snug text-ink transition-colors group-hover:text-accent">
+                      {post.title}
+                    </h3>
+                  </div>
+                </Link>
+              ))}
             </div>
           </section>
         ) : null}

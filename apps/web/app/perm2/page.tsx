@@ -3,8 +3,9 @@ import type { Metadata } from 'next';
 import { CityHubPreview } from '@/components/CityHubPreview';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
+import { mergeBlogCards } from '@/lib/blog-utils';
 import { resolveCityInfo } from '@/lib/cityInfo';
-import { loadCityDto } from '@/server/cached-city-data';
+import { getCachedCityHubArticles, loadCityDto } from '@/server/cached-city-data';
 
 export const metadata: Metadata = {
   title: 'Пермь - превью нового дизайна',
@@ -15,6 +16,9 @@ export const metadata: Metadata = {
 export default async function Perm2Page() {
   const loaded = await loadCityDto('perm');
   const guide = resolveCityInfo('perm');
+  const articles = mergeBlogCards(
+    (await getCachedCityHubArticles('perm').catch(() => null))?.articles || null,
+  );
 
   if (loaded.kind !== 'ok' || !guide) {
     return (
@@ -29,7 +33,7 @@ export default async function Perm2Page() {
 
   return (
     <SiteLayout chromeVariant="v2">
-      <CityHubPreview payload={loaded.payload} guide={guide} />
+      <CityHubPreview payload={loaded.payload} guide={guide} articles={articles} />
     </SiteLayout>
   );
 }

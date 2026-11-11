@@ -29,7 +29,7 @@ export function SiteHeaderV2() {
   const cityLabel = selectedCity?.cityLabel ?? 'Все города';
 
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/75">
+    <header className="sticky top-0 z-50 border-b border-line bg-white shadow-[0_1px_0_rgba(15,17,23,0.04)]">
       <div className="container-page flex h-16 items-center gap-4 md:h-[72px] md:gap-5">
         <Link
           href="/"
