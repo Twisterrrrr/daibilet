@@ -150,7 +150,7 @@ export function BlogArticleHero({
     <>
       <PageBreadcrumbBar items={breadcrumbs} hideLastOnMobile />
       <section className="border-b border-slate-200 bg-slate-50">
-        <div className="relative hidden w-full overflow-hidden bg-slate-100 lg:block lg:aspect-[2.15/1]">
+        <div className="relative hidden w-full overflow-hidden bg-slate-100 lg:block lg:aspect-[4.3/1]">
           <SafeImage
             src={coverImageUrl}
             alt=""
