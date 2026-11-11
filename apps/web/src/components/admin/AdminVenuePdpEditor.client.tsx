@@ -65,6 +65,16 @@ const emptyDocument = (variant: string, kinds: string[]): Document => ({
   variant, status: 'DRAFT', content: { summary: '', conversion: { mode: 'none', primaryAction: 'none', label: '', targetEventId: '', externalUrl: '' }, gallery: [], facts: [], sections: kinds.map(emptySection), sources: [] },
 });
 
+function formatRevisionDate(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return 'дата неизвестна';
+  return new Intl.DateTimeFormat('ru-RU', {
+    dateStyle: 'short',
+    timeStyle: 'short',
+    timeZone: 'Europe/Moscow',
+  }).format(date);
+}
+
 function Field({ label, value, onChange, multiline = false, list }: { label: string; value: string; onChange: (value: string) => void; multiline?: boolean; list?: string }) {
   return <label className="block text-xs text-muted-foreground">{label}
     {multiline ? <textarea value={value} onChange={(event) => onChange(event.target.value)} className="mt-1 min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground" />
@@ -146,6 +156,18 @@ export function AdminPdpEditor({ entity, entityId, entitySlug, variants, initial
       setError('');
     } catch (cause) { setError(cause instanceof Error ? cause.message : String(cause)); }
   }
+  function restoreRevision(revision: NonNullable<Document['revisions']>[number]) {
+    if (!document) return;
+    if (!window.confirm(`Восстановить содержимое версии ${revision.version} в форме? Оно загрузится как черновик; текущая версия останется в истории.`)) return;
+    setDocument({
+      ...document,
+      variant: revision.variant,
+      status: 'DRAFT',
+      content: revision.content,
+    });
+    setMessage(`Версия ${revision.version} загружена в форму как черновик. Нажми «${saveButtonLabel}», чтобы сохранить её новой версией.`);
+    setError('');
+  }
   async function save() {
     if (!document) return;
     setSaving(true); setError(''); setMessage('');
@@ -214,6 +236,13 @@ export function AdminPdpEditor({ entity, entityId, entitySlug, variants, initial
         </div>
       </div> : null}
     </section>
+    {entity === 'venues' ? <section className="space-y-2 rounded-md border border-slate-200 p-3">
+      <div><h4 className="text-sm font-semibold">История редакций</h4><p className="mt-1 text-xs text-muted-foreground">При восстановлении старая версия загружается как черновик. Публичная версия не меняется, пока отдельно не поставишь статус «Готово».</p></div>
+      {document.revisions?.length ? <ul className="space-y-2">{document.revisions.map((revision) => <li key={revision.id} className="flex flex-wrap items-center justify-between gap-2 rounded-md bg-slate-50 px-3 py-2 text-xs">
+        <span>Версия {revision.version} · {labels[revision.variant] || revision.variant} · {revision.status} · {formatRevisionDate(revision.createdAt)}</span>
+        {revision.version !== document.version ? <Button type="button" variant="outline" size="sm" onClick={() => restoreRevision(revision)}>Восстановить в черновик</Button> : <span className="text-emerald-700">Текущая</span>}
+      </li>)}</ul> : <p className="text-xs text-muted-foreground">История появится после применения миграции истории PDP.</p>}
+    </section> : null}
     <div className="grid gap-3 sm:grid-cols-2">
       <label className="text-xs text-muted-foreground">Сценарий PDP
         <select className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground" value={document.variant} onChange={(event) => changeVariant(event.target.value)}>

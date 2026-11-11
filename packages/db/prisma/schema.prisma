@@ -1073,8 +1073,25 @@ model PdpDocument {
 
   venue Venue? @relation("VenuePdpDocument", fields: [venueId], references: [id], onDelete: Cascade)
   event Event? @relation("EventPdpDocument", fields: [eventId], references: [id], onDelete: Cascade)
+  revisions PdpDocumentRevision[]
 
   @@index([variant, status])
+}
+
+/// Immutable editorial snapshots for PDP document history and safe restore.
+model PdpDocumentRevision {
+  id             String   @id @default(cuid())
+  pdpDocumentId  String
+  version        Int
+  variant        String
+  status         String
+  content        Json
+  createdAt      DateTime @default(now())
+
+  pdpDocument PdpDocument @relation(fields: [pdpDocumentId], references: [id], onDelete: Cascade)
+
+  @@unique([pdpDocumentId, version])
+  @@index([pdpDocumentId, createdAt])
 }
 
 /// Stable editorial wrapper for one or more catalog Events. Public routing and

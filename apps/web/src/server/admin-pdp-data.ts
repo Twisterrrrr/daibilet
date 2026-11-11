@@ -17,6 +17,14 @@ export type AdminPdpDocument = {
   };
   version?: number;
   updatedAt?: string;
+  revisions?: Array<{
+    id: string;
+    version: number;
+    variant: string;
+    status: 'DRAFT' | 'REVIEW' | 'READY';
+    content: AdminPdpDocument['content'];
+    createdAt: string;
+  }>;
 };
 
 export type AdminPdpEditorData = {

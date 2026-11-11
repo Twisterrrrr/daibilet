@@ -107,7 +107,21 @@ export async function readPdpDocument(db, entity, id) {
   const column = entity === 'venues' ? 'venueId' : entity === 'events' ? 'eventId' : null;
   if (!column) throw new Error('Invalid PDP entity');
   const result = await db.query(`SELECT id, variant, status, content, version, "updatedAt" FROM "PdpDocument" WHERE "${column}" = $1`, [id]);
-  return result.rows[0] || null;
+  const document = result.rows[0] || null;
+  if (!document) return null;
+  try {
+    const revisions = await db.query(`
+      SELECT id, version, variant, status, content, "createdAt"
+      FROM "PdpDocumentRevision"
+      WHERE "pdpDocumentId" = $1
+      ORDER BY version DESC
+      LIMIT 20
+    `, [document.id]);
+    return { ...document, revisions: revisions.rows };
+  } catch (error) {
+    if (error?.code === '42P01' || error?.cause?.code === '42P01') return { ...document, revisions: [] };
+    throw error;
+  }
 }
 
 export async function readReadyPdpDocument(db, entity, id) {
@@ -134,11 +148,19 @@ export async function savePdpDocument(db, entity, id, payload) {
   const owner = await db.query(`SELECT id FROM "${entity === 'venues' ? 'Venue' : 'Event'}" WHERE id = $1`, [id]);
   if (!owner.rows.length) return null;
   const result = await db.query(`
-    INSERT INTO "PdpDocument" (id, "${column}", variant, status, content, "updatedAt")
-    VALUES ($1, $2, $3, $4, $5::jsonb, now())
-    ON CONFLICT ("${column}") DO UPDATE SET variant = excluded.variant, status = excluded.status,
-      content = excluded.content, version = "PdpDocument".version + 1, "updatedAt" = now()
-    RETURNING id, variant, status, content, version, "updatedAt"
-  `, [randomUUID(), id, normalized.variant, normalized.status, JSON.stringify(normalized.content)]);
-  return result.rows[0];
+    WITH saved AS (
+      INSERT INTO "PdpDocument" (id, "${column}", variant, status, content, "updatedAt")
+      VALUES ($1, $2, $3, $4, $5::jsonb, now())
+      ON CONFLICT ("${column}") DO UPDATE SET variant = excluded.variant, status = excluded.status,
+        content = excluded.content, version = "PdpDocument".version + 1, "updatedAt" = now()
+      RETURNING id, variant, status, content, version, "updatedAt"
+    ), revision AS (
+      INSERT INTO "PdpDocumentRevision" (id, "pdpDocumentId", version, variant, status, content)
+      SELECT $6, id, version, variant, status, content FROM saved
+      RETURNING id
+    )
+    SELECT saved.* FROM saved
+  `, [randomUUID(), id, normalized.variant, normalized.status, JSON.stringify(normalized.content), randomUUID()]);
+  if (!result.rows[0]) return null;
+  return readPdpDocument(db, entity, id);
 }

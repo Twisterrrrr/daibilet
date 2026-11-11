@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { PDP_VARIANTS, emptyPdpContent, normalizePdpDocument, readReadyPdpDocument, savePdpDocument } from './pdp-documents.js';
+import { PDP_VARIANTS, emptyPdpContent, normalizePdpDocument, readPdpDocument, readReadyPdpDocument, savePdpDocument } from './pdp-documents.js';
 
 test('all place scenarios and the event scenario have unique section keys', () => {
   assert.ok(Object.keys(PDP_VARIANTS).length >= 14);
@@ -48,7 +48,27 @@ test('save keeps the entity relation and increments document version', async () 
   const saved = await savePdpDocument(db, 'venues', 'venue-1', { variant: 'museum', content: emptyPdpContent('museum') });
   assert.equal(saved.version, 2);
   assert.match(calls[1].sql, /ON CONFLICT \("venueId"\)/);
+  assert.match(calls[1].sql, /INSERT INTO "PdpDocumentRevision"/);
   assert.equal(calls[1].values[1], 'venue-1');
+});
+
+test('admin PDP reader returns immutable revisions newest first', async () => {
+  const calls = [];
+  const db = { query: async (sql, values) => {
+    calls.push({ sql, values });
+    if (/FROM "PdpDocument"/.test(sql)) {
+      return { rows: [{ id: 'doc-1', version: 3, variant: 'museum', status: 'READY', content: { summary: 'current' } }] };
+    }
+    return { rows: [
+      { id: 'rev-3', version: 3, variant: 'museum', status: 'READY', content: { summary: 'current' }, createdAt: '2026-11-11T10:00:00.000Z' },
+      { id: 'rev-2', version: 2, variant: 'museum', status: 'DRAFT', content: { summary: 'older' }, createdAt: '2026-11-10T10:00:00.000Z' },
+    ] };
+  } };
+  const document = await readPdpDocument(db, 'venues', 'venue-1');
+  assert.equal(document.revisions.length, 2);
+  assert.equal(document.revisions[1].content.summary, 'older');
+  assert.match(calls[1].sql, /ORDER BY version DESC/);
+  assert.deepEqual(calls[1].values, ['doc-1']);
 });
 
 test('event PDP documents persist against the event relation only', async () => {
