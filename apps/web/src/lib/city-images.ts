@@ -242,7 +242,6 @@ const CITY_NIGHT_HUB_SLUGS = new Set([
   'tyumen',
   'ufa',
   'ulan-ude',
-  'ulyanovsk',
   'veliky-novgorod',
   'vladimir',
   'vladivostok',
@@ -297,7 +296,6 @@ export function resolveCityCardThumbImage(city: CityImageSource): string | null 
 /** Night hero for city hub (`/cities/[slug]`). */
 export function resolveCityNightImage(city: CityImageSource): string | null {
   const imageSlug = cityCardImageSlug(city);
-  if (imageSlug === 'ulyanovsk') return '/images/venues/ulyanovsk/hero-generated-2026-11.png';
   if (imageSlug === 'kirov-kirovskaya-oblast') return '/images/venues/kirov-kirovskaya-oblast/hero-generated-2026-11.png';
   if (!CITY_NIGHT_HUB_SLUGS.has(imageSlug)) return null;
   return `/images/cities/night/${imageSlug}.png`;
