@@ -7,6 +7,7 @@ Status: backend/API flow verified on staging, 2026-11-11. Production was not cha
 - A supplier is provisioned by an authenticated administrator; there is no public supplier signup.
 - New suppliers are created as `DRAFT`. Provisioning accepts only public contact fields and never accepts legal or bank credentials.
 - An existing active `SiteUser` is assigned a supplier role. The account-to-supplier assignment and place links are recorded in `AdminAuditLog`.
+- `DRAFT`, `REVIEW`, and `ACTIVE` suppliers can submit place proposals according to their membership role. `PAUSED` and `ARCHIVED` suppliers retain read-only access to their workspace/history but cannot submit requests.
 - `SupplierVenue` links can be soft-disabled. Supplier accounts can be paused or archived without deleting their history.
 - A supplier cannot write directly to `Venue` or `PdpDocument`. They submit `CREATE` or `UPDATE` requests; an editor reviews, applies, and can roll back the approved revision.
 - Applying a `CREATE` request creates a `CANDIDATE` venue with `isIndexable=false`, and links it to the submitting supplier so it appears in that supplier's workspace.

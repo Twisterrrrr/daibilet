@@ -7,7 +7,7 @@ test('supplier workspace exposes linked PDP drafts and their status', async () =
   const workspace = await buildSupplierPlaceWorkspace({ query: async (sql) => {
     if (sql.includes('FROM "SupplierUser" su') && sql.includes('JOIN "SupplierVenue"')) {
       assert.doesNotMatch(sql, /page\.status\s*=\s*'READY'/);
-      return { rows: [{ supplierId: 'supplier-1', supplierRole: 'OPERATOR', venueId: 'venue-1', title: 'Музей', pdpVariant: 'museum', pdpStatus: 'DRAFT', pdpContent: { summary: 'Черновик' } }] };
+      return { rows: [{ supplierId: 'supplier-1', supplierStatus: 'ACTIVE', supplierRole: 'OPERATOR', venueId: 'venue-1', title: 'Музей', pdpVariant: 'museum', pdpStatus: 'DRAFT', pdpContent: { summary: 'Черновик' } }] };
     }
     return { rows: [] };
   } }, 'user-1');
@@ -31,7 +31,7 @@ test('supplier text edits preserve editor-owned section data and DRAFT status', 
   const current = { variant: 'museum', status: 'DRAFT', content, version: 1 };
   let inserted;
   const db = { query: async (sql, values) => {
-    if (sql.includes('SELECT role FROM "SupplierUser"')) return { rows: [{ role: 'OPERATOR' }] };
+    if (sql.includes('SELECT membership.role')) return { rows: [{ role: 'OPERATOR', supplierStatus: 'DRAFT' }] };
     if (sql.includes('FROM "SupplierVenue" link')) return { rows: [{ id: 'venue-1', title: 'Музей', placeType: 'MUSEUM' }] };
     if (sql.includes('FROM "PdpDocument" WHERE "venueId"')) return { rows: [current] };
     if (sql.includes('INSERT INTO "SupplierPlaceRequest"')) { inserted = JSON.parse(values[6]); return { rows: [] }; }
@@ -64,4 +64,29 @@ test('supplier text edits preserve editor-owned section data and DRAFT status', 
     const badContent = { ...content, sections: [{ id: 'not_a_section', kind: 'about', title: 'x', body: 'x' }] };
     return submitSupplierPlaceRequest(db, 'user-1', { type: 'UPDATE', supplierId: 'supplier-1', venueId: 'venue-1', pdpContent: badContent });
   }, /Unknown or duplicate PDP section/);
+});
+
+test('paused and archived suppliers are read-only and cannot submit place requests', async () => {
+  const workspace = await buildSupplierPlaceWorkspace({ query: async (sql) => {
+    if (sql.includes('FROM "SupplierUser" su') && sql.includes('JOIN "SupplierVenue"')) {
+      return { rows: [{ supplierId: 'supplier-paused', supplierStatus: 'PAUSED', supplierRole: 'OWNER', venueId: 'venue-1', title: 'Место' }] };
+    }
+    if (sql.includes('SELECT supplier.id, supplier.title, supplier.status, su.role')) {
+      return { rows: [{ id: 'supplier-paused', title: 'Пауза', status: 'PAUSED', role: 'OWNER' }] };
+    }
+    return { rows: [] };
+  } }, 'user-1');
+  assert.equal(workspace.venues[0].editable, false);
+  assert.equal(workspace.suppliers[0].canSubmit, false);
+
+  for (const supplierStatus of ['PAUSED', 'ARCHIVED']) {
+    const db = { query: async (sql) => {
+      if (sql.includes('SELECT membership.role')) return { rows: [{ role: 'OWNER', supplierStatus }] };
+      throw new Error(`Unexpected query after blocked status: ${sql}`);
+    } };
+    await assert.rejects(
+      submitSupplierPlaceRequest(db, 'user-1', { type: 'CREATE', supplierId: `supplier-${supplierStatus}` }),
+      /paused or archived/,
+    );
+  }
 });

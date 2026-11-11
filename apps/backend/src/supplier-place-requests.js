@@ -5,13 +5,14 @@ import { emptyPdpContent, normalizePdpDocument, readPdpDocument, savePdpDocument
 import { createAdminVenue } from './dto.js';
 
 const EDIT_ROLES = new Set(['OWNER', 'ADMIN', 'OPERATOR']);
+const SUBMITTABLE_SUPPLIER_STATUSES = new Set(['DRAFT', 'REVIEW', 'ACTIVE']);
 const PLACE_SUBTYPE = /^[a-z0-9_-]{1,64}$/u;
 const MAX_REQUEST_BYTES = 180_000;
 
 export async function buildSupplierPlaceWorkspace(db, siteUserId) {
   const [venues, cities, requests, suppliers] = await Promise.all([
     db.query(`
-      SELECT sv."supplierId", supplier.title AS "supplierTitle", su.role AS "supplierRole",
+      SELECT sv."supplierId", supplier.title AS "supplierTitle", supplier.status AS "supplierStatus", su.role AS "supplierRole",
         venue.id AS "venueId", venue.title, venue.slug, venue."placeType", venue."placeSubtype",
         venue.kind, venue.address, venue."shortDescription", venue."description", venue."metroStation",
         venue."wayToFind", venue."parkingInfo", city.title AS city,
@@ -42,7 +43,7 @@ export async function buildSupplierPlaceWorkspace(db, siteUserId) {
       LIMIT 100
     `, [siteUserId]),
     db.query(`
-      SELECT supplier.id, supplier.title, su.role
+      SELECT supplier.id, supplier.title, supplier.status, su.role
       FROM "SupplierUser" su JOIN "Supplier" supplier ON supplier.id = su."supplierId"
       WHERE su."siteUserId" = $1 AND su."isActive" = true
       ORDER BY supplier.title
@@ -52,13 +53,21 @@ export async function buildSupplierPlaceWorkspace(db, siteUserId) {
   return {
     venues: venues.rows.map((row) => ({
       ...row,
-      editable: EDIT_ROLES.has(String(row.supplierRole || '').toUpperCase()),
+      editable: SUBMITTABLE_SUPPLIER_STATUSES.has(String(row.supplierStatus || '').toUpperCase())
+        && EDIT_ROLES.has(String(row.supplierRole || '').toUpperCase()),
       suggestedVariant: row.pdpVariant || suggestedPlacePdpVariant(row.placeType, row.placeSubtype),
       pdpStatus: row.pdpStatus || null,
       pdpContent: row.pdpContent || null,
     })),
     cities: cities.rows.map((row) => ({ id: row.id, slug: row.slug, title: row.title })),
-    suppliers: suppliers.rows.map((row) => ({ id: row.id, title: row.title, role: row.role, canSubmit: EDIT_ROLES.has(String(row.role).toUpperCase()) })),
+    suppliers: suppliers.rows.map((row) => ({
+      id: row.id,
+      title: row.title,
+      role: row.role,
+      status: row.status,
+      canSubmit: SUBMITTABLE_SUPPLIER_STATUSES.has(String(row.status || '').toUpperCase())
+        && EDIT_ROLES.has(String(row.role).toUpperCase()),
+    })),
     requests: requests.rows,
   };
 }
@@ -70,12 +79,17 @@ export async function submitSupplierPlaceRequest(db, siteUserId, input = {}) {
   if (!supplierId) throw new Error('Supplier is required');
 
   const membership = await db.query(`
-    SELECT role FROM "SupplierUser"
-    WHERE "supplierId" = $1 AND "siteUserId" = $2 AND "isActive" = true
+    SELECT membership.role, supplier.status AS "supplierStatus"
+    FROM "SupplierUser" membership
+    JOIN "Supplier" supplier ON supplier.id = membership."supplierId"
+    WHERE membership."supplierId" = $1 AND membership."siteUserId" = $2 AND membership."isActive" = true
     LIMIT 1
   `, [supplierId, siteUserId]);
   const role = String(membership.rows[0]?.role || '').toUpperCase();
   if (!membership.rows[0]) throw new Error('Supplier access denied');
+  if (!SUBMITTABLE_SUPPLIER_STATUSES.has(String(membership.rows[0].supplierStatus || '').toUpperCase())) {
+    throw new Error('Supplier account is paused or archived and cannot submit place requests');
+  }
   if (!EDIT_ROLES.has(role)) throw new Error('Supplier role cannot submit place requests');
 
   let venueId = null;
