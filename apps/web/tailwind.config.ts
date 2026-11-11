@@ -53,6 +53,21 @@ const config: Config = {
         },
         urgency: 'hsl(var(--urgency))',
         success: 'hsl(var(--success))',
+        /* Новый шаблон: red accent + ink/line neutrals (Inter + Unbounded). Hex literals
+           so /alpha opacity modifiers compile (var(--x) hex cannot). */
+        accent: {
+          DEFAULT: '#ff4757',
+          dark: '#e6394a',
+          soft: '#ffeaed',
+        },
+        ink: {
+          DEFAULT: '#0f1117',
+          2: '#2a2d3a',
+          muted: '#6b7080',
+          'muted-2': '#9ca1ae',
+        },
+        line: '#e8e9ee',
+        'surface-alt': '#f6f7fb',
         /* Literal oklch + <alpha-value>: var(--navy-*) alone breaks /opacity
            (invalid color → body graphite inherits on navy hero lead/crumbs). */
         navy: {

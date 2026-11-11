@@ -43,6 +43,21 @@ export const fontSourceSerif = localFont({
   fallback: ['Georgia', 'serif'],
 });
 
+/**
+ * Display-шрифт нового шаблона (Inter body + Unbounded display).
+ * Кириллическое подмножество (U+0400-045F), variable 200-900. Латинское
+ * подмножество добавляется отдельно, когда миграция дойдёт до страниц с
+ * латинскими заголовками.
+ */
+export const fontUnbounded = localFont({
+  src: [{ path: '../../public/fonts/Unbounded-Variable.woff2', style: 'normal' }],
+  variable: '--font-unbounded',
+  display: 'swap',
+  weight: '200 900',
+  preload: false,
+  fallback: ['system-ui', 'sans-serif'],
+});
+
 /** Class list for `<html>`: CSS variables for sans-serif families consumed by globals.css + Tailwind. */
 export const fontSansVariableClassName = [
   fontInter.variable,

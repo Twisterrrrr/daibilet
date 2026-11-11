@@ -47,6 +47,16 @@ html[data-nav-pending='1'] {
     --ring: 221 83% 53%;
     --urgency: 15 90% 55%;
     --success: 145 60% 42%;
+    /* Новый шаблон (шт: Inter body + Unbounded display, акцент красный) */
+    --accent: #ff4757;
+    --accent-dark: #e6394a;
+    --accent-soft: #ffeaed;
+    --ink: #0f1117;
+    --ink-2: #2a2d3a;
+    --ink-muted: #6b7080;
+    --ink-muted-2: #9ca1ae;
+    --line: #e8e9ee;
+    --surface-alt: #f6f7fb;
     --graphite: 210 9% 11%;
     --graphite-muted: 215 10% 46%;
     --surface-muted: 210 17% 98%;
