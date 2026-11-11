@@ -17,6 +17,7 @@ import { fontUnbounded } from '@/lib/fonts';
 import { resolveCityHeroRegionBadge } from '@/lib/city-hero-region';
 import { resolveCityImage } from '@/lib/city-images';
 import { resolveCityPlaceHref, type CityInfoEntry } from '@/lib/cityInfo';
+import { resolveVenueHeroImage } from '@/lib/city-place-images';
 import { formatPriceFrom, pluralEvents, pluralPoints, pluralVenues } from '@/lib/format';
 import { landingCategoryHref } from '@/lib/landing-routes';
 import type { PublicCityPageDto } from '@daibilet/contracts/public';
@@ -144,39 +145,55 @@ export function CityHubPreview({
             <div className="mt-8 flex gap-4 overflow-x-auto pb-1">
               {places.map((place, index) => {
                 const href = resolveCityPlaceHref(place);
+                const image = resolveVenueHeroImage(place.venueSlug || place.locationSlug || null, place.imageUrl);
                 const inner = (
                   <>
-                    <div className="flex items-start gap-2">
-                      <span className="grid size-7 shrink-0 place-items-center rounded-full bg-surface-alt text-sm font-bold text-ink">
+                    <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-alt">
+                      {image ? (
+                        <SafeImage
+                          src={image}
+                          alt=""
+                          fill
+                          sizes="18rem"
+                          className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-accent-soft to-surface-alt text-accent/40">
+                          <MapPin className="h-8 w-8" aria-hidden />
+                        </div>
+                      )}
+                      <span className="absolute left-3 top-3 grid size-7 place-items-center rounded-full bg-white text-sm font-bold text-ink shadow-sm">
                         {index + 1}
                       </span>
-                      <h3 className="text-base font-bold leading-snug tracking-tight text-ink">{place.name}</h3>
                     </div>
-                    {place.desc ? (
-                      <p className="mt-1.5 line-clamp-3 text-sm leading-relaxed text-ink-muted">{place.desc}</p>
-                    ) : null}
-                    <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 pt-3 text-xs text-ink-muted-2">
-                      {place.visitMinutes ? (
-                        <span className="inline-flex items-center gap-1">
-                          <Clock className="h-3.5 w-3.5" aria-hidden />
-                          {place.visitMinutes}
-                        </span>
+                    <div className="flex flex-1 flex-col gap-1.5 p-4">
+                      <h3 className="text-base font-bold leading-snug tracking-tight text-ink">{place.name}</h3>
+                      {place.desc ? (
+                        <p className="line-clamp-2 text-sm leading-relaxed text-ink-muted">{place.desc}</p>
                       ) : null}
-                      {place.address ? (
-                        <span className="inline-flex items-center gap-1">
-                          <MapPin className="h-3.5 w-3.5" aria-hidden />
-                          {place.address}
-                        </span>
-                      ) : null}
+                      <div className="mt-auto flex flex-wrap gap-x-3 gap-y-1 pt-2 text-xs text-ink-muted-2">
+                        {place.visitMinutes ? (
+                          <span className="inline-flex items-center gap-1">
+                            <Clock className="h-3.5 w-3.5" aria-hidden />
+                            {place.visitMinutes}
+                          </span>
+                        ) : null}
+                        {place.address ? (
+                          <span className="inline-flex items-center gap-1">
+                            <MapPin className="h-3.5 w-3.5" aria-hidden />
+                            {place.address}
+                          </span>
+                        ) : null}
+                      </div>
                     </div>
                   </>
                 );
                 const cardClass =
-                  'flex min-h-[10rem] w-72 shrink-0 flex-col gap-2 rounded-2xl border border-line bg-white p-5 shadow-card transition hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-card-hover';
+                  'flex w-72 shrink-0 flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-card transition hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-card-hover';
                 return href ? (
                   <Link key={place.name} href={href} className={`${cardClass} group`}>
                     {inner}
-                    <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent">
+                    <span className="flex items-center gap-1.5 px-4 pb-3 text-sm font-semibold text-accent">
                       Подробнее <ArrowRight className="h-4 w-4" aria-hidden />
                     </span>
                   </Link>
@@ -345,22 +362,36 @@ export function CityHubPreview({
               <p className="mt-2 text-sm text-ink-muted">Куда съездить из {city.name} на день или выходные</p>
             </div>
             <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {suburbs.map((suburb) => (
-                <div
-                  key={suburb.name}
-                  className="flex flex-col gap-2 rounded-2xl border border-line bg-white p-5 shadow-card"
-                >
-                  <h3 className="text-base font-bold leading-snug text-ink">{suburb.name}</h3>
-                  {suburb.desc ? (
-                    <p className="line-clamp-3 text-sm leading-relaxed text-ink-muted">{suburb.desc}</p>
-                  ) : null}
-                  {suburb.places?.length ? (
-                    <span className="mt-auto pt-2 text-xs font-semibold uppercase tracking-[0.08em] text-accent">
-                      {suburb.places.length} мест
-                    </span>
-                  ) : null}
-                </div>
-              ))}
+              {suburbs.map((suburb) => {
+                const image = resolveVenueHeroImage(
+                  suburb.locationSlug || suburb.venueSlug || suburb.dayRouteId || null,
+                  suburb.imageUrl,
+                );
+                return (
+                  <div key={suburb.name} className="flex flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-card">
+                    <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-alt">
+                      {image ? (
+                        <SafeImage src={image} alt="" fill sizes="16rem" className="object-cover" />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-accent-soft to-surface-alt text-accent/40">
+                          <MapPin className="h-8 w-8" aria-hidden />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex flex-1 flex-col gap-2 p-4">
+                      <h3 className="text-base font-bold leading-snug text-ink">{suburb.name}</h3>
+                      {suburb.desc ? (
+                        <p className="line-clamp-3 text-sm leading-relaxed text-ink-muted">{suburb.desc}</p>
+                      ) : null}
+                      {suburb.places?.length ? (
+                        <span className="mt-auto pt-2 text-xs font-semibold uppercase tracking-[0.08em] text-accent">
+                          {suburb.places.length} мест
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </section>
         ) : null}
