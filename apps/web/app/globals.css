@@ -2454,3 +2454,35 @@ body > div:has(iframe[src*='ticketscloud']) {
     border-bottom: 1px solid #e2e8f0 !important;
   }
 }
+/* ── New-design preview: scoped retheme for trust pages (.trust-v2).
+   Re-colors the shared trust content components without touching live routes. ── */
+.trust-v2 :is(h1, h2, h3) {
+  font-family: var(--font-unbounded), var(--font-manrope), 'Inter', system-ui, sans-serif;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.trust-v2 .text-slate-900 { color: var(--ink); }
+.trust-v2 .text-slate-800,
+.trust-v2 .text-slate-700 { color: var(--ink-2); }
+.trust-v2 .text-slate-600,
+.trust-v2 .text-slate-500 { color: var(--ink-muted); }
+.trust-v2 .text-slate-400,
+.trust-v2 .text-slate-300 { color: var(--ink-muted-2); }
+.trust-v2 .text-primary-600,
+.trust-v2 .text-primary-700 { color: var(--accent); }
+.trust-v2 .text-primary-800 { color: var(--accent-dark); }
+.trust-v2 .hover\:text-primary-600:hover,
+.trust-v2 .hover\:text-primary-700:hover,
+.trust-v2 .hover\:text-primary-800:hover { color: var(--accent-dark); }
+
+.trust-v2 .bg-slate-50,
+.trust-v2 .bg-slate-100 { background-color: var(--surface-alt); }
+.trust-v2 .bg-slate-200 { background-color: var(--line); }
+.trust-v2 .bg-primary-600 { background-color: var(--accent); }
+.trust-v2 .bg-primary-50 { background-color: var(--accent-soft); }
+.trust-v2 .hover\:bg-primary-700:hover { background-color: var(--accent-dark); }
+
+.trust-v2 .border-slate-200,
+.trust-v2 .border-slate-300 { border-color: var(--line); }
+.trust-v2 .hover\:border-slate-400:hover { border-color: var(--ink-muted-2); }
