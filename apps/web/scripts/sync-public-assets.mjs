@@ -29,7 +29,7 @@ const sourceRoots = [
 
 const SUBDIRS = ['blog', 'cities', 'hero', 'events', 'landings', 'home', 'venues', 'og'];
 
-function copyDir(sourceDir, targetDir) {
+function copyDir(sourceDir, targetDir, { preserveExisting = false, skipGenerated = false } = {}) {
   if (!fs.existsSync(sourceDir)) return 0;
   fs.mkdirSync(targetDir, { recursive: true });
   let copied = 0;
@@ -37,10 +37,14 @@ function copyDir(sourceDir, targetDir) {
     const from = path.join(sourceDir, entry.name);
     const to = path.join(targetDir, entry.name);
     if (entry.isDirectory()) {
-      copied += copyDir(from, to);
+      if (skipGenerated && entry.name === 'generated') continue;
+      copied += copyDir(from, to, { preserveExisting, skipGenerated });
       continue;
     }
     if (!/\.(jpe?g|png|webp|gif|svg)$/i.test(entry.name)) continue;
+    // Existing web venue images are curated assets; the legacy Vite tree may
+    // contain stale or generated replacements with the same filenames.
+    if (preserveExisting && fs.existsSync(to)) continue;
     fs.copyFileSync(from, to);
     copied += 1;
   }
@@ -54,7 +58,11 @@ for (const sourceRoot of sourceRoots) {
   if (!fs.existsSync(sourceRoot)) continue;
   usedSource = sourceRoot;
   for (const subdir of SUBDIRS) {
-    copied += copyDir(path.join(sourceRoot, subdir), path.join(targetRoot, subdir));
+    const isVenueAssets = subdir === 'venues';
+    copied += copyDir(path.join(sourceRoot, subdir), path.join(targetRoot, subdir), {
+      preserveExisting: isVenueAssets,
+      skipGenerated: isVenueAssets,
+    });
   }
   break;
 }
