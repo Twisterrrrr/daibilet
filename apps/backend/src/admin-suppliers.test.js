@@ -86,5 +86,6 @@ test('supplier list exposes linked identities but no financial credentials', asy
   await listAdminSuppliers(db, 'museum');
   assert.match(query, /"SupplierUser"/);
   assert.match(query, /"SupplierVenue"/);
+  assert.match(query, /supplier\."websiteUrl"/);
   assert.doesNotMatch(query, /payoutAccount|yookassaShopId|"inn"/i);
 });

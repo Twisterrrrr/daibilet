@@ -26,7 +26,7 @@ export async function listAdminSuppliers(db, search = '') {
   const term = String(search || '').trim().slice(0, 120);
   const result = await db.query(`
     SELECT supplier.id, supplier.slug, supplier.title, supplier.status, supplier.email,
-      supplier.phone, supplier.websiteUrl AS "websiteUrl", supplier.createdAt AS "createdAt",
+      supplier.phone, supplier."websiteUrl" AS "websiteUrl", supplier."createdAt" AS "createdAt",
       COALESCE(users.items, '[]'::jsonb) AS users,
       COALESCE(venues.items, '[]'::jsonb) AS venues
     FROM "Supplier" supplier
