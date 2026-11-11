@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 
 export default function About2Page() {
   return (
-    <SiteLayout>
+    <SiteLayout chromeVariant="v2">
       <div className="min-h-screen bg-white">
         <div className="border-b border-line bg-ink">
           <div className="container-page max-w-4xl py-2">
@@ -55,8 +55,9 @@ export default function About2Page() {
             <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
               <h2 className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted-2">Покупка билетов</h2>
               <p className="mt-3 text-[15px] leading-6 text-ink-2">
-                Оплата проходит в виджете билетной системы партнёра (Ticketscloud или Теплоход). Мы не подменяем цену и
-                не обещаем скидки, которых нет в источнике. После оплаты заказ можно найти в разделе «Мои покупки».
+                Пока что оплата проходит в виджетах билетной системы Ticketscloud, но скоро мы перейдем на свой
+                полноценный финконтур. Мы не подменяем цену и не обещаем скидки, которых нет в источнике. После оплаты
+                заказ можно найти в разделе «Мои покупки».
               </p>
             </section>
 
