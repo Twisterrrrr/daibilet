@@ -76,7 +76,7 @@ export function CityHubPreview({
         </div>
       </section>
 
-      <div className="container-page max-w-5xl py-12 sm:py-16">
+      <div className="container-page py-12 sm:py-16">
         {guide.hookFact ? (
           <section className="rounded-2xl border border-accent/20 bg-accent-soft px-6 py-5">
             <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.08em] text-accent">
@@ -95,12 +95,17 @@ export function CityHubPreview({
               </h2>
               <p className="mt-2 text-sm text-ink-muted">Главные места, музеи и гастро-точки города</p>
             </div>
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {places.map((place) => {
+            <div className="mt-8 flex gap-4 overflow-x-auto pb-1">
+              {places.map((place, index) => {
                 const href = resolveCityPlaceHref(place);
                 const inner = (
                   <>
-                    <h3 className="text-base font-bold leading-snug tracking-tight text-ink">{place.name}</h3>
+                    <div className="flex items-start gap-2">
+                      <span className="grid size-7 shrink-0 place-items-center rounded-full bg-surface-alt text-sm font-bold text-ink">
+                        {index + 1}
+                      </span>
+                      <h3 className="text-base font-bold leading-snug tracking-tight text-ink">{place.name}</h3>
+                    </div>
                     {place.desc ? (
                       <p className="mt-1.5 line-clamp-3 text-sm leading-relaxed text-ink-muted">{place.desc}</p>
                     ) : null}
@@ -121,7 +126,7 @@ export function CityHubPreview({
                   </>
                 );
                 const cardClass =
-                  'flex min-h-[10rem] flex-col gap-2 rounded-2xl border border-line bg-white p-5 shadow-card transition hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-card-hover';
+                  'flex min-h-[10rem] w-72 shrink-0 flex-col gap-2 rounded-2xl border border-line bg-white p-5 shadow-card transition hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-card-hover';
                 return href ? (
                   <Link key={place.name} href={href} className={`${cardClass} group`}>
                     {inner}
@@ -147,7 +152,7 @@ export function CityHubPreview({
               </h2>
               <p className="mt-2 text-sm text-ink-muted">Проверенные сценарии прогулок по городу</p>
             </div>
-            <div className="mt-8 grid gap-4 sm:grid-cols-2">
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {routes.map((route) => (
                 <div key={route.id} className="flex flex-col gap-3 rounded-2xl border border-line bg-white p-6 shadow-card">
                   <h3 className="text-lg font-bold leading-snug tracking-tight text-ink">{route.title}</h3>
