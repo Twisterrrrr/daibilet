@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { BookOpen, Bookmark, Map, Ticket } from 'lucide-react';
 
+import { RecentViewsRail } from '@/components/RecentViewsRail.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import { fontUnbounded } from '@/lib/fonts';
 import { pageTitle } from '@/lib/seo-meta';
@@ -36,6 +38,32 @@ export default function NotFoundPreviewPage() {
             На главную
           </Link>
         </div>
+      </div>
+
+      <div className="container-page mb-16">
+        <RecentViewsRail />
+        <section className="mt-16">
+          <h2 className="font-display text-lg font-bold tracking-tight text-ink">Куда дальше</h2>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { label: 'Афиша событий', href: '/events', Icon: Ticket },
+              { label: 'Подборки', href: '/podborki', Icon: Bookmark },
+              { label: 'Гид по городам', href: '/cities', Icon: Map },
+              { label: 'Блог', href: '/blog', Icon: BookOpen },
+            ].map(({ label, href, Icon }) => (
+              <Link
+                key={href}
+                href={href}
+                className="group flex items-center gap-3 rounded-2xl border border-line bg-white p-4 shadow-card transition hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-card-hover"
+              >
+                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent">
+                  <Icon className="h-5 w-5" aria-hidden />
+                </span>
+                <span className="min-w-0 flex-1 text-sm font-semibold text-ink group-hover:text-accent">{label}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
       </div>
     </SiteLayout>
   );

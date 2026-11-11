@@ -9,6 +9,8 @@
  * - catalog_interstitial_click
  */
 
+import { rememberRecentView } from '@/lib/recent-views';
+
 export type CatalogBannerTarget = 'rooftops' | 'river' | 'weekend' | 'blog' | string;
 
 export const METRIKA_GOALS = {
@@ -117,6 +119,12 @@ export function trackCityHubView(params?: {
     city: params?.city ? String(params.city) : undefined,
     slug: params?.slug ? String(params.slug) : undefined,
   });
+
+  const title = params?.city ? String(params.city).trim() : '';
+  const slug = params?.slug ? String(params.slug).trim() : '';
+  if (title && slug) {
+    rememberRecentView({ kind: 'city', href: `/cities/${slug}`, title });
+  }
 }
 
 /**
