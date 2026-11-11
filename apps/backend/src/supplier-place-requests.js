@@ -221,6 +221,16 @@ export async function applySupplierPlaceRequest(db, id, input = {}) {
         openingHours: candidate.openingHours,
         heroImageUrl: candidate.imageUrl,
       });
+      await tx.query(`
+        INSERT INTO "SupplierVenue" (id, "supplierId", "venueId", "isPrimary", "isActive", "createdAt", "updatedAt")
+        VALUES ($1, $2, $3, false, true, now(), now())
+        ON CONFLICT ("supplierId", "venueId") DO UPDATE
+          SET "isActive" = true, "updatedAt" = now()
+      `, [randomUUID(), request.supplierId, created.id]);
+      await tx.query(`
+        INSERT INTO "AdminAuditLog" (id, action, "targetType", "targetId", outcome, detail, "createdAt")
+        VALUES ($1, 'SUPPLIER_VENUE_LINKED', 'SUPPLIER', $2, 'SUCCESS', $3::jsonb, now())
+      `, [randomUUID(), request.supplierId, JSON.stringify({ venueId: created.id, source: 'PLACE_REQUEST_CREATE', requestId: id })]);
       const createdVenue = await tx.query(`SELECT "updatedAt" FROM "Venue" WHERE id = $1`, [created.id]);
       const appliedAt = new Date();
       const update = await tx.query(`
