@@ -13,16 +13,19 @@ export const metadata: Metadata = {
 
 export default async function Blog2Page() {
   let posts: Awaited<ReturnType<typeof getCachedBlogPageData>>['posts'] = [];
+  let afishaPromos: Awaited<ReturnType<typeof getCachedBlogPageData>>['afishaPromos'] = {};
   try {
     const data = await getCachedBlogPageData();
     posts = data.posts ?? [];
+    afishaPromos = data.afishaPromos ?? {};
   } catch {
     posts = [];
+    afishaPromos = {};
   }
 
   return (
     <SiteLayout chromeVariant="v2">
-      <BlogPreviewListing posts={posts} />
+      <BlogPreviewListing posts={posts} afishaPromos={afishaPromos} />
     </SiteLayout>
   );
 }
