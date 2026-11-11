@@ -242,6 +242,7 @@ const CITY_NIGHT_HUB_SLUGS = new Set([
   'tyumen',
   'ufa',
   'ulan-ude',
+  'ulyanovsk',
   'veliky-novgorod',
   'vladimir',
   'vladivostok',
