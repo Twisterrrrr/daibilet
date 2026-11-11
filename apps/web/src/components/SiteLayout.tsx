@@ -6,7 +6,9 @@ import { ScrollToTopButton } from '@/components/ScrollToTop.client';
 import { ChatWidget } from '@/components/ChatWidget.client';
 import { SiteChromeSkeleton } from '@/components/SiteChromeSkeleton';
 import { SiteFooter } from '@/components/SiteFooter';
+import { SiteFooterV2 } from '@/components/SiteFooterV2';
 import { SiteHeader } from '@/components/SiteHeader.client';
+import { SiteHeaderV2 } from '@/components/SiteHeaderV2.client';
 import { SelectedCityProvider } from '@/components/SelectedCityProvider.client';
 import { SiteProviders } from '@/components/SiteProviders.client';
 import { slimDestinationsForLayout } from '@/lib/ssr-lean-payloads';
@@ -26,9 +28,11 @@ export async function SiteLayout({
   children,
   footerVariant = 'default',
   initialCity = null,
+  chromeVariant = 'default',
 }: {
   children: React.ReactNode;
   footerVariant?: 'default' | 'compact';
+  chromeVariant?: 'default' | 'v2';
   /**
    * Cookie/SSR city from pages that are already dynamic (home).
    * Do NOT read the request cookie store here: SiteLayout is inlined into ISR hubs/PDPs
@@ -65,13 +69,13 @@ export async function SiteLayout({
       <SelectedCityProvider destinations={destinations} initialCity={resolvedInitialCity}>
         <div className="flex min-h-screen flex-col bg-background">
           <div className="print:hidden">
-            <SiteHeader destinations={destinations} />
+            {chromeVariant === 'v2' ? <SiteHeaderV2 /> : <SiteHeader destinations={destinations} />}
           </div>
           <Suspense fallback={<SiteChromeSkeleton variant="page" omitHeader />}>
             <main className="flex-1">{children}</main>
           </Suspense>
           <div className="print:hidden pb-[calc(6rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
-            <SiteFooter destinations={destinations} variant={footerVariant} />
+            {chromeVariant === 'v2' ? <SiteFooterV2 /> : <SiteFooter destinations={destinations} variant={footerVariant} />}
             <ScrollToTopButton />
             <ChatWidget />
           </div>
