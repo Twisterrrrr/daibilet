@@ -118,9 +118,9 @@ export function CityHubPreview({
       </div>
 
       <div className="container-page py-12 sm:py-16">
-        <div className={guide.hookFact ? 'grid gap-4 md:grid-cols-[1.2fr_1fr]' : ''}>
+        <div className={guide.hookFact ? 'grid gap-4 md:grid-cols-[2fr_3fr]' : ''}>
           {guide.hookFact ? (
-            <section className="rounded-2xl border border-[#e8dab8] bg-[#faf6ee] px-6 py-5">
+            <section className="flex flex-col justify-center rounded-2xl border border-[#e8dab8] bg-[#faf6ee] px-6 py-5">
               <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.08em] text-[#a88740]">
                 <Info className="h-4 w-4" aria-hidden />
                 Интересный факт
