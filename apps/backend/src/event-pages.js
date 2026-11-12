@@ -754,9 +754,10 @@ export async function resolvePublicEventPageEventIds(db, eventPageId, directEven
 }
 
 /**
- * Ensure a private EventPage shell for a currently saleable catalog Event.
- * Safe to call from every provider sync: it never edits an existing page or
- * groups sibling slots. The slug remains a candidate until editorial review.
+ * Ensure an EventPage for a currently saleable catalog Event.
+ * Safe to call from provider sync: existing direct links stay untouched, while
+ * one explicit Ticketscloud parent may add a same-city sibling to its page.
+ * New standalone pages remain private candidates until editorial review.
  */
 export async function ensureDraftEventPageForEvent(client, eventId) {
   if (!client || typeof client.query !== 'function') throw new Error('A PostgreSQL query client is required');
@@ -889,15 +890,11 @@ export async function ensureDraftEventPageForEvent(client, eventId) {
     `, [sourceId, metaExternalId, event.primaryCityId, eventId]);
     if (matchingPages.rows.length === 1) {
       const pageId = matchingPages.rows[0].id;
-      const linkedEvents = await client.query(`
-        SELECT "eventId" FROM "EventPageEvent"
-        WHERE "eventPageId" = $1 ORDER BY position, "createdAt"
-      `, [pageId]);
       const adapter = { transaction: (callback) => callback({ query: (sql, params) => client.query(sql, params) }) };
-      const page = await replaceAdminEventPageEvents(adapter, pageId, {
-        eventIds: [...linkedEvents.rows.map((row) => row.eventId), eventId],
+      const page = await appendAdminEventPageEventsBatch(adapter, pageId, {
+        eventIds: [eventId],
         changeNote: `Автопривязка синхронизацией: одинаковый Ticketscloud metaExternalId и город (${event.cityTitle})`,
-      });
+      }, null, { allowPublished: true });
       return { created: false, grouped: true, id: page.id, slug: page.slug };
     }
   }
@@ -1170,12 +1167,13 @@ export async function replaceAdminEventPageEvents(db, id, payload, actorId = nul
 }
 
 /**
- * Append a large, explicitly reviewed Event ID batch without replacing existing links.
+ * Append an Event ID batch without replacing existing links.
  * The request is atomic; up to 5,000 IDs are accepted and inserted in SQL chunks of 500.
  * Repeating a successful request is safe: IDs already linked to this page are reported,
- * while IDs owned by another page reject the whole transaction.
+ * while IDs owned by another page reject the whole transaction. Published pages stay
+ * protected by default; trusted sync code may opt in for an explicit provider match.
  */
-export async function appendAdminEventPageEventsBatch(db, id, payload, actorId = null) {
+export async function appendAdminEventPageEventsBatch(db, id, payload, actorId = null, { allowPublished = false } = {}) {
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)) throw new Error('Invalid EventPage batch payload');
   const eventIds = normalizeEventPageBatchAppendIds(payload.eventIds);
   const changeNote = optionalText(payload.changeNote, 'changeNote', 1000);
@@ -1184,7 +1182,7 @@ export async function appendAdminEventPageEventsBatch(db, id, payload, actorId =
     const pageResult = await query(`SELECT * FROM "EventPage" WHERE id = $1 FOR UPDATE`, [id]);
     const page = pageResult.rows[0];
     if (!page) return null;
-    if (page.publishedAt != null || page.isIndexable === true) {
+    if (!allowPublished && (page.publishedAt != null || page.isIndexable === true)) {
       throw new Error('Batch EventPage links can only be changed before publication');
     }
 

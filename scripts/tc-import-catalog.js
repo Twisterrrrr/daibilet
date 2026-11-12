@@ -155,18 +155,12 @@ async function importCatalogEvents(catalog, options = {}) {
     providerMetadataRows: 0,
   };
 
+  let transactionStarted = false;
   try {
-    await client.query("BEGIN");
-    await ensureSource(client);
-    await ensureCategories(client);
-
-    const beforeResult = await client.query(
-      `select count(*)::int as count from "EventSourceLink" where "sourceId" = $1`,
-      [TICKETSCLOUD_SOURCE_ID],
-    );
-    stats.eventsBefore = beforeResult.rows[0]?.count ?? 0;
-
-    await client.query(
+    // Keep the run marker outside the catalog transaction so a later rollback
+    // does not erase the failure record along with the imported catalog rows.
+    await ensureSource(pool);
+    await pool.query(
       `
         insert into "SourceSyncRun" (id, "sourceId", status, mode, "startedAt", stats)
         values ($1, $2, 'RUNNING', $3, $4, $5::jsonb)
@@ -179,6 +173,16 @@ async function importCatalogEvents(catalog, options = {}) {
         JSON.stringify({ summaryCounts: summary?.counts || null, skipMissingFromCatalog }),
       ],
     );
+
+    await client.query("BEGIN");
+    transactionStarted = true;
+    await ensureCategories(client);
+
+    const beforeResult = await client.query(
+      `select count(*)::int as count from "EventSourceLink" where "sourceId" = $1`,
+      [TICKETSCLOUD_SOURCE_ID],
+    );
+    stats.eventsBefore = beforeResult.rows[0]?.count ?? 0;
 
     const importedEventIds = [];
     const cityIdCache = new Map();
@@ -269,7 +273,7 @@ async function importCatalogEvents(catalog, options = {}) {
     await client.query("COMMIT");
     return stats;
   } catch (error) {
-    await client.query("ROLLBACK");
+    if (transactionStarted) await client.query("ROLLBACK");
     try {
       await pool.query(
         `
