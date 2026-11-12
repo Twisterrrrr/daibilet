@@ -2150,7 +2150,7 @@ function decodeVenueCatalogCursor(raw) {
 }
 
 function catalogPopularity(item) {
-  return Math.max(Number(item.events) || 0, Number(item.stopEventCount) || 0);
+  return Number(item.futureSessionCount) || 0;
 }
 
 function sortVenueCatalogItems(items, sortMode) {
@@ -2560,6 +2560,33 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
   let pageItems = countsPending
     ? page.map((item) => ({ ...item, events: 0, nextSlot: null }))
     : page;
+  if (!countsPending && !isPins && pageItems.length) {
+    try {
+      const catalog = await import('./public-catalog.dto.js');
+      const sessions = await catalog.getPublicCatalogSessionsSoft(1_500, { hydrateSlots: false });
+      if (sessions) {
+        const nextByVenue = new Map();
+        for (const session of sessions) {
+          if (!session.venueId || !session.startsAt) continue;
+          const startsAt = Date.parse(session.startsAt);
+          if (!Number.isFinite(startsAt) || startsAt < Date.now() - 15 * 60 * 1000) continue;
+          const current = nextByVenue.get(session.venueId);
+          if (!current || startsAt < current.startsAt) {
+            nextByVenue.set(session.venueId, {
+              startsAt,
+              event: { title: session.title, dateLabel: session.dateLabel },
+            });
+          }
+        }
+        pageItems = pageItems.map((item) => ({
+          ...item,
+          ...(nextByVenue.get(item.id)?.event ? { nextEvent: nextByVenue.get(item.id).event } : {}),
+        }));
+      }
+    } catch {
+      // The venue feed remains available while the catalog cache is cold.
+    }
+  }
   // The sitemap asks for the dump limit with a hard refresh. Detail may have no
   // public catalog sessions even when the legacy event count is positive.
   if (options.freshHub === true && requestedLimit >= VENUE_CATALOG_HUB_MAX && !countsPending) {

@@ -29,6 +29,7 @@ import {
   shouldSynthesizeWidgetOnlySession,
 } from './public-event-widget-fallback.js';
 import { pickCatalogSubcategories } from './public-catalog.mapper.js';
+import { formatReviewDisplayName } from './review-display.js';
 import { spreadCatalogSessionsByCoverImage } from './public-catalog-spread.js';
 import { pickRelatedSessions } from './event-related.js';
 import { formatPublicEventTitle } from './event-title-normalize.ts';
@@ -585,6 +586,22 @@ async function loadPublicEventDto(
     event.purchaseProvider = null;
   }
   const publicOffers = hasEndedFallback ? [] : offers;
+  const pdp = await attachReadyEventPdp(requestedEvent.id);
+  const [ratingSummary, reviews] = await loadPublicEventReviews(groupEventIds);
+  const pdpSections = pdp?.content.sections || [];
+  const program = pdpSections
+    .filter((section) => section.kind === 'program')
+    .flatMap((section) => (section.items || []).map((item) => ({
+      timeLabel: item.timeLabel || item.meta || '',
+      title: item.title,
+      ...(item.description ? { description: item.description } : {}),
+    })).filter((item) => item.timeLabel));
+  const faq = pdpSections
+    .filter((section) => section.kind === 'faq')
+    .flatMap((section) => (section.items || []).map((item) => ({
+      q: item.title,
+      a: item.description || item.meta || '',
+    })).filter((item) => item.q && item.a));
   const ticketPrices = hasEndedFallback ? [] : buildTicketPrices(publicOffers, sessions, event);
   const purchaseOptionEvents = stablePagePublished && stablePageEvents.length > 1
     ? stablePageEvents
@@ -646,6 +663,10 @@ async function loadPublicEventDto(
   return {
     generatedAt: new Date().toISOString(),
     event,
+    rating: ratingSummary,
+    reviews,
+    ...(program.length ? { program } : {}),
+    ...(faq.length ? { faq } : {}),
     availability,
     ...(stablePage ? {
       eventPageRoute: {
@@ -665,7 +686,7 @@ async function loadPublicEventDto(
         seoDescription: stablePage.seoDescription,
       } : null,
     } : { eventPageRoute: null, eventPage: null }),
-    pdp: await attachReadyEventPdp(requestedEvent.id),
+    pdp,
     ...(requestedSessionContext && sessions.some((session) => session.eventId !== requestedEvent.id)
       ? { requestedSessionContext }
       : {}),
@@ -728,6 +749,38 @@ async function attachReadyEventPdp(eventId: string): Promise<PublicPdpDocumentDt
     console.warn('[public-event-pdp] optional document lookup failed', error);
     return null;
   }
+}
+
+async function loadPublicEventReviews(
+  eventIds: string[],
+): Promise<[
+  { value: number; count: number } | null,
+  NonNullable<PublicEventPageDto['reviews']>,
+]> {
+  const ids = [...new Set(eventIds.filter(Boolean))];
+  if (!ids.length) return [null, []];
+  const where = { eventId: { in: ids }, status: 'APPROVED' as const };
+  const [aggregate, rows] = await Promise.all([
+    prisma.review.aggregate({ where, _avg: { rating: true }, _count: { _all: true } }),
+    prisma.review.findMany({
+      where,
+      orderBy: [{ isVerified: 'desc' }, { createdAt: 'desc' }],
+      take: 8,
+      select: { id: true, authorName: true, rating: true, text: true, createdAt: true, publishedAt: true },
+    }),
+  ]);
+  const count = aggregate._count._all;
+  const average = aggregate._avg.rating || 0;
+  const rating = count >= 10 && average > 0
+    ? { value: Math.round(average * 10) / 10, count }
+    : null;
+  return [rating, rows.map((row) => ({
+    id: row.id,
+    authorName: formatReviewDisplayName(row.authorName),
+    rating: row.rating,
+    text: row.text,
+    createdAt: (row.publishedAt || row.createdAt).toISOString(),
+  }))];
 }
 
 async function resolveEvent(eventSlugOrId: string): Promise<EventRecord | null> {

@@ -68,6 +68,7 @@ export interface PublicSessionDto extends PurchaseFields {
   venueId?: string | null;
   venueSlug?: string | null;
   venue: string;
+  venueMetroStation?: string | null;
   venueAddress?: string | null;
   venueKind: string;
   offerTitle?: string | null;
@@ -88,6 +89,7 @@ export interface PublicSessionDto extends PurchaseFields {
   priceTo?: number | null;
   vacant?: number | null;
   imageUrl?: string | null;
+  rating?: { value: number; count: number } | null;
   manualLandingStatus?: string | null;
 }
 
@@ -109,6 +111,7 @@ export interface PublicCatalogListItemDto extends PurchaseFields {
   destinationType: DestinationType;
   venueSlug?: string | null;
   venue: string;
+  venueMetroStation?: string | null;
   venueKind: string;
   category: string;
   subcategories?: string[];
@@ -124,6 +127,7 @@ export interface PublicCatalogListItemDto extends PurchaseFields {
   priceTo?: number | null;
   vacant?: number | null;
   imageUrl?: string | null;
+  rating?: { value: number; count: number } | null;
 }
 
 export interface PublicCatalogDto extends ApiEnvelope {
@@ -153,6 +157,7 @@ export interface PublicVenueDto extends SeoFields {
   latitude?: number | null;
   longitude?: number | null;
   metroStation?: string | null;
+  nextEvent?: { title: string; dateLabel: string } | null;
   wayToFind?: string | null;
   parkingInfo?: string | null;
   type: string;
@@ -234,6 +239,10 @@ export interface PublicPurchaseOptionDto extends PurchaseFields {
 
 export interface PublicEventPageDto extends ApiEnvelope {
   event: PublicEventDto;
+  rating?: { value: number; count: number } | null;
+  reviews?: Array<{ id: string; authorName: string; rating: number; text: string; createdAt: string; authorRole?: string | null }>;
+  program?: Array<{ timeLabel: string; title: string; description?: string }>;
+  faq?: Array<{ q: string; a: string }>;
   availability?: 'AVAILABLE' | 'ENDED' | 'NO_UPCOMING' | null;
   pdp?: PublicPdpDocumentDto | null;
   eventPage?: {
@@ -391,7 +400,7 @@ export interface PublicPdpDocumentDto {
     facts?: Array<{ label: string; value: string; sourceUrl?: string; verifiedAt?: string }>;
     sections?: Array<{
       id: string; kind: string; title?: string; body?: string;
-      items?: Array<{ title: string; description?: string; imageUrl?: string; linkUrl?: string; meta?: string; details?: Array<{ label: string; value: string }> }>;
+      items?: Array<{ title: string; description?: string; imageUrl?: string; linkUrl?: string; meta?: string; timeLabel?: string; details?: Array<{ label: string; value: string }> }>;
     }>;
     sources?: Array<{ title: string; url: string; checkedAt?: string }>;
     conversion?: { mode: string; primaryAction: string; label?: string; targetEventId?: string; externalUrl?: string };
