@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { CityHubPreview } from '@/components/CityHubPreview';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
+import '@/styles/cityhub-v2.css';
 import { mergeBlogCards } from '@/lib/blog-utils';
 import { resolveCityInfo } from '@/lib/cityInfo';
 import { getCachedCityHubArticles, loadCityDto } from '@/server/cached-city-data';

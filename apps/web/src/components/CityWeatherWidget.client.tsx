@@ -31,6 +31,8 @@ type Props = {
   citySlug: string;
   cityIn?: string;
   editorial?: boolean;
+  /** Только прогноз погоды, без блока «Когда ехать» (для V2-превью хаба). */
+  hideSeasons?: boolean;
 };
 
 type LoadState =
@@ -84,7 +86,7 @@ const TAB_ICON = {
   winter: Snowflake,
 } as const;
 
-export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props) {
+export function CityWeatherWidget({ citySlug, cityIn, editorial = false, hideSeasons = false }: Props) {
   const resolvedSlug = normalizeCityHubSlug(citySlug) || citySlug;
   const flavor = resolveCityLocalFlavor(resolvedSlug);
   const weather = flavor?.weather;
@@ -130,7 +132,7 @@ export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props
   const hasSeasons = Boolean(whenToGo?.seasons?.length);
   // Reserve forecast column as soon as weather pack exists (avoid late pop-in after fetch).
   const showForecastShell = Boolean(weather);
-  const twoCol = showForecastShell && hasSeasons;
+  const twoCol = showForecastShell && hasSeasons && !hideSeasons;
   const forecastPending = showForecastShell && !showForecast;
   const kickerClass = editorial
     ? 'text-xs font-bold uppercase tracking-[0.14em] text-zinc-500'
@@ -228,7 +230,7 @@ export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props
           </div>
         ) : null}
 
-        {hasSeasons && whenToGo ? (
+        {hasSeasons && whenToGo && !hideSeasons ? (
           <div
             className={
               twoCol ? `min-w-0 md:border-l md:pl-6 ${forecastRule}` : 'min-w-0'
