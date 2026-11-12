@@ -22,6 +22,12 @@
 [Зависание SSR и ответы 502 роботам - 16.10.2026](./ssr-hang-crawler-2026-10-16.md)
 [Teplohod: baseline Sharp и Next Image Optimizer - 21.10.2026](./teplohod-image-optimization-experiment-2026-10-21.md)
 [Teplohod PDP: выборочные статические WebP обложки - 21.10.2026](./teplohod-pdp-webp-pilot-2026-10-21.md)
+[Городские хабы: сверка коммитов и незавершённых правок - 12.11.2026](./city-hub-work-log-2026-11-12.md)
+[Карта рабочих копий и переносов - 10.11.2026](./local-workspace-inventory-2026-11-10.md)
+[Сверка tours с активной копией Daibilet - 10.11.2026](./tours-vs-daibilet-audit-2026-11-10.md)
+[Диагностика production-сети и диска](./production-network-and-disk-diagnostics.md)
+[Индексируемые EventPage с активными рерайтами - 12.11.2026](./eventpage-rewrite-recrawl-queue-2026-11-12.md)
+[Редакторский батч EventPage: 30 текстов, источники и сверка - 11.11.2026](./eventpage-rewrite-batch-30-source-audit-2026-11-11.md)
 [ISR 500 на удалённых событиях - 21.10.2026](./event-not-found-ssr-regression-2026-10-21.md)
 
 Навигация по репозиторию `Twisterrrrr/daibilet`.
