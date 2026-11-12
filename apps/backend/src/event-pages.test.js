@@ -166,6 +166,24 @@ test('EventPage batch append chunks large inserts and safely accepts a repeated 
   assert.equal(second.alreadyLinkedCount, 501);
   assert.equal(second.eventCount, 501);
   assert.deepEqual(insertChunkSizes, [500, 1]);
+
+  page.status = 'READY';
+  page.publishedAt = new Date();
+  page.isIndexable = true;
+  await assert.rejects(
+    appendAdminEventPageEventsBatch(db, 'page-1', { eventIds: ['evt-502'] }),
+    /can only be changed before publication/,
+  );
+  const publishedAddition = await appendAdminEventPageEventsBatch(
+    db,
+    'page-1',
+    { eventIds: ['evt-502'], changeNote: 'Explicit provider parent match' },
+    null,
+    { allowPublished: true },
+  );
+  assert.equal(publishedAddition.addedCount, 1);
+  assert.equal(publishedAddition.eventCount, 502);
+  assert.equal(links.get('evt-502'), 'page-1');
 });
 
 test('EventPage batch append rejects duplicate IDs and batches above 5,000', async () => {
