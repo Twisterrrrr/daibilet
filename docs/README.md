@@ -28,6 +28,10 @@
 [Диагностика production-сети и диска](./production-network-and-disk-diagnostics.md)
 [Индексируемые EventPage с активными рерайтами - 12.11.2026](./eventpage-rewrite-recrawl-queue-2026-11-12.md)
 [Редакторский батч EventPage: 30 текстов, источники и сверка - 11.11.2026](./eventpage-rewrite-batch-30-source-audit-2026-11-11.md)
+[Рерайты EventPage: production apply и редакционные источники - 05.11.2026](./eventpage-rewrite-production-apply-2026-11-05.md)
+[Аудит источников редакционных EventPage - 04.11.2026](./eventpage-editorial-source-audit-2026-11-04.md)
+[Новогодние EventPage B01–B03: production apply - 10.11.2026](./archives/new-year-batches-b01-b03-production-2026-11-10.md)
+[Архив редакционных правок EventPage - 09–10.11.2026](./eventpage-editorial-archive-2026-11-09-10.md)
 [ISR 500 на удалённых событиях - 21.10.2026](./event-not-found-ssr-regression-2026-10-21.md)
 
 Навигация по репозиторию `Twisterrrrr/daibilet`.
