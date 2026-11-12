@@ -222,3 +222,10 @@
 
 /* Map fixture display font to the app's self-hosted Unbounded (hashed next/font family). */
 .v2{--font-display:var(--font-unbounded),'Inter',sans-serif}
+
+
+/* Native <details> adaptation for the event PDP .faq-item accordion (mockup used JS .is-open). */
+.v2 .faq-item summary{list-style:none;cursor:pointer}
+.v2 .faq-item summary::-webkit-details-marker{display:none}
+.v2 .faq-item[open] .faq-q::after{transform:rotate(45deg);color:var(--accent)}
+.v2 .faq-item[open] .faq-a{max-height:300px;padding-bottom:18px}

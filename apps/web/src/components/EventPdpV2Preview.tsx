@@ -14,6 +14,9 @@ export function EventPdpV2Preview({ page }: { page: PublicEventPageDto }) {
   const mainImage = gallery?.[0]?.url || event.imageUrl;
   const thumbs = gallery?.slice(0, 4) ?? [];
   const related = (page.related ?? []).slice(0, 4);
+  const sections = page.pdp?.content?.sections ?? [];
+  const programSection = sections.find((s) => s.kind === 'program');
+  const faqSection = sections.find((s) => s.kind === 'faq');
   const price = event.priceFrom ?? page.stats?.priceFrom ?? null;
   const ctaUrl = sessions[0]?.purchaseUrl || event.purchaseUrl || null;
 
@@ -62,6 +65,23 @@ export function EventPdpV2Preview({ page }: { page: PublicEventPageDto }) {
         <div className="container">
           <div className="main__grid">
             <div className="content">
+              {programSection?.items?.length ? (
+                <section>
+                  <h2>{programSection.title || 'Программа вечера'}</h2>
+                  <ul className="program">
+                    {programSection.items.map((it, i) => (
+                      <li key={i}>
+                        <span className="program__time">{it.meta || ''}</span>
+                        <div className="program__body">
+                          <strong>{it.title}</strong>
+                          {it.description ? <span>{it.description}</span> : null}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null}
+
               <section>
                 <h2>Что важно знать</h2>
                 <div className="info-grid">
@@ -71,6 +91,18 @@ export function EventPdpV2Preview({ page }: { page: PublicEventPageDto }) {
                   {price ? <div className="info-card"><div><strong>Цена</strong><span>{rub(price)}</span></div></div> : null}
                 </div>
               </section>
+
+              {faqSection?.items?.length ? (
+                <section>
+                  <h2>{faqSection.title || 'Частые вопросы'}</h2>
+                  {faqSection.items.map((it, i) => (
+                    <details key={i} className="faq-item">
+                      <summary className="faq-q">{it.title}</summary>
+                      <p className="faq-a">{it.description}</p>
+                    </details>
+                  ))}
+                </section>
+              ) : null}
 
               {related.length ? (
                 <section className="related">

@@ -25,10 +25,11 @@ Builder: `apps/backend/src/public-catalog.dto.ts`.
 | # | Поле | Тип | Источник | Приоритет |
 |---|---|---|---|---|
 | A1 | `venueMetroStation` | `string \| null` | `Venue.metroStation` (в `PublicVenueDto` уже проброшено, в каталог - нет) | Высокий |
-| A2 | `rating` | `{ value: number; count: number } \| null` | Агрегат по `Review` (status=APPROVED); логика уже есть в вебе `apps/web/src/server/cached-event-data.ts` -> `getCachedEventAggregateRating` | Высокий |
+| A2 | `rating` | `{ value: number; count: number } \| null` | Батчевый агрегат по `Review` (status=APPROVED) одним запросом на пакет событий; каталог сохраняет рейтинг в своём кэше. Логика агрегата уже есть в вебе `apps/web/src/server/cached-event-data.ts` -> `getCachedEventAggregateRating` | Высокий |
 
-Примечание к A2: тянуть денормализованно в список, иначе один запрос на карточку
-умножит нагрузку каталога. Отдельные отзывы в список не нужны.
+Примечание к A2: тянем денормализованно в список батчем (один aggregated-запрос на
+пакет, не N запросов), результат кладём в кэш каталога. Отдельные отзывы в список не
+нужны.
 
 ## B. PDP события: `PublicEventPageDto`
 
@@ -38,10 +39,17 @@ Builder: `apps/backend/src/public-event.dto.ts`.
 
 | # | Поле | Тип | Источник | Приоритет |
 |---|---|---|---|---|
-| B1 | `rating` | `{ value: number; count: number } \| null` | тот же агрегат, что A2 | Высокий |
-| B2 | `reviews` | `Array<{ id; authorName; rating; text; createdAt; authorRole? }>` | `Review` (APPROVED), первые ~5-10. `authorRole` - если есть подпись роли, в схеме может отсутствовать | Средний |
-| B3 | `program` | `Array<{ timeLabel: string; title: string; description? }>` | Блок «Программа вечера». Отдельной модели нет; предложение - формализовать конвенцию через `pdp.content.sections[]` c `kind: 'program'`, где `item.meta` = время, либо добавить `timeLabel` в items | Средний |
-| B4 | `faq` | `Array<{ q: string; a: string }>` | Блок «Частые вопросы» события. Конвенция уже есть - `PublicRegionInfoDto.faq` | Средний |
+| B1 | `rating` | `{ value: number; count: number } \| null` | батчевый агрегат по `Review` (см. A2), закешированный каталогом | Высокий |
+| B2 | `reviews` | `Array<{ id; authorName; rating; text; createdAt }>` | `Review` (APPROVED), первые ~5-10. `authorRole` не добавлять - такого поля в схеме `Review` нет | Средний |
+
+Программа и FAQ - без новых top-level полей DTO:
+
+- Выводятся из редакционных `pdp.content.sections[]` по явным `kind: 'program'` /
+  `kind: 'faq'` (конвенция на стороне web).
+- Единственная правка контракта: добавить `timeLabel?: string` в items-схему
+  `PublicPdpDocumentDto.content.sections[].items[]` (время пункта программы; web
+  сегодня читает `item.meta`, после правки переключится на `timeLabel || meta`).
+- FAQ: `item.title` = вопрос, `item.description` = ответ.
 
 ## C. Площадки: `PublicVenueDto` / venue catalog feed
 
@@ -51,9 +59,10 @@ Builder: `apps/backend/src/public-venue.dto.ts` (+ legacy `apps/backend/src/dto.
 
 | # | Поле | Тип | Источник | Приоритет |
 |---|---|---|---|---|
-| C1 | `district` | `string \| null` | Район для фейсета «Район: любой», строки `yp-row` и сортировки «по району». В `Venue` поля района нет - нужен источник (редакционное поле или форвард из гео) | Низкий (дорогой: нет источника в БД) |
 | C2 | `nextEvent` | `{ title: string; dateLabel: string } \| null` | Ближайшая будущая сессия площадки (считается рядом с `futureSessionCount`) | Высокий (дёшево) |
-| C3 | `capacity` | `number \| null` | Вместимость (featured / yp в макете). Редакционное поле | Низкий |
+
+Откладывается: `district` (бывший C1) и `capacity` (бывший C3) в эту итерацию не
+добавляются, Prisma не меняется - в `Venue` нет источника этих полей.
 
 Примечание к C: бейдж «N событий» и сортировка «по количеству событий» должны брать
 `futureSessionCount` (уже есть в `PublicVenueDto`), а не `events` (all-time) - иначе
@@ -79,10 +88,11 @@ Builder: `apps/backend/src/public-venue.dto.ts` (+ legacy `apps/backend/src/dto.
 
 ## Порядок выполнения
 
-1. A1 + A2 (карточки главной и афиши - самый частый UI).
+1. A1 + A2 (карточки главной и афиши - самый частый UI; рейтинг батчевым агрегатом).
 2. B1 + B2 (PDP события).
 3. C2 (ближайшее событие - дёшево, рядом с futureSessionCount).
-4. B3, B4, C1, C3 по готовности (B4/C2 дешёвые, C1 требует решения по источнику района).
+4. B3/B4: программа и FAQ из `pdp.content.sections` (`kind: program/faq`) + `timeLabel` в items.
+   `district` (C1) и `capacity` (C3) - отложены, источника в `Venue` нет, Prisma не трогаем.
 
 ## Приёмка
 
