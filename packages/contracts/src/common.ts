@@ -43,11 +43,15 @@ export function indexabilityDecision(input: {
   template?: 'location' | 'institution' | null;
 }): { indexable: boolean; reason: string } {
   if (input.detailAvailable === false) return { indexable: false, reason: 'detail_unavailable' };
-  if (input.isIndexable === false) return { indexable: false, reason: 'explicit_noindex' };
   if (String(input.pageStatus || '').trim().toUpperCase() === 'HIDDEN') return { indexable: false, reason: 'hidden_page' };
   if (['meeting_point', 'online', 'other'].includes(String(input.type || '').trim().toLowerCase())) {
     return { indexable: false, reason: 'non_venue_type' };
   }
+  const pageStatus = String(input.pageStatus || '').trim().toUpperCase();
+  if (pageStatus === 'CANDIDATE') return { indexable: false, reason: 'candidate_noindex' };
+  // Editorial publication is the indexation decision; ticket availability is independent.
+  if (pageStatus === 'PUBLISHED') return { indexable: true, reason: 'published_editorial_page' };
+  if (input.isIndexable === false) return { indexable: false, reason: 'explicit_noindex' };
   const futureSessions = Number(input.futureSessions) || 0;
   if (futureSessions < 1) return { indexable: false, reason: 'zero_future_sessions' };
   if (input.template && input.hasAddress != null && input.hasDescription != null && input.hasHeroImage != null) {

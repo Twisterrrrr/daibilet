@@ -54,6 +54,8 @@ export type HubIndexDecision = {
     | 'low_event_count'
     | 'zero_events'
     | 'explicit_noindex'
+    | 'candidate_noindex'
+    | 'published_editorial_page'
     | 'hidden_page'
     | 'detail_unavailable'
     | 'non_venue_type'

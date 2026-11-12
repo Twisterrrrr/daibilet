@@ -6,14 +6,14 @@ import { markVenueSitemapCanonicalSlugs, markVenueSitemapDetailAvailability } fr
 
 test('detail content gate matches the no-session venue branches', () => {
   const base = { title: 'Зал', kind: 'CONCERT_HALL', pageStatus: 'CANDIDATE', address: 'ул. 1' };
-  assert.equal(evaluateVenueDetailContentGate(base, 'concert_hall', 'institution').reason, 'missing_text');
+  assert.deepEqual(evaluateVenueDetailContentGate(base, 'concert_hall', 'institution'), { available: true, reason: 'candidate_basic_page' });
   assert.equal(evaluateVenueDetailContentGate({ ...base, shortDescription: 'О зале' }, 'concert_hall', 'institution').available, true);
   assert.equal(evaluateVenueDetailContentGate({ ...base, kind: 'PIER', address: '', shortDescription: 'Причал' }, 'pier', 'location').reason, 'missing_address');
   assert.equal(evaluateVenueDetailContentGate({ ...base, pageStatus: 'NONE', shortDescription: 'О зале' }, 'concert_hall', 'institution').reason, 'none_status');
   assert.equal(evaluateVenueDetailContentGate({ ...base, pageStatus: 'PUBLISHED', shortDescription: 'О зале' }, 'concert_hall', 'institution').available, true);
 });
 
-test('sitemap batch keeps venues with catalog sessions and excludes content-only 404s', () => {
+test('candidate venue detail stays available without sessions or editorial copy', () => {
   const rows = [
     { id: 'bad', slug: 'empty-hall', title: 'Пустой зал', kind: 'CONCERT_HALL', pageStatus: 'CANDIDATE', address: 'ул. 1', city: 'Москва' },
     { id: 'live', slug: 'live-hall', title: 'Живой зал', kind: 'CONCERT_HALL', pageStatus: 'CANDIDATE', address: 'ул. 2', city: 'Москва' },
@@ -24,15 +24,16 @@ test('sitemap batch keeps venues with catalog sessions and excludes content-only
   const catalog = { resolveCatalogSessionsByVenueKeys: (keys: string[]) => keys.includes('live') ? [session] : [] };
   const result = markVenueSitemapDetailAvailability(pageItems, rows, [session], catalog);
   assert.equal(result[0].isIndexable, false);
-  assert.equal(result[0].detailAvailable, false);
+  assert.equal(result[0].detailAvailable, true);
+  assert.equal(result[0].isIndexable, false);
   assert.equal(result[1].detailAvailable, true);
   assert.equal(result[2].detailAvailable, true);
 });
 
-test('sitemap batch follows venue detail indexability for weak institution pages', () => {
+test('sitemap batch follows editorial venue status regardless of sales counts', () => {
   const rows = [
     { id: 'weak', slug: 'weak-club', title: 'Weak club', kind: 'CLUB_BAR_RESTAURANT', pageStatus: 'CANDIDATE', address: 'ул. 1', shortDescription: 'О клубе', city: 'Москва', isIndexable: true },
-    { id: 'strong', slug: 'strong-club', title: 'Strong club', kind: 'CLUB_BAR_RESTAURANT', pageStatus: 'CANDIDATE', address: 'ул. 2', shortDescription: 'О клубе', city: 'Москва', isIndexable: true },
+    { id: 'strong', slug: 'strong-club', title: 'Strong club', kind: 'CLUB_BAR_RESTAURANT', pageStatus: 'PUBLISHED', address: 'ул. 2', shortDescription: 'О клубе', city: 'Москва', isIndexable: true },
     { id: 'blocked', slug: 'blocked-club', title: 'Blocked club', kind: 'CLUB_BAR_RESTAURANT', pageStatus: 'CANDIDATE', address: 'ул. 3', shortDescription: 'О клубе', city: 'Москва', isIndexable: false },
   ];
   const pageItems = rows.map((row) => ({ id: row.id, slug: row.slug, events: 3 }));
@@ -46,6 +47,20 @@ test('sitemap batch follows venue detail indexability for weak institution pages
   assert.deepEqual(result.map((item: { detailAvailable?: boolean; isIndexable?: boolean }) => [item.detailAvailable, item.isIndexable]), [
     [true, false], [true, true], [true, false],
   ]);
+});
+
+test('published venue without future sessions remains eligible for sitemap slug verification', async () => {
+  let duplicateLookupCalls = 0;
+  const db = {
+    query: async (sql: string) => {
+      if (sql.includes('group by slug')) duplicateLookupCalls += 1;
+      return { rows: [] };
+    },
+  };
+  const items = [{ id: 'museum-published', slug: 'museum-published', pageStatus: 'PUBLISHED', isIndexable: true, futureSessionCount: 0 }];
+  const result = await markVenueSitemapCanonicalSlugs(items, db);
+  assert.equal(duplicateLookupCalls, 1);
+  assert.equal(result[0]?.isIndexable, true);
 });
 
 test('sitemap excludes a duplicate slug that resolves to another venue ID', async () => {

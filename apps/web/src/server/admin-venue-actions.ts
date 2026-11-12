@@ -27,6 +27,7 @@ function backSuffix(formData: FormData): string {
 export async function saveAdminVenueAction(formData: FormData) {
   const id = String(formData.get('id') || '').trim();
   if (!id) throw new Error('missing venue id');
+  const pageStatus = String(formData.get('pageStatus') || 'NONE').trim().toUpperCase();
 
   const body = {
     title: String(formData.get('title') || '').trim(),
@@ -48,11 +49,11 @@ export async function saveAdminVenueAction(formData: FormData) {
     phone: emptyToNull(formData.get('phone')),
     openingHours: emptyToNull(formData.get('openingHours')),
     hookFact: emptyToNull(formData.get('hookFact')),
-    isIndexable: formData.get('isIndexable') === 'on' || formData.get('isIndexable') === 'true',
+    isIndexable: pageStatus === 'PUBLISHED',
     kind: String(formData.get('kind') || 'VENUE').trim(),
     placeType: emptyToNull(formData.get('placeType')),
     placeSubtype: emptyToNull(formData.get('placeSubtype')),
-    pageStatus: String(formData.get('pageStatus') || 'NONE').trim(),
+    pageStatus,
   };
 
   const response = await adminApiFetch(`/api/admin/venues/${encodeURIComponent(id)}`, {

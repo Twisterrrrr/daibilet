@@ -96,18 +96,14 @@ test('explicit noindex still wins and thin venues stay out', () => {
   assert.equal(evaluateVenueIndexability({ futureSessions: 3, type: 'museum', detailAvailable: false }).reason, 'detail_unavailable');
 });
 
-test('hidden venue stays out while candidate and published statuses retain the existing rule', () => {
+test('venue editorial status controls indexation independently of sessions', () => {
   assert.equal(
     evaluateVenueIndexability({ futureSessions: 5, type: 'museum', pageStatus: ' hidden ' }).reason,
     'hidden_page',
   );
-  for (const pageStatus of ['NONE', 'CANDIDATE', 'PUBLISHED']) {
-    assert.equal(
-      evaluateVenueIndexability({ futureSessions: 5, type: 'museum', pageStatus }).indexable,
-      true,
-      pageStatus,
-    );
-  }
+  assert.equal(evaluateVenueIndexability({ futureSessions: 5, type: 'museum', pageStatus: 'CANDIDATE' }).reason, 'candidate_noindex');
+  assert.equal(evaluateVenueIndexability({ futureSessions: 0, isIndexable: false, type: 'museum', pageStatus: 'PUBLISHED' }).indexable, true);
+  assert.equal(evaluateVenueIndexability({ futureSessions: 5, type: 'museum', pageStatus: 'NONE' }).indexable, true);
 });
 
 test('the excluded set stays small and explicit', () => {

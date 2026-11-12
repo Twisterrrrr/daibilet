@@ -2340,7 +2340,10 @@ export function needsVenueSitemapDetailCheck(item, duplicateSlugs, hubById) {
 }
 
 export async function markVenueSitemapCanonicalSlugs(pageItems, db, hubRows = []) {
-  const eligible = pageItems.filter((item) => item.isIndexable !== false && Number(item.futureSessionCount) > 0);
+  const eligible = pageItems.filter((item) =>
+    item.isIndexable !== false &&
+    (Number(item.futureSessionCount) > 0 || String(item.pageStatus || '').toUpperCase() === 'PUBLISHED'),
+  );
   const slugs = [...new Set(eligible.map((item) => String(item.slug || '').trim()).filter(Boolean))];
   if (!slugs.length) return pageItems;
   const duplicates = await db.query(
@@ -2855,7 +2858,21 @@ export function publicVenuesForSessionsFromHub(sessions, hubRows, limit) {
  * rank ~511 with hub limit 500 → events>0 but venues=0.
  */
 export async function resolvePublicVenuesForSessions(db, sessions, hubRows, limit = 24) {
-  const fromHub = publicVenuesForSessionsFromHub(sessions, hubRows, limit);
+  const { activeCounts, waterCounts, busCounts } = buildActiveVenueEventCounts(sessions);
+  const fromHub = publicVenuesForSessionsFromHub(sessions, hubRows, limit).map((item) => {
+    const source = (hubRows || []).find((row) => row.id === item.id);
+    const ids = source?.mergedVenueIds || [item.id];
+    const count = (counts) => ids.reduce((total, id) => total + (counts.get(id) || 0), 0);
+    const events = count(activeCounts);
+    if (!events) return item;
+    return {
+      ...item,
+      events,
+      futureSessionCount: events,
+      waterEvents: count(waterCounts),
+      busEvents: count(busCounts),
+    };
+  });
   if (fromHub.length >= limit) return fromHub;
 
   const venueIds = new Set(sessionVenueIds(sessions));
@@ -2873,8 +2890,7 @@ export async function resolvePublicVenuesForSessions(db, sessions, hubRows, limi
   const missingIds = [...venueIds].filter((id) => !coveredIds.has(id));
   if (!missingIds.length) return fromHub;
 
-  const { activeCounts, waterCounts, busCounts, heroImageFallbacks, nextSessionStartsAt } =
-    buildActiveVenueEventCounts(sessions);
+  const { heroImageFallbacks, nextSessionStartsAt } = buildActiveVenueEventCounts(sessions);
   const missingRows = (await venueRowsByIds(db, missingIds))
     .map((row) => ({
       ...row,

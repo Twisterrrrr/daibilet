@@ -2861,6 +2861,9 @@ export async function updateAdminVenue(db, venueId, payload) {
   const current = await buildAdminVenueDetail(db, venueId);
   if (!current) return null;
   const next = { ...current, ...normalized };
+  // Page status is the editorial indexation switch: candidates stay noindex,
+  // while publication enables indexing even when ticket sales are absent.
+  next.isIndexable = String(next.pageStatus || '').trim().toUpperCase() === 'PUBLISHED';
   if (Object.prototype.hasOwnProperty.call(normalized, 'cityId') && next.cityId) {
     const city = await db.query(`SELECT id FROM "City" WHERE id = $1 LIMIT 1`, [next.cityId]);
     if (!city.rows[0]) throw new Error('Unknown city');
