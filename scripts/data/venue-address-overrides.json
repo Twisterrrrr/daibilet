@@ -267,6 +267,105 @@
       "city": "Казань",
       "latitude": 55.773334,
       "longitude": 49.091479
+    },
+    {
+      "id": "venue_tep_1552",
+      "title": "Банкетный зал «Триумф»",
+      "match": ["venue_tep_1552", "Банкетный зал «Триумф»", "банкетныи-зал-триумф-1552"],
+      "kind": "CLUB_BAR_RESTAURANT",
+      "address": "Москва, Неверовского ул., 15",
+      "city": "Москва"
+    },
+    {
+      "id": "venue_tep_1051",
+      "title": "Банкетный зал гостиницы «Космос»",
+      "match": ["venue_tep_1052", "venue_tep_1506"],
+      "kind": "CLUB_BAR_RESTAURANT",
+      "city": "Москва"
+    },
+    {
+      "id": "venue_tep_1555",
+      "title": "Банкетный зал «Аструс»",
+      "match": ["venue_tep_1556"],
+      "kind": "CLUB_BAR_RESTAURANT",
+      "city": "Москва"
+    },
+    {
+      "id": "venue_tep_1049",
+      "title": "Банкетный зал Arbat Hall",
+      "match": ["venue_tep_1049", "Arbat Hall", "банкетныи-зал-arbat-hall-1049"],
+      "kind": "CLUB_BAR_RESTAURANT",
+      "city": "Москва"
+    },
+    {
+      "id": "venue_tep_1050",
+      "title": "Банкетный зал Арбат Холл",
+      "match": ["venue_tep_1050", "банкетныи-зал-арбат-холл-1050"],
+      "kind": "CLUB_BAR_RESTAURANT",
+      "city": "Москва"
+    },
+    {
+      "id": "venue_tep_738",
+      "title": "Москворецкая ул. Парковка туристического транспорта через дорогу от ул. Варварка 6",
+      "match": ["venue_tep_661", "venue_tep_778", "venue_tep_1018", "venue_tep_1300"],
+      "kind": "MEETING_POINT",
+      "city": "Москва"
+    },
+    {
+      "id": "venue_tep_1570",
+      "title": "Автобус. Отправление: Большой Москворецкий Мост",
+      "match": ["venue_tep_1570"],
+      "kind": "MEETING_POINT",
+      "city": "Москва"
+    },
+    {
+      "id": "venue_tep_1568",
+      "title": "Автобус отправляется от ул. Косыгина вл. 29",
+      "match": ["venue_tep_1568"],
+      "kind": "MEETING_POINT",
+      "city": "Москва"
+    },
+    {
+      "id": "venue_tep_1433",
+      "title": "YUTONG 6122",
+      "match": ["venue_tep_1433"],
+      "kind": "BUS",
+      "city": "Москва"
+    },
+    {
+      "id": "venue_tep_1199",
+      "title": "Транспорт зависит от размера группы",
+      "match": ["venue_tep_1199"],
+      "kind": "BUS",
+      "city": "Москва"
+    },
+    {
+      "id": "venue_tep_370",
+      "title": "Смотровая площадка на крыше небоскреба Москва-сити. \"ВЫШЕ ТОЛЬКО ЛЮБОВЬ\"",
+      "match": ["venue_tep_370"],
+      "kind": "ATTRACTION",
+      "city": "Москва"
+    },
+    {
+      "id": "venue_tep_653",
+      "title": "Болотная пл. у пам. И.Е. Репину",
+      "match": ["venue_tep_653"],
+      "kind": "MEETING_POINT",
+      "city": "Москва"
+    },
+    {
+      "id": "venue_tep_769",
+      "title": "Исаакиевская пл.",
+      "match": ["venue_tep_769"],
+      "kind": "MEETING_POINT",
+      "city": "Санкт-Петербург"
+    },
+    {
+      "id": "venue_tep_783",
+      "title": "Площадь Минина и Пожарского (у Дмитриевской башни Кремля)",
+      "match": ["venue_tep_783"],
+      "kind": "MEETING_POINT",
+      "city": "Нижний Новгород"
     }
   ]
 }
