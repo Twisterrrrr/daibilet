@@ -876,13 +876,14 @@ export async function ensureDraftEventPageForEvent(client, eventId) {
   `, [eventId]);
   if (explicitGroup.rows.length === 1 && event.primaryCityId) {
     const { sourceId, metaExternalId } = explicitGroup.rows[0];
+    // Exact key comparison keeps the sourceId/metaExternalId index usable.
     const matchingPages = await client.query(`
       SELECT DISTINCT page.id, page.slug
       FROM "EventSourceLink" sibling_link
       JOIN "Event" sibling_event ON sibling_event.id = sibling_link."eventId"
       JOIN "EventPageEvent" page_link ON page_link."eventId" = sibling_event.id
       JOIN "EventPage" page ON page.id = page_link."eventPageId"
-      WHERE sibling_link."sourceId" = $1 AND trim(sibling_link."metaExternalId") = $2
+      WHERE sibling_link."sourceId" = $1 AND sibling_link."metaExternalId" = $2
         AND sibling_event."primaryCityId" = $3
         AND sibling_event.id <> $4
       ORDER BY page.id
