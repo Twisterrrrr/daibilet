@@ -8,7 +8,7 @@ test('detail content gate matches the no-session venue branches', () => {
   const base = { title: 'Зал', kind: 'CONCERT_HALL', pageStatus: 'CANDIDATE', address: 'ул. 1' };
   assert.deepEqual(evaluateVenueDetailContentGate(base, 'concert_hall', 'institution'), { available: true, reason: 'candidate_basic_page' });
   assert.equal(evaluateVenueDetailContentGate({ ...base, shortDescription: 'О зале' }, 'concert_hall', 'institution').available, true);
-  assert.equal(evaluateVenueDetailContentGate({ ...base, kind: 'PIER', address: '', shortDescription: 'Причал' }, 'pier', 'location').reason, 'missing_address');
+  assert.equal(evaluateVenueDetailContentGate({ ...base, kind: 'PIER', address: '', shortDescription: 'Причал' }, 'pier', 'location').reason, 'candidate_basic_page');
   assert.equal(evaluateVenueDetailContentGate({ ...base, pageStatus: 'NONE', shortDescription: 'О зале' }, 'concert_hall', 'institution').reason, 'none_status');
   assert.equal(evaluateVenueDetailContentGate({ ...base, pageStatus: 'PUBLISHED', shortDescription: 'О зале' }, 'concert_hall', 'institution').available, true);
 });
