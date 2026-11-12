@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Star } from 'lucide-react';
 
 import { SafeImage } from '@/components/SafeImage.client';
 import { formatPriceFrom } from '@/lib/format';
@@ -19,9 +20,19 @@ export function V2EventCard({ item }: { item: PublicCatalogListItemDto }) {
           {item.timeLabel ? `, ${item.timeLabel}` : ''}
         </div>
         <span className="event-card__title">{item.title}</span>
-        <div className="event-card__venue">{item.venue}</div>
+        <div className="event-card__venue">
+          {item.venue}
+          {item.venueMetroStation ? ` · м. ${item.venueMetroStation}` : ''}
+        </div>
         <div className="event-card__foot">
-          <span />
+          {item.rating?.value ? (
+            <div className="rating">
+              <Star className="h-3.5 w-3.5 fill-current" aria-hidden />
+              {item.rating.value} <span>({item.rating.count})</span>
+            </div>
+          ) : (
+            <span />
+          )}
           {item.priceFrom ? <div className="price">{formatPriceFrom(item.priceFrom)}</div> : null}
         </div>
       </div>

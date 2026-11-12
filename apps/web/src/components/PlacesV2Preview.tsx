@@ -73,7 +73,15 @@ export function PlacesV2Preview({ venues, total }: { venues: PublicVenueDto[]; t
                       <span>{v.address}{v.metroStation ? ` · м. ${v.metroStation}` : ''}</span>
                     </div>
                   ) : null}
-                  {v.hookFact ? <div className="place-card__next--empty">{v.hookFact}</div> : null}
+                  {v.nextEvent ? (
+                    <div className="place-card__next">
+                      <span className="place-card__next-label">Ближайшее:</span>
+                      <span className="place-card__next-date">{v.nextEvent.dateLabel}</span>
+                      <span className="place-card__next-title">{v.nextEvent.title}</span>
+                    </div>
+                  ) : v.hookFact ? (
+                    <div className="place-card__next--empty">{v.hookFact}</div>
+                  ) : null}
                 </div>
               </Link>
             ))}

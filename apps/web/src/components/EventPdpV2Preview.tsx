@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Star } from 'lucide-react';
 
 import { SafeImage } from '@/components/SafeImage.client';
 import { V2Trust } from '@/components/V2Trust';
@@ -14,9 +15,9 @@ export function EventPdpV2Preview({ page }: { page: PublicEventPageDto }) {
   const mainImage = gallery?.[0]?.url || event.imageUrl;
   const thumbs = gallery?.slice(0, 4) ?? [];
   const related = (page.related ?? []).slice(0, 4);
-  const sections = page.pdp?.content?.sections ?? [];
-  const programSection = sections.find((s) => s.kind === 'program');
-  const faqSection = sections.find((s) => s.kind === 'faq');
+  const reviews = page.reviews ?? [];
+  const program = page.program ?? [];
+  const faq = page.faq ?? [];
   const price = event.priceFrom ?? page.stats?.priceFrom ?? null;
   const ctaUrl = sessions[0]?.purchaseUrl || event.purchaseUrl || null;
 
@@ -48,6 +49,12 @@ export function EventPdpV2Preview({ page }: { page: PublicEventPageDto }) {
             </div>
 
             <div className="hero__info">
+              {page.rating?.value ? (
+                <a href="#reviews" className="rating-inline">
+                  <Star className="h-4 w-4 fill-current" aria-hidden />
+                  {page.rating.value} <span>· {page.rating.count} отзывов</span>
+                </a>
+              ) : null}
               <h1>{event.title}</h1>
               <div className="hero__meta">
                 {sessions[0] ? <div className="hero__meta-item"><span>{sessions[0].dateLabel}</span></div> : null}
@@ -65,13 +72,13 @@ export function EventPdpV2Preview({ page }: { page: PublicEventPageDto }) {
         <div className="container">
           <div className="main__grid">
             <div className="content">
-              {programSection?.items?.length ? (
+              {program.length ? (
                 <section>
-                  <h2>{programSection.title || 'Программа вечера'}</h2>
+                  <h2>Программа вечера</h2>
                   <ul className="program">
-                    {programSection.items.map((it, i) => (
+                    {program.map((it, i) => (
                       <li key={i}>
-                        <span className="program__time">{it.meta || ''}</span>
+                        <span className="program__time">{it.timeLabel}</span>
                         <div className="program__body">
                           <strong>{it.title}</strong>
                           {it.description ? <span>{it.description}</span> : null}
@@ -92,13 +99,32 @@ export function EventPdpV2Preview({ page }: { page: PublicEventPageDto }) {
                 </div>
               </section>
 
-              {faqSection?.items?.length ? (
+              {reviews.length ? (
+                <section id="reviews">
+                  <h2>Отзывы {page.rating ? <span style={{ color: 'var(--muted)', fontFamily: 'var(--font-inter)', fontSize: 16, fontWeight: 500 }}>· {page.rating.count}</span> : null}</h2>
+                  {reviews.map((r) => (
+                    <div key={r.id} className="review">
+                      <div className="review__head">
+                        <div className="review__avatar">{r.authorName?.[0] ?? '?'}</div>
+                        <div className="review__meta">
+                          <strong>{r.authorName}</strong>
+                          {r.createdAt ? <small>{new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(r.createdAt))}</small> : null}
+                        </div>
+                        <div className="review__stars">{'★'.repeat(Math.min(5, Math.max(1, Math.round(r.rating))))}</div>
+                      </div>
+                      <p className="review__text">{r.text}</p>
+                    </div>
+                  ))}
+                </section>
+              ) : null}
+
+              {faq.length ? (
                 <section>
-                  <h2>{faqSection.title || 'Частые вопросы'}</h2>
-                  {faqSection.items.map((it, i) => (
+                  <h2>Частые вопросы</h2>
+                  {faq.map((it, i) => (
                     <details key={i} className="faq-item">
-                      <summary className="faq-q">{it.title}</summary>
-                      <p className="faq-a">{it.description}</p>
+                      <summary className="faq-q">{it.q}</summary>
+                      <p className="faq-a">{it.a}</p>
                     </details>
                   ))}
                 </section>
