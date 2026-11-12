@@ -289,6 +289,8 @@ export type CitySuburbGastroStop = {
 /** Вложенная точка внутри significantSuburb (мини-локация day-trip). */
 export type CitySuburbPlace = CityPlaceLinkFields & {
   name: string;
+  /** Direct editorial cover for this nested suburb point. */
+  imageUrl?: string | null;
   /** Краткое описание для блока «Что посмотреть». */
   desc?: string;
   address?: string | null;
@@ -4904,7 +4906,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
   ulyanovsk: {
     brief:
       'Симбирск - старинный город на крутом холме над Волгой, чья панорама захватывает дух из-за невероятной ширины Куйбышевского водохранилища. Крупный авиационный центр страны и родина Владимира Ленина, сохранившая огромный исторический квартал XIX века.',
-    hookFact: 'В Ульяновске работает Головной отраслевой музей истории гражданской авиации с экспозиционной площадкой под открытым небом. Перед визитом проверьте график и схему проезда на сайте музея.',
+    hookFact: 'В 1797 году в альманахе «Аониды», который издавал уроженец Симбирска Николай Карамзин, в печати появилась буква «ё» - сегодня на Новом Венце этой букве посвящён отдельный памятник.',
     mustSee: ULYANOVSK_MUST_SEE as CityMustSeeItem[],
     significantSuburbs: ULYANOVSK_SUBURBS,
     dayRoutePresets: ULYANOVSK_DAY_ROUTE_PRESETS,

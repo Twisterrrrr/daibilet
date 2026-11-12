@@ -11,12 +11,12 @@ export const ULYANOVSK_SUBURBS: CitySuburbItem[] = [
     travelVector: 'Автобус или автомобиль',
     travelVectorBlurb: 'Сверьте расписание маршрутки № 111 и режим выбранных объектов перед поездкой. Палеонтологический заказник посещайте по правилам охраняемой территории.',
     places: [
-      { name: 'Ундоровский палеонтологический музей', desc: 'Экспозиция морских рептилий и находок из местных юрских отложений.', dayRouteId: 'ulyanovsk-undory-paleontology-museum', latitude: 54.607421, longitude: 48.391214 },
-      { name: 'Минеральный источник № 1', desc: 'Бювет у курортной зоны Ундор; уточните доступ и режим работы на месте.', latitude: 54.59945, longitude: 48.412117 },
-      { name: 'Малиновый овраг', desc: 'Геологический разрез на территории геопарка; посещение природных обнажений планируйте с учётом правил заказника.' },
-      { name: 'Долина кристаллов', desc: 'Геологический участок, который посещают в составе экскурсионного маршрута по Ундории.' },
-      { name: 'Городищенский разрез и залив', desc: 'Палеонтологические и геологические объекты на берегу водохранилища; не собирайте окаменелости без разрешения.' },
-      { name: 'Санаторный парк в Ундорах', desc: 'Аллеи курортной зоны рядом с санаториями и источниками.' },
+      { name: 'Ундоровский палеонтологический музей', desc: 'Экспозиция морских рептилий и находок из местных юрских отложений.', imageUrl: '/images/venues/ulyanovsk/suburb-undory-paleontology-generated.jpg', dayRouteId: 'ulyanovsk-undory-paleontology-museum', latitude: 54.607421, longitude: 48.391214 },
+      { name: 'Минеральный источник № 1', desc: 'Бювет у курортной зоны Ундор; уточните доступ и режим работы на месте.', imageUrl: '/images/venues/ulyanovsk/suburb-undory-mineral-spring-generated.jpg', latitude: 54.59945, longitude: 48.412117 },
+      { name: 'Малиновый овраг', desc: 'Геологический разрез на территории геопарка; посещение природных обнажений планируйте с учётом правил заказника.', imageUrl: '/images/venues/ulyanovsk/suburb-undory-malinovy-ovrag-generated.jpg' },
+      { name: 'Долина кристаллов', desc: 'Геологический участок, который посещают в составе экскурсионного маршрута по Ундории.', imageUrl: '/images/venues/ulyanovsk/suburb-undory-dolina-kristallov-generated.jpg' },
+      { name: 'Городищенский разрез и залив', desc: 'Палеонтологические и геологические объекты на берегу водохранилища; не собирайте окаменелости без разрешения.', imageUrl: '/images/venues/ulyanovsk/suburb-undory-gorodishchenskiy-razrez-generated.jpg' },
+      { name: 'Санаторный парк в Ундорах', desc: 'Аллеи курортной зоны рядом с санаториями и источниками.', imageUrl: '/images/venues/ulyanovsk/suburb-undory-sanatorny-park-generated.jpg' },
     ],
   },
   {
@@ -27,11 +27,11 @@ export const ULYANOVSK_SUBURBS: CitySuburbItem[] = [
     travelVector: 'Автомобиль; междугородний автобус до района парка',
     travelVectorBlurb: 'До выезда оформите разрешение на сайте национального парка и уточните открытые маршруты. Не сходите с тропы, не собирайте камни и окаменелости.',
     places: [
-      { name: 'Экотропа «По следам сурка»', desc: 'Маршрут национального парка; сезон работы и условия посещения уточняйте у администрации.' },
-      { name: 'Арбугинская гора', desc: 'Видовая точка над волжским ландшафтом; координаты относятся к ориентиру направления.', dayRouteId: 'ulyanovsk-arbuginskaya-gora-poi', latitude: 54.020541, longitude: 48.59121 },
-      { name: 'Экотропа «Шиловская лесостепь»', desc: 'Официально оборудованный маршрут национального парка; перед визитом проверьте доступность.' },
-      { name: 'Маршрут «Волжский берег»', desc: 'Природный маршрут парка вдоль берега; конкретный участок и вход согласуйте с парком.' },
-      { name: 'Меловые склоны и смотровые площадки', desc: 'Чувствительные природные участки: передвигайтесь по разрешённым тропам.' },
+      { name: 'Экотропа «По следам сурка»', desc: 'Маршрут национального парка; сезон работы и условия посещения уточняйте у администрации.', imageUrl: '/images/venues/ulyanovsk/suburb-sengiley-marmot-trail-generated.jpg' },
+      { name: 'Арбугинская гора', desc: 'Видовая точка над волжским ландшафтом; координаты относятся к ориентиру направления.', imageUrl: '/images/venues/ulyanovsk/suburb-arbuginskaya-gora-generated.jpg', dayRouteId: 'ulyanovsk-arbuginskaya-gora-poi', latitude: 54.020541, longitude: 48.59121 },
+      { name: 'Экотропа «Шиловская лесостепь»', desc: 'Официально оборудованный маршрут национального парка; перед визитом проверьте доступность.', imageUrl: '/images/venues/ulyanovsk/suburb-shilovskaya-forest-steppe-generated.jpg' },
+      { name: 'Маршрут «Волжский берег»', desc: 'Природный маршрут парка вдоль берега; конкретный участок и вход согласуйте с парком.', imageUrl: '/images/venues/ulyanovsk/suburb-volzhskiy-bereg-generated.jpg' },
+      { name: 'Меловые склоны и смотровые площадки', desc: 'Чувствительные природные участки: передвигайтесь по разрешённым тропам.', imageUrl: '/images/venues/ulyanovsk/suburb-melovye-sklony-generated.jpg' },
     ],
   },
   {
@@ -42,10 +42,10 @@ export const ULYANOVSK_SUBURBS: CitySuburbItem[] = [
     travelVector: 'Междугородний автобус или автомобиль',
     travelVectorBlurb: 'Расписание и режим посещения часовни уточните перед выездом. Указанная точка — ориентир посёлка, а не точная координата входа на природный объект.',
     places: [
-      { name: 'Никольская гора', desc: 'Местная возвышенность и ориентир поездки; доступные подходы уточняйте в Сурском.' },
-      { name: 'Часовня Николая Чудотворца', desc: 'Паломнический объект; соблюдайте действующие правила посещения.' },
-      { name: 'Источники у Никольской горы', desc: 'Родники и купель, если доступны; не употребляйте воду без проверки её пригодности.' },
-      { name: 'Историко-краеведческий музей Сурского', desc: 'Местная история района; проверьте часы работы заранее.' },
+      { name: 'Никольская гора', desc: 'Местная возвышенность и ориентир поездки; доступные подходы уточняйте в Сурском.', imageUrl: '/images/venues/ulyanovsk/suburb-nikolskaya-gora-generated.jpg' },
+      { name: 'Часовня Николая Чудотворца', desc: 'Паломнический объект; соблюдайте действующие правила посещения.', imageUrl: '/images/venues/ulyanovsk/suburb-chapel-nikolaya-chudotvortsa-generated.jpg' },
+      { name: 'Источники у Никольской горы', desc: 'Родники и купель, если доступны; не употребляйте воду без проверки её пригодности.', imageUrl: '/images/venues/ulyanovsk/suburb-springs-nikolskaya-gora-generated.jpg' },
+      { name: 'Историко-краеведческий музей Сурского', desc: 'Местная история района; проверьте часы работы заранее.', imageUrl: '/images/venues/ulyanovsk/suburb-surskoe-local-museum-generated.jpg' },
     ],
   },
   {
@@ -56,10 +56,10 @@ export const ULYANOVSK_SUBURBS: CitySuburbItem[] = [
     travelVector: 'Автомобиль',
     travelVectorBlurb: 'Проверьте дорожные условия, доступность берега и действующие правила посещения перед выездом. На природной территории не сходите на сплавины и заболоченные участки.',
     places: [
-      { name: 'Берег Юловского пруда', desc: 'Основной ориентир прогулки; оборудованность пляжа и купание требуют проверки на месте.', dayRouteId: 'ulyanovsk-yulovskiy-prud', latitude: 53.945121, longitude: 46.512412 },
-      { name: 'Сосновый бор', desc: 'Лесная прогулка по существующим дорогам и тропам.' },
-      { name: 'Плотина у пруда', desc: 'Гидротехническое сооружение — осматривать только с безопасных доступных подходов.' },
-      { name: 'Лесные поляны у Юлова', desc: 'Места для отдыха без оборудованного сервиса; увозите мусор с собой.' },
+      { name: 'Берег Юловского пруда', desc: 'Основной ориентир прогулки; оборудованность пляжа и купание требуют проверки на месте.', imageUrl: '/images/venues/ulyanovsk/suburb-yulovskiy-prud-shore-generated.jpg', dayRouteId: 'ulyanovsk-yulovskiy-prud', latitude: 53.945121, longitude: 46.512412 },
+      { name: 'Сосновый бор', desc: 'Лесная прогулка по существующим дорогам и тропам.', imageUrl: '/images/venues/ulyanovsk/suburb-yulovskiy-pine-forest-generated.jpg' },
+      { name: 'Плотина у пруда', desc: 'Гидротехническое сооружение — осматривать только с безопасных доступных подходов.', imageUrl: '/images/venues/ulyanovsk/suburb-yulovskiy-dam-generated.jpg' },
+      { name: 'Лесные поляны у Юлова', desc: 'Места для отдыха без оборудованного сервиса; увозите мусор с собой.', imageUrl: '/images/venues/ulyanovsk/suburb-yulovskiy-forest-glade-generated.jpg' },
     ],
   },
 ];
@@ -82,7 +82,7 @@ export const ULYANOVSK_DAY_ROUTE_PRESETS: CityDayRoutePreset[] = [
     ],
   },
   {
-    id: 'ulyanovsk-museum-quarter', title: 'Музейный Симбирск', description: 'Музеи и архитектурные памятники центральных кварталов.', timingNote: 'Проверьте выходные дни музеев и возможность входа в действующие религиозные здания.',
+    id: 'ulyanovsk-museum-quarter', title: 'Музейный Симбирск', description: 'Музеи и архитектурные памятники центральных кварталов.', timingNote: 'Проверьте выходные дни музеев и возможность входа в действующие религиозные здания.', coverImageUrl: '/images/venues/ulyanovsk/ulyanovsk-museum-simbirsk-route-generated.jpg',
     stops: [
       routeStop('Музей «Симбирская фотография»', 30, 'Музей истории фотографии.'),
       routeStop('Лютеранская церковь Святой Марии (Кирха)', 20, 'Историческая кирха; внутренний осмотр зависит от расписания.'),
@@ -137,7 +137,7 @@ export const ULYANOVSK_MUST_SEE: CityMustSeeItem[] = [
   mainPlace('Воскресенско-Германовский собор', 'Православный собор в Ульяновске.', 'temple', 'пер. Гоголя, 11', 54.329438, 48.400934, undefined, undefined, 25),
   mainPlace('Храм Святого Равноапостольного Князя Владимира', 'Православный храм в северной части города.', 'temple', 'ул. Волжская, 50А', 54.354124, 48.461241, undefined, undefined, 25),
   mainPlace('Лютеранская церковь Святой Марии (Кирха)', 'Историческая кирха; уточните возможность осмотра интерьера.', 'temple', 'ул. Ленина, 100', 54.31421, 48.395121, undefined, undefined, 25),
-  mainPlace('Бульвар Новый Венец', 'Пешеходная эспланада на высоком берегу Волги с панорамными видами.', 'main', 'бульвар Новый Венец', 54.318124, 48.405412, 'ulyanovsk-bul-var-novyy-venets', undefined, 40, undefined, '/images/venues/ulyanovsk/bul-var-novyy-venets-generated.png'),
+  mainPlace('Бульвар Новый Венец', 'Пешеходная эспланада на высоком берегу Волги с панорамными видами.', 'main', 'бульвар Новый Венец', 54.318124, 48.405412, 'ulyanovsk-bul-var-novyy-venets', undefined, 40, undefined, '/images/venues/ulyanovsk/bul-var-novyy-venets-generated.jpg'),
   mainPlace('Парк «Владимирский сад»', 'Исторический городской сад с прогулочными аллеями.', 'park', 'ул. Гончарова, 18', 54.3148, 48.3975, undefined, undefined, 30),
   mainPlace('Парк Победы', 'Большой парк с мемориальной аллеей и экспозицией военной техники.', 'park', 'ул. Юности, 2', 54.312, 48.365, undefined, undefined, 60),
   mainPlace('Сквер Карамзина', 'Зелёный сквер рядом с историческими зданиями центра.', 'park', 'сквер Карамзина', 54.315, 48.4036, undefined, undefined, 20),

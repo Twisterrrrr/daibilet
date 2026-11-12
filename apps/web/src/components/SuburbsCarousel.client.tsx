@@ -88,6 +88,8 @@ function suburbHeroImage(
   place: CitySuburbItem,
   venues: DayRouteVenueMatchSource[],
 ): string | null {
+  const direct = String(place.imageUrl || '').trim();
+  if (direct) return direct;
   const candidates: Array<string | null | undefined> = [
     place.venueSlug,
     place.locationSlug,
@@ -310,6 +312,7 @@ export function SuburbsCarousel({
           desc: String(poi.desc || '').trim() || undefined,
           href: resolveCityPlaceTitleHref(poi, venues, { allowNameMatch: false }),
           imageSlug: String(poi.locationSlug || poi.venueSlug || '').trim() || null,
+          imageUrl: poi.imageUrl,
           transitTip: String(poi.transitTip || '').trim() || undefined,
           dayLabel: String(poi.dayLabel || '').trim() || undefined,
           visitMinutes: poi.visitMinutes,

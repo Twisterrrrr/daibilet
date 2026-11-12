@@ -5,7 +5,7 @@ import { join } from 'node:path';
 
 const appRoot = process.env.APP_DIR || '/opt/daibilet';
 const dir = process.env.SHADOW_WEB_DIR;
-const port = Number(process.env.SHADOW_WEB_PORT || 3002);
+const port = Number(process.env.SHADOW_WEB_PORT || 3003);
 if (!dir || !Number.isInteger(port)) throw new Error('Shadow directory and port are required');
 const require = createRequire(join(appRoot, 'apps/web/package.json'));
 const next = require('next');

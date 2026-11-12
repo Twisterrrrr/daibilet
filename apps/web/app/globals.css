@@ -945,6 +945,13 @@ html[data-nav-pending='1'] {
   }
 
   /** Event PDP: mobile keeps curated focal points; desktop uses vertical center. */
+  .event-page-editorial-copy > p:first-child {
+    border-left: 2px solid hsl(var(--border));
+    padding-left: 1rem;
+    color: hsl(var(--graphite-muted));
+    font-weight: 500;
+  }
+
   .event-page-hero-image {
     object-position: var(--event-hero-mobile-position, center 25%);
   }

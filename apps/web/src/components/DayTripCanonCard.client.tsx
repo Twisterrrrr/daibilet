@@ -12,6 +12,8 @@ export type DayTripCanonSight = {
   href?: string | null;
   /** venueSlug / locationSlug for photo cover */
   imageSlug?: string | null;
+  /** Direct editorial image for a nested suburb point. */
+  imageUrl?: string | null;
   /** Совет по перемещению к этой точке (серая строка между пунктами). */
   transitTip?: string;
   /** Заголовок дня над пунктом (multi-day suburb: «День 1 - Усьва»). */
@@ -250,6 +252,7 @@ export function DayTripCanonCard({
                   desc: poi.desc,
                   href: poi.href,
                   imageSlug: poi.imageSlug,
+                  imageUrl: poi.imageUrl,
                   visitMinutes: poi.visitMinutes,
                   transitTip: poi.transitTip,
                   dayLabel: poi.dayLabel,
@@ -429,6 +432,7 @@ export function DayTripCanonCard({
                     desc: poi.desc,
                     href: poi.href,
                     imageSlug: poi.imageSlug,
+                    imageUrl: poi.imageUrl,
                     visitMinutes: poi.visitMinutes,
                     transitTip: poi.transitTip,
                     dayLabel: poi.dayLabel,
@@ -490,6 +494,7 @@ export function DayTripCanonCard({
                 desc: poi.desc,
                 href: poi.href,
                 imageSlug: poi.imageSlug,
+                imageUrl: poi.imageUrl,
                 visitMinutes: poi.visitMinutes,
                 transitTip: poi.transitTip,
                 dayLabel: poi.dayLabel,

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Keep a warmed copy serving while the primary .next directory and service change.
-SHADOW_WEB_PORT="${SHADOW_WEB_PORT:-3002}"
+# 3002 is reserved by the persistent PDP smoke service on MSK.
+SHADOW_WEB_PORT="${SHADOW_WEB_PORT:-3003}"
 SHADOW_WEB_SERVICE="${SHADOW_WEB_SERVICE:-daibilet-web-deploy-shadow}"
 SHADOW_WEB_DIR="${APP_DIR}/var/deploy-shadow/web"
 DEPLOY_HANDOFF_DIR="${DEPLOY_HANDOFF_DIR:-${APP_DIR}/deploy/scripts}"
