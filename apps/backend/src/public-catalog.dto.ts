@@ -493,6 +493,7 @@ function scheduleInlineCatalogRebuild(reason: string): Promise<PublicSessionDto[
       const sessions = filterCatalogSessions(
         dedupeCrossSourceCatalogSessions(regroupMappedPublicCatalogSessions(mapped)),
       );
+      await attachCatalogRatings(sessions);
       const sessionsWithEventPages = await attachUnambiguousEventPageSlugs(sessions);
       const now = Date.now();
       const expiresAt = now + Math.max(30_000, PUBLIC_CATALOG_CACHE_MS);
@@ -541,6 +542,46 @@ function scheduleInlineCatalogRebuild(reason: string): Promise<PublicSessionDto[
   });
 
   return catalogBuildPromise;
+}
+
+async function attachCatalogRatings(sessions: PublicSessionDto[]): Promise<void> {
+  const eventIds = [...new Set(sessions.flatMap((session) =>
+    session.groupEventIds?.length ? session.groupEventIds : [session.id],
+  ))];
+  if (!eventIds.length) return;
+
+  const aggregates = new Map<string, { sum: number; count: number }>();
+  for (let offset = 0; offset < eventIds.length; offset += 500) {
+    const rows = await prisma.review.groupBy({
+      by: ['eventId'],
+      where: { eventId: { in: eventIds.slice(offset, offset + 500) }, status: 'APPROVED' },
+      _avg: { rating: true },
+      _count: { _all: true },
+    });
+    for (const row of rows) {
+      if (!row.eventId) continue;
+      aggregates.set(row.eventId, {
+        sum: (row._avg.rating || 0) * row._count._all,
+        count: row._count._all,
+      });
+    }
+  }
+
+  for (const session of sessions) {
+    const ids = session.groupEventIds?.length ? session.groupEventIds : [session.id];
+    const summary = ids.reduce((result, id) => {
+      const aggregate = aggregates.get(id);
+      return aggregate
+        ? { sum: result.sum + aggregate.sum, count: result.count + aggregate.count }
+        : result;
+    }, { sum: 0, count: 0 });
+    if (summary.count >= 10 && summary.sum > 0) {
+      session.rating = {
+        value: Math.round((summary.sum / summary.count) * 10) / 10,
+        count: summary.count,
+      };
+    }
+  }
 }
 
 function sleep(ms: number): Promise<void> {
@@ -657,6 +698,7 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
         venue.slug as "venueSlug",
         venue.title as venue,
         venue.address as "venueAddress",
+        venue."metroStation" as "venueMetroStation",
         venue."heroImageUrl" as "venueHeroImageUrl",
         venue.kind as "venueKind",
         override.title as "overrideTitle",

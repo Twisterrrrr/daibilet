@@ -40,6 +40,7 @@ export function toPublicCatalogListItem(session: PublicSessionDto): PublicCatalo
   if (session.peerCityCount != null) item.peerCityCount = session.peerCityCount;
   if (session.citySlug != null) item.citySlug = session.citySlug;
   if (session.venueSlug != null) item.venueSlug = session.venueSlug;
+  if (session.venueMetroStation != null) item.venueMetroStation = session.venueMetroStation;
   if (session.venueAddress != null) item.venueAddress = session.venueAddress;
   if (session.subcategories?.length) item.subcategories = session.subcategories.slice(0, 4);
   if (session.kind != null) item.kind = session.kind;
@@ -49,6 +50,7 @@ export function toPublicCatalogListItem(session: PublicSessionDto): PublicCatalo
   if (session.priceTo != null) item.priceTo = session.priceTo;
   if (session.vacant != null) item.vacant = session.vacant;
   if (session.imageUrl != null) item.imageUrl = session.imageUrl;
+  if (session.rating != null) item.rating = session.rating;
   if (session.purchaseReady != null) item.purchaseReady = session.purchaseReady;
   if (session.purchaseMode != null) item.purchaseMode = session.purchaseMode;
   if (session.purchaseProvider != null) item.purchaseProvider = session.purchaseProvider;
@@ -94,12 +96,14 @@ export function toPublicHomeCardSession(session: PublicSessionDto): PublicCatalo
     ...(base.eventPageIndexableSlug != null ? { eventPageIndexableSlug: base.eventPageIndexableSlug } : {}),
     ...(base.citySlug != null ? { citySlug: base.citySlug } : {}),
     ...(base.venueSlug != null ? { venueSlug: base.venueSlug } : {}),
+    ...(base.venueMetroStation != null ? { venueMetroStation: base.venueMetroStation } : {}),
     ...(base.venueAddress != null ? { venueAddress: base.venueAddress } : {}),
     ...(base.subcategories?.length ? { subcategories: base.subcategories } : {}),
     ...(base.priceFrom != null ? { priceFrom: base.priceFrom } : {}),
     ...(base.priceTo != null ? { priceTo: base.priceTo } : {}),
     ...(base.vacant != null ? { vacant: base.vacant } : {}),
     ...(base.imageUrl != null ? { imageUrl: base.imageUrl } : {}),
+    ...(base.rating != null ? { rating: base.rating } : {}),
     ...(base.purchaseReady != null ? { purchaseReady: base.purchaseReady } : {}),
     ...(base.purchaseMode != null ? { purchaseMode: base.purchaseMode } : {}),
     ...(base.purchaseProvider != null ? { purchaseProvider: base.purchaseProvider } : {}),
