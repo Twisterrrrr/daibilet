@@ -935,6 +935,7 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
       representative."venueSlug",
       representative.venue,
       representative."venueAddress",
+      representative."venueMetroStation",
       representative."venueHeroImageUrl",
       representative."venueKind",
       representative."overrideTitle",
