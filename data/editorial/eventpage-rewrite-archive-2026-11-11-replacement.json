@@ -1,0 +1,197 @@
+{
+  "capturedAt": "2026-11-11T12:09:31.068Z",
+  "readOnlySnapshot": true,
+  "source": "TICKETSCLOUD",
+  "eventPageId": "1485bd03-82b0-4606-972d-22ac6af5b641",
+  "eventId": "evt_6ad7139e0676bca826912824",
+  "slug": "shou-defile-led-i-plamya-vidnoe",
+  "page": {
+    "id": "1485bd03-82b0-4606-972d-22ac6af5b641",
+    "slug": "shou-defile-led-i-plamya-vidnoe",
+    "title": "ШОУ-ДЕФИЛЕ \"ЛЁД И ПЛАМЯ\"",
+    "summary": null,
+    "content": {
+      "sections": []
+    },
+    "seoH1": "ШОУ-ДЕФИЛЕ \"ЛЁД И ПЛАМЯ\"",
+    "seoTitle": "ШОУ-ДЕФИЛЕ \"ЛЁД И ПЛАМЯ\" | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "tourGroupId": null,
+    "createdAt": "2026-11-03T15:10:56.552Z",
+    "updatedAt": "2026-11-03T15:10:56.552Z",
+    "tourGroup": null,
+    "events": [
+      {
+        "id": "25ae0fd9-d817-48ee-a33e-8d7283e1b2b5",
+        "eventId": "evt_6ad7139e0676bca826912824",
+        "position": 0,
+        "role": "PRIMARY",
+        "sourceSnapshot": {
+          "id": "evt_6ad7139e0676bca826912824",
+          "kind": "SINGLE",
+          "slug": "шоу-дефиле-лед-и-пламя-6ad7139e0676bca826912824",
+          "seoH1": null,
+          "title": "ШОУ-ДЕФИЛЕ \"ЛЁД И ПЛАМЯ\"",
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ad7139e0676bca826912824",
+              "externalId": "6ad7139e0676bca826912824",
+              "metaExternalId": null
+            }
+          ],
+          "venueId": "venue_6684329099bebb5042f44b4a",
+          "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ad7139ea3a6b14957cb968a.png",
+          "seoTitle": null,
+          "cityTitle": "Видное",
+          "venueTitle": "Астро Плаза",
+          "description": "ЛЁД И ПЛАМЯ: Твой выход на подиум <br><br>Хватит просто смотреть на моду — пришло время стать её частью! <br><br>Что тебя ждет: <br><br>-Лекция «Русский код». Узнай тайны, зашитые в ДНК нашего стиля. <br><br>-Шоу-дефиле \"Лед и пламя\", где грация подиума встречается с дерзостью танцев на каблуках.<br><br>-Твой триумф: Ты не просто гость. Ты — модель! Пройди свой путь по подиуму под руководством хореографа и почувствуй эту магию. <br><br>Эстетика: Игристое, профессиональный контент и караоке-драйв в финале.<br><br>Почувствуй холодную уверенность и обжигающую страсть.<br>Стань легендой этого вечера.<br><br>Дресс код: <br>Мы ждем вас в вечерних и коктейльных образах. <br><br>Цветовая палитра вечера:  Холодные оттенки (серебро, белый, голубой, розовый, стальной). <br><br>Теплые оттенки (красный,оранжевый, золото, черный, бордовый, ,фиолетовый).<br><br>Позвольте себе быть ослепительной!",
+          "isIndexable": true,
+          "purchaseFlow": "EXTERNAL",
+          "venueAddress": "Проспект Ленинского Комсомола, 41",
+          "canonicalPath": null,
+          "primaryCityId": "city_473778",
+          "supplierTitle": null,
+          "managementMode": "SOURCE_MANAGED",
+          "seoDescription": null,
+          "shortDescription": null
+        },
+        "createdAt": "2026-11-03T15:10:56.552Z",
+        "eventTitle": "ШОУ-ДЕФИЛЕ \"ЛЁД И ПЛАМЯ\"",
+        "eventSlug": "шоу-дефиле-лед-и-пламя-6ad7139e0676bca826912824",
+        "eventKind": "SINGLE",
+        "primaryCityId": "city_473778",
+        "cityTitle": "Видное",
+        "venueId": "venue_6684329099bebb5042f44b4a",
+        "venueTitle": "Астро Плаза",
+        "venueAddress": "Проспект Ленинского Комсомола, 41",
+        "supplierTitle": null,
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ad7139e0676bca826912824",
+            "externalId": "6ad7139e0676bca826912824",
+            "metaExternalId": null
+          }
+        ]
+      }
+    ],
+    "reviewCandidates": [],
+    "routes": [
+      {
+        "id": "1fe37fb1-f4d8-4166-a13b-532af74f1bba",
+        "path": "/events/shou-defile-led-i-plamya-vidnoe",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T15:10:56.552Z"
+      }
+    ],
+    "revisions": [
+      {
+        "id": "fa46cd57-f96a-4b16-9ffb-4d6d5d5a8ef6",
+        "version": 1,
+        "content": {
+          "slug": "shou-defile-led-i-plamya-vidnoe",
+          "seoH1": "ШОУ-ДЕФИЛЕ \"ЛЁД И ПЛАМЯ\"",
+          "title": "ШОУ-ДЕФИЛЕ \"ЛЁД И ПЛАМЯ\"",
+          "content": {
+            "sections": []
+          },
+          "summary": null,
+          "seoTitle": "ШОУ-ДЕФИЛЕ \"ЛЁД И ПЛАМЯ\" | Дайбилет",
+          "canonicalPath": null,
+          "seoDescription": null
+        },
+        "sourceSnapshot": {
+          "events": [
+            {
+              "role": "PRIMARY",
+              "eventId": "evt_6ad7139e0676bca826912824",
+              "position": 0,
+              "sourceSnapshot": {
+                "id": "evt_6ad7139e0676bca826912824",
+                "kind": "SINGLE",
+                "slug": "шоу-дефиле-лед-и-пламя-6ad7139e0676bca826912824",
+                "seoH1": null,
+                "title": "ШОУ-ДЕФИЛЕ \"ЛЁД И ПЛАМЯ\"",
+                "sources": [
+                  {
+                    "code": "TICKETSCLOUD",
+                    "name": "Ticketscloud",
+                    "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ad7139e0676bca826912824",
+                    "externalId": "6ad7139e0676bca826912824",
+                    "metaExternalId": null
+                  }
+                ],
+                "venueId": "venue_6684329099bebb5042f44b4a",
+                "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ad7139ea3a6b14957cb968a.png",
+                "seoTitle": null,
+                "cityTitle": "Видное",
+                "venueTitle": "Астро Плаза",
+                "description": "ЛЁД И ПЛАМЯ: Твой выход на подиум <br><br>Хватит просто смотреть на моду — пришло время стать её частью! <br><br>Что тебя ждет: <br><br>-Лекция «Русский код». Узнай тайны, зашитые в ДНК нашего стиля. <br><br>-Шоу-дефиле \"Лед и пламя\", где грация подиума встречается с дерзостью танцев на каблуках.<br><br>-Твой триумф: Ты не просто гость. Ты — модель! Пройди свой путь по подиуму под руководством хореографа и почувствуй эту магию. <br><br>Эстетика: Игристое, профессиональный контент и караоке-драйв в финале.<br><br>Почувствуй холодную уверенность и обжигающую страсть.<br>Стань легендой этого вечера.<br><br>Дресс код: <br>Мы ждем вас в вечерних и коктейльных образах. <br><br>Цветовая палитра вечера:  Холодные оттенки (серебро, белый, голубой, розовый, стальной). <br><br>Теплые оттенки (красный,оранжевый, золото, черный, бордовый, ,фиолетовый).<br><br>Позвольте себе быть ослепительной!",
+                "isIndexable": true,
+                "purchaseFlow": "EXTERNAL",
+                "venueAddress": "Проспект Ленинского Комсомола, 41",
+                "canonicalPath": null,
+                "primaryCityId": "city_473778",
+                "supplierTitle": null,
+                "managementMode": "SOURCE_MANAGED",
+                "seoDescription": null,
+                "shortDescription": null
+              }
+            }
+          ],
+          "routes": [
+            {
+              "id": "1fe37fb1-f4d8-4166-a13b-532af74f1bba",
+              "kind": "CANDIDATE",
+              "path": "/events/shou-defile-led-i-plamya-vidnoe",
+              "source": "event-page-draft",
+              "createdAt": "2026-11-03T18:10:56.552Z",
+              "eventPageId": "1485bd03-82b0-4606-972d-22ac6af5b641"
+            }
+          ]
+        },
+        "changeNote": "Автоматически создан черновик EventPage при синхронизации события; требуется редакционная проверка",
+        "createdBy": null,
+        "createdAt": "2026-11-03T15:10:56.552Z"
+      }
+    ]
+  },
+  "event": {
+    "id": "evt_6ad7139e0676bca826912824",
+    "title": "ШОУ-ДЕФИЛЕ \"ЛЁД И ПЛАМЯ\"",
+    "description": "ЛЁД И ПЛАМЯ: Твой выход на подиум <br><br>Хватит просто смотреть на моду — пришло время стать её частью! <br><br>Что тебя ждет: <br><br>-Лекция «Русский код». Узнай тайны, зашитые в ДНК нашего стиля. <br><br>-Шоу-дефиле \"Лед и пламя\", где грация подиума встречается с дерзостью танцев на каблуках.<br><br>-Твой триумф: Ты не просто гость. Ты — модель! Пройди свой путь по подиуму под руководством хореографа и почувствуй эту магию. <br><br>Эстетика: Игристое, профессиональный контент и караоке-драйв в финале.<br><br>Почувствуй холодную уверенность и обжигающую страсть.<br>Стань легендой этого вечера.<br><br>Дресс код: <br>Мы ждем вас в вечерних и коктейльных образах. <br><br>Цветовая палитра вечера:  Холодные оттенки (серебро, белый, голубой, розовый, стальной). <br><br>Теплые оттенки (красный,оранжевый, золото, черный, бордовый, ,фиолетовый).<br><br>Позвольте себе быть ослепительной!",
+    "override_description": "ЛЁД И ПЛАМЯ: Твой выход на подиум\n\nХватит просто смотреть на моду - пришло время стать её частью!\n\n## Что тебя ждет\n\n- Лекция «Русский код». Узнай тайны, зашитые в ДНК нашего стиля.\n- Шоу-дефиле \"Лед и пламя\", где грация подиума встречается с дерзостью танцев на каблуках.\n- Твой триумф: Ты не просто гость. Ты - модель! Пройди свой путь по подиуму под руководством хореографа и почувствуй эту магию.\n\nЭстетика: Игристое, профессиональный контент и караоке-драйв в финале. Почувствуй холодную уверенность и обжигающую страсть. Стань легендой этого вечера.\n\n## Дресс код\n\nМы ждем вас в вечерних и коктейльных образах. Цветовая палитра вечера: Холодные оттенки (серебро, белый, голубой, розовый, стальной). Теплые оттенки (красный,оранжевый, золото, черный, бордовый, ,фиолетовый).\n\nПозвольте себе быть ослепительной!",
+    "ageLimit": "6",
+    "priceFromRub": 1000,
+    "city": "Видное",
+    "venue": "Астро Плаза",
+    "address": "Проспект Ленинского Комсомола, 41",
+    "offer_min": 1000,
+    "active_offers": 1,
+    "sessions": [
+      {
+        "start": "2026-12-03T16:00:00",
+        "end": "2026-12-03T17:30:00"
+      }
+    ]
+  },
+  "routes": [
+    {
+      "path": "/events/shou-defile-led-i-plamya-vidnoe",
+      "kind": "CANDIDATE",
+      "source": "event-page-draft"
+    }
+  ],
+  "revision": {
+    "n": 1,
+    "version": 1
+  }
+}

@@ -1,0 +1,318 @@
+{
+  "appliedAt": "2026-11-11T12:18:01.754Z",
+  "count": 30,
+  "results": [
+    {
+      "eventId": "evt_6ad496a9d1aac40c4757fe57",
+      "eventPageId": "097580e2-02a7-491d-8fe2-cd196eea0c6f",
+      "slug": "cirk-shapito-hischnik-i-princessa-cirka-v-min-vodah-mineralnye-vody-6",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T09:14:04.571Z",
+      "route": "/events/cirk-shapito-hischnik-i-princessa-cirka-v-min-vodah-mineralnye-vody-6",
+      "revision": "2->4"
+    },
+    {
+      "eventId": "evt_6adb37dca70637f2af1319eb",
+      "eventPageId": "a629e3ce-f411-43da-be48-268777e9b510",
+      "slug": "komediinoe-shou-devochki-eto-pipec-kaliningrad-2",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T09:14:06.778Z",
+      "route": "/events/komediinoe-shou-devochki-eto-pipec-kaliningrad-2",
+      "revision": "2->4"
+    },
+    {
+      "eventId": "evt_6abfe1c2fedf2222fb97cfe9",
+      "eventPageId": "4ce50abf-fcc0-4772-bb3f-7aae5b3fb44c",
+      "slug": "zooteatr-reptilii-v-g-sankt-peterburg-trk-grand-kanon-sankt-peterburg-26",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T09:14:08.577Z",
+      "route": "/events/zooteatr-reptilii-v-g-sankt-peterburg-trk-grand-kanon-sankt-peterburg-26",
+      "revision": "2->4"
+    },
+    {
+      "eventId": "evt_6ad74456294a7dea9d0893f3",
+      "eventPageId": "528f057f-09cb-4e85-a6e5-147b33b9af49",
+      "slug": "obraza-net-17-dekabrya-sankt-peterburg",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T09:14:10.535Z",
+      "route": "/events/obraza-net-17-dekabrya-sankt-peterburg",
+      "revision": "2->4"
+    },
+    {
+      "eventId": "evt_6adaf954cbf4f5b926ebd162",
+      "eventPageId": "e2d4f16b-f7d4-4e27-b335-645bb99a1e36",
+      "slug": "inside-the-rain-komsomolsk-na-amure",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T09:14:12.592Z",
+      "route": "/events/inside-the-rain-komsomolsk-na-amure",
+      "revision": "2->4"
+    },
+    {
+      "eventId": "evt_6ad9a5a8964b0f6925a9e149",
+      "eventPageId": "3b64df36-6155-4db2-b547-10b0c4b7008d",
+      "slug": "aca-211-sankt-peterburg",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T09:14:14.67Z",
+      "route": "/events/aca-211-sankt-peterburg",
+      "revision": "2->4"
+    },
+    {
+      "eventId": "evt_6ad9f6d3b6a310b0fe76698a",
+      "eventPageId": "87d44405-1cfd-4cc1-81a3-8a9de6c96fbe",
+      "slug": "ledovoe-shou-schelkunchik-v-tambove-tambov-3",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T09:14:16.613Z",
+      "route": "/events/ledovoe-shou-schelkunchik-v-tambove-tambov-3",
+      "revision": "2->4"
+    },
+    {
+      "eventId": "evt_6ad8ea79d504d9b6f330f92a",
+      "eventPageId": "1b98d70c-35bb-4179-9291-cce317d68960",
+      "slug": "megamozg-ekaterinburg",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T09:14:18.581Z",
+      "route": "/events/megamozg-ekaterinburg",
+      "revision": "2->4"
+    },
+    {
+      "eventId": "evt_6ab963957c015e077a4bdd1a",
+      "eventPageId": "b8a64e94-b654-41b5-969f-aa922cb00dfc",
+      "slug": "anna-koroleva-i-arsenal-alekseya-kozlova-moskva-2",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T09:14:20.579Z",
+      "route": "/events/anna-koroleva-i-arsenal-alekseya-kozlova-moskva-2",
+      "revision": "1->3"
+    },
+    {
+      "eventId": "evt_6acf3dea749b174d31a9cff7",
+      "eventPageId": "4a2cc3ec-496b-4738-9e11-3e2e406dccb5",
+      "slug": "anna-bolein-igra-s-koronoi-moskva",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T09:14:22.503Z",
+      "route": "/events/anna-bolein-igra-s-koronoi-moskva",
+      "revision": "1->3"
+    },
+    {
+      "eventId": "evt_6abff807772d40451f8ea22a",
+      "eventPageId": "61dfc71e-9e90-4087-817b-9c5848256d36",
+      "slug": "daniil-kramer-i-roman-miroshnichenko-dialog-virtuozov-moskva",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T09:14:24.452Z",
+      "route": "/events/daniil-kramer-i-roman-miroshnichenko-dialog-virtuozov-moskva",
+      "revision": "1->3"
+    },
+    {
+      "eventId": "evt_6abff405310c1214ad37c6f3",
+      "eventPageId": "22a0fbd8-e3f2-45be-a766-f3f3f27e1eb4",
+      "slug": "dmitrii-mospan-i-mosdzhaz-kvartet-dzhazovye-istorii-moskva",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T09:14:26.405Z",
+      "route": "/events/dmitrii-mospan-i-mosdzhaz-kvartet-dzhazovye-istorii-moskva",
+      "revision": "1->3"
+    },
+    {
+      "eventId": "evt_6aaee405dae89da9da3e69e8",
+      "eventPageId": "0068cfe1-e80a-4249-85ba-fcfd80b66191",
+      "slug": "zvezdy-russkoi-fortepiannoi-shkoly-v-kuskovo-elena-drozdova-moskva",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T09:14:28.405Z",
+      "route": "/events/zvezdy-russkoi-fortepiannoi-shkoly-v-kuskovo-elena-drozdova-moskva",
+      "revision": "1->3"
+    },
+    {
+      "eventId": "evt_6a54be5b7a1abb4dfb5f56f4",
+      "eventPageId": "0b1dcaf9-7f18-4b99-b730-b431e788f20d",
+      "slug": "koncert-legendarnoi-gruppy-masha-i-medvedi-moskva",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T09:14:30.404Z",
+      "route": "/events/koncert-legendarnoi-gruppy-masha-i-medvedi-moskva",
+      "revision": "1->3"
+    },
+    {
+      "eventId": "evt_6ac8da1ca8b4b34be26c19e2",
+      "eventPageId": "d22abfa4-e495-41d2-ae50-4e27dfcdc67d",
+      "slug": "orkestr-svyatoslava-tekucheva-muzhchiny-kotorye-poyut-moskva",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T09:14:32.41Z",
+      "route": "/events/orkestr-svyatoslava-tekucheva-muzhchiny-kotorye-poyut-moskva",
+      "revision": "1->3"
+    },
+    {
+      "eventId": "evt_6ae39b653217ffd03b92b0fe",
+      "eventPageId": "d9e9f693-359b-4197-a279-c6beb357fe7c",
+      "slug": "shilkloper-kramer-chernakova-solo-duo-trio-moskva",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T09:14:34.361Z",
+      "route": "/events/shilkloper-kramer-chernakova-solo-duo-trio-moskva",
+      "revision": "1->3"
+    },
+    {
+      "eventId": "evt_6ae4dab91b5153a5bfd47bb2",
+      "eventPageId": "f894680e-c3ae-4b5a-8ead-3a237091f9e0",
+      "slug": "ekskursiya-v-osobnyak-saltykovyh-chertkovyh-moskva",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T09:17:32.46Z",
+      "route": "/events/ekskursiya-v-osobnyak-saltykovyh-chertkovyh-moskva",
+      "revision": "1->3"
+    },
+    {
+      "eventId": "evt_6ac8b44f2c74ed7502470231",
+      "eventPageId": "cb777c6d-a63d-48b5-9675-035e7e65691e",
+      "slug": "andrei-dubov-shopen-brams-list-rahmaninov-sankt-peterburg",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T09:17:34.742Z",
+      "route": "/events/andrei-dubov-shopen-brams-list-rahmaninov-sankt-peterburg",
+      "revision": "1->3"
+    },
+    {
+      "eventId": "evt_6abd0265145a7e1bc18898c8",
+      "eventPageId": "defccbdb-d560-4eb7-8346-6606cc3381b2",
+      "slug": "art-kvartirnik-aivazovskii-hudozhnik-diplomat-arheolog-muzykant-i-istinnyi-korol-morya-sankt-peterburg",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T09:17:36.997Z",
+      "route": "/events/art-kvartirnik-aivazovskii-hudozhnik-diplomat-arheolog-muzykant-i-istinnyi-korol-morya-sankt-peterburg",
+      "revision": "1->3"
+    },
+    {
+      "eventId": "evt_6ae49308125d95f5996b959a",
+      "eventPageId": "b9be16a7-0570-4dea-9166-5f365e7a72be",
+      "slug": "art-kvartirnik-v-peterburge-zoloto-i-krah-imperii-kak-dorevolyucionnye-oligarhi-stroili-biznes-i-sankt-peterburg",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T09:17:39.014Z",
+      "route": "/events/art-kvartirnik-v-peterburge-zoloto-i-krah-imperii-kak-dorevolyucionnye-oligarhi-stroili-biznes-i-sankt-peterburg",
+      "revision": "1->3"
+    },
+    {
+      "eventId": "evt_6a86d99cbe112fc256099c5b",
+      "eventPageId": "011dcd6c-c7c2-4da2-a09b-f4f9dcab506e",
+      "slug": "bolshoi-novogodnii-korporativ-bogi-v-lyubvi-sankt-peterburg",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T09:17:41.3Z",
+      "route": "/events/bolshoi-novogodnii-korporativ-bogi-v-lyubvi-sankt-peterburg",
+      "revision": "1->3"
+    },
+    {
+      "eventId": "evt_6ae062032ce98af40ce3f969",
+      "eventPageId": "61f420b3-1a1e-4d1f-9604-ed307bb1f0b1",
+      "slug": "v-ruskealu-na-retropoezde-vodopady-i-mramornyi-kanon-sankt-peterburg-2",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T09:17:43.816Z",
+      "route": "/events/v-ruskealu-na-retropoezde-vodopady-i-mramornyi-kanon-sankt-peterburg-2",
+      "revision": "1->3"
+    },
+    {
+      "eventId": "evt_6ae0651560d93e74c8e3f982",
+      "eventPageId": "ea918b51-c7ea-44aa-80a1-676597d4d3d7",
+      "slug": "karelskie-haski-i-mramornyi-mir-sankt-peterburg-2",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T09:17:46.248Z",
+      "route": "/events/karelskie-haski-i-mramornyi-mir-sankt-peterburg-2",
+      "revision": "1->3"
+    },
+    {
+      "eventId": "evt_6a453f2ba71a7dd9e81798ac",
+      "eventPageId": "89fe7682-2d11-4ea6-a3cd-9db2e7009d59",
+      "slug": "tri-razvodnyh-mosta-razvod-mostov-ot-petrogradskoi-storony-sankt-peterburg",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T09:17:48.707Z",
+      "route": "/events/tri-razvodnyh-mosta-razvod-mostov-ot-petrogradskoi-storony-sankt-peterburg",
+      "revision": "1->3"
+    },
+    {
+      "eventId": "evt_6983f1d2cf6b084d10ae419a",
+      "eventPageId": "80b07af4-1e30-4662-ad99-6e559db20c41",
+      "slug": "flamenko-gitara-tanec-flamenco-familia-v-muzee-nostalgii-v-salone-na-nevskom-prazdnichnaya-ve-sankt-peterburg",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T09:17:50.912Z",
+      "route": "/events/flamenko-gitara-tanec-flamenco-familia-v-muzee-nostalgii-v-salone-na-nevskom-prazdnichnaya-ve-sankt-peterburg",
+      "revision": "1->3"
+    },
+    {
+      "eventId": "evt_6acfa3c8764820bc2674b31a",
+      "eventPageId": "eb6084a5-f946-424c-8056-217f7900b1b0",
+      "slug": "organnyi-triumf-zvuki-vechnosti-aida-gluhova-organ-smolensk",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T09:17:52.83Z",
+      "route": "/events/organnyi-triumf-zvuki-vechnosti-aida-gluhova-organ-smolensk",
+      "revision": "1->3"
+    },
+    {
+      "eventId": "evt_6acfa35512e168dd70d2f508",
+      "eventPageId": "5a685f42-2d69-4c8e-bdff-91f260ec2cca",
+      "slug": "populyarnaya-klassika-dlya-detei-aida-gluhova-organ-smolensk",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T09:17:54.798Z",
+      "route": "/events/populyarnaya-klassika-dlya-detei-aida-gluhova-organ-smolensk",
+      "revision": "1->3"
+    },
+    {
+      "eventId": "evt_6ad7139e0676bca826912824",
+      "eventPageId": "1485bd03-82b0-4606-972d-22ac6af5b641",
+      "slug": "shou-defile-led-i-plamya-vidnoe",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T09:17:56.767Z",
+      "route": "/events/shou-defile-led-i-plamya-vidnoe",
+      "revision": "1->3"
+    },
+    {
+      "eventId": "evt_tep_1323",
+      "eventPageId": "d3a7578c-024b-4795-b3d9-d7a4fb5a8871",
+      "slug": "dzhaz-na-korable-moskva-2",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T09:17:58.62Z",
+      "route": "/events/dzhaz-na-korable-moskva-2",
+      "revision": "2->4"
+    },
+    {
+      "eventId": "evt_tep_1344",
+      "eventPageId": "bd0442c1-f8f6-40bd-b743-2efc890b987e",
+      "slug": "disko-hity-80-90-na-korable-moskva",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T09:18:00.574Z",
+      "route": "/events/disko-hity-80-90-na-korable-moskva",
+      "revision": "2->4"
+    }
+  ],
+  "verification": {
+    "checkedAt": "2026-11-11T12:21:45Z",
+    "publicPages": 30,
+    "http200": 30,
+    "selfCanonical": 30,
+    "indexFollow": 30,
+    "sitemap": "https://daibilet.ru/sitemaps/events.xml",
+    "sitemapHttp": 200,
+    "sitemapContainsBatch": true,
+    "revalidation": "success",
+    "indexNowQueued": true
+  }
+}
