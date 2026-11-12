@@ -50,10 +50,10 @@ export function EventsV2Preview({ catalog }: { catalog: PublicCatalogDto }) {
                 <p className="page-head__meta"><strong>{catalog?.total ?? items.length}</strong> событий · выбор редакции</p>
               </div>
             </div>
-            <form className="search-compact" onSubmit={(e) => e.preventDefault()}>
+            <div className="search-compact">
               <span className="search-compact__icon"><Search className="h-4 w-4" aria-hidden /></span>
               <input type="text" placeholder="Событие, площадка или артист" />
-            </form>
+            </div>
           </div>
 
           <div className="calendar-wrap">

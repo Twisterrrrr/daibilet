@@ -31,11 +31,11 @@ export function HomeV2Preview({ catalog, landings, articles }: Props) {
               <span className="badge">Афиша · Санкт-Петербург</span>
               <h1>Найдите своё <em>событие</em> в Петербурге</h1>
               <p className="hero__lead">Концерты, спектакли, выставки и прогулки — всё в одном месте.</p>
-              <form className="search" onSubmit={(e) => e.preventDefault()}>
+              <div className="search">
                 <span className="search__icon"><Search className="h-5 w-5" aria-hidden /></span>
                 <input type="text" placeholder="Событие, площадка или артист" />
-                <button type="submit" className="btn btn--primary">Найти</button>
-              </form>
+                <button type="button" className="btn btn--primary">Найти</button>
+              </div>
               <div className="pills">
                 {['Сегодня', 'Выходные', 'Концерты', 'Театр', 'Выставки', 'Бесплатно'].map((p, i) => (
                   <button key={p} className={`pill ${i === 0 ? 'is-active' : ''}`}>{p}</button>

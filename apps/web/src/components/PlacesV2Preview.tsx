@@ -22,10 +22,10 @@ export function PlacesV2Preview({ venues, total }: { venues: PublicVenueDto[]; t
               <p className="head__meta"><strong>{total}</strong> площадок · театры, клубы, музеи, лофты</p>
             </div>
           </div>
-          <form className="search-compact" onSubmit={(e) => e.preventDefault()}>
+          <div className="search-compact">
             <span className="search-compact__icon"><Search className="h-4 w-4" aria-hidden /></span>
             <input type="text" placeholder="Название площадки или адрес" />
-          </form>
+          </div>
         </div>
 
         <div className="type-tabs">
