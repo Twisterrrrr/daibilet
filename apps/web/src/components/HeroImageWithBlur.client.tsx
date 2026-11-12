@@ -7,7 +7,7 @@ import { resolveTeplohodPdpImage } from '@/lib/teplohod-pdp-image-map';
 const EVENT_HERO_BACKDROP_SIZES = '360px';
 const EVENT_HERO_FRAME_SIZES = '(min-aspect-ratio: 21/9) 1600px, (max-width: 1280px) 100vw, 1280px';
 
-/** Keep the artwork inside the page container and use a softened monochrome bleed behind it. */
+/** Keep the artwork inside the page container and extend its colors into a softened backdrop. */
 export function HeroImageWithBlur({
   src,
   alt,
@@ -69,8 +69,8 @@ export function HeroImageWithBlur({
         {renderLayer({
           imageAlt: '',
           sizes: EVENT_HERO_BACKDROP_SIZES,
-          className: 'scale-110 object-cover grayscale blur-2xl',
-          layerStyle: { objectPosition: focalPoint, opacity: 0.55, ...style },
+          className: 'scale-110 object-cover blur-2xl',
+          layerStyle: { objectPosition: focalPoint, opacity: 0.7, ...style },
         })}
       </div>
       <div

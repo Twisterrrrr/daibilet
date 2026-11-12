@@ -683,7 +683,7 @@ export function EventHero({
       }`}
     >
       <EventPageCitySync city={event.city} />
-      {/* Keep the artwork inside the page container; monochrome blur fills the side bleed. */}
+        {/* Keep the artwork inside the page container; its colors fill the side bleed. */}
       <HeroImageWithBlur
         src={heroImage || null}
         alt={formatPublicTitle(event.title)}
