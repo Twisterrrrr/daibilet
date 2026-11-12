@@ -125,7 +125,7 @@ test('sitemap invariant rejects a hidden venue and missing venue source', () => 
   };
   assert.throws(() => assertSitemapNoindexInvariant(entry, new Map([[url, venue]])), /noindex venue URL/);
   assert.throws(() => assertSitemapNoindexInvariant(entry, new Map()), /noindex venue URL/);
-  assert.doesNotThrow(() => assertSitemapNoindexInvariant(entry, new Map([[url, { ...venue, pageStatus: 'CANDIDATE' }]])));
+  assert.throws(() => assertSitemapNoindexInvariant(entry, new Map([[url, { ...venue, pageStatus: 'CANDIDATE' }]])), /noindex venue URL/);
 });
 
 test('excludeLanding values are stable and aliases do not duplicate canonical keys', () => {
