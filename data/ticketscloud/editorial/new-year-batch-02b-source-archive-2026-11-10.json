@@ -1,0 +1,806 @@
+{
+  "capturedAt": "2026-11-10T06:22:57.681Z",
+  "purpose": "Original production text and pre-rewrite EventPage state; archived, not active page content.",
+  "items": {
+    "evt_6ab40924d4f6dc5f5d4e75b7": {
+      "eventId": "evt_6ab40924d4f6dc5f5d4e75b7",
+      "eventPageId": "ef2e497c-1542-45e4-b030-20d00f39e01d",
+      "slug": "dzhaz-pri-svechah-melodii-rozhdestva-sankt-peterburg",
+      "title": "Джаз при свечах. Мелодии Рождества",
+      "city": "Санкт-Петербург",
+      "venue": "Концертный зал Яани Кирик",
+      "page": {
+        "id": "ef2e497c-1542-45e4-b030-20d00f39e01d",
+        "slug": "dzhaz-pri-svechah-melodii-rozhdestva-sankt-peterburg",
+        "title": "Джаз при свечах. Мелодии Рождества",
+        "summary": null,
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "content": {
+          "sections": []
+        },
+        "seoH1": "Джаз при свечах. Мелодии Рождества",
+        "seoTitle": "Джаз при свечах. Мелодии Рождества | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "routes": [
+        {
+          "path": "/events/dzhaz-pri-svechah-melodii-rozhdestva-sankt-peterburg",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "revision": 1,
+      "event": {
+        "id": "evt_6ab40924d4f6dc5f5d4e75b7",
+        "title": "Джаз при свечах. Мелодии Рождества",
+        "description": "Праздничный концерт в историческом здании лютеранской церкви Яани Кирик.<br><br>Обладательница гипнотического джазового тембра Юлия Худякова и её виртуозный бэнд (рояль, контрабас, ударные) подарят вам яркие впечатления в канун Нового года. В свете сотен свечей под сводами старинной кирхи прозвучат бессмертные хиты Луи Армстронга, Фрэнка Синатры, Эллы Фицджеральд и неожиданные джазовые интерпретации всемирно известных композиций.<br><br>Камерная атмосфера, акустика старинного здания и искренняя вовлечённость музыкантов создадут волшебный вечер, который вы ещё долго будете вспоминать. Концерт идеален для романтического свидания, встречи с друзьями или уютного семейного вечера.<br><br>Продолжительность: 1 час без антракта.",
+        "ageLimit": "0",
+        "priceFromRub": 1500,
+        "venue": "Концертный зал Яани Кирик",
+        "address": "ул. Декабристов, 54А",
+        "offer_min": 1500,
+        "active_offers": 14,
+        "future_sessions": [
+          {
+            "startsAt": "2026-12-26 16:00:00"
+          }
+        ]
+      },
+      "legacyOverrideDescription": "«Джаз при свечах. Мелодии Рождества» - джазовый концерт на площадке «Концертный зал Яани Кирик» в Санкт-Петербурге. Камерная атмосфера, акустика старинного здания и искренняя вовлечённость музыкантов создадут волшебный вечер, который вы ещё долго будете вспоминать. Концерт идеален для романтического свидания, встречи с друзьями или уютного семейного вечера.\n\n## Практическая информация\n\n- Место - «Концертный зал Яани Кирик», Санкт-Петербург\n- Адрес - ул. Декабристов, 54А\n- Продолжительность - около 60 минут\n- Билеты - от 1 500 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_6ab40924d4f6dc5f5d4e75b7",
+        "kind": "RECURRING",
+        "slug": "джаз-при-свечах-мелодии-рождества-6ab40924d4f6dc5f5d4e75b7",
+        "seoH1": null,
+        "title": "Джаз при свечах. Мелодии Рождества",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ab40924d4f6dc5f5d4e75b7",
+            "externalId": "6ab40924d4f6dc5f5d4e75b7",
+            "metaExternalId": "6ab4066300e1e93393a4df87"
+          }
+        ],
+        "venueId": "venue_57c9d5ca9cb5383c457c9cc5",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6ab406632a8e981d403cefcc.jpg",
+        "seoTitle": null,
+        "cityTitle": "Санкт-Петербург",
+        "venueTitle": "Концертный зал Яани Кирик",
+        "description": "Праздничный концерт в историческом здании лютеранской церкви Яани Кирик.<br><br>Обладательница гипнотического джазового тембра Юлия Худякова и её виртуозный бэнд (рояль, контрабас, ударные) подарят вам яркие впечатления в канун Нового года. В свете сотен свечей под сводами старинной кирхи прозвучат бессмертные хиты Луи Армстронга, Фрэнка Синатры, Эллы Фицджеральд и неожиданные джазовые интерпретации всемирно известных композиций.<br><br>Камерная атмосфера, акустика старинного здания и искренняя вовлечённость музыкантов создадут волшебный вечер, который вы ещё долго будете вспоминать. Концерт идеален для романтического свидания, встречи с друзьями или уютного семейного вечера.<br><br>Продолжительность: 1 час без антракта.",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "ул. Декабристов, 54А",
+        "canonicalPath": null,
+        "primaryCityId": "city_498817",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    "evt_6ae786ddef5a97ab5a605537": {
+      "eventId": "evt_6ae786ddef5a97ab5a605537",
+      "eventPageId": "4b9e93cd-b408-40bb-981d-b8dd85805f88",
+      "slug": "novogodnii-ogonek-so-zvezdami-80-90h-gruppa-karolina-istra",
+      "title": "Новогодний Огонёк со Звёздами 80-90х, группа \"КАРОЛИНА\"",
+      "city": "Истра",
+      "venue": "Бар-ресторан \"Первый\"",
+      "page": {
+        "id": "4b9e93cd-b408-40bb-981d-b8dd85805f88",
+        "slug": "novogodnii-ogonek-so-zvezdami-80-90h-gruppa-karolina-istra",
+        "title": "Новогодний Огонёк со Звёздами 80-90х, группа \"КАРОЛИНА\"",
+        "summary": null,
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "content": {
+          "sections": []
+        },
+        "seoH1": "Новогодний Огонёк со Звёздами 80-90х, группа \"КАРОЛИНА\"",
+        "seoTitle": "Новогодний Огонёк со Звёздами 80-90х, группа \"КАРОЛИНА\" | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "routes": [
+        {
+          "path": "/events/novogodnii-ogonek-so-zvezdami-80-90h-gruppa-karolina-istra",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "revision": 1,
+      "event": {
+        "id": "evt_6ae786ddef5a97ab5a605537",
+        "title": "Новогодний Огонёк со Звёздами 80-90х, группа \"КАРОЛИНА\"",
+        "description": "26 декабря<br>Бар-ресторан \"Первый\" (г. Истра)<br>Сбор гостей в 19:00, начало в 20:00<br>Тел. +79684994167<br><br>Новогодний Огонёк со Звёздами 80-90х!<br><br>В праздничном концерте примут участие настоящие звёзды, легенды 80-90х:<br><br>— Группа «КАРОЛИНА»<br><br>Музыкальное шоу, где легендарные хиты оживают по новому, а эксклюзивные концертные композиции подарят ощущение, что время повернулось вспять.<br><br>Вас ждёт прекрасная атмосфера, которая подарит всем гостям нашего концерта, ностальгические переживания, волшебные и настоящие эмоции магической музыки disco. Мы гарантируем Вам танцевальный позитив с настоящими звёздами 80-90х. В программе нетленные супер-хиты: «Летний дискобар» (Танцуют огоньки), «Звёздный вечер», «Не надо слёз», «На дискотеке» (Зимний вечер), \"Маленький принц\" и многие другие.<br><br>В этот вечер в компании звёзд и ведущего концерта, вы окунётесь в атмосферу праздника и веселья!",
+        "ageLimit": "12",
+        "priceFromRub": 1300,
+        "venue": "Бар-ресторан \"Первый\"",
+        "address": "ул. 9-й Гвардейской Дивизии, 9 корп 3",
+        "offer_min": 1300,
+        "active_offers": 7,
+        "future_sessions": [
+          {
+            "startsAt": "2026-12-26 17:00:00"
+          }
+        ]
+      },
+      "legacyOverrideDescription": null,
+      "sourceSnapshot": {
+        "id": "evt_6ae786ddef5a97ab5a605537",
+        "kind": "SINGLE",
+        "slug": "новогоднии-огонек-со-звездами-80-90х-группа-каролина-6ae786ddef5a97ab5a605537",
+        "seoH1": null,
+        "title": "Новогодний Огонёк со Звёздами 80-90х, группа \"КАРОЛИНА\"",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ae786ddef5a97ab5a605537",
+            "externalId": "6ae786ddef5a97ab5a605537",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_5873b85ed352860018db86dd",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-11/6ae786dc2bcbeb9aa1257ec6.jpg",
+        "seoTitle": null,
+        "cityTitle": "Истра",
+        "venueTitle": "Бар-ресторан \"Первый\"",
+        "description": "26 декабря<br>Бар-ресторан \"Первый\" (г. Истра)<br>Сбор гостей в 19:00, начало в 20:00<br>Тел. +79684994167<br><br>Новогодний Огонёк со Звёздами 80-90х!<br><br>В праздничном концерте примут участие настоящие звёзды, легенды 80-90х:<br><br>— Группа «КАРОЛИНА»<br><br>Музыкальное шоу, где легендарные хиты оживают по новому, а эксклюзивные концертные композиции подарят ощущение, что время повернулось вспять.<br><br>Вас ждёт прекрасная атмосфера, которая подарит всем гостям нашего концерта, ностальгические переживания, волшебные и настоящие эмоции магической музыки disco. Мы гарантируем Вам танцевальный позитив с настоящими звёздами 80-90х. В программе нетленные супер-хиты: «Летний дискобар» (Танцуют огоньки), «Звёздный вечер», «Не надо слёз», «На дискотеке» (Зимний вечер), \"Маленький принц\" и многие другие.<br><br>В этот вечер в компании звёзд и ведущего концерта, вы окунётесь в атмосферу праздника и веселья!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "ул. 9-й Гвардейской Дивизии, 9 корп 3",
+        "canonicalPath": null,
+        "primaryCityId": "city_555746",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    "evt_6ad8d0e27a01b29e31fc3f45": {
+      "eventId": "evt_6ad8d0e27a01b29e31fc3f45",
+      "eventPageId": "f4a981a5-16c1-49ae-9077-880bd6d08862",
+      "slug": "novogodnyaya-vecherinka-v-parke-krasnodar-s-aiwaska-krasnodar",
+      "title": "Новогодняя вечеринка в парке «Краснодар» с Aiwaska",
+      "city": "Краснодар",
+      "venue": "Eat Beat (Парк Краснодар)",
+      "page": {
+        "id": "f4a981a5-16c1-49ae-9077-880bd6d08862",
+        "slug": "novogodnyaya-vecherinka-v-parke-krasnodar-s-aiwaska-krasnodar",
+        "title": "Новогодняя вечеринка в парке «Краснодар» с Aiwaska",
+        "summary": null,
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "content": {
+          "sections": []
+        },
+        "seoH1": "Новогодняя вечеринка в парке «Краснодар» с Aiwaska",
+        "seoTitle": "Новогодняя вечеринка в парке «Краснодар» с Aiwaska | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "routes": [
+        {
+          "path": "/events/novogodnyaya-vecherinka-v-parke-krasnodar-s-aiwaska-krasnodar",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "revision": 1,
+      "event": {
+        "id": "evt_6ad8d0e27a01b29e31fc3f45",
+        "title": "Новогодняя вечеринка в парке «Краснодар» с Aiwaska",
+        "description": "Новогодний карнавал в парке, самая яркая предновогодняя ночь!",
+        "ageLimit": "18",
+        "priceFromRub": 1500,
+        "venue": "Eat Beat (Парк Краснодар)",
+        "address": "Улица Героя Владислава Посадского, 2 ст И",
+        "offer_min": 1500,
+        "active_offers": 1,
+        "future_sessions": [
+          {
+            "startsAt": "2026-12-26 19:00:00"
+          }
+        ]
+      },
+      "legacyOverrideDescription": null,
+      "sourceSnapshot": {
+        "id": "evt_6ad8d0e27a01b29e31fc3f45",
+        "kind": "SINGLE",
+        "slug": "новогодняя-вечеринка-в-парке-краснодар-с-aiwaska-6ad8d0e27a01b29e31fc3f45",
+        "seoH1": null,
+        "title": "Новогодняя вечеринка в парке «Краснодар» с Aiwaska",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ad8d0e27a01b29e31fc3f45",
+            "externalId": "6ad8d0e27a01b29e31fc3f45",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_6ad8d09c7ee51a2aee0533c7",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ad90bff1ffbe2a9a2995412.jpg",
+        "seoTitle": null,
+        "cityTitle": "Краснодар",
+        "venueTitle": "Eat Beat (Парк Краснодар)",
+        "description": "Новогодний карнавал в парке, самая яркая предновогодняя ночь!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Улица Героя Владислава Посадского, 2 ст И",
+        "canonicalPath": null,
+        "primaryCityId": "city_542420",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    "evt_6ab23bbfc611d5060e0ea9f5": {
+      "eventId": "evt_6ab23bbfc611d5060e0ea9f5",
+      "eventPageId": "9e28d0d0-4ddb-477d-8741-315f9a6f5a2d",
+      "slug": "aleks-abra-it-s-the-most-wonderful-time-of-the-year-glavnoe-nochnoe-novogodnee-shou-moskva",
+      "title": "Алекс Абра: It's The Most Wonderful Time Of The Year. Главное ночное новогоднее шоу.",
+      "city": "Москва",
+      "venue": "Джем Клуб / Jam Club",
+      "page": {
+        "id": "9e28d0d0-4ddb-477d-8741-315f9a6f5a2d",
+        "slug": "aleks-abra-it-s-the-most-wonderful-time-of-the-year-glavnoe-nochnoe-novogodnee-shou-moskva",
+        "title": "Алекс Абра: It's The Most Wonderful Time Of The Year. Главное ночное новогоднее шоу.",
+        "summary": null,
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "content": {
+          "sections": []
+        },
+        "seoH1": "Алекс Абра: It's The Most Wonderful Time Of The Year. Главное ночное новогоднее шоу.",
+        "seoTitle": "Алекс Абра: It's The Most Wonderful Time Of The Year. Главное ночное новогоднее шоу. | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "routes": [
+        {
+          "path": "/events/aleks-abra-it-s-the-most-wonderful-time-of-the-year-glavnoe-nochnoe-novogodnee-shou-moskva",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "revision": 1,
+      "event": {
+        "id": "evt_6ab23bbfc611d5060e0ea9f5",
+        "title": "Алекс Абра: It's The Most Wonderful Time Of The Year. Главное ночное новогоднее шоу.",
+        "description": "Добро пожаловать в Рождественскую сказку! <br><br>   Здесь Вы сможете погрузиться в атмосферу старых новогодних голлливудских фильмов и мюзиклов,  высшего света 20 века, наслаждаясь вкуснейшими Christmas песнями в исполнении одного из самых востребованных и харизматичных джазовых вокалистов, обладателя бархатного баритона - Алекса Абра и ведущих джазменов столицы. <br><br>    \"Santa Claus Is Coming To Town\" , \"It's The Most Wonderful Time Of The Year \" ; Let It Snow;  \"Jingle Bell Rock\", \"Mr Sandman\", \"Have Yourself a Merry Little Christmas \"и множество подобных невероятно уютных и ярких песен из репертуара легенд мировой джазовой сцены, центральным из которых в этот вечер станет Фрэнк Синатра. Это не просто концерт, а целое шоу, состоящее из музыкального юмора, множества шуток и импровизации. <br><br>  Однако главная особенность всех шоу Алекса Абра - это 100% аутентичность в звучании  исполняемых им песен, добиться которой солист смог своему абсолютно свободному владению английским языком, идеальному произношению и глубокому пониманию стиля. <br><br>   Алекс Абра - известный российский джазовый вокалист и автор песен;  лауреат(1-е место) международного фестиваля Усадьба Джаз; участник анти-ГОЛОСА - проекта Александра Градского; участник телешоу \"Поймай меня, если сможешь\", резидент московских джаз клубов и концертных агенств; полиглот.",
+        "ageLimit": "6",
+        "priceFromRub": 4500,
+        "venue": "Джем Клуб / Jam Club",
+        "address": "Сретенка, д. 11",
+        "offer_min": 4500,
+        "active_offers": 5,
+        "future_sessions": [
+          {
+            "startsAt": "2026-12-26 19:00:00"
+          }
+        ]
+      },
+      "legacyOverrideDescription": "«Алекс Абра: It's The Most Wonderful Time Of The Year. Главное ночное новогоднее шоу.» в Москве.\n\nПрограмма шоу построена на эффектах: номера сменяют друг друга, зал становится частью происходящего. Свет, музыка и костюмы создают цельное впечатление, а зал включается в происходящее. Места в центральной части зала дают лучший обзор - выбирать их стоит заранее. Хорошая идея на вечер выходного дня. Зрелищная программа: сцена, свет и артисты работают на одно впечатление. Номера идут без длинных пауз, поэтому внимание зала держится на протяжении всего вечера.\n\nМеста в центральной части зала дают лучший обзор - выбирать их стоит заранее. Выходной вечер под это подходит отлично. Программа шоу построена на эффектах: номера сменяют друг друга, зал становится частью происходящего. Свет, костюмы и музыка подобраны так, чтобы усилить впечатление от каждого эпизода. Чаще всего это семейный формат: удобно прийти и компанией, и с детьми. Для вечера выходного дня - в самый раз.\n\nДобро пожаловать в Рождественскую сказку! Здесь Вы сможете погрузиться в атмосферу старых новогодних голлливудских фильмов и мюзиклов, высшего света 20 века, наслаждаясь вкуснейшими Christmas песнями в исполнении одного из самых востребованных и харизматичных джазовых вокалистов, обладателя бархатного баритона - Алекса Абра и ведущих джазменов столицы.\n\n\"Santa Claus Is Coming To Town\", \"It's The Most Wonderful Time Of The Year \"; Let It Snow; \"Jingle Bell Rock\", \"Mr Sandman\", \"Have Yourself a Merry Little Christmas \"и множество подобных невероятно уютных и ярких песен из репертуара легенд мировой джазовой сцены, центральным из которых в этот вечер станет Фрэнк Синатра. Это не просто концерт, а целое шоу, состоящее из музыкального юмора, множества шуток и импровизации.\n\nОднако главная особенность всех шоу Алекса Абра - это 100% аутентичность в звучании исполняемых им песен, добиться которой солист смог своему абсолютно свободному владению английским языком, идеальному произношению и глубокому пониманию стиля.\n\nАлекс Абра - известный российский джазовый вокалист и автор песен; лауреат(1-е место) международного фестиваля Усадьба Джаз; участник анти-ГОЛОСА - проекта Александра Градского; участник телешоу \"Поймай меня, если сможешь\", резидент московских джаз клубов и концертных агенств; полиглот.\n\n## Практическая информация\n\n- Место - «Джем Клуб Мьюзик», Москва\n- Адрес - Сретенка, д. 11\n- Продолжительность - около 120 минут\n- Возрастное ограничение - 6+\n- Билеты - от 4 500 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_6ab23bbfc611d5060e0ea9f5",
+        "kind": "SINGLE",
+        "slug": "алекс-абра-it-s-the-most-wonderful-time-of-the-year-главное-ночное-новогоднее-шоу-6ab23bbfc611d5060e0ea9f5",
+        "seoH1": null,
+        "title": "Алекс Абра: It's The Most Wonderful Time Of The Year. Главное ночное новогоднее шоу.",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ab23bbfc611d5060e0ea9f5",
+            "externalId": "6ab23bbfc611d5060e0ea9f5",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_623457215d2b1afd72c3ec48",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6ab23be43a4239e46c676b69.jpg",
+        "seoTitle": null,
+        "cityTitle": "Москва",
+        "venueTitle": "Джем Клуб / Jam Club",
+        "description": "Добро пожаловать в Рождественскую сказку! <br><br>   Здесь Вы сможете погрузиться в атмосферу старых новогодних голлливудских фильмов и мюзиклов,  высшего света 20 века, наслаждаясь вкуснейшими Christmas песнями в исполнении одного из самых востребованных и харизматичных джазовых вокалистов, обладателя бархатного баритона - Алекса Абра и ведущих джазменов столицы. <br><br>    \"Santa Claus Is Coming To Town\" , \"It's The Most Wonderful Time Of The Year \" ; Let It Snow;  \"Jingle Bell Rock\", \"Mr Sandman\", \"Have Yourself a Merry Little Christmas \"и множество подобных невероятно уютных и ярких песен из репертуара легенд мировой джазовой сцены, центральным из которых в этот вечер станет Фрэнк Синатра. Это не просто концерт, а целое шоу, состоящее из музыкального юмора, множества шуток и импровизации. <br><br>  Однако главная особенность всех шоу Алекса Абра - это 100% аутентичность в звучании  исполняемых им песен, добиться которой солист смог своему абсолютно свободному владению английским языком, идеальному произношению и глубокому пониманию стиля. <br><br>   Алекс Абра - известный российский джазовый вокалист и автор песен;  лауреат(1-е место) международного фестиваля Усадьба Джаз; участник анти-ГОЛОСА - проекта Александра Градского; участник телешоу \"Поймай меня, если сможешь\", резидент московских джаз клубов и концертных агенств; полиглот.",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Сретенка, д. 11",
+        "canonicalPath": null,
+        "primaryCityId": "city_524901",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    "evt_6ae8aae79d127cb1871136e8": {
+      "eventId": "evt_6ae8aae79d127cb1871136e8",
+      "eventPageId": "31a071c9-4b8d-4109-83b5-1da714a534c9",
+      "slug": "novogodnyaya-elka-dlya-malyshei-3-kaliningrad",
+      "title": "Новогодняя елка для малышей, 3+",
+      "city": "Калининград",
+      "venue": "Театр Николая Захарова",
+      "page": {
+        "id": "31a071c9-4b8d-4109-83b5-1da714a534c9",
+        "slug": "novogodnyaya-elka-dlya-malyshei-3-kaliningrad",
+        "title": "Новогодняя елка для малышей, 3+",
+        "summary": null,
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "content": {
+          "sections": []
+        },
+        "seoH1": "Новогодняя елка для малышей, 3+",
+        "seoTitle": "Новогодняя елка для малышей, 3+ | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "routes": [
+        {
+          "path": "/events/novogodnyaya-elka-dlya-malyshei-3-kaliningrad",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "revision": 1,
+      "event": {
+        "id": "evt_6ae8aae79d127cb1871136e8",
+        "title": "Новогодняя елка для малышей, 3+",
+        "description": "Детское новогоднее представление в необычном театре за столиками<br>Конкурсы, подвижные игры, квесты и призы<br>Памятный сувенир каждому ребенку<br>Фотосессия с Дедом Морозом и Снегурочкой<br>Новогодний буфет",
+        "ageLimit": "0",
+        "priceFromRub": 1000,
+        "venue": "Театр Николая Захарова",
+        "address": "ул. Глазунова, д. 9 (заезд с ул.Глазунова 22)",
+        "offer_min": 1000,
+        "active_offers": 4,
+        "future_sessions": [
+          {
+            "startsAt": "2026-12-27 09:00:00"
+          }
+        ]
+      },
+      "legacyOverrideDescription": null,
+      "sourceSnapshot": {
+        "id": "evt_6ae8aae79d127cb1871136e8",
+        "kind": "SINGLE",
+        "slug": "новогодняя-елка-для-малышеи-3-6ae8aae79d127cb1871136e8",
+        "seoH1": null,
+        "title": "Новогодняя елка для малышей, 3+",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ae8aae79d127cb1871136e8",
+            "externalId": "6ae8aae79d127cb1871136e8",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_5e394c1acbde02a17748cd1a",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-11/6ae8aae6fec780663b104e5d.jpg",
+        "seoTitle": null,
+        "cityTitle": "Калининград",
+        "venueTitle": "Театр Николая Захарова",
+        "description": "Детское новогоднее представление в необычном театре за столиками<br>Конкурсы, подвижные игры, квесты и призы<br>Памятный сувенир каждому ребенку<br>Фотосессия с Дедом Морозом и Снегурочкой<br>Новогодний буфет",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "ул. Глазунова, д. 9 (заезд с ул.Глазунова 22)",
+        "canonicalPath": null,
+        "primaryCityId": "city_554234",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    "evt_6ae8ac1a9641ea1b20ba3080": {
+      "eventId": "evt_6ae8ac1a9641ea1b20ba3080",
+      "eventPageId": "fe56d3b0-0243-4f47-b279-a5accf6aadfd",
+      "slug": "ded-moroz-i-ledi-bag-bitva-za-novyi-god-6-kaliningrad",
+      "title": "Дед Мороз и Леди Баг. Битва за новый год, 6+",
+      "city": "Калининград",
+      "venue": "Театр Николая Захарова",
+      "page": {
+        "id": "fe56d3b0-0243-4f47-b279-a5accf6aadfd",
+        "slug": "ded-moroz-i-ledi-bag-bitva-za-novyi-god-6-kaliningrad",
+        "title": "Дед Мороз и Леди Баг. Битва за новый год, 6+",
+        "summary": null,
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "content": {
+          "sections": []
+        },
+        "seoH1": "Дед Мороз и Леди Баг. Битва за новый год, 6+",
+        "seoTitle": "Дед Мороз и Леди Баг. Битва за новый год, 6+ | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "routes": [
+        {
+          "path": "/events/ded-moroz-i-ledi-bag-bitva-za-novyi-god-6-kaliningrad",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "revision": 1,
+      "event": {
+        "id": "evt_6ae8ac1a9641ea1b20ba3080",
+        "title": "Дед Мороз и Леди Баг. Битва за новый год, 6+",
+        "description": "Детское новогоднее представление в необычном театре за столиками<br>Конкурсы, подвижные игры, квесты и призы<br>Шоу фокусника<br>Памятный сувенир каждому ребенку<br>Фотосессия с Дедом Морозом и персонажами<br>Новогодний буфет",
+        "ageLimit": "6",
+        "priceFromRub": 1000,
+        "venue": "Театр Николая Захарова",
+        "address": "ул. Глазунова, д. 9 (заезд с ул.Глазунова 22)",
+        "offer_min": 1000,
+        "active_offers": 4,
+        "future_sessions": [
+          {
+            "startsAt": "2026-12-27 11:30:00"
+          }
+        ]
+      },
+      "legacyOverrideDescription": null,
+      "sourceSnapshot": {
+        "id": "evt_6ae8ac1a9641ea1b20ba3080",
+        "kind": "SINGLE",
+        "slug": "дед-мороз-и-леди-баг-битва-за-новыи-год-6-6ae8ac1a9641ea1b20ba3080",
+        "seoH1": null,
+        "title": "Дед Мороз и Леди Баг. Битва за новый год, 6+",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ae8ac1a9641ea1b20ba3080",
+            "externalId": "6ae8ac1a9641ea1b20ba3080",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_5e394c1acbde02a17748cd1a",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-11/6ae8ac189641ea1b20ba307e.png",
+        "seoTitle": null,
+        "cityTitle": "Калининград",
+        "venueTitle": "Театр Николая Захарова",
+        "description": "Детское новогоднее представление в необычном театре за столиками<br>Конкурсы, подвижные игры, квесты и призы<br>Шоу фокусника<br>Памятный сувенир каждому ребенку<br>Фотосессия с Дедом Морозом и персонажами<br>Новогодний буфет",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "ул. Глазунова, д. 9 (заезд с ул.Глазунова 22)",
+        "canonicalPath": null,
+        "primaryCityId": "city_554234",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    "evt_6ae3957cd56f423c23698ec9": {
+      "eventId": "evt_6ae3957cd56f423c23698ec9",
+      "eventPageId": "d2908e51-da4f-4c01-bd10-b93da2215252",
+      "slug": "andrei-vinogradov-novogodnii-koncert-moskva",
+      "title": "АНДРЕЙ ВИНОГРАДОВ: «НОВОГОДНИЙ КОНЦЕРТ»",
+      "city": "Москва",
+      "venue": "Клуб Алексея Козлова",
+      "page": {
+        "id": "d2908e51-da4f-4c01-bd10-b93da2215252",
+        "slug": "andrei-vinogradov-novogodnii-koncert-moskva",
+        "title": "АНДРЕЙ ВИНОГРАДОВ: «НОВОГОДНИЙ КОНЦЕРТ»",
+        "summary": null,
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "content": {
+          "sections": []
+        },
+        "seoH1": "АНДРЕЙ ВИНОГРАДОВ: «НОВОГОДНИЙ КОНЦЕРТ»",
+        "seoTitle": "АНДРЕЙ ВИНОГРАДОВ: «НОВОГОДНИЙ КОНЦЕРТ» | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "routes": [
+        {
+          "path": "/events/andrei-vinogradov-novogodnii-koncert-moskva",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "revision": 1,
+      "event": {
+        "id": "evt_6ae3957cd56f423c23698ec9",
+        "title": "АНДРЕЙ ВИНОГРАДОВ: «НОВОГОДНИЙ КОНЦЕРТ»",
+        "description": "Андрей Виноградов — единственный в России профессиональный исполнитель на редком инструменте hurdy-gurdy (хёрди-гёрди, европейская колёсная лира).<br><br>В программе выступления — микс этнических мотивов Болгарии, Македонии, Турции, России и Германии, импровизационной музыки, авторских композиций и оригинальных аранжировок. В финале выступления музыкант исполнит свою знаменитую «Reverse Dance», набравшую более 18 миллионов просмотров на YouTube, а также ответит на вопросы слушателей и расскажет об уникальном инструменте, созданном мастером Вольфгангом Вайзельбаумером.<br><br>Композитор и аранжировщик Андрей Виноградов родился в Екатеринбурге, окончил музыкальное училище им. П.И. Чайковского по классу композиции, а в 1982 году был приглашён на учёбу в Российскую академию музыки им. Гнесиных, где обучался джазовому фортепиано под руководством Игоря Бриля. Уже в 1984-м Андрей стал клавишником легендарного «Арсенала» Алексея Козлова, а впоследствии участвовал во многих престижных фестивалях в России и за рубежом.<br><br>Виноградов записал несколько альбомов, два из которых — «Russian Hurdy-Gurdy Tunes» («Русские наигрыши на колёсной лире») и «Russian Strolling Beggars Tunes» («Наигрыши русских странников») — посвящены русской традиции колёсной лиры, тогда как «Music For Hurdy-Gurdy» («Музыка для колёсной лиры»), «Aequilibrium» («Равновесие») и «Distant Calls» («Дальние звонки») исследуют европейскую традицию. Несмотря на внешнюю схожесть инструмента в разных культурах, техники игры на русской и европейской лирах кардинально различаются, и Андрей виртуозно владеет обеими.<br><br>На протяжении многих лет музыкант активно занимается популяризацией европейской школы хёрди-гёрди в России.",
+        "ageLimit": "12",
+        "priceFromRub": 1000,
+        "venue": "Клуб Алексея Козлова",
+        "address": "Маросейка 9/2",
+        "offer_min": 1000,
+        "active_offers": 8,
+        "future_sessions": [
+          {
+            "startsAt": "2026-12-27 12:00:00"
+          }
+        ]
+      },
+      "legacyOverrideDescription": null,
+      "sourceSnapshot": {
+        "id": "evt_6ae3957cd56f423c23698ec9",
+        "kind": "SINGLE",
+        "slug": "андреи-виноградов-новогоднии-концерт-6ae3957cd56f423c23698ec9",
+        "seoH1": null,
+        "title": "АНДРЕЙ ВИНОГРАДОВ: «НОВОГОДНИЙ КОНЦЕРТ»",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ae3957cd56f423c23698ec9",
+            "externalId": "6ae3957cd56f423c23698ec9",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_590854a3515e350016705a52",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2024-08/66ab80bfc4ce6a7ae62063c0.jpg",
+        "seoTitle": null,
+        "cityTitle": "Москва",
+        "venueTitle": "Клуб Алексея Козлова",
+        "description": "Андрей Виноградов — единственный в России профессиональный исполнитель на редком инструменте hurdy-gurdy (хёрди-гёрди, европейская колёсная лира).<br><br>В программе выступления — микс этнических мотивов Болгарии, Македонии, Турции, России и Германии, импровизационной музыки, авторских композиций и оригинальных аранжировок. В финале выступления музыкант исполнит свою знаменитую «Reverse Dance», набравшую более 18 миллионов просмотров на YouTube, а также ответит на вопросы слушателей и расскажет об уникальном инструменте, созданном мастером Вольфгангом Вайзельбаумером.<br><br>Композитор и аранжировщик Андрей Виноградов родился в Екатеринбурге, окончил музыкальное училище им. П.И. Чайковского по классу композиции, а в 1982 году был приглашён на учёбу в Российскую академию музыки им. Гнесиных, где обучался джазовому фортепиано под руководством Игоря Бриля. Уже в 1984-м Андрей стал клавишником легендарного «Арсенала» Алексея Козлова, а впоследствии участвовал во многих престижных фестивалях в России и за рубежом.<br><br>Виноградов записал несколько альбомов, два из которых — «Russian Hurdy-Gurdy Tunes» («Русские наигрыши на колёсной лире») и «Russian Strolling Beggars Tunes» («Наигрыши русских странников») — посвящены русской традиции колёсной лиры, тогда как «Music For Hurdy-Gurdy» («Музыка для колёсной лиры»), «Aequilibrium» («Равновесие») и «Distant Calls» («Дальние звонки») исследуют европейскую традицию. Несмотря на внешнюю схожесть инструмента в разных культурах, техники игры на русской и европейской лирах кардинально различаются, и Андрей виртуозно владеет обеими.<br><br>На протяжении многих лет музыкант активно занимается популяризацией европейской школы хёрди-гёрди в России.",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Маросейка 9/2",
+        "canonicalPath": null,
+        "primaryCityId": "city_524901",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    "evt_6a6cc29c3f084f2c6f20a476": {
+      "eventId": "evt_6a6cc29c3f084f2c6f20a476",
+      "eventPageId": "64f5d444-6989-47f0-bf50-f5c994f5b678",
+      "slug": "snegurochka-opernoe-immersivnoe-predstavlenie-sankt-peterburg",
+      "title": "\"СНЕГУРОЧКА\" Оперное иммерсивное представление",
+      "city": "Санкт-Петербург",
+      "venue": "Музыкальный салон «Классика без границ»",
+      "page": {
+        "id": "64f5d444-6989-47f0-bf50-f5c994f5b678",
+        "slug": "snegurochka-opernoe-immersivnoe-predstavlenie-sankt-peterburg",
+        "title": "\"СНЕГУРОЧКА\" Оперное иммерсивное представление",
+        "summary": null,
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "content": {
+          "sections": []
+        },
+        "seoH1": "\"СНЕГУРОЧКА\" Оперное иммерсивное представление",
+        "seoTitle": "\"СНЕГУРОЧКА\" Оперное иммерсивное представление | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "routes": [
+        {
+          "path": "/events/snegurochka-opernoe-immersivnoe-predstavlenie-sankt-peterburg",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "revision": 1,
+      "event": {
+        "id": "evt_6a6cc29c3f084f2c6f20a476",
+        "title": "\"СНЕГУРОЧКА\" Оперное иммерсивное представление",
+        "description": "Приглашаем маленьких и взрослых на семейные представления от создателей проекта\"Оперная Кухня\": интерактивные оперные сказки по мотивам одноименных опер.<br><br>Общительные Баба Яга и Кикимора встречают гостей и вместе с молодыми оперными певцами и зрителями готовят на \"Оперной кухне\" сказки в гостеприимном музыкальном салоне \"Классика без границ\". <br><br>Представление длится 90 минут с конкурсами чаепитием,сластями, призами и подарками.<br><br>\"Снегурочка\"- представление по мотивам одноименной оперы Николая Римского- Корсакова.<br> <br>Волшебницы Баба Яга и Кикимора превращают салон в \"Берендеево Царство \" и готовят сказку на \" Оперной кухне \"с молодыми оперными певцами и зрителями.<br><br>Баба Яга - Татьяна Чухрай,автор проекта \" Оперная Кухня \",партия фортепиано<br>Кикимора- Анастасия Мазанкина,соавтор проекта<br>Снегурочка, Дед Мороз, Мизгирь, Купава, Лель- солисты театров Санкт-Петербурга<br>Царь Берендей,Бобыль и Бобылиха- зрители, победители весёлых конкурсов с призами.<br><br>Представление пройдет в сопровождении рояля, который принадлежал Римскому- Корсакову.<br><br>В завершение представления  Дед Мороз подарит зрителям новогодние подарки, а гостеприимная Кикимора- чаепитие с персонажами. <br><br>У зрителей будет возможность сделать памятные  фото и видео с персонажами в \"Берендеевом Царстве\"",
+        "ageLimit": "6",
+        "priceFromRub": 1800,
+        "venue": "Музыкальный салон «Классика без границ»",
+        "address": "Казанская ул, 7 литера В, оф. 208",
+        "offer_min": 1800,
+        "active_offers": 1,
+        "future_sessions": [
+          {
+            "startsAt": "2026-12-27 12:00:00"
+          }
+        ]
+      },
+      "legacyOverrideDescription": "Приглашаем маленьких и взрослых на семейные представления от создателей проекта\"Оперная Кухня\": интерактивные оперные сказки по мотивам одноименных опер. Общительные Баба Яга и Кикимора встречают гостей и вместе с молодыми оперными певцами и зрителями готовят на \"Оперной кухне\" сказки в гостеприимном музыкальном салоне \"Классика без границ\". Представление длится 90 минут с конкурсами чаепитием,сластями, призами и подарками.\n\nХороший повод сменить обстановку: вместо экрана - площадка, сцена и другие зрители рядом. Времени хватает, чтобы и включиться в происходящее, и просто отдохнуть: темп комфортный для большинства гостей. Можно прийти и одному: в зале обычно легко найти своё место и настроение. Хорошо для выходного: рядом с остальными планами дня. Вечер проводят в зале вместе с другими зрителями: программа идёт последовательно, от начала до конца. Времени хватает, чтобы и включиться в происходящее, и просто отдохнуть: темп комфортный для большинства гостей. Приятный вариант и для компании, и для спокойного вечера вдвоём. Выходной днём - удобно: вечер остаётся свободным.\n\n\"Снегурочка\"- представление по мотивам одноименной оперы Николая Римского- Корсакова. Волшебницы Баба Яга и Кикимора превращают салон в \"Берендеево Царство \" и готовят сказку на \" Оперной кухне \"с молодыми оперными певцами и зрителями. Баба Яга - Татьяна Чухрай,автор проекта \" Оперная Кухня \",партия фортепиано Кикимора- Анастасия Мазанкина,соавтор проекта Снегурочка, Дед Мороз, Мизгирь, Купава, Лель- солисты театров Санкт-Петербурга Царь Берендей,Бобыль и Бобылиха- зрители, победители весёлых конкурсов с призами.\n\nПредставление пройдет в сопровождении рояля, который принадлежал Римскому- Корсакову. В завершение представления Дед Мороз подарит зрителям новогодние подарки, а гостеприимная Кикимора- чаепитие с персонажами. У зрителей будет возможность сделать памятные фото и видео с персонажами в \"Берендеевом Царстве\".\n\n## Практическая информация\n\n- Место - Музыкальный салон «Классика без границ», Санкт-Петербург\n- Адрес - Казанская ул, 7 литера В, оф. 208\n- Продолжительность - около 90 минут\n- Возрастное ограничение - 6+\n- Билеты - от 1 800 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_6a6cc29c3f084f2c6f20a476",
+        "kind": "SINGLE",
+        "slug": "снегурочка-оперное-иммерсивное-представление-6a6cc29c3f084f2c6f20a476",
+        "seoH1": null,
+        "title": "\"СНЕГУРОЧКА\" Оперное иммерсивное представление",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a6cc29c3f084f2c6f20a476",
+            "externalId": "6a6cc29c3f084f2c6f20a476",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_617ee7732217973cbcec9ddc",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-07/6a6cc29bb08a50e87b9119e9.jpg",
+        "seoTitle": null,
+        "cityTitle": "Санкт-Петербург",
+        "venueTitle": "Музыкальный салон «Классика без границ»",
+        "description": "Приглашаем маленьких и взрослых на семейные представления от создателей проекта\"Оперная Кухня\": интерактивные оперные сказки по мотивам одноименных опер.<br><br>Общительные Баба Яга и Кикимора встречают гостей и вместе с молодыми оперными певцами и зрителями готовят на \"Оперной кухне\" сказки в гостеприимном музыкальном салоне \"Классика без границ\". <br><br>Представление длится 90 минут с конкурсами чаепитием,сластями, призами и подарками.<br><br>\"Снегурочка\"- представление по мотивам одноименной оперы Николая Римского- Корсакова.<br> <br>Волшебницы Баба Яга и Кикимора превращают салон в \"Берендеево Царство \" и готовят сказку на \" Оперной кухне \"с молодыми оперными певцами и зрителями.<br><br>Баба Яга - Татьяна Чухрай,автор проекта \" Оперная Кухня \",партия фортепиано<br>Кикимора- Анастасия Мазанкина,соавтор проекта<br>Снегурочка, Дед Мороз, Мизгирь, Купава, Лель- солисты театров Санкт-Петербурга<br>Царь Берендей,Бобыль и Бобылиха- зрители, победители весёлых конкурсов с призами.<br><br>Представление пройдет в сопровождении рояля, который принадлежал Римскому- Корсакову.<br><br>В завершение представления  Дед Мороз подарит зрителям новогодние подарки, а гостеприимная Кикимора- чаепитие с персонажами. <br><br>У зрителей будет возможность сделать памятные  фото и видео с персонажами в \"Берендеевом Царстве\"",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Казанская ул, 7 литера В, оф. 208",
+        "canonicalPath": null,
+        "primaryCityId": "city_498817",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    "evt_6ae1d93484be2341be7d5a34": {
+      "eventId": "evt_6ae1d93484be2341be7d5a34",
+      "eventPageId": "3a98e292-3e61-4289-8ba6-2f7fc1ea178c",
+      "slug": "pank-rok-elka-tver",
+      "title": "ПАНК-РОК-ЁЛКА",
+      "city": "Тверь",
+      "venue": "Клуб Биг Бен",
+      "page": {
+        "id": "3a98e292-3e61-4289-8ba6-2f7fc1ea178c",
+        "slug": "pank-rok-elka-tver",
+        "title": "ПАНК-РОК-ЁЛКА",
+        "summary": null,
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "content": {
+          "sections": []
+        },
+        "seoH1": "ПАНК-РОК-ЁЛКА",
+        "seoTitle": "ПАНК-РОК-ЁЛКА | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "routes": [
+        {
+          "path": "/events/pank-rok-elka-tver",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "revision": 1,
+      "event": {
+        "id": "evt_6ae1d93484be2341be7d5a34",
+        "title": "ПАНК-РОК-ЁЛКА",
+        "description": "Предновогодний фестиваль живой музыки «ПАНК-РОК-ЁЛКА-2026»<br>Участвуют:<br>★ CHIPS<br>★ ОХОТА<br>★ РОБОКОТ<br>★ ОСОЗНАНИЕ<br>★ ДОКТОР ВЫХОДНОЙ<br>★ НЕПРИЛИЧНЫЕ НАДПИСИ<br>Спец гость - Чемодан Гризли",
+        "ageLimit": "16",
+        "priceFromRub": 500,
+        "venue": "Клуб Биг Бен",
+        "address": "ул.Брагина, д.2",
+        "offer_min": 500,
+        "active_offers": 4,
+        "future_sessions": [
+          {
+            "startsAt": "2026-12-27 14:00:00"
+          }
+        ]
+      },
+      "legacyOverrideDescription": null,
+      "sourceSnapshot": {
+        "id": "evt_6ae1d93484be2341be7d5a34",
+        "kind": "SINGLE",
+        "slug": "панк-рок-елка-6ae1d93484be2341be7d5a34",
+        "seoH1": null,
+        "title": "ПАНК-РОК-ЁЛКА",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ae1d93484be2341be7d5a34",
+            "externalId": "6ae1d93484be2341be7d5a34",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_5ccac696aba999000cbc902e",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ae23216b8a3f1b19f60fca8.jpg",
+        "seoTitle": null,
+        "cityTitle": "Тверь",
+        "venueTitle": "Клуб Биг Бен",
+        "description": "Предновогодний фестиваль живой музыки «ПАНК-РОК-ЁЛКА-2026»<br>Участвуют:<br>★ CHIPS<br>★ ОХОТА<br>★ РОБОКОТ<br>★ ОСОЗНАНИЕ<br>★ ДОКТОР ВЫХОДНОЙ<br>★ НЕПРИЛИЧНЫЕ НАДПИСИ<br>Спец гость - Чемодан Гризли",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "ул.Брагина, д.2",
+        "canonicalPath": null,
+        "primaryCityId": "city_480060",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    "evt_6ac67a069a90e0ef58f42912": {
+      "eventId": "evt_6ac67a069a90e0ef58f42912",
+      "eventPageId": "95897e2c-f41b-4197-ae48-f1ae3df5bd35",
+      "slug": "aleksandr-demidov-rozhdestvenskii-koncert-moskva",
+      "title": "Александр Демидов. Рождественский концерт",
+      "city": "Москва",
+      "venue": "Культурный центр на Арбате",
+      "page": {
+        "id": "95897e2c-f41b-4197-ae48-f1ae3df5bd35",
+        "slug": "aleksandr-demidov-rozhdestvenskii-koncert-moskva",
+        "title": "Александр Демидов. Рождественский концерт",
+        "summary": null,
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "content": {
+          "sections": []
+        },
+        "seoH1": "Александр Демидов. Рождественский концерт",
+        "seoTitle": "Александр Демидов. Рождественский концерт | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "routes": [
+        {
+          "path": "/events/aleksandr-demidov-rozhdestvenskii-koncert-moskva",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "revision": 1,
+      "event": {
+        "id": "evt_6ac67a069a90e0ef58f42912",
+        "title": "Александр Демидов. Рождественский концерт",
+        "description": "Рождественский вечер на Арбате <br><br>Новогодняя суета столичных улиц, волшебные огни Старого Арбата, хрустальный зал с колоннами, ароматы хвои и мандаринов, ожидание чудес и подарков, а самое главное музыка, под которую исполняются желания — всё это ждёт вас на Рождественском концерте. Этот предпраздничный вечер и мелодии, многие из которых вы услышите впервые, будто созданы для долгожданной сказки.<br><br>Под аккомпанемент легендарного рояля Steinway & Sons и старинной скрипки Александра Демидова мы оправимся в мир новогодних чудес! <br><br>В этот вечер каждый из вас может стать Тайным Сантой: сделать подарок на Рождество для одного из гостей, а в ответ получить новогодний сюрприз от своего тайного друга. Все желающие участвовать в игре могут принести один подарок для одного из гостей Рождественского вечера, имя которого вы узнаете во время жеребьевки перед концертом. Возможно, эта встреча вырастет в настоящую дружбу, ведь именно в Рождество и случаются чудеса.<br><br>В программе:<br>18:00-21:00 Рождественский маркет<br>18:00-19:00 Сбор, жеребьевка, обмен подарками (Игра Тайный Санта)<br>19:00-20:30 Рождественский концерт.",
+        "ageLimit": "6",
+        "priceFromRub": 1000,
+        "venue": "Культурный центр на Арбате",
+        "address": "Арбат, 9 стр. 1",
+        "offer_min": 1000,
+        "active_offers": 8,
+        "future_sessions": [
+          {
+            "startsAt": "2026-12-27 15:00:00"
+          }
+        ]
+      },
+      "legacyOverrideDescription": "Рождественский вечер на Арбате\n\nНовогодняя суета столичных улиц, волшебные огни Старого Арбата, хрустальный зал с колоннами, ароматы хвои и мандаринов, ожидание чудес и подарков, а самое главное музыка, под которую исполняются желания - всё это ждёт вас на Рождественском концерте. Этот предпраздничный вечер и мелодии, многие из которых вы услышите впервые, будто созданы для долгожданной сказки. Под аккомпанемент легендарного рояля Steinway & Sons и старинной скрипки Александра Демидова мы оправимся в мир новогодних чудес!\n\nВ этот вечер каждый из вас может стать Тайным Сантой: сделать подарок на Рождество для одного из гостей, а в ответ получить новогодний сюрприз от своего тайного друга. Все желающие участвовать в игре могут принести один подарок для одного из гостей Рождественского вечера, имя которого вы узнаете во время жеребьевки перед концертом. Возможно, эта встреча вырастет в настоящую дружбу, ведь именно в Рождество и случаются чудеса.\n\n## В программе\n18:00-21:00 Рождественский маркет\n18:00-19:00 Сбор, жеребьевка, обмен подарками (Игра Тайный Санта) 19:00-20:30 Рождественский концерт.\n\n## Практическая информация\n\n- Место - «Культурный центр на Арбате», Москва\n- Адрес - Арбат, 9 стр. 1\n- Продолжительность - около 180 минут\n- Возрастное ограничение - 6+\n- Билеты - от 1 000 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_6ac67a069a90e0ef58f42912",
+        "kind": "SINGLE",
+        "slug": "александр-демидов-рождественскии-концерт-6ac67a069a90e0ef58f42912",
+        "seoH1": null,
+        "title": "Александр Демидов. Рождественский концерт",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ac67a069a90e0ef58f42912",
+            "externalId": "6ac67a069a90e0ef58f42912",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_673c6e9531de460985a9e52c",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ac7e2e963254f5f7cb02deb.jpg",
+        "seoTitle": null,
+        "cityTitle": "Москва",
+        "venueTitle": "Культурный центр на Арбате",
+        "description": "Рождественский вечер на Арбате <br><br>Новогодняя суета столичных улиц, волшебные огни Старого Арбата, хрустальный зал с колоннами, ароматы хвои и мандаринов, ожидание чудес и подарков, а самое главное музыка, под которую исполняются желания — всё это ждёт вас на Рождественском концерте. Этот предпраздничный вечер и мелодии, многие из которых вы услышите впервые, будто созданы для долгожданной сказки.<br><br>Под аккомпанемент легендарного рояля Steinway & Sons и старинной скрипки Александра Демидова мы оправимся в мир новогодних чудес! <br><br>В этот вечер каждый из вас может стать Тайным Сантой: сделать подарок на Рождество для одного из гостей, а в ответ получить новогодний сюрприз от своего тайного друга. Все желающие участвовать в игре могут принести один подарок для одного из гостей Рождественского вечера, имя которого вы узнаете во время жеребьевки перед концертом. Возможно, эта встреча вырастет в настоящую дружбу, ведь именно в Рождество и случаются чудеса.<br><br>В программе:<br>18:00-21:00 Рождественский маркет<br>18:00-19:00 Сбор, жеребьевка, обмен подарками (Игра Тайный Санта)<br>19:00-20:30 Рождественский концерт.",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Арбат, 9 стр. 1",
+        "canonicalPath": null,
+        "primaryCityId": "city_524901",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    }
+  }
+}
