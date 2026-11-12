@@ -1,0 +1,2613 @@
+{
+  "batch": "B01",
+  "createdAt": "2026-11-10",
+  "source": "Ticketscloud",
+  "usage": "ARCHIVE_ONLY; source and legacy override are not active EventPage content",
+  "eventPageIds": [
+    "a6eedee6-7009-4aa5-90a8-9860557bcafb",
+    "c016c8c5-0cda-4f4e-9b7e-05f7ae58b5a6",
+    "2ff7cc9c-674e-4bfe-98e1-3017db5933bb",
+    "4162ceeb-f457-47da-8fe3-946617b8213e",
+    "729aeebd-96be-4cd1-94cb-90f426a4fd72",
+    "cc49b917-2d09-4b33-b2ba-72681e07f297",
+    "2ddb2b3a-fade-40a5-a333-760c7bb6c4f1",
+    "71d6f0c7-8792-47ab-adcf-f4745980211b",
+    "52bbc926-af2c-4607-9383-2f8115b0b383",
+    "8a80a65c-5c47-40cc-a8fa-f5b9c1b6a98b",
+    "a114eeb2-7fd2-45c7-a26d-8c35f61e1e8b",
+    "e73400db-fb9c-4993-ba13-fcbe5d0e1693",
+    "f36cd8cf-dc6a-42f5-bf31-d86e9612b526",
+    "e088377a-7d9a-43fe-a163-27ebf0a9efc2",
+    "a8905fd5-0e19-4b59-8ef4-c4dfee5e4f71",
+    "75cb82cd-37e7-4052-b61e-4df51ae0eae2",
+    "763a6b32-7cde-45bf-a6a4-760594f4539d",
+    "95a3b8f0-056c-46b0-9ba4-2c7795f34d58",
+    "56aa6ed2-593a-4fbe-87d7-f327e30aef64",
+    "675ab4b3-c0fc-48ca-b436-4c5a22191288",
+    "da3d4f93-cb47-40a6-ac1e-455dc1578fdc",
+    "717b59df-c07e-48a7-8fc2-aac828dc58cf",
+    "10303445-4b2b-49f6-b906-4d370793dc1b",
+    "976fd5e0-6964-4cbf-af79-eb02a0f8e560",
+    "19d0b78b-3054-44d8-920c-db6ae4eb6f16",
+    "c50becf5-8d2e-4bc1-8901-0add82cede4c"
+  ],
+  "groups": [
+    {
+      "candidateKey": "москва|есенин-центр|щелкунчик. предчувствие волшебства. музыкальное путешествие в зимнюю сказку в есенин-центре. вечер при свечах",
+      "mappingState": "ONE_EVENTPAGE",
+      "action": "REWRITE_EXISTING_EVENTPAGE",
+      "city": "Москва",
+      "venue": "Есенин-центр",
+      "title": "Щелкунчик. Предчувствие волшебства. Музыкальное путешествие в зимнюю сказку в Есенин-центре. Вечер при свечах",
+      "eventCount": 1,
+      "eventIds": [
+        "evt_6ae3345f015bfdad6a1f7c7b"
+      ],
+      "eventSlugs": [
+        "щелкунчик-предчувствие-волшебства-музыкальное-путешествие-в-зимнюю-сказку-в-есенин-центре-вечер-6ae3345f015bfdad6a1f7c7b"
+      ],
+      "sourceNames": [
+        "Ticketscloud"
+      ],
+      "activeOfferEventCount": 1,
+      "firstSeasonDate": "2026-12-03 16:00:00",
+      "lastSeasonDate": "2026-12-03 16:00:00",
+      "priceMinRub": 1200,
+      "pageCount": 1,
+      "pages": [
+        {
+          "eventpageId": "763a6b32-7cde-45bf-a6a4-760594f4539d",
+          "slug": "schelkunchik-predchuvstvie-volshebstva-muzykalnoe-puteshestvie-v-zimnyuyu-skazku-v-esenin-centre-vecher-moskva",
+          "title": "Щелкунчик. Предчувствие волшебства. Музыкальное путешествие в зимнюю сказку в Есенин-центре. Вечер при свечах",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "publishedAt": null,
+          "linkedEventCount": 1,
+          "sectionCount": 0,
+          "editorialState": "empty",
+          "eventIds": [
+            "evt_6ae3345f015bfdad6a1f7c7b"
+          ]
+        }
+      ],
+      "unlinkedEventIds": [],
+      "sourceDescriptionMissingCount": 0,
+      "sourceDescriptionMinChars": 341,
+      "sourceDescriptionMaxChars": 341,
+      "priorityBatch": "B01"
+    },
+    {
+      "candidateKey": "москва|дом винтажной музыки|джаз поэмы. новогодний концерт",
+      "mappingState": "ONE_EVENTPAGE",
+      "action": "REWRITE_EXISTING_EVENTPAGE",
+      "city": "Москва",
+      "venue": "Дом винтажной музыки",
+      "title": "Джаз Поэмы. Новогодний концерт",
+      "eventCount": 1,
+      "eventIds": [
+        "evt_6adca05b56fba519ed105419"
+      ],
+      "eventSlugs": [
+        "джаз-поэмы-новогоднии-концерт-6adca05b56fba519ed105419"
+      ],
+      "sourceNames": [
+        "Ticketscloud"
+      ],
+      "activeOfferEventCount": 1,
+      "firstSeasonDate": "2026-12-03 17:00:00",
+      "lastSeasonDate": "2026-12-03 17:00:00",
+      "priceMinRub": 800,
+      "pageCount": 1,
+      "pages": [
+        {
+          "eventpageId": "8a80a65c-5c47-40cc-a8fa-f5b9c1b6a98b",
+          "slug": "dzhaz-poemy-novogodnii-koncert-moskva",
+          "title": "Джаз Поэмы. Новогодний концерт",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "publishedAt": null,
+          "linkedEventCount": 1,
+          "sectionCount": 0,
+          "editorialState": "empty",
+          "eventIds": [
+            "evt_6adca05b56fba519ed105419"
+          ]
+        }
+      ],
+      "unlinkedEventIds": [],
+      "sourceDescriptionMissingCount": 0,
+      "sourceDescriptionMinChars": 788,
+      "sourceDescriptionMaxChars": 788,
+      "priorityBatch": "B01"
+    },
+    {
+      "candidateKey": "зеленоград|дом культуры миэт|щелкунчик: чайковский в джазе",
+      "mappingState": "ONE_EVENTPAGE",
+      "action": "REWRITE_EXISTING_EVENTPAGE",
+      "city": "Зеленоград",
+      "venue": "Дом культуры МИЭТ",
+      "title": "Щелкунчик: Чайковский в джазе",
+      "eventCount": 1,
+      "eventIds": [
+        "evt_6ad7e4bdefc48d634a4cd2d8"
+      ],
+      "eventSlugs": [
+        "щелкунчик-чаиковскии-в-джазе-6ad7e4bdefc48d634a4cd2d8"
+      ],
+      "sourceNames": [
+        "Ticketscloud"
+      ],
+      "activeOfferEventCount": 1,
+      "firstSeasonDate": "2026-12-05 16:00:00",
+      "lastSeasonDate": "2026-12-05 16:00:00",
+      "priceMinRub": 1000,
+      "pageCount": 1,
+      "pages": [
+        {
+          "eventpageId": "2ff7cc9c-674e-4bfe-98e1-3017db5933bb",
+          "slug": "schelkunchik-chaikovskii-v-dzhaze-zelenograd",
+          "title": "Щелкунчик: Чайковский в джазе",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "publishedAt": null,
+          "linkedEventCount": 1,
+          "sectionCount": 0,
+          "editorialState": "empty",
+          "eventIds": [
+            "evt_6ad7e4bdefc48d634a4cd2d8"
+          ]
+        }
+      ],
+      "unlinkedEventIds": [],
+      "sourceDescriptionMissingCount": 0,
+      "sourceDescriptionMinChars": 1096,
+      "sourceDescriptionMaxChars": 1096,
+      "priorityBatch": "B01"
+    },
+    {
+      "candidateKey": "москва|джем клуб / jam club|алекс абра: sinatra christmas. рождественские джазовое шоу",
+      "mappingState": "ONE_EVENTPAGE",
+      "action": "REWRITE_EXISTING_EVENTPAGE",
+      "city": "Москва",
+      "venue": "Джем Клуб / Jam Club",
+      "title": "Алекс Абра: Sinatra Christmas. Рождественские джазовое шоу",
+      "eventCount": 1,
+      "eventIds": [
+        "evt_6ab234e96e3e0971661e5b36"
+      ],
+      "eventSlugs": [
+        "алекс-абра-sinatra-christmas-рождественские-джазовое-шоу-6ab234e96e3e0971661e5b36"
+      ],
+      "sourceNames": [
+        "Ticketscloud"
+      ],
+      "activeOfferEventCount": 1,
+      "firstSeasonDate": "2026-12-10 17:00:00",
+      "lastSeasonDate": "2026-12-10 17:00:00",
+      "priceMinRub": 4000,
+      "pageCount": 1,
+      "pages": [
+        {
+          "eventpageId": "2ddb2b3a-fade-40a5-a333-760c7bb6c4f1",
+          "slug": "aleks-abra-sinatra-christmas-rozhdestvenskie-dzhazovoe-shou-moskva",
+          "title": "Алекс Абра: Sinatra Christmas. Рождественские джазовое шоу",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "publishedAt": null,
+          "linkedEventCount": 1,
+          "sectionCount": 0,
+          "editorialState": "empty",
+          "eventIds": [
+            "evt_6ab234e96e3e0971661e5b36"
+          ]
+        }
+      ],
+      "unlinkedEventIds": [],
+      "sourceDescriptionMissingCount": 0,
+      "sourceDescriptionMinChars": 2434,
+      "sourceDescriptionMaxChars": 2434,
+      "priorityBatch": "B01"
+    },
+    {
+      "candidateKey": "москва|музей-заповедник царицыно, баженовский зал|новый год! с владимиром сурдиным и алексеем семихатовым!",
+      "mappingState": "ONE_EVENTPAGE",
+      "action": "REWRITE_EXISTING_EVENTPAGE",
+      "city": "Москва",
+      "venue": "Музей-заповедник Царицыно, Баженовский зал",
+      "title": "Новый год! С Владимиром Сурдиным и Алексеем Семихатовым!",
+      "eventCount": 1,
+      "eventIds": [
+        "evt_6ac91efde2b1828475d87dea"
+      ],
+      "eventSlugs": [
+        "новыи-год-с-владимиром-сурдиным-и-алексеем-семихатовым-6ac91efde2b1828475d87dea"
+      ],
+      "sourceNames": [
+        "Ticketscloud"
+      ],
+      "activeOfferEventCount": 1,
+      "firstSeasonDate": "2026-12-11 16:00:00",
+      "lastSeasonDate": "2026-12-11 16:00:00",
+      "priceMinRub": 6000,
+      "pageCount": 1,
+      "pages": [
+        {
+          "eventpageId": "f36cd8cf-dc6a-42f5-bf31-d86e9612b526",
+          "slug": "novyi-god-s-vladimirom-surdinym-i-alekseem-semihatovym-moskva",
+          "title": "Новый год! С Владимиром Сурдиным и Алексеем Семихатовым!",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "publishedAt": null,
+          "linkedEventCount": 1,
+          "sectionCount": 0,
+          "editorialState": "empty",
+          "eventIds": [
+            "evt_6ac91efde2b1828475d87dea"
+          ]
+        }
+      ],
+      "unlinkedEventIds": [],
+      "sourceDescriptionMissingCount": 0,
+      "sourceDescriptionMinChars": 2267,
+      "sourceDescriptionMaxChars": 2267,
+      "priorityBatch": "B01"
+    },
+    {
+      "candidateKey": "тверь|бар \"база\"|новый год со снегурочками от тётошной. репетиция",
+      "mappingState": "ONE_EVENTPAGE",
+      "action": "REWRITE_EXISTING_EVENTPAGE",
+      "city": "Тверь",
+      "venue": "Бар \"База\"",
+      "title": "Новый год со Снегурочками от Тётошной. Репетиция",
+      "eventCount": 1,
+      "eventIds": [
+        "evt_6ad5ea597f0027048431458d"
+      ],
+      "eventSlugs": [
+        "новыи-год-от-тетошнои-репетиция-6ad5ea597f0027048431458d"
+      ],
+      "sourceNames": [
+        "Ticketscloud"
+      ],
+      "activeOfferEventCount": 1,
+      "firstSeasonDate": "2026-12-11 16:00:00",
+      "lastSeasonDate": "2026-12-11 16:00:00",
+      "priceMinRub": 900,
+      "pageCount": 1,
+      "pages": [
+        {
+          "eventpageId": "976fd5e0-6964-4cbf-af79-eb02a0f8e560",
+          "slug": "novyi-god-ot-tetoshnoi-repeticiya-tver",
+          "title": "Новый год со Снегурочками от Тётошной. Репетиция",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "publishedAt": null,
+          "linkedEventCount": 1,
+          "sectionCount": 0,
+          "editorialState": "empty",
+          "eventIds": [
+            "evt_6ad5ea597f0027048431458d"
+          ]
+        }
+      ],
+      "unlinkedEventIds": [],
+      "sourceDescriptionMissingCount": 0,
+      "sourceDescriptionMinChars": 567,
+      "sourceDescriptionMaxChars": 567,
+      "priorityBatch": "B01"
+    },
+    {
+      "candidateKey": "москва|центр современной музыки и исполнительских искусств \"тон\"|предчувствие рождества",
+      "mappingState": "ONE_EVENTPAGE",
+      "action": "REWRITE_EXISTING_EVENTPAGE",
+      "city": "Москва",
+      "venue": "Центр современной музыки и исполнительских искусств \"ТОН\"",
+      "title": "Предчувствие Рождества",
+      "eventCount": 1,
+      "eventIds": [
+        "evt_6ad671b7d553b2d1a313d020"
+      ],
+      "eventSlugs": [
+        "предчувствие-рождества-6ad671b7d553b2d1a313d020"
+      ],
+      "sourceNames": [
+        "Ticketscloud"
+      ],
+      "activeOfferEventCount": 1,
+      "firstSeasonDate": "2026-12-12 16:00:00",
+      "lastSeasonDate": "2026-12-12 16:00:00",
+      "priceMinRub": 2500,
+      "pageCount": 1,
+      "pages": [
+        {
+          "eventpageId": "e088377a-7d9a-43fe-a163-27ebf0a9efc2",
+          "slug": "predchuvstvie-rozhdestva-moskva",
+          "title": "Предчувствие Рождества",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "publishedAt": null,
+          "linkedEventCount": 1,
+          "sectionCount": 0,
+          "editorialState": "empty",
+          "eventIds": [
+            "evt_6ad671b7d553b2d1a313d020"
+          ]
+        }
+      ],
+      "unlinkedEventIds": [],
+      "sourceDescriptionMissingCount": 0,
+      "sourceDescriptionMinChars": 2367,
+      "sourceDescriptionMaxChars": 2367,
+      "priorityBatch": "B01"
+    },
+    {
+      "candidateKey": "москва|джем клуб / jam club|рождество 2000-х",
+      "mappingState": "ONE_EVENTPAGE",
+      "action": "REWRITE_EXISTING_EVENTPAGE",
+      "city": "Москва",
+      "venue": "Джем Клуб / Jam Club",
+      "title": "Рождество 2000-х",
+      "eventCount": 1,
+      "eventIds": [
+        "evt_6aac17b6c9dd03eb482f7adf"
+      ],
+      "eventSlugs": [
+        "рождество-2000-х-6aac17b6c9dd03eb482f7adf"
+      ],
+      "sourceNames": [
+        "Ticketscloud"
+      ],
+      "activeOfferEventCount": 1,
+      "firstSeasonDate": "2026-12-12 16:00:00",
+      "lastSeasonDate": "2026-12-12 16:00:00",
+      "priceMinRub": 2500,
+      "pageCount": 1,
+      "pages": [
+        {
+          "eventpageId": "a8905fd5-0e19-4b59-8ef4-c4dfee5e4f71",
+          "slug": "rozhdestvo-2000-h-moskva",
+          "title": "Рождество 2000-х",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "publishedAt": null,
+          "linkedEventCount": 1,
+          "sectionCount": 0,
+          "editorialState": "empty",
+          "eventIds": [
+            "evt_6aac17b6c9dd03eb482f7adf"
+          ]
+        }
+      ],
+      "unlinkedEventIds": [],
+      "sourceDescriptionMissingCount": 0,
+      "sourceDescriptionMinChars": 487,
+      "sourceDescriptionMaxChars": 487,
+      "priorityBatch": "B01"
+    },
+    {
+      "candidateKey": "москва|бар гадкий койот|fizica & antarctic в москве - новогодний концерт",
+      "mappingState": "ONE_EVENTPAGE",
+      "action": "REWRITE_EXISTING_EVENTPAGE",
+      "city": "Москва",
+      "venue": "Бар Гадкий Койот",
+      "title": "FIZICA & ANTARCTIC в Москве - Новогодний концерт",
+      "eventCount": 1,
+      "eventIds": [
+        "evt_6a75c8d3e66db030c467f7cc"
+      ],
+      "eventSlugs": [
+        "fizica-antarctic-в-москве-новогоднии-концерт-6a75c8d3e66db030c467f7cc"
+      ],
+      "sourceNames": [
+        "Ticketscloud"
+      ],
+      "activeOfferEventCount": 1,
+      "firstSeasonDate": "2026-12-12 17:00:00",
+      "lastSeasonDate": "2026-12-12 17:00:00",
+      "priceMinRub": 1900,
+      "pageCount": 1,
+      "pages": [
+        {
+          "eventpageId": "729aeebd-96be-4cd1-94cb-90f426a4fd72",
+          "slug": "fizica-antarctic-v-moskve-novogodnii-koncert-moskva",
+          "title": "FIZICA & ANTARCTIC в Москве - Новогодний концерт",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "publishedAt": null,
+          "linkedEventCount": 1,
+          "sectionCount": 0,
+          "editorialState": "empty",
+          "eventIds": [
+            "evt_6a75c8d3e66db030c467f7cc"
+          ]
+        }
+      ],
+      "unlinkedEventIds": [],
+      "sourceDescriptionMissingCount": 0,
+      "sourceDescriptionMinChars": 658,
+      "sourceDescriptionMaxChars": 658,
+      "priorityBatch": "B01"
+    },
+    {
+      "candidateKey": "санкт-петербург|дворец кваренги (freedom)|новый год! с владимиром сурдиным и алексеем семихатовым!",
+      "mappingState": "ONE_EVENTPAGE",
+      "action": "REWRITE_EXISTING_EVENTPAGE",
+      "city": "Санкт-Петербург",
+      "venue": "Дворец Кваренги (Freedom)",
+      "title": "Новый год! С Владимиром Сурдиным и Алексеем Семихатовым!",
+      "eventCount": 1,
+      "eventIds": [
+        "evt_6ac9015590383ac485af6c57"
+      ],
+      "eventSlugs": [
+        "новыи-год-с-владимиром-сурдиным-и-алексеем-семихатовым-6ac9015590383ac485af6c57"
+      ],
+      "sourceNames": [
+        "Ticketscloud"
+      ],
+      "activeOfferEventCount": 1,
+      "firstSeasonDate": "2026-12-13 16:00:00",
+      "lastSeasonDate": "2026-12-13 16:00:00",
+      "priceMinRub": 6000,
+      "pageCount": 1,
+      "pages": [
+        {
+          "eventpageId": "717b59df-c07e-48a7-8fc2-aac828dc58cf",
+          "slug": "novyi-god-s-vladimirom-surdinym-i-alekseem-semihatovym-sankt-peterburg",
+          "title": "Новый год! С Владимиром Сурдиным и Алексеем Семихатовым!",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "publishedAt": null,
+          "linkedEventCount": 1,
+          "sectionCount": 0,
+          "editorialState": "empty",
+          "eventIds": [
+            "evt_6ac9015590383ac485af6c57"
+          ]
+        }
+      ],
+      "unlinkedEventIds": [],
+      "sourceDescriptionMissingCount": 0,
+      "sourceDescriptionMinChars": 2536,
+      "sourceDescriptionMaxChars": 2536,
+      "priorityBatch": "B01"
+    },
+    {
+      "candidateKey": "краснодар|филармония им. г.ф. пономаренко|новогодние саундтреки при свечах с асо-оркестром. шоу которое подарит вам чудо",
+      "mappingState": "ONE_EVENTPAGE",
+      "action": "REWRITE_EXISTING_EVENTPAGE",
+      "city": "Краснодар",
+      "venue": "Филармония им. Г.Ф. Пономаренко",
+      "title": "Новогодние саундтреки при свечах с АСО-оркестром. Шоу которое подарит вам чудо",
+      "eventCount": 1,
+      "eventIds": [
+        "evt_6aa80e7d4b84407c30797825"
+      ],
+      "eventSlugs": [
+        "новогодние-саундтреки-при-свечах-с-асо-оркестром-шоу-которое-подарит-вам-чудо-6aa80e7d4b84407c30797825"
+      ],
+      "sourceNames": [
+        "Ticketscloud"
+      ],
+      "activeOfferEventCount": 1,
+      "firstSeasonDate": "2026-12-16 16:00:00",
+      "lastSeasonDate": "2026-12-16 16:00:00",
+      "priceMinRub": 2300,
+      "pageCount": 1,
+      "pages": [
+        {
+          "eventpageId": "4162ceeb-f457-47da-8fe3-946617b8213e",
+          "slug": "novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-krasnodar",
+          "title": "Новогодние саундтреки при свечах с АСО-оркестром. Шоу которое подарит вам чудо",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "publishedAt": null,
+          "linkedEventCount": 1,
+          "sectionCount": 0,
+          "editorialState": "empty",
+          "eventIds": [
+            "evt_6aa80e7d4b84407c30797825"
+          ]
+        }
+      ],
+      "unlinkedEventIds": [],
+      "sourceDescriptionMissingCount": 0,
+      "sourceDescriptionMinChars": 3273,
+      "sourceDescriptionMaxChars": 3273,
+      "priorityBatch": "B01"
+    },
+    {
+      "candidateKey": "москва|музыкальная гостиная «бунинский зал»|щелкунчик. предчувствие волшебства. музыкальное путешествие в зимнюю сказку в бунинской музыкальной гостиной. вечер при свечах",
+      "mappingState": "ONE_EVENTPAGE",
+      "action": "REWRITE_EXISTING_EVENTPAGE",
+      "city": "Москва",
+      "venue": "Музыкальная гостиная «Бунинский зал»",
+      "title": "Щелкунчик. Предчувствие волшебства. Музыкальное путешествие в зимнюю сказку в Бунинской музыкальной гостиной. Вечер при свечах",
+      "eventCount": 1,
+      "eventIds": [
+        "evt_6ae33ce4c99c815c1dcb3350"
+      ],
+      "eventSlugs": [
+        "щелкунчик-предчувствие-волшебства-музыкальное-путешествие-в-зимнюю-сказку-в-бунинскои-музыкальн-6ae33ce4c99c815c1dcb3350"
+      ],
+      "sourceNames": [
+        "Ticketscloud"
+      ],
+      "activeOfferEventCount": 1,
+      "firstSeasonDate": "2026-12-17 16:30:00",
+      "lastSeasonDate": "2026-12-17 16:30:00",
+      "priceMinRub": 1200,
+      "pageCount": 1,
+      "pages": [
+        {
+          "eventpageId": "75cb82cd-37e7-4052-b61e-4df51ae0eae2",
+          "slug": "schelkunchik-predchuvstvie-volshebstva-muzykalnoe-puteshestvie-v-zimnyuyu-skazku-v-buninskoi-muzykaln-moskva",
+          "title": "Щелкунчик. Предчувствие волшебства. Музыкальное путешествие в зимнюю сказку в Бунинской музыкальной гостиной. Вечер при свечах",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "publishedAt": null,
+          "linkedEventCount": 1,
+          "sectionCount": 0,
+          "editorialState": "empty",
+          "eventIds": [
+            "evt_6ae33ce4c99c815c1dcb3350"
+          ]
+        }
+      ],
+      "unlinkedEventIds": [],
+      "sourceDescriptionMissingCount": 0,
+      "sourceDescriptionMinChars": 341,
+      "sourceDescriptionMaxChars": 341,
+      "priorityBatch": "B01"
+    },
+    {
+      "candidateKey": "москва|джем клуб / jam club|алекс абра: let it snow. рождественское джазовое шоу.",
+      "mappingState": "ONE_EVENTPAGE",
+      "action": "REWRITE_EXISTING_EVENTPAGE",
+      "city": "Москва",
+      "venue": "Джем Клуб / Jam Club",
+      "title": "Алекс Абра: Let It Snow. Рождественское джазовое шоу.",
+      "eventCount": 1,
+      "eventIds": [
+        "evt_6ab239479d31379f2b65355b"
+      ],
+      "eventSlugs": [
+        "алекс-абра-let-it-snow-рождественское-джазовое-шоу-6ab239479d31379f2b65355b"
+      ],
+      "sourceNames": [
+        "Ticketscloud"
+      ],
+      "activeOfferEventCount": 1,
+      "firstSeasonDate": "2026-12-17 17:00:00",
+      "lastSeasonDate": "2026-12-17 17:00:00",
+      "priceMinRub": 4000,
+      "pageCount": 1,
+      "pages": [
+        {
+          "eventpageId": "cc49b917-2d09-4b33-b2ba-72681e07f297",
+          "slug": "aleks-abra-let-it-snow-rozhdestvenskoe-dzhazovoe-shou-moskva",
+          "title": "Алекс Абра: Let It Snow. Рождественское джазовое шоу.",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "publishedAt": null,
+          "linkedEventCount": 1,
+          "sectionCount": 0,
+          "editorialState": "empty",
+          "eventIds": [
+            "evt_6ab239479d31379f2b65355b"
+          ]
+        }
+      ],
+      "unlinkedEventIds": [],
+      "sourceDescriptionMissingCount": 0,
+      "sourceDescriptionMinChars": 2398,
+      "sourceDescriptionMaxChars": 2398,
+      "priorityBatch": "B01"
+    },
+    {
+      "candidateKey": "ульяновск|евангелическо-лютеранская церковь святой марии|«в ожидании рождества. орган и голоса при свечах»",
+      "mappingState": "ONE_EVENTPAGE",
+      "action": "REWRITE_EXISTING_EVENTPAGE",
+      "city": "Ульяновск",
+      "venue": "Евангелическо-Лютеранская церковь Святой Марии",
+      "title": "«В ОЖИДАНИИ РОЖДЕСТВА. Орган и голоса при свечах»",
+      "eventCount": 1,
+      "eventIds": [
+        "evt_6ad7b61179df44983db5cebd"
+      ],
+      "eventSlugs": [
+        "в-ожидании-рождества-орган-и-голоса-при-свечах-6ad7b61179df44983db5cebd"
+      ],
+      "sourceNames": [
+        "Ticketscloud"
+      ],
+      "activeOfferEventCount": 1,
+      "firstSeasonDate": "2026-12-18 15:00:00",
+      "lastSeasonDate": "2026-12-18 15:00:00",
+      "priceMinRub": 1200,
+      "pageCount": 1,
+      "pages": [
+        {
+          "eventpageId": "19d0b78b-3054-44d8-920c-db6ae4eb6f16",
+          "slug": "v-ozhidanii-rozhdestva-organ-i-golosa-pri-svechah-ulyanovsk",
+          "title": "«В ОЖИДАНИИ РОЖДЕСТВА. Орган и голоса при свечах»",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "publishedAt": null,
+          "linkedEventCount": 1,
+          "sectionCount": 0,
+          "editorialState": "empty",
+          "eventIds": [
+            "evt_6ad7b61179df44983db5cebd"
+          ]
+        }
+      ],
+      "unlinkedEventIds": [],
+      "sourceDescriptionMissingCount": 0,
+      "sourceDescriptionMinChars": 1413,
+      "sourceDescriptionMaxChars": 1413,
+      "priorityBatch": "B01"
+    },
+    {
+      "candidateKey": "санкт-петербург|музей-усадьба г.р. державина|александр демидов. рождественский концерт.",
+      "mappingState": "ONE_EVENTPAGE",
+      "action": "REWRITE_EXISTING_EVENTPAGE",
+      "city": "Санкт-Петербург",
+      "venue": "Музей-усадьба Г.Р. Державина",
+      "title": "Александр Демидов. Рождественский концерт.",
+      "eventCount": 1,
+      "eventIds": [
+        "evt_6ab2f0b5b704cb21b99e4cff"
+      ],
+      "eventSlugs": [
+        "александр-демидов-рождественскии-концерт-6ab2f0b5b704cb21b99e4cff"
+      ],
+      "sourceNames": [
+        "Ticketscloud"
+      ],
+      "activeOfferEventCount": 1,
+      "firstSeasonDate": "2026-12-18 16:00:00",
+      "lastSeasonDate": "2026-12-18 16:00:00",
+      "priceMinRub": 800,
+      "pageCount": 1,
+      "pages": [
+        {
+          "eventpageId": "da3d4f93-cb47-40a6-ac1e-455dc1578fdc",
+          "slug": "aleksandr-demidov-rozhdestvenskii-koncert-sankt-peterburg",
+          "title": "Александр Демидов. Рождественский концерт.",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "publishedAt": null,
+          "linkedEventCount": 1,
+          "sectionCount": 0,
+          "editorialState": "empty",
+          "eventIds": [
+            "evt_6ab2f0b5b704cb21b99e4cff"
+          ]
+        }
+      ],
+      "unlinkedEventIds": [],
+      "sourceDescriptionMissingCount": 0,
+      "sourceDescriptionMinChars": 2012,
+      "sourceDescriptionMaxChars": 2012,
+      "priorityBatch": "B01"
+    },
+    {
+      "candidateKey": "ульяновск|евангелическо-лютеранская церковь святой марии|рождество при свечах. от баха до «щелкунчика»",
+      "mappingState": "ONE_EVENTPAGE",
+      "action": "REWRITE_EXISTING_EVENTPAGE",
+      "city": "Ульяновск",
+      "venue": "Евангелическо-Лютеранская церковь Святой Марии",
+      "title": "РОЖДЕСТВО ПРИ СВЕЧАХ. От Баха до «Щелкунчика»",
+      "eventCount": 1,
+      "eventIds": [
+        "evt_6ad7bd4a84d972d11d6939af"
+      ],
+      "eventSlugs": [
+        "рождество-при-свечах-от-баха-до-щелкунчика-6ad7bd4a84d972d11d6939af"
+      ],
+      "sourceNames": [
+        "Ticketscloud"
+      ],
+      "activeOfferEventCount": 1,
+      "firstSeasonDate": "2026-12-19 13:00:00",
+      "lastSeasonDate": "2026-12-19 13:00:00",
+      "priceMinRub": 1200,
+      "pageCount": 1,
+      "pages": [
+        {
+          "eventpageId": "c50becf5-8d2e-4bc1-8901-0add82cede4c",
+          "slug": "rozhdestvo-pri-svechah-ot-baha-do-schelkunchika-ulyanovsk",
+          "title": "РОЖДЕСТВО ПРИ СВЕЧАХ. От Баха до «Щелкунчика»",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "publishedAt": null,
+          "linkedEventCount": 1,
+          "sectionCount": 0,
+          "editorialState": "empty",
+          "eventIds": [
+            "evt_6ad7bd4a84d972d11d6939af"
+          ]
+        }
+      ],
+      "unlinkedEventIds": [],
+      "sourceDescriptionMissingCount": 0,
+      "sourceDescriptionMinChars": 1696,
+      "sourceDescriptionMaxChars": 1696,
+      "priorityBatch": "B01"
+    },
+    {
+      "candidateKey": "гатчина|площадка фестивальный центр «лидер»|балет «щелкунчик»",
+      "mappingState": "ONE_EVENTPAGE",
+      "action": "REWRITE_EXISTING_EVENTPAGE",
+      "city": "Гатчина",
+      "venue": "Площадка Фестивальный центр «Лидер»",
+      "title": "Балет «Щелкунчик»",
+      "eventCount": 1,
+      "eventIds": [
+        "evt_6a896e543dd7cd2a48e11484"
+      ],
+      "eventSlugs": [
+        "балет-щелкунчик-6a896e543dd7cd2a48e11484"
+      ],
+      "sourceNames": [
+        "Ticketscloud"
+      ],
+      "activeOfferEventCount": 1,
+      "firstSeasonDate": "2026-12-19 16:00:00",
+      "lastSeasonDate": "2026-12-19 16:00:00",
+      "priceMinRub": 2000,
+      "pageCount": 1,
+      "pages": [
+        {
+          "eventpageId": "c016c8c5-0cda-4f4e-9b7e-05f7ae58b5a6",
+          "slug": "balet-schelkunchik-gatchina",
+          "title": "Балет «Щелкунчик»",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "publishedAt": null,
+          "linkedEventCount": 1,
+          "sectionCount": 0,
+          "editorialState": "empty",
+          "eventIds": [
+            "evt_6a896e543dd7cd2a48e11484"
+          ]
+        }
+      ],
+      "unlinkedEventIds": [],
+      "sourceDescriptionMissingCount": 0,
+      "sourceDescriptionMinChars": 1520,
+      "sourceDescriptionMaxChars": 1520,
+      "priorityBatch": "B01"
+    },
+    {
+      "candidateKey": "москва|джем клуб / jam club|лиза макеева - \"рождественские мелодии нью йорка\"",
+      "mappingState": "ONE_EVENTPAGE",
+      "action": "REWRITE_EXISTING_EVENTPAGE",
+      "city": "Москва",
+      "venue": "Джем Клуб / Jam Club",
+      "title": "Лиза Макеева - \"Рождественские мелодии Нью Йорка\"",
+      "eventCount": 1,
+      "eventIds": [
+        "evt_6ace27e38566b034b416c33a"
+      ],
+      "eventSlugs": [
+        "лиза-макеева-рождественские-мелодии-нью-иорка-6ace27e38566b034b416c33a"
+      ],
+      "sourceNames": [
+        "Ticketscloud"
+      ],
+      "activeOfferEventCount": 1,
+      "firstSeasonDate": "2026-12-19 16:00:00",
+      "lastSeasonDate": "2026-12-19 16:00:00",
+      "priceMinRub": 2000,
+      "pageCount": 1,
+      "pages": [
+        {
+          "eventpageId": "e73400db-fb9c-4993-ba13-fcbe5d0e1693",
+          "slug": "liza-makeeva-rozhdestvenskie-melodii-nyu-iorka-moskva",
+          "title": "Лиза Макеева - \"Рождественские мелодии Нью Йорка\"",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "publishedAt": null,
+          "linkedEventCount": 1,
+          "sectionCount": 0,
+          "editorialState": "empty",
+          "eventIds": [
+            "evt_6ace27e38566b034b416c33a"
+          ]
+        }
+      ],
+      "unlinkedEventIds": [],
+      "sourceDescriptionMissingCount": 0,
+      "sourceDescriptionMinChars": 1160,
+      "sourceDescriptionMaxChars": 1160,
+      "priorityBatch": "B01"
+    },
+    {
+      "candidateKey": "москва|арт-пространство люмьер холл|концерт «рождественский джаз»",
+      "mappingState": "ONE_EVENTPAGE",
+      "action": "REWRITE_EXISTING_EVENTPAGE",
+      "city": "Москва",
+      "venue": "Арт-пространство Люмьер Холл",
+      "title": "Концерт «Рождественский джаз»",
+      "eventCount": 1,
+      "eventIds": [
+        "evt_6abb9087edf766d2da82bfa1"
+      ],
+      "eventSlugs": [
+        "концерт-рождественскии-джаз-6abb9087edf766d2da82bfa1"
+      ],
+      "sourceNames": [
+        "Ticketscloud"
+      ],
+      "activeOfferEventCount": 1,
+      "firstSeasonDate": "2026-12-19 18:00:00",
+      "lastSeasonDate": "2026-12-19 18:00:00",
+      "priceMinRub": 1300,
+      "pageCount": 1,
+      "pages": [
+        {
+          "eventpageId": "a114eeb2-7fd2-45c7-a26d-8c35f61e1e8b",
+          "slug": "koncert-rozhdestvenskii-dzhaz-moskva",
+          "title": "Концерт «Рождественский джаз»",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "publishedAt": null,
+          "linkedEventCount": 1,
+          "sectionCount": 0,
+          "editorialState": "empty",
+          "eventIds": [
+            "evt_6abb9087edf766d2da82bfa1"
+          ]
+        }
+      ],
+      "unlinkedEventIds": [],
+      "sourceDescriptionMissingCount": 0,
+      "sourceDescriptionMinChars": 1393,
+      "sourceDescriptionMaxChars": 1393,
+      "priorityBatch": "B01"
+    },
+    {
+      "candidateKey": "волхов|волховский городской дворец культуры|новогодняя ёлка \"гарри поттер. тайна запретного леса\"",
+      "mappingState": "ONE_EVENTPAGE",
+      "action": "REWRITE_EXISTING_EVENTPAGE",
+      "city": "Волхов",
+      "venue": "Волховский Городской Дворец Культуры",
+      "title": "Новогодняя Ёлка \"Гарри Поттер. Тайна Запретного Леса\"",
+      "eventCount": 1,
+      "eventIds": [
+        "evt_6ac60ab78add3abe0cb85905"
+      ],
+      "eventSlugs": [
+        "новогодняя-елка-гарри-поттер-таина-запретного-леса-6ac60ab78add3abe0cb85905"
+      ],
+      "sourceNames": [
+        "Ticketscloud"
+      ],
+      "activeOfferEventCount": 1,
+      "firstSeasonDate": "2026-12-20 09:00:00",
+      "lastSeasonDate": "2026-12-20 09:00:00",
+      "priceMinRub": 600,
+      "pageCount": 1,
+      "pages": [
+        {
+          "eventpageId": "a6eedee6-7009-4aa5-90a8-9860557bcafb",
+          "slug": "novogodnyaya-elka-garri-potter-taina-zapretnogo-lesa-volhov",
+          "title": "Новогодняя Ёлка \"Гарри Поттер. Тайна Запретного Леса\"",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "publishedAt": null,
+          "linkedEventCount": 1,
+          "sectionCount": 0,
+          "editorialState": "empty",
+          "eventIds": [
+            "evt_6ac60ab78add3abe0cb85905"
+          ]
+        }
+      ],
+      "unlinkedEventIds": [],
+      "sourceDescriptionMissingCount": 0,
+      "sourceDescriptionMinChars": 1032,
+      "sourceDescriptionMaxChars": 1032,
+      "priorityBatch": "B01"
+    },
+    {
+      "candidateKey": "москва|усадьба кусково портретная галерея большой каменной оранжереи|щелкунчик. предчувствие волшебства. музыкальное путешествие в зимнюю сказку в усадьбе кусково",
+      "mappingState": "ONE_EVENTPAGE",
+      "action": "REWRITE_EXISTING_EVENTPAGE",
+      "city": "Москва",
+      "venue": "Усадьба Кусково Портретная галерея большой каменной оранжереи",
+      "title": "Щелкунчик. Предчувствие волшебства. Музыкальное путешествие в зимнюю сказку в усадьбе Кусково",
+      "eventCount": 1,
+      "eventIds": [
+        "evt_6ad47bd4abbbcf11c9c4bd9e"
+      ],
+      "eventSlugs": [
+        "щелкунчик-предчувствие-волшебства-музыкальное-путешествие-в-зимнюю-сказку-в-усадьбе-кусково-6ad47bd4abbbcf11c9c4bd9e"
+      ],
+      "sourceNames": [
+        "Ticketscloud"
+      ],
+      "activeOfferEventCount": 1,
+      "firstSeasonDate": "2026-12-20 12:00:00",
+      "lastSeasonDate": "2026-12-20 12:00:00",
+      "priceMinRub": 900,
+      "pageCount": 1,
+      "pages": [
+        {
+          "eventpageId": "95a3b8f0-056c-46b0-9ba4-2c7795f34d58",
+          "slug": "schelkunchik-predchuvstvie-volshebstva-muzykalnoe-puteshestvie-v-zimnyuyu-skazku-v-usadbe-kuskovo-moskva",
+          "title": "Щелкунчик. Предчувствие волшебства. Музыкальное путешествие в зимнюю сказку в усадьбе Кусково",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "publishedAt": null,
+          "linkedEventCount": 1,
+          "sectionCount": 0,
+          "editorialState": "empty",
+          "eventIds": [
+            "evt_6ad47bd4abbbcf11c9c4bd9e"
+          ]
+        }
+      ],
+      "unlinkedEventIds": [],
+      "sourceDescriptionMissingCount": 0,
+      "sourceDescriptionMinChars": 341,
+      "sourceDescriptionMaxChars": 341,
+      "priorityBatch": "B01"
+    },
+    {
+      "candidateKey": "ростов-на-дону|пересвет-арена|новогодний шоу-концерт",
+      "mappingState": "ONE_EVENTPAGE",
+      "action": "REWRITE_EXISTING_EVENTPAGE",
+      "city": "Ростов-на-Дону",
+      "venue": "Пересвет-Арена",
+      "title": "Новогодний Шоу-Концерт",
+      "eventCount": 1,
+      "eventIds": [
+        "evt_6ad011229630e1640215cdad"
+      ],
+      "eventSlugs": [
+        "новогоднии-шоу-концерт-6ad011229630e1640215cdad"
+      ],
+      "sourceNames": [
+        "Ticketscloud"
+      ],
+      "activeOfferEventCount": 1,
+      "firstSeasonDate": "2026-12-20 17:00:00",
+      "lastSeasonDate": "2026-12-20 17:00:00",
+      "priceMinRub": 2500,
+      "pageCount": 1,
+      "pages": [
+        {
+          "eventpageId": "56aa6ed2-593a-4fbe-87d7-f327e30aef64",
+          "slug": "novogodnii-shou-koncert-rostov-na-donu",
+          "title": "Новогодний Шоу-Концерт",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "publishedAt": null,
+          "linkedEventCount": 1,
+          "sectionCount": 0,
+          "editorialState": "empty",
+          "eventIds": [
+            "evt_6ad011229630e1640215cdad"
+          ]
+        }
+      ],
+      "unlinkedEventIds": [],
+      "sourceDescriptionMissingCount": 0,
+      "sourceDescriptionMinChars": 829,
+      "sourceDescriptionMaxChars": 829,
+      "priorityBatch": "B01"
+    },
+    {
+      "candidateKey": "санкт-петербург|action club|fizica & antarctic в санкт-петербурге - новогодний концерт",
+      "mappingState": "ONE_EVENTPAGE",
+      "action": "REWRITE_EXISTING_EVENTPAGE",
+      "city": "Санкт-Петербург",
+      "venue": "Action club",
+      "title": "FIZICA & ANTARCTIC в Санкт-Петербурге - Новогодний концерт",
+      "eventCount": 1,
+      "eventIds": [
+        "evt_6a99bbf778043ee36116eb4e"
+      ],
+      "eventSlugs": [
+        "fizica-antarctic-в-санкт-петербурге-новогоднии-концерт-6a99bbf778043ee36116eb4e"
+      ],
+      "sourceNames": [
+        "Ticketscloud"
+      ],
+      "activeOfferEventCount": 1,
+      "firstSeasonDate": "2026-12-20 17:00:00",
+      "lastSeasonDate": "2026-12-20 17:00:00",
+      "priceMinRub": 1900,
+      "pageCount": 1,
+      "pages": [
+        {
+          "eventpageId": "675ab4b3-c0fc-48ca-b436-4c5a22191288",
+          "slug": "fizica-antarctic-v-sankt-peterburge-novogodnii-koncert-sankt-peterburg",
+          "title": "FIZICA & ANTARCTIC в Санкт-Петербурге - Новогодний концерт",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "publishedAt": null,
+          "linkedEventCount": 1,
+          "sectionCount": 0,
+          "editorialState": "empty",
+          "eventIds": [
+            "evt_6a99bbf778043ee36116eb4e"
+          ]
+        }
+      ],
+      "unlinkedEventIds": [],
+      "sourceDescriptionMissingCount": 0,
+      "sourceDescriptionMinChars": 603,
+      "sourceDescriptionMaxChars": 603,
+      "priorityBatch": "B01"
+    },
+    {
+      "candidateKey": "тверь|клуб биг бен|новогодняя танцплощадка \"папина музыка\" от гр. скип",
+      "mappingState": "ONE_EVENTPAGE",
+      "action": "REWRITE_EXISTING_EVENTPAGE",
+      "city": "Тверь",
+      "venue": "Клуб Биг Бен",
+      "title": "Новогодняя Танцплощадка \"Папина музыка\" от гр. СКИП",
+      "eventCount": 1,
+      "eventIds": [
+        "evt_6ae2139b87426c82b102e520"
+      ],
+      "eventSlugs": [
+        "новогодняя-танцплощадка-папина-музыка-от-гр-скип-6ae2139b87426c82b102e520"
+      ],
+      "sourceNames": [
+        "Ticketscloud"
+      ],
+      "activeOfferEventCount": 1,
+      "firstSeasonDate": "2026-12-23 16:00:00",
+      "lastSeasonDate": "2026-12-23 16:00:00",
+      "priceMinRub": 500,
+      "pageCount": 1,
+      "pages": [
+        {
+          "eventpageId": "10303445-4b2b-49f6-b906-4d370793dc1b",
+          "slug": "novogodnyaya-tancploschadka-papina-muzyka-ot-gr-skip-tver",
+          "title": "Новогодняя Танцплощадка \"Папина музыка\" от гр. СКИП",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "publishedAt": null,
+          "linkedEventCount": 1,
+          "sectionCount": 0,
+          "editorialState": "empty",
+          "eventIds": [
+            "evt_6ae2139b87426c82b102e520"
+          ]
+        }
+      ],
+      "unlinkedEventIds": [],
+      "sourceDescriptionMissingCount": 0,
+      "sourceDescriptionMinChars": 904,
+      "sourceDescriptionMaxChars": 904,
+      "priorityBatch": "B01"
+    },
+    {
+      "candidateKey": "москва|библиотека по естественным наукам российской академии наук.|алексей водовозов. здравствуй, ****, новый год!",
+      "mappingState": "ONE_EVENTPAGE",
+      "action": "REWRITE_EXISTING_EVENTPAGE",
+      "city": "Москва",
+      "venue": "Библиотека по естественным наукам Российской академии наук.",
+      "title": "Алексей Водовозов. Здравствуй, ****, Новый год!",
+      "eventCount": 1,
+      "eventIds": [
+        "evt_6ad67aa79401508de03d1b16"
+      ],
+      "eventSlugs": [
+        "алексеи-водовозов-здравствуи-новыи-год-6ad67aa79401508de03d1b16"
+      ],
+      "sourceNames": [
+        "Ticketscloud"
+      ],
+      "activeOfferEventCount": 1,
+      "firstSeasonDate": "2026-12-23 16:30:00",
+      "lastSeasonDate": "2026-12-23 16:30:00",
+      "priceMinRub": 1600,
+      "pageCount": 1,
+      "pages": [
+        {
+          "eventpageId": "71d6f0c7-8792-47ab-adcf-f4745980211b",
+          "slug": "aleksei-vodovozov-zdravstvui-novyi-god-moskva",
+          "title": "Алексей Водовозов. Здравствуй, ****, Новый год!",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "publishedAt": null,
+          "linkedEventCount": 1,
+          "sectionCount": 0,
+          "editorialState": "empty",
+          "eventIds": [
+            "evt_6ad67aa79401508de03d1b16"
+          ]
+        }
+      ],
+      "unlinkedEventIds": [],
+      "sourceDescriptionMissingCount": 0,
+      "sourceDescriptionMinChars": 1334,
+      "sourceDescriptionMaxChars": 1334,
+      "priorityBatch": "B01"
+    },
+    {
+      "candidateKey": "москва|аудиториум|алексей решетун. новый год по судебно-медицински.",
+      "mappingState": "ONE_EVENTPAGE",
+      "action": "REWRITE_EXISTING_EVENTPAGE",
+      "city": "Москва",
+      "venue": "Аудиториум",
+      "title": "Алексей Решетун. Новый год по судебно-медицински.",
+      "eventCount": 1,
+      "eventIds": [
+        "evt_6ac5434089e6a22cd0abf834"
+      ],
+      "eventSlugs": [
+        "алексеи-решетун-новыи-год-по-судебно-медицинске-6ac5434089e6a22cd0abf834"
+      ],
+      "sourceNames": [
+        "Ticketscloud"
+      ],
+      "activeOfferEventCount": 1,
+      "firstSeasonDate": "2026-12-23 16:30:00",
+      "lastSeasonDate": "2026-12-23 16:30:00",
+      "priceMinRub": 2000,
+      "pageCount": 1,
+      "pages": [
+        {
+          "eventpageId": "52bbc926-af2c-4607-9383-2f8115b0b383",
+          "slug": "aleksei-reshetun-novyi-god-po-sudebno-medicinske-moskva",
+          "title": "Алексей Решетун. Новый год по судебно-медицински.",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "publishedAt": null,
+          "linkedEventCount": 1,
+          "sectionCount": 0,
+          "editorialState": "empty",
+          "eventIds": [
+            "evt_6ac5434089e6a22cd0abf834"
+          ]
+        }
+      ],
+      "unlinkedEventIds": [],
+      "sourceDescriptionMissingCount": 0,
+      "sourceDescriptionMinChars": 1516,
+      "sourceDescriptionMaxChars": 1516,
+      "priorityBatch": "B01"
+    }
+  ],
+  "entries": [
+    {
+      "eventId": "evt_6ac60ab78add3abe0cb85905",
+      "eventSlug": "новогодняя-елка-гарри-поттер-таина-запретного-леса-6ac60ab78add3abe0cb85905",
+      "title": "Новогодняя Ёлка \"Гарри Поттер. Тайна Запретного Леса\"",
+      "city": "Волхов",
+      "venue": "Волховский Городской Дворец Культуры",
+      "address": "пл. Ленина, д.1",
+      "eventPageId": "a6eedee6-7009-4aa5-90a8-9860557bcafb",
+      "eventPageSlug": "novogodnyaya-elka-garri-potter-taina-zapretnogo-lesa-volhov",
+      "sourceDescription": "В формате захватывающего интерактивного шоу за 60 минут ребята полностью погрузятся в атмосферу Хогвартса: пройдут посвящение в ученики знаменитой школы магии, посетят увлекательный мастер‑класс по зельеварению, освоят базовые заклинания под руководством опытных наставников и Деда Мороза, а затем продемонстрируют свою ловкость и командный дух в динамичном матче по квиддичу.<br><br>Зрителей ждёт настоящий мультисенсорный опыт — 3D звук создаёт эффект полного погружения, а оригинальные видеоинсталляции буквально переносят в загадочные локации Запретного Леса. Завершают картину зрелищные номера: традиционные фокусы и иллюзионы гармонично сочетаются с современными научными шоу — крио‑ и тесла‑шоу добавляют программе особый драйв и демонстрируют магию на стыке волшебства и технологий.",
+      "sourceUsage": "UNUSED_ORIGINAL_SOURCE",
+      "legacyOverrideDescription": "В формате захватывающего интерактивного шоу за 60 минут ребята полностью погрузятся в атмосферу Хогвартса: пройдут посвящение в ученики знаменитой школы магии, посетят увлекательный мастер‑класс по зельеварению, освоят базовые заклинания под руководством опытных наставников и Деда Мороза, а затем продемонстрируют свою ловкость и командный дух в динамичном матче по квиддичу.\nЗрителей ждёт настоящий мультисенсорный опыт - 3D звук создаёт эффект полного погружения, а оригинальные видеоинсталляции буквально переносят в загадочные локации Запретного Леса. Завершают картину зрелищные номера: традиционные фокусы и иллюзионы гармонично сочетаются с современными научными шоу - крио‑ и тесла‑шоу добавляют программе особый драйв и демонстрируют магию на стыке волшебства и технологий.\n\n## Практическая информация\n\n- Место - «Волховский Городской Дворец Культуры», Волхов\n- Адрес - пл. Ленина, д.1\n- Продолжительность - около 60 минут\n- Билеты - от 600 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "legacyOverrideUsage": "ARCHIVED_LEGACY_COPY; do not overwrite during EventPage rewrite",
+      "sessionSnapshot": [
+        {
+          "id": "sess_6ac60ab78add3abe0cb85905",
+          "endsAt": "2026-12-20 10:00:00",
+          "startsAt": "2026-12-20 09:00:00",
+          "priceFromRub": 600
+        }
+      ],
+      "ageLimit": "0",
+      "priceFromRub": 600,
+      "sourceSnapshot": {
+        "id": "evt_6ac60ab78add3abe0cb85905",
+        "kind": "SINGLE",
+        "slug": "новогодняя-елка-гарри-поттер-таина-запретного-леса-6ac60ab78add3abe0cb85905",
+        "seoH1": null,
+        "title": "Новогодняя Ёлка \"Гарри Поттер. Тайна Запретного Леса\"",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "externalId": "6ac60ab78add3abe0cb85905",
+            "metaExternalId": null,
+            "sourceUrlRedacted": true
+          }
+        ],
+        "venueId": "venue_642e66f101eb1f389e9f2c8c",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ac60ab771feb796cadf6879.jpg",
+        "seoTitle": null,
+        "cityTitle": "Волхов",
+        "venueTitle": "Волховский Городской Дворец Культуры",
+        "description": "В формате захватывающего интерактивного шоу за 60 минут ребята полностью погрузятся в атмосферу Хогвартса: пройдут посвящение в ученики знаменитой школы магии, посетят увлекательный мастер‑класс по зельеварению, освоят базовые заклинания под руководством опытных наставников и Деда Мороза, а затем продемонстрируют свою ловкость и командный дух в динамичном матче по квиддичу.<br><br>Зрителей ждёт настоящий мультисенсорный опыт — 3D звук создаёт эффект полного погружения, а оригинальные видеоинсталляции буквально переносят в загадочные локации Запретного Леса. Завершают картину зрелищные номера: традиционные фокусы и иллюзионы гармонично сочетаются с современными научными шоу — крио‑ и тесла‑шоу добавляют программе особый драйв и демонстрируют магию на стыке волшебства и технологий.",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "пл. Ленина, д.1",
+        "canonicalPath": null,
+        "primaryCityId": "city_472722",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    {
+      "eventId": "evt_6a896e543dd7cd2a48e11484",
+      "eventSlug": "балет-щелкунчик-6a896e543dd7cd2a48e11484",
+      "title": "Балет «Щелкунчик»",
+      "city": "Гатчина",
+      "venue": "Площадка Фестивальный центр «Лидер»",
+      "address": "Ленинградская область, Гатчинский муниципальный округ, посёлок Новый Свет, 82",
+      "eventPageId": "c016c8c5-0cda-4f4e-9b7e-05f7ae58b5a6",
+      "eventPageSlug": "balet-schelkunchik-gatchina",
+      "sourceDescription": "Балет «Щелкунчик» Санкт-Петербургской компании театр балета «Сен-Мишель» возвращает зрителей к истории, которая впервые была представлена на сцене Мариинского театра в 1892 году. Сон девочки Маши, навеянный в Рождественскую ночь добрым чародеем Дроссельмейером, размывает границы между реальностью и миром фантазий. Её праздничный подарок, кукла Щелкунчик, силой волшебства превращается в прекрасного Принца, способного пробудить в её сердце первые робкие чувства. «Щелкунчик» в хореографии Михаила Венщикова рождён в традициях петербургской балетной классики. Автор включил в спектакль главные танцевальные номера, задуманные его первыми постановщиками Мариусом Петипа и Львом Ивановым. «Танец Снежинок», «Вальс Цветов» и «Дивертисмент Игрушек» хорошо знакомы современному зрителю, а воссозданное легендарное «Adagio c шарфом» будет исполнено впервые спустя сто с лишним лет.<br>Мировая премьера этого спектакля состоялось в декабре 2017 года на сцене Королевского Центра искусств BOZAR в Брюсселе. Роль Маши на первых показах исполнила заслуженная артистка России, ведущая солистка Большого театра Анастасия Горячева, роль Щелкунчика-Принца - солист Баварского государственного театра Элвис Нудо. С тех пор спектакль был многократно показан на сценах театров Германии, Бельгии, Нидерландов. Постановка снискала любовь публики и успех среди искушенных балетных критиков.<br>Спектакль проходит под фонограмму.",
+      "sourceUsage": "UNUSED_ORIGINAL_SOURCE",
+      "legacyOverrideDescription": "«Балет «Щелкунчик»» в Гатчине. Балет «Щелкунчик» Санкт-Петербургской компании театр балета «Сен-Мишель» возвращает зрителей к истории, которая впервые была представлена на сцене Мариинского театра в 1892 году. Сон девочки Маши, навеянный в Рождественскую ночь добрым чародеем Дроссельмейером, размывает границы между реальностью и миром фантазий. Её праздничный подарок, кукла Щелкунчик, силой волшебства превращается в прекрасного Принца, способного пробудить в её сердце первые робкие чувства.\n\n«Щелкунчик» в хореографии Михаила Венщикова рождён в традициях петербургской балетной классики. Автор включил в спектакль главные танцевальные номера, задуманные его первыми постановщиками Мариусом Петипа и Львом Ивановым. «Танец Снежинок», «Вальс Цветов» и «Дивертисмент Игрушек» хорошо знакомы современному зрителю, а воссозданное легендарное «Adagio c шарфом» будет исполнено впервые спустя сто с лишним лет.\n\nМировая премьера этого спектакля состоялось в декабре 2017 года на сцене Королевского Центра искусств BOZAR в Брюсселе. Роль Маши на первых показах исполнила заслуженная артистка России, ведущая солистка Большого театра Анастасия Горячева, роль Щелкунчика-Принца - солист Баварского государственного театра Элвис Нудо. С тех пор спектакль был многократно показан на сценах театров Германии, Бельгии, Нидерландов. Постановка снискала любовь публики и успех среди искушенных балетных критиков.\nСпектакль проходит под фонограмму.\n\n## Где и когда\n\n- Гатчина, Площадка Фестивальный центр «Лидер»\n- Билеты: от 2000 ₽",
+      "legacyOverrideUsage": "ARCHIVED_LEGACY_COPY; do not overwrite during EventPage rewrite",
+      "sessionSnapshot": [
+        {
+          "id": "sess_6a896e543dd7cd2a48e11484",
+          "endsAt": "2026-12-19 18:00:00",
+          "startsAt": "2026-12-19 16:00:00",
+          "priceFromRub": 2000
+        }
+      ],
+      "ageLimit": "0",
+      "priceFromRub": 2000,
+      "sourceSnapshot": {
+        "id": "evt_6a896e543dd7cd2a48e11484",
+        "kind": "SINGLE",
+        "slug": "балет-щелкунчик-6a896e543dd7cd2a48e11484",
+        "seoH1": null,
+        "title": "Балет «Щелкунчик»",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "externalId": "6a896e543dd7cd2a48e11484",
+            "metaExternalId": null,
+            "sourceUrlRedacted": true
+          }
+        ],
+        "venueId": "venue_6a8882266f13609af24ff3e5",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-08/6a889d3f399f7801818e82af.jpg",
+        "seoTitle": null,
+        "cityTitle": "Гатчина",
+        "venueTitle": "Площадка Фестивальный центр «Лидер»",
+        "description": "Балет «Щелкунчик» Санкт-Петербургской компании театр балета «Сен-Мишель» возвращает зрителей к истории, которая впервые была представлена на сцене Мариинского театра в 1892 году. Сон девочки Маши, навеянный в Рождественскую ночь добрым чародеем Дроссельмейером, размывает границы между реальностью и миром фантазий. Её праздничный подарок, кукла Щелкунчик, силой волшебства превращается в прекрасного Принца, способного пробудить в её сердце первые робкие чувства. «Щелкунчик» в хореографии Михаила Венщикова рождён в традициях петербургской балетной классики. Автор включил в спектакль главные танцевальные номера, задуманные его первыми постановщиками Мариусом Петипа и Львом Ивановым. «Танец Снежинок», «Вальс Цветов» и «Дивертисмент Игрушек» хорошо знакомы современному зрителю, а воссозданное легендарное «Adagio c шарфом» будет исполнено впервые спустя сто с лишним лет.<br>Мировая премьера этого спектакля состоялось в декабре 2017 года на сцене Королевского Центра искусств BOZAR в Брюсселе. Роль Маши на первых показах исполнила заслуженная артистка России, ведущая солистка Большого театра Анастасия Горячева, роль Щелкунчика-Принца - солист Баварского государственного театра Элвис Нудо. С тех пор спектакль был многократно показан на сценах театров Германии, Бельгии, Нидерландов. Постановка снискала любовь публики и успех среди искушенных балетных критиков.<br>Спектакль проходит под фонограмму.",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Ленинградская область, Гатчинский муниципальный округ, посёлок Новый Свет, 82",
+        "canonicalPath": null,
+        "primaryCityId": "city_manual_гатчина",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    {
+      "eventId": "evt_6ad7e4bdefc48d634a4cd2d8",
+      "eventSlug": "щелкунчик-чаиковскии-в-джазе-6ad7e4bdefc48d634a4cd2d8",
+      "title": "Щелкунчик: Чайковский в джазе",
+      "city": "Зеленоград",
+      "venue": "Дом культуры МИЭТ",
+      "address": "пл. Шокина, 1, стр.2",
+      "eventPageId": "2ff7cc9c-674e-4bfe-98e1-3017db5933bb",
+      "eventPageSlug": "schelkunchik-chaikovskii-v-dzhaze-zelenograd",
+      "sourceDescription": "Есть музыка, без которой невозможно представить Новый год. «Щелкунчик» Чайковского — одна из таких историй. Но в этот вечер знакомая с детства сказка зазвучит совершенно иначе.<br><br>Эстрадный оркестр МИЭТ п/у Юрия Ковешникова, представит знаменитую музыку П. И. Чайковского в блистательных джазовых аранжировках великого маэстро Дюка Эллингтона. <br>Вальсы, марши и волшебные мелодии «Щелкунчика» встретятся со свингом, свободой импровизации и изысканностью большого джазового оркестра.<br><br>Эллингтон сохраняет узнаваемые темы Чайковского, но наполняет их новым ритмом, красками и характером джаза. А вокруг — мягкий свет свечей, зимнее настроение и ощущение приближающегося праздника. На один вечер концертный зал превратится в пространство рождественской сказки, где классика XX века вступает в диалог с классикой XIX столетия, а хорошо знакомая музыка неожиданно открывается заново.<br><br>Помимо «Щелкунчика», во-втором отделении, прозвучат также известные композиции оркестра Эллингтона: Caravan, Take the A Train, Mood Indigo, Satin Doll и другие. <br><br>Не пропустите уникальное шоу!",
+      "sourceUsage": "UNUSED_ORIGINAL_SOURCE",
+      "legacyOverrideDescription": "Есть музыка, без которой невозможно представить Новый год. «Щелкунчик» Чайковского - одна из таких историй. Но в этот вечер знакомая с детства сказка зазвучит совершенно иначе.\n\nЭстрадный оркестр МИЭТ п/у Юрия Ковешникова, представит знаменитую музыку П. И. Чайковского в блистательных джазовых аранжировках великого маэстро Дюка Эллингтона.\nВальсы, марши и волшебные мелодии «Щелкунчика» встретятся со свингом, свободой импровизации и изысканностью большого джазового оркестра. Эллингтон сохраняет узнаваемые темы Чайковского, но наполняет их новым ритмом, красками и характером джаза. А вокруг - мягкий свет свечей, зимнее настроение и ощущение приближающегося праздника. На один вечер концертный зал превратится в пространство рождественской сказки, где классика XX века вступает в диалог с классикой XIX столетия, а хорошо знакомая музыка неожиданно открывается заново.\n\nПомимо «Щелкунчика», во-втором отделении, прозвучат также известные композиции оркестра Эллингтона: Caravan, Take the A Train, Mood Indigo, Satin Doll и другие. Не пропустите уникальное шоу!",
+      "legacyOverrideUsage": "ARCHIVED_LEGACY_COPY; do not overwrite during EventPage rewrite",
+      "sessionSnapshot": [
+        {
+          "id": "sess_6ad7e4bdefc48d634a4cd2d8",
+          "endsAt": "2026-12-05 18:00:00",
+          "startsAt": "2026-12-05 16:00:00",
+          "priceFromRub": 1000
+        }
+      ],
+      "ageLimit": "0",
+      "priceFromRub": 1000,
+      "sourceSnapshot": {
+        "id": "evt_6ad7e4bdefc48d634a4cd2d8",
+        "kind": "SINGLE",
+        "slug": "щелкунчик-чаиковскии-в-джазе-6ad7e4bdefc48d634a4cd2d8",
+        "seoH1": null,
+        "title": "Щелкунчик: Чайковский в джазе",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "externalId": "6ad7e4bdefc48d634a4cd2d8",
+            "metaExternalId": null,
+            "sourceUrlRedacted": true
+          }
+        ],
+        "venueId": "venue_5df8e26646c150d57724c398",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ad7e4baeca482fe811c8a92.png",
+        "seoTitle": null,
+        "cityTitle": "Зеленоград",
+        "venueTitle": "Дом культуры МИЭТ",
+        "description": "Есть музыка, без которой невозможно представить Новый год. «Щелкунчик» Чайковского — одна из таких историй. Но в этот вечер знакомая с детства сказка зазвучит совершенно иначе.<br><br>Эстрадный оркестр МИЭТ п/у Юрия Ковешникова, представит знаменитую музыку П. И. Чайковского в блистательных джазовых аранжировках великого маэстро Дюка Эллингтона. <br>Вальсы, марши и волшебные мелодии «Щелкунчика» встретятся со свингом, свободой импровизации и изысканностью большого джазового оркестра.<br><br>Эллингтон сохраняет узнаваемые темы Чайковского, но наполняет их новым ритмом, красками и характером джаза. А вокруг — мягкий свет свечей, зимнее настроение и ощущение приближающегося праздника. На один вечер концертный зал превратится в пространство рождественской сказки, где классика XX века вступает в диалог с классикой XIX столетия, а хорошо знакомая музыка неожиданно открывается заново.<br><br>Помимо «Щелкунчика», во-втором отделении, прозвучат также известные композиции оркестра Эллингтона: Caravan, Take the A Train, Mood Indigo, Satin Doll и другие. <br><br>Не пропустите уникальное шоу!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "пл. Шокина, 1, стр.2",
+        "canonicalPath": null,
+        "primaryCityId": "city_463829",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    {
+      "eventId": "evt_6aa80e7d4b84407c30797825",
+      "eventSlug": "новогодние-саундтреки-при-свечах-с-асо-оркестром-шоу-которое-подарит-вам-чудо-6aa80e7d4b84407c30797825",
+      "title": "Новогодние саундтреки при свечах с АСО-оркестром. Шоу которое подарит вам чудо",
+      "city": "Краснодар",
+      "venue": "Филармония им. Г.Ф. Пономаренко",
+      "address": "улица Красная, 55",
+      "eventPageId": "4162ceeb-f457-47da-8fe3-946617b8213e",
+      "eventPageSlug": "novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-krasnodar",
+      "sourceDescription": "Новогодние саундтреки при свечах: Симфоническое шоу, которое подарит вам чудо!<br><br>Что делает Новый год по-настоящему волшебным?<br>Конечно, музыка, которая звучит в наших любимых фильмах!<br>Мы приглашаем вас на мультимедийное симфоническое шоу, где магия кино встречается с праздничным уютом.<br><br>В этот вечер, АСО-оркестр (Avatar Cinematic Orchestra), который официально признан лучшим оркестром 2025 года — превратит сцену в сказочное пространство, залитое мягким светом тысячи зажжённых свечей. Это не просто концерт, это путешествие в мир, где оживают самые теплые воспоминания.<br><br>В программе — саундтреки из фильмов, которые мы знаем и любим с детства:<br>\"Один дома\", \"Щелкунчик\", \"Ирония судьбы\", \"Бриллиантовая рука\", \"Иван Васильевич меняет профессию\",\"Гарри Поттер\", \"Человек-паук\", \"Красавица и Чудовище\", \"Игры престолов\", \"Мстители\", \"Титаник\", \"Хатико\", \"Пираты Карибского моря\",\"Амели\", \"Жестокие игры\", \"Красотка\", \"Секс в большом городе\" \"1+1\", \"Джеймс Бонд\" и многие другие, а также, великие темы Ханса Циммера, Людовико Эйнауди и Джона Уильямса.<br><br>Почему это шоу нельзя пропустить?<br><br>Атмосфера: Тысячи зажжённых свечей создают невероятный уют и романтику. Вы забудете о суете и полностью погрузитесь в симфоническую магию.<br><br>Эмоции: Ведущая вечера — певица Akvatoriya — не просто объявит номера, а расскажет захватывающие истории создания этих шедевров, добавляя вечеру нотку интриги и душевности.<br><br>Виртуозность: ACO-оркестр — это мощь, драйв и филигранное исполнение, которое заставит ваше сердце биться в ритме любимых киногероев.<br><br>Идеальный план на праздники:<br><br>Приходите всей семьей с детьми, назначайте романтические свидания, приглашайте друзей или сделайте подарок самым близким. Музыка в живом исполнении — это лучший способ почувствовать приближение праздника и зарядиться новогодним настроением на весь год вперед!<br><br>Подарите себе и любимым вечер, который запомнится навсегда.<br><br>Билеты уже в продаже. Успейте занять лучшие места в зале!",
+      "sourceUsage": "UNUSED_ORIGINAL_SOURCE",
+      "legacyOverrideDescription": "Новогодние саундтреки при свечах с АСО-оркестром. Шоу которое подарит вам чудо в Краснодаре. Подойдёт для семейного выхода и компании друзей. Номера идут без длинных пауз, поэтому внимание зала держится на протяжении всего вечера.\n\nШоу-формат рассчитан на эмоции: здесь важно не только что показывают, но и как. Свет, костюмы и музыка подобраны так, чтобы усилить впечатление от каждого эпизода. Хороший вариант, если хочется ярких впечатлений. Дневной формат удобен, если вечер буднего дня занят. Шоу, которое держит внимание от первого номера до финала. Свет, музыка и костюмы создают цельное впечатление, а зал включается в происходящее. Места в центральной части зала дают лучший обзор - выбирать их стоит заранее.\n\nХорошо в середине недели: не нужно ждать выходных. Программа шоу построена на эффектах: номера сменяют друг друга, зал становится частью происходящего. Свет, музыка и костюмы создают цельное впечатление, а зал включается в происходящее. Чаще всего это семейный формат: удобно прийти и компанией, и с детьми. Днём проще выбрать время и спокойно добраться.\n\nНовогодние саундтреки при свечах: Симфоническое шоу, которое подарит вам чудо! Что делает Новый год по-настоящему волшебным? Конечно, музыка, которая звучит в наших любимых фильмах! Мы приглашаем вас на мультимедийное симфоническое шоу, где магия кино встречается с праздничным уютом.\n\nВ этот вечер, АСО-оркестр (Avatar Cinematic Orchestra), который официально признан лучшим оркестром 2025 года - превратит сцену в сказочное пространство, залитое мягким светом тысячи зажжённых свечей. Это не просто концерт, это путешествие в мир, где оживают самые теплые воспоминания.\n\n## В программе - саундтреки из фильмов, которые мы знаем и любим с детства\n\n\"Один дома\", \"Щелкунчик\", \"Ирония судьбы\", \"Бриллиантовая рука\", \"Иван Васильевич меняет профессию\",\"Гарри Поттер\", \"Человек-паук\", \"Красавица и Чудовище\", \"Игры престолов\", \"Мстители\", \"Титаник\", \"Хатико\", \"Пираты Карибского моря\",\"Амели\", \"Жестокие игры\", \"Красотка\", \"Секс в большом городе\" \"1+1\", \"Джеймс Бонд\" и многие другие, а также, великие темы Ханса Циммера, Людовико Эйнауди и Джона Уильямса. Почему это шоу нельзя пропустить? Атмосфера: Тысячи зажжённых свечей создают невероятный уют и романтику. Вы забудете о суете и полностью погрузитесь в симфоническую магию.\n\nЭмоции: Ведущая вечера - певица Akvatoriya - не просто объявит номера, а расскажет захватывающие истории создания этих шедевров, добавляя вечеру нотку интриги и душевности. Виртуозность: ACO-оркестр - это мощь, драйв и филигранное исполнение, которое заставит ваше сердце биться в ритме любимых киногероев.\n\n## Идеальный план на праздники\n\nПриходите всей семьей с детьми, назначайте романтические свидания, приглашайте друзей или сделайте подарок самым близким. Музыка в живом исполнении - это лучший способ почувствовать приближение праздника и зарядиться новогодним настроением на весь год вперед! Подарите себе и любимым вечер, который запомнится навсегда.\n\nБилеты уже в продаже. Успейте занять лучшие места в зале!\n\n## Практическая информация\n\n- Место - «Филармония им. Г.Ф. Пономаренко», Краснодар\n- Адрес - улица Красная, 55\n- Продолжительность - около 105 минут\n- Билеты - от 2 300 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "legacyOverrideUsage": "ARCHIVED_LEGACY_COPY; do not overwrite during EventPage rewrite",
+      "sessionSnapshot": [
+        {
+          "id": "sess_6aa80e7d4b84407c30797825",
+          "endsAt": "2026-12-16 17:45:00",
+          "startsAt": "2026-12-16 16:00:00",
+          "priceFromRub": 2300
+        }
+      ],
+      "ageLimit": "0",
+      "priceFromRub": 2300,
+      "sourceSnapshot": {
+        "id": "evt_6aa80e7d4b84407c30797825",
+        "kind": "SINGLE",
+        "slug": "новогодние-саундтреки-при-свечах-с-асо-оркестром-шоу-которое-подарит-вам-чудо-6aa80e7d4b84407c30797825",
+        "seoH1": null,
+        "title": "Новогодние саундтреки при свечах с АСО-оркестром. Шоу которое подарит вам чудо",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "externalId": "6aa80e7d4b84407c30797825",
+            "metaExternalId": null,
+            "sourceUrlRedacted": true
+          }
+        ],
+        "venueId": "venue_5985ec90515e350019bd03c5",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ae09eabe470c7927580b21f.png",
+        "seoTitle": null,
+        "cityTitle": "Краснодар",
+        "venueTitle": "Филармония им. Г.Ф. Пономаренко",
+        "description": "Новогодние саундтреки при свечах: Симфоническое шоу, которое подарит вам чудо!<br><br>Что делает Новый год по-настоящему волшебным?<br>Конечно, музыка, которая звучит в наших любимых фильмах!<br>Мы приглашаем вас на мультимедийное симфоническое шоу, где магия кино встречается с праздничным уютом.<br><br>В этот вечер, АСО-оркестр (Avatar Cinematic Orchestra), который официально признан лучшим оркестром 2025 года — превратит сцену в сказочное пространство, залитое мягким светом тысячи зажжённых свечей. Это не просто концерт, это путешествие в мир, где оживают самые теплые воспоминания.<br><br>В программе — саундтреки из фильмов, которые мы знаем и любим с детства:<br>\"Один дома\", \"Щелкунчик\", \"Ирония судьбы\", \"Бриллиантовая рука\", \"Иван Васильевич меняет профессию\",\"Гарри Поттер\", \"Человек-паук\", \"Красавица и Чудовище\", \"Игры престолов\", \"Мстители\", \"Титаник\", \"Хатико\", \"Пираты Карибского моря\",\"Амели\", \"Жестокие игры\", \"Красотка\", \"Секс в большом городе\" \"1+1\", \"Джеймс Бонд\" и многие другие, а также, великие темы Ханса Циммера, Людовико Эйнауди и Джона Уильямса.<br><br>Почему это шоу нельзя пропустить?<br><br>Атмосфера: Тысячи зажжённых свечей создают невероятный уют и романтику. Вы забудете о суете и полностью погрузитесь в симфоническую магию.<br><br>Эмоции: Ведущая вечера — певица Akvatoriya — не просто объявит номера, а расскажет захватывающие истории создания этих шедевров, добавляя вечеру нотку интриги и душевности.<br><br>Виртуозность: ACO-оркестр — это мощь, драйв и филигранное исполнение, которое заставит ваше сердце биться в ритме любимых киногероев.<br><br>Идеальный план на праздники:<br><br>Приходите всей семьей с детьми, назначайте романтические свидания, приглашайте друзей или сделайте подарок самым близким. Музыка в живом исполнении — это лучший способ почувствовать приближение праздника и зарядиться новогодним настроением на весь год вперед!<br><br>Подарите себе и любимым вечер, который запомнится навсегда.<br><br>Билеты уже в продаже. Успейте занять лучшие места в зале!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "улица Красная, 55",
+        "canonicalPath": null,
+        "primaryCityId": "city_542420",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    {
+      "eventId": "evt_6a75c8d3e66db030c467f7cc",
+      "eventSlug": "fizica-antarctic-в-москве-новогоднии-концерт-6a75c8d3e66db030c467f7cc",
+      "title": "FIZICA & ANTARCTIC в Москве - Новогодний концерт",
+      "city": "Москва",
+      "venue": "Бар Гадкий Койот",
+      "address": "ул. Большая Дмитровка, 13",
+      "eventPageId": "729aeebd-96be-4cd1-94cb-90f426a4fd72",
+      "eventPageSlug": "fizica-antarctic-v-moskve-novogodnii-koncert-moskva",
+      "sourceDescription": "Встречайте Новый Год вместе с FIZICA на фирменном клубном концерте! Вас ждут все хиты и новинки, праздничная атмосфера, оригинальный мерч, новогодний антураж легендарного бара и яркие эмоции.<br><br>Meet&Greet (фото и автограф с артистом) пройдет перед концертом с 18:00 до 19:00. Meet&Greet также входит во все категории билетов со столом. В билеты на второй этаж включены напитки и закуски.<br><br> 18+",
+      "sourceUsage": "UNUSED_ORIGINAL_SOURCE",
+      "legacyOverrideDescription": "Встречайте Новый Год вместе с FIZICA на фирменном клубном концерте! Вас ждут все хиты и новинки, праздничная атмосфера, оригинальный мерч, новогодний антураж легендарного бара и яркие эмоции. Meet&Greet (фото и автограф с артистом) пройдет перед концертом с 18:00 до 19:00. Meet&Greet также входит во все категории билетов со столом. В билеты на второй этаж включены напитки и закуски.\n\n## Практическая информация\n\n- Место - «Бар Гадкий Койот», Москва\n- Адрес - ул. Большая Дмитровка, 13\n- Продолжительность - около 120 минут\n- Возрастное ограничение - 18+\n- Билеты - от 1 900 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "legacyOverrideUsage": "ARCHIVED_LEGACY_COPY; do not overwrite during EventPage rewrite",
+      "sessionSnapshot": [
+        {
+          "id": "sess_6a75c8d3e66db030c467f7cc",
+          "endsAt": "2026-12-12 19:00:00",
+          "startsAt": "2026-12-12 17:00:00",
+          "priceFromRub": 1900
+        }
+      ],
+      "ageLimit": "18",
+      "priceFromRub": 1900,
+      "sourceSnapshot": {
+        "id": "evt_6a75c8d3e66db030c467f7cc",
+        "kind": "SINGLE",
+        "slug": "fizica-antarctic-в-москве-новогоднии-концерт-6a75c8d3e66db030c467f7cc",
+        "seoH1": null,
+        "title": "FIZICA & ANTARCTIC в Москве - Новогодний концерт",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "externalId": "6a75c8d3e66db030c467f7cc",
+            "metaExternalId": null,
+            "sourceUrlRedacted": true
+          }
+        ],
+        "venueId": "venue_66c1cb5a5c13fc89c4d95c54",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-08/6a75c8d3e66db030c467f7ca.jpg",
+        "seoTitle": null,
+        "cityTitle": "Москва",
+        "venueTitle": "Бар Гадкий Койот",
+        "description": "Встречайте Новый Год вместе с FIZICA на фирменном клубном концерте! Вас ждут все хиты и новинки, праздничная атмосфера, оригинальный мерч, новогодний антураж легендарного бара и яркие эмоции.<br><br>Meet&Greet (фото и автограф с артистом) пройдет перед концертом с 18:00 до 19:00. Meet&Greet также входит во все категории билетов со столом. В билеты на второй этаж включены напитки и закуски.<br><br> 18+",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "ул. Большая Дмитровка, 13",
+        "canonicalPath": null,
+        "primaryCityId": "city_524901",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    {
+      "eventId": "evt_6ab239479d31379f2b65355b",
+      "eventSlug": "алекс-абра-let-it-snow-рождественское-джазовое-шоу-6ab239479d31379f2b65355b",
+      "title": "Алекс Абра: Let It Snow. Рождественское джазовое шоу.",
+      "city": "Москва",
+      "venue": "Джем Клуб / Jam Club",
+      "address": "Сретенка, д. 11",
+      "eventPageId": "cc49b917-2d09-4b33-b2ba-72681e07f297",
+      "eventPageSlug": "aleks-abra-let-it-snow-rozhdestvenskoe-dzhazovoe-shou-moskva",
+      "sourceDescription": "Добро пожаловать в Рождественскую сказку! <br><br>   Здесь Вы сможете погрузиться в атмосферу старых новогодних голлливудских фильмов и мюзиклов,  высшего света 20 века, наслаждаясь вкуснейшими Christmas песнями в исполнении одного из самых востребованных и харизматичных джазовых вокалистов, обладателя бархатного баритона - Алекса Абра и ведущих джазменов столицы. <br><br>    \"Santa Claus Is Coming To Town\" , \"It's The Most Wonderful Time Of The Year \" ; Let It Snow;  \"Jingle Bell Rock\", \"Mr Sandman\", \"Have Yourself a Merry Little Christmas \"и множество подобных невероятно уютных и ярких песен из репертуара легенд мировой джазовой сцены, центральным из которых в этот вечер станет Фрэнк Синатра. Это не просто концерт, а целое шоу, состоящее из музыкального юмора, множества шуток и импровизации. <br><br>  Однако главная особенность всех шоу Алекса Абра - это 100% аутентичность в звучании  исполняемых им песен, добиться которой солист смог своему абсолютно свободному владению английским языком, идеальному произношению и глубокому пониманию стиля. <br><br>   Алекс Абра - известный российский джазовый вокалист и автор песен;  лауреат(1-е место) международного фестиваля Усадьба Джаз; участник анти-ГОЛОСА - проекта Александра Градского; участник телешоу \"Поймай меня, если сможешь\", резидент московских джаз клубов и концертных агенств; полиглот.",
+      "sourceUsage": "UNUSED_ORIGINAL_SOURCE",
+      "legacyOverrideDescription": "Алекс Абра: Let It Snow. Рождественское джазовое шоу.\n\nШоу-формат рассчитан на эмоции: здесь важно не только что показывают, но и как. Такие программы обычно интересны и взрослым, и детям - каждый находит своё. Хороший вариант, если хочется ярких впечатлений. Вечер буднего дня - хороший способ разгрузить голову. Зрелищная программа: сцена, свет и артисты работают на одно впечатление. Такие программы обычно интересны и взрослым, и детям - каждый находит своё. Подойдёт для семейного выхода и компании друзей.\n\nУдобно после рабочего дня: переключиться и отдохнуть. Зрелищная программа: сцена, свет и артисты работают на одно впечатление. Программа собрана из ярких эпизодов, которые сменяют друг друга без провисаний. Хороший вариант, если хочется ярких впечатлений. Подходит для буднего вечера: не нужно ждать выходных.\n\nДобро пожаловать в Рождественскую сказку! Здесь Вы сможете погрузиться в атмосферу старых новогодних голлливудских фильмов и мюзиклов, высшего света 20 века, наслаждаясь вкуснейшими Christmas песнями в исполнении одного из самых востребованных и харизматичных джазовых вокалистов, обладателя бархатного баритона - Алекса Абра и ведущих джазменов столицы.\n\n\"Santa Claus Is Coming To Town\", \"It's The Most Wonderful Time Of The Year \"; Let It Snow; \"Jingle Bell Rock\", \"Mr Sandman\", \"Have Yourself a Merry Little Christmas \"и множество подобных невероятно уютных и ярких песен из репертуара легенд мировой джазовой сцены, центральным из которых в этот вечер станет Фрэнк Синатра. Это не просто концерт, а целое шоу, состоящее из музыкального юмора, множества шуток и импровизации.\n\nОднако главная особенность всех шоу Алекса Абра - это 100% аутентичность в звучании исполняемых им песен, добиться которой солист смог своему абсолютно свободному владению английским языком, идеальному произношению и глубокому пониманию стиля.\n\nАлекс Абра - известный российский джазовый вокалист и автор песен; лауреат(1-е место) международного фестиваля Усадьба Джаз; участник анти-ГОЛОСА - проекта Александра Градского; участник телешоу \"Поймай меня, если сможешь\", резидент московских джаз клубов и концертных агенств; полиглот.\n\n## Практическая информация\n\n- Место - «Джем Клуб Мьюзик», Москва\n- Адрес - Сретенка, д. 11\n- Продолжительность - около 120 минут\n- Возрастное ограничение - 6+\n- Билеты - от 4 000 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "legacyOverrideUsage": "ARCHIVED_LEGACY_COPY; do not overwrite during EventPage rewrite",
+      "sessionSnapshot": [
+        {
+          "id": "sess_6ab239479d31379f2b65355b",
+          "endsAt": "2026-12-17 19:00:00",
+          "startsAt": "2026-12-17 17:00:00",
+          "priceFromRub": 4000
+        }
+      ],
+      "ageLimit": "6",
+      "priceFromRub": 4000,
+      "sourceSnapshot": {
+        "id": "evt_6ab239479d31379f2b65355b",
+        "kind": "SINGLE",
+        "slug": "алекс-абра-let-it-snow-рождественское-джазовое-шоу-6ab239479d31379f2b65355b",
+        "seoH1": null,
+        "title": "Алекс Абра: Let It Snow. Рождественское джазовое шоу.",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "externalId": "6ab239479d31379f2b65355b",
+            "metaExternalId": null,
+            "sourceUrlRedacted": true
+          }
+        ],
+        "venueId": "venue_623457215d2b1afd72c3ec48",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6ab2398a6dd7f74aff0bd684.jpg",
+        "seoTitle": null,
+        "cityTitle": "Москва",
+        "venueTitle": "Джем Клуб / Jam Club",
+        "description": "Добро пожаловать в Рождественскую сказку! <br><br>   Здесь Вы сможете погрузиться в атмосферу старых новогодних голлливудских фильмов и мюзиклов,  высшего света 20 века, наслаждаясь вкуснейшими Christmas песнями в исполнении одного из самых востребованных и харизматичных джазовых вокалистов, обладателя бархатного баритона - Алекса Абра и ведущих джазменов столицы. <br><br>    \"Santa Claus Is Coming To Town\" , \"It's The Most Wonderful Time Of The Year \" ; Let It Snow;  \"Jingle Bell Rock\", \"Mr Sandman\", \"Have Yourself a Merry Little Christmas \"и множество подобных невероятно уютных и ярких песен из репертуара легенд мировой джазовой сцены, центральным из которых в этот вечер станет Фрэнк Синатра. Это не просто концерт, а целое шоу, состоящее из музыкального юмора, множества шуток и импровизации. <br><br>  Однако главная особенность всех шоу Алекса Абра - это 100% аутентичность в звучании  исполняемых им песен, добиться которой солист смог своему абсолютно свободному владению английским языком, идеальному произношению и глубокому пониманию стиля. <br><br>   Алекс Абра - известный российский джазовый вокалист и автор песен;  лауреат(1-е место) международного фестиваля Усадьба Джаз; участник анти-ГОЛОСА - проекта Александра Градского; участник телешоу \"Поймай меня, если сможешь\", резидент московских джаз клубов и концертных агенств; полиглот.",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Сретенка, д. 11",
+        "canonicalPath": null,
+        "primaryCityId": "city_524901",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    {
+      "eventId": "evt_6ab234e96e3e0971661e5b36",
+      "eventSlug": "алекс-абра-sinatra-christmas-рождественские-джазовое-шоу-6ab234e96e3e0971661e5b36",
+      "title": "Алекс Абра: Sinatra Christmas. Рождественские джазовое шоу",
+      "city": "Москва",
+      "venue": "Джем Клуб / Jam Club",
+      "address": "Сретенка, д. 11",
+      "eventPageId": "2ddb2b3a-fade-40a5-a333-760c7bb6c4f1",
+      "eventPageSlug": "aleks-abra-sinatra-christmas-rozhdestvenskie-dzhazovoe-shou-moskva",
+      "sourceDescription": "Добро пожаловать в Рождественскую сказку! <br><br>   Здесь Вы сможете погрузиться в атмосферу старых новогодних голлливудских фильмов и мюзиклов,  высшего света 20 века, наслаждаясь вкуснейшими Christmas песнями в исполнении одного из самых востребованных и харизматичных джазовых вокалистов, обладателя бархатного баритона - Алекса Абра и ведущих джазменов столицы. <br><br>    \"Santa Claus Is Coming To Town\" , \"It's The Most Wonderful Time Of The Year \" ; Let It Snow;  \"Jingle Bell Rock\", \"Mr Sandman\", \"Have Yourself a Merry Little Christmas \"и множество подобных невероятно уютных и ярких песен из репертуара легенд мировой джазовой сцены, центральным из которых в этот вечер станет Фрэнк Синатра. Это не просто концерт, а целое шоу, состоящее из музыкального юмора, множества шуток и импровизации. <br><br>  Однако главная особенность всех шоу Алекса Абра - это 100% аутентичность в звучании  исполняемых им песен, добиться которой солист смог своему абсолютно свободному владению английским языком, идеальному произношению и глубокому пониманию стиля. <br><br>   Алекс Абра - известный российский джазовый вокалист и автор песен;  лауреат(1-е место) международного фестиваля Усадьба Джаз; участник анти-ГОЛОСА - проекта Александра Градского; участник телешоу \"Поймай меня, если сможешь\", резидент московских джаз клубов и концертных агенств; полиглот.",
+      "sourceUsage": "UNUSED_ORIGINAL_SOURCE",
+      "legacyOverrideDescription": "Алекс Абра: Sinatra Christmas. Рождественские джазовое шоу в Москве.\n\nШоу, которое держит внимание от первого номера до финала. Свет, костюмы и музыка подобраны так, чтобы усилить впечатление от каждого эпизода. Подойдёт для семейного выхода и компании друзей. Удобно после рабочего дня: переключиться и отдохнуть. Шоу - это зрелище с полной отдачей: свет, звук, сцена и артисты работают как единый механизм. Номера идут без длинных пауз, поэтому внимание зала держится на протяжении всего вечера. Хороший вариант, если хочется ярких впечатлений.\n\nПодходит для буднего вечера: не нужно ждать выходных. Программа шоу построена на эффектах: номера сменяют друг друга, зал становится частью происходящего. Свет, костюмы и музыка подобраны так, чтобы усилить впечатление от каждого эпизода. Рекомендуем приходить заранее: перед началом собирается много зрителей.\n\nДобро пожаловать в Рождественскую сказку! Здесь Вы сможете погрузиться в атмосферу старых новогодних голлливудских фильмов и мюзиклов, высшего света 20 века, наслаждаясь вкуснейшими Christmas песнями в исполнении одного из самых востребованных и харизматичных джазовых вокалистов, обладателя бархатного баритона - Алекса Абра и ведущих джазменов столицы.\n\n\"Santa Claus Is Coming To Town\", \"It's The Most Wonderful Time Of The Year \"; Let It Snow; \"Jingle Bell Rock\", \"Mr Sandman\", \"Have Yourself a Merry Little Christmas \"и множество подобных невероятно уютных и ярких песен из репертуара легенд мировой джазовой сцены, центральным из которых в этот вечер станет Фрэнк Синатра. Это не просто концерт, а целое шоу, состоящее из музыкального юмора, множества шуток и импровизации.\n\nОднако главная особенность всех шоу Алекса Абра - это 100% аутентичность в звучании исполняемых им песен, добиться которой солист смог своему абсолютно свободному владению английским языком, идеальному произношению и глубокому пониманию стиля.\n\nАлекс Абра - известный российский джазовый вокалист и автор песен; лауреат(1-е место) международного фестиваля Усадьба Джаз; участник анти-ГОЛОСА - проекта Александра Градского; участник телешоу \"Поймай меня, если сможешь\", резидент московских джаз клубов и концертных агенств; полиглот.\n\n## Практическая информация\n\n- Место - «Джем Клуб Мьюзик», Москва\n- Адрес - Сретенка, д. 11\n- Продолжительность - около 120 минут\n- Возрастное ограничение - 6+\n- Билеты - от 4 000 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "legacyOverrideUsage": "ARCHIVED_LEGACY_COPY; do not overwrite during EventPage rewrite",
+      "sessionSnapshot": [
+        {
+          "id": "sess_6ab234e96e3e0971661e5b36",
+          "endsAt": "2026-12-10 19:00:00",
+          "startsAt": "2026-12-10 17:00:00",
+          "priceFromRub": 4000
+        }
+      ],
+      "ageLimit": "6",
+      "priceFromRub": 4000,
+      "sourceSnapshot": {
+        "id": "evt_6ab234e96e3e0971661e5b36",
+        "kind": "SINGLE",
+        "slug": "алекс-абра-sinatra-christmas-рождественские-джазовое-шоу-6ab234e96e3e0971661e5b36",
+        "seoH1": null,
+        "title": "Алекс Абра: Sinatra Christmas. Рождественские джазовое шоу",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "externalId": "6ab234e96e3e0971661e5b36",
+            "metaExternalId": null,
+            "sourceUrlRedacted": true
+          }
+        ],
+        "venueId": "venue_623457215d2b1afd72c3ec48",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6ab2355e9277710a3613b30c.jpg",
+        "seoTitle": null,
+        "cityTitle": "Москва",
+        "venueTitle": "Джем Клуб / Jam Club",
+        "description": "Добро пожаловать в Рождественскую сказку! <br><br>   Здесь Вы сможете погрузиться в атмосферу старых новогодних голлливудских фильмов и мюзиклов,  высшего света 20 века, наслаждаясь вкуснейшими Christmas песнями в исполнении одного из самых востребованных и харизматичных джазовых вокалистов, обладателя бархатного баритона - Алекса Абра и ведущих джазменов столицы. <br><br>    \"Santa Claus Is Coming To Town\" , \"It's The Most Wonderful Time Of The Year \" ; Let It Snow;  \"Jingle Bell Rock\", \"Mr Sandman\", \"Have Yourself a Merry Little Christmas \"и множество подобных невероятно уютных и ярких песен из репертуара легенд мировой джазовой сцены, центральным из которых в этот вечер станет Фрэнк Синатра. Это не просто концерт, а целое шоу, состоящее из музыкального юмора, множества шуток и импровизации. <br><br>  Однако главная особенность всех шоу Алекса Абра - это 100% аутентичность в звучании  исполняемых им песен, добиться которой солист смог своему абсолютно свободному владению английским языком, идеальному произношению и глубокому пониманию стиля. <br><br>   Алекс Абра - известный российский джазовый вокалист и автор песен;  лауреат(1-е место) международного фестиваля Усадьба Джаз; участник анти-ГОЛОСА - проекта Александра Градского; участник телешоу \"Поймай меня, если сможешь\", резидент московских джаз клубов и концертных агенств; полиглот.",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Сретенка, д. 11",
+        "canonicalPath": null,
+        "primaryCityId": "city_524901",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    {
+      "eventId": "evt_6ad67aa79401508de03d1b16",
+      "eventSlug": "алексеи-водовозов-здравствуи-новыи-год-6ad67aa79401508de03d1b16",
+      "title": "Алексей Водовозов. Здравствуй, ****, Новый год!",
+      "city": "Москва",
+      "venue": "Библиотека по естественным наукам Российской академии наук.",
+      "address": "Малый Знаменский пер., 11/11",
+      "eventPageId": "71d6f0c7-8792-47ab-adcf-f4745980211b",
+      "eventPageSlug": "aleksei-vodovozov-zdravstvui-novyi-god-moskva",
+      "sourceDescription": "Лекция Алексея Водовозова «Здравствуй, **** , Новый год!».<br><br><br>Доступны билеты на живое выступление и на онлайн-трансляцию.<br><br><br><br>О чём лекция?<br><br><br>Может ли Новый год быть темой для научных исследований? Нет ничего невозможного, если ты умеешь правильно писать заявки на гранты и потом правильно преподносить своё открытие в отчёте. <br><br>Каких только новогодних публикаций не приходилось встречать врачу и научному журналисту Алексею Водовозову. <br><br>Он расскажет, какой новогодний десерт может считаться наиболее здоровым, греет ли безалкогольный глинтвейн так же эффективно, как содержащий этанол, почему нельзя рисовать новогодние открытки ярко-зелёной краской, чем опасны гаитянские барабаны в качестве подарка и что там со здоровьем всех ипостасей Деда Мороза.<br> <br><br><br>Кто рассказывает?<br><br><br>Алексей Водовозов. Российский научный журналист и медицинский блогер. Врач-терапевт высшей квалификационной категории, токсиколог, член Комиссии РАН по популяризации науки. В прошлом — военный врач, подполковник медицинской службы запаса. Ведёт просветительский блог «Смотровая Военврача», в 2019 году назван одним из самых известных в России популяризаторов доказательной медицины.<br><br><br><br>Информация:<br><br><br>Контакты организатора: +7 915 248 97 37<br><br>Возрастное ограничение 16+",
+      "sourceUsage": "UNUSED_ORIGINAL_SOURCE",
+      "legacyOverrideDescription": "Лекция Алексея Водовозова «Здравствуй, **** , Новый год!». Доступны билеты на живое выступление и на онлайн-трансляцию. О чём лекция?\n\nМожет ли Новый год быть темой для научных исследований? Нет ничего невозможного, если ты умеешь правильно писать заявки на гранты и потом правильно преподносить своё открытие в отчёте. Каких только новогодних публикаций не приходилось встречать врачу и научному журналисту Алексею Водовозову.\n\nОн расскажет, какой новогодний десерт может считаться наиболее здоровым, греет ли безалкогольный глинтвейн так же эффективно, как содержащий этанол, почему нельзя рисовать новогодние открытки ярко-зелёной краской, чем опасны гаитянские барабаны в качестве подарка и что там со здоровьем всех ипостасей Деда Мороза. Кто рассказывает?\nАлексей Водовозов. Российский научный журналист и медицинский блогер. Врач-терапевт высшей квалификационной категории, токсиколог, член Комиссии РАН по популяризации науки. В прошлом - военный врач, подполковник медицинской службы запаса. Ведёт просветительский блог «Смотровая Военврача», в 2019 году назван одним из самых известных в России популяризаторов доказательной медицины.\n\n## Информация\n\nКонтакты организатора: +7 915 248 97 37\nВозрастное ограничение 16+",
+      "legacyOverrideUsage": "ARCHIVED_LEGACY_COPY; do not overwrite during EventPage rewrite",
+      "sessionSnapshot": [
+        {
+          "id": "sess_6ad67aa79401508de03d1b16",
+          "endsAt": "2026-12-23 18:30:00",
+          "startsAt": "2026-12-23 16:30:00",
+          "priceFromRub": 1600
+        }
+      ],
+      "ageLimit": "16",
+      "priceFromRub": 1600,
+      "sourceSnapshot": {
+        "id": "evt_6ad67aa79401508de03d1b16",
+        "kind": "SINGLE",
+        "slug": "алексеи-водовозов-здравствуи-новыи-год-6ad67aa79401508de03d1b16",
+        "seoH1": null,
+        "title": "Алексей Водовозов. Здравствуй, ****, Новый год!",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "externalId": "6ad67aa79401508de03d1b16",
+            "metaExternalId": null,
+            "sourceUrlRedacted": true
+          }
+        ],
+        "venueId": "venue_64f1d1894bfccdf555f926d6",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ad67aa65b16bff3e9cacf34.jpg",
+        "seoTitle": null,
+        "cityTitle": "Москва",
+        "venueTitle": "Библиотека по естественным наукам Российской академии наук.",
+        "description": "Лекция Алексея Водовозова «Здравствуй, **** , Новый год!».<br><br><br>Доступны билеты на живое выступление и на онлайн-трансляцию.<br><br><br><br>О чём лекция?<br><br><br>Может ли Новый год быть темой для научных исследований? Нет ничего невозможного, если ты умеешь правильно писать заявки на гранты и потом правильно преподносить своё открытие в отчёте. <br><br>Каких только новогодних публикаций не приходилось встречать врачу и научному журналисту Алексею Водовозову. <br><br>Он расскажет, какой новогодний десерт может считаться наиболее здоровым, греет ли безалкогольный глинтвейн так же эффективно, как содержащий этанол, почему нельзя рисовать новогодние открытки ярко-зелёной краской, чем опасны гаитянские барабаны в качестве подарка и что там со здоровьем всех ипостасей Деда Мороза.<br> <br><br><br>Кто рассказывает?<br><br><br>Алексей Водовозов. Российский научный журналист и медицинский блогер. Врач-терапевт высшей квалификационной категории, токсиколог, член Комиссии РАН по популяризации науки. В прошлом — военный врач, подполковник медицинской службы запаса. Ведёт просветительский блог «Смотровая Военврача», в 2019 году назван одним из самых известных в России популяризаторов доказательной медицины.<br><br><br><br>Информация:<br><br><br>Контакты организатора: +7 915 248 97 37<br><br>Возрастное ограничение 16+",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Малый Знаменский пер., 11/11",
+        "canonicalPath": null,
+        "primaryCityId": "city_524901",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    {
+      "eventId": "evt_6ac5434089e6a22cd0abf834",
+      "eventSlug": "алексеи-решетун-новыи-год-по-судебно-медицинске-6ac5434089e6a22cd0abf834",
+      "title": "Алексей Решетун. Новый год по судебно-медицински.",
+      "city": "Москва",
+      "venue": "Аудиториум",
+      "address": "Воздвиженка, 9",
+      "eventPageId": "52bbc926-af2c-4607-9383-2f8115b0b383",
+      "eventPageSlug": "aleksei-reshetun-novyi-god-po-sudebno-medicinske-moskva",
+      "sourceDescription": "Лекция Алексея Решетуна «Новый год по судебно-медицински». <br><br><br>Доступны билеты на живое выступление и на онлайн-трансляцию.<br><br><br><br>О чём лекция?<br><br><br>Традиционно новогодние праздники в нашей стране длятся долго и сопровождаются различными весельями, гуляниями, празднованиями и другими приятными событиями. Но таковыми праздники являются не для всех. <br><br>Например, для судебно-медицинских экспертов эти дни означают усиление работы, усиление интенсивности, увеличение числа различных случаев травматизма, а иногда даже и смертельных случаев. <br><br>Как относятся к Новому году судебно-медицинские эксперты? И с какими случаями мы можем столкнуться во время празднования Нового года?<br><br>На лекции поговорим о том, как себя уберечь во время празднования Нового года, на что обратить внимание и как сохранить свою жизнь и, собственно, здоровье, чтобы праздник был именно праздником, а не закончился поездкой в больницу или в морг.<br><br><br><br>Кто рассказывает?<br><br><br>Алексей Решетун. Врач, судебно-медицинский эксперт высшей квалификационной категории, автор научно-популярных книг, двукратный победитель в литературном конкурсе среди медицинских работников «Здравомыслие-2020» и «Здравомыслие-2025» Минздрава России, член Российского союза писателей.<br><br><br><br>Информация:<br><br><br>Контакты организатора: +7 915 248 97 37<br><br>Возрастное ограничение 16+",
+      "sourceUsage": "UNUSED_ORIGINAL_SOURCE",
+      "legacyOverrideDescription": "Лекция Алексея Решетуна «Новый год по судебно-медицински». Доступны билеты на живое выступление и на онлайн-трансляцию. О чём лекция?\n\nТрадиционно новогодние праздники в нашей стране длятся долго и сопровождаются различными весельями, гуляниями, празднованиями и другими приятными событиями. Но таковыми праздники являются не для всех. Например, для судебно-медицинских экспертов эти дни означают усиление работы, усиление интенсивности, увеличение числа различных случаев травматизма, а иногда даже и смертельных случаев.\n\nКак относятся к Новому году судебно-медицинские эксперты? И с какими случаями мы можем столкнуться во время празднования Нового года? На лекции поговорим о том, как себя уберечь во время празднования Нового года, на что обратить внимание и как сохранить свою жизнь и, собственно, здоровье, чтобы праздник был именно праздником, а не закончился поездкой в больницу или в морг.\n\nКто рассказывает? Алексей Решетун. Врач, судебно-медицинский эксперт высшей квалификационной категории, автор научно-популярных книг, двукратный победитель в литературном конкурсе среди медицинских работников «Здравомыслие-2020» и «Здравомыслие-2025» Минздрава России, член Российского союза писателей.\n\n## Информация\n\nКонтакты организатора: +7 915 248 97 37.\n\n## Практическая информация\n\n- Место - «Аудиториум», Москва\n- Адрес - Воздвиженка, 9\n- Продолжительность - около 120 минут\n- Возрастное ограничение - 16+\n- Билеты - от 1 200 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "legacyOverrideUsage": "ARCHIVED_LEGACY_COPY; do not overwrite during EventPage rewrite",
+      "sessionSnapshot": [
+        {
+          "id": "sess_6ac5434089e6a22cd0abf834",
+          "endsAt": "2026-12-23 18:30:00",
+          "startsAt": "2026-12-23 16:30:00",
+          "priceFromRub": 2000
+        }
+      ],
+      "ageLimit": "16",
+      "priceFromRub": 2000,
+      "sourceSnapshot": {
+        "id": "evt_6ac5434089e6a22cd0abf834",
+        "kind": "SINGLE",
+        "slug": "алексеи-решетун-новыи-год-по-судебно-медицинске-6ac5434089e6a22cd0abf834",
+        "seoH1": null,
+        "title": "Алексей Решетун. Новый год по судебно-медицински.",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "externalId": "6ac5434089e6a22cd0abf834",
+            "metaExternalId": null,
+            "sourceUrlRedacted": true
+          }
+        ],
+        "venueId": "venue_5c7a5248737a62000c0a198a",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ac5478b45447619d7643709.jpg",
+        "seoTitle": null,
+        "cityTitle": "Москва",
+        "venueTitle": "Аудиториум",
+        "description": "Лекция Алексея Решетуна «Новый год по судебно-медицински». <br><br><br>Доступны билеты на живое выступление и на онлайн-трансляцию.<br><br><br><br>О чём лекция?<br><br><br>Традиционно новогодние праздники в нашей стране длятся долго и сопровождаются различными весельями, гуляниями, празднованиями и другими приятными событиями. Но таковыми праздники являются не для всех. <br><br>Например, для судебно-медицинских экспертов эти дни означают усиление работы, усиление интенсивности, увеличение числа различных случаев травматизма, а иногда даже и смертельных случаев. <br><br>Как относятся к Новому году судебно-медицинские эксперты? И с какими случаями мы можем столкнуться во время празднования Нового года?<br><br>На лекции поговорим о том, как себя уберечь во время празднования Нового года, на что обратить внимание и как сохранить свою жизнь и, собственно, здоровье, чтобы праздник был именно праздником, а не закончился поездкой в больницу или в морг.<br><br><br><br>Кто рассказывает?<br><br><br>Алексей Решетун. Врач, судебно-медицинский эксперт высшей квалификационной категории, автор научно-популярных книг, двукратный победитель в литературном конкурсе среди медицинских работников «Здравомыслие-2020» и «Здравомыслие-2025» Минздрава России, член Российского союза писателей.<br><br><br><br>Информация:<br><br><br>Контакты организатора: +7 915 248 97 37<br><br>Возрастное ограничение 16+",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Воздвиженка, 9",
+        "canonicalPath": null,
+        "primaryCityId": "city_524901",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    {
+      "eventId": "evt_6adca05b56fba519ed105419",
+      "eventSlug": "джаз-поэмы-новогоднии-концерт-6adca05b56fba519ed105419",
+      "title": "Джаз Поэмы. Новогодний концерт",
+      "city": "Москва",
+      "venue": "Дом винтажной музыки",
+      "address": "ул. Орджоникидзе, 1",
+      "eventPageId": "8a80a65c-5c47-40cc-a8fa-f5b9c1b6a98b",
+      "eventPageSlug": "dzhaz-poemy-novogodnii-koncert-moskva",
+      "sourceDescription": "«Джаз Поэмы» — триумфаторы международного конкурса «Jazz Birds» в номинации «Великолепная десятка» и победители «Moscow Jazz Festival 2026»<br><br>Вас ждет вечер, где гармонично сплетаются знакомые с детства новогодние песни на русском языке и голливудский рождественский джаз из старых кинофильмов. В программе — любимые композиции: Пять минут, Одна снежинка, Увезу тебя я в Тундру, Ой мороз, мороз, Let it Snow, Jingle Bells в авторских аранжировках невероятной красоты.<br><br>Живые инструменты, акустика винтажного зала и хорошая компания — идеальный рецепт вашего зимнего вечера. <br><br>Создавать эту магию на сцене будут:<br>• Маргарита Буракова — вокал<br>• Елизавета Савченко — фортепиано<br>• Матвей Михеев — саксофон<br>• Дамир Халиулин — контрабас<br>• Давид Магоян — барабаны",
+      "sourceUsage": "UNUSED_ORIGINAL_SOURCE",
+      "legacyOverrideDescription": null,
+      "legacyOverrideUsage": "NONE",
+      "sessionSnapshot": [
+        {
+          "id": "sess_6adca05b56fba519ed105419",
+          "endsAt": "2026-12-03 18:30:00",
+          "startsAt": "2026-12-03 17:00:00",
+          "priceFromRub": 800
+        }
+      ],
+      "ageLimit": "18",
+      "priceFromRub": 800,
+      "sourceSnapshot": {
+        "id": "evt_6adca05b56fba519ed105419",
+        "kind": "SINGLE",
+        "slug": "джаз-поэмы-новогоднии-концерт-6adca05b56fba519ed105419",
+        "seoH1": null,
+        "title": "Джаз Поэмы. Новогодний концерт",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "externalId": "6adca05b56fba519ed105419",
+            "metaExternalId": null,
+            "sourceUrlRedacted": true
+          }
+        ],
+        "venueId": "venue_6468a3fdb2516beb95c871ea",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6adca05a37db13635ec604ec.jpg",
+        "seoTitle": null,
+        "cityTitle": "Москва",
+        "venueTitle": "Дом винтажной музыки",
+        "description": "«Джаз Поэмы» — триумфаторы международного конкурса «Jazz Birds» в номинации «Великолепная десятка» и победители «Moscow Jazz Festival 2026»<br><br>Вас ждет вечер, где гармонично сплетаются знакомые с детства новогодние песни на русском языке и голливудский рождественский джаз из старых кинофильмов. В программе — любимые композиции: Пять минут, Одна снежинка, Увезу тебя я в Тундру, Ой мороз, мороз, Let it Snow, Jingle Bells в авторских аранжировках невероятной красоты.<br><br>Живые инструменты, акустика винтажного зала и хорошая компания — идеальный рецепт вашего зимнего вечера. <br><br>Создавать эту магию на сцене будут:<br>• Маргарита Буракова — вокал<br>• Елизавета Савченко — фортепиано<br>• Матвей Михеев — саксофон<br>• Дамир Халиулин — контрабас<br>• Давид Магоян — барабаны",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "ул. Орджоникидзе, 1",
+        "canonicalPath": null,
+        "primaryCityId": "city_524901",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    {
+      "eventId": "evt_6abb9087edf766d2da82bfa1",
+      "eventSlug": "концерт-рождественскии-джаз-6abb9087edf766d2da82bfa1",
+      "title": "Концерт «Рождественский джаз»",
+      "city": "Москва",
+      "venue": "Арт-пространство Люмьер Холл",
+      "address": "Берсеневский пер., д. 2, стр. 1",
+      "eventPageId": "a114eeb2-7fd2-45c7-a26d-8c35f61e1e8b",
+      "eventPageSlug": "koncert-rozhdestvenskii-dzhaz-moskva",
+      "sourceDescription": "Есть музыка, без которой сложно представить Рождество и Новый год. <br>Первые ноты знакомых мелодий возвращают то самое ощущение приближающегося праздника: огни ёлки, снег за окном, любимые фильмы и вечера, когда впереди ещё целая череда зимних чудес.<br><br>«Рождественский джаз» в Люмьер-Холле соберёт самые известные американские рождественские композиции, многие из которых стали неотъемлемой частью любимого новогоднего кино.<br><br>В программе прозвучат «Somewhere in My Memory» из фильма «Один дома», легендарная «White Christmas», «Have Yourself a Merry Little Christmas», «Let It Snow», «The Christmas Song» и другие мелодии золотой эпохи американского джаза и Голливуда.<br><br>На сцене выступят музыканты московского джаз-бэнда Real Jam в составе квартета: вокал, саксофон, фортепиано и контрабас. Живой звук, мягкий джазовый вокал и знакомые с детства мелодии создадут атмосферу уютного рождественского вечера.<br><br>Концерт пройдёт в Большом мультимедийном зале Люмьер-Холла.<br><br>Оставьте предновогоднюю суету за дверями и проведите этот вечер среди любимой музыки, тёплых воспоминаний и ощущения приближающегося праздника.",
+      "sourceUsage": "UNUSED_ORIGINAL_SOURCE",
+      "legacyOverrideDescription": "Есть музыка, без которой сложно представить Рождество и Новый год. Первые ноты знакомых мелодий возвращают то самое ощущение приближающегося праздника: огни ёлки, снег за окном, любимые фильмы и вечера, когда впереди ещё целая череда зимних чудес. «Рождественский джаз» в Люмьер-Холле соберёт самые известные американские рождественские композиции, многие из которых стали неотъемлемой частью любимого новогоднего кино.\n\nВ программе прозвучат «Somewhere in My Memory» из фильма «Один дома», легендарная «White Christmas», «Have Yourself a Merry Little Christmas», «Let It Snow», «The Christmas Song» и другие мелодии золотой эпохи американского джаза и Голливуда. На сцене выступят музыканты московского джаз-бэнда Real Jam в составе квартета: вокал, саксофон, фортепиано и контрабас. Живой звук, мягкий джазовый вокал и знакомые с детства мелодии создадут атмосферу уютного рождественского вечера.\n\nКонцерт пройдёт в Большом мультимедийном зале Люмьер-Холла. Оставьте предновогоднюю суету за дверями и проведите этот вечер среди любимой музыки, тёплых воспоминаний и ощущения приближающегося праздника.\n\n## Практическая информация\n\n- Место - «Арт-пространство Люмьер Холл», Москва\n- Адрес - Берсеневский пер., д. 2, стр. 1\n- Продолжительность - около 75 минут\n- Возрастное ограничение - 12+\n- Билеты - от 1 300 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "legacyOverrideUsage": "ARCHIVED_LEGACY_COPY; do not overwrite during EventPage rewrite",
+      "sessionSnapshot": [
+        {
+          "id": "sess_6abb9087edf766d2da82bfa1",
+          "endsAt": "2026-12-19 19:15:00",
+          "startsAt": "2026-12-19 18:00:00",
+          "priceFromRub": 1300
+        }
+      ],
+      "ageLimit": "12",
+      "priceFromRub": 1300,
+      "sourceSnapshot": {
+        "id": "evt_6abb9087edf766d2da82bfa1",
+        "kind": "SINGLE",
+        "slug": "концерт-рождественскии-джаз-6abb9087edf766d2da82bfa1",
+        "seoH1": null,
+        "title": "Концерт «Рождественский джаз»",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "externalId": "6abb9087edf766d2da82bfa1",
+            "metaExternalId": null,
+            "sourceUrlRedacted": true
+          }
+        ],
+        "venueId": "venue_54cabc2b9cb5385a9f65b95a",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6abb90fc06f88ce6035f9de7.jpg",
+        "seoTitle": null,
+        "cityTitle": "Москва",
+        "venueTitle": "Арт-пространство Люмьер Холл",
+        "description": "Есть музыка, без которой сложно представить Рождество и Новый год. <br>Первые ноты знакомых мелодий возвращают то самое ощущение приближающегося праздника: огни ёлки, снег за окном, любимые фильмы и вечера, когда впереди ещё целая череда зимних чудес.<br><br>«Рождественский джаз» в Люмьер-Холле соберёт самые известные американские рождественские композиции, многие из которых стали неотъемлемой частью любимого новогоднего кино.<br><br>В программе прозвучат «Somewhere in My Memory» из фильма «Один дома», легендарная «White Christmas», «Have Yourself a Merry Little Christmas», «Let It Snow», «The Christmas Song» и другие мелодии золотой эпохи американского джаза и Голливуда.<br><br>На сцене выступят музыканты московского джаз-бэнда Real Jam в составе квартета: вокал, саксофон, фортепиано и контрабас. Живой звук, мягкий джазовый вокал и знакомые с детства мелодии создадут атмосферу уютного рождественского вечера.<br><br>Концерт пройдёт в Большом мультимедийном зале Люмьер-Холла.<br><br>Оставьте предновогоднюю суету за дверями и проведите этот вечер среди любимой музыки, тёплых воспоминаний и ощущения приближающегося праздника.",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Берсеневский пер., д. 2, стр. 1",
+        "canonicalPath": null,
+        "primaryCityId": "city_524901",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    {
+      "eventId": "evt_6ace27e38566b034b416c33a",
+      "eventSlug": "лиза-макеева-рождественские-мелодии-нью-иорка-6ace27e38566b034b416c33a",
+      "title": "Лиза Макеева - \"Рождественские мелодии Нью Йорка\"",
+      "city": "Москва",
+      "venue": "Джем Клуб / Jam Club",
+      "address": "Сретенка, д. 11",
+      "eventPageId": "e73400db-fb9c-4993-ba13-fcbe5d0e1693",
+      "eventPageSlug": "liza-makeeva-rozhdestvenskie-melodii-nyu-iorka-moskva",
+      "sourceDescription": "It’s beginning to look a lot like Christmas! <br>Сказочная Москва в ожидании Новогодних праздников! <br>По радио уже звучат песни «Let it snow», «Santa baby»,  «Winter wonderland» и в сознании сразу же возникает картинка красочного рождественского Нью-Йорка - одной из столиц мирового джаза! <br>Лиза Макеева и ее джаз бэнд приглашают зрителей уже сейчас создать себе праздничное настроение и окунуться в атмосферу сияющего огнями зимнего Нью-Йорка, где уже через несколько дней случится Рождественский вечер!<br>Окутывающий бархатный тембр актрисы театра и кино, певицы Лизы Макеевой привносит новую энергию в джазовые стандарты, а также погружает зрителя в яркую атмосферу старого Голливуда и классики мирового кинематографа. <br>Вместе с Лизой на сцене вас будут ждать великолепные джазовые музыканты: <br>Александр Гуреев - саксофон<br>Сергей Кириллов - фортепиано<br>Олег Степанов - ударные<br>Александр Байдаков - контрабас",
+      "sourceUsage": "UNUSED_ORIGINAL_SOURCE",
+      "legacyOverrideDescription": "It’s beginning to look a lot like Christmas! Сказочная Москва в ожидании Новогодних праздников! По радио уже звучат песни «Let it snow», «Santa baby», «Winter wonderland» и в сознании сразу же возникает картинка красочного рождественского Нью-Йорка - одной из столиц мирового джаза! Лиза Макеева и ее джаз бэнд приглашают зрителей уже сейчас создать себе праздничное настроение и окунуться в атмосферу сияющего огнями зимнего Нью-Йорка, где уже через несколько дней случится Рождественский вечер!\n\nОкутывающий бархатный тембр актрисы театра и кино, певицы Лизы Макеевой привносит новую энергию в джазовые стандарты, а также погружает зрителя в яркую атмосферу старого Голливуда и классики мирового кинематографа. Вместе с Лизой на сцене вас будут ждать великолепные джазовые музыканты: Александр Гуреев - саксофон Сергей Кириллов - фортепиано Олег Степанов - ударные Александр Байдаков - контрабас.\n\n## Практическая информация\n\n- Место - «Джем Клуб Мьюзик», Москва\n- Адрес - Сретенка, д. 11\n- Продолжительность - около 120 минут\n- Возрастное ограничение - 6+\n- Билеты - от 2 500 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "legacyOverrideUsage": "ARCHIVED_LEGACY_COPY; do not overwrite during EventPage rewrite",
+      "sessionSnapshot": [
+        {
+          "id": "sess_6ace27e38566b034b416c33a",
+          "endsAt": "2026-12-19 18:00:00",
+          "startsAt": "2026-12-19 16:00:00",
+          "priceFromRub": 2000
+        }
+      ],
+      "ageLimit": "6",
+      "priceFromRub": 2000,
+      "sourceSnapshot": {
+        "id": "evt_6ace27e38566b034b416c33a",
+        "kind": "SINGLE",
+        "slug": "лиза-макеева-рождественские-мелодии-нью-иорка-6ace27e38566b034b416c33a",
+        "seoH1": null,
+        "title": "Лиза Макеева - \"Рождественские мелодии Нью Йорка\"",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "externalId": "6ace27e38566b034b416c33a",
+            "metaExternalId": null,
+            "sourceUrlRedacted": true
+          }
+        ],
+        "venueId": "venue_623457215d2b1afd72c3ec48",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ace284143c138341f71ec02.jpg",
+        "seoTitle": null,
+        "cityTitle": "Москва",
+        "venueTitle": "Джем Клуб / Jam Club",
+        "description": "It’s beginning to look a lot like Christmas! <br>Сказочная Москва в ожидании Новогодних праздников! <br>По радио уже звучат песни «Let it snow», «Santa baby»,  «Winter wonderland» и в сознании сразу же возникает картинка красочного рождественского Нью-Йорка - одной из столиц мирового джаза! <br>Лиза Макеева и ее джаз бэнд приглашают зрителей уже сейчас создать себе праздничное настроение и окунуться в атмосферу сияющего огнями зимнего Нью-Йорка, где уже через несколько дней случится Рождественский вечер!<br>Окутывающий бархатный тембр актрисы театра и кино, певицы Лизы Макеевой привносит новую энергию в джазовые стандарты, а также погружает зрителя в яркую атмосферу старого Голливуда и классики мирового кинематографа. <br>Вместе с Лизой на сцене вас будут ждать великолепные джазовые музыканты: <br>Александр Гуреев - саксофон<br>Сергей Кириллов - фортепиано<br>Олег Степанов - ударные<br>Александр Байдаков - контрабас",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Сретенка, д. 11",
+        "canonicalPath": null,
+        "primaryCityId": "city_524901",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    {
+      "eventId": "evt_6ac91efde2b1828475d87dea",
+      "eventSlug": "новыи-год-с-владимиром-сурдиным-и-алексеем-семихатовым-6ac91efde2b1828475d87dea",
+      "title": "Новый год! С Владимиром Сурдиным и Алексеем Семихатовым!",
+      "city": "Москва",
+      "venue": "Музей-заповедник Царицыно, Баженовский зал",
+      "address": "Дольская ул., 1с6",
+      "eventPageId": "f36cd8cf-dc6a-42f5-bf31-d86e9612b526",
+      "eventPageSlug": "novyi-god-s-vladimirom-surdinym-i-alekseem-semihatovym-moskva",
+      "sourceDescription": "Приглашаем вас на Новый год с Владимиром Сурдиным и Алексеем Семихатовым из серии мероприятий «Лекции во дворцах»!<br><br>В изысканной и камерной атмосфере мы проводим прошедший год в компании наших замечательных лекторов.<br><br>В программе мероприятия, помимо лекций, вас ждут кейтеринг, напитки, фотосессия с лекторами, возможность приватного общения, а также живая музыка.<br><br><br><br>О чём расскажут наши лекторы:<br><br><br>Человек стремительно ворвался в космос в 1961 году, преодолел притяжение Земли в 1968 году... Казалось, космическую экспансию человечества не остановить: вот-вот начнутся полёты на Марс и дальше, дальше.<br><br>Но до сих пор, несмотря на смену эпох в технологиях, мы даже не вернулись на Луну. А роботы за эти годы побывали у всех планет, на некоторых их спутниках, астероидах и кометах, отправились к границам Солнечной системы.<br><br>Так, может быть, человеку не место в космосе? Или мы начали слишком рано, не обеспечив сначала «волшебные» технологии?<br><br>«Вторая космическая гонка» — пустой лозунг или наступающая реальность, которая повлечет за собой изменения в жизни человечества? Непростой вопрос. <br><br>Обсудим его вместе: Сурдин и Семихатов не соглашаются друг с другом.<br><br><br><br>О лекторах:<br><br><br>Владимир Сурдин. Кандидат физико-математических наук, старший научный сотрудник Государственного астрономического института имени П. К. Штернберга, доцент физического факультета МГУ. Лауреат Беляевской премии и премии «Просветитель».<br><br><br>Алексей Семихатов. Доктор физико-математических наук, заведующий лабораторией Теории фундаментальных взаимодействий, Физический ин-т им Лебедева РАН, ведущий программы «Вопрос Науки», лауреат Национальной премии «Книга Года» 2023 за книгу «Всё, что движется. Прогулки по беспокойной Вселенной».<br><br><br><br>О площадке: <br><br><br>Большой Царицынский Дворец — жемчужина Царицынского дворцово-паркового ансамбля. Дворец был построен в 1786-1796 годах Матвеем Казаковым.<br><br>Выполненный в характерном для Царицыно стиле псевдоготики, Большой Царицынский дворец несёт в себе явные черты классицизма и является ярким памятником архитектуры XVIII века.<br><br><br><br>Информация:<br><br><br>Контакты организатора: +7 915 248 97 37<br><br>Возрастное ограничение 6+",
+      "sourceUsage": "UNUSED_ORIGINAL_SOURCE",
+      "legacyOverrideDescription": "## О лекторах\n\nВладимир Сурдин. Кандидат физико-математических наук, старший научный сотрудник Государственного астрономического института имени П. К. Штернберга, доцент физического факультета МГУ. Лауреат Беляевской премии и премии «Просветитель».\n\nАлексей Семихатов. Доктор физико-математических наук, заведующий лабораторией Теории фундаментальных взаимодействий, Физический ин-т им Лебедева РАН, ведущий программы «Вопрос Науки», лауреат Национальной премии «Книга Года» 2023 за книгу «Всё, что движется. Прогулки по беспокойной Вселенной».\n\n## О площадке\n\nБольшой Царицынский Дворец - жемчужина Царицынского дворцово-паркового ансамбля. Дворец был построен в 1786-1796 годах Матвеем Казаковым. Выполненный в характерном для Царицыно стиле псевдоготики, Большой Царицынский дворец несёт в себе явные черты классицизма и является ярким памятником архитектуры XVIII века.\n\n## Информация\nКонтакты организатора: +7 915 248 97 37\nВозрастное ограничение 6+",
+      "legacyOverrideUsage": "ARCHIVED_LEGACY_COPY; do not overwrite during EventPage rewrite",
+      "sessionSnapshot": [
+        {
+          "id": "sess_6ac91efde2b1828475d87dea",
+          "endsAt": "2026-12-11 19:00:00",
+          "startsAt": "2026-12-11 16:00:00",
+          "priceFromRub": 6000
+        }
+      ],
+      "ageLimit": "6",
+      "priceFromRub": 6000,
+      "sourceSnapshot": {
+        "id": "evt_6ac91efde2b1828475d87dea",
+        "kind": "SINGLE",
+        "slug": "новыи-год-с-владимиром-сурдиным-и-алексеем-семихатовым-6ac91efde2b1828475d87dea",
+        "seoH1": null,
+        "title": "Новый год! С Владимиром Сурдиным и Алексеем Семихатовым!",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "externalId": "6ac91efde2b1828475d87dea",
+            "metaExternalId": null,
+            "sourceUrlRedacted": true
+          }
+        ],
+        "venueId": "venue_6aa83818b9d85a696ae0bf47",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ac91efd298a01bdf421c641.jpg",
+        "seoTitle": null,
+        "cityTitle": "Москва",
+        "venueTitle": "Музей-заповедник Царицыно, Баженовский зал",
+        "description": "Приглашаем вас на Новый год с Владимиром Сурдиным и Алексеем Семихатовым из серии мероприятий «Лекции во дворцах»!<br><br>В изысканной и камерной атмосфере мы проводим прошедший год в компании наших замечательных лекторов.<br><br>В программе мероприятия, помимо лекций, вас ждут кейтеринг, напитки, фотосессия с лекторами, возможность приватного общения, а также живая музыка.<br><br><br><br>О чём расскажут наши лекторы:<br><br><br>Человек стремительно ворвался в космос в 1961 году, преодолел притяжение Земли в 1968 году... Казалось, космическую экспансию человечества не остановить: вот-вот начнутся полёты на Марс и дальше, дальше.<br><br>Но до сих пор, несмотря на смену эпох в технологиях, мы даже не вернулись на Луну. А роботы за эти годы побывали у всех планет, на некоторых их спутниках, астероидах и кометах, отправились к границам Солнечной системы.<br><br>Так, может быть, человеку не место в космосе? Или мы начали слишком рано, не обеспечив сначала «волшебные» технологии?<br><br>«Вторая космическая гонка» — пустой лозунг или наступающая реальность, которая повлечет за собой изменения в жизни человечества? Непростой вопрос. <br><br>Обсудим его вместе: Сурдин и Семихатов не соглашаются друг с другом.<br><br><br><br>О лекторах:<br><br><br>Владимир Сурдин. Кандидат физико-математических наук, старший научный сотрудник Государственного астрономического института имени П. К. Штернберга, доцент физического факультета МГУ. Лауреат Беляевской премии и премии «Просветитель».<br><br><br>Алексей Семихатов. Доктор физико-математических наук, заведующий лабораторией Теории фундаментальных взаимодействий, Физический ин-т им Лебедева РАН, ведущий программы «Вопрос Науки», лауреат Национальной премии «Книга Года» 2023 за книгу «Всё, что движется. Прогулки по беспокойной Вселенной».<br><br><br><br>О площадке: <br><br><br>Большой Царицынский Дворец — жемчужина Царицынского дворцово-паркового ансамбля. Дворец был построен в 1786-1796 годах Матвеем Казаковым.<br><br>Выполненный в характерном для Царицыно стиле псевдоготики, Большой Царицынский дворец несёт в себе явные черты классицизма и является ярким памятником архитектуры XVIII века.<br><br><br><br>Информация:<br><br><br>Контакты организатора: +7 915 248 97 37<br><br>Возрастное ограничение 6+",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Дольская ул., 1с6",
+        "canonicalPath": null,
+        "primaryCityId": "city_524901",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    {
+      "eventId": "evt_6ad671b7d553b2d1a313d020",
+      "eventSlug": "предчувствие-рождества-6ad671b7d553b2d1a313d020",
+      "title": "Предчувствие Рождества",
+      "city": "Москва",
+      "venue": "Центр современной музыки и исполнительских искусств \"ТОН\"",
+      "address": "Делегатская улица, 3 к 1",
+      "eventPageId": "e088377a-7d9a-43fe-a163-27ebf0a9efc2",
+      "eventPageSlug": "predchuvstvie-rozhdestva-moskva",
+      "sourceDescription": "Как \"звучит\" Рождество? Какая музыка способна выразить атмосферу ожидания чуда, радостных эмоций, и, в то же время, - мыслей о вечном, возвышенном? Ответы на эти вопросы предложат певица, заслуженная артистка России, солистка «Геликон-оперы» и приглашенная солистка Большого театра Ксения Вязникова и органистка, профессор Московской консерватории Евгения Кривицкая. <br><br>12 декабря в Центре современной музыки и исполнительских искусств «Тон», на площадке Всероссийского музея Декоративного искусства, будет представлена концертная программа «Предчувствие Рождества». Арии из опер Генделя, Перселла, возвышенная молитва Ave Maria Шуберта, органные сочинения Баха, рождественская пастораль французского композитор Луи Альфреда Лефебюра-Велли раскроют все многообразие мира классической музыки, настроят на возвышенный лад. Украсят вечер, сделают его атмосферу теплой и непринужденной комментарии исполнителей, которые помогут прочувствовать содержание музыки.<br><br>О Ксении Вязниковой пишут, как «о ярком вокальном явлении в российском музыкальном пространстве. В репертуаре ведущей солистки Московского музыкального театра «Геликон-опера» - свыше 30 ведущих партий для меццо-сопрано. Она - педагог двух ВУЗов, регулярно даёт мастер-классы», а также продолжает выступать в ведущих европейских театрах.<br><br>Евгения Кривицкая успешно совмещает интенсивную исполнительскую деятельность с преподаванием истории зарубежной музыки в Московской консерватории, активной работой журналиста, музыкального критика и главного редактор известного бренда – журнала «Музыкальная жизнь».<br>Дуэт Ксении Вязниковой и Евгении Кривицкой дебютировал с программой «Небесные струны. Голос и орган», показанной в усадьбе «Кусково» и в Калининградском кафедральном соборе. «Предчувствие Рождества» – новое совместное путешествие в мир красоты и гармонии.<br><br>Встреча с классикой окажется еще более притягательной, если учесть, что Центр «Тон» расположен в пространстве усадьбы графа Остермана, как часто теперь называют Всероссийский музей декоративного искусства. Посетители концертов могут ознакомиться с экспозицией, объединяющей уникальные экспонаты народного и прикладного творчества с современным дизайном, обменяться впечатлениями в уютном кафе с эксклюзивными десертами в меню. <br>Все это делает встречу с музыкой незабываемым культурным событием, которое стоит посетить!",
+      "sourceUsage": "UNUSED_ORIGINAL_SOURCE",
+      "legacyOverrideDescription": null,
+      "legacyOverrideUsage": "NONE",
+      "sessionSnapshot": [
+        {
+          "id": "sess_6ad671b7d553b2d1a313d020",
+          "endsAt": "2026-12-12 18:00:00",
+          "startsAt": "2026-12-12 16:00:00",
+          "priceFromRub": 2500
+        }
+      ],
+      "ageLimit": "6",
+      "priceFromRub": 2500,
+      "sourceSnapshot": {
+        "id": "evt_6ad671b7d553b2d1a313d020",
+        "kind": "SINGLE",
+        "slug": "предчувствие-рождества-6ad671b7d553b2d1a313d020",
+        "seoH1": null,
+        "title": "Предчувствие Рождества",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "externalId": "6ad671b7d553b2d1a313d020",
+            "metaExternalId": null,
+            "sourceUrlRedacted": true
+          }
+        ],
+        "venueId": "venue_69872bf8bec5c18ee6ef7029",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ad671b5e814a1221cfb419f.png",
+        "seoTitle": null,
+        "cityTitle": "Москва",
+        "venueTitle": "Центр современной музыки и исполнительских искусств \"ТОН\"",
+        "description": "Как \"звучит\" Рождество? Какая музыка способна выразить атмосферу ожидания чуда, радостных эмоций, и, в то же время, - мыслей о вечном, возвышенном? Ответы на эти вопросы предложат певица, заслуженная артистка России, солистка «Геликон-оперы» и приглашенная солистка Большого театра Ксения Вязникова и органистка, профессор Московской консерватории Евгения Кривицкая. <br><br>12 декабря в Центре современной музыки и исполнительских искусств «Тон», на площадке Всероссийского музея Декоративного искусства, будет представлена концертная программа «Предчувствие Рождества». Арии из опер Генделя, Перселла, возвышенная молитва Ave Maria Шуберта, органные сочинения Баха, рождественская пастораль французского композитор Луи Альфреда Лефебюра-Велли раскроют все многообразие мира классической музыки, настроят на возвышенный лад. Украсят вечер, сделают его атмосферу теплой и непринужденной комментарии исполнителей, которые помогут прочувствовать содержание музыки.<br><br>О Ксении Вязниковой пишут, как «о ярком вокальном явлении в российском музыкальном пространстве. В репертуаре ведущей солистки Московского музыкального театра «Геликон-опера» - свыше 30 ведущих партий для меццо-сопрано. Она - педагог двух ВУЗов, регулярно даёт мастер-классы», а также продолжает выступать в ведущих европейских театрах.<br><br>Евгения Кривицкая успешно совмещает интенсивную исполнительскую деятельность с преподаванием истории зарубежной музыки в Московской консерватории, активной работой журналиста, музыкального критика и главного редактор известного бренда – журнала «Музыкальная жизнь».<br>Дуэт Ксении Вязниковой и Евгении Кривицкой дебютировал с программой «Небесные струны. Голос и орган», показанной в усадьбе «Кусково» и в Калининградском кафедральном соборе. «Предчувствие Рождества» – новое совместное путешествие в мир красоты и гармонии.<br><br>Встреча с классикой окажется еще более притягательной, если учесть, что Центр «Тон» расположен в пространстве усадьбы графа Остермана, как часто теперь называют Всероссийский музей декоративного искусства. Посетители концертов могут ознакомиться с экспозицией, объединяющей уникальные экспонаты народного и прикладного творчества с современным дизайном, обменяться впечатлениями в уютном кафе с эксклюзивными десертами в меню. <br>Все это делает встречу с музыкой незабываемым культурным событием, которое стоит посетить!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Делегатская улица, 3 к 1",
+        "canonicalPath": null,
+        "primaryCityId": "city_524901",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    {
+      "eventId": "evt_6aac17b6c9dd03eb482f7adf",
+      "eventSlug": "рождество-2000-х-6aac17b6c9dd03eb482f7adf",
+      "title": "Рождество 2000-х",
+      "city": "Москва",
+      "venue": "Джем Клуб / Jam Club",
+      "address": "Сретенка, д. 11",
+      "eventPageId": "a8905fd5-0e19-4b59-8ef4-c4dfee5e4f71",
+      "eventPageSlug": "rozhdestvo-2000-h-moskva",
+      "sourceDescription": "Рождество 2000-х: рождественские композиции Whitney Houston, Mariah Carey, Michael Jackson, Gregory Porter, Diana Krall и другие. <br><br>В программе знакомые всем классические рождественские джаз, соул, фанк и поп композиции 2000-х.",
+      "sourceUsage": "UNUSED_ORIGINAL_SOURCE",
+      "legacyOverrideDescription": "Рождество 2000-х: рождественские композиции Whitney Houston, Mariah Carey, Michael Jackson, Gregory Porter, Diana Krall и другие. В программе знакомые всем классические рождественские джаз, соул, фанк и поп композиции 2000-х.\n\n## Практическая информация\n\n- Место - «Джем Клуб Мьюзик», Москва\n- Адрес - Сретенка, д. 11\n- Продолжительность - около 120 минут\n- Возрастное ограничение - 6+\n- Билеты - от 2 500 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "legacyOverrideUsage": "ARCHIVED_LEGACY_COPY; do not overwrite during EventPage rewrite",
+      "sessionSnapshot": [
+        {
+          "id": "sess_6aac17b6c9dd03eb482f7adf",
+          "endsAt": "2026-12-12 18:00:00",
+          "startsAt": "2026-12-12 16:00:00",
+          "priceFromRub": 2500
+        }
+      ],
+      "ageLimit": "6",
+      "priceFromRub": 2500,
+      "sourceSnapshot": {
+        "id": "evt_6aac17b6c9dd03eb482f7adf",
+        "kind": "SINGLE",
+        "slug": "рождество-2000-х-6aac17b6c9dd03eb482f7adf",
+        "seoH1": null,
+        "title": "Рождество 2000-х",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "externalId": "6aac17b6c9dd03eb482f7adf",
+            "metaExternalId": null,
+            "sourceUrlRedacted": true
+          }
+        ],
+        "venueId": "venue_623457215d2b1afd72c3ec48",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6aac17ed9f2cb43a2699052c.jpg",
+        "seoTitle": null,
+        "cityTitle": "Москва",
+        "venueTitle": "Джем Клуб / Jam Club",
+        "description": "Рождество 2000-х: рождественские композиции Whitney Houston, Mariah Carey, Michael Jackson, Gregory Porter, Diana Krall и другие. <br><br>В программе знакомые всем классические рождественские джаз, соул, фанк и поп композиции 2000-х.",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Сретенка, д. 11",
+        "canonicalPath": null,
+        "primaryCityId": "city_524901",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    {
+      "eventId": "evt_6ae33ce4c99c815c1dcb3350",
+      "eventSlug": "щелкунчик-предчувствие-волшебства-музыкальное-путешествие-в-зимнюю-сказку-в-бунинскои-музыкальн-6ae33ce4c99c815c1dcb3350",
+      "title": "Щелкунчик. Предчувствие волшебства. Музыкальное путешествие в зимнюю сказку в Бунинской музыкальной гостиной. Вечер при свечах",
+      "city": "Москва",
+      "venue": "Музыкальная гостиная «Бунинский зал»",
+      "address": "Улица 1905 года ,3",
+      "eventPageId": "75cb82cd-37e7-4052-b61e-4df51ae0eae2",
+      "eventPageSlug": "schelkunchik-predchuvstvie-volshebstva-muzykalnoe-puteshestvie-v-zimnyuyu-skazku-v-buninskoi-muzykaln-moskva",
+      "sourceDescription": "Уже совсем скоро наступят самые долгожданные праздники, и уже сейчас мы приглашаем вас окунуться в волшебную атмосферу под музыку всеми любимой сказки, а также других зимних музыкальных шедевров.<br><br>Эту чудесную музыку исполнят для вас прекрасные музыканты:<br><br>Марина Шиганова (скрипка)<br>Дмитрий Максименко (рояль)<br><br>Ждём вас!",
+      "sourceUsage": "UNUSED_ORIGINAL_SOURCE",
+      "legacyOverrideDescription": null,
+      "legacyOverrideUsage": "NONE",
+      "sessionSnapshot": [
+        {
+          "id": "sess_6ae33ce4c99c815c1dcb3350",
+          "endsAt": "2026-12-17 17:40:00",
+          "startsAt": "2026-12-17 16:30:00",
+          "priceFromRub": 1200
+        }
+      ],
+      "ageLimit": "0",
+      "priceFromRub": 1200,
+      "sourceSnapshot": {
+        "id": "evt_6ae33ce4c99c815c1dcb3350",
+        "kind": "SINGLE",
+        "slug": "щелкунчик-предчувствие-волшебства-музыкальное-путешествие-в-зимнюю-сказку-в-бунинскои-музыкальн-6ae33ce4c99c815c1dcb3350",
+        "seoH1": null,
+        "title": "Щелкунчик. Предчувствие волшебства. Музыкальное путешествие в зимнюю сказку в Бунинской музыкальной гостиной. Вечер при свечах",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "externalId": "6ae33ce4c99c815c1dcb3350",
+            "metaExternalId": null,
+            "sourceUrlRedacted": true
+          }
+        ],
+        "venueId": "venue_690b7ba11bd63054b9b2f8d5",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ae33ce3d139ac6efeb45822.png",
+        "seoTitle": null,
+        "cityTitle": "Москва",
+        "venueTitle": "Музыкальная гостиная «Бунинский зал»",
+        "description": "Уже совсем скоро наступят самые долгожданные праздники, и уже сейчас мы приглашаем вас окунуться в волшебную атмосферу под музыку всеми любимой сказки, а также других зимних музыкальных шедевров.<br><br>Эту чудесную музыку исполнят для вас прекрасные музыканты:<br><br>Марина Шиганова (скрипка)<br>Дмитрий Максименко (рояль)<br><br>Ждём вас!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Улица 1905 года ,3",
+        "canonicalPath": null,
+        "primaryCityId": "city_524901",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    {
+      "eventId": "evt_6ae3345f015bfdad6a1f7c7b",
+      "eventSlug": "щелкунчик-предчувствие-волшебства-музыкальное-путешествие-в-зимнюю-сказку-в-есенин-центре-вечер-6ae3345f015bfdad6a1f7c7b",
+      "title": "Щелкунчик. Предчувствие волшебства. Музыкальное путешествие в зимнюю сказку в Есенин-центре. Вечер при свечах",
+      "city": "Москва",
+      "venue": "Есенин-центр",
+      "address": "Москва, переулок Чернышевского, 4стр2",
+      "eventPageId": "763a6b32-7cde-45bf-a6a4-760594f4539d",
+      "eventPageSlug": "schelkunchik-predchuvstvie-volshebstva-muzykalnoe-puteshestvie-v-zimnyuyu-skazku-v-esenin-centre-vecher-moskva",
+      "sourceDescription": "Уже совсем скоро наступят самые долгожданные праздники, и уже сейчас мы приглашаем вас окунуться в волшебную атмосферу под музыку всеми любимой сказки, а также других зимних музыкальных шедевров.<br><br>Эту чудесную музыку исполнят для вас прекрасные музыканты:<br><br>Марина Шиганова (скрипка)<br>Дмитрий Максименко (рояль)<br><br>Ждём вас!",
+      "sourceUsage": "UNUSED_ORIGINAL_SOURCE",
+      "legacyOverrideDescription": null,
+      "legacyOverrideUsage": "NONE",
+      "sessionSnapshot": [
+        {
+          "id": "sess_6ae3345f015bfdad6a1f7c7b",
+          "endsAt": "2026-12-03 17:10:00",
+          "startsAt": "2026-12-03 16:00:00",
+          "priceFromRub": 1200
+        }
+      ],
+      "ageLimit": "0",
+      "priceFromRub": 1200,
+      "sourceSnapshot": {
+        "id": "evt_6ae3345f015bfdad6a1f7c7b",
+        "kind": "SINGLE",
+        "slug": "щелкунчик-предчувствие-волшебства-музыкальное-путешествие-в-зимнюю-сказку-в-есенин-центре-вечер-6ae3345f015bfdad6a1f7c7b",
+        "seoH1": null,
+        "title": "Щелкунчик. Предчувствие волшебства. Музыкальное путешествие в зимнюю сказку в Есенин-центре. Вечер при свечах",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "externalId": "6ae3345f015bfdad6a1f7c7b",
+            "metaExternalId": null,
+            "sourceUrlRedacted": true
+          }
+        ],
+        "venueId": "venue_5c504771267581000cf13da5",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ae3345f65f96a835b48a9c1.png",
+        "seoTitle": null,
+        "cityTitle": "Москва",
+        "venueTitle": "Есенин-центр",
+        "description": "Уже совсем скоро наступят самые долгожданные праздники, и уже сейчас мы приглашаем вас окунуться в волшебную атмосферу под музыку всеми любимой сказки, а также других зимних музыкальных шедевров.<br><br>Эту чудесную музыку исполнят для вас прекрасные музыканты:<br><br>Марина Шиганова (скрипка)<br>Дмитрий Максименко (рояль)<br><br>Ждём вас!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Москва, переулок Чернышевского, 4стр2",
+        "canonicalPath": null,
+        "primaryCityId": "city_524901",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    {
+      "eventId": "evt_6ad47bd4abbbcf11c9c4bd9e",
+      "eventSlug": "щелкунчик-предчувствие-волшебства-музыкальное-путешествие-в-зимнюю-сказку-в-усадьбе-кусково-6ad47bd4abbbcf11c9c4bd9e",
+      "title": "Щелкунчик. Предчувствие волшебства. Музыкальное путешествие в зимнюю сказку в усадьбе Кусково",
+      "city": "Москва",
+      "venue": "Усадьба Кусково Портретная галерея большой каменной оранжереи",
+      "address": "ул. Юности д. 2, стр. 7",
+      "eventPageId": "95a3b8f0-056c-46b0-9ba4-2c7795f34d58",
+      "eventPageSlug": "schelkunchik-predchuvstvie-volshebstva-muzykalnoe-puteshestvie-v-zimnyuyu-skazku-v-usadbe-kuskovo-moskva",
+      "sourceDescription": "Уже совсем скоро наступят самые долгожданные праздники, и уже сейчас мы приглашаем вас окунуться в волшебную атмосферу под музыку всеми любимой сказки, а также других зимних музыкальных шедевров.<br><br>Эту чудесную музыку исполнят для вас прекрасные музыканты:<br><br>Марина Шиганова (скрипка)<br>Дмитрий Максименко (рояль)<br><br>Ждём вас!",
+      "sourceUsage": "UNUSED_ORIGINAL_SOURCE",
+      "legacyOverrideDescription": "Уже совсем скоро наступят самые долгожданные праздники, и уже сейчас мы приглашаем вас окунуться в волшебную атмосферу под музыку всеми любимой сказки, а также других зимних музыкальных шедевров.\n\n## Эту чудесную музыку исполнят для вас прекрасные музыканты\n\nМарина Шиганова (скрипка)\nДмитрий Максименко (рояль)\n\nЖдём вас!",
+      "legacyOverrideUsage": "ARCHIVED_LEGACY_COPY; do not overwrite during EventPage rewrite",
+      "sessionSnapshot": [
+        {
+          "id": "sess_6ad47bd4abbbcf11c9c4bd9e",
+          "endsAt": "2026-12-20 13:15:00",
+          "startsAt": "2026-12-20 12:00:00",
+          "priceFromRub": 900
+        }
+      ],
+      "ageLimit": "0",
+      "priceFromRub": 900,
+      "sourceSnapshot": {
+        "id": "evt_6ad47bd4abbbcf11c9c4bd9e",
+        "kind": "SINGLE",
+        "slug": "щелкунчик-предчувствие-волшебства-музыкальное-путешествие-в-зимнюю-сказку-в-усадьбе-кусково-6ad47bd4abbbcf11c9c4bd9e",
+        "seoH1": null,
+        "title": "Щелкунчик. Предчувствие волшебства. Музыкальное путешествие в зимнюю сказку в усадьбе Кусково",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "externalId": "6ad47bd4abbbcf11c9c4bd9e",
+            "metaExternalId": null,
+            "sourceUrlRedacted": true
+          }
+        ],
+        "venueId": "venue_65c23f6cb4500cc20a8be9f3",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ad47bd349833fd9dd98c758.png",
+        "seoTitle": null,
+        "cityTitle": "Москва",
+        "venueTitle": "Усадьба Кусково Портретная галерея большой каменной оранжереи",
+        "description": "Уже совсем скоро наступят самые долгожданные праздники, и уже сейчас мы приглашаем вас окунуться в волшебную атмосферу под музыку всеми любимой сказки, а также других зимних музыкальных шедевров.<br><br>Эту чудесную музыку исполнят для вас прекрасные музыканты:<br><br>Марина Шиганова (скрипка)<br>Дмитрий Максименко (рояль)<br><br>Ждём вас!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "ул. Юности д. 2, стр. 7",
+        "canonicalPath": null,
+        "primaryCityId": "city_524901",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    {
+      "eventId": "evt_6ad011229630e1640215cdad",
+      "eventSlug": "новогоднии-шоу-концерт-6ad011229630e1640215cdad",
+      "title": "Новогодний Шоу-Концерт",
+      "city": "Ростов-на-Дону",
+      "venue": "Пересвет-Арена",
+      "address": "Целиноградская улица, 3",
+      "eventPageId": "56aa6ed2-593a-4fbe-87d7-f327e30aef64",
+      "eventPageSlug": "novogodnii-shou-koncert-rostov-na-donu",
+      "sourceDescription": "Не пропусти Новогодний Шоу Концерт симфо-группы TEODOR совместно с театром танца Zодчие, который погрузит вас в волшебную атмосферу симфонической музыки  !  <br><br>🌟 Дата: 20 декабря <br>🌟 Время: 20:00<br>🌟 Место: ‘Пересвет Арена’<br>Ростов-на-Дону Целиноградская ул.,3<br><br>Всеми любимые Новогодние произведения, подарят эмоции новогоднего волшебства.<br>А легендарные треки Linkin Park| Vivaldi| 50 cent| Баста| Paganini| Queen| <br>Sting| Mozart| Michael Jackson | музыка из к/ф в неповторимой авторской аранжировке TEODOR получат новую жизнь и зазвучат в одном современном стиле !🎶",
+      "sourceUsage": "UNUSED_ORIGINAL_SOURCE",
+      "legacyOverrideDescription": "Не пропусти Новогодний Шоу Концерт симфо-группы TEODOR совместно с театром танца Zодчие, который погрузит вас в волшебную атмосферу симфонической музыки! 🌟 Дата: 20 декабря 🌟 Время: 20:00 🌟 Место: ‘Пересвет Арена’ Ростов-на-Дону Целиноградская ул.,3 Всеми любимые Новогодние произведения, подарят эмоции новогоднего волшебства. А легендарные треки Linkin Park| Vivaldi| 50 cent| Баста| Paganini| Queen| Sting| Mozart| Michael Jackson | музыка из к/ф в неповторимой авторской аранжировке TEODOR получат новую жизнь и зазвучат в одном современном стиле!🎶.\n\n## Практическая информация\n\n- Место - «Пересвет-Арена», Ростов-на-Дону\n- Адрес - Целиноградская улица, 3\n- Продолжительность - около 120 минут\n- Возрастное ограничение - 6+\n- Билеты - от 2 500 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "legacyOverrideUsage": "ARCHIVED_LEGACY_COPY; do not overwrite during EventPage rewrite",
+      "sessionSnapshot": [
+        {
+          "id": "sess_6ad011229630e1640215cdad",
+          "endsAt": "2026-12-20 19:00:00",
+          "startsAt": "2026-12-20 17:00:00",
+          "priceFromRub": 2500
+        }
+      ],
+      "ageLimit": "6",
+      "priceFromRub": 2500,
+      "sourceSnapshot": {
+        "id": "evt_6ad011229630e1640215cdad",
+        "kind": "SINGLE",
+        "slug": "новогоднии-шоу-концерт-6ad011229630e1640215cdad",
+        "seoH1": null,
+        "title": "Новогодний Шоу-Концерт",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "externalId": "6ad011229630e1640215cdad",
+            "metaExternalId": null,
+            "sourceUrlRedacted": true
+          }
+        ],
+        "venueId": "venue_63186370f32babf653f166d8",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ad019bec24fd3eaaf958700.jpg",
+        "seoTitle": null,
+        "cityTitle": "Ростов-на-Дону",
+        "venueTitle": "Пересвет-Арена",
+        "description": "Не пропусти Новогодний Шоу Концерт симфо-группы TEODOR совместно с театром танца Zодчие, который погрузит вас в волшебную атмосферу симфонической музыки  !  <br><br>🌟 Дата: 20 декабря <br>🌟 Время: 20:00<br>🌟 Место: ‘Пересвет Арена’<br>Ростов-на-Дону Целиноградская ул.,3<br><br>Всеми любимые Новогодние произведения, подарят эмоции новогоднего волшебства.<br>А легендарные треки Linkin Park| Vivaldi| 50 cent| Баста| Paganini| Queen| <br>Sting| Mozart| Michael Jackson | музыка из к/ф в неповторимой авторской аранжировке TEODOR получат новую жизнь и зазвучат в одном современном стиле !🎶",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Целиноградская улица, 3",
+        "canonicalPath": null,
+        "primaryCityId": "city_501175",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    {
+      "eventId": "evt_6a99bbf778043ee36116eb4e",
+      "eventSlug": "fizica-antarctic-в-санкт-петербурге-новогоднии-концерт-6a99bbf778043ee36116eb4e",
+      "title": "FIZICA & ANTARCTIC в Санкт-Петербурге - Новогодний концерт",
+      "city": "Санкт-Петербург",
+      "venue": "Action club",
+      "address": "Лиговский пр., 113",
+      "eventPageId": "675ab4b3-c0fc-48ca-b436-4c5a22191288",
+      "eventPageSlug": "fizica-antarctic-v-sankt-peterburge-novogodnii-koncert-sankt-peterburg",
+      "sourceDescription": "Встречайте Новый Год вместе с FIZICA на фирменном клубном концерте! Вас ждут все хиты и новинки, праздничная атмосфера, оригинальный мерч, новогодний антураж легендарного бара и яркие эмоции.<br><br>Meet&Greet (фото и автограф с артистом) пройдет перед концертом с 18:00 до 19:00. Meet&Greet также входит во все категории билетов со столом.",
+      "sourceUsage": "UNUSED_ORIGINAL_SOURCE",
+      "legacyOverrideDescription": "Встречайте Новый Год вместе с FIZICA на фирменном клубном концерте! Вас ждут все хиты и новинки, праздничная атмосфера, оригинальный мерч, новогодний антураж легендарного бара и яркие эмоции. Meet&Greet (фото и автограф с артистом) пройдет перед концертом с 18:00 до 19:00. Meet&Greet также входит во все категории билетов со столом.\n\n## Практическая информация\n\n- Место - «Action club», Санкт-Петербург\n- Адрес - Лиговский пр., 113\n- Продолжительность - около 120 минут\n- Возрастное ограничение - 16+\n- Билеты - от 1 900 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "legacyOverrideUsage": "ARCHIVED_LEGACY_COPY; do not overwrite during EventPage rewrite",
+      "sessionSnapshot": [
+        {
+          "id": "sess_6a99bbf778043ee36116eb4e",
+          "endsAt": "2026-12-20 19:00:00",
+          "startsAt": "2026-12-20 17:00:00",
+          "priceFromRub": 1900
+        }
+      ],
+      "ageLimit": "16",
+      "priceFromRub": 1900,
+      "sourceSnapshot": {
+        "id": "evt_6a99bbf778043ee36116eb4e",
+        "kind": "SINGLE",
+        "slug": "fizica-antarctic-в-санкт-петербурге-новогоднии-концерт-6a99bbf778043ee36116eb4e",
+        "seoH1": null,
+        "title": "FIZICA & ANTARCTIC в Санкт-Петербурге - Новогодний концерт",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "externalId": "6a99bbf778043ee36116eb4e",
+            "metaExternalId": null,
+            "sourceUrlRedacted": true
+          }
+        ],
+        "venueId": "venue_651add1494d93df66a01813b",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6a99bbf763f24a8913c0421e.jpg",
+        "seoTitle": null,
+        "cityTitle": "Санкт-Петербург",
+        "venueTitle": "Action club",
+        "description": "Встречайте Новый Год вместе с FIZICA на фирменном клубном концерте! Вас ждут все хиты и новинки, праздничная атмосфера, оригинальный мерч, новогодний антураж легендарного бара и яркие эмоции.<br><br>Meet&Greet (фото и автограф с артистом) пройдет перед концертом с 18:00 до 19:00. Meet&Greet также входит во все категории билетов со столом.",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Лиговский пр., 113",
+        "canonicalPath": null,
+        "primaryCityId": "city_498817",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    {
+      "eventId": "evt_6ab2f0b5b704cb21b99e4cff",
+      "eventSlug": "александр-демидов-рождественскии-концерт-6ab2f0b5b704cb21b99e4cff",
+      "title": "Александр Демидов. Рождественский концерт.",
+      "city": "Санкт-Петербург",
+      "venue": "Музей-усадьба Г.Р. Державина",
+      "address": "Наб. р. Фонтанки, 118",
+      "eventPageId": "da3d4f93-cb47-40a6-ac1e-455dc1578fdc",
+      "eventPageSlug": "aleksandr-demidov-rozhdestvenskii-koncert-sankt-peterburg",
+      "sourceDescription": "Рождественский вечер на Фонтанке<br><br>Предновогодняя суета сияющих улиц, запах хвои и мандаринов, величественная строгость заснеженных набережных, уютные огни в окнах старинных особняков, ожидание чудес и подарков, а самое главное — музыка, под которую исполняются желания! Всё это ждёт вас на Рождественском концерте в самом сердце Санкт-Петербурга. Этот предпраздничный вечер и мелодии, многие из которых вы услышите впервые, будто созданы для долгожданной сказки.<br><br>Здесь, на набережной реки Фонтанки, царит дух классицизма, время словно замедляет свой бег. Имперская роскошь мраморного колонного зала усадьбы Г. Р. Державина, в котором проходили торжественные заседания литературного общества «Беседа любителей русского слова», преданно хранит тайны  Рождественских ночей.<br><br>Под аккомпанемент легендарного рояля Steinway & Sons и старинной скрипки Александра Демидова мы отправимся в мир светлых зимних грез, где за Невой всегда слышен шелест крыльев ангелов.<br><br>В этот вечер каждый из вас может стать Тайным Сантой: сделать подарок на Рождество для одного из гостей, а в ответ получить новогодний сюрприз от своего тайного друга. Все желающие участвовать в игре могут принести один подарок для одного из гостей Рождественского вечера, имя которого вы узнаете во время жеребьевки перед концертом. Возможно, эта встреча вырастет в настоящую дружбу, ведь именно в белую ночь петербургского Рождества и случаются самые настоящие чудеса.<br><br>В программе: <br>18:00–20:00 — Рождественский маркет с возможностью приобрести фирменный мерч <br>18:00–19:00 — Сбор гостей, жеребьевка, обмен подарками (Игра «Тайный Санта») <br>19:00–20:00 — Рождественский концерт<br><br>Место: Санкт-Петербург, наб. реки Фонтанки, 118, колонный зал музея-усадьбы Г. Р. Державина",
+      "sourceUsage": "UNUSED_ORIGINAL_SOURCE",
+      "legacyOverrideDescription": "Рождественский вечер на Фонтанке\n\nПредновогодняя суета сияющих улиц, запах хвои и мандаринов, величественная строгость заснеженных набережных, уютные огни в окнах старинных особняков, ожидание чудес и подарков, а самое главное музыка, под которую исполняются желания - всё это ждёт вас на Рождественском концерте в самом сердце Санкт-Петербурга. Этот предпраздничный вечер и мелодии, многие из которых вы услышите впервые, будто созданы для долгожданной сказки.\n\nЗдесь, на набережной реки Фонтанки, царит дух классицизма, время словно замедляет свой бег. Имперская роскошь мраморного колонного зала усадьбы Г. Державина, в котором проходили торжественные заседания литературного общества «Беседа любителей русского слова», преданно хранит тайны Рождественских ночей. Под аккомпанемент легендарного рояля Steinway & Sons и старинной скрипки Александра Демидова мы отправимся в мир светлых зимних грез, где за Невой всегда слышен шелест крыльев ангелов.\n\nВ этот вечер каждый из вас может стать Тайным Сантой: сделать подарок на Рождество для одного из гостей, а в ответ получить новогодний сюрприз от своего тайного друга. Все желающие участвовать в игре могут принести один подарок для одного из гостей Рождественского вечера, имя которого вы узнаете во время жеребьевки перед концертом. Возможно, эта встреча вырастет в настоящую дружбу, ведь именно в белую ночь петербургского Рождества и случаются самые настоящие чудеса.\n\n## В программе\n\n18:00-20:00 - Рождественский маркет с возможностью приобрести фирменный мерч 18:00-19:00 - Сбор гостей, жеребьевка, обмен подарками (Игра «Тайный Санта») 19:00-20:00 - Рождественский концерт\n\nМесто: Санкт-Петербург, наб. реки Фонтанки, 118, колонный зал музея-усадьбы Г. Р. Державина.\n\n## Практическая информация\n\n- Место - «Музей-усадьба Г.Р. Державина», Санкт-Петербург\n- Адрес - Наб. р. Фонтанки, 118\n- Продолжительность - около 120 минут\n- Возрастное ограничение - 6+\n- Билеты - от 800 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "legacyOverrideUsage": "ARCHIVED_LEGACY_COPY; do not overwrite during EventPage rewrite",
+      "sessionSnapshot": [
+        {
+          "id": "sess_6ab2f0b5b704cb21b99e4cff",
+          "endsAt": "2026-12-18 18:00:00",
+          "startsAt": "2026-12-18 16:00:00",
+          "priceFromRub": 800
+        }
+      ],
+      "ageLimit": "6",
+      "priceFromRub": 800,
+      "sourceSnapshot": {
+        "id": "evt_6ab2f0b5b704cb21b99e4cff",
+        "kind": "SINGLE",
+        "slug": "александр-демидов-рождественскии-концерт-6ab2f0b5b704cb21b99e4cff",
+        "seoH1": null,
+        "title": "Александр Демидов. Рождественский концерт.",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "externalId": "6ab2f0b5b704cb21b99e4cff",
+            "metaExternalId": null,
+            "sourceUrlRedacted": true
+          }
+        ],
+        "venueId": "venue_5a04a866515e3500198b0d76",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ac574a55c6c776571fd5888.jpg",
+        "seoTitle": null,
+        "cityTitle": "Санкт-Петербург",
+        "venueTitle": "Музей-усадьба Г.Р. Державина",
+        "description": "Рождественский вечер на Фонтанке<br><br>Предновогодняя суета сияющих улиц, запах хвои и мандаринов, величественная строгость заснеженных набережных, уютные огни в окнах старинных особняков, ожидание чудес и подарков, а самое главное — музыка, под которую исполняются желания! Всё это ждёт вас на Рождественском концерте в самом сердце Санкт-Петербурга. Этот предпраздничный вечер и мелодии, многие из которых вы услышите впервые, будто созданы для долгожданной сказки.<br><br>Здесь, на набережной реки Фонтанки, царит дух классицизма, время словно замедляет свой бег. Имперская роскошь мраморного колонного зала усадьбы Г. Р. Державина, в котором проходили торжественные заседания литературного общества «Беседа любителей русского слова», преданно хранит тайны  Рождественских ночей.<br><br>Под аккомпанемент легендарного рояля Steinway & Sons и старинной скрипки Александра Демидова мы отправимся в мир светлых зимних грез, где за Невой всегда слышен шелест крыльев ангелов.<br><br>В этот вечер каждый из вас может стать Тайным Сантой: сделать подарок на Рождество для одного из гостей, а в ответ получить новогодний сюрприз от своего тайного друга. Все желающие участвовать в игре могут принести один подарок для одного из гостей Рождественского вечера, имя которого вы узнаете во время жеребьевки перед концертом. Возможно, эта встреча вырастет в настоящую дружбу, ведь именно в белую ночь петербургского Рождества и случаются самые настоящие чудеса.<br><br>В программе: <br>18:00–20:00 — Рождественский маркет с возможностью приобрести фирменный мерч <br>18:00–19:00 — Сбор гостей, жеребьевка, обмен подарками (Игра «Тайный Санта») <br>19:00–20:00 — Рождественский концерт<br><br>Место: Санкт-Петербург, наб. реки Фонтанки, 118, колонный зал музея-усадьбы Г. Р. Державина",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Наб. р. Фонтанки, 118",
+        "canonicalPath": null,
+        "primaryCityId": "city_498817",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    {
+      "eventId": "evt_6ac9015590383ac485af6c57",
+      "eventSlug": "новыи-год-с-владимиром-сурдиным-и-алексеем-семихатовым-6ac9015590383ac485af6c57",
+      "title": "Новый год! С Владимиром Сурдиным и Алексеем Семихатовым!",
+      "city": "Санкт-Петербург",
+      "venue": "Дворец Кваренги (Freedom)",
+      "address": "Казанская ул., 7",
+      "eventPageId": "717b59df-c07e-48a7-8fc2-aac828dc58cf",
+      "eventPageSlug": "novyi-god-s-vladimirom-surdinym-i-alekseem-semihatovym-sankt-peterburg",
+      "sourceDescription": "Приглашаем вас на Новый год с Владимиром Сурдиным и Алексеем Семихатовым из серии мероприятий «Лекции во дворцах»!<br><br>В изысканной и камерной атмосфере мы проводим прошедший год в компании наших замечательных лекторов.<br><br>В программе мероприятия, помимо лекций, вас ждут кейтеринг, напитки, фотосессия с лекторами, возможность приватного общения, а также живая музыка.<br><br><br><br>О чём расскажут наши лекторы:<br><br><br>Человек стремительно ворвался в космос в 1961 году, преодолел притяжение Земли в 1968 году... Казалось, космическую экспансию человечества не остановить: вот-вот начнутся полёты на Марс и дальше, дальше.<br><br>Но до сих пор, несмотря на смену эпох в технологиях, мы даже не вернулись на Луну. А роботы за эти годы побывали у всех планет, на некоторых их спутниках, астероидах и кометах, отправились к границам Солнечной системы.<br><br>Так, может быть, человеку не место в космосе? Или мы начали слишком рано, не обеспечив сначала «волшебные» технологии?<br><br>«Вторая космическая гонка» — пустой лозунг или наступающая реальность, которая повлечет за собой изменения в жизни человечества? Непростой вопрос. <br><br>Обсудим его вместе: Сурдин и Семихатов не соглашаются друг с другом.<br><br><br><br>О лекторах:<br><br><br>Владимир Сурдин. Кандидат физико-математических наук, старший научный сотрудник Государственного астрономического института имени П. К. Штернберга, доцент физического факультета МГУ. Лауреат Беляевской премии и премии «Просветитель».<br><br><br>Алексей Семихатов. Доктор физико-математических наук, заведующий лабораторией Теории фундаментальных взаимодействий, Физический ин-т им Лебедева РАН, ведущий программы «Вопрос Науки», лауреат Национальной премии «Книга Года» 2023 за книгу «Всё, что движется. Прогулки по беспокойной Вселенной».<br><br><br><br>О площадке:<br><br><br>Дворец Кваренги — историческое пространство в центре Санкт-Петербурга. Здание было построено в 1808 -1810 годах по проекту архитектора Джакомо Кваренги и является памятником архитектуры регионального значения. <br><br>Высокие потолки, приятный голубой цвет стен, 2 ряда колонн и аутентичный паркет, а самое главное — потолочная лепнина с силуэтами пеликанов, которые и дали название залу, в котором мы будем располагаться с вами в этот вечер. Исторически он предназначался для светских приемов, банкетов и балов, особенностью этого зала являются дворцовый интерьер и старинный белый рояль.<br><br><br><br>Информация:<br><br><br>Контакты организатора: +7 915 248 97 37<br><br>Возрастное ограничение 6+",
+      "sourceUsage": "UNUSED_ORIGINAL_SOURCE",
+      "legacyOverrideDescription": "Приглашаем вас на Новый год с Владимиром Сурдиным и Алексеем Семихатовым из серии мероприятий «Лекции во дворцах»! В изысканной и камерной атмосфере мы проводим прошедший год в компании наших замечательных лекторов. В программе мероприятия, помимо лекций, вас ждут кейтеринг, напитки, фотосессия с лекторами, возможность приватного общения, а также живая музыка.\n\n## О лекторах\n\nВладимир Сурдин. Кандидат физико-математических наук, старший научный сотрудник Государственного астрономического института имени П. К. Штернберга, доцент физического факультета МГУ. Лауреат Беляевской премии и премии «Просветитель».\n\nАлексей Семихатов. Доктор физико-математических наук, заведующий лабораторией Теории фундаментальных взаимодействий, Физический ин-т им Лебедева РАН, ведущий программы «Вопрос Науки», лауреат Национальной премии «Книга Года» 2023 за книгу «Всё, что движется. Прогулки по беспокойной Вселенной».\n\n## О площадке\n\nДворец Кваренги - историческое пространство в центре Санкт-Петербурга. Здание было построено в 1808 -1810 годах по проекту архитектора Джакомо Кваренги и является памятником архитектуры регионального значения. Высокие потолки, приятный голубой цвет стен, 2 ряда колонн и аутентичный паркет, а самое главное - потолочная лепнина с силуэтами пеликанов, которые и дали название залу, в котором мы будем располагаться с вами в этот вечер. Исторически он предназначался для светских приемов, банкетов и балов, особенностью этого зала являются дворцовый интерьер и старинный белый рояль.\n\n## Информация\nКонтакты организатора: +7 915 248 97 37\nВозрастное ограничение 6+",
+      "legacyOverrideUsage": "ARCHIVED_LEGACY_COPY; do not overwrite during EventPage rewrite",
+      "sessionSnapshot": [
+        {
+          "id": "sess_6ac9015590383ac485af6c57",
+          "endsAt": "2026-12-13 19:00:00",
+          "startsAt": "2026-12-13 16:00:00",
+          "priceFromRub": 6000
+        }
+      ],
+      "ageLimit": "6",
+      "priceFromRub": 6000,
+      "sourceSnapshot": {
+        "id": "evt_6ac9015590383ac485af6c57",
+        "kind": "SINGLE",
+        "slug": "новыи-год-с-владимиром-сурдиным-и-алексеем-семихатовым-6ac9015590383ac485af6c57",
+        "seoH1": null,
+        "title": "Новый год! С Владимиром Сурдиным и Алексеем Семихатовым!",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "externalId": "6ac9015590383ac485af6c57",
+            "metaExternalId": null,
+            "sourceUrlRedacted": true
+          }
+        ],
+        "venueId": "venue_69f44a7ef6431c02b00c8419",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ac90276dc27073ab787faf7.jpg",
+        "seoTitle": null,
+        "cityTitle": "Санкт-Петербург",
+        "venueTitle": "Дворец Кваренги (Freedom)",
+        "description": "Приглашаем вас на Новый год с Владимиром Сурдиным и Алексеем Семихатовым из серии мероприятий «Лекции во дворцах»!<br><br>В изысканной и камерной атмосфере мы проводим прошедший год в компании наших замечательных лекторов.<br><br>В программе мероприятия, помимо лекций, вас ждут кейтеринг, напитки, фотосессия с лекторами, возможность приватного общения, а также живая музыка.<br><br><br><br>О чём расскажут наши лекторы:<br><br><br>Человек стремительно ворвался в космос в 1961 году, преодолел притяжение Земли в 1968 году... Казалось, космическую экспансию человечества не остановить: вот-вот начнутся полёты на Марс и дальше, дальше.<br><br>Но до сих пор, несмотря на смену эпох в технологиях, мы даже не вернулись на Луну. А роботы за эти годы побывали у всех планет, на некоторых их спутниках, астероидах и кометах, отправились к границам Солнечной системы.<br><br>Так, может быть, человеку не место в космосе? Или мы начали слишком рано, не обеспечив сначала «волшебные» технологии?<br><br>«Вторая космическая гонка» — пустой лозунг или наступающая реальность, которая повлечет за собой изменения в жизни человечества? Непростой вопрос. <br><br>Обсудим его вместе: Сурдин и Семихатов не соглашаются друг с другом.<br><br><br><br>О лекторах:<br><br><br>Владимир Сурдин. Кандидат физико-математических наук, старший научный сотрудник Государственного астрономического института имени П. К. Штернберга, доцент физического факультета МГУ. Лауреат Беляевской премии и премии «Просветитель».<br><br><br>Алексей Семихатов. Доктор физико-математических наук, заведующий лабораторией Теории фундаментальных взаимодействий, Физический ин-т им Лебедева РАН, ведущий программы «Вопрос Науки», лауреат Национальной премии «Книга Года» 2023 за книгу «Всё, что движется. Прогулки по беспокойной Вселенной».<br><br><br><br>О площадке:<br><br><br>Дворец Кваренги — историческое пространство в центре Санкт-Петербурга. Здание было построено в 1808 -1810 годах по проекту архитектора Джакомо Кваренги и является памятником архитектуры регионального значения. <br><br>Высокие потолки, приятный голубой цвет стен, 2 ряда колонн и аутентичный паркет, а самое главное — потолочная лепнина с силуэтами пеликанов, которые и дали название залу, в котором мы будем располагаться с вами в этот вечер. Исторически он предназначался для светских приемов, банкетов и балов, особенностью этого зала являются дворцовый интерьер и старинный белый рояль.<br><br><br><br>Информация:<br><br><br>Контакты организатора: +7 915 248 97 37<br><br>Возрастное ограничение 6+",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Казанская ул., 7",
+        "canonicalPath": null,
+        "primaryCityId": "city_498817",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    {
+      "eventId": "evt_6ae2139b87426c82b102e520",
+      "eventSlug": "новогодняя-танцплощадка-папина-музыка-от-гр-скип-6ae2139b87426c82b102e520",
+      "title": "Новогодняя Танцплощадка \"Папина музыка\" от гр. СКИП",
+      "city": "Тверь",
+      "venue": "Клуб Биг Бен",
+      "address": "ул.Брагина, д.2",
+      "eventPageId": "10303445-4b2b-49f6-b906-4d370793dc1b",
+      "eventPageSlug": "novogodnyaya-tancploschadka-papina-muzyka-ot-gr-skip-tver",
+      "sourceDescription": "Зрителей снова ожидает увлекательное путешествие в мир той самой калининской танцплощадки, где когда-то впервые знакомились и влюблялись. И пусть за окном зима, в зале будет по-настоящему тепло — как в те вечера, когда встречали Новый год под любимые пластинки.<br><br>В концерте прозвучат нестареющие хиты из репертуара популярных групп 60-х, 70-х, 80-х и 90-х, а также любимые песни золотой эпохи рок-н-ролла. Это музыка, под которую мы встречали праздники, танцевали на школьных вечерах и просто были счастливы.<br><br>Кавер-группа СКИП исполняет композиции любимых групп, на которых выросло не одно поколение. Проект был создан профессиональными музыкантами, с детства увлечёнными качественной музыкой и бережно донесшими до наших дней дух и звучание той эпохи. Музыканты собрались вместе поиграть любимую музыку для души и для всех, кто разделяет их любовь — а в новогодние дни это особенно уместно.",
+      "sourceUsage": "UNUSED_ORIGINAL_SOURCE",
+      "legacyOverrideDescription": null,
+      "legacyOverrideUsage": "NONE",
+      "sessionSnapshot": [
+        {
+          "id": "sess_6ae2139b87426c82b102e520",
+          "endsAt": "2026-12-23 19:00:00",
+          "startsAt": "2026-12-23 16:00:00",
+          "priceFromRub": 500
+        }
+      ],
+      "ageLimit": "16",
+      "priceFromRub": 500,
+      "sourceSnapshot": {
+        "id": "evt_6ae2139b87426c82b102e520",
+        "kind": "SINGLE",
+        "slug": "новогодняя-танцплощадка-папина-музыка-от-гр-скип-6ae2139b87426c82b102e520",
+        "seoH1": null,
+        "title": "Новогодняя Танцплощадка \"Папина музыка\" от гр. СКИП",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "externalId": "6ae2139b87426c82b102e520",
+            "metaExternalId": null,
+            "sourceUrlRedacted": true
+          }
+        ],
+        "venueId": "venue_5ccac696aba999000cbc902e",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ae2139a7383f75afd89f509.jpg",
+        "seoTitle": null,
+        "cityTitle": "Тверь",
+        "venueTitle": "Клуб Биг Бен",
+        "description": "Зрителей снова ожидает увлекательное путешествие в мир той самой калининской танцплощадки, где когда-то впервые знакомились и влюблялись. И пусть за окном зима, в зале будет по-настоящему тепло — как в те вечера, когда встречали Новый год под любимые пластинки.<br><br>В концерте прозвучат нестареющие хиты из репертуара популярных групп 60-х, 70-х, 80-х и 90-х, а также любимые песни золотой эпохи рок-н-ролла. Это музыка, под которую мы встречали праздники, танцевали на школьных вечерах и просто были счастливы.<br><br>Кавер-группа СКИП исполняет композиции любимых групп, на которых выросло не одно поколение. Проект был создан профессиональными музыкантами, с детства увлечёнными качественной музыкой и бережно донесшими до наших дней дух и звучание той эпохи. Музыканты собрались вместе поиграть любимую музыку для души и для всех, кто разделяет их любовь — а в новогодние дни это особенно уместно.",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "ул.Брагина, д.2",
+        "canonicalPath": null,
+        "primaryCityId": "city_480060",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    {
+      "eventId": "evt_6ad5ea597f0027048431458d",
+      "eventSlug": "новыи-год-от-тетошнои-репетиция-6ad5ea597f0027048431458d",
+      "title": "Новый год со Снегурочками от Тётошной. Репетиция",
+      "city": "Тверь",
+      "venue": "Бар \"База\"",
+      "address": "ул. Красина, 28",
+      "eventPageId": "976fd5e0-6964-4cbf-af79-eb02a0f8e560",
+      "eventPageSlug": "novyi-god-ot-tetoshnoi-repeticiya-tver",
+      "sourceDescription": "Те самые Снегурочки, что не просят читать стишки на табуретке. Их короны слегка набекрень, мишура помнит 98‑й, зато юмор — острее льда на нечищеном тротуаре!<br><br>В программе: стендап, гадалка, Дед Мороз и хоровод «Для тех, у кого одышка» и интерактивы, от которых даже суровый бухгалтер начнёт каяться в грехах. Шутим про бывших, ипотеку и почему Дед Мороз ушёл к молодой Снежинке.<br><br>Это не «идеальный праздник» — это праздник, который вы не забудете (даже если захотите). Дат всё меньше — успейте забронировать, пока они не растаяли, как наши мечты о принце!",
+      "sourceUsage": "UNUSED_ORIGINAL_SOURCE",
+      "legacyOverrideDescription": "Те самые Снегурочки, что не просят читать стишки на табуретке. Их короны слегка набекрень, мишура помнит 98‑й, зато юмор - острее льда на нечищеном тротуаре! В программе: стендап, гадалка, Дед Мороз и хоровод «Для тех, у кого одышка» и интерактивы, от которых даже суровый бухгалтер начнёт каяться в грехах. Шутим про бывших, ипотеку и почему Дед Мороз ушёл к молодой Снежинке.\n\nЭто не «идеальный праздник» - это праздник, который вы не забудете (даже если захотите). Дат всё меньше - успейте забронировать, пока они не растаяли, как наши мечты о принце!",
+      "legacyOverrideUsage": "ARCHIVED_LEGACY_COPY; do not overwrite during EventPage rewrite",
+      "sessionSnapshot": [
+        {
+          "id": "sess_6ad5ea597f0027048431458d",
+          "endsAt": "2026-12-11 17:45:00",
+          "startsAt": "2026-12-11 16:00:00",
+          "priceFromRub": 900
+        }
+      ],
+      "ageLimit": "18",
+      "priceFromRub": 900,
+      "sourceSnapshot": {
+        "id": "evt_6ad5ea597f0027048431458d",
+        "kind": "SINGLE",
+        "slug": "новыи-год-от-тетошнои-репетиция-6ad5ea597f0027048431458d",
+        "seoH1": null,
+        "title": "Новый год со Снегурочками от Тётошной. Репетиция",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "externalId": "6ad5ea597f0027048431458d",
+            "metaExternalId": null,
+            "sourceUrlRedacted": true
+          }
+        ],
+        "venueId": "venue_65f08f6678dee512bf986355",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ad741d92aeedeb1272659a0.jpg",
+        "seoTitle": null,
+        "cityTitle": "Тверь",
+        "venueTitle": "Бар \"База\"",
+        "description": "Те самые Снегурочки, что не просят читать стишки на табуретке. Их короны слегка набекрень, мишура помнит 98‑й, зато юмор — острее льда на нечищеном тротуаре!<br><br>В программе: стендап, гадалка, Дед Мороз и хоровод «Для тех, у кого одышка» и интерактивы, от которых даже суровый бухгалтер начнёт каяться в грехах. Шутим про бывших, ипотеку и почему Дед Мороз ушёл к молодой Снежинке.<br><br>Это не «идеальный праздник» — это праздник, который вы не забудете (даже если захотите). Дат всё меньше — успейте забронировать, пока они не растаяли, как наши мечты о принце!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "ул. Красина, 28",
+        "canonicalPath": null,
+        "primaryCityId": "city_480060",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    {
+      "eventId": "evt_6ad7b61179df44983db5cebd",
+      "eventSlug": "в-ожидании-рождества-орган-и-голоса-при-свечах-6ad7b61179df44983db5cebd",
+      "title": "«В ОЖИДАНИИ РОЖДЕСТВА. Орган и голоса при свечах»",
+      "city": "Ульяновск",
+      "venue": "Евангелическо-Лютеранская церковь Святой Марии",
+      "address": "ул. Ленина, 100",
+      "eventPageId": "19d0b78b-3054-44d8-920c-db6ae4eb6f16",
+      "eventPageSlug": "v-ozhidanii-rozhdestva-organ-i-golosa-pri-svechah-ulyanovsk",
+      "sourceDescription": "Серия концертов «Органные сезоны при свечах»<br><br>«Органные сезоны при свечах» продолжаются в кирхе Святой Марии. 18 декабря приглашаем вас на особенный вечер — в ожидании Рождества.<br><br>Знаменитая Токката и фуга Баха, нежная «Аве Мария», рождественские арии и «Тихая ночь» прозвучат под сводами старинной церкви. Вместе с органом зазвучат меццо-сопрано и баритон — сольные номера и дуэты раскроют красоту этого сочетания.<br><br>За высокими окнами — зимний вечер, внутри — мерцание свечей и музыка, которую особенно хочется разделить с близкими в преддверии праздника.<br><br>Концертное объединение «Онегин» представляет проект «Классика в старинных стенах».<br><br>ИСПОЛНИТЕЛИ<br><br>Мария Бельтюкова — органистка из Минска, солистка Липецкого Дома музыки.<br><br>Валерий Суковых — баритон, лауреат Гранта Президента Российской Федерации.<br><br>Марина Кузьминых — меццо-сопрано, автор проекта «Классика в старинных стенах».<br><br>ПРОГРАММА<br><br>И. С. Бах — Токката и фуга ре минор, BWV 565<br>И. С. Бах — Bereite dich, Zion<br>Г. Ф. Гендель — For behold, darkness shall cover the earth<br>К. Сен-Санс — Expectans expectavi<br>Л. Лефебюр-Вели — Болеро<br>Г. Ф. Гендель — Dignare<br>Ф. Шуберт — Ave Maria<br>С. Франк — Panis Angelicus<br>Г. Белье — Токката<br>Г. Ф. Гендель — How willing my paternal love<br>Дж. Пуччини — Salve Regina<br>Дж. Каччини — Ave Maria<br>Ф. Грубер — Stille Nacht («Тихая ночь»)",
+      "sourceUsage": "UNUSED_ORIGINAL_SOURCE",
+      "legacyOverrideDescription": "Серия концертов «Органные сезоны при свечах»\n\n«Органные сезоны при свечах» продолжаются в кирхе Святой Марии. 18 декабря приглашаем вас на особенный вечер - в ожидании Рождества. Знаменитая Токката и фуга Баха, нежная «Аве Мария», рождественские арии и «Тихая ночь» прозвучат под сводами старинной церкви. Вместе с органом зазвучат меццо-сопрано и баритон - сольные номера и дуэты раскроют красоту этого сочетания.\n\nЗа высокими окнами - зимний вечер, внутри - мерцание свечей и музыка, которую особенно хочется разделить с близкими в преддверии праздника. Концертное объединение «Онегин» представляет проект «Классика в старинных стенах».\n\n## ИСПОЛНИТЕЛИ\n\nМария Бельтюкова - органистка из Минска, солистка Липецкого Дома музыки. Валерий Суковых - баритон, лауреат Гранта Президента Российской Федерации. Марина Кузьминых - меццо-сопрано, автор проекта «Классика в старинных стенах».\n\n## ПРОГРАММА\n\nИ. С. Бах - Токката и фуга ре минор, BWV 565\nИ. С. Бах - Bereite dich, Zion\nГ. Ф. Гендель - For behold, darkness shall cover the earth\nК. Сен-Санс - Expectans expectavi\nЛ. Лефебюр-Вели - Болеро\nГ. Ф. Гендель - Dignare\nФ. Шуберт - Ave Maria\nС. Франк - Panis Angelicus\nГ. Белье - Токката\nГ. Ф. Гендель - How willing my paternal love\nДж. Пуччини - Salve Regina\nДж. Каччини - Ave Maria\nФ. Грубер - Stille Nacht («Тихая ночь»)",
+      "legacyOverrideUsage": "ARCHIVED_LEGACY_COPY; do not overwrite during EventPage rewrite",
+      "sessionSnapshot": [
+        {
+          "id": "sess_6ad7b61179df44983db5cebd",
+          "endsAt": "2026-12-18 16:15:00",
+          "startsAt": "2026-12-18 15:00:00",
+          "priceFromRub": 1200
+        }
+      ],
+      "ageLimit": "6",
+      "priceFromRub": 1200,
+      "sourceSnapshot": {
+        "id": "evt_6ad7b61179df44983db5cebd",
+        "kind": "SINGLE",
+        "slug": "в-ожидании-рождества-орган-и-голоса-при-свечах-6ad7b61179df44983db5cebd",
+        "seoH1": null,
+        "title": "«В ОЖИДАНИИ РОЖДЕСТВА. Орган и голоса при свечах»",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "externalId": "6ad7b61179df44983db5cebd",
+            "metaExternalId": null,
+            "sourceUrlRedacted": true
+          }
+        ],
+        "venueId": "venue_65ccc0d98cde97ae4c5228b6",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ad7d3573cc3f5b5913ebf00.png",
+        "seoTitle": null,
+        "cityTitle": "Ульяновск",
+        "venueTitle": "Евангелическо-Лютеранская церковь Святой Марии",
+        "description": "Серия концертов «Органные сезоны при свечах»<br><br>«Органные сезоны при свечах» продолжаются в кирхе Святой Марии. 18 декабря приглашаем вас на особенный вечер — в ожидании Рождества.<br><br>Знаменитая Токката и фуга Баха, нежная «Аве Мария», рождественские арии и «Тихая ночь» прозвучат под сводами старинной церкви. Вместе с органом зазвучат меццо-сопрано и баритон — сольные номера и дуэты раскроют красоту этого сочетания.<br><br>За высокими окнами — зимний вечер, внутри — мерцание свечей и музыка, которую особенно хочется разделить с близкими в преддверии праздника.<br><br>Концертное объединение «Онегин» представляет проект «Классика в старинных стенах».<br><br>ИСПОЛНИТЕЛИ<br><br>Мария Бельтюкова — органистка из Минска, солистка Липецкого Дома музыки.<br><br>Валерий Суковых — баритон, лауреат Гранта Президента Российской Федерации.<br><br>Марина Кузьминых — меццо-сопрано, автор проекта «Классика в старинных стенах».<br><br>ПРОГРАММА<br><br>И. С. Бах — Токката и фуга ре минор, BWV 565<br>И. С. Бах — Bereite dich, Zion<br>Г. Ф. Гендель — For behold, darkness shall cover the earth<br>К. Сен-Санс — Expectans expectavi<br>Л. Лефебюр-Вели — Болеро<br>Г. Ф. Гендель — Dignare<br>Ф. Шуберт — Ave Maria<br>С. Франк — Panis Angelicus<br>Г. Белье — Токката<br>Г. Ф. Гендель — How willing my paternal love<br>Дж. Пуччини — Salve Regina<br>Дж. Каччини — Ave Maria<br>Ф. Грубер — Stille Nacht («Тихая ночь»)",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "ул. Ленина, 100",
+        "canonicalPath": null,
+        "primaryCityId": "city_479123",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    {
+      "eventId": "evt_6ad7bd4a84d972d11d6939af",
+      "eventSlug": "рождество-при-свечах-от-баха-до-щелкунчика-6ad7bd4a84d972d11d6939af",
+      "title": "РОЖДЕСТВО ПРИ СВЕЧАХ. От Баха до «Щелкунчика»",
+      "city": "Ульяновск",
+      "venue": "Евангелическо-Лютеранская церковь Святой Марии",
+      "address": "ул. Ленина, 100",
+      "eventPageId": "c50becf5-8d2e-4bc1-8901-0add82cede4c",
+      "eventPageSlug": "rozhdestvo-pri-svechah-ot-baha-do-schelkunchika-ulyanovsk",
+      "sourceDescription": "Зимние сумерки за окнами, мягкий свет свечей и старинная кирха, наполненная музыкой. В этот декабрьский вечер приглашаем вас почувствовать Рождество — в торжественном звучании органа, красоте голосов и мелодиях, знакомых с детства.<br><br>От величественного Баха до сказочного мира «Щелкунчика» Чайковского — программа объединит шедевры классики и рождественские песнопения, с которыми особенно хочется встречать зимние праздники.<br><br>Орган раскроется во всём богатстве красок, а меццо-сопрано и баритон наполнят вечер теплом человеческого голоса. Прозвучат сольные произведения и дуэты — нежные, светлые и праздничные.<br><br>Концертное объединение «Онегин» представляет проект «Классика в старинных стенах» и приглашает разделить этот вечер с близкими. Старинная архитектура, свечи и живое исполнение станут частью вашего рождественского воспоминания.<br><br>ИСПОЛНИТЕЛИ<br><br>Мария Бельтюкова — органистка из Минска, солистка Липецкого Дома музыки.<br><br>Валерий Суковых — баритон, лауреат Гранта Президента Российской Федерации.<br><br>Марина Кузьминых — меццо-сопрано, автор проекта «Классика в старинных стенах»<br><br>ПРОГРАММА<br><br>И. С. Бах — Прелюдия и фуга до мажор, BWV 531<br>И. С. Бах — Ich steh an deiner Krippen hier, BWV 469<br>Г. Ф. Гендель — Ombra mai fu<br>И. С. Бах — Ш. Гуно — Ave Maria<br>А. Вивальди — «Зима» из цикла «Времена года»<br>А. Дворжак — Ave maris stella<br>Ф. Шуберт — Ave Maria<br>А. Адан — Cantique de Noël («Святая ночь»)<br>П. И. Чайковский — «Танец Феи Драже» из балета «Щелкунчик»<br>Adeste fideles<br>Ф. Грубер — Stille Nacht («Тихая ночь»)<br><br>Подарите себе вечер музыки — и возможность побыть рядом с теми, с кем хочется встречать Рождество.",
+      "sourceUsage": "UNUSED_ORIGINAL_SOURCE",
+      "legacyOverrideDescription": "Зимние сумерки за окнами, мягкий свет свечей и старинная кирха, наполненная музыкой. В этот декабрьский вечер приглашаем вас почувствовать Рождество - в торжественном звучании органа, красоте голосов и мелодиях, знакомых с детства. От величественного Баха до сказочного мира «Щелкунчика» Чайковского - программа объединит шедевры классики и рождественские песнопения, с которыми особенно хочется встречать зимние праздники.\n\nОрган раскроется во всём богатстве красок, а меццо-сопрано и баритон наполнят вечер теплом человеческого голоса. Прозвучат сольные произведения и дуэты - нежные, светлые и праздничные. Концертное объединение «Онегин» представляет проект «Классика в старинных стенах» и приглашает разделить этот вечер с близкими. Старинная архитектура, свечи и живое исполнение станут частью вашего рождественского воспоминания.\n\n## ИСПОЛНИТЕЛИ\n\nМария Бельтюкова - органистка из Минска, солистка Липецкого Дома музыки. Валерий Суковых - баритон, лауреат Гранта Президента Российской Федерации.\n\nМарина Кузьминых - меццо-сопрано, автор проекта «Классика в старинных стенах»\n\n## ПРОГРАММА\n\nИ. С. Бах - Прелюдия и фуга до мажор, BWV 531\nИ. С. Бах - Ich steh an deiner Krippen hier, BWV 469\nГ. Ф. Гендель - Ombra mai fu\nИ. С. Бах - Ш. Гуно - Ave Maria\nА. Вивальди - «Зима» из цикла «Времена года»\nА. Дворжак - Ave maris stella\nФ. Шуберт - Ave Maria\nА. Адан - Cantique de Noël («Святая ночь»)\nП. И. Чайковский - «Танец Феи Драже» из балета «Щелкунчик»\nAdeste fideles\nФ. Грубер - Stille Nacht («Тихая ночь»)\n\nПодарите себе вечер музыки - и возможность побыть рядом с теми, с кем хочется встречать Рождество.",
+      "legacyOverrideUsage": "ARCHIVED_LEGACY_COPY; do not overwrite during EventPage rewrite",
+      "sessionSnapshot": [
+        {
+          "id": "sess_6ad7bd4a84d972d11d6939af",
+          "endsAt": "2026-12-19 14:15:00",
+          "startsAt": "2026-12-19 13:00:00",
+          "priceFromRub": 1200
+        }
+      ],
+      "ageLimit": "6",
+      "priceFromRub": 1200,
+      "sourceSnapshot": {
+        "id": "evt_6ad7bd4a84d972d11d6939af",
+        "kind": "SINGLE",
+        "slug": "рождество-при-свечах-от-баха-до-щелкунчика-6ad7bd4a84d972d11d6939af",
+        "seoH1": null,
+        "title": "РОЖДЕСТВО ПРИ СВЕЧАХ. От Баха до «Щелкунчика»",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "externalId": "6ad7bd4a84d972d11d6939af",
+            "metaExternalId": null,
+            "sourceUrlRedacted": true
+          }
+        ],
+        "venueId": "venue_65ccc0d98cde97ae4c5228b6",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ad7d3bf600ce19943f1c1db.png",
+        "seoTitle": null,
+        "cityTitle": "Ульяновск",
+        "venueTitle": "Евангелическо-Лютеранская церковь Святой Марии",
+        "description": "Зимние сумерки за окнами, мягкий свет свечей и старинная кирха, наполненная музыкой. В этот декабрьский вечер приглашаем вас почувствовать Рождество — в торжественном звучании органа, красоте голосов и мелодиях, знакомых с детства.<br><br>От величественного Баха до сказочного мира «Щелкунчика» Чайковского — программа объединит шедевры классики и рождественские песнопения, с которыми особенно хочется встречать зимние праздники.<br><br>Орган раскроется во всём богатстве красок, а меццо-сопрано и баритон наполнят вечер теплом человеческого голоса. Прозвучат сольные произведения и дуэты — нежные, светлые и праздничные.<br><br>Концертное объединение «Онегин» представляет проект «Классика в старинных стенах» и приглашает разделить этот вечер с близкими. Старинная архитектура, свечи и живое исполнение станут частью вашего рождественского воспоминания.<br><br>ИСПОЛНИТЕЛИ<br><br>Мария Бельтюкова — органистка из Минска, солистка Липецкого Дома музыки.<br><br>Валерий Суковых — баритон, лауреат Гранта Президента Российской Федерации.<br><br>Марина Кузьминых — меццо-сопрано, автор проекта «Классика в старинных стенах»<br><br>ПРОГРАММА<br><br>И. С. Бах — Прелюдия и фуга до мажор, BWV 531<br>И. С. Бах — Ich steh an deiner Krippen hier, BWV 469<br>Г. Ф. Гендель — Ombra mai fu<br>И. С. Бах — Ш. Гуно — Ave Maria<br>А. Вивальди — «Зима» из цикла «Времена года»<br>А. Дворжак — Ave maris stella<br>Ф. Шуберт — Ave Maria<br>А. Адан — Cantique de Noël («Святая ночь»)<br>П. И. Чайковский — «Танец Феи Драже» из балета «Щелкунчик»<br>Adeste fideles<br>Ф. Грубер — Stille Nacht («Тихая ночь»)<br><br>Подарите себе вечер музыки — и возможность побыть рядом с теми, с кем хочется встречать Рождество.",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "ул. Ленина, 100",
+        "canonicalPath": null,
+        "primaryCityId": "city_479123",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    }
+  ],
+  "redactionNote": "Provider source URLs omitted from local archive; source descriptions and stable external IDs are preserved."
+}
