@@ -24,6 +24,7 @@ import {
   orderBlogCardsForVisit,
   pickHomeBlogStrip,
   resolveBlogCardDateLabel,
+  sortBlogCardsByPublishedAt,
   splitBlogListingHero,
   staticBlogCards,
   truncateAtSentence,
@@ -97,21 +98,34 @@ test('static cards expose date + topics + searchText', () => {
   assert.ok(moscow?.searchText?.includes('москв'));
 });
 
-test('splitBlogListingHero: isFeatured wins, else first card', () => {
+test('splitBlogListingHero: newest published article leads even when an older one is pinned', () => {
   const cards = staticBlogCards();
   assert.ok(cards.length >= 3);
 
   const fallback = splitBlogListingHero(cards);
-  assert.equal(fallback.featured?.slug, cards[0]?.slug);
+  assert.equal(fallback.featured?.slug, sortBlogCardsByPublishedAt(cards)[0]?.slug);
   assert.ok(!fallback.feed.some((p) => p.slug === fallback.featured?.slug));
   assert.ok(fallback.hot.length >= 1);
   assert.ok(fallback.hot.length <= 3);
 
-  const flaggedSlug = cards[2]!.slug;
-  const withFlag = cards.map((c, i) => ({ ...c, isFeatured: i === 2 }));
-  const split = splitBlogListingHero(withFlag);
-  assert.equal(split.featured?.slug, flaggedSlug);
+  const withDates = cards.slice(0, 3).map((c, i) => ({
+    ...c,
+    isFeatured: i === 2,
+    publishedAt: `2026-11-${String(i + 1).padStart(2, '0')}T12:00:00.000Z`,
+  }));
+  const split = splitBlogListingHero(withDates);
+  assert.equal(split.featured?.slug, withDates.at(-1)?.slug);
   assert.ok(!split.feed.some((p) => p.slug === split.featured?.slug));
+  assert.equal(split.hot[0]?.slug, withDates.at(-2)?.slug);
+});
+
+test('blog chronology falls back to static Russian editorial dates', () => {
+  const cards = staticBlogCards();
+  const posts = [
+    { ...cards[0]!, publishedAt: null, editorialDate: '5 авг 2026' },
+    { ...cards[1]!, publishedAt: null, editorialDate: '10 ноября 2026' },
+  ];
+  assert.equal(sortBlogCardsByPublishedAt(posts)[0]?.slug, posts[1]?.slug);
 });
 
 test('pickHomeBlogStrip: weekly hero rotates, ignores isFeatured sticky', () => {

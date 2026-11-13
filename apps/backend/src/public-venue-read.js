@@ -211,6 +211,9 @@ const CITY_SLUG_CANONICAL = {
   'nizhnii-novgorod': 'nizhniy-novgorod',
   'veliky-novgorod': 'velikiy-novgorod',
   'velikiy-novgorod': 'velikiy-novgorod',
+  // Legacy DB city slug is transliterated as maikop; public event catalog uses maykop.
+  maikop: 'maykop',
+  maykop: 'maykop',
   rostov: 'rostov-na-donu',
   'rostov-on-don': 'rostov-na-donu',
   'rostov-na-donu': 'rostov-na-donu',

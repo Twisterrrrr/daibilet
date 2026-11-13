@@ -333,6 +333,21 @@ test('lookupVenueCatalogSessions drops foreign-city name twins', () => {
   assert.equal(filtered[0].id, 'sess-spb');
 });
 
+test('venue city filter treats legacy Maikop and public Maykop slugs as the same city', () => {
+  const event = {
+    id: 'evt-uglystephan-maykop',
+    venueId: 'venue_portal_maykop',
+    city: 'Майкоп',
+    citySlug: 'maykop',
+  };
+  const filtered = filterSessionsToVenueCity([event], {
+    city: 'Майкоп',
+    citySlug: 'маикоп',
+  });
+  assert.equal(filtered.length, 1);
+  assert.equal(filtered[0].id, event.id);
+});
+
 test('saleable fortress is one museum card, not a parallel sight', () => {
   assert.equal(
     resolvePublicVenueKind('ATTRACTION', 'Петропавловская крепость', 'СПб', { totalEvents: 1 }),
