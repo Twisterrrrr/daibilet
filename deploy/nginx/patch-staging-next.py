@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Patch staging.daibilet.ru: proxy public to Next :3000, keep /api/ on :4001."""
 from pathlib import Path
+import re
 
 CONF = Path("/etc/nginx/sites-enabled/daibilet.conf")
 text = CONF.read_text()
@@ -25,6 +26,20 @@ server_start = text.rfind("\nserver {", 0, text.index(marker))
 block_end = text.index("\n}\n", text.index(marker)) + 2
 old_block = text[server_start:block_end]
 
+catalog_location = """    # Public catalog reads are proxied through Next's allowlisted server client.
+    # Orders, writes, admin, and other API paths continue to use staging API.
+    location ~ ^/api/public/(events(/[^/]+)?|venues(/(event-counts|map-tip|[^/]+))?|cities/[^/]+|destinations|articles(/[^/]+)?|landings/[^/]+|landings-catalog|search(/results)?)$ {
+        proxy_pass http://daibilet_web_staging;
+        proxy_http_version 1.1;
+        proxy_set_header Authorization "";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        add_header X-Robots-Tag "noindex, nofollow" always;
+    }
+"""
+
 # The current admin UI is part of the Next application. Keep staging's admin
 # route on the same upstream instead of aliasing an obsolete Vite directory.
 admin_location = """    location /admin/ {
@@ -41,8 +56,6 @@ admin_location = """    location /admin/ {
     }
 """
 if "location /admin/ {" in old_block:
-    import re
-
     old_block, count = re.subn(
         r"    location /admin/ \{.*?\n    \}\n",
         admin_location,
@@ -55,8 +68,14 @@ if "location /admin/ {" in old_block:
     text = text[:server_start] + old_block + text[block_end:]
     block_end = server_start + len(old_block)
 
-if "proxy_pass http://daibilet_web_staging" in old_block:
-    print("staging Next proxy already configured")
+if re.search(r"location / \{\s*proxy_pass http://daibilet_web_staging;", old_block):
+    if "location ~ ^/api/public/" not in old_block:
+        api_marker = "    location /api/ {"
+        if api_marker not in old_block:
+            raise SystemExit("could not find staging API location to insert catalog proxy")
+        old_block = old_block.replace(api_marker, catalog_location + "\n" + api_marker, 1)
+        text = text[:server_start] + old_block + text[block_end:]
+    print("staging Next proxy configured; catalog split applied")
     CONF.write_text(text)
     raise SystemExit(0)
 
@@ -74,6 +93,17 @@ server {
 
     gzip on;
     gzip_types text/plain text/css application/json application/javascript image/svg+xml text/html;
+
+    location ~ ^/api/public/(events(/[^/]+)?|venues(/(event-counts|map-tip|[^/]+))?|cities/[^/]+|destinations|articles(/[^/]+)?|landings/[^/]+|landings-catalog|search(/results)?)$ {
+        proxy_pass http://daibilet_web_staging;
+        proxy_http_version 1.1;
+        proxy_set_header Authorization "";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        add_header X-Robots-Tag "noindex, nofollow" always;
+    }
 
     location /api/ {
         proxy_pass http://daibilet_api_staging;

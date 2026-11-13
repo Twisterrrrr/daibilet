@@ -15,6 +15,27 @@ export function resolvePublicApiBase(env: NodeJS.ProcessEnv = process.env): stri
   return (fromEnv.trim() || 'http://127.0.0.1:4000').replace(/\/$/, '');
 }
 
+/**
+ * Catalog reads may use a different backend from other public API calls.
+ * Staging can read the live catalog while keeping orders and writes on its own
+ * isolated API/database. Paths are deliberately allowlisted below.
+ */
+export function isPublicCatalogApiPath(apiPath: string): boolean {
+  const path = apiPath.startsWith('/') ? apiPath : `/${apiPath}`;
+  return /^\/api\/public\/(?:events(?:\/[^/]+)?|venues(?:\/(?:event-counts|map-tip|[^/]+))?|cities\/[^/]+|destinations|articles(?:\/[^/]+)?|landings\/[^/]+|landings-catalog|search(?:\/results)?)$/.test(path);
+}
+
+export function resolvePublicApiBaseForPath(
+  apiPath: string,
+  env: NodeJS.ProcessEnv = process.env,
+): string {
+  const catalogBase = env.DAIBILET_PUBLIC_CATALOG_API_INTERNAL_URL?.trim();
+  if (catalogBase && isPublicCatalogApiPath(apiPath)) {
+    return catalogBase.replace(/\/$/, '');
+  }
+  return resolvePublicApiBase(env);
+}
+
 export function toPublicApiSearchParams(input?: PublicApiSearchParams | null): URLSearchParams {
   if (!input) return new URLSearchParams();
   if (input instanceof URLSearchParams) return new URLSearchParams(input);
@@ -42,8 +63,13 @@ export function buildPublicApiUrl(
     throw new Error(`Public API path must start with /api/public/: ${path}`);
   }
 
-  const url = new URL(`${resolvePublicApiBase()}${path}`);
+  const isCatalogRead = Boolean(
+    process.env.DAIBILET_PUBLIC_CATALOG_API_INTERNAL_URL?.trim() && isPublicCatalogApiPath(path),
+  );
+  const url = new URL(`${resolvePublicApiBaseForPath(path)}${path}`);
   const params = toPublicApiSearchParams(searchParams);
+  // A staging request must not invalidate caches on the production API.
+  if (isCatalogRead) params.delete('refresh');
   for (const [key, value] of params.entries()) url.searchParams.append(key, value);
   return url.toString();
 }

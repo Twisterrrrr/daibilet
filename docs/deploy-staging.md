@@ -156,3 +156,21 @@ pnpm backend:next:parity
 ```
 
 Чеклист: [phases/phase-f3-cutover-checklist.md](./phases/phase-f3-cutover-checklist.md)
+
+### Production catalog reads, isolated staging writes
+
+Staging Next may read the production catalog through
+`DAIBILET_PUBLIC_CATALOG_API_INTERNAL_URL=http://127.0.0.1:4000`. Keep
+`DAIBILET_PUBLIC_API_INTERNAL_URL` and `DAIBILET_ADMIN_API_URL` pointed at
+`127.0.0.1:4001`. The web API client only selects the production base for its
+allowlisted read routes (events, venues, cities, destinations, articles,
+landings, and search); other public API requests stay on the staging backend.
+The staging Nginx vhost must route only those corresponding GET endpoints
+through the Next API handlers. Orders, subscriptions, admin, sync, checkout,
+and other API paths remain on the staging API. Never copy staging Basic Auth to
+the production API.
+
+This split lets the preview display live catalog data while an editor uses the
+staging admin and database. Venue editor preview remains the path for reviewing
+staging-only edits. Do not reduce or reseed the staging database until the live
+read split is deployed and smoke-checked; retain a verified DB backup first.
