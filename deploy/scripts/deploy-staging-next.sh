@@ -57,13 +57,13 @@ rsync -a --delete apps/admin/dist/ "$ADMIN_DIR/"
 pnpm web:build
 
 if systemctl is-active --quiet "$API_SERVICE"; then
-  systemctl restart "$API_SERVICE"
+  sudo -n systemctl restart "$API_SERVICE"
 else
   echo "Warning: $API_SERVICE not active — start manually"
 fi
 
 if systemctl is-active --quiet "$WEB_SERVICE"; then
-  systemctl restart "$WEB_SERVICE"
+  sudo -n systemctl restart "$WEB_SERVICE"
 else
   echo "Warning: $WEB_SERVICE not active — install deploy/systemd/daibilet-web-staging.service"
 fi
