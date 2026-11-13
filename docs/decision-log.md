@@ -427,3 +427,13 @@ in code; validate legacy fallback and redirect behavior on staging before
 populating production route mappings. Hidden/removed Events without an exact
 published EventPage remain 404 unless a later reviewed lifecycle policy says
 otherwise.
+
+---
+
+## 2026-11-13 — Persistent production image root
+
+**Решение:** Nginx продолжает раздавать прежние `/images/...` URL из постоянного `apps/web/public/images`. Production deploy только проверяет наличие этого каталога и не гидрирует его из `apps/public/public/images`. Runtime image delta доставляется отдельно, additive и с SHA-256 проверкой. Legacy-каталог и его Git-история остаются до завершения отдельной миграции CI-источника и проверки восстановления из архива.
+
+**Почему:** Web image root — persistent production data, а повторная копия из legacy может вернуть устаревшие версии поверх активных изображений. Путь Nginx не меняем, чтобы не ломать уже опубликованные адреса.
+
+**Implementation status:** Локально подготовлено: deploy helpers теперь проверяют persistent root без копирования и исправления владельца. Production delta из 18 URL проверена (18/18 HTTP 200; 4 файла добавлены, 14 уже были с совпадающим SHA-256). Изменения deploy scripts требуют отдельного релиза; CI `web:build` пока использует legacy-дерево как эфемерный источник проверки OG-файлов. Ничего в Git или на сервере из legacy-деревьев не удалялось.

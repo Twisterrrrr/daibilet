@@ -104,10 +104,10 @@ test "$(git rev-parse "$DEPLOY_SHA^{commit}")" = "$DEPLOY_SHA"
 git restore --source=HEAD --staged --worktree -- apps/web/next-env.d.ts
 git checkout --detach "$DEPLOY_SHA"
 test "$(git rev-parse HEAD)" = "$DEPLOY_SHA"
-# A prior legacy asset sync may have overwritten tracked Next venue images.
-# Restore the curated copies from this release before syncing any missing legacy assets.
+# Restore tracked Next venue images from this release. The persistent nginx
+# image root is checked separately and is never hydrated from legacy apps/public.
 git restore --source="$DEPLOY_SHA" --staged --worktree -- apps/web/public/images/venues
-sync_public_assets_deploy
+ensure_public_assets_deploy
 
 # Enum expands (TEMPLE/BUS …) require a fresh Prisma client on MSK before API restart.
 # Restart alone is not enough: node_modules/@prisma/client stays stale and
@@ -185,7 +185,7 @@ if [[ "$WEB_READY" -ne 1 ]]; then
     rm_rf_deploy "${WEB_NEXT_DIR}"
     mv "${WEB_NEXT_PREV}" "${WEB_NEXT_DIR}"
     git checkout --detach "$PREVIOUS_SHA"
-    sync_public_assets_deploy
+    ensure_public_assets_deploy
     systemctl_deploy start "$WEB_SERVICE" || true
     finish_web_handoff || true
     echo "Restored BUILD_ID=$(cat "${WEB_NEXT_DIR}/BUILD_ID")"
