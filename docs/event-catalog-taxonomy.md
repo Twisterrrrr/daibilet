@@ -82,17 +82,21 @@ backend - тогда рельсы Афиши («Концерты», «Театр
 - `catalogLists?: Array<{ key: 'family_kids' | 'family_all' | 'free' | 'weekend'; title: string }>`
 - `tagLabels?: string[]` (человекочитаемые жанры)
 
-## Площадки: «Развлечения» как display-группа (без нового kind)
+## Площадки: тип/подтип из PlaceType/PlaceSubtype (не «Развлечения»)
 
-Цирк, планетарий, зоопарк, аквапарк, парк аттракционов - не отдельные `VenueKind`.
-Новый enum не добавляем. Вместо этого в `apps/web/src/lib/venue-kind-mapping.ts` ввести
-**display-группу «Развлечения»**, собирающую: `CLUB_BAR_RESTAURANT` + `ATTRACTION`
-(цирк/планетарий/зоопарк - title-эвристикой, как уже сделано для `art_space`/`temple`) +
-`SPORT_ACTIVITY_SPACE` (активные развлечения).
+«Развлечения» - это раздел СОБЫТИЙ (`cat_entertainment`). У площадок своя таксономия:
+- `Venue.kind` (VenueKind) - грубое семейство (institution / location);
+- `Venue.placeType` (enum PlaceType) - тип: THEATRE, MUSEUM, ENTERTAINMENT, FOOD,
+  ARCHITECTURE, MONUMENT, NATURE, RELIGION, URBAN, TRANSPORT, VENUE, OTHER;
+- `Venue.placeSubtype` (String) - подтип: circus (Цирк), zoo (Зоопарк),
+  planetarium (Планетарий), aquarium (Океанариум), museum (Музей), gallery (Галерея),
+  restaurant (Ресторан), park (Парк) и т.д. Контролируемый список - в
+  `packages/contracts/src/place-pdp.ts` (PLACE_TYPE_OPTIONS / PLACE_SUBTYPE_OPTIONS).
 
-Плюс разовый reclassify: строки «цирк/планетарий/зоопарк/аквапарк» из `OTHER` ->
-ближайший kind (например `ATTRACTION`), чтобы не висели в «Другое». Web (`/places2`)
-берёт ярлык группы из маппинга; отдельная правка фронта не требуется.
+Цирк, Зоопарк, Планетарий обособляются через `placeSubtype` (web показывает отдельные
+группы по ярлыку подтипа). RU-ярлыки берутся из place-pdp.ts. Новый enum не нужен - он
+уже есть; при необходимости строки в БД проставляются через `placeType`/`placeSubtype`,
+а не через `kind`.
 
 - Рельсы Афиши - плоский набор: типы по `catalogSubcategory.title`, списки по
   `catalogLists` (со ссылкой в каталог с пресетом фильтра).

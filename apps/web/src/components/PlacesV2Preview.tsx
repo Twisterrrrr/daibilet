@@ -1,13 +1,29 @@
 import Link from 'next/link';
 import { Search } from 'lucide-react';
 
+import { Fragment } from 'react';
+
 import { SafeImage } from '@/components/SafeImage.client';
 import { fontUnbounded } from '@/lib/fonts';
 import { pluralVenues } from '@/lib/format';
 import { venueKindLabel } from '@/lib/venue-kind-mapping';
+import { PLACE_SUBTYPE_OPTIONS, PLACE_TYPE_OPTIONS } from '@daibilet/contracts/place-pdp';
 import type { PublicVenueDto } from '@daibilet/contracts/public';
 
-const typeLabel = (v: PublicVenueDto) => venueKindLabel(v.type, v.name) || 'Площадка';
+/** Группировка мест по подтипу/типу из place-pdp: Цирк, Зоопарк, Планетарий и т.д. */
+const typeLabel = (v: PublicVenueDto) => {
+  const subtype = String(v.placeSubtype || '').trim().toLowerCase();
+  if (subtype) {
+    for (const opts of Object.values(PLACE_SUBTYPE_OPTIONS)) {
+      const hit = opts.find((o) => o.value === subtype);
+      if (hit) return hit.label;
+    }
+  }
+  const type = String(v.placeType || '').trim().toUpperCase();
+  const typeHit = PLACE_TYPE_OPTIONS.find(([t]) => t === type);
+  if (typeHit) return typeHit[1];
+  return venueKindLabel(v.type, v.name) || 'Площадка';
+};
 
 function PlaceCard({ v }: { v: PublicVenueDto }) {
   return (
@@ -39,11 +55,11 @@ function PlaceCard({ v }: { v: PublicVenueDto }) {
 
 export function PlacesV2Preview({ venues, total }: { venues: PublicVenueDto[]; total: number }) {
   const featured = venues.filter((v) => v.heroImageUrl).slice(0, 6);
-  const types = Array.from(new Set(venues.map(typeLabel))).slice(0, 8);
-  const groups = Array.from(new Set(venues.map(typeLabel)))
-    .slice(0, 8)
+  const types = Array.from(new Set(venues.map(typeLabel)));
+  const groups = types
     .map((type) => ({ type, venues: venues.filter((v) => typeLabel(v) === type) }))
-    .filter((g) => g.venues.length);
+    .filter((g) => g.venues.length)
+    .sort((a, b) => b.venues.length - a.venues.length);
 
   return (
     <div className={`v2 ${fontUnbounded.variable}`}>
@@ -53,7 +69,7 @@ export function PlacesV2Preview({ venues, total }: { venues: PublicVenueDto[]; t
           <div className="head__row">
             <div>
               <h1>Площадки</h1>
-              <p className="head__meta"><strong>{total}</strong> площадок · театры, клубы, музеи, лофты</p>
+              <p className="head__meta"><strong>{total}</strong> площадок · театры, музеи, памятники, гастро и другое</p>
             </div>
           </div>
           <div className="search-compact">
@@ -91,21 +107,37 @@ export function PlacesV2Preview({ venues, total }: { venues: PublicVenueDto[]; t
         </section>
       ) : null}
 
-      {groups.map((group) => (
-        <section key={group.type} className="places-section">
-          <div className="container">
-            <div className="featured-places__head">
-              <div>
-                <h2>{group.type}</h2>
-                <p>{pluralVenues(group.venues.length)}</p>
+      {groups.map((group, gi) => (
+        <Fragment key={group.type}>
+          <section className="places-section">
+            <div className="container">
+              <div className="featured-places__head">
+                <div>
+                  <h2>{group.type}</h2>
+                  <p>{pluralVenues(group.venues.length)}</p>
+                </div>
+                <Link href="/places" className="link-more">Все площадки →</Link>
               </div>
-              <Link href="/places" className="link-more">Все площадки →</Link>
+              <div className="places-grid">
+                {group.venues.slice(0, 4).map((v) => <PlaceCard key={v.id} v={v} />)}
+              </div>
             </div>
-            <div className="places-grid">
-              {group.venues.slice(0, 4).map((v) => <PlaceCard key={v.id} v={v} />)}
-            </div>
-          </div>
-        </section>
+          </section>
+          {gi === 1 ? (
+            <section className="places-section">
+              <div className="container">
+                <Link href="/my-day" className="route-banner">
+                  <div>
+                    <span className="route-banner__kicker">Инструмент</span>
+                    <h3>Готовые маршруты</h3>
+                    <p>Соберите день из готовых сценариев прогулок по городу</p>
+                  </div>
+                  <span className="btn btn--primary">Собрать маршрут →</span>
+                </Link>
+              </div>
+            </section>
+          ) : null}
+        </Fragment>
       ))}
     </div>
   );
