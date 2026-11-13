@@ -11,7 +11,7 @@
  * P1: blog `*-inline*.jpg` in place, max 1400px, q~82.
  * P1b: landings PNG→JPEG ~1400px (also caps oversized landing JPG).
  *
- * Source of truth: apps/public/public/images/ (mirrors to apps/web/public/images if present).
+ * Canonical source and output: apps/web/public/images/.
  *
  * Mass cut on MSK (owner / ops — do not commit thousands of event/venue binaries):
  *   ssh daibilet-msk
@@ -29,8 +29,8 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '..');
-const publicImages = path.join(rootDir, 'apps/public/public/images');
-const webImages = path.join(rootDir, 'apps/web/public/images');
+const publicImages = path.join(rootDir, 'apps/web/public/images');
+const webImages = publicImages;
 
 const CARD_WIDTH = 1200;
 const CARD_QUALITY = 88;
@@ -92,6 +92,7 @@ function mirrorToWeb(absPublic) {
   const rel = path.relative(publicImages, absPublic);
   if (rel.startsWith('..')) return;
   const dest = path.join(webImages, rel);
+  if (path.resolve(dest) === path.resolve(absPublic)) return;
   fs.mkdirSync(path.dirname(dest), { recursive: true });
   fs.copyFileSync(absPublic, dest);
 }

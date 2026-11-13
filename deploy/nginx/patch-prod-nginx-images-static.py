@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Serve /images/* from disk via nginx alias (bypass Next + /_next/image optimizer).
 
-Why: local static under apps/web/public/images (synced from apps/public/public/images)
+Why: local static assets are served from the canonical apps/web/public/images tree.
 must not hit Node image optimizer — MSK egress/DNS failures and SWR rebuild hangs
 cause 502/504 on /_next/image even for on-disk PNG/JPG.
 """

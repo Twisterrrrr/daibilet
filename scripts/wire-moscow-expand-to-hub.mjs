@@ -4,7 +4,6 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const cityInfoPath = path.join(root, 'apps/web/src/lib/cityInfo.ts');
-const publicCityInfoPath = path.join(root, 'apps/public/src/lib/cityInfo.ts');
 const editorialPath = path.join(root, 'scripts/data/must-see-editorial-moscow.json');
 
 const dry = process.argv.includes('--dry-run');
@@ -272,22 +271,6 @@ function wireFile(filePath) {
   };
 }
 
-function fileExists(p) {
-  try {
-    readFileSync(p);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
 const reports = [wireFile(cityInfoPath)];
-if (fileExists(publicCityInfoPath)) {
-  try {
-    reports.push(wireFile(publicCityInfoPath));
-  } catch (e) {
-    reports.push({ file: 'apps/public/src/lib/cityInfo.ts', error: String(e.message || e) });
-  }
-}
 
 console.log(JSON.stringify({ dry, apply, expands: expands.length, reports }, null, 2));

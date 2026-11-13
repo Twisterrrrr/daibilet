@@ -8,10 +8,7 @@ const block = fs
   .replace(/\r\n/g, '\n')
   .trimEnd() + '\n';
 
-const paths = [
-  path.join(root, 'apps/web/src/lib/cityInfo.ts'),
-  path.join(root, 'apps/public/src/lib/cityInfo.ts'),
-];
+const paths = [path.join(root, 'apps/web/src/lib/cityInfo.ts')];
 
 for (const p of paths) {
   let src = fs.readFileSync(p, 'utf8').replace(/\r\n/g, '\n');

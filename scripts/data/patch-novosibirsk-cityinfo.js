@@ -26,7 +26,7 @@ const block = `
 
 const re = /\n  novosibirsk: \{[\s\S]*?\n  \},\n  krasnoyarsk:/;
 
-for (const rel of ['apps/web/src/lib/cityInfo.ts', 'apps/public/src/lib/cityInfo.ts']) {
+for (const rel of ['apps/web/src/lib/cityInfo.ts']) {
   const file = path.join(process.cwd(), rel);
   let s = fs.readFileSync(file, 'utf8');
   if (!s.includes("from './novosibirsk-hub'")) {

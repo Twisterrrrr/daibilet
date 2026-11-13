@@ -103,7 +103,7 @@ function buildCoverSvg({ seedHex, palette }) {
 }
 
 /**
- * Write a unique JPEG cover under apps/public (+ mirror to apps/web if present).
+ * Write a unique JPEG cover to the canonical Next static asset tree.
  * @returns public URL path e.g. /images/venues/generated/venue-auto-abc123.jpg
  */
 export async function writeGeneratedCatalogCover(rootDir, options) {
@@ -119,15 +119,10 @@ export async function writeGeneratedCatalogCover(rootDir, options) {
   const fileName = `${kind === 'event' ? 'evt' : 'venue'}-auto-${seedHex}.jpg`;
   const relUrl = `/images/${folder}/generated/${fileName}`;
 
-  const publicPath = path.join(rootDir, 'apps/public/public', relUrl.replace(/^\//, ''));
   const webPath = path.join(rootDir, 'apps/web/public', relUrl.replace(/^\//, ''));
-  fs.mkdirSync(path.dirname(publicPath), { recursive: true });
+  fs.mkdirSync(path.dirname(webPath), { recursive: true });
 
-  if (!force && fs.existsSync(publicPath) && fs.statSync(publicPath).size > 1024) {
-    if (fs.existsSync(path.dirname(webPath))) {
-      fs.mkdirSync(path.dirname(webPath), { recursive: true });
-      if (!fs.existsSync(webPath)) fs.copyFileSync(publicPath, webPath);
-    }
+  if (!force && fs.existsSync(webPath) && fs.statSync(webPath).size > 1024) {
     return relUrl;
   }
 
@@ -135,10 +130,6 @@ export async function writeGeneratedCatalogCover(rootDir, options) {
   const palette = paletteFor({ kind: venueKind, category, seedHex });
   const svg = buildCoverSvg({ seedHex, palette });
   const buffer = await sharp(Buffer.from(svg)).jpeg({ quality: 82, mozjpeg: true }).toBuffer();
-  fs.writeFileSync(publicPath, buffer);
-  if (fs.existsSync(path.join(rootDir, 'apps/web/public'))) {
-    fs.mkdirSync(path.dirname(webPath), { recursive: true });
-    fs.writeFileSync(webPath, buffer);
-  }
+  fs.writeFileSync(webPath, buffer);
   return relUrl;
 }

@@ -148,10 +148,7 @@ function loadHeroMap() {
 function heroExists(rel) {
   if (!rel) return false;
   const clean = rel.replace(/^\//, '');
-  return (
-    fs.existsSync(path.join(rootDir, 'apps/web/public', clean)) ||
-    fs.existsSync(path.join(rootDir, 'apps/public/public', clean))
-  );
+  return fs.existsSync(path.join(rootDir, 'apps/web/public', clean));
 }
 
 async function main() {

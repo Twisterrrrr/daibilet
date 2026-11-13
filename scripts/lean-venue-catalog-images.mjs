@@ -15,8 +15,8 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '..');
-const publicVenues = path.join(rootDir, 'apps/public/public/images/venues');
-const webVenues = path.join(rootDir, 'apps/web/public/images/venues');
+const publicVenues = path.join(rootDir, 'apps/web/public/images/venues');
+const webVenues = publicVenues;
 
 const THUMB_WIDTH = 960;
 const HERO_WIDTH = 1600;
@@ -65,6 +65,7 @@ function mirrorToWeb(absPublic) {
   if (!fs.existsSync(webVenues)) return;
   const rel = path.relative(publicVenues, absPublic);
   const dest = path.join(webVenues, rel);
+  if (path.resolve(dest) === path.resolve(absPublic)) return;
   fs.mkdirSync(path.dirname(dest), { recursive: true });
   fs.copyFileSync(absPublic, dest);
 }

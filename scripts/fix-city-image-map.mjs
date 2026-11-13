@@ -10,7 +10,7 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const venuesRoot = path.join(root, 'apps/public/public/images/venues');
+const venuesRoot = path.join(root, 'apps/web/public/images/venues');
 
 const city = process.argv.find((a) => a.startsWith('--city='))?.slice('--city='.length);
 const dryRun = process.argv.includes('--dry-run');

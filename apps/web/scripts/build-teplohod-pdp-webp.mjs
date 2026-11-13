@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 
 const webRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const repoRoot = path.resolve(webRoot, '../..');
-const outputDir = path.join(repoRoot, 'apps/public/public/images/events/teplohod-pdp');
+const outputDir = path.join(webRoot, 'public/images/events/teplohod-pdp');
 const sourceImages = [
   ['51', 'https://cdn.teplohod.info/images/cache/Events/Event51/4bf789e910-1.jpg', 'd285345f36cf33dec3ba2f4afddb8c728d368b3dc382fb67321c44a44452805e'],
   ['1360', 'https://cdn.teplohod.info/images/cache/Events/Event1360/611db9f32d-1.jpg', '5b747728f7d1c873fdf70877b40fab6f8fda65ffb68f4be6e1cd8fdbaa0c5109'],

@@ -12,7 +12,7 @@ import { writeVenueStillVariants } from './lib/venue-still-variants.mjs';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..');
 const assets = process.env.VENUE_ASSETS_DIR || 'C:/Users/user/.cursor/projects/f-coding-daibilet-push/assets';
-const publicDir = path.join(root, 'apps/public/public/images/venues');
+const publicDir = path.join(root, 'apps/web/public/images/venues');
 const sharp = createRequire(path.join(root, 'apps/web/package.json'))('sharp');
 
 async function gate(src, city, stem) {

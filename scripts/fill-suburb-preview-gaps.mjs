@@ -19,7 +19,7 @@ const root = path.resolve(__dirname, '..');
 const dry = process.argv.includes('--dry-run');
 const gapsPath = path.join(root, 'tmp-suburb-preview-gaps.json');
 const mapPath = path.join(root, 'apps/web/src/lib/city-place-images.ts');
-const venuesRoot = path.join(root, 'apps/public/public/images/venues');
+const venuesRoot = path.join(root, 'apps/web/public/images/venues');
 
 const RU = {
   а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z', и: 'i',
@@ -202,20 +202,6 @@ async function main() {
     slugAssignments.push({ ...row, locationSlug });
     const ok = insertSlugInFile(row.file, row.name, locationSlug);
     if (!ok) console.warn('slug insert failed', row.file, row.name);
-  }
-
-  // also sync public mirrors for patched hub files
-  const patchedFiles = [...new Set(slugAssignments.map((r) => r.file))];
-  for (const f of patchedFiles) {
-    if (f === 'city-destination-registry.ts') continue;
-    const web = path.join(root, 'apps/web/src/lib', f);
-    const pub = path.join(root, 'apps/public/src/lib', f);
-    if (fs.existsSync(web) && fs.existsSync(path.dirname(pub))) {
-      let body = fs.readFileSync(web, 'utf8');
-      // public often drops .ts in imports
-      body = body.replace(/from '\.\/([^']+)\.ts'/g, "from './$1'");
-      if (!dry) fs.writeFileSync(pub, body);
-    }
   }
 
   // 2) all slugs needing editorial = missingEditorial + newly assigned

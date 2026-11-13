@@ -42,7 +42,7 @@
 ### PUBLISHED: жёсткие правила
 
 1. GPT всегда сдаёт `status: DRAFT` - **не** `PUBLISHED`.
-2. **Cover обязателен:** уникальный JPG на диске `apps/public/public/images/blog/{slug}.jpg` + `coverImageUrl` / `imageAlt` в frontmatter. Запрещены city-placeholder (`cities/*.png`).
+2. **Cover обязателен:** уникальный JPG на диске `apps/web/public/images/blog/{slug}.jpg` + `coverImageUrl` / `imageAlt` в frontmatter. Запрещены city-placeholder (`cities/*.png`).
 3. **Inline 1-2 обязательны** в body до публикации:
    - `[image side=left|right src="/images/blog/{slug}-inline.jpg" alt="…"]`
    - второе: `{slug}-inline-2.jpg`
@@ -764,9 +764,9 @@ GPT **не** генерирует файлы изображений. Cover и in
 
 | Тип | Файл на диске | Frontmatter / shortcode |
 |-----|---------------|-------------------------|
-| Cover | `apps/public/public/images/blog/{slug}.jpg` | `coverImageUrl: "/images/blog/{slug}.jpg"` + `imageAlt: "…"` |
-| Inline 1 | `apps/public/public/images/blog/{slug}-inline.jpg` | `[image side=left\|right src="/images/blog/{slug}-inline.jpg" alt="…"]` |
-| Inline 2 | `apps/public/public/images/blog/{slug}-inline-2.jpg` | `[image side=… src="/images/blog/{slug}-inline-2.jpg" alt="…"]` |
+| Cover | `apps/web/public/images/blog/{slug}.jpg` | `coverImageUrl: "/images/blog/{slug}.jpg"` + `imageAlt: "…"` |
+| Inline 1 | `apps/web/public/images/blog/{slug}-inline.jpg` | `[image side=left\|right src="/images/blog/{slug}-inline.jpg" alt="…"]` |
+| Inline 2 | `apps/web/public/images/blog/{slug}-inline-2.jpg` | `[image side=… src="/images/blog/{slug}-inline-2.jpg" alt="…"]` |
 | Inline 3+ | `{slug}-inline-3.jpg` и т.д. | только если промпт явно требует больше двух |
 
 Правила `.cursorrules` п.6-7:
@@ -836,7 +836,7 @@ GPT **не** генерирует файлы изображений. Cover и in
 ## Чеклист агента перед PUBLISHED
 
 - [ ] Slug не в инвентаре content-blog-plan
-- [ ] `apps/public/public/images/blog/{slug}.jpg` exists (не placeholder)
+- [ ] `apps/web/public/images/blog/{slug}.jpg` exists (не placeholder)
 - [ ] `-inline.jpg` и при необходимости `-inline-2.jpg` exists, src ≠ cover
 - [ ] Body содержит 1-2 `[image …]` shortcodes
 - [ ] Нет `—` / `–` в пользовательском тексте

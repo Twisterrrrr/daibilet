@@ -14,10 +14,7 @@ const pack = JSON.parse(
   fs.readFileSync(path.join(rootDir, 'scripts/data/suburb-nested-coords.json'), 'utf8'),
 );
 
-const TARGETS = [
-  'apps/web/src/lib/cityInfo.ts',
-  'apps/public/src/lib/cityInfo.ts',
-];
+const TARGETS = ['apps/web/src/lib/cityInfo.ts'];
 
 function parseTopLevelObjects(text) {
   const out = [];

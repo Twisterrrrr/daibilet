@@ -9,7 +9,6 @@ ROOT = Path(__file__).resolve().parents[1]
 ROWS = json.loads((ROOT / "scripts/data/must-see-editorial-nizhny.json").read_text(encoding="utf-8"))
 OUTS = [
     ROOT / "apps/web/public/images/venues/nizhny-novgorod",
-    ROOT / "apps/public/public/images/venues/nizhny-novgorod",
 ]
 W, H = 1600, 1200
 

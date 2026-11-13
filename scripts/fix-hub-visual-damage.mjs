@@ -2,7 +2,7 @@
  * Flag brightness, collage and clone suspects for visual review.
  * Brightness is not an orientation classifier: snow, interiors and reflections
  * can be brighter at the bottom of a correctly oriented photo.
- * Source of truth: apps/public/public/images/venues (mirrors to apps/web).
+ * Source of truth: apps/web/public/images/venues.
  *
  *   node scripts/fix-hub-visual-damage.mjs --cities=rostov-na-donu,omsk,tyumen,penza,chelyabinsk --dry-run
  *   node scripts/fix-hub-visual-damage.mjs --cities=omsk --dry-run
@@ -17,8 +17,8 @@ import { writeVenueStillVariants } from './lib/venue-still-variants.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..');
-const publicVenues = path.join(root, 'apps/public/public/images/venues');
-const webVenues = path.join(root, 'apps/web/public/images/venues');
+const publicVenues = path.join(root, 'apps/web/public/images/venues');
+const webVenues = publicVenues;
 const sharp = createRequire(path.join(root, 'apps/web/package.json'))('sharp');
 
 const citiesArg = process.argv.find((a) => a.startsWith('--cities='));
@@ -146,7 +146,7 @@ async function metrics(file) {
 }
 
 async function installBoth(city, stem, buf) {
-  for (const rootDir of [publicVenues, webVenues]) {
+  for (const rootDir of new Set([publicVenues, webVenues])) {
     const dir = path.join(rootDir, city);
     fs.mkdirSync(dir, { recursive: true });
     await writeVenueStillVariants(sharp, buf, dir, stem);

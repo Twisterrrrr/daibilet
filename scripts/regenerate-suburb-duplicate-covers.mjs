@@ -16,7 +16,7 @@ import { catalogCoverHash } from './lib/catalog-cover-generate.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..');
 const sharp = createRequire(path.join(root, 'apps/web/package.json'))('sharp');
-const venuesRoot = path.join(root, 'apps/public/public/images/venues');
+const venuesRoot = path.join(root, 'apps/web/public/images/venues');
 
 const WIDTH = 1600;
 const HEIGHT = 1067;

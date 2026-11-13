@@ -192,10 +192,7 @@ export function mergeMonumentMustSeeIntoCityInfo(
 }
 `;
 
-  const targets = [
-    path.join(ROOT, 'apps/web/src/lib/city-monuments-must-see.ts'),
-    path.join(ROOT, 'apps/public/src/lib/city-monuments-must-see.ts'),
-  ];
+  const targets = [path.join(ROOT, 'apps/web/src/lib/city-monuments-must-see.ts')];
   for (const target of targets) {
     fs.writeFileSync(target, body, 'utf8');
     console.log('wrote', path.relative(ROOT, target), 'cities', Object.keys(byCity).length, 'items', pack.length);

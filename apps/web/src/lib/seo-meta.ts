@@ -15,7 +15,7 @@ export const OG_IMAGE_WIDTH = 1200;
 export const OG_IMAGE_HEIGHT = 630;
 export const OG_IMAGE_TYPE = 'image/jpeg';
 
-/** Relative path on disk (apps/public/public + synced web/public). */
+/** Relative path on disk under apps/web/public. */
 export const DEFAULT_OG_IMAGE_PATH = '/images/og/site-default-v2.jpg';
 
 /** Site-wide OG fallback. Absolute JPEG 1200x630 - never the 2.5MB home-hero selfie. */

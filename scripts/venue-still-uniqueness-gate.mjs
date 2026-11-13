@@ -11,7 +11,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..');
-const publicDir = path.join(root, 'apps/public/public/images/venues');
+const publicDir = path.join(root, 'apps/web/public/images/venues');
 const sharp = createRequire(path.join(root, 'apps/web/package.json'))('sharp');
 
 const DENYLIST_PATH = path.join(root, 'scripts/venue-still-denylist.json');

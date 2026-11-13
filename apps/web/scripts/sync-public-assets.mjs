@@ -1,14 +1,14 @@
 /**
- * Копирует статику Vite public → Next public перед сборкой.
+ * Копирует legacy статику и deploy fallback в канонический Next public перед сборкой.
  *
- * Источник (эталон): apps/public/public/images/
+ * Legacy источник (только чтение): apps/public/public/images/
  *   blog/      — обложки статей
  *   cities/    — карточки городов (*.png)
  *   hero/      — фон главной
  *   events/    — обложки событий (fallback)
  *   landings/  — промо подборок
  *   home/      — format/thematic tiles на главной
- *   venues/    — обложки площадок (если есть)
+ *   venues/    — legacy обложки площадок (только если файла ещё нет в web)
  *   og/        — Open Graph / share preview images
  *
  * Назначение: apps/web/public/images/
@@ -58,10 +58,9 @@ for (const sourceRoot of sourceRoots) {
   if (!fs.existsSync(sourceRoot)) continue;
   usedSource = sourceRoot;
   for (const subdir of SUBDIRS) {
-    const isVenueAssets = subdir === 'venues';
     copied += copyDir(path.join(sourceRoot, subdir), path.join(targetRoot, subdir), {
-      preserveExisting: isVenueAssets,
-      skipGenerated: isVenueAssets,
+      preserveExisting: true,
+      skipGenerated: subdir === 'venues',
     });
   }
   break;

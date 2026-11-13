@@ -177,7 +177,6 @@ async function main() {
   const items = extractMoscowMustSee(fs.readFileSync(cityInfoPath, 'utf8'));
   const outDirs = [
     path.join(rootDir, 'apps/web/public/images/venues/moscow'),
-    path.join(rootDir, 'apps/public/public/images/venues/moscow'),
   ];
   for (const d of outDirs) fs.mkdirSync(d, { recursive: true });
 

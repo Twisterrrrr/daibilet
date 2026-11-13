@@ -16,7 +16,7 @@ const rootDir = path.resolve(__dirname, '..');
 const WIDTH = 1600;
 const HEIGHT = 1200;
 const missingPath = path.join(rootDir, '.deploy-tmp/locations-truly-missing.json');
-const outPublic = path.join(rootDir, 'apps/public/public/images/venues');
+const outWeb = path.join(rootDir, 'apps/web/public/images/venues');
 const mapPath = path.join(rootDir, 'apps/web/src/lib/city-place-images.ts');
 
 const CITY_FOLDER = {
@@ -217,7 +217,7 @@ async function main() {
     if (skip.has(item.slug)) continue;
     const city = cityFolder(item.city, item.slug);
     const stem = fileStem(item.slug, city);
-    const dir = path.join(outPublic, city);
+    const dir = path.join(outWeb, city);
     fs.mkdirSync(dir, { recursive: true });
     const file = `${stem}.jpg`;
     const abs = path.join(dir, file);

@@ -16,8 +16,8 @@ import { writeVenueCardThumbSidecars, VENUE_STILL } from './lib/venue-still-vari
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..');
-const publicVenues = path.join(root, 'apps/public/public/images/venues');
-const webVenues = path.join(root, 'apps/web/public/images/venues');
+const publicVenues = path.join(root, 'apps/web/public/images/venues');
+const webVenues = publicVenues;
 const sharp = createRequire(path.join(root, 'apps/web/package.json'))('sharp');
 
 const SKIP_CITIES = new Set(['place', 'generated']);
@@ -45,6 +45,7 @@ function mirrorSidecars(publicDir, stem) {
   if (!fs.existsSync(webVenues)) return;
   const relCity = path.relative(publicVenues, publicDir);
   const destDir = path.join(webVenues, relCity);
+  if (path.resolve(destDir) === path.resolve(publicDir)) return;
   fs.mkdirSync(destDir, { recursive: true });
   for (const suffix of ['-card.jpg', '-thumb.jpg']) {
     const src = path.join(publicDir, `${stem}${suffix}`);

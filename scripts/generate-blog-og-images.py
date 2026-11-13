@@ -8,7 +8,6 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
 DIRS = [
-    ROOT / "apps/public/public/images/blog",
     ROOT / "apps/web/public/images/blog",
 ]
 SKIP_NAMES = {"blog-list-hero.jpg", "blog-hero-promo.jpg"}

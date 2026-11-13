@@ -19,8 +19,8 @@ from pathlib import Path
 from PIL import Image, ImageOps
 
 ROOT = Path(__file__).resolve().parents[1]
-PUBLIC = ROOT / "apps/public/public/images"
-WEB = ROOT / "apps/web/public/images"
+PUBLIC = ROOT / "apps/web/public/images"
+WEB = PUBLIC
 
 CARD_WIDTH = 640
 CARD_QUALITY = 65
@@ -86,6 +86,8 @@ def mirror_to_web(abs_public: Path) -> None:
     except ValueError:
         return
     dest = WEB / rel
+    if dest.resolve() == abs_public.resolve():
+        return
     dest.parent.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(abs_public, dest)
 

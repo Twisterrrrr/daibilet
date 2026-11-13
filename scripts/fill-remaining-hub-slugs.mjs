@@ -10,7 +10,7 @@ import { pathToFileURL } from 'url';
 
 const root = process.cwd();
 const lib = path.join(root, 'apps/web/src/lib');
-const venues = path.join(root, 'apps/public/public/images/venues');
+const venues = path.join(root, 'apps/web/public/images/venues');
 const mapPath = path.join(lib, 'city-place-images.ts');
 const sharp = createRequire(path.join(root, 'apps/web/package.json'))('sharp');
 

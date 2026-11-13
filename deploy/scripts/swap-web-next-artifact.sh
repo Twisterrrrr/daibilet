@@ -69,7 +69,7 @@ fi
 echo "HEAD=$(git rev-parse --short HEAD) ($(git rev-parse HEAD))"
 
 # nginx serves /images/ from apps/web/public/images (gitignored); GHA only swaps .next.
-# Sync etalon apps/public/public/images → web public after git reset.
+# Hydrate web public from retained legacy/deploy asset sources after git reset.
 sync_public_assets_deploy
 
 WEB_NEXT_DIR="apps/web/.next"

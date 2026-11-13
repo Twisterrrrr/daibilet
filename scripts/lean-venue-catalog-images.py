@@ -17,8 +17,8 @@ from pathlib import Path
 from PIL import Image, ImageOps
 
 ROOT = Path(__file__).resolve().parents[1]
-PUBLIC_VENUES = ROOT / "apps/public/public/images/venues"
-WEB_VENUES = ROOT / "apps/web/public/images/venues"
+PUBLIC_VENUES = ROOT / "apps/web/public/images/venues"
+WEB_VENUES = PUBLIC_VENUES
 
 THUMB_WIDTH = 640
 HERO_WIDTH = 1200
@@ -53,6 +53,8 @@ def mirror_to_web(abs_public: Path) -> None:
     if not WEB_VENUES.is_dir():
         return
     dest = WEB_VENUES / abs_public.relative_to(PUBLIC_VENUES)
+    if dest.resolve() == abs_public.resolve():
+        return
     dest.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(abs_public, dest)
 

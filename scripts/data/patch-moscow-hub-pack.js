@@ -360,7 +360,6 @@ function patchFile(rel) {
 
 for (const f of [
   'apps/web/src/lib/cityInfo.ts',
-  'apps/public/src/lib/cityInfo.ts',
 ]) {
   patchFile(f);
 }

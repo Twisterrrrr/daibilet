@@ -16,7 +16,6 @@ const rootDir = path.resolve(__dirname, '..');
 const WIDTH = 1600;
 const HEIGHT = 1200;
 const missingPath = path.join(rootDir, '.deploy-tmp/gastro-missing.json');
-const outPublic = path.join(rootDir, 'apps/public/public/images/venues');
 const outWeb = path.join(rootDir, 'apps/web/public/images/venues');
 const mapPath = path.join(rootDir, 'apps/web/src/lib/city-place-images.ts');
 
@@ -140,23 +139,16 @@ async function main() {
     const stem = fileStem(item.slug, city);
     const file = `${stem}.jpg`;
     const url = `/images/venues/${city}/${file}`;
-    for (const base of [outPublic, outWeb]) {
-      fs.mkdirSync(path.join(base, city), { recursive: true });
-    }
-    const absPublic = path.join(outPublic, city, file);
     const absWeb = path.join(outWeb, city, file);
-    if (fs.existsSync(absPublic) && fs.statSync(absPublic).size > 20_000) {
+    fs.mkdirSync(path.dirname(absWeb), { recursive: true });
+    if (fs.existsSync(absWeb) && fs.statSync(absWeb).size > 20_000) {
       existed += 1;
-      if (!fs.existsSync(absWeb) || fs.statSync(absWeb).size < 20_000) {
-        fs.copyFileSync(absPublic, absWeb);
-      }
       mapEntries.push([item.slug, url]);
       continue;
     }
     const seedHex = catalogCoverHash(`gastro-cover:${item.slug}`);
     const svg = Buffer.from(buildSvg(seedHex));
-    await sharp(svg).jpeg({ quality: 86, mozjpeg: true }).toFile(absPublic);
-    fs.copyFileSync(absPublic, absWeb);
+    await sharp(svg).jpeg({ quality: 86, mozjpeg: true }).toFile(absWeb);
     created += 1;
     mapEntries.push([item.slug, url]);
   }

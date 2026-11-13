@@ -1,6 +1,6 @@
 /**
  * Wire KGD city mustSee slugs from must-see-editorial-kaliningrad-city.json
- * into apps/web + apps/public cityInfo.ts. Idempotent.
+ * into the canonical apps/web cityInfo.ts. Idempotent.
  *
  * Usage: node scripts/wire-kgd-city-mustsee-slugs.js
  */
@@ -23,10 +23,7 @@ for (const row of pack) {
 // Антидубль здания музея ИЗО. Gastro (5) - в каталоге /locations как ATTRACTION.
 const HUB_ONLY = new Set(['Здание Кёнигсбергской биржи'].map(norm));
 
-const files = [
-  path.join(root, 'apps/web/src/lib/cityInfo.ts'),
-  path.join(root, 'apps/public/src/lib/cityInfo.ts'),
-];
+const files = [path.join(root, 'apps/web/src/lib/cityInfo.ts')];
 
 function norm(s) {
   return String(s || '')

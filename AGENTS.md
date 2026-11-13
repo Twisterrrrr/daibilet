@@ -15,7 +15,11 @@
 - `apps/web` — Next.js App Router, **это production public**
 - `apps/admin`, `apps/backend` — админка и API
 - `apps/worker` — фоновые задачи
-- `apps/public` — **legacy Vite-фронт**, в CI не собирается, новый функционал сюда не пишем
+- `apps/public` — **legacy Vite-фронт**, в CI не собирается; его исходники и
+  `apps/public/public` только читаются для переноса старой статики. Не создавать
+  и не изменять там файлы скриптами, генераторами или сборкой. Канон приложения
+  и активных ассетов — `apps/web`; legacy-дерево будет удалено после завершения
+  миграции ассетов из `docs/image-archive-runtime-migration-2026-11-13.md`.
 - `packages/db` — Prisma 7.8, `packages/contracts` — Zod DTO, `packages/config` — tsconfig
 
 ## Перед любыми изменениями прочитай
@@ -61,7 +65,7 @@
 - Модель **не выдумывает факты**. Рерайт переписывает предоставленный текст,
   но цены, время, адреса, наличие билетов и факты о площадках берутся из
   источника. Никогда не «улучшай» числа.
-- У любой статьи обязателен blog cover: `apps/public/public/images/blog/{slug}.jpg`
+- У любой статьи обязателен blog cover: `apps/web/public/images/blog/{slug}.jpg`
   плюс `coverImageUrl` / `imageAlt` во frontmatter. Запрещены city-placeholder
   и публикация в `PUBLISHED` без файла на диске.
 - В теле статьи обязательны **1-2 inline-фото**:

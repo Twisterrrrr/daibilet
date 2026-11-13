@@ -83,7 +83,6 @@ async function main() {
   const sharp = loadSharp();
   const outDirs = [
     path.join(rootDir, 'apps/web/public/images/venues/nizhny-novgorod'),
-    path.join(rootDir, 'apps/public/public/images/venues/nizhny-novgorod'),
   ];
   for (const d of outDirs) fs.mkdirSync(d, { recursive: true });
 

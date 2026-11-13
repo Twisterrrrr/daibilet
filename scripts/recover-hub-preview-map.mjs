@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mapPath = path.join(root, 'apps/web/src/lib/city-place-images.ts');
-const venuesRoot = path.join(root, 'apps/public/public/images/venues');
+const venuesRoot = path.join(root, 'apps/web/public/images/venues');
 const lib = path.join(root, 'apps/web/src/lib');
 
 const KNOWN = [

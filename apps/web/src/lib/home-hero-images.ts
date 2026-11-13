@@ -1,6 +1,6 @@
 /**
  * Пул full-bleed hero для главной: tourist emotions (люди в городах РФ).
- * Эталон: apps/public/public/images/home/hero-emotion-*.jpg (sync → apps/web/public/images).
+ * Legacy assets were migrated to apps/web/public/images/home/.
  * Ротатор / CMS HeroBanner берут этот пул; без hydration flash на сервере.
  *
  * object-position: лица/глаза обычно в верхней трети кадра. При object-cover

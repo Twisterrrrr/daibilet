@@ -9,8 +9,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const sharp = createRequire(path.join(root, 'apps/web/package.json'))('sharp');
-const pub = path.join(root, 'apps/public/public/images/venues/moscow');
-const web = path.join(root, 'apps/web/public/images/venues/moscow');
+const pub = path.join(root, 'apps/web/public/images/venues/moscow');
 
 const stems = [
   'pamyatnik-a-s-pushkinu',
@@ -54,9 +53,6 @@ for (const stem of stems) {
   fs.renameSync(tmp, src);
   await write(src, path.join(pub, `${stem}-thumb.jpg`), 640, 70);
   await write(src, path.join(pub, `${stem}-card.jpg`), 960, 82);
-  for (const name of [`${stem}.jpg`, `${stem}-thumb.jpg`, `${stem}-card.jpg`]) {
-    fs.copyFileSync(path.join(pub, name), path.join(web, name));
-  }
   const size = fs.statSync(src).size;
   console.log(JSON.stringify({ stem, heroBytes: size }));
 }

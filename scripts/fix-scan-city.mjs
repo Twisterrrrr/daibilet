@@ -41,7 +41,7 @@ function run(label, args) {
 
 async function rethumbCityFolder(citySlug) {
   const sharp = createRequire(path.join(root, 'apps/web/package.json'))('sharp');
-  const dir = path.join(root, 'apps/public/public/images/venues', citySlug);
+  const dir = path.join(root, 'apps/web/public/images/venues', citySlug);
   if (!fs.existsSync(dir)) return { rethumb: 0 };
   const bases = fs
     .readdirSync(dir)

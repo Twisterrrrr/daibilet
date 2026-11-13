@@ -30,7 +30,7 @@ const IMAGE_MAP = new Map([
   ],
 ]);
 
-const publicDir = path.join(rootDir, 'apps/public/public');
+const publicDir = path.join(rootDir, 'apps/web/public');
 for (const imageUrl of new Set(IMAGE_MAP.values())) {
   const filePath = path.join(publicDir, imageUrl.replace(/^\//, ''));
   if (!fs.existsSync(filePath)) {

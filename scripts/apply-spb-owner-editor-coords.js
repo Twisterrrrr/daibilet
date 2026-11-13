@@ -9,10 +9,7 @@ const path = require('path');
 const rootDir = path.resolve(__dirname, '..');
 const RAW_PATH = path.join(rootDir, 'scripts/data/spb-owner-editor-coords-raw.txt');
 const LOCK_PATH = path.join(rootDir, 'scripts/data/spb-owner-editor-coords.json');
-const CITYINFO_PATHS = [
-  path.join(rootDir, 'apps/web/src/lib/cityInfo.ts'),
-  path.join(rootDir, 'apps/public/src/lib/cityInfo.ts'),
-];
+const CITYINFO_PATHS = [path.join(rootDir, 'apps/web/src/lib/cityInfo.ts')];
 const COORDS_TS = path.join(rootDir, 'apps/web/src/lib/city-place-coords.ts');
 const EDITORIAL_JSON = path.join(rootDir, 'scripts/data/must-see-editorial.json');
 const AUDIT_JS = path.join(rootDir, 'scripts/audit-cityinfo-yandex-coords.js');

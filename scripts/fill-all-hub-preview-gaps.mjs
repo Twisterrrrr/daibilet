@@ -22,7 +22,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..');
 const dry = process.argv.includes('--dry-run');
 const mapPath = path.join(root, 'apps/web/src/lib/city-place-images.ts');
-const venuesRoot = path.join(root, 'apps/public/public/images/venues');
+const venuesRoot = path.join(root, 'apps/web/public/images/venues');
 const lib = path.join(root, 'apps/web/src/lib');
 
 function loadSharp() {
