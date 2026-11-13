@@ -72,7 +72,7 @@ export function MyDaySavedScenariosRail({
       aria-label="Мои сценарии дня"
     >
       <p className="text-sm font-bold text-slate-900">Мои сценарии дня</p>
-      <p className="mt-0.5 text-xs text-slate-500">Снимки маршрута в этом браузере - нажмите, чтобы открыть</p>
+      <p className="mt-0.5 text-xs text-slate-500">Сохранены в этом браузере - нажмите, чтобы открыть</p>
       <div className="mt-3 flex flex-wrap gap-2">
         {scenarios.slice(0, 12).map((scenario) => {
           const on = scenario.id === activeId;

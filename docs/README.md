@@ -93,6 +93,7 @@
 
 | Документ | Описание |
 |----------|----------|
+| [My-day v2: аудит архитектуры и план перехода](./my-day-v2-architecture-2026-11-13.md) | Аудит V1 и безопасный план развития по шаблону v2 |
 | [catalog-location-venue-canon.md](./catalog-location-venue-canon.md) | **Канон:** Локация vs Площадка / антидубли |
 | [myday-commercial-canon.md](./myday-commercial-canon.md) | Канон «Мой день» (planner + checklist) |
 | [mvp-spec.md](./mvp-spec.md) | Продуктовая спецификация |

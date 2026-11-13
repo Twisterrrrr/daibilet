@@ -79,6 +79,7 @@ import {
 } from '@/components/DayRouteSearchSelect.client';
 import { SuburbsCarousel } from '@/components/SuburbsCarousel.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
+import { useUserAuthOptional } from '@/hooks/useUserAuth';
 import { catalogHrefWithSelectedCity, placesHubHrefWithSelectedCity } from '@/lib/catalog-url';
 import { matchDestination } from '@/lib/selected-city';
 import { preloadPlaceImages } from '@/lib/city-place-images';
@@ -442,14 +443,19 @@ function DayRoutePanelInner() {
 
   const searchParams = useSearchParams();
   const selectedCity = useSelectedCityOptional();
+  const userAuth = useUserAuthOptional();
+  const planParam = searchParams.get('plan');
   const itemsParam = searchParams.get('items');
   const cityParam = searchParams.get('city');
   const dayParam = searchParams.get('day');
+  const editorialRouteParam = searchParams.get('route');
   const [mounted, setMounted] = useState(false);
   const [route, setRoute] = useState<DayRouteState>(() =>
     typeof window === 'undefined' ? { cityId: null, venues: [] } : readDayRoute(),
   );
   const [payload, setPayload] = useState<MatchPayload | null>(null);
+  const [editorialRouteLabel, setEditorialRouteLabel] = useState<{ slug: string; title: string; description: string | null } | null>(null);
+  const [editorialRouteError, setEditorialRouteError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
   const [copyStatus, setCopyStatus] = useState<'idle' | 'ok' | 'err'>('idle');
@@ -518,6 +524,9 @@ function DayRoutePanelInner() {
   const [savedScenarios, setSavedScenarios] = useState<DayRouteSavedScenario[]>([]);
   const [scenarioBusy, setScenarioBusy] = useState(false);
   const [scenarioSheetOpen, setScenarioSheetOpen] = useState(false);
+  const [accountPlanBusy, setAccountPlanBusy] = useState(false);
+  const [accountPlanMessage, setAccountPlanMessage] = useState<string | null>(null);
+  const [accountPlanCode, setAccountPlanCode] = useState<string | null>(null);
 
   useEffect(() => setMounted(true), []);
 
@@ -699,8 +708,197 @@ function DayRoutePanelInner() {
     setCityInput(label);
   }, [selectedCity?.cityLabel, cityInput]);
 
-  // Share hydrate: prefer `?city=&items=` (viral); legacy `?day=` fallback.
+  // URL precedence: private account plan > editorial route > `items` > legacy `day`.
   useEffect(() => {
+    if (planParam) {
+      const key = `plan:${planParam}`;
+      if (hydratedDayRef.current === key) {
+        setReady(true);
+        return;
+      }
+      const token = userAuth?.token;
+      if (!token) {
+        if (userAuth?.isLoading) return;
+        setReady(true);
+        setEditorialRouteError('Войдите в аккаунт, чтобы открыть личный план.');
+        return;
+      }
+      const controller = new AbortController();
+      setReady(false);
+      setLoading(true);
+      setEditorialRouteError(null);
+      fetch(`/api/day-route/plans/${encodeURIComponent(planParam)}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        signal: controller.signal,
+      })
+        .then(async (response) => {
+          const body = await response.json() as { ok?: boolean; error?: string; plan?: {
+            title: string | null; citySlug: string | null; sourceRouteSlug: string | null;
+            travelMode: DayRouteTravelMode; hourStart: string; hourEnd: string; hourPlanOn: boolean;
+            stops: Array<{ sourceType: string; sourceId: string | null; title: string | null;
+              latitude: number | null; longitude: number | null; address: string | null; note: string | null;
+              dwellMinutes: number | null; startsAt: string | null; sessionLabel: string | null;
+              ticketBought: boolean; isSuburb: boolean }>;
+          } };
+          if (!response.ok || !body.plan) throw new Error(body.error || 'plan_unavailable');
+          return body.plan;
+        })
+        .then(async (saved) => {
+          if (controller.signal.aborted) return;
+          const locators = saved.stops.filter((stop) => stop.sourceId && !['CUSTOM', 'NOTE'].includes(stop.sourceType)).map((stop) => stop.sourceId!);
+          const matchResponse = locators.length ? await fetch(`/api/day-route/matches?venueIds=${encodeURIComponent(locators.join(','))}`, { signal: controller.signal }) : null;
+          const matched = matchResponse?.ok ? await matchResponse.json() as MatchPayload : null;
+          const byLocator = new Map<string, DayRouteVenueItem>();
+          for (const venue of matched?.venues || []) {
+            const item = matchVenueToDayRouteItem(venue);
+            for (const locator of [venue.id, venue.slug, venue.eventId, venue.eventSlug]) if (locator) byLocator.set(locator, item);
+          }
+          const cityOptions = selectedCity?.destinations?.length ? selectedCity.destinations : destinationsFallback;
+          const destination = saved.citySlug ? matchDestination(cityOptions, saved.citySlug) : null;
+          const items: DayRouteVenueItem[] = saved.stops.map((stop, index) => {
+            const custom = stop.sourceType === 'CUSTOM' || stop.sourceType === 'NOTE';
+            const base = stop.sourceId ? byLocator.get(stop.sourceId) : null;
+            const isNote = stop.sourceType === 'NOTE';
+            return {
+              ...(base || {}),
+              id: isNote ? `note_saved_${index}` : custom ? `text_saved_${index}` : base?.id || stop.sourceId || `saved_${index}`,
+              slug: custom ? null : base?.slug || stop.sourceId,
+              title: stop.title || base?.title || stop.sourceId || 'Точка маршрута',
+              city: destination?.type === 'city' ? destination.name : base?.city || null,
+              cityId: destination?.type === 'city' ? destination.id : base?.cityId || null,
+              citySlug: saved.citySlug || base?.citySlug || null,
+              address: stop.address ?? base?.address ?? null,
+              latitude: stop.latitude ?? base?.latitude ?? null,
+              longitude: stop.longitude ?? base?.longitude ?? null,
+              note: stop.note,
+              dwellMinutes: stop.dwellMinutes ?? undefined,
+              startsAt: stop.startsAt,
+              sessionLabel: stop.sessionLabel,
+              ticketBought: stop.ticketBought,
+              isSuburb: stop.isSuburb,
+            };
+          });
+          const next = replaceDayRouteFromVenues(items, destination?.type === 'city' ? destination.id : null);
+          skipUrlSyncRef.current = true;
+          setRoute(next);
+          setTravelMode(saved.travelMode);
+          setHourStart(saved.hourStart);
+          setHourEnd(saved.hourEnd);
+          setHourPlanOn(saved.hourPlanOn);
+          setEditorialRouteLabel(saved.sourceRouteSlug ? { slug: saved.sourceRouteSlug, title: saved.title || 'Мой план', description: null } : null);
+          setAccountPlanCode(planParam);
+          setEditorialRouteError(null);
+          hydratedDayRef.current = key;
+          setReady(true);
+        })
+        .catch((error: unknown) => {
+          if (controller.signal.aborted) return;
+          setEditorialRouteError(error instanceof Error && error.message === 'unauthorized' ? 'Войдите в аккаунт, чтобы открыть личный план.' : 'Не удалось открыть сохранённый план. Проверьте ссылку и войдите в аккаунт.');
+          setReady(true);
+        })
+        .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+      return () => controller.abort();
+    }
+
+    if (editorialRouteParam) {
+      const key = `route:${editorialRouteParam.trim().toLowerCase()}`;
+      if (hydratedDayRef.current === key) {
+        setReady(true);
+        return;
+      }
+
+      const controller = new AbortController();
+      setReady(false);
+      setLoading(true);
+      setEditorialRouteError(null);
+      setEditorialRouteLabel(null);
+      fetch(`/api/day-route/editorial?slug=${encodeURIComponent(editorialRouteParam)}`, {
+        signal: controller.signal,
+      })
+        .then(async (response) => {
+          const body = (await response.json()) as {
+            ok?: boolean;
+            error?: string;
+            route?: {
+              slug: string;
+              title: string;
+              description: string | null;
+              citySlug: string;
+              stops: Array<{
+                locator: string;
+                name: string;
+                desc: string | null;
+                address: string | null;
+                href: string | null;
+                imageUrl: string | null;
+                latitude: number | null;
+                longitude: number | null;
+                visitMinutes: number | null;
+                eventId?: string | null;
+                eventSlug?: string | null;
+                startsAt?: string | null;
+              }>;
+            };
+          };
+          if (!response.ok || !body.route) throw new Error(body.error || 'route_unavailable');
+          return body.route;
+        })
+        .then((editorial) => {
+          if (controller.signal.aborted) return;
+          const cityOptions = selectedCity?.destinations?.length
+            ? selectedCity.destinations
+            : destinationsFallback;
+          const matchedDestination = matchDestination(cityOptions, editorial.citySlug);
+          const destination = matchedDestination?.type === 'city' ? matchedDestination : null;
+          const nextItems: DayRouteVenueItem[] = editorial.stops.map((stop) => ({
+            id: stop.locator,
+            slug: stop.locator,
+            title: stop.name || stop.locator,
+            city: destination?.name || null,
+            cityId: destination?.id || null,
+            citySlug: editorial.citySlug,
+            href: stop.href,
+            imageUrl: stop.imageUrl,
+            address: stop.address,
+            latitude: stop.latitude,
+            longitude: stop.longitude,
+            eventId: stop.eventId || null,
+            eventSlug: stop.eventSlug || null,
+            startsAt: stop.startsAt || null,
+            dwellMinutes: stop.visitMinutes,
+          }));
+          const next = replaceDayRouteFromVenues(nextItems, destination?.id || null);
+          skipUrlSyncRef.current = true;
+          setRoute(next);
+          setPayload(null);
+          setEditorialRouteLabel({
+            slug: editorial.slug,
+            title: editorial.title,
+            description: editorial.description,
+          });
+          hydratedDayRef.current = key;
+          if (destination?.name && selectedCity?.setCity) {
+            void selectedCity.setCity(destination.name, { skipRouteConfirm: true });
+          }
+          setReady(true);
+        })
+        .catch((error: unknown) => {
+          if (controller.signal.aborted) return;
+          setEditorialRouteError(
+            error instanceof Error && error.message === 'ambiguous_route'
+              ? 'Этот маршрут временно недоступен.'
+              : 'Не удалось открыть готовый маршрут. Проверьте ссылку или выберите сценарий в городе.',
+          );
+          setReady(true);
+        })
+        .finally(() => {
+          if (!controller.signal.aborted) setLoading(false);
+        });
+      return () => controller.abort();
+    }
+
+    setEditorialRouteLabel(null);
+    setEditorialRouteError(null);
     const itemTokens = parseDayRouteItemsParam(itemsParam);
     const legacyTokens = itemTokens.length ? [] : parseDayRouteQueryParam(dayParam);
     if (!itemTokens.length && !legacyTokens.length) {
@@ -851,7 +1049,7 @@ function DayRoutePanelInner() {
       })
       .finally(() => setLoading(false));
     return () => controller.abort();
-  }, [itemsParam, cityParam, dayParam, destinationsFallback]);
+  }, [planParam, userAuth?.token, userAuth?.isLoading, editorialRouteParam, itemsParam, cityParam, dayParam, destinationsFallback, selectedCity?.destinations]);
 
   // Close share menu on outside click (desktop popover + mobile sheet).
   useEffect(() => {
@@ -1025,6 +1223,13 @@ function DayRoutePanelInner() {
       skipUrlSyncRef.current = false;
       return;
     }
+    if (accountPlanCode) {
+      const planPath = `/my-day?plan=${encodeURIComponent(accountPlanCode)}`;
+      const current = `${window.location.pathname}${window.location.search}`;
+      if (current !== planPath) replaceMyDayUrl(planPath);
+      return;
+    }
+    if (planParam) return;
     const syncCity =
       pageCitySlug ||
       dayRouteDominantCitySlug(route.venues) ||
@@ -1036,7 +1241,7 @@ function DayRoutePanelInner() {
     if (!route.venues.length && (itemsParam || dayParam)) return;
     if (!route.venues.length && !window.location.search) return;
     replaceMyDayUrl(nextPath);
-  }, [route.venues, ready, pageCitySlug, cityParam, itemsParam, dayParam]);
+  }, [route.venues, ready, pageCitySlug, cityParam, itemsParam, dayParam, planParam, accountPlanCode]);
 
   const afishaHref = catalogHrefWithSelectedCity(scopeCityParam || 'all');
   const placesHref = placesHubHrefWithSelectedCity(scopeCityParam);
@@ -2520,8 +2725,42 @@ function DayRoutePanelInner() {
     setScenarioSheetOpen(true);
   }
 
-  function commitScenarioSave(name: string) {
-    if (scenarioBusy || !route.venues.length) return;
+  async function savePlanToAccount() {
+    if (!userAuth?.token || accountPlanBusy || !route.venues.length) return;
+    setAccountPlanBusy(true);
+    setAccountPlanMessage(null);
+    try {
+      const response = await fetch('/api/day-route/plans', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${userAuth.token}` },
+        body: JSON.stringify({
+          code: accountPlanCode,
+          title: titleInput.trim() || editorialRouteLabel?.title || (scopeCityName ? `Мой день ${inCityPrepositional(scopeCityName)}` : 'Мой день'),
+          citySlug: scopeCitySlug || null,
+          sourceRouteSlug: editorialRouteLabel?.slug || null,
+          travelMode,
+          hourStart,
+          hourEnd,
+          hourPlanOn,
+          stops: route.venues,
+        }),
+      });
+      const body = await response.json() as { ok?: boolean; error?: string; plan?: { code: string } };
+      if (!response.ok || !body.plan?.code) throw new Error(body.error || 'save_failed');
+      setAccountPlanCode(body.plan.code);
+      const path = `/my-day?plan=${encodeURIComponent(body.plan.code)}`;
+      skipUrlSyncRef.current = true;
+      replaceMyDayUrl(path);
+      setAccountPlanMessage('План сохранён в аккаунте. Ссылка откроется после входа в ваш аккаунт.');
+    } catch {
+      setAccountPlanMessage('Не удалось сохранить план. Попробуйте ещё раз.');
+    } finally {
+      setAccountPlanBusy(false);
+    }
+  }
+
+  function commitScenarioSave(name: string): boolean {
+    if (scenarioBusy || !route.venues.length) return false;
     setScenarioBusy(true);
     try {
       const saved = saveDayRouteScenario({
@@ -2540,6 +2779,7 @@ function DayRoutePanelInner() {
         flashDayRouteFeedback(`Сценарий «${saved.name}» сохранён`);
         setDndAnnounce(`Сценарий «${saved.name}» сохранён.`);
       }
+      return Boolean(saved);
     } finally {
       setScenarioBusy(false);
     }
@@ -3533,6 +3773,21 @@ function DayRoutePanelInner() {
       data-day-mobile-view={mobileView}
       onKeyDownCapture={onMyDayListKeyDownCapture}
     >
+      {editorialRouteLabel ? (
+        <section className="mb-4 rounded-2xl border border-primary-100 bg-white px-4 py-3 shadow-sm" data-day-editorial-route>
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-primary-700">Готовый маршрут</p>
+          <h2 className="mt-0.5 text-base font-bold text-slate-900">{editorialRouteLabel.title}</h2>
+          {editorialRouteLabel.description ? (
+            <p className="mt-1 text-sm leading-relaxed text-slate-600">{editorialRouteLabel.description}</p>
+          ) : null}
+          <p className="mt-1 text-xs text-slate-500">Это ваша копия маршрута. Изменения не затронут исходный сценарий.</p>
+        </section>
+      ) : null}
+      {editorialRouteError ? (
+        <p role="alert" className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900" data-day-editorial-route-error>
+          {editorialRouteError}
+        </p>
+      ) : null}
       <div ref={listRootRef} className="min-w-0" data-day-list-root>
       {!isEmptyRoute ? (
         <>
@@ -3887,6 +4142,25 @@ function DayRoutePanelInner() {
           className="mt-4 w-full max-lg:rounded-2xl max-lg:bg-[#F5F5F7] max-lg:p-3 sm:mt-6"
           data-day-route-list-section
         >
+          <div className="mb-2 flex flex-wrap items-center gap-2" data-day-account-plan>
+            {userAuth?.isLoggedIn ? (
+              <button
+                type="button"
+                onClick={() => void savePlanToAccount()}
+                disabled={accountPlanBusy}
+                className="inline-flex min-h-9 items-center gap-2 rounded-full border border-emerald-300 bg-emerald-50 px-3.5 text-xs font-semibold text-emerald-800 hover:bg-emerald-100 disabled:opacity-50"
+              >
+                <Bookmark className="h-3.5 w-3.5" aria-hidden />
+                {accountPlanBusy ? 'Сохраняем…' : accountPlanCode ? 'Обновить план в аккаунте' : 'Сохранить в аккаунт'}
+              </button>
+            ) : (
+              <Link href={`/login?returnTo=${encodeURIComponent(planParam ? `/my-day?plan=${planParam}` : '/my-day')}`} className="inline-flex min-h-9 items-center rounded-full border border-slate-200 bg-white px-3.5 text-xs font-semibold text-slate-700 hover:bg-slate-50">
+                Войдите, чтобы сохранить план
+              </Link>
+            )}
+            {accountPlanMessage ? <span role="status" className="text-xs text-slate-600">{accountPlanMessage}</span> : null}
+            {accountPlanCode ? <Link href={`/my-day?plan=${encodeURIComponent(accountPlanCode)}`} className="text-xs font-medium text-primary-700 underline">Ссылка на план</Link> : null}
+          </div>
           <MyDayToolbar
             stopsCount={route.venues.length}
             stopsCountLabel={stopsCountLabel}

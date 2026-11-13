@@ -200,7 +200,7 @@ export function CityDayPresetBlock({
     setBusyId(id);
     applyNamedRoute(items);
     if (navigateToMyDay) {
-      router.push('/my-day');
+      router.push(id === 'default' ? '/my-day' : `/my-day?route=${encodeURIComponent(id)}`);
       return;
     }
     window.setTimeout(() => setBusyId(null), 400);

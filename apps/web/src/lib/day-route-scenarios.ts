@@ -4,7 +4,6 @@
 
 import {
   buildDayRouteSharePath,
-  clearDayRoute,
   createTextDayRouteStopId,
   hydrateDayRouteFromShare,
   parseDayRouteItemsParam,
@@ -24,6 +23,8 @@ export type DayRouteSavedScenario = {
   cityName: string | null;
   /** Share-format items param. */
   items: string;
+  /** Full local snapshot, including custom coordinates and planner edits. */
+  stops?: DayRouteVenueItem[];
   travelMode: DayRouteTravelMode;
   hourStart: string;
   hourEnd: string;
@@ -47,6 +48,13 @@ function safeParse(raw: string | null): DayRouteSavedScenario[] {
           citySlug: r.citySlug ? String(r.citySlug) : null,
           cityName: r.cityName ? String(r.cityName) : null,
           items: String(r.items || ''),
+          stops: Array.isArray(r.stops)
+            ? r.stops.filter((stop): stop is DayRouteVenueItem => {
+                if (!stop || typeof stop !== 'object') return false;
+                const item = stop as Partial<DayRouteVenueItem>;
+                return typeof item.id === 'string' && typeof item.title === 'string';
+              }).map((stop) => ({ ...stop }))
+            : undefined,
           travelMode: r.travelMode === 'auto' ? 'auto' : 'walk',
           hourStart: String(r.hourStart || '10:00'),
           hourEnd: String(r.hourEnd || '22:00'),
@@ -69,12 +77,13 @@ export function readDayRouteScenarios(): DayRouteSavedScenario[] {
   }
 }
 
-export function writeDayRouteScenarios(list: DayRouteSavedScenario[]): void {
-  if (typeof window === 'undefined') return;
+export function writeDayRouteScenarios(list: DayRouteSavedScenario[]): boolean {
+  if (typeof window === 'undefined') return false;
   try {
     localStorage.setItem(DAY_ROUTE_SCENARIOS_KEY, JSON.stringify(list.slice(0, 40)));
+    return true;
   } catch {
-    // ignore quota
+    return false;
   }
 }
 
@@ -116,6 +125,7 @@ export function saveDayRouteScenario(input: {
     citySlug: input.citySlug || null,
     cityName: input.cityName || null,
     items,
+    stops: input.venues.map((venue) => ({ ...venue })),
     travelMode: input.travelMode,
     hourStart: input.hourStart,
     hourEnd: input.hourEnd,
@@ -123,8 +133,8 @@ export function saveDayRouteScenario(input: {
     savedAt: Date.now(),
   };
   const prev = readDayRouteScenarios().filter((s) => s.name !== name);
-  writeDayRouteScenarios([entry, ...prev]);
-  return entry;
+  if (!writeDayRouteScenarios([entry, ...prev])) return null;
+  return readDayRouteScenarios().some((scenario) => scenario.id === entry.id) ? entry : null;
 }
 
 export function removeDayRouteScenario(id: string): void {
@@ -136,6 +146,13 @@ export function removeDayRouteScenario(id: string): void {
  * Catalog titles may be stubs until enrich runs in the panel.
  */
 export function applyDayRouteScenario(scenario: DayRouteSavedScenario): number {
+  if (scenario.stops?.length) {
+    const stops = scenario.stops.map((stop) => ({ ...stop }));
+    if (!writeDayRoute({ cityId: null, venues: stops })) return 0;
+    const savedIds = new Set(readDayRouteFresh().venues.map((stop) => stop.id));
+    return stops.every((stop) => savedIds.has(stop.id)) ? stops.length : 0;
+  }
+
   const tokens = parseDayRouteItemsParam(scenario.items);
   if (!tokens.length) return 0;
   // Prefer share hydrate path: text tokens + catalog locators as stubs.
@@ -159,8 +176,7 @@ export function applyDayRouteScenario(scenario: DayRouteSavedScenario): number {
     });
   }
   if (!venues.length) return 0;
-  clearDayRoute();
-  const next = hydrateDayRouteFromShare(venues, null);
-  writeDayRoute(next);
-  return readDayRouteFresh().venues.length;
+  hydrateDayRouteFromShare(venues, null);
+  const savedIds = new Set(readDayRouteFresh().venues.map((stop) => stop.id));
+  return venues.every((stop) => savedIds.has(stop.id)) ? venues.length : 0;
 }

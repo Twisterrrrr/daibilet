@@ -163,8 +163,8 @@ export function MyDayToolbar({
         {/* Full chrome: hidden while collapsed on every breakpoint. */}
         <div className={collapsed ? 'hidden' : undefined} data-my-day-toolbar-full>
         {/* 1-2. Stats + always-visible clear (owner: clear pictogram in route panel). */}
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex min-w-0 flex-wrap items-center gap-x-5 gap-y-1.5 text-sm">
+          <div className="flex items-start justify-between gap-3">
+          <div className="flex min-w-0 flex-wrap items-center gap-x-5 gap-y-1.5 text-sm" data-day-route-summary>
             <span className="inline-flex items-center gap-2 font-semibold text-slate-900">
               <MapPin className="h-4 w-4 shrink-0 text-primary-600" aria-hidden />
               <span data-day-route-count-heading>{stopsCountLabel}</span>
@@ -220,6 +220,12 @@ export function MyDayToolbar({
             </button>
           </div>
         </div>
+
+        {stopsCount > 0 ? (
+          <p className="mt-2 text-xs text-slate-500" data-day-route-estimate>
+            Время в пути и на местах рассчитано приблизительно
+          </p>
+        ) : null}
 
         {/* Atomic wrap groups: travel | optimize+hours+trash | export.
             Each cluster nowraps; the parent wraps whole clusters, not single buttons. */}

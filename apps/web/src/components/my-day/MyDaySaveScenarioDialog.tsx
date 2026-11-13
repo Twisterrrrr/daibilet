@@ -8,10 +8,10 @@ type MyDaySaveScenarioDialogProps = {
   defaultName: string;
   busy?: boolean;
   onClose: () => void;
-  onSave: (name: string) => void;
+  onSave: (name: string) => boolean;
 };
 
-/** Lovable-style «Сохранить как сценарий» - localStorage MVP, no cloud catalog. */
+/** Save a named route snapshot in this browser's local storage. */
 export function MyDaySaveScenarioDialog({
   open,
   defaultName,
@@ -20,11 +20,13 @@ export function MyDaySaveScenarioDialog({
   onSave,
 }: MyDaySaveScenarioDialogProps) {
   const [name, setName] = useState(defaultName);
+  const [saveError, setSaveError] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!open) return;
     setName(defaultName);
+    setSaveError(false);
     window.setTimeout(() => inputRef.current?.focus(), 60);
   }, [open, defaultName]);
 
@@ -43,7 +45,7 @@ export function MyDaySaveScenarioDialog({
     event.preventDefault();
     const trimmed = name.trim();
     if (!trimmed || busy) return;
-    onSave(trimmed);
+    setSaveError(!onSave(trimmed));
   }
 
   return (
@@ -66,10 +68,10 @@ export function MyDaySaveScenarioDialog({
               id="my-day-save-scenario-title"
               className="text-base font-bold text-slate-900"
             >
-              Сохранить как сценарий
+              Сохранить на этом устройстве
             </p>
             <p className="mt-0.5 text-sm text-slate-500">
-              Снимок маршрута в браузере - открывается из «Мои сценарии дня» в ленте маршрута.
+              Маршрут сохранится в этом браузере. Он не появится на других устройствах и не создаст ссылку для друзей.
             </p>
           </div>
           <button
@@ -98,6 +100,11 @@ export function MyDaySaveScenarioDialog({
               className="mt-1.5 w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-primary-400 disabled:opacity-60"
             />
           </label>
+          {saveError ? (
+            <p role="alert" className="text-sm text-rose-700">
+              Не удалось сохранить маршрут в этом браузере. Проверьте свободное место в хранилище и попробуйте ещё раз.
+            </p>
+          ) : null}
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <button
               type="button"

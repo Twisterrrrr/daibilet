@@ -8,6 +8,7 @@ import {
   createNoteDayRouteStopId,
   createTextDayRouteStopId,
   hydrateDayRouteFromShare,
+  readDayRouteFresh,
   type DayRouteVenueItem,
 } from '@/lib/day-route';
 import {
@@ -68,6 +69,10 @@ export function DayRouteSharePublicActions({ code, citySlug, longPath, stops }: 
       const venues = stopsToVenues(stops, citySlug);
       if (venues.length) {
         hydrateDayRouteFromShare(venues, citySlug);
+        const savedIds = new Set(readDayRouteFresh().venues.map((venue) => venue.id));
+        if (!venues.every((venue) => savedIds.has(venue.id))) {
+          throw new Error('local_save_failed');
+        }
       }
       setSaveOk(true);
       router.push(longPath || '/my-day');
