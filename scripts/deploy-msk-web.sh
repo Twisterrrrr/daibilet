@@ -24,6 +24,20 @@ cd "$APP_DIR"
 source "${APP_DIR}/deploy/scripts/deploy-runtime.sh"
 source "${DEPLOY_HANDOFF_DIR:-${APP_DIR}/deploy/scripts}/web-upstream-handoff.sh"
 
+# This script is uploaded and sourced before the production checkout advances
+# to DEPLOY_SHA, so deploy-runtime.sh may still be the previous version. Keep
+# this helper available in the current shell during the transition.
+if ! declare -F ensure_public_assets_deploy >/dev/null; then
+  ensure_public_assets_deploy() {
+    local images_dir="${APP_DIR}/apps/web/public/images"
+    if [[ ! -d "$images_dir" ]]; then
+      echo "ERROR: persistent nginx image root is missing: ${images_dir}" >&2
+      return 1
+    fi
+    echo "Using persistent nginx image root: ${images_dir} (legacy hydration disabled)"
+  }
+fi
+
 if [[ -z "$ARTIFACT" || ! -f "$ARTIFACT" ]]; then
   echo "ERROR: ARTIFACT path required (readable .tgz of apps/web/.next)" >&2
   exit 2
