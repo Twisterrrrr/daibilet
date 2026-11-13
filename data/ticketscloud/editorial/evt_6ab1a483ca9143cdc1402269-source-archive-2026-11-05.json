@@ -1,0 +1,64 @@
+{
+  "eventId": "evt_6ab1a483ca9143cdc1402269",
+  "eventTitle": "Сон у Красной горы | 14 ноября | Санкт-Петербург",
+  "eventPageId": "cc311a28-90c8-4674-8eca-2139581e2128",
+  "eventPageSlug": "son-u-krasnoi-gory-14-noyabrya-sankt-peterburg",
+  "archiveStatus": "UNUSED_ORIGINAL_SOURCE",
+  "retrievedAt": "2026-11-05",
+  "sourceSnapshot": {
+    "id": "evt_6ab1a483ca9143cdc1402269",
+    "kind": "SINGLE",
+    "slug": "сон-у-краснои-горы-14-ноября-санкт-петербург-6ab1a483ca9143cdc1402269",
+    "seoH1": null,
+    "title": "Сон у Красной горы | 14 ноября | Санкт-Петербург",
+    "sources": [
+      {
+        "code": "TICKETSCLOUD",
+        "name": "Ticketscloud",
+        "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ab1a483ca9143cdc1402269",
+        "externalId": "6ab1a483ca9143cdc1402269",
+        "metaExternalId": null
+      }
+    ],
+    "venueId": "venue_5c236babbf89d4000bf868dd",
+    "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6ab7a829ca3f3c0d2c245dd1.jpg",
+    "seoTitle": null,
+    "cityTitle": "Санкт-Петербург",
+    "venueTitle": "ДК Железнодорожников",
+    "description": null,
+    "isIndexable": true,
+    "purchaseFlow": "EXTERNAL",
+    "venueAddress": "Тамбовская, 63",
+    "canonicalPath": null,
+    "primaryCityId": "city_498817",
+    "supplierTitle": null,
+    "managementMode": "SOURCE_MANAGED",
+    "seoDescription": null,
+    "shortDescription": null
+  },
+  "originalDescription": null,
+  "previousEventOverride": "Сон у Красной горы | 14 ноября | Санкт-Петербург - мероприятие в Санкт-Петербурге, на площадке «ДК Железнодорожников». Программа идёт от начала до конца в одном зале: зрители находятся внутри действия, а не смотрят его со стороны. Многое решают детали: обстановка, общение и то, что происходит в зале. Приятный вариант и для компании, и для спокойного вечера вдвоём. Выходной днём - удобно: вечер остаётся свободным.\n\n## Практическая информация\n\n- Место - «ДК Железнодорожников», Санкт-Петербург\n- Адрес - Тамбовская, 63\n- Продолжительность - около 120 минут\n- Возрастное ограничение - 6+\n- Билеты - от 2 400 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+  "activeSessions": [
+    {
+      "startsAt": "2026-11-14T14:00:00",
+      "endsAt": "2026-11-14T16:00:00",
+      "priceFromRub": 2500
+    }
+  ],
+  "activeOffers": [
+    {
+      "title": "Партер",
+      "priceRub": 2500
+    },
+    {
+      "title": "Партер",
+      "priceRub": 3000
+    },
+    {
+      "title": "Партер",
+      "priceRub": 3500
+    }
+  ],
+  "originalEffectiveChars": 691,
+  "rewriteMainChars": 943
+}

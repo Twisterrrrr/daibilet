@@ -1,0 +1,58 @@
+{
+  "capturedAt": "2026-11-10T04:43:49.227Z",
+  "provider": "teplohod",
+  "entries": [
+    {
+      "eventId": "evt_tep_1276",
+      "eventPageId": "5606c7c0-d517-4ea3-acbf-32c32f4c0a78",
+      "eventPageSlug": "novogodnii-korporativ-17-23-i-24-dekabrya-2026-na-teplohode-river-palas-s-kruizom-i-razvlekatelnoi-programmoi-moskva",
+      "title": "Новогодний корпоратив 17, 23, 24 и 26 декабря 2026 на теплоходе Ривер Палас с круизом и развлекательной программой",
+      "city": "Москва",
+      "sourceDescription": "<p><strong>Начало мероприятия: 18:00 </strong></p><p>17:30 сбор гостей</p><p>18:00 отправление теплохода</p><p>23:00 окончание мероприятия</p>",
+      "sourceChars": 99,
+      "sourceSessionStarts": [
+        {
+          "id": "sess_tep_674153",
+          "endsAt": "2026-12-17 20:00:00",
+          "startsAt": "2026-12-17 15:00:00",
+          "priceFromRub": 18990
+        },
+        {
+          "id": "sess_tep_674154",
+          "endsAt": "2026-12-23 20:00:00",
+          "startsAt": "2026-12-23 15:00:00",
+          "priceFromRub": 18990
+        },
+        {
+          "id": "sess_tep_674155",
+          "endsAt": "2026-12-24 20:00:00",
+          "startsAt": "2026-12-24 15:00:00",
+          "priceFromRub": 18990
+        },
+        {
+          "id": "sess_tep_688907",
+          "endsAt": "2026-12-26 20:00:00",
+          "startsAt": "2026-12-26 15:00:00",
+          "priceFromRub": 18990
+        }
+      ]
+    },
+    {
+      "eventId": "evt_tep_1259",
+      "eventPageId": "feda2d30-8788-4184-8c7d-299459d620af",
+      "eventPageSlug": "novogodnii-korporativ-18-i-25-dekabrya-2026-na-teplohode-river-palas-s-kruizom-i-razvlekatelnoi-programmoi-moskva",
+      "title": "Новогодний корпоратив 18 и 25 декабря 2026 на теплоходе Ривер Палас с круизом и развлекательной программой",
+      "city": "Москва",
+      "sourceDescription": "<p><strong>Начало мероприятия:&nbsp;</strong></p><p>17:30 сбор гостей</p><p>18:00 отправление теплохода</p><p>23:00 окончание мероприятия</p>",
+      "sourceChars": 99,
+      "sourceSessionStarts": [
+        {
+          "id": "sess_tep_674151",
+          "endsAt": "2026-12-18 20:00:00",
+          "startsAt": "2026-12-18 15:00:00",
+          "priceFromRub": 28500
+        }
+      ]
+    }
+  ]
+}\n

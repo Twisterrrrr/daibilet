@@ -10,6 +10,7 @@ import {
   needsVenueSitemapDetailCheck,
   publicVenueRowMatchesCityFilter,
   publicVenuesForSessionsFromHub,
+  resolvePublicVenuesForSessions,
   resolvePublicVenueCanonicalPath,
   resolvePublicVenueKind,
   scoreRelatedVenueCandidate,
@@ -33,13 +34,30 @@ test('venue list applies the detail indexability gate and canonical resolver', (
     futureSessionCount: 2, events: 4,
   };
   assert.equal(mapPublicVenueListItem(base).isIndexable, false);
-  assert.equal(mapPublicVenueListItem({ ...base, futureSessionCount: 3 }).isIndexable, true);
+  assert.equal(mapPublicVenueListItem({ ...base, futureSessionCount: 3 }).isIndexable, false);
+  assert.equal(mapPublicVenueListItem({ ...base, pageStatus: 'PUBLISHED', isIndexable: false, futureSessionCount: 0 }).isIndexable, true);
   const museum = mapPublicVenueListItem({
     ...base, kind: 'MUSEUM_ART_SPACE', slug: 'muzei-im-n-ostrovskogo',
     canonicalPath: '/venues/музеи-им-н-островского-5d61087e6be9adfb0dd8425b',
     futureSessionCount: 3,
   });
   assert.equal(museum.canonicalPath, '/venues/muzei-im-n-ostrovskogo');
+});
+
+test('city venue links use session relationships for event counters instead of stale hub zeros', async () => {
+  const id = 'venue_maikop_hall';
+  const hubRows = [{
+    id, slug: 'grand-hall', name: 'Grand Hall', title: 'Grand Hall', city: 'Майкоп',
+    kind: 'CONCERT_HALL', pageStatus: 'candidate', events: 0, mergedVenueIds: [id],
+  }];
+  const sessions = [
+    { id: 'event-1', venueId: id, groupKey: 'event-1' },
+    { id: 'event-2', venueId: id, groupKey: 'event-2' },
+    { id: 'event-3', venueId: id, groupKey: 'event-3' },
+  ];
+  const venues = await resolvePublicVenuesForSessions({ query: async () => ({ rows: [] }) }, sessions, hubRows, 24);
+  assert.equal(venues[0]?.events, 3);
+  assert.equal(venues[0]?.futureSessionCount, 3);
 });
 
 test('sitemap verifies pier-like rows against the authoritative detail type', () => {
@@ -313,6 +331,21 @@ test('lookupVenueCatalogSessions drops foreign-city name twins', () => {
   });
   assert.equal(filtered.length, 1);
   assert.equal(filtered[0].id, 'sess-spb');
+});
+
+test('venue city filter treats legacy Maikop and public Maykop slugs as the same city', () => {
+  const event = {
+    id: 'evt-uglystephan-maykop',
+    venueId: 'venue_portal_maykop',
+    city: 'Майкоп',
+    citySlug: 'maykop',
+  };
+  const filtered = filterSessionsToVenueCity([event], {
+    city: 'Майкоп',
+    citySlug: 'маикоп',
+  });
+  assert.equal(filtered.length, 1);
+  assert.equal(filtered[0].id, event.id);
 });
 
 test('saleable fortress is one museum card, not a parallel sight', () => {

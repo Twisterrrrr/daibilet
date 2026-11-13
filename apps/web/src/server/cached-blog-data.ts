@@ -13,6 +13,7 @@ import {
   type BlogArticleDto,
   type BlogCardDto,
   splitBlogListingHero,
+  sortBlogCardsByPublishedAt,
 } from '@/lib/blog-utils';
 import { BLOG_PAGE_CACHE_TAG, PUBLIC_PAGE_REVALIDATE } from '@/server/cache-config';
 import { fetchPublicApiJson } from '@/server/public-api-client';
@@ -92,6 +93,7 @@ async function loadBlogPageData(): Promise<BlogPageData> {
     // fallback to static posts
   }
 
+  posts = sortBlogCardsByPublishedAt(posts);
   const { featured, hot } = splitBlogListingHero(posts);
   const promoPosts = [featured, ...hot].filter(Boolean) as BlogCardDto[];
 

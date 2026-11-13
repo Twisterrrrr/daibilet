@@ -22,6 +22,17 @@
 [Зависание SSR и ответы 502 роботам - 16.10.2026](./ssr-hang-crawler-2026-10-16.md)
 [Teplohod: baseline Sharp и Next Image Optimizer - 21.10.2026](./teplohod-image-optimization-experiment-2026-10-21.md)
 [Teplohod PDP: выборочные статические WebP обложки - 21.10.2026](./teplohod-pdp-webp-pilot-2026-10-21.md)
+[Городские хабы: сверка коммитов и незавершённых правок - 12.11.2026](./city-hub-work-log-2026-11-12.md)
+[Архив изображений и переход на активную статику - 13.11.2026](./image-archive-runtime-migration-2026-11-13.md)
+[Карта рабочих копий и переносов - 10.11.2026](./local-workspace-inventory-2026-11-10.md)
+[Сверка tours с активной копией Daibilet - 10.11.2026](./tours-vs-daibilet-audit-2026-11-10.md)
+[Диагностика production-сети и диска](./production-network-and-disk-diagnostics.md)
+[Индексируемые EventPage с активными рерайтами - 12.11.2026](./eventpage-rewrite-recrawl-queue-2026-11-12.md)
+[Редакторский батч EventPage: 30 текстов, источники и сверка - 11.11.2026](./eventpage-rewrite-batch-30-source-audit-2026-11-11.md)
+[Рерайты EventPage: production apply и редакционные источники - 05.11.2026](./eventpage-rewrite-production-apply-2026-11-05.md)
+[Аудит источников редакционных EventPage - 04.11.2026](./eventpage-editorial-source-audit-2026-11-04.md)
+[Новогодние EventPage B01–B03: production apply - 10.11.2026](./archives/new-year-batches-b01-b03-production-2026-11-10.md)
+[Архив редакционных правок EventPage - 09–10.11.2026](./eventpage-editorial-archive-2026-11-09-10.md)
 [ISR 500 на удалённых событиях - 21.10.2026](./event-not-found-ssr-regression-2026-10-21.md)
 
 Навигация по репозиторию `Twisterrrrr/daibilet`.

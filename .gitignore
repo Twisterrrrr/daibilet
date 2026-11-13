@@ -17,10 +17,11 @@ dist/
 **/dist/
 .vite/
 **/.vite/
-apps/web/public/images/
-!apps/web/public/images/
+apps/web/public/images/**
 !apps/web/public/images/venues/
+apps/web/public/images/venues/**
 !apps/web/public/images/venues/ulyanovsk/
+apps/web/public/images/venues/ulyanovsk/**
 !apps/web/public/images/venues/ulyanovsk/*-generated.png
 !apps/web/public/images/venues/ulyanovsk/*-commons.jpg
 

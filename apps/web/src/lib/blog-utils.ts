@@ -445,7 +445,7 @@ export function splitBlogSeriesHeroTitle(
 
 /**
  * Hero / feed split for `/blog`:
- * - featured = first `isFeatured` card, else first in the given order
+ * - featured = newest published card (an editorial pin must not bury newer articles)
  * - feed = everything except featured (no duplicate in magazine first slot)
  * - hot = next 3 for «Свежее» sidebar
  */
@@ -459,16 +459,47 @@ export function splitBlogListingHero(
 } {
   if (!posts.length) return { featured: null, feed: [], hot: [] };
 
-  const featured = posts.find((post) => post.isFeatured === true) || posts[0] || null;
+  const orderedPosts = sortBlogCardsByPublishedAt(posts);
+  const featured = orderedPosts[0] || null;
   if (!featured) return { featured: null, feed: [], hot: [] };
 
-  const feed = posts.filter((post) => post.slug !== featured.slug);
+  const feed = orderedPosts.filter((post) => post.slug !== featured.slug);
   const limit = Math.max(1, Math.min(hotLimit, 3));
   return {
     featured,
     feed,
     hot: feed.slice(0, limit),
   };
+}
+
+const BLOG_RUSSIAN_MONTHS: Record<string, number> = {
+  январь: 0, января: 0, янв: 0,
+  февраль: 1, февраля: 1, февр: 1,
+  март: 2, марта: 2, мар: 2,
+  апрель: 3, апреля: 3, апр: 3,
+  май: 4, мая: 4,
+  июнь: 5, июня: 5, июн: 5,
+  июль: 6, июля: 6, июл: 6,
+  август: 7, августа: 7, авг: 7,
+  сентябрь: 8, сентября: 8, сент: 8, сен: 8,
+  октябрь: 9, октября: 9, окт: 9,
+  ноябрь: 10, ноября: 10, нояб: 10,
+  декабрь: 11, декабря: 11, дек: 11,
+};
+
+/** Public blog order is chronological; `isFeatured` is editorial metadata, not a pin. */
+export function sortBlogCardsByPublishedAt(posts: BlogCardDto[]): BlogCardDto[] {
+  return [...posts].sort((a, b) => {
+    const time = (post: BlogCardDto) => {
+      const published = Date.parse(String(post.publishedAt || ''));
+      if (Number.isFinite(published)) return published;
+      const match = String(post.editorialDate || '').trim().match(/^(\d{1,2})\s+([а-яё]+)\s+(\d{4})$/iu);
+      if (!match) return 0;
+      const month = BLOG_RUSSIAN_MONTHS[match[2].toLocaleLowerCase('ru-RU')];
+      return month == null ? 0 : Date.UTC(Number(match[3]), month, Number(match[1]));
+    };
+    return time(b) - time(a);
+  });
 }
 
 /** ISO week key `YYYY-Www` for SSR-stable weekly picks (UTC). */

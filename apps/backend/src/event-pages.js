@@ -759,10 +759,12 @@ export async function resolvePublicEventPageEventIds(db, eventPageId, directEven
  * one explicit Ticketscloud parent may add a same-city sibling to its page.
  * New standalone pages remain private candidates until editorial review.
  */
-export async function ensureDraftEventPageForEvent(client, eventId) {
+export async function ensureDraftEventPageForEvent(client, eventId, { skipEventAdvisoryLock = false } = {}) {
   if (!client || typeof client.query !== 'function') throw new Error('A PostgreSQL query client is required');
-  const lockKey = `event-page-event:${eventId}`;
-  await client.query('SELECT pg_advisory_xact_lock(hashtext($1))', [lockKey]);
+  if (!skipEventAdvisoryLock) {
+    const lockKey = `event-page-event:${eventId}`;
+    await client.query('SELECT pg_advisory_xact_lock(hashtext($1))', [lockKey]);
+  }
   const existing = await client.query(`
     SELECT page.id, page.slug
     FROM "EventPageEvent" link JOIN "EventPage" page ON page.id = link."eventPageId"

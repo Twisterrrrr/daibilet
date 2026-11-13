@@ -47,8 +47,6 @@ type CatalogResultsProps = {
   sort?: string | null;
   /** Date/category/q/etc. active - keep filter-reset primary, city hubs secondary. */
   hasExtraFilters?: boolean;
-  /** Items already surfaced in the editorial affiche block. */
-  excludeEventIds?: readonly string[];
 };
 
 const CATALOG_EMPTY_CITY_HUBS = [
@@ -187,7 +185,6 @@ export function CatalogResults({
   city,
   sort,
   hasExtraFilters = false,
-  excludeEventIds = [],
 }: CatalogResultsProps) {
   const filtersLayout = useCatalogFiltersLayout();
   const filtersCollapsed = filtersLayout?.desktopCollapsed ?? false;
@@ -198,14 +195,12 @@ export function CatalogResults({
   // Owner 2026-08-13: temporarily hide «Сейчас выбирают» / «Популярное сейчас» rail on /events.
   const SHOW_CATALOG_LIVE_RAIL = false;
   const showLiveRail = SHOW_CATALOG_LIVE_RAIL && liveRailItems.length >= 3 && viewMode === 'cards';
-  const spotlightIds = new Set(excludeEventIds);
   // Keep «Сейчас выбирают» / «Популярное сейчас» from mirroring the first page of cards 1:1.
   const listItemsWithoutLiveRail = showLiveRail
     ? catalogItems.filter((item) => !liveRailItems.some((rail) => rail.id === item.id))
     : catalogItems;
-  const listItems = spotlightIds.size
-    ? listItemsWithoutLiveRail.filter((item) => !spotlightIds.has(item.id))
-    : listItemsWithoutLiveRail;
+  // «Стоит увидеть» is a duplicate city-popular rail; its events remain in the catalog below.
+  const listItems = listItemsWithoutLiveRail;
   const gridRef = useRef<HTMLUListElement>(null);
   const columnsPerRow = useCatalogGridColumnCount(gridRef, filtersCollapsed, listItems.length);
   const gridEntries = useMemo(

@@ -291,16 +291,7 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
               className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
             />
           </Field>
-          <label className="flex items-center gap-2 text-sm text-slate-700">
-            <input
-              type="checkbox"
-              name="isIndexable"
-              defaultChecked={detail.isIndexable}
-              className="h-4 w-4 rounded border-slate-300"
-            />
-            Индексировать
-          </label>
-          <p className="text-xs text-slate-500">Новые карточки-кандидаты создаются с noindex. Для индексации редактор отдельно проверяет страницу, меняет статус на «Опубликована» и включает этот флажок.</p>
+          <p className="text-xs text-slate-500">Кандидат доступен как базовая страница с noindex. После редакторской проверки статус «Опубликована» включает индексацию; наличие активных продаж на это не влияет.</p>
           <button
             type="submit"
             className="rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800"

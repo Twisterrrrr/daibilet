@@ -1,0 +1,49 @@
+{
+  "eventId": "evt_69a89734965828fe050d6909",
+  "eventPageId": "8afe05e6-20e0-4ff3-b5fb-d94b89eacb75",
+  "eventPageSlug": "diskoteka-hit-za-hitom-tula",
+  "archiveStatus": "UNUSED_ORIGINAL_SOURCE",
+  "retrievedAt": "2026-11-05",
+  "sourceSnapshot": {
+    "id": "evt_69a89734965828fe050d6909",
+    "kind": "SINGLE",
+    "slug": "tc-69a89734965828fe050d6909-дискотека-хит-за-хитом",
+    "seoH1": null,
+    "title": "Дискотека Новогодний Огонек",
+    "sources": [
+      {
+        "code": "TICKETSCLOUD",
+        "name": "Ticketscloud",
+        "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=69a89734965828fe050d6909",
+        "externalId": "69a89734965828fe050d6909",
+        "metaExternalId": null
+      }
+    ],
+    "venueId": "venue_6751bcf5823a4dc1df4c179c",
+    "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ace3da215192a6c139bfc03.png",
+    "seoTitle": null,
+    "cityTitle": "Тула",
+    "venueTitle": "MINI by Concert Hall",
+    "description": null,
+    "isIndexable": true,
+    "purchaseFlow": "EXTERNAL",
+    "venueAddress": "наб. Дрейера, 54",
+    "canonicalPath": null,
+    "primaryCityId": "city_480562",
+    "supplierTitle": null,
+    "managementMode": "SOURCE_MANAGED",
+    "seoDescription": null,
+    "shortDescription": null
+  },
+  "originalDescription": null,
+  "previousEventOverride": "«Дискотека Новогодний Огонек» - поп-концерт на площадке «MINI by Concert Hall» в Туле.\n\n## Практическая информация\n\n- Место - «MINI by Concert Hall», Тула\n- Адрес - наб. Дрейера, 54\n- Продолжительность - около 120 минут\n- Возрастное ограничение - 16+\n- Билеты - от 2 000 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+  "activeSessions": [
+    {
+      "start": "2027-01-04T17:00:00",
+      "end": "2027-01-04T19:00:00",
+      "price": 2000
+    }
+  ],
+  "mainChars": 516,
+  "previousEffectiveChars": 353
+}

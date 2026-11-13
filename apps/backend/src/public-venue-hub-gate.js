@@ -102,6 +102,11 @@ export function evaluateVenueDetailContentGate(row, resolvedPublicKind, pageTemp
   const hasAddress = Boolean(String(row.address || '').trim());
   const hasDescription = Boolean(String(row.description || row.shortDescription || '').trim());
   const hasAddressProfile = hasAddress && hasDescription;
+  // Imported candidates are public as basic noindex PDPs. Missing editorial
+  // copy is a completion task, not a reason to make their URLs return 404.
+  if (status === 'CANDIDATE') {
+    return { available: true, reason: 'candidate_basic_page' };
+  }
   if (isContentPlaceHubEligible(row, resolvedPublicKind)) {
     return { available: true, reason: 'content_place' };
   }

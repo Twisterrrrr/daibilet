@@ -88,6 +88,10 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
   const [loading, setLoading] = useState(() => !initialCatalog);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [popularSpotlight, setPopularSpotlight] = useState<{
+    cityKey: string;
+    items: PublicCatalogListItemDto[];
+  } | null>(null);
   const [viewMode, setViewModeState] = useState<CatalogViewMode>('cards');
   const pagingModeRef = useRef<'replace' | 'append'>('replace');
   const fetchedQueryKeyRef = useRef('');
@@ -451,12 +455,64 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
   );
   const spotlightItems = useMemo(
     () =>
-      catalog && viewMode === 'cards' && !hasExtraCatalogFilters
-        ? pickCatalogZenSpotlightItems(catalog.items)
+      viewMode === 'cards' &&
+      !hasExtraCatalogFilters &&
+      popularSpotlight?.cityKey === String(filterValues.city || '').trim().toLowerCase()
+        ? popularSpotlight.items
         : [],
-    [catalog, viewMode, hasExtraCatalogFilters],
+    [filterValues.city, viewMode, hasExtraCatalogFilters, popularSpotlight],
   );
-  const spotlightIds = useMemo(() => spotlightItems.map((item) => item.id), [spotlightItems]);
+
+  useEffect(() => {
+    const city = String(filterValues.city || '').trim();
+    const cityKey = city.toLowerCase();
+    if (
+      !city ||
+      cityBootstrapPending ||
+      needsCityGate ||
+      viewMode !== 'cards' ||
+      hasExtraCatalogFilters
+    ) {
+      setPopularSpotlight(null);
+      return;
+    }
+
+    const controller = new AbortController();
+    let cancelled = false;
+    const timeoutId = window.setTimeout(() => {
+      controller.abort();
+    }, catalogClientFetchTimeoutMs(CATALOG_PAGE_SIZE_DEFAULT));
+    setPopularSpotlight((current) => (current?.cityKey === cityKey ? current : null));
+
+    const params = buildCatalogApiSearchParams({
+      city,
+      sort: 'popular',
+      limit: CATALOG_PAGE_SIZE_DEFAULT,
+    }, 1);
+    fetch(`/api/public/events?${params.toString()}`, { signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) throw new Error('popular_spotlight_fetch_failed');
+        return response.json() as Promise<PublicCatalogDto>;
+      })
+      .then((payload) => {
+        if (cancelled) return;
+        setPopularSpotlight({
+          cityKey,
+          items: pickCatalogZenSpotlightItems(payload.items),
+        });
+      })
+      .catch((fetchError) => {
+        if (cancelled || (fetchError instanceof Error && fetchError.name === 'AbortError')) return;
+        setPopularSpotlight({ cityKey, items: [] });
+      })
+      .finally(() => window.clearTimeout(timeoutId));
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeoutId);
+      controller.abort();
+    };
+  }, [cityBootstrapPending, filterValues.city, hasExtraCatalogFilters, needsCityGate, viewMode]);
 
   if (needsCityGate) {
     return <EventsCityGate />;
@@ -471,8 +527,6 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
       layout="split"
     >
       {({ filtersButton, quickSelectors }) => <>
-      {spotlightItems.length ? <CatalogZenSpotlight items={spotlightItems} /> : null}
-
       {/* Count on sm+; sort + page size + view stay on one row.
           Active filter chips live under H1 in EventsCatalogHero. */}
       <div
@@ -554,6 +608,8 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
         </div>
       </div>
 
+      {spotlightItems.length ? <CatalogZenSpotlight items={spotlightItems} /> : null}
+
       {(loading && !catalog) || (cityBootstrapPending && !catalog) ? (
         <CatalogCardSkeletonGrid />
       ) : (
@@ -564,7 +620,6 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
           city={filterValues.city}
           sort={filterValues.sort}
           hasExtraFilters={hasExtraCatalogFilters}
-          excludeEventIds={spotlightIds}
           clearHref={buildCatalogHref({
             city: filterValues.city,
             sort: filterValues.sort,

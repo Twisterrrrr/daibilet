@@ -1,5 +1,27 @@
 # Decision Log — Daibilet
 
+## 2026-11-12 — Imported place candidate versus editorial PDP
+
+**Decision:** An imported Venue with `pageStatus=CANDIDATE` is a public,
+accessible basic PDP and must return HTTP 200 with `noindex, follow` by default.
+Missing editorial fields must not turn that candidate route into a 404; they
+remain visible as completion requirements in the editor. After an editor
+completes and publishes the PDP, it becomes indexable and enters the public
+sitemap. `HIDDEN` remains unavailable. Do not expose draft editorial content
+while serving the candidate page.
+
+**Why:** Availability and search indexing are separate controls. Imported
+places should be reviewable and usable as simple informational cards before
+they have a full editorial profile or sales contract; publication is the
+editorial gate for search.
+
+**Implementation status:** Implemented on 2026-11-12: CANDIDATE detail routes
+bypass missing-copy gates and remain noindex; the admin derives indexation from
+editorial status; PUBLISHED pages are indexable regardless of ticket
+availability and remain eligible for sitemap verification. City-page venue
+counters are recalculated from the matched session-to-venue links. Regression
+tests and typechecks pass locally; staging verification is pending.
+
 ## 2026-10-27 — EventPage candidate slug drops the provider slot ID
 
 When preparing an EventPage slug, remove the Ticketscloud 24-character ID only
