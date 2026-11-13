@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 
 import { EventsV2Preview } from '@/components/EventsV2Preview';
 import { SiteLayout } from '@/components/SiteLayout';
-import { getHomeCatalog } from '@/server/cached-home-data';
+import { mergeBlogCards, type BlogCardDto } from '@/lib/blog-utils';
+import { getHomeArticles, getHomeCatalog, getHomeLandings } from '@/server/cached-home-data';
 import type { PublicCatalogDto } from '@daibilet/contracts/public';
 import '@/lib/env';
 import '@/styles/v2-events.css';
@@ -24,9 +25,12 @@ const EMPTY: PublicCatalogDto = {
 
 export default async function Afisha2Page() {
   const catalog = await getHomeCatalog().catch(() => EMPTY);
+  const landings = (await getHomeLandings().catch(() => null))?.items ?? [];
+  const rawArticles = (await getHomeArticles().catch(() => null))?.articles;
+  const articles = mergeBlogCards((rawArticles as BlogCardDto[] | null) ?? null);
   return (
     <SiteLayout chromeVariant="v2">
-      <EventsV2Preview catalog={catalog} />
+      <EventsV2Preview catalog={catalog} landings={landings} articles={articles} />
     </SiteLayout>
   );
 }

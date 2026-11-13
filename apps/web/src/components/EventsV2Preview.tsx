@@ -1,10 +1,13 @@
 import Link from 'next/link';
+import { Fragment } from 'react';
 import { Search } from 'lucide-react';
 
 import { SafeImage } from '@/components/SafeImage.client';
 import { V2EventCard } from '@/components/V2EventCard';
 import { fontUnbounded } from '@/lib/fonts';
-import type { PublicCatalogDto } from '@daibilet/contracts/public';
+import { pluralEvents } from '@/lib/format';
+import type { BlogCardDto } from '@/lib/blog-utils';
+import type { PublicCatalogDto, PublicLandingDto } from '@daibilet/contracts/public';
 
 const DOW = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
 const MONTH = ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
@@ -33,10 +36,28 @@ function calendar(items: { startsAt: string }[]) {
   return tiles;
 }
 
-export function EventsV2Preview({ catalog }: { catalog: PublicCatalogDto }) {
+type Props = {
+  catalog: PublicCatalogDto;
+  landings?: PublicLandingDto[];
+  articles?: BlogCardDto[];
+};
+
+export function EventsV2Preview({ catalog, landings = [], articles = [] }: Props) {
   const items = catalog?.items ?? [];
   const cats = catalog?.facets?.categories ?? [];
-  const featured = items.slice(0, 2);
+  const featured = items.filter((it) => it.imageUrl).slice(0, 2);
+
+  const groups: Array<{ category: string; items: typeof items }> = [];
+  for (const it of items) {
+    const key = it.category || 'Другое';
+    let group = groups.find((g) => g.category === key);
+    if (!group) {
+      group = { category: key, items: [] };
+      groups.push(group);
+    }
+    group.items.push(it);
+  }
+  const rails = groups.filter((g) => g.items.length >= 2);
 
   return (
     <div className={`v2 ${fontUnbounded.variable}`}>
@@ -88,14 +109,49 @@ export function EventsV2Preview({ catalog }: { catalog: PublicCatalogDto }) {
             </section>
           ) : null}
 
-          <section className="section carousel">
-            <div className="container">
-              <div className="carousel__head">
-                <div><h2>Ближайшие события</h2><p>{items.length} событий · выбрано редакцией</p></div>
+          {landings.length ? (
+            <section className="section">
+              <div className="container">
+                <div className="bottom-cta__inner">
+                  <div>
+                    <h2>Подборки</h2>
+                    <p>{landings.slice(0, 3).map((l) => l.title).join(' · ')}</p>
+                  </div>
+                  <Link href="/podborki" className="btn btn--white btn--lg">Смотреть подборки →</Link>
+                </div>
               </div>
-              <div className="scroller">{items.slice(0, 12).map((item) => <V2EventCard key={item.id} item={item} />)}</div>
-            </div>
-          </section>
+            </section>
+          ) : null}
+
+          {rails.map((group, idx) => (
+            <Fragment key={group.category}>
+              <section className="section carousel">
+                <div className="container">
+                  <div className="carousel__head">
+                    <div>
+                      <h2>{group.category}</h2>
+                      <p>{pluralEvents(group.items.length)} · выбор редакции</p>
+                    </div>
+                    <Link href="/events" className="link-more">Смотреть всё →</Link>
+                  </div>
+                  <div className="scroller">{group.items.map((item) => <V2EventCard key={item.id} item={item} />)}</div>
+                </div>
+              </section>
+              {idx === 1 && articles.length ? (
+                <section className="section">
+                  <div className="container">
+                    <div className="bottom-cta__inner">
+                      <div>
+                        <h2>Статьи и рецензии</h2>
+                        <p>{articles.slice(0, 3).map((a) => a.title).join(' · ')}</p>
+                      </div>
+                      <Link href="/blog" className="btn btn--white btn--lg">Читать →</Link>
+                    </div>
+                  </div>
+                </section>
+              ) : null}
+            </Fragment>
+          ))}
 
           <section className="bottom-cta">
             <div className="container">
