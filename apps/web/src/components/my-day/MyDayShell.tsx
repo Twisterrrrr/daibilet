@@ -7,9 +7,9 @@ import { usePersistedNumber } from '@/components/my-day/usePersistedNumber';
 
 const LIST_SPLIT_KEY = 'daibilet.my-day.list-split';
 /** Keep the itinerary readable; the map remains resizable once there are stops. */
-const LIST_SPLIT_DEFAULT = 46;
-const LIST_SPLIT_MIN = 38;
-const LIST_SPLIT_MAX = 70;
+const LIST_SPLIT_DEFAULT = 38;
+const LIST_SPLIT_MIN = 28;
+const LIST_SPLIT_MAX = 50;
 
 type MyDayShellProps = {
   mapOpen: boolean;
@@ -48,11 +48,11 @@ export function MyDayShell({
   return (
     <div
       ref={shellRef}
-      className={`flex flex-col gap-4 lg:grid lg:items-start lg:gap-0 ${gridClass} ${className}`.trim()}
+      className={`flex flex-col gap-4 lg:grid lg:items-stretch lg:gap-0 ${gridClass} ${className}`.trim()}
       style={
         splitOn
           ? {
-              gridTemplateColumns: `minmax(24rem, ${effectiveListPct}fr) minmax(20rem, ${100 - effectiveListPct}fr)`,
+              gridTemplateColumns: `minmax(22rem, min(${effectiveListPct}vw, 32rem)) minmax(20rem, 1fr)`,
             }
           : undefined
       }
@@ -60,7 +60,7 @@ export function MyDayShell({
       data-my-day-map-open={showMapColumn && mapOpen ? '1' : '0'}
       data-my-day-list-split={splitOn ? String(effectiveListPct) : undefined}
     >
-      <div className="relative min-w-0 lg:pr-3" data-my-day-list-col>
+      <div className="relative min-h-0 min-w-0 lg:h-full lg:border-r lg:border-slate-200" data-my-day-list-col>
         {list}
         {splitOn ? (
           <MyDayResizeHandle
@@ -79,7 +79,7 @@ export function MyDayShell({
       </div>
       {showMapColumn ? (
         <aside
-          className="relative hidden lg:sticky lg:top-[var(--site-header-height)] lg:block lg:h-[calc(100vh-var(--site-header-height))] lg:self-start"
+          className="relative hidden lg:sticky lg:top-[calc(var(--site-header-height)_+_5rem)] lg:block lg:h-[calc(100dvh_-_var(--site-header-height)_-_5rem)] lg:self-start"
           data-my-day-map-col
         >
           {map}
