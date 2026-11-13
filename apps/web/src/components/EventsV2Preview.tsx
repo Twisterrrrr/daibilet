@@ -142,7 +142,7 @@ export function EventsV2Preview({ catalog, landings = [], articles = [] }: Props
                   <div className="container">
                     <div className="bottom-cta__inner">
                       <div>
-                        <h2>Статьи и рецензии</h2>
+                        <h2>Статьи</h2>
                         <p>{articles.slice(0, 3).map((a) => a.title).join(' · ')}</p>
                       </div>
                       <Link href="/blog" className="btn btn--white btn--lg">Читать →</Link>
