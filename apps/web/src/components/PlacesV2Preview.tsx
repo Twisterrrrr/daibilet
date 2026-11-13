@@ -4,9 +4,10 @@ import { Search } from 'lucide-react';
 import { SafeImage } from '@/components/SafeImage.client';
 import { fontUnbounded } from '@/lib/fonts';
 import { pluralVenues } from '@/lib/format';
+import { venueKindLabel } from '@/lib/venue-kind-mapping';
 import type { PublicVenueDto } from '@daibilet/contracts/public';
 
-const typeLabel = (v: PublicVenueDto) => v.placeSubtype || v.placeType || v.type || 'Площадка';
+const typeLabel = (v: PublicVenueDto) => venueKindLabel(v.type, v.name) || 'Площадка';
 
 function PlaceCard({ v }: { v: PublicVenueDto }) {
   return (
