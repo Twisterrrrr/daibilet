@@ -47,7 +47,7 @@ type Props = {
 export function EventsV2Preview({ catalog, landings = [], articles = [] }: Props) {
   const items = catalog?.items ?? [];
   const cats = catalog?.facets?.categories ?? [];
-  const featured = items.filter((it) => it.imageUrl).slice(0, 2);
+  const featured = items.filter((it) => it.imageUrl).slice(0, 5);
 
   const groups: Array<{ category: string; items: typeof items }> = [];
   for (const it of items) {
@@ -95,7 +95,7 @@ export function EventsV2Preview({ catalog, landings = [], articles = [] }: Props
                   <div><h2>Стоит увидеть</h2><p>События, на которые советуем обратить внимание в первую очередь</p></div>
                   <Link href="/events" className="link-more">Вся афиша →</Link>
                 </div>
-                <div className="featured-grid">
+                <div className="featured-carousel">
                   {featured.map((e) => (
                     <Link key={e.id} href={`/events/${e.eventPageSlug || e.slug || ''}`} className="featured-card">
                       {e.imageUrl ? <SafeImage src={e.imageUrl} alt="" fill sizes="50vw" className="object-cover" /> : null}

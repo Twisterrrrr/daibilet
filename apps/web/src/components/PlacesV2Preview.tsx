@@ -37,7 +37,7 @@ function PlaceCard({ v }: { v: PublicVenueDto }) {
 }
 
 export function PlacesV2Preview({ venues, total }: { venues: PublicVenueDto[]; total: number }) {
-  const featured = venues.filter((v) => v.heroImageUrl).slice(0, 4);
+  const featured = venues.filter((v) => v.heroImageUrl).slice(0, 6);
   const types = Array.from(new Set(venues.map(typeLabel))).slice(0, 8);
   const groups = Array.from(new Set(venues.map(typeLabel)))
     .slice(0, 8)
@@ -69,13 +69,13 @@ export function PlacesV2Preview({ venues, total }: { venues: PublicVenueDto[]; t
         </div>
       </div>
 
-      {featured.length >= 3 ? (
+      {featured.length >= 2 ? (
         <section className="featured-places">
           <div className="container">
             <div className="featured-places__head">
               <div><h2>Главные площадки</h2><p>Театры, залы и пространства, которые определяют город</p></div>
             </div>
-            <div className="featured-grid">
+            <div className="featured-carousel">
               {featured.map((v) => (
                 <Link key={v.id} href={`/venues/${v.slug || ''}`} className="featured-place">
                   {v.heroImageUrl ? <SafeImage src={v.heroImageUrl} alt="" fill sizes="24rem" className="object-cover" /> : null}

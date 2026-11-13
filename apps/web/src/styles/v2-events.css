@@ -347,3 +347,10 @@
 
 /* Map fixture display font to the app's self-hosted Unbounded (hashed next/font family). */
 .v2{--font-display:var(--font-unbounded),'Inter',sans-serif}
+
+
+/* Featured rail: 2 visible banners + peek of the next, scroll-snap. */
+.v2 .featured-carousel{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -24px;padding:2px 24px 20px;scrollbar-width:none;-ms-overflow-style:none}
+.v2 .featured-carousel::-webkit-scrollbar{display:none}
+.v2 .featured-carousel>*{flex:0 0 46%;min-width:290px;scroll-snap-align:start}
+@media(max-width:720px){.v2 .featured-carousel>*{flex:0 0 84%}}
