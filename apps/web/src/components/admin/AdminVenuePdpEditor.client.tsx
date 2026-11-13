@@ -196,8 +196,9 @@ export function AdminPdpEditor({ entity, entityId, entitySlug, variants, initial
     </div>
     <section className="rounded-md border border-indigo-200 bg-indigo-50/50 p-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div><h4 className="text-sm font-semibold">Предпросмотр публичной страницы</h4><p className="mt-1 text-xs text-muted-foreground">Используется тот же компонент, что и на сайте. Черновик виден здесь, но публично показывается только после статуса «Готово».</p></div>
+        <div><h4 className="text-sm font-semibold">Предпросмотр публичной страницы</h4><p className="mt-1 text-xs text-muted-foreground">Встроенный блок показывает редакционный контент. Кнопка «Вся страница» открывает сохранённый черновик в полном шаблоне PDP; публично контент показывается только после статуса «Готово».</p></div>
         <div className="flex gap-2">
+          {entity === 'venues' ? <a href={`/admin/venues/${encodeURIComponent(entityId)}/preview`} target="_blank" rel="noreferrer" className="inline-flex h-9 items-center rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground hover:bg-accent">Вся страница</a> : null}
           <Button type="button" variant="outline" size="sm" onClick={() => setPreviewDevice('desktop')} aria-pressed={previewDevice === 'desktop'}>Компьютер</Button>
           <Button type="button" variant="outline" size="sm" onClick={() => setPreviewDevice('mobile')} aria-pressed={previewDevice === 'mobile'}>Телефон</Button>
           <Button type="button" variant="outline" size="sm" onClick={() => setPreviewOpen((open) => !open)}>{previewOpen ? 'Скрыть' : 'Открыть'}</Button>
