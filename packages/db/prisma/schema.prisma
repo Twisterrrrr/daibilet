@@ -1082,6 +1082,7 @@ model EventPage {
   slug           String   @unique
   title          String
   summary        String?
+  heroImageUrl   String?
   content        Json     @default("{}")
   seoH1          String?
   seoTitle       String?

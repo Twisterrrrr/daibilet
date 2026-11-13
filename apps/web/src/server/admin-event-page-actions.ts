@@ -13,6 +13,7 @@ export async function createAdminEventPageAction(input: {
   eventId: string;
   slug: string;
   title: string;
+  heroImageUrl?: string;
   content: AdminPdpDocument['content'];
 }) {
   const response = await adminApiFetch('/api/admin/event-pages', {
@@ -22,6 +23,7 @@ export async function createAdminEventPageAction(input: {
       eventIds: [input.eventId],
       slug: input.slug,
       title: input.title,
+      heroImageUrl: input.heroImageUrl,
       summary: input.content.summary,
       content: input.content,
       changeNote: 'Первичная редакция подробностей события',
@@ -34,6 +36,7 @@ export async function createAdminEventPageAction(input: {
 export async function saveAdminEventPageAction(id: string, input: {
   slug: string;
   title: string;
+  heroImageUrl: string;
   content: AdminPdpDocument['content'];
   seoH1: string;
   seoTitle: string;

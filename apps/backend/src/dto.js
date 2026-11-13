@@ -5423,6 +5423,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
       status: eventPageRoute.status,
       published: eventPageRoute.published,
       isIndexable: eventPageRoute.isIndexable,
+      heroImageUrl: eventPageRoute.heroImageUrl || null,
       availability: eventPageAvailability,
     } : null,
     availability: eventAvailability,

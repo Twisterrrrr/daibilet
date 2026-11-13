@@ -142,7 +142,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         title: shareTitle,
         description,
         path,
-        image: await resolveSsrOgImage(event.imageUrl),
+        image: await resolveSsrOgImage(stableRoute?.heroImageUrl || loaded.payload.eventPage?.heroImageUrl || event.imageUrl),
       }),
     };
   } catch (error) {

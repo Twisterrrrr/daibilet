@@ -1,5 +1,20 @@
 # Decision Log — Daibilet
 
+## 2026-11-13 — EventPage owns its editorial hero image
+
+**Decision:** Store a page-specific cover in `EventPage.heroImageUrl`. Provider
+catalog sync updates Event/EventSession inventory and must not control this
+editorial image. Public event pages prefer the EventPage image and fall back to
+the existing event image. Admin updates that omit the new field preserve its
+current value, so older rewrite clients cannot clear it accidentally.
+
+**Why:** A generated or editorially selected image must survive subsequent
+Ticketscloud/Teplohod imports and remain attached to the stable page identity.
+
+**Implementation:** Additive Prisma migration, EventPage admin editor and DTO,
+public page and OpenGraph rendering. The MSK artifact deployment applies
+`pnpm db:deploy` before Prisma client generation and service restart.
+
 ## 2026-11-12 — Imported place candidate versus editorial PDP
 
 **Decision:** An imported Venue with `pageStatus=CANDIDATE` is a public,

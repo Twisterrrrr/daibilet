@@ -248,10 +248,18 @@ function normalizeEventPageBatchAppendIds(value) {
 
 function normalizePage(payload, { creating = false } = {}) {
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)) throw new Error('Invalid EventPage payload');
+  const hasHeroImageUrl = Object.prototype.hasOwnProperty.call(payload, 'heroImageUrl');
+  const heroImageUrl = hasHeroImageUrl ? optionalText(payload.heroImageUrl, 'heroImageUrl', 2000) : undefined;
+  if (heroImageUrl && !heroImageUrl.startsWith('/') && !/^https:\/\//iu.test(heroImageUrl)) {
+    throw new Error('heroImageUrl must be a site-relative path or HTTPS URL');
+  }
+  if (heroImageUrl?.startsWith('//')) throw new Error('heroImageUrl must not be protocol-relative');
   const page = {
     slug: normalizeSlug(payload.slug),
     title: requiredText(payload.title, 'title', 500),
     summary: optionalText(payload.summary, 'summary', 4000),
+    heroImageUrl: creating ? (heroImageUrl ?? null) : heroImageUrl,
+    hasHeroImageUrl: creating || hasHeroImageUrl,
     content: normalizeContent(payload.content ?? {}),
     seoH1: optionalText(payload.seoH1, 'seoH1', 500),
     seoTitle: optionalText(payload.seoTitle, 'seoTitle', 500),
@@ -279,6 +287,7 @@ function pageSnapshot(page) {
     slug: page.slug,
     title: page.title,
     summary: page.summary,
+    heroImageUrl: page.heroImageUrl ?? null,
     content: page.content,
     seoH1: page.seoH1,
     seoTitle: page.seoTitle,
@@ -305,7 +314,7 @@ async function appendPageRevision(query, id, page, { changeNote = null, actorId 
 
 async function readPage(query, id) {
   const pageResult = await query(`
-    SELECT id, slug, title, summary, content, "seoH1", "seoTitle", "seoDescription",
+    SELECT id, slug, title, summary, "heroImageUrl", content, "seoH1", "seoTitle", "seoDescription",
       "canonicalPath", status, "isIndexable", "publishedAt", "tourGroupId", "createdAt", "updatedAt"
     FROM "EventPage" WHERE id = $1
   `, [id]);
@@ -539,7 +548,7 @@ export async function searchAdminEventPageEventCandidates(db, rawQuery) {
 export async function readPublishedEventPageForEvent(db, eventId) {
   try {
     const result = await db.query(`
-      SELECT page.slug, page.title, page.summary, page.content, page."seoH1",
+      SELECT page.slug, page.title, page.summary, page."heroImageUrl", page.content, page."seoH1",
         page."seoTitle", page."seoDescription", page."canonicalPath",
         page."isIndexable", page."publishedAt"
       FROM "EventPage" page
@@ -561,7 +570,7 @@ export async function readPublicEventPageRouteBySlug(db, slug) {
   if (!key) return null;
   try {
     const result = await db.query(`
-      SELECT page.id, page.slug, page.status, page."isIndexable", page."publishedAt",
+      SELECT page.id, page.slug, page.status, page."isIndexable", page."publishedAt", page."heroImageUrl",
         ARRAY(
           SELECT link."eventId" FROM "EventPageEvent" link
           WHERE link."eventPageId" = page.id
@@ -603,6 +612,7 @@ export async function readPublicEventPageRouteBySlug(db, slug) {
       status: row.status,
       published,
       isIndexable: published && row.isIndexable === true,
+      heroImageUrl: row.heroImageUrl || null,
     };
   } catch (error) {
     // Rolling deploys may hit a catalog database before EventPage migration.
@@ -999,10 +1009,10 @@ export async function createAdminEventPage(db, payload, actorId = null) {
     }
 
     const insert = await query(`
-      INSERT INTO "EventPage" (id, slug, title, summary, content, "seoH1", "seoTitle", "seoDescription", "canonicalPath", status, "isIndexable", "updatedAt")
-      VALUES ($1, $2, $3, $4, $5::jsonb, $6, $7, $8, $9, 'DRAFT', false, now())
+      INSERT INTO "EventPage" (id, slug, title, summary, "heroImageUrl", content, "seoH1", "seoTitle", "seoDescription", "canonicalPath", status, "isIndexable", "updatedAt")
+      VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7, $8, $9, $10, 'DRAFT', false, now())
       RETURNING id
-    `, [randomUUID(), allocatedSlug, page.title, page.summary, JSON.stringify(page.content), page.seoH1, page.seoTitle, page.seoDescription, page.canonicalPath]);
+    `, [randomUUID(), allocatedSlug, page.title, page.summary, page.heroImageUrl, JSON.stringify(page.content), page.seoH1, page.seoTitle, page.seoDescription, page.canonicalPath]);
     const id = insert.rows[0].id;
     const allocatedPage = { ...page, slug: allocatedSlug };
 
@@ -1047,14 +1057,16 @@ export async function updateAdminEventPage(db, id, payload, actorId = null) {
       throw new Error('Only READY EventPages can be indexable');
     }
     const updated = await query(`
-      UPDATE "EventPage" SET slug = $2, title = $3, summary = $4, content = $5::jsonb,
-        "seoH1" = $6, "seoTitle" = $7, "seoDescription" = $8, "canonicalPath" = $9,
-        status = COALESCE($10, status),
-        "publishedAt" = CASE WHEN COALESCE($10, status) = 'READY' THEN "publishedAt" ELSE NULL END,
-        "isIndexable" = COALESCE($11, "isIndexable"),
+      UPDATE "EventPage" SET slug = $2, title = $3, summary = $4,
+        "heroImageUrl" = CASE WHEN $5::boolean THEN $6 ELSE "heroImageUrl" END,
+        content = $7::jsonb,
+        "seoH1" = $8, "seoTitle" = $9, "seoDescription" = $10, "canonicalPath" = $11,
+        status = COALESCE($12, status),
+        "publishedAt" = CASE WHEN COALESCE($12, status) = 'READY' THEN "publishedAt" ELSE NULL END,
+        "isIndexable" = COALESCE($13, "isIndexable"),
         "updatedAt" = now()
       WHERE id = $1 RETURNING *
-    `, [id, page.slug, page.title, page.summary, JSON.stringify(page.content), page.seoH1, page.seoTitle, page.seoDescription, page.canonicalPath, page.status ?? null, page.isIndexable ?? null]);
+    `, [id, page.slug, page.title, page.summary, page.hasHeroImageUrl, page.heroImageUrl ?? null, JSON.stringify(page.content), page.seoH1, page.seoTitle, page.seoDescription, page.canonicalPath, page.status ?? null, page.isIndexable ?? null]);
     const sourceState = await currentSourceState(query, id);
     await appendPageRevision(query, id, updated.rows[0], { changeNote: page.changeNote, actorId, sourceState });
     return readPage(query, id);

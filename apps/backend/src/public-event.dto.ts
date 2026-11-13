@@ -226,6 +226,7 @@ type StableEventPageRecord = {
   slug: string;
   title: string;
   summary: string | null;
+  heroImageUrl: string | null;
   content: unknown;
   seoH1: string | null;
   seoTitle: string | null;
@@ -241,7 +242,7 @@ async function loadStableEventPage(where: 'slug' | 'eventId', value: string): Pr
   try {
     const condition = where === 'slug' ? 'lower(page.slug) = lower($1)' : 'link."eventId" = $1';
     const result = await prisma.$queryRawUnsafe<StableEventPageRecord[]>(`
-      SELECT page.id, page.slug, page.title, page.summary, page.content, page."seoH1", page."seoTitle", page."seoDescription",
+      SELECT page.id, page.slug, page.title, page.summary, page."heroImageUrl", page.content, page."seoH1", page."seoTitle", page."seoDescription",
         page.status, page."isIndexable", page."publishedAt", link."eventId",
         ARRAY(
           SELECT page_link."eventId" FROM "EventPageEvent" page_link
@@ -724,12 +725,14 @@ async function loadPublicEventDto(
         status: stablePage.status,
         published: stablePage.status === 'READY' && stablePage.publishedAt != null,
         isIndexable: stablePage.status === 'READY' && stablePage.publishedAt != null && stablePage.isIndexable,
+        heroImageUrl: stablePage.heroImageUrl,
         availability,
       },
       eventPage: stablePage.status === 'READY' && stablePage.publishedAt != null ? {
         slug: stablePage.slug,
         title: stablePage.title,
         summary: stablePage.summary,
+        heroImageUrl: stablePage.heroImageUrl,
         content: stablePage.content as NonNullable<PublicEventPageDto['eventPage']>['content'],
         seoH1: stablePage.seoH1,
         seoTitle: stablePage.seoTitle,

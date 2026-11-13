@@ -400,6 +400,7 @@ export interface PublicEventPageDto extends ApiEnvelope {
     slug: string;
     title: string;
     summary: string | null;
+    heroImageUrl?: string | null;
     content: PublicPdpDocumentDto['content'];
     seoH1: string | null;
     seoTitle?: string | null;
@@ -411,6 +412,7 @@ export interface PublicEventPageDto extends ApiEnvelope {
     status: string;
     published: boolean;
     isIndexable: boolean;
+    heroImageUrl?: string | null;
     availability?: 'AVAILABLE' | 'ENDED' | 'NO_UPCOMING' | null;
   } | null;
   /** Context of the requested slot URL, used for a past-date notice when sibling sessions remain. */

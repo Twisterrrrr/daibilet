@@ -615,7 +615,7 @@ export function EventHero({
   const oldPrice = getTicketOldPrice(payload, priceRange);
   const fallbackPrice = formatPriceRub(stats.priceFrom ?? event.priceFrom);
   const priceLabel = priceRange ? formatHeroBuyButtonPrice(priceRange) : fallbackPrice ? `от ${fallbackPrice}` : '';
-  const heroImage = String(event.imageUrl || '').trim();
+  const heroImage = String(payload.eventPageRoute?.heroImageUrl || payload.eventPage?.heroImageUrl || event.imageUrl || '').trim();
   const heroFocalPoint = resolveEventHeroObjectPosition({
     slug: event.slug,
     sourceSlug: event.sourceSlug,

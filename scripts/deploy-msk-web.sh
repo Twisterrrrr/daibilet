@@ -116,6 +116,8 @@ if [[ -f package.json ]]; then
   if command -v pnpm >/dev/null 2>&1; then
     # Production node_modules are root-owned; run pnpm as root so it does not
     # try to relink the workspace as deploy and fail on EACCES.
+    sudo -n env CI=true pnpm db:deploy
+    echo "Prisma migrations deployed"
     sudo -n env CI=true pnpm db:generate
   else
     npx --yes prisma generate --schema packages/db/prisma/schema.prisma

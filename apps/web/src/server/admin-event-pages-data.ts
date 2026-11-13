@@ -6,6 +6,7 @@ export type AdminEventPage = {
   slug: string;
   title: string;
   summary: string | null;
+  heroImageUrl: string | null;
   content: AdminPdpDocument['content'];
   seoH1: string | null;
   seoTitle: string | null;

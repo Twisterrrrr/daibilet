@@ -67,6 +67,7 @@ export function AdminEventPageEditor({ eventId, eventSlug, eventTitle, sourceDes
 }) {
   const [page, setPage] = useState<AdminEventPage | null>(pageData.page);
   const [title, setTitle] = useState(pageData.page?.title ?? eventTitle);
+  const [heroImageUrl, setHeroImageUrl] = useState(pageData.page?.heroImageUrl ?? '');
   const [slug, setSlug] = useState(pageData.page?.slug ?? proposeEventPageSlug(eventSlug, eventId));
   const [seoH1, setSeoH1] = useState(pageData.page?.seoH1 ?? '');
   const [seoTitle, setSeoTitle] = useState(pageData.page?.seoTitle ?? '');
@@ -98,11 +99,13 @@ export function AdminEventPageEditor({ eventId, eventSlug, eventTitle, sourceDes
         eventId,
         slug,
         title,
+        heroImageUrl,
         content: initialDocument.content,
       });
       setPage(created);
       setSlug(created.slug);
       setTitle(created.title);
+      setHeroImageUrl(created.heroImageUrl || '');
       setSlugNotice(created.slug === slug ? '' : `Для черновика выделен безопасный slug «${created.slug}». Город добавляется автоматически; при совпадении в этом городе используется суффикс -2, -3 и далее. События не объединялись.`);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Не удалось создать страницу события.');
@@ -116,6 +119,7 @@ export function AdminEventPageEditor({ eventId, eventSlug, eventTitle, sourceDes
     const saved = await saveAdminEventPageAction(page.id, {
       slug,
       title,
+      heroImageUrl,
       content: document.content,
       seoH1,
       seoTitle,
@@ -299,6 +303,7 @@ export function AdminEventPageEditor({ eventId, eventSlug, eventTitle, sourceDes
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <AdminField label="Название страницы"><input className={adminInputClass} value={title} onChange={(event) => setTitle(event.target.value)} /></AdminField>
         <AdminField label="Кандидат slug EventPage"><input className={adminInputClass} value={slug} onChange={(event) => setSlug(event.target.value)} /><small>Для одиночного события город добавится при создании; коллизия в том же городе получит -2, -3 и далее.</small></AdminField>
+        <div className="sm:col-span-2"><AdminField label="Обложка EventPage (URL)"><input className={adminInputClass} type="text" placeholder="/images/events/generated/cover.webp" value={heroImageUrl} onChange={(event) => setHeroImageUrl(event.target.value)} /></AdminField></div>
       </div>
       <p className="mt-2 text-xs text-slate-600">Код источника убирается, только если совпадает с ID Event. К одиночному событию добавится город; при совпадении в том же городе — -2, -3 и далее. Это внутренний slug: публичный URL, canonical и sitemap не меняются.</p>
       <button
@@ -313,6 +318,7 @@ export function AdminEventPageEditor({ eventId, eventSlug, eventTitle, sourceDes
       <div className="grid gap-3 sm:grid-cols-2">
         <AdminField label="Название страницы"><input className={adminInputClass} value={title} onChange={(event) => setTitle(event.target.value)} /></AdminField>
         <AdminField label="Кандидат slug EventPage"><input className={adminInputClass} value={slug} onChange={(event) => setSlug(event.target.value)} /><small>Slug черновика включает город, если это одиночное событие; одинаковые названия в одном городе получают -2, -3 и далее.</small></AdminField>
+        <div className="sm:col-span-2"><AdminField label="Обложка EventPage (URL)"><input className={adminInputClass} type="text" placeholder="/images/events/generated/cover.webp" value={heroImageUrl} onChange={(event) => setHeroImageUrl(event.target.value)} /><small>Редакционная обложка страницы; не зависит от изображений импортированных слотов.</small></AdminField></div>
         <AdminField label="SEO H1"><input className={adminInputClass} value={seoH1} onChange={(event) => setSeoH1(event.target.value)} /></AdminField>
         <AdminField label="SEO title"><input className={adminInputClass} value={seoTitle} onChange={(event) => setSeoTitle(event.target.value)} /></AdminField>
         <div className="sm:col-span-2"><AdminField label="SEO description"><textarea className={`${adminInputClass} min-h-20`} value={seoDescription} onChange={(event) => setSeoDescription(event.target.value)} /></AdminField></div>
