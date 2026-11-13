@@ -49,9 +49,15 @@ test('child title plus confirmed 6+ age maps to children list, not family-all', 
   assert.deepEqual(lists, ['family_kids']);
 });
 
+test('accepts numeric age values used by imported event records', () => {
+  assert.deepEqual(resolveCatalogLists({ title: 'Детское шоу фокусов', ageLimit: '6' }), ['family_kids']);
+  assert.deepEqual(resolveCatalogLists({ title: 'Семейный спектакль', ageLimit: '0' }), ['family_all']);
+});
+
 test('family phrase with compatible age maps to family-all', () => {
   const lists = resolveCatalogLists({ title: 'Фестиваль для всей семьи', ageLimit: '0+' });
   assert.deepEqual(lists, ['family_all']);
+  assert.deepEqual(resolveCatalogLists({ tags: ['Для семейного просмотра'], ageLimit: '0' }), ['family_all']);
 });
 
 test('stable kids subcategory ID is a child signal; zoo and entertainment-center IDs are family signals', () => {
@@ -62,6 +68,7 @@ test('stable kids subcategory ID is a child signal; zoo and entertainment-center
 
 test('age 12+ and adult keywords exclude family lists', () => {
   assert.deepEqual(resolveCatalogLists({ title: 'Детское шоу', ageLimit: '12+' }), []);
+  assert.deepEqual(resolveCatalogLists({ title: 'Детское шоу', ageLimit: '12' }), []);
   assert.deepEqual(resolveCatalogLists({ title: 'Семейная ночная вечеринка', ageLimit: '6+' }), []);
 });
 

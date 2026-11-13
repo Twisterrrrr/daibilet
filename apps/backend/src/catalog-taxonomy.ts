@@ -161,16 +161,16 @@ function scoreFamilyAudience(input: EventTaxonomyInput, age: number | null) {
   const childTerms = /(^|[^\p{L}])(?:детск(?:ий|ая|ое|ие)?|для детей|детям|малыш(?:ам|и)?|сказк\p{L}*|мульт\p{L}*|елк\p{L}*|кукольн\p{L}*|детское шоу)(?=$|[^\p{L}])/u;
   const familyTerms = /(^|[^\p{L}])(?:семейн\p{L}*|для всей семьи|для взрослых и детей|взрослым и детям)(?=$|[^\p{L}])/u;
   const negatedChild = /(?:не для детей|детский сад|детсад)/u.test(title);
-  const adultOnly = /(?:^|[^\d])(?:12|16|18)\s*\+(?:$|[^\d])/u.test(normalize(input.ageLimit || '')) ||
+  const adultOnly = /^(?:12|16|18)\s*\+?$/u.test(normalize(input.ageLimit || '')) ||
     /(^|[^\p{L}])(?:ночн\p{L}*|бар|клуб|стендап|комеди\p{L}*|юмор для взрослых|андеграунд|дискотек\p{L}* до утра)(?=$|[^\p{L}])/u.test(title);
   if (adultOnly || negatedChild) return { childScore: 0, familyScore: 0, adultOnly: true };
 
   let childScore = 0;
   let familyScore = 0;
-  if (tags.some((tag) => /^(детям|для детей|детский|детское|детская)$/.test(tag)) ||
+  if (tags.some((tag) => /(^|[^\p{L}])(?:детск\p{L}*|детям|для детей)(?=$|[^\p{L}])/u.test(tag)) ||
       subcategories.some((tag) => /^(детям|для детей|детские мероприятия|sub[_-]entertainment[_-]children)$/.test(tag))) childScore += 5;
-  if (tags.some((tag) => /^(семейный|семейное|для всей семьи|семейный день)$/.test(tag)) ||
-      subcategories.some((tag) => /^(для всей семьи|семейные мероприятия)$/.test(tag))) familyScore += 5;
+  if (tags.some((tag) => /(^|[^\p{L}])(?:семейн\p{L}*|для всей семьи|для семейного просмотра)(?=$|[^\p{L}])/u.test(tag)) ||
+      subcategories.some((tag) => /(^|[^\p{L}])(?:семейн\p{L}*|для всей семьи|для семейного просмотра)(?=$|[^\p{L}])/u.test(tag))) familyScore += 5;
   if (subcategories.some((tag) => /^(зоопарки и фермы|развлекательные центры|sub[_-]entertainment[_-](?:zoo|fun))$/.test(tag))) familyScore += 5;
   if (childTerms.test(title)) childScore += 4;
   if (familyTerms.test(title)) familyScore += 4;
@@ -210,7 +210,8 @@ function toDate(value: string | Date | null | undefined): Date | null {
 }
 
 function parseAgeLimit(value: string | null | undefined): number | null {
-  const match = String(value || '').match(/(?:^|\D)(0|3|6|7|12|16|18)\s*\+/);
+  // Imported Event.ageLimit values are often stored as "0" / "6" without the plus sign.
+  const match = String(value || '').trim().match(/^(0|3|6|7|12|16|18)\s*\+?$/);
   return match ? Number(match[1]) : null;
 }
 
