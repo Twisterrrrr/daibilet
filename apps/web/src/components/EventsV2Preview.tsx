@@ -7,6 +7,7 @@ import { V2EventCard } from '@/components/V2EventCard';
 import { fontUnbounded } from '@/lib/fonts';
 import { pluralEvents } from '@/lib/format';
 import { collectCatalogLabels } from '@/lib/catalog-labels';
+import { buildCatalogHref } from '@/lib/catalog-url';
 import type { BlogCardDto } from '@/lib/blog-utils';
 import type { PublicCatalogDto, PublicLandingDto } from '@daibilet/contracts/public';
 
@@ -139,7 +140,7 @@ export function EventsV2Preview({ catalog, landings = [], articles = [] }: Props
                       <h2>{group.category}</h2>
                       <p>{pluralEvents(group.items.length)} · выбор редакции</p>
                     </div>
-                    <Link href="/events" className="link-more">Смотреть всё →</Link>
+                    <Link href={buildCatalogHref({ q: group.category })} className="link-more">Смотреть всё →</Link>
                   </div>
                   <div className="scroller">{group.items.map((item) => <V2EventCard key={item.id} item={item} />)}</div>
                 </div>
