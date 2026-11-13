@@ -82,7 +82,17 @@ backend - тогда рельсы Афиши («Концерты», «Театр
 - `catalogLists?: Array<{ key: 'family_kids' | 'family_all' | 'free' | 'weekend'; title: string }>`
 - `tagLabels?: string[]` (человекочитаемые жанры)
 
-## Web (Cline, после появления полей)
+## Площадки: «Развлечения» как display-группа (без нового kind)
+
+Цирк, планетарий, зоопарк, аквапарк, парк аттракционов - не отдельные `VenueKind`.
+Новый enum не добавляем. Вместо этого в `apps/web/src/lib/venue-kind-mapping.ts` ввести
+**display-группу «Развлечения»**, собирающую: `CLUB_BAR_RESTAURANT` + `ATTRACTION`
+(цирк/планетарий/зоопарк - title-эвристикой, как уже сделано для `art_space`/`temple`) +
+`SPORT_ACTIVITY_SPACE` (активные развлечения).
+
+Плюс разовый reclassify: строки «цирк/планетарий/зоопарк/аквапарк» из `OTHER` ->
+ближайший kind (например `ATTRACTION`), чтобы не висели в «Другое». Web (`/places2`)
+берёт ярлык группы из маппинга; отдельная правка фронта не требуется.
 
 - Рельсы Афиши - плоский набор: типы по `catalogSubcategory.title`, списки по
   `catalogLists` (со ссылкой в каталог с пресетом фильтра).
