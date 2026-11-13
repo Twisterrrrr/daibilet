@@ -112,6 +112,67 @@ test "$INCOMING_BUILD_ID" = "$EXPECTED_BUILD_ID" || { echo 'ERROR: incoming BUIL
 test "$(cat "$WEB_NEXT_STAGE/DEPLOY_SHA")" = "$DEPLOY_SHA" || { echo 'ERROR: artifact SHA mismatch'; exit 1; }
 # Resolve the incoming commit independently before altering the running checkout.
 test "$(git rev-parse "$DEPLOY_SHA^{commit}")" = "$DEPLOY_SHA"
+
+# Preserve untracked files that the target commit is about to add. Editorial
+# apply/verification runs can leave their audit JSON and scripts in the
+# production checkout; git checkout must not silently discard those records.
+preserve_checkout_conflicts() {
+  local preserve_root="${APP_DIR}/var/deploy-preserved/${DEPLOY_SHA}"
+  local relative source destination destination_dir source_real
+  local count=0
+
+  echo "Checkout conflict audit before preserving production files"
+  df -hT / "$APP_DIR"
+  for service in nginx "$WEB_SERVICE" "$API_SERVICE"; do
+    printf 'service %s: ' "$service"
+    systemctl_deploy is-active "$service" 2>/dev/null || true
+  done
+
+  if [[ -L "${APP_DIR}/var" || -L "$preserve_root" ]]; then
+    echo "ERROR: deploy preservation path is a symlink; refusing to move production files" >&2
+    return 1
+  fi
+  mkdir -p "$preserve_root"
+  chmod 700 "${APP_DIR}/var/deploy-preserved" "$preserve_root"
+
+  while IFS= read -r -d '' relative; do
+    source="${APP_DIR}/${relative}"
+    [[ -e "$source" || -L "$source" ]] || continue
+    git ls-files --error-unmatch -- "$relative" >/dev/null 2>&1 && continue
+
+    if [[ -L "$source" || ! -f "$source" ]]; then
+      echo "ERROR: untracked checkout conflict is not a regular file: $source" >&2
+      return 1
+    fi
+    source_real="$(realpath -m -- "$source")"
+    if [[ "$source_real" != "$source" ]]; then
+      echo "ERROR: untracked checkout conflict resolves through a symlink: $source → $source_real" >&2
+      return 1
+    fi
+
+    destination="${preserve_root}/${relative}"
+    destination_dir="$(dirname "$destination")"
+    mkdir -p "$destination_dir"
+    if [[ -L "$destination_dir" || -e "$destination" || -L "$destination" ]]; then
+      echo "ERROR: preservation destination already exists or is a symlink: $destination" >&2
+      return 1
+    fi
+    if [[ "$(stat -c '%d' -- "$source")" != "$(stat -c '%d' -- "$destination_dir")" ]]; then
+      echo "ERROR: source and preservation destination are on different filesystems: $source" >&2
+      return 1
+    fi
+
+    du -h -- "$source"
+    mv -- "$source" "$destination"
+    echo "Preserved untracked file: $source → $destination"
+    count=$((count + 1))
+  done < <(git ls-tree -r --name-only -z "$DEPLOY_SHA")
+
+  echo "Preserved untracked checkout conflicts: $count"
+}
+
+preserve_checkout_conflicts
+
 # Next.js rewrites this tracked, generated file during builds on the host. Reset
 # only that generated drift so the subsequent checkout can switch to the artifact
 # commit; leave all other local files untouched.
