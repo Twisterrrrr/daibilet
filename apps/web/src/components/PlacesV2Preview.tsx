@@ -25,15 +25,22 @@ const typeLabel = (v: PublicVenueDto) => {
   return venueKindLabel(v.type, v.name) || 'Площадка';
 };
 
-/** Развлекательные подтипы - сводим в один блок «Развлечения» (штучные экземпляры). */
+/**
+ * Display-группировка мест для Афиши (не меняет каноничный placeType/placeSubtype).
+ * «Развлечения» = развлекательные подтипы (штучные: цирк/зоопарк/планетарий/аквапарк…).
+ * «Достопримечательности» = памятники/архитектура/природа.
+ */
 const ENTERTAINMENT_SUBTYPES = new Set([
   'zoo', 'circus', 'planetarium', 'aquarium', 'amusement_park', 'water_park',
   'quest', 'observation_deck', 'cinema',
 ]);
+const SIGHT_PLACE_TYPES = new Set(['MONUMENT', 'ARCHITECTURE', 'NATURE']);
 
 function groupLabel(v: PublicVenueDto): string {
   const subtype = String(v.placeSubtype || '').trim().toLowerCase();
   if (ENTERTAINMENT_SUBTYPES.has(subtype)) return 'Развлечения';
+  const type = String(v.placeType || '').trim().toUpperCase();
+  if (SIGHT_PLACE_TYPES.has(type)) return 'Достопримечательности';
   return typeLabel(v);
 }
 
@@ -73,8 +80,9 @@ export function PlacesV2Preview({ venues, total }: { venues: PublicVenueDto[]; t
     .filter((g) => g.venues.length)
     .sort((a, b) => b.venues.length - a.venues.length);
   const MAJOR_MIN = 2;
-  const major = groups.filter((g) => g.type === 'Развлечения' || g.venues.length >= MAJOR_MIN);
-  const minor = groups.filter((g) => g.type !== 'Развлечения' && g.venues.length < MAJOR_MIN);
+  const ALWAYS_MAJOR = new Set(['Развлечения', 'Достопримечательности']);
+  const major = groups.filter((g) => ALWAYS_MAJOR.has(g.type) || g.venues.length >= MAJOR_MIN);
+  const minor = groups.filter((g) => !ALWAYS_MAJOR.has(g.type) && g.venues.length < MAJOR_MIN);
   const minorVenues = minor.flatMap((g) => g.venues);
 
   return (
