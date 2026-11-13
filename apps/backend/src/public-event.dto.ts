@@ -122,9 +122,31 @@ const eventBuilds = new Map<string, Promise<PublicEventPageDto | null>>();
 
 type PublicTourPeer = NonNullable<PublicEventPageDto['peerEvents']>[number];
 
+async function loadIndexableEventPageSlugs(eventIds: string[]): Promise<Map<string, string>> {
+  const uniqueIds = [...new Set(eventIds.filter(Boolean))];
+  if (!uniqueIds.length) return new Map();
+  try {
+    const rows = await prisma.$queryRawUnsafe<Array<{ eventId: string; slug: string }>>(`
+      SELECT DISTINCT ON (link."eventId") link."eventId", page.slug
+      FROM "EventPageEvent" link
+      JOIN "EventPage" page ON page.id = link."eventPageId"
+      WHERE link."eventId" = ANY($1::text[])
+        AND page.status = 'READY'
+        AND page."publishedAt" IS NOT NULL
+        AND page."isIndexable" IS TRUE
+      ORDER BY link."eventId", link.position, link."createdAt", page.slug
+    `, uniqueIds);
+    return new Map(rows.map((row) => [row.eventId, row.slug]));
+  } catch (error) {
+    if ((error as { code?: string })?.code === 'P2021' || (error as { code?: string })?.code === '42P01') return new Map();
+    throw error;
+  }
+}
+
 async function loadPublishedTourPeers(eventId: string): Promise<{ assigned: boolean; peers: PublicTourPeer[] }> {
   try {
     const result = await prisma.$queryRawUnsafe<Array<PublicTourPeer & { eventPageSlug: string | null }>>(`
+      WITH city_candidates AS (
       SELECT peer_event.id,
         peer_event.slug,
         peer_page.slug AS "eventPageSlug",
@@ -133,15 +155,29 @@ async function loadPublishedTourPeers(eventId: string): Promise<{ assigned: bool
         city.slug AS "citySlug",
         COALESCE(venue.title, '') AS venue,
         COALESCE(venue.slug, '') AS "venueSlug",
-        next_session."startsAt" AS "startsAt",
-        peer_event."priceFromRub" AS "priceFrom"
+        peer_event."startsAt" AS "startsAt",
+        peer_event."priceFromRub" AS "priceFrom",
+        ROW_NUMBER() OVER (
+          PARTITION BY city.id
+          ORDER BY peer_event."startsAt" NULLS LAST, peer_page.slug
+        ) AS city_rank
       FROM "EventPageEvent" current_link
       JOIN "EventPage" current_page ON current_page.id = current_link."eventPageId"
       JOIN "EventTourGroup" tour_group ON tour_group.id = current_page."tourGroupId"
       JOIN "Event" current_event ON current_event.id = current_link."eventId"
       JOIN "EventPage" peer_page ON peer_page."tourGroupId" = tour_group.id AND peer_page.id <> current_page.id
       JOIN LATERAL (
-        SELECT event.id, event.slug, event.title, event."primaryCityId", event."venueId", event."priceFromRub"
+        SELECT event.id, event.slug, event.title, event."primaryCityId", event."venueId", event."priceFromRub",
+          (
+            SELECT min(session."startsAt")
+            FROM "EventSession" session
+            WHERE session."eventId" = event.id
+              AND session."isActive" IS TRUE
+              AND session."cancelledAt" IS NULL
+              AND session."startsAt" >= now() - interval '15 minutes'
+              AND lower(coalesce(session."sourceStatus", '')) NOT IN
+                ('widget_blocked', 'paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden', 'stand_by', 'closed', 'sales_closed', 'sale_closed', 'not_for_sale')
+          ) AS "startsAt"
         FROM "EventPageEvent" peer_link
         JOIN "Event" event ON event.id = peer_link."eventId"
         WHERE peer_link."eventPageId" = peer_page.id
@@ -170,25 +206,21 @@ async function loadPublishedTourPeers(eventId: string): Promise<{ assigned: bool
                 )
               )
           )
-        ORDER BY peer_link.position, peer_link."createdAt", event.id
+        ORDER BY "startsAt" NULLS LAST, peer_link.position, peer_link."createdAt", event.id
         LIMIT 1
       ) peer_event ON peer_event."primaryCityId" <> current_event."primaryCityId"
       JOIN "City" city ON city.id = peer_event."primaryCityId"
       LEFT JOIN "Venue" venue ON venue.id = peer_event."venueId"
-      LEFT JOIN LATERAL (
-        SELECT min(session."startsAt") AS "startsAt"
-        FROM "EventPageEvent" peer_link
-        JOIN "EventSession" session ON session."eventId" = peer_link."eventId"
-        WHERE peer_link."eventPageId" = peer_page.id
-          AND session."isActive" IS TRUE
-          AND session."cancelledAt" IS NULL
-          AND session."startsAt" >= now()
-      ) next_session ON true
       WHERE current_link."eventId" = $1
         AND current_page.status = 'READY' AND current_page."publishedAt" IS NOT NULL
         AND peer_page.status = 'READY' AND peer_page."publishedAt" IS NOT NULL
-      ORDER BY next_session."startsAt" NULLS LAST, city.title, peer_page.slug
-      LIMIT 8
+        AND peer_page."isIndexable" IS TRUE
+      )
+      SELECT id, slug, "eventPageSlug", title, city, "citySlug", venue, "venueSlug", "startsAt", "priceFrom"
+      FROM city_candidates
+      WHERE city_rank = 1
+      ORDER BY "startsAt" NULLS LAST, city, "eventPageSlug"
+      LIMIT 30
     `, eventId);
     const assigned = await prisma.$queryRawUnsafe<Array<{ assigned: boolean }>>(`
       SELECT EXISTS (
@@ -209,6 +241,7 @@ async function loadPublishedTourPeers(eventId: string): Promise<{ assigned: bool
         venue: peer.venue,
         venueSlug: peer.venueSlug,
         startsAt: peer.startsAt,
+        timeZone: resolveCityTimeZone(peer.city),
         priceFrom: peer.priceFrom,
       })),
     };
@@ -665,24 +698,37 @@ async function loadPublicEventDto(
   );
   const related = await loadRelatedSessionsFromDb(requestedEvent, groupEventIds, 12);
   const explicitTour = await loadPublishedTourPeers(requestedEvent.id);
-  const inferredPeers: PublicTourPeer[] = mergedGroupEvents
-    .filter((peer) => peer.id !== requestedEvent.id && peer.primaryCityId !== requestedEvent.primaryCityId)
-    .slice(0, 8)
-    .map((peer) => {
-      const nextSession = sessionRows.find((session) => session.eventId === peer.id);
-      return {
+  const inferredPeerCandidates = mergedGroupEvents.filter((peer) =>
+    peer.id !== requestedEvent.id && peer.primaryCityId && peer.primaryCityId !== requestedEvent.primaryCityId,
+  );
+  const inferredPageSlugs = explicitTour.assigned
+    ? new Map<string, string>()
+    : await loadIndexableEventPageSlugs(inferredPeerCandidates.map((peer) => peer.id));
+  const inferredPeers: PublicTourPeer[] = explicitTour.assigned ? [] : inferredPeerCandidates
+    .flatMap((peer) => {
+      const eventPageSlug = inferredPageSlugs.get(peer.id);
+      const nextSession = sessionRows
+        .filter((session) => session.eventId === peer.id && session.startsAt && session.startsAt.getTime() >= Date.now() - 15 * 60_000)
+        .sort((a, b) => (a.startsAt?.getTime() || 0) - (b.startsAt?.getTime() || 0))[0];
+      const cityId = peer.primaryCityId || '';
+      if (!eventPageSlug || !nextSession || !peer.primaryCity?.title || !cityId) return [];
+      return [{
         id: peer.id,
         slug: publicSlug(peer.slug),
+        eventPageSlug,
         title: formatPublicEventTitle(peer.override?.title || peer.title),
-        city: peer.primaryCity?.title || '',
-        citySlug: peer.primaryCity?.slug || '',
+        city: peer.primaryCity.title,
+        citySlug: peer.primaryCity.slug || '',
         venue: peer.venue?.title || '',
         venueSlug: peer.venue?.slug || '',
-        startsAt: nextSession?.startsAt?.toISOString() || null,
+        startsAt: nextSession.startsAt?.toISOString() || null,
+        timeZone: resolveCityTimeZone(peer.primaryCity.title),
         priceFrom: peer.priceFromRub || null,
-      };
+      }];
     })
-    .filter((peer) => peer.city && peer.slug !== publicSlug(requestedEvent.slug));
+    .sort((a, b) => String(a.startsAt || '').localeCompare(String(b.startsAt || ''), 'en') || a.city.localeCompare(b.city, 'ru'))
+    .filter((peer, index, peers) => peers.findIndex((candidate) => candidate.citySlug === peer.citySlug) === index)
+    .slice(0, 30);
   const priceValues = [event.priceFrom, ...sessions.map((session) => session.priceFrom)]
     .filter((value): value is number => Number.isFinite(value) && Number(value) >= MIN_DISPLAY_PRICE_RUB);
   const vacantValues = sessions.map((session) => session.vacant)

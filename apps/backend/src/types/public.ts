@@ -310,6 +310,7 @@ export interface PublicEventPageDto extends ApiEnvelope {
     venue: string;
     venueSlug: string;
     startsAt: string | null;
+    timeZone?: string | null;
     priceFrom: number | null;
   }>;
   stats: {

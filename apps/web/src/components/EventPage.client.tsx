@@ -7,6 +7,7 @@ import { Calendar, ChevronRight, MapPin, Percent, Shield, Users } from 'lucide-r
 import type { PublicEventPageDto } from '@daibilet/contracts/public';
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { EventPageCitySync } from '@/components/EventPageCitySync.client';
+import { PeerEventsHeroSwitcher } from '@/components/PeerEventsBlock.client';
 import { EventRatingBadge } from '@/components/EventPdpChrome.client';
 import {
   compareSessionsByStartsAt,
@@ -604,9 +605,11 @@ export function EventHeroBuyButton({
 export function EventHero({
   payload,
   aggregate = null,
+  peers = [],
 }: {
   payload: PublicEventPageDto;
   aggregate?: { ratingValue: number; reviewCount: number } | null;
+  peers?: NonNullable<PublicEventPageDto['peerEvents']>;
 }) {
   const { event, stats } = payload;
   // Header follows event city (page context beats global filter).
@@ -676,7 +679,7 @@ export function EventHero({
 
   return (
     <div
-      className={`relative isolate grid w-full min-w-0 overflow-hidden bg-slate-900 aspect-[3/4] md:aspect-auto ${
+      className={`relative z-20 isolate grid w-full min-w-0 overflow-visible bg-slate-900 aspect-[3/4] md:aspect-auto ${
         longHeroTitle
           ? 'md:min-h-[40rem] lg:min-h-[28rem]'
           : 'md:min-h-[36rem] lg:min-h-[420px]'
@@ -804,6 +807,8 @@ export function EventHero({
                   <span className="min-w-0">{nearestLabel}</span>
                 </div>
               ) : null}
+
+              <PeerEventsHeroSwitcher peers={peers} />
 
               {/* 7. Link the venue name and street address together to its internal PDP. */}
               {venueStreetAddress ? (

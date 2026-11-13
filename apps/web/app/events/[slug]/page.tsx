@@ -8,7 +8,6 @@ import { EventPdpBody } from '@/components/EventPdpBody.client';
 import { VenuePdpContent } from '@/components/VenuePdpContent.client';
 import { EventTags, EventTrustStrip } from '@/components/EventPageSections';
 import { JsonLdScripts } from '@/components/JsonLdScripts';
-import { PeerEventsBlock } from '@/components/PeerEventsBlock.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
 import { toEventPageClientPayload } from '@/lib/event-page-client-props';
@@ -192,7 +191,7 @@ export default async function EventDetailPage({ params }: PageProps) {
       {/* Outside SiteLayout client boundary so crawlers see scripts in View Source */}
       <JsonLdScripts blocks={jsonLdBlocks} idPrefix="event-jsonld" />
       <SiteLayout>
-        <EventHero payload={clientPayload} aggregate={aggregate} />
+        <EventHero payload={clientPayload} aggregate={aggregate} peers={payload.peerEvents} />
         <ExpiredEventSessionNotice context={clientPayload.requestedSessionContext} />
         <EventPageScheduleNotice
           availability={payload.availability || payload.eventPageRoute?.availability}
@@ -218,12 +217,6 @@ export default async function EventDetailPage({ params }: PageProps) {
             </div>
           </div>
         </div>
-
-        {payload.peerEvents?.length ? (
-          <div className="container-page pb-8 sm:pb-10 lg:pb-14">
-            <PeerEventsBlock peers={payload.peerEvents} />
-          </div>
-        ) : null}
 
         {related?.length ? (
           <section className="border-t border-slate-200/80 bg-surface-muted section-y">

@@ -444,7 +444,7 @@ export interface PublicEventPageDto extends ApiEnvelope {
   peerEvents?: Array<{
     id: string;
     slug: string;
-    /** Stable local EventPage path for explicit tour links; absent for inferred legacy peers. */
+    /** Stable path of the published, indexable EventPage for this city. */
     eventPageSlug?: string | null;
     title: string;
     city: string;
@@ -452,6 +452,7 @@ export interface PublicEventPageDto extends ApiEnvelope {
     venue: string;
     venueSlug: string;
     startsAt: string | null;
+    timeZone?: string | null;
     priceFrom: number | null;
   }>;
   stats: {
