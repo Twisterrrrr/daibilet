@@ -1,0 +1,2192 @@
+[
+  {
+    "eventId": "evt_6a5b5f3a22df122781b0e622",
+    "eventPageId": "658e0c7d-cbd9-4e89-9bcf-858a80b80660",
+    "slug": "neoklassicheskii-koncert-kompozitora-denisa-stelmaha-v-irkutske-irkutsk",
+    "title": "Неоклассический концерт композитора Дениса Стельмаха в Иркутске.",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Неоклассический концерт композитора Дениса Стельмаха в Иркутске.",
+    "seoTitle": "Неоклассический концерт композитора Дениса Стельмаха в Иркутске. | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6a5b5f3a22df122781b0e622"
+    ],
+    "routes": [
+      {
+        "path": "/events/neoklassicheskii-koncert-kompozitora-denisa-stelmaha-v-irkutske-irkutsk",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T18:11:05.364Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6a5b5f3a22df122781b0e622",
+      "kind": "SINGLE",
+      "slug": "неоклассическии-концерт-композитора-дениса-стельмаха-в-иркутске-6a5b5f3a22df122781b0e622",
+      "seoH1": null,
+      "title": "Неоклассический концерт композитора Дениса Стельмаха в Иркутске.",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a5b5f3a22df122781b0e622",
+          "externalId": "6a5b5f3a22df122781b0e622",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_6a560991b25159768a1916d0",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-07/6a5b5f3a49b45b0f7ed48a2c.png",
+      "seoTitle": null,
+      "cityTitle": "Иркутск",
+      "venueTitle": "Филармония. Органный зал",
+      "description": "Денис Стельмах — молодой пианист и композитор из Архангельска, чье творчество уже на протяжении десяти лет пленяет сердца людей по всему миру своей искренностью и простотой.<br><br>Музыка Дениса — честная и широкая, играющая в ассоциации и по-настоящему от сердца. Грустная и лиричная, свободная и чистая, глубокая и прозрачная: композиции без слов, полные смысла и рассказов о чувствах, переживаниях композитора. Заключённые в изящную эмбиентно-фортепианную звуковую оболочку, они навевают яркие ностальгические образы о давно ушедших временах беззаботного детства и цветущей глубокими чувствами юности, когда каждый день казался нам предвестником чего-то подлинно удивительного, качественно нового и светлого.",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "Сухэ-Батора, 1",
+      "canonicalPath": null,
+      "primaryCityId": "city_2023469",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Иркутск",
+      "venue": "Филармония. Органный зал",
+      "address": "Сухэ-Батора, 1",
+      "ageLimit": "6",
+      "minOffer": 900,
+      "nextStart": "2026-11-20T10:30:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 7
+    }
+  },
+  {
+    "eventId": "evt_6a35492b38e8bdc916dd698b",
+    "eventPageId": "dfce45ad-5a1c-47d9-a179-210b70eed9be",
+    "slug": "20-11-2026-bratsk-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-bratsk",
+    "title": "20.11.2026 / Братск /Костя Кулясов и группа АнимациЯ /animaciya.online",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "20.11.2026 / Братск /Костя Кулясов и группа АнимациЯ /animaciya.online",
+    "seoTitle": "20.11.2026 / Братск /Костя Кулясов и группа АнимациЯ /animaciya.online | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6a35492b38e8bdc916dd698b"
+    ],
+    "routes": [
+      {
+        "path": "/events/20-11-2026-bratsk-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-bratsk",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T20:40:08.666Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6a35492b38e8bdc916dd698b",
+      "kind": "SINGLE",
+      "slug": "tc-6a35492b38e8bdc916dd698b-20-11-2026-братск-костя-кулясов-и-группа-анимация-animaciya-online",
+      "seoH1": null,
+      "title": "20.11.2026 / Братск /Костя Кулясов и группа АнимациЯ /animaciya.online",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a35492b38e8bdc916dd698b",
+          "externalId": "6a35492b38e8bdc916dd698b",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_6808d884ecd1c7d1039f10a0",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-06/6a35492a74c39ee0e61197aa.jpg",
+      "seoTitle": null,
+      "cityTitle": "Братск",
+      "venueTitle": "Harat`S Irish pub",
+      "description": "Концерт Кости Кулясова и группы АнимациЯ в Братске в пабе  Harats встречаемся 20 ноября! <br>Программа : \"Все хиты\". <br>________________________________<br><br><br>📍 г. Братск, Проспект Ленина 35<br>📅 20 ноября 2026 <br>________________________________<br>Костя Кулясов и группа АнимациЯ возвращается с большим сольным концертом, где будут песни, которые вы знаете наизусть, и те, что особенно хочется услышать живьём.<br><br>Это будет вечер честных текстов, громких припевов, живых эмоций и той самой атмосферы, ради которой мы снова и снова собираемся вместе. Будем петь, вспоминать, переживать и проживать каждую песню вместе с вами.<br><br>Если давно собирались попасть на концерт «Анимации» — это отличный повод. Если уже были — знаете, что такие встречи не хочется пропускать.<br><br>Билеты уже в продаже. Не откладывайте на потом — лучшие места заканчиваются первыми.<br><br>До встречи на концерте!",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "пр. Ленина, 35",
+      "canonicalPath": null,
+      "primaryCityId": "city_2051523",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Братск",
+      "venue": "Harat`S Irish pub",
+      "address": "пр. Ленина, 35",
+      "ageLimit": "16",
+      "minOffer": 2200,
+      "nextStart": "2026-11-20T12:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 7
+    }
+  },
+  {
+    "eventId": "evt_69d24132d1068f8c88a31ea7",
+    "eventPageId": "285d2698-62e2-4919-bd6e-bb332d2ea13f",
+    "slug": "bolshoi-solnyi-koncert-russkii-razmer-33-tyumen",
+    "title": "Большой сольный концерт Русский Размер - 33!",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Большой сольный концерт Русский Размер - 33!",
+    "seoTitle": "Большой сольный концерт Русский Размер - 33! | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_69d24132d1068f8c88a31ea7"
+    ],
+    "routes": [
+      {
+        "path": "/events/bolshoi-solnyi-koncert-russkii-razmer-33-tyumen",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T20:40:00.172Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_69d24132d1068f8c88a31ea7",
+      "kind": "SINGLE",
+      "slug": "tc-69d24132d1068f8c88a31ea7-большои-сольныи-концерт-русскии-размер-33",
+      "seoH1": null,
+      "title": "Большой сольный концерт Русский Размер - 33!",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=69d24132d1068f8c88a31ea7",
+          "externalId": "69d24132d1068f8c88a31ea7",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_587e0801515e350017c0e7e8",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6ab02d10cedc5971b6d7e9e3.jpg",
+      "seoTitle": null,
+      "cityTitle": "Тюмень",
+      "venueTitle": "Глав клуб",
+      "description": "Большой сольный  концерт группы «Русский размер» к дню рождению группы! 33 года на сцене! <br>Одна из самых любимых групп всех поколений выступит в формате «Большой сольный концерт». Все хиты, хотя любая песня этой группы-хит! Атмосферное выступление, общение со зрителями и, самое главное, музыка на все времена.<br>«Русский размер» относится к тем коллективам, которые «взорвали» танцплощадки 90-х. Электронная музыка была невероятно востребована на только появившихся тогда клубных тусовках. До сих пор группа поражает своей индивидуальностью и неповторимым стилем.<br>Ангел дня, Весна, Ю-А-Ю, Лети, Звезда разлуки, Вот так, Она лежала на земле, Весь этот мир, Между небом и землей, Было и прошло и другие хиты вы услышите на сцене Глав Клуба!",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "улица Максима Горького, 44/3",
+      "canonicalPath": null,
+      "primaryCityId": "city_1488754",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Тюмень",
+      "venue": "Глав клуб",
+      "address": "улица Максима Горького, 44/3",
+      "ageLimit": "18",
+      "minOffer": 1500,
+      "nextStart": "2026-11-20T14:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 6
+    }
+  },
+  {
+    "eventId": "evt_6abba5432f613cb2e5fac11b",
+    "eventPageId": "24a663f5-6c57-4529-8265-bae684eab6fe",
+    "slug": "argishti-koncert-golos-neba-i-zemli-tyumen",
+    "title": "Аргишти Концерт \"Голос Неба и Земли\"",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Аргишти Концерт \"Голос Неба и Земли\"",
+    "seoTitle": "Аргишти Концерт \"Голос Неба и Земли\" | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6abba5432f613cb2e5fac11b"
+    ],
+    "routes": [
+      {
+        "path": "/events/argishti-koncert-golos-neba-i-zemli-tyumen",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T18:10:09.700Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6abba5432f613cb2e5fac11b",
+      "kind": "SINGLE",
+      "slug": "аргишти-концерт-голос-неба-и-земли-6abba5432f613cb2e5fac11b",
+      "seoH1": null,
+      "title": "Аргишти Концерт \"Голос Неба и Земли\"",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6abba5432f613cb2e5fac11b",
+          "externalId": "6abba5432f613cb2e5fac11b",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_63eb87e65a6a2342efd4f7ef",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6abba54287a69e50e3fe8b48.jpg",
+      "seoTitle": null,
+      "cityTitle": "Тюмень",
+      "venueTitle": "Йога центр Ананда",
+      "description": "20 ноября 2026 года известный в России и за рубежом этно-музыкант и художник из Санкт-Петербурга Аргишти представит свою соло-программу «Голос Неба и Земли». Древняя культура южных стран в тембрах дудука, арабского уда, персидской флейты и восточной перкуссии. <br><br>Главный герой концерта, конечно, дудук. Однако, в руках Аргишти окажется несколько этнических музыкальных инструментов сразу за один концерт! Такие разные — духовые, струнные и ударные. Они несут в себе всю мудрость восточных сказаний о храбрых героях и влюблённых красавицах, об уникальной природе Востока, о тёмных ночах и долгих разговорах у костра посреди безграничной пустыни.<br><br>\"На голос дудука идёт тот, кому действительно интересна жизнь его души\" - часто говорит Аргишти, и, пожалуй, каждый, кто хоть однажды слышал голос этого инструмента, согласится с маэстро. Сеанс спонтанного единения слушателей, сплочённых бесценным чувством - искренностью, вот что такое концерты Аргишти, где каждый музыкальный инструмент обладает психотерапевтической способностью раскрывать сердце человека, успокаивая его и одаряя особенной тихой радостью. Нота за нотой создают канву повествования и воссоздают неповторимый дух Востока. <br><br>Сцену украсят картины Аргишти, как прекрасное дополнение к образам, создаваемым проникновенной музыкой.<br><br><br>Организатор: +79320181122",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "ул.Водопроводная 6",
+      "canonicalPath": null,
+      "primaryCityId": "city_1488754",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Тюмень",
+      "venue": "Йога центр Ананда",
+      "address": "ул.Водопроводная 6",
+      "ageLimit": "12",
+      "minOffer": 1800,
+      "nextStart": "2026-11-20T14:30:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 3
+    }
+  },
+  {
+    "eventId": "evt_6a8d9a2efd0cb2c5bdf471d6",
+    "eventPageId": "d17ff131-ddc5-473c-9856-0c7454a23fa7",
+    "slug": "billy-s-band-ekaterinburg",
+    "title": "Billy’s Band",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Billy’s Band",
+    "seoTitle": "Billy’s Band | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6a8d9a2efd0cb2c5bdf471d6"
+    ],
+    "routes": [
+      {
+        "path": "/events/billy-s-band-ekaterinburg",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T20:40:31.360Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6a8d9a2efd0cb2c5bdf471d6",
+      "kind": "SINGLE",
+      "slug": "billy-s-band-6a8d9a2efd0cb2c5bdf471d6",
+      "seoH1": null,
+      "title": "Billy’s Band",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a8d9a2efd0cb2c5bdf471d6",
+          "externalId": "6a8d9a2efd0cb2c5bdf471d6",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_68590c27be006ec312dbe79f",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-08/6a8d9c8572c1ccb50e98344a.jpg",
+      "seoTitle": null,
+      "cityTitle": "Екатеринбург",
+      "venueTitle": "ТЦ Комсомол, Джой Паб",
+      "description": "Атмосфера довлатовского Петербурга и Лос-Анджелеса Тома Уэйста, лёгкая джазовая грусть и тяжелая рок-н-ролльная романтика — это включено в концертную программу группы Billy’s band. А ещё музыканты из северной столицы исполнят: «Коктейль из лунного света и вина», «Блюз в голове» и «Оторвемся по-питерски», так и недавно представленные «Мама, забери», «Старомоден» и «Ты мерещишься мне».<br><br>Хрипотца Билли Новика, саксофон Михаила Жидких и гитара нового участника коллектива Марса Ковалевского — обязательные атрибуты этого, фантастически обаятельного коллектива Billy’s Band.",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "BadenLand, Сибирский Тракт, 2, Екатеринбург, Свердловская обл., Россия, 620007",
+      "canonicalPath": null,
+      "primaryCityId": "city_1486209",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Екатеринбург",
+      "venue": "ТЦ Комсомол, Джой Паб",
+      "address": "BadenLand, Сибирский Тракт, 2, Екатеринбург, Свердловская обл., Россия, 620007",
+      "ageLimit": "18",
+      "minOffer": 2000,
+      "nextStart": "2026-11-20T15:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 11
+    }
+  },
+  {
+    "eventId": "evt_6a8c23fc3eef01592600c567",
+    "eventPageId": "94d3d989-b114-447d-b922-1c80d6ec34e7",
+    "slug": "ivan-zolo-penza-20-noyabrya-rok-kafe-131-2-penza",
+    "title": "IVAN ZOLO | ПЕНЗА | 20 НОЯБРЯ | РОК-КАФЕ 13½",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "IVAN ZOLO | ПЕНЗА | 20 НОЯБРЯ | РОК-КАФЕ 13½",
+    "seoTitle": "IVAN ZOLO | ПЕНЗА | 20 НОЯБРЯ | РОК-КАФЕ 13½ | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6a8c23fc3eef01592600c567"
+    ],
+    "routes": [
+      {
+        "path": "/events/ivan-zolo-penza-20-noyabrya-rok-kafe-131-2-penza",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T18:10:45.970Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6a8c23fc3eef01592600c567",
+      "kind": "SINGLE",
+      "slug": "ivan-zolo-пенза-20-ноября-рок-кафе-131-2-6a8c23fc3eef01592600c567",
+      "seoH1": null,
+      "title": "IVAN ZOLO | ПЕНЗА | 20 НОЯБРЯ | РОК-КАФЕ 13½",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a8c23fc3eef01592600c567",
+          "externalId": "6a8c23fc3eef01592600c567",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_6277eaa6fa6bbf619711486c",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-08/6a8c23fb53556a4e7dfeaf41.jpg",
+      "seoTitle": null,
+      "cityTitle": "Пенза",
+      "venueTitle": "Рок Кафе 13½",
+      "description": "IVAN ZOLO едет к СВОИМ!<br><br>В новом туре «СВОЙ В ГОРОДЕ» — встречи с Золиками по всей стране!<br><br>В программе — песни с первого альбома «КРАФТОВЫЙ», а также главные хиты «Альтушка», «Баобаб», «Лаванда», «Марабу». <br>Новые треки, впервые прозвучат на концертах!<br><br>В этот раз не через экран и не на стриме <br>IVAN ZOLO будет в Пензе 20 ноября.<br><br>Увидимся на концерте!",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "Чехова 15 Пенза",
+      "canonicalPath": null,
+      "primaryCityId": "city_511565",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Пенза",
+      "venue": "Рок Кафе 13½",
+      "address": "Чехова 15 Пенза",
+      "ageLimit": "12",
+      "minOffer": 1100,
+      "nextStart": "2026-11-20T15:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 5
+    }
+  },
+  {
+    "eventId": "evt_6acfa4f855de9e5ece972783",
+    "eventPageId": "1be63f00-1b74-47df-89a6-aaaefbe4b8df",
+    "slug": "november-metal-fest-moskva",
+    "title": "NOVEMBER METAL FEST",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "NOVEMBER METAL FEST",
+    "seoTitle": "NOVEMBER METAL FEST | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6acfa4f855de9e5ece972783"
+    ],
+    "routes": [
+      {
+        "path": "/events/november-metal-fest-moskva",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T18:09:56.030Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6acfa4f855de9e5ece972783",
+      "kind": "SINGLE",
+      "slug": "november-metal-fest-6acfa4f855de9e5ece972783",
+      "seoH1": null,
+      "title": "NOVEMBER METAL FEST",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6acfa4f855de9e5ece972783",
+          "externalId": "6acfa4f855de9e5ece972783",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_58b69bf1515e3500159b31aa",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6acfa4f59bd2d9b6ae570bd1.jpg",
+      "seoTitle": null,
+      "cityTitle": "Москва",
+      "venueTitle": "MEZZO FORTE CLUB",
+      "description": "November Metal Fest 2026: только один вечер, только настоящий металл! 🔥<br><br><br>Группа «Эпитафия» приглашает всех, кто чувствует ритм тяжёлого звука, на ежегодный фестиваль November Metal Fest 2026! 🤘<br><br>🗓 Когда: 20 ноября<br>📍 Где: Москва, клуб «Mezzo Forte»<br><br>На одной сцене соберутся легенды отечественной тяжёлой сцены:<br>✅ «Чёрный кофе»<br>✅ «Артерия»<br>✅ И другие крутые группы — список пополняется!<br>А группа «Эпитафия» готовит для вас особый подарок: часовая программа и эксклюзивная премьера новой песни — только в этот вечер! 💥<br>Количество билетов строго ограничено — не упусти свой шанс быть в эпицентре метал-энергии.",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "1-я Останкинская, д. 53",
+      "canonicalPath": null,
+      "primaryCityId": "city_524901",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Москва",
+      "venue": "MEZZO FORTE CLUB",
+      "address": "1-я Останкинская, д. 53",
+      "ageLimit": "12",
+      "minOffer": 1500,
+      "nextStart": "2026-11-20T15:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 4
+    }
+  },
+  {
+    "eventId": "evt_6a48f77538bdf7b85c2fa7bf",
+    "eventPageId": "48c818c1-d023-4167-bfd1-8bc3e489fe44",
+    "slug": "simfoniya-roka-akt-pervyi-cheboksary",
+    "title": "Симфония рока: Акт первый",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Симфония рока: Акт первый",
+    "seoTitle": "Симфония рока: Акт первый | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6a48f77538bdf7b85c2fa7bf"
+    ],
+    "routes": [
+      {
+        "path": "/events/simfoniya-roka-akt-pervyi-cheboksary",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T20:40:10.435Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6a48f77538bdf7b85c2fa7bf",
+      "kind": "SINGLE",
+      "slug": "симфония-рока-акт-первыи-6a48f77538bdf7b85c2fa7bf",
+      "seoH1": null,
+      "title": "Симфония рока: Акт первый",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a48f77538bdf7b85c2fa7bf",
+          "externalId": "6a48f77538bdf7b85c2fa7bf",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_5e046e81f5395f41c5c83d8e",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6ab1825aac3a6f563a8ec986.png",
+      "seoTitle": null,
+      "cityTitle": "Чебоксары",
+      "venueTitle": "Дворец культуры ЧГУ",
+      "description": "Дмитрий Чирков <br>«РОК — ЭТО КЛАССИКА. МЫ ДОКАЖЕМ.» <br><br>Музыка, от которой бегут мурашки и замирает сердце. <br><br>Оркестр играет рок, и струны рвутся от накала. СЛО — мощь, драйв и классическое звучание в одном флаконе. <br><br>В программе: от бессмертного Queen до агрессивного Rammstein, от легендарного КиШ до пронзительного Виктора Цоя. <br><br>Дирижёр Дмитрий Чирков ведёт за собой. Солисты Арслан и Артём играют так, что мурашки гарантированы. <br><br>Рок начинается здесь.",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "ул. Университетская, 38",
+      "canonicalPath": null,
+      "primaryCityId": "city_569696",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Чебоксары",
+      "venue": "Дворец культуры ЧГУ",
+      "address": "ул. Университетская, 38",
+      "ageLimit": "6",
+      "minOffer": 900,
+      "nextStart": "2026-11-20T16:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 8
+    }
+  },
+  {
+    "eventId": "evt_6abf5bbd4b44952667022700",
+    "eventPageId": "787c34c2-5e9d-427a-8864-f44d24b50a0a",
+    "slug": "koncert-antona-zacepina-sankt-peterburg",
+    "title": "Концерт Антона Зацепина",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Концерт Антона Зацепина",
+    "seoTitle": "Концерт Антона Зацепина | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6abf5bbd4b44952667022700"
+    ],
+    "routes": [
+      {
+        "path": "/events/koncert-antona-zacepina-sankt-peterburg",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T18:10:02.124Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6abf5bbd4b44952667022700",
+      "kind": "SINGLE",
+      "slug": "концерт-антона-зацепина-6abf5bbd4b44952667022700",
+      "seoH1": null,
+      "title": "Концерт Антона Зацепина",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6abf5bbd4b44952667022700",
+          "externalId": "6abf5bbd4b44952667022700",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_63d245c0cf850e128fd98aeb",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6abf5bfb1641acab8e8ad373.jpg",
+      "seoTitle": null,
+      "cityTitle": "Санкт-Петербург",
+      "venueTitle": "Ibiza",
+      "description": "Приглашаем вас на концерт Антона Зацепина — яркого артиста, певца, чьи песни стали настоящими хитами для нескольких поколений слушателей.<br><br>В этот вечер зрителей ждут любимые композиции.<br>Антон исполнит самые известные песни из своего репертуара, а также порадует поклонников новыми музыкальными композициями. <br><br>Концерт Антона Зацепина — это встреча с артистом, который умеет заряжать энергией, создавать тёплую атмосферу и дарить зрителям отличное настроение. <br>Не упустите возможность провести незабываемый вечер в компании любимого исполнителя!<br><br>Сбор гостей в 20:00<br>Начало концерта в  22:00<br><br>DC/FC",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "Садовая ул., 12",
+      "canonicalPath": null,
+      "primaryCityId": "city_498817",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Санкт-Петербург",
+      "venue": "Ibiza",
+      "address": "Садовая ул., 12",
+      "ageLimit": "18",
+      "minOffer": 1500,
+      "nextStart": "2026-11-20T16:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 37
+    }
+  },
+  {
+    "eventId": "evt_6ab3b454a57c3e210575e8d5",
+    "eventPageId": "baa923ce-7a3b-4ce3-a7a5-becda8d1b064",
+    "slug": "koncert-olega-nikitina-dlya-nas-s-toboyu-moskva",
+    "title": "Концерт Олега Никитина - \"Для нас с тобою\"",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Концерт Олега Никитина - \"Для нас с тобою\"",
+    "seoTitle": "Концерт Олега Никитина - \"Для нас с тобою\" | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6ab3b454a57c3e210575e8d5"
+    ],
+    "routes": [
+      {
+        "path": "/events/koncert-olega-nikitina-dlya-nas-s-toboyu-moskva",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T18:10:11.964Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6ab3b454a57c3e210575e8d5",
+      "kind": "SINGLE",
+      "slug": "концерт-олега-никитина-для-нас-с-тобою-6ab3b454a57c3e210575e8d5",
+      "seoH1": null,
+      "title": "Концерт Олега Никитина - \"Для нас с тобою\"",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ab3b454a57c3e210575e8d5",
+          "externalId": "6ab3b454a57c3e210575e8d5",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_63429ede137b2e27807b9e20",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6ab67e20e3e9cea086c856bc.jpg",
+      "seoTitle": null,
+      "cityTitle": "Москва",
+      "venueTitle": "Концертный зал Центрального Офицерского Клуба ВКС",
+      "description": "Представляем вашему вниманию сольную песенную программу \"Для нас с тобою\", с участием Автора-Исполнителя своих собственных песен, Лауреата Международного Фестиваля \"Шансон над Волгой\", Обладателя 1 го места Международного Фестиваля \"Венец Шансона\", Обладателя Кубка Открытие Фестиваля \"Изысканный Шансон\", Актера Российского Кино(снявшегося более чем в 80 кинофильмах) - Олега Никитина.<br><br>Вы услышите и увидите только авторские, новые, яркие песни и краски Российского Шансона, удачно и счастливо существующие в творческом тандеме с актерской песней:<br>Лед тронулся;<br>Для нас с тобою;<br>Кудряшки;<br>Желанна;<br>Коньячок;<br>Абрау дюрсо и др.",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "ул. Павловская, 8",
+      "canonicalPath": null,
+      "primaryCityId": "city_524901",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Москва",
+      "venue": "Концертный зал Центрального Офицерского Клуба ВКС",
+      "address": "ул. Павловская, 8",
+      "ageLimit": "16",
+      "minOffer": 300,
+      "nextStart": "2026-11-20T16:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 6
+    }
+  },
+  {
+    "eventId": "evt_6ab536719aaeb8b240db7270",
+    "eventPageId": "6187f718-cf13-49c7-903b-8c529a9c30ee",
+    "slug": "oleg-medvedev-i-roman-filippov-koncert-v-kc-dom-moskva",
+    "title": "Олег Медведев и Роман Филиппов - концерт в КЦ ДОМ",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Олег Медведев и Роман Филиппов - концерт в КЦ ДОМ",
+    "seoTitle": "Олег Медведев и Роман Филиппов - концерт в КЦ ДОМ | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6ab536719aaeb8b240db7270"
+    ],
+    "routes": [
+      {
+        "path": "/events/oleg-medvedev-i-roman-filippov-koncert-v-kc-dom-moskva",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T18:10:15.409Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6ab536719aaeb8b240db7270",
+      "kind": "SINGLE",
+      "slug": "олег-медведев-и-роман-филиппов-концерт-в-кц-дом-6ab536719aaeb8b240db7270",
+      "seoH1": null,
+      "title": "Олег Медведев и Роман Филиппов - концерт в КЦ ДОМ",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ab536719aaeb8b240db7270",
+          "externalId": "6ab536719aaeb8b240db7270",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_61f2d244debbab343d578ccb",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6ab5367012a01bcd84ca53ad.jpg",
+      "seoTitle": null,
+      "cityTitle": "Москва",
+      "venueTitle": "ДОМ",
+      "description": "Приглашаем на большой концерт Олега Медведева в Москве - 20 ноября, Культурный Центр ДОМ.<br>Вторая гитара - Роман Филиппов.<br>Олег Медведев (г. Иркутск) - автор песен, которые знают и любят по всей стране инженеры и туристы, историки и электрики, студенты и доктора наук - все те, кто точно знает, что \"один лишь Праздник есть, который и вправду нужен\". <br>Концерт-подзарядка перед долгой зимой. Присоединяйтесь!",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "Большой Овчинниковский переулок, дом 24, строение 4",
+      "canonicalPath": null,
+      "primaryCityId": "city_524901",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Москва",
+      "venue": "ДОМ",
+      "address": "Большой Овчинниковский переулок, дом 24, строение 4",
+      "ageLimit": "12",
+      "minOffer": 2800,
+      "nextStart": "2026-11-20T16:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 1
+    }
+  },
+  {
+    "eventId": "evt_6a8f47e3e2a0d1e8e741cc2d",
+    "eventPageId": "098983af-62af-4a52-9752-f52541fffce7",
+    "slug": "aikko-koncert-v-penze-penza",
+    "title": "AIKKO [КОНЦЕРТ В ПЕНЗЕ]",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "AIKKO [КОНЦЕРТ В ПЕНЗЕ]",
+    "seoTitle": "AIKKO [КОНЦЕРТ В ПЕНЗЕ] | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6a8f47e3e2a0d1e8e741cc2d"
+    ],
+    "routes": [
+      {
+        "path": "/events/aikko-koncert-v-penze-penza",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T18:10:45.826Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6a8f47e3e2a0d1e8e741cc2d",
+      "kind": "SINGLE",
+      "slug": "aikko-концерт-в-пензе-6a8f47e3e2a0d1e8e741cc2d",
+      "seoH1": null,
+      "title": "AIKKO [КОНЦЕРТ В ПЕНЗЕ]",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a8f47e3e2a0d1e8e741cc2d",
+          "externalId": "6a8f47e3e2a0d1e8e741cc2d",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_65422be9eafbb2dd36c46b79",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-08/6a8f3b7b76e3952f9573a5f7.jpg",
+      "seoTitle": null,
+      "cityTitle": "Пенза",
+      "venueTitle": "Бар \"Montana\"",
+      "description": "20 ноября 2026 | aikko – Большой концерт в Пензе | Бар \"Montana\" | Начало в 19:00<br><br>Купить электронный билет можно прямо здесь!<br>При входе стоимость билетов будет выше (при их наличии).<br><br>Подробнее о событии: https://vk.me/aikkotourpnz<br><br>Дополнительная информация через Telegram: https://t.me/AbrikosConcert_supbot, через VK – https://vk.me/abrikosconcert или по тел. 8-928-105-44-65 (MAX и звонки).<br><br>Место проведения концерта:<br>Бар \"Montana\"<br>Адрес: г. Пенза, пр. Строителей, 9 (ТЦ Олимп, 4 этаж)<br>Рекомендованный возраст 16+<br><br>Организатор: <br>Концертное агентство \"Abrikos Concert\" – Ваши любимые звезды с нами становятся ближе<br>https://vk.ru/abrikosconcert",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "пр. Строителей, 9",
+      "canonicalPath": null,
+      "primaryCityId": "city_511565",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Пенза",
+      "venue": "Бар \"Montana\"",
+      "address": "пр. Строителей, 9",
+      "ageLimit": "16",
+      "minOffer": 2200,
+      "nextStart": "2026-11-20T16:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 5
+    }
+  },
+  {
+    "eventId": "evt_6964c159e639aebdf4720d07",
+    "eventPageId": "de3777a1-8a0e-4f74-ae90-dfd54dd82b00",
+    "slug": "gruppa-mirazh-bolshoi-solnyi-koncert-sankt-peterburg",
+    "title": "Группа Мираж. Большой сольный концерт",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Группа Мираж. Большой сольный концерт",
+    "seoTitle": "Группа Мираж. Большой сольный концерт | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6964c159e639aebdf4720d07"
+    ],
+    "routes": [
+      {
+        "path": "/events/gruppa-mirazh-bolshoi-solnyi-koncert-sankt-peterburg",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T20:39:57.846Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6964c159e639aebdf4720d07",
+      "kind": "SINGLE",
+      "slug": "группа-мираж-большои-сольныи-концерт-6964c159e639aebdf4720d07",
+      "seoH1": null,
+      "title": "Группа Мираж. Большой сольный концерт",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6964c159e639aebdf4720d07",
+          "externalId": "6964c159e639aebdf4720d07",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_583ebddbd35286001504f465",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-01/6964c158dc09ae16e62844e7.jpg",
+      "seoTitle": null,
+      "cityTitle": "Санкт-Петербург",
+      "venueTitle": "Клуб \"Космонавт\"",
+      "description": "Культовая группа «Мираж» даст большой концерт в Санкт-Петербурге!<br><br>Все любимые хиты, которые ты знаешь наизусть, прозвучат в живом звуке, среди них:<br>«Музыка нас связала», «Наступает ночь»,<br>«Новый герой», «Я больше не прошу»,<br>«Безумный мир» и тонна других звучных блокбастеров в большом шоу во главе с<br>Екатериной Болдышевой!<br>Это будет вечер, после которого ты будешь в экстазе ещё долгое время!<br><br>Хочешь поплясать на огромном танцполе? Тогда покупай категорию “Танцпол”.<br>Хочешь посидеть на мягком диване с полноценным меню и прекрасным видом на всё шоу? Тогда бери VIP-зону! Обратите внимание, что столы продаются по местам. Если хотите сидеть без подсадки, то нужно выкупать стол целиком.<br><br>Запуск гостей с 19:00, начало концерта в 20:00. Рекомендуем приходить к началу запуска, чтобы занять лучшие места у сцены и сделать заказы за ваши столики.<br><br>Клуб Космонавт, Бронницкая 24 (м. Технологический институт)<br><br>Мероприятие 16+<br><br>Если тебе нужна помощь в выборе места, позвони нам: +7 (991) 779-10-97 (12:00–23:00 МСК)",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "ул. Бронницкая, д. 24",
+      "canonicalPath": null,
+      "primaryCityId": "city_498817",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Санкт-Петербург",
+      "venue": "Клуб \"Космонавт\"",
+      "address": "ул. Бронницкая, д. 24",
+      "ageLimit": "16",
+      "minOffer": 3000,
+      "nextStart": "2026-11-20T17:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 1
+    }
+  },
+  {
+    "eventId": "evt_6ad7c429b34fc421a1a6dc4d",
+    "eventPageId": "73dbd515-b1d8-463e-8c1c-11e84afffa30",
+    "slug": "20-noyabrya-gruppa-zahar-hity-gruppy-korol-i-shut-i-russkogo-pank-roka-moskva",
+    "title": "20 Ноября. Группа \"ЗАХАР\". Хиты группы \"Король и Шут\" и русского панк рока.",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "20 Ноября. Группа \"ЗАХАР\". Хиты группы \"Король и Шут\" и русского панк рока.",
+    "seoTitle": "20 Ноября. Группа \"ЗАХАР\". Хиты группы \"Король и Шут\" и русского панк рока. | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6ad7c429b34fc421a1a6dc4d"
+    ],
+    "routes": [
+      {
+        "path": "/events/20-noyabrya-gruppa-zahar-hity-gruppy-korol-i-shut-i-russkogo-pank-roka-moskva",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T18:09:45.944Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6ad7c429b34fc421a1a6dc4d",
+      "kind": "SINGLE",
+      "slug": "20-ноября-группа-захар-хиты-группы-король-и-шут-и-русского-панк-рока-6ad7c429b34fc421a1a6dc4d",
+      "seoH1": null,
+      "title": "20 Ноября. Группа \"ЗАХАР\". Хиты группы \"Король и Шут\" и русского панк рока.",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ad7c429b34fc421a1a6dc4d",
+          "externalId": "6ad7c429b34fc421a1a6dc4d",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_557c82c89cb53870bca56b50",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ad7c428d4693cf11ec70b6e.jpg",
+      "seoTitle": null,
+      "cityTitle": "Москва",
+      "venueTitle": "Клуб \"GLASTONBERRY\"",
+      "description": "20 го ноября группа \"ЗАХАР\" выступит в клубе \"Glastonberry\" в Москве.<br>Основал коллектив бас гитарист группы «Король и Шут» Сергей Захаров.<br>Группа объединила известных рок  музыкантов нашей страны:<br>Сергей Захаров            (Король и Шут)<br>Алексей Назаров         (План Ломоносова)<br>Елена Варфоломеева  ( Леди Балалайка)<br>Майк Кремлин              (Глушители)<br>Михаил Шаев                (План Ломоносова)<br>Шерзад Хайитбаев       (МИРИАД) <br><br>В программе концерта прозвучат хиты известных коллективов: \"Король и Шут\", \"Бригадный подряд\" план «План Ломоносова» и др.<br>Кроме того, будут исполнены песни из сольного альбома Михаила Горшенёва \"Я – алкоголик, анархист\".<br>Также в программе вечера — произведения таких легенд русского панк-рока, как Егор Летов и Юрий Хой.<br>Концерт обещает быть ярким и запоминающимся, ведь панк-рок — объединяет.",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "1-я Дубровская улица, 13Ас1",
+      "canonicalPath": null,
+      "primaryCityId": "city_524901",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Москва",
+      "venue": "Клуб \"GLASTONBERRY\"",
+      "address": "1-я Дубровская улица, 13Ас1",
+      "ageLimit": "16",
+      "minOffer": 1000,
+      "nextStart": "2026-11-20T17:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 4
+    }
+  },
+  {
+    "eventId": "evt_6a7b2c1b052ba5d10bcef00d",
+    "eventPageId": "ccdbcafe-96cb-4cf8-9fee-79bd33e02e0e",
+    "slug": "chingis-han-legendarnaya-gruppa-80h-moskva",
+    "title": "Чингис Хан - легендарная группа 80х!",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Чингис Хан - легендарная группа 80х!",
+    "seoTitle": "Чингис Хан - легендарная группа 80х! | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6a7b2c1b052ba5d10bcef00d"
+    ],
+    "routes": [
+      {
+        "path": "/events/chingis-han-legendarnaya-gruppa-80h-moskva",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T18:10:59.985Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6a7b2c1b052ba5d10bcef00d",
+      "kind": "SINGLE",
+      "slug": "чингис-хан-легендарная-группа-80х-6a7b2c1b052ba5d10bcef00d",
+      "seoH1": null,
+      "title": "Чингис Хан - легендарная группа 80х!",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a7b2c1b052ba5d10bcef00d",
+          "externalId": "6a7b2c1b052ba5d10bcef00d",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_6234b4769cbd5cf182d32d3f",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-08/6a7b2c1a052ba5d10bcef00a.jpg",
+      "seoTitle": null,
+      "cityTitle": "Москва",
+      "venueTitle": "Руки ВВерх! Бар на Таганке",
+      "description": "Долгожданный концерт группы Чингис Хан<br><br>Созданная Вольфгангом Хайкелем в Мюнхене в 1979 для участия в конкурсе Евровидение, группа Dschinghis Khan, заняв в итоге четвертое место с одноименной песней, следующим синглом “Moskau” покорила мировые чарты, удерживая первое место в хит-параде Австралии в течение шести недель!<br><br>Последовавший за этим успех синглов “Hadschi Halef Omar”, “Rom”, “Pistolero” и “Loreley” сделал их законодателями жанра евродиско-поп. Выпустив к 1985 году шесть альбомов, группа взяла паузу. Возрождение наступило в 2005 с приходом Штефана Трака (Stefan Track). В 2018 перезаписанный хит “Moskau” стал неофициальным гимном Чемпионата мира по футболу в России. В 2020 Вольфганг Хайкель и Штефан Трак записали восьмой альбом группы “Here We Go”.<br><br>Безумная энергетика и яркие костюмы делают выступления группы Dschinghis Khan запоминающимися надолго!",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "Москва, Нижегородская, 2к1",
+      "canonicalPath": null,
+      "primaryCityId": "city_524901",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Москва",
+      "venue": "Руки ВВерх! Бар на Таганке",
+      "address": "Москва, Нижегородская, 2к1",
+      "ageLimit": "18",
+      "minOffer": 3000,
+      "nextStart": "2026-11-20T17:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 8
+    }
+  },
+  {
+    "eventId": "evt_6ac902126e74e195425d8d07",
+    "eventPageId": "d3a7b8cc-666b-4b85-ac25-43bf1730f891",
+    "slug": "dzhaz-rasskaz-kommunalnaya-kvartira-sankt-peterburg",
+    "title": "\"Джаз-рассказ. Зощенко. Коммунальная квартира.\"",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "\"Джаз-рассказ. Зощенко. Коммунальная квартира.\"",
+    "seoTitle": "\"Джаз-рассказ. Зощенко. Коммунальная квартира.\" | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6ac902126e74e195425d8d07"
+    ],
+    "routes": [
+      {
+        "path": "/events/dzhaz-rasskaz-kommunalnaya-kvartira-sankt-peterburg",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T18:10:00.459Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6ac902126e74e195425d8d07",
+      "kind": "SINGLE",
+      "slug": "джаз-рассказ-коммунальная-квартира-6ac902126e74e195425d8d07",
+      "seoH1": null,
+      "title": "\"Джаз-рассказ. Зощенко. Коммунальная квартира.\"",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ac902126e74e195425d8d07",
+          "externalId": "6ac902126e74e195425d8d07",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_5e39e8ad0c5266cedda84edb",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-03/69bad05063f11b8e219b59b3.jpg",
+      "seoTitle": null,
+      "cityTitle": "Санкт-Петербург",
+      "venueTitle": "Особняк Брюллова",
+      "description": "Коммунальная квартира — это целая эпоха жизни нашей страны, в чем-то — это наш культурный код.<br><br>С коммуналками у всех нас связано много историй. Многие в них жили, некоторые живут до сих пор, и практически все бывали там в гостях.<br><br>Истории коммунальных квартир полны юмора и ностальгии...<br><br>За основу спектакля взяты рассказы Михаила Зощенко, а пьесу написала драматург Настасья Фёдорова.<br><br><br>Автор и вдохновитель проекта «Джаз-Рассказ» — петербургский актер, лауреат конкурса «Поющая маска», номинант театральной премии «Прорыв» Кузьма Стомаченко.<br><br>Женскую роль исполняет актриса и певица Анна Петросян, известная своими театральными работами на сценах Петербурга и участием в группе «Сестра Петра».<br><br>За музыкальное сопровождение отвечает Lev Piano Band: на саксофоне, ударных, клавишах и контрабасе играют известные петербургские музыканты.",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "Наб. Лейтенанта Шмидта, 37",
+      "canonicalPath": null,
+      "primaryCityId": "city_498817",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Санкт-Петербург",
+      "venue": "Особняк Брюллова",
+      "address": "Наб. Лейтенанта Шмидта, 37",
+      "ageLimit": "16",
+      "minOffer": 2500,
+      "nextStart": "2026-11-20T17:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 6
+    }
+  },
+  {
+    "eventId": "evt_6ae0bb923a910a1ec52b4ce5",
+    "eventPageId": "9f0d124e-02dd-460f-9549-237fe6efd586",
+    "slug": "koncert-uchenikov-aset-moskva",
+    "title": "КОНЦЕРТ УЧЕНИКОВ ASET",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "КОНЦЕРТ УЧЕНИКОВ ASET",
+    "seoTitle": "КОНЦЕРТ УЧЕНИКОВ ASET | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6ae0bb923a910a1ec52b4ce5"
+    ],
+    "routes": [
+      {
+        "path": "/events/koncert-uchenikov-aset-moskva",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T18:11:12.045Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6ae0bb923a910a1ec52b4ce5",
+      "kind": "SINGLE",
+      "slug": "концерт-учеников-aset-6ae0bb923a910a1ec52b4ce5",
+      "seoH1": null,
+      "title": "КОНЦЕРТ УЧЕНИКОВ ASET",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ae0bb923a910a1ec52b4ce5",
+          "externalId": "6ae0bb923a910a1ec52b4ce5",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_590854a3515e350016705a52",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ae0bc18a59060c8f81ca5c6.jpg",
+      "seoTitle": null,
+      "cityTitle": "Москва",
+      "venueTitle": "Клуб Алексея Козлова",
+      "description": "21 ноября на сцену выйдут ученики певицы и композитора ASET. Для молодых артистов это уникальная возможность попробовать себя на большой сцене. В программе прозвучат мировые хиты на английском и русском языках.<br><br>Помимо сольной карьеры ASET является заслуженным педагогом и музыкальным наставником со стажем более 20 лет, а так же членом жюри многих музыкальных фестивалей и конкурсов. Певица успешно готовит молодых артистов к участию как в музыкальных проектах, так и масштабных фестивалях. Ученики также принимают участие уникальную возможность принять участие в сольных концертах ASET.<br><br>Асет Самраилова – певица и композитор, участница 2-го сезона шоу «Голос» на Первом канале, шоу «Главная Сцена», а так же «Большой джаз» и «Романтика романса» на телеканале Культура, хэдлайнер международных фестивалей. Работая в жанрах поп, R&B, соул, джаз, блюз и городской романс, певица уверенно покоряет музыкальный Олимп. За своеобразный стиль исполнения ее прозвали «Российской Алишей Кис» – необычный тембр голоса и природное обаяние ASET не оставляет равнодушным ни одного зрителя. Певица регулярно выступает на лучших площадках Москвы и других городов России и за рубежом.",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "Маросейка 9/2",
+      "canonicalPath": null,
+      "primaryCityId": "city_524901",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Москва",
+      "venue": "Клуб Алексея Козлова",
+      "address": "Маросейка 9/2",
+      "ageLimit": "12",
+      "minOffer": 1000,
+      "nextStart": "2026-11-21T11:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 1
+    }
+  },
+  {
+    "eventId": "evt_6acf9d518a697b06e80c02a1",
+    "eventPageId": "6b54c755-887c-4240-b3ca-b4d99c1b5017",
+    "slug": "organ-muzyka-kino-aleksandr-hmarnyi-smolensk",
+    "title": "\"ОРГАН. МУЗЫКА КИНО\". Александр Хмарный",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "\"ОРГАН. МУЗЫКА КИНО\". Александр Хмарный",
+    "seoTitle": "\"ОРГАН. МУЗЫКА КИНО\". Александр Хмарный | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6acf9d518a697b06e80c02a1"
+    ],
+    "routes": [
+      {
+        "path": "/events/organ-muzyka-kino-aleksandr-hmarnyi-smolensk",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T18:09:52.180Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6acf9d518a697b06e80c02a1",
+      "kind": "SINGLE",
+      "slug": "орган-музыка-кино-александр-хмарныи-6acf9d518a697b06e80c02a1",
+      "seoH1": null,
+      "title": "\"ОРГАН. МУЗЫКА КИНО\". Александр Хмарный",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6acf9d518a697b06e80c02a1",
+          "externalId": "6acf9d518a697b06e80c02a1",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_696a63aeea6927d7d0e6c289",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ae1ca1cf1290caf0c18e6a6.jpg",
+      "seoTitle": null,
+      "cityTitle": "Смоленск",
+      "venueTitle": "Дом Музыки",
+      "description": "Х.Цимер - Интерстеллар<br>Д. Джонс - Пираты Карибского моря<br>Д.Уильямс - Список Шиндлера<br>А.Тарковский - Солярис<br>М. Таривердиев - Маленький принц <br>М. Таривердиев - Снег над Ленинградом<br>В.Дашкевич - Приключения Шерлока Холмса<br>Дж. Хорнер - Титаник<br>Дж.Уильямс - Звездные войны<br><br>     <br>Льготные категории граждан могут приобрести билеты по специальной цене в кассе Дома музыки.<br>Часы работы кассы - среда, четверг, пятница, суббота с 10.00 до 16.00<br>Количество льготных билетов ограничено<br>Информация о льготах - на сайте Дома музыки в разделе \"Зрителям\"<br>https://dmsmolensk.ru/zritelyam",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "Бакунина 2Д",
+      "canonicalPath": null,
+      "primaryCityId": "city_491687",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Смоленск",
+      "venue": "Дом Музыки",
+      "address": "Бакунина 2Д",
+      "ageLimit": "12",
+      "minOffer": 1700,
+      "nextStart": "2026-11-21T11:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 4
+    }
+  },
+  {
+    "eventId": "evt_6a0a26f221a01d97b31dde32",
+    "eventPageId": "5eaee4c1-5103-477b-a6f7-89adb4699adb",
+    "slug": "sveta-bolshoi-solnyi-koncert-krasnodar",
+    "title": "Света. Большой сольный концерт",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Света. Большой сольный концерт",
+    "seoTitle": "Света. Большой сольный концерт | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6a0a26f221a01d97b31dde32"
+    ],
+    "routes": [
+      {
+        "path": "/events/sveta-bolshoi-solnyi-koncert-krasnodar",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T20:40:02.525Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6a0a26f221a01d97b31dde32",
+      "kind": "SINGLE",
+      "slug": "света-большои-сольныи-концерт-6a0a26f221a01d97b31dde32",
+      "seoH1": null,
+      "title": "Света. Большой сольный концерт",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a0a26f221a01d97b31dde32",
+          "externalId": "6a0a26f221a01d97b31dde32",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_64e7093fd7a4dcf239fd559d",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-05/6a0a26f1425f66c9e88b85ac.jpg",
+      "seoTitle": null,
+      "cityTitle": "Краснодар",
+      "venueTitle": "Порт 219",
+      "description": "Певица Света с грандиозной сольной программой!<br><br>Тебя ждут любимые хиты со всех альбомов от королевы танцевальной поп-музыки нулевых, живые музыканты и сногсшибательные танцы от балета в фирменном шоу!<br><br>Ты услышишь абсолютно все хиты, среди которых: «Дорога в аэропорт», «Что мне делать сегодня», «Твои глаза», «А может нет, а может да», «Ты не мой», «Хватит, довольно», и тонну других блокбастеров!<br><br>Сбор гостей за 1 час до начала концерта.<br>Рекомендуем приходить к началу запуска, чтобы занять лучшие места у сцены и сделать заказы за ваши столики.<br>Если тебе нужна помощь в выборе стола, позвони нам: +7 (911) 168-74-55 (12:00–23:00 МСК).",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "ул. Вишняковой, 1/10с2",
+      "canonicalPath": null,
+      "primaryCityId": "city_542420",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Краснодар",
+      "venue": "Порт 219",
+      "address": "ул. Вишняковой, 1/10с2",
+      "ageLimit": "12",
+      "minOffer": 3300,
+      "nextStart": "2026-11-20T17:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 1
+    }
+  },
+  {
+    "eventId": "evt_6ad9ed76a2273572e81fc9fd",
+    "eventPageId": "46505d54-d974-42cb-b192-dfe892754a81",
+    "slug": "reiv-dlya-vygorevshih-lo-fi-jazz-acoustic-edition-moskva",
+    "title": "Рейв для выгоревших: Lo-Fi Jazz Acoustic Edition",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Рейв для выгоревших: Lo-Fi Jazz Acoustic Edition",
+    "seoTitle": "Рейв для выгоревших: Lo-Fi Jazz Acoustic Edition | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6ad9ed76a2273572e81fc9fd"
+    ],
+    "routes": [
+      {
+        "path": "/events/reiv-dlya-vygorevshih-lo-fi-jazz-acoustic-edition-moskva",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T18:09:35.795Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6ad9ed76a2273572e81fc9fd",
+      "kind": "SINGLE",
+      "slug": "реив-для-выгоревших-lo-fi-jazz-acoustic-edition-6ad9ed76a2273572e81fc9fd",
+      "seoH1": null,
+      "title": "Рейв для выгоревших: Lo-Fi Jazz Acoustic Edition",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ad9ed76a2273572e81fc9fd",
+          "externalId": "6ad9ed76a2273572e81fc9fd",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_6468a3fdb2516beb95c871ea",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ad9ed73286fac4519c4eff8.png",
+      "seoTitle": null,
+      "cityTitle": "Москва",
+      "venueTitle": "Дом винтажной музыки",
+      "description": "«Рейв для выгоревших» возвращается с обновлённой программой: к PCHBLK и пианисту Тони Карапетяну присоединяется барабанщик Коля Прихотько.<br><br>Этот вечер создан для тех, кто устал от бесконечных дел, дедлайнов и хаоса. Здесь не нужно быть бодрым и «включённым» — можно просто расслабиться, выдохнуть и позволить музыке делать своё.<br><br>PCHBLK запускает мягкие биты, Тони Карапетян добавляет джазовые импровизации, а Коля Прихотько — живые барабаны. Вместе они создают музыку, под которую можно отвлечься от повседневной суеты и просто побыть здесь и сейчас.<br><br>В Доме винтажной музыки — рейв без суеты, где ритм не разгоняет, а успокаивает.",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "ул. Орджоникидзе, 1",
+      "canonicalPath": null,
+      "primaryCityId": "city_524901",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Москва",
+      "venue": "Дом винтажной музыки",
+      "address": "ул. Орджоникидзе, 1",
+      "ageLimit": "18",
+      "minOffer": 1000,
+      "nextStart": "2026-11-20T18:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 3
+    }
+  },
+  {
+    "eventId": "evt_6ace2f3c256c476149092f41",
+    "eventPageId": "5559ee8a-3d82-406d-99b6-dcb5356201ab",
+    "slug": "friday-night-betty-boop-lovers-elena-moiseenko-moskva",
+    "title": "FRIDAY NIGHT: BETTY BOOP LOVERS & ЕЛЕНА МОИСЕЕНКО",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "FRIDAY NIGHT: BETTY BOOP LOVERS & ЕЛЕНА МОИСЕЕНКО",
+    "seoTitle": "FRIDAY NIGHT: BETTY BOOP LOVERS & ЕЛЕНА МОИСЕЕНКО | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6ace2f3c256c476149092f41"
+    ],
+    "routes": [
+      {
+        "path": "/events/friday-night-betty-boop-lovers-elena-moiseenko-moskva",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T20:41:45.584Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6ace2f3c256c476149092f41",
+      "kind": "SINGLE",
+      "slug": "friday-night-betty-boop-lovers-елена-моисеенко-6ace2f3c256c476149092f41",
+      "seoH1": null,
+      "title": "FRIDAY NIGHT: BETTY BOOP LOVERS & ЕЛЕНА МОИСЕЕНКО",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ace2f3c256c476149092f41",
+          "externalId": "6ace2f3c256c476149092f41",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_590854a3515e350016705a52",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2024-08/66d218562de229a1da8f1173.jpg",
+      "seoTitle": null,
+      "cityTitle": "Москва",
+      "venueTitle": "Клуб Алексея Козлова",
+      "description": "Weekend-вечеринка в Клубе Алексея Козлова: джайв, свинг и джамп-блюз в исполнении «Betty Boop Lovers». Квинтет славится концертными шоу, изобретательными переделками мировых хитов рок-н-ролла, а также, разумеется, высоким исполнительским мастерством.<br><br>Этим вечером к группе присоединится Елена Моисеенко — московская вокалистка, ученица Галины Филатовой (известной джазовой певицы и преподавателя джазового отделения МПГУ им. Ленина).<br><br>С музыкантами «Betty Boop Lovers» Елена знакома ещё с начала 2000-х, когда она выступала в составе московской рокабилли-группы «Sleepwalkers». Несколько лет назад Елена спела с «Betty Boop Lovers» одну-единственную песню на фестивале «Усадьба Jazz» в Санкт-Петербурге, добавила красоты в звучание группы — и зародилась идея сделать совместную программу. Теперь эта программа исполняется регулярно, и у сложившегося совместного проекта есть свой круг преданных поклонников. Вместе с Еленой группа несколько меняет свою стилистику и обращается к раннему эстрадно-танцевальному джайву и свингу универсального (в том числе европейского) толка: в репертуаре появляется, например, материал на французском языке, который ближе к атмосфере парижских кабарэ начала XX века, чем американского бара.<br><br>На сцену выйдут: Елена Моисеенко (вокал), Владимир Гончаров (вокал, гитара), Евгений Ломакин (вокал, ударные), Михаил Богданов (контрабас), Илья Чумаченко (тенор-саксофон), Илья Розенблат (баритон-саксофон).",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "Маросейка 9/2",
+      "canonicalPath": null,
+      "primaryCityId": "city_524901",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Москва",
+      "venue": "Клуб Алексея Козлова",
+      "address": "Маросейка 9/2",
+      "ageLimit": "12",
+      "minOffer": 1000,
+      "nextStart": "2026-11-20T19:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 8
+    }
+  },
+  {
+    "eventId": "evt_6ac89bd95a0ab1050c104ea5",
+    "eventPageId": "ec3f5b6b-4331-4718-8f8f-6180ff85851c",
+    "slug": "nochnoi-dzhem-s-mihailom-mishurisom-moskva-4",
+    "title": "Ночной Джем с Михаилом Мишурисом",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Ночной Джем с Михаилом Мишурисом",
+    "seoTitle": "Ночной Джем с Михаилом Мишурисом | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6ac89bd95a0ab1050c104ea5"
+    ],
+    "routes": [
+      {
+        "path": "/events/nochnoi-dzhem-s-mihailom-mishurisom-moskva-4",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T20:41:41.125Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6ac89bd95a0ab1050c104ea5",
+      "kind": "SINGLE",
+      "slug": "ночнои-джем-с-михаилом-мишурисом-6ac89bd95a0ab1050c104ea5",
+      "seoH1": null,
+      "title": "Ночной Джем с Михаилом Мишурисом",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ac89bd95a0ab1050c104ea5",
+          "externalId": "6ac89bd95a0ab1050c104ea5",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_623457215d2b1afd72c3ec48",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ac89b7f3bfcc288c753aacf.jpg",
+      "seoTitle": null,
+      "cityTitle": "Москва",
+      "venueTitle": "Джем Клуб / Jam Club",
+      "description": "Если говорить о российских блюзовых музыкантах, его имя прозвучит сразу. Певец, гитарист, неутомимый пропагандист блюза - он может часами говорить о любимых пластинках или петь под гитару. <br><br>Клубы и пабы - его родная стихия. Но ещё в начале карьеры, в 1997 году, он выступил в легендарном чикагском клубе «Buddy Guy’s Legends» - на вечере памяти блюзмена Лютера Эллисона.<br><br>Михаил поёт везде: в маленьких барах для пары засидевшихся гостей и на больших сценах в костюме и при галстуке. На крупнейшем блюзовом фестивале страны он спускался со сцены и пел без микрофона, прогуливаясь по траве с гитарой. А на шоу «Голос» отважился спеть блюз Вилли Диксона для многомиллионной аудитории.<br><br>Что вас ждёт на джеме?<br><br>Живой блюз, импровизации, стихийные танцы и атмосфера, где стираются границы между сценой и залом. Будет ли это дуэт, трио или полный бэнд - удовольствие гарантировано.",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "Сретенка, д. 11",
+      "canonicalPath": null,
+      "primaryCityId": "city_524901",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Москва",
+      "venue": "Джем Клуб / Jam Club",
+      "address": "Сретенка, д. 11",
+      "ageLimit": "6",
+      "minOffer": 1000,
+      "nextStart": "2026-11-20T19:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 4
+    }
+  },
+  {
+    "eventId": "evt_6a4d70d11c24ad99ff20c6b5",
+    "eventPageId": "2b5a9cc8-50e6-4792-88c7-ac51044f24de",
+    "slug": "vivaldi-pri-svechah-sankt-peterburg",
+    "title": "Вивальди при свечах",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Вивальди при свечах",
+    "seoTitle": "Вивальди при свечах | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6a4d70d11c24ad99ff20c6b5"
+    ],
+    "routes": [
+      {
+        "path": "/events/vivaldi-pri-svechah-sankt-peterburg",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T19:35:43.962Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6a4d70d11c24ad99ff20c6b5",
+      "kind": "RECURRING",
+      "slug": "tc-6a4d70d11c24ad99ff20c6b5-вивальди-при-свечах",
+      "seoH1": null,
+      "title": "Вивальди при свечах",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a4d70d11c24ad99ff20c6b5",
+          "externalId": "6a4d70d11c24ad99ff20c6b5",
+          "metaExternalId": "6a4d6b75aaf9e3bffccf3bef"
+        }
+      ],
+      "venueId": "venue_595eba63515e350015dff9ef",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-07/6a4d6b7503a5fc43dc16d8cc.jpg",
+      "seoTitle": null,
+      "cityTitle": "Санкт-Петербург",
+      "venueTitle": "Кафедральный собор св. Петра и Павла (Петрикирхе)",
+      "description": "Красивейший концерт от «Амадеус»!<br><br>Здесь - как и всегда - только лучшие музыканты и волшебная атмосфера! Представьте: звучит великолепная музыка Вивальди при свете сотен свечей...<br><br>Вивальди популярен! Даже сейчас. Кажется, что уж это имя известно всем на свете - настолько популярна его музыка, прошедшая через века!<br>Красота, мощь, изысканность, выразительность, порыв... Вот, что несёт его музыка, и вот, что сделало её бессмертной и актуальной во все времена. Не пропустите!<br><br>Исполнители: ведущие музыканты Санкт-Петербурга, лауреаты международных конкурсов, солисты и приглашенные музыканты Мариинского театра и Санкт-Петербургской филармонии.<br><br>Продолжительность концерта: 1 час без антракта.<br><br>При желании вы можете докупить экскурсию по Петрикирхе и посетить её в день концерта. Для этого выберите билет и нажмите на кнопку Экскурсия по Петрикирхе. Экскурсия начинается за час до начала мероприятия. Встречаемся у входа в Петрикирхе. Во время прогулки по зданию вам расскажут историю возникновения собора, покажут восточную башню с видом на Невский проспект и ангела Петрикирхе. Затем вы спуститесь в «Катакомбы» — там сохранилась часть чаши бассейна, который в советские годы занимал весь партер.",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "Невский пр., 22-24",
+      "canonicalPath": null,
+      "primaryCityId": "city_498817",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Санкт-Петербург",
+      "venue": "Кафедральный собор св. Петра и Павла (Петрикирхе)",
+      "address": "Невский пр., 22-24",
+      "ageLimit": "0",
+      "minOffer": 500,
+      "nextStart": "2026-11-20T16:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 14
+    }
+  },
+  {
+    "eventId": "evt_6a58b64e6042ce6aae06b897",
+    "eventPageId": "056639b6-c3d3-425b-bc4e-7d4ee95fcb90",
+    "slug": "melodii-svechei-arfa-i-skripka-sankt-peterburg",
+    "title": "Мелодии свечей. Арфа и скрипка",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Мелодии свечей. Арфа и скрипка",
+    "seoTitle": "Мелодии свечей. Арфа и скрипка | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6a58b64e6042ce6aae06b897"
+    ],
+    "routes": [
+      {
+        "path": "/events/melodii-svechei-arfa-i-skripka-sankt-peterburg",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T19:35:49.218Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6a58b64e6042ce6aae06b897",
+      "kind": "RECURRING",
+      "slug": "мелодии-свечеи-арфа-и-скрипка-6a58b64e6042ce6aae06b897",
+      "seoH1": null,
+      "title": "Мелодии свечей. Арфа и скрипка",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a58b64e6042ce6aae06b897",
+          "externalId": "6a58b64e6042ce6aae06b897",
+          "metaExternalId": "6987a7a0f44a5b7414d10568"
+        }
+      ],
+      "venueId": "venue_6009628f4511049dd531795d",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-02/6987a7a0d3f700e4da88d3a4.jpg",
+      "seoTitle": null,
+      "cityTitle": "Санкт-Петербург",
+      "venueTitle": "Особняк Половцова",
+      "description": "В самом центре Северной столицы, в роскошных интерьерах знаменитого особняка, состоится уютное музыкальное событие — «Дуэт арфы и скрипки при свечах»<br><br>Концертный зал, украшенный мягким светом свечей, классическая и романтическая музыка создадут ощущение погружения в прошлое, а акустика старинных стен подчеркнёт богатство звучания арфы и скрипки. <br><br>Программа концерта охватывает обширный пласт мировой музыкальной культуры от средневековья до эпохи романтизма. Произведения Ж. Массне, И. Штрауса, К. Сен-Санса, Дж. Пуччини и др. композиторов будут исполнены в неповторимом звучании струнного дуэта, а таинственное мерцание свечей дополнит эстетическую гармонию, погружая слушателей в мир красоты и спокойствия.<br><br>Перед началом вас ждёт экскурсия по великолепным залам уникального архитектурного творения Максимилиана Месмахера — особняка Половцова.<br><br>Экскурсия-проход по парадным залам оплачивается дополнительно к билету по желанию и наличию.<br><br>Начало экскурсии за час до начала концерта.<br><br>При необходимости формируется вторая группа, начало экскурсии для которой за полчаса до концерта.<br><br>Зрители без экскурсии приглашаются в зал за 15 мин до начала концерта.<br><br>Продолжительность концерта: 1 час 10 минут.<br><br>Свободная рассадка в соответствии с категорией билетов.<br><br>«Категория С» без экскурсии - свободная рассадка, начиная с 8 ряда<br>«Категория С (С экскурсией)» - экскурсия за 50 мин до начала концерта, свободная рассадка, начиная с 8 ряда<br><br>«Категория В» без экскурсии - свободная рассадка, начиная с 3 ряда<br>«Категория В (С экскурсией)» - экскурсия за 50 мин до начала концерта, свободная рассадка, начиная с 3 ряда<br><br>«Категория А» без экскурсии - свободная рассадка 1-й и 2-й ряд<br>«Категория А (С экскурсией)» - экскурсия за 50 мин до начала концерта, свободная рассадка 1-й и 2-й ряд.",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "Большая Морская, 52",
+      "canonicalPath": null,
+      "primaryCityId": "city_498817",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Санкт-Петербург",
+      "venue": "Особняк Половцова",
+      "address": "Большая Морская, 52",
+      "ageLimit": "6",
+      "minOffer": 2300,
+      "nextStart": "2026-11-24T17:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 6
+    }
+  },
+  {
+    "eventId": "evt_6ab5b3771689cbe6f9504b2d",
+    "eventPageId": "b4214bac-0ed4-4e6b-a6d2-e5e608b7c5be",
+    "slug": "100-jazz-band-stefaniya-damocidi-rossiya-greciya-moskva",
+    "title": "100% JAZZ BAND & СТЕФАНИЯ ДАМОЦИДИ (РОССИЯ/ГРЕЦИЯ)",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "100% JAZZ BAND & СТЕФАНИЯ ДАМОЦИДИ (РОССИЯ/ГРЕЦИЯ)",
+    "seoTitle": "100% JAZZ BAND & СТЕФАНИЯ ДАМОЦИДИ (РОССИЯ/ГРЕЦИЯ) | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6ab5b3771689cbe6f9504b2d"
+    ],
+    "routes": [
+      {
+        "path": "/events/100-jazz-band-stefaniya-damocidi-rossiya-greciya-moskva",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T20:41:01.476Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6ab5b3771689cbe6f9504b2d",
+      "kind": "SINGLE",
+      "slug": "100-jazz-band-стефания-дамоциди-россия-греция-6ab5b3771689cbe6f9504b2d",
+      "seoH1": null,
+      "title": "100% JAZZ BAND & СТЕФАНИЯ ДАМОЦИДИ (РОССИЯ/ГРЕЦИЯ)",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ab5b3771689cbe6f9504b2d",
+          "externalId": "6ab5b3771689cbe6f9504b2d",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_624c69d8b949160eb15f1bbb",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2024-07/66aaa47cf0b586424d0ea03d.jpg",
+      "seoTitle": null,
+      "cityTitle": "Москва",
+      "venueTitle": "Kozlov Club Unplugged",
+      "description": "ВНИМАНИЕ! НОВАЯ СЦЕНА КЛУБА НАХОДИТСЯ ПО АДРЕСУ: УЛ. МЯСНИЦКАЯ, 15 (вход через Lions Head Pub)<br><br>Проект «100% Jazz Band» — это всё то, с чем ассоциируется джаз в традиционном понимании: эстетика салонов высшего общества, мягкое и завораживающее звучание, изысканные соло и, конечно, потрясающая музыка золотой эры жанра. Аудиторию ждут знакомые песни из репертуара Эллы Фицджеральд, Фрэнка Синатры, Мэрилин Монро, Сары Вон, Луи Примы. А истинные ценители откроют для себя новые джазовые композиции, которые, быть может, не так известны, но от этого не менее прекрасны.<br><br>Особая изюминка концерта — нежный голос восходящей звезды, вокалистки греческого происхождения Стефании Дамоциди.<br><br>Cостав образован весной 2022 года вокруг Стефании Дамоциди, которую многие джазовые критики и специалисты называют одной из самых многообещающих джазовых певиц своего поколения. В самом названии коллектива заложен ключ к пониманию его стилистики: эти музыканты не экспериментируют и не ищут принципиально новых смыслов в джазовой музыке, но со всей любовью и страстью отдаются исполнению её в эталонном, каноническом виде. Это тот самый «золотой стандарт», во времена которого джаз был музыкой одновременно популярной, модной, современной и интересной всем. Это те самые композиции, которые и сегодня известны каждому. <br><br>На сцену выйдет Стефания Дамоциди (вокал) в сопровождении инструментального ансамбля, точный состав которого будет опубликован ближе к дате концерта.",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "Мясницкая 15",
+      "canonicalPath": null,
+      "primaryCityId": "city_524901",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Москва",
+      "venue": "Kozlov Club Unplugged",
+      "address": "Мясницкая 15",
+      "ageLimit": "12",
+      "minOffer": 1500,
+      "nextStart": "2026-11-20T18:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 7
+    }
+  },
+  {
+    "eventId": "evt_6ad4df46be48c3d73d517275",
+    "eventPageId": "6e84c774-06e5-4fd9-8503-f0e361bf5785",
+    "slug": "miyadzaki-zhivye-saundtreki-pod-zvezdnym-kupolom-nizhniy-novgorod",
+    "title": "Миядзаки. Живые саундтреки под звёздным куполом",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Миядзаки. Живые саундтреки под звёздным куполом",
+    "seoTitle": "Миядзаки. Живые саундтреки под звёздным куполом | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6ad4df46be48c3d73d517275"
+    ],
+    "routes": [
+      {
+        "path": "/events/miyadzaki-zhivye-saundtreki-pod-zvezdnym-kupolom-nizhniy-novgorod",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T20:42:06.037Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6ad4df46be48c3d73d517275",
+      "kind": "SINGLE",
+      "slug": "миядзаки-живые-саундтреки-под-звездным-куполом-6ad4df46be48c3d73d517275",
+      "seoH1": null,
+      "title": "Миядзаки. Живые саундтреки под звёздным куполом",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ad4df46be48c3d73d517275",
+          "externalId": "6ad4df46be48c3d73d517275",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_619f70f067809a6406c208ab",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-07/6a660921707dee78adf4d297.jpg",
+      "seoTitle": null,
+      "cityTitle": "Нижний Новгород",
+      "venueTitle": "Планетарий 1 в Парке Швейцария",
+      "description": "21 ноября 2026 года в 19:00 в Планетарии 1 состоится уникальный живой концерт — саундтреки культовых аниме-фильмов Хаяо Миядзаки прозвучат под настоящим звёздным куполом.<br><br>Виолончель и фортепиано перенесут зрителей в миры Тоторо, Хаула, Сан и Тихиро — прямо среди тысяч звёзд. Музыка Дзё Хисаиси будет исполнена вживую, без записей и фонограммы.<br> <br>Хаяо Миядзаки - обладатель премии «Оскар» за «Унесённых призраками» (2003) и почётной премии Академии за вклад в мировой кинематограф. Его работы — «Мой сосед Тоторо», «Ходячий замок», «Принцесса Мононоке» — стали классикой мировой анимации и источником вдохновения для целых поколений.<br>Дзё Хисаиси — японский композитор и дирижёр, создавший музыкальный язык всей вселенной Миядзаки. За 40 лет сотрудничества написал саундтреки к более чем 100 фильмам и телесериалам, выпустил свыше 40 сольных альбомов. Его мелодии узнаваемы с первых нот: нежные, эпические, пронзительные — они живут отдельной жизнью и вне экрана.<br><br>ПРОГРАММА: «Унесённые призраками», «Мой сосед Тоторо», «Принцесса Мононоке», «Ходячий замок», «Навсикая из Долины ветров», «Замок Калиостро».<br><br>ИСПОЛНИТЕЛИ:<br>Николай Максимов (виолончель) — лауреат международных конкурсов, лауреат фестиваля «Новые имена».<br>Михаил Зайденберг (фортепиано) — пианист, композитор, саунд-продюсер, лауреат международных конкурсов, стипендиант гранта Президента РФ.",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "Проспект Гагарина 35",
+      "canonicalPath": null,
+      "primaryCityId": "city_520555",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Нижний Новгород",
+      "venue": "Планетарий 1 в Парке Швейцария",
+      "address": "Проспект Гагарина 35",
+      "ageLimit": "6",
+      "minOffer": 1500,
+      "nextStart": "2026-11-21T14:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 3
+    }
+  },
+  {
+    "eventId": "evt_6aba7c740f4bff70eecfc034",
+    "eventPageId": "e066ce62-e14b-40ed-a076-fd007f6cd7c6",
+    "slug": "koncert-amerikanskii-dzhaz-moskva",
+    "title": "Концерт «Американский джаз»",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Концерт «Американский джаз»",
+    "seoTitle": "Концерт «Американский джаз» | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6aba7c740f4bff70eecfc034"
+    ],
+    "routes": [
+      {
+        "path": "/events/koncert-amerikanskii-dzhaz-moskva",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T18:11:00.592Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6aba7c740f4bff70eecfc034",
+      "kind": "SINGLE",
+      "slug": "концерт-американскии-джаз-6aba7c740f4bff70eecfc034",
+      "seoH1": null,
+      "title": "Концерт «Американский джаз»",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6aba7c740f4bff70eecfc034",
+          "externalId": "6aba7c740f4bff70eecfc034",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_54cabc2b9cb5385a9f65b95a",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6aba7d6c0f4bff70eecfc056.jpg",
+      "seoTitle": null,
+      "cityTitle": "Москва",
+      "venueTitle": "Арт-пространство Люмьер Холл",
+      "description": "Ямайско-российский проект Afro-dite и креативное пространство «Люмьер-Холл» представят программу, состоящую из известных композиций золотой эпохи джаза, а также произведений в стилях, предшествовавших джазу, таких как госпел и спиричуэлс, и направлениях, ставших его естественным продолжением: ритм-н-блюз и соул.<br><br>Концерт пройдет в Большом мультимедийном зале «Люмьер-Холла», где музыка и масштабные проекции создадут особую атмосферу джазового вечера.<br><br>В основе звучания – живой вокал, мягкое электропиано, плотный пульс контрабаса, и перкуссии. <br>Afro-dite – это свободное звучание, яркая энергетика, искренность и невероятное обаяние солистки Анджелик.<br><br>Анджелик – вокалистка из Ямайки, которая свободно чувствует себя в самых разных жанрах, от оперы до регги, музыки своей родины. В её творческой биографии сотрудничество с Дэмиеном Марли, сыном легендарного Боба Марли, а также с Лу Грэммом, культовым вокалистом Foreigner и успешным сольным артистом.<br><br>На сцену выйдут:<br>Анджелик – вокал<br>Андрей Капустин – контрабас<br>Михаил Данилов – перкуссия, конферанс<br>Илья Олейников – клавишные",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "Берсеневский пер., д. 2, стр. 1",
+      "canonicalPath": null,
+      "primaryCityId": "city_524901",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Москва",
+      "venue": "Арт-пространство Люмьер Холл",
+      "address": "Берсеневский пер., д. 2, стр. 1",
+      "ageLimit": "16",
+      "minOffer": 1500,
+      "nextStart": "2026-11-20T17:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 3
+    }
+  },
+  {
+    "eventId": "evt_6aabed1937cfc49b052e4ec2",
+    "eventPageId": "a669d70c-6734-41af-80ba-8ba59065c576",
+    "slug": "legendy-disko-v-osobnyake-polovcova-ot-abba-do-queen-sankt-peterburg",
+    "title": "Легенды диско в Особняке Половцова. От ABBA до Queen",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Легенды диско в Особняке Половцова. От ABBA до Queen",
+    "seoTitle": "Легенды диско в Особняке Половцова. От ABBA до Queen | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6aabed1937cfc49b052e4ec2"
+    ],
+    "routes": [
+      {
+        "path": "/events/legendy-disko-v-osobnyake-polovcova-ot-abba-do-queen-sankt-peterburg",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T19:35:48.128Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6aabed1937cfc49b052e4ec2",
+      "kind": "RECURRING",
+      "slug": "легенды-диско-в-особняке-половцова-от-abba-до-queen-6aabed1937cfc49b052e4ec2",
+      "seoH1": null,
+      "title": "Легенды диско в Особняке Половцова. От ABBA до Queen",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6aabed1937cfc49b052e4ec2",
+          "externalId": "6aabed1937cfc49b052e4ec2",
+          "metaExternalId": "6aabeca38b45e0594758a104"
+        }
+      ],
+      "venueId": "venue_56e179c39cb538637fb8a2e4",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6aabeca30c650cb686e2affe.jpg",
+      "seoTitle": null,
+      "cityTitle": "Санкт-Петербург",
+      "venueTitle": "Особняк А.А. Половцова (Дом Архитектора)",
+      "description": "Команда «Русские Музыкальные Сезоны» превращает самые красивые и необычные залы Петербурга<br>в уютные концертные площадки, создавая неповторимую атмосферу и идеальный фон для музицирования.<br><br>Роскошный Бронзовый зал в этот вечер наполнится лучшими хитами эпохи диско от Boney M до Bee Gees в исполнении камерного оркестра. Каждая нота найдет отражение в вашей душе и позволит насладиться энергией музыки! <br><br>Что Вас ждет:<br>🕯️ Магическая атмосфера вечера в роскошных интерьерах<br>🎹 Виртуозное исполнение в авторских инструментальных аранжировках",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "Большая Морская ул. 52",
+      "canonicalPath": null,
+      "primaryCityId": "city_498817",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Санкт-Петербург",
+      "venue": "Особняк А.А. Половцова (Дом Архитектора)",
+      "address": "Большая Морская ул. 52",
+      "ageLimit": "6",
+      "minOffer": 1500,
+      "nextStart": "2026-11-20T17:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 12
+    }
+  },
+  {
+    "eventId": "evt_6a85bee78a30a92439b11567",
+    "eventPageId": "1fc75d75-92ff-4e80-bacd-123e0abc7ee1",
+    "slug": "20-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-ryazan",
+    "title": "20.11 | Евгения Рыбакова и группа Обними Кита | Рок с барабанами и скрипкой | Рязань",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "20.11 | Евгения Рыбакова и группа Обними Кита | Рок с барабанами и скрипкой | Рязань",
+    "seoTitle": "20.11 | Евгения Рыбакова и группа Обними Кита | Рок с барабанами и скрипкой | Рязань | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6a85bee78a30a92439b11567"
+    ],
+    "routes": [
+      {
+        "path": "/events/20-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-ryazan",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T20:40:24.447Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6a85bee78a30a92439b11567",
+      "kind": "SINGLE",
+      "slug": "20-11-евгения-рыбакова-и-группа-обними-кита-рок-с-барабанами-и-скрипкои-рязань-6a85bee78a30a92439b11567",
+      "seoH1": null,
+      "title": "20.11 | Евгения Рыбакова и группа Обними Кита | Рок с барабанами и скрипкой | Рязань",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a85bee78a30a92439b11567",
+          "externalId": "6a85bee78a30a92439b11567",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_67ece17db3a5333a583f1543",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-08/6a86ee1c3c999d09844f2e30.png",
+      "seoTitle": null,
+      "cityTitle": "Рязань",
+      "venueTitle": "4912",
+      "description": "Раз в году последние романтики и нежные мечтатели из группы «Обними Кита» перевоплощаются в прожжённых рокеров, обнажая своё истинное «Я». Знакомые песни зазвучат в утяжелённых аранжировках. Ещё больше драйва, раскатистые барабанные партии, скрежет гитар и неистовое звучание скрипки. Готовьтесь петь и отрываться по полной! Будет жарко!",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "пл. Соборная, 21. 2 этаж",
+      "canonicalPath": null,
+      "primaryCityId": "city_500096",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Рязань",
+      "venue": "4912",
+      "address": "пл. Соборная, 21. 2 этаж",
+      "ageLimit": "16",
+      "minOffer": 1800,
+      "nextStart": "2026-11-20T17:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 4
+    }
+  },
+  {
+    "eventId": "evt_6aba2978f1a4b004e357e43c",
+    "eventPageId": "2bbaf66a-ba4c-4c22-8aad-32a9d985aafe",
+    "slug": "vselennaya-golosov-muzykalnoe-shou-yulaik-sankt-peterburg",
+    "title": "Вселенная голосов: музыкальное шоу ЮLAЙК",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Вселенная голосов: музыкальное шоу ЮLAЙК",
+    "seoTitle": "Вселенная голосов: музыкальное шоу ЮLAЙК | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6aba2978f1a4b004e357e43c"
+    ],
+    "routes": [
+      {
+        "path": "/events/vselennaya-golosov-muzykalnoe-shou-yulaik-sankt-peterburg",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T20:41:05.409Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6aba2978f1a4b004e357e43c",
+      "kind": "SINGLE",
+      "slug": "вселенная-голосов-музыкальное-шоу-юlaик-6aba2978f1a4b004e357e43c",
+      "seoH1": null,
+      "title": "Вселенная голосов: музыкальное шоу ЮLAЙК",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6aba2978f1a4b004e357e43c",
+          "externalId": "6aba2978f1a4b004e357e43c",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_5b30cfdd519f7b001a12d8be",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2025-07/6863c0a10368e88ae078bf57.jpg",
+      "seoTitle": null,
+      "cityTitle": "Санкт-Петербург",
+      "venueTitle": "Планетарий 1",
+      "description": "Планетарий 1 приглашает вас на уникальное музыкальное шоу \"Вселенная голосов\", которое представит российская группа ЮLAЙК!  Мировые хиты Queen, Evanescence, Celine Dion, АИГЕЛ, Sting и многих других легендарных исполнителей  прозвучат в завораживающих многоголосных аранжировках на фоне космических пейзажей. <br><br>Через красивое музыкальное повествование мы вместе погрузимся в исследование себя и космоса и ответим на вопрос: что общего между космическими явлениями и человеческими чувствами.<br><br><br>Группа ЮLАЙК (U LIKE), созданная в Санкт-Петербурге в мае 2013 года, — это настоящий оркестр из пяти женских голосов, исполняющий современные акапелла-композиции в авторских аранжировках. Одна из лучших акапелла-групп мира. Их творчество завоевало признание публики и жюри на международных конкурсах: группа стала победителем крупнейшего международного конкурса \"Acappella Moscow» 2024, представляла Россию на Dubai Expo 2021, их треки входят в крупные редакторские плейлисты на \"Яндекс-музыке\", участники ТВ-шоу «Ну-ка все вместе» <br><br>Вас ждет полное погружение в музыку без музыкальных инструментов и проживание поистине уникального аудиального и визуального опыта!",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "наб. Обводного канала, 74Ц",
+      "canonicalPath": null,
+      "primaryCityId": "city_498817",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Санкт-Петербург",
+      "venue": "Планетарий 1",
+      "address": "наб. Обводного канала, 74Ц",
+      "ageLimit": "6",
+      "minOffer": 2500,
+      "nextStart": "2026-11-20T18:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 2
+    }
+  }
+]

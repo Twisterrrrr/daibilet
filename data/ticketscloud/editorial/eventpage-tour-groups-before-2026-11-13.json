@@ -1,0 +1,808 @@
+{
+  "generatedAt": "2026-11-12T21:36:14.102Z",
+  "groups": [
+    {
+      "key": "anna_asti",
+      "title": "ANNA ASTI - шоу «Царица»",
+      "existingGroup": null
+    },
+    {
+      "key": "rain_dance",
+      "title": "В объятиях дождя - танцевальное шоу",
+      "existingGroup": null
+    },
+    {
+      "key": "sveta",
+      "title": "Света - большой сольный концерт",
+      "existingGroup": null
+    },
+    {
+      "key": "rock_symphony",
+      "title": "Симфония рока - Акт первый",
+      "existingGroup": null
+    },
+    {
+      "key": "reshetun",
+      "title": "Алексей Решетун - Новый год по судебно-медицински",
+      "existingGroup": null
+    },
+    {
+      "key": "nigativ",
+      "title": "Нигатив - Все хиты + 44",
+      "existingGroup": null
+    },
+    {
+      "key": "surdin_semikhatov",
+      "title": "Новый год с Владимиром Сурдиным и Алексеем Семихатовым",
+      "existingGroup": null
+    },
+    {
+      "key": "naik_borzov",
+      "title": "Найк Борзов - Большой новогодний концерт",
+      "existingGroup": null
+    },
+    {
+      "key": "helvegen",
+      "title": "HELVEGEN - презентация нового альбома",
+      "existingGroup": null
+    }
+  ],
+  "pages": [
+    {
+      "groupKey": "anna_asti",
+      "eventPageId": "0e89916b-f9f4-4626-9bbe-288aa3444337",
+      "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-vladivostok",
+      "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Владивосток",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T06:29:16.603Z",
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_69f8eb16ed0e1619e45bc72c",
+          "city": "Владивосток",
+          "venue": "КСК Фетисов Арена",
+          "address": "ул. Маковского, д. 284"
+        }
+      ]
+    },
+    {
+      "groupKey": "anna_asti",
+      "eventPageId": "3b816506-41c1-4367-972d-07a486ef499d",
+      "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-tula",
+      "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Тула",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T06:29:17.426Z",
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_69fd8dd4a7835719e4d9f05e",
+          "city": "Тула",
+          "venue": "Тула Арена",
+          "address": "Калужское ш., 18"
+        }
+      ]
+    },
+    {
+      "groupKey": "anna_asti",
+      "eventPageId": "7632040e-efaa-42d6-ba17-53c2dd58932a",
+      "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-voronezh",
+      "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Воронеж",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T06:29:16.727Z",
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6a8307af4ee6d470db0da246",
+          "city": "Воронеж",
+          "venue": "Ледовый дворец спорта «Юбилейный»",
+          "address": "ул. Карла Маркса, 116"
+        }
+      ]
+    },
+    {
+      "groupKey": "anna_asti",
+      "eventPageId": "95d20c5c-51c0-4007-9ae8-467e6afc3fce",
+      "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-ryazan",
+      "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Рязань",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T06:29:17.263Z",
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_69e5f0546f2ef39d67a00eda",
+          "city": "Рязань",
+          "venue": "ДС Олимпийский",
+          "address": "улица Зубковой, 12 к2"
+        }
+      ]
+    },
+    {
+      "groupKey": "anna_asti",
+      "eventPageId": "cba0fb4e-fe37-4fda-a70c-f02c35cd5867",
+      "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-chelyabinsk",
+      "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Челябинск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T06:29:17.751Z",
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6ace72d8e3304bdcce50be32",
+          "city": "Челябинск",
+          "venue": "Ледовая арена Трактор",
+          "address": "ул. 250-Летия Челябинска, 38"
+        }
+      ]
+    },
+    {
+      "groupKey": "anna_asti",
+      "eventPageId": "cd8d9b6d-d61b-4c06-99e1-ab6e59207fac",
+      "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-krasnodar",
+      "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Краснодар",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T06:29:16.888Z",
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6a2f0b6f45040b5afce38fe4",
+          "city": "Краснодар",
+          "venue": "ДС ОЛИМП",
+          "address": "ул. Береговая, 144"
+        }
+      ]
+    },
+    {
+      "groupKey": "anna_asti",
+      "eventPageId": "d7a18f1c-f1f8-4f3d-91f6-5177b9a5dfbd",
+      "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-kurgan",
+      "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Курган",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T06:29:17.090Z",
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_69fd82eadb42bf5f5966403b",
+          "city": "Курган",
+          "venue": "Ледовый Дворец Спорта им. Парышева",
+          "address": "1-й А микрорайон, 7"
+        }
+      ]
+    },
+    {
+      "groupKey": "anna_asti",
+      "eventPageId": "ea2c25aa-4e4f-4135-a029-a1bcf5da4212",
+      "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-habarovsk",
+      "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Хабаровск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T06:29:17.623Z",
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_69fa2bd974a803f6a1a427d9",
+          "city": "Хабаровск",
+          "venue": "Ерофей Арена",
+          "address": "ул. Морозова Павла Леонтьевича, д. 83"
+        }
+      ]
+    },
+    {
+      "groupKey": "rain_dance",
+      "eventPageId": "08c18b93-de50-4425-9b53-119e2eae0f01",
+      "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-vidnoe",
+      "title": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6a7ecac3cf1020227eac0a46",
+          "city": "Видное",
+          "venue": "МАУ \"Дворец культуры \"Видное\"",
+          "address": "улица школьная, 22а"
+        }
+      ]
+    },
+    {
+      "groupKey": "rain_dance",
+      "eventPageId": "1cf11495-e6d6-4e09-a702-b39b70906350",
+      "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-samara",
+      "title": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6add79c1b0d9d1d50b7ca14b",
+          "city": "Самара",
+          "venue": "ДК Металлургов",
+          "address": "пр-т Металлургов, 75"
+        }
+      ]
+    },
+    {
+      "groupKey": "rain_dance",
+      "eventPageId": "20a56d74-eecc-4a9a-ab54-15a83267deb5",
+      "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-bataysk",
+      "title": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T06:29:18.301Z",
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6abada9da5015085a739d69e",
+          "city": "Батайск",
+          "venue": "ГКДЦ",
+          "address": "пл. Ленина, дом 5"
+        }
+      ]
+    },
+    {
+      "groupKey": "rain_dance",
+      "eventPageId": "298e5b4d-aff6-45ab-ac17-90b97e59629d",
+      "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-osinniki",
+      "title": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6a9f7d58b18bb55200e9844c",
+          "city": "Осинники",
+          "venue": "Дворец культуры \"Шахтер\"",
+          "address": "Кирова, д. 19"
+        }
+      ]
+    },
+    {
+      "groupKey": "rain_dance",
+      "eventPageId": "29e8fc7f-42f6-41d3-8a31-1e7736910187",
+      "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-irkutsk",
+      "title": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6aceffe79d8b3138b7b8028d",
+          "city": "Иркутск",
+          "venue": "ДК \"Орбита\"",
+          "address": "Cоветская ул., д.139"
+        }
+      ]
+    },
+    {
+      "groupKey": "rain_dance",
+      "eventPageId": "35983553-77fc-4c98-90bf-7c5702965226",
+      "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-fryazino",
+      "title": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6a7d81879a802162ed2db43f",
+          "city": "Фрязино",
+          "venue": "ДК \"Исток\"",
+          "address": "Комсомольская улица, 17"
+        }
+      ]
+    },
+    {
+      "groupKey": "rain_dance",
+      "eventPageId": "46894ae1-e4a0-46b9-aa31-d45f68b32944",
+      "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-lobnya",
+      "title": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6ac461a90723cba62ee434eb",
+          "city": "Лобня",
+          "venue": "ДК Луговая",
+          "address": "Научный городок дом 1Б"
+        }
+      ]
+    },
+    {
+      "groupKey": "rain_dance",
+      "eventPageId": "598fc7e8-0587-4cbf-835c-e8186c236198",
+      "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-kovrov",
+      "title": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6acf2ca96b4cacda3dafc825",
+          "city": "Ковров",
+          "venue": "ДКиТ \"Родина\"",
+          "address": "Волго-Донская ул., 1А"
+        }
+      ]
+    },
+    {
+      "groupKey": "rain_dance",
+      "eventPageId": "81982e23-542d-4ea3-a49b-0b5c16681a2d",
+      "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-prokopevsk",
+      "title": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-12T20:54:22.755Z",
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6a9f72b2ed68f08ba4ec7e66",
+          "city": "Прокопьевск",
+          "venue": "МБУК ДК Красная Горка",
+          "address": "ул. Союзная, 4"
+        }
+      ]
+    },
+    {
+      "groupKey": "rain_dance",
+      "eventPageId": "cbaf67ae-81e9-440e-b8c5-feb67f30fbbf",
+      "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-ryazan",
+      "title": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6acef8330606a94adec02774",
+          "city": "Рязань",
+          "venue": "Рязанский дворец молодежи",
+          "address": "пл. 50-летия Октября, д. 1"
+        }
+      ]
+    },
+    {
+      "groupKey": "rain_dance",
+      "eventPageId": "cd2a54da-9039-4066-9646-866092f33d95",
+      "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-tver",
+      "title": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6acf0d7886b9fafbc7b6bd42",
+          "city": "Тверь",
+          "venue": "ДК Металлист",
+          "address": "ш. Петербургское, 39"
+        }
+      ]
+    },
+    {
+      "groupKey": "rain_dance",
+      "eventPageId": "dd5bb03a-1952-406b-8190-9eb7f0533e58",
+      "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-rossosh",
+      "title": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6acf25398b9976fb2aa2d6ae",
+          "city": "Россошь",
+          "venue": "Молодёжный центр",
+          "address": "ул. Пролетарская, д. 110Б"
+        }
+      ]
+    },
+    {
+      "groupKey": "rain_dance",
+      "eventPageId": "e09609a9-da05-4d6b-98fa-73d93220d220",
+      "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-belovo",
+      "title": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6a9e556b94728b0144de2a01",
+          "city": "Белово",
+          "venue": "ЦДК Белово",
+          "address": "Октябрьская ул., 12а"
+        }
+      ]
+    },
+    {
+      "groupKey": "rain_dance",
+      "eventPageId": "f6844a5f-fee2-4dbc-bb0e-fca1960b86fd",
+      "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-voronezh",
+      "title": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6acf1b336653a342420bbd57",
+          "city": "Воронеж",
+          "venue": "ДК Железнодорожников",
+          "address": "Никитинская ул., 1"
+        }
+      ]
+    },
+    {
+      "groupKey": "sveta",
+      "eventPageId": "22056081-8714-4dbf-a06f-044eeb7e1ec9",
+      "slug": "sveta-bolshoi-solnyi-koncert-omsk",
+      "title": "Света. Большой сольный концерт",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6a0a2a9d86d5d85983fcf538",
+          "city": "Омск",
+          "venue": "Клуб \"Ангар\"",
+          "address": "Кемеровская 1/3"
+        }
+      ]
+    },
+    {
+      "groupKey": "sveta",
+      "eventPageId": "2966620b-26f5-4d50-9294-09530727481a",
+      "slug": "sveta-bolshoi-solnyi-koncert-surgut",
+      "title": "Света. Большой сольный концерт",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6a0a2a164a9e04ef13e22f6b",
+          "city": "Сургут",
+          "venue": "РК ВАВИЛОН",
+          "address": "Профсоюзов 55"
+        }
+      ]
+    },
+    {
+      "groupKey": "sveta",
+      "eventPageId": "5eaee4c1-5103-477b-a6f7-89adb4699adb",
+      "slug": "sveta-bolshoi-solnyi-koncert-krasnodar",
+      "title": "Света. Большой сольный концерт",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-12T20:39:39.808Z",
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6a0a26f221a01d97b31dde32",
+          "city": "Краснодар",
+          "venue": "Порт 219",
+          "address": "ул. Вишняковой, 1/10с2"
+        }
+      ]
+    },
+    {
+      "groupKey": "sveta",
+      "eventPageId": "6686c1d1-33c3-492d-a815-982a84584c6b",
+      "slug": "sveta-bolshoi-solnyi-koncert-ryazan",
+      "title": "Света. Большой сольный концерт",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-12T19:37:22.443Z",
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6a0a246239a27964e5bc2267",
+          "city": "Рязань",
+          "venue": "Руки Вверх! Бар (ex. Deep)",
+          "address": "проезд Завражнова, 4"
+        }
+      ]
+    },
+    {
+      "groupKey": "sveta",
+      "eventPageId": "7cdd4dc8-a09d-4a02-8985-34463e052bcc",
+      "slug": "sveta-bolshoi-solnyi-koncert-lipeck",
+      "title": "Света. Большой сольный концерт",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6a0a24eb425f66c9e88b84d1",
+          "city": "Липецк",
+          "venue": "КРК \"Мегаполис\"",
+          "address": "КРК \"Мегаполис\", ул. Московская, 75А, Липецк, Липецкая обл., Россия, 398024"
+        }
+      ]
+    },
+    {
+      "groupKey": "sveta",
+      "eventPageId": "e3ba8d7f-b817-4837-a8bb-b1d22704cff6",
+      "slug": "sveta-bolshoi-solnyi-koncert-voronezh",
+      "title": "Света. Большой сольный концерт",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6a0a27a8fd33f026a391297f",
+          "city": "Воронеж",
+          "venue": "Концертный зал «Palazzo»",
+          "address": "Московский проспект, 9"
+        }
+      ]
+    },
+    {
+      "groupKey": "sveta",
+      "eventPageId": "f02eacbe-43c0-4dae-8a3c-2457726a4942",
+      "slug": "sveta-bolshoi-solnyi-koncert-tula",
+      "title": "Света. Большой сольный концерт",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6a0a25cffd33f026a3912691",
+          "city": "Тула",
+          "venue": "ДК Туламашзавод",
+          "address": "ул. Демидовская д.52"
+        }
+      ]
+    },
+    {
+      "groupKey": "rock_symphony",
+      "eventPageId": "48c818c1-d023-4167-bfd1-8bc3e489fe44",
+      "slug": "simfoniya-roka-akt-pervyi-cheboksary",
+      "title": "Симфония рока: Акт первый",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-12T20:39:34.742Z",
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6a48f77538bdf7b85c2fa7bf",
+          "city": "Чебоксары",
+          "venue": "Дворец культуры ЧГУ",
+          "address": "ул. Университетская, 38"
+        }
+      ]
+    },
+    {
+      "groupKey": "rock_symphony",
+      "eventPageId": "6a96b975-0578-484d-ae67-0b68f9be0234",
+      "slug": "simfoniya-roka-akt-pervyi-volzhsk",
+      "title": "Симфония рока: Акт первый",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-12T19:37:32.723Z",
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6abe4f638e2a1ee5f42ebcc1",
+          "city": "Волжск",
+          "venue": "МУ ГЦК",
+          "address": "Ул. Дружбы, 16а"
+        }
+      ]
+    },
+    {
+      "groupKey": "rock_symphony",
+      "eventPageId": "9dd73a25-5a85-4922-98da-7339f96024ee",
+      "slug": "simfoniya-roka-akt-pervyi-ulyanovsk",
+      "title": "Симфония рока: Акт первый",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6a4b8c8aa9413e29dc81751d",
+          "city": "Ульяновск",
+          "venue": "ДК \"Руслан\"",
+          "address": "ул. 40-летия Победы, 15, Ульяновск, Ульяновская обл.,"
+        }
+      ]
+    },
+    {
+      "groupKey": "reshetun",
+      "eventPageId": "52bbc926-af2c-4607-9383-2f8115b0b383",
+      "slug": "aleksei-reshetun-novyi-god-po-sudebno-medicinske-moskva",
+      "title": "Алексей Решетун. Новый год по судебно-медицински.",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-10T05:00:29.452Z",
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6ac5434089e6a22cd0abf834",
+          "city": "Москва",
+          "venue": "Аудиториум",
+          "address": "Воздвиженка, 9"
+        }
+      ]
+    },
+    {
+      "groupKey": "reshetun",
+      "eventPageId": "cd321ce8-6706-491a-bc76-df931489a9ea",
+      "slug": "aleksei-reshetun-novyi-god-po-sudebno-medicinski-sankt-peterburg",
+      "title": "Алексей Решетун. Новый год по судебно-медицински.",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-10T06:18:03.998Z",
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6ad686b06556323c5ec0d868",
+          "city": "Санкт-Петербург",
+          "venue": "Гостиница \"Октябрьская\"",
+          "address": "Лиговский проспект 10"
+        }
+      ]
+    },
+    {
+      "groupKey": "nigativ",
+      "eventPageId": "1387b4f6-8afa-41ad-87c8-552abacf7fb9",
+      "slug": "nigativ-vse-hity-44-12-03-27-sankt-peterburg-aurora-concert-hall-sankt-peterburg",
+      "title": "Нигатив. Все хиты + 44 | 12.03.27 | Санкт-Петербург, Aurora Concert Hall",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T06:29:20.780Z",
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6abd140ddb782c0522c6be57",
+          "city": "Санкт-Петербург",
+          "venue": "Aurora Concert Hall",
+          "address": "Пироговская наб., 5/2"
+        }
+      ]
+    },
+    {
+      "groupKey": "nigativ",
+      "eventPageId": "a2b48836-287a-46c0-a6dd-20c2ef02b066",
+      "slug": "nigativ-vse-hity-44-04-03-27-moskva-base-moskva",
+      "title": "Нигатив. Все хиты + 44 | 04.03.27 | Москва, BASE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T06:29:20.647Z",
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6aca05407ebf70419a6b98e4",
+          "city": "Москва",
+          "venue": "BASE",
+          "address": "ул. Орджоникидзе, 11с1"
+        }
+      ]
+    },
+    {
+      "groupKey": "surdin_semikhatov",
+      "eventPageId": "717b59df-c07e-48a7-8fc2-aac828dc58cf",
+      "slug": "novyi-god-s-vladimirom-surdinym-i-alekseem-semihatovym-sankt-peterburg",
+      "title": "Новый год! С Владимиром Сурдиным и Алексеем Семихатовым!",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-10T05:00:27.949Z",
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6ac9015590383ac485af6c57",
+          "city": "Санкт-Петербург",
+          "venue": "Дворец Кваренги (Freedom)",
+          "address": "Казанская ул., 7"
+        }
+      ]
+    },
+    {
+      "groupKey": "surdin_semikhatov",
+      "eventPageId": "f36cd8cf-dc6a-42f5-bf31-d86e9612b526",
+      "slug": "novyi-god-s-vladimirom-surdinym-i-alekseem-semihatovym-moskva",
+      "title": "Новый год! С Владимиром Сурдиным и Алексеем Семихатовым!",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-10T05:00:25.866Z",
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6ac91efde2b1828475d87dea",
+          "city": "Москва",
+          "venue": "Музей-заповедник Царицыно, Баженовский зал",
+          "address": "Дольская ул., 1с6"
+        }
+      ]
+    },
+    {
+      "groupKey": "naik_borzov",
+      "eventPageId": "a3a383ea-87a8-4b02-805b-7e346e374e19",
+      "slug": "naik-borzov-bolshoi-novogodnii-koncert-nizhniy-novgorod",
+      "title": "Найк Борзов \"Большой Новогодний Концерт\"",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6aba79ca9b9732652ace9369",
+          "city": "Нижний Новгород",
+          "venue": "MILO Concert Hall / МИЛО Концерт Холл",
+          "address": "ул. Родионова, 4"
+        }
+      ]
+    },
+    {
+      "groupKey": "naik_borzov",
+      "eventPageId": "b58d977e-c9d2-4e1c-b0ba-2a1105f7153c",
+      "slug": "naik-borzov-bolshoi-novogodnii-koncert-ekaterinburg",
+      "title": "Найк Борзов \"Большой Новогодний концерт\"",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T06:29:20.515Z",
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_6abe37b0679adb8c18452397",
+          "city": "Екатеринбург",
+          "venue": "Концерт-холл \"Свобода\"",
+          "address": "ул. Черкасская, 12"
+        }
+      ]
+    },
+    {
+      "groupKey": "helvegen",
+      "eventPageId": "1412abfb-be64-4e9f-97b8-babb0e436cbf",
+      "slug": "helvegen-prezentaciya-novogo-alboma-sankt-peterburg",
+      "title": "HELVEGEN. Презентация нового альбома.",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-12T19:37:36.309Z",
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_69ce823069d25036357a0839",
+          "city": "Санкт-Петербург",
+          "venue": "РАССВЕТ",
+          "address": "ул. Комсомола, 2 (Вход через арку Арсенальная наб., 1)"
+        }
+      ]
+    },
+    {
+      "groupKey": "helvegen",
+      "eventPageId": "6978ed1d-dfb7-44ad-9fe1-059aa8dd7edd",
+      "slug": "helvegen-prezentaciya-novogo-alboma-moskva",
+      "title": "HELVEGEN. Презентация нового альбома.",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroup": null,
+      "events": [
+        {
+          "eventId": "evt_69ce8519d0b4bfe9ed5811c1",
+          "city": "Москва",
+          "venue": "Свобода",
+          "address": "Ленинградский просп., 47, стр. 19"
+        }
+      ]
+    }
+  ]
+}

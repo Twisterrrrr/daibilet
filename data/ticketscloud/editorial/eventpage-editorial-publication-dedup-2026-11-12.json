@@ -1,0 +1,38 @@
+[
+  {
+    "eventId": "evt_6aa13ad966c680c4bbbf7e6c",
+    "slug": "lisistrata-moskva",
+    "batches": [
+      30,
+      31
+    ],
+    "selectedBatch": 31
+  },
+  {
+    "eventId": "evt_6aceae3c59bb66609b2d12be",
+    "slug": "oruell-tango-staryh-gazet-sankt-peterburg",
+    "batches": [
+      30,
+      31
+    ],
+    "selectedBatch": 31
+  },
+  {
+    "eventId": "evt_6aa43794e4d866ddb6143b50",
+    "slug": "tribute-to-alcide-yellow-nunez-moskva",
+    "batches": [
+      30,
+      31
+    ],
+    "selectedBatch": 31
+  },
+  {
+    "eventId": "evt_6aa2c6cd932fbe5320ed2ca8",
+    "slug": "pyatnica-13-organ-v-planetarii-sankt-peterburg",
+    "batches": [
+      30,
+      32
+    ],
+    "selectedBatch": 32
+  }
+]

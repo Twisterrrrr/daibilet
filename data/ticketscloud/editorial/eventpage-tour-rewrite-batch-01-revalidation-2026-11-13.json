@@ -1,0 +1,3509 @@
+{
+  "startedAt": "2026-11-13T05:01:27.199Z",
+  "publicCacheInvalidated": true,
+  "cache": {
+    "ok": true,
+    "warm": "none",
+    "reason": "published 291 touring EventPage rewrites batch 01 2026-11-13"
+  },
+  "revalidated": 582,
+  "indexNowQueued": 291,
+  "eventPagePaths": 291,
+  "legacyPaths": 291,
+  "results": [
+    {
+      "slug": "spektakl-master-i-margarita-g-voronezh",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-voronezh-6a99701c5495f123e69d3594",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-staryi-oskol-staryy-oskol",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-staryi-oskol-6af1c049dda95afbb60f3eb9",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-sosnovyi-bor-sosnovyy-bor",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-sosnovyi-bor-6ae44519619587a9a6637f23",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-vologda",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-vologda-69ef5eddd4726050713a1174",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-cherepovec",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-cherepovec-69ef3c0da2a14ce1d3e18733",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-novosibirsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-novosibirsk-6adf5ddec3a8f73936ac139c",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-astrahan",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-astrahan-6ac5e240d8b491329a81c352",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-naberezhnye-chelny",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-naberezhnye-chelny-6ac5e1236a62ff31b434ae18",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-kazan-2",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-kazan-6ac5dfc1eeeac4736dedf5e4",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-vyksa",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-vyksa-6ac5db2ea79f24059f55a0f2",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-ekaterinburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-ekaterinburg-6ac25c9eab60373c7d0064f0",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-lipeck",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-lipeck-6abf7497e20d1aa91bfa1514",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-nizhnii-novgorod-nizhniy-novgorod",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-nizhnii-novgorod-6abf6f610580058eea46e648",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-chelyabinsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-chelyabinsk-6abd021f246a512200a6565f",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-tver",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-tver-6abd00800101a46fe9c3742d",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-magnitogorsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-magnitogorsk-6abcff2428f8b846baeac278",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-volgograd",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-volgograd-6aba2e0ae239f9ad601f210b",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-bryansk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-bryansk-6aba2badfdc350433f6d95c4",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-marks",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-marks-6ab524795f0c69d597878ed4",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-nizhnekamsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-nizhnekamsk-6ab135de94c5da9c195de340",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-saratov",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-saratov-6ab12fd372c829017b9dbcda",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-orenburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-orenburg-6ab1051bb6b675c36bae4872",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-tula",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-tula-6ab0dc63b36d818acc6e0aad",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-severodvinsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-severodvinsk-6ab0d349c4106f9d35d6a83f",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-arhangelsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-arhangelsk-6ab0d25a70587feb368472ef",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-samara",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-samara-6ab0d00b1e84f1cd8fe00574",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-chapaevsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-chapaevsk-6aad3dbf9a2aa5a5a3d260d9",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-angarsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-angarsk-6a9e9dd64ed38bddd13cb021",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-irkutsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-irkutsk-6a9e9c5d4c09e5eb7bf9561b",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-usole-sibirskoe",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-usole-sibirskoe-6a9e86b61256e257b28da11a",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-chita",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-chita-6a9e84c759e219019c5222ae",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-maikop-maykop",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-maikop-6a9e83d9bf254d6af788ecf7",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-belgorod",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-belgorod-6a99643554c1c368547de825",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-yakutsk-2",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-yakutsk-69ef5d670b5a1d3f039d659d",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-yakutsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-yakutsk-69ef3e2f081ecdc355a70abc",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-orsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-orsk-6ab1384ab3edd3ee62212c90",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-naberezhnye-chelny",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-6ad727ea819ffec438188e30",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-nizhnekamsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-6ad637067b2a6eeaa3065b12",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-kursk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-6ab5419d8812f2076755ab56",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-saransk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tc-6a3d4e6aa6834a4d2c2658d1-solnyi-stendap-koncert-vani-usovicha",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-rybinsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-6ad9e45ef556c6b6567a7962",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-cherepovec",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-6ad9e204e0d53f0d4d4441c1",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-krasnodar-2",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-6ad8befb5579f083ec389f33",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-kurgan",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-6ad7345249f062dec5b64b3f",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-ekaterinburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-6ad72bda1a2997202e0c420c",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-nizhniy-tagil",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-6ad7294af0e541abb39e263e",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-izhevsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-6ad6390d305806dca70aac00",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-bryansk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-6ad62e2300c278c4dc65fb52",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-tambov-2",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-6acf8dac643975d32953b579",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-egorevsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-6abf8dffb71e075c4098a509",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-orel",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-6a9f1bb6ad4c77069e6fe530",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-chelyabinsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-6a9ebb64c9f27e0538d8893a",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-tyumen",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-6a9eb7ceaf0600079e5a04af",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-stupino",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-6a95e02b000c7e48570d8992",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-obninsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-6a7b45ceb1c04f7b5ae059ea",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-krasnodar",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-6a723f4cadf4825b58af30f9",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-armavir",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-6a6f175405bdab34745afcf4",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-elektrostal",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-6a5f35223a504f9b7432fe65",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-lyubercy",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-6a5f2f0a4cb8d9a55d4fe891",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-rostov-na-donu",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-6a5e1836e233b8c1e504ac2d",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-ulyanovsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-6a574d28556ae0b7f2847020",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-fryazino",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-6a4f9c1793b5422f0f70d5ea",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-smolensk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-6a4f94a7c99de477b8667820",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-penza",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tc-6a43b2cd8f094a700e2df9f2-solnyi-stendap-koncert-vani-usovicha",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-domodedovo",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tc-6a43afc7741fa164c27c3fff-solnyi-stendap-koncert-vani-usovicha",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-murmansk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-6aa16b486b2c7044bcc4fdd3",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-monino",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-6a5f321efc188f76edd8771b",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-chehov-moskovskaya-oblast",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-6a57492249bde1e87b8526fb",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-tambov",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tc-69fddcddd46ef3197d397afd-solnyi-stendap-koncert-vani-usovicha",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-6af210b4ccf0d11727479b30",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-moskva-2",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-6af213478848eb8f0da67e52",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-saransk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-6a96e0d3a541fda4eb32bf26",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-barnaul",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-6abd44dfa1973ef64d938bcc",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-petrozavodsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-6abe268ea32798b037f9e0b4",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-ulyanovsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-6ac769cf19ca282d334eede5",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-kemerovo",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-6abd4334a1973ef64d9389b8",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-omsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-6abe2ac9e4d4fac84db7206a",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-tomsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-6abe28506c1d63503b3bc227",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-novokuzneck",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-6abcec0ace18856f1f097738",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-novosibirsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-6abcf6ddfa9a961c2f347030",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-penza",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-6abce8b9a6cfba8c8569d6fa",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-ekaterinburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-6a96e5e6df1af42352c38508",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-tyumen",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-6a96e32cf0c947dad97c3e25",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-chelyabinsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-6a97d7db32e5f318e3e00546",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-ufa",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-6ac7414115b6b7fc43fb5c44",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-sterlitamak",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-6ae337f0644b9d3b54e67a0f",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-izhevsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-6ad76fe38e6a892aba4e7ce6",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-tyumen",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-6ad755fb9edb7b438e69bfd8",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-neftekamsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-6acf741becae28181a34ff5e",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-ufa-3",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-6abe5046515c1da8e926df51",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-ulyanovsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-6ad8779541e0891989f3131b",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-saratov",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-6acf42e276aa06eb0911f034",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-perm",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-6acf288b880eaec14588195a",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-chelyabinsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-6abe611eaf52e98b188f10ad",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-ufa-2",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-6abe4760074e7182bb977323",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-ufa",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-6abe469e917e05a0f7019e0e",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-ekaterinburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-6abe43f00bf7bc54a82b2516",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-samara",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-6abe423455cca182804255c8",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "tatarskaya-chak-chak-diskoteka-18-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tc-6a4224491e57d9dfd190c192-tatarskaya-chak-chak-diskoteka-18",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-kursk-2",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-6ac243e431134f92b4ed619d",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-samara",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-6abffb58edea108054b53ecd",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-volgograd",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-6abff1155c7c700e21719370",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-irkutsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-6ad614a402bb54cd51481e3f",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-voronezh-2",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-6ad4b657e5d7a9679c09be16",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-ekaterinburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-6ac62da0d87af6a4d614c9d7",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-novosibirsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-6ab3ec1a6bbf38dd97584526",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-omsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-6ab3ea14bffbbdab9d3c2b5c",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-tyumen",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-6ab3e623d88580f154cbdab6",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-tambov",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-6aa442618c6690160cbb36c7",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-saratov",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-6a9038cfe001ac3316aeff3c",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-bryansk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-6a8cc087684b911ffa792a2c",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-kursk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-6a8cba7371bd4358e70b2227",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-voronezh",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-6a8cb8b76a0ac2cc1c54ed99",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "kamazz-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "kamazz-sankt-peterburg-6aac4838b44f5250579534ab",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "kamazz-krasnodar",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "kamazz-krasnodar-6aa1c1c367fc7a359db7e819",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "kamazz-shahty",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "kamazz-shahty-6a9c8988c4b48b7904841e24",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "kamazz-volgodonsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "kamazz-volgodonsk-6a88a5bdb5cc470905135fe1",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "kamazz-armavir",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "kamazz-armavir-6a91e51aa82faefbf8b73d82",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "kamazz-elec",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "kamazz-elec-6a80bb37d5e0b6805ae2548a",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "kamazz-kuzneck",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "kamazz-kuzneck-6a674d4eaf5c6ea6930b6d89",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "kamazz-rostov-na-donu",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "kamazz-rostov-na-donu-6a75c00c5aa7b770d8091e5c",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "kamazz-tambov",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "kamazz-tambov-6a674fc9af5c6ea6930b7283",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "kamazz-kaliningrad",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "kamazz-kaliningrad-6aac4a75d52bd1d7573336d4",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "cirk-buduschego-za-granyu-vozmozhnogo-gubkinskiy-2",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "cirk-buduschego-za-granyu-vozmozhnogo-6ad11b8ce4569b1a6f6d4378",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "cirk-buduschego-za-granyu-vozmozhnogo-tazovskiy-2",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "cirk-buduschego-za-granyu-vozmozhnogo-6af0810ba0da0ad0ba348037",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "cirk-buduschego-za-granyu-vozmozhnogo-tarko-sale",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "cirk-buduschego-za-granyu-vozmozhnogo-6ae2c48ba235f4ccbcabb3ac",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "cirk-buduschego-za-granyu-vozmozhnogo-gubkinskiy",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "cirk-buduschego-za-granyu-vozmozhnogo-6abe03e81b579fe33c1728f8",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "cirk-buduschego-za-granyu-vozmozhnogo-tazovskiy",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "cirk-buduschego-za-granyu-vozmozhnogo-6abe02c91b579fe33c1727cd",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "cirk-buduschego-za-granyu-vozmozhnogo-izluchinsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "cirk-buduschego-za-granyu-vozmozhnogo-6abe07b63110221ff1e6042c",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "cirk-buduschego-za-granyu-vozmozhnogo-langepas",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "cirk-buduschego-za-granyu-vozmozhnogo-6abe4268e72c259567af80a7",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "cirk-buduschego-za-granyu-vozmozhnogo-megion",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "cirk-buduschego-za-granyu-vozmozhnogo-6abe3bb6687e7189fbea2681",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "cirk-buduschego-za-granyu-vozmozhnogo-pokachi",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "cirk-buduschego-za-granyu-vozmozhnogo-6abe06443110221ff1e602e7",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-krasnodar",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-6a609b68842a62adca1dc869",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-voronezh",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-6a6095f614733e4e4a61ccca",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-kaliningrad",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-6a4fa1439f52db3303ebd1d6",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-vladivostok",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tc-6a1e9d86ac31da86e98d0daf-vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-irkutsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tc-6a171a72471d12e50de788bc-vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-rostov-na-donu",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-6a61e7f9f3828bf0ba09528c",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-habarovsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tc-6a1725067f98102f0c7775c6-vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-perm",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tc-6a14c5c21193648817617c8d-vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "marko-polo-nizhniy-novgorod",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "marko-polo-6a732a3f72b1f485aaa0e818",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "marko-polo-ivanovo",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "marko-polo-6a73250a92cb0b6ce3a86991",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "marko-polo-tver",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "marko-polo-6a732743ba197bb728186440",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "marko-polo-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "marko-polo-6a72fbb5d98d220439c9eb8f",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "marko-polo-smolensk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "marko-polo-6a732c56aa8d59031f992903",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "marko-polo-moskva-2",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "marko-polo-6a7346aea031be3ed31da95f",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "marko-polo-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "marko-polo-6a733f9ea031be3ed31d966e",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "marko-polo-samara",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "marko-polo-6a734265e5765e5ec3181490",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-rostov-na-donu-3",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-6a91be18b500786eeba5786a",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-ufa",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-6a91abb91d3b54e5a941727b",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-rostov-na-donu-2",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-6a91bb834335caffaf89e9db",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-rostov-na-donu-6",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-6a934ad208746e4855543341",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-ufa-3",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-6a91c50e4f48310c3b1ce40c",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-rostov-na-donu-5",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-6a91cedd332c2567cd992024",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-ufa-2",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-6a91b4d897eee8e5c10aecb6",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-rostov-na-donu-4",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-6a91c0e919ec0b1f3c09484d",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-ufa-4",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-6a935273afdd6c366491ccc9",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-ufa-2",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-6a91ef455cf0097565094843",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-rostov-na-donu-3",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-6a91fca55a1ae26fb9d24d7f",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-rostov-na-donu",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-6a91e392683ad867f71fb77a",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-ufa",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-6a91eccaa138d08dbcd0beca",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-rostov-na-donu-2",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-6a91f02b2cea4615fc0b3b73",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-krasnodar",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-6aa80e7d4b84407c30797825",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-ufa-3",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-6a91fb0d162aa700db6ce382",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "koncert-gruppy-doktor-shlyager-chita",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "koncert-gruppy-doktor-shlyager-6ae4727c48c44a79a9db5569",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "koncert-gruppy-doktor-shlyager-gusinoozersk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "koncert-gruppy-doktor-shlyager-6af43bdabcab2da601b0f8c2",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "koncert-gruppy-doktor-shlyager-mogoytuy",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "koncert-gruppy-doktor-shlyager-6aec72b50e3318cb613a885c",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "koncert-gruppy-doktor-shlyager-borzya",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "koncert-gruppy-doktor-shlyager-6aeb1fa9ef75ecd851216a7e",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "koncert-gruppy-doktor-shlyager-zabaykalsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "koncert-gruppy-doktor-shlyager-6aeb1dc92bbe1d64f6bd2a1b",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "koncert-gruppy-doktor-shlyager-petrovsk-zabaykalskiy",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "koncert-gruppy-doktor-shlyager-6aeaf96469e9204f557fe3b4",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "koncert-gruppy-doktor-shlyager-ulan-ude",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "koncert-gruppy-doktor-shlyager-6ae1317a0c5e92d245d904ea",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "koncert-gruppy-doktor-shlyager-angarsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "koncert-gruppy-doktor-shlyager-6adaf7b8a47bd5b9850e55c7",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "plamenev-ulyanovsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "plamenev-ulyanovsk-6a67a53500a9179d7eb6056c",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "plamenev-korolev",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "plamenev-korolev-6ad9d8818aa68c4c2823a415",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "plamenev-ramenskoe",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "plamenev-ramenskoe-6ad4a979a2788f079538ea14",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "plamenev-odincovo",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "plamenev-odincovo-6ad34bbede162659b60a1a04",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "plamenev-sergiev-posad",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "plamenev-sergiev-posad-6ad394e4cc77ab8332de245b",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "plamenev-kaliningrad",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "plamenev-kaliningrad-6ac38309029564dfe9339dcd",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "plamenev-kazan",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "plamenev-kazan-6a6488deaf421ef35ead93e0",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "plamenev-cheboksary",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "plamenev-cheboksary-6a648b66e85f51303c7303f7",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-kotovsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-kotovsk-6ae8c9a73d1c2a18aef0b11b",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-kalach-na-donu",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-kalach-na-donu-6ae89268b933f95cd2046936",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-gryazi",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tc-6a4e6dc2330eefd4b06013c2-spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-gryazi",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-zhirnovsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-zhirnovsk-6ae9e095b8661ec670f32739",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-skopin",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-skopin-6ae898748219440b441f406e",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-zherdevka",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-zherdevka-6ae87a1ce390fe0e867a6a1e",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-usman",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-usman-6a91b336a331a1c650d9014c",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-uryupinske-uryupinsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-uryupinske-6ae87054c58de22b116c1836",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-ahtubinske-ahtubinsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-ahtubinske-6aec8999f2673e6c7bc44702",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-borisoglebske-borisoglebsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-borisoglebske-6ae9c215b57a68e5d24f16da",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-boguchare-boguchar",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-boguchare-6ad5d38deaa632460dd7a482",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-ostrogozhske-ostrogozhsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-ostrogozhske-6ad0d9bb65a1beace4a89025",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-novovoronezhe-novovoronezh",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-novovoronezhe-6a5a7c70e9a25a9a032806e9",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "sveta-bolshoi-solnyi-koncert-omsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "sveta-bolshoi-solnyi-koncert-6a0a2a9d86d5d85983fcf538",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "sveta-bolshoi-solnyi-koncert-surgut",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "sveta-bolshoi-solnyi-koncert-6a0a2a164a9e04ef13e22f6b",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "sveta-bolshoi-solnyi-koncert-krasnodar",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "sveta-bolshoi-solnyi-koncert-6a0a26f221a01d97b31dde32",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "sveta-bolshoi-solnyi-koncert-tula",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "sveta-bolshoi-solnyi-koncert-6a0a25cffd33f026a3912691",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "sveta-bolshoi-solnyi-koncert-lipeck",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "sveta-bolshoi-solnyi-koncert-6a0a24eb425f66c9e88b84d1",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "sveta-bolshoi-solnyi-koncert-voronezh",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "sveta-bolshoi-solnyi-koncert-6a0a27a8fd33f026a391297f",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "sveta-bolshoi-solnyi-koncert-ryazan",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "sveta-bolshoi-solnyi-koncert-6a0a246239a27964e5bc2267",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "pryzhok-v-svobodu-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "pryzhok-v-svobodu-6aba4024b832242c12ecbb89",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "pryzhok-v-svobodu-omsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "pryzhok-v-svobodu-6a90219f9f442696c325812a",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "pryzhok-v-svobodu-novosibirsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "pryzhok-v-svobodu-6a8d8360319f25e0723cc362",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "pryzhok-v-svobodu-krasnoyarsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "pryzhok-v-svobodu-6a86fafe4ed75aa4797db24d",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "pryzhok-v-svobodu-irkutsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "pryzhok-v-svobodu-6a86f2aed6759e8617a69732",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "pryzhok-v-svobodu-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tc-6a311fe2a85a742fc46bf439-pryzhok-v-svobodu",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "pryzhok-v-svobodu-abakan",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "pryzhok-v-svobodu-6a8d882a19012f29899648ea",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "koncert-zvezdy-80-90h-gruppa-karolina-bogdanovich",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "koncert-zvezdy-80-90h-gruppa-karolina-6a99e75d06a572510b9ce734",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "koncert-zvezdy-80-90h-gruppa-karolina-verhniy-tagil",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "koncert-zvezdy-80-90h-gruppa-karolina-6a837830e6d243471f51d1b3",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "koncert-zvezdy-80-90h-gruppa-karolina-ekaterinburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "koncert-zvezdy-80-90h-gruppa-karolina-6a8f68b332b7788fd0f90dc3",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "koncert-zvezdy-80-90h-gruppa-karolina-sol-ileck",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "koncert-zvezdy-80-90h-gruppa-karolina-6a690e9687ed31352356bf5f",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "koncert-zvezdy-80-90h-gruppa-karolina-nizhniy-novgorod",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "koncert-zvezdy-80-90h-gruppa-karolina-6a660171b8b261b2b38c0805",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "koncert-zvezdy-80-90h-gruppa-karolina-buguruslan",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "koncert-zvezdy-80-90h-gruppa-karolina-6a8ae59fe9c8db62b888d96f",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "koncert-zvezdy-80-90h-gruppa-karolina-bogorodsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "koncert-zvezdy-80-90h-gruppa-karolina-6a74b35ef29fb21ddf2f1592",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "15-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-nizhnii-novgorod-nizhniy-novgorod",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "15-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-nizhnii-novgorod-6a86efaed6759e8617a69584",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "14-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-yaroslavl",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "14-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-yaroslavl-6a85b260d8dad89ab876b707",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "25-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "25-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-sankt-peterburg-6a8841c57ee00752102296be",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "26-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "26-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-moskva-6a8835717503af4b04ee50c6",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "21-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-tula",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "21-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-tula-6a86eb1f50470c72fc856f89",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "24-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-tver",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "24-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-tver-6a85c25f8141f5183eb67719",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "20-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-ryazan",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "20-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-ryazan-6a85bee78a30a92439b11567",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "gruppa-lesopoval-kolomna",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "gruppa-lesopoval-6ae9b6aacfa8f140964cba49",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "gruppa-lesopoval-balashiha",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "gruppa-lesopoval-6ace5bb85ea3ce4ec2cf33db",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "gruppa-lesopoval-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "gruppa-lesopoval-6ace486c395cca569dc1d2fe",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "gruppa-lesopoval-moskva-2",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "gruppa-lesopoval-6ace4b9a0f3a62e8a83bfa1e",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "gruppa-lesopoval-obninsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "gruppa-lesopoval-6aabf08f6c37f996150449e7",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "gruppa-lesopoval-domodedovo",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "gruppa-lesopoval-6ace53755ea3ce4ec2cf3005",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "gruppa-lesopoval-zelenograd",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "gruppa-lesopoval-6aabf8820d3fb180f778b1ba",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "cirk-fantastik-lobnya-3",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "cirk-fantastik-6adf49ffadb1f04f9426296f",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "cirk-fantastik-lyubercy-3",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "cirk-fantastik-6af08e5c96e0678be868afc0",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "cirk-fantastik-lyubercy-4",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "cirk-fantastik-6aec6fc196890f27f71eb525",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "cirk-fantastik-lobnya-4",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "cirk-fantastik-6adf4a1b126abdfa564ffe5b",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "cirk-fantastik-lobnya-2",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "cirk-fantastik-6adf49e112969a98003f332a",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "cirk-fantastik-lobnya",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "cirk-fantastik-6adf4438a4f01a847f018d60",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "cirk-fantastik-lyubercy-2",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "cirk-fantastik-6ac93f4e35ed8944ed57cf43",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "gruppa-mirazh-korolev",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "gruppa-mirazh-6ae9b8c0eb967f453a27b471",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "gruppa-mirazh-domodedovo",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "gruppa-mirazh-6ace523bff5c048191fe6e1f",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "gruppa-mirazh-podolsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "gruppa-mirazh-6ace4eb3f85afe35d84a7855",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "gruppa-mirazh-zelenograd",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "gruppa-mirazh-6aabf787fc7cfc7c4e3e55ff",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "gruppa-mirazh-chehov-moskovskaya-oblast",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "gruppa-mirazh-6aabf492e1ccde2779205d03",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "gruppa-mirazh-obninsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "gruppa-mirazh-6aabf2044b2fba74b905b5ab",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-penza",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-6abd043a246a512200a65a69",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-cheboksary",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-6ab65d826baf472295ddc4f2",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-yoshkar-ola",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-6aae98fd5836e3e9d884996c",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-kirov-kirovskaya-oblast",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-6aaeabfd47e7470de65e1d97",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-syktyvkar",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-6aae8fd32c711f5727e018a0",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-saransk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-6aae985d90ea2934115ab2df",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-perm",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-6ab518eaf9d450bb0c9c89bc",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-tula",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-6ab7dd709791b36d8a5a428e",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-ryazan",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-6ab7de01bb75e0fee9120541",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-izhevsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-6ab24f9585813c3c43d213a9",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-kaluga",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-6ab6d731ea74f172f246db32",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "maks-evdokimov-solnyi-stendap-koncert-balans-krasnoyarsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "maks-evdokimov-solnyi-stendap-koncert-balans-6ac8e67603cecd1468f836f2",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "maks-evdokimov-solnyi-stendap-koncert-balans-kemerovo",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "maks-evdokimov-solnyi-stendap-koncert-balans-6ac8e6fa69f08f072fe1fd08",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "maks-evdokimov-solnyi-stendap-koncert-novokuzneck",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "maks-evdokimov-solnyi-stendap-koncert-6ac617b4ad63449e7957c854",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "maks-evdokimov-solnyi-stendap-koncert-abakan",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "maks-evdokimov-solnyi-stendap-koncert-6ac616fb5ba53ea46174e9f2",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "maks-evdokimov-solnyi-stendap-koncert-novosibirsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "maks-evdokimov-solnyi-stendap-koncert-6ac615c4a9cf9a70a47c5da7",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "maks-evdokimov-solnyi-koncert-barnaul",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "maks-evdokimov-solnyi-koncert-6ac4fb20bc59123013f29370",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "stendap-koncert-viktorii-skladchikovoi-krasnoyarsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "stendap-koncert-viktorii-skladchikovoi-6abb89aa627999e51bace377",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "stendap-koncert-viktorii-skladchikovoi-yurga",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "stendap-koncert-viktorii-skladchikovoi-6aa911cd3493cf1bbb936ed5",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "stendap-koncert-viktorii-skladchikovoi-balakovo",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "stendap-koncert-viktorii-skladchikovoi-6a870525b1ba3f1df4150f32",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "stendap-koncert-viktorii-skladchikovoi-egorevsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "stendap-koncert-viktorii-skladchikovoi-6abfd53e4cc95e0573c75499",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "stendap-koncert-viktorii-skladchikovoi-murom",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "stendap-koncert-viktorii-skladchikovoi-6ac662f7e1e5bc97bda1d469",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "cink-urodov-rostov-na-donu-28-11-rostov-na-donu",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "cink-urodov-rostov-na-donu-28-11-6a90216d9f442696c325810b",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "cink-urodov-sankt-peterburg-06-12-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "cink-urodov-sankt-peterburg-06-12-6a8fe44230055212bfd2884f",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "cink-urodov-moskva-19-12-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "cink-urodov-moskva-19-12-6a8fdfae5a6dbebdca6577b4",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "cink-urodov-krasnodar-27-11-krasnodar",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "cink-urodov-krasnodar-27-11-6a9021f6ed13c77879c8ab1b",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "cink-urodov-voronezh-29-11-voronezh",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "cink-urodov-voronezh-29-11-6a90205c924a9cea1f00614d",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dmitrii-dubrov-i-alla-luzheckaya-volgograd-3-12-2026-volgograd",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "dmitrii-dubrov-i-alla-luzheckaya-volgograd-3-12-2026-6aa1967c06f19f13eb010051",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dmitrii-dubrov-i-alla-luzheckaya-penza-5-12-2026-penza",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "dmitrii-dubrov-i-alla-luzheckaya-penza-5-12-2026-6aa14e0964f8d81621d30404",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dmitrii-dubrov-i-alla-luzheckaya-saratov-4-12-26-saratov",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "dmitrii-dubrov-i-alla-luzheckaya-saratov-4-12-26-6aa13b48c0123aef4addfb80",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dmitrii-dubrov-i-alla-luzheckaya-voronezh-29-11-2026-voronezh",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "dmitrii-dubrov-i-alla-luzheckaya-voronezh-29-11-2026-6a9eae417d5bfc0c5ac37daa",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dmitrii-dubrov-i-alla-luzheckaya-lipeck-28-11-26-lipeck",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "dmitrii-dubrov-i-alla-luzheckaya-lipeck-28-11-26-6a9eaada3a42b5697dd99a46",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "simfoniya-lyubvi-simfonicheskii-koncert-v-siyanii-tysyachi-svechei-bugulma",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "simfoniya-lyubvi-simfonicheskii-koncert-v-siyanii-tysyachi-svechei-6ad0f5049ac2ecaf9f0cfc9b",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "simfoniya-lyubvi-simfonicheskii-koncert-v-siyanii-tysyachi-svechei-krasnoturinsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "simfoniya-lyubvi-simfonicheskii-koncert-v-siyanii-tysyachi-svechei-6add948b6e8b7da758403772",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "simfoniya-lyubvi-simfonicheskii-koncert-v-siyanii-tysyachi-svechei-salavat",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "simfoniya-lyubvi-simfonicheskii-koncert-v-siyanii-tysyachi-svechei-6ad79a58be7bed495f9a79a5",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "simfoniya-lyubvi-simfonicheskii-koncert-v-siyanii-tysyachi-svechei-buzuluk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "simfoniya-lyubvi-simfonicheskii-koncert-v-siyanii-tysyachi-svechei-6ad0b111f4f98cbce4bd9acb",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "muzyka-lyubvi-v-siyanii-tysyachi-svechei-roslavl",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "muzyka-lyubvi-v-siyanii-tysyachi-svechei-6ac3e5c0406008e46b510954",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "novogodnii-ogonek-so-zvezdami-80-90h-gruppa-karolina-smolensk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "novogodnii-ogonek-so-zvezdami-80-90h-gruppa-karolina-6ae7b16934f95b20a165af4d",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "novogodnii-ogonek-so-zvezdami-80-90h-gruppa-karolina-istra",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "novogodnii-ogonek-so-zvezdami-80-90h-gruppa-karolina-6ae786ddef5a97ab5a605537",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "novogodnii-ogonek-so-zvezdami-80-90h-gruppa-karolina-kursk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "novogodnii-ogonek-so-zvezdami-80-90h-gruppa-karolina-6ae796b1f6a1a3ac2b8cc5cf",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "novogodnii-ogonek-so-zvezdami-80-90h-gruppa-karolina-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "novogodnii-ogonek-so-zvezdami-80-90h-gruppa-karolina-6adc9670b5d55a4403d2052b",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "novogodnii-ogonek-so-zvezdami-80-90h-gruppa-karolina-tver",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "novogodnii-ogonek-so-zvezdami-80-90h-gruppa-karolina-6ac6bb08b2aca4fab5c5b971",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-koncert-olega-maiami-v-krasnodare-krasnodar",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-koncert-olega-maiami-v-krasnodare-6a7ede5fcb315799746a9d51",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-koncert-olega-maiami-v-sankt-peterburge-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-koncert-olega-maiami-v-sankt-peterburge-6a7ed610cde3e80ad5ee6bbc",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-koncert-olega-maiami-v-novosibirske-novosibirsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-koncert-olega-maiami-v-novosibirske-6a7edfe7cb315799746aa209",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-koncert-olega-maiami-v-ekaterinburge-ekaterinburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-koncert-olega-maiami-v-ekaterinburge-6a7ed4f15806305acca07acc",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "aikko-koncert-v-krasnodare-krasnodar",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "aikko-koncert-v-krasnodare-6a8f4a2043a9cba04c111917",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "aikko-koncert-v-saratove-saratov",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "aikko-koncert-v-saratove-6a8f48ca10e3d38f5fc3b415",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "aikko-koncert-v-voronezhe-voronezh",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "aikko-koncert-v-voronezhe-6a8f4a71e2a0d1e8e741ccae",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "aikko-koncert-v-volgograde-volgograd",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "aikko-koncert-v-volgograde-6a8f49425c2adba2f5aeb71e",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    }
+  ],
+  "completedAt": "2026-11-13T05:01:29.607Z",
+  "complete": true
+}

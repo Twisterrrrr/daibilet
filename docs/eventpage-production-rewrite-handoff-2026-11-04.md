@@ -10,7 +10,7 @@
 
 ## Rewrite agent scope
 
-Use [`eventpage-rewrite-work-queue-2026-11-04.csv`](./eventpage-rewrite-work-queue-2026-11-04.csv). It has `eventpage_id`, stable public URL, `/admin/events/{representative_event_id}` editor path, representative ID, the Event IDs directly attached to the page, active saleable Event IDs, and verified recurring product groups.
+Use [`eventpage-rewrite-work-queue-2026-11-04.csv.gz`](./eventpage-rewrite-work-queue-2026-11-04.csv.gz). It has `eventpage_id`, stable public URL, `/admin/events/{representative_event_id}` editor path, representative ID, the Event IDs directly attached to the page, active saleable Event IDs, and verified recurring product groups.
 
 The rewrite agent should edit the EventPage editorial content only. Preserve supplier/source text as an archived, non-published source object and mark the rewrite as the active editorial text. Do not create another page, change EventPage/EventID mappings, publish, set indexability, alter canonical/sitemap, or add redirects. For the three newly created pages, the queue marks `created_needs_rewrite`; other records are existing drafts and need review before editing.
 

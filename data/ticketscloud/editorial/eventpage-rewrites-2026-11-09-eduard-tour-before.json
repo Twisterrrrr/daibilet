@@ -1,0 +1,1336 @@
+{
+  "capturedAt": "2026-11-09T20:54:09.212Z",
+  "purpose": "Pre-rewrite production archive for the Eduard Khusnutdinov tour. Legacy overrides remain unchanged; EventPage sections hold the active editorial rewrite.",
+  "items": {
+    "evt_6aaa3c7c653b5c324572a323": {
+      "eventId": "evt_6aaa3c7c653b5c324572a323",
+      "eventPageId": "df365a8c-1536-491e-8b2e-ca3df041929a",
+      "slug": "eduard-husnutdinov-vo-vladimire-2026-vladimir",
+      "sourceTitle": "Эдуард Хуснутдинов во Владимире 2026",
+      "sourceDescription": "Эдуард — душа народных хитов — с сольным концертом!  <br>Популярный автор-исполнитель, подаривший нам легендарные хиты «Я живу не унываю», «Не святой», «Отогреется душа», «Этот трек» и многие другие, приглашает вас на долгожданный концерт в новом сезоне!<br>Вас ждёт: <br>✔ Тёплая, почти домашняя атмосфера — каждое слово и нота прозвучат по-особенному.  <br>✔ Живой звук и неповторимая харизма — Эдуард исполнит свои хиты так, как умеет только он: с душой и искренностью.  <br>✔ Любимые песни, которые вы будете петь вместе.<br>Это больше, чем концерт — это встреча друзей.<br>Успейте забронировать лучшие места!",
+      "legacyOverrideDescription": "«Эдуард Хуснутдинов во Владимире 2026». Сольный концерт Эдуарда Хуснутдинова - автора-исполнителя, чьи песни «Я живу не унываю», «Не святой», «Отогреется душа» и «Этот трек» стали народными хитами. В программе - любимые песни в живом звуке, теплая атмосфера и знакомые с детства мотивы, которые можно петь вместе с артистом.\n\nБлижайший концерт пройдет во Владимире.\n\n## Практическая информация\n\n- Место - Ресторан-пивоварня «MaxBräu», Владимир\n- Адрес - г. Владимир, ул. Дзержинского 11, 2 этаж\n- Продолжительность - около 90 минут\n- Возрастное ограничение - 12+\n- Билеты - от 1 500 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_6aaa3c7c653b5c324572a323",
+        "kind": "SINGLE",
+        "slug": "эдуард-хуснутдинов-во-владимире-2026-6aaa3c7c653b5c324572a323",
+        "seoH1": null,
+        "title": "Эдуард Хуснутдинов во Владимире 2026",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6aaa3c7c653b5c324572a323",
+            "externalId": "6aaa3c7c653b5c324572a323",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_5790877d9cb5386e6c6db983",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6aaa3c7c5068f0aa40384317.jpg",
+        "seoTitle": null,
+        "cityTitle": "Владимир",
+        "venueTitle": "Ресторан-пивоварня «MaxBräu»",
+        "description": "Эдуард — душа народных хитов — с сольным концертом!  <br>Популярный автор-исполнитель, подаривший нам легендарные хиты «Я живу не унываю», «Не святой», «Отогреется душа», «Этот трек» и многие другие, приглашает вас на долгожданный концерт в новом сезоне!<br>Вас ждёт: <br>✔ Тёплая, почти домашняя атмосфера — каждое слово и нота прозвучат по-особенному.  <br>✔ Живой звук и неповторимая харизма — Эдуард исполнит свои хиты так, как умеет только он: с душой и искренностью.  <br>✔ Любимые песни, которые вы будете петь вместе.<br>Это больше, чем концерт — это встреча друзей.<br>Успейте забронировать лучшие места!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "г. Владимир, ул. Дзержинского 11, 2 этаж",
+        "canonicalPath": null,
+        "primaryCityId": "city_473247",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "Эдуард Хуснутдинов во Владимире 2026",
+        "seoH1": "Эдуард Хуснутдинов во Владимире 2026",
+        "seoTitle": "Эдуард Хуснутдинов во Владимире 2026 | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/eduard-husnutdinov-vo-vladimire-2026-vladimir",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "f6acd71c-8d57-43d9-ac2e-32f5834f8458",
+          "eventId": "evt_6aaa3c7c653b5c324572a323",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_6aaa3c7c653b5c324572a323",
+            "kind": "SINGLE",
+            "slug": "эдуард-хуснутдинов-во-владимире-2026-6aaa3c7c653b5c324572a323",
+            "seoH1": null,
+            "title": "Эдуард Хуснутдинов во Владимире 2026",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6aaa3c7c653b5c324572a323",
+                "externalId": "6aaa3c7c653b5c324572a323",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_5790877d9cb5386e6c6db983",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6aaa3c7c5068f0aa40384317.jpg",
+            "seoTitle": null,
+            "cityTitle": "Владимир",
+            "venueTitle": "Ресторан-пивоварня «MaxBräu»",
+            "description": "Эдуард — душа народных хитов — с сольным концертом!  <br>Популярный автор-исполнитель, подаривший нам легендарные хиты «Я живу не унываю», «Не святой», «Отогреется душа», «Этот трек» и многие другие, приглашает вас на долгожданный концерт в новом сезоне!<br>Вас ждёт: <br>✔ Тёплая, почти домашняя атмосфера — каждое слово и нота прозвучат по-особенному.  <br>✔ Живой звук и неповторимая харизма — Эдуард исполнит свои хиты так, как умеет только он: с душой и искренностью.  <br>✔ Любимые песни, которые вы будете петь вместе.<br>Это больше, чем концерт — это встреча друзей.<br>Успейте забронировать лучшие места!",
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "г. Владимир, ул. Дзержинского 11, 2 этаж",
+            "canonicalPath": null,
+            "primaryCityId": "city_473247",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": null
+          },
+          "createdAt": "2026-11-03T20:40:48.983Z",
+          "eventTitle": "Эдуард Хуснутдинов во Владимире 2026",
+          "eventSlug": "эдуард-хуснутдинов-во-владимире-2026-6aaa3c7c653b5c324572a323",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_473247",
+          "cityTitle": "Владимир",
+          "venueId": "venue_5790877d9cb5386e6c6db983",
+          "venueTitle": "Ресторан-пивоварня «MaxBräu»",
+          "venueAddress": "г. Владимир, ул. Дзержинского 11, 2 этаж",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6aaa3c7c653b5c324572a323",
+              "externalId": "6aaa3c7c653b5c324572a323",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "city": "Владимир",
+        "venue": "Ресторан-пивоварня «MaxBräu»",
+        "address": "г. Владимир, ул. Дзержинского 11, 2 этаж",
+        "ageLimit": "12",
+        "offerMin": 1500,
+        "activeOffers": 9,
+        "futureSessions": [
+          "2026-11-11 17:00:00"
+        ]
+      }
+    },
+    "evt_6aaa86440187b3a251a7c3ae": {
+      "eventId": "evt_6aaa86440187b3a251a7c3ae",
+      "eventPageId": "b274ac82-977a-452b-aa7f-830ef0bb6fe1",
+      "slug": "eduard-husnutdinov-v-ivanovo-2026-ivanovo",
+      "sourceTitle": "Эдуард Хуснутдинов в Иваново 2026",
+      "sourceDescription": "Эдуард — душа народных хитов — с сольным концертом!  <br>Популярный автор-исполнитель, подаривший нам легендарные хиты «Я живу не унываю», «Не святой», «Отогреется душа», «Этот трек» и многие другие, приглашает вас на долгожданный концерт в новом сезоне!<br>Вас ждёт: <br>✔ Тёплая, почти домашняя атмосфера — каждое слово и нота прозвучат по-особенному.  <br>✔ Живой звук и неповторимая харизма — Эдуард исполнит свои хиты так, как умеет только он: с душой и искренностью.  <br>✔ Любимые песни, которые вы будете петь вместе.<br>Это больше, чем концерт — это встреча друзей.<br>Успейте забронировать лучшие места!",
+      "legacyOverrideDescription": "Эдуард Хуснутдинов в Иваново 2026. Сольный концерт Эдуарда Хуснутдинова - автора-исполнителя, чьи песни «Я живу не унываю», «Не святой», «Отогреется душа» и «Этот трек» стали народными хитами. В программе - любимые песни в живом звуке, теплая атмосфера и знакомые с детства мотивы, которые можно петь вместе с артистом.\n\nБлижайший концерт пройдет в Иваново.\n\n## Практическая информация\n\n- Место - «Руки Вверх Бар», Иваново\n- Адрес - пл. Пушкина, 2, Иваново, Ивановская обл., Россия, 153000\n- Продолжительность - около 90 минут\n- Возрастное ограничение - 12+\n- Билеты - от 1 250 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_6aaa86440187b3a251a7c3ae",
+        "kind": "SINGLE",
+        "slug": "эдуард-хуснутдинов-в-иваново-2026-6aaa86440187b3a251a7c3ae",
+        "seoH1": null,
+        "title": "Эдуард Хуснутдинов в Иваново 2026",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6aaa86440187b3a251a7c3ae",
+            "externalId": "6aaa86440187b3a251a7c3ae",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_6962a20d283f35184a166fa8",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6aaa8643525f4007a9f776d8.jpg",
+        "seoTitle": null,
+        "cityTitle": "Иваново",
+        "venueTitle": "Руки Вверх Бар",
+        "description": "Эдуард — душа народных хитов — с сольным концертом!  <br>Популярный автор-исполнитель, подаривший нам легендарные хиты «Я живу не унываю», «Не святой», «Отогреется душа», «Этот трек» и многие другие, приглашает вас на долгожданный концерт в новом сезоне!<br>Вас ждёт: <br>✔ Тёплая, почти домашняя атмосфера — каждое слово и нота прозвучат по-особенному.  <br>✔ Живой звук и неповторимая харизма — Эдуард исполнит свои хиты так, как умеет только он: с душой и искренностью.  <br>✔ Любимые песни, которые вы будете петь вместе.<br>Это больше, чем концерт — это встреча друзей.<br>Успейте забронировать лучшие места!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "пл. Пушкина, 2, Иваново, Ивановская обл., Россия, 153000",
+        "canonicalPath": null,
+        "primaryCityId": "city_555312",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "Эдуард Хуснутдинов в Иваново 2026",
+        "seoH1": "Эдуард Хуснутдинов в Иваново 2026",
+        "seoTitle": "Эдуард Хуснутдинов в Иваново 2026 | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/eduard-husnutdinov-v-ivanovo-2026-ivanovo",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "1fe39e87-245a-475c-b3b9-335c43b20663",
+          "eventId": "evt_6aaa86440187b3a251a7c3ae",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_6aaa86440187b3a251a7c3ae",
+            "kind": "SINGLE",
+            "slug": "эдуард-хуснутдинов-в-иваново-2026-6aaa86440187b3a251a7c3ae",
+            "seoH1": null,
+            "title": "Эдуард Хуснутдинов в Иваново 2026",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6aaa86440187b3a251a7c3ae",
+                "externalId": "6aaa86440187b3a251a7c3ae",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_6962a20d283f35184a166fa8",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6aaa8643525f4007a9f776d8.jpg",
+            "seoTitle": null,
+            "cityTitle": "Иваново",
+            "venueTitle": "Руки Вверх Бар",
+            "description": "Эдуард — душа народных хитов — с сольным концертом!  <br>Популярный автор-исполнитель, подаривший нам легендарные хиты «Я живу не унываю», «Не святой», «Отогреется душа», «Этот трек» и многие другие, приглашает вас на долгожданный концерт в новом сезоне!<br>Вас ждёт: <br>✔ Тёплая, почти домашняя атмосфера — каждое слово и нота прозвучат по-особенному.  <br>✔ Живой звук и неповторимая харизма — Эдуард исполнит свои хиты так, как умеет только он: с душой и искренностью.  <br>✔ Любимые песни, которые вы будете петь вместе.<br>Это больше, чем концерт — это встреча друзей.<br>Успейте забронировать лучшие места!",
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "пл. Пушкина, 2, Иваново, Ивановская обл., Россия, 153000",
+            "canonicalPath": null,
+            "primaryCityId": "city_555312",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": null
+          },
+          "createdAt": "2026-11-03T20:40:49.465Z",
+          "eventTitle": "Эдуард Хуснутдинов в Иваново 2026",
+          "eventSlug": "эдуард-хуснутдинов-в-иваново-2026-6aaa86440187b3a251a7c3ae",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_555312",
+          "cityTitle": "Иваново",
+          "venueId": "venue_6962a20d283f35184a166fa8",
+          "venueTitle": "Руки Вверх Бар",
+          "venueAddress": "пл. Пушкина, 2, Иваново, Ивановская обл., Россия, 153000",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6aaa86440187b3a251a7c3ae",
+              "externalId": "6aaa86440187b3a251a7c3ae",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "city": "Иваново",
+        "venue": "Руки Вверх Бар",
+        "address": "пл. Пушкина, 2, Иваново, Ивановская обл., Россия, 153000",
+        "ageLimit": "12",
+        "offerMin": 1250,
+        "activeOffers": 7,
+        "futureSessions": [
+          "2026-11-15 17:00:00"
+        ]
+      }
+    },
+    "evt_6ab50429050b3c2a5b29766a": {
+      "eventId": "evt_6ab50429050b3c2a5b29766a",
+      "eventPageId": "3bb0a8b1-456b-4048-a50c-5310aaa07ec5",
+      "slug": "eduard-husnutdinov-v-kirove-2026-kirov-kirovskaya-oblast",
+      "sourceTitle": "Эдуард Хуснутдинов в Кирове 2026",
+      "sourceDescription": "Эдуард — душа народных хитов — с сольным концертом!  <br>Популярный автор-исполнитель, подаривший нам легендарные хиты «Я живу не унываю», «Не святой», «Отогреется душа», «Этот трек» и многие другие, приглашает вас на долгожданный концерт в новом сезоне!<br>Вас ждёт: <br>✔ Тёплая, почти домашняя атмосфера — каждое слово и нота прозвучат по-особенному.  <br>✔ Живой звук и неповторимая харизма — Эдуард исполнит свои хиты так, как умеет только он: с душой и искренностью.  <br>✔ Любимые песни, которые вы будете петь вместе.<br>Это больше, чем концерт — это встреча друзей.<br>Успейте забронировать лучшие места!",
+      "legacyOverrideDescription": "Эдуард Хуснутдинов в Кирове 2026 в Кирове (Кировская область). Сольный концерт Эдуарда Хуснутдинова - автора-исполнителя, чьи песни «Я живу не унываю», «Не святой», «Отогреется душа» и «Этот трек» стали народными хитами. В программе - любимые песни в живом звуке, теплая атмосфера и знакомые с детства мотивы, которые можно петь вместе с артистом.\n\nБлижайший концерт пройдет в Кирове (Кировская область).\n\n## Практическая информация\n\n- Место - «Mr. Green», Киров (Кировская область)\n- Адрес - Заводская улица, 51\n- Продолжительность - около 90 минут\n- Возрастное ограничение - 12+\n- Билеты - от 1 250 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_6ab50429050b3c2a5b29766a",
+        "kind": "SINGLE",
+        "slug": "эдуард-хуснутдинов-в-кирове-2026-6ab50429050b3c2a5b29766a",
+        "seoH1": null,
+        "title": "Эдуард Хуснутдинов в Кирове 2026",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ab50429050b3c2a5b29766a",
+            "externalId": "6ab50429050b3c2a5b29766a",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_613b0e3885384248b6570b86",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6ab5042858fcdc187849abaf.jpg",
+        "seoTitle": null,
+        "cityTitle": "Киров (Кировская область)",
+        "venueTitle": "Mr. Green",
+        "description": "Эдуард — душа народных хитов — с сольным концертом!  <br>Популярный автор-исполнитель, подаривший нам легендарные хиты «Я живу не унываю», «Не святой», «Отогреется душа», «Этот трек» и многие другие, приглашает вас на долгожданный концерт в новом сезоне!<br>Вас ждёт: <br>✔ Тёплая, почти домашняя атмосфера — каждое слово и нота прозвучат по-особенному.  <br>✔ Живой звук и неповторимая харизма — Эдуард исполнит свои хиты так, как умеет только он: с душой и искренностью.  <br>✔ Любимые песни, которые вы будете петь вместе.<br>Это больше, чем концерт — это встреча друзей.<br>Успейте забронировать лучшие места!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Заводская улица, 51",
+        "canonicalPath": null,
+        "primaryCityId": "city_548408",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "Эдуард Хуснутдинов в Кирове 2026",
+        "seoH1": "Эдуард Хуснутдинов в Кирове 2026",
+        "seoTitle": "Эдуард Хуснутдинов в Кирове 2026 | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/eduard-husnutdinov-v-kirove-2026-kirov-kirovskaya-oblast",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "25864505-3c6c-45a9-8076-2aff1a8be357",
+          "eventId": "evt_6ab50429050b3c2a5b29766a",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_6ab50429050b3c2a5b29766a",
+            "kind": "SINGLE",
+            "slug": "эдуард-хуснутдинов-в-кирове-2026-6ab50429050b3c2a5b29766a",
+            "seoH1": null,
+            "title": "Эдуард Хуснутдинов в Кирове 2026",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ab50429050b3c2a5b29766a",
+                "externalId": "6ab50429050b3c2a5b29766a",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_613b0e3885384248b6570b86",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6ab5042858fcdc187849abaf.jpg",
+            "seoTitle": null,
+            "cityTitle": "Киров (Кировская область)",
+            "venueTitle": "Mr. Green",
+            "description": "Эдуард — душа народных хитов — с сольным концертом!  <br>Популярный автор-исполнитель, подаривший нам легендарные хиты «Я живу не унываю», «Не святой», «Отогреется душа», «Этот трек» и многие другие, приглашает вас на долгожданный концерт в новом сезоне!<br>Вас ждёт: <br>✔ Тёплая, почти домашняя атмосфера — каждое слово и нота прозвучат по-особенному.  <br>✔ Живой звук и неповторимая харизма — Эдуард исполнит свои хиты так, как умеет только он: с душой и искренностью.  <br>✔ Любимые песни, которые вы будете петь вместе.<br>Это больше, чем концерт — это встреча друзей.<br>Успейте забронировать лучшие места!",
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "Заводская улица, 51",
+            "canonicalPath": null,
+            "primaryCityId": "city_548408",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": null
+          },
+          "createdAt": "2026-11-03T20:41:00.120Z",
+          "eventTitle": "Эдуард Хуснутдинов в Кирове 2026",
+          "eventSlug": "эдуард-хуснутдинов-в-кирове-2026-6ab50429050b3c2a5b29766a",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_548408",
+          "cityTitle": "Киров (Кировская область)",
+          "venueId": "venue_613b0e3885384248b6570b86",
+          "venueTitle": "Mr. Green",
+          "venueAddress": "Заводская улица, 51",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ab50429050b3c2a5b29766a",
+              "externalId": "6ab50429050b3c2a5b29766a",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "city": "Киров (Кировская область)",
+        "venue": "Mr. Green",
+        "address": "Заводская улица, 51",
+        "ageLimit": "12",
+        "offerMin": 1250,
+        "activeOffers": 6,
+        "futureSessions": [
+          "2026-11-24 17:00:00"
+        ]
+      }
+    },
+    "evt_6ab51c60c29790d80d56f0da": {
+      "eventId": "evt_6ab51c60c29790d80d56f0da",
+      "eventPageId": "5c249e31-434a-4150-a4b1-9b1b6e6bb538",
+      "slug": "eduard-husnutdinov-v-kostrome-2026-kostroma",
+      "sourceTitle": "Эдуард Хуснутдинов в Костроме 2026",
+      "sourceDescription": "Эдуард — душа народных хитов — с сольным концертом!  <br>Популярный автор-исполнитель, подаривший нам легендарные хиты «Я живу не унываю», «Не святой», «Отогреется душа», «Этот трек» и многие другие, приглашает вас на долгожданный концерт в новом сезоне!<br>Вас ждёт: <br>✔ Тёплая, почти домашняя атмосфера — каждое слово и нота прозвучат по-особенному.  <br>✔ Живой звук и неповторимая харизма — Эдуард исполнит свои хиты так, как умеет только он: с душой и искренностью.  <br>✔ Любимые песни, которые вы будете петь вместе.<br>Это больше, чем концерт — это встреча друзей.<br>Успейте забронировать лучшие места!",
+      "legacyOverrideDescription": "Эдуард Хуснутдинов в Костроме 2026 в Костроме. Сольный концерт Эдуарда Хуснутдинова - автора-исполнителя, чьи песни «Я живу не унываю», «Не святой», «Отогреется душа» и «Этот трек» стали народными хитами. В программе - любимые песни в живом звуке, теплая атмосфера и знакомые с детства мотивы, которые можно петь вместе с артистом.\n\nБлижайший концерт пройдет в Костроме.\n\n## Практическая информация\n\n- Место - «Дом музыки Павла Герштейна», Кострома\n- Адрес - улица Никитская, 96\n- Продолжительность - около 90 минут\n- Возрастное ограничение - 12+\n- Билеты - от 1 000 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_6ab51c60c29790d80d56f0da",
+        "kind": "SINGLE",
+        "slug": "эдуард-хуснутдинов-в-костроме-2026-6ab51c60c29790d80d56f0da",
+        "seoH1": null,
+        "title": "Эдуард Хуснутдинов в Костроме 2026",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ab51c60c29790d80d56f0da",
+            "externalId": "6ab51c60c29790d80d56f0da",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_5d6f84781ec03970293c1a73",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6ab51c5f1615525683ccc319.jpg",
+        "seoTitle": null,
+        "cityTitle": "Кострома",
+        "venueTitle": "Дом музыки Павла Герштейна",
+        "description": "Эдуард — душа народных хитов — с сольным концертом!  <br>Популярный автор-исполнитель, подаривший нам легендарные хиты «Я живу не унываю», «Не святой», «Отогреется душа», «Этот трек» и многие другие, приглашает вас на долгожданный концерт в новом сезоне!<br>Вас ждёт: <br>✔ Тёплая, почти домашняя атмосфера — каждое слово и нота прозвучат по-особенному.  <br>✔ Живой звук и неповторимая харизма — Эдуард исполнит свои хиты так, как умеет только он: с душой и искренностью.  <br>✔ Любимые песни, которые вы будете петь вместе.<br>Это больше, чем концерт — это встреча друзей.<br>Успейте забронировать лучшие места!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "улица Никитская, 96",
+        "canonicalPath": null,
+        "primaryCityId": "city_543878",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "Эдуард Хуснутдинов в Костроме 2026",
+        "seoH1": "Эдуард Хуснутдинов в Костроме 2026",
+        "seoTitle": "Эдуард Хуснутдинов в Костроме 2026 | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/eduard-husnutdinov-v-kostrome-2026-kostroma",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "6259eb99-6c76-4db9-9f1d-29de507d61d3",
+          "eventId": "evt_6ab51c60c29790d80d56f0da",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_6ab51c60c29790d80d56f0da",
+            "kind": "SINGLE",
+            "slug": "эдуард-хуснутдинов-в-костроме-2026-6ab51c60c29790d80d56f0da",
+            "seoH1": null,
+            "title": "Эдуард Хуснутдинов в Костроме 2026",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ab51c60c29790d80d56f0da",
+                "externalId": "6ab51c60c29790d80d56f0da",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_5d6f84781ec03970293c1a73",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6ab51c5f1615525683ccc319.jpg",
+            "seoTitle": null,
+            "cityTitle": "Кострома",
+            "venueTitle": "Дом музыки Павла Герштейна",
+            "description": "Эдуард — душа народных хитов — с сольным концертом!  <br>Популярный автор-исполнитель, подаривший нам легендарные хиты «Я живу не унываю», «Не святой», «Отогреется душа», «Этот трек» и многие другие, приглашает вас на долгожданный концерт в новом сезоне!<br>Вас ждёт: <br>✔ Тёплая, почти домашняя атмосфера — каждое слово и нота прозвучат по-особенному.  <br>✔ Живой звук и неповторимая харизма — Эдуард исполнит свои хиты так, как умеет только он: с душой и искренностью.  <br>✔ Любимые песни, которые вы будете петь вместе.<br>Это больше, чем концерт — это встреча друзей.<br>Успейте забронировать лучшие места!",
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "улица Никитская, 96",
+            "canonicalPath": null,
+            "primaryCityId": "city_543878",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": null
+          },
+          "createdAt": "2026-11-03T20:41:00.442Z",
+          "eventTitle": "Эдуард Хуснутдинов в Костроме 2026",
+          "eventSlug": "эдуард-хуснутдинов-в-костроме-2026-6ab51c60c29790d80d56f0da",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_543878",
+          "cityTitle": "Кострома",
+          "venueId": "venue_5d6f84781ec03970293c1a73",
+          "venueTitle": "Дом музыки Павла Герштейна",
+          "venueAddress": "улица Никитская, 96",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ab51c60c29790d80d56f0da",
+              "externalId": "6ab51c60c29790d80d56f0da",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "city": "Кострома",
+        "venue": "Дом музыки Павла Герштейна",
+        "address": "улица Никитская, 96",
+        "ageLimit": "12",
+        "offerMin": 1000,
+        "activeOffers": 13,
+        "futureSessions": [
+          "2026-11-22 16:00:00"
+        ]
+      }
+    },
+    "evt_6aa943c1bb9c2e9fe1155822": {
+      "eventId": "evt_6aa943c1bb9c2e9fe1155822",
+      "eventPageId": "96ff5f52-dd4a-4157-a251-118ba54112b2",
+      "slug": "eduard-husnutdinov-v-moskve-2026-moskva",
+      "sourceTitle": "Эдуард Хуснутдинов в Москве 2026",
+      "sourceDescription": "Эдуард — душа народных хитов — с сольным концертом!  <br>Популярный автор-исполнитель, подаривший нам легендарные хиты «Я живу не унываю», «Не святой», «Отогреется душа», «Этот трек» и многие другие, приглашает вас на долгожданный концерт в новом сезоне!<br>Вас ждёт: <br>✔ Тёплая, почти домашняя атмосфера — каждое слово и нота прозвучат по-особенному.  <br>✔ Живой звук и неповторимая харизма — Эдуард исполнит свои хиты так, как умеет только он: с душой и искренностью.  <br>✔ Любимые песни, которые вы будете петь вместе.<br>Это больше, чем концерт — это встреча друзей.<br>Успейте забронировать лучшие места!",
+      "legacyOverrideDescription": "«Эдуард Хуснутдинов в Москве 2026» в Москве. Сольный концерт Эдуарда Хуснутдинова - автора-исполнителя, чьи песни «Я живу не унываю», «Не святой», «Отогреется душа» и «Этот трек» стали народными хитами. В программе - любимые песни в живом звуке, теплая атмосфера и знакомые с детства мотивы, которые можно петь вместе с артистом.\n\nБлижайший концерт пройдет в Москве.\n\n## Практическая информация\n\n- Место - «Клуб Чиж и Компания», Москва\n- Адрес - ул. Фридриха Энгельса, 20с1\n- Продолжительность - около 90 минут\n- Возрастное ограничение - 12+\n- Билеты - от 2 000 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_6aa943c1bb9c2e9fe1155822",
+        "kind": "SINGLE",
+        "slug": "эдуард-хуснутдинов-в-москве-2026-6aa943c1bb9c2e9fe1155822",
+        "seoH1": null,
+        "title": "Эдуард Хуснутдинов в Москве 2026",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6aa943c1bb9c2e9fe1155822",
+            "externalId": "6aa943c1bb9c2e9fe1155822",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_69b2ef1361e83a88964cd4dc",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6aa943c0f8ae73bd66a16b86.jpg",
+        "seoTitle": null,
+        "cityTitle": "Москва",
+        "venueTitle": "Клуб Чиж и Компания",
+        "description": "Эдуард — душа народных хитов — с сольным концертом!  <br>Популярный автор-исполнитель, подаривший нам легендарные хиты «Я живу не унываю», «Не святой», «Отогреется душа», «Этот трек» и многие другие, приглашает вас на долгожданный концерт в новом сезоне!<br>Вас ждёт: <br>✔ Тёплая, почти домашняя атмосфера — каждое слово и нота прозвучат по-особенному.  <br>✔ Живой звук и неповторимая харизма — Эдуард исполнит свои хиты так, как умеет только он: с душой и искренностью.  <br>✔ Любимые песни, которые вы будете петь вместе.<br>Это больше, чем концерт — это встреча друзей.<br>Успейте забронировать лучшие места!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "ул. Фридриха Энгельса, 20с1",
+        "canonicalPath": null,
+        "primaryCityId": "city_524901",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "Эдуард Хуснутдинов в Москве 2026",
+        "seoH1": "Эдуард Хуснутдинов в Москве 2026",
+        "seoTitle": "Эдуард Хуснутдинов в Москве 2026 | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/eduard-husnutdinov-v-moskve-2026-moskva",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "a849731b-6a24-4bc6-aa06-3fc100716fb4",
+          "eventId": "evt_6aa943c1bb9c2e9fe1155822",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_6aa943c1bb9c2e9fe1155822",
+            "kind": "SINGLE",
+            "slug": "эдуард-хуснутдинов-в-москве-2026-6aa943c1bb9c2e9fe1155822",
+            "seoH1": null,
+            "title": "Эдуард Хуснутдинов в Москве 2026",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6aa943c1bb9c2e9fe1155822",
+                "externalId": "6aa943c1bb9c2e9fe1155822",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_69b2ef1361e83a88964cd4dc",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6aa943c0f8ae73bd66a16b86.jpg",
+            "seoTitle": null,
+            "cityTitle": "Москва",
+            "venueTitle": "Клуб Чиж и Компания",
+            "description": "Эдуард — душа народных хитов — с сольным концертом!  <br>Популярный автор-исполнитель, подаривший нам легендарные хиты «Я живу не унываю», «Не святой», «Отогреется душа», «Этот трек» и многие другие, приглашает вас на долгожданный концерт в новом сезоне!<br>Вас ждёт: <br>✔ Тёплая, почти домашняя атмосфера — каждое слово и нота прозвучат по-особенному.  <br>✔ Живой звук и неповторимая харизма — Эдуард исполнит свои хиты так, как умеет только он: с душой и искренностью.  <br>✔ Любимые песни, которые вы будете петь вместе.<br>Это больше, чем концерт — это встреча друзей.<br>Успейте забронировать лучшие места!",
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "ул. Фридриха Энгельса, 20с1",
+            "canonicalPath": null,
+            "primaryCityId": "city_524901",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": null
+          },
+          "createdAt": "2026-11-03T20:40:48.405Z",
+          "eventTitle": "Эдуард Хуснутдинов в Москве 2026",
+          "eventSlug": "эдуард-хуснутдинов-в-москве-2026-6aa943c1bb9c2e9fe1155822",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_524901",
+          "cityTitle": "Москва",
+          "venueId": "venue_69b2ef1361e83a88964cd4dc",
+          "venueTitle": "Клуб Чиж и Компания",
+          "venueAddress": "ул. Фридриха Энгельса, 20с1",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6aa943c1bb9c2e9fe1155822",
+              "externalId": "6aa943c1bb9c2e9fe1155822",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "city": "Москва",
+        "venue": "Клуб Чиж и Компания",
+        "address": "ул. Фридриха Энгельса, 20с1",
+        "ageLimit": "12",
+        "offerMin": 2000,
+        "activeOffers": 3,
+        "futureSessions": [
+          "2026-11-12 17:00:00"
+        ]
+      }
+    },
+    "evt_6ab524cda381875b4bdba4bc": {
+      "eventId": "evt_6ab524cda381875b4bdba4bc",
+      "eventPageId": "47b6ac9a-f131-400d-962c-afd3bb5f81d1",
+      "slug": "eduard-husnutdinov-v-permi-2026-perm",
+      "sourceTitle": "Эдуард Хуснутдинов в Перми 2026",
+      "sourceDescription": "Эдуард — душа народных хитов — с сольным концертом!  <br>Популярный автор-исполнитель, подаривший нам легендарные хиты «Я живу не унываю», «Не святой», «Отогреется душа», «Этот трек» и многие другие, приглашает вас на долгожданный концерт в новом сезоне!<br>Вас ждёт: <br>✔ Тёплая, почти домашняя атмосфера — каждое слово и нота прозвучат по-особенному.  <br>✔ Живой звук и неповторимая харизма — Эдуард исполнит свои хиты так, как умеет только он: с душой и искренностью.  <br>✔ Любимые песни, которые вы будете петь вместе.<br>Это больше, чем концерт — это встреча друзей.<br>Успейте забронировать лучшие места!",
+      "legacyOverrideDescription": "«Эдуард Хуснутдинов в Перми 2026» в Перми. Сольный концерт Эдуарда Хуснутдинова - автора-исполнителя, чьи песни «Я живу не унываю», «Не святой», «Отогреется душа» и «Этот трек» стали народными хитами. В программе - любимые песни в живом звуке, теплая атмосфера и знакомые с детства мотивы, которые можно петь вместе с артистом.\n\nБлижайший концерт пройдет в Перми.\n\n## Практическая информация\n\n- Место - «Ресторан Кама», Пермь\n- Адрес - ул. Сибирская, 25\n- Продолжительность - около 90 минут\n- Возрастное ограничение - 12+\n- Билеты - от 1 500 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_6ab524cda381875b4bdba4bc",
+        "kind": "SINGLE",
+        "slug": "эдуард-хуснутдинов-в-перми-2026-6ab524cda381875b4bdba4bc",
+        "seoH1": null,
+        "title": "Эдуард Хуснутдинов в Перми 2026",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ab524cda381875b4bdba4bc",
+            "externalId": "6ab524cda381875b4bdba4bc",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_5c7d0808a5c32c000b8cac6c",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6ab524cd83153f69a9fe0c47.jpg",
+        "seoTitle": null,
+        "cityTitle": "Пермь",
+        "venueTitle": "Ресторан Кама",
+        "description": "Эдуард — душа народных хитов — с сольным концертом!  <br>Популярный автор-исполнитель, подаривший нам легендарные хиты «Я живу не унываю», «Не святой», «Отогреется душа», «Этот трек» и многие другие, приглашает вас на долгожданный концерт в новом сезоне!<br>Вас ждёт: <br>✔ Тёплая, почти домашняя атмосфера — каждое слово и нота прозвучат по-особенному.  <br>✔ Живой звук и неповторимая харизма — Эдуард исполнит свои хиты так, как умеет только он: с душой и искренностью.  <br>✔ Любимые песни, которые вы будете петь вместе.<br>Это больше, чем концерт — это встреча друзей.<br>Успейте забронировать лучшие места!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "ул. Сибирская, 25",
+        "canonicalPath": null,
+        "primaryCityId": "city_511196",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "Эдуард Хуснутдинов в Перми 2026",
+        "seoH1": "Эдуард Хуснутдинов в Перми 2026",
+        "seoTitle": "Эдуард Хуснутдинов в Перми 2026 | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/eduard-husnutdinov-v-permi-2026-perm",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "52af2e94-7284-49a0-87df-3be7f8b58372",
+          "eventId": "evt_6ab524cda381875b4bdba4bc",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_6ab524cda381875b4bdba4bc",
+            "kind": "SINGLE",
+            "slug": "эдуард-хуснутдинов-в-перми-2026-6ab524cda381875b4bdba4bc",
+            "seoH1": null,
+            "title": "Эдуард Хуснутдинов в Перми 2026",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ab524cda381875b4bdba4bc",
+                "externalId": "6ab524cda381875b4bdba4bc",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_5c7d0808a5c32c000b8cac6c",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6ab524cd83153f69a9fe0c47.jpg",
+            "seoTitle": null,
+            "cityTitle": "Пермь",
+            "venueTitle": "Ресторан Кама",
+            "description": "Эдуард — душа народных хитов — с сольным концертом!  <br>Популярный автор-исполнитель, подаривший нам легендарные хиты «Я живу не унываю», «Не святой», «Отогреется душа», «Этот трек» и многие другие, приглашает вас на долгожданный концерт в новом сезоне!<br>Вас ждёт: <br>✔ Тёплая, почти домашняя атмосфера — каждое слово и нота прозвучат по-особенному.  <br>✔ Живой звук и неповторимая харизма — Эдуард исполнит свои хиты так, как умеет только он: с душой и искренностью.  <br>✔ Любимые песни, которые вы будете петь вместе.<br>Это больше, чем концерт — это встреча друзей.<br>Успейте забронировать лучшие места!",
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "ул. Сибирская, 25",
+            "canonicalPath": null,
+            "primaryCityId": "city_511196",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": null
+          },
+          "createdAt": "2026-11-03T20:41:00.805Z",
+          "eventTitle": "Эдуард Хуснутдинов в Перми 2026",
+          "eventSlug": "эдуард-хуснутдинов-в-перми-2026-6ab524cda381875b4bdba4bc",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_511196",
+          "cityTitle": "Пермь",
+          "venueId": "venue_5c7d0808a5c32c000b8cac6c",
+          "venueTitle": "Ресторан Кама",
+          "venueAddress": "ул. Сибирская, 25",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ab524cda381875b4bdba4bc",
+              "externalId": "6ab524cda381875b4bdba4bc",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "city": "Пермь",
+        "venue": "Ресторан Кама",
+        "address": "ул. Сибирская, 25",
+        "ageLimit": "12",
+        "offerMin": 1500,
+        "activeOffers": 8,
+        "futureSessions": [
+          "2026-11-25 15:00:00"
+        ]
+      }
+    },
+    "evt_6aaaa750f7ae5d9cf34b64de": {
+      "eventId": "evt_6aaaa750f7ae5d9cf34b64de",
+      "eventPageId": "68de109c-7bcd-467d-9b05-bec5e5eef480",
+      "slug": "eduard-husnutdinov-v-tveri-2026-tver",
+      "sourceTitle": "Эдуард Хуснутдинов в Твери 2026",
+      "sourceDescription": "Эдуард — душа народных хитов — с сольным концертом!  <br>Популярный автор-исполнитель, подаривший нам легендарные хиты «Я живу не унываю», «Не святой», «Отогреется душа», «Этот трек» и многие другие, приглашает вас на долгожданный концерт в новом сезоне!<br>Вас ждёт: <br>✔ Тёплая, почти домашняя атмосфера — каждое слово и нота прозвучат по-особенному.  <br>✔ Живой звук и неповторимая харизма — Эдуард исполнит свои хиты так, как умеет только он: с душой и искренностью.  <br>✔ Любимые песни, которые вы будете петь вместе.<br>Это больше, чем концерт — это встреча друзей.<br>Успейте забронировать лучшие места!",
+      "legacyOverrideDescription": "Эдуард Хуснутдинов в Твери 2026 в Твери. Сольный концерт Эдуарда Хуснутдинова - автора-исполнителя, чьи песни «Я живу не унываю», «Не святой», «Отогреется душа» и «Этот трек» стали народными хитами. В программе - любимые песни в живом звуке, теплая атмосфера и знакомые с детства мотивы, которые можно петь вместе с артистом.\n\nБлижайший концерт пройдет в Твери.\n\n## Практическая информация\n\n- Место - «ДК Металлист», Тверь\n- Адрес - ш. Петербургское, 39\n- Продолжительность - около 90 минут\n- Возрастное ограничение - 12+\n- Билеты - от 1 000 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_6aaaa750f7ae5d9cf34b64de",
+        "kind": "SINGLE",
+        "slug": "эдуард-хуснутдинов-в-твери-2026-6aaaa750f7ae5d9cf34b64de",
+        "seoH1": null,
+        "title": "Эдуард Хуснутдинов в Твери 2026",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6aaaa750f7ae5d9cf34b64de",
+            "externalId": "6aaaa750f7ae5d9cf34b64de",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_5c374ee7b6603c004b81f620",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6aaaa74ff7ae5d9cf34b64dc.jpg",
+        "seoTitle": null,
+        "cityTitle": "Тверь",
+        "venueTitle": "ДК Металлист",
+        "description": "Эдуард — душа народных хитов — с сольным концертом!  <br>Популярный автор-исполнитель, подаривший нам легендарные хиты «Я живу не унываю», «Не святой», «Отогреется душа», «Этот трек» и многие другие, приглашает вас на долгожданный концерт в новом сезоне!<br>Вас ждёт: <br>✔ Тёплая, почти домашняя атмосфера — каждое слово и нота прозвучат по-особенному.  <br>✔ Живой звук и неповторимая харизма — Эдуард исполнит свои хиты так, как умеет только он: с душой и искренностью.  <br>✔ Любимые песни, которые вы будете петь вместе.<br>Это больше, чем концерт — это встреча друзей.<br>Успейте забронировать лучшие места!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "ш. Петербургское, 39",
+        "canonicalPath": null,
+        "primaryCityId": "city_480060",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "Эдуард Хуснутдинов в Твери 2026",
+        "seoH1": "Эдуард Хуснутдинов в Твери 2026",
+        "seoTitle": "Эдуард Хуснутдинов в Твери 2026 | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/eduard-husnutdinov-v-tveri-2026-tver",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "ba14d86b-1083-4748-9692-607ca9035b32",
+          "eventId": "evt_6aaaa750f7ae5d9cf34b64de",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_6aaaa750f7ae5d9cf34b64de",
+            "kind": "SINGLE",
+            "slug": "эдуард-хуснутдинов-в-твери-2026-6aaaa750f7ae5d9cf34b64de",
+            "seoH1": null,
+            "title": "Эдуард Хуснутдинов в Твери 2026",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6aaaa750f7ae5d9cf34b64de",
+                "externalId": "6aaaa750f7ae5d9cf34b64de",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_5c374ee7b6603c004b81f620",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6aaaa74ff7ae5d9cf34b64dc.jpg",
+            "seoTitle": null,
+            "cityTitle": "Тверь",
+            "venueTitle": "ДК Металлист",
+            "description": "Эдуард — душа народных хитов — с сольным концертом!  <br>Популярный автор-исполнитель, подаривший нам легендарные хиты «Я живу не унываю», «Не святой», «Отогреется душа», «Этот трек» и многие другие, приглашает вас на долгожданный концерт в новом сезоне!<br>Вас ждёт: <br>✔ Тёплая, почти домашняя атмосфера — каждое слово и нота прозвучат по-особенному.  <br>✔ Живой звук и неповторимая харизма — Эдуард исполнит свои хиты так, как умеет только он: с душой и искренностью.  <br>✔ Любимые песни, которые вы будете петь вместе.<br>Это больше, чем концерт — это встреча друзей.<br>Успейте забронировать лучшие места!",
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "ш. Петербургское, 39",
+            "canonicalPath": null,
+            "primaryCityId": "city_480060",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": null
+          },
+          "createdAt": "2026-11-03T20:40:49.600Z",
+          "eventTitle": "Эдуард Хуснутдинов в Твери 2026",
+          "eventSlug": "эдуард-хуснутдинов-в-твери-2026-6aaaa750f7ae5d9cf34b64de",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_480060",
+          "cityTitle": "Тверь",
+          "venueId": "venue_5c374ee7b6603c004b81f620",
+          "venueTitle": "ДК Металлист",
+          "venueAddress": "ш. Петербургское, 39",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6aaaa750f7ae5d9cf34b64de",
+              "externalId": "6aaaa750f7ae5d9cf34b64de",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "city": "Тверь",
+        "venue": "ДК Металлист",
+        "address": "ш. Петербургское, 39",
+        "ageLimit": "12",
+        "offerMin": 1000,
+        "activeOffers": 13,
+        "futureSessions": [
+          "2026-11-21 16:00:00"
+        ]
+      }
+    },
+    "evt_6aacc8305f1f4d71f386b1b8": {
+      "eventId": "evt_6aacc8305f1f4d71f386b1b8",
+      "eventPageId": "26a3bcbc-14d0-4e38-8dc6-97edbc234c3e",
+      "slug": "eduard-husnutdinov-v-tule-2026-tula",
+      "sourceTitle": "Эдуард Хуснутдинов в Туле 2026",
+      "sourceDescription": "Эдуард — душа народных хитов — с сольным концертом!  <br>Популярный автор-исполнитель, подаривший нам легендарные хиты «Я живу не унываю», «Не святой», «Отогреется душа», «Этот трек» и многие другие, приглашает вас на долгожданный концерт в новом сезоне!<br>Вас ждёт: <br>✔ Тёплая, почти домашняя атмосфера — каждое слово и нота прозвучат по-особенному.  <br>✔ Живой звук и неповторимая харизма — Эдуард исполнит свои хиты так, как умеет только он: с душой и искренностью.  <br>✔ Любимые песни, которые вы будете петь вместе.<br>Это больше, чем концерт — это встреча друзей.<br>Успейте забронировать лучшие места!",
+      "legacyOverrideDescription": "Эдуард Хуснутдинов в Туле 2026 в Туле. Сольный концерт Эдуарда Хуснутдинова - автора-исполнителя, чьи песни «Я живу не унываю», «Не святой», «Отогреется душа» и «Этот трек» стали народными хитами. В программе - любимые песни в живом звуке, теплая атмосфера и знакомые с детства мотивы, которые можно петь вместе с артистом.\n\nБлижайший концерт пройдет в Туле.\n\n## Практическая информация\n\n- Место - «Ресторан Тбилиси», Тула\n- Адрес - Красноармейский пр., 7Б\n- Продолжительность - около 90 минут\n- Возрастное ограничение - 12+\n- Билеты - от 1 500 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_6aacc8305f1f4d71f386b1b8",
+        "kind": "SINGLE",
+        "slug": "эдуард-хуснутдинов-в-туле-2026-6aacc8305f1f4d71f386b1b8",
+        "seoH1": null,
+        "title": "Эдуард Хуснутдинов в Туле 2026",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6aacc8305f1f4d71f386b1b8",
+            "externalId": "6aacc8305f1f4d71f386b1b8",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_691ca0e2237a0cb9f621ace1",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6aacc82f815d98267a68de26.jpg",
+        "seoTitle": null,
+        "cityTitle": "Тула",
+        "venueTitle": "Ресторан Тбилиси",
+        "description": "Эдуард — душа народных хитов — с сольным концертом!  <br>Популярный автор-исполнитель, подаривший нам легендарные хиты «Я живу не унываю», «Не святой», «Отогреется душа», «Этот трек» и многие другие, приглашает вас на долгожданный концерт в новом сезоне!<br>Вас ждёт: <br>✔ Тёплая, почти домашняя атмосфера — каждое слово и нота прозвучат по-особенному.  <br>✔ Живой звук и неповторимая харизма — Эдуард исполнит свои хиты так, как умеет только он: с душой и искренностью.  <br>✔ Любимые песни, которые вы будете петь вместе.<br>Это больше, чем концерт — это встреча друзей.<br>Успейте забронировать лучшие места!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Красноармейский пр., 7Б",
+        "canonicalPath": null,
+        "primaryCityId": "city_480562",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "Эдуард Хуснутдинов в Туле 2026",
+        "seoH1": "Эдуард Хуснутдинов в Туле 2026",
+        "seoTitle": "Эдуард Хуснутдинов в Туле 2026 | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/eduard-husnutdinov-v-tule-2026-tula",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "1fc6d500-68c8-4879-8e7a-3e918372ff8a",
+          "eventId": "evt_6aacc8305f1f4d71f386b1b8",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_6aacc8305f1f4d71f386b1b8",
+            "kind": "SINGLE",
+            "slug": "эдуард-хуснутдинов-в-туле-2026-6aacc8305f1f4d71f386b1b8",
+            "seoH1": null,
+            "title": "Эдуард Хуснутдинов в Туле 2026",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6aacc8305f1f4d71f386b1b8",
+                "externalId": "6aacc8305f1f4d71f386b1b8",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_691ca0e2237a0cb9f621ace1",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6aacc82f815d98267a68de26.jpg",
+            "seoTitle": null,
+            "cityTitle": "Тула",
+            "venueTitle": "Ресторан Тбилиси",
+            "description": "Эдуард — душа народных хитов — с сольным концертом!  <br>Популярный автор-исполнитель, подаривший нам легендарные хиты «Я живу не унываю», «Не святой», «Отогреется душа», «Этот трек» и многие другие, приглашает вас на долгожданный концерт в новом сезоне!<br>Вас ждёт: <br>✔ Тёплая, почти домашняя атмосфера — каждое слово и нота прозвучат по-особенному.  <br>✔ Живой звук и неповторимая харизма — Эдуард исполнит свои хиты так, как умеет только он: с душой и искренностью.  <br>✔ Любимые песни, которые вы будете петь вместе.<br>Это больше, чем концерт — это встреча друзей.<br>Успейте забронировать лучшие места!",
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "Красноармейский пр., 7Б",
+            "canonicalPath": null,
+            "primaryCityId": "city_480562",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": null
+          },
+          "createdAt": "2026-11-03T20:40:51.718Z",
+          "eventTitle": "Эдуард Хуснутдинов в Туле 2026",
+          "eventSlug": "эдуард-хуснутдинов-в-туле-2026-6aacc8305f1f4d71f386b1b8",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_480562",
+          "cityTitle": "Тула",
+          "venueId": "venue_691ca0e2237a0cb9f621ace1",
+          "venueTitle": "Ресторан Тбилиси",
+          "venueAddress": "Красноармейский пр., 7Б",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6aacc8305f1f4d71f386b1b8",
+              "externalId": "6aacc8305f1f4d71f386b1b8",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "city": "Тула",
+        "venue": "Ресторан Тбилиси",
+        "address": "Красноармейский пр., 7Б",
+        "ageLimit": "12",
+        "offerMin": 1500,
+        "activeOffers": 7,
+        "futureSessions": [
+          "2026-11-13 17:00:00"
+        ]
+      }
+    },
+    "evt_6ab6393bc8898448c0b7f531": {
+      "eventId": "evt_6ab6393bc8898448c0b7f531",
+      "eventPageId": "63c16a86-077d-4a1a-875f-5eded1f06927",
+      "slug": "eduard-husnutdinov-v-ufe-2026-ufa",
+      "sourceTitle": "Эдуард Хуснутдинов в Уфе 2026",
+      "sourceDescription": "Эдуард — душа народных хитов — с сольным концертом!  <br>Популярный автор-исполнитель, подаривший нам легендарные хиты «Я живу не унываю», «Не святой», «Отогреется душа», «Этот трек» и многие другие, приглашает вас на долгожданный концерт в новом сезоне!<br>Вас ждёт: <br>✔ Тёплая, почти домашняя атмосфера — каждое слово и нота прозвучат по-особенному.  <br>✔ Живой звук и неповторимая харизма — Эдуард исполнит свои хиты так, как умеет только он: с душой и искренностью.  <br>✔ Любимые песни, которые вы будете петь вместе.<br>Это больше, чем концерт — это встреча друзей.<br>Успейте забронировать лучшие места!",
+      "legacyOverrideDescription": "Эдуард Хуснутдинов в Уфе 2026 в Уфе. Сольный концерт Эдуарда Хуснутдинова - автора-исполнителя, чьи песни «Я живу не унываю», «Не святой», «Отогреется душа» и «Этот трек» стали народными хитами. В программе - любимые песни в живом звуке, теплая атмосфера и знакомые с детства мотивы, которые можно петь вместе с артистом.\n\nБлижайший концерт пройдет в Уфе.\n\n## Практическая информация\n\n- Место - Клубный ресторан \"Maximilian's\", Уфа\n- Адрес - ул. Менделеева, 137, ТРК «Иремель»\n- Продолжительность - около 90 минут\n- Возрастное ограничение - 12+\n- Билеты - от 1 000 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_6ab6393bc8898448c0b7f531",
+        "kind": "SINGLE",
+        "slug": "эдуард-хуснутдинов-в-уфе-2026-6ab6393bc8898448c0b7f531",
+        "seoH1": null,
+        "title": "Эдуард Хуснутдинов в Уфе 2026",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ab6393bc8898448c0b7f531",
+            "externalId": "6ab6393bc8898448c0b7f531",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_63db56f91d8910930ffe3e5e",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6ab6393ad2e4f842981a236c.jpg",
+        "seoTitle": null,
+        "cityTitle": "Уфа",
+        "venueTitle": "Клубный ресторан \"Maximilian's\"",
+        "description": "Эдуард — душа народных хитов — с сольным концертом!  <br>Популярный автор-исполнитель, подаривший нам легендарные хиты «Я живу не унываю», «Не святой», «Отогреется душа», «Этот трек» и многие другие, приглашает вас на долгожданный концерт в новом сезоне!<br>Вас ждёт: <br>✔ Тёплая, почти домашняя атмосфера — каждое слово и нота прозвучат по-особенному.  <br>✔ Живой звук и неповторимая харизма — Эдуард исполнит свои хиты так, как умеет только он: с душой и искренностью.  <br>✔ Любимые песни, которые вы будете петь вместе.<br>Это больше, чем концерт — это встреча друзей.<br>Успейте забронировать лучшие места!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "ул. Менделеева, 137, ТРК «Иремель»",
+        "canonicalPath": null,
+        "primaryCityId": "city_479561",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "Эдуард Хуснутдинов в Уфе 2026",
+        "seoH1": "Эдуард Хуснутдинов в Уфе 2026",
+        "seoTitle": "Эдуард Хуснутдинов в Уфе 2026 | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/eduard-husnutdinov-v-ufe-2026-ufa",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "0478518c-6599-473e-a7c7-18df51b6dfd1",
+          "eventId": "evt_6ab6393bc8898448c0b7f531",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_6ab6393bc8898448c0b7f531",
+            "kind": "SINGLE",
+            "slug": "эдуард-хуснутдинов-в-уфе-2026-6ab6393bc8898448c0b7f531",
+            "seoH1": null,
+            "title": "Эдуард Хуснутдинов в Уфе 2026",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ab6393bc8898448c0b7f531",
+                "externalId": "6ab6393bc8898448c0b7f531",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_63db56f91d8910930ffe3e5e",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6ab6393ad2e4f842981a236c.jpg",
+            "seoTitle": null,
+            "cityTitle": "Уфа",
+            "venueTitle": "Клубный ресторан \"Maximilian's\"",
+            "description": "Эдуард — душа народных хитов — с сольным концертом!  <br>Популярный автор-исполнитель, подаривший нам легендарные хиты «Я живу не унываю», «Не святой», «Отогреется душа», «Этот трек» и многие другие, приглашает вас на долгожданный концерт в новом сезоне!<br>Вас ждёт: <br>✔ Тёплая, почти домашняя атмосфера — каждое слово и нота прозвучат по-особенному.  <br>✔ Живой звук и неповторимая харизма — Эдуард исполнит свои хиты так, как умеет только он: с душой и искренностью.  <br>✔ Любимые песни, которые вы будете петь вместе.<br>Это больше, чем концерт — это встреча друзей.<br>Успейте забронировать лучшие места!",
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "ул. Менделеева, 137, ТРК «Иремель»",
+            "canonicalPath": null,
+            "primaryCityId": "city_479561",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": null
+          },
+          "createdAt": "2026-11-03T20:41:02.132Z",
+          "eventTitle": "Эдуард Хуснутдинов в Уфе 2026",
+          "eventSlug": "эдуард-хуснутдинов-в-уфе-2026-6ab6393bc8898448c0b7f531",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_479561",
+          "cityTitle": "Уфа",
+          "venueId": "venue_63db56f91d8910930ffe3e5e",
+          "venueTitle": "Клубный ресторан \"Maximilian's\"",
+          "venueAddress": "ул. Менделеева, 137, ТРК «Иремель»",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ab6393bc8898448c0b7f531",
+              "externalId": "6ab6393bc8898448c0b7f531",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "city": "Уфа",
+        "venue": "Клубный ресторан \"Maximilian's\"",
+        "address": "ул. Менделеева, 137, ТРК «Иремель»",
+        "ageLimit": "12",
+        "offerMin": 1000,
+        "activeOffers": 14,
+        "futureSessions": [
+          "2026-12-03 15:00:00"
+        ]
+      }
+    },
+    "evt_6aaa9eb507570a2982ad5d06": {
+      "eventId": "evt_6aaa9eb507570a2982ad5d06",
+      "eventPageId": "c0a35048-1998-44ad-8a15-95eb838fc124",
+      "slug": "eduard-husnutdinov-v-cherepovce-2026-cherepovec",
+      "sourceTitle": "Эдуард Хуснутдинов в Череповце 2026",
+      "sourceDescription": "Эдуард — душа народных хитов — с сольным концертом!  <br>Популярный автор-исполнитель, подаривший нам легендарные хиты «Я живу не унываю», «Не святой», «Отогреется душа», «Этот трек» и многие другие, приглашает вас на долгожданный концерт в новом сезоне!<br>Вас ждёт: <br>✔ Тёплая, почти домашняя атмосфера — каждое слово и нота прозвучат по-особенному.  <br>✔ Живой звук и неповторимая харизма — Эдуард исполнит свои хиты так, как умеет только он: с душой и искренностью.  <br>✔ Любимые песни, которые вы будете петь вместе.<br>Это больше, чем концерт — это встреча друзей.<br>Успейте забронировать лучшие места!",
+      "legacyOverrideDescription": "Эдуард Хуснутдинов в Череповце 2026 в Череповеце. Сольный концерт Эдуарда Хуснутдинова - автора-исполнителя, чьи песни «Я живу не унываю», «Не святой», «Отогреется душа» и «Этот трек» стали народными хитами. В программе - любимые песни в живом звуке, теплая атмосфера и знакомые с детства мотивы, которые можно петь вместе с артистом.\n\nБлижайший концерт пройдет в Череповеце.\n\n## Практическая информация\n\n- Место - «Руки ВВерх! Бар», Череповец\n- Адрес - ул. Леднева, 4\n- Продолжительность - около 90 минут\n- Возрастное ограничение - 12+\n- Билеты - от 1 250 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_6aaa9eb507570a2982ad5d06",
+        "kind": "SINGLE",
+        "slug": "эдуард-хуснутдинов-в-череповце-2026-6aaa9eb507570a2982ad5d06",
+        "seoH1": null,
+        "title": "Эдуард Хуснутдинов в Череповце 2026",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6aaa9eb507570a2982ad5d06",
+            "externalId": "6aaa9eb507570a2982ad5d06",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_657414a00f5c3de0af16b51a",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6aaa9fdae4633cffd36053b6.jpg",
+        "seoTitle": null,
+        "cityTitle": "Череповец",
+        "venueTitle": "Руки ВВерх! Бар",
+        "description": "Эдуард — душа народных хитов — с сольным концертом!  <br>Популярный автор-исполнитель, подаривший нам легендарные хиты «Я живу не унываю», «Не святой», «Отогреется душа», «Этот трек» и многие другие, приглашает вас на долгожданный концерт в новом сезоне!<br>Вас ждёт: <br>✔ Тёплая, почти домашняя атмосфера — каждое слово и нота прозвучат по-особенному.  <br>✔ Живой звук и неповторимая харизма — Эдуард исполнит свои хиты так, как умеет только он: с душой и искренностью.  <br>✔ Любимые песни, которые вы будете петь вместе.<br>Это больше, чем концерт — это встреча друзей.<br>Успейте забронировать лучшие места!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "ул. Леднева, 4",
+        "canonicalPath": null,
+        "primaryCityId": "city_569223",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "Эдуард Хуснутдинов в Череповце 2026",
+        "seoH1": "Эдуард Хуснутдинов в Череповце 2026",
+        "seoTitle": "Эдуард Хуснутдинов в Череповце 2026 | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/eduard-husnutdinov-v-cherepovce-2026-cherepovec",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "a6576fa5-f4c0-4ce4-bd42-4db679073087",
+          "eventId": "evt_6aaa9eb507570a2982ad5d06",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_6aaa9eb507570a2982ad5d06",
+            "kind": "SINGLE",
+            "slug": "эдуард-хуснутдинов-в-череповце-2026-6aaa9eb507570a2982ad5d06",
+            "seoH1": null,
+            "title": "Эдуард Хуснутдинов в Череповце 2026",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6aaa9eb507570a2982ad5d06",
+                "externalId": "6aaa9eb507570a2982ad5d06",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_657414a00f5c3de0af16b51a",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6aaa9fdae4633cffd36053b6.jpg",
+            "seoTitle": null,
+            "cityTitle": "Череповец",
+            "venueTitle": "Руки ВВерх! Бар",
+            "description": "Эдуард — душа народных хитов — с сольным концертом!  <br>Популярный автор-исполнитель, подаривший нам легендарные хиты «Я живу не унываю», «Не святой», «Отогреется душа», «Этот трек» и многие другие, приглашает вас на долгожданный концерт в новом сезоне!<br>Вас ждёт: <br>✔ Тёплая, почти домашняя атмосфера — каждое слово и нота прозвучат по-особенному.  <br>✔ Живой звук и неповторимая харизма — Эдуард исполнит свои хиты так, как умеет только он: с душой и искренностью.  <br>✔ Любимые песни, которые вы будете петь вместе.<br>Это больше, чем концерт — это встреча друзей.<br>Успейте забронировать лучшие места!",
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "ул. Леднева, 4",
+            "canonicalPath": null,
+            "primaryCityId": "city_569223",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": null
+          },
+          "createdAt": "2026-11-03T20:40:49.522Z",
+          "eventTitle": "Эдуард Хуснутдинов в Череповце 2026",
+          "eventSlug": "эдуард-хуснутдинов-в-череповце-2026-6aaa9eb507570a2982ad5d06",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_569223",
+          "cityTitle": "Череповец",
+          "venueId": "venue_657414a00f5c3de0af16b51a",
+          "venueTitle": "Руки ВВерх! Бар",
+          "venueAddress": "ул. Леднева, 4",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6aaa9eb507570a2982ad5d06",
+              "externalId": "6aaa9eb507570a2982ad5d06",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "city": "Череповец",
+        "venue": "Руки ВВерх! Бар",
+        "address": "ул. Леднева, 4",
+        "ageLimit": "12",
+        "offerMin": 1250,
+        "activeOffers": 7,
+        "futureSessions": [
+          "2026-11-17 17:00:00"
+        ]
+      }
+    }
+  }
+}

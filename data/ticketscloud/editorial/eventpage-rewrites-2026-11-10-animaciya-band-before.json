@@ -1,0 +1,804 @@
+{
+  "capturedAt": "2026-11-09T21:04:57.286Z",
+  "purpose": "Pre-rewrite production archive; legacy overrides remain unchanged and archival. EventPage sections receive the active editorial rewrite.",
+  "items": {
+    "evt_6a79780b77910dcc8bd339de": {
+      "eventId": "evt_6a79780b77910dcc8bd339de",
+      "eventPageId": "38bb0418-d716-40cd-bf5c-649682e29ad4",
+      "slug": "14-11-2026-novokuzneck-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-novokuzneck",
+      "sourceTitle": "14.11.2026 / Новокузнецк/Костя Кулясов и группа АнимациЯ /animaciya.online",
+      "sourceDescription": "Концерт Кости Кулясова и группы АнимациЯ в Новокузнецке в ресторане \"Три Толстяка\" , встречаемся 14 ноября! Программа : \"Все хиты\". <br>________________________________<br><br> г. Новокузнецк, ул. Народная дом 9 А<br><br>14 ноября  2026 <br>________________________________<br>Костя Кулясов и группа АнимациЯ возвращается с большим сольным концертом, где будут песни, которые вы знаете наизусть, и те, что особенно хочется услышать живьём.<br><br>Это будет вечер честных текстов, громких припевов, живых эмоций и той самой атмосферы, ради которой мы снова и снова собираемся вместе. Будем петь, вспоминать, переживать и проживать каждую песню вместе с вами.<br><br>Если давно собирались попасть на концерт «Анимации» — это отличный повод. Если уже были — знаете, что такие встречи не хочется пропускать.<br><br>Билеты уже в продаже. Не откладывайте на потом — лучшие места заканчиваются первыми.<br><br>До встречи на концерте!<br><br>_____________________________________<br>«Я люблю свою Родину, вроде бы» - фраза из песни группы «АнимациЯ». Костя Кулясов, лидер группы, и тот самый автор, у которого что ни песня, то крылатое выражение. Хочешь попасть на концерт? Жми на ссылку и покупай билет! Ты услышишь полтора десятка ломовейших хитов и самые новые песни!",
+      "legacyOverrideDescription": "Концерт Кости Кулясова и группы АнимациЯ в Новокузнецке в ресторане \"Три Толстяка\", встречаемся 14 ноября! Программа: \"Все хиты\". Хороший повод сменить обстановку: вместо экрана - площадка, сцена и другие зрители рядом.\n\nНовокузнецк, ул. Народная дом 9 А\n14 ноября 2026\nКостя Кулясов и группа АнимациЯ возвращается с большим сольным концертом, где будут песни, которые вы знаете наизусть, и те, что особенно хочется услышать живьём. Это будет вечер честных текстов, громких припевов, живых эмоций и той самой атмосферы, ради которой мы снова и снова собираемся вместе. Будем петь, вспоминать, переживать и проживать каждую песню вместе с вами.\n\nЕсли давно собирались попасть на концерт «Анимации» - это отличный повод. Если уже были - знаете, что такие встречи не хочется пропускать. Не откладывайте на потом - лучшие места заканчиваются первыми.\n\nДо встречи на концерте! «Я люблю свою Родину, вроде бы» - фраза из песни группы «АнимациЯ». Костя Кулясов, лидер группы, и тот самый автор, у которого что ни песня, то крылатое выражение. Хочешь попасть на концерт? Жми на ссылку и покупай билет! Ты услышишь полтора десятка ломовейших хитов и самые новые песни!\n\n## Практическая информация\n\n- Место - «Три толстяка», Новокузнецк\n- Адрес - ул. Народная, 9а\n- Продолжительность - около 120 минут\n- Возрастное ограничение - 16+\n- Билеты - от 2 200 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_6a79780b77910dcc8bd339de",
+        "kind": "SINGLE",
+        "slug": "14-11-2026-новокузнецк-костя-кулясов-и-группа-анимация-animaciya-online-6a79780b77910dcc8bd339de",
+        "seoH1": null,
+        "title": "14.11.2026 / Новокузнецк/Костя Кулясов и группа АнимациЯ /animaciya.online",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a79780b77910dcc8bd339de",
+            "externalId": "6a79780b77910dcc8bd339de",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_6279fa8d6863ceb704c90ba6",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-08/6a79780be918329161f87234.jpg",
+        "seoTitle": null,
+        "cityTitle": "Новокузнецк",
+        "venueTitle": "Три толстяка",
+        "description": "Концерт Кости Кулясова и группы АнимациЯ в Новокузнецке в ресторане \"Три Толстяка\" , встречаемся 14 ноября! Программа : \"Все хиты\". <br>________________________________<br><br> г. Новокузнецк, ул. Народная дом 9 А<br><br>14 ноября  2026 <br>________________________________<br>Костя Кулясов и группа АнимациЯ возвращается с большим сольным концертом, где будут песни, которые вы знаете наизусть, и те, что особенно хочется услышать живьём.<br><br>Это будет вечер честных текстов, громких припевов, живых эмоций и той самой атмосферы, ради которой мы снова и снова собираемся вместе. Будем петь, вспоминать, переживать и проживать каждую песню вместе с вами.<br><br>Если давно собирались попасть на концерт «Анимации» — это отличный повод. Если уже были — знаете, что такие встречи не хочется пропускать.<br><br>Билеты уже в продаже. Не откладывайте на потом — лучшие места заканчиваются первыми.<br><br>До встречи на концерте!<br><br>_____________________________________<br>«Я люблю свою Родину, вроде бы» - фраза из песни группы «АнимациЯ». Костя Кулясов, лидер группы, и тот самый автор, у которого что ни песня, то крылатое выражение. Хочешь попасть на концерт? Жми на ссылку и покупай билет! Ты услышишь полтора десятка ломовейших хитов и самые новые песни!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "ул. Народная, 9а",
+        "canonicalPath": null,
+        "primaryCityId": "city_1496990",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "14.11.2026 / Новокузнецк/Костя Кулясов и группа АнимациЯ /animaciya.online",
+        "seoH1": "14.11.2026 / Новокузнецк/Костя Кулясов и группа АнимациЯ /animaciya.online",
+        "seoTitle": "14.11.2026 / Новокузнецк/Костя Кулясов и группа АнимациЯ /animaciya.online | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/14-11-2026-novokuzneck-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-novokuzneck",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "ee492cc7-8200-42c8-8213-26f764140f1e",
+          "eventId": "evt_6a79780b77910dcc8bd339de",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_6a79780b77910dcc8bd339de",
+            "kind": "SINGLE",
+            "slug": "14-11-2026-новокузнецк-костя-кулясов-и-группа-анимация-animaciya-online-6a79780b77910dcc8bd339de",
+            "seoH1": null,
+            "title": "14.11.2026 / Новокузнецк/Костя Кулясов и группа АнимациЯ /animaciya.online",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a79780b77910dcc8bd339de",
+                "externalId": "6a79780b77910dcc8bd339de",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_6279fa8d6863ceb704c90ba6",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-08/6a79780be918329161f87234.jpg",
+            "seoTitle": null,
+            "cityTitle": "Новокузнецк",
+            "venueTitle": "Три толстяка",
+            "description": "Концерт Кости Кулясова и группы АнимациЯ в Новокузнецке в ресторане \"Три Толстяка\" , встречаемся 14 ноября! Программа : \"Все хиты\". <br>________________________________<br><br> г. Новокузнецк, ул. Народная дом 9 А<br><br>14 ноября  2026 <br>________________________________<br>Костя Кулясов и группа АнимациЯ возвращается с большим сольным концертом, где будут песни, которые вы знаете наизусть, и те, что особенно хочется услышать живьём.<br><br>Это будет вечер честных текстов, громких припевов, живых эмоций и той самой атмосферы, ради которой мы снова и снова собираемся вместе. Будем петь, вспоминать, переживать и проживать каждую песню вместе с вами.<br><br>Если давно собирались попасть на концерт «Анимации» — это отличный повод. Если уже были — знаете, что такие встречи не хочется пропускать.<br><br>Билеты уже в продаже. Не откладывайте на потом — лучшие места заканчиваются первыми.<br><br>До встречи на концерте!<br><br>_____________________________________<br>«Я люблю свою Родину, вроде бы» - фраза из песни группы «АнимациЯ». Костя Кулясов, лидер группы, и тот самый автор, у которого что ни песня, то крылатое выражение. Хочешь попасть на концерт? Жми на ссылку и покупай билет! Ты услышишь полтора десятка ломовейших хитов и самые новые песни!",
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "ул. Народная, 9а",
+            "canonicalPath": null,
+            "primaryCityId": "city_1496990",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": null
+          },
+          "createdAt": "2026-11-03T20:40:19.291Z",
+          "eventTitle": "14.11.2026 / Новокузнецк/Костя Кулясов и группа АнимациЯ /animaciya.online",
+          "eventSlug": "14-11-2026-новокузнецк-костя-кулясов-и-группа-анимация-animaciya-online-6a79780b77910dcc8bd339de",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_1496990",
+          "cityTitle": "Новокузнецк",
+          "venueId": "venue_6279fa8d6863ceb704c90ba6",
+          "venueTitle": "Три толстяка",
+          "venueAddress": "ул. Народная, 9а",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a79780b77910dcc8bd339de",
+              "externalId": "6a79780b77910dcc8bd339de",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "city": "Новокузнецк",
+        "venue": "Три толстяка",
+        "address": "ул. Народная, 9а",
+        "ageLimit": "16",
+        "offerMin": 2200,
+        "activeOffers": 6,
+        "futureSessions": [
+          "2026-11-14T13:00:00"
+        ]
+      }
+    },
+    "evt_6a326088034eef6ae27dc6e1": {
+      "eventId": "evt_6a326088034eef6ae27dc6e1",
+      "eventPageId": "487055eb-d3d0-446e-ae8e-2dcf795e10c7",
+      "slug": "12-11-2026-tomsk-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-tomsk",
+      "sourceTitle": "12.11.2026 / Томск /Костя Кулясов и группа АнимациЯ /animaciya.online",
+      "sourceDescription": "Концерт Кости Кулясова и группы АнимациЯ в Томске рок- бар Варяг, встречаемся 12 ноября! Программа : \"Все хиты\". <br>________________________________<br><br>📍 Томск, проспект Ленина, 104<br>📅 12 ноября  2026 <br>________________________________<br>Костя Кулясов и группа АнимациЯ возвращается с большим сольным концертом, где будут песни, которые вы знаете наизусть, и те, что особенно хочется услышать живьём.<br><br>Это будет вечер честных текстов, громких припевов, живых эмоций и той самой атмосферы, ради которой мы снова и снова собираемся вместе. Будем петь, вспоминать, переживать и проживать каждую песню вместе с вами.<br><br>Если давно собирались попасть на концерт «Анимации» — это отличный повод. Если уже были — знаете, что такие встречи не хочется пропускать.<br><br>Билеты уже в продаже. Не откладывайте на потом — лучшие места заканчиваются первыми.<br><br>До встречи на концерте!",
+      "legacyOverrideDescription": "Концерт Кости Кулясова и группы АнимациЯ в Томске рок- бар Варяг, встречаемся 12 ноября! Программа: \"Все хиты\".\n\n📍 Томск, проспект Ленина, 104\n📅 12 ноября 2026\nКостя Кулясов и группа АнимациЯ возвращается с большим сольным концертом, где будут песни, которые вы знаете наизусть, и те, что особенно хочется услышать живьём. Это будет вечер честных текстов, громких припевов, живых эмоций и той самой атмосферы, ради которой мы снова и снова собираемся вместе. Будем петь, вспоминать, переживать и проживать каждую песню вместе с вами.\n\nЕсли давно собирались попасть на концерт «Анимации» - это отличный повод. Если уже были - знаете, что такие встречи не хочется пропускать. Не откладывайте на потом - лучшие места заканчиваются первыми.\n\nДо встречи на концерте! Программа гастролирует: 5 вечеров, с 7 ноября - 26 декабря 2026, и это 2-й из них. Если не успеваете на этот вечер, будет следующий.\n\n## Практическая информация\n\n- Место - «Рок-бар Варяг», Томск\n- Адрес - просп. Ленина, д. 104\n- Продолжительность - около 120 минут\n- Возрастное ограничение - 16+\n- Билеты - от 2 500 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_6a326088034eef6ae27dc6e1",
+        "kind": "SINGLE",
+        "slug": "tc-6a326088034eef6ae27dc6e1-12-11-2026-томск-костя-кулясов-и-группа-анимация-animaciya-online",
+        "seoH1": null,
+        "title": "12.11.2026 / Томск /Костя Кулясов и группа АнимациЯ /animaciya.online",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a326088034eef6ae27dc6e1",
+            "externalId": "6a326088034eef6ae27dc6e1",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_61c56d959670fb0437e2e773",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-06/6a326088034eef6ae27dc6df.jpg",
+        "seoTitle": null,
+        "cityTitle": "Томск",
+        "venueTitle": "Рок-бар Варяг",
+        "description": "Концерт Кости Кулясова и группы АнимациЯ в Томске рок- бар Варяг, встречаемся 12 ноября! Программа : \"Все хиты\". <br>________________________________<br><br>📍 Томск, проспект Ленина, 104<br>📅 12 ноября  2026 <br>________________________________<br>Костя Кулясов и группа АнимациЯ возвращается с большим сольным концертом, где будут песни, которые вы знаете наизусть, и те, что особенно хочется услышать живьём.<br><br>Это будет вечер честных текстов, громких припевов, живых эмоций и той самой атмосферы, ради которой мы снова и снова собираемся вместе. Будем петь, вспоминать, переживать и проживать каждую песню вместе с вами.<br><br>Если давно собирались попасть на концерт «Анимации» — это отличный повод. Если уже были — знаете, что такие встречи не хочется пропускать.<br><br>Билеты уже в продаже. Не откладывайте на потом — лучшие места заканчиваются первыми.<br><br>До встречи на концерте!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "просп. Ленина, д. 104",
+        "canonicalPath": null,
+        "primaryCityId": "city_1489425",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "12.11.2026 / Томск /Костя Кулясов и группа АнимациЯ /animaciya.online",
+        "seoH1": "12.11.2026 / Томск /Костя Кулясов и группа АнимациЯ /animaciya.online",
+        "seoTitle": "12.11.2026 / Томск /Костя Кулясов и группа АнимациЯ /animaciya.online | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/12-11-2026-tomsk-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-tomsk",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "36079537-3520-4f77-8cce-ae4ac30c4a0c",
+          "eventId": "evt_6a326088034eef6ae27dc6e1",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_6a326088034eef6ae27dc6e1",
+            "kind": "SINGLE",
+            "slug": "tc-6a326088034eef6ae27dc6e1-12-11-2026-томск-костя-кулясов-и-группа-анимация-animaciya-online",
+            "seoH1": null,
+            "title": "12.11.2026 / Томск /Костя Кулясов и группа АнимациЯ /animaciya.online",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a326088034eef6ae27dc6e1",
+                "externalId": "6a326088034eef6ae27dc6e1",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_61c56d959670fb0437e2e773",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-06/6a326088034eef6ae27dc6df.jpg",
+            "seoTitle": null,
+            "cityTitle": "Томск",
+            "venueTitle": "Рок-бар Варяг",
+            "description": "Концерт Кости Кулясова и группы АнимациЯ в Томске рок- бар Варяг, встречаемся 12 ноября! Программа : \"Все хиты\". <br>________________________________<br><br>📍 Томск, проспект Ленина, 104<br>📅 12 ноября  2026 <br>________________________________<br>Костя Кулясов и группа АнимациЯ возвращается с большим сольным концертом, где будут песни, которые вы знаете наизусть, и те, что особенно хочется услышать живьём.<br><br>Это будет вечер честных текстов, громких припевов, живых эмоций и той самой атмосферы, ради которой мы снова и снова собираемся вместе. Будем петь, вспоминать, переживать и проживать каждую песню вместе с вами.<br><br>Если давно собирались попасть на концерт «Анимации» — это отличный повод. Если уже были — знаете, что такие встречи не хочется пропускать.<br><br>Билеты уже в продаже. Не откладывайте на потом — лучшие места заканчиваются первыми.<br><br>До встречи на концерте!",
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "просп. Ленина, д. 104",
+            "canonicalPath": null,
+            "primaryCityId": "city_1489425",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": null
+          },
+          "createdAt": "2026-11-03T20:40:07.739Z",
+          "eventTitle": "12.11.2026 / Томск /Костя Кулясов и группа АнимациЯ /animaciya.online",
+          "eventSlug": "tc-6a326088034eef6ae27dc6e1-12-11-2026-томск-костя-кулясов-и-группа-анимация-animaciya-online",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_1489425",
+          "cityTitle": "Томск",
+          "venueId": "venue_61c56d959670fb0437e2e773",
+          "venueTitle": "Рок-бар Варяг",
+          "venueAddress": "просп. Ленина, д. 104",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a326088034eef6ae27dc6e1",
+              "externalId": "6a326088034eef6ae27dc6e1",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "city": "Томск",
+        "venue": "Рок-бар Варяг",
+        "address": "просп. Ленина, д. 104",
+        "ageLimit": "16",
+        "offerMin": 2500,
+        "activeOffers": 3,
+        "futureSessions": [
+          "2026-11-12T13:00:00"
+        ]
+      }
+    },
+    "evt_6a3272167bd4ee47709f2610": {
+      "eventId": "evt_6a3272167bd4ee47709f2610",
+      "eventPageId": "539de031-e65c-4096-91f4-5f54bd9e4764",
+      "slug": "15-11-2026-barnaul-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-barnaul",
+      "sourceTitle": "15.11.2026 / Барнаул /Костя Кулясов и группа АнимациЯ /animaciya.online",
+      "sourceDescription": "Концерт Кости Кулясова и группы АнимациЯ в Барнауле в ресторане Lil Brazil, встречаемся 15 ноября! Программа : \"Все хиты\". <br>________________________________<br> Барнаул, пр. Красноармейский, 47а, Lil Brazil<br><br> 15 ноября  2026 <br>________________________________<br>Костя Кулясов и группа АнимациЯ возвращается с большим сольным концертом, где будут песни, которые вы знаете наизусть, и те, что особенно хочется услышать живьём.<br><br>Это будет вечер честных текстов, громких припевов, живых эмоций и той самой атмосферы, ради которой мы снова и снова собираемся вместе. Будем петь, вспоминать, переживать и проживать каждую песню вместе с вами.<br><br>Если давно собирались попасть на концерт «Анимации» — это отличный повод. Если уже были — знаете, что такие встречи не хочется пропускать.<br><br>Билеты уже в продаже. Не откладывайте на потом — лучшие места заканчиваются первыми.<br><br>До встречи на концерте!",
+      "legacyOverrideDescription": "Концерт Кости Кулясова и группы АнимациЯ в Барнауле в ресторане Lil Brazil, встречаемся 15 ноября! Программа: \"Все хиты\". Барнаул, пр. Красноармейский, 47а, Lil Brazil\n15 ноября 2026\nКостя Кулясов и группа АнимациЯ возвращается с большим сольным концертом, где будут песни, которые вы знаете наизусть, и те, что особенно хочется услышать живьём. Это будет вечер честных текстов, громких припевов, живых эмоций и той самой атмосферы, ради которой мы снова и снова собираемся вместе. Будем петь, вспоминать, переживать и проживать каждую песню вместе с вами.\n\nЕсли давно собирались попасть на концерт «Анимации» - это отличный повод. Если уже были - знаете, что такие встречи не хочется пропускать. Не откладывайте на потом - лучшие места заканчиваются первыми.\n\nДо встречи на концерте!\n\n## Практическая информация\n\n- Место - «Lil Brazil», Барнаул\n- Адрес - Пролетарская ул., 124\n- Продолжительность - около 120 минут\n- Возрастное ограничение - 16+\n- Билеты - от 2 500 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_6a3272167bd4ee47709f2610",
+        "kind": "SINGLE",
+        "slug": "tc-6a3272167bd4ee47709f2610-15-11-2026-барнаул-костя-кулясов-и-группа-анимация-animaciya-online",
+        "seoH1": null,
+        "title": "15.11.2026 / Барнаул /Костя Кулясов и группа АнимациЯ /animaciya.online",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a3272167bd4ee47709f2610",
+            "externalId": "6a3272167bd4ee47709f2610",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_679a3f2cd8bb3b8643c1ccca",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-06/6a32721689b7e2ccfd269031.jpg",
+        "seoTitle": null,
+        "cityTitle": "Барнаул",
+        "venueTitle": "Lil Brazil",
+        "description": "Концерт Кости Кулясова и группы АнимациЯ в Барнауле в ресторане Lil Brazil, встречаемся 15 ноября! Программа : \"Все хиты\". <br>________________________________<br> Барнаул, пр. Красноармейский, 47а, Lil Brazil<br><br> 15 ноября  2026 <br>________________________________<br>Костя Кулясов и группа АнимациЯ возвращается с большим сольным концертом, где будут песни, которые вы знаете наизусть, и те, что особенно хочется услышать живьём.<br><br>Это будет вечер честных текстов, громких припевов, живых эмоций и той самой атмосферы, ради которой мы снова и снова собираемся вместе. Будем петь, вспоминать, переживать и проживать каждую песню вместе с вами.<br><br>Если давно собирались попасть на концерт «Анимации» — это отличный повод. Если уже были — знаете, что такие встречи не хочется пропускать.<br><br>Билеты уже в продаже. Не откладывайте на потом — лучшие места заканчиваются первыми.<br><br>До встречи на концерте!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Пролетарская ул., 124",
+        "canonicalPath": null,
+        "primaryCityId": "city_1510853",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "15.11.2026 / Барнаул /Костя Кулясов и группа АнимациЯ /animaciya.online",
+        "seoH1": "15.11.2026 / Барнаул /Костя Кулясов и группа АнимациЯ /animaciya.online",
+        "seoTitle": "15.11.2026 / Барнаул /Костя Кулясов и группа АнимациЯ /animaciya.online | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/15-11-2026-barnaul-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-barnaul",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "6492b9c2-2da4-4451-bd48-22117606bb51",
+          "eventId": "evt_6a3272167bd4ee47709f2610",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_6a3272167bd4ee47709f2610",
+            "kind": "SINGLE",
+            "slug": "tc-6a3272167bd4ee47709f2610-15-11-2026-барнаул-костя-кулясов-и-группа-анимация-animaciya-online",
+            "seoH1": null,
+            "title": "15.11.2026 / Барнаул /Костя Кулясов и группа АнимациЯ /animaciya.online",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a3272167bd4ee47709f2610",
+                "externalId": "6a3272167bd4ee47709f2610",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_679a3f2cd8bb3b8643c1ccca",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-06/6a32721689b7e2ccfd269031.jpg",
+            "seoTitle": null,
+            "cityTitle": "Барнаул",
+            "venueTitle": "Lil Brazil",
+            "description": "Концерт Кости Кулясова и группы АнимациЯ в Барнауле в ресторане Lil Brazil, встречаемся 15 ноября! Программа : \"Все хиты\". <br>________________________________<br> Барнаул, пр. Красноармейский, 47а, Lil Brazil<br><br> 15 ноября  2026 <br>________________________________<br>Костя Кулясов и группа АнимациЯ возвращается с большим сольным концертом, где будут песни, которые вы знаете наизусть, и те, что особенно хочется услышать живьём.<br><br>Это будет вечер честных текстов, громких припевов, живых эмоций и той самой атмосферы, ради которой мы снова и снова собираемся вместе. Будем петь, вспоминать, переживать и проживать каждую песню вместе с вами.<br><br>Если давно собирались попасть на концерт «Анимации» — это отличный повод. Если уже были — знаете, что такие встречи не хочется пропускать.<br><br>Билеты уже в продаже. Не откладывайте на потом — лучшие места заканчиваются первыми.<br><br>До встречи на концерте!",
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "Пролетарская ул., 124",
+            "canonicalPath": null,
+            "primaryCityId": "city_1510853",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": null
+          },
+          "createdAt": "2026-11-03T20:40:07.874Z",
+          "eventTitle": "15.11.2026 / Барнаул /Костя Кулясов и группа АнимациЯ /animaciya.online",
+          "eventSlug": "tc-6a3272167bd4ee47709f2610-15-11-2026-барнаул-костя-кулясов-и-группа-анимация-animaciya-online",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_1510853",
+          "cityTitle": "Барнаул",
+          "venueId": "venue_679a3f2cd8bb3b8643c1ccca",
+          "venueTitle": "Lil Brazil",
+          "venueAddress": "Пролетарская ул., 124",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a3272167bd4ee47709f2610",
+              "externalId": "6a3272167bd4ee47709f2610",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "city": "Барнаул",
+        "venue": "Lil Brazil",
+        "address": "Пролетарская ул., 124",
+        "ageLimit": "16",
+        "offerMin": 2500,
+        "activeOffers": 7,
+        "futureSessions": [
+          "2026-11-15T13:00:00"
+        ]
+      }
+    },
+    "evt_6a3267e392340fb768e0a097": {
+      "eventId": "evt_6a3267e392340fb768e0a097",
+      "eventPageId": "7bb515c8-cb5e-463a-ae2e-1e06753968f6",
+      "slug": "13-11-2026-kemerovo-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-kemerovo",
+      "sourceTitle": "13.11.2026 / Кемерово /Костя Кулясов и группа АнимациЯ /animaciya.online",
+      "sourceDescription": "Концерт Кости Кулясова и группы АнимациЯ в Кемерово в ресторане Hofbrau , встречаемся 13 ноября! Программа : \"Все хиты\". <br>________________________________<br><br> Кемерово, Бульвар Строителей 54а<br><br> 13 ноября  2026 <br>________________________________<br>Костя Кулясов и группа АнимациЯ возвращается с большим сольным концертом, где будут песни, которые вы знаете наизусть, и те, что особенно хочется услышать живьём.<br><br>Это будет вечер честных текстов, громких припевов, живых эмоций и той самой атмосферы, ради которой мы снова и снова собираемся вместе. Будем петь, вспоминать, переживать и проживать каждую песню вместе с вами.<br><br>Если давно собирались попасть на концерт «Анимации» — это отличный повод. Если уже были — знаете, что такие встречи не хочется пропускать.<br><br>Билеты уже в продаже. Не откладывайте на потом — лучшие места заканчиваются первыми.<br><br>До встречи на концерте!<br><br>Адрес: г. Кемерово, ночной клуб Эфир, Бульвар Строителей 54а<br>_________________________",
+      "legacyOverrideDescription": "Концерт Кости Кулясова и группы АнимациЯ в Кемерове в ресторане Hofbrau, встречаемся 13 ноября! Программа: \"Все хиты\".\n\nКемерово, Бульвар Строителей 54а\n13 ноября 2026\nКостя Кулясов и группа АнимациЯ возвращается с большим сольным концертом, где будут песни, которые вы знаете наизусть, и те, что особенно хочется услышать живьём. Это будет вечер честных текстов, громких припевов, живых эмоций и той самой атмосферы, ради которой мы снова и снова собираемся вместе. Будем петь, вспоминать, переживать и проживать каждую песню вместе с вами.\n\nЕсли давно собирались попасть на концерт «Анимации» - это отличный повод. Если уже были - знаете, что такие встречи не хочется пропускать. Не откладывайте на потом - лучшие места заканчиваются первыми.\n\nДо встречи на концерте! Кемерово, ночной клуб Эфир, Бульвар Строителей 54а. Тур по городам, с 7 ноября - 26 декабря 2026: всего 5 вечеров, это 3-й. Можно сравнить даты и остановиться на удобной.\n\n## Практическая информация\n\n- Место - «ресторан Hofbrau», Кемерово\n- Адрес - Бульвар Строителей, 54а\n- Продолжительность - около 120 минут\n- Возрастное ограничение - 16+\n- Билеты - от 2 500 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_6a3267e392340fb768e0a097",
+        "kind": "SINGLE",
+        "slug": "tc-6a3267e392340fb768e0a097-13-11-2026-кемерово-костя-кулясов-и-группа-анимация-animaciya-online",
+        "seoH1": null,
+        "title": "13.11.2026 / Кемерово /Костя Кулясов и группа АнимациЯ /animaciya.online",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a3267e392340fb768e0a097",
+            "externalId": "6a3267e392340fb768e0a097",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_62938d1fba6a1b1554067fd5",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-06/6a42560c2acb1c039a2c1afe.jpg",
+        "seoTitle": null,
+        "cityTitle": "Кемерово",
+        "venueTitle": "ресторан Hofbrau",
+        "description": "Концерт Кости Кулясова и группы АнимациЯ в Кемерово в ресторане Hofbrau , встречаемся 13 ноября! Программа : \"Все хиты\". <br>________________________________<br><br> Кемерово, Бульвар Строителей 54а<br><br> 13 ноября  2026 <br>________________________________<br>Костя Кулясов и группа АнимациЯ возвращается с большим сольным концертом, где будут песни, которые вы знаете наизусть, и те, что особенно хочется услышать живьём.<br><br>Это будет вечер честных текстов, громких припевов, живых эмоций и той самой атмосферы, ради которой мы снова и снова собираемся вместе. Будем петь, вспоминать, переживать и проживать каждую песню вместе с вами.<br><br>Если давно собирались попасть на концерт «Анимации» — это отличный повод. Если уже были — знаете, что такие встречи не хочется пропускать.<br><br>Билеты уже в продаже. Не откладывайте на потом — лучшие места заканчиваются первыми.<br><br>До встречи на концерте!<br><br>Адрес: г. Кемерово, ночной клуб Эфир, Бульвар Строителей 54а<br>_________________________",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Бульвар Строителей, 54а",
+        "canonicalPath": null,
+        "primaryCityId": "city_1503901",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "13.11.2026 / Кемерово /Костя Кулясов и группа АнимациЯ /animaciya.online",
+        "seoH1": "13.11.2026 / Кемерово /Костя Кулясов и группа АнимациЯ /animaciya.online",
+        "seoTitle": "13.11.2026 / Кемерово /Костя Кулясов и группа АнимациЯ /animaciya.online | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/13-11-2026-kemerovo-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-kemerovo",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "cfacbcb4-3de8-4930-8739-b7023bb87a4d",
+          "eventId": "evt_6a3267e392340fb768e0a097",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_6a3267e392340fb768e0a097",
+            "kind": "SINGLE",
+            "slug": "tc-6a3267e392340fb768e0a097-13-11-2026-кемерово-костя-кулясов-и-группа-анимация-animaciya-online",
+            "seoH1": null,
+            "title": "13.11.2026 / Кемерово /Костя Кулясов и группа АнимациЯ /animaciya.online",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a3267e392340fb768e0a097",
+                "externalId": "6a3267e392340fb768e0a097",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_62938d1fba6a1b1554067fd5",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-06/6a42560c2acb1c039a2c1afe.jpg",
+            "seoTitle": null,
+            "cityTitle": "Кемерово",
+            "venueTitle": "ресторан Hofbrau",
+            "description": "Концерт Кости Кулясова и группы АнимациЯ в Кемерово в ресторане Hofbrau , встречаемся 13 ноября! Программа : \"Все хиты\". <br>________________________________<br><br> Кемерово, Бульвар Строителей 54а<br><br> 13 ноября  2026 <br>________________________________<br>Костя Кулясов и группа АнимациЯ возвращается с большим сольным концертом, где будут песни, которые вы знаете наизусть, и те, что особенно хочется услышать живьём.<br><br>Это будет вечер честных текстов, громких припевов, живых эмоций и той самой атмосферы, ради которой мы снова и снова собираемся вместе. Будем петь, вспоминать, переживать и проживать каждую песню вместе с вами.<br><br>Если давно собирались попасть на концерт «Анимации» — это отличный повод. Если уже были — знаете, что такие встречи не хочется пропускать.<br><br>Билеты уже в продаже. Не откладывайте на потом — лучшие места заканчиваются первыми.<br><br>До встречи на концерте!<br><br>Адрес: г. Кемерово, ночной клуб Эфир, Бульвар Строителей 54а<br>_________________________",
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "Бульвар Строителей, 54а",
+            "canonicalPath": null,
+            "primaryCityId": "city_1503901",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": null
+          },
+          "createdAt": "2026-11-03T20:40:07.804Z",
+          "eventTitle": "13.11.2026 / Кемерово /Костя Кулясов и группа АнимациЯ /animaciya.online",
+          "eventSlug": "tc-6a3267e392340fb768e0a097-13-11-2026-кемерово-костя-кулясов-и-группа-анимация-animaciya-online",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_1503901",
+          "cityTitle": "Кемерово",
+          "venueId": "venue_62938d1fba6a1b1554067fd5",
+          "venueTitle": "ресторан Hofbrau",
+          "venueAddress": "Бульвар Строителей, 54а",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a3267e392340fb768e0a097",
+              "externalId": "6a3267e392340fb768e0a097",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "city": "Кемерово",
+        "venue": "ресторан Hofbrau",
+        "address": "Бульвар Строителей, 54а",
+        "ageLimit": "16",
+        "offerMin": 2500,
+        "activeOffers": 14,
+        "futureSessions": [
+          "2026-11-13T13:00:00"
+        ]
+      }
+    },
+    "evt_6a33acb64259f2497f1de605": {
+      "eventId": "evt_6a33acb64259f2497f1de605",
+      "eventPageId": "b12be7df-523d-47da-b31c-88575326a705",
+      "slug": "17-11-2026-abakan-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-abakan",
+      "sourceTitle": "17.11.2026 / Абакан /Костя Кулясов и группа АнимациЯ /animaciya.online",
+      "sourceDescription": "Концерт Кости Кулясова и группы АнимациЯ в Абакане в баре Rock and Roll встречаемся 17 ноября! Программа : \"Все хиты\". <br>________________________________<br><br>📍 г. Абакан, Ленинского Комсомола ул.39<br><br>📅 17 ноября  2026 <br>________________________________<br>Костя Кулясов и группа АнимациЯ возвращается с большим сольным концертом, где будут песни, которые вы знаете наизусть, и те, что особенно хочется услышать живьём.<br><br>Это будет вечер честных текстов, громких припевов, живых эмоций и той самой атмосферы, ради которой мы снова и снова собираемся вместе. Будем петь, вспоминать, переживать и проживать каждую песню вместе с вами.<br><br>Если давно собирались попасть на концерт «Анимации» — это отличный повод. Если уже были — знаете, что такие встречи не хочется пропускать.<br><br>Билеты уже в продаже. Не откладывайте на потом — лучшие места заканчиваются первыми.<br><br>До встречи на концерте!<br><br>_______________________________________<br>«Я люблю свою Родину, вроде бы» - фраза из песни группы «АнимациЯ». Костя Кулясов, лидер группы, и тот самый автор, у которого что ни песня, то крылатое выражение. Хочешь попасть на концерт? Жми на ссылку и покупай билет! Ты услышишь полтора десятка ломовейших хитов и самые новые песни!",
+      "legacyOverrideDescription": "Концерт Кости Кулясова и группы АнимациЯ в Абакане в баре Rock and Roll встречаемся 17 ноября! Программа: \"Все хиты\".\n\nАбакан, Ленинского Комсомола ул.39\n📅 17 ноября 2026\nКостя Кулясов и группа АнимациЯ возвращается с большим сольным концертом, где будут песни, которые вы знаете наизусть, и те, что особенно хочется услышать живьём. Это будет вечер честных текстов, громких припевов, живых эмоций и той самой атмосферы, ради которой мы снова и снова собираемся вместе. Будем петь, вспоминать, переживать и проживать каждую песню вместе с вами.\n\nЕсли давно собирались попасть на концерт «Анимации» - это отличный повод. Если уже были - знаете, что такие встречи не хочется пропускать. Не откладывайте на потом - лучшие места заканчиваются первыми.\n\nДо встречи на концерте! «Я люблю свою Родину, вроде бы» - фраза из песни группы «АнимациЯ». Костя Кулясов, лидер группы, и тот самый автор, у которого что ни песня, то крылатое выражение. Хочешь попасть на концерт? Жми на ссылку и покупай билет! Ты услышишь полтора десятка ломовейших хитов и самые новые песни!\n\n## Практическая информация\n\n- Место - \"ROCK&ROLL bar\", Абакан\n- Адрес - ул. Ленинского Комсомола, 39\n- Продолжительность - около 120 минут\n- Возрастное ограничение - 16+\n- Билеты - от 2 200 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_6a33acb64259f2497f1de605",
+        "kind": "SINGLE",
+        "slug": "tc-6a33acb64259f2497f1de605-17-11-2026-абакан-костя-кулясов-и-группа-анимация-animaciya-online",
+        "seoH1": null,
+        "title": "17.11.2026 / Абакан /Костя Кулясов и группа АнимациЯ /animaciya.online",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a33acb64259f2497f1de605",
+            "externalId": "6a33acb64259f2497f1de605",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_5bbf557a434cdd000caa45db",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-06/6a33acb5dfa3b17e9bab7f3f.jpg",
+        "seoTitle": null,
+        "cityTitle": "Абакан",
+        "venueTitle": "\"ROCK&ROLL bar\"",
+        "description": "Концерт Кости Кулясова и группы АнимациЯ в Абакане в баре Rock and Roll встречаемся 17 ноября! Программа : \"Все хиты\". <br>________________________________<br><br>📍 г. Абакан, Ленинского Комсомола ул.39<br><br>📅 17 ноября  2026 <br>________________________________<br>Костя Кулясов и группа АнимациЯ возвращается с большим сольным концертом, где будут песни, которые вы знаете наизусть, и те, что особенно хочется услышать живьём.<br><br>Это будет вечер честных текстов, громких припевов, живых эмоций и той самой атмосферы, ради которой мы снова и снова собираемся вместе. Будем петь, вспоминать, переживать и проживать каждую песню вместе с вами.<br><br>Если давно собирались попасть на концерт «Анимации» — это отличный повод. Если уже были — знаете, что такие встречи не хочется пропускать.<br><br>Билеты уже в продаже. Не откладывайте на потом — лучшие места заканчиваются первыми.<br><br>До встречи на концерте!<br><br>_______________________________________<br>«Я люблю свою Родину, вроде бы» - фраза из песни группы «АнимациЯ». Костя Кулясов, лидер группы, и тот самый автор, у которого что ни песня, то крылатое выражение. Хочешь попасть на концерт? Жми на ссылку и покупай билет! Ты услышишь полтора десятка ломовейших хитов и самые новые песни!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "ул. Ленинского Комсомола, 39",
+        "canonicalPath": null,
+        "primaryCityId": "city_1512236",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "17.11.2026 / Абакан /Костя Кулясов и группа АнимациЯ /animaciya.online",
+        "seoH1": "17.11.2026 / Абакан /Костя Кулясов и группа АнимациЯ /animaciya.online",
+        "seoTitle": "17.11.2026 / Абакан /Костя Кулясов и группа АнимациЯ /animaciya.online | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/17-11-2026-abakan-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-abakan",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "3bc9906f-820e-48db-8b1d-3ff3d9ff2978",
+          "eventId": "evt_6a33acb64259f2497f1de605",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_6a33acb64259f2497f1de605",
+            "kind": "SINGLE",
+            "slug": "tc-6a33acb64259f2497f1de605-17-11-2026-абакан-костя-кулясов-и-группа-анимация-animaciya-online",
+            "seoH1": null,
+            "title": "17.11.2026 / Абакан /Костя Кулясов и группа АнимациЯ /animaciya.online",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a33acb64259f2497f1de605",
+                "externalId": "6a33acb64259f2497f1de605",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_5bbf557a434cdd000caa45db",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-06/6a33acb5dfa3b17e9bab7f3f.jpg",
+            "seoTitle": null,
+            "cityTitle": "Абакан",
+            "venueTitle": "\"ROCK&ROLL bar\"",
+            "description": "Концерт Кости Кулясова и группы АнимациЯ в Абакане в баре Rock and Roll встречаемся 17 ноября! Программа : \"Все хиты\". <br>________________________________<br><br>📍 г. Абакан, Ленинского Комсомола ул.39<br><br>📅 17 ноября  2026 <br>________________________________<br>Костя Кулясов и группа АнимациЯ возвращается с большим сольным концертом, где будут песни, которые вы знаете наизусть, и те, что особенно хочется услышать живьём.<br><br>Это будет вечер честных текстов, громких припевов, живых эмоций и той самой атмосферы, ради которой мы снова и снова собираемся вместе. Будем петь, вспоминать, переживать и проживать каждую песню вместе с вами.<br><br>Если давно собирались попасть на концерт «Анимации» — это отличный повод. Если уже были — знаете, что такие встречи не хочется пропускать.<br><br>Билеты уже в продаже. Не откладывайте на потом — лучшие места заканчиваются первыми.<br><br>До встречи на концерте!<br><br>_______________________________________<br>«Я люблю свою Родину, вроде бы» - фраза из песни группы «АнимациЯ». Костя Кулясов, лидер группы, и тот самый автор, у которого что ни песня, то крылатое выражение. Хочешь попасть на концерт? Жми на ссылку и покупай билет! Ты услышишь полтора десятка ломовейших хитов и самые новые песни!",
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "ул. Ленинского Комсомола, 39",
+            "canonicalPath": null,
+            "primaryCityId": "city_1512236",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": null
+          },
+          "createdAt": "2026-11-03T20:40:07.975Z",
+          "eventTitle": "17.11.2026 / Абакан /Костя Кулясов и группа АнимациЯ /animaciya.online",
+          "eventSlug": "tc-6a33acb64259f2497f1de605-17-11-2026-абакан-костя-кулясов-и-группа-анимация-animaciya-online",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_1512236",
+          "cityTitle": "Абакан",
+          "venueId": "venue_5bbf557a434cdd000caa45db",
+          "venueTitle": "\"ROCK&ROLL bar\"",
+          "venueAddress": "ул. Ленинского Комсомола, 39",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a33acb64259f2497f1de605",
+              "externalId": "6a33acb64259f2497f1de605",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "city": "Абакан",
+        "venue": "\"ROCK&ROLL bar\"",
+        "address": "ул. Ленинского Комсомола, 39",
+        "ageLimit": "16",
+        "offerMin": 2200,
+        "activeOffers": 10,
+        "futureSessions": [
+          "2026-11-17T13:00:00"
+        ]
+      }
+    },
+    "evt_6a8c82a91ecdee7663cff1ac": {
+      "eventId": "evt_6a8c82a91ecdee7663cff1ac",
+      "eventPageId": "d4af0955-8b27-4e7a-9b5b-151018fafde1",
+      "slug": "18-11-2026-krasnoyarsk-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-krasnoyarsk",
+      "sourceTitle": "18.11.2026 / Красноярск /Костя Кулясов и группа АнимациЯ /animaciya.online",
+      "sourceDescription": "Концерт Кости Кулясова и группы АнимациЯ в Красноярске в баре 64/6 встречаемся 18 ноября! Программа : \"Все хиты\". <br>____________<br>Костя Кулясов и группа АнимациЯ возвращается с большим сольным концертом, где будут песни, которые вы знаете наизусть, и те, что особенно хочется услышать живьём.<br><br>Это будет вечер честных текстов, громких припевов, живых эмоций и той самой атмосферы, ради которой мы снова и снова собираемся вместе. Будем петь, вспоминать, переживать и проживать каждую песню вместе с вами.<br><br>Если давно собирались попасть на концерт «Анимации» — это отличный повод. Если уже были — знаете, что такие встречи не хочется пропускать.<br><br>Билеты уже в продаже. Не откладывайте на потом — лучшие места заканчиваются первыми.<br><br>До встречи на концерте!<br><br>_______________________________________<br>«Я люблю свою Родину, вроде бы» - фраза из песни группы «АнимациЯ». Костя Кулясов, лидер группы, и тот самый автор, у которого что ни песня, то крылатое выражение. Хочешь попасть на концерт? Жми на ссылку и покупай билет! Ты услышишь полтора десятка ломовейших хитов и самые новые песни!",
+      "legacyOverrideDescription": "Концерт Кости Кулясова и группы АнимациЯ в Красноярске в баре 64/6 встречаемся 18 ноября! Программа: \"Все хиты\". Костя Кулясов и группа АнимациЯ возвращается с большим сольным концертом, где будут песни, которые вы знаете наизусть, и те, что особенно хочется услышать живьём.\n\nЭто будет вечер честных текстов, громких припевов, живых эмоций и той самой атмосферы, ради которой мы снова и снова собираемся вместе. Будем петь, вспоминать, переживать и проживать каждую песню вместе с вами. Если давно собирались попасть на концерт «Анимации» - это отличный повод. Если уже были - знаете, что такие встречи не хочется пропускать.\n\nНе откладывайте на потом - лучшие места заканчиваются первыми. До встречи на концерте!\n«Я люблю свою Родину, вроде бы» - фраза из песни группы «АнимациЯ». Костя Кулясов, лидер группы, и тот самый автор, у которого что ни песня, то крылатое выражение. Хочешь попасть на концерт? Жми на ссылку и покупай билет! Ты услышишь полтора десятка ломовейших хитов и самые новые песни!\n\nЭто 2-й город тура (даты с 1 ноября - 27 декабря 2026): всего таких городов 3. Даты идут одна за другой: есть из чего выбрать.\n\n## Практическая информация\n\n- Место - «Клуб 64/6», Красноярск\n- Адрес - Качинская 64/6\n- Продолжительность - около 120 минут\n- Возрастное ограничение - 16+\n- Билеты - от 2 500 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_6a8c82a91ecdee7663cff1ac",
+        "kind": "SINGLE",
+        "slug": "18-11-2026-красноярск-костя-кулясов-и-группа-анимация-animaciya-online-6a8c82a91ecdee7663cff1ac",
+        "seoH1": null,
+        "title": "18.11.2026 / Красноярск /Костя Кулясов и группа АнимациЯ /animaciya.online",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a8c82a91ecdee7663cff1ac",
+            "externalId": "6a8c82a91ecdee7663cff1ac",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_6061782b5a7855aa797d423b",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-08/6a8c82a91ecdee7663cff1aa.jpg",
+        "seoTitle": null,
+        "cityTitle": "Красноярск",
+        "venueTitle": "Клуб 64/6",
+        "description": "Концерт Кости Кулясова и группы АнимациЯ в Красноярске в баре 64/6 встречаемся 18 ноября! Программа : \"Все хиты\". <br>____________<br>Костя Кулясов и группа АнимациЯ возвращается с большим сольным концертом, где будут песни, которые вы знаете наизусть, и те, что особенно хочется услышать живьём.<br><br>Это будет вечер честных текстов, громких припевов, живых эмоций и той самой атмосферы, ради которой мы снова и снова собираемся вместе. Будем петь, вспоминать, переживать и проживать каждую песню вместе с вами.<br><br>Если давно собирались попасть на концерт «Анимации» — это отличный повод. Если уже были — знаете, что такие встречи не хочется пропускать.<br><br>Билеты уже в продаже. Не откладывайте на потом — лучшие места заканчиваются первыми.<br><br>До встречи на концерте!<br><br>_______________________________________<br>«Я люблю свою Родину, вроде бы» - фраза из песни группы «АнимациЯ». Костя Кулясов, лидер группы, и тот самый автор, у которого что ни песня, то крылатое выражение. Хочешь попасть на концерт? Жми на ссылку и покупай билет! Ты услышишь полтора десятка ломовейших хитов и самые новые песни!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Качинская 64/6",
+        "canonicalPath": null,
+        "primaryCityId": "city_1502026",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "18.11.2026 / Красноярск /Костя Кулясов и группа АнимациЯ /animaciya.online",
+        "seoH1": "18.11.2026 / Красноярск /Костя Кулясов и группа АнимациЯ /animaciya.online",
+        "seoTitle": "18.11.2026 / Красноярск /Костя Кулясов и группа АнимациЯ /animaciya.online | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/18-11-2026-krasnoyarsk-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-krasnoyarsk",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "6d8f54b8-31a7-407c-929b-1082ffc20e24",
+          "eventId": "evt_6a8c82a91ecdee7663cff1ac",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_6a8c82a91ecdee7663cff1ac",
+            "kind": "SINGLE",
+            "slug": "18-11-2026-красноярск-костя-кулясов-и-группа-анимация-animaciya-online-6a8c82a91ecdee7663cff1ac",
+            "seoH1": null,
+            "title": "18.11.2026 / Красноярск /Костя Кулясов и группа АнимациЯ /animaciya.online",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a8c82a91ecdee7663cff1ac",
+                "externalId": "6a8c82a91ecdee7663cff1ac",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_6061782b5a7855aa797d423b",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-08/6a8c82a91ecdee7663cff1aa.jpg",
+            "seoTitle": null,
+            "cityTitle": "Красноярск",
+            "venueTitle": "Клуб 64/6",
+            "description": "Концерт Кости Кулясова и группы АнимациЯ в Красноярске в баре 64/6 встречаемся 18 ноября! Программа : \"Все хиты\". <br>____________<br>Костя Кулясов и группа АнимациЯ возвращается с большим сольным концертом, где будут песни, которые вы знаете наизусть, и те, что особенно хочется услышать живьём.<br><br>Это будет вечер честных текстов, громких припевов, живых эмоций и той самой атмосферы, ради которой мы снова и снова собираемся вместе. Будем петь, вспоминать, переживать и проживать каждую песню вместе с вами.<br><br>Если давно собирались попасть на концерт «Анимации» — это отличный повод. Если уже были — знаете, что такие встречи не хочется пропускать.<br><br>Билеты уже в продаже. Не откладывайте на потом — лучшие места заканчиваются первыми.<br><br>До встречи на концерте!<br><br>_______________________________________<br>«Я люблю свою Родину, вроде бы» - фраза из песни группы «АнимациЯ». Костя Кулясов, лидер группы, и тот самый автор, у которого что ни песня, то крылатое выражение. Хочешь попасть на концерт? Жми на ссылку и покупай билет! Ты услышишь полтора десятка ломовейших хитов и самые новые песни!",
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "Качинская 64/6",
+            "canonicalPath": null,
+            "primaryCityId": "city_1502026",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": null
+          },
+          "createdAt": "2026-11-03T20:40:30.745Z",
+          "eventTitle": "18.11.2026 / Красноярск /Костя Кулясов и группа АнимациЯ /animaciya.online",
+          "eventSlug": "18-11-2026-красноярск-костя-кулясов-и-группа-анимация-animaciya-online-6a8c82a91ecdee7663cff1ac",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_1502026",
+          "cityTitle": "Красноярск",
+          "venueId": "venue_6061782b5a7855aa797d423b",
+          "venueTitle": "Клуб 64/6",
+          "venueAddress": "Качинская 64/6",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a8c82a91ecdee7663cff1ac",
+              "externalId": "6a8c82a91ecdee7663cff1ac",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "city": "Красноярск",
+        "venue": "Клуб 64/6",
+        "address": "Качинская 64/6",
+        "ageLimit": "16",
+        "offerMin": 2500,
+        "activeOffers": 7,
+        "futureSessions": [
+          "2026-11-18T13:00:00"
+        ]
+      }
+    }
+  }
+}

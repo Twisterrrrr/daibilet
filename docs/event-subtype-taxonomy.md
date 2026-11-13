@@ -40,4 +40,4 @@ These are controlled product subtypes, not free-form tags. A single primary subt
 
 ## Reproducible proposal output
 
-Run `scripts/classify-event-subtypes.py` against `eventpage-full-eventid-matrix-2026-11-04.csv`. The output includes only `READY` Events with future sellable sessions, and carries both the existing category and the proposed subtype. It is a review artifact, not a production migration.
+Run `scripts/classify-event-subtypes.py` against `eventpage-full-eventid-matrix-2026-11-04.csv.gz`. The output includes only `READY` Events with future sellable sessions, and carries both the existing category and the proposed subtype. It is a review artifact, not a production migration.

@@ -1,0 +1,937 @@
+{
+  "capturedAt": "2026-11-09T20:57:59.249Z",
+  "purpose": "Pre-rewrite production archive for ANNA ASTI show Царица city pages. Legacy overrides remain unchanged; EventPage sections hold the active editorial rewrite.",
+  "items": {
+    "evt_69f8eb16ed0e1619e45bc72c": {
+      "eventId": "evt_69f8eb16ed0e1619e45bc72c",
+      "eventPageId": "0e89916b-f9f4-4626-9bbe-288aa3444337",
+      "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-vladivostok",
+      "sourceTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Владивосток",
+      "sourceDescription": "Anna Asti представляет новое шоу «Царица», которое обещает стать настоящим праздником для всех её поклонников. Это будет шоу, которое нельзя пропустить — с масштабными спецэффектами, завораживающей хореографией и, конечно, любимыми хитами.<br><br>«Я очень горжусь своей #Astifam и безгранично благодарна судьбе за то, что подарила мне таких невероятно талантливых людей в команду. Я восхищаюсь тем, как они любят своё дело и всегда выкладываются на все 100%. Каждый раз, выходя на сцену, мы стремимся создать настоящий праздник для вас, дорогие зрители», — делится своими ожиданиями Anna Asti.<br><br>Многое из того, что будет представлено на шоу «Царица», зрители ещё не видели на концертах певицы. Программа обещает море света, ослепительные спецэффекты и незабываемую атмосферу. Кроме того, зрители смогут услышать новые песни, которые легко смогут выучить до самого концерта!",
+      "legacyOverrideDescription": "«ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Владивосток».\n\nГлавная «Царица» современной pop-сцены возвращается с грандиозным шоу мирового уровня. Огненные спецэффекты, профессиональная танцевальная труппа, невероятные костюмы и, конечно, любимые хиты, которые знает наизусть вся страна. Подойдёт всем, кто хочет петь в унисон, танцевать до упада и прочувствовать главные треки о любви.\n\n## Практическая информация\n\n- Место - «КСК Фетисов Арена», Владивосток\n- Адрес - ул. Маковского, д. 284\n- Продолжительность - около 150 минут\n- Возрастное ограничение - 12+\n- Билеты - от 3 000 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_69f8eb16ed0e1619e45bc72c",
+        "kind": "SINGLE",
+        "slug": "tc-69f8eb16ed0e1619e45bc72c-anna-asti-сольныи-концерт-шоу-царица-в-г-владивосток",
+        "seoH1": null,
+        "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Владивосток",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=69f8eb16ed0e1619e45bc72c",
+            "externalId": "69f8eb16ed0e1619e45bc72c",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_62fcf138d17dc6bce772a685",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-05/69f8fc275f0785a6dd3a037b.jpg",
+        "seoTitle": null,
+        "cityTitle": "Владивосток",
+        "venueTitle": "КСК Фетисов Арена",
+        "description": "Anna Asti представляет новое шоу «Царица», которое обещает стать настоящим праздником для всех её поклонников. Это будет шоу, которое нельзя пропустить — с масштабными спецэффектами, завораживающей хореографией и, конечно, любимыми хитами.<br><br>«Я очень горжусь своей #Astifam и безгранично благодарна судьбе за то, что подарила мне таких невероятно талантливых людей в команду. Я восхищаюсь тем, как они любят своё дело и всегда выкладываются на все 100%. Каждый раз, выходя на сцену, мы стремимся создать настоящий праздник для вас, дорогие зрители», — делится своими ожиданиями Anna Asti.<br><br>Многое из того, что будет представлено на шоу «Царица», зрители ещё не видели на концертах певицы. Программа обещает море света, ослепительные спецэффекты и незабываемую атмосферу. Кроме того, зрители смогут услышать новые песни, которые легко смогут выучить до самого концерта!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "ул. Маковского, д. 284",
+        "canonicalPath": null,
+        "primaryCityId": "city_2013348",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": "Главная «Царица» современной pop-сцены возвращается с грандиозным шоу мирового уровня. Огненные спецэффекты, профессиональная танцевальная труппа, невероятные костюмы и, конечно, любимые хиты, которые знает наизусть вся…"
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Владивосток",
+        "seoH1": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Владивосток",
+        "seoTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Владивосток | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/anna-asti-solnyi-koncert-shou-carica-v-g-vladivostok",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "908c47b1-0595-4bab-83b3-beaafd74a643",
+          "eventId": "evt_69f8eb16ed0e1619e45bc72c",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_69f8eb16ed0e1619e45bc72c",
+            "kind": "SINGLE",
+            "slug": "tc-69f8eb16ed0e1619e45bc72c-anna-asti-сольныи-концерт-шоу-царица-в-г-владивосток",
+            "seoH1": null,
+            "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Владивосток",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=69f8eb16ed0e1619e45bc72c",
+                "externalId": "69f8eb16ed0e1619e45bc72c",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_62fcf138d17dc6bce772a685",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-05/69f8fc275f0785a6dd3a037b.jpg",
+            "seoTitle": null,
+            "cityTitle": "Владивосток",
+            "venueTitle": "КСК Фетисов Арена",
+            "description": "Anna Asti представляет новое шоу «Царица», которое обещает стать настоящим праздником для всех её поклонников. Это будет шоу, которое нельзя пропустить — с масштабными спецэффектами, завораживающей хореографией и, конечно, любимыми хитами.<br><br>«Я очень горжусь своей #Astifam и безгранично благодарна судьбе за то, что подарила мне таких невероятно талантливых людей в команду. Я восхищаюсь тем, как они любят своё дело и всегда выкладываются на все 100%. Каждый раз, выходя на сцену, мы стремимся создать настоящий праздник для вас, дорогие зрители», — делится своими ожиданиями Anna Asti.<br><br>Многое из того, что будет представлено на шоу «Царица», зрители ещё не видели на концертах певицы. Программа обещает море света, ослепительные спецэффекты и незабываемую атмосферу. Кроме того, зрители смогут услышать новые песни, которые легко смогут выучить до самого концерта!",
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "ул. Маковского, д. 284",
+            "canonicalPath": null,
+            "primaryCityId": "city_2013348",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": "Главная «Царица» современной pop-сцены возвращается с грандиозным шоу мирового уровня. Огненные спецэффекты, профессиональная танцевальная труппа, невероятные костюмы и, конечно, любимые хиты, которые знает наизусть вся…"
+          },
+          "createdAt": "2026-11-03T18:11:24.714Z",
+          "eventTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Владивосток",
+          "eventSlug": "tc-69f8eb16ed0e1619e45bc72c-anna-asti-сольныи-концерт-шоу-царица-в-г-владивосток",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_2013348",
+          "cityTitle": "Владивосток",
+          "venueId": "venue_62fcf138d17dc6bce772a685",
+          "venueTitle": "КСК Фетисов Арена",
+          "venueAddress": "ул. Маковского, д. 284",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=69f8eb16ed0e1619e45bc72c",
+              "externalId": "69f8eb16ed0e1619e45bc72c",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "city": "Владивосток",
+        "venue": "КСК Фетисов Арена",
+        "address": "ул. Маковского, д. 284",
+        "ageLimit": "12",
+        "offerMin": 3000,
+        "activeOffers": 103,
+        "futureSessions": [
+          "2026-11-13 10:00:00"
+        ]
+      }
+    },
+    "evt_6a8307af4ee6d470db0da246": {
+      "eventId": "evt_6a8307af4ee6d470db0da246",
+      "eventPageId": "7632040e-efaa-42d6-ba17-53c2dd58932a",
+      "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-voronezh",
+      "sourceTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Воронеж",
+      "sourceDescription": "Anna Asti представляет новое шоу «Царица», которое обещает стать настоящим праздником для всех её поклонников. Это будет шоу, которое нельзя пропустить — с масштабными спецэффектами, завораживающей хореографией и, конечно, любимыми хитами.<br><br>«Я очень горжусь своей #Astifam и безгранично благодарна судьбе за то, что подарила мне таких невероятно талантливых людей в команду. Я восхищаюсь тем, как они любят своё дело и всегда выкладываются на все 100%. Каждый раз, выходя на сцену, мы стремимся создать настоящий праздник для вас, дорогие зрители», — делится своими ожиданиями Anna Asti.<br><br>Многое из того, что будет представлено на шоу «Царица», зрители ещё не видели на концертах певицы. Программа обещает море света, ослепительные спецэффекты и незабываемую атмосферу. Кроме того, зрители смогут услышать новые песни, которые легко смогут выучить до самого концерта!",
+      "legacyOverrideDescription": "Anna Asti представляет новое шоу «Царица», которое обещает стать настоящим праздником для всех её поклонников. Это будет шоу, которое нельзя пропустить - с масштабными спецэффектами, завораживающей хореографией и, конечно, любимыми хитами. «Я очень горжусь своей #Astifam и безгранично благодарна судьбе за то, что подарила мне таких невероятно талантливых людей в команду. Я восхищаюсь тем, как они любят своё дело и всегда выкладываются на все 100%. Каждый раз, выходя на сцену, мы стремимся создать настоящий праздник для вас, дорогие зрители», - делится своими ожиданиями Anna Asti.\n\nМногое из того, что будет представлено на шоу «Царица», зрители ещё не видели на концертах певицы. Программа обещает море света, ослепительные спецэффекты и незабываемую атмосферу. Кроме того, зрители смогут услышать новые песни, которые легко смогут выучить до самого концерта!\n\n## Практическая информация\n\n- Место - Ледовый дворец спорта «Юбилейный», Воронеж\n- Адрес - ул. Карла Маркса, 116\n- Продолжительность - около 150 минут\n- Возрастное ограничение - 12+\n- Билеты - от 2 500 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_6a8307af4ee6d470db0da246",
+        "kind": "SINGLE",
+        "slug": "anna-asti-сольныи-концерт-шоу-царица-в-г-воронеж-6a8307af4ee6d470db0da246",
+        "seoH1": null,
+        "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Воронеж",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a8307af4ee6d470db0da246",
+            "externalId": "6a8307af4ee6d470db0da246",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_5c3cc02067fc0b000fa9031a",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-08/6a8307afa265d6bd7c8711d7.jpg",
+        "seoTitle": null,
+        "cityTitle": "Воронеж",
+        "venueTitle": "Ледовый дворец спорта «Юбилейный»",
+        "description": "Anna Asti представляет новое шоу «Царица», которое обещает стать настоящим праздником для всех её поклонников. Это будет шоу, которое нельзя пропустить — с масштабными спецэффектами, завораживающей хореографией и, конечно, любимыми хитами.<br><br>«Я очень горжусь своей #Astifam и безгранично благодарна судьбе за то, что подарила мне таких невероятно талантливых людей в команду. Я восхищаюсь тем, как они любят своё дело и всегда выкладываются на все 100%. Каждый раз, выходя на сцену, мы стремимся создать настоящий праздник для вас, дорогие зрители», — делится своими ожиданиями Anna Asti.<br><br>Многое из того, что будет представлено на шоу «Царица», зрители ещё не видели на концертах певицы. Программа обещает море света, ослепительные спецэффекты и незабываемую атмосферу. Кроме того, зрители смогут услышать новые песни, которые легко смогут выучить до самого концерта!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "ул. Карла Маркса, 116",
+        "canonicalPath": null,
+        "primaryCityId": "city_472045",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Воронеж",
+        "seoH1": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Воронеж",
+        "seoTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Воронеж | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/anna-asti-solnyi-koncert-shou-carica-v-g-voronezh",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "a254a25b-2c79-4870-9b63-9f806064c99b",
+          "eventId": "evt_6a8307af4ee6d470db0da246",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_6a8307af4ee6d470db0da246",
+            "kind": "SINGLE",
+            "slug": "anna-asti-сольныи-концерт-шоу-царица-в-г-воронеж-6a8307af4ee6d470db0da246",
+            "seoH1": null,
+            "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Воронеж",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a8307af4ee6d470db0da246",
+                "externalId": "6a8307af4ee6d470db0da246",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_5c3cc02067fc0b000fa9031a",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-08/6a8307afa265d6bd7c8711d7.jpg",
+            "seoTitle": null,
+            "cityTitle": "Воронеж",
+            "venueTitle": "Ледовый дворец спорта «Юбилейный»",
+            "description": "Anna Asti представляет новое шоу «Царица», которое обещает стать настоящим праздником для всех её поклонников. Это будет шоу, которое нельзя пропустить — с масштабными спецэффектами, завораживающей хореографией и, конечно, любимыми хитами.<br><br>«Я очень горжусь своей #Astifam и безгранично благодарна судьбе за то, что подарила мне таких невероятно талантливых людей в команду. Я восхищаюсь тем, как они любят своё дело и всегда выкладываются на все 100%. Каждый раз, выходя на сцену, мы стремимся создать настоящий праздник для вас, дорогие зрители», — делится своими ожиданиями Anna Asti.<br><br>Многое из того, что будет представлено на шоу «Царица», зрители ещё не видели на концертах певицы. Программа обещает море света, ослепительные спецэффекты и незабываемую атмосферу. Кроме того, зрители смогут услышать новые песни, которые легко смогут выучить до самого концерта!",
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "ул. Карла Маркса, 116",
+            "canonicalPath": null,
+            "primaryCityId": "city_472045",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": null
+          },
+          "createdAt": "2026-11-03T18:10:36.433Z",
+          "eventTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Воронеж",
+          "eventSlug": "anna-asti-сольныи-концерт-шоу-царица-в-г-воронеж-6a8307af4ee6d470db0da246",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_472045",
+          "cityTitle": "Воронеж",
+          "venueId": "venue_5c3cc02067fc0b000fa9031a",
+          "venueTitle": "Ледовый дворец спорта «Юбилейный»",
+          "venueAddress": "ул. Карла Маркса, 116",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a8307af4ee6d470db0da246",
+              "externalId": "6a8307af4ee6d470db0da246",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "city": "Воронеж",
+        "venue": "Ледовый дворец спорта «Юбилейный»",
+        "address": "ул. Карла Маркса, 116",
+        "ageLimit": "12",
+        "offerMin": 2500,
+        "activeOffers": 44,
+        "futureSessions": [
+          "2026-12-16 17:00:00"
+        ]
+      }
+    },
+    "evt_6a2f0b6f45040b5afce38fe4": {
+      "eventId": "evt_6a2f0b6f45040b5afce38fe4",
+      "eventPageId": "cd8d9b6d-d61b-4c06-99e1-ab6e59207fac",
+      "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-krasnodar",
+      "sourceTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Краснодар",
+      "sourceDescription": "Anna Asti представляет новое шоу «Царица», которое обещает стать настоящим праздником для всех её поклонников. Это будет шоу, которое нельзя пропустить — с масштабными спецэффектами, завораживающей хореографией и, конечно, любимыми хитами.<br><br>«Я очень горжусь своей #Astifam и безгранично благодарна судьбе за то, что подарила мне таких невероятно талантливых людей в команду. Я восхищаюсь тем, как они любят своё дело и всегда выкладываются на все 100%. Каждый раз, выходя на сцену, мы стремимся создать настоящий праздник для вас, дорогие зрители», — делится своими ожиданиями Anna Asti.<br><br>Многое из того, что будет представлено на шоу «Царица», зрители ещё не видели на концертах певицы. Программа обещает море света, ослепительные спецэффекты и незабываемую атмосферу. Кроме того, зрители смогут услышать новые песни, которые легко смогут выучить до самого концерта!",
+      "legacyOverrideDescription": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Краснодар.\n\nГлавная «Царица» современной pop-сцены возвращается с грандиозным шоу мирового уровня. Огненные спецэффекты, профессиональная танцевальная труппа, невероятные костюмы и, конечно, любимые хиты, которые знает наизусть вся страна. Подойдёт всем, кто хочет петь в унисон, танцевать до упада и прочувствовать главные треки о любви.\n\n## Практическая информация\n\n- Место - «ДС ОЛИМП», Краснодар\n- Адрес - ул. Береговая, 144\n- Продолжительность - около 150 минут\n- Возрастное ограничение - 12+\n- Билеты - от 3 000 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_6a2f0b6f45040b5afce38fe4",
+        "kind": "SINGLE",
+        "slug": "tc-6a2f0b6f45040b5afce38fe4-anna-asti-сольныи-концерт-шоу-царица-в-г-краснодар",
+        "seoH1": null,
+        "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Краснодар",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a2f0b6f45040b5afce38fe4",
+            "externalId": "6a2f0b6f45040b5afce38fe4",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_65b3601b1665ac3b78305f47",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-06/6a2f0b6e477481d769b10e9d.png",
+        "seoTitle": null,
+        "cityTitle": "Краснодар",
+        "venueTitle": "ДС ОЛИМП",
+        "description": "Anna Asti представляет новое шоу «Царица», которое обещает стать настоящим праздником для всех её поклонников. Это будет шоу, которое нельзя пропустить — с масштабными спецэффектами, завораживающей хореографией и, конечно, любимыми хитами.<br><br>«Я очень горжусь своей #Astifam и безгранично благодарна судьбе за то, что подарила мне таких невероятно талантливых людей в команду. Я восхищаюсь тем, как они любят своё дело и всегда выкладываются на все 100%. Каждый раз, выходя на сцену, мы стремимся создать настоящий праздник для вас, дорогие зрители», — делится своими ожиданиями Anna Asti.<br><br>Многое из того, что будет представлено на шоу «Царица», зрители ещё не видели на концертах певицы. Программа обещает море света, ослепительные спецэффекты и незабываемую атмосферу. Кроме того, зрители смогут услышать новые песни, которые легко смогут выучить до самого концерта!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "ул. Береговая, 144",
+        "canonicalPath": null,
+        "primaryCityId": "city_542420",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": "Главная «Царица» современной pop-сцены возвращается с грандиозным шоу мирового уровня. Огненные спецэффекты, профессиональная танцевальная труппа, невероятные костюмы и, конечно, любимые хиты, которые знает наизусть вся…"
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Краснодар",
+        "seoH1": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Краснодар",
+        "seoTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Краснодар | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/anna-asti-solnyi-koncert-shou-carica-v-g-krasnodar",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "11ba4473-c927-487d-afa0-0cd9ab47a3c3",
+          "eventId": "evt_6a2f0b6f45040b5afce38fe4",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_6a2f0b6f45040b5afce38fe4",
+            "kind": "SINGLE",
+            "slug": "tc-6a2f0b6f45040b5afce38fe4-anna-asti-сольныи-концерт-шоу-царица-в-г-краснодар",
+            "seoH1": null,
+            "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Краснодар",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a2f0b6f45040b5afce38fe4",
+                "externalId": "6a2f0b6f45040b5afce38fe4",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_65b3601b1665ac3b78305f47",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-06/6a2f0b6e477481d769b10e9d.png",
+            "seoTitle": null,
+            "cityTitle": "Краснодар",
+            "venueTitle": "ДС ОЛИМП",
+            "description": "Anna Asti представляет новое шоу «Царица», которое обещает стать настоящим праздником для всех её поклонников. Это будет шоу, которое нельзя пропустить — с масштабными спецэффектами, завораживающей хореографией и, конечно, любимыми хитами.<br><br>«Я очень горжусь своей #Astifam и безгранично благодарна судьбе за то, что подарила мне таких невероятно талантливых людей в команду. Я восхищаюсь тем, как они любят своё дело и всегда выкладываются на все 100%. Каждый раз, выходя на сцену, мы стремимся создать настоящий праздник для вас, дорогие зрители», — делится своими ожиданиями Anna Asti.<br><br>Многое из того, что будет представлено на шоу «Царица», зрители ещё не видели на концертах певицы. Программа обещает море света, ослепительные спецэффекты и незабываемую атмосферу. Кроме того, зрители смогут услышать новые песни, которые легко смогут выучить до самого концерта!",
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "ул. Береговая, 144",
+            "canonicalPath": null,
+            "primaryCityId": "city_542420",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": "Главная «Царица» современной pop-сцены возвращается с грандиозным шоу мирового уровня. Огненные спецэффекты, профессиональная танцевальная труппа, невероятные костюмы и, конечно, любимые хиты, которые знает наизусть вся…"
+          },
+          "createdAt": "2026-11-03T18:11:24.433Z",
+          "eventTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Краснодар",
+          "eventSlug": "tc-6a2f0b6f45040b5afce38fe4-anna-asti-сольныи-концерт-шоу-царица-в-г-краснодар",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_542420",
+          "cityTitle": "Краснодар",
+          "venueId": "venue_65b3601b1665ac3b78305f47",
+          "venueTitle": "ДС ОЛИМП",
+          "venueAddress": "ул. Береговая, 144",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a2f0b6f45040b5afce38fe4",
+              "externalId": "6a2f0b6f45040b5afce38fe4",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "city": "Краснодар",
+        "venue": "ДС ОЛИМП",
+        "address": "ул. Береговая, 144",
+        "ageLimit": "12",
+        "offerMin": 3000,
+        "activeOffers": 42,
+        "futureSessions": [
+          "2026-12-11 17:00:00"
+        ]
+      }
+    },
+    "evt_69fd82eadb42bf5f5966403b": {
+      "eventId": "evt_69fd82eadb42bf5f5966403b",
+      "eventPageId": "d7a18f1c-f1f8-4f3d-91f6-5177b9a5dfbd",
+      "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-kurgan",
+      "sourceTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Курган",
+      "sourceDescription": "Anna Asti представляет новое шоу «Царица», которое обещает стать настоящим праздником для всех её поклонников. Это будет шоу, которое нельзя пропустить — с масштабными спецэффектами, завораживающей хореографией и, конечно, любимыми хитами.<br><br>«Я очень горжусь своей #Astifam и безгранично благодарна судьбе за то, что подарила мне таких невероятно талантливых людей в команду. Я восхищаюсь тем, как они любят своё дело и всегда выкладываются на все 100%. Каждый раз, выходя на сцену, мы стремимся создать настоящий праздник для вас, дорогие зрители», — делится своими ожиданиями Anna Asti.<br><br>Многое из того, что будет представлено на шоу «Царица», зрители ещё не видели на концертах певицы. Программа обещает море света, ослепительные спецэффекты и незабываемую атмосферу. Кроме того, зрители смогут услышать новые песни, которые легко смогут выучить до самого концерта!",
+      "legacyOverrideDescription": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Главная «Царица» современной pop-сцены возвращается с грандиозным шоу мирового уровня. Огненные спецэффекты, профессиональная танцевальная труппа, невероятные костюмы и, конечно, любимые хиты, которые знает наизусть вся страна.\n\nПодойдёт всем, кто хочет петь в унисон, танцевать до упада и прочувствовать главные треки о любви. Это 3-й город тура (даты с 4 декабря 2026 - 14 марта 2027): всего таких городов 3. Если не успеваете на этот вечер, будет следующий.\n\n## Практическая информация\n\n- Место - «Ледовый Дворец Спорта им. Парышева», Курган\n- Адрес - 1-й А микрорайон, 7\n- Продолжительность - около 150 минут\n- Возрастное ограничение - 12+\n- Билеты - от 2 000 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_69fd82eadb42bf5f5966403b",
+        "kind": "SINGLE",
+        "slug": "tc-69fd82eadb42bf5f5966403b-anna-asti-сольныи-концерт-шоу-царица-в-г-курган",
+        "seoH1": null,
+        "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Курган",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=69fd82eadb42bf5f5966403b",
+            "externalId": "69fd82eadb42bf5f5966403b",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_5df8a58d321b864b297e5575",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-05/69fd82ea88a732e3bb09fc55.jpg",
+        "seoTitle": null,
+        "cityTitle": "Курган",
+        "venueTitle": "Ледовый Дворец Спорта им. Парышева",
+        "description": "Anna Asti представляет новое шоу «Царица», которое обещает стать настоящим праздником для всех её поклонников. Это будет шоу, которое нельзя пропустить — с масштабными спецэффектами, завораживающей хореографией и, конечно, любимыми хитами.<br><br>«Я очень горжусь своей #Astifam и безгранично благодарна судьбе за то, что подарила мне таких невероятно талантливых людей в команду. Я восхищаюсь тем, как они любят своё дело и всегда выкладываются на все 100%. Каждый раз, выходя на сцену, мы стремимся создать настоящий праздник для вас, дорогие зрители», — делится своими ожиданиями Anna Asti.<br><br>Многое из того, что будет представлено на шоу «Царица», зрители ещё не видели на концертах певицы. Программа обещает море света, ослепительные спецэффекты и незабываемую атмосферу. Кроме того, зрители смогут услышать новые песни, которые легко смогут выучить до самого концерта!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "1-й А микрорайон, 7",
+        "canonicalPath": null,
+        "primaryCityId": "city_1501321",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": "Главная «Царица» современной pop-сцены возвращается с грандиозным шоу мирового уровня. Огненные спецэффекты, профессиональная танцевальная труппа, невероятные костюмы и, конечно, любимые хиты, которые знает наизусть вся…"
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Курган",
+        "seoH1": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Курган",
+        "seoTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Курган | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/anna-asti-solnyi-koncert-shou-carica-v-g-kurgan",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "632ccc1d-169d-4610-b530-87291d1f5945",
+          "eventId": "evt_69fd82eadb42bf5f5966403b",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_69fd82eadb42bf5f5966403b",
+            "kind": "SINGLE",
+            "slug": "tc-69fd82eadb42bf5f5966403b-anna-asti-сольныи-концерт-шоу-царица-в-г-курган",
+            "seoH1": null,
+            "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Курган",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=69fd82eadb42bf5f5966403b",
+                "externalId": "69fd82eadb42bf5f5966403b",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_5df8a58d321b864b297e5575",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-05/69fd82ea88a732e3bb09fc55.jpg",
+            "seoTitle": null,
+            "cityTitle": "Курган",
+            "venueTitle": "Ледовый Дворец Спорта им. Парышева",
+            "description": "Anna Asti представляет новое шоу «Царица», которое обещает стать настоящим праздником для всех её поклонников. Это будет шоу, которое нельзя пропустить — с масштабными спецэффектами, завораживающей хореографией и, конечно, любимыми хитами.<br><br>«Я очень горжусь своей #Astifam и безгранично благодарна судьбе за то, что подарила мне таких невероятно талантливых людей в команду. Я восхищаюсь тем, как они любят своё дело и всегда выкладываются на все 100%. Каждый раз, выходя на сцену, мы стремимся создать настоящий праздник для вас, дорогие зрители», — делится своими ожиданиями Anna Asti.<br><br>Многое из того, что будет представлено на шоу «Царица», зрители ещё не видели на концертах певицы. Программа обещает море света, ослепительные спецэффекты и незабываемую атмосферу. Кроме того, зрители смогут услышать новые песни, которые легко смогут выучить до самого концерта!",
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "1-й А микрорайон, 7",
+            "canonicalPath": null,
+            "primaryCityId": "city_1501321",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": "Главная «Царица» современной pop-сцены возвращается с грандиозным шоу мирового уровня. Огненные спецэффекты, профессиональная танцевальная труппа, невероятные костюмы и, конечно, любимые хиты, которые знает наизусть вся…"
+          },
+          "createdAt": "2026-11-03T20:40:01.228Z",
+          "eventTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Курган",
+          "eventSlug": "tc-69fd82eadb42bf5f5966403b-anna-asti-сольныи-концерт-шоу-царица-в-г-курган",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_1501321",
+          "cityTitle": "Курган",
+          "venueId": "venue_5df8a58d321b864b297e5575",
+          "venueTitle": "Ледовый Дворец Спорта им. Парышева",
+          "venueAddress": "1-й А микрорайон, 7",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=69fd82eadb42bf5f5966403b",
+              "externalId": "69fd82eadb42bf5f5966403b",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "city": "Курган",
+        "venue": "Ледовый Дворец Спорта им. Парышева",
+        "address": "1-й А микрорайон, 7",
+        "ageLimit": "12",
+        "offerMin": 2000,
+        "activeOffers": 24,
+        "futureSessions": [
+          "2027-03-14 15:00:00"
+        ]
+      }
+    },
+    "evt_69e5f0546f2ef39d67a00eda": {
+      "eventId": "evt_69e5f0546f2ef39d67a00eda",
+      "eventPageId": "95d20c5c-51c0-4007-9ae8-467e6afc3fce",
+      "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-ryazan",
+      "sourceTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Рязань",
+      "sourceDescription": "Anna Asti представляет новое шоу «Царица», которое обещает стать настоящим праздником для всех её поклонников. Это будет шоу, которое нельзя пропустить — с масштабными спецэффектами, завораживающей хореографией и, конечно, любимыми хитами.<br><br>«Я очень горжусь своей #Astifam и безгранично благодарна судьбе за то, что подарила мне таких невероятно талантливых людей в команду. Я восхищаюсь тем, как они любят своё дело и всегда выкладываются на все 100%. Каждый раз, выходя на сцену, мы стремимся создать настоящий праздник для вас, дорогие зрители», — делится своими ожиданиями Anna Asti.<br><br>Многое из того, что будет представлено на шоу «Царица», зрители ещё не видели на концертах певицы. Программа обещает море света, ослепительные спецэффекты и незабываемую атмосферу. Кроме того, зрители смогут услышать новые песни, которые легко смогут выучить до самого концерта!",
+      "legacyOverrideDescription": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Главная «Царица» современной pop-сцены возвращается с грандиозным шоу мирового уровня. Огненные спецэффекты, профессиональная танцевальная труппа, невероятные костюмы и, конечно, любимые хиты, которые знает наизусть вся страна.\n\nПодойдёт всем, кто хочет петь в унисон, танцевать до упада и прочувствовать главные треки о любви. Такая программа проходит в нескольких городах, с 4 декабря 2026 - 14 марта 2027: это 1-я остановка тура. Можно сравнить даты и остановиться на удобной.\n\n## Практическая информация\n\n- Место - «ДС Олимпийский», Рязань\n- Адрес - улица Зубковой, 12 к2\n- Продолжительность - около 150 минут\n- Возрастное ограничение - 12+\n- Билеты - от 2 800 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_69e5f0546f2ef39d67a00eda",
+        "kind": "SINGLE",
+        "slug": "tc-69e5f0546f2ef39d67a00eda-anna-asti-сольныи-концерт-шоу-царица-в-г-рязань",
+        "seoH1": null,
+        "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Рязань",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=69e5f0546f2ef39d67a00eda",
+            "externalId": "69e5f0546f2ef39d67a00eda",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_5cff7d3ab660679d74ef3b35",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-04/69e5f053785675c1e4a1444c.jpg",
+        "seoTitle": null,
+        "cityTitle": "Рязань",
+        "venueTitle": "ДС Олимпийский",
+        "description": "Anna Asti представляет новое шоу «Царица», которое обещает стать настоящим праздником для всех её поклонников. Это будет шоу, которое нельзя пропустить — с масштабными спецэффектами, завораживающей хореографией и, конечно, любимыми хитами.<br><br>«Я очень горжусь своей #Astifam и безгранично благодарна судьбе за то, что подарила мне таких невероятно талантливых людей в команду. Я восхищаюсь тем, как они любят своё дело и всегда выкладываются на все 100%. Каждый раз, выходя на сцену, мы стремимся создать настоящий праздник для вас, дорогие зрители», — делится своими ожиданиями Anna Asti.<br><br>Многое из того, что будет представлено на шоу «Царица», зрители ещё не видели на концертах певицы. Программа обещает море света, ослепительные спецэффекты и незабываемую атмосферу. Кроме того, зрители смогут услышать новые песни, которые легко смогут выучить до самого концерта!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "улица Зубковой, 12 к2",
+        "canonicalPath": null,
+        "primaryCityId": "city_500096",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": "Главная «Царица» современной pop-сцены возвращается с грандиозным шоу мирового уровня. Огненные спецэффекты, профессиональная танцевальная труппа, невероятные костюмы и, конечно, любимые хиты, которые знает наизусть вся…"
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Рязань",
+        "seoH1": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Рязань",
+        "seoTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Рязань | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/anna-asti-solnyi-koncert-shou-carica-v-g-ryazan",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "0331b64a-f15a-4a33-ba0f-8ddbb4db12c4",
+          "eventId": "evt_69e5f0546f2ef39d67a00eda",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_69e5f0546f2ef39d67a00eda",
+            "kind": "SINGLE",
+            "slug": "tc-69e5f0546f2ef39d67a00eda-anna-asti-сольныи-концерт-шоу-царица-в-г-рязань",
+            "seoH1": null,
+            "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Рязань",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=69e5f0546f2ef39d67a00eda",
+                "externalId": "69e5f0546f2ef39d67a00eda",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_5cff7d3ab660679d74ef3b35",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-04/69e5f053785675c1e4a1444c.jpg",
+            "seoTitle": null,
+            "cityTitle": "Рязань",
+            "venueTitle": "ДС Олимпийский",
+            "description": "Anna Asti представляет новое шоу «Царица», которое обещает стать настоящим праздником для всех её поклонников. Это будет шоу, которое нельзя пропустить — с масштабными спецэффектами, завораживающей хореографией и, конечно, любимыми хитами.<br><br>«Я очень горжусь своей #Astifam и безгранично благодарна судьбе за то, что подарила мне таких невероятно талантливых людей в команду. Я восхищаюсь тем, как они любят своё дело и всегда выкладываются на все 100%. Каждый раз, выходя на сцену, мы стремимся создать настоящий праздник для вас, дорогие зрители», — делится своими ожиданиями Anna Asti.<br><br>Многое из того, что будет представлено на шоу «Царица», зрители ещё не видели на концертах певицы. Программа обещает море света, ослепительные спецэффекты и незабываемую атмосферу. Кроме того, зрители смогут услышать новые песни, которые легко смогут выучить до самого концерта!",
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "улица Зубковой, 12 к2",
+            "canonicalPath": null,
+            "primaryCityId": "city_500096",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": "Главная «Царица» современной pop-сцены возвращается с грандиозным шоу мирового уровня. Огненные спецэффекты, профессиональная танцевальная труппа, невероятные костюмы и, конечно, любимые хиты, которые знает наизусть вся…"
+          },
+          "createdAt": "2026-11-03T18:11:24.794Z",
+          "eventTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Рязань",
+          "eventSlug": "tc-69e5f0546f2ef39d67a00eda-anna-asti-сольныи-концерт-шоу-царица-в-г-рязань",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_500096",
+          "cityTitle": "Рязань",
+          "venueId": "venue_5cff7d3ab660679d74ef3b35",
+          "venueTitle": "ДС Олимпийский",
+          "venueAddress": "улица Зубковой, 12 к2",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=69e5f0546f2ef39d67a00eda",
+              "externalId": "69e5f0546f2ef39d67a00eda",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "city": "Рязань",
+        "venue": "ДС Олимпийский",
+        "address": "улица Зубковой, 12 к2",
+        "ageLimit": "12",
+        "offerMin": 2800,
+        "activeOffers": 36,
+        "futureSessions": [
+          "2026-12-04 17:00:00"
+        ]
+      }
+    },
+    "evt_69fd8dd4a7835719e4d9f05e": {
+      "eventId": "evt_69fd8dd4a7835719e4d9f05e",
+      "eventPageId": "3b816506-41c1-4367-972d-07a486ef499d",
+      "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-tula",
+      "sourceTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Тула",
+      "sourceDescription": "Anna Asti представляет новое шоу «Царица», которое обещает стать настоящим праздником для всех её поклонников. Это будет шоу, которое нельзя пропустить — с масштабными спецэффектами, завораживающей хореографией и, конечно, любимыми хитами.<br><br>«Я очень горжусь своей #Astifam и безгранично благодарна судьбе за то, что подарила мне таких невероятно талантливых людей в команду. Я восхищаюсь тем, как они любят своё дело и всегда выкладываются на все 100%. Каждый раз, выходя на сцену, мы стремимся создать настоящий праздник для вас, дорогие зрители», — делится своими ожиданиями Anna Asti.<br><br>Многое из того, что будет представлено на шоу «Царица», зрители ещё не видели на концертах певицы. Программа обещает море света, ослепительные спецэффекты и незабываемую атмосферу. Кроме того, зрители смогут услышать новые песни, которые легко смогут выучить до самого концерта!",
+      "legacyOverrideDescription": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Главная «Царица» современной pop-сцены возвращается с грандиозным шоу мирового уровня. Огненные спецэффекты, профессиональная танцевальная труппа, невероятные костюмы и, конечно, любимые хиты, которые знает наизусть вся страна.\n\nПодойдёт всем, кто хочет петь в унисон, танцевать до упада и прочувствовать главные треки о любви. Это гастрольная серия (4 декабря 2026 - 14 марта 2027): дата 2 из 3. Если не успеваете на этот вечер, будет следующий.\n\n## Практическая информация\n\n- Место - «Тула Арена», Тула\n- Адрес - Калужское ш., 18\n- Продолжительность - около 150 минут\n- Возрастное ограничение - 12+\n- Билеты - от 3 000 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_69fd8dd4a7835719e4d9f05e",
+        "kind": "SINGLE",
+        "slug": "tc-69fd8dd4a7835719e4d9f05e-anna-asti-сольныи-концерт-шоу-царица-в-г-тула",
+        "seoH1": null,
+        "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Тула",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=69fd8dd4a7835719e4d9f05e",
+            "externalId": "69fd8dd4a7835719e4d9f05e",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_6391a172c3daadfc3313448a",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-05/69fd8dd4aabe5f918661f14d.png",
+        "seoTitle": null,
+        "cityTitle": "Тула",
+        "venueTitle": "Тула Арена",
+        "description": "Anna Asti представляет новое шоу «Царица», которое обещает стать настоящим праздником для всех её поклонников. Это будет шоу, которое нельзя пропустить — с масштабными спецэффектами, завораживающей хореографией и, конечно, любимыми хитами.<br><br>«Я очень горжусь своей #Astifam и безгранично благодарна судьбе за то, что подарила мне таких невероятно талантливых людей в команду. Я восхищаюсь тем, как они любят своё дело и всегда выкладываются на все 100%. Каждый раз, выходя на сцену, мы стремимся создать настоящий праздник для вас, дорогие зрители», — делится своими ожиданиями Anna Asti.<br><br>Многое из того, что будет представлено на шоу «Царица», зрители ещё не видели на концертах певицы. Программа обещает море света, ослепительные спецэффекты и незабываемую атмосферу. Кроме того, зрители смогут услышать новые песни, которые легко смогут выучить до самого концерта!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Калужское ш., 18",
+        "canonicalPath": null,
+        "primaryCityId": "city_480562",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": "Главная «Царица» современной pop-сцены возвращается с грандиозным шоу мирового уровня. Огненные спецэффекты, профессиональная танцевальная труппа, невероятные костюмы и, конечно, любимые хиты, которые знает наизусть вся…"
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Тула",
+        "seoH1": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Тула",
+        "seoTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Тула | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/anna-asti-solnyi-koncert-shou-carica-v-g-tula",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "af8dc060-020f-46e5-b508-29c1c973d3fd",
+          "eventId": "evt_69fd8dd4a7835719e4d9f05e",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_69fd8dd4a7835719e4d9f05e",
+            "kind": "SINGLE",
+            "slug": "tc-69fd8dd4a7835719e4d9f05e-anna-asti-сольныи-концерт-шоу-царица-в-г-тула",
+            "seoH1": null,
+            "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Тула",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=69fd8dd4a7835719e4d9f05e",
+                "externalId": "69fd8dd4a7835719e4d9f05e",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_6391a172c3daadfc3313448a",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-05/69fd8dd4aabe5f918661f14d.png",
+            "seoTitle": null,
+            "cityTitle": "Тула",
+            "venueTitle": "Тула Арена",
+            "description": "Anna Asti представляет новое шоу «Царица», которое обещает стать настоящим праздником для всех её поклонников. Это будет шоу, которое нельзя пропустить — с масштабными спецэффектами, завораживающей хореографией и, конечно, любимыми хитами.<br><br>«Я очень горжусь своей #Astifam и безгранично благодарна судьбе за то, что подарила мне таких невероятно талантливых людей в команду. Я восхищаюсь тем, как они любят своё дело и всегда выкладываются на все 100%. Каждый раз, выходя на сцену, мы стремимся создать настоящий праздник для вас, дорогие зрители», — делится своими ожиданиями Anna Asti.<br><br>Многое из того, что будет представлено на шоу «Царица», зрители ещё не видели на концертах певицы. Программа обещает море света, ослепительные спецэффекты и незабываемую атмосферу. Кроме того, зрители смогут услышать новые песни, которые легко смогут выучить до самого концерта!",
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "Калужское ш., 18",
+            "canonicalPath": null,
+            "primaryCityId": "city_480562",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": "Главная «Царица» современной pop-сцены возвращается с грандиозным шоу мирового уровня. Огненные спецэффекты, профессиональная танцевальная труппа, невероятные костюмы и, конечно, любимые хиты, которые знает наизусть вся…"
+          },
+          "createdAt": "2026-11-03T18:11:24.508Z",
+          "eventTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Тула",
+          "eventSlug": "tc-69fd8dd4a7835719e4d9f05e-anna-asti-сольныи-концерт-шоу-царица-в-г-тула",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_480562",
+          "cityTitle": "Тула",
+          "venueId": "venue_6391a172c3daadfc3313448a",
+          "venueTitle": "Тула Арена",
+          "venueAddress": "Калужское ш., 18",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=69fd8dd4a7835719e4d9f05e",
+              "externalId": "69fd8dd4a7835719e4d9f05e",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "city": "Тула",
+        "venue": "Тула Арена",
+        "address": "Калужское ш., 18",
+        "ageLimit": "12",
+        "offerMin": 3000,
+        "activeOffers": 45,
+        "futureSessions": [
+          "2026-12-06 17:00:00"
+        ]
+      }
+    },
+    "evt_69fa2bd974a803f6a1a427d9": {
+      "eventId": "evt_69fa2bd974a803f6a1a427d9",
+      "eventPageId": "ea2c25aa-4e4f-4135-a029-a1bcf5da4212",
+      "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-habarovsk",
+      "sourceTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Хабаровск",
+      "sourceDescription": "Anna Asti представляет новое шоу «Царица», которое обещает стать настоящим праздником для всех её поклонников. Это будет шоу, которое нельзя пропустить — с масштабными спецэффектами, завораживающей хореографией и, конечно, любимыми хитами.<br><br>«Я очень горжусь своей #Astifam и безгранично благодарна судьбе за то, что подарила мне таких невероятно талантливых людей в команду. Я восхищаюсь тем, как они любят своё дело и всегда выкладываются на все 100%. Каждый раз, выходя на сцену, мы стремимся создать настоящий праздник для вас, дорогие зрители», — делится своими ожиданиями Anna Asti.<br><br>Многое из того, что будет представлено на шоу «Царица», зрители ещё не видели на концертах певицы. Программа обещает море света, ослепительные спецэффекты и незабываемую атмосферу. Кроме того, зрители смогут услышать новые песни, которые легко смогут выучить до самого концерта!",
+      "legacyOverrideDescription": "«ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Хабаровск».\n\nГлавная «Царица» современной pop-сцены возвращается с грандиозным шоу мирового уровня. Огненные спецэффекты, профессиональная танцевальная труппа, невероятные костюмы и, конечно, любимые хиты, которые знает наизусть вся страна. Подойдёт всем, кто хочет петь в унисон, танцевать до упада и прочувствовать главные треки о любви.\n\n## Практическая информация\n\n- Место - «Ерофей Арена», Хабаровск\n- Адрес - ул. Морозова Павла Леонтьевича, д. 83\n- Продолжительность - около 150 минут\n- Возрастное ограничение - 12+\n- Билеты - от 3 000 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_69fa2bd974a803f6a1a427d9",
+        "kind": "SINGLE",
+        "slug": "tc-69fa2bd974a803f6a1a427d9-anna-asti-сольныи-концерт-шоу-царица-в-г-хабаровск",
+        "seoH1": null,
+        "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Хабаровск",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=69fa2bd974a803f6a1a427d9",
+            "externalId": "69fa2bd974a803f6a1a427d9",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_60e70a8e75aaebcb52fa96f4",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-05/69fa2bd9b1b60eaeb270d1cb.png",
+        "seoTitle": null,
+        "cityTitle": "Хабаровск",
+        "venueTitle": "Ерофей Арена",
+        "description": "Anna Asti представляет новое шоу «Царица», которое обещает стать настоящим праздником для всех её поклонников. Это будет шоу, которое нельзя пропустить — с масштабными спецэффектами, завораживающей хореографией и, конечно, любимыми хитами.<br><br>«Я очень горжусь своей #Astifam и безгранично благодарна судьбе за то, что подарила мне таких невероятно талантливых людей в команду. Я восхищаюсь тем, как они любят своё дело и всегда выкладываются на все 100%. Каждый раз, выходя на сцену, мы стремимся создать настоящий праздник для вас, дорогие зрители», — делится своими ожиданиями Anna Asti.<br><br>Многое из того, что будет представлено на шоу «Царица», зрители ещё не видели на концертах певицы. Программа обещает море света, ослепительные спецэффекты и незабываемую атмосферу. Кроме того, зрители смогут услышать новые песни, которые легко смогут выучить до самого концерта!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "ул. Морозова Павла Леонтьевича, д. 83",
+        "canonicalPath": null,
+        "primaryCityId": "city_2022890",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": "Главная «Царица» современной pop-сцены возвращается с грандиозным шоу мирового уровня. Огненные спецэффекты, профессиональная танцевальная труппа, невероятные костюмы и, конечно, любимые хиты, которые знает наизусть вся…"
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Хабаровск",
+        "seoH1": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Хабаровск",
+        "seoTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Хабаровск | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/anna-asti-solnyi-koncert-shou-carica-v-g-habarovsk",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "8a59919b-343e-480c-966e-405e982eeaae",
+          "eventId": "evt_69fa2bd974a803f6a1a427d9",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_69fa2bd974a803f6a1a427d9",
+            "kind": "SINGLE",
+            "slug": "tc-69fa2bd974a803f6a1a427d9-anna-asti-сольныи-концерт-шоу-царица-в-г-хабаровск",
+            "seoH1": null,
+            "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Хабаровск",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=69fa2bd974a803f6a1a427d9",
+                "externalId": "69fa2bd974a803f6a1a427d9",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_60e70a8e75aaebcb52fa96f4",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-05/69fa2bd9b1b60eaeb270d1cb.png",
+            "seoTitle": null,
+            "cityTitle": "Хабаровск",
+            "venueTitle": "Ерофей Арена",
+            "description": "Anna Asti представляет новое шоу «Царица», которое обещает стать настоящим праздником для всех её поклонников. Это будет шоу, которое нельзя пропустить — с масштабными спецэффектами, завораживающей хореографией и, конечно, любимыми хитами.<br><br>«Я очень горжусь своей #Astifam и безгранично благодарна судьбе за то, что подарила мне таких невероятно талантливых людей в команду. Я восхищаюсь тем, как они любят своё дело и всегда выкладываются на все 100%. Каждый раз, выходя на сцену, мы стремимся создать настоящий праздник для вас, дорогие зрители», — делится своими ожиданиями Anna Asti.<br><br>Многое из того, что будет представлено на шоу «Царица», зрители ещё не видели на концертах певицы. Программа обещает море света, ослепительные спецэффекты и незабываемую атмосферу. Кроме того, зрители смогут услышать новые песни, которые легко смогут выучить до самого концерта!",
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "ул. Морозова Павла Леонтьевича, д. 83",
+            "canonicalPath": null,
+            "primaryCityId": "city_2022890",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": "Главная «Царица» современной pop-сцены возвращается с грандиозным шоу мирового уровня. Огненные спецэффекты, профессиональная танцевальная труппа, невероятные костюмы и, конечно, любимые хиты, которые знает наизусть вся…"
+          },
+          "createdAt": "2026-11-03T18:11:24.600Z",
+          "eventTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Хабаровск",
+          "eventSlug": "tc-69fa2bd974a803f6a1a427d9-anna-asti-сольныи-концерт-шоу-царица-в-г-хабаровск",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_2022890",
+          "cityTitle": "Хабаровск",
+          "venueId": "venue_60e70a8e75aaebcb52fa96f4",
+          "venueTitle": "Ерофей Арена",
+          "venueAddress": "ул. Морозова Павла Леонтьевича, д. 83",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=69fa2bd974a803f6a1a427d9",
+              "externalId": "69fa2bd974a803f6a1a427d9",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "city": "Хабаровск",
+        "venue": "Ерофей Арена",
+        "address": "ул. Морозова Павла Леонтьевича, д. 83",
+        "ageLimit": "12",
+        "offerMin": 3000,
+        "activeOffers": 32,
+        "futureSessions": [
+          "2026-11-15 10:00:00"
+        ]
+      }
+    }
+  }
+}

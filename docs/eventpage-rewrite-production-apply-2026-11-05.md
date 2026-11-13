@@ -24,7 +24,7 @@
 - Снимок production-записей, связей, маршрутов, агрегатов и прежних редакций перед изменением: `data/ticketscloud/editorial/eventpage-pre-rewrite-production-2026-11-05.json`.
 - Архив оригиналов Вассы (2 Event ID): `data/ticketscloud/editorial/vassa-source-archive-2026-11-05.json`.
 - Архив оригиналов и прежних оверрайдов прогулки (178 Event ID): `data/ticketscloud/editorial/petro-source-archive-2026-11-05.json`.
-- Обновлённая очередь: `docs/eventpage-rewrite-work-queue-2026-11-04.csv`.
+- Обновлённая очередь: `docs/eventpage-rewrite-work-queue-2026-11-04.csv.gz`.
 
 ## Редакционные ссылки
 

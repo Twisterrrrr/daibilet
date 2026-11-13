@@ -364,3 +364,51 @@ identity, factual copy and object-specific imagery are reviewed.
 
 **Статус:** Активно / Отменено / Заменено ссылкой на новую запись
 ```
+
+## 2026-11-12 — Imported place candidate versus editorial PDP
+
+**Decision:** An imported Venue with `pageStatus=CANDIDATE` is a public,
+accessible basic PDP and must return HTTP 200 with `noindex, follow` by default.
+Missing editorial fields must not turn that candidate route into a 404; they
+remain visible as completion requirements in the editor. After an editor
+completes and publishes the PDP, it becomes indexable and enters the public
+sitemap. `HIDDEN` remains unavailable. Do not expose draft editorial content
+while serving the candidate page.
+
+**Why:** Availability and search indexing are separate controls. Imported
+places should be reviewable and usable as simple informational cards before
+they have a full editorial profile or sales contract; publication is the
+editorial gate for search.
+
+**Implementation status:** Implemented locally on 2026-11-12: CANDIDATE detail
+routes bypass missing-copy gates and remain noindex; the admin derives indexation
+from editorial status; PUBLISHED pages are indexable regardless of ticket
+availability and remain eligible for sitemap verification. City-page venue
+counters are recalculated from the matched session-to-venue links. Regression
+tests and typechecks pass locally; staging verification is pending.
+
+## 2026-11-12 — Safe automatic migration from legacy Event URLs
+
+**Decision:** Preserve old Event/slot URLs as fallback until a stable EventPage
+is publicly published. After publication, issue a permanent redirect only when
+the old path maps to the Event through an exact Event ID and that Event is
+explicitly linked to that EventPage. Never infer URL ownership from title,
+city, venue, provider parent, or a partial ID. If a route is ambiguous, the
+EventPage is still draft, or no exact target exists, do not redirect; retain a
+working legacy response where the source Event is public, otherwise return the
+appropriate not-found response. Conflicts and unresolved paths must appear in
+the dry-run report and block automatic redirect activation.
+
+**Why:** Old indexed links must not be lost during the EventPage migration, but
+automatically guessed redirects can merge distinct local events or tours and
+send visitors to the wrong content. Publication is the cutover gate: draft
+content must not become a public redirect target.
+
+**Implementation status:** Decision only; the public resolver currently reads
+EventPage slugs and Event IDs but does not use `EventPageRoute` as a redirect
+map. The route table is metadata, not proof that redirects work. Implement an
+exact-ID route-map dry run, conflict reporting, and public permanent redirects
+in code; validate legacy fallback and redirect behavior on staging before
+populating production route mappings. Hidden/removed Events without an exact
+published EventPage remain 404 unless a later reviewed lifecycle policy says
+otherwise.

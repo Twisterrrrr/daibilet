@@ -1,0 +1,207 @@
+{
+  "capturedAt": "2026-11-10T04:43:35.987Z",
+  "purpose": "Pre-rewrite production snapshot; source text archived, rewrite will be active EventPage editorial content.",
+  "items": {
+    "evt_tep_1276": {
+      "eventId": "evt_tep_1276",
+      "eventPageId": "5606c7c0-d517-4ea3-acbf-32c32f4c0a78",
+      "slug": "novogodnii-korporativ-17-23-i-24-dekabrya-2026-na-teplohode-river-palas-s-kruizom-i-razvlekatelnoi-programmoi-moskva",
+      "sourceDescription": "<p><strong>Начало мероприятия: 18:00 </strong></p><p>17:30 сбор гостей</p><p>18:00 отправление теплохода</p><p>23:00 окончание мероприятия</p>",
+      "legacyOverrideDescription": "«Новогодний корпоратив 17, 23 и 24 декабря 2026 на теплоходе Ривер Палас с круизом и развлекательной программой» - экскурсия в Москве, на площадке «Национальный центр «Россия»»., 14, Москва, Россия, 123100.\n\n## Практическая информация\n\n- Место - Национальный центр «Россия», Москва\n- Адрес - Краснопресненская наб., 14, Москва, Россия, 123100\n- Продолжительность - около 300 минут\n- Билеты - от 18 990 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "title": "Новогодний корпоратив 17, 23 и 24 декабря 2026 на теплоходе Ривер Палас с круизом и развлекательной программой",
+        "summary": null,
+        "seoH1": "Новогодний корпоратив 17, 23 и 24 декабря 2026 на теплоходе Ривер Палас с круизом и развлекательной программой",
+        "seoTitle": "Новогодний корпоратив 17, 23 и 24 декабря 2026 на теплоходе Ривер Палас с круизом и развлекательной программой | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/novogodnii-korporativ-17-23-i-24-dekabrya-2026-na-teplohode-river-palas-s-kruizom-i-razvlekatelnoi-programmoi-moskva",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "46bb0ccd-2f4c-4d5f-be65-ed9d99129bcf",
+          "eventId": "evt_tep_1276",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_tep_1276",
+            "kind": "RECURRING",
+            "slug": "новогоднии-корпоратив-17-23-и-24-декабря-2026-на-теплоходе-ривер-палас-с-круизом-и-развлекательнои-программои-1276",
+            "seoH1": null,
+            "title": "Новогодний корпоратив 17, 23 и 24 декабря 2026 на теплоходе Ривер Палас с круизом и развлекательной программой",
+            "sources": [
+              {
+                "code": "TEPLOHOD",
+                "name": "Teplohod.info",
+                "externalId": "1276",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_tep_1",
+            "imageUrl": "https://cdn.teplohod.info/images/cache/Events/Event1276/dc51f34e41-1.jpg",
+            "seoTitle": null,
+            "cityTitle": "Москва",
+            "venueTitle": "Национальный центр «Россия»",
+            "description": "<p><strong>Начало мероприятия: 18:00 </strong></p><p>17:30 сбор гостей</p><p>18:00 отправление теплохода</p><p>23:00 окончание мероприятия</p>",
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "Краснопресненская наб., 14, Москва, Россия, 123100",
+            "canonicalPath": null,
+            "primaryCityId": "city_tep_1",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": null
+          },
+          "createdAt": "2026-11-03T19:35:16.719Z",
+          "eventTitle": "Новогодний корпоратив 17, 23, 24 и 26 декабря 2026 на теплоходе Ривер Палас с круизом и развлекательной программой",
+          "eventSlug": "новогоднии-корпоратив-17-23-и-24-декабря-2026-на-теплоходе-ривер-палас-с-круизом-и-развлекательнои-программои-1276",
+          "eventKind": "RECURRING",
+          "primaryCityId": "city_tep_1",
+          "cityTitle": "Москва",
+          "venueId": "venue_tep_1",
+          "venueTitle": "Национальный центр «Россия»",
+          "venueAddress": "Краснопресненская наб., 14, Москва, Россия, 123100",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TEPLOHOD",
+              "name": "Teplohod.info",
+              "sourceUrl": "https://account.teplohod.info/order/event-order?widget_id=14208&event_id=1276",
+              "externalId": "1276",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "currentEventFacts": {
+        "ageLimit": null,
+        "venue": "Национальный центр «Россия»",
+        "address": "Краснопресненская наб., 14, Москва, Россия, 123100",
+        "offerMin": 18990,
+        "activeOffers": 10,
+        "futureSessionStarts": [
+          "2026-12-17 15:00:00",
+          "2026-12-23 15:00:00",
+          "2026-12-24 15:00:00",
+          "2026-12-26 15:00:00"
+        ]
+      }
+    },
+    "evt_tep_1259": {
+      "eventId": "evt_tep_1259",
+      "eventPageId": "feda2d30-8788-4184-8c7d-299459d620af",
+      "slug": "novogodnii-korporativ-18-i-25-dekabrya-2026-na-teplohode-river-palas-s-kruizom-i-razvlekatelnoi-programmoi-moskva",
+      "sourceDescription": "<p><strong>Начало мероприятия:&nbsp;</strong></p><p>17:30 сбор гостей</p><p>18:00 отправление теплохода</p><p>23:00 окончание мероприятия</p>",
+      "legacyOverrideDescription": "«Новогодний корпоратив 18 и 25 декабря 2026 на теплоходе Ривер Палас с круизом и развлекательной программой» - экскурсия в Москве, на площадке «Национальный центр «Россия»»., 14, Москва, Россия, 123100.\n\n## Практическая информация\n\n- Место - Национальный центр «Россия», Москва\n- Адрес - Краснопресненская наб., 14, Москва, Россия, 123100\n- Продолжительность - около 300 минут\n- Билеты - от 24 500 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "title": "Новогодний корпоратив 18 и 25 декабря 2026 на теплоходе Ривер Палас с круизом и развлекательной программой",
+        "summary": null,
+        "seoH1": "Новогодний корпоратив 18 и 25 декабря 2026 на теплоходе Ривер Палас с круизом и развлекательной программой",
+        "seoTitle": "Новогодний корпоратив 18 и 25 декабря 2026 на теплоходе Ривер Палас с круизом и развлекательной программой | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/novogodnii-korporativ-18-i-25-dekabrya-2026-na-teplohode-river-palas-s-kruizom-i-razvlekatelnoi-programmoi-moskva",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "331340da-02ed-46eb-9d4d-3e583b4fd239",
+          "eventId": "evt_tep_1259",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_tep_1259",
+            "kind": "SINGLE",
+            "slug": "новогоднии-корпоратив-18-и-25-декабря-2026-на-теплоходе-ривер-палас-с-круизом-и-развлекательнои-программои-1259",
+            "seoH1": null,
+            "title": "Новогодний корпоратив 18 и 25 декабря 2026 на теплоходе Ривер Палас с круизом и развлекательной программой",
+            "sources": [
+              {
+                "code": "TEPLOHOD",
+                "name": "Teplohod.info",
+                "externalId": "1259",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_tep_1",
+            "imageUrl": "https://cdn.teplohod.info/images/cache/Events/Event1259/ea290ff72a-1.jpg",
+            "seoTitle": null,
+            "cityTitle": "Москва",
+            "venueTitle": "Национальный центр «Россия»",
+            "description": "<p><strong>Начало мероприятия:&nbsp;</strong></p><p>17:30 сбор гостей</p><p>18:00 отправление теплохода</p><p>23:00 окончание мероприятия</p>",
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "Краснопресненская наб., 14, Москва, Россия, 123100",
+            "canonicalPath": null,
+            "primaryCityId": "city_tep_1",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": null
+          },
+          "createdAt": "2026-11-03T20:43:13.711Z",
+          "eventTitle": "Новогодний корпоратив 18 и 25 декабря 2026 на теплоходе Ривер Палас с круизом и развлекательной программой",
+          "eventSlug": "новогоднии-корпоратив-18-и-25-декабря-2026-на-теплоходе-ривер-палас-с-круизом-и-развлекательнои-программои-1259",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_tep_1",
+          "cityTitle": "Москва",
+          "venueId": "venue_tep_1",
+          "venueTitle": "Национальный центр «Россия»",
+          "venueAddress": "Краснопресненская наб., 14, Москва, Россия, 123100",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TEPLOHOD",
+              "name": "Teplohod.info",
+              "sourceUrl": "https://account.teplohod.info/order/event-order?widget_id=14208&event_id=1259",
+              "externalId": "1259",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "currentEventFacts": {
+        "ageLimit": null,
+        "venue": "Национальный центр «Россия»",
+        "address": "Краснопресненская наб., 14, Москва, Россия, 123100",
+        "offerMin": 28500,
+        "activeOffers": 2,
+        "futureSessionStarts": [
+          "2026-12-18 15:00:00"
+        ]
+      }
+    }
+  }
+}\n

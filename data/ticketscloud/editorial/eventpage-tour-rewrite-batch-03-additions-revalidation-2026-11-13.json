@@ -1,0 +1,533 @@
+{
+  "startedAt": "2026-11-13T06:25:19.039Z",
+  "publicCacheInvalidated": true,
+  "cache": {
+    "ok": true,
+    "warm": "none",
+    "reason": "published 3 additional touring rewrites (43 EventPage, 43 EventID), batch 03 additions 2026-11-13"
+  },
+  "revalidated": 86,
+  "indexNowQueued": 43,
+  "eventPagePaths": 43,
+  "legacyPaths": 43,
+  "results": [
+    {
+      "slug": "shura-penza",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "shura-6ae1b1970b51c66e6b231e92",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "shura-kemerovo",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "shura-6aa315d5c6a1e6d667517eea",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "shura-kazan",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tc-69a80f23bc4e6b6688330f10-shura",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "shura-volgograd",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "shura-6aaee0bde285cf74d1c74d99",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "shura-ulan-ude",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "shura-6aa98deb27ef5536ac75d69d",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "shura-tomsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "shura-6aa31c4ee0ee08b94c3db3d5",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "shura-lipeck",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "shura-6a9043388cfdfb9023e69cac",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "shura-saratov",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "shura-6a7f31d58748aee7347f95d6",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "shura-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "shura-6aa9845aba4079b2fa559d23",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "shura-irkutsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "shura-6a7f617e85d93155c66b12c4",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "shura-vladivostok",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "shura-6a7f5e4af3622d1e4079fdf3",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "shura-volgograd-2",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "shura-6ab3ce92e34ed8bc76e0b78a",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "shura-chelyabinsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tc-69e74b67f1dc9db591136deb-shura",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "shura-ufa",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tc-69e67b2dc8fb254d708ba235-shura",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "shura-samara",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tc-69b040d961884aa8c8772f4b-shura",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "shura-nizhniy-novgorod",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tc-69a54a462f10714ffa03da5a-shura",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "shura-voronezh",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tc-69b0435fccddb4e5f2a03b1a-shura",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-voronezh",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-6aee380ce2443c855170bdab",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-rostov-na-donu",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-6aee27373e51cf84832de54b",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-krasnodar",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-6aede501c6f431f331bcd41c",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-chelyabinsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-6adf800e55a18bbac897f5c5",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-ufa",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-6ada07444d9876ffa71f9aca",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-tyumen",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-6ad9fbb1a5e54f1a3a8f80b5",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-ekaterinburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-6ad8ea79d504d9b6f330f92a",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-perm",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-6ad8df569c1641cb1e9e92b0",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-izhevsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-6ad8cfdf2699c05cb9dbd2f3",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-kazan",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-6ab16e8ecb104f3265d47df9",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-nizhniy-novgorod",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-6ab16a495107893b0d64a793",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-vladimir",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-6ab16569887ba6b9dd25666e",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-penza",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-6ada16e305c4496a1704384b",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-samara",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-6ada13c3ab7401d1e584a6af",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-tula",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-6ab17431161fd9902f6a81de",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-yaroslavl",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "megamozg-6ab15fe8795a3029260bfb86",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "call-me-karizma-17-aprelya-novosibirsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "call-me-karizma-17-aprelya-novosibirsk-6ac8ec6c5aa1b4370eadf622",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "call-me-karizma-10-aprelya-krasnodar",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "call-me-karizma-10-aprelya-krasnodar-6a832e7b85e603f946e8529b",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "call-me-karizma-25-aprelya-samara",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "call-me-karizma-25-aprelya-samara-6a83325e05a0c2c7e8ebe86a",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "call-me-karizma-9-aprelya-rostov-na-donu",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "call-me-karizma-9-aprelya-rostov-na-donu-6a832a5f8d1562e48b949ca9",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "call-me-karizma-16-aprelya-ekaterinburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "call-me-karizma-16-aprelya-ekaterinburg-6a832ef1ee9565ee56584882",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "call-me-karizma-23-aprelya-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "call-me-karizma-23-aprelya-sankt-peterburg-6a833165bcc0da660b9ec09a",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "call-me-karizma-2-aprelya-nizhnii-novgorod-nizhniy-novgorod",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "call-me-karizma-2-aprelya-nizhnii-novgorod-6a8325dc270cbffc3ebf4f60",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "call-me-karizma-18-aprelya-krasnoyarsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "call-me-karizma-18-aprelya-krasnoyarsk-6a8330ce5d4e8a4127ca3eac",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "call-me-karizma-24-aprelya-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "call-me-karizma-24-aprelya-moskva-6a8331ef05a0c2c7e8ebe768",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "call-me-karizma-3-aprelya-kazan",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "call-me-karizma-3-aprelya-kazan-6a832d5a270cbffc3ebf5418",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    }
+  ],
+  "completedAt": "2026-11-13T06:25:19.642Z",
+  "complete": true
+}
