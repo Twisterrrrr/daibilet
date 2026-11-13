@@ -60,6 +60,10 @@ export function PlacesV2Preview({ venues, total }: { venues: PublicVenueDto[]; t
     .map((type) => ({ type, venues: venues.filter((v) => typeLabel(v) === type) }))
     .filter((g) => g.venues.length)
     .sort((a, b) => b.venues.length - a.venues.length);
+  const MAJOR_MIN = 2;
+  const major = groups.filter((g) => g.venues.length >= MAJOR_MIN);
+  const minor = groups.filter((g) => g.venues.length < MAJOR_MIN);
+  const minorVenues = minor.flatMap((g) => g.venues);
 
   return (
     <div className={`v2 ${fontUnbounded.variable}`}>
@@ -107,7 +111,7 @@ export function PlacesV2Preview({ venues, total }: { venues: PublicVenueDto[]; t
         </section>
       ) : null}
 
-      {groups.map((group, gi) => (
+      {major.map((group, gi) => (
         <Fragment key={group.type}>
           <section className="places-section">
             <div className="container">
@@ -139,6 +143,22 @@ export function PlacesV2Preview({ venues, total }: { venues: PublicVenueDto[]; t
           ) : null}
         </Fragment>
       ))}
+
+      {minorVenues.length ? (
+        <section className="places-section">
+          <div className="container">
+            <div className="featured-places__head">
+              <div>
+                <h2>Ещё площадки</h2>
+                <p>{pluralVenues(minorVenues.length)} штучных: цирк, зоопарк, планетарий и другое</p>
+              </div>
+            </div>
+            <div className="places-grid">
+              {minorVenues.slice(0, 8).map((v) => <PlaceCard key={v.id} v={v} />)}
+            </div>
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 }
