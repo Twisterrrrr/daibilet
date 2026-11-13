@@ -24,6 +24,7 @@
 [Teplohod PDP: выборочные статические WebP обложки - 21.10.2026](./teplohod-pdp-webp-pilot-2026-10-21.md)
 [Городские хабы: сверка коммитов и незавершённых правок - 12.11.2026](./city-hub-work-log-2026-11-12.md)
 [Архив изображений и переход на активную статику - 13.11.2026](./image-archive-runtime-migration-2026-11-13.md)
+[Канон структуры архива изображений - 13.11.2026](./image-archive-canon.md)
 [Карта рабочих копий и переносов - 10.11.2026](./local-workspace-inventory-2026-11-10.md)
 [Сверка tours с активной копией Daibilet - 10.11.2026](./tours-vs-daibilet-audit-2026-11-10.md)
 [Диагностика production-сети и диска](./production-network-and-disk-diagnostics.md)

@@ -1,5 +1,22 @@
 # Decision Log — Daibilet
 
+## 2026-11-13 — Каноническое хранение изображений
+
+Единый облачный архив `D:\Yandex.Disk\Daibilet_images` организован по
+владельцам контента: `main`, `cities`, `blog`, `places`, `events`,
+`collections`, `banners`, `shared` и `provenance`. Городские превью, дневные и
+ночные hero, identity, маршруты и пригороды лежат под `cities/<slug>`; карточки
+и оригиналы отдельных объектов — под `places/<city>/<place>`. Повторяющееся
+содержимое хранится однократно по SHA-256, разные версии одного исходного пути
+сохраняются отдельно. `MANIFEST.csv` — каноническая карта исходных путей,
+версий и архивных адресов; `RUNTIME_REFERENCES.csv` остаётся лишь снимком и не
+используется как основание для удаления. Подробные правила и точная структура:
+[канон архива изображений](./image-archive-canon.md).
+
+Архивная перекладка не меняет публичные URL и бинарное содержимое сайта.
+Удаление Git/production-копий разрешается только в отдельном runtime-переходе
+после smoke-проверок и готового отката.
+
 ## 2026-11-12 — Imported place candidate versus editorial PDP
 
 **Decision:** An imported Venue with `pageStatus=CANDIDATE` is a public,
