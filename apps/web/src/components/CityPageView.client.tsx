@@ -338,7 +338,7 @@ export function CityPageView({
       (guide?.sights?.length ||
         guide?.mustSee?.length ||
         guide?.significantSuburbs?.length ||
-        (contentReady && (categories.length > 0 || (payload?.venues?.length || 0) > 0))),
+        guide?.dayRoutePresets?.length),
   );
   const hasFaq = unifiedFaq.length > 0;
   const hasSeo = Boolean(seoText);
@@ -374,7 +374,8 @@ export function CityPageView({
     !isCityHubSectionHidden(hubConfig, 'sights') &&
       (guide?.mustSee?.length ||
         guide?.sights?.length ||
-        (contentReady && (categories.length > 0 || (payload?.venues?.length || 0) > 0))),
+        guide?.significantSuburbs?.length ||
+        guide?.dayRoutePresets?.length),
   );
   const hasRoutesNav = Boolean(guide?.dayRoutePresets?.length);
   const hasSuburbsNav = Boolean(guide?.significantSuburbs?.length);
@@ -527,7 +528,6 @@ export function CityPageView({
                   categories={categories}
                   venues={payload.venues}
                   landings={payload.landings}
-                  allowFallback={contentReady}
                   editorial={editorial}
                   articles={[]}
                   sessions={payload.sessions}
@@ -1216,7 +1216,6 @@ function CitySightsSection({
   categories,
   venues,
   landings = [],
-  allowFallback = false,
   editorial = false,
   articles = [],
   sessions = [],
@@ -1231,7 +1230,6 @@ function CitySightsSection({
   categories: Array<[string, number]>;
   venues: PublicVenueDto[];
   landings?: PublicLandingDto[];
-  allowFallback?: boolean;
   editorial?: boolean;
   articles?: BlogCardDto[];
   sessions?: PublicSessionDto[];
@@ -1259,9 +1257,7 @@ function CitySightsSection({
     ? fromMustSee
     : fromSights.length
       ? fromSights
-      : allowFallback
-        ? buildFallbackMustSee(city, categories, venues)
-        : [];
+      : [];
   if (
     !places.length &&
     !articles.length &&
@@ -2472,23 +2468,6 @@ function dedupeHubSessions(sessions: PublicSessionDto[]): PublicSessionDto[] {
     out.push(session);
   }
   return out;
-}
-
-function buildFallbackMustSee(
-  city: PublicCityDto,
-  categories: Array<[string, number]>,
-  venues: PublicVenueDto[],
-): CityMustSeeItem[] {
-  const categoryPlaces: CityMustSeeItem[] = categories.slice(0, 3).map(([name, count]) => ({
-    name,
-    desc: `${pluralEvents(count)} в каталоге города ${city.name}: удобно начать выбор с этой категории.`,
-  }));
-  const venuePlaces: CityMustSeeItem[] = venues.slice(0, 3).map((venue) => ({
-    name: venue.name,
-    desc: `${pluralEvents(venue.events)} на странице площадки. Проверьте расписание, цену и ближайшие даты.`,
-    href: venueHref(venue),
-  }));
-  return [...categoryPlaces, ...venuePlaces];
 }
 
 function aboutCityPrepositional(city: PublicCityDto) {
