@@ -195,9 +195,12 @@ const CITY_DAYTIME_PREVIEW_SLUGS = new Set([
  * Catalog/home keep daytime; hubs without a night asset fall back to day.
  */
 const CITY_NIGHT_HUB_SLUGS = new Set([
+  'abakan',
+  'arhangelsk',
   'astrahan',
   'barnaul',
   'belgorod',
+  'blagoveschensk-amurskaya-oblast',
   'bryansk',
   'cheboksary',
   'chelyabinsk',
@@ -207,16 +210,19 @@ const CITY_NIGHT_HUB_SLUGS = new Set([
   'irkutsk',
   'ivanovo',
   'izhevsk',
+  'kaluga',
   'kaliningrad',
   'kazan',
   'kemerovo',
   'kirov-kirovskaya-oblast',
+  'kostroma',
   'krasnodar',
   'krasnoyarsk',
   'kurgan',
   'kursk',
   'lipeck',
   'moscow',
+  'murmansk',
   'nizhny-novgorod',
   'novosibirsk',
   'omsk',
@@ -224,19 +230,25 @@ const CITY_NIGHT_HUB_SLUGS = new Set([
   'orenburg',
   'penza',
   'perm',
+  'pskov',
   'rostov-on-don',
   'ryazan',
   'saint-petersburg',
   'samara',
   'saransk',
   'saratov',
+  'sevastopol',
+  'simferopol',
   'smolensk',
   'sochi',
   'sortavala',
   'stavropol',
   'suzdal',
+  'surgut',
+  'syktyvkar',
   'tambov',
   'tomsk',
+  'tolyatti',
   'tula',
   'tver',
   'tyumen',
@@ -245,12 +257,32 @@ const CITY_NIGHT_HUB_SLUGS = new Set([
   'ulyanovsk',
   'veliky-novgorod',
   'vladimir',
+  'vladikavkaz',
   'vladivostok',
   'volgograd',
   'vologda',
   'voronezh',
   'yaroslavl',
   'yoshkar-ola',
+  'yuzhno-sahalinsk',
+]);
+
+/** Newly generated hub covers are optimized WebP; legacy files keep their original paths. */
+const CITY_NIGHT_WEBP_SLUGS = new Set([
+  'abakan',
+  'arhangelsk',
+  'blagoveschensk-amurskaya-oblast',
+  'vladikavkaz',
+  'kaluga',
+  'kostroma',
+  'murmansk',
+  'pskov',
+  'sevastopol',
+  'simferopol',
+  'surgut',
+  'syktyvkar',
+  'tolyatti',
+  'yuzhno-sahalinsk',
 ]);
 
 function isUsableRemoteImage(url: string): boolean {
@@ -299,7 +331,8 @@ export function resolveCityNightImage(city: CityImageSource): string | null {
   const imageSlug = cityCardImageSlug(city);
   if (imageSlug === 'kirov-kirovskaya-oblast') return '/images/venues/kirov-kirovskaya-oblast/hero-generated-2026-11.png';
   if (!CITY_NIGHT_HUB_SLUGS.has(imageSlug)) return null;
-  return `/images/cities/night/${imageSlug}.png`;
+  const extension = CITY_NIGHT_WEBP_SLUGS.has(imageSlug) ? 'webp' : 'png';
+  return `/images/cities/night/${imageSlug}.${extension}`;
 }
 
 export function resolveCityCardImage(
