@@ -25,6 +25,18 @@ const typeLabel = (v: PublicVenueDto) => {
   return venueKindLabel(v.type, v.name) || 'Площадка';
 };
 
+/** Развлекательные подтипы - сводим в один блок «Развлечения» (штучные экземпляры). */
+const ENTERTAINMENT_SUBTYPES = new Set([
+  'zoo', 'circus', 'planetarium', 'aquarium', 'amusement_park', 'water_park',
+  'quest', 'observation_deck', 'cinema',
+]);
+
+function groupLabel(v: PublicVenueDto): string {
+  const subtype = String(v.placeSubtype || '').trim().toLowerCase();
+  if (ENTERTAINMENT_SUBTYPES.has(subtype)) return 'Развлечения';
+  return typeLabel(v);
+}
+
 function PlaceCard({ v }: { v: PublicVenueDto }) {
   return (
     <Link href={`/venues/${v.slug || ''}`} className="place-card">
@@ -55,14 +67,14 @@ function PlaceCard({ v }: { v: PublicVenueDto }) {
 
 export function PlacesV2Preview({ venues, total }: { venues: PublicVenueDto[]; total: number }) {
   const featured = venues.filter((v) => v.heroImageUrl).slice(0, 6);
-  const types = Array.from(new Set(venues.map(typeLabel)));
+  const types = Array.from(new Set(venues.map(groupLabel)));
   const groups = types
-    .map((type) => ({ type, venues: venues.filter((v) => typeLabel(v) === type) }))
+    .map((type) => ({ type, venues: venues.filter((v) => groupLabel(v) === type) }))
     .filter((g) => g.venues.length)
     .sort((a, b) => b.venues.length - a.venues.length);
   const MAJOR_MIN = 2;
-  const major = groups.filter((g) => g.venues.length >= MAJOR_MIN);
-  const minor = groups.filter((g) => g.venues.length < MAJOR_MIN);
+  const major = groups.filter((g) => g.type === 'Развлечения' || g.venues.length >= MAJOR_MIN);
+  const minor = groups.filter((g) => g.type !== 'Развлечения' && g.venues.length < MAJOR_MIN);
   const minorVenues = minor.flatMap((g) => g.venues);
 
   return (
