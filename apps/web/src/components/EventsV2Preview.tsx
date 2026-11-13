@@ -116,7 +116,13 @@ export function EventsV2Preview({ catalog, landings = [], articles = [] }: Props
                 <div className="bottom-cta__inner">
                   <div>
                     <h2>Подборки</h2>
-                    <p>{landings.slice(0, 3).map((l) => l.title).join(' · ')}</p>
+                    <ul className="mt-2 list-disc space-y-1 pl-5 text-white/90">
+                      {landings.slice(0, 4).map((l) => (
+                        <li key={l.slug}>
+                          <Link href={`/podborki/${l.slug}`} className="text-white/90 hover:text-white">{l.title}</Link>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                   <Link href="/podborki" className="btn btn--white btn--lg">Смотреть подборки →</Link>
                 </div>
@@ -144,7 +150,13 @@ export function EventsV2Preview({ catalog, landings = [], articles = [] }: Props
                     <div className="bottom-cta__inner">
                       <div>
                         <h2>Статьи</h2>
-                        <p>{articles.slice(0, 3).map((a) => a.title).join(' · ')}</p>
+                        <ul className="mt-2 list-disc space-y-1 pl-5 text-white/90">
+                          {articles.slice(0, 4).map((a) => (
+                            <li key={a.slug}>
+                              <Link href={`/blog/${a.slug}`} className="text-white/90 hover:text-white">{a.title}</Link>
+                            </li>
+                          ))}
+                        </ul>
                       </div>
                       <Link href="/blog" className="btn btn--white btn--lg">Читать →</Link>
                     </div>
