@@ -107,6 +107,9 @@ Builder: `apps/backend/src/public-venue.dto.ts` (+ legacy `apps/backend/src/dto.
 `catalogTheme?: string` (имя landing-рубрики). Тогда web группирует/делит строго по теме,
 без жанровых эвристик. Web пока группирует по `collectCatalogLabels` (жанровый уровень).
 
+Полный проект типизации (две оси: тип + списки, канонический набор рельс, резолвер,
+backfill, DTO) - в `docs/event-catalog-taxonomy.md`.
+
 ## Приёмка
 
 - Контракты: `packages/contracts` типы без ошибок.
