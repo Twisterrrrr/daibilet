@@ -94,6 +94,19 @@ Builder: `apps/backend/src/public-venue.dto.ts` (+ legacy `apps/backend/src/dto.
 4. B3/B4: программа и FAQ из `pdp.content.sections` (`kind: program/faq`) + `timeLabel` в items.
    `district` (C1) и `capacity` (C3) - отложены, источника в `Venue` нет, Prisma не трогаем.
 
+## F. Каталожная тема события (для точных рельс «Концерты/Спектакли/Экскурсии»)
+
+Проблема: у события нет нормализованного подтипа. `category` грубая (у Ticketscloud -
+часто generic «Мероприятия»), `subcategories`/`tags` - жанровые и шумные (уже чистятся
+`collectCatalogLabels`). Точная тема («Концерты», «Спектакли», «Экскурсии»...) выводится
+в `landing-rules.ts` (`matchingLandingSlugs`), но `toPublicCatalogListItem` не копирует
+`landingSlugs` в карточку.
+
+Нужно от Codex: пробросить в `PublicCatalogListItemDto` сигнал темы -
+`landingSlugs?: string[]` (из `matchingLandingSlugs`) и/или нормализованный
+`catalogTheme?: string` (имя landing-рубрики). Тогда web группирует/делит строго по теме,
+без жанровых эвристик. Web пока группирует по `collectCatalogLabels` (жанровый уровень).
+
 ## Приёмка
 
 - Контракты: `packages/contracts` типы без ошибок.

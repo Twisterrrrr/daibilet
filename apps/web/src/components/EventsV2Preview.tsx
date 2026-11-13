@@ -6,6 +6,7 @@ import { SafeImage } from '@/components/SafeImage.client';
 import { V2EventCard } from '@/components/V2EventCard';
 import { fontUnbounded } from '@/lib/fonts';
 import { pluralEvents } from '@/lib/format';
+import { collectCatalogLabels } from '@/lib/catalog-labels';
 import type { BlogCardDto } from '@/lib/blog-utils';
 import type { PublicCatalogDto, PublicLandingDto } from '@daibilet/contracts/public';
 
@@ -49,7 +50,7 @@ export function EventsV2Preview({ catalog, landings = [], articles = [] }: Props
 
   const groups: Array<{ category: string; items: typeof items }> = [];
   for (const it of items) {
-    const key = it.category || 'Другое';
+    const key = collectCatalogLabels(it, 1)[0] || it.category || 'Другое';
     let group = groups.find((g) => g.category === key);
     if (!group) {
       group = { category: key, items: [] };
@@ -57,7 +58,7 @@ export function EventsV2Preview({ catalog, landings = [], articles = [] }: Props
     }
     group.items.push(it);
   }
-  const rails = groups.filter((g) => g.items.length >= 2);
+  const rails = groups.filter((g) => g.items.length >= 2).sort((a, b) => b.items.length - a.items.length);
 
   return (
     <div className={`v2 ${fontUnbounded.variable}`}>
