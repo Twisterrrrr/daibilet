@@ -67,6 +67,21 @@ const REGION_TIME_ZONES = {
   'Ханты-Мансийский автономный округ': 'Asia/Yekaterinburg',
 };
 
+function sqlStringLiteral(value) {
+  return `'${String(value).replace(/'/g, "''")}'`;
+}
+
+/** SQL equivalent of resolveCityTimeZone for grouped catalog aggregates. */
+export function resolveCityTimeZoneSqlExpression(cityColumn = 'city.title', regionColumn = 'region.title') {
+  const cityCase = Object.entries(CITY_TIME_ZONE_OVERRIDES)
+    .sort(([left], [right]) => left.localeCompare(right, 'ru'))
+    .map(([city, zone]) => `when ${cityColumn} = ${sqlStringLiteral(city)} then ${sqlStringLiteral(zone)}`);
+  const regionCase = Object.entries(REGION_TIME_ZONES)
+    .sort(([left], [right]) => left.localeCompare(right, 'ru'))
+    .map(([region, zone]) => `when ${regionColumn} = ${sqlStringLiteral(region)} then ${sqlStringLiteral(zone)}`);
+  return `case ${[...cityCase, ...regionCase].join(' ')} else ${sqlStringLiteral(DEFAULT_CITY_TIME_ZONE)} end`;
+}
+
 const cityToRegion = routing.cityToRegion || {};
 
 function normalizeCityKey(value) {

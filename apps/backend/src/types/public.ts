@@ -10,6 +10,10 @@ import type {
 } from './common.js';
 import type { LandingContentBlockDto } from './landing.js';
 
+export type CatalogListKey = 'family_kids' | 'family_all' | 'free' | 'weekend';
+export interface CatalogTaxonomyLabel { slug: string; title: string }
+export interface CatalogListLabel { key: CatalogListKey; title: string }
+
 export interface PublicStatsDto extends ApiEnvelope {
   events: number;
   cities: number;
@@ -74,6 +78,10 @@ export interface PublicSessionDto extends PurchaseFields {
   offerTitle?: string | null;
   offerSourceCode?: string | null;
   category: string;
+  catalogCategory?: CatalogTaxonomyLabel | null;
+  catalogSubcategory?: CatalogTaxonomyLabel | null;
+  catalogLists?: CatalogListLabel[];
+  tagLabels?: string[];
   subcategories?: string[];
   tags: string[];
   kind?: string | null;
@@ -142,6 +150,7 @@ export interface PublicCatalogDto extends ApiEnvelope {
     categories: FacetCount[];
     subcategories: FacetCount[];
     tags?: FacetCount[];
+    catalogLists?: Array<CatalogListLabel & { events: number }>;
     landings: Array<{ slug: string; title: string; events: number }>;
     priceSteps: number[];
   };
@@ -196,6 +205,10 @@ export interface PublicEventDto extends SeoFields, PurchaseFields {
   description?: string | null;
   imageUrl?: string | null;
   category: string;
+  catalogCategory?: CatalogTaxonomyLabel | null;
+  catalogSubcategory?: CatalogTaxonomyLabel | null;
+  catalogLists?: CatalogListLabel[];
+  tagLabels?: string[];
   tags: string[];
   subcategories?: string[];
   city: string;

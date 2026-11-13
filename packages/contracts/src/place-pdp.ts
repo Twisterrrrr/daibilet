@@ -46,7 +46,6 @@ export const PLACE_SUBTYPE_OPTIONS: Record<PlaceType, readonly PlaceSubtypeOptio
   ],
   MUSEUM: [
     { value: 'museum', label: 'Музей', variant: 'museum' }, { value: 'gallery', label: 'Галерея', variant: 'museum' },
-    { value: 'planetarium', label: 'Планетарий', variant: 'museum' }, { value: 'aquarium', label: 'Океанариум', variant: 'museum' },
   ],
   RELIGION: [
     { value: 'church', label: 'Церковь' }, { value: 'chapel', label: 'Часовня' }, { value: 'cathedral', label: 'Собор' },
@@ -62,14 +61,15 @@ export const PLACE_SUBTYPE_OPTIONS: Record<PlaceType, readonly PlaceSubtypeOptio
     { value: 'embankment', label: 'Набережная', variant: 'urban_area' }, { value: 'district', label: 'Район', variant: 'urban_area' },
   ],
   THEATRE: [
-    { value: 'theatre', label: 'Театр', variant: 'theater' }, { value: 'cinema', label: 'Кинотеатр', variant: 'venue' },
-    { value: 'circus', label: 'Цирк', variant: 'attraction' }, { value: 'concert_hall', label: 'Концертный зал', variant: 'concert_hall' },
+    { value: 'theatre', label: 'Театр', variant: 'theater' }, { value: 'concert_hall', label: 'Концертный зал', variant: 'concert_hall' },
     { value: 'philharmonic', label: 'Филармония', variant: 'concert_hall' },
   ],
   ENTERTAINMENT: [
     { value: 'amusement_park', label: 'Парк аттракционов', variant: 'park' }, { value: 'zoo', label: 'Зоопарк', variant: 'attraction' },
     { value: 'water_park', label: 'Аквапарк', variant: 'attraction' }, { value: 'quest', label: 'Квест-пространство', variant: 'attraction' },
     { value: 'observation_deck', label: 'Смотровая площадка', variant: 'attraction' },
+    { value: 'circus', label: 'Цирк', variant: 'attraction' }, { value: 'cinema', label: 'Кинотеатр', variant: 'attraction' },
+    { value: 'planetarium', label: 'Планетарий', variant: 'attraction' }, { value: 'aquarium', label: 'Океанариум', variant: 'attraction' },
   ],
   FOOD: [
     { value: 'restaurant', label: 'Ресторан', variant: 'food' }, { value: 'cafe', label: 'Кафе', variant: 'food' },
@@ -194,8 +194,10 @@ export const PDP_SUBTYPE_CONTENT_HINTS: Record<string, Partial<Record<string, st
   'MUSEUM:aquarium': { collection: 'Опишите экспозиционные зоны и правила взаимодействия с животными, если они официально опубликованы.' },
   'THEATRE:concert_hall': { halls: 'Опишите концертный зал и его конфигурации; если предмет места — регулярные концерты, редактор может выбрать профиль «Концертный зал».' },
   'THEATRE:philharmonic': { repertoire_guide: 'Опишите оркестры, циклы и принцип абонементов. Состав конкретных концертов берите из афиши.' },
-  'THEATRE:cinema': { halls: 'Уточните залы и формат показа. Для кинозала редактор может выбрать профиль «Площадка», если он точнее.' },
-  'THEATRE:circus': { visit_facts: 'Уточните особенности посещения семейной площадки; конкретные представления и билеты поступают из афиши.' },
+  'ENTERTAINMENT:cinema': { halls: 'Уточните залы и формат показа. Ближайшие сеансы показывайте из актуального расписания.' },
+  'ENTERTAINMENT:circus': { visit_facts: 'Уточните особенности посещения семейной площадки; конкретные представления и билеты поступают из афиши.' },
+  'ENTERTAINMENT:planetarium': { visit_facts: 'Опишите подтверждённые форматы программ и правила посещения; расписание сеансов берите из афиши.' },
+  'ENTERTAINMENT:aquarium': { visit_facts: 'Опишите зоны и правила посещения; время кормлений указывайте только по актуальному расписанию.' },
   'ENTERTAINMENT:zoo': { zones: 'Опишите зоны и правила посещения животных. Расписание кормлений добавляйте только при наличии официального расписания.' },
   'ENTERTAINMENT:water_park': { entry_rules: 'Добавьте подтверждённые ограничения по росту, возрасту, безопасности и необходимой экипировке.' },
   'ENTERTAINMENT:quest': { visit_routes: 'Укажите подтверждённые параметры группы, возраст и длительность формата; доступные сеансы показываются из системы продаж.' },

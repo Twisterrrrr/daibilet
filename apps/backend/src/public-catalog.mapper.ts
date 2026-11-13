@@ -24,6 +24,12 @@ import {
 } from './public-destination.js';
 import type { DestinationType, TimeBucket } from './types/common.js';
 import type { PublicSessionDto } from './types/public.js';
+import {
+  catalogListsWithTitles,
+  normalizeCatalogTagLabels,
+  resolveCatalogLists,
+  resolveEventTaxonomy,
+} from './catalog-taxonomy.js';
 
 export interface PublicCatalogSlotRow {
   id?: string | null;
@@ -54,6 +60,11 @@ export interface PublicCatalogMappingRow {
   ageLimit?: string | null;
   imageUrl: string | null;
   category: string | null;
+  categorySlug?: string | null;
+  primarySubcategorySlug?: string | null;
+  primarySubcategoryTitle?: string | null;
+  freeAdmissionConfirmed?: boolean;
+  weekendSessionConfirmed?: boolean;
   cityId: string | null;
   city: string | null;
   citySlug: string | null;
@@ -69,6 +80,8 @@ export interface PublicCatalogMappingRow {
   venueMetroStation?: string | null;
   venueHeroImageUrl: string | null;
   venueKind: string | null;
+  venuePlaceType?: string | null;
+  venuePlaceSubtype?: string | null;
   overrideTitle: string | null;
   overrideMergeGroupKey: string | null;
   overrideDescription: string | null;
@@ -311,6 +324,43 @@ export function mapGroupedPublicSession(
     startsAt: session.startsAt,
     upcomingSlots,
   });
+  const taxonomy = resolveEventTaxonomy({
+    title: session.title,
+    category: row.category,
+    categorySlug: row.categorySlug,
+    editorialSubcategorySlug: row.primarySubcategorySlug,
+    editorialSubcategoryTitle: row.primarySubcategoryTitle,
+    sourceSubcategories: subcategories,
+    tags,
+    venue: session.venue,
+    venuePlaceType: row.venuePlaceType,
+    venuePlaceSubtype: row.venuePlaceSubtype,
+    ageLimit: session.ageLimit,
+    priceFrom: row.priceFrom,
+    freeAdmissionConfirmed: row.freeAdmissionConfirmed,
+    weekendSessionConfirmed: row.weekendSessionConfirmed,
+    landingSlugs: session.landingSlugs,
+    startsAt: session.startsAt,
+    upcomingSlots,
+    timeZone,
+  });
+  session.catalogCategory = taxonomy.category;
+  session.catalogSubcategory = taxonomy.subcategory;
+  session.catalogLists = catalogListsWithTitles(resolveCatalogLists({
+    title: session.title,
+    sourceSubcategories: subcategories,
+    tags,
+    venue: session.venue,
+    venuePlaceType: row.venuePlaceType,
+    venuePlaceSubtype: row.venuePlaceSubtype,
+    ageLimit: session.ageLimit,
+    priceFrom: row.priceFrom,
+    freeAdmissionConfirmed: row.freeAdmissionConfirmed,
+    startsAt: session.startsAt,
+    upcomingSlots,
+    timeZone,
+  }));
+  session.tagLabels = normalizeCatalogTagLabels(tags);
   session.manualLandingStatus = manualLandingStatus;
   return session;
 }

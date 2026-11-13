@@ -43,6 +43,10 @@ export function toPublicCatalogListItem(session: PublicSessionDto): PublicCatalo
   if (session.venueMetroStation != null) item.venueMetroStation = session.venueMetroStation;
   if (session.venueAddress != null) item.venueAddress = session.venueAddress;
   if (session.subcategories?.length) item.subcategories = session.subcategories.slice(0, 4);
+  if (session.catalogCategory !== undefined) item.catalogCategory = session.catalogCategory;
+  if (session.catalogSubcategory !== undefined) item.catalogSubcategory = session.catalogSubcategory;
+  if (session.catalogLists?.length) item.catalogLists = session.catalogLists;
+  if (session.tagLabels?.length) item.tagLabels = session.tagLabels;
   if (session.kind != null) item.kind = session.kind;
   if (session.sourceStatus != null) item.sourceStatus = session.sourceStatus;
   if (session.ageLimit != null) item.ageLimit = session.ageLimit;
@@ -99,6 +103,10 @@ export function toPublicHomeCardSession(session: PublicSessionDto): PublicCatalo
     ...(base.venueMetroStation != null ? { venueMetroStation: base.venueMetroStation } : {}),
     ...(base.venueAddress != null ? { venueAddress: base.venueAddress } : {}),
     ...(base.subcategories?.length ? { subcategories: base.subcategories } : {}),
+    ...(base.catalogCategory !== undefined ? { catalogCategory: base.catalogCategory } : {}),
+    ...(base.catalogSubcategory !== undefined ? { catalogSubcategory: base.catalogSubcategory } : {}),
+    ...(base.catalogLists?.length ? { catalogLists: base.catalogLists } : {}),
+    ...(base.tagLabels?.length ? { tagLabels: base.tagLabels } : {}),
     ...(base.priceFrom != null ? { priceFrom: base.priceFrom } : {}),
     ...(base.priceTo != null ? { priceTo: base.priceTo } : {}),
     ...(base.vacant != null ? { vacant: base.vacant } : {}),

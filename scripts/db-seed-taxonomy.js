@@ -12,7 +12,7 @@ const SUBCATEGORIES = [
   ['sub_museums_art_spaces', 'cat_museums_art', 'art-prostranstva', 'Арт-пространства', 30],
   ['sub_museums_workshops', 'cat_museums_art', 'master-klassy', 'Мастер-классы', 40],
   ['sub_events_concerts', 'cat_events', 'koncerty', 'Концерты', 10],
-  ['sub_events_theater', 'cat_events', 'teatr', 'Театр', 20],
+  ['sub_events_theater', 'cat_events', 'teatr', 'Спектакли', 20],
   ['sub_events_show', 'cat_events', 'shou', 'Шоу', 30],
   ['sub_events_festivals', 'cat_events', 'festivali', 'Фестивали', 40],
   ['sub_active_sport', 'cat_active', 'sport', 'Спорт', 10],

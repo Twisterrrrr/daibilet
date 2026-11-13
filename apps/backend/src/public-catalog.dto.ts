@@ -10,7 +10,7 @@ import {
   isPublicSessionRowOnSale,
   isSaleableForPublicCatalog,
 } from './catalog-availability.js';
-import { resolveCityTimeZone } from './city-timezone.js';
+import { resolveCityTimeZone, resolveCityTimeZoneSqlExpression } from './city-timezone.js';
 import {
   loadPublicCatalogDiskCacheWithStat,
   resolveCatalogRebuildLockPath,
@@ -684,8 +684,25 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
         event."ageLimit",
         event."imageUrl",
         event."priceFromRub",
+        (event."priceFromRub" = 0
+          or exists (
+            select 1 from "EventOffer" free_offer
+            where free_offer."eventId" = event.id and free_offer.active = true and free_offer."priceRub" = 0
+          )
+          or exists (
+            select 1 from "EventSession" free_session
+            where free_session."eventId" = event.id
+              and free_session."priceFromRub" = 0
+              and free_session."isActive" is not false
+              and free_session."cancelledAt" is null
+              and lower(coalesce(free_session."sourceStatus", '')) not in (${raw(PUBLIC_SALES_BLOCKED_STATUS_SQL)})
+              and free_session."startsAt" >= now() - interval '15 minutes'
+          )) as "freeAdmissionConfirmed",
         event."ticketsVacant",
         category.title as category,
+        category.slug as "categorySlug",
+        primary_subcategory.slug as "primarySubcategorySlug",
+        primary_subcategory.title as "primarySubcategoryTitle",
         city.id as "cityId",
         city.title as city,
         city.slug as "citySlug",
@@ -701,6 +718,8 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
         venue."metroStation" as "venueMetroStation",
         venue."heroImageUrl" as "venueHeroImageUrl",
         venue.kind as "venueKind",
+        venue."placeType" as "venuePlaceType",
+        venue."placeSubtype" as "venuePlaceSubtype",
         override.title as "overrideTitle",
         override."mergeGroupKey" as "overrideMergeGroupKey",
         override.description as "overrideDescription",
@@ -728,6 +747,10 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
             and offer."priceRub" >= ${MIN_DISPLAY_PRICE_RUB}
         ) as "offerPriceMaxRub",
         count(distinct session.id) filter (where ${raw(ACTIVE_SESSION_SQL)})::int as "slotCount",
+        bool_or(
+          session."startsAt" is not null
+          and extract(dow from session."startsAt" at time zone ${raw(resolveCityTimeZoneSqlExpression())}) in (0, 6)
+        ) filter (where ${raw(ACTIVE_SESSION_SQL)}) as "weekendSessionConfirmed",
         (
           select coalesce(array_agg(title order by priority, title), '{}')
           from (
@@ -761,6 +784,7 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
         ) as subcategories
       from "Event" event
       left join "Category" category on category.id = event."categoryId"
+      left join "Subcategory" primary_subcategory on primary_subcategory.id = event."primarySubcategoryId"
       left join "City" city on city.id = event."primaryCityId"
       left join "Region" region on region.id = city."regionId"
       left join "Venue" venue on venue.id = event."venueId"
@@ -780,6 +804,9 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
         tc_meta."metaCount",
         override.id,
         category.title,
+        category.slug,
+        primary_subcategory.slug,
+        primary_subcategory.title,
         city.id,
         city.title,
         city.slug,
@@ -794,6 +821,8 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
         venue.address,
         venue."heroImageUrl",
         venue.kind,
+        venue."placeType",
+        venue."placeSubtype",
         primary_offer."sourceCode",
         primary_offer.title,
         primary_offer."priceRub",
@@ -923,6 +952,11 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
       representative."ageLimit",
       representative."imageUrl",
       representative.category,
+      representative."categorySlug",
+      representative."primarySubcategorySlug",
+      representative."primarySubcategoryTitle",
+      representative."freeAdmissionConfirmed",
+      representative."weekendSessionConfirmed",
       representative."cityId",
       representative.city,
       representative."citySlug",
@@ -938,6 +972,8 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
       representative."venueMetroStation",
       representative."venueHeroImageUrl",
       representative."venueKind",
+      representative."venuePlaceType",
+      representative."venuePlaceSubtype",
       representative."overrideTitle",
       representative."overrideDescription",
       representative."overrideShortDescription",
@@ -1037,11 +1073,16 @@ function matchesCatalogQuery(
     query.category &&
     query.category !== 'all' &&
     session.category !== query.category &&
-    !pickCatalogSubcategories(session).includes(query.category)
+    !pickCatalogSubcategories(session).includes(query.category) &&
+    session.catalogSubcategory?.slug !== query.category &&
+    session.catalogSubcategory?.title !== query.category &&
+    session.catalogCategory?.slug !== query.category &&
+    session.catalogCategory?.title !== query.category
   ) {
     return false;
   }
-  if (query.tag && query.tag !== 'all' && !session.tags.includes(query.tag)) return false;
+  if (query.tag && query.tag !== 'all' && !session.tags.includes(query.tag) &&
+    !(session.catalogLists || []).some((entry) => entry.key === query.tag || entry.title === query.tag)) return false;
   if (
     !ignore.landing &&
     query.landing &&
@@ -1097,13 +1138,23 @@ function buildConditionalCatalogFacets(
     cities: countCatalogValues(forCities.map((session) => session.destination || session.city))
       .filter(([name, events]) => name !== 'Не указан' && events >= 1)
       .map(([name, events]) => ({ name, events })),
-    categories: countCatalogValues(forCategories.map((session) => session.category))
+    categories: countCatalogValues(forCategories
+      .map((session) => session.catalogSubcategory?.title || '')
+      .filter(Boolean))
       .filter(([, events]) => events >= 1)
       .map(([name, events]) => ({ name, events })),
-    subcategories: countCatalogValues(forSubcategories.flatMap((session) => pickCatalogSubcategories(session, 8)))
+    subcategories: countCatalogValues(forSubcategories.flatMap((session) =>
+      pickCatalogSubcategories(session, 8).filter((label) => label !== session.catalogSubcategory?.title),
+    ))
       .filter(([name, events]) => name.length <= 32 && events >= 1)
       .slice(0, 24)
       .map(([name, events]) => ({ name, events })),
+    catalogLists: countCatalogValues(forCategories.flatMap((session) =>
+      (session.catalogLists || []).map((entry) => `${entry.key}\u0000${entry.title}`),
+    )).map(([encoded, events]) => {
+      const [key, title] = encoded.split('\u0000');
+      return { key: key as 'family_kids' | 'family_all' | 'free' | 'weekend', title: title || String(key || ''), events };
+    }),
     landings: countCatalogValues(forLandings.flatMap((session) => session.landingSlugs || []))
       .filter(([, events]) => events >= 1)
       .map(([slug, events]) => {

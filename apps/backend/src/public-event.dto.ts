@@ -10,7 +10,7 @@ import {
   isWideLifetimeSession,
   resolvePublicEventAvailability,
 } from './catalog-availability.js';
-import { resolveCityTimeZone } from './city-timezone.js';
+import { isLocalWeekend, resolveCityTimeZone } from './city-timezone.js';
 import { formatDate, formatTime, normalizeStartsAt, timeBucket } from './public-datetime.js';
 import { dedupePublicOffers, preferNamedTicketOffers } from './public-offers.js';
 import { findLandingRule, matchingLandingSlugs } from './landing-rules.js';
@@ -29,6 +29,12 @@ import {
   shouldSynthesizeWidgetOnlySession,
 } from './public-event-widget-fallback.js';
 import { pickCatalogSubcategories } from './public-catalog.mapper.js';
+import {
+  catalogListsWithTitles,
+  normalizeCatalogTagLabels,
+  resolveCatalogLists,
+  resolveEventTaxonomy,
+} from './catalog-taxonomy.js';
 import { formatReviewDisplayName } from './review-display.js';
 import { spreadCatalogSessionsByCoverImage } from './public-catalog-spread.js';
 import { pickRelatedSessions } from './event-related.js';
@@ -487,6 +493,46 @@ async function loadPublicEventDto(
     startsAt: sessions[0]?.startsAt || null,
     upcomingSlots: sessions,
   });
+  const eventTimeZone = resolveCityTimeZone(requestedEvent.primaryCity?.title, destination.name);
+  const freeAdmissionConfirmed = requestedEvent.priceFromRub === 0 ||
+    sessions.some((session) => session.priceFrom === 0) ||
+    offers.some((offer) => offer.priceRub === 0);
+  const weekendSessionConfirmed = sessions.some((session) => isLocalWeekend(session.startsAt, eventTimeZone));
+  const taxonomy = resolveEventTaxonomy({
+    title,
+    category: requestedEvent.category?.title,
+    categorySlug: requestedEvent.category?.slug,
+    editorialSubcategorySlug: requestedEvent.primarySubcategory?.slug,
+    editorialSubcategoryTitle: requestedEvent.primarySubcategory?.title,
+    sourceSubcategories: subcategories,
+    tags,
+    venue: requestedEvent.venue?.title,
+    venuePlaceType: requestedEvent.venue?.placeType,
+    venuePlaceSubtype: requestedEvent.venue?.placeSubtype,
+    ageLimit: requestedEvent.ageLimit,
+    priceFrom,
+    freeAdmissionConfirmed,
+    weekendSessionConfirmed,
+    landingSlugs,
+    startsAt: sessions[0]?.startsAt || null,
+    upcomingSlots: sessions,
+    timeZone: eventTimeZone,
+  });
+  const catalogLists = catalogListsWithTitles(resolveCatalogLists({
+    title,
+    sourceSubcategories: subcategories,
+    tags,
+    venue: requestedEvent.venue?.title,
+    venuePlaceType: requestedEvent.venue?.placeType,
+    venuePlaceSubtype: requestedEvent.venue?.placeSubtype,
+    ageLimit: requestedEvent.ageLimit,
+    priceFrom,
+    freeAdmissionConfirmed,
+    weekendSessionConfirmed,
+    startsAt: sessions[0]?.startsAt || null,
+    upcomingSlots: sessions,
+    timeZone: eventTimeZone,
+  }));
   const event: PublicEventDto = {
     id: representative.id,
     slug: publicSlug(representative.slug),
@@ -509,6 +555,10 @@ async function loadPublicEventDto(
         requestedEvent.primaryCity?.heroImageUrl,
       ),
     category: requestedEvent.category?.title || 'События',
+    catalogCategory: taxonomy.category,
+    catalogSubcategory: taxonomy.subcategory,
+    catalogLists,
+    tagLabels: normalizeCatalogTagLabels(tags),
     tags,
     subcategories,
     city: requestedEvent.primaryCity?.title || 'Не указан',
@@ -517,7 +567,7 @@ async function loadPublicEventDto(
     sourceCitySlug: requestedEvent.primaryCity?.slug || null,
     destination: destination.name,
     destinationType: destination.type,
-    timeZone: resolveCityTimeZone(requestedEvent.primaryCity?.title, destination.name),
+    timeZone: eventTimeZone,
     venueId: requestedEvent.venue?.id || null,
     venueSlug: requestedEvent.venue?.slug || null,
     venue: requestedEvent.venue?.title || 'Не указано',
