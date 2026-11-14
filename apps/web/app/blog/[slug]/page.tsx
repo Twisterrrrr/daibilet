@@ -20,7 +20,6 @@ const BLOG_SLUG_REDIRECTS: Record<string, string> = {
   'bylinnyy-bereg-fentezi-fest': '/cities/velikiy-novgorod',
   'bylinnyy-bereg-fentezi-fest-volhov': '/cities/velikiy-novgorod',
   'fentezi-fest-bylinnyy-bereg': '/cities/velikiy-novgorod',
-  'moskva-rechnye-progulki-zaryade': '/blog/moskva-rechnye-progulki-kak-vybrat',
   'sochi-noch-bez-glyanca-rok-stendap-dzhaz': '/cities/sochi',
   'perm-gorod-i-prigorody': '/blog/perm-za-2-dnya',
   // Старый open-air Макса (HIDDEN) → актуальная колонка про парки
