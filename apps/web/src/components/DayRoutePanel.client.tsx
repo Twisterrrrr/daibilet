@@ -26,6 +26,9 @@ import {
   Ship,
   Sparkles,
   StickyNote,
+  Sunrise,
+  Sun,
+  Moon,
   Ticket,
   Trash2,
   X,
@@ -265,6 +268,19 @@ type DayRouteAccordionId = 'mustSee' | 'text';
 type DayRouteStopViewMode = 'grid' | 'list';
 type DayRouteMobileShelf = 'route' | 'add';
 type MyDayPickerSection = 'scenarios' | 'places' | 'suburbs' | 'picks' | 'boat' | 'own';
+type DayRoutePeriod = 'morning' | 'day' | 'evening';
+
+function dayRoutePeriodAt(minute: number): DayRoutePeriod {
+  if (minute < 12 * 60) return 'morning';
+  if (minute < 17 * 60) return 'day';
+  return 'evening';
+}
+
+const DAY_ROUTE_PERIOD_META: Record<DayRoutePeriod, { label: string; time: string; Icon: typeof Sunrise }> = {
+  morning: { label: 'Утро', time: 'до 12:00', Icon: Sunrise },
+  day: { label: 'День', time: '12:00-17:00', Icon: Sun },
+  evening: { label: 'Вечер', time: 'после 17:00', Icon: Moon },
+};
 
 /** Owner 2026-08-06: post-buy modal «Оформили билет?» off until UX revisit. Buy links still open. */
 const SHOW_DAY_TICKET_HANDOFF_MODAL = false;
@@ -1898,6 +1914,16 @@ function DayRoutePanelInner() {
       lunch: hourLunch,
     });
   }, [hourPlanOn, route.venues, hourStart, hourEnd, hourLunch]);
+  const displayTimingPlan = useMemo(
+    () =>
+      hourPlan ||
+      computeDayRouteHourPlan(route.venues, {
+        startHHMM: hourStart,
+        endHHMM: '23:59',
+        lunch: false,
+      }),
+    [hourPlan, route.venues, hourStart],
+  );
 
   const purchasedStops = useMemo(() => {
     const overflow = new Set(hourPlan?.overflowIds || []);
@@ -1923,6 +1949,14 @@ function DayRoutePanelInner() {
     () => planStops.filter((v) => !isStopTagHidden(v)),
     [planStops, isStopTagHidden],
   );
+  const periodCounts = useMemo(() => {
+    const counts: Record<DayRoutePeriod, number> = { morning: 0, day: 0, evening: 0 };
+    for (const venue of displayPlanStops) {
+      const minute = displayTimingPlan.byId[venue.id]?.startMin ?? 10 * 60;
+      counts[dayRoutePeriodAt(minute)] += 1;
+    }
+    return counts;
+  }, [displayPlanStops, displayTimingPlan]);
   const displayPurchasedStops = useMemo(
     () => purchasedStops.filter((v) => !isStopTagHidden(v)),
     [purchasedStops, isStopTagHidden],
@@ -4284,7 +4318,7 @@ function DayRoutePanelInner() {
                     venue={venue}
                     variant={effectiveStopViewMode}
                     group="purchased"
-                    softTimeLabel={hourPlan?.byId[venue.id]?.label || null}
+                    softTimeLabel={displayTimingPlan.byId[venue.id]?.label || null}
                     hasCoords={Boolean(lookupDayRouteCoords(venue, coordsById))}
                     mapsUrl={(() => {
                       const c = lookupDayRouteCoords(venue, coordsById);
@@ -4364,8 +4398,33 @@ function DayRoutePanelInner() {
                 const segmentToNext =
                   globalIndex >= 0 ? segmentMeters[globalIndex] ?? null : null;
                 const listMode = effectiveStopViewMode === 'list';
+                const period = dayRoutePeriodAt(
+                  displayTimingPlan.byId[venue.id]?.startMin ?? 10 * 60,
+                );
+                const previousVenue = displayPlanStops[index - 1];
+                const previousPeriod = previousVenue
+                  ? dayRoutePeriodAt(
+                      displayTimingPlan.byId[previousVenue.id]?.startMin ?? 10 * 60,
+                    )
+                  : null;
+                const periodMeta = DAY_ROUTE_PERIOD_META[period];
                 return (
                   <Fragment key={venue.id}>
+                    {period !== previousPeriod ? (
+                      <li
+                        className="list-none px-1 pb-1 pt-3 first:pt-1"
+                        data-day-period-group={period}
+                      >
+                        <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.12em] text-slate-700">
+                          <periodMeta.Icon className="h-4 w-4 text-slate-500" aria-hidden />
+                          <span>{periodMeta.label}</span>
+                          <span className="font-medium tracking-normal text-slate-400">{periodMeta.time}</span>
+                          <span className="ml-auto rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold tracking-normal text-slate-500 ring-1 ring-slate-200">
+                            {periodCounts[period]}
+                          </span>
+                        </div>
+                      </li>
+                    ) : null}
                     <DayRouteVenueCard
                       index={index}
                       total={displayPlanStops.length}
@@ -4373,7 +4432,7 @@ function DayRoutePanelInner() {
                       venue={venue}
                       variant={effectiveStopViewMode}
                       group="plans"
-                      softTimeLabel={hourPlan?.byId[venue.id]?.label || null}
+                      softTimeLabel={displayTimingPlan.byId[venue.id]?.label || null}
                       typeTag={dayRouteStopTypeTag(venue, resolveStopTag(venue))}
                       fallbackImageUrl={cityFallbackImage}
                       hasCoords={Boolean(lookupDayRouteCoords(venue, coordsById))}
@@ -4607,7 +4666,6 @@ function DayRoutePanelInner() {
             mapStops.length > 0 ? (
               <MyDayMapAside
                 mapOpen={myDay.mapOpen}
-                onToggleOpen={myDay.toggleMapOpen}
                 onOpenFull={myDay.openMapFull}
               >
                 <div className="relative isolate h-full min-h-0 w-full">

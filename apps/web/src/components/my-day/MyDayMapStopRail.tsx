@@ -21,7 +21,7 @@ export function MyDayMapStopRail({ items, activeId, onSelect }: Props) {
 
   return (
     <div
-      className="pointer-events-none absolute inset-x-3 bottom-3 z-[450] sm:inset-x-4"
+      className="pointer-events-none absolute bottom-3 left-3 right-[4.5rem] z-[450] sm:left-4"
       data-my-day-map-stop-rail
     >
       <div

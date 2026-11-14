@@ -1,11 +1,10 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
+import { Maximize2 } from 'lucide-react';
 
 type MyDayMapAsideProps = {
   mapOpen: boolean;
-  onToggleOpen: () => void;
   onOpenFull?: () => void;
   children: ReactNode;
   toolbar?: ReactNode;
@@ -17,7 +16,6 @@ type MyDayMapAsideProps = {
  */
 export function MyDayMapAside({
   mapOpen,
-  onToggleOpen,
   onOpenFull,
   children,
   toolbar,
@@ -29,31 +27,7 @@ export function MyDayMapAside({
       data-day-route-map-wrap
       data-day-route-map-desktop
     >
-      {/*
-        Chrome corners must not stack on Leaflet zoom (was: Свернуть + fullscreen + +/-
-        all fighting in the top-right). Collapse sits on the panel edge (left);
-        fullscreen alone top-right; zoom is bottom-right inside DayRouteOsmMap.
-      */}
-      <button
-        type="button"
-        onClick={onToggleOpen}
-        aria-expanded={mapOpen}
-        aria-label={mapOpen ? 'Свернуть карту' : 'Развернуть карту'}
-        title={mapOpen ? 'Свернуть карту' : 'Развернуть карту'}
-        data-my-day-map-collapse
-        className={`absolute top-3 z-[500] inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 ${
-          mapOpen ? 'left-3 px-3 py-1.5' : 'left-1/2 -translate-x-1/2 p-2'
-        }`}
-      >
-        {mapOpen ? (
-          <>
-            <ChevronRight className="h-3.5 w-3.5" aria-hidden /> Свернуть
-          </>
-        ) : (
-          <ChevronLeft className="h-4 w-4" aria-hidden />
-        )}
-      </button>
-
+      {/* The zoom controls sit alongside the stop rail; keep fullscreen in the top corner. */}
       {mapOpen && onOpenFull ? (
         <button
           type="button"
