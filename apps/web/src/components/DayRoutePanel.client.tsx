@@ -3126,7 +3126,7 @@ function DayRoutePanelInner() {
       <div
         className={
           placement === 'desktop'
-            ? 'pointer-events-auto absolute bottom-3 left-3 right-3 z-[1100] max-h-[min(36vh,11.5rem)] overflow-hidden rounded-2xl border border-slate-200 bg-white/95 p-2.5 shadow-md backdrop-blur sm:left-auto sm:right-3 sm:w-[min(22rem,calc(100%-1.5rem))]'
+            ? 'pointer-events-auto absolute left-3 right-3 top-14 z-[1100] max-h-[min(36vh,11.5rem)] overflow-hidden rounded-2xl border border-slate-200 bg-white/95 p-2.5 shadow-md backdrop-blur sm:left-auto sm:right-3 sm:w-[min(22rem,calc(100%-1.5rem))]'
             : 'pointer-events-auto absolute bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] left-3 right-3 z-[1100] max-h-[min(32vh,10rem)] overflow-hidden rounded-2xl border border-slate-200 bg-white/95 p-2.5 shadow-md backdrop-blur'
         }
         data-day-map-focus-card
