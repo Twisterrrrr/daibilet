@@ -68,6 +68,7 @@ import { CityPicker } from '@/components/CityPicker.client';
 import { DayRouteBoatWizard } from '@/components/DayRouteBoatWizard.client';
 import { DayRouteOsmMap } from '@/components/DayRouteOsmMap.client';
 import { DayRouteStopsTimeline } from '@/components/DayRouteStopsTimeline.client';
+import { MyDayMapStopRail } from '@/components/my-day/MyDayMapStopRail';
 import {
   DayRoutePurchaseCta,
   isDayRouteVendorCheckoutUrl,
@@ -4613,9 +4614,23 @@ function DayRoutePanelInner() {
                     selectedStopId={mapSelectedStopId}
                     panToStopId={focusedStopId}
                     focusRequestKey={stopFocusRequestKey}
-                    focusOverlayReservePx={188}
                     onStopClick={(stopId) => focusStopFromMap(stopId, { scrollList: false })}
                     className="absolute inset-0 h-full w-full bg-slate-100"
+                  />
+                  <MyDayMapStopRail
+                    items={displayMapStops.map((stop) => {
+                      const venue = route.venues.find((item) => item.id === stop.id);
+                      return {
+                        id: stop.id,
+                        title: stop.title,
+                        imageUrl: venue ? resolveDayRouteStopImage(venue) : null,
+                        meta: venue?.dwellMinutes
+                          ? `${formatDayRouteSoftMinutes(venue.dwellMinutes)} на осмотр`
+                          : null,
+                      };
+                    })}
+                    activeId={mapSelectedStopId}
+                    onSelect={(stopId) => focusStopFromMap(stopId, { scrollList: false })}
                   />
                   <div className="pointer-events-none absolute left-3 top-14 z-[450] rounded-2xl bg-white/95 px-4 py-2.5 shadow-sm ring-1 ring-slate-900/5 backdrop-blur sm:left-4" data-day-map-summary>
                     <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">Маршрут дня</p>
@@ -5241,7 +5256,6 @@ function DayRoutePanelInner() {
             selectedStopId={focusedStopId}
             panToStopId={focusedStopId}
             focusRequestKey={stopFocusRequestKey}
-            focusOverlayReservePx={248}
             onStopClick={focusStopFromMap}
             layoutKey="mobile-map-sheet"
             className="h-full w-full"
