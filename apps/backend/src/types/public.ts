@@ -217,6 +217,7 @@ export interface PublicEventDto extends SeoFields, PurchaseFields {
   sourceCitySlug?: string | null;
   venueId?: string | null;
   venueSlug?: string | null;
+  venuePageIndexable?: boolean;
   destination?: string | null;
   destinationType?: DestinationType | string | null;
   /** IANA TZ of event city/region — labels formatted in this zone (widget local time). */

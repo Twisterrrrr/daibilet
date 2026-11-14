@@ -604,6 +604,7 @@ async function loadPublicEventDto(
     timeZone: eventTimeZone,
     venueId: requestedEvent.venue?.id || null,
     venueSlug: requestedEvent.venue?.slug || null,
+    venuePageIndexable: requestedEvent.venue?.pageStatus === 'PUBLISHED' && requestedEvent.venue?.isIndexable === true,
     venue: requestedEvent.venue?.title || 'Не указано',
     venueAddress: requestedEvent.venue?.address || null,
     venueKind: requestedEvent.venue?.kind || 'OTHER',

@@ -631,7 +631,10 @@ export function EventHero({
     .filter(Boolean));
   const hasMultipleSessionVenues = distinctSessionVenues.size > 1;
   const hasMultipleDeparturePiers = hasMultipleSessionVenues && [...distinctSessionVenues].every((value) => /причал|набережн|теплоход|речного вокзала/u.test(value));
-  const canOpenVenueModal = !hasMultipleSessionVenues && Boolean(event.venue && (event.venueId || event.venueSlug));
+  const canOpenVenueModal =
+    !hasMultipleSessionVenues &&
+    event.venuePageIndexable === true &&
+    Boolean(event.venue && (event.venueId || event.venueSlug));
   const venuePageHref = canOpenVenueModal
     ? venueHref({
         id: event.venueId || event.venueSlug || event.venue,
