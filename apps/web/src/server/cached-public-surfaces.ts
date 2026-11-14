@@ -16,7 +16,7 @@ import {
   DESTINATIONS_CACHE_TAG,
   PUBLIC_SURFACES_CACHE_TAG,
 } from '@/server/cache-config';
-import { fetchPublicApiJson } from '@/server/public-api-client';
+import { fetchPublicApiJson, resolvePublicApiBaseForPath } from '@/server/public-api-client';
 
 /** Hot catalog DTOs for /podborki, /venues, /locations - short TTL, no Redis yet. */
 export { DESTINATIONS_CACHE_TAG, PUBLIC_SURFACES_CACHE_TAG };
@@ -113,12 +113,13 @@ export async function getCachedLandingsCatalog(city = 'all') {
  * `{ "tags": ["destinations", "public-surfaces"] }` (admin city update / catalog warm).
  */
 export async function getCachedDestinations() {
+  const apiBase = resolvePublicApiBaseForPath('/api/public/destinations');
   return unstable_cache(
     () =>
       fetchPublicApiJson<PublicDestinationsPayload>('/api/public/destinations', {
         timeoutMs: 3_000,
       }),
-    ['public-destinations-v3-http'],
+    ['public-destinations-v4-http', apiBase],
     {
       revalidate: 86_400,
       tags: [PUBLIC_SURFACES_CACHE_TAG, DESTINATIONS_CACHE_TAG],
