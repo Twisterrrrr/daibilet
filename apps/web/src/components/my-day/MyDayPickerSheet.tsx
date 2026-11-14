@@ -35,8 +35,8 @@ type MyDayPickerSheetProps = {
   /** Unified catalog search above tabs (places + events). */
   search?: ReactNode;
   children: ReactNode;
-  /** Desktop drawer shifts the planner workspace instead of covering it. */
-  desktopPush?: boolean;
+  /** Desktop drawer overlays the planner while leaving the map visible beside it. */
+  desktopOverlay?: boolean;
 };
 
 /**
@@ -50,7 +50,7 @@ export function MyDayPickerSheet({
   onClose,
   search,
   children,
-  desktopPush = false,
+  desktopOverlay = false,
 }: MyDayPickerSheetProps) {
   const titleId = useId();
   const descId = useId();
@@ -97,11 +97,11 @@ export function MyDayPickerSheet({
   }
 
   return createPortal(
-    <div className={`fixed inset-0 z-[80] ${desktopPush ? 'lg:top-[var(--site-header-height)]' : ''}`} data-my-day-picker-sheet="1" role="presentation">
+    <div className={`fixed inset-0 z-[80] ${desktopOverlay ? 'lg:top-[var(--site-header-height)] lg:pointer-events-none' : ''}`} data-my-day-picker-sheet="1" role="presentation">
       <button
         type="button"
         aria-label="Закрыть подбор"
-        className={`absolute inset-0 bg-slate-950/70 ${desktopPush ? 'lg:hidden' : ''}`}
+        className={`absolute inset-0 bg-slate-950/70 ${desktopOverlay ? 'lg:hidden' : ''}`}
         onClick={onClose}
       />
       <aside
@@ -109,11 +109,11 @@ export function MyDayPickerSheet({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descId}
-        className={`absolute inset-y-0 left-0 flex w-full max-w-full flex-col bg-white shadow-2xl sm:w-[min(92vw,var(--my-day-picker-w))] sm:max-w-none ${desktopPush ? 'lg:fixed lg:inset-y-auto lg:bottom-0 lg:left-0 lg:top-[var(--site-header-height)] lg:w-[300px] lg:max-w-none' : ''}`}
+        className={`absolute inset-y-0 left-0 flex w-full max-w-full flex-col bg-white shadow-2xl sm:w-[min(92vw,var(--my-day-picker-w))] sm:max-w-none ${desktopOverlay ? 'lg:pointer-events-auto lg:fixed lg:inset-y-auto lg:bottom-0 lg:left-0 lg:top-[var(--site-header-height)] lg:w-[min(45vw,620px)] lg:min-w-[420px] lg:max-w-none' : ''}`}
         style={{ ['--my-day-picker-w' as string]: `${pickerWidth}px` }}
         data-my-day-picker-panel
       >
-        {!desktopPush ? <MyDayResizeHandle
+        {!desktopOverlay ? <MyDayResizeHandle
           label="Ширина подбора"
           showFrom="sm"
           className="right-0 translate-x-1/2"
@@ -150,14 +150,14 @@ export function MyDayPickerSheet({
           </div>
         ) : null}
 
-        <div className={`grid min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)] sm:grid-cols-[220px_minmax(0,1fr)] sm:grid-rows-1 ${desktopPush ? 'lg:grid-cols-1' : ''}`}>
+        <div className={`grid min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)] sm:grid-cols-[220px_minmax(0,1fr)] sm:grid-rows-1 ${desktopOverlay ? 'lg:grid-cols-1' : ''}`}>
           <div
             ref={listRef}
             role="tablist"
             aria-orientation="vertical"
             aria-label="Разделы подбора"
             onKeyDown={onKeyNav}
-          className={`flex gap-1 overflow-x-auto border-b border-slate-200 p-2 [scrollbar-width:none] sm:flex-col sm:overflow-y-auto sm:border-b-0 sm:border-r sm:border-slate-200 [&::-webkit-scrollbar]:hidden ${desktopPush ? 'lg:grid lg:grid-cols-2 lg:gap-1 lg:border-b lg:border-r-0' : ''}`}
+          className={`flex gap-1 overflow-x-auto border-b border-slate-200 p-2 [scrollbar-width:none] sm:flex-col sm:overflow-y-auto sm:border-b-0 sm:border-r sm:border-slate-200 [&::-webkit-scrollbar]:hidden ${desktopOverlay ? 'lg:grid lg:grid-cols-2 lg:gap-1 lg:border-b lg:border-r-0' : ''}`}
           >
             {tabs.map((t) => {
               const on = t.value === current?.value;
@@ -172,7 +172,7 @@ export function MyDayPickerSheet({
                   aria-controls="my-day-picker-panel"
                   tabIndex={on ? 0 : -1}
                   onClick={() => onSectionChange(t.value)}
-                  className={`inline-flex shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-left text-sm font-semibold transition sm:w-full ${desktopPush ? 'lg:min-w-0 lg:px-2 lg:text-xs' : ''} ${
+                  className={`inline-flex shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-left text-sm font-semibold transition sm:w-full ${desktopOverlay ? 'lg:min-w-0 lg:px-2 lg:text-xs' : ''} ${
                     on
                       ? 'bg-primary-600 text-white'
                       : 'text-slate-500 hover:bg-slate-100'
@@ -189,7 +189,7 @@ export function MyDayPickerSheet({
             id="my-day-picker-panel"
             role="tabpanel"
             aria-labelledby={current ? `my-day-picker-tab-${current.value}` : undefined}
-            className={`min-w-0 overflow-y-auto p-4 [container-type:inline-size] ${desktopPush ? 'lg:border-t lg:border-slate-200' : ''}`}
+            className={`min-w-0 overflow-y-auto p-4 [container-type:inline-size] ${desktopOverlay ? 'lg:border-t lg:border-slate-200' : ''}`}
           >
             {current ? (
               <p className="mb-3 text-xs text-slate-500" data-my-day-picker-hint>

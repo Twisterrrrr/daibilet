@@ -3769,7 +3769,7 @@ function DayRoutePanelInner() {
   return (
     <>
     <div
-      className={`mx-auto w-full max-w-[1600px] bg-[#f4f6f9] print:hidden transition-[margin,width] duration-300 ease-out ${pickerOpen ? 'lg:ml-[300px] lg:mr-0 lg:w-[calc(100%_-_300px)] lg:max-w-none' : ''} ${
+      className={`mx-auto w-full max-w-[1600px] bg-[#f4f6f9] print:hidden ${
         isEmptyRoute
           ? 'pb-10'
           : hasMapStops
@@ -4712,7 +4712,7 @@ function DayRoutePanelInner() {
 
       <MyDayPickerSheet
         open={pickerOpen}
-        desktopPush
+        desktopOverlay
         section={pickerSection}
         tabs={pickerTabs}
         onSectionChange={(next) => {
