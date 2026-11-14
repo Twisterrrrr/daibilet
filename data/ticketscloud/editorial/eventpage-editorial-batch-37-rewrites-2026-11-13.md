@@ -4,6 +4,7 @@ Status: редакционные тексты; production apply pending final au
 
 ## 1. Круговая прогулка от причала "Парк Горького-2"
 
+
 - Event ID: `evt_tep_1574`
 - EventPage: `/events/krugovaya-progulka-ot-prichala-park-gorkogo-2-moskva`
 
@@ -27,6 +28,7 @@ Status: редакционные тексты; production apply pending final au
 
 
 ## 2. Часовая прогулка на электросудне-ресторане от причала Китай-город
+
 
 - Event ID: `evt_tep_1332`
 - EventPage: `/events/rechnaya-progulka-na-komfortabelnom-elektrohode-strelna-moskva`
@@ -52,6 +54,7 @@ Status: редакционные тексты; production apply pending final au
 
 
 ## 3. Обед/Ужин на борту панорамного теплохода с видом на центр Москвы
+
 
 - Event ID: `evt_tep_282`
 - EventPage: `/events/obed-uzhin-na-bortu-panoramnogo-teplohoda-s-vidom-na-centr-moskvy-moskva`
@@ -80,6 +83,7 @@ Status: редакционные тексты; production apply pending final au
 
 ## 4. Вечерняя прогулка на электросудне от причала Парк Горького-2
 
+
 - Event ID: `evt_tep_1314`
 - EventPage: `/events/vechernyaya-progulka-na-elektrosudne-ot-prichala-park-gorkogo-2-moskva`
 
@@ -103,6 +107,7 @@ Status: редакционные тексты; production apply pending final au
 
 
 ## 5. Экскурсия по коммуналкам
+
 
 - Event ID: `evt_6ac7672fe775b2e77a581a03`
 - EventPage: `/events/ekskursiya-po-kommunalkam-sankt-peterburg`
@@ -136,6 +141,7 @@ Status: редакционные тексты; production apply pending final au
 
 ## 6. Три старинные квартиры
 
+
 - Event ID: `evt_6ae0d2c9a3c84c12f0616ef7`
 - EventPage: `/events/tri-starinnye-kvartiry-sankt-peterburg`
 
@@ -161,6 +167,7 @@ Status: редакционные тексты; production apply pending final au
 
 ## 7. Вечерняя обзорная экскурсия по Санкт-Петербургу
 
+
 - Event ID: `evt_6addfa1538e53d0655fdf9e3`
 - EventPage: `/events/vechernyaya-obzornaya-ekskursiya-po-sankt-peterburgu-sankt-peterburg`
 
@@ -185,6 +192,7 @@ Status: редакционные тексты; production apply pending final au
 
 
 ## 8. Вечерняя Москва
+
 
 - Event ID: `evt_6a51f3ba78bf43e3a263d3d4`
 - EventPage: `/events/vechernyaya-moskva`
@@ -223,6 +231,7 @@ Status: редакционные тексты; production apply pending final au
 
 ## 9. Развод мостов и Финский залив с живым гидом
 
+
 - Event ID: `evt_6aed96ce0dc8d0dc62b73dac`
 - EventPage: `/events/razvodnye-mosty-i-finskii-zaliv-s-zhivym-gidom-sankt-peterburg`
 
@@ -238,6 +247,8 @@ Status: редакционные тексты; production apply pending final au
 
 Теплоход проходит к каждому мосту в расчётное время разведения, поэтому прогулка занимает значительную часть ночи. Это маршрут для тех, кто хочет увидеть одновременно морскую панораму залива и работу мостов в историческом центре, не переходя между точками по набережным.
 
+На борту работают мини-бар и кухня, но приносить собственные еду и напитки организатор запрещает. Посадка проходит на Синопской набережной напротив дома 28; после рейса предусмотрена высадка на двух берегах — у Синопской набережной, 10, или на Свердловской набережной.
+
 ### Практическая информация
 
 - **Теплоход:** двухпалубная «Москва», тёплый салон и открытая палуба
@@ -249,6 +260,7 @@ Status: редакционные тексты; production apply pending final au
 
 
 ## 10. Карельские Хаски и Мраморный мир
+
 
 - Event ID: `evt_69f0b0ab4f5f8b61aea95e4c`
 - EventPage: `/events/karelskie-haski-i-mramornyi-mir-sankt-peterburg`
@@ -282,6 +294,7 @@ Status: редакционные тексты; production apply pending final au
 
 ## 11. Рускеала на ретропоезде: зимняя сказка Карелии за один день
 
+
 - Event ID: `evt_6ad9ef8b79d3a002312d1427`
 - EventPage: `/events/ruskeala-na-retropoezde-zimnyaya-skazka-karelii-za-odin-den-sankt-peterburg`
 
@@ -308,6 +321,7 @@ Status: редакционные тексты; production apply pending final au
 
 
 ## 12. В Карелию без спешки: Рускеала, Ахвенкоски и Корела за день
+
 
 - Event ID: `evt_6ad9eced618097e8c82d1427`
 - EventPage: `/events/v-kareliyu-bez-speshki-ruskeala-ahvenkoski-i-korela-za-den-sankt-peterburg`
@@ -336,6 +350,7 @@ Status: редакционные тексты; production apply pending final au
 
 ## 13. Древние крепости Руси: Псков-Изборск-Печоры
 
+
 - Event ID: `evt_6adb764b0bbff161502d12e0`
 - EventPage: `/events/drevnie-kreposti-rusi-pskov-izborsk-pechory-sankt-peterburg`
 
@@ -351,6 +366,8 @@ Status: редакционные тексты; production apply pending final au
 
 Переезды между городами дают возможность увидеть ландшафт Псковской области, а последовательность остановок связывает три разных эпохи и типа памятников. Это самостоятельная автобусная экскурсия на целый день, поэтому удобная одежда и обувь пригодятся и для прогулок по территории крепости, и для посещения монастырского комплекса.
 
+Расписание исходной программы предусматривает ранний выезд из Петербурга в 6:15, техническую остановку в Луге, затем посещение кремля, монастыря и крепости. Обед в Пскове в стоимость не включён: в описании тура указана стоимость от 650 рублей. Возвращение в Санкт-Петербург запланировано поздно вечером.
+
 ### Практическая информация
 
 - **Отправление:** Санкт-Петербург, метро «Московская»
@@ -362,6 +379,7 @@ Status: редакционные тексты; production apply pending final au
 
 
 ## 14. Великий Новгород - Истоки Руси
+
 
 - Event ID: `evt_6adb6bf76feacc35e82d1311`
 - EventPage: `/events/velikii-novgorod-istoki-rusi-sankt-peterburg`
@@ -384,6 +402,8 @@ Status: редакционные тексты; production apply pending final au
 
 Экскурсионное сопровождение продолжается и в дороге: трассовый рассказ помогает связать отдельные остановки с общей историей региона. При планировании дня учитывайте, что это поездка из нескольких длинных переездов и осмотров, а свободное время в городе ограничено расписанием.
 
+В программе также заявлен заезд в Варлаамо-Хутынский монастырь перед обратной дорогой. Для этой остановки, как и для остальных объектов, время зависит от графика группы и дорожной ситуации.
+
 ### Практическая информация
 
 - **Отправление:** Санкт-Петербург, Казанский собор
@@ -395,6 +415,7 @@ Status: редакционные тексты; production apply pending final au
 
 
 ## 15. Выборг: Рождество в средневековой Европе за один день
+
 
 - Event ID: `evt_6ad8f3fa01583b347a2d137a`
 - EventPage: `/events/vyborg-rozhdestvo-v-srednevekovoi-evrope-za-odin-den-sankt-peterburg`
@@ -422,6 +443,7 @@ Status: редакционные тексты; production apply pending final au
 
 
 ## 16. Карельский колорит: долина водопадов, лес, уха и музей в скале
+
 
 - Event ID: `evt_69f0b8a0650774491ca95d70`
 - EventPage: `/events/karelskii-kolorit-dolina-vodopadov-les-uha-i-muzei-v-skale-sankt-peterburg`
@@ -454,6 +476,7 @@ Status: редакционные тексты; production apply pending final au
 
 ## 17. Янтарная комната и личные покои Романовых: экскурсия по двум дворцам
 
+
 - Event ID: `evt_6ade08faa4145f67e9fdf90f`
 - EventPage: `/events/yantarnaya-komnata-i-lichnye-pokoi-romanovyh-ekskursiya-po-dvum-dvorcam-sankt-peterburg`
 
@@ -485,6 +508,7 @@ Status: редакционные тексты; production apply pending final au
 
 ## 18. Два мира императорской резиденции: Дворцовая церковь и личные покои Павла I
 
+
 - Event ID: `evt_6ade1a8d1712507ad9fdfa77`
 - EventPage: `/events/dva-mira-imperatorskoi-rezidencii-dvorcovaya-cerkov-i-lichnye-pokoi-pavla-i-sankt-peterburg`
 
@@ -508,6 +532,8 @@ Status: редакционные тексты; production apply pending final au
 
 В Китайской голубой гостиной сохранились лаковые панно XVIII века, встроенные в голубые шелковые обои. Скульптурный кабинет украшен лепными барельефами, а в Живописном кабинете собраны картины, которые Павел привёз из Европы. Эти детали делают маршрут предметным: о привычках владельцев здесь рассказывают сами интерьеры.
 
+Отдельная часть рассказа посвящена деталям Дворцовой церкви: императорским хорам, откуда семья слушала службу, и спасению трёх икон во время войны. В Китайской голубой гостиной сохранились лаковые панно XVIII века; эти предметы помогают увидеть не только парадную сторону резиденции, но и личные художественные интересы владельцев.
+
 ### Практическая информация
 
 - **Место встречи:** Лиговский проспект, 10/118, центральный вход гостиницы «Октябрьская»
@@ -519,6 +545,7 @@ Status: редакционные тексты; production apply pending final au
 
 
 ## 19. Царское Село: Екатерининский дворец, парк и Феодоровский собор
+
 
 - Event ID: `evt_6addeb92ac860ff0072d14e8`
 - EventPage: `/events/carskoe-selo-ekaterininskii-dvorec-park-i-feodorovskii-sobor-sankt-peterburg`
@@ -551,6 +578,7 @@ Status: редакционные тексты; production apply pending final au
 
 ## 20. Гжель. Дом Салтыкова - Университет - мастер-класс. На своих автомобилях
 
+
 - Event ID: `evt_6ad9f7ae286fac4519c4f0fe`
 - EventPage: `/events/gzhel-dom-saltykova-universitet-master-klass-na-svoih-avtomobilyah-moskva`
 
@@ -566,6 +594,8 @@ Status: редакционные тексты; production apply pending final au
 
 Маршрут проходит на личных автомобилях: участники добираются между точками самостоятельно, следуя программе организатора. Это важно учитывать при планировании поездки и координации группы. Содержание занятия и материалы лучше уточнить до покупки, поскольку мастер-класс может зависеть от выбранного сеанса.
 
+Дом-музей Салтыкова открылся в 2018 году в старой деревянной избе. Музей декоративно-прикладного искусства Гжельского университета работает с 1994 года; его собрание включает более тысячи дипломных работ выпускников и пополняется ежегодно. На мастер-классе участники расписывают керамическую заготовку, а комплексный обед включён в описанную организатором программу.
+
 ### Практическая информация
 
 - **Формат:** экскурсия и мастер-класс в Гжели; передвижение на личных автомобилях
@@ -575,6 +605,7 @@ Status: редакционные тексты; production apply pending final au
 
 
 ## 21. Маршрут «Всё включено» по Петербургу: автобусный тур с крейсером «Аврора»
+
 
 - Event ID: `evt_6ae97c46e54272dd8a234f91`
 - EventPage: `/events/marshrut-vse-vklyucheno-po-peterburgu-obzornyi-avtobusnyi-tur-s-kreiserom-avrora-sankt-peterburg`
@@ -600,6 +631,7 @@ Status: редакционные тексты; production apply pending final au
 
 
 ## 22. Прогулка по местам загадывания желаний
+
 
 - Event ID: `evt_6ae0f998ba00841c3a616ce3`
 - EventPage: `/events/progulka-po-mestam-zagadyvaniya-zhelanii-sankt-peterburg`
@@ -632,6 +664,7 @@ Status: редакционные тексты; production apply pending final au
 
 ## 23. Смотровая площадка «Выше только любовь» в Москва-Сити
 
+
 - Event ID: `evt_6ae35e2d994e49deb6953e46`
 - EventPage: `/events/poseschenie-smotrovoi-ploschadki-vyshe-tolko-lyubov-v-moskva-siti-moskva`
 
@@ -657,6 +690,7 @@ Status: редакционные тексты; production apply pending final au
 
 ## 24. Экскурсия в Дом учёных — Владимирский дворец
 
+
 - Event ID: `evt_6a8c2926b3411763c57dcc75`
 - EventPage: `/events/ekskursiya-v-dom-uchenyh-vladimirskii-dvorec-sankt-peterburg`
 
@@ -681,6 +715,7 @@ Status: редакционные тексты; production apply pending final au
 
 
 ## 25. Богемный арт-бранч: роковые женщины Серебряного века
+
 
 - Event ID: `evt_6ad68f7a6173f3e5aefc8c3d`
 - EventPage: `/events/bogemnyi-art-branch-rokovye-zhenschiny-serebryanogo-veka-muzy-vedmy-i-razrushitelnicy-sudeb-sankt-peterburg`
@@ -713,6 +748,7 @@ Status: редакционные тексты; production apply pending final au
 
 ## 26. Йога среди искусства
 
+
 - Event ID: `evt_6ab2942bf06aa21992b5283f`
 - EventPage: `/events/ioga-sredi-iskusstva-moskva`
 
@@ -737,6 +773,7 @@ Status: редакционные тексты; production apply pending final au
 
 
 ## 27. Арт-свидание: картина с машиной мечты
+
 
 - Event ID: `evt_6ab14ac02ddf81186ad93278`
 - EventPage: `/events/art-svidanie-kartina-s-mashinoi-mechty-akril-smola-18-sankt-peterburg`
@@ -769,6 +806,7 @@ Status: редакционные тексты; production apply pending final au
 
 ## 28. Мастер-класс по изготовлению свечи с тайным посланием
 
+
 - Event ID: `evt_6ae1a8a83ec27989bcbe6734`
 - EventPage: `/events/tvorcheskii-master-klass-po-izgotovleniyu-svechi-s-tainym-poslaniem-perm-3`
 
@@ -782,6 +820,8 @@ Status: редакционные тексты; production apply pending final au
 
 Занятие подходит для совместного досуга: каждый проходит основные шаги и декорирует собственную работу. Ведущий сопровождает процесс и объясняет, как соблюдать пропорции и обращаться с материалами. Готовому изделию может потребоваться время для застывания; детали получения свечи следует уточнить на месте. Информация о материалах и включённых расходниках зависит от условий выбранного билета.
 
+На выбор организатор указывает более 70 ароматов; для декора доступны цветные и чёрно-белые буквы. В исходном описании также заявлено, что все необходимые материалы и работа мастера входят в стоимость занятия.
+
 ### Практическая информация
 
 - **Адрес:** Тополевый переулок, 10, офис 212, Пермь
@@ -793,6 +833,7 @@ Status: редакционные тексты; production apply pending final au
 
 
 ## 29. Экскурсия «Петербургский микс»
+
 
 - Event ID: `evt_6a86d3a90ee98d3c0001007d`
 - EventPage: `/events/ekskursiya-peterburgskii-miks-sankt-peterburg`
@@ -818,6 +859,7 @@ Status: редакционные тексты; production apply pending final au
 
 
 ## 30. А. П. Шадрин. «Воспоминания о Крыме и Севастополе»
+
 
 - Event ID: `evt_6aecf298b0e4104ee0b73e1e`
 - EventPage: `/events/a-p-shadrin-1942-2018-vospominaniya-o-kryme-i-sevastopole-moskva`
