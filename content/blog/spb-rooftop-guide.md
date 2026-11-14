@@ -34,7 +34,7 @@ status: PUBLISHED
 
 [ROMANTIC JAZZ HITS на крыше Невского](/events/tc-697a6a38fae497c417f3dd50-romantic-jazz-hits-na-kryshe-nevskogo-fortepiannye-improvizacii-v-salone-serebryanogo-veka-vech) — от 1 450 ₽, ближайшая дата — 24 октября;
 
-[«Латино джаз — мировые хиты»](/events/latino-dzhaz-mirovye-hity-trio-anny-shtein-retro-vecherinka-s-furshetom-v-muzee-na-nevskom-6a9ff51c53e0a1636569b681) — от 1 590 ₽, ближайшая дата — 25 октября;
+[«PIANO-ROCK»: концерт на крыше Невского](/events/koncert-na-kryshe-nevskogo-piano-rock-legendy-v-fortepiannyh-interpretaciyah-salonnaya-vecherink-sankt-peterburg) - фортепианные интерпретации рок-легенд в салоне Музея Карла Буллы; дату и цену проверьте в карточке;
 
 [«Мировые хиты кино»](/events/tc-6973dacb3cd6346e0b9a6d91-mirovye-kinohity-na-royale-v-stile-dzhaz-koncert-improvizacii-kino-vecherinka-s-furshetom-retro) — от 1520 ₽.
 
@@ -52,7 +52,7 @@ status: PUBLISHED
 
 ## Развод мостов: выбор не только по количеству
 
-Сравнить рейсы удобнее на лендинге [«Ночные разводные мосты»](/bridges-night).
+Сравнить водные маршруты Петербурга можно в разделе [речных прогулок](/rechnye-progulki/saint-petersburg/).
 
 Ночные рейсы отличаются причалом, маршрутом, продолжительностью и форматом рассказа.
 
@@ -60,7 +60,7 @@ status: PUBLISHED
 
 [Маршрут к трём разводным мостам от Петроградской стороны](/events/tc-6a453f2ba71a7dd9e81798ac-tri-razvodnyh-mosta-razvod-mostov-ot-petrogradskoi-storony) стоит от 1050 ₽. Он может быть логичнее для тех, кто живёт или заканчивает вечер на этом берегу.
 
-[Ночная экскурсия «Пять разводных мостов» с гидом](/events/ночная-экскурсия-пять-разводных-мостов-с-гидом-925) предлагает более длинный маршрут и живой рассказ.
+[«Пять разводных мостов»](/events/pyat-razvodnyh-mostov-sankt-peterburg) - ночной круиз по Неве с гидом. Причал, время отправления и цену проверьте в карточке.
 
 Цифра в названии не гарантирует лучшего впечатления. Иногда два моста, увиденные с хорошей позиции и без спешки, запоминаются сильнее, чем пять пролётов в длинной ночной поездке.
 

@@ -21,7 +21,7 @@ readMin: 6
 imageAlt: "Ночная набережная Сочи: огни, пирс и живая клубная атмосфера без глянца"
 coverImageUrl: "/images/blog/sochi-noch-bez-glyanca-rok-stendap-dzhaz.jpg"
 publishedAt: "2026-08-11T22:35:00+03:00"
-status: PUBLISHED
+status: HIDDEN
 isFeatured: false
 ---
 

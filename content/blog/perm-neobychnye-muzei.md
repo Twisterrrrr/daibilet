@@ -22,7 +22,7 @@ status: PUBLISHED
 
 [image side=right src="/images/blog/perm-neobychnye-muzei-inline.jpg" alt="Ретро-автомобили в пермском музее «Ретро-гараж»"]
 
-[NOTE label="Маршрут" text="Классику набережной и «пермских богов» удобно держать рядом: [«Пермь за 2 дня»](/blog/perm-za-2-dnya) и [город + пригороды](/blog/perm-gorod-i-prigorody); точки дня — в [«Мой день»](/my-day?city=perm)."]
+[NOTE label="Маршрут" text="Классику набережной и «пермских богов» удобно держать рядом: [«Пермь за 2 дня»](/blog/perm-za-2-dnya); точки дня можно собрать в [«Моём дне»](/my-day?city=perm)."]
 
 ## 1. Пермский автомобильный музей «Ретро-гараж»
 

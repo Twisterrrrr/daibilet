@@ -16,13 +16,13 @@ const BLOG_SLUG_REDIRECTS: Record<string, string> = {
   'kazan-na-vkus-master-klassy': '/cities/kazan',
   'kazan-rechnye-progulki': '/cities/kazan',
   'voronezh-zhatva-gorod-sad': '/cities/voronezh',
-  // Дубль колонки Макса (HIDDEN) → live канон
-  'bylinnyy-bereg-fentezi-fest': '/blog/fentezi-fest-bylinnyy-bereg',
-  // Тот же дубль, но с "-volhov" в слаге. Остался отдельной индексируемой
-  // страницей: 200, self-canonical, isIndexable=true, присутствует в blog.xml.
-  // Тема та же (Былинный берег + Фэнтези Фест на Волхове), тела разные,
-  // поэтому это каннибализация ключа, а не побайтовый дубль.
-  'bylinnyy-bereg-fentezi-fest-volhov': '/blog/fentezi-fest-bylinnyy-bereg',
+  // Сезонные материалы и старые URL событий, по которым больше нет актуальной программы.
+  'bylinnyy-bereg-fentezi-fest': '/cities/velikiy-novgorod',
+  'bylinnyy-bereg-fentezi-fest-volhov': '/cities/velikiy-novgorod',
+  'fentezi-fest-bylinnyy-bereg': '/cities/velikiy-novgorod',
+  'moskva-rechnye-progulki-zaryade': '/blog/moskva-rechnye-progulki-kak-vybrat',
+  'sochi-noch-bez-glyanca-rok-stendap-dzhaz': '/cities/sochi',
+  'perm-gorod-i-prigorody': '/blog/perm-za-2-dnya',
   // Старый open-air Макса (HIDDEN) → актуальная колонка про парки
   'open-air-festy-vyhodnoi-ru': '/blog/moskva-parki-open-air-vyhodnye',
 };

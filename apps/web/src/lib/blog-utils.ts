@@ -342,7 +342,12 @@ function enrichCardFields(slug: string, partial: Partial<BlogCardDto>): Pick<
 }
 
 export function staticBlogCards(): BlogCardDto[] {
-  return BLOG_POSTS.map((post) => {
+  const hiddenSlugs = new Set([
+    'fentezi-fest-bylinnyy-bereg',
+    'moskva-rechnye-progulki-zaryade',
+    'sochi-noch-bez-glyanca-rok-stendap-dzhaz',
+  ]);
+  return BLOG_POSTS.filter((post) => !hiddenSlugs.has(post.slug)).map((post) => {
     const enriched = enrichCardFields(post.slug, {
       title: post.title,
       excerpt: post.excerpt,

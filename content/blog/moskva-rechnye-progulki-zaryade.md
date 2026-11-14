@@ -14,7 +14,7 @@ date: "10 июля 2026"
 readMin: 8
 imageAlt: "Теплоход на Москве-реке у Зарядья"
 coverImageUrl: "/images/blog/moskva-rechnye-progulki-zaryade.jpg"
-status: PUBLISHED
+status: HIDDEN
 ---
 Причал у парка «Зарядье» расположен так удачно, что кажется: можно подойти к воде, купить любой билет и получить один и тот же вид на Кремль.
 
