@@ -1491,6 +1491,12 @@ function DayRoutePanelInner() {
           item: DayRouteVenueItem;
           hook: string | null;
         } => Boolean(row),
+      )
+      // Must-see feeds can repeat a venue through multiple source rows. Keep
+      // the first canonical item so list keys and route identity stay unique.
+      .filter(
+        (row, index, rows) =>
+          rows.findIndex((candidate) => candidate.item.id === row.item.id) === index,
       );
   }, [mustSeePlaces, matchSources, catalogCityId, catalogCityName, catalogCitySlug, catalogCitySourceSlug]);
 
