@@ -362,6 +362,17 @@ export function MyDayToolbar({
         </div>
       </div>
 
+      <p
+        id="dnd-hint"
+        className="sr-only"
+        data-my-day-dnd-hint
+      >
+        Порядок можно менять мышью или с клавиатуры: фокус на ручке перетаскивания, стрелки вверх /
+        вниз, пробел - взять и отпустить, Escape - отменить.
+      </p>
+
+      {children}
+
       {showTypes ? (
         <div
           className="mt-3 rounded-2xl border border-slate-200/80 bg-white p-3 shadow-sm sm:mt-4 sm:p-4"
@@ -410,17 +421,6 @@ export function MyDayToolbar({
           </div>
         </div>
       ) : null}
-
-      <p
-        id="dnd-hint"
-        className="mt-4 hidden text-xs text-slate-500 lg:block"
-        data-my-day-dnd-hint
-      >
-        Порядок можно менять мышью или с клавиатуры: фокус на ручке перетаскивания, стрелки вверх /
-        вниз, пробел - взять и отпустить, Escape - отменить.
-      </p>
-
-      {children}
     </div>
   );
 }
