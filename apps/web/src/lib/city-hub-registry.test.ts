@@ -11,8 +11,8 @@ import {
   resolveHubSlug,
 } from './city-hub-registry.ts';
 
-test('registry holds 31 hubs and every slug is unique', () => {
-  assert.equal(CITY_HUBS.length, 31);
+test('registry holds 32 hubs and every slug is unique', () => {
+  assert.equal(CITY_HUBS.length, 32);
   const slugs = CITY_HUBS.map((hub) => hub.slug);
   assert.equal(new Set(slugs).size, slugs.length, 'duplicate hub slugs');
 });

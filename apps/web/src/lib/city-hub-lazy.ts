@@ -49,6 +49,7 @@ const HUB_LOADERS: Record<string, HubLoader> = {
   'izhevsk': () => import('./izhevsk-hub'),
   'sochi': () => import('./sochi-hub'),
   'ulyanovsk': () => import('./ulyanovsk-hub'),
+  'veliky-novgorod': () => import('./veliky-novgorod-hub'),
 };
 
 const hubCache = new Map<string, CityHubData>();

@@ -38,6 +38,7 @@ export const CITY_HUBS: readonly HubEntry[] = [
   { slug: 'ekaterinburg', title: 'Екатеринбург', hasPack: true, affiche: true, strong: true },
   { slug: 'kazan', title: 'Казань', hasPack: true, affiche: true, strong: true },
   { slug: 'nizhniy-novgorod', title: 'Нижний Новгород', hasPack: false, affiche: true, strong: true },
+  { slug: 'veliky-novgorod', title: 'Великий Новгород', hasPack: true, affiche: false, strong: true },
   { slug: 'samara', title: 'Самара', hasPack: true, affiche: true, strong: true },
   { slug: 'novosibirsk', title: 'Новосибирск', hasPack: true, affiche: false, strong: true },
   { slug: 'krasnodar', title: 'Краснодар', hasPack: true, affiche: true, strong: true },
