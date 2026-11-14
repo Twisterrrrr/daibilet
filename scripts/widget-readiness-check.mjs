@@ -9,6 +9,8 @@
  */
 
 const DEFAULT_BASE = process.env.DAIBILET_API_URL || process.env.VITE_DAIBILET_API_URL || "https://daibilet.ru";
+const FETCH_TIMEOUT_MS = Number(process.env.WIDGET_CHECK_TIMEOUT_MS || 10_000);
+const FETCH_RETRIES = Number(process.env.WIDGET_CHECK_RETRIES || 2);
 
 const ETALON_SLUGS = [
   {
@@ -22,7 +24,7 @@ const ETALON_SLUGS = [
     note: "TC, Санкт-Петербург",
   },
   {
-    slug: "progulka-ot-prichala-kitai-gorod-do-prichala-kievskii-826",
+    slug: "marshrut-zolotoi-ostrov-ot-prichala-tretyakovskii-298",
     provider: "TEPLOHOD",
     note: "TEP, сеансы",
   },
@@ -53,8 +55,36 @@ function parseArgs(argv) {
 
 function extractTcEventIdFromUrl(url) {
   if (!url) return null;
-  const match = String(url).match(/[?&]event=([^&]+)/);
-  return match ? decodeURIComponent(match[1]) : null;
+  try {
+    const parsed = new URL(String(url));
+    if (parsed.protocol !== "https:" || !/(^|\.)ticketscloud\.(com|org|ru)$/i.test(parsed.hostname)) return null;
+    return parsed.searchParams.get("event");
+  } catch {
+    return null;
+  }
+}
+
+async function sleep(ms) {
+  await new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchWithRetry(url) {
+  let lastError;
+  for (let attempt = 0; attempt <= FETCH_RETRIES; attempt += 1) {
+    try {
+      const response = await fetch(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
+      if (response.status >= 500 && attempt < FETCH_RETRIES) {
+        await sleep(300 * 2 ** attempt);
+        continue;
+      }
+      return response;
+    } catch (error) {
+      lastError = error;
+      if (attempt >= FETCH_RETRIES) break;
+      await sleep(300 * 2 ** attempt);
+    }
+  }
+  throw lastError;
 }
 
 function checkTcEvent(event, sessions) {
@@ -67,7 +97,7 @@ function checkTcEvent(event, sessions) {
   }
   const purchaseUrl = event.purchaseUrl || sessions[0]?.purchaseUrl;
   if (!purchaseUrl) issues.push("missing purchaseUrl");
-  else if (!extractTcEventIdFromUrl(purchaseUrl)) issues.push("purchaseUrl without event=");
+  else if (!extractTcEventIdFromUrl(purchaseUrl)) issues.push("purchaseUrl is not a Ticketscloud HTTPS URL with event=");
   else if (!/token=/.test(purchaseUrl)) issues.push("purchaseUrl without token=");
   if (event.purchaseReady === false) issues.push("purchaseReady=false");
   const purchasable = sessions.filter((s) => s.purchaseReady !== false && s.purchaseUrl);
@@ -86,16 +116,21 @@ function checkTepEvent(event, sessions) {
   }
   const purchaseUrl = event.purchaseUrl || sessions[0]?.purchaseUrl;
   if (!purchaseUrl) issues.push("missing purchaseUrl");
-  else if (!/teplohod\.info\/event\/\d+/i.test(purchaseUrl)) issues.push("purchaseUrl not teplohod.info/event/");
+  else if (!/^https:\/\/(?:[^/]+\.)?teplohod\.info\//i.test(purchaseUrl) ||
+      !/account\.teplohod\.info\/order\/event-order|teplohod\.info\/event\/\d+/i.test(purchaseUrl)) {
+    issues.push("purchaseUrl not teplohod checkout");
+  }
   if (event.purchaseReady === false) issues.push("purchaseReady=false");
   return issues;
 }
 
 async function fetchEvent(base, slug) {
   const url = `${base.replace(/\/+$/, "")}/api/public/events/${encodeURIComponent(slug)}`;
-  const response = await fetch(url);
+  const response = await fetchWithRetry(url);
   if (!response.ok) {
-    throw new Error(`HTTP ${response.status} for ${slug}`);
+    const error = new Error(`HTTP ${response.status} for ${slug}`);
+    error.status = response.status;
+    throw error;
   }
   const payload = await response.json();
   return {
@@ -104,16 +139,53 @@ async function fetchEvent(base, slug) {
   };
 }
 
+function inferProvider(item) {
+  const declaredValues = [
+    item?.widgetProvider,
+    item?.purchaseProvider,
+    item?.offerSourceCode,
+    item?.provider,
+    item?.source,
+    item?.sourceCode,
+  ]
+    .filter(Boolean)
+    .map((value) => String(value).toUpperCase());
+
+  if (declaredValues.some((value) => value === "TEP" || value.includes("TEPLOHOD"))) return "TEPLOHOD";
+  if (declaredValues.some((value) => value === "TC" || value.includes("TICKETSCLOUD"))) {
+    return "TICKETSCLOUD";
+  }
+
+  const purchaseUrl = item?.purchaseUrl || item?.widgetUrl || item?.deeplinkUrl;
+  if (/^https:\/\/(?:[^/]+\.)?teplohod\.info\//i.test(String(purchaseUrl || ""))) return "TEPLOHOD";
+  if (/^https:\/\/(?:[^/]+\.)?ticketscloud\.(?:com|org|ru)\//i.test(String(purchaseUrl || ""))) return "TICKETSCLOUD";
+  if (/^TC-/i.test(String(item?.slug || ""))) return "TICKETSCLOUD";
+  if (/^evt_tep_\d+$/i.test(String(item?.id || ""))) return "TEPLOHOD";
+  return null;
+}
+
 async function discoverSlugs(base, limit) {
   const url = `${base.replace(/\/+$/, "")}/api/public/events?limit=${limit}`;
-  const response = await fetch(url);
+  const response = await fetchWithRetry(url);
   if (!response.ok) throw new Error(`catalog HTTP ${response.status}`);
   const payload = await response.json();
   return (payload.items || []).map((item) => ({
     slug: item.slug,
-    provider: String(item.id || "").includes("tep") ? "TEPLOHOD" : item.slug?.startsWith("tc-") ? "TICKETSCLOUD" : null,
+    provider: inferProvider(item),
     note: "discovered",
   }));
+}
+
+async function discoverProviderSlug(base, provider, seen) {
+  const normalizedProvider = String(provider || "").toUpperCase();
+  if (!normalizedProvider) return null;
+  const discovered = await discoverSlugs(base, 200);
+  return discovered.find(
+    (item) =>
+      item.slug &&
+      !seen.has(item.slug) &&
+      String(item.provider || "").toUpperCase() === normalizedProvider,
+  );
 }
 
 async function main() {
@@ -132,22 +204,48 @@ async function main() {
     seen.add(target.slug);
 
     try {
-      const { event, sessions } = await fetchEvent(options.base, target.slug);
+      let activeTarget = target;
+      let event;
+      let sessions;
+      try {
+        const fetched = await fetchEvent(options.base, activeTarget.slug);
+        event = fetched.event;
+        sessions = fetched.sessions;
+      } catch (error) {
+        if (error?.status !== 404 || !target.provider) throw error;
+        const replacement = await discoverProviderSlug(options.base, target.provider, seen);
+        if (!replacement) throw error;
+        activeTarget = {
+          ...replacement,
+          provider: target.provider,
+          note: `${target.note || "etalon"} fallback for stale slug ${target.slug}`,
+        };
+        seen.add(activeTarget.slug);
+        const fetched = await fetchEvent(options.base, activeTarget.slug);
+        event = fetched.event;
+        sessions = fetched.sessions;
+      }
       const provider =
-        target.provider ||
+        activeTarget.provider ||
         String(event.widgetProvider || event.widgetPayload?.provider || "").toUpperCase();
-      const issues =
+      const actualProvider = String(event.widgetProvider || event.widgetPayload?.provider || "").toUpperCase();
+      const issues = [];
+      if (activeTarget.provider && actualProvider && activeTarget.provider !== actualProvider) {
+        issues.push(`provider mismatch: expected ${activeTarget.provider}, API returned ${actualProvider}`);
+      }
+      issues.push(...(
         provider.includes("TEP") || provider === "TEPLOHOD"
           ? checkTepEvent(event, sessions)
-          : checkTcEvent(event, sessions);
+          : checkTcEvent(event, sessions)
+      ));
       const ok = issues.length === 0;
       if (!ok) failed += 1;
       rows.push({
-        slug: target.slug,
+        slug: activeTarget.slug,
         provider: provider || "?",
         ok,
         issues,
-        note: target.note || "",
+        note: activeTarget.note || "",
         tcEventId: event.widgetPayload?.tcEventId,
         tepEventId: event.widgetPayload?.tepEventId,
         purchaseReady: event.purchaseReady,

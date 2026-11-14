@@ -1,8 +1,9 @@
 # Deploy: Staging на Timeweb Cloud
 
-Дата: 2026-07-09.
+Дата: 2026-07-09.  
+**Статус 2026-08-07:** исторический runbook. Хост staging тогда был SPB `.16` (Intelligent Hoopoe) - **труп**, не SSH. Актуальный catalog/build = MSK `201.24.125.184`. Staging DB name `daibilet_staging` в docker-compose - локальный/optional контур, не привязка к `.16`.
 
-Цель: проверить `integrate/mvp-launch` на staging **без затирания** prod `daibilet.ru`.
+Цель (историческая): проверить `integrate/mvp-launch` на staging **без затирания** prod `daibilet.ru`.
 
 ## Директории
 
@@ -13,10 +14,11 @@
 | Admin static | `/var/www/daibilet/staging-admin` |
 | Prod (не трогать) | `/opt/daibilet` |
 
-## Первичная установка на сервере
+## Первичная установка на сервере (historical - не выполнять на `.16`)
 
 ```bash
-ssh root@213.171.7.16
+# Канон сейчас: ssh daibilet-msk (201.24.125.184), не Intelligent Hoopoe.
+ssh daibilet-msk
 
 cd /opt
 git clone -b integrate/mvp-launch https://github.com/Twisterrrrr/daibilet.git daibilet-staging
@@ -125,3 +127,50 @@ nginx -t && systemctl reload nginx
 4. DNS/upstream switch по [deploy-timeweb.md](./deploy-timeweb.md)
 
 **Не переключать `daibilet.ru` без staging smoke.**
+
+---
+
+## F3: Next.js public (`feat/next-monorepo`)
+
+Legacy SPA deploy выше — **до cutover**. После F3:
+
+```bash
+cd /opt/daibilet-staging
+git checkout feat/next-monorepo
+BRANCH=feat/next-monorepo ./deploy/scripts/deploy-staging-next.sh
+```
+
+Один раз:
+
+```bash
+cp deploy/systemd/daibilet-web-staging.service /etc/systemd/system/
+systemctl enable --now daibilet-web-staging
+# nginx: deploy/nginx/staging-next.conf.snippet
+```
+
+Smoke:
+
+```bash
+pnpm launch:staging-smoke-next
+pnpm backend:next:parity
+```
+
+Чеклист: [phases/phase-f3-cutover-checklist.md](./phases/phase-f3-cutover-checklist.md)
+
+### Production catalog reads, isolated staging writes
+
+Staging Next may read the production catalog through
+`DAIBILET_PUBLIC_CATALOG_API_INTERNAL_URL=http://127.0.0.1:4000`. Keep
+`DAIBILET_PUBLIC_API_INTERNAL_URL` and `DAIBILET_ADMIN_API_URL` pointed at
+`127.0.0.1:4001`. The web API client only selects the production base for its
+allowlisted read routes (events, venues, cities, destinations, articles,
+landings, and search); other public API requests stay on the staging backend.
+The staging Nginx vhost must route only those corresponding GET endpoints
+through the Next API handlers. Orders, subscriptions, admin, sync, checkout,
+and other API paths remain on the staging API. Never copy staging Basic Auth to
+the production API.
+
+This split lets the preview display live catalog data while an editor uses the
+staging admin and database. Venue editor preview remains the path for reviewing
+staging-only edits. Do not reduce or reseed the staging database until the live
+read split is deployed and smoke-checked; retain a verified DB backup first.

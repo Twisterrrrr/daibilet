@@ -1,0 +1,2192 @@
+[
+  {
+    "eventId": "evt_6abe3bb6687e7189fbea2681",
+    "eventPageId": "71f2a6ca-93f2-4734-99d2-621bc8fcb75a",
+    "slug": "cirk-buduschego-za-granyu-vozmozhnogo-megion",
+    "title": "Цирк БУДУЩЕГО \"За гранью возможного\"",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Цирк БУДУЩЕГО \"За гранью возможного\"",
+    "seoTitle": "Цирк БУДУЩЕГО \"За гранью возможного\" | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6abe3bb6687e7189fbea2681"
+    ],
+    "routes": [
+      {
+        "path": "/events/cirk-buduschego-za-granyu-vozmozhnogo-megion",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T20:41:15.596Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6abe3bb6687e7189fbea2681",
+      "kind": "SINGLE",
+      "slug": "цирк-будущего-за-гранью-возможного-6abe3bb6687e7189fbea2681",
+      "seoH1": null,
+      "title": "Цирк БУДУЩЕГО \"За гранью возможного\"",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6abe3bb6687e7189fbea2681",
+          "externalId": "6abe3bb6687e7189fbea2681",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_5b85282c4532e4000d437f67",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6abe3bb533e83ee147b0d135.jpg",
+      "seoTitle": null,
+      "cityTitle": "Мегион",
+      "venueTitle": "Дворец искусств",
+      "description": "«Мы не спорим с гравитацией — мы с ней договариваемся. В этом шоу она становится подсказкой: где зависнуть, где замереть, где позволить сцене творить чудеса. Технологии и искусство сплетаются, чтобы на один вечер отменить привычные правила мира. Приходите — почувствуйте, как реальность становится пластичной».",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "ул. Заречная, 8",
+      "canonicalPath": null,
+      "primaryCityId": "city_1499053",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Мегион",
+      "venue": "Дворец искусств",
+      "address": "ул. Заречная, 8",
+      "ageLimit": "0",
+      "minOffer": 800,
+      "nextStart": "2026-11-20T13:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 6
+    }
+  },
+  {
+    "eventId": "evt_6ae480f313bd1cf7f817140e",
+    "eventPageId": "4ea14013-4b7b-4380-a53a-809d47b7b31b",
+    "slug": "interaktivnyi-spektakl-kolobok-ot-1-do-4-let-sankt-peterburg-2",
+    "title": "Интерактивный спектакль \"Колобок\" от 1 до 4 лет",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Интерактивный спектакль \"Колобок\" от 1 до 4 лет",
+    "seoTitle": "Интерактивный спектакль \"Колобок\" от 1 до 4 лет | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6ae480f313bd1cf7f817140e"
+    ],
+    "routes": [
+      {
+        "path": "/events/interaktivnyi-spektakl-kolobok-ot-1-do-4-let-sankt-peterburg-2",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-12T06:51:27.160Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6ae480f313bd1cf7f817140e",
+      "kind": "SINGLE",
+      "slug": "интерактивныи-спектакль-колобок-от-1-до-4-лет-6ae480f313bd1cf7f817140e",
+      "seoH1": null,
+      "title": "Интерактивный спектакль \"Колобок\" от 1 до 4 лет",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ae480f313bd1cf7f817140e",
+          "externalId": "6ae480f313bd1cf7f817140e",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_62d7e106c7fd5a8b55808e77",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-07/6a4fbf89c07d1c13160c05ce.png",
+      "seoTitle": null,
+      "cityTitle": "Санкт-Петербург",
+      "venueTitle": "Театр для детей \"Малышок\" (пр.Искровский пр.д22. кор.А)",
+      "description": "Интерактивный спектакль по мотивам известной народной сказки. Непослушный Колобок укатился в лес искать себе друзей. На пути его ждут разные приключения.<br>Дети помогают Колобку вернуться домой. Наш спектакль с хорошим финалом!<br><br> Продолжительность: 35 минут веселого действия + время на фотографии в декорациях спектакля.<br>Дети до 4 лет могут посещать спектакли только в сопровождении взрослого. На взрослого и ребёнка приобретается 2 билета.<br>Зрителям необходимо иметь сменную обувь. Просим приходить за 10-15 минут до начала спектакля.<br>Во время спектакля разрешена фотосъёмка. Если вы не хотите, чтобы ваш ребёнок попал в кадр, предупредите администратора до начала представления.",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "пр. Искровский д.22 кор.А (15 мин.пешком от м.Дыбенко)",
+      "canonicalPath": null,
+      "primaryCityId": "city_498817",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Санкт-Петербург",
+      "venue": "Театр для детей \"Малышок\" (пр.Искровский пр.д22. кор.А)",
+      "address": "пр. Искровский д.22 кор.А (15 мин.пешком от м.Дыбенко)",
+      "ageLimit": "0",
+      "minOffer": 950,
+      "nextStart": "2026-11-20T14:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 3
+    }
+  },
+  {
+    "eventId": "evt_6ada6ae8305c94f5abfdf68a",
+    "eventPageId": "affe879e-60e6-4f19-b5c7-2845784ea4c9",
+    "slug": "shou-legendy-russkogo-roka-oktyabrskiy-respublika-bashkortostan",
+    "title": "Шоу \"ЛЕГЕНДЫ РУССКОГО РОКА\"",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Шоу \"ЛЕГЕНДЫ РУССКОГО РОКА\"",
+    "seoTitle": "Шоу \"ЛЕГЕНДЫ РУССКОГО РОКА\" | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6ada6ae8305c94f5abfdf68a"
+    ],
+    "routes": [
+      {
+        "path": "/events/shou-legendy-russkogo-roka-oktyabrskiy-respublika-bashkortostan",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T19:35:37.788Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6ada6ae8305c94f5abfdf68a",
+      "kind": "RECURRING",
+      "slug": "шоу-легенды-русского-рока-6ada6ae8305c94f5abfdf68a",
+      "seoH1": null,
+      "title": "Шоу \"ЛЕГЕНДЫ РУССКОГО РОКА\"",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ada6ae8305c94f5abfdf68a",
+          "externalId": "6ada6ae8305c94f5abfdf68a",
+          "metaExternalId": "6ada6a9ef58d7d0c288a9fe2"
+        }
+      ],
+      "venueId": "venue_6ada6a864123b99a1fb4cc2f",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ada886bf62c2f916bf0de03.jpg",
+      "seoTitle": null,
+      "cityTitle": "Октябрьский (Республика Башкортостан)",
+      "venueTitle": "МБУ \"Дворец Молодежи\"",
+      "description": "кавер-проект «КОВЕР band» анонсирует уникальное мультимедийное рок-шоу. «КОВЕР band» объявляет о запуске своего нового масштабного музыкального шоу. Это не просто концерт, а цельная рок-история, в которой хиты нескольких поколений переплетаются с оригинальным визуальным сюжетом.<br>Главная фишка шоу — глубокая интеграция музыки и визуального искусства. Каждая песня на сцене сопровождается уникальным сюжетным кусочком на экране. Видеоряд создан в авторском художественном стиле, напоминающем контрастную, почти нуарную акварель. На фоне блеклого, туманного окружающего мира герой всегда остается ярким, цветным и живым центром этой истории.<br>Живой звук, мощный вокал, драйв культовых рок-хитов и трогательная визуальная новелла на больших экранах гарантируют зрителям полное погружение в атмосферу ностальгии и чистого рока.",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "проспект Ленина 37",
+      "canonicalPath": null,
+      "primaryCityId": "city_515879",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Октябрьский (Республика Башкортостан)",
+      "venue": "МБУ \"Дворец Молодежи\"",
+      "address": "проспект Ленина 37",
+      "ageLimit": "16",
+      "minOffer": 700,
+      "nextStart": "2026-11-20T14:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 1
+    }
+  },
+  {
+    "eventId": "evt_6ad092fe545764b2af011a47",
+    "eventPageId": "afcc6407-6576-43d1-8ac8-9f1033d1716a",
+    "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-liskah-liski",
+    "title": "Спектакль \"Что Творят Мужчины\" с Сергеем Астаховым в Лисках",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Спектакль \"Что Творят Мужчины\" с Сергеем Астаховым в Лисках",
+    "seoTitle": "Спектакль \"Что Творят Мужчины\" с Сергеем Астаховым в Лисках | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6ad092fe545764b2af011a47"
+    ],
+    "routes": [
+      {
+        "path": "/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-liskah-liski",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T18:11:37.928Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6ad092fe545764b2af011a47",
+      "kind": "SINGLE",
+      "slug": "спектакль-что-творят-мужчины-с-сергеем-астаховым-в-лисках-6ad092fe545764b2af011a47",
+      "seoH1": null,
+      "title": "Спектакль \"Что Творят Мужчины\" с Сергеем Астаховым в Лисках",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ad092fe545764b2af011a47",
+          "externalId": "6ad092fe545764b2af011a47",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_6235f331b250f8579db79930",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ad092fbc11e1540fc2ef972.jpg",
+      "seoTitle": null,
+      "cityTitle": "Лиски",
+      "venueTitle": "Городской дворец культуры",
+      "description": "<iframe width=\"265\" height=\"540\" src=\"//ok.ru/videoembed/18462929980126?nochat=1&autoplay=1\" frameborder=\"0\" allow=\"autoplay\" allowfullscreen></iframe><br><br>📍 Комедийный спектакль \"Что творят мужчины\" с Сергеем Астаховым в главной роли — это яркое шоу, наполненное острым юмором и живым заигрыванием со зрителем. Шутки и неожиданные повороты не дают ни минуты скучать.<br><br>⭐ Это остроумный, динамичный, уморительно веселый спектакль о том, как бывший матрос становится руководителем целого театра. Состоится ли главная премьера сезона? Сможет ли драматург одолеть матроса и поставить спектакль так, как того требует искусство? Всё это вы увидите лично, если посетите по-настоящему смешную комедию в компании друзей и близких!<br><br>❤ Спектакль уже покорил сердца публики более чем в 300 городах России и ближнего зарубежья, собирая полные залы и вызывая бурю эмоций.",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "проспект Ленина 32А",
+      "canonicalPath": null,
+      "primaryCityId": "city_534838",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Лиски",
+      "venue": "Городской дворец культуры",
+      "address": "проспект Ленина 32А",
+      "ageLimit": "16",
+      "minOffer": 1200,
+      "nextStart": "2026-11-20T15:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 4
+    }
+  },
+  {
+    "eventId": "evt_6a9e83d9bf254d6af788ecf7",
+    "eventPageId": "647aee3a-07f2-457a-911e-d8869bde486d",
+    "slug": "spektakl-master-i-margarita-g-maikop-maykop",
+    "title": "Спектакль Мастер и Маргарита г Майкоп",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Спектакль Мастер и Маргарита г Майкоп",
+    "seoTitle": "Спектакль Мастер и Маргарита г Майкоп | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6a9e83d9bf254d6af788ecf7"
+    ],
+    "routes": [
+      {
+        "path": "/events/spektakl-master-i-margarita-g-maikop-maykop",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T18:10:49.713Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6a9e83d9bf254d6af788ecf7",
+      "kind": "SINGLE",
+      "slug": "спектакль-мастер-и-маргарита-г-маикоп-6a9e83d9bf254d6af788ecf7",
+      "seoH1": null,
+      "title": "Спектакль Мастер и Маргарита г Майкоп",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a9e83d9bf254d6af788ecf7",
+          "externalId": "6a9e83d9bf254d6af788ecf7",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_641963e46fa8f7fd04ca5e33",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6a9e83d921d3d64854ad8dc7.jpg",
+      "seoTitle": null,
+      "cityTitle": "Майкоп",
+      "venueTitle": "Государственная филармония республики Адыгея",
+      "description": "«Мастер и Маргарита» — роман, который не так просто перенести на театральные подмостки. Однако, когда это удается, результат поражает воображение. Зрители, наблюдающие за мистическим действом на сцене, испытывают восторг и восхищение. Удачно продуманные мизансцены, яркие танцы, роскошные костюмы, мастерство художника по свету и блестящая игра актеров превращают спектакль в настоящее волшебство.<br>Театральная версия романа Булгакова не уступает оригинальному произведению по силе воздействия. Зрители словно переносятся в Москву 30-х годов, ощущая атмосферу, краски и даже запахи того времени. Живая игра актеров, волшебная музыка и оригинальное решение проблемы мистики на сцене создают неповторимую атмосферу.<br>Воланд, ведьмы, коты, исторические личности — все это кажется плодом больного воображения поэта Ивана Бездомного. Но реальность, представленная в спектакле, заставляет задуматься о природе творчества и его влиянии на жизнь. Сыграть в этой постановке мечтает каждый актер, но удается это лишь немногим. Сложность сюжета и мистическая атмосфера романа требуют от актеров искренности и веры в то, что любовь сильнее смерти.<br>Спектакль «Мастер и Маргарита» уже 20 лет радует зрителей и заслужил репутацию самого популярного в странах СНГ и зарубежья. Он стал подлинным шедевром искусства театра двадцать первого века.",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "ул. Пионерская, 300",
+      "canonicalPath": null,
+      "primaryCityId": "city_528293",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Майкоп",
+      "venue": "Государственная филармония республики Адыгея",
+      "address": "ул. Пионерская, 300",
+      "ageLimit": "12",
+      "minOffer": 1000,
+      "nextStart": "2026-11-20T15:30:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 6
+    }
+  },
+  {
+    "eventId": "evt_6ad665cefd4f74ee19528c6f",
+    "eventPageId": "371eaf45-0f88-4a9f-87d2-665ecc76d8c5",
+    "slug": "oge-po-litre-spektakl-dlya-9-10-11-klassov-po-pese-yulii-voronovoi-sankt-peterburg",
+    "title": "\"ОГЭ ПО ЛИТРЕ\", спектакль для старших классов от независимого театрального проекта \"чтеатр\"",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "\"ОГЭ ПО ЛИТРЕ\", спектакль для старших классов от независимого театрального проекта \"чтеатр\"",
+    "seoTitle": "\"ОГЭ ПО ЛИТРЕ\", спектакль для старших классов от независимого театрального проекта \"чтеатр\" | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6ad665cefd4f74ee19528c6f"
+    ],
+    "routes": [
+      {
+        "path": "/events/oge-po-litre-spektakl-dlya-9-10-11-klassov-po-pese-yulii-voronovoi-sankt-peterburg",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T18:11:51.660Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6ad665cefd4f74ee19528c6f",
+      "kind": "SINGLE",
+      "slug": "огэ-по-литре-спектакль-для-9-10-11-классов-по-пьесе-юлии-вороновои-6ad665cefd4f74ee19528c6f",
+      "seoH1": null,
+      "title": "\"ОГЭ ПО ЛИТРЕ\", спектакль для старших классов от независимого театрального проекта \"чтеатр\"",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ad665cefd4f74ee19528c6f",
+          "externalId": "6ad665cefd4f74ee19528c6f",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_6347472eddefe67e63877b64",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6adc812f482a2672e32a3ef9.jpg",
+      "seoTitle": null,
+      "cityTitle": "Санкт-Петербург",
+      "venueTitle": "Культурный центр \"Фенестра\"",
+      "description": "Пушкин против Пушкина вновь сойдутся на одной сцене!<br><br>Накануне экзамена девятиклассник Веня Пушкин должен сделать выбор: послушаться маму и остаться готовиться к ОГЭ или пойти против неё, чтобы поддержать попавшую в больницу девочку, в которую влюблён. Пока мама и воображаемая учительница требуют соответствовать великой фамилии, Веня впервые решает сам, каким Пушкиным ему быть.<br><br>Наша пьеса затрагивает проблемы, знакомые современным подросткам: давление<br>родительских ожиданий, экзаменационный стресс, гиперопеку, первую любовь и<br>необходимость самостоятельно принимать решения.<br><br>Спектакль предлагает взглянуть на конфликт поколений с разных сторон, где у подростка, родителя и учителя — своя правда.  Мы хотим начать диалог прямо после нашего спектакля. Вместе с артистами и режиссером мы проведем обсуждение, где любой желающий - подросток, родитель или учитель, смогут выразить свое мнение по поводу увиденного и обсудить темы, затронутые в пьесе.<br><br>автор пьесы Юлия Воронова<br>режиссер Игорь Хонин<br>в спектакле заняты Макар Громов, Полина Кудимова, Аня Черкашина<br>художник Маша Рыкова<br>продюсер Серафима Иванова",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "ул. Дровяная, 3",
+      "canonicalPath": null,
+      "primaryCityId": "city_498817",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Санкт-Петербург",
+      "venue": "Культурный центр \"Фенестра\"",
+      "address": "ул. Дровяная, 3",
+      "ageLimit": "12",
+      "minOffer": 1700,
+      "nextStart": "2026-11-20T16:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 2
+    }
+  },
+  {
+    "eventId": "evt_6a81e42523d46ece3991999f",
+    "eventPageId": "c4d86679-bb1b-42f2-bb49-34d4279dd97c",
+    "slug": "voshititelnye-istorii-parikmahera-nakonechnikova-spektakl-komediya-sankt-peterburg",
+    "title": "«Восхитительные истории парикмахера Наконечникова» спектакль, комедия",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "«Восхитительные истории парикмахера Наконечникова» спектакль, комедия",
+    "seoTitle": "«Восхитительные истории парикмахера Наконечникова» спектакль, комедия | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6a81e42523d46ece3991999f"
+    ],
+    "routes": [
+      {
+        "path": "/events/voshititelnye-istorii-parikmahera-nakonechnikova-spektakl-komediya-sankt-peterburg",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T20:40:22.770Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6a81e42523d46ece3991999f",
+      "kind": "SINGLE",
+      "slug": "восхитительные-истории-парикмахера-наконечникова-спектакль-комедия-6a81e42523d46ece3991999f",
+      "seoH1": null,
+      "title": "«Восхитительные истории парикмахера Наконечникова» спектакль, комедия",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a81e42523d46ece3991999f",
+          "externalId": "6a81e42523d46ece3991999f",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_59dbb6e1515e35001c9546b0",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6acf7c987641db2d5f7fc6d7.jpg",
+      "seoTitle": null,
+      "cityTitle": "Санкт-Петербург",
+      "venueTitle": "Дом Шрёдера",
+      "description": "Смешные и трогательные короткие истории от лица провинциального парикмахера Наконечникова, который внезапно обнаружил в себе талант драматурга.<br><br>Спектакль объединён жизненными сюжетами, которые знакомы каждому. Ну, кто из нас не терял, например, деньги. И каждый когда-нибудь влюблялся. Однако, если ты что-то теряешь - всегда находишь что-то другое.<br><br>Герои весёлых рассказов: продавщица, шофёр, молодой тракторист, студент и студентка, таксист, сельская учительница, начальник, городская актрисочка, и, даже, Ангел в шляпе и пиджаке, который появляется в начале и в конце - талантливо воплощены молодыми артистами театра \"Палитра\".<br><br>Спектакль является результатом синтеза творчества двух выдающихся российских писателей 20 века - Александра Вампилова и Василия Шукшина. Живое исполнение эстрадных хитов 70-х добавляет спектаклю энергии и настроения. <br><br>Театр \"Палитра\"<br>Режиссёр-постановщик - Владимир Сабельфельд<br><br>Продолжительность: 2 часа с одним антрактом.<br>Аудитория: 12+",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "Петроградская наб, дом 32.",
+      "canonicalPath": null,
+      "primaryCityId": "city_498817",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Санкт-Петербург",
+      "venue": "Дом Шрёдера",
+      "address": "Петроградская наб, дом 32.",
+      "ageLimit": "12",
+      "minOffer": 1000,
+      "nextStart": "2026-11-20T16:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 5
+    }
+  },
+  {
+    "eventId": "evt_6adb15e2aae814aa3feec217",
+    "eventPageId": "c61a4f6c-d87f-4104-8db3-dd06c697c4db",
+    "slug": "shou-fokusov-i-yumora-moskva-2",
+    "title": "Шоу фокусов и юмора",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Шоу фокусов и юмора",
+    "seoTitle": "Шоу фокусов и юмора | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6adb15e2aae814aa3feec217"
+    ],
+    "routes": [
+      {
+        "path": "/events/shou-fokusov-i-yumora-moskva-2",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T20:42:38.103Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6adb15e2aae814aa3feec217",
+      "kind": "SINGLE",
+      "slug": "шоу-фокусов-и-юмора-6adb15e2aae814aa3feec217",
+      "seoH1": null,
+      "title": "Шоу фокусов и юмора",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6adb15e2aae814aa3feec217",
+          "externalId": "6adb15e2aae814aa3feec217",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_69313f61d2ccfa29436c7889",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ad0ed8dfb1b6f1e734b1a2d.png",
+      "seoTitle": null,
+      "cityTitle": "Москва",
+      "venueTitle": "Московский стендап клуб",
+      "description": "Юмор, магия и незабываемый вечер — всё в одном шоу!<br><br>Вас ждёт вечер, в котором смех сменяется удивлением, а яркие эмоции — новыми впечатлениями. Стендап, невероятные фокусы, вкусная еда, любимые напитки и уютная атмосфера — идеальное сочетание для отдыха и отличного настроения.<br><br>Это больше, чем просто концерт. Живое общение, энергия сцены, неожиданные моменты и юмор, который объединяет. Здесь можно от души посмеяться, удивиться невозможному и просто насладиться вечером, который точно запомнится.",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "ул. Сретенка 34/1 с.1",
+      "canonicalPath": null,
+      "primaryCityId": "city_524901",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Москва",
+      "venue": "Московский стендап клуб",
+      "address": "ул. Сретенка 34/1 с.1",
+      "ageLimit": "18",
+      "minOffer": 1266,
+      "nextStart": "2026-11-20T16:30:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 4
+    }
+  },
+  {
+    "eventId": "evt_6ab96928572915057208cefe",
+    "eventPageId": "c654befc-0c89-45d6-ba48-8e61dcd39378",
+    "slug": "burlesk-detektiv-ubiistvenno-krasiva-moskva",
+    "title": "Бурлеск-детектив \"Убийственно красива\"",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Бурлеск-детектив \"Убийственно красива\"",
+    "seoTitle": "Бурлеск-детектив \"Убийственно красива\" | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6ab96928572915057208cefe"
+    ],
+    "routes": [
+      {
+        "path": "/events/burlesk-detektiv-ubiistvenno-krasiva-moskva",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T18:10:08.628Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6ab96928572915057208cefe",
+      "kind": "SINGLE",
+      "slug": "бурлеск-детектив-убииственно-красива-6ab96928572915057208cefe",
+      "seoH1": null,
+      "title": "Бурлеск-детектив \"Убийственно красива\"",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ab96928572915057208cefe",
+          "externalId": "6ab96928572915057208cefe",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_6468a3fdb2516beb95c871ea",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6ab969262b31165ef560d9c6.jpg",
+      "seoTitle": null,
+      "cityTitle": "Москва",
+      "venueTitle": "Дом винтажной музыки",
+      "description": "Детектив Мисс Крис и адвокат Анна Тайсберг объединяют усилия, чтобы раскрыть новое дело и найти истинную преступницу.<br><br>Сбор гостей в 19:00<br>Начало шоу в 20:00",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "ул. Орджоникидзе, 1",
+      "canonicalPath": null,
+      "primaryCityId": "city_524901",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Москва",
+      "venue": "Дом винтажной музыки",
+      "address": "ул. Орджоникидзе, 1",
+      "ageLimit": "18",
+      "minOffer": 2500,
+      "nextStart": "2026-11-20T17:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 9
+    }
+  },
+  {
+    "eventId": "evt_6ad1a31fc76d83a966b0385b",
+    "eventPageId": "f36a54b0-5574-4c53-af79-b825d487e002",
+    "slug": "spektakl-levoryuciya-tolyatti",
+    "title": "Спектакль \"Леворюция\"",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Спектакль \"Леворюция\"",
+    "seoTitle": "Спектакль \"Леворюция\" | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6ad1a31fc76d83a966b0385b"
+    ],
+    "routes": [
+      {
+        "path": "/events/spektakl-levoryuciya-tolyatti",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T18:09:56.915Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6ad1a31fc76d83a966b0385b",
+      "kind": "SINGLE",
+      "slug": "спектакль-леворюция-6ad1a31fc76d83a966b0385b",
+      "seoH1": null,
+      "title": "Спектакль \"Леворюция\"",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ad1a31fc76d83a966b0385b",
+          "externalId": "6ad1a31fc76d83a966b0385b",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_6759908bb803faf3cedd600b",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-01/695ebaea8654f45e9887a2dd.jpg",
+      "seoTitle": null,
+      "cityTitle": "Тольятти",
+      "venueTitle": "Театр Иллюзий",
+      "description": "Французская комедия для искушенного взрослого зрителя (по мотивам французского драматурга Жан Ануй «Генералы в юбках»).<br><br>Погрузившись вместе с актерами в атмосферу мира, где правят женщины, у зрителя будет возможность оказаться в числе присяжных на судебном процессе, принимать решения в наказании или оправдании главного персонажа Леона за содеянные им преступления.<br><br>А также насладиться красивыми эротическими женскими танцами, испить бокал игристого вина и провести время в атмосфере надуманной истории о матриархате, окутанной откровенными моментами измен главного персонажа, искрометным юмором и бредовыми, похотливыми вымыслами героев спектакля.<br><br>Режиссер Ишбульдина Е.В.<br><br> Иммерсивный спектакль — это уникальный опыт, где вы становитесь частью происходящего. Чтобы погружение было комфортным и безопасным для вас и актеров, пожалуйста, соблюдайте следующие правила:<br><br>• Приходите вовремя. Если вы опоздаете к началу спектакля более чем на 5 минут, администрация имеет право не пустить вас в зал. Действие начинается сразу, и опоздание разрушит атмосферу спектакля. Деньги за билеты в этом случае не возвращаются.<br><br>• Соблюдайте тишину. Во время действия запрещено разговаривать и отвлекать других зрителей. Отключите звук мобильных телефонов.<br><br>• Не выходите во время действия. Вставать, перемещаться по залу без острой нужды, а также выходить и заходить обратно во время спектакля строго запрещено. Если вы покинете зал, вернуться назад вы уже не сможете.<br><br>• Уважайте личные границы других зрителей. Вы на спектакле не одни поэтому  выкрики , хождения, разговоры по телефону нарушают атмосферу спектакля. При подобном поведении вас могут попросить покинуть зал. Если вы приобрели билет на первый ряд, с вами будут  взаимодействовать актеры, учитывайте это при выборе места и ряда.",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "Юбилейная 29, 1 вход, 2 этаж, офис 209 А",
+      "canonicalPath": null,
+      "primaryCityId": "city_manual_тольятти",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Тольятти",
+      "venue": "Театр Иллюзий",
+      "address": "Юбилейная 29, 1 вход, 2 этаж, офис 209 А",
+      "ageLimit": "18",
+      "minOffer": 1000,
+      "nextStart": "2026-11-20T17:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 3
+    }
+  },
+  {
+    "eventId": "evt_6ae3719e1ee81e4acbdfbab4",
+    "eventPageId": "34b72484-819b-4803-b217-758a87a89d5e",
+    "slug": "minecraft-show-mainkraft-shou-moskva",
+    "title": "MINECRAFT SHOW - МАЙНКРАФТ ШОУ",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "MINECRAFT SHOW - МАЙНКРАФТ ШОУ",
+    "seoTitle": "MINECRAFT SHOW - МАЙНКРАФТ ШОУ | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6ae3719e1ee81e4acbdfbab4"
+    ],
+    "routes": [
+      {
+        "path": "/events/minecraft-show-mainkraft-shou-moskva",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-12T06:51:27.160Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6ae3719e1ee81e4acbdfbab4",
+      "kind": "SINGLE",
+      "slug": "minecraft-show-маинкрафт-шоу-6ae3719e1ee81e4acbdfbab4",
+      "seoH1": null,
+      "title": "MINECRAFT SHOW - МАЙНКРАФТ ШОУ",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ae3719e1ee81e4acbdfbab4",
+          "externalId": "6ae3719e1ee81e4acbdfbab4",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_69b2d2e9dae88285d7ef3155",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ae3719e02469dba6bacee54.jpg",
+      "seoTitle": null,
+      "cityTitle": "Москва",
+      "venueTitle": "МКДЦ «на Грина»",
+      "description": "БОЛЬШОЙ ТУР МАЙНКРАФТ ШОУ: РЕАЛЬНОСТЬ, КОТОРУЮ ВЫ ЖДАЛИ ВСЮ ЖИЗНЬ!<br><br>Майнкрафт - Это моя жизнь!<br><br><br>Представьте себе мир, где кубическая вселенная Minecraft перестает быть пикселями на экране и обретает плоть, звук и объем. Именно это случится в вашем городе, когда Стив, очаровательная Марго и отважный Джо прибудут в рамках своего грандиозного турне по России! Более 40 городов — и в каждом из них мы превратим обычный концертный зал в настоящий биом Minecraft, полный опасностей, загадок и сюрпризов.<br><br>Это не просто детский спектакль. Это масштабная интерактивная сага, где сюжетная линия пишется прямо на ваших глазах. Герои столкнутся с чередой испытаний, и без вашей помощи — без ваших подсказок, знаний игровой механики и смелости — им просто не выстоять. <br><br>Злая колдунья Свинозомби <br>пробирается из Ада в верхний мир Майнкрафта и благодаря черной магии захватывает Стива в свои сети.<br>Смогут ли они победить злодеев и пройти все ловушки? <br>Теперь это зависит не от сценаристов, а от зала!<br><br>Что мы везем с собой через полстраны? <br>Целую фуру впечатлений!<br><br>Наш технический десант подготовил реквизит, который поражает воображение:<br><br>Ростовые куклы, Стив, Гаст легендарный Крипер, харизматичный Стив и грозный Зомби теперь на большой сцене!<br><br>Эксклюзивные саундтреки Майнкрафт шоу <br><br>Коллекционное оружие и уникальные костюмы героев, сшитые с точностью до последнего пикселя.<br><br>Над сценой парит летающий Гаст, а рядом возвышаются огромные работающие верстак и печь — визуальный центр шоу.<br><br>Мыльное шоу, гигантские пузыри и многие другие эффекты ждут вас!<br><br>Бесплатная фотосессия с главными героями после спектакля <br><br>Тот самый Волшебный сундук, который откроется только самым активным участникам.<br><br>Погрузись в мир Майнкрафта:<br>Мы не просто показываем историю — мы заставляем вас ее чувствовать. Мощнейшая звуковая аппаратура воспроизведет каждый шорок травы и рык моба, а профессиональное световое оборудование окрасит сцену в цвета Края. Спецэффекты в виде мощных ветровых дым-машин и огромных летающих мячей, порхающих над головами зрителей, сотрут грань между зрителем и участником.<br><br>Это единственный шанс в этом году оказаться по ту сторону экрана. Собирайте команду, и готовьтесь к самому грандиозному приключению! <br>До встречи на Майнкрафт Шоу!",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "ул. Грина, 1Б",
+      "canonicalPath": null,
+      "primaryCityId": "city_524901",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Москва",
+      "venue": "МКДЦ «на Грина»",
+      "address": "ул. Грина, 1Б",
+      "ageLimit": "0",
+      "minOffer": 900,
+      "nextStart": "2026-11-21T11:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 8
+    }
+  },
+  {
+    "eventId": "evt_6ada1a33ab6296106c050c7d",
+    "eventPageId": "224aa887-0753-4055-ae10-7a8695a2cee9",
+    "slug": "golaya-ufa",
+    "title": "\"Голая\"",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "\"Голая\"",
+    "seoTitle": "\"Голая\" | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6ada1a33ab6296106c050c7d"
+    ],
+    "routes": [
+      {
+        "path": "/events/golaya-ufa",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T20:42:35.173Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6ada1a33ab6296106c050c7d",
+      "kind": "SINGLE",
+      "slug": "голая-6ada1a33ab6296106c050c7d",
+      "seoH1": null,
+      "title": "\"Голая\"",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ada1a33ab6296106c050c7d",
+          "externalId": "6ada1a33ab6296106c050c7d",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_653b6f06aedc97553c5058c5",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-04/69ee01a97c62661768b57b05.jpg",
+      "seoTitle": null,
+      "cityTitle": "Уфа",
+      "venueTitle": "Частный профессиональный театр The TEATR",
+      "description": "Спектакль-ретрит.<br><br>Главная героиня Лиза приезжает в буддистский монастырь, чтобы разоблачить духовных якобы «Просветленных» мудрецов, но жизнь принимает совершенно другой оборот. Происходит очищение души через высвобождение боли и освобождение от страхов, которые сковывали ее душу много лет.<br><br>Это спектакль о духовном и телесном, о человечности и жестокости, о чистоте и порочности, о людях, и не только. Это история о каждом из нас. Эта история - от первого до последнего слова правда, потому что перед вами ...ГОЛАЯ.<br><br>Хотим предупредить вас, что при опоздании на спектакль более чем на 20 минут, театр вправе не пустить вас в зал, так как это помешает актерам и зрителям. Пожалуйста, постарайтесь не опаздывать или предупредите нас!",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "Карла Маркса 48/1",
+      "canonicalPath": null,
+      "primaryCityId": "city_479561",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Уфа",
+      "venue": "Частный профессиональный театр The TEATR",
+      "address": "Карла Маркса 48/1",
+      "ageLimit": "18",
+      "minOffer": 2000,
+      "nextStart": "2026-11-20T14:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 1
+    }
+  },
+  {
+    "eventId": "evt_6aaa4fe9eaf8e47c65c8662f",
+    "eventPageId": "630d5c5a-19ab-4778-a865-28c51b5f89f3",
+    "slug": "balet-spyaschaya-krasavica-sankt-peterburg",
+    "title": "Балет «Спящая красавица»",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Балет «Спящая красавица»",
+    "seoTitle": "Балет «Спящая красавица» | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6aaa4fe9eaf8e47c65c8662f"
+    ],
+    "routes": [
+      {
+        "path": "/events/balet-spyaschaya-krasavica-sankt-peterburg",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T20:40:49.056Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6aaa4fe9eaf8e47c65c8662f",
+      "kind": "SINGLE",
+      "slug": "балет-спящая-красавица-6aaa4fe9eaf8e47c65c8662f",
+      "seoH1": null,
+      "title": "Балет «Спящая красавица»",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6aaa4fe9eaf8e47c65c8662f",
+          "externalId": "6aaa4fe9eaf8e47c65c8662f",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_58ca88ce515e3500152d336a",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-08/6a91cd145b2c4847e0a0939b.jpg",
+      "seoTitle": null,
+      "cityTitle": "Санкт-Петербург",
+      "venueTitle": "КЗ \"У Финляндского\"",
+      "description": null,
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "Арсенальная наб., 13/1///Arsenalnaya Emb., 13/1",
+      "canonicalPath": null,
+      "primaryCityId": "city_498817",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Санкт-Петербург",
+      "venue": "КЗ \"У Финляндского\"",
+      "address": "Арсенальная наб., 13/1///Arsenalnaya Emb., 13/1",
+      "ageLimit": "0",
+      "minOffer": 2000,
+      "nextStart": "2026-11-21T10:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 10
+    }
+  },
+  {
+    "eventId": "evt_6ac4b946e3e6e24dc6d369ee",
+    "eventPageId": "66d9b6db-fa49-4387-83fc-32398a483397",
+    "slug": "cirk-na-ldu-tver",
+    "title": "Цирк на льду",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Цирк на льду",
+    "seoTitle": "Цирк на льду | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6ac4b946e3e6e24dc6d369ee"
+    ],
+    "routes": [
+      {
+        "path": "/events/cirk-na-ldu-tver",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T20:41:30.603Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6ac4b946e3e6e24dc6d369ee",
+      "kind": "SINGLE",
+      "slug": "цирк-на-льду-6ac4b946e3e6e24dc6d369ee",
+      "seoH1": null,
+      "title": "Цирк на льду",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ac4b946e3e6e24dc6d369ee",
+          "externalId": "6ac4b946e3e6e24dc6d369ee",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_6ac392e46598a67bf9a656e9",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ac4b9459e0c30a5780ba54f.jpg",
+      "seoTitle": null,
+      "cityTitle": "Тверь",
+      "venueTitle": "ТЦ Торговый парк № 1",
+      "description": null,
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "проспект Октябрьский 103",
+      "canonicalPath": null,
+      "primaryCityId": "city_480060",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Тверь",
+      "venue": "ТЦ Торговый парк № 1",
+      "address": "проспект Октябрьский 103",
+      "ageLimit": "0",
+      "minOffer": 1200,
+      "nextStart": "2026-11-21T10:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 6
+    }
+  },
+  {
+    "eventId": "evt_6ae328f5284463eaa2d84c64",
+    "eventPageId": "90cb9f61-9c85-4861-8e16-e6725f9223e3",
+    "slug": "immersivnoe-shou-spektakl-kartina-na-million-moskva",
+    "title": "Иммерсивное шоу-спектакль «КАРТИНА НА МИЛЛИОН»",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Иммерсивное шоу-спектакль «КАРТИНА НА МИЛЛИОН»",
+    "seoTitle": "Иммерсивное шоу-спектакль «КАРТИНА НА МИЛЛИОН» | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6ae328f5284463eaa2d84c64"
+    ],
+    "routes": [
+      {
+        "path": "/events/immersivnoe-shou-spektakl-kartina-na-million-moskva",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T20:43:03.724Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6ae328f5284463eaa2d84c64",
+      "kind": "SINGLE",
+      "slug": "иммерсивное-шоу-спектакль-картина-на-миллион-6ae328f5284463eaa2d84c64",
+      "seoH1": null,
+      "title": "Иммерсивное шоу-спектакль «КАРТИНА НА МИЛЛИОН»",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ae328f5284463eaa2d84c64",
+          "externalId": "6ae328f5284463eaa2d84c64",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_666b31d46d81c527c7299b23",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6ab2c6a5ea21f7ec99625c86.jpg",
+      "seoTitle": null,
+      "cityTitle": "Москва",
+      "venueTitle": "Signature art в высотке на Котельнической",
+      "description": "«Крыши и Выше» представляют уникальный формат мероприятия — иммерсивный спектакль!<br>Что это значит? <br>ВЫ — одно из действующих лиц!<br>ВЫ — можете примерить самые неожиданные образы вместе с профессиональными актёрами! <br>ВЫ — одновременно гость, участник, артист и зритель!<br>Представьте: вы приглашены на выставку редких картин. <br>Главная сенсация вечера — полотно известного художника стоимостью миллион долларов.<br>Сразу после выставки картину должен приобрести таинственный меценат-миллионер, и после этого она навсегда исчезнет от посторонних глаз в частной коллекции.<br>Сегодня — ваш последний шанс её увидеть.<br>Но всё ли пойдёт по плану?..<br>В этот вечер вас ждут: <br>— welcome drink;<br>— театральный перформанс;<br>— живая музыка;<br>— участие в спектакле вместе с профессиональными актёрами театра \"Модерн\".<br>— неожиданные роли и новые эмоции;<br>— веселье и незабываемые впечатления.<br>Кем вы станете в этой истории — наблюдателем, героем или тем, кто изменит ход событий?<br>То, как далеко вы решитесь зайти в своей роли, зависит только от вас.<br>Ждём вас в арт-ресторане SIGNATURE на Котельнической набережной.<br>Дресс-код коктейльный, не строго, но желательно.<br>Это не спектакль, который вы смотрите.<br>Это спектакль, в котором вы живёте!",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "г. Москва, Котельническая набережная, 1/15 корпус В",
+      "canonicalPath": null,
+      "primaryCityId": "city_524901",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Москва",
+      "venue": "Signature art в высотке на Котельнической",
+      "address": "г. Москва, Котельническая набережная, 1/15 корпус В",
+      "ageLimit": "0",
+      "minOffer": 5900,
+      "nextStart": "2026-11-21T16:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 2
+    }
+  },
+  {
+    "eventId": "evt_6a980232f1ed4e1a970c38a4",
+    "eventPageId": "8761f6f2-c495-4d1a-a2f0-bf46adec3ae4",
+    "slug": "tablao-de-las-llamas-unikalnyi-spektakl-flamenko-chistaya-strast-i-improvizaciya-moskva",
+    "title": "TABLAO. De Las Llamas: уникальный спектакль фламенко – чистая страсть и импровизация",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "TABLAO. De Las Llamas: уникальный спектакль фламенко – чистая страсть и импровизация",
+    "seoTitle": "TABLAO. De Las Llamas: уникальный спектакль фламенко – чистая страсть и импровизация | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6a980232f1ed4e1a970c38a4"
+    ],
+    "routes": [
+      {
+        "path": "/events/tablao-de-las-llamas-unikalnyi-spektakl-flamenko-chistaya-strast-i-improvizaciya-moskva",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T20:40:38.280Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6a980232f1ed4e1a970c38a4",
+      "kind": "SINGLE",
+      "slug": "tablao-de-las-llamas-уникальныи-спектакль-фламенко-чистая-страсть-и-импровизация-6a980232f1ed4e1a970c38a4",
+      "seoH1": null,
+      "title": "TABLAO. De Las Llamas: уникальный спектакль фламенко – чистая страсть и импровизация",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a980232f1ed4e1a970c38a4",
+          "externalId": "6a980232f1ed4e1a970c38a4",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_656c6bff16ef85c0548ff2df",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6a9a96186d1e0db20554f85d.png",
+      "seoTitle": null,
+      "cityTitle": "Москва",
+      "venueTitle": "Клуб Ивана Смирнова",
+      "description": "Вы когда-нибудь видели, как рождается искусство? Без сценария, без репетиций финала, только чистая страсть и импровизация.<br><br>«De Las Llamas» в переводе с испанского означает «Из пламени». <br>И это не просто название – это то, что вы почувствуете каждой клеткой тела. <br>На наших глазах музыканты и танцоры ведут диалог без слов, используя лишь каноны фламенко. <br><br>Каждое шоу – это уникальный спектакль, который невозможно повторить.<br><br>Что вас ждет? <br><br>✨ Вихрь эмоций: от нежной пластики кистей и взмахов шалей до яростного, огненного сапатеадо. <br><br>✨ Атмосфера Испании: магические звуки гитары, глубокий вокал, ритмичные удары перкуссии и пальмас. <br><br>✨ Эстетика в деталях: грация веера, звонкие удары бастона, игривые сомбреро и летящие юбки.<br><br>Это не просто концерт. Это профессиональный балет фламенко под руководством Юлии Плахотиной – Президента Федерации Фламенко России, чьи постановки покоряют сцены Кремлевского Дворца.<br>Почувствуйте огонь. Станьте частью легенды.",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "г. Москва, ул. Долгоруковская, дом 31, стр. 32, этаж 3",
+      "canonicalPath": null,
+      "primaryCityId": "city_524901",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Москва",
+      "venue": "Клуб Ивана Смирнова",
+      "address": "г. Москва, ул. Долгоруковская, дом 31, стр. 32, этаж 3",
+      "ageLimit": "6",
+      "minOffer": 1300,
+      "nextStart": "2026-11-21T16:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 3
+    }
+  },
+  {
+    "eventId": "evt_6ad01c1a65580925b38fac16",
+    "eventPageId": "57bff3e8-5138-4216-905f-6e19988e5df4",
+    "slug": "metel-muzykalno-dramaticheskaya-fantaziya-po-povesti-a-s-pushkina-sankt-peterburg",
+    "title": "Метель. Спектакль по повести А. С. Пушкина",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Метель. Спектакль по повести А. С. Пушкина",
+    "seoTitle": "Метель. Спектакль по повести А. С. Пушкина | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6ad01c1a65580925b38fac16"
+    ],
+    "routes": [
+      {
+        "path": "/events/metel-muzykalno-dramaticheskaya-fantaziya-po-povesti-a-s-pushkina-sankt-peterburg",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T18:10:58.530Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6ad01c1a65580925b38fac16",
+      "kind": "SINGLE",
+      "slug": "метель-музыкально-драматическая-фантазия-по-повести-а-с-пушкина-6ad01c1a65580925b38fac16",
+      "seoH1": null,
+      "title": "Метель. Спектакль по повести А. С. Пушкина",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ad01c1a65580925b38fac16",
+          "externalId": "6ad01c1a65580925b38fac16",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_6714f68f3a6a23ac2596313a",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ad01c1acd5dca5cdf521bbb.jpg",
+      "seoTitle": null,
+      "cityTitle": "Санкт-Петербург",
+      "venueTitle": "Арт-пространство \"Сад Искусств\"",
+      "description": "Почти 200 лет  назад А. С. Пушкин явил миру образец великолепной, лаконичной и ясной прозы – повесть «Метель».  Гений Пушкин заключил в рамки анекдота с романтическим флёром  глубокую философскую мысль, разглядеть которую так же не просто, как очертания ближайших окрестностей в метель. По сей день читатели не устают разглядывать в этой удивительной истории образы и символы, хранящие загадку и мудрость русской души.<br>Авторы спектакля превращают «Метель» Пушкина в музыкально-драматическую фантазию, где слово великого классика в слиянии с прекрасной музыкой, рождает новые образы и смыслы. И главный вопрос, на который создатели действа мечтают найти ответ: человек или стихия задаёт вектор движения и запускает события в нашей жизни? Метель, как воплощение тайных сил оживает и говорит со зрителем от лица самой Природы. Умеем ли мы во время услышать её? А если нет, то, что нам мешает? Возможно ли быть частью стихии, оставаясь при этом просто человеком с присущими ему слабостями и несовершенствами? Чего стоят нам наши ошибки? Почему именно русская земля рождает истину, от которой уводят нас «французские романы»?<br>Героиня истории Марья Гавриловна, живущая в иллюзиях романтической баллады,  обретает свое истинное счастье, пройдя через суровую реальность, страдания, и понимает, наконец, простую истину, что Жизнь – это царство случая. <br>Приглашаем Вас стать свидетелем этой удивительной и в то же время простой истории, где каждый сможет найти своё.",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "Загородный пр. 35",
+      "canonicalPath": null,
+      "primaryCityId": "city_498817",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Санкт-Петербург",
+      "venue": "Арт-пространство \"Сад Искусств\"",
+      "address": "Загородный пр. 35",
+      "ageLimit": "6",
+      "minOffer": 1000,
+      "nextStart": "2026-11-22T15:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 3
+    }
+  },
+  {
+    "eventId": "evt_6aae8d87cd604f1f02cd5ba2",
+    "eventPageId": "e132a92a-83b8-417c-880c-19a36451e603",
+    "slug": "gala-shou-a-lya-russ-v-plameni-1000-svechei-tobolsk",
+    "title": "Гала-шоу «А-Ля Русс» в пламени 1000 свечей",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Гала-шоу «А-Ля Русс» в пламени 1000 свечей",
+    "seoTitle": "Гала-шоу «А-Ля Русс» в пламени 1000 свечей | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6aae8d87cd604f1f02cd5ba2"
+    ],
+    "routes": [
+      {
+        "path": "/events/gala-shou-a-lya-russ-v-plameni-1000-svechei-tobolsk",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T20:40:53.396Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6aae8d87cd604f1f02cd5ba2",
+      "kind": "SINGLE",
+      "slug": "гала-шоу-а-ля-русс-в-пламени-1000-свечеи-6aae8d87cd604f1f02cd5ba2",
+      "seoH1": null,
+      "title": "Гала-шоу «А-Ля Русс» в пламени 1000 свечей",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6aae8d87cd604f1f02cd5ba2",
+          "externalId": "6aae8d87cd604f1f02cd5ba2",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_5a8d644fd35286001c4ae761",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6aae8d878b97920688d9e974.jpg",
+      "seoTitle": null,
+      "cityTitle": "Тобольск",
+      "venueTitle": "ДК \"Синтез\"",
+      "description": "Гала-шоу «а-Ля Русс»: Новая музыкальная легенда в ДК «Синтез»<br>21 ноября сцена превратится в эпицентр «Русского шика» — здесь петербургский соло-оркестр Fhilharmonic Бэнд представит свое долгожданное шоу «А-Ля Русс». <br><br>Гала-шоу \"А-Ля Русс\" - это лимитированная премьера: талантливая вокалистка исполнит фольклорные хиты в авторской обработке, соло-оркестр Fhilharmonic Бэнд проведёт сквозь эпохи, а голос AI-ведущего раскроет контекст — без пауз, без пафоса, без скучных номеров. Визуальное совершенство вечера подчеркнет живая архитектура света и завораживающее пламя 1000 свечей, которые превратят зал в волшебное пространство, где зрители почувствуют и погрузятся в настоящее, душевное, проникновенное искусство.<br><br>Это не просто концерт, это мощное шоу, где современная энергия встречается с величием симфонического ансамбля и любимыми мелодиями в новой, захватывающей обработке.<br> «а-Ля Русс» — это симбиоз академического мастерства и драйва стадионных концертов. <br><br>Проведите этот субботний вечер в атмосфере, где традиции оживают в новом веке, даря незабываемые эмоции как ценителям фольклора, классики, джаза, так и любителям современной Поп-рок музыки. <br><br>Спешите занять лучшие места: билеты на субботние выступления обычно разлетаются в первые недели анонса. Подарите себе вечер, который согреет этой осенью!",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "6 микрорайон, 52, Тобольск, Тюменская обл., 626150",
+      "canonicalPath": null,
+      "primaryCityId": "city_1489530",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Тобольск",
+      "venue": "ДК \"Синтез\"",
+      "address": "6 микрорайон, 52, Тобольск, Тюменская обл., 626150",
+      "ageLimit": "6",
+      "minOffer": 1500,
+      "nextStart": "2026-11-21T14:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 4
+    }
+  },
+  {
+    "eventId": "evt_6ae0bcb83fa7836a7734bd38",
+    "eventPageId": "11b4d6a5-8422-44f2-80d8-38afa0e26b79",
+    "slug": "vecher-valsa-gala-koncert-solistov-baleta-sankt-peterburg",
+    "title": "\"Вечер вальса\" гала‑концерт солистов балета",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "\"Вечер вальса\" гала‑концерт солистов балета",
+    "seoTitle": "\"Вечер вальса\" гала‑концерт солистов балета | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6ae0bcb83fa7836a7734bd38"
+    ],
+    "routes": [
+      {
+        "path": "/events/vecher-valsa-gala-koncert-solistov-baleta-sankt-peterburg",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T18:11:21.038Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6ae0bcb83fa7836a7734bd38",
+      "kind": "SINGLE",
+      "slug": "вечер-вальса-гала-концерт-солистов-балета-6ae0bcb83fa7836a7734bd38",
+      "seoH1": null,
+      "title": "\"Вечер вальса\" гала‑концерт солистов балета",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ae0bcb83fa7836a7734bd38",
+          "externalId": "6ae0bcb83fa7836a7734bd38",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_59dbb6e1515e35001c9546b0",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ae0bcfb6ddba9f5a2f6d671.jpg",
+      "seoTitle": null,
+      "cityTitle": "Санкт-Петербург",
+      "venueTitle": "Дом Шрёдера",
+      "description": "В стенах исторического особняка раскроется магия вальса — лёгкая, стремительная и бесконечно красивая. Программа собирает самые узнаваемые и эмоционально насыщенные вальсы мировой классики: от искрящегося «Голубого Дуная» Штрауса до пронзительного «Грустного вальса» Сибелиуса, и торжественного «Вальса Цветов» Чайковского. Каждый номер — отдельная история, рассказанная языком танца.<br><br>Зрителей ждёт калейдоскоп образов: стремительные вращения, тонкие нюансы пластики и выразительные дуэты солистов. Яркие костюмы подчёркивают характер каждого вальса, превращая концерт в череду живописных сцен.<br><br>Особую атмосферу создаёт сочетание виртуозной хореографии и богатства музыкальной палитры: здесь и романтическая лирика Шопена, и кинематографическая выразительность Шварца, и драматургическая сила Прокофьева.<br><br>Пространство Дома Шрёдера усиливает впечатление: камерная атмосфера позволяет разглядеть мельчайшие детали исполнения и по-новому услышать знакомые мелодии.<br><br>В программе:<br><br>И. Штраус. «Голубой Дунай»;<br>И. Шварц. «Мелодия белых ночей»;<br>Г. Свиридов. Вальс из балета «Метель»;<br>Ф. Шопен. 7‑й вальс;<br>Л. Делиб. Вальс из балета «Коппелия» («Рондино»);<br>Я. Сибелиус. «Грустный вальс» (Онегин pas de deux);<br>П. Чайковский. Вальс из балета «Лебединое озеро»;<br>П. Чайковский. Вальс Цветов из балета «Щелкунчик»;<br>С. Прокофьев. Вальс из балета «Золушка»;<br>Ф. Шопен. 11‑й вальс и другие.<br>Хореограф-постановщик — Михаил Венщиков.<br><br>В концерте примут участие артисты и солисты театра балета «Сен-Мишель», а также приглашённые солисты музыкальных театров города, лауреаты международных и всероссийских конкурсов. <br><br>Продолжительность: два отделения, с одним антрактом.<br>Возрастная категория: 12+<br>Продюсер: Анастасия Козельская",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "Петроградская наб, дом 32.",
+      "canonicalPath": null,
+      "primaryCityId": "city_498817",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Санкт-Петербург",
+      "venue": "Дом Шрёдера",
+      "address": "Петроградская наб, дом 32.",
+      "ageLimit": "12",
+      "minOffer": 1500,
+      "nextStart": "2026-11-22T16:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 5
+    }
+  },
+  {
+    "eventId": "evt_6ae8c6fa8f5a9feed820ac76",
+    "eventPageId": "b7056c4e-a383-4e4f-8604-d300ee1461e5",
+    "slug": "byt-chelovekom-sankt-peterburg-2",
+    "title": "Быть Человеком",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Быть Человеком",
+    "seoTitle": "Быть Человеком | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6ae8c6fa8f5a9feed820ac76"
+    ],
+    "routes": [
+      {
+        "path": "/events/byt-chelovekom-sankt-peterburg-2",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T20:43:13.420Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6ae8c6fa8f5a9feed820ac76",
+      "kind": "SINGLE",
+      "slug": "быть-человеком-6ae8c6fa8f5a9feed820ac76",
+      "seoH1": null,
+      "title": "Быть Человеком",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ae8c6fa8f5a9feed820ac76",
+          "externalId": "6ae8c6fa8f5a9feed820ac76",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_6253497bd15e3c697b8ae78d",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-11/6ae8c793a5f7d53ee4cd9f2e.jpg",
+      "seoTitle": null,
+      "cityTitle": "Санкт-Петербург",
+      "venueTitle": "Театр Парнас",
+      "description": "Что, если наша жизнь — всего лишь поле для эксперимента?<br><br>В обычный 6«А» приходит новая ученица Алиса. Она безупречна — и поэтому опасна. Она — живой инструмент программы «Паллиатив», класс — уменьшенная модель общества, а конфликты — предмет холодного анализа.<br><br>Алиса доведёт каждого до предела, чтобы вскрыть скрытых лидеров, жертв и палачей. Но создатели «Паллиатива» не учли одного: человеческая душа не укладывается в алгоритмы. Столкнувшись с настоящей дружбой, болью и жертвенностью, их совершенный инструмент начинает давать сбой.<br><br>«Быть человеком» — это не ответ, а вопрос, поставленный с предельной остротой. Спектакль о том, что остаётся человеческим в мире, где на тебя смотрят как на функцию. Это напряженный разговор о том, о чем все молчат: ожестокости и доброте, о дружбе и предательстве, о том, что прячется в глубине каждого ребенка.",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "ул. Рубцова 5, 3 этаж",
+      "canonicalPath": null,
+      "primaryCityId": "city_498817",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Санкт-Петербург",
+      "venue": "Театр Парнас",
+      "address": "ул. Рубцова 5, 3 этаж",
+      "ageLimit": "12",
+      "minOffer": 300,
+      "nextStart": "2026-11-20T16:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 1
+    }
+  },
+  {
+    "eventId": "evt_6ad1a365c76d83a966b0388f",
+    "eventPageId": "963c638b-94dc-4aea-9c7b-15d40f99a597",
+    "slug": "semeinyi-spektakl-skazka-o-poteryannom-vremeni-tolyatti",
+    "title": "Семейный спектакль «Сказка о потерянном времени»",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Семейный спектакль «Сказка о потерянном времени»",
+    "seoTitle": "Семейный спектакль «Сказка о потерянном времени» | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6ad1a365c76d83a966b0388f"
+    ],
+    "routes": [
+      {
+        "path": "/events/semeinyi-spektakl-skazka-o-poteryannom-vremeni-tolyatti",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T18:09:57.010Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6ad1a365c76d83a966b0388f",
+      "kind": "SINGLE",
+      "slug": "семеиныи-спектакль-сказка-о-потерянном-времени-6ad1a365c76d83a966b0388f",
+      "seoH1": null,
+      "title": "Семейный спектакль «Сказка о потерянном времени»",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ad1a365c76d83a966b0388f",
+          "externalId": "6ad1a365c76d83a966b0388f",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_6759908bb803faf3cedd600b",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-01/696254a2cdea7b6e1e194700.jpg",
+      "seoTitle": null,
+      "cityTitle": "Тольятти",
+      "venueTitle": "Театр Иллюзий",
+      "description": "Спектакль  по мотивам одноимённого произведения Евгения Шварца - это иммерсивное приключение для всей семьи.<br><br>В современном и динамичном исполнении вас ждут настоящие чудеса, волшебные превращения, подарки и, конечно, мудрый финал, который тронет сердце даже самого скептичного зрителя.<br><br>Это история мальчика Пети, который тратил время впустую: прогуливал уроки и не слушался старших. За это волшебники-лентяи наказали его, превратив в старика. Чтобы вернуть себе детство, ему придётся пройти настоящее испытание.<br><br>Особенность спектакля - полное погружение в действие. Дети не просто смотрят историю, у них будет возможность   выйти на сцену и принять участие в нашей волшебной истории.<br><br>Длительность 50 мин. Обратите внимание, что билет приобретается на каждое посадочное место (отдельно для ребенка и сопровождающего взрослого). На спектакль без сопровождения дети допускаются с 8 лет.<br><br>Режиссер Ишбульдина Е.В.<br><br>Иммерсивный спектакль — это уникальный опыт, где вы становитесь частью происходящего. Чтобы погружение было комфортным и безопасным для вас и актеров, пожалуйста, соблюдайте следующие правила:<br><br>• Приходите вовремя. Если вы опоздаете к началу спектакля более чем на 5 минут, администрация имеет право не пустить вас в зал. Действие начинается сразу, и опоздание разрушит атмосферу спектакля. Деньги за билеты в этом случае не возвращаются.<br><br>• Соблюдайте тишину. Во время действия запрещено разговаривать и отвлекать других зрителей. Отключите звук мобильных телефонов.<br><br>• Не выходите во время действия. Вставать, перемещаться по залу без острой нужды, а также выходить и заходить обратно во время спектакля строго запрещено. Если вы покинете зал, вернуться назад вы уже не сможете.<br><br>• Уважайте личные границы других зрителей. Вы на спектакле не одни поэтому  выкрики , хождения, разговоры по телефону нарушают атмосферу спектакля. При подобном поведении вас могут попросить покинуть зал. Если вы приобрели билет на первый ряд, с вами будут  взаимодействовать актеры, учитывайте это при выборе места и ряда.",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "Юбилейная 29, 1 вход, 2 этаж, офис 209 А",
+      "canonicalPath": null,
+      "primaryCityId": "city_manual_тольятти",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Тольятти",
+      "venue": "Театр Иллюзий",
+      "address": "Юбилейная 29, 1 вход, 2 этаж, офис 209 А",
+      "ageLimit": "6",
+      "minOffer": 750,
+      "nextStart": "2026-11-21T13:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 4
+    }
+  },
+  {
+    "eventId": "evt_6ab2596f5df7c377d183d0b0",
+    "eventPageId": "29c70f59-6f0a-4b33-992c-cd69d19a6c8a",
+    "slug": "u-nas-v-pyutyurbyurge-literaturno-muzykalnyi-spektakl-s-komicheskim-ishodom-po-yumoristicheskim-ras-sankt-peterburg",
+    "title": "\"У нас в Пютюрбюрге\". Литературно-музыкальный спектакль с комическим исходом по юмористическим рассказам А. П. Чехова",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "\"У нас в Пютюрбюрге\". Литературно-музыкальный спектакль с комическим исходом по юмористическим рассказам А. П. Чехова",
+    "seoTitle": "\"У нас в Пютюрбюрге\". Литературно-музыкальный спектакль с комическим исходом по юмористическим рассказам А. П. Чехова | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6ab2596f5df7c377d183d0b0"
+    ],
+    "routes": [
+      {
+        "path": "/events/u-nas-v-pyutyurbyurge-literaturno-muzykalnyi-spektakl-s-komicheskim-ishodom-po-yumoristicheskim-ras-sankt-peterburg",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T20:40:57.198Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6ab2596f5df7c377d183d0b0",
+      "kind": "SINGLE",
+      "slug": "у-нас-в-пютюрбюрге-литературно-музыкальныи-спектакль-с-комическим-исходом-по-юмористическим-рас-6ab2596f5df7c377d183d0b0",
+      "seoH1": null,
+      "title": "\"У нас в Пютюрбюрге\". Литературно-музыкальный спектакль с комическим исходом по юмористическим рассказам А. П. Чехова",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ab2596f5df7c377d183d0b0",
+          "externalId": "6ab2596f5df7c377d183d0b0",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_5bc4567597a630000ce38d64",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2025-03/67cdd959a7a10618c20f03f2.jpg",
+      "seoTitle": null,
+      "cityTitle": "Санкт-Петербург",
+      "venueTitle": "Музей Бенуа на Васильевском",
+      "description": "Искрометная комедия, в которой зритель станет свидетелем семи историй соединенных между собой лирическими и юмористическими романсами прошлых лет. <br><br>Спектакль неоднократно успешно  выступал в Фонде Российской культуры в Москве.<br><br>🎭Первый раз он был сыгран 18 ноября 2009 года в Арт-Подвале Бродячей Собаки  и с тех пор  всегда имел успех и  полный аншлаг .<br>И сейчас вы можете насладиться искромётной комедией в исполнении замечательных актёров.<br><br>Юмористические рассказы великого классика, <br><br>🎤Волшебные звуки рояля, тонкое исполнение городского романса, живой звук , чарующий голос Надежды Алексеевой (победительницы многих конкурсов, многократной участницы \"Весны романса\"), яркие и трогательные образы талантливо созданные актерами, особенная атмосфера  подарят вам удивительный вечер.<br> <br>Комедия не лишённая доли щемящей трогательности, впрочем, как и все произведения А.П.Чехова. <br><br>В спектакль по мотивам А. П. Чехова вошли рассказы \"Невидимые миру слезы\", \"Знакомый мужчина\", \"Муж\", \"Предложение\", \"Загадочная натура\", \"Комик\", \"Ушла\".<br><br>Перед спектаклем гостей познакомят с историей квартиры семьи Бенуа.",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "Васильевский остров, 3-я линия, дом 20, кв. 8",
+      "canonicalPath": null,
+      "primaryCityId": "city_498817",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Санкт-Петербург",
+      "venue": "Музей Бенуа на Васильевском",
+      "address": "Васильевский остров, 3-я линия, дом 20, кв. 8",
+      "ageLimit": "12",
+      "minOffer": 2000,
+      "nextStart": "2026-11-21T14:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 1
+    }
+  },
+  {
+    "eventId": "evt_6a81e71dc82a495fbaf183f4",
+    "eventPageId": "54784c4f-fc4a-4995-9243-4bae69acfeef",
+    "slug": "smotri-naverh-spektakl-po-motivam-rasskazov-reya-bredberi-sankt-peterburg",
+    "title": "«Смотри наверх!» спектакль по мотивам рассказов Рэя Брэдбери",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "«Смотри наверх!» спектакль по мотивам рассказов Рэя Брэдбери",
+    "seoTitle": "«Смотри наверх!» спектакль по мотивам рассказов Рэя Брэдбери | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6a81e71dc82a495fbaf183f4"
+    ],
+    "routes": [
+      {
+        "path": "/events/smotri-naverh-spektakl-po-motivam-rasskazov-reya-bredberi-sankt-peterburg",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T18:11:22.325Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6a81e71dc82a495fbaf183f4",
+      "kind": "SINGLE",
+      "slug": "смотри-наверх-спектакль-по-мотивам-рассказов-рэя-брэдбери-6a81e71dc82a495fbaf183f4",
+      "seoH1": null,
+      "title": "«Смотри наверх!» спектакль по мотивам рассказов Рэя Брэдбери",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a81e71dc82a495fbaf183f4",
+          "externalId": "6a81e71dc82a495fbaf183f4",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_59dbb6e1515e35001c9546b0",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-02/69934b2bae79dd9220cd778d.jpg",
+      "seoTitle": null,
+      "cityTitle": "Санкт-Петербург",
+      "venueTitle": "Дом Шрёдера",
+      "description": "Сценическая интерпретация трёх рассказов выдающегося американского писателя-фантаста и философа Рея Брэдбери. В основе постановки — произведения: «Калейдоскоп», «Бетономешалка» и «Человек».<br><br>Три рассказа, объединённые в единую повесть, создают эффект калейдоскопа  – многогранную и динамичную картину образов и смыслов. Каждый из трёх рассказов сохраняет собственный стиль и атмосферу, но их соединение рождает новое художественное целое.<br><br>Центральная мысль спектакля раскрывается в финальной фразе марсианина Эттила: «Все всегда что‑то ищут». Пути поиска непредсказуемы, а способ обретения всегда неожидан.<br><br>Спектакль не просто пересказывает рассказы Брэдбери — но демонстрирует универсальность его философских идей; показывает многомерность человеческой природы через призму фантастики; создаёт визуально атмосферное пространство, где наука и мечта переплетаются.<br><br>«Смотри наверх!» приглашает к размышлению о вечных вопросах через призму фантастической реальности, где каждый зритель тоже становится искателем ответов.<br> <br>Сценография – Евгений Потешкин,<br>Хореограф –Александр Богомолов<br>Композитор – Пётр Иванов,<br>Тексты песен – Владимир Сабельфельд<br>Консультант – Анна Сенникова <br><br>Театр \"Палитра\"<br>Режиссёр-постановщик - Владимир Сабельфельд<br><br>Продолжительность: 2 часа с одним антрактом.<br>Аудитория: 16+",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "Петроградская наб, дом 32.",
+      "canonicalPath": null,
+      "primaryCityId": "city_498817",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Санкт-Петербург",
+      "venue": "Дом Шрёдера",
+      "address": "Петроградская наб, дом 32.",
+      "ageLimit": "12",
+      "minOffer": 1000,
+      "nextStart": "2026-11-21T16:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 5
+    }
+  },
+  {
+    "eventId": "evt_6ac41631946eca2227e0c0e4",
+    "eventPageId": "6c3ee94e-b7ca-4296-a4ec-6d7fe357fead",
+    "slug": "interaktivnyi-spektakl-teremok-ot-1-do-4-let-sankt-peterburg",
+    "title": "Интерактивный спектакль \"Теремок\" от 1 до 4 лет",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Интерактивный спектакль \"Теремок\" от 1 до 4 лет",
+    "seoTitle": "Интерактивный спектакль \"Теремок\" от 1 до 4 лет | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6ac41631946eca2227e0c0e4"
+    ],
+    "routes": [
+      {
+        "path": "/events/interaktivnyi-spektakl-teremok-ot-1-do-4-let-sankt-peterburg",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T20:41:29.256Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6ac41631946eca2227e0c0e4",
+      "kind": "SINGLE",
+      "slug": "интерактивныи-спектакль-теремок-от-1-до-4-лет-6ac41631946eca2227e0c0e4",
+      "seoH1": null,
+      "title": "Интерактивный спектакль \"Теремок\" от 1 до 4 лет",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ac41631946eca2227e0c0e4",
+          "externalId": "6ac41631946eca2227e0c0e4",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_62d7e106c7fd5a8b55808e77",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-07/6a53890620cbdca03b27e455.png",
+      "seoTitle": null,
+      "cityTitle": "Санкт-Петербург",
+      "venueTitle": "Театр для детей \"Малышок\" (пр.Искровский пр.д22. кор.А)",
+      "description": "Очень яркий и красочный спектакль, по мотивом известной народной сказки. Юные зрители принимают активное участие в происходящем на сцене.<br>Помогают всем героям сказки: убирают теремок с Мышкой, кашу варят с Лягушкой, пляшут с Зайкой, ну и, конечно, строят Теремок с Медведем.<br><br>Продолжительность 35 минут.<br><br>Дети до 4 лет могут посещать спектакли только в сопровождении взрослого. На взрослого и ребенка приобретается 2 билета.<br><br>Зрителям необходимо иметь сменную обувь. Просим приходить за 10-15 минут до начала спектакля.<br><br>Во время спектакля разрешена фотосъёмка. Если вы не хотите, чтобы ваш ребёнок попал в кадр, предупредите администратора до начала представления.",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "пр. Искровский д.22 кор.А (15 мин.пешком от м.Дыбенко)",
+      "canonicalPath": null,
+      "primaryCityId": "city_498817",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Санкт-Петербург",
+      "venue": "Театр для детей \"Малышок\" (пр.Искровский пр.д22. кор.А)",
+      "address": "пр. Искровский д.22 кор.А (15 мин.пешком от м.Дыбенко)",
+      "ageLimit": "0",
+      "minOffer": 900,
+      "nextStart": "2026-11-22T08:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 3
+    }
+  },
+  {
+    "eventId": "evt_6a9f72b2ed68f08ba4ec7e66",
+    "eventPageId": "81982e23-542d-4ea3-a49b-0b5c16681a2d",
+    "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-prokopevsk",
+    "title": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+    "seoTitle": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6a9f72b2ed68f08ba4ec7e66"
+    ],
+    "routes": [
+      {
+        "path": "/events/v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-prokopevsk",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T20:40:42.961Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6a9f72b2ed68f08ba4ec7e66",
+      "kind": "SINGLE",
+      "slug": "в-объятиях-дождя-танцевальное-шоу-с-дождем-6a9f72b2ed68f08ba4ec7e66",
+      "seoH1": null,
+      "title": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a9f72b2ed68f08ba4ec7e66",
+          "externalId": "6a9f72b2ed68f08ba4ec7e66",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_66b312d0994f20c965fc1e57",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6a9f72a120562d47a9fe82bb.png",
+      "seoTitle": null,
+      "cityTitle": "Прокопьевск",
+      "venueTitle": "МБУК ДК Красная Горка",
+      "description": null,
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "ул. Союзная, 4",
+      "canonicalPath": null,
+      "primaryCityId": "city_1494114",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Прокопьевск",
+      "venue": "МБУК ДК Красная Горка",
+      "address": "ул. Союзная, 4",
+      "ageLimit": "16",
+      "minOffer": 1500,
+      "nextStart": "2026-11-22T11:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 5
+    }
+  },
+  {
+    "eventId": "evt_6adbc38e87c30d12a61c9359",
+    "eventPageId": "9759fa35-96a1-4123-993a-3a87784236e1",
+    "slug": "gorko-komediinyi-spektakl-dueta-nebolet-chelyabinsk",
+    "title": "Горько! Комедийный спектакль дуэта \"НЕБОЛЕТ\"",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Горько! Комедийный спектакль дуэта \"НЕБОЛЕТ\"",
+    "seoTitle": "Горько! Комедийный спектакль дуэта \"НЕБОЛЕТ\" | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6adbc38e87c30d12a61c9359"
+    ],
+    "routes": [
+      {
+        "path": "/events/gorko-komediinyi-spektakl-dueta-nebolet-chelyabinsk",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T18:09:43.840Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6adbc38e87c30d12a61c9359",
+      "kind": "SINGLE",
+      "slug": "горько-комедииныи-спектакль-дуэта-неболет-6adbc38e87c30d12a61c9359",
+      "seoH1": null,
+      "title": "Горько! Комедийный спектакль дуэта \"НЕБОЛЕТ\"",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6adbc38e87c30d12a61c9359",
+          "externalId": "6adbc38e87c30d12a61c9359",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_6849bd1020fec209ef4a0875",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6adbc43a278dc166c901d3a7.png",
+      "seoTitle": null,
+      "cityTitle": "Челябинск",
+      "venueTitle": "Horse Head",
+      "description": "Паб-театр Horse Head приглашает вас на, пожалуй, самое необычное событие сезона — интерактивный спектакль-свадьбу «Горько» от знаменитого челябинского дуэта лирической клоунады «НЕБОЛЕТ».<br><br>Забудьте про скучные театральные ряды. В этот вечер залы нашего паба превратятся в эпицентр шумного, безумного и до боли знакомого ретро-застолья! Вы станете не просто зрителями, а полноценными гостями на свадьбе, где будет абсолютно всё, без чего не обходится ни одно приличное гулянье: знакомство с родителями, безумные конкурсы, тосты, танцы до упаду под хиты эпохи застоя и перестройки, бросание букета и, конечно, неизменная праздничная потасовка.<br><br>За гротескными оранжевыми шевелюрами молодожёнов и фонтаном свадебного абсурда скрывается невероятно нежная, трогательная и пронзительная история о человеческих отношениях, любви, ценности семьи и о том, как важно уметь прощать.<br><br>Эту улетную свадебную драму для вас разыграют неподражаемые мастера экспрессии и невербального театра:<br><br>• В роли счастливейшего жениха — Станислав Хомков<br><br>• В роли колоритной невесты — Никита Манылов<br><br>Собирайте друзей, занимайте места за столиками, заказывайте фирменные напитки и приготовьтесь громко кричать «Горько!» вместе с нами. Гуляют все!<br><br>Где: Паб-театр Horse Head (ул. Труда, 91)<br><br>Возрастное ограничение: 18+",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "Труда 91",
+      "canonicalPath": null,
+      "primaryCityId": "city_1508291",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Челябинск",
+      "venue": "Horse Head",
+      "address": "Труда 91",
+      "ageLimit": "18",
+      "minOffer": 1400,
+      "nextStart": "2026-11-25T14:30:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 4
+    }
+  },
+  {
+    "eventId": "evt_6ae9c83b0af34f653ffdfcf5",
+    "eventPageId": "10245629-af80-4ca6-aba9-dc034dcb9ae9",
+    "slug": "solnyi-stendap-koncert-rasslabsya-tak-u-vseh-chita",
+    "title": "Сольный стендап концерт \"Расслабься так у всех \"",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Сольный стендап концерт \"Расслабься так у всех \"",
+    "seoTitle": "Сольный стендап концерт \"Расслабься так у всех \" | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6ae9c83b0af34f653ffdfcf5"
+    ],
+    "routes": [
+      {
+        "path": "/events/solnyi-stendap-koncert-rasslabsya-tak-u-vseh-chita",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-12T06:51:27.160Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6ae9c83b0af34f653ffdfcf5",
+      "kind": "SINGLE",
+      "slug": "сольныи-стендап-концерт-расслабься-так-у-всех-6ae9c83b0af34f653ffdfcf5",
+      "seoH1": null,
+      "title": "Сольный стендап концерт \"Расслабься так у всех \"",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ae9c83b0af34f653ffdfcf5",
+          "externalId": "6ae9c83b0af34f653ffdfcf5",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_6ae9c04ae1b264ab75ce8cd8",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-11/6ae9c83b41ffb748e39ae358.png",
+      "seoTitle": null,
+      "cityTitle": "Чита",
+      "venueTitle": "Бригантина",
+      "description": "Валерия Яковлева — звезда шоу «Женский стендап» на ТНТ, актриса, комик и блогер с миллионными просмотрами — представляет новый сольный концерт «Расслабься, так у всех!».<br>Одна из самых ярких комикесс современности честно и до слёз смешно говорит о семье, отношениях, материнстве, возрасте и жизненных кризисах, в которых каждый узнает себя.<br>«Расслабься, так у всех!» — это не просто стендап, а вечер мощной самоиронии, жизненного юмора и шуток без цензуры. Острее реальности, смешнее, чем жизнь — Валерия превращает бытовые проблемы в повод смеяться над тем, что знакомо каждому.<br>Участница проектов «Женский стендап» на ТНТ, «Comedy Баттл» и «Открытый микрофон» приглашает зрителей расслабиться, посмеяться над жизнью и хотя бы на один вечер забыть о повседневных заботах. Настоящий женский стендап 18+",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "Ангарская ул., 44",
+      "canonicalPath": null,
+      "primaryCityId": "city_2025339",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Чита",
+      "venue": "Бригантина",
+      "address": "Ангарская ул., 44",
+      "ageLimit": "18",
+      "minOffer": 1800,
+      "nextStart": "2026-11-21T09:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 7
+    }
+  },
+  {
+    "eventId": "evt_6aa3c70694dba4b99f7b0bca",
+    "eventPageId": "fe153e1f-e0f7-4dca-8c56-cffabde24840",
+    "slug": "komediya-kogda-angely-shutyat-gatchina",
+    "title": "Комедия,, Когда Ангелы шутят,,",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Комедия,, Когда Ангелы шутят,,",
+    "seoTitle": "Комедия,, Когда Ангелы шутят,, | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6aa3c70694dba4b99f7b0bca"
+    ],
+    "routes": [
+      {
+        "path": "/events/komediya-kogda-angely-shutyat-gatchina",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T18:10:22.910Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6aa3c70694dba4b99f7b0bca",
+      "kind": "SINGLE",
+      "slug": "комедия-когда-ангелы-шутят-6aa3c70694dba4b99f7b0bca",
+      "seoH1": null,
+      "title": "Комедия,, Когда Ангелы шутят,,",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6aa3c70694dba4b99f7b0bca",
+          "externalId": "6aa3c70694dba4b99f7b0bca",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_68b8331cb0b28a9dc8b56672",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6aa3c706a502d2d76d7980d7.jpg",
+      "seoTitle": null,
+      "cityTitle": "Гатчина",
+      "venueTitle": "МБУ центр творчества юных",
+      "description": "Спектакль - лауреат премии за лучший спектакль на фестивале,, Амурская осень,,. <br>Романтическая комедия, наполненная светлыми чувствами, музыкой, предвосхищением чуда и верой в будущее, подарит удивительные впечатления и незабываемый вечер в театре. И остаётся только верить в чудеса!<br>В ролях<br>Светлана Антонова, Мария Порошина, Илья Шакунов, Дмитрий Мухамадеев, Григорий Сиятвинда, Пётр Красилов, , Олег Соколов.<br>Режиссёр<br>Валерия Итименева",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "Революционный пер., 1",
+      "canonicalPath": null,
+      "primaryCityId": "city_manual_гатчина",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Гатчина",
+      "venue": "МБУ центр творчества юных",
+      "address": "Революционный пер., 1",
+      "ageLimit": "12",
+      "minOffer": 2500,
+      "nextStart": "2026-11-23T16:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 6
+    }
+  },
+  {
+    "eventId": "evt_6ac6016ea6a04d1eb2c6e077",
+    "eventPageId": "30074b01-a189-4722-8ccb-f64ed269e05a",
+    "slug": "koncert-spektakl-pisma-neznakomke-moskva",
+    "title": "Концерт-спектакль «Письма незнакомке»",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Концерт-спектакль «Письма незнакомке»",
+    "seoTitle": "Концерт-спектакль «Письма незнакомке» | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6ac6016ea6a04d1eb2c6e077"
+    ],
+    "routes": [
+      {
+        "path": "/events/koncert-spektakl-pisma-neznakomke-moskva",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T20:41:35.203Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6ac6016ea6a04d1eb2c6e077",
+      "kind": "SINGLE",
+      "slug": "концерт-спектакль-письма-незнакомке-6ac6016ea6a04d1eb2c6e077",
+      "seoH1": null,
+      "title": "Концерт-спектакль «Письма незнакомке»",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ac6016ea6a04d1eb2c6e077",
+          "externalId": "6ac6016ea6a04d1eb2c6e077",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_6468a3fdb2516beb95c871ea",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6a9a9632bd396f8081963fb2.jpg",
+      "seoTitle": null,
+      "cityTitle": "Москва",
+      "venueTitle": "Дом винтажной музыки",
+      "description": "Погрузитесь в мир эмоций и историй, оживших в спектакле по мотивам писем Андре Моруа.<br>Он писал ей всю жизнь. Она молчала. До этого вечера.<br>В 1956 Андре Моруа написал «Письма незнакомке» — изящный, горький и ироничный монолог автора, обращенный к женщине, которую он никогда не встретит.<br>70 лет этот текст оставался односторонним.<br><br>Молодой режиссер Надежда Гусакова (выпускница ГИТИСа) поставила спектакль-диалог. Она дала Незнакомке три голоса — три женские ипостаси, которые не соглашаются, не оправдываются, а отвечают. На равных.<br>«Я не хотела “осовременивать” Моруа. Я хотела дать ему собеседницу. Ту, которую он сам придумал, но так и не услышал. В этом спектакле она наконец заговорит. Её голоса — это музыка Тирсена, стихи Далиды, слезы Пиаф.<br>И моя личная дерзость»  - режиссер спектакля.<br><br>Концерт-спектакль: когда музыка становится словом<br>В этом спектакле музыка не просто сопровождает действие — она спорит, соглашается и любит. Там, где бессильны письма Андре Моруа, в диалог вступает живой французский шансон.<br><br>Мелодии Яна Тирсена из «Амели», чувственные исповеди Эдит Пиаф, Далиды и Лары Фабиан становятся главным ответом Незнакомки. Это разговор двух миров, где инструменты и голоса обретают силу живого слова.<br><br><br>ГОЛОС. Артем Леонов (Театр Иллюзий).<br>Голос, который оживляет письма Андре Моруа. Его интонации превращают текст столетней давности в живое признание.<br>ВОКАЛ. Три характера Незнакомки. Ксения Крылова, Надежда Гусакова и Алеся Кись. Три разных темперамента, которые вступают в диалог с автором.<br>МУЗЫКА. Инструментальное трио. Рояль (Светлана Рыжова), аккордеон (Артем Хорошавин), контрабас (Олег Чернявский). Живое, пульсирующее дыхание Парижа.<br><br>«Ты думал, что я — тишина. А я — целый оркестр»",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "ул. Орджоникидзе, 1",
+      "canonicalPath": null,
+      "primaryCityId": "city_524901",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Москва",
+      "venue": "Дом винтажной музыки",
+      "address": "ул. Орджоникидзе, 1",
+      "ageLimit": "18",
+      "minOffer": 1000,
+      "nextStart": "2026-11-25T16:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 8
+    }
+  },
+  {
+    "eventId": "evt_6a07139893b4c769a21e390d",
+    "eventPageId": "00e44f38-2137-4b51-8a2a-60fb50dd0ddb",
+    "slug": "gore-ot-uma-moskva",
+    "title": "Горе от ума",
+    "status": "DRAFT",
+    "isIndexable": false,
+    "publishedAt": null,
+    "content": {
+      "sections": []
+    },
+    "summary": null,
+    "seoH1": "Горе от ума",
+    "seoTitle": "Горе от ума | Дайбилет",
+    "seoDescription": null,
+    "canonicalPath": null,
+    "eventIds": [
+      "evt_6a07139893b4c769a21e390d"
+    ],
+    "routes": [
+      {
+        "path": "/events/gore-ot-uma-moskva",
+        "kind": "CANDIDATE",
+        "source": "event-page-draft",
+        "createdAt": "2026-11-03T20:40:01.702Z"
+      }
+    ],
+    "revision": {
+      "version": 1,
+      "count": 1
+    },
+    "sourceSnapshot": {
+      "id": "evt_6a07139893b4c769a21e390d",
+      "kind": "SINGLE",
+      "slug": "горе-от-ума-6a07139893b4c769a21e390d",
+      "seoH1": null,
+      "title": "Горе от ума",
+      "sources": [
+        {
+          "code": "TICKETSCLOUD",
+          "name": "Ticketscloud",
+          "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a07139893b4c769a21e390d",
+          "externalId": "6a07139893b4c769a21e390d",
+          "metaExternalId": null
+        }
+      ],
+      "venueId": "venue_5a159b08d35286001a228685",
+      "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-04/69df81c1d529cb5b007d95bf.jpg",
+      "seoTitle": null,
+      "cityTitle": "Москва",
+      "venueTitle": "ДК РГСУ",
+      "description": "«Горе от ума» –  Все мы немного Чацкие! Задаемся вопросом - «А судьи кто?», верим, что добро побеждает зло, и что нашей искренней любви будут рады.<br> <br>«Чуть свет – уж на ногах! и я у ваших ног.» - полный восторга Чацкий врывается в размеренную жизнь Софьи и дома Фамусовых. Он полон любви, возвращается на родину, чтобы обрести счастье, но обнаруживает, что его не ждали.<br> <br>Полон досады и разочарования он не сдерживает своих суждений о местном обществе и нравах -<br> <br>«Душа здесь у меня каким-то горем сжата,<br>И в многолюдстве я потерян, сам не свой.<br>Нет! недоволен я Москвой.»<br> <br>Спектакль \"Горе от ума\" в постановке Николая Черкасова является истинным триумфом интеллектуального театра. Эта работа не только воссоздает мир Грибоедова, но и предлагает зрителям глубокий анализ общественных явлений и человеческих отношений, актуальных в любую эпоху.<br> <br>Николай Черкасов, выпускник ГИТИСа, ученик Б.А. Покровского и лауреат награды \"Соотечественник года\", вложил в эту постановку всю глубину своего понимания искусства, создавая не просто спектакль, а многоуровневое исследование человеческой натуры.<br> <br>\"Горе от ума\" в этой интерпретации — это вызов зрителю, приглашение к размышлению и погружению в бесконечный мир идей и эмоций, где каждое слово и каждый жест обретают новый смысл\".<br> <br>Пред-премьерные показы имели огромный успех в доказательство тому, что классика может и должна быть интересна современному человеку. Театр Черкасова это та самая классика, о которой вы мечтали!",
+      "isIndexable": true,
+      "purchaseFlow": "EXTERNAL",
+      "venueAddress": "Стромынский переулок, 5",
+      "canonicalPath": null,
+      "primaryCityId": "city_524901",
+      "supplierTitle": null,
+      "managementMode": "SOURCE_MANAGED",
+      "seoDescription": null,
+      "shortDescription": null
+    },
+    "liveFacts": {
+      "city": "Москва",
+      "venue": "ДК РГСУ",
+      "address": "Стромынский переулок, 5",
+      "ageLimit": "12",
+      "minOffer": 700,
+      "nextStart": "2026-11-21T15:00:00.000Z",
+      "futureSessions": 1,
+      "activeOffers": 4
+    }
+  }
+]

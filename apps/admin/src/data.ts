@@ -1,3 +1,4 @@
+import { adminFetch } from '@/lib/admin-api';
 import type { AdminData, AdminEventRow } from '@/types';
 
 export const adminData: AdminData = window.ADMIN_DATA ?? {
@@ -40,15 +41,18 @@ export const adminData: AdminData = window.ADMIN_DATA ?? {
 };
 
 export async function hydrateAdminData(): Promise<void> {
-  const env = (import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env;
-  const baseUrl = env?.VITE_DAIBILET_API_URL || 'http://127.0.0.1:4000';
   const controller = new AbortController();
-  const timeout = window.setTimeout(() => controller.abort(), 1500);
+  const timeout = window.setTimeout(() => controller.abort(), 8000);
   try {
-    const response = await fetch(`${baseUrl}/api/admin/dashboard`, { cache: 'no-store', signal: controller.signal });
+    const response = await adminFetch('/api/admin/dashboard', {
+      cache: 'no-store',
+      signal: controller.signal,
+    });
     if (!response.ok) return;
-    const remoteData = (await response.json()) as AdminData;
-    Object.assign(adminData, remoteData);
+    const remoteData = (await response.json()) as Partial<AdminData>;
+    if (remoteData.generatedAt) adminData.generatedAt = remoteData.generatedAt;
+    if (remoteData.metrics) adminData.metrics = { ...adminData.metrics, ...remoteData.metrics };
+    if (remoteData.importJob) adminData.importJob = remoteData.importJob;
   } catch {
     // Admin remains usable from apps/admin/data.js while the local API is offline.
   } finally {

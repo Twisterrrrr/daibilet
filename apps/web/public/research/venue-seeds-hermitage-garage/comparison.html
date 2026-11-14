@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Сравнение SPBBOATS vs Daibilet - research</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <nav class="site-nav" aria-label="Разделы пакета">
+    <a href="./index.html">Обзор</a>
+    <a href="./comparison.html" aria-current="page">Сравнение</a>
+    <a href="./ermitazh.html">Эрмитаж</a>
+    <a href="./garazh.html">Гараж</a>
+    <a href="./block-layout/daibilet.html">Блоки Daibilet</a>
+    <a href="./block-layout/spbboats.html">Блоки SPBBOATS</a>
+  </nav>
+
+  <main class="wrap">
+    <p class="eyebrow">COMPARISON</p>
+    <h1>Сравнение SPBBOATS vs Daibilet (venue PDP)</h1>
+    <p class="lead">
+      Что перенять из SPBBOATS-сида Эрмитажа/Гаража, не ломая session-first UX Daibilet.
+    </p>
+
+    <h2>Ось: контент блоков</h2>
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>SPBBOATS</th>
+            <th>Daibilet</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Highlights / «что внутри»</td>
+            <td>Да, per-venue string[]</td>
+            <td>Нет (только prose description)</td>
+          </tr>
+          <tr>
+            <td>FAQ</td>
+            <td>Per-venue JSON + JSON-LD</td>
+            <td>Хардкод 3 общих вопроса</td>
+          </tr>
+          <tr>
+            <td>Features chips</td>
+            <td>Коды (no_queue, audio_guide…)</td>
+            <td>Нет</td>
+          </tr>
+          <tr>
+            <td>Opening hours</td>
+            <td>Json mon-sun в Venue</td>
+            <td>Частично hardcoded map по slug; на institution FAQ прямо говорит «проверьте сайт»</td>
+          </tr>
+          <tr>
+            <td>Template JSON</td>
+            <td>venueTemplateData + merge</td>
+            <td>Нет typed PDP template</td>
+          </tr>
+          <tr>
+            <td>hookFact / wayToFind</td>
+            <td>Нет в seed-venues</td>
+            <td>Да (must-see / logistics)</td>
+          </tr>
+          <tr>
+            <td>Gallery</td>
+            <td>galleryUrls на Venue</td>
+            <td>Обычно один heroImageUrl</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Ось: верстка / UX</h2>
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>SPBBOATS</th>
+            <th>Daibilet</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Фокус PDP</td>
+            <td>Карточка места + билеты/офферы</td>
+            <td>Афиша сессий + day-route + STOP-экскурсии</td>
+          </tr>
+          <tr>
+            <td>Tickets</td>
+            <td>TicketsBlock по Venue offers</td>
+            <td>Sessions/Admission + TC widget</td>
+          </tr>
+          <tr>
+            <td>Program</td>
+            <td>Exhibition program groups</td>
+            <td>VenueProgramBlock по sessions + date rail</td>
+          </tr>
+          <tr>
+            <td>Related</td>
+            <td>articles + venues</td>
+            <td>relatedVenues + stop/nearby events</td>
+          </tr>
+          <tr>
+            <td>Sticky CTA</td>
+            <td>Да</td>
+            <td>Да (MobileStickyActionBar)</td>
+          </tr>
+          <tr>
+            <td>Schema.org</td>
+            <td>Museum + FAQPage</td>
+            <td>SEO meta / applyVenueSeo (слабее FAQ JSON-LD)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Ось: данные / seed</h2>
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>SPBBOATS</th>
+            <th>Daibilet</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Эрмитаж</td>
+            <td>Полный seed <code>ermitazh</code> + images + OPEN_DATE offer</td>
+            <td>ensure-скрипт + must-see editorial + cover на диске</td>
+          </tr>
+          <tr>
+            <td>Гараж</td>
+            <td>seed <code>garazh</code> (slim) + images на <code>muzej-garazh</code> + demo <code>garage-moscow-demo</code></td>
+            <td>cityInfo must-see <code>moscow-muzey-garazh</code>, cover, hours hardcode</td>
+          </tr>
+          <tr>
+            <td>Slug-канон</td>
+            <td>Рассинхрон garazh / muzej-garazh</td>
+            <td>moscow-muzey-garazh (стабильнее для MSK)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Практические выводы (что перенять)</h2>
+    <ol>
+      <li>
+        <strong>Per-venue highlights + FAQ из сида Эрмитажа</strong> - самый дешёвый выигрыш для
+        <a href="https://daibilet.ru/venues/ermitazh">/venues/ermitazh</a>
+        (и потом Гараж): у нас FAQ сейчас generic.
+      </li>
+      <li>
+        <strong>features chips</strong> (без очереди / аудиогид / доступность) - визуальный слой без новой CMS;
+        можно маппить в InstitutionVenueLayout.
+      </li>
+      <li>
+        <strong>openingHours как данные Venue</strong>, не hardcode map - иначе FAQ «актуальны ли часы» честно признаёт дыру.
+      </li>
+      <li>
+        <strong>Не тащить целиком SPBBOATS template JSON</strong> без нужды: наша сила - афиша, STOP-связи,
+        «Мой день», wayToFind/hookFact. Брать контентные поля, не ломать session-first UX.
+      </li>
+    </ol>
+
+    <p class="footer">
+      Источник markdown:
+      <code>docs/research/venue-seeds-hermitage-garage/COMPARISON-spbboats-vs-daibilet.md</code>
+      · <a href="./index.html">К обзору</a>
+    </p>
+  </main>
+</body>
+</html>

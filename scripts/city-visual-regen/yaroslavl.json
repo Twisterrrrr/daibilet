@@ -1,0 +1,61 @@
+{
+  "city": "yaroslavl",
+  "mustSeeCount": 70,
+  "regen": [
+    {
+      "stem": "karabikha-muzey-dedushki-mazaya",
+      "name": "karabikha muzey dedushki mazaya",
+      "clusterSize": 2,
+      "keeper": "karabikha-bolshoy-gospodskiy-dom"
+    },
+    {
+      "stem": "karabikha-nizhniy-angliyskiy-park",
+      "name": "karabikha nizhniy angliyskiy park",
+      "clusterSize": 3,
+      "keeper": "demidovskiy-stolp"
+    },
+    {
+      "stem": "karabikha-verhniy-frantsuzskiy-park",
+      "name": "karabikha verhniy frantsuzskiy park",
+      "clusterSize": 3,
+      "keeper": "gubernatorskiy-dom"
+    },
+    {
+      "stem": "vyatskoe-hram-voskreseniya",
+      "name": "vyatskoe hram voskreseniya",
+      "clusterSize": 2,
+      "keeper": "restoran-ioann-vasilevich"
+    },
+    {
+      "stem": "vyatskoe-kupecheskaya-pekarniya",
+      "name": "vyatskoe kupecheskaya pekarniya",
+      "clusterSize": 2,
+      "keeper": "skulptura-troitsa"
+    },
+    {
+      "stem": "vyatskoe-muzey-kuhonnoy-mashinerii",
+      "name": "vyatskoe muzey kuhonnoy mashinerii",
+      "clusterSize": 3,
+      "keeper": "demidovskiy-stolp"
+    },
+    {
+      "stem": "vyatskoe-muzey-russkoy-predpriimchivosti",
+      "name": "vyatskoe muzey russkoy predpriimchivosti",
+      "clusterSize": 2,
+      "keeper": "identity-gastro"
+    },
+    {
+      "stem": "vyatskoe-muzey-zabavnyh-veshchey",
+      "name": "vyatskoe muzey zabavnyh veshchey",
+      "clusterSize": 2,
+      "keeper": "pamyatnik-savve-mamontovu"
+    },
+    {
+      "stem": "vyatskoe-zvuki-vremeni",
+      "name": "vyatskoe zvuki vremeni",
+      "clusterSize": 3,
+      "keeper": "gubernatorskiy-dom"
+    }
+  ],
+  "d0": 11
+}

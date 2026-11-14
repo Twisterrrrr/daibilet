@@ -1,0 +1,1148 @@
+{
+  "startedAt": "2026-11-13T05:55:21.324Z",
+  "groups": [
+    {
+      "groupNo": 1,
+      "title": "Цирковое представление «Шоу Браво»",
+      "tourGroupId": "eb5096ce-6820-4a57-95bf-f19db3041dde",
+      "pages": 5,
+      "cityRepresentatives": 5
+    },
+    {
+      "groupNo": 2,
+      "title": "«Достойный стендап»",
+      "tourGroupId": "e15f99a4-8eae-47d4-b4d1-b0552fe184ce",
+      "pages": 3,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 3,
+      "title": "Цирковое шоу «Бруно»",
+      "tourGroupId": "fdac50b2-6de3-46be-bb85-6dbf19eba8e7",
+      "pages": 3,
+      "cityRepresentatives": 3
+    },
+    {
+      "groupNo": 4,
+      "title": "Сольный стендап Константина Бутакова",
+      "tourGroupId": "8f841ace-3ee9-4c93-9e57-6c288629b32c",
+      "pages": 2,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 5,
+      "title": "Группа «АнимациЯ» — концерт к 26-летию",
+      "tourGroupId": "913329b1-c5d6-4c12-a4b2-62df95433048",
+      "pages": 2,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 6,
+      "title": "Medio Modo Fest: фестиваль научно-популярных лекций",
+      "tourGroupId": "b42c79d5-9fd2-401c-bb3d-2529ae1c0baf",
+      "pages": 2,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 7,
+      "title": "«Маша и Медведи» — концерт",
+      "tourGroupId": "b17cf9ff-98e6-4bc7-a0c2-ef5d0b34d9ed",
+      "pages": 2,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 8,
+      "title": "Артемизия и SATAROVA — концерт двух музыкальных проектов",
+      "tourGroupId": "5c1943ee-ad87-4ad9-86c8-e5b3c92b9f12",
+      "pages": 2,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 9,
+      "title": "«Бессонов. Лирика» — чтение рассказов о любви",
+      "tourGroupId": "b6dc0a7b-fea7-4771-900e-805520b7b8dd",
+      "pages": 2,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 10,
+      "title": "Константин Лем и White Fox Music — акустический концерт",
+      "tourGroupId": "fba761a3-ac83-48c6-8a0d-b92d36c4e5a2",
+      "pages": 2,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 11,
+      "title": "Виктория Складчикова — стендап, повтор материала 2026 года",
+      "tourGroupId": "d8b6b116-2027-4203-9fae-f30ea4ddb8ad",
+      "pages": 2,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 12,
+      "title": "«Торба-на-Круче» — концерт",
+      "tourGroupId": "01dd9b9e-0378-4c80-bedc-87af08f9da2f",
+      "pages": 2,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 13,
+      "title": "Юлия Коган — концерт с юмористическими песнями и балладами",
+      "tourGroupId": "8c3aed17-d105-40d3-b3af-3286c3a7a03c",
+      "pages": 2,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 14,
+      "title": "Norma Tale — сольный концерт",
+      "tourGroupId": "d6c99e45-3985-4ee5-8a05-a3f1c6079807",
+      "pages": 2,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 15,
+      "title": "Алексей Решетун - Новый год по судебно-медицински",
+      "tourGroupId": "c429fda0-35a3-4673-8a02-b3929fbbcf85",
+      "pages": 2,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 16,
+      "title": "PALC — сольный концерт",
+      "tourGroupId": "8e734507-a17a-4659-9808-49a7529f1612",
+      "pages": 2,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 17,
+      "title": "«Хиты 2000-х»: караоке с оркестром",
+      "tourGroupId": "36d6c8b9-3ec5-49e6-81e5-df9b40280611",
+      "pages": 2,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 18,
+      "title": "Алексей Третьяков — «Это точно икона?»",
+      "tourGroupId": "526ec0fe-9bce-4add-9f06-65a8e29cd290",
+      "pages": 2,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 19,
+      "title": "Спектакль «Мэрилин Монро. Как паутина на ветру…»",
+      "tourGroupId": "9bdeaad5-e19a-47ad-8f9b-9b74d3700492",
+      "pages": 2,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 20,
+      "title": "Voroth (Ворот) — концерт в рамках METAL ASSAULT FEST",
+      "tourGroupId": "8e4e0965-80cf-4de5-bce4-a331ed524f14",
+      "pages": 2,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 21,
+      "title": "Жека Басотский — концерт",
+      "tourGroupId": "7252c9d7-4b87-4215-8697-e714b7d361b2",
+      "pages": 2,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 22,
+      "title": "Музыкальное лото «Бинго FM»",
+      "tourGroupId": "a1dbf2a5-7065-4b09-a058-decad2a95e5d",
+      "pages": 2,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 23,
+      "title": "Мирослава и Злата Быковы — концерт «Тот самый тур»",
+      "tourGroupId": "590ca16b-fb79-4a3c-a9ba-950184762dc9",
+      "pages": 2,
+      "cityRepresentatives": 2
+    }
+  ],
+  "pages": [
+    {
+      "eventPageId": "6ae2a40e-e0a8-4205-a3f9-4ee6b39b40f4",
+      "eventId": "evt_6af005516ab6aaefc4cf5d90",
+      "eventIds": [
+        "evt_6af005516ab6aaefc4cf5d90"
+      ],
+      "slug": "cirk-shou-bravo-g-mcensk",
+      "url": "https://daibilet.ru/events/cirk-shou-bravo-g-mcensk",
+      "title": "Цирк \"Шоу Браво\" г. Мценск",
+      "city": "Мценск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:25.620Z",
+      "canonicalPath": "/events/cirk-shou-bravo-g-mcensk",
+      "seoDescription": "Цирковое представление «Шоу Браво». В афише «Шоу Браво» заявлено театрально-цирковое представление. Мценск, 20 ноября 2026 года в 18:00.",
+      "tourGroupId": "eb5096ce-6820-4a57-95bf-f19db3041dde",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "ed61179f-05ed-4150-8002-91254937ca1b",
+      "eventId": "evt_6aee28312d5a50f7960e9581",
+      "eventIds": [
+        "evt_6aee28312d5a50f7960e9581"
+      ],
+      "slug": "cirk-shou-bravo-g-miass",
+      "url": "https://daibilet.ru/events/cirk-shou-bravo-g-miass",
+      "title": "Цирк \"Шоу Браво\" г. Миасс",
+      "city": "Миасс",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:25.957Z",
+      "canonicalPath": "/events/cirk-shou-bravo-g-miass",
+      "seoDescription": "Цирковое представление «Шоу Браво». В афише «Шоу Браво» заявлено театрально-цирковое представление. Миасс, 3 декабря 2026 года в 16:00.",
+      "tourGroupId": "eb5096ce-6820-4a57-95bf-f19db3041dde",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "e9269026-b520-44ce-889e-19adc9d817b3",
+      "eventId": "evt_6aecdce24d62a20740afb2a5",
+      "eventIds": [
+        "evt_6aecdce24d62a20740afb2a5"
+      ],
+      "slug": "cirk-shou-bravo-g-zlatoust",
+      "url": "https://daibilet.ru/events/cirk-shou-bravo-g-zlatoust",
+      "title": "Цирк \"Шоу Браво\" г. Златоуст",
+      "city": "Златоуст",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:26.305Z",
+      "canonicalPath": "/events/cirk-shou-bravo-g-zlatoust",
+      "seoDescription": "Цирковое представление «Шоу Браво». В афише «Шоу Браво» заявлено театрально-цирковое представление. Златоуст, 2 декабря 2026 года в 18:30.",
+      "tourGroupId": "eb5096ce-6820-4a57-95bf-f19db3041dde",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "b2f781d4-d5f6-4c3e-ab84-cd4316bacf56",
+      "eventId": "evt_6aeccf0e428c5e652135bf06",
+      "eventIds": [
+        "evt_6aeccf0e428c5e652135bf06"
+      ],
+      "slug": "cirk-shou-bravo-g-korkino",
+      "url": "https://daibilet.ru/events/cirk-shou-bravo-g-korkino",
+      "title": "Цирк \"Шоу Браво\" г. Коркино",
+      "city": "Коркино",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:26.635Z",
+      "canonicalPath": "/events/cirk-shou-bravo-g-korkino",
+      "seoDescription": "Цирковое представление «Шоу Браво». В афише «Шоу Браво» заявлено театрально-цирковое представление. Коркино, 29 ноября 2026 года в 10:00.",
+      "tourGroupId": "eb5096ce-6820-4a57-95bf-f19db3041dde",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "4002e040-ff8c-4248-93d0-fffd77726604",
+      "eventId": "evt_6aec7035b9394373959070bc",
+      "eventIds": [
+        "evt_6aec7035b9394373959070bc"
+      ],
+      "slug": "cirk-shou-bravo-g-chebarkul",
+      "url": "https://daibilet.ru/events/cirk-shou-bravo-g-chebarkul",
+      "title": "Цирк \"Шоу Браво\" г.Чебаркуль",
+      "city": "Чебаркуль",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:26.957Z",
+      "canonicalPath": "/events/cirk-shou-bravo-g-chebarkul",
+      "seoDescription": "Цирковое представление «Шоу Браво». В афише «Шоу Браво» заявлено театрально-цирковое представление. Чебаркуль, 24 ноября 2026 года в 16:00.",
+      "tourGroupId": "eb5096ce-6820-4a57-95bf-f19db3041dde",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "03818c2a-ced1-4873-afea-d683fb5eae95",
+      "eventId": "evt_6adefd3e869e3b4bf676e1e7",
+      "eventIds": [
+        "evt_6adefd3e869e3b4bf676e1e7"
+      ],
+      "slug": "dostoinyi-stendap-naberezhnye-chelny",
+      "url": "https://daibilet.ru/events/dostoinyi-stendap-naberezhnye-chelny",
+      "title": "Достойный стендап",
+      "city": "Набережные Челны",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:27.299Z",
+      "canonicalPath": "/events/dostoinyi-stendap-naberezhnye-chelny",
+      "seoDescription": "«Достойный стендап». «Достойный стендап» — выступление нескольких комиков, которые представят зрителям авторски. Набережные Челны, 28 ноября 2026 года в 19:00.",
+      "tourGroupId": "e15f99a4-8eae-47d4-b4d1-b0552fe184ce",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "17215bed-e434-4bd6-b7e0-2008a06d5af3",
+      "eventId": "evt_6ab3d7ac0a3f7ab03f330879",
+      "eventIds": [
+        "evt_6ab3d7aa0a3f7ab03f330869",
+        "evt_6ab3d7ab0a3f7ab03f330871",
+        "evt_6ab3d7ac0a3f7ab03f330879",
+        "evt_6ab3d7ad0a3f7ab03f330881"
+      ],
+      "slug": "dostoinyi-stendap-kazan",
+      "url": "https://daibilet.ru/events/dostoinyi-stendap-kazan",
+      "title": "Достойный стендап",
+      "city": "Казань",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:28.675Z",
+      "canonicalPath": "/events/dostoinyi-stendap-kazan",
+      "seoDescription": "«Достойный стендап». «Достойный стендап» — выступление нескольких комиков, которые представят зрителям авторски. Казань, 19 ноября 2026 года в 20:00.",
+      "tourGroupId": null,
+      "revisionBefore": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "b5a98917-4e32-4e1f-9b50-978afc16d79c",
+      "eventId": "evt_6aa14b11e4b1d69979bf825c",
+      "eventIds": [
+        "evt_6ab3d782cc5a0aebe23308f6",
+        "evt_6aa14b11e4b1d69979bf825c",
+        "evt_6aa14b15e4b1d69979bf830c",
+        "evt_6aa14b19e4b1d69979bf83bc",
+        "evt_6ab3d785cc5a0aebe233097a",
+        "evt_6ab3d784cc5a0aebe233094e"
+      ],
+      "slug": "dostoinyi-stendap-kazan-2",
+      "url": "https://daibilet.ru/events/dostoinyi-stendap-kazan-2",
+      "title": "Достойный стендап",
+      "city": "Казань",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:31.280Z",
+      "canonicalPath": "/events/dostoinyi-stendap-kazan-2",
+      "seoDescription": "«Достойный стендап». «Достойный стендап» — выступление нескольких комиков, которые представят зрителям авторски. Казань, 15 ноября 2026 года в 20:00.",
+      "tourGroupId": "e15f99a4-8eae-47d4-b4d1-b0552fe184ce",
+      "revisionBefore": 6,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "be4df034-fb72-4267-981c-1a30e3d657d4",
+      "eventId": "evt_6aeec0746ea5caff2c63ff19",
+      "eventIds": [
+        "evt_6aeec0746ea5caff2c63ff19"
+      ],
+      "slug": "cirk-bruno-v-g-ob",
+      "url": "https://daibilet.ru/events/cirk-bruno-v-g-ob",
+      "title": "Цирк Бруно в г. Обь",
+      "city": "Обь",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:33.271Z",
+      "canonicalPath": "/events/cirk-bruno-v-g-ob",
+      "seoDescription": "Цирковое шоу «Бруно». В анонсе цирка «Бруно» перечислены животные, которых можно увидеть в программе: американск. Обь, 15 ноября 2026 года в 08:00.",
+      "tourGroupId": "fdac50b2-6de3-46be-bb85-6dbf19eba8e7",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "ccbfe318-3491-4ad3-a602-5ae1fc7b7b87",
+      "eventId": "evt_6ae99200c30edbbf395feb3f",
+      "eventIds": [
+        "evt_6ae99200c30edbbf395feb3f"
+      ],
+      "slug": "cirk-bruno-v-g-tobolsk",
+      "url": "https://daibilet.ru/events/cirk-bruno-v-g-tobolsk",
+      "title": "Цирк Бруно в г. Тобольск",
+      "city": "Тобольск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:33.647Z",
+      "canonicalPath": "/events/cirk-bruno-v-g-tobolsk",
+      "seoDescription": "Цирковое шоу «Бруно». В анонсе цирка «Бруно» перечислены животные, которых можно увидеть в программе: американск. Тобольск, 23 ноября 2026 года в 16:00.",
+      "tourGroupId": "fdac50b2-6de3-46be-bb85-6dbf19eba8e7",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "6d2bbcae-551f-4ec0-949d-544ad683e946",
+      "eventId": "evt_6ae5c1bc51b1a49728b5bbd5",
+      "eventIds": [
+        "evt_6ae5c1bc51b1a49728b5bbd5"
+      ],
+      "slug": "cirk-bruno-v-g-ishim",
+      "url": "https://daibilet.ru/events/cirk-bruno-v-g-ishim",
+      "title": "Цирк Бруно в г. Ишим",
+      "city": "Ишим",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:33.987Z",
+      "canonicalPath": "/events/cirk-bruno-v-g-ishim",
+      "seoDescription": "Цирковое шоу «Бруно». В анонсе цирка «Бруно» перечислены животные, которых можно увидеть в программе: американск. Ишим, 20 ноября 2026 года в 16:00.",
+      "tourGroupId": "fdac50b2-6de3-46be-bb85-6dbf19eba8e7",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "7c7ef641-85ca-433c-a9b1-bad70de68c38",
+      "eventId": "evt_6a08c7315154d6eeda68b59b",
+      "eventIds": [
+        "evt_6a08c7315154d6eeda68b59b"
+      ],
+      "slug": "konstantin-butakov-omsk",
+      "url": "https://daibilet.ru/events/konstantin-butakov-omsk",
+      "title": "Константин Бутаков",
+      "city": "Омск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:34.330Z",
+      "canonicalPath": "/events/konstantin-butakov-omsk",
+      "seoDescription": "Сольный стендап Константина Бутакова. Константин Бутаков — стендап-комик и резидент проекта Stand Up на ТНТ. Омск, 22 апреля 2027 года в 19:00.",
+      "tourGroupId": "8f841ace-3ee9-4c93-9e57-6c288629b32c",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "0eb4a499-0dce-4569-9748-aca36a11beb8",
+      "eventId": "evt_6aaaed88fcf51bce0db98378",
+      "eventIds": [
+        "evt_6aaaed88fcf51bce0db98378"
+      ],
+      "slug": "konstantin-butakov-sankt-peterburg",
+      "url": "https://daibilet.ru/events/konstantin-butakov-sankt-peterburg",
+      "title": "Константин Бутаков",
+      "city": "Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:34.640Z",
+      "canonicalPath": "/events/konstantin-butakov-sankt-peterburg",
+      "seoDescription": "Сольный стендап Константина Бутакова. Константин Бутаков — стендап-комик и резидент проекта Stand Up на ТНТ. Санкт-Петербург, 13 декабря 2026 года в 19:00.",
+      "tourGroupId": "8f841ace-3ee9-4c93-9e57-6c288629b32c",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "b3b42a30-6777-4e85-93fb-702e28bd893e",
+      "eventId": "evt_6a4b8bdd55b5149b79736911",
+      "eventIds": [
+        "evt_6a4b8bdd55b5149b79736911"
+      ],
+      "slug": "animaciya-sankt-peterburg",
+      "url": "https://daibilet.ru/events/animaciya-sankt-peterburg",
+      "title": "АнимациЯ",
+      "city": "Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:34.977Z",
+      "canonicalPath": "/events/animaciya-sankt-peterburg",
+      "seoDescription": "Группа «АнимациЯ» — концерт к 26-летию. Костя Кулясов и группа «АнимациЯ» отмечают 26 лет коллектива большим сольным концертом. Санкт-Петербург, 11 декабря 2026 года в 20:00.",
+      "tourGroupId": "913329b1-c5d6-4c12-a4b2-62df95433048",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "9f4a3b3b-b9f9-4499-96c2-a63a7ee9b205",
+      "eventId": "evt_6a5f1742b5d976d88369a69d",
+      "eventIds": [
+        "evt_6a5f1742b5d976d88369a69d"
+      ],
+      "slug": "animaciya-moskva",
+      "url": "https://daibilet.ru/events/animaciya-moskva",
+      "title": "АнимациЯ",
+      "city": "Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:35.320Z",
+      "canonicalPath": "/events/animaciya-moskva",
+      "seoDescription": "Группа «АнимациЯ» — концерт к 26-летию. Костя Кулясов и группа «АнимациЯ» отмечают 26 лет коллектива большим сольным концертом. Москва, 12 декабря 2026 года в 20:00.",
+      "tourGroupId": "913329b1-c5d6-4c12-a4b2-62df95433048",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "d31661d5-8449-46fe-b09f-c7aeb2559eb4",
+      "eventId": "evt_6a4bb4527183349db28ca515",
+      "eventIds": [
+        "evt_6a4bb4527183349db28ca515"
+      ],
+      "slug": "mediomodo-fest-stanislav-drobyshevskii-kirill-domnin-burenok-aleksei-vodovozov-sankt-peterburg",
+      "url": "https://daibilet.ru/events/mediomodo-fest-stanislav-drobyshevskii-kirill-domnin-burenok-aleksei-vodovozov-sankt-peterburg",
+      "title": "Medio Modo Fest",
+      "city": "Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:35.664Z",
+      "canonicalPath": "/events/mediomodo-fest-stanislav-drobyshevskii-kirill-domnin-burenok-aleksei-vodovozov-sankt-peterburg",
+      "seoDescription": "Medio Modo Fest: фестиваль научно-популярных лекций. Medio Modo Fest объединяет выступления антрополога Станислава Дробышевского, автора истори. Санкт-Петербург, 15 ноября 2026 года в 18:00.",
+      "tourGroupId": "b42c79d5-9fd2-401c-bb3d-2529ae1c0baf",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "2c2a1e2f-c92f-4934-8cd7-00c5febca3b0",
+      "eventId": "evt_6a4e156830c57197c672db3c",
+      "eventIds": [
+        "evt_6a4e156830c57197c672db3c"
+      ],
+      "slug": "medio-modo-fest-moskva",
+      "url": "https://daibilet.ru/events/medio-modo-fest-moskva",
+      "title": "Medio Modo Fest",
+      "city": "Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:36.028Z",
+      "canonicalPath": "/events/medio-modo-fest-moskva",
+      "seoDescription": "Medio Modo Fest: фестиваль научно-популярных лекций. Medio Modo Fest объединяет выступления антрополога Станислава Дробышевского, автора истори. Москва, 14 ноября 2026 года в 18:00.",
+      "tourGroupId": "b42c79d5-9fd2-401c-bb3d-2529ae1c0baf",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "ebf2f74e-7402-424e-88e9-a5eda3abbc33",
+      "eventId": "evt_6a85d58ee5c5d68a2d7540f5",
+      "eventIds": [
+        "evt_6a85d58ee5c5d68a2d7540f5"
+      ],
+      "slug": "masha-i-medvedi-samara",
+      "url": "https://daibilet.ru/events/masha-i-medvedi-samara",
+      "title": "Маша и Медведи",
+      "city": "Самара",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:36.420Z",
+      "canonicalPath": "/events/masha-i-medvedi-samara",
+      "seoDescription": "«Маша и Медведи» — концерт. На концерте «Маши и Медведей» прозвучат песни, с которыми группа стала известна на рубеже . Самара, 29 ноября 2026 года в 20:00.",
+      "tourGroupId": "b17cf9ff-98e6-4bc7-a0c2-ef5d0b34d9ed",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "4ae65e1b-1da5-4618-ae51-8c12fdf64eb2",
+      "eventId": "evt_6a85dbe99dc070640d0769d5",
+      "eventIds": [
+        "evt_6a85dbe99dc070640d0769d5"
+      ],
+      "slug": "masha-i-medvedi-kazan",
+      "url": "https://daibilet.ru/events/masha-i-medvedi-kazan",
+      "title": "Маша и Медведи",
+      "city": "Казань",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:36.777Z",
+      "canonicalPath": "/events/masha-i-medvedi-kazan",
+      "seoDescription": "«Маша и Медведи» — концерт. На концерте «Маши и Медведей» прозвучат песни, с которыми группа стала известна на рубеже . Казань, 22 ноября 2026 года в 19:00.",
+      "tourGroupId": "b17cf9ff-98e6-4bc7-a0c2-ef5d0b34d9ed",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "fec2106f-da87-465a-b817-e07faf224bb6",
+      "eventId": "evt_6a8973d6da2d1b2080d37039",
+      "eventIds": [
+        "evt_6a8973d6da2d1b2080d37039"
+      ],
+      "slug": "artemiziya-i-satarova-solnyi-koncert-moskva",
+      "url": "https://daibilet.ru/events/artemiziya-i-satarova-solnyi-koncert-moskva",
+      "title": "Артемизия и SATAROVA. Сольный концерт.",
+      "city": "Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:37.165Z",
+      "canonicalPath": "/events/artemiziya-i-satarova-solnyi-koncert-moskva",
+      "seoDescription": "Артемизия и SATAROVA — концерт двух музыкальных проектов. В одном концерте встречаются Артемизия и SATAROVA — два проекта, которые афиша объединяет . Москва, 5 декабря 2026 года в 19:30.",
+      "tourGroupId": "5c1943ee-ad87-4ad9-86c8-e5b3c92b9f12",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "87d3abfc-b61c-4085-8c36-3a86f669bd21",
+      "eventId": "evt_6a9049876a20214c63002611",
+      "eventIds": [
+        "evt_6a9049876a20214c63002611"
+      ],
+      "slug": "artemiziya-i-satarova-solnyi-koncert-sankt-peterburg",
+      "url": "https://daibilet.ru/events/artemiziya-i-satarova-solnyi-koncert-sankt-peterburg",
+      "title": "Артемизия и SATAROVA. Сольный концерт.",
+      "city": "Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:37.481Z",
+      "canonicalPath": "/events/artemiziya-i-satarova-solnyi-koncert-sankt-peterburg",
+      "seoDescription": "Артемизия и SATAROVA — концерт двух музыкальных проектов. В одном концерте встречаются Артемизия и SATAROVA — два проекта, которые афиша объединяет . Санкт-Петербург, 12 декабря 2026 года в 19:30.",
+      "tourGroupId": "5c1943ee-ad87-4ad9-86c8-e5b3c92b9f12",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "521ce655-5147-4f16-b0bf-01800f5a641b",
+      "eventId": "evt_6aaccd85a0b9d18fd1ec9ea7",
+      "eventIds": [
+        "evt_6aaccd85a0b9d18fd1ec9ea7"
+      ],
+      "slug": "bessonov-lirika-novosibirsk",
+      "url": "https://daibilet.ru/events/bessonov-lirika-novosibirsk",
+      "title": "Бессонов. Лирика",
+      "city": "Новосибирск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:37.819Z",
+      "canonicalPath": "/events/bessonov-lirika-novosibirsk",
+      "seoDescription": "«Бессонов. Лирика» — чтение рассказов о любви. Писатель Александр Бессонов и актёр Владимир Дербенцев представят рассказы и тексты о любв. Новосибирск, 17 ноября 2026 года в 19:00.",
+      "tourGroupId": "b6dc0a7b-fea7-4771-900e-805520b7b8dd",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "48b99fcf-a0b7-4ef4-8501-a41d31b12ea0",
+      "eventId": "evt_6ac4b630ae2e3c3b68c82c38",
+      "eventIds": [
+        "evt_6ac4b630ae2e3c3b68c82c38"
+      ],
+      "slug": "bessonov-lirika-kazan",
+      "url": "https://daibilet.ru/events/bessonov-lirika-kazan",
+      "title": "Бессонов. Лирика",
+      "city": "Казань",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:38.152Z",
+      "canonicalPath": "/events/bessonov-lirika-kazan",
+      "seoDescription": "«Бессонов. Лирика» — чтение рассказов о любви. Писатель Александр Бессонов и актёр Владимир Дербенцев представят рассказы и тексты о любв. Казань, 30 ноября 2026 года в 19:00.",
+      "tourGroupId": "b6dc0a7b-fea7-4771-900e-805520b7b8dd",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "5c39fe8d-a4b1-419c-97c2-8d4abc5ae733",
+      "eventId": "evt_6ab25d7cb3ed3399e140a8f1",
+      "eventIds": [
+        "evt_6ab25d7cb3ed3399e140a8f1"
+      ],
+      "slug": "konstantin-lem-white-fox-music-rostov-na-donu",
+      "url": "https://daibilet.ru/events/konstantin-lem-white-fox-music-rostov-na-donu",
+      "title": "КОНСТАНТИН ЛЕМ & WHITE FOX MUSIC",
+      "city": "Ростов-на-Дону",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:38.488Z",
+      "canonicalPath": "/events/konstantin-lem-white-fox-music-rostov-na-donu",
+      "seoDescription": "Константин Лем и White Fox Music — акустический концерт. Константин Лем — автор песен, исполнитель и гитарист из Санкт-Петербурга. Ростов-на-Дону, 11 декабря 2026 года в 20:00.",
+      "tourGroupId": "fba761a3-ac83-48c6-8a0d-b92d36c4e5a2",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "89464ae8-7024-4e79-bbb2-3a42087ca69e",
+      "eventId": "evt_6ab3cee64eea62cf8fbc81fd",
+      "eventIds": [
+        "evt_6ab3cee64eea62cf8fbc81fd"
+      ],
+      "slug": "konstantin-lem-white-fox-music-krasnodar",
+      "url": "https://daibilet.ru/events/konstantin-lem-white-fox-music-krasnodar",
+      "title": "КОНСТАНТИН ЛЕМ & WHITE FOX MUSIC",
+      "city": "Краснодар",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:38.832Z",
+      "canonicalPath": "/events/konstantin-lem-white-fox-music-krasnodar",
+      "seoDescription": "Константин Лем и White Fox Music — акустический концерт. Константин Лем — автор песен, исполнитель и гитарист из Санкт-Петербурга. Краснодар, 10 декабря 2026 года в 20:00.",
+      "tourGroupId": "fba761a3-ac83-48c6-8a0d-b92d36c4e5a2",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "e9e456cd-a5e9-4728-98a2-a643ee1eb0de",
+      "eventId": "evt_6ab5297583153f69a9fe0d43",
+      "eventIds": [
+        "evt_6ab5297583153f69a9fe0d43"
+      ],
+      "slug": "stendap-koncert-viktorii-skladchikovoi-povtor-materiala-2026-goda-samara",
+      "url": "https://daibilet.ru/events/stendap-koncert-viktorii-skladchikovoi-povtor-materiala-2026-goda-samara",
+      "title": "Стендап-концерт Виктории Складчиковой (Повтор материала 2026 года)",
+      "city": "Самара",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:39.165Z",
+      "canonicalPath": "/events/stendap-koncert-viktorii-skladchikovoi-povtor-materiala-2026-goda-samara",
+      "seoDescription": "Виктория Складчикова — стендап, повтор материала 2026 года. Виктория Складчикова строит стендап на наблюдениях из собственной жизни и рассказывает их . Самара, 29 января 2027 года в 19:00.",
+      "tourGroupId": "d8b6b116-2027-4203-9fae-f30ea4ddb8ad",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "a258cb76-80a4-446a-ba86-da28b6868dc0",
+      "eventId": "evt_6add067d17f3645f42c23c85",
+      "eventIds": [
+        "evt_6add067d17f3645f42c23c85"
+      ],
+      "slug": "stendap-koncert-viktorii-skladchikovoi-povtor-materiala-2026-goda-ryazan",
+      "url": "https://daibilet.ru/events/stendap-koncert-viktorii-skladchikovoi-povtor-materiala-2026-goda-ryazan",
+      "title": "Стендап-концерт Виктории Складчиковой (Повтор материала 2026 года)",
+      "city": "Рязань",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:39.511Z",
+      "canonicalPath": "/events/stendap-koncert-viktorii-skladchikovoi-povtor-materiala-2026-goda-ryazan",
+      "seoDescription": "Виктория Складчикова — стендап, повтор материала 2026 года. Виктория Складчикова строит стендап на наблюдениях из собственной жизни и рассказывает их . Рязань, 17 января 2027 года в 21:30.",
+      "tourGroupId": "d8b6b116-2027-4203-9fae-f30ea4ddb8ad",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "b988135c-a6c8-400a-a69c-57e00f82bc90",
+      "eventId": "evt_6abb9aa224b6018b0bb21c0e",
+      "eventIds": [
+        "evt_6abb9aa224b6018b0bb21c0e"
+      ],
+      "slug": "torba-na-kruche-moskva",
+      "url": "https://daibilet.ru/events/torba-na-kruche-moskva",
+      "title": "Торба-на-Круче",
+      "city": "Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:39.855Z",
+      "canonicalPath": "/events/torba-na-kruche-moskva",
+      "seoDescription": "«Торба-на-Круче» — концерт. «Торба-на-Круче» — рок-группа из Санкт-Петербурга, чью музыку часто связывают с романтичес. Москва, 9 декабря 2026 года в 20:00.",
+      "tourGroupId": "01dd9b9e-0378-4c80-bedc-87af08f9da2f",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "ae9f795d-c6ea-4d20-ac86-302b3b7f160f",
+      "eventId": "evt_6abc386674ed056f4f34f840",
+      "eventIds": [
+        "evt_6abc386674ed056f4f34f840"
+      ],
+      "slug": "torba-na-kruche-sankt-peterburg",
+      "url": "https://daibilet.ru/events/torba-na-kruche-sankt-peterburg",
+      "title": "Торба-на-Круче",
+      "city": "Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:40.198Z",
+      "canonicalPath": "/events/torba-na-kruche-sankt-peterburg",
+      "seoDescription": "«Торба-на-Круче» — концерт. «Торба-на-Круче» — рок-группа из Санкт-Петербурга, чью музыку часто связывают с романтичес. Санкт-Петербург, 17 декабря 2026 года в 20:00.",
+      "tourGroupId": "01dd9b9e-0378-4c80-bedc-87af08f9da2f",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "253aa8a9-76d2-450b-a805-29fa7830fea3",
+      "eventId": "evt_6abe85d52386b0e293b95089",
+      "eventIds": [
+        "evt_6abe85d52386b0e293b95089"
+      ],
+      "slug": "yuliya-kogan-ekaterinburg",
+      "url": "https://daibilet.ru/events/yuliya-kogan-ekaterinburg",
+      "title": "Юлия Коган",
+      "city": "Екатеринбург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:40.544Z",
+      "canonicalPath": "/events/yuliya-kogan-ekaterinburg",
+      "seoDescription": "Юлия Коган — концерт с юмористическими песнями и балладами. Юлия Коган известна слушателям по сотрудничеству с группами «Ленинград» и «Король и Шут». Екатеринбург, 9 января 2027 года в 20:00.",
+      "tourGroupId": "8c3aed17-d105-40d3-b3af-3286c3a7a03c",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "98d5ea04-bfac-405f-badb-7bf94046e02f",
+      "eventId": "evt_6ac6c25f06f159bf11738ee4",
+      "eventIds": [
+        "evt_6ac6c25f06f159bf11738ee4"
+      ],
+      "slug": "yuliya-kogan-chelyabinsk",
+      "url": "https://daibilet.ru/events/yuliya-kogan-chelyabinsk",
+      "title": "Юлия Коган",
+      "city": "Челябинск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:40.855Z",
+      "canonicalPath": "/events/yuliya-kogan-chelyabinsk",
+      "seoDescription": "Юлия Коган — концерт с юмористическими песнями и балладами. Юлия Коган известна слушателям по сотрудничеству с группами «Ленинград» и «Король и Шут». Челябинск, 8 января 2027 года в 20:00.",
+      "tourGroupId": "8c3aed17-d105-40d3-b3af-3286c3a7a03c",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "48506e71-2dd1-4f74-8c89-2e263f6370e7",
+      "eventId": "evt_6abfb27efbbbaca107e1fee2",
+      "eventIds": [
+        "evt_6abfb27efbbbaca107e1fee2"
+      ],
+      "slug": "norma-tale-solnyi-koncert-sankt-peterburg",
+      "url": "https://daibilet.ru/events/norma-tale-solnyi-koncert-sankt-peterburg",
+      "title": "Norma Tale. Сольный концерт",
+      "city": "Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:41.167Z",
+      "canonicalPath": "/events/norma-tale-solnyi-koncert-sankt-peterburg",
+      "seoDescription": "Norma Tale — сольный концерт. В основе образного мира Norma Tale — фэнтези, мифология и истории о человеческих чувствах. Санкт-Петербург, 30 января 2027 года в 19:30.",
+      "tourGroupId": "d6c99e45-3985-4ee5-8a05-a3f1c6079807",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "86523635-3eaf-4fa3-808e-93195f7bad94",
+      "eventId": "evt_6abfbde480cd2d4930e86fe5",
+      "eventIds": [
+        "evt_6abfbde480cd2d4930e86fe5"
+      ],
+      "slug": "norma-tale-solnyi-koncert-moskva",
+      "url": "https://daibilet.ru/events/norma-tale-solnyi-koncert-moskva",
+      "title": "Norma Tale. Сольный концерт",
+      "city": "Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:41.515Z",
+      "canonicalPath": "/events/norma-tale-solnyi-koncert-moskva",
+      "seoDescription": "Norma Tale — сольный концерт. В основе образного мира Norma Tale — фэнтези, мифология и истории о человеческих чувствах. Москва, 6 февраля 2027 года в 19:30.",
+      "tourGroupId": "d6c99e45-3985-4ee5-8a05-a3f1c6079807",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "52bbc926-af2c-4607-9383-2f8115b0b383",
+      "eventId": "evt_6ac5434089e6a22cd0abf834",
+      "eventIds": [
+        "evt_6ac5434089e6a22cd0abf834"
+      ],
+      "slug": "aleksei-reshetun-novyi-god-po-sudebno-medicinske-moskva",
+      "url": "https://daibilet.ru/events/aleksei-reshetun-novyi-god-po-sudebno-medicinske-moskva",
+      "title": "Алексей Решетун. Новый год по судебно-медицински.",
+      "city": "Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-10T05:00:29.452Z",
+      "canonicalPath": "/events/aleksei-reshetun-novyi-god-po-sudebno-medicinske-moskva",
+      "seoDescription": "Алексей Решетун — лекция «Новый год по судебно-медицински». Лекция Алексея Решетуна «Новый год по судебно-медицински» предлагает посмотреть на длинные. Москва, 23 декабря 2026 года в 19:30.",
+      "tourGroupId": "c429fda0-35a3-4673-8a02-b3929fbbcf85",
+      "revisionBefore": 5,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "cd321ce8-6706-491a-bc76-df931489a9ea",
+      "eventId": "evt_6ad686b06556323c5ec0d868",
+      "eventIds": [
+        "evt_6ad686b06556323c5ec0d868"
+      ],
+      "slug": "aleksei-reshetun-novyi-god-po-sudebno-medicinski-sankt-peterburg",
+      "url": "https://daibilet.ru/events/aleksei-reshetun-novyi-god-po-sudebno-medicinski-sankt-peterburg",
+      "title": "Алексей Решетун. Новый год по судебно-медицински.",
+      "city": "Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-10T06:18:03.998Z",
+      "canonicalPath": "/events/aleksei-reshetun-novyi-god-po-sudebno-medicinski-sankt-peterburg",
+      "seoDescription": "Алексей Решетун — лекция «Новый год по судебно-медицински». Лекция Алексея Решетуна «Новый год по судебно-медицински» предлагает посмотреть на длинные. Санкт-Петербург, 26 декабря 2026 года в 15:00.",
+      "tourGroupId": "c429fda0-35a3-4673-8a02-b3929fbbcf85",
+      "revisionBefore": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "e1487b06-5891-4fb6-8edf-3c9b13f731e0",
+      "eventId": "evt_6ac39ec471aaf2ffe161059a",
+      "eventIds": [
+        "evt_6ac39ec471aaf2ffe161059a"
+      ],
+      "slug": "palc-solnyi-koncert-moskva",
+      "url": "https://daibilet.ru/events/palc-solnyi-koncert-moskva",
+      "title": "PALC. Сольный концерт",
+      "city": "Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:42.342Z",
+      "canonicalPath": "/events/palc-solnyi-koncert-moskva",
+      "seoDescription": "PALC — сольный концерт. PALC готовит сольное выступление с живым звуком в полном составе. Москва, 17 апреля 2027 года в 19:00.",
+      "tourGroupId": "8e734507-a17a-4659-9808-49a7529f1612",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "17726ece-a5fb-42d7-b73d-cea17df22c8f",
+      "eventId": "evt_6ac3a2464addcdaa6023f264",
+      "eventIds": [
+        "evt_6ac3a2464addcdaa6023f264"
+      ],
+      "slug": "palc-solnyi-koncert-sankt-peterburg",
+      "url": "https://daibilet.ru/events/palc-solnyi-koncert-sankt-peterburg",
+      "title": "PALC. Сольный концерт",
+      "city": "Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:42.670Z",
+      "canonicalPath": "/events/palc-solnyi-koncert-sankt-peterburg",
+      "seoDescription": "PALC — сольный концерт. PALC готовит сольное выступление с живым звуком в полном составе. Санкт-Петербург, 16 апреля 2027 года в 19:00.",
+      "tourGroupId": "8e734507-a17a-4659-9808-49a7529f1612",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "4a556c9a-9aaa-4b25-91c7-1b5ce60a0cc7",
+      "eventId": "evt_6ac4d9e766ed9b4f87b5080e",
+      "eventIds": [
+        "evt_6ac4d9e766ed9b4f87b5080e"
+      ],
+      "slug": "hity-2000h-karaoke-s-orkestrom-moskva",
+      "url": "https://daibilet.ru/events/hity-2000h-karaoke-s-orkestrom-moskva",
+      "title": "Хиты 2000х. Караоке с оркестром",
+      "city": "Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:43.036Z",
+      "canonicalPath": "/events/hity-2000h-karaoke-s-orkestrom-moskva",
+      "seoDescription": "«Хиты 2000-х»: караоке с оркестром. «Хиты 2000-х» — концерт, где зрители не только слушают музыку, но и поют вместе с залом. Москва, 16 декабря 2026 года в 19:00.",
+      "tourGroupId": "36d6c8b9-3ec5-49e6-81e5-df9b40280611",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "40dd2d16-166b-4b65-86c4-5a4b68b14ed2",
+      "eventId": "evt_6ad604ff5dfe9998acc8f624",
+      "eventIds": [
+        "evt_6ad604ff5dfe9998acc8f624"
+      ],
+      "slug": "hity-2000h-karaoke-s-orkestrom-simferopol",
+      "url": "https://daibilet.ru/events/hity-2000h-karaoke-s-orkestrom-simferopol",
+      "title": "Хиты 2000х. Караоке с оркестром",
+      "city": "Симферополь",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:43.378Z",
+      "canonicalPath": "/events/hity-2000h-karaoke-s-orkestrom-simferopol",
+      "seoDescription": "«Хиты 2000-х»: караоке с оркестром. «Хиты 2000-х» — концерт, где зрители не только слушают музыку, но и поют вместе с залом. Симферополь, 19 ноября 2026 года в 19:00.",
+      "tourGroupId": "36d6c8b9-3ec5-49e6-81e5-df9b40280611",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "3345594a-d6d4-4687-97f2-a3a7fe81eb61",
+      "eventId": "evt_6ac8c440a9cb6a37cd9d2690",
+      "eventIds": [
+        "evt_6ac8c440a9cb6a37cd9d2690"
+      ],
+      "slug": "aleksei-tretyakov-eto-tochno-ikona-nauchno-istoricheskii-vzglyad-na-samye-neobychnye-obrazy-v-ikonop-moskva",
+      "url": "https://daibilet.ru/events/aleksei-tretyakov-eto-tochno-ikona-nauchno-istoricheskii-vzglyad-na-samye-neobychnye-obrazy-v-ikonop-moskva",
+      "title": "Алексей Третьяков. Это точно икона? Научно-исторический взгляд на самые необычные образы в иконописи.",
+      "city": "Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:43.709Z",
+      "canonicalPath": "/events/aleksei-tretyakov-eto-tochno-ikona-nauchno-istoricheskii-vzglyad-na-samye-neobychnye-obrazy-v-ikonop-moskva",
+      "seoDescription": "Алексей Третьяков — «Это точно икона?». Лекция Алексея Третьякова «Это точно икона?» посвящена образам, которые могут удивить совр. Москва, 11 декабря 2026 года в 19:00.",
+      "tourGroupId": "526ec0fe-9bce-4add-9f06-65a8e29cd290",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "21a9b8fa-d0ac-42ea-b012-2c14c73daab6",
+      "eventId": "evt_6ac8ca099766b7066f7926c7",
+      "eventIds": [
+        "evt_6ac8ca099766b7066f7926c7"
+      ],
+      "slug": "aleksei-tretyakov-eto-tochno-ikona-nauchno-istoricheskii-vzglyad-na-samye-neobychnye-obrazy-v-ikonop-sankt-peterburg",
+      "url": "https://daibilet.ru/events/aleksei-tretyakov-eto-tochno-ikona-nauchno-istoricheskii-vzglyad-na-samye-neobychnye-obrazy-v-ikonop-sankt-peterburg",
+      "title": "Алексей Третьяков. Это точно икона? Научно-исторический взгляд на самые необычные образы в иконописи.",
+      "city": "Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:44.061Z",
+      "canonicalPath": "/events/aleksei-tretyakov-eto-tochno-ikona-nauchno-istoricheskii-vzglyad-na-samye-neobychnye-obrazy-v-ikonop-sankt-peterburg",
+      "seoDescription": "Алексей Третьяков — «Это точно икона?». Лекция Алексея Третьякова «Это точно икона?» посвящена образам, которые могут удивить совр. Санкт-Петербург, 13 декабря 2026 года в 19:00.",
+      "tourGroupId": "526ec0fe-9bce-4add-9f06-65a8e29cd290",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "9d10cb36-940f-42ae-8503-2c3e594fb27e",
+      "eventId": "evt_6ad24c0a7f5775a26bc3b972",
+      "eventIds": [
+        "evt_6ad24c0a7f5775a26bc3b972"
+      ],
+      "slug": "merilin-monro-kak-pautina-na-vetru-orel",
+      "url": "https://daibilet.ru/events/merilin-monro-kak-pautina-na-vetru-orel",
+      "title": "\"Мэрилин Монро. Как паутина на ветру...\"",
+      "city": "Орёл",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:44.410Z",
+      "canonicalPath": "/events/merilin-monro-kak-pautina-na-vetru-orel",
+      "seoDescription": "Спектакль «Мэрилин Монро. Как паутина на ветру…». Спектакль «Мэрилин Монро. Орёл, 18 января 2027 года в 19:00.",
+      "tourGroupId": "9bdeaad5-e19a-47ad-8f9b-9b74d3700492",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "027c156e-dc4d-401c-b5f2-e9bd8818b0e0",
+      "eventId": "evt_6ae412f8705bbb759f2a6148",
+      "eventIds": [
+        "evt_6ae412f8705bbb759f2a6148"
+      ],
+      "slug": "merilin-monro-kak-pautina-na-vetru-moskva",
+      "url": "https://daibilet.ru/events/merilin-monro-kak-pautina-na-vetru-moskva",
+      "title": "\"Мэрилин Монро. Как паутина на ветру...\"",
+      "city": "Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:44.756Z",
+      "canonicalPath": "/events/merilin-monro-kak-pautina-na-vetru-moskva",
+      "seoDescription": "Спектакль «Мэрилин Монро. Как паутина на ветру…». Спектакль «Мэрилин Монро. Москва, 9 декабря 2026 года в 19:00.",
+      "tourGroupId": "9bdeaad5-e19a-47ad-8f9b-9b74d3700492",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "9c945e58-7368-4941-a373-62b17312f0f7",
+      "eventId": "evt_6ad3dbb8293c1ed1307e134f",
+      "eventIds": [
+        "evt_6ad3dbb8293c1ed1307e134f"
+      ],
+      "slug": "voroth-vorot-lipeck",
+      "url": "https://daibilet.ru/events/voroth-vorot-lipeck",
+      "title": "Voroth (Ворот)",
+      "city": "Липецк",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:45.087Z",
+      "canonicalPath": "/events/voroth-vorot-lipeck",
+      "seoDescription": "Voroth (Ворот) — концерт в рамках METAL ASSAULT FEST. Группа Voroth выступит в рамках юбилейного тура METAL ASSAULT FEST. Липецк, 24 декабря 2026 года в 19:00.",
+      "tourGroupId": "8e4e0965-80cf-4de5-bce4-a331ed524f14",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "83cb872c-4333-4735-b1a6-47a4722b3f25",
+      "eventId": "evt_6ad3dfdce34758ddc59d2293",
+      "eventIds": [
+        "evt_6ad3dfdce34758ddc59d2293"
+      ],
+      "slug": "voroth-vorot-voronezh",
+      "url": "https://daibilet.ru/events/voroth-vorot-voronezh",
+      "title": "Voroth (Ворот)",
+      "city": "Воронеж",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:45.403Z",
+      "canonicalPath": "/events/voroth-vorot-voronezh",
+      "seoDescription": "Voroth (Ворот) — концерт в рамках METAL ASSAULT FEST. Группа Voroth выступит в рамках юбилейного тура METAL ASSAULT FEST. Воронеж, 25 декабря 2026 года в 19:00.",
+      "tourGroupId": "8e4e0965-80cf-4de5-bce4-a331ed524f14",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "963df98d-1f6d-403a-8e5d-39fe0766511e",
+      "eventId": "evt_6af2930126752731b4477765",
+      "eventIds": [
+        "evt_6af2930126752731b4477765"
+      ],
+      "slug": "5-02-zheka-basotskii-sankt-peterburg",
+      "url": "https://daibilet.ru/events/5-02-zheka-basotskii-sankt-peterburg",
+      "title": "5.02 | Жека Басотский | Санкт-Петербург",
+      "city": "Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:45.731Z",
+      "canonicalPath": "/events/5-02-zheka-basotskii-sankt-peterburg",
+      "seoDescription": "Жека Басотский — концерт. Жека Басотский — рэп-исполнитель из Смоленска. Санкт-Петербург, 5 февраля 2027 года в 19:00.",
+      "tourGroupId": "7252c9d7-4b87-4215-8697-e714b7d361b2",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "29d35f16-9d00-4fae-ad54-ab3935e1060e",
+      "eventId": "evt_6af29a62a9d77f531be348f3",
+      "eventIds": [
+        "evt_6af29a62a9d77f531be348f3"
+      ],
+      "slug": "6-02-zheka-basotskii-moskva",
+      "url": "https://daibilet.ru/events/6-02-zheka-basotskii-moskva",
+      "title": "6.02 | Жека Басотский | Москва",
+      "city": "Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:46.085Z",
+      "canonicalPath": "/events/6-02-zheka-basotskii-moskva",
+      "seoDescription": "Жека Басотский — концерт. Жека Басотский — рэп-исполнитель из Смоленска. Москва, 6 февраля 2027 года в 19:00.",
+      "tourGroupId": "7252c9d7-4b87-4215-8697-e714b7d361b2",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "c35e694b-8535-4da7-823d-e22eaac0f1d9",
+      "eventId": "evt_6ae9b200910854ee5945c18a",
+      "eventIds": [
+        "evt_6ae9b200910854ee5945c18a"
+      ],
+      "slug": "muzykalnoe-loto-bingo-fm-sankt-peterburg",
+      "url": "https://daibilet.ru/events/muzykalnoe-loto-bingo-fm-sankt-peterburg",
+      "title": "Музыкальное лото Бинго FM",
+      "city": "Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:46.453Z",
+      "canonicalPath": "/events/muzykalnoe-loto-bingo-fm-sankt-peterburg",
+      "seoDescription": "Музыкальное лото «Бинго FM». «Бинго FM» соединяет музыкальное лото и вечеринку. Санкт-Петербург, 14 ноября 2026 года в 19:30.",
+      "tourGroupId": "a1dbf2a5-7065-4b09-a058-decad2a95e5d",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "8efdeace-e414-401c-b0d2-d17d82680fba",
+      "eventId": "evt_6ae9af48c507f90269eb7628",
+      "eventIds": [
+        "evt_6ae9af48c507f90269eb7628"
+      ],
+      "slug": "muzykalnoe-loto-bingo-fm-moskva",
+      "url": "https://daibilet.ru/events/muzykalnoe-loto-bingo-fm-moskva",
+      "title": "Музыкальное лото Бинго FM",
+      "city": "Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:46.775Z",
+      "canonicalPath": "/events/muzykalnoe-loto-bingo-fm-moskva",
+      "seoDescription": "Музыкальное лото «Бинго FM». «Бинго FM» соединяет музыкальное лото и вечеринку. Москва, 28 ноября 2026 года в 20:00.",
+      "tourGroupId": "a1dbf2a5-7065-4b09-a058-decad2a95e5d",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "93f6eba8-b2b6-4ce3-a1c8-0299f645fe79",
+      "eventId": "evt_6ae5c5448240d60dad0cc9e4",
+      "eventIds": [
+        "evt_6ae5c5448240d60dad0cc9e4"
+      ],
+      "slug": "solnyi-koncert-miroslavy-i-zlaty-bykovyh-v-ekaterinburge-ekaterinburg",
+      "url": "https://daibilet.ru/events/solnyi-koncert-miroslavy-i-zlaty-bykovyh-v-ekaterinburge-ekaterinburg",
+      "title": "Сольный концерт Мирославы и Златы Быковых в Екатеринбурге!",
+      "city": "Екатеринбург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:47.107Z",
+      "canonicalPath": "/events/solnyi-koncert-miroslavy-i-zlaty-bykovyh-v-ekaterinburge-ekaterinburg",
+      "seoDescription": "Мирослава и Злата Быковы — концерт «Тот самый тур». Мирослава и Злата Быковы отправляются в «Тот самый тур» с совместным сольным концертом. Екатеринбург, 16 февраля 2027 года в 19:00.",
+      "tourGroupId": "590ca16b-fb79-4a3c-a9ba-950184762dc9",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "14896912-adc4-4f67-8de7-4bbccb604cda",
+      "eventId": "evt_6ae5c466bd58c04fb399cbf4",
+      "eventIds": [
+        "evt_6ae5c466bd58c04fb399cbf4"
+      ],
+      "slug": "solnyi-koncert-miroslavy-i-zlaty-bykovyh-v-chelyabinske-chelyabinsk",
+      "url": "https://daibilet.ru/events/solnyi-koncert-miroslavy-i-zlaty-bykovyh-v-chelyabinske-chelyabinsk",
+      "title": "Сольный концерт Мирославы и Златы Быковых в Челябинске!",
+      "city": "Челябинск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:55:47.440Z",
+      "canonicalPath": "/events/solnyi-koncert-miroslavy-i-zlaty-bykovyh-v-chelyabinske-chelyabinsk",
+      "seoDescription": "Мирослава и Злата Быковы — концерт «Тот самый тур». Мирослава и Злата Быковы отправляются в «Тот самый тур» с совместным сольным концертом. Челябинск, 14 февраля 2027 года в 17:00.",
+      "tourGroupId": "590ca16b-fb79-4a3c-a9ba-950184762dc9",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    }
+  ],
+  "sameCityUnassigned": 1,
+  "completedAt": "2026-11-13T05:55:47.624Z",
+  "completed": true
+}

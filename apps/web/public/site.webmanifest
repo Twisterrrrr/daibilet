@@ -1,0 +1,23 @@
+{
+  "name": "Дайбилет",
+  "short_name": "Дайбилет",
+  "description": "Афиша событий, экскурсий и мероприятий в городах России. Билеты онлайн.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4A7FD4",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

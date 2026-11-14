@@ -1,0 +1,49 @@
+{
+  "eventId": "evt_6aabf787fc7cfc7c4e3e55ff",
+  "eventPageId": "f01f3713-35e9-4d66-bb5a-1f8bf0085f20",
+  "eventPageSlug": "gruppa-mirazh-zelenograd",
+  "archiveStatus": "UNUSED_ORIGINAL_SOURCE",
+  "retrievedAt": "2026-11-05",
+  "sourceSnapshot": {
+    "id": "evt_6aabf787fc7cfc7c4e3e55ff",
+    "kind": "SINGLE",
+    "slug": "группа-мираж-6aabf787fc7cfc7c4e3e55ff",
+    "seoH1": null,
+    "title": "Группа \"МИРАЖ\"",
+    "sources": [
+      {
+        "code": "TICKETSCLOUD",
+        "name": "Ticketscloud",
+        "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6aabf787fc7cfc7c4e3e55ff",
+        "externalId": "6aabf787fc7cfc7c4e3e55ff",
+        "metaExternalId": null
+      }
+    ],
+    "venueId": "venue_5df8e26646c150d57724c398",
+    "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6aabf787a532ef741af74f8c.jpg",
+    "seoTitle": null,
+    "cityTitle": "Зеленоград",
+    "venueTitle": "Дом культуры МИЭТ",
+    "description": null,
+    "isIndexable": true,
+    "purchaseFlow": "EXTERNAL",
+    "venueAddress": "пл. Шокина, 1, стр.2",
+    "canonicalPath": null,
+    "primaryCityId": "city_463829",
+    "supplierTitle": null,
+    "managementMode": "SOURCE_MANAGED",
+    "seoDescription": null,
+    "shortDescription": null
+  },
+  "originalDescription": null,
+  "previousEventOverride": "«Мираж» - поп-концерт на площадке «Дом культуры МИЭТ» в Зеленограде. Советская и российская группа, основанная в 1986 году в Москве. Работает в стиле евродиско, художественный руководитель - Андрей Литягин; известна песнями «Музыка нас связала» и «Снова вместе».\n\n## Практическая информация\n\n- Место - «Дом культуры МИЭТ», Зеленоград\n- Адрес - пл. Шокина, 1, стр.2\n- Продолжительность - около 100 минут\n- Возрастное ограничение - 12+\n- Билеты - от 2 500 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+  "activeSessions": [
+    {
+      "start": "2026-12-10T16:00:00",
+      "end": "2026-12-10T17:40:00",
+      "price": 2500
+    }
+  ],
+  "mainChars": 618,
+  "previousEffectiveChars": 536
+}

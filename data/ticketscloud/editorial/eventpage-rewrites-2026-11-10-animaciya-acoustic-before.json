@@ -1,0 +1,671 @@
+{
+  "capturedAt": "2026-11-09T21:02:29.031Z",
+  "purpose": "Pre-rewrite production archive; legacy overrides remain unchanged and archival. EventPage sections receive the active editorial rewrite.",
+  "items": {
+    "evt_6ad5ed5a2525da76d7aef422": {
+      "eventId": "evt_6ad5ed5a2525da76d7aef422",
+      "eventPageId": "43d9815d-c4b9-43e9-a95e-75f3684e0711",
+      "slug": "04-02-2027-petropavlovsk-kamchatskii-vse-hity-kostya-kulyasov-gr-animaciya-akustika-animaciya-onlin-petropavlovsk-kamchatskiy",
+      "sourceTitle": "04.02.2027 / Петропавловск -Камчатский /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online",
+      "sourceDescription": "4 февраля  2027  в П. Камчатском на площадке паба Harats   состоится душевная  акустика  КОСТИ КУЛЯСОВА - лидера группы  АНИМАЦИЯ! Все хиты!<br><br><br>Драйв и энергия, откровения и удалое веселье, мощнейшая музыка и интеллектуальные тексты - это главный рецепт всегда успешного и захватывающего концерта КОСТИ. <br>Прозвучат и любимые всеми хиты, и  совершенно новые песни! <br>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬<br>Адрес: г. Петропавловск-Камчатский, ул.Пограничная, д.17<br>Начало концерта в 19.00 <br>____________________________<br>«Я люблю свою Родину, вроде бы» - фраза из песни группы «АнимациЯ». Костя Кулясов, лидер группы, и тот самый автор, у которого что ни песня, то крылатое выражение. Хочешь попасть на концерт? Жми на ссылку и покупай билет! Ты услышишь полтора десятка ломовейших хитов и самые новые песни!",
+      "legacyOverrideDescription": "4 февраля 2027 в П. Камчатском на площадке паба Harats состоится душевная акустика КОСТИ КУЛЯСОВА - лидера группы АНИМАЦИЯ! Все хиты!\n\nДрайв и энергия, откровения и удалое веселье, мощнейшая музыка и интеллектуальные тексты - это главный рецепт всегда успешного и захватывающего концерта КОСТИ. Прозвучат и любимые всеми хиты, и совершенно новые песни!\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\nАдрес: г. Петропавловск-Камчатский, ул. Пограничная, д.17\nНачало концерта в 19.00\n«Я люблю свою Родину, вроде бы» - фраза из песни группы «АнимациЯ». Костя Кулясов, лидер группы, и тот самый автор, у которого что ни песня, то крылатое выражение. Хочешь попасть на концерт? Жми на ссылку и покупай билет! Ты услышишь полтора десятка ломовейших хитов и самые новые песни!",
+      "sourceSnapshot": {
+        "id": "evt_6ad5ed5a2525da76d7aef422",
+        "kind": "SINGLE",
+        "slug": "04-02-2027-петропавловск-камчатскии-все-хиты-костя-кулясов-гр-анимация-акустика-animaciya-onlin-6ad5ed5a2525da76d7aef422",
+        "seoH1": null,
+        "title": "04.02.2027 / Петропавловск -Камчатский /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ad5ed5a2525da76d7aef422",
+            "externalId": "6ad5ed5a2525da76d7aef422",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_61ecb6f5552e5b4c52a4b927",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ad5ed594a4f4d864bd623c3.jpg",
+        "seoTitle": null,
+        "cityTitle": "Петропавловск-Камчатский",
+        "venueTitle": "Harat's pub",
+        "description": "4 февраля  2027  в П. Камчатском на площадке паба Harats   состоится душевная  акустика  КОСТИ КУЛЯСОВА - лидера группы  АНИМАЦИЯ! Все хиты!<br><br><br>Драйв и энергия, откровения и удалое веселье, мощнейшая музыка и интеллектуальные тексты - это главный рецепт всегда успешного и захватывающего концерта КОСТИ. <br>Прозвучат и любимые всеми хиты, и  совершенно новые песни! <br>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬<br>Адрес: г. Петропавловск-Камчатский, ул.Пограничная, д.17<br>Начало концерта в 19.00 <br>____________________________<br>«Я люблю свою Родину, вроде бы» - фраза из песни группы «АнимациЯ». Костя Кулясов, лидер группы, и тот самый автор, у которого что ни песня, то крылатое выражение. Хочешь попасть на концерт? Жми на ссылку и покупай билет! Ты услышишь полтора десятка ломовейших хитов и самые новые песни!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "ул. Пограничная 17",
+        "canonicalPath": null,
+        "primaryCityId": "city_2122104",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "04.02.2027 / Петропавловск -Камчатский /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online",
+        "seoH1": "04.02.2027 / Петропавловск -Камчатский /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online",
+        "seoTitle": "04.02.2027 / Петропавловск -Камчатский /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/04-02-2027-petropavlovsk-kamchatskii-vse-hity-kostya-kulyasov-gr-animaciya-akustika-animaciya-onlin-petropavlovsk-kamchatskiy",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "1d514cb4-3807-4b28-9935-2b90ea0f46d7",
+          "eventId": "evt_6ad5ed5a2525da76d7aef422",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_6ad5ed5a2525da76d7aef422",
+            "kind": "SINGLE",
+            "slug": "04-02-2027-петропавловск-камчатскии-все-хиты-костя-кулясов-гр-анимация-акустика-animaciya-onlin-6ad5ed5a2525da76d7aef422",
+            "seoH1": null,
+            "title": "04.02.2027 / Петропавловск -Камчатский /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ad5ed5a2525da76d7aef422",
+                "externalId": "6ad5ed5a2525da76d7aef422",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_61ecb6f5552e5b4c52a4b927",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ad5ed594a4f4d864bd623c3.jpg",
+            "seoTitle": null,
+            "cityTitle": "Петропавловск-Камчатский",
+            "venueTitle": "Harat's pub",
+            "description": "4 февраля  2027  в П. Камчатском на площадке паба Harats   состоится душевная  акустика  КОСТИ КУЛЯСОВА - лидера группы  АНИМАЦИЯ! Все хиты!<br><br><br>Драйв и энергия, откровения и удалое веселье, мощнейшая музыка и интеллектуальные тексты - это главный рецепт всегда успешного и захватывающего концерта КОСТИ. <br>Прозвучат и любимые всеми хиты, и  совершенно новые песни! <br>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬<br>Адрес: г. Петропавловск-Камчатский, ул.Пограничная, д.17<br>Начало концерта в 19.00 <br>____________________________<br>«Я люблю свою Родину, вроде бы» - фраза из песни группы «АнимациЯ». Костя Кулясов, лидер группы, и тот самый автор, у которого что ни песня, то крылатое выражение. Хочешь попасть на концерт? Жми на ссылку и покупай билет! Ты услышишь полтора десятка ломовейших хитов и самые новые песни!",
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "ул. Пограничная 17",
+            "canonicalPath": null,
+            "primaryCityId": "city_2122104",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": null
+          },
+          "createdAt": "2026-11-03T20:42:15.944Z",
+          "eventTitle": "04.02.2027 / Петропавловск -Камчатский /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online",
+          "eventSlug": "04-02-2027-петропавловск-камчатскии-все-хиты-костя-кулясов-гр-анимация-акустика-animaciya-onlin-6ad5ed5a2525da76d7aef422",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_2122104",
+          "cityTitle": "Петропавловск-Камчатский",
+          "venueId": "venue_61ecb6f5552e5b4c52a4b927",
+          "venueTitle": "Harat's pub",
+          "venueAddress": "ул. Пограничная 17",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ad5ed5a2525da76d7aef422",
+              "externalId": "6ad5ed5a2525da76d7aef422",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "city": "Петропавловск-Камчатский",
+        "venue": "Harat's pub",
+        "address": "ул. Пограничная 17",
+        "ageLimit": "16",
+        "offerMin": 2200,
+        "activeOffers": 6,
+        "futureSessions": [
+          "2027-02-04T08:00:00"
+        ]
+      }
+    },
+    "evt_6a3677d73e648237552b90ce": {
+      "eventId": "evt_6a3677d73e648237552b90ce",
+      "eventPageId": "453a9378-8625-498f-8259-5b6a504d1af9",
+      "slug": "26-11-2026-kostroma-vse-hity-kostya-kulyasov-gr-animaciya-akustika-animaciya-online-kostroma",
+      "sourceTitle": "26.11.2026 / Кострома /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online",
+      "sourceDescription": "26 ноября  2026  в Костроме  в пивотеке Swabz душевная акустика  КОСТИ КУЛЯСОВА - лидера группы  АНИМАЦИЯ! Программа : \"Все хиты\". <br><br><br>Драйв и энергия, откровения и удалое веселье, мощнейшая музыка и интеллектуальные тексты - это главный рецепт всегда успешного и захватывающего концерта КОСТИ. <br>Прозвучат и любимые всеми хиты, и  совершенно новые песни! <br><br>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬<br><br>«Я люблю свою Родину, вроде бы» - фраза из песни группы «АнимациЯ». Костя Кулясов, лидер группы, и тот самый автор, у которого что ни песня, то крылатое выражение.  Ты услышишь полтора десятка ломовейших хитов и самые новые песни из альбома, который готовится к выходу. Будь первым, будь в курсе!",
+      "legacyOverrideDescription": "26 ноября 2026 в Костроме в пивотеке Swabz душевная акустика КОСТИ КУЛЯСОВА - лидера группы АНИМАЦИЯ! Программа: \"Все хиты\". Драйв и энергия, откровения и удалое веселье, мощнейшая музыка и интеллектуальные тексты - это главный рецепт всегда успешного и захватывающего концерта КОСТИ. Прозвучат и любимые всеми хиты, и совершенно новые песни!\n\n«Я люблю свою Родину, вроде бы» - фраза из песни группы «АнимациЯ». Костя Кулясов, лидер группы, и тот самый автор, у которого что ни песня, то крылатое выражение. Ты услышишь полтора десятка ломовейших хитов и самые новые песни из альбома, который готовится к выходу. Будь первым, будь в курсе!\n\nЭто 2-й вечер серии (даты с 25 ноября - 26 ноября 2026): всего 2 вечера. Можно сравнить даты и остановиться на удобной.\n\n## Практическая информация\n\n- Место - «ПИВОТЕКА SWABZ», Кострома\n- Адрес - ул. Советская д.2\n- Продолжительность - около 120 минут\n- Возрастное ограничение - 16+\n- Билеты - от 2 200 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_6a3677d73e648237552b90ce",
+        "kind": "SINGLE",
+        "slug": "tc-6a3677d73e648237552b90ce-26-11-2026-кострома-все-хиты-костя-кулясов-гр-анимация-акустика-animaciya-online",
+        "seoH1": null,
+        "title": "26.11.2026 / Кострома /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a3677d73e648237552b90ce",
+            "externalId": "6a3677d73e648237552b90ce",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_61d5b045af1fb82f5eba0fc7",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-06/6a3677d718305ba95d696459.jpg",
+        "seoTitle": null,
+        "cityTitle": "Кострома",
+        "venueTitle": "ПИВОТЕКА SWABZ",
+        "description": "26 ноября  2026  в Костроме  в пивотеке Swabz душевная акустика  КОСТИ КУЛЯСОВА - лидера группы  АНИМАЦИЯ! Программа : \"Все хиты\". <br><br><br>Драйв и энергия, откровения и удалое веселье, мощнейшая музыка и интеллектуальные тексты - это главный рецепт всегда успешного и захватывающего концерта КОСТИ. <br>Прозвучат и любимые всеми хиты, и  совершенно новые песни! <br><br>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬<br><br>«Я люблю свою Родину, вроде бы» - фраза из песни группы «АнимациЯ». Костя Кулясов, лидер группы, и тот самый автор, у которого что ни песня, то крылатое выражение.  Ты услышишь полтора десятка ломовейших хитов и самые новые песни из альбома, который готовится к выходу. Будь первым, будь в курсе!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "ул. Советская д.2",
+        "canonicalPath": null,
+        "primaryCityId": "city_543878",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "26.11.2026 / Кострома /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online",
+        "seoH1": "26.11.2026 / Кострома /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online",
+        "seoTitle": "26.11.2026 / Кострома /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/26-11-2026-kostroma-vse-hity-kostya-kulyasov-gr-animaciya-akustika-animaciya-online-kostroma",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "2652361a-442a-4257-90b1-d3d75cc17bb7",
+          "eventId": "evt_6a3677d73e648237552b90ce",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_6a3677d73e648237552b90ce",
+            "kind": "SINGLE",
+            "slug": "tc-6a3677d73e648237552b90ce-26-11-2026-кострома-все-хиты-костя-кулясов-гр-анимация-акустика-animaciya-online",
+            "seoH1": null,
+            "title": "26.11.2026 / Кострома /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a3677d73e648237552b90ce",
+                "externalId": "6a3677d73e648237552b90ce",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_61d5b045af1fb82f5eba0fc7",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-06/6a3677d718305ba95d696459.jpg",
+            "seoTitle": null,
+            "cityTitle": "Кострома",
+            "venueTitle": "ПИВОТЕКА SWABZ",
+            "description": "26 ноября  2026  в Костроме  в пивотеке Swabz душевная акустика  КОСТИ КУЛЯСОВА - лидера группы  АНИМАЦИЯ! Программа : \"Все хиты\". <br><br><br>Драйв и энергия, откровения и удалое веселье, мощнейшая музыка и интеллектуальные тексты - это главный рецепт всегда успешного и захватывающего концерта КОСТИ. <br>Прозвучат и любимые всеми хиты, и  совершенно новые песни! <br><br>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬<br><br>«Я люблю свою Родину, вроде бы» - фраза из песни группы «АнимациЯ». Костя Кулясов, лидер группы, и тот самый автор, у которого что ни песня, то крылатое выражение.  Ты услышишь полтора десятка ломовейших хитов и самые новые песни из альбома, который готовится к выходу. Будь первым, будь в курсе!",
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "ул. Советская д.2",
+            "canonicalPath": null,
+            "primaryCityId": "city_543878",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": null
+          },
+          "createdAt": "2026-11-03T20:40:08.808Z",
+          "eventTitle": "26.11.2026 / Кострома /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online",
+          "eventSlug": "tc-6a3677d73e648237552b90ce-26-11-2026-кострома-все-хиты-костя-кулясов-гр-анимация-акустика-animaciya-online",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_543878",
+          "cityTitle": "Кострома",
+          "venueId": "venue_61d5b045af1fb82f5eba0fc7",
+          "venueTitle": "ПИВОТЕКА SWABZ",
+          "venueAddress": "ул. Советская д.2",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a3677d73e648237552b90ce",
+              "externalId": "6a3677d73e648237552b90ce",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "city": "Кострома",
+        "venue": "ПИВОТЕКА SWABZ",
+        "address": "ул. Советская д.2",
+        "ageLimit": "16",
+        "offerMin": 2200,
+        "activeOffers": 2,
+        "futureSessions": [
+          "2026-11-26T17:00:00"
+        ]
+      }
+    },
+    "evt_6ad9f9afbafbc9c8fc4ffd13": {
+      "eventId": "evt_6ad9f9afbafbc9c8fc4ffd13",
+      "eventPageId": "4a1fdf78-d062-40e9-9774-4417e07f3a81",
+      "slug": "21-02-2027-kerch-vse-hity-kostya-kulyasov-gr-animaciya-akustika-animaciya-online-kerch",
+      "sourceTitle": "21.02.2027 / Керчь /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online",
+      "sourceDescription": "21 февраля  2027   на площадке бара  Камелот  состоится душевная  акустика  КОСТИ КУЛЯСОВА - лидера группы  АНИМАЦИЯ! Все хиты!<br><br><br>Драйв и энергия, откровения и удалое веселье, мощнейшая музыка и интеллектуальные тексты - это главный рецепт всегда успешного и захватывающего концерта КОСТИ. <br>Прозвучат и любимые всеми хиты, и  совершенно новые песни! <br> ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬<br>Адрес: г. Керчь, ул.Свердлова 7 <br>Начало концерта - 20-00<br>До встречи на концерте!<br>________________________<br>«Я люблю свою Родину, вроде бы» - фраза из песни группы «АнимациЯ». Костя Кулясов, лидер группы, и тот самый автор, у которого что ни песня, то крылатое выражение. Хочешь попасть на концерт? Жми на ссылку и покупай билет! Ты услышишь полтора десятка ломовейших хитов и самые новые песни!",
+      "legacyOverrideDescription": "## Концерт\n\n21 февраля 2027 года в баре «Камелот» в Керчи выступит Костя Кулясов — лидер группы «АнимациЯ». Это акустический концерт с известными песнями коллектива и новыми композициями.\n\n## Музыкальная программа\n\nПесни Кулясова соединяют энергичную рок-музыку с текстами, в которых есть и юмор, и наблюдения о повседневной жизни. Организатор обещает около пятнадцати знакомых хитов и свежий материал.\n\n## Практическая информация\n\nАдрес: ул. Свердлова, 7\nНачало концерта: 20:00",
+      "sourceSnapshot": {
+        "id": "evt_6ad9f9afbafbc9c8fc4ffd13",
+        "kind": "SINGLE",
+        "slug": "21-02-2027-керчь-все-хиты-костя-кулясов-гр-анимация-акустика-animaciya-online-6ad9f9afbafbc9c8fc4ffd13",
+        "seoH1": null,
+        "title": "21.02.2027 / Керчь /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ad9f9afbafbc9c8fc4ffd13",
+            "externalId": "6ad9f9afbafbc9c8fc4ffd13",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_63ecfdb9bdcfaf73a69b4d84",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ad9f9ae1444d60fe219e302.jpg",
+        "seoTitle": null,
+        "cityTitle": "Керчь",
+        "venueTitle": "клуб КАМЕЛОТ",
+        "description": "21 февраля  2027   на площадке бара  Камелот  состоится душевная  акустика  КОСТИ КУЛЯСОВА - лидера группы  АНИМАЦИЯ! Все хиты!<br><br><br>Драйв и энергия, откровения и удалое веселье, мощнейшая музыка и интеллектуальные тексты - это главный рецепт всегда успешного и захватывающего концерта КОСТИ. <br>Прозвучат и любимые всеми хиты, и  совершенно новые песни! <br> ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬<br>Адрес: г. Керчь, ул.Свердлова 7 <br>Начало концерта - 20-00<br>До встречи на концерте!<br>________________________<br>«Я люблю свою Родину, вроде бы» - фраза из песни группы «АнимациЯ». Костя Кулясов, лидер группы, и тот самый автор, у которого что ни песня, то крылатое выражение. Хочешь попасть на концерт? Жми на ссылку и покупай билет! Ты услышишь полтора десятка ломовейших хитов и самые новые песни!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "г. Керчь, ул.Свердлова 7",
+        "canonicalPath": null,
+        "primaryCityId": "city_706524",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "21.02.2027 / Керчь /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online",
+        "seoH1": "21.02.2027 / Керчь /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online",
+        "seoTitle": "21.02.2027 / Керчь /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/21-02-2027-kerch-vse-hity-kostya-kulyasov-gr-animaciya-akustika-animaciya-online-kerch",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "1951ce21-33a5-4a10-a3b9-a6d3eb51f98d",
+          "eventId": "evt_6ad9f9afbafbc9c8fc4ffd13",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_6ad9f9afbafbc9c8fc4ffd13",
+            "kind": "SINGLE",
+            "slug": "21-02-2027-керчь-все-хиты-костя-кулясов-гр-анимация-акустика-animaciya-online-6ad9f9afbafbc9c8fc4ffd13",
+            "seoH1": null,
+            "title": "21.02.2027 / Керчь /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ad9f9afbafbc9c8fc4ffd13",
+                "externalId": "6ad9f9afbafbc9c8fc4ffd13",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_63ecfdb9bdcfaf73a69b4d84",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ad9f9ae1444d60fe219e302.jpg",
+            "seoTitle": null,
+            "cityTitle": "Керчь",
+            "venueTitle": "клуб КАМЕЛОТ",
+            "description": "21 февраля  2027   на площадке бара  Камелот  состоится душевная  акустика  КОСТИ КУЛЯСОВА - лидера группы  АНИМАЦИЯ! Все хиты!<br><br><br>Драйв и энергия, откровения и удалое веселье, мощнейшая музыка и интеллектуальные тексты - это главный рецепт всегда успешного и захватывающего концерта КОСТИ. <br>Прозвучат и любимые всеми хиты, и  совершенно новые песни! <br> ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬<br>Адрес: г. Керчь, ул.Свердлова 7 <br>Начало концерта - 20-00<br>До встречи на концерте!<br>________________________<br>«Я люблю свою Родину, вроде бы» - фраза из песни группы «АнимациЯ». Костя Кулясов, лидер группы, и тот самый автор, у которого что ни песня, то крылатое выражение. Хочешь попасть на концерт? Жми на ссылку и покупай билет! Ты услышишь полтора десятка ломовейших хитов и самые новые песни!",
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "г. Керчь, ул.Свердлова 7",
+            "canonicalPath": null,
+            "primaryCityId": "city_706524",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": null
+          },
+          "createdAt": "2026-11-03T20:42:33.924Z",
+          "eventTitle": "21.02.2027 / Керчь /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online",
+          "eventSlug": "21-02-2027-керчь-все-хиты-костя-кулясов-гр-анимация-акустика-animaciya-online-6ad9f9afbafbc9c8fc4ffd13",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_706524",
+          "cityTitle": "Керчь",
+          "venueId": "venue_63ecfdb9bdcfaf73a69b4d84",
+          "venueTitle": "клуб КАМЕЛОТ",
+          "venueAddress": "г. Керчь, ул.Свердлова 7",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ad9f9afbafbc9c8fc4ffd13",
+              "externalId": "6ad9f9afbafbc9c8fc4ffd13",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "city": "Керчь",
+        "venue": "клуб КАМЕЛОТ",
+        "address": "г. Керчь, ул.Свердлова 7",
+        "ageLimit": "16",
+        "offerMin": 1900,
+        "activeOffers": 1,
+        "futureSessions": [
+          "2027-02-21T17:00:00"
+        ]
+      }
+    },
+    "evt_6ad5f448319ea894665f763a": {
+      "eventId": "evt_6ad5f448319ea894665f763a",
+      "eventPageId": "4df029c7-5f5a-47c7-b4f4-bc982ff5d928",
+      "slug": "05-02-2027-vladivostok-vse-hity-kostya-kulyasov-gr-animaciya-akustika-animaciya-online-vladivostok",
+      "sourceTitle": "05.02.2027 / Владивосток /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online",
+      "sourceDescription": "5 февраля  2027   на площадке бара Агутин  состоится душевная  акустика  КОСТИ КУЛЯСОВА - лидера группы  АНИМАЦИЯ! Все хиты!<br><br><br>Драйв и энергия, откровения и удалое веселье, мощнейшая музыка и интеллектуальные тексты - это главный рецепт всегда успешного и захватывающего концерта КОСТИ. <br>Прозвучат и любимые всеми хиты, и  совершенно новые песни!  <br>Адрес: г. Владивосток, ул. Пограничная дом 6<br>Начало концерта в 20.00 <br>____________________________<br>«Я люблю свою Родину, вроде бы» - фраза из песни группы «АнимациЯ». Костя Кулясов, лидер группы, и тот самый автор, у которого что ни песня, то крылатое выражение. Хочешь попасть на концерт? Жми на ссылку и покупай билет! Ты услышишь полтора десятка ломовейших хитов и самые новые песни!",
+      "legacyOverrideDescription": "## Концерт\n\n5 февраля 2027 года в баре «Агутин» во Владивостоке выступит Костя Кулясов — лидер группы «АнимациЯ». В акустической программе прозвучат хиты коллектива и новые песни.\n\n## Музыкальная программа\n\nКулясов известен энергичной подачей и текстами с точными, запоминающимися строками. Организатор обещает около пятнадцати знакомых композиций и свежий материал.\n\n## Практическая информация\n\nДата: 5 февраля 2027 года\nМесто: бар «Агутин», Владивосток\nАдрес: ул. Пограничная, 6\nНачало: 20:00",
+      "sourceSnapshot": {
+        "id": "evt_6ad5f448319ea894665f763a",
+        "kind": "SINGLE",
+        "slug": "05-02-2027-владивосток-все-хиты-костя-кулясов-гр-анимация-акустика-animaciya-online-6ad5f448319ea894665f763a",
+        "seoH1": null,
+        "title": "05.02.2027 / Владивосток /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ad5f448319ea894665f763a",
+            "externalId": "6ad5f448319ea894665f763a",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_6897634ac74c5fad4de382ee",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ad5f44773a7bcf25d358f21.jpg",
+        "seoTitle": null,
+        "cityTitle": "Владивосток",
+        "venueTitle": "Агутин Music Bar",
+        "description": "5 февраля  2027   на площадке бара Агутин  состоится душевная  акустика  КОСТИ КУЛЯСОВА - лидера группы  АНИМАЦИЯ! Все хиты!<br><br><br>Драйв и энергия, откровения и удалое веселье, мощнейшая музыка и интеллектуальные тексты - это главный рецепт всегда успешного и захватывающего концерта КОСТИ. <br>Прозвучат и любимые всеми хиты, и  совершенно новые песни!  <br>Адрес: г. Владивосток, ул. Пограничная дом 6<br>Начало концерта в 20.00 <br>____________________________<br>«Я люблю свою Родину, вроде бы» - фраза из песни группы «АнимациЯ». Костя Кулясов, лидер группы, и тот самый автор, у которого что ни песня, то крылатое выражение. Хочешь попасть на концерт? Жми на ссылку и покупай билет! Ты услышишь полтора десятка ломовейших хитов и самые новые песни!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "ул. Пограничная, 6",
+        "canonicalPath": null,
+        "primaryCityId": "city_2013348",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "05.02.2027 / Владивосток /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online",
+        "seoH1": "05.02.2027 / Владивосток /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online",
+        "seoTitle": "05.02.2027 / Владивосток /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/05-02-2027-vladivostok-vse-hity-kostya-kulyasov-gr-animaciya-akustika-animaciya-online-vladivostok",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "493670b9-28da-463c-a47a-7e7cb3c62ff0",
+          "eventId": "evt_6ad5f448319ea894665f763a",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_6ad5f448319ea894665f763a",
+            "kind": "SINGLE",
+            "slug": "05-02-2027-владивосток-все-хиты-костя-кулясов-гр-анимация-акустика-animaciya-online-6ad5f448319ea894665f763a",
+            "seoH1": null,
+            "title": "05.02.2027 / Владивосток /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ad5f448319ea894665f763a",
+                "externalId": "6ad5f448319ea894665f763a",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_6897634ac74c5fad4de382ee",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ad5f44773a7bcf25d358f21.jpg",
+            "seoTitle": null,
+            "cityTitle": "Владивосток",
+            "venueTitle": "Агутин Music Bar",
+            "description": "5 февраля  2027   на площадке бара Агутин  состоится душевная  акустика  КОСТИ КУЛЯСОВА - лидера группы  АНИМАЦИЯ! Все хиты!<br><br><br>Драйв и энергия, откровения и удалое веселье, мощнейшая музыка и интеллектуальные тексты - это главный рецепт всегда успешного и захватывающего концерта КОСТИ. <br>Прозвучат и любимые всеми хиты, и  совершенно новые песни!  <br>Адрес: г. Владивосток, ул. Пограничная дом 6<br>Начало концерта в 20.00 <br>____________________________<br>«Я люблю свою Родину, вроде бы» - фраза из песни группы «АнимациЯ». Костя Кулясов, лидер группы, и тот самый автор, у которого что ни песня, то крылатое выражение. Хочешь попасть на концерт? Жми на ссылку и покупай билет! Ты услышишь полтора десятка ломовейших хитов и самые новые песни!",
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "ул. Пограничная, 6",
+            "canonicalPath": null,
+            "primaryCityId": "city_2013348",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": null
+          },
+          "createdAt": "2026-11-03T20:42:16.002Z",
+          "eventTitle": "05.02.2027 / Владивосток /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online",
+          "eventSlug": "05-02-2027-владивосток-все-хиты-костя-кулясов-гр-анимация-акустика-animaciya-online-6ad5f448319ea894665f763a",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_2013348",
+          "cityTitle": "Владивосток",
+          "venueId": "venue_6897634ac74c5fad4de382ee",
+          "venueTitle": "Агутин Music Bar",
+          "venueAddress": "ул. Пограничная, 6",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ad5f448319ea894665f763a",
+              "externalId": "6ad5f448319ea894665f763a",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "city": "Владивосток",
+        "venue": "Агутин Music Bar",
+        "address": "ул. Пограничная, 6",
+        "ageLimit": "16",
+        "offerMin": 2000,
+        "activeOffers": 5,
+        "futureSessions": [
+          "2027-02-05T10:00:00"
+        ]
+      }
+    },
+    "evt_6ad5f9a435e881f8eb5e9329": {
+      "eventId": "evt_6ad5f9a435e881f8eb5e9329",
+      "eventPageId": "68ca925a-1ae5-42b8-bbf8-7113cf0c534d",
+      "slug": "07-02-2027-blagoveschensk-vse-hity-kostya-kulyasov-gr-animaciya-akustika-animaciya-online-blagoveschensk-amurskaya-oblast",
+      "sourceTitle": "07.02.2027 / Благовещенск /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online",
+      "sourceDescription": "7 февраля  2027   на площадке бара \"От винта\" состоится душевная  акустика  КОСТИ КУЛЯСОВА - лидера группы  АНИМАЦИЯ! Все хиты!<br><br><br>Драйв и энергия, откровения и удалое веселье, мощнейшая музыка и интеллектуальные тексты - это главный рецепт всегда успешного и захватывающего концерта КОСТИ. <br>Прозвучат и любимые всеми хиты, и  совершенно новые песни!   ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬<br><br>Адрес: Красноармейская улица, 129<br>Начало концерта - 20-00<br>До встречи на концерте<br>____________________________<br>«Я люблю свою Родину, вроде бы» - фраза из песни группы «АнимациЯ». Костя Кулясов, лидер группы, и тот самый автор, у которого что ни песня, то крылатое выражение. Хочешь попасть на концерт? Жми на ссылку и покупай билет! Ты услышишь полтора десятка ломовейших хитов и самые новые песни!",
+      "legacyOverrideDescription": "7 февраля 2027 на площадке бара \"От винта\" состоится душевная акустика КОСТИ КУЛЯСОВА - лидера группы АНИМАЦИЯ! Все хиты! Драйв и энергия, откровения и удалое веселье, мощнейшая музыка и интеллектуальные тексты - это главный рецепт всегда успешного и захватывающего концерта КОСТИ.\nПрозвучат и любимые всеми хиты, и совершенно новые песни! ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n\nАдрес: Красноармейская улица, 129\nНачало концерта - 20-00\nДо встречи на концерте\n«Я люблю свою Родину, вроде бы» - фраза из песни группы «АнимациЯ». Костя Кулясов, лидер группы, и тот самый автор, у которого что ни песня, то крылатое выражение. Хочешь попасть на концерт? Жми на ссылку и покупай билет! Ты услышишь полтора десятка ломовейших хитов и самые новые песни!",
+      "sourceSnapshot": {
+        "id": "evt_6ad5f9a435e881f8eb5e9329",
+        "kind": "SINGLE",
+        "slug": "07-02-2027-благовещенск-все-хиты-костя-кулясов-гр-анимация-акустика-animaciya-online-6ad5f9a435e881f8eb5e9329",
+        "seoH1": null,
+        "title": "07.02.2027 / Благовещенск /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ad5f9a435e881f8eb5e9329",
+            "externalId": "6ad5f9a435e881f8eb5e9329",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_6113c426c9f6a64e03f04073",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ad5f9a3319ea894665f76e5.jpg",
+        "seoTitle": null,
+        "cityTitle": "Благовещенск (Амурская область)",
+        "venueTitle": "Бар \"От Винта\"",
+        "description": "7 февраля  2027   на площадке бара \"От винта\" состоится душевная  акустика  КОСТИ КУЛЯСОВА - лидера группы  АНИМАЦИЯ! Все хиты!<br><br><br>Драйв и энергия, откровения и удалое веселье, мощнейшая музыка и интеллектуальные тексты - это главный рецепт всегда успешного и захватывающего концерта КОСТИ. <br>Прозвучат и любимые всеми хиты, и  совершенно новые песни!   ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬<br><br>Адрес: Красноармейская улица, 129<br>Начало концерта - 20-00<br>До встречи на концерте<br>____________________________<br>«Я люблю свою Родину, вроде бы» - фраза из песни группы «АнимациЯ». Костя Кулясов, лидер группы, и тот самый автор, у которого что ни песня, то крылатое выражение. Хочешь попасть на концерт? Жми на ссылку и покупай билет! Ты услышишь полтора десятка ломовейших хитов и самые новые песни!",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Красноармейская улица, 129",
+        "canonicalPath": null,
+        "primaryCityId": "city_2026609",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "07.02.2027 / Благовещенск /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online",
+        "seoH1": "07.02.2027 / Благовещенск /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online",
+        "seoTitle": "07.02.2027 / Благовещенск /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/07-02-2027-blagoveschensk-vse-hity-kostya-kulyasov-gr-animaciya-akustika-animaciya-online-blagoveschensk-amurskaya-oblast",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "3986b259-5807-47d6-bf83-0704b2c854fe",
+          "eventId": "evt_6ad5f9a435e881f8eb5e9329",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_6ad5f9a435e881f8eb5e9329",
+            "kind": "SINGLE",
+            "slug": "07-02-2027-благовещенск-все-хиты-костя-кулясов-гр-анимация-акустика-animaciya-online-6ad5f9a435e881f8eb5e9329",
+            "seoH1": null,
+            "title": "07.02.2027 / Благовещенск /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ad5f9a435e881f8eb5e9329",
+                "externalId": "6ad5f9a435e881f8eb5e9329",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_6113c426c9f6a64e03f04073",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ad5f9a3319ea894665f76e5.jpg",
+            "seoTitle": null,
+            "cityTitle": "Благовещенск (Амурская область)",
+            "venueTitle": "Бар \"От Винта\"",
+            "description": "7 февраля  2027   на площадке бара \"От винта\" состоится душевная  акустика  КОСТИ КУЛЯСОВА - лидера группы  АНИМАЦИЯ! Все хиты!<br><br><br>Драйв и энергия, откровения и удалое веселье, мощнейшая музыка и интеллектуальные тексты - это главный рецепт всегда успешного и захватывающего концерта КОСТИ. <br>Прозвучат и любимые всеми хиты, и  совершенно новые песни!   ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬<br><br>Адрес: Красноармейская улица, 129<br>Начало концерта - 20-00<br>До встречи на концерте<br>____________________________<br>«Я люблю свою Родину, вроде бы» - фраза из песни группы «АнимациЯ». Костя Кулясов, лидер группы, и тот самый автор, у которого что ни песня, то крылатое выражение. Хочешь попасть на концерт? Жми на ссылку и покупай билет! Ты услышишь полтора десятка ломовейших хитов и самые новые песни!",
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "Красноармейская улица, 129",
+            "canonicalPath": null,
+            "primaryCityId": "city_2026609",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": null
+          },
+          "createdAt": "2026-11-03T20:42:16.193Z",
+          "eventTitle": "07.02.2027 / Благовещенск /Все хиты/ КОСТЯ КУЛЯСОВ гр. АнимациЯ / АКУСТИКА / animaciya.online",
+          "eventSlug": "07-02-2027-благовещенск-все-хиты-костя-кулясов-гр-анимация-акустика-animaciya-online-6ad5f9a435e881f8eb5e9329",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_2026609",
+          "cityTitle": "Благовещенск (Амурская область)",
+          "venueId": "venue_6113c426c9f6a64e03f04073",
+          "venueTitle": "Бар \"От Винта\"",
+          "venueAddress": "Красноармейская улица, 129",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ad5f9a435e881f8eb5e9329",
+              "externalId": "6ad5f9a435e881f8eb5e9329",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "city": "Благовещенск (Амурская область)",
+        "venue": "Бар \"От Винта\"",
+        "address": "Красноармейская улица, 129",
+        "ageLimit": "16",
+        "offerMin": 2000,
+        "activeOffers": 7,
+        "futureSessions": [
+          "2027-02-07T10:00:00"
+        ]
+      }
+    }
+  }
+}

@@ -167,6 +167,10 @@ export function isSameSessionDay(
   );
 }
 
+export function isSessionToday(iso: string, timeZone: string = SITE_TIME_ZONE): boolean {
+  return isSameSessionDay(iso, new Date(), timeZone);
+}
+
 export function isSessionTomorrow(startsAt: string, timeZone: string = SITE_TIME_ZONE): boolean {
   const sessionParts = getSessionDateParts(startsAt, timeZone);
   if (!sessionParts) return false;

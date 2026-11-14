@@ -1,0 +1,3446 @@
+{
+  "total": 344,
+  "errors": [],
+  "results": [
+    {
+      "url": "https://daibilet.ru/venues/stage-standup-club-krasnyi-zal",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/stage-standup-club-krasnyi-zal",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/stage-standup-club-krasnyi-zal",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/klub-alekseya-kozlova",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/klub-alekseya-kozlova",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/klub-alekseya-kozlova",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/klub-galereya",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/klub-galereya",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/klub-galereya",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/klub-solo",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/klub-solo",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/klub-solo",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/dom-shredera",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/dom-shredera",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/dom-shredera",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/klub-big-ben",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/klub-big-ben",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/klub-big-ben",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/kozlov-club-unplugged",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/kozlov-club-unplugged",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/kozlov-club-unplugged",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/art-prostranstvo-lyumer-holl-g-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/art-prostranstvo-lyumer-holl-g-moskva",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/art-prostranstvo-lyumer-holl-g-moskva",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/davai-lama",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/davai-lama",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/davai-lama",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/o-connell-s-pub",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/o-connell-s-pub",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/o-connell-s-pub",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/bar-restoran-douglas-duglas",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/bar-restoran-douglas-duglas",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/bar-restoran-douglas-duglas",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/dzhem-klub-myuzik",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/dzhem-klub-myuzik",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/dzhem-klub-myuzik",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/popravka-bar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/popravka-bar",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/popravka-bar",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/restoran-brauhaus",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/restoran-brauhaus",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/restoran-brauhaus",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/muzykalnyi-salon-klassika-bez-granic",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/muzykalnyi-salon-klassika-bez-granic",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/muzykalnyi-salon-klassika-bez-granic",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/gamma-more",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/gamma-more",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/gamma-more",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/muzei-benua-na-vasilevskom",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/muzei-benua-na-vasilevskom",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/muzei-benua-na-vasilevskom",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/jagger-club",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/jagger-club",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/jagger-club",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/dom-vintazhnoi-muzyki",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/dom-vintazhnoi-muzyki",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/dom-vintazhnoi-muzyki",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/muzei-nostalgii",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/muzei-nostalgii",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/muzei-nostalgii",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/muzeinyi-centr-ploschad-mira",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/muzeinyi-centr-ploschad-mira",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/muzeinyi-centr-ploschad-mira",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/nacionalnyi-centr-rossiya-1",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/nacionalnyi-centr-rossiya-1",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/nacionalnyi-centr-rossiya-1",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/krymskii-most-11",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/krymskii-most-11",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/krymskii-most-11",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/tochka-sbora",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/tochka-sbora",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/tochka-sbora",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/maltiiskaya-kapella-voroncovskogo-dvorca",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/maltiiskaya-kapella-voroncovskogo-dvorca",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/maltiiskaya-kapella-voroncovskogo-dvorca",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/osobnyak-myasnikova",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/osobnyak-myasnikova",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/osobnyak-myasnikova",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/severnyi-rechnoi-vokzal-prichal-no1-57",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/severnyi-rechnoi-vokzal-prichal-no1-57",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/severnyi-rechnoi-vokzal-prichal-no1-57",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/biblioteka-po-estestvennym-naukam-rossiiskoi-akademii-nauk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/biblioteka-po-estestvennym-naukam-rossiiskoi-akademii-nauk",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/biblioteka-po-estestvennym-naukam-rossiiskoi-akademii-nauk",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/kitai-gorod-ustinskii-sektor-c-42",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/kitai-gorod-ustinskii-sektor-c-42",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/kitai-gorod-ustinskii-sektor-c-42",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/klub-glastonberry",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/klub-glastonberry",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/klub-glastonberry",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/klub-ivana-smirnova",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/klub-ivana-smirnova",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/klub-ivana-smirnova",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/teatr-pokolenii",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/teatr-pokolenii",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/teatr-pokolenii",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/teatralnyi-osobnyak",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/teatralnyi-osobnyak",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/teatralnyi-osobnyak",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/kitchen-lab-dzhazovyi-gastropab",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/kitchen-lab-dzhazovyi-gastropab",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/kitchen-lab-dzhazovyi-gastropab",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/stand-up-patriki",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/stand-up-patriki",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/stand-up-patriki",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/yakareliya-kazanskaya-ul-2",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/yakareliya-kazanskaya-ul-2",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/yakareliya-kazanskaya-ul-2",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/kitai-gorod-ustinskii-sektor-b-41",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/kitai-gorod-ustinskii-sektor-b-41",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/kitai-gorod-ustinskii-sektor-b-41",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/klub-prityazhenie",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/klub-prityazhenie",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/klub-prityazhenie",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/stendap-klub-lokaciya",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/stendap-klub-lokaciya",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/stendap-klub-lokaciya",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/teatr-kurt",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/teatr-kurt",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/teatr-kurt",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/kabare-kafe-brodyachaya-sobaka",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/kabare-kafe-brodyachaya-sobaka",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/kabare-kafe-brodyachaya-sobaka",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/kafedralnyi-sobor-sv-petra-i-pavla-petrikirhe",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/kafedralnyi-sobor-sv-petra-i-pavla-petrikirhe",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/kafedralnyi-sobor-sv-petra-i-pavla-petrikirhe",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/ritm-blyuz-kafe",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/ritm-blyuz-kafe",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/ritm-blyuz-kafe",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/svoboda-malyi-zal",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/svoboda-malyi-zal",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/svoboda-malyi-zal",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/pravda-bar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/pravda-bar",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/pravda-bar",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/klub-chizh-i-kompaniya",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/klub-chizh-i-kompaniya",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/klub-chizh-i-kompaniya",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/lastochka",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/lastochka",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/lastochka",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/rassvet",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/rassvet",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/rassvet",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/svoboda",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/svoboda",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/svoboda",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/lyustra-bar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/lyustra-bar",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/lyustra-bar",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/koncertnyi-zal-yaani-kirik",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/koncertnyi-zal-yaani-kirik",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/koncertnyi-zal-yaani-kirik",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/muzei-garri-pottera",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/muzei-garri-pottera",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/muzei-garri-pottera",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/muzei-karla-bully",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/muzei-karla-bully",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/muzei-karla-bully",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/stendap-klub-chelyabinsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/stendap-klub-chelyabinsk",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/stendap-klub-chelyabinsk",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/teatr-niti",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/teatr-niti",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/teatr-niti",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/teatr-tmin",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/teatr-tmin",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/teatr-tmin",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/standup-spot",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/standup-spot",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/standup-spot",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/sinii-pushkin-bar-shnurova",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/sinii-pushkin-bar-shnurova",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/sinii-pushkin-bar-shnurova",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/biblioteka-planetariya-1",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/biblioteka-planetariya-1",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/biblioteka-planetariya-1",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/dk-rostselmash",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/dk-rostselmash",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/dk-rostselmash",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/zamok-na-nevskom",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/zamok-na-nevskom",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/zamok-na-nevskom",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/klub-dom-pechati",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/klub-dom-pechati",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/klub-dom-pechati",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/prichal-na-fontanke-53",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/prichal-na-fontanke-53",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/prichal-na-fontanke-53",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/teatr-drimvil",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/teatr-drimvil",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/teatr-drimvil",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/chastnyi-professionalnyi-teatr-the-teatr",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/chastnyi-professionalnyi-teatr-the-teatr",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/chastnyi-professionalnyi-teatr-the-teatr",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/kultura-concert-hall",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/kultura-concert-hall",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/kultura-concert-hall",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/mezzo-forte-club",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/mezzo-forte-club",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/mezzo-forte-club",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/art-teatr-na-leninskom",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/art-teatr-na-leninskom",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/art-teatr-na-leninskom",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/bar-spletni",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/bar-spletni",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/bar-spletni",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/kitai-gorod-ustinskii-sektor-a-9",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/kitai-gorod-ustinskii-sektor-a-9",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/kitai-gorod-ustinskii-sektor-a-9",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/moskovskii-hudozhestvennyi-teatr-komedii",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/moskovskii-hudozhestvennyi-teatr-komedii",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/moskovskii-hudozhestvennyi-teatr-komedii",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/ogni-ufy",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/ogni-ufy",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/ogni-ufy",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/restoran-antresol-i-perec",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/restoran-antresol-i-perec",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/restoran-antresol-i-perec",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/teatr-vkusa-i-petrovskii-derevenskii-teatr",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/teatr-vkusa-i-petrovskii-derevenskii-teatr",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/teatr-vkusa-i-petrovskii-derevenskii-teatr",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/teatr-nikolaya-zaharova",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/teatr-nikolaya-zaharova",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/teatr-nikolaya-zaharova",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/treugolnik-rok-bar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/treugolnik-rok-bar",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/treugolnik-rok-bar",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/urban",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/urban",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/urban",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/be-italian",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/be-italian",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/be-italian",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/milo-concert-hall",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/milo-concert-hall",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/milo-concert-hall",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/evgenich-na-cvetnom-bulvare",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/evgenich-na-cvetnom-bulvare",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/evgenich-na-cvetnom-bulvare",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/dom-pechati",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/dom-pechati",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/dom-pechati",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/dom-uchenyh-im-gorkogo",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/dom-uchenyh-im-gorkogo",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/dom-uchenyh-im-gorkogo",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/zaryade-sektor-b-43",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/zaryade-sektor-b-43",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/zaryade-sektor-b-43",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/klub-kosmonavt",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/klub-kosmonavt",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/klub-kosmonavt",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/kultura-koncert-holl",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/kultura-koncert-holl",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/kultura-koncert-holl",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/okc-na-pushkinskoi",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/okc-na-pushkinskoi",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/okc-na-pushkinskoi",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/restoran-f11-sky-bar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/restoran-f11-sky-bar",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/restoran-f11-sky-bar",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/stendap-bar-mayakovskii",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/stendap-bar-mayakovskii",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/stendap-bar-mayakovskii",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/teatr-dlya-detei-malyshok-pr-iskrovskii-pr-d22-kor-a",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/teatr-dlya-detei-malyshok-pr-iskrovskii-pr-d22-kor-a",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/teatr-dlya-detei-malyshok-pr-iskrovskii-pr-d22-kor-a",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/action-club",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/action-club",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/action-club",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/klub-izi",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/klub-izi",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/klub-izi",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/teatr-monplezir",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/teatr-monplezir",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/teatr-monplezir",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/bar-cpr",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/bar-cpr",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/bar-cpr",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/galereya-iskusstv-niko",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/galereya-iskusstv-niko",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/galereya-iskusstv-niko",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/dom-gogolya",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/dom-gogolya",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/dom-gogolya",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/kievskii-sektor-a-14",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/kievskii-sektor-a-14",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/kievskii-sektor-a-14",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/kinokoncertnyi-zal-penza",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/kinokoncertnyi-zal-penza",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/kinokoncertnyi-zal-penza",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/kongress-holl",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/kongress-holl",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/kongress-holl",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/osobnyak-polovcova",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/osobnyak-polovcova",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/osobnyak-polovcova",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/prichal-na-nab-reki-fontanki-71-59-926449-30-328948",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/prichal-na-nab-reki-fontanki-71-59-926449-30-328948",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/prichal-na-nab-reki-fontanki-71-59-926449-30-328948",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/prichal-na-sinopskoi-nab-10",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/prichal-na-sinopskoi-nab-10",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/prichal-na-sinopskoi-nab-10",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/houmi-bar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/houmi-bar",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/houmi-bar",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/omega-tsvetnoy-rooftop",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/omega-tsvetnoy-rooftop",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/omega-tsvetnoy-rooftop",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/stand-up-bar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/stand-up-bar",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/stand-up-bar",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/stereo-people",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/stereo-people",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/stereo-people",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/anglikanskaya-cerkov-svyatogo-andreya-st-andrews-anglican-church",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/anglikanskaya-cerkov-svyatogo-andreya-st-andrews-anglican-church",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/anglikanskaya-cerkov-svyatogo-andreya-st-andrews-anglican-church",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/bar-escobar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/bar-escobar",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/bar-escobar",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/grimerka-gastro-club-karaoke-bar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/grimerka-gastro-club-karaoke-bar",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/grimerka-gastro-club-karaoke-bar",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/evangelichesko-lyuteranskii-sobor-sv-mihaila",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/evangelichesko-lyuteranskii-sobor-sv-mihaila",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/evangelichesko-lyuteranskii-sobor-sv-mihaila",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/integrativnyi-dzhazovyi-centr",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/integrativnyi-dzhazovyi-centr",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/integrativnyi-dzhazovyi-centr",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/karaoke-eho",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/karaoke-eho",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/karaoke-eho",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/knizhnyi-klub-magazin-giperion",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/knizhnyi-klub-magazin-giperion",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/knizhnyi-klub-magazin-giperion",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/kulturnyi-centr-serdce",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/kulturnyi-centr-serdce",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/kulturnyi-centr-serdce",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/mts-live-holl-voronezh",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/mts-live-holl-voronezh",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/mts-live-holl-voronezh",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/mts-live-holl-samara-eh-krc-zvezda",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/mts-live-holl-samara-eh-krc-zvezda",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/mts-live-holl-samara-eh-krc-zvezda",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/permskii-stendap-klub",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/permskii-stendap-klub",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/permskii-stendap-klub",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/platforma",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/platforma",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/platforma",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/teplohod-rio-4",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/teplohod-rio-4",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/teplohod-rio-4",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/restoran-krysha-18",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/restoran-krysha-18",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/restoran-krysha-18",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/restoran-tillander",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/restoran-tillander",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/restoran-tillander",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/restoran-v-otele-agni",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/restoran-v-otele-agni",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/restoran-v-otele-agni",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/restoran-serp-i-hleb",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/restoran-serp-i-hleb",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/restoran-serp-i-hleb",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/stendap-klub",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/stendap-klub",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/stendap-klub",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/teatr-parnas",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/teatr-parnas",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/teatr-parnas",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/centralnyi-dom-aktera-gostinaya",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/centralnyi-dom-aktera-gostinaya",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/centralnyi-dom-aktera-gostinaya",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/yuzhnyi-rechnoi-vokzal-prichal-no5-73",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/yuzhnyi-rechnoi-vokzal-prichal-no5-73",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/yuzhnyi-rechnoi-vokzal-prichal-no5-73",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/kowalski-club",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/kowalski-club",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/kowalski-club",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/stereopeople",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/stereopeople",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/stereopeople",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/oberton",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/oberton",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/oberton",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/admiralteiskaya-nab-10-45",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/admiralteiskaya-nab-10-45",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/admiralteiskaya-nab-10-45",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/bar-medved",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/bar-medved",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/bar-medved",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/bar-triniti",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/bar-triniti",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/bar-triniti",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/bar-dovlatov",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/bar-dovlatov",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/bar-dovlatov",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/bar-sumbur",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/bar-sumbur",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/bar-sumbur",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/barmuzei-vasi-lozhkina",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/barmuzei-vasi-lozhkina",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/barmuzei-vasi-lozhkina",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/vserossiiskaya-gosudarstvennaya-biblioteka-inostrannoi-literatury-im-m-i-rudomino",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/vserossiiskaya-gosudarstvennaya-biblioteka-inostrannoi-literatury-im-m-i-rudomino",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/vserossiiskaya-gosudarstvennaya-biblioteka-inostrannoi-literatury-im-m-i-rudomino",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/gastropab-357",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/gastropab-357",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/gastropab-357",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/dom-kultury",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/dom-kultury",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/dom-kultury",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/klub-komedii-89",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/klub-komedii-89",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/klub-komedii-89",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/klub-uzdechka",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/klub-uzdechka",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/klub-uzdechka",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/kompromat",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/kompromat",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/kompromat",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/krk-megapolis",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/krk-megapolis",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/krk-megapolis",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/kc-feniks",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/kc-feniks",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/kc-feniks",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/mo-tri",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/mo-tri",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/mo-tri",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/prichal-naberezhnaya-reki-fontanki-u-doma-71",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/prichal-naberezhnaya-reki-fontanki-u-doma-71",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/prichal-naberezhnaya-reki-fontanki-u-doma-71",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/nirvana-club",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/nirvana-club",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/nirvana-club",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/restoran-perchini-na-novo-vokzalnoi",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/restoran-perchini-na-novo-vokzalnoi",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/restoran-perchini-na-novo-vokzalnoi",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/rossiiskaya-nacionalnaya-biblioteka",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/rossiiskaya-nacionalnaya-biblioteka",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/rossiiskaya-nacionalnaya-biblioteka",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/teatr-rezonans",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/teatr-rezonans",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/teatr-rezonans",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/usadba-kuskovo-portretnaya-galereya-bolshoi-kamennoi-oranzherei",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/usadba-kuskovo-portretnaya-galereya-bolshoi-kamennoi-oranzherei",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/usadba-kuskovo-portretnaya-galereya-bolshoi-kamennoi-oranzherei",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/cerkov-svyatogo-apostola-ioanna-yaani-kirik",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/cerkov-svyatogo-apostola-ioanna-yaani-kirik",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/cerkov-svyatogo-apostola-ioanna-yaani-kirik",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/comedy-34",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/comedy-34",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/comedy-34",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/manya-bar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/manya-bar",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/manya-bar",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/pravda",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/pravda",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/pravda",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/the-right-place",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/the-right-place",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/the-right-place",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/veritas",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/veritas",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/veritas",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/kolizei",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/kolizei",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/kolizei",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/bar-gadkii-koiot",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/bar-gadkii-koiot",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/bar-gadkii-koiot",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/biblioteka-chitalnya-imeni-pushkina",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/biblioteka-chitalnya-imeni-pushkina",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/biblioteka-chitalnya-imeni-pushkina",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/voronezhskii-koncertnyi-zal",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/voronezhskii-koncertnyi-zal",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/voronezhskii-koncertnyi-zal",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/galereya-ili-glazunova",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/galereya-ili-glazunova",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/galereya-ili-glazunova",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/gnezdo-gluharya",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/gnezdo-gluharya",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/gnezdo-gluharya",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/dom-aktera",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/dom-aktera",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/dom-aktera",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/esenin-centr",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/esenin-centr",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/esenin-centr",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/kafe-klub-staryi-park",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/kafe-klub-staryi-park",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/kafe-klub-staryi-park",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/kb-ceh",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/kb-ceh",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/kb-ceh",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/kz-izmailovo",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/kz-izmailovo",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/kz-izmailovo",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/klub-alibi",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/klub-alibi",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/klub-alibi",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/klub-angar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/klub-angar",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/klub-angar",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/klub-saund",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/klub-saund",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/klub-saund",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/koncertnyi-klub-kadry",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/koncertnyi-klub-kadry",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/koncertnyi-klub-kadry",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/kremlevskaya-naberezhnaya-1-4-92",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/kremlevskaya-naberezhnaya-1-4-92",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/kremlevskaya-naberezhnaya-1-4-92",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/masterskaya-na-kulishkah",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/masterskaya-na-kulishkah",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/masterskaya-na-kulishkah",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/muzei-garri-pottera-hogvarts-holl",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/muzei-garri-pottera-hogvarts-holl",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/muzei-garri-pottera-hogvarts-holl",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/oranzhereya-tavricheskogo-sada",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/oranzhereya-tavricheskogo-sada",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/oranzhereya-tavricheskogo-sada",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/orbita",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/orbita",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/orbita",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/osobnyak-a-a-polovcova-dom-arhitektora",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/osobnyak-a-a-polovcova-dom-arhitektora",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/osobnyak-a-a-polovcova-dom-arhitektora",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/park-gorkogo-2-sektor-v-97",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/park-gorkogo-2-sektor-v-97",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/park-gorkogo-2-sektor-v-97",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/patriarshii-sektor-a-8",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/patriarshii-sektor-a-8",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/patriarshii-sektor-a-8",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/resto-bar-ryumochka",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/resto-bar-ryumochka",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/resto-bar-ryumochka",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/restoran-maksimilians",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/restoran-maksimilians",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/restoran-maksimilians",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/ritmy",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/ritmy",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/ritmy",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/smena",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/smena",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/smena",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/teatr-lunnyi-slon",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/teatr-lunnyi-slon",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/teatr-lunnyi-slon",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/teatr-na-obochine",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/teatr-na-obochine",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/teatr-na-obochine",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/teatralno-koncertnyi-kompleks-karnaval-carnival-concert-hall-anichkov-palace",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/teatralno-koncertnyi-kompleks-karnaval-carnival-concert-hall-anichkov-palace",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/teatralno-koncertnyi-kompleks-karnaval-carnival-concert-hall-anichkov-palace",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/treningovyi-centr-izmailovskii",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/treningovyi-centr-izmailovskii",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/treningovyi-centr-izmailovskii",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/hofbroihaus",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/hofbroihaus",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/hofbroihaus",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/abrikos-arena",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/abrikos-arena",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/abrikos-arena",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/comedy-hub-club",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/comedy-hub-club",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/comedy-hub-club",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/horse-head",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/horse-head",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/horse-head",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/improve-club",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/improve-club",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/improve-club",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/linda-de-la-art-centr",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/linda-de-la-art-centr",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/linda-de-la-art-centr",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/twentyoneclub",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/twentyoneclub",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/twentyoneclub",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/unlock-cafe",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/unlock-cafe",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/unlock-cafe",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/1865",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/1865",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/1865",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/art-klub-ploschadka",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/art-klub-ploschadka",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/art-klub-ploschadka",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/art-prostranstvo-siyanie",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/art-prostranstvo-siyanie",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/art-prostranstvo-siyanie",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/bar-viking",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/bar-viking",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/bar-viking",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/bar-sovremennik",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/bar-sovremennik",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/bar-sovremennik",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/bar-bez-nazvaniya",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/bar-bez-nazvaniya",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/bar-bez-nazvaniya",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/brasseriya-leven",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/brasseriya-leven",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/brasseriya-leven",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/dvorec-na-yauze",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/dvorec-na-yauze",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/dvorec-na-yauze",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/dk-krasnoe-sormovo",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/dk-krasnoe-sormovo",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/dk-krasnoe-sormovo",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/evangelichesko-lyuteranskaya-cerkov-svyatoi-marii",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/evangelichesko-lyuteranskaya-cerkov-svyatoi-marii",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/evangelichesko-lyuteranskaya-cerkov-svyatoi-marii",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/esod-dom-evreiskoi-kultury",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/esod-dom-evreiskoi-kultury",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/esod-dom-evreiskoi-kultury",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/zhabl-eks-the-place",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/zhabl-eks-the-place",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/zhabl-eks-the-place",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/istorika",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/istorika",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/istorika",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/kafe-baloven",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/kafe-baloven",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/kafe-baloven",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/kz-signal",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/kz-signal",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/kz-signal",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/klub-64-6",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/klub-64-6",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/klub-64-6",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/klub-underground",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/klub-underground",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/klub-underground",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/klub-restoran-petrovich",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/klub-restoran-petrovich",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/klub-restoran-petrovich",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/koncertnyi-zal-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/koncertnyi-zal-moskva",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/koncertnyi-zal-moskva",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/korchma-pristanische",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/korchma-pristanische",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/korchma-pristanische",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/kulturama-obrazovatelnyi-klaster",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/kulturama-obrazovatelnyi-klaster",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/kulturama-obrazovatelnyi-klaster",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/maksimilians",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/maksimilians",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/maksimilians",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/memorialnyi-muzei-a-n-skryabina-bolshoi-zal",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/memorialnyi-muzei-a-n-skryabina-bolshoi-zal",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/memorialnyi-muzei-a-n-skryabina-bolshoi-zal",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/mts-live-holl-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/mts-live-holl-sankt-peterburg",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/mts-live-holl-sankt-peterburg",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/port-219",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/port-219",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/port-219",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/rk-krasnyi-bolshoi-zal",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/rk-krasnyi-bolshoi-zal",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/rk-krasnyi-bolshoi-zal",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/rodnya-speis",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/rodnya-speis",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/rodnya-speis",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/rodnya-space",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/rodnya-space",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/rodnya-space",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/serzhant-pepper",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/serzhant-pepper",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/serzhant-pepper",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/teatr-licedei",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/teatr-licedei",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/teatr-licedei",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/teatralnyi-zal-muzeya-vladimira-vysockogo",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/teatralnyi-zal-muzeya-vladimira-vysockogo",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/teatralnyi-zal-muzeya-vladimira-vysockogo",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/hogvarts-holl",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/hogvarts-holl",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/hogvarts-holl",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/ciferblat-na-moike",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/ciferblat-na-moike",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/ciferblat-na-moike",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/shtopor-rok-bar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/shtopor-rok-bar",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/shtopor-rok-bar",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/yaht-klub-k2-na-krestovskom-ostrove-77",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/yaht-klub-k2-na-krestovskom-ostrove-77",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/yaht-klub-k2-na-krestovskom-ostrove-77",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/base",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/base",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/base",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/eventuki",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/eventuki",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/eventuki",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/factory-3",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/factory-3",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/factory-3",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/hairy-lemon-pub",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/hairy-lemon-pub",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/hairy-lemon-pub",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/heaven-bar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/heaven-bar",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/heaven-bar",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/machine-head",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/machine-head",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/machine-head",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/nenavist",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/nenavist",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/nenavist",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/rock-cafe-131-2",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/rock-cafe-131-2",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/rock-cafe-131-2",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/standup-bar-krasnodar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/standup-bar-krasnodar",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/standup-bar-krasnodar",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/the-rock-bar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/the-rock-bar",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/the-rock-bar",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/vpiska-tvoego-goroda",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/vpiska-tvoego-goroda",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/vpiska-tvoego-goroda",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/zoccolo-2-0",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/zoccolo-2-0",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/zoccolo-2-0",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/kongress-holl-toratau",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/kongress-holl-toratau",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/kongress-holl-toratau",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/pepelac",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/pepelac",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/pepelac",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/alkatras",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/alkatras",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/alkatras",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/art-prostranstvo-lampa",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/art-prostranstvo-lampa",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/art-prostranstvo-lampa",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/bar-v-gostyah-u-lyubochki",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/bar-v-gostyah-u-lyubochki",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/bar-v-gostyah-u-lyubochki",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/bar-stavnikov",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/bar-stavnikov",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/bar-stavnikov",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/bar-titry",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/bar-titry",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/bar-titry",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/bar-berlogin",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/bar-berlogin",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/bar-berlogin",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/bar-serzhant-pepper",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/bar-serzhant-pepper",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/bar-serzhant-pepper",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/bar-tamburin",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/bar-tamburin",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/bar-tamburin",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/barak-o-mama",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/barak-o-mama",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/barak-o-mama",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/bauns",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/bauns",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/bauns",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/bryusov-holl-ordynka",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/bryusov-holl-ordynka",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/bryusov-holl-ordynka",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/vorobevy-gory-sektor-a-3",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/vorobevy-gory-sektor-a-3",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/vorobevy-gory-sektor-a-3",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/voronezhskii-stendap-klub",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/voronezhskii-stendap-klub",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/voronezhskii-stendap-klub",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/dvorec-kultury-i-iskusstv-mgu-im-n-p-ogareva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/dvorec-kultury-i-iskusstv-mgu-im-n-p-ogareva",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/dvorec-kultury-i-iskusstv-mgu-im-n-p-ogareva",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/dvorec-molodezhi-byvsh-gigant",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/dvorec-molodezhi-byvsh-gigant",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/dvorec-molodezhi-byvsh-gigant",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/dzhaz-klub-esse",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/dzhaz-klub-esse",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/dzhaz-klub-esse",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/dk-gaz",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/dk-gaz",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/dk-gaz",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/dk-orbita",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/dk-orbita",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/dk-orbita",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/dk-im-ya-uhsaya",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/dk-im-ya-uhsaya",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/dk-im-ya-uhsaya",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/dk-tolyatti",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/dk-tolyatti",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/dk-tolyatti",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/dom-muzei-gogolya",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/dom-muzei-gogolya",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/dom-muzei-gogolya",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/zaryade-sektor-a-4",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/zaryade-sektor-a-4",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/zaryade-sektor-a-4",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/immersivnyi-teatr-morfeus",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/immersivnyi-teatr-morfeus",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/immersivnyi-teatr-morfeus",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/istorii",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/istorii",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/istorii",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/kz-u-finlyandskogo",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/kz-u-finlyandskogo",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/kz-u-finlyandskogo",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/kz-grand-holl-sibir",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/kz-grand-holl-sibir",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/kz-grand-holl-sibir",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/kkk-im-v-mayakovskogo",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/kkk-im-v-mayakovskogo",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/kkk-im-v-mayakovskogo",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/klub-12",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/klub-12",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/klub-12",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/klub-vysockii",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/klub-vysockii",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/klub-vysockii",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/klub-kitaiskii-letchik-dzhao-da",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/klub-kitaiskii-letchik-dzhao-da",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/klub-kitaiskii-letchik-dzhao-da",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/klub-med",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/klub-med",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/klub-med",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/klub-shipr",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/klub-shipr",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/klub-shipr",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/klub-atmosfera",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/klub-atmosfera",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/klub-atmosfera",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/klub-ozz",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/klub-ozz",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/klub-ozz",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/klub-mini-by-concert-hall",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/klub-mini-by-concert-hall",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/klub-mini-by-concert-hall",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/koncert-holl-svoboda",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/koncert-holl-svoboda",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/koncert-holl-svoboda",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/koncert-holl-cenzura",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/koncert-holl-cenzura",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/koncert-holl-cenzura",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/koncertnyi-zal-sankt-peterburg-st-petersburg-hall",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/koncertnyi-zal-sankt-peterburg-st-petersburg-hall",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/koncertnyi-zal-sankt-peterburg-st-petersburg-hall",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/kulturno-sportivnyi-centr-mechta",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/kulturno-sportivnyi-centr-mechta",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/kulturno-sportivnyi-centr-mechta",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/kulturnyi-centr-na-arbate",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/kulturnyi-centr-na-arbate",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/kulturnyi-centr-na-arbate",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/leven",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/leven",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/leven",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/muzei-im-n-ostrovskogo",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/muzei-im-n-ostrovskogo",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/muzei-im-n-ostrovskogo",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/nastoikin",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/nastoikin",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/nastoikin",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/otel-sankt-peterburg-bolshoi-koncertnyi-zal",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/otel-sankt-peterburg-bolshoi-koncertnyi-zal",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/otel-sankt-peterburg-bolshoi-koncertnyi-zal",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/pab-oliver",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/pab-oliver",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/pab-oliver",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/pab-pinta",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/pab-pinta",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/pab-pinta",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/restoran-klub-magnus-locus",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/restoran-klub-magnus-locus",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/restoran-klub-magnus-locus",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/restoran-sobytii-aleksandrovskii-park",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/restoran-sobytii-aleksandrovskii-park",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/restoran-sobytii-aleksandrovskii-park",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/restoran-gastroli-grill",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/restoran-gastroli-grill",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/restoran-gastroli-grill",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/restoran-klub-shagal",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/restoran-klub-shagal",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/restoran-klub-shagal",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/rok-bar-veselyi-dzhoker",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/rok-bar-veselyi-dzhoker",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/rok-bar-veselyi-dzhoker",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/rok-bar-prb",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/rok-bar-prb",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/rok-bar-prb",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/rostovskii-dom-oficerov",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/rostovskii-dom-oficerov",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/rostovskii-dom-oficerov",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/severnyi-rechnoi-vokzal-prichal-no16-91",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/severnyi-rechnoi-vokzal-prichal-no16-91",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/severnyi-rechnoi-vokzal-prichal-no16-91",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/sindikat",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/sindikat",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/sindikat",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/spletni-bar-by-anna-asti",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/spletni-bar-by-anna-asti",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/spletni-bar-by-anna-asti",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/stendap-klub-hedlainer",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/stendap-klub-hedlainer",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/stendap-klub-hedlainer",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/teatr-studiya-foshoo",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/teatr-studiya-foshoo",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/teatr-studiya-foshoo",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/ton71",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/ton71",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/ton71",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/trenirovochnaya-baza-nfr",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/trenirovochnaya-baza-nfr",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/trenirovochnaya-baza-nfr",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/tretyakovskii-sektor-a-29",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/tretyakovskii-sektor-a-29",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/tretyakovskii-sektor-a-29",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/tri-topora",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/tri-topora",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/tri-topora",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/centr-novoi-kultury-mir-iskusstv",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/centr-novoi-kultury-mir-iskusstv",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/centr-novoi-kultury-mir-iskusstv",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/centralnyi-oficerskii-klub-vozdushno-kosmicheskih-sil",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/centralnyi-oficerskii-klub-vozdushno-kosmicheskih-sil",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/centralnyi-oficerskii-klub-vozdushno-kosmicheskih-sil",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/ck-tgu-tomskii-gosudarstvennyi-universitet",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/ck-tgu-tomskii-gosudarstvennyi-universitet",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/ck-tgu-tomskii-gosudarstvennyi-universitet",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/shkola-sushi-lover",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/shkola-sushi-lover",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/shkola-sushi-lover",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/eglerio",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/eglerio",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/eglerio",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/comedy34",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/comedy34",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/comedy34",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/grousehall",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/grousehall",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/grousehall",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/h2o-arthall",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/h2o-arthall",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/h2o-arthall",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/harat-s-pub",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/harat-s-pub",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/harat-s-pub",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/ibiza",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/ibiza",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/ibiza",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/music-hall-27",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/music-hall-27",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/music-hall-27",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/nirvana-cover-pub",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/nirvana-cover-pub",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/nirvana-cover-pub",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/off-teatr",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/off-teatr",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/off-teatr",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/punk-fiction",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/punk-fiction",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/punk-fiction",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/signature-art",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/signature-art",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/signature-art",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/soho-rooms",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/soho-rooms",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/soho-rooms",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/spirit-sound-base",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/spirit-sound-base",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/spirit-sound-base",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/the-rock-bar-small-stage",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/the-rock-bar-small-stage",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/the-rock-bar-small-stage",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/vnvnc",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/vnvnc",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/vnvnc",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/werk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/werk",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/werk",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/venues/yauza",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/venues/yauza",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/venues/yauza",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/vorobevy-gory-sektor-b-38",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/vorobevy-gory-sektor-b-38",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/vorobevy-gory-sektor-b-38",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/klenovyi-bulvar-20",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/klenovyi-bulvar-20",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/klenovyi-bulvar-20",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/novospasskii-most-sektor-b-13",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/novospasskii-most-sektor-b-13",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/novospasskii-most-sektor-b-13",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/ulica-sibgata-hakima-4-99",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/ulica-sibgata-hakima-4-99",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/ulica-sibgata-hakima-4-99",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/g-gorodec-ul-b-kirovskii-sezd-29-na-naberezhnoi",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/g-gorodec-ul-b-kirovskii-sezd-29-na-naberezhnoi",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/g-gorodec-ul-b-kirovskii-sezd-29-na-naberezhnoi",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/ligovskii-pr-10-u-glavnogo-vhoda-v-gostinicu-oktyabrskaya",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/ligovskii-pr-10-u-glavnogo-vhoda-v-gostinicu-oktyabrskaya",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/ligovskii-pr-10-u-glavnogo-vhoda-v-gostinicu-oktyabrskaya",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/luzhniki-48",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/luzhniki-48",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/luzhniki-48",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/m-1905-goda",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/m-1905-goda",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/m-1905-goda",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/neskuchnyi-sad-sektor-a-7",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/neskuchnyi-sad-sektor-a-7",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/neskuchnyi-sad-sektor-a-7",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/neskuchnyi-sad-sektor-b-39",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/neskuchnyi-sad-sektor-b-39",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/neskuchnyi-sad-sektor-b-39",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/novodevichii-monastyr",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/novodevichii-monastyr",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/novodevichii-monastyr",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/park-gorkogo-2-sektor-a-87",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/park-gorkogo-2-sektor-a-87",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/park-gorkogo-2-sektor-a-87",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/petrovskaya-naberezhnaya-62",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/petrovskaya-naberezhnaya-62",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/petrovskaya-naberezhnaya-62",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/sibir-ledovyi-dvorec-sporta",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/sibir-ledovyi-dvorec-sporta",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/sibir-ledovyi-dvorec-sporta",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/m-kropotkinskaya-vyhod-iz-metro-no2-u-restorana-il-patio-vas-vstretit-gid-s-tablichkoi-lyubimyi-gorod",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/m-kropotkinskaya-vyhod-iz-metro-no2-u-restorana-il-patio-vas-vstretit-gid-s-tablichkoi-lyubimyi-gorod",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/m-kropotkinskaya-vyhod-iz-metro-no2-u-restorana-il-patio-vas-vstretit-gid-s-tablichkoi-lyubimyi-gorod",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/cirk-shapito-karakat-shou",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/cirk-shapito-karakat-shou",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/cirk-shapito-karakat-shou",
+      "problems": []
+    },
+    {
+      "url": "https://daibilet.ru/locations/moscow-raceway",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/locations/moscow-raceway",
+      "robots": [
+        "index, follow"
+      ],
+      "canonical": "https://daibilet.ru/locations/moscow-raceway",
+      "problems": []
+    }
+  ]
+}

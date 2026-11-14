@@ -1,0 +1,433 @@
+{
+  "cache": {
+    "ok": true,
+    "warm": "none",
+    "reason": "EventPage editorial batch 33 publication"
+  },
+  "revalidated": 30,
+  "indexNowQueued": 30,
+  "results": [
+    {
+      "slug": "neoklassicheskii-koncert-kompozitora-denisa-stelmaha-v-irkutske-irkutsk",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "20-11-2026-bratsk-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-bratsk",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "bolshoi-solnyi-koncert-russkii-razmer-33-tyumen",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "argishti-koncert-golos-neba-i-zemli-tyumen",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "billy-s-band-ekaterinburg",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "ivan-zolo-penza-20-noyabrya-rok-kafe-131-2-penza",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "november-metal-fest-moskva",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "simfoniya-roka-akt-pervyi-cheboksary",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "koncert-antona-zacepina-sankt-peterburg",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "koncert-olega-nikitina-dlya-nas-s-toboyu-moskva",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "oleg-medvedev-i-roman-filippov-koncert-v-kc-dom-moskva",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "aikko-koncert-v-penze-penza",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "gruppa-mirazh-bolshoi-solnyi-koncert-sankt-peterburg",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "20-noyabrya-gruppa-zahar-hity-gruppy-korol-i-shut-i-russkogo-pank-roka-moskva",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "chingis-han-legendarnaya-gruppa-80h-moskva",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "dzhaz-rasskaz-kommunalnaya-kvartira-sankt-peterburg",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "koncert-uchenikov-aset-moskva",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "organ-muzyka-kino-aleksandr-hmarnyi-smolensk",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "sveta-bolshoi-solnyi-koncert-krasnodar",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "reiv-dlya-vygorevshih-lo-fi-jazz-acoustic-edition-moskva",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "friday-night-betty-boop-lovers-elena-moiseenko-moskva",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "nochnoi-dzhem-s-mihailom-mishurisom-moskva-4",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "vivaldi-pri-svechah-sankt-peterburg",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "melodii-svechei-arfa-i-skripka-sankt-peterburg",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "100-jazz-band-stefaniya-damocidi-rossiya-greciya-moskva",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "miyadzaki-zhivye-saundtreki-pod-zvezdnym-kupolom-nizhniy-novgorod",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "koncert-amerikanskii-dzhaz-moskva",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "legendy-disko-v-osobnyake-polovcova-ot-abba-do-queen-sankt-peterburg",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "20-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-ryazan",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "vselennaya-golosov-muzykalnoe-shou-yulaik-sankt-peterburg",
+      "ok": true,
+      "indexNowQueued": true
+    }
+  ],
+  "smoke": [
+    {
+      "slug": "neoklassicheskii-koncert-kompozitora-denisa-stelmaha-v-irkutske-irkutsk",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/neoklassicheskii-koncert-kompozitora-denisa-stelmaha-v-irkutske-irkutsk",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "20-11-2026-bratsk-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-bratsk",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/20-11-2026-bratsk-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-bratsk",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "bolshoi-solnyi-koncert-russkii-razmer-33-tyumen",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/bolshoi-solnyi-koncert-russkii-razmer-33-tyumen",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "argishti-koncert-golos-neba-i-zemli-tyumen",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/argishti-koncert-golos-neba-i-zemli-tyumen",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "billy-s-band-ekaterinburg",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/billy-s-band-ekaterinburg",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "ivan-zolo-penza-20-noyabrya-rok-kafe-131-2-penza",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/ivan-zolo-penza-20-noyabrya-rok-kafe-131-2-penza",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "november-metal-fest-moskva",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/november-metal-fest-moskva",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "simfoniya-roka-akt-pervyi-cheboksary",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/simfoniya-roka-akt-pervyi-cheboksary",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "koncert-antona-zacepina-sankt-peterburg",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/koncert-antona-zacepina-sankt-peterburg",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "koncert-olega-nikitina-dlya-nas-s-toboyu-moskva",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/koncert-olega-nikitina-dlya-nas-s-toboyu-moskva",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "oleg-medvedev-i-roman-filippov-koncert-v-kc-dom-moskva",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/oleg-medvedev-i-roman-filippov-koncert-v-kc-dom-moskva",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "aikko-koncert-v-penze-penza",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/aikko-koncert-v-penze-penza",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "gruppa-mirazh-bolshoi-solnyi-koncert-sankt-peterburg",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/gruppa-mirazh-bolshoi-solnyi-koncert-sankt-peterburg",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "20-noyabrya-gruppa-zahar-hity-gruppy-korol-i-shut-i-russkogo-pank-roka-moskva",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/20-noyabrya-gruppa-zahar-hity-gruppy-korol-i-shut-i-russkogo-pank-roka-moskva",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "chingis-han-legendarnaya-gruppa-80h-moskva",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/chingis-han-legendarnaya-gruppa-80h-moskva",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "dzhaz-rasskaz-kommunalnaya-kvartira-sankt-peterburg",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/dzhaz-rasskaz-kommunalnaya-kvartira-sankt-peterburg",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "koncert-uchenikov-aset-moskva",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/koncert-uchenikov-aset-moskva",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "organ-muzyka-kino-aleksandr-hmarnyi-smolensk",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/organ-muzyka-kino-aleksandr-hmarnyi-smolensk",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "sveta-bolshoi-solnyi-koncert-krasnodar",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/sveta-bolshoi-solnyi-koncert-krasnodar",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "reiv-dlya-vygorevshih-lo-fi-jazz-acoustic-edition-moskva",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/reiv-dlya-vygorevshih-lo-fi-jazz-acoustic-edition-moskva",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "friday-night-betty-boop-lovers-elena-moiseenko-moskva",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/friday-night-betty-boop-lovers-elena-moiseenko-moskva",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "nochnoi-dzhem-s-mihailom-mishurisom-moskva-4",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/nochnoi-dzhem-s-mihailom-mishurisom-moskva-4",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "vivaldi-pri-svechah-sankt-peterburg",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/vivaldi-pri-svechah-sankt-peterburg",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "melodii-svechei-arfa-i-skripka-sankt-peterburg",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/melodii-svechei-arfa-i-skripka-sankt-peterburg",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "100-jazz-band-stefaniya-damocidi-rossiya-greciya-moskva",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/100-jazz-band-stefaniya-damocidi-rossiya-greciya-moskva",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "miyadzaki-zhivye-saundtreki-pod-zvezdnym-kupolom-nizhniy-novgorod",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/miyadzaki-zhivye-saundtreki-pod-zvezdnym-kupolom-nizhniy-novgorod",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "koncert-amerikanskii-dzhaz-moskva",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/koncert-amerikanskii-dzhaz-moskva",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "legendy-disko-v-osobnyake-polovcova-ot-abba-do-queen-sankt-peterburg",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/legendy-disko-v-osobnyake-polovcova-ot-abba-do-queen-sankt-peterburg",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "20-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-ryazan",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/20-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-ryazan",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "vselennaya-golosov-muzykalnoe-shou-yulaik-sankt-peterburg",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/vselennaya-golosov-muzykalnoe-shou-yulaik-sankt-peterburg",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    }
+  ]
+}

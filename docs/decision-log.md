@@ -1,5 +1,103 @@
 # Decision Log — Daibilet
 
+## 2026-11-13 — EventPage owns its editorial hero image
+
+**Decision:** Store a page-specific cover in `EventPage.heroImageUrl`. Provider
+catalog sync updates Event/EventSession inventory and must not control this
+editorial image. Public event pages prefer the EventPage image and fall back to
+the existing event image. Admin updates that omit the new field preserve its
+current value, so older rewrite clients cannot clear it accidentally.
+
+**Why:** A generated or editorially selected image must survive subsequent
+Ticketscloud/Teplohod imports and remain attached to the stable page identity.
+
+**Implementation:** Additive Prisma migration, EventPage admin editor and DTO,
+public page and OpenGraph rendering. The MSK artifact deployment applies
+`pnpm db:deploy` before Prisma client generation and service restart.
+
+## 2026-11-12 — Imported place candidate versus editorial PDP
+
+**Decision:** An imported Venue with `pageStatus=CANDIDATE` is a public,
+accessible basic PDP and must return HTTP 200 with `noindex, follow` by default.
+Missing editorial fields must not turn that candidate route into a 404; they
+remain visible as completion requirements in the editor. After an editor
+completes and publishes the PDP, it becomes indexable and enters the public
+sitemap. `HIDDEN` remains unavailable. Do not expose draft editorial content
+while serving the candidate page.
+
+**Why:** Availability and search indexing are separate controls. Imported
+places should be reviewable and usable as simple informational cards before
+they have a full editorial profile or sales contract; publication is the
+editorial gate for search.
+
+**Implementation status:** Implemented on 2026-11-12: CANDIDATE detail routes
+bypass missing-copy gates and remain noindex; the admin derives indexation from
+editorial status; PUBLISHED pages are indexable regardless of ticket
+availability and remain eligible for sitemap verification. City-page venue
+counters are recalculated from the matched session-to-venue links. Regression
+tests and typechecks pass locally; staging verification is pending.
+
+## 2026-10-27 — EventPage candidate slug drops the provider slot ID
+
+When preparing an EventPage slug, remove the Ticketscloud 24-character ID only
+when it matches that Event's internal ID; remove a Teplohod numeric suffix only
+when it matches `evt_tep_<id>`. Keep provider IDs on Event/EventSession for
+inventory and purchase. The EventPage slug is an internal candidate until URL
+mapping is approved; it does not change the public URL, canonical, sitemap, or
+redirects. Identical candidate slugs are collision warnings, never an automatic
+instruction to merge Events. Keep each unresolved Event separate and allocate a
+unique internal draft slug with `-2`, `-3`, etc.; the suffix is persisted and
+never reassigned. The admin reviews whether to keep pages separate or link true
+slots to one EventPage. Public routes remain unchanged until URL mapping review.
+
+For a single-Event draft, append the transliterated catalog city name (e.g. `-ufa`,
+`-perm`) when it is not already present. This separates same-title events in
+different cities. Same-city collisions receive `-2`, `-3`, etc. Multi-Event
+pages do not get a city suffix because they may span cities. The current-sale
+collision review is recorded in
+[`eventpage-slug-collision-review-2026-10-27.csv`](./eventpage-slug-collision-review-2026-10-27.csv);
+these are review candidates, not merge instructions.
+
+## 2026-10-27 — Stable EventPage identity is separate from catalog inventory
+
+`Event` remains the inventory/purchasing entity and `EventSession` remains its
+dated slot. `PdpDocument` remains an optional editorial document attached to a
+single Event or Venue. A new additive `EventPage` represents the stable public
+editorial identity and may link multiple explicitly reviewed Events through
+`EventPageEvent`; it does not replace Event, sessions, offers, or provider IDs.
+
+`EventPageRoute` records candidate and historical paths only. This schema
+foundation does not alter runtime routing, canonical tags, sitemap, redirects,
+fallback lookup, or indexing. New pages default to draft/non-indexable until
+the sync policy and URL correspondence map are approved. Never infer a merge
+from title similarity or provider grouping alone. See
+[EventPage foundation](./event-page-foundation-2026-10-27.md).
+
+## 2026-10-14 — Places taxonomy for completed city hubs
+
+PDP.xlsx is the complete editorial source for the city hubs represented in that workbook,
+not a complete inventory of every existing PDP or venue. Missing workbook rows never
+hide unrelated site pages. Reconciliation first uses a source key, then one city/name
+match corroborated by address or coordinates; uncertain pairs require review.
+
+Places use one primary `PlaceType`, an optional precise subtype and additional roles
+or hub badges. `religion` and `urban` are primary types. `transport` covers piers,
+terminals and stations; a bus vehicle is not a place subtype. A regular departure
+pier can use `pier_departures` only when particular sessions have verified
+`TripDeparture` links. New unmatched places remain hidden and noindex until their
+identity, factual copy and object-specific imagery are reviewed.
+
+## 2026-10-08 — R12 sandbox и R13 catalog release
+
+Владелец явно разрешил sandbox-деплой R12 на `.159` в сессии 07–08.10,
+несмотря на общий запрет AGENTS.md. Разрешение ограничено этим sandbox-релизом;
+включение live checkout и использование live-ключей не разрешались.
+
+Финансовый backend исполняет `codex/stage0-r12` (`7f756a58a`) на `.159`.
+Каталог исполняет `feat/next-monorepo` (`c18b97259`) на MSK и получает DTO
+по HTTPS. Для выпуска R12 не требуется переносить весь финансовый runtime
+в каталожную ветку. [Проверки выпуска](./stage0-r12-r13-release-2026-10-08.md).
+
 Хронология ключевых архитектурных и продуктовых решений.
 
 ---
@@ -119,7 +217,7 @@
 
 **Почему:** Приоритет — открытие виджетов и корректная передача ID, а не продажи. API-check дешевле и воспроизводимее ручного клика.
 
-**Статус:** Активно. Browser smoke — ручной чеклист в `widget-data-contract.md`. Импорт sync→БД — фаза B.
+**Статус:** Активно. Browser smoke 0.2 закрыт 2026-07-22 (ручное подтверждение). Импорт sync→БД — фаза B.
 
 ---
 
@@ -163,13 +261,33 @@
 
 ---
 
+## 2026-07-10 — Codex split: phase2-foundation, cherry-pick после F3
+
+**Решение:** Codex = ветка **`codex/phase2-foundation`** (не `phase2-finance-next`). Unrelated history — **no wholesale merge**. Canonical public Next = **`apps/web`**. Cherry-pick после F3: Phase 2 schema, event change requests, admin contracts. **Не мержить** Codex Next в `apps/public` + proxy bridge.
+
+**Почему:** Два конкурирующих Next-подхода (Path A proxy vs Path B full-stack). F3 cutover не должен блокироваться на merge Codex.
+
+**Статус:** Активно. [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md), [codex-cherry-pick-plan.md](./codex-cherry-pick-plan.md).
+
+---
+
+## 2026-07-10 — F2 закрыт: landings ISR, catalog filters, widgets
+
+**Решение:** Завершён F2 public SSR: landings (`/podborki` + SEO paths) с ISR/SSG, SSR-фильтры каталога (city/date/sort/q), client widgets TC/Teplohod на event page, `backend:next:parity`.
+
+**Почему:** Exit criteria F2 — indexable HTML без JS + parity с legacy перед F3 cutover.
+
+**Статус:** Активно. Следующий шаг — F3 ([phase-f3-cutover-checklist.md](./phases/phase-f3-cutover-checklist.md)).
+
+---
+
 ## 2026-07-10 — Frontend остаётся Vite SPA (не Next.js)
 
 **Решение:** `apps/public` и `apps/admin` — Vite 6 + React 19 CSR. Next.js не в scope MVP.
 
 **Почему:** Текущий deploy (static + nginx + API) работает; миграция на Next.js не даёт ROI до стабилизации backend и SEO-требований.
 
-**Статус:** Активно. Пересмотреть в Phase F при необходимости SSR/prerender.
+**Статус:** Заменено Path B — Vite deprecated после F3 cutover.
 
 ---
 
@@ -179,11 +297,76 @@
 
 **Почему:** Vite CSR + lazy load 60 — поисковики получают мало контента без JS. Path B из аудита — целевое решение.
 
-**Codex:** параллельно `codex/phase2-finance-next` — Phase 2 schema + supplier admin read, **без** YooKassa runtime.
+**Codex:** параллельно **`codex/phase2-foundation`** — Phase 2 schema + event change requests; cherry-pick **после F3**, **без** YooKassa runtime и **без** Codex Next/proxy.
 
-**Статус:** Активно. [phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md), [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md).
+**Статус:** Активно. F2 ✅. [phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md), [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md). Ветка `feat/next-monorepo`.
 
 ---
+
+## 2026-07-10 — F2: full-stack read (Prisma в Next, не proxy)
+
+**Решение:** Public SSR и Route Handlers читают через Prisma/`public-*.dto.ts` port в `apps/web`, без промежуточного fetch к `apps/backend`. Legacy backend остаётся для sync/writes/admin до F4/F5.
+
+**Почему:** Один раз попыхтим с porting DTO — дальше проще: нет dual HTTP hop, единый type graph, проще cutover и retire `dto.js`.
+
+**Статус:** Активно. F2 ✅ на `feat/next-monorepo`.
+
+---
+
+## 2026-07-10 — Catalog page sizes: 100 / 200 / 300
+
+**Решение:** Public catalog default limit **100**, max **300**, UI selector **100 / 200 / 300**. SSR page 1 всегда рендерит default (100), независимо от selector.
+
+**Почему:** Круглые порции, ×1.67 к текущим 60, вписываются в perf budget (~8 KB JSON на 100). Константы в `@daibilet/contracts/catalog`.
+
+**Статус:** Активно.
+
+---
+
+## 2026-07-13 — Defer `tc:sync` widgetUrl backfill на prod
+
+**Решение:** Не запускать полный `npm run tc:sync` на prod в рамках этапа 0. Оставить pipeline (фаза B) для staging и плановых maintenance windows; prod backfill — только при регрессии saleable events или перед включением nightly cron.
+
+**Почему:**
+
+1. **Saleable path закрыт:** `check:widgets` prod **4/4 OK** (2026-07-13) на эталонных TC/TEP slug — `purchaseReady`, `widgetPayload`, `purchaseUrl` в порядке; ProviderLink покрывает опубликованные события.
+2. **Долг не блокирует MVP:** ~62k offers без `widgetUrl` в audit — в основном исторический хвост / не-saleable; не влияет на CTA «Купить» на indexable карточках.
+3. **Риск maintenance:** prod `tc:sync` = длинный fetch + mass upsert; без окна возможны lock/contention и случайный сброс admin override (см. фаза C guards — но rollback дороже defer).
+
+**Критерии пересмотра (любой → запланировать sync):**
+
+- `check:widgets` prod FAIL на эталонах после deploy/import
+- `check:sync-invariants` prod: saleable event без ProviderLink / без widget URL
+- Новая массовая публикация TC-каталога без widget URL
+- Включение nightly `check:sync-invariants` + алерт (audit §151)
+
+**Пересмотр:** 2026-08-01 или при первом prod FAIL виджетов.
+
+**Follow-up 2026-07-13:** выполнен `npm run tc:sync` на prod (тогда `213.171.7.16`, ныне MSK `.184`): 17356 source events, 17082 offers с widgetUrl, 66535 ProviderLink, ~101s. `check:widgets` 4/4 OK после sync.
+
+**Статус:** Активно (defer снят для TC backfill; browser smoke 0.2 ✅ 2026-07-22).
+
+---
+
+## 2026-10-15 — Внутренняя продажа с исполнением через API поставщика
+
+**Решение:** Разделяем владельца платежа, источник записи заказа и способ исполнения каждой позиции. Покупка и оплата в Daibilet с выпуском билета через API поставщика остаётся внутренней продажей `CheckoutOrder`; внешний ID/номер поставщика сохраняется в `FulfillmentItem` и не создаёт второй импортированный заказ для финансовой сводки. Импортированная продажа с оплатой у Ticketscloud/Teplohod остаётся внешней. Если API партнёра принимает и платёж, этот поток классифицируется отдельно по фактическому владельцу денег.
+
+**Почему:** `Supplier.integrationMode=API_SYNC`, `SupplierIntegration`, `CheckoutOrder` и `FulfillmentItem.provider` уже дают основу, но бинарный `sourceKind` в текущем DTO не описывает все три оси. Без разделения реестр может удвоить продажи, показать неверные денежные действия или выдать билет до ответа поставщика.
+
+**Статус:** Продуктовый контракт; реализация API-адаптера, расширение DTO и smoke выполняются отдельными срезами.
+
+**Уточнение владельца:** В API-шлюзе платёж принимает Daibilet, но это не требует единого checkout UI: для поставщика допускается отдельный сценарий покупки. Деньги затем либо распределяются сплитом, либо целиком проходят через Daibilet с последующим расчётом. Поставщик планирует давать квоту; билет автоматически выдаётся при открытом слоте и подтверждённом наличии. Реализация должна отдельно подтвердить протокол резерва и ответ поставщика о выпуске: одного открытого слота недостаточно для показа действительного билета.
+
+---
+
+## 2026-10-15 — Places: родительский тип, подтип и безопасная сверка PDP
+
+**Решение:** `Venue.placeType` хранит один родительский тип Places, `placeSubtype` - один предметный подтип. `hubTags` и `isMainPlace` отвечают за редакционную навигацию; `pageTemplate` и роли - за поведение страницы. `transport/pier` не выводит расписание без подтверждённой связи конкретного `EventSession` с точкой отправления. Файл PDP является полным редакционным источником только для завершённых городских хабов; отсутствие записи в нём само по себе не удаляет другие PDP.
+
+**Почему:** старый `VenueKind` смешивает тип места, роль площадки и поставщицкие ярлыки. Например, в `CONCERT_HALL` встречаются пабы и открытые площадки, а в `PIER` - объекты без подтверждённой посадки. Новые записи с ошибками координат, сомнительной идентичностью или без проверенного изображения остаются на сверку и не публикуются автоматически.
+
+**Статус:** Внедрение поэтапно; массовые импорты проходят проверку идентичности и запускаются отдельно от миграции схемы.
 
 ## Шаблон новой записи
 
@@ -196,3 +379,61 @@
 
 **Статус:** Активно / Отменено / Заменено ссылкой на новую запись
 ```
+
+## 2026-11-12 — Imported place candidate versus editorial PDP
+
+**Decision:** An imported Venue with `pageStatus=CANDIDATE` is a public,
+accessible basic PDP and must return HTTP 200 with `noindex, follow` by default.
+Missing editorial fields must not turn that candidate route into a 404; they
+remain visible as completion requirements in the editor. After an editor
+completes and publishes the PDP, it becomes indexable and enters the public
+sitemap. `HIDDEN` remains unavailable. Do not expose draft editorial content
+while serving the candidate page.
+
+**Why:** Availability and search indexing are separate controls. Imported
+places should be reviewable and usable as simple informational cards before
+they have a full editorial profile or sales contract; publication is the
+editorial gate for search.
+
+**Implementation status:** Implemented locally on 2026-11-12: CANDIDATE detail
+routes bypass missing-copy gates and remain noindex; the admin derives indexation
+from editorial status; PUBLISHED pages are indexable regardless of ticket
+availability and remain eligible for sitemap verification. City-page venue
+counters are recalculated from the matched session-to-venue links. Regression
+tests and typechecks pass locally; staging verification is pending.
+
+## 2026-11-12 — Safe automatic migration from legacy Event URLs
+
+**Decision:** Preserve old Event/slot URLs as fallback until a stable EventPage
+is publicly published. After publication, issue a permanent redirect only when
+the old path maps to the Event through an exact Event ID and that Event is
+explicitly linked to that EventPage. Never infer URL ownership from title,
+city, venue, provider parent, or a partial ID. If a route is ambiguous, the
+EventPage is still draft, or no exact target exists, do not redirect; retain a
+working legacy response where the source Event is public, otherwise return the
+appropriate not-found response. Conflicts and unresolved paths must appear in
+the dry-run report and block automatic redirect activation.
+
+**Why:** Old indexed links must not be lost during the EventPage migration, but
+automatically guessed redirects can merge distinct local events or tours and
+send visitors to the wrong content. Publication is the cutover gate: draft
+content must not become a public redirect target.
+
+**Implementation status:** Decision only; the public resolver currently reads
+EventPage slugs and Event IDs but does not use `EventPageRoute` as a redirect
+map. The route table is metadata, not proof that redirects work. Implement an
+exact-ID route-map dry run, conflict reporting, and public permanent redirects
+in code; validate legacy fallback and redirect behavior on staging before
+populating production route mappings. Hidden/removed Events without an exact
+published EventPage remain 404 unless a later reviewed lifecycle policy says
+otherwise.
+
+---
+
+## 2026-11-13 — Persistent production image root
+
+**Решение:** Nginx продолжает раздавать прежние `/images/...` URL из постоянного `apps/web/public/images`. Production deploy только проверяет наличие этого каталога и не гидрирует его из `apps/public/public/images`. Runtime image delta доставляется отдельно, additive и с SHA-256 проверкой. Legacy-каталог и его Git-история остаются до завершения отдельной миграции CI-источника и проверки восстановления из архива.
+
+**Почему:** Web image root — persistent production data, а повторная копия из legacy может вернуть устаревшие версии поверх активных изображений. Путь Nginx не меняем, чтобы не ломать уже опубликованные адреса.
+
+**Implementation status:** Локально подготовлено: deploy helpers теперь проверяют persistent root без копирования и исправления владельца. Production delta из 18 URL проверена (18/18 HTTP 200; 4 файла добавлены, 14 уже были с совпадающим SHA-256). Изменения deploy scripts требуют отдельного релиза; CI `web:build` пока использует legacy-дерево как эфемерный источник проверки OG-файлов. Ничего в Git или на сервере из legacy-деревьев не удалялось.

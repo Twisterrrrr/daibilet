@@ -299,6 +299,7 @@ export type PublicBuyerOrderTicket = {
   number?: string | null;
   status: string;
   displayStatus: string;
+  eventId?: string | null;
   eventTitle?: string | null;
   eventUrl?: string | null;
   startsAt?: string | null;
@@ -318,6 +319,7 @@ export type PublicBuyerOrder = {
     email?: string | null;
     phone?: string | null;
   };
+  eventId?: string | null;
   eventTitle?: string | null;
   eventUrl?: string | null;
   purchasedAt?: string | null;

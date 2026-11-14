@@ -1,0 +1,762 @@
+{
+  "appliedAt": "2026-11-12T21:36:20.714Z",
+  "groupCount": 9,
+  "assignedPageCount": 42,
+  "groups": [
+    {
+      "key": "anna_asti",
+      "title": "ANNA ASTI - шоу «Царица»",
+      "tourGroupId": "d3c693d8-cd51-4578-b89d-cfd0cd3fca19",
+      "pageCount": 8,
+      "pages": [
+        {
+          "eventPageId": "0e89916b-f9f4-4626-9bbe-288aa3444337",
+          "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-vladivostok",
+          "city": "Владивосток"
+        },
+        {
+          "eventPageId": "3b816506-41c1-4367-972d-07a486ef499d",
+          "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-tula",
+          "city": "Тула"
+        },
+        {
+          "eventPageId": "7632040e-efaa-42d6-ba17-53c2dd58932a",
+          "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-voronezh",
+          "city": "Воронеж"
+        },
+        {
+          "eventPageId": "95d20c5c-51c0-4007-9ae8-467e6afc3fce",
+          "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-ryazan",
+          "city": "Рязань"
+        },
+        {
+          "eventPageId": "cba0fb4e-fe37-4fda-a70c-f02c35cd5867",
+          "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-chelyabinsk",
+          "city": "Челябинск"
+        },
+        {
+          "eventPageId": "cd8d9b6d-d61b-4c06-99e1-ab6e59207fac",
+          "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-krasnodar",
+          "city": "Краснодар"
+        },
+        {
+          "eventPageId": "d7a18f1c-f1f8-4f3d-91f6-5177b9a5dfbd",
+          "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-kurgan",
+          "city": "Курган"
+        },
+        {
+          "eventPageId": "ea2c25aa-4e4f-4135-a029-a1bcf5da4212",
+          "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-habarovsk",
+          "city": "Хабаровск"
+        }
+      ]
+    },
+    {
+      "key": "rain_dance",
+      "title": "В объятиях дождя - танцевальное шоу",
+      "tourGroupId": "bfedd02b-e3bb-40a0-bf4d-f4e5259652d5",
+      "pageCount": 14,
+      "pages": [
+        {
+          "eventPageId": "08c18b93-de50-4425-9b53-119e2eae0f01",
+          "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-vidnoe",
+          "city": "Видное"
+        },
+        {
+          "eventPageId": "1cf11495-e6d6-4e09-a702-b39b70906350",
+          "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-samara",
+          "city": "Самара"
+        },
+        {
+          "eventPageId": "20a56d74-eecc-4a9a-ab54-15a83267deb5",
+          "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-bataysk",
+          "city": "Батайск"
+        },
+        {
+          "eventPageId": "298e5b4d-aff6-45ab-ac17-90b97e59629d",
+          "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-osinniki",
+          "city": "Осинники"
+        },
+        {
+          "eventPageId": "29e8fc7f-42f6-41d3-8a31-1e7736910187",
+          "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-irkutsk",
+          "city": "Иркутск"
+        },
+        {
+          "eventPageId": "35983553-77fc-4c98-90bf-7c5702965226",
+          "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-fryazino",
+          "city": "Фрязино"
+        },
+        {
+          "eventPageId": "46894ae1-e4a0-46b9-aa31-d45f68b32944",
+          "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-lobnya",
+          "city": "Лобня"
+        },
+        {
+          "eventPageId": "598fc7e8-0587-4cbf-835c-e8186c236198",
+          "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-kovrov",
+          "city": "Ковров"
+        },
+        {
+          "eventPageId": "81982e23-542d-4ea3-a49b-0b5c16681a2d",
+          "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-prokopevsk",
+          "city": "Прокопьевск"
+        },
+        {
+          "eventPageId": "cbaf67ae-81e9-440e-b8c5-feb67f30fbbf",
+          "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-ryazan",
+          "city": "Рязань"
+        },
+        {
+          "eventPageId": "cd2a54da-9039-4066-9646-866092f33d95",
+          "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-tver",
+          "city": "Тверь"
+        },
+        {
+          "eventPageId": "dd5bb03a-1952-406b-8190-9eb7f0533e58",
+          "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-rossosh",
+          "city": "Россошь"
+        },
+        {
+          "eventPageId": "e09609a9-da05-4d6b-98fa-73d93220d220",
+          "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-belovo",
+          "city": "Белово"
+        },
+        {
+          "eventPageId": "f6844a5f-fee2-4dbc-bb0e-fca1960b86fd",
+          "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-voronezh",
+          "city": "Воронеж"
+        }
+      ]
+    },
+    {
+      "key": "sveta",
+      "title": "Света - большой сольный концерт",
+      "tourGroupId": "311e2ed3-8c0d-48ab-b2e3-2aee805a68de",
+      "pageCount": 7,
+      "pages": [
+        {
+          "eventPageId": "22056081-8714-4dbf-a06f-044eeb7e1ec9",
+          "slug": "sveta-bolshoi-solnyi-koncert-omsk",
+          "city": "Омск"
+        },
+        {
+          "eventPageId": "2966620b-26f5-4d50-9294-09530727481a",
+          "slug": "sveta-bolshoi-solnyi-koncert-surgut",
+          "city": "Сургут"
+        },
+        {
+          "eventPageId": "5eaee4c1-5103-477b-a6f7-89adb4699adb",
+          "slug": "sveta-bolshoi-solnyi-koncert-krasnodar",
+          "city": "Краснодар"
+        },
+        {
+          "eventPageId": "6686c1d1-33c3-492d-a815-982a84584c6b",
+          "slug": "sveta-bolshoi-solnyi-koncert-ryazan",
+          "city": "Рязань"
+        },
+        {
+          "eventPageId": "7cdd4dc8-a09d-4a02-8985-34463e052bcc",
+          "slug": "sveta-bolshoi-solnyi-koncert-lipeck",
+          "city": "Липецк"
+        },
+        {
+          "eventPageId": "e3ba8d7f-b817-4837-a8bb-b1d22704cff6",
+          "slug": "sveta-bolshoi-solnyi-koncert-voronezh",
+          "city": "Воронеж"
+        },
+        {
+          "eventPageId": "f02eacbe-43c0-4dae-8a3c-2457726a4942",
+          "slug": "sveta-bolshoi-solnyi-koncert-tula",
+          "city": "Тула"
+        }
+      ]
+    },
+    {
+      "key": "rock_symphony",
+      "title": "Симфония рока - Акт первый",
+      "tourGroupId": "9ca50496-9d97-472c-a47d-f563f5306067",
+      "pageCount": 3,
+      "pages": [
+        {
+          "eventPageId": "48c818c1-d023-4167-bfd1-8bc3e489fe44",
+          "slug": "simfoniya-roka-akt-pervyi-cheboksary",
+          "city": "Чебоксары"
+        },
+        {
+          "eventPageId": "6a96b975-0578-484d-ae67-0b68f9be0234",
+          "slug": "simfoniya-roka-akt-pervyi-volzhsk",
+          "city": "Волжск"
+        },
+        {
+          "eventPageId": "9dd73a25-5a85-4922-98da-7339f96024ee",
+          "slug": "simfoniya-roka-akt-pervyi-ulyanovsk",
+          "city": "Ульяновск"
+        }
+      ]
+    },
+    {
+      "key": "reshetun",
+      "title": "Алексей Решетун - Новый год по судебно-медицински",
+      "tourGroupId": "c429fda0-35a3-4673-8a02-b3929fbbcf85",
+      "pageCount": 2,
+      "pages": [
+        {
+          "eventPageId": "52bbc926-af2c-4607-9383-2f8115b0b383",
+          "slug": "aleksei-reshetun-novyi-god-po-sudebno-medicinske-moskva",
+          "city": "Москва"
+        },
+        {
+          "eventPageId": "cd321ce8-6706-491a-bc76-df931489a9ea",
+          "slug": "aleksei-reshetun-novyi-god-po-sudebno-medicinski-sankt-peterburg",
+          "city": "Санкт-Петербург"
+        }
+      ]
+    },
+    {
+      "key": "nigativ",
+      "title": "Нигатив - Все хиты + 44",
+      "tourGroupId": "22d74de4-6376-419e-9b37-cf19ffb45e66",
+      "pageCount": 2,
+      "pages": [
+        {
+          "eventPageId": "1387b4f6-8afa-41ad-87c8-552abacf7fb9",
+          "slug": "nigativ-vse-hity-44-12-03-27-sankt-peterburg-aurora-concert-hall-sankt-peterburg",
+          "city": "Санкт-Петербург"
+        },
+        {
+          "eventPageId": "a2b48836-287a-46c0-a6dd-20c2ef02b066",
+          "slug": "nigativ-vse-hity-44-04-03-27-moskva-base-moskva",
+          "city": "Москва"
+        }
+      ]
+    },
+    {
+      "key": "surdin_semikhatov",
+      "title": "Новый год с Владимиром Сурдиным и Алексеем Семихатовым",
+      "tourGroupId": "96db26df-651b-422b-ac1a-0c63b6e2c965",
+      "pageCount": 2,
+      "pages": [
+        {
+          "eventPageId": "717b59df-c07e-48a7-8fc2-aac828dc58cf",
+          "slug": "novyi-god-s-vladimirom-surdinym-i-alekseem-semihatovym-sankt-peterburg",
+          "city": "Санкт-Петербург"
+        },
+        {
+          "eventPageId": "f36cd8cf-dc6a-42f5-bf31-d86e9612b526",
+          "slug": "novyi-god-s-vladimirom-surdinym-i-alekseem-semihatovym-moskva",
+          "city": "Москва"
+        }
+      ]
+    },
+    {
+      "key": "naik_borzov",
+      "title": "Найк Борзов - Большой новогодний концерт",
+      "tourGroupId": "815522c2-978b-4950-8233-12d482119690",
+      "pageCount": 2,
+      "pages": [
+        {
+          "eventPageId": "a3a383ea-87a8-4b02-805b-7e346e374e19",
+          "slug": "naik-borzov-bolshoi-novogodnii-koncert-nizhniy-novgorod",
+          "city": "Нижний Новгород"
+        },
+        {
+          "eventPageId": "b58d977e-c9d2-4e1c-b0ba-2a1105f7153c",
+          "slug": "naik-borzov-bolshoi-novogodnii-koncert-ekaterinburg",
+          "city": "Екатеринбург"
+        }
+      ]
+    },
+    {
+      "key": "helvegen",
+      "title": "HELVEGEN - презентация нового альбома",
+      "tourGroupId": "73c27b40-9726-4728-afa7-86857f77bf05",
+      "pageCount": 2,
+      "pages": [
+        {
+          "eventPageId": "1412abfb-be64-4e9f-97b8-babb0e436cbf",
+          "slug": "helvegen-prezentaciya-novogo-alboma-sankt-peterburg",
+          "city": "Санкт-Петербург"
+        },
+        {
+          "eventPageId": "6978ed1d-dfb7-44ad-9fe1-059aa8dd7edd",
+          "slug": "helvegen-prezentaciya-novogo-alboma-moskva",
+          "city": "Москва"
+        }
+      ]
+    }
+  ],
+  "verified": [
+    {
+      "groupKey": "anna_asti",
+      "eventPageId": "0e89916b-f9f4-4626-9bbe-288aa3444337",
+      "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-vladivostok",
+      "city": "Владивосток",
+      "tourGroupId": "d3c693d8-cd51-4578-b89d-cfd0cd3fca19",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T06:29:16.603Z",
+      "events": 1
+    },
+    {
+      "groupKey": "anna_asti",
+      "eventPageId": "3b816506-41c1-4367-972d-07a486ef499d",
+      "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-tula",
+      "city": "Тула",
+      "tourGroupId": "d3c693d8-cd51-4578-b89d-cfd0cd3fca19",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T06:29:17.426Z",
+      "events": 1
+    },
+    {
+      "groupKey": "anna_asti",
+      "eventPageId": "7632040e-efaa-42d6-ba17-53c2dd58932a",
+      "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-voronezh",
+      "city": "Воронеж",
+      "tourGroupId": "d3c693d8-cd51-4578-b89d-cfd0cd3fca19",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T06:29:16.727Z",
+      "events": 1
+    },
+    {
+      "groupKey": "anna_asti",
+      "eventPageId": "95d20c5c-51c0-4007-9ae8-467e6afc3fce",
+      "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-ryazan",
+      "city": "Рязань",
+      "tourGroupId": "d3c693d8-cd51-4578-b89d-cfd0cd3fca19",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T06:29:17.263Z",
+      "events": 1
+    },
+    {
+      "groupKey": "anna_asti",
+      "eventPageId": "cba0fb4e-fe37-4fda-a70c-f02c35cd5867",
+      "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-chelyabinsk",
+      "city": "Челябинск",
+      "tourGroupId": "d3c693d8-cd51-4578-b89d-cfd0cd3fca19",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T06:29:17.751Z",
+      "events": 1
+    },
+    {
+      "groupKey": "anna_asti",
+      "eventPageId": "cd8d9b6d-d61b-4c06-99e1-ab6e59207fac",
+      "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-krasnodar",
+      "city": "Краснодар",
+      "tourGroupId": "d3c693d8-cd51-4578-b89d-cfd0cd3fca19",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T06:29:16.888Z",
+      "events": 1
+    },
+    {
+      "groupKey": "anna_asti",
+      "eventPageId": "d7a18f1c-f1f8-4f3d-91f6-5177b9a5dfbd",
+      "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-kurgan",
+      "city": "Курган",
+      "tourGroupId": "d3c693d8-cd51-4578-b89d-cfd0cd3fca19",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T06:29:17.090Z",
+      "events": 1
+    },
+    {
+      "groupKey": "anna_asti",
+      "eventPageId": "ea2c25aa-4e4f-4135-a029-a1bcf5da4212",
+      "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-habarovsk",
+      "city": "Хабаровск",
+      "tourGroupId": "d3c693d8-cd51-4578-b89d-cfd0cd3fca19",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T06:29:17.623Z",
+      "events": 1
+    },
+    {
+      "groupKey": "rain_dance",
+      "eventPageId": "08c18b93-de50-4425-9b53-119e2eae0f01",
+      "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-vidnoe",
+      "city": "Видное",
+      "tourGroupId": "bfedd02b-e3bb-40a0-bf4d-f4e5259652d5",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "events": 1
+    },
+    {
+      "groupKey": "rain_dance",
+      "eventPageId": "1cf11495-e6d6-4e09-a702-b39b70906350",
+      "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-samara",
+      "city": "Самара",
+      "tourGroupId": "bfedd02b-e3bb-40a0-bf4d-f4e5259652d5",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "events": 1
+    },
+    {
+      "groupKey": "rain_dance",
+      "eventPageId": "20a56d74-eecc-4a9a-ab54-15a83267deb5",
+      "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-bataysk",
+      "city": "Батайск",
+      "tourGroupId": "bfedd02b-e3bb-40a0-bf4d-f4e5259652d5",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T06:29:18.301Z",
+      "events": 1
+    },
+    {
+      "groupKey": "rain_dance",
+      "eventPageId": "298e5b4d-aff6-45ab-ac17-90b97e59629d",
+      "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-osinniki",
+      "city": "Осинники",
+      "tourGroupId": "bfedd02b-e3bb-40a0-bf4d-f4e5259652d5",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "events": 1
+    },
+    {
+      "groupKey": "rain_dance",
+      "eventPageId": "29e8fc7f-42f6-41d3-8a31-1e7736910187",
+      "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-irkutsk",
+      "city": "Иркутск",
+      "tourGroupId": "bfedd02b-e3bb-40a0-bf4d-f4e5259652d5",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "events": 1
+    },
+    {
+      "groupKey": "rain_dance",
+      "eventPageId": "35983553-77fc-4c98-90bf-7c5702965226",
+      "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-fryazino",
+      "city": "Фрязино",
+      "tourGroupId": "bfedd02b-e3bb-40a0-bf4d-f4e5259652d5",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "events": 1
+    },
+    {
+      "groupKey": "rain_dance",
+      "eventPageId": "46894ae1-e4a0-46b9-aa31-d45f68b32944",
+      "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-lobnya",
+      "city": "Лобня",
+      "tourGroupId": "bfedd02b-e3bb-40a0-bf4d-f4e5259652d5",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "events": 1
+    },
+    {
+      "groupKey": "rain_dance",
+      "eventPageId": "598fc7e8-0587-4cbf-835c-e8186c236198",
+      "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-kovrov",
+      "city": "Ковров",
+      "tourGroupId": "bfedd02b-e3bb-40a0-bf4d-f4e5259652d5",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "events": 1
+    },
+    {
+      "groupKey": "rain_dance",
+      "eventPageId": "81982e23-542d-4ea3-a49b-0b5c16681a2d",
+      "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-prokopevsk",
+      "city": "Прокопьевск",
+      "tourGroupId": "bfedd02b-e3bb-40a0-bf4d-f4e5259652d5",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-12T20:54:22.755Z",
+      "events": 1
+    },
+    {
+      "groupKey": "rain_dance",
+      "eventPageId": "cbaf67ae-81e9-440e-b8c5-feb67f30fbbf",
+      "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-ryazan",
+      "city": "Рязань",
+      "tourGroupId": "bfedd02b-e3bb-40a0-bf4d-f4e5259652d5",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "events": 1
+    },
+    {
+      "groupKey": "rain_dance",
+      "eventPageId": "cd2a54da-9039-4066-9646-866092f33d95",
+      "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-tver",
+      "city": "Тверь",
+      "tourGroupId": "bfedd02b-e3bb-40a0-bf4d-f4e5259652d5",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "events": 1
+    },
+    {
+      "groupKey": "rain_dance",
+      "eventPageId": "dd5bb03a-1952-406b-8190-9eb7f0533e58",
+      "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-rossosh",
+      "city": "Россошь",
+      "tourGroupId": "bfedd02b-e3bb-40a0-bf4d-f4e5259652d5",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "events": 1
+    },
+    {
+      "groupKey": "rain_dance",
+      "eventPageId": "e09609a9-da05-4d6b-98fa-73d93220d220",
+      "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-belovo",
+      "city": "Белово",
+      "tourGroupId": "bfedd02b-e3bb-40a0-bf4d-f4e5259652d5",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "events": 1
+    },
+    {
+      "groupKey": "rain_dance",
+      "eventPageId": "f6844a5f-fee2-4dbc-bb0e-fca1960b86fd",
+      "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-voronezh",
+      "city": "Воронеж",
+      "tourGroupId": "bfedd02b-e3bb-40a0-bf4d-f4e5259652d5",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "events": 1
+    },
+    {
+      "groupKey": "sveta",
+      "eventPageId": "22056081-8714-4dbf-a06f-044eeb7e1ec9",
+      "slug": "sveta-bolshoi-solnyi-koncert-omsk",
+      "city": "Омск",
+      "tourGroupId": "311e2ed3-8c0d-48ab-b2e3-2aee805a68de",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "events": 1
+    },
+    {
+      "groupKey": "sveta",
+      "eventPageId": "2966620b-26f5-4d50-9294-09530727481a",
+      "slug": "sveta-bolshoi-solnyi-koncert-surgut",
+      "city": "Сургут",
+      "tourGroupId": "311e2ed3-8c0d-48ab-b2e3-2aee805a68de",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "events": 1
+    },
+    {
+      "groupKey": "sveta",
+      "eventPageId": "5eaee4c1-5103-477b-a6f7-89adb4699adb",
+      "slug": "sveta-bolshoi-solnyi-koncert-krasnodar",
+      "city": "Краснодар",
+      "tourGroupId": "311e2ed3-8c0d-48ab-b2e3-2aee805a68de",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-12T20:39:39.808Z",
+      "events": 1
+    },
+    {
+      "groupKey": "sveta",
+      "eventPageId": "6686c1d1-33c3-492d-a815-982a84584c6b",
+      "slug": "sveta-bolshoi-solnyi-koncert-ryazan",
+      "city": "Рязань",
+      "tourGroupId": "311e2ed3-8c0d-48ab-b2e3-2aee805a68de",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-12T19:37:22.443Z",
+      "events": 1
+    },
+    {
+      "groupKey": "sveta",
+      "eventPageId": "7cdd4dc8-a09d-4a02-8985-34463e052bcc",
+      "slug": "sveta-bolshoi-solnyi-koncert-lipeck",
+      "city": "Липецк",
+      "tourGroupId": "311e2ed3-8c0d-48ab-b2e3-2aee805a68de",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "events": 1
+    },
+    {
+      "groupKey": "sveta",
+      "eventPageId": "e3ba8d7f-b817-4837-a8bb-b1d22704cff6",
+      "slug": "sveta-bolshoi-solnyi-koncert-voronezh",
+      "city": "Воронеж",
+      "tourGroupId": "311e2ed3-8c0d-48ab-b2e3-2aee805a68de",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "events": 1
+    },
+    {
+      "groupKey": "sveta",
+      "eventPageId": "f02eacbe-43c0-4dae-8a3c-2457726a4942",
+      "slug": "sveta-bolshoi-solnyi-koncert-tula",
+      "city": "Тула",
+      "tourGroupId": "311e2ed3-8c0d-48ab-b2e3-2aee805a68de",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "events": 1
+    },
+    {
+      "groupKey": "rock_symphony",
+      "eventPageId": "48c818c1-d023-4167-bfd1-8bc3e489fe44",
+      "slug": "simfoniya-roka-akt-pervyi-cheboksary",
+      "city": "Чебоксары",
+      "tourGroupId": "9ca50496-9d97-472c-a47d-f563f5306067",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-12T20:39:34.742Z",
+      "events": 1
+    },
+    {
+      "groupKey": "rock_symphony",
+      "eventPageId": "6a96b975-0578-484d-ae67-0b68f9be0234",
+      "slug": "simfoniya-roka-akt-pervyi-volzhsk",
+      "city": "Волжск",
+      "tourGroupId": "9ca50496-9d97-472c-a47d-f563f5306067",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-12T19:37:32.723Z",
+      "events": 1
+    },
+    {
+      "groupKey": "rock_symphony",
+      "eventPageId": "9dd73a25-5a85-4922-98da-7339f96024ee",
+      "slug": "simfoniya-roka-akt-pervyi-ulyanovsk",
+      "city": "Ульяновск",
+      "tourGroupId": "9ca50496-9d97-472c-a47d-f563f5306067",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "events": 1
+    },
+    {
+      "groupKey": "reshetun",
+      "eventPageId": "52bbc926-af2c-4607-9383-2f8115b0b383",
+      "slug": "aleksei-reshetun-novyi-god-po-sudebno-medicinske-moskva",
+      "city": "Москва",
+      "tourGroupId": "c429fda0-35a3-4673-8a02-b3929fbbcf85",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-10T05:00:29.452Z",
+      "events": 1
+    },
+    {
+      "groupKey": "reshetun",
+      "eventPageId": "cd321ce8-6706-491a-bc76-df931489a9ea",
+      "slug": "aleksei-reshetun-novyi-god-po-sudebno-medicinski-sankt-peterburg",
+      "city": "Санкт-Петербург",
+      "tourGroupId": "c429fda0-35a3-4673-8a02-b3929fbbcf85",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-10T06:18:03.998Z",
+      "events": 1
+    },
+    {
+      "groupKey": "nigativ",
+      "eventPageId": "1387b4f6-8afa-41ad-87c8-552abacf7fb9",
+      "slug": "nigativ-vse-hity-44-12-03-27-sankt-peterburg-aurora-concert-hall-sankt-peterburg",
+      "city": "Санкт-Петербург",
+      "tourGroupId": "22d74de4-6376-419e-9b37-cf19ffb45e66",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T06:29:20.780Z",
+      "events": 1
+    },
+    {
+      "groupKey": "nigativ",
+      "eventPageId": "a2b48836-287a-46c0-a6dd-20c2ef02b066",
+      "slug": "nigativ-vse-hity-44-04-03-27-moskva-base-moskva",
+      "city": "Москва",
+      "tourGroupId": "22d74de4-6376-419e-9b37-cf19ffb45e66",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T06:29:20.647Z",
+      "events": 1
+    },
+    {
+      "groupKey": "surdin_semikhatov",
+      "eventPageId": "717b59df-c07e-48a7-8fc2-aac828dc58cf",
+      "slug": "novyi-god-s-vladimirom-surdinym-i-alekseem-semihatovym-sankt-peterburg",
+      "city": "Санкт-Петербург",
+      "tourGroupId": "96db26df-651b-422b-ac1a-0c63b6e2c965",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-10T05:00:27.949Z",
+      "events": 1
+    },
+    {
+      "groupKey": "surdin_semikhatov",
+      "eventPageId": "f36cd8cf-dc6a-42f5-bf31-d86e9612b526",
+      "slug": "novyi-god-s-vladimirom-surdinym-i-alekseem-semihatovym-moskva",
+      "city": "Москва",
+      "tourGroupId": "96db26df-651b-422b-ac1a-0c63b6e2c965",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-10T05:00:25.866Z",
+      "events": 1
+    },
+    {
+      "groupKey": "naik_borzov",
+      "eventPageId": "a3a383ea-87a8-4b02-805b-7e346e374e19",
+      "slug": "naik-borzov-bolshoi-novogodnii-koncert-nizhniy-novgorod",
+      "city": "Нижний Новгород",
+      "tourGroupId": "815522c2-978b-4950-8233-12d482119690",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "events": 1
+    },
+    {
+      "groupKey": "naik_borzov",
+      "eventPageId": "b58d977e-c9d2-4e1c-b0ba-2a1105f7153c",
+      "slug": "naik-borzov-bolshoi-novogodnii-koncert-ekaterinburg",
+      "city": "Екатеринбург",
+      "tourGroupId": "815522c2-978b-4950-8233-12d482119690",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T06:29:20.515Z",
+      "events": 1
+    },
+    {
+      "groupKey": "helvegen",
+      "eventPageId": "1412abfb-be64-4e9f-97b8-babb0e436cbf",
+      "slug": "helvegen-prezentaciya-novogo-alboma-sankt-peterburg",
+      "city": "Санкт-Петербург",
+      "tourGroupId": "73c27b40-9726-4728-afa7-86857f77bf05",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-12T19:37:36.309Z",
+      "events": 1
+    },
+    {
+      "groupKey": "helvegen",
+      "eventPageId": "6978ed1d-dfb7-44ad-9fe1-059aa8dd7edd",
+      "slug": "helvegen-prezentaciya-novogo-alboma-moskva",
+      "city": "Москва",
+      "tourGroupId": "73c27b40-9726-4728-afa7-86857f77bf05",
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "events": 1
+    }
+  ],
+  "cacheInvalidation": {
+    "ok": true,
+    "status": 200,
+    "payload": {
+      "ok": true,
+      "warm": "none",
+      "reason": "event page tour groups assigned"
+    }
+  }
+}

@@ -1,14 +1,60 @@
 # Документация Daibilet
 
+[Roadmap Daibilet — сводка на 2026-10](./roadmap-2026-10.md)
+[SEO-аудит 18.10.2026: кэш sitemap, каноникал Москвы, главная no-store](./seo-audit-2026-10-18.md)
+[Карта соответствий PDP событий, слотов и legacy URL - 27.10.2026](./event-pdp-url-correspondence-audit-2026-10-27.md)
+[EventPage: схема, API, редактор, продажи и блокер Event ID - 27.10.2026](./event-page-foundation-2026-10-27.md)
+[Матрица Event ID → EventPage и решения по типам событий - 03.11.2026](./eventpage-event-matrix-2026-11-03.md)
+[Статус rollout EventPage: production drafts, staging, CI и оставшиеся SEO-шаги - 03.11.2026](./eventpage-rollout-status-2026-11-03.md)
+[Партия: Музей матрёшки и речные маршруты - 03.11.2026](./eventpage-museum-river-review-2026-11-03.md)
+[Построчные решения по 19 Event ID этой партии](./eventpage-museum-river-decisions-2026-11-03.csv)
+[Стендап и музыканты: полная очередь проверки EventPage](./eventpage-performer-review-2026-11-03.md)
+[Кластеры исполнителей и 641 Event ID](./eventpage-performer-clusters-2026-11-03.csv)
+[Triage Event ID, текущих и исторических URL - 03.11.2026](./eventpage-link-triage-2026-11-03.md)
+[Разовые события: живые, пустые и прошедшие - production snapshot 03.11.2026](./single-events-live-and-expired-policy-2026-11-03.md)
+[PDP событий в админке и ЛК поставщика - план реализации](./event-pdp-admin-supplier-workbench-2026-10.md)
+[Подготовка schema_alignment к прод-БД - 17.10.2026](./schema-alignment-prod-fix-2026-10-17.md)
+[Сверка схемы и миграций каталога и финконтура - 17.10.2026](./finance-schema-unification-2026-10-17.md)
+[Places: типизация, сверка PDP и передача Cline](./places-taxonomy-cline-handoff-2026-10.md)
+[Выпуск Places и сверка PDP - 15.10.2026](./places-release-2026-10-15.md)
+[Доступ сотрудников к админке: аудит legacy и проект RBAC](./admin-rbac-design-2026-10.md)
+[Нагрузка CPU на MSK - 15.10.2026](./cpu-load-msk.md)
+[Зависание SSR и ответы 502 роботам - 16.10.2026](./ssr-hang-crawler-2026-10-16.md)
+[Teplohod: baseline Sharp и Next Image Optimizer - 21.10.2026](./teplohod-image-optimization-experiment-2026-10-21.md)
+[Teplohod PDP: выборочные статические WebP обложки - 21.10.2026](./teplohod-pdp-webp-pilot-2026-10-21.md)
+[Городские хабы: сверка коммитов и незавершённых правок - 12.11.2026](./city-hub-work-log-2026-11-12.md)
+[Архив изображений и переход на активную статику - 13.11.2026](./image-archive-runtime-migration-2026-11-13.md)
+[Карта рабочих копий и переносов - 10.11.2026](./local-workspace-inventory-2026-11-10.md)
+[Сверка tours с активной копией Daibilet - 10.11.2026](./tours-vs-daibilet-audit-2026-11-10.md)
+[Диагностика production-сети и диска](./production-network-and-disk-diagnostics.md)
+[Индексируемые EventPage с активными рерайтами - 12.11.2026](./eventpage-rewrite-recrawl-queue-2026-11-12.md)
+[Редакторский батч EventPage: 30 текстов, источники и сверка - 11.11.2026](./eventpage-rewrite-batch-30-source-audit-2026-11-11.md)
+[Рерайты EventPage: production apply и редакционные источники - 05.11.2026](./eventpage-rewrite-production-apply-2026-11-05.md)
+[Аудит источников редакционных EventPage - 04.11.2026](./eventpage-editorial-source-audit-2026-11-04.md)
+[Новогодние EventPage B01–B03: production apply - 10.11.2026](./archives/new-year-batches-b01-b03-production-2026-11-10.md)
+[Архив редакционных правок EventPage - 09–10.11.2026](./eventpage-editorial-archive-2026-11-09-10.md)
+[ISR 500 на удалённых событиях - 21.10.2026](./event-not-found-ssr-regression-2026-10-21.md)
+
 Навигация по репозиторию `Twisterrrrr/daibilet`.
 
 ## С чего начать
 
 1. **[current-state.md](./current-state.md)** — текущее состояние, ветки, блокеры
-2. **[decision-log.md](./decision-log.md)** — зафиксированные решения
+2. **[Project.md](./Project.md)** — архитектура и этапы F
+3. **[Tasktracker.md](./Tasktracker.md)** — прогресс задач
+4. **[Diary.md](./Diary.md)** — технический дневник
+5. **[decision-log.md](./decision-log.md)** — зафиксированные решения
 3. **[launch-qa-and-deploy.md](./launch-qa-and-deploy.md)** — smoke перед продажами
 4. **[deploy-timeweb.md](./deploy-timeweb.md)** — prod на Timeweb
 5. **[deploy-staging.md](./deploy-staging.md)** — staging `/opt/daibilet-staging`
+
+## Ops / production readiness
+
+| Документ | Описание |
+|----------|----------|
+| **[production-readiness-checklist.md](./production-readiness-checklist.md)** | Чеклист «демо vs prod» (Habr), owners, ROI |
+| **[incident-runbook.md](./incident-runbook.md)** | Быстрая диагностика и rollback MSK |
+| **[codex-prod-readiness-handoff.md](./codex-prod-readiness-handoff.md)** | CODEX: cron на prod, auth audit, backup drill |
 
 ## Checkpoint / аудит
 
@@ -23,8 +69,10 @@
 |----------|----------|
 | [phases/README.md](./phases/README.md) | Дорожная карта фаз A–E |
 | [phases/phase-e-prisma-runtime.md](./phases/phase-e-prisma-runtime.md) | **Фаза E (закрыта):** TS flags, parity, staging DB |
-| [phases/phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md) | **Фаза F:** Next full-stack, SEO SSR |
-| [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md) | **Codex:** Phase 2 finance в Next monorepo |
+| [phases/phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md) | **Фаза F:** Next full-stack, SEO SSR (F2 ✅) |
+| [phases/phase-f3-cutover-checklist.md](./phases/phase-f3-cutover-checklist.md) | **F3:** cutover staging/prod |
+| [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md) | **Codex:** `codex/phase2-foundation`, cherry-pick после F3 |
+| [codex-cherry-pick-plan.md](./codex-cherry-pick-plan.md) | План cherry-pick Codex → `feat/next-monorepo` |
 | [phases/phase-a-widget-readiness.md](./phases/phase-a-widget-readiness.md) | **Фаза A (закрыта):** API-проверка виджетов |
 | [phases/phase-b-import-sync.md](./phases/phase-b-import-sync.md) | **Фаза B (закрыта):** sync → БД, ProviderLink |
 | [phases/phase-c-data-integrity.md](./phases/phase-c-data-integrity.md) | **Фаза C (закрыта):** инварианты, import guards |
@@ -45,14 +93,23 @@
 
 | Документ | Описание |
 |----------|----------|
+| [My-day v2: аудит архитектуры и план перехода](./my-day-v2-architecture-2026-11-13.md) | Аудит V1 и безопасный план развития по шаблону v2 |
+| [catalog-location-venue-canon.md](./catalog-location-venue-canon.md) | **Канон:** Локация vs Площадка / антидубли |
+| [myday-commercial-canon.md](./myday-commercial-canon.md) | Канон «Мой день» (planner + checklist) |
 | [mvp-spec.md](./mvp-spec.md) | Продуктовая спецификация |
 | [seo-public-mvp.md](./seo-public-mvp.md) | SEO public |
+| [artist-bios.md](./artist-bios.md) | Био исполнителей: правила, покрытие, батч |
+| [organizer-email-intake.md](./organizer-email-intake.md) | Приём писем организаторов: IMAP → staging → apply |
 | [admin-lovable-v4-mvp-plan.md](./admin-lovable-v4-mvp-plan.md) | План админки |
 
 ## Интеграции
 
 | Документ | Описание |
 |----------|----------|
+| [catalog-finance-projection.md](./catalog-finance-projection.md) | **Lock:** граница catalog ↔ finance, projection matrix, PurchaseProjection gap |
+| [museum-contract-readiness.md](./museum-contract-readiness.md) | **Museum-1:** роли/функции, Stage 0 Codex brief, Stage 1 schedule, Stage 2 LK |
+| [spb-finance-host.md](./spb-finance-host.md) | Host roles `.184` / `.159` / `.16` |
+| [phase-2-finance-supplier-blueprint.md](./phase-2-finance-supplier-blueprint.md) | Phase G product / checkout / supplier LC |
 | [integrations.md](./integrations.md) | Ticketscloud, Teplohod |
 | [ticketscloud-import.md](./ticketscloud-import.md) | TC import |
 | [event-extraction.md](./event-extraction.md) | Правила извлечения событий |
@@ -68,3 +125,7 @@
 
 - [apps/public/README.md](../apps/public/README.md)
 - [apps/admin/README.md](../apps/admin/README.md)
+
+## Атрибуция иконок
+
+Favicon / PWA-иконки (`apps/web/public/favicon.*`, `icon-*.png`, `apple-touch-icon.png`): силуэт билета по [Flaticon ticket_1912](https://www.flaticon.com/ru/free-icon/ticket_1912) (автор **Freepik** / **Flaticon**), перекрашен в бренд-синий `#4A7FD4` (`DAIBILET_LOGO_BLUE`), повёрнут на −45° с крупным fill (~88–90% кадра).

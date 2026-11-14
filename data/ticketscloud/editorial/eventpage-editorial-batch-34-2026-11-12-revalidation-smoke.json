@@ -1,0 +1,433 @@
+{
+  "cache": {
+    "ok": true,
+    "warm": "none",
+    "reason": "EventPage editorial batch 34 publication"
+  },
+  "revalidated": 30,
+  "indexNowQueued": 30,
+  "results": [
+    {
+      "slug": "cirk-buduschego-za-granyu-vozmozhnogo-megion",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "interaktivnyi-spektakl-kolobok-ot-1-do-4-let-sankt-peterburg-2",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "shou-legendy-russkogo-roka-oktyabrskiy-respublika-bashkortostan",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-liskah-liski",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-maikop-maykop",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "oge-po-litre-spektakl-dlya-9-10-11-klassov-po-pese-yulii-voronovoi-sankt-peterburg",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "voshititelnye-istorii-parikmahera-nakonechnikova-spektakl-komediya-sankt-peterburg",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "shou-fokusov-i-yumora-moskva-2",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "burlesk-detektiv-ubiistvenno-krasiva-moskva",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "spektakl-levoryuciya-tolyatti",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "minecraft-show-mainkraft-shou-moskva",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "golaya-ufa",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "balet-spyaschaya-krasavica-sankt-peterburg",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "cirk-na-ldu-tver",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "immersivnoe-shou-spektakl-kartina-na-million-moskva",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "tablao-de-las-llamas-unikalnyi-spektakl-flamenko-chistaya-strast-i-improvizaciya-moskva",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "metel-muzykalno-dramaticheskaya-fantaziya-po-povesti-a-s-pushkina-sankt-peterburg",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "gala-shou-a-lya-russ-v-plameni-1000-svechei-tobolsk",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "vecher-valsa-gala-koncert-solistov-baleta-sankt-peterburg",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "byt-chelovekom-sankt-peterburg-2",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "semeinyi-spektakl-skazka-o-poteryannom-vremeni-tolyatti",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "u-nas-v-pyutyurbyurge-literaturno-muzykalnyi-spektakl-s-komicheskim-ishodom-po-yumoristicheskim-ras-sankt-peterburg",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "smotri-naverh-spektakl-po-motivam-rasskazov-reya-bredberi-sankt-peterburg",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "interaktivnyi-spektakl-teremok-ot-1-do-4-let-sankt-peterburg",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-prokopevsk",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "gorko-komediinyi-spektakl-dueta-nebolet-chelyabinsk",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-rasslabsya-tak-u-vseh-chita",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "komediya-kogda-angely-shutyat-gatchina",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "koncert-spektakl-pisma-neznakomke-moskva",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "gore-ot-uma-moskva",
+      "ok": true,
+      "indexNowQueued": true
+    }
+  ],
+  "smoke": [
+    {
+      "slug": "cirk-buduschego-za-granyu-vozmozhnogo-megion",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/cirk-buduschego-za-granyu-vozmozhnogo-megion",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "interaktivnyi-spektakl-kolobok-ot-1-do-4-let-sankt-peterburg-2",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/interaktivnyi-spektakl-kolobok-ot-1-do-4-let-sankt-peterburg-2",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "shou-legendy-russkogo-roka-oktyabrskiy-respublika-bashkortostan",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/shou-legendy-russkogo-roka-oktyabrskiy-respublika-bashkortostan",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-liskah-liski",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-liskah-liski",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-maikop-maykop",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-maikop-maykop",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "oge-po-litre-spektakl-dlya-9-10-11-klassov-po-pese-yulii-voronovoi-sankt-peterburg",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/oge-po-litre-spektakl-dlya-9-10-11-klassov-po-pese-yulii-voronovoi-sankt-peterburg",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "voshititelnye-istorii-parikmahera-nakonechnikova-spektakl-komediya-sankt-peterburg",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/voshititelnye-istorii-parikmahera-nakonechnikova-spektakl-komediya-sankt-peterburg",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "shou-fokusov-i-yumora-moskva-2",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/shou-fokusov-i-yumora-moskva-2",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "burlesk-detektiv-ubiistvenno-krasiva-moskva",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/burlesk-detektiv-ubiistvenno-krasiva-moskva",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "spektakl-levoryuciya-tolyatti",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/spektakl-levoryuciya-tolyatti",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "minecraft-show-mainkraft-shou-moskva",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/minecraft-show-mainkraft-shou-moskva",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "golaya-ufa",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/golaya-ufa",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "balet-spyaschaya-krasavica-sankt-peterburg",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/balet-spyaschaya-krasavica-sankt-peterburg",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "cirk-na-ldu-tver",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/cirk-na-ldu-tver",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "immersivnoe-shou-spektakl-kartina-na-million-moskva",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/immersivnoe-shou-spektakl-kartina-na-million-moskva",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "tablao-de-las-llamas-unikalnyi-spektakl-flamenko-chistaya-strast-i-improvizaciya-moskva",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/tablao-de-las-llamas-unikalnyi-spektakl-flamenko-chistaya-strast-i-improvizaciya-moskva",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "metel-muzykalno-dramaticheskaya-fantaziya-po-povesti-a-s-pushkina-sankt-peterburg",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/metel-muzykalno-dramaticheskaya-fantaziya-po-povesti-a-s-pushkina-sankt-peterburg",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "gala-shou-a-lya-russ-v-plameni-1000-svechei-tobolsk",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/gala-shou-a-lya-russ-v-plameni-1000-svechei-tobolsk",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "vecher-valsa-gala-koncert-solistov-baleta-sankt-peterburg",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/vecher-valsa-gala-koncert-solistov-baleta-sankt-peterburg",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "byt-chelovekom-sankt-peterburg-2",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/byt-chelovekom-sankt-peterburg-2",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "semeinyi-spektakl-skazka-o-poteryannom-vremeni-tolyatti",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/semeinyi-spektakl-skazka-o-poteryannom-vremeni-tolyatti",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "u-nas-v-pyutyurbyurge-literaturno-muzykalnyi-spektakl-s-komicheskim-ishodom-po-yumoristicheskim-ras-sankt-peterburg",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/u-nas-v-pyutyurbyurge-literaturno-muzykalnyi-spektakl-s-komicheskim-ishodom-po-yumoristicheskim-ras-sankt-peterburg",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "smotri-naverh-spektakl-po-motivam-rasskazov-reya-bredberi-sankt-peterburg",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/smotri-naverh-spektakl-po-motivam-rasskazov-reya-bredberi-sankt-peterburg",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "interaktivnyi-spektakl-teremok-ot-1-do-4-let-sankt-peterburg",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/interaktivnyi-spektakl-teremok-ot-1-do-4-let-sankt-peterburg",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-prokopevsk",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-prokopevsk",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "gorko-komediinyi-spektakl-dueta-nebolet-chelyabinsk",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/gorko-komediinyi-spektakl-dueta-nebolet-chelyabinsk",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-rasslabsya-tak-u-vseh-chita",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-rasslabsya-tak-u-vseh-chita",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "komediya-kogda-angely-shutyat-gatchina",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/komediya-kogda-angely-shutyat-gatchina",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "koncert-spektakl-pisma-neznakomke-moskva",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/koncert-spektakl-pisma-neznakomke-moskva",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "gore-ot-uma-moskva",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/gore-ot-uma-moskva",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    }
+  ]
+}

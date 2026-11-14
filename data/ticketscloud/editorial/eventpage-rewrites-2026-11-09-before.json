@@ -1,0 +1,834 @@
+{
+  "capturedAt": "2026-11-09T20:45:05.250Z",
+  "purpose": "Pre-rewrite production archive. Legacy EventOverride text retained; EventPage content is the active editorial rewrite.",
+  "items": {
+    "evt_6acfd363cbc0880ed1ac87ce": {
+      "eventId": "evt_6acfd363cbc0880ed1ac87ce",
+      "eventPageId": "d5991ae8-4564-4633-8c4e-46110bbfdc7c",
+      "slug": "hamdam-sabirov-peshta-sankt-peterburg",
+      "sourceTitle": "Хамдам Собиров. PESHTA",
+      "sourceDescription": null,
+      "legacyOverrideDescription": null,
+      "sourceSnapshot": {
+        "id": "evt_6acfd363cbc0880ed1ac87ce",
+        "kind": "SINGLE",
+        "slug": "хамдам-сабиров-peshta-6acfd363cbc0880ed1ac87ce",
+        "seoH1": null,
+        "title": "Хамдам Собиров. PESHTA",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6acfd363cbc0880ed1ac87ce",
+            "externalId": "6acfd363cbc0880ed1ac87ce",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_62d65bb25e66b48e387e68b6",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ad285e27463c1ae5e06d974.png",
+        "seoTitle": null,
+        "cityTitle": "Санкт-Петербург",
+        "venueTitle": "Клуб Саунд",
+        "description": null,
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Кожевенная линия, д. 40Б",
+        "canonicalPath": null,
+        "primaryCityId": "city_498817",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "Хамдам Собиров. PESHTA",
+        "seoH1": "Хамдам Собиров. PESHTA",
+        "seoTitle": "Хамдам Собиров. PESHTA | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/hamdam-sabirov-peshta-sankt-peterburg",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "430a660e-c1e8-4270-b537-bde5e2cf3be1",
+          "eventId": "evt_6acfd363cbc0880ed1ac87ce",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_6acfd363cbc0880ed1ac87ce",
+            "kind": "SINGLE",
+            "slug": "хамдам-сабиров-peshta-6acfd363cbc0880ed1ac87ce",
+            "seoH1": null,
+            "title": "Хамдам Собиров. PESHTA",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6acfd363cbc0880ed1ac87ce",
+                "externalId": "6acfd363cbc0880ed1ac87ce",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_62d65bb25e66b48e387e68b6",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ad285e27463c1ae5e06d974.png",
+            "seoTitle": null,
+            "cityTitle": "Санкт-Петербург",
+            "venueTitle": "Клуб Саунд",
+            "description": null,
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "Кожевенная линия, д. 40Б",
+            "canonicalPath": null,
+            "primaryCityId": "city_498817",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": null
+          },
+          "createdAt": "2026-11-03T18:11:52.490Z",
+          "eventTitle": "Хамдам Собиров. PESHTA",
+          "eventSlug": "хамдам-сабиров-peshta-6acfd363cbc0880ed1ac87ce",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_498817",
+          "cityTitle": "Санкт-Петербург",
+          "venueId": "venue_62d65bb25e66b48e387e68b6",
+          "venueTitle": "Клуб Саунд",
+          "venueAddress": "Кожевенная линия, д. 40Б",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6acfd363cbc0880ed1ac87ce",
+              "externalId": "6acfd363cbc0880ed1ac87ce",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "title": "Хамдам Собиров. PESHTA",
+        "city": "Санкт-Петербург",
+        "venue": "Клуб Саунд",
+        "address": "Кожевенная линия, д. 40Б",
+        "ageLimit": "18",
+        "priceFromRub": 2700,
+        "offerMin": 2700,
+        "activeOffers": 18,
+        "futureSessions": [
+          {
+            "start": "2026-11-26T17:00:00",
+            "end": "2026-11-26T18:30:00"
+          }
+        ]
+      }
+    },
+    "evt_6abd140ddb782c0522c6be57": {
+      "eventId": "evt_6abd140ddb782c0522c6be57",
+      "eventPageId": "1387b4f6-8afa-41ad-87c8-552abacf7fb9",
+      "slug": "nigativ-vse-hity-44-12-03-27-sankt-peterburg-aurora-concert-hall-sankt-peterburg",
+      "sourceTitle": "Нигатив. Все хиты + 44 | 12.03.27 | Санкт-Петербург, Aurora Concert Hall",
+      "sourceDescription": null,
+      "legacyOverrideDescription": "Все хиты + 44 | 12.03.27 | Санкт-Петербург, Aurora Concert Hall - концерт в Санкт-Петербурге, на площадке «Aurora Concert Hall». Концерт - это встреча с музыкой вживую: артисты на сцене, полный звук и публика рядом. Атмосфера концерта сильно отличается от домашнего прослушивания: звук идёт напрямую со сцены, а зал реагирует на каждую композицию. Приходите компанией или вдвоём - концерт одинаково хорошо звучит и в одиночку, и в компании. Удобно после рабочего дня: переключиться и отдохнуть.\n\n## Практическая информация\n\n- Место - «Aurora Concert Hall», Санкт-Петербург\n- Адрес - Пироговская наб., 5/2\n- Продолжительность - около 150 минут\n- Возрастное ограничение - 16+\n- Билеты - от 2 500 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_6abd140ddb782c0522c6be57",
+        "kind": "SINGLE",
+        "slug": "нигатив-все-хиты-44-12-03-27-санкт-петербург-aurora-concert-hall-6abd140ddb782c0522c6be57",
+        "seoH1": null,
+        "title": "Нигатив. Все хиты + 44 | 12.03.27 | Санкт-Петербург, Aurora Concert Hall",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6abd140ddb782c0522c6be57",
+            "externalId": "6abd140ddb782c0522c6be57",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_56c487689cb5381d14f20bef",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6abd5a73fb9a5896827bfff0.jpg",
+        "seoTitle": null,
+        "cityTitle": "Санкт-Петербург",
+        "venueTitle": "Aurora Concert Hall",
+        "description": null,
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Пироговская наб., 5/2",
+        "canonicalPath": null,
+        "primaryCityId": "city_498817",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "Нигатив. Все хиты + 44 | 12.03.27 | Санкт-Петербург, Aurora Concert Hall",
+        "seoH1": "Нигатив. Все хиты + 44 | 12.03.27 | Санкт-Петербург, Aurora Concert Hall",
+        "seoTitle": "Нигатив. Все хиты + 44 | 12.03.27 | Санкт-Петербург, Aurora Concert Hall | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/nigativ-vse-hity-44-12-03-27-sankt-peterburg-aurora-concert-hall-sankt-peterburg",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "ac890eca-0c48-42cb-9542-1be7fce0c1b0",
+          "eventId": "evt_6abd140ddb782c0522c6be57",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_6abd140ddb782c0522c6be57",
+            "kind": "SINGLE",
+            "slug": "нигатив-все-хиты-44-12-03-27-санкт-петербург-aurora-concert-hall-6abd140ddb782c0522c6be57",
+            "seoH1": null,
+            "title": "Нигатив. Все хиты + 44 | 12.03.27 | Санкт-Петербург, Aurora Concert Hall",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6abd140ddb782c0522c6be57",
+                "externalId": "6abd140ddb782c0522c6be57",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_56c487689cb5381d14f20bef",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6abd5a73fb9a5896827bfff0.jpg",
+            "seoTitle": null,
+            "cityTitle": "Санкт-Петербург",
+            "venueTitle": "Aurora Concert Hall",
+            "description": null,
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "Пироговская наб., 5/2",
+            "canonicalPath": null,
+            "primaryCityId": "city_498817",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": null
+          },
+          "createdAt": "2026-11-03T20:41:12.341Z",
+          "eventTitle": "Нигатив. Все хиты + 44 | 12.03.27 | Санкт-Петербург, Aurora Concert Hall",
+          "eventSlug": "нигатив-все-хиты-44-12-03-27-санкт-петербург-aurora-concert-hall-6abd140ddb782c0522c6be57",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_498817",
+          "cityTitle": "Санкт-Петербург",
+          "venueId": "venue_56c487689cb5381d14f20bef",
+          "venueTitle": "Aurora Concert Hall",
+          "venueAddress": "Пироговская наб., 5/2",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6abd140ddb782c0522c6be57",
+              "externalId": "6abd140ddb782c0522c6be57",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "title": "Нигатив. Все хиты + 44 | 12.03.27 | Санкт-Петербург, Aurora Concert Hall",
+        "city": "Санкт-Петербург",
+        "venue": "Aurora Concert Hall",
+        "address": "Пироговская наб., 5/2",
+        "ageLimit": "16",
+        "priceFromRub": 2500,
+        "offerMin": 2500,
+        "activeOffers": 83,
+        "futureSessions": [
+          {
+            "start": "2027-03-12T17:00:00",
+            "end": "2027-03-12T19:30:00"
+          }
+        ]
+      }
+    },
+    "evt_6aca05407ebf70419a6b98e4": {
+      "eventId": "evt_6aca05407ebf70419a6b98e4",
+      "eventPageId": "a2b48836-287a-46c0-a6dd-20c2ef02b066",
+      "slug": "nigativ-vse-hity-44-04-03-27-moskva-base-moskva",
+      "sourceTitle": "Нигатив. Все хиты + 44 | 04.03.27 | Москва, BASE",
+      "sourceDescription": null,
+      "legacyOverrideDescription": "«Нигатив. Все хиты + 44 | 04.03.27 | Москва, BASE» - рэп-концерт.\n\n## Практическая информация\n\n- Место - «BASE», Москва\n- Адрес - ул. Орджоникидзе, 11с1\n- Продолжительность - около 150 минут\n- Возрастное ограничение - 18+\n- Билеты - от 2 000 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_6aca05407ebf70419a6b98e4",
+        "kind": "SINGLE",
+        "slug": "нигатив-все-хиты-44-04-03-27-москва-base-6aca05407ebf70419a6b98e4",
+        "seoH1": null,
+        "title": "Нигатив. Все хиты + 44 | 04.03.27 | Москва, BASE",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6aca05407ebf70419a6b98e4",
+            "externalId": "6aca05407ebf70419a6b98e4",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_63985a2fcae029a4d9184fee",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6aca053f91cd742fd08807fc.jpg",
+        "seoTitle": null,
+        "cityTitle": "Москва",
+        "venueTitle": "BASE",
+        "description": null,
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "ул. Орджоникидзе, 11с1",
+        "canonicalPath": null,
+        "primaryCityId": "city_524901",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "Нигатив. Все хиты + 44 | 04.03.27 | Москва, BASE",
+        "seoH1": "Нигатив. Все хиты + 44 | 04.03.27 | Москва, BASE",
+        "seoTitle": "Нигатив. Все хиты + 44 | 04.03.27 | Москва, BASE | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/nigativ-vse-hity-44-04-03-27-moskva-base-moskva",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "e664f49c-7c37-4d98-b3d4-7ae2a31e5d26",
+          "eventId": "evt_6aca05407ebf70419a6b98e4",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_6aca05407ebf70419a6b98e4",
+            "kind": "SINGLE",
+            "slug": "нигатив-все-хиты-44-04-03-27-москва-base-6aca05407ebf70419a6b98e4",
+            "seoH1": null,
+            "title": "Нигатив. Все хиты + 44 | 04.03.27 | Москва, BASE",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6aca05407ebf70419a6b98e4",
+                "externalId": "6aca05407ebf70419a6b98e4",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_63985a2fcae029a4d9184fee",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6aca053f91cd742fd08807fc.jpg",
+            "seoTitle": null,
+            "cityTitle": "Москва",
+            "venueTitle": "BASE",
+            "description": null,
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "ул. Орджоникидзе, 11с1",
+            "canonicalPath": null,
+            "primaryCityId": "city_524901",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": null
+          },
+          "createdAt": "2026-11-03T20:41:43.218Z",
+          "eventTitle": "Нигатив. Все хиты + 44 | 04.03.27 | Москва, BASE",
+          "eventSlug": "нигатив-все-хиты-44-04-03-27-москва-base-6aca05407ebf70419a6b98e4",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_524901",
+          "cityTitle": "Москва",
+          "venueId": "venue_63985a2fcae029a4d9184fee",
+          "venueTitle": "BASE",
+          "venueAddress": "ул. Орджоникидзе, 11с1",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6aca05407ebf70419a6b98e4",
+              "externalId": "6aca05407ebf70419a6b98e4",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "title": "Нигатив. Все хиты + 44 | 04.03.27 | Москва, BASE",
+        "city": "Москва",
+        "venue": "BASE",
+        "address": "ул. Орджоникидзе, 11с1",
+        "ageLimit": "18",
+        "priceFromRub": 2000,
+        "offerMin": 2000,
+        "activeOffers": 18,
+        "futureSessions": [
+          {
+            "start": "2027-03-04T17:00:00",
+            "end": "2027-03-04T19:30:00"
+          }
+        ]
+      }
+    },
+    "evt_6a95740f0ca3c3a0893ffc7b": {
+      "eventId": "evt_6a95740f0ca3c3a0893ffc7b",
+      "eventPageId": "4e6bfd9d-1132-4084-99c3-b213e4fae867",
+      "slug": "trinadcat-karat-arhangelsk-20-dekabrya-ruki-vverh-arhangelsk",
+      "sourceTitle": "ТРИНАДЦАТЬ КАРАТ | АРХАНГЕЛЬСК | 20 ДЕКАБРЯ | РУКИ ВВЕРХ",
+      "sourceDescription": null,
+      "legacyOverrideDescription": "«ТРИНАДЦАТЬ КАРАТ | АРХАНГЕЛЬСК | 20 ДЕКАБРЯ | РУКИ ВВЕРХ» - рок-концерт.\n\n## Практическая информация\n\n- Место - «Руки ВВерх! Бар», Архангельск\n- Адрес - ул. Воскресенская, 20\n- Продолжительность - около 90 минут\n- Возрастное ограничение - 16+\n- Билеты - от 2 000 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_6a95740f0ca3c3a0893ffc7b",
+        "kind": "SINGLE",
+        "slug": "тринадцать-карат-архангельск-20-декабря-руки-вверх-6a95740f0ca3c3a0893ffc7b",
+        "seoH1": null,
+        "title": "ТРИНАДЦАТЬ КАРАТ | АРХАНГЕЛЬСК | 20 ДЕКАБРЯ | РУКИ ВВЕРХ",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a95740f0ca3c3a0893ffc7b",
+            "externalId": "6a95740f0ca3c3a0893ffc7b",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_64da5d24796bee7648080eab",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-08/6a95829887f4d925c5deb64e.jpg",
+        "seoTitle": null,
+        "cityTitle": "Архангельск",
+        "venueTitle": "Руки ВВерх! Бар",
+        "description": null,
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "ул. Воскресенская, 20",
+        "canonicalPath": null,
+        "primaryCityId": "city_581049",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "ТРИНАДЦАТЬ КАРАТ | АРХАНГЕЛЬСК | 20 ДЕКАБРЯ | РУКИ ВВЕРХ",
+        "seoH1": "ТРИНАДЦАТЬ КАРАТ | АРХАНГЕЛЬСК | 20 ДЕКАБРЯ | РУКИ ВВЕРХ",
+        "seoTitle": "ТРИНАДЦАТЬ КАРАТ | АРХАНГЕЛЬСК | 20 ДЕКАБРЯ | РУКИ ВВЕРХ | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/trinadcat-karat-arhangelsk-20-dekabrya-ruki-vverh-arhangelsk",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "0aa2c220-83fb-4a12-9351-aa8f2daf3518",
+          "eventId": "evt_6a95740f0ca3c3a0893ffc7b",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_6a95740f0ca3c3a0893ffc7b",
+            "kind": "SINGLE",
+            "slug": "тринадцать-карат-архангельск-20-декабря-руки-вверх-6a95740f0ca3c3a0893ffc7b",
+            "seoH1": null,
+            "title": "ТРИНАДЦАТЬ КАРАТ | АРХАНГЕЛЬСК | 20 ДЕКАБРЯ | РУКИ ВВЕРХ",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a95740f0ca3c3a0893ffc7b",
+                "externalId": "6a95740f0ca3c3a0893ffc7b",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_64da5d24796bee7648080eab",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-08/6a95829887f4d925c5deb64e.jpg",
+            "seoTitle": null,
+            "cityTitle": "Архангельск",
+            "venueTitle": "Руки ВВерх! Бар",
+            "description": null,
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "ул. Воскресенская, 20",
+            "canonicalPath": null,
+            "primaryCityId": "city_581049",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": null
+          },
+          "createdAt": "2026-11-03T18:10:31.381Z",
+          "eventTitle": "ТРИНАДЦАТЬ КАРАТ | АРХАНГЕЛЬСК | 20 ДЕКАБРЯ | РУКИ ВВЕРХ",
+          "eventSlug": "тринадцать-карат-архангельск-20-декабря-руки-вверх-6a95740f0ca3c3a0893ffc7b",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_581049",
+          "cityTitle": "Архангельск",
+          "venueId": "venue_64da5d24796bee7648080eab",
+          "venueTitle": "Руки ВВерх! Бар",
+          "venueAddress": "ул. Воскресенская, 20",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a95740f0ca3c3a0893ffc7b",
+              "externalId": "6a95740f0ca3c3a0893ffc7b",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "title": "ТРИНАДЦАТЬ КАРАТ | АРХАНГЕЛЬСК | 20 ДЕКАБРЯ | РУКИ ВВЕРХ",
+        "city": "Архангельск",
+        "venue": "Руки ВВерх! Бар",
+        "address": "ул. Воскресенская, 20",
+        "ageLimit": "16",
+        "priceFromRub": 2000,
+        "offerMin": 2000,
+        "activeOffers": 4,
+        "futureSessions": [
+          {
+            "start": "2026-12-20T17:00:00",
+            "end": "2026-12-20T18:30:00"
+          }
+        ]
+      }
+    },
+    "evt_6aa2f3f0187e252232dd1194": {
+      "eventId": "evt_6aa2f3f0187e252232dd1194",
+      "eventPageId": "eec39022-948c-49e8-9026-4df085dfacd1",
+      "slug": "policeimako-lomovoi-radio-natasha-2026-itogi-moskva",
+      "sourceTitle": "Евгеника. Ломовой. \"Радио Наташа\" 2026 ИТОГИ",
+      "sourceDescription": null,
+      "legacyOverrideDescription": "Евгеника. \"Радио Наташа\" 2026 ИТОГИ - мероприятие в Москве, на площадке «Гримёрка Gastro Club & Karaoke Bar». Концерт собирает слушателей в одном зале, чтобы вместе пережить музыку в живом исполнении. Программа построена так, чтобы держать внимание: композиции сменяют друг друга, а между ними почти нет пауз. Хороший повод провести вечер с друзьями - а можно прийти и одному, музыка в зале объединяет. Подходит для буднего вечера: не нужно ждать выходных.\n\n## Практическая информация\n\n- Место - «Гримёрка Gastro Club & Karaoke Bar», Москва\n- Адрес - Пушечная ул., 9/6\n- Продолжительность - около 180 минут\n- Возрастное ограничение - 18+\n- Билеты - от 2 000 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "sourceSnapshot": {
+        "id": "evt_6aa2f3f0187e252232dd1194",
+        "kind": "SINGLE",
+        "slug": "полицеимако-ломовои-радио-наташа-2026-итоги-6aa2f3f0187e252232dd1194",
+        "seoH1": null,
+        "title": "Евгеника. Ломовой. \"Радио Наташа\" 2026 ИТОГИ",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6aa2f3f0187e252232dd1194",
+            "externalId": "6aa2f3f0187e252232dd1194",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_69036b3d88263f70479d39c2",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ac38232d8fee5392fc833e1.jpg",
+        "seoTitle": null,
+        "cityTitle": "Москва",
+        "venueTitle": "Гримёрка Gastro Club & Karaoke Bar",
+        "description": null,
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Пушечная ул., 9/6",
+        "canonicalPath": null,
+        "primaryCityId": "city_524901",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "Евгеника. Ломовой. \"Радио Наташа\" 2026 ИТОГИ",
+        "seoH1": "Евгеника. Ломовой. \"Радио Наташа\" 2026 ИТОГИ",
+        "seoTitle": "Евгеника. Ломовой. \"Радио Наташа\" 2026 ИТОГИ | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/policeimako-lomovoi-radio-natasha-2026-itogi-moskva",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "6bb1aacb-6cce-4e4e-91c6-643243c2f323",
+          "eventId": "evt_6aa2f3f0187e252232dd1194",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_6aa2f3f0187e252232dd1194",
+            "kind": "SINGLE",
+            "slug": "полицеимако-ломовои-радио-наташа-2026-итоги-6aa2f3f0187e252232dd1194",
+            "seoH1": null,
+            "title": "Евгеника. Ломовой. \"Радио Наташа\" 2026 ИТОГИ",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6aa2f3f0187e252232dd1194",
+                "externalId": "6aa2f3f0187e252232dd1194",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_69036b3d88263f70479d39c2",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ac38232d8fee5392fc833e1.jpg",
+            "seoTitle": null,
+            "cityTitle": "Москва",
+            "venueTitle": "Гримёрка Gastro Club & Karaoke Bar",
+            "description": null,
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "Пушечная ул., 9/6",
+            "canonicalPath": null,
+            "primaryCityId": "city_524901",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": null
+          },
+          "createdAt": "2026-11-03T20:40:46.334Z",
+          "eventTitle": "Евгеника. Ломовой. \"Радио Наташа\" 2026 ИТОГИ",
+          "eventSlug": "полицеимако-ломовои-радио-наташа-2026-итоги-6aa2f3f0187e252232dd1194",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_524901",
+          "cityTitle": "Москва",
+          "venueId": "venue_69036b3d88263f70479d39c2",
+          "venueTitle": "Гримёрка Gastro Club & Karaoke Bar",
+          "venueAddress": "Пушечная ул., 9/6",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6aa2f3f0187e252232dd1194",
+              "externalId": "6aa2f3f0187e252232dd1194",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "title": "Евгеника. Ломовой. \"Радио Наташа\" 2026 ИТОГИ",
+        "city": "Москва",
+        "venue": "Гримёрка Gastro Club & Karaoke Bar",
+        "address": "Пушечная ул., 9/6",
+        "ageLimit": "18",
+        "priceFromRub": 1500,
+        "offerMin": 1500,
+        "activeOffers": 62,
+        "futureSessions": [
+          {
+            "start": "2026-12-07T17:00:00",
+            "end": "2026-12-07T20:00:00"
+          }
+        ]
+      }
+    },
+    "evt_6a0b732a15569d7fd36c60d5": {
+      "eventId": "evt_6a0b732a15569d7fd36c60d5",
+      "eventPageId": "87d20700-666d-46a8-8b9c-9b9b37fc9826",
+      "slug": "pavel-kashin-sankt-peterburg-2",
+      "sourceTitle": "Павел Кашин",
+      "sourceDescription": null,
+      "legacyOverrideDescription": "«Павел Кашин» в Санкт-Петербурге. Вечер утончённой, меланхоличной и глубокой лирики от легендарного питерского музыканта. Интеллигентный pop-рок, поэтичные тексты и живое, искреннее общение со слушателями.\n\nПодойдёт ценителям красивой мелодичной музыки и светлой ностальгии. Санкт-Петербург.\n\n## Где и когда\n\n- Санкт-Петербург, бар-ресторан Douglas (Дуглас)\n- Билеты: от 2200 ₽\n- Возраст: 16+",
+      "sourceSnapshot": {
+        "id": "evt_6a0b732a15569d7fd36c60d5",
+        "kind": "SINGLE",
+        "slug": "tc-6a0b732a15569d7fd36c60d5-павел-кашин",
+        "seoH1": null,
+        "title": "Павел Кашин",
+        "sources": [
+          {
+            "code": "TICKETSCLOUD",
+            "name": "Ticketscloud",
+            "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a0b732a15569d7fd36c60d5",
+            "externalId": "6a0b732a15569d7fd36c60d5",
+            "metaExternalId": null
+          }
+        ],
+        "venueId": "venue_5e46aba19eb4e5f547c1c669",
+        "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2025-11/6907a53201b7a42a09be16b5.png",
+        "seoTitle": null,
+        "cityTitle": "Санкт-Петербург",
+        "venueTitle": "бар-ресторан Douglas (Дуглас)",
+        "description": null,
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Финляндский пр. 1",
+        "canonicalPath": null,
+        "primaryCityId": "city_498817",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": "Вечер утончённой, меланхоличной и глубокой лирики от легендарного питерского музыканта. Интеллигентный pop-рок, поэтичные тексты и живое, искреннее общение со слушателями."
+      },
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "summary": null,
+        "title": "Павел Кашин",
+        "seoH1": "Павел Кашин",
+        "seoTitle": "Павел Кашин | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/pavel-kashin-sankt-peterburg-2",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "7f9d665a-da49-4e22-a70d-5f321da53342",
+          "eventId": "evt_6a0b732a15569d7fd36c60d5",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_6a0b732a15569d7fd36c60d5",
+            "kind": "SINGLE",
+            "slug": "tc-6a0b732a15569d7fd36c60d5-павел-кашин",
+            "seoH1": null,
+            "title": "Павел Кашин",
+            "sources": [
+              {
+                "code": "TICKETSCLOUD",
+                "name": "Ticketscloud",
+                "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a0b732a15569d7fd36c60d5",
+                "externalId": "6a0b732a15569d7fd36c60d5",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_5e46aba19eb4e5f547c1c669",
+            "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2025-11/6907a53201b7a42a09be16b5.png",
+            "seoTitle": null,
+            "cityTitle": "Санкт-Петербург",
+            "venueTitle": "бар-ресторан Douglas (Дуглас)",
+            "description": null,
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "Финляндский пр. 1",
+            "canonicalPath": null,
+            "primaryCityId": "city_498817",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": "Вечер утончённой, меланхоличной и глубокой лирики от легендарного питерского музыканта. Интеллигентный pop-рок, поэтичные тексты и живое, искреннее общение со слушателями."
+          },
+          "createdAt": "2026-11-03T20:40:03.047Z",
+          "eventTitle": "Павел Кашин",
+          "eventSlug": "tc-6a0b732a15569d7fd36c60d5-павел-кашин",
+          "eventKind": "SINGLE",
+          "primaryCityId": "city_498817",
+          "cityTitle": "Санкт-Петербург",
+          "venueId": "venue_5e46aba19eb4e5f547c1c669",
+          "venueTitle": "бар-ресторан Douglas (Дуглас)",
+          "venueAddress": "Финляндский пр. 1",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TICKETSCLOUD",
+              "name": "Ticketscloud",
+              "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a0b732a15569d7fd36c60d5",
+              "externalId": "6a0b732a15569d7fd36c60d5",
+              "metaExternalId": null
+            }
+          ]
+        }
+      ],
+      "eventFacts": {
+        "title": "Павел Кашин",
+        "city": "Санкт-Петербург",
+        "venue": "бар-ресторан Douglas (Дуглас)",
+        "address": "Финляндский пр. 1",
+        "ageLimit": "16",
+        "priceFromRub": 2200,
+        "offerMin": 2200,
+        "activeOffers": 5,
+        "futureSessions": [
+          {
+            "start": "2027-01-22T16:00:00",
+            "end": "2027-01-22T18:45:00"
+          }
+        ]
+      }
+    }
+  }
+}

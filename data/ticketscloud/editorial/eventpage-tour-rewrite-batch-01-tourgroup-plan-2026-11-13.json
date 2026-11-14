@@ -1,0 +1,607 @@
+{
+  "groups": [
+    {
+      "groupNo": 1,
+      "title": "Спектакль «Мастер и Маргарита»",
+      "pageCount": 36,
+      "cityCount": 35,
+      "candidatePageIds": [
+        "689927cd-0c61-4082-b27d-cf66d0988583",
+        "da19c506-97eb-4eb2-b1c8-75ba83f60634",
+        "aa7e027e-6731-41fe-8e3d-d2b14bb7cfbc",
+        "c5c1c3f5-fa2e-4f10-9837-c5188cb9a790",
+        "dfcec286-56c8-415f-9e3a-084fd67ceda2",
+        "1d7d362e-e612-49bd-a5ec-92b68bfcacb1",
+        "e59c4ec7-325d-4658-bae0-f84d44d5fe7a",
+        "b1acc725-6ed2-40b6-901f-966e88e18c1a",
+        "80928775-6733-45a7-bea9-aeb2bb12cd6b",
+        "92e33688-3cf5-4516-83f1-f8a30317664c",
+        "5438fa1f-88a7-4456-ac61-5206a07e6c2b",
+        "581ce4a4-d420-4d9e-9c8f-2bbf273e6c60",
+        "c4072e52-361c-4404-9b9c-0ced1e45a2b8",
+        "91bb7a87-8007-4b44-bd1b-73ef6ca323cb",
+        "bd3aafcd-1dc8-4aab-8686-3ab3d61c4343",
+        "fbf022b6-d9e4-4688-8df0-164bc8a70dd5",
+        "f029f987-45a4-4e06-9780-9ac2b13ddc2b",
+        "7efad558-0e42-4436-8ba0-83d70c0ec70c",
+        "c6c3078d-aedb-4ecc-a27f-6afd58dd4177",
+        "f2535303-cb70-47e9-b512-4e581fe64c70",
+        "ac9a67f3-3ca4-4339-82d4-9fb2836cffad",
+        "dae59aa4-94ff-4387-ad3a-8120482272d8",
+        "35dcfb21-d997-42c8-b6b1-23b8d2636418",
+        "a717bc60-4c0c-4902-b110-ff99aff4b1f1",
+        "08d5a085-2a12-43e1-80ae-15762dececfd",
+        "1636940b-f0df-4e11-90a3-cc5e0883f15d",
+        "f7134e69-56b0-463b-a179-36f2aac1c6c6",
+        "accccb8d-816b-4a0d-a420-1d9fb4ec4452",
+        "1e7b39a4-63f0-4786-9cc2-304f333217a8",
+        "bc4da688-c233-4c9d-8c70-79c31c8b28c2",
+        "c940678d-fc97-4b6c-9e06-bf50c0b9902a",
+        "647aee3a-07f2-457a-911e-d8869bde486d",
+        "597d707c-3cf0-4c75-adf3-cf1512f540d9",
+        "cc07413a-6156-4b48-883f-32bcb133c72d",
+        "b490b399-82f4-44f7-b7a9-cdd76c70228b"
+      ],
+      "extraSameCityPageIds": [
+        "4a1e2b92-4621-42a6-8425-677cea253186"
+      ],
+      "extraSameCity": "Якутск — Спектакль Мастер и Маргарита г Якутск — spektakl-master-i-margarita-g-yakutsk"
+    },
+    {
+      "groupNo": 2,
+      "title": "Ваня Усович — сольный стендап-концерт",
+      "pageCount": 33,
+      "cityCount": 31,
+      "candidatePageIds": [
+        "8f41e149-33ee-4111-a7f5-88c22b0f113c",
+        "736fb2ba-abac-4000-b571-f63283ade9d0",
+        "bf361cc7-d6ca-4bf1-8bf3-10a8c8c02e6d",
+        "3c6cccdf-b570-4ed0-92e3-57eae2f3e034",
+        "cd2cf4ef-3fdc-4948-85bf-62a563d75f30",
+        "7edab3de-31c9-49e1-b171-306863a92dc0",
+        "45c8f239-ad40-4c62-91a5-30ae0b8f1b07",
+        "4eea028c-88b7-4948-a074-fb18e3382fce",
+        "3b62316a-a428-4257-8f18-701d3719e408",
+        "d93addf3-c9c2-4ca2-a108-ce8176f9ed41",
+        "2f37380f-8c8e-43c9-b6cc-fe1ab181e9f9",
+        "bbc0b638-a5fe-4875-a819-fabe358d6a45",
+        "f80b5d02-a004-468f-ad41-6609d2e59bdc",
+        "ade93c6c-c49d-4b4a-a9b8-1afca899b517",
+        "691e7791-7347-4f00-be64-7c63a06caca3",
+        "78a5954c-4b38-402b-93d0-c23cf5f1ba5b",
+        "7628870f-1169-497a-b5d8-882a0c489b29",
+        "d2520f17-fa5f-474d-a889-f9547c50b1ca",
+        "8922fdbc-fc7b-4a71-b9a9-c2079f088434",
+        "6ac7a574-7724-4c4e-a124-4ce7550b9adb",
+        "f4d08d7c-95bf-4451-82eb-e0d974c8f84b",
+        "91b2fd51-8c56-47d3-be10-784eaa6e6694",
+        "40fbfcab-dbb8-4831-9299-3743c00cc730",
+        "4bf91c82-4a77-47d8-b6b1-3383af9f4219",
+        "813e1c3e-836f-460c-b513-0229ab784ffb",
+        "645b9182-44de-4ff1-8707-cc4c57a61fd6",
+        "c659f577-b45f-4a04-9442-2723c7b923bc",
+        "8bf5376f-ac4a-470d-94e9-a325fe084190",
+        "6bbf9703-a930-4c71-9a81-151ac9dd0b99",
+        "46892e31-5916-4e7a-99b6-8200969f81bc",
+        "642c2976-9a0d-49fa-b8fd-c984d89f7209"
+      ],
+      "extraSameCityPageIds": [
+        "2aafb982-b408-48b1-a3ae-4171274b02cc",
+        "7c9afaef-9bd0-40ba-9918-db200179e18e"
+      ],
+      "extraSameCity": "Краснодар — Сольный стендап-концерт Вани Усовича — solnyi-stendap-koncert-vani-usovicha-krasnodar-2; Тамбов — Сольный стендап-концерт Вани Усовича — solnyi-stendap-koncert-vani-usovicha-tambov-2"
+    },
+    {
+      "groupNo": 3,
+      "title": "Богдан Лисевский — сольный стендап-концерт",
+      "pageCount": 16,
+      "cityCount": 15,
+      "candidatePageIds": [
+        "68e6f3c6-3c53-4a41-b17d-690e88e05003",
+        "e27200f5-272f-4e42-bcf2-809c2ef251f7",
+        "6f9af0ef-8a72-43c0-9c6a-1b1e78c1d726",
+        "372e37bb-99e0-4db8-a137-33d734f20e46",
+        "b90021db-257b-44e5-9b9b-a738160143d1",
+        "41f2c976-a5f5-4881-88c8-cf28e3328f4e",
+        "7ecacf49-2895-4dba-ac28-f3587d38e4a0",
+        "e0c6271e-0695-49fb-afc0-2d09d58e568b",
+        "890bf312-d264-4a70-bc81-237134cd3787",
+        "65a610b2-8984-46b9-946d-abbc55976d91",
+        "3ba09660-5ff3-4ede-852d-d75972c7f915",
+        "baa0721e-55cc-4006-8c6e-986fbbad37ae",
+        "fc651785-0edb-4239-87e9-3ff5f98feb3c",
+        "6872463c-cdc4-46a6-a9b6-f25a138f6d0c",
+        "cec8098e-87ff-451f-ab33-75809266e3a8"
+      ],
+      "extraSameCityPageIds": [
+        "877205fa-59ee-411e-97ad-973c8d203018"
+      ],
+      "extraSameCity": "Москва — Сольный стендап-концерт Богдана Лисевского — solnyi-stendap-koncert-bogdana-lisevskogo-moskva"
+    },
+    {
+      "groupNo": 4,
+      "title": "Чак-чак дискотека",
+      "pageCount": 14,
+      "cityCount": 12,
+      "candidatePageIds": [
+        "655af240-7b5e-41d5-b54f-dcf0e312c0c7",
+        "872247ea-5ea5-4347-9ec0-3acaf753500c",
+        "b4b6ffa0-281c-4677-bddf-941675b89376",
+        "a567241b-73c4-4662-9213-1c5e86a4c722",
+        "78213554-050b-467b-aa8b-55d21a2b210a",
+        "95959e3c-1315-4a2d-84a0-981a5cc1d4a5",
+        "08ecb5d3-734e-42dc-8dfd-9e451982be88",
+        "00651a74-594a-4468-9e68-b3d90c9de078",
+        "bc215e0a-3076-4459-b3e1-298a3da98b0a",
+        "b96e7bd7-0499-498b-8b7a-4fbd83b072f9",
+        "036b9ea6-027a-4783-96c1-8b2b48f056af",
+        "5efe58e8-c24a-411d-9e7e-8c340697a985"
+      ],
+      "extraSameCityPageIds": [
+        "f8d711bb-24fd-49f3-aac9-5255b978d839",
+        "5ce2490b-32ce-4bea-bba3-692831e0bd37"
+      ],
+      "extraSameCity": "Уфа — Татаро-башкирская чак-чак дискотека — tataro-bashkirskaya-chak-chak-diskoteka-ufa-2; Уфа — Татаро-башкирская чак-чак дискотека — tataro-bashkirskaya-chak-chak-diskoteka-ufa-3"
+    },
+    {
+      "groupNo": 5,
+      "title": "Дима Илюхин — сольный стендап-концерт",
+      "pageCount": 14,
+      "cityCount": 12,
+      "candidatePageIds": [
+        "958df8a3-5725-438a-9b4f-e86bed9da609",
+        "ea61edd4-af0b-4ccc-9adb-280b819c40f7",
+        "421e042f-bdef-4dc3-b5a5-7699c2afc3f0",
+        "bbdcde3a-0ee0-4229-979c-f1eec14e7e78",
+        "03e421ed-d3ec-48d1-b1e3-9527276e1f9a",
+        "c6ee40e5-9d92-4ffa-a95a-6457bec34c5b",
+        "254016d0-d276-41b0-a4c2-45b7b2bf219e",
+        "b4e0ddaf-3f25-4149-8ecb-c7d677265574",
+        "c55a265d-2f41-4fd2-98a7-2fdb693395fe",
+        "a6382629-8e06-4141-b0fd-9290e8a97edf",
+        "d9c6eb57-4543-4640-9e4d-5efbbd17c90f",
+        "4d3e50c5-5acf-4a14-a1a6-5c2c2267f270"
+      ],
+      "extraSameCityPageIds": [
+        "4290f07d-1dfa-45bf-ae1f-1d8ce8e4a884",
+        "cec0c44a-48c3-4625-a528-c8c9575ae703"
+      ],
+      "extraSameCity": "Курск — Дима Илюхин - сольный стендап-концерт — dima-ilyuhin-solnyi-stendap-koncert-kursk; Воронеж — Дима Илюхин - сольный стендап-концерт — dima-ilyuhin-solnyi-stendap-koncert-voronezh-2"
+    },
+    {
+      "groupNo": 6,
+      "title": "Kamazz — концерт",
+      "pageCount": 10,
+      "cityCount": 10,
+      "candidatePageIds": [
+        "06036076-604b-4047-bdea-665edb1667b9",
+        "a1092140-58dc-4748-83ac-d1d80996c4e1",
+        "237eef1d-9be7-40d5-a683-f0fcfcb37dd8",
+        "217e6a3e-709f-4e32-a421-5d556d7c3d02",
+        "9478a453-30fb-4122-b29c-f86857cc40c4",
+        "1249a947-9abe-47ae-92a4-014cb339a4bb",
+        "58c94608-2f9f-4d83-83f0-b817198965f9",
+        "74fc47b2-3ac2-43d1-9a34-579567a23498",
+        "39348b22-64da-4e1c-a240-d1af9fb71760",
+        "3f0bbe9e-8305-4a2e-95ad-c6eff6170489"
+      ],
+      "extraSameCityPageIds": [],
+      "extraSameCity": ""
+    },
+    {
+      "groupNo": 7,
+      "title": "Цирк будущего: «За гранью возможного»",
+      "pageCount": 9,
+      "cityCount": 7,
+      "candidatePageIds": [
+        "38fd9f7d-9103-4bee-b22e-5e8f64c98db7",
+        "df6daaff-9ff7-4b2e-9b4e-6d28f1661223",
+        "63946bcc-6478-4a36-9c87-ef881b9d43ce",
+        "3e853a50-b641-47cd-9672-f1cc5aea91f9",
+        "80fd3e7d-040d-4327-b595-13566b62ff14",
+        "71f2a6ca-93f2-4734-99d2-621bc8fcb75a",
+        "8c0258d6-cf68-4e37-8aea-87e1d111502d"
+      ],
+      "extraSameCityPageIds": [
+        "5c9b45e7-42be-47e9-993c-0eb4161e2cce",
+        "cc614e33-e5b0-41cf-ae87-105787ccce6d"
+      ],
+      "extraSameCity": "Губкинский — Цирк БУДУЩЕГО \"За гранью возможного\" — cirk-buduschego-za-granyu-vozmozhnogo-gubkinskiy; Тазовский — Цирк БУДУЩЕГО \"За гранью возможного\" — cirk-buduschego-za-granyu-vozmozhnogo-tazovskiy-2"
+    },
+    {
+      "groupNo": 8,
+      "title": "Василий Бейнарович — лекция",
+      "pageCount": 8,
+      "cityCount": 8,
+      "candidatePageIds": [
+        "3ad6db1d-2151-4a5d-b9f4-f5cf5e20c12f",
+        "b91589c1-5fcd-457c-a840-71f0267005f7",
+        "cd55a80c-5046-4cf2-808b-085ebb10a93d",
+        "aa2312d5-26dc-4f0c-b2d6-5d3042c8ad88",
+        "567f72a3-6d45-4cd0-97e1-861bd33ca339",
+        "cebe5b69-6116-47ad-b449-47fe98227023",
+        "c2ee320e-5bd4-4bd4-b4b3-5760973f8ce3",
+        "8bbdca82-f564-43c8-9d59-2f12573ba50f"
+      ],
+      "extraSameCityPageIds": [],
+      "extraSameCity": ""
+    },
+    {
+      "groupNo": 9,
+      "title": "Шоу «Марко Поло»",
+      "pageCount": 8,
+      "cityCount": 7,
+      "candidatePageIds": [
+        "04673bbc-5cb3-46cc-83ae-3ddb955b51c0",
+        "0b684d5f-b2ea-445a-a8af-9dcd93feddf8",
+        "2cdc5ff7-3270-4520-b46d-1fe37dd0db94",
+        "1bb1b0df-7973-4e46-ae13-c8e3e383474a",
+        "e7c4b62e-6f6f-4f5a-af16-c65763b6bf22",
+        "9d5fc390-2a4a-486d-8f73-0d4716e2004f",
+        "6094a98c-1c37-44d2-b394-360b5132f259"
+      ],
+      "extraSameCityPageIds": [
+        "ac20a476-53ac-4fde-9be7-4ade859a8679"
+      ],
+      "extraSameCity": "Москва — Марко Поло — marko-polo-moskva"
+    },
+    {
+      "groupNo": 10,
+      "title": "Россия vs Hollywood — саундтреки при свечах с АСО-оркестром",
+      "pageCount": 8,
+      "cityCount": 2,
+      "candidatePageIds": [
+        "99894103-2709-4373-8a2a-610f913c45c4",
+        "81e1d394-0b8b-4401-a5e8-daa273a59182"
+      ],
+      "extraSameCityPageIds": [
+        "eb4f315a-0819-4356-90dc-301e56b43678",
+        "cc1f4e12-94b1-4b80-9524-f925eb24591f",
+        "f70ccc61-1203-4837-b1ee-1f996a68d07c",
+        "0a156a45-364c-418e-9dff-802945f3344d",
+        "c1b3392e-3484-4e24-83ae-1dc22c85905f",
+        "dfa78782-0fea-4bc7-81d4-814585f7a785"
+      ],
+      "extraSameCity": "Ростов-на-Дону — Россия VS Hollywood. Саундтреки при свечах с АСО-оркестром — rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-rostov-na-donu-6; Ростов-на-Дону — Россия VS Hollywood. Саундтреки при свечах с АСО-оркестром — rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-rostov-na-donu-2; Ростов-на-Дону — Россия VS Hollywood. Саундтреки при свечах с АСО-оркестром — rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-rostov-na-donu-3; Ростов-на-Дону — Россия VS Hollywood. Саундтреки при свечах с АСО-оркестром — rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-rostov-na-donu-4; Уфа — Россия VS Hollywood. Саундтреки при свечах с АСО-оркестром — rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-ufa-2; Уфа — Россия VS Hollywood. Саундтреки при свечах с АСО-оркестром — rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-ufa-3"
+    },
+    {
+      "groupNo": 11,
+      "title": "Новогодние саундтреки при свечах с АСО-оркестром",
+      "pageCount": 8,
+      "cityCount": 3,
+      "candidatePageIds": [
+        "54a396bf-93f3-4a49-96b5-726a396771e2",
+        "cb352ea6-210d-4fcf-adbf-68dc5b1d3e23",
+        "4162ceeb-f457-47da-8fe3-946617b8213e"
+      ],
+      "extraSameCityPageIds": [
+        "e35014a5-8fe0-4808-8b84-fd079929158f",
+        "eac5e947-508b-4e46-a9af-48e009aa8bdc",
+        "0bde1f18-7c6f-4604-8ce6-6e708d676a3e",
+        "2e12a409-4d6f-4ea7-88a6-dd6b201e533d",
+        "fecd6bee-d17f-4054-9936-154787f9a9e5"
+      ],
+      "extraSameCity": "Уфа — Новогодние саундтреки при свечах с АСО-оркестром. Шоу которое подарит вам чудо! — novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-ufa-2; Уфа — Новогодние саундтреки при свечах с АСО-оркестром. Шоу которое подарит вам чудо! — novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-ufa-3; Уфа — Новогодние саундтреки при свечах с АСО-оркестром. Шоу которое подарит вам чудо! — novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-ufa-4; Ростов-на-Дону — Новогодние саундтреки при свечах с АСО-оркестром. Шоу которое подарит вам чудо! — novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-rostov-na-donu-2; Ростов-на-Дону — Новогодние саундтреки при свечах с АСО-оркестром. Шоу которое подарит вам чудо! — novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-rostov-na-donu-3"
+    },
+    {
+      "groupNo": 12,
+      "title": "Группа «Доктор Шлягер» — концерт",
+      "pageCount": 8,
+      "cityCount": 8,
+      "candidatePageIds": [
+        "bf03a11e-5999-4430-9158-5d35587f3f95",
+        "ae715cf2-10a2-4d18-8439-d9f4b90f4abd",
+        "46ea40e9-a491-4b76-ac66-54dd268a488c",
+        "bc3197c0-04a5-44f8-9858-0f5337c559c6",
+        "9bb99967-2dc6-475e-85f9-294fc17ffe2c",
+        "dceed819-cd50-438c-b4d5-16a489f8b485",
+        "5f34eecf-069d-4e11-b54a-344e1f5de154",
+        "d232c3bf-80ea-4752-a5ce-41f7aa2f38a8"
+      ],
+      "extraSameCityPageIds": [],
+      "extraSameCity": ""
+    },
+    {
+      "groupNo": 13,
+      "title": "Пламенев — концерт",
+      "pageCount": 8,
+      "cityCount": 8,
+      "candidatePageIds": [
+        "dc4e7b66-8326-48ed-82fd-934804706116",
+        "940e40bd-7042-486c-86a1-f01162aaaa7d",
+        "63fa9ecd-8081-43f2-9f93-06a5bbc9f946",
+        "3858d6d4-7b8e-45aa-9ac0-86069f27470b",
+        "623c5ed0-4abe-4eb8-ad7e-a29d8fa0f21d",
+        "aac9d2c6-7039-4418-a5d9-28156c412e39",
+        "630e579f-73fb-4ccc-93f4-2b128437b65d",
+        "9d7f03ae-b70b-4af9-ba17-d108e560529e"
+      ],
+      "extraSameCityPageIds": [],
+      "extraSameCity": ""
+    },
+    {
+      "groupNo": 14,
+      "title": "«Что творят мужчины» с Сергеем Астаховым",
+      "pageCount": 13,
+      "cityCount": 13,
+      "candidatePageIds": [
+        "ce8c649f-dd99-46ce-a07f-2c8c1f66a45e",
+        "561e4e31-d90d-4ef4-a561-bb339bb68e9a",
+        "b8499b86-653f-4e85-932c-c49d9db51d92",
+        "5d596309-30ff-4464-9ea6-3974fd94f085",
+        "d7f81a6d-f5c7-4f0b-a704-40fe8e18226a",
+        "64b40c8c-dbc8-4e2a-9bc1-5a2a1b568443",
+        "395f1fc5-c802-4769-b335-49011d818839",
+        "fc21a6f3-5421-44fa-ba1b-c40fcafde3ce",
+        "6794a2e2-5233-4b21-bf8f-798984349aff",
+        "d7e973c6-12a2-49db-bb41-d3649e4ee17d",
+        "a7ed9374-0d7a-4cf3-9dfc-4468300963b2",
+        "ae2f07fb-918f-4d25-83bd-b5657fa7e4e8",
+        "2608dc1a-2dad-415b-83c2-d2ff198a476a"
+      ],
+      "extraSameCityPageIds": [],
+      "extraSameCity": ""
+    },
+    {
+      "groupNo": 15,
+      "title": "Света — большой сольный концерт",
+      "pageCount": 7,
+      "cityCount": 7,
+      "candidatePageIds": [
+        "22056081-8714-4dbf-a06f-044eeb7e1ec9",
+        "2966620b-26f5-4d50-9294-09530727481a",
+        "5eaee4c1-5103-477b-a6f7-89adb4699adb",
+        "f02eacbe-43c0-4dae-8a3c-2457726a4942",
+        "7cdd4dc8-a09d-4a02-8985-34463e052bcc",
+        "e3ba8d7f-b817-4837-a8bb-b1d22704cff6",
+        "6686c1d1-33c3-492d-a815-982a84584c6b"
+      ],
+      "extraSameCityPageIds": [],
+      "extraSameCity": ""
+    },
+    {
+      "groupNo": 16,
+      "title": "«Прыжок в свободу»",
+      "pageCount": 7,
+      "cityCount": 7,
+      "candidatePageIds": [
+        "460572b2-699f-4cd4-afe5-54c2c5ac9c3f",
+        "3b7398c9-1d34-409b-8fec-688d18bc326a",
+        "245b2398-cdab-4d2c-8a6e-fd172482e4bb",
+        "d618cc6e-a9d5-4366-8ba3-b38bb8168bc0",
+        "db1c0148-f172-40f6-9e48-5941350d58ca",
+        "a93775e4-f684-4fe9-8528-d92230040d44",
+        "01788b7e-3e10-4f19-b4c0-bc3c91330d54"
+      ],
+      "extraSameCityPageIds": [],
+      "extraSameCity": ""
+    },
+    {
+      "groupNo": 17,
+      "title": "Концерт «Звезды Х» и группы «Каролина»",
+      "pageCount": 7,
+      "cityCount": 7,
+      "candidatePageIds": [
+        "114cbc45-87bb-483d-9307-1775c3e4bcdd",
+        "857e6ba1-900f-480f-9688-1e72ff9867b9",
+        "d97351eb-76c5-4cfa-a3e7-2cf578f198e9",
+        "0730ca30-f42d-4553-be25-f595593b50a2",
+        "99afdd59-cff5-4093-8511-a28ac2629d8c",
+        "fb7ba5eb-6dc8-4266-b532-8a05c9cea9e8",
+        "549827a9-402f-457d-a35e-9a38fea7ec5e"
+      ],
+      "extraSameCityPageIds": [],
+      "extraSameCity": ""
+    },
+    {
+      "groupNo": 18,
+      "title": "Евгения Рыбакова и группа «Обними кита»",
+      "pageCount": 7,
+      "cityCount": 7,
+      "candidatePageIds": [
+        "183e36d5-8dd5-475b-92be-fd6019b9c69c",
+        "262044a4-2054-40bd-b82c-14ee9e0a2643",
+        "9370e2e2-843b-4576-aef2-b11af179ebe5",
+        "4d226d3d-faed-48ae-b954-c87e86678be4",
+        "ee550738-23e9-49be-ba82-7d880096fecd",
+        "bd796e1a-9f6c-451c-b8f2-4391d7cf713d",
+        "1fc75d75-92ff-4e80-bacd-123e0abc7ee1"
+      ],
+      "extraSameCityPageIds": [],
+      "extraSameCity": ""
+    },
+    {
+      "groupNo": 19,
+      "title": "Группа «Лесоповал» — концерт",
+      "pageCount": 7,
+      "cityCount": 6,
+      "candidatePageIds": [
+        "a4d9b059-fcf9-47c5-83f3-5298f14e7444",
+        "994be354-0bc3-4e9e-9d02-a6676709f969",
+        "0f496c30-0b77-46bf-8ca0-5e7216913f66",
+        "92fbe176-7ef5-4f2e-ae84-ed437616f589",
+        "ef377f0b-6ef9-4cf3-b32e-63f7405196c5",
+        "5a48878a-9863-4068-a676-92e36a5cd632"
+      ],
+      "extraSameCityPageIds": [
+        "8f2b6e85-3f5e-4a27-a05c-b0c75f4637bf"
+      ],
+      "extraSameCity": "Москва — Группа \"ЛЕСОПОВАЛ\" — gruppa-lesopoval-moskva-2"
+    },
+    {
+      "groupNo": 20,
+      "title": "Цирк Фантастик",
+      "pageCount": 7,
+      "cityCount": 2,
+      "candidatePageIds": [
+        "1856042d-afa6-4f94-9996-7b00e56aa563",
+        "5dcb0ffd-7349-4047-9713-266c6e088e0c"
+      ],
+      "extraSameCityPageIds": [
+        "21984cbc-2349-4b52-ad80-6f301f630342",
+        "73e47130-f923-4275-881b-6f62eeb8678e",
+        "4cfa4dae-70dd-4cf6-8c88-f953adfa8aec",
+        "1770953a-4e57-439f-bd3c-a1b13444c817",
+        "1614ce94-2529-4dee-964c-d146390baba0"
+      ],
+      "extraSameCity": "Лобня — ЦИРК ФАНТАСТИК — cirk-fantastik-lobnya-2; Лобня — ЦИРК ФАНТАСТИК — cirk-fantastik-lobnya-3; Лобня — ЦИРК ФАНТАСТИК — cirk-fantastik-lobnya-4; Люберцы — ЦИРК ФАНТАСТИК — cirk-fantastik-lyubercy-4; Люберцы — ЦИРК ФАНТАСТИК — cirk-fantastik-lyubercy-3"
+    },
+    {
+      "groupNo": 21,
+      "title": "Группа «Мираж» — концерт",
+      "pageCount": 6,
+      "cityCount": 6,
+      "candidatePageIds": [
+        "9b319f5c-bfc3-4d9f-888e-f98c133a7ea9",
+        "18fe8324-c8b3-456f-8474-2ff0716f7b32",
+        "2506efeb-df77-49da-b726-f9cf3210da4f",
+        "f01f3713-35e9-4d66-bb5a-1f8bf0085f20",
+        "4e6ed4f9-0869-4882-a71e-268345a924f5",
+        "0d7c9a8f-5117-4edb-91ec-694459f4ee61"
+      ],
+      "extraSameCityPageIds": [],
+      "extraSameCity": ""
+    },
+    {
+      "groupNo": 22,
+      "title": "Интонация — тур «За мечтой»",
+      "pageCount": 11,
+      "cityCount": 11,
+      "candidatePageIds": [
+        "79c07674-2fd8-4e0a-b1fa-3277f61b141a",
+        "ce1624d3-b750-4832-a4d9-8a9911ff89a0",
+        "d6709fe1-59ad-407c-97e3-315a38222d3d",
+        "30da4f18-f238-4c62-a402-cc9fdadf5033",
+        "c491db0b-5909-4d48-9637-ec4cecca1fe5",
+        "391661e2-67fb-4b97-a5bc-94bd83493c0c",
+        "679e7cd7-4848-41d6-bad7-a1fc207557cb",
+        "f7c747f7-5df2-4a97-98f0-1e9db0ec3854",
+        "bf7d0346-c7f4-4d43-879a-15c71cb8ec00",
+        "e014dab5-3d7d-4a67-8480-e340989c5c89",
+        "db8615fd-1d1d-49ca-9739-20bd49b202da"
+      ],
+      "extraSameCityPageIds": [],
+      "extraSameCity": ""
+    },
+    {
+      "groupNo": 23,
+      "title": "Макс Евдокимов — стендап «Баланс»",
+      "pageCount": 6,
+      "cityCount": 6,
+      "candidatePageIds": [
+        "a930f11b-daf5-4d79-bb2c-15e8e2556df3",
+        "563e5fab-1b89-4f99-8c5f-877fc32766fd",
+        "03673872-be7c-4d40-9d46-c40ddbdf138b",
+        "d30d1e43-c820-4a44-a1c1-32800d2a20a5",
+        "2d90ce5f-04c1-43e1-8397-a58d3f40ebea",
+        "b8d4fb5c-f090-47c5-ae92-886fba31a67e"
+      ],
+      "extraSameCityPageIds": [],
+      "extraSameCity": ""
+    },
+    {
+      "groupNo": 24,
+      "title": "Виктория Складчикова — стендап-концерт",
+      "pageCount": 5,
+      "cityCount": 5,
+      "candidatePageIds": [
+        "e50290bd-38a8-40c6-bd39-64545a3d5c81",
+        "c4630b3f-4e14-43ac-ac4e-0fbd866c3010",
+        "21ffbeee-2277-4002-b193-53b441259ac1",
+        "b6a46a9a-4d60-4360-95fc-26fe3cc8a375",
+        "1315c1da-3d5f-498b-916f-c7ff08721313"
+      ],
+      "extraSameCityPageIds": [],
+      "extraSameCity": ""
+    },
+    {
+      "groupNo": 25,
+      "title": "«Цинк уродов» — концерт",
+      "pageCount": 5,
+      "cityCount": 5,
+      "candidatePageIds": [
+        "160f115e-94cd-496d-a9b8-a0cdf66bb7c3",
+        "3154da7a-01d1-4f55-a571-d866a0bc5d5c",
+        "6e0129e8-2cb7-457e-bdbd-2bd074eb4f56",
+        "2e9fc5d6-1df2-40ba-8a25-530497e77982",
+        "cabfd1c0-786d-48aa-b323-9865de8c4164"
+      ],
+      "extraSameCityPageIds": [],
+      "extraSameCity": ""
+    },
+    {
+      "groupNo": 26,
+      "title": "Дмитрий Дубров и Алла Лужецкая",
+      "pageCount": 5,
+      "cityCount": 5,
+      "candidatePageIds": [
+        "adb91abd-88cb-4e56-8056-e5d671ff321d",
+        "f617ec30-d0c4-45d5-9149-694c69336886",
+        "1fdb3a78-4c52-44bf-af9d-58bb783d42ba",
+        "40f5ec7c-5454-42b2-a412-9efd4e39bf53",
+        "5c43feea-c4b7-4ca6-b4c7-cde18da6fa42"
+      ],
+      "extraSameCityPageIds": [],
+      "extraSameCity": ""
+    },
+    {
+      "groupNo": 27,
+      "title": "«Симфония любви» — концерт при свечах",
+      "pageCount": 5,
+      "cityCount": 5,
+      "candidatePageIds": [
+        "97df3de2-d4a9-43db-82f3-ee9bb755be48",
+        "66bddb19-c5a0-47c7-8e0d-3193677439e5",
+        "d5ed4ccf-5aee-4502-8ba1-42800e7e3da2",
+        "9a1a46a1-de1e-45de-9185-d398bda40915",
+        "d237b6a2-9d43-4cd2-ad2c-83cb206536b9"
+      ],
+      "extraSameCityPageIds": [],
+      "extraSameCity": ""
+    },
+    {
+      "groupNo": 28,
+      "title": "Новогодний огонёк с группой «Каролина»",
+      "pageCount": 5,
+      "cityCount": 5,
+      "candidatePageIds": [
+        "6a1bc42c-d99a-4d23-8ea7-29281e544037",
+        "4b9e93cd-b408-40bb-981d-b8dd85805f88",
+        "1ddfc054-7e20-440a-8fc6-e3e32730f99c",
+        "75468fca-e612-4fcc-9ebe-1aeb3da382fd",
+        "deb774fc-ba91-46f8-bbee-0d302dda2ccd"
+      ],
+      "extraSameCityPageIds": [],
+      "extraSameCity": ""
+    },
+    {
+      "groupNo": 29,
+      "title": "Олег Майами — концерт",
+      "pageCount": 4,
+      "cityCount": 4,
+      "candidatePageIds": [
+        "533f232b-3c3c-49a5-8736-329fd1a0a30d",
+        "3cd15683-49a6-4a37-8caa-935e1855b5dc",
+        "3894ccdc-718d-4c17-aafb-80416e146c4f",
+        "cdd7f399-767a-4a8c-b913-368d54570b36"
+      ],
+      "extraSameCityPageIds": [],
+      "extraSameCity": ""
+    },
+    {
+      "groupNo": 30,
+      "title": "aikko — концерт",
+      "pageCount": 4,
+      "cityCount": 4,
+      "candidatePageIds": [
+        "13da320f-84af-45e5-83b2-c43d540b189a",
+        "378b8294-5850-407b-b550-6ac95ba67e35",
+        "ca5d3ae8-b1f0-46aa-8f63-92fb42779343",
+        "4f23a8f1-bab9-444b-8abc-953f5aeddf61"
+      ],
+      "extraSameCityPageIds": [],
+      "extraSameCity": ""
+    }
+  ],
+  "policy": "One representative EventPage per city; repeated same-city pages remain separate and unassigned because current backend enforces one city page per TourGroup."
+}

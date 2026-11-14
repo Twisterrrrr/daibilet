@@ -2,6 +2,11 @@
 .env
 .env.*
 !.env.example
+# Secret files dropped by hand - never commit
+*токен*
+*token*
+*.pem
+*.p12
 
 # Dependencies
 node_modules/
@@ -12,6 +17,13 @@ dist/
 **/dist/
 .vite/
 **/.vite/
+apps/web/public/images/**
+!apps/web/public/images/venues/
+apps/web/public/images/venues/**
+!apps/web/public/images/venues/ulyanovsk/
+apps/web/public/images/venues/ulyanovsk/**
+!apps/web/public/images/venues/ulyanovsk/*-generated.png
+!apps/web/public/images/venues/ulyanovsk/*-commons.jpg
 
 # Generated code
 packages/db/src/generated/
@@ -29,6 +41,14 @@ data/*.log
 .agents/
 .codex-screenshots/
 
+# One-off agent/deploy scratch (smoke scripts, patches) — never commit
+.deploy-tmp/
+tmp-*/
+tmp-*.json
+tmp-*.txt
+scripts/tmp-*
+scripts/analyze-seed-thin.*
+
 # Generated supplier snapshots and local SQL dumps
 data/ticketscloud/*.json
 data/db/*.sql
@@ -38,3 +58,9 @@ data/db/*.sql
 Thumbs.db
 .idea/
 .vscode/
+__pycache__/
+*.pyc
+
+# Runtime disk caches (INC.504.4 catalog DTO snapshot)
+var/cache/
+var/deploy-shadow/

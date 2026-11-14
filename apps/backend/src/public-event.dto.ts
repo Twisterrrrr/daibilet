@@ -1,9 +1,18 @@
-import { Prisma, prisma } from '../../../packages/db/src/client.ts';
+import type { Prisma } from '@daibilet/db';
+import { prisma } from '@daibilet/db';
+import { join } from '@daibilet/db/sql';
 import {
+  hasUpcomingOrOpenSchedule,
   isOpenDateCatalogRow,
+  isPublicSessionRowOnSale,
+  isStartedTicketcloudSlot,
+  isSaleableEventForPublic,
   isWideLifetimeSession,
+  resolvePublicEventAvailability,
 } from './catalog-availability.js';
-import { dedupePublicOffers, formatDate, formatTime, isSaleableEventForPublic, normalizeStartsAt, preferNamedTicketOffers, timeBucket } from './dto.js';
+import { isLocalWeekend, resolveCityTimeZone } from './city-timezone.js';
+import { formatDate, formatTime, normalizeStartsAt, timeBucket } from './public-datetime.js';
+import { dedupePublicOffers, preferNamedTicketOffers } from './public-offers.js';
 import { findLandingRule, matchingLandingSlugs } from './landing-rules.js';
 import {
   buildProviderWidgetPayload,
@@ -12,18 +21,40 @@ import {
   purchaseInfo,
   resolveSessionPurchaseExternalId,
 } from './provider-purchase.js';
-import { getPublicCatalogSessions } from './public-catalog.dto.js';
+import type { PurchaseProvider } from './types/common.js';
+import { resolveEditorialEventImage } from './event-cover-images.js';
+import { pickFirstUsableEventImageUrl } from './event-image-url.js';
+import {
+  pickPrimarySessionPurchase,
+  shouldSynthesizeWidgetOnlySession,
+} from './public-event-widget-fallback.js';
 import { pickCatalogSubcategories } from './public-catalog.mapper.js';
+import {
+  catalogListsWithTitles,
+  normalizeCatalogTagLabels,
+  resolveCatalogLists,
+  resolveEventTaxonomy,
+} from './catalog-taxonomy.js';
+import { formatReviewDisplayName } from './review-display.js';
+import { spreadCatalogSessionsByCoverImage } from './public-catalog-spread.js';
+import { pickRelatedSessions } from './event-related.js';
+import { formatPublicEventTitle } from './event-title-normalize.ts';
 import type {
   PublicEventDto,
   PublicEventPageDto,
+  PublicPdpDocumentDto,
   PublicOfferDto,
+  PublicPurchaseOptionDto,
   PublicSessionDto,
   PublicTicketPriceDto,
 } from './types/public.js';
 
 const MIN_DISPLAY_PRICE_RUB = 100;
 const PUBLIC_EVENT_CACHE_MS = 5 * 60 * 1000;
+/** DB fetch budget before STAND_BY/closed filter (meta products have many dated TC children). */
+const PUBLIC_EVENT_SESSION_FETCH_LIMIT = 64;
+/** Max on-sale sessions on the public event page (was hard-capped at 5). */
+const PUBLIC_EVENT_SESSION_DISPLAY_LIMIT = 32;
 
 const eventInclude = {
   primaryCity: { include: { region: true } },
@@ -80,12 +111,189 @@ interface MappedOffer extends PublicOfferDto {
   eventId: string;
   sortOrder: number | null;
   sourceTicketId: string | null;
+  payload: Prisma.JsonValue | null;
 }
 
 type PublicEventSession = PublicEventPageDto['sessions'][number];
+type RequestedSessionContext = NonNullable<PublicEventPageDto['requestedSessionContext']>;
 
 const eventCache = new Map<string, CachedEventPage>();
 const eventBuilds = new Map<string, Promise<PublicEventPageDto | null>>();
+
+type PublicTourPeer = NonNullable<PublicEventPageDto['peerEvents']>[number];
+
+async function loadIndexableEventPageSlugs(eventIds: string[]): Promise<Map<string, string>> {
+  const uniqueIds = [...new Set(eventIds.filter(Boolean))];
+  if (!uniqueIds.length) return new Map();
+  try {
+    const rows = await prisma.$queryRawUnsafe<Array<{ eventId: string; slug: string }>>(`
+      SELECT DISTINCT ON (link."eventId") link."eventId", page.slug
+      FROM "EventPageEvent" link
+      JOIN "EventPage" page ON page.id = link."eventPageId"
+      WHERE link."eventId" = ANY($1::text[])
+        AND page.status = 'READY'
+        AND page."publishedAt" IS NOT NULL
+        AND page."isIndexable" IS TRUE
+      ORDER BY link."eventId", link.position, link."createdAt", page.slug
+    `, uniqueIds);
+    return new Map(rows.map((row) => [row.eventId, row.slug]));
+  } catch (error) {
+    if ((error as { code?: string })?.code === 'P2021' || (error as { code?: string })?.code === '42P01') return new Map();
+    throw error;
+  }
+}
+
+async function loadPublishedTourPeers(eventId: string): Promise<{ assigned: boolean; peers: PublicTourPeer[] }> {
+  try {
+    const result = await prisma.$queryRawUnsafe<Array<PublicTourPeer & { eventPageSlug: string | null }>>(`
+      WITH city_candidates AS (
+      SELECT peer_event.id,
+        peer_event.slug,
+        peer_page.slug AS "eventPageSlug",
+        peer_event.title,
+        city.title AS city,
+        city.slug AS "citySlug",
+        COALESCE(venue.title, '') AS venue,
+        COALESCE(venue.slug, '') AS "venueSlug",
+        peer_event."startsAt" AS "startsAt",
+        peer_event."priceFromRub" AS "priceFrom",
+        ROW_NUMBER() OVER (
+          PARTITION BY city.id
+          ORDER BY peer_event."startsAt" NULLS LAST, peer_page.slug
+        ) AS city_rank
+      FROM "EventPageEvent" current_link
+      JOIN "EventPage" current_page ON current_page.id = current_link."eventPageId"
+      JOIN "EventTourGroup" tour_group ON tour_group.id = current_page."tourGroupId"
+      JOIN "Event" current_event ON current_event.id = current_link."eventId"
+      JOIN "EventPage" peer_page ON peer_page."tourGroupId" = tour_group.id AND peer_page.id <> current_page.id
+      JOIN LATERAL (
+        SELECT event.id, event.slug, event.title, event."primaryCityId", event."venueId", event."priceFromRub",
+          (
+            SELECT min(session."startsAt")
+            FROM "EventSession" session
+            WHERE session."eventId" = event.id
+              AND session."isActive" IS TRUE
+              AND session."cancelledAt" IS NULL
+              AND session."startsAt" >= now() - interval '15 minutes'
+              AND lower(coalesce(session."sourceStatus", '')) NOT IN
+                ('widget_blocked', 'paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden', 'stand_by', 'closed', 'sales_closed', 'sale_closed', 'not_for_sale')
+          ) AS "startsAt"
+        FROM "EventPageEvent" peer_link
+        JOIN "Event" event ON event.id = peer_link."eventId"
+        WHERE peer_link."eventPageId" = peer_page.id
+          AND event."primaryCityId" IS NOT NULL
+          AND event.status <> 'HIDDEN'
+          AND EXISTS (
+            SELECT 1 FROM "EventOffer" offer
+            WHERE offer."eventId" = event.id AND offer.active IS NOT FALSE
+              AND (
+                (upper(event.kind::text) = 'OPEN_DATE'
+                  AND (event."openDateValidTo" IS NULL OR event."openDateValidTo" >= now()))
+                OR EXISTS (
+                  SELECT 1 FROM "EventSession" available_session
+                  WHERE available_session."eventId" = event.id
+                    AND available_session."isActive" IS NOT FALSE
+                    AND available_session."cancelledAt" IS NULL
+                    AND lower(coalesce(available_session."sourceStatus", '')) NOT IN
+                      ('widget_blocked', 'paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden', 'stand_by', 'closed', 'sales_closed', 'sale_closed', 'not_for_sale')
+                    AND (
+                      (available_session."startsAt" IS NOT NULL AND available_session."startsAt" >= now() - interval '15 minutes')
+                      OR (available_session."startsAt" IS NOT NULL AND available_session."endsAt" IS NOT NULL
+                        AND available_session."startsAt" < now() AND available_session."endsAt" >= now()
+                        AND available_session."endsAt" - available_session."startsAt" < interval '36 hours')
+                      OR lower(coalesce(available_session."sourceStatus", '')) IN ('open_date', 'widget')
+                    )
+                )
+              )
+          )
+        ORDER BY "startsAt" NULLS LAST, peer_link.position, peer_link."createdAt", event.id
+        LIMIT 1
+      ) peer_event ON peer_event."primaryCityId" <> current_event."primaryCityId"
+      JOIN "City" city ON city.id = peer_event."primaryCityId"
+      LEFT JOIN "Venue" venue ON venue.id = peer_event."venueId"
+      WHERE current_link."eventId" = $1
+        AND current_page.status = 'READY' AND current_page."publishedAt" IS NOT NULL
+        AND peer_page.status = 'READY' AND peer_page."publishedAt" IS NOT NULL
+        AND peer_page."isIndexable" IS TRUE
+      )
+      SELECT id, slug, "eventPageSlug", title, city, "citySlug", venue, "venueSlug", "startsAt", "priceFrom"
+      FROM city_candidates
+      WHERE city_rank = 1
+      ORDER BY "startsAt" NULLS LAST, city, "eventPageSlug"
+      LIMIT 30
+    `, eventId);
+    const assigned = await prisma.$queryRawUnsafe<Array<{ assigned: boolean }>>(`
+      SELECT EXISTS (
+        SELECT 1 FROM "EventPageEvent" link
+        JOIN "EventPage" page ON page.id = link."eventPageId"
+        WHERE link."eventId" = $1 AND page."tourGroupId" IS NOT NULL
+      ) AS assigned
+    `, eventId);
+    return {
+      assigned: assigned[0]?.assigned === true,
+      peers: result.map((peer) => ({
+        id: peer.id,
+        slug: peer.slug,
+        eventPageSlug: peer.eventPageSlug,
+        title: peer.title,
+        city: peer.city,
+        citySlug: peer.citySlug,
+        venue: peer.venue,
+        venueSlug: peer.venueSlug,
+        startsAt: peer.startsAt,
+        timeZone: resolveCityTimeZone(peer.city),
+        priceFrom: peer.priceFrom,
+      })),
+    };
+  } catch (error) {
+    // Keep the public event read path compatible during rolling migration rollout.
+    if ((error as { code?: string })?.code === 'P2021' || (error as { code?: string })?.code === '42P01') {
+      return { assigned: false, peers: [] };
+    }
+    throw error;
+  }
+}
+
+type StableEventPageRecord = {
+  id: string;
+  slug: string;
+  title: string;
+  summary: string | null;
+  heroImageUrl: string | null;
+  content: unknown;
+  seoH1: string | null;
+  seoTitle: string | null;
+  seoDescription: string | null;
+  status: string;
+  isIndexable: boolean;
+  publishedAt: Date | null;
+  eventId: string;
+  eventIds: string[];
+};
+
+async function loadStableEventPage(where: 'slug' | 'eventId', value: string): Promise<StableEventPageRecord | null> {
+  try {
+    const condition = where === 'slug' ? 'lower(page.slug) = lower($1)' : 'link."eventId" = $1';
+    const result = await prisma.$queryRawUnsafe<StableEventPageRecord[]>(`
+      SELECT page.id, page.slug, page.title, page.summary, page."heroImageUrl", page.content, page."seoH1", page."seoTitle", page."seoDescription",
+        page.status, page."isIndexable", page."publishedAt", link."eventId",
+        ARRAY(
+          SELECT page_link."eventId" FROM "EventPageEvent" page_link
+          WHERE page_link."eventPageId" = page.id
+          ORDER BY page_link.position, page_link."createdAt", page_link."eventId"
+        ) AS "eventIds"
+      FROM "EventPage" page
+      JOIN "EventPageEvent" link ON link."eventPageId" = page.id
+      WHERE ${condition}
+      ORDER BY link.position, link."createdAt"
+      LIMIT 1
+    `, value);
+    return result[0] || null;
+  } catch (error) {
+    if ((error as { code?: string })?.code === 'P2021' || (error as { code?: string })?.code === '42P01') return null;
+    throw error;
+  }
+}
 
 export function clearPublicEventDtoCache(): void {
   eventCache.clear();
@@ -116,34 +324,93 @@ export async function buildPublicEventDto(
   }
 }
 
-async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPageDto | null> {
-  const catalogSessions = await getPublicCatalogSessions();
+async function loadPublicEventDto(
+  eventSlugOrId: string,
+  allowSoftRedirect = true,
+  inheritedSessionContext?: RequestedSessionContext | null,
+): Promise<PublicEventPageDto | null> {
+  // PERF.E5: resolve by slug/id via Prisma - do NOT load full public catalog (~2600 rows).
   const requestedSlug = publicSlug(eventSlugOrId);
-  const targetCatalogSession = catalogSessions.find((session) =>
-    session.id === eventSlugOrId ||
-    session.sourceSlug === eventSlugOrId ||
-    session.slug === requestedSlug ||
-    (session.groupEventIds || []).includes(eventSlugOrId)
-  );
-
-  const requestedEvent = await resolveEvent(eventSlugOrId, targetCatalogSession);
+  const stablePageBySlug = await loadStableEventPage('slug', requestedSlug);
+  const requestedEvent = stablePageBySlug
+    ? await prisma.event.findUnique({ where: { id: stablePageBySlug.eventId }, include: eventInclude })
+    : await resolveEvent(eventSlugOrId);
   if (!requestedEvent) return null;
-  const groupEventIds = targetCatalogSession?.groupEventIds?.length
-    ? targetCatalogSession.groupEventIds
-    : [requestedEvent.id];
-  const groupEvents = await prisma.event.findMany({
-    where: { id: { in: groupEventIds } },
-    include: eventInclude,
-  });
-  const eventsById = new Map(groupEvents.map((event) => [event.id, event]));
-  if (!eventsById.has(requestedEvent.id)) eventsById.set(requestedEvent.id, requestedEvent);
-  const representative = eventsById.get(targetCatalogSession?.id || '') || requestedEvent;
+  const stablePage = stablePageBySlug || await loadStableEventPage('eventId', requestedEvent.id);
+  const stablePagePublished = stablePage?.status === 'READY' && stablePage.publishedAt != null;
+  const stablePageEventIds = stablePagePublished ? stablePage.eventIds : [];
+  const stablePageEvents = stablePageEventIds.length
+    ? await prisma.event.findMany({
+        where: { id: { in: stablePageEventIds }, status: { notIn: ['HIDDEN', 'DRAFT'] } },
+        include: eventInclude,
+      })
+    : [];
+  const mergeGroupMembers = await loadMergeGroupMembers([requestedEvent, ...stablePageEvents]);
+  const metaGroupMembers = await loadMetaGroupMembers(requestedEvent);
+  const requestedSessionContext = inheritedSessionContext === undefined
+    ? mergeGroupMembers.length || metaGroupMembers.length
+      ? await loadRequestedSessionContext(requestedEvent)
+      : null
+    : inheritedSessionContext;
+  const eventsById = new Map<string, EventRecord>([[requestedEvent.id, requestedEvent]]);
+  const stablePageEventsById = new Map(stablePageEvents.map((event) => [event.id, event]));
+  for (const eventId of stablePageEventIds) {
+    const event = stablePageEventsById.get(eventId);
+    if (event) eventsById.set(event.id, event);
+  }
+  for (const member of mergeGroupMembers) eventsById.set(member.id, member);
+  for (const member of metaGroupMembers) eventsById.set(member.id, member);
+  const mergedGroupEvents = [...eventsById.values()];
+  const groupEventIds = [...eventsById.keys()];
+  const purchaseProvider = pickGroupPurchaseProvider(undefined, mergedGroupEvents, requestedEvent);
+  const providerFilteredEventIds = filterGroupEventIdsByPurchaseProvider(
+    groupEventIds,
+    eventsById,
+    purchaseProvider,
+    requestedEvent.id,
+  );
+  // Explicit EventPage membership is an editor-confirmed relationship, so include
+  // those local product records even when their providers differ. Their own
+  // sessions and offer URLs remain attached to the source Event.
+  const purchaseGroupEventIds = [...new Set([
+    ...providerFilteredEventIds,
+    ...stablePageEventIds.filter((eventId) => eventsById.has(eventId)),
+  ])];
+  const offerScopeEventIds = [...new Set([
+    ...purchaseGroupEventIds,
+    ...mergeGroupMembers.map((member) => member.id),
+    ...metaGroupMembers.map((member) => member.id),
+  ])];
+  const representative = eventsById.get(purchaseGroupEventIds[0] || '') || requestedEvent;
+  // Tariff/offer rows must come from the page event (and merge peers), not from
+  // hundreds of dated TC siblings. Ordering the whole meta-group by price ASC +
+  // take 32 keeps only the cheapest child tariffs and drops adult/other categories.
+  const tariffOfferEventIds = [...new Set([
+    requestedEvent.id,
+    representative.id,
+    ...stablePageEventIds,
+  ])];
 
   const now = new Date();
+  // Prefer live sibling when the opened slug itself is STAND_BY/closed (meta TC children).
+  if (
+    allowSoftRedirect &&
+    !stablePagePublished &&
+    !isPublicSessionRowOnSale({ sourceStatus: requestedEvent.sourceStatus })
+  ) {
+    const nearestSibling =
+      (await findNearestSaleableSiblingSlug(requestedEvent, metaGroupMembers, mergeGroupMembers)) ||
+      (await findSaleableTitleTwinSlug(requestedEvent));
+    if (nearestSibling && publicSlug(nearestSibling) !== requestedSlug) {
+      return loadPublicEventDto(nearestSibling, false, requestedSessionContext);
+    }
+  }
   const [sessionRows, offerRows] = await Promise.all([
     prisma.eventSession.findMany({
       where: {
-        eventId: { in: groupEventIds },
+        eventId: { in: offerScopeEventIds },
+        isActive: true,
+        cancelledAt: null,
         OR: [
           { endsAt: { gte: now } },
           { startsAt: { gte: now } },
@@ -151,17 +418,34 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
       },
       include: sessionInclude,
       orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
-      take: 5,
-    }),
+      take: PUBLIC_EVENT_SESSION_FETCH_LIMIT,
+    }).then((rows) =>
+      rows.filter((session) => {
+        if (!isPublicSessionRowOnSale(session)) return false;
+        const event = eventsById.get(session.eventId) || requestedEvent;
+        if (!isPublicSessionRowOnSale({ sourceStatus: event.sourceStatus })) return false;
+        if (isStartedTicketcloudSlot(
+          { kind: event.kind, sourceStatus: session.sourceStatus, startsAt: session.startsAt },
+          purchaseProviderForEvent(event) || purchaseProvider,
+          now,
+        )) return false;
+        return hasUpcomingOrOpenSchedule({
+          kind: event.kind,
+          sourceStatus: session.sourceStatus,
+          startsAt: session.startsAt,
+          endsAt: session.endsAt,
+        });
+      }).slice(0, PUBLIC_EVENT_SESSION_DISPLAY_LIMIT),
+    ),
     prisma.eventOffer.findMany({
       where: {
-        eventId: { in: groupEventIds },
+        eventId: { in: tariffOfferEventIds },
         active: true,
         priceRub: { gte: MIN_DISPLAY_PRICE_RUB },
       },
       include: offerInclude,
       orderBy: [{ priceRub: 'asc' }, { id: 'asc' }],
-      take: 32,
+      take: 64,
     }),
   ]);
 
@@ -199,24 +483,39 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
     eventSourceCode,
     eventPurchase,
     eventPurchaseUrl,
-    targetCatalogSession,
+    undefined,
   );
-  const sessions = publicSessions.length ? publicSessions : widgetOnlySessions;
+  const sessions = dedupePublicEventSessionsByStartsAt(
+    publicSessions.length ? publicSessions : widgetOnlySessions,
+  );
+  const sessionHistory = sessions.length ? null : await prisma.eventSession.aggregate({
+    where: { eventId: { in: groupEventIds }, cancelledAt: null },
+    _max: { startsAt: true, endsAt: true },
+  });
+  const historyDates = [sessionHistory?._max.startsAt, sessionHistory?._max.endsAt]
+    .filter((value): value is Date => value instanceof Date && Number.isFinite(value.getTime()));
+  const lastSessionAt = historyDates.length
+    ? historyDates.reduce((latest, value) => value > latest ? value : latest)
+    : null;
+  const availability = resolvePublicEventAvailability(sessions.length > 0, lastSessionAt);
+  const hasEndedFallback = sessions.length === 0 && lastSessionAt != null;
+  const primaryPurchase = pickPrimarySessionPurchase(sessions, eventPurchaseUrl, requestedIdentity.externalId);
   const tags = orderedEventTags(requestedEvent);
   const subcategories = pickCatalogSubcategories({
     category: requestedEvent.category?.title || null,
     subcategories: eventSubcategories(requestedEvent),
     tags,
+    title: requestedEvent.override?.title || requestedEvent.title,
+    venue: requestedEvent.venue?.title || null,
   });
-  const destination = eventDestination(requestedEvent, targetCatalogSession);
+  const destination = eventDestination(requestedEvent);
   const priceFrom = displayPriceFrom(
-    targetCatalogSession?.priceFrom,
     requestedEvent.priceFromRub,
     ...sessions.map((session) => session.priceFrom),
     ...offers.map((offer) => offer.priceRub),
   );
-  const title = requestedEvent.override?.title || requestedEvent.title;
-  const landingSlugs = targetCatalogSession?.landingSlugs || matchingLandingSlugs({
+  const title = formatPublicEventTitle(requestedEvent.override?.title || requestedEvent.title);
+  const landingSlugs = matchingLandingSlugs({
     title,
     category: requestedEvent.category?.title || null,
     sourceCategory: requestedEvent.category?.title || null,
@@ -228,21 +527,72 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
     startsAt: sessions[0]?.startsAt || null,
     upcomingSlots: sessions,
   });
+  const eventTimeZone = resolveCityTimeZone(requestedEvent.primaryCity?.title, destination.name);
+  const freeAdmissionConfirmed = requestedEvent.priceFromRub === 0 ||
+    sessions.some((session) => session.priceFrom === 0) ||
+    offers.some((offer) => offer.priceRub === 0);
+  const weekendSessionConfirmed = sessions.some((session) => isLocalWeekend(session.startsAt, eventTimeZone));
+  const taxonomy = resolveEventTaxonomy({
+    title,
+    category: requestedEvent.category?.title,
+    categorySlug: requestedEvent.category?.slug,
+    editorialSubcategorySlug: requestedEvent.primarySubcategory?.slug,
+    editorialSubcategoryTitle: requestedEvent.primarySubcategory?.title,
+    sourceSubcategories: subcategories,
+    tags,
+    venue: requestedEvent.venue?.title,
+    venuePlaceType: requestedEvent.venue?.placeType,
+    venuePlaceSubtype: requestedEvent.venue?.placeSubtype,
+    ageLimit: requestedEvent.ageLimit,
+    priceFrom,
+    freeAdmissionConfirmed,
+    weekendSessionConfirmed,
+    landingSlugs,
+    startsAt: sessions[0]?.startsAt || null,
+    upcomingSlots: sessions,
+    timeZone: eventTimeZone,
+  });
+  const catalogLists = catalogListsWithTitles(resolveCatalogLists({
+    title,
+    sourceSubcategories: subcategories,
+    tags,
+    venue: requestedEvent.venue?.title,
+    venuePlaceType: requestedEvent.venue?.placeType,
+    venuePlaceSubtype: requestedEvent.venue?.placeSubtype,
+    ageLimit: requestedEvent.ageLimit,
+    priceFrom,
+    freeAdmissionConfirmed,
+    weekendSessionConfirmed,
+    startsAt: sessions[0]?.startsAt || null,
+    upcomingSlots: sessions,
+    timeZone: eventTimeZone,
+  }));
   const event: PublicEventDto = {
     id: representative.id,
     slug: publicSlug(representative.slug),
     sourceSlug: representative.slug,
     sourceCode: eventSourceCode,
-    externalId: requestedIdentity.externalId,
+    externalId: primaryPurchase.externalId,
     widgetProvider: providerForSource(eventSourceCode),
     widgetPayload: buildProviderWidgetPayload({
       sourceCode: eventSourceCode,
-      externalId: requestedIdentity.externalId,
+      externalId: primaryPurchase.externalId,
     }),
     title,
     description: cleanImportedDescription(requestedEvent.override?.description || requestedEvent.description),
-    imageUrl: requestedEvent.override?.imageUrl || requestedEvent.imageUrl || requestedEvent.venue?.heroImageUrl || requestedEvent.primaryCity?.heroImageUrl || null,
+    imageUrl:
+      resolveEditorialEventImage(requestedEvent.id, requestedEvent.slug, null) ||
+      pickFirstUsableEventImageUrl(
+        requestedEvent.override?.imageUrl,
+        requestedEvent.imageUrl,
+        requestedEvent.venue?.heroImageUrl,
+        requestedEvent.primaryCity?.heroImageUrl,
+      ),
     category: requestedEvent.category?.title || 'События',
+    catalogCategory: taxonomy.category,
+    catalogSubcategory: taxonomy.subcategory,
+    catalogLists,
+    tagLabels: normalizeCatalogTagLabels(tags),
     tags,
     subcategories,
     city: requestedEvent.primaryCity?.title || 'Не указан',
@@ -251,58 +601,201 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
     sourceCitySlug: requestedEvent.primaryCity?.slug || null,
     destination: destination.name,
     destinationType: destination.type,
+    timeZone: eventTimeZone,
     venueId: requestedEvent.venue?.id || null,
     venueSlug: requestedEvent.venue?.slug || null,
+    venuePageIndexable: requestedEvent.venue?.pageStatus === 'PUBLISHED' && requestedEvent.venue?.isIndexable === true,
     venue: requestedEvent.venue?.title || 'Не указано',
     venueAddress: requestedEvent.venue?.address || null,
     venueKind: requestedEvent.venue?.kind || 'OTHER',
+    venueLatitude:
+      requestedEvent.venue?.latitude == null || !Number.isFinite(requestedEvent.venue.latitude)
+        ? null
+        : Number(requestedEvent.venue.latitude),
+    venueLongitude:
+      requestedEvent.venue?.longitude == null || !Number.isFinite(requestedEvent.venue.longitude)
+        ? null
+        : Number(requestedEvent.venue.longitude),
+    venueMetroStation: (() => {
+      const text = String(requestedEvent.venue?.metroStation ?? '').trim();
+      return text || null;
+    })(),
+    venueWayToFind: (() => {
+      const text = String(requestedEvent.venue?.wayToFind ?? '').trim();
+      return text || null;
+    })(),
+    venueParkingInfo: (() => {
+      const text = String(requestedEvent.venue?.parkingInfo ?? '').trim();
+      return text || null;
+    })(),
     ageLimit: requestedEvent.ageLimit,
     priceFrom,
-    vacant: targetCatalogSession?.vacant ?? requestedEvent.ticketsVacant,
+    vacant: requestedEvent.ticketsVacant,
     eventType: requestedEvent.kind.toLowerCase(),
     landingSlugs,
-    groupKey: targetCatalogSession?.groupKey || eventGroupKey(requestedEvent, requestedIdentity),
-    groupEventIds,
-    sessionCount: targetCatalogSession?.sessionCount || sessions.length,
-    purchaseUrl: eventPurchaseUrl,
-    widgetUrl: representativeOffer?.widgetUrl || eventPurchaseUrl,
+    groupKey: eventGroupKey(requestedEvent, requestedIdentity),
+    groupEventIds: [...new Set([
+      ...groupEventIds,
+      ...metaGroupMembers.map((member) => member.id),
+    ])],
+    sessionCount: sessions.length,
+    purchaseUrl: primaryPurchase.purchaseUrl,
+    widgetUrl: representativeOffer?.widgetUrl || primaryPurchase.purchaseUrl,
     deeplinkUrl: representativeOffer?.deeplinkUrl || null,
-    purchaseReady: eventPurchase.ready,
+    purchaseReady: eventPurchase.ready || Boolean(primaryPurchase.purchaseUrl),
     purchaseMode: eventPurchase.mode,
     purchaseProvider: eventPurchase.provider,
-    purchaseUrlSource: eventPurchase.urlSource,
+    purchaseUrlSource: primaryPurchase.urlSource || eventPurchase.urlSource,
     seoH1: requestedEvent.override?.seoH1 || requestedEvent.seoH1 || title,
-    seoTitle: requestedEvent.override?.seoTitle || requestedEvent.seoTitle || `${title}: билеты и расписание | Дайбилет`,
+    seoTitle: requestedEvent.override?.seoTitle || requestedEvent.seoTitle || (() => {
+      const nearest = sessions[0];
+      const dateBit = [nearest?.dateLabel, nearest?.timeLabel].filter(Boolean).join(', ');
+      const core = dateBit && !String(title).includes(String(nearest?.dateLabel || ''))
+        ? `${title} (${dateBit})`
+        : title;
+      return `${core}: билеты и расписание | Дайбилет`;
+    })(),
     seoDescription: cleanImportedDescription(requestedEvent.override?.seoDescription || requestedEvent.seoDescription) ||
       `Расписание, цены и билеты на ${title}. Покупка через виджет билетной системы.`,
     canonicalPath: requestedEvent.override?.canonicalPath || requestedEvent.canonicalPath || `/events/${publicSlug(representative.slug)}`,
     isIndexable: requestedEvent.override?.isIndexable ?? requestedEvent.isIndexable,
   };
-  const ticketPrices = buildTicketPrices(offers, sessions, event);
-  const related = relatedSessions(catalogSessions, groupEventIds, requestedEvent, 12);
+  if (hasEndedFallback) {
+    event.priceFrom = null;
+    event.vacant = null;
+    event.purchaseUrl = null;
+    event.widgetUrl = null;
+    event.deeplinkUrl = null;
+    event.purchaseReady = false;
+    event.purchaseMode = 'unavailable';
+    event.purchaseProvider = null;
+  }
+  const publicOffers = hasEndedFallback ? [] : offers;
+  const pdp = await attachReadyEventPdp(requestedEvent.id);
+  const [ratingSummary, reviews] = await loadPublicEventReviews(groupEventIds);
+  const pdpSections = pdp?.content.sections || [];
+  const program = pdpSections
+    .filter((section) => section.kind === 'program')
+    .flatMap((section) => (section.items || []).map((item) => ({
+      timeLabel: item.timeLabel || item.meta || '',
+      title: item.title,
+      ...(item.description ? { description: item.description } : {}),
+    })).filter((item) => item.timeLabel));
+  const faq = pdpSections
+    .filter((section) => section.kind === 'faq')
+    .flatMap((section) => (section.items || []).map((item) => ({
+      q: item.title,
+      a: item.description || item.meta || '',
+    })).filter((item) => item.q && item.a));
+  const ticketPrices = hasEndedFallback ? [] : buildTicketPrices(publicOffers, sessions, event);
+  const purchaseOptionEvents = stablePagePublished && stablePageEvents.length > 1
+    ? stablePageEvents
+    : mergedGroupEvents;
+  const purchaseOptions = await buildMergedPurchaseOptions(
+    purchaseOptionEvents,
+    publicOffers,
+    requestedEvent,
+    eventPurchaseUrl,
+  );
+  const related = await loadRelatedSessionsFromDb(requestedEvent, groupEventIds, 12);
+  const explicitTour = await loadPublishedTourPeers(requestedEvent.id);
+  const inferredPeerCandidates = mergedGroupEvents.filter((peer) =>
+    peer.id !== requestedEvent.id && peer.primaryCityId && peer.primaryCityId !== requestedEvent.primaryCityId,
+  );
+  const inferredPageSlugs = explicitTour.assigned
+    ? new Map<string, string>()
+    : await loadIndexableEventPageSlugs(inferredPeerCandidates.map((peer) => peer.id));
+  const inferredPeers: PublicTourPeer[] = explicitTour.assigned ? [] : inferredPeerCandidates
+    .flatMap((peer) => {
+      const eventPageSlug = inferredPageSlugs.get(peer.id);
+      const nextSession = sessionRows
+        .filter((session) => session.eventId === peer.id && session.startsAt && session.startsAt.getTime() >= Date.now() - 15 * 60_000)
+        .sort((a, b) => (a.startsAt?.getTime() || 0) - (b.startsAt?.getTime() || 0))[0];
+      const cityId = peer.primaryCityId || '';
+      if (!eventPageSlug || !nextSession || !peer.primaryCity?.title || !cityId) return [];
+      return [{
+        id: peer.id,
+        slug: publicSlug(peer.slug),
+        eventPageSlug,
+        title: formatPublicEventTitle(peer.override?.title || peer.title),
+        city: peer.primaryCity.title,
+        citySlug: peer.primaryCity.slug || '',
+        venue: peer.venue?.title || '',
+        venueSlug: peer.venue?.slug || '',
+        startsAt: nextSession.startsAt?.toISOString() || null,
+        timeZone: resolveCityTimeZone(peer.primaryCity.title),
+        priceFrom: peer.priceFromRub || null,
+      }];
+    })
+    .sort((a, b) => String(a.startsAt || '').localeCompare(String(b.startsAt || ''), 'en') || a.city.localeCompare(b.city, 'ru'))
+    .filter((peer, index, peers) => peers.findIndex((candidate) => candidate.citySlug === peer.citySlug) === index)
+    .slice(0, 30);
   const priceValues = [event.priceFrom, ...sessions.map((session) => session.priceFrom)]
     .filter((value): value is number => Number.isFinite(value) && Number(value) >= MIN_DISPLAY_PRICE_RUB);
   const vacantValues = sessions.map((session) => session.vacant)
     .filter((value): value is number => Number.isFinite(value));
 
-  const scheduleSource = sessionRows[0] || sessions[0] || targetCatalogSession;
-  if (!isSaleableEventForPublic({
+  const scheduleSource = sessionRows[0] || sessions[0];
+  const scheduleSourceStatus = scheduleSource && 'sourceStatus' in scheduleSource
+    ? scheduleSource.sourceStatus
+    : requestedEvent.sourceStatus;
+  if (!stablePagePublished && !hasEndedFallback && !isSaleableEventForPublic({
     kind: requestedEvent.kind,
-    sourceStatus: requestedEvent.sourceStatus,
+    sourceStatus: scheduleSourceStatus,
     startsAt: scheduleSource && 'startsAt' in scheduleSource ? scheduleSource.startsAt : null,
     endsAt: sessionRows[0]?.endsAt || sessions.find((session) => session.endsAt)?.endsAt || null,
     purchaseReady: event.purchaseReady,
     priceFrom: event.priceFrom,
   })) {
+    if (allowSoftRedirect) {
+      const nearestSibling =
+        (await findNearestSaleableSiblingSlug(requestedEvent, metaGroupMembers, mergeGroupMembers)) ||
+        (await findSaleableTitleTwinSlug(requestedEvent));
+      if (nearestSibling && publicSlug(nearestSibling) !== requestedSlug) {
+        return loadPublicEventDto(nearestSibling, false, requestedSessionContext);
+      }
+    }
     return null;
   }
 
   return {
     generatedAt: new Date().toISOString(),
     event,
+    rating: ratingSummary,
+    reviews,
+    ...(program.length ? { program } : {}),
+    ...(faq.length ? { faq } : {}),
+    availability,
+    ...(stablePage ? {
+      eventPageRoute: {
+        slug: stablePage.slug,
+        status: stablePage.status,
+        published: stablePage.status === 'READY' && stablePage.publishedAt != null,
+        isIndexable: stablePage.status === 'READY' && stablePage.publishedAt != null && stablePage.isIndexable,
+        heroImageUrl: stablePage.heroImageUrl,
+        availability,
+      },
+      eventPage: stablePage.status === 'READY' && stablePage.publishedAt != null ? {
+        slug: stablePage.slug,
+        title: stablePage.title,
+        summary: stablePage.summary,
+        heroImageUrl: stablePage.heroImageUrl,
+        content: stablePage.content as NonNullable<PublicEventPageDto['eventPage']>['content'],
+        seoH1: stablePage.seoH1,
+        seoTitle: stablePage.seoTitle,
+        seoDescription: stablePage.seoDescription,
+      } : null,
+    } : { eventPageRoute: null, eventPage: null }),
+    pdp,
+    ...(requestedSessionContext && sessions.some((session) => session.eventId !== requestedEvent.id)
+      ? { requestedSessionContext }
+      : {}),
     sessions,
-    offers: offers.map(({ eventId: _eventId, sortOrder: _sortOrder, sourceTicketId: _sourceTicketId, ...offer }) => offer),
+    offers: publicOffers.map(({ eventId: _eventId, sortOrder: _sortOrder, sourceTicketId: _sourceTicketId, payload: _payload, ...offer }) => offer),
     ticketPrices,
+    ...(!hasEndedFallback && purchaseOptions.length >= 2 ? { purchaseOptions } : {}),
+    // Explicit manual tour grouping wins; inferred source groups remain fallback only.
+    peerEvents: explicitTour.assigned ? explicitTour.peers : inferredPeers,
     related,
     landings: landingSlugs.map(findLandingRule).filter(isDefined).map((rule) => ({
       slug: rule.slug,
@@ -311,26 +804,109 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
       chips: rule.chips,
     })),
     stats: {
-      sessions: targetCatalogSession?.sessionCount || sessions.length,
+      sessions: sessions.length,
       priceFrom: priceValues.length ? Math.min(...priceValues) : null,
       vacant: vacantValues.length ? vacantValues.reduce((sum, value) => sum + value, 0) : null,
     },
   };
 }
 
-async function resolveEvent(
-  eventSlugOrId: string,
-  catalogSession?: PublicSessionDto,
-): Promise<EventRecord | null> {
+async function loadRequestedSessionContext(event: EventRecord): Promise<RequestedSessionContext | null> {
+  const sessions = await prisma.eventSession.findMany({
+    where: {
+      eventId: event.id,
+      isActive: true,
+      cancelledAt: null,
+      startsAt: { not: null },
+    },
+    select: { startsAt: true, endsAt: true },
+    orderBy: { startsAt: 'asc' },
+    take: 2,
+  });
+  if (sessions.length !== 1 || !sessions[0]?.startsAt) return null;
+
+  const destination = eventDestination(event);
+  const timeZone = resolveCityTimeZone(event.primaryCity?.title, destination.name);
+  return {
+    startsAt: normalizeStartsAt(sessions[0].startsAt) || sessions[0].startsAt.toISOString(),
+    endsAt: normalizeStartsAt(sessions[0].endsAt),
+    dateLabel: formatDate(sessions[0].startsAt, timeZone),
+    timeLabel: formatTime(sessions[0].startsAt, timeZone),
+    cityName: event.primaryCity?.title || destination.name,
+    citySlug: destination.slug,
+  };
+}
+
+async function attachReadyEventPdp(eventId: string): Promise<PublicPdpDocumentDto | null> {
+  try {
+    const document = await prisma.pdpDocument.findUnique({
+      where: { eventId },
+      select: { variant: true, status: true, content: true },
+    });
+    if (!document || document.status !== 'READY') return null;
+    return { variant: document.variant, content: document.content as PublicPdpDocumentDto['content'] };
+  } catch (error) {
+    console.warn('[public-event-pdp] optional document lookup failed', error);
+    return null;
+  }
+}
+
+async function loadPublicEventReviews(
+  eventIds: string[],
+): Promise<[
+  { value: number; count: number } | null,
+  NonNullable<PublicEventPageDto['reviews']>,
+]> {
+  const ids = [...new Set(eventIds.filter(Boolean))];
+  if (!ids.length) return [null, []];
+  const where = { eventId: { in: ids }, status: 'APPROVED' as const };
+  const [aggregate, rows] = await Promise.all([
+    prisma.review.aggregate({ where, _avg: { rating: true }, _count: { _all: true } }),
+    prisma.review.findMany({
+      where,
+      orderBy: [{ isVerified: 'desc' }, { createdAt: 'desc' }],
+      take: 8,
+      select: { id: true, authorName: true, rating: true, text: true, createdAt: true, publishedAt: true },
+    }),
+  ]);
+  const count = aggregate._count._all;
+  const average = aggregate._avg.rating || 0;
+  const rating = count >= 10 && average > 0
+    ? { value: Math.round(average * 10) / 10, count }
+    : null;
+  return [rating, rows.map((row) => ({
+    id: row.id,
+    authorName: formatReviewDisplayName(row.authorName),
+    rating: row.rating,
+    text: row.text,
+    createdAt: (row.publishedAt || row.createdAt).toISOString(),
+  }))];
+}
+
+async function resolveEvent(eventSlugOrId: string): Promise<EventRecord | null> {
   const direct = await prisma.event.findFirst({
     where: { OR: [{ id: eventSlugOrId }, { slug: eventSlugOrId }] },
     include: eventInclude,
   });
   if (direct) return direct;
 
-  if (catalogSession?.id) {
-    const catalogEvent = await prisma.event.findUnique({ where: { id: catalogSession.id }, include: eventInclude });
-    if (catalogEvent) return catalogEvent;
+  const requestedSlug = publicSlug(eventSlugOrId);
+  if (requestedSlug && requestedSlug !== eventSlugOrId) {
+    const byPublicSlug = await prisma.event.findFirst({
+      where: { slug: requestedSlug },
+      include: eventInclude,
+    });
+    if (byPublicSlug) return byPublicSlug;
+  }
+
+  const tcPrefixMatch = eventSlugOrId.match(/^tc-([a-f0-9]{24})-/i);
+  if (tcPrefixMatch?.[1]) {
+    const tcId = tcPrefixMatch[1];
+    const tcEvent = await prisma.event.findFirst({
+      where: { OR: [{ id: tcId }, { id: `evt_${tcId}` }] },
+      include: eventInclude,
+    });
+    if (tcEvent) return tcEvent;
   }
 
   const suffix = eventSlugOrId.match(/(?:^|-)([a-f0-9]{20,})$/i)?.[1];
@@ -342,13 +918,80 @@ async function resolveEvent(
     if (suffixEvent) return suffixEvent;
   }
 
+  // PERF.E5 fallback: DB slug is often Cyrillic/source while public URLs use transliterated slug.
+  // Scanning only the latest 20k rows misses stale catalog rows (34k+ events on prod).
+  if (requestedSlug) {
+    const byCanonical = await prisma.event.findFirst({
+      where: {
+        OR: [
+          { canonicalPath: `/events/${requestedSlug}` },
+          { override: { is: { canonicalPath: `/events/${requestedSlug}` } } },
+        ],
+      },
+      include: eventInclude,
+    });
+    if (byCanonical) return byCanonical;
+  }
+
+  const trailingToken = extractEventTrailingLookupToken(eventSlugOrId);
+  if (trailingToken) {
+    const byTepId = await prisma.event.findFirst({
+      where: { id: buildTepEventIdFromTrailingToken(trailingToken) },
+      include: eventInclude,
+    });
+    if (byTepId && publicSlug(byTepId.slug) === requestedSlug) return byTepId;
+
+    const suffixCandidates = await prisma.event.findMany({
+      where: { slug: { endsWith: `-${trailingToken}` } },
+      select: { id: true, slug: true },
+      take: 32,
+    });
+    const matched = suffixCandidates.find((candidate) => publicSlug(candidate.slug) === requestedSlug);
+    if (matched) {
+      return prisma.event.findUnique({ where: { id: matched.id }, include: eventInclude });
+    }
+  }
+
+  // Teplohod slugs may end with a truncated word instead of a numeric ID.
+  // Only ~260 TEP rows need transliteration; cache this bounded lookup instead
+  // of scanning 20k recent events for every unresolved public URL.
+  if (requestedSlug) {
+    const tepId = await resolveTepPublicSlugId(requestedSlug);
+    if (tepId) return prisma.event.findUnique({ where: { id: tepId }, include: eventInclude });
+  }
+
   const candidates = await prisma.event.findMany({
     select: { id: true, slug: true },
     orderBy: { updatedAt: 'desc' },
     take: 20000,
   });
-  const match = candidates.find((candidate) => publicSlug(candidate.slug) === publicSlug(eventSlugOrId));
+  const match = candidates.find((candidate) => publicSlug(candidate.slug) === requestedSlug);
   return match ? prisma.event.findUnique({ where: { id: match.id }, include: eventInclude }) : null;
+}
+
+let tepPublicSlugCache: { expiresAt: number; ids: Map<string, string> } | null = null;
+
+export function mapTepPublicSlugIds(rows: Array<{ id: string; slug: string }>): Map<string, string> {
+  const ids = new Map<string, string>();
+  for (const row of rows) {
+    const slug = publicSlug(row.slug);
+    if (slug) ids.set(slug, row.id);
+  }
+  return ids;
+}
+
+async function resolveTepPublicSlugId(requestedSlug: string): Promise<string | null> {
+  if (!tepPublicSlugCache || tepPublicSlugCache.expiresAt <= Date.now()) {
+    const rows = await prisma.event.findMany({
+      where: { id: { startsWith: 'evt_tep_' } },
+      select: { id: true, slug: true },
+    });
+    tepPublicSlugCache = {
+      expiresAt: Date.now() + 5 * 60 * 1000,
+      ids: mapTepPublicSlugIds(rows),
+    };
+  }
+  return tepPublicSlugCache.ids.get(requestedSlug) || null;
 }
 
 function mapSession(
@@ -374,22 +1017,42 @@ function mapSession(
     offerDeeplinkUrl: offer?.deeplinkUrl,
     externalId,
   });
+  // TC meta-group siblings often inherit the representative offer widgetUrl (same event=).
+  // Rebuild from this session's externalId so each slot opens its own TicketsCloud event.
+  const rebuiltPurchaseUrl = buildProviderWidgetUrl({
+    sourceCode,
+    offerSourceCode: offer?.sourceCode,
+    externalId,
+  });
+  const resolvedPurchaseUrl =
+    (providerForSource(sourceCode) === 'TICKETSCLOUD' && rebuiltPurchaseUrl) ||
+    purchase.url ||
+    eventPurchaseUrl;
   const openDate = requestedEvent.kind === 'OPEN_DATE' || session.sourceStatus?.toLowerCase() === 'open_date';
   const wideLifetime = isWideLifetimeSession(session.startsAt, session.endsAt);
   const startsAt = openDate || wideLifetime ? null : normalizeStartsAt(session.startsAt);
+  // Display = local wall-clock of the event city/region (same as TC/TEP widget), not browser TZ / forced MSK.
+  const destination = eventDestination(event);
+  const timeZone = resolveCityTimeZone(
+    event.primaryCity?.title || requestedEvent.primaryCity?.title,
+    destination.name,
+  );
   return {
     id: session.id,
     eventId: session.eventId,
+    venueTitle: event.venue?.title || null,
+    venueAddress: event.venue?.address || null,
     startsAt,
     endsAt: normalizeStartsAt(session.endsAt),
-    dateLabel: openDate ? 'Открытая дата' : wideLifetime ? 'Даты в виджете' : formatDate(session.startsAt),
-    timeLabel: openDate ? 'В виджете' : wideLifetime ? 'При покупке' : formatTime(session.startsAt),
-    timeBucket: openDate || wideLifetime ? 'day' : timeBucket(session.startsAt),
+    dateLabel: openDate ? 'Открытая дата' : wideLifetime ? 'Даты в виджете' : formatDate(session.startsAt, timeZone),
+    timeLabel: openDate ? 'В виджете' : wideLifetime ? 'При покупке' : formatTime(session.startsAt, timeZone),
+    timeBucket: openDate || wideLifetime ? 'day' : timeBucket(session.startsAt, timeZone),
+    timeZone,
     sourceStatus: session.sourceStatus,
     priceFrom: displayPriceFrom(session.priceFromRub, offer?.priceRub),
     vacant: session.ticketsVacant,
-    purchaseUrl: purchase.url || eventPurchaseUrl,
-    purchaseReady: purchase.ready || Boolean(eventPurchaseUrl),
+    purchaseUrl: resolvedPurchaseUrl,
+    purchaseReady: purchase.ready || Boolean(resolvedPurchaseUrl),
     purchaseUrlSource: purchase.urlSource,
   };
 }
@@ -397,16 +1060,17 @@ function mapSession(
 function buildWidgetOnlySessions(
   sessions: PublicEventSession[],
   event: EventRecord,
-  sourceCode: string | null,
+  _sourceCode: string | null,
   purchase: ReturnType<typeof purchaseInfo>,
   purchaseUrl: string | null,
-  catalogSession?: PublicSessionDto,
+  _catalogSession?: PublicSessionDto,
 ): PublicEventSession[] {
-  if (
-    sessions.length ||
-    !isOpenDateCatalogRow({ kind: event.kind, sourceStatus: event.sourceStatus }) ||
-    !purchase.ready
-  ) {
+  if (!shouldSynthesizeWidgetOnlySession({
+    sessionsLength: sessions.length,
+    kind: event.kind,
+    sourceStatus: event.sourceStatus,
+    purchaseReady: purchase.ready,
+  })) {
     return [];
   }
   return [{
@@ -418,8 +1082,8 @@ function buildWidgetOnlySessions(
     timeLabel: 'Выберите время',
     timeBucket: 'day',
     sourceStatus: 'widget',
-    priceFrom: displayPriceFrom(catalogSession?.priceFrom, event.priceFromRub),
-    vacant: catalogSession?.vacant ?? event.ticketsVacant,
+    priceFrom: displayPriceFrom(event.priceFromRub),
+    vacant: event.ticketsVacant,
     purchaseUrl,
     purchaseReady: true,
     purchaseUrlSource: purchase.urlSource,
@@ -453,11 +1117,13 @@ function mapOfferRecord(offer: OfferRecord): MappedOffer {
     sourceCode: offer.sourceCode,
     title: offer.title || 'Ticketscloud widget',
     priceRub: offer.priceRub,
+    oldPriceRub: offer.oldPriceRub ?? null,
     widgetUrl: offer.widgetUrl,
     deeplinkUrl: offer.deeplinkUrl,
     active: offer.active,
     sortOrder: offerSortOrder(offer.payload),
     sourceTicketId: sourceLink?.externalId || null,
+    payload: offer.payload,
   };
 }
 
@@ -469,6 +1135,493 @@ function primaryOfferMap(offers: MappedOffer[]): Map<string, MappedOffer> {
   return result;
 }
 
+function purchaseProviderForEvent(event: EventRecord): PurchaseProvider | null {
+  return providerForSource(eventIdentity(event).sourceCode);
+}
+
+function pickGroupPurchaseProvider(
+  catalogSession: PublicSessionDto | undefined,
+  groupEvents: EventRecord[],
+  requestedEvent: EventRecord,
+): PurchaseProvider | null {
+  const fromCatalog = providerForSource(
+    catalogSession?.purchaseProvider || catalogSession?.offerSourceCode,
+  );
+  if (fromCatalog) return fromCatalog;
+
+  const requestedProvider = purchaseProviderForEvent(requestedEvent);
+  if (requestedProvider) return requestedProvider;
+
+  for (const event of groupEvents) {
+    if (purchaseProviderForEvent(event) === 'TEPLOHOD') return 'TEPLOHOD';
+  }
+  for (const event of groupEvents) {
+    if (purchaseProviderForEvent(event) === 'TICKETSCLOUD') return 'TICKETSCLOUD';
+  }
+  return null;
+}
+
+function filterGroupEventIdsByPurchaseProvider(
+  groupEventIds: string[],
+  eventsById: Map<string, EventRecord>,
+  provider: PurchaseProvider | null,
+  requestedEventId: string,
+): string[] {
+  if (!provider || groupEventIds.length <= 1) {
+    return groupEventIds.includes(requestedEventId)
+      ? groupEventIds
+      : [requestedEventId, ...groupEventIds];
+  }
+
+  const filtered = groupEventIds.filter((id) => {
+    const event = eventsById.get(id);
+    if (!event) return id === requestedEventId;
+    return purchaseProviderForEvent(event) === provider;
+  });
+
+  if (!filtered.length) return [requestedEventId];
+  if (!filtered.includes(requestedEventId)) return [requestedEventId, ...filtered];
+  return filtered;
+}
+
+function scorePublicEventSession(session: PublicEventSession): number {
+  let score = 0;
+  if (session.purchaseReady !== false) score += 40;
+  if (typeof session.vacant === 'number') {
+    if (session.vacant > 0) score += 20 + Math.min(session.vacant, 180);
+    if (session.vacant === 0) score -= 30;
+  } else {
+    score += 5;
+  }
+  return score;
+}
+
+function dedupePublicEventSessionsByStartsAt(sessions: PublicEventSession[]): PublicEventSession[] {
+  const ranked = new Map<string, PublicEventSession>();
+
+  for (const session of sessions) {
+    // Keep simultaneous sessions at different departure points. Dated source
+    // duplicates at the same time and venue can still collapse to one row.
+    const venueKey = `${session.venueAddress || ''}|${session.venueTitle || ''}`.trim().toLocaleLowerCase('ru');
+    const key = session.startsAt ? `${session.startsAt}|${venueKey}` : session.id;
+    const current = ranked.get(key);
+    if (!current || scorePublicEventSession(session) > scorePublicEventSession(current)) {
+      ranked.set(key, session);
+    }
+  }
+
+  return [...ranked.values()].sort((left, right) => {
+    const leftTime = left.startsAt ? new Date(left.startsAt).getTime() : Number.POSITIVE_INFINITY;
+    const rightTime = right.startsAt ? new Date(right.startsAt).getTime() : Number.POSITIVE_INFINITY;
+    return leftTime - rightTime || String(left.id).localeCompare(String(right.id));
+  });
+}
+
+function mergedCatalogTitle(event: EventRecord): string | null {
+  return cleanImportedDescription(event.override?.title);
+}
+
+function normalizeMergeGroupKey(value: string | null | undefined): string | null {
+  const raw = cleanImportedDescription(value)?.trim().toLowerCase();
+  if (!raw) return null;
+  const normalized = raw.replace(/[^a-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '');
+  return normalized || null;
+}
+
+async function loadMergeGroupMembers(requestedEvents: EventRecord[]): Promise<EventRecord[]> {
+  const groups = new Map<string, { mergeGroupKey: string; cityId: string; venueId: string | null }>();
+  for (const event of requestedEvents) {
+    const mergeGroupKey = normalizeMergeGroupKey(event.override?.mergeGroupKey);
+    const cityId = event.primaryCityId;
+    if (!mergeGroupKey || !cityId) continue;
+    const venueId = event.venueId || null;
+    groups.set(JSON.stringify([mergeGroupKey, cityId, venueId]), { mergeGroupKey, cityId, venueId });
+  }
+  if (!groups.size) return [];
+  return prisma.event.findMany({
+    where: {
+      status: { notIn: ['HIDDEN', 'DRAFT'] },
+      OR: [...groups.values()].map(({ mergeGroupKey, cityId, venueId }) => ({
+        primaryCityId: cityId,
+        venueId,
+        override: { mergeGroupKey },
+      })),
+    },
+    include: eventInclude,
+  });
+}
+
+/** Same TicketsCloud meta product → sibling dated events with future slots. */
+async function loadMetaGroupMembers(requestedEvent: EventRecord): Promise<EventRecord[]> {
+  const tcMetaLinks = requestedEvent.sourceLinks
+    .filter((link) => link.source.code.toUpperCase() === 'TICKETSCLOUD' && link.metaExternalId)
+    .map((link) => ({ sourceId: link.sourceId, metaExternalId: link.metaExternalId!.trim() }));
+  const sourceIds = [...new Set(tcMetaLinks.map((link) => link.sourceId))];
+  const metaIds = [...new Set(tcMetaLinks.map((link) => link.metaExternalId))];
+  if (!sourceIds.length || !metaIds.length) return [];
+
+  // Critical: do NOT take an arbitrary 200 EventSourceLink rows - for large meta products
+  // (600+ dated TC children) that sample often has zero upcoming sessions, so the event
+  // page shows only the current slug's single slot. Prefer nearest future siblings.
+  const upcomingRows = await prisma.$queryRaw<Array<{ eventId: string }>>`
+    SELECT s."eventId" AS "eventId"
+    FROM "EventSession" s
+    INNER JOIN "EventSourceLink" sl ON sl."eventId" = s."eventId"
+    INNER JOIN "Event" e ON e.id = s."eventId"
+    WHERE sl."sourceId" IN (${join(sourceIds)})
+      AND trim(sl."metaExternalId") IN (${join(metaIds)})
+      AND e.status NOT IN ('HIDDEN', 'DRAFT')
+      AND e."primaryCityId" IS NOT DISTINCT FROM ${requestedEvent.primaryCityId}
+      AND s."eventId" <> ${requestedEvent.id}
+      AND (
+        s."startsAt" >= NOW() - INTERVAL '15 minutes'
+        OR (s."endsAt" IS NOT NULL AND s."endsAt" >= NOW())
+      )
+    ORDER BY s."startsAt" ASC NULLS LAST, s.id ASC
+    LIMIT 48
+  `;
+  let eventIds = [...new Set(upcomingRows.map((row) => row.eventId))];
+  if (!eventIds.length) {
+    const siblingRows = await prisma.$queryRaw<Array<{ eventId: string }>>`
+      SELECT sl."eventId" AS "eventId"
+      FROM "EventSourceLink" sl
+      INNER JOIN "Event" e ON e.id = sl."eventId"
+      WHERE sl."sourceId" IN (${join(sourceIds)})
+        AND trim(sl."metaExternalId") IN (${join(metaIds)})
+        AND e.status NOT IN ('HIDDEN', 'DRAFT')
+        AND e."primaryCityId" IS NOT DISTINCT FROM ${requestedEvent.primaryCityId}
+        AND sl."eventId" <> ${requestedEvent.id}
+      ORDER BY sl."eventId"
+      LIMIT 48
+    `;
+    eventIds = [...new Set(siblingRows.map((row) => row.eventId))];
+  }
+  if (!eventIds.length) return [];
+
+  return prisma.event.findMany({
+    where: {
+      id: { in: eventIds },
+      status: { notIn: ['HIDDEN', 'DRAFT'] },
+    },
+    include: eventInclude,
+  });
+}
+
+/**
+ * Past dated / unsaleable slug → nearest meta/merge sibling that still has a future
+ * on-sale session. Used as soft-404 recovery so order deep-links stay useful.
+ * Skip STAND_BY / closed siblings - they would soft-404 again under allowSoftRedirect=false.
+ */
+async function findNearestSaleableSiblingSlug(
+  requestedEvent: EventRecord,
+  metaMembers: EventRecord[],
+  mergeMembers: EventRecord[],
+): Promise<string | null> {
+  const candidates = [...metaMembers, ...mergeMembers].filter((event) => {
+    if (event.id === requestedEvent.id) return false;
+    return isPublicSessionRowOnSale({ sourceStatus: event.sourceStatus });
+  });
+  if (!candidates.length) return null;
+
+  const now = new Date();
+  const sessions = await prisma.eventSession.findMany({
+    where: {
+      eventId: { in: candidates.map((event) => event.id) },
+      isActive: true,
+      cancelledAt: null,
+      OR: [{ startsAt: { gte: now } }, { endsAt: { gte: now } }],
+    },
+    select: { eventId: true, startsAt: true, sourceStatus: true },
+    orderBy: { startsAt: 'asc' },
+    take: 50,
+  });
+  if (!sessions.length) return null;
+
+  const byId = new Map(candidates.map((event) => [event.id, event]));
+  for (const session of sessions) {
+    if (!isPublicSessionRowOnSale(session)) continue;
+    const event = byId.get(session.eventId);
+    if (event?.slug) return event.slug;
+  }
+  return null;
+}
+
+/**
+ * TC STAND_BY (or cancelled) product with a live Teplohod twin of the same title
+ * (token-set equal, word order may differ). Same-city only.
+ * Prod case: evt_6a1ef2c… STAND_BY → evt_tep_910.
+ */
+async function findSaleableTitleTwinSlug(requestedEvent: EventRecord): Promise<string | null> {
+  const fingerprint = eventTitleTokenFingerprint(
+    requestedEvent.override?.title || requestedEvent.title,
+  );
+  const tokens = fingerprint.split(' ').filter((token) => token.length >= 4);
+  if (tokens.length < 4 || !requestedEvent.primaryCityId) return null;
+
+  const keyTokens = [...tokens].sort((left, right) => right.length - left.length).slice(0, 5);
+  const candidates = await prisma.event.findMany({
+    where: {
+      id: { not: requestedEvent.id },
+      primaryCityId: requestedEvent.primaryCityId,
+      status: { notIn: ['HIDDEN', 'DRAFT'] },
+      AND: keyTokens.map((token) => ({
+        title: { contains: token, mode: 'insensitive' as const },
+      })),
+    },
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      sourceStatus: true,
+    },
+    take: 48,
+  });
+
+  const twins = candidates.filter(
+    (row) =>
+      eventTitleTokenFingerprint(row.title) === fingerprint &&
+      isPublicSessionRowOnSale({ sourceStatus: row.sourceStatus }),
+  );
+  if (!twins.length) return null;
+
+  const now = new Date();
+  const sessions = await prisma.eventSession.findMany({
+    where: {
+      eventId: { in: twins.map((twin) => twin.id) },
+      isActive: true,
+      cancelledAt: null,
+      startsAt: { gte: now },
+    },
+    select: { eventId: true, startsAt: true, sourceStatus: true },
+    orderBy: { startsAt: 'asc' },
+    take: 30,
+  });
+
+  const byId = new Map(twins.map((twin) => [twin.id, twin]));
+  for (const session of sessions) {
+    if (!isPublicSessionRowOnSale(session)) continue;
+    const twin = byId.get(session.eventId);
+    if (twin?.slug) return twin.slug;
+  }
+  return null;
+}
+
+/** Order-insensitive title key so TC/TEP twins with shuffled phrases still match. */
+export function eventTitleTokenFingerprint(title: string): string {
+  return String(title || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[«»""„']/g, '')
+    .replace(/[^a-zа-яё0-9\s]+/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .split(' ')
+    .filter((token) => token.length >= 2)
+    .sort()
+    .join(' ');
+}
+
+function resolveMultiPurchasePeers(groupEvents: EventRecord[], requestedEvent: EventRecord): EventRecord[] {
+  const mergeGroupKey = normalizeMergeGroupKey(requestedEvent.override?.mergeGroupKey);
+  if (mergeGroupKey) {
+    // Explicit mergeGroupKey: allow cross-city merges (admin knows what they're doing).
+    return groupEvents.filter(
+      (event) =>
+        normalizeMergeGroupKey(event.override?.mergeGroupKey) === mergeGroupKey,
+    );
+  }
+
+  const mergeTitle = mergedCatalogTitle(requestedEvent);
+  if (!mergeTitle) return [];
+
+  // Automatic title merge: restrict to same city to avoid false positives.
+  return groupEvents.filter(
+    (event) =>
+      mergedCatalogTitle(event) === mergeTitle &&
+      event.primaryCityId === requestedEvent.primaryCityId,
+  );
+}
+
+function isMultiProductMergedGroup(peers: EventRecord[]): boolean {
+  if (peers.length < 2) return false;
+
+  const distinctTitles = new Set(
+    peers.map((event) => normalizeGroupPart(formatPublicEventTitle(event.title))).filter(Boolean),
+  );
+  return distinctTitles.size >= 2;
+}
+
+function buildPurchaseOptionDescription(event: EventRecord): string | null {
+  const title = formatPublicEventTitle(event.title);
+  if (isAdultOrChildPurchaseOptionTitle(title)) return null;
+
+  const raw = cleanImportedDescription(
+    event.override?.shortDescription || event.description || event.override?.description,
+  );
+
+  // Build venue + city prefix for cross-city merge context.
+  const venueName = event.venue?.title?.trim() || '';
+  const cityName = event.primaryCity?.title?.trim() || '';
+  const locationPrefix = venueName && cityName
+    ? `${venueName}, ${cityName}`
+    : venueName || cityName || '';
+
+  if (!raw && !locationPrefix) return null;
+
+  const lines = (raw || '')
+    .split(/\n+/)
+    .map((line) => line.replace(/^[-–—•*]\s*/, '').trim())
+    .filter(Boolean);
+  const snippet = lines.slice(0, 3).join(' · ');
+
+  // Combine location prefix with description snippet.
+  const parts = [locationPrefix, snippet].filter(Boolean);
+  const combined = parts.join(' — ');
+  if (!combined) return null;
+  return combined.length > 260 ? `${combined.slice(0, 257).trim()}…` : combined;
+}
+
+function isAdultOrChildPurchaseOptionTitle(title: string): boolean {
+  const normalized = normalizeGroupPart(title);
+  if (!normalized) return false;
+  return normalized.includes('взросл') || normalized.includes('детск');
+}
+
+function purchaseOptionDisplayPriority(title: string): number {
+  const normalized = normalizeGroupPart(title);
+  if (normalized.includes('взросл')) return 0;
+  if (normalized.includes('детск')) return 1;
+  return 100;
+}
+
+function purchaseOptionSortKey(title: string): number {
+  const match = title.match(/(\d+)/);
+  return match ? Number(match[1]) : 9999;
+}
+
+async function loadEarliestUpcomingStartsAt(eventIds: string[]): Promise<Map<string, number>> {
+  if (!eventIds.length) return new Map();
+  const now = new Date();
+  const rows = await prisma.eventSession.findMany({
+    where: {
+      eventId: { in: eventIds },
+      OR: [{ endsAt: { gte: now } }, { startsAt: { gte: now } }],
+    },
+    select: { eventId: true, startsAt: true },
+    orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
+  });
+
+  const map = new Map<string, number>();
+  for (const row of rows) {
+    if (map.has(row.eventId) || !row.startsAt) continue;
+    map.set(row.eventId, row.startsAt.getTime());
+  }
+  return map;
+}
+
+function pickBetterPurchaseOption(
+  left: PublicPurchaseOptionDto,
+  right: PublicPurchaseOptionDto,
+  upcomingStartsAt: Map<string, number>,
+): PublicPurchaseOptionDto {
+  const leftStart = upcomingStartsAt.get(left.id);
+  const rightStart = upcomingStartsAt.get(right.id);
+  if (leftStart && !rightStart) return left;
+  if (rightStart && !leftStart) return right;
+  if (leftStart && rightStart && leftStart !== rightStart) {
+    return leftStart < rightStart ? left : right;
+  }
+
+  const leftPrice = left.priceFrom ?? Number.POSITIVE_INFINITY;
+  const rightPrice = right.priceFrom ?? Number.POSITIVE_INFINITY;
+  if (leftPrice !== rightPrice) return leftPrice < rightPrice ? left : right;
+  return left.title.localeCompare(right.title, 'ru') <= 0 ? left : right;
+}
+
+async function buildMergedPurchaseOptions(
+  groupEvents: EventRecord[],
+  offers: MappedOffer[],
+  requestedEvent: EventRecord,
+  fallbackPurchaseUrl: string | null,
+): Promise<PublicPurchaseOptionDto[]> {
+  const peers = resolveMultiPurchasePeers(groupEvents, requestedEvent);
+  if (!isMultiProductMergedGroup(peers)) return [];
+
+  const mergeGroupKey = normalizeMergeGroupKey(requestedEvent.override?.mergeGroupKey);
+  const mergeTitle = mergedCatalogTitle(requestedEvent);
+  const upcomingStartsAt = await loadEarliestUpcomingStartsAt(peers.map((event) => event.id));
+
+  const offersByEventId = new Map<string, MappedOffer[]>();
+  for (const offer of offers) {
+    const bucket = offersByEventId.get(offer.eventId) || [];
+    bucket.push(offer);
+    offersByEventId.set(offer.eventId, bucket);
+  }
+
+  const options = peers
+    .map((event) => {
+      const identity = eventIdentity(event);
+      const title = formatPublicEventTitle(event.title);
+      const titleKey = normalizeGroupPart(title);
+      if (!titleKey) return null;
+      if (!mergeGroupKey && mergeTitle && titleKey === normalizeGroupPart(mergeTitle)) return null;
+
+      const eventOffers = preferNamedTicketOffers(offersByEventId.get(event.id) || []);
+      const primaryOffer = eventOffers[0] || offersByEventId.get(event.id)?.[0] || null;
+      const purchase = purchaseInfo({
+        sourceCode: identity.sourceCode,
+        offerSourceCode: primaryOffer?.sourceCode,
+        offerWidgetUrl: primaryOffer?.widgetUrl,
+        offerDeeplinkUrl: primaryOffer?.deeplinkUrl,
+        externalId: identity.externalId,
+      });
+      const priceFrom = displayPriceFrom(primaryOffer?.priceRub, event.priceFromRub);
+      if (!priceFrom || !purchase.ready) return null;
+
+      return {
+        id: event.id,
+        slug: publicSlug(event.slug),
+        title,
+        description: buildPurchaseOptionDescription(event) ?? null,
+        priceFrom,
+        externalId: identity.externalId,
+        purchaseProvider: purchase.provider,
+        purchaseUrl: purchase.url || fallbackPurchaseUrl,
+        widgetUrl: primaryOffer?.widgetUrl || purchase.url || fallbackPurchaseUrl,
+        deeplinkUrl: primaryOffer?.deeplinkUrl || null,
+        purchaseReady: purchase.ready,
+        purchaseMode: purchase.mode,
+        purchaseUrlSource: purchase.urlSource,
+      } as PublicPurchaseOptionDto;
+    })
+    .filter((option): option is PublicPurchaseOptionDto => option !== null);
+
+  return dedupePurchaseOptionsByTitle(options, upcomingStartsAt);
+}
+
+function dedupePurchaseOptionsByTitle(
+  options: PublicPurchaseOptionDto[],
+  upcomingStartsAt: Map<string, number> = new Map(),
+): PublicPurchaseOptionDto[] {
+  const byTitle = new Map<string, PublicPurchaseOptionDto>();
+  for (const option of options) {
+    const key = normalizeGroupPart(option.title);
+    const current = byTitle.get(key);
+    if (!current) {
+      byTitle.set(key, option);
+      continue;
+    }
+    byTitle.set(key, pickBetterPurchaseOption(current, option, upcomingStartsAt));
+  }
+
+  return [...byTitle.values()].sort((left, right) =>
+    purchaseOptionDisplayPriority(left.title) - purchaseOptionDisplayPriority(right.title) ||
+    purchaseOptionSortKey(left.title) - purchaseOptionSortKey(right.title) ||
+    (left.priceFrom ?? 0) - (right.priceFrom ?? 0) ||
+    left.title.localeCompare(right.title, 'ru'),
+  );
+}
+
 function buildTicketPrices(
   offers: MappedOffer[],
   sessions: PublicEventSession[],
@@ -478,13 +1631,18 @@ function buildTicketPrices(
   const eventTitleKey = normalizeGroupPart(event.title);
   for (const offer of preferNamedTicketOffers(offers)) {
     if (!Number.isFinite(offer.priceRub) || Number(offer.priceRub) < MIN_DISPLAY_PRICE_RUB) continue;
+    const title = normalizeTicketTitle(offer.title, eventTitleKey);
     rows.push({
-      key: `offer:${offer.id}:${normalizeTicketTitle(offer.title, eventTitleKey)}:${offer.priceRub}`,
-      title: normalizeTicketTitle(offer.title, eventTitleKey),
+      key: `offer:${offer.id}:${normalizeGroupPart(title)}:${offer.priceRub}`,
+      title,
       priceRub: Number(offer.priceRub),
+      oldPriceRub:
+        typeof offer.oldPriceRub === 'number' && offer.oldPriceRub > Number(offer.priceRub)
+          ? Number(offer.oldPriceRub)
+          : null,
       source: sourceLabel(offer.sourceCode),
       sourceTicketId: offer.sourceTicketId,
-      description: 'Покупка открывается в виджете билетной системы.',
+      description: resolveOfferTicketDescription(offer, title),
       purchaseUrl: offer.widgetUrl || offer.deeplinkUrl || event.purchaseUrl || null,
       kind: 'offer',
       sortOrder: offer.sortOrder ?? null,
@@ -494,11 +1652,11 @@ function buildTicketPrices(
   for (const session of sessions) {
     if (!Number.isFinite(session.priceFrom) || Number(session.priceFrom) < MIN_DISPLAY_PRICE_RUB || offerPrices.has(Number(session.priceFrom))) continue;
     rows.push({
-      key: `session:${session.priceFrom}`,
+      key: `session:${session.id || session.priceFrom}:${session.priceFrom}`,
       title: 'Билет на отдельные сеансы',
       priceRub: Number(session.priceFrom),
       source: null,
-      description: 'Минимальная доступная цена среди ближайших дат.',
+      description: null,
       purchaseUrl: session.purchaseUrl || event.purchaseUrl || null,
       kind: 'session',
       sortOrder: null,
@@ -510,7 +1668,7 @@ function buildTicketPrices(
       title: 'Билет',
       priceRub: Number(event.priceFrom),
       source: null,
-      description: 'Точная категория билета уточняется в виджете поставщика.',
+      description: null,
       purchaseUrl: event.purchaseUrl || null,
       kind: 'fallback',
       sortOrder: null,
@@ -518,9 +1676,12 @@ function buildTicketPrices(
   }
   const unique = new Map<string, PublicTicketPriceDto>();
   for (const row of rows) {
-    const key = `${normalizeGroupPart(row.title)}:${row.priceRub}`;
-    const current = unique.get(key);
-    if (!current || (row.kind === 'offer' && current.kind !== 'offer')) unique.set(key, row);
+    const labelKey = normalizeGroupPart(normalizeTicketCategoryLabel(row.title));
+    const mergeKey = `${labelKey}:${row.priceRub}`;
+    const current = unique.get(mergeKey);
+    if (!current || (row.kind === 'offer' && current.kind !== 'offer')) {
+      unique.set(mergeKey, row);
+    }
   }
   return [...unique.values()].sort((left, right) => {
     const leftOrder = left.sortOrder ?? 9999;
@@ -529,37 +1690,148 @@ function buildTicketPrices(
   }).slice(0, 32);
 }
 
-function relatedSessions(
-  sessions: PublicSessionDto[],
-  groupEventIds: string[],
+/**
+ * PERF.E5 related: same city only (no cross-city OR category bleed), scored +
+ * product-title dedupe via pickRelatedSessions. Fetch a wide pool - dated twin
+ * events share a title and must collapse before fill.
+ */
+async function loadRelatedSessionsFromDb(
   event: EventRecord,
+  excludeEventIds: string[],
   limit: number,
-): PublicSessionDto[] {
-  const groupIds = new Set(groupEventIds);
-  return sessions.filter((session) =>
-    !(session.groupEventIds || [session.id]).some((id) => groupIds.has(id)) &&
-    (session.cityId === event.primaryCityId || session.category === event.category?.title)
-  ).slice(0, limit);
+): Promise<PublicSessionDto[]> {
+  const exclude = new Set(excludeEventIds.map(String));
+  const now = new Date();
+  if (!event.primaryCityId) return [];
+
+  const candidateTake = Math.max(limit * 24, 96);
+  const rows = await prisma.event.findMany({
+    where: {
+      id: { notIn: [...exclude] },
+      status: { in: ['READY', 'PUBLISHED'] },
+      primaryCityId: event.primaryCityId,
+      sessions: {
+        some: {
+          OR: [{ startsAt: { gte: now } }, { endsAt: { gte: now } }],
+        },
+      },
+    },
+    include: {
+      primaryCity: { include: { region: true } },
+      venue: true,
+      category: true,
+      primarySubcategory: true,
+      subcategories: { include: { subcategory: true } },
+      tags: { include: { tag: true } },
+      override: true,
+      sessions: {
+        where: {
+          OR: [{ startsAt: { gte: now } }, { endsAt: { gte: now } }],
+        },
+        orderBy: { startsAt: 'asc' },
+        take: 1,
+      },
+    },
+    orderBy: { updatedAt: 'desc' },
+    take: candidateTake,
+  });
+
+  const catalogSessions: PublicSessionDto[] = [];
+  for (const row of rows) {
+    if (exclude.has(String(row.id))) continue;
+    const next = row.sessions[0];
+    if (!next) continue;
+    const city = row.primaryCity;
+    const destName =
+      city?.isDestination === false && city.region
+        ? city.region.title
+        : city?.title || 'Не указан';
+    const destSlug = city?.isDestination === false && city.region
+      ? publicSlug(city.region.title)
+      : city?.slug
+        ? publicSlug(city.slug)
+        : publicSlug(destName);
+    const destType: 'city' | 'region' =
+      city?.isDestination === false && city.region ? 'region' : 'city';
+    const timeZone = resolveCityTimeZone(city?.title, destName);
+    const startsAt = normalizeStartsAt(next.startsAt) || '';
+    const tags = row.tags.map((entry) => entry.tag.title).filter(Boolean);
+    const subcategories = [
+      ...new Set(
+        [
+          row.primarySubcategory?.title,
+          ...row.subcategories.map((entry) => entry.subcategory.title),
+        ].filter((value): value is string => Boolean(value)),
+      ),
+    ];
+    catalogSessions.push({
+      id: row.id,
+      slug: publicSlug(row.slug),
+      sourceSlug: row.slug,
+      title: formatPublicEventTitle(row.override?.title || row.title),
+      cityId: row.primaryCityId,
+      citySlug: destSlug,
+      sourceCitySlug: city?.slug || null,
+      city: city?.title || 'Не указан',
+      destination: destName,
+      destinationType: destType,
+      venueId: row.venueId,
+      venueSlug: row.venue?.slug || null,
+      venue: row.venue?.title || 'Не указано',
+      venueKind: row.venue?.kind || 'OTHER',
+      category: row.category?.title || 'События',
+      tags,
+      subcategories,
+      ageLimit: row.ageLimit ?? null,
+      kind: row.kind.toLowerCase(),
+      startsAt,
+      dateLabel: formatDate(next.startsAt, timeZone),
+      timeLabel: formatTime(next.startsAt, timeZone),
+      timeBucket: timeBucket(next.startsAt, timeZone),
+      timeZone,
+      priceFrom: displayPriceFrom(row.priceFromRub, next.priceFromRub),
+      vacant: next.ticketsVacant ?? row.ticketsVacant,
+      imageUrl:
+        resolveEditorialEventImage(row.id, row.slug, null) ||
+        pickFirstUsableEventImageUrl(row.override?.imageUrl, row.imageUrl, row.venue?.heroImageUrl),
+      purchaseReady: true,
+    });
+  }
+
+  const subject = {
+    cityId: event.primaryCityId,
+    city: event.primaryCity?.title || '',
+    category: event.category?.title || '',
+    title: formatPublicEventTitle(event.override?.title || event.title),
+    tags: event.tags.map((entry) => entry.tag.title).filter(Boolean),
+    subcategories: eventSubcategories(event),
+    venueKind: event.venue?.kind || 'OTHER',
+    venueId: event.venueId,
+    ageLimit: event.ageLimit ?? null,
+  };
+
+  const related = pickRelatedSessions(
+    subject,
+    catalogSessions,
+    excludeEventIds,
+    () => [],
+    limit,
+  ) as PublicSessionDto[];
+
+  return spreadCatalogSessionsByCoverImage(related).slice(0, limit);
 }
 
-function eventDestination(event: EventRecord, catalogSession?: PublicSessionDto): {
+function eventDestination(event: EventRecord): {
   name: string;
   slug: string;
   type: 'city' | 'region';
 } {
-  if (catalogSession) {
-    return {
-      name: catalogSession.destination,
-      slug: catalogSession.citySlug || publicSlug(catalogSession.destination),
-      type: catalogSession.destinationType,
-    };
-  }
   const city = event.primaryCity;
   if (city?.isDestination === false && city.region) {
     return { name: city.region.title, slug: publicSlug(city.region.title), type: 'region' };
   }
   const name = city?.title || 'Не указан';
-  return { name, slug: publicSlug(name), type: 'city' };
+  return { name, slug: city?.slug ? publicSlug(city.slug) : publicSlug(name), type: 'city' };
 }
 
 function eventSubcategories(event: EventRecord): string[] {
@@ -600,10 +1872,10 @@ function displayPriceFrom(...values: Array<number | null | undefined>): number |
 }
 
 function normalizeTicketTitle(value: string | null | undefined, eventTitleKey: string): string {
-  const title = cleanImportedDescription(value) || '';
-  const key = normalizeGroupPart(title);
+  const raw = cleanImportedDescription(value) || '';
+  const key = normalizeGroupPart(raw);
   if (!key || key === eventTitleKey || key === 'widget' || key.includes('ticketscloud widget')) return 'Билет';
-  return title;
+  return normalizeTicketCategoryLabel(raw);
 }
 
 function sourceLabel(sourceCode: string): string | null {
@@ -637,7 +1909,101 @@ function normalizeGroupPart(value: unknown): string {
   return String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
 }
 
-function publicSlug(value: string): string {
+function splitTitlePartsWithoutWeekdays(title: string): string[] {
+  const parts = title.split(',').map((part) => part.trim()).filter(Boolean);
+  const weekdayToken = /^(?:ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС)$/iu;
+  const weekdayRange = /^(?:ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС)(?:\s*[,—–\-]\s*(?:ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС))+$/iu;
+
+  while (parts.length > 1) {
+    const last = parts.at(-1);
+    if (!last) break;
+    if (weekdayToken.test(last) || weekdayRange.test(last)) {
+      parts.pop();
+      continue;
+    }
+    break;
+  }
+
+  return parts;
+}
+
+function isGenericTicketDescription(value?: string | null): boolean {
+  const text = cleanImportedDescription(value)?.toLowerCase() || '';
+  if (!text) return true;
+  if (text.includes('покупка открывается в виджете')) return true;
+  if (text.includes('уточняется в виджете')) return true;
+  if (text.includes('минимальная доступная цена')) return true;
+  return false;
+}
+
+function isTransportBoilerplate(value?: string | null): boolean {
+  const text = cleanImportedDescription(value);
+  if (!text) return false;
+  return /перевозка\s+пас[-.\s]?в/i.test(text) && /\bТС\s*\d+/i.test(text);
+}
+
+function normalizeTicketCategoryLabel(raw?: string | null): string {
+  let text = cleanImportedDescription(raw);
+  if (!text) return 'Билет';
+
+  const dashSplit = text.split(/\s[-–—]\s/);
+  if (dashSplit.length > 1) {
+    const head = dashSplit[0]?.trim() || '';
+    const tail = dashSplit.slice(1).join(' - ').trim();
+    if (head && (!tail || isTransportBoilerplate(tail))) return head;
+  }
+
+  text = text
+    .replace(/\s*[-–—]?\s*перевозка\s+пас[-.\s]?в\s+.+?\s+ТС\s*\d+\s*$/iu, '')
+    .trim();
+
+  const parts = splitTitlePartsWithoutWeekdays(text);
+  if (parts.length > 1) {
+    const tail = parts.slice(1).join(', ').trim();
+    if (!tail || isTransportBoilerplate(tail)) return parts[0] || 'Билет';
+  }
+
+  return text || 'Билет';
+}
+
+function extractOfferPayloadDescription(payload: Prisma.JsonValue | null): string | null {
+  if (!payload || Array.isArray(payload) || typeof payload !== 'object') return null;
+  const record = payload as Record<string, unknown>;
+  for (const key of ['description', 'comment', 'text']) {
+    const direct = cleanImportedDescription(String(record[key] || ''));
+    if (direct && !isGenericTicketDescription(direct) && !isTransportBoilerplate(direct)) return direct;
+  }
+  const ticket = record.ticket;
+  if (ticket && typeof ticket === 'object' && !Array.isArray(ticket)) {
+    for (const key of ['description', 'comment', 'text']) {
+      const nested = cleanImportedDescription(String((ticket as Record<string, unknown>)[key] || ''));
+      if (nested && !isGenericTicketDescription(nested) && !isTransportBoilerplate(nested)) return nested;
+    }
+  }
+  return null;
+}
+
+function parseTitleSupplement(rawTitle: string | null | undefined, normalizedTitle: string): string | null {
+  const clean = cleanImportedDescription(rawTitle);
+  if (!clean) return null;
+  const parts = splitTitlePartsWithoutWeekdays(clean);
+  if (parts.length <= 1) return null;
+  const supplement = parts.slice(1).join(', ').trim();
+  if (!supplement || isGenericTicketDescription(supplement) || isTransportBoilerplate(supplement)) return null;
+  if (normalizeGroupPart(parts[0]) === normalizeGroupPart(normalizedTitle)) return supplement;
+  if (normalizeGroupPart(clean) === normalizeGroupPart(normalizedTitle)) return supplement;
+  return supplement;
+}
+
+function resolveOfferTicketDescription(offer: MappedOffer, normalizedTitle: string): string | null {
+  const fromPayload = extractOfferPayloadDescription(offer.payload);
+  if (fromPayload) return fromPayload;
+  const fromTitle = parseTitleSupplement(offer.title, normalizedTitle);
+  if (fromTitle) return fromTitle;
+  return null;
+}
+
+export function publicSlug(value: string): string {
   const letters: Record<string, string> = {
     а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z', и: 'i', й: 'y',
     к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f',
@@ -645,6 +2011,18 @@ function publicSlug(value: string): string {
   };
   return String(value || '').trim().toLowerCase().split('').map((character) => letters[character] ?? character)
     .join('').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').replace(/-{2,}/g, '-');
+}
+
+export function extractEventTrailingLookupToken(eventSlugOrId: string): string | null {
+  return eventSlugOrId.match(/-([a-z0-9]+)$/i)?.[1] ?? null;
+}
+
+export function buildTepEventIdFromTrailingToken(token: string): string {
+  return `evt_tep_${token}`;
+}
+
+export function matchesPublicEventSlug(requestedSlug: string, dbSlug: string): boolean {
+  return publicSlug(dbSlug) === publicSlug(requestedSlug);
 }
 
 function isDefined<T>(value: T | null | undefined): value is T {

@@ -1,0 +1,49 @@
+{
+  "eventId": "evt_6ac77983ed0e47d4aea90d79",
+  "eventPageId": "9c8f4613-078d-4198-95fb-af4e7942ff73",
+  "eventPageSlug": "huan-orlandis-bend-tomsk",
+  "archiveStatus": "UNUSED_ORIGINAL_SOURCE",
+  "retrievedAt": "2026-11-05",
+  "sourceSnapshot": {
+    "id": "evt_6ac77983ed0e47d4aea90d79",
+    "kind": "SINGLE",
+    "slug": "хуан-орландис-бэнд-6ac77983ed0e47d4aea90d79",
+    "seoH1": null,
+    "title": "ХУАН ОРЛАНДИС БЭНД",
+    "sources": [
+      {
+        "code": "TICKETSCLOUD",
+        "name": "Ticketscloud",
+        "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ac77983ed0e47d4aea90d79",
+        "externalId": "6ac77983ed0e47d4aea90d79",
+        "metaExternalId": null
+      }
+    ],
+    "venueId": "venue_661637a1d399c36eaab50fd2",
+    "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ac77983d26b49f0d16ae6c3.jpg",
+    "seoTitle": null,
+    "cityTitle": "Томск",
+    "venueTitle": "Underground",
+    "description": null,
+    "isIndexable": true,
+    "purchaseFlow": "EXTERNAL",
+    "venueAddress": "Карла Маркса 23а",
+    "canonicalPath": null,
+    "primaryCityId": "city_1489425",
+    "supplierTitle": null,
+    "managementMode": "SOURCE_MANAGED",
+    "seoDescription": null,
+    "shortDescription": null
+  },
+  "originalDescription": null,
+  "previousEventOverride": "«ХУАН ОРЛАНДИС БЭНД» - джазовый концерт на площадке «Underground» в Томске.\n\n## Практическая информация\n\n- Место - «Underground», Томск\n- Адрес - Карла Маркса 23а\n- Продолжительность - около 120 минут\n- Возрастное ограничение - 6+\n- Билеты - от 1 950 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+  "activeSessions": [
+    {
+      "start": "2026-11-19T12:00:00",
+      "end": "2026-11-19T14:00:00",
+      "price": 1950
+    }
+  ],
+  "mainChars": 658,
+  "previousEffectiveChars": 333
+}

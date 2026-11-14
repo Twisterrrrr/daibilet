@@ -1,0 +1,677 @@
+{
+  "startedAt": "2026-11-13T05:56:08.617Z",
+  "publicCacheInvalidated": true,
+  "cache": {
+    "ok": true,
+    "warm": "none",
+    "reason": "published 23 touring program rewrites (51 EventPage, 59 linked events), batch 03 2026-11-13"
+  },
+  "revalidated": 110,
+  "indexNowQueued": 51,
+  "eventPagePaths": 51,
+  "legacyPaths": 59,
+  "results": [
+    {
+      "slug": "cirk-shou-bravo-g-mcensk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "cirk-shou-bravo-g-mcensk-6af005516ab6aaefc4cf5d90",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "cirk-shou-bravo-g-miass",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "cirk-shou-bravo-g-miass-6aee28312d5a50f7960e9581",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "cirk-shou-bravo-g-zlatoust",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "cirk-shou-bravo-g-zlatoust-6aecdce24d62a20740afb2a5",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "cirk-shou-bravo-g-korkino",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "cirk-shou-bravo-g-korkino-6aeccf0e428c5e652135bf06",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "cirk-shou-bravo-g-chebarkul",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "cirk-shou-bravo-g-chebarkul-6aec7035b9394373959070bc",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dostoinyi-stendap-naberezhnye-chelny",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "dostoinyi-stendap-6adefd3e869e3b4bf676e1e7",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dostoinyi-stendap-kazan",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "dostoinyi-stendap-6ab3d7aa0a3f7ab03f330869",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dostoinyi-stendap-6ab3d7ab0a3f7ab03f330871",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dostoinyi-stendap-6ab3d7ac0a3f7ab03f330879",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dostoinyi-stendap-6ab3d7ad0a3f7ab03f330881",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dostoinyi-stendap-kazan-2",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "dostoinyi-stendap-6ab3d782cc5a0aebe23308f6",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dostoinyi-stendap-6aa14b11e4b1d69979bf825c",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dostoinyi-stendap-6aa14b15e4b1d69979bf830c",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dostoinyi-stendap-6aa14b19e4b1d69979bf83bc",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dostoinyi-stendap-6ab3d785cc5a0aebe233097a",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dostoinyi-stendap-6ab3d784cc5a0aebe233094e",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "cirk-bruno-v-g-ob",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "cirk-bruno-v-g-ob-6aeec0746ea5caff2c63ff19",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "cirk-bruno-v-g-tobolsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "cirk-bruno-v-g-tobolsk-6ae99200c30edbbf395feb3f",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "cirk-bruno-v-g-ishim",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "cirk-bruno-v-g-ishim-6ae5c1bc51b1a49728b5bbd5",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "konstantin-butakov-omsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tc-6a08c7315154d6eeda68b59b-konstantin-butakov",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "konstantin-butakov-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "konstantin-butakov-6aaaed88fcf51bce0db98378",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "animaciya-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tc-6a4b8bdd55b5149b79736911-animaciya",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "animaciya-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "animaciya-6a5f1742b5d976d88369a69d",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "mediomodo-fest-stanislav-drobyshevskii-kirill-domnin-burenok-aleksei-vodovozov-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tc-6a4bb4527183349db28ca515-mediomodo-fest-stanislav-drobyshevskii-kirill-domnin-burenok-aleksei-vodovozov",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "medio-modo-fest-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "medio-modo-fest-6a4e156830c57197c672db3c",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "masha-i-medvedi-samara",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "masha-i-medvedi-6a85d58ee5c5d68a2d7540f5",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "masha-i-medvedi-kazan",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "masha-i-medvedi-6a85dbe99dc070640d0769d5",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "artemiziya-i-satarova-solnyi-koncert-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "artemiziya-i-satarova-solnyi-koncert-6a8973d6da2d1b2080d37039",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "artemiziya-i-satarova-solnyi-koncert-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "artemiziya-i-satarova-solnyi-koncert-6a9049876a20214c63002611",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "bessonov-lirika-novosibirsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "bessonov-lirika-6aaccd85a0b9d18fd1ec9ea7",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "bessonov-lirika-kazan",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "bessonov-lirika-6ac4b630ae2e3c3b68c82c38",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "konstantin-lem-white-fox-music-rostov-na-donu",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "konstantin-lem-white-fox-music-6ab25d7cb3ed3399e140a8f1",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "konstantin-lem-white-fox-music-krasnodar",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "konstantin-lem-white-fox-music-6ab3cee64eea62cf8fbc81fd",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "stendap-koncert-viktorii-skladchikovoi-povtor-materiala-2026-goda-samara",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "stendap-koncert-viktorii-skladchikovoi-povtor-materiala-2026-goda-6ab5297583153f69a9fe0d43",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "stendap-koncert-viktorii-skladchikovoi-povtor-materiala-2026-goda-ryazan",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "stendap-koncert-viktorii-skladchikovoi-povtor-materiala-2026-goda-6add067d17f3645f42c23c85",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "torba-na-kruche-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "torba-na-kruche-6abb9aa224b6018b0bb21c0e",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "torba-na-kruche-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "torba-na-kruche-6abc386674ed056f4f34f840",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "yuliya-kogan-ekaterinburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "yuliya-kogan-6abe85d52386b0e293b95089",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "yuliya-kogan-chelyabinsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "yuliya-kogan-6ac6c25f06f159bf11738ee4",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "norma-tale-solnyi-koncert-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "norma-tale-solnyi-koncert-6abfb27efbbbaca107e1fee2",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "norma-tale-solnyi-koncert-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "norma-tale-solnyi-koncert-6abfbde480cd2d4930e86fe5",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "aleksei-reshetun-novyi-god-po-sudebno-medicinske-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "aleksei-reshetun-novyi-god-po-sudebno-medicinske-6ac5434089e6a22cd0abf834",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "aleksei-reshetun-novyi-god-po-sudebno-medicinski-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "aleksei-reshetun-novyi-god-po-sudebno-medicinski-6ad686b06556323c5ec0d868",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "palc-solnyi-koncert-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "palc-solnyi-koncert-6ac39ec471aaf2ffe161059a",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "palc-solnyi-koncert-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "palc-solnyi-koncert-6ac3a2464addcdaa6023f264",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "hity-2000h-karaoke-s-orkestrom-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "hity-2000h-karaoke-s-orkestrom-6ac4d9e766ed9b4f87b5080e",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "hity-2000h-karaoke-s-orkestrom-simferopol",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "hity-2000h-karaoke-s-orkestrom-6ad604ff5dfe9998acc8f624",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "aleksei-tretyakov-eto-tochno-ikona-nauchno-istoricheskii-vzglyad-na-samye-neobychnye-obrazy-v-ikonop-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "aleksei-tretyakov-eto-tochno-ikona-nauchno-istoricheskii-vzglyad-na-samye-neobychnye-obrazy-v-ikonop-6ac8c440a9cb6a37cd9d2690",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "aleksei-tretyakov-eto-tochno-ikona-nauchno-istoricheskii-vzglyad-na-samye-neobychnye-obrazy-v-ikonop-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "aleksei-tretyakov-eto-tochno-ikona-nauchno-istoricheskii-vzglyad-na-samye-neobychnye-obrazy-v-ikonop-6ac8ca099766b7066f7926c7",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "merilin-monro-kak-pautina-na-vetru-orel",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "merilin-monro-kak-pautina-na-vetru-6ad24c0a7f5775a26bc3b972",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "merilin-monro-kak-pautina-na-vetru-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "merilin-monro-kak-pautina-na-vetru-6ae412f8705bbb759f2a6148",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "voroth-vorot-lipeck",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "voroth-vorot-6ad3dbb8293c1ed1307e134f",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "voroth-vorot-voronezh",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "voroth-vorot-6ad3dfdce34758ddc59d2293",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "5-02-zheka-basotskii-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "5-02-zheka-basotskii-sankt-peterburg-6af2930126752731b4477765",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "6-02-zheka-basotskii-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "6-02-zheka-basotskii-moskva-6af29a62a9d77f531be348f3",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "muzykalnoe-loto-bingo-fm-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "muzykalnoe-loto-bingo-fm-6ae9b200910854ee5945c18a",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "muzykalnoe-loto-bingo-fm-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "muzykalnoe-loto-bingo-fm-6ae9af48c507f90269eb7628",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-koncert-miroslavy-i-zlaty-bykovyh-v-ekaterinburge-ekaterinburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-koncert-miroslavy-i-zlaty-bykovyh-v-ekaterinburge-6ae5c5448240d60dad0cc9e4",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-koncert-miroslavy-i-zlaty-bykovyh-v-chelyabinske-chelyabinsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-koncert-miroslavy-i-zlaty-bykovyh-v-chelyabinske-6ae5c466bd58c04fb399cbf4",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    }
+  ],
+  "completedAt": "2026-11-13T05:56:09.046Z",
+  "complete": true
+}

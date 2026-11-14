@@ -1,0 +1,18 @@
+# Izhevsk image credits
+
+The JPEGs below are resized and, for the `-card` and `-thumb` versions, cropped derivatives of the linked Wikimedia Commons photographs. The crop/resize is the only change. Attribution is kept here with the image source files.
+
+| Local image | Source and author | License |
+| --- | --- | --- |
+| `pamyatnik-izhiku*.jpg` | [Скульптура «Ижик».jpg](https://commons.wikimedia.org/wiki/File:%D0%A1%D0%BA%D1%83%D0%BB%D1%8C%D0%BF%D1%82%D1%83%D1%80%D0%B0_%22%D0%98%D0%B6%D0%B8%D0%BA%22.jpg), Yan.gorev | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) |
+| `muzey-strelkovogo-oruzhiya-imeni-m-t-kalashnikova*.jpg` | [Kalashnikov Museum and Exhibition Complex of Small Arms.jpg](https://commons.wikimedia.org/wiki/File:Kalashnikov_Museum_and_Exhibition_Complex_of_Small_Arms.jpg), Vyacheslav Bukharov | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) |
+| `svyato-mihaylovskiy-sobor*.jpg` | [Свято-Михайловский собор (Ижевск).jpg](https://commons.wikimedia.org/wiki/File:%D0%A1%D0%B2%D1%8F%D1%82%D0%BE-%D0%9C%D0%B8%D1%85%D0%B0%D0%B9%D0%BB%D0%BE%D0%B2%D1%81%D0%BA%D0%B8%D0%B9_%D1%81%D0%BE%D0%B1%D0%BE%D1%80_(%D0%98%D0%B6%D0%B5%D0%B2%D1%81%D0%BA).jpg), Vyacheslav Bukharov | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) |
+| `zoopark-udmurtii*.jpg` | [Izhevsk Zoo.jpg](https://commons.wikimedia.org/wiki/File:Izhevsk_Zoo.jpg), Vyacheslav Bukharov | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) |
+| `mihaylovskaya-kolonna*.jpg` | [Aerial photographs of Izhevsk-45.jpg](https://commons.wikimedia.org/wiki/File:Aerial_photographs_of_Izhevsk-45.jpg), Vyacheslav Bukharov | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) |
+| `izhevskiy-prud-i-naberezhnaya-zodchego-dudina*.jpg` | [Zodchego Dudina Embankment (September 2022) - 1.jpg](https://commons.wikimedia.org/wiki/File:Zodchego_Dudina_Embankment_(September_2022)_-_1.jpg), Vyacheslav Bukharov | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) |
+| `druzhba-narodov*.jpg` | [Forever with Russia monument, Izhevsk-12.jpg](https://commons.wikimedia.org/wiki/File:Forever_with_Russia_monument,_Izhevsk-12.jpg), Vyacheslav Bukharov | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) |
+| `gunsmiths*.jpg` | [Monument to Izhevsk Armourers.JPG](https://commons.wikimedia.org/wiki/File:Monument_to_Izhevsk_Armourers.JPG), Bayerniko | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) |
+| `crocodile*.jpg` | [Скульптура «Крокодил» в Ижевске. 01.jpg](https://commons.wikimedia.org/wiki/File:%D0%A1%D0%BA%D1%83%D0%BB%D1%8C%D0%BF%D1%82%D1%83%D1%80%D0%B0_%22%D0%9A%D1%80%D0%BE%D0%BA%D0%BE%D0%B4%D0%B8%D0%BB%22_%D0%B2_%D0%98%D0%B6%D0%B5%D0%B2%D1%81%D0%BA%D0%B5._01.jpg), Yan.gorev | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) |
+| `pamyatnik-deryabinu*.jpg` | [Бюст А.Ф.Дерябина в Ижевске 02.jpg](https://commons.wikimedia.org/wiki/File:%D0%91%D1%8E%D1%81%D1%82_%D0%90.%D0%A4.%D0%94%D0%B5%D1%80%D1%8F%D0%B1%D0%B8%D0%BD%D0%B0_%D0%B2_%D0%98%D0%B6%D0%B5%D0%B2%D1%81%D0%BA%D0%B5_02.jpg), Yan.gorev | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) |
+| `pamyatnik-pelmenu*.jpg` | [Памятник пельменю в Ижевске.jpg](https://commons.wikimedia.org/wiki/File:%D0%9F%D0%B0%D0%BC%D1%8F%D1%82%D0%BD%D0%B8%D0%BA_%D0%BF%D0%B5%D0%BB%D1%8C%D0%BC%D0%B5%D0%BD%D1%8E_%D0%B2_%D0%98%D0%B6%D0%B5%D0%B2%D1%81%D0%BA%D0%B5.jpg), Yan.gorev | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) |
+| `zvezdochka*.jpg` | [Звёздочка.jpg](https://commons.wikimedia.org/wiki/File:%D0%97%D0%B2%D1%91%D0%B7%D0%B4%D0%BE%D1%87%D0%BA%D0%B0.jpg), Yan.gorev | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) |

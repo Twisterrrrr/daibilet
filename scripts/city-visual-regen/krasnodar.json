@@ -1,0 +1,25 @@
+{
+  "city": "krasnodar",
+  "mustSeeCount": 70,
+  "regen": [
+    {
+      "stem": "guamskoe-ushchele",
+      "name": "guamskoe ushchele",
+      "clusterSize": 3,
+      "keeper": "alleya-tysyachi-sosen"
+    },
+    {
+      "stem": "pshada-dolmeny",
+      "name": "pshada dolmeny",
+      "clusterSize": 3,
+      "keeper": "alleya-tysyachi-sosen"
+    },
+    {
+      "stem": "ulitsa-krasnaya",
+      "name": "ulitsa krasnaya",
+      "clusterSize": 2,
+      "keeper": "gorodskoy-sad-park-gor-kogo"
+    }
+  ],
+  "d0": 4
+}
