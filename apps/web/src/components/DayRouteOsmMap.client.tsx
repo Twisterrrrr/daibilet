@@ -12,6 +12,7 @@ export type DayRouteMapStop = {
   index: number;
   latitude: number;
   longitude: number;
+  kind?: 'place' | 'event' | 'custom';
 };
 
 const MIN_ZOOM = 3;
@@ -36,7 +37,7 @@ function syncLeafletSize(map: LeafletMap) {
   map.invalidateSize({ animate: false, pan: false });
 }
 
-function numberedMarkerHtml(n: number, selected: boolean, title: string): string {
+function numberedMarkerHtml(n: number, selected: boolean, title: string, kind: DayRouteMapStop['kind']): string {
   const label = String(n);
   const active = selected ? ' is-active' : '';
   const safeTitle = String(title || '')
@@ -50,7 +51,7 @@ function numberedMarkerHtml(n: number, selected: boolean, title: string): string
     : '';
   return (
     '<div class="daibilet-day-pin-wrap">' +
-    '<div class="daibilet-day-pin' +
+    `<div class="daibilet-day-pin daibilet-day-pin--${kind || 'place'}` +
     active +
     '" data-day-map-pin>' +
     label +
@@ -189,6 +190,7 @@ export function DayRouteOsmMap({
             stop.index + 1,
             selected,
             formatPublicTitle(stop.title) || stop.title,
+            stop.kind,
           ),
           iconSize: [200, 40],
           iconAnchor: [20, 20],
@@ -245,6 +247,7 @@ export function DayRouteOsmMap({
             stop.index + 1,
             Boolean(selectedStopId && selectedStopId === stop.id),
             formatPublicTitle(stop.title) || stop.title,
+            stop.kind,
           ),
           iconSize: [200, 40],
           iconAnchor: [20, 20],

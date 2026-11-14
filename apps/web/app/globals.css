@@ -2334,6 +2334,21 @@ body > div:has(iframe[src*='ticketscloud']) {
     color 0.15s ease,
     border-color 0.15s ease;
 }
+.daibilet-day-pin--place {
+  border-color: #0f1b2d;
+  background: #fff;
+  color: #0f1b2d;
+}
+.daibilet-day-pin--event {
+  border-color: #0f1b2d;
+  background: #0f1b2d;
+  color: #fff;
+}
+.daibilet-day-pin--custom {
+  border-color: #b8860b;
+  background: #fef3c7;
+  color: #7c5100;
+}
 .daibilet-day-pin-label {
   /* Flex sibling of the pin - do NOT use left:100% (that parks the caption
      outside the 200px icon box and Leaflet clips it). */
@@ -2362,9 +2377,27 @@ body > div:has(iframe[src*='ticketscloud']) {
 .daibilet-day-route-marker:hover .daibilet-day-pin,
 .daibilet-day-pin.is-active {
   background: #fff;
-  color: hsl(var(--primary));
-  border-color: hsl(var(--primary));
+  color: #0f1b2d;
+  border-color: #0f1b2d;
   transform: scale(1.35);
+}
+.daibilet-map-legend-dot {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  flex: none;
+  border: 2px solid #0f1b2d;
+  border-radius: 9999px;
+  background: #fff;
+}
+.daibilet-map-legend-dot--event {
+  background: #0f1b2d;
+}
+.daibilet-map-legend-line {
+  display: inline-block;
+  width: 20px;
+  flex: none;
+  border-top: 2px dashed rgba(15, 27, 45, 0.4);
 }
 /* Leaflet OSM attribution: hide UA flag badge, keep © OpenStreetMap text.
    Upstream leaflet.css forces display:inline !important; belt-and-suspenders

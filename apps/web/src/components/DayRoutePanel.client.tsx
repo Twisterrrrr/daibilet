@@ -1748,6 +1748,7 @@ function DayRoutePanelInner() {
           index,
           latitude: coords.latitude,
           longitude: coords.longitude,
+          kind: venue.eventId ? 'event' as const : venue.id.startsWith('text_') ? 'custom' as const : 'place' as const,
         };
       })
       .filter(
@@ -1759,6 +1760,7 @@ function DayRoutePanelInner() {
           index: number;
           latitude: number;
           longitude: number;
+          kind: 'place' | 'event' | 'custom';
         } => Boolean(row),
       );
   }, [route.venues, coordsById]);
@@ -4632,6 +4634,14 @@ function DayRoutePanelInner() {
                     activeId={mapSelectedStopId}
                     onSelect={(stopId) => focusStopFromMap(stopId, { scrollList: false })}
                   />
+                  <div
+                    className="absolute bottom-[5.5rem] left-3 z-[450] hidden flex-col gap-1.5 rounded-2xl border border-slate-200 bg-white/95 px-3.5 py-2.5 text-[11px] font-medium text-slate-700 shadow-sm backdrop-blur lg:flex"
+                    data-day-map-legend
+                  >
+                    <span className="inline-flex items-center gap-2"><i aria-hidden="true" className="daibilet-map-legend-dot daibilet-map-legend-dot--place" />Место / достопримечательность</span>
+                    <span className="inline-flex items-center gap-2"><i aria-hidden="true" className="daibilet-map-legend-dot daibilet-map-legend-dot--event" />Событие</span>
+                    <span className="mt-0.5 inline-flex items-center gap-2 text-slate-400"><i aria-hidden="true" className="daibilet-map-legend-line" />Порядок перемещения</span>
+                  </div>
                   <div className="pointer-events-none absolute left-3 top-14 z-[450] rounded-2xl bg-white/95 px-4 py-2.5 shadow-sm ring-1 ring-slate-900/5 backdrop-blur sm:left-4" data-day-map-summary>
                     <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">Маршрут дня</p>
                     <p className="mt-0.5 text-[13px] font-semibold text-slate-900">
