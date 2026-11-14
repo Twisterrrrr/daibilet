@@ -98,6 +98,7 @@ export function DayRouteOsmMap({
   fallbackCenter = null,
   /** When set, pans the map so the stop stays above the focus-card overlay. */
   panToStopId = null,
+  focusRequestKey = 0,
   focusOverlayReservePx = DEFAULT_FOCUS_OVERLAY_RESERVE_PX,
 }: {
   stops: DayRouteMapStop[];
@@ -109,6 +110,8 @@ export function DayRouteOsmMap({
   /** Empty-route preview: city center without markers. */
   fallbackCenter?: { latitude: number; longitude: number } | null;
   panToStopId?: string | null;
+  /** Changes for each explicit stop click, including repeated clicks on one stop. */
+  focusRequestKey?: number;
   focusOverlayReservePx?: number;
 }) {
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -223,6 +226,10 @@ export function DayRouteOsmMap({
           keyboard: true,
         }).addTo(map);
         marker.on('click', () => {
+          map.flyTo(latLng, Math.max(map.getZoom(), 16), {
+            animate: true,
+            duration: 0.55,
+          });
           onStopClickRef.current?.(stop.id);
         });
         markersRef.current.push(marker);
@@ -254,7 +261,29 @@ export function DayRouteOsmMap({
       cancelled = true;
       resizeObserver?.disconnect();
     };
-  }, [stopsKey, stops, selectedStopId, centerKey, fallbackCenter]);
+  }, [stopsKey, centerKey]);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    void loadDaibiletLeaflet().then((L) => {
+      if (cancelled) return;
+      markersRef.current.forEach((marker, index) => {
+        const stop = stops[index];
+        if (!stop) return;
+        marker.setIcon(L.divIcon({
+          className: 'daibilet-day-route-marker',
+          html: numberedMarkerHtml(
+            stop.index + 1,
+            Boolean(selectedStopId && selectedStopId === stop.id),
+            formatPublicTitle(stop.title) || stop.title,
+          ),
+          iconSize: [200, 40],
+          iconAnchor: [20, 20],
+        }));
+      });
+    });
+    return () => { cancelled = true; };
+  }, [selectedStopId, stopsKey]);
 
   React.useEffect(() => {
     const map = mapRef.current;
@@ -264,10 +293,18 @@ export function DayRouteOsmMap({
 
     const id = window.setTimeout(() => {
       syncLeafletSize(map);
-      panStopForFocusOverlay(map, stop.latitude, stop.longitude, focusOverlayReservePx);
+      map.flyTo([stop.latitude, stop.longitude], Math.max(map.getZoom(), 16), {
+        animate: true,
+        duration: 0.55,
+      });
+      map.once('moveend', () => {
+        if (mapRef.current === map) {
+          panStopForFocusOverlay(map, stop.latitude, stop.longitude, focusOverlayReservePx);
+        }
+      });
     }, 80);
     return () => window.clearTimeout(id);
-  }, [panToStopId, stopsKey, stops, focusOverlayReservePx, layoutKey]);
+  }, [panToStopId, stopsKey, focusOverlayReservePx, layoutKey, focusRequestKey]);
 
   React.useEffect(() => {
     return () => {

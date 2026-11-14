@@ -501,6 +501,7 @@ function DayRoutePanelInner() {
   const [hotPickTab, setHotPickTab] = useState<HotPickTabId>('tips');
   /** Stop focused from map pin click. */
   const [focusedStopId, setFocusedStopId] = useState<string | null>(null);
+  const [stopFocusRequestKey, setStopFocusRequestKey] = useState(0);
   /** Hover/focus highlight for the map marker (separate from focusedStopId). */
   const [hoverStopId, setHoverStopId] = useState<string | null>(null);
   /** Mobile (&lt;lg): list-first; map is a separate fullscreen mode (Wanderlog-style). */
@@ -3063,6 +3064,7 @@ function DayRoutePanelInner() {
     // Explicit selection should win over hover highlight.
     setHoverStopId(null);
     setFocusedStopId(stopId);
+    setStopFocusRequestKey((key) => key + 1);
     if (mobileView === 'map') return;
     if (opts?.scrollList === false) return;
     const root = listRootRef.current || document;
@@ -3761,7 +3763,7 @@ function DayRoutePanelInner() {
   return (
     <>
     <div
-      className={`mx-auto w-full max-w-[1600px] bg-[#f4f6f9] print:hidden ${
+      className={`mx-auto w-full max-w-[1600px] bg-[#f4f6f9] print:hidden transition-[margin,width] duration-300 ease-out ${pickerOpen ? 'lg:ml-[300px] lg:mr-0 lg:w-[calc(100%_-_300px)] lg:max-w-none' : ''} ${
         isEmptyRoute
           ? 'pb-10'
           : hasMapStops
@@ -4282,6 +4284,7 @@ function DayRoutePanelInner() {
                     segmentToNext={null}
                     travelMode={travelMode}
                     focused={focusedStopId === venue.id}
+                    onSelectStop={() => focusStopFromMap(venue.id)}
                     onMoveUp={() => undefined}
                     onMoveDown={() => undefined}
                     onRemove={() => setRoute(removeFromDayRoute(venue.id))}
@@ -4373,6 +4376,7 @@ function DayRoutePanelInner() {
                       hideGeoSegment={listMode}
                       travelMode={travelMode}
                       focused={focusedStopId === venue.id}
+                      onSelectStop={() => focusStopFromMap(venue.id)}
                       dragging={dragVenueId === venue.id}
                       grabbed={grabbedKey === venue.id}
                       onDragStart={
@@ -4553,6 +4557,7 @@ function DayRoutePanelInner() {
                     segmentToNext={null}
                     travelMode={travelMode}
                     focused={focusedStopId === venue.id}
+                    onSelectStop={() => focusStopFromMap(venue.id)}
                     onMoveUp={() => setRoute(moveDayRoutePlanVenue(venue.id, -1))}
                     onMoveDown={() => setRoute(moveDayRoutePlanVenue(venue.id, 1))}
                     onRemove={() => setRoute(removeFromDayRoute(venue.id))}
@@ -4601,6 +4606,7 @@ function DayRoutePanelInner() {
                     stops={displayMapStops}
                     selectedStopId={mapSelectedStopId}
                     panToStopId={focusedStopId}
+                    focusRequestKey={stopFocusRequestKey}
                     focusOverlayReservePx={188}
                     onStopClick={(stopId) => focusStopFromMap(stopId, { scrollList: false })}
                     className="absolute inset-0 h-full w-full bg-slate-100"
@@ -4700,6 +4706,7 @@ function DayRoutePanelInner() {
 
       <MyDayPickerSheet
         open={pickerOpen}
+        desktopPush
         section={pickerSection}
         tabs={pickerTabs}
         onSectionChange={(next) => {
@@ -5227,6 +5234,7 @@ function DayRoutePanelInner() {
             stops={displayMapStops}
             selectedStopId={focusedStopId}
             panToStopId={focusedStopId}
+            focusRequestKey={stopFocusRequestKey}
             focusOverlayReservePx={248}
             onStopClick={focusStopFromMap}
             layoutKey="mobile-map-sheet"
@@ -5819,6 +5827,7 @@ function DayRouteVenueCard({
   onSetDwellMinutes,
   onHoverStop,
   onHoverClear,
+  onSelectStop,
 }: {
   venue: DayRouteVenueItem;
   index: number;
@@ -5859,6 +5868,7 @@ function DayRouteVenueCard({
   /** Optional marker highlight on hover/focus without changing route order. */
   onHoverStop?: (stopId: string) => void;
   onHoverClear?: () => void;
+  onSelectStop?: () => void;
 }) {
   // Ticket QR / «отметить купленным» живут в блоке «Билеты в поездке», не в строке места.
   void onToggleBought;
@@ -6119,6 +6129,10 @@ function DayRouteVenueCard({
         data-day-stop-grabbed={grabbed ? '1' : undefined}
         onMouseEnter={hoverEnter}
         onMouseLeave={hoverLeave}
+        onClick={(event) => {
+          if ((event.target as HTMLElement).closest('a,button,input,textarea,select,[data-day-stop-grip]')) return;
+          onSelectStop?.();
+        }}
         onFocusCapture={hoverEnter}
         onBlurCapture={onBlurCapture}
         onDragOver={canDrag ? onDragOver : undefined}
