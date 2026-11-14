@@ -9,7 +9,7 @@ import { buildVenueBreadcrumbs } from '@/lib/structured-data';
 export function VenueBreadcrumbsNav({ payload }: { payload: PublicVenuePageDto }) {
   const crumbs = buildVenueBreadcrumbs(payload);
   return (
-    <nav aria-label="Хлебные крошки" className="container-page flex flex-wrap items-center gap-1.5 py-3 text-sm text-slate-500">
+    <nav aria-label="Хлебные крошки" className="container-page flex flex-wrap items-center gap-1.5 py-3 text-sm text-white/80 [text-shadow:0_1px_3px_rgba(0,0,0,0.65)]">
       {crumbs.map((crumb, index) => {
         const isLast = index === crumbs.length - 1;
         return (

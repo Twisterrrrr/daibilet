@@ -45,6 +45,43 @@ import type {
   PublicVenuePageDto,
 } from '@daibilet/contracts/public';
 
+function VenueHeroActions({ venue, imageUrl }: { venue: PublicVenueDto; imageUrl?: string | null }) {
+  const share = () => {
+    if (navigator.share) void navigator.share({ title: venue.name, url: window.location.href });
+    else void navigator.clipboard?.writeText(window.location.href);
+  };
+  return (
+    <div className="flex items-center gap-2">
+      <AddToDayRouteButton
+        variant="dark"
+        iconOnly
+        className="h-11 w-11 rounded-full !px-0"
+        venue={{
+          id: venue.id,
+          slug: venue.slug,
+          title: venue.title || venue.name,
+          city: venue.city,
+          citySlug: venue.citySlug,
+          href: venueHref(venue),
+          imageUrl: imageUrl || venue.heroImageUrl,
+          address: venue.address,
+          latitude: venue.latitude,
+          longitude: venue.longitude,
+        }}
+      />
+      <button
+        type="button"
+        onClick={share}
+        aria-label="Поделиться"
+        title="Поделиться"
+        className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-slate-950/70 text-white hover:bg-slate-950/85"
+      >
+        <Share2 className="h-4 w-4" />
+      </button>
+    </div>
+  );
+}
+
 export function LocationVenueLayout({
   venue: venueProp,
   stats,
@@ -162,10 +199,6 @@ export function LocationVenueLayout({
       data-venue-pdp-md
       data-venue-experience={experience.id}
     >
-      <div className="border-b border-slate-200 bg-white">
-        <VenueBreadcrumbsNav payload={pagePayload} />
-      </div>
-
       {isPier ? (
         <>
           <section className="relative isolate grid w-full overflow-hidden bg-slate-900 text-white aspect-square md:aspect-auto md:min-h-80 lg:min-h-[28rem]">
@@ -183,7 +216,8 @@ export function LocationVenueLayout({
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/45 to-slate-900/15" />
             </div>
-            <div className="container-page absolute inset-0 z-10 flex flex-col justify-end pb-5 pt-20 md:pb-12 md:pt-24">
+            <div className="container-page absolute inset-0 z-10 flex flex-col justify-between pb-5 pt-2 md:pb-12 md:pt-4">
+              <VenueBreadcrumbsNav payload={pagePayload} />
               {/* Type pills fight H1 on mobile - desktop only, solid chips */}
               <div className="mb-3 hidden flex-wrap gap-2 md:flex">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-950/75 px-3 py-1 text-xs font-semibold">
@@ -226,21 +260,7 @@ export function LocationVenueLayout({
                       {primaryCta.label}
                     </a>
                   ) : null}
-                  <AddToDayRouteButton
-                    variant="dark"
-                    venue={{
-                      id: venue.id,
-                      slug: venue.slug,
-                      title: venue.title || venue.name,
-                      city: venue.city,
-                      citySlug: venue.citySlug,
-                      href: venueHref(venue),
-                      imageUrl: venue.heroImageUrl,
-                      address: venue.address,
-                      latitude: venue.latitude,
-                      longitude: venue.longitude,
-                    }}
-                  />
+                  <VenueHeroActions venue={venue} />
                 </div>
               ) : null}
             </div>
@@ -265,7 +285,8 @@ export function LocationVenueLayout({
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/55 to-slate-950/15" />
           </div>
-          <div className="container-page absolute inset-0 z-10 flex flex-col justify-end pb-5 pt-20 md:pb-14 md:pt-24 lg:pb-20">
+          <div className="container-page absolute inset-0 z-10 flex flex-col justify-between pb-5 pt-2 md:pb-14 md:pt-4 lg:pb-20">
+            <VenueBreadcrumbsNav payload={pagePayload} />
             <div className="mb-3 hidden flex-wrap gap-2 md:flex">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-950/75 px-3 py-1 text-xs font-semibold">
                 <TypeIcon className="h-3.5 w-3.5" /> {typeLabel}
@@ -320,7 +341,8 @@ export function LocationVenueLayout({
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/40 to-slate-950/10" />
           </div>
-          <div className="container-page absolute inset-0 z-10 flex flex-col justify-end pb-5 pt-20 md:pb-14 md:pt-24 lg:pb-20">
+          <div className="container-page absolute inset-0 z-10 flex flex-col justify-between pb-5 pt-2 md:pb-14 md:pt-4 lg:pb-20">
+            <VenueBreadcrumbsNav payload={pagePayload} />
             <div className="mb-3 hidden flex-wrap gap-2 md:flex">
               {heroBadges.length > 0 ? (
                 heroBadges.map((badge) => (
@@ -385,21 +407,7 @@ export function LocationVenueLayout({
                   {primaryCta.label}
                 </a>
               ) : null}
-              <AddToDayRouteButton
-                variant="dark"
-                venue={{
-                  id: venue.id,
-                  slug: venue.slug,
-                  title: venue.title || venue.name,
-                  city: venue.city,
-                  citySlug: venue.citySlug,
-                  href: venueHref(venue),
-                  imageUrl: venue.heroImageUrl,
-                  address: venue.address,
-                  latitude: venue.latitude,
-                  longitude: venue.longitude,
-                }}
-              />
+              <VenueHeroActions venue={venue} />
             </div>
           </div>
         </section>
@@ -427,11 +435,14 @@ export function LocationVenueLayout({
                     </div>
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/30 to-transparent" />
-                  <div className="absolute left-6 top-6">
+                  <div className="absolute left-6 top-20">
                     <div className="inline-flex items-center gap-2 rounded-full bg-white/95 px-3 py-1.5 text-sm font-bold text-slate-900 backdrop-blur">
                       <TypeIcon className="h-4 w-4 text-primary-600" />
                       {typeLabel}
                     </div>
+                  </div>
+                  <div className="absolute inset-x-0 top-0 z-10">
+                    <VenueBreadcrumbsNav payload={pagePayload} />
                   </div>
                   <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                     <h1 className="font-display text-2xl font-extrabold text-white sm:text-3xl lg:text-4xl">{title}</h1>

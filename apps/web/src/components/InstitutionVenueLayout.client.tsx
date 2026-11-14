@@ -305,10 +305,6 @@ export function InstitutionVenueLayout({
       data-venue-pdp-md
       data-venue-experience={experience.id}
     >
-      <div className="border-b border-zinc-200/80 bg-white">
-        <VenueBreadcrumbsNav payload={pagePayload} />
-      </div>
-
       <section className="relative isolate grid w-full overflow-hidden bg-slate-900 text-white aspect-square md:aspect-auto md:min-h-80 lg:min-h-[30rem]">
         <div className="absolute inset-0">
           {heroImage ? (
@@ -326,7 +322,8 @@ export function InstitutionVenueLayout({
           <div className={`absolute inset-0 ${heroGradient}`} />
         </div>
 
-        <div className="container-page absolute inset-0 z-10 flex flex-col justify-end pb-5 pt-20 md:pb-14 md:pt-24">
+        <div className="container-page absolute inset-0 z-10 flex flex-col justify-between pb-5 pt-2 md:pb-14 md:pt-4">
+          <VenueBreadcrumbsNav payload={pagePayload} />
           <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-end">
             <div className="max-w-2xl">
               <div className="mb-3 flex flex-wrap items-center gap-2">
@@ -374,7 +371,7 @@ export function InstitutionVenueLayout({
             </div>
 
             {/* Sticky footer covers mobile CTA */}
-            <div className="hidden flex-col items-start gap-2 md:flex md:items-end">
+            <div className="hidden flex-col items-start gap-3 md:flex md:items-end">
               {primaryCta ? (
                 <a
                   href={primaryCta.href}
@@ -390,29 +387,34 @@ export function InstitutionVenueLayout({
                   {primaryCta.external ? <ExternalLink className="h-3.5 w-3.5" /> : null}
                 </a>
               ) : null}
-              <AddToDayRouteButton
-                variant="dark"
-                venue={{
-                  id: venue.id,
-                  slug: venue.slug,
-                  title: venue.title || venue.name,
-                  city: venue.city,
-                  citySlug: venue.citySlug,
-                  href: venueHref(venue),
-                  imageUrl: heroImage,
-                  address: venue.address,
-                  latitude: venue.latitude,
-                  longitude: venue.longitude,
-                }}
-              />
-              <button
-                type="button"
-                onClick={share}
-                className="inline-flex items-center gap-1 rounded-full bg-slate-950/70 px-3 py-1.5 text-xs font-medium hover:bg-slate-950/85"
-              >
-                <Share2 className="h-3.5 w-3.5" />
-                Поделиться
-              </button>
+              <div className="flex items-center gap-2">
+                <AddToDayRouteButton
+                  variant="dark"
+                  iconOnly
+                  className="h-11 w-11 rounded-full !px-0"
+                  venue={{
+                    id: venue.id,
+                    slug: venue.slug,
+                    title: venue.title || venue.name,
+                    city: venue.city,
+                    citySlug: venue.citySlug,
+                    href: venueHref(venue),
+                    imageUrl: heroImage,
+                    address: venue.address,
+                    latitude: venue.latitude,
+                    longitude: venue.longitude,
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={share}
+                  aria-label="Поделиться"
+                  title="Поделиться"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-slate-950/70 text-white hover:bg-slate-950/85"
+                >
+                  <Share2 className="h-4 w-4" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -426,24 +428,16 @@ export function InstitutionVenueLayout({
         </div>
       ) : null}
 
-      {(heroAddressLine || openingHours?.lines?.[0]) ? (
+      {openingHours?.lines?.[0] ? (
         <div
           className="hidden border-b border-slate-200 bg-white md:block"
           data-venue-meta-row
         >
           <div className="container-page flex flex-wrap items-center gap-x-5 gap-y-1 py-3 text-sm text-slate-600">
-            {heroAddressLine ? (
-              <span className="inline-flex items-center gap-1.5">
-                <MapPin className="h-3.5 w-3.5 shrink-0 text-primary-600" />
-                {heroAddressLine}
-              </span>
-            ) : null}
-            {openingHours?.lines?.[0] ? (
-              <span className="inline-flex items-center gap-1.5">
-                <Clock className="h-3.5 w-3.5 shrink-0 text-primary-600" />
-                {openingHours.lines[0]}
-              </span>
-            ) : null}
+            <span className="inline-flex items-center gap-1.5">
+              <Clock className="h-3.5 w-3.5 shrink-0 text-primary-600" />
+              {openingHours.lines[0]}
+            </span>
           </div>
         </div>
       ) : null}
