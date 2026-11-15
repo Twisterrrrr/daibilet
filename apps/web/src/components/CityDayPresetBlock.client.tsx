@@ -504,6 +504,14 @@ export function CityDayPresetBlock({
                   />
                 )}
                 <span className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/35 to-slate-950/5" />
+                {row.preset.coverImageCredit ? (
+                  <span
+                    className="absolute right-2 top-2 z-10 rounded bg-slate-950/70 px-1.5 py-1 text-[9px] leading-tight text-white"
+                    title={`Источник: ${row.preset.coverImageCredit.sourceUrl} · ${row.preset.coverImageCredit.licenseUrl}`}
+                  >
+                    Фото: {row.preset.coverImageCredit.author} · {row.preset.coverImageCredit.license}
+                  </span>
+                ) : null}
                 <span className="absolute inset-x-0 bottom-0 p-3 sm:p-3.5">
                   <span
                     className={`line-clamp-3 font-bold leading-snug text-white drop-shadow ${

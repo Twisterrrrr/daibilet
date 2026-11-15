@@ -286,6 +286,7 @@ export function SuburbsCarousel({
         editorial={editorial}
         magazine={compact}
         heroImageUrl={heroImageUrl}
+        heroImageCredit={place.imageCredit || null}
         lead={titleLines.lead}
         title={titleNode}
         subtitle={titleLines.subtitle}

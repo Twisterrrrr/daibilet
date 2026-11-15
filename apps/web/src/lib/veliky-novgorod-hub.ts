@@ -62,6 +62,8 @@ export const VELIKY_NOVGOROD_SUBURBS: CitySuburbItem[] = [
     dayRouteId: 'veliky-novgorod-south-bank',
     mustSeeFilter: 'main',
     visitMinutes: 'полдня',
+    imageUrl: '/images/cities/suburbs/veliky-novgorod-peryn-skete.jpg',
+    imageCredit: { author: 'Sterndmitri', sourceUrl: 'https://commons.wikimedia.org/wiki/File:PerynSketePerynChapelCells.jpg', license: 'CC BY-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/' },
     latitude: 58.490332,
     longitude: 31.272284,
     places: [
@@ -99,6 +101,7 @@ export const VELIKY_NOVGOROD_DAY_ROUTE_PRESETS: CityDayRoutePreset[] = [
     id: 'veliky-novgorod-medieval-center',
     title: 'Сердце древнего города',
     description: 'Пешеходный маршрут по двум историческим берегам: начните в Кремле, перейдите Волхов и завершите у древних церквей Торга.',
+    coverImageUrl: '/images/cities/night/veliky-novgorod.png',
     travelVector: 'Пешком; через Волхов — по пешеходному мосту.',
     stops: [
       VELIKY_NOVGOROD_MUST_SEE[0],
@@ -116,6 +119,8 @@ export const VELIKY_NOVGOROD_DAY_ROUTE_PRESETS: CityDayRoutePreset[] = [
     title: 'Деревянное зодчество и монастыри',
     description: 'Отдельная загородная поездка: музей, монастырский ансамбль и Перынский скит. Проверяйте сезонный режим музея и дорогу у воды.',
     timingNote: 'Закладывайте не меньше половины дня; порядок поездки зависит от расписания транспорта и площадок.',
+    coverImageUrl: '/images/cities/routes/veliky-novgorod-vitoslavlitsy.jpg',
+    coverImageCredit: { author: 'Александр Сигачёв', sourceUrl: 'https://commons.wikimedia.org/wiki/File:Vitoslavlicy_-_2025-08_-_p3.jpg', license: 'CC BY-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/' },
     travelVector: 'Такси или городской транспорт до южных площадок; между удалёнными остановками удобнее такси.',
     stops: [
       ...[0, 2, 4].map((index) => ({ ...VELIKY_NOVGOROD_SUBURBS[0].places![index], desc: VELIKY_NOVGOROD_SUBURBS[0].places![index].desc || VELIKY_NOVGOROD_SUBURBS[0].places![index].name }) as CityMustSeeItem),

@@ -23,6 +23,41 @@ export type CityRegionalEvent = {
 };
 
 export const CITY_REGIONAL_EVENTS: Record<string, CityRegionalEvent[]> = {
+  'veliky-novgorod': [
+    {
+      id: 'veliky-novgorod-dostoevsky-theatre-festival-2026',
+      title: 'Международный фестиваль театральных искусств имени Ф. М. Достоевского',
+      startDate: '2026-10-29',
+      endDate: '2026-11-02',
+      datesLabel: '29 октября - 2 ноября 2026',
+      place: 'Новгородская областная филармония, Кремль, 8',
+      blurb: 'Тридцатый международный театральный фестиваль; в 2026 году его программа также охватывает Старую Руссу и Валдай.',
+      sourceUrl: 'https://novgorod.travel/events/mezhdunarodnyy-festival-teatralnykh-iskusstv-imeni-f-m-dostoevskogo',
+      sourceLabel: 'novgorod.travel',
+    },
+    {
+      id: 'veliky-novgorod-gastro-festival-2026',
+      title: 'Гастрофестиваль «Князь, вы кушать хотите?»',
+      startDate: '2026-10-28',
+      endDate: '2026-11-15',
+      datesLabel: '28 октября - 15 ноября 2026',
+      place: 'Кафе и рестораны Великого Новгорода',
+      blurb: 'Спецменю по мотивам произведений Достоевского в заведениях Великого Новгорода, Старой Руссы и Любытина.',
+      sourceUrl: 'https://novgorod.travel/events/gastrofestival-knyaz-vy-kushat-khotite',
+      sourceLabel: 'novgorod.travel',
+    },
+    {
+      id: 'veliky-novgorod-sadko-vitoslavlitsy-2026',
+      title: 'Праздник фольклора и ремёсел «Садко»',
+      startDate: '2026-06-21',
+      endDate: '2026-06-21',
+      datesLabel: '21 июня 2026',
+      place: 'Музей «Витославлицы», Юрьевское шоссе',
+      blurb: 'Праздник в рамках международного фестиваля «Садко»: фольклорные коллективы, мастера, концерты и ярмарки.',
+      sourceUrl: 'https://novgorod.travel/en/events/prazdnik-folklora-i-remesel-sadko',
+      sourceLabel: 'novgorod.travel',
+    },
+  ],
   moscow: [
     {
       id: 'msk-punchline-2026',

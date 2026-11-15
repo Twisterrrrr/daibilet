@@ -369,6 +369,8 @@ export type CityDayRoutePreset = {
    * Нужна, когда у остановок только label-card stubs или нет blogSlug.
    */
   coverImageUrl?: string;
+  /** Visible image attribution when the route cover has a share-alike license. */
+  coverImageCredit?: { author: string; sourceUrl: string; license: string; licenseUrl: string };
   /** Optional day-trip logistics (same canon as significantSuburbs). */
   travelVector?: string;
   travelVectorBlurb?: string;

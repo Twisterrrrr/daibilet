@@ -45,6 +45,7 @@ export type DayTripCanonCardProps = {
   magazine?: boolean;
   /** Cover for magazine layout (editorial / hub hero). */
   heroImageUrl?: string | null;
+  heroImageCredit?: { author: string; sourceUrl: string; license: string; licenseUrl: string } | null;
   /** Short lead under title (suburb desc). */
   lead?: string | null;
   /** Footer CTA (AddMany / Collect day button). */
@@ -100,6 +101,7 @@ export function DayTripCanonCard({
   editorial = false,
   magazine = false,
   heroImageUrl = null,
+  heroImageCredit = null,
   lead = null,
   cta,
   titleExtra,
@@ -197,6 +199,11 @@ export function DayTripCanonCard({
                 >
                   {index + 1}
                 </span>
+                {heroImageCredit ? (
+                  <a href={heroImageCredit.sourceUrl} target="_blank" rel="noreferrer" className="absolute bottom-2 right-2 rounded bg-slate-950/70 px-1.5 py-1 text-[9px] text-white underline" title={`Фото: ${heroImageCredit.author} · ${heroImageCredit.license}`}>
+                    Фото: {heroImageCredit.author}
+                  </a>
+                ) : null}
               </div>
             ) : null}
 
@@ -414,6 +421,11 @@ export function DayTripCanonCard({
               >
                 {index + 1}
               </span>
+              {heroImageCredit ? (
+                <a href={heroImageCredit.sourceUrl} target="_blank" rel="noreferrer" className="absolute bottom-2 right-2 rounded bg-slate-950/70 px-1.5 py-1 text-[9px] text-white underline" title={`Фото: ${heroImageCredit.author} · ${heroImageCredit.license}`}>
+                  Фото: {heroImageCredit.author}
+                </a>
+              ) : null}
             </div>
             <div className={`min-w-0 ${HUB_DETAIL_BODY}`} data-day-trip-body>
               {headAndMeta}

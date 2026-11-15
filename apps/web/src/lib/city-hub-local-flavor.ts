@@ -63,6 +63,7 @@ import {
   KIROV_WHEN_TO_GO,
   TOLYATTI_WHEN_TO_GO,
   IZHEVSK_WHEN_TO_GO,
+  VELIKY_NOVGOROD_WHEN_TO_GO,
 } from './when-to-go-packs.ts';
 import { normalizeCityHubSlug } from './city-hub-config.ts';
 import type { CityMustSeeItem, CitySuburbItem, CitySuburbPlace } from './cityInfo.ts';
@@ -201,6 +202,26 @@ const PERM_WEATHER: CityWeatherFlavor = {
   indoorCtaOvercast: 'Пасмурно: галерея или Театр-Театр, пока улица ждёт',
   indoorCtaRain: 'Дождь: музеи и кафе центра короткими перебежками',
   indoorCtaSnow: 'Снег: тёплые залы; к Каме только в протекторе',
+};
+
+const VELIKY_NOVGOROD_WEATHER: CityWeatherFlavor = {
+  latitude: 58.5213,
+  longitude: 31.2755,
+  timezone: 'Europe/Moscow',
+  outdoorSlugs: [
+    'veliky-novgorod-novgorodskiy-detinets-kreml',
+    'veliky-novgorod-yaroslavovo-dvorische',
+    'veliky-novgorod-peshehodny-most-volkhov',
+    'veliky-novgorod-ryurikovo-gorodische',
+  ],
+  indoorSlugs: [
+    'veliky-novgorod-muzey-derevyannogo-zodchestva-vitoslavlitsy',
+    'veliky-novgorod-sofiyskiy-sobor',
+  ],
+  outdoorCta: 'Хорошая погода: Кремль, Торговая сторона и прогулка вдоль Волхова',
+  indoorCtaOvercast: 'Пасмурно: выберите музей или экспозицию в центре',
+  indoorCtaRain: 'Дождь: запланируйте музей и проверьте часы работы перед выходом',
+  indoorCtaSnow: 'Снег: сократите прогулку и оставьте больше времени на музейные залы',
 };
 
 const MONTH_TITLE = [
@@ -2050,6 +2071,11 @@ const TYUMEN_SLIDES: CityIdentitySlide[] = [
 ];
 
 export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
+  'veliky-novgorod': {
+    tags: [],
+    weather: VELIKY_NOVGOROD_WEATHER,
+    whenToGo: VELIKY_NOVGOROD_WHEN_TO_GO,
+  },
   perm: {
     identityHeading: 'Чем уникальна Пермь',
     identityLead: IDENTITY_LEAD,
