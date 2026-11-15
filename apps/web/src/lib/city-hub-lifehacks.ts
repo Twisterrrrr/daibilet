@@ -2247,12 +2247,6 @@ const CITY_HUB_LIFEHACKS: Record<string, CityLifehackPack> = {
       cta: { kind: 'gis', label: 'Маршрут до Витославлиц', href: twoGisCitySearchUrl('veliky-novgorod', 'автобус 7 Витославлицы') },
     },
     {
-      id: 'veliky-novgorod-taxi', tabId: 'transit', icon: 'transit',
-      title: 'Заказывайте такси через приложение',
-      body: body('Стоимость поездки зависит от маршрута, времени и спроса. Посмотрите цену в приложении перед заказом — так проще сравнить варианты и избежать сюрприза.'),
-      cta: { kind: 'maps', label: 'Такси в Великом Новгороде', href: yandexMapsSearchUrl('такси Великий Новгород') },
-    },
-    {
       id: 'veliky-novgorod-kremlin-entry', tabId: 'walk', icon: 'museum',
       title: 'В Детинец можно зайти бесплатно',
       body: body('Вход на территорию Детинца свободный. Звонница, палаты и музейные экспозиции — отдельные объекты со своим режимом и билетами.'),
