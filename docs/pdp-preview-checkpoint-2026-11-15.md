@@ -25,11 +25,13 @@ This checkpoint records the isolated staging preview work for the Places/Events/
 - Backend test suite: 184/184 passed.
 - Web and backend typecheck passed; `git diff --check` passed.
 - Isolated preview web build completed successfully after both code changes (251 static pages); preview web/API services are active on ports 3013/4012.
+- Venue sitemap previously requested one `limit=10000` API response, but the public venue API caps each dump at 2,000 rows; the response also reported `total=3823` and `hasMore=true`. The sitemap silently missed all later pages. Added bounded pagination (`sort=asc`, 2,000 per request) in commit `47c7dc3f0` (`fix(sitemap): paginate venue catalog results`), with tests for page continuation and the 10,000-row ceiling.
+- The isolated preview then returned `/sitemaps/venues.xml` with HTTP 200 in 18.15 seconds. It included 1,717 unique indexable URLs and a known stable-slug record on the second API page. Two API pages returned 3,823 unique venue IDs (2,000 + 1,823). The route still verifies 1,490 `/locations/` URLs individually in groups of eight; monitor/optimize this if cold shared-staging runs approach the gateway timeout.
 - Server root filesystem after build: 66% used.
 
 ## Remaining acceptance gaps
 
-- The prior `/sitemaps/venues.xml` timeout remains unresolved. The known heavy route was not re-requested; inspect API/query performance before retrying.
-- Visual editing/save/reopen of Place and City PDPs, gallery/source workflow, and the full public sitemap/SEO matrix remain to be accepted.
+- The pagination bug is fixed and the full venue sitemap was verified on isolated preview. The shared staging timeout was not re-tested; the staging checkout is still not a safe deployment target. The 18-second preview duration leaves an optimization opportunity in per-location detail verification.
+- Visual editing/save/reopen of Place and City PDPs, gallery/source workflow, and the remaining public sitemap/SEO matrix remain to be accepted.
 - Shared staging is still not the target for a release because its checkout and catalog state were previously found dirty/stale. Production was not touched.
 - Overall plan remains in progress; this checkpoint closes no full plan item by itself.
