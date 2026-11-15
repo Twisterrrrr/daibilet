@@ -358,11 +358,9 @@ function scheduleCityPageRebuild(
           : cityRecord?.seoDescription ||
             `Афиша событий, экскурсий, музеев и активностей ${entityLabel}. Быстрый выбор по датам, площадкам и категориям.`),
         canonicalPath: publishedPdp?.canonicalPath || cityRecord?.canonicalPath || `/cities/${destination.slug}`,
-        ...(pdpDocument?.status === 'HIDDEN'
-          ? { isIndexable: false }
-          : publishedPdp
-            ? { isIndexable: publishedPdp.isIndexable }
-            : {}),
+        ...(pdpDocument
+          ? { isIndexable: pdpDocument.status === 'PUBLISHED' && Boolean(publishedPdp) && Boolean(pdpDocument.isIndexable) }
+          : {}),
         ...(publishedPdp ? { pdp: publishedPdp } : {}),
       },
       sessions: sessions as PublicCityPageDto['sessions'],
@@ -528,11 +526,9 @@ async function buildStandaloneCityPageWithoutSessions(args: {
           ? `Список событий, площадок и популярных городов в ${destination.name} для загородного отдыха и поездок выходного дня.`
           : `Афиша событий, экскурсий, музеев и активностей ${entityLabel}. Быстрый выбор по датам, площадкам и категориям.`),
       canonicalPath: publishedPdp?.canonicalPath || cityRecord?.canonicalPath || `/cities/${destination.slug}`,
-      ...(pdpDocument?.status === 'HIDDEN'
-        ? { isIndexable: false }
-        : publishedPdp
-          ? { isIndexable: publishedPdp.isIndexable }
-          : {}),
+      ...(pdpDocument
+        ? { isIndexable: pdpDocument.status === 'PUBLISHED' && Boolean(publishedPdp) && Boolean(pdpDocument.isIndexable) }
+        : {}),
       ...(publishedPdp ? { pdp: publishedPdp } : {}),
     },
     sessions: [],
