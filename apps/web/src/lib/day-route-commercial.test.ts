@@ -92,6 +92,20 @@ describe('day-route-commercial chips', () => {
         stop({
           id: 'venue_sp',
           slug: 'siniy-pushkin',
+          title: 'Шоу',
+          ticketUrl: '/events/pushkin-show',
+          eventId: 'evt_pushkin',
+          eventSlug: 'pushkin-show',
+          eventStop: true,
+        }),
+      ),
+      false,
+    );
+    assert.equal(
+      dayRouteOfferIsVenueBound(
+        stop({
+          id: 'venue_sp',
+          slug: 'siniy-pushkin',
           title: 'Синий Пушкин',
           ticketUrl: '/events/pushkin-show',
           eventId: 'evt_pushkin',

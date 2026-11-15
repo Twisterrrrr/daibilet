@@ -38,10 +38,14 @@ function ensureHost(): HTMLDivElement {
 }
 
 function hideToast(host: HTMLDivElement) {
-  // Inline `display:flex` beats the HTML `hidden` attribute's UA `display:none`,
-  // so the toast stayed visible forever after add. Hide via display explicitly.
-  host.hidden = true;
-  host.style.display = 'none';
+  host.style.opacity = '0';
+  host.style.transform = 'translate(-50%, 16px)';
+  window.setTimeout(() => {
+    if (host.style.opacity === '0') {
+      host.hidden = true;
+      host.style.display = 'none';
+    }
+  }, 240);
 }
 
 function scheduleHide(host: HTMLDivElement, ms: number) {
@@ -60,28 +64,29 @@ export function flashDayRouteFeedback(message: string, options: DayRouteFeedback
 
   const host = ensureHost();
   const showClear = Boolean(options.showClear);
-  const mapFabVisible = Boolean(document.querySelector('[data-my-day-map-fab]'));
-  const bottomOffset = mapFabVisible
-    ? 'calc(5.75rem + env(safe-area-inset-bottom, 0px))'
-    : '1.25rem';
+  const bottomOffset = window.matchMedia('(min-width: 1024px)').matches
+    ? '28px'
+    : 'calc(84px + env(safe-area-inset-bottom, 0px))';
 
   host.style.cssText = [
     'position:fixed',
     'left:50%',
     `bottom:${bottomOffset}`,
-    'transform:translateX(-50%)',
-    'z-index:99999',
-    'max-width:min(18rem,calc(100vw - 2rem))',
-    'padding:0.55rem 0.75rem',
+    'transform:translate(-50%,16px)',
+    'z-index:1000',
+    'max-width:min(90vw,460px)',
+    'padding:10px 18px',
     'border-radius:9999px',
-    'background:#064e3b',
+    'background:#0F1B2D',
     'color:#fff',
-    'font:600 13px/1.3 system-ui,sans-serif',
-    'box-shadow:0 8px 24px rgba(0,0,0,.18)',
+    'font:500 12.5px/1.3 system-ui,sans-serif',
+    'box-shadow:0 18px 40px -18px rgba(15,27,45,.9)',
     'text-align:center',
     'display:flex',
     'align-items:center',
-    'gap:0.45rem',
+    'gap:10px',
+    'opacity:0',
+    'transition:opacity .22s ease,transform .22s ease',
     showClear ? 'pointer-events:auto' : 'pointer-events:none',
   ].join(';');
 
@@ -89,7 +94,7 @@ export function flashDayRouteFeedback(message: string, options: DayRouteFeedback
 
   const label = document.createElement('span');
   label.textContent = text;
-  label.style.cssText = 'min-width:0;flex:1;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis';
+  label.style.cssText = 'min-width:0;flex:1;text-align:center';
   host.appendChild(label);
 
   if (showClear) {
@@ -106,6 +111,7 @@ export function flashDayRouteFeedback(message: string, options: DayRouteFeedback
       'justify-content:center',
       'width:2rem',
       'height:2rem',
+      'min-height:0',
       'border-radius:9999px',
       'border:1px solid rgba(255,255,255,0.35)',
       'background:rgba(255,255,255,0.12)',
@@ -123,5 +129,10 @@ export function flashDayRouteFeedback(message: string, options: DayRouteFeedback
   }
 
   host.hidden = false;
+  host.style.display = 'flex';
+  window.requestAnimationFrame(() => {
+    host.style.opacity = '1';
+    host.style.transform = 'translate(-50%,0)';
+  });
   scheduleHide(host, showClear ? HIDE_MS : HIDE_MS_PLAIN);
 }

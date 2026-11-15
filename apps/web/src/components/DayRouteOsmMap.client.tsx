@@ -21,16 +21,24 @@ const MAX_ZOOM = 18;
 /** Wait until the host has a real box - L.map(0×0) leaves gray gutters after grow. */
 async function waitForMapHostSize(
   node: HTMLElement,
-  isCancelled: () => boolean,
+  signal: AbortSignal,
 ): Promise<boolean> {
-  for (let i = 0; i < 90; i += 1) {
-    if (isCancelled()) return false;
-    if (node.clientWidth >= 32 && node.clientHeight >= 32) return true;
-    await new Promise<void>((resolve) => {
-      requestAnimationFrame(() => resolve());
+  if (node.clientWidth >= 32 && node.clientHeight >= 32) return true;
+  return new Promise((resolve) => {
+    const observer = new ResizeObserver(() => {
+      if (signal.aborted) finish(false);
+      else if (node.clientWidth >= 32 && node.clientHeight >= 32) finish(true);
     });
-  }
-  return node.clientWidth > 0 && node.clientHeight > 0;
+    const onAbort = () => finish(false);
+    const finish = (ready: boolean) => {
+      observer.disconnect();
+      signal.removeEventListener('abort', onAbort);
+      resolve(ready);
+    };
+    observer.observe(node);
+    signal.addEventListener('abort', onAbort, { once: true });
+    if (signal.aborted) finish(false);
+  });
 }
 
 function syncLeafletSize(map: LeafletMap) {
@@ -75,6 +83,7 @@ export function DayRouteOsmMap({
   /** When set, centers the map on the focused stop. */
   panToStopId = null,
   focusRequestKey = 0,
+  fitRouteRequestKey = 0,
 }: {
   stops: DayRouteMapStop[];
   className?: string;
@@ -87,6 +96,8 @@ export function DayRouteOsmMap({
   panToStopId?: string | null;
   /** Changes for each explicit stop click, including repeated clicks on one stop. */
   focusRequestKey?: number;
+  /** Changes when the user explicitly requests the full route extent. */
+  fitRouteRequestKey?: number;
 }) {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const mapRef = React.useRef<LeafletMap | null>(null);
@@ -117,15 +128,15 @@ export function DayRouteOsmMap({
     if (!node) return;
     if (stops.length === 0 && !fallbackCenter) return;
 
-    let cancelled = false;
+    const abortController = new AbortController();
     let resizeObserver: ResizeObserver | null = null;
 
     void (async () => {
       const L = await loadDaibiletLeaflet();
-      if (cancelled || !node) return;
+      if (abortController.signal.aborted || !node) return;
 
-      const ready = await waitForMapHostSize(node, () => cancelled);
-      if (cancelled || !ready || !node) return;
+      const ready = await waitForMapHostSize(node, abortController.signal);
+      if (abortController.signal.aborted || !ready || !node) return;
 
       const initialCenter: [number, number] = stops[0]
         ? [stops[0].latitude, stops[0].longitude]
@@ -151,19 +162,16 @@ export function DayRouteOsmMap({
       // so one-time layers must be gated: unguarded addTo() stacked a zoom
       // control pair (and a tile layer) per run — 6 controls on the map.
       if (!existingMap) {
-        // bottomright: MyDayMapAside keeps collapse (left) + fullscreen (top-right).
-        L.control
-          .zoom({
-            position: 'bottomright',
-            zoomInTitle: 'Приблизить',
-            zoomOutTitle: 'Отдалить',
-          })
-          .addTo(map);
+        map.attributionControl.setPrefix(false);
+        // Bottom right, lifted above the stop rail through the map's scoped CSS.
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution:
             '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>',
           maxZoom: MAX_ZOOM,
         }).addTo(map);
+        if (layoutKey === 'desktop-map') {
+          map.attributionControl.remove();
+        }
       }
 
         resizeObserver = new ResizeObserver(() => {
@@ -229,7 +237,7 @@ export function DayRouteOsmMap({
     })();
 
     return () => {
-      cancelled = true;
+      abortController.abort();
       resizeObserver?.disconnect();
     };
   }, [stopsKey, centerKey]);
@@ -272,6 +280,20 @@ export function DayRouteOsmMap({
     }, 80);
     return () => window.clearTimeout(id);
   }, [panToStopId, stopsKey, layoutKey, focusRequestKey]);
+
+  React.useEffect(() => {
+    if (!fitRouteRequestKey || stops.length < 2) return;
+    let cancelled = false;
+    void loadDaibiletLeaflet().then((L) => {
+      const map = mapRef.current;
+      if (cancelled || !map) return;
+      map.flyToBounds(
+        L.latLngBounds(stops.map((stop) => [stop.latitude, stop.longitude] as [number, number])),
+        { padding: [36, 36], maxZoom: 15, duration: 0.55 },
+      );
+    });
+    return () => { cancelled = true; };
+  }, [fitRouteRequestKey, stopsKey]);
 
   React.useEffect(() => {
     return () => {
@@ -323,6 +345,7 @@ export function DayRouteOsmMap({
       aria-label="Карта маршрута дня"
       aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight"
       data-day-route-map="leaflet"
+      data-day-route-map-layout={typeof layoutKey === 'string' ? layoutKey : undefined}
       tabIndex={stops.length > 0 ? 0 : undefined}
       onKeyDown={onMapKeyDown}
       onPointerDown={() => {

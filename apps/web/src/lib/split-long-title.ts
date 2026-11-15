@@ -20,7 +20,10 @@ export function splitLongTitleAtBreak(
   const hyphenAt = text.search(/ [-—–] /);
   const candidates: Array<{ at: number; mark: ':' | '-'; skip: number }> = [];
   if (colonAt >= 0) candidates.push({ at: colonAt, mark: ':', skip: 2 });
-  if (hyphenAt >= 0) candidates.push({ at: hyphenAt, mark: '-', skip: 3 });
+  // Do not split English hyphenated phrases such as "Hop on-hop off".
+  if (hyphenAt >= 0 && !/\b(?:hop\s+on|hop\s+off)\s*[-—–]\s*(?:hop\s+on|hop\s+off)\b/i.test(text)) {
+    candidates.push({ at: hyphenAt, mark: '-', skip: 3 });
+  }
   candidates.sort((a, b) => a.at - b.at);
 
   for (const item of candidates) {

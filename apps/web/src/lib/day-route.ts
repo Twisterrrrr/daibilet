@@ -123,6 +123,8 @@ export type DayRouteVenueItem = {
   /** Optional: added from event card/page (backward compatible - older storage omits these). */
   eventId?: string | null;
   eventSlug?: string | null;
+  /** Added from a specific event, even when the map pin is anchored to its venue. */
+  eventStop?: boolean;
   /** Human label for session time, e.g. «сб, 14:00». */
   sessionLabel?: string | null;
   startsAt?: string | null;
@@ -965,6 +967,7 @@ function mergeDayRouteVenueFields(
   else if (existingTip) next.transitTip = existingTip;
   if (incoming.eventId) next.eventId = incoming.eventId;
   if (incoming.eventSlug) next.eventSlug = incoming.eventSlug;
+  if (incoming.eventStop) next.eventStop = true;
   if (incoming.sessionLabel) next.sessionLabel = incoming.sessionLabel;
   if (incoming.startsAt) next.startsAt = incoming.startsAt;
   if (incoming.ticketUrl) next.ticketUrl = incoming.ticketUrl;
@@ -2079,11 +2082,10 @@ export function enrichDayRouteFromMatchVenues(payloadVenues: DayRouteCoordSource
       isDayRoutePlaceholderTitle(item.title) || item.title === item.id || item.title === item.eventId;
     if (match.title && stubTitle) next.title = match.title;
     const placeOnly = !item.eventId && !item.eventSlug;
-    // Curated must-see pins beat hub/DB geo (e.g. Perm embankment geocoded into Kama).
-    const editorial = placeOnly
-      ? lookupEditorialPlaceCoords(next.slug || item.slug || match.slug)
-      : null;
-    if (editorial) {
+    // Curated place pins beat hub/DB geo; for event stops use the same entry only
+    // as a fallback when the supplier has no coordinates for its venue.
+    const editorial = lookupEditorialPlaceCoords(next.slug || item.slug || match.slug);
+    if (editorial && (placeOnly || !isValidCoordinatePair(lat, lng))) {
       next.latitude = editorial.latitude;
       next.longitude = editorial.longitude;
     } else if (isValidCoordinatePair(lat, lng)) {

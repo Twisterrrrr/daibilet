@@ -15,7 +15,7 @@ type MyDayMobileMapSheetProps = {
 };
 
 /**
- * Lovable mobile pattern: FAB «Карта · N» → bottom sheet ~85vh (not fullscreen-only).
+ * Mobile pattern: centered «Карта · N» → bottom sheet ~85vh (not fullscreen-only).
  */
 export function MyDayMobileMapSheet({
   open,
@@ -29,12 +29,12 @@ export function MyDayMobileMapSheet({
   return (
     <>
       {!open ? (
-      <div className="pointer-events-none fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] right-4 z-40 flex justify-end sm:right-6 lg:hidden print:hidden">
+      <div className="pointer-events-none fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] inset-x-0 z-40 flex justify-center lg:hidden print:hidden">
         <button
           type="button"
           onClick={onOpen}
           data-my-day-map-fab
-          className="pointer-events-auto inline-flex items-center gap-2 rounded-full bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-primary-700"
+          className="pointer-events-auto inline-flex items-center gap-2 rounded-full bg-primary-600 min-h-12 px-7 py-3 text-base font-semibold text-white shadow-lg transition hover:bg-primary-700"
         >
           <MapIcon className="h-4 w-4" aria-hidden />
           Карта · {stopCount}

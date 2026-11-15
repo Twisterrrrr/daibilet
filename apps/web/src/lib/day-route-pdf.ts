@@ -48,9 +48,16 @@ const lat2y = (lat: number, z: number) => {
 function loadImage(src: string): Promise<HTMLImageElement | null> {
   return new Promise((resolve) => {
     const img = new Image();
+    const timeout = window.setTimeout(() => finish(null), 4000);
+    function finish(image: HTMLImageElement | null) {
+      window.clearTimeout(timeout);
+      img.onload = null;
+      img.onerror = null;
+      resolve(image);
+    }
     img.crossOrigin = 'anonymous';
-    img.onload = () => resolve(img);
-    img.onerror = () => resolve(null);
+    img.onload = () => finish(img);
+    img.onerror = () => finish(null);
     img.src = src;
   });
 }

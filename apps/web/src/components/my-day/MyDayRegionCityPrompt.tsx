@@ -88,6 +88,7 @@ export const MyDayRegionCityPrompt = forwardRef<HTMLElement, MyDayRegionCityProm
               value={value === alternatives.regionName ? 'all' : value}
               onChange={onChange}
               allLabel="Другой город"
+              showAllOption={false}
               variant="hero"
               className="w-full"
             />
