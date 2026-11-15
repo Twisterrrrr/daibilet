@@ -13,6 +13,10 @@ describe('place slug aliases', () => {
     assert.equal(resolvePlaceSlugAlias('voronezh-kramskoy'), 'voronezh-hudozhestvennyy-muzey-kramskogo');
     assert.equal(resolvePlaceSlugAlias('ryazan-kreml'), 'ryazan-ryazanskiy-kreml');
     assert.equal(
+      resolvePlaceSlugAlias('vrubelevskiy-korpus-vrubel-omsk'),
+      'omsk-muzey-izobrazitelnyh-iskusstv-vrubelya',
+    );
+    assert.equal(
       resolvePlaceSlugAlias('naprotiv-teatra-sovremennik-625af9838532f4ffe3fefe4b'),
       'moscow-sovremennik',
     );
@@ -48,7 +52,7 @@ describe('place slug aliases', () => {
     assert.equal(placeSlugAliasHref('unknown-place'), null);
 
     const redirects = placeSlugAliasRedirects();
-    assert.equal(redirects.length, 12);
+    assert.equal(redirects.length, 14);
     assert.ok(
       redirects.some(
         (row) =>
@@ -62,6 +66,14 @@ describe('place slug aliases', () => {
         (row) =>
           row.source === '/venues/voronezh-kramskoy' &&
           row.destination === '/venues/voronezh-hudozhestvennyy-muzey-kramskogo',
+      ),
+    );
+    assert.ok(
+      redirects.some(
+        (row) =>
+          row.source === '/venues/vrubelevskiy-korpus-vrubel-omsk' &&
+          row.destination === '/venues/omsk-muzey-izobrazitelnyh-iskusstv-vrubelya' &&
+          row.permanent,
       ),
     );
   });

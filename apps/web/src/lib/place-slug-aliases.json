@@ -22,5 +22,9 @@
   "petrovskii-putevoi-dvorec-5cd1bf3d079a40000c1e0639": {
     "slug": "moscow-petrovskiy-putevoy-dvorets",
     "family": "institution"
+  },
+  "vrubelevskiy-korpus-vrubel-omsk": {
+    "slug": "omsk-muzey-izobrazitelnyh-iskusstv-vrubelya",
+    "family": "institution"
   }
 }
