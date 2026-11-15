@@ -30,6 +30,10 @@
     "./place-pdp": {
       "types": "./src/place-pdp.ts",
       "default": "./src/place-pdp.ts"
+    },
+    "./city-pdp": {
+      "types": "./src/city-pdp.ts",
+      "default": "./src/city-pdp.ts"
     }
   },
   "scripts": {

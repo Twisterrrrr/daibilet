@@ -8,4 +8,5 @@ export * from './public.js';
 export * from './schemas.js';
 export * from './source.js';
 export * from './place-pdp.js';
+export * from './city-pdp.js';
 

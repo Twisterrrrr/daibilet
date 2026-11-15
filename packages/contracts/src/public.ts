@@ -10,6 +10,7 @@ import type {
   TimeBucket,
 } from './common.js';
 import type { LandingContentBlockDto } from './landing.js';
+import type { PublishedDestinationPdpDto } from './city-pdp.js';
 
 export type CatalogListKey = 'family_kids' | 'family_all' | 'free' | 'weekend';
 export interface CatalogTaxonomyLabel { slug: string; title: string }
@@ -248,6 +249,9 @@ export interface PublicCityDto extends SeoFields {
   events: number;
   venues: number;
   categories: Record<string, number>;
+  heroImageUrl?: string | null;
+  /** Editorial snapshot exposed only after an explicit city/region PDP publish. */
+  pdp?: PublishedDestinationPdpDto | null;
 }
 
 /** Адм. центр субъекта для region hub (мост в city hub). */
