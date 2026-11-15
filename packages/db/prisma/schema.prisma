@@ -957,7 +957,8 @@ model Region {
   slug  String @unique
   title String
 
-  cities City[]
+  cities      City[]
+  pdpDocument DestinationPdpDocument?
 }
 
 model City {
@@ -976,12 +977,57 @@ model City {
   isDestination  Boolean @default(false)
 
   region    Region?    @relation(fields: [regionId], references: [id])
+  pdpDocument DestinationPdpDocument?
   venues    Venue[]
   events    Event[]
   landings  Landing[]
   articles  Article[]
   tripPlans TripPlan[]
   admissionProducts AdmissionProduct[]
+}
+
+/// Draftable editorial content for a city or regional hub. The public hub keeps
+/// its existing static/catalog fallback until a document is explicitly published.
+model DestinationPdpDocument {
+  id             String    @id @default(cuid())
+  cityId         String?   @unique
+  regionId       String?   @unique
+  summary        String?
+  heroImageUrl   String?
+  content        Json      @default("{}")
+  publishedContent Json?
+  seoH1          String?
+  seoTitle       String?
+  seoDescription String?
+  canonicalPath  String?
+  status         String    @default("DRAFT")
+  isIndexable    Boolean   @default(false)
+  publishedAt    DateTime?
+  version        Int       @default(1)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  city     City?     @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  region   Region?   @relation(fields: [regionId], references: [id], onDelete: Cascade)
+  revisions DestinationPdpRevision[]
+
+  @@index([status, isIndexable])
+  @@index([updatedAt])
+}
+
+model DestinationPdpRevision {
+  id         String   @id @default(cuid())
+  documentId String
+  version    Int
+  snapshot   Json
+  changeNote String?
+  actorId    String?
+  createdAt  DateTime @default(now())
+
+  document DestinationPdpDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@unique([documentId, version])
+  @@index([createdAt])
 }
 
 model Venue {
