@@ -27,6 +27,7 @@ test('public stable route returns identity and keeps draft page non-indexable', 
   };
   assert.deepEqual(await readPublicEventPageRouteBySlug(db, 'Stable-Show-Perm'), {
     id: 'page-1', slug: 'stable-show-perm', eventId: 'evt-1', eventIds: ['evt-1'], status: 'DRAFT', published: false, isIndexable: false,
+    heroImageUrl: null,
   });
 });
 
@@ -41,6 +42,7 @@ test('public stable route selects a visible event when an earlier linked slot is
   };
   assert.deepEqual(await readPublicEventPageRouteBySlug(db, 'stable-show-perm'), {
     id: 'page-1', slug: 'stable-show-perm', eventId: 'evt-live', eventIds: ['evt-hidden', 'evt-live'], status: 'DRAFT', published: false, isIndexable: false,
+    heroImageUrl: null,
   });
 });
 
