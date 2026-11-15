@@ -21,7 +21,7 @@ import { hasSeoListingEditorial } from '@/data/seo-listing-texts';
 import { isEventsCatalogSitemapEligibleUrl } from '@/lib/events-catalog-indexing';
 import { evaluateListingIndexability, MIN_LISTING_OFFERS_FOR_INDEX } from '@/lib/seo-listing-meta';
 import { buildPodborkiCityCanonicalPath, isPodborkiSeoPilotCitySlug, PODBORKI_SEO_PILOT_CITY_SLUGS } from '@/lib/podborki-city-seo';
-import { venueCanonicalPath, cityHref, citySlug } from '@/lib/routes';
+import { venueCanonicalPath, cityCanonicalPath, cityHref, citySlug } from '@/lib/routes';
 import { cityPlacesCatalogHref } from '@/lib/catalog-url';
 import { getCachedCatalog } from '@/server/cached-catalog-data';
 import { getCachedDestinations } from '@/server/cached-public-surfaces';
@@ -303,9 +303,55 @@ export async function buildEventsSitemapEntries(): Promise<SitemapEntry[]> {
 
 export async function buildCitiesSitemapEntries(): Promise<SitemapEntry[]> {
   const destinationsPayload = await getCachedDestinations();
-  return (destinationsPayload?.destinations || [])
+  const editorialBySlug = new Map<string, {
+    title: string;
+    slug: string;
+    sourceSlug: string | null;
+    type: 'city' | 'region';
+    status: string;
+    isIndexable: boolean;
+    canonicalPath: string | null;
+    updatedAt: Date;
+  }>();
+  try {
+    const [cities, regions] = await Promise.all([
+      prisma.city.findMany({
+        where: { pdpDocument: { isNot: null } },
+        select: {
+          title: true, slug: true, updatedAt: true,
+          pdpDocument: { select: { status: true, isIndexable: true, canonicalPath: true, updatedAt: true } },
+        },
+      }),
+      prisma.region.findMany({
+        where: { pdpDocument: { isNot: null } },
+        select: {
+          title: true, slug: true,
+          pdpDocument: { select: { status: true, isIndexable: true, canonicalPath: true, updatedAt: true } },
+        },
+      }),
+    ]);
+    for (const city of cities) {
+      if (!city.pdpDocument) continue;
+      const record = { title: city.title, slug: city.slug, sourceSlug: null, type: 'city' as const, ...city.pdpDocument, updatedAt: city.pdpDocument.updatedAt || city.updatedAt };
+      editorialBySlug.set(record.slug.toLowerCase(), record);
+    }
+    for (const region of regions) {
+      if (!region.pdpDocument) continue;
+      const record = { title: region.title, slug: region.slug, sourceSlug: null, type: 'region' as const, ...region.pdpDocument, updatedAt: region.pdpDocument.updatedAt };
+      editorialBySlug.set(record.slug.toLowerCase(), record);
+    }
+  } catch (error) {
+    // The additive migration may not yet be applied in an older deployment.
+    // Preserve the legacy sitemap path, but make the missing integration visible.
+    console.error('[sitemap] destination PDP indexability lookup failed', error);
+  }
+
+  const entries = (destinationsPayload?.destinations || [])
     .filter((destination) => {
       if (!destination.slug) return false;
+      const editorial = editorialBySlug.get(String(destination.slug).toLowerCase()) ||
+        (destination.sourceSlug ? editorialBySlug.get(String(destination.sourceSlug).toLowerCase()) : undefined);
+      if (editorial) return editorial.status === 'PUBLISHED' && editorial.isIndexable;
       if (destination.type === 'city') {
         return evaluateCityIndexability({
           events: destination.events,
@@ -321,12 +367,51 @@ export async function buildCitiesSitemapEntries(): Promise<SitemapEntry[]> {
       }
       return false;
     })
-    .flatMap((destination) => [
-      entry(cityHref(destination), 'daily', destination.type === 'region' ? 0.7 : 0.75),
-      ...(destination.type === 'city' && destination.venues > 0
-        ? [entry(cityPlacesCatalogHref(citySlug(destination)), 'daily', 0.65)]
-        : []),
-    ]);
+    .flatMap((destination) => {
+      const editorial = destination.slug
+        ? editorialBySlug.get(String(destination.slug).toLowerCase()) ||
+          (destination.sourceSlug ? editorialBySlug.get(String(destination.sourceSlug).toLowerCase()) : undefined)
+        : undefined;
+      const href = editorial ? destinationPdpSitemapPath(editorial) : cityHref(destination);
+      return [
+        ...(href ? [entry(href, 'daily', destination.type === 'region' ? 0.7 : 0.75, editorial?.updatedAt)] : []),
+        ...(destination.type === 'city' && destination.venues > 0
+          ? [entry(cityPlacesCatalogHref(citySlug(destination)), 'daily', 0.65)]
+          : []),
+      ];
+    });
+
+  const seen = new Set(entries.map((item) => new URL(item.url).pathname));
+  for (const editorial of editorialBySlug.values()) {
+    if (editorial.status !== 'PUBLISHED' || !editorial.isIndexable) continue;
+    const path = destinationPdpSitemapPath(editorial);
+    if (!path || seen.has(path)) continue;
+    entries.push(entry(path, 'daily', editorial.type === 'region' ? 0.7 : 0.75, editorial.updatedAt));
+    seen.add(path);
+  }
+  return entries;
+}
+
+export function destinationPdpSitemapPath(destination: {
+  title: string;
+  slug: string;
+  sourceSlug: string | null;
+  canonicalPath: string | null;
+}): string | null {
+  const canonical = cityCanonicalPath({
+    slug: destination.slug,
+    sourceSlug: destination.sourceSlug,
+    name: destination.title,
+    canonicalPath: destination.canonicalPath,
+  });
+  try {
+    const site = new URL(getSiteUrl());
+    const url = new URL(canonical, site);
+    if (url.origin !== site.origin || !url.pathname.startsWith('/cities/')) return null;
+    return url.pathname;
+  } catch {
+    return null;
+  }
 }
 
 export async function buildVenuesSitemapEntries(): Promise<SitemapEntry[]> {

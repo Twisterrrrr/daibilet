@@ -121,13 +121,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       (sum, item) => sum + (Number(item.eventCount) || 0),
       0,
     );
-    const decision = evaluateRegionIndexability({
+    const legacyDecision = evaluateRegionIndexability({
       childEventTotal: childEventTotal || payload.stats?.events || city.events || 0,
       isIndexable: city.isIndexable,
     });
-    const hubTitle = buildRegionHubSeoTitleCore(city.name);
-    const hubTitleFull = buildRegionHubSeoTitle(city.name);
-    const description = city.seoDescription || buildRegionHubSeoDescription(city.name);
+    const indexable = city.pdp ? city.pdp.isIndexable : legacyDecision.indexable;
+    const hubTitle = city.pdp?.seoTitle || city.seoTitle || buildRegionHubSeoTitleCore(city.name);
+    const hubTitleFull = city.pdp?.seoTitle || city.seoTitle || buildRegionHubSeoTitle(city.name);
+    const description = city.pdp?.seoDescription || city.seoDescription || buildRegionHubSeoDescription(city.name);
     const imagePath = resolveCityImage({
       slug: city.slug,
       sourceSlug: city.sourceSlug,
@@ -139,7 +140,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: pageTitle(hubTitle),
       description,
       alternates: { canonical: path },
-      robots: robotsForRegionIndexability(decision.indexable),
+      robots: robotsForRegionIndexability(indexable),
       ...buildShareMetadata({
         title: hubTitleFull,
         description,
@@ -149,17 +150,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const decision = evaluateCityIndexability({
+  const legacyDecision = evaluateCityIndexability({
     events: payload.stats?.events ?? city.events ?? 0,
     slug: city.slug,
     sourceSlug: city.sourceSlug,
     isIndexable: city.isIndexable,
   });
+  const indexable = city.pdp ? city.pdp.isIndexable : legacyDecision.indexable;
 
   // Date baked at cache build time (unstable_cache 300s) - do not call connection()/Date live.
-  const hubTitle = buildCityHubSeoTitleCore(city.name);
-  const hubTitleFull = buildCityHubSeoTitle(city.name);
-  const description = city.seoDescription || buildCityHubSeoDescription(city.name);
+  const hubTitle = city.pdp?.seoTitle || city.seoTitle || buildCityHubSeoTitleCore(city.name);
+  const hubTitleFull = city.pdp?.seoTitle || city.seoTitle || buildCityHubSeoTitle(city.name);
+  const description = city.pdp?.seoDescription || city.seoDescription || buildCityHubSeoDescription(city.name);
   const imagePath = resolveCityImage({
     slug: city.slug,
     sourceSlug: city.sourceSlug,
@@ -176,7 +178,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: expansionAbsolute ? { absolute: hubTitleFull } : pageTitle(hubTitle),
       description,
       alternates: { canonical: path },
-      robots: robotsForIndexability(decision.indexable),
+      robots: robotsForIndexability(indexable),
       ...buildShareMetadata({
         title: hubTitleFull,
         description,
@@ -251,7 +253,9 @@ export default async function CityPage({ params }: PageProps) {
           </Suspense>
           <CityFaqServer
             cityName={payload.city.name}
-            items={(payload.regionInfo?.faq || [])
+            items={(payload.city.pdp?.content.faq?.length
+              ? payload.city.pdp.content.faq.map((item) => ({ q: item.question, a: item.answer }))
+              : payload.regionInfo?.faq || [])
               .filter((item) => item.q?.trim() && item.a?.trim())
               .map((item) => ({ question: item.q, answer: item.a }))}
           />

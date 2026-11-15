@@ -2,7 +2,9 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 
 import { AdminApiErrorBanner } from '@/components/admin/AdminApiErrorBanner';
+import { DestinationPdpEditor } from '@/components/admin/DestinationPdpEditor.client';
 import { PUBLIC_SITE_BASE } from '@/lib/admin-ui';
+import { loadAdminDestinationPdpAction } from '@/server/admin-destination-pdp-actions';
 import { saveAdminCityAction } from '@/server/admin-city-actions';
 import { loadAdminCityDetail } from '@/server/admin-cities-data';
 
@@ -25,6 +27,13 @@ export default async function AdminCityDetailPage({ params, searchParams }: Page
   const back = first(rawSearch.back) || '';
   const backHref = /^\/admin\/cities(?:\?|$)/.test(back) ? back : '/admin/cities';
   const detail = await loadAdminCityDetail(id);
+  let destinationPdp = null;
+  let destinationPdpError = '';
+  try {
+    destinationPdp = await loadAdminDestinationPdpAction('cities', id);
+  } catch (error) {
+    destinationPdpError = error instanceof Error ? error.message : 'Не удалось загрузить редакторский PDP';
+  }
   const slugConflict = first(rawSearch.error) === 'slug_not_unique';
   const notice = slugConflict
     ? 'Slug уже занят другим городом - выберите другой.'
@@ -54,6 +63,7 @@ export default async function AdminCityDetailPage({ params, searchParams }: Page
             >
               {detail.isDestination ? 'Хаб направления' : 'Обычный город'}
             </span>
+            {detail.slug ? <Link href={`/admin/cities/regions`} className="inline-flex items-center rounded-md border border-slate-200 bg-white px-2 py-0.5 text-xs text-slate-700 hover:bg-slate-50">Редактор регионов</Link> : null}
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -79,6 +89,7 @@ export default async function AdminCityDetailPage({ params, searchParams }: Page
       <AdminApiErrorBanner errors={detail.errors} />
 
       {detail.found ? (
+        <>
         <form action={saveAdminCityAction} className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
           <input type="hidden" name="id" value={detail.id} />
           <input type="hidden" name="back" value={backHref} />
@@ -174,6 +185,9 @@ export default async function AdminCityDetailPage({ params, searchParams }: Page
             Сохранить
           </button>
         </form>
+        {destinationPdpError ? <p role="alert" className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-800">Не удалось загрузить PDP-редактор: {destinationPdpError}</p> : null}
+        {destinationPdp ? <DestinationPdpEditor ownerType="cities" owner={destinationPdp.owner} initialDocument={destinationPdp.document} initialReadiness={{ ready: destinationPdp.readiness.ready, issues: destinationPdp.readiness.missing || [] }} /> : null}
+        </>
       ) : null}
     </div>
   );

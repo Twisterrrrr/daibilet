@@ -8,6 +8,7 @@ import {
   renderUrlsetXml,
   resolveSitemapLastModified,
   sitemapResponseHeaders,
+  destinationPdpSitemapPath,
 } from '@/lib/sitemap-data';
 
 // The pure helpers are tested through their own module: public-read only
@@ -38,6 +39,18 @@ test('sitemap cache does not advertise a long stale window for changing catalogs
   assert.equal(sitemapResponseHeaders('landings')['Cache-Control'], 'public, s-maxage=900');
   assert.equal(sitemapResponseHeaders('blog')['Cache-Control'], 'public, s-maxage=3600');
   assert.equal(sitemapResponseHeaders('static')['Cache-Control'], 'public, s-maxage=3600');
+});
+
+test('destination PDP sitemap path includes only the URL that remains canonical', () => {
+  assert.equal(destinationPdpSitemapPath({
+    title: 'Тверь', slug: 'tver', sourceSlug: null, canonicalPath: null,
+  }), '/cities/tver');
+  assert.equal(destinationPdpSitemapPath({
+    title: 'Старая карточка', slug: 'old-town', sourceSlug: null, canonicalPath: '/cities/new-town',
+  }), '/cities/new-town');
+  assert.equal(destinationPdpSitemapPath({
+    title: 'Внешний canonical', slug: 'external-canonical', sourceSlug: null, canonicalPath: 'https://example.com/cities/external-canonical',
+  }), '/cities/external-canonical');
 });
 
 test('sitemap lastmod: uses a real updatedAt when present', () => {

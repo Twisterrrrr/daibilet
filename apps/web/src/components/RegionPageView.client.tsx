@@ -8,6 +8,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { DestinationRegionGuide } from '@/components/DestinationRegionGuide.client';
 import { HubEventsAfficheRail } from '@/components/HubEventsAfficheRail.client';
 import { PageBreadcrumbBar } from '@/components/PageBreadcrumbs';
+import { DestinationPdpContent } from '@/components/DestinationPdpContent.client';
 import { RegionOrientMap, type RegionMapPoint } from '@/components/RegionOrientMap.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { formatNumber } from '@/lib/format';
@@ -149,7 +150,7 @@ export function RegionPageView({
     [childChrome, slug],
   );
   const cityFilter = childChrome ? [childChrome.child.name] : null;
-  const heading = childChrome?.h1 || city?.name || '';
+  const heading = childChrome?.h1 || city?.pdp?.seoH1 || city?.seoH1 || city?.name || '';
   const childCityDisplay = childChrome
     ? stripCityDisambiguator(childChrome.child.name) || childChrome.child.name
     : null;
@@ -169,7 +170,7 @@ export function RegionPageView({
     return items;
   }, [city, childChrome, childCityDisplay, slug]);
   const regionBrief =
-    regionInfo?.brief?.trim() ||
+    city?.pdp?.content.regionBrief?.trim() || regionInfo?.brief?.trim() ||
     (city
       ? isTierC
         ? eventTotal > 0
@@ -301,7 +302,7 @@ export function RegionPageView({
   }, [payload?.sessions]);
 
   const topPlaces =
-    liveTier === 'A'
+    !city?.pdp && liveTier === 'A'
       ? (regionInfo?.topPlaces || [])
           .filter((item) => item.name?.trim())
           .filter((place) => {
@@ -311,7 +312,7 @@ export function RegionPageView({
             return childCities.some((cityItem) => nameSet.has(cityItem.name.toLowerCase()) && cityItem.eventCount > 0);
           })
       : [];
-  const faqItems = isTierC
+  const faqItems = isTierC || city?.pdp
     ? []
     : regionInfo?.faq?.filter((item) => item.q?.trim() && item.a?.trim()) || [];
   const cityFilterLabel = cityFilter?.length
@@ -379,11 +380,14 @@ export function RegionPageView({
       { id: 'guide', label: 'Места', show: Boolean(destinationGuide) },
       { id: 'cities', label: 'Города', show: childCities.some((c) => c.eventCount > 0) || childCities.length > 0 },
       { id: 'places', label: 'Куда съездить', show: topPlaces.length > 0 },
+      { id: 'city-must-see', label: 'Главные места', show: Boolean(city?.pdp?.content.mustSee?.length || city?.pdp?.content.regionTopPlaces?.length) },
+      { id: 'city-routes', label: 'Маршруты', show: Boolean(city?.pdp?.content.routes?.length) },
+      { id: 'city-suburbs', label: 'Пригороды', show: Boolean(city?.pdp?.content.significantSuburbs?.length) },
       { id: 'affiche', label: 'События', show: true },
       { id: 'bridge', label: centerCity ? `Афиша ${centerCityGenitive}` : 'Центр', show: Boolean(centerCity) },
-      { id: 'faq', label: 'FAQ', show: faqItems.length > 0 },
+      { id: 'faq', label: 'FAQ', show: Boolean(city?.pdp?.content.faq?.length || faqItems.length > 0) },
     ].filter((tab) => tab.show);
-  }, [childCities, topPlaces.length, faqItems.length, isTierC, centerCity, centerCityGenitive, eventTotal, destinationGuide]);
+  }, [childCities, topPlaces.length, faqItems.length, isTierC, centerCity, centerCityGenitive, eventTotal, destinationGuide, city?.pdp]);
 
   if (error && !city) {
     return (
@@ -487,6 +491,8 @@ export function RegionPageView({
             </div>
           </nav>
         ) : null}
+
+        {city.pdp ? <DestinationPdpContent pdp={city.pdp} cityName={city.name} region showFaq={false} /> : null}
 
         {destinationGuide ? (
           <section id="guide" className={`border-b border-slate-200 bg-white ${SECTION_SCROLL_MT}`}>
