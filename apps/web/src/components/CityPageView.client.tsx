@@ -63,6 +63,7 @@ import { resolveCityImage } from '@/lib/city-images';
 import { CITY_NIGHT_HERO } from '@/lib/city-night-hero';
 import { cityHasLifehacks } from '@/lib/city-hub-lifehacks';
 import {
+  filterHubAfficheCategory,
   filterStandupFromAllFeed,
   groupStandupInHubFeed,
   isCityHubTouristAffiche,
@@ -273,10 +274,7 @@ export function CityPageView({
 
   const sessions = React.useMemo(() => {
     if (!payload) return [];
-    const byChip = payload.sessions.filter((session) => {
-      if (category !== 'all' && session.category !== category) return false;
-      return true;
-    });
+    const byChip = filterHubAfficheCategory(payload.sessions, category);
     const filtered = filterStandupFromAllFeed(byChip, category, { tourist: touristAffiche });
     const ranked = rankCityHubSessions(filtered);
     return dedupeHubSessions(ranked);

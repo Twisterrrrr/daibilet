@@ -69,10 +69,10 @@ export function CityIdentityCarousel({ citySlug, editorial = false, sectionId, o
                 : 'w-[min(100%,19.5rem)] shrink-0 snap-start overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.06)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_28px_-10px_hsl(221_83%_53%_/_0.28)]'
             }
           >
-            <div className="relative">
+            <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
               <button
                 type="button"
-                className="relative block w-full overflow-hidden bg-slate-100 text-left"
+                className="absolute inset-0 block h-full w-full overflow-hidden text-left"
                 onClick={() => onSelect(focusFromIdentitySlide(slide))}
               >
                 <CardSafeImage
@@ -90,7 +90,7 @@ export function CityIdentityCarousel({ citySlug, editorial = false, sectionId, o
                 ) : null}
               </button>
               {slide.imageCredit ? (
-                <div className="absolute inset-x-2 bottom-2 z-10 flex max-w-[calc(100%-1rem)] flex-wrap items-center gap-x-1 rounded-md bg-slate-950/75 px-2 py-1 text-[10px] leading-tight text-white shadow-sm">
+                <div className="absolute inset-x-2 bottom-2 z-10 flex max-w-[calc(100%-1rem)] flex-wrap items-center gap-x-1 text-[10px] leading-tight text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.95)]">
                   <a href={slide.imageCredit.sourceUrl} target="_blank" rel="noreferrer" className="underline underline-offset-2">
                     Фото: {slide.imageCredit.author}
                   </a>
