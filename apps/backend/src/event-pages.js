@@ -685,7 +685,7 @@ export async function mergeAdminEventPages(db, targetPageId, rawSourcePageIds, r
     if (cityIds.size !== 1 || venueIds.size !== 1 || allLinks.rows.some((link) => !link.cityId || !link.venueId)) {
       throw new Error('Merged EventPages must all belong to the same known city and venue');
     }
-    if (allLinks.rows.some((link) => !/^зоотеатр\s+рептилий\b/iu.test(String(link.eventTitle || '').trim()))) {
+    if (allLinks.rows.some((link) => !/^зоотеатр\s+рептилий(?=\s|$)/iu.test(String(link.eventTitle || '').trim()))) {
       throw new Error('This merge operation is restricted to confirmed ZooTeatr reptile listings');
     }
     const eventIds = allLinks.rows.map((link) => String(link.eventId));
