@@ -35,3 +35,9 @@ This checkpoint records the isolated staging preview work for the Places/Events/
 - Visual editing/save/reopen of Place and City PDPs, gallery/source workflow, and the remaining public sitemap/SEO matrix remain to be accepted.
 - Shared staging is still not the target for a release because its checkout and catalog state were previously found dirty/stale. Production was not touched.
 - Overall plan remains in progress; this checkpoint closes no full plan item by itself.
+
+## Admin publish safety follow-up
+
+- The destination PDP editor now tracks unsaved changes across content, media, and SEO fields. It disables publishing while edits are unsaved and disables hiding until the draft is saved, so a click cannot silently publish or hide the older server snapshot while appearing to include newer form values.
+- Saving still follows the backend rule that edits to a READY/PUBLISHED page return it to editorial review. The UI explains this before save. The explicit `isIndexable` checkbox remains a publish-time choice and is sent only with the publish request.
+- Verified on this iteration: web typecheck passed, full web CI 359/359, and `git diff --check` passed. Production build and isolated preview deployment are pending for this follow-up.

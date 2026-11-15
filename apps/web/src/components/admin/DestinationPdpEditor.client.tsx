@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useTransition } from 'react';
+import { useMemo, useRef, useState, useTransition } from 'react';
 import type { DestinationPdpContent, DestinationPdpStatus } from '@daibilet/contracts/city-pdp';
 import { DestinationPdpContent as DestinationPdpPublicContent } from '@/components/DestinationPdpContent.client';
 import { SafeImage } from '@/components/SafeImage.client';
@@ -51,6 +51,8 @@ export function DestinationPdpEditor({ ownerType, owner, initialDocument, initia
   const [notice, setNotice] = useState('');
   const [error, setError] = useState('');
   const [isPending, startTransition] = useTransition();
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const changeRevision = useRef(0);
 
   const status = document?.status || 'DRAFT';
   const readiness = useMemo(() => {
@@ -63,7 +65,15 @@ export function DestinationPdpEditor({ ownerType, owner, initialDocument, initia
   }, [content]);
 
   function update<K extends keyof DestinationPdpContent>(key: K, value: DestinationPdpContent[K]) {
+    changeRevision.current += 1;
+    setHasUnsavedChanges(true);
     setContent((current) => ({ ...current, [key]: value }));
+  }
+
+  function updateField<T>(setter: (value: T) => void, value: T) {
+    changeRevision.current += 1;
+    setHasUnsavedChanges(true);
+    setter(value);
   }
 
   function run(action: () => Promise<unknown>, success: string) {
@@ -75,6 +85,7 @@ export function DestinationPdpEditor({ ownerType, owner, initialDocument, initia
   }
 
   async function persistDraft() {
+      const savingRevision = changeRevision.current;
       const result = await saveAdminDestinationPdpAction(ownerType, owner.id, {
         summary: summary.trim() || null, heroImageUrl: heroImageUrl.trim() || null,
         seoH1: seoH1.trim() || null, seoTitle: seoTitle.trim() || null,
@@ -82,6 +93,7 @@ export function DestinationPdpEditor({ ownerType, owner, initialDocument, initia
         content, changeNote: 'Редактирование PDP направления в админке',
       }) as { document?: DestinationEditorDocument };
       if (result.document) setDocument(result.document);
+      if (changeRevision.current === savingRevision) setHasUnsavedChanges(false);
       return result;
   }
 
@@ -121,6 +133,7 @@ export function DestinationPdpEditor({ ownerType, owner, initialDocument, initia
       {initialReadiness.issues?.length ? <p className="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-900">До публикации заполните обязательные поля и источники.</p> : null}
       {notice ? <p role="status" className="rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-900">{notice}</p> : null}
       {error ? <p role="alert" className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-900">{error}</p> : null}
+      {hasUnsavedChanges ? <p role="status" className="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-900">Есть несохранённые изменения. Сохранение обновит черновик и вернёт PDP на редакторскую проверку.</p> : null}
 
       <nav aria-label="Разделы редактора PDP" className="flex flex-wrap gap-1 border-b border-slate-200">
         {TABS.map(([key, label]) => <button key={key} type="button" onClick={() => setTab(key)} className={`border-b-2 px-3 py-2 text-sm ${tab === key ? 'border-blue-600 font-semibold text-blue-700' : 'border-transparent text-slate-600 hover:text-slate-900'}`}>{label}</button>)}
@@ -128,8 +141,8 @@ export function DestinationPdpEditor({ ownerType, owner, initialDocument, initia
 
       {tab === 'overview' ? <div className="grid gap-3 md:grid-cols-2">
         <Field label="Заголовок вступления"><input value={content.introTitle || ''} onChange={(e) => update('introTitle', e.target.value)} className={inputClass} /></Field>
-        <Field label="Hero image URL"><input value={heroImageUrl} onChange={(e) => setHeroImageUrl(e.target.value)} placeholder="/images/cities/..." className={inputClass} /></Field>
-        <Field label="Короткое описание / лид"><textarea rows={3} value={summary} onChange={(e) => setSummary(e.target.value)} className={inputClass} /></Field>
+        <Field label="Hero image URL"><input value={heroImageUrl} onChange={(e) => updateField(setHeroImageUrl, e.target.value)} placeholder="/images/cities/..." className={inputClass} /></Field>
+        <Field label="Короткое описание / лид"><textarea rows={3} value={summary} onChange={(e) => updateField(setSummary, e.target.value)} className={inputClass} /></Field>
         <Field label="Вводный текст PDP"><textarea rows={6} value={content.introText || ''} onChange={(e) => update('introText', e.target.value)} className={inputClass} /></Field>
         {ownerType === 'regions' ? <Field label="Кратко о регионе"><textarea rows={5} value={content.regionBrief || ''} onChange={(e) => update('regionBrief', e.target.value)} className={inputClass} /></Field> : null}
       </div> : null}
@@ -161,10 +174,10 @@ export function DestinationPdpEditor({ ownerType, owner, initialDocument, initia
 
       {tab === 'seo' ? <div className="space-y-4">
         <div className="grid gap-3 md:grid-cols-2">
-          <Field label="SEO H1"><input value={seoH1} onChange={(e) => setSeoH1(e.target.value)} className={inputClass} /></Field>
-          <Field label="SEO title"><input value={seoTitle} onChange={(e) => setSeoTitle(e.target.value)} className={inputClass} /></Field>
-          <Field label="Canonical path"><input value={canonicalPath} onChange={(e) => setCanonicalPath(e.target.value)} className={`${inputClass} font-mono`} /></Field>
-          <Field label="SEO description"><textarea rows={3} value={seoDescription} onChange={(e) => setSeoDescription(e.target.value)} className={inputClass} /></Field>
+          <Field label="SEO H1"><input value={seoH1} onChange={(e) => updateField(setSeoH1, e.target.value)} className={inputClass} /></Field>
+          <Field label="SEO title"><input value={seoTitle} onChange={(e) => updateField(setSeoTitle, e.target.value)} className={inputClass} /></Field>
+          <Field label="Canonical path"><input value={canonicalPath} onChange={(e) => updateField(setCanonicalPath, e.target.value)} className={`${inputClass} font-mono`} /></Field>
+          <Field label="SEO description"><textarea rows={3} value={seoDescription} onChange={(e) => updateField(setSeoDescription, e.target.value)} className={inputClass} /></Field>
         </div>
         <div className="rounded-lg border border-slate-200 p-3">
           <h4 className="font-semibold text-slate-900">Готовность и публикация</h4>
@@ -175,8 +188,8 @@ export function DestinationPdpEditor({ ownerType, owner, initialDocument, initia
             <button type="button" disabled={isPending} onClick={save} className={secondaryButton}>Сохранить черновик</button>
             {status === 'DRAFT' || status === 'HIDDEN' ? <button type="button" disabled={isPending} onClick={() => setStatus('REVIEW')} className={secondaryButton}>На редакторскую проверку</button> : null}
             {status === 'REVIEW' ? <button type="button" disabled={isPending || !readiness.ready} onClick={() => setStatus('READY')} className={secondaryButton}>Подтвердить готовность</button> : null}
-            {status === 'READY' ? <button type="button" disabled={isPending} onClick={publish} className={primaryButton}>Опубликовать</button> : null}
-            {status !== 'HIDDEN' && document ? <button type="button" disabled={isPending} onClick={() => setStatus('HIDDEN')} className="rounded-md border border-red-200 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50">Скрыть PDP</button> : null}
+            {status === 'READY' ? <button type="button" disabled={isPending || hasUnsavedChanges || !readiness.ready} onClick={publish} className={primaryButton}>Опубликовать</button> : null}
+            {status !== 'HIDDEN' && document ? <button type="button" disabled={isPending || hasUnsavedChanges} onClick={() => setStatus('HIDDEN')} className="rounded-md border border-red-200 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50">Скрыть PDP</button> : null}
           </div>
         </div>
         {document?.revisions?.length ? <div><h4 className="mb-2 text-sm font-semibold">История изменений</h4><ol className="space-y-1 text-xs text-slate-600">{document.revisions.slice(0, 5).map((revision) => <li key={revision.id}>v{revision.version} · {new Date(revision.createdAt).toLocaleString('ru-RU')} · {revision.changeNote || 'изменение статуса/публикация'}</li>)}</ol></div> : null}
