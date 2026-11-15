@@ -56,3 +56,9 @@ This audit was performed against the current `feat/next-monorepo` frontend files
 
 - The API accepts local or HTTP(S) media URLs plus `alt`, caption, credit, and source URL; it does not upload files. The UI should use the approved image asset workflow and require attribution/source where applicable.
 - A real city PDP cannot be accepted until the additive migration is applied to an isolated database, the page is authored through the admin UI, the admin preview matches the public published render, and robots/canonical/sitemap are checked. Do not apply this migration to the dirty shared staging checkout.
+
+### Destination routing: Vyborg example
+
+- Vyborg remains a child destination of the Leningrad Oblast hub until its own city hub is fully authored and accepted. Do not create or expose a thin standalone `/cities/vyborg` page ahead of that work.
+- Once the Vyborg PDP is ready, discovery links can point directly to it. The Oblast page remains a distinct regional hub; its Vyborg child filter can remain available for regional event browsing.
+- Do not model the city of Vyborg itself as a `Region`. Use the city destination for Vyborg; reserve Region for a multi-city geographic hub.

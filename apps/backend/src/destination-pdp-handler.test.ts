@@ -138,3 +138,64 @@ test('saving a city PDP draft preserves the published snapshot and creates a rev
   assert.equal(payload.document.summary, 'Обновлённый обзор Перми');
   assert.deepEqual(payload.readiness, { ready: true, missing: [] });
 });
+
+test('publishing a READY destination stores a snapshot and defaults to noindex', async () => {
+  const content = {
+    introTitle: 'Выборг: город у залива',
+    introText: 'Редакционный обзор с проверенными источниками.',
+    mustSee: [{ name: 'Выборгский замок' }],
+    sources: [{ title: 'Официальный туристический портал', url: 'https://visitvyborg.ru' }],
+  };
+  let stored: Record<string, unknown> = {
+    id: 'pdp-region-1', regionId: 'region-1', cityId: null,
+    summary: 'Выборг и окрестности', heroImageUrl: null, content,
+    publishedContent: null, seoH1: 'Выборг', seoTitle: 'Выборг: что посмотреть',
+    seoDescription: 'Путеводитель по Выборгу.', canonicalPath: '/cities/leningradskaya-oblast',
+    status: 'READY', isIndexable: false, publishedAt: null, version: 2,
+    updatedAt: new Date('2026-11-15T00:00:00.000Z'),
+  };
+  const revisions: Array<Record<string, unknown>> = [];
+  const prisma = {
+    region: { async findUnique() { return { id: 'region-1', slug: 'leningradskaya-oblast', title: 'Ленинградская область' }; } },
+    async $transaction<T>(callback: (tx: unknown) => Promise<T>) {
+      const tx = {
+        destinationPdpDocument: {
+          async findUnique() { return stored; },
+          async update(args: { data: Record<string, unknown> }) { stored = { ...stored, ...args.data }; return stored; },
+          async findUniqueOrThrow() { return { ...stored, revisions }; },
+        },
+        destinationPdpRevision: {
+          async create(args: { data: Record<string, unknown> }) { revisions.push(args.data); },
+        },
+      };
+      return callback(tx);
+    },
+  } as unknown as PrismaClient;
+  const request = Readable.from(['{}']);
+  let body = '';
+  let statusCode = 0;
+  let invalidation = '';
+  const context = {
+    method: 'POST',
+    pathname: '/api/admin/destinations/regions/region-1/pdp/publish',
+    request,
+    response: {
+      writeHead(code: number) { statusCode = code; },
+      end(value?: string) { body = value || ''; },
+    },
+  } as unknown as RouteContext;
+  const handler = createAdminDestinationPdpRouteHandler({ prisma, invalidatePublicCaches(reason) { invalidation = reason; } });
+
+  assert.equal(await handler(context), true);
+  assert.equal(statusCode, 200);
+  assert.equal(stored.status, 'PUBLISHED');
+  assert.equal(stored.isIndexable, false);
+  assert.equal(stored.publishedAt instanceof Date, true);
+  assert.equal((stored.publishedContent as { version: number }).version, 3);
+  assert.deepEqual((stored.publishedContent as { content: unknown }).content, content);
+  assert.equal(revisions.length, 1);
+  assert.equal(invalidation, 'destination PDP published');
+  const payload = JSON.parse(body);
+  assert.equal(payload.document.status, 'PUBLISHED');
+  assert.equal(payload.document.isIndexable, false);
+});
