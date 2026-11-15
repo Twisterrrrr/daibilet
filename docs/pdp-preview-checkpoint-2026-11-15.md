@@ -16,13 +16,15 @@ This checkpoint records the isolated staging preview work for the Places/Events/
 - `/events/krim-plin-moskva` and `/events/ekskursiya-na-lenfilm` return HTTP 200 with self-canonical and `noindex, follow` in the isolated preview.
 - The former is the sales example; the latter is the information-only example. Purchase was not initiated and purchase references were not inspected or logged.
 - `/cities/moskva` resolves to the existing published city route `/cities/moscow`, which returns HTTP 200 and remains `index, follow`. It is not the unpublished editorial draft.
+- The authenticated city admin page returns HTTP 200 and includes the destination editor tabs. The existing Moscow editorial document loads as `DRAFT`, version 2, `isIndexable=false`, readiness complete, with 4 sources, 3 must-see places, and 1 route. Hero/gallery remain empty pending a verified media source.
+- The legacy city-record form no longer repeats the intro, hero, or SEO controls already owned by the PDP editor. Those legacy values are submitted as hidden fields so saving basic city identity cannot erase the old source values. Commit: `1bfc249f3` (`fix(admin): keep city PDP fields in one editor`), pushed and built in the isolated preview.
 
 ## Checks
 
 - Web CI: 357/357 passed.
 - Backend test suite: 184/184 passed.
 - Web and backend typecheck passed; `git diff --check` passed.
-- Isolated preview web build completed successfully (251 static pages); preview web/API services are active on ports 3013/4012.
+- Isolated preview web build completed successfully after both code changes (251 static pages); preview web/API services are active on ports 3013/4012.
 - Server root filesystem after build: 66% used.
 
 ## Remaining acceptance gaps
