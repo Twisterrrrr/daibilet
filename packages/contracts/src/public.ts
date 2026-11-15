@@ -401,7 +401,7 @@ export interface PublicEventPageDto extends ApiEnvelope {
   /** Current schedule state; populated for both stable EventPages and legacy event URL fallbacks. */
   availability?: 'AVAILABLE' | 'ENDED' | 'NO_UPCOMING' | null;
   pdp?: PublicPdpDocumentDto | null;
-  /** Editorial copy published on the existing Event URL; URL/canonical stay owned by Event. */
+  /** Published editorial identity linked to Event; legacy Event URLs canonicalize to this stable slug. */
   eventPage?: {
     slug: string;
     title: string;
