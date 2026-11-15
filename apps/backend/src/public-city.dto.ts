@@ -1,4 +1,6 @@
 import { prisma } from '@daibilet/db';
+import type { PublishedDestinationPdpDto } from '@daibilet/contracts/city-pdp';
+import { readPublishedDestinationPdp } from './destination-pdp-policy.js';
 import {
   publicVenueHubRows,
   resolvePublicVenuesForSessions,
@@ -215,6 +217,7 @@ function scheduleCityPageRebuild(
         cacheKey,
         builtAt,
         buildStartedAt,
+        catalogSessions,
       });
       return emptyPage;
     }
@@ -227,6 +230,7 @@ function scheduleCityPageRebuild(
         cacheKey,
         builtAt,
         buildStartedAt,
+        catalogSessions,
       });
     }
     const destination = publicDestinationFromSession(seedSession);
@@ -236,7 +240,7 @@ function scheduleCityPageRebuild(
       CITY_SSR_SESSION_LIMIT,
     ).map((session) => toPublicCatalogListItem(session));
     const mapStartedAt = Date.now();
-    const [sessionVenues, cityRecord, contentVenues] = await Promise.all([
+    const [sessionVenues, cityRecord, contentVenues, regionRecord] = await Promise.all([
       withTimeout(
         resolvePublicVenuesForSessions(legacyDb, matchedSessions, venueHubRows, 24),
         CITY_SECONDARY_TIMEOUT_MS,
@@ -245,7 +249,7 @@ function scheduleCityPageRebuild(
       ),
       destination.type === 'city' && seedSession.cityId
         ? withTimeout(
-            prisma.city.findUnique({ where: { id: seedSession.cityId } }),
+            prisma.city.findUnique({ where: { id: seedSession.cityId }, include: { pdpDocument: true } }),
             CITY_SECONDARY_TIMEOUT_MS,
             null,
             'city-record',
@@ -259,6 +263,14 @@ function scheduleCityPageRebuild(
             'city-content-venues',
           )
         : Promise.resolve([]),
+      destination.type === 'region'
+        ? withTimeout(
+            prisma.region.findUnique({ where: { slug: destination.slug }, include: { pdpDocument: true } }),
+            CITY_SECONDARY_TIMEOUT_MS,
+            null,
+            'region-pdp-document',
+          )
+        : Promise.resolve(null),
     ]);
     const venues = mergeCityPageVenues(sessionVenues, contentVenues, 250);
     cityPerfMark('venues+city-record', mapStartedAt, { venues: venues.length });
@@ -279,6 +291,8 @@ function scheduleCityPageRebuild(
     const entityLabel = destinationPrepositional(destination);
 
     const isRegion = destination.type === 'region';
+    const pdpDocument = (isRegion ? regionRecord?.pdpDocument : cityRecord?.pdpDocument) || null;
+    const publishedPdp = readPublishedDestinationPdp(pdpDocument);
     const destinations = isRegion
       ? (await buildPublicDestinationsDto(forceRefresh)).destinations
       : [];
@@ -332,17 +346,24 @@ function scheduleCityPageRebuild(
         events: matchedSessions.length,
         venues: venueCount,
         categories,
-        seoH1: isRegion
+        heroImageUrl: publishedPdp?.heroImageUrl || cityRecord?.heroImageUrl || null,
+        seoH1: publishedPdp?.seoH1 || (isRegion
           ? `Мероприятия и загородный отдых в ${destination.name}`
-          : cityRecord?.seoH1 || destination.name,
-        seoTitle: isRegion
+          : cityRecord?.seoH1 || destination.name),
+        seoTitle: publishedPdp?.seoTitle || (isRegion
           ? `${destination.name}: куда съездить и что посмотреть, загородный отдых`
-          : cityRecord?.seoTitle || buildCityHubSeoTitle(destination.name),
-        seoDescription: isRegion
+          : cityRecord?.seoTitle || buildCityHubSeoTitle(destination.name)),
+        seoDescription: publishedPdp?.seoDescription || (isRegion
           ? regionSeoDescription
           : cityRecord?.seoDescription ||
-            `Афиша событий, экскурсий, музеев и активностей ${entityLabel}. Быстрый выбор по датам, площадкам и категориям.`,
-        canonicalPath: cityRecord?.canonicalPath || `/cities/${destination.slug}`,
+            `Афиша событий, экскурсий, музеев и активностей ${entityLabel}. Быстрый выбор по датам, площадкам и категориям.`),
+        canonicalPath: publishedPdp?.canonicalPath || cityRecord?.canonicalPath || `/cities/${destination.slug}`,
+        ...(pdpDocument?.status === 'HIDDEN'
+          ? { isIndexable: false }
+          : publishedPdp
+            ? { isIndexable: publishedPdp.isIndexable }
+            : {}),
+        ...(publishedPdp ? { pdp: publishedPdp } : {}),
       },
       sessions: sessions as PublicCityPageDto['sessions'],
       venues,
@@ -357,7 +378,9 @@ function scheduleCityPageRebuild(
         ? {
             centerCity: regionEnrichment.centerCity,
             childCities: regionEnrichment.childCities,
-            regionInfo: regionEnrichment.regionInfo,
+            regionInfo: publishedPdp && isRegion
+              ? regionInfoFromPublishedPdp(publishedPdp)
+              : regionEnrichment.regionInfo,
             regionTier: regionEnrichment.liveTier,
             regionInfoNeedsGeneration: regionEnrichment.regionInfoNeedsGeneration,
           }
@@ -391,9 +414,49 @@ async function buildStandaloneCityPageWithoutSessions(args: {
   cacheKey: string;
   builtAt: number;
   buildStartedAt: number;
+  catalogSessions: PublicSessionDto[];
 }): Promise<PublicCityPageDto | null> {
+  const [cityRecord, regionRecord] = await Promise.all([
+    withTimeout(
+      prisma.city.findFirst({
+        where: {
+          OR: [
+            { id: args.citySlugOrId },
+            { slug: args.requestedSlug },
+            { slug: args.citySlugOrId },
+          ],
+        },
+        include: { pdpDocument: true },
+      }),
+      CITY_SECONDARY_TIMEOUT_MS,
+      null,
+      'standalone-city-record',
+    ),
+    withTimeout(
+      prisma.region.findFirst({
+        where: {
+          OR: [
+            { id: args.citySlugOrId },
+            { slug: args.requestedSlug },
+            { slug: args.citySlugOrId },
+          ],
+        },
+        include: {
+          pdpDocument: true,
+          cities: { select: { id: true, slug: true, title: true } },
+        },
+      }),
+      CITY_SECONDARY_TIMEOUT_MS,
+      null,
+      'standalone-region-record',
+    ),
+  ]);
   const standaloneName =
-    matchStandaloneCityBySlug(args.requestedSlug) || matchStandaloneCityBySlug(args.citySlugOrId);
+    matchStandaloneCityBySlug(args.requestedSlug) ||
+    matchStandaloneCityBySlug(args.citySlugOrId) ||
+    cityRecord?.title ||
+    regionRecord?.title ||
+    null;
   if (!standaloneName) {
     const payload = null;
     pageCache.set(args.cacheKey, {
@@ -405,19 +468,21 @@ async function buildStandaloneCityPageWithoutSessions(args: {
     return payload;
   }
 
-  const cityRecord = await withTimeout(
-    prisma.city.findFirst({ where: { title: standaloneName } }),
-    CITY_SECONDARY_TIMEOUT_MS,
-    null,
-    'standalone-city-record',
-  );
-  const destination = publicDestinationFromSession({
-    destination: standaloneName,
-    destinationType: 'city',
-    city: standaloneName,
-    cityId: cityRecord?.id,
-    sourceCitySlug: cityRecord?.slug,
-  } as never);
+  const destination = regionRecord && !cityRecord
+    ? {
+        id: regionRecord.id,
+        slug: regionRecord.slug,
+        sourceSlug: regionRecord.slug,
+        name: regionRecord.title,
+        type: 'region' as const,
+      }
+    : publicDestinationFromSession({
+        destination: standaloneName,
+        destinationType: 'city',
+        city: standaloneName,
+        cityId: cityRecord?.id,
+        sourceCitySlug: cityRecord?.slug,
+      } as never);
   const contentVenues = cityRecord?.id
     ? await withTimeout(
         publicPublishedVenuesByCityId(getLegacyDb(), cityRecord.id, 250),
@@ -427,6 +492,18 @@ async function buildStandaloneCityPageWithoutSessions(args: {
       )
     : [];
   const entityLabel = destinationPrepositional(destination);
+  const isRegion = destination.type === 'region';
+  const pdpDocument = (isRegion ? regionRecord?.pdpDocument : cityRecord?.pdpDocument) || null;
+  const publishedPdp = readPublishedDestinationPdp(pdpDocument);
+  const regionEnrichment = isRegion
+    ? buildRegionHubEnrichment({
+        regionName: destination.name,
+        regionSlug: destination.slug,
+        sessions: [],
+        destinations: buildPublicDestinationRowsFromSessions(args.catalogSessions),
+      })
+    : null;
+  const knownCityDestinations = buildPublicDestinationRowsFromSessions(args.catalogSessions);
   const payload: PublicCityPageDto = {
     generatedAt: new Date().toISOString(),
     city: {
@@ -434,28 +511,56 @@ async function buildStandaloneCityPageWithoutSessions(args: {
       slug: destination.slug,
       sourceSlug: destination.sourceSlug,
       name: destination.name,
-      title: destination.name,
-      type: 'city',
+      title: isRegion ? `${destination.name}: куда съездить и что посмотреть` : destination.name,
+      type: destination.type,
       isDestination: true,
       events: 0,
       venues: contentVenues.length,
       categories: {},
-      seoH1: cityRecord?.seoH1 || destination.name,
-      seoTitle: cityRecord?.seoTitle || buildCityHubSeoTitle(destination.name),
+      heroImageUrl: publishedPdp?.heroImageUrl || cityRecord?.heroImageUrl || null,
+      seoH1: publishedPdp?.seoH1 || cityRecord?.seoH1 || (isRegion ? `Мероприятия и загородный отдых в ${destination.name}` : destination.name),
+      seoTitle: publishedPdp?.seoTitle || cityRecord?.seoTitle || (isRegion
+        ? `${destination.name}: куда съездить и что посмотреть, загородный отдых`
+        : buildCityHubSeoTitle(destination.name)),
       seoDescription:
-        cityRecord?.seoDescription ||
-        `Афиша событий, экскурсий, музеев и активностей ${entityLabel}. Быстрый выбор по датам, площадкам и категориям.`,
-      canonicalPath: cityRecord?.canonicalPath || `/cities/${destination.slug}`,
+        publishedPdp?.seoDescription || cityRecord?.seoDescription ||
+        (isRegion
+          ? `Список событий, площадок и популярных городов в ${destination.name} для загородного отдыха и поездок выходного дня.`
+          : `Афиша событий, экскурсий, музеев и активностей ${entityLabel}. Быстрый выбор по датам, площадкам и категориям.`),
+      canonicalPath: publishedPdp?.canonicalPath || cityRecord?.canonicalPath || `/cities/${destination.slug}`,
+      ...(pdpDocument?.status === 'HIDDEN'
+        ? { isIndexable: false }
+        : publishedPdp
+          ? { isIndexable: publishedPdp.isIndexable }
+          : {}),
+      ...(publishedPdp ? { pdp: publishedPdp } : {}),
     },
     sessions: [],
-    venues: contentVenues,
+    venues: isRegion ? [] : contentVenues,
     landings: [],
     stats: {
       events: 0,
-      venues: contentVenues.length,
+      venues: isRegion ? 0 : contentVenues.length,
       categories: 0,
       priceFrom: null,
     },
+    ...(regionEnrichment
+      ? {
+          centerCity: regionEnrichment.centerCity,
+          childCities: regionEnrichment.childCities.length
+            ? regionEnrichment.childCities
+            : (regionRecord?.cities || []).map((city) => ({
+                slug: city.slug,
+                name: city.title,
+                eventCount: knownCityDestinations.find((item) => item.slug === city.slug)?.events || 0,
+              })),
+          regionInfo: publishedPdp
+            ? regionInfoFromPublishedPdp(publishedPdp)
+            : regionEnrichment.regionInfo,
+          regionTier: regionEnrichment.liveTier,
+          regionInfoNeedsGeneration: regionEnrichment.regionInfoNeedsGeneration,
+        }
+      : {}),
   };
   pageCache.set(args.cacheKey, {
     expiresAt: args.builtAt + PUBLIC_CITY_CACHE_MS,
@@ -474,4 +579,17 @@ function countBy(values: string[]): Record<string, number> {
     result[value] = (result[value] || 0) + 1;
     return result;
   }, {});
+}
+
+function regionInfoFromPublishedPdp(pdp: PublishedDestinationPdpDto) {
+  return {
+    brief: pdp.content.regionBrief || null,
+    topPlaces: (pdp.content.regionTopPlaces || []).map((place) => ({
+      name: place.name,
+      desc: place.description || '',
+      cityNames: place.cityName ? [place.cityName] : null,
+      imageUrl: place.imageUrl || null,
+    })),
+    faq: (pdp.content.faq || []).map((item) => ({ q: item.question, a: item.answer })),
+  };
 }
