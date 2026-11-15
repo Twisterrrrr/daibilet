@@ -95,7 +95,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const stableRoute = loaded.payload.eventPageRoute;
     const hasPublishedStablePage = Boolean(stableRoute?.published);
     const stablePageTitle = String(loaded.payload.eventPage?.seoTitle || loaded.payload.eventPage?.title || '').trim();
-    const path = stableRoute?.published
+    const path = stableRoute?.published || stableRoute?.historicalAlias
       ? `/events/${encodeURIComponent(stableRoute.slug)}`
       : event.canonicalPath || eventHref(event);
     const priceRange = getTicketPriceRange(loaded.payload);
@@ -130,7 +130,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {
       title: !hasPublishedStablePage && expansionMeta ? { absolute: expansionMeta.title } : title,
       description,
-      ...((stableRoute && ((stableRoute.published && !stableRoute.isIndexable) || (!stableRoute.published && stableRoute.slug === decodedSlug))) ||
+      ...((stableRoute && (stableRoute.historicalAlias
+        ? (!stableRoute.published || !stableRoute.isIndexable)
+        : ((stableRoute.published && !stableRoute.isIndexable) || (!stableRoute.published && stableRoute.slug === decodedSlug)))) ||
       (!hasPublishedStablePage && (loaded.payload.availability === 'ENDED' || loaded.payload.availability === 'NO_UPCOMING'))
         ? { robots: { index: false, follow: true } }
         : {}),
