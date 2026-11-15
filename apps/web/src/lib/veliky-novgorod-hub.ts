@@ -2,7 +2,7 @@
 import type { CityDayRoutePreset, CityMustSeeItem, CitySuburbItem } from './cityInfo-data';
 
 export const VELIKY_NOVGOROD_MUST_SEE: CityMustSeeItem[] = [
-  // Нумерация из новгород.md; в источнике №50 повторяет Рюриково городище, поэтому здесь взята отдельная церковь из того же маршрута.
+  // Нумерация и повторы сохранены по новгород.md: пункт 50 повторяет Рюриково городище.
   { name: "Новгородский Кремль (Детинец)", dayRouteId: 'veliky-novgorod-place-1', desc: "Одна из древнейших каменных крепостей России, историческое и духовное сердце города. Вход свободный.", mustSeeFilter: "main", address: "Кремль", latitude: 58.521404, longitude: 31.275535, locationSlug: "veliky-novgorod-novgorodskiy-detinets-kreml" },
   { name: "Софийский собор", dayRouteId: 'veliky-novgorod-place-2', desc: "Древнейший сохранившийся православный храм России (1045–1050 гг.), главный символ города.", mustSeeFilter: "temple", address: "Кремль, 1", latitude: 58.522049, longitude: 31.276564, locationSlug: "veliky-novgorod-sofiyskiy-sobor", alsoMain: true },
   { name: "Памятник «Тысячелетие России»", dayRouteId: 'veliky-novgorod-place-3', desc: "Монумент 1862 года в честь тысячелетней годовщины призвания варягов, содержит более сотни фигур выдающихся деятелей.", mustSeeFilter: "monument", address: "Кремль", latitude: 58.521144, longitude: 31.275247, locationSlug: "veliky-novgorod-pamyatnik-tysyacheletie-rossii", alsoMain: true },
@@ -23,7 +23,7 @@ export const VELIKY_NOVGOROD_MUST_SEE: CityMustSeeItem[] = [
   { name: "Церковь Симеона Богоприимца", dayRouteId: 'veliky-novgorod-place-18', desc: "Уникальная настенная роспись с портретами святых в медальонах.", mustSeeFilter: "temple", address: "[уточнить]", latitude: 58.53632, longitude: 31.27646 },
   { name: "Церковь Успения Пресвятой Богородицы в Волотове", dayRouteId: 'veliky-novgorod-place-19', desc: "Всемирно известна фресковой росписью 1363 года.", mustSeeFilter: "temple", address: "[уточнить]", latitude: 58.5372, longitude: 31.35677 },
   { name: "Знаменский собор", dayRouteId: 'veliky-novgorod-place-20', desc: "Памятник архитектуры и живописи XVII–XVIII вв.", mustSeeFilter: "temple", address: "[уточнить]", latitude: 58.5171, longitude: 31.29453 },
-  { name: "Рюриково городище", dayRouteId: 'veliky-novgorod-place-21', desc: "Историческое место, откуда, по летописи, началась Русь. Находится на правом берегу Волхова.", mustSeeFilter: "secret", address: "Рюриково городище", latitude: 58.493687, longitude: 31.298049, locationSlug: "veliky-novgorod-ryurikovo-gorodische" },
+  { name: "Рюриково городище", dayRouteId: 'veliky-novgorod-place-21', desc: "Историческое место, откуда, по летописи, началась Русь. Находится на правом берегу Волхова.", mustSeeFilter: "secret", address: "Рюриково городище", latitude: 58.493687, longitude: 31.298049, locationSlug: "veliky-novgorod-ryurikovo-gorodische", imageUrl: '/images/venues/veliky-novgorod/ryurikovo-gorodische.jpg' },
   { name: "Городская усадьба", dayRouteId: 'veliky-novgorod-place-22', desc: "Пример гражданской застройки XVIII–XIX веков.", mustSeeFilter: "houses", address: "[уточнить]" },
   { name: "Дом купца", dayRouteId: 'veliky-novgorod-place-23', desc: "Памятник купеческой архитектуры.", mustSeeFilter: "houses", address: "[уточнить]" },
   { name: "Здание бывшей гимназии", dayRouteId: 'veliky-novgorod-place-24', desc: "Историческое учебное заведение.", mustSeeFilter: "houses", address: "[уточнить]" },
@@ -52,7 +52,7 @@ export const VELIKY_NOVGOROD_MUST_SEE: CityMustSeeItem[] = [
   { name: "Новгородский академический театр драмы им. Ф. М. Достоевского", dayRouteId: 'veliky-novgorod-place-47', desc: "Главная театральная сцена города.", mustSeeFilter: "creative", address: "ул. Великая, 14", latitude: 58.523, longitude: 31.271 },
   { name: "Театр «Малый»", dayRouteId: 'veliky-novgorod-place-48', desc: "Камерный театр с интересным репертуаром.", mustSeeFilter: "creative", address: "ул. Фёдоровский ручей, [уточнить номер дома]" },
   { name: "Витославлицы, Юрьев монастырь и Перынский скит", dayRouteId: 'veliky-novgorod-place-49', desc: "Компактный маршрут на полдня.", mustSeeFilter: "main", address: "Маршрут; точка начала и координаты уточнить" },
-  { name: "Церковь Благовещения на Городище", dayRouteId: 'veliky-novgorod-place-50', desc: "Древний храм на территории Рюрикова городища.", mustSeeFilter: "temple", address: "Рюриково городище; координаты уточнить" },
+  { name: "Рюриково городище", dayRouteId: 'veliky-novgorod-place-50', desc: "Историческое место на правом берегу Волхова.", mustSeeFilter: "secret", address: "Рюриково городище", latitude: 58.493687, longitude: 31.298049, locationSlug: "veliky-novgorod-ryurikovo-gorodische", imageUrl: '/images/venues/veliky-novgorod/ryurikovo-gorodische.jpg' },
 ];
 
 export const VELIKY_NOVGOROD_SUBURBS: CitySuburbItem[] = [

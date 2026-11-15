@@ -2233,6 +2233,38 @@ const KIROV_ITEMS: CityLifehackItem[] = [
 ];
 
 const CITY_HUB_LIFEHACKS: Record<string, CityLifehackPack> = {
+  'veliky-novgorod': lifehackPack([
+    {
+      id: 'veliky-novgorod-lastochka', tabId: 'transit', icon: 'transit',
+      title: 'Сравните «Ласточку» из Петербурга',
+      body: body('Поездка занимает около трёх часов. В исходном гиде указана цена от 717 ₽; сверяйте расписание и стоимость на дату поездки.'),
+      cta: { kind: 'link', label: 'Расписание и билеты РЖД', href: 'https://www.rzd.ru/' },
+    },
+    {
+      id: 'veliky-novgorod-bus-7', tabId: 'transit', icon: 'transit',
+      title: 'До Витославлиц — автобус № 7',
+      body: body('В гиде указан городской автобус № 7 от железнодорожного вокзала. Номер, остановки и интервал проверьте перед выездом; цена 35 ₽ приведена в исходном файле и может устареть.'),
+      cta: { kind: 'gis', label: 'Маршрут до Витославлиц', href: twoGisCitySearchUrl('veliky-novgorod', 'автобус 7 Витославлицы') },
+    },
+    {
+      id: 'veliky-novgorod-taxi', tabId: 'transit', icon: 'transit',
+      title: 'Сверьте цену такси перед поездкой',
+      body: body('Оценка 150–200 ₽ за поездки по городу взята из исходного гида. Проверьте цену в приложении перед заказом: тариф зависит от времени, спроса и маршрута.'),
+      cta: { kind: 'maps', label: 'Такси в Великом Новгороде', href: yandexMapsSearchUrl('такси Великий Новгород') },
+    },
+    {
+      id: 'veliky-novgorod-kremlin-entry', tabId: 'walk', icon: 'museum',
+      title: 'Гуляйте по территории Кремля бесплатно',
+      body: body('Вход на территорию Детинца свободный. Звонница, палаты и музейные экспозиции — отдельные объекты со своим режимом и билетами.'),
+      cta: { kind: 'places', label: 'Новгородский Детинец', slugs: ['veliky-novgorod-novgorodskiy-detinets-kreml'], scrollTo: 'places' },
+    },
+    {
+      id: 'veliky-novgorod-trade-side-lunch', tabId: 'food', icon: 'food',
+      title: 'Планируйте обед на Торговой стороне',
+      body: body('Включите кафе Торговой стороны в прогулку по Ярославову Дворищу. Меню, цены и часы работы уточняйте у конкретного заведения.'),
+      cta: { kind: 'maps', label: 'Кафе на Торговой стороне', href: yandexMapsSearchUrl('кафе Торговая сторона Великий Новгород') },
+    },
+  ]),
   perm: lifehackPack(PERM_ITEMS),
   moscow: lifehackPack(MOSCOW_ITEMS),
   'saint-petersburg': lifehackPack(SPB_ITEMS),

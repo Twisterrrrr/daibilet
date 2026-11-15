@@ -224,6 +224,53 @@ const VELIKY_NOVGOROD_WEATHER: CityWeatherFlavor = {
   indoorCtaSnow: 'Снег: сократите прогулку и оставьте больше времени на музейные залы',
 };
 
+const VELIKY_NOVGOROD_SLIDES: CityIdentitySlide[] = [
+  {
+    id: 'veliky-novgorod-cradle-of-rus',
+    title: 'Родина России',
+    text: 'Летописное предание о призвании варягов связывает начало русской государственности с Новгородской землёй. Рюриково городище хранит память об этом раннем периоде.',
+    imageSrc: '/images/cities/identity/veliky-novgorod-rurikovo-gorodishche.jpg',
+    imageAlt: 'Панорама Рюрикова городища у истока Волхова',
+    imageCredit: { author: 'User№101', sourceUrl: 'https://commons.wikimedia.org/wiki/File:Riurikovo_Gorodishche.jpg', license: 'CC BY-SA 3.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0/' },
+    slugs: ['veliky-novgorod-ryurikovo-gorodische'],
+    target: 'suburbs',
+    badge: 'История',
+  },
+  {
+    id: 'veliky-novgorod-republic',
+    title: 'Господин Великий Новгород',
+    text: 'Торговая сторона и Ярославово Дворище напоминают о Новгородской республике и вечевом устройстве города.',
+    imageSrc: '/images/cities/identity/veliky-novgorod-yaroslav-court.jpg',
+    imageAlt: 'Панорама храмов Ярославова Дворища',
+    imageCredit: { author: 'Ludvig14', sourceUrl: 'https://commons.wikimedia.org/wiki/File:VNovgorod_YaroslavsCourt_VN83l.jpg', license: 'CC BY-SA 3.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0/' },
+    slugs: ['veliky-novgorod-yaroslavovo-dvorische'],
+    target: 'places',
+    badge: 'Республика',
+  },
+  {
+    id: 'veliky-novgorod-open-air-museum',
+    title: 'Город-музей под открытым небом',
+    text: 'Памятники разных эпох стоят на обоих берегах Волхова. Софийский собор — один из главных ориентиров исторического центра.',
+    imageSrc: '/images/cities/identity/veliky-novgorod-sofia-aerial.jpg',
+    imageAlt: 'Софийский собор и Новгородский кремль с высоты',
+    imageCredit: { author: 'Красный', sourceUrl: 'https://commons.wikimedia.org/wiki/File:Великий_Новгород,_Софийский_собор_сверху.jpg', license: 'CC BY-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/' },
+    slugs: ['veliky-novgorod-sofiyskiy-sobor', 'veliky-novgorod-novgorodskiy-detinets-kreml'],
+    target: 'places',
+    badge: 'Архитектура',
+  },
+  {
+    id: 'veliky-novgorod-birch-bark-letters',
+    title: 'Берестяные грамоты',
+    text: 'Сотни найденных в Новгороде берестяных грамот сохранили частные письма и повседневные записи средневековых горожан.',
+    imageSrc: '/images/cities/identity/veliky-novgorod-birch-bark-letter.jpg',
+    imageAlt: 'Берестяная грамота № 591 с древним кириллическим алфавитом',
+    imageCredit: { author: 'Автор не указан; файл загружен AshFox', sourceUrl: 'https://commons.wikimedia.org/wiki/File:Birch_bark_alphabet_of_Novgorod.jpg', license: 'CC BY 1.0', licenseUrl: 'https://creativecommons.org/licenses/by/1.0/' },
+    slugs: ['veliky-novgorod-novgorodskiy-detinets-kreml'],
+    target: 'places',
+    badge: 'Письменность',
+  },
+];
+
 const MONTH_TITLE = [
   '',
   'Январь',
@@ -2072,7 +2119,10 @@ const TYUMEN_SLIDES: CityIdentitySlide[] = [
 
 export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
   'veliky-novgorod': {
-    tags: [],
+    identityHeading: 'Чем уникален Великий Новгород',
+    identityLead: 'Четыре истории, которые объясняют характер города',
+    tags: tagsFromSlides(VELIKY_NOVGOROD_SLIDES),
+    slides: VELIKY_NOVGOROD_SLIDES,
     weather: VELIKY_NOVGOROD_WEATHER,
     whenToGo: VELIKY_NOVGOROD_WHEN_TO_GO,
   },
