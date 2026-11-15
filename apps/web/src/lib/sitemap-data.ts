@@ -49,6 +49,9 @@ export type SitemapEntry = {
 
 const MAX_EVENTS = 45_000;
 const MAX_VENUES = 10_000;
+// /api/public/venues caps an explicit dump at 2,000 rows. Follow its pages so
+// the sitemap does not silently omit the remainder of the public place catalog.
+const VENUE_SITEMAP_PAGE_SIZE = 2_000;
 const VENUE_SITEMAP_SNAPSHOT_MS = 5 * 60 * 1000;
 
 /**
@@ -56,7 +59,34 @@ const VENUE_SITEMAP_SNAPSHOT_MS = 5 * 60 * 1000;
  * `buildPublicVenuesCatalog` rows the direct `public-read` call used to build.
  */
 type SitemapVenueRow = PublicVenueDto & { events?: number | null };
-type SitemapVenuesPayload = { venues?: SitemapVenueRow[] };
+type SitemapVenuesPayload<T = SitemapVenueRow> = {
+  venues?: T[];
+  hasMore?: boolean;
+  total?: number;
+};
+
+export async function collectVenueSitemapPages<T>(
+  fetchPage: (page: number, limit: number) => Promise<SitemapVenuesPayload<T>>,
+  options: { pageSize?: number; maxVenues?: number } = {},
+): Promise<SitemapVenuesPayload<T>> {
+  const pageSize = Math.max(1, Math.floor(options.pageSize || VENUE_SITEMAP_PAGE_SIZE));
+  const maxVenues = Math.max(1, Math.floor(options.maxVenues || MAX_VENUES));
+  const venues: T[] = [];
+  let total = 0;
+  let hasMore = true;
+  let page = 1;
+
+  while (hasMore && venues.length < maxVenues) {
+    const payload = await fetchPage(page, pageSize);
+    const rows = payload.venues || [];
+    if (page === 1) total = Number(payload.total) || 0;
+    venues.push(...rows.slice(0, maxVenues - venues.length));
+    hasMore = Boolean(payload.hasMore) && rows.length > 0;
+    page += 1;
+  }
+
+  return { venues, total, hasMore };
+}
 
 let venueSitemapSnapshot: {
   expiresAt: number;
@@ -78,10 +108,12 @@ async function freshVenuesForSitemap(): Promise<SitemapVenuesPayload> {
     return venueSitemapSnapshot.payload;
   }
   if (!venueSitemapRebuild) {
-    venueSitemapRebuild = fetchPublicApiJson<SitemapVenuesPayload>('/api/public/venues', {
-      searchParams: { limit: MAX_VENUES },
-      timeoutMs: 30_000,
-    })
+    venueSitemapRebuild = collectVenueSitemapPages((page, limit) =>
+      fetchPublicApiJson<SitemapVenuesPayload>('/api/public/venues', {
+        searchParams: { limit, page, sort: 'asc' },
+        timeoutMs: 30_000,
+      }),
+    )
       .then((payload) => {
         venueSitemapSnapshot = { payload, expiresAt: Date.now() + VENUE_SITEMAP_SNAPSHOT_MS };
         return payload;

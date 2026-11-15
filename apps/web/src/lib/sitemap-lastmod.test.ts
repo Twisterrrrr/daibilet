@@ -4,6 +4,7 @@ import path from 'node:path';
 import test from 'node:test';
 
 import {
+  collectVenueSitemapPages,
   renderSitemapIndexXml,
   renderUrlsetXml,
   resolveSitemapLastModified,
@@ -27,6 +28,32 @@ import { freshnessMapFromRows, publicFreshnessSlug } from '@daibilet/backend/eve
  */
 const WEB_ROOT = path.resolve(__dirname, '../..');
 const REPO_ROOT = path.resolve(WEB_ROOT, '../..');
+
+test('venue sitemap walks every API page instead of truncating at the 2,000-row dump cap', async () => {
+  const calls: Array<[number, number]> = [];
+  const payload = await collectVenueSitemapPages(async (page, limit) => {
+    calls.push([page, limit]);
+    if (page === 1) return { venues: [{ id: 'venue-1' }, { id: 'venue-2' }], total: 3, hasMore: true };
+    return { venues: [{ id: 'venue-3' }], total: 3, hasMore: false };
+  }, { pageSize: 2, maxVenues: 10 });
+
+  assert.deepEqual(calls, [[1, 2], [2, 2]]);
+  assert.deepEqual(payload.venues?.map((venue) => venue.id), ['venue-1', 'venue-2', 'venue-3']);
+  assert.equal(payload.total, 3);
+  assert.equal(payload.hasMore, false);
+});
+
+test('venue sitemap respects its configured maximum and stops requesting pages', async () => {
+  const calls: number[] = [];
+  const payload = await collectVenueSitemapPages(async (page) => {
+    calls.push(page);
+    return { venues: [{ id: `${page}-a` }, { id: `${page}-b` }, { id: `${page}-c` }], total: 9, hasMore: true };
+  }, { pageSize: 3, maxVenues: 4 });
+
+  assert.deepEqual(calls, [1, 2]);
+  assert.deepEqual(payload.venues?.map((venue) => venue.id), ['1-a', '1-b', '1-c', '2-a']);
+  assert.equal(payload.hasMore, true);
+});
 
 test('sitemap cache does not advertise a long stale window for changing catalogs', () => {
   // Runtime generation is still cached to protect the 22-page event query from
