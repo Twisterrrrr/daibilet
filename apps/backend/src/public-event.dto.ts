@@ -220,7 +220,7 @@ async function loadPublishedTourPeers(eventId: string): Promise<{ assigned: bool
       FROM city_candidates
       WHERE city_rank = 1
       ORDER BY "startsAt" NULLS LAST, city, "eventPageSlug"
-      LIMIT 30
+      LIMIT 36
     `, eventId);
     const assigned = await prisma.$queryRawUnsafe<Array<{ assigned: boolean }>>(`
       SELECT EXISTS (
