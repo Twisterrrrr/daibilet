@@ -56,12 +56,33 @@ does not publish a page by itself.
 
 The only canonical type slugs are:
 
-`museums`, `theatres`, `concert-halls`, `parks`, `landmarks`, `temples`,
-`art-spaces`, `food`, `venues`, `entertainment`, `walks`, `transport`.
+| Slug | Label | Membership predicate over place taxonomy |
+| --- | --- | --- |
+| `museums` | Музеи и галереи | `MUSEUM` (`museum`, `gallery`); reviewed legacy museum/gallery kinds |
+| `theatres` | Театры | `THEATRE` (`theatre`); reviewed legacy theatre kinds |
+| `concert-halls` | Концертные залы и филармонии | `THEATRE` (`concert_hall`, `philharmonic`) or `VENUE` (`concert_hall`); reviewed legacy concert-hall kind |
+| `parks` | Парки и сады | `NATURE` (`park`, `garden`); reviewed legacy park kind |
+| `landmarks` | Достопримечательности | `ARCHITECTURE` or `MONUMENT`; `URBAN` (`square`) and `ENTERTAINMENT` (`observation_deck`) when editorially classified as landmarks |
+| `temples` | Храмы и монастыри | `RELIGION` and approved subtypes |
+| `art-spaces` | Арт-пространства и лофты | `MUSEUM` (`gallery`) or `VENUE` (`exhibition_hall`); reviewed legacy art-space kind |
+| `food` | Рестораны и кафе | `FOOD` and approved subtypes; reviewed legacy food/gastro/bar kinds |
+| `venues` | Банкетные и событийные площадки | `VENUE` and approved event-space subtypes; reviewed legacy venue kind |
+| `entertainment` | Развлечения и семейный отдых | `ENTERTAINMENT` and approved subtypes |
+| `walks` | Набережные и места для прогулок | `URBAN` (`square`, `street`, `embankment`, `district`) and approved outdoor-walk records |
+| `transport` | Причалы и точки отправления | `TRANSPORT` and approved subtypes; reviewed legacy pier/meeting-point kinds |
 
-Each slug has one reviewed mapping to `placeType`/`placeSubtype` values and a
-Russian display label. A venue may appear in more than one type catalog through
-its approved taxonomy, while its PDP URL and primary breadcrumb remain stable.
+This is a catalog taxonomy, so membership can overlap: for example, a gallery
+can appear in both `museums` and `art-spaces`, and a concert hall can appear in
+both `theatres` and `concert-halls`. Membership is explicit editorial taxonomy,
+not a title-only guess. This catalog type does not change a place's primary
+`placeType`, PDP URL or primary breadcrumb.
+
+The route registry and API must share the same predicate implementation. The
+current generic Places `type` filter accepts parent/legacy type values but does
+not fully implement these subtype-aware predicates. Therefore type routes must
+remain behind the preview flag until the backend can filter and count by the
+exact registry predicate; do not estimate indexability from a partial client
+filter.
 Legacy `/places/institution` and `/places/location` family facets are reserved
 paths and remain available until a separate migration decision; they are not
 aliases for any of the 12 types.
