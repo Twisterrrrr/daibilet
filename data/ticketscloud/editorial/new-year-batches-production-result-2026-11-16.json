@@ -1,0 +1,2258 @@
+{
+  "startedAt": "2026-11-16T16:01:12.788Z",
+  "completedAt": "2026-11-16T16:08:16.732Z",
+  "complete": true,
+  "pages": [
+    {
+      "id": "7c9871c4-860f-46f9-ac6b-9d3136873c5e",
+      "slug": "aidahar-neonovyi-god-volgograd",
+      "url": "https://daibilet.ru/events/aidahar-neonovyi-god-volgograd",
+      "batch": 1,
+      "title": "АЙДАХАР: НЕОНОВЫЙ ГОД",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:01:51.899Z",
+      "eventIds": [
+        "evt_6aeaefa2d9a56b6202b73d52",
+        "evt_6aeaefa0d9a56b6202b73d42"
+      ],
+      "routes": [
+        "/events/aidahar-neonovyi-god-volgograd"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "9974200e-f43e-469a-9622-df6d6e67a30a",
+      "slug": "bal-zolushki-volshebnoe-novogodnee-predstavlenie-v-osobnyake-ministra-milyutina-sankt-peterburg",
+      "url": "https://daibilet.ru/events/bal-zolushki-volshebnoe-novogodnee-predstavlenie-v-osobnyake-ministra-milyutina-sankt-peterburg",
+      "batch": 1,
+      "title": "\"Бал Золушки\" Волшебное новогоднее представление в особняке министра Милютина",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:01:55.490Z",
+      "eventIds": [
+        "evt_6ac63a360112a68fd035957c",
+        "evt_6ac63a380112a68fd0359596",
+        "evt_6ac63a3a0112a68fd03595b0",
+        "evt_6ac63a3c0112a68fd03595ca",
+        "evt_6ac63a3e0112a68fd03595e4",
+        "evt_6ac63a370112a68fd0359589",
+        "evt_6ac63a3b0112a68fd03595bd",
+        "evt_6ac63a3f0112a68fd03595f1",
+        "evt_6ac63a390112a68fd03595a3",
+        "evt_6ac63d9e469bd539dc35957c"
+      ],
+      "routes": [
+        "/events/bal-zolushki-volshebnoe-novogodnee-predstavlenie-v-osobnyake-ministra-milyutina-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "bd14274b-edff-4740-9824-a10d8a3ce9ec",
+      "slug": "bolshaya-novogodnyaya-elka-s-zhivym-vokalom-i-orkestrom-kak-kazaki-novyi-god-iskali-s-podarkom-sankt-peterburg",
+      "url": "https://daibilet.ru/events/bolshaya-novogodnyaya-elka-s-zhivym-vokalom-i-orkestrom-kak-kazaki-novyi-god-iskali-s-podarkom-sankt-peterburg",
+      "batch": 1,
+      "title": "Большая новогодняя ёлка с живым вокалом и оркестром. Как казаки Новый год искали. С подарком",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:01:59.462Z",
+      "eventIds": [
+        "evt_6ad9dd00df49aafb93fdf68a",
+        "evt_6ad9dd02df49aafb93fdf799"
+      ],
+      "routes": [
+        "/events/bolshaya-novogodnyaya-elka-s-zhivym-vokalom-i-orkestrom-kak-kazaki-novyi-god-iskali-s-podarkom-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "d074782c-e5ce-4ed4-8ae5-a5a5106af05b",
+      "slug": "detskaya-novogodnyaya-elka-novyi-ded-moroz-sankt-peterburg",
+      "url": "https://daibilet.ru/events/detskaya-novogodnyaya-elka-novyi-ded-moroz-sankt-peterburg",
+      "batch": 1,
+      "title": "Детская новогодняя ёлка «Новый дед мороз?»",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:02:03.283Z",
+      "eventIds": [
+        "evt_6a92867ab13d08f7e3700232",
+        "evt_6a92867db13d08f7e37002b8",
+        "evt_6a928682b13d08f7e3700381",
+        "evt_6a928688b13d08f7e37004d0",
+        "evt_6a928680b13d08f7e370033e",
+        "evt_6a928684b13d08f7e3700407",
+        "evt_6a92867cb13d08f7e3700275",
+        "evt_6a928683b13d08f7e37003c4",
+        "evt_6a928687b13d08f7e370048d",
+        "evt_6a92867fb13d08f7e37002fb",
+        "evt_6a928686b13d08f7e370044a",
+        "evt_6a92868ab13d08f7e3700513"
+      ],
+      "routes": [
+        "/events/detskaya-novogodnyaya-elka-novyi-ded-moroz-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "9cbbbfa2-fd42-41a0-9c1d-fb1a23c47012",
+      "slug": "findus-i-mehanicheskii-ded-moroz-4-moskva",
+      "url": "https://daibilet.ru/events/findus-i-mehanicheskii-ded-moroz-4-moskva",
+      "batch": 1,
+      "title": "Финдус и механический Дед Мороз, 4+",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:02:14.410Z",
+      "eventIds": [
+        "evt_6ad7dcce7b313feda864e0c1",
+        "evt_6ad7dccf7b313feda864e0ce",
+        "evt_6ad7dccf7b313feda864e0db",
+        "evt_6ad7dcd07b313feda864e0e8",
+        "evt_6ad7dcd27b313feda864e102",
+        "evt_6ad7dcd37b313feda864e10f",
+        "evt_6ad7dcd37b313feda864e11c",
+        "evt_6ad7dcd47b313feda864e129",
+        "evt_6ad7dcd57b313feda864e136",
+        "evt_6ad7dcd57b313feda864e143",
+        "evt_6ad7dcd67b313feda864e150",
+        "evt_6ad7dcd77b313feda864e15d",
+        "evt_6ad7dcd87b313feda864e16a",
+        "evt_6ad7dcd97b313feda864e177",
+        "evt_6ad7dcd97b313feda864e184",
+        "evt_6ad7dcda7b313feda864e191",
+        "evt_6ad7dcdb7b313feda864e19e",
+        "evt_6ad7dcdb7b313feda864e1ab",
+        "evt_6ad7dcdc7b313feda864e1b8",
+        "evt_6ad7dcdd7b313feda864e1c5",
+        "evt_6ad7dcdd7b313feda864e1d2",
+        "evt_6ad7dcde7b313feda864e1df",
+        "evt_6ad7dcdf7b313feda864e1ec",
+        "evt_6ad7dcdf7b313feda864e1f9",
+        "evt_6ad7dce07b313feda864e206",
+        "evt_6ad7dce17b313feda864e213",
+        "evt_6ad7dce27b313feda864e220",
+        "evt_6ad7dce37b313feda864e22d",
+        "evt_6ad7dce47b313feda864e23a",
+        "evt_6ad7dce47b313feda864e247",
+        "evt_6ad7dce57b313feda864e254",
+        "evt_6ad7dce67b313feda864e261",
+        "evt_6ad7dce67b313feda864e26e",
+        "evt_6ad7dce77b313feda864e27b",
+        "evt_6ad7dce87b313feda864e288",
+        "evt_6ad7dce87b313feda864e295",
+        "evt_6ad7dce97b313feda864e2a2",
+        "evt_6ad7dcea7b313feda864e2af",
+        "evt_6ad7dcea7b313feda864e2bc",
+        "evt_6ad7dceb7b313feda864e2c9",
+        "evt_6ad7dcec7b313feda864e2d6",
+        "evt_6ad7dcec7b313feda864e2e3",
+        "evt_6ad7dced7b313feda864e2f0"
+      ],
+      "routes": [
+        "/events/findus-i-mehanicheskii-ded-moroz-4-moskva"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "7428dcca-6f26-4ccd-8340-cca7ffb1628d",
+      "slug": "kak-spasti-novogodnee-volshebstvo-sankt-peterburg",
+      "url": "https://daibilet.ru/events/kak-spasti-novogodnee-volshebstvo-sankt-peterburg",
+      "batch": 1,
+      "title": "Как спасти новогоднее волшебство",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:02:23.750Z",
+      "eventIds": [
+        "evt_6ad8f77c4ed63ade292d1315",
+        "evt_6ad8f77d4ed63ade292d1322",
+        "evt_6ad8f77d4ed63ade292d132f",
+        "evt_6ad8f77e4ed63ade292d133c"
+      ],
+      "routes": [
+        "/events/kak-spasti-novogodnee-volshebstvo-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "660e2fba-83ab-44b8-92a3-57b87515485d",
+      "slug": "kosmicheskaya-elka-na-mks-orehovo-zuevo",
+      "url": "https://daibilet.ru/events/kosmicheskaya-elka-na-mks-orehovo-zuevo",
+      "batch": 1,
+      "title": "Космическая ёлка на МКС",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:02:26.381Z",
+      "eventIds": [
+        "evt_6ac40242a5df89a0f209063b",
+        "evt_6ac40246a5df89a0f20909a7",
+        "evt_6ac40244a5df89a0f20907f1"
+      ],
+      "routes": [
+        "/events/kosmicheskaya-elka-na-mks-orehovo-zuevo"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "0c28192f-0883-4b82-8038-2eed0d710fe3",
+      "slug": "novogodnii-detskii-spektakl-dlya-vsei-semi-schelkunchik-moskva",
+      "url": "https://daibilet.ru/events/novogodnii-detskii-spektakl-dlya-vsei-semi-schelkunchik-moskva",
+      "batch": 1,
+      "title": "Новогодний детский спектакль для всей семьи «ЩЕЛКУНЧИК»",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:02:30.058Z",
+      "eventIds": [
+        "evt_6ab22c6d1a950cc7bcb527bd",
+        "evt_6ab22c701a950cc7bcb52963",
+        "evt_6ab22c6f1a950cc7bcb52890",
+        "evt_6ab22c711a950cc7bcb52a36"
+      ],
+      "routes": [
+        "/events/novogodnii-detskii-spektakl-dlya-vsei-semi-schelkunchik-moskva"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "820bf4d2-8187-4fb3-a1f1-742eeda761d3",
+      "slug": "novogodnyaya-istoriya-dlya-detei-4-petropavlovsk-kamchatskiy",
+      "url": "https://daibilet.ru/events/novogodnyaya-istoriya-dlya-detei-4-petropavlovsk-kamchatskiy",
+      "batch": 1,
+      "title": "Новогодняя история для детей - 4",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:02:32.886Z",
+      "eventIds": [
+        "evt_6af2f2ed17e1c857e5a6f4f5",
+        "evt_6af2f2ed17e1c857e5a6f3c1",
+        "evt_6af2f2ec17e1c857e5a6f28d"
+      ],
+      "routes": [
+        "/events/novogodnyaya-istoriya-dlya-detei-4-petropavlovsk-kamchatskiy"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "bcbf20d1-a831-4c2a-ad15-ad8cca455bf6",
+      "slug": "novogodnyaya-kvest-progulka-s-veduschim-modnoe-rassledovanie-v-kitai-gorode-moskva",
+      "url": "https://daibilet.ru/events/novogodnyaya-kvest-progulka-s-veduschim-modnoe-rassledovanie-v-kitai-gorode-moskva",
+      "batch": 1,
+      "title": "Новогодняя квест-прогулка с ведущим \"Модное расследование в Китай городе\"",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:04:04.213Z",
+      "eventIds": [
+        "evt_6af434609354f6e1c9a6f29b",
+        "evt_6af434619354f6e1c9a6f2a8",
+        "evt_6af434619354f6e1c9a6f2b5",
+        "evt_6af434629354f6e1c9a6f2c2",
+        "evt_6af434639354f6e1c9a6f2cf",
+        "evt_6af434639354f6e1c9a6f2dc",
+        "evt_6af434649354f6e1c9a6f2e9",
+        "evt_6af434649354f6e1c9a6f2f6",
+        "evt_6af434659354f6e1c9a6f303",
+        "evt_6af434669354f6e1c9a6f310",
+        "evt_6af434669354f6e1c9a6f31d",
+        "evt_6af434679354f6e1c9a6f32a",
+        "evt_6af434689354f6e1c9a6f337",
+        "evt_6af434689354f6e1c9a6f344",
+        "evt_6af434699354f6e1c9a6f351",
+        "evt_6af434699354f6e1c9a6f35e",
+        "evt_6af4346a9354f6e1c9a6f36b",
+        "evt_6af4346a9354f6e1c9a6f378",
+        "evt_6af4346b9354f6e1c9a6f385",
+        "evt_6af4346c9354f6e1c9a6f392",
+        "evt_6af4346c9354f6e1c9a6f39f",
+        "evt_6af4346d9354f6e1c9a6f3ac",
+        "evt_6af4346e9354f6e1c9a6f3b9",
+        "evt_6af4346e9354f6e1c9a6f3c6",
+        "evt_6af4346f9354f6e1c9a6f3d3",
+        "evt_6af4346f9354f6e1c9a6f3e0",
+        "evt_6af434709354f6e1c9a6f3ed",
+        "evt_6af434719354f6e1c9a6f3fa",
+        "evt_6af434719354f6e1c9a6f407",
+        "evt_6af434729354f6e1c9a6f414",
+        "evt_6af434729354f6e1c9a6f421",
+        "evt_6af434739354f6e1c9a6f42e",
+        "evt_6af434739354f6e1c9a6f43b",
+        "evt_6af434749354f6e1c9a6f448",
+        "evt_6af434759354f6e1c9a6f455",
+        "evt_6af434759354f6e1c9a6f462",
+        "evt_6af434769354f6e1c9a6f46f",
+        "evt_6af434779354f6e1c9a6f47c",
+        "evt_6af434779354f6e1c9a6f489",
+        "evt_6af434789354f6e1c9a6f496",
+        "evt_6af434789354f6e1c9a6f4a3",
+        "evt_6af434799354f6e1c9a6f4b0",
+        "evt_6af4347a9354f6e1c9a6f4bd",
+        "evt_6af4347a9354f6e1c9a6f4ca",
+        "evt_6af4347b9354f6e1c9a6f4d7",
+        "evt_6af4347b9354f6e1c9a6f4e4",
+        "evt_6af4347c9354f6e1c9a6f4f1",
+        "evt_6af4347d9354f6e1c9a6f4fe",
+        "evt_6af4347d9354f6e1c9a6f50b",
+        "evt_6af4347e9354f6e1c9a6f518",
+        "evt_6af4347e9354f6e1c9a6f525",
+        "evt_6af4347f9354f6e1c9a6f532",
+        "evt_6af434809354f6e1c9a6f53f",
+        "evt_6af434809354f6e1c9a6f54c",
+        "evt_6af434819354f6e1c9a6f559",
+        "evt_6af434819354f6e1c9a6f566",
+        "evt_6af434829354f6e1c9a6f573",
+        "evt_6af434839354f6e1c9a6f580",
+        "evt_6af434839354f6e1c9a6f58d",
+        "evt_6af434849354f6e1c9a6f59a",
+        "evt_6af434859354f6e1c9a6f5a7",
+        "evt_6af434859354f6e1c9a6f5b4",
+        "evt_6af434869354f6e1c9a6f5c1",
+        "evt_6af434879354f6e1c9a6f5ce",
+        "evt_6af434879354f6e1c9a6f5db",
+        "evt_6af434889354f6e1c9a6f5e8",
+        "evt_6af434899354f6e1c9a6f5f5",
+        "evt_6af434899354f6e1c9a6f602",
+        "evt_6af4348a9354f6e1c9a6f60f",
+        "evt_6af4348b9354f6e1c9a6f61c",
+        "evt_6af4348c9354f6e1c9a6f629",
+        "evt_6af4348c9354f6e1c9a6f636",
+        "evt_6af4348d9354f6e1c9a6f643",
+        "evt_6af4348d9354f6e1c9a6f650",
+        "evt_6af4348e9354f6e1c9a6f65d",
+        "evt_6af4348f9354f6e1c9a6f66a",
+        "evt_6af4348f9354f6e1c9a6f677",
+        "evt_6af434909354f6e1c9a6f684",
+        "evt_6af434919354f6e1c9a6f691",
+        "evt_6af434919354f6e1c9a6f69e",
+        "evt_6af434929354f6e1c9a6f6ab",
+        "evt_6af434939354f6e1c9a6f6b8",
+        "evt_6af434949354f6e1c9a6f6c5",
+        "evt_6af434949354f6e1c9a6f6d2",
+        "evt_6af434959354f6e1c9a6f6df",
+        "evt_6af434969354f6e1c9a6f6ec",
+        "evt_6af434969354f6e1c9a6f6f9",
+        "evt_6af434979354f6e1c9a6f706",
+        "evt_6af434989354f6e1c9a6f713",
+        "evt_6af434989354f6e1c9a6f720",
+        "evt_6af434999354f6e1c9a6f72d",
+        "evt_6af434999354f6e1c9a6f73a",
+        "evt_6af4349a9354f6e1c9a6f747",
+        "evt_6af4349b9354f6e1c9a6f754",
+        "evt_6af4349b9354f6e1c9a6f761",
+        "evt_6af4349c9354f6e1c9a6f76e",
+        "evt_6af4349c9354f6e1c9a6f77b",
+        "evt_6af4349d9354f6e1c9a6f788",
+        "evt_6af4349e9354f6e1c9a6f795",
+        "evt_6af4349e9354f6e1c9a6f7a2",
+        "evt_6af4349f9354f6e1c9a6f7af",
+        "evt_6af4349f9354f6e1c9a6f7bc",
+        "evt_6af434a09354f6e1c9a6f7c9",
+        "evt_6af434a19354f6e1c9a6f7d6",
+        "evt_6af434a19354f6e1c9a6f7e3",
+        "evt_6af434a29354f6e1c9a6f7f0",
+        "evt_6af434a29354f6e1c9a6f7fd",
+        "evt_6af434a39354f6e1c9a6f80a",
+        "evt_6af434a49354f6e1c9a6f817",
+        "evt_6af434a49354f6e1c9a6f824",
+        "evt_6af434a59354f6e1c9a6f831",
+        "evt_6af434a59354f6e1c9a6f83e",
+        "evt_6af434a69354f6e1c9a6f84b",
+        "evt_6af434a69354f6e1c9a6f858",
+        "evt_6af434a79354f6e1c9a6f865",
+        "evt_6af434a89354f6e1c9a6f872",
+        "evt_6af434a89354f6e1c9a6f87f",
+        "evt_6af434a99354f6e1c9a6f88c",
+        "evt_6af434a99354f6e1c9a6f899",
+        "evt_6af434aa9354f6e1c9a6f8a6",
+        "evt_6af434ab9354f6e1c9a6f8b3",
+        "evt_6af434ab9354f6e1c9a6f8c0",
+        "evt_6af434ac9354f6e1c9a6f8cd",
+        "evt_6af434ac9354f6e1c9a6f8da",
+        "evt_6af434ad9354f6e1c9a6f8e7",
+        "evt_6af434ae9354f6e1c9a6f8f4",
+        "evt_6af434ae9354f6e1c9a6f901",
+        "evt_6af434af9354f6e1c9a6f90e",
+        "evt_6af434af9354f6e1c9a6f91b",
+        "evt_6af434b09354f6e1c9a6f928",
+        "evt_6af434b19354f6e1c9a6f935",
+        "evt_6af434b19354f6e1c9a6f942",
+        "evt_6af434b29354f6e1c9a6f94f",
+        "evt_6af434b29354f6e1c9a6f95c",
+        "evt_6af434b39354f6e1c9a6f969",
+        "evt_6af434b49354f6e1c9a6f976",
+        "evt_6af434b49354f6e1c9a6f983",
+        "evt_6af434b59354f6e1c9a6f990",
+        "evt_6af434b59354f6e1c9a6f99d",
+        "evt_6af434b69354f6e1c9a6f9aa",
+        "evt_6af434b69354f6e1c9a6f9b7",
+        "evt_6af434b79354f6e1c9a6f9c4",
+        "evt_6af434b79354f6e1c9a6f9d1",
+        "evt_6af434b89354f6e1c9a6f9de",
+        "evt_6af434b99354f6e1c9a6f9eb",
+        "evt_6af434b99354f6e1c9a6f9f8",
+        "evt_6af434ba9354f6e1c9a6fa05",
+        "evt_6af434ba9354f6e1c9a6fa12",
+        "evt_6af434bb9354f6e1c9a6fa1f",
+        "evt_6af434bb9354f6e1c9a6fa2c",
+        "evt_6af434bc9354f6e1c9a6fa39",
+        "evt_6af434bd9354f6e1c9a6fa46",
+        "evt_6af434bd9354f6e1c9a6fa53",
+        "evt_6af434be9354f6e1c9a6fa60",
+        "evt_6af434be9354f6e1c9a6fa6d",
+        "evt_6af434bf9354f6e1c9a6fa7a",
+        "evt_6af434bf9354f6e1c9a6fa87",
+        "evt_6af434c09354f6e1c9a6fa94",
+        "evt_6af434c19354f6e1c9a6faa1",
+        "evt_6af434c19354f6e1c9a6faae",
+        "evt_6af434c29354f6e1c9a6fabb",
+        "evt_6af434c29354f6e1c9a6fac8",
+        "evt_6af434c39354f6e1c9a6fad5",
+        "evt_6af434c49354f6e1c9a6fae2",
+        "evt_6af434c49354f6e1c9a6faef",
+        "evt_6af434c59354f6e1c9a6fafc",
+        "evt_6af434c69354f6e1c9a6fb09",
+        "evt_6af434c69354f6e1c9a6fb16",
+        "evt_6af434c79354f6e1c9a6fb23",
+        "evt_6af434c89354f6e1c9a6fb30",
+        "evt_6af434c89354f6e1c9a6fb3d",
+        "evt_6af434c99354f6e1c9a6fb4a",
+        "evt_6af434c99354f6e1c9a6fb57",
+        "evt_6af434ca9354f6e1c9a6fb64",
+        "evt_6af434cb9354f6e1c9a6fb71",
+        "evt_6af434cb9354f6e1c9a6fb7e",
+        "evt_6af434cc9354f6e1c9a6fb8b",
+        "evt_6af434cc9354f6e1c9a6fb98",
+        "evt_6af434cd9354f6e1c9a6fba5",
+        "evt_6af434ce9354f6e1c9a6fbb2",
+        "evt_6af434ce9354f6e1c9a6fbbf",
+        "evt_6af434cf9354f6e1c9a6fbcc",
+        "evt_6af434cf9354f6e1c9a6fbd9",
+        "evt_6af434d09354f6e1c9a6fbe6",
+        "evt_6af434d19354f6e1c9a6fbf3",
+        "evt_6af434d19354f6e1c9a6fc00",
+        "evt_6af434d29354f6e1c9a6fc0d",
+        "evt_6af434d29354f6e1c9a6fc1a",
+        "evt_6af434d39354f6e1c9a6fc27",
+        "evt_6af434d49354f6e1c9a6fc34",
+        "evt_6af434d49354f6e1c9a6fc41",
+        "evt_6af434d59354f6e1c9a6fc4e",
+        "evt_6af434d69354f6e1c9a6fc5b",
+        "evt_6af434d69354f6e1c9a6fc68",
+        "evt_6af434d79354f6e1c9a6fc75",
+        "evt_6af434d89354f6e1c9a6fc82",
+        "evt_6af434d89354f6e1c9a6fc8f",
+        "evt_6af434d99354f6e1c9a6fc9c",
+        "evt_6af434d99354f6e1c9a6fca9",
+        "evt_6af435039354f6e1c9a7002a",
+        "evt_6af435049354f6e1c9a70037",
+        "evt_6af435049354f6e1c9a70044",
+        "evt_6af435059354f6e1c9a70051",
+        "evt_6af435069354f6e1c9a7005e",
+        "evt_6af435069354f6e1c9a7006b",
+        "evt_6af435079354f6e1c9a70078",
+        "evt_6af435079354f6e1c9a70085",
+        "evt_6af435089354f6e1c9a70092",
+        "evt_6af435089354f6e1c9a7009f",
+        "evt_6af435099354f6e1c9a700ac",
+        "evt_6af4350a9354f6e1c9a700b9",
+        "evt_6af4350a9354f6e1c9a700c6",
+        "evt_6af4350b9354f6e1c9a700d3",
+        "evt_6af4350b9354f6e1c9a700e0",
+        "evt_6af4350c9354f6e1c9a700ed",
+        "evt_6af4350c9354f6e1c9a700fa",
+        "evt_6af4350d9354f6e1c9a70107",
+        "evt_6af4350e9354f6e1c9a70114",
+        "evt_6af4350e9354f6e1c9a70121",
+        "evt_6af4350f9354f6e1c9a7012e",
+        "evt_6af4350f9354f6e1c9a7013b",
+        "evt_6af435109354f6e1c9a70148",
+        "evt_6af435109354f6e1c9a70155",
+        "evt_6af435119354f6e1c9a70162",
+        "evt_6af435129354f6e1c9a7016f",
+        "evt_6af435129354f6e1c9a7017c",
+        "evt_6af435139354f6e1c9a70189",
+        "evt_6af435139354f6e1c9a70196",
+        "evt_6af435149354f6e1c9a701a3",
+        "evt_6af435149354f6e1c9a701b0",
+        "evt_6af435159354f6e1c9a701bd",
+        "evt_6af435169354f6e1c9a701ca",
+        "evt_6af435169354f6e1c9a701d7",
+        "evt_6af435179354f6e1c9a701e4",
+        "evt_6af435179354f6e1c9a701f1",
+        "evt_6af435189354f6e1c9a701fe",
+        "evt_6af435199354f6e1c9a7020b",
+        "evt_6af435199354f6e1c9a70218",
+        "evt_6af4351a9354f6e1c9a70225",
+        "evt_6af4351a9354f6e1c9a70232",
+        "evt_6af4351b9354f6e1c9a7023f",
+        "evt_6af4351c9354f6e1c9a7024c",
+        "evt_6af4351c9354f6e1c9a70259",
+        "evt_6af4351d9354f6e1c9a70266",
+        "evt_6af4351d9354f6e1c9a70273",
+        "evt_6af4351e9354f6e1c9a70280",
+        "evt_6af4351e9354f6e1c9a7028d",
+        "evt_6af4351f9354f6e1c9a7029a",
+        "evt_6af435209354f6e1c9a702a7",
+        "evt_6af435209354f6e1c9a702b4",
+        "evt_6af435219354f6e1c9a702c1",
+        "evt_6af435219354f6e1c9a702ce",
+        "evt_6af435229354f6e1c9a702db",
+        "evt_6af435229354f6e1c9a702e8",
+        "evt_6af435239354f6e1c9a702f5",
+        "evt_6af435249354f6e1c9a70302",
+        "evt_6af435249354f6e1c9a7030f",
+        "evt_6af435259354f6e1c9a7031c",
+        "evt_6af435269354f6e1c9a70329",
+        "evt_6af435269354f6e1c9a70336",
+        "evt_6af435279354f6e1c9a70343",
+        "evt_6af435279354f6e1c9a70350",
+        "evt_6af435289354f6e1c9a7035d",
+        "evt_6af435289354f6e1c9a7036a",
+        "evt_6af435299354f6e1c9a70377",
+        "evt_6af4352a9354f6e1c9a70384",
+        "evt_6af4352a9354f6e1c9a70391",
+        "evt_6af4352b9354f6e1c9a7039e",
+        "evt_6af4352b9354f6e1c9a703ab",
+        "evt_6af4352c9354f6e1c9a703b8",
+        "evt_6af4352c9354f6e1c9a703c5",
+        "evt_6af4352d9354f6e1c9a703d2",
+        "evt_6af4352d9354f6e1c9a703df",
+        "evt_6af4352e9354f6e1c9a703ec",
+        "evt_6af4352f9354f6e1c9a703f9",
+        "evt_6af4352f9354f6e1c9a70406",
+        "evt_6af435309354f6e1c9a70413",
+        "evt_6af435309354f6e1c9a70420",
+        "evt_6af435319354f6e1c9a7042d",
+        "evt_6af435329354f6e1c9a7043a",
+        "evt_6af435329354f6e1c9a70447",
+        "evt_6af435339354f6e1c9a70454",
+        "evt_6af435349354f6e1c9a70461",
+        "evt_6af435349354f6e1c9a7046e",
+        "evt_6af435359354f6e1c9a7047b",
+        "evt_6af435359354f6e1c9a70488",
+        "evt_6af435369354f6e1c9a70495",
+        "evt_6af435369354f6e1c9a704a2",
+        "evt_6af435379354f6e1c9a704af",
+        "evt_6af435389354f6e1c9a704bc",
+        "evt_6af435389354f6e1c9a704c9",
+        "evt_6af435399354f6e1c9a704d6",
+        "evt_6af435399354f6e1c9a704e3",
+        "evt_6af4353a9354f6e1c9a704f0",
+        "evt_6af4353b9354f6e1c9a704fd",
+        "evt_6af4353b9354f6e1c9a7050a",
+        "evt_6af4353c9354f6e1c9a70517",
+        "evt_6af4353c9354f6e1c9a70524",
+        "evt_6af4353d9354f6e1c9a70531",
+        "evt_6af4353e9354f6e1c9a7053e",
+        "evt_6af4353e9354f6e1c9a7054b",
+        "evt_6af4353f9354f6e1c9a70558",
+        "evt_6af4353f9354f6e1c9a70565",
+        "evt_6af435409354f6e1c9a70572",
+        "evt_6af435409354f6e1c9a7057f",
+        "evt_6af435419354f6e1c9a7058c",
+        "evt_6af435429354f6e1c9a70599",
+        "evt_6af435429354f6e1c9a705a6",
+        "evt_6af435439354f6e1c9a705b3",
+        "evt_6af435449354f6e1c9a705c0",
+        "evt_6af435449354f6e1c9a705cd",
+        "evt_6af435459354f6e1c9a705da",
+        "evt_6af435469354f6e1c9a705e7",
+        "evt_6af435469354f6e1c9a705f4",
+        "evt_6af435479354f6e1c9a70601",
+        "evt_6af435479354f6e1c9a7060e",
+        "evt_6af435489354f6e1c9a7061b",
+        "evt_6af435489354f6e1c9a70628",
+        "evt_6af435499354f6e1c9a70635",
+        "evt_6af4354a9354f6e1c9a70642",
+        "evt_6af4354a9354f6e1c9a7064f",
+        "evt_6af4354b9354f6e1c9a7065c",
+        "evt_6af4354b9354f6e1c9a70669",
+        "evt_6af4354c9354f6e1c9a70676",
+        "evt_6af4354d9354f6e1c9a70683",
+        "evt_6af4354d9354f6e1c9a70690",
+        "evt_6af4354e9354f6e1c9a7069d",
+        "evt_6af4354e9354f6e1c9a706aa",
+        "evt_6af4354f9354f6e1c9a706b7",
+        "evt_6af435509354f6e1c9a706c4",
+        "evt_6af435509354f6e1c9a706d1",
+        "evt_6af435519354f6e1c9a706de",
+        "evt_6af435519354f6e1c9a706eb",
+        "evt_6af435529354f6e1c9a706f8",
+        "evt_6af435529354f6e1c9a70705",
+        "evt_6af435539354f6e1c9a70712",
+        "evt_6af435549354f6e1c9a7071f",
+        "evt_6af435549354f6e1c9a7072c",
+        "evt_6af435559354f6e1c9a70739",
+        "evt_6af435559354f6e1c9a70746",
+        "evt_6af435569354f6e1c9a70753",
+        "evt_6af435579354f6e1c9a70760",
+        "evt_6af435579354f6e1c9a7076d",
+        "evt_6af435589354f6e1c9a7077a",
+        "evt_6af435589354f6e1c9a70787",
+        "evt_6af435599354f6e1c9a70794",
+        "evt_6af4355a9354f6e1c9a707a1",
+        "evt_6af4355a9354f6e1c9a707ae",
+        "evt_6af4355b9354f6e1c9a707bb",
+        "evt_6af4355b9354f6e1c9a707c8",
+        "evt_6af4355c9354f6e1c9a707d5",
+        "evt_6af4355c9354f6e1c9a707e2",
+        "evt_6af4355d9354f6e1c9a707ef",
+        "evt_6af4355e9354f6e1c9a707fc",
+        "evt_6af4355f9354f6e1c9a70809",
+        "evt_6af4355f9354f6e1c9a70816",
+        "evt_6af435609354f6e1c9a70823",
+        "evt_6af435609354f6e1c9a70830",
+        "evt_6af435619354f6e1c9a7083d",
+        "evt_6af435619354f6e1c9a7084a",
+        "evt_6af435629354f6e1c9a70857",
+        "evt_6af435639354f6e1c9a70864",
+        "evt_6af435639354f6e1c9a70871",
+        "evt_6af435649354f6e1c9a7087e",
+        "evt_6af435649354f6e1c9a7088b",
+        "evt_6af435659354f6e1c9a70898",
+        "evt_6af435659354f6e1c9a708a5",
+        "evt_6af435669354f6e1c9a708b2",
+        "evt_6af435679354f6e1c9a708bf",
+        "evt_6af435679354f6e1c9a708cc",
+        "evt_6af435689354f6e1c9a708d9",
+        "evt_6af435689354f6e1c9a708e6",
+        "evt_6af435699354f6e1c9a708f3",
+        "evt_6af4356a9354f6e1c9a70900",
+        "evt_6af4356a9354f6e1c9a7090d",
+        "evt_6af4356b9354f6e1c9a7091a",
+        "evt_6af4356b9354f6e1c9a70927",
+        "evt_6af4356c9354f6e1c9a70934",
+        "evt_6af4356d9354f6e1c9a70941",
+        "evt_6af4356d9354f6e1c9a7094e",
+        "evt_6af4356e9354f6e1c9a7095b",
+        "evt_6af4356e9354f6e1c9a70968"
+      ],
+      "routes": [
+        "/events/novogodnyaya-kvest-progulka-s-veduschim-modnoe-rassledovanie-v-kitai-gorode-moskva"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "b431f768-3b3a-4946-88b4-1dfb4fb9b6a8",
+      "slug": "novogodnyaya-kvest-shkola-volshebnika-v-hogvartse-ekaterinburg",
+      "url": "https://daibilet.ru/events/novogodnyaya-kvest-shkola-volshebnika-v-hogvartse-ekaterinburg",
+      "batch": 1,
+      "title": "🎄 Новогодняя квест-школа волшебника в Хогвартсе 🎄",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:05:37.969Z",
+      "eventIds": [
+        "evt_6ac8f80f02780d68bba54f11",
+        "evt_6ac8f81402780d68bba54f45",
+        "evt_6ac8f81102780d68bba54f1e",
+        "evt_6ac8f81302780d68bba54f38",
+        "evt_6ac8f81202780d68bba54f2b",
+        "evt_6ac8f81702780d68bba54f5f"
+      ],
+      "routes": [
+        "/events/novogodnyaya-kvest-shkola-volshebnika-v-hogvartse-ekaterinburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "946897cc-c2fb-4720-9a53-093f38fde33b",
+      "slug": "novogodnyaya-rezidenciya-treh-morozov-volzhskiy-volgogradskaya-oblast",
+      "url": "https://daibilet.ru/events/novogodnyaya-rezidenciya-treh-morozov-volzhskiy-volgogradskaya-oblast",
+      "batch": 1,
+      "title": "Новогодняя резиденция трех Морозов",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:05:43.229Z",
+      "eventIds": [
+        "evt_6adb918ca1edc508aafdf687",
+        "evt_6adb9192a1edc508aafdf6ef",
+        "evt_6adb9191a1edc508aafdf6e7",
+        "evt_6adb9191a1edc508aafdf6df",
+        "evt_6adb9190a1edc508aafdf6d7",
+        "evt_6adb9190a1edc508aafdf6cf",
+        "evt_6adb9190a1edc508aafdf6c7",
+        "evt_6adb918fa1edc508aafdf6bf",
+        "evt_6adb918fa1edc508aafdf6b7",
+        "evt_6adb918fa1edc508aafdf6af",
+        "evt_6adb918ea1edc508aafdf6a7",
+        "evt_6adb918ea1edc508aafdf69f",
+        "evt_6adb918da1edc508aafdf697",
+        "evt_6adb918da1edc508aafdf68f"
+      ],
+      "routes": [
+        "/events/novogodnyaya-rezidenciya-treh-morozov-volzhskiy-volgogradskaya-oblast"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "e2cb2ef3-2222-4f03-8aa6-3323ef280510",
+      "slug": "novyi-god-vokrug-sveta-volgograd",
+      "url": "https://daibilet.ru/events/novyi-god-vokrug-sveta-volgograd",
+      "batch": 1,
+      "title": "Новый Год Вокруг света",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:05:49.276Z",
+      "eventIds": [
+        "evt_6adb8be00f5b6eaaa92d12bd",
+        "evt_6adb8be50f5b6eaaa92d1315",
+        "evt_6adb8be40f5b6eaaa92d130d",
+        "evt_6adb8be40f5b6eaaa92d1305",
+        "evt_6adb8be30f5b6eaaa92d12fd",
+        "evt_6adb8be30f5b6eaaa92d12ed",
+        "evt_6adb8be20f5b6eaaa92d12e5",
+        "evt_6adb8be20f5b6eaaa92d12dd",
+        "evt_6adb8be20f5b6eaaa92d12d5",
+        "evt_6adb8be10f5b6eaaa92d12cd",
+        "evt_6adb8be10f5b6eaaa92d12c5"
+      ],
+      "routes": [
+        "/events/novyi-god-vokrug-sveta-volgograd"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "2de85db8-0f81-4f63-bc84-7fdabf67d13e",
+      "slug": "organ-v-predchuvstvii-rozhdestva-sankt-peterburg",
+      "url": "https://daibilet.ru/events/organ-v-predchuvstvii-rozhdestva-sankt-peterburg",
+      "batch": 1,
+      "title": "Орган. В предчувствии Рождества",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:05:53.850Z",
+      "eventIds": [
+        "evt_6ab3fcaf05e572850d4e75b7",
+        "evt_6ab3fcb505e572850d4e7862"
+      ],
+      "routes": [
+        "/events/organ-v-predchuvstvii-rozhdestva-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "a43e2ba2-7157-47aa-a9a1-16e6fbc2e44b",
+      "slug": "zimnii-vintazhnyi-market-v-astorii-sankt-peterburg",
+      "url": "https://daibilet.ru/events/zimnii-vintazhnyi-market-v-astorii-sankt-peterburg",
+      "batch": 1,
+      "title": "Зимний винтажный маркет в «Астории»",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:05:56.077Z",
+      "eventIds": [
+        "evt_6ae70891ade97c95385e0d49"
+      ],
+      "routes": [
+        "/events/zimnii-vintazhnyi-market-v-astorii-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "04075485-a1c3-47d9-92e7-9d8b5b17657d",
+      "slug": "pisma-na-rozhdestvo-sankt-peterburg",
+      "url": "https://daibilet.ru/events/pisma-na-rozhdestvo-sankt-peterburg",
+      "batch": 1,
+      "title": "Письма на Рождество",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:06:00.900Z",
+      "eventIds": [
+        "evt_6ad16dc1f57f96e1e82d12e1",
+        "evt_6ad16dc2f57f96e1e82d12ee",
+        "evt_6ad16dc2f57f96e1e82d12fb",
+        "evt_6ad16dc3f57f96e1e82d1308",
+        "evt_6ad16dc4f57f96e1e82d1315",
+        "evt_6ad16dc5f57f96e1e82d1322",
+        "evt_6ad16dc5f57f96e1e82d132f",
+        "evt_6ad16dc6f57f96e1e82d133c",
+        "evt_6ad16dc7f57f96e1e82d1349",
+        "evt_6ad16dc8f57f96e1e82d1356",
+        "evt_6ad16dc8f57f96e1e82d1363",
+        "evt_6ad16dc9f57f96e1e82d1370",
+        "evt_6ad16dcaf57f96e1e82d137d",
+        "evt_6ad16dcbf57f96e1e82d138a",
+        "evt_6ad16dcbf57f96e1e82d1397",
+        "evt_6ad16dccf57f96e1e82d13a4",
+        "evt_6ad16dcdf57f96e1e82d13b1",
+        "evt_6ad16dcdf57f96e1e82d13be",
+        "evt_6ad16dcef57f96e1e82d13cb"
+      ],
+      "routes": [
+        "/events/pisma-na-rozhdestvo-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "3466fe8e-57fb-425c-ae55-a3cf1f40f9c3",
+      "slug": "rozhdestvo-v-nyu-iorke-mirovye-hity-i-zvezdy-brodveya-v-ispolnenii-arsena-mukendi-na-teploi-kryshe-moskva",
+      "url": "https://daibilet.ru/events/rozhdestvo-v-nyu-iorke-mirovye-hity-i-zvezdy-brodveya-v-ispolnenii-arsena-mukendi-na-teploi-kryshe-moskva",
+      "batch": 1,
+      "title": "Рождество в Нью Йорке / Мировые хиты и звезды Бродвея в исполнении Арсена Мукенди на теплой Крыше",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:06.724Z",
+      "eventIds": [
+        "evt_6af495774115f8ee5aec34d1"
+      ],
+      "routes": [
+        "/events/rozhdestvo-v-nyu-iorke-mirovye-hity-i-zvezdy-brodveya-v-ispolnenii-arsena-mukendi-na-teploi-kryshe-moskva"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "9c6c9b2f-dbf3-4cec-bce9-161928a95158",
+      "slug": "rozhdestvo-v-yaani-kirik-sankt-peterburg",
+      "url": "https://daibilet.ru/events/rozhdestvo-v-yaani-kirik-sankt-peterburg",
+      "batch": 1,
+      "title": "Рождество в Яани Кирик",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:07.325Z",
+      "eventIds": [
+        "evt_6adf48bd31bffc10a12d12bd",
+        "evt_6adf48c131bffc10a12d14e4"
+      ],
+      "routes": [
+        "/events/rozhdestvo-v-yaani-kirik-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "81121ac2-5815-4d9e-b884-fce07fa83f8e",
+      "slug": "rozhdestvo-vokrug-sveta-moskva",
+      "url": "https://daibilet.ru/events/rozhdestvo-vokrug-sveta-moskva",
+      "batch": 1,
+      "title": "Рождество вокруг света",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:12.672Z",
+      "eventIds": [
+        "evt_6aeb1e0ab8d6ddb721234f82",
+        "evt_6aeb1e09b8d6ddb721234f6b",
+        "evt_6aeb1e06b8d6ddb721234f26",
+        "evt_6aeb1e05b8d6ddb721234f0f",
+        "evt_6aeb1e04b8d6ddb721234ef8",
+        "evt_6aeb1e03b8d6ddb721234ee1",
+        "evt_6aeb1e02b8d6ddb721234eb3",
+        "evt_6aeb1e00b8d6ddb721234e85",
+        "evt_6aeb1dffb8d6ddb721234e6e",
+        "evt_6aeb1dfdb8d6ddb721234e40",
+        "evt_6aeb1dfcb8d6ddb721234e29",
+        "evt_6aeb1dfbb8d6ddb721234e12",
+        "evt_6aeb1df9b8d6ddb721234de4",
+        "evt_6aeb1df8b8d6ddb721234dcd",
+        "evt_6aeb1df7b8d6ddb721234db6",
+        "evt_6aeb1df5b8d6ddb721234d88",
+        "evt_6aeb1df4b8d6ddb721234d71",
+        "evt_6aeb1df3b8d6ddb721234d5a",
+        "evt_6aeb1df2b8d6ddb721234d43",
+        "evt_6aeb1df1b8d6ddb721234d2c"
+      ],
+      "routes": [
+        "/events/rozhdestvo-vokrug-sveta-moskva"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "ae75b1f5-64c3-4d6e-a097-e10af76a342a",
+      "slug": "rospis-sharov-novogodnyaya-igrushka-krasnoyarsk",
+      "url": "https://daibilet.ru/events/rospis-sharov-novogodnyaya-igrushka-krasnoyarsk",
+      "batch": 1,
+      "title": "Роспись шаров. Новогодняя игрушка",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:12.352Z",
+      "eventIds": [
+        "evt_6adddf2c267a99dfd4fdf6af",
+        "evt_6adddf2e267a99dfd4fdf6d7",
+        "evt_6adddf2e267a99dfd4fdf6df",
+        "evt_6adddf2e267a99dfd4fdf6e7",
+        "evt_6adddf2f267a99dfd4fdf6ef",
+        "evt_6adddf2f267a99dfd4fdf6f7",
+        "evt_6adddf2f267a99dfd4fdf6ff",
+        "evt_6adddf30267a99dfd4fdf707",
+        "evt_6adddf30267a99dfd4fdf70f",
+        "evt_6adddf30267a99dfd4fdf717",
+        "evt_6adddf31267a99dfd4fdf71f",
+        "evt_6adddf31267a99dfd4fdf727",
+        "evt_6adddf31267a99dfd4fdf72f",
+        "evt_6adddf32267a99dfd4fdf737",
+        "evt_6adddf32267a99dfd4fdf73f",
+        "evt_6adddf33267a99dfd4fdf747",
+        "evt_6adddf33267a99dfd4fdf74f",
+        "evt_6adddf33267a99dfd4fdf757",
+        "evt_6adddf34267a99dfd4fdf75f",
+        "evt_6adddf34267a99dfd4fdf767",
+        "evt_6adddf34267a99dfd4fdf76f",
+        "evt_6adddf35267a99dfd4fdf777",
+        "evt_6adddf35267a99dfd4fdf77f",
+        "evt_6adddf35267a99dfd4fdf787",
+        "evt_6adddf36267a99dfd4fdf78f",
+        "evt_6adddf36267a99dfd4fdf797",
+        "evt_6adddf37267a99dfd4fdf79f",
+        "evt_6adddf37267a99dfd4fdf7a7",
+        "evt_6adddf37267a99dfd4fdf7af"
+      ],
+      "routes": [
+        "/events/rospis-sharov-novogodnyaya-igrushka-krasnoyarsk"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "c6dbc76a-569d-48db-8c6c-703a4e772f40",
+      "slug": "santa-uspeet-ne-uchite-deda-sankt-peterburg",
+      "url": "https://daibilet.ru/events/santa-uspeet-ne-uchite-deda-sankt-peterburg",
+      "batch": 1,
+      "title": "Санта успеет?! Не учите деда",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:15.805Z",
+      "eventIds": [
+        "evt_6ad14c1e1bec5175cc64e0d0",
+        "evt_6ad14c1f1bec5175cc64e0dd",
+        "evt_6ad14c1f1bec5175cc64e0ea",
+        "evt_6ad14c201bec5175cc64e0f7",
+        "evt_6ad14c211bec5175cc64e104",
+        "evt_6ad14c211bec5175cc64e111",
+        "evt_6ad154515cdeec88ee64e0bb",
+        "evt_6ad154515cdeec88ee64e0c8",
+        "evt_6ad154525cdeec88ee64e0d5",
+        "evt_6ad163e6d101a366042d12b8",
+        "evt_6ad163e7d101a366042d12c5",
+        "evt_6ad163e8d101a366042d12d2",
+        "evt_6ad163e8d101a366042d12df",
+        "evt_6ad163ead101a366042d1306",
+        "evt_6ad163ebd101a366042d1313",
+        "evt_6ad163ecd101a366042d1320",
+        "evt_6ad163ecd101a366042d132d",
+        "evt_6ad163edd101a366042d133a",
+        "evt_6ad163eed101a366042d1347",
+        "evt_6ad163efd101a366042d1354",
+        "evt_6ad163f0d101a366042d1361",
+        "evt_6ad163f1d101a366042d137b",
+        "evt_6ad163f2d101a366042d1388",
+        "evt_6ad163f3d101a366042d1395",
+        "evt_6ad16906f57f96e1e82d12b8",
+        "evt_6ad16908f57f96e1e82d12c5",
+        "evt_6ad17b349372d479292d12c5",
+        "evt_6ad17b359372d479292d12d2",
+        "evt_6ad17b359372d479292d12df",
+        "evt_6ada18852f461ded20fdf6e9"
+      ],
+      "routes": [
+        "/events/santa-uspeet-ne-uchite-deda-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "87e22e23-35e5-46d0-bbbb-b8fe9b42949b",
+      "slug": "schelkunchik-novogodnyaya-muzykalnaya-skazka-s-pesochnoi-animaciei-moskva",
+      "url": "https://daibilet.ru/events/schelkunchik-novogodnyaya-muzykalnaya-skazka-s-pesochnoi-animaciei-moskva",
+      "batch": 1,
+      "title": "Щелкунчик. Новогодняя музыкальная сказка с песочной анимацией",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:27.333Z",
+      "eventIds": [
+        "evt_6ae5a3a09f47acd341518ab6",
+        "evt_6ae5a3a19f47acd341518ba0"
+      ],
+      "routes": [
+        "/events/schelkunchik-novogodnyaya-muzykalnaya-skazka-s-pesochnoi-animaciei-moskva"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "4ed941ee-5c14-4b7d-88bf-f196213f6897",
+      "slug": "sergei-voronov-the-crossroadz-prednovogodnii-blyuz-rok-moskva",
+      "url": "https://daibilet.ru/events/sergei-voronov-the-crossroadz-prednovogodnii-blyuz-rok-moskva",
+      "batch": 1,
+      "title": "СЕРГЕЙ ВОРОНОВ & THE CROSSROADZ: «ПРЕДНОВОГОДНИЙ БЛЮЗ-РОК»",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:29.848Z",
+      "eventIds": [
+        "evt_6adce46b7fdaa10dcd64893b"
+      ],
+      "routes": [
+        "/events/sergei-voronov-the-crossroadz-prednovogodnii-blyuz-rok-moskva"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "d52e2d41-2b96-497a-b9dd-8af226d5503d",
+      "slug": "santa-uspeet-poka-my-verim-premera-sankt-peterburg",
+      "url": "https://daibilet.ru/events/santa-uspeet-poka-my-verim-premera-sankt-peterburg",
+      "batch": 1,
+      "title": "Санта успеет?! Пока мы верим (ПРЕМЬЕРА)",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:26.024Z",
+      "eventIds": [
+        "evt_6ad1497501ab3cf2e92d12dc",
+        "evt_6ad1497601ab3cf2e92d12e9",
+        "evt_6ad1497701ab3cf2e92d12f6",
+        "evt_6ad1497701ab3cf2e92d1303",
+        "evt_6ad15eb148ba0c38ad2d12ba",
+        "evt_6ad15eb248ba0c38ad2d12c7",
+        "evt_6ad15eb348ba0c38ad2d12e1",
+        "evt_6ad15eb448ba0c38ad2d12ee",
+        "evt_6ad15eb548ba0c38ad2d12fb",
+        "evt_6ad15eb748ba0c38ad2d1322",
+        "evt_6ad15eb748ba0c38ad2d132f",
+        "evt_6ad15eb848ba0c38ad2d133c",
+        "evt_6ad15eb948ba0c38ad2d1349",
+        "evt_6ad15eba48ba0c38ad2d1356",
+        "evt_6ad15eba48ba0c38ad2d1363",
+        "evt_6ad15ebb48ba0c38ad2d1370",
+        "evt_6ad15ebd48ba0c38ad2d1397",
+        "evt_6ad15ebe48ba0c38ad2d13a4",
+        "evt_6ad167d8ed034afbcb64e0d8",
+        "evt_6ad1752db9123a66bc2d12b8",
+        "evt_6ad1752eb9123a66bc2d12c5",
+        "evt_6ad1752eb9123a66bc2d12d2",
+        "evt_6ad1752fb9123a66bc2d12df",
+        "evt_6ad17530b9123a66bc2d12ec",
+        "evt_6ad17530b9123a66bc2d12f9",
+        "evt_6ad17531b9123a66bc2d1306",
+        "evt_6ad17532b9123a66bc2d1313",
+        "evt_6ad17532b9123a66bc2d1320",
+        "evt_6ad17533b9123a66bc2d132d",
+        "evt_6ad17534b9123a66bc2d133a",
+        "evt_6ad17534b9123a66bc2d1347"
+      ],
+      "routes": [
+        "/events/santa-uspeet-poka-my-verim-premera-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "1db4c763-b585-4ba7-b6b2-90c5b84dd8c2",
+      "slug": "sinii-traktor-spaset-novyi-god-losino-petrovskiy",
+      "url": "https://daibilet.ru/events/sinii-traktor-spaset-novyi-god-losino-petrovskiy",
+      "batch": 1,
+      "title": "Синий Трактор спасёт Новый год!",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:31.832Z",
+      "eventIds": [
+        "evt_6aef9aac6f8451754723f59e"
+      ],
+      "routes": [
+        "/events/sinii-traktor-spaset-novyi-god-losino-petrovskiy"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "75d5426b-6b8a-4b9f-bd93-54d4c52f5e11",
+      "slug": "santa-uspeet-poka-pekutsya-pryaniki-sankt-peterburg",
+      "url": "https://daibilet.ru/events/santa-uspeet-poka-pekutsya-pryaniki-sankt-peterburg",
+      "batch": 1,
+      "title": "Санта успеет?! Пока пекутся пряники",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:27.391Z",
+      "eventIds": [
+        "evt_6ad145424f6769f33864e0b1",
+        "evt_6ad145434f6769f33864e0be",
+        "evt_6ad145444f6769f33864e0cb",
+        "evt_6ad1519ab715d453a964e0b8",
+        "evt_6ad1519bb715d453a964e0d2",
+        "evt_6ad1519cb715d453a964e0df",
+        "evt_6ad1519db715d453a964e0f9",
+        "evt_6ad1519eb715d453a964e106",
+        "evt_6ad1519eb715d453a964e113",
+        "evt_6ad1577ab31783fd0c2d12b8",
+        "evt_6ad1577bb31783fd0c2d12c5",
+        "evt_6ad1577bb31783fd0c2d12d2",
+        "evt_6ad1577cb31783fd0c2d12df",
+        "evt_6ad1577db31783fd0c2d12ec",
+        "evt_6ad1577eb31783fd0c2d12f9",
+        "evt_6ad179698e060f836a64e0ae",
+        "evt_6ad1796a8e060f836a64e0bb",
+        "evt_6ad1796b8e060f836a64e0c8",
+        "evt_6ad1796c8e060f836a64e0d5",
+        "evt_6ad1796c8e060f836a64e0e2",
+        "evt_6ad1796d8e060f836a64e0ef",
+        "evt_6ad179708e060f836a64e123",
+        "evt_6ad179708e060f836a64e130",
+        "evt_6ada174b225f382fe7fdf6b6",
+        "evt_6ada174d225f382fe7fdf6c3",
+        "evt_6ada174e225f382fe7fdf6d0"
+      ],
+      "routes": [
+        "/events/santa-uspeet-poka-pekutsya-pryaniki-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "e7ac0f6d-0ca0-409a-87d2-3029d0396076",
+      "slug": "tatarskii-novyi-god-v-suleiman-palas-kazan",
+      "url": "https://daibilet.ru/events/tatarskii-novyi-god-v-suleiman-palas-kazan",
+      "batch": 1,
+      "title": "Татарский Новый год в Сулейман Палас",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:34.916Z",
+      "eventIds": [
+        "evt_6ae9d921007a310bd9ccb338"
+      ],
+      "routes": [
+        "/events/tatarskii-novyi-god-v-suleiman-palas-kazan"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "06d1390f-576b-4a04-a2e6-32be8ebdb4e1",
+      "slug": "ameli-rahil-zimnii-koncert-moskva",
+      "url": "https://daibilet.ru/events/ameli-rahil-zimnii-koncert-moskva",
+      "batch": 1,
+      "title": "Амели Рахиль. Зимний концерт.",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:37.172Z",
+      "eventIds": [
+        "evt_6ac25fcd932915fb8be4d6ad"
+      ],
+      "routes": [
+        "/events/ameli-rahil-zimnii-koncert-moskva"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "c52c756f-f235-4aff-ae3c-12930420e209",
+      "slug": "taina-gospozhi-svechi-novogodnii-karnaval-moskva",
+      "url": "https://daibilet.ru/events/taina-gospozhi-svechi-novogodnii-karnaval-moskva",
+      "batch": 1,
+      "title": "ТАЙНА ГОСПОЖИ СВЕЧИ. НОВОГОДНИЙ КАРНАВАЛ",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:35.001Z",
+      "eventIds": [
+        "evt_6ad91cbe858fa072f9fdf687",
+        "evt_6ad91cbf858fa072f9fdf69e",
+        "evt_6ad91cc0858fa072f9fdf6b5",
+        "evt_6ad91cc1858fa072f9fdf6cc",
+        "evt_6ad91cc3858fa072f9fdf6e3",
+        "evt_6ad91cc4858fa072f9fdf6fa",
+        "evt_6ad91cc5858fa072f9fdf711",
+        "evt_6ad91cc6858fa072f9fdf728"
+      ],
+      "routes": [
+        "/events/taina-gospozhi-svechi-novogodnii-karnaval-moskva"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "4595489e-5363-45db-8ea6-faefffce4b32",
+      "slug": "schelkunchik-muzykalnaya-skazka-dlya-chteca-baleta-i-simfonicheskogo-orkestra-sankt-peterburg",
+      "url": "https://daibilet.ru/events/schelkunchik-muzykalnaya-skazka-dlya-chteca-baleta-i-simfonicheskogo-orkestra-sankt-peterburg",
+      "batch": 2,
+      "title": "«Щелкунчик». Музыкальная сказка для чтеца, балета и симфонического оркестра.",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:39.285Z",
+      "eventIds": [
+        "evt_6af4bbbd6b64f4c71aa6f292"
+      ],
+      "routes": [
+        "/events/schelkunchik-muzykalnaya-skazka-dlya-chteca-baleta-i-simfonicheskogo-orkestra-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "476ec6c2-a3d0-45bf-b171-88c6e9befa04",
+      "slug": "07-01-chernyi-obelisk-rozhdestvenskaya-akustika-action-spb-sankt-peterburg",
+      "url": "https://daibilet.ru/events/07-01-chernyi-obelisk-rozhdestvenskaya-akustika-action-spb-sankt-peterburg",
+      "batch": 2,
+      "title": "07.01 - Черный Обелиск | Рождественская акустика - Action (СПб)",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:39.989Z",
+      "eventIds": [
+        "evt_6abda41cf818abbc1e84a093"
+      ],
+      "routes": [
+        "/events/07-01-chernyi-obelisk-rozhdestvenskaya-akustika-action-spb-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "e15a96ae-ef27-4270-8b34-23070ae1dc58",
+      "slug": "25-12-rok-elka-cokol-spb-sankt-peterburg",
+      "url": "https://daibilet.ru/events/25-12-rok-elka-cokol-spb-sankt-peterburg",
+      "batch": 2,
+      "title": "25.12 - Рок Ёлка - Цоколь (СПб)",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:40.970Z",
+      "eventIds": [
+        "evt_6aedd5041d4abec6585410bc"
+      ],
+      "routes": [
+        "/events/25-12-rok-elka-cokol-spb-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "6aaf45a3-cd6d-4622-8eed-840a665b7d93",
+      "slug": "tomket-prednovogodnii-otryv-moskva",
+      "url": "https://daibilet.ru/events/tomket-prednovogodnii-otryv-moskva",
+      "batch": 2,
+      "title": "Томкэт. Предновогодний отрыв",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:41.626Z",
+      "eventIds": [
+        "evt_6aeccc05d0d85e177fbc43fa"
+      ],
+      "routes": [
+        "/events/tomket-prednovogodnii-otryv-moskva"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "3a375f6e-3f3c-4316-9c4a-ce178e7e4470",
+      "slug": "schelkunchik-i-myshinyi-korol-pushkin",
+      "url": "https://daibilet.ru/events/schelkunchik-i-myshinyi-korol-pushkin",
+      "batch": 2,
+      "title": "«Щелкунчик и Мышиный король»",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:43.608Z",
+      "eventIds": [
+        "evt_6af4e354e70af9bdf0ab494f"
+      ],
+      "routes": [
+        "/events/schelkunchik-i-myshinyi-korol-pushkin"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "6234c2f2-e1cc-440b-a74b-841a2b2dec69",
+      "slug": "06-01-koshmar-pered-rozhdestvom-serdce-spb-sankt-peterburg",
+      "url": "https://daibilet.ru/events/06-01-koshmar-pered-rozhdestvom-serdce-spb-sankt-peterburg",
+      "batch": 2,
+      "title": "06.01 - Кошмар Перед Рождеством - Сердце (СПб)",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:45.291Z",
+      "eventIds": [
+        "evt_6ad7f410428e1bc981a41c4c"
+      ],
+      "routes": [
+        "/events/06-01-koshmar-pered-rozhdestvom-serdce-spb-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "bf8c0717-6b15-49f4-951b-30c9ffdb1641",
+      "slug": "anton-zaletaev-i-letnyi-sezon-predrozhdestvenskii-koncert-moskva",
+      "url": "https://daibilet.ru/events/anton-zaletaev-i-letnyi-sezon-predrozhdestvenskii-koncert-moskva",
+      "batch": 2,
+      "title": "АНТОН ЗАЛЕТАЕВ И «ЛЁТНЫЙ СЕЗОН»: «ПРЕДРОЖДЕСТВЕНСКИЙ КОНЦЕРТ»",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:46.744Z",
+      "eventIds": [
+        "evt_6af4a58be7248ae335e6e523"
+      ],
+      "routes": [
+        "/events/anton-zaletaev-i-letnyi-sezon-predrozhdestvenskii-koncert-moskva"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "db18a7e7-073a-4cba-9436-d825fb1e2e34",
+      "slug": "zimnii-festival-pianissimo-solnyi-koncert-valentina-malinina-v-bolshom-petergofskom-dvorce-sankt-peterburg",
+      "url": "https://daibilet.ru/events/zimnii-festival-pianissimo-solnyi-koncert-valentina-malinina-v-bolshom-petergofskom-dvorce-sankt-peterburg",
+      "batch": 2,
+      "title": "Зимний фестиваль Pianissimo. Сольный концерт Валентин Малинин в Большом петергофском дворце",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:47.232Z",
+      "eventIds": [
+        "evt_6a959f4548064a1bbd41fb06"
+      ],
+      "routes": [
+        "/events/zimnii-festival-pianissimo-solnyi-koncert-valentina-malinina-v-bolshom-petergofskom-dvorce-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "8eb6c0e8-7038-4180-b8e9-74992bc98504",
+      "slug": "vystavka-v-gorode-n-zima-novogodnie-istorii-iz-detstva-novosibirsk",
+      "url": "https://daibilet.ru/events/vystavka-v-gorode-n-zima-novogodnie-istorii-iz-detstva-novosibirsk",
+      "batch": 1,
+      "title": "Выставки «Новогодние миниатюры» и «В городе N зима»",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:43.597Z",
+      "eventIds": [
+        "evt_6ad9f236ab938e911efdf687",
+        "evt_6ad9f26fab938e911efdf95f",
+        "evt_6ad9f26dab938e911efdf94f",
+        "evt_6ad9f26dab938e911efdf947",
+        "evt_6ad9f26cab938e911efdf93f",
+        "evt_6ad9f26cab938e911efdf937",
+        "evt_6ad9f26aab938e911efdf92f",
+        "evt_6ad9f26aab938e911efdf927",
+        "evt_6ad9f268ab938e911efdf917",
+        "evt_6ad9f268ab938e911efdf90f",
+        "evt_6ad9f267ab938e911efdf907",
+        "evt_6ad9f266ab938e911efdf8ff",
+        "evt_6ad9f266ab938e911efdf8f7",
+        "evt_6ad9f265ab938e911efdf8ef",
+        "evt_6ad9f264ab938e911efdf8df",
+        "evt_6ad9f263ab938e911efdf8d7",
+        "evt_6ad9f262ab938e911efdf8cf",
+        "evt_6ad9f262ab938e911efdf8c7",
+        "evt_6ad9f261ab938e911efdf8bf",
+        "evt_6ad9f261ab938e911efdf8b7",
+        "evt_6ad9f260ab938e911efdf8a7",
+        "evt_6ad9f25fab938e911efdf89f",
+        "evt_6ad9f25eab938e911efdf897",
+        "evt_6ad9f25eab938e911efdf88f",
+        "evt_6ad9f25dab938e911efdf887",
+        "evt_6ad9f25dab938e911efdf87f",
+        "evt_6ad9f25bab938e911efdf86f",
+        "evt_6ad9f25bab938e911efdf867",
+        "evt_6ad9f25aab938e911efdf85f",
+        "evt_6ad9f259ab938e911efdf857",
+        "evt_6ad9f259ab938e911efdf84f",
+        "evt_6ad9f258ab938e911efdf847",
+        "evt_6ad9f254ab938e911efdf80f",
+        "evt_6ad9f253ab938e911efdf7ff",
+        "evt_6ad9f252ab938e911efdf7f7",
+        "evt_6ad9f252ab938e911efdf7ef",
+        "evt_6ad9f251ab938e911efdf7e7",
+        "evt_6ad9f250ab938e911efdf7df",
+        "evt_6ad9f250ab938e911efdf7d7",
+        "evt_6ad9f24fab938e911efdf7c7",
+        "evt_6ad9f24eab938e911efdf7bf",
+        "evt_6ad9f24dab938e911efdf7b7",
+        "evt_6ad9f24dab938e911efdf7af",
+        "evt_6ad9f24cab938e911efdf7a7",
+        "evt_6ad9f24bab938e911efdf79f",
+        "evt_6ad9f24aab938e911efdf78f",
+        "evt_6ad9f24aab938e911efdf787",
+        "evt_6ad9f249ab938e911efdf77f",
+        "evt_6ad9f248ab938e911efdf777",
+        "evt_6ad9f248ab938e911efdf76f",
+        "evt_6ad9f247ab938e911efdf767",
+        "evt_6ad9f246ab938e911efdf757",
+        "evt_6ad9f245ab938e911efdf74f",
+        "evt_6ad9f244ab938e911efdf747",
+        "evt_6ad9f244ab938e911efdf73f",
+        "evt_6ad9f243ab938e911efdf737",
+        "evt_6ad9f243ab938e911efdf72f",
+        "evt_6ad9f242ab938e911efdf71f",
+        "evt_6ad9f241ab938e911efdf717",
+        "evt_6ad9f240ab938e911efdf70f",
+        "evt_6ad9f240ab938e911efdf707",
+        "evt_6ad9f23fab938e911efdf6ff",
+        "evt_6ad9f23fab938e911efdf6f7",
+        "evt_6ad9f23dab938e911efdf6e7",
+        "evt_6ad9f23dab938e911efdf6df",
+        "evt_6ad9f23cab938e911efdf6d7",
+        "evt_6ad9f23bab938e911efdf6cf",
+        "evt_6ad9f23bab938e911efdf6c7",
+        "evt_6ad9f23aab938e911efdf6bf",
+        "evt_6ad9f239ab938e911efdf6af",
+        "evt_6ad9f238ab938e911efdf6a7",
+        "evt_6ad9f238ab938e911efdf69f",
+        "evt_6ad9f237ab938e911efdf697"
+      ],
+      "routes": [
+        "/events/vystavka-v-gorode-n-zima-novogodnie-istorii-iz-detstva-novosibirsk"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "7a8185e0-d438-4804-a8b8-676ff2b6485b",
+      "slug": "zimnii-festival-pianissimo-solnyi-koncert-maksim-li-v-bolshom-petergofskom-dvorce-sankt-peterburg",
+      "url": "https://daibilet.ru/events/zimnii-festival-pianissimo-solnyi-koncert-maksim-li-v-bolshom-petergofskom-dvorce-sankt-peterburg",
+      "batch": 2,
+      "title": "Зимний фестиваль Pianissimo. Сольный концерт Даниил Пронин в Большом петергофском дворце",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:49.457Z",
+      "eventIds": [
+        "evt_6a95a0abc2b56aff4a2e010e"
+      ],
+      "routes": [
+        "/events/zimnii-festival-pianissimo-solnyi-koncert-maksim-li-v-bolshom-petergofskom-dvorce-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "980eb6f8-f5ba-43a0-b6a1-5684136828b0",
+      "slug": "zimnii-festival-pianissimo-solnyi-koncert-dzhanluka-kristofaro-v-gosudarstvennom-ermitazhe-sankt-peterburg",
+      "url": "https://daibilet.ru/events/zimnii-festival-pianissimo-solnyi-koncert-dzhanluka-kristofaro-v-gosudarstvennom-ermitazhe-sankt-peterburg",
+      "batch": 2,
+      "title": "Зимний фестиваль Pianissimo. Сольный концерт Джанлука Кристофаро в Государственном Эрмитаже",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:50.191Z",
+      "eventIds": [
+        "evt_6a959358cc6507488cb13f41"
+      ],
+      "routes": [
+        "/events/zimnii-festival-pianissimo-solnyi-koncert-dzhanluka-kristofaro-v-gosudarstvennom-ermitazhe-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "3f030fe2-b5e2-41e2-8e88-b3fc7f908717",
+      "slug": "zimnii-festival-pianissimo-solnyi-koncert-alihan-kunduhov-v-bolshom-petergofskom-dvorce-sankt-peterburg",
+      "url": "https://daibilet.ru/events/zimnii-festival-pianissimo-solnyi-koncert-alihan-kunduhov-v-bolshom-petergofskom-dvorce-sankt-peterburg",
+      "batch": 2,
+      "title": "Зимний фестиваль Pianissimo. Сольный концерт Алихан Кундухов в Большом петергофском дворце",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:50.369Z",
+      "eventIds": [
+        "evt_6a96ea0935bfdcc3b65c41c6"
+      ],
+      "routes": [
+        "/events/zimnii-festival-pianissimo-solnyi-koncert-alihan-kunduhov-v-bolshom-petergofskom-dvorce-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "99b73b15-f55a-4c04-9873-876b6bb460ae",
+      "slug": "volshebstvo-rozhdestva-v-dorevolyucionnoi-rossii-moskva",
+      "url": "https://daibilet.ru/events/volshebstvo-rozhdestva-v-dorevolyucionnoi-rossii-moskva",
+      "batch": 2,
+      "title": "«Волшебство Рождества в дореволюционной России»",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:51.081Z",
+      "eventIds": [
+        "evt_6af381da7704ae9ff676e8de"
+      ],
+      "routes": [
+        "/events/volshebstvo-rozhdestva-v-dorevolyucionnoi-rossii-moskva"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "4efc231b-9be4-499c-be0f-8ed411da49d6",
+      "slug": "vay-muzykalnoe-loto-russkoe-novogodnee-karaoke-samara",
+      "url": "https://daibilet.ru/events/vay-muzykalnoe-loto-russkoe-novogodnee-karaoke-samara",
+      "batch": 2,
+      "title": "Ваy Музыкальное лото. Русское новогоднее караоке",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:51.723Z",
+      "eventIds": [
+        "evt_6af2f7d36e5418c584bcc8eb"
+      ],
+      "routes": [
+        "/events/vay-muzykalnoe-loto-russkoe-novogodnee-karaoke-samara"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "8b648331-7303-4941-ab02-494ab77961e5",
+      "slug": "vay-muzykalnoe-loto-novogodnyaya-sbornaya-elka-russkoe-90-e-i-00-e-samara",
+      "url": "https://daibilet.ru/events/vay-muzykalnoe-loto-novogodnyaya-sbornaya-elka-russkoe-90-e-i-00-e-samara",
+      "batch": 2,
+      "title": "Ваy Музыкальное лото. Новогодняя сборная ёлка. Русское 90-е и 00-е",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:51.850Z",
+      "eventIds": [
+        "evt_6af2f6e2e1ed328a2efe5d9f"
+      ],
+      "routes": [
+        "/events/vay-muzykalnoe-loto-novogodnyaya-sbornaya-elka-russkoe-90-e-i-00-e-samara"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "42b1d7fd-d344-43b4-ad66-ee39ec42c8b9",
+      "slug": "vay-muzykalnoe-loto-elka-iz-detstva-russkie-hity-90-h-i-00-h-samara",
+      "url": "https://daibilet.ru/events/vay-muzykalnoe-loto-elka-iz-detstva-russkie-hity-90-h-i-00-h-samara",
+      "batch": 2,
+      "title": "Ваy Музыкальное лото. Ёлка из детства: Русские хиты 90-х и 00-х",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:52.603Z",
+      "eventIds": [
+        "evt_6af2f4fb6e5418c584bcc503"
+      ],
+      "routes": [
+        "/events/vay-muzykalnoe-loto-elka-iz-detstva-russkie-hity-90-h-i-00-h-samara"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "442829e6-ed5f-4e7c-86e5-3c67f5c48ce3",
+      "slug": "v-ozhidanii-rozhdestva-sankt-peterburg",
+      "url": "https://daibilet.ru/events/v-ozhidanii-rozhdestva-sankt-peterburg",
+      "batch": 2,
+      "title": "В ожидании Рождества",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:53.114Z",
+      "eventIds": [
+        "evt_6af42fb7195d862048486847"
+      ],
+      "routes": [
+        "/events/v-ozhidanii-rozhdestva-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "c9fe43fe-4682-425e-a6df-deb11f21d886",
+      "slug": "v-ozhidanii-rozhdestva-moskva",
+      "url": "https://daibilet.ru/events/v-ozhidanii-rozhdestva-moskva",
+      "batch": 2,
+      "title": "«В ожидании Рождества»",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:53.257Z",
+      "eventIds": [
+        "evt_6adf2c70d4e6178626804f55"
+      ],
+      "routes": [
+        "/events/v-ozhidanii-rozhdestva-moskva"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "fc80912d-e93f-449f-92bd-d19b497c62a1",
+      "slug": "antiutrennik-novyi-god-beeez-pravil-7-sankt-peterburg",
+      "url": "https://daibilet.ru/events/antiutrennik-novyi-god-beeez-pravil-7-sankt-peterburg",
+      "batch": 2,
+      "title": "Антиутренник \"Новый год бЕЕЕз правил\" 7+",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:54.045Z",
+      "eventIds": [
+        "evt_6af71555ee8ce5108150c378"
+      ],
+      "routes": [
+        "/events/antiutrennik-novyi-god-beeez-pravil-7-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "06cb09c0-bf9a-41d4-b9d9-fd4d2f17d631",
+      "slug": "gruppa-rok-ostrova-nizhniy-novgorod",
+      "url": "https://daibilet.ru/events/gruppa-rok-ostrova-nizhniy-novgorod",
+      "batch": 2,
+      "title": "Группа РОК - ОСТРОВА. НОВОГОДНИЙ КОНЦЕРТ",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:54.566Z",
+      "eventIds": [
+        "evt_6addf38ba35339404cd9cc2c"
+      ],
+      "routes": [
+        "/events/gruppa-rok-ostrova-nizhniy-novgorod"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "90d63e76-96c9-4a43-a106-f26003958205",
+      "slug": "elka-novogodnee-shou-pod-dozhdem-koscheevo-carstvo-rostov-na-donu",
+      "url": "https://daibilet.ru/events/elka-novogodnee-shou-pod-dozhdem-koscheevo-carstvo-rostov-na-donu",
+      "batch": 2,
+      "title": "Ёлка под дождём - \"Кощеево царство\"",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:54.776Z",
+      "eventIds": [
+        "evt_69909067904d029c66caa1a7"
+      ],
+      "routes": [
+        "/events/elka-novogodnee-shou-pod-dozhdem-koscheevo-carstvo-rostov-na-donu"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "546d4c53-ce11-4477-8ebe-433252154986",
+      "slug": "dzhordzh-maikl-superhity-tribyut-shou-sankt-peterburg",
+      "url": "https://daibilet.ru/events/dzhordzh-maikl-superhity-tribyut-shou-sankt-peterburg",
+      "batch": 2,
+      "title": "\"ДЖОРДЖ МАЙКЛ. СУПЕРХИТЫ\" РОЖДЕСТВЕНСКИЙ ШОУ-КОНЦЕРТ",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:55.507Z",
+      "eventIds": [
+        "evt_6aef6920944c66a017d4c349"
+      ],
+      "routes": [
+        "/events/dzhordzh-maikl-superhity-tribyut-shou-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "2703fe82-9ee6-4429-ba72-6d188263e373",
+      "slug": "dzhaz-pered-rozhdestvom-kazan",
+      "url": "https://daibilet.ru/events/dzhaz-pered-rozhdestvom-kazan",
+      "batch": 2,
+      "title": "Джаз перед рождеством",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:56.001Z",
+      "eventIds": [
+        "evt_6aecbb0d5457d3867ade22ef"
+      ],
+      "routes": [
+        "/events/dzhaz-pered-rozhdestvom-kazan"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "a42535aa-1e54-4806-8b65-5f8600089281",
+      "slug": "dmitrii-veteran-chestnyh-i-chestnyi-kvartet-zimnii-bit-moskva",
+      "url": "https://daibilet.ru/events/dmitrii-veteran-chestnyh-i-chestnyi-kvartet-zimnii-bit-moskva",
+      "batch": 2,
+      "title": "ДМИТРИЙ «ВЕТЕРАН» ЧЕСТНЫХ И «ЧЕСТНЫЙ КВАРТЕТ»: «ЗИМНИЙ БИТ»",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:56.272Z",
+      "eventIds": [
+        "evt_6aedf9716986b5e6f3be77d2"
+      ],
+      "routes": [
+        "/events/dmitrii-veteran-chestnyh-i-chestnyi-kvartet-zimnii-bit-moskva"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "e7a8a15f-04d9-4e20-9f58-57e83f575842",
+      "slug": "detskaya-novogodnyaya-elka-vidnoe",
+      "url": "https://daibilet.ru/events/detskaya-novogodnyaya-elka-vidnoe",
+      "batch": 2,
+      "title": "Детская новогодняя елка",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:56.914Z",
+      "eventIds": [
+        "evt_6aec687e75ab5b92edffbf21"
+      ],
+      "routes": [
+        "/events/detskaya-novogodnyaya-elka-vidnoe"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "55ac23e4-9598-4655-822c-b7b9a5e4414d",
+      "slug": "denis-antipin-prazdnichnyi-stendap-koncert-6-dekabrya-21-30-sankt-peterburg",
+      "url": "https://daibilet.ru/events/denis-antipin-prazdnichnyi-stendap-koncert-6-dekabrya-21-30-sankt-peterburg",
+      "batch": 2,
+      "title": "Денис Антипин / Праздничный стендап-концерт / 6 декабря / 21:30",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:57.376Z",
+      "eventIds": [
+        "evt_6ae248fd8e5dae53a8e049a9"
+      ],
+      "routes": [
+        "/events/denis-antipin-prazdnichnyi-stendap-koncert-6-dekabrya-21-30-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "8d12c935-1e24-4581-bf05-6c266b3a5945",
+      "slug": "degustaciya-i-dzhaz-vina-rozhdestva-sankt-peterburg",
+      "url": "https://daibilet.ru/events/degustaciya-i-dzhaz-vina-rozhdestva-sankt-peterburg",
+      "batch": 2,
+      "title": "Дегустация и Джаз: ВИНА РОЖДЕСТВА",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:57.563Z",
+      "eventIds": [
+        "evt_6ae9953e389b14679526b352"
+      ],
+      "routes": [
+        "/events/degustaciya-i-dzhaz-vina-rozhdestva-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "d1f3b18e-e8da-44ea-9237-dce039b6b022",
+      "slug": "rozhdestvo-1920-h-tadorovsky-band-moskva",
+      "url": "https://daibilet.ru/events/rozhdestvo-1920-h-tadorovsky-band-moskva",
+      "batch": 2,
+      "title": "\"Рождество 1920-х\". Tadorovsky Band",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:58.313Z",
+      "eventIds": [
+        "evt_6ae117a94ed621eaf97a2917"
+      ],
+      "routes": [
+        "/events/rozhdestvo-1920-h-tadorovsky-band-moskva"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "a26c3269-118e-4933-84dc-8a2233028ac8",
+      "slug": "balet-schelkunchik-gatchina-2",
+      "url": "https://daibilet.ru/events/balet-schelkunchik-gatchina-2",
+      "batch": 2,
+      "title": "Балет «Щелкунчик»",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:58.861Z",
+      "eventIds": [
+        "evt_6ae2ec830b1f8b3bfd14debe"
+      ],
+      "routes": [
+        "/events/balet-schelkunchik-gatchina-2"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "b7218b5a-9ee8-46f5-8b50-bfb52a40b7cd",
+      "slug": "arteriya-prednovogodnii-koncert-moskva",
+      "url": "https://daibilet.ru/events/arteriya-prednovogodnii-koncert-moskva",
+      "batch": 2,
+      "title": "Артерия - Предновогодний концерт!",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:07:59.277Z",
+      "eventIds": [
+        "evt_6af5c4b5bfddfd904eb48c0f"
+      ],
+      "routes": [
+        "/events/arteriya-prednovogodnii-koncert-moskva"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "cf609f68-d671-4534-9535-d951edfbd44e",
+      "slug": "elka-s-fedulom-i-puzo-moskva",
+      "url": "https://daibilet.ru/events/elka-s-fedulom-i-puzo-moskva",
+      "batch": 2,
+      "title": "ЁЛКА С ФЕДУЛОМ И ПУЗО",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:08:00.064Z",
+      "eventIds": [
+        "evt_6af092ac1c5da5c19e05f7e5"
+      ],
+      "routes": [
+        "/events/elka-s-fedulom-i-puzo-moskva"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "e2e73e07-eee3-4cb3-8abc-25fbda5aac07",
+      "slug": "zimnii-vecher-v-usadbe-bethoven-chaikovskii-rahmaninov-moskva",
+      "url": "https://daibilet.ru/events/zimnii-vecher-v-usadbe-bethoven-chaikovskii-rahmaninov-moskva",
+      "batch": 3,
+      "title": "«ЗИМНИЙ ВЕЧЕР В УСАДЬБЕ. Бетховен • Чайковский • Рахманинов»",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:08:00.640Z",
+      "eventIds": [
+        "evt_6ae9ae57c507f90269eb7540"
+      ],
+      "routes": [
+        "/events/zimnii-vecher-v-usadbe-bethoven-chaikovskii-rahmaninov-moskva"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "c3b94f7b-352e-4200-a03d-2ee2a5f63494",
+      "slug": "rok-hity-mtv-shou-koncert-sankt-peterburg-4",
+      "url": "https://daibilet.ru/events/rok-hity-mtv-shou-koncert-sankt-peterburg-4",
+      "batch": 3,
+      "title": "\"РОК-ХИТЫ MTV\" НОВОГОДНИЙ ШОУ-КОНЦЕРТ",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:08:00.928Z",
+      "eventIds": [
+        "evt_6ad8d78b2f459f49470f80db"
+      ],
+      "routes": [
+        "/events/rok-hity-mtv-shou-koncert-sankt-peterburg-4"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "b3c16e95-52d0-4597-8d06-bdbce5fdc9e5",
+      "slug": "rozhdestvenskii-organ-v-maltiiskoi-kapelle-tihaya-noch-sankt-peterburg",
+      "url": "https://daibilet.ru/events/rozhdestvenskii-organ-v-maltiiskoi-kapelle-tihaya-noch-sankt-peterburg",
+      "batch": 3,
+      "title": "Рождественский орган в Мальтийской капелле. Тихая ночь",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:08:01.961Z",
+      "eventIds": [
+        "evt_6af463f061af5fd02b27e953"
+      ],
+      "routes": [
+        "/events/rozhdestvenskii-organ-v-maltiiskoi-kapelle-tihaya-noch-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "09fdf99f-3377-4e2b-85f5-c18d50767278",
+      "slug": "novogodnyaya-goths-undead-party-sankt-peterburg",
+      "url": "https://daibilet.ru/events/novogodnyaya-goths-undead-party-sankt-peterburg",
+      "batch": 3,
+      "title": "Новогодняя Goths Undead Party!",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:08:02.352Z",
+      "eventIds": [
+        "evt_6af2efda103c7bd39ccf73c0"
+      ],
+      "routes": [
+        "/events/novogodnyaya-goths-undead-party-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "4c611e18-d770-4373-ba8e-f4c694c71569",
+      "slug": "novogodnyaya-akustika-russkii-rok-smolensk",
+      "url": "https://daibilet.ru/events/novogodnyaya-akustika-russkii-rok-smolensk",
+      "batch": 3,
+      "title": "Новогодняя акустика. Русский Рок",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:08:02.800Z",
+      "eventIds": [
+        "evt_6af2753af97768c9fe39be9b"
+      ],
+      "routes": [
+        "/events/novogodnyaya-akustika-russkii-rok-smolensk"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "10910f83-e521-4188-90cb-80b1bfc80059",
+      "slug": "novogodnii-voskresnik-v-klube-universal-31-dekabrya-23-00-kaliningrad",
+      "url": "https://daibilet.ru/events/novogodnii-voskresnik-v-klube-universal-31-dekabrya-23-00-kaliningrad",
+      "batch": 3,
+      "title": "Новогодний VOSKRESNIK в клубе Universal / 31 Декабря 23:00 🪩🎄",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:08:03.903Z",
+      "eventIds": [
+        "evt_6aea020b95cb6b60d1c648f6"
+      ],
+      "routes": [
+        "/events/novogodnii-voskresnik-v-klube-universal-31-dekabrya-23-00-kaliningrad"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "dd9f4958-5de8-47eb-b9f9-95482d2f4a4e",
+      "slug": "novogodnii-spektakl-volshebstvo-elfa-sankt-peterburg",
+      "url": "https://daibilet.ru/events/novogodnii-spektakl-volshebstvo-elfa-sankt-peterburg",
+      "batch": 3,
+      "title": "Новогодний спектакль \"Волшебство Эльфа\"",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:08:04.271Z",
+      "eventIds": [
+        "evt_6af71484bca77fc3d5866fa8"
+      ],
+      "routes": [
+        "/events/novogodnii-spektakl-volshebstvo-elfa-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "985d8c8d-aa6e-410d-9e0c-3dcaaeaf8ce3",
+      "slug": "novogodnii-rok-ogonek-sankt-peterburg",
+      "url": "https://daibilet.ru/events/novogodnii-rok-ogonek-sankt-peterburg",
+      "batch": 3,
+      "title": "НОВОГОДНИЙ \"РОК-ОГОНЕК\" ШОУ-КОНЦЕРТ",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:08:04.700Z",
+      "eventIds": [
+        "evt_6aca37c721e9bea1f6051601"
+      ],
+      "routes": [
+        "/events/novogodnii-rok-ogonek-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "4d81e7a8-05b6-4e92-befe-d56f985f2ac7",
+      "slug": "novogodnii-perepoloh-moskva",
+      "url": "https://daibilet.ru/events/novogodnii-perepoloh-moskva",
+      "batch": 3,
+      "title": "Новогодний переполох",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:08:05.427Z",
+      "eventIds": [
+        "evt_6ae7bc4ac9c78f874067c1bd"
+      ],
+      "routes": [
+        "/events/novogodnii-perepoloh-moskva"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "0b3755ab-10df-4902-8e2c-ec901c7bb5fa",
+      "slug": "novogodnii-banket-s-razvlekatelnoi-programmoi-zimnyaya-noch-2027-vidnoe",
+      "url": "https://daibilet.ru/events/novogodnii-banket-s-razvlekatelnoi-programmoi-zimnyaya-noch-2027-vidnoe",
+      "batch": 3,
+      "title": "Новогодний банкет с развлекательной программой \"Зимняя ночь 2027\"",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:08:06.150Z",
+      "eventIds": [
+        "evt_6af2e7476ceafaa66eb2aa5e"
+      ],
+      "routes": [
+        "/events/novogodnii-banket-s-razvlekatelnoi-programmoi-zimnyaya-noch-2027-vidnoe"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "09e69fe6-23fa-41cb-827a-f26d578d46a7",
+      "slug": "novogodnii-malyshnik-pryanichnye-priklyucheniya-sankt-peterburg",
+      "url": "https://daibilet.ru/events/novogodnii-malyshnik-pryanichnye-priklyucheniya-sankt-peterburg",
+      "batch": 3,
+      "title": "Новогодний малышник \"Пряничные приключения\"",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:08:06.750Z",
+      "eventIds": [
+        "evt_6af712b619d1cd2826c3b8cd"
+      ],
+      "routes": [
+        "/events/novogodnii-malyshnik-pryanichnye-priklyucheniya-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "da9a10e1-ed5c-44b6-a70e-01c1ae0d9206",
+      "slug": "novogodnyaya-istoriya-s-rvi-meha-orkestrom-novosibirsk",
+      "url": "https://daibilet.ru/events/novogodnyaya-istoriya-s-rvi-meha-orkestrom-novosibirsk",
+      "batch": 3,
+      "title": "НОВОГОДНЯЯ ИСТОРИЯ С РВИ МЕХА ОРКЕСТРОМ",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:08:07.308Z",
+      "eventIds": [
+        "evt_6aef0f3e8c9253c2a094a26c"
+      ],
+      "routes": [
+        "/events/novogodnyaya-istoriya-s-rvi-meha-orkestrom-novosibirsk"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "acc8ee88-8bf7-426b-b6a3-654ed2562351",
+      "slug": "novogodnie-ogni-parizha-koncert-gruppy-eliseiskie-polya-moskva",
+      "url": "https://daibilet.ru/events/novogodnie-ogni-parizha-koncert-gruppy-eliseiskie-polya-moskva",
+      "batch": 3,
+      "title": "«Новогодние огни Парижа» — концерт группы «Елисейские поля»",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:08:07.864Z",
+      "eventIds": [
+        "evt_6ad3b9ce6c4833f1dc03b524"
+      ],
+      "routes": [
+        "/events/novogodnie-ogni-parizha-koncert-gruppy-eliseiskie-polya-moskva"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "c1a0e9f0-50ae-4646-9f71-38f9889bbadd",
+      "slug": "nepoyda-zimnii-blyuz-moskva",
+      "url": "https://daibilet.ru/events/nepoyda-zimnii-blyuz-moskva",
+      "batch": 3,
+      "title": "NEPOYDA: «ЗИМНИЙ БЛЮЗ»",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:08:08.684Z",
+      "eventIds": [
+        "evt_6afa0ebeac4fd1ec397a0285"
+      ],
+      "routes": [
+        "/events/nepoyda-zimnii-blyuz-moskva"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "3366937d-8ee9-4c5c-8de5-3a9093ebc512",
+      "slug": "granzh-zimnii-akusticheskii-koncert-dichotomia-flow-unplugged-sankt-peterburg",
+      "url": "https://daibilet.ru/events/granzh-zimnii-akusticheskii-koncert-dichotomia-flow-unplugged-sankt-peterburg",
+      "batch": 3,
+      "title": "ГРАНЖ — зимний акустический концерт | dichotomia flow unplugged",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:08:08.694Z",
+      "eventIds": [
+        "evt_6ae5d5dcb7bf2a0f7f076f3d"
+      ],
+      "routes": [
+        "/events/granzh-zimnii-akusticheskii-koncert-dichotomia-flow-unplugged-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "b8be3c4d-ce98-4f20-9322-fca7385083df",
+      "slug": "fortepiannoe-randevu-vladimir-rybakov-koncert-za-stolikami-s-furshetom-sankt-peterburg",
+      "url": "https://daibilet.ru/events/fortepiannoe-randevu-vladimir-rybakov-koncert-za-stolikami-s-furshetom-sankt-peterburg",
+      "batch": 3,
+      "title": "«Фортепианное рандеву» Владимир Рыбаков - новогодний концерт за столиками с фуршетом",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:08:09.341Z",
+      "eventIds": [
+        "evt_6aa2d9b5e4c6ce2775635a46"
+      ],
+      "routes": [
+        "/events/fortepiannoe-randevu-vladimir-rybakov-koncert-za-stolikami-s-furshetom-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "28e08d9e-f4f0-495c-b23d-13945a2591e4",
+      "slug": "diskoteka-90h-shou-koncert-sankt-peterburg-2",
+      "url": "https://daibilet.ru/events/diskoteka-90h-shou-koncert-sankt-peterburg-2",
+      "batch": 3,
+      "title": "НОВОГОДНЯЯ \"ДИСКОТЕКА 90Х\" ШОУ-КОНЦЕРТ.",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:08:10.188Z",
+      "eventIds": [
+        "evt_6aca3929a2f77e7e8006dab2"
+      ],
+      "routes": [
+        "/events/diskoteka-90h-shou-koncert-sankt-peterburg-2"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "ec489c93-ac5a-43c4-a88e-b523cd866a5f",
+      "slug": "eka-novogodnii-dzhaz-moskva",
+      "url": "https://daibilet.ru/events/eka-novogodnii-dzhaz-moskva",
+      "batch": 3,
+      "title": "ЭКА: «НОВОГОДНИЙ ДЖАЗ»",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:08:10.264Z",
+      "eventIds": [
+        "evt_6aede9df2d8bd0a155790d62"
+      ],
+      "routes": [
+        "/events/eka-novogodnii-dzhaz-moskva"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "d2b61b5e-144a-4b46-93e6-160e4e3962f3",
+      "slug": "dariel-rene-hot-havana-jazz-trio-kuba-latinoamerikanskii-novyi-god-moskva",
+      "url": "https://daibilet.ru/events/dariel-rene-hot-havana-jazz-trio-kuba-latinoamerikanskii-novyi-god-moskva",
+      "batch": 3,
+      "title": "DARIEL RENE & HOT HAVANA JAZZ TRIO (КУБА): ЛАТИНОАМЕРИКАНСКИЙ НОВЫЙ ГОД",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:08:10.873Z",
+      "eventIds": [
+        "evt_6afa119779712cb834930299"
+      ],
+      "routes": [
+        "/events/dariel-rene-hot-havana-jazz-trio-kuba-latinoamerikanskii-novyi-god-moskva"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "9d0c76c7-39c0-4d2a-96f3-249bcf37d064",
+      "slug": "cirque-du-commode-novyi-god-2027-sankt-peterburg",
+      "url": "https://daibilet.ru/events/cirque-du-commode-novyi-god-2027-sankt-peterburg",
+      "batch": 3,
+      "title": "CIRQUE DU COMMODE — НОВЫЙ ГОД 2027",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:08:11.501Z",
+      "eventIds": [
+        "evt_6aeb18f2bee723878199a819"
+      ],
+      "routes": [
+        "/events/cirque-du-commode-novyi-god-2027-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "c0332ffd-bf87-4712-a310-bd4c85e48809",
+      "slug": "betsy-novogodnee-shou-sankt-peterburg",
+      "url": "https://daibilet.ru/events/betsy-novogodnee-shou-sankt-peterburg",
+      "batch": 3,
+      "title": "Betsy - Новогоднее шоу",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:08:11.633Z",
+      "eventIds": [
+        "evt_6abcefdb38923b68a62fb9c3"
+      ],
+      "routes": [
+        "/events/betsy-novogodnee-shou-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "f15f4f7a-95cf-4a86-85c2-e00895f273dc",
+      "slug": "noch-pered-rozhdestvom-spektakl-koncert-sankt-peterburg",
+      "url": "https://daibilet.ru/events/noch-pered-rozhdestvom-spektakl-koncert-sankt-peterburg",
+      "batch": 3,
+      "title": "\"Ночь перед Рождеством\" спектакль-концерт",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:08:12.359Z",
+      "eventIds": [
+        "evt_6af2f312096100bb04fa9bae"
+      ],
+      "routes": [
+        "/events/noch-pered-rozhdestvom-spektakl-koncert-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "36ce6d1f-316c-414f-abf5-43e7077ca683",
+      "slug": "novogodnyaya-magiya-sankt-peterburg",
+      "url": "https://daibilet.ru/events/novogodnyaya-magiya-sankt-peterburg",
+      "batch": 3,
+      "title": "Новогодняя Магия",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:08:13.003Z",
+      "eventIds": [
+        "evt_6af711c0250a99d1b6b923f5"
+      ],
+      "routes": [
+        "/events/novogodnyaya-magiya-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "e7be2948-f45e-4a71-8f7c-bcd4bf763a99",
+      "slug": "novogodnyaya-noch-2027-muzykalnoe-loto-vecher-igr-v-moskve-s-31-dekabrya-na-1-yanvarya-galereya-moskva",
+      "url": "https://daibilet.ru/events/novogodnyaya-noch-2027-muzykalnoe-loto-vecher-igr-v-moskve-s-31-dekabrya-na-1-yanvarya-galereya-moskva",
+      "batch": 3,
+      "title": "Новогодняя ночь 2027: Музыкальное лото Вечер Игр в Москве с 31 декабря на 1 января — Галерея",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:08:13.154Z",
+      "eventIds": [
+        "evt_6ac6f07deca59fa8b8004b67"
+      ],
+      "routes": [
+        "/events/novogodnyaya-noch-2027-muzykalnoe-loto-vecher-igr-v-moskve-s-31-dekabrya-na-1-yanvarya-galereya-moskva"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "ba7ca074-0d20-436d-9d6e-b7cfe6dcc1b7",
+      "slug": "novogodnyaya-noch-2027-muzykalnoe-loto-vecher-igr-v-moskve-s-31-dekabrya-na-1-yanvarya-solo-moskva",
+      "url": "https://daibilet.ru/events/novogodnyaya-noch-2027-muzykalnoe-loto-vecher-igr-v-moskve-s-31-dekabrya-na-1-yanvarya-solo-moskva",
+      "batch": 3,
+      "title": "Новогодняя ночь 2027: Музыкальное лото Вечер Игр в Москве с 31 декабря на 1 января — Соло",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:08:13.923Z",
+      "eventIds": [
+        "evt_6af2ab91f0b9fbf0d45779dd"
+      ],
+      "routes": [
+        "/events/novogodnyaya-noch-2027-muzykalnoe-loto-vecher-igr-v-moskve-s-31-dekabrya-na-1-yanvarya-solo-moskva"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "6c39d3c8-f379-4551-9a26-f643e2c22ae6",
+      "slug": "rozhdestvenskii-dzhaz-novogodnii-koncert-s-dzhazovoi-zvezdoi-gabriel-biggest-na-teploi-panoramnoi-moskva-2",
+      "url": "https://daibilet.ru/events/rozhdestvenskii-dzhaz-novogodnii-koncert-s-dzhazovoi-zvezdoi-gabriel-biggest-na-teploi-panoramnoi-moskva-2",
+      "batch": 3,
+      "title": "\"Рождественский джаз\": Новогодний концерт с джазовой звездой Габриэль Биггест на теплой панорамной крыше!",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:08:14.426Z",
+      "eventIds": [
+        "evt_6aecfcf61a11db81f5e75c2d"
+      ],
+      "routes": [
+        "/events/rozhdestvenskii-dzhaz-novogodnii-koncert-s-dzhazovoi-zvezdoi-gabriel-biggest-na-teploi-panoramnoi-moskva-2"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "cbf49930-88e1-4642-bd18-cc8d2ec27585",
+      "slug": "rozhdestvenskii-2027-solnyi-koncert-evgeniya-egorova-v-sankt-peterburge-sankt-peterburg",
+      "url": "https://daibilet.ru/events/rozhdestvenskii-2027-solnyi-koncert-evgeniya-egorova-v-sankt-peterburge-sankt-peterburg",
+      "batch": 3,
+      "title": "\"Рождественский 2027\" - сольный концерт Евгения Егорова в Санкт-Петербурге",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:08:14.752Z",
+      "eventIds": [
+        "evt_6ad317c3e455ff26be914d00"
+      ],
+      "routes": [
+        "/events/rozhdestvenskii-2027-solnyi-koncert-evgeniya-egorova-v-sankt-peterburge-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "ca30b658-cf7e-4820-ada6-5632c4881a19",
+      "slug": "rozhdestvenskii-2027-solnyi-koncert-evgeniya-egorova-v-moskve-moskva",
+      "url": "https://daibilet.ru/events/rozhdestvenskii-2027-solnyi-koncert-evgeniya-egorova-v-moskve-moskva",
+      "batch": 3,
+      "title": "\"Рождественский 2027\" - сольный концерт Евгения Егорова в Москве",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:08:15.361Z",
+      "eventIds": [
+        "evt_6ad3161a562275264435e877"
+      ],
+      "routes": [
+        "/events/rozhdestvenskii-2027-solnyi-koncert-evgeniya-egorova-v-moskve-moskva"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "f55530c8-8ae2-44b9-b236-023124550c9c",
+      "slug": "rozhdestvenskie-istorii-vecher-novogodnih-saundtrekov-moskva",
+      "url": "https://daibilet.ru/events/rozhdestvenskie-istorii-vecher-novogodnih-saundtrekov-moskva",
+      "batch": 3,
+      "title": "Рождественские истории: вечер новогодних саундтреков",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:08:15.873Z",
+      "eventIds": [
+        "evt_6af87a653260e98e9ea7fd3f"
+      ],
+      "routes": [
+        "/events/rozhdestvenskie-istorii-vecher-novogodnih-saundtrekov-moskva"
+      ],
+      "linksAndRoutesChanged": false
+    },
+    {
+      "id": "d114e59c-93d9-4aa3-909a-2c5550c116c7",
+      "slug": "rozhdestvenskaya-skazka-fortepiannaya-misteriya-gofmana-prazdnichnaya-vecherinka-retroshou-s-furshetom-p-sankt-peterburg",
+      "url": "https://daibilet.ru/events/rozhdestvenskaya-skazka-fortepiannaya-misteriya-gofmana-prazdnichnaya-vecherinka-retroshou-s-furshetom-p-sankt-peterburg",
+      "batch": 3,
+      "title": "Рождественская сказка — Фортепианная мистерия Гофмана — праздничная вечеринка + Ретрошоу с фуршетом под рояль в Музее ностальгии на Невском",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-16T13:08:16.345Z",
+      "eventIds": [
+        "evt_6aa30b61e6de5c0d7c52cf62"
+      ],
+      "routes": [
+        "/events/rozhdestvenskaya-skazka-fortepiannaya-misteriya-gofmana-prazdnichnaya-vecherinka-retroshou-s-furshetom-p-sankt-peterburg"
+      ],
+      "linksAndRoutesChanged": false
+    }
+  ],
+  "counts": {
+    "applied": 90,
+    "indexable": 90,
+    "indexableEventPagesBefore": 1003,
+    "indexableEventPagesAfter": 1093
+  },
+  "linksRoutesSeoFieldsChanged": false
+}
