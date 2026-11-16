@@ -99,3 +99,21 @@ family. Keep the map as a checked-in artifact and retain legacy redirects.
   This proposal does not merge or rename those routes.
 - The event catalog and event pages remain on `/events` and `/events/{slug}`;
   their sitemap, canonical rules, links and IDs are outside this migration.
+
+## Production URL inventory (read-only, 2026-11-16)
+
+- Sitemap index currently exposes six child sitemaps, including `cities.xml`
+  and `landings.xml`.
+- `cities.xml` contains **66** `/cities/{slug}` hub URLs and **51**
+  `/places/c/{city}` place-catalog URLs.
+- Current one-segment roots in `static.xml` do not collide with those 66 hub
+  slugs.
+- There is one overlap with the first segment of existing city-scoped
+  landings: `moscow` (`/moscow/moscow-museums`). Keep that exact landing URL
+  resolvable. It does not conflict with the city home `/moscow`; the two-segment
+  resolver must match a registered city type only for the approved type slug
+  set and otherwise continue to the existing landing resolver.
+- Other current city-prefixed landing examples include
+  `/saint-petersburg/night-bridges`, `/saint-petersburg/spb-yards`, and
+  `/saint-petersburg/planetarium`. Preserve these exact routes unless a URL is
+  separately reviewed and included in the redirect map.
