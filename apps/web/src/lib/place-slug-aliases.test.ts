@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import {
+  PLACE_SLUG_ALIASES,
   placeSlugAliasHref,
   placeSlugAliasRedirects,
   resolvePlaceSlugAlias,
@@ -48,7 +49,7 @@ describe('place slug aliases', () => {
     assert.equal(placeSlugAliasHref('unknown-place'), null);
 
     const redirects = placeSlugAliasRedirects();
-    assert.equal(redirects.length, 12);
+    assert.equal(redirects.length, Object.keys(PLACE_SLUG_ALIASES).length * 2);
     assert.ok(
       redirects.some(
         (row) =>
