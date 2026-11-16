@@ -1016,6 +1016,57 @@ async function attachUnambiguousEventPageSlugs(sessions: PublicSessionDto[]): Pr
         rows: await prisma.$queryRawUnsafe<Array<{ eventId: string; slug: string }>>(query, ...params),
       }),
     });
+    const pageSlugs = [...new Set(pageSlugByEventId.values())];
+    const peerCityCountBySlug = new Map<string, number>();
+    if (pageSlugs.length) {
+      const rows = await prisma.$queryRawUnsafe<Array<{ slug: string; peerCityCount: number }>>(`
+        SELECT current_page.slug,
+          COUNT(DISTINCT peer_event."primaryCityId")::int AS "peerCityCount"
+        FROM "EventPage" current_page
+        JOIN "EventTourGroup" tour_group ON tour_group.id = current_page."tourGroupId"
+        JOIN "EventPageEvent" current_link ON current_link."eventPageId" = current_page.id
+        JOIN "Event" current_event ON current_event.id = current_link."eventId"
+        JOIN "EventPage" peer_page ON peer_page."tourGroupId" = tour_group.id
+          AND peer_page.id <> current_page.id
+          AND peer_page.status = 'READY'
+          AND peer_page."publishedAt" IS NOT NULL
+          AND peer_page."isIndexable" IS TRUE
+        JOIN "EventPageEvent" peer_link ON peer_link."eventPageId" = peer_page.id
+        JOIN "Event" peer_event ON peer_event.id = peer_link."eventId"
+        WHERE current_page.slug = ANY($1::text[])
+          AND current_page.status = 'READY'
+          AND current_page."publishedAt" IS NOT NULL
+          AND current_page."isIndexable" IS TRUE
+          AND current_event."primaryCityId" IS NOT NULL
+          AND peer_event."primaryCityId" IS NOT NULL
+          AND peer_event."primaryCityId" <> current_event."primaryCityId"
+          AND peer_event.status <> 'HIDDEN'
+          AND EXISTS (
+            SELECT 1 FROM "EventOffer" offer
+            WHERE offer."eventId" = peer_event.id AND offer.active IS NOT FALSE
+          )
+          AND (
+            (upper(peer_event.kind::text) = 'OPEN_DATE'
+              AND (peer_event."openDateValidTo" IS NULL OR peer_event."openDateValidTo" >= now()))
+            OR EXISTS (
+              SELECT 1 FROM "EventSession" available_session
+              WHERE available_session."eventId" = peer_event.id
+                AND available_session."isActive" IS NOT FALSE
+                AND available_session."cancelledAt" IS NULL
+                AND lower(coalesce(available_session."sourceStatus", '')) NOT IN
+                  ('widget_blocked', 'paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden', 'stand_by', 'closed', 'sales_closed', 'sale_closed', 'not_for_sale')
+                AND (
+                  available_session."startsAt" >= now() - interval '15 minutes'
+                  OR (available_session."startsAt" < now() AND available_session."endsAt" >= now()
+                    AND available_session."endsAt" - available_session."startsAt" < interval '36 hours')
+                  OR lower(coalesce(available_session."sourceStatus", '')) IN ('open_date', 'widget')
+                )
+            )
+          )
+        GROUP BY current_page.slug
+      `, pageSlugs);
+      for (const row of rows) peerCityCountBySlug.set(row.slug, Number(row.peerCityCount) || 0);
+    }
     const indexablePageSlugs = [...new Set(pageSlugByEventId.values())];
     const indexablePageSlugSet = new Set<string>();
     if (indexablePageSlugs.length) {
@@ -1028,10 +1079,12 @@ async function attachUnambiguousEventPageSlugs(sessions: PublicSessionDto[]): Pr
     }
     return sessions.map((session) => {
       const eventPageSlug = pageSlugByEventId.get(session.id);
+      const indexable = Boolean(eventPageSlug && indexablePageSlugSet.has(eventPageSlug));
       return eventPageSlug ? {
         ...session,
         eventPageSlug,
-        ...(indexablePageSlugSet.has(eventPageSlug) ? { eventPageIndexableSlug: eventPageSlug } : {}),
+        peerCityCount: Math.max(session.peerCityCount || 0, indexable ? peerCityCountBySlug.get(eventPageSlug) || 0 : 0),
+        ...(indexable ? { eventPageIndexableSlug: eventPageSlug } : {}),
       } : session;
     });
   } catch {

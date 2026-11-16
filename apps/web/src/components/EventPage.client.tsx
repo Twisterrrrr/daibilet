@@ -4,7 +4,7 @@ import * as React from 'react';
 import Link from 'next/link';
 import { Calendar, ChevronRight, MapPin, Percent, Shield, Users } from 'lucide-react';
 
-import type { PublicEventPageDto } from '@daibilet/contracts/public';
+import type { PublicEventDto, PublicEventPageDto } from '@daibilet/contracts/public';
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { EventPageCitySync } from '@/components/EventPageCitySync.client';
 import { PeerEventsHeroSwitcher } from '@/components/PeerEventsBlock.client';
@@ -32,7 +32,6 @@ import {
   buildGroupedTicketCategories,
   compactSectorTicketCategories,
   FLEXIBLE_SCHEDULE_LABEL,
-  isCategoryDuplicatedInBreadcrumbs,
   isFlexibleScheduleSession,
   scrollToBuyCard,
 } from '@/lib/event-page-utils';
@@ -65,6 +64,34 @@ type EventSession = PublicEventPageDto['sessions'][number] & {
 
 /** Buy card: nearest upcoming slots only - not the full day dump. */
 const EVENT_PAGE_NEAREST_SLOTS = 5;
+
+function getEventHeroTypeLabel(event: PublicEventDto): string | null {
+  const candidates = [
+    event.catalogSubcategory?.title,
+    ...(event.subcategories || []),
+    event.category,
+    ...(event.tagLabels || []),
+    ...(event.tags || []),
+  ];
+  for (const raw of candidates) {
+    const value = String(raw || '').trim();
+    if (!value) continue;
+    const normalized = value.toLocaleLowerCase('ru');
+    if (/спектак|балет|опера|театр/u.test(normalized)) return 'Спектакли';
+    if (/концерт|музык/u.test(normalized)) return 'Концерты';
+    if (/экскурс|прогул/u.test(normalized)) return 'Экскурсии';
+    if (/стендап/u.test(normalized)) return 'Стендап';
+    if (/цирк/u.test(normalized)) return 'Цирк';
+    if (/выстав/u.test(normalized)) return 'Выставки';
+    if (/квест/u.test(normalized)) return 'Квесты';
+    if (/фестив/u.test(normalized)) return 'Фестивали';
+    if (/спорт|матч/u.test(normalized)) return 'Спорт';
+    if (/музей/u.test(normalized)) return 'Музеи';
+    if (/^(афиша|мероприятия|развлечения|события)$/u.test(normalized)) continue;
+    if (value.length <= 36) return value;
+  }
+  return null;
+}
 
 export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
   const { event } = payload;
@@ -665,9 +692,19 @@ export function EventHero({
     'inline-flex max-w-full items-center gap-1 rounded-full bg-slate-950/75 px-2.5 py-1 text-[11px] font-medium text-white';
   const solidChipLinkClassName = `${solidChipClassName} cursor-pointer transition hover:bg-slate-950/90 hover:underline hover:decoration-white/50 hover:underline-offset-2`;
 
-  const heroTitle = formatPublicTitle(String(payload.eventPage?.seoH1 || payload.eventPage?.title || event.seoH1 || event.title || '').trim());
+  const titleSource = String(payload.eventPage?.seoH1 || payload.eventPage?.title || event.seoH1 || event.title || '').trim();
+  const escapedCity = String(event.city || '').trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const titleWithoutCityCandidate = escapedCity
+    ? titleSource.replace(new RegExp(`(?:\\s*[-–—,|]\\s*|\\s+(?:г\\.?\\s*)?)${escapedCity}\\s*$`, 'iu'), '').trim()
+    : titleSource;
+  const titleWithoutCity = titleWithoutCityCandidate || titleSource;
+  const heroTitle = formatPublicTitle(titleWithoutCity);
   const titleSplit = splitLongTitleAtBreak(heroTitle);
   const longHeroTitle = Boolean(titleSplit) || heroTitle.length > 48;
+  const heroHeightClass = longHeroTitle
+    ? peers.length ? 'md:min-h-[40rem] lg:min-h-[31.5rem]' : 'md:min-h-[40rem] lg:min-h-[28rem]'
+    : peers.length ? 'md:min-h-[36rem] lg:min-h-[476px]' : 'md:min-h-[36rem] lg:min-h-[420px]';
+  const heroTypeLabel = getEventHeroTypeLabel(event);
   const nearestLabel = nextSession
     ? isFlexibleScheduleSession(nextSession)
       ? FLEXIBLE_SCHEDULE_LABEL
@@ -675,18 +712,11 @@ export function EventHero({
     : null;
   const trailCrumbs = breadcrumbs.length > 1 ? breadcrumbs.slice(0, -1) : breadcrumbs;
   const currentCrumb = breadcrumbs.length > 1 ? breadcrumbs[breadcrumbs.length - 1] : null;
-  // Category is already in the breadcrumb trail -> do not repeat it under the crumbs.
-  const categoryInCrumbs = isCategoryDuplicatedInBreadcrumbs(event.category, trailCrumbs);
-  const showHeroCategory = Boolean(event.category) && !categoryInCrumbs;
-  const hasHeroMetaRow = showHeroCategory || Boolean(aggregate);
+  const hasHeroMetaRow = Boolean(heroTypeLabel) || Boolean(aggregate);
 
   return (
     <div
-      className={`relative z-20 isolate grid w-full min-w-0 overflow-visible bg-slate-900 aspect-[3/4] md:aspect-auto ${
-        longHeroTitle
-          ? 'md:min-h-[40rem] lg:min-h-[28rem]'
-          : 'md:min-h-[36rem] lg:min-h-[420px]'
-      }`}
+      className={`relative z-20 isolate grid w-full min-w-0 overflow-visible bg-slate-900 aspect-[3/4] md:aspect-auto ${heroHeightClass}`}
     >
       <EventPageCitySync city={event.city} />
         {/* Keep the artwork inside the page container; its colors fill the side bleed. */}
@@ -700,6 +730,10 @@ export function EventHero({
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent"
       />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-[42%] bg-gradient-to-b from-slate-950/75 via-slate-950/30 to-transparent"
+      />
 
       {/*
         Tablet (md…lg): taller hero + top >> bottom so copy sits low like desktop.
@@ -709,7 +743,7 @@ export function EventHero({
         {/* Keep navigation at the top edge of the artwork, with matching hero inset. */}
         <nav
           aria-label="Хлебные крошки"
-          className="flex min-w-0 flex-wrap items-center gap-1.5 text-sm text-white/70"
+          className="flex min-w-0 flex-wrap items-center gap-1.5 text-sm font-medium text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.85)]"
         >
           {trailCrumbs.map((crumb, index) => (
             <span key={`${crumb.path}:${index}`} className="inline-flex shrink-0 items-center gap-1.5">
@@ -724,12 +758,12 @@ export function EventHero({
         <div className="mt-auto min-w-0">
           <div className="flex min-w-0 items-end justify-between gap-4">
             <div className="min-w-0 max-w-3xl">
-              {/* 2. Category / type - only when the breadcrumbs do not already show it. */}
+              {/* 2. Specific event type above the title. */}
               {hasHeroMetaRow ? (
                 <div className="mb-1.5 flex flex-wrap items-center gap-2">
-                  {showHeroCategory ? (
+                  {heroTypeLabel ? (
                     <p className="text-[11px] font-medium uppercase tracking-wide text-white/70">
-                      {event.category}
+                      {heroTypeLabel}
                     </p>
                   ) : null}
                   {aggregate ? (
