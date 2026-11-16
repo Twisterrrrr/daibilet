@@ -6,10 +6,21 @@ import { ChevronRight } from 'lucide-react';
 import type { PublicVenuePageDto } from '@daibilet/contracts/public';
 import { buildVenueBreadcrumbs } from '@/lib/structured-data';
 
-export function VenueBreadcrumbsNav({ payload }: { payload: PublicVenuePageDto }) {
+export function VenueBreadcrumbsNav({
+  payload,
+  overlay = false,
+}: {
+  payload: PublicVenuePageDto;
+  overlay?: boolean;
+}) {
   const crumbs = buildVenueBreadcrumbs(payload);
   return (
-    <nav aria-label="Хлебные крошки" className="container-page flex flex-wrap items-center gap-1.5 py-3 text-sm text-slate-500">
+    <nav
+      aria-label="Хлебные крошки"
+      className={`${overlay ? '' : 'container-page'} flex flex-wrap items-center gap-1.5 text-sm ${
+        overlay ? 'py-0 text-white/75' : 'py-3 text-slate-500'
+      }`}
+    >
       {crumbs.map((crumb, index) => {
         const isLast = index === crumbs.length - 1;
         return (
@@ -19,9 +30,9 @@ export function VenueBreadcrumbsNav({ payload }: { payload: PublicVenuePageDto }
           >
             {index > 0 ? <ChevronRight className="h-3.5 w-3.5 shrink-0" aria-hidden /> : null}
             {isLast ? (
-              <span className="line-clamp-1 text-slate-900">{crumb.name}</span>
+              <span className={`line-clamp-1 ${overlay ? 'text-white' : 'text-slate-900'}`}>{crumb.name}</span>
             ) : (
-              <Link href={crumb.path} className="transition hover:text-primary-600">
+              <Link href={crumb.path} className={`transition ${overlay ? 'hover:text-white' : 'hover:text-primary-600'}`}>
                 {crumb.name}
               </Link>
             )}

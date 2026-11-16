@@ -20,7 +20,6 @@ import { VenueNearbyMiniGrid } from '@/components/VenueNearbyMiniGrid.client';
 import { VenueAdmissionBlock } from '@/components/VenueAdmissionBlock';
 import { VenueBreadcrumbsNav } from '@/components/VenueBreadcrumbsNav.client';
 import { VenueEditorialTicketsBlock } from '@/components/VenueEditorialTicketsBlock';
-import { PlaceTaxonomyBadges } from '@/components/PlaceTaxonomyBadges';
 import { VenueStickyCashier } from '@/components/VenueStickyCashier.client';
 import {
   isAddressEchoWayToFind,
@@ -97,6 +96,7 @@ export function InstitutionVenueLayout({
   void _stats;
   void _nearbyEvents;
   const venue = React.useMemo(() => applyVenueEditorialOverlay(venueProp), [venueProp]);
+  const hasPdpDocument = Boolean(pagePayload.pdp);
   const title = venue.seoH1 || venue.title || venue.name;
   const streetAddress = formatStreetAddress(venue.address, { city: venue.city });
   const hasMap = Boolean(venue.latitude && venue.longitude);
@@ -172,12 +172,18 @@ export function InstitutionVenueLayout({
   const phone = nonEmptyLogisticsText(editorial?.phone);
   const website = nonEmptyLogisticsText(editorial?.website);
   const websiteLabel = editorial?.websiteLabel || 'Официальный сайт';
+  const verifiedOfficialSite = pagePayload.pdp?.content.sources?.find((source) =>
+    /официальн.{0,20}сайт/i.test(source.title || '') && /^https:\/\//i.test(source.url || ''),
+  )?.url || null;
+  const officialSiteUrl = website || verifiedOfficialSite;
   const wayTipRaw =
     nonEmptyLogisticsText(venue.wayToFind) || nonEmptyLogisticsText(editorial?.wayToFind);
   const wayTip =
     wayTipRaw && !isAddressEchoWayToFind(wayTipRaw, venue.address, venue.city) ? wayTipRaw : null;
   const visitTips = nonEmptyLogisticsText(editorial?.visitTips);
-  const showVisitSection = Boolean(openingHours?.lines?.length || visitTips || wayTip);
+  const showVisitSection = hasPdpDocument
+    ? Boolean(openingHours?.lines?.length)
+    : Boolean(openingHours?.lines?.length || visitTips || wayTip);
   const editorialTicketsHref = String(editorial?.tickets?.href || '').trim();
   /** Editorial commercial block only when no LC and no live afisha (XOR). */
   const showEditorialTickets = Boolean(
@@ -207,7 +213,7 @@ export function InstitutionVenueLayout({
       : showEditorialTickets
         ? 'editorial'
         : null;
-  const primaryCta = resolveVenuePrimaryCta({
+  const resolvedPrimaryCta = resolveVenuePrimaryCta({
     hasAdmission: hasInternalLcTickets,
     hasProgram: hasAfisha,
     editorialTickets: !hasInternalLcTickets ? editorialTickets : null,
@@ -215,7 +221,17 @@ export function InstitutionVenueLayout({
     admissionLabel: experience.admissionCtaLabel,
     programLabel: experience.programCtaLabel,
   });
-  const cashierHint = openingHours?.lines?.[0] || (website ? websiteLabel : null) || null;
+  const primaryCta = resolvedPrimaryCta || (officialSiteUrl
+    ? {
+        kind: 'official_site' as const,
+        href: officialSiteUrl,
+        label: isMuseumOrArt ? 'Актуальная программа' : 'Официальный сайт',
+        external: true,
+      }
+    : hasMap
+      ? { kind: 'visit' as const, href: '#contacts', label: 'Как добраться' }
+      : null);
+  const cashierHint = openingHours?.lines?.[0] || (officialSiteUrl ? websiteLabel : null) || null;
   const similarVenues = React.useMemo(
     () => filterSimilarInstitutionVenues(venue, relatedVenues, 4),
     [venue, relatedVenues],
@@ -232,19 +248,23 @@ export function InstitutionVenueLayout({
     [venue.slug, heroImage],
   );
   const showHoursOrContacts = Boolean(openingHours?.lines?.length || phone || website);
-  const heroAddressLine = [streetAddress || venue.city, metroLabel].filter(Boolean).join(' • ');
+  const addressWithCity = streetAddress && venue.city && !streetAddress.toLocaleLowerCase().includes(venue.city.toLocaleLowerCase())
+    ? `${streetAddress}, ${venue.city}`
+    : streetAddress || venue.city;
+  const heroAddressLine = [addressWithCity, metroLabel].filter(Boolean).join(' · ');
   const seoSections = editorial?.seoSections || [];
   const aboutProse = String(editorial?.aboutBody || '').trim()
     || (venue.description && venue.description !== intro ? venue.description : '');
   const heroBadges = React.useMemo(() => {
-    if (editorial?.badges?.length) return editorial.badges.slice(0, 5);
-    const badges: string[] = [];
-    if (typeLabel) badges.push(typeLabel);
-    for (const chip of featureChips.slice(0, 3)) badges.push(chip.label);
-    for (const [name] of categories.slice(0, 2)) {
-      if (!badges.includes(name)) badges.push(name);
-    }
-    return badges.slice(0, 5);
+    const candidates = [typeLabel, ...(editorial?.badges || []), ...featureChips.slice(0, 2).map((chip) => chip.label), ...categories.slice(0, 2).map(([name]) => name)];
+    const seen = new Set<string>();
+    return candidates.flatMap((candidate) => {
+      const label = String(candidate || '').trim();
+      const key = label.toLocaleLowerCase().replace(/\s+/g, ' ');
+      if (!label || seen.has(key) || seen.size >= 2) return [];
+      seen.add(key);
+      return [label];
+    });
   }, [editorial?.badges, typeLabel, featureChips, categories]);
 
   const cityTz = React.useMemo(
@@ -271,6 +291,18 @@ export function InstitutionVenueLayout({
 
   const stickyTabs = React.useMemo(() => {
     const tabs: Array<readonly [string, string]> = [];
+    if (pagePayload.pdp) {
+      const sections = (pagePayload.pdp.content.sections || []).filter((section) =>
+        Boolean(section.title?.trim() || section.body?.trim() || section.items?.length),
+      );
+      if (pagePayload.pdp.content.summary?.trim()) tabs.push(['#about', 'О месте']);
+      sections.slice(0, 2).forEach((section, index) => {
+        tabs.push([`#pdp-section-${index}`, section.title?.trim() || 'Подробнее']);
+      });
+      if (sections.length > 2) tabs.push(['#pdp-more-sections', 'Ещё о месте']);
+      if (tabs.length > 1) return tabs;
+      return [];
+    }
     if (showCommercialCenter) tabs.push(['#center', 'Билеты']);
     else if (hasInternalLcTickets) tabs.push(['#venue-admission', 'Билеты']);
     if (hasAfisha) tabs.push(['#venue-program', experience.programTabLabel]);
@@ -281,6 +313,7 @@ export function InstitutionVenueLayout({
     return tabs;
   }, [
     aboutHeading,
+    pagePayload.pdp,
     experience.programTabLabel,
     showCommercialCenter,
     hasInternalLcTickets,
@@ -305,10 +338,6 @@ export function InstitutionVenueLayout({
       data-venue-pdp-md
       data-venue-experience={experience.id}
     >
-      <div className="border-b border-zinc-200/80 bg-white">
-        <VenueBreadcrumbsNav payload={pagePayload} />
-      </div>
-
       <section className="relative isolate grid w-full overflow-hidden bg-slate-900 text-white aspect-square md:aspect-auto md:min-h-80 lg:min-h-[30rem]">
         <div className="absolute inset-0">
           {heroImage ? (
@@ -326,7 +355,8 @@ export function InstitutionVenueLayout({
           <div className={`absolute inset-0 ${heroGradient}`} />
         </div>
 
-        <div className="container-page absolute inset-0 z-10 flex flex-col justify-end pb-5 pt-20 md:pb-14 md:pt-24">
+        <div className="container-page absolute inset-0 z-10 flex flex-col justify-between pb-5 pt-3 md:pb-14 md:pt-4">
+          <VenueBreadcrumbsNav payload={pagePayload} overlay />
           <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-end">
             <div className="max-w-2xl">
               <div className="mb-3 flex flex-wrap items-center gap-2">
@@ -350,17 +380,11 @@ export function InstitutionVenueLayout({
               </div>
 
               <h1 className="font-display text-2xl font-extrabold leading-tight text-white sm:text-4xl md:text-5xl">{title}</h1>
-              <PlaceTaxonomyBadges venue={venue} />
-
               {heroAddressLine ? (
                 <p className="mt-2 flex items-start gap-1.5 text-sm text-white/90 md:hidden">
                   <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
                   <span>{heroAddressLine}</span>
                 </p>
-              ) : null}
-
-              {venue.city ? (
-                <p className="mt-1.5 text-sm font-medium text-white/80 md:hidden">{venue.city}</p>
               ) : null}
 
               {heroAddressLine ? (
@@ -370,28 +394,35 @@ export function InstitutionVenueLayout({
                 </div>
               ) : null}
 
-              <p className="mt-4 hidden max-w-xl text-base leading-relaxed text-white/90 md:block">{intro}</p>
+              {!hasPdpDocument && intro ? (
+                <p className="mt-4 hidden max-w-xl text-base leading-relaxed text-white/90 md:block">{intro}</p>
+              ) : null}
             </div>
 
-            {/* Sticky footer covers mobile CTA */}
-            <div className="hidden flex-col items-start gap-2 md:flex md:items-end">
+            <div className="flex flex-wrap items-center gap-2 md:justify-end">
               {primaryCta ? (
                 <a
                   href={primaryCta.href}
                   {...(primaryCta.external
                     ? { target: '_blank', rel: 'noreferrer' as const }
                     : {})}
-                  className={`inline-flex items-center gap-2 rounded-full px-6 py-3 font-bold shadow-lg transition hover:opacity-95 ${
-                    isTheatre ? 'bg-rose-500 text-white hover:bg-rose-600' : 'bg-white text-slate-900 hover:bg-slate-100'
+                  className={`inline-flex min-h-11 items-center gap-2 rounded-full px-5 py-3 text-sm font-bold shadow-lg transition hover:opacity-95 ${
+                    isTheatre ? 'bg-rose-500 text-white hover:bg-rose-600' : 'bg-primary-600 text-white hover:bg-primary-700'
                   }`}
                 >
-                  <Ticket className="h-4 w-4" />
+                  {primaryCta.kind === 'official_site' ? (
+                    <ExternalLink className="h-4 w-4" />
+                  ) : (
+                    <Ticket className="h-4 w-4" />
+                  )}
                   {primaryCta.label}
                   {primaryCta.external ? <ExternalLink className="h-3.5 w-3.5" /> : null}
                 </a>
               ) : null}
               <AddToDayRouteButton
                 variant="dark"
+                iconOnly
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60"
                 venue={{
                   id: venue.id,
                   slug: venue.slug,
@@ -408,17 +439,18 @@ export function InstitutionVenueLayout({
               <button
                 type="button"
                 onClick={share}
-                className="inline-flex items-center gap-1 rounded-full bg-slate-950/70 px-3 py-1.5 text-xs font-medium hover:bg-slate-950/85"
+                aria-label="Поделиться"
+                title="Поделиться"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60"
               >
-                <Share2 className="h-3.5 w-3.5" />
-                Поделиться
+                <Share2 className="h-4 w-4" />
               </button>
             </div>
           </div>
         </div>
       </section>
 
-      {intro ? (
+      {!hasPdpDocument && intro ? (
         <div className="border-b border-slate-200 bg-white md:hidden">
           <div className="container-page py-4 text-sm text-slate-700">
             <p className="leading-relaxed text-slate-600">{intro}</p>
@@ -426,18 +458,12 @@ export function InstitutionVenueLayout({
         </div>
       ) : null}
 
-      {(heroAddressLine || openingHours?.lines?.[0]) ? (
+      {openingHours?.lines?.[0] ? (
         <div
           className="hidden border-b border-slate-200 bg-white md:block"
           data-venue-meta-row
         >
           <div className="container-page flex flex-wrap items-center gap-x-5 gap-y-1 py-3 text-sm text-slate-600">
-            {heroAddressLine ? (
-              <span className="inline-flex items-center gap-1.5">
-                <MapPin className="h-3.5 w-3.5 shrink-0 text-primary-600" />
-                {heroAddressLine}
-              </span>
-            ) : null}
             {openingHours?.lines?.[0] ? (
               <span className="inline-flex items-center gap-1.5">
                 <Clock className="h-3.5 w-3.5 shrink-0 text-primary-600" />
@@ -448,7 +474,7 @@ export function InstitutionVenueLayout({
         </div>
       ) : null}
 
-      <nav className="sticky top-[var(--site-header-height)] z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
+      {stickyTabs.length > 1 ? <nav className="sticky top-[var(--site-header-height)] z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="container-page flex gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {stickyTabs.map(([href, label]) => (
             <a
@@ -460,7 +486,7 @@ export function InstitutionVenueLayout({
             </a>
           ))}
         </div>
-      </nav>
+      </nav> : null}
 
       <div className="container-page grid grid-cols-[minmax(0,1fr)] gap-8 py-8 lg:grid-cols-3">
         <div className="space-y-8 lg:col-span-2">
@@ -506,7 +532,7 @@ export function InstitutionVenueLayout({
 
           {children ? children : null}
 
-          {galleryImages.length >= 2 ? (
+          {!hasPdpDocument && galleryImages.length >= 2 ? (
             <section
               className="scroll-mt-24"
               data-venue-gallery
@@ -531,7 +557,7 @@ export function InstitutionVenueLayout({
             </section>
           ) : null}
 
-          <section id="about" className="scroll-mt-24">
+          {!hasPdpDocument ? <section id="about" className="scroll-mt-24">
             <h2 className="font-display text-xl font-bold tracking-tight text-zinc-950 sm:text-2xl">
               {aboutHeading}
             </h2>
@@ -571,15 +597,15 @@ export function InstitutionVenueLayout({
                   </p>
                 ))
               : null}
-          </section>
+          </section> : null}
 
-          {hookFactText ? (
+          {!hasPdpDocument && hookFactText ? (
             <p className="venue-md-body" data-venue-hook-fact data-venue-md-prose>
               {hookFactText}
             </p>
           ) : null}
 
-          {seoSections.length > 0 ? (
+          {!hasPdpDocument && seoSections.length > 0 ? (
             <section
               id="venue-guide"
               className="scroll-mt-24 space-y-8"
@@ -630,12 +656,12 @@ export function InstitutionVenueLayout({
                   <p className="mt-4 text-xs leading-5 text-slate-500">{OPEN_DATE_HOURS_HOLIDAY_NOTE}</p>
                 </div>
               ) : null}
-              {visitTips ? (
+              {!hasPdpDocument && visitTips ? (
                 <p className="venue-md-body mt-6 rounded-xl bg-slate-50 p-4" data-venue-visit-tips>
                   {visitTips}
                 </p>
               ) : null}
-              {wayTip ? (
+              {!hasPdpDocument && wayTip ? (
                 <p className="venue-md-body mt-4 text-slate-600" data-venue-way-tip-inline>
                   {wayTip}
                 </p>
@@ -643,7 +669,7 @@ export function InstitutionVenueLayout({
             </section>
           ) : null}
 
-          {showFaq ? (
+          {!hasPdpDocument && showFaq ? (
             <section id="faq" className="scroll-mt-24">
               <h2 className="font-display text-xl font-bold tracking-tight text-zinc-950 sm:text-2xl">
                 Вопросы

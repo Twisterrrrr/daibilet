@@ -6,6 +6,7 @@ import {
   Car,
   CheckCircle2,
   Clock,
+  ExternalLink,
   MapPin,
   Navigation as NavigationIcon,
   Share2,
@@ -155,6 +156,13 @@ export function LocationVenueLayout({
       routeGroups.length > 0 ||
       sessions.length > 0 ||
       Number(stats.events || 0) > 0);
+  const share = () => {
+    if (navigator.share) {
+      void navigator.share({ title: venue.name, url: window.location.href });
+    } else {
+      void navigator.clipboard?.writeText(window.location.href);
+    }
+  };
 
   return (
     <div
@@ -162,9 +170,11 @@ export function LocationVenueLayout({
       data-venue-pdp-md
       data-venue-experience={experience.id}
     >
-      <div className="border-b border-slate-200 bg-white">
-        <VenueBreadcrumbsNav payload={pagePayload} />
-      </div>
+      {!isPier ? (
+        <div className="border-b border-slate-200 bg-white">
+          <VenueBreadcrumbsNav payload={pagePayload} />
+        </div>
+      ) : null}
 
       {isPier ? (
         <>
@@ -183,66 +193,82 @@ export function LocationVenueLayout({
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/45 to-slate-900/15" />
             </div>
-            <div className="container-page absolute inset-0 z-10 flex flex-col justify-end pb-5 pt-20 md:pb-12 md:pt-24">
-              {/* Type pills fight H1 on mobile - desktop only, solid chips */}
-              <div className="mb-3 hidden flex-wrap gap-2 md:flex">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-950/75 px-3 py-1 text-xs font-semibold">
-                  <Anchor className="h-3.5 w-3.5" /> Причал
-                </span>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-sky-400 px-3 py-1 text-xs font-bold text-sky-950">
-                  <Waves className="h-3.5 w-3.5" /> {formatNumber(routeCount)} {routeCount === 1 ? 'маршрут' : routeCount >= 2 && routeCount <= 4 ? 'маршрута' : 'маршрутов'}
-                </span>
-              </div>
-              <h1 className="font-display text-2xl font-extrabold text-white sm:text-4xl md:text-5xl">{title}</h1>
-              {heroAddressLine ? (
-                <p className="mt-2 flex items-start gap-1.5 text-sm text-white/90 md:hidden">
-                  <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
-                  <span>{heroAddressLine}</span>
-                </p>
-              ) : null}
-              {venue.city ? (
-                <p className="mt-1.5 text-sm font-medium text-white/80 md:hidden">{venue.city}</p>
-              ) : null}
-              {heroLead ? (
-                <p className="mt-3 hidden max-w-3xl text-sm text-white/85 sm:text-base md:block">{heroLead}</p>
-              ) : null}
-              <div className="mt-3 hidden flex-wrap gap-x-5 gap-y-1 text-sm text-white/85 md:flex">
-                {heroAddressLine ? (
-                  <span className="inline-flex items-center gap-1.5">
-                    <MapPin className="h-4 w-4" /> {heroAddressLine}
+            <div className="container-page absolute inset-0 z-10 flex flex-col justify-between pb-5 pt-3 md:pb-12 md:pt-4">
+              <VenueBreadcrumbsNav payload={pagePayload} overlay />
+              <div className="flex flex-col justify-end">
+                {/* Type pills fight H1 on mobile - desktop only, solid chips */}
+                <div className="mb-3 hidden flex-wrap gap-2 md:flex">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-950/75 px-3 py-1 text-xs font-semibold">
+                    <Anchor className="h-3.5 w-3.5" /> Причал
                   </span>
-                ) : null}
-                <span className="inline-flex items-center gap-1.5">
-                  <Ticket className="h-4 w-4" /> {formatMoney(stats.priceFrom)}
-                </span>
-              </div>
-              {routeGroups.length > 0 || primaryCta ? (
-                <div className="mt-6 hidden flex-wrap items-center gap-3 md:flex">
-                  {primaryCta ? (
-                    <a
-                      href={primaryCta.href}
-                      className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-6 py-2.5 text-sm font-bold text-slate-950 hover:bg-slate-100"
-                    >
-                      {primaryCta.label}
-                    </a>
-                  ) : null}
-                  <AddToDayRouteButton
-                    variant="dark"
-                    venue={{
-                      id: venue.id,
-                      slug: venue.slug,
-                      title: venue.title || venue.name,
-                      city: venue.city,
-                      citySlug: venue.citySlug,
-                      href: venueHref(venue),
-                      imageUrl: venue.heroImageUrl,
-                      address: venue.address,
-                      latitude: venue.latitude,
-                      longitude: venue.longitude,
-                    }}
-                  />
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-sky-400 px-3 py-1 text-xs font-bold text-sky-950">
+                    <Waves className="h-3.5 w-3.5" /> {formatNumber(routeCount)} {routeCount === 1 ? 'маршрут' : routeCount >= 2 && routeCount <= 4 ? 'маршрута' : 'маршрутов'}
+                  </span>
                 </div>
-              ) : null}
+                <h1 className="font-display text-2xl font-extrabold text-white sm:text-4xl md:text-5xl">{title}</h1>
+                {heroAddressLine ? (
+                  <p className="mt-2 flex items-start gap-1.5 text-sm text-white/90 md:hidden">
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+                    <span>{heroAddressLine}</span>
+                  </p>
+                ) : null}
+                {venue.city ? (
+                  <p className="mt-1.5 text-sm font-medium text-white/80 md:hidden">{venue.city}</p>
+                ) : null}
+                {heroLead ? (
+                  <p className="mt-3 hidden max-w-3xl text-sm text-white/85 sm:text-base md:block">{heroLead}</p>
+                ) : null}
+                <div className="mt-3 hidden flex-wrap gap-x-5 gap-y-1 text-sm text-white/85 md:flex">
+                  {heroAddressLine ? (
+                    <span className="inline-flex items-center gap-1.5">
+                      <MapPin className="h-4 w-4" /> {heroAddressLine}
+                    </span>
+                  ) : null}
+                  <span className="inline-flex items-center gap-1.5">
+                    <Ticket className="h-4 w-4" /> {formatMoney(stats.priceFrom)}
+                  </span>
+                </div>
+                {routeGroups.length > 0 || primaryCta ? (
+                  <div className="mt-5 flex flex-wrap items-center gap-2">
+                    {primaryCta ? (
+                      <a
+                        href={primaryCta.href}
+                        {...(primaryCta.external ? { target: '_blank', rel: 'noreferrer' as const } : {})}
+                        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-primary-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg hover:bg-primary-700"
+                      >
+                        {primaryCta.kind === 'official_site' ? <ExternalLink className="h-4 w-4" /> : <Ticket className="h-4 w-4" />}
+                        {primaryCta.label}
+                      </a>
+                    ) : null}
+                    <AddToDayRouteButton
+                      variant="dark"
+                      iconOnly
+                      className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60"
+                      venue={{
+                        id: venue.id,
+                        slug: venue.slug,
+                        title: venue.title || venue.name,
+                        city: venue.city,
+                        citySlug: venue.citySlug,
+                        href: venueHref(venue),
+                        imageUrl: venue.heroImageUrl,
+                        address: venue.address,
+                        latitude: venue.latitude,
+                        longitude: venue.longitude,
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={share}
+                      aria-label="Поделиться"
+                      title="Поделиться"
+                      className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60"
+                    >
+                      <Share2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : null}
+              </div>
             </div>
           </section>
           {(heroLead) ? (
@@ -703,9 +729,15 @@ export function LocationVenueLayout({
 
         <div className="space-y-4 lg:sticky lg:top-[calc(var(--site-header-height)+3.5rem)] lg:self-start">
           {primaryCta ? (
-            <VenueStickyCashier cta={primaryCta} hint={heroAddressLine || null} />
+            <VenueStickyCashier cta={primaryCta} hint={isPier ? null : heroAddressLine || null} />
           ) : null}
-          <LocationVenueSidebar venue={venue} relatedVenues={relatedVenues} metroLabel={metroLabel} />
+          <LocationVenueSidebar
+            venue={venue}
+            relatedVenues={relatedVenues}
+            metroLabel={metroLabel}
+            showActions={!isPier}
+            showContactDetails={!isPier}
+          />
         </div>
       </div>
     </div>
@@ -716,10 +748,14 @@ function LocationVenueSidebar({
   venue,
   relatedVenues,
   metroLabel,
+  showActions = true,
+  showContactDetails = true,
 }: {
   venue: PublicVenueDto;
   relatedVenues: PublicVenueDto[];
   metroLabel: string | null;
+  showActions?: boolean;
+  showContactDetails?: boolean;
 }) {
   const hasCoords = Boolean(venue.latitude && venue.longitude);
   const streetAddress = formatStreetAddress(venue.address, { city: venue.city });
@@ -732,7 +768,7 @@ function LocationVenueSidebar({
   return (
     <aside className="lg:sticky lg:top-24 lg:self-start">
       <div className="space-y-4">
-        {streetAddress || metroLabel || venue.city ? (
+        {showContactDetails && (streetAddress || metroLabel || venue.city) ? (
           <div id="contacts" className="rounded-2xl border border-slate-200 bg-white p-5">
             <div className="text-sm font-semibold text-slate-900">Контакты</div>
             <ul className="mt-3 space-y-3 text-sm text-slate-700">
@@ -777,7 +813,7 @@ function LocationVenueSidebar({
           </div>
         ) : null}
 
-        <AddToDayRouteButton
+        {showActions ? <AddToDayRouteButton
           className="w-full min-h-12 rounded-2xl px-4 py-3 text-sm"
           venue={{
             id: venue.id,
@@ -791,9 +827,9 @@ function LocationVenueSidebar({
             latitude: venue.latitude,
             longitude: venue.longitude,
           }}
-        />
+        /> : null}
 
-        <button
+        {showActions ? <button
           type="button"
           onClick={() => {
             if (navigator.share) {
@@ -805,7 +841,7 @@ function LocationVenueSidebar({
           className="flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white p-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
         >
           <Share2 className="h-4 w-4" /> Поделиться точкой
-        </button>
+        </button> : null}
 
         {relatedVenues.length > 0 ? <VenueNearbyMiniGrid venues={relatedVenues} limit={4} /> : null}
       </div>

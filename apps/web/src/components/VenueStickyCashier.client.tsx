@@ -74,7 +74,9 @@ export function VenueStickyCashier({
               ) : null}
             </div>
           ) : (
-            <p className="text-sm font-semibold text-zinc-950">Билеты и визит</p>
+            <p className="text-sm font-semibold text-zinc-950">
+              {cta.kind === 'official_site' ? 'Актуальная информация у площадки' : 'Билеты и визит'}
+            </p>
           )}
           <CtaAnchor
             cta={cta}

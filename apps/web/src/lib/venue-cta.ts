@@ -5,7 +5,7 @@
  * Never invent a buy button without a real target.
  */
 
-export type VenueCtaKind = 'admission' | 'program' | 'editorial_tickets' | 'visit';
+export type VenueCtaKind = 'admission' | 'program' | 'editorial_tickets' | 'official_site' | 'visit';
 
 export type VenueEditorialTicketsCta = {
   href: string;

@@ -237,7 +237,7 @@ export function VenuePageView({
                 nearbyEvents={contentReady ? matchedPayload.nearbyEvents || [] : []}
                 pagePayload={matchedPayload}
               >
-                <VenuePdpContent document={matchedPayload.pdp} />
+                <VenuePdpContent document={matchedPayload.pdp} hideAddressFact={Boolean(venue.address)} />
                 {admissionProducts.length > 0 ? <VenueAdmissionBlock products={admissionProducts} /> : null}
                 {baseSessions.length > 0 ? (
                   <VenueProgramBlock
