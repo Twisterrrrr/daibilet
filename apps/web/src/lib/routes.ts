@@ -2,7 +2,7 @@ import type { PublicSessionDto } from '@daibilet/contracts/public';
 import { venueTemplate } from '@/lib/venue-kind-mapping';
 
 type EventRouteSource = Pick<PublicSessionDto, 'id' | 'slug' | 'sourceSlug' | 'eventPageSlug' | 'title'>;
-type CityRouteSource = { slug?: string | null; sourceSlug?: string | null; name: string };
+type CityRouteSource = { slug?: string | null; sourceSlug?: string | null; name: string; type?: string | null };
 type VenueRouteSource = { id: string; slug?: string | null; name: string; type?: string | null };
 
 const CYRILLIC_MAP: Record<string, string> = {
@@ -13,7 +13,25 @@ const CYRILLIC_MAP: Record<string, string> = {
 
 const CITY_SLUG_ALIASES: Record<string, string> = {
   moskva: 'moscow',
+  'nizhniy-novgorod': 'nizhny-novgorod',
+  'velikiy-novgorod': 'veliky-novgorod',
 };
+
+const CITY_API_SLUGS_BY_PUBLIC_SLUG: Record<string, string> = {
+  'nizhny-novgorod': 'nizhniy-novgorod',
+  'veliky-novgorod': 'velikiy-novgorod',
+};
+
+export function canonicalCitySlug(value?: string | null): string {
+  const normalized = normalizeSlug(value);
+  return CITY_SLUG_ALIASES[normalized] || normalized;
+}
+
+/** Map a reviewed public spelling to the slug currently accepted by the API. */
+export function cityLookupSlug(value: string): string {
+  const canonical = canonicalCitySlug(value);
+  return CITY_API_SLUGS_BY_PUBLIC_SLUG[canonical] || canonical;
+}
 
 export function eventHref(event: EventRouteSource): string {
   return `/events/${eventSlug(event)}`;
@@ -31,13 +49,19 @@ export function eventSlug(event: EventRouteSource): string {
 }
 
 export function cityHref(city: CityRouteSource): string {
-  return `/cities/${citySlug(city)}`;
+  const slug = citySlug(city);
+  if (isCityFirstUrlMode()) return city.type === 'region' ? `/regions/${slug}` : `/${slug}`;
+  return `/cities/${slug}`;
+}
+
+export function isCityFirstUrlMode(): boolean {
+  return process.env.NEXT_PUBLIC_CITY_URL_MODE === 'city-first';
 }
 
 export function citySlug(city: CityRouteSource): string {
   for (const candidate of [city.slug, city.sourceSlug]) {
     const normalized = normalizeSlug(candidate);
-    if (normalized && !isOpaqueId(normalized)) return CITY_SLUG_ALIASES[normalized] || normalized;
+    if (normalized && !isOpaqueId(normalized)) return canonicalCitySlug(normalized);
   }
   return normalizeSlug(city.name) || 'city';
 }
@@ -61,7 +85,7 @@ export function cityCanonicalPath(
     return href;
   }
 
-  const match = pathname.match(/^\/cities\/([^/]+)\/?$/i);
+  const match = pathname.match(/^\/(?:cities|regions)\/([^/]+)\/?$/i);
   if (!match) return stored;
 
   let storedSlug = match[1];
@@ -72,9 +96,9 @@ export function cityCanonicalPath(
   }
 
   const aliases = [city.slug, city.sourceSlug, city.name]
-    .map((value) => normalizeSlug(value))
+    .map((value) => canonicalCitySlug(value))
     .filter(Boolean);
-  return aliases.includes(normalizeSlug(storedSlug)) ? href : stored;
+  return aliases.includes(canonicalCitySlug(storedSlug)) ? href : stored;
 }
 
 /** Афиша города — расписание событий на странице CityPage. */

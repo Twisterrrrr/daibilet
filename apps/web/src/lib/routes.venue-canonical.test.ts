@@ -22,6 +22,26 @@ test('cityCanonicalPath keeps intentional canonical paths to another city', () =
   assert.equal(cityCanonicalPath(city), '/cities/another-city');
 });
 
+test('city-first staging mode uses city roots and a separate region namespace', () => {
+  const previousMode = process.env.NEXT_PUBLIC_CITY_URL_MODE;
+  process.env.NEXT_PUBLIC_CITY_URL_MODE = 'city-first';
+  try {
+    assert.equal(cityHref({ slug: 'moskva', name: 'Москва', type: 'city' }), '/moscow');
+    assert.equal(cityHref({ slug: 'perm-krai', name: 'Пермский край', type: 'region' }), '/regions/perm-krai');
+    assert.equal(
+      cityCanonicalPath({ slug: 'moskva', sourceSlug: 'москва', name: 'Москва', type: 'city', canonicalPath: '/cities/moskva' }),
+      '/moscow',
+    );
+    assert.equal(
+      cityCanonicalPath({ slug: 'perm-krai', name: 'Пермский край', type: 'region', canonicalPath: '/cities/another-region' }),
+      '/cities/another-region',
+    );
+  } finally {
+    if (previousMode === undefined) delete process.env.NEXT_PUBLIC_CITY_URL_MODE;
+    else process.env.NEXT_PUBLIC_CITY_URL_MODE = previousMode;
+  }
+});
+
 test('venueCanonicalPath ignores stored path from the other family', () => {
   const venue = {
     id: 'venue_691e1ef5558b4d7999e63912',

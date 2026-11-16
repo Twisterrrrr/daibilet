@@ -17,6 +17,8 @@ import {
 } from '@/lib/events-catalog-indexing';
 import { resolveLegacyLandingRedirect } from '@/lib/landing-routes';
 import { resolvePodborkiCityQueryRedirect } from '@/lib/podborki-city-seo';
+import { resolveCityFirstRedirectPath } from '@/lib/city-first-route-slugs';
+import { isCityFirstUrlMode } from '@/lib/routes';
 import { canonicalizeRegionChildCitySearch } from '../backend/src/search-geo-match.ts';
 
 function unauthorizedAdminResponse(realm: string) {
@@ -100,6 +102,9 @@ export async function proxy(request: NextRequest) {
   const citySlugRedirect = redirectCyrillicCitySlug(request);
   if (citySlugRedirect) return citySlugRedirect;
 
+  const cityFirstRedirect = redirectLegacyCityFirstPath(request);
+  if (cityFirstRedirect) return cityFirstRedirect;
+
   const cityQueryRedirect = redirectBrokenRegionChildCityQuery(request);
   if (cityQueryRedirect) return cityQueryRedirect;
 
@@ -165,6 +170,19 @@ function redirectCyrillicCitySlug(request: NextRequest): NextResponse | null {
   return NextResponse.redirect(url, 308);
 }
 
+/**
+ * City-first rollout redirects only city PDPs already present in the reviewed
+ * route allowlist. Other `/cities/*` and `/places/c/*` URLs remain on the old
+ * implementation until their destination pages are ready.
+ */
+function redirectLegacyCityFirstPath(request: NextRequest): NextResponse | null {
+  const targetPath = resolveCityFirstRedirectPath(request.nextUrl.pathname, isCityFirstUrlMode());
+  if (!targetPath) return null;
+  const url = request.nextUrl.clone();
+  url.pathname = targetPath;
+  return NextResponse.redirect(url, 308);
+}
+
 /** Soft `/podborki?city=` → marker CHPU `/podborki/c/{city}` for meta-pilot cities. */
 function redirectPodborkiCityQueryToMarker(request: NextRequest): NextResponse | null {
   const { pathname } = request.nextUrl;
@@ -211,8 +229,10 @@ export const config = {
     '/buyers/:path*',
     '/venues',
     '/venues/:path*',
+    '/places/:path*',
     '/cities',
     '/cities/:path*',
+    '/:city',
     '/podborki',
     '/sync-health',
     '/sync-health/:path*',

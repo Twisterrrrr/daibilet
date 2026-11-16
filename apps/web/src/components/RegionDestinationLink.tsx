@@ -26,7 +26,7 @@ export function RegionDestinationLink({
   className = '',
   variant = 'row',
 }: {
-  region: Pick<PublicDestinationDto, 'slug' | 'name' | 'events'>;
+  region: Pick<PublicDestinationDto, 'slug' | 'name' | 'events' | 'type'>;
   className?: string;
   /** `chip` - compact gray pill for city cards; `row` - legacy full-width link. */
   variant?: 'row' | 'chip';

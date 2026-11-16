@@ -21,7 +21,7 @@ import { hasSeoListingEditorial } from '@/data/seo-listing-texts';
 import { isEventsCatalogSitemapEligibleUrl } from '@/lib/events-catalog-indexing';
 import { evaluateListingIndexability, MIN_LISTING_OFFERS_FOR_INDEX } from '@/lib/seo-listing-meta';
 import { buildPodborkiCityCanonicalPath, isPodborkiSeoPilotCitySlug, PODBORKI_SEO_PILOT_CITY_SLUGS } from '@/lib/podborki-city-seo';
-import { venueCanonicalPath, cityCanonicalPath, cityHref, citySlug } from '@/lib/routes';
+import { venueCanonicalPath, cityCanonicalPath, cityHref, citySlug, isCityFirstUrlMode } from '@/lib/routes';
 import { cityPlacesCatalogHref } from '@/lib/catalog-url';
 import { getCachedCatalog } from '@/server/cached-catalog-data';
 import { getCachedDestinations } from '@/server/cached-public-surfaces';
@@ -404,7 +404,9 @@ export async function buildCitiesSitemapEntries(): Promise<SitemapEntry[]> {
         ? editorialBySlug.get(String(destination.slug).toLowerCase()) ||
           (destination.sourceSlug ? editorialBySlug.get(String(destination.sourceSlug).toLowerCase()) : undefined)
         : undefined;
-      const href = editorial ? destinationPdpSitemapPath(editorial) : cityHref(destination);
+      const href = editorial
+        ? destinationPdpSitemapPath({ ...editorial, type: editorial.type })
+        : cityHref(destination);
       return [
         ...(href ? [entry(href, 'daily', destination.type === 'region' ? 0.7 : 0.75, editorial?.updatedAt)] : []),
         ...(destination.type === 'city' && destination.venues > 0
@@ -416,7 +418,7 @@ export async function buildCitiesSitemapEntries(): Promise<SitemapEntry[]> {
   const seen = new Set(entries.map((item) => new URL(item.url).pathname));
   for (const editorial of editorialBySlug.values()) {
     if (editorial.status !== 'PUBLISHED' || !editorial.isIndexable) continue;
-    const path = destinationPdpSitemapPath(editorial);
+    const path = destinationPdpSitemapPath({ ...editorial, type: editorial.type });
     if (!path || seen.has(path)) continue;
     entries.push(entry(path, 'daily', editorial.type === 'region' ? 0.7 : 0.75, editorial.updatedAt));
     seen.add(path);
@@ -429,17 +431,26 @@ export function destinationPdpSitemapPath(destination: {
   slug: string;
   sourceSlug: string | null;
   canonicalPath: string | null;
+  type?: 'city' | 'region';
 }): string | null {
   const canonical = cityCanonicalPath({
     slug: destination.slug,
     sourceSlug: destination.sourceSlug,
     name: destination.title,
+    type: destination.type,
     canonicalPath: destination.canonicalPath,
   });
   try {
     const site = new URL(getSiteUrl());
     const url = new URL(canonical, site);
-    if (url.origin !== site.origin || !url.pathname.startsWith('/cities/')) return null;
+    const isLegacyDestinationPath = /^\/(cities|regions)\/[^/]+\/?$/.test(url.pathname);
+    const isCityFirstCityPath = destination.type === 'city'
+      && isCityFirstUrlMode()
+      && /^\/[a-z0-9]+(?:-[a-z0-9]+)*\/?$/.test(url.pathname);
+    const isCityFirstRegionPath = destination.type === 'region'
+      && isCityFirstUrlMode()
+      && /^\/regions\/[^/]+\/?$/.test(url.pathname);
+    if (url.origin !== site.origin || !(isLegacyDestinationPath || isCityFirstCityPath || isCityFirstRegionPath)) return null;
     return url.pathname;
   } catch {
     return null;
