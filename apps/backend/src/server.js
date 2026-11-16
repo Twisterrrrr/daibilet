@@ -16,6 +16,7 @@ import {
   findAdminEventPageByEvent,
   getAdminEventPage,
   listAdminEventTourGroups,
+  mergeAdminEventPages,
   moveAdminEventPageEvent,
   publishAdminEventPage,
   replaceAdminEventPageEvents,
@@ -896,6 +897,28 @@ export async function handleRequest(request, response) {
       } catch (error) {
         const message = error instanceof Error ? error.message : 'invalid_event_page_batch';
         const status = /already belong|published|unique|duplicate/i.test(message) ? 409 : 400;
+        sendJson(response, { error: message }, status);
+      }
+      return;
+    }
+
+    const eventPageMergeMatch = request.method === 'POST'
+      ? url.pathname.match(/^\/api\/admin\/event-pages\/([^/]+)\/merge$/)
+      : null;
+    if (eventPageMergeMatch) {
+      try {
+        const body = await readJsonBody(request);
+        const result = await mergeAdminEventPages(
+          db,
+          decodeURIComponent(eventPageMergeMatch[1]),
+          body?.sourcePageIds,
+          body?.mergeGroupKey,
+        );
+        if (result) invalidatePublicCaches('event pages consolidated');
+        sendJson(response, result || { error: 'event_page_not_found' }, result ? 200 : 404);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'event_page_merge_failed';
+        const status = /already owned|different mergeGroupKey|conflict|different TourGroups/i.test(message) ? 409 : 400;
         sendJson(response, { error: message }, status);
       }
       return;

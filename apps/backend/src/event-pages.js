@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 
 const EDITORIAL_STATUSES = new Set(['DRAFT', 'REVIEW', 'READY']);
 const ROUTE_KINDS = new Set(['CANDIDATE', 'HISTORICAL', 'CURRENT']);
+const MAX_EVENT_PAGE_MERGE_SOURCES = 500;
 const MAX_CONTENT_BYTES = 200_000;
 const MAX_EVENT_PAGE_BATCH_APPEND_IDS = 5_000;
 const EVENT_PAGE_BATCH_INSERT_SIZE = 500;
@@ -566,9 +567,33 @@ export async function readPublishedEventPageForEvent(db, eventId) {
 
 /** Resolve only the stable public identity. Draft copy itself is never returned here. */
 export async function readPublicEventPageRouteBySlug(db, slug) {
+  return readPublicEventPageRouteBySlugInternal(db, slug, new Set());
+}
+
+async function readPublicEventPageRouteBySlugInternal(db, slug, visitedSlugs) {
   const key = String(slug || '').trim().toLowerCase();
   if (!key) return null;
+  if (visitedSlugs.has(key)) return null;
+  visitedSlugs.add(key);
   try {
+    // EventPage consolidation keeps old paths as historical aliases on the
+    // surviving page. Serve the target PDP at the old path with its canonical
+    // URL; this preserves old links without making empty source shells 404.
+    const historicalAlias = await db.query(`
+      SELECT target.slug
+      FROM "EventPageRoute" route
+      JOIN "EventPage" target ON target.id = route."eventPageId"
+      WHERE lower(route.path) = $1
+        AND route.kind = 'HISTORICAL'
+        AND route.source LIKE 'eventpage-merge:%'
+        AND lower(target.slug) <> $2
+        AND EXISTS (SELECT 1 FROM "EventPageEvent" link WHERE link."eventPageId" = target.id)
+      LIMIT 1
+    `, [`/events/${key}`, key]);
+    if (historicalAlias.rows[0]?.slug) {
+      const target = await readPublicEventPageRouteBySlugInternal(db, historicalAlias.rows[0].slug, visitedSlugs);
+      return target ? { ...target, historicalAlias: true } : null;
+    }
     const result = await db.query(`
       SELECT page.id, page.slug, page.status, page."isIndexable", page."publishedAt", page."heroImageUrl",
         ARRAY(
@@ -613,12 +638,157 @@ export async function readPublicEventPageRouteBySlug(db, slug) {
       published,
       isIndexable: published && row.isIndexable === true,
       heroImageUrl: row.heroImageUrl || null,
+      historicalAlias: false,
     };
   } catch (error) {
     // Rolling deploys may hit a catalog database before EventPage migration.
     if (error?.code === '42P01' || error?.cause?.code === '42P01') return null;
     throw error;
   }
+}
+
+/**
+ * Consolidate recurring listings into one local EventPage while keeping every
+ * former route as a canonical alias and retaining source revisions. The caller
+ * supplies exact page IDs after editorial identity review; this method checks
+ * city and venue consistency before moving anything.
+ */
+export async function mergeAdminEventPages(db, targetPageId, rawSourcePageIds, rawMergeGroupKey, actorId = null) {
+  const targetId = requiredText(targetPageId, 'targetPageId', 100);
+  const mergeGroupKey = requiredText(rawMergeGroupKey, 'mergeGroupKey', 64).toLowerCase();
+  if (mergeGroupKey !== 'zooteatr-reptilii') throw new Error('Only the verified ZooTeatr reptile merge key is supported');
+  if (!Array.isArray(rawSourcePageIds)) throw new Error('sourcePageIds must be an array');
+  const sourceIds = [...new Set(rawSourcePageIds.map((id) => requiredText(id, 'sourcePageId', 100)))];
+  if (!sourceIds.length || sourceIds.length > MAX_EVENT_PAGE_MERGE_SOURCES) {
+    throw new Error(`sourcePageIds must contain 1-${MAX_EVENT_PAGE_MERGE_SOURCES} unique IDs`);
+  }
+  if (sourceIds.includes(targetId)) throw new Error('targetPageId cannot also be a source page');
+
+  return db.transaction(async ({ query }) => {
+    const requestedIds = [targetId, ...sourceIds].sort();
+    const lockedPages = await query(`
+      SELECT id, slug, title, summary, "heroImageUrl", content, "seoH1", "seoTitle", "seoDescription",
+        "canonicalPath", status, "isIndexable", "publishedAt", "tourGroupId"
+      FROM "EventPage" WHERE id = ANY($1::text[]) ORDER BY id FOR UPDATE
+    `, [requestedIds]);
+    if (lockedPages.rows.length !== requestedIds.length) throw new Error('One or more EventPages were not found');
+    const target = lockedPages.rows.find((page) => page.id === targetId);
+    const sources = sourceIds.map((id) => lockedPages.rows.find((page) => page.id === id));
+    if (!target || sources.some((page) => !page)) throw new Error('EventPage merge target or source is missing');
+
+    const allLinks = await query(`
+      SELECT link.id, link."eventPageId", link."eventId", link.position, link.role,
+        event.title AS "eventTitle", event."primaryCityId" AS "cityId", event."venueId"
+      FROM "EventPageEvent" link
+      JOIN "Event" event ON event.id = link."eventId"
+      WHERE link."eventPageId" = ANY($1::text[])
+      ORDER BY link."eventPageId", link.position, link."createdAt"
+      FOR UPDATE OF link
+    `, [requestedIds]);
+    if (!allLinks.rows.some((link) => link.eventPageId === targetId)) throw new Error('Target EventPage must already have at least one Event');
+    const cityIds = new Set(allLinks.rows.map((link) => String(link.cityId || '')).filter(Boolean));
+    const venueIds = new Set(allLinks.rows.map((link) => String(link.venueId || '')).filter(Boolean));
+    if (cityIds.size !== 1 || venueIds.size !== 1 || allLinks.rows.some((link) => !link.cityId || !link.venueId)) {
+      throw new Error('Merged EventPages must all belong to the same known city and venue');
+    }
+    if (allLinks.rows.some((link) => !/^зоотеатр\s+рептилий(?=\s|$)/iu.test(String(link.eventTitle || '').trim()))) {
+      throw new Error('This merge operation is restricted to confirmed ZooTeatr reptile listings');
+    }
+    const eventIds = allLinks.rows.map((link) => String(link.eventId));
+    if (new Set(eventIds).size !== eventIds.length) {
+      throw new Error('The same Event is linked to more than one page in this merge; resolve duplicate links first');
+    }
+    const tourGroupIds = new Set(lockedPages.rows.map((page) => page.tourGroupId || null));
+    if (tourGroupIds.size > 1) {
+      throw new Error('Pages with different TourGroup assignments cannot be merged');
+    }
+
+    const existingOverrides = await query(`
+      SELECT "eventId", "mergeGroupKey" FROM "EventOverride"
+      WHERE "eventId" = ANY($1::text[])
+    `, [eventIds]);
+    if (existingOverrides.rows.some((row) => row.mergeGroupKey && row.mergeGroupKey !== mergeGroupKey)) {
+      throw new Error('At least one Event already has a different mergeGroupKey');
+    }
+    const sourceSnapshots = new Map();
+    for (const source of sources) sourceSnapshots.set(source.id, await currentSourceState(query, source.id));
+
+    // Keep all former page paths (including candidate/historical aliases) on
+    // the target and mark them as canonical aliases. Existing revisions and
+    // source page content remain untouched as an archive.
+    for (const source of sources) {
+      const routeRows = await query(`
+        SELECT id, path FROM "EventPageRoute" WHERE "eventPageId" = $1 FOR UPDATE
+      `, [source.id]);
+      const sourcePath = `/events/${source.slug}`;
+      const paths = new Set([...routeRows.rows.map((route) => route.path), sourcePath]);
+      for (const path of paths) {
+        if (path === `/events/${target.slug}`) throw new Error('A source path conflicts with the target canonical path');
+        const owner = await query(`SELECT id, "eventPageId" FROM "EventPageRoute" WHERE path = $1 FOR UPDATE`, [path]);
+        if (owner.rows[0] && owner.rows[0].eventPageId !== source.id) {
+          throw new Error(`Historical path is already owned by another EventPage: ${path}`);
+        }
+        if (owner.rows[0]) {
+          await query(`
+            UPDATE "EventPageRoute" SET "eventPageId" = $2, kind = 'HISTORICAL', source = $3
+            WHERE id = $1
+          `, [owner.rows[0].id, targetId, `eventpage-merge:${source.slug}`]);
+        } else {
+          await query(`
+            INSERT INTO "EventPageRoute" (id, "eventPageId", path, kind, source)
+            VALUES ($1, $2, $3, 'HISTORICAL', $4)
+          `, [randomUUID(), targetId, path, `eventpage-merge:${source.slug}`]);
+        }
+      }
+    }
+
+    const nextPositionResult = await query(`
+      SELECT COALESCE(MAX(position), -1) + 1 AS "nextPosition"
+      FROM "EventPageEvent" WHERE "eventPageId" = $1
+    `, [targetId]);
+    let nextPosition = Number(nextPositionResult.rows[0]?.nextPosition) || 0;
+    for (const link of allLinks.rows.filter((item) => item.eventPageId !== targetId)) {
+      await query(`
+        UPDATE "EventPageEvent"
+        SET "eventPageId" = $2, position = $3, role = 'PURCHASE_OPTION'
+        WHERE id = $1
+      `, [link.id, targetId, nextPosition++]);
+    }
+
+    for (const eventId of eventIds) {
+      await query(`
+        INSERT INTO "EventOverride" (id, "eventId", "mergeGroupKey", "updatedAt")
+        VALUES ($1, $2, $3, now())
+        ON CONFLICT ("eventId") DO UPDATE SET "mergeGroupKey" = EXCLUDED."mergeGroupKey", "updatedAt" = now()
+      `, [randomUUID(), eventId, mergeGroupKey]);
+    }
+
+    for (const source of sources) {
+      await query(`UPDATE "EventPage" SET "updatedAt" = now() WHERE id = $1`, [source.id]);
+      await appendPageRevision(query, source.id, source, {
+        changeNote: `Содержимое и история сохранены; связанные события объединены в ${target.slug}`,
+        actorId,
+        sourceState: {
+          ...sourceSnapshots.get(source.id),
+          mergeTarget: target.slug,
+        },
+      });
+    }
+    await query(`UPDATE "EventPage" SET "updatedAt" = now() WHERE id = $1`, [targetId]);
+    const targetState = await currentSourceState(query, targetId);
+    await appendPageRevision(query, targetId, target, {
+      changeNote: `В одну EventPage объединено ${allLinks.rows.length} событий одного города и площадки`,
+      actorId,
+      sourceState: targetState,
+    });
+
+    return {
+      target: await readPage(query, targetId),
+      sourcePageIds: sourceIds,
+      movedEventCount: allLinks.rows.filter((link) => link.eventPageId !== targetId).length,
+      retainedRouteCount: await query(`SELECT count(*)::int AS count FROM "EventPageRoute" WHERE "eventPageId" = $1 AND source LIKE 'eventpage-merge:%'`, [targetId]).then((result) => result.rows[0]?.count || 0),
+    };
+  });
 }
 
 /**

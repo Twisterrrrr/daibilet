@@ -1136,8 +1136,9 @@ model EventPageEvent {
   @@index([eventPageId, role])
 }
 
-/// Historical and candidate paths are recorded for audit/mapping only. This
-/// table does not issue redirects, alter canonicals, or make URLs indexable.
+/// Candidate and historical paths are retained for audit. Paths marked with
+/// source `eventpage-merge:<slug>` resolve to the surviving EventPage content
+/// and its canonical URL; they do not create separate indexable pages.
 model EventPageRoute {
   id          String   @id @default(cuid())
   eventPageId String

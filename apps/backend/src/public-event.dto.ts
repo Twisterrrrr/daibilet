@@ -220,7 +220,7 @@ async function loadPublishedTourPeers(eventId: string): Promise<{ assigned: bool
       FROM city_candidates
       WHERE city_rank = 1
       ORDER BY "startsAt" NULLS LAST, city, "eventPageSlug"
-      LIMIT 30
+      LIMIT 36
     `, eventId);
     const assigned = await prisma.$queryRawUnsafe<Array<{ assigned: boolean }>>(`
       SELECT EXISTS (
@@ -269,6 +269,7 @@ type StableEventPageRecord = {
   publishedAt: Date | null;
   eventId: string;
   eventIds: string[];
+  historicalAlias?: boolean;
 };
 
 async function loadStableEventPage(where: 'slug' | 'eventId', value: string): Promise<StableEventPageRecord | null> {
@@ -288,7 +289,23 @@ async function loadStableEventPage(where: 'slug' | 'eventId', value: string): Pr
       ORDER BY link.position, link."createdAt"
       LIMIT 1
     `, value);
-    return result[0] || null;
+    if (result[0]) return result[0];
+    if (where !== 'slug') return null;
+
+    const alias = await prisma.$queryRawUnsafe<Array<{ slug: string }>>(`
+      SELECT target.slug
+      FROM "EventPageRoute" route
+      JOIN "EventPage" target ON target.id = route."eventPageId"
+      WHERE lower(route.path) = lower($1)
+        AND route.kind = 'HISTORICAL'
+        AND route.source LIKE 'eventpage-merge:%'
+        AND lower(target.slug) <> lower($2)
+        AND EXISTS (SELECT 1 FROM "EventPageEvent" link WHERE link."eventPageId" = target.id)
+      LIMIT 1
+    `, `/events/${value}`, value);
+    if (!alias[0]?.slug) return null;
+    const target = await loadStableEventPage('slug', alias[0].slug);
+    return target ? { ...target, historicalAlias: true } : null;
   } catch (error) {
     if ((error as { code?: string })?.code === 'P2021' || (error as { code?: string })?.code === '42P01') return null;
     throw error;
@@ -773,6 +790,7 @@ async function loadPublicEventDto(
         published: stablePage.status === 'READY' && stablePage.publishedAt != null,
         isIndexable: stablePage.status === 'READY' && stablePage.publishedAt != null && stablePage.isIndexable,
         heroImageUrl: stablePage.heroImageUrl,
+        historicalAlias: stablePage.historicalAlias === true,
         availability,
       },
       eventPage: stablePage.status === 'READY' && stablePage.publishedAt != null ? {

@@ -274,6 +274,7 @@ export interface PublicEventPageDto extends ApiEnvelope {
     status: string;
     published: boolean;
     isIndexable: boolean;
+    historicalAlias?: boolean;
     heroImageUrl?: string | null;
     availability?: 'AVAILABLE' | 'ENDED' | 'NO_UPCOMING' | null;
   } | null;

@@ -277,7 +277,14 @@ export async function buildEventsSitemapEntries(): Promise<SitemapEntry[]> {
   // The catalog list alone can therefore omit their stable, indexable URLs.
   try {
     const pages = await prisma.eventPage.findMany({
-      where: { status: 'READY', publishedAt: { not: null }, isIndexable: true },
+      where: {
+        status: 'READY',
+        publishedAt: { not: null },
+        isIndexable: true,
+        // Empty source shells left after a consolidation are historical URL
+        // containers, not independent indexable EventPages.
+        events: { some: {} },
+      },
       select: { slug: true, updatedAt: true, publishedAt: true },
       orderBy: { slug: 'asc' },
     });
