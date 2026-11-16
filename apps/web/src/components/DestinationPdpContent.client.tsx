@@ -21,7 +21,7 @@ export function DestinationPdpContent({ pdp, cityName, region, showFaq = true }:
     </section> : null}
 
     {mainPlaces.length ? <section id="city-must-see" className="container-page border-t border-slate-100 py-8 sm:py-12">
-      <SectionHeading>{destinationMainPlacesHeading(region)}</SectionHeading>
+      <SectionHeading>{destinationMainPlacesHeading(cityName)}</SectionHeading>
       <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {mainPlaces.map((place, index) => <PlaceCard key={`${place.name}-${index}`} place={place} />)}
       </div>
@@ -47,7 +47,7 @@ export function DestinationPdpContent({ pdp, cityName, region, showFaq = true }:
 
     {content.travelText ? <section className="container-page border-t border-slate-100 py-8 sm:py-12"><SectionHeading>Как спланировать поездку</SectionHeading><p className="mt-4 max-w-4xl whitespace-pre-line text-base leading-7 text-slate-600">{content.travelText}</p></section> : null}
 
-    {gallery.length ? <section className="container-page border-t border-slate-100 py-8 sm:py-12"><SectionHeading>{destinationGalleryHeading(region)}</SectionHeading><div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4">{gallery.map((item, index) => <figure key={`${item.url}-${index}`} className="overflow-hidden rounded-xl bg-slate-100"><div className="relative aspect-[4/3]"><SafeImage src={item.url} alt={item.alt} fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover" /></div>{item.caption || item.credit ? <figcaption className="p-2 text-xs text-slate-600">{item.caption}{item.credit ? <span className="block text-slate-400">{item.credit}</span> : null}</figcaption> : null}</figure>)}</div></section> : null}
+    {gallery.length ? <section className="container-page border-t border-slate-100 py-8 sm:py-12"><SectionHeading>{destinationGalleryHeading(cityName)}</SectionHeading><div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4">{gallery.map((item, index) => <figure key={`${item.url}-${index}`} className="overflow-hidden rounded-xl bg-slate-100"><div className="relative aspect-[4/3]"><SafeImage src={item.url} alt={item.alt} fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover" /></div>{item.caption || item.credit ? <figcaption className="p-2 text-xs text-slate-600">{item.caption}{item.credit ? <span className="block text-slate-400">{item.credit}</span> : null}</figcaption> : null}</figure>)}</div></section> : null}
 
     {showFaq && content.faq?.length ? <section id="faq" className="container-page border-t border-slate-100 py-8 sm:py-12"><SectionHeading>Частые вопросы</SectionHeading><div className="mt-4 max-w-4xl divide-y divide-slate-200">{content.faq.map((item, index) => <details key={`${item.question}-${index}`} className="py-4"><summary className="cursor-pointer font-medium text-slate-900">{item.question}</summary><p className="mt-3 whitespace-pre-line text-sm leading-6 text-slate-600">{item.answer}</p></details>)}</div></section> : null}
   </div>;

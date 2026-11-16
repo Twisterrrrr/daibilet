@@ -1,7 +1,9 @@
-export function destinationMainPlacesHeading(region: boolean): string {
-  return region ? 'Главные места региона' : 'Что посмотреть в городе';
+import { cityToGenitive } from './city-declension';
+
+export function destinationMainPlacesHeading(destinationName: string): string {
+  return `Главные места ${cityToGenitive(destinationName)}`;
 }
 
-export function destinationGalleryHeading(region: boolean): string {
-  return region ? 'Фотографии региона' : 'Фотографии города';
+export function destinationGalleryHeading(destinationName: string): string {
+  return `Фотографии ${cityToGenitive(destinationName)}`;
 }
