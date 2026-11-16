@@ -8,6 +8,8 @@ export type HubAfficheSession = {
   eventTitle?: string | null;
   venue?: string | null;
   venueSlug?: string | null;
+  subcategories?: string[] | null;
+  tags?: string[] | null;
 };
 
 export type HubAfficheRow<T extends HubAfficheSession = HubAfficheSession> =
@@ -30,12 +32,15 @@ const TOURIST_AFFICHE_SLUGS = new Set([
 const CHIP_ORDER = [
   'Экскурсии',
   'Речные прогулки',
-  'Театр',
   'Концерты',
+  'Спектакли',
+  'Фестивали',
+  'Шоу и встречи',
+  'Юмор',
   'Музеи и арт',
   'Активный отдых',
   'Развлечения',
-  'Мероприятия',
+  'Другие события',
 ];
 
 const MUSEUM_TAB_MIN = 3;
@@ -47,7 +52,37 @@ export function isCityHubTouristAffiche(slug: string | null | undefined): boolea
 }
 
 export function sessionHaystack(session: HubAfficheSession): string {
-  return `${session.category || ''} ${session.title || ''} ${session.eventTitle || ''} ${session.venue || ''}`.toLowerCase();
+  return [
+    session.category,
+    session.title,
+    session.eventTitle,
+    session.venue,
+    ...(session.tags || []),
+    ...(session.subcategories || []),
+  ].filter(Boolean).join(' ').toLowerCase();
+}
+
+/** Split generic «Мероприятия» source buckets into visitor-facing types. */
+export function hubAfficheCategory(session: HubAfficheSession): string {
+  const category = String(session.category || '').trim();
+  if (/^театр(?:\b|\s)/i.test(category)) return 'Спектакли';
+  if (/^(юмор|стендап|stand[\s-]?up)$/i.test(category)) return 'Юмор';
+  if (!/^(мероприятия|события|развлечения)$/i.test(category)) return category;
+
+  const hay = sessionHaystack(session);
+  const title = `${session.title || ''} ${session.eventTitle || ''}`.toLowerCase();
+  if (/фестивал|\bфест\b|\bfest\b|festival|историческ.{0,12}реконструкц|косплей/.test(hay)) return 'Фестивали';
+  if (/спектакл|премьера|балет|опера|мюзикл|театр|драматическ/.test(hay)) return 'Спектакли';
+  if (/концерт|оркестр|симфон|филармон/.test(title)) return 'Концерты';
+  if (/стендап|stand[\s-]?up|юмор|комеди|квиз/.test(hay)) return 'Юмор';
+  if (/встреча|вечер|шоу|цирк|иллюзион/.test(title)) return 'Шоу и встречи';
+  if (/поп|рок|панк|металл|джаз|эстрад|ska|live/.test(hay)) return 'Концерты';
+  return 'Другие события';
+}
+
+export function filterHubAfficheCategory<T extends HubAfficheSession>(sessions: T[], category: string): T[] {
+  if (category === 'all') return sessions;
+  return sessions.filter((session) => hubAfficheCategory(session) === category);
 }
 
 export function isStandupSession(session: HubAfficheSession): boolean {
@@ -82,7 +117,7 @@ export function visibleAfficheCategories(
 ): Array<[string, number]> {
   const counts = new Map<string, number>();
   for (const session of sessions) {
-    const name = String(session.category || '').trim();
+    const name = hubAfficheCategory(session);
     if (!name) continue;
     counts.set(name, (counts.get(name) || 0) + 1);
   }

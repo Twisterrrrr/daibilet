@@ -2233,6 +2233,32 @@ const KIROV_ITEMS: CityLifehackItem[] = [
 ];
 
 const CITY_HUB_LIFEHACKS: Record<string, CityLifehackPack> = {
+  'veliky-novgorod': lifehackPack([
+    {
+      id: 'veliky-novgorod-lastochka', tabId: 'transit', icon: 'transit',
+      title: 'Из Петербурга в Новгород — на «Ласточке»',
+      body: body('Скоростной поезд довезёт из Петербурга примерно за три часа. Расписание и стоимость зависят от даты поездки — проверьте их на сайте РЖД перед покупкой.'),
+      cta: { kind: 'link', label: 'Расписание и билеты РЖД', href: 'https://www.rzd.ru/' },
+    },
+    {
+      id: 'veliky-novgorod-bus-7', tabId: 'transit', icon: 'transit',
+      title: 'До Витославлиц удобно доехать на автобусе № 7',
+      body: body('Автобус № 7 идёт от железнодорожного вокзала к музею. Перед выездом проверьте актуальный маршрут, интервал движения и стоимость проезда.'),
+      cta: { kind: 'gis', label: 'Маршрут до Витославлиц', href: twoGisCitySearchUrl('veliky-novgorod', 'автобус 7 Витославлицы') },
+    },
+    {
+      id: 'veliky-novgorod-kremlin-entry', tabId: 'walk', icon: 'museum',
+      title: 'В Детинец можно зайти бесплатно',
+      body: body('Вход на территорию Детинца свободный. Звонница, палаты и музейные экспозиции — отдельные объекты со своим режимом и билетами.'),
+      cta: { kind: 'places', label: 'Новгородский Детинец', slugs: ['veliky-novgorod-novgorodskiy-detinets-kreml'], scrollTo: 'places' },
+    },
+    {
+      id: 'veliky-novgorod-trade-side-lunch', tabId: 'food', icon: 'food',
+      title: 'Остановитесь на обед на Торговой стороне',
+      body: body('У Ярославова Дворища есть кафе и рестораны, где можно перекусить без большого счёта. Меню и часы работы лучше проверить перед визитом.'),
+      cta: { kind: 'maps', label: 'Кафе на Торговой стороне', href: yandexMapsSearchUrl('кафе Торговая сторона Великий Новгород') },
+    },
+  ]),
   perm: lifehackPack(PERM_ITEMS),
   moscow: lifehackPack(MOSCOW_ITEMS),
   'saint-petersburg': lifehackPack(SPB_ITEMS),

@@ -250,15 +250,12 @@ export function SuburbsCarousel({
       const slug = String(place.venueSlug || place.locationSlug || '').trim();
       return slug && String(venue.slug || '').trim() === slug;
     });
-    // Venue hook only - do not dump suburb `desc` into logistics (it belongs under the title).
-    const blurb =
-      !compact
-        ? dayRouteHookLine({
-            hookFact: matchedVenue?.hookFact,
-            shortDescription: matchedVenue?.shortDescription,
-            preferEditorial: true,
-          }) || ''
-        : '';
+    const blurb = dayRouteHookLine({
+      desc: place.desc,
+      hookFact: matchedVenue?.hookFact,
+      shortDescription: matchedVenue?.shortDescription,
+      preferEditorial: true,
+    }, 180) || '';
     const nested = Array.isArray(place.places) ? place.places.filter((p) => p?.name) : [];
     const bulkVenues = buildBulkVenues(place, venues, city);
     const heroImageUrl = suburbHeroImage(place, venues);
@@ -286,7 +283,8 @@ export function SuburbsCarousel({
         editorial={editorial}
         magazine={compact}
         heroImageUrl={heroImageUrl}
-        lead={titleLines.lead}
+        heroImageCredit={place.imageCredit || null}
+        lead={blurb || titleLines.lead}
         title={titleNode}
         subtitle={titleLines.subtitle}
         titleExtra={
@@ -302,9 +300,7 @@ export function SuburbsCarousel({
         logisticsExit={logisticsExit}
         logisticsExitLabel={suburbExitLabel(place, Boolean(logisticsExit))}
         logisticsText={String(place.travelVectorBlurb || '').trim() || undefined}
-        logisticsExtra={
-          [String(place.timingNote || '').trim(), blurb].filter(Boolean).join(' ') || undefined
-        }
+        logisticsExtra={String(place.timingNote || '').trim() || undefined}
         gastro={compact ? null : resolveCanonGastroStop(place)}
         sightDescFromMd={compact}
         sights={nested.map((poi) => ({
@@ -313,12 +309,13 @@ export function SuburbsCarousel({
           href: resolveCityPlaceTitleHref(poi, venues, { allowNameMatch: false }),
           imageSlug: String(poi.locationSlug || poi.venueSlug || '').trim() || null,
           imageUrl: poi.imageUrl,
+          imageCredit: poi.imageCredit,
           transitTip: String(poi.transitTip || '').trim() || undefined,
           dayLabel: String(poi.dayLabel || '').trim() || undefined,
           visitMinutes: poi.visitMinutes,
         }))}
         cta={
-          bulkVenues.length > 0 ? (
+          !compact && bulkVenues.length > 0 ? (
             <AddManyToDayRouteButton
               compact
               variant={compact ? 'primary' : 'light'}
@@ -365,6 +362,23 @@ export function SuburbsCarousel({
 
       <div className={hideHeader ? undefined : compact ? 'mt-4' : 'mt-5'}>
         {compact ? renderChipRow('accordion') : renderChipRow('tabs')}
+        {compact && selected ? (
+          <div className="mt-3" data-day-suburb-primary-cta>
+            {(() => {
+              const venuesForSuburb = buildBulkVenues(selected, venues, city);
+              return venuesForSuburb.length ? (
+                <AddManyToDayRouteButton
+                  compact
+                  variant="primary"
+                  mode={replaceDayOnApply ? 'replace' : 'append'}
+                  navigateToMyDay={navigateToMyDayOnApply}
+                  className="w-full !min-h-11 !rounded-xl !px-4 !py-2.5 !text-sm"
+                  venues={venuesForSuburb}
+                />
+              ) : null;
+            })()}
+          </div>
+        ) : null}
         {selected && selectedIndex != null ? renderSuburbPanel(selected, selectedIndex) : null}
         {compact && selectedIndex == null ? (
           <p className="mt-3 text-sm text-slate-500" data-city-suburb-hint>

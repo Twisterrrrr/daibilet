@@ -1,7 +1,7 @@
 /**
- * Копирует legacy статику и deploy fallback в канонический Next public перед сборкой.
+ * Копирует read-only архив изображений и deploy fallback в Next public перед сборкой.
  *
- * Legacy источник (только чтение): apps/public/public/images/
+ * Переходный источник изображений (только чтение): apps/public/public/images/
  *   blog/      — обложки статей
  *   cities/    — карточки городов (*.png)
  *   hero/      — фон главной
@@ -23,7 +23,6 @@ const targetRoot = path.join(webRoot, 'public/images');
 
 const sourceRoots = [
   path.join(repoRoot, 'apps/public/public/images'),
-  path.join(repoRoot, 'apps/public/dist/images'),
   path.join(repoRoot, 'deploy/assets/images'),
 ];
 

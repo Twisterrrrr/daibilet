@@ -63,6 +63,7 @@ import {
   KIROV_WHEN_TO_GO,
   TOLYATTI_WHEN_TO_GO,
   IZHEVSK_WHEN_TO_GO,
+  VELIKY_NOVGOROD_WHEN_TO_GO,
 } from './when-to-go-packs.ts';
 import { normalizeCityHubSlug } from './city-hub-config.ts';
 import type { CityMustSeeItem, CitySuburbItem, CitySuburbPlace } from './cityInfo.ts';
@@ -202,6 +203,73 @@ const PERM_WEATHER: CityWeatherFlavor = {
   indoorCtaRain: 'Дождь: музеи и кафе центра короткими перебежками',
   indoorCtaSnow: 'Снег: тёплые залы; к Каме только в протекторе',
 };
+
+const VELIKY_NOVGOROD_WEATHER: CityWeatherFlavor = {
+  latitude: 58.5213,
+  longitude: 31.2755,
+  timezone: 'Europe/Moscow',
+  outdoorSlugs: [
+    'veliky-novgorod-novgorodskiy-detinets-kreml',
+    'veliky-novgorod-yaroslavovo-dvorische',
+    'veliky-novgorod-peshehodny-most-volkhov',
+    'veliky-novgorod-ryurikovo-gorodische',
+  ],
+  indoorSlugs: [
+    'veliky-novgorod-muzey-derevyannogo-zodchestva-vitoslavlitsy',
+    'veliky-novgorod-sofiyskiy-sobor',
+  ],
+  outdoorCta: 'Хорошая погода: Кремль, Торговая сторона и прогулка вдоль Волхова',
+  indoorCtaOvercast: 'Пасмурно: выберите музей или экспозицию в центре',
+  indoorCtaRain: 'Дождь: запланируйте музей и проверьте часы работы перед выходом',
+  indoorCtaSnow: 'Снег: сократите прогулку и оставьте больше времени на музейные залы',
+};
+
+const VELIKY_NOVGOROD_SLIDES: CityIdentitySlide[] = [
+  {
+    id: 'veliky-novgorod-cradle-of-rus',
+    title: 'Родина России',
+    text: 'Летописное предание о призвании варягов связывает начало русской государственности с Новгородской землёй. Рюриково городище хранит память об этом раннем периоде.',
+    imageSrc: '/images/cities/identity/veliky-novgorod-rurikovo-gorodishche.jpg',
+    imageAlt: 'Панорама Рюрикова городища у истока Волхова',
+    imageCredit: { author: 'User№101', sourceUrl: 'https://commons.wikimedia.org/wiki/File:Riurikovo_Gorodishche.jpg', license: 'CC BY-SA 3.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0/' },
+    slugs: ['veliky-novgorod-ryurikovo-gorodische'],
+    target: 'suburbs',
+    badge: 'История',
+  },
+  {
+    id: 'veliky-novgorod-republic',
+    title: 'Господин Великий Новгород',
+    text: 'Торговая сторона и Ярославово Дворище напоминают о Новгородской республике и вечевом устройстве города.',
+    imageSrc: '/images/cities/identity/veliky-novgorod-yaroslav-court.jpg',
+    imageAlt: 'Панорама храмов Ярославова Дворища',
+    imageCredit: { author: 'Ludvig14', sourceUrl: 'https://commons.wikimedia.org/wiki/File:VNovgorod_YaroslavsCourt_VN83l.jpg', license: 'CC BY-SA 3.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0/' },
+    slugs: ['veliky-novgorod-yaroslavovo-dvorische'],
+    target: 'places',
+    badge: 'Республика',
+  },
+  {
+    id: 'veliky-novgorod-open-air-museum',
+    title: 'Город-музей под открытым небом',
+    text: 'Памятники разных эпох стоят на обоих берегах Волхова. Софийский собор — один из главных ориентиров исторического центра.',
+    imageSrc: '/images/cities/identity/veliky-novgorod-sofia-aerial.jpg',
+    imageAlt: 'Софийский собор и Новгородский кремль с высоты',
+    imageCredit: { author: 'Красный', sourceUrl: 'https://commons.wikimedia.org/wiki/File:Великий_Новгород,_Софийский_собор_сверху.jpg', license: 'CC BY-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/' },
+    slugs: ['veliky-novgorod-sofiyskiy-sobor', 'veliky-novgorod-novgorodskiy-detinets-kreml'],
+    target: 'places',
+    badge: 'Архитектура',
+  },
+  {
+    id: 'veliky-novgorod-birch-bark-letters',
+    title: 'Берестяные грамоты',
+    text: 'Сотни найденных в Новгороде берестяных грамот сохранили частные письма и повседневные записи средневековых горожан.',
+    imageSrc: '/images/cities/identity/veliky-novgorod-birch-bark-letter.jpg',
+    imageAlt: 'Берестяная грамота № 591 с древним кириллическим алфавитом',
+    imageCredit: { author: 'Автор не указан; файл загружен AshFox', sourceUrl: 'https://commons.wikimedia.org/wiki/File:Birch_bark_alphabet_of_Novgorod.jpg', license: 'CC BY 1.0', licenseUrl: 'https://creativecommons.org/licenses/by/1.0/' },
+    slugs: ['veliky-novgorod-novgorodskiy-detinets-kreml'],
+    target: 'places',
+    badge: 'Письменность',
+  },
+];
 
 const MONTH_TITLE = [
   '',
@@ -2050,6 +2118,14 @@ const TYUMEN_SLIDES: CityIdentitySlide[] = [
 ];
 
 export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
+  'veliky-novgorod': {
+    identityHeading: 'Чем уникален Великий Новгород',
+    identityLead: 'Четыре истории, которые объясняют характер города',
+    tags: tagsFromSlides(VELIKY_NOVGOROD_SLIDES),
+    slides: VELIKY_NOVGOROD_SLIDES,
+    weather: VELIKY_NOVGOROD_WEATHER,
+    whenToGo: VELIKY_NOVGOROD_WHEN_TO_GO,
+  },
   perm: {
     identityHeading: 'Чем уникальна Пермь',
     identityLead: IDENTITY_LEAD,

@@ -223,7 +223,7 @@ export type CityMustSeeItem = CityPlaceLinkFields & {
   /** Curated local photo for editorial stops without a catalog page. */
   imageUrl?: string | null;
   /** Visible attribution for locally curated third-party photos. */
-  imageCredit?: { author: string; sourceUrl: string; license: string; licenseUrl: string };
+  imageCredit?: { author: string; sourceUrl?: string; license: string; licenseUrl?: string };
   /** Optional day-route coords when hub venues omit the place. */
   latitude?: number | null;
   longitude?: number | null;
@@ -298,6 +298,8 @@ export type CitySuburbPlace = CityPlaceLinkFields & {
   name: string;
   /** Direct editorial cover for this nested suburb point. */
   imageUrl?: string | null;
+  /** Visible attribution for locally curated third-party photos. */
+  imageCredit?: { author: string; sourceUrl?: string; license: string; licenseUrl?: string };
   /** Краткое описание для блока «Что посмотреть». */
   desc?: string;
   address?: string | null;
@@ -369,6 +371,8 @@ export type CityDayRoutePreset = {
    * Нужна, когда у остановок только label-card stubs или нет blogSlug.
    */
   coverImageUrl?: string;
+  /** Visible image attribution when the route cover has a share-alike license. */
+  coverImageCredit?: { author: string; sourceUrl?: string; license: string; licenseUrl?: string };
   /** Optional day-trip logistics (same canon as significantSuburbs). */
   travelVector?: string;
   travelVectorBlurb?: string;
