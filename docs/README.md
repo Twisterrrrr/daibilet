@@ -26,6 +26,7 @@
 [Архив изображений и переход на активную статику - 13.11.2026](./image-archive-runtime-migration-2026-11-13.md)
 [Карта рабочих копий и переносов - 10.11.2026](./local-workspace-inventory-2026-11-10.md)
 [Сверка tours с активной копией Daibilet - 10.11.2026](./tours-vs-daibilet-audit-2026-11-10.md)
+[Legacy apps/public isolation](./legacy-public-isolation.md)
 [Диагностика production-сети и диска](./production-network-and-disk-diagnostics.md)
 [Индексируемые EventPage с активными рерайтами - 12.11.2026](./eventpage-rewrite-recrawl-queue-2026-11-12.md)
 [Редакторский батч EventPage: 30 текстов, источники и сверка - 11.11.2026](./eventpage-rewrite-batch-30-source-audit-2026-11-11.md)

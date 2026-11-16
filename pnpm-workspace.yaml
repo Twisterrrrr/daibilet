@@ -1,5 +1,7 @@
 packages:
   - apps/*
+  # Frozen Vite public app: source-only legacy, not a workspace package.
+  - '!apps/public'
   - packages/*
 
 engineStrict: true
