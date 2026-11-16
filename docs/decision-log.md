@@ -1,5 +1,25 @@
 # Decision Log — Daibilet
 
+## 2026-11-16 — City-first URL hierarchy; preserve event URLs
+
+City hubs move toward `/{city}`, region hubs use `/regions/{region}`, and
+city-place catalogs use `/{city}/places` plus `/{city}/{type}` for registered
+place types. Global directories remain `/cities`, `/regions`, and `/places`;
+global place-type catalogs remain `/places/{type}`. Existing venue/location
+PDP route families remain stable. `/events` and `/events/{slug}` are explicitly
+outside this URL migration and do not change.
+
+Add routes and verify them before switching canonicals or redirecting existing
+URLs. The migration map must be reviewed and redirects must be one-hop. City
+routes resolve only for registered hubs, with explicit reserved paths and
+precedence over generic landing routes. City × place-type pages follow the
+0 → 404, 1–2 → noindex/canonical to city places, 3+ → self-canonical index
+policy. Full rules and rollout sequence are in
+[`city-region-place-url-canon-2026-11-16.md`](./city-region-place-url-canon-2026-11-16.md).
+
+**Status:** Architecture recorded; route implementation and staging QA remain
+open. No public URLs were changed by this decision.
+
 ## 2026-11-13 — EventPage owns its editorial hero image
 
 **Decision:** Store a page-specific cover in `EventPage.heroImageUrl`. Provider
