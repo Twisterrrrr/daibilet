@@ -1,0 +1,23 @@
+{
+  "appliedAt": "2026-11-16T20:53:44.634Z",
+  "database": "daibilet",
+  "pages": [
+    {
+      "slug": "cirk-bruno-v-g-ishim",
+      "url": "https://daibilet.ru/events/cirk-bruno-v-g-ishim",
+      "revisionCount": 7,
+      "status": "READY",
+      "isIndexable": true
+    },
+    {
+      "slug": "cirk-bruno-v-g-tobolsk",
+      "url": "https://daibilet.ru/events/cirk-bruno-v-g-tobolsk",
+      "revisionCount": 6,
+      "status": "READY",
+      "isIndexable": true
+    }
+  ],
+  "routesChanged": false,
+  "eventLinksChanged": false,
+  "publicationOrIndexabilityChanged": false
+}
