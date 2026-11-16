@@ -27,6 +27,7 @@
 [Карта рабочих копий и переносов - 10.11.2026](./local-workspace-inventory-2026-11-10.md)
 [Сверка tours с активной копией Daibilet - 10.11.2026](./tours-vs-daibilet-audit-2026-11-10.md)
 [Консервация локальной копии tours и сверка рабочего состояния - 16.11.2026](./tours-vs-daibilet-audit-2026-11-16.md)
+[Изоляция legacy apps/public](./legacy-public-isolation.md)
 [Диагностика production-сети и диска](./production-network-and-disk-diagnostics.md)
 [Индексируемые EventPage с активными рерайтами - 12.11.2026](./eventpage-rewrite-recrawl-queue-2026-11-12.md)
 [Редакторский батч EventPage: 30 текстов, источники и сверка - 11.11.2026](./eventpage-rewrite-batch-30-source-audit-2026-11-11.md)
@@ -130,4 +131,3 @@
 ## Атрибуция иконок
 
 Favicon / PWA-иконки (`apps/web/public/favicon.*`, `icon-*.png`, `apple-touch-icon.png`): силуэт билета по [Flaticon ticket_1912](https://www.flaticon.com/ru/free-icon/ticket_1912) (автор **Freepik** / **Flaticon**), перекрашен в бренд-синий `#4A7FD4` (`DAIBILET_LOGO_BLUE`), повёрнут на −45° с крупным fill (~88–90% кадра).
-

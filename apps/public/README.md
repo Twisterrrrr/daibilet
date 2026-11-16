@@ -1,25 +1,14 @@
-# Public
+# Legacy public (Vite)
 
-Vite React public-каталог Дайбилета: главная, каталог, страницы событий, городов, площадок, лендингов и покупок.
+Этот каталог сохранён как архив исходников старого публичного приложения.
+Единственный активный public runtime — `apps/web` (Next.js).
 
-## Локальный запуск
+- `apps/public` исключён из pnpm workspace и рекурсивных build/typecheck задач.
+- Старые Vite deploy-скрипты закрыты; production и staging обслуживаются Next.
+- Исходники и ассеты здесь не редактировать и не собирать для публикации.
+- `apps/public/public/images` пока остаётся только read-only источником для
+  переходной миграции ассетов, вызываемой из `apps/web/scripts/sync-public-assets.mjs`.
+  Удалять его можно после отдельной сверки ассетов и перевода сборки на
+  самостоятельный архив изображений.
 
-```bash
-npm --prefix apps/public install
-npm run public:serve
-```
-
-URL:
-
-```text
-http://127.0.0.1:5178
-```
-
-## Проверка
-
-```bash
-npm --prefix apps/public run typecheck
-npm run public:build
-```
-
-В production public собирается со значением `VITE_DAIBILET_API_URL=https://api.daibilet.ru`.
+Решение и оставшиеся шаги: [`docs/legacy-public-isolation.md`](../../docs/legacy-public-isolation.md).

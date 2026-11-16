@@ -15,11 +15,11 @@
 - `apps/web` — Next.js App Router, **это production public**
 - `apps/admin`, `apps/backend` — админка и API
 - `apps/worker` — фоновые задачи
-- `apps/public` — **legacy Vite-фронт**, в CI не собирается; его исходники и
-  `apps/public/public` только читаются для переноса старой статики. Не создавать
-  и не изменять там файлы скриптами, генераторами или сборкой. Канон приложения
-  и активных ассетов — `apps/web`; legacy-дерево будет удалено после завершения
-  миграции ассетов из `docs/image-archive-runtime-migration-2026-11-13.md`.
+- `apps/public` — **изолированный legacy Vite-фронт**, исключённый из pnpm
+  workspace и production/staging deploy. Его исходники не собирать и не менять.
+  `apps/public/public/images` пока разрешён только как read-only источник
+  переходной миграции ассетов в `apps/web`; удалить эту связь после проверки
+  `docs/image-archive-runtime-migration-2026-11-13.md`.
 - `packages/db` — Prisma 7.8, `packages/contracts` — Zod DTO, `packages/config` — tsconfig
 
 ## Перед любыми изменениями прочитай
