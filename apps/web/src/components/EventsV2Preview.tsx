@@ -48,13 +48,17 @@ export function EventsV2Preview({ catalog, landings = [], articles = [] }: Props
   const items = catalog?.items ?? [];
   const cats = catalog?.facets?.categories ?? [];
   const featured = items.filter((it) => it.imageUrl).slice(0, 5);
+  const audienceLists = (catalog?.facets?.catalogLists ?? [])
+    .filter((l) => l.events >= 1)
+    .sort((a, b) => b.events - a.events);
 
-  const groups: Array<{ category: string; items: typeof items }> = [];
+  const groups: Array<{ key: string; label: string; items: typeof items }> = [];
   for (const it of items) {
-    const key = collectCatalogLabels(it, 1)[0] || it.category || 'Другое';
-    let group = groups.find((g) => g.category === key);
+    const label = it.catalogSubcategory?.title || collectCatalogLabels(it, 1)[0] || it.category || 'Другое';
+    const key = it.catalogSubcategory?.slug || label;
+    let group = groups.find((g) => g.key === key);
     if (!group) {
-      group = { category: key, items: [] };
+      group = { key, label, items: [] };
       groups.push(group);
     }
     group.items.push(it);
@@ -84,9 +88,18 @@ export function EventsV2Preview({ catalog, landings = [], articles = [] }: Props
           </div>
 
           <div className="quick-pills">
-            <button className="pill is-active">Все</button>
-            {cats.slice(0, 6).map((c) => <button key={c.name} className="pill">{c.name}</button>)}
+            <Link href="/events" className="pill is-active">Все</Link>
+            {cats.slice(0, 6).map((c) => <Link key={c.name} href={buildCatalogHref({ category: c.name })} className="pill">{c.name}</Link>)}
           </div>
+          {audienceLists.length ? (
+            <div className="quick-pills">
+              {audienceLists.map((l) => (
+                <Link key={l.key} href={buildCatalogHref({ tag: l.key })} className="pill">
+                  {l.title} · {l.events}
+                </Link>
+              ))}
+            </div>
+          ) : null}
 
           {featured.length >= 2 ? (
             <section className="section">
@@ -100,7 +113,7 @@ export function EventsV2Preview({ catalog, landings = [], articles = [] }: Props
                     <Link key={e.id} href={`/events/${e.eventPageSlug || e.slug || ''}`} className="featured-card">
                       {e.imageUrl ? <SafeImage src={e.imageUrl} alt="" fill sizes="50vw" className="object-cover" /> : null}
                       <div className="featured-card__body">
-                        <span className="featured-card__tag">{e.category}</span>
+                        <span className="featured-card__tag">{e.catalogSubcategory?.title || e.category}</span>
                         <h3>{e.title}</h3>
                         <p>{e.dateLabel} · {e.venue}</p>
                       </div>
@@ -132,15 +145,15 @@ export function EventsV2Preview({ catalog, landings = [], articles = [] }: Props
           ) : null}
 
           {rails.map((group, idx) => (
-            <Fragment key={group.category}>
+            <Fragment key={group.key}>
               <section className="section carousel">
                 <div className="container">
                   <div className="carousel__head">
                     <div>
-                      <h2>{group.category}</h2>
+                      <h2>{group.label}</h2>
                       <p>{pluralEvents(group.items.length)} · выбор редакции</p>
                     </div>
-                    <Link href={buildCatalogHref({ q: group.category })} className="link-more">Смотреть всё →</Link>
+                    <Link href={buildCatalogHref({ category: group.key })} className="link-more">Смотреть всё →</Link>
                   </div>
                   <div className="scroller">{group.items.map((item) => <V2EventCard key={item.id} item={item} />)}</div>
                 </div>

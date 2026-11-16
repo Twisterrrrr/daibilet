@@ -25,6 +25,7 @@ export function catalogFiltersCacheKey(
     q?: string;
     city?: string;
     category?: string;
+    tag?: string;
     landing?: string;
     excludeLanding?: string[] | string;
     date?: string;
@@ -51,6 +52,7 @@ export function catalogFiltersCacheKey(
     q: filters.q,
     city: filters.city,
     category: filters.category,
+    tag: filters.tag,
     landing: filters.landing,
     excludeLanding: exclude ? exclude.split(',') : undefined,
     date: filters.date,
@@ -75,6 +77,7 @@ export function catalogQueryCacheKey(query: PublicCatalogQuery & { page?: number
     q: query.q ?? '',
     city: query.city ?? '',
     category: query.category ?? '',
+    tag: query.tag ?? '',
     landing: query.landing ?? '',
     excludeLanding,
     date: query.date ?? '',
@@ -175,6 +178,7 @@ export function buildCatalogApiSearchParams(
     q?: string;
     city?: string;
     category?: string;
+    tag?: string;
     landing?: string;
     excludeLanding?: string[] | string;
     date?: string;
@@ -193,6 +197,7 @@ export function buildCatalogApiSearchParams(
   if (q) params.set('q', q);
   if (filters.city) params.set('city', filters.city);
   if (filters.category) params.set('category', filters.category);
+  if (filters.tag) params.set('tag', filters.tag);
   if (filters.landing) params.set('landing', filters.landing);
   const exclude = Array.isArray(filters.excludeLanding)
     ? [...filters.excludeLanding].map((s) => String(s).trim().toLowerCase()).filter(Boolean).sort()

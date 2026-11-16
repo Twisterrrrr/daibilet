@@ -246,3 +246,10 @@
 .v2 .featured-carousel::-webkit-scrollbar{display:none}
 .v2 .featured-carousel>*{flex:0 0 30%;min-width:200px;scroll-snap-align:start}
 @media(max-width:720px){.v2 .featured-carousel>*{flex:0 0 70%}}
+
+
+/* Route promo banner between place blocks. */
+.v2 .route-banner{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;border-radius:24px;padding:28px 32px;background:linear-gradient(135deg,var(--violet),#8b7cf0);color:#fff;text-decoration:none}
+.v2 .route-banner__kicker{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:rgba(255,255,255,.16);padding:4px 10px;border-radius:100px}
+.v2 .route-banner h3{font-family:var(--font-display);font-size:22px;line-height:1.15;letter-spacing:-.02em;margin-top:10px}
+.v2 .route-banner p{font-size:14px;opacity:.82;margin-top:6px}

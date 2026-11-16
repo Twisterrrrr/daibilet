@@ -9,6 +9,7 @@ export interface CatalogFilterValues {
   q?: string;
   city?: string;
   category?: string;
+  tag?: string;
   landing?: string;
   /** Hide sessions that carry these landing slugs (standup, river-cruises, …). */
   excludeLanding?: string[] | string;
@@ -88,6 +89,7 @@ export function catalogFiltersFromQuery(query: CatalogFilterValues): CatalogFilt
     q: query.q || undefined,
     city: query.city && query.city !== 'all' ? query.city : undefined,
     category: query.category && query.category !== 'all' ? query.category : undefined,
+    tag: query.tag && query.tag !== 'all' ? query.tag : undefined,
     landing: query.landing && query.landing !== 'all' ? query.landing : undefined,
     excludeLanding: excludeLanding.length ? excludeLanding : undefined,
     date: query.date && query.date !== 'all' ? query.date : undefined,
@@ -108,6 +110,7 @@ export function buildCatalogHref(values: CatalogFilterValues): string {
   if (values.q?.trim()) params.set('q', values.q.trim());
   if (values.city) params.set('city', values.city);
   if (values.category) params.set('category', values.category);
+  if (values.tag) params.set('tag', values.tag);
   if (values.landing) params.set('landing', values.landing);
   const excludeLanding = normalizeExcludeLandingParam(values.excludeLanding);
   if (excludeLanding.length) params.set('excludeLanding', excludeLanding.join(','));
@@ -226,6 +229,7 @@ export function clearCatalogFilterKey(
   if (key === 'q') delete next.q;
   if (key === 'city') delete next.city;
   if (key === 'category') delete next.category;
+  if (key === 'tag') delete next.tag;
   if (key === 'landing') delete next.landing;
   if (key === 'excludeLanding') delete next.excludeLanding;
   if (key === 'date') delete next.date;

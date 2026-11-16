@@ -9,7 +9,7 @@ import type { PublicCatalogListItemDto } from '@daibilet/contracts/public';
 /** Карточка события нового шаблона (`.event-card`) — общая для главной и афиши. */
 export function V2EventCard({ item }: { item: PublicCatalogListItemDto }) {
   const href = `/events/${item.eventPageSlug || item.slug || ''}`;
-  const tag = collectCatalogLabels(item, 1)[0] || item.category;
+  const tag = item.catalogSubcategory?.title || item.tagLabels?.[0] || collectCatalogLabels(item, 1)[0] || item.category;
   return (
     <Link href={href} className="event-card">
       <div className="event-card__media">
