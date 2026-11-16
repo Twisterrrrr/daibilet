@@ -73,6 +73,11 @@ const nextConfig: NextConfig = {
       { source: '/places', has: [{ type: 'query', key: 'family', value: 'location' }], destination: '/places/location', permanent: true },
       // English alias should resolve to the imported/canonical city slug used by catalog DTOs.
       { source: '/cities/saint-petersburg', destination: '/cities/sankt-peterburg', permanent: true },
+      // Canonical city URLs use the English transliteration without the extra "i".
+      { source: '/cities/velikiy-novgorod', destination: '/cities/veliky-novgorod', statusCode: 301 },
+      { source: '/cities/nizhniy-novgorod', destination: '/cities/nizhny-novgorod', statusCode: 301 },
+      { source: '/places/c/nizhniy-novgorod', destination: '/places/c/nizhny-novgorod', statusCode: 301 },
+      { source: '/places/c/velikiy-novgorod', destination: '/places/c/veliky-novgorod', statusCode: 301 },
       // Moscow has one city record (city_524901); use the stable English slug everywhere.
       { source: '/cities/moskva', destination: '/cities/moscow', permanent: true },
       { source: '/my-orders', destination: '/account/purchases', permanent: true },

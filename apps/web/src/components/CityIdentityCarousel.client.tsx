@@ -91,13 +91,21 @@ export function CityIdentityCarousel({ citySlug, editorial = false, sectionId, o
               </button>
               {slide.imageCredit ? (
                 <div className="absolute inset-x-2 bottom-2 z-10 flex max-w-[calc(100%-1rem)] flex-wrap items-center gap-x-1 text-[10px] leading-tight text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.95)]">
-                  <a href={slide.imageCredit.sourceUrl} target="_blank" rel="noreferrer" className="underline underline-offset-2">
-                    Фото: {slide.imageCredit.author}
-                  </a>
+                  {slide.imageCredit.sourceUrl ? (
+                    <a href={slide.imageCredit.sourceUrl} target="_blank" rel="noreferrer" className="underline underline-offset-2">
+                      Фото: {slide.imageCredit.author}
+                    </a>
+                  ) : (
+                    <span>Фото: {slide.imageCredit.author}</span>
+                  )}
                   <span aria-hidden="true">·</span>
-                  <a href={slide.imageCredit.licenseUrl} target="_blank" rel="noreferrer" className="underline underline-offset-2">
-                    {slide.imageCredit.license}
-                  </a>
+                  {slide.imageCredit.licenseUrl ? (
+                    <a href={slide.imageCredit.licenseUrl} target="_blank" rel="noreferrer" className="underline underline-offset-2">
+                      {slide.imageCredit.license}
+                    </a>
+                  ) : (
+                    <span>{slide.imageCredit.license}</span>
+                  )}
                 </div>
               ) : null}
             </div>

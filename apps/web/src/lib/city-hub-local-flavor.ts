@@ -154,7 +154,7 @@ export type CityIdentitySlide = {
   text: string;
   imageSrc: string;
   imageAlt: string;
-  imageCredit?: { author: string; sourceUrl: string; license: string; licenseUrl: string };
+  imageCredit?: { author: string; sourceUrl?: string; license: string; licenseUrl?: string };
   slugs: string[];
   target: 'places' | 'suburbs' | 'mixed';
   /** Short category pill on the photo (Символ, Гастро, …). */
@@ -227,8 +227,8 @@ const VELIKY_NOVGOROD_WEATHER: CityWeatherFlavor = {
 const VELIKY_NOVGOROD_SLIDES: CityIdentitySlide[] = [
   {
     id: 'veliky-novgorod-cradle-of-rus',
-    title: 'Родина России',
-    text: 'Летописное предание о призвании варягов связывает начало русской государственности с Новгородской землёй. Рюриково городище хранит память об этом раннем периоде.',
+    title: 'Отсюда пошла земля русская',
+    text: 'У истока Волхова Рюриково городище напоминает о ранней истории Новгорода. На холме сохранились руины Благовещенской церкви XII века и открывается просторный вид на реку.',
     imageSrc: '/images/cities/identity/veliky-novgorod-rurikovo-gorodishche.jpg',
     imageAlt: 'Панорама Рюрикова городища у истока Волхова',
     imageCredit: { author: 'User№101', sourceUrl: 'https://commons.wikimedia.org/wiki/File:Riurikovo_Gorodishche.jpg', license: 'CC BY-SA 3.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0/' },
@@ -238,8 +238,8 @@ const VELIKY_NOVGOROD_SLIDES: CityIdentitySlide[] = [
   },
   {
     id: 'veliky-novgorod-republic',
-    title: 'Господин Великий Новгород',
-    text: 'Торговая сторона и Ярославово Дворище напоминают о Новгородской республике и вечевом устройстве города.',
+    title: 'Вечевой колокол и купеческий размах',
+    text: 'Новгородом правили вече и боярские семьи, а на Торговой стороне кипела торговля. Белые храмы Ярославова Дворища до сих пор стоят среди бывших торговых рядов.',
     imageSrc: '/images/cities/identity/veliky-novgorod-yaroslav-court.jpg',
     imageAlt: 'Панорама храмов Ярославова Дворища',
     imageCredit: { author: 'Ludvig14', sourceUrl: 'https://commons.wikimedia.org/wiki/File:VNovgorod_YaroslavsCourt_VN83l.jpg', license: 'CC BY-SA 3.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0/' },
@@ -248,26 +248,26 @@ const VELIKY_NOVGOROD_SLIDES: CityIdentitySlide[] = [
     badge: 'Республика',
   },
   {
-    id: 'veliky-novgorod-open-air-museum',
-    title: 'Город-музей под открытым небом',
-    text: 'Памятники разных эпох стоят на обоих берегах Волхова. Софийский собор — один из главных ориентиров исторического центра.',
-    imageSrc: '/images/cities/identity/veliky-novgorod-sofia-aerial.jpg',
-    imageAlt: 'Софийский собор и Новгородский кремль с высоты',
-    imageCredit: { author: 'Красный', sourceUrl: 'https://commons.wikimedia.org/wiki/File:Великий_Новгород,_Софийский_собор_сверху.jpg', license: 'CC BY-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/' },
+    id: 'veliky-novgorod-birch-bark-letters',
+    title: 'SMS-ки из XII века',
+    text: 'Берестяные грамоты сохранили обычные разговоры средневековых новгородцев: просьбы, счета, семейные записки и школьные рисунки мальчика Онфима.',
+    imageSrc: '/images/cities/identity/veliky-novgorod-birch-bark-letter.jpg',
+    imageAlt: 'Берестяная грамота с древним кириллическим письмом',
+    imageCredit: { author: 'Автор не указан; файл загружен AshFox', sourceUrl: 'https://commons.wikimedia.org/wiki/File:Birch_bark_alphabet_of_Novgorod.jpg', license: 'CC BY 1.0', licenseUrl: 'https://creativecommons.org/licenses/by/1.0/' },
     slugs: ['veliky-novgorod-sofiyskiy-sobor', 'veliky-novgorod-novgorodskiy-detinets-kreml'],
     target: 'places',
-    badge: 'Архитектура',
+    badge: 'Артефакты',
   },
   {
-    id: 'veliky-novgorod-birch-bark-letters',
-    title: 'Берестяные грамоты',
-    text: 'Сотни найденных в Новгороде берестяных грамот сохранили частные письма и повседневные записи средневековых горожан.',
-    imageSrc: '/images/cities/identity/veliky-novgorod-birch-bark-letter.jpg',
-    imageAlt: 'Берестяная грамота № 591 с древним кириллическим алфавитом',
-    imageCredit: { author: 'Автор не указан; файл загружен AshFox', sourceUrl: 'https://commons.wikimedia.org/wiki/File:Birch_bark_alphabet_of_Novgorod.jpg', license: 'CC BY 1.0', licenseUrl: 'https://creativecommons.org/licenses/by/1.0/' },
-    slugs: ['veliky-novgorod-novgorodskiy-detinets-kreml'],
+    id: 'veliky-novgorod-gastronomy',
+    title: 'Ильменский судак и сулья',
+    text: 'Попробуйте уху с шафраном, жареного ильменского судака, серые щи из крошева и местный пряник с медовухой.',
+    imageSrc: '/images/cities/identity/veliky-novgorod-gastronomy.jpg',
+    imageAlt: 'Традиционный обед: уха, судак и новгородский пряник',
+    imageCredit: { author: 'Сгенерировано ИИ · Daibilet', license: 'Редакционное изображение' },
+    slugs: [],
     target: 'places',
-    badge: 'Письменность',
+    badge: 'Гастрономия',
   },
 ];
 

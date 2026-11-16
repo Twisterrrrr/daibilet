@@ -13,6 +13,8 @@ const CYRILLIC_MAP: Record<string, string> = {
 
 const CITY_SLUG_ALIASES: Record<string, string> = {
   moskva: 'moscow',
+  'nizhniy-novgorod': 'nizhny-novgorod',
+  'velikiy-novgorod': 'veliky-novgorod',
 };
 
 export function eventHref(event: EventRouteSource): string {
@@ -71,10 +73,11 @@ export function cityCanonicalPath(
     // Keep the raw segment; normalizeSlug will safely reduce it below.
   }
 
+  const normalizeCityAlias = (value: string) => CITY_SLUG_ALIASES[value] || value;
   const aliases = [city.slug, city.sourceSlug, city.name]
-    .map((value) => normalizeSlug(value))
+    .map((value) => normalizeCityAlias(normalizeSlug(value)))
     .filter(Boolean);
-  return aliases.includes(normalizeSlug(storedSlug)) ? href : stored;
+  return aliases.includes(normalizeCityAlias(normalizeSlug(storedSlug))) ? href : stored;
 }
 
 /** Афиша города — расписание событий на странице CityPage. */

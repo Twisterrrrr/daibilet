@@ -105,6 +105,8 @@ const CITY_SLUG_ALIASES: Record<string, string> = {
   kazan: 'kazan',
   'nizhny-novgorod': 'nizhny-novgorod',
   'nizhniy-novgorod': 'nizhny-novgorod',
+  'veliky-novgorod': 'veliky-novgorod',
+  'velikiy-novgorod': 'veliky-novgorod',
   samara: 'samara',
   volgograd: 'volgograd',
   yaroslavl: 'yaroslavl',

@@ -380,11 +380,11 @@ export function CityPageView({
   const hasFestivalsNav = cityHasRegionalFestivals(hubSlug);
 
   const applyPlaceFocus = React.useCallback((focus: CityPlaceFocus | null) => {
-    if (!focus?.slugs.length) {
+    if (!focus) {
       setPlaceFocus(null);
       return;
     }
-    setPlaceFocus(focus);
+    setPlaceFocus(focus.slugs.length ? focus : null);
     scrollToSection(focus.scrollTo === 'suburbs' ? 'city-suburbs' : 'city-must-see');
   }, []);
   // Story cards UI hidden (owner 2026-08-03); keep build helper for later - do not render.

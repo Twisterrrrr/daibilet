@@ -182,7 +182,7 @@ export function DayTripCanonCard({
           >
             {cover ? (
               <div
-                className="relative h-36 w-full shrink-0 overflow-hidden rounded-2xl bg-[#F5F5F7] sm:h-full sm:min-h-[7.5rem] sm:max-h-[11rem]"
+                className="relative h-36 w-full shrink-0 overflow-hidden rounded-2xl bg-[#F5F5F7] sm:aspect-[16/9] sm:h-auto sm:max-h-none"
                 data-day-trip-cover
               >
                 <CardSafeImage

@@ -2549,7 +2549,10 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
   const servedFromFullHub = Boolean(fullWarm?.rows?.length && rows === fullWarm.rows);
   const countsPending = Boolean(shellCounts && !servedFromFullHub);
 
-  let mapped = rows.map(mapPublicVenueListItem);
+  let mapped = rows
+    .map(mapPublicVenueListItem)
+    // Do not render a stale duplicate PDP alias as a second venue card.
+    .filter((venue) => String(venue?.slug || '').trim().toLowerCase() === resolvePlaceSlugAlias(venue?.slug));
   const { filtered, cityUniverse, typeUniverse, scaleUniverse } = applyListFilters(mapped);
   const sorted = sortVenueCatalogItems(filtered, sortMode);
   const facetSource = { cityUniverse, typeUniverse, scaleUniverse };
@@ -3133,6 +3136,7 @@ export function mergeCityPageVenues(sessionVenues, contentVenues, limit = 250) {
     if (!item || out.length >= cap) return;
     const id = String(item.id || '').trim();
     const slug = String(item.slug || '').trim().toLowerCase();
+    if (slug && resolvePlaceSlugAlias(slug) !== slug) return;
     const keys = [id, slug].filter(Boolean);
     if (!keys.length || keys.some((key) => seen.has(key))) return;
     for (const key of keys) seen.add(key);

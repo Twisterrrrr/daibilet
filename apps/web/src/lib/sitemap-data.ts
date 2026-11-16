@@ -310,7 +310,7 @@ export async function buildEventsSitemapEntries(): Promise<SitemapEntry[]> {
 
 export async function buildCitiesSitemapEntries(): Promise<SitemapEntry[]> {
   const destinationsPayload = await getCachedDestinations();
-  return (destinationsPayload?.destinations || [])
+  const entries = (destinationsPayload?.destinations || [])
     .filter((destination) => {
       if (!destination.slug) return false;
       if (destination.type === 'city') {
@@ -334,6 +334,9 @@ export async function buildCitiesSitemapEntries(): Promise<SitemapEntry[]> {
         ? [entry(cityPlacesCatalogHref(citySlug(destination)), 'daily', 0.65)]
         : []),
     ]);
+  // Legacy city aliases may still arrive from the public catalog. Since their
+  // hrefs normalize to the canonical slug, keep each canonical URL once.
+  return [...new Map(entries.map((item) => [item.url, item])).values()];
 }
 
 export async function buildVenuesSitemapEntries(): Promise<SitemapEntry[]> {

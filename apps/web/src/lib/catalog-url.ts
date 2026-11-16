@@ -205,7 +205,11 @@ export function placesHubHrefWithSelectedCity(
 
 /** Indexable city catalog with its own canonical URL and server-side pagination. */
 export function cityPlacesCatalogHref(citySlug: string, page = 1): string {
-  const path = `/places/c/${encodeURIComponent(citySlug)}`;
+  const normalizedCitySlug = ({
+    'nizhniy-novgorod': 'nizhny-novgorod',
+    'velikiy-novgorod': 'veliky-novgorod',
+  } as Record<string, string>)[citySlug] || citySlug;
+  const path = `/places/c/${encodeURIComponent(normalizedCitySlug)}`;
   return page > 1 ? `${path}?page=${page}` : path;
 }
 
