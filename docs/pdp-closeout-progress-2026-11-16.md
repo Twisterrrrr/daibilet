@@ -39,3 +39,11 @@ Do not implement the proposed URL migration in this acceptance branch yet. The r
 - Before changing city roots, inventory existing city aliases, landing paths, static/system slugs, link helpers, breadcrumbs and stored canonicals; then define 301s and sitemap cutover.
 
 This section is an implementation review, not an approved route decision. Existing public URL behavior remains unchanged.
+
+## Follow-up check — 2026-11-16
+
+- The client SSH failure was a stale local `/32` route left over from a previous Wi-Fi network. Updating it to the current Wi-Fi gateway restored SSH; no server SSH/firewall configuration was changed.
+- Read-only server checks: city PDP preview web/API services are active; web port `3013` returned 200; public Krasnodar API on `4012` returned 200; production home returned 200. Root filesystem was 68% used.
+- Opened the authenticated City editor for the existing Krasnodar draft. Its tabs rendered for overview, main content, routes/suburbs, FAQ, media, preview and SEO/publication. The draft remained `DRAFT`, `noindex`; no save, status transition, publish or database write was made. Routes, FAQ and five source references were present; gallery had zero items.
+- The draft preview exposed incorrect Russian case in generated section headings (for example, “Что посмотреть в Краснодар”). The isolated branch now uses neutral labels (“Что посмотреть в городе” / “Главные места региона”, “Фотографии города” / “Фотографии региона”) with a regression test. Web typecheck passed and web CI passed **360/360**.
+- The updated component has not yet been deployed to the preview release; the browser interaction against local dev did not confirm its preview tab. Keep the copy fix unaccepted until a rebuilt preview visibly shows the corrected labels.

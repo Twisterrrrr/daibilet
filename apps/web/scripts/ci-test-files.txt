@@ -64,3 +64,4 @@ src/lib/city-hub-scenario-blog-links.test.ts
 src/lib/event-description-lead.test.ts
 src/lib/event-music-description.test.ts
 src/lib/event-not-found-similar.test.ts
+src/lib/destination-pdp-labels.test.ts
