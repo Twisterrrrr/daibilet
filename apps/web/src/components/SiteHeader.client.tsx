@@ -115,7 +115,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
     <>
       <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200/60 bg-white/80 pt-[env(safe-area-inset-top,0px)] shadow-[0_1px_0_hsl(210_9%_11%/0.04)] backdrop-blur-xl supports-[backdrop-filter]:bg-white/70">
         {/* Same width as page content (.container-page). */}
-        <div className="container-page relative flex min-h-[var(--site-header-height)] items-center justify-between py-2.5 sm:py-3 lg:py-3.5">
+        <div className={`${pathname.startsWith('/my-day') ? 'container-page my-day-site-header-inner' : 'container-page'} relative flex min-h-[var(--site-header-height)] items-center justify-between py-2.5 sm:py-3 lg:py-3.5`}>
           <div className="flex min-w-0 flex-1 flex-nowrap items-center gap-2 sm:gap-3 lg:flex-none lg:gap-6 xl:gap-8">
             {/* Mobile: burger left (owner); desktop nav stays centered. */}
             <div className="lg:hidden">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useId, useRef, type KeyboardEvent, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { X, type LucideIcon } from 'lucide-react';
 import { MyDayResizeHandle } from '@/components/my-day/MyDayResizeHandle';
@@ -37,6 +37,9 @@ type MyDayPickerSheetProps = {
   children: ReactNode;
   /** Desktop drawer overlays the planner while leaving the map visible beside it. */
   desktopOverlay?: boolean;
+  /** Mount point for the desktop inline accordion. Mobile keeps the modal sheet. */
+  desktopAccordion?: boolean;
+  desktopMount?: HTMLElement | null;
 };
 
 /**
@@ -51,21 +54,32 @@ export function MyDayPickerSheet({
   search,
   children,
   desktopOverlay = false,
+  desktopAccordion = false,
+  desktopMount = null,
 }: MyDayPickerSheetProps) {
   const titleId = useId();
   const descId = useId();
   const listRef = useRef<HTMLDivElement | null>(null);
+  const [isDesktop, setIsDesktop] = useState(false);
   const current = tabs.find((t) => t.value === section) ?? tabs[0];
   const [pickerWidth, setPickerWidth] = usePersistedNumber(PICKER_WIDTH_KEY, PICKER_WIDTH_DEFAULT);
 
   useEffect(() => {
-    if (!open) return;
+    const media = window.matchMedia('(min-width: 1024px)');
+    const update = () => setIsDesktop(media.matches);
+    update();
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
+
+  useEffect(() => {
+    if (!open || (desktopAccordion && isDesktop && desktopMount)) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => {
       document.body.style.overflow = prev;
     };
-  }, [open]);
+  }, [open, desktopAccordion, desktopMount, isDesktop]);
 
   useEffect(() => {
     if (!open) return;
@@ -96,6 +110,90 @@ export function MyDayPickerSheet({
     listRef.current?.querySelectorAll<HTMLButtonElement>('[role=tab]')[next]?.focus();
   }
 
+  const panel = (
+    <>
+      <header className="flex shrink-0 items-start justify-between gap-3 border-b border-slate-200 px-5 py-4">
+        <div className="min-w-0">
+          <h2 id={titleId} className="text-base font-bold text-slate-900">Подбор точек</h2>
+          <p id={descId} className="mt-0.5 text-xs text-slate-500">
+            Один поиск по местам и событиям. Выбранное сразу в маршрут и на карту
+          </p>
+        </div>
+        <button
+          type="button"
+          aria-label="Закрыть подбор"
+          onClick={onClose}
+          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-200 text-slate-500 hover:bg-slate-50"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      </header>
+
+      {search ? (
+        <div className="relative z-20 shrink-0 border-b border-slate-200 px-5 py-3" data-my-day-picker-search>
+          {search}
+        </div>
+      ) : null}
+
+      <div className={`grid min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)] sm:grid-cols-[220px_minmax(0,1fr)] sm:grid-rows-1 ${desktopOverlay || desktopAccordion ? 'lg:grid-cols-1' : ''}`}>
+        <div
+          ref={listRef}
+          role="tablist"
+          aria-orientation={desktopOverlay || desktopAccordion ? 'horizontal' : 'vertical'}
+          aria-label="Разделы подбора"
+          onKeyDown={onKeyNav}
+          className={`flex gap-1 overflow-x-auto border-b border-slate-200 p-2 [scrollbar-width:none] sm:flex-col sm:overflow-y-auto sm:border-b-0 sm:border-r sm:border-slate-200 [&::-webkit-scrollbar]:hidden ${(desktopOverlay || desktopAccordion) ? 'lg:grid lg:grid-cols-2 lg:gap-1 lg:border-b lg:border-r-0' : ''}`}
+        >
+          {tabs.map((t) => {
+            const on = t.value === current?.value;
+            const Icon = t.icon;
+            return (
+              <button
+                key={t.value}
+                type="button"
+                role="tab"
+                id={`my-day-picker-tab-${t.value}`}
+                aria-selected={on}
+                aria-controls="my-day-picker-panel"
+                tabIndex={on ? 0 : -1}
+                onClick={() => onSectionChange(t.value)}
+                className={`inline-flex shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-left text-sm font-semibold transition sm:w-full ${(desktopOverlay || desktopAccordion) ? 'lg:min-w-0 lg:px-2 lg:text-xs' : ''} ${on ? 'bg-primary-600 text-white' : 'text-slate-500 hover:bg-slate-100'}`}
+              >
+                <Icon className="h-4 w-4 shrink-0" aria-hidden />
+                <span className="min-w-0 sm:truncate">{t.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        <div
+          id="my-day-picker-panel"
+          role="tabpanel"
+          aria-labelledby={current ? `my-day-picker-tab-${current.value}` : undefined}
+          className={`min-w-0 overflow-y-auto p-4 [container-type:inline-size] ${(desktopOverlay || desktopAccordion) ? 'lg:border-t lg:border-slate-200' : ''}`}
+        >
+          {current ? <p className="mb-3 text-xs text-slate-500" data-my-day-picker-hint>{current.hint}</p> : null}
+          {children}
+        </div>
+      </div>
+    </>
+  );
+
+  if (desktopAccordion && isDesktop && desktopMount) {
+    return createPortal(
+      <section
+        role="region"
+        aria-labelledby={titleId}
+        aria-describedby={descId}
+        className="mb-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md motion-safe:animate-[my-day-picker-reveal_180ms_ease-out]"
+        data-my-day-picker-accordion="1"
+      >
+        {panel}
+      </section>,
+      desktopMount,
+    );
+  }
+
   return createPortal(
     <div className={`fixed inset-0 z-[80] ${desktopOverlay ? 'lg:top-[var(--site-header-height)] lg:pointer-events-none' : ''}`} data-my-day-picker-sheet="1" role="presentation">
       <button
@@ -122,83 +220,7 @@ export function MyDayPickerSheet({
             setPickerWidth(Math.min(max, Math.max(PICKER_WIDTH_MIN, clientX)));
           }}
         /> : null}
-        <header className="flex shrink-0 items-start justify-between gap-3 border-b border-slate-200 px-5 py-4">
-          <div className="min-w-0">
-            <h2 id={titleId} className="text-base font-bold text-slate-900">
-              Подбор точек
-            </h2>
-            <p id={descId} className="mt-0.5 text-xs text-slate-500">
-              Один поиск по местам и событиям. Выбранное сразу в маршрут и на карту
-            </p>
-          </div>
-          <button
-            type="button"
-            aria-label="Закрыть"
-            onClick={onClose}
-            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-200 text-slate-500 hover:bg-slate-50"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </header>
-
-        {search ? (
-          <div
-            className="relative z-20 shrink-0 border-b border-slate-200 px-5 py-3"
-            data-my-day-picker-search
-          >
-            {search}
-          </div>
-        ) : null}
-
-        <div className={`grid min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)] sm:grid-cols-[220px_minmax(0,1fr)] sm:grid-rows-1 ${desktopOverlay ? 'lg:grid-cols-1' : ''}`}>
-          <div
-            ref={listRef}
-            role="tablist"
-            aria-orientation="vertical"
-            aria-label="Разделы подбора"
-            onKeyDown={onKeyNav}
-          className={`flex gap-1 overflow-x-auto border-b border-slate-200 p-2 [scrollbar-width:none] sm:flex-col sm:overflow-y-auto sm:border-b-0 sm:border-r sm:border-slate-200 [&::-webkit-scrollbar]:hidden ${desktopOverlay ? 'lg:grid lg:grid-cols-2 lg:gap-1 lg:border-b lg:border-r-0' : ''}`}
-          >
-            {tabs.map((t) => {
-              const on = t.value === current?.value;
-              const Icon = t.icon;
-              return (
-                <button
-                  key={t.value}
-                  type="button"
-                  role="tab"
-                  id={`my-day-picker-tab-${t.value}`}
-                  aria-selected={on}
-                  aria-controls="my-day-picker-panel"
-                  tabIndex={on ? 0 : -1}
-                  onClick={() => onSectionChange(t.value)}
-                  className={`inline-flex shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-left text-sm font-semibold transition sm:w-full ${desktopOverlay ? 'lg:min-w-0 lg:px-2 lg:text-xs' : ''} ${
-                    on
-                      ? 'bg-primary-600 text-white'
-                      : 'text-slate-500 hover:bg-slate-100'
-                  }`}
-                >
-                  <Icon className="h-4 w-4 shrink-0" aria-hidden />
-                  <span className="min-w-0 sm:truncate">{t.label}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          <div
-            id="my-day-picker-panel"
-            role="tabpanel"
-            aria-labelledby={current ? `my-day-picker-tab-${current.value}` : undefined}
-            className={`min-w-0 overflow-y-auto p-4 [container-type:inline-size] ${desktopOverlay ? 'lg:border-t lg:border-slate-200' : ''}`}
-          >
-            {current ? (
-              <p className="mb-3 text-xs text-slate-500" data-my-day-picker-hint>
-                {current.hint}
-              </p>
-            ) : null}
-            {children}
-          </div>
-        </div>
+        {panel}
       </aside>
     </div>,
     document.body,

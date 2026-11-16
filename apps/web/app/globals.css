@@ -325,6 +325,17 @@ html[data-nav-pending='1'] {
     max-width: var(--container-page-max);
   }
 
+  @media (min-width: 1024px) {
+    .my-day-site-header-inner {
+      max-width: 100rem;
+    }
+  }
+
+  @keyframes my-day-picker-reveal {
+    from { opacity: 0; transform: translateY(-0.35rem); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
   .site-header-icon-link {
     @apply inline-flex items-center justify-center rounded-full p-2.5 text-graphite-muted transition hover:bg-surface-muted hover:text-graphite;
   }

@@ -36,7 +36,6 @@ import {
 import {
   MyDayCityPickStarter,
   MyDayRegionCityPrompt,
-  MyDayFloatingPickerDock,
   MyDayPickerLaunch,
   MyDayPickerSheet,
   MyDayItinerary,
@@ -529,6 +528,7 @@ function DayRoutePanelInner() {
   const myDay = useMyDayController();
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pickerSection, setPickerSection] = useState<MyDayPickerSection>('scenarios');
+  const [pickerAccordionHost, setPickerAccordionHost] = useState<HTMLDivElement | null>(null);
   const [matchesExpanded, setMatchesExpanded] = useState(false);
   /** Session dismiss for «Свободное окно» upsell (resets on reload). */
   const [freeWindowDismissed, setFreeWindowDismissed] = useState(false);
@@ -3445,9 +3445,11 @@ function DayRoutePanelInner() {
     return (
       <section
         className={[
-          'rounded-2xl border border-dashed border-primary-300/70 bg-primary-50/40 p-5 sm:p-6',
           hideMap
-            ? 'mt-0'
+            ? 'rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6'
+            : 'rounded-2xl border border-dashed border-primary-300/70 bg-primary-50/40 p-5 sm:p-6',
+          hideMap
+            ? 'mt-0 min-h-[min(58vh,32rem)]'
             : 'mt-4 grid gap-4 sm:mt-5 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,280px)] xl:mx-auto xl:max-w-5xl',
         ].join(' ')}
         ref={hideMap ? undefined : unifiedSearchRef}
@@ -3529,42 +3531,6 @@ function DayRoutePanelInner() {
           </div>
         ) : null}
       </section>
-    );
-  }
-
-  /**
-   * Non-empty plan: search under H1 (no city picker row; quiet «или сменить город»).
-   * Picker sheet has the same unified search for mobile / add-more.
-   */
-  function renderHeaderCompactSearch() {
-    return (
-      <div
-        ref={(node) => {
-          unifiedSearchRef.current = node;
-        }}
-        className="mt-3 hidden w-full flex-col gap-1.5 sm:mt-4 lg:flex"
-        data-day-unified-search
-        data-day-header-search="1"
-      >
-        <div className="flex min-w-0 w-full items-start gap-2">
-          <div className="min-w-0 flex-1">{renderUnifiedSearchSelect()}</div>
-          {insertAfterVenueId ? (
-            <button
-              type="button"
-              data-day-insert-after-cancel
-              className="mt-0.5 inline-flex min-h-10 shrink-0 items-center rounded-xl px-2.5 text-xs font-semibold text-slate-500 transition hover:bg-slate-100 hover:text-slate-800"
-              onClick={() => setInsertAfterVenueId(null)}
-            >
-              Отмена
-            </button>
-          ) : null}
-        </div>
-        {hasCatalogCity && catalogError ? (
-          <p className="mt-1 mb-0 text-xs font-medium text-rose-700" role="status">
-            {catalogError}
-          </p>
-        ) : null}
-      </div>
     );
   }
 
@@ -3991,7 +3957,7 @@ function DayRoutePanelInner() {
           list={
             <div className="min-w-0 bg-[#f4f6f9] lg:h-full lg:overflow-y-auto lg:px-4 lg:py-4 [scrollbar-width:thin]" data-my-day-list-inner data-my-day-page-col="1">
       {/* ≥1 stop: compact city+search under topbar (no mid-page bordered starter card) */}
-      {!isEmptyRoute ? renderHeaderCompactSearch() : null}
+      <div ref={setPickerAccordionHost} data-my-day-picker-accordion-host />
 
       {copyStatus === 'ok' ? (
         <p
@@ -4119,10 +4085,6 @@ function DayRoutePanelInner() {
         >
           <MyDayPickerLaunch tabs={pickerTabs} onOpen={openPicker} />
         </div>
-      ) : null}
-
-      {!isEmptyRoute && hasCatalogCity && pickerTabs.length ? (
-        <MyDayFloatingPickerDock tabs={pickerTabs} onOpen={openPicker} />
       ) : null}
 
       {cityScenarios.length ? (
@@ -4743,20 +4705,56 @@ function DayRoutePanelInner() {
               </div>
             </header>
           ) : null}
+          <div ref={setPickerAccordionHost} className="hidden lg:block" data-my-day-picker-accordion-host />
           {showEmptyDesktopShell ? (
             <>
               <div className="mt-4 lg:hidden" data-my-day-empty-mobile>
                 {renderEmptyStarter()}
               </div>
               <div
-                className="mt-5 hidden lg:grid lg:grid-cols-[minmax(0,56fr)_minmax(24rem,44fr)] lg:items-stretch lg:gap-6"
-                data-my-day-empty-two-blocks
+                className="mt-5 hidden items-stretch gap-4 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(22rem,1fr)] lg:gap-5 xl:grid-cols-3"
+                data-my-day-empty-three-blocks
               >
-                <div className="min-w-0" data-my-day-picker-host>
-                  {renderEmptyStarter({ hideMap: true })}
+                <div className="contents lg:flex lg:min-w-0 lg:flex-col lg:gap-4 xl:contents" data-my-day-empty-steps>
+                  <div className="min-w-0" data-my-day-picker-host>
+                    {renderEmptyStarter({ hideMap: true })}
+                  </div>
+                  <section
+                    className="min-h-[min(58vh,32rem)] rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
+                    data-my-day-empty-picker-categories
+                    aria-labelledby="day-empty-picker-title"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary-50 text-primary-600">
+                        <Sparkles className="h-5 w-5" aria-hidden />
+                      </span>
+                      <h2 id="day-empty-picker-title" className="font-display text-xl font-extrabold text-slate-900 sm:text-2xl">
+                        Соберите маршрут сами
+                      </h2>
+                    </div>
+                    <div className="mt-5 flex flex-col gap-2.5">
+                      {pickerTabs.filter((tab) => tab.value !== 'scenarios').map((tab) => {
+                        const Icon = tab.icon;
+                        return (
+                          <button
+                            key={tab.value}
+                            type="button"
+                            onClick={() => openPicker(tab.value)}
+                            className="inline-flex min-h-14 w-full items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-3 text-left text-sm font-semibold text-slate-900 transition hover:border-primary-200 hover:bg-primary-50/50"
+                          >
+                            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white text-primary-600 shadow-sm">
+                              <Icon className="h-4 w-4" aria-hidden />
+                            </span>
+                            <span className="min-w-0 flex-1">{tab.label}</span>
+                            <ChevronDown className="h-4 w-4 shrink-0 -rotate-90 text-slate-400" aria-hidden />
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </section>
                 </div>
                 <div
-                  className="relative min-h-[26rem] overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 lg:min-h-[min(58vh,32rem)]"
+                  className="relative min-h-[min(58vh,32rem)] overflow-hidden rounded-2xl border border-slate-200 bg-slate-100"
                   data-my-day-empty-map
                 >
                   <div className="pointer-events-none absolute left-3 top-3 z-[500] rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm">
@@ -4775,18 +4773,13 @@ function DayRoutePanelInner() {
                     stops={[]}
                     fallbackCenter={emptyMapCenter}
                     className="absolute inset-0 h-full w-full bg-slate-100"
-                    layoutKey="empty-two-blocks"
+                    layoutKey="empty-three-blocks"
                   />
                 </div>
               </div>
             </>
           ) : (
             <>
-              {!isEmptyRoute && hasCatalogCity && pickerTabs.length ? (
-                <div className="mt-4 lg:mt-5 xl:max-w-3xl" data-my-day-picker-host>
-                  <MyDayPickerLaunch tabs={pickerTabs} onOpen={openPicker} />
-                </div>
-              ) : null}
               {isEmptyRoute ? renderEmptyStarter() : null}
             </>
           )}
@@ -4796,6 +4789,8 @@ function DayRoutePanelInner() {
       <MyDayPickerSheet
         open={pickerOpen}
         desktopOverlay
+        desktopAccordion
+        desktopMount={pickerAccordionHost}
         section={pickerSection}
         tabs={pickerTabs}
         onSectionChange={(next) => {
