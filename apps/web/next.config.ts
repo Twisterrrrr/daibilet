@@ -1,5 +1,20 @@
 import type { NextConfig } from 'next';
 import placeSlugAliases from './src/lib/place-slug-aliases.json';
+import { resolveLegacyCitySpellingRedirect } from './src/lib/city-first-route-slugs';
+
+const cityFirstUrlsEnabled = process.env.NEXT_PUBLIC_CITY_URL_MODE === 'city-first';
+const citySpellingRedirects = [
+  '/cities/saint-petersburg',
+  '/cities/velikiy-novgorod',
+  '/cities/nizhniy-novgorod',
+  '/places/c/nizhniy-novgorod',
+  '/places/c/velikiy-novgorod',
+  '/cities/moskva',
+].map((source) => ({
+  source,
+  destination: resolveLegacyCitySpellingRedirect(source, cityFirstUrlsEnabled)!,
+  statusCode: 301,
+}));
 
 const placeSlugAliasRedirects = Object.entries(placeSlugAliases).flatMap(([from, to]) => {
   const destination = `${to.family === 'location' ? '/locations' : '/venues'}/${to.slug}`;
@@ -71,15 +86,8 @@ const nextConfig: NextConfig = {
       // external links target the query form, so the 301 is free.
       { source: '/places', has: [{ type: 'query', key: 'family', value: 'institution' }], destination: '/places/institution', permanent: true },
       { source: '/places', has: [{ type: 'query', key: 'family', value: 'location' }], destination: '/places/location', permanent: true },
-      // English alias should resolve to the imported/canonical city slug used by catalog DTOs.
-      { source: '/cities/saint-petersburg', destination: '/cities/sankt-peterburg', permanent: true },
-      // Canonical city URLs use the English transliteration without the extra "i".
-      { source: '/cities/velikiy-novgorod', destination: '/cities/veliky-novgorod', statusCode: 301 },
-      { source: '/cities/nizhniy-novgorod', destination: '/cities/nizhny-novgorod', statusCode: 301 },
-      { source: '/places/c/nizhniy-novgorod', destination: '/places/c/nizhny-novgorod', statusCode: 301 },
-      { source: '/places/c/velikiy-novgorod', destination: '/places/c/veliky-novgorod', statusCode: 301 },
-      // Moscow has one city record (city_524901); use the stable English slug everywhere.
-      { source: '/cities/moskva', destination: '/cities/moscow', permanent: true },
+      // Spelling aliases preserve legacy paths unless the city-first rollout is enabled.
+      ...citySpellingRedirects,
       { source: '/my-orders', destination: '/account/purchases', permanent: true },
       { source: '/river-cruises', destination: '/rechnye-progulki', permanent: true },
       { source: '/river-cruises/:city', destination: '/rechnye-progulki/:city', permanent: true },
