@@ -143,7 +143,7 @@ export function CityHeroStrip({
                   {pluralEvents(stats.events)}
                 </span>
                 <span className="inline-flex rounded-full bg-white px-3 py-1.5 text-sm font-semibold text-slate-800 ring-1 ring-slate-200">
-                  {pluralVenues(stats.venues)}
+                  {pluralVenues(stats.venues)} с событиями
                 </span>
                 {guidePlaces > 0 ? (
                   <span className="inline-flex rounded-full bg-white px-3 py-1.5 text-sm font-semibold text-slate-800 ring-1 ring-slate-200">
@@ -265,7 +265,7 @@ export function CityHeroStrip({
                 {pluralEvents(stats.events)}
               </span>
               <span className="inline-flex rounded-full bg-navy-foreground/15 px-3 py-1.5 text-sm font-semibold text-navy-foreground ring-1 ring-navy-foreground/20 backdrop-blur-sm">
-                {pluralVenues(stats.venues)}
+                {pluralVenues(stats.venues)} с событиями
               </span>
               {guidePlaces > 0 ? (
                 <span className="inline-flex rounded-full bg-navy-foreground/15 px-3 py-1.5 text-sm font-semibold text-navy-foreground ring-1 ring-navy-foreground/20 backdrop-blur-sm">

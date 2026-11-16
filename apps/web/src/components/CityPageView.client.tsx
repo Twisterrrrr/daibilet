@@ -66,6 +66,8 @@ import {
   filterHubAfficheCategory,
   filterStandupFromAllFeed,
   groupStandupInHubFeed,
+  sortCityHubAfficheRows,
+  sortCityHubSessionsChronologically,
   isCityHubTouristAffiche,
   preferredAfficheCategory,
   rankCityHubSessions,
@@ -277,7 +279,7 @@ export function CityPageView({
     const byChip = filterHubAfficheCategory(payload.sessions, category);
     const filtered = filterStandupFromAllFeed(byChip, category, { tourist: touristAffiche });
     const ranked = rankCityHubSessions(filtered);
-    return dedupeHubSessions(ranked);
+    return dedupeHubSessions(sortCityHubSessionsChronologically(ranked));
   }, [category, payload, touristAffiche]);
 
   // Chip facets = hub feed only (same universe as the list / «Все»), not full-city catalog.
@@ -296,9 +298,11 @@ export function CityPageView({
   }, [categories, touristAffiche, slug]);
   const afficheRows = React.useMemo(
     () =>
-      touristAffiche
-        ? groupStandupInHubFeed(sessions)
-        : sessions.map((session) => ({ kind: 'event' as const, session })),
+      sortCityHubAfficheRows(
+        touristAffiche
+          ? groupStandupInHubFeed(sessions)
+          : sessions.map((session) => ({ kind: 'event' as const, session })),
+      ),
     [sessions, touristAffiche],
   );
 
@@ -1848,7 +1852,7 @@ function VenueHighlights({
             Площадки и локации
           </h3>
           <p className={`mt-2 max-w-3xl text-base leading-7 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>
-            Музеи, театры, причалы и точки старта экскурсий {cityIn}. Показано {featured.length} из {Math.max(featured.length, totalVenues || venues.length)} мест.
+            Музеи, театры, причалы и точки старта экскурсий {cityIn}. Здесь собраны локации справочника; счётчик в шапке показывает площадки с событиями. Показано {featured.length} из {Math.max(featured.length, totalVenues || venues.length)} мест.
           </p>
         </div>
         <div className={`flex flex-wrap gap-3 text-sm font-semibold ${editorial ? 'text-zinc-800' : ''}`}>

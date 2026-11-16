@@ -10,11 +10,34 @@ export type HubAfficheSession = {
   venueSlug?: string | null;
   subcategories?: string[] | null;
   tags?: string[] | null;
+  startsAt?: string | null;
+  upcomingSlots?: Array<{ startsAt?: string | null }> | null;
 };
 
 export type HubAfficheRow<T extends HubAfficheSession = HubAfficheSession> =
   | { kind: 'event'; session: T }
   | { kind: 'standup'; sessions: T[]; venueName: string };
+
+function sessionStartMs(session: HubAfficheSession): number {
+  const values = [session.startsAt, ...(session.upcomingSlots || []).map((slot) => slot.startsAt)]
+    .map((value) => (value ? Date.parse(value) : Number.NaN))
+    .filter(Number.isFinite);
+  return values.length ? Math.min(...values) : Number.POSITIVE_INFINITY;
+}
+
+/** Put the next dated session first; undated rows follow dated ones. */
+export function sortCityHubSessionsChronologically<T extends HubAfficheSession>(sessions: T[]): T[] {
+  return [...sessions].sort((left, right) => sessionStartMs(left) - sessionStartMs(right));
+}
+
+/** Grouped stand-up rows are placed by their first session date too. */
+export function sortCityHubAfficheRows<T extends HubAfficheSession>(rows: HubAfficheRow<T>[]): HubAfficheRow<T>[] {
+  const rowStartMs = (row: HubAfficheRow<T>) =>
+    row.kind === 'event'
+      ? sessionStartMs(row.session)
+      : Math.min(...row.sessions.map(sessionStartMs));
+  return [...rows].sort((left, right) => rowStartMs(left) - rowStartMs(right));
+}
 
 const TOURIST_AFFICHE_SLUGS = new Set([
   'perm',
