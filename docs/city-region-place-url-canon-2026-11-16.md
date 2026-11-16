@@ -1,5 +1,11 @@
 # City, region and place URL canon
 
+> The authoritative cross-domain route matrix is
+> [`domain-url-canon-2026-11-16.md`](./domain-url-canon-2026-11-16.md).
+> This document owns the city/region/place migration audit and exact
+> production URL inventory; if a general route rule differs, follow the
+> cross-domain canon and update this audit alongside it.
+
 **Status:** Approved target architecture; implementation is staged separately.
 **Date:** 2026-11-16
 
@@ -104,8 +110,11 @@ family. Keep the map as a checked-in artifact and retain legacy redirects.
 
 - Sitemap index currently exposes six child sitemaps, including `cities.xml`
   and `landings.xml`.
-- `cities.xml` contains **66** `/cities/{slug}` hub URLs and **51**
-  `/places/c/{city}` place-catalog URLs.
+- `/api/public/destinations` currently exposes **93** destinations: **69
+  cities** and **24 regions**. This is the full current destination inventory;
+  it is larger than the indexable URL inventory.
+- `cities.xml` contains **66** `/cities/{slug}` hub URLs (51 cities and 15
+  regions) and **51** `/places/c/{city}` place-catalog URLs.
 - Current one-segment roots in `static.xml` do not collide with those 66 hub
   slugs.
 - There is one overlap with the first segment of existing city-scoped
@@ -117,10 +126,14 @@ family. Keep the map as a checked-in artifact and retain legacy redirects.
   `/saint-petersburg/night-bridges`, `/saint-petersburg/spb-yards`, and
   `/saint-petersburg/planetarium`. Preserve these exact routes unless a URL is
   separately reviewed and included in the redirect map.
-- A first mapping pass matched all 66 city/region sitemap URLs and all 51 city
-  place-catalog URLs one-to-one against `/api/public/destinations` (51 cities,
-  15 regions; no missing or duplicate matches). The resulting migration
-  candidate table is
+- A mapping pass matched all 66 city/region sitemap URLs and all 51 city
+  place-catalog URLs one-to-one against `/api/public/destinations` (no missing
+  or duplicate matches). The current-sitemap map is
   [`city-place-url-map-production-2026-11-16.csv`](./city-place-url-map-production-2026-11-16.csv).
   It is an audit artifact only: no redirects or canonical changes have been
   applied.
+- The full 93-destination inventory is in
+  [`city-region-destination-inventory-2026-11-16.csv`](./city-region-destination-inventory-2026-11-16.csv).
+  **27 records (18 cities and 9 regions) have no current sitemap URL.** They
+  stay out of the migration map until an editorial hub is explicitly
+  published; a destination record alone does not authorize a new public hub.
