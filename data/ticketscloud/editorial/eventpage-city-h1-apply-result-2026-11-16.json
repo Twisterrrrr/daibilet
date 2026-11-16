@@ -1,0 +1,190 @@
+{
+  "appliedAt": "2026-11-16T20:38:05.935Z",
+  "database": "daibilet",
+  "changedPages": 20,
+  "pages": [
+    {
+      "id": "cba0fb4e-fe37-4fda-a70c-f02c35cd5867",
+      "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-chelyabinsk",
+      "url": "https://daibilet.ru/events/anna-asti-solnyi-koncert-shou-carica-v-g-chelyabinsk",
+      "seoH1": "ANNA ASTI. Сольный концерт «ШОУ „Царица“» в Челябинске",
+      "status": "READY",
+      "isIndexable": true,
+      "revisionCount": 6
+    },
+    {
+      "id": "ea2c25aa-4e4f-4135-a029-a1bcf5da4212",
+      "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-habarovsk",
+      "url": "https://daibilet.ru/events/anna-asti-solnyi-koncert-shou-carica-v-g-habarovsk",
+      "seoH1": "ANNA ASTI. Сольный концерт «ШОУ „Царица“» в Хабаровске",
+      "status": "READY",
+      "isIndexable": true,
+      "revisionCount": 6
+    },
+    {
+      "id": "cd8d9b6d-d61b-4c06-99e1-ab6e59207fac",
+      "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-krasnodar",
+      "url": "https://daibilet.ru/events/anna-asti-solnyi-koncert-shou-carica-v-g-krasnodar",
+      "seoH1": "ANNA ASTI. Сольный концерт «ШОУ „Царица“» в Краснодаре",
+      "status": "READY",
+      "isIndexable": true,
+      "revisionCount": 6
+    },
+    {
+      "id": "d7a18f1c-f1f8-4f3d-91f6-5177b9a5dfbd",
+      "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-kurgan",
+      "url": "https://daibilet.ru/events/anna-asti-solnyi-koncert-shou-carica-v-g-kurgan",
+      "seoH1": "ANNA ASTI. Сольный концерт «ШОУ „Царица“» в Кургане",
+      "status": "READY",
+      "isIndexable": true,
+      "revisionCount": 6
+    },
+    {
+      "id": "95d20c5c-51c0-4007-9ae8-467e6afc3fce",
+      "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-ryazan",
+      "url": "https://daibilet.ru/events/anna-asti-solnyi-koncert-shou-carica-v-g-ryazan",
+      "seoH1": "ANNA ASTI. Сольный концерт «ШОУ „Царица“» в Рязани",
+      "status": "READY",
+      "isIndexable": true,
+      "revisionCount": 6
+    },
+    {
+      "id": "3b816506-41c1-4367-972d-07a486ef499d",
+      "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-tula",
+      "url": "https://daibilet.ru/events/anna-asti-solnyi-koncert-shou-carica-v-g-tula",
+      "seoH1": "ANNA ASTI. Сольный концерт «ШОУ „Царица“» в Туле",
+      "status": "READY",
+      "isIndexable": true,
+      "revisionCount": 6
+    },
+    {
+      "id": "0e89916b-f9f4-4626-9bbe-288aa3444337",
+      "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-vladivostok",
+      "url": "https://daibilet.ru/events/anna-asti-solnyi-koncert-shou-carica-v-g-vladivostok",
+      "seoH1": "ANNA ASTI. Сольный концерт «ШОУ „Царица“» во Владивостоке",
+      "status": "READY",
+      "isIndexable": true,
+      "revisionCount": 6
+    },
+    {
+      "id": "7632040e-efaa-42d6-ba17-53c2dd58932a",
+      "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-voronezh",
+      "url": "https://daibilet.ru/events/anna-asti-solnyi-koncert-shou-carica-v-g-voronezh",
+      "seoH1": "ANNA ASTI. Сольный концерт «ШОУ „Царица“» в Воронеже",
+      "status": "READY",
+      "isIndexable": true,
+      "revisionCount": 6
+    },
+    {
+      "id": "d4d98185-c822-4eda-8e05-f1d9bc6a22eb",
+      "slug": "anton-i-viktoriya-makarskie-zhivoi-koncert-v-domodedovo",
+      "url": "https://daibilet.ru/events/anton-i-viktoriya-makarskie-zhivoi-koncert-v-domodedovo",
+      "seoH1": "Антон и Виктория Макарские. «Живой концерт» в Домодедове",
+      "status": "READY",
+      "isIndexable": true,
+      "revisionCount": 5
+    },
+    {
+      "id": "ac9c0f08-3bdd-42fa-b339-92f128ba5a1f",
+      "slug": "anton-i-viktoriya-makarskie-zhivoi-koncert-v-orehovo-zuevo",
+      "url": "https://daibilet.ru/events/anton-i-viktoriya-makarskie-zhivoi-koncert-v-orehovo-zuevo",
+      "seoH1": "Антон и Виктория Макарские. «Живой концерт» в Орехово-Зуеве",
+      "status": "READY",
+      "isIndexable": true,
+      "revisionCount": 5
+    },
+    {
+      "id": "be4df034-fb72-4267-981c-1a30e3d657d4",
+      "slug": "cirk-bruno-v-g-ob",
+      "url": "https://daibilet.ru/events/cirk-bruno-v-g-ob",
+      "seoH1": "Цирк Бруно в Оби",
+      "status": "READY",
+      "isIndexable": true,
+      "revisionCount": 5
+    },
+    {
+      "id": "b8499b86-653f-4e85-932c-c49d9db51d92",
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-gryazi",
+      "url": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-gryazi",
+      "seoH1": "Спектакль «Что творят мужчины» с Сергеем Астаховым в Грязях",
+      "status": "READY",
+      "isIndexable": true,
+      "revisionCount": 5
+    },
+    {
+      "id": "561e4e31-d90d-4ef4-a561-bb339bb68e9a",
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-kalach-na-donu",
+      "url": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-kalach-na-donu",
+      "seoH1": "Спектакль «Что творят мужчины» с Сергеем Астаховым в Калаче-на-Дону",
+      "status": "READY",
+      "isIndexable": true,
+      "revisionCount": 5
+    },
+    {
+      "id": "ce8c649f-dd99-46ce-a07f-2c8c1f66a45e",
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-kotovsk",
+      "url": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-kotovsk",
+      "seoH1": "Спектакль «Что творят мужчины» с Сергеем Астаховым в Котовске",
+      "status": "READY",
+      "isIndexable": true,
+      "revisionCount": 5
+    },
+    {
+      "id": "d7f81a6d-f5c7-4f0b-a704-40fe8e18226a",
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-skopin",
+      "url": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-skopin",
+      "seoH1": "Спектакль «Что творят мужчины» с Сергеем Астаховым в Скопине",
+      "status": "READY",
+      "isIndexable": true,
+      "revisionCount": 5
+    },
+    {
+      "id": "395f1fc5-c802-4769-b335-49011d818839",
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-usman",
+      "url": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-usman",
+      "seoH1": "Спектакль «Что творят мужчины» с Сергеем Астаховым в Усмани",
+      "status": "READY",
+      "isIndexable": true,
+      "revisionCount": 5
+    },
+    {
+      "id": "64b40c8c-dbc8-4e2a-9bc1-5a2a1b568443",
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-zherdevka",
+      "url": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-zherdevka",
+      "seoH1": "Спектакль «Что творят мужчины» с Сергеем Астаховым в Жердевке",
+      "status": "READY",
+      "isIndexable": true,
+      "revisionCount": 5
+    },
+    {
+      "id": "5d596309-30ff-4464-9ea6-3974fd94f085",
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-zhirnovsk",
+      "url": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-zhirnovsk",
+      "seoH1": "Спектакль «Что творят мужчины» с Сергеем Астаховым в Жирновске",
+      "status": "READY",
+      "isIndexable": true,
+      "revisionCount": 5
+    },
+    {
+      "id": "c4bf1618-bd01-46d4-b8a9-ae1a9dba0fb1",
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-kotovo",
+      "url": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-kotovo",
+      "seoH1": "Спектакль «Что творят мужчины» с Сергеем Астаховым в Котове",
+      "status": "READY",
+      "isIndexable": true,
+      "revisionCount": 5
+    },
+    {
+      "id": "979e9692-dfa2-4849-8053-49be803d3d52",
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-surovikino",
+      "url": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-surovikino",
+      "seoH1": "Спектакль «Что творят мужчины» с Сергеем Астаховым в Суровикино",
+      "status": "READY",
+      "isIndexable": true,
+      "revisionCount": 5
+    }
+  ],
+  "eventLinksChanged": false,
+  "routesChanged": false,
+  "publicationOrIndexabilityChanged": false
+}

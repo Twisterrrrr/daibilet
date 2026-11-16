@@ -1,0 +1,666 @@
+{
+  "database": "daibilet",
+  "capturedAt": "2026-11-16T20:37:32.540Z",
+  "pages": [
+    {
+      "target": {
+        "id": "cba0fb4e-fe37-4fda-a70c-f02c35cd5867",
+        "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-chelyabinsk",
+        "city": "Челябинск",
+        "expectedH1": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Челябинск",
+        "brokenH1": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в",
+        "seoH1": "ANNA ASTI. Сольный концерт «ШОУ „Царица“» в Челябинске"
+      },
+      "page": {
+        "id": "cba0fb4e-fe37-4fda-a70c-f02c35cd5867",
+        "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-chelyabinsk",
+        "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Челябинск",
+        "seoH1": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Челябинск",
+        "seoTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Челябинск | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null,
+        "status": "READY",
+        "isIndexable": true,
+        "publishedAt": "2026-11-11T03:29:17.751Z"
+      },
+      "eventIds": [
+        "evt_6ace72d8e3304bdcce50be32"
+      ],
+      "routes": [
+        {
+          "path": "/events/anna-asti-solnyi-koncert-shou-carica-v-g-chelyabinsk",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisionCount": 5
+    },
+    {
+      "target": {
+        "id": "ea2c25aa-4e4f-4135-a029-a1bcf5da4212",
+        "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-habarovsk",
+        "city": "Хабаровск",
+        "expectedH1": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Хабаровск",
+        "brokenH1": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в",
+        "seoH1": "ANNA ASTI. Сольный концерт «ШОУ „Царица“» в Хабаровске"
+      },
+      "page": {
+        "id": "ea2c25aa-4e4f-4135-a029-a1bcf5da4212",
+        "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-habarovsk",
+        "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Хабаровск",
+        "seoH1": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Хабаровск",
+        "seoTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Хабаровск | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null,
+        "status": "READY",
+        "isIndexable": true,
+        "publishedAt": "2026-11-11T03:29:17.623Z"
+      },
+      "eventIds": [
+        "evt_69fa2bd974a803f6a1a427d9"
+      ],
+      "routes": [
+        {
+          "path": "/events/anna-asti-solnyi-koncert-shou-carica-v-g-habarovsk",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisionCount": 5
+    },
+    {
+      "target": {
+        "id": "cd8d9b6d-d61b-4c06-99e1-ab6e59207fac",
+        "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-krasnodar",
+        "city": "Краснодар",
+        "expectedH1": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Краснодар",
+        "brokenH1": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в",
+        "seoH1": "ANNA ASTI. Сольный концерт «ШОУ „Царица“» в Краснодаре"
+      },
+      "page": {
+        "id": "cd8d9b6d-d61b-4c06-99e1-ab6e59207fac",
+        "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-krasnodar",
+        "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Краснодар",
+        "seoH1": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Краснодар",
+        "seoTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Краснодар | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null,
+        "status": "READY",
+        "isIndexable": true,
+        "publishedAt": "2026-11-11T03:29:16.888Z"
+      },
+      "eventIds": [
+        "evt_6a2f0b6f45040b5afce38fe4"
+      ],
+      "routes": [
+        {
+          "path": "/events/anna-asti-solnyi-koncert-shou-carica-v-g-krasnodar",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisionCount": 5
+    },
+    {
+      "target": {
+        "id": "d7a18f1c-f1f8-4f3d-91f6-5177b9a5dfbd",
+        "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-kurgan",
+        "city": "Курган",
+        "expectedH1": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Курган",
+        "brokenH1": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в",
+        "seoH1": "ANNA ASTI. Сольный концерт «ШОУ „Царица“» в Кургане"
+      },
+      "page": {
+        "id": "d7a18f1c-f1f8-4f3d-91f6-5177b9a5dfbd",
+        "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-kurgan",
+        "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Курган",
+        "seoH1": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Курган",
+        "seoTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Курган | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null,
+        "status": "READY",
+        "isIndexable": true,
+        "publishedAt": "2026-11-11T03:29:17.090Z"
+      },
+      "eventIds": [
+        "evt_69fd82eadb42bf5f5966403b"
+      ],
+      "routes": [
+        {
+          "path": "/events/anna-asti-solnyi-koncert-shou-carica-v-g-kurgan",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisionCount": 5
+    },
+    {
+      "target": {
+        "id": "95d20c5c-51c0-4007-9ae8-467e6afc3fce",
+        "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-ryazan",
+        "city": "Рязань",
+        "expectedH1": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Рязань",
+        "brokenH1": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в",
+        "seoH1": "ANNA ASTI. Сольный концерт «ШОУ „Царица“» в Рязани"
+      },
+      "page": {
+        "id": "95d20c5c-51c0-4007-9ae8-467e6afc3fce",
+        "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-ryazan",
+        "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Рязань",
+        "seoH1": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Рязань",
+        "seoTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Рязань | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null,
+        "status": "READY",
+        "isIndexable": true,
+        "publishedAt": "2026-11-11T03:29:17.263Z"
+      },
+      "eventIds": [
+        "evt_69e5f0546f2ef39d67a00eda"
+      ],
+      "routes": [
+        {
+          "path": "/events/anna-asti-solnyi-koncert-shou-carica-v-g-ryazan",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisionCount": 5
+    },
+    {
+      "target": {
+        "id": "3b816506-41c1-4367-972d-07a486ef499d",
+        "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-tula",
+        "city": "Тула",
+        "expectedH1": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Тула",
+        "brokenH1": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в",
+        "seoH1": "ANNA ASTI. Сольный концерт «ШОУ „Царица“» в Туле"
+      },
+      "page": {
+        "id": "3b816506-41c1-4367-972d-07a486ef499d",
+        "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-tula",
+        "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Тула",
+        "seoH1": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Тула",
+        "seoTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Тула | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null,
+        "status": "READY",
+        "isIndexable": true,
+        "publishedAt": "2026-11-11T03:29:17.426Z"
+      },
+      "eventIds": [
+        "evt_69fd8dd4a7835719e4d9f05e"
+      ],
+      "routes": [
+        {
+          "path": "/events/anna-asti-solnyi-koncert-shou-carica-v-g-tula",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisionCount": 5
+    },
+    {
+      "target": {
+        "id": "0e89916b-f9f4-4626-9bbe-288aa3444337",
+        "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-vladivostok",
+        "city": "Владивосток",
+        "expectedH1": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Владивосток",
+        "brokenH1": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в",
+        "seoH1": "ANNA ASTI. Сольный концерт «ШОУ „Царица“» во Владивостоке"
+      },
+      "page": {
+        "id": "0e89916b-f9f4-4626-9bbe-288aa3444337",
+        "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-vladivostok",
+        "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Владивосток",
+        "seoH1": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Владивосток",
+        "seoTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Владивосток | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null,
+        "status": "READY",
+        "isIndexable": true,
+        "publishedAt": "2026-11-11T03:29:16.603Z"
+      },
+      "eventIds": [
+        "evt_69f8eb16ed0e1619e45bc72c"
+      ],
+      "routes": [
+        {
+          "path": "/events/anna-asti-solnyi-koncert-shou-carica-v-g-vladivostok",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisionCount": 5
+    },
+    {
+      "target": {
+        "id": "7632040e-efaa-42d6-ba17-53c2dd58932a",
+        "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-voronezh",
+        "city": "Воронеж",
+        "expectedH1": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Воронеж",
+        "brokenH1": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в",
+        "seoH1": "ANNA ASTI. Сольный концерт «ШОУ „Царица“» в Воронеже"
+      },
+      "page": {
+        "id": "7632040e-efaa-42d6-ba17-53c2dd58932a",
+        "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-voronezh",
+        "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Воронеж",
+        "seoH1": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Воронеж",
+        "seoTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Воронеж | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null,
+        "status": "READY",
+        "isIndexable": true,
+        "publishedAt": "2026-11-11T03:29:16.727Z"
+      },
+      "eventIds": [
+        "evt_6a8307af4ee6d470db0da246"
+      ],
+      "routes": [
+        {
+          "path": "/events/anna-asti-solnyi-koncert-shou-carica-v-g-voronezh",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisionCount": 5
+    },
+    {
+      "target": {
+        "id": "d4d98185-c822-4eda-8e05-f1d9bc6a22eb",
+        "slug": "anton-i-viktoriya-makarskie-zhivoi-koncert-v-domodedovo",
+        "city": "Домодедово",
+        "expectedH1": "Антон и Виктория Макарские. \"Живой Концерт\" в Домодедово",
+        "brokenH1": "Антон и Виктория Макарские. \"Живой Концерт\" в",
+        "seoH1": "Антон и Виктория Макарские. «Живой концерт» в Домодедове"
+      },
+      "page": {
+        "id": "d4d98185-c822-4eda-8e05-f1d9bc6a22eb",
+        "slug": "anton-i-viktoriya-makarskie-zhivoi-koncert-v-domodedovo",
+        "title": "Антон и Виктория Макарские. \"Живой Концерт\" в Домодедово",
+        "seoH1": "Антон и Виктория Макарские. \"Живой Концерт\" в Домодедово",
+        "seoTitle": "Антон и Виктория Макарские. \"Живой Концерт\" в Домодедово | Дайбилет",
+        "seoDescription": "Антон и Виктория Макарские — «Живой концерт». Антон и Виктория Макарские представляют интерактивную музыкальную программу, в которой зрители участвуют в выборе и развитии вечера. Показ: Домодедово, 1 апреля 2027 года в 19:00 (местное время); адрес: Каширское шоссе, дом 100А.",
+        "canonicalPath": "/events/anton-i-viktoriya-makarskie-zhivoi-koncert-v-domodedovo",
+        "status": "READY",
+        "isIndexable": true,
+        "publishedAt": "2026-11-13T02:33:27.857Z"
+      },
+      "eventIds": [
+        "evt_6a72fda1c26f5eac0d7eedc1"
+      ],
+      "routes": [
+        {
+          "path": "/events/anton-i-viktoriya-makarskie-zhivoi-koncert-v-domodedovo",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisionCount": 4
+    },
+    {
+      "target": {
+        "id": "ac9c0f08-3bdd-42fa-b339-92f128ba5a1f",
+        "slug": "anton-i-viktoriya-makarskie-zhivoi-koncert-v-orehovo-zuevo",
+        "city": "Орехово-Зуево",
+        "expectedH1": "Антон и Виктория Макарские. \"Живой Концерт\" в Орехово-Зуево",
+        "brokenH1": "Антон и Виктория Макарские. \"Живой Концерт\" в",
+        "seoH1": "Антон и Виктория Макарские. «Живой концерт» в Орехово-Зуеве"
+      },
+      "page": {
+        "id": "ac9c0f08-3bdd-42fa-b339-92f128ba5a1f",
+        "slug": "anton-i-viktoriya-makarskie-zhivoi-koncert-v-orehovo-zuevo",
+        "title": "Антон и Виктория Макарские. \"Живой Концерт\" в Орехово-Зуево",
+        "seoH1": "Антон и Виктория Макарские. \"Живой Концерт\" в Орехово-Зуево",
+        "seoTitle": "Антон и Виктория Макарские. \"Живой Концерт\" в Орехово-Зуево | Дайбилет",
+        "seoDescription": "Антон и Виктория Макарские — «Живой концерт». Антон и Виктория Макарские представляют интерактивную музыкальную программу, в которой зрители участвуют в выборе и развитии вечера. Показ: Орехово-Зуево, 11 апреля 2027 года в 18:00 (местное время); адрес: ул. Бугрова, 5.",
+        "canonicalPath": "/events/anton-i-viktoriya-makarskie-zhivoi-koncert-v-orehovo-zuevo",
+        "status": "READY",
+        "isIndexable": true,
+        "publishedAt": "2026-11-13T02:33:27.541Z"
+      },
+      "eventIds": [
+        "evt_6a9a5503bbe3e32a158db230"
+      ],
+      "routes": [
+        {
+          "path": "/events/anton-i-viktoriya-makarskie-zhivoi-koncert-v-orehovo-zuevo",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisionCount": 4
+    },
+    {
+      "target": {
+        "id": "be4df034-fb72-4267-981c-1a30e3d657d4",
+        "slug": "cirk-bruno-v-g-ob",
+        "city": "Обь",
+        "expectedH1": "Цирк Бруно в г. Обь",
+        "brokenH1": "Цирк Бруно в",
+        "seoH1": "Цирк Бруно в Оби"
+      },
+      "page": {
+        "id": "be4df034-fb72-4267-981c-1a30e3d657d4",
+        "slug": "cirk-bruno-v-g-ob",
+        "title": "Цирк Бруно в г. Обь",
+        "seoH1": "Цирк Бруно в г. Обь",
+        "seoTitle": "Цирк Бруно в г. Обь | Дайбилет",
+        "seoDescription": "Цирковое шоу «Бруно». В анонсе цирка «Бруно» перечислены животные, которых можно увидеть в программе: американск. Обь, 15 ноября 2026 года в 08:00.",
+        "canonicalPath": "/events/cirk-bruno-v-g-ob",
+        "status": "READY",
+        "isIndexable": true,
+        "publishedAt": "2026-11-13T02:55:33.271Z"
+      },
+      "eventIds": [
+        "evt_6aeec0746ea5caff2c63ff19"
+      ],
+      "routes": [
+        {
+          "path": "/events/cirk-bruno-v-g-ob",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisionCount": 4
+    },
+    {
+      "target": {
+        "id": "b8499b86-653f-4e85-932c-c49d9db51d92",
+        "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-gryazi",
+        "city": "Грязи",
+        "expectedH1": "Спектакль Что Творят Мужчины с Сергеем Астаховым в г. Грязи",
+        "brokenH1": "Спектакль Что Творят Мужчины с Сергеем Астаховым в",
+        "seoH1": "Спектакль «Что творят мужчины» с Сергеем Астаховым в Грязях"
+      },
+      "page": {
+        "id": "b8499b86-653f-4e85-932c-c49d9db51d92",
+        "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-gryazi",
+        "title": "Спектакль Что Творят Мужчины с Сергеем Астаховым в г. Грязи",
+        "seoH1": "Спектакль Что Творят Мужчины с Сергеем Астаховым в г. Грязи",
+        "seoTitle": "Спектакль Что Творят Мужчины с Сергеем Астаховым в г. Грязи | Дайбилет",
+        "seoDescription": "Действие спектакля разворачивается в театральной труппе, которая готовит премьеру в Петрограде 1920 года. Показ в городе Грязи — 15 ноября 2026 года, 18:00.",
+        "canonicalPath": "/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-gryazi",
+        "status": "READY",
+        "isIndexable": true,
+        "publishedAt": "2026-11-13T01:58:52.390Z"
+      },
+      "eventIds": [
+        "evt_6a4e6dc2330eefd4b06013c2"
+      ],
+      "routes": [
+        {
+          "path": "/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-gryazi",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisionCount": 4
+    },
+    {
+      "target": {
+        "id": "561e4e31-d90d-4ef4-a561-bb339bb68e9a",
+        "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-kalach-na-donu",
+        "city": "Калач-на-Дону",
+        "expectedH1": "Спектакль \"Что творят мужчины\" с Сергеем Астаховым в г. Калач-на-Дону",
+        "brokenH1": "Спектакль \"Что творят мужчины\" с Сергеем Астаховым в",
+        "seoH1": "Спектакль «Что творят мужчины» с Сергеем Астаховым в Калаче-на-Дону"
+      },
+      "page": {
+        "id": "561e4e31-d90d-4ef4-a561-bb339bb68e9a",
+        "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-kalach-na-donu",
+        "title": "Спектакль \"Что творят мужчины\" с Сергеем Астаховым в г. Калач-на-Дону",
+        "seoH1": "Спектакль \"Что творят мужчины\" с Сергеем Астаховым в г. Калач-на-Дону",
+        "seoTitle": "Спектакль \"Что творят мужчины\" с Сергеем Астаховым в г. Калач-на-Дону | Дайбилет",
+        "seoDescription": "Действие спектакля разворачивается в театральной труппе, которая готовит премьеру в Петрограде 1920 года. Показ в городе Калач-на-Дону — 20 декабря 2026 года, 18:00.",
+        "canonicalPath": "/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-kalach-na-donu",
+        "status": "READY",
+        "isIndexable": true,
+        "publishedAt": "2026-11-13T01:58:52.076Z"
+      },
+      "eventIds": [
+        "evt_6ae89268b933f95cd2046936"
+      ],
+      "routes": [
+        {
+          "path": "/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-kalach-na-donu",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisionCount": 4
+    },
+    {
+      "target": {
+        "id": "ce8c649f-dd99-46ce-a07f-2c8c1f66a45e",
+        "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-kotovsk",
+        "city": "Котовск",
+        "expectedH1": "Спектакль Что Творят Мужчины с Сергеем Астаховым в г. Котовск",
+        "brokenH1": "Спектакль Что Творят Мужчины с Сергеем Астаховым в",
+        "seoH1": "Спектакль «Что творят мужчины» с Сергеем Астаховым в Котовске"
+      },
+      "page": {
+        "id": "ce8c649f-dd99-46ce-a07f-2c8c1f66a45e",
+        "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-kotovsk",
+        "title": "Спектакль Что Творят Мужчины с Сергеем Астаховым в г. Котовск",
+        "seoH1": "Спектакль Что Творят Мужчины с Сергеем Астаховым в г. Котовск",
+        "seoTitle": "Спектакль Что Творят Мужчины с Сергеем Астаховым в г. Котовск | Дайбилет",
+        "seoDescription": "Действие спектакля разворачивается в театральной труппе, которая готовит премьеру в Петрограде 1920 года. Показ в городе Котовск — 11 декабря 2026 года, 18:30.",
+        "canonicalPath": "/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-kotovsk",
+        "status": "READY",
+        "isIndexable": true,
+        "publishedAt": "2026-11-13T01:58:51.717Z"
+      },
+      "eventIds": [
+        "evt_6ae8c9a73d1c2a18aef0b11b"
+      ],
+      "routes": [
+        {
+          "path": "/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-kotovsk",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisionCount": 4
+    },
+    {
+      "target": {
+        "id": "d7f81a6d-f5c7-4f0b-a704-40fe8e18226a",
+        "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-skopin",
+        "city": "Скопин",
+        "expectedH1": "Спектакль Что Творят Мужчины с Сергеем Астаховым в г. Скопин",
+        "brokenH1": "Спектакль Что Творят Мужчины с Сергеем Астаховым в",
+        "seoH1": "Спектакль «Что творят мужчины» с Сергеем Астаховым в Скопине"
+      },
+      "page": {
+        "id": "d7f81a6d-f5c7-4f0b-a704-40fe8e18226a",
+        "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-skopin",
+        "title": "Спектакль Что Творят Мужчины с Сергеем Астаховым в г. Скопин",
+        "seoH1": "Спектакль Что Творят Мужчины с Сергеем Астаховым в г. Скопин",
+        "seoTitle": "Спектакль Что Творят Мужчины с Сергеем Астаховым в г. Скопин | Дайбилет",
+        "seoDescription": "Действие спектакля разворачивается в театральной труппе, которая готовит премьеру в Петрограде 1920 года. Показ в городе Скопин — 10 декабря 2026 года, 19:00.",
+        "canonicalPath": "/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-skopin",
+        "status": "READY",
+        "isIndexable": true,
+        "publishedAt": "2026-11-13T01:58:53.023Z"
+      },
+      "eventIds": [
+        "evt_6ae898748219440b441f406e"
+      ],
+      "routes": [
+        {
+          "path": "/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-skopin",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisionCount": 4
+    },
+    {
+      "target": {
+        "id": "395f1fc5-c802-4769-b335-49011d818839",
+        "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-usman",
+        "city": "Усмань",
+        "expectedH1": "Спектакль \"Что Творят Мужчины\" с Сергеем Астаховым в г. Усмань",
+        "brokenH1": "Спектакль \"Что Творят Мужчины\" с Сергеем Астаховым в",
+        "seoH1": "Спектакль «Что творят мужчины» с Сергеем Астаховым в Усмани"
+      },
+      "page": {
+        "id": "395f1fc5-c802-4769-b335-49011d818839",
+        "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-usman",
+        "title": "Спектакль \"Что Творят Мужчины\" с Сергеем Астаховым в г. Усмань",
+        "seoH1": "Спектакль \"Что Творят Мужчины\" с Сергеем Астаховым в г. Усмань",
+        "seoTitle": "Спектакль \"Что Творят Мужчины\" с Сергеем Астаховым в г. Усмань | Дайбилет",
+        "seoDescription": "Действие спектакля разворачивается в театральной труппе, которая готовит премьеру в Петрограде 1920 года. Показ в городе Усмань — 15 ноября 2026 года, 13:00.",
+        "canonicalPath": "/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-usman",
+        "status": "READY",
+        "isIndexable": true,
+        "publishedAt": "2026-11-13T01:58:53.594Z"
+      },
+      "eventIds": [
+        "evt_6a91b336a331a1c650d9014c"
+      ],
+      "routes": [
+        {
+          "path": "/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-usman",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisionCount": 4
+    },
+    {
+      "target": {
+        "id": "64b40c8c-dbc8-4e2a-9bc1-5a2a1b568443",
+        "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-zherdevka",
+        "city": "Жердевка",
+        "expectedH1": "Спектакль \"Что творят мужчины\" с Сергеем Астаховым в г. Жердевка",
+        "brokenH1": "Спектакль \"Что творят мужчины\" с Сергеем Астаховым в",
+        "seoH1": "Спектакль «Что творят мужчины» с Сергеем Астаховым в Жердевке"
+      },
+      "page": {
+        "id": "64b40c8c-dbc8-4e2a-9bc1-5a2a1b568443",
+        "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-zherdevka",
+        "title": "Спектакль \"Что творят мужчины\" с Сергеем Астаховым в г. Жердевка",
+        "seoH1": "Спектакль \"Что творят мужчины\" с Сергеем Астаховым в г. Жердевка",
+        "seoTitle": "Спектакль \"Что творят мужчины\" с Сергеем Астаховым в г. Жердевка | Дайбилет",
+        "seoDescription": "Действие спектакля разворачивается в театральной труппе, которая готовит премьеру в Петрограде 1920 года. Показ в городе Жердевка — 12 декабря 2026 года, 13:00.",
+        "canonicalPath": "/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-zherdevka",
+        "status": "READY",
+        "isIndexable": true,
+        "publishedAt": "2026-11-13T01:58:53.320Z"
+      },
+      "eventIds": [
+        "evt_6ae87a1ce390fe0e867a6a1e"
+      ],
+      "routes": [
+        {
+          "path": "/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-zherdevka",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisionCount": 4
+    },
+    {
+      "target": {
+        "id": "5d596309-30ff-4464-9ea6-3974fd94f085",
+        "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-zhirnovsk",
+        "city": "Жирновск",
+        "expectedH1": "Спектакль \"Что творят мужчины\" с Сергеем Астаховым в г. Жирновск",
+        "brokenH1": "Спектакль \"Что творят мужчины\" с Сергеем Астаховым в",
+        "seoH1": "Спектакль «Что творят мужчины» с Сергеем Астаховым в Жирновске"
+      },
+      "page": {
+        "id": "5d596309-30ff-4464-9ea6-3974fd94f085",
+        "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-zhirnovsk",
+        "title": "Спектакль \"Что творят мужчины\" с Сергеем Астаховым в г. Жирновск",
+        "seoH1": "Спектакль \"Что творят мужчины\" с Сергеем Астаховым в г. Жирновск",
+        "seoTitle": "Спектакль \"Что творят мужчины\" с Сергеем Астаховым в г. Жирновск | Дайбилет",
+        "seoDescription": "Действие спектакля разворачивается в театральной труппе, которая готовит премьеру в Петрограде 1920 года. Показ в городе Жирновск — 14 декабря 2026 года, 18:00.",
+        "canonicalPath": "/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-zhirnovsk",
+        "status": "READY",
+        "isIndexable": true,
+        "publishedAt": "2026-11-13T01:58:52.710Z"
+      },
+      "eventIds": [
+        "evt_6ae9e095b8661ec670f32739"
+      ],
+      "routes": [
+        {
+          "path": "/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-zhirnovsk",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisionCount": 4
+    },
+    {
+      "target": {
+        "id": "c4bf1618-bd01-46d4-b8a9-ae1a9dba0fb1",
+        "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-kotovo",
+        "city": "Котово",
+        "expectedH1": "Спектакль Что Творят Мужчины с Сергеем Астаховым в Котово",
+        "brokenH1": "Спектакль Что Творят Мужчины с Сергеем Астаховым в",
+        "seoH1": "Спектакль «Что творят мужчины» с Сергеем Астаховым в Котове"
+      },
+      "page": {
+        "id": "c4bf1618-bd01-46d4-b8a9-ae1a9dba0fb1",
+        "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-kotovo",
+        "title": "Спектакль Что Творят Мужчины с Сергеем Астаховым в Котово",
+        "seoH1": "Спектакль Что Творят Мужчины с Сергеем Астаховым в Котово",
+        "seoTitle": "Спектакль Что Творят Мужчины с Сергеем Астаховым в Котово | Дайбилет",
+        "seoDescription": "«Что творят мужчины» с Сергеем Астаховым. В спектакле «Что творят мужчины» Сергей Астахов играет бывшего матроса, которому предстоит руководить театром. Показ: Котово, 15 декабря 2026 года в 18:30 (местное время); адрес: ул. Мира, д. 128.",
+        "canonicalPath": "/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-kotovo",
+        "status": "READY",
+        "isIndexable": true,
+        "publishedAt": "2026-11-13T02:33:29.805Z"
+      },
+      "eventIds": [
+        "evt_6aec9f5b3ebbbc1c3188563f"
+      ],
+      "routes": [
+        {
+          "path": "/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-kotovo",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisionCount": 4
+    },
+    {
+      "target": {
+        "id": "979e9692-dfa2-4849-8053-49be803d3d52",
+        "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-surovikino",
+        "city": "Суровикино",
+        "expectedH1": "Спектакль Что Творят Мужчины с Сергеем Астаховым в Суровикино",
+        "brokenH1": "Спектакль Что Творят Мужчины с Сергеем Астаховым в",
+        "seoH1": "Спектакль «Что творят мужчины» с Сергеем Астаховым в Суровикино"
+      },
+      "page": {
+        "id": "979e9692-dfa2-4849-8053-49be803d3d52",
+        "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-surovikino",
+        "title": "Спектакль Что Творят Мужчины с Сергеем Астаховым в Суровикино",
+        "seoH1": "Спектакль Что Творят Мужчины с Сергеем Астаховым в Суровикино",
+        "seoTitle": "Спектакль Что Творят Мужчины с Сергеем Астаховым в Суровикино | Дайбилет",
+        "seoDescription": "«Что творят мужчины» с Сергеем Астаховым. В спектакле «Что творят мужчины» Сергей Астахов играет бывшего матроса, которому предстоит руководить театром. Показ: Суровикино, 20 декабря 2026 года в 13:00 (местное время); адрес: ул. Ленина, 78, Суровикино, Волгоградская обл., Россия, 404415.",
+        "canonicalPath": "/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-surovikino",
+        "status": "READY",
+        "isIndexable": true,
+        "publishedAt": "2026-11-13T02:33:29.477Z"
+      },
+      "eventIds": [
+        "evt_6ae88e3dbfe08b07425c94c6"
+      ],
+      "routes": [
+        {
+          "path": "/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-surovikino",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisionCount": 4
+    }
+  ]
+}

@@ -697,7 +697,11 @@ export function EventHero({
   const titleWithoutCityCandidate = escapedCity
     ? titleSource.replace(new RegExp(`(?:\\s*[-–—,|]\\s*|\\s+(?:г\\.?\\s*)?)${escapedCity}\\s*$`, 'iu'), '').trim()
     : titleSource;
-  const titleWithoutCity = titleWithoutCityCandidate || titleSource;
+  const titleWithoutCity = !titleWithoutCityCandidate
+    ? titleSource
+    : /(?:^|\s)(?:в|во)\s*$/iu.test(titleWithoutCityCandidate) && event.city
+      ? `${titleWithoutCityCandidate.replace(/\s+(?:в|во)\s*$/iu, '').trim()} — ${event.city}`
+      : titleWithoutCityCandidate;
   const heroTitle = formatPublicTitle(titleWithoutCity);
   const titleSplit = splitLongTitleAtBreak(heroTitle);
   const longHeroTitle = Boolean(titleSplit) || heroTitle.length > 48;

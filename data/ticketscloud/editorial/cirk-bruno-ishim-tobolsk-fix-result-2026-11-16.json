@@ -1,0 +1,35 @@
+{
+  "appliedAt": "2026-11-16T20:30:05.420Z",
+  "pages": [
+    {
+      "id": "6d2bbcae-551f-4ec0-949d-544ad683e946",
+      "slug": "cirk-bruno-v-g-ishim",
+      "url": "https://daibilet.ru/events/cirk-bruno-v-g-ishim",
+      "seoH1": "Цирк Бруно в Ишиме",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T02:55:33.987Z",
+      "revisionCountBefore": 5,
+      "revisionCountAfter": 6,
+      "eventIdsChanged": false,
+      "routesChanged": false,
+      "seoFieldsChanged": false
+    },
+    {
+      "id": "ccbfe318-3491-4ad3-a602-5ae1fc7b7b87",
+      "slug": "cirk-bruno-v-g-tobolsk",
+      "url": "https://daibilet.ru/events/cirk-bruno-v-g-tobolsk",
+      "seoH1": "Цирк Бруно в Тобольске",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T02:55:33.647Z",
+      "revisionCountBefore": 4,
+      "revisionCountAfter": 5,
+      "eventIdsChanged": false,
+      "routesChanged": false,
+      "seoFieldsChanged": false
+    }
+  ],
+  "contentUpdated": "about section: animal list separated from circus acts",
+  "activeEditorialVersion": "2026-11-16-bruno-city-and-program-fix"
+}
