@@ -544,6 +544,22 @@ test('dayRouteItemFromEvent adds venue + session label', () => {
   assertCloseCoord(item!.latitude, 59.939864, 'ermitazh latitude (from event)');
 });
 
+test('dayRouteItemFromEvent uses editorial coordinates when catalog venue geo is missing', () => {
+  const item = dayRouteItemFromEvent({
+    id: 'evt_tep_653',
+    slug: 'ekskursiya-na-avtobuse',
+    title: 'Экскурсия на двухэтажном автобусе',
+    venueId: 'venue_tep_653',
+    venueSlug: 'болотная-пл-у-пам-и-е-репину-653',
+    venue: 'Болотная пл. у пам. И.Е. Репину',
+    venueLatitude: null,
+    venueLongitude: null,
+  });
+  assert.ok(item);
+  assertCloseCoord(item!.latitude, 55.744893, 'Repin Square latitude');
+  assertCloseCoord(item!.longitude, 37.615424, 'Repin Square longitude');
+});
+
 test('dayRouteItemFromEvent builds sessionLabel from startsAt when labels missing', () => {
   const item = dayRouteItemFromEvent({
     id: 'evt_starts',
@@ -558,6 +574,20 @@ test('dayRouteItemFromEvent builds sessionLabel from startsAt when labels missin
   assert.ok(item!.sessionLabel);
   assert.match(item!.sessionLabel!, /15/);
   assert.match(item!.sessionLabel!, /19:00/);
+});
+
+test('dayRouteItemFromEvent skips open-date widget labels without inventing a session time', () => {
+  const item = dayRouteItemFromEvent({
+    id: 'evt_open_date',
+    slug: 'open-date-event',
+    title: 'Событие с выбором времени в виджете',
+    venue: 'Площадка',
+    startsAt: '',
+    dateLabel: 'Открытая дата',
+    timeLabel: 'В виджете',
+  });
+  assert.ok(item);
+  assert.equal(item!.sessionLabel, null);
 });
 
 test('dayRouteItemFromEvent falls back to event id without venue', () => {

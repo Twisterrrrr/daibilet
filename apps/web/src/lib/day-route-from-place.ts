@@ -10,6 +10,7 @@ import {
   DAY_ROUTE_MAX,
   DAY_ROUTE_SOFT,
   formatDayRouteStartsAtLabel,
+  isDayRouteSoftSessionLabel,
   type DayRouteVenueItem,
 } from './day-route.ts'
 import { isValidCoordinatePair } from './day-route-score.ts'
@@ -330,7 +331,7 @@ export type DayRouteEventSource = {
 
 function formatEventSessionLabel(event: DayRouteEventSource): string | null {
   const parts = [String(event.dateLabel || '').trim(), String(event.timeLabel || '').trim()].filter(
-    Boolean,
+    (part) => part && !isDayRouteSoftSessionLabel(part),
   );
   if (parts.length) return parts.join(', ');
   return formatDayRouteStartsAtLabel(event.startsAt);
@@ -377,6 +378,14 @@ export function dayRouteItemFromEvent(event: DayRouteEventSource): DayRouteVenue
     resolveVenueHeroImage(venueSlug, event.imageUrl) ||
     String(event.imageUrl || '').trim() ||
     null;
+  const liveCoords = coordsFromVenue({
+    latitude: event.venueLatitude ?? null,
+    longitude: event.venueLongitude ?? null,
+  });
+  const venueCoords =
+    liveCoords.latitude != null && liveCoords.longitude != null
+      ? liveCoords
+      : coordsFromVenue(lookupEditorialPlaceCoords(venueSlug));
 
   let ticketUrl: string | null = null;
   if (eventSlug || eventId) {
@@ -423,12 +432,10 @@ export function dayRouteItemFromEvent(event: DayRouteEventSource): DayRouteVenue
     href,
     imageUrl,
     address: String(event.venueAddress || '').trim() || null,
-    ...coordsFromVenue({
-      latitude: event.venueLatitude,
-      longitude: event.venueLongitude,
-    }),
+    ...venueCoords,
     eventId,
     eventSlug,
+    eventStop: true,
     sessionLabel,
     startsAt,
     ticketUrl,

@@ -97,6 +97,7 @@ export const MyDayCityPickStarter = forwardRef<HTMLElement, MyDayCityPickStarter
               value={value}
               onChange={onChange}
               allLabel="Выберите город"
+              showAllOption={false}
               variant="hero"
               className="w-full"
             />

@@ -35,6 +35,11 @@
   background: #f1f5f9;
 }
 
+/* On the My Day map, lift zoom controls just above the bottom stop carousel. */
+[data-day-route-map='leaflet'] .leaflet-bottom.leaflet-right {
+  bottom: 5.5rem;
+}
+
 /* Global img max-width resets break OSM tile sizing - keep tiles native. */
 .leaflet-container img.leaflet-tile {
   max-width: none !important;

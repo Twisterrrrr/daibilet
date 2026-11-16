@@ -61,11 +61,11 @@ export function editorialTagFromTitle(title: string | null | undefined): string 
   return null;
 }
 
-const FREE_OUTDOOR_TITLE_RE =
-  /площад|сквер|мост|набереж|бульвар|проспект|улица|переул|аллея|всадник|стрелка|лини[ияю]/i;
 const PAID_ENTRY_TITLE_RE =
   /собор|храм|колоннад|дворец|дворца\b|музей|эрмитаж|театр|галере|особняк|замок|крепост|смотров|палацц|выстав|ботаническ|оранжерей|зоопарк|океанариум|планетари|петергоф|павловск|царск|кусков|царицын|гатчин|ораниенбаум|меншиков|лахта|канатно|телебашн|останкин|бункер|ледокол|аквапарк|дельфин|\bцирк|некропол|макет|усадьб|павильон|аврора|крейсер|лицей|аттракцион|диво-остров|дендрар|аптекарск/i;
 const PAID_ENTRY_TAGS = new Set(['Музей', 'Храм', 'Театр', 'Событие', 'Еда', 'Особняк']);
+const FREE_OUTDOOR_TITLE_RE =
+  /площад|сквер|мост|набереж|бульвар|проспект|улица|переул|аллея|всадник|стрелка|лини[ияю]/i;
 
 function isLikelyPaidEntry(venue: DayRouteVenueItem, typeTag?: string | null): boolean {
   if (PAID_ENTRY_TITLE_RE.test(String(venue.title || ''))) return true;
@@ -78,7 +78,7 @@ function isLikelyFreeOutdoor(venue: DayRouteVenueItem, typeTag?: string | null):
   return FREE_OUTDOOR_TITLE_RE.test(String(venue.title || ''));
 }
 
-/** Soft price chip. Do not invent «Вход свободный» for interiors (Исаакий, колоннада, музей). */
+/** Soft price chip. Do not infer free entry for interiors (Исаакий, колоннада, музей). */
 export function dayRouteStopPriceChipLabel(
   venue: DayRouteVenueItem,
   typeTag?: string | null,

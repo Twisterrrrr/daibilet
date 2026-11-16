@@ -16,6 +16,8 @@ type CityPickerProps = {
   value: string;
   onChange: (value: string) => void;
   allLabel?: string;
+  /** Hide the non-city `all` option. */
+  showAllOption?: boolean;
   variant?: CityPickerVariant;
   className?: string;
   /** Open the dropdown on mount (e.g. /my-day «или сменить город»). */
@@ -29,6 +31,7 @@ export function CityPicker({
   value,
   onChange,
   allLabel = 'Все города',
+  showAllOption = true,
   variant = 'hero',
   className = '',
   defaultOpen = false,
@@ -172,24 +175,26 @@ export function CityPicker({
             />
           </div>
           <ul role="listbox" aria-label="Города">
-            <li>
-              <button
-                type="button"
-                role="option"
-                aria-selected={isAllSelected}
-                onMouseDown={(event) => event.preventDefault()}
-                onClick={() => selectCity('all')}
-                className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm hover:bg-slate-100 ${
-                  isAllSelected ? 'bg-slate-100 font-semibold text-slate-900' : 'text-slate-700'
-                }`}
-              >
-                <span className="flex items-center gap-2">
-                  <MapPin className="h-3.5 w-3.5 text-slate-400" />
-                  {allLabel}
-                </span>
-                {isAllSelected ? <Check className="h-4 w-4 text-primary-600" /> : null}
-              </button>
-            </li>
+            {showAllOption ? (
+              <li>
+                <button
+                  type="button"
+                  role="option"
+                  aria-selected={isAllSelected}
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={() => selectCity('all')}
+                  className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm hover:bg-slate-100 ${
+                    isAllSelected ? 'bg-slate-100 font-semibold text-slate-900' : 'text-slate-700'
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <MapPin className="h-3.5 w-3.5 text-slate-400" />
+                    {allLabel}
+                  </span>
+                  {isAllSelected ? <Check className="h-4 w-4 text-primary-600" /> : null}
+                </button>
+              </li>
+            ) : null}
             {filteredCityOptions.map((city) => {
               const active = Boolean(
                 selectedMatch

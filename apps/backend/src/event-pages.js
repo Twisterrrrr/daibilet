@@ -567,8 +567,14 @@ export async function readPublishedEventPageForEvent(db, eventId) {
 
 /** Resolve only the stable public identity. Draft copy itself is never returned here. */
 export async function readPublicEventPageRouteBySlug(db, slug) {
+  return readPublicEventPageRouteBySlugInternal(db, slug, new Set());
+}
+
+async function readPublicEventPageRouteBySlugInternal(db, slug, visitedSlugs) {
   const key = String(slug || '').trim().toLowerCase();
   if (!key) return null;
+  if (visitedSlugs.has(key)) return null;
+  visitedSlugs.add(key);
   try {
     // EventPage consolidation keeps old paths as historical aliases on the
     // surviving page. Serve the target PDP at the old path with its canonical
@@ -585,7 +591,7 @@ export async function readPublicEventPageRouteBySlug(db, slug) {
       LIMIT 1
     `, [`/events/${key}`, key]);
     if (historicalAlias.rows[0]?.slug) {
-      const target = await readPublicEventPageRouteBySlug(db, historicalAlias.rows[0].slug);
+      const target = await readPublicEventPageRouteBySlugInternal(db, historicalAlias.rows[0].slug, visitedSlugs);
       return target ? { ...target, historicalAlias: true } : null;
     }
     const result = await db.query(`

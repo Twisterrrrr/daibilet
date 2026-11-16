@@ -31,12 +31,14 @@ export function HeroImageWithBlur({
   const renderLayer = ({
     imageAlt,
     sizes,
+    quality,
     className: layerClassName,
     layerStyle,
     layerPriority = false,
   }: {
     imageAlt: string;
     sizes: string;
+    quality?: number;
     className: string;
     layerStyle: React.CSSProperties;
     layerPriority?: boolean;
@@ -47,6 +49,7 @@ export function HeroImageWithBlur({
         alt={imageAlt}
         fill
         sizes={sizes}
+        quality={quality}
         className={layerClassName}
         style={layerStyle}
         priority={layerPriority}
@@ -80,6 +83,9 @@ export function HeroImageWithBlur({
         {renderLayer({
           imageAlt: alt,
           sizes: EVENT_HERO_FRAME_SIZES,
+          // Event hero is a high-visibility image. Keep the cover treatment,
+          // but request a higher optimizer quality than listing thumbnails.
+          quality: 95,
           className: `object-cover ${className}`,
           layerStyle: {
             objectPosition: focalPoint,

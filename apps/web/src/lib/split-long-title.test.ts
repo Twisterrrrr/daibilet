@@ -25,3 +25,10 @@ test('long title breaks after spaced hyphen, not inside hyphenated words', () =>
     null,
   );
 });
+
+test('long title keeps the hop-on hop-off phrase together', () => {
+  assert.equal(
+    splitLongTitleAtBreak('Экскурсия на двухэтажном автобусе по системе "Hop on - hop off" г. Москва'),
+    null,
+  );
+});

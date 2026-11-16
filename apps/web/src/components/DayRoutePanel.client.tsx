@@ -36,7 +36,6 @@ import {
 import {
   MyDayCityPickStarter,
   MyDayRegionCityPrompt,
-  MyDayFloatingPickerDock,
   MyDayPickerLaunch,
   MyDayPickerSheet,
   MyDayItinerary,
@@ -95,7 +94,6 @@ import {
   DAY_ROUTE_MIN,
   DAY_ROUTE_SOFT,
   DAY_ROUTE_SOFT_WARN,
-  addNoteStopToDayRoute,
   addTextStopToDayRoute,
   applyItemTokensToVenues,
   applyShareMetaToVenues,
@@ -283,7 +281,7 @@ const DAY_ROUTE_PERIOD_META: Record<DayRoutePeriod, { label: string; time: strin
 };
 
 /** Owner 2026-08-06: post-buy modal «Оформили билет?» off until UX revisit. Buy links still open. */
-const SHOW_DAY_TICKET_HANDOFF_MODAL = false;
+const SHOW_DAY_TICKET_HANDOFF_MODAL = true;
 const NEARBY_MATCHES_PREVIEW = 3;
 /** Underline via ::after so hover never changes line-box / cursor hit-testing. */
 const DAY_TEXT_LINK =
@@ -519,6 +517,7 @@ function DayRoutePanelInner() {
   /** Stop focused from map pin click. */
   const [focusedStopId, setFocusedStopId] = useState<string | null>(null);
   const [stopFocusRequestKey, setStopFocusRequestKey] = useState(0);
+  const [fitRouteRequestKey, setFitRouteRequestKey] = useState(0);
   /** Hover/focus highlight for the map marker (separate from focusedStopId). */
   const [hoverStopId, setHoverStopId] = useState<string | null>(null);
   /** Mobile (&lt;lg): list-first; map is a separate fullscreen mode (Wanderlog-style). */
@@ -528,12 +527,14 @@ function DayRoutePanelInner() {
   /** Lovable-style map chrome: collapse / fullscreen / mobile sheet. */
   const myDay = useMyDayController();
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [mobilePresetsOpen, setMobilePresetsOpen] = useState(false);
   const [pickerSection, setPickerSection] = useState<MyDayPickerSection>('scenarios');
   const [matchesExpanded, setMatchesExpanded] = useState(false);
   /** Session dismiss for «Свободное окно» upsell (resets on reload). */
   const [freeWindowDismissed, setFreeWindowDismissed] = useState(false);
   /** HTML5 DnD: venue id currently dragged (plan stops). */
   const [dragVenueId, setDragVenueId] = useState<string | null>(null);
+  const [dragOverVenueId, setDragOverVenueId] = useState<string | null>(null);
   const [grabbedKey, setGrabbedKey] = useState<string | null>(null);
   /** Restore grip focus after keyboard reorder (React remount can drop focus). */
   const gripFocusVenueIdRef = useRef<string | null>(null);
@@ -555,7 +556,6 @@ function DayRoutePanelInner() {
   /** Next catalog/text add inserts after this stop (from between-card «+»). */
   const [insertAfterVenueId, setInsertAfterVenueId] = useState<string | null>(null);
   /** Open between-card «+» popover for this afterVenueId. */
-  const [betweenMenuAfterId, setBetweenMenuAfterId] = useState<string | null>(null);
   const listRootRef = useRef<HTMLDivElement | null>(null);
   /** After external «Купить билет» - ask guest to mark bought (gated by SHOW_DAY_TICKET_HANDOFF_MODAL). */
   const [ticketHandoff, setTicketHandoffState] = useState<{
@@ -563,6 +563,7 @@ function DayRoutePanelInner() {
     ticketUrl: string;
     title: string;
   } | null>(null);
+  const [ticketHandoffTime, setTicketHandoffTime] = useState('');
   const setTicketHandoff = (
     next: {
       venueId: string;
@@ -571,6 +572,7 @@ function DayRoutePanelInner() {
     } | null,
   ) => {
     if (!SHOW_DAY_TICKET_HANDOFF_MODAL && next !== null) return;
+    setTicketHandoffTime('');
     setTicketHandoffState(next);
   };
   /** Show-ticket modal: real QR only when ticketQrData exists; else stub. */
@@ -1542,33 +1544,6 @@ function DayRoutePanelInner() {
     );
   }, [mustSeeResolved, mustSeeFilter, mustSeeFilterMeta]);
 
-  const betweenInsertSuggestions = useMemo(() => {
-    const out: Array<{
-      id: string;
-      title: string;
-      tag: string;
-      imageUrl: string | null;
-      item: DayRouteVenueItem;
-    }> = [];
-    for (const row of mustSeeResolved) {
-      if (out.length >= 4) break;
-      const inRoute =
-        isInDayRoute(row.item.id, route) ||
-        Boolean(row.item.slug && isInDayRoute(row.item.slug, route));
-      if (inRoute) continue;
-      if (!lookupDayRouteCoords(row.item, buildDayRouteCoordsMap([row.item]))) continue;
-      const kind = classifyMustSeePlace(row.place);
-      out.push({
-        id: row.item.id,
-        title: row.place.name || row.item.title,
-        tag: mustSeeFilterLabel(kind),
-        imageUrl: resolveDayRouteStopImage(row.item) || row.item.imageUrl || null,
-        item: row.item,
-      });
-    }
-    return out;
-  }, [mustSeeResolved, route]);
-
   function pickLocationById(id: string) {
     const venue = locationsCatalog.find((item) => item.id === id);
     if (!venue) return;
@@ -2294,6 +2269,14 @@ function DayRoutePanelInner() {
     return null;
   }, [route.venues]);
   const canOptimize = coordsCount >= 2;
+  const ticketHandoffVenue = ticketHandoff
+    ? route.venues.find((venue) => venue.id === ticketHandoff.venueId) || null
+    : null;
+  const ticketHandoffNeedsTime = Boolean(
+    ticketHandoffVenue &&
+      (ticketHandoffVenue.eventId || ticketHandoffVenue.eventSlug) &&
+      !/\b\d{1,2}:\d{2}\b/.test(formatDayRouteSessionDisplay(ticketHandoffVenue) || ''),
+  );
 
   useEffect(() => {
     setMatchesExpanded(false);
@@ -2619,31 +2602,43 @@ function DayRoutePanelInner() {
 
   function onPlanStopDragStart(venueId: string) {
     setDragVenueId(venueId);
+    setDragOverVenueId(null);
   }
 
-  function onPlanStopDragOver(event: DragEvent) {
+  function onPlanStopDragOver(event: DragEvent, targetVenueId: string) {
     event.preventDefault();
+    setDragOverVenueId(dragVenueId === targetVenueId ? null : targetVenueId);
   }
 
-  function onPlanStopDrop(targetVenueId: string) {
+  function onPlanStopDrop(targetVenueId: string, event: DragEvent) {
     if (!dragVenueId || dragVenueId === targetVenueId) {
       setDragVenueId(null);
+      setDragOverVenueId(null);
       return;
     }
     const planIds = planStops.map((v) => v.id);
     const from = planIds.indexOf(dragVenueId);
     const to = planIds.indexOf(targetVenueId);
-    if (from < 0 || to < 0) {
+    const crossesSession = from >= 0 && to >= 0 && planStops
+      .slice(Math.min(from, to), Math.max(from, to) + 1)
+      .some(dayRouteStopReorderLocked);
+    if (from < 0 || to < 0 || crossesSession) {
       setDragVenueId(null);
+      setDragOverVenueId(null);
+      if (crossesSession) flashDayRouteFeedback('Точка не может пересечь сеанс с фиксированным временем');
       return;
     }
     const nextPlanIds = [...planIds];
     const [moved] = nextPlanIds.splice(from, 1);
     if (!moved) {
       setDragVenueId(null);
+      setDragOverVenueId(null);
       return;
     }
-    nextPlanIds.splice(to, 0, moved);
+    const targetRect = event.currentTarget.getBoundingClientRect();
+    let insertAt = to + (event.clientY >= targetRect.top + targetRect.height / 2 ? 1 : 0);
+    if (from < insertAt) insertAt -= 1;
+    nextPlanIds.splice(Math.max(0, Math.min(nextPlanIds.length, insertAt)), 0, moved);
     const planIdSet = new Set(planIds);
     let cursor = 0;
     const nextIds = route.venues.map((v) => {
@@ -2652,10 +2647,21 @@ function DayRoutePanelInner() {
     });
     setRoute(reorderDayRoute(nextIds));
     setDragVenueId(null);
+    setDragOverVenueId(null);
   }
 
   function onPlanStopDragEnd() {
     setDragVenueId(null);
+    setDragOverVenueId(null);
+  }
+
+  function movePlanStop(venueId: string, delta: -1 | 1) {
+    const venues = route.venues.filter((venue) => !venue.ticketBought);
+    const index = venues.findIndex((venue) => venue.id === venueId);
+    if (index < 0) return;
+    const target = venues[index + delta];
+    if (!target || dayRouteStopReorderLocked(venues[index]!) || dayRouteStopReorderLocked(target)) return;
+    setRoute(moveDayRoutePlanVenue(venueId, delta));
   }
 
   function onPlanGripKeyDown(
@@ -2670,7 +2676,7 @@ function DayRoutePanelInner() {
       event.preventDefault();
       gripFocusVenueIdRef.current = venueId;
       armScrollPreserve();
-      setRoute(moveDayRoutePlanVenue(venueId, event.key === 'ArrowUp' ? -1 : 1));
+      movePlanStop(venueId, event.key === 'ArrowUp' ? -1 : 1);
       return;
     }
     if (event.key === ' ' || event.key === 'Enter') {
@@ -2689,7 +2695,7 @@ function DayRoutePanelInner() {
     if (event.key === 'Escape' && grabbedKey === venueId) {
       event.preventDefault();
       setGrabbedKey(null);
-      setDndAnnounce('Перемещение отменено.');
+      setDndAnnounce('Режим перемещения закрыт.');
     }
   }
 
@@ -2852,41 +2858,6 @@ function DayRoutePanelInner() {
     refreshScenarios();
   }
 
-  function openInsertPlaceAfter(afterVenueId: string) {
-    setBetweenMenuAfterId(null);
-    if (atMax) {
-      setInsertAfterVenueId(null);
-      flashDayRouteFeedback(dayRouteHardLimitMessage());
-      return;
-    }
-    setInsertAfterVenueId(afterVenueId);
-    openPicker('places');
-  }
-
-  function openInsertNoteAfter(afterVenueId: string, body = 'Заметка') {
-    setBetweenMenuAfterId(null);
-    if (atMax) {
-      flashDayRouteFeedback(dayRouteHardLimitMessage());
-      return;
-    }
-    const text = String(body || '').trim() || 'Заметка';
-    setRoute(addNoteStopToDayRoute({ body: text, afterVenueId }));
-    flashDayRouteFeedback('Заметка добавлена');
-  }
-
-  function insertSuggestionAfter(afterVenueId: string, item: DayRouteVenueItem) {
-    setBetweenMenuAfterId(null);
-    if (atMax) {
-      flashDayRouteFeedback(dayRouteHardLimitMessage());
-      return;
-    }
-    if (!lookupDayRouteCoords(item, buildDayRouteCoordsMap([item]))) {
-      flashDayRouteFeedback('У места нет координат - выберите другое');
-      return;
-    }
-    setRoute(appendDayRouteItem(item, afterVenueId));
-  }
-
   function openTextForm() {
     openPicker('own');
   }
@@ -2974,7 +2945,7 @@ function DayRoutePanelInner() {
       ? [{ value: 'places' as const, label: 'Главные места', hint: 'Топ мест города', icon: MapPin }]
       : []),
     ...(showSuburbsGuide
-      ? [{ value: 'suburbs' as const, label: 'Значимые пригороды', hint: 'Поездки за город на полдня', icon: Landmark }]
+      ? [{ value: 'suburbs' as const, label: 'Пригороды', hint: 'Поездки за город на полдня', icon: Landmark }]
       : []),
     ...(showHotPicks
       ? [{ value: 'picks' as const, label: 'Выбор Дайбилет', hint: 'Рекомендации сервиса', icon: Sparkles }]
@@ -3106,6 +3077,12 @@ function DayRoutePanelInner() {
   function focusStopFromMap(stopId: string, opts?: { scrollList?: boolean }) {
     // Explicit selection should win over hover highlight.
     setHoverStopId(null);
+    if (focusedStopId === stopId) {
+      setFocusedStopId(null);
+      setStopFocusRequestKey((key) => key + 1);
+      setFitRouteRequestKey((key) => key + 1);
+      return;
+    }
     setFocusedStopId(stopId);
     setStopFocusRequestKey((key) => key + 1);
     if (mobileView === 'map') return;
@@ -3122,7 +3099,6 @@ function DayRoutePanelInner() {
   }
 
   function renderMapFocusCard(placement: 'desktop' | 'mobile' = 'mobile') {
-    if (placement === 'mobile') return null;
     if (!focusedVenue) return null;
     // Same hint chain as must-see / catalog cards: hookFact → shortDescription → editorial desc.
     const matchedSource =
@@ -3149,7 +3125,6 @@ function DayRoutePanelInner() {
         desc: mustSeeRow?.place.desc,
         preferEditorial: true,
       },
-      260,
     );
     const addressLine =
       formatStreetAddress(focusedVenue.address, { city: focusedVenue.city }) ||
@@ -3160,18 +3135,18 @@ function DayRoutePanelInner() {
       <div
         className={
           placement === 'desktop'
-            ? 'pointer-events-auto absolute left-3 right-3 top-14 z-[1100] max-h-[min(36vh,11.5rem)] overflow-hidden rounded-2xl border border-slate-200 bg-white/95 p-2.5 shadow-md backdrop-blur sm:left-auto sm:right-3 sm:w-[min(22rem,calc(100%-1.5rem))]'
-            : 'pointer-events-auto absolute bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] left-3 right-3 z-[1100] max-h-[min(32vh,10rem)] overflow-hidden rounded-2xl border border-slate-200 bg-white/95 p-2.5 shadow-md backdrop-blur'
+            ? 'pointer-events-auto absolute left-3 right-3 top-14 z-[1100] max-h-[min(42vh,18rem)] overflow-y-auto rounded-2xl border border-slate-200 bg-white/95 p-2.5 shadow-md backdrop-blur sm:left-auto sm:right-3 sm:w-[min(22rem,calc(100%-1.5rem))]'
+            : 'pointer-events-auto absolute bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] left-3 right-3 z-[1100] max-h-[min(40vh,14rem)] overflow-y-auto rounded-2xl border border-slate-200 bg-white/95 p-2.5 shadow-md backdrop-blur'
         }
         data-day-map-focus-card
         data-day-map-focus-placement={placement}
       >
         <div className="flex items-start gap-2">
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-slate-900">{focusedVenue.title}</p>
+            <p className="text-sm font-semibold leading-snug text-slate-900">{focusedVenue.title}</p>
             {focusSubtitle ? (
             <p
-              className="mt-0.5 line-clamp-2 text-[11px] leading-snug text-slate-500"
+              className="mt-0.5 whitespace-normal text-[11px] leading-snug text-slate-600"
               title={focusSubtitle}
               data-day-map-focus-subtitle
             >
@@ -3402,13 +3377,11 @@ function DayRoutePanelInner() {
     const hideMap = Boolean(opts?.hideMap);
     const cityLabel = scopeCityName || pageCityName || '';
     const cityInCase = cityLabel ? inCityPrepositional(cityLabel) : '';
-    const firstPreset = dayRoutePresets[0] || null;
-    const firstPresetItems = firstPreset
-      ? buildCityDayRoutePreset(firstPreset.stops, matchSources, dayPresetCityCtx)
-      : [];
-    const firstPresetReady =
-      Boolean(firstPreset) &&
-      cityDayRoutePresetAvailable(firstPreset!.stops, matchSources, dayPresetCityCtx);
+    const quickPresets = dayRoutePresets.slice(0, 5).flatMap((preset) => {
+      if (!cityDayRoutePresetAvailable(preset.stops, matchSources, dayPresetCityCtx)) return [];
+      const items = buildCityDayRoutePreset(preset.stops, matchSources, dayPresetCityCtx);
+      return [{ preset, items }];
+    });
 
     if (!hasPageCity) {
       if (selectedRegionAlternatives) {
@@ -3445,7 +3418,9 @@ function DayRoutePanelInner() {
     return (
       <section
         className={[
-          'rounded-2xl border border-dashed border-primary-300/70 bg-primary-50/40 p-5 sm:p-6',
+            hideMap
+            ? 'flex min-h-[18rem] flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm 2xl:min-h-full xl:p-8'
+            : 'rounded-2xl border border-dashed border-primary-300/70 bg-primary-50/40 p-5 sm:p-6',
           hideMap
             ? 'mt-0'
             : 'mt-4 grid gap-4 sm:mt-5 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,280px)] xl:mx-auto xl:max-w-5xl',
@@ -3457,53 +3432,130 @@ function DayRoutePanelInner() {
         data-day-starter-shell={hideMap ? '1' : undefined}
       >
         <div className="min-w-0">
-          <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-primary-600">
-            Шаг 1 из 2
-          </p>
-          <h2 className="mt-1 font-display text-xl font-extrabold text-slate-900 sm:text-2xl">
-            Начните день с готового сценария
-          </h2>
-          <p className="mt-1 max-w-xl text-sm leading-relaxed text-slate-600">
-            Сценарий сразу добавит 5-7 точек с логистикой и таймингом. Или соберите маршрут вручную
-            из главных мест {cityInCase || 'города'} - порядок потом можно менять перетаскиванием.
-          </p>
-          <div className="mt-5 flex flex-col gap-2">
+          {hideMap ? (
+            <div className="mt-1 flex items-center gap-3" data-day-empty-desktop-title>
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary-50 text-primary-700">
+                <Route className="h-5 w-5" aria-hidden />
+              </span>
+              <h2 className="font-display text-xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-[1.65rem]">
+                Выберите готовый маршрут
+              </h2>
+            </div>
+          ) : (
+            <h2 className="mt-1 font-display text-xl font-extrabold text-slate-900 sm:text-2xl">
+              Начните день с готового сценария
+            </h2>
+          )}
+          {!hideMap ? (
+            <p className="mt-1 max-w-xl text-sm leading-relaxed text-slate-600">
+              Сценарий сразу добавит 5-7 точек с логистикой и таймингом. Или соберите маршрут вручную из главных мест {cityInCase || 'города'} - порядок потом можно менять перетаскиванием.
+            </p>
+          ) : null}
+          {!hideMap ? <div className="mt-5 flex flex-col gap-2">
             <button
               type="button"
               data-day-empty-pick-scenario
-              onClick={() => openPicker('scenarios')}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-primary-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary-700"
+              aria-expanded={hideMap ? undefined : mobilePresetsOpen}
+              aria-controls={hideMap ? undefined : 'my-day-mobile-presets-accordion'}
+              onClick={() => {
+                if (hideMap) setPickerSection('scenarios');
+                else if (quickPresets.length) setMobilePresetsOpen((open) => !open);
+                else openPicker('scenarios');
+              }}
+              className={`relative inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-primary-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary-700`}
             >
-              <Route className="h-4 w-4" aria-hidden />
-              Выбрать готовый сценарий
+              <span className="inline-flex items-center gap-2">
+                <Route className="h-4 w-4" aria-hidden />
+                {hideMap ? 'Готовый сценарий' : 'Выбрать готовый сценарий'}
+              </span>
+              {!hideMap ? <ChevronDown className={`absolute right-4 h-4 w-4 transition-transform ${mobilePresetsOpen ? 'rotate-180' : ''}`} aria-hidden /> : null}
             </button>
             <button
               type="button"
               data-day-empty-add-places
-              onClick={() => openPicker('places')}
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-primary-300 bg-white px-5 py-3 text-sm font-semibold text-primary-700 transition hover:bg-primary-50"
+              onClick={() => {
+                if (hideMap) setPickerSection('places');
+                else openPicker('places');
+              }}
+              className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-primary-300 bg-white px-5 py-3 text-sm font-semibold text-primary-700 transition hover:bg-primary-50 ${hideMap ? 'w-full' : ''}`}
             >
               <Plus className="h-4 w-4" aria-hidden />
-              Добавить места самому
+              {hideMap ? 'Выбрать места' : 'Добавить места'}
             </button>
-          </div>
-          {firstPresetReady && firstPreset ? (
-            <button
-              type="button"
-              data-day-empty-quick-preset={firstPreset.id}
-              onClick={() => {
-                replaceDayRouteFromVenues(firstPresetItems, pageCityId || null);
-                setRoute(readDayRouteFresh());
-                flashDayRouteFeedback(
-                  dayRouteAddSuccessMessage(firstPresetItems.length) ||
-                    `Сценарий «${firstPreset.title}» в маршруте`,
-                  { showClear: true },
-                );
-              }}
-              className={`inline-btn mt-4 min-h-0 text-left text-sm font-semibold text-primary-700 ${DAY_TEXT_LINK}`}
-            >
-              Или соберите за меня: «{firstPreset.title}» ({firstPresetItems.length} точек)
-            </button>
+          </div> : null}
+          {hideMap && quickPresets.length ? (
+            <div className="mt-5 border-t border-slate-200 pt-4" data-day-empty-quick-presets>
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-sm font-semibold text-slate-800">Популярные маршруты</p>
+                <button
+                  type="button"
+                  onClick={() => openPicker('scenarios')}
+                  className="shrink-0 text-xs font-semibold text-primary-700"
+                  data-day-empty-presets-all
+                >
+                  Смотреть все
+                </button>
+              </div>
+              <div className="mt-2 flex flex-col">
+                {quickPresets.map(({ preset, items }) => (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    data-day-empty-quick-preset={preset.id}
+                    onClick={() => {
+                      replaceDayRouteFromVenues(items, pageCityId || null);
+                      setRoute(readDayRouteFresh());
+                      flashDayRouteFeedback(
+                        dayRouteAddSuccessMessage(items.length) || `Сценарий «${preset.title}» в маршруте`,
+                        { showClear: true },
+                      );
+                    }}
+                    className={`inline-flex min-h-10 w-full items-center gap-2 rounded-lg border-b border-slate-100 px-2.5 py-1.5 text-left text-[13px] font-medium text-primary-700 transition hover:bg-primary-50 ${DAY_TEXT_LINK}`}
+                  >
+                    <span className="min-w-0 flex-1 truncate">{preset.title}</span>
+                    <span className="shrink-0 text-xs text-slate-500">{items.length} точек</span>
+                    <ChevronDown className="h-4 w-4 shrink-0 -rotate-90 text-slate-400" aria-hidden />
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
+          {!hideMap && mobilePresetsOpen && quickPresets.length ? (
+            <div id="my-day-mobile-presets-accordion" className="mt-3 rounded-2xl border border-slate-200 bg-white p-3" data-day-mobile-presets-accordion>
+              <div className="flex items-center justify-between gap-3 px-1">
+                <p className="text-sm font-semibold text-slate-800">Готовые маршруты</p>
+                <button
+                  type="button"
+                  onClick={() => openPicker('scenarios')}
+                  className="shrink-0 text-xs font-semibold text-primary-700"
+                  data-day-mobile-presets-all
+                >
+                  Смотреть все
+                </button>
+              </div>
+              <div className="mt-2 flex flex-col">
+                {quickPresets.map(({ preset, items }) => (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    onClick={() => {
+                      replaceDayRouteFromVenues(items, pageCityId || null);
+                      setRoute(readDayRouteFresh());
+                      setMobilePresetsOpen(false);
+                      flashDayRouteFeedback(
+                        dayRouteAddSuccessMessage(items.length) || `Сценарий «${preset.title}» в маршруте`,
+                        { showClear: true },
+                      );
+                    }}
+                    className={`inline-flex min-h-10 w-full items-center gap-2 rounded-lg border-b border-slate-100 px-2.5 py-1.5 text-left text-[13px] font-medium text-primary-700 transition hover:bg-primary-50 ${DAY_TEXT_LINK}`}
+                  >
+                    <span className="min-w-0 flex-1 truncate">{preset.title}</span>
+                    <span className="shrink-0 text-xs text-slate-500">{items.length} точек</span>
+                    <ChevronDown className="h-4 w-4 shrink-0 -rotate-90 text-slate-400" aria-hidden />
+                  </button>
+                ))}
+              </div>
+            </div>
           ) : null}
         </div>
 
@@ -3603,6 +3655,7 @@ function DayRoutePanelInner() {
                 setHeaderCityChangeOpen(false);
               }}
               allLabel="Город"
+              showAllOption={false}
               variant="hero"
               className="w-full"
             />
@@ -3648,120 +3701,6 @@ function DayRoutePanelInner() {
         >
           <Car className="h-3.5 w-3.5" aria-hidden />
         </button>
-      </div>
-    );
-  }
-
-  function renderOptimizeGhost() {
-    if (!canOptimize) return null;
-    return (
-      <button
-        type="button"
-        onClick={optimizeOrder}
-        data-day-map-optimize
-        className="inline-flex min-h-9 w-full items-center justify-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-slate-900 lg:w-auto lg:min-h-8"
-      >
-        <Sparkles className="h-3.5 w-3.5 shrink-0 text-slate-400" />
-        Оптимизировать маршрут
-      </button>
-    );
-  }
-
-  /**
-   * Mobile: demote Plan/Optimize to compact icon buttons so they do not stack
-   * against sticky primary «Посмотреть готовый день».
-   */
-  function renderMobileRouteActions() {
-    const canHourPlan = route.venues.length >= 1;
-    if (!canHourPlan && !canOptimize) return null;
-    return (
-      <div
-        className="flex w-full items-center justify-end gap-1.5 lg:hidden"
-        data-day-route-toolbar-inner
-        data-day-mobile-route-actions
-        role="group"
-        aria-label="Действия с маршрутом"
-      >
-        {canHourPlan ? (
-          hourPlanOn ? (
-            <button
-              type="button"
-              data-day-hour-reset
-              aria-label="Сбросить время"
-              title="Сбросить время"
-              onClick={() => {
-                setHourPlanOn(false);
-                setHourSheetOpen(false);
-              }}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-            >
-              <Clock className="h-4 w-4 shrink-0" aria-hidden />
-            </button>
-          ) : (
-            <button
-              type="button"
-              data-day-hour-plan
-              aria-label="Распланировать"
-              title="Распланировать"
-              onClick={() => setHourSheetOpen(true)}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100"
-            >
-              <Clock className="h-4 w-4 shrink-0" aria-hidden />
-            </button>
-          )
-        ) : null}
-        {canOptimize ? (
-          <button
-            type="button"
-            onClick={optimizeOrder}
-            data-day-map-optimize
-            aria-label="Оптимизировать маршрут"
-            title="Оптимизировать маршрут"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-          >
-            <Sparkles className="h-4 w-4 shrink-0" aria-hidden />
-          </button>
-        ) : null}
-      </div>
-    );
-  }
-
-  /** Desktop distance/stats row: Hour plan + Optimize flush right (title row stays airy). */
-  function renderDesktopDistanceActions() {
-    const canHourPlan = route.venues.length >= 1;
-    if (!canHourPlan && !canOptimize) return null;
-    return (
-      <div
-        className="hidden shrink-0 items-center justify-end gap-1.5 lg:flex"
-        data-day-desktop-distance-actions
-      >
-        {canHourPlan ? (
-          hourPlanOn ? (
-            <button
-              type="button"
-              data-day-hour-reset
-              onClick={() => {
-                setHourPlanOn(false);
-                setHourSheetOpen(false);
-              }}
-              className="inline-flex min-h-8 items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
-            >
-              <Clock className="h-3.5 w-3.5 shrink-0" />
-              Сбросить время
-            </button>
-          ) : (
-            <button
-              type="button"
-              data-day-hour-plan
-              onClick={() => setHourSheetOpen(true)}
-              className="inline-flex min-h-8 items-center justify-center gap-1.5 rounded-full border border-primary-200 bg-primary-50 px-3 py-1.5 text-xs font-semibold text-primary-800 transition hover:bg-primary-100"
-            >
-              <Clock className="h-3.5 w-3.5 shrink-0" />
-              Распланировать день по часам
-            </button>
-          )
-        ) : null}
-        {renderOptimizeGhost()}
       </div>
     );
   }
@@ -3883,23 +3822,30 @@ function DayRoutePanelInner() {
             </div>
 
             <div className="relative flex shrink-0 items-center gap-2 lg:hidden">
-              {route.venues.length ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    clearDayRoute();
-                    setRoute(readDayRoute());
-                    replaceMyDayUrl('/my-day');
-                    flashDayRouteFeedback('Маршрут очищен');
-                  }}
-                  aria-label="Очистить маршрут"
-                  title="Очистить маршрут"
-                  data-day-clear
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition hover:bg-white/20 hover:text-white"
+              {yandexUrl ? (
+                <a
+                  href={yandexUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="В Яндекс.Карты"
+                  title="В Яндекс.Карты"
+                  data-day-open-route
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition hover:bg-white/20"
                 >
-                  <Trash2 className="h-4 w-4" aria-hidden />
-                </button>
+                  <Navigation className="h-4 w-4" aria-hidden />
+                </a>
               ) : null}
+              <button
+                type="button"
+                onClick={() => userAuth?.isLoggedIn ? void savePlanToAccount() : saveCurrentAsScenario()}
+                disabled={!route.venues.length || accountPlanBusy || scenarioBusy}
+                aria-label="Сохранить"
+                title="Сохранить"
+                data-day-save
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition hover:bg-white/20 disabled:opacity-50"
+              >
+                <Bookmark className="h-4 w-4" aria-hidden />
+              </button>
               <button
                 type="button"
                 onClick={() => setShareMenuOpen(true)}
@@ -3926,7 +3872,7 @@ function DayRoutePanelInner() {
                 className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
               >
                 <Navigation className="h-4 w-4" aria-hidden />
-                Открыть маршрут
+                <span className="hidden lg:inline">В Яндекс.Карты</span>
               </a>
             ) : (
               <button
@@ -3936,26 +3882,9 @@ function DayRoutePanelInner() {
                 className="inline-flex cursor-not-allowed items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white/45"
               >
                 <Navigation className="h-4 w-4" aria-hidden />
-                Открыть маршрут
+                В Яндекс.Карты
               </button>
             )}
-            {route.venues.length ? (
-              <button
-                type="button"
-                onClick={() => {
-                  clearDayRoute();
-                  setRoute(readDayRoute());
-                  replaceMyDayUrl('/my-day');
-                  flashDayRouteFeedback('Маршрут очищен');
-                }}
-                aria-label="Очистить маршрут"
-                title="Очистить маршрут"
-                data-day-clear
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition hover:bg-white/20 hover:text-white"
-              >
-                <Trash2 className="h-4 w-4" aria-hidden />
-              </button>
-            ) : null}
             <button
               type="button"
               onClick={() => userAuth?.isLoggedIn ? void savePlanToAccount() : saveCurrentAsScenario()}
@@ -3964,13 +3893,7 @@ function DayRoutePanelInner() {
               className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <Bookmark className="h-4 w-4" aria-hidden />
-              {userAuth?.isLoggedIn
-                ? accountPlanBusy
-                  ? 'Сохраняем…'
-                  : accountPlanCode
-                    ? 'Обновить план'
-                    : 'Сохранить день'
-                : 'Сохранить сценарий'}
+              {accountPlanBusy ? 'Сохраняем…' : 'Сохранить'}
             </button>
             <button
               type="button"
@@ -3991,17 +3914,6 @@ function DayRoutePanelInner() {
           list={
             <div className="min-w-0 bg-[#f4f6f9] lg:h-full lg:overflow-y-auto lg:px-4 lg:py-4 [scrollbar-width:thin]" data-my-day-list-inner data-my-day-page-col="1">
       {/* ≥1 stop: compact city+search under topbar (no mid-page bordered starter card) */}
-      {!isEmptyRoute ? renderHeaderCompactSearch() : null}
-
-      {copyStatus === 'ok' ? (
-        <p
-          role="status"
-          className="mt-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-900"
-          data-day-share-ok
-        >
-          Текст с ссылкой скопирован!
-        </p>
-      ) : null}
 
       {tripTickets.length ? (
         <section
@@ -4112,18 +4024,6 @@ function DayRoutePanelInner() {
         </>
       ) : null}
 
-      {hasCatalogCity && pickerTabs.length ? (
-        <div
-          className={`mt-4 lg:mt-5 ${route.venues.length ? 'lg:hidden' : 'xl:max-w-3xl'}`}
-          data-my-day-picker-host
-        >
-          <MyDayPickerLaunch tabs={pickerTabs} onOpen={openPicker} />
-        </div>
-      ) : null}
-
-      {!isEmptyRoute && hasCatalogCity && pickerTabs.length ? (
-        <MyDayFloatingPickerDock tabs={pickerTabs} onOpen={openPicker} />
-      ) : null}
 
       {cityScenarios.length ? (
         <div className="mt-3 lg:mt-4">
@@ -4191,55 +4091,27 @@ function DayRoutePanelInner() {
       {/* 1. Route list */}
       {!route.venues.length ? null : (
         <section
-          className="mt-4 w-full max-lg:rounded-2xl max-lg:bg-[#F5F5F7] max-lg:p-3 sm:mt-6"
+          className="mt-4 w-full sm:mt-6"
           data-day-route-list-section
         >
-          <div className="mb-2 flex flex-wrap items-center gap-2" data-day-account-plan>
-            {!userAuth?.isLoggedIn ? (
-              <Link href={`/login?returnTo=${encodeURIComponent(planParam ? `/my-day?plan=${planParam}` : '/my-day')}`} className="inline-flex min-h-9 items-center rounded-full border border-slate-200 bg-white px-3.5 text-xs font-semibold text-slate-700 hover:bg-slate-50">
-                Войдите, чтобы сохранить план
-              </Link>
-            ) : null}
-            {accountPlanMessage ? <span role="status" className="text-xs text-slate-600">{accountPlanMessage}</span> : null}
-            {accountPlanCode ? <Link href={`/my-day?plan=${encodeURIComponent(accountPlanCode)}`} className="text-xs font-medium text-primary-700 underline">Ссылка на план</Link> : null}
-          </div>
           <MyDayToolbar
             stopsCount={route.venues.length}
             stopsCountLabel={stopsCountLabel}
+            cityLabel={scopeCityName || 'Маршрут на день'}
+            onAddPlaces={() => openPicker('places')}
             distanceLabel={
               totalDistanceMeters > 0 ? formatDayRouteDistance(totalDistanceMeters) : null
             }
             travelMinutesLabel={
               travelMinutes > 0 ? formatDayRouteTravelMinutes(travelMinutes) : null
             }
-            totalWithStopsLabel={totalWithStopsLabel}
-            travelMode={travelMode}
-            onTravelModeChange={setTravelMode}
             canOptimize={canOptimize}
             onOptimize={optimizeOrder}
-            hourPlanOn={hourPlanOn}
-            canHourPlan={route.venues.length >= 1}
-            onToggleHourPlan={() => {
-              setHourPlanOn(false);
-              setHourSheetOpen(false);
-            }}
-            onOpenHourSheet={() => setHourSheetOpen(true)}
-            hourStart={hourStart}
-            hourEnd={hourEnd}
-            onHourStartChange={setHourStart}
-            onHourEndChange={setHourEnd}
             onClear={() => {
               clearDayRoute();
               setRoute(readDayRoute());
               replaceMyDayUrl('/my-day');
             }}
-            onPrintPdf={() => {
-              void exportPdfWithMap();
-            }}
-            printPdfBusy={pdfBusy}
-            printPdfLabel="PDF с картой"
-            onSaveScenario={saveCurrentAsScenario}
-            saveScenarioBusy={scenarioBusy}
             typeCounts={stopTypeCounts}
             hiddenTags={hiddenStopTags}
             visibleStopsCount={visibleRouteVenues.filter((v) => !isNoteDayRouteStop(v)).length}
@@ -4249,6 +4121,19 @@ function DayRoutePanelInner() {
               );
             }}
             onShowAllTags={() => setHiddenStopTags([])}
+            settingsSlot={
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              {renderTravelModeToggle()}
+              <button type="button" onClick={() => setHourSheetOpen(true)} className="inline-btn inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 text-xs font-semibold">
+                <Clock className="size-4" aria-hidden />
+                По часам
+              </button>
+              <button type="button" disabled={pdfBusy} onClick={() => void exportPdfWithMap().catch(() => flashDayRouteFeedback('Не удалось скачать PDF'))} className="inline-btn inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 text-xs font-semibold disabled:opacity-50">
+                <Printer className="size-4" aria-hidden />
+                {pdfBusy ? 'Готовим PDF…' : 'PDF с картой'}
+              </button>
+            </div>
+            }
             scheduleSlot={
               <>
                 <div className="sr-only" aria-live="polite">
@@ -4276,7 +4161,7 @@ function DayRoutePanelInner() {
               </>
             }
           >
-          <MyDayItinerary>
+          <MyDayItinerary className="px-0">
           {missingCoordsCount > 0 ? (
             <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
               {coordsCount < 2
@@ -4318,7 +4203,7 @@ function DayRoutePanelInner() {
                     venue={venue}
                     variant={effectiveStopViewMode}
                     group="purchased"
-                    softTimeLabel={displayTimingPlan.byId[venue.id]?.label || null}
+                    softTimeLabel={effectiveStopViewMode === 'list' ? null : displayTimingPlan.byId[venue.id]?.label || null}
                     hasCoords={Boolean(lookupDayRouteCoords(venue, coordsById))}
                     mapsUrl={(() => {
                       const c = lookupDayRouteCoords(venue, coordsById);
@@ -4369,22 +4254,6 @@ function DayRoutePanelInner() {
                 data-day-plan-list="plans"
               data-day-stop-view={effectiveStopViewMode}
             >
-              {effectiveStopViewMode === 'list' && planStops.length > 0 ? (
-                <DayRouteBetweenInsert
-                  afterVenueId="__start__"
-                  menuOpen={betweenMenuAfterId === '__start__'}
-                  onMenuOpenChange={(open) =>
-                    setBetweenMenuAfterId(open ? '__start__' : null)
-                  }
-                  segmentMeters={null}
-                  travelMode={travelMode}
-                  disabled={atMax}
-                  suggestions={betweenInsertSuggestions}
-                  onAddNote={(text) => openInsertNoteAfter('__start__', text)}
-                  onAddSuggestion={(item) => insertSuggestionAfter('__start__', item)}
-                  onOpenFullPicker={() => openInsertPlaceAfter('__start__')}
-                />
-              ) : null}
               {displayPlanStops.map((venue, index) => {
                 const globalIndex = route.venues.findIndex((v) => v.id === venue.id);
                 const nextTipRaw =
@@ -4432,7 +4301,7 @@ function DayRoutePanelInner() {
                       venue={venue}
                       variant={effectiveStopViewMode}
                       group="plans"
-                      softTimeLabel={displayTimingPlan.byId[venue.id]?.label || null}
+                      softTimeLabel={effectiveStopViewMode === 'list' ? null : displayTimingPlan.byId[venue.id]?.label || null}
                       typeTag={dayRouteStopTypeTag(venue, resolveStopTag(venue))}
                       fallbackImageUrl={cityFallbackImage}
                       hasCoords={Boolean(lookupDayRouteCoords(venue, coordsById))}
@@ -4446,6 +4315,7 @@ function DayRoutePanelInner() {
                       focused={focusedStopId === venue.id}
                       onSelectStop={() => focusStopFromMap(venue.id)}
                       dragging={dragVenueId === venue.id}
+                      dropTarget={dragOverVenueId === venue.id}
                       grabbed={grabbedKey === venue.id}
                       onDragStart={
                         dayRouteStopReorderLocked(venue)
@@ -4455,20 +4325,20 @@ function DayRoutePanelInner() {
                       onDragOver={
                         dayRouteStopReorderLocked(venue)
                           ? undefined
-                          : (event) => onPlanStopDragOver(event)
+                          : (event) => onPlanStopDragOver(event, venue.id)
                       }
                       onDrop={
                         dayRouteStopReorderLocked(venue)
                           ? undefined
-                          : () => onPlanStopDrop(venue.id)
+                          : (event) => onPlanStopDrop(venue.id, event)
                       }
                       onDragEnd={onPlanStopDragEnd}
                       onGripKeyDown={(event) => onPlanGripKeyDown(event, venue.id)}
                       onGripBlur={() => {
                         if (grabbedKey === venue.id) setGrabbedKey(null);
                       }}
-                      onMoveUp={() => setRoute(moveDayRoutePlanVenue(venue.id, -1))}
-                      onMoveDown={() => setRoute(moveDayRoutePlanVenue(venue.id, 1))}
+                      onMoveUp={() => movePlanStop(venue.id, -1)}
+                      onMoveDown={() => movePlanStop(venue.id, 1)}
                       onRemove={() => setRoute(removeFromDayRoute(venue.id))}
                       onToggleBought={() =>
                         setRoute(
@@ -4496,22 +4366,18 @@ function DayRoutePanelInner() {
                       onHoverStop={(id) => setHoverStopId(id)}
                       onHoverClear={() => setHoverStopId(null)}
                     />
-                    {listMode ? (
-                      <DayRouteBetweenInsert
-                        afterVenueId={venue.id}
-                        menuOpen={betweenMenuAfterId === venue.id}
-                        onMenuOpenChange={(open) =>
-                          setBetweenMenuAfterId(open ? venue.id : null)
-                        }
-                        segmentMeters={index < planStops.length - 1 ? segmentToNext : null}
-                        travelMode={travelMode}
-                        transitTip={index < planStops.length - 1 ? betweenTip : ''}
-                        disabled={atMax}
-                        suggestions={betweenInsertSuggestions}
-                        onAddNote={(text) => openInsertNoteAfter(venue.id, text)}
-                        onAddSuggestion={(item) => insertSuggestionAfter(venue.id, item)}
-                        onOpenFullPicker={() => openInsertPlaceAfter(venue.id)}
-                      />
+                    {listMode && index < displayPlanStops.length - 1 && ((segmentToNext ?? 0) > 0 || betweenTip) ? (
+                      <li className="ml-4 flex flex-wrap items-center gap-2 border-l border-dashed border-slate-200 py-1.5 pl-3 text-xs text-slate-500">
+                        {travelMode === 'auto' ? (
+                          <Car className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                        ) : (
+                          <PersonStanding className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                        )}
+                        {segmentToNext != null && segmentToNext > 0 ? (
+                          <span>{formatDayRouteDistance(segmentToNext)} · ~{formatDayRouteTravelMinutes(estimateDayRouteTravelMinutes(segmentToNext, travelMode))} {travelMode === 'auto' ? 'на авто' : 'пешком'}</span>
+                        ) : null}
+                        {betweenTip ? <span>{betweenTip}</span> : null}
+                      </li>
                     ) : null}
                     {(() => {
                       const gapAtIndex =
@@ -4656,6 +4522,15 @@ function DayRoutePanelInner() {
 
           </MyDayItinerary>
           </MyDayToolbar>
+          <div className="mt-3 flex flex-wrap items-center gap-2" data-day-account-plan>
+            {!userAuth?.isLoggedIn ? (
+              <Link href={`/login?returnTo=${encodeURIComponent(planParam ? `/my-day?plan=${planParam}` : '/my-day')}`} className="inline-flex min-h-9 items-center rounded-full border border-slate-200 bg-white px-3.5 text-xs font-semibold text-slate-700 hover:bg-slate-50">
+                Войдите, чтобы сохранить план
+              </Link>
+            ) : null}
+            {accountPlanMessage ? <span role="status" className="text-xs text-slate-600">{accountPlanMessage}</span> : null}
+            {accountPlanCode ? <Link href={`/my-day?plan=${encodeURIComponent(accountPlanCode)}`} className="text-xs font-medium text-primary-700 underline">Ссылка на план</Link> : null}
+          </div>
         </section>
       )}
 
@@ -4672,11 +4547,28 @@ function DayRoutePanelInner() {
                   <DayRouteOsmMap
                     stops={displayMapStops}
                     selectedStopId={mapSelectedStopId}
-                    panToStopId={focusedStopId}
+                    panToStopId={mapSelectedStopId}
                     focusRequestKey={stopFocusRequestKey}
+                    fitRouteRequestKey={fitRouteRequestKey}
                     onStopClick={(stopId) => focusStopFromMap(stopId, { scrollList: false })}
+                    layoutKey="desktop-map"
                     className="absolute inset-0 h-full w-full bg-slate-100"
                   />
+                  {focusedStopId ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFocusedStopId(null);
+                        setHoverStopId(null);
+                        setStopFocusRequestKey((key) => key + 1);
+                        setFitRouteRequestKey((key) => key + 1);
+                      }}
+                      className="absolute bottom-[5.5rem] right-3 z-[460] rounded-full border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-800 shadow-md hover:bg-slate-50"
+                      data-day-map-show-all
+                    >
+                      Все точки
+                    </button>
+                  ) : null}
                   <MyDayMapStopRail
                     items={displayMapStops.map((stop) => {
                       const venue = route.venues.find((item) => item.id === stop.id);
@@ -4700,11 +4592,22 @@ function DayRoutePanelInner() {
                     <span className="inline-flex items-center gap-2"><i aria-hidden="true" className="daibilet-map-legend-dot daibilet-map-legend-dot--event" />Событие</span>
                     <span className="mt-0.5 inline-flex items-center gap-2 text-slate-400"><i aria-hidden="true" className="daibilet-map-legend-line" />Порядок перемещения</span>
                   </div>
-                  <div className="pointer-events-none absolute left-3 top-14 z-[450] rounded-2xl bg-white/95 px-4 py-2.5 shadow-sm ring-1 ring-slate-900/5 backdrop-blur sm:left-4" data-day-map-summary>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">Маршрут дня</p>
-                    <p className="mt-0.5 text-[13px] font-semibold text-slate-900">
-                      {scopeCityName || 'Ваш город'} · {route.venues.length} {route.venues.length === 1 ? 'точка' : route.venues.length < 5 ? 'точки' : 'точек'}
-                    </p>
+                  <div className="pointer-events-none absolute left-3 top-3 z-[450] flex w-max flex-col items-center gap-1 sm:left-4">
+                    <div className="rounded-2xl bg-white/95 px-4 py-2.5 shadow-sm ring-1 ring-slate-900/5 backdrop-blur" data-day-map-summary>
+                      <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">Маршрут дня</p>
+                      <p className="mt-0.5 text-[13px] font-semibold text-slate-900">
+                        {scopeCityName || 'Ваш город'} · {route.venues.length} {route.venues.length === 1 ? 'точка' : route.venues.length < 5 ? 'точки' : 'точек'}
+                      </p>
+                    </div>
+                    <a
+                      href="https://www.openstreetmap.org/copyright"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="pointer-events-auto rounded-md bg-white/90 px-2 py-0.5 text-center text-[10px] leading-4 text-slate-500 shadow-sm hover:text-slate-800"
+                      aria-label="© OpenStreetMap"
+                    >
+                      © OpenStreetMap
+                    </a>
                   </div>
                   {renderMapFocusCard('desktop')}
                 </div>
@@ -4745,29 +4648,67 @@ function DayRoutePanelInner() {
           ) : null}
           {showEmptyDesktopShell ? (
             <>
-              <div className="mt-4 lg:hidden" data-my-day-empty-mobile>
+              <div className="mt-4 md:hidden" data-my-day-empty-mobile>
                 {renderEmptyStarter()}
               </div>
               <div
-                className="mt-5 hidden lg:grid lg:grid-cols-[minmax(0,56fr)_minmax(24rem,44fr)] lg:items-stretch lg:gap-6"
-                data-my-day-empty-two-blocks
+                className="mt-5 hidden min-h-[34rem] md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:items-stretch md:gap-4 2xl:aspect-[3/1] 2xl:min-h-0 2xl:grid-cols-3"
+                data-my-day-empty-three-blocks
               >
-                <div className="min-w-0" data-my-day-picker-host>
-                  {renderEmptyStarter({ hideMap: true })}
+                <div className="flex min-h-0 min-w-0 flex-col gap-4 2xl:contents">
+                  <div className="min-h-0 min-w-0" data-my-day-picker-host>
+                    {renderEmptyStarter({ hideMap: true })}
+                  </div>
+                  <section
+                    className="flex min-h-0 min-w-0 flex-col overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-sm xl:p-8"
+                    data-my-day-empty-categories
+                    aria-label="Категории подбора"
+                  >
+                    <div className="mt-1 flex items-center gap-3">
+                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary-50 text-primary-700">
+                        <Sparkles className="h-5 w-5" aria-hidden />
+                      </span>
+                      <h2 className="font-display text-xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-[1.65rem]">
+                        Соберите маршрут сами
+                      </h2>
+                    </div>
+                    <div className="mt-4 grid grid-cols-2 gap-2 lg:grid-cols-1">
+                      {pickerTabs
+                        .filter((tab) => tab.value !== 'boat' && tab.value !== 'scenarios')
+                        .map((tab) => {
+                          const Icon = tab.icon;
+                          const label = tab.value === 'own' ? 'Добавь свою точку' : tab.label;
+                          return (
+                            <button
+                              key={tab.value}
+                              type="button"
+                              onClick={() => openPicker(tab.value)}
+                              className="flex min-h-12 w-full items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-left text-sm font-semibold text-slate-800 transition hover:border-primary-300 hover:bg-primary-50 hover:text-primary-800"
+                            >
+                              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-white text-primary-700 shadow-sm">
+                                <Icon className="h-4 w-4" aria-hidden />
+                              </span>
+                              <span className="min-w-0 flex-1">{label}</span>
+                              <ChevronDown className="h-4 w-4 -rotate-90 text-slate-400" aria-hidden />
+                            </button>
+                          );
+                        })}
+                    </div>
+                  </section>
                 </div>
                 <div
-                  className="relative min-h-[26rem] overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 lg:min-h-[min(58vh,32rem)]"
+                  className="relative min-h-0 min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-slate-100"
                   data-my-day-empty-map
                 >
                   <div className="pointer-events-none absolute left-3 top-3 z-[500] rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm">
-                    Точки появятся здесь
+                    Точки маршрута появятся здесь
                   </div>
                   <button
                     type="button"
                     onClick={myDay.openMapFull}
                     aria-label="Открыть карту на весь экран"
                     title="Карта на весь экран"
-                    className="absolute right-3 top-3 z-[500] grid h-9 w-9 place-items-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50"
+                    className="absolute right-3 top-3 z-[500] grid !h-9 !min-h-9 !w-9 !min-w-9 shrink-0 aspect-square place-items-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50"
                   >
                     <Maximize2 className="h-4 w-4" aria-hidden />
                   </button>
@@ -4775,7 +4716,7 @@ function DayRoutePanelInner() {
                     stops={[]}
                     fallbackCenter={emptyMapCenter}
                     className="absolute inset-0 h-full w-full bg-slate-100"
-                    layoutKey="empty-two-blocks"
+                    layoutKey="empty-three-blocks"
                   />
                 </div>
               </div>
@@ -4943,7 +4884,7 @@ function DayRoutePanelInner() {
                       </span>
                       {hook ? (
                         <span
-                          className="mt-1 block line-clamp-3 text-xs leading-snug text-slate-500"
+                          className="mt-1 block line-clamp-2 text-xs leading-snug text-slate-500"
                           title={hook}
                         >
                           {hook}
@@ -5267,14 +5208,15 @@ function DayRoutePanelInner() {
             myDay.openMobileMap();
             setMobileView('map');
           }}
+          stopCount={mapStops.length}
           onClose={() => {
             myDay.closeMobileMap();
             setMobileView('list');
           }}
-          stopCount={mapStops.length}
           yandexUrl={yandexUrl}
           footer={
             <>
+              {renderMapFocusCard('mobile')}
               {route.venues.length > 0 ? (
                 <div
                   className="absolute inset-x-0 bottom-0 z-[1000] border-t border-slate-200/80 bg-white/95 backdrop-blur"
@@ -5299,10 +5241,10 @@ function DayRoutePanelInner() {
                           type="button"
                           role="tab"
                           aria-selected={active}
-                          onClick={() => focusStopFromMap(venue.id)}
+                          onClick={() => focusStopFromMap(venue.id, { scrollList: false })}
                           className={`inline-flex max-w-[10rem] shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-left text-[11px] font-semibold ${
                             active
-                              ? 'border-emerald-300 bg-emerald-50 text-emerald-950'
+                              ? 'border-slate-900 bg-slate-900 text-white'
                               : 'border-slate-200 bg-white text-slate-800'
                           }`}
                         >
@@ -5319,12 +5261,27 @@ function DayRoutePanelInner() {
             </>
           }
         >
-          <DayRouteOsmMap
+                  {focusedStopId ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFocusedStopId(null);
+                        setHoverStopId(null);
+                        setStopFocusRequestKey((key) => key + 1);
+                      }}
+                      className="absolute bottom-16 right-3 z-[460] rounded-full border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-800 shadow-md hover:bg-slate-50"
+                      data-day-map-show-all
+                    >
+                      Все точки
+                    </button>
+                  ) : null}
+                  <DayRouteOsmMap
             stops={displayMapStops}
             selectedStopId={focusedStopId}
-            panToStopId={focusedStopId}
+                    panToStopId={focusedStopId}
             focusRequestKey={stopFocusRequestKey}
-            onStopClick={focusStopFromMap}
+            fitRouteRequestKey={fitRouteRequestKey}
+            onStopClick={(stopId) => focusStopFromMap(stopId, { scrollList: false })}
             layoutKey="mobile-map-sheet"
             className="h-full w-full"
           />
@@ -5338,6 +5295,9 @@ function DayRoutePanelInner() {
         <DayRouteOsmMap
           stops={hasMapStops ? displayMapStops : []}
           selectedStopId={hasMapStops ? mapSelectedStopId : undefined}
+          panToStopId={hasMapStops ? focusedStopId : undefined}
+          focusRequestKey={stopFocusRequestKey}
+          fitRouteRequestKey={fitRouteRequestKey}
           fallbackCenter={hasMapStops ? undefined : emptyMapCenter}
           onStopClick={
             hasMapStops
@@ -5347,6 +5307,7 @@ function DayRoutePanelInner() {
           layoutKey={hasMapStops ? 'desktop-map-full' : 'empty-map-full'}
           className="h-full w-full"
         />
+        {hasMapStops ? renderMapFocusCard('desktop') : null}
       </MyDayMapFullScreen>
 
       </div>
@@ -5404,13 +5365,31 @@ function DayRoutePanelInner() {
             Отметьте, чтобы маршрут стал готовым
             {ticketHandoff.title ? ` - ${ticketHandoff.title}` : ''}.
           </p>
+          {ticketHandoffNeedsTime ? (
+            <label className="mt-4 block text-sm font-medium text-slate-800">
+              Время начала по билету
+              <input
+                type="time"
+                required
+                value={ticketHandoffTime}
+                onChange={(event) => setTicketHandoffTime(event.target.value)}
+                data-day-ticket-handoff-time
+                className="mt-1.5 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-base text-slate-900 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+              />
+            </label>
+          ) : null}
           <div className="mt-4 flex flex-col gap-2">
             <button
               type="button"
               data-day-ticket-handoff-bought
-              className="inline-flex min-h-11 items-center justify-center rounded-full bg-emerald-600 px-4 text-sm font-bold text-white hover:bg-emerald-700"
+              disabled={ticketHandoffNeedsTime && !ticketHandoffTime}
+              className="inline-flex min-h-11 items-center justify-center rounded-full bg-emerald-600 px-4 text-sm font-bold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-600"
               onClick={() => {
-                setRoute(updateDayRouteVenue(ticketHandoff.venueId, { ticketBought: true }));
+                setRoute(updateDayRouteVenue(ticketHandoff.venueId, {
+                  ticketBought: true,
+                  ...(ticketHandoffTime ? { sessionLabel: ticketHandoffTime } : {}),
+                }));
+                setTicketHandoffTime('');
                 setTicketHandoff(null);
                 flashDayRouteFeedback('Билет отмечен');
               }}
@@ -5430,7 +5409,10 @@ function DayRoutePanelInner() {
               type="button"
               data-day-ticket-handoff-skip
               className="inline-flex min-h-11 items-center justify-center rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-              onClick={() => setTicketHandoff(null)}
+              onClick={() => {
+                setTicketHandoffTime('');
+                setTicketHandoff(null);
+              }}
             >
               Пока пропустить
             </button>
@@ -5535,7 +5517,7 @@ function DayRoutePanelInner() {
             Распланировать день по часам
           </p>
           <p className="mt-1 text-sm text-slate-600">
-            Подскажем мягкие интервалы на карточках. Список останется прежним - без шкалы времени.
+            Укажите время начала и конца дня. Если все точки не помещаются, покажем их в запасных планах.
           </p>
           <div className="mt-4 grid grid-cols-2 gap-3">
             <label className="block">
@@ -5649,238 +5631,6 @@ function DayRouteListPin({ n, active = false }: { n: number; active?: boolean })
   );
 }
 
-/**
- * Between list stops: travel leg + Lovable «+ Добавить» panel (note / suggested places).
- */
-function DayRouteBetweenInsert({
-  afterVenueId,
-  menuOpen,
-  onMenuOpenChange,
-  segmentMeters,
-  travelMode,
-  transitTip,
-  disabled = false,
-  suggestions = [],
-  onAddNote,
-  onAddSuggestion,
-  onOpenFullPicker,
-}: {
-  afterVenueId: string;
-  menuOpen: boolean;
-  onMenuOpenChange: (open: boolean) => void;
-  segmentMeters: number | null;
-  travelMode: DayRouteTravelMode;
-  transitTip?: string;
-  disabled?: boolean;
-  suggestions?: Array<{
-    id: string;
-    title: string;
-    tag: string;
-    imageUrl: string | null;
-    item: DayRouteVenueItem;
-  }>;
-  onAddNote: (text: string) => void;
-  onAddSuggestion: (item: DayRouteVenueItem) => void;
-  onOpenFullPicker?: () => void;
-}) {
-  const rootRef = useRef<HTMLLIElement | null>(null);
-  const [noteText, setNoteText] = useState('');
-  const segmentMinutes =
-    segmentMeters != null && segmentMeters > 0
-      ? estimateDayRouteTravelMinutes(segmentMeters, travelMode)
-      : 0;
-  const distanceLabel =
-    segmentMeters != null && segmentMeters > 0 ? formatDayRouteDistance(segmentMeters) : '';
-  const timeLabel = segmentMinutes > 0 ? formatDayRouteTravelMinutes(segmentMinutes) : '';
-  const statsLabel =
-    timeLabel && distanceLabel
-      ? `${distanceLabel} · ~${timeLabel}`
-      : timeLabel || distanceLabel || '';
-  const showLeg = Boolean(statsLabel || transitTip);
-
-  useEffect(() => {
-    if (!menuOpen) setNoteText('');
-  }, [menuOpen]);
-
-  useEffect(() => {
-    if (!menuOpen) return;
-    function onDocPointer(event: MouseEvent) {
-      const el = rootRef.current;
-      if (!el) return;
-      if (event.target instanceof Node && !el.contains(event.target)) {
-        onMenuOpenChange(false);
-      }
-    }
-    function onKey(event: KeyboardEvent) {
-      if (event.key === 'Escape') onMenuOpenChange(false);
-    }
-    document.addEventListener('mousedown', onDocPointer);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('mousedown', onDocPointer);
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [menuOpen, onMenuOpenChange]);
-
-  return (
-    <li
-      ref={rootRef}
-      className="relative list-none"
-      data-day-between-insert
-      data-day-between-after={afterVenueId}
-    >
-      {showLeg ? (
-        <div className="ml-[1.15rem] flex items-center gap-2.5 border-l border-dashed border-slate-200 py-1.5 pl-7 text-xs text-slate-500 sm:ml-5 sm:pl-8">
-          {travelMode === 'auto' ? (
-            <Car className="h-3.5 w-3.5 shrink-0" aria-hidden />
-          ) : (
-            <PersonStanding className="h-3.5 w-3.5 shrink-0" aria-hidden />
-          )}
-          <div
-            className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-0.5"
-            data-day-between-meta
-          >
-            {statsLabel ? (
-              <span className="tabular-nums" data-day-between-stats>
-                {statsLabel} {travelMode === 'auto' ? 'на авто' : 'пешком'}
-              </span>
-            ) : null}
-            {transitTip ? (
-              <span
-                className="hidden min-w-0 flex-1 text-[11px] text-slate-400 line-clamp-1 sm:inline"
-                data-day-transit-between
-              >
-                {transitTip}
-              </span>
-            ) : null}
-          </div>
-        </div>
-      ) : null}
-
-      <div className="ml-[1.15rem] py-0.5 sm:ml-5" data-day-between-add>
-        {menuOpen ? (
-          <div
-            className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm"
-            data-day-between-panel
-          >
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-sm font-semibold text-slate-900">Что добавить сюда?</p>
-              <button
-                type="button"
-                aria-label="Закрыть"
-                onClick={() => onMenuOpenChange(false)}
-                className="grid h-7 w-7 place-items-center rounded-full border border-slate-200 text-slate-400 hover:bg-slate-50"
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
-            </div>
-
-            <div className="mt-3 flex gap-2">
-              <input
-                value={noteText}
-                onChange={(e) => setNoteText(e.target.value)}
-                placeholder="Заметка: например, кофе и передышка"
-                disabled={disabled}
-                data-day-between-note-input
-                className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-primary-400 disabled:opacity-50"
-                onKeyDown={(e) => {
-                  if (e.key !== 'Enter') return;
-                  e.preventDefault();
-                  const t = noteText.trim();
-                  if (!t || disabled) return;
-                  onAddNote(t);
-                  setNoteText('');
-                  onMenuOpenChange(false);
-                }}
-              />
-              <button
-                type="button"
-                disabled={disabled || !noteText.trim()}
-                data-day-between-add-note
-                onClick={() => {
-                  const t = noteText.trim();
-                  if (!t) return;
-                  onAddNote(t);
-                  setNoteText('');
-                  onMenuOpenChange(false);
-                }}
-                className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-primary-600 px-3 py-2 text-sm font-semibold text-white disabled:opacity-40"
-              >
-                <StickyNote className="h-4 w-4" aria-hidden />
-                Заметка
-              </button>
-            </div>
-
-            {suggestions.length ? (
-              <div className="mt-3 grid gap-2 sm:grid-cols-2" data-day-between-suggestions>
-                {suggestions.map((s) => (
-                  <button
-                    key={s.id}
-                    type="button"
-                    disabled={disabled}
-                    data-day-between-suggest={s.id}
-                    onClick={() => {
-                      onAddSuggestion(s.item);
-                      onMenuOpenChange(false);
-                    }}
-                    className="flex items-center gap-3 rounded-xl border border-slate-200 p-2 text-left transition hover:bg-slate-50 disabled:opacity-50"
-                  >
-                    <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-slate-100">
-                      {s.imageUrl ? (
-                        <CardSafeImage src={s.imageUrl} alt="" fill sizes="2.5rem" className="object-cover" />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center text-slate-400">
-                          <MapPin className="h-4 w-4" />
-                        </div>
-                      )}
-                    </div>
-                    <span className="min-w-0">
-                      <span className="block text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-slate-400">
-                        {s.tag}
-                      </span>
-                      <span className="block truncate text-sm font-semibold text-slate-900">{s.title}</span>
-                    </span>
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <p className="mt-3 text-sm text-slate-500">
-                Подходящих мест рядом нет - откройте полный подбор.
-              </p>
-            )}
-
-            {onOpenFullPicker ? (
-              <button
-                type="button"
-                disabled={disabled}
-                onClick={() => {
-                  onMenuOpenChange(false);
-                  onOpenFullPicker();
-                }}
-                className={`inline-btn mt-3 min-h-0 text-xs font-semibold text-primary-700 ${DAY_TEXT_LINK}`}
-              >
-                Открыть полный подбор
-              </button>
-            ) : null}
-          </div>
-        ) : (
-          <button
-            type="button"
-            aria-label="Добавить точку или заметку"
-            disabled={disabled}
-            data-day-between-plus
-            onClick={() => onMenuOpenChange(true)}
-            className="inline-flex items-center gap-2 rounded-full border border-dashed border-slate-300 px-3 py-1 text-xs font-semibold text-slate-500 transition hover:border-primary-400 hover:text-primary-700 disabled:opacity-40"
-          >
-            <Plus className="h-3.5 w-3.5" aria-hidden />
-            Добавить
-          </button>
-        )}
-      </div>
-    </li>
-  );
-}
-
 function DayRouteVenueCard({
   venue,
   index,
@@ -5899,6 +5649,7 @@ function DayRouteVenueCard({
   focused = false,
   dragging = false,
   grabbed = false,
+  dropTarget = false,
   onDragStart,
   onDragOver,
   onDrop,
@@ -5938,9 +5689,10 @@ function DayRouteVenueCard({
   focused?: boolean;
   dragging?: boolean;
   grabbed?: boolean;
+  dropTarget?: boolean;
   onDragStart?: () => void;
   onDragOver?: (event: DragEvent) => void;
-  onDrop?: () => void;
+  onDrop?: (event: DragEvent) => void;
   onDragEnd?: () => void;
   onGripKeyDown?: (event: React.KeyboardEvent<HTMLButtonElement>) => void;
   onGripBlur?: () => void;
@@ -6014,6 +5766,10 @@ function DayRouteVenueCard({
       ? formatDayRouteSegmentHint(segmentToNext, travelMode)
       : '';
   const sessionDisplay = formatDayRouteSessionDisplay(venue);
+  const eventBoundSession = Boolean((venue.eventId || venue.eventSlug) && sessionDisplay);
+  const eventStartTime = eventBoundSession
+    ? sessionDisplay?.match(/\b(\d{1,2}:\d{2})\s*$/)?.[1] || sessionDisplay
+    : null;
   const segmentLine = segmentHint ? `далее ~ ${segmentHint}` : '';
 
   const hoverEnter = () => {
@@ -6043,13 +5799,16 @@ function DayRouteVenueCard({
     <span className={titleClass}>{venue.title}</span>
   );
   const resolvedTypeTag = String(typeTag || '').trim() || null;
-  const priceChipLabel = dayRouteStopPriceChipLabel(venue, resolvedTypeTag);
+  const inferredPriceChipLabel = dayRouteStopPriceChipLabel(venue, resolvedTypeTag);
+  const priceChipLabel = inferredPriceChipLabel === 'Вход свободный' ? '' : inferredPriceChipLabel;
   const softTimeNode = softTimeLabel ? (
     <p className="m-0 text-[12px] font-semibold text-primary-700" data-day-soft-time>
       {softTimeLabel}
     </p>
   ) : null;
-  const dwellSoftLabel = dayRouteStopDwellChipLabel(venue, resolvedTypeTag);
+  const dwellSoftLabel = eventBoundSession
+    ? formatDayRouteSoftMinutes(dayRouteStopDwellMinutes(venue, resolvedTypeTag))
+    : `${formatDayRouteSoftMinutes(dayRouteStopDwellMinutes(venue, resolvedTypeTag))} на осмотр`;
   const dwellIsCustom = normalizeDayRouteDwellMinutes(venue.dwellMinutes) != null;
   const dwellCanEdit = Boolean(onSetDwellMinutes) && !noteStop;
 
@@ -6205,7 +5964,7 @@ function DayRouteVenueCard({
       (textStop ? 'Своё место' : null);
     return (
       <li
-        className={`relative w-full scroll-mt-4 list-none ${dragging ? 'opacity-40' : ''}`}
+        className="relative w-full scroll-mt-4 list-none"
         data-day-plan-stop={venue.id}
         data-day-stop-variant="list"
         data-day-stop-list="lovable"
@@ -6215,6 +5974,7 @@ function DayRouteVenueCard({
         data-day-session={sessionDisplay || undefined}
         data-day-stop-focused={focused ? '1' : undefined}
         data-day-stop-grabbed={grabbed ? '1' : undefined}
+        data-day-stop-drop-target={dropTarget ? '1' : undefined}
         onMouseEnter={hoverEnter}
         onMouseLeave={hoverLeave}
         onClick={(event) => {
@@ -6227,21 +5987,51 @@ function DayRouteVenueCard({
         onDrop={canDrag ? onDrop : undefined}
         onDragEnd={canDrag ? onDragEnd : undefined}
       >
+        <button
+          type="button"
+          aria-label="Удалить точку"
+          title="Удалить точку"
+          data-day-stop-remove
+          onClick={onRemove}
+          className="absolute right-2 top-2 z-10 grid !h-8 !min-h-8 !w-8 !min-w-8 shrink-0 aspect-square place-items-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:bg-slate-100 hover:text-slate-900"
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
         <article
-          className={`group grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3 rounded-2xl border p-3 transition-colors sm:gap-4 sm:p-4 max-lg:border-slate-200/90 max-lg:bg-white max-lg:shadow-sm ${
+          draggable={canDrag}
+          onDragStart={
+            canDrag
+              ? (event) => {
+                  event.stopPropagation();
+                  event.dataTransfer.effectAllowed = 'move';
+                  event.dataTransfer.setData('text/plain', venue.id);
+                  onDragStart?.();
+                }
+              : undefined
+          }
+          className={`group grid cursor-grab grid-cols-[auto_minmax(0,1fr)] items-start gap-3 rounded-2xl border bg-white p-3 shadow-sm transition-[box-shadow,border-color,transform,opacity] active:cursor-grabbing sm:gap-4 sm:p-4 ${
             focused
-              ? 'border-primary-300 bg-primary-50/40 shadow-sm'
+              ? 'border-slate-900 shadow-[0_0_0_3px_rgba(15,27,45,.09),0_12px_28px_-20px_rgba(15,27,45,.65)]'
               : grabbed
                 ? 'border-primary-400 bg-primary-50/30'
-                : 'border-transparent bg-transparent hover:bg-slate-50 max-lg:hover:bg-slate-50'
-          } ${purchased ? 'border-l-[3px] border-l-primary-600' : ''}`}
+                : dropTarget
+                  ? 'border-slate-900 shadow-[0_0_0_2px_rgba(15,27,45,.18)]'
+                  : 'border-[#E5EAF1] hover:-translate-y-px hover:border-[#C9D4E3] hover:shadow-[0_12px_28px_-20px_rgba(15,27,45,.65)]'
+          } ${dragging ? 'scale-[.98] opacity-[.35] shadow-none' : ''} ${purchased ? 'border-l-[3px] border-l-primary-600' : ''}`}
           data-day-stop-shell
         >
           <div
             className="flex shrink-0 flex-col items-center gap-2"
             data-day-stop-index-cluster
           >
-            <DayRouteListPin n={pinNumber} active={focused} />
+            {eventStartTime ? (
+              <span className="flex h-12 w-14 shrink-0 flex-col items-center justify-center rounded-xl border border-slate-300 bg-slate-50 text-slate-900">
+                <span className="text-sm font-bold leading-4 tabular-nums">{eventStartTime}</span>
+                <span className="mt-0.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-slate-500">Старт</span>
+              </span>
+            ) : (
+              <DayRouteListPin n={pinNumber} active={focused} />
+            )}
             {reorderLocked ? (
               <span
                 className="inline-flex text-slate-300"
@@ -6254,7 +6044,6 @@ function DayRouteVenueCard({
             ) : (
               <button
                 type="button"
-                draggable={canDrag}
                 aria-label={`Переместить «${venue.title}», позиция ${index + 1} из ${total}`}
                 aria-describedby="dnd-hint"
                 aria-pressed={grabbed}
@@ -6262,16 +6051,7 @@ function DayRouteVenueCard({
                 data-day-stop-grip
                 onKeyDown={onGripKeyDown}
                 onBlur={onGripBlur}
-                onDragStart={
-                  canDrag
-                    ? (event) => {
-                        event.stopPropagation();
-                        onDragStart?.();
-                      }
-                    : undefined
-                }
-                onDragEnd={canDrag ? onDragEnd : undefined}
-                className={`grid h-9 w-9 cursor-grab place-items-center rounded-md border transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 active:cursor-grabbing ${
+                className={`hidden h-9 w-9 cursor-grab place-items-center rounded-md border transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 active:cursor-grabbing lg:grid ${
                   grabbed
                     ? 'border-primary-500 bg-primary-50 text-primary-700'
                     : 'border-slate-200 text-slate-400'
@@ -6280,6 +6060,16 @@ function DayRouteVenueCard({
                 <GripVertical className="h-4 w-4" aria-hidden />
               </button>
             )}
+            {!reorderLocked && group === 'plans' && total > 1 ? (
+              <div className="flex flex-col lg:hidden">
+                <button type="button" disabled={index === 0} aria-label={`Поднять точку «${venue.title}»`} onClick={onMoveUp} className="inline-btn grid size-8 place-items-center rounded-md text-slate-500 disabled:opacity-30">
+                  <ChevronUp className="size-4" aria-hidden />
+                </button>
+                <button type="button" disabled={index === total - 1} aria-label={`Опустить точку «${venue.title}»`} onClick={onMoveDown} className="inline-btn grid size-8 place-items-center rounded-md text-slate-500 disabled:opacity-30">
+                  <ChevronDown className="size-4" aria-hidden />
+                </button>
+              </div>
+            ) : null}
           </div>
 
           <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-3 sm:gap-4">
@@ -6306,6 +6096,35 @@ function DayRouteVenueCard({
                     Оплачено
                   </span>
                 ) : null}
+                {priceChipLabel ? (
+                  <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">
+                    {priceChipLabel}
+                  </span>
+                ) : null}
+                {!dwellOpen ? (
+                  dwellCanEdit ? (
+                    <button
+                      type="button"
+                      data-day-dwell-chip
+                      data-day-dwell-custom={dwellIsCustom ? '1' : undefined}
+                      title="Изменить время на месте"
+                      aria-label={`Время на месте: ${dwellSoftLabel}. Нажмите, чтобы изменить`}
+                      onClick={() => {
+                        setDwellDraft(String(normalizeDayRouteDwellMinutes(venue.dwellMinutes) ?? dayRouteStopDwellMinutes(venue, resolvedTypeTag)));
+                        setDwellOpen(true);
+                      }}
+                      className={`inline-btn min-h-0 rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                        dwellIsCustom
+                          ? 'bg-primary-50 text-primary-800 ring-1 ring-primary-100'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80'
+                      }`}
+                    >
+                      {dwellSoftLabel}
+                    </button>
+                  ) : (
+                    <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs text-slate-600">{dwellSoftLabel}</span>
+                  )
+                ) : null}
               </div>
               <h2 className="mt-1 line-clamp-2 font-display text-base font-bold leading-snug tracking-tight text-slate-900 sm:text-lg">
                 {titleNode}
@@ -6321,18 +6140,7 @@ function DayRouteVenueCard({
                 </p>
               ) : null}
               <div className="mt-2 flex flex-wrap items-center gap-2">
-                {sessionDisplay ? (
-                  <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
-                    {sessionDisplay}
-                  </span>
-                ) : null}
-                {priceChipLabel ? (
-                  <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
-                    {priceChipLabel}
-                  </span>
-                ) : null}
-                {dwellCanEdit ? (
-                  dwellOpen ? (
+                {dwellCanEdit && dwellOpen ? (
                     <div
                       className="flex w-full min-w-0 flex-col gap-1.5 rounded-xl border border-slate-200 bg-white p-2"
                       data-day-dwell-editor
@@ -6406,34 +6214,7 @@ function DayRouteVenueCard({
                         </button>
                       </form>
                     </div>
-                  ) : (
-                    <button
-                      type="button"
-                      data-day-dwell-chip
-                      data-day-dwell-custom={dwellIsCustom ? '1' : undefined}
-                      title="Изменить время на месте"
-                      aria-label={`Время на месте: ${dwellSoftLabel}. Нажмите, чтобы изменить`}
-                      onClick={() => {
-                        setDwellDraft(
-                          String(
-                            normalizeDayRouteDwellMinutes(venue.dwellMinutes) ??
-                              dayRouteStopDwellMinutes(venue, resolvedTypeTag),
-                          ),
-                        );
-                        setDwellOpen(true);
-                      }}
-                      className={`inline-btn min-h-0 rounded-full px-2.5 py-1 text-xs font-medium ${
-                        dwellIsCustom
-                          ? 'bg-primary-50 text-primary-800 ring-1 ring-primary-100'
-                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80'
-                      }`}
-                    >
-                      {dwellSoftLabel}
-                    </button>
-                  )
-                ) : (
-                  <span className="text-xs text-slate-500">{dwellSoftLabel}</span>
-                )}
+                ) : null}
                 {venue.note && !textStop ? (
                   <span className="line-clamp-1 text-xs text-slate-500">{venue.note}</span>
                 ) : null}
@@ -6478,10 +6259,7 @@ function DayRouteVenueCard({
               ) : null}
             </div>
 
-            <div
-              className="flex shrink-0 flex-col items-end gap-2"
-              data-day-stop-media
-            >
+          <div className="relative flex shrink-0 flex-col items-end" data-day-stop-media>
               <div
                 className="relative h-20 w-20 overflow-hidden rounded-xl bg-slate-100 sm:h-24 sm:w-28"
                 data-day-stop-thumb
@@ -6493,32 +6271,6 @@ function DayRouteVenueCard({
                     <MapPin className="h-5 w-5" aria-hidden />
                   </div>
                 )}
-              </div>
-              <div
-                className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 max-lg:opacity-100"
-                data-day-stop-actions
-              >
-                {mapsUrl ? (
-                  <a
-                    href={mapsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="Открыть в Яндекс.Картах"
-                    title="Открыть в Яндекс.Картах"
-                    data-day-stop-maps
-                    className="grid h-7 w-7 place-items-center rounded-full border border-slate-200 bg-white text-sky-600 hover:bg-sky-50"
-                  >
-                    <Navigation className="h-3.5 w-3.5" />
-                  </a>
-                ) : null}
-                <button
-                  type="button"
-                  aria-label="Убрать из маршрута"
-                  onClick={onRemove}
-                  className="grid h-7 w-7 place-items-center rounded-full border border-slate-200 text-slate-500 hover:bg-slate-100"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
               </div>
             </div>
           </div>

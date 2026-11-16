@@ -2316,8 +2316,12 @@ body > div:has(iframe[src*='ticketscloud']) {
   padding-left: 6px;
 }
 .daibilet-day-pin {
+  box-sizing: border-box;
+  flex: 0 0 28px;
   width: 28px;
+  min-width: 28px;
   height: 28px;
+  aspect-ratio: 1 / 1;
   border-radius: 9999px;
   display: flex;
   align-items: center;

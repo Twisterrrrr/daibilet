@@ -134,6 +134,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
               value={cityValue}
               onChange={onCityChange}
               allLabel="Город"
+              showAllOption={false}
               variant="header"
               className="hidden shrink-0 lg:block lg:min-w-0 lg:max-w-[13rem] xl:max-w-[15rem]"
             />
@@ -171,6 +172,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
               value={cityValue}
               onChange={onCityChange}
               allLabel="Город"
+              showAllOption={false}
               variant="header"
               className="shrink-0 lg:hidden"
             />

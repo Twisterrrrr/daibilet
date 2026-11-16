@@ -785,6 +785,12 @@ const PAINTED_LINES_COORDS_20260815: Record<string, EditorialPlaceCoords> = {
   'kaliningrad-muzey-kvartira-altes-haus': { latitude: 54.721512, longitude: 20.471112 },
 };
 
+/** Coordinates for the Teplohod Moscow boarding point at Repin Square. */
+const MOSCOW_EVENT_VENUE_COORDS: Record<string, EditorialPlaceCoords> = {
+  // Monument / Bolotnaya Square coordinates: https://openarium.ru/poi/59393291/
+  'болотная-пл-у-пам-и-е-репину-653': { latitude: 55.744893, longitude: 37.615424 },
+};
+
 const EDITORIAL_COORDS_BY_SLUG: Record<string, EditorialPlaceCoords> = {
   ...NIZHNY_NOVGOROD_COORDS,
   ...SAINT_PETERSBURG_COORDS,
@@ -795,6 +801,7 @@ const EDITORIAL_COORDS_BY_SLUG: Record<string, EditorialPlaceCoords> = {
   ...KRASNODAR_COORDS,
   ...KRASNOYARSK_COORDS,
   ...PAINTED_LINES_COORDS_20260815,
+  ...MOSCOW_EVENT_VENUE_COORDS,
 };
 
 export function lookupEditorialPlaceCoords(

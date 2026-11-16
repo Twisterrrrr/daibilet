@@ -760,6 +760,30 @@ test('enrichDayRouteFromMatchVenues replaces event stub title + coords + image',
   assert.equal(stop?.ticketUrl, '/events/standup-po-zhenski');
 });
 
+test('enrichDayRouteFromMatchVenues uses editorial coordinates for an event whose venue has no geo', () => {
+  mockStorage();
+  clearDayRoute();
+  addToDayRoute({
+    id: 'venue_tep_653',
+    slug: 'болотная-пл-у-пам-и-е-репину-653',
+    title: 'Экскурсия на двухэтажном автобусе',
+    eventId: 'evt_tep_653',
+    eventSlug: 'ekskursiya-na-avtobuse',
+  });
+  const next = enrichDayRouteFromMatchVenues([
+    {
+      id: 'venue_tep_653',
+      slug: 'болотная-пл-у-пам-и-е-репину-653',
+      eventId: 'evt_tep_653',
+      eventSlug: 'ekskursiya-na-avtobuse',
+      latitude: null,
+      longitude: null,
+    },
+  ]);
+  assert.equal(next.venues[0]?.latitude, 55.744893);
+  assert.equal(next.venues[0]?.longitude, 37.615424);
+});
+
 test('formatDayRouteStartsAtLabel keeps date + time in ru locale', () => {
   const label = formatDayRouteStartsAtLabel('2026-08-15T16:00:00.000Z');
   assert.ok(label);

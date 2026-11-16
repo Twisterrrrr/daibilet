@@ -116,9 +116,10 @@ export function classifyDayRouteCommercialChip(
 export function dayRouteOfferIsVenueBound(
   venue: Pick<
     DayRouteVenueItem,
-    'id' | 'slug' | 'eventId' | 'eventSlug' | 'ticketUrl' | 'startsAt' | 'sessionLabel' | 'title'
+    'id' | 'slug' | 'eventId' | 'eventSlug' | 'eventStop' | 'ticketUrl' | 'startsAt' | 'sessionLabel' | 'title'
   >,
 ): boolean {
+  if (venue.eventStop) return false;
   if (!dayRouteStopHasTicket(venue)) return false;
   if (dayRouteSessionTimeLabel(venue)) return false;
   const eventId = String(venue.eventId || '').trim();

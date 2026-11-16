@@ -35,7 +35,7 @@ export function MyDayMapAside({
           aria-label="Открыть карту на весь экран"
           title="Карта на весь экран"
           data-my-day-map-full
-          className="absolute right-3 top-3 z-[500] grid h-9 w-9 place-items-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50"
+          className="absolute right-3 top-3 z-[500] grid !h-9 !min-h-9 !w-9 !min-w-9 shrink-0 aspect-square place-items-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50"
         >
           <Maximize2 className="h-4 w-4" aria-hidden />
         </button>
