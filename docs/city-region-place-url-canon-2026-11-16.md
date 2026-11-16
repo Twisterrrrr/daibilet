@@ -117,3 +117,10 @@ family. Keep the map as a checked-in artifact and retain legacy redirects.
   `/saint-petersburg/night-bridges`, `/saint-petersburg/spb-yards`, and
   `/saint-petersburg/planetarium`. Preserve these exact routes unless a URL is
   separately reviewed and included in the redirect map.
+- A first mapping pass matched all 66 city/region sitemap URLs and all 51 city
+  place-catalog URLs one-to-one against `/api/public/destinations` (51 cities,
+  15 regions; no missing or duplicate matches). The resulting migration
+  candidate table is
+  [`city-place-url-map-production-2026-11-16.csv`](./city-place-url-map-production-2026-11-16.csv).
+  It is an audit artifact only: no redirects or canonical changes have been
+  applied.
