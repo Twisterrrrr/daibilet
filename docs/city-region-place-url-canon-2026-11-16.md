@@ -126,9 +126,15 @@ family. Keep the map as a checked-in artifact and retain legacy redirects.
   `/saint-petersburg/night-bridges`, `/saint-petersburg/spb-yards`, and
   `/saint-petersburg/planetarium`. Preserve these exact routes unless a URL is
   separately reviewed and included in the redirect map.
+- The live sitemap has `/cities/nizhny-novgorod`, `/cities/veliky-novgorod`,
+  `/places/c/nizhny-novgorod`, and `/places/c/veliky-novgorod`. Their reviewed
+  city-first targets use those same public spellings. The API lookup slugs
+  `nizhniy-novgorod` and `velikiy-novgorod` are aliases only; they must not
+  produce separate city or city-place pages. Event, article, and authored
+  landing URLs containing either spelling remain untouched.
 - A mapping pass matched all 66 city/region sitemap URLs and all 51 city
-  place-catalog URLs one-to-one against `/api/public/destinations` (no missing
-  or duplicate matches). The current-sitemap map is
+  place-catalog URLs one-to-one against `/api/public/destinations` by entity
+  identity. The current-sitemap map is
   [`city-place-url-map-production-2026-11-16.csv`](./city-place-url-map-production-2026-11-16.csv).
   It is an audit artifact only: no redirects or canonical changes have been
   applied.

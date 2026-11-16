@@ -129,6 +129,14 @@ landing slugs, registered type names, and other destination slugs before
 publication. Collisions require a reviewed alternate slug/alias; no route may
 be selected by whichever dynamic handler happens to match first.
 
+The public city slugs for Нижний Новгород and Великий Новгород are
+`nizhny-novgorod` and `veliky-novgorod`. The production destination API
+currently uses `nizhniy-novgorod` and `velikiy-novgorod`; those are data lookup
+aliases, not public URL spellings. City and city-place routes using the API
+spellings must permanently redirect in one hop to the reviewed public slug.
+This alias rule is scoped to city routes and must not rewrite event PDPs,
+articles, or category landings whose own slugs contain those words.
+
 Region PDPs may cover the region and its significant suburbs/settlements.
 Listing a suburb on a region page does not publish a separate city PDP; it gets
 its own `/{city}` route only after editorial publication and a collision check.
