@@ -131,6 +131,7 @@ export function MobileNavLayer({
                   close();
                 }}
                 allLabel={cityLabel === 'Все города' ? 'Город' : cityLabel}
+                showAllOption={false}
                 variant="compact"
                 className="w-full"
               />
