@@ -1656,12 +1656,9 @@ function CitySightsMustSeeList({
                   />
                   {place.imageCredit ? (
                     <div className="absolute inset-x-2 bottom-2 z-10 flex justify-end gap-1 text-[10px] leading-none text-white drop-shadow [text-shadow:0_1px_3px_rgba(0,0,0,0.95)]">
-                      <a href={place.imageCredit.sourceUrl} target="_blank" rel="noreferrer" className="rounded bg-black/55 px-1.5 py-1 hover:bg-black/75">
-                        {place.imageCredit.author}
-                      </a>
-                      <a href={place.imageCredit.licenseUrl} target="_blank" rel="noreferrer" className="rounded bg-black/55 px-1.5 py-1 hover:bg-black/75">
-                        {place.imageCredit.license}
-                      </a>
+                      {place.imageCredit.sourceUrl ? <a href={place.imageCredit.sourceUrl} target="_blank" rel="noreferrer" className="underline underline-offset-2">{place.imageCredit.author}</a> : <span>{place.imageCredit.author}</span>}
+                      <span aria-hidden="true">·</span>
+                      {place.imageCredit.licenseUrl ? <a href={place.imageCredit.licenseUrl} target="_blank" rel="noreferrer" className="underline underline-offset-2">{place.imageCredit.license}</a> : <span>{place.imageCredit.license}</span>}
                     </div>
                   ) : null}
                 </div>

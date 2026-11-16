@@ -1308,7 +1308,7 @@ const LOCATION_PACK_IMAGES: Record<string, string> = {
   'tomsk-rossiysko-nemetskiy-dom-dom-kuptsa-golovanova': '/images/venues/tomsk/rossiysko-nemetskiy-dom-dom-kuptsa-golovanova.jpg',
   'kemerovo-rudnichnyy-sosnovyy-bor': '/images/venues/kemerovo/rudnichnyy-sosnovyy-bor.jpg',
   'vladivostok-russkiy-most': '/images/venues/vladivostok/russkiy-most.jpg',
-  'veliky-novgorod-ryurikovo-gorodische': '/images/venues/veliky-novgorod/ryurikovo-gorodische.jpg',
+  'veliky-novgorod-ryurikovo-gorodische': '/images/venues/veliky-novgorod/ryurikovo-gorodishche-6083.jpg',
   'ryazan-ryazanskiy-kreml': '/images/venues/ryazan/ryazanskiy-kreml-r20261027.jpg',
   'samara-samarskaya-naberezhnaya': '/images/venues/samara/samarskaya-naberezhnaya.jpg',
   'yuzhno-sahalinsk-sahalinskiy-zoobotanicheskiy-park': '/images/venues/yuzhno-sahalinsk/sahalinskiy-zoobotanicheskiy-park.jpg',

@@ -14,6 +14,7 @@ export type DayTripCanonSight = {
   imageSlug?: string | null;
   /** Direct editorial image for a nested suburb point. */
   imageUrl?: string | null;
+  imageCredit?: { author: string; sourceUrl?: string; license: string; licenseUrl?: string };
   /** Совет по перемещению к этой точке (серая строка между пунктами). */
   transitTip?: string;
   /** Заголовок дня над пунктом (multi-day suburb: «День 1 - Усьва»). */
@@ -45,7 +46,7 @@ export type DayTripCanonCardProps = {
   magazine?: boolean;
   /** Cover for magazine layout (editorial / hub hero). */
   heroImageUrl?: string | null;
-  heroImageCredit?: { author: string; sourceUrl: string; license: string; licenseUrl: string } | null;
+  heroImageCredit?: { author: string; sourceUrl?: string; license: string; licenseUrl?: string } | null;
   /** Short lead under title (suburb desc). */
   lead?: string | null;
   /** Footer CTA (AddMany / Collect day button). */
@@ -200,9 +201,11 @@ export function DayTripCanonCard({
                   {index + 1}
                 </span>
                 {heroImageCredit ? (
-                  <a href={heroImageCredit.sourceUrl} target="_blank" rel="noreferrer" className="absolute bottom-2 right-2 rounded bg-slate-950/70 px-1.5 py-1 text-[9px] text-white underline" title={`Фото: ${heroImageCredit.author} · ${heroImageCredit.license}`}>
-                    Фото: {heroImageCredit.author}
-                  </a>
+                  <div className="absolute bottom-2 right-2 z-10 flex max-w-[calc(100%-1rem)] flex-wrap justify-end gap-x-1 text-[9px] leading-tight text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)]">
+                    {heroImageCredit.sourceUrl ? <a href={heroImageCredit.sourceUrl} target="_blank" rel="noreferrer" className="underline underline-offset-2">Фото: {heroImageCredit.author}</a> : <span>Фото: {heroImageCredit.author}</span>}
+                    <span aria-hidden="true">·</span>
+                    {heroImageCredit.licenseUrl ? <a href={heroImageCredit.licenseUrl} target="_blank" rel="noreferrer" className="underline underline-offset-2">{heroImageCredit.license}</a> : <span>{heroImageCredit.license}</span>}
+                  </div>
                 ) : null}
               </div>
             ) : null}
@@ -233,7 +236,7 @@ export function DayTripCanonCard({
                   </div>
                 </div>
                 {leadDistinct ? (
-                  <p className={`mt-2 text-sm leading-relaxed ${softClass}`} data-day-trip-lead>
+                    <p className={`mt-2 text-sm leading-relaxed ${softClass} ${magazine ? 'line-clamp-2' : ''}`} data-day-trip-lead>
                     {leadDistinct}
                   </p>
                 ) : null}
@@ -260,6 +263,7 @@ export function DayTripCanonCard({
                   href: poi.href,
                   imageSlug: poi.imageSlug,
                   imageUrl: poi.imageUrl,
+                  imageCredit: poi.imageCredit,
                   visitMinutes: poi.visitMinutes,
                   transitTip: poi.transitTip,
                   dayLabel: poi.dayLabel,
@@ -422,9 +426,11 @@ export function DayTripCanonCard({
                 {index + 1}
               </span>
               {heroImageCredit ? (
-                <a href={heroImageCredit.sourceUrl} target="_blank" rel="noreferrer" className="absolute bottom-2 right-2 rounded bg-slate-950/70 px-1.5 py-1 text-[9px] text-white underline" title={`Фото: ${heroImageCredit.author} · ${heroImageCredit.license}`}>
-                  Фото: {heroImageCredit.author}
-                </a>
+                <div className="absolute bottom-2 right-2 z-10 flex max-w-[calc(100%-1rem)] flex-wrap justify-end gap-x-1 text-[9px] leading-tight text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)]">
+                  {heroImageCredit.sourceUrl ? <a href={heroImageCredit.sourceUrl} target="_blank" rel="noreferrer" className="underline underline-offset-2">Фото: {heroImageCredit.author}</a> : <span>Фото: {heroImageCredit.author}</span>}
+                  <span aria-hidden="true">·</span>
+                  {heroImageCredit.licenseUrl ? <a href={heroImageCredit.licenseUrl} target="_blank" rel="noreferrer" className="underline underline-offset-2">{heroImageCredit.license}</a> : <span>{heroImageCredit.license}</span>}
+                </div>
               ) : null}
             </div>
             <div className={`min-w-0 ${HUB_DETAIL_BODY}`} data-day-trip-body>
@@ -445,6 +451,7 @@ export function DayTripCanonCard({
                     href: poi.href,
                     imageSlug: poi.imageSlug,
                     imageUrl: poi.imageUrl,
+                    imageCredit: poi.imageCredit,
                     visitMinutes: poi.visitMinutes,
                     transitTip: poi.transitTip,
                     dayLabel: poi.dayLabel,
@@ -507,6 +514,7 @@ export function DayTripCanonCard({
                 href: poi.href,
                 imageSlug: poi.imageSlug,
                 imageUrl: poi.imageUrl,
+              imageCredit: poi.imageCredit,
                 visitMinutes: poi.visitMinutes,
                 transitTip: poi.transitTip,
                 dayLabel: poi.dayLabel,
