@@ -580,7 +580,7 @@ export function buildVenueBreadcrumbs(payload: PublicVenuePageDto): StructuredBr
   if (region) {
     crumbs.push({
       name: region.name,
-      path: cityHref({ name: region.name, slug: region.slug }),
+      path: cityHref({ name: region.name, slug: region.slug, type: 'region' }),
     });
   }
 

@@ -18,6 +18,7 @@ import {
 } from '@/lib/event-description-lead';
 import { stripSessionDateLines } from '@/lib/event-description-session-lines';
 import { eventHref } from '@/lib/routes';
+import { resolveEventPageUrlPolicy } from '@/lib/event-page-url-policy';
 import { getTicketPriceRange } from '@/lib/event-page-utils';
 import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
 import { resolveSsrOgImage } from '@/server/og-image';
@@ -93,11 +94,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   try {
     const event = loaded.payload.event;
     const stableRoute = loaded.payload.eventPageRoute;
-    const hasPublishedStablePage = Boolean(stableRoute?.published);
-    const stablePageTitle = String(loaded.payload.eventPage?.seoTitle || loaded.payload.eventPage?.title || '').trim();
-    const path = stableRoute?.published || stableRoute?.historicalAlias
-      ? `/events/${encodeURIComponent(stableRoute.slug)}`
-      : event.canonicalPath || eventHref(event);
+    const linkedEventPage = loaded.payload.eventPage;
+    const urlPolicy = resolveEventPageUrlPolicy({
+      requestedSlug: decodedSlug,
+      eventCanonicalPath: event.canonicalPath,
+      fallbackPath: eventHref(event),
+      eventPageRoute: stableRoute,
+      publishedEventPage: linkedEventPage,
+      availability: loaded.payload.availability,
+    });
+    const hasPublishedStablePage = urlPolicy.hasPublishedStablePage;
+    const stablePageTitle = String(linkedEventPage?.seoTitle || linkedEventPage?.title || '').trim();
+    const path = urlPolicy.canonicalPath;
     const priceRange = getTicketPriceRange(loaded.payload);
     const expansionMeta = buildEventListingMeta({
       eventTitle: event.title,
@@ -117,7 +125,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     });
     const title = pageTitle(hasPublishedStablePage ? stablePageTitle || disambiguatedTitle : expansionMeta?.title || disambiguatedTitle);
     const shareTitle = !hasPublishedStablePage && expansionMeta ? expansionMeta.title : `${title} | Дайбилет`;
-    const seoDescription = String(loaded.payload.eventPage?.seoDescription || event.seoDescription || '').trim();
+    const seoDescription = String(linkedEventPage?.seoDescription || event.seoDescription || '').trim();
     const genericSeo = /^Расписание, цены и билеты на /iu.test(seoDescription);
     const concertLead = isConcertLikeEvent(event) ? buildConcertLead(event) : '';
     const renderedLead = displayEventDescription(event).split(/\n\s*\n/u)[0] || '';
@@ -130,10 +138,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {
       title: !hasPublishedStablePage && expansionMeta ? { absolute: expansionMeta.title } : title,
       description,
-      ...((stableRoute && (stableRoute.historicalAlias
-        ? (!stableRoute.published || !stableRoute.isIndexable)
-        : ((stableRoute.published && !stableRoute.isIndexable) || (!stableRoute.published && stableRoute.slug === decodedSlug)))) ||
-      (!hasPublishedStablePage && (loaded.payload.availability === 'ENDED' || loaded.payload.availability === 'NO_UPCOMING'))
+      ...(urlPolicy.noindex
         ? { robots: { index: false, follow: true } }
         : {}),
       alternates: {
@@ -143,7 +148,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         title: shareTitle,
         description,
         path,
-        image: await resolveSsrOgImage(stableRoute?.heroImageUrl || loaded.payload.eventPage?.heroImageUrl || event.imageUrl),
+        image: await resolveSsrOgImage(stableRoute?.heroImageUrl || linkedEventPage?.heroImageUrl || event.imageUrl),
       }),
     };
   } catch (error) {

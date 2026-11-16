@@ -33,6 +33,7 @@ export default async function AdminCitiesPage({ searchParams }: PageProps) {
             Название, slug, SEO и тексты карточек городов.
           </p>
         </div>
+        <Link href="/admin/cities/regions" className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Региональные хабы</Link>
       </header>
 
       <AdminApiErrorBanner errors={data.errors} />

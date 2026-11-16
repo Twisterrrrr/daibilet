@@ -21,7 +21,7 @@ import { hasSeoListingEditorial } from '@/data/seo-listing-texts';
 import { isEventsCatalogSitemapEligibleUrl } from '@/lib/events-catalog-indexing';
 import { evaluateListingIndexability, MIN_LISTING_OFFERS_FOR_INDEX } from '@/lib/seo-listing-meta';
 import { buildPodborkiCityCanonicalPath, isPodborkiSeoPilotCitySlug, PODBORKI_SEO_PILOT_CITY_SLUGS } from '@/lib/podborki-city-seo';
-import { venueCanonicalPath, cityHref, citySlug } from '@/lib/routes';
+import { venueCanonicalPath, cityCanonicalPath, cityHref, citySlug, isCityFirstUrlMode } from '@/lib/routes';
 import { cityPlacesCatalogHref } from '@/lib/catalog-url';
 import { getCachedCatalog } from '@/server/cached-catalog-data';
 import { getCachedDestinations } from '@/server/cached-public-surfaces';
@@ -49,6 +49,9 @@ export type SitemapEntry = {
 
 const MAX_EVENTS = 45_000;
 const MAX_VENUES = 10_000;
+// /api/public/venues caps an explicit dump at 2,000 rows. Follow its pages so
+// the sitemap does not silently omit the remainder of the public place catalog.
+const VENUE_SITEMAP_PAGE_SIZE = 2_000;
 const VENUE_SITEMAP_SNAPSHOT_MS = 5 * 60 * 1000;
 
 /**
@@ -56,7 +59,34 @@ const VENUE_SITEMAP_SNAPSHOT_MS = 5 * 60 * 1000;
  * `buildPublicVenuesCatalog` rows the direct `public-read` call used to build.
  */
 type SitemapVenueRow = PublicVenueDto & { events?: number | null };
-type SitemapVenuesPayload = { venues?: SitemapVenueRow[] };
+type SitemapVenuesPayload<T = SitemapVenueRow> = {
+  venues?: T[];
+  hasMore?: boolean;
+  total?: number;
+};
+
+export async function collectVenueSitemapPages<T>(
+  fetchPage: (page: number, limit: number) => Promise<SitemapVenuesPayload<T>>,
+  options: { pageSize?: number; maxVenues?: number } = {},
+): Promise<SitemapVenuesPayload<T>> {
+  const pageSize = Math.max(1, Math.floor(options.pageSize || VENUE_SITEMAP_PAGE_SIZE));
+  const maxVenues = Math.max(1, Math.floor(options.maxVenues || MAX_VENUES));
+  const venues: T[] = [];
+  let total = 0;
+  let hasMore = true;
+  let page = 1;
+
+  while (hasMore && venues.length < maxVenues) {
+    const payload = await fetchPage(page, pageSize);
+    const rows = payload.venues || [];
+    if (page === 1) total = Number(payload.total) || 0;
+    venues.push(...rows.slice(0, maxVenues - venues.length));
+    hasMore = Boolean(payload.hasMore) && rows.length > 0;
+    page += 1;
+  }
+
+  return { venues, total, hasMore };
+}
 
 let venueSitemapSnapshot: {
   expiresAt: number;
@@ -78,10 +108,12 @@ async function freshVenuesForSitemap(): Promise<SitemapVenuesPayload> {
     return venueSitemapSnapshot.payload;
   }
   if (!venueSitemapRebuild) {
-    venueSitemapRebuild = fetchPublicApiJson<SitemapVenuesPayload>('/api/public/venues', {
-      searchParams: { limit: MAX_VENUES },
-      timeoutMs: 30_000,
-    })
+    venueSitemapRebuild = collectVenueSitemapPages((page, limit) =>
+      fetchPublicApiJson<SitemapVenuesPayload>('/api/public/venues', {
+        searchParams: { limit, page, sort: 'asc' },
+        timeoutMs: 30_000,
+      }),
+    )
       .then((payload) => {
         venueSitemapSnapshot = { payload, expiresAt: Date.now() + VENUE_SITEMAP_SNAPSHOT_MS };
         return payload;
@@ -310,9 +342,55 @@ export async function buildEventsSitemapEntries(): Promise<SitemapEntry[]> {
 
 export async function buildCitiesSitemapEntries(): Promise<SitemapEntry[]> {
   const destinationsPayload = await getCachedDestinations();
+  const editorialBySlug = new Map<string, {
+    title: string;
+    slug: string;
+    sourceSlug: string | null;
+    type: 'city' | 'region';
+    status: string;
+    isIndexable: boolean;
+    canonicalPath: string | null;
+    updatedAt: Date;
+  }>();
+  try {
+    const [cities, regions] = await Promise.all([
+      prisma.city.findMany({
+        where: { pdpDocument: { isNot: null } },
+        select: {
+          title: true, slug: true, updatedAt: true,
+          pdpDocument: { select: { status: true, isIndexable: true, canonicalPath: true, updatedAt: true } },
+        },
+      }),
+      prisma.region.findMany({
+        where: { pdpDocument: { isNot: null } },
+        select: {
+          title: true, slug: true,
+          pdpDocument: { select: { status: true, isIndexable: true, canonicalPath: true, updatedAt: true } },
+        },
+      }),
+    ]);
+    for (const city of cities) {
+      if (!city.pdpDocument) continue;
+      const record = { title: city.title, slug: city.slug, sourceSlug: null, type: 'city' as const, ...city.pdpDocument, updatedAt: city.pdpDocument.updatedAt || city.updatedAt };
+      editorialBySlug.set(record.slug.toLowerCase(), record);
+    }
+    for (const region of regions) {
+      if (!region.pdpDocument) continue;
+      const record = { title: region.title, slug: region.slug, sourceSlug: null, type: 'region' as const, ...region.pdpDocument, updatedAt: region.pdpDocument.updatedAt };
+      editorialBySlug.set(record.slug.toLowerCase(), record);
+    }
+  } catch (error) {
+    // The additive migration may not yet be applied in an older deployment.
+    // Preserve the legacy sitemap path, but make the missing integration visible.
+    console.error('[sitemap] destination PDP indexability lookup failed', error);
+  }
+
   const entries = (destinationsPayload?.destinations || [])
     .filter((destination) => {
       if (!destination.slug) return false;
+      const editorial = editorialBySlug.get(String(destination.slug).toLowerCase()) ||
+        (destination.sourceSlug ? editorialBySlug.get(String(destination.sourceSlug).toLowerCase()) : undefined);
+      if (editorial) return editorial.status === 'PUBLISHED' && editorial.isIndexable;
       if (destination.type === 'city') {
         return evaluateCityIndexability({
           events: destination.events,
@@ -328,15 +406,62 @@ export async function buildCitiesSitemapEntries(): Promise<SitemapEntry[]> {
       }
       return false;
     })
-    .flatMap((destination) => [
-      entry(cityHref(destination), 'daily', destination.type === 'region' ? 0.7 : 0.75),
-      ...(destination.type === 'city' && destination.venues > 0
-        ? [entry(cityPlacesCatalogHref(citySlug(destination)), 'daily', 0.65)]
-        : []),
-    ]);
-  // Legacy city aliases may still arrive from the public catalog. Since their
-  // hrefs normalize to the canonical slug, keep each canonical URL once.
-  return [...new Map(entries.map((item) => [item.url, item])).values()];
+    .flatMap((destination) => {
+      const editorial = destination.slug
+        ? editorialBySlug.get(String(destination.slug).toLowerCase()) ||
+          (destination.sourceSlug ? editorialBySlug.get(String(destination.sourceSlug).toLowerCase()) : undefined)
+        : undefined;
+      const href = editorial
+        ? destinationPdpSitemapPath({ ...editorial, type: editorial.type })
+        : cityHref(destination);
+      return [
+        ...(href ? [entry(href, 'daily', destination.type === 'region' ? 0.7 : 0.75, editorial?.updatedAt)] : []),
+        ...(destination.type === 'city' && destination.venues > 0
+          ? [entry(cityPlacesCatalogHref(citySlug(destination)), 'daily', 0.65)]
+          : []),
+      ];
+    });
+
+  const seen = new Set(entries.map((item) => new URL(item.url).pathname));
+  for (const editorial of editorialBySlug.values()) {
+    if (editorial.status !== 'PUBLISHED' || !editorial.isIndexable) continue;
+    const path = destinationPdpSitemapPath({ ...editorial, type: editorial.type });
+    if (!path || seen.has(path)) continue;
+    entries.push(entry(path, 'daily', editorial.type === 'region' ? 0.7 : 0.75, editorial.updatedAt));
+    seen.add(path);
+  }
+  return entries;
+}
+
+export function destinationPdpSitemapPath(destination: {
+  title: string;
+  slug: string;
+  sourceSlug: string | null;
+  canonicalPath: string | null;
+  type?: 'city' | 'region';
+}): string | null {
+  const canonical = cityCanonicalPath({
+    slug: destination.slug,
+    sourceSlug: destination.sourceSlug,
+    name: destination.title,
+    type: destination.type,
+    canonicalPath: destination.canonicalPath,
+  });
+  try {
+    const site = new URL(getSiteUrl());
+    const url = new URL(canonical, site);
+    const isLegacyDestinationPath = /^\/(cities|regions)\/[^/]+\/?$/.test(url.pathname);
+    const isCityFirstCityPath = destination.type === 'city'
+      && isCityFirstUrlMode()
+      && /^\/[a-z0-9]+(?:-[a-z0-9]+)*\/?$/.test(url.pathname);
+    const isCityFirstRegionPath = destination.type === 'region'
+      && isCityFirstUrlMode()
+      && /^\/regions\/[^/]+\/?$/.test(url.pathname);
+    if (url.origin !== site.origin || !(isLegacyDestinationPath || isCityFirstCityPath || isCityFirstRegionPath)) return null;
+    return url.pathname;
+  } catch {
+    return null;
+  }
 }
 
 export async function buildVenuesSitemapEntries(): Promise<SitemapEntry[]> {

@@ -125,7 +125,7 @@ export function CityHeroStrip({
                 </p>
               ) : null}
               <h1 className="font-display text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl md:text-5xl">
-                {city.name}
+                {city.pdp?.seoH1 || city.seoH1 || city.name}
               </h1>
               {brief ? (
                 <p
@@ -252,7 +252,7 @@ export function CityHeroStrip({
             ) : null}
 
             <h1 className="font-display text-4xl font-extrabold tracking-tight text-navy-foreground sm:text-5xl md:text-6xl">
-              {city.name}
+              {city.pdp?.seoH1 || city.seoH1 || city.name}
             </h1>
             {brief ? (
               <p className="mt-3 max-w-xl text-base leading-relaxed text-navy-foreground/80 sm:text-lg">

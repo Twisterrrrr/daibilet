@@ -2,7 +2,9 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 
 import { AdminApiErrorBanner } from '@/components/admin/AdminApiErrorBanner';
+import { DestinationPdpEditor } from '@/components/admin/DestinationPdpEditor.client';
 import { PUBLIC_SITE_BASE } from '@/lib/admin-ui';
+import { loadAdminDestinationPdpAction } from '@/server/admin-destination-pdp-actions';
 import { saveAdminCityAction } from '@/server/admin-city-actions';
 import { loadAdminCityDetail } from '@/server/admin-cities-data';
 
@@ -25,6 +27,13 @@ export default async function AdminCityDetailPage({ params, searchParams }: Page
   const back = first(rawSearch.back) || '';
   const backHref = /^\/admin\/cities(?:\?|$)/.test(back) ? back : '/admin/cities';
   const detail = await loadAdminCityDetail(id);
+  let destinationPdp = null;
+  let destinationPdpError = '';
+  try {
+    destinationPdp = await loadAdminDestinationPdpAction('cities', id);
+  } catch (error) {
+    destinationPdpError = error instanceof Error ? error.message : 'Не удалось загрузить редакторский PDP';
+  }
   const slugConflict = first(rawSearch.error) === 'slug_not_unique';
   const notice = slugConflict
     ? 'Slug уже занят другим городом - выберите другой.'
@@ -43,7 +52,7 @@ export default async function AdminCityDetailPage({ params, searchParams }: Page
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-xl font-semibold text-slate-900">{detail.title}</h2>
-          <p className="mt-1 text-sm text-slate-600">Карточка города: название, slug, SEO и intro.</p>
+          <p className="mt-1 text-sm text-slate-600">Справочные поля карточки города. Редакционный текст, медиа и SEO настраиваются во вкладках PDP ниже.</p>
           <div className="mt-2 flex flex-wrap gap-1.5">
             <span
               className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs ${
@@ -54,6 +63,7 @@ export default async function AdminCityDetailPage({ params, searchParams }: Page
             >
               {detail.isDestination ? 'Хаб направления' : 'Обычный город'}
             </span>
+            {detail.slug ? <Link href={`/admin/cities/regions`} className="inline-flex items-center rounded-md border border-slate-200 bg-white px-2 py-0.5 text-xs text-slate-700 hover:bg-slate-50">Редактор регионов</Link> : null}
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -79,9 +89,18 @@ export default async function AdminCityDetailPage({ params, searchParams }: Page
       <AdminApiErrorBanner errors={detail.errors} />
 
       {detail.found ? (
+        <>
         <form action={saveAdminCityAction} className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
           <input type="hidden" name="id" value={detail.id} />
           <input type="hidden" name="back" value={backHref} />
+          {/* Keep legacy values intact while the editorial PDP editor owns their current UI. */}
+          <input type="hidden" name="introTitle" value={detail.introTitle || ''} />
+          <input type="hidden" name="introText" value={detail.introText || ''} />
+          <input type="hidden" name="heroImageUrl" value={detail.heroImageUrl || ''} />
+          <input type="hidden" name="seoH1" value={detail.seoH1 || ''} />
+          <input type="hidden" name="seoTitle" value={detail.seoTitle || ''} />
+          <input type="hidden" name="seoDescription" value={detail.seoDescription || ''} />
+          <input type="hidden" name="canonicalPath" value={detail.canonicalPath || ''} />
           <div className="grid gap-3 md:grid-cols-2">
             <Field label="Название">
               <input
@@ -106,58 +125,7 @@ export default async function AdminCityDetailPage({ params, searchParams }: Page
                 className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
               />
             </Field>
-            <Field label="Заголовок интро">
-              <input
-                name="introTitle"
-                defaultValue={detail.introTitle || ''}
-                className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
-              />
-            </Field>
-            <Field label="SEO H1">
-              <input
-                name="seoH1"
-                defaultValue={detail.seoH1 || ''}
-                className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
-              />
-            </Field>
-            <Field label="SEO title">
-              <input
-                name="seoTitle"
-                defaultValue={detail.seoTitle || ''}
-                className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
-              />
-            </Field>
-            <Field label="Обложка (URL)">
-              <input
-                name="heroImageUrl"
-                defaultValue={detail.heroImageUrl || ''}
-                className="w-full rounded-md border border-slate-200 px-3 py-2 font-mono text-sm"
-              />
-            </Field>
-            <Field label="canonicalPath">
-              <input
-                name="canonicalPath"
-                defaultValue={detail.canonicalPath || ''}
-                className="w-full rounded-md border border-slate-200 px-3 py-2 font-mono text-sm"
-              />
-            </Field>
           </div>
-          <Field label="Текст интро">
-            <textarea
-              name="introText"
-              rows={4}
-              defaultValue={detail.introText || ''}
-              className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
-            />
-          </Field>
-          <Field label="SEO description">
-            <textarea
-              name="seoDescription"
-              rows={3}
-              defaultValue={detail.seoDescription || ''}
-              className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
-            />
-          </Field>
           <label className="flex items-center gap-2 text-sm text-slate-700">
             <input
               type="checkbox"
@@ -174,6 +142,9 @@ export default async function AdminCityDetailPage({ params, searchParams }: Page
             Сохранить
           </button>
         </form>
+        {destinationPdpError ? <p role="alert" className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-800">Не удалось загрузить PDP-редактор: {destinationPdpError}</p> : null}
+        {destinationPdp ? <DestinationPdpEditor ownerType="cities" owner={destinationPdp.owner} initialDocument={destinationPdp.document} initialReadiness={{ ready: destinationPdp.readiness.ready, issues: destinationPdp.readiness.missing || [] }} /> : null}
+        </>
       ) : null}
     </div>
   );

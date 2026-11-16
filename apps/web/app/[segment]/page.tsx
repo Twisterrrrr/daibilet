@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
-
 import { buildLandingMetadata, LandingRoutePage } from '@/server/landing-route-page';
 import { listLandingStaticParamsOne } from '@/lib/landing-routes';
+import { isCityFirstLegacyRouteSlug } from '@/lib/city-first-route-slugs';
+import { cityLookupSlug, isCityFirstUrlMode } from '@/lib/routes';
+import CityPage, { generateMetadata as generateCityMetadata } from '../cities/[slug]/page';
 
 export const revalidate = 3600;
 
@@ -15,6 +17,9 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { segment } = await params;
+  if (isCityFirstUrlMode() && isCityFirstLegacyRouteSlug(segment)) {
+    return generateCityMetadata({ params: Promise.resolve({ slug: cityLookupSlug(segment) }) });
+  }
   return buildLandingMetadata(`/${segment}`);
 }
 
@@ -24,5 +29,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
  */
 export default async function LandingSegmentPage({ params }: PageProps) {
   const { segment } = await params;
+  if (isCityFirstUrlMode() && isCityFirstLegacyRouteSlug(segment)) {
+    return CityPage({ params: Promise.resolve({ slug: cityLookupSlug(segment) }) });
+  }
   return LandingRoutePage({ pathname: `/${segment}` });
 }

@@ -138,7 +138,7 @@ function CityHubTags({
       {showRegion && region ? (
         <li className="min-w-0">
           <RegionDestinationLink
-            region={{ slug: region.slug, name: region.name, events: region.eventCount }}
+            region={{ slug: region.slug, name: region.name, events: region.eventCount, type: 'region' }}
             variant="chip"
           />
         </li>

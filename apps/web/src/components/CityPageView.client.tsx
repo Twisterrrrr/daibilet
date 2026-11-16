@@ -6,6 +6,7 @@ import { trackCityHubView } from '@/lib/catalog-analytics';
 import Link from 'next/link';
 
 import { CityHeroStrip } from '@/components/CityHeroStrip.client';
+import { DestinationPdpContent } from '@/components/DestinationPdpContent.client';
 import { CityHubArticlesGrid } from '@/components/CityHubArticleTeaser.client';
 import { CityAdmissionBlock } from '@/components/CityAdmissionBlock';
 import {
@@ -272,6 +273,13 @@ export function CityPageView({
   }, []);
 
   const city = payload?.city;
+  const publishedDestinationPdp = city?.pdp || null;
+  const editorialContent = publishedDestinationPdp?.content;
+  const hasEditorialPlaces = Boolean(publishedDestinationPdp && (
+    editorialContent?.mustSee?.length || editorialContent?.sights?.length ||
+    editorialContent?.routes?.length || editorialContent?.significantSuburbs?.length ||
+    editorialContent?.gallery?.length || editorialContent?.faq?.length || editorialContent?.travelText
+  ));
   const touristAffiche = isCityHubTouristAffiche(normalizeCityHubSlug(city?.slug || city?.sourceSlug || slug));
 
   const sessions = React.useMemo(() => {
@@ -342,7 +350,7 @@ export function CityPageView({
         guide?.significantSuburbs?.length ||
         guide?.dayRoutePresets?.length),
   );
-  const hasFaq = unifiedFaq.length > 0;
+  const hasFaq = editorialContent?.faq?.length ? true : !publishedDestinationPdp && unifiedFaq.length > 0;
   const hasSeo = Boolean(seoText);
   const aboutArticles = hubArticles?.about || [];
   const afficheArticles = hubArticles?.affiche || [];
@@ -370,17 +378,18 @@ export function CityPageView({
   const hasLifehacks = cityHasLifehacks(hubSlug);
   const hasMore = hasDirections || hasVenues || moreArticles.length > 0;
   const hasCollections = hasDirections;
-  const showSightsBlock = hasSights || hasHookFact || hasWeather || hasWhenToGo || hasIdentity;
+  const showSightsBlock = !hasEditorialPlaces && (hasSights || hasHookFact || hasWeather || hasWhenToGo || hasIdentity);
   const hasWhyGoNav = hasIdentity || hasHookFact || hasWeather || hasWhenToGo;
   const hasMustSeeNav = Boolean(
     !isCityHubSectionHidden(hubConfig, 'sights') &&
-      (guide?.mustSee?.length ||
+      (editorialContent?.mustSee?.length || editorialContent?.sights?.length ||
+        guide?.mustSee?.length ||
         guide?.sights?.length ||
         guide?.significantSuburbs?.length ||
         guide?.dayRoutePresets?.length),
   );
-  const hasRoutesNav = Boolean(guide?.dayRoutePresets?.length);
-  const hasSuburbsNav = Boolean(guide?.significantSuburbs?.length);
+  const hasRoutesNav = Boolean(editorialContent?.routes?.length || guide?.dayRoutePresets?.length);
+  const hasSuburbsNav = Boolean(editorialContent?.significantSuburbs?.length || guide?.significantSuburbs?.length);
   const hasFestivalsNav = cityHasRegionalFestivals(hubSlug);
 
   const applyPlaceFocus = React.useCallback((focus: CityPlaceFocus | null) => {
@@ -461,6 +470,10 @@ export function CityPageView({
               mobileExtraTabs={tabs.mobileExtra}
               editorial={editorial}
             />
+
+            {publishedDestinationPdp ? (
+              <DestinationPdpContent pdp={publishedDestinationPdp} cityName={city.name} region={city.type === 'region'} />
+            ) : null}
 
             {showSightsBlock ? (
               <div

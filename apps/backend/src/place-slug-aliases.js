@@ -10,6 +10,7 @@ export const PLACE_SLUG_ALIASES = {
   'naprotiv-teatra-sovremennik-625af9838532f4ffe3fefe4b': 'moscow-sovremennik',
   'yusupovskiy-dvorec-63986bf7a7df': 'saint-petersburg-yusupovskiy-dvorets',
   'petrovskii-putevoi-dvorec-5cd1bf3d079a40000c1e0639': 'moscow-petrovskiy-putevoy-dvorets',
+  'vrubelevskiy-korpus-vrubel-omsk': 'omsk-muzey-izobrazitelnyh-iskusstv-vrubelya',
 };
 
 export function resolvePlaceSlugAlias(slug) {

@@ -1,5 +1,25 @@
 # Decision Log — Daibilet
 
+## 2026-11-16 — City-first URL hierarchy; preserve event URLs
+
+City hubs move toward `/{city}`, region hubs use `/regions/{region}`, and
+city-place catalogs use `/{city}/places` plus `/{city}/{type}` for registered
+place types. Global directories remain `/cities`, `/regions`, and `/places`;
+global place-type catalogs remain `/places/{type}`. Existing venue/location
+PDP route families remain stable. `/events` and `/events/{slug}` are explicitly
+outside this URL migration and do not change.
+
+Add routes and verify them before switching canonicals or redirecting existing
+URLs. The migration map must be reviewed and redirects must be one-hop. City
+routes resolve only for registered hubs, with explicit reserved paths and
+precedence over generic landing routes. City × place-type pages follow the
+0 → 404, 1–2 → noindex/canonical to city places, 3+ → self-canonical index
+policy. Full rules and rollout sequence are in
+[`city-region-place-url-canon-2026-11-16.md`](./city-region-place-url-canon-2026-11-16.md).
+
+**Status:** Architecture recorded; route implementation and staging QA remain
+open. No public URLs were changed by this decision.
+
 ## 2026-11-13 — EventPage owns its editorial hero image
 
 **Decision:** Store a page-specific cover in `EventPage.heroImageUrl`. Provider
@@ -379,6 +399,28 @@ identity, factual copy and object-specific imagery are reviewed.
 
 **Статус:** Активно / Отменено / Заменено ссылкой на новую запись
 ```
+
+## 2026-11-16 — Единый доменный URL-канон
+
+**Решение:** Целевые URL всех публичных сущностей зафиксированы в
+[`domain-url-canon-2026-11-16.md`](./domain-url-canon-2026-11-16.md): города
+живут на `/{city}`, регионы на `/regions/{region}`, городские каталоги мест
+на `/{city}/places`, типы мест — по утверждённому реестру, а EventPage
+сохраняют `/events/{slug}`. Каталоги, PDP и редакционные сущности имеют
+раздельные URL-обязанности. Уровень типа места не меняет адрес PDP.
+
+Старые URL не отключаются в ходе реализации. Переезд `/cities/{slug}` и
+`/places/c/{city}` выполняется отдельным проверенным выпуском по точной
+production-карте. Event/slot URL редиректятся только по точной Event ID связи
+с опубликованной EventPage. Неопубликованные направления из справочника сами
+по себе не получают публичный или индексируемый хаб.
+
+**Почему:** Уменьшить конфликты между динамическими Next.js routes, остановить
+появление новых slot-level индексируемых страниц и сохранить старые посадочные
+до проверки редиректов и canonical parity.
+
+**Статус:** Целевой канон и матрица зафиксированы; новые маршруты, sitemap,
+canonical и редиректы внедряются отдельными этапами. Production URL не менялись.
 
 ## 2026-11-12 — Imported place candidate versus editorial PDP
 

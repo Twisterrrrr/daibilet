@@ -1,4 +1,5 @@
 import { CATALOG_PAGE_SIZE_DEFAULT, CATALOG_PAGE_SIZES, type CatalogPageSize } from '@daibilet/contracts/catalog';
+import { canonicalCitySlug } from './routes';
 
 export type CatalogSort = 'time' | 'price' | 'price_asc' | 'price_desc' | 'popular' | 'departing_soon' | 'random';
 
@@ -205,12 +206,18 @@ export function placesHubHrefWithSelectedCity(
 
 /** Indexable city catalog with its own canonical URL and server-side pagination. */
 export function cityPlacesCatalogHref(citySlug: string, page = 1): string {
-  const normalizedCitySlug = ({
-    'nizhniy-novgorod': 'nizhny-novgorod',
-    'velikiy-novgorod': 'veliky-novgorod',
-  } as Record<string, string>)[citySlug] || citySlug;
-  const path = `/places/c/${encodeURIComponent(normalizedCitySlug)}`;
+  const publicCitySlug = canonicalCitySlug(citySlug);
+  const path = process.env.NEXT_PUBLIC_CITY_URL_MODE === 'city-first'
+    ? `/${encodeURIComponent(publicCitySlug)}/places`
+    : `/places/c/${encodeURIComponent(publicCitySlug)}`;
   return page > 1 ? `${path}?page=${page}` : path;
+}
+
+/** Indexable city × place-type route in the city-first URL mode. */
+export function cityPlaceTypeHref(citySlug: string, typeSlug: string): string {
+  return process.env.NEXT_PUBLIC_CITY_URL_MODE === 'city-first'
+    ? `/${encodeURIComponent(citySlug)}/${encodeURIComponent(typeSlug)}`
+    : `/places?city=${encodeURIComponent(citySlug)}&type=${encodeURIComponent(typeSlug)}`;
 }
 
 export function mergeCatalogFilters(

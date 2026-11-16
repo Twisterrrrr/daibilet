@@ -1,5 +1,6 @@
 import type { Server } from 'node:http';
 import './bootstrap-env.js';
+import { prisma } from '@daibilet/db';
 import { buildAdminEventChangeRequestDetailDto, buildAdminEventChangeRequestsDto } from './admin-event-change-requests.dto.js';
 import { createAdminEventChangeRequestsRouteHandler } from './admin-event-change-requests-handler.js';
 import { createAdminEventsRouteHandler } from './admin-events-handler.js';
@@ -8,6 +9,7 @@ import { buildAdminEventDetailDto, buildAdminEventsListDto } from './admin-event
 import { applyApprovedEventChangeRequest } from './event-change-request-applier.js';
 import { reviewEventChangeRequest } from './event-change-request-review.js';
 import { createAdminLandingsRouteHandler } from './admin-landings-handler.js';
+import { createAdminDestinationPdpRouteHandler } from './destination-pdp-handler.js';
 import { createAdminOrdersRouteHandler } from './admin-orders-handler.js';
 import { createAdminOrdersReadRouteHandler } from './admin-orders-read-handler.js';
 import { buildAdminOrdersListDto } from './admin-orders.dto.js';
@@ -90,6 +92,10 @@ const server = startServer({
       createAdminOrdersReadRouteHandler({
         enabled: adminFlags.orders,
         buildOrdersList: buildAdminOrdersListDto,
+      }),
+      createAdminDestinationPdpRouteHandler({
+        prisma,
+        invalidatePublicCaches,
       }),
       createAdminEventsReadRouteHandler({
         enabled: adminFlags.events,
