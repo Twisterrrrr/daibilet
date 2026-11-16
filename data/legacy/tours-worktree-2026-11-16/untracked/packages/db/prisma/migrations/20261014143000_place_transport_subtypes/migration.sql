@@ -1,0 +1,2 @@
+ALTER TYPE "PlaceType" ADD VALUE 'TRANSPORT';
+ALTER TABLE "Venue" ADD COLUMN "placeSubtype" TEXT;
