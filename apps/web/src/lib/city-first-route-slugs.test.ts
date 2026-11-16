@@ -4,9 +4,9 @@ import test from 'node:test';
 import {
   CITY_FIRST_LEGACY_ROUTE_SLUGS,
   isCityFirstLegacyRouteSlug,
-  resolveLegacyCitySpellingRedirect,
   resolveCityFirstRedirectPath,
 } from './city-first-route-slugs';
+import { resolveLegacyCitySpellingRedirect } from './city-spelling-redirects';
 
 test('legacy city root routes cover the current sitemap city hubs only', () => {
   assert.equal(CITY_FIRST_LEGACY_ROUTE_SLUGS.length, 51);

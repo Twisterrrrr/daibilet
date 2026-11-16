@@ -1,6 +1,6 @@
 import type { NextConfig } from 'next';
 import placeSlugAliases from './src/lib/place-slug-aliases.json';
-import { resolveLegacyCitySpellingRedirect } from './src/lib/city-first-route-slugs';
+import { resolveLegacyCitySpellingRedirect } from './src/lib/city-spelling-redirects';
 
 const cityFirstUrlsEnabled = process.env.NEXT_PUBLIC_CITY_URL_MODE === 'city-first';
 const citySpellingRedirects = [
