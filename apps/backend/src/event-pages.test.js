@@ -66,6 +66,21 @@ test('public stable route returns null before EventPage migration is present', a
   assert.equal(await readPublicEventPageRouteBySlug(db, 'stable-show-perm'), null);
 });
 
+test('public stable route stops when historical aliases form a cycle', async () => {
+  const db = {
+    async query(sql, params) {
+      if (/SELECT target\.slug/.test(sql)) {
+        const aliases = { '/events/route-a': 'route-b', '/events/route-b': 'route-a' };
+        const targetSlug = aliases[params[0]];
+        return { rows: targetSlug ? [{ slug: targetSlug }] : [] };
+      }
+      throw new Error('Route lookup should stop before querying a page');
+    },
+  };
+
+  assert.equal(await readPublicEventPageRouteBySlug(db, 'route-a'), null);
+});
+
 test('stable EventPage expands only matching product siblings with one owner and one target page', async () => {
   let call = 0;
   const db = {
