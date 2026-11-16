@@ -389,23 +389,44 @@ export function buildGroupedTicketCategories(payload: PublicEventPageDto): Ticke
     .sort((a, b) => (groupSortOrder.get(a.key) ?? 9999) - (groupSortOrder.get(b.key) ?? 9999));
 }
 
-/** Consolidate large venue sector lists into price tiers while retaining every sector label. */
+/** Consolidate long numbered venue category lists into price tiers without dropping labels. */
 export function compactSectorTicketCategories(rows: TicketCategoryRow[]): TicketCategoryRow[] {
-  if (rows.length <= 8 || !rows.every((row) => /^сектор\s+\d+$/i.test(row.name))) return rows;
+  if (rows.length <= 8 || rows.some((row) => row.description)) return rows;
+
+  const parsed = rows.map((row) => {
+    const match = row.name.trim().match(/^(сектор|стол)\s+(\d+)$/iu);
+    return match ? { row, kind: match[1].toLocaleLowerCase('ru'), number: Number(match[2]) } : null;
+  });
+  if (parsed.some((item) => !item) || new Set(parsed.map((item) => item!.kind)).size !== 1) return rows;
+  const kind = parsed[0]!.kind;
 
   const tiers = new Map<string, TicketCategoryRow>();
-  for (const row of rows) {
+  const numbersByTier = new Map<string, number[]>();
+  for (const item of parsed) {
+    const row = item!.row;
     const key = `${row.minPrice}:${row.maxPrice}`;
-    const current = tiers.get(key);
-    if (current) {
-      current.name += `, ${row.name.replace(/^сектор\s+/i, '')}`;
-      continue;
+    numbersByTier.set(key, [...(numbersByTier.get(key) || []), item!.number]);
+    if (!tiers.has(key)) tiers.set(key, { ...row, key: `numbered-category-tier-${key}`, name: '' });
+  }
+
+  const compactNumbers = (values: number[]) => {
+    const sorted = [...new Set(values)].sort((a, b) => a - b);
+    const ranges: string[] = [];
+    for (let index = 0; index < sorted.length;) {
+      const start = sorted[index];
+      let end = start;
+      while (index + 1 < sorted.length && sorted[index + 1] === end + 1) {
+        end = sorted[++index];
+      }
+      ranges.push(end > start ? `${start}–${end}` : String(start));
+      index += 1;
     }
-    tiers.set(key, {
-      ...row,
-      key: `sector-tier-${key}`,
-      name: `Секторы ${row.name.replace(/^сектор\s+/i, '')}`,
-    });
+    return ranges.join(', ');
+  };
+
+  for (const [key, row] of tiers) {
+    const label = compactNumbers(numbersByTier.get(key) || []);
+    row.name = kind === 'стол' ? `Столы ${label}` : `Секторы ${label}`;
   }
 
   return [...tiers.values()].sort((a, b) => a.minPrice - b.minPrice || a.maxPrice - b.maxPrice);

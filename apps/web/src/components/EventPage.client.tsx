@@ -811,8 +811,6 @@ export function EventHero({
                 </div>
               ) : null}
 
-              <PeerEventsHeroSwitcher peers={peers} />
-
               {/* 7. Link the venue name and street address together to its internal PDP. */}
               {venueStreetAddress ? (
                 venuePageHref ? (
@@ -840,6 +838,9 @@ export function EventHero({
                   </span>
                 )
               ) : null}
+
+              {/* Keep tour navigation at the end of the hero, after the local venue details. */}
+              <PeerEventsHeroSwitcher peers={peers} />
             </div>
 
             {/* Keep the desktop hero CTA; the mobile sticky bar covers that viewport. */}
