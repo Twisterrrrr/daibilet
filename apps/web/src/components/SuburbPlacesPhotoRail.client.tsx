@@ -15,6 +15,7 @@ export type SuburbPlaceRailItem = {
   imageSlug?: string | null;
   /** Direct cover when slug is missing (suburb hero fallback). */
   imageUrl?: string | null;
+  imageCredit?: { author: string; sourceUrl?: string; license: string; licenseUrl?: string };
   visitMinutes?: number | string;
   transitTip?: string;
   dayLabel?: string;
@@ -127,6 +128,13 @@ export function SuburbPlacesPhotoRail({
                 <span className="absolute left-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-white/95 text-xs font-semibold text-slate-700 shadow-sm">
                   {index + 1}
                 </span>
+                {place.imageCredit ? (
+                  <div className="absolute inset-x-2 bottom-2 z-10 flex flex-wrap justify-end gap-x-1 text-[9px] leading-tight text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)]">
+                    {place.imageCredit.sourceUrl ? <a href={place.imageCredit.sourceUrl} target="_blank" rel="noreferrer" className="underline underline-offset-2">Фото: {place.imageCredit.author}</a> : <span>Фото: {place.imageCredit.author}</span>}
+                    <span aria-hidden="true">·</span>
+                    {place.imageCredit.licenseUrl ? <a href={place.imageCredit.licenseUrl} target="_blank" rel="noreferrer" className="underline underline-offset-2">{place.imageCredit.license}</a> : <span>{place.imageCredit.license}</span>}
+                  </div>
+                ) : null}
               </div>
               <div className="flex flex-col p-4 sm:p-5">
                 {place.href ? (

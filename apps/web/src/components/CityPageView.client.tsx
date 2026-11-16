@@ -63,6 +63,7 @@ import { resolveCityImage } from '@/lib/city-images';
 import { CITY_NIGHT_HERO } from '@/lib/city-night-hero';
 import { cityHasLifehacks } from '@/lib/city-hub-lifehacks';
 import {
+  filterHubAfficheCategory,
   filterStandupFromAllFeed,
   groupStandupInHubFeed,
   isCityHubTouristAffiche,
@@ -273,10 +274,7 @@ export function CityPageView({
 
   const sessions = React.useMemo(() => {
     if (!payload) return [];
-    const byChip = payload.sessions.filter((session) => {
-      if (category !== 'all' && session.category !== category) return false;
-      return true;
-    });
+    const byChip = filterHubAfficheCategory(payload.sessions, category);
     const filtered = filterStandupFromAllFeed(byChip, category, { tourist: touristAffiche });
     const ranked = rankCityHubSessions(filtered);
     return dedupeHubSessions(ranked);
@@ -1658,12 +1656,9 @@ function CitySightsMustSeeList({
                   />
                   {place.imageCredit ? (
                     <div className="absolute inset-x-2 bottom-2 z-10 flex justify-end gap-1 text-[10px] leading-none text-white drop-shadow [text-shadow:0_1px_3px_rgba(0,0,0,0.95)]">
-                      <a href={place.imageCredit.sourceUrl} target="_blank" rel="noreferrer" className="rounded bg-black/55 px-1.5 py-1 hover:bg-black/75">
-                        {place.imageCredit.author}
-                      </a>
-                      <a href={place.imageCredit.licenseUrl} target="_blank" rel="noreferrer" className="rounded bg-black/55 px-1.5 py-1 hover:bg-black/75">
-                        {place.imageCredit.license}
-                      </a>
+                      {place.imageCredit.sourceUrl ? <a href={place.imageCredit.sourceUrl} target="_blank" rel="noreferrer" className="underline underline-offset-2">{place.imageCredit.author}</a> : <span>{place.imageCredit.author}</span>}
+                      <span aria-hidden="true">·</span>
+                      {place.imageCredit.licenseUrl ? <a href={place.imageCredit.licenseUrl} target="_blank" rel="noreferrer" className="underline underline-offset-2">{place.imageCredit.license}</a> : <span>{place.imageCredit.license}</span>}
                     </div>
                   ) : null}
                 </div>
