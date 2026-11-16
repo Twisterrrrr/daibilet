@@ -3,6 +3,8 @@
 from pathlib import Path
 import re
 
+from staging_upstream_config import point_staging_web_upstream_to_next
+
 CONF = Path("/etc/nginx/sites-enabled/daibilet.conf")
 text = CONF.read_text()
 
@@ -17,6 +19,8 @@ if "upstream daibilet_web_staging" not in text:
         + "\n\nupstream daibilet_web_staging {\n    server 127.0.0.1:3000;\n    keepalive 8;\n}\n"
         + text[end:]
     )
+
+text = point_staging_web_upstream_to_next(text)
 
 marker = "server_name staging.daibilet.ru;"
 if marker not in text:
