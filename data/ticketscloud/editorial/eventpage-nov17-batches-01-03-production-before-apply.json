@@ -1,0 +1,3826 @@
+{
+  "backedUpAt": "2026-11-17T04:50:40.566Z",
+  "database": "daibilet",
+  "pages": [
+    {
+      "id": "34789b97-ea6c-4ea9-a722-688bd2f401af",
+      "slug": "zhivopis-guash-krasnoyarsk-2",
+      "title": "Живопись. Гуашь",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Живопись. Гуашь",
+      "seoTitle": "Живопись. Гуашь | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af6e9aaa390be459fc3b8de",
+          "position": 0
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6e9aba390be459fc3b8e6",
+          "position": 1
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6e9aba390be459fc3b8ee",
+          "position": 2
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6e9aba390be459fc3b8f6",
+          "position": 3
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6e9aca390be459fc3b8fe",
+          "position": 4
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6e9aca390be459fc3b906",
+          "position": 5
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6e9ada390be459fc3b90e",
+          "position": 6
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6e9ada390be459fc3b916",
+          "position": 7
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6e9ada390be459fc3b91e",
+          "position": 8
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/zhivopis-guash-krasnoyarsk-2",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 9,
+      "activeEvents": 7
+    },
+    {
+      "id": "46a38408-fd33-4be5-9870-3a99783122cd",
+      "slug": "iskusstvo-biseropleteniya-sozdaem-figurki-krasnoyarsk",
+      "title": "Искусство бисероплетения: создаём фигурки",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Искусство бисероплетения: создаём фигурки",
+      "seoTitle": "Искусство бисероплетения: создаём фигурки | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af6d87423ffb9f755c3b8d6",
+          "position": 0
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6d87423ffb9f755c3b8de",
+          "position": 1
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6d87523ffb9f755c3b8e6",
+          "position": 2
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6d87523ffb9f755c3b8ee",
+          "position": 3
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6d87623ffb9f755c3b8f6",
+          "position": 4
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6d87623ffb9f755c3b8fe",
+          "position": 5
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6d87723ffb9f755c3b906",
+          "position": 6
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6d87723ffb9f755c3b90e",
+          "position": 7
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6d87823ffb9f755c3b916",
+          "position": 8
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6d87823ffb9f755c3b91e",
+          "position": 9
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6d87923ffb9f755c3b926",
+          "position": 10
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6d87923ffb9f755c3b92e",
+          "position": 11
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6d87923ffb9f755c3b936",
+          "position": 12
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/iskusstvo-biseropleteniya-sozdaem-figurki-krasnoyarsk",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 13,
+      "activeEvents": 13
+    },
+    {
+      "id": "0f3dd70e-7694-41a4-b882-7bd1664e2857",
+      "slug": "magiya-cveta-i-sveta-krasnoyarsk",
+      "title": "«Магия цвета и света»",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "«Магия цвета и света»",
+      "seoTitle": "«Магия цвета и света» | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af6c942a567b35d6da6f2a2",
+          "position": 0
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c943a567b35d6da6f2aa",
+          "position": 1
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c943a567b35d6da6f2b2",
+          "position": 2
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c944a567b35d6da6f2ba",
+          "position": 3
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c944a567b35d6da6f2c2",
+          "position": 4
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c944a567b35d6da6f2ca",
+          "position": 5
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c945a567b35d6da6f2d2",
+          "position": 6
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c945a567b35d6da6f2da",
+          "position": 7
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c946a567b35d6da6f2e2",
+          "position": 8
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c946a567b35d6da6f2ea",
+          "position": 9
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c947a567b35d6da6f2f2",
+          "position": 10
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c947a567b35d6da6f2fa",
+          "position": 11
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c947a567b35d6da6f302",
+          "position": 12
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c948a567b35d6da6f30a",
+          "position": 13
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c948a567b35d6da6f312",
+          "position": 14
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c948a567b35d6da6f31a",
+          "position": 15
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c949a567b35d6da6f322",
+          "position": 16
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c949a567b35d6da6f32a",
+          "position": 17
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c94aa567b35d6da6f332",
+          "position": 18
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/magiya-cveta-i-sveta-krasnoyarsk",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 19,
+      "activeEvents": 19
+    },
+    {
+      "id": "a41e49de-e14b-434a-8629-7da00b43a2b9",
+      "slug": "tekstilnaya-mozaika-krasnoyarsk",
+      "title": "«Текстильная мозаика»",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "«Текстильная мозаика»",
+      "seoTitle": "«Текстильная мозаика» | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af6c438719541e781a6f29e",
+          "position": 0
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c438719541e781a6f2a6",
+          "position": 1
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c439719541e781a6f2ae",
+          "position": 2
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c439719541e781a6f2b6",
+          "position": 3
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c439719541e781a6f2be",
+          "position": 4
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c43a719541e781a6f2c6",
+          "position": 5
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c43a719541e781a6f2ce",
+          "position": 6
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c43a719541e781a6f2d6",
+          "position": 7
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c43b719541e781a6f2de",
+          "position": 8
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c43b719541e781a6f2e6",
+          "position": 9
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c43c719541e781a6f2ee",
+          "position": 10
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c43c719541e781a6f2f6",
+          "position": 11
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c43c719541e781a6f2fe",
+          "position": 12
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c43d719541e781a6f306",
+          "position": 13
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c43d719541e781a6f30e",
+          "position": 14
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c43d719541e781a6f316",
+          "position": 15
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c43e719541e781a6f31e",
+          "position": 16
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c43e719541e781a6f326",
+          "position": 17
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6c43f719541e781a6f32e",
+          "position": 18
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/tekstilnaya-mozaika-krasnoyarsk",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 19,
+      "activeEvents": 19
+    },
+    {
+      "id": "44a6e267-f7b3-4d55-ac7b-24f19d3ffd20",
+      "slug": "cvetochnaya-masterskaya-krasnoyarsk",
+      "title": "Цветочная мастерская",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Цветочная мастерская",
+      "seoTitle": "Цветочная мастерская | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af6ce3cb76710fedda6f2a5",
+          "position": 0
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6ce3db76710fedda6f2ad",
+          "position": 1
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6ce3db76710fedda6f2b5",
+          "position": 2
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6ce3eb76710fedda6f2bd",
+          "position": 3
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6ce3eb76710fedda6f2c5",
+          "position": 4
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6ce3eb76710fedda6f2cd",
+          "position": 5
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6ce3fb76710fedda6f2d5",
+          "position": 6
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6ce3fb76710fedda6f2dd",
+          "position": 7
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6ce3fb76710fedda6f2e5",
+          "position": 8
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6ce40b76710fedda6f2ed",
+          "position": 9
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6ce40b76710fedda6f2f5",
+          "position": 10
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6ce41b76710fedda6f2fd",
+          "position": 11
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6ce41b76710fedda6f305",
+          "position": 12
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6ce41b76710fedda6f30d",
+          "position": 13
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6ce42b76710fedda6f315",
+          "position": 14
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6ce42b76710fedda6f31d",
+          "position": 15
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6ce42b76710fedda6f325",
+          "position": 16
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6ce43b76710fedda6f32d",
+          "position": 17
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6ce43b76710fedda6f335",
+          "position": 18
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6ce44b76710fedda6f33d",
+          "position": 19
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6ce44b76710fedda6f345",
+          "position": 20
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6ce44b76710fedda6f34d",
+          "position": 21
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6ce45b76710fedda6f355",
+          "position": 22
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6ce45b76710fedda6f35d",
+          "position": 23
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6ce46b76710fedda6f365",
+          "position": 24
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/cvetochnaya-masterskaya-krasnoyarsk",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 25,
+      "activeEvents": 25
+    },
+    {
+      "id": "90d70b68-d7e7-49da-b0cd-72eb8ce9d58c",
+      "slug": "pikselnaya-palitra-krasnoyarsk",
+      "title": "«Пиксельная палитра»",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "«Пиксельная палитра»",
+      "seoTitle": "«Пиксельная палитра» | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af6debbbc8ec64e97c3b8e2",
+          "position": 0
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6debcbc8ec64e97c3b8ea",
+          "position": 1
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6debcbc8ec64e97c3b8f2",
+          "position": 2
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6debdbc8ec64e97c3b8fa",
+          "position": 3
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6debdbc8ec64e97c3b902",
+          "position": 4
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6debdbc8ec64e97c3b90a",
+          "position": 5
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6debebc8ec64e97c3b912",
+          "position": 6
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6debebc8ec64e97c3b91a",
+          "position": 7
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6debebc8ec64e97c3b922",
+          "position": 8
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6debfbc8ec64e97c3b92a",
+          "position": 9
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6debfbc8ec64e97c3b932",
+          "position": 10
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6dec0bc8ec64e97c3b93a",
+          "position": 11
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6dec0bc8ec64e97c3b942",
+          "position": 12
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6dec0bc8ec64e97c3b94a",
+          "position": 13
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6dec1bc8ec64e97c3b952",
+          "position": 14
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6dec1bc8ec64e97c3b95a",
+          "position": 15
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6dec2bc8ec64e97c3b962",
+          "position": 16
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6dec2bc8ec64e97c3b96a",
+          "position": 17
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af6dec2bc8ec64e97c3b972",
+          "position": 18
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/pikselnaya-palitra-krasnoyarsk",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 19,
+      "activeEvents": 18
+    },
+    {
+      "id": "753b5335-468c-462f-9885-d41d6581d78b",
+      "slug": "dvoinoi-stendap-krasnoyarsk",
+      "title": "Двойной стендап",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Двойной стендап",
+      "seoTitle": "Двойной стендап | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6afa5894a18dff8236c3b8ce",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/dvoinoi-stendap-krasnoyarsk",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "42202822-9b8b-4a83-a49b-4c90edb63e17",
+      "slug": "stendap-i-dzhaz-perm",
+      "title": "Стендап и Джаз",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Стендап и Джаз",
+      "seoTitle": "Стендап и Джаз | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af9ab6df625d206678c90a6",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/stendap-i-dzhaz-perm",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "08588ca2-0fa2-4c6c-adca-4a4e758bec4b",
+      "slug": "muzykalnoe-loto-muzykalnyi-kviz-shou-vecher-v-papa-s-22-noyabrya-vs-moskva",
+      "title": "МУЗЫКАЛЬНОЕ ЛОТО + МУЗЫКАЛЬНЫЙ КВИЗ | Шоу-вечер в PAPA’S | 22 ноября (вс)",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "МУЗЫКАЛЬНОЕ ЛОТО + МУЗЫКАЛЬНЫЙ КВИЗ | Шоу-вечер в PAPA’S | 22 ноября (вс)",
+      "seoTitle": "МУЗЫКАЛЬНОЕ ЛОТО + МУЗЫКАЛЬНЫЙ КВИЗ | Шоу-вечер в PAPA’S | 22 ноября (вс) | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af967da140bb5d2dd14ee52",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/muzykalnoe-loto-muzykalnyi-kviz-shou-vecher-v-papa-s-22-noyabrya-vs-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "137abe58-a7c7-4525-b034-69ac3f1f4c4b",
+      "slug": "kvartirnik-po-italyanski-pri-svechah-sankt-peterburg",
+      "title": "Квартирник по-итальянски при свечах",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Квартирник по-итальянски при свечах",
+      "seoTitle": "Квартирник по-итальянски при свечах | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af98513dc58514d0fb9f7b9",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/kvartirnik-po-italyanski-pri-svechah-sankt-peterburg",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "85f0a27e-1879-4191-a2db-6db0f702d60a",
+      "slug": "vecher-magii-kemerovo",
+      "title": "Вечер магии",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Вечер магии",
+      "seoTitle": "Вечер магии | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af1ff403bae2a0bf05546c6",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/vecher-magii-kemerovo",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "b95cb08c-e1b1-43cc-817e-c7c44b8785cf",
+      "slug": "akusticheskii-kaver-koncert-iz-pesen-nautilus-pompilius-splin-i-mumii-troll-smolensk",
+      "title": "Акустический кавер-концерт из песен Наутилус Помпилиус, СПЛИН и Мумий Тролль",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Акустический кавер-концерт из песен Наутилус Помпилиус, СПЛИН и Мумий Тролль",
+      "seoTitle": "Акустический кавер-концерт из песен Наутилус Помпилиус, СПЛИН и Мумий Тролль | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6afa5fbcf3f4aaaa84dad4ea",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/akusticheskii-kaver-koncert-iz-pesen-nautilus-pompilius-splin-i-mumii-troll-smolensk",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "ccdc1b85-1b0d-43ee-8237-cf6a7d8ab068",
+      "slug": "razgovor-s-psihologom-ryazan",
+      "title": "Разговор с психологом",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Разговор с психологом",
+      "seoTitle": "Разговор с психологом | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af9a1fcb31db51416bfd47f",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/razgovor-s-psihologom-ryazan",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "4bd5e818-562d-497c-a808-ccfdc6070766",
+      "slug": "anime-podkast-ekaterinburg",
+      "title": "Аниме подкаст",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Аниме подкаст",
+      "seoTitle": "Аниме подкаст | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af6ec1a6cab0ce28336622a",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/anime-podkast-ekaterinburg",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "69497c0d-10b6-4e2a-a86d-698b75fe6345",
+      "slug": "kovalski-storona-b-aleksandr-ulanov-samara",
+      "title": "Ковальски: сторона Б | Александр Уланов",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Ковальски: сторона Б | Александр Уланов",
+      "seoTitle": "Ковальски: сторона Б | Александр Уланов | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af9d97f228033ea92fade1c",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/kovalski-storona-b-aleksandr-ulanov-samara",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "54bb87ff-86c5-4967-bc80-5b07e01041ed",
+      "slug": "pyat-uglov-sankt-peterburg",
+      "title": "\"Пять углов\"",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "\"Пять углов\"",
+      "seoTitle": "\"Пять углов\" | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af6b49705cf784f325ba4ff",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/pyat-uglov-sankt-peterburg",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "5a32edb8-ec07-421a-a595-1f10d2118abd",
+      "slug": "eduard-asadov-ya-mogu-tebya-ochen-zhdat-bolshoi-vecher-poezii-sankt-peterburg-2",
+      "title": "Эдуард Асадов. «Я могу тебя очень ждать...». Большой вечер поэзии",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Эдуард Асадов. «Я могу тебя очень ждать...». Большой вечер поэзии",
+      "seoTitle": "Эдуард Асадов. «Я могу тебя очень ждать...». Большой вечер поэзии | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af98d800fd865d6a5015813",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/eduard-asadov-ya-mogu-tebya-ochen-zhdat-bolshoi-vecher-poezii-sankt-peterburg-2",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "38ccdc6c-71d7-4b00-aaef-24036de3c715",
+      "slug": "scenicheskaya-rech-dyshim-artikuliruem-govorim-sankt-peterburg",
+      "title": "Сценическая речь: дышим, артикулируем, говорим",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Сценическая речь: дышим, артикулируем, говорим",
+      "seoTitle": "Сценическая речь: дышим, артикулируем, говорим | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6aabbbc572a4c579567d830d",
+          "position": 0
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6aabbbc772a4c579567d8325",
+          "position": 1
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6aabbbc772a4c579567d831d",
+          "position": 2
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6aabbbc672a4c579567d8315",
+          "position": 3
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af98027192fe7cd0cc3b8dc",
+          "position": 4
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af98027192fe7cd0cc3b8d4",
+          "position": 5
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af98026192fe7cd0cc3b8cc",
+          "position": 6
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/scenicheskaya-rech-dyshim-artikuliruem-govorim-sankt-peterburg",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 7,
+      "activeEvents": 5
+    },
+    {
+      "id": "ad1af851-8f46-4af7-a65e-4fbedbed3dc4",
+      "slug": "anatolii-borozdin-stendap-koncert-9-dekabrya-21-30-sankt-peterburg",
+      "title": "Анатолий Бороздин | Стендап-концерт / 9 декабря / 21:30",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Анатолий Бороздин | Стендап-концерт / 9 декабря / 21:30",
+      "seoTitle": "Анатолий Бороздин | Стендап-концерт / 9 декабря / 21:30 | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af9f5eaf349936836db0a87",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/anatolii-borozdin-stendap-koncert-9-dekabrya-21-30-sankt-peterburg",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "95cffece-5a30-4ad2-86d2-597eb56bf578",
+      "slug": "vlyublennyi-v-shekspir-sankt-peterburg",
+      "title": "\"Влюбленный в...Шекспир\"",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "\"Влюбленный в...Шекспир\"",
+      "seoTitle": "\"Влюбленный в...Шекспир\" | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af6b58aa2208bbf53e629c9",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/vlyublennyi-v-shekspir-sankt-peterburg",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "93658409-a373-4c54-9c8c-027ff52e7c76",
+      "slug": "real-jam-jazz-band-happy-holiday-moskva",
+      "title": "REAL JAM JAZZ BAND: «HAPPY HOLIDAY!»",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "REAL JAM JAZZ BAND: «HAPPY HOLIDAY!»",
+      "seoTitle": "REAL JAM JAZZ BAND: «HAPPY HOLIDAY!» | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6afa0d522dbc22c68890d662",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/real-jam-jazz-band-happy-holiday-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "0a354b9f-58ce-4e9d-b849-6ca5aa8e3008",
+      "slug": "spektakl-performans-gosti-ekaterinburg-2",
+      "title": "Спектакль-перформанс «Гости»",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Спектакль-перформанс «Гости»",
+      "seoTitle": "Спектакль-перформанс «Гости» | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af6f3eb1a599ecdb0331450",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/spektakl-performans-gosti-ekaterinburg-2",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "1cdf21db-a2a8-48e8-a67d-908ce887fe17",
+      "slug": "ioannis-kofopulos-i-grekobanda-moskva",
+      "title": "ИОАННИС КОФОПУЛОС И «ГРЕКОБАНДА»",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "ИОАННИС КОФОПУЛОС И «ГРЕКОБАНДА»",
+      "seoTitle": "ИОАННИС КОФОПУЛОС И «ГРЕКОБАНДА» | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6afa0f3a6e33013422dbf182",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/ioannis-kofopulos-i-grekobanda-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "4b7a0c72-46e3-4c65-984c-db20f19241e4",
+      "slug": "lisenok-lyudvig-6-sankt-peterburg",
+      "title": "«Лисенок Людвиг», 6+",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "«Лисенок Людвиг», 6+",
+      "seoTitle": "«Лисенок Людвиг», 6+ | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af6b7e7204193b0c661624f",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/lisenok-lyudvig-6-sankt-peterburg",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "85f8c680-3bb8-489c-b4d0-78eacc1618a2",
+      "slug": "zhizn-prekrasna-sankt-peterburg",
+      "title": "«Жизнь прекрасна»",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "«Жизнь прекрасна»",
+      "seoTitle": "«Жизнь прекрасна» | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af6b61e462bb3c69875f12c",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/zhizn-prekrasna-sankt-peterburg",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "5284f478-2179-4b01-bb79-bb596529f7bd",
+      "slug": "nu-novyi-god-pogodi-sankt-peterburg-2",
+      "title": "Ну, Новый год, погоди!",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Ну, Новый год, погоди!",
+      "seoTitle": "Ну, Новый год, погоди! | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af84b838bd3aa8104c3b8d1",
+          "position": 0
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af84b838bd3aa8104c3ba24",
+          "position": 1
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af84b848bd3aa8104c3bb77",
+          "position": 2
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af84b858bd3aa8104c3bcca",
+          "position": 3
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af84b868bd3aa8104c3be1d",
+          "position": 4
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af84b878bd3aa8104c3bf70",
+          "position": 5
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af84b888bd3aa8104c3c0c3",
+          "position": 6
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af84b898bd3aa8104c3c216",
+          "position": 7
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af84b898bd3aa8104c3c369",
+          "position": 8
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/nu-novyi-god-pogodi-sankt-peterburg-2",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 9,
+      "activeEvents": 9
+    },
+    {
+      "id": "06c1eb15-3e16-47df-b2ff-a1794cdd959f",
+      "slug": "yubileinyi-festival-a2-show-2027-penza",
+      "title": "Юбилейный фестиваль A2 SHOW 2027",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Юбилейный фестиваль A2 SHOW 2027",
+      "seoTitle": "Юбилейный фестиваль A2 SHOW 2027 | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af860a7ea5b50538c1a110e",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/yubileinyi-festival-a2-show-2027-penza",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "30c44674-befa-45d9-aa3b-ab13997fb1dd",
+      "slug": "romeo-i-dzhuletta-sankt-peterburg",
+      "title": "Ромео и Джульетта",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Ромео и Джульетта",
+      "seoTitle": "Ромео и Джульетта | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af6114f5f5ea07917a8bf87",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/romeo-i-dzhuletta-sankt-peterburg",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "b504a4c7-27ed-4dd8-ad66-f65b7d9cead5",
+      "slug": "lekciya-dismaland-antidisnei-benksi-sankt-peterburg",
+      "title": "Лекция. Dismaland: антиДисней Бэнкси",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Лекция. Dismaland: антиДисней Бэнкси",
+      "seoTitle": "Лекция. Dismaland: антиДисней Бэнкси | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6aa400f63ced9efa07cb91ec",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/lekciya-dismaland-antidisnei-benksi-sankt-peterburg",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "d57323cf-3c7f-4a7b-bb55-e08f8dc7e8e4",
+      "slug": "interaktivnyi-spektakl-aibolit-ot-2-5-do-6-let-sankt-peterburg",
+      "title": "Интерактивный спектакль \"Айболит\" от 2,5 до 6 лет",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Интерактивный спектакль \"Айболит\" от 2,5 до 6 лет",
+      "seoTitle": "Интерактивный спектакль \"Айболит\" от 2,5 до 6 лет | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ac41f3ca4d4a7dd1c5f1ee2",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/interaktivnyi-spektakl-aibolit-ot-2-5-do-6-let-sankt-peterburg",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "c955b520-360a-41fb-bf25-ac3ffb361210",
+      "slug": "bulat-okudzhava-chasovye-lyubvi-sankt-peterburg-3",
+      "title": "Булат Окуджава. «Часовые любви»",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Булат Окуджава. «Часовые любви»",
+      "seoTitle": "Булат Окуджава. «Часовые любви» | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af9873ef3f7a97c61a79f43",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/bulat-okudzhava-chasovye-lyubvi-sankt-peterburg-3",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "0dd86344-ae73-4eb7-a99a-066711830613",
+      "slug": "denis-gvozdev-ryazan",
+      "title": "Денис Гвоздев",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Денис Гвоздев",
+      "seoTitle": "Денис Гвоздев | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af9ab7d305c19b188cb03e2",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/denis-gvozdev-ryazan",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "ed4fafe9-f61c-4b45-b422-99410cbd7ae3",
+      "slug": "pavel-kashin-smolensk",
+      "title": "Павел Кашин",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Павел Кашин",
+      "seoTitle": "Павел Кашин | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6afa58e202bcaf209c007b30",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/pavel-kashin-smolensk",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "485afa82-478f-4643-852f-119882acadd6",
+      "slug": "s6teen-seattle-16-25-let-moskva",
+      "title": "S6TEEN (Seattle 16) 25 лет",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "S6TEEN (Seattle 16) 25 лет",
+      "seoTitle": "S6TEEN (Seattle 16) 25 лет | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af5fcd8eea1615be0ca1226",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/s6teen-seattle-16-25-let-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "cf4ae802-cf9c-45e8-9802-c8a137fe9f43",
+      "slug": "the-big-livers-rock-n-roll-show-sankt-peterburg",
+      "title": "The Big Livers Rock-n-Roll Show",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "The Big Livers Rock-n-Roll Show",
+      "seoTitle": "The Big Livers Rock-n-Roll Show | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af2c6c9d39f78d9aeac04d3",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/the-big-livers-rock-n-roll-show-sankt-peterburg",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "3be3a5c6-f338-4aaa-b5a8-4182bc0ac201",
+      "slug": "bahyt-kompot-moskva-3",
+      "title": "БАХЫТ-КОМПОТ",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "БАХЫТ-КОМПОТ",
+      "seoTitle": "БАХЫТ-КОМПОТ | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af9b0ebd9f81a30e4d3a09b",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/bahyt-kompot-moskva-3",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "e9d4b6d3-7865-4a47-8cae-23a22874c891",
+      "slug": "spektakl-moi-paren-shtyk-moskva",
+      "title": "Спектакль Мой парень штык",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Спектакль Мой парень штык",
+      "seoTitle": "Спектакль Мой парень штык | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af9e108f526e3a86bafa571",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/spektakl-moi-paren-shtyk-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "2a6785f1-a57e-496d-b305-0c43c1eb203d",
+      "slug": "mamulki-bend-v-live-stars-moskva",
+      "title": "Мамульки Bend в Live Stars",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Мамульки Bend в Live Stars",
+      "seoTitle": "Мамульки Bend в Live Stars | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af725d5b84ec4f8bd339322",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/mamulki-bend-v-live-stars-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "07d819e4-d0d5-4559-bb6f-5e3dd5676ea9",
+      "slug": "tatyana-zykina-moskva",
+      "title": "Татьяна Зыкина",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Татьяна Зыкина",
+      "seoTitle": "Татьяна Зыкина | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af9b63b947f23b2141723a4",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/tatyana-zykina-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "95476056-67c5-486e-bea6-a6316ad38914",
+      "slug": "horonko-orkestr-moskva",
+      "title": "Хоронько Оркестр",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Хоронько Оркестр",
+      "seoTitle": "Хоронько Оркестр | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af9ba86c935749a57826042",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/horonko-orkestr-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "dd5eae6a-c9ca-4ef8-bc37-2aad3ca529e0",
+      "slug": "mirovye-i-rozhdestvenskie-hity-v-simfonicheskom-zvuchanii-na-teploi-kryshe-koncert-imperialis-orche-moskva",
+      "title": "Мировые и Рождественские хиты в Симфоническом звучании на Теплой Крыше / Концерт Imperialis Orchestra",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Мировые и Рождественские хиты в Симфоническом звучании на Теплой Крыше / Концерт Imperialis Orchestra",
+      "seoTitle": "Мировые и Рождественские хиты в Симфоническом звучании на Теплой Крыше / Концерт Imperialis Orchestra | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af8684a36ed1f6d222459cf",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/mirovye-i-rozhdestvenskie-hity-v-simfonicheskom-zvuchanii-na-teploi-kryshe-koncert-imperialis-orche-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "735f5f60-a1cd-4c84-9d24-f50397dd2d44",
+      "slug": "strannaya-miss-sevidzh-ekaterinburg",
+      "title": "Странная мисс Сэвидж",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Странная мисс Сэвидж",
+      "seoTitle": "Странная мисс Сэвидж | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ad3acc1f79eabe6aef59b85",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/strannaya-miss-sevidzh-ekaterinburg",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "57d63f26-baf6-4a3e-b839-ede475a16f4f",
+      "slug": "esenin-teatr-v-pabe-chelyabinsk",
+      "title": "Есенин. Театр в пабе",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Есенин. Театр в пабе",
+      "seoTitle": "Есенин. Театр в пабе | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ac750dfae4ab86694e82b54",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/esenin-teatr-v-pabe-chelyabinsk",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "37e188d2-fee5-463d-a927-d77e38639991",
+      "slug": "mify-i-tainy-istorii-lektorii-s-glebom-aleksushinym-dostizheniya-i-nedostatki-sovetskogo-turizma-b-samara",
+      "title": "Мифы и тайны истории | лекторий с Глебом Алексушиным. Достижения и недостатки советского туризма: были ли раньше деревья большими?",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Мифы и тайны истории | лекторий с Глебом Алексушиным. Достижения и недостатки советского туризма: были ли раньше деревья большими?",
+      "seoTitle": "Мифы и тайны истории | лекторий с Глебом Алексушиным. Достижения и недостатки советского туризма: были ли раньше деревья большими? | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ae8bbed22e9a7ae8278ae11",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/mify-i-tainy-istorii-lektorii-s-glebom-aleksushinym-dostizheniya-i-nedostatki-sovetskogo-turizma-b-samara",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "d931018a-6870-4614-9945-7b25c39b028a",
+      "slug": "ekskursiya-v-osobnyak-zimina-moskva-2",
+      "title": "Экскурсия в особняк Зимина",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Экскурсия в особняк Зимина",
+      "seoTitle": "Экскурсия в особняк Зимина | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ae214e35088c685fcfdbd7b",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/ekskursiya-v-osobnyak-zimina-moskva-2",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "bae0dee6-1902-4b65-949f-1cbb7bf1c8ef",
+      "slug": "blistatelnyi-sankt-peterburg",
+      "title": "Блистательный Санкт-Петербург",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Блистательный Санкт-Петербург",
+      "seoTitle": "Блистательный Санкт-Петербург | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ad374cd76739261465169c6",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/blistatelnyi-sankt-peterburg",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "3921737a-3ab2-4f64-8ad4-dc50ece9e841",
+      "slug": "balet-schelkunchik-sankt-peterburg-12",
+      "title": "Балет «Щелкунчик»",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Балет «Щелкунчик»",
+      "seoTitle": "Балет «Щелкунчик» | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ac5f2946bc57f430ecb7145",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/balet-schelkunchik-sankt-peterburg-12",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "c68fb313-8e87-4ff3-ab4b-6b0c90e90e53",
+      "slug": "alexander-dovgopoly-project-moskva",
+      "title": "ALEXANDER DOVGOPOLY PROJECT",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "ALEXANDER DOVGOPOLY PROJECT",
+      "seoTitle": "ALEXANDER DOVGOPOLY PROJECT | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ac8dbda3d90cc52e14e9f0d",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/alexander-dovgopoly-project-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "f7d48418-c9b3-4e4e-89f5-dab115813029",
+      "slug": "koncert-kamernyi-orkestr-igorya-lermana-v-den-rozhdeniya-naberezhnye-chelny",
+      "title": "Концерт «Камерный оркестр Игоря Лермана. В День рождения!»",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Концерт «Камерный оркестр Игоря Лермана. В День рождения!»",
+      "seoTitle": "Концерт «Камерный оркестр Игоря Лермана. В День рождения!» | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af732a33eea1c18b007388b",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/koncert-kamernyi-orkestr-igorya-lermana-v-den-rozhdeniya-naberezhnye-chelny",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "f1003ce7-a336-41e7-b512-b2dc15aa5f48",
+      "slug": "moscow-ragtime-band-moskva-2",
+      "title": "MOSCOW RAGTIME BAND",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "MOSCOW RAGTIME BAND",
+      "seoTitle": "MOSCOW RAGTIME BAND | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6abfcd8218083a6fda9ccd25",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/moscow-ragtime-band-moskva-2",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "c02fff08-9393-4d65-a5c3-2cfacc236d3c",
+      "slug": "tal-babickii-izrail-i-dzhazovyi-orkestr-denisa-melnikova-moskva",
+      "title": "ТАЛЬ БАБИЦКИЙ (ИЗРАИЛЬ) И ДЖАЗОВЫЙ ОРКЕСТР ДЕНИСА МЕЛЬНИКОВА",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "ТАЛЬ БАБИЦКИЙ (ИЗРАИЛЬ) И ДЖАЗОВЫЙ ОРКЕСТР ДЕНИСА МЕЛЬНИКОВА",
+      "seoTitle": "ТАЛЬ БАБИЦКИЙ (ИЗРАИЛЬ) И ДЖАЗОВЫЙ ОРКЕСТР ДЕНИСА МЕЛЬНИКОВА | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6abfe0d8166f8dbe21db4c0c",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/tal-babickii-izrail-i-dzhazovyi-orkestr-denisa-melnikova-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "022fdad7-3bb6-4741-9979-bf71dc6cb8bd",
+      "slug": "muzyka-ostrovov-aleksei-chichilin-island-music-iii-kuba-moskva",
+      "title": "Музыка островов | Алексей Чичилин – Island music III: Куба",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Музыка островов | Алексей Чичилин – Island music III: Куба",
+      "seoTitle": "Музыка островов | Алексей Чичилин – Island music III: Куба | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ad5327cc3247089669df790",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/muzyka-ostrovov-aleksei-chichilin-island-music-iii-kuba-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "bc71220f-3ef0-4622-a3f1-ca9884c9e32f",
+      "slug": "koncert-gurude-serdce-dreva-krasnoyarsk",
+      "title": "Концерт GURUDE \"Сердце древа\"",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Концерт GURUDE \"Сердце древа\"",
+      "seoTitle": "Концерт GURUDE \"Сердце древа\" | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6a99b03df5e8bfce87f70386",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/koncert-gurude-serdce-dreva-krasnoyarsk",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "fc1e7cb8-38ca-4493-acfb-117b07b00e65",
+      "slug": "blyuzovyi-dzhem-s-rok-bendom-the-lagoon-krasnoyarsk",
+      "title": "Блюзовый джем с рок-бэндом The Lagoon",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Блюзовый джем с рок-бэндом The Lagoon",
+      "seoTitle": "Блюзовый джем с рок-бэндом The Lagoon | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ae8507a5035667e9b518ab3",
+          "position": 0
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6ae8507b5035667e9b518b03",
+          "position": 1
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/blyuzovyi-dzhem-s-rok-bendom-the-lagoon-krasnoyarsk",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 2,
+      "activeEvents": 1
+    },
+    {
+      "id": "14e8658b-ec6b-49e6-8281-7d4c843a1c80",
+      "slug": "plumbum-dreams-tribyut-led-zeppelin-moskva",
+      "title": "Plumbum Dreams - трибьют \"LED ZEPPELIN\"",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Plumbum Dreams - трибьют \"LED ZEPPELIN\"",
+      "seoTitle": "Plumbum Dreams - трибьют \"LED ZEPPELIN\" | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ad8694302f66ab85e5cb10d",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/plumbum-dreams-tribyut-led-zeppelin-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "5c13fd39-ac6b-49c9-8ec7-b2c9f9cdfe57",
+      "slug": "sasha-rastich-7-rasa-19-11-staryi-park-ryazan",
+      "title": "Саша РАСТИЧ / 7 РАСА - 19.11 - СТАРЫЙ ПАРК",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Саша РАСТИЧ / 7 РАСА - 19.11 - СТАРЫЙ ПАРК",
+      "seoTitle": "Саша РАСТИЧ / 7 РАСА - 19.11 - СТАРЫЙ ПАРК | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6a9ea860c9f27e0538d88724",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/sasha-rastich-7-rasa-19-11-staryi-park-ryazan",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "8c82fd67-862d-41d8-86a2-48f6eda999bd",
+      "slug": "ekskursiya-v-muzei-kvartiru-golovanova-i-kabinet-nezhdanovoi-moskva",
+      "title": "Экскурсия в музей-квартиру Голованова и кабинет Неждановой",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Экскурсия в музей-квартиру Голованова и кабинет Неждановой",
+      "seoTitle": "Экскурсия в музей-квартиру Голованова и кабинет Неждановой | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6acf63f30545ab9682136c5e",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/ekskursiya-v-muzei-kvartiru-golovanova-i-kabinet-nezhdanovoi-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "e7aa27cd-0a80-41b0-b542-14b66a6aaee6",
+      "slug": "otpetye-moshenniki-sankt-peterburg",
+      "title": "Отпетые мошенники",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Отпетые мошенники",
+      "seoTitle": "Отпетые мошенники | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6a86fe973af6fae0ea59d9bd",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/otpetye-moshenniki-sankt-peterburg",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "ade168f7-ba65-4cd8-9fc9-1f7dfbaf1a5b",
+      "slug": "kosmicheskii-dzhaz-sade-sankt-peterburg",
+      "title": "Космический джаз: Sade",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Космический джаз: Sade",
+      "seoTitle": "Космический джаз: Sade | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6aa2c9f5eaaa507eba576534",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/kosmicheskii-dzhaz-sade-sankt-peterburg",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "d592143a-1d01-4b97-a358-0c3ca73696c8",
+      "slug": "novodevichii-monastyr-na-perekrestke-carskih-sudeb-moskva",
+      "title": "Новодевичий монастырь: на перекрестке царских судеб",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Новодевичий монастырь: на перекрестке царских судеб",
+      "seoTitle": "Новодевичий монастырь: на перекрестке царских судеб | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ac8dc8fc36bbc1be0a54f13",
+          "position": 0
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6ac8f05a9ed275412a58138c",
+          "position": 1
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6a9bd1f840eb7bf93e9dce9a",
+          "position": 2
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6a9bd1f640eb7bf93e9dce88",
+          "position": 3
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6a9bd1f440eb7bf93e9dce76",
+          "position": 4
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6a9bd1f240eb7bf93e9dce64",
+          "position": 5
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6a9bd1f140eb7bf93e9dce52",
+          "position": 6
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6a9bd1ee40eb7bf93e9dce40",
+          "position": 7
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6a9bd1ec40eb7bf93e9dce2e",
+          "position": 8
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6a53583d8d92a7d20f63ceae",
+          "position": 9
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6a53583b8d92a7d20f63ce9c",
+          "position": 10
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6a5358398d92a7d20f63ce8a",
+          "position": 11
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6a5358378d92a7d20f63ce78",
+          "position": 12
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6a5358358d92a7d20f63ce66",
+          "position": 13
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6a5358338d92a7d20f63ce54",
+          "position": 14
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6a5358318d92a7d20f63ce42",
+          "position": 15
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6a53582f8d92a7d20f63ce30",
+          "position": 16
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6a51ffe50344995cb1150132",
+          "position": 17
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6a51ffe30344995cb1150120",
+          "position": 18
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6a51ffe10344995cb115010e",
+          "position": 19
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6a51ffe00344995cb11500fc",
+          "position": 20
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6a51ffde0344995cb11500ea",
+          "position": 21
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6a51ffdc0344995cb11500d8",
+          "position": 22
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6a51ffdb0344995cb11500c6",
+          "position": 23
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6a51ffd90344995cb11500b4",
+          "position": 24
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6a51ffd60344995cb1150090",
+          "position": 25
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6a51ffd20344995cb115006c",
+          "position": 26
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6a51ffd00344995cb115005a",
+          "position": 27
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6a51ffcf0344995cb1150048",
+          "position": 28
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/novodevichii-monastyr-na-perekrestke-carskih-sudeb-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 29,
+      "activeEvents": 25
+    },
+    {
+      "id": "fdf9b77f-e846-46d6-83d4-82e74f9256af",
+      "slug": "anton-zaletaev-i-letnyi-sezon-moskva",
+      "title": "АНТОН ЗАЛЕТАЕВ И «ЛЁТНЫЙ СЕЗОН»",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "АНТОН ЗАЛЕТАЕВ И «ЛЁТНЫЙ СЕЗОН»",
+      "seoTitle": "АНТОН ЗАЛЕТАЕВ И «ЛЁТНЫЙ СЕЗОН» | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6abfdff444c0d778508ab5f8",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/anton-zaletaev-i-letnyi-sezon-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "1f95a6e8-0c7e-4d94-a59a-cf37c8ccc5ae",
+      "slug": "sergei-filatov-yurii-novgorodskii-mariya-vladimirskaya-moskva",
+      "title": "СЕРГЕЙ ФИЛАТОВ – ЮРИЙ НОВГОРОДСКИЙ – МАРИЯ ВЛАДИМИРСКАЯ",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "СЕРГЕЙ ФИЛАТОВ – ЮРИЙ НОВГОРОДСКИЙ – МАРИЯ ВЛАДИМИРСКАЯ",
+      "seoTitle": "СЕРГЕЙ ФИЛАТОВ – ЮРИЙ НОВГОРОДСКИЙ – МАРИЯ ВЛАДИМИРСКАЯ | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ad4e5436c6e1d0c62961770",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/sergei-filatov-yurii-novgorodskii-mariya-vladimirskaya-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "ab6beca5-3f08-4483-a9a8-c4cc28e7ef10",
+      "slug": "dmitrii-kazachkov-vecher-pamyati-nikolaya-arutyunova-moskva",
+      "title": "ДМИТРИЙ КАЗАЧКОВ: ВЕЧЕР ПАМЯТИ НИКОЛАЯ АРУТЮНОВА",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "ДМИТРИЙ КАЗАЧКОВ: ВЕЧЕР ПАМЯТИ НИКОЛАЯ АРУТЮНОВА",
+      "seoTitle": "ДМИТРИЙ КАЗАЧКОВ: ВЕЧЕР ПАМЯТИ НИКОЛАЯ АРУТЮНОВА | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ace2fbcd239b43f4005ea69",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/dmitrii-kazachkov-vecher-pamyati-nikolaya-arutyunova-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "770e3017-294d-44e9-a415-1361ee5fb735",
+      "slug": "festival-budnik-moskva",
+      "title": "Фестиваль Будник!",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Фестиваль Будник!",
+      "seoTitle": "Фестиваль Будник! | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ae1a9f925308047c3ac1dd4",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/festival-budnik-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "cbb23b24-32ce-40b7-b3d5-7978af8eae9f",
+      "slug": "minecraft-show-mainkraft-shou-moskva-2",
+      "title": "MINECRAFT SHOW - МАЙНКРАФТ ШОУ",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "MINECRAFT SHOW - МАЙНКРАФТ ШОУ",
+      "seoTitle": "MINECRAFT SHOW - МАЙНКРАФТ ШОУ | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ae37aae97cc76ccd33a4aa6",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/minecraft-show-mainkraft-shou-moskva-2",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "ae8b2900-03c2-46fd-839b-e550197d20cc",
+      "slug": "sofiya-acbeha-negga-moskva",
+      "title": "СОФИЯ АЦБЕХА НЕГГА",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "СОФИЯ АЦБЕХА НЕГГА",
+      "seoTitle": "СОФИЯ АЦБЕХА НЕГГА | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ab5b2ba1689cbe6f9504ab2",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/sofiya-acbeha-negga-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "b0386ae7-cdbd-4090-9632-be29567b4396",
+      "slug": "tvoi-prazdnik-sankt-peterburg",
+      "title": "Твой Праздник",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Твой Праздник",
+      "seoTitle": "Твой Праздник | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ac444fb90762689ae090655",
+          "position": 0
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6ac444fd90762689ae090667",
+          "position": 1
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/tvoi-prazdnik-sankt-peterburg",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 2,
+      "activeEvents": 2
+    },
+    {
+      "id": "f4d3c901-ccfa-4e09-ae32-aab00bcbb666",
+      "slug": "vivaldi-vremena-goda-sankt-peterburg-2",
+      "title": "Вивальди Времена года. Оркестр Феникс",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Вивальди Времена года. Оркестр Феникс",
+      "seoTitle": "Вивальди Времена года. Оркестр Феникс | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ab14cb7f0c61eb6e9b528ef",
+          "position": 0
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6ab14cbff0c61eb6e9b52b4f",
+          "position": 1
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6a9bc1d3c8016df43b9dcef5",
+          "position": 2
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6a9bc1cec8016df43b9dcdc5",
+          "position": 3
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/vivaldi-vremena-goda-sankt-peterburg-2",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 4,
+      "activeEvents": 3
+    },
+    {
+      "id": "8208560f-763f-4bf8-b59e-4668a6be0a44",
+      "slug": "sergei-dolzhenkov-new-blood-big-band-moskva",
+      "title": "СЕРГЕЙ ДОЛЖЕНКОВ & NEW BLOOD BIG BAND",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "СЕРГЕЙ ДОЛЖЕНКОВ & NEW BLOOD BIG BAND",
+      "seoTitle": "СЕРГЕЙ ДОЛЖЕНКОВ & NEW BLOOD BIG BAND | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6abfd88b3473ad14fd7c73a6",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/sergei-dolzhenkov-new-blood-big-band-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "a57828e5-eae4-48b7-a6cf-bb5560f4e138",
+      "slug": "nostalgiya-noyabrya-sankt-peterburg",
+      "title": "Ностальгия ноября",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Ностальгия ноября",
+      "seoTitle": "Ностальгия ноября | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6a952da5aae3094f9db4fe92",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/nostalgiya-noyabrya-sankt-peterburg",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "e668fc45-8241-481b-aea7-78d2d56adedf",
+      "slug": "trio-mihaila-kistanova-specialnyi-gost-vovka-kozhekin-garmoshka-moskva",
+      "title": "Трио Михаила Кистанова, специальный гость Вовка Кожекин (гармошка)",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Трио Михаила Кистанова, специальный гость Вовка Кожекин (гармошка)",
+      "seoTitle": "Трио Михаила Кистанова, специальный гость Вовка Кожекин (гармошка) | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ad86714c5fe6a0f542fbe7d",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/trio-mihaila-kistanova-specialnyi-gost-vovka-kozhekin-garmoshka-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "fa69ebab-d9e8-4853-916b-9a4f4ee977ca",
+      "slug": "aleks-abra-new-york-new-york-klassicheskii-dzhaz-s-yumorom-moskva",
+      "title": "Алекс Абра: New York New York. Классический джаз с юмором.",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Алекс Абра: New York New York. Классический джаз с юмором.",
+      "seoTitle": "Алекс Абра: New York New York. Классический джаз с юмором. | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ab231739cb10ab6f6ee6788",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/aleks-abra-new-york-new-york-klassicheskii-dzhaz-s-yumorom-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "46728f23-e067-4794-bb9d-3dc5c2bf4f3a",
+      "slug": "svetlana-zhavoronkova-secret-atelier-moskva",
+      "title": "СВЕТЛАНА ЖАВОРОНКОВА & SECRET ATELIER",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "СВЕТЛАНА ЖАВОРОНКОВА & SECRET ATELIER",
+      "seoTitle": "СВЕТЛАНА ЖАВОРОНКОВА & SECRET ATELIER | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6abfe33e47798c549d92835d",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/svetlana-zhavoronkova-secret-atelier-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "35ecdc52-99cf-48e4-8f68-0445fad10f69",
+      "slug": "bozhole-nuvo-2026-vecherinka-koncert-vo-francuzskom-stile-sankt-peterburg",
+      "title": "\"БОЖОЛЕ НУВО-2026\" Вечеринка-концерт во французском стиле",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "\"БОЖОЛЕ НУВО-2026\" Вечеринка-концерт во французском стиле",
+      "seoTitle": "\"БОЖОЛЕ НУВО-2026\" Вечеринка-концерт во французском стиле | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ac51145d61abda5fe00dc89",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/bozhole-nuvo-2026-vecherinka-koncert-vo-francuzskom-stile-sankt-peterburg",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "24683404-0c13-4ef0-be0a-08a49f61aa64",
+      "slug": "rok-hity-mtv-shou-koncert-sankt-peterburg",
+      "title": "\"РОК-ХИТЫ MTV\" ШОУ-КОНЦЕРТ",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "\"РОК-ХИТЫ MTV\" ШОУ-КОНЦЕРТ",
+      "seoTitle": "\"РОК-ХИТЫ MTV\" ШОУ-КОНЦЕРТ | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6a79cb35a76da46b435b99a1",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/rok-hity-mtv-shou-koncert-sankt-peterburg",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "fd1e0ab3-7fe9-490b-8b48-617410a6c303",
+      "slug": "stabat-mater-pergolezi-bah-muzyka-soborov-pri-svechah-moskva",
+      "title": "«STABAT MATER. Перголези • Бах. Музыка соборов при свечах»",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "«STABAT MATER. Перголези • Бах. Музыка соборов при свечах»",
+      "seoTitle": "«STABAT MATER. Перголези • Бах. Музыка соборов при свечах» | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ab24ec3174fa70a98492b01",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/stabat-mater-pergolezi-bah-muzyka-soborov-pri-svechah-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "6763d805-768a-494f-bca0-4a43be2c31a4",
+      "slug": "shopen-pri-svechah-sankt-peterburg",
+      "title": "Шопен при свечах",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Шопен при свечах",
+      "seoTitle": "Шопен при свечах | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6a0209d9f601f6cca92a0c33",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/shopen-pri-svechah-sankt-peterburg",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "d5757782-3d02-49d1-b4ce-ca2490b9c83d",
+      "slug": "praktiki-osoznannogo-vospriyatiya-iskusstva-zhanr-nyu-v-tvorchestve-andreya-pozdeeva-krasnoyarsk",
+      "title": "Практики осознанного восприятия искусства «Жанр «ню» в творчестве Андрея Поздеева»",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Практики осознанного восприятия искусства «Жанр «ню» в творчестве Андрея Поздеева»",
+      "seoTitle": "Практики осознанного восприятия искусства «Жанр «ню» в творчестве Андрея Поздеева» | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ab9f7d9bb2365b2301ad479",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/praktiki-osoznannogo-vospriyatiya-iskusstva-zhanr-nyu-v-tvorchestve-andreya-pozdeeva-krasnoyarsk",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "84982c8a-f122-4f99-a8aa-51f297386c59",
+      "slug": "izzotop-tribyut-zz-top-moskva",
+      "title": "IZZoTop - трибьют \"ZZ Top\"",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "IZZoTop - трибьют \"ZZ Top\"",
+      "seoTitle": "IZZoTop - трибьют \"ZZ Top\" | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6adc63380832de12efb53fcd",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/izzotop-tribyut-zz-top-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "2933256b-de03-4e72-94f7-b5066cd718bf",
+      "slug": "interaktivnyi-spektakl-muha-cokotuha-ot-2-do-6-let-sankt-peterburg-3",
+      "title": "Интерактивный спектакль \"Муха Цокотуха \" от 2 до 6 лет",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Интерактивный спектакль \"Муха Цокотуха \" от 2 до 6 лет",
+      "seoTitle": "Интерактивный спектакль \"Муха Цокотуха \" от 2 до 6 лет | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ac42347dbcd6b44e4973f08",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/interaktivnyi-spektakl-muha-cokotuha-ot-2-do-6-let-sankt-peterburg-3",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "e254a913-4db0-4c60-b6d5-dfd75533824a",
+      "slug": "strunnoe-svetovoe-shou-moskva",
+      "title": "Струнное световое шоу",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Струнное световое шоу",
+      "seoTitle": "Струнное световое шоу | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6a55f7a23bdaed105e2e6cb6",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/strunnoe-svetovoe-shou-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "246b5ec6-907e-4869-9874-f784aba416d8",
+      "slug": "legendarnye-hity-90-h-i-2000-h-muzykalnyi-vecher-nad-moskvoi-moskva",
+      "title": "Легендарные хиты 90-х и 2000-х. Музыкальный вечер над Москвой",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Легендарные хиты 90-х и 2000-х. Музыкальный вечер над Москвой",
+      "seoTitle": "Легендарные хиты 90-х и 2000-х. Музыкальный вечер над Москвой | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ae31a1322674d3e5631af8d",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/legendarnye-hity-90-h-i-2000-h-muzykalnyi-vecher-nad-moskvoi-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "557647e0-0dda-4eca-bcd4-6eebfa8ccf2f",
+      "slug": "yaponskii-vecher-dlya-dvoih-krasnoyarsk",
+      "title": "«Японский вечер для двоих»",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "«Японский вечер для двоих»",
+      "seoTitle": "«Японский вечер для двоих» | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ac0dd24d1480ff5e9f959cd",
+          "position": 0
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6ac0dd26d1480ff5e9f959dd",
+          "position": 1
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6ac0dd26d1480ff5e9f959e5",
+          "position": 2
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6ac0dd27d1480ff5e9f959ed",
+          "position": 3
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6ac0dd28d1480ff5e9f959f5",
+          "position": 4
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6ac0dd28d1480ff5e9f959fd",
+          "position": 5
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6ac0dd29d1480ff5e9f95a05",
+          "position": 6
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6ac0dd2ad1480ff5e9f95a0d",
+          "position": 7
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/yaponskii-vecher-dlya-dvoih-krasnoyarsk",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 8,
+      "activeEvents": 7
+    },
+    {
+      "id": "90322135-c38b-44b7-b486-efbb554e7045",
+      "slug": "doors-lovers-korolev",
+      "title": "DOORS LOVERS",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "DOORS LOVERS",
+      "seoTitle": "DOORS LOVERS | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6a674f46af5c6ea6930b7138",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/doors-lovers-korolev",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "bada1b45-6b49-4fac-9ef2-8d3dfb63c93d",
+      "slug": "andrei-atlas-solnyi-stendap-koncert-v-g-samare-samara",
+      "title": "Андрей Атлас. Сольный стендап концерт в г. Самаре",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Андрей Атлас. Сольный стендап концерт в г. Самаре",
+      "seoTitle": "Андрей Атлас. Сольный стендап концерт в г. Самаре | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6a9db6274cd948c9f14296fc",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/andrei-atlas-solnyi-stendap-koncert-v-g-samare-samara",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "917bf4da-0ff4-49c0-921f-e086439f7e1c",
+      "slug": "zhanna-legenda-sankt-peterburg",
+      "title": "Жанна. Легенда",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Жанна. Легенда",
+      "seoTitle": "Жанна. Легенда | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ace9335042dc06057d8e958",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/zhanna-legenda-sankt-peterburg",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "560c0a9f-0503-4a0a-8121-1a774c3f7de0",
+      "slug": "sestry-moskva",
+      "title": "Сёстры",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Сёстры",
+      "seoTitle": "Сёстры | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ae47fe2501b07dd68fa8d87",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/sestry-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "89660bd0-e3fb-4f6d-8a02-b52a31ff3adc",
+      "slug": "kvintet-viktorii-krivozubovoi-na-paru-slov-moskva",
+      "title": "КВИНТЕТ ВИКТОРИИ КРИВОЗУБОВОЙ «НА ПАРУ СЛОВ»",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "КВИНТЕТ ВИКТОРИИ КРИВОЗУБОВОЙ «НА ПАРУ СЛОВ»",
+      "seoTitle": "КВИНТЕТ ВИКТОРИИ КРИВОЗУБОВОЙ «НА ПАРУ СЛОВ» | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ab5b3077cff52717116d168",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/kvintet-viktorii-krivozubovoi-na-paru-slov-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "efb887d9-9094-4f4d-bf9e-0176d226b9ba",
+      "slug": "ekskursiya-v-muzei-mvd-rossii-k-dnyu-milicii-moskva",
+      "title": "Экскурсия в музей МВД России к Дню милиции",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Экскурсия в музей МВД России к Дню милиции",
+      "seoTitle": "Экскурсия в музей МВД России к Дню милиции | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6aca618b32f61bb6cadfa834",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/ekskursiya-v-muzei-mvd-rossii-k-dnyu-milicii-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    },
+    {
+      "id": "98f1b629-9d5b-4267-b555-d241ab3cf80d",
+      "slug": "mediakult-luchshee-dlya-zhizni-dizain-bez-granic-moskva",
+      "title": "МЕДИАКУЛЬТ | Лучшее для жизни. Дизайн без границ",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "МЕДИАКУЛЬТ | Лучшее для жизни. Дизайн без границ",
+      "seoTitle": "МЕДИАКУЛЬТ | Лучшее для жизни. Дизайн без границ | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af6d2cb2614efc0ea6fffc9",
+          "position": 0
+        }
+      ],
+      "routes": [
+        {
+          "kind": "CANDIDATE",
+          "path": "/events/mediakult-luchshee-dlya-zhizni-dizain-bez-granic-moskva",
+          "source": "event-page-draft"
+        }
+      ],
+      "revisions": 1,
+      "activeEvents": 1
+    }
+  ]
+}

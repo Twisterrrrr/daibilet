@@ -1,0 +1,595 @@
+{
+  "generatedAt": "2026-11-17T00:59:17.997Z",
+  "sourceArchive": "D:\\coding\\_scratch\\2026-11-16-eventpage-rewrites\\data\\ticketscloud\\editorial\\eventpage-nov17-batch-03-source-archive.json",
+  "rewriteFile": "D:\\coding\\_scratch\\2026-11-16-eventpage-rewrites\\data\\ticketscloud\\editorial\\eventpage-nov17-batch-03-rewrites.md",
+  "textRuChecked": false,
+  "internalChecksOnly": true,
+  "entryCount": 30,
+  "uniqueEventPageIds": 30,
+  "uniqueEventIds": 41,
+  "repeatedEventIds": [],
+  "allPass": true,
+  "entries": [
+    {
+      "position": 1,
+      "pageId": "fdf9b77f-e846-46d6-83d4-82e74f9256af",
+      "slug": "anton-zaletaev-i-letnyi-sezon-moskva",
+      "title": "АНТОН ЗАЛЕТАЕВ И «ЛЁТНЫЙ СЕЗОН»",
+      "eventIds": [
+        "evt_6abfdff444c0d778508ab5f8"
+      ],
+      "originalChars": 2793,
+      "rewriteChars": 2958,
+      "substantiveParagraphs": 6,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 22,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 2,
+      "pageId": "1f95a6e8-0c7e-4d94-a59a-cf37c8ccc5ae",
+      "slug": "sergei-filatov-yurii-novgorodskii-mariya-vladimirskaya-moskva",
+      "title": "СЕРГЕЙ ФИЛАТОВ – ЮРИЙ НОВГОРОДСКИЙ – МАРИЯ ВЛАДИМИРСКАЯ",
+      "eventIds": [
+        "evt_6ad4e5436c6e1d0c62961770"
+      ],
+      "originalChars": 2740,
+      "rewriteChars": 2825,
+      "substantiveParagraphs": 6,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 8,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 3,
+      "pageId": "ab6beca5-3f08-4483-a9a8-c4cc28e7ef10",
+      "slug": "dmitrii-kazachkov-vecher-pamyati-nikolaya-arutyunova-moskva",
+      "title": "ДМИТРИЙ КАЗАЧКОВ: ВЕЧЕР ПАМЯТИ НИКОЛАЯ АРУТЮНОВА",
+      "eventIds": [
+        "evt_6ace2fbcd239b43f4005ea69"
+      ],
+      "originalChars": 2642,
+      "rewriteChars": 2834,
+      "substantiveParagraphs": 7,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 8,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 4,
+      "pageId": "770e3017-294d-44e9-a415-1361ee5fb735",
+      "slug": "festival-budnik-moskva",
+      "title": "Фестиваль Будник!",
+      "eventIds": [
+        "evt_6ae1a9f925308047c3ac1dd4"
+      ],
+      "originalChars": 2242,
+      "rewriteChars": 2307,
+      "substantiveParagraphs": 5,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 2,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 5,
+      "pageId": "cbb23b24-32ce-40b7-b3d5-7978af8eae9f",
+      "slug": "minecraft-show-mainkraft-shou-moskva-2",
+      "title": "MINECRAFT SHOW - МАЙНКРАФТ ШОУ",
+      "eventIds": [
+        "evt_6ae37aae97cc76ccd33a4aa6"
+      ],
+      "originalChars": 2217,
+      "rewriteChars": 2348,
+      "substantiveParagraphs": 6,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 8,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 6,
+      "pageId": "ae8b2900-03c2-46fd-839b-e550197d20cc",
+      "slug": "sofiya-acbeha-negga-moskva",
+      "title": "СОФИЯ АЦБЕХА НЕГГА",
+      "eventIds": [
+        "evt_6ab5b2ba1689cbe6f9504ab2"
+      ],
+      "originalChars": 2193,
+      "rewriteChars": 2256,
+      "substantiveParagraphs": 5,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 7,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 7,
+      "pageId": "b0386ae7-cdbd-4090-9632-be29567b4396",
+      "slug": "tvoi-prazdnik-sankt-peterburg",
+      "title": "Твой Праздник",
+      "eventIds": [
+        "evt_6ac444fb90762689ae090655",
+        "evt_6ac444fd90762689ae090667"
+      ],
+      "originalChars": 2130,
+      "rewriteChars": 2187,
+      "substantiveParagraphs": 5,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 2,
+      "activeOffersAtCapture": 6,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 8,
+      "pageId": "f4d3c901-ccfa-4e09-ae32-aab00bcbb666",
+      "slug": "vivaldi-vremena-goda-sankt-peterburg-2",
+      "title": "Вивальди Времена года. Оркестр Феникс",
+      "eventIds": [
+        "evt_6ab14cb7f0c61eb6e9b528ef",
+        "evt_6ab14cbff0c61eb6e9b52b4f",
+        "evt_6a9bc1d3c8016df43b9dcef5",
+        "evt_6a9bc1cec8016df43b9dcdc5"
+      ],
+      "originalChars": 2092,
+      "rewriteChars": 2331,
+      "substantiveParagraphs": 6,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 3,
+      "activeOffersAtCapture": 23,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 9,
+      "pageId": "8208560f-763f-4bf8-b59e-4668a6be0a44",
+      "slug": "sergei-dolzhenkov-new-blood-big-band-moskva",
+      "title": "СЕРГЕЙ ДОЛЖЕНКОВ & NEW BLOOD BIG BAND",
+      "eventIds": [
+        "evt_6abfd88b3473ad14fd7c73a6"
+      ],
+      "originalChars": 1772,
+      "rewriteChars": 2069,
+      "substantiveParagraphs": 5,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 43,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 10,
+      "pageId": "a57828e5-eae4-48b7-a6cf-bb5560f4e138",
+      "slug": "nostalgiya-noyabrya-sankt-peterburg",
+      "title": "Ностальгия ноября",
+      "eventIds": [
+        "evt_6a952da5aae3094f9db4fe92"
+      ],
+      "originalChars": 1687,
+      "rewriteChars": 1905,
+      "substantiveParagraphs": 5,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 1,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 11,
+      "pageId": "e668fc45-8241-481b-aea7-78d2d56adedf",
+      "slug": "trio-mihaila-kistanova-specialnyi-gost-vovka-kozhekin-garmoshka-moskva",
+      "title": "Трио Михаила Кистанова, специальный гость Вовка Кожекин (гармошка)",
+      "eventIds": [
+        "evt_6ad86714c5fe6a0f542fbe7d"
+      ],
+      "originalChars": 1664,
+      "rewriteChars": 1904,
+      "substantiveParagraphs": 5,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 3,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 12,
+      "pageId": "fa69ebab-d9e8-4853-916b-9a4f4ee977ca",
+      "slug": "aleks-abra-new-york-new-york-klassicheskii-dzhaz-s-yumorom-moskva",
+      "title": "Алекс Абра: New York New York. Классический джаз с юмором.",
+      "eventIds": [
+        "evt_6ab231739cb10ab6f6ee6788"
+      ],
+      "originalChars": 1657,
+      "rewriteChars": 1903,
+      "substantiveParagraphs": 5,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 5,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 13,
+      "pageId": "46728f23-e067-4794-bb9d-3dc5c2bf4f3a",
+      "slug": "svetlana-zhavoronkova-secret-atelier-moskva",
+      "title": "СВЕТЛАНА ЖАВОРОНКОВА & SECRET ATELIER",
+      "eventIds": [
+        "evt_6abfe33e47798c549d92835d"
+      ],
+      "originalChars": 1656,
+      "rewriteChars": 1868,
+      "substantiveParagraphs": 5,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 44,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 14,
+      "pageId": "35ecdc52-99cf-48e4-8f68-0445fad10f69",
+      "slug": "bozhole-nuvo-2026-vecherinka-koncert-vo-francuzskom-stile-sankt-peterburg",
+      "title": "\"БОЖОЛЕ НУВО-2026\" Вечеринка-концерт во французском стиле",
+      "eventIds": [
+        "evt_6ac51145d61abda5fe00dc89"
+      ],
+      "originalChars": 1273,
+      "rewriteChars": 1399,
+      "substantiveParagraphs": 4,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 1,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 15,
+      "pageId": "24683404-0c13-4ef0-be0a-08a49f61aa64",
+      "slug": "rok-hity-mtv-shou-koncert-sankt-peterburg",
+      "title": "\"РОК-ХИТЫ MTV\" ШОУ-КОНЦЕРТ",
+      "eventIds": [
+        "evt_6a79cb35a76da46b435b99a1"
+      ],
+      "originalChars": 1555,
+      "rewriteChars": 1579,
+      "substantiveParagraphs": 4,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 3,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 16,
+      "pageId": "fd1e0ab3-7fe9-490b-8b48-617410a6c303",
+      "slug": "stabat-mater-pergolezi-bah-muzyka-soborov-pri-svechah-moskva",
+      "title": "«STABAT MATER. Перголези • Бах. Музыка соборов при свечах»",
+      "eventIds": [
+        "evt_6ab24ec3174fa70a98492b01"
+      ],
+      "originalChars": 1149,
+      "rewriteChars": 1549,
+      "substantiveParagraphs": 4,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 7,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 17,
+      "pageId": "6763d805-768a-494f-bca0-4a43be2c31a4",
+      "slug": "shopen-pri-svechah-sankt-peterburg",
+      "title": "Шопен при свечах",
+      "eventIds": [
+        "evt_6a0209d9f601f6cca92a0c33"
+      ],
+      "originalChars": 1147,
+      "rewriteChars": 1350,
+      "substantiveParagraphs": 4,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 14,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 18,
+      "pageId": "d5757782-3d02-49d1-b4ce-ca2490b9c83d",
+      "slug": "praktiki-osoznannogo-vospriyatiya-iskusstva-zhanr-nyu-v-tvorchestve-andreya-pozdeeva-krasnoyarsk",
+      "title": "Практики осознанного восприятия искусства «Жанр «ню» в творчестве Андрея Поздеева»",
+      "eventIds": [
+        "evt_6ab9f7d9bb2365b2301ad479"
+      ],
+      "originalChars": 1132,
+      "rewriteChars": 1422,
+      "substantiveParagraphs": 4,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 1,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 19,
+      "pageId": "84982c8a-f122-4f99-a8aa-51f297386c59",
+      "slug": "izzotop-tribyut-zz-top-moskva",
+      "title": "IZZoTop - трибьют \"ZZ Top\"",
+      "eventIds": [
+        "evt_6adc63380832de12efb53fcd"
+      ],
+      "originalChars": 1128,
+      "rewriteChars": 1271,
+      "substantiveParagraphs": 4,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 3,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 20,
+      "pageId": "2933256b-de03-4e72-94f7-b5066cd718bf",
+      "slug": "interaktivnyi-spektakl-muha-cokotuha-ot-2-do-6-let-sankt-peterburg-3",
+      "title": "Интерактивный спектакль \"Муха Цокотуха \" от 2 до 6 лет",
+      "eventIds": [
+        "evt_6ac42347dbcd6b44e4973f08"
+      ],
+      "originalChars": 1105,
+      "rewriteChars": 1312,
+      "substantiveParagraphs": 4,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 3,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 21,
+      "pageId": "e254a913-4db0-4c60-b6d5-dfd75533824a",
+      "slug": "strunnoe-svetovoe-shou-moskva",
+      "title": "Струнное световое шоу",
+      "eventIds": [
+        "evt_6a55f7a23bdaed105e2e6cb6"
+      ],
+      "originalChars": 1101,
+      "rewriteChars": 1346,
+      "substantiveParagraphs": 5,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 10,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 22,
+      "pageId": "246b5ec6-907e-4869-9874-f784aba416d8",
+      "slug": "legendarnye-hity-90-h-i-2000-h-muzykalnyi-vecher-nad-moskvoi-moskva",
+      "title": "Легендарные хиты 90-х и 2000-х. Музыкальный вечер над Москвой",
+      "eventIds": [
+        "evt_6ae31a1322674d3e5631af8d"
+      ],
+      "originalChars": 1099,
+      "rewriteChars": 1373,
+      "substantiveParagraphs": 4,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 4,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 23,
+      "pageId": "557647e0-0dda-4eca-bcd4-6eebfa8ccf2f",
+      "slug": "yaponskii-vecher-dlya-dvoih-krasnoyarsk",
+      "title": "«Японский вечер для двоих»",
+      "eventIds": [
+        "evt_6ac0dd24d1480ff5e9f959cd",
+        "evt_6ac0dd26d1480ff5e9f959dd",
+        "evt_6ac0dd26d1480ff5e9f959e5",
+        "evt_6ac0dd27d1480ff5e9f959ed",
+        "evt_6ac0dd28d1480ff5e9f959f5",
+        "evt_6ac0dd28d1480ff5e9f959fd",
+        "evt_6ac0dd29d1480ff5e9f95a05",
+        "evt_6ac0dd2ad1480ff5e9f95a0d"
+      ],
+      "originalChars": 1096,
+      "rewriteChars": 1301,
+      "substantiveParagraphs": 4,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 7,
+      "activeOffersAtCapture": 7,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 24,
+      "pageId": "90322135-c38b-44b7-b486-efbb554e7045",
+      "slug": "doors-lovers-korolev",
+      "title": "DOORS LOVERS",
+      "eventIds": [
+        "evt_6a674f46af5c6ea6930b7138"
+      ],
+      "originalChars": 1086,
+      "rewriteChars": 1307,
+      "substantiveParagraphs": 4,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 36,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 25,
+      "pageId": "bada1b45-6b49-4fac-9ef2-8d3dfb63c93d",
+      "slug": "andrei-atlas-solnyi-stendap-koncert-v-g-samare-samara",
+      "title": "Андрей Атлас. Сольный стендап концерт в г. Самаре",
+      "eventIds": [
+        "evt_6a9db6274cd948c9f14296fc"
+      ],
+      "originalChars": 1069,
+      "rewriteChars": 1212,
+      "substantiveParagraphs": 4,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 4,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 26,
+      "pageId": "917bf4da-0ff4-49c0-921f-e086439f7e1c",
+      "slug": "zhanna-legenda-sankt-peterburg",
+      "title": "Жанна. Легенда",
+      "eventIds": [
+        "evt_6ace9335042dc06057d8e958"
+      ],
+      "originalChars": 1047,
+      "rewriteChars": 1088,
+      "substantiveParagraphs": 3,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 6,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 27,
+      "pageId": "560c0a9f-0503-4a0a-8121-1a774c3f7de0",
+      "slug": "sestry-moskva",
+      "title": "Сёстры",
+      "eventIds": [
+        "evt_6ae47fe2501b07dd68fa8d87"
+      ],
+      "originalChars": 1046,
+      "rewriteChars": 1206,
+      "substantiveParagraphs": 4,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 3,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 28,
+      "pageId": "89660bd0-e3fb-4f6d-8a02-b52a31ff3adc",
+      "slug": "kvintet-viktorii-krivozubovoi-na-paru-slov-moskva",
+      "title": "КВИНТЕТ ВИКТОРИИ КРИВОЗУБОВОЙ «НА ПАРУ СЛОВ»",
+      "eventIds": [
+        "evt_6ab5b3077cff52717116d168"
+      ],
+      "originalChars": 1014,
+      "rewriteChars": 1177,
+      "substantiveParagraphs": 4,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 9,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 29,
+      "pageId": "efb887d9-9094-4f4d-bf9e-0176d226b9ba",
+      "slug": "ekskursiya-v-muzei-mvd-rossii-k-dnyu-milicii-moskva",
+      "title": "Экскурсия в музей МВД России к Дню милиции",
+      "eventIds": [
+        "evt_6aca618b32f61bb6cadfa834"
+      ],
+      "originalChars": 1007,
+      "rewriteChars": 1326,
+      "substantiveParagraphs": 4,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 1,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 30,
+      "pageId": "98f1b629-9d5b-4267-b555-d241ab3cf80d",
+      "slug": "mediakult-luchshee-dlya-zhizni-dizain-bez-granic-moskva",
+      "title": "МЕДИАКУЛЬТ | Лучшее для жизни. Дизайн без границ",
+      "eventIds": [
+        "evt_6af6d2cb2614efc0ea6fffc9"
+      ],
+      "originalChars": 1291,
+      "rewriteChars": 1599,
+      "substantiveParagraphs": 4,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 3,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    }
+  ]
+}

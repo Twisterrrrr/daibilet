@@ -1,0 +1,613 @@
+{
+  "generatedAt": "2026-11-17T00:29:39.173Z",
+  "sourceArchive": "D:\\coding\\_scratch\\2026-11-16-eventpage-rewrites\\data\\ticketscloud\\editorial\\eventpage-nov17-batch-02-source-archive.json",
+  "rewriteFile": "D:\\coding\\_scratch\\2026-11-16-eventpage-rewrites\\data\\ticketscloud\\editorial\\eventpage-nov17-batch-02-rewrites.md",
+  "textRuChecked": false,
+  "internalChecksOnly": true,
+  "entryCount": 30,
+  "uniqueEventPageIds": 30,
+  "uniqueEventIds": 59,
+  "repeatedEventIds": [],
+  "allPass": true,
+  "entries": [
+    {
+      "position": 1,
+      "pageId": "c955b520-360a-41fb-bf25-ac3ffb361210",
+      "slug": "bulat-okudzhava-chasovye-lyubvi-sankt-peterburg-3",
+      "title": "Булат Окуджава. «Часовые любви»",
+      "eventIds": [
+        "evt_6af9873ef3f7a97c61a79f43"
+      ],
+      "originalChars": 1888,
+      "rewriteChars": 2307,
+      "substantiveParagraphs": 5,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 3,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 2,
+      "pageId": "0dd86344-ae73-4eb7-a99a-066711830613",
+      "slug": "denis-gvozdev-ryazan",
+      "title": "Денис Гвоздев",
+      "eventIds": [
+        "evt_6af9ab7d305c19b188cb03e2"
+      ],
+      "originalChars": 159,
+      "rewriteChars": 831,
+      "substantiveParagraphs": 3,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 5,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 3,
+      "pageId": "ed4fafe9-f61c-4b45-b422-99410cbd7ae3",
+      "slug": "pavel-kashin-smolensk",
+      "title": "Павел Кашин",
+      "eventIds": [
+        "evt_6afa58e202bcaf209c007b30"
+      ],
+      "originalChars": 936,
+      "rewriteChars": 1061,
+      "substantiveParagraphs": 3,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 3,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 4,
+      "pageId": "485afa82-478f-4643-852f-119882acadd6",
+      "slug": "s6teen-seattle-16-25-let-moskva",
+      "title": "S6TEEN (Seattle 16) 25 лет",
+      "eventIds": [
+        "evt_6af5fcd8eea1615be0ca1226"
+      ],
+      "originalChars": 341,
+      "rewriteChars": 951,
+      "substantiveParagraphs": 3,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 1,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 5,
+      "pageId": "cf4ae802-cf9c-45e8-9802-c8a137fe9f43",
+      "slug": "the-big-livers-rock-n-roll-show-sankt-peterburg",
+      "title": "The Big Livers Rock-n-Roll Show",
+      "eventIds": [
+        "evt_6af2c6c9d39f78d9aeac04d3"
+      ],
+      "originalChars": 902,
+      "rewriteChars": 1025,
+      "substantiveParagraphs": 3,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 2,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 6,
+      "pageId": "3be3a5c6-f338-4aaa-b5a8-4182bc0ac201",
+      "slug": "bahyt-kompot-moskva-3",
+      "title": "БАХЫТ-КОМПОТ",
+      "eventIds": [
+        "evt_6af9b0ebd9f81a30e4d3a09b"
+      ],
+      "originalChars": 594,
+      "rewriteChars": 877,
+      "substantiveParagraphs": 3,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 12,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 7,
+      "pageId": "e9d4b6d3-7865-4a47-8cae-23a22874c891",
+      "slug": "spektakl-moi-paren-shtyk-moskva",
+      "title": "Спектакль Мой парень штык",
+      "eventIds": [
+        "evt_6af9e108f526e3a86bafa571"
+      ],
+      "originalChars": 198,
+      "rewriteChars": 875,
+      "substantiveParagraphs": 3,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 6,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 8,
+      "pageId": "2a6785f1-a57e-496d-b305-0c43c1eb203d",
+      "slug": "mamulki-bend-v-live-stars-moskva",
+      "title": "Мамульки Bend в Live Stars",
+      "eventIds": [
+        "evt_6af725d5b84ec4f8bd339322"
+      ],
+      "originalChars": 466,
+      "rewriteChars": 851,
+      "substantiveParagraphs": 3,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 5,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 9,
+      "pageId": "07d819e4-d0d5-4559-bb6f-5e3dd5676ea9",
+      "slug": "tatyana-zykina-moskva",
+      "title": "Татьяна Зыкина",
+      "eventIds": [
+        "evt_6af9b63b947f23b2141723a4"
+      ],
+      "originalChars": 302,
+      "rewriteChars": 827,
+      "substantiveParagraphs": 3,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 17,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 10,
+      "pageId": "95476056-67c5-486e-bea6-a6316ad38914",
+      "slug": "horonko-orkestr-moskva",
+      "title": "Хоронько Оркестр",
+      "eventIds": [
+        "evt_6af9ba86c935749a57826042"
+      ],
+      "originalChars": 425,
+      "rewriteChars": 876,
+      "substantiveParagraphs": 3,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 14,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 11,
+      "pageId": "dd5eae6a-c9ca-4ef8-bc37-2aad3ca529e0",
+      "slug": "mirovye-i-rozhdestvenskie-hity-v-simfonicheskom-zvuchanii-na-teploi-kryshe-koncert-imperialis-orche-moskva",
+      "title": "Мировые и Рождественские хиты в Симфоническом звучании на Теплой Крыше / Концерт Imperialis Orchestra",
+      "eventIds": [
+        "evt_6af8684a36ed1f6d222459cf"
+      ],
+      "originalChars": 1460,
+      "rewriteChars": 1584,
+      "substantiveParagraphs": 4,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 4,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 12,
+      "pageId": "735f5f60-a1cd-4c84-9d24-f50397dd2d44",
+      "slug": "strannaya-miss-sevidzh-ekaterinburg",
+      "title": "Странная мисс Сэвидж",
+      "eventIds": [
+        "evt_6ad3acc1f79eabe6aef59b85"
+      ],
+      "originalChars": 1178,
+      "rewriteChars": 1267,
+      "substantiveParagraphs": 4,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 9,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 13,
+      "pageId": "57d63f26-baf6-4a3e-b839-ede475a16f4f",
+      "slug": "esenin-teatr-v-pabe-chelyabinsk",
+      "title": "Есенин. Театр в пабе",
+      "eventIds": [
+        "evt_6ac750dfae4ab86694e82b54"
+      ],
+      "originalChars": 481,
+      "rewriteChars": 874,
+      "substantiveParagraphs": 3,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 4,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 14,
+      "pageId": "37e188d2-fee5-463d-a927-d77e38639991",
+      "slug": "mify-i-tainy-istorii-lektorii-s-glebom-aleksushinym-dostizheniya-i-nedostatki-sovetskogo-turizma-b-samara",
+      "title": "Мифы и тайны истории | лекторий с Глебом Алексушиным. Достижения и недостатки советского туризма: были ли раньше деревья большими?",
+      "eventIds": [
+        "evt_6ae8bbed22e9a7ae8278ae11"
+      ],
+      "originalChars": 781,
+      "rewriteChars": 1031,
+      "substantiveParagraphs": 3,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 1,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 15,
+      "pageId": "d931018a-6870-4614-9945-7b25c39b028a",
+      "slug": "ekskursiya-v-osobnyak-zimina-moskva-2",
+      "title": "Экскурсия в особняк Зимина",
+      "eventIds": [
+        "evt_6ae214e35088c685fcfdbd7b"
+      ],
+      "originalChars": 428,
+      "rewriteChars": 889,
+      "substantiveParagraphs": 3,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 1,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 16,
+      "pageId": "bae0dee6-1902-4b65-949f-1cbb7bf1c8ef",
+      "slug": "blistatelnyi-sankt-peterburg",
+      "title": "Блистательный Санкт-Петербург",
+      "eventIds": [
+        "evt_6ad374cd76739261465169c6"
+      ],
+      "originalChars": 1356,
+      "rewriteChars": 1437,
+      "substantiveParagraphs": 4,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 1,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 17,
+      "pageId": "3921737a-3ab2-4f64-8ad4-dc50ece9e841",
+      "slug": "balet-schelkunchik-sankt-peterburg-12",
+      "title": "Балет «Щелкунчик»",
+      "eventIds": [
+        "evt_6ac5f2946bc57f430ecb7145"
+      ],
+      "originalChars": 1573,
+      "rewriteChars": 1625,
+      "substantiveParagraphs": 4,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 7,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 18,
+      "pageId": "c68fb313-8e87-4ff3-ab4b-6b0c90e90e53",
+      "slug": "alexander-dovgopoly-project-moskva",
+      "title": "ALEXANDER DOVGOPOLY PROJECT",
+      "eventIds": [
+        "evt_6ac8dbda3d90cc52e14e9f0d"
+      ],
+      "originalChars": 1856,
+      "rewriteChars": 2265,
+      "substantiveParagraphs": 5,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 8,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 19,
+      "pageId": "f7d48418-c9b3-4e4e-89f5-dab115813029",
+      "slug": "koncert-kamernyi-orkestr-igorya-lermana-v-den-rozhdeniya-naberezhnye-chelny",
+      "title": "Концерт «Камерный оркестр Игоря Лермана. В День рождения!»",
+      "eventIds": [
+        "evt_6af732a33eea1c18b007388b"
+      ],
+      "originalChars": 1873,
+      "rewriteChars": 2046,
+      "substantiveParagraphs": 5,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 1,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 20,
+      "pageId": "f1003ce7-a336-41e7-b512-b2dc15aa5f48",
+      "slug": "moscow-ragtime-band-moskva-2",
+      "title": "MOSCOW RAGTIME BAND",
+      "eventIds": [
+        "evt_6abfcd8218083a6fda9ccd25"
+      ],
+      "originalChars": 2508,
+      "rewriteChars": 2656,
+      "substantiveParagraphs": 6,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 8,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 21,
+      "pageId": "c02fff08-9393-4d65-a5c3-2cfacc236d3c",
+      "slug": "tal-babickii-izrail-i-dzhazovyi-orkestr-denisa-melnikova-moskva",
+      "title": "ТАЛЬ БАБИЦКИЙ (ИЗРАИЛЬ) И ДЖАЗОВЫЙ ОРКЕСТР ДЕНИСА МЕЛЬНИКОВА",
+      "eventIds": [
+        "evt_6abfe0d8166f8dbe21db4c0c"
+      ],
+      "originalChars": 1708,
+      "rewriteChars": 2044,
+      "substantiveParagraphs": 5,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 43,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 22,
+      "pageId": "022fdad7-3bb6-4741-9979-bf71dc6cb8bd",
+      "slug": "muzyka-ostrovov-aleksei-chichilin-island-music-iii-kuba-moskva",
+      "title": "Музыка островов | Алексей Чичилин – Island music III: Куба",
+      "eventIds": [
+        "evt_6ad5327cc3247089669df790"
+      ],
+      "originalChars": 2375,
+      "rewriteChars": 2687,
+      "substantiveParagraphs": 6,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 1,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 23,
+      "pageId": "bc71220f-3ef0-4622-a3f1-ca9884c9e32f",
+      "slug": "koncert-gurude-serdce-dreva-krasnoyarsk",
+      "title": "Концерт GURUDE \"Сердце древа\"",
+      "eventIds": [
+        "evt_6a99b03df5e8bfce87f70386"
+      ],
+      "originalChars": 862,
+      "rewriteChars": 1048,
+      "substantiveParagraphs": 3,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 8,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 24,
+      "pageId": "fc1e7cb8-38ca-4493-acfb-117b07b00e65",
+      "slug": "blyuzovyi-dzhem-s-rok-bendom-the-lagoon-krasnoyarsk",
+      "title": "Блюзовый джем с рок-бэндом The Lagoon",
+      "eventIds": [
+        "evt_6ae8507a5035667e9b518ab3",
+        "evt_6ae8507b5035667e9b518b03"
+      ],
+      "originalChars": 647,
+      "rewriteChars": 906,
+      "substantiveParagraphs": 3,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 1,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 25,
+      "pageId": "14e8658b-ec6b-49e6-8281-7d4c843a1c80",
+      "slug": "plumbum-dreams-tribyut-led-zeppelin-moskva",
+      "title": "Plumbum Dreams - трибьют \"LED ZEPPELIN\"",
+      "eventIds": [
+        "evt_6ad8694302f66ab85e5cb10d"
+      ],
+      "originalChars": 648,
+      "rewriteChars": 961,
+      "substantiveParagraphs": 3,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 3,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 26,
+      "pageId": "5c13fd39-ac6b-49c9-8ec7-b2c9f9cdfe57",
+      "slug": "sasha-rastich-7-rasa-19-11-staryi-park-ryazan",
+      "title": "Саша РАСТИЧ / 7 РАСА - 19.11 - СТАРЫЙ ПАРК",
+      "eventIds": [
+        "evt_6a9ea860c9f27e0538d88724"
+      ],
+      "originalChars": 650,
+      "rewriteChars": 873,
+      "substantiveParagraphs": 3,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 8,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 27,
+      "pageId": "8c82fd67-862d-41d8-86a2-48f6eda999bd",
+      "slug": "ekskursiya-v-muzei-kvartiru-golovanova-i-kabinet-nezhdanovoi-moskva",
+      "title": "Экскурсия в музей-квартиру Голованова и кабинет Неждановой",
+      "eventIds": [
+        "evt_6acf63f30545ab9682136c5e"
+      ],
+      "originalChars": 1876,
+      "rewriteChars": 2115,
+      "substantiveParagraphs": 5,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 1,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 28,
+      "pageId": "e7aa27cd-0a80-41b0-b542-14b66a6aaee6",
+      "slug": "otpetye-moshenniki-sankt-peterburg",
+      "title": "Отпетые мошенники",
+      "eventIds": [
+        "evt_6a86fe973af6fae0ea59d9bd"
+      ],
+      "originalChars": 591,
+      "rewriteChars": 818,
+      "substantiveParagraphs": 3,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 103,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 29,
+      "pageId": "ade168f7-ba65-4cd8-9fc9-1f7dfbaf1a5b",
+      "slug": "kosmicheskii-dzhaz-sade-sankt-peterburg",
+      "title": "Космический джаз: Sade",
+      "eventIds": [
+        "evt_6aa2c9f5eaaa507eba576534"
+      ],
+      "originalChars": 992,
+      "rewriteChars": 1041,
+      "substantiveParagraphs": 3,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 1,
+      "activeOffersAtCapture": 2,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    },
+    {
+      "position": 30,
+      "pageId": "d592143a-1d01-4b97-a358-0c3ca73696c8",
+      "slug": "novodevichii-monastyr-na-perekrestke-carskih-sudeb-moskva",
+      "title": "Новодевичий монастырь: на перекрестке царских судеб",
+      "eventIds": [
+        "evt_6ac8dc8fc36bbc1be0a54f13",
+        "evt_6ac8f05a9ed275412a58138c",
+        "evt_6a9bd1f840eb7bf93e9dce9a",
+        "evt_6a9bd1f640eb7bf93e9dce88",
+        "evt_6a9bd1f440eb7bf93e9dce76",
+        "evt_6a9bd1f240eb7bf93e9dce64",
+        "evt_6a9bd1f140eb7bf93e9dce52",
+        "evt_6a9bd1ee40eb7bf93e9dce40",
+        "evt_6a9bd1ec40eb7bf93e9dce2e",
+        "evt_6a53583d8d92a7d20f63ceae",
+        "evt_6a53583b8d92a7d20f63ce9c",
+        "evt_6a5358398d92a7d20f63ce8a",
+        "evt_6a5358378d92a7d20f63ce78",
+        "evt_6a5358358d92a7d20f63ce66",
+        "evt_6a5358338d92a7d20f63ce54",
+        "evt_6a5358318d92a7d20f63ce42",
+        "evt_6a53582f8d92a7d20f63ce30",
+        "evt_6a51ffe50344995cb1150132",
+        "evt_6a51ffe30344995cb1150120",
+        "evt_6a51ffe10344995cb115010e",
+        "evt_6a51ffe00344995cb11500fc",
+        "evt_6a51ffde0344995cb11500ea",
+        "evt_6a51ffdc0344995cb11500d8",
+        "evt_6a51ffdb0344995cb11500c6",
+        "evt_6a51ffd90344995cb11500b4",
+        "evt_6a51ffd60344995cb1150090",
+        "evt_6a51ffd20344995cb115006c",
+        "evt_6a51ffd00344995cb115005a",
+        "evt_6a51ffcf0344995cb1150048"
+      ],
+      "originalChars": 1895,
+      "rewriteChars": 2256,
+      "substantiveParagraphs": 5,
+      "practicalInfoPresent": true,
+      "futureSaleableSlotsAtCapture": 25,
+      "activeOffersAtCapture": 75,
+      "lengthPass": true,
+      "paragraphPass": true,
+      "exactDuplicateMain": false,
+      "editorialStatus": "PREPARED_NOT_APPLIED"
+    }
+  ]
+}

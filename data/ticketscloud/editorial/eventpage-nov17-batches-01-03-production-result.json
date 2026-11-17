@@ -1,0 +1,1965 @@
+{
+  "appliedAt": "2026-11-17T05:02:28.839Z",
+  "complete": true,
+  "database": "daibilet",
+  "pages": [
+    {
+      "eventPageId": "46a38408-fd33-4be5-9870-3a99783122cd",
+      "slug": "iskusstvo-biseropleteniya-sozdaem-figurki-krasnoyarsk",
+      "title": "Искусство бисероплетения: создаём фигурки",
+      "batch": 1,
+      "eventIds": [
+        "evt_6af6d87423ffb9f755c3b8d6",
+        "evt_6af6d87423ffb9f755c3b8de",
+        "evt_6af6d87523ffb9f755c3b8e6",
+        "evt_6af6d87523ffb9f755c3b8ee",
+        "evt_6af6d87623ffb9f755c3b8f6",
+        "evt_6af6d87623ffb9f755c3b8fe",
+        "evt_6af6d87723ffb9f755c3b906",
+        "evt_6af6d87723ffb9f755c3b90e",
+        "evt_6af6d87823ffb9f755c3b916",
+        "evt_6af6d87823ffb9f755c3b91e",
+        "evt_6af6d87923ffb9f755c3b926",
+        "evt_6af6d87923ffb9f755c3b92e",
+        "evt_6af6d87923ffb9f755c3b936"
+      ],
+      "originalChars": 590,
+      "rewriteChars": 712,
+      "substantiveParagraphs": 2,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:28.839Z",
+      "routes": [
+        "/events/iskusstvo-biseropleteniya-sozdaem-figurki-krasnoyarsk"
+      ],
+      "revisionsBefore": 13,
+      "revisionsAfter": 15
+    },
+    {
+      "eventPageId": "0f3dd70e-7694-41a4-b882-7bd1664e2857",
+      "slug": "magiya-cveta-i-sveta-krasnoyarsk",
+      "title": "«Магия цвета и света»",
+      "batch": 1,
+      "eventIds": [
+        "evt_6af6c942a567b35d6da6f2a2",
+        "evt_6af6c943a567b35d6da6f2aa",
+        "evt_6af6c943a567b35d6da6f2b2",
+        "evt_6af6c944a567b35d6da6f2ba",
+        "evt_6af6c944a567b35d6da6f2c2",
+        "evt_6af6c944a567b35d6da6f2ca",
+        "evt_6af6c945a567b35d6da6f2d2",
+        "evt_6af6c945a567b35d6da6f2da",
+        "evt_6af6c946a567b35d6da6f2e2",
+        "evt_6af6c946a567b35d6da6f2ea",
+        "evt_6af6c947a567b35d6da6f2f2",
+        "evt_6af6c947a567b35d6da6f2fa",
+        "evt_6af6c947a567b35d6da6f302",
+        "evt_6af6c948a567b35d6da6f30a",
+        "evt_6af6c948a567b35d6da6f312",
+        "evt_6af6c948a567b35d6da6f31a",
+        "evt_6af6c949a567b35d6da6f322",
+        "evt_6af6c949a567b35d6da6f32a",
+        "evt_6af6c94aa567b35d6da6f332"
+      ],
+      "originalChars": 711,
+      "rewriteChars": 930,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:29.505Z",
+      "routes": [
+        "/events/magiya-cveta-i-sveta-krasnoyarsk"
+      ],
+      "revisionsBefore": 19,
+      "revisionsAfter": 21
+    },
+    {
+      "eventPageId": "a41e49de-e14b-434a-8629-7da00b43a2b9",
+      "slug": "tekstilnaya-mozaika-krasnoyarsk",
+      "title": "«Текстильная мозаика»",
+      "batch": 1,
+      "eventIds": [
+        "evt_6af6c438719541e781a6f29e",
+        "evt_6af6c438719541e781a6f2a6",
+        "evt_6af6c439719541e781a6f2ae",
+        "evt_6af6c439719541e781a6f2b6",
+        "evt_6af6c439719541e781a6f2be",
+        "evt_6af6c43a719541e781a6f2c6",
+        "evt_6af6c43a719541e781a6f2ce",
+        "evt_6af6c43a719541e781a6f2d6",
+        "evt_6af6c43b719541e781a6f2de",
+        "evt_6af6c43b719541e781a6f2e6",
+        "evt_6af6c43c719541e781a6f2ee",
+        "evt_6af6c43c719541e781a6f2f6",
+        "evt_6af6c43c719541e781a6f2fe",
+        "evt_6af6c43d719541e781a6f306",
+        "evt_6af6c43d719541e781a6f30e",
+        "evt_6af6c43d719541e781a6f316",
+        "evt_6af6c43e719541e781a6f31e",
+        "evt_6af6c43e719541e781a6f326",
+        "evt_6af6c43f719541e781a6f32e"
+      ],
+      "originalChars": 508,
+      "rewriteChars": 914,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:30.271Z",
+      "routes": [
+        "/events/tekstilnaya-mozaika-krasnoyarsk"
+      ],
+      "revisionsBefore": 19,
+      "revisionsAfter": 21
+    },
+    {
+      "eventPageId": "44a6e267-f7b3-4d55-ac7b-24f19d3ffd20",
+      "slug": "cvetochnaya-masterskaya-krasnoyarsk",
+      "title": "Цветочная мастерская",
+      "batch": 1,
+      "eventIds": [
+        "evt_6af6ce3cb76710fedda6f2a5",
+        "evt_6af6ce3db76710fedda6f2ad",
+        "evt_6af6ce3db76710fedda6f2b5",
+        "evt_6af6ce3eb76710fedda6f2bd",
+        "evt_6af6ce3eb76710fedda6f2c5",
+        "evt_6af6ce3eb76710fedda6f2cd",
+        "evt_6af6ce3fb76710fedda6f2d5",
+        "evt_6af6ce3fb76710fedda6f2dd",
+        "evt_6af6ce3fb76710fedda6f2e5",
+        "evt_6af6ce40b76710fedda6f2ed",
+        "evt_6af6ce40b76710fedda6f2f5",
+        "evt_6af6ce41b76710fedda6f2fd",
+        "evt_6af6ce41b76710fedda6f305",
+        "evt_6af6ce41b76710fedda6f30d",
+        "evt_6af6ce42b76710fedda6f315",
+        "evt_6af6ce42b76710fedda6f31d",
+        "evt_6af6ce42b76710fedda6f325",
+        "evt_6af6ce43b76710fedda6f32d",
+        "evt_6af6ce43b76710fedda6f335",
+        "evt_6af6ce44b76710fedda6f33d",
+        "evt_6af6ce44b76710fedda6f345",
+        "evt_6af6ce44b76710fedda6f34d",
+        "evt_6af6ce45b76710fedda6f355",
+        "evt_6af6ce45b76710fedda6f35d",
+        "evt_6af6ce46b76710fedda6f365"
+      ],
+      "originalChars": 963,
+      "rewriteChars": 1037,
+      "substantiveParagraphs": 4,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:31.000Z",
+      "routes": [
+        "/events/cvetochnaya-masterskaya-krasnoyarsk"
+      ],
+      "revisionsBefore": 25,
+      "revisionsAfter": 27
+    },
+    {
+      "eventPageId": "90d70b68-d7e7-49da-b0cd-72eb8ce9d58c",
+      "slug": "pikselnaya-palitra-krasnoyarsk",
+      "title": "«Пиксельная палитра»",
+      "batch": 1,
+      "eventIds": [
+        "evt_6af6debbbc8ec64e97c3b8e2",
+        "evt_6af6debcbc8ec64e97c3b8ea",
+        "evt_6af6debcbc8ec64e97c3b8f2",
+        "evt_6af6debdbc8ec64e97c3b8fa",
+        "evt_6af6debdbc8ec64e97c3b902",
+        "evt_6af6debdbc8ec64e97c3b90a",
+        "evt_6af6debebc8ec64e97c3b912",
+        "evt_6af6debebc8ec64e97c3b91a",
+        "evt_6af6debebc8ec64e97c3b922",
+        "evt_6af6debfbc8ec64e97c3b92a",
+        "evt_6af6debfbc8ec64e97c3b932",
+        "evt_6af6dec0bc8ec64e97c3b93a",
+        "evt_6af6dec0bc8ec64e97c3b942",
+        "evt_6af6dec0bc8ec64e97c3b94a",
+        "evt_6af6dec1bc8ec64e97c3b952",
+        "evt_6af6dec1bc8ec64e97c3b95a",
+        "evt_6af6dec2bc8ec64e97c3b962",
+        "evt_6af6dec2bc8ec64e97c3b96a",
+        "evt_6af6dec2bc8ec64e97c3b972"
+      ],
+      "originalChars": 741,
+      "rewriteChars": 970,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:31.693Z",
+      "routes": [
+        "/events/pikselnaya-palitra-krasnoyarsk"
+      ],
+      "revisionsBefore": 19,
+      "revisionsAfter": 21
+    },
+    {
+      "eventPageId": "753b5335-468c-462f-9885-d41d6581d78b",
+      "slug": "dvoinoi-stendap-krasnoyarsk",
+      "title": "Двойной стендап",
+      "batch": 1,
+      "eventIds": [
+        "evt_6afa5894a18dff8236c3b8ce"
+      ],
+      "originalChars": 316,
+      "rewriteChars": 645,
+      "substantiveParagraphs": 2,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:32.350Z",
+      "routes": [
+        "/events/dvoinoi-stendap-krasnoyarsk"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "42202822-9b8b-4a83-a49b-4c90edb63e17",
+      "slug": "stendap-i-dzhaz-perm",
+      "title": "Стендап и Джаз",
+      "batch": 1,
+      "eventIds": [
+        "evt_6af9ab6df625d206678c90a6"
+      ],
+      "originalChars": 926,
+      "rewriteChars": 963,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:33.144Z",
+      "routes": [
+        "/events/stendap-i-dzhaz-perm"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "08588ca2-0fa2-4c6c-adca-4a4e758bec4b",
+      "slug": "muzykalnoe-loto-muzykalnyi-kviz-shou-vecher-v-papa-s-22-noyabrya-vs-moskva",
+      "title": "МУЗЫКАЛЬНОЕ ЛОТО + МУЗЫКАЛЬНЫЙ КВИЗ | Шоу-вечер в PAPA’S | 22 ноября (вс)",
+      "batch": 1,
+      "eventIds": [
+        "evt_6af967da140bb5d2dd14ee52"
+      ],
+      "originalChars": 1245,
+      "rewriteChars": 1337,
+      "substantiveParagraphs": 4,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:33.822Z",
+      "routes": [
+        "/events/muzykalnoe-loto-muzykalnyi-kviz-shou-vecher-v-papa-s-22-noyabrya-vs-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "137abe58-a7c7-4525-b034-69ac3f1f4c4b",
+      "slug": "kvartirnik-po-italyanski-pri-svechah-sankt-peterburg",
+      "title": "Квартирник по-итальянски при свечах",
+      "batch": 1,
+      "eventIds": [
+        "evt_6af98513dc58514d0fb9f7b9"
+      ],
+      "originalChars": 2134,
+      "rewriteChars": 2476,
+      "substantiveParagraphs": 6,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:34.370Z",
+      "routes": [
+        "/events/kvartirnik-po-italyanski-pri-svechah-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "85f0a27e-1879-4191-a2db-6db0f702d60a",
+      "slug": "vecher-magii-kemerovo",
+      "title": "Вечер магии",
+      "batch": 1,
+      "eventIds": [
+        "evt_6af1ff403bae2a0bf05546c6"
+      ],
+      "originalChars": 714,
+      "rewriteChars": 954,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:34.945Z",
+      "routes": [
+        "/events/vecher-magii-kemerovo"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "b95cb08c-e1b1-43cc-817e-c7c44b8785cf",
+      "slug": "akusticheskii-kaver-koncert-iz-pesen-nautilus-pompilius-splin-i-mumii-troll-smolensk",
+      "title": "Акустический кавер-концерт из песен Наутилус Помпилиус, СПЛИН и Мумий Тролль",
+      "batch": 1,
+      "eventIds": [
+        "evt_6afa5fbcf3f4aaaa84dad4ea"
+      ],
+      "originalChars": 823,
+      "rewriteChars": 1063,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:35.582Z",
+      "routes": [
+        "/events/akusticheskii-kaver-koncert-iz-pesen-nautilus-pompilius-splin-i-mumii-troll-smolensk"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "ccdc1b85-1b0d-43ee-8237-cf6a7d8ab068",
+      "slug": "razgovor-s-psihologom-ryazan",
+      "title": "Разговор с психологом",
+      "batch": 1,
+      "eventIds": [
+        "evt_6af9a1fcb31db51416bfd47f"
+      ],
+      "originalChars": 276,
+      "rewriteChars": 1070,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:36.251Z",
+      "routes": [
+        "/events/razgovor-s-psihologom-ryazan"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "4bd5e818-562d-497c-a808-ccfdc6070766",
+      "slug": "anime-podkast-ekaterinburg",
+      "title": "Аниме подкаст",
+      "batch": 1,
+      "eventIds": [
+        "evt_6af6ec1a6cab0ce28336622a"
+      ],
+      "originalChars": 295,
+      "rewriteChars": 993,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:36.873Z",
+      "routes": [
+        "/events/anime-podkast-ekaterinburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "69497c0d-10b6-4e2a-a86d-698b75fe6345",
+      "slug": "kovalski-storona-b-aleksandr-ulanov-samara",
+      "title": "Ковальски: сторона Б | Александр Уланов",
+      "batch": 1,
+      "eventIds": [
+        "evt_6af9d97f228033ea92fade1c"
+      ],
+      "originalChars": 1337,
+      "rewriteChars": 1374,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:37.461Z",
+      "routes": [
+        "/events/kovalski-storona-b-aleksandr-ulanov-samara"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "54bb87ff-86c5-4967-bc80-5b07e01041ed",
+      "slug": "pyat-uglov-sankt-peterburg",
+      "title": "\"Пять углов\"",
+      "batch": 1,
+      "eventIds": [
+        "evt_6af6b49705cf784f325ba4ff"
+      ],
+      "originalChars": 662,
+      "rewriteChars": 1073,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:38.131Z",
+      "routes": [
+        "/events/pyat-uglov-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "5a32edb8-ec07-421a-a595-1f10d2118abd",
+      "slug": "eduard-asadov-ya-mogu-tebya-ochen-zhdat-bolshoi-vecher-poezii-sankt-peterburg-2",
+      "title": "Эдуард Асадов. «Я могу тебя очень ждать...». Большой вечер поэзии",
+      "batch": 1,
+      "eventIds": [
+        "evt_6af98d800fd865d6a5015813"
+      ],
+      "originalChars": 1733,
+      "rewriteChars": 1846,
+      "substantiveParagraphs": 4,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:38.857Z",
+      "routes": [
+        "/events/eduard-asadov-ya-mogu-tebya-ochen-zhdat-bolshoi-vecher-poezii-sankt-peterburg-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "38ccdc6c-71d7-4b00-aaef-24036de3c715",
+      "slug": "scenicheskaya-rech-dyshim-artikuliruem-govorim-sankt-peterburg",
+      "title": "Сценическая речь: дышим, артикулируем, говорим",
+      "batch": 1,
+      "eventIds": [
+        "evt_6aabbbc572a4c579567d830d",
+        "evt_6aabbbc672a4c579567d8315",
+        "evt_6aabbbc772a4c579567d831d",
+        "evt_6aabbbc772a4c579567d8325",
+        "evt_6af98026192fe7cd0cc3b8cc",
+        "evt_6af98027192fe7cd0cc3b8d4",
+        "evt_6af98027192fe7cd0cc3b8dc"
+      ],
+      "originalChars": 513,
+      "rewriteChars": 1105,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:40.137Z",
+      "routes": [
+        "/events/scenicheskaya-rech-dyshim-artikuliruem-govorim-sankt-peterburg"
+      ],
+      "revisionsBefore": 7,
+      "revisionsAfter": 9
+    },
+    {
+      "eventPageId": "ad1af851-8f46-4af7-a65e-4fbedbed3dc4",
+      "slug": "anatolii-borozdin-stendap-koncert-9-dekabrya-21-30-sankt-peterburg",
+      "title": "Анатолий Бороздин | Стендап-концерт / 9 декабря / 21:30",
+      "batch": 1,
+      "eventIds": [
+        "evt_6af9f5eaf349936836db0a87"
+      ],
+      "originalChars": 544,
+      "rewriteChars": 928,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:41.329Z",
+      "routes": [
+        "/events/anatolii-borozdin-stendap-koncert-9-dekabrya-21-30-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "95cffece-5a30-4ad2-86d2-597eb56bf578",
+      "slug": "vlyublennyi-v-shekspir-sankt-peterburg",
+      "title": "\"Влюбленный в...Шекспир\"",
+      "batch": 1,
+      "eventIds": [
+        "evt_6af6b58aa2208bbf53e629c9"
+      ],
+      "originalChars": 681,
+      "rewriteChars": 1015,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:42.690Z",
+      "routes": [
+        "/events/vlyublennyi-v-shekspir-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "93658409-a373-4c54-9c8c-027ff52e7c76",
+      "slug": "real-jam-jazz-band-happy-holiday-moskva",
+      "title": "REAL JAM JAZZ BAND: «HAPPY HOLIDAY!»",
+      "batch": 1,
+      "eventIds": [
+        "evt_6afa0d522dbc22c68890d662"
+      ],
+      "originalChars": 2458,
+      "rewriteChars": 2667,
+      "substantiveParagraphs": 6,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:44.026Z",
+      "routes": [
+        "/events/real-jam-jazz-band-happy-holiday-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "0a354b9f-58ce-4e9d-b849-6ca5aa8e3008",
+      "slug": "spektakl-performans-gosti-ekaterinburg-2",
+      "title": "Спектакль-перформанс «Гости»",
+      "batch": 1,
+      "eventIds": [
+        "evt_6af6f3eb1a599ecdb0331450"
+      ],
+      "originalChars": 1458,
+      "rewriteChars": 1574,
+      "substantiveParagraphs": 4,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:44.772Z",
+      "routes": [
+        "/events/spektakl-performans-gosti-ekaterinburg-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "1cdf21db-a2a8-48e8-a67d-908ce887fe17",
+      "slug": "ioannis-kofopulos-i-grekobanda-moskva",
+      "title": "ИОАННИС КОФОПУЛОС И «ГРЕКОБАНДА»",
+      "batch": 1,
+      "eventIds": [
+        "evt_6afa0f3a6e33013422dbf182"
+      ],
+      "originalChars": 1163,
+      "rewriteChars": 1265,
+      "substantiveParagraphs": 4,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:45.583Z",
+      "routes": [
+        "/events/ioannis-kofopulos-i-grekobanda-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "4b7a0c72-46e3-4c65-984c-db20f19241e4",
+      "slug": "lisenok-lyudvig-6-sankt-peterburg",
+      "title": "«Лисенок Людвиг», 6+",
+      "batch": 1,
+      "eventIds": [
+        "evt_6af6b7e7204193b0c661624f"
+      ],
+      "originalChars": 470,
+      "rewriteChars": 997,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:46.295Z",
+      "routes": [
+        "/events/lisenok-lyudvig-6-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "85f8c680-3bb8-489c-b4d0-78eacc1618a2",
+      "slug": "zhizn-prekrasna-sankt-peterburg",
+      "title": "«Жизнь прекрасна»",
+      "batch": 1,
+      "eventIds": [
+        "evt_6af6b61e462bb3c69875f12c"
+      ],
+      "originalChars": 466,
+      "rewriteChars": 1138,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:46.892Z",
+      "routes": [
+        "/events/zhizn-prekrasna-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "5284f478-2179-4b01-bb79-bb596529f7bd",
+      "slug": "nu-novyi-god-pogodi-sankt-peterburg-2",
+      "title": "Ну, Новый год, погоди!",
+      "batch": 1,
+      "eventIds": [
+        "evt_6af84b838bd3aa8104c3b8d1",
+        "evt_6af84b838bd3aa8104c3ba24",
+        "evt_6af84b848bd3aa8104c3bb77",
+        "evt_6af84b858bd3aa8104c3bcca",
+        "evt_6af84b868bd3aa8104c3be1d",
+        "evt_6af84b878bd3aa8104c3bf70",
+        "evt_6af84b888bd3aa8104c3c0c3",
+        "evt_6af84b898bd3aa8104c3c216",
+        "evt_6af84b898bd3aa8104c3c369"
+      ],
+      "originalChars": 488,
+      "rewriteChars": 1067,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:47.713Z",
+      "routes": [
+        "/events/nu-novyi-god-pogodi-sankt-peterburg-2"
+      ],
+      "revisionsBefore": 9,
+      "revisionsAfter": 11
+    },
+    {
+      "eventPageId": "06c1eb15-3e16-47df-b2ff-a1794cdd959f",
+      "slug": "yubileinyi-festival-a2-show-2027-penza",
+      "title": "Юбилейный фестиваль A2 SHOW 2027",
+      "batch": 1,
+      "eventIds": [
+        "evt_6af860a7ea5b50538c1a110e"
+      ],
+      "originalChars": 1032,
+      "rewriteChars": 1097,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:48.513Z",
+      "routes": [
+        "/events/yubileinyi-festival-a2-show-2027-penza"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "30c44674-befa-45d9-aa3b-ab13997fb1dd",
+      "slug": "romeo-i-dzhuletta-sankt-peterburg",
+      "title": "Ромео и Джульетта",
+      "batch": 1,
+      "eventIds": [
+        "evt_6af6114f5f5ea07917a8bf87"
+      ],
+      "originalChars": 487,
+      "rewriteChars": 1096,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:49.147Z",
+      "routes": [
+        "/events/romeo-i-dzhuletta-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "b504a4c7-27ed-4dd8-ad66-f65b7d9cead5",
+      "slug": "lekciya-dismaland-antidisnei-benksi-sankt-peterburg",
+      "title": "Лекция. Dismaland: антиДисней Бэнкси",
+      "batch": 1,
+      "eventIds": [
+        "evt_6aa400f63ced9efa07cb91ec"
+      ],
+      "originalChars": 904,
+      "rewriteChars": 1358,
+      "substantiveParagraphs": 4,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:49.908Z",
+      "routes": [
+        "/events/lekciya-dismaland-antidisnei-benksi-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "d57323cf-3c7f-4a7b-bb55-e08f8dc7e8e4",
+      "slug": "interaktivnyi-spektakl-aibolit-ot-2-5-do-6-let-sankt-peterburg",
+      "title": "Интерактивный спектакль \"Айболит\" от 2,5 до 6 лет",
+      "batch": 1,
+      "eventIds": [
+        "evt_6ac41f3ca4d4a7dd1c5f1ee2"
+      ],
+      "originalChars": 654,
+      "rewriteChars": 1100,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:50.652Z",
+      "routes": [
+        "/events/interaktivnyi-spektakl-aibolit-ot-2-5-do-6-let-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "c955b520-360a-41fb-bf25-ac3ffb361210",
+      "slug": "bulat-okudzhava-chasovye-lyubvi-sankt-peterburg-3",
+      "title": "Булат Окуджава. «Часовые любви»",
+      "batch": 2,
+      "eventIds": [
+        "evt_6af9873ef3f7a97c61a79f43"
+      ],
+      "originalChars": 1888,
+      "rewriteChars": 2307,
+      "substantiveParagraphs": 5,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:51.410Z",
+      "routes": [
+        "/events/bulat-okudzhava-chasovye-lyubvi-sankt-peterburg-3"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "0dd86344-ae73-4eb7-a99a-066711830613",
+      "slug": "denis-gvozdev-ryazan",
+      "title": "Денис Гвоздев",
+      "batch": 2,
+      "eventIds": [
+        "evt_6af9ab7d305c19b188cb03e2"
+      ],
+      "originalChars": 159,
+      "rewriteChars": 831,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:52.043Z",
+      "routes": [
+        "/events/denis-gvozdev-ryazan"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "ed4fafe9-f61c-4b45-b422-99410cbd7ae3",
+      "slug": "pavel-kashin-smolensk",
+      "title": "Павел Кашин",
+      "batch": 2,
+      "eventIds": [
+        "evt_6afa58e202bcaf209c007b30"
+      ],
+      "originalChars": 936,
+      "rewriteChars": 1061,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:52.695Z",
+      "routes": [
+        "/events/pavel-kashin-smolensk"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "485afa82-478f-4643-852f-119882acadd6",
+      "slug": "s6teen-seattle-16-25-let-moskva",
+      "title": "S6TEEN (Seattle 16) 25 лет",
+      "batch": 2,
+      "eventIds": [
+        "evt_6af5fcd8eea1615be0ca1226"
+      ],
+      "originalChars": 341,
+      "rewriteChars": 951,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:53.450Z",
+      "routes": [
+        "/events/s6teen-seattle-16-25-let-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "cf4ae802-cf9c-45e8-9802-c8a137fe9f43",
+      "slug": "the-big-livers-rock-n-roll-show-sankt-peterburg",
+      "title": "The Big Livers Rock-n-Roll Show",
+      "batch": 2,
+      "eventIds": [
+        "evt_6af2c6c9d39f78d9aeac04d3"
+      ],
+      "originalChars": 902,
+      "rewriteChars": 1025,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:54.092Z",
+      "routes": [
+        "/events/the-big-livers-rock-n-roll-show-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "3be3a5c6-f338-4aaa-b5a8-4182bc0ac201",
+      "slug": "bahyt-kompot-moskva-3",
+      "title": "БАХЫТ-КОМПОТ",
+      "batch": 2,
+      "eventIds": [
+        "evt_6af9b0ebd9f81a30e4d3a09b"
+      ],
+      "originalChars": 594,
+      "rewriteChars": 877,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:54.715Z",
+      "routes": [
+        "/events/bahyt-kompot-moskva-3"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "e9d4b6d3-7865-4a47-8cae-23a22874c891",
+      "slug": "spektakl-moi-paren-shtyk-moskva",
+      "title": "Спектакль Мой парень штык",
+      "batch": 2,
+      "eventIds": [
+        "evt_6af9e108f526e3a86bafa571"
+      ],
+      "originalChars": 198,
+      "rewriteChars": 875,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:55.401Z",
+      "routes": [
+        "/events/spektakl-moi-paren-shtyk-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "2a6785f1-a57e-496d-b305-0c43c1eb203d",
+      "slug": "mamulki-bend-v-live-stars-moskva",
+      "title": "Мамульки Bend в Live Stars",
+      "batch": 2,
+      "eventIds": [
+        "evt_6af725d5b84ec4f8bd339322"
+      ],
+      "originalChars": 466,
+      "rewriteChars": 851,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:56.078Z",
+      "routes": [
+        "/events/mamulki-bend-v-live-stars-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "07d819e4-d0d5-4559-bb6f-5e3dd5676ea9",
+      "slug": "tatyana-zykina-moskva",
+      "title": "Татьяна Зыкина",
+      "batch": 2,
+      "eventIds": [
+        "evt_6af9b63b947f23b2141723a4"
+      ],
+      "originalChars": 302,
+      "rewriteChars": 827,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:56.831Z",
+      "routes": [
+        "/events/tatyana-zykina-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "95476056-67c5-486e-bea6-a6316ad38914",
+      "slug": "horonko-orkestr-moskva",
+      "title": "Хоронько Оркестр",
+      "batch": 2,
+      "eventIds": [
+        "evt_6af9ba86c935749a57826042"
+      ],
+      "originalChars": 425,
+      "rewriteChars": 876,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:57.412Z",
+      "routes": [
+        "/events/horonko-orkestr-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "dd5eae6a-c9ca-4ef8-bc37-2aad3ca529e0",
+      "slug": "mirovye-i-rozhdestvenskie-hity-v-simfonicheskom-zvuchanii-na-teploi-kryshe-koncert-imperialis-orche-moskva",
+      "title": "Мировые и Рождественские хиты в Симфоническом звучании на Теплой Крыше / Концерт Imperialis Orchestra",
+      "batch": 2,
+      "eventIds": [
+        "evt_6af8684a36ed1f6d222459cf"
+      ],
+      "originalChars": 1460,
+      "rewriteChars": 1584,
+      "substantiveParagraphs": 4,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:58.158Z",
+      "routes": [
+        "/events/mirovye-i-rozhdestvenskie-hity-v-simfonicheskom-zvuchanii-na-teploi-kryshe-koncert-imperialis-orche-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "735f5f60-a1cd-4c84-9d24-f50397dd2d44",
+      "slug": "strannaya-miss-sevidzh-ekaterinburg",
+      "title": "Странная мисс Сэвидж",
+      "batch": 2,
+      "eventIds": [
+        "evt_6ad3acc1f79eabe6aef59b85"
+      ],
+      "originalChars": 1178,
+      "rewriteChars": 1267,
+      "substantiveParagraphs": 4,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:02:59.246Z",
+      "routes": [
+        "/events/strannaya-miss-sevidzh-ekaterinburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "57d63f26-baf6-4a3e-b839-ede475a16f4f",
+      "slug": "esenin-teatr-v-pabe-chelyabinsk",
+      "title": "Есенин. Театр в пабе",
+      "batch": 2,
+      "eventIds": [
+        "evt_6ac750dfae4ab86694e82b54"
+      ],
+      "originalChars": 481,
+      "rewriteChars": 874,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:00.731Z",
+      "routes": [
+        "/events/esenin-teatr-v-pabe-chelyabinsk"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "37e188d2-fee5-463d-a927-d77e38639991",
+      "slug": "mify-i-tainy-istorii-lektorii-s-glebom-aleksushinym-dostizheniya-i-nedostatki-sovetskogo-turizma-b-samara",
+      "title": "Мифы и тайны истории | лекторий с Глебом Алексушиным. Достижения и недостатки советского туризма: были ли раньше деревья большими?",
+      "batch": 2,
+      "eventIds": [
+        "evt_6ae8bbed22e9a7ae8278ae11"
+      ],
+      "originalChars": 781,
+      "rewriteChars": 1031,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:02.524Z",
+      "routes": [
+        "/events/mify-i-tainy-istorii-lektorii-s-glebom-aleksushinym-dostizheniya-i-nedostatki-sovetskogo-turizma-b-samara"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "d931018a-6870-4614-9945-7b25c39b028a",
+      "slug": "ekskursiya-v-osobnyak-zimina-moskva-2",
+      "title": "Экскурсия в особняк Зимина",
+      "batch": 2,
+      "eventIds": [
+        "evt_6ae214e35088c685fcfdbd7b"
+      ],
+      "originalChars": 428,
+      "rewriteChars": 889,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:03.663Z",
+      "routes": [
+        "/events/ekskursiya-v-osobnyak-zimina-moskva-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "bae0dee6-1902-4b65-949f-1cbb7bf1c8ef",
+      "slug": "blistatelnyi-sankt-peterburg",
+      "title": "Блистательный Санкт-Петербург",
+      "batch": 2,
+      "eventIds": [
+        "evt_6ad374cd76739261465169c6"
+      ],
+      "originalChars": 1356,
+      "rewriteChars": 1437,
+      "substantiveParagraphs": 4,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:04.314Z",
+      "routes": [
+        "/events/blistatelnyi-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "3921737a-3ab2-4f64-8ad4-dc50ece9e841",
+      "slug": "balet-schelkunchik-sankt-peterburg-12",
+      "title": "Балет «Щелкунчик»",
+      "batch": 2,
+      "eventIds": [
+        "evt_6ac5f2946bc57f430ecb7145"
+      ],
+      "originalChars": 1573,
+      "rewriteChars": 1625,
+      "substantiveParagraphs": 4,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:04.999Z",
+      "routes": [
+        "/events/balet-schelkunchik-sankt-peterburg-12"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "c68fb313-8e87-4ff3-ab4b-6b0c90e90e53",
+      "slug": "alexander-dovgopoly-project-moskva",
+      "title": "ALEXANDER DOVGOPOLY PROJECT",
+      "batch": 2,
+      "eventIds": [
+        "evt_6ac8dbda3d90cc52e14e9f0d"
+      ],
+      "originalChars": 1856,
+      "rewriteChars": 2265,
+      "substantiveParagraphs": 5,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:05.574Z",
+      "routes": [
+        "/events/alexander-dovgopoly-project-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "f7d48418-c9b3-4e4e-89f5-dab115813029",
+      "slug": "koncert-kamernyi-orkestr-igorya-lermana-v-den-rozhdeniya-naberezhnye-chelny",
+      "title": "Концерт «Камерный оркестр Игоря Лермана. В День рождения!»",
+      "batch": 2,
+      "eventIds": [
+        "evt_6af732a33eea1c18b007388b"
+      ],
+      "originalChars": 1873,
+      "rewriteChars": 2046,
+      "substantiveParagraphs": 5,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:06.146Z",
+      "routes": [
+        "/events/koncert-kamernyi-orkestr-igorya-lermana-v-den-rozhdeniya-naberezhnye-chelny"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "f1003ce7-a336-41e7-b512-b2dc15aa5f48",
+      "slug": "moscow-ragtime-band-moskva-2",
+      "title": "MOSCOW RAGTIME BAND",
+      "batch": 2,
+      "eventIds": [
+        "evt_6abfcd8218083a6fda9ccd25"
+      ],
+      "originalChars": 2508,
+      "rewriteChars": 2656,
+      "substantiveParagraphs": 6,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:06.931Z",
+      "routes": [
+        "/events/moscow-ragtime-band-moskva-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "c02fff08-9393-4d65-a5c3-2cfacc236d3c",
+      "slug": "tal-babickii-izrail-i-dzhazovyi-orkestr-denisa-melnikova-moskva",
+      "title": "ТАЛЬ БАБИЦКИЙ (ИЗРАИЛЬ) И ДЖАЗОВЫЙ ОРКЕСТР ДЕНИСА МЕЛЬНИКОВА",
+      "batch": 2,
+      "eventIds": [
+        "evt_6abfe0d8166f8dbe21db4c0c"
+      ],
+      "originalChars": 1708,
+      "rewriteChars": 2044,
+      "substantiveParagraphs": 5,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:07.768Z",
+      "routes": [
+        "/events/tal-babickii-izrail-i-dzhazovyi-orkestr-denisa-melnikova-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "022fdad7-3bb6-4741-9979-bf71dc6cb8bd",
+      "slug": "muzyka-ostrovov-aleksei-chichilin-island-music-iii-kuba-moskva",
+      "title": "Музыка островов | Алексей Чичилин – Island music III: Куба",
+      "batch": 2,
+      "eventIds": [
+        "evt_6ad5327cc3247089669df790"
+      ],
+      "originalChars": 2375,
+      "rewriteChars": 2687,
+      "substantiveParagraphs": 6,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:08.491Z",
+      "routes": [
+        "/events/muzyka-ostrovov-aleksei-chichilin-island-music-iii-kuba-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "bc71220f-3ef0-4622-a3f1-ca9884c9e32f",
+      "slug": "koncert-gurude-serdce-dreva-krasnoyarsk",
+      "title": "Концерт GURUDE \"Сердце древа\"",
+      "batch": 2,
+      "eventIds": [
+        "evt_6a99b03df5e8bfce87f70386"
+      ],
+      "originalChars": 862,
+      "rewriteChars": 1048,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:09.073Z",
+      "routes": [
+        "/events/koncert-gurude-serdce-dreva-krasnoyarsk"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "fc1e7cb8-38ca-4493-acfb-117b07b00e65",
+      "slug": "blyuzovyi-dzhem-s-rok-bendom-the-lagoon-krasnoyarsk",
+      "title": "Блюзовый джем с рок-бэндом The Lagoon",
+      "batch": 2,
+      "eventIds": [
+        "evt_6ae8507a5035667e9b518ab3",
+        "evt_6ae8507b5035667e9b518b03"
+      ],
+      "originalChars": 647,
+      "rewriteChars": 906,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:09.789Z",
+      "routes": [
+        "/events/blyuzovyi-dzhem-s-rok-bendom-the-lagoon-krasnoyarsk"
+      ],
+      "revisionsBefore": 2,
+      "revisionsAfter": 4
+    },
+    {
+      "eventPageId": "14e8658b-ec6b-49e6-8281-7d4c843a1c80",
+      "slug": "plumbum-dreams-tribyut-led-zeppelin-moskva",
+      "title": "Plumbum Dreams - трибьют \"LED ZEPPELIN\"",
+      "batch": 2,
+      "eventIds": [
+        "evt_6ad8694302f66ab85e5cb10d"
+      ],
+      "originalChars": 648,
+      "rewriteChars": 961,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:10.431Z",
+      "routes": [
+        "/events/plumbum-dreams-tribyut-led-zeppelin-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "5c13fd39-ac6b-49c9-8ec7-b2c9f9cdfe57",
+      "slug": "sasha-rastich-7-rasa-19-11-staryi-park-ryazan",
+      "title": "Саша РАСТИЧ / 7 РАСА - 19.11 - СТАРЫЙ ПАРК",
+      "batch": 2,
+      "eventIds": [
+        "evt_6a9ea860c9f27e0538d88724"
+      ],
+      "originalChars": 650,
+      "rewriteChars": 873,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:11.036Z",
+      "routes": [
+        "/events/sasha-rastich-7-rasa-19-11-staryi-park-ryazan"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "8c82fd67-862d-41d8-86a2-48f6eda999bd",
+      "slug": "ekskursiya-v-muzei-kvartiru-golovanova-i-kabinet-nezhdanovoi-moskva",
+      "title": "Экскурсия в музей-квартиру Голованова и кабинет Неждановой",
+      "batch": 2,
+      "eventIds": [
+        "evt_6acf63f30545ab9682136c5e"
+      ],
+      "originalChars": 1876,
+      "rewriteChars": 2115,
+      "substantiveParagraphs": 5,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:11.876Z",
+      "routes": [
+        "/events/ekskursiya-v-muzei-kvartiru-golovanova-i-kabinet-nezhdanovoi-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "e7aa27cd-0a80-41b0-b542-14b66a6aaee6",
+      "slug": "otpetye-moshenniki-sankt-peterburg",
+      "title": "Отпетые мошенники",
+      "batch": 2,
+      "eventIds": [
+        "evt_6a86fe973af6fae0ea59d9bd"
+      ],
+      "originalChars": 591,
+      "rewriteChars": 818,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:12.621Z",
+      "routes": [
+        "/events/otpetye-moshenniki-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "ade168f7-ba65-4cd8-9fc9-1f7dfbaf1a5b",
+      "slug": "kosmicheskii-dzhaz-sade-sankt-peterburg",
+      "title": "Космический джаз: Sade",
+      "batch": 2,
+      "eventIds": [
+        "evt_6aa2c9f5eaaa507eba576534"
+      ],
+      "originalChars": 992,
+      "rewriteChars": 1041,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:13.276Z",
+      "routes": [
+        "/events/kosmicheskii-dzhaz-sade-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "d592143a-1d01-4b97-a358-0c3ca73696c8",
+      "slug": "novodevichii-monastyr-na-perekrestke-carskih-sudeb-moskva",
+      "title": "Новодевичий монастырь: на перекрестке царских судеб",
+      "batch": 2,
+      "eventIds": [
+        "evt_6a51ffcf0344995cb1150048",
+        "evt_6a51ffd00344995cb115005a",
+        "evt_6a51ffd20344995cb115006c",
+        "evt_6a51ffd60344995cb1150090",
+        "evt_6a51ffd90344995cb11500b4",
+        "evt_6a51ffdb0344995cb11500c6",
+        "evt_6a51ffdc0344995cb11500d8",
+        "evt_6a51ffde0344995cb11500ea",
+        "evt_6a51ffe00344995cb11500fc",
+        "evt_6a51ffe10344995cb115010e",
+        "evt_6a51ffe30344995cb1150120",
+        "evt_6a51ffe50344995cb1150132",
+        "evt_6a53582f8d92a7d20f63ce30",
+        "evt_6a5358318d92a7d20f63ce42",
+        "evt_6a5358338d92a7d20f63ce54",
+        "evt_6a5358358d92a7d20f63ce66",
+        "evt_6a5358378d92a7d20f63ce78",
+        "evt_6a5358398d92a7d20f63ce8a",
+        "evt_6a53583b8d92a7d20f63ce9c",
+        "evt_6a53583d8d92a7d20f63ceae",
+        "evt_6a9bd1ec40eb7bf93e9dce2e",
+        "evt_6a9bd1ee40eb7bf93e9dce40",
+        "evt_6a9bd1f140eb7bf93e9dce52",
+        "evt_6a9bd1f240eb7bf93e9dce64",
+        "evt_6a9bd1f440eb7bf93e9dce76",
+        "evt_6a9bd1f640eb7bf93e9dce88",
+        "evt_6a9bd1f840eb7bf93e9dce9a",
+        "evt_6ac8dc8fc36bbc1be0a54f13",
+        "evt_6ac8f05a9ed275412a58138c"
+      ],
+      "originalChars": 1895,
+      "rewriteChars": 2256,
+      "substantiveParagraphs": 5,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:14.546Z",
+      "routes": [
+        "/events/novodevichii-monastyr-na-perekrestke-carskih-sudeb-moskva"
+      ],
+      "revisionsBefore": 29,
+      "revisionsAfter": 31
+    },
+    {
+      "eventPageId": "fdf9b77f-e846-46d6-83d4-82e74f9256af",
+      "slug": "anton-zaletaev-i-letnyi-sezon-moskva",
+      "title": "АНТОН ЗАЛЕТАЕВ И «ЛЁТНЫЙ СЕЗОН»",
+      "batch": 3,
+      "eventIds": [
+        "evt_6abfdff444c0d778508ab5f8"
+      ],
+      "originalChars": 2793,
+      "rewriteChars": 2958,
+      "substantiveParagraphs": 6,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:15.197Z",
+      "routes": [
+        "/events/anton-zaletaev-i-letnyi-sezon-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "1f95a6e8-0c7e-4d94-a59a-cf37c8ccc5ae",
+      "slug": "sergei-filatov-yurii-novgorodskii-mariya-vladimirskaya-moskva",
+      "title": "СЕРГЕЙ ФИЛАТОВ – ЮРИЙ НОВГОРОДСКИЙ – МАРИЯ ВЛАДИМИРСКАЯ",
+      "batch": 3,
+      "eventIds": [
+        "evt_6ad4e5436c6e1d0c62961770"
+      ],
+      "originalChars": 2740,
+      "rewriteChars": 2825,
+      "substantiveParagraphs": 6,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:15.755Z",
+      "routes": [
+        "/events/sergei-filatov-yurii-novgorodskii-mariya-vladimirskaya-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "ab6beca5-3f08-4483-a9a8-c4cc28e7ef10",
+      "slug": "dmitrii-kazachkov-vecher-pamyati-nikolaya-arutyunova-moskva",
+      "title": "ДМИТРИЙ КАЗАЧКОВ: ВЕЧЕР ПАМЯТИ НИКОЛАЯ АРУТЮНОВА",
+      "batch": 3,
+      "eventIds": [
+        "evt_6ace2fbcd239b43f4005ea69"
+      ],
+      "originalChars": 2642,
+      "rewriteChars": 2834,
+      "substantiveParagraphs": 7,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:16.560Z",
+      "routes": [
+        "/events/dmitrii-kazachkov-vecher-pamyati-nikolaya-arutyunova-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "770e3017-294d-44e9-a415-1361ee5fb735",
+      "slug": "festival-budnik-moskva",
+      "title": "Фестиваль Будник!",
+      "batch": 3,
+      "eventIds": [
+        "evt_6ae1a9f925308047c3ac1dd4"
+      ],
+      "originalChars": 2242,
+      "rewriteChars": 2307,
+      "substantiveParagraphs": 5,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:17.217Z",
+      "routes": [
+        "/events/festival-budnik-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "cbb23b24-32ce-40b7-b3d5-7978af8eae9f",
+      "slug": "minecraft-show-mainkraft-shou-moskva-2",
+      "title": "MINECRAFT SHOW - МАЙНКРАФТ ШОУ",
+      "batch": 3,
+      "eventIds": [
+        "evt_6ae37aae97cc76ccd33a4aa6"
+      ],
+      "originalChars": 2217,
+      "rewriteChars": 2348,
+      "substantiveParagraphs": 6,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:17.823Z",
+      "routes": [
+        "/events/minecraft-show-mainkraft-shou-moskva-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "ae8b2900-03c2-46fd-839b-e550197d20cc",
+      "slug": "sofiya-acbeha-negga-moskva",
+      "title": "СОФИЯ АЦБЕХА НЕГГА",
+      "batch": 3,
+      "eventIds": [
+        "evt_6ab5b2ba1689cbe6f9504ab2"
+      ],
+      "originalChars": 2193,
+      "rewriteChars": 2256,
+      "substantiveParagraphs": 5,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:18.783Z",
+      "routes": [
+        "/events/sofiya-acbeha-negga-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "b0386ae7-cdbd-4090-9632-be29567b4396",
+      "slug": "tvoi-prazdnik-sankt-peterburg",
+      "title": "Твой Праздник",
+      "batch": 3,
+      "eventIds": [
+        "evt_6ac444fb90762689ae090655",
+        "evt_6ac444fd90762689ae090667"
+      ],
+      "originalChars": 2130,
+      "rewriteChars": 2187,
+      "substantiveParagraphs": 5,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:20.108Z",
+      "routes": [
+        "/events/tvoi-prazdnik-sankt-peterburg"
+      ],
+      "revisionsBefore": 2,
+      "revisionsAfter": 4
+    },
+    {
+      "eventPageId": "f4d3c901-ccfa-4e09-ae32-aab00bcbb666",
+      "slug": "vivaldi-vremena-goda-sankt-peterburg-2",
+      "title": "Вивальди Времена года. Оркестр Феникс",
+      "batch": 3,
+      "eventIds": [
+        "evt_6a9bc1cec8016df43b9dcdc5",
+        "evt_6a9bc1d3c8016df43b9dcef5",
+        "evt_6ab14cb7f0c61eb6e9b528ef",
+        "evt_6ab14cbff0c61eb6e9b52b4f"
+      ],
+      "originalChars": 2092,
+      "rewriteChars": 2331,
+      "substantiveParagraphs": 6,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:21.431Z",
+      "routes": [
+        "/events/vivaldi-vremena-goda-sankt-peterburg-2"
+      ],
+      "revisionsBefore": 4,
+      "revisionsAfter": 6
+    },
+    {
+      "eventPageId": "8208560f-763f-4bf8-b59e-4668a6be0a44",
+      "slug": "sergei-dolzhenkov-new-blood-big-band-moskva",
+      "title": "СЕРГЕЙ ДОЛЖЕНКОВ & NEW BLOOD BIG BAND",
+      "batch": 3,
+      "eventIds": [
+        "evt_6abfd88b3473ad14fd7c73a6"
+      ],
+      "originalChars": 1772,
+      "rewriteChars": 2069,
+      "substantiveParagraphs": 5,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:22.656Z",
+      "routes": [
+        "/events/sergei-dolzhenkov-new-blood-big-band-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "a57828e5-eae4-48b7-a6cf-bb5560f4e138",
+      "slug": "nostalgiya-noyabrya-sankt-peterburg",
+      "title": "Ностальгия ноября",
+      "batch": 3,
+      "eventIds": [
+        "evt_6a952da5aae3094f9db4fe92"
+      ],
+      "originalChars": 1687,
+      "rewriteChars": 1905,
+      "substantiveParagraphs": 5,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:23.504Z",
+      "routes": [
+        "/events/nostalgiya-noyabrya-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "e668fc45-8241-481b-aea7-78d2d56adedf",
+      "slug": "trio-mihaila-kistanova-specialnyi-gost-vovka-kozhekin-garmoshka-moskva",
+      "title": "Трио Михаила Кистанова, специальный гость Вовка Кожекин (гармошка)",
+      "batch": 3,
+      "eventIds": [
+        "evt_6ad86714c5fe6a0f542fbe7d"
+      ],
+      "originalChars": 1664,
+      "rewriteChars": 1904,
+      "substantiveParagraphs": 5,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:24.210Z",
+      "routes": [
+        "/events/trio-mihaila-kistanova-specialnyi-gost-vovka-kozhekin-garmoshka-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "fa69ebab-d9e8-4853-916b-9a4f4ee977ca",
+      "slug": "aleks-abra-new-york-new-york-klassicheskii-dzhaz-s-yumorom-moskva",
+      "title": "Алекс Абра: New York New York. Классический джаз с юмором.",
+      "batch": 3,
+      "eventIds": [
+        "evt_6ab231739cb10ab6f6ee6788"
+      ],
+      "originalChars": 1657,
+      "rewriteChars": 1903,
+      "substantiveParagraphs": 5,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:24.910Z",
+      "routes": [
+        "/events/aleks-abra-new-york-new-york-klassicheskii-dzhaz-s-yumorom-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "46728f23-e067-4794-bb9d-3dc5c2bf4f3a",
+      "slug": "svetlana-zhavoronkova-secret-atelier-moskva",
+      "title": "СВЕТЛАНА ЖАВОРОНКОВА & SECRET ATELIER",
+      "batch": 3,
+      "eventIds": [
+        "evt_6abfe33e47798c549d92835d"
+      ],
+      "originalChars": 1656,
+      "rewriteChars": 1868,
+      "substantiveParagraphs": 5,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:25.657Z",
+      "routes": [
+        "/events/svetlana-zhavoronkova-secret-atelier-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "35ecdc52-99cf-48e4-8f68-0445fad10f69",
+      "slug": "bozhole-nuvo-2026-vecherinka-koncert-vo-francuzskom-stile-sankt-peterburg",
+      "title": "\"БОЖОЛЕ НУВО-2026\" Вечеринка-концерт во французском стиле",
+      "batch": 3,
+      "eventIds": [
+        "evt_6ac51145d61abda5fe00dc89"
+      ],
+      "originalChars": 1273,
+      "rewriteChars": 1399,
+      "substantiveParagraphs": 4,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:26.398Z",
+      "routes": [
+        "/events/bozhole-nuvo-2026-vecherinka-koncert-vo-francuzskom-stile-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "24683404-0c13-4ef0-be0a-08a49f61aa64",
+      "slug": "rok-hity-mtv-shou-koncert-sankt-peterburg",
+      "title": "\"РОК-ХИТЫ MTV\" ШОУ-КОНЦЕРТ",
+      "batch": 3,
+      "eventIds": [
+        "evt_6a79cb35a76da46b435b99a1"
+      ],
+      "originalChars": 1555,
+      "rewriteChars": 1579,
+      "substantiveParagraphs": 4,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:27.137Z",
+      "routes": [
+        "/events/rok-hity-mtv-shou-koncert-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "fd1e0ab3-7fe9-490b-8b48-617410a6c303",
+      "slug": "stabat-mater-pergolezi-bah-muzyka-soborov-pri-svechah-moskva",
+      "title": "«STABAT MATER. Перголези • Бах. Музыка соборов при свечах»",
+      "batch": 3,
+      "eventIds": [
+        "evt_6ab24ec3174fa70a98492b01"
+      ],
+      "originalChars": 1149,
+      "rewriteChars": 1549,
+      "substantiveParagraphs": 4,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:27.791Z",
+      "routes": [
+        "/events/stabat-mater-pergolezi-bah-muzyka-soborov-pri-svechah-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "6763d805-768a-494f-bca0-4a43be2c31a4",
+      "slug": "shopen-pri-svechah-sankt-peterburg",
+      "title": "Шопен при свечах",
+      "batch": 3,
+      "eventIds": [
+        "evt_6a0209d9f601f6cca92a0c33"
+      ],
+      "originalChars": 1147,
+      "rewriteChars": 1350,
+      "substantiveParagraphs": 4,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:28.531Z",
+      "routes": [
+        "/events/shopen-pri-svechah-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "d5757782-3d02-49d1-b4ce-ca2490b9c83d",
+      "slug": "praktiki-osoznannogo-vospriyatiya-iskusstva-zhanr-nyu-v-tvorchestve-andreya-pozdeeva-krasnoyarsk",
+      "title": "Практики осознанного восприятия искусства «Жанр «ню» в творчестве Андрея Поздеева»",
+      "batch": 3,
+      "eventIds": [
+        "evt_6ab9f7d9bb2365b2301ad479"
+      ],
+      "originalChars": 1132,
+      "rewriteChars": 1422,
+      "substantiveParagraphs": 4,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:29.217Z",
+      "routes": [
+        "/events/praktiki-osoznannogo-vospriyatiya-iskusstva-zhanr-nyu-v-tvorchestve-andreya-pozdeeva-krasnoyarsk"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "84982c8a-f122-4f99-a8aa-51f297386c59",
+      "slug": "izzotop-tribyut-zz-top-moskva",
+      "title": "IZZoTop - трибьют \"ZZ Top\"",
+      "batch": 3,
+      "eventIds": [
+        "evt_6adc63380832de12efb53fcd"
+      ],
+      "originalChars": 1128,
+      "rewriteChars": 1271,
+      "substantiveParagraphs": 4,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:29.885Z",
+      "routes": [
+        "/events/izzotop-tribyut-zz-top-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "2933256b-de03-4e72-94f7-b5066cd718bf",
+      "slug": "interaktivnyi-spektakl-muha-cokotuha-ot-2-do-6-let-sankt-peterburg-3",
+      "title": "Интерактивный спектакль \"Муха Цокотуха \" от 2 до 6 лет",
+      "batch": 3,
+      "eventIds": [
+        "evt_6ac42347dbcd6b44e4973f08"
+      ],
+      "originalChars": 1105,
+      "rewriteChars": 1312,
+      "substantiveParagraphs": 4,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:30.525Z",
+      "routes": [
+        "/events/interaktivnyi-spektakl-muha-cokotuha-ot-2-do-6-let-sankt-peterburg-3"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "e254a913-4db0-4c60-b6d5-dfd75533824a",
+      "slug": "strunnoe-svetovoe-shou-moskva",
+      "title": "Струнное световое шоу",
+      "batch": 3,
+      "eventIds": [
+        "evt_6a55f7a23bdaed105e2e6cb6"
+      ],
+      "originalChars": 1101,
+      "rewriteChars": 1346,
+      "substantiveParagraphs": 5,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:31.253Z",
+      "routes": [
+        "/events/strunnoe-svetovoe-shou-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "246b5ec6-907e-4869-9874-f784aba416d8",
+      "slug": "legendarnye-hity-90-h-i-2000-h-muzykalnyi-vecher-nad-moskvoi-moskva",
+      "title": "Легендарные хиты 90-х и 2000-х. Музыкальный вечер над Москвой",
+      "batch": 3,
+      "eventIds": [
+        "evt_6ae31a1322674d3e5631af8d"
+      ],
+      "originalChars": 1099,
+      "rewriteChars": 1373,
+      "substantiveParagraphs": 4,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:31.880Z",
+      "routes": [
+        "/events/legendarnye-hity-90-h-i-2000-h-muzykalnyi-vecher-nad-moskvoi-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "557647e0-0dda-4eca-bcd4-6eebfa8ccf2f",
+      "slug": "yaponskii-vecher-dlya-dvoih-krasnoyarsk",
+      "title": "«Японский вечер для двоих»",
+      "batch": 3,
+      "eventIds": [
+        "evt_6ac0dd24d1480ff5e9f959cd",
+        "evt_6ac0dd26d1480ff5e9f959dd",
+        "evt_6ac0dd26d1480ff5e9f959e5",
+        "evt_6ac0dd27d1480ff5e9f959ed",
+        "evt_6ac0dd28d1480ff5e9f959f5",
+        "evt_6ac0dd28d1480ff5e9f959fd",
+        "evt_6ac0dd29d1480ff5e9f95a05",
+        "evt_6ac0dd2ad1480ff5e9f95a0d"
+      ],
+      "originalChars": 1096,
+      "rewriteChars": 1301,
+      "substantiveParagraphs": 4,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:32.595Z",
+      "routes": [
+        "/events/yaponskii-vecher-dlya-dvoih-krasnoyarsk"
+      ],
+      "revisionsBefore": 8,
+      "revisionsAfter": 10
+    },
+    {
+      "eventPageId": "90322135-c38b-44b7-b486-efbb554e7045",
+      "slug": "doors-lovers-korolev",
+      "title": "DOORS LOVERS",
+      "batch": 3,
+      "eventIds": [
+        "evt_6a674f46af5c6ea6930b7138"
+      ],
+      "originalChars": 1086,
+      "rewriteChars": 1307,
+      "substantiveParagraphs": 4,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:33.343Z",
+      "routes": [
+        "/events/doors-lovers-korolev"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "bada1b45-6b49-4fac-9ef2-8d3dfb63c93d",
+      "slug": "andrei-atlas-solnyi-stendap-koncert-v-g-samare-samara",
+      "title": "Андрей Атлас. Сольный стендап концерт в г. Самаре",
+      "batch": 3,
+      "eventIds": [
+        "evt_6a9db6274cd948c9f14296fc"
+      ],
+      "originalChars": 1069,
+      "rewriteChars": 1212,
+      "substantiveParagraphs": 4,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:33.963Z",
+      "routes": [
+        "/events/andrei-atlas-solnyi-stendap-koncert-v-g-samare-samara"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "917bf4da-0ff4-49c0-921f-e086439f7e1c",
+      "slug": "zhanna-legenda-sankt-peterburg",
+      "title": "Жанна. Легенда",
+      "batch": 3,
+      "eventIds": [
+        "evt_6ace9335042dc06057d8e958"
+      ],
+      "originalChars": 1047,
+      "rewriteChars": 1088,
+      "substantiveParagraphs": 3,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:34.771Z",
+      "routes": [
+        "/events/zhanna-legenda-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "560c0a9f-0503-4a0a-8121-1a774c3f7de0",
+      "slug": "sestry-moskva",
+      "title": "Сёстры",
+      "batch": 3,
+      "eventIds": [
+        "evt_6ae47fe2501b07dd68fa8d87"
+      ],
+      "originalChars": 1046,
+      "rewriteChars": 1206,
+      "substantiveParagraphs": 4,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:35.534Z",
+      "routes": [
+        "/events/sestry-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "89660bd0-e3fb-4f6d-8a02-b52a31ff3adc",
+      "slug": "kvintet-viktorii-krivozubovoi-na-paru-slov-moskva",
+      "title": "КВИНТЕТ ВИКТОРИИ КРИВОЗУБОВОЙ «НА ПАРУ СЛОВ»",
+      "batch": 3,
+      "eventIds": [
+        "evt_6ab5b3077cff52717116d168"
+      ],
+      "originalChars": 1014,
+      "rewriteChars": 1177,
+      "substantiveParagraphs": 4,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:36.229Z",
+      "routes": [
+        "/events/kvintet-viktorii-krivozubovoi-na-paru-slov-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "efb887d9-9094-4f4d-bf9e-0176d226b9ba",
+      "slug": "ekskursiya-v-muzei-mvd-rossii-k-dnyu-milicii-moskva",
+      "title": "Экскурсия в музей МВД России к Дню милиции",
+      "batch": 3,
+      "eventIds": [
+        "evt_6aca618b32f61bb6cadfa834"
+      ],
+      "originalChars": 1007,
+      "rewriteChars": 1326,
+      "substantiveParagraphs": 4,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:36.929Z",
+      "routes": [
+        "/events/ekskursiya-v-muzei-mvd-rossii-k-dnyu-milicii-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "98f1b629-9d5b-4267-b555-d241ab3cf80d",
+      "slug": "mediakult-luchshee-dlya-zhizni-dizain-bez-granic-moskva",
+      "title": "МЕДИАКУЛЬТ | Лучшее для жизни. Дизайн без границ",
+      "batch": 3,
+      "eventIds": [
+        "evt_6af6d2cb2614efc0ea6fffc9"
+      ],
+      "originalChars": 1291,
+      "rewriteChars": 1599,
+      "substantiveParagraphs": 4,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T05:03:37.690Z",
+      "routes": [
+        "/events/mediakult-luchshee-dlya-zhizni-dizain-bez-granic-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3
+    },
+    {
+      "eventPageId": "34789b97-ea6c-4ea9-a722-688bd2f401af",
+      "slug": "zhivopis-guash-krasnoyarsk-2",
+      "title": "Живопись. Гуашь",
+      "batch": 1,
+      "eventIds": [
+        "evt_6af6e9aaa390be459fc3b8de",
+        "evt_6af6e9aba390be459fc3b8e6",
+        "evt_6af6e9aba390be459fc3b8ee",
+        "evt_6af6e9aba390be459fc3b8f6",
+        "evt_6af6e9aca390be459fc3b8fe",
+        "evt_6af6e9aca390be459fc3b906",
+        "evt_6af6e9ada390be459fc3b90e",
+        "evt_6af6e9ada390be459fc3b916",
+        "evt_6af6e9ada390be459fc3b91e"
+      ],
+      "originalChars": 587,
+      "rewriteChars": 695,
+      "substantiveParagraphs": 2,
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-17T07:47:13.390Z",
+      "routes": [
+        "/events/zhivopis-guash-krasnoyarsk-2"
+      ],
+      "revisionsBefore": 9,
+      "revisionsAfter": 11
+    }
+  ],
+  "counts": {
+    "applied": 90,
+    "indexable": 90
+  },
+  "linksRoutesAndSeoFieldsChanged": false,
+  "skipped": []
+}
