@@ -175,16 +175,16 @@
         {
           "batch": 1,
           "position": 12,
-          "id": "b5aaa2a2-e9a4-4706-a25c-b01809afc952",
-          "slug": "istoricheskii-fat-stendap-sankt-peterburg",
-          "title": "🏛️Исторический FAT стендап",
-          "city": "Санкт-Петербург",
-          "sources": "TICKETSCLOUD",
-          "freshLinkedEvents": 5,
-          "linkedEvents": 5,
-          "activeSlots": 5,
-          "nextSlot": "2026-12-04T14:00:00.000Z",
-          "sourceChars": 3050
+          "id": "37e188d2-fee5-463d-a927-d77e38639991",
+          "slug": "mify-i-tainy-istorii-lektorii-s-glebom-aleksushinym-dostizheniya-i-nedostatki-sovetskogo-turizma-b-samara",
+          "title": "Мифы и тайны истории | лекторий с Глебом Алексушиным. Достижения и недостатки советского туризма: были ли раньше деревья большими?",
+          "city": "Самара",
+          "sources": "backlog",
+          "freshLinkedEvents": 0,
+          "linkedEvents": 1,
+          "activeSlots": 1,
+          "nextSlot": "2026-11-17T12:00:00.000Z",
+          "sourceChars": 799
         },
         {
           "batch": 1,
