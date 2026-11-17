@@ -35,6 +35,12 @@ corepack prepare pnpm@11.7.0 --activate 2>/dev/null || true
 
 pnpm install --frozen-lockfile 2>/dev/null || pnpm install
 
+# Images are persistent, Git-ignored runtime assets. Validate them on the host
+# before touching the staging database or building the public app.
+source "${APP_DIR}/deploy/scripts/deploy-runtime.sh"
+ensure_public_assets_deploy
+pnpm hub:check-image-quality
+
 export NEXT_PUBLIC_TC_WIDGET_TOKEN="${NEXT_PUBLIC_TC_WIDGET_TOKEN:-$TICKETSCLOUD_WIDGET_TOKEN}"
 export NEXT_PUBLIC_TEP_WIDGET_ID="${NEXT_PUBLIC_TEP_WIDGET_ID:-$TEP_WIDGET_ID}"
 

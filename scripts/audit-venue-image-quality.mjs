@@ -12,7 +12,13 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const lib = path.join(root, 'apps/web/src/lib');
-const venuesRoot = path.join(root, 'apps/public/public/images/venues');
+// Venue images are persistent runtime assets in apps/web/public and are not
+// tracked in Git. CI builds intentionally have no image payload; the deploy
+// scripts run this guard on the server after checking that the persistent root
+// exists. Override the path for local audits when the assets live elsewhere.
+const venuesRoot = path.resolve(
+  process.env.DAIBILET_VENUE_IMAGE_ROOT || path.join(root, 'apps/web/public/images/venues'),
+);
 const outPath = path.join(root, 'scripts/audit-venue-image-quality.json');
 
 const cityFilter = process.argv.find((a) => a.startsWith('--city='))?.slice('--city='.length) || null;
