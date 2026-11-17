@@ -111,11 +111,12 @@ internal links on staging.
 - Current place-family PDPs use both `/venues/{slug}` and `/locations/{slug}`.
   Keep the family unchanged. The domain URL matrix defines the public-slug
   rule: route/canonical/sitemap use `Venue.publicSlug`; `Venue.slug` remains
-  the import identity. The nullable column and unique index are present in the
-  staging database. The integration branch is pushed, but deployment is paused
-  until the 11,255 tracked changes in the staging worktree are reconciled; the
-  deploy script would switch that worktree. Existing published records require
-  a reviewed dry-run before bulk assignment or redirects.
+  the import identity. The integration branch is deployed to staging and the
+  nullable column/unique index were already present there. A published museum
+  PDP now verifies old-slug 308 → clean slug, clean-page 200, canonical, and
+  sitemap inclusion. Pre-existing staging edits were preserved in Git stash.
+  Existing published records require a reviewed dry-run before bulk assignment
+  or redirects.
 - Event PDPs remain on `/events/{slug}`. The national catalog remains `/events`; city-specific catalogs are `/{city}/events` and do not change EventPage identities or URLs.
 
 ## Production URL inventory (read-only, 2026-11-16)
