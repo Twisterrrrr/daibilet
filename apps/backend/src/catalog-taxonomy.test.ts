@@ -101,6 +101,13 @@ test('moves cinema, circus, planetarium and aquarium into the entertainment plac
   for (const subtype of ['planetarium', 'aquarium']) assert.equal(placeSubtypeIssue('MUSEUM', subtype), 'subtype_type_mismatch');
 });
 
+test('classifies tour-bus boarding places under transport and keeps cafe as a food subtype', () => {
+  assert.equal(placeSubtypeIssue('TRANSPORT', 'tour_bus'), null);
+  assert.equal(suggestedPlacePdpVariant('TRANSPORT', 'tour_bus'), 'transport');
+  assert.equal(placeSubtypeIssue('FOOD', 'cafe'), null);
+  assert.equal(suggestedPlacePdpVariant('FOOD', 'cafe'), 'food');
+});
+
 test('place taxonomy heuristics only suggest candidates and do not overwrite a resolved subtype', () => {
   assert.deepEqual(suggestPlaceTaxonomyCandidate({ title: 'Океанариум «Риф»', placeType: 'MUSEUM', placeSubtype: 'aquarium' }), {
     placeType: 'ENTERTAINMENT', placeSubtype: 'aquarium', variant: 'attraction', reason: 'title_aquarium',

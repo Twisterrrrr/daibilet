@@ -1,5 +1,11 @@
 # Decision Log — Daibilet
 
+## 2026-11-17 — Tour-bus pickup places and metro geotag
+
+**Decision:** `TRANSPORT:tour_bus` means a specific pickup place for a sightseeing bus. It is not the vehicle, carrier, or a regular transit stop. The editor should request the exact address/orientation, and a connection to an event/session is added only when departure from that place is confirmed. The catalog group can be labelled «Туравтобусы»; the single candidate subtype is «Туравтобус».
+
+Railway stations and bus stations remain separate subtypes (`railway_station`, `bus_station`). A metro station is not a standalone Places entity or subtype; `Venue.metroStation` is a nearby-location hint. `FOOD:cafe` already exists and must not be duplicated.
+
 ## 2026-11-17 — Separate Clubs and Bar/Restaurant place catalogs
 
 **Decision:** Places navigation has separate `clubs` and `bar-restaurants`
