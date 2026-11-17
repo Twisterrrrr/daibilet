@@ -35,6 +35,9 @@ test('city-first redirects old city URLs and spelling aliases only for ready hub
   assert.equal(resolveCityFirstRedirectPath('/cities/perm-krai', true), null);
   assert.equal(resolveCityFirstRedirectPath('/nizhniy-novgorod', true), '/nizhny-novgorod');
   assert.equal(resolveCityFirstRedirectPath('/velikiy-novgorod/places', true), '/veliky-novgorod/places');
+  assert.equal(resolveCityFirstRedirectPath('/nizhniy-novgorod/events', true), '/nizhny-novgorod/events');
+  assert.equal(resolveCityFirstRedirectPath('/velikiy-novgorod/events', true), '/veliky-novgorod/events');
+  assert.equal(resolveCityFirstRedirectPath('/moskva/events', true), '/moscow/events');
   assert.equal(resolveCityFirstRedirectPath('/moscow', true), null);
   assert.equal(resolveCityFirstRedirectPath('/cities/not-reviewed', true), null);
   assert.equal(resolveCityFirstRedirectPath('/places/c/perm', false), null);

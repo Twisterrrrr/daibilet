@@ -86,6 +86,14 @@ export function isCityFirstLegacyRouteSlug(slug: string): boolean {
 }
 export function resolveCityFirstRedirectPath(pathname: string, enabled: boolean): string | null {
   if (!enabled) return null;
+  const cityEventsMatch = pathname.match(/^\/([^/]+)\/events\/?$/);
+  if (cityEventsMatch) {
+    const rawSlug = cityEventsMatch[1];
+    const canonical = canonicalCitySlug(rawSlug);
+    if (canonical !== rawSlug && isCityFirstLegacyRouteSlug(canonical)) {
+      return `/${canonical}/events`;
+    }
+  }
   const legacyMatch = pathname.match(/^\/(?:cities\/([^/]+)|places\/c\/([^/]+))\/?$/);
   const aliasMatch = pathname.match(/^\/([^/]+)(\/places)?\/?$/);
   const rawSlug = legacyMatch?.[1] || legacyMatch?.[2] || aliasMatch?.[1];

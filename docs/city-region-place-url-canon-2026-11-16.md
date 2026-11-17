@@ -135,7 +135,8 @@ internal links on staging.
   city-first targets use those same public spellings. The API lookup slugs
   `nizhniy-novgorod` and `velikiy-novgorod` are aliases only; they must not
   produce separate city or city-place pages. Event, article, and authored
-  landing URLs containing either spelling remain untouched.
+  landing URLs containing either spelling remain untouched. City event-catalog
+  routes using the aliases redirect to the public city spelling.
 - A mapping pass matched all 66 city/region sitemap URLs and all 51 city
   place-catalog URLs one-to-one against `/api/public/destinations` by entity
   identity. The current-sitemap map is

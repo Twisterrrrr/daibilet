@@ -57,9 +57,10 @@ The approved public spellings are:
 The live city sitemap uses `nizhny` and `veliky`; the API spellings are lookup
 aliases and must not create separate city or city-place pages. City and city
 place paths that arrive through those aliases should redirect in one hop to the
-public canonical spelling. This is a city-route-only rule. Event PDPs, article
-slugs, and authored category landing paths containing these tokens are kept
-exactly as they are.
+public canonical spelling, including their `/events` and `/places` city
+catalogs. This is a city-route-only rule. Event PDPs, article slugs, and
+authored category landing paths containing these tokens are kept exactly as
+they are.
 
 The current city map matches all 66 live city/region hub paths and 51 city
 place-catalog paths by destination identity. On staging, all 117 old paths now
@@ -68,8 +69,9 @@ Novgorod paths use the public spellings above; the API spellings remain lookup
 aliases only.
 
 The staging city sitemap contains canonical Novgorod slugs and omits the API
-spelling aliases. A dedicated `/{city}/events` catalog route is implemented
-and awaits staging acceptance before any production rollout.
+spelling aliases. The dedicated `/{city}/events` catalog route is deployed on
+staging and returns city-filtered SSR listings for Moscow and Saint Petersburg.
+No production rollout has been made.
 
 ## Sources and artifacts
 
