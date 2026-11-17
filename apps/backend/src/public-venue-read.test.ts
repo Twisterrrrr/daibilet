@@ -9,6 +9,9 @@ import {
   mergePublicVenueHubRows,
   needsVenueSitemapDetailCheck,
   publicVenueRowMatchesCityFilter,
+  publicVenueRowMatchesCatalogFilter,
+  publicVenueRowMatchesSubtypeFilter,
+  publicVenueRowMatchesTypeFilter,
   publicVenuesForSessionsFromHub,
   resolvePublicVenuesForSessions,
   resolvePublicVenueCanonicalPath,
@@ -16,6 +19,24 @@ import {
   scoreRelatedVenueCandidate,
   venueTextKeysFuzzyMatch,
 } from './public-venue-read.js';
+
+test('place type filtering prefers reviewed taxonomy and supports exact club subtype', () => {
+  const reviewedClub = { placeType: 'venue', placeSubtype: 'club', type: 'club_bar_restaurant' };
+  const reviewedRestaurant = { placeType: 'food', placeSubtype: 'restaurant', type: 'club_bar_restaurant' };
+  const unreviewedImport = { placeType: null, placeSubtype: null, type: 'club_bar_restaurant' };
+
+  assert.equal(publicVenueRowMatchesTypeFilter(reviewedClub, 'food,bar,club_bar_restaurant'), false);
+  assert.equal(publicVenueRowMatchesTypeFilter(reviewedClub, 'venue'), true);
+  assert.equal(publicVenueRowMatchesTypeFilter(reviewedRestaurant, 'food'), true);
+  assert.equal(publicVenueRowMatchesTypeFilter(unreviewedImport, 'club_bar_restaurant'), true);
+  assert.equal(publicVenueRowMatchesSubtypeFilter(reviewedClub, 'club'), true);
+  assert.equal(publicVenueRowMatchesSubtypeFilter({ placeType: 'food', placeSubtype: 'club' }, 'club'), false);
+  assert.equal(publicVenueRowMatchesSubtypeFilter(reviewedRestaurant, 'club'), false);
+  assert.equal(publicVenueRowMatchesSubtypeFilter(unreviewedImport, 'club'), false);
+  assert.equal(publicVenueRowMatchesCatalogFilter(reviewedClub, 'gastro,bar,club_bar_restaurant', 'restaurant,cafe,bar'), false);
+  assert.equal(publicVenueRowMatchesCatalogFilter(reviewedRestaurant, 'gastro,bar,club_bar_restaurant', 'restaurant,cafe,bar'), true);
+  assert.equal(publicVenueRowMatchesCatalogFilter(unreviewedImport, 'gastro,bar,club_bar_restaurant', 'restaurant,cafe,bar'), true);
+});
 
 test('venue list DTO keeps future sessions distinct from all-time events', () => {
   const venue = mapPublicVenueListItem({

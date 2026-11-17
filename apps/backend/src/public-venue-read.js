@@ -2241,7 +2241,7 @@ export function mapPublicVenueListItem(row) {
     hookFact: normalizeNullableString(normalized.hookFact),
     type,
     placeType: normalized.placeType?.toLowerCase() || null,
-    placeSubtype: normalized.placeSubtype || null,
+    placeSubtype: normalized.placeSubtype?.toLowerCase() || null,
     isMainPlace: normalized.isMainPlace === true,
     hubTags: normalized.hubTags || [],
     template,
@@ -2413,6 +2413,7 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
   const query = String(searchParams.get('q') || '').trim().toLowerCase();
   const cityFilter = String(searchParams.get('city') || '').trim().toLowerCase();
   const typeFilter = String(searchParams.get('type') || '').trim().toLowerCase();
+  const subtypeFilter = String(searchParams.get('subtype') || '').trim().toLowerCase();
   const familyRaw = String(searchParams.get('family') || '').trim().toLowerCase();
   const familyFilter = familyRaw === 'institution' || familyRaw === 'location' ? familyRaw : '';
   const scaleFilter = String(searchParams.get('scale') || '').trim().toLowerCase();
@@ -2424,6 +2425,17 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
     const scaleSource = facetSource?.scaleUniverse || filteredItems;
     const cities = countBy(citySource.map((venue) => venue.city).filter(Boolean));
     const types = countBy(typeSource.map((venue) => venue.placeType || venue.type).filter(Boolean));
+    const subtypes = countBy(typeSource.map((venue) => venue.placeSubtype).filter(Boolean));
+    const catalogCategories = {
+      bar_restaurant: typeSource.filter((venue) =>
+        publicVenueRowMatchesCatalogFilter(
+          venue,
+          'food,gastro,bar,club_bar_restaurant',
+          'restaurant,cafe,bar',
+        ),
+      ).length,
+      clubs: typeSource.filter((venue) => publicVenueRowMatchesSubtypeFilter(venue, 'club')).length,
+    };
     const scales = countBy(
       scaleSource
         .filter((venue) => venue.template === 'institution')
@@ -2451,6 +2463,8 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
       events: eventsTotal,
       cities,
       types,
+      subtypes,
+      catalogCategories,
       scales,
       logistics,
     };
@@ -2507,16 +2521,9 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
       working = working.filter((venue) => publicVenueRowMatchesCityFilter(venue, cityFilter));
     }
     const typeUniverse = working;
-    if (typeFilter) {
-      const typeSet = new Set(
-        typeFilter
-          .split(',')
-          .map((part) => String(part || '').trim().toLowerCase())
-          .filter(Boolean),
-      );
+    if (typeFilter || subtypeFilter) {
       working = working.filter((venue) =>
-        typeSet.has(String(venue.placeType || '').toLowerCase()) ||
-        typeSet.has(String(venue.type || '').toLowerCase()),
+        publicVenueRowMatchesCatalogFilter(venue, typeFilter, subtypeFilter),
       );
     }
     const scaleUniverse = working;
@@ -3053,6 +3060,48 @@ export function publicVenueRowMatchesCityFilter(row, cityFilterRaw) {
   // nizhny-novgorod filter vs nizhny-novgorod-* slugs when canon is nizhniy-novgorod
   if (filterCanon === 'nizhniy-novgorod' && venueSlug.startsWith('nizhny-novgorod-')) return true;
   return false;
+}
+
+/** Explicit editorial placeType wins; legacy supplier type is fallback only. */
+export function publicVenueRowMatchesTypeFilter(row, typeFilterRaw) {
+  const typeSet = new Set(
+    String(typeFilterRaw || '')
+      .split(',')
+      .map((part) => String(part || '').trim().toLowerCase())
+      .filter(Boolean),
+  );
+  if (!typeSet.size) return true;
+  const placeType = String(row?.placeType || '').trim().toLowerCase();
+  if (placeType) return typeSet.has(placeType);
+  return typeSet.has(String(row?.type || '').trim().toLowerCase());
+}
+
+/** Subtype filters use explicit editorial assignments only. */
+export function publicVenueRowMatchesSubtypeFilter(row, subtypeFilterRaw) {
+  const subtypeSet = new Set(
+    String(subtypeFilterRaw || '')
+      .split(',')
+      .map((part) => String(part || '').trim().toLowerCase())
+      .filter(Boolean),
+  );
+  if (!subtypeSet.size) return true;
+  const subtype = String(row?.placeSubtype || '').trim().toLowerCase();
+  if (!subtypeSet.has(subtype)) return false;
+  if (subtype === 'club' && String(row?.placeType || '').trim().toLowerCase() !== 'venue') return false;
+  return true;
+}
+
+/** A catalog facet can union reviewed subtypes and legacy type fallbacks. */
+export function publicVenueRowMatchesCatalogFilter(row, typeFilterRaw, subtypeFilterRaw) {
+  if (typeFilterRaw && subtypeFilterRaw) {
+    return (
+      publicVenueRowMatchesTypeFilter(row, typeFilterRaw) ||
+      publicVenueRowMatchesSubtypeFilter(row, subtypeFilterRaw)
+    );
+  }
+  return typeFilterRaw
+    ? publicVenueRowMatchesTypeFilter(row, typeFilterRaw)
+    : publicVenueRowMatchesSubtypeFilter(row, subtypeFilterRaw);
 }
 
 /**
