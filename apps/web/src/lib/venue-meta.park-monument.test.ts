@@ -50,7 +50,10 @@ describe('park + monument venue kinds', () => {
 describe('places hub parent types', () => {
   it('uses taxonomy parents and preserves legacy catalog fallbacks', () => {
     const byId = Object.fromEntries(PLACES_HUB_CATEGORY_CHIPS.map((chip) => [chip.id, chip]));
-    assert.deepEqual(byId.food?.types, ['food', 'gastro', 'bar', 'club_bar_restaurant']);
+    assert.deepEqual(byId.bar_restaurant?.types, ['food', 'gastro', 'bar', 'club_bar_restaurant']);
+    assert.deepEqual(byId.bar_restaurant?.subtypes, ['restaurant', 'cafe', 'bar']);
+    assert.deepEqual(byId.clubs?.types, []);
+    assert.deepEqual(byId.clubs?.subtypes, ['club']);
     assert.deepEqual(byId.transport?.types, ['transport', 'pier', 'pier_water']);
     assert.deepEqual(byId.attractions?.types, ['attraction']);
     assert.deepEqual(byId.religion?.types, ['religion', 'temple']);
@@ -72,6 +75,23 @@ describe('places hub parent types', () => {
     const chip = resolvePlacesHubCategoryChip('religion');
     assert.ok(chip);
     assert.equal(placesHubCategoryCount({ temple: 12, attraction: 40 }, chip), 12);
+  });
+
+  it('resolves clubs as their own explicit subtype category', () => {
+    assert.equal(resolvePlacesHubCategoryChip('clubs')?.id, 'clubs');
+    const clubs = resolvePlacesHubCategoryChip('clubs');
+    assert.ok(clubs);
+    assert.equal(placesHubCategoryCount({ venue: 20 }, clubs, { club: 3 }), 3);
+    assert.equal(placesHubCategoryCount({ venue: 20 }, clubs, {}), 0);
+  });
+
+  it('keeps restaurants and bars separate from explicitly typed clubs', () => {
+    assert.equal(resolvePlacesHubCategoryChip('food')?.id, 'bar_restaurant');
+    assert.equal(resolvePlacesHubCategoryChip('restaurant')?.id, 'bar_restaurant');
+    const eateries = resolvePlacesHubCategoryChip('bar_restaurant');
+    assert.ok(eateries);
+    assert.equal(placesHubCategoryCount({ club_bar_restaurant: 14 }, eateries, { restaurant: 3, cafe: 2, bar: 1 }), 20);
+    assert.equal(placesHubCategoryCount({ food: 100 }, eateries, { restaurant: 3, cafe: 2, bar: 1 }, { bar_restaurant: 6 }), 6);
   });
 });
 

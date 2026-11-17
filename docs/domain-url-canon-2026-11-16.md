@@ -65,11 +65,12 @@ The only canonical type slugs are:
 | `landmarks` | Достопримечательности | `ARCHITECTURE` or `MONUMENT`; `URBAN` (`square`) and `ENTERTAINMENT` (`observation_deck`) when editorially classified as landmarks |
 | `temples` | Храмы и монастыри | `RELIGION` and approved subtypes |
 | `art-spaces` | Арт-пространства и лофты | `MUSEUM` (`gallery`) or `VENUE` (`exhibition_hall`); reviewed legacy art-space kind |
-| `food` | Рестораны и кафе | `FOOD` and approved subtypes; reviewed legacy food/gastro/bar kinds |
+| `bar-restaurants` | Бары и рестораны | `FOOD` (`restaurant`, `cafe`, `bar`) plus reviewed legacy gastro/bar kinds; legacy `CLUB_BAR_RESTAURANT` is a temporary broad fallback |
 | `venues` | Банкетные и событийные площадки | `VENUE` and approved event-space subtypes; reviewed legacy venue kind |
 | `entertainment` | Развлечения и семейный отдых | `ENTERTAINMENT` and approved subtypes |
 | `walks` | Набережные и места для прогулок | `URBAN` (`square`, `street`, `embankment`, `district`) and approved outdoor-walk records |
 | `transport` | Причалы и точки отправления | `TRANSPORT` and approved subtypes; reviewed legacy pier/meeting-point kinds |
+| `clubs` | Клубы | `VENUE` + explicitly reviewed `club` subtype; legacy `club_bar_restaurant` alone is not sufficient |
 
 This is a catalog taxonomy, so membership can overlap: for example, a gallery
 can appear in both `museums` and `art-spaces`, and a concert hall can appear in
@@ -77,15 +78,26 @@ both `theatres` and `concert-halls`. Membership is explicit editorial taxonomy,
 not a title-only guess. This catalog type does not change a place's primary
 `placeType`, PDP URL or primary breadcrumb.
 
-The route registry and API must share the same predicate implementation. The
-current generic Places `type` filter accepts parent/legacy type values but does
-not fully implement these subtype-aware predicates. Therefore type routes must
-remain behind the preview flag until the backend can filter and count by the
-exact registry predicate; do not estimate indexability from a partial client
-filter.
+`clubs` is a separately registered catalog facet, not a new Prisma
+`PlaceType`: it selects reviewed `placeType=VENUE, placeSubtype=club` records.
+The legacy supplier kind `CLUB_BAR_RESTAURANT` is shared by clubs, bars and
+restaurants; it remains a temporary fallback in `bar-restaurants` while those
+rows are reviewed and must not infer membership in `clubs`. If a record has an
+explicit `placeType`, that editorial taxonomy takes precedence over its legacy
+supplier kind for catalog filtering. The `bar-restaurants` facet unions the
+approved Food subtypes (`restaurant`, `cafe`, `bar`) with that legacy fallback.
+Subtype-specific pages and counts use the same server-side predicate.
+
+The route registry and API filters must use the exact predicates in
+[`place-city-type-filter-map-2026-11-17.md`](./place-city-type-filter-map-2026-11-17.md).
+The public Places API accepts a union of reviewed subtype and legacy type
+fallbacks, with an explicit `placeType` taking priority over legacy supplier
+kind. Type route counts and indexability must come from the exact filtered API
+result, not a sum of overlapping parent and subtype counters.
 Legacy `/places/institution` and `/places/location` family facets are reserved
 paths and remain available until a separate migration decision; they are not
-aliases for any of the 12 types.
+aliases for the 12 parent PlaceType values or their separately registered
+editorial catalog facets.
 
 For national type catalogs, use the same minimum inventory rule as city types:
 0 places → 404; 1–2 → `noindex, follow` and canonical `/places`; 3+ distinct

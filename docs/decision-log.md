@@ -1,5 +1,18 @@
 # Decision Log — Daibilet
 
+## 2026-11-17 — Separate Clubs and Bar/Restaurant place catalogs
+
+**Decision:** Places navigation has separate `clubs` and `bar-restaurants`
+facets. Clubs require an explicit `placeType=VENUE` plus
+`placeSubtype=club`; bars and restaurants use approved `FOOD` subtypes and the
+legacy `CLUB_BAR_RESTAURANT` fallback while imports are reviewed. A reviewed
+`placeType` takes precedence over legacy supplier kind. This adds a catalog
+facet, not a new Prisma `PlaceType`, and does not change any PDP URL.
+
+**Status:** Decision and filter behavior are being implemented in the current
+Places catalog slice. City/national type routes must use the same API filter
+and count predicates before becoming indexable.
+
 ## 2026-11-16 — City-first URL hierarchy; preserve event URLs
 
 City hubs move toward `/{city}`, region hubs use `/regions/{region}`, and

@@ -33,9 +33,11 @@ the current event inventory or from the presence of a sales contract.
 | Event catalog and PDP | `/events`, `/events/{slug}` | **No change** |
 
 The city type segment is directly under the city (`/{city}/museums`,
-`/{city}/theatres`). `/places` remains the all-places route, while
+`/{city}/theatres`, `/{city}/clubs`, `/{city}/bar-restaurants`). `/places` remains the all-places route, while
 `/{city}/places` remains the complete city catalog. A city type route is
-recognized only when `{type}` is in the canonical place-type registry.
+recognized only when `{type}` is in the canonical place-catalog registry.
+The registry may include editorial facets backed by subtypes, not just parent
+PlaceType values.
 
 ## Indexing rules for city × place type
 

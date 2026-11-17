@@ -392,7 +392,12 @@ export const LOCATION_CATALOG_TYPE_OPTIONS = CATALOG_TYPE_OPTIONS.filter((option
 );
 
 /** Parent Places types, with legacy chips kept as fallbacks for unreviewed imports. */
-export const PLACES_HUB_CATEGORY_CHIPS: Array<{ id: string; label: string; types: string[] }> = [
+export const PLACES_HUB_CATEGORY_CHIPS: Array<{
+  id: string;
+  label: string;
+  types: string[];
+  subtypes?: string[];
+}> = [
   { id: 'architecture', label: 'Архитектура', types: ['architecture'] },
   { id: 'monument', label: 'Памятники', types: ['monument'] },
   { id: 'museum', label: 'Музеи', types: ['museum', 'art_space', 'museum_art_space'] },
@@ -401,7 +406,10 @@ export const PLACES_HUB_CATEGORY_CHIPS: Array<{ id: string; label: string; types
   { id: 'urban', label: 'Городские места', types: ['urban', 'outdoor_location'] },
   { id: 'theatre', label: 'Театры и сцены', types: ['theatre', 'theater', 'concert_hall'] },
   { id: 'entertainment', label: 'Развлечения', types: ['entertainment', 'sport_activity_space'] },
-  { id: 'food', label: 'Еда', types: ['food', 'gastro', 'bar', 'club_bar_restaurant'] },
+  // Legacy club_bar_restaurant remains in this broad fallback until each row
+  // is reviewed; an explicit Venue/club subtype is filtered into Clubs only.
+  { id: 'bar_restaurant', label: 'Бары и рестораны', types: ['food', 'gastro', 'bar', 'club_bar_restaurant'], subtypes: ['restaurant', 'cafe', 'bar'] },
+  { id: 'clubs', label: 'Клубы', types: [], subtypes: ['club'] },
   { id: 'transport', label: 'Транспорт', types: ['transport', 'pier', 'pier_water'] },
   { id: 'venue', label: 'Площадки', types: ['venue', 'meeting_point'] },
   { id: 'attractions', label: 'Другие достопримечательности', types: ['attraction'] },
@@ -417,22 +425,32 @@ export function resolvePlacesHubCategoryChip(
   const byId = PLACES_HUB_CATEGORY_CHIPS.find((chip) => chip.id === raw);
   if (byId) return byId;
   const legacyIds: Record<string, string> = { museums: 'museum', galleries: 'museum', theaters: 'theatre', concert_halls: 'theatre',
-    bars_restaurants: 'food', gastro: 'food', outdoors: 'nature', temples: 'religion',
-    monuments: 'monument', piers: 'transport', buses: 'transport', venues: 'venue', sport: 'entertainment' };
+    food: 'bar_restaurant', bars_restaurants: 'bar_restaurant', gastro: 'bar_restaurant', restaurant: 'bar_restaurant', cafe: 'bar_restaurant',
+    outdoors: 'nature', temples: 'religion',
+    monuments: 'monument', piers: 'transport', buses: 'transport', venues: 'venue', sport: 'entertainment',
+    clubs: 'clubs' };
   const legacyId = legacyIds[raw];
   if (legacyId) return PLACES_HUB_CATEGORY_CHIPS.find((chip) => chip.id === legacyId) || null;
   // Legacy `?type=theater` / `museum` from older URLs.
   return (
-    PLACES_HUB_CATEGORY_CHIPS.find((chip) => chip.types.includes(normalizeVenueKind(raw))) || null
+    PLACES_HUB_CATEGORY_CHIPS.find((chip) =>
+      chip.types.includes(normalizeVenueKind(raw)) || chip.subtypes?.includes(raw),
+    ) || null
   );
 }
 
 export function placesHubCategoryCount(
   typesCounts: Record<string, number> | null | undefined,
   chip: (typeof PLACES_HUB_CATEGORY_CHIPS)[number],
+  subtypeCounts?: Record<string, number> | null,
+  catalogCategoryCounts?: Record<string, number> | null,
 ): number {
+  const exactCount = catalogCategoryCounts?.[chip.id];
+  if (Number.isFinite(Number(exactCount))) return Number(exactCount);
   const counts = typesCounts || {};
-  return chip.types.reduce((sum, type) => sum + (Number(counts[type]) || 0), 0);
+  const typesTotal = chip.types.reduce((sum, type) => sum + (Number(counts[type]) || 0), 0);
+  const subtypes = subtypeCounts || {};
+  return typesTotal + (chip.subtypes || []).reduce((sum, subtype) => sum + (Number(subtypes[subtype]) || 0), 0);
 }
 
 /** UX-масштаб площадок на `/venues` - только эвристики по kind, без Prisma. */

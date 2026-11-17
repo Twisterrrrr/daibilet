@@ -14,6 +14,7 @@ export type VenueCatalogFeedQuery = {
   family?: VenueCatalogFamily | 'all';
   city?: string;
   type?: string;
+  subtype?: string;
   scale?: string;
   logistics?: string;
   sort?: VenueCatalogSort;
@@ -38,6 +39,8 @@ export type VenueCatalogFeedStats = {
   events?: number;
   cities: Record<string, number>;
   types: Record<string, number>;
+  subtypes?: Record<string, number>;
+  catalogCategories?: Record<string, number>;
   scales?: Record<string, number>;
   logistics?: Record<string, number>;
 };
@@ -70,6 +73,8 @@ function emptyStats(): VenueCatalogFeedStats {
     events: 0,
     cities: {},
     types: {},
+    subtypes: {},
+    catalogCategories: {},
     scales: {},
     logistics: {},
   };
@@ -87,6 +92,7 @@ export function buildVenueCatalogSearchParams(query: VenueCatalogFeedQuery): URL
   params.set('limit', String(query.limit || VENUE_CATALOG_PAGE_SIZE));
   if (query.city && query.city !== 'all') params.set('city', query.city);
   if (query.type && query.type !== 'all') params.set('type', query.type);
+  if (query.subtype && query.subtype !== 'all') params.set('subtype', query.subtype);
   if (query.scale && query.scale !== 'all') params.set('scale', query.scale);
   if (query.logistics && query.logistics !== 'all') params.set('logistics', query.logistics);
   if (query.sort && query.sort !== 'events') params.set('sort', query.sort);
@@ -107,6 +113,7 @@ export function venueCatalogCacheKey(query: VenueCatalogFeedQuery): string {
     query.family || 'all',
     query.city || 'all',
     query.type || 'all',
+    query.subtype || 'all',
     query.scale || 'all',
     query.logistics || 'all',
     query.sort || 'events',
@@ -151,6 +158,8 @@ export function mapVenueCatalogFeedPage(payload: PublicVenuesDto | null | undefi
       events: Number(stats?.events) || 0,
       cities: stats?.cities || {},
       types: stats?.types || {},
+      subtypes: stats?.subtypes || {},
+      catalogCategories: stats?.catalogCategories || {},
       scales: stats?.scales || {},
       logistics: stats?.logistics || {},
     },

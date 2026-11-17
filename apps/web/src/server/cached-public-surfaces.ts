@@ -133,6 +133,7 @@ export async function getCachedVenuesCatalog(
     limit?: number;
     city?: string;
     type?: string;
+    subtype?: string;
     scale?: string;
     logistics?: string;
     sort?: string;
@@ -146,6 +147,7 @@ export async function getCachedVenuesCatalog(
   const limit = options.limit ?? 24;
   const city = options.city?.trim() || '';
   const type = options.type?.trim() || '';
+  const subtype = options.subtype?.trim() || '';
   const scale = options.scale?.trim() || '';
   const logistics = options.logistics?.trim() || '';
   const sort = options.sort?.trim() || 'events';
@@ -155,11 +157,12 @@ export async function getCachedVenuesCatalog(
   const shell = options.counts === false;
   // Cache key: city+kind+page(+scale/logistics[+sort/q]) + shell/full.
   const cacheKeyParts = [
-    'public-venues-catalog-v7-page',
+    'public-venues-catalog-v8-page',
     family,
     String(limit),
     city || 'all',
     type || 'all',
+    subtype || 'all',
     scale || 'all',
     logistics || 'all',
     sort,
@@ -173,6 +176,7 @@ export async function getCachedVenuesCatalog(
       if (family === 'institution' || family === 'location') searchParams.family = family;
       if (city) searchParams.city = city;
       if (type) searchParams.type = type;
+      if (subtype) searchParams.subtype = subtype;
       if (scale) searchParams.scale = scale;
       if (logistics) searchParams.logistics = logistics;
       if (sort && sort !== 'events') searchParams.sort = sort;

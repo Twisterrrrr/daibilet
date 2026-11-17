@@ -356,10 +356,11 @@ export function PlacesHubView({
       family,
       city: cityFetchKey || undefined,
       type: categoryChip
-        ? categoryChip.types.join(',')
+        ? categoryChip.types.join(',') || undefined
         : typeFilter !== 'all'
           ? typeFilter
           : undefined,
+      subtype: categoryChip?.subtypes?.join(',') || undefined,
       sort: sortMode,
       q: q || undefined,
       hasEvents: hasEvents || undefined,
@@ -475,6 +476,8 @@ export function PlacesHubView({
             setStats({
               ...slice.stats,
               types: basePage.stats.types,
+              subtypes: basePage.stats.subtypes,
+              catalogCategories: basePage.stats.catalogCategories,
               cities: basePage.stats.cities,
               venues: basePage.stats.venues,
               venuesWithEvents: basePage.stats.venuesWithEvents,
@@ -492,6 +495,7 @@ export function PlacesHubView({
             const shellQuery = {
               ...feedQuery,
               type: undefined,
+              subtype: undefined,
               page: 1,
               counts: allowShell ? (false as const) : true,
             };
@@ -502,6 +506,8 @@ export function PlacesHubView({
                 setStats((prev) => ({
                   ...prev,
                   types: shellPage.stats.types,
+                  subtypes: shellPage.stats.subtypes,
+                  catalogCategories: shellPage.stats.catalogCategories,
                   cities: shellPage.stats.cities,
                   venues: shellPage.stats.venues,
                   venuesWithEvents: shellPage.stats.venuesWithEvents,
@@ -643,9 +649,9 @@ export function PlacesHubView({
     const counts = stats.types || {};
     return PLACES_HUB_CATEGORY_CHIPS.map((chip) => ({
       ...chip,
-      count: placesHubCategoryCount(counts, chip),
+      count: placesHubCategoryCount(counts, chip, stats.subtypes, stats.catalogCategories),
     })).filter((chip) => chip.count > 0);
-  }, [stats.types]);
+  }, [stats.types, stats.subtypes, stats.catalogCategories]);
 
   const cityCount = cityOptions.length;
   const cityName = cityFilter !== 'all' ? cityFilter : null;
