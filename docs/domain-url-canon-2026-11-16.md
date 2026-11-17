@@ -14,7 +14,7 @@ city/place migration detail and the production URL audit live in
 | --- | --- | --- | --- |
 | City | Destination ID + reviewed slug | City guide, city events and city places | Current event/venue count or supplier |
 | Region | Destination ID + reviewed slug | Regional guide and its settlements | A city having a sales contract |
-| Place | Venue ID + stable public slug | Informational PDP; sales/events are optional modules | Place taxonomy, sales availability or supplier slug |
+| Place | Venue ID + stable `publicSlug` | Informational PDP; sales/events are optional modules | Place taxonomy, sales availability or supplier slug |
 | Event | EventPage ID + stable event slug | Editorial event/show page aggregating exact linked Event IDs and available sessions | A particular slot/session ID |
 | Event / slot | Provider Event ID / session ID | Offer, schedule and purchase data attached to EventPage | Owning a separate editorial URL by default |
 | Collection | Editorial Landing ID + slug | Curated selection, optionally city-scoped | An inferred event category |
@@ -24,6 +24,21 @@ Changing the classification of a place or event changes its catalog membership,
 not its stable PDP URL. A page can remain informational and accessible when it
 has no active sales. Editorial publication controls indexation; supplier sync
 does not publish a page by itself.
+
+### Place slug rules
+
+- `Venue.slug` remains the provider/import identity and is never rewritten to
+  make a prettier URL. Public route, canonical, and sitemap use `Venue.publicSlug`.
+- A manually created place gets a readable slug from its title. If occupied,
+  append the city slug; if that is occupied too, use the first free `-2`, `-3`,
+  and so on. Slug is then stable when the title changes.
+- An imported candidate may keep its legacy URL while it has no `publicSlug`.
+  When an editor publishes it, assign a unique clean `publicSlug` before making
+  it indexable. Existing published rows are migrated only by a reviewed dry-run.
+- The legacy path continues to resolve by the unchanged `Venue.slug` and
+  permanently redirects directly to the same record's public slug. Never infer
+  a place redirect from title or type. A family flip (`/locations` ↔ `/venues`)
+  requires its own reviewed redirect decision.
 
 ## 2. Canonical public URL matrix
 
@@ -38,7 +53,7 @@ does not publish a page by itself.
 | Global place-type catalog | No settled path | `/places/{type}` | Only one registered type slug; index after catalog eligibility checks |
 | City places catalog | `/places/c/{city}` | `/{city}/places` | Published city route; all public non-hidden place records for that city |
 | City × place type | No settled path | `/{city}/{type}` | Only registered type + registered city; see the 0/1–2/3+ rule below |
-| Place PDP | `/venues/{slug}` or `/locations/{slug}` | Same family with stable public slug | Keep current family unless an individual reviewed redirect migrates it; slug does not depend on type |
+| Place PDP | `/venues/{import-slug}` or `/locations/{import-slug}` | Same family with stable `/venues/{publicSlug}` or `/locations/{publicSlug}` | `Venue.slug` is an import/sync key, not the public slug. New editor-created candidates get a clean public slug immediately; publishing an older candidate fills it if absent. Keep the existing family. |
 | National event catalog | `/events` (city filters may use query parameters) | `/events` | Keep current route and preserve EventPage-focused catalog behavior |
 | Event PDP | `/events/{slug}` (legacy slot/Event URLs also exist) | `/events/{event-page-slug}` | Canonical editorial page; aggregate only explicitly linked Event IDs and their sessions |
 | City event catalog | Event catalog with city filter | `/{city}/events` | City listing of EventPages; Event PDPs stay under `/events/` |
@@ -185,7 +200,8 @@ reviewed, one-hop permanent redirects:
 | `/cities/{region}` | `/regions/{region}` | Exact destination type must be `region` |
 | `/places/c/{city}` | `/{city}/places` | Exact city match |
 | Old slot/Event URL | `/events/{event-page-slug}` | Exact Event ID link to a published EventPage only |
-| Old place slug/family | Reviewed place PDP URL | Per-place alias only; never infer from title/type |
+| Old place slug in the same family | `/venues/{publicSlug}` or `/locations/{publicSlug}` | Resolve the exact Venue by its unchanged import slug, then one-hop 308 to its `publicSlug`; no title/type guessing |
+| Place family flip | Reviewed `/locations/{slug}` ↔ `/venues/{slug}` target | Per-place alias and explicit family decision; never bundle with slug cleanup |
 
 Every redirect map must be generated from current production URLs, reviewed for
 collisions and checked for loops/chains. Keep old URLs resolving through a

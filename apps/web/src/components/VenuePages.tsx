@@ -231,6 +231,7 @@ export async function VenueDetailPage({
   const targetHref = venueHref({
     id: payload.venue.id,
     slug: payload.venue.slug || decodedSlug,
+    publicSlug: payload.venue.publicSlug,
     name: payload.venue.name,
     type: family === 'location' ? 'location' : payload.venue.type,
   });

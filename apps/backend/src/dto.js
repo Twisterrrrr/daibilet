@@ -2869,12 +2869,15 @@ export async function updateAdminVenue(db, venueId, payload) {
     const city = await db.query(`SELECT id FROM "City" WHERE id = $1 LIMIT 1`, [next.cityId]);
     if (!city.rows[0]) throw new Error('Unknown city');
   }
+  if (next.isIndexable && !next.publicSlug) {
+    const city = next.cityId
+      ? await db.query(`SELECT id, slug, title FROM "City" WHERE id = $1 LIMIT 1`, [next.cityId])
+      : { rows: [] };
+    const citySlug = city.rows[0]?.slug || city.rows[0]?.title || next.city || '';
+    next.publicSlug = await uniqueVenuePublicSlug(db, next.title, citySlug, venueId);
+  }
   if (next.publicSlug) {
-    const taken = await db.query(
-      `SELECT id FROM "Venue" WHERE "publicSlug" = $1 AND id <> $2 LIMIT 1`,
-      [next.publicSlug, venueId],
-    );
-    if (taken.rows[0]) throw new Error('Этот публичный slug уже занят другой площадкой');
+    await assertVenuePublicSlugAvailable(db, next.publicSlug, venueId);
   }
   const result = await db.query(
     `
@@ -2948,13 +2951,6 @@ export async function createAdminVenue(db, payload = {}) {
   const normalized = normalizeVenuePayload(payload);
   const title = normalized.title?.trim();
   if (!title) throw new Error('Название площадки обязательно');
-  if (normalized.publicSlug) {
-    const taken = await db.query(
-      `SELECT id FROM "Venue" WHERE "publicSlug" = $1 LIMIT 1`,
-      [normalized.publicSlug],
-    );
-    if (taken.rows[0]) throw new Error('Этот публичный slug уже занят другой площадкой');
-  }
   const cityId = normalized.cityId || null;
   let citySlug = '';
   if (cityId) {
@@ -2962,6 +2958,8 @@ export async function createAdminVenue(db, payload = {}) {
     if (!city.rows[0]) throw new Error('Unknown city');
     citySlug = city.rows[0].slug || city.rows[0].title || '';
   }
+  const publicSlug = normalized.publicSlug || await uniqueVenuePublicSlug(db, title, citySlug);
+  if (normalized.publicSlug) await assertVenuePublicSlugAvailable(db, publicSlug);
   const id = `venue_${randomUUID().replaceAll('-', '').slice(0, 24)}`;
   const baseSlug = publicCitySlug([citySlug, title].filter(Boolean).join(' ')) || 'venue';
   const slug = `${baseSlug}-${id.slice(-8)}`;
@@ -2979,7 +2977,7 @@ export async function createAdminVenue(db, payload = {}) {
     id, slug, title, normalized.description ?? null, Boolean(normalized.description),
     normalized.shortDescription ?? null, normalized.heroImageUrl ?? null,
     normalized.seoH1 ?? null, normalized.seoTitle ?? null, normalized.seoDescription ?? null,
-    normalized.canonicalPath ?? null, normalized.publicSlug ?? null, cityId, normalized.address ?? null,
+    normalized.canonicalPath ?? null, publicSlug, cityId, normalized.address ?? null,
     normalized.latitude ?? null, normalized.longitude ?? null, normalized.metroStation ?? null,
     normalized.wayToFind ?? null, normalized.parkingInfo ?? null, normalized.websiteUrl ?? null,
     normalized.phone ?? null, normalized.openingHours ?? null, normalized.kind || venueKindForPlaceType(normalized.placeType, normalized.placeSubtype),
@@ -2987,6 +2985,38 @@ export async function createAdminVenue(db, payload = {}) {
   ]);
   if (!result.rows[0]) throw new Error('Не удалось создать площадку');
   return buildAdminVenueDetail(db, id);
+}
+
+async function uniqueVenuePublicSlug(db, title, citySlug, excludeId = null) {
+  const titleSlug = publicCitySlug(title) || 'venue';
+  const cityPart = publicCitySlug(citySlug);
+  const bases = [titleSlug];
+  if (cityPart && cityPart !== titleSlug) bases.push(`${titleSlug}-${cityPart}`);
+
+  for (const candidate of bases) {
+    if (await isVenuePublicSlugAvailable(db, candidate, excludeId)) return candidate;
+  }
+
+  const collisionBase = bases[bases.length - 1];
+  for (let suffix = 2; suffix <= 10000; suffix += 1) {
+    const candidate = `${collisionBase}-${suffix}`;
+    if (await isVenuePublicSlugAvailable(db, candidate, excludeId)) return candidate;
+  }
+  throw new Error('Не удалось подобрать свободный публичный slug площадки');
+}
+
+async function isVenuePublicSlugAvailable(db, publicSlug, excludeId = null) {
+  const result = await db.query(
+    `SELECT id FROM "Venue" WHERE "publicSlug" = $1 AND ($2::text IS NULL OR id <> $2) LIMIT 1`,
+    [publicSlug, excludeId],
+  );
+  return !result.rows[0];
+}
+
+async function assertVenuePublicSlugAvailable(db, publicSlug, excludeId = null) {
+  if (!(await isVenuePublicSlugAvailable(db, publicSlug, excludeId))) {
+    throw new Error('Этот публичный slug уже занят другой площадкой');
+  }
 }
 
 function venueKindForPlaceType(placeType, placeSubtype) {

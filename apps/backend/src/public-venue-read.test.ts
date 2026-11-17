@@ -20,7 +20,7 @@ import {
   scoreRelatedVenueCandidate,
   venueTextKeysFuzzyMatch,
 } from './public-venue-read.js';
-import { createAdminVenue } from './dto.js';
+import { createAdminVenue, updateAdminVenue } from './dto.js';
 test('place type filtering prefers reviewed taxonomy and supports exact club subtype', () => {
   const reviewedClub = { placeType: 'venue', placeSubtype: 'club', type: 'club_bar_restaurant' };
   const reviewedRestaurant = { placeType: 'food', placeSubtype: 'restaurant', type: 'club_bar_restaurant' };
@@ -234,9 +234,9 @@ test('resolvePublicVenueCanonicalPath drops a TEP numeric suffix after public sl
 });
 
 test('createAdminVenue persists an explicitly supplied publicSlug', async () => {
-  const calls = [];
+  const calls: Array<{ sql: string; params: any[] }> = [];
   const db = {
-    async query(sql, params = []) {
+    async query(sql: string, params: any[] = []) {
       calls.push({ sql: String(sql), params });
       if (String(sql).includes('SELECT id FROM "Venue" WHERE "publicSlug"')) return { rows: [] };
       if (String(sql).includes('INSERT INTO "Venue"')) return { rows: [{ id: 'venue_test' }] };
@@ -250,14 +250,75 @@ test('createAdminVenue persists an explicitly supplied publicSlug', async () => 
 
   await createAdminVenue(db, { title: 'Test venue', publicSlug: 'test-venue' });
   const insert = calls.find(({ sql }) => sql.includes('INSERT INTO "Venue"'));
+  if (!insert) throw new Error('Venue insert was not executed');
   assert.ok(insert.sql.includes('"publicSlug"'));
   assert.ok(insert.params.includes('test-venue'));
 });
 
-test('createAdminVenue rejects a duplicate publicSlug before inserting', async () => {
-  const calls = [];
+test('createAdminVenue assigns a clean publicSlug when none is supplied', async () => {
+  const calls: Array<{ sql: string; params: any[] }> = [];
   const db = {
-    async query(sql) {
+    async query(sql: string, params: any[] = []) {
+      const statement = String(sql);
+      calls.push({ sql: statement, params });
+      if (statement.includes('SELECT id FROM "Venue" WHERE "publicSlug"')) return { rows: [] };
+      if (statement.includes('INSERT INTO "Venue"')) return { rows: [{ id: 'venue_test' }] };
+      if (statement.includes('from "Venue" venue')) {
+        return { rows: [{ id: 'venue_test', slug: 'russkiy-muzey-fotografii-abc12345', publicSlug: 'russkiy-muzey-fotografii', title: 'Русский музей фотографии', kind: 'MUSEUM_ART_SPACE', pageStatus: 'CANDIDATE' }] };
+      }
+      if (statement.includes('from "Event" event')) return { rows: [] };
+      throw new Error(`Unexpected query: ${statement}`);
+    },
+  };
+
+  await createAdminVenue(db, { title: 'Русский музей фотографии' });
+  const insert = calls.find(({ sql }) => sql.includes('INSERT INTO "Venue"'));
+  if (!insert) throw new Error('Venue insert was not executed');
+  assert.equal(insert.params[11], 'russkiy-muzey-fotografii');
+});
+
+test('publishing an imported venue fills a clean publicSlug', async () => {
+  const current: {
+    id: string;
+    slug: string;
+    publicSlug: string | null;
+    title: string;
+    kind: string;
+    pageStatus: string;
+    cityId: string | null;
+  } = {
+    id: 'venue_legacy',
+    slug: 'banketnyi-zal-triumf-1552',
+    publicSlug: null,
+    title: 'Банкетный зал Триумф',
+    kind: 'CLUB_BAR_RESTAURANT',
+    pageStatus: 'CANDIDATE',
+    cityId: null,
+  };
+  const db = {
+    async query(sql: string, params: any[] = []) {
+      const statement = String(sql);
+      if (statement.includes('from "Venue" venue')) return { rows: [{ ...current }] };
+      if (statement.includes('from "Event" event')) return { rows: [] };
+      if (statement.includes('SELECT id FROM "Venue" WHERE "publicSlug"')) return { rows: [] };
+      if (statement.includes('update "Venue"')) {
+        current.publicSlug = params[25];
+        current.pageStatus = params[11];
+        return { rows: [{ id: current.id }] };
+      }
+      throw new Error(`Unexpected query: ${statement}`);
+    },
+  };
+
+  await updateAdminVenue(db, 'venue_legacy', { pageStatus: 'PUBLISHED' });
+  assert.equal(current.publicSlug, 'banketnyy-zal-triumf');
+  assert.equal(current.pageStatus, 'PUBLISHED');
+});
+
+test('createAdminVenue rejects a duplicate publicSlug before inserting', async () => {
+  const calls: string[] = [];
+  const db = {
+    async query(sql: string) {
       calls.push(String(sql));
       if (String(sql).includes('SELECT id FROM "Venue" WHERE "publicSlug"')) return { rows: [{ id: 'venue_existing' }] };
       throw new Error(`Unexpected query: ${sql}`);

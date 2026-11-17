@@ -109,7 +109,12 @@ internal links on staging.
   city-type routes therefore require explicit route precedence and reserved
   slug handling; a broad rewrite alone is unsafe.
 - Current place-family PDPs use both `/venues/{slug}` and `/locations/{slug}`.
-  This proposal does not merge or rename those routes.
+  Keep the family unchanged. The domain URL matrix defines the public-slug
+  rule: route/canonical/sitemap use `Venue.publicSlug`; `Venue.slug` remains
+  the import identity. The nullable column and unique index are present in the
+  staging database, but the integration branch still needs deployment and URL
+  smoke. Existing published records require a reviewed dry-run before bulk
+  assignment or redirects.
 - Event PDPs remain on `/events/{slug}`. The national catalog remains `/events`; city-specific catalogs are `/{city}/events` and do not change EventPage identities or URLs.
 
 ## Production URL inventory (read-only, 2026-11-16)
