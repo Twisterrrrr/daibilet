@@ -13,6 +13,7 @@ import { isLabelCardVenueStub } from '@/lib/city-place-images';
 import {
   buildCityDayRoutePreset,
   cityDayRoutePresetAvailable,
+  excludeRentalStopsFromDefaultPreset,
   type DayRouteCityContext,
   type DayRouteVenueMatchSource,
 } from '@/lib/day-route-from-place';
@@ -168,11 +169,11 @@ export function CityDayPresetBlock({
   }, [namedPresets, venues, city]);
 
   const fallbackPreset = useMemo(() => {
-    const source = mustSeePlacesForDefaultPreset(places);
+    const source = excludeRentalStopsFromDefaultPreset(mustSeePlacesForDefaultPreset(places), venues);
     return buildCityDayRoutePreset(source, venues, city);
   }, [places, venues, city]);
   const fallbackAvailable = useMemo(() => {
-    const source = mustSeePlacesForDefaultPreset(places);
+    const source = excludeRentalStopsFromDefaultPreset(mustSeePlacesForDefaultPreset(places), venues);
     return cityDayRoutePresetAvailable(source, venues, city);
   }, [places, venues, city]);
 

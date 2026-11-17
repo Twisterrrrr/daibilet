@@ -8,6 +8,7 @@ import {
   dayRouteHookLine,
   dayRouteItemFromEvent,
   dayRouteItemFromMustSee,
+  excludeRentalStopsFromDefaultPreset,
 } from './day-route-from-place.ts';
 
 const city = { id: 'city_spb', name: 'Санкт-Петербург', slug: 'sankt-peterburg' };
@@ -499,6 +500,17 @@ test('buildCityDayRoutePreset takes all resolvable must-see up to soft guideline
     cityDayRoutePresetAvailable(places.slice(0, 2), venues, city),
     false,
   );
+});
+
+test('default My-day preset excludes rental places but keeps other curated stops', () => {
+  const places = [
+    { name: 'Парк', desc: '', locationSlug: 'city-park' },
+    { name: 'Прокат велосипедов', desc: '', venueSlug: 'bike-rental' },
+  ];
+  const venueRows = [
+    { slug: 'bike-rental', name: 'Прокат велосипедов', placeType: 'ENTERTAINMENT', placeSubtype: 'rental' },
+  ];
+  assert.deepEqual(excludeRentalStopsFromDefaultPreset(places, venueRows), [places[0]]);
 });
 
 test('buildCityDayRoutePreset named size can fill up to DAY_ROUTE_MAX with dayRouteId stubs', () => {

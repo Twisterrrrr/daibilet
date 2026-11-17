@@ -27,6 +27,8 @@ export type DayRouteVenueMatchSource = {
   name: string;
   title?: string | null;
   type?: string | null;
+  placeType?: string | null;
+  placeSubtype?: string | null;
   pageStatus?: string | null;
   latitude?: number | null;
   longitude?: number | null;
@@ -455,6 +457,24 @@ export function buildCityDayRoutePreset(
     items.push(item);
   }
   return items;
+}
+
+/** Exclude equipment-rental venues from the automatic fallback route. */
+export function excludeRentalStopsFromDefaultPreset(
+  places: CityMustSeeItem[],
+  venues: DayRouteVenueMatchSource[],
+): CityMustSeeItem[] {
+  const rentalSlugs = new Set(
+    venues
+      .filter((venue) =>
+        String(venue.placeType || '').toUpperCase() === 'ENTERTAINMENT' &&
+        String(venue.placeSubtype || '').toLowerCase() === 'rental',
+      )
+      .map((venue) => String(venue.slug || '').trim())
+      .filter(Boolean),
+  );
+  if (!rentalSlugs.size) return places;
+  return places.filter((place) => !rentalSlugs.has(pickPlaceSlug(place) || ''));
 }
 
 export function cityDayRoutePresetAvailable(

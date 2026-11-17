@@ -108,6 +108,11 @@ test('classifies tour-bus boarding places under transport and keeps cafe as a fo
   assert.equal(suggestedPlacePdpVariant('FOOD', 'cafe'), 'food');
 });
 
+test('classifies curated rentals as a separate entertainment subtype', () => {
+  assert.equal(placeSubtypeIssue('ENTERTAINMENT', 'rental'), null);
+  assert.equal(suggestedPlacePdpVariant('ENTERTAINMENT', 'rental'), 'sport');
+});
+
 test('place taxonomy heuristics only suggest candidates and do not overwrite a resolved subtype', () => {
   assert.deepEqual(suggestPlaceTaxonomyCandidate({ title: 'Океанариум «Риф»', placeType: 'MUSEUM', placeSubtype: 'aquarium' }), {
     placeType: 'ENTERTAINMENT', placeSubtype: 'aquarium', variant: 'attraction', reason: 'title_aquarium',
