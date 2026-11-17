@@ -1,8 +1,8 @@
 # Production URL reconciliation
 
 **Snapshot:** 2026-11-16. Read-only review of production sitemap URLs and
-production EventPage relations. No redirects, DB records, or production config
-were changed.
+production EventPage relations. Follow-up staging implementation was verified
+on 2026-11-17; production URLs, DB records, and config were not changed.
 
 ## Priority: event URLs
 
@@ -62,9 +62,14 @@ slugs, and authored category landing paths containing these tokens are kept
 exactly as they are.
 
 The current city map matches all 66 live city/region hub paths and 51 city
-place-catalog paths by destination identity. The four current paths for Нижний
-Новгород and Великий Новгород are explicitly recorded in the map; their targets
-use the public spellings above.
+place-catalog paths by destination identity. On staging, all 117 old paths now
+redirect directly to their reviewed city-first or region target. The four
+Novgorod paths use the public spellings above; the API spellings remain lookup
+aliases only.
+
+The staging city sitemap contains canonical Novgorod slugs and omits the API
+spelling aliases. A dedicated `/{city}/events` catalog route is implemented
+and awaits staging acceptance before any production rollout.
 
 ## Sources and artifacts
 
@@ -77,7 +82,8 @@ use the public spellings above.
   historical event URL set. Four approved city-slug aliases are listed as
   planned redirects, not live sitemap entries.
 - [`city-place-url-map-production-2026-11-16.csv`](./city-place-url-map-production-2026-11-16.csv)
-  maps current city/region sitemap paths to reviewed destination identities.
+  maps current city/region sitemap paths to reviewed destination identities;
+  all 117 reviewed old paths were verified as direct staging redirects.
 
-No deployment, production redirect, sitemap edit, or database mutation was
-performed as part of this reconciliation.
+No production deployment, redirect, sitemap edit, or database mutation was
+performed. City-first redirects were enabled and verified on staging only.

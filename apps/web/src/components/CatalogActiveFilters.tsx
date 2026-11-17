@@ -42,31 +42,34 @@ function humanDateChipLabel(raw: string): string | null {
 export function CatalogActiveFilters({
   values,
   className = '',
+  buildHref: buildRouteHref,
 }: {
   values: CatalogFilterValues;
   className?: string;
+  buildHref?: (values: CatalogFilterValues) => string;
 }) {
+  const buildHref = buildRouteHref || buildCatalogHref;
   const chips: Array<{ key: string; label: string; href: string }> = [];
 
   if (values.q?.trim()) {
     chips.push({
       key: 'q',
       label: `«${values.q.trim()}»`,
-      href: buildCatalogHref(clearCatalogFilterKey(values, 'q')),
+      href: buildHref(clearCatalogFilterKey(values, 'q')),
     });
   }
   if (values.category) {
     chips.push({
       key: 'category',
       label: displayCatalogLabel(values.category),
-      href: buildCatalogHref(clearCatalogFilterKey(values, 'category')),
+      href: buildHref(clearCatalogFilterKey(values, 'category')),
     });
   }
   if (values.landing) {
     chips.push({
       key: 'landing',
       label: values.landing,
-      href: buildCatalogHref(clearCatalogFilterKey(values, 'landing')),
+      href: buildHref(clearCatalogFilterKey(values, 'landing')),
     });
   }
 
@@ -74,7 +77,7 @@ export function CatalogActiveFilters({
     chips.push({
       key: `exclude:${slug}`,
       label: `без ${catalogExcludeThemeChip(slug)}`,
-      href: buildCatalogHref({
+      href: buildHref({
         ...values,
         // values.excludeLanding may arrive as a bare string, but removeExcludeLanding
         // only takes the list form, so normalise it first.
@@ -89,7 +92,7 @@ export function CatalogActiveFilters({
     chips.push({
       key: 'from',
       label: rangeLabel || [values.from, values.to].filter(Boolean).join(' - '),
-      href: buildCatalogHref(clearCatalogFilterKey(values, 'from')),
+      href: buildHref(clearCatalogFilterKey(values, 'from')),
     });
   } else if (values.date) {
     const dateLabel = humanDateChipLabel(values.date);
@@ -97,7 +100,7 @@ export function CatalogActiveFilters({
       chips.push({
         key: 'date',
         label: dateLabel,
-        href: buildCatalogHref(clearCatalogFilterKey(values, 'date')),
+        href: buildHref(clearCatalogFilterKey(values, 'date')),
       });
     }
   }
@@ -108,14 +111,14 @@ export function CatalogActiveFilters({
       chips.push({
         key: 'minPrice',
         label: `от ${values.minPrice} ₽`,
-        href: buildCatalogHref(clearCatalogFilterKey(values, 'minPrice')),
+        href: buildHref(clearCatalogFilterKey(values, 'minPrice')),
       });
     }
     if (values.maxPrice != null) {
       chips.push({
         key: 'maxPrice',
         label: `до ${values.maxPrice} ₽`,
-        href: buildCatalogHref(clearCatalogFilterKey(values, 'maxPrice')),
+        href: buildHref(clearCatalogFilterKey(values, 'maxPrice')),
       });
     }
   }
@@ -125,7 +128,7 @@ export function CatalogActiveFilters({
     chips.push({
       key: 'ageMax',
       label: ageLabel ? `Возраст ${ageLabel}` : `до ${values.ageMax}+`,
-      href: buildCatalogHref(clearCatalogFilterKey(values, 'ageMax')),
+      href: buildHref(clearCatalogFilterKey(values, 'ageMax')),
     });
   }
 
@@ -149,7 +152,7 @@ export function CatalogActiveFilters({
         </Link>
       ))}
       <Link
-        href={buildCatalogHref({
+        href={buildHref({
           city: values.city,
           sort: values.sort,
           limit: values.limit,

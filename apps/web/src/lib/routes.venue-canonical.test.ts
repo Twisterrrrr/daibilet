@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { cityCanonicalPath, cityHref, venueCanonicalPath, venueHref, venuePageTemplate } from './routes.ts';
+import { cityCanonicalPath, cityEventsHref, cityHref, venueCanonicalPath, venueHref, venuePageTemplate } from './routes.ts';
 
 test('cityCanonicalPath normalizes a stored Cyrillic path for the same Latin city route', () => {
   const city = {
@@ -27,6 +27,7 @@ test('city-first staging mode uses city roots and a separate region namespace', 
   process.env.NEXT_PUBLIC_CITY_URL_MODE = 'city-first';
   try {
     assert.equal(cityHref({ slug: 'moskva', name: 'Москва', type: 'city' }), '/moscow');
+    assert.equal(cityEventsHref({ slug: 'moskva', name: 'Москва', type: 'city' }), '/moscow/events');
     assert.equal(cityHref({ slug: 'perm-krai', name: 'Пермский край', type: 'region' }), '/regions/perm-krai');
     assert.equal(
       cityCanonicalPath({ slug: 'moskva', sourceSlug: 'москва', name: 'Москва', type: 'city', canonicalPath: '/cities/moskva' }),

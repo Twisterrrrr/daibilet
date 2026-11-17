@@ -6,7 +6,7 @@
 > production URL inventory; if a general route rule differs, follow the
 > cross-domain canon and update this audit alongside it.
 
-**Status:** Approved target architecture; implementation is staged separately.
+**Status:** Approved architecture; city/region routes and redirects are on staging. City event catalogs are implemented in the current branch and await staging acceptance.
 **Date:** 2026-11-16
 
 ## Decision
@@ -67,9 +67,9 @@ No generic unknown path may silently become a city or an indexable landing.
 
 ## Legacy URLs and migration
 
-The first release adds and verifies the new routes without removing current
-ones. After route parity is confirmed, migrate old city and city-place URLs
-with one-hop permanent redirects:
+The staging release adds and verifies the new routes without removing current
+ones. The reviewed city/region redirects are enabled on staging and were
+checked against all 117 current sitemap URLs:
 
 - `/cities/{city}` → `/{city}`
 - `/places/c/{city}` → `/{city}/places`
@@ -77,10 +77,13 @@ with one-hop permanent redirects:
   listed in a reviewed redirect map; they must not be mistaken for place-type
   routes.
 
-Before enabling redirects, generate and review an exhaustive old→new URL map,
-including aliases and collisions. Verify status, destination, canonical,
-robots, sitemap membership, breadcrumbs, and internal links for every route
-family. Keep the map as a checked-in artifact and retain legacy redirects.
+The checked-in old→new URL map is in
+[`city-place-url-map-production-2026-11-16.csv`](./city-place-url-map-production-2026-11-16.csv).
+Staging check on 2026-11-17: city 51/51, city-place 51/51, region 15/15 direct
+redirects. Novgorod spelling aliases are one-hop and absent from `cities.xml`.
+Production has not been changed. Before any production rollout, complete city
+event route acceptance and verify canonical, robots, sitemap, breadcrumbs, and
+internal links on staging.
 
 ## Rollout sequence
 
@@ -98,13 +101,14 @@ family. Keep the map as a checked-in artifact and retain legacy redirects.
 
 - Current city hubs are served at `/cities/{slug}` and city place catalogs at
   `/places/c/{city}`.
+- On staging, the 51 reviewed city hub URLs resolve at `/{city}`, the 51 city-place URLs at `/{city}/places`, and 15 published region URLs at `/regions/{region}`. All 117 legacy URLs tested as one-hop permanent redirects to the reviewed target.
+- `/{city}/events` has a dedicated catalog route for the 51 registered city slugs. It filters by the stored API destination slug, keeps filters and pagination on the city route, sets a city-specific canonical, and enters `cities.xml` only when the city has event inventory. Staging acceptance is pending.
 - Next.js has generic one- and two-segment landing routes. New root city and
   city-type routes therefore require explicit route precedence and reserved
   slug handling; a broad rewrite alone is unsafe.
 - Current place-family PDPs use both `/venues/{slug}` and `/locations/{slug}`.
   This proposal does not merge or rename those routes.
-- The event catalog and event pages remain on `/events` and `/events/{slug}`;
-  their sitemap, canonical rules, links and IDs are outside this migration.
+- Event PDPs remain on `/events/{slug}`. The national catalog remains `/events`; city-specific catalogs are `/{city}/events` and do not change EventPage identities or URLs.
 
 ## Production URL inventory (read-only, 2026-11-16)
 
@@ -136,8 +140,7 @@ family. Keep the map as a checked-in artifact and retain legacy redirects.
   place-catalog URLs one-to-one against `/api/public/destinations` by entity
   identity. The current-sitemap map is
   [`city-place-url-map-production-2026-11-16.csv`](./city-place-url-map-production-2026-11-16.csv).
-  It is an audit artifact only: no redirects or canonical changes have been
-  applied.
+  It is an audit artifact and the source for the staging redirect check.
 - The full 93-destination inventory is in
   [`city-region-destination-inventory-2026-11-16.csv`](./city-region-destination-inventory-2026-11-16.csv).
   **27 records (18 cities and 9 regions) have no current sitemap URL.** They

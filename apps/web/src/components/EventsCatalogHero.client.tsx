@@ -10,6 +10,7 @@ import {
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { isCatalogPageSize } from '@daibilet/contracts/catalog';
 import {
+  buildCatalogHref,
   catalogFiltersFromQuery,
   type CatalogFilterValues,
   type CatalogSort,
@@ -26,7 +27,10 @@ function parseOptionalInt(raw: string | null): number | undefined {
  * Catalog header: H1/subtitle + removable active-filter chips.
  * Date rail lives in catalog-main (same width as the card grid).
  */
-export function EventsCatalogHero() {
+export function EventsCatalogHero({
+  cityNameOverride,
+  basePath = '/events',
+}: { cityNameOverride?: string; basePath?: string }) {
   const searchParams = useSearchParams();
   const selectedCity = useSelectedCityOptional();
 
@@ -50,13 +54,13 @@ export function EventsCatalogHero() {
   }, [searchParams]);
 
   const cityReady = selectedCity?.cityReady ?? true;
-  const cityName =
+  const cityName = cityNameOverride || (
     cityReady && (filterValues.city || (selectedCity && selectedCity.cityValue !== 'all'))
       ? selectedCity?.selectedDestination?.name ||
         (selectedCity?.cityLabel !== 'Все города' ? selectedCity?.cityLabel : null) ||
         filterValues.city ||
         null
-      : null;
+      : null);
 
   const dateLabel = useMemo(() => catalogActiveDateHeadingLabel(filterValues), [filterValues]);
 
@@ -77,9 +81,11 @@ export function EventsCatalogHero() {
     // Prefer resolved city name slug from URL/header so "Сбросить" keeps city context.
     const city =
       filterValues.city ||
-      (selectedCity?.cityValue && selectedCity.cityValue !== 'all' ? selectedCity.cityValue : undefined);
+      (!cityNameOverride && selectedCity?.cityValue && selectedCity.cityValue !== 'all'
+        ? selectedCity.cityValue
+        : undefined);
     return { ...filterValues, city };
-  }, [filterValues, selectedCity?.cityValue]);
+  }, [cityNameOverride, filterValues, selectedCity?.cityValue]);
 
   return (
     <div className="border-b border-slate-100 bg-white max-sm:border-0 max-sm:bg-transparent">
@@ -93,7 +99,14 @@ export function EventsCatalogHero() {
               {subtitle}
             </p>
           ) : null}
-          <CatalogActiveFilters values={chipValues} className={filtered ? 'mt-2.5' : 'mt-3'} />
+          <CatalogActiveFilters
+            values={chipValues}
+            buildHref={(values) => buildCatalogHref(values, {
+              pathname: basePath,
+              omitCity: Boolean(cityNameOverride),
+            })}
+            className={filtered ? 'mt-2.5' : 'mt-3'}
+          />
       </div>
     </div>
   );

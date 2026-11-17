@@ -101,9 +101,11 @@ export function cityCanonicalPath(
   return aliases.includes(canonicalCitySlug(storedSlug)) ? href : stored;
 }
 
-/** Афиша города — расписание событий на странице CityPage. */
+/** Городская афиша в city-first mode; legacy mode keeps the CityPage anchor. */
 export function cityEventsHref(city: CityRouteSource): string {
-  return `${cityHref(city)}#affiche`;
+  return isCityFirstUrlMode()
+    ? `${cityHref(city).replace(/\/$/, '')}/events`
+    : `${cityHref(city)}#affiche`;
 }
 
 export function venueHref(venue: VenueRouteSource): string {

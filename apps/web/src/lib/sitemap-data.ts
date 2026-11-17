@@ -21,8 +21,9 @@ import { hasSeoListingEditorial } from '@/data/seo-listing-texts';
 import { isEventsCatalogSitemapEligibleUrl } from '@/lib/events-catalog-indexing';
 import { evaluateListingIndexability, MIN_LISTING_OFFERS_FOR_INDEX } from '@/lib/seo-listing-meta';
 import { buildPodborkiCityCanonicalPath, isPodborkiSeoPilotCitySlug, PODBORKI_SEO_PILOT_CITY_SLUGS } from '@/lib/podborki-city-seo';
-import { venueCanonicalPath, cityCanonicalPath, cityHref, citySlug, isCityFirstUrlMode } from '@/lib/routes';
+import { venueCanonicalPath, cityCanonicalPath, cityEventsHref, cityHref, citySlug, isCityFirstUrlMode } from '@/lib/routes';
 import { cityPlacesCatalogHref } from '@/lib/catalog-url';
+import { isCityFirstLegacyRouteSlug } from '@/lib/city-first-route-slugs';
 import { getCachedCatalog } from '@/server/cached-catalog-data';
 import { getCachedDestinations } from '@/server/cached-public-surfaces';
 import { fetchPublicApiJson } from '@/server/public-api-client';
@@ -416,6 +417,10 @@ export async function buildCitiesSitemapEntries(): Promise<SitemapEntry[]> {
         : cityHref(destination);
       return [
         ...(href ? [entry(href, 'daily', destination.type === 'region' ? 0.7 : 0.75, editorial?.updatedAt)] : []),
+        ...(destination.type === 'city' && isCityFirstUrlMode() && destination.events > 0
+          && isCityFirstLegacyRouteSlug(citySlug(destination))
+          ? [entry(cityEventsHref(destination), 'daily', 0.75, editorial?.updatedAt)]
+          : []),
         ...(destination.type === 'city' && destination.venues > 0
           ? [entry(cityPlacesCatalogHref(citySlug(destination)), 'daily', 0.65)]
           : []),

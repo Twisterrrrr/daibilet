@@ -44,6 +44,8 @@ type CatalogToolbarProps = {
   compact?: boolean;
   /** Sidebar + main column on lg+; children render in main column. */
   layout?: 'default' | 'split';
+  /** Optional route-aware href builder for fixed-city catalog routes. */
+  buildHref?: (values: CatalogFilterValues) => string;
   children?: ReactNode | ((controls: { filtersButton: ReactNode; quickSelectors: ReactNode }) => ReactNode);
 };
 
@@ -58,6 +60,7 @@ export function CatalogToolbar({
   cityReady: _cityReady = true,
   compact = false,
   layout = 'default',
+  buildHref: buildRouteHref,
   children,
 }: CatalogToolbarProps) {
   const router = useRouter();
@@ -109,8 +112,9 @@ export function CatalogToolbar({
     };
   }, [showSearchHints]);
 
+  const buildHref = buildRouteHref || buildCatalogHref;
   const navigate = (next: CatalogFilterValues) => {
-    router.push(buildCatalogHref(next), { scroll: false });
+    router.push(buildHref(next), { scroll: false });
   };
 
   // Desktop search settles after a short pause; mobile commits on submit.
@@ -152,6 +156,7 @@ export function CatalogToolbar({
         filters={filters}
         primary={categorySplit.primary}
         overflow={categorySplit.overflow}
+        buildHref={buildHref}
         onOpenMore={() => setCategoriesMoreOpen(true)}
       />
       <div className="catalog-discovery-row__actions">
@@ -230,6 +235,7 @@ export function CatalogToolbar({
           open={categoriesMoreOpen}
           filters={filters}
           overflow={categorySplit.overflow}
+          buildHref={buildHref}
           onClose={() => setCategoriesMoreOpen(false)}
         />
       </div>
@@ -548,6 +554,7 @@ export function CatalogToolbar({
             <MobileCategoryIconRail
               filters={filters}
               categories={facets.categories}
+              buildHref={buildHref}
               disabled={disabled}
               qDraft={qDraft}
             />
@@ -567,6 +574,7 @@ export function CatalogToolbar({
         open={categoriesMoreOpen}
         filters={filters}
         overflow={categorySplit.overflow}
+        buildHref={buildHref}
         onClose={() => setCategoriesMoreOpen(false)}
       />
 
@@ -598,14 +606,17 @@ export function CatalogToolbar({
 function MobileCategoryIconRail({
   filters,
   categories,
+  buildHref: buildRouteHref,
   disabled,
   qDraft,
 }: {
   filters: CatalogFilterValues;
   categories: CatalogCategoryFacet[];
+  buildHref?: (values: CatalogFilterValues) => string;
   disabled?: boolean;
   qDraft: string;
 }) {
+  const buildHref = buildRouteHref || buildCatalogHref;
   const withQ = (category: string | undefined): CatalogFilterValues => ({
     ...filters,
     q: qDraft.trim() || filters.q,
@@ -620,7 +631,7 @@ function MobileCategoryIconRail({
       className="flex w-full min-w-0 flex-nowrap items-stretch gap-1.5 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
     >
       <Link
-        href={buildCatalogHref(withQ(undefined))}
+        href={buildHref(withQ(undefined))}
         role="tab"
         aria-selected={!filters.category}
         aria-disabled={disabled || undefined}
@@ -663,7 +674,7 @@ function MobileCategoryIconRail({
         return (
           <Link
             key={item.name}
-            href={buildCatalogHref(withQ(active ? undefined : item.name))}
+            href={buildHref(withQ(active ? undefined : item.name))}
             role="tab"
             aria-selected={active}
             title={shouldShowCatalogCategoryCount(item.events, filters.limit) ? `${label}: ${item.events}` : label}
@@ -787,17 +798,20 @@ function CategoryTabs({
   filters,
   primary,
   overflow,
+  buildHref: buildRouteHref,
   onOpenMore,
 }: {
   filters: CatalogFilterValues;
   primary: CatalogCategoryFacet[];
   overflow: CatalogCategoryFacet[];
+  buildHref?: (values: CatalogFilterValues) => string;
   onOpenMore: () => void;
 }) {
+  const buildHref = buildRouteHref || buildCatalogHref;
   return (
     <>
       <Link
-        href={buildCatalogHref({ ...filters, category: undefined, page: undefined })}
+        href={buildHref({ ...filters, category: undefined, page: undefined })}
         role="tab"
         aria-selected={!filters.category}
         className={`catalog-chip snap-start ${!filters.category ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
@@ -826,7 +840,7 @@ function CategoryTabs({
         return (
           <Link
             key={item.name}
-            href={buildCatalogHref({
+            href={buildHref({
               ...filters,
               category: active ? undefined : item.name,
               page: undefined,
@@ -872,13 +886,16 @@ function MoreCategoriesSheet({
   open,
   filters,
   overflow,
+  buildHref: buildRouteHref,
   onClose,
 }: {
   open: boolean;
   filters: CatalogFilterValues;
   overflow: CatalogCategoryFacet[];
+  buildHref?: (values: CatalogFilterValues) => string;
   onClose: () => void;
 }) {
+  const buildHref = buildRouteHref || buildCatalogHref;
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
@@ -925,7 +942,7 @@ function MoreCategoriesSheet({
             return (
               <li key={item.name}>
                 <Link
-                  href={buildCatalogHref({
+                  href={buildHref({
                     ...filters,
                     category: active ? undefined : item.name,
                     page: undefined,

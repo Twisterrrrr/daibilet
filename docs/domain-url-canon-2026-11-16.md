@@ -1,6 +1,6 @@
 # Daibilet domain and URL canon
 
-**Status:** Approved target architecture; implementation and redirects are staged separately.
+**Status:** Approved architecture; city/region routes and redirects are on staging. City event catalog acceptance is pending.
 **Date:** 2026-11-16
 **Canonical host:** `https://daibilet.ru`
 

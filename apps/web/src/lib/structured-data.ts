@@ -144,6 +144,8 @@ export function buildLandingItemListJsonLd(input: {
 /** `/events` index: crawlable event URLs without pretending the listing is an Event detail page. */
 export function buildEventsCatalogItemListJsonLd(
   sessions: Array<Pick<PublicCatalogListItemDto, 'title' | 'slug' | 'id'>>,
+  name = 'Афиша событий',
+  listPath = '/events',
 ): Record<string, unknown> | null {
   const items = sessions.slice(0, 48);
   if (!items.length) return null;
@@ -151,8 +153,8 @@ export function buildEventsCatalogItemListJsonLd(
   return {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
-    name: 'Афиша событий',
-    url: toAbsoluteUrl('/events'),
+    name,
+    url: toAbsoluteUrl(listPath),
     numberOfItems: items.length,
     itemListElement: items.map((session, index) => {
       const path = eventHref(session);

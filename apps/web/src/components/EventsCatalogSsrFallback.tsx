@@ -5,6 +5,7 @@ import { EventCard } from '@/components/EventCard';
 import { isCatalogExcludedMuseumAdmission } from '@/lib/catalog-exclusions';
 import { pluralEvents } from '@/lib/format';
 import { collapseCatalogComboFamilies } from '@/lib/home-showcase-sections';
+import { inCityPrepositional } from '@/lib/city-declension';
 
 const EVENTS_SUPPORT =
   'Официальные билеты на экскурсии, концерты и музеи более чем в 100 городах России.';
@@ -17,12 +18,12 @@ export function selectEventsCatalogSsrItems(
   );
 }
 
-export function EventsCatalogSsrHero() {
+export function EventsCatalogSsrHero({ cityName }: { cityName?: string }) {
   return (
     <div className="border-b border-slate-100 bg-white" data-ssr-events-hero>
       <div className="container-page py-3 sm:py-5">
         <h1 className="font-display text-2xl font-bold text-graphite sm:text-3xl">
-          Афиша событий
+          {cityName ? `Афиша событий ${inCityPrepositional(cityName)}` : 'Афиша событий'}
         </h1>
         <p className="mt-1.5 max-w-3xl text-sm text-graphite-muted sm:text-base">
           {EVENTS_SUPPORT}
@@ -34,8 +35,10 @@ export function EventsCatalogSsrHero() {
 
 export function EventsCatalogSsrFallback({
   catalog,
+  basePath = '/events',
 }: {
   catalog: PublicCatalogDto | null;
+  basePath?: string;
 }) {
   if (!catalog) {
     return (
@@ -88,6 +91,7 @@ export function EventsCatalogSsrFallback({
         limit={catalog.limit}
         shownCount={Math.min(items.length, catalog.total)}
         searchParams={{}}
+        basePath={basePath}
       />
     </section>
   );

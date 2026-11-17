@@ -105,11 +105,14 @@ export function catalogFiltersFromQuery(query: CatalogFilterValues): CatalogFilt
   };
 }
 
-export function buildCatalogHref(values: CatalogFilterValues): string {
+export function buildCatalogHref(
+  values: CatalogFilterValues,
+  options: { pathname?: string; omitCity?: boolean } = {},
+): string {
   const params = new URLSearchParams();
 
   if (values.q?.trim()) params.set('q', values.q.trim());
-  if (values.city) params.set('city', values.city);
+  if (values.city && !options.omitCity) params.set('city', values.city);
   if (values.category) params.set('category', values.category);
   if (values.tag) params.set('tag', values.tag);
   if (values.landing) params.set('landing', values.landing);
@@ -126,7 +129,8 @@ export function buildCatalogHref(values: CatalogFilterValues): string {
   if (values.page && values.page > 1) params.set('page', String(values.page));
 
   const query = params.toString();
-  return query ? `/events?${query}` : '/events';
+  const pathname = options.pathname || '/events';
+  return query ? `${pathname}?${query}` : pathname;
 }
 
 /** Catalog `/events` href with header city when values have no explicit `city`. */
@@ -212,6 +216,7 @@ export function cityPlacesCatalogHref(citySlug: string, page = 1): string {
     : `/places/c/${encodeURIComponent(publicCitySlug)}`;
   return page > 1 ? `${path}?page=${page}` : path;
 }
+
 
 /** Indexable city × place-type route in the city-first URL mode. */
 export function cityPlaceTypeHref(citySlug: string, typeSlug: string): string {

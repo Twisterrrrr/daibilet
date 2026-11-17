@@ -45,6 +45,8 @@ import {
 type CatalogShellProps = {
   initialCatalog?: PublicCatalogDto | null;
   initialQueryKey?: string;
+  routeCity?: string;
+  basePath?: string;
 };
 
 function parseEventsCatalogPageParam(raw: string | null): number {
@@ -72,7 +74,12 @@ function mergeCatalogItems(
   return merged;
 }
 
-export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: CatalogShellProps) {
+export function CatalogShell({
+  initialCatalog = null,
+  initialQueryKey = '',
+  routeCity = '',
+  basePath = '/events',
+}: CatalogShellProps) {
   const router = useRouter();
   const urlSearchParams = useSearchParams();
   const selectedCity = useSelectedCityOptional();
@@ -80,6 +87,8 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
   // hydration snapshot stable so it cannot replace an already-appended list.
   const bootCatalogRef = useRef(initialCatalog);
   const bootQueryKeyRef = useRef(initialQueryKey);
+  const fixedCity = routeCity.trim();
+  const fixedCityRoute = Boolean(fixedCity);
   const rawUrlCity = urlSearchParams.get('city')?.trim() || '';
   const urlCityIsAll = rawUrlCity.toLowerCase() === 'all';
   const urlHasCity = Boolean(rawUrlCity) && !urlCityIsAll;
@@ -98,12 +107,13 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
   const catalogRef = useRef<PublicCatalogDto | null>(initialCatalog);
   catalogRef.current = catalog;
 
-  const cityReady = selectedCity?.cityReady ?? true;
+  const cityReady = fixedCityRoute ? true : selectedCity?.cityReady ?? true;
   const geoBootstrapPending = selectedCity?.geoBootstrapPending ?? false;
   /** Wait for storage resolve when URL has no city — avoids «Все города» then Уфа. */
-  const cityBootstrapPending = !rawUrlCity && Boolean(selectedCity) && !cityReady;
+  const cityBootstrapPending = !fixedCityRoute && !rawUrlCity && Boolean(selectedCity) && !cityReady;
   /** Hard geo: no mixed national feed until the user picks a city. */
   const needsCityGate =
+    !fixedCityRoute &&
     !cityBootstrapPending &&
     !geoBootstrapPending &&
     cityReady &&
@@ -134,13 +144,14 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
     const params = new URLSearchParams(window.location.search);
     if (page <= 1) params.delete('page');
     else params.set('page', String(page));
+    if (fixedCityRoute) params.delete('city');
     const qs = params.toString();
-    const href = qs ? `/events?${qs}` : '/events';
+    const href = qs ? `${basePath}?${qs}` : basePath;
     // Next patches History API and would sync useSearchParams → reset paging to replace.
     ignoreNextUrlPageRef.current = true;
     if (historyMode === 'replace') window.history.replaceState(null, '', href);
     else window.history.pushState(null, '', href);
-  }, []);
+  }, [basePath, fixedCityRoute]);
 
   useEffect(() => {
     if (ignoreNextUrlPageRef.current) {
@@ -181,7 +192,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
       ageMax: query.ageMax,
       page: listPage,
     });
-    const fetchCity = resolveCatalogFetchCity({
+    const fetchCity = fixedCity || resolveCatalogFetchCity({
       urlCity: rawUrlCity,
       urlCityAll: urlCityIsAll,
       cityReady,
@@ -189,7 +200,15 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
       destinations: selectedCity?.destinations || [],
     });
     return { ...base, city: fetchCity };
-  }, [query, cityReady, selectedCity, rawUrlCity, urlCityIsAll, listPage]);
+  }, [query, cityReady, selectedCity, rawUrlCity, urlCityIsAll, listPage, fixedCity]);
+
+  const buildRouteHref = useCallback(
+    (values: CatalogFilterValues) => buildCatalogHref(values, {
+      pathname: basePath,
+      omitCity: fixedCityRoute,
+    }),
+    [basePath, fixedCityRoute],
+  );
 
   const filtersQueryKey = useMemo(
     () => catalogFiltersCacheKey(filterValues, 1),
@@ -267,13 +286,14 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
 
   const paginationSearchParams = useMemo(() => {
     const next = { ...searchParamsRecord };
+    if (fixedCityRoute) delete next.city;
     const limit = filterValues.limit;
     if (limit && limit !== CATALOG_PAGE_SIZE_DEFAULT) next.limit = String(limit);
     else delete next.limit;
     if (listPage > 1) next.page = String(listPage);
     else delete next.page;
     return next;
-  }, [searchParamsRecord, listPage, filterValues.limit]);
+  }, [searchParamsRecord, listPage, filterValues.limit, fixedCityRoute]);
 
   useEffect(() => {
     const fromUrl = urlSearchParams.get('view');
@@ -286,7 +306,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
 
   // Cyrillic ?city= names break client refetch — canonicalize to destination slug.
   useEffect(() => {
-    if (!rawUrlCity || urlCityIsAll) return;
+    if (fixedCityRoute || !rawUrlCity || urlCityIsAll) return;
     const destinations = selectedCity?.destinations || [];
     if (!destinations.length) return;
     const normalized = resolveCatalogFetchCity({
@@ -301,7 +321,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
     params.set('city', normalized);
     const qs = params.toString();
     router.replace(qs ? `/events?${qs}` : '/events', { scroll: false });
-  }, [rawUrlCity, urlCityIsAll, router, selectedCity?.destinations]);
+  }, [fixedCityRoute, rawUrlCity, urlCityIsAll, router, selectedCity?.destinations]);
 
   useEffect(() => {
     if (cityBootstrapPending) {
@@ -328,7 +348,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
     if (!appendMode) {
       const bootCatalog = bootCatalogRef.current;
       const bootQueryKey = bootQueryKeyRef.current;
-      if (bootQueryKey && effectiveQueryKey === bootQueryKey && bootCatalog && urlHasCity) {
+      if (bootQueryKey && effectiveQueryKey === bootQueryKey && bootCatalog && (urlHasCity || fixedCityRoute)) {
         setCatalog(bootCatalog);
         setLoading(false);
         setError(null);
@@ -412,6 +432,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
     cityBootstrapPending,
     needsCityGate,
     urlHasCity,
+    fixedCityRoute,
     filterValues,
   ]);
 
@@ -422,10 +443,11 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
       const params = new URLSearchParams(urlSearchParams.toString());
       if (next === 'cards') params.delete('view');
       else params.set('view', next);
+      if (fixedCityRoute) params.delete('city');
       const queryString = params.toString();
-      router.replace(queryString ? `/events?${queryString}` : '/events', { scroll: false });
+      router.replace(queryString ? `${basePath}?${queryString}` : basePath, { scroll: false });
     },
-    [router, urlSearchParams],
+    [basePath, fixedCityRoute, router, urlSearchParams],
   );
 
   useEffect(() => {
@@ -522,6 +544,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
     <CatalogToolbar
       facets={facets}
       values={filterValues}
+      buildHref={buildRouteHref}
       disabled={(loading && !catalog) || cityBootstrapPending}
       cityReady={cityReady || urlHasCity}
       layout="split"
@@ -560,7 +583,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
             className="min-w-0 shrink"
             onChange={(sort: CatalogSort) => {
               router.push(
-                buildCatalogHref({
+                buildRouteHref({
                   ...filterValues,
                   sort,
                   page: undefined,
@@ -585,7 +608,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
                   onClick={() => {
                     if (active) return;
                     router.push(
-                      buildCatalogHref({
+                      buildRouteHref({
                         ...filterValues,
                         limit: size as CatalogPageSize,
                         page: undefined,
@@ -620,7 +643,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
           city={filterValues.city}
           sort={filterValues.sort}
           hasExtraFilters={hasExtraCatalogFilters}
-          clearHref={buildCatalogHref({
+          clearHref={buildRouteHref({
             city: filterValues.city,
             sort: filterValues.sort,
             limit: filterValues.limit,
@@ -645,6 +668,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
           limit={catalog.limit}
           nextFetchPage={nextFetchPage}
           searchParams={paginationSearchParams}
+          basePath={basePath}
           onPageChange={goToListPage}
           onLoadMore={loadMoreNextPage}
           loadingMore={loadingMore}
