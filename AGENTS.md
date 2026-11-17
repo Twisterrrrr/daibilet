@@ -17,9 +17,9 @@
 - `apps/worker` — фоновые задачи
 - `apps/public` — **изолированный legacy Vite-фронт**, исключённый из pnpm
   workspace и production/staging deploy. Его исходники не собирать и не менять.
-  `apps/public/public/images` пока разрешён только как read-only источник
-  переходной миграции ассетов в `apps/web`; удалить эту связь после проверки
-  `docs/image-archive-runtime-migration-2026-11-13.md`.
+  Бинарные изображения `apps/public/public/images` архивированы вне Git в
+  синхронизируемом архиве с SHA-256-манифестом; сборка Next не читает legacy
+  image tree. Текстовые `SOURCES.md` остаются в Git как provenance.
 - `packages/db` — Prisma 7.8, `packages/contracts` — Zod DTO, `packages/config` — tsconfig
 
 ## Перед любыми изменениями прочитай

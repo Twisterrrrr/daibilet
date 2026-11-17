@@ -12,6 +12,14 @@
 node_modules/
 **/node_modules/
 
+# Archived legacy Vite images; only textual provenance stays in Git.
+apps/public/public/images/**/*.jpg
+apps/public/public/images/**/*.jpeg
+apps/public/public/images/**/*.png
+apps/public/public/images/**/*.webp
+apps/public/public/images/**/*.gif
+apps/public/public/images/**/*.svg
+
 # Build output
 dist/
 **/dist/
