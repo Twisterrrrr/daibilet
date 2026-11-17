@@ -1961,5 +1961,11 @@
     "indexable": 90
   },
   "linksRoutesAndSeoFieldsChanged": false,
-  "skipped": []
+  "skipped": [],
+  "revalidation": {
+    "completedOn": "2026-11-17",
+    "cachePathsAccepted": 92,
+    "indexNowUrlsQueued": 90,
+    "host": "production"
+  }
 }
