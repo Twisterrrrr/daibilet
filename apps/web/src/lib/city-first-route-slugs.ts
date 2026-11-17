@@ -59,7 +59,27 @@ export const CITY_FIRST_LEGACY_ROUTE_SLUGS = [
   'yaroslavl',
 ] as const;
 
+/** Published region routes currently present in the reviewed production sitemap. */
+export const CITY_FIRST_LEGACY_REGION_ROUTE_SLUGS = [
+  'habarovskiy-kray',
+  'kaluzhskaya-oblast',
+  'krasnodarskiy-kray',
+  'leningradskaya-oblast',
+  'moskovskaya-oblast',
+  'nizhegorodskaya-oblast',
+  'orenburgskaya-oblast',
+  'respublika-bashkortostan',
+  'respublika-tatarstan',
+  'rostovskaya-oblast',
+  'sverdlovskaya-oblast',
+  'tulskaya-oblast',
+  'tyumenskaya-oblast',
+  'vologodskaya-oblast',
+  'voronezhskaya-oblast',
+] as const;
+
 const cityRouteSlugSet = new Set<string>(CITY_FIRST_LEGACY_ROUTE_SLUGS);
+const regionRouteSlugSet = new Set<string>(CITY_FIRST_LEGACY_REGION_ROUTE_SLUGS);
 
 export function isCityFirstLegacyRouteSlug(slug: string): boolean {
   return cityRouteSlugSet.has(String(slug || '').trim().toLowerCase());
@@ -72,6 +92,10 @@ export function resolveCityFirstRedirectPath(pathname: string, enabled: boolean)
   if (!rawSlug) return null;
 
   const canonical = canonicalCitySlug(rawSlug);
+  const isLegacyCityRoute = /^\/cities\/[^/]+\/?$/i.test(pathname);
+  if (isLegacyCityRoute && regionRouteSlugSet.has(canonical)) {
+    return `/regions/${canonical}`;
+  }
   if (!isCityFirstLegacyRouteSlug(canonical)) return null;
   const isPlaces = pathname.startsWith('/places/c/') || Boolean(aliasMatch?.[2]);
   const isLegacyNamespace = Boolean(legacyMatch);
