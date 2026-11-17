@@ -364,7 +364,7 @@
           ],
           "reportedLinkedEvents": 25,
           "freshEvents": 25,
-          "sourceChars": 86679,
+          "sourceChars": 2166,
           "sameSourceAsFirst": true
         },
         {
@@ -394,7 +394,7 @@
           ],
           "reportedLinkedEvents": 12,
           "freshEvents": 12,
-          "sourceChars": 49019,
+          "sourceChars": 2450,
           "sameSourceAsFirst": false
         }
       ]
@@ -451,7 +451,7 @@
           ],
           "reportedLinkedEvents": 25,
           "freshEvents": 25,
-          "sourceChars": 84668,
+          "sourceChars": 2170,
           "sameSourceAsFirst": true
         },
         {
@@ -469,7 +469,7 @@
           ],
           "reportedLinkedEvents": 6,
           "freshEvents": 0,
-          "sourceChars": 18623,
+          "sourceChars": 2327,
           "sameSourceAsFirst": false
         }
       ]

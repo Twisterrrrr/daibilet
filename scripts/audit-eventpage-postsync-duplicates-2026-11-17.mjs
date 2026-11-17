@@ -41,8 +41,8 @@ const normalize = (text) => (text ?? '').toLowerCase()
   .replace(/[\p{Extended_Pictographic}\uFE0F]/gu, ' ')
   .replace(/[^\p{L}\p{N}]+/gu, ' ').replace(/\s+/g, ' ').trim();
 const ledgerTitleCity = new Set(rows.map((row) => `${normalize(row[ix['Название']])}|${normalize(row[ix['Город']])}`));
-const textOf = (page) => (page.events ?? []).map((event) => event.description ?? '').join('\n')
-  .replace(/<[^>]*>/g, ' ').replace(/&nbsp;|&#160;/gi, ' ').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
+const textOf = (page) => [...new Set((page.events ?? []).map((event) => (event.description ?? '')
+  .replace(/<[^>]*>/g, ' ').replace(/&nbsp;|&#160;/gi, ' ').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim()).filter(Boolean))].join('\n\n');
 
 const fresh = source.candidates.filter((page) => page.fresh_linked_events > 0);
 const matchedExisting = fresh.filter((page) => ledgerByPage.has(page.id));

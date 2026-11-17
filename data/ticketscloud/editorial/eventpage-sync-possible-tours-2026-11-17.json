@@ -12,14 +12,14 @@
           "id": "21bde2cf-789c-4ebc-9457-7c6a93982d5c",
           "slug": "stendap-improvizaciya-perm",
           "city": "Пермь",
-          "sourceChars": 4449,
+          "sourceChars": 889,
           "descriptionMatchesFirst": true
         },
         {
           "id": "e6b3582e-12e3-400f-a5bb-15591567f331",
           "slug": "stendap-improvizaciya-chelyabinsk",
           "city": "Челябинск",
-          "sourceChars": 2535,
+          "sourceChars": 633,
           "descriptionMatchesFirst": false
         }
       ]
@@ -62,7 +62,7 @@
           "id": "6aed33ff-75e5-4eea-9c2f-1bc31dd08b15",
           "slug": "otkrytyi-mikrofon-chelyabinsk",
           "city": "Челябинск",
-          "sourceChars": 2108,
+          "sourceChars": 702,
           "descriptionMatchesFirst": false
         },
         {
@@ -83,14 +83,14 @@
           "id": "d213bdcd-6599-447e-9a99-f71bb405b449",
           "slug": "otkrytyi-mikrofon-perm",
           "city": "Пермь",
-          "sourceChars": 7367,
+          "sourceChars": 920,
           "descriptionMatchesFirst": false
         },
         {
           "id": "82011024-f5bd-4696-925f-a4c132d849bb",
           "slug": "otkrytyi-mikrofon-tolyatti-2",
           "city": "Тольятти",
-          "sourceChars": 2671,
+          "sourceChars": 333,
           "descriptionMatchesFirst": false
         },
         {
@@ -111,14 +111,14 @@
           "id": "e2d8b438-0697-46fa-bac7-c9cf0461324a",
           "slug": "otkrytyi-mikrofon-tolyatti",
           "city": "Тольятти",
-          "sourceChars": 1247,
+          "sourceChars": 155,
           "descriptionMatchesFirst": false
         },
         {
           "id": "f0e46625-1394-4d22-b604-1695ec9339ab",
           "slug": "otkrytyi-mikrofon-krasnodar",
           "city": "Краснодар",
-          "sourceChars": 9998,
+          "sourceChars": 1110,
           "descriptionMatchesFirst": false
         },
         {
@@ -206,7 +206,7 @@
           "id": "07c26c80-f9ea-4ecc-944e-a10d6f54c378",
           "slug": "novyi-stendap-kazan",
           "city": "Казань",
-          "sourceChars": 7299,
+          "sourceChars": 729,
           "descriptionMatchesFirst": true
         },
         {
@@ -271,7 +271,7 @@
           "id": "7b420571-d5db-4bc3-8489-832a60429244",
           "slug": "gryaznyi-stendap-perm",
           "city": "Пермь",
-          "sourceChars": 818,
+          "sourceChars": 272,
           "descriptionMatchesFirst": false
         }
       ]

@@ -14,7 +14,7 @@ const rewrittenEventIds=new Set(ledgerLines.slice(1).flatMap(l=>parseCsvLine(l)[
 const priorIds=new Set(previous.batches.flatMap(b=>b.entries.map(e=>e.id)));
 const activeIds=new Set(activeSnapshot.activeIds);
 const candidates=archive.candidates;
-const sourceText=c=>((c.events||[]).map(e=>e.description||'').join('\n')).replace(/<[^>]*>/g,' ').replace(/&nbsp;|&#160;/gi,' ').replace(/&amp;/g,'&').replace(/\s+/g,' ').trim();
+const sourceText=c=>[...new Set((c.events||[]).map(e=>(e.description||'').replace(/<[^>]*>/g,' ').replace(/&nbsp;|&#160;/gi,' ').replace(/&amp;/g,'&').replace(/\s+/g,' ').trim()).filter(Boolean))].join('\n\n');
 function tokenJaccard(a,b){const ta=new Set(sourceText(a).toLowerCase().match(/[\p{L}\p{N}]{3,}/gu)||[]),tb=new Set(sourceText(b).toLowerCase().match(/[\p{L}\p{N}]{3,}/gu)||[]);if(!ta.size||!tb.size)return 0;let common=0;for(const token of ta)if(tb.has(token))common++;return common/(ta.size+tb.size-common);}
 function eventDateValid(c){return activeIds.has(c.id)&&((c.has_open_date_offer===true)||Date.parse(c.next_saleable_slot||'')>now.getTime());}
 function eventKey(c){const e=c.events?.[0]||{};return `${normalized(c.title)}|${normalized(e.city)}|${normalized(e.venue)}`;}
