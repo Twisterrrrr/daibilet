@@ -70,6 +70,7 @@ export const PLACE_SUBTYPE_OPTIONS: Record<PlaceType, readonly PlaceSubtypeOptio
     { value: 'observation_deck', label: 'Смотровая площадка', variant: 'attraction' },
     { value: 'circus', label: 'Цирк', variant: 'attraction' }, { value: 'cinema', label: 'Кинотеатр', variant: 'attraction' },
     { value: 'planetarium', label: 'Планетарий', variant: 'attraction' }, { value: 'aquarium', label: 'Океанариум', variant: 'attraction' },
+    { value: 'rental', label: 'Прокат', variant: 'sport' },
   ],
   FOOD: [
     { value: 'restaurant', label: 'Ресторан', variant: 'food' }, { value: 'cafe', label: 'Кафе', variant: 'food' },
@@ -202,6 +203,7 @@ export const PDP_SUBTYPE_CONTENT_HINTS: Record<string, Partial<Record<string, st
   'ENTERTAINMENT:zoo': { zones: 'Опишите зоны и правила посещения животных. Расписание кормлений добавляйте только при наличии официального расписания.' },
   'ENTERTAINMENT:water_park': { entry_rules: 'Добавьте подтверждённые ограничения по росту, возрасту, безопасности и необходимой экипировке.' },
   'ENTERTAINMENT:quest': { visit_routes: 'Укажите подтверждённые параметры группы, возраст и длительность формата; доступные сеансы показываются из системы продаж.' },
+  'ENTERTAINMENT:rental': { equipment: 'Укажите, что можно взять напрокат, для каких занятий подходит оборудование, а также подтверждённые условия и ограничения.' },
   'FOOD:restaurant': { booking: 'Расскажите, как бронировать столик. Свободное время показывайте только из подключённой системы бронирования.' },
   'FOOD:food_market': { spaces: 'Перечислите подтверждённые зоны или корнеры; актуальных операторов регулярно сверяйте с источником.' },
   'TRANSPORT:pier': { boarding: 'Укажите точное место посадки и ориентиры. Наличие причала само по себе не подтверждает рейс.' },
