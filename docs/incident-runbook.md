@@ -20,6 +20,13 @@ systemctl is-active daibilet-web daibilet-api
 curl -fsS http://127.0.0.1:3001/api/health && echo OK web
 curl -fsS http://127.0.0.1:4000/api/health && echo OK api
 
+# Один реальный public API route и SSR PDP города: health сам по себе
+# не подтверждает, что Prisma-модель и schema БД согласованы.
+curl -fsS http://127.0.0.1:4000/api/public/cities/moskva -o /dev/null && echo OK city API
+city_code="$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:3001/cities/novosibirsk)"
+echo "city PDP HTTP ${city_code}"
+test "$city_code" = "200"
+
 # Публично
 curl -fsS -o /dev/null -w "home %{http_code} ttfb=%{time_starttransfer}\n" https://daibilet.ru/
 
@@ -85,6 +92,12 @@ Postgres (Docker, **не** останавливать без owner):
 ```bash
 docker ps | grep postgres
 ```
+
+При Prisma 500 после отменённого deploy проверь незавершённые миграции в
+`_prisma_migrations`, наличие ожидаемых таблиц/колонок и версии generated client.
+Не считать `/api/health` достаточной проверкой: после восстановления пройти
+конкретный public API route и соответствующую SSR-страницу. Для разбора инцидента
+17.11.2026 см. [отчёт](./prod-prisma-city-pdp-incident-2026-11-17.md).
 
 ---
 

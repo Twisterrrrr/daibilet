@@ -249,6 +249,9 @@ jobs:
             test "$code" = "200"
           done
           curl -fsS -o /dev/null -w "api health %{http_code}\n" https://daibilet.ru/api/health
+          city_code="$(curl -sS --max-time 20 -o /dev/null -w '%{http_code}' https://daibilet.ru/api/public/cities/moskva)"
+          echo "city API → ${city_code}"
+          test "$city_code" = "200"
           bash deploy/scripts/smoke-crawler-prod.sh
 
       - name: Verify deploy

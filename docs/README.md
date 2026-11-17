@@ -30,6 +30,7 @@
 [Консервация локальной копии tours и сверка рабочего состояния - 16.11.2026](./tours-vs-daibilet-audit-2026-11-16.md)
 [Изоляция legacy apps/public](./legacy-public-isolation.md)
 [Диагностика production-сети и диска](./production-network-and-disk-diagnostics.md)
+[Инцидент production: незавершённая Prisma-миграция, stale client и 5xx - 17.11.2026](./prod-prisma-city-pdp-incident-2026-11-17.md)
 [Индексируемые EventPage с активными рерайтами - 12.11.2026](./eventpage-rewrite-recrawl-queue-2026-11-12.md)
 [Редакторский батч EventPage: 30 текстов, источники и сверка - 11.11.2026](./eventpage-rewrite-batch-30-source-audit-2026-11-11.md)
 [Рерайты EventPage: production apply и редакционные источники - 05.11.2026](./eventpage-rewrite-production-apply-2026-11-05.md)
