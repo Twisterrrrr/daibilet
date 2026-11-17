@@ -1,0 +1,20 @@
+{
+  "generatedAt": "2026-11-17T12:50:36.106Z",
+  "totalUniqueEventPages": 1532,
+  "readyIndexable": 1330,
+  "readyNoindex": 202,
+  "trackedActiveRewriteBaseline": 1205,
+  "newYearProductionPages": 90,
+  "nov17BatchPages": 90,
+  "nov17BatchOverlapWithNext150": 3,
+  "latestNextFivePages": 150,
+  "latestLinkedEventRelationships": 16947,
+  "knownDistinctEventIdsFromCapturedLists": 16771,
+  "rowsWithExactIdListCountMismatch": 12,
+  "linkedEventCountPositiveDeltas": 10,
+  "linkedEventCountNegativeDeltas": 2,
+  "netLinkedEventCountDelta": 176,
+  "tourTaggedPageRows": 485,
+  "uniqueTourEventPages": 485,
+  "limitations": "Tracker refreshed counts/availability on 2026-11-16 but does not export exact EventPageEvent IDs. The archived ID arrays match counts for most pages; 12 page memberships changed in count (+176 net), and their exact added/removed IDs are not available in this workspace snapshot. New Year/Nov17 batches use exact IDs in their apply/audit files."
+}

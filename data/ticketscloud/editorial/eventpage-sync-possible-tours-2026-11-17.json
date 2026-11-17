@@ -1,0 +1,302 @@
+{
+  "capturedAt": "2026-11-16T21:22:27.548Z",
+  "note": "Same normalized title across cities is a screening signal only; these groups are not confirmed tours and must be compared by artist/program, organizer, venue/source and exact Event IDs before sharing text or changing links.",
+  "groups": [
+    {
+      "kind": "possible-tour-review-not-confirmed",
+      "title": "Стендап-импровизация",
+      "exactDescriptionMatches": 0,
+      "cities": "Пермь|Челябинск",
+      "pages": [
+        {
+          "id": "21bde2cf-789c-4ebc-9457-7c6a93982d5c",
+          "slug": "stendap-improvizaciya-perm",
+          "city": "Пермь",
+          "sourceChars": 4449,
+          "descriptionMatchesFirst": true
+        },
+        {
+          "id": "e6b3582e-12e3-400f-a5bb-15591567f331",
+          "slug": "stendap-improvizaciya-chelyabinsk",
+          "city": "Челябинск",
+          "sourceChars": 2535,
+          "descriptionMatchesFirst": false
+        }
+      ]
+    },
+    {
+      "kind": "possible-tour-review-not-confirmed",
+      "title": "Открытый микрофон / 1 декабря / 21:30",
+      "exactDescriptionMatches": 5,
+      "cities": "Санкт-Петербург|Челябинск|Краснодар|Пермь|Тольятти|Екатеринбург|Сургут",
+      "pages": [
+        {
+          "id": "e19090ae-af2f-4c1e-b382-380c189162b7",
+          "slug": "otkrytyi-mikrofon-1-dekabrya-21-30-sankt-peterburg",
+          "city": "Санкт-Петербург",
+          "sourceChars": 662,
+          "descriptionMatchesFirst": true
+        },
+        {
+          "id": "5c579cfb-1d53-4656-8fcf-3fd95893c32d",
+          "slug": "otkrytyi-mikrofon-8-dekabrya-21-30-sankt-peterburg",
+          "city": "Санкт-Петербург",
+          "sourceChars": 662,
+          "descriptionMatchesFirst": true
+        },
+        {
+          "id": "b23ed8b3-fc2c-4586-b312-30681eeb43ac",
+          "slug": "otkrytyi-mikrofon-15-dekabrya-21-30-sankt-peterburg",
+          "city": "Санкт-Петербург",
+          "sourceChars": 662,
+          "descriptionMatchesFirst": true
+        },
+        {
+          "id": "4fedde36-87a4-4dd4-b41e-bc7ccc0c866c",
+          "slug": "otkrytyi-mikrofon-22-dekabrya-21-30-sankt-peterburg",
+          "city": "Санкт-Петербург",
+          "sourceChars": 662,
+          "descriptionMatchesFirst": true
+        },
+        {
+          "id": "6aed33ff-75e5-4eea-9c2f-1bc31dd08b15",
+          "slug": "otkrytyi-mikrofon-chelyabinsk",
+          "city": "Челябинск",
+          "sourceChars": 2108,
+          "descriptionMatchesFirst": false
+        },
+        {
+          "id": "0381a140-aec9-4fc2-b72c-a0e4db5dd125",
+          "slug": "otkrytyi-mikrofon-krasnodar-3",
+          "city": "Краснодар",
+          "sourceChars": 172,
+          "descriptionMatchesFirst": false
+        },
+        {
+          "id": "b12e27a2-d29c-4929-a2a8-e07b5135f148",
+          "slug": "otkrytyi-mikrofon-17-noyabrya-21-30-sankt-peterburg",
+          "city": "Санкт-Петербург",
+          "sourceChars": 662,
+          "descriptionMatchesFirst": true
+        },
+        {
+          "id": "d213bdcd-6599-447e-9a99-f71bb405b449",
+          "slug": "otkrytyi-mikrofon-perm",
+          "city": "Пермь",
+          "sourceChars": 7367,
+          "descriptionMatchesFirst": false
+        },
+        {
+          "id": "82011024-f5bd-4696-925f-a4c132d849bb",
+          "slug": "otkrytyi-mikrofon-tolyatti-2",
+          "city": "Тольятти",
+          "sourceChars": 2671,
+          "descriptionMatchesFirst": false
+        },
+        {
+          "id": "3d3cf800-b2f4-4f5f-bfef-4201342d196c",
+          "slug": "otkrytyi-mikrofon-krasnodar-7",
+          "city": "Краснодар",
+          "sourceChars": 172,
+          "descriptionMatchesFirst": false
+        },
+        {
+          "id": "3c7e7ec8-4717-4249-84e5-02c8297e6588",
+          "slug": "otkrytyi-mikrofon-ekaterinburg-2",
+          "city": "Екатеринбург",
+          "sourceChars": 298,
+          "descriptionMatchesFirst": false
+        },
+        {
+          "id": "e2d8b438-0697-46fa-bac7-c9cf0461324a",
+          "slug": "otkrytyi-mikrofon-tolyatti",
+          "city": "Тольятти",
+          "sourceChars": 1247,
+          "descriptionMatchesFirst": false
+        },
+        {
+          "id": "f0e46625-1394-4d22-b604-1695ec9339ab",
+          "slug": "otkrytyi-mikrofon-krasnodar",
+          "city": "Краснодар",
+          "sourceChars": 9998,
+          "descriptionMatchesFirst": false
+        },
+        {
+          "id": "dbe0d9d0-f65f-48ae-a5e3-ef2f7600ce83",
+          "slug": "otkrytyi-mikrofon-surgut",
+          "city": "Сургут",
+          "sourceChars": 836,
+          "descriptionMatchesFirst": false
+        }
+      ]
+    },
+    {
+      "kind": "possible-tour-review-not-confirmed",
+      "title": "Хоронько Оркестр",
+      "exactDescriptionMatches": 0,
+      "cities": "Москва|Санкт-Петербург",
+      "pages": [
+        {
+          "id": "95476056-67c5-486e-bea6-a6316ad38914",
+          "slug": "horonko-orkestr-moskva",
+          "city": "Москва",
+          "sourceChars": 425,
+          "descriptionMatchesFirst": true
+        },
+        {
+          "id": "49a6b2a4-08bf-43d1-9229-3cd0f7f1ac57",
+          "slug": "horonko-orkestr-sankt-peterburg",
+          "city": "Санкт-Петербург",
+          "sourceChars": 501,
+          "descriptionMatchesFirst": false
+        }
+      ]
+    },
+    {
+      "kind": "possible-tour-review-not-confirmed",
+      "title": "Самвел Кафьян - сольный концерт",
+      "exactDescriptionMatches": 1,
+      "cities": "Волгоград|Воронеж",
+      "pages": [
+        {
+          "id": "bd87f51f-89ee-4ee4-8a6f-254ed3d79023",
+          "slug": "samvel-kafyan-solnyi-koncert-volgograd",
+          "city": "Волгоград",
+          "sourceChars": 821,
+          "descriptionMatchesFirst": true
+        },
+        {
+          "id": "f640eaf3-9a55-46da-81ec-0315b6488bb3",
+          "slug": "samvel-kafyan-solnyi-koncert-voronezh",
+          "city": "Воронеж",
+          "sourceChars": 821,
+          "descriptionMatchesFirst": true
+        }
+      ]
+    },
+    {
+      "kind": "possible-tour-review-not-confirmed",
+      "title": "\"Хорошо, что выжил... Жаль, что из ума...\"",
+      "exactDescriptionMatches": 0,
+      "cities": "Волгодонск|Батайск",
+      "pages": [
+        {
+          "id": "f1d0734e-13be-40d1-ac7e-0a551c40b4dd",
+          "slug": "horosho-chto-vyzhil-zhal-chto-iz-uma-volgodonsk",
+          "city": "Волгодонск",
+          "sourceChars": 853,
+          "descriptionMatchesFirst": true
+        },
+        {
+          "id": "9c4dee77-8a2b-4f08-9203-8d30b83aa651",
+          "slug": "horosho-chto-vyzhil-zhal-chto-iz-uma-bataysk",
+          "city": "Батайск",
+          "sourceChars": 0,
+          "descriptionMatchesFirst": false
+        }
+      ]
+    },
+    {
+      "kind": "possible-tour-review-not-confirmed",
+      "title": "Новый стендап",
+      "exactDescriptionMatches": 0,
+      "cities": "Казань|Красноярск",
+      "pages": [
+        {
+          "id": "07c26c80-f9ea-4ecc-944e-a10d6f54c378",
+          "slug": "novyi-stendap-kazan",
+          "city": "Казань",
+          "sourceChars": 7299,
+          "descriptionMatchesFirst": true
+        },
+        {
+          "id": "ece14f55-682d-4d00-97bd-62877d0a4698",
+          "slug": "novyi-stendap-krasnoyarsk",
+          "city": "Красноярск",
+          "sourceChars": 88,
+          "descriptionMatchesFirst": false
+        }
+      ]
+    },
+    {
+      "kind": "possible-tour-review-not-confirmed",
+      "title": "Музыка КИНОшедевров в сиянии тысячи свечей",
+      "exactDescriptionMatches": 1,
+      "cities": "Пермь|Яранск|Богородицк",
+      "pages": [
+        {
+          "id": "fc1117ed-282c-49a1-b269-cd6a5dea7f5d",
+          "slug": "muzyka-kinoshedevrov-v-siyanii-tysyachi-svechei-perm",
+          "city": "Пермь",
+          "sourceChars": 414,
+          "descriptionMatchesFirst": true
+        },
+        {
+          "id": "1a691e0e-7d6e-424b-8b88-a0c5456a4a97",
+          "slug": "muzyka-kinoshedevrov-v-siyanii-tysyachi-svechei-yaransk",
+          "city": "Яранск",
+          "sourceChars": 414,
+          "descriptionMatchesFirst": true
+        },
+        {
+          "id": "55a827b2-ea43-4b39-b5c7-01d52e628949",
+          "slug": "muzyka-kinoshedevrov-v-siyanii-tysyachi-svechei-bogorodick",
+          "city": "Богородицк",
+          "sourceChars": 411,
+          "descriptionMatchesFirst": false
+        }
+      ]
+    },
+    {
+      "kind": "possible-tour-review-not-confirmed",
+      "title": "Грязный Стендап",
+      "exactDescriptionMatches": 0,
+      "cities": "Екатеринбург|Санкт-Петербург|Пермь",
+      "pages": [
+        {
+          "id": "3bbdddd2-d409-4fbf-867d-d5c4b3ca2711",
+          "slug": "gryaznyi-stendap-ekaterinburg-3",
+          "city": "Екатеринбург",
+          "sourceChars": 536,
+          "descriptionMatchesFirst": true
+        },
+        {
+          "id": "49332c10-8468-4bde-8190-79c42d1770b4",
+          "slug": "gryaznyi-stendap-20-noyabrya-23-00-sankt-peterburg",
+          "city": "Санкт-Петербург",
+          "sourceChars": 460,
+          "descriptionMatchesFirst": false
+        },
+        {
+          "id": "7b420571-d5db-4bc3-8489-832a60429244",
+          "slug": "gryaznyi-stendap-perm",
+          "city": "Пермь",
+          "sourceChars": 818,
+          "descriptionMatchesFirst": false
+        }
+      ]
+    },
+    {
+      "kind": "possible-tour-review-not-confirmed",
+      "title": "Музыкальное лото",
+      "exactDescriptionMatches": 0,
+      "cities": "Волгоград|Череповец",
+      "pages": [
+        {
+          "id": "a7febff1-0081-4a53-86ea-92822b004b01",
+          "slug": "muzykalnoe-loto-volgograd-2",
+          "city": "Волгоград",
+          "sourceChars": 954,
+          "descriptionMatchesFirst": true
+        },
+        {
+          "id": "aa71d282-df4b-4fcb-918e-48a813f5644d",
+          "slug": "muzykalnoe-loto-cherepovec",
+          "city": "Череповец",
+          "sourceChars": 654,
+          "descriptionMatchesFirst": false
+        }
+      ]
+    }
+  ]
+}

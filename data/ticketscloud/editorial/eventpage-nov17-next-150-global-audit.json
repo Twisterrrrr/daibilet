@@ -1,0 +1,59 @@
+{
+  "createdAt": "2026-11-17T11:43:20.719Z",
+  "batches": [
+    {
+      "batch": 1,
+      "entries": 30,
+      "eventPages": 30,
+      "uniqueEventIds": 287,
+      "repeatedEventIds": 0,
+      "auditPass": true
+    },
+    {
+      "batch": 2,
+      "entries": 30,
+      "eventPages": 30,
+      "uniqueEventIds": 4157,
+      "repeatedEventIds": 0,
+      "auditPass": true
+    },
+    {
+      "batch": 3,
+      "entries": 30,
+      "eventPages": 30,
+      "uniqueEventIds": 497,
+      "repeatedEventIds": 0,
+      "auditPass": true
+    },
+    {
+      "batch": 4,
+      "entries": 30,
+      "eventPages": 30,
+      "uniqueEventIds": 274,
+      "repeatedEventIds": 0,
+      "auditPass": true
+    },
+    {
+      "batch": 5,
+      "entries": 30,
+      "eventPages": 30,
+      "uniqueEventIds": 82,
+      "repeatedEventIds": 0,
+      "auditPass": true
+    }
+  ],
+  "totalRewrites": 150,
+  "uniqueEventPages": 150,
+  "uniqueLinkedEventIds": 5297,
+  "repeatedEventIds": [],
+  "allBatchAuditsPass": true,
+  "production": {
+    "newlyPublished": 147,
+    "alreadyPublishedBeforeRun": 3,
+    "totalIndexable": 150,
+    "activeAvailabilityConfirmed": 150,
+    "linksRoutesCanonicalChanged": false,
+    "checkedAt": "2026-11-17T09:43:36.836Z"
+  },
+  "textRuChecked": false
+}

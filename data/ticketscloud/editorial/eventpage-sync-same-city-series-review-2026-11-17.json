@@ -1,0 +1,549 @@
+{
+  "capturedAt": "2026-11-16T21:22:27.548Z",
+  "note": "Repeated date series grouped by normalized title, city and venue. This is a review queue: compare exact Event IDs, source descriptions, cast/program and organizer before applying one master rewrite or changing EventPage links.",
+  "groups": [
+    {
+      "kind": "same-title-city-venue",
+      "title": "Музыкальное Лото у Жукова! 29 ноября (вс) - тема: Вечеринка 90-х|PAPA’S",
+      "city": "Москва",
+      "venue": "Papa'S Bar & Grill",
+      "pages": [
+        {
+          "id": "c48a99d8-918b-4ac9-b323-dcdf569e501c",
+          "slug": "muzykalnoe-loto-u-zhukova-29-noyabrya-vs-tema-vecherinka-90-h-papa-s-moskva",
+          "linkedEventIds": [
+            "evt_6af9da33f5b5f39b3aba59d2"
+          ],
+          "reportedLinkedEvents": 1,
+          "freshEvents": 1,
+          "sourceChars": 1586,
+          "sameSourceAsFirst": true
+        },
+        {
+          "id": "9de89fb1-3b73-4666-bb3e-739a56318a2e",
+          "slug": "muzykalnoe-loto-u-zhukova-06-dekabrya-vs-tema-vecherinka-90-h-papa-s-moskva",
+          "linkedEventIds": [
+            "evt_6af9dd23228033ea92fade80"
+          ],
+          "reportedLinkedEvents": 1,
+          "freshEvents": 1,
+          "sourceChars": 1586,
+          "sameSourceAsFirst": true
+        }
+      ]
+    },
+    {
+      "kind": "same-title-city-venue",
+      "title": "Открытый микрофон / 1 декабря / 21:30",
+      "city": "Санкт-Петербург",
+      "venue": "Stage StandUp Club | Черный зал |",
+      "pages": [
+        {
+          "id": "e19090ae-af2f-4c1e-b382-380c189162b7",
+          "slug": "otkrytyi-mikrofon-1-dekabrya-21-30-sankt-peterburg",
+          "linkedEventIds": [
+            "evt_6af9ea868e5aa2b641e77365"
+          ],
+          "reportedLinkedEvents": 1,
+          "freshEvents": 1,
+          "sourceChars": 662,
+          "sameSourceAsFirst": true
+        },
+        {
+          "id": "5c579cfb-1d53-4656-8fcf-3fd95893c32d",
+          "slug": "otkrytyi-mikrofon-8-dekabrya-21-30-sankt-peterburg",
+          "linkedEventIds": [
+            "evt_6af9eae81fcfb9bdda7a70b4"
+          ],
+          "reportedLinkedEvents": 1,
+          "freshEvents": 1,
+          "sourceChars": 662,
+          "sameSourceAsFirst": true
+        },
+        {
+          "id": "b23ed8b3-fc2c-4586-b312-30681eeb43ac",
+          "slug": "otkrytyi-mikrofon-15-dekabrya-21-30-sankt-peterburg",
+          "linkedEventIds": [
+            "evt_6af9eb64d4efc00adb0f1252"
+          ],
+          "reportedLinkedEvents": 1,
+          "freshEvents": 1,
+          "sourceChars": 662,
+          "sameSourceAsFirst": true
+        },
+        {
+          "id": "4fedde36-87a4-4dd4-b41e-bc7ccc0c866c",
+          "slug": "otkrytyi-mikrofon-22-dekabrya-21-30-sankt-peterburg",
+          "linkedEventIds": [
+            "evt_6af9ebb8caa7489176ab32ea"
+          ],
+          "reportedLinkedEvents": 1,
+          "freshEvents": 1,
+          "sourceChars": 662,
+          "sameSourceAsFirst": true
+        },
+        {
+          "id": "b12e27a2-d29c-4929-a2a8-e07b5135f148",
+          "slug": "otkrytyi-mikrofon-17-noyabrya-21-30-sankt-peterburg",
+          "linkedEventIds": [
+            "evt_6ad65710bb35349b107f368c"
+          ],
+          "reportedLinkedEvents": 1,
+          "freshEvents": 0,
+          "sourceChars": 662,
+          "sameSourceAsFirst": true
+        }
+      ]
+    },
+    {
+      "kind": "same-title-city-venue",
+      "title": "Проверка материала / 2 декабря / 20:00",
+      "city": "Санкт-Петербург",
+      "venue": "Stage StandUp Club | Черный зал |",
+      "pages": [
+        {
+          "id": "c95e22a8-859c-41cd-9092-ce3abf26d158",
+          "slug": "proverka-materiala-2-dekabrya-20-00-sankt-peterburg",
+          "linkedEventIds": [
+            "evt_6af9ecdffe352cce693700d7"
+          ],
+          "reportedLinkedEvents": 1,
+          "freshEvents": 1,
+          "sourceChars": 426,
+          "sameSourceAsFirst": true
+        },
+        {
+          "id": "d1274c95-d54c-41e5-ab53-a1e1f26514e3",
+          "slug": "proverka-materiala-9-dekabrya-19-00-sankt-peterburg",
+          "linkedEventIds": [
+            "evt_6af9ed965ad56bc864355598"
+          ],
+          "reportedLinkedEvents": 1,
+          "freshEvents": 1,
+          "sourceChars": 430,
+          "sameSourceAsFirst": false
+        },
+        {
+          "id": "ef4d54db-62cb-4367-abf4-ce53a02da883",
+          "slug": "proverka-materiala-16-dekabrya-20-00-sankt-peterburg",
+          "linkedEventIds": [
+            "evt_6af9ee17d4efc00adb0f12a3"
+          ],
+          "reportedLinkedEvents": 1,
+          "freshEvents": 1,
+          "sourceChars": 422,
+          "sameSourceAsFirst": false
+        },
+        {
+          "id": "59571587-06b5-403d-b926-d43156f520c2",
+          "slug": "proverka-materiala-23-dekabrya-20-00-sankt-peterburg",
+          "linkedEventIds": [
+            "evt_6af9eee75ad56bc8643555c6"
+          ],
+          "reportedLinkedEvents": 1,
+          "freshEvents": 1,
+          "sourceChars": 426,
+          "sameSourceAsFirst": false
+        },
+        {
+          "id": "5455004d-4a92-4406-8174-dfaa1099cac5",
+          "slug": "proverka-materiala-18-noyabrya-20-00-sankt-peterburg",
+          "linkedEventIds": [
+            "evt_6ad658c4d2c23270d33e936b"
+          ],
+          "reportedLinkedEvents": 1,
+          "freshEvents": 0,
+          "sourceChars": 422,
+          "sameSourceAsFirst": false
+        }
+      ]
+    },
+    {
+      "kind": "same-title-city-venue",
+      "title": "Восемь комиков / 3 декабря / 20:00",
+      "city": "Санкт-Петербург",
+      "venue": "Stage StandUp Club | Основной зал",
+      "pages": [
+        {
+          "id": "bfaacc0e-0cf6-40de-9dc0-fb11aa59df98",
+          "slug": "vosem-komikov-3-dekabrya-20-00-sankt-peterburg",
+          "linkedEventIds": [
+            "evt_6af9f1c706c2e8927131f8d0"
+          ],
+          "reportedLinkedEvents": 1,
+          "freshEvents": 1,
+          "sourceChars": 515,
+          "sameSourceAsFirst": true
+        },
+        {
+          "id": "35191db6-6cf4-4d47-8fcd-4bbbd7b07563",
+          "slug": "vosem-komikov-24-dekabrya-20-00-sankt-peterburg",
+          "linkedEventIds": [
+            "evt_6af9f32dfe352cce693701b3"
+          ],
+          "reportedLinkedEvents": 1,
+          "freshEvents": 1,
+          "sourceChars": 515,
+          "sameSourceAsFirst": true
+        },
+        {
+          "id": "ae483201-13cc-4f9d-9647-9bd6c5c083a7",
+          "slug": "vosem-komikov-19-noyabrya-20-00-sankt-peterburg",
+          "linkedEventIds": [
+            "evt_6ad661b2ab1f468d9a58586d"
+          ],
+          "reportedLinkedEvents": 1,
+          "freshEvents": 0,
+          "sourceChars": 515,
+          "sameSourceAsFirst": true
+        }
+      ]
+    },
+    {
+      "kind": "same-title-city-venue",
+      "title": "Ваня Ильин | Проверка всякого / 7 декабря / 19:00",
+      "city": "Санкт-Петербург",
+      "venue": "Stage StandUp Club | Черный зал |",
+      "pages": [
+        {
+          "id": "6fa8e2d9-e428-4472-acd1-014eb98bfb38",
+          "slug": "vanya-ilin-proverka-vsyakogo-7-dekabrya-19-00-sankt-peterburg",
+          "linkedEventIds": [
+            "evt_6af9f3e08378f64d925ddb78"
+          ],
+          "reportedLinkedEvents": 1,
+          "freshEvents": 1,
+          "sourceChars": 449,
+          "sameSourceAsFirst": true
+        },
+        {
+          "id": "3aeea2c8-034c-4173-bb0d-c02e02c90b2a",
+          "slug": "vanya-ilin-proverka-vsyakogo-14-dekabrya-19-00-sankt-peterburg",
+          "linkedEventIds": [
+            "evt_6af9f44106c2e8927131f946"
+          ],
+          "reportedLinkedEvents": 1,
+          "freshEvents": 1,
+          "sourceChars": 449,
+          "sameSourceAsFirst": true
+        },
+        {
+          "id": "2ac44085-f65e-4592-8579-ddd0c32d8d8e",
+          "slug": "vanya-ilin-proverka-vsyakogo-21-dekabrya-19-00-sankt-peterburg",
+          "linkedEventIds": [
+            "evt_6af9f4aae107bd975ae81ea6"
+          ],
+          "reportedLinkedEvents": 1,
+          "freshEvents": 1,
+          "sourceChars": 449,
+          "sameSourceAsFirst": true
+        },
+        {
+          "id": "46d9aa75-b838-4fd5-b46d-71da5dfa87cf",
+          "slug": "vanya-ilin-proverka-vsyakogo-28-dekabrya-19-00-sankt-peterburg",
+          "linkedEventIds": [
+            "evt_6af9f51c12ac0d115ebef8ed"
+          ],
+          "reportedLinkedEvents": 1,
+          "freshEvents": 1,
+          "sourceChars": 449,
+          "sameSourceAsFirst": true
+        }
+      ]
+    },
+    {
+      "kind": "same-title-city-venue",
+      "title": "Дима Гаврилов / Проверочный стендап-концерт / 16 декабря / 19:00",
+      "city": "Санкт-Петербург",
+      "venue": "Stage StandUp Club | Красный зал",
+      "pages": [
+        {
+          "id": "4802070f-0175-4028-b198-cba8c33fa104",
+          "slug": "dima-gavrilov-proverochnyi-stendap-koncert-16-dekabrya-19-00-sankt-peterburg",
+          "linkedEventIds": [
+            "evt_6af9f6ef63512cea1439ad94"
+          ],
+          "reportedLinkedEvents": 1,
+          "freshEvents": 1,
+          "sourceChars": 730,
+          "sameSourceAsFirst": true
+        },
+        {
+          "id": "adb17a22-974a-4191-b579-80a68d9ff0c3",
+          "slug": "dima-gavrilov-proverochnyi-stendap-koncert-17-dekabrya-19-00-sankt-peterburg",
+          "linkedEventIds": [
+            "evt_6af9f79bcda0733e413ce44c"
+          ],
+          "reportedLinkedEvents": 1,
+          "freshEvents": 1,
+          "sourceChars": 730,
+          "sameSourceAsFirst": true
+        }
+      ]
+    },
+    {
+      "kind": "same-title-city-venue",
+      "title": "Маленькая Ёлочка",
+      "city": "Санкт-Петербург",
+      "venue": "Театр Парнас",
+      "pages": [
+        {
+          "id": "13258ff8-2ccb-4d6c-b94e-30bf84976d34",
+          "slug": "malenkaya-elochka-sankt-peterburg-2",
+          "linkedEventIds": [
+            "evt_6af9958785e273fdc14d2bdc"
+          ],
+          "reportedLinkedEvents": 1,
+          "freshEvents": 1,
+          "sourceChars": 420,
+          "sameSourceAsFirst": true
+        },
+        {
+          "id": "6de3cce5-8b5b-48a1-85a6-b2cebc793c81",
+          "slug": "malenkaya-elochka-sankt-peterburg",
+          "linkedEventIds": [
+            "evt_6af995dc186bb7088ec2140a"
+          ],
+          "reportedLinkedEvents": 1,
+          "freshEvents": 1,
+          "sourceChars": 420,
+          "sameSourceAsFirst": true
+        }
+      ]
+    },
+    {
+      "kind": "same-title-city-venue",
+      "title": "🎧Веселое музыкальное лото",
+      "city": "Санкт-Петербург",
+      "venue": "\"Синий Пушкин\" бар Шнурова",
+      "pages": [
+        {
+          "id": "33f96be2-eaed-4a5d-aed2-4fa427aad319",
+          "slug": "veseloe-muzykalnoe-loto-sankt-peterburg-3",
+          "linkedEventIds": [
+            "evt_6a8f2893ffc368459e1acaa4",
+            "evt_6ab903b59f5e53ed324e7d83",
+            "evt_6ab903b39f5e53ed324e7d30",
+            "evt_6ab903b19f5e53ed324e7cdd",
+            "evt_6ab903af9f5e53ed324e7c8a",
+            "evt_6ab903ad9f5e53ed324e7c37",
+            "evt_6ab903ab9f5e53ed324e7be4",
+            "evt_6ab903a99f5e53ed324e7b91",
+            "evt_6ab903a79f5e53ed324e7b3e",
+            "evt_6ab9039f9f5e53ed324e79f2",
+            "evt_6ab9039d9f5e53ed324e799f",
+            "evt_6a8f28a6ffc368459e1acd3c",
+            "evt_6a8f28a3ffc368459e1acce9",
+            "evt_6a8f28a1ffc368459e1acc96",
+            "evt_6a8f289effc368459e1acc43",
+            "evt_6af99b3a56c9e12bedc3c0e9",
+            "evt_6af99b3956c9e12bedc3c096",
+            "evt_6af99b3856c9e12bedc3c043",
+            "evt_6af99b3756c9e12bedc3bff0",
+            "evt_6af99b3656c9e12bedc3bf9d",
+            "evt_6af99b3556c9e12bedc3bf4a",
+            "evt_6af99b3456c9e12bedc3bef7",
+            "evt_6af99b3356c9e12bedc3bea4",
+            "evt_6af99b3256c9e12bedc3be51",
+            "evt_6af99b3156c9e12bedc3bdfe",
+            "evt_6af99b3056c9e12bedc3bdab",
+            "evt_6af99b2f56c9e12bedc3bd58",
+            "evt_6af99b2e56c9e12bedc3bd05",
+            "evt_6af99b2d56c9e12bedc3bcb2",
+            "evt_6af99b2c56c9e12bedc3bc5f",
+            "evt_6af99b2b56c9e12bedc3bc0c",
+            "evt_6af99b2a56c9e12bedc3bbb9",
+            "evt_6af99b2956c9e12bedc3bb66",
+            "evt_6af99b2856c9e12bedc3bb13",
+            "evt_6af99b2756c9e12bedc3bac0",
+            "evt_6af99b2656c9e12bedc3ba6d",
+            "evt_6af99b2556c9e12bedc3ba1a",
+            "evt_6af99b2456c9e12bedc3b9c7",
+            "evt_6af99b2356c9e12bedc3b974",
+            "evt_6af99b2256c9e12bedc3b921"
+          ],
+          "reportedLinkedEvents": 25,
+          "freshEvents": 25,
+          "sourceChars": 86679,
+          "sameSourceAsFirst": true
+        },
+        {
+          "id": "297d30b2-043d-450e-a0d2-4896e6709a94",
+          "slug": "veseloe-muzykalnoe-loto-sankt-peterburg-2",
+          "linkedEventIds": [
+            "evt_6abe5656ef79416ade0ef2b8",
+            "evt_6abe5668ef79416ade0ef520",
+            "evt_6abe5666ef79416ade0ef4c8",
+            "evt_6abe5663ef79416ade0ef470",
+            "evt_6abe5660ef79416ade0ef418",
+            "evt_6abe565def79416ade0ef3c0",
+            "evt_6abe565bef79416ade0ef368",
+            "evt_6abe5658ef79416ade0ef310",
+            "evt_6af99f267a1791f7cdc3bc66",
+            "evt_6af99f257a1791f7cdc3bc13",
+            "evt_6af99f247a1791f7cdc3bbc0",
+            "evt_6af99f237a1791f7cdc3bb6d",
+            "evt_6af99f227a1791f7cdc3bb1a",
+            "evt_6af99f217a1791f7cdc3bac7",
+            "evt_6af99f207a1791f7cdc3ba74",
+            "evt_6af99f1f7a1791f7cdc3ba21",
+            "evt_6af99f1e7a1791f7cdc3b9ce",
+            "evt_6af99f1d7a1791f7cdc3b97b",
+            "evt_6af99f1c7a1791f7cdc3b928",
+            "evt_6af99f1b7a1791f7cdc3b8d5"
+          ],
+          "reportedLinkedEvents": 12,
+          "freshEvents": 12,
+          "sourceChars": 49019,
+          "sameSourceAsFirst": false
+        }
+      ]
+    },
+    {
+      "kind": "same-title-city-venue",
+      "title": "🎤Музыкальное БИНГО с комиком",
+      "city": "Санкт-Петербург",
+      "venue": "\"Синий Пушкин\" бар Шнурова",
+      "pages": [
+        {
+          "id": "b0c158a9-aaea-4349-82dd-76a67dbd79a3",
+          "slug": "muzykalnoe-bingo-s-komikom-sankt-peterburg-4",
+          "linkedEventIds": [
+            "evt_6ab9055642edb4eb6f4e75fd",
+            "evt_6ab9056142edb4eb6f4e7675",
+            "evt_6ab9056042edb4eb6f4e766d",
+            "evt_6ab9055f42edb4eb6f4e7665",
+            "evt_6ab9055e42edb4eb6f4e765d",
+            "evt_6ab9055e42edb4eb6f4e7655",
+            "evt_6ab9055d42edb4eb6f4e764d",
+            "evt_6ab9055c42edb4eb6f4e7645",
+            "evt_6ab9055b42edb4eb6f4e763d",
+            "evt_6ab9055b42edb4eb6f4e7635",
+            "evt_6ab9055a42edb4eb6f4e762d",
+            "evt_6ab9055942edb4eb6f4e7625",
+            "evt_6ab9055942edb4eb6f4e761d",
+            "evt_6ab9055842edb4eb6f4e7615",
+            "evt_6af9a0c544eb9432dec3b98f",
+            "evt_6af9a0c444eb9432dec3b987",
+            "evt_6af9a0c444eb9432dec3b97f",
+            "evt_6af9a0c444eb9432dec3b977",
+            "evt_6af9a0c344eb9432dec3b96f",
+            "evt_6af9a0c344eb9432dec3b967",
+            "evt_6af9a0c244eb9432dec3b95f",
+            "evt_6af9a0c244eb9432dec3b957",
+            "evt_6af9a0c144eb9432dec3b94f",
+            "evt_6af9a0c144eb9432dec3b947",
+            "evt_6af9a0c144eb9432dec3b93f",
+            "evt_6af9a0c044eb9432dec3b937",
+            "evt_6af9a0c044eb9432dec3b92f",
+            "evt_6af9a0bf44eb9432dec3b927",
+            "evt_6af9a0bf44eb9432dec3b91f",
+            "evt_6af9a0be44eb9432dec3b917",
+            "evt_6af9a0be44eb9432dec3b90f",
+            "evt_6af9a0bd44eb9432dec3b907",
+            "evt_6af9a0bd44eb9432dec3b8ff",
+            "evt_6af9a0bc44eb9432dec3b8f7",
+            "evt_6af9a0bc44eb9432dec3b8ef",
+            "evt_6af9a0bc44eb9432dec3b8e7",
+            "evt_6af9a0bb44eb9432dec3b8df",
+            "evt_6af9a0bb44eb9432dec3b8d7",
+            "evt_6af9a0ba44eb9432dec3b8cf"
+          ],
+          "reportedLinkedEvents": 25,
+          "freshEvents": 25,
+          "sourceChars": 84668,
+          "sameSourceAsFirst": true
+        },
+        {
+          "id": "2e34e55e-dbe7-4722-a777-3c528fdc9f46",
+          "slug": "muzykalnoe-bingo-s-komikom-sankt-peterburg-3",
+          "linkedEventIds": [
+            "evt_6ab99770d03b66047f4e75ec",
+            "evt_6ab99775d03b66047f4e7624",
+            "evt_6ab99774d03b66047f4e761c",
+            "evt_6ab99774d03b66047f4e7614",
+            "evt_6ab99773d03b66047f4e760c",
+            "evt_6ab99772d03b66047f4e7604",
+            "evt_6ab99771d03b66047f4e75fc",
+            "evt_6ab99771d03b66047f4e75f4"
+          ],
+          "reportedLinkedEvents": 6,
+          "freshEvents": 0,
+          "sourceChars": 18623,
+          "sameSourceAsFirst": false
+        }
+      ]
+    },
+    {
+      "kind": "same-title-city-venue",
+      "title": "Цирк \"Новогодний Карнавал\" в г.Фокино",
+      "city": "Брянск",
+      "venue": "Цирк \"Новогодний Карнавал\" в г.Фокино",
+      "pages": [
+        {
+          "id": "b9921980-a67e-46b0-ba8c-5bd3802ba8bc",
+          "slug": "cirk-novogodnii-karnaval-v-g-fokino-bryansk-3",
+          "linkedEventIds": [
+            "evt_6af9910d5b96c31525bf4453"
+          ],
+          "reportedLinkedEvents": 1,
+          "freshEvents": 1,
+          "sourceChars": 0,
+          "sameSourceAsFirst": false
+        },
+        {
+          "id": "bc7db4f2-2ac3-4ecc-9816-115b31c85909",
+          "slug": "cirk-novogodnii-karnaval-v-g-fokino-bryansk-2",
+          "linkedEventIds": [
+            "evt_6af991430fd865d6a501589f"
+          ],
+          "reportedLinkedEvents": 1,
+          "freshEvents": 1,
+          "sourceChars": 0,
+          "sameSourceAsFirst": false
+        },
+        {
+          "id": "74544252-ef11-42a0-a4b9-c3adcbfff0cc",
+          "slug": "cirk-novogodnii-karnaval-v-g-fokino-bryansk",
+          "linkedEventIds": [
+            "evt_6af99162a2294144804df91b"
+          ],
+          "reportedLinkedEvents": 1,
+          "freshEvents": 1,
+          "sourceChars": 0,
+          "sameSourceAsFirst": false
+        }
+      ]
+    },
+    {
+      "kind": "same-title-city-venue",
+      "title": "Алексей Сапрыкин / 5 января / 16:00",
+      "city": "Санкт-Петербург",
+      "venue": "Stage StandUp Club | Красный зал",
+      "pages": [
+        {
+          "id": "64b293f6-8c10-42a4-b7c4-42f0fb4e98f9",
+          "slug": "aleksei-saprykin-5-yanvarya-16-00-sankt-peterburg",
+          "linkedEventIds": [
+            "evt_6afa04b6a55b81e301811be5"
+          ],
+          "reportedLinkedEvents": 1,
+          "freshEvents": 1,
+          "sourceChars": 433,
+          "sameSourceAsFirst": true
+        },
+        {
+          "id": "01c33864-a5db-4741-82ba-597526155fa1",
+          "slug": "aleksei-saprykin-6-yanvarya-16-00-sankt-peterburg",
+          "linkedEventIds": [
+            "evt_6afa054d20677dc3529bb2ab"
+          ],
+          "reportedLinkedEvents": 1,
+          "freshEvents": 1,
+          "sourceChars": 433,
+          "sameSourceAsFirst": true
+        }
+      ]
+    }
+  ]
+}

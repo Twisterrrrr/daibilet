@@ -315,16 +315,16 @@
         {
           "batch": 1,
           "position": 22,
-          "id": "64b293f6-8c10-42a4-b7c4-42f0fb4e98f9",
-          "slug": "aleksei-saprykin-5-yanvarya-16-00-sankt-peterburg",
-          "title": "Алексей Сапрыкин / 5 января / 16:00",
-          "city": "Санкт-Петербург",
-          "sources": "TICKETSCLOUD",
-          "freshLinkedEvents": 1,
+          "id": "57d63f26-baf6-4a3e-b839-ede475a16f4f",
+          "slug": "esenin-teatr-v-pabe-chelyabinsk",
+          "title": "Есенин. Театр в пабе",
+          "city": "Челябинск",
+          "sources": "backlog",
+          "freshLinkedEvents": 0,
           "linkedEvents": 1,
           "activeSlots": 1,
-          "nextSlot": "2027-01-05T10:00:00.000Z",
-          "sourceChars": 440
+          "nextSlot": "2026-11-17T11:30:00.000Z",
+          "sourceChars": 481
         },
         {
           "batch": 1,
@@ -446,16 +446,16 @@
         {
           "batch": 2,
           "position": 1,
-          "id": "ec3e61c6-3ae4-4a99-9e51-5346e001baee",
-          "slug": "vystavka-antologiya-pozdeeva-krasnoyarsk",
-          "title": "Выставка «Антология Поздеева»",
+          "id": "bc71220f-3ef0-4622-a3f1-ca9884c9e32f",
+          "slug": "koncert-gurude-serdce-dreva-krasnoyarsk",
+          "title": "Концерт GURUDE \"Сердце древа\"",
           "city": "Красноярск",
           "sources": "backlog",
           "freshLinkedEvents": 0,
-          "linkedEvents": 77,
-          "activeSlots": 77,
-          "nextSlot": "2026-11-17T01:00:00.000Z",
-          "sourceChars": 516
+          "linkedEvents": 1,
+          "activeSlots": 1,
+          "nextSlot": "2026-11-19T09:00:00.000Z",
+          "sourceChars": 862
         },
         {
           "batch": 2,
