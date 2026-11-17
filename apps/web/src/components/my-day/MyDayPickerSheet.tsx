@@ -185,7 +185,7 @@ export function MyDayPickerSheet({
         role="region"
         aria-labelledby={titleId}
         aria-describedby={descId}
-        className="mb-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md motion-safe:animate-[my-day-picker-reveal_180ms_ease-out]"
+        className="mb-4 flex max-h-[calc(100dvh_-_var(--site-header-height)_-_6rem)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md motion-safe:animate-[my-day-picker-reveal_180ms_ease-out]"
         data-my-day-picker-accordion="1"
       >
         {panel}

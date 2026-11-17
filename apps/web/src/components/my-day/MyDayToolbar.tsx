@@ -37,6 +37,7 @@ type MyDayToolbarProps = {
   onTravelModeChange: (mode: TravelMode) => void;
   canOptimize: boolean;
   onOptimize: () => void;
+  onOpenPicker?: () => void;
   hourPlanOn: boolean;
   canHourPlan: boolean;
   onToggleHourPlan: () => void;
@@ -81,6 +82,7 @@ export function MyDayToolbar({
   onTravelModeChange,
   canOptimize,
   onOptimize,
+  onOpenPicker,
   hourPlanOn,
   canHourPlan,
   onToggleHourPlan,
@@ -233,6 +235,17 @@ export function MyDayToolbar({
           className="mt-4 flex flex-wrap items-center gap-2"
           data-my-day-toolbar-controls
         >
+          {onOpenPicker ? (
+            <button
+              type="button"
+              onClick={onOpenPicker}
+              data-day-add-places
+              className="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-full border border-dashed border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:border-primary-300 hover:bg-primary-50"
+            >
+              <MapPin className="h-4 w-4" aria-hidden />
+              Добавить места
+            </button>
+          ) : null}
           <div
             className="inline-flex shrink-0 rounded-full border border-slate-200 p-0.5"
             role="group"

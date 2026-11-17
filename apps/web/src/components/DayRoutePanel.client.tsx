@@ -36,7 +36,6 @@ import {
 import {
   MyDayCityPickStarter,
   MyDayRegionCityPrompt,
-  MyDayPickerLaunch,
   MyDayPickerSheet,
   MyDayItinerary,
   MyDayMapAside,
@@ -265,7 +264,6 @@ import type { VenueCatalogCard } from '@/lib/venue-map-types';
 type DayRouteAccordionId = 'mustSee' | 'text';
 /** Wave 1.5: list-only itinerary (Lovable). Grid card markup kept as dead path. */
 type DayRouteStopViewMode = 'grid' | 'list';
-type DayRouteMobileShelf = 'route' | 'add';
 type MyDayPickerSection = 'scenarios' | 'places' | 'suburbs' | 'picks' | 'boat' | 'own';
 type DayRoutePeriod = 'morning' | 'day' | 'evening';
 
@@ -523,7 +521,6 @@ function DayRoutePanelInner() {
   /** Mobile (&lt;lg): list-first; map is a separate fullscreen mode (Wanderlog-style). */
   const [mobileView, setMobileView] = useState<'list' | 'map'>('list');
   /** Mobile shelf: route steps/map vs catalog add tools. */
-  const [mobileShelf, setMobileShelf] = useState<DayRouteMobileShelf>('route');
   /** Lovable-style map chrome: collapse / fullscreen / mobile sheet. */
   const myDay = useMyDayController();
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -666,10 +663,6 @@ function DayRoutePanelInner() {
       window.removeEventListener('storage', sync);
     };
   }, []);
-
-  useEffect(() => {
-    if (route.venues.length === 0) setMobileShelf('route');
-  }, [route.venues.length]);
 
   /**
    * Wave 1.5: always list itinerary (Lovable parity).
@@ -2991,6 +2984,11 @@ function DayRoutePanelInner() {
       : pickerTabs[0]?.value || 'own';
     setPickerSection(allowed);
     setPickerOpen(true);
+    if (route.venues.length > 0 && window.matchMedia('(min-width: 1024px)').matches) {
+      window.setTimeout(() => {
+        pickerAccordionHost?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      }, 0);
+    }
     if (allowed === 'own') {
       setOpenPanel('text');
       window.setTimeout(() => titleFieldRef.current?.focus(), 120);
@@ -3957,7 +3955,11 @@ function DayRoutePanelInner() {
           list={
             <div className="min-w-0 bg-[#f4f6f9] lg:h-full lg:overflow-y-auto lg:px-4 lg:py-4 [scrollbar-width:thin]" data-my-day-list-inner data-my-day-page-col="1">
       {/* ≥1 stop: compact city+search under topbar (no mid-page bordered starter card) */}
-      <div ref={setPickerAccordionHost} data-my-day-picker-accordion-host />
+      <div
+        ref={setPickerAccordionHost}
+        className="scroll-mt-[calc(var(--site-header-height)+0.5rem)]"
+        data-my-day-picker-accordion-host
+      />
 
       {copyStatus === 'ok' ? (
         <p
@@ -4078,15 +4080,6 @@ function DayRoutePanelInner() {
         </>
       ) : null}
 
-      {hasCatalogCity && pickerTabs.length ? (
-        <div
-          className={`mt-4 lg:mt-5 ${route.venues.length ? 'lg:hidden' : 'xl:max-w-3xl'}`}
-          data-my-day-picker-host
-        >
-          <MyDayPickerLaunch tabs={pickerTabs} onOpen={openPicker} />
-        </div>
-      ) : null}
-
       {cityScenarios.length ? (
         <div className="mt-3 lg:mt-4">
           <MyDaySavedScenariosRail
@@ -4098,56 +4091,8 @@ function DayRoutePanelInner() {
         </div>
       ) : null}
 
-      {/* Mobile shelf tabs - only empty day (Lovable: no dual tabs when route exists) */}
-      {!route.venues.length && hasCatalogCity && pickerTabs.length ? (
-        <div
-          className="sticky top-[var(--site-header-height)] z-20 -mx-4 mt-4 border-b border-slate-200/80 bg-white/95 px-4 py-2 backdrop-blur lg:hidden"
-          data-day-mobile-shelf-tabs
-          role="tablist"
-          aria-label="Разделы моего дня"
-        >
-        <div className="flex gap-1 rounded-xl bg-[#F5F5F7] p-1">
-          <button
-            type="button"
-            role="tab"
-            aria-selected={mobileShelf === 'route'}
-            onClick={() => {
-              setMobileShelf('route');
-              setMobileView('list');
-            }}
-            className={`inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-lg px-2 text-xs font-semibold transition ${
-              mobileShelf === 'route'
-                ? 'bg-white text-slate-900 shadow-sm'
-                : 'text-slate-500'
-            }`}
-          >
-            <Route className="h-3.5 w-3.5 shrink-0" aria-hidden />
-            Карта и шаги{route.venues.length ? ` (${route.venues.length})` : ''}
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={mobileShelf === 'add'}
-            onClick={() => openPicker(pickerTabs[0]?.value || 'own')}
-            className={`inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-lg px-2 text-xs font-semibold transition ${
-              pickerOpen
-                ? 'bg-white text-slate-900 shadow-sm'
-                : 'text-slate-500'
-            }`}
-          >
-            <Plus className="h-3.5 w-3.5 shrink-0" aria-hidden />
-            Добавить места
-          </button>
-        </div>
-        </div>
-      ) : null}
-
       <div
-        className={
-          route.venues.length > 0 || mobileShelf === 'route'
-            ? 'contents'
-            : 'hidden lg:contents'
-        }
+        className={route.venues.length > 0 ? 'contents' : 'hidden lg:contents'}
         data-day-mobile-shelf-panel="route"
       >
       {/* 1. Route list */}
@@ -4156,15 +4101,12 @@ function DayRoutePanelInner() {
           className="mt-4 w-full max-lg:rounded-2xl max-lg:bg-[#F5F5F7] max-lg:p-3 sm:mt-6"
           data-day-route-list-section
         >
-          <div className="mb-2 flex flex-wrap items-center gap-2" data-day-account-plan>
-            {!userAuth?.isLoggedIn ? (
-              <Link href={`/login?returnTo=${encodeURIComponent(planParam ? `/my-day?plan=${planParam}` : '/my-day')}`} className="inline-flex min-h-9 items-center rounded-full border border-slate-200 bg-white px-3.5 text-xs font-semibold text-slate-700 hover:bg-slate-50">
-                Войдите, чтобы сохранить план
-              </Link>
-            ) : null}
-            {accountPlanMessage ? <span role="status" className="text-xs text-slate-600">{accountPlanMessage}</span> : null}
-            {accountPlanCode ? <Link href={`/my-day?plan=${encodeURIComponent(accountPlanCode)}`} className="text-xs font-medium text-primary-700 underline">Ссылка на план</Link> : null}
-          </div>
+          {accountPlanMessage || accountPlanCode ? (
+            <div className="mb-2 flex flex-wrap items-center gap-2" data-day-account-plan>
+              {accountPlanMessage ? <span role="status" className="text-xs text-slate-600">{accountPlanMessage}</span> : null}
+              {accountPlanCode ? <Link href={`/my-day?plan=${encodeURIComponent(accountPlanCode)}`} className="text-xs font-medium text-primary-700 underline">Ссылка на план</Link> : null}
+            </div>
+          ) : null}
           <MyDayToolbar
             stopsCount={route.venues.length}
             stopsCountLabel={stopsCountLabel}
@@ -4179,6 +4121,7 @@ function DayRoutePanelInner() {
             onTravelModeChange={setTravelMode}
             canOptimize={canOptimize}
             onOptimize={optimizeOrder}
+            onOpenPicker={() => openPicker('places')}
             hourPlanOn={hourPlanOn}
             canHourPlan={route.venues.length >= 1}
             onToggleHourPlan={() => {
@@ -4705,7 +4648,6 @@ function DayRoutePanelInner() {
               </div>
             </header>
           ) : null}
-          <div ref={setPickerAccordionHost} className="hidden lg:block" data-my-day-picker-accordion-host />
           {showEmptyDesktopShell ? (
             <>
               <div className="mt-4 lg:hidden" data-my-day-empty-mobile>
@@ -4720,7 +4662,7 @@ function DayRoutePanelInner() {
                     {renderEmptyStarter({ hideMap: true })}
                   </div>
                   <section
-                    className="min-h-[min(58vh,32rem)] rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
+                    className="flex min-h-[calc(100dvh_-_var(--site-header-height)_-_10rem)] flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
                     data-my-day-empty-picker-categories
                     aria-labelledby="day-empty-picker-title"
                   >
@@ -4732,29 +4674,23 @@ function DayRoutePanelInner() {
                         Соберите маршрут сами
                       </h2>
                     </div>
-                    <div className="mt-5 flex flex-col gap-2.5">
-                      {pickerTabs.filter((tab) => tab.value !== 'scenarios').map((tab) => {
-                        const Icon = tab.icon;
-                        return (
-                          <button
-                            key={tab.value}
-                            type="button"
-                            onClick={() => openPicker(tab.value)}
-                            className="inline-flex min-h-14 w-full items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-3 text-left text-sm font-semibold text-slate-900 transition hover:border-primary-200 hover:bg-primary-50/50"
-                          >
-                            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white text-primary-600 shadow-sm">
-                              <Icon className="h-4 w-4" aria-hidden />
-                            </span>
-                            <span className="min-w-0 flex-1">{tab.label}</span>
-                            <ChevronDown className="h-4 w-4 shrink-0 -rotate-90 text-slate-400" aria-hidden />
-                          </button>
-                        );
-                      })}
-                    </div>
+                    <p className="mt-2 text-sm text-slate-600">
+                      Выберите места и события для своего маршрута.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => openPicker('places')}
+                      data-day-empty-open-picker
+                      className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary-600 px-4 text-sm font-semibold text-white transition hover:bg-primary-700"
+                    >
+                      <Plus className="h-4 w-4" aria-hidden />
+                      Добавить места
+                    </button>
+                    <div ref={setPickerAccordionHost} className="mt-4" data-my-day-picker-accordion-host />
                   </section>
                 </div>
                 <div
-                  className="relative min-h-[min(58vh,32rem)] overflow-hidden rounded-2xl border border-slate-200 bg-slate-100"
+                  className="relative min-h-[calc(100dvh_-_var(--site-header-height)_-_10rem)] overflow-hidden rounded-2xl border border-slate-200 bg-slate-100"
                   data-my-day-empty-map
                 >
                   <div className="pointer-events-none absolute left-3 top-3 z-[500] rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm">
