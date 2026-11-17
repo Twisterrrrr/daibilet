@@ -179,6 +179,17 @@ preserve_checkout_conflicts
 git restore --source=HEAD --staged --worktree -- apps/web/next-env.d.ts
 git checkout --detach "$DEPLOY_SHA"
 test "$(git rev-parse HEAD)" = "$DEPLOY_SHA"
+
+# The artifact workflow can change runtime dependencies without building them
+# on the host. Refresh the workspace only when dependency manifests or the
+# lockfile changed, so API restarts use the same Prisma/client versions as CI.
+if ! git diff --quiet "$PREVIOUS_SHA" "$DEPLOY_SHA" -- \
+  package.json pnpm-lock.yaml pnpm-workspace.yaml \
+  ':(glob)apps/*/package.json' ':(glob)packages/*/package.json'; then
+  echo "Dependency manifests changed; installing the frozen workspace lockfile"
+  sudo -n env CI=true pnpm install --frozen-lockfile
+fi
+
 # Restore tracked Next venue images from this release. The persistent nginx
 # image root is checked separately and is never hydrated from legacy apps/public.
 git restore --source="$DEPLOY_SHA" --staged --worktree -- apps/web/public/images/venues
