@@ -36,6 +36,7 @@ function sqlNormalizedEventTitle(column = 'e.title'): string {
 export type LeanPublicVenueRow = {
   id: string;
   slug: string;
+  publicSlug: string | null;
   name: string;
   title: string;
   shortDescription: string | null;
@@ -72,6 +73,7 @@ export type LeanPublicVenueRow = {
 const venueListSelect = {
   id: true,
   slug: true,
+  publicSlug: true,
   title: true,
   shortDescription: true,
   description: true,
@@ -301,6 +303,7 @@ function mapLeanVenueRow(
   return {
     id: row.id,
     slug: row.slug,
+    publicSlug: row.publicSlug,
     name: row.title,
     title: row.title,
     shortDescription: leanText ? null : row.shortDescription,
