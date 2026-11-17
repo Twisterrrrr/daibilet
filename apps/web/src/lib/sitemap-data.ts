@@ -490,14 +490,24 @@ export async function buildVenuesSitemapEntries(): Promise<SitemapEntry[]> {
     sources.set(result.url, venue);
     return result;
   });
-  const pathCounts = new Map<string, number>();
-  for (const item of entries) pathCounts.set(item.url, (pathCounts.get(item.url) || 0) + 1);
+  const slugCounts = new Map<string, number>();
+  for (const item of entries) {
+    const rawSlug = new URL(item.url).pathname.split('/').pop() || '';
+    let slug = rawSlug;
+    try { slug = decodeURIComponent(rawSlug); } catch { /* Keep the encoded value for collision detection. */ }
+    slugCounts.set(slug, (slugCounts.get(slug) || 0) + 1);
+  }
   const uniqueEntries = [...new Map(entries.map((item) => [item.url, item])).values()];
-  // Location types and colliding paths can resolve to a different detail row
-  // than the list DTO. Verify the final URL through the API used by HTML.
+  // The list DTO already carries the canonical path and indexability for a
+  // unique slug. Only duplicate slugs are ambiguous because the detail API is
+  // resolved by slug alone; verify those through the same API used by HTML.
   const checked = new Map<string, boolean>();
-  const candidates = uniqueEntries.filter((item) =>
-    new URL(item.url).pathname.startsWith('/locations/') || (pathCounts.get(item.url) || 0) > 1);
+  const candidates = uniqueEntries.filter((item) => {
+    const rawSlug = new URL(item.url).pathname.split('/').pop() || '';
+    let slug = rawSlug;
+    try { slug = decodeURIComponent(rawSlug); } catch { /* Keep the encoded value for collision detection. */ }
+    return (slugCounts.get(slug) || 0) > 1;
+  });
   for (let i = 0; i < candidates.length; i += 8) {
     const batch = await Promise.all(candidates.slice(i, i + 8).map(async (item) => {
       const pathname = new URL(item.url).pathname;
