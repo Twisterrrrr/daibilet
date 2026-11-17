@@ -593,6 +593,10 @@ export interface PublicVenuesDto extends ApiEnvelope {
     events?: number;
     cities: Record<string, number>;
     types: Record<string, number>;
+    /** Counts by editorial place subtype, for subtype-specific catalog facets. */
+    subtypes?: Record<string, number>;
+    /** Exact counts for registered union facets such as clubs/bar-restaurants. */
+    catalogCategories?: Record<string, number>;
     scales?: Record<string, number>;
     logistics?: Record<string, number>;
   };
