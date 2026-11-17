@@ -86,6 +86,7 @@ export const PLACE_SUBTYPE_OPTIONS: Record<PlaceType, readonly PlaceSubtypeOptio
     { value: 'sea_terminal', label: 'Морской терминал', variant: 'pier' }, { value: 'marina', label: 'Марина', variant: 'pier' },
     { value: 'railway_station', label: 'Железнодорожный вокзал', variant: 'transport' },
     { value: 'airport', label: 'Аэропорт', variant: 'transport' }, { value: 'bus_station', label: 'Автовокзал', variant: 'transport' },
+    { value: 'tour_bus', label: 'Туравтобус', variant: 'transport' },
   ],
   OTHER: [{ value: 'other', label: 'Другое', variant: 'venue' }],
 };
@@ -206,6 +207,7 @@ export const PDP_SUBTYPE_CONTENT_HINTS: Record<string, Partial<Record<string, st
   'TRANSPORT:pier': { boarding: 'Укажите точное место посадки и ориентиры. Наличие причала само по себе не подтверждает рейс.' },
   'TRANSPORT:river_terminal': { boarding: 'Разделите вход в терминал и конкретную точку посадки; отправления связываются с причалом и живым расписанием.' },
   'TRANSPORT:railway_station': { stations: 'Укажите входы, платформенные/терминальные зоны и пересадки; расписание берите из транспортного источника.' },
+  'TRANSPORT:tour_bus': { boarding: 'Это место посадки на туристический экскурсионный автобус. Укажите точный адрес и ориентир; связь с конкретной экскурсией добавляйте только при подтверждённом отправлении отсюда.' },
   'TRANSPORT:airport': { stations: 'Уточните терминалы и переходы. Номера рейсов и фактическое время отправления не храните как редакционный текст.' },
   'TRANSPORT:funicular': { schedule_notes: 'Опишите сезонность и погодные ограничения; актуальный режим работы проверяйте у оператора.' },
   'NATURE:reserve': { safety: 'Добавьте официальные правила доступа, разрешения и ограничения маршрутов; не публикуйте непроверенные советы по безопасности.' },
