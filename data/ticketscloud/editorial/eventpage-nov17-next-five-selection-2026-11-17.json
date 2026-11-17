@@ -427,16 +427,16 @@
         {
           "batch": 1,
           "position": 30,
-          "id": "27cd6955-8568-49d3-913e-20a1266dcecb",
-          "slug": "v-ruskealu-na-retropoezde-vodopady-i-mramornyi-kanon-sankt-peterburg",
-          "title": "В Рускеалу на ретропоезде: Водопады и мраморный каньон",
-          "city": "Санкт-Петербург",
+          "id": "ec3e61c6-3ae4-4a99-9e51-5346e001baee",
+          "slug": "vystavka-antologiya-pozdeeva-krasnoyarsk",
+          "title": "Выставка «Антология Поздеева»",
+          "city": "Красноярск",
           "sources": "backlog",
           "freshLinkedEvents": 0,
-          "linkedEvents": 46,
-          "activeSlots": 45,
+          "linkedEvents": 77,
+          "activeSlots": 77,
           "nextSlot": "2026-11-17T01:00:00.000Z",
-          "sourceChars": 3433
+          "sourceChars": 516
         }
       ]
     },
