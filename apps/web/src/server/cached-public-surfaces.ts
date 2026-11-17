@@ -142,6 +142,8 @@ export async function getCachedVenuesCatalog(
     q?: string;
     /** Progressive SSR/client shell: skip distinct product counts wait. */
     counts?: boolean;
+    /** Retry one transient timeout for server-rendered catalog pages. */
+    retries?: number;
   } = {},
 ) {
   const limit = options.limit ?? 24;
@@ -187,6 +189,8 @@ export async function getCachedVenuesCatalog(
       return fetchPublicApiJson<PublicVenuesDto>('/api/public/venues', {
         searchParams,
         timeoutMs: shell ? 3_000 : 5_000,
+        retries: options.retries,
+        retryDelayMs: 150,
       });
     },
     cacheKeyParts,

@@ -358,7 +358,7 @@ export async function buildCitiesSitemapEntries(): Promise<SitemapEntry[]> {
       prisma.city.findMany({
         where: { pdpDocument: { isNot: null } },
         select: {
-          title: true, slug: true, updatedAt: true,
+          title: true, slug: true,
           pdpDocument: { select: { status: true, isIndexable: true, canonicalPath: true, updatedAt: true } },
         },
       }),
@@ -372,7 +372,7 @@ export async function buildCitiesSitemapEntries(): Promise<SitemapEntry[]> {
     ]);
     for (const city of cities) {
       if (!city.pdpDocument) continue;
-      const record = { title: city.title, slug: city.slug, sourceSlug: null, type: 'city' as const, ...city.pdpDocument, updatedAt: city.pdpDocument.updatedAt || city.updatedAt };
+      const record = { title: city.title, slug: city.slug, sourceSlug: null, type: 'city' as const, ...city.pdpDocument, updatedAt: city.pdpDocument.updatedAt };
       editorialBySlug.set(record.slug.toLowerCase(), record);
     }
     for (const region of regions) {
