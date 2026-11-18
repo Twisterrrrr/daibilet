@@ -144,7 +144,7 @@ export function MyDayPickerSheet({
           aria-orientation={desktopOverlay || desktopAccordion ? 'horizontal' : 'vertical'}
           aria-label="Разделы подбора"
           onKeyDown={onKeyNav}
-          className={`flex gap-1 overflow-x-auto border-b border-slate-200 p-2 [scrollbar-width:none] sm:flex-col sm:overflow-y-auto sm:border-b-0 sm:border-r sm:border-slate-200 [&::-webkit-scrollbar]:hidden ${desktopAccordion ? 'lg:grid lg:grid-cols-2 lg:gap-1.5 lg:border-b-0 lg:bg-[#F5F5F7] lg:p-1.5' : desktopOverlay ? 'lg:grid lg:grid-cols-2 lg:gap-1 lg:border-b lg:border-r-0' : ''}`}
+          className={`flex gap-1 overflow-x-auto border-b border-slate-200 p-2 [scrollbar-width:none] sm:flex-col sm:overflow-y-auto sm:border-b-0 sm:border-r sm:border-slate-200 [&::-webkit-scrollbar]:hidden ${desktopAccordion ? 'lg:grid lg:grid-cols-2 lg:gap-1 lg:rounded-xl lg:border-0 lg:bg-[#F1F4F9] lg:p-1' : desktopOverlay ? 'lg:grid lg:grid-cols-2 lg:gap-1 lg:border-b lg:border-r-0' : ''}`}
         >
           {tabs.map((t) => {
             const on = t.value === current?.value;
@@ -159,10 +159,10 @@ export function MyDayPickerSheet({
                 aria-controls="my-day-picker-panel"
                 tabIndex={on ? 0 : -1}
                 onClick={() => onSectionChange(t.value)}
-                className={`inline-flex min-h-10 shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-left text-sm font-semibold transition sm:w-full ${(desktopOverlay || desktopAccordion) ? 'lg:min-w-0 lg:justify-start lg:px-3 lg:text-xs' : ''} ${on ? (desktopAccordion ? 'bg-[#0F1B2D] text-white shadow-sm' : 'bg-primary-600 text-white') : 'text-slate-600 hover:bg-white/80'}`}
+                className={`inline-flex min-h-10 shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-left text-sm font-semibold transition sm:w-full ${(desktopOverlay || desktopAccordion) ? 'lg:min-w-0 lg:px-2 lg:text-xs' : ''} ${desktopAccordion ? (on ? 'lg:justify-center lg:rounded-lg lg:bg-white lg:text-center lg:text-[#0F1B2D] lg:shadow-[0_1px_3px_rgba(15,27,45,.12)]' : 'lg:justify-center lg:rounded-lg lg:bg-transparent lg:text-center lg:text-slate-500 lg:hover:text-[#0F1B2D]') : on ? 'bg-primary-600 text-white' : 'text-slate-600 hover:bg-white/80'}`}
               >
-                <Icon className="h-4 w-4 shrink-0" aria-hidden />
-                <span className="min-w-0 sm:truncate">{t.label}</span>
+                <Icon className={`h-4 w-4 shrink-0 ${desktopAccordion ? 'lg:hidden' : ''}`} aria-hidden />
+                <span className="min-w-0 sm:truncate lg:whitespace-normal">{t.label}</span>
               </button>
             );
           })}

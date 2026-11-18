@@ -228,7 +228,6 @@ import {
 } from '@/lib/must-see-filters';
 import { MustSeeFilterTabs } from '@/components/MustSeeFilterTabs.client';
 import {
-  buildDayRouteTypeCounts,
   DAY_ROUTE_DWELL_PRESETS,
   dayRouteDefaultDwellMinutes,
   dayRouteStopDwellChipLabel,
@@ -487,7 +486,6 @@ function DayRoutePanelInner() {
   const [geocodeHint, setGeocodeHint] = useState<string | null>(null);
   const [geocodePreview, setGeocodePreview] = useState<SoftGeocodeHit | null>(null);
   /** Lovable «Типы точек»: hidden tags filter itinerary visibility. */
-  const [hiddenStopTags, setHiddenStopTags] = useState<string[]>([]);
   /** Exclusive accordion for route-building tools only (must-see / custom). */
   /** Guidebook (scenarios + suburbs DayTripCanonCard) stays always open as day-plan cards. */
   const [openPanel, setOpenPanel] = useState<DayRouteAccordionId | null>(null);
@@ -1836,22 +1834,6 @@ function DayRoutePanelInner() {
       null,
     [mustSeeTagByKey, catalogTypeByKey],
   );
-  const stopTypeCounts = useMemo(
-    () => buildDayRouteTypeCounts(route.venues, resolveStopTag),
-    [route.venues, resolveStopTag],
-  );
-  const isStopTagHidden = useCallback(
-    (venue: DayRouteVenueItem) => {
-      if (isNoteDayRouteStop(venue)) return false;
-      const tag = dayRouteStopTypeTag(venue, resolveStopTag(venue));
-      return hiddenStopTags.includes(tag);
-    },
-    [hiddenStopTags, resolveStopTag],
-  );
-  const visibleRouteVenues = useMemo(
-    () => route.venues.filter((v) => !isStopTagHidden(v)),
-    [route.venues, isStopTagHidden],
-  );
   const stopsCountLabel = useMemo(() => {
     const n = route.venues.length;
     const abs = Math.abs(n) % 100;
@@ -1939,10 +1921,7 @@ function DayRoutePanelInner() {
     return route.venues.filter((v) => !dayRouteStopIsPurchased(v) && !overflow.has(v.id));
   }, [route.venues, hourPlan]);
 
-  const displayPlanStops = useMemo(
-    () => planStops.filter((v) => !isStopTagHidden(v)),
-    [planStops, isStopTagHidden],
-  );
+  const displayPlanStops = planStops;
   const periodCounts = useMemo(() => {
     const counts: Record<DayRoutePeriod, number> = { morning: 0, day: 0, evening: 0 };
     for (const venue of displayPlanStops) {
@@ -1951,18 +1930,8 @@ function DayRoutePanelInner() {
     }
     return counts;
   }, [displayPlanStops, displayTimingPlan]);
-  const displayPurchasedStops = useMemo(
-    () => purchasedStops.filter((v) => !isStopTagHidden(v)),
-    [purchasedStops, isStopTagHidden],
-  );
-  const displayMapStops = useMemo(
-    () =>
-      mapStops.filter((stop) => {
-        const venue = route.venues.find((v) => v.id === stop.id);
-        return venue ? !isStopTagHidden(venue) : true;
-      }),
-    [mapStops, route.venues, isStopTagHidden],
-  );
+  const displayPurchasedStops = purchasedStops;
+  const displayMapStops = mapStops;
 
   const overflowStops = useMemo(() => {
     if (!hourPlan?.overflowIds.length) return [] as DayRouteVenueItem[];
@@ -4098,15 +4067,6 @@ function DayRoutePanelInner() {
             printPdfLabel="PDF с картой"
             onSaveScenario={saveCurrentAsScenario}
             saveScenarioBusy={scenarioBusy}
-            typeCounts={stopTypeCounts}
-            hiddenTags={hiddenStopTags}
-            visibleStopsCount={visibleRouteVenues.filter((v) => !isNoteDayRouteStop(v)).length}
-            onToggleTag={(tag) => {
-              setHiddenStopTags((prev) =>
-                prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag],
-              );
-            }}
-            onShowAllTags={() => setHiddenStopTags([])}
             scheduleSlot={
               <>
                 <div className="sr-only" aria-live="polite">
