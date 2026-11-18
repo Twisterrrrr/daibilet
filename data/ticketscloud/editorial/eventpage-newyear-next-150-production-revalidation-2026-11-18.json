@@ -1,0 +1,52 @@
+{
+  "checkedAt": "2026-11-18T16:08:39.231Z",
+  "cacheRevalidation": {
+    "status": 200,
+    "revalidatedPaths": 225,
+    "indexNowQueued": false,
+    "paths": [
+      "222 EventPage URLs",
+      "/events",
+      "/sitemap.xml",
+      "/sitemaps/events.xml"
+    ]
+  },
+  "indexNow": {
+    "status": 200,
+    "queuedUrls": 222,
+    "indexNowQueued": true,
+    "note": "Queued by the production endpoint; search-engine crawl timing is not guaranteed."
+  },
+  "publicSmoke": [
+    {
+      "url": "https://daibilet.ru/events/novogodnyaya-kvest-shkola-volshebnikov-novosibirsk",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "self"
+    },
+    {
+      "url": "https://daibilet.ru/events/novogodnyaya-kvest-shkola-yunogo-volshebnika-krasnoyarsk",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "self"
+    },
+    {
+      "url": "https://daibilet.ru/events/zimnii-festival-pianissimo-solnyi-koncert-chiho-chhve-v-gosudarstvennom-ermitazhe-sankt-peterburg",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "self"
+    },
+    {
+      "url": "https://daibilet.ru/events/novogodnyaya-elka-na-teplohode-s-interaktivnym-spektaklem-taina-ledyanogo-posoha-moskva",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "unchanged preexisting slot URL"
+    }
+  ],
+  "eventSitemap": {
+    "url": "https://daibilet.ru/sitemaps/events.xml",
+    "status": 200,
+    "containsNovosibirskHogwarts": true,
+    "containsKrasnoyarskHogwarts": true
+  }
+}

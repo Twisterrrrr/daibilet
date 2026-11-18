@@ -1,0 +1,4853 @@
+{
+  "startedAt": "2026-11-18T15:43:06.446Z",
+  "appliedAt": "2026-11-18T15:58:24.901Z",
+  "complete": true,
+  "database": "daibilet",
+  "pages": [
+    {
+      "eventPageId": "2beca36c-9423-433b-b336-3f940e6d1b5f",
+      "slug": "olga-oleinikova-i-sunny-side-singers-rozhdestvenskii-perepoloh-moskva",
+      "title": "ОЛЬГА ОЛЕЙНИКОВА И SUNNY SIDE SINGERS: «РОЖДЕСТВЕНСКИЙ ПЕРЕПОЛОХ»",
+      "city": "Москва",
+      "effectiveTextSection": "B1 #1",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:46:21.045Z",
+      "eventIds": [
+        "evt_6aecebccaa4473cd41dd011e"
+      ],
+      "routes": [
+        "/events/olga-oleinikova-i-sunny-side-singers-rozhdestvenskii-perepoloh-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "2309dda4-d7f8-4730-bdf9-7f0f3883719b",
+      "slug": "prednovogodnii-gamma-dzhaz-dzhem-moskva",
+      "title": "Предновогодний Гамма Джаз Джем",
+      "city": "Москва",
+      "effectiveTextSection": "B1 #2",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:46:22.608Z",
+      "eventIds": [
+        "evt_6a743812956530937e808d6c"
+      ],
+      "routes": [
+        "/events/prednovogodnii-gamma-dzhaz-dzhem-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "51523978-d879-4ee9-a234-f684886b11e2",
+      "slug": "novyi-god-v-maltiiskoi-kapelle-ansambl-petro-art-kvintet-sankt-peterburg",
+      "title": "Новый год в Мальтийской капелле. Ансамбль Петро Арт квинтет",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B1 #3",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:46:24.527Z",
+      "eventIds": [
+        "evt_6af4331395982f23767e96cb"
+      ],
+      "routes": [
+        "/events/novyi-god-v-maltiiskoi-kapelle-ansambl-petro-art-kvintet-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "f66f3251-b04f-4476-b210-4e73bdcf1e5f",
+      "slug": "rozhdestvenskii-semeinyi-branch-moskva",
+      "title": "Рождественский семейный бранч",
+      "city": "Москва",
+      "effectiveTextSection": "B1 #4",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:46:25.744Z",
+      "eventIds": [
+        "evt_6aec404931e8ff27b041739f"
+      ],
+      "routes": [
+        "/events/rozhdestvenskii-semeinyi-branch-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "ead34a55-a66f-41ac-9273-e67e359f7aa5",
+      "slug": "prednovogodnii-voskresnyi-dzhazovyi-vecher-moskva",
+      "title": "Предновогодний Воскресный джазовый вечер",
+      "city": "Москва",
+      "effectiveTextSection": "B1 #5",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:46:27.768Z",
+      "eventIds": [
+        "evt_6a743a4e8fa075ab62808d28"
+      ],
+      "routes": [
+        "/events/prednovogodnii-voskresnyi-dzhazovyi-vecher-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "15736ff4-a4fc-4b47-b14a-d628396177c9",
+      "slug": "prednovogodnii-saksofon-igorya-chushova-tver",
+      "title": "ПРЕДНОВОГОДНИЙ САКСОФОН ИГОРЯ ЧУШОВА",
+      "city": "Тверь",
+      "effectiveTextSection": "B1 #6",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:46:34.528Z",
+      "eventIds": [
+        "evt_6ae27f88f7c3f11c3d277765"
+      ],
+      "routes": [
+        "/events/prednovogodnii-saksofon-igorya-chushova-tver"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "19647e49-4e04-42a1-beeb-09730b5e5f4f",
+      "slug": "prednovogodnyaya-vecherinka-pop-rok-i-mandariny-ot-oilband-surgut",
+      "title": "ПредНовогодняя вечеринка ПОП-РОК и мандарины от OILBAND!",
+      "city": "Сургут",
+      "effectiveTextSection": "B1 #7",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:46:39.620Z",
+      "eventIds": [
+        "evt_6af0902c6cde2cbcd08de3d3"
+      ],
+      "routes": [
+        "/events/prednovogodnyaya-vecherinka-pop-rok-i-mandariny-ot-oilband-surgut"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "c40e72fd-bf25-434f-9fa3-f5e9963dbb8b",
+      "slug": "prednovogodnii-stand-up-tver",
+      "title": "ПРЕДНОВОГОДНИЙ STAND UP",
+      "city": "Тверь",
+      "effectiveTextSection": "B1 #8",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:46:44.216Z",
+      "eventIds": [
+        "evt_6ae233ee81a55acfa6eb65ba"
+      ],
+      "routes": [
+        "/events/prednovogodnii-stand-up-tver"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "dda1bc94-cd57-4bd6-acd1-b193d614f803",
+      "slug": "prednovogodnii-koncert-h-arktida-h-19-dekabrya-h-klub-m2-g-tula",
+      "title": "Предновогодний концерт х АрктидА х 19 декабря х клуб М2 г.Тула",
+      "city": "Тула",
+      "effectiveTextSection": "B1 #9",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:46:50.386Z",
+      "eventIds": [
+        "evt_6a7bae0a534b6b0e5324d365"
+      ],
+      "routes": [
+        "/events/prednovogodnii-koncert-h-arktida-h-19-dekabrya-h-klub-m2-g-tula"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "2c1866ef-8ab6-4ca2-80bc-cf61025712b3",
+      "slug": "pervyi-novyi-god-aidahara-volgograd",
+      "title": "ПЕРВЫЙ НОВЫЙ ГОД АЙДАХАРА",
+      "city": "Волгоград",
+      "effectiveTextSection": "B1 #10",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:46:54.046Z",
+      "eventIds": [
+        "evt_6aeae650f5d1744613b73d65",
+        "evt_6aeae650f5d1744613b73d5d",
+        "evt_6aeae64ff5d1744613b73d55",
+        "evt_6aeae64ff5d1744613b73d4d"
+      ],
+      "routes": [
+        "/events/pervyi-novyi-god-aidahara-volgograd"
+      ],
+      "revisionsBefore": 4,
+      "revisionsAfter": 6,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "fdac6e0d-f5ef-4572-be0f-25dd0aa435f0",
+      "slug": "prednovogodnyaya-stilyagi-pati-jagger-lounge-sankt-peterburg",
+      "title": "Предновогодняя «Стиляги Пати» Jagger Lounge",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B1 #11",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:47:03.701Z",
+      "eventIds": [
+        "evt_6aef2cead1cc4500c52fafc8"
+      ],
+      "routes": [
+        "/events/prednovogodnyaya-stilyagi-pati-jagger-lounge-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "325ba8a1-5e9f-40fb-bd3e-1158593c8d4f",
+      "slug": "tancevalnyi-spektakl-hutor-noch-pered-rozhdestvom-sankt-peterburg",
+      "title": "Танцевальный спектакль «Хутор. Ночь перед Рождеством»",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B1 #12",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:47:05.526Z",
+      "eventIds": [
+        "evt_6adf20ac176490fbdaef0a5d"
+      ],
+      "routes": [
+        "/events/tancevalnyi-spektakl-hutor-noch-pered-rozhdestvom-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "29ff56e7-239f-431f-98e4-5fc9b8cd19cc",
+      "slug": "novyi-god-v-maltiiskoi-kapelle-organnyi-koncert-sankt-peterburg",
+      "title": "Новый год в Мальтийской капелле Органный концерт",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B1 #13",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:47:07.286Z",
+      "eventIds": [
+        "evt_6af43182df1f379c6bd9a9f2"
+      ],
+      "routes": [
+        "/events/novyi-god-v-maltiiskoi-kapelle-organnyi-koncert-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "d535372a-8863-4efc-8e5e-67a530d5ee63",
+      "slug": "volshebnyi-vecher-pod-zvuki-fortepiano-novogodnie-i-rozhdestvenskie-melodii-sochi",
+      "title": "Волшебный вечер под звуки фортепиано. Новогодние и рождественские мелодии",
+      "city": "Сочи",
+      "effectiveTextSection": "B1 #14",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:47:09.840Z",
+      "eventIds": [
+        "evt_6aef1d83a38d7632fac17d3e",
+        "evt_6aef1d82a38d7632fac17cfd",
+        "evt_6aef1d7ea38d7632fac17bf9",
+        "evt_6aef1d7da38d7632fac17bb8",
+        "evt_6aef1d7ca38d7632fac17b77",
+        "evt_6aef1d7aa38d7632fac17b36",
+        "evt_6aef1d77a38d7632fac17a73",
+        "evt_6aef1d76a38d7632fac17a32",
+        "evt_6aef1d75a38d7632fac179f1",
+        "evt_6aef1d74a38d7632fac179b0",
+        "evt_6aef1d73a38d7632fac1796f",
+        "evt_6aef1d71a38d7632fac178ed",
+        "evt_6aef1d70a38d7632fac178ac",
+        "evt_6aef1d6ea38d7632fac1786b",
+        "evt_6aef1d6da38d7632fac1782a",
+        "evt_6aef1d6ca38d7632fac177e9",
+        "evt_6aef1d6ba38d7632fac177a8",
+        "evt_6aef1d68a38d7632fac176e5",
+        "evt_6aef1d66a38d7632fac176a4",
+        "evt_6aef1d65a38d7632fac17663",
+        "evt_6aef1d64a38d7632fac17622",
+        "evt_6aef1d63a38d7632fac175e1",
+        "evt_6aef1d62a38d7632fac175a0",
+        "evt_6aef1d61a38d7632fac1755f",
+        "evt_6aef1d60a38d7632fac1751e",
+        "evt_6aef1d5da38d7632fac1749c"
+      ],
+      "routes": [
+        "/events/volshebnyi-vecher-pod-zvuki-fortepiano-novogodnie-i-rozhdestvenskie-melodii-sochi"
+      ],
+      "revisionsBefore": 26,
+      "revisionsAfter": 28,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "c5a096ce-d2e0-432d-b382-09ffc38b6b16",
+      "slug": "novogodnyaya-anarhicheskaya-vecherinka-moskva",
+      "title": "Новогодняя Анархическая вечеринка",
+      "city": "Москва",
+      "effectiveTextSection": "B1 #15",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:47:13.593Z",
+      "eventIds": [
+        "evt_6af09f8a89779ff0d64fd9b4"
+      ],
+      "routes": [
+        "/events/novogodnyaya-anarhicheskaya-vecherinka-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "8ff9835e-6b08-4bab-89c3-6d3e6472885b",
+      "slug": "novogodnii-tver-kaver-fest-chast-ii-tver",
+      "title": "НОВОГОДНИЙ ТВЕРЬ-КАВЕР-ФЕСТ (часть II )",
+      "city": "Тверь",
+      "effectiveTextSection": "B1 #16",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:47:14.773Z",
+      "eventIds": [
+        "evt_6ae1d12ab5c0245578345a1a"
+      ],
+      "routes": [
+        "/events/novogodnii-tver-kaver-fest-chast-ii-tver"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "b38320f9-087a-4d72-b836-e989d73f664f",
+      "slug": "novogodnii-tver-kaver-fest-tver",
+      "title": "НОВОГОДНИЙ ТВЕРЬ-КАВЕР-ФЕСТ",
+      "city": "Тверь",
+      "effectiveTextSection": "B1 #17",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:47:16.049Z",
+      "eventIds": [
+        "evt_6ae1cdb9d98172b85c528d21"
+      ],
+      "routes": [
+        "/events/novogodnii-tver-kaver-fest-tver"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "6e7b8dac-755d-42a3-b743-7c91fbafd5dc",
+      "slug": "novogodnii-utrennik-1-nizhniy-novgorod",
+      "title": "Новогодний утренник 1+",
+      "city": "Нижний Новгород",
+      "effectiveTextSection": "B1 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:47:17.573Z",
+      "eventIds": [
+        "evt_6ae8e847b3407c46e8277f8d"
+      ],
+      "routes": [
+        "/events/novogodnii-utrennik-1-nizhniy-novgorod"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "2eb71fa6-2962-4fde-a150-0936bbdbb483",
+      "slug": "robert-rozhdestvenskii-vse-nachinaetsya-s-lyubvi-sankt-peterburg",
+      "title": "Роберт Рождественский. Все начинается с любви...",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B1 #19",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:47:20.286Z",
+      "eventIds": [
+        "evt_6aaf8addac289a29c820d6e1"
+      ],
+      "routes": [
+        "/events/robert-rozhdestvenskii-vse-nachinaetsya-s-lyubvi-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "a9fe1389-172f-495b-b67b-26eb7d47b6bc",
+      "slug": "novogodnyaya-noch-zolotoi-mikrofon-sankt-peterburg",
+      "title": "НОВОГОДНЯЯ НОЧЬ «ЗОЛОТОЙ МИКРОФОН»",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B1 #20",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:47:22.084Z",
+      "eventIds": [
+        "evt_6af5d515b715b6c44ce66b44"
+      ],
+      "routes": [
+        "/events/novogodnyaya-noch-zolotoi-mikrofon-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "438cc44d-8397-47e7-b533-82e4c8c82684",
+      "slug": "rozhdestvenskii-shou-koncert-simfo-gruppy-teodor-krasnodar",
+      "title": "Рождественский Шоу-Концерт симфо-группы TEODOR",
+      "city": "Краснодар",
+      "effectiveTextSection": "B1 #21",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:47:23.593Z",
+      "eventIds": [
+        "evt_6af8b1f99d0e758112e38138"
+      ],
+      "routes": [
+        "/events/rozhdestvenskii-shou-koncert-simfo-gruppy-teodor-krasnodar"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "ac1a5edb-993f-41d6-8ecd-8b9bc6afb232",
+      "slug": "koncert-flamenco-familia-rozhdestvenskaya-vecherinka-na-kryshe-nevskogo-s-furshetom-sankt-peterburg",
+      "title": "КОНЦЕРТ FLAMENCO FAMILIA — Рождественская вечеринка на Невском с фуршетом и РЕТРО ШОУ",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B1 #22",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:47:24.806Z",
+      "eventIds": [
+        "evt_6983fe7eddda25b9510e442b"
+      ],
+      "routes": [
+        "/events/koncert-flamenco-familia-rozhdestvenskaya-vecherinka-na-kryshe-nevskogo-s-furshetom-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "227db2b9-e702-422c-a541-94e5c29bd631",
+      "slug": "zimnii-festival-pianissimo-solnyi-koncert-fedora-orlova-v-gosudarstvennom-ermitazhe-sankt-peterburg",
+      "title": "Зимний фестиваль Pianissimo. Сольный концерт Федор Орлов в Государственном Эрмитаже",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B1 #23",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:47:27.503Z",
+      "eventIds": [
+        "evt_6a7de197c1fb950ecafc3626"
+      ],
+      "routes": [
+        "/events/zimnii-festival-pianissimo-solnyi-koncert-fedora-orlova-v-gosudarstvennom-ermitazhe-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "cbf256cb-47dd-4139-9f6a-b7d0462421cb",
+      "slug": "kvintet-maksima-durova-teplyi-zimnii-dzhaz-moskva",
+      "title": "КВИНТЕТ МАКСИМА ДУРОВА: «ТЁПЛЫЙ ЗИМНИЙ ДЖАЗ»",
+      "city": "Москва",
+      "effectiveTextSection": "B1 #24",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:47:30.162Z",
+      "eventIds": [
+        "evt_6ae391794de81cb936c0ba0b"
+      ],
+      "routes": [
+        "/events/kvintet-maksima-durova-teplyi-zimnii-dzhaz-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "d70d63f7-b15f-4a8b-9299-266a89d6bb9a",
+      "slug": "valdai-i-velikii-novgorod-za-odin-den-kolokola-monastyri-i-novogodnyaya-skazka-sankt-peterburg",
+      "title": "Валдай и Великий Новгород за один день: колокола, монастыри и новогодняя сказка",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B1 #25",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:47:31.887Z",
+      "eventIds": [
+        "evt_6ad9ea9d256f9821c4fdf68b",
+        "evt_6ad9ea9e256f9821c4fdf693",
+        "evt_6ad9ea9f256f9821c4fdf69b",
+        "evt_6ad9ea9f256f9821c4fdf6a3",
+        "evt_6ad9eaa0256f9821c4fdf6ab",
+        "evt_6ad9eaa0256f9821c4fdf6b3"
+      ],
+      "routes": [
+        "/events/valdai-i-velikii-novgorod-za-odin-den-kolokola-monastyri-i-novogodnyaya-skazka-sankt-peterburg"
+      ],
+      "revisionsBefore": 6,
+      "revisionsAfter": 8,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "5df5b6d9-000f-4b59-968d-86a7945e8336",
+      "slug": "elka-novogodnee-shou-koscheevo-carstvo-voronezh",
+      "title": "Ёлка! Новогоднее шоу \"Кощеево царство\"",
+      "city": "Воронеж",
+      "effectiveTextSection": "B1 #26",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:47:35.515Z",
+      "eventIds": [
+        "evt_69c6f2079f08e83ad485426f"
+      ],
+      "routes": [
+        "/events/elka-novogodnee-shou-koscheevo-carstvo-voronezh"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "30d13192-1efb-4959-ae79-a7a2e823b6e4",
+      "slug": "elka-novogodnee-shou-koscheevo-carstvo-voronezh-3",
+      "title": "Ёлка! Новогоднее шоу \"Кощеево царство\"",
+      "city": "Воронеж",
+      "effectiveTextSection": "B1 #26",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:47:37.815Z",
+      "eventIds": [
+        "evt_69c6f357b7df67643719f8aa"
+      ],
+      "routes": [
+        "/events/elka-novogodnee-shou-koscheevo-carstvo-voronezh-3"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "69d19b03-b1f3-4d9e-b599-c933731c4ce5",
+      "slug": "bolshaya-novogodnyaya-elka-v-kz-u-finlyandskogo-skazka-serebryanoe-kopytce-sankt-peterburg",
+      "title": "Большая русская ёлка в КЗ \"У Финляндского\"- сказка \"Серебряное копытце\"",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B1 #28",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:47:40.175Z",
+      "eventIds": [
+        "evt_6ad5a307b329033ee87e14fa"
+      ],
+      "routes": [
+        "/events/bolshaya-novogodnyaya-elka-v-kz-u-finlyandskogo-skazka-serebryanoe-kopytce-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "a5c0d81c-60b7-4222-b504-2219494f4c4c",
+      "slug": "bolshaya-novogodnyaya-elka-v-kz-u-finlyandskogo-skazka-serebryanoe-kopytce-sankt-peterburg-2",
+      "title": "Большая русская ёлка в КЗ \"У Финляндского\"- сказка \"Серебряное копытце\"",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B1 #28",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:47:42.004Z",
+      "eventIds": [
+        "evt_6ad5a52a0b29b1589eb2c1b6"
+      ],
+      "routes": [
+        "/events/bolshaya-novogodnyaya-elka-v-kz-u-finlyandskogo-skazka-serebryanoe-kopytce-sankt-peterburg-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "8e68b323-1631-4598-b1a3-1631c4cfb9ac",
+      "slug": "novogodnyaya-moskva-obzornaya-avtobusnaya-ekskursiya-31-dekabrya-moskva",
+      "title": "Новогодняя Москва: обзорная автобусная экскурсия 31 декабря",
+      "city": "Москва",
+      "effectiveTextSection": "B1 #29",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:47:43.535Z",
+      "eventIds": [
+        "evt_6a534beed3a8340d5414ffdc",
+        "evt_6a534bf0d3a8340d5414ffee",
+        "evt_69442d82160438455c2bb13a"
+      ],
+      "routes": [
+        "/events/novogodnyaya-moskva-obzornaya-avtobusnaya-ekskursiya-31-dekabrya-moskva"
+      ],
+      "revisionsBefore": 3,
+      "revisionsAfter": 5,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "9e49bd00-a43e-46f7-8f22-b03e44e16dcc",
+      "slug": "novogodnyaya-moskva-obzornaya-ekskursiya-moskva",
+      "title": "Новогодняя Москва: обзорная экскурсия",
+      "city": "Москва",
+      "effectiveTextSection": "B1 #30",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:47:45.254Z",
+      "eventIds": [
+        "evt_6aca181e31834938eba54f11",
+        "evt_6aca1ab025fdc6c912a54f59",
+        "evt_6aca1aaf25fdc6c912a54f47",
+        "evt_6aca1aad25fdc6c912a54f35",
+        "evt_6aca1aac25fdc6c912a54f23",
+        "evt_6aca1aaa25fdc6c912a54f11",
+        "evt_6aca1a402020b274665816a6",
+        "evt_6aca1a3f2020b27466581694",
+        "evt_6aca1a3d2020b27466581682",
+        "evt_6aca1a3c2020b27466581670",
+        "evt_6aca1a3a2020b2746658165e",
+        "evt_6aca1a392020b2746658164c",
+        "evt_6aca1a372020b2746658163a",
+        "evt_6aca1a362020b27466581628",
+        "evt_6aca1a352020b27466581616",
+        "evt_6aca1a332020b27466581604",
+        "evt_6aca1a322020b274665815f2",
+        "evt_6aca1a302020b274665815e0",
+        "evt_6aca1a2f2020b274665815ce",
+        "evt_6aca1a2d2020b274665815bc",
+        "evt_6aca1a2c2020b274665815aa",
+        "evt_6aca1a2b2020b27466581598",
+        "evt_6aca1a292020b27466581586",
+        "evt_6aca1a282020b27466581574",
+        "evt_6aca1a262020b27466581562",
+        "evt_6aca1a252020b27466581550",
+        "evt_6aca1a232020b2746658153e",
+        "evt_6aca1a222020b2746658152c",
+        "evt_6aca1a202020b2746658151a",
+        "evt_6aca1a1f2020b27466581508",
+        "evt_6aca1a1d2020b274665814f6",
+        "evt_6aca1a1c2020b274665814e4",
+        "evt_6aca1a1b2020b274665814d2",
+        "evt_6aca1a192020b274665814c0",
+        "evt_6aca1a182020b274665814ae",
+        "evt_6aca1a162020b2746658149c",
+        "evt_6aca1a152020b2746658148a",
+        "evt_6aca1a132020b27466581478",
+        "evt_6aca1a112020b27466581466",
+        "evt_6aca1a0f2020b27466581454",
+        "evt_6aca1a0e2020b27466581442",
+        "evt_6aca1a0c2020b27466581430",
+        "evt_6aca1a0b2020b2746658141e",
+        "evt_6aca1a092020b2746658140c",
+        "evt_6aca1a082020b274665813fa",
+        "evt_6aca1a072020b274665813e8",
+        "evt_6aca1a052020b274665813d6",
+        "evt_6aca1a042020b274665813c4",
+        "evt_6aca1a022020b274665813b2",
+        "evt_6aca1a012020b274665813a0",
+        "evt_6aca19ff2020b2746658138e",
+        "evt_6aca182131834938eba54f35",
+        "evt_6aca182031834938eba54f23"
+      ],
+      "routes": [
+        "/events/novogodnyaya-moskva-obzornaya-ekskursiya-moskva"
+      ],
+      "revisionsBefore": 53,
+      "revisionsAfter": 55,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "ce39c4cd-fffe-4a42-94c5-a3d310657827",
+      "slug": "elka-novogodnee-shou-koscheevo-carstvo-voronezh-2",
+      "title": "Ёлка! Новогоднее шоу \"Кощеево царство\"",
+      "city": "Воронеж",
+      "effectiveTextSection": "B1 #26",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:48:06.263Z",
+      "eventIds": [
+        "evt_69c6f2b635d4ad48aef49c42"
+      ],
+      "routes": [
+        "/events/elka-novogodnee-shou-koscheevo-carstvo-voronezh-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "758fd5cf-5ce7-4c17-ba6c-e6482e373a52",
+      "slug": "zimnii-festival-pianissimo-solnyi-koncert-fedora-orlova-v-gosudarstvennom-ermitazhe-sankt-peterburg-2",
+      "title": "Зимний фестиваль Pianissimo. Сольный концерт Максим Клецун в Государственном Эрмитаже",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B2 #2",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:48:08.076Z",
+      "eventIds": [
+        "evt_6a959c4704134d9ee56fe16f"
+      ],
+      "routes": [
+        "/events/zimnii-festival-pianissimo-solnyi-koncert-fedora-orlova-v-gosudarstvennom-ermitazhe-sankt-peterburg-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "4b073b78-330b-4f94-b20b-7aa2354c6bde",
+      "slug": "novogodnee-ledovoe-shou-snezhnaya-koroleva-podarok-kolomna",
+      "title": "Новогоднее ледовое шоу Снежная королева + Подарок",
+      "city": "Коломна",
+      "effectiveTextSection": "B2 #3",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:48:10.365Z",
+      "eventIds": [
+        "evt_6aa01a56b9675b2db47b9845"
+      ],
+      "routes": [
+        "/events/novogodnee-ledovoe-shou-snezhnaya-koroleva-podarok-kolomna"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "7121a02a-9344-4054-8048-b1c654ee4e7f",
+      "slug": "bogemnyi-art-branch-schelkunchik-kak-smotret-samyi-novogodnii-balet-sankt-peterburg",
+      "title": "Богемный арт-бранч: «Щелкунчик: как смотреть самый новогодний балет?»",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B2 #4",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:48:12.057Z",
+      "eventIds": [
+        "evt_6af2d6d2dd22cd8324d76074"
+      ],
+      "routes": [
+        "/events/bogemnyi-art-branch-schelkunchik-kak-smotret-samyi-novogodnii-balet-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "5f3f6d41-4942-4d05-998c-7c575f00bc82",
+      "slug": "chaikovskii-pri-svechah-rozhdestvenskii-koncert-muzyki-i-baleta-na-panoramnoi-kryshe-moskva-4",
+      "title": "«Чайковский при свечах»: Рождественский концерт музыки и балета на панорамной крыше!",
+      "city": "Москва",
+      "effectiveTextSection": "B2 #5",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:48:18.856Z",
+      "eventIds": [
+        "evt_6ac4db96abbc6a02a0bf921f"
+      ],
+      "routes": [
+        "/events/chaikovskii-pri-svechah-rozhdestvenskii-koncert-muzyki-i-baleta-na-panoramnoi-kryshe-moskva-4"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "3ccbe112-07ae-46a9-bae7-c4e5e13ba1f4",
+      "slug": "ledovoe-shou-schelkunchik-v-novosibirske-novosibirsk",
+      "title": "Ледовое шоу \"Щелкунчик\" в Новосибирске",
+      "city": "Новосибирск",
+      "effectiveTextSection": "B2 #6",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:48:22.646Z",
+      "eventIds": [
+        "evt_6aaa1b977a3d5a546b3147ef"
+      ],
+      "routes": [
+        "/events/ledovoe-shou-schelkunchik-v-novosibirske-novosibirsk"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "c138ed32-d2b3-4e69-9564-0f572d3aea79",
+      "slug": "novogodnee-ledovoe-shou-snezhnaya-koroleva-efremov",
+      "title": "Новогоднее ледовое шоу Снежная королева",
+      "city": "Ефремов",
+      "effectiveTextSection": "B2 #3",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:48:23.756Z",
+      "eventIds": [
+        "evt_6aa90da739aba7c9e39a9540"
+      ],
+      "routes": [
+        "/events/novogodnee-ledovoe-shou-snezhnaya-koroleva-efremov"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "12f655b0-5639-4961-86f6-dd72d7f36eff",
+      "slug": "novogodnii-gogol-mogol-teatr-traktir-s-literaturnym-menyu-sankt-peterburg",
+      "title": "\"Новогодний Гоголь-моголь\" театр-трактир с литературным меню",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B2 #7",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:48:25.994Z",
+      "eventIds": [
+        "evt_6aa423ad7e621c603bc49b4e"
+      ],
+      "routes": [
+        "/events/novogodnii-gogol-mogol-teatr-traktir-s-literaturnym-menyu-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "7024badb-89b0-4811-81bf-55f48d923a62",
+      "slug": "dzhaz-kabare-novogodnyaya-noch-burlesk-shou-na-panoramnoi-kryshe-v-soprovozhdenii-zhivogo-dzhaza-18-moskva-3",
+      "title": "«Джаз Кабаре. Новогодняя ночь»:Бурлеск-шоу на панорамной крыше в сопровождении живого джаза! 18+",
+      "city": "Москва",
+      "effectiveTextSection": "B2 #8",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:48:28.038Z",
+      "eventIds": [
+        "evt_6ac5620cf7a0102112c74cc0"
+      ],
+      "routes": [
+        "/events/dzhaz-kabare-novogodnyaya-noch-burlesk-shou-na-panoramnoi-kryshe-v-soprovozhdenii-zhivogo-dzhaza-18-moskva-3"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "129a5a06-7690-45e6-b36d-39e47a149734",
+      "slug": "zimnii-festival-pianissimo-solnyi-koncert-konstantin-matias-v-gosudarstvennom-ermitazhe-sankt-peterburg",
+      "title": "Зимний фестиваль Pianissimo. Сольный концерт Константин Матиас в Государственном Эрмитаже",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B2 #9",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:48:29.085Z",
+      "eventIds": [
+        "evt_6a986197af8de8948ba6812b"
+      ],
+      "routes": [
+        "/events/zimnii-festival-pianissimo-solnyi-koncert-konstantin-matias-v-gosudarstvennom-ermitazhe-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "156355f2-37d8-4337-a322-1020a3b5dcda",
+      "slug": "multimediinyi-spektakl-skazka-schelkunchik-v-planetarii-1-sankt-peterburg-2",
+      "title": "Мультимедийный спектакль-сказка «Щелкунчик» в Планетарии 1",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B2 #10",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:48:30.358Z",
+      "eventIds": [
+        "evt_6abc1d1efdac4ee1fc0bbf58"
+      ],
+      "routes": [
+        "/events/multimediinyi-spektakl-skazka-schelkunchik-v-planetarii-1-sankt-peterburg-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "ed14ddb7-acbe-43a6-a5ef-8932769266b8",
+      "slug": "multimediinyi-spektakl-skazka-schelkunchik-v-planetarii-1-sankt-peterburg-3",
+      "title": "Мультимедийный спектакль-сказка «Щелкунчик» в Планетарии 1",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B2 #10",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:48:31.696Z",
+      "eventIds": [
+        "evt_6abc1d5a200b250c67e42d14"
+      ],
+      "routes": [
+        "/events/multimediinyi-spektakl-skazka-schelkunchik-v-planetarii-1-sankt-peterburg-3"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "93574169-6cf2-49b9-aa54-ac131e6d0682",
+      "slug": "melodii-rozhdestva-chaikovskii-vals-cvetov-vivaldi-zima-bah-tokkata-i-fuga-re-minor-shubert-ave-moskva",
+      "title": "«МЕЛОДИИ РОЖДЕСТВА. Чайковский. «Вальс цветов» • Вивальди. «Зима» • Бах. Токката и фуга ре минор • Шуберт. Ave Maria»",
+      "city": "Москва",
+      "effectiveTextSection": "B2 #11",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:48:33.355Z",
+      "eventIds": [
+        "evt_6af4cd828afa7d6de47aefb9"
+      ],
+      "routes": [
+        "/events/melodii-rozhdestva-chaikovskii-vals-cvetov-vivaldi-zima-bah-tokkata-i-fuga-re-minor-shubert-ave-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "8b0214c8-49b6-494d-bcd0-994063288ee7",
+      "slug": "ledovoe-shou-schelkunchik-v-sterlitamake-sterlitamak",
+      "title": "Ледовое шоу \"Щелкунчик\" в Стерлитамаке",
+      "city": "Стерлитамак",
+      "effectiveTextSection": "B2 #6",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:48:34.476Z",
+      "eventIds": [
+        "evt_6ad05a99a61a2aa5d1c67326"
+      ],
+      "routes": [
+        "/events/ledovoe-shou-schelkunchik-v-sterlitamake-sterlitamak"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "8a96ddcd-bea3-45dd-8a55-fa94b56810b5",
+      "slug": "ledovoe-shou-schelkunchik-orenburg-2",
+      "title": "Ледовое шоу \"Щелкунчик\" в Оренбурге",
+      "city": "Оренбург",
+      "effectiveTextSection": "B2 #6",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:48:35.813Z",
+      "eventIds": [
+        "evt_6aa27d01a5318fc6a8b4b72b"
+      ],
+      "routes": [
+        "/events/ledovoe-shou-schelkunchik-orenburg-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "42d2079c-8129-433e-ad17-3e79df1830b4",
+      "slug": "multimediinyi-spektakl-skazka-schelkunchik-v-planetarii-1-sankt-peterburg",
+      "title": "Мультимедийный спектакль-сказка «Щелкунчик» в Планетарии 1",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B2 #10",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:48:37.087Z",
+      "eventIds": [
+        "evt_6abc1cce8fd931cd1ab59862"
+      ],
+      "routes": [
+        "/events/multimediinyi-spektakl-skazka-schelkunchik-v-planetarii-1-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "8f0b3c9e-b924-4505-8640-4791754af5cd",
+      "slug": "ledovoe-shou-schelkunchik-orenburg",
+      "title": "Ледовое шоу \"Щелкунчик\" в Оренбурге",
+      "city": "Оренбург",
+      "effectiveTextSection": "B2 #6",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:48:38.451Z",
+      "eventIds": [
+        "evt_6aa262c434bafffd6c44a688"
+      ],
+      "routes": [
+        "/events/ledovoe-shou-schelkunchik-orenburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "898bb19d-72a3-485a-91aa-a29db0f70a4c",
+      "slug": "balet-schelkunchik-s-obzornoi-ekskursiei-po-dvorcu-nachalo-ekskursii-16-45-nachalo-baleta-18-00-sankt-peterburg-2",
+      "title": "Балет \"Щелкунчик\". С обзорной экскурсией по Дворцу (начало экскурсии 16:45, начало балета 18:00)",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B2 #12",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:48:39.836Z",
+      "eventIds": [
+        "evt_6a8c61d70bc200ae90360f33"
+      ],
+      "routes": [
+        "/events/balet-schelkunchik-s-obzornoi-ekskursiei-po-dvorcu-nachalo-ekskursii-16-45-nachalo-baleta-18-00-sankt-peterburg-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "7b2d9db7-05fb-4757-a39e-9c2590e4b151",
+      "slug": "balet-schelkunchik-s-obzornoi-ekskursiei-po-dvorcu-nachalo-ekskursii-18-45-nachalo-baleta-20-00-sankt-peterburg-2",
+      "title": "Балет \"Щелкунчик\". С обзорной экскурсией по Дворцу (начало экскурсии 18:45, начало балета 20:00)",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B2 #12",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:48:43.167Z",
+      "eventIds": [
+        "evt_6a8c611523bea23e84519f7a"
+      ],
+      "routes": [
+        "/events/balet-schelkunchik-s-obzornoi-ekskursiei-po-dvorcu-nachalo-ekskursii-18-45-nachalo-baleta-20-00-sankt-peterburg-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "87340382-a450-40dc-a983-cdef39bf2f4b",
+      "slug": "balet-schelkunchik-s-obzornoi-ekskursiei-po-dvorcu-nachalo-ekskursii-18-45-nachalo-baleta-20-00-sankt-peterburg-4",
+      "title": "Балет \"Щелкунчик\". С обзорной экскурсией по Дворцу (начало экскурсии 18:45, начало балета 20:00)",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B2 #12",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:48:44.375Z",
+      "eventIds": [
+        "evt_6a8c616dc666c60f5129c415"
+      ],
+      "routes": [
+        "/events/balet-schelkunchik-s-obzornoi-ekskursiei-po-dvorcu-nachalo-ekskursii-18-45-nachalo-baleta-20-00-sankt-peterburg-4"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "b3b14d6b-518d-4962-ac70-3db69810ac5a",
+      "slug": "balet-schelkunchik-s-obzornoi-ekskursiei-po-dvorcu-nachalo-ekskursii-18-45-nachalo-baleta-20-00-sankt-peterburg-6",
+      "title": "Балет \"Щелкунчик\". С обзорной экскурсией по Дворцу (начало экскурсии 18:45, начало балета 20:00)",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B2 #12",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:48:46.145Z",
+      "eventIds": [
+        "evt_6a8c63f80bc200ae903610cf"
+      ],
+      "routes": [
+        "/events/balet-schelkunchik-s-obzornoi-ekskursiei-po-dvorcu-nachalo-ekskursii-18-45-nachalo-baleta-20-00-sankt-peterburg-6"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "d493aabf-bcf1-4517-9450-062ed5b0c958",
+      "slug": "balet-schelkunchik-s-obzornoi-ekskursiei-po-dvorcu-nachalo-ekskursii-18-45-nachalo-baleta-20-00-sankt-peterburg-3",
+      "title": "Балет \"Щелкунчик\". С обзорной экскурсией по Дворцу (начало экскурсии 18:45, начало балета 20:00)",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B2 #12",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:48:49.491Z",
+      "eventIds": [
+        "evt_6a8c613633fbcbbacd26f744"
+      ],
+      "routes": [
+        "/events/balet-schelkunchik-s-obzornoi-ekskursiei-po-dvorcu-nachalo-ekskursii-18-45-nachalo-baleta-20-00-sankt-peterburg-3"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "e0b95a7e-670c-4746-9143-97d8cbefd924",
+      "slug": "balet-schelkunchik-s-obzornoi-ekskursiei-po-dvorcu-nachalo-ekskursii-18-45-nachalo-baleta-20-00-sankt-peterburg",
+      "title": "Балет \"Щелкунчик\". С обзорной экскурсией по Дворцу (начало экскурсии 18:45, начало балета 20:00)",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B2 #12",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:48:51.155Z",
+      "eventIds": [
+        "evt_6a8ac5bacc92c02cf19df519"
+      ],
+      "routes": [
+        "/events/balet-schelkunchik-s-obzornoi-ekskursiei-po-dvorcu-nachalo-ekskursii-18-45-nachalo-baleta-20-00-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "ab34f259-9c14-4aab-b33f-7c08cb98d1be",
+      "slug": "zimnii-festival-pianissimo-solnyi-koncert-maksim-li-v-gosudarstvennom-ermitazhe-sankt-peterburg",
+      "title": "Зимний фестиваль Pianissimo. Сольный концерт Максим Ли в Государственном Эрмитаже",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B2 #13",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:48:52.210Z",
+      "eventIds": [
+        "evt_6a982f912988cebd8d1328b5"
+      ],
+      "routes": [
+        "/events/zimnii-festival-pianissimo-solnyi-koncert-maksim-li-v-gosudarstvennom-ermitazhe-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "5958de50-09d4-4eae-ade7-10044716fa08",
+      "slug": "zimnii-festival-pianissimo-solnyi-koncert-roman-sher-v-gosudarstvennom-ermitazhe-sankt-peterburg",
+      "title": "Зимний фестиваль Pianissimo. Сольный концерт Роман Шер в Государственном Эрмитаже",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B2 #14",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:48:53.525Z",
+      "eventIds": [
+        "evt_6a982af0b3f8162d2d296c64"
+      ],
+      "routes": [
+        "/events/zimnii-festival-pianissimo-solnyi-koncert-roman-sher-v-gosudarstvennom-ermitazhe-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "0875f7b4-fe96-4d9a-b413-4bfb87104578",
+      "slug": "rozhdestvenskii-festival-serenada-uhodyaschemu-godu-naberezhnye-chelny-2",
+      "title": "Рождественский фестиваль \"Серенада уходящему году\"",
+      "city": "Набережные Челны",
+      "effectiveTextSection": "B2 #15",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:48:54.696Z",
+      "eventIds": [
+        "evt_6ae1e32c43693ec7bb72a43f"
+      ],
+      "routes": [
+        "/events/rozhdestvenskii-festival-serenada-uhodyaschemu-godu-naberezhnye-chelny-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "d588ea74-8f95-4f2d-a615-4fb038ee1262",
+      "slug": "rozhdestvenskii-festival-serenada-uhodyaschemu-godu-naberezhnye-chelny-3",
+      "title": "Рождественский фестиваль \"Серенада уходящему году\"",
+      "city": "Набережные Челны",
+      "effectiveTextSection": "B2 #16",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:48:57.137Z",
+      "eventIds": [
+        "evt_6ae1e7e288296dbea6ef62c2"
+      ],
+      "routes": [
+        "/events/rozhdestvenskii-festival-serenada-uhodyaschemu-godu-naberezhnye-chelny-3"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "b3d84dd6-14fc-4d8b-8bff-a55c2b5d9871",
+      "slug": "rozhdestvenskii-ekspress-prazdnichnyi-koncert-za-stolikami-s-furshetom-sankt-peterburg",
+      "title": "\"Рождественский экспресс\" праздничный концерт за столиками с фуршетом",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B2 #17",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:48:59.456Z",
+      "eventIds": [
+        "evt_6aa94ae17fa78337145ba252"
+      ],
+      "routes": [
+        "/events/rozhdestvenskii-ekspress-prazdnichnyi-koncert-za-stolikami-s-furshetom-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "c96d2ad3-8043-41e0-9e7f-4e7494704fb3",
+      "slug": "rozhdestvenskii-ekspress-prazdnichnyi-koncert-za-stolikami-s-furshetom-sankt-peterburg-2",
+      "title": "\"Рождественский экспресс\" праздничный концерт за столиками с фуршетом",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B2 #17",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:49:02.053Z",
+      "eventIds": [
+        "evt_6aa94c464a7db4e991dc3ed3"
+      ],
+      "routes": [
+        "/events/rozhdestvenskii-ekspress-prazdnichnyi-koncert-za-stolikami-s-furshetom-sankt-peterburg-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "6df0f1ee-d98a-447c-a154-12a60139ddfd",
+      "slug": "novogodnee-interaktivnoe-shou-eho-fantazii-vladimir-2",
+      "title": "Новогоднее интерактивное шоу \"Эхо Фантазий\"",
+      "city": "Владимир",
+      "effectiveTextSection": "B2 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:49:04.174Z",
+      "eventIds": [
+        "evt_6aa15c0f16ec1ed97377406b"
+      ],
+      "routes": [
+        "/events/novogodnee-interaktivnoe-shou-eho-fantazii-vladimir-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "f7978070-6089-4895-b811-effaca2dce1e",
+      "slug": "zimnii-festival-pianissimo-solnyi-koncert-pak-chanhek-v-bolshom-petergofskom-dvorce-sankt-peterburg",
+      "title": "Зимний фестиваль Pianissimo. Сольный концерт Пак Чанхёк в Большом петергофском дворце",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B2 #19",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:49:10.035Z",
+      "eventIds": [
+        "evt_6a96e80ff0c947dad97c411b"
+      ],
+      "routes": [
+        "/events/zimnii-festival-pianissimo-solnyi-koncert-pak-chanhek-v-bolshom-petergofskom-dvorce-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "aaa9256c-5578-4779-91ce-b6cd25fd957a",
+      "slug": "samaya-zimnyaya-skazka-novogodnyaya-elka-i-spektakl-dlya-detei-v-samare-samara",
+      "title": "Самая зимняя сказка — новогодняя ёлка и спектакль для детей в Самаре",
+      "city": "Самара",
+      "effectiveTextSection": "B2 #20",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:49:17.343Z",
+      "eventIds": [
+        "evt_6ad8670185b847222c20dc17"
+      ],
+      "routes": [
+        "/events/samaya-zimnyaya-skazka-novogodnyaya-elka-i-spektakl-dlya-detei-v-samare-samara"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "d4a18e2a-b323-40e0-b3a4-5e1bfc7fa776",
+      "slug": "samaya-zimnyaya-skazka-novogodnyaya-elka-i-spektakl-dlya-detei-v-samare-samara-5",
+      "title": "Самая зимняя сказка — новогодняя ёлка и спектакль для детей в Самаре",
+      "city": "Самара",
+      "effectiveTextSection": "B2 #20",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:49:22.479Z",
+      "eventIds": [
+        "evt_6ad87de2a1dd77d8209d05bf"
+      ],
+      "routes": [
+        "/events/samaya-zimnyaya-skazka-novogodnyaya-elka-i-spektakl-dlya-detei-v-samare-samara-5"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "51f75357-79fd-4ee2-b927-3a3c9b394277",
+      "slug": "novogodnii-dzhaz-zolotaya-kollekciya-orkestr-severnaya-veneciya-sankt-peterburg-2",
+      "title": "«НОВОГОДНИЙ ДЖАЗ. ЗОЛОТАЯ КОЛЛЕКЦИЯ». Оркестр «Северная Венеция»",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B2 #21",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:49:24.134Z",
+      "eventIds": [
+        "evt_6ad0ec9ffbe00f8ed9841631"
+      ],
+      "routes": [
+        "/events/novogodnii-dzhaz-zolotaya-kollekciya-orkestr-severnaya-veneciya-sankt-peterburg-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "1e7d1054-4f90-4ae3-b22b-c0aac716b058",
+      "slug": "yubileinoe-shou-garri-potter-novyi-god-v-zapretnom-lesu-sankt-peterburg",
+      "title": "Юбилейное шоу «Гарри Поттер. Новый год в Запретном Лесу»",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B2 #22",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:49:27.053Z",
+      "eventIds": [
+        "evt_69cb9780e2c2137731156cbf"
+      ],
+      "routes": [
+        "/events/yubileinoe-shou-garri-potter-novyi-god-v-zapretnom-lesu-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "c05d0271-cda1-4c12-8dbf-7b8b627b0577",
+      "slug": "yubileinoe-shou-garri-potter-novyi-god-v-zapretnom-lesu-sankt-peterburg-2",
+      "title": "Юбилейное шоу «Гарри Поттер. Новый год в Запретном Лесу»",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B2 #22",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:49:30.133Z",
+      "eventIds": [
+        "evt_69cba170ddb89b4064cbeb9c"
+      ],
+      "routes": [
+        "/events/yubileinoe-shou-garri-potter-novyi-god-v-zapretnom-lesu-sankt-peterburg-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "e727e9c0-2fe9-4c7b-8bba-a0be91647207",
+      "slug": "novogodnee-interaktivnoe-shou-eho-fantazii-vladimir",
+      "title": "Новогоднее интерактивное шоу \"Эхо Фантазий\"",
+      "city": "Владимир",
+      "effectiveTextSection": "B2 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:49:31.754Z",
+      "eventIds": [
+        "evt_6aa1402ec0123aef4addfca6"
+      ],
+      "routes": [
+        "/events/novogodnee-interaktivnoe-shou-eho-fantazii-vladimir"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "af86b276-3bc7-475f-9533-e1c3f4924bc3",
+      "slug": "schelkunchik-moskva",
+      "title": "Щелкунчик",
+      "city": "Москва",
+      "effectiveTextSection": "B3 #2",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:49:33.662Z",
+      "eventIds": [
+        "evt_6ae67b05f80a026430518ab5",
+        "evt_6ae67b08f80a026430518c1a",
+        "evt_6ae67b0af80a026430518d7f",
+        "evt_6ae67b0cf80a026430518ee4",
+        "evt_6ae67b0ef80a026430519049",
+        "evt_6ae67b10f80a0264305191ae",
+        "evt_6ae67b12f80a026430519313",
+        "evt_6ae67b13f80a026430519478"
+      ],
+      "routes": [
+        "/events/schelkunchik-moskva"
+      ],
+      "revisionsBefore": 8,
+      "revisionsAfter": 10,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "e572b866-2b18-48dd-9749-e96046badab4",
+      "slug": "novogodnii-dzhaz-zolotaya-kollekciya-orkestr-severnaya-veneciya-sankt-peterburg",
+      "title": "«НОВОГОДНИЙ ДЖАЗ. ЗОЛОТАЯ КОЛЛЕКЦИЯ». Оркестр «Северная Венеция»",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B2 #21",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:49:36.076Z",
+      "eventIds": [
+        "evt_6ad0e8cd92a631f72eea962b"
+      ],
+      "routes": [
+        "/events/novogodnii-dzhaz-zolotaya-kollekciya-orkestr-severnaya-veneciya-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "3565610a-5d40-42e4-bcf9-34c5c27d6f0c",
+      "slug": "muzyka-pri-svechah-melodii-rozhdestva-sankt-peterburg-4",
+      "title": "Музыка при свечах. Мелодии Рождества",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #4",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:49:38.144Z",
+      "eventIds": [
+        "evt_6a970ad20728e0e74ffa8703"
+      ],
+      "routes": [
+        "/events/muzyka-pri-svechah-melodii-rozhdestva-sankt-peterburg-4"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "3836ae1f-e223-4d82-b8d3-7e91d1789e97",
+      "slug": "schelkunchik-spektakl-dlya-detei-s-pesochnoi-animaciei-i-zhivoi-muzykoi-sankt-peterburg-2",
+      "title": "\"Щелкунчик\" спектакль для детей с песочной анимацией и живой музыкой",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #5",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:49:39.805Z",
+      "eventIds": [
+        "evt_6a7afa7cdd100af17b2c6bb2"
+      ],
+      "routes": [
+        "/events/schelkunchik-spektakl-dlya-detei-s-pesochnoi-animaciei-i-zhivoi-muzykoi-sankt-peterburg-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "0ab7da14-d232-4b3a-b2ef-6371d861e141",
+      "slug": "novogodnee-ledovoe-shou-snezhnaya-koroleva-podarok-kolomna-2",
+      "title": "Новогоднее ледовое шоу Снежная королева + Подарок",
+      "city": "Коломна",
+      "effectiveTextSection": "B2 #3",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:49:45.766Z",
+      "eventIds": [
+        "evt_6aa01da787087be8ea74b894"
+      ],
+      "routes": [
+        "/events/novogodnee-ledovoe-shou-snezhnaya-koroleva-podarok-kolomna-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "41409e23-0c25-4100-9cb5-9ede4cac88d8",
+      "slug": "schelkunchik-spektakl-dlya-detei-s-pesochnoi-animaciei-i-zhivoi-muzykoi-sankt-peterburg",
+      "title": "\"Щелкунчик\" спектакль для детей с песочной анимацией и живой музыкой",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #5",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:49:57.479Z",
+      "eventIds": [
+        "evt_6a7af936f2417fa73c25133a"
+      ],
+      "routes": [
+        "/events/schelkunchik-spektakl-dlya-detei-s-pesochnoi-animaciei-i-zhivoi-muzykoi-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "e5f3ea40-4631-4a2a-9cbf-c960285e8eed",
+      "slug": "ekskursiya-v-osobnyak-shredera-koncert-rozhdestvenskii-ekspress-za-stolikami-s-furshetom-sankt-peterburg",
+      "title": "Экскурсия в особняк Шрёдера + концерт \"Рождественский экспресс\" за столиками с фуршетом",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B2 #17",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:49:59.332Z",
+      "eventIds": [
+        "evt_6aa951287bf319e4348d4bf2"
+      ],
+      "routes": [
+        "/events/ekskursiya-v-osobnyak-shredera-koncert-rozhdestvenskii-ekspress-za-stolikami-s-furshetom-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "e4391b1c-df63-4890-97c1-bb52c945800c",
+      "slug": "horovoe-karaoke-s-muzykantami-novogodnyaya-versiya-moskva",
+      "title": "Хоровое караоке с музыкантами: Новогодняя версия",
+      "city": "Москва",
+      "effectiveTextSection": "B3 #8",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:50:01.728Z",
+      "eventIds": [
+        "evt_6aaa6db6af2f6265464c2dbf"
+      ],
+      "routes": [
+        "/events/horovoe-karaoke-s-muzykantami-novogodnyaya-versiya-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "6f13dab5-6177-4a92-a520-6fa093e77b7f",
+      "slug": "rozhdestvenskii-gala-koncert-solistov-baleta-s-obzornoi-ekskursiei-po-dvorcu-nachalo-ekskursii-18-sankt-peterburg-2",
+      "title": "Рождественский гала-концерт солистов балета. С обзорной экскурсией по Дворцу (начало экскурсии 18:45, начало балета 20:00)",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #9",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:50:06.473Z",
+      "eventIds": [
+        "evt_6a8c629ef125a8d533456ab5"
+      ],
+      "routes": [
+        "/events/rozhdestvenskii-gala-koncert-solistov-baleta-s-obzornoi-ekskursiei-po-dvorcu-nachalo-ekskursii-18-sankt-peterburg-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "4a226a6c-bfa3-4b1e-9eab-50c9e0928c3a",
+      "slug": "vihri-valsa-viktor-nikolaev-fortepiannyi-novogodnii-koncert-s-furshetom-sankt-peterburg-2",
+      "title": "\"Вихри вальса\" Виктор Николаев - фортепианный новогодний концерт с фуршетом",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #10",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:50:09.959Z",
+      "eventIds": [
+        "evt_6a9bee579c3692b28277caad"
+      ],
+      "routes": [
+        "/events/vihri-valsa-viktor-nikolaev-fortepiannyi-novogodnii-koncert-s-furshetom-sankt-peterburg-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "8241bf6a-b2d5-40b4-ad81-083747c0ea42",
+      "slug": "lya-mur-francuzskii-shanson-novogodnii-uzhin-koncert-sankt-peterburg",
+      "title": "\"Ля мур\" французский шансон, Новогодний ужин-концерт",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #11",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:50:17.969Z",
+      "eventIds": [
+        "evt_6acfb3be96995858ca4f1ee2"
+      ],
+      "routes": [
+        "/events/lya-mur-francuzskii-shanson-novogodnii-uzhin-koncert-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "3e9c233b-6521-4e67-b56f-ad2401d9092c",
+      "slug": "vihri-valsa-viktor-nikolaev-fortepiannyi-novogodnii-koncert-s-furshetom-sankt-peterburg",
+      "title": "\"Вихри вальса\" Виктор Николаев - фортепианный новогодний концерт с фуршетом",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #10",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:50:33.479Z",
+      "eventIds": [
+        "evt_6a9bed3fa0749c33319b96b4"
+      ],
+      "routes": [
+        "/events/vihri-valsa-viktor-nikolaev-fortepiannyi-novogodnii-koncert-s-furshetom-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "bb608ac3-6ca0-4acf-9bab-dbd2d8aba0b0",
+      "slug": "schelkunchik-volshebnye-sny-v-dome-shredera-spektakl-balet-sankt-peterburg",
+      "title": "«Щелкунчик — волшебные сны в доме Шрёдера» спектакль-балет",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #12",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:50:37.364Z",
+      "eventIds": [
+        "evt_6af34c61a0964a76b0397605"
+      ],
+      "routes": [
+        "/events/schelkunchik-volshebnye-sny-v-dome-shredera-spektakl-balet-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "2519be2c-fc0b-42d4-88da-48d51741d100",
+      "slug": "lya-mur-francuzskii-shanson-novogodnii-uzhin-koncert-sankt-peterburg-2",
+      "title": "\"Ля мур\" французский шансон, Новогодний ужин-концерт",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #11",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:50:39.377Z",
+      "eventIds": [
+        "evt_6acfb55650a5e19175bfbc6a"
+      ],
+      "routes": [
+        "/events/lya-mur-francuzskii-shanson-novogodnii-uzhin-koncert-sankt-peterburg-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "645d8836-b166-469f-9b96-08a7030e2534",
+      "slug": "lya-mur-francuzskii-shanson-novogodnii-uzhin-koncert-sankt-peterburg-4",
+      "title": "\"Ля мур\" французский шансон, Новогодний ужин-концерт",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #11",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:50:40.874Z",
+      "eventIds": [
+        "evt_6acfb6f299696bc7a13f0f1f"
+      ],
+      "routes": [
+        "/events/lya-mur-francuzskii-shanson-novogodnii-uzhin-koncert-sankt-peterburg-4"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "9e44281c-f169-46bd-97d0-5bc1351d0a50",
+      "slug": "lya-mur-francuzskii-shanson-novogodnii-uzhin-koncert-sankt-peterburg-3",
+      "title": "\"Ля мур\" французский шансон, Новогодний ужин-концерт",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #11",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:50:42.598Z",
+      "eventIds": [
+        "evt_6acfb69167fa9aff1364d5d0"
+      ],
+      "routes": [
+        "/events/lya-mur-francuzskii-shanson-novogodnii-uzhin-koncert-sankt-peterburg-3"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "7d7ae9ad-9643-430c-8716-8355974a3b39",
+      "slug": "rozhdestvenskii-organ-sankt-peterburg",
+      "title": "Рождественский орган",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #13",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:50:44.141Z",
+      "eventIds": [
+        "evt_6a53fb2892d0aac5d2cca490"
+      ],
+      "routes": [
+        "/events/rozhdestvenskii-organ-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "aedea5b9-b14e-4f2a-8ada-8c99a4353692",
+      "slug": "rozhdestvenskii-organ-sankt-peterburg-2",
+      "title": "Рождественский Орган",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #13",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:50:45.692Z",
+      "eventIds": [
+        "evt_6ae78897195d86b5a7518ab2",
+        "evt_6ae7889d195d86b5a7519286",
+        "evt_6ae7889b195d86b5a7518fea",
+        "evt_6ae78899195d86b5a7518d4e"
+      ],
+      "routes": [
+        "/events/rozhdestvenskii-organ-sankt-peterburg-2"
+      ],
+      "revisionsBefore": 4,
+      "revisionsAfter": 6,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "e643a753-232a-4301-b567-24eae5eb59c8",
+      "slug": "rozhdestvenskii-organ-pri-svechah-sankt-peterburg",
+      "title": "Рождественский орган при свечах",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #14",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:50:47.616Z",
+      "eventIds": [
+        "evt_6aa7d0604ae3cd003551b6a0"
+      ],
+      "routes": [
+        "/events/rozhdestvenskii-organ-pri-svechah-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "40b2f7a4-9d35-41fa-8c0a-1ecb6a252105",
+      "slug": "zimnii-festival-pianissimo-solnyi-koncert-tolga-bilget-v-bolshom-petergofskom-dvorce-sankt-peterburg",
+      "title": "Зимний фестиваль Pianissimo. Сольный концерт Толга Билгет в Большом петергофском дворце",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #15",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:50:49.592Z",
+      "eventIds": [
+        "evt_6a96eea1ec517e86a79d8083"
+      ],
+      "routes": [
+        "/events/zimnii-festival-pianissimo-solnyi-koncert-tolga-bilget-v-bolshom-petergofskom-dvorce-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "b46e73fd-3f53-4ebc-bbae-584383228a24",
+      "slug": "rozhdestvenskii-gala-koncert-solistov-baleta-s-obzornoi-ekskursiei-po-dvorcu-nachalo-ekskursii-18-sankt-peterburg",
+      "title": "Рождественский гала-концерт солистов балета. С обзорной экскурсией по Дворцу (начало экскурсии 18:45, начало балета 20:00)",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #9",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:50:51.224Z",
+      "eventIds": [
+        "evt_6a8ac8b7cc92c02cf19df6d9"
+      ],
+      "routes": [
+        "/events/rozhdestvenskii-gala-koncert-solistov-baleta-s-obzornoi-ekskursiei-po-dvorcu-nachalo-ekskursii-18-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "651b0b51-95d5-478f-8267-ff37af88b613",
+      "slug": "ezhik-fima-novogodnie-chudesa-sankt-peterburg-2",
+      "title": "Ёжик Фима. Новогодние чудеса",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #16",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:50:56.788Z",
+      "eventIds": [
+        "evt_6af1a8445b80bc899a53903c"
+      ],
+      "routes": [
+        "/events/ezhik-fima-novogodnie-chudesa-sankt-peterburg-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "f07b3e5e-8f5e-48b7-89d2-7ad74020e899",
+      "slug": "ezhik-fima-novogodnie-chudesa-sankt-peterburg-3",
+      "title": "Ёжик Фима. Новогодние чудеса",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #16",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:51:04.316Z",
+      "eventIds": [
+        "evt_6af1a8239b74209979d52413"
+      ],
+      "routes": [
+        "/events/ezhik-fima-novogodnie-chudesa-sankt-peterburg-3"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "f2f7a197-4386-4336-aef1-fad5291db8a6",
+      "slug": "ezhik-fima-novogodnie-chudesa-sankt-peterburg",
+      "title": "Ёжик Фима. Новогодние чудеса",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #16",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:51:07.895Z",
+      "eventIds": [
+        "evt_6af1a8b3c80e72181fca85dc"
+      ],
+      "routes": [
+        "/events/ezhik-fima-novogodnie-chudesa-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "b578a652-713f-4fcb-81a7-55c4720d271b",
+      "slug": "novogodnyaya-melodiya-irina-aleshina-arii-iz-oper-pesni-sovetskoi-estrady-sankt-peterburg",
+      "title": "\"Новогодняя мелодия\" Ирина Алёшина - арии из опер, песни советской эстрады",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #17",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:51:09.379Z",
+      "eventIds": [
+        "evt_6a99bb010041a9d582185a6f"
+      ],
+      "routes": [
+        "/events/novogodnyaya-melodiya-irina-aleshina-arii-iz-oper-pesni-sovetskoi-estrady-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "cc204598-0633-4d16-82ae-bbfd3f36558a",
+      "slug": "novogodnyaya-melodiya-irina-aleshina-arii-iz-oper-pesni-sovetskoi-estrady-sankt-peterburg-2",
+      "title": "\"Новогодняя мелодия\" Ирина Алёшина - арии из опер, песни советской эстрады",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #17",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:51:10.872Z",
+      "eventIds": [
+        "evt_6a99bbaeeb555248d090b45f"
+      ],
+      "routes": [
+        "/events/novogodnyaya-melodiya-irina-aleshina-arii-iz-oper-pesni-sovetskoi-estrady-sankt-peterburg-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "e0011822-24cd-4140-a70f-8a7dc83e04cb",
+      "slug": "novogodnee-ledovoe-shou-snezhnaya-koroleva-efremov-2",
+      "title": "Новогоднее ледовое шоу Снежная королева",
+      "city": "Ефремов",
+      "effectiveTextSection": "B2 #3",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:51:12.231Z",
+      "eventIds": [
+        "evt_6aa913bcef7ba73604283690"
+      ],
+      "routes": [
+        "/events/novogodnee-ledovoe-shou-snezhnaya-koroleva-efremov-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "080d26b8-d861-43b3-9077-6364f2b7a376",
+      "slug": "kak-zdorovo-chtovsemyzdes-18-novogodka-dlya-vzroslyh-sankt-peterburg-3",
+      "title": "«Как здорово, чтовсемыздесь» (18+) | Новогодка для взрослых",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:51:13.881Z",
+      "eventIds": [
+        "evt_6ae9b65859c78b23fd6a30a9"
+      ],
+      "routes": [
+        "/events/kak-zdorovo-chtovsemyzdes-18-novogodka-dlya-vzroslyh-sankt-peterburg-3"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "15b18b4c-049d-4352-886e-b596e580b890",
+      "slug": "kak-zdorovo-chtovsemyzdes-18-novogodka-dlya-vzroslyh-sankt-peterburg-5",
+      "title": "«Как здорово, чтовсемыздесь» (18+) | Новогодка для взрослых",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:51:15.295Z",
+      "eventIds": [
+        "evt_6ae9b6904bc9f9ef14a2f17a"
+      ],
+      "routes": [
+        "/events/kak-zdorovo-chtovsemyzdes-18-novogodka-dlya-vzroslyh-sankt-peterburg-5"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "20a313b4-4761-4e7d-ac25-b9e350069baa",
+      "slug": "kak-zdorovo-chtovsemyzdes-18-novogodka-dlya-vzroslyh-sankt-peterburg-2",
+      "title": "«Как здорово, чтовсемыздесь» (18+) | Новогодка для взрослых",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:51:17.247Z",
+      "eventIds": [
+        "evt_6ae9b5ed4bc9f9ef14a2f141"
+      ],
+      "routes": [
+        "/events/kak-zdorovo-chtovsemyzdes-18-novogodka-dlya-vzroslyh-sankt-peterburg-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "32d32bd4-95b9-4452-a10a-9a151a8f0437",
+      "slug": "kak-zdorovo-chtovsemyzdes-18-novogodka-dlya-vzroslyh-sankt-peterburg-4",
+      "title": "«Как здорово, чтовсемыздесь» (18+) | Новогодка для взрослых",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:51:28.642Z",
+      "eventIds": [
+        "evt_6ae9b6775289e7dabc04d7c4"
+      ],
+      "routes": [
+        "/events/kak-zdorovo-chtovsemyzdes-18-novogodka-dlya-vzroslyh-sankt-peterburg-4"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "3f54d970-d9c1-4be0-a17b-44365b213703",
+      "slug": "kak-zdorovo-chtovsemyzdes-18-novogodka-dlya-vzroslyh-sankt-peterburg-6",
+      "title": "«Как здорово, чтовсемыздесь» (18+) | Новогодка для взрослых",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:51:33.147Z",
+      "eventIds": [
+        "evt_6ae9b6bc5af89e676f4a75b8"
+      ],
+      "routes": [
+        "/events/kak-zdorovo-chtovsemyzdes-18-novogodka-dlya-vzroslyh-sankt-peterburg-6"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "7f3e1d17-12c3-4652-a2eb-01df7e98cc0b",
+      "slug": "kak-zdorovo-chtovsemyzdes-18-novogodka-dlya-vzroslyh-sankt-peterburg-7",
+      "title": "«Как здорово, чтовсемыздесь» (18+) | Новогодка для взрослых",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:51:42.215Z",
+      "eventIds": [
+        "evt_6ae9b6aaa7d88e7be7beca96"
+      ],
+      "routes": [
+        "/events/kak-zdorovo-chtovsemyzdes-18-novogodka-dlya-vzroslyh-sankt-peterburg-7"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "bde8db3d-7f80-42d2-a752-84ecaafbb5d2",
+      "slug": "kak-zdorovo-chtovsemyzdes-18-novogodka-dlya-vzroslyh-sankt-peterburg",
+      "title": "«Как здорово, чтовсемыздесь» (18+) | Новогодка для взрослых",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:51:44.133Z",
+      "eventIds": [
+        "evt_6ae9b6315af89e676f4a7572"
+      ],
+      "routes": [
+        "/events/kak-zdorovo-chtovsemyzdes-18-novogodka-dlya-vzroslyh-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "2b927629-938a-461c-97e6-1e89e68f5e4f",
+      "slug": "muzyka-pri-svechah-melodii-rozhdestva-sankt-peterburg",
+      "title": "Музыка при свечах. Мелодии Рождества",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #19",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:51:51.757Z",
+      "eventIds": [
+        "evt_6aa6a213b09ca464f09a7fcc"
+      ],
+      "routes": [
+        "/events/muzyka-pri-svechah-melodii-rozhdestva-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "d64ee70c-364c-4595-9151-a72955d22dbc",
+      "slug": "chaikovskii-pri-svechah-rozhdestvenskii-koncert-muzyki-i-baleta-na-panoramnoi-kryshe-moskva-2",
+      "title": "«Чайковский при свечах»: Рождественский концерт музыки и балета на панорамной крыше!",
+      "city": "Москва",
+      "effectiveTextSection": "B2 #5",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:51:58.405Z",
+      "eventIds": [
+        "evt_6a9ace01a1e29103a6f66749"
+      ],
+      "routes": [
+        "/events/chaikovskii-pri-svechah-rozhdestvenskii-koncert-muzyki-i-baleta-na-panoramnoi-kryshe-moskva-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "3c23c304-7872-4460-8651-8626af89907c",
+      "slug": "dzhaz-kabare-novogodnyaya-noch-burlesk-shou-na-panoramnoi-kryshe-v-soprovozhdenii-zhivogo-dzhaza-18-moskva",
+      "title": "«Джаз Кабаре. Новогодняя ночь»:Бурлеск-шоу на панорамной крыше в сопровождении живого джаза! 18+",
+      "city": "Москва",
+      "effectiveTextSection": "B2 #8",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:52:00.697Z",
+      "eventIds": [
+        "evt_6ac560fe9d58384a98a7b148"
+      ],
+      "routes": [
+        "/events/dzhaz-kabare-novogodnyaya-noch-burlesk-shou-na-panoramnoi-kryshe-v-soprovozhdenii-zhivogo-dzhaza-18-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "da519257-887e-4ef2-9491-f236cd35dc00",
+      "slug": "horovoe-karaoke-s-muzykantami-novogodnyaya-versiya-moskva-2",
+      "title": "Хоровое караоке с музыкантами: Новогодняя версия",
+      "city": "Москва",
+      "effectiveTextSection": "B3 #8",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:52:02.155Z",
+      "eventIds": [
+        "evt_6aaa6fbcf81f76620ee5f46e"
+      ],
+      "routes": [
+        "/events/horovoe-karaoke-s-muzykantami-novogodnyaya-versiya-moskva-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "ddff8054-0199-473c-a372-c779d9c6707e",
+      "slug": "interaktivnoe-predstavlenie-malenkii-ded-moroz-dlya-detei-ot-2-do-6-let-sankt-peterburg-2",
+      "title": "Интерактивное представление \"Маленький Дед Мороз\" для детей от 2 до 6 лет.",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #22",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:52:03.575Z",
+      "eventIds": [
+        "evt_6ace791727dfc834a13d78e0"
+      ],
+      "routes": [
+        "/events/interaktivnoe-predstavlenie-malenkii-ded-moroz-dlya-detei-ot-2-do-6-let-sankt-peterburg-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "b882ce9d-0f7e-4109-b4e0-38fb6de00c1f",
+      "slug": "zimnii-festival-pianissimo-solnyi-koncert-chanda-bupe-lupambo-v-bolshom-petergofskom-dvorce-sankt-peterburg",
+      "title": "Зимний фестиваль Pianissimo. Сольный концерт Чанда Бупе Лупамбо в Большом петергофском дворце",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #23",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:52:05.463Z",
+      "eventIds": [
+        "evt_6a96ed307beeae8a55afa41b"
+      ],
+      "routes": [
+        "/events/zimnii-festival-pianissimo-solnyi-koncert-chanda-bupe-lupambo-v-bolshom-petergofskom-dvorce-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "2b4efd06-3477-4be2-b9fe-b7c264a3f9f6",
+      "slug": "kiberelka-priklyucheniya-v-bolshih-lukomorah-moskva-3",
+      "title": "Киберёлка: приключения в Больших Лукоморах",
+      "city": "Москва",
+      "effectiveTextSection": "B3 #24",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:52:06.919Z",
+      "eventIds": [
+        "evt_6a7da8a83a3959f3b8fe663e"
+      ],
+      "routes": [
+        "/events/kiberelka-priklyucheniya-v-bolshih-lukomorah-moskva-3"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "46a90c45-01e4-436b-93ff-2dd0661bbbe6",
+      "slug": "kiberelka-priklyucheniya-v-bolshih-lukomorah-moskva-2",
+      "title": "Киберёлка: приключения в Больших Лукоморах",
+      "city": "Москва",
+      "effectiveTextSection": "B3 #24",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:52:09.145Z",
+      "eventIds": [
+        "evt_6a7da8713a3959f3b8fe6626"
+      ],
+      "routes": [
+        "/events/kiberelka-priklyucheniya-v-bolshih-lukomorah-moskva-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "c2c7810a-42e4-4da4-afec-a61ca83efe09",
+      "slug": "kiberelka-priklyucheniya-v-bolshih-lukomorah-moskva-4",
+      "title": "Киберёлка: приключения в Больших Лукоморах",
+      "city": "Москва",
+      "effectiveTextSection": "B3 #24",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:52:15.206Z",
+      "eventIds": [
+        "evt_6a7da8d12193a7a9db43be09"
+      ],
+      "routes": [
+        "/events/kiberelka-priklyucheniya-v-bolshih-lukomorah-moskva-4"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "5b5c5e87-0e78-4f70-aff9-50a47ec74a6c",
+      "slug": "chaikovskii-pri-svechah-rozhdestvenskii-koncert-muzyki-i-baleta-na-panoramnoi-kryshe-moskva",
+      "title": "«Чайковский при свечах»: Рождественский концерт музыки и балета на панорамной крыше!",
+      "city": "Москва",
+      "effectiveTextSection": "B2 #5",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:52:17.327Z",
+      "eventIds": [
+        "evt_6a9aca5761eac99b2ab6ce64"
+      ],
+      "routes": [
+        "/events/chaikovskii-pri-svechah-rozhdestvenskii-koncert-muzyki-i-baleta-na-panoramnoi-kryshe-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "31694259-8f37-41b2-9102-daa143c90670",
+      "slug": "vzlomai-novyi-god-kazan-2",
+      "title": "Взломай Новый год",
+      "city": "Казань",
+      "effectiveTextSection": "B4 #1",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:52:21.599Z",
+      "eventIds": [
+        "evt_6abd2e9bc5665bcf505aead5"
+      ],
+      "routes": [
+        "/events/vzlomai-novyi-god-kazan-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "473cced4-b4c2-41d3-95f8-bf3faeb337c4",
+      "slug": "vzlomai-novyi-god-kazan-4",
+      "title": "Взломай Новый год",
+      "city": "Казань",
+      "effectiveTextSection": "B4 #1",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:52:25.202Z",
+      "eventIds": [
+        "evt_6abd2f7a1a2a46bf8df71da5"
+      ],
+      "routes": [
+        "/events/vzlomai-novyi-god-kazan-4"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "83046c11-f19e-4c1d-9e68-8f9b3fc60595",
+      "slug": "vzlomai-novyi-god-kazan-3",
+      "title": "Взломай Новый год",
+      "city": "Казань",
+      "effectiveTextSection": "B4 #1",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:52:30.936Z",
+      "eventIds": [
+        "evt_6abd2f4217588bb013acfff5"
+      ],
+      "routes": [
+        "/events/vzlomai-novyi-god-kazan-3"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "81572136-dbc3-4af6-8e42-f77507e96818",
+      "slug": "kiberelka-priklyucheniya-v-bolshih-lukomorah-moskva",
+      "title": "Киберёлка: приключения в Больших Лукоморах",
+      "city": "Москва",
+      "effectiveTextSection": "B3 #24",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:52:38.317Z",
+      "eventIds": [
+        "evt_6a7da6d52a2b81921086f67e"
+      ],
+      "routes": [
+        "/events/kiberelka-priklyucheniya-v-bolshih-lukomorah-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "fcc402e9-addf-4225-a78c-c44f660fbe7d",
+      "slug": "the-silvertonez-zolotye-hity-60-h-moskva",
+      "title": "Новогодний „Голубой огонёк“",
+      "city": "Москва",
+      "effectiveTextSection": "B4 #2",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:52:40.063Z",
+      "eventIds": [
+        "evt_6ad7252d5c28832a472c73f9"
+      ],
+      "routes": [
+        "/events/the-silvertonez-zolotye-hity-60-h-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "120c0674-cfbd-498e-a6c4-9012e49dc8a8",
+      "slug": "dzhazovaya-programma-novogodnyaya-moskva-2",
+      "title": "Джазовая программа \"Новогодняя Москва\"",
+      "city": "Москва",
+      "effectiveTextSection": "B4 #3",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:52:41.303Z",
+      "eventIds": [
+        "evt_6ae862a440e64b6ac36f9809"
+      ],
+      "routes": [
+        "/events/dzhazovaya-programma-novogodnyaya-moskva-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "e6bd3fc1-9c94-4ccf-908e-a8a583145063",
+      "slug": "dzhazovaya-programma-novogodnyaya-moskva",
+      "title": "Джазовая программа \"Новогодняя Москва\"",
+      "city": "Москва",
+      "effectiveTextSection": "B4 #3",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:52:42.815Z",
+      "eventIds": [
+        "evt_6ae861df491ac982f548e86f"
+      ],
+      "routes": [
+        "/events/dzhazovaya-programma-novogodnyaya-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "6138d57c-1d8d-4f50-9201-6c53c8b68d5f",
+      "slug": "interaktivnoe-predstavlenie-malenkii-ded-moroz-dlya-detei-ot-2-do-6-let-sankt-peterburg",
+      "title": "Интерактивное представление \"Маленький Дед Мороз\" для детей от 2 до 6 лет.",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #22",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:52:44.486Z",
+      "eventIds": [
+        "evt_6ace77b8feff2d587e4745ce"
+      ],
+      "routes": [
+        "/events/interaktivnoe-predstavlenie-malenkii-ded-moroz-dlya-detei-ot-2-do-6-let-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "a628aff3-0783-4170-9665-4b7408138e75",
+      "slug": "muzyka-pri-svechah-melodii-rozhdestva-sankt-peterburg-2",
+      "title": "Музыка при свечах. Мелодии Рождества",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #4",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:52:49.086Z",
+      "eventIds": [
+        "evt_6ae795458bf998c419518aba",
+        "evt_6ae795478bf998c419518d56"
+      ],
+      "routes": [
+        "/events/muzyka-pri-svechah-melodii-rozhdestva-sankt-peterburg-2"
+      ],
+      "revisionsBefore": 2,
+      "revisionsAfter": 4,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "b61bded1-f57f-49ec-a153-d64fc321e60d",
+      "slug": "intonaciya-rozhdestvenskaya-akustika-moskva",
+      "title": "Интонация. Рождественская акустика",
+      "city": "Москва",
+      "effectiveTextSection": "B4 #7",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:52:57.195Z",
+      "eventIds": [
+        "evt_6ae72eade6ead336d5fffb0c"
+      ],
+      "routes": [
+        "/events/intonaciya-rozhdestvenskaya-akustika-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "619df282-5c27-4603-9543-3a333e714b3f",
+      "slug": "balet-schelkunchik-sankt-peterburg-5",
+      "title": "Балет \"Щелкунчик\"",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B4 #8",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:53:02.405Z",
+      "eventIds": [
+        "evt_6a91af096f82470d21cb5a17"
+      ],
+      "routes": [
+        "/events/balet-schelkunchik-sankt-peterburg-5"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "e2246eee-a1ef-4024-8b08-83e80ca12208",
+      "slug": "novogodnii-haip-kazan-2",
+      "title": "Новогодний хайп",
+      "city": "Казань",
+      "effectiveTextSection": "B4 #9",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:53:04.205Z",
+      "eventIds": [
+        "evt_6ad8696cc03aecba973cfb8f"
+      ],
+      "routes": [
+        "/events/novogodnii-haip-kazan-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "536c77c0-ed6f-4a61-9594-0a96ef22e2e6",
+      "slug": "koncert-rozhdestvenskie-hity-moskva",
+      "title": "Концерт «Рождественские хиты»",
+      "city": "Москва",
+      "effectiveTextSection": "B4 #10",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:53:05.513Z",
+      "eventIds": [
+        "evt_6abb8a9defab4d2e6095e2ce"
+      ],
+      "routes": [
+        "/events/koncert-rozhdestvenskie-hity-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "5de139f8-0097-459a-95bc-422e8cf07acd",
+      "slug": "prednovogodnii-koncert-orkestr-pavla-oparovskogo-sankt-peterburg",
+      "title": "\"Предновогодний концерт\" оркестр Павла Опаровского",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B4 #11",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:53:07.905Z",
+      "eventIds": [
+        "evt_6abe92848577d3fec571c3e5"
+      ],
+      "routes": [
+        "/events/prednovogodnii-koncert-orkestr-pavla-oparovskogo-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "64f76976-1e8a-47f9-a5b2-f4d4c0289786",
+      "slug": "prednovogodnii-koncert-orkestr-pavla-oparovskogo-sankt-peterburg-2",
+      "title": "\"Предновогодний концерт\" оркестр Павла Опаровского",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B4 #11",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:53:09.415Z",
+      "eventIds": [
+        "evt_6abe93f38834b36ac4fba010"
+      ],
+      "routes": [
+        "/events/prednovogodnii-koncert-orkestr-pavla-oparovskogo-sankt-peterburg-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "8a107bcf-e5bb-4563-a5a3-4741c35cec59",
+      "slug": "novogodnii-haip-kazan",
+      "title": "Новогодний хайп",
+      "city": "Казань",
+      "effectiveTextSection": "B4 #9",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:53:11.023Z",
+      "eventIds": [
+        "evt_6abd3115bca4a074ce820f56"
+      ],
+      "routes": [
+        "/events/novogodnii-haip-kazan"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "13a44a2d-1be2-4b38-a616-6e047d2fca27",
+      "slug": "chudo-meshok-deda-moroza-novogodnee-predstavlenie-s-podarkami-elka-sankt-peterburg",
+      "title": "\"Чудо-мешок Деда Мороза\" новогоднее представление с подарками. Ёлка",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B4 #12",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:53:12.842Z",
+      "eventIds": [
+        "evt_6af0b04ea167c9868a7d1e72"
+      ],
+      "routes": [
+        "/events/chudo-meshok-deda-moroza-novogodnee-predstavlenie-s-podarkami-elka-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "40c8c912-f2fc-4551-8abf-5c6a8bf9c46a",
+      "slug": "chudo-meshok-deda-moroza-novogodnee-predstavlenie-s-podarkami-elka-sankt-peterburg-2",
+      "title": "\"Чудо-мешок Деда Мороза\" новогоднее представление с подарками. Ёлка",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B4 #12",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:53:14.058Z",
+      "eventIds": [
+        "evt_6af0a1ca6993eb851038f8cd"
+      ],
+      "routes": [
+        "/events/chudo-meshok-deda-moroza-novogodnee-predstavlenie-s-podarkami-elka-sankt-peterburg-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "c5c8f87b-de82-4941-a691-6620e9d59249",
+      "slug": "balet-schelkunchik-sankt-peterburg-7",
+      "title": "Балет \"Щелкунчик\"",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B4 #8",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:53:20.483Z",
+      "eventIds": [
+        "evt_6a91b093a9049cc0a1861915"
+      ],
+      "routes": [
+        "/events/balet-schelkunchik-sankt-peterburg-7"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "8c1579fc-6371-40e2-b884-42330ebb1964",
+      "slug": "nola-jazz-band-muzyka-novogo-orleana-i-novogodnie-hity-moskva",
+      "title": "Nola Jazz Band. Музыка Нового Орлеана и новогодние хиты!",
+      "city": "Москва",
+      "effectiveTextSection": "B4 #13",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:53:31.294Z",
+      "eventIds": [
+        "evt_6ae9f28e4ac07149438e0ff5"
+      ],
+      "routes": [
+        "/events/nola-jazz-band-muzyka-novogo-orleana-i-novogodnie-hity-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "5ee22be3-4f49-4662-a9f1-df0528398ec5",
+      "slug": "balet-schelkunchik-sankt-peterburg-15",
+      "title": "Балет. «Щелкунчик»",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B4 #14",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:53:36.959Z",
+      "eventIds": [
+        "evt_6af1a51465c78ab0939367ef"
+      ],
+      "routes": [
+        "/events/balet-schelkunchik-sankt-peterburg-15"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "9c4e66f7-da35-478f-9ca8-d5358756f26e",
+      "slug": "balet-schelkunchik-sankt-peterburg-17",
+      "title": "Балет. «Щелкунчик»",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B4 #14",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:53:45.617Z",
+      "eventIds": [
+        "evt_6af19d49a18152855d2af671"
+      ],
+      "routes": [
+        "/events/balet-schelkunchik-sankt-peterburg-17"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "9ff8f290-a405-4507-b764-560abdb86b3c",
+      "slug": "balet-schelkunchik-sankt-peterburg-19",
+      "title": "Балет. «Щелкунчик»",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B4 #14",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:53:47.175Z",
+      "eventIds": [
+        "evt_6af19c88c966b09ce69cf9fe"
+      ],
+      "routes": [
+        "/events/balet-schelkunchik-sankt-peterburg-19"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "aef1ecb8-8a66-46ee-b8e1-80384ee0c9ee",
+      "slug": "balet-schelkunchik-sankt-peterburg-16",
+      "title": "Балет. «Щелкунчик»",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B4 #14",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:53:50.841Z",
+      "eventIds": [
+        "evt_6af1a4494ac6343218aaad3d"
+      ],
+      "routes": [
+        "/events/balet-schelkunchik-sankt-peterburg-16"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "b72dc0d7-8b12-4181-bed3-8495d891c675",
+      "slug": "balet-schelkunchik-sankt-peterburg-14",
+      "title": "Балет. «Щелкунчик»",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B4 #14",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:53:52.119Z",
+      "eventIds": [
+        "evt_6ae8992ae3d23d5fde1cb5d9"
+      ],
+      "routes": [
+        "/events/balet-schelkunchik-sankt-peterburg-14"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "c7bafae9-0148-4a1b-80ae-e6d0e5dcbd25",
+      "slug": "balet-schelkunchik-sankt-peterburg-18",
+      "title": "Балет. «Щелкунчик»",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B4 #14",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:53:53.718Z",
+      "eventIds": [
+        "evt_6af19cee5c7029ee85ac522e"
+      ],
+      "routes": [
+        "/events/balet-schelkunchik-sankt-peterburg-18"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "dc6c6945-ce83-4741-b081-1b1634fbc4ed",
+      "slug": "balet-schelkunchik-sankt-peterburg-13",
+      "title": "Балет. «Щелкунчик»",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B4 #14",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:53:54.863Z",
+      "eventIds": [
+        "evt_6ae8976df32c7b65f86c510d"
+      ],
+      "routes": [
+        "/events/balet-schelkunchik-sankt-peterburg-13"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "040d63f5-7b6b-49d3-b08a-bb41c903f200",
+      "slug": "klubnaya-programma-zimnego-festivalya-pianissimo-sezon-dekabr-2026-fevral-2027-sankt-peterburg",
+      "title": "Клубная программа зимнего фестиваля Pianissimo /Сезон: декабрь 2026 — февраль 2027",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B4 #15",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:53:56.039Z",
+      "eventIds": [
+        "evt_6a8954f18736a0ef2ddcfc83"
+      ],
+      "routes": [
+        "/events/klubnaya-programma-zimnego-festivalya-pianissimo-sezon-dekabr-2026-fevral-2027-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "1dc78075-5ba3-46d3-aba0-36eb47366035",
+      "slug": "dva-melkih-rycarya-6-moskva",
+      "title": "Два мелких рыцаря, 6+",
+      "city": "Москва",
+      "effectiveTextSection": "B4 #25",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:53:57.320Z",
+      "eventIds": [
+        "evt_6ac7fd027bed022d4a59831e"
+      ],
+      "routes": [
+        "/events/dva-melkih-rycarya-6-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "7252e8ca-278b-43e2-88e4-51b36cc0e12f",
+      "slug": "novogodnii-divertisment-irina-aleshina-i-aleksandr-minchenko-koncert-za-stolikami-s-furshetom-sankt-peterburg-2",
+      "title": "«Новогодний дивертисмент» Ирина Алёшина и Александр Минченко - концерт за столиками с фуршетом",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B4 #16",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:53:58.518Z",
+      "eventIds": [
+        "evt_6a9c396dd29c8747064d42ff"
+      ],
+      "routes": [
+        "/events/novogodnii-divertisment-irina-aleshina-i-aleksandr-minchenko-koncert-za-stolikami-s-furshetom-sankt-peterburg-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "a465f730-b885-4400-9e8c-5870db0789ff",
+      "slug": "novogodnii-divertisment-irina-aleshina-i-aleksandr-minchenko-koncert-za-stolikami-s-furshetom-sankt-peterburg",
+      "title": "«Новогодний дивертисмент» Ирина Алёшина и Александр Минченко - концерт за столиками с фуршетом",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B4 #16",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:53:59.745Z",
+      "eventIds": [
+        "evt_6a9c32a153813fef6b58ef79"
+      ],
+      "routes": [
+        "/events/novogodnii-divertisment-irina-aleshina-i-aleksandr-minchenko-koncert-za-stolikami-s-furshetom-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "090f6d94-73c0-4315-8a99-0b34d39a5a2c",
+      "slug": "master-klass-rozhdestvenskii-venok-moskva-3",
+      "title": "Мастер-класс «Рождественский венок»",
+      "city": "Москва",
+      "effectiveTextSection": "B4 #17",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:54:01.559Z",
+      "eventIds": [
+        "evt_6abe56a4613d44f0c7e10d47"
+      ],
+      "routes": [
+        "/events/master-klass-rozhdestvenskii-venok-moskva-3"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "15c4d24e-094a-4982-84e5-96c72b4ece75",
+      "slug": "master-klass-rozhdestvenskii-venok-moskva-2",
+      "title": "Мастер-класс «Рождественский венок»",
+      "city": "Москва",
+      "effectiveTextSection": "B4 #17",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:54:03.854Z",
+      "eventIds": [
+        "evt_6abb9207907982da560eeb41"
+      ],
+      "routes": [
+        "/events/master-klass-rozhdestvenskii-venok-moskva-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "07cf758f-ffd2-4ea4-8a76-8f8d8e3b4baf",
+      "slug": "kak-novogodnyaya-igrushka-iskala-chudo-omsk-21",
+      "title": "«Как Новогодняя игрушка искала чудо»",
+      "city": "Омск",
+      "effectiveTextSection": "B4 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:54:05.654Z",
+      "eventIds": [
+        "evt_6ad3448125a31c90fca3e00c"
+      ],
+      "routes": [
+        "/events/kak-novogodnyaya-igrushka-iskala-chudo-omsk-21"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "0b939e84-653e-411b-91fa-3406e9d8e084",
+      "slug": "kak-novogodnyaya-igrushka-iskala-chudo-omsk-13",
+      "title": "«Как Новогодняя игрушка искала чудо»",
+      "city": "Омск",
+      "effectiveTextSection": "B4 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:54:07.174Z",
+      "eventIds": [
+        "evt_6ad34360603bbb9776a5d492"
+      ],
+      "routes": [
+        "/events/kak-novogodnyaya-igrushka-iskala-chudo-omsk-13"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "4255a681-842b-464d-987f-f29975dd767a",
+      "slug": "kak-novogodnyaya-igrushka-iskala-chudo-omsk-16",
+      "title": "«Как Новогодняя игрушка искала чудо»",
+      "city": "Омск",
+      "effectiveTextSection": "B4 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:54:08.387Z",
+      "eventIds": [
+        "evt_6ad3436ea8c984c7b2a0df67"
+      ],
+      "routes": [
+        "/events/kak-novogodnyaya-igrushka-iskala-chudo-omsk-16"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "551ab44a-ce0b-444e-90e2-92e5d0123cb5",
+      "slug": "kak-novogodnyaya-igrushka-iskala-chudo-omsk-22",
+      "title": "«Как Новогодняя игрушка искала чудо»",
+      "city": "Омск",
+      "effectiveTextSection": "B4 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:54:09.801Z",
+      "eventIds": [
+        "evt_6ad34460599ce972d1b6ae10"
+      ],
+      "routes": [
+        "/events/kak-novogodnyaya-igrushka-iskala-chudo-omsk-22"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "911f09c4-1dc3-4ca5-8211-95bf6f511299",
+      "slug": "kak-novogodnyaya-igrushka-iskala-chudo-omsk-14",
+      "title": "«Как Новогодняя игрушка искала чудо»",
+      "city": "Омск",
+      "effectiveTextSection": "B4 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:54:11.339Z",
+      "eventIds": [
+        "evt_6ad3433730f9194eda011005"
+      ],
+      "routes": [
+        "/events/kak-novogodnyaya-igrushka-iskala-chudo-omsk-14"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "927276b6-9670-40cb-b8fd-9dfb13928824",
+      "slug": "kak-novogodnyaya-igrushka-iskala-chudo-omsk-17",
+      "title": "«Как Новогодняя игрушка искала чудо»",
+      "city": "Омск",
+      "effectiveTextSection": "B4 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:54:13.250Z",
+      "eventIds": [
+        "evt_6ad34383775c66a5a971302f"
+      ],
+      "routes": [
+        "/events/kak-novogodnyaya-igrushka-iskala-chudo-omsk-17"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "9318bc98-115e-4ea9-8287-ab1a42cdb631",
+      "slug": "kak-novogodnyaya-igrushka-iskala-chudo-omsk-15",
+      "title": "«Как Новогодняя игрушка искала чудо»",
+      "city": "Омск",
+      "effectiveTextSection": "B4 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:54:19.508Z",
+      "eventIds": [
+        "evt_6ad343e9f8e4a6afc6378ffe"
+      ],
+      "routes": [
+        "/events/kak-novogodnyaya-igrushka-iskala-chudo-omsk-15"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "a505c72c-2cb8-4126-8fb3-3b8cc3da5153",
+      "slug": "kak-novogodnyaya-igrushka-iskala-chudo-omsk-19",
+      "title": "«Как Новогодняя игрушка искала чудо»",
+      "city": "Омск",
+      "effectiveTextSection": "B4 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:54:21.729Z",
+      "eventIds": [
+        "evt_6ad343faf8e4a6afc6379004"
+      ],
+      "routes": [
+        "/events/kak-novogodnyaya-igrushka-iskala-chudo-omsk-19"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "e9547077-68b7-441b-a20c-a87ef8adb504",
+      "slug": "kak-novogodnyaya-igrushka-iskala-chudo-omsk-23",
+      "title": "«Как Новогодняя игрушка искала чудо»",
+      "city": "Омск",
+      "effectiveTextSection": "B4 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:54:24.166Z",
+      "eventIds": [
+        "evt_6ad3448ff8e4a6afc637905b"
+      ],
+      "routes": [
+        "/events/kak-novogodnyaya-igrushka-iskala-chudo-omsk-23"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "eb229572-54fe-4eb9-b2e6-0b86c1dd795b",
+      "slug": "kak-novogodnyaya-igrushka-iskala-chudo-omsk-18",
+      "title": "«Как Новогодняя игрушка искала чудо»",
+      "city": "Омск",
+      "effectiveTextSection": "B4 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:54:26.475Z",
+      "eventIds": [
+        "evt_6ad343dcd92a96f6c48cdb0f"
+      ],
+      "routes": [
+        "/events/kak-novogodnyaya-igrushka-iskala-chudo-omsk-18"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "f3d7a231-547d-43c7-9c17-675495467380",
+      "slug": "kak-novogodnyaya-igrushka-iskala-chudo-omsk-12",
+      "title": "«Как Новогодняя игрушка искала чудо»",
+      "city": "Омск",
+      "effectiveTextSection": "B4 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:54:28.023Z",
+      "eventIds": [
+        "evt_6ad342f432df40e7cff71680"
+      ],
+      "routes": [
+        "/events/kak-novogodnyaya-igrushka-iskala-chudo-omsk-12"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "f6470847-4921-47ba-bdd8-c19141a2b3ac",
+      "slug": "kak-novogodnyaya-igrushka-iskala-chudo-omsk-20",
+      "title": "«Как Новогодняя игрушка искала чудо»",
+      "city": "Омск",
+      "effectiveTextSection": "B4 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:54:31.087Z",
+      "eventIds": [
+        "evt_6ad344729f2b4e6801988974"
+      ],
+      "routes": [
+        "/events/kak-novogodnyaya-igrushka-iskala-chudo-omsk-20"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "00f6fd8d-67e5-4fc8-aa54-e5edd1b3dfdf",
+      "slug": "kak-novogodnyaya-igrushka-iskala-chudo-omsk-5",
+      "title": "«Как Новогодняя игрушка искала чудо»",
+      "city": "Омск",
+      "effectiveTextSection": "B4 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:54:37.967Z",
+      "eventIds": [
+        "evt_6ad33f9f32df40e7cff71606"
+      ],
+      "routes": [
+        "/events/kak-novogodnyaya-igrushka-iskala-chudo-omsk-5"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "08d94020-6492-4eea-9a04-1eee26af9716",
+      "slug": "kak-novogodnyaya-igrushka-iskala-chudo-omsk-6",
+      "title": "«Как Новогодняя игрушка искала чудо»",
+      "city": "Омск",
+      "effectiveTextSection": "B4 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:54:40.371Z",
+      "eventIds": [
+        "evt_6ad33facd92a96f6c48cda52"
+      ],
+      "routes": [
+        "/events/kak-novogodnyaya-igrushka-iskala-chudo-omsk-6"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "3e48c500-2a7f-4000-b170-0052a2ab4a04",
+      "slug": "kak-novogodnyaya-igrushka-iskala-chudo-omsk-7",
+      "title": "«Как Новогодняя игрушка искала чудо»",
+      "city": "Омск",
+      "effectiveTextSection": "B4 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:54:41.739Z",
+      "eventIds": [
+        "evt_6ad33fbe762dcee1b6166c56"
+      ],
+      "routes": [
+        "/events/kak-novogodnyaya-igrushka-iskala-chudo-omsk-7"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "559add67-333b-400c-a4f4-2c7e8fc271ad",
+      "slug": "kak-novogodnyaya-igrushka-iskala-chudo-omsk-10",
+      "title": "«Как Новогодняя игрушка искала чудо»",
+      "city": "Омск",
+      "effectiveTextSection": "B4 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:54:43.356Z",
+      "eventIds": [
+        "evt_6ad3407c085f87159ad0cf33"
+      ],
+      "routes": [
+        "/events/kak-novogodnyaya-igrushka-iskala-chudo-omsk-10"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "62f204a3-c2c9-434d-a216-9adb8d6bfc44",
+      "slug": "kak-novogodnyaya-igrushka-iskala-chudo-omsk",
+      "title": "«Как Новогодняя игрушка искала чудо»",
+      "city": "Омск",
+      "effectiveTextSection": "B4 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:54:44.786Z",
+      "eventIds": [
+        "evt_6ad33f0e085f87159ad0cf1c"
+      ],
+      "routes": [
+        "/events/kak-novogodnyaya-igrushka-iskala-chudo-omsk"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "7d5a033b-9f09-4030-8c9b-e97857600268",
+      "slug": "kak-novogodnyaya-igrushka-iskala-chudo-omsk-2",
+      "title": "«Как Новогодняя игрушка искала чудо»",
+      "city": "Омск",
+      "effectiveTextSection": "B4 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:54:46.098Z",
+      "eventIds": [
+        "evt_6ad33f4635fc71fe924269b5"
+      ],
+      "routes": [
+        "/events/kak-novogodnyaya-igrushka-iskala-chudo-omsk-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "a59e3c37-dce2-450c-a3a8-d58264e7a395",
+      "slug": "kak-novogodnyaya-igrushka-iskala-chudo-omsk-3",
+      "title": "«Как Новогодняя игрушка искала чудо»",
+      "city": "Омск",
+      "effectiveTextSection": "B4 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:54:47.575Z",
+      "eventIds": [
+        "evt_6ad33f5acc4ddd4943c1b3fa"
+      ],
+      "routes": [
+        "/events/kak-novogodnyaya-igrushka-iskala-chudo-omsk-3"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "a86ebec9-b9e3-40a7-ac84-2ee71d0c7734",
+      "slug": "kak-novogodnyaya-igrushka-iskala-chudo-omsk-9",
+      "title": "«Как Новогодняя игрушка искала чудо»",
+      "city": "Омск",
+      "effectiveTextSection": "B4 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:54:49.764Z",
+      "eventIds": [
+        "evt_6ad34065f8e4a6afc6378f3e"
+      ],
+      "routes": [
+        "/events/kak-novogodnyaya-igrushka-iskala-chudo-omsk-9"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "e54705b1-eb3d-424e-a800-39e22b893ca2",
+      "slug": "kak-novogodnyaya-igrushka-iskala-chudo-omsk-8",
+      "title": "«Как Новогодняя игрушка искала чудо»",
+      "city": "Омск",
+      "effectiveTextSection": "B4 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:54:55.158Z",
+      "eventIds": [
+        "evt_6ad3403e9f3fe8a244ae3cd6"
+      ],
+      "routes": [
+        "/events/kak-novogodnyaya-igrushka-iskala-chudo-omsk-8"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "fec3df42-d7ef-4982-9fb6-141fcd5b3bc7",
+      "slug": "kak-novogodnyaya-igrushka-iskala-chudo-omsk-4",
+      "title": "«Как Новогодняя игрушка искала чудо»",
+      "city": "Омск",
+      "effectiveTextSection": "B4 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:54:56.385Z",
+      "eventIds": [
+        "evt_6ad33f85762dcee1b6166c4c"
+      ],
+      "routes": [
+        "/events/kak-novogodnyaya-igrushka-iskala-chudo-omsk-4"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "ff7b2d21-65f8-4daa-9da4-94ab7936a876",
+      "slug": "kak-novogodnyaya-igrushka-iskala-chudo-omsk-11",
+      "title": "«Как Новогодняя игрушка искала чудо»",
+      "city": "Омск",
+      "effectiveTextSection": "B4 #18",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:54:58.163Z",
+      "eventIds": [
+        "evt_6ad3408d775c66a5a9712f6d"
+      ],
+      "routes": [
+        "/events/kak-novogodnyaya-igrushka-iskala-chudo-omsk-11"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "547996e8-22ed-4d28-b845-21a1649dbbda",
+      "slug": "novogodnii-detskii-bal-snezhnaya-koroleva-sankt-peterburg-3",
+      "title": "Новогодний детский бал. «Снежная королева»",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B4 #20",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:54:59.966Z",
+      "eventIds": [
+        "evt_6ae8a2858d3b3d4d043f3981"
+      ],
+      "routes": [
+        "/events/novogodnii-detskii-bal-snezhnaya-koroleva-sankt-peterburg-3"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "7a761c04-7c88-4843-b177-f0f938427430",
+      "slug": "novogodnii-detskii-bal-snezhnaya-koroleva-sankt-peterburg-2",
+      "title": "Новогодний детский бал. «Снежная королева»",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B4 #20",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:55:01.183Z",
+      "eventIds": [
+        "evt_6ae8a176f259e56a842f25e9"
+      ],
+      "routes": [
+        "/events/novogodnii-detskii-bal-snezhnaya-koroleva-sankt-peterburg-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "cba90e10-4fb5-49eb-b522-49dc2f28eda8",
+      "slug": "novogodnii-detskii-bal-snezhnaya-koroleva-sankt-peterburg",
+      "title": "Новогодний детский бал. «Снежная королева»",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B4 #20",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:55:04.965Z",
+      "eventIds": [
+        "evt_6ae89fe8ce1b13af3e57ac77"
+      ],
+      "routes": [
+        "/events/novogodnii-detskii-bal-snezhnaya-koroleva-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "0d053d2e-7532-404e-a247-e462cd31f05c",
+      "slug": "50-ottenkov-novogodnei-nochi-ufa-5",
+      "title": "50 Оттенков новогодней ночи",
+      "city": "Уфа",
+      "effectiveTextSection": "B4 #21",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:55:12.214Z",
+      "eventIds": [
+        "evt_6aeb4c716582a9703f471803"
+      ],
+      "routes": [
+        "/events/50-ottenkov-novogodnei-nochi-ufa-5"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "146b2f56-66bf-4639-8dc9-f722e9812109",
+      "slug": "50-ottenkov-novogodnei-nochi-ufa-3",
+      "title": "50 Оттенков новогодней ночи",
+      "city": "Уфа",
+      "effectiveTextSection": "B4 #21",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:55:21.174Z",
+      "eventIds": [
+        "evt_6aeb4cc518567349c07e58b0"
+      ],
+      "routes": [
+        "/events/50-ottenkov-novogodnei-nochi-ufa-3"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "7675b543-e4fa-4778-9214-36a8dad3bb74",
+      "slug": "50-ottenkov-novogodnei-nochi-ufa-6",
+      "title": "50 Оттенков новогодней ночи",
+      "city": "Уфа",
+      "effectiveTextSection": "B4 #21",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:55:23.575Z",
+      "eventIds": [
+        "evt_6aeb4c2e56a298dd8563dea4"
+      ],
+      "routes": [
+        "/events/50-ottenkov-novogodnei-nochi-ufa-6"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "86e1d5e5-1447-48a3-9fa7-816a8c5c78fe",
+      "slug": "50-ottenkov-novogodnei-nochi-ufa-4",
+      "title": "50 Оттенков новогодней ночи",
+      "city": "Уфа",
+      "effectiveTextSection": "B4 #21",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:55:26.953Z",
+      "eventIds": [
+        "evt_6aeb4caa094a207a4cd0f293"
+      ],
+      "routes": [
+        "/events/50-ottenkov-novogodnei-nochi-ufa-4"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "aa889e96-645c-40a8-a7bd-c7af49abc0ea",
+      "slug": "50-ottenkov-novogodnei-nochi-ufa-2",
+      "title": "50 Оттенков новогодней ночи",
+      "city": "Уфа",
+      "effectiveTextSection": "B4 #21",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:55:36.003Z",
+      "eventIds": [
+        "evt_6aec463112d2020295e38d9b"
+      ],
+      "routes": [
+        "/events/50-ottenkov-novogodnei-nochi-ufa-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "cdfb2cbd-7ec8-4cb8-bd96-238169c8ecbd",
+      "slug": "50-ottenkov-novogodnei-nochi-ufa",
+      "title": "50 Оттенков новогодней ночи",
+      "city": "Уфа",
+      "effectiveTextSection": "B4 #21",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:55:42.280Z",
+      "eventIds": [
+        "evt_6aec464b3a8a456e9d6c3f5a"
+      ],
+      "routes": [
+        "/events/50-ottenkov-novogodnei-nochi-ufa"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "380aa5d1-cca4-4051-9a45-1faff4db9ecd",
+      "slug": "nu-novyi-god-pogodi-sankt-peterburg",
+      "title": "Ну, Новый год, погоди!",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B4 #22",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:55:46.777Z",
+      "eventIds": [
+        "evt_6ae65e034aa28a3a01518ae6",
+        "evt_6ae65e044aa28a3a01518c39",
+        "evt_6ae65e054aa28a3a01518d8c",
+        "evt_6ae65e064aa28a3a01518edf"
+      ],
+      "routes": [
+        "/events/nu-novyi-god-pogodi-sankt-peterburg"
+      ],
+      "revisionsBefore": 4,
+      "revisionsAfter": 6,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "188918c6-0ba5-4b96-a7c7-ac0c207a284a",
+      "slug": "kirpichi-novogodnie-priklyucheniya-nizhniy-novgorod",
+      "title": "Кирпичи. Новогодние приключения",
+      "city": "Нижний Новгород",
+      "effectiveTextSection": "B4 #23",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:55:53.927Z",
+      "eventIds": [
+        "evt_6aca2d35879a77d5a652e45e"
+      ],
+      "routes": [
+        "/events/kirpichi-novogodnie-priklyucheniya-nizhniy-novgorod"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "0639be2a-8bc8-49a9-9ad5-7fc344356566",
+      "slug": "bremenskie-muzykanty-i-novyi-god-novogodnii-muzykalnyi-spektakl-dlya-detei-sankt-peterburg-4",
+      "title": "«Бременские музыканты и Новый год». Новогодний музыкальный спектакль для детей",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B4 #24",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:55:55.355Z",
+      "eventIds": [
+        "evt_6ae4702011fd5f9d47e0f4dc"
+      ],
+      "routes": [
+        "/events/bremenskie-muzykanty-i-novyi-god-novogodnii-muzykalnyi-spektakl-dlya-detei-sankt-peterburg-4"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "2e4aa1f5-6991-4289-9d61-13117cdd684d",
+      "slug": "bremenskie-muzykanty-i-novyi-god-novogodnii-muzykalnyi-spektakl-dlya-detei-sankt-peterburg-3",
+      "title": "«Бременские музыканты и Новый год». Новогодний музыкальный спектакль для детей",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B4 #24",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:55:56.846Z",
+      "eventIds": [
+        "evt_6ae46fb743e3d00dedbba7ba"
+      ],
+      "routes": [
+        "/events/bremenskie-muzykanty-i-novyi-god-novogodnii-muzykalnyi-spektakl-dlya-detei-sankt-peterburg-3"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "2f65e19f-7c40-4fcf-a206-348a2e6b93cc",
+      "slug": "bremenskie-muzykanty-i-novyi-god-novogodnii-muzykalnyi-spektakl-dlya-detei-sankt-peterburg-5",
+      "title": "«Бременские музыканты и Новый год». Новогодний музыкальный спектакль для детей",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B4 #24",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:55:58.377Z",
+      "eventIds": [
+        "evt_6ae4a097a65dccb5776120f3"
+      ],
+      "routes": [
+        "/events/bremenskie-muzykanty-i-novyi-god-novogodnii-muzykalnyi-spektakl-dlya-detei-sankt-peterburg-5"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "64b633b3-b377-4dba-b931-aeee04bc3b1b",
+      "slug": "bremenskie-muzykanty-i-novyi-god-novogodnii-muzykalnyi-spektakl-dlya-detei-sankt-peterburg-2",
+      "title": "«Бременские музыканты и Новый год». Новогодний музыкальный спектакль для детей",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B4 #24",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:55:59.535Z",
+      "eventIds": [
+        "evt_6ae46f22bfd5a9d46f8af0c2"
+      ],
+      "routes": [
+        "/events/bremenskie-muzykanty-i-novyi-god-novogodnii-muzykalnyi-spektakl-dlya-detei-sankt-peterburg-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "9b58dbec-69d4-4357-aa31-c1d9c590824a",
+      "slug": "bremenskie-muzykanty-i-novyi-god-novogodnii-muzykalnyi-spektakl-dlya-detei-sankt-peterburg",
+      "title": "«Бременские музыканты и Новый год». Новогодний музыкальный спектакль для детей",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B4 #24",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:56:00.925Z",
+      "eventIds": [
+        "evt_6ae462086d71f3026139dc7e"
+      ],
+      "routes": [
+        "/events/bremenskie-muzykanty-i-novyi-god-novogodnii-muzykalnyi-spektakl-dlya-detei-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "dacda32e-a9bd-47b9-a072-5ab20208724f",
+      "slug": "bremenskie-muzykanty-i-novyi-god-novogodnii-muzykalnyi-spektakl-dlya-detei-sankt-peterburg-6",
+      "title": "«Бременские музыканты и Новый год». Новогодний музыкальный спектакль для детей",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B4 #24",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:56:02.598Z",
+      "eventIds": [
+        "evt_6ae4a0eaa9736d56f0ae2cab"
+      ],
+      "routes": [
+        "/events/bremenskie-muzykanty-i-novyi-god-novogodnii-muzykalnyi-spektakl-dlya-detei-sankt-peterburg-6"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "a3a11fdf-6641-4dd9-8291-4a57dc4970f4",
+      "slug": "master-klass-zimnii-buket-moskva",
+      "title": "Мастер-класс «Зимний букет»",
+      "city": "Москва",
+      "effectiveTextSection": "B5 #1",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:56:04.200Z",
+      "eventIds": [
+        "evt_6ad6fd63e913eddb59e3cd2b"
+      ],
+      "routes": [
+        "/events/master-klass-zimnii-buket-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "e23b5311-43cf-46da-b3bd-3c4c0d2ae04b",
+      "slug": "novogodnyaya-kvest-shkola-volshebnikov-novosibirsk",
+      "title": "Новогодняя Квест-Школа волшебников",
+      "city": "Новосибирск",
+      "effectiveTextSection": "B5 #2",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:56:05.583Z",
+      "eventIds": [
+        "evt_6ac11431dbf568e3b6f958e4",
+        "evt_6ac11430dbf568e3b6f958d7",
+        "evt_6ac1142fdbf568e3b6f958ca",
+        "evt_6ac1142edbf568e3b6f958bd",
+        "evt_6ac1142cdbf568e3b6f958b0"
+      ],
+      "routes": [
+        "/events/novogodnyaya-kvest-shkola-volshebnikov-novosibirsk"
+      ],
+      "revisionsBefore": 5,
+      "revisionsAfter": 7,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "e9b7b3b0-6b5e-413c-9786-be26ae3b4d57",
+      "slug": "irina-hakamada-master-obscheniya-uspeh-bez-zatrat-moskva",
+      "title": "Ирина Хакамада. Мастер общения: успех без затрат. Предновогодняя встреча - с праздничными сюрпризами!",
+      "city": "Москва",
+      "effectiveTextSection": "B5 #3",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:56:13.015Z",
+      "eventIds": [
+        "evt_6abf5f4d1641acab8e8ad46a"
+      ],
+      "routes": [
+        "/events/irina-hakamada-master-obscheniya-uspeh-bez-zatrat-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "eeda1b6f-f5bd-4b8b-a488-5f282791a118",
+      "slug": "vau-muzykalnoe-loto-zimnyaya-vecherinka-russkie-hity-karaoke-samara",
+      "title": "Вау Музыкальное лото. Зимняя вечеринка. Русские хиты караоке",
+      "city": "Самара",
+      "effectiveTextSection": "B5 #4",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:56:17.343Z",
+      "eventIds": [
+        "evt_6af2f60134132f0b45358617"
+      ],
+      "routes": [
+        "/events/vau-muzykalnoe-loto-zimnyaya-vecherinka-russkie-hity-karaoke-samara"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "08d9ca1c-4303-4b34-b3d3-23ce0146dffa",
+      "slug": "vau-muzykalnoe-loto-novogodnee-zastole-russkie-hity-samara",
+      "title": "Вау Музыкальное лото. Новогоднее застолье. Русские хиты",
+      "city": "Самара",
+      "effectiveTextSection": "B5 #5",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:56:20.926Z",
+      "eventIds": [
+        "evt_6af2f82434132f0b453586da"
+      ],
+      "routes": [
+        "/events/vau-muzykalnoe-loto-novogodnee-zastole-russkie-hity-samara"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "ccf2912b-1242-40ca-847c-1ea82de8dfff",
+      "slug": "vau-muzykalnoe-loto-novogodnyaya-vecherinka-disko-miks-samara",
+      "title": "Вау Музыкальное лото. Новогодняя вечеринка. Диско - микс",
+      "city": "Самара",
+      "effectiveTextSection": "B5 #6",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:56:22.438Z",
+      "eventIds": [
+        "evt_6af2f3fee02f9c37dc47f8d6"
+      ],
+      "routes": [
+        "/events/vau-muzykalnoe-loto-novogodnyaya-vecherinka-disko-miks-samara"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "76fa43a7-5ae3-4e44-9de2-efd9b7ed8eab",
+      "slug": "vau-muzykalnoe-loto-top-hity-miks-novyi-god-k-nam-mchitsya-samara",
+      "title": "Вау Музыкальное лото. ТОП-ХИТЫ. МИКС. Новый год к нам мчится!",
+      "city": "Самара",
+      "effectiveTextSection": "B5 #7",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:56:25.244Z",
+      "eventIds": [
+        "evt_6af2f5bd92e73173dfed623c"
+      ],
+      "routes": [
+        "/events/vau-muzykalnoe-loto-top-hity-miks-novyi-god-k-nam-mchitsya-samara"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "c8b008dd-569b-4d25-8824-226ef68d59f9",
+      "slug": "vau-muzykalnoe-loto-hity-2010-h-i-2020-h-miks-novyi-god-vse-blizhe-samara",
+      "title": "Вау Музыкальное лото. Хиты 2010-х и 2020-х. Микс. Новый год всё ближе!",
+      "city": "Самара",
+      "effectiveTextSection": "B5 #8",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:56:26.316Z",
+      "eventIds": [
+        "evt_6af2f79034132f0b453586d2"
+      ],
+      "routes": [
+        "/events/vau-muzykalnoe-loto-hity-2010-h-i-2020-h-miks-novyi-god-vse-blizhe-samara"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "1f1bc5dd-496d-4042-ade0-c15991f5e25d",
+      "slug": "russkie-muzykalnye-sezony-v-otele-nacional-moskva",
+      "title": "Русские Музыкальные Сезоны в отеле «Националь»",
+      "city": "Москва",
+      "effectiveTextSection": "B5 #9",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:56:28.123Z",
+      "eventIds": [
+        "evt_6aa24999ccaa3603bdbf7e2c",
+        "evt_6ae9f3f0e73656c718234d58",
+        "evt_6ae9f3efe73656c718234d41",
+        "evt_6ae9f3eee73656c718234d2a",
+        "evt_6a6867b5c4da6536193bc9db",
+        "evt_6a6867b3c4da6536193bc9c4"
+      ],
+      "routes": [
+        "/events/russkie-muzykalnye-sezony-v-otele-nacional-moskva"
+      ],
+      "revisionsBefore": 6,
+      "revisionsAfter": 8,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "3a97ba77-2baa-40c7-98d9-4e61a225e041",
+      "slug": "nauchnyi-novyi-god-2026-19-dekabrya-11-00-perm",
+      "title": "Научный Новый год 2026, 19 декабря, 11:00",
+      "city": "Пермь",
+      "effectiveTextSection": "B5 #10",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:56:32.009Z",
+      "eventIds": [
+        "evt_6ad9e811d6e589090cbc7457"
+      ],
+      "routes": [
+        "/events/nauchnyi-novyi-god-2026-19-dekabrya-11-00-perm"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "7179c504-ca31-4f20-9c16-2673ff57a2ce",
+      "slug": "nauchnyi-novyi-god-2026-19-dekabrya-14-00-perm",
+      "title": "Научный Новый год 2026, 19 декабря, 14:00",
+      "city": "Пермь",
+      "effectiveTextSection": "B5 #10",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:56:39.931Z",
+      "eventIds": [
+        "evt_6ad9e92ffaebe3c8820df584"
+      ],
+      "routes": [
+        "/events/nauchnyi-novyi-god-2026-19-dekabrya-14-00-perm"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "0ad97381-be29-42b3-9d94-9814b18d58cc",
+      "slug": "nauchnyi-novyi-god-2026-19-dekabrya-17-00-perm",
+      "title": "Научный Новый год 2026, 19 декабря, 17:00",
+      "city": "Пермь",
+      "effectiveTextSection": "B5 #10",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:56:42.927Z",
+      "eventIds": [
+        "evt_6ad9ea143e73a5c5c5af6bfa"
+      ],
+      "routes": [
+        "/events/nauchnyi-novyi-god-2026-19-dekabrya-17-00-perm"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "bf5e723e-542e-48c8-beee-be3a56ddd556",
+      "slug": "nauchnyi-novyi-god-2026-20-dekabrya-11-00-perm",
+      "title": "Научный Новый год 2026, 20 декабря, 11:00",
+      "city": "Пермь",
+      "effectiveTextSection": "B5 #10",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:56:44.574Z",
+      "eventIds": [
+        "evt_6ad9ea8c32d088bf69a99a37"
+      ],
+      "routes": [
+        "/events/nauchnyi-novyi-god-2026-20-dekabrya-11-00-perm"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "68994de1-65cf-4b8a-b9ff-3695ccc4e450",
+      "slug": "nauchnyi-novyi-god-2026-20-dekabrya-14-00-perm",
+      "title": "Научный Новый год 2026, 20 декабря, 14:00",
+      "city": "Пермь",
+      "effectiveTextSection": "B5 #10",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:56:45.967Z",
+      "eventIds": [
+        "evt_6ad9eb1aabe8723d8e40cffc"
+      ],
+      "routes": [
+        "/events/nauchnyi-novyi-god-2026-20-dekabrya-14-00-perm"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "f7cc3e4e-fcd7-4683-b59b-8aae9576cc5c",
+      "slug": "nauchnyi-novyi-god-2026-20-dekabrya-17-00-perm",
+      "title": "Научный Новый год 2026, 20 декабря, 17:00",
+      "city": "Пермь",
+      "effectiveTextSection": "B5 #10",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:56:47.035Z",
+      "eventIds": [
+        "evt_6ad9eb94db844e1e04399795"
+      ],
+      "routes": [
+        "/events/nauchnyi-novyi-god-2026-20-dekabrya-17-00-perm"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "80e947ae-9929-428a-b970-2e63734df63f",
+      "slug": "novogodnyaya-elka-dlya-malyshei-3-kaliningrad-4",
+      "title": "Новогодняя елка для малышей, 3+",
+      "city": "Калининград",
+      "effectiveTextSection": "B5 #16",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:56:48.141Z",
+      "eventIds": [
+        "evt_6aeb36c75933667bf6d9b720"
+      ],
+      "routes": [
+        "/events/novogodnyaya-elka-dlya-malyshei-3-kaliningrad-4"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "adc96637-c516-48b2-8c45-81d9d5d3276e",
+      "slug": "novogodnyaya-elka-dlya-malyshei-3-kaliningrad-3",
+      "title": "Новогодняя елка для малышей, 3+",
+      "city": "Калининград",
+      "effectiveTextSection": "B5 #16",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:56:49.585Z",
+      "eventIds": [
+        "evt_6aeb36ed7901ea9371c8bc9c"
+      ],
+      "routes": [
+        "/events/novogodnyaya-elka-dlya-malyshei-3-kaliningrad-3"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "eeb35a0c-af10-4607-a288-a9491718b587",
+      "slug": "novogodnyaya-elka-dlya-malyshei-3-kaliningrad-5",
+      "title": "Новогодняя елка для малышей, 3+",
+      "city": "Калининград",
+      "effectiveTextSection": "B5 #16",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:56:51.334Z",
+      "eventIds": [
+        "evt_6aeb1a0397c401084c7c8e27"
+      ],
+      "routes": [
+        "/events/novogodnyaya-elka-dlya-malyshei-3-kaliningrad-5"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "fca7524e-de2a-4e49-96e6-4fbebb183aee",
+      "slug": "novogodnyaya-elka-dlya-malyshei-3-kaliningrad-2",
+      "title": "Новогодняя елка для малышей, 3+",
+      "city": "Калининград",
+      "effectiveTextSection": "B5 #16",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:56:53.199Z",
+      "eventIds": [
+        "evt_6aeb372006c766010de5673e"
+      ],
+      "routes": [
+        "/events/novogodnyaya-elka-dlya-malyshei-3-kaliningrad-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "062c31fe-7a58-4a30-8841-75f00f56e7d3",
+      "slug": "ded-moroz-i-ledi-bag-bitva-za-novyi-god-6-kaliningrad-3",
+      "title": "Дед Мороз и Леди Баг. Битва за новый год, 6+",
+      "city": "Калининград",
+      "effectiveTextSection": "B5 #17",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:56:54.583Z",
+      "eventIds": [
+        "evt_6aeb37868e5da406024a49ca"
+      ],
+      "routes": [
+        "/events/ded-moroz-i-ledi-bag-bitva-za-novyi-god-6-kaliningrad-3"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "6632cb5c-9d85-4851-a8aa-8b08e7fb46d9",
+      "slug": "ded-moroz-i-ledi-bag-bitva-za-novyi-god-6-kaliningrad-2",
+      "title": "Дед Мороз и Леди Баг. Битва за новый год, 6+",
+      "city": "Калининград",
+      "effectiveTextSection": "B5 #17",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:56:55.652Z",
+      "eventIds": [
+        "evt_6aeb37988e5da406024a4a23"
+      ],
+      "routes": [
+        "/events/ded-moroz-i-ledi-bag-bitva-za-novyi-god-6-kaliningrad-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "fa12238d-2d84-4993-9ac8-26701f445812",
+      "slug": "ded-moroz-i-ledi-bag-bitva-za-novyi-god-6-kaliningrad-4",
+      "title": "Дед Мороз и Леди Баг. Битва за новый год, 6+",
+      "city": "Калининград",
+      "effectiveTextSection": "B5 #17",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:56:58.635Z",
+      "eventIds": [
+        "evt_6aeb376a6f7116506323dda9"
+      ],
+      "routes": [
+        "/events/ded-moroz-i-ledi-bag-bitva-za-novyi-god-6-kaliningrad-4"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "8c92e918-5fa2-472e-a85c-572a7f61d9cd",
+      "slug": "novogodnyaya-kvest-shkola-yunogo-volshebnika-krasnoyarsk",
+      "title": "🎄 Новогодняя квест-школа волшебника в Хогвартсе 🎄",
+      "city": "Красноярск",
+      "effectiveTextSection": "B5 #18",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:57:00.379Z",
+      "eventIds": [
+        "evt_6ac8def43ee2b2dc815813e3",
+        "evt_6ac8def23ee2b2dc815813d6",
+        "evt_6ac8def13ee2b2dc815813c9",
+        "evt_6ac8def03ee2b2dc815813bc",
+        "evt_6ac8deee3ee2b2dc815813af",
+        "evt_6ac8deed3ee2b2dc815813a2",
+        "evt_6ac8deec3ee2b2dc81581395"
+      ],
+      "routes": [
+        "/events/novogodnyaya-kvest-shkola-yunogo-volshebnika-krasnoyarsk"
+      ],
+      "revisionsBefore": 7,
+      "revisionsAfter": 9,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "54c63161-0bdc-4c86-ad2c-cf28c5632641",
+      "slug": "saksofon-na-zakate-novogodnie-i-rozhdestvenskie-melodii-s-panoramnym-vidom-igraet-yurii-bedrak-sochi-2",
+      "title": "«Саксофон на закате». Новогодние и рождественские мелодии с панорамным видом. Играет Юрий Бедрак.",
+      "city": "Сочи",
+      "effectiveTextSection": "B5 #19",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:57:02.815Z",
+      "eventIds": [
+        "evt_6af05101808ef8598cb832de"
+      ],
+      "routes": [
+        "/events/saksofon-na-zakate-novogodnie-i-rozhdestvenskie-melodii-s-panoramnym-vidom-igraet-yurii-bedrak-sochi-2"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "7428ffb9-bbdd-4aa8-b042-f8da142ea453",
+      "slug": "saksofon-na-zakate-novogodnie-i-rozhdestvenskie-melodii-s-panoramnym-vidom-igraet-yurii-bedrak-sochi-3",
+      "title": "«Саксофон на закате». Новогодние и рождественские мелодии с панорамным видом. Играет Юрий Бедрак.",
+      "city": "Сочи",
+      "effectiveTextSection": "B5 #19",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:57:04.045Z",
+      "eventIds": [
+        "evt_6af04f051a5b1eb4d8965a5d"
+      ],
+      "routes": [
+        "/events/saksofon-na-zakate-novogodnie-i-rozhdestvenskie-melodii-s-panoramnym-vidom-igraet-yurii-bedrak-sochi-3"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "f335f7c1-d0b4-49ea-8f2e-893c7436989c",
+      "slug": "saksofon-na-zakate-novogodnie-i-rozhdestvenskie-melodii-s-panoramnym-vidom-igraet-yurii-bedrak-sochi",
+      "title": "«Саксофон на закате». Новогодние и рождественские мелодии с панорамным видом. Играет Юрий Бедрак.",
+      "city": "Сочи",
+      "effectiveTextSection": "B5 #19",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:57:05.815Z",
+      "eventIds": [
+        "evt_6af052fb808ef8598cb83368"
+      ],
+      "routes": [
+        "/events/saksofon-na-zakate-novogodnie-i-rozhdestvenskie-melodii-s-panoramnym-vidom-igraet-yurii-bedrak-sochi"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "ba91f939-40c7-4618-953a-988c7bf6a0d4",
+      "slug": "stand-up-na-rozhdestvenskoi-nizhniy-novgorod-2",
+      "title": "Stand Up на Рождественской",
+      "city": "Нижний Новгород",
+      "effectiveTextSection": "B5 #20",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:57:07.265Z",
+      "eventIds": [
+        "evt_6adfd2ffca37d07d5ce3f969",
+        "evt_6adfd300ca37d07d5ce3f971",
+        "evt_6adfd300ca37d07d5ce3f979",
+        "evt_6adfd300ca37d07d5ce3f981",
+        "evt_6adfd301ca37d07d5ce3f989"
+      ],
+      "routes": [
+        "/events/stand-up-na-rozhdestvenskoi-nizhniy-novgorod-2"
+      ],
+      "revisionsBefore": 5,
+      "revisionsAfter": 7,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "d3ec38c8-06e8-46d7-8983-0d6c2493f029",
+      "slug": "zimnii-festival-pianissimo-solnyi-koncert-filipp-rudenko-v-gosudarstvennom-ermitazhe-sankt-peterburg",
+      "title": "Зимний фестиваль Pianissimo. Сольный концерт Филипп Руденко в Государственном Эрмитаже",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B5 #21",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:57:09.178Z",
+      "eventIds": [
+        "evt_6a9d39326c5c585c183d2a37"
+      ],
+      "routes": [
+        "/events/zimnii-festival-pianissimo-solnyi-koncert-filipp-rudenko-v-gosudarstvennom-ermitazhe-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "4fe5cc79-7f90-43a4-a362-dd2f05ec8dce",
+      "slug": "muzykalnyi-salon-v-osobnyake-kshesinskoi-sankt-peterburg",
+      "title": "Музыкальный салон в Особняке Кшесинской",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B5 #22",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:57:11.014Z",
+      "eventIds": [
+        "evt_6aaa761395ac0a635a71ee34",
+        "evt_6aeddef56bbeb839e9234d6e",
+        "evt_6aeddef46bbeb839e9234d4d",
+        "evt_6aeddef26bbeb839e9234d2c",
+        "evt_6a4fbb5fb66db2355d1500a3",
+        "evt_6a4fbb5cb66db2355d150082",
+        "evt_6a4fbb5ab66db2355d150061",
+        "evt_6a4fbb57b66db2355d150040",
+        "evt_6a4fbb55b66db2355d15001f",
+        "evt_6a4fbb52b66db2355d14fffe",
+        "evt_6a4fbb4fb66db2355d14ffdd",
+        "evt_6a4523a280fe8d5f2b1794c9",
+        "evt_6a45239f80fe8d5f2b1794a8",
+        "evt_6a45239d80fe8d5f2b179487",
+        "evt_6a45239a80fe8d5f2b179466",
+        "evt_6a45239780fe8d5f2b179445"
+      ],
+      "routes": [
+        "/events/muzykalnyi-salon-v-osobnyake-kshesinskoi-sankt-peterburg"
+      ],
+      "revisionsBefore": 16,
+      "revisionsAfter": 18,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "11ad3527-bc05-4220-9109-4968b529beec",
+      "slug": "snegurochka-maslenichnoe-opernoe-immersivnoe-predstavlenie-sankt-peterburg",
+      "title": "\"СНЕГУРОЧКА\" Масленичное оперное иммерсивное представление",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B5 #23",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:57:15.431Z",
+      "eventIds": [
+        "evt_6a6cc2ce767009278945762e"
+      ],
+      "routes": [
+        "/events/snegurochka-maslenichnoe-opernoe-immersivnoe-predstavlenie-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "a392e496-8ae1-4966-832a-e015eb4bf94f",
+      "slug": "schelkunchik-spektakl-balet-sankt-peterburg",
+      "title": "«Щелкунчик — волшебные сны в доме Шрёдера» спектакль-балет",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B3 #12",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:57:17.195Z",
+      "eventIds": [
+        "evt_6a846124a39acf0bbbfe1791"
+      ],
+      "routes": [
+        "/events/schelkunchik-spektakl-balet-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "e32030ad-85e1-46a7-b38f-d2c19feef6f0",
+      "slug": "schelkunchik-balet-moskva",
+      "title": "Щелкунчик",
+      "city": "Москва",
+      "effectiveTextSection": "B3 #2",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:57:20.555Z",
+      "eventIds": [
+        "evt_6ad12dbe4e559cab1f2d12bc"
+      ],
+      "routes": [
+        "/events/schelkunchik-balet-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "5373bf6b-999b-4034-be4c-1f05806f77ad",
+      "slug": "ot-rozhdestva-do-novogo-goda-kulturnaya-istoriya-peterburgskih-balov-sankt-peterburg",
+      "title": "От Рождества до Нового года: культурная история петербургских балов",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B5 #26",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:57:22.523Z",
+      "eventIds": [
+        "evt_6ae8a28bd708edc4a5d97641"
+      ],
+      "routes": [
+        "/events/ot-rozhdestva-do-novogo-goda-kulturnaya-istoriya-peterburgskih-balov-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "f535284c-acac-46e9-8e35-e7e781aec941",
+      "slug": "master-klass-po-novogodnim-kompoziciyam-i-venkam-vmeste-s-dekoratorom-polinoi-filippovoi-sankt-peterburg",
+      "title": "Мастер-класс по новогодним композициям и венкам вместе с декоратором Полиной Филипповой",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B5 #27",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:57:34.256Z",
+      "eventIds": [
+        "evt_6ae8a4508d3b3d4d043f3a6b"
+      ],
+      "routes": [
+        "/events/master-klass-po-novogodnim-kompoziciyam-i-venkam-vmeste-s-dekoratorom-polinoi-filippovoi-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "0f64ec3e-f39c-48ee-b498-f1589c002a2e",
+      "slug": "zimnii-festival-pianissimo-solnyi-koncert-chiho-chhve-v-gosudarstvennom-ermitazhe-sankt-peterburg",
+      "title": "Зимний фестиваль Pianissimo. Сольный концерт Чихо Чхве в Государственном Эрмитаже",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B5 #28",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:57:46.831Z",
+      "eventIds": [
+        "evt_6a9beac79445140c266c342f"
+      ],
+      "routes": [
+        "/events/zimnii-festival-pianissimo-solnyi-koncert-chiho-chhve-v-gosudarstvennom-ermitazhe-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "a264eda8-86ff-40db-8aca-dbfba12e7cf1",
+      "slug": "muzykalnyi-spektakl-schelkunchik-sankt-peterburg",
+      "title": "Музыкальный спектакль. «Щелкунчик»",
+      "city": "Санкт-Петербург",
+      "effectiveTextSection": "B5 #29",
+      "contentMode": "DIRECT",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:57:55.249Z",
+      "eventIds": [
+        "evt_6ae45d340c4920ccb365422e"
+      ],
+      "routes": [
+        "/events/muzykalnyi-spektakl-schelkunchik-sankt-peterburg"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    },
+    {
+      "eventPageId": "6be9cdff-427a-4ef9-b45d-5d6047a0c368",
+      "slug": "master-klass-rozhdestvenskii-venok-moskva",
+      "title": "Мастер-класс «Рождественский венок»",
+      "city": "Москва",
+      "effectiveTextSection": "B4 #17",
+      "contentMode": "MASTER_REUSE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-18T12:57:56.803Z",
+      "eventIds": [
+        "evt_6a82d7bc1fca3124cbd2ed5a"
+      ],
+      "routes": [
+        "/events/master-klass-rozhdestvenskii-venok-moskva"
+      ],
+      "revisionsBefore": 1,
+      "revisionsAfter": 3,
+      "linksRoutesSeoChanged": false,
+      "usedDynamicPracticalInfo": true
+    }
+  ],
+  "skippedInactive": [
+    {
+      "eventPageId": "620e0c0f-45fd-4e6c-9fbd-3c4e99c7d0c6",
+      "slug": "novogodnyaya-elka-na-teplohode-s-interaktivnym-spektaklem-taina-ledyanogo-posoha-moskva",
+      "title": "Новогодняя Елка на теплоходе с интерактивным спектаклем \"Тайна ледяного посоха\"",
+      "city": "Москва",
+      "reason": "no future saleable session with active offer at production preflight"
+    },
+    {
+      "eventPageId": "eb78bb74-97a1-4e07-96d6-69ec1665e2db",
+      "slug": "interaktivnoe-predstavlenie-malenkii-ded-moroz-dlya-detei-ot-2-do-6-let-sankt-peterburg-3",
+      "title": "Интерактивное представление \"Маленький Дед Мороз\" для детей от 2 до 6 лет.",
+      "city": "Санкт-Петербург",
+      "reason": "no future saleable session with active offer at production preflight"
+    },
+    {
+      "eventPageId": "c66170ae-e2aa-4187-8d9c-07a176bcedde",
+      "slug": "vzlomai-novyi-god-kazan-5",
+      "title": "Взломай Новый год",
+      "city": "Казань",
+      "reason": "no future saleable session with active offer at production preflight"
+    },
+    {
+      "eventPageId": "7747fb1b-e6e3-46b8-9c98-4f2e3be316b8",
+      "slug": "vzlomai-novyi-god-kazan",
+      "title": "Взломай Новый год",
+      "city": "Казань",
+      "reason": "no future saleable session with active offer at production preflight"
+    },
+    {
+      "eventPageId": "814a8057-05b5-4ebb-9d04-779d45c06a83",
+      "slug": "novogodnii-detskii-bal-snezhnaya-koroleva-sankt-peterburg-4",
+      "title": "Новогодний детский бал. «Снежная королева»",
+      "city": "Санкт-Петербург",
+      "reason": "no future saleable session with active offer at production preflight"
+    }
+  ],
+  "counts": {
+    "planned": 222,
+    "applied": 222,
+    "indexable": 222,
+    "indexableEventPagesBefore": 1330,
+    "indexableEventPagesAfter": 1552
+  },
+  "completedAt": "2026-11-18T15:58:24.901Z",
+  "linksRoutesSeoFieldsChanged": false,
+  "staticPracticalInfoCopied": false,
+  "practicalInfoRendering": "Generated per Event DTO on each page as a list"
+}

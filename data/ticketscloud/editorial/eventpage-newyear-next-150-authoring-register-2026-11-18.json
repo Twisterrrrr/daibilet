@@ -6,7 +6,7 @@
   "uniqueExpandedEventPageIds": 227,
   "allSelectedHaveCity": true,
   "allSelectedHaveActiveOffer": true,
-  "applyStatus": "NOT_APPLIED",
+  "applyStatus": "222_EVENTPAGES_APPLIED_INDEXABLE_5_SKIPPED_NO_ACTIVE_SALE",
   "items": [
     {
       "batch": "1",
@@ -33,7 +33,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "пн, 21 дек., 20:00 ул. Маросейка, 9/2 Купить билет - от 1 500 ₽ Электронный биле",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "1",
@@ -46,9 +48,9 @@
       "venue": "Gamma More",
       "sourceEventIds": "evt_6a743812956530937e808d6c",
       "sourceChars": "1566",
-      "sourceCharsExcludingPractical": "1566",
+      "sourceCharsExcludingPractical": "859",
       "rewriteChars": "1690",
-      "lengthDelta": "124",
+      "lengthDelta": "831",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "124",
@@ -60,7 +62,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вт, 1 дек., 21:00 ул. Большая Сухаревская пл., 14/7 Купить билет - от 500 ₽ Элек",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "1",
@@ -73,9 +77,9 @@
       "venue": "Мальтийская Капелла Воронцовского дворца",
       "sourceEventIds": "evt_6af4331395982f23767e96cb",
       "sourceChars": "1094",
-      "sourceCharsExcludingPractical": "1094",
+      "sourceCharsExcludingPractical": "1095",
       "rewriteChars": "1125",
-      "lengthDelta": "31",
+      "lengthDelta": "30",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "31",
@@ -87,7 +91,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "чт, 31 дек., 18:00 ул. Садовая, 26 Купить билет - от 1 500 ₽ Электронный билет П",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "1",
@@ -100,9 +106,9 @@
       "venue": "Gamma More",
       "sourceEventIds": "evt_6aec404931e8ff27b041739f",
       "sourceChars": "885",
-      "sourceCharsExcludingPractical": "885",
+      "sourceCharsExcludingPractical": "883",
       "rewriteChars": "1164",
-      "lengthDelta": "279",
+      "lengthDelta": "281",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "279",
@@ -114,7 +120,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "чт, 7 янв., 13:00 ул. Большая Сухаревская пл., 14/7 Купить билет - от 1 000 ₽ Эл",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "1",
@@ -127,9 +135,9 @@
       "venue": "Gamma More",
       "sourceEventIds": "evt_6a743a4e8fa075ab62808d28",
       "sourceChars": "851",
-      "sourceCharsExcludingPractical": "851",
+      "sourceCharsExcludingPractical": "363",
       "rewriteChars": "1215",
-      "lengthDelta": "364",
+      "lengthDelta": "852",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "364",
@@ -141,7 +149,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 22 нояб., 20:00 ул. Большая Сухаревская пл., 14/7 Купить билет - от 1 000 ₽ ",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "1",
@@ -168,7 +178,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вт, 22 дек., 19:00 д.ул.Брагина, д. 2 Купить билет - от 400 ₽ Электронный билет ",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "1",
@@ -181,9 +193,9 @@
       "venue": "РК ВАВИЛОН",
       "sourceEventIds": "evt_6af0902c6cde2cbcd08de3d3",
       "sourceChars": "448",
-      "sourceCharsExcludingPractical": "448",
+      "sourceCharsExcludingPractical": "422",
       "rewriteChars": "762",
-      "lengthDelta": "314",
+      "lengthDelta": "340",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "314",
@@ -195,7 +207,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "ср, 30 дек., 20:00 ул. Профсоюзов, 55 Купить билет - от 1 000 ₽ Электронный биле",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "1",
@@ -208,9 +222,9 @@
       "venue": "Клуб Биг Бен",
       "sourceEventIds": "evt_6ae233ee81a55acfa6eb65ba",
       "sourceChars": "707",
-      "sourceCharsExcludingPractical": "703",
+      "sourceCharsExcludingPractical": "28",
       "rewriteChars": "1070",
-      "lengthDelta": "367",
+      "lengthDelta": "1042",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "363",
@@ -222,7 +236,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вт, 29 дек., 18:00 д.ул.Брагина, д. 2 Купить билет - от 500 ₽ Электронный билет ",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "1",
@@ -235,9 +251,9 @@
       "venue": "Рок-клуб М2",
       "sourceEventIds": "evt_6a7bae0a534b6b0e5324d365",
       "sourceChars": "460",
-      "sourceCharsExcludingPractical": "460",
+      "sourceCharsExcludingPractical": "467",
       "rewriteChars": "694",
-      "lengthDelta": "234",
+      "lengthDelta": "227",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "234",
@@ -249,7 +265,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "сб, 19 дек., 19:00 Октябрьская улица, 306 Купить билет - от 1 500 ₽ Электронный ",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "1",
@@ -262,9 +280,9 @@
       "venue": "Айдахар",
       "sourceEventIds": "evt_6aeae650f5d1744613b73d65",
       "sourceChars": "608",
-      "sourceCharsExcludingPractical": "608",
+      "sourceCharsExcludingPractical": "620",
       "rewriteChars": "768",
-      "lengthDelta": "160",
+      "lengthDelta": "148",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "160",
@@ -276,7 +294,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "сб, 19 дек., 10:30 Бульвар 30-летия Победы, 21 Купить билет - от 2 390 ₽ Электро",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "1",
@@ -303,7 +323,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "ср, 30 дек., 20:00 Пл. Конституции 2 Купить билет - от 5 000 ₽ Электронный билет",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "1",
@@ -330,7 +352,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "чт, 7 янв., 18:00 ул. Ланское ш., 35 Купить билет - от 1 200 ₽ Электронный билет",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "1",
@@ -343,9 +367,9 @@
       "venue": "Мальтийская Капелла Воронцовского дворца",
       "sourceEventIds": "evt_6af43182df1f379c6bd9a9f2",
       "sourceChars": "506",
-      "sourceCharsExcludingPractical": "506",
+      "sourceCharsExcludingPractical": "507",
       "rewriteChars": "777",
-      "lengthDelta": "271",
+      "lengthDelta": "270",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "271",
@@ -357,7 +381,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "чт, 31 дек., 14:00 ул. Садовая, 26 Купить билет - от 1 500 ₽ Электронный билет П",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "1",
@@ -384,7 +410,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 20 дек., 20:00 Черноморская улица, 13г Купить билет - от 1 000 ₽ Электронный",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "1",
@@ -397,9 +425,9 @@
       "venue": "ШТОПОР рок-бар",
       "sourceEventIds": "evt_6af09f8a89779ff0d64fd9b4",
       "sourceChars": "222",
-      "sourceCharsExcludingPractical": "222",
+      "sourceCharsExcludingPractical": "200",
       "rewriteChars": "732",
-      "lengthDelta": "510",
+      "lengthDelta": "532",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "510",
@@ -411,7 +439,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "сб, 26 дек., 20:00 Шарикоподшипниковская ул., д.38, стр.1 Купить билет - от 2 00",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "1",
@@ -424,9 +454,9 @@
       "venue": "Клуб Биг Бен",
       "sourceEventIds": "evt_6ae1d12ab5c0245578345a1a",
       "sourceChars": "138",
-      "sourceCharsExcludingPractical": "138",
+      "sourceCharsExcludingPractical": "139",
       "rewriteChars": "724",
-      "lengthDelta": "586",
+      "lengthDelta": "585",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "586",
@@ -438,7 +468,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "пт, 25 дек., 19:00 д.ул.Брагина, д. 2 Купить билет - от 500 ₽ Электронный билет ",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "1",
@@ -465,7 +497,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "пт, 18 дек., 19:00 д.ул.Брагина, д. 2 Купить билет - от 500 ₽ Электронный билет ",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "1",
@@ -492,7 +526,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "сб, 26 дек., 10:00 ул. Бетанкура, 4 Купить билет - от 2 500 ₽ Электронный билет ",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "1",
@@ -505,9 +541,9 @@
       "venue": "Бар ЦПР",
       "sourceEventIds": "evt_6aaf8addac289a29c820d6e1",
       "sourceChars": "2304",
-      "sourceCharsExcludingPractical": "2304",
+      "sourceCharsExcludingPractical": "2322",
       "rewriteChars": "2351",
-      "lengthDelta": "47",
+      "lengthDelta": "29",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "47",
@@ -519,7 +555,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 29 нояб., 18:00 Литейный просп., 28 Купить билет - от 600 ₽ Электронный биле",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "1",
@@ -546,7 +584,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "чт, 31 дек., 23:59 Полтавская улица, д.7 Купить билет - от 1 000 ₽ Электронный билет После",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "1",
@@ -559,9 +599,9 @@
       "venue": "ФудХолл 313 | ТРЦ Галерея",
       "sourceEventIds": "",
       "sourceChars": "578",
-      "sourceCharsExcludingPractical": "574",
+      "sourceCharsExcludingPractical": "582",
       "rewriteChars": "888",
-      "lengthDelta": "314",
+      "lengthDelta": "306",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "310",
@@ -573,7 +613,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "чт, 7 янв., 21:00 ул. Володи Головатого, 313 Купить билет - от 1 500 ₽ Электронный билет П",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "1",
@@ -586,9 +628,9 @@
       "venue": "Музей Карла Буллы",
       "sourceEventIds": "evt_6983fe7eddda25b9510e442b",
       "sourceChars": "3661",
-      "sourceCharsExcludingPractical": "3661",
-      "rewriteChars": "3676",
-      "lengthDelta": "15",
+      "sourceCharsExcludingPractical": "3711",
+      "rewriteChars": "4169",
+      "lengthDelta": "458",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "15",
@@ -600,7 +642,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "сб, 9 янв., 19:00 Невский проспект, 54 Купить билет - от 1 890 ₽ Электронный бил",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "1",
@@ -613,9 +657,9 @@
       "venue": "Государственный Эрмитаж (Зимний дворец)",
       "sourceEventIds": "evt_6a7de197c1fb950ecafc3626",
       "sourceChars": "2856",
-      "sourceCharsExcludingPractical": "2856",
+      "sourceCharsExcludingPractical": "2867",
       "rewriteChars": "2873",
-      "lengthDelta": "17",
+      "lengthDelta": "6",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "17",
@@ -627,7 +671,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "пн, 28 дек., 19:00 Дворцовая наб., 34 Купить билет - от 5 000 ₽ Электронный биле",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "1",
@@ -654,7 +700,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "чт, 24 дек., 20:30 ул. Маросейка, 9/2 Купить билет - от 1 000 ₽ Электронный биле",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "1",
@@ -667,13 +715,13 @@
       "venue": "КС-РЕСУРС",
       "sourceEventIds": "evt_6ad9eaa0256f9821c4fdf6b3",
       "sourceChars": "2653",
-      "sourceCharsExcludingPractical": "2285",
-      "rewriteChars": "2691",
-      "lengthDelta": "406",
+      "sourceCharsExcludingPractical": "2595",
+      "rewriteChars": "2756",
+      "lengthDelta": "161",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "38",
-      "substantiveParagraphs": "5",
+      "substantiveParagraphs": "6",
       "paragraphStatus": "PASS",
       "rewriteSection": "B1 #25",
       "effectiveTextSection": "B1 #25",
@@ -681,7 +729,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "пт, 1 янв., 07:20 Казанская ул., 2 Купить билет - от 3 950 ₽ Электронный билет П",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "1",
@@ -694,9 +744,9 @@
       "venue": "МТС Live Холл Воронеж",
       "sourceEventIds": "evt_69c6f2079f08e83ad485426f",
       "sourceChars": "1571",
-      "sourceCharsExcludingPractical": "1398",
+      "sourceCharsExcludingPractical": "1462",
       "rewriteChars": "1785",
-      "lengthDelta": "387",
+      "lengthDelta": "323",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "214",
@@ -708,7 +758,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "ср, 30 дек., 15:00 Рамонский р-он, пос. Солнечный, Парковая улица, дом 3. Купить",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "1",
@@ -721,9 +773,9 @@
       "venue": "МТС Live Холл Воронеж",
       "sourceEventIds": "evt_69c6f357b7df67643719f8aa",
       "sourceChars": "1569",
-      "sourceCharsExcludingPractical": "1396",
+      "sourceCharsExcludingPractical": "1460",
       "rewriteChars": "1785",
-      "lengthDelta": "389",
+      "lengthDelta": "325",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "216",
@@ -735,7 +787,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "ср, 30 дек., 18:00 Рамонский р-он, пос. Солнечный, Парковая улица, дом 3. Купить",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "1",
@@ -748,9 +802,9 @@
       "venue": "КЗ \"У Финляндского\"",
       "sourceEventIds": "evt_6ad5a307b329033ee87e14fa | evt_6ad5a52a0b29b1589eb2c1b6",
       "sourceChars": "2004",
-      "sourceCharsExcludingPractical": "0",
-      "rewriteChars": "2008",
-      "lengthDelta": "2008",
+      "sourceCharsExcludingPractical": "2000",
+      "rewriteChars": "2088",
+      "lengthDelta": "88",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "4",
@@ -762,7 +816,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 3 янв., 11:00 Арсенальная наб., 13/1 Купить билет - от 1 000 ₽ Электронный б",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 2,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "1",
@@ -775,9 +831,9 @@
       "venue": "м. Кропоткинская, выход из метро №2, у ресторана Иль Патио вас встретит гид с табличкой Любимый город",
       "sourceEventIds": "evt_6a534bf0d3a8340d5414ffee",
       "sourceChars": "2429",
-      "sourceCharsExcludingPractical": "2277",
+      "sourceCharsExcludingPractical": "2280",
       "rewriteChars": "2452",
-      "lengthDelta": "175",
+      "lengthDelta": "172",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "23",
@@ -789,7 +845,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "чт, 31 дек., 15:00 ул. Волхонка, 15-17, строение 1 Купить билет - от 1 700 ₽ Эле",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "1",
@@ -802,9 +860,9 @@
       "venue": "Место встречи: м. Площадь Революции, выход №10, сразу на выходе из метро гид с таб. Любимый город",
       "sourceEventIds": "evt_6aca1aad25fdc6c912a54f35",
       "sourceChars": "2417",
-      "sourceCharsExcludingPractical": "2417",
+      "sourceCharsExcludingPractical": "2420",
       "rewriteChars": "2464",
-      "lengthDelta": "47",
+      "lengthDelta": "44",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "47",
@@ -816,7 +874,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "пн, 28 дек., 19:00 5, строение 2 Купить билет - от 1 500 ₽ Электронный билет Пос",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "2",
@@ -829,9 +889,9 @@
       "venue": "МТС Live Холл Воронеж",
       "sourceEventIds": "evt_69c6f2b635d4ad48aef49c42",
       "sourceChars": "1453",
-      "sourceCharsExcludingPractical": "1392",
+      "sourceCharsExcludingPractical": "1461",
       "rewriteChars": "1785",
-      "lengthDelta": "393",
+      "lengthDelta": "324",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "332",
@@ -843,7 +903,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "ср, 30 дек., 12:00 Рамонский р-он, пос. Солнечный, Парковая улица, дом 3. Купить",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "2",
@@ -856,13 +918,13 @@
       "venue": "Государственный Эрмитаж (Зимний дворец)",
       "sourceEventIds": "evt_6a959c4704134d9ee56fe16f",
       "sourceChars": "2118",
-      "sourceCharsExcludingPractical": "2118",
+      "sourceCharsExcludingPractical": "2117",
       "rewriteChars": "2350",
-      "lengthDelta": "232",
+      "lengthDelta": "233",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "232",
-      "substantiveParagraphs": "4",
+      "substantiveParagraphs": "5",
       "paragraphStatus": "PASS",
       "rewriteSection": "B2 #2",
       "effectiveTextSection": "B2 #2",
@@ -870,7 +932,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "пн, 21 дек., 19:00 Дворцовая наб., 34 Купить билет - от 5 000 ₽ Электронный биле",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "2",
@@ -883,13 +947,13 @@
       "venue": "Конькобежный центр \"Коломна\"",
       "sourceEventIds": "evt_6aa01a56b9675b2db47b9845",
       "sourceChars": "1965",
-      "sourceCharsExcludingPractical": "1806",
-      "rewriteChars": "1998",
-      "lengthDelta": "192",
+      "sourceCharsExcludingPractical": "1061",
+      "rewriteChars": "2219",
+      "lengthDelta": "1158",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "33",
-      "substantiveParagraphs": "5",
+      "substantiveParagraphs": "6",
       "paragraphStatus": "PASS",
       "rewriteSection": "B2 #3",
       "effectiveTextSection": "B2 #3",
@@ -897,7 +961,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 3 янв., 12:00 ул. Набережной реки Коломенки, 7 Купить билет - от 1 400 ₽ Эле",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "2",
@@ -910,13 +976,13 @@
       "venue": "Goose Goose",
       "sourceEventIds": "evt_6af2d6d2dd22cd8324d76074",
       "sourceChars": "2126",
-      "sourceCharsExcludingPractical": "1722",
-      "rewriteChars": "2161",
-      "lengthDelta": "439",
+      "sourceCharsExcludingPractical": "2142",
+      "rewriteChars": "2198",
+      "lengthDelta": "56",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "35",
-      "substantiveParagraphs": "4",
+      "substantiveParagraphs": "5",
       "paragraphStatus": "PASS",
       "rewriteSection": "B2 #4",
       "effectiveTextSection": "B2 #4",
@@ -924,7 +990,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 27 дек., 12:00 ул. Большая Конюшенная, 27 Купить билет - от 3 600 ₽ Электрон",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "2",
@@ -937,13 +1005,13 @@
       "venue": "Omega Tsvetnoy Rooftop",
       "sourceEventIds": "evt_6ac4db96abbc6a02a0bf921f",
       "sourceChars": "1168",
-      "sourceCharsExcludingPractical": "1162",
-      "rewriteChars": "1568",
-      "lengthDelta": "406",
+      "sourceCharsExcludingPractical": "1167",
+      "rewriteChars": "1605",
+      "lengthDelta": "438",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "400",
-      "substantiveParagraphs": "2",
+      "substantiveParagraphs": "3",
       "paragraphStatus": "PASS",
       "rewriteSection": "B2 #5",
       "effectiveTextSection": "B2 #5",
@@ -951,7 +1019,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 27 дек., 16:00 Цветной бульвар, дом 15, строение 1 Купить билет - от 2 000 ₽",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "2",
@@ -964,13 +1034,13 @@
       "venue": "Сибирь, ледовый дворец спорта",
       "sourceEventIds": "evt_6aaa1b977a3d5a546b3147ef",
       "sourceChars": "1580",
-      "sourceCharsExcludingPractical": "1544",
-      "rewriteChars": "1703",
-      "lengthDelta": "159",
+      "sourceCharsExcludingPractical": "673",
+      "rewriteChars": "1950",
+      "lengthDelta": "1277",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "123",
-      "substantiveParagraphs": "3",
+      "substantiveParagraphs": "5",
       "paragraphStatus": "PASS",
       "rewriteSection": "B2 #6",
       "effectiveTextSection": "B2 #6",
@@ -978,7 +1048,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "сб, 2 янв., 13:00 улица Богдана Хмельницкого, 23 Купить билет - от 1 500 ₽ Элект",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "2",
@@ -991,13 +1063,13 @@
       "venue": "СК МЕГА",
       "sourceEventIds": "evt_6aa90da739aba7c9e39a9540",
       "sourceChars": "1901",
-      "sourceCharsExcludingPractical": "1807",
-      "rewriteChars": "1998",
-      "lengthDelta": "191",
+      "sourceCharsExcludingPractical": "997",
+      "rewriteChars": "2219",
+      "lengthDelta": "1222",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "97",
-      "substantiveParagraphs": "5",
+      "substantiveParagraphs": "6",
       "paragraphStatus": "PASS",
       "rewriteSection": "B2 #3",
       "effectiveTextSection": "B2 #3",
@@ -1005,7 +1077,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вт, 5 янв., 12:00 ул. Дружбы 6А Купить билет - от 1 800 ₽ Электронный билет Посл",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "2",
@@ -1018,13 +1092,13 @@
       "venue": "Дом Шрёдера",
       "sourceEventIds": "evt_6aa423ad7e621c603bc49b4e",
       "sourceChars": "2117",
-      "sourceCharsExcludingPractical": "2067",
-      "rewriteChars": "2178",
-      "lengthDelta": "111",
+      "sourceCharsExcludingPractical": "1552",
+      "rewriteChars": "2215",
+      "lengthDelta": "663",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "61",
-      "substantiveParagraphs": "4",
+      "substantiveParagraphs": "5",
       "paragraphStatus": "PASS",
       "rewriteSection": "B2 #7",
       "effectiveTextSection": "B2 #7",
@@ -1032,7 +1106,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вт, 5 янв., 19:00 Петроградская наб, дом 32. Купить билет - от 5 500 ₽ Электронн",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "2",
@@ -1045,13 +1121,13 @@
       "venue": "Omega Tsvetnoy Rooftop",
       "sourceEventIds": "evt_6ac5620cf7a0102112c74cc0",
       "sourceChars": "1125",
-      "sourceCharsExcludingPractical": "1051",
-      "rewriteChars": "1545",
-      "lengthDelta": "494",
+      "sourceCharsExcludingPractical": "902",
+      "rewriteChars": "1582",
+      "lengthDelta": "680",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "420",
-      "substantiveParagraphs": "2",
+      "substantiveParagraphs": "3",
       "paragraphStatus": "PASS",
       "rewriteSection": "B2 #8",
       "effectiveTextSection": "B2 #8",
@@ -1059,7 +1135,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вт, 5 янв., 21:00 Цветной бульвар, дом 15, строение 1 Купить билет - от 2 800 ₽ ",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "2",
@@ -1072,13 +1150,13 @@
       "venue": "Государственный Эрмитаж (Зимний дворец)",
       "sourceEventIds": "evt_6a986197af8de8948ba6812b",
       "sourceChars": "1725",
-      "sourceCharsExcludingPractical": "83",
-      "rewriteChars": "1958",
-      "lengthDelta": "1875",
+      "sourceCharsExcludingPractical": "1715",
+      "rewriteChars": "1995",
+      "lengthDelta": "280",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "233",
-      "substantiveParagraphs": "4",
+      "substantiveParagraphs": "5",
       "paragraphStatus": "PASS",
       "rewriteSection": "B2 #9",
       "effectiveTextSection": "B2 #9",
@@ -1086,7 +1164,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "пн, 18 янв., 19:00 Дворцовая наб., 34 Купить билет - от 5 000 ₽ Электронный биле",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "2",
@@ -1099,13 +1179,13 @@
       "venue": "Планетарий 1",
       "sourceEventIds": "evt_6abc1d1efdac4ee1fc0bbf58 | evt_6abc1d5a200b250c67e42d14",
       "sourceChars": "1823",
-      "sourceCharsExcludingPractical": "1763",
-      "rewriteChars": "1952",
-      "lengthDelta": "189",
+      "sourceCharsExcludingPractical": "1685",
+      "rewriteChars": "2055",
+      "lengthDelta": "370",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "129",
-      "substantiveParagraphs": "5",
+      "substantiveParagraphs": "6",
       "paragraphStatus": "PASS",
       "rewriteSection": "B2 #10",
       "effectiveTextSection": "B2 #10",
@@ -1113,7 +1193,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "ср, 30 дек., 10:00 наб. Обводного канала, 74Ц Купить билет - от 1 500 ₽ Электрон",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 2,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "2",
@@ -1126,13 +1208,13 @@
       "venue": "Англиканская Церковь Святого Андрея///St Andrews Anglican Church",
       "sourceEventIds": "evt_6af4cd828afa7d6de47aefb9",
       "sourceChars": "1547",
-      "sourceCharsExcludingPractical": "1547",
-      "rewriteChars": "1651",
-      "lengthDelta": "104",
+      "sourceCharsExcludingPractical": "1359",
+      "rewriteChars": "1688",
+      "lengthDelta": "329",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "104",
-      "substantiveParagraphs": "2",
+      "substantiveParagraphs": "4",
       "paragraphStatus": "PASS",
       "rewriteSection": "B2 #11",
       "effectiveTextSection": "B2 #11",
@@ -1140,7 +1222,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "ср, 23 дек., 20:00 Вознесенский переулок, 8/5 Купить билет - от 1 200 ₽ Электрон",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "2",
@@ -1153,13 +1237,13 @@
       "venue": "Стерлитамак Арена",
       "sourceEventIds": "evt_6ad05a99a61a2aa5d1c67326",
       "sourceChars": "1511",
-      "sourceCharsExcludingPractical": "632",
-      "rewriteChars": "1703",
-      "lengthDelta": "1071",
+      "sourceCharsExcludingPractical": "673",
+      "rewriteChars": "1950",
+      "lengthDelta": "1277",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "192",
-      "substantiveParagraphs": "3",
+      "substantiveParagraphs": "5",
       "paragraphStatus": "PASS",
       "rewriteSection": "B2 #6",
       "effectiveTextSection": "B2 #6",
@@ -1167,7 +1251,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 27 дек., 13:00 Коммунистическая ул., 101 Купить билет - от 1 200 ₽ Электронн",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "2",
@@ -1180,13 +1266,13 @@
       "venue": "Ледовый дворец \"Звездный\"",
       "sourceEventIds": "evt_6aa27d01a5318fc6a8b4b72b",
       "sourceChars": "774",
-      "sourceCharsExcludingPractical": "672",
-      "rewriteChars": "1703",
-      "lengthDelta": "1031",
+      "sourceCharsExcludingPractical": "673",
+      "rewriteChars": "1950",
+      "lengthDelta": "1277",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "929",
-      "substantiveParagraphs": "3",
+      "substantiveParagraphs": "5",
       "paragraphStatus": "PASS",
       "rewriteSection": "B2 #6",
       "effectiveTextSection": "B2 #6",
@@ -1194,7 +1280,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "сб, 26 дек., 17:00 Комсомольская ул., 197/3 Купить билет - от 1 800 ₽ Электронны",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "2",
@@ -1207,13 +1295,13 @@
       "venue": "Планетарий 1",
       "sourceEventIds": "evt_6abc1cce8fd931cd1ab59862",
       "sourceChars": "1764",
-      "sourceCharsExcludingPractical": "1764",
-      "rewriteChars": "1952",
-      "lengthDelta": "188",
+      "sourceCharsExcludingPractical": "1685",
+      "rewriteChars": "2055",
+      "lengthDelta": "370",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "188",
-      "substantiveParagraphs": "5",
+      "substantiveParagraphs": "6",
       "paragraphStatus": "PASS",
       "rewriteSection": "B2 #10",
       "effectiveTextSection": "B2 #10",
@@ -1221,7 +1309,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "пн, 28 дек., 10:00 наб. Обводного канала, 74Ц Купить билет - от 1 500 ₽ Электрон",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "2",
@@ -1234,13 +1324,13 @@
       "venue": "Ледовый дворец \"Звездный\"",
       "sourceEventIds": "evt_6aa262c434bafffd6c44a688",
       "sourceChars": "1488",
-      "sourceCharsExcludingPractical": "1452",
-      "rewriteChars": "1703",
-      "lengthDelta": "251",
+      "sourceCharsExcludingPractical": "673",
+      "rewriteChars": "1950",
+      "lengthDelta": "1277",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "215",
-      "substantiveParagraphs": "3",
+      "substantiveParagraphs": "5",
       "paragraphStatus": "PASS",
       "rewriteSection": "B2 #6",
       "effectiveTextSection": "B2 #6",
@@ -1248,7 +1338,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "сб, 26 дек., 13:00 Комсомольская ул., 197/3 Купить билет - от 1 300 ₽ Электронны",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "2",
@@ -1261,9 +1353,9 @@
       "venue": "Дом ученых им. Горького",
       "sourceEventIds": "evt_6a8c61d70bc200ae90360f33",
       "sourceChars": "1305",
-      "sourceCharsExcludingPractical": "19",
+      "sourceCharsExcludingPractical": "1176",
       "rewriteChars": "1557",
-      "lengthDelta": "1538",
+      "lengthDelta": "381",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "252",
@@ -1275,7 +1367,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 13 дек., 16:45 Дворцовая набережная, 26 Купить билет - от 3 000 ₽ Электронны",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "2",
@@ -1288,9 +1382,9 @@
       "venue": "Дом ученых им. Горького",
       "sourceEventIds": "evt_6a8c611523bea23e84519f7a | evt_6a8c616dc666c60f5129c415 | evt_6a8c63f80bc200ae903610cf | evt_6a8c613633fbcbbacd26f744 | evt_6a8ac5bacc92c02cf19df519",
       "sourceChars": "1305",
-      "sourceCharsExcludingPractical": "19",
+      "sourceCharsExcludingPractical": "1176",
       "rewriteChars": "1557",
-      "lengthDelta": "1538",
+      "lengthDelta": "381",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "252",
@@ -1302,7 +1396,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вт, 8 дек., 18:45 Дворцовая набережная, 26 Купить билет - от 3 000 ₽ Электронный",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 5,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "2",
@@ -1315,13 +1411,13 @@
       "venue": "Государственный Эрмитаж (Зимний дворец)",
       "sourceEventIds": "evt_6a982f912988cebd8d1328b5",
       "sourceChars": "1516",
-      "sourceCharsExcludingPractical": "1516",
-      "rewriteChars": "1663",
-      "lengthDelta": "147",
+      "sourceCharsExcludingPractical": "1526",
+      "rewriteChars": "1700",
+      "lengthDelta": "174",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "147",
-      "substantiveParagraphs": "3",
+      "substantiveParagraphs": "4",
       "paragraphStatus": "PASS",
       "rewriteSection": "B2 #13",
       "effectiveTextSection": "B2 #13",
@@ -1329,7 +1425,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "пн, 25 янв., 19:00 Дворцовая наб., 34 Купить билет - от 5 000 ₽ Электронный биле",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "2",
@@ -1342,13 +1440,13 @@
       "venue": "Государственный Эрмитаж (Зимний дворец)",
       "sourceEventIds": "evt_6a982af0b3f8162d2d296c64",
       "sourceChars": "1508",
-      "sourceCharsExcludingPractical": "1508",
-      "rewriteChars": "1559",
-      "lengthDelta": "51",
+      "sourceCharsExcludingPractical": "1534",
+      "rewriteChars": "1596",
+      "lengthDelta": "62",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "51",
-      "substantiveParagraphs": "3",
+      "substantiveParagraphs": "4",
       "paragraphStatus": "PASS",
       "rewriteSection": "B2 #14",
       "effectiveTextSection": "B2 #14",
@@ -1356,7 +1454,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "пн, 11 янв., 19:00 Дворцовая наб., 34 Купить билет - от 5 000 ₽ Электронный биле",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "2",
@@ -1383,7 +1483,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 20 дек., 18:30 автозаводский проспект 8 (25/05) Купить билет - от 600 ₽ Элек",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "2",
@@ -1396,9 +1498,9 @@
       "venue": "Органный зал",
       "sourceEventIds": "evt_6ae1e7e288296dbea6ef62c2",
       "sourceChars": "1519",
-      "sourceCharsExcludingPractical": "1519",
+      "sourceCharsExcludingPractical": "1513",
       "rewriteChars": "1534",
-      "lengthDelta": "15",
+      "lengthDelta": "21",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "15",
@@ -1410,7 +1512,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вт, 22 дек., 18:30 автозаводский проспект 8 (25/05) Купить билет - от 600 ₽ Элек",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "2",
@@ -1423,13 +1527,13 @@
       "venue": "Дом Шрёдера",
       "sourceEventIds": "evt_6aa94ae17fa78337145ba252 | evt_6aa94c464a7db4e991dc3ed3",
       "sourceChars": "1600",
-      "sourceCharsExcludingPractical": "1600",
-      "rewriteChars": "1814",
-      "lengthDelta": "214",
+      "sourceCharsExcludingPractical": "1526",
+      "rewriteChars": "1886",
+      "lengthDelta": "360",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "214",
-      "substantiveParagraphs": "5",
+      "substantiveParagraphs": "6",
       "paragraphStatus": "PASS",
       "rewriteSection": "B2 #17",
       "effectiveTextSection": "B2 #17",
@@ -1437,7 +1541,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "ср, 6 янв., 15:00 Петроградская наб, дом 32. Купить билет - от 1 000 ₽ Электронн",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 2,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "2",
@@ -1450,9 +1556,9 @@
       "venue": "Art HaII",
       "sourceEventIds": "evt_6aa15c0f16ec1ed97377406b",
       "sourceChars": "1475",
-      "sourceCharsExcludingPractical": "1426",
+      "sourceCharsExcludingPractical": "1370",
       "rewriteChars": "1548",
-      "lengthDelta": "122",
+      "lengthDelta": "178",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "73",
@@ -1464,7 +1570,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "пт, 25 дек., 16:00 Северная улица, 2а Купить билет - от 1 400 ₽ Электронный биле",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "2",
@@ -1477,13 +1585,13 @@
       "venue": "Большой петергофский дворец",
       "sourceEventIds": "evt_6a96e80ff0c947dad97c411b",
       "sourceChars": "1630",
-      "sourceCharsExcludingPractical": "1630",
-      "rewriteChars": "2223",
-      "lengthDelta": "593",
+      "sourceCharsExcludingPractical": "1627",
+      "rewriteChars": "2260",
+      "lengthDelta": "633",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "593",
-      "substantiveParagraphs": "4",
+      "substantiveParagraphs": "5",
       "paragraphStatus": "PASS",
       "rewriteSection": "B2 #19",
       "effectiveTextSection": "B2 #19",
@@ -1491,7 +1599,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 10 янв., 16:00 Разводная улица, 2 Купить билет - от 5 000 ₽ Электронный биле",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "2",
@@ -1504,13 +1614,13 @@
       "venue": "МТС Live Холл Самара (ех. КРЦ «Звезда»)",
       "sourceEventIds": "evt_6ad8670185b847222c20dc17 | evt_6ad87de2a1dd77d8209d05bf",
       "sourceChars": "1022",
-      "sourceCharsExcludingPractical": "1022",
-      "rewriteChars": "1494",
-      "lengthDelta": "472",
+      "sourceCharsExcludingPractical": "1023",
+      "rewriteChars": "1576",
+      "lengthDelta": "553",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "472",
-      "substantiveParagraphs": "2",
+      "substantiveParagraphs": "3",
       "paragraphStatus": "PASS",
       "rewriteSection": "B2 #20",
       "effectiveTextSection": "B2 #20",
@@ -1518,7 +1628,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "сб, 2 янв., 13:30 ул. Ново-Садовая, 106Г Купить билет - от 450 ₽ Электронный бил",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 2,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "2",
@@ -1531,13 +1643,13 @@
       "venue": "Музейно-выставочный центр \"Петербургский художник\"",
       "sourceEventIds": "evt_6ad0ec9ffbe00f8ed9841631",
       "sourceChars": "1221",
-      "sourceCharsExcludingPractical": "1221",
-      "rewriteChars": "1576",
-      "lengthDelta": "355",
+      "sourceCharsExcludingPractical": "1222",
+      "rewriteChars": "1613",
+      "lengthDelta": "391",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "355",
-      "substantiveParagraphs": "2",
+      "substantiveParagraphs": "3",
       "paragraphStatus": "PASS",
       "rewriteSection": "B2 #21",
       "effectiveTextSection": "B2 #21",
@@ -1545,7 +1657,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 3 янв., 17:00 наб. реки Мойки, 100 Купить билет - от 1 500 ₽ Электронный бил",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "2",
@@ -1558,13 +1672,13 @@
       "venue": "Дом Молодежи \"Атлант\"",
       "sourceEventIds": "evt_69cb9780e2c2137731156cbf",
       "sourceChars": "1265",
-      "sourceCharsExcludingPractical": "1105",
-      "rewriteChars": "1661",
-      "lengthDelta": "556",
+      "sourceCharsExcludingPractical": "1264",
+      "rewriteChars": "1732",
+      "lengthDelta": "468",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "396",
-      "substantiveParagraphs": "2",
+      "substantiveParagraphs": "3",
       "paragraphStatus": "PASS",
       "rewriteSection": "B2 #22",
       "effectiveTextSection": "B2 #22",
@@ -1572,7 +1686,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "сб, 26 дек., 11:30 ул. Руставели, 37 Купить билет - от 1 200 ₽ Электронный билет",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "2",
@@ -1585,13 +1701,13 @@
       "venue": "Дом Молодежи \"Атлант\"",
       "sourceEventIds": "evt_69cba170ddb89b4064cbeb9c",
       "sourceChars": "1265",
-      "sourceCharsExcludingPractical": "1105",
-      "rewriteChars": "1661",
-      "lengthDelta": "556",
+      "sourceCharsExcludingPractical": "1264",
+      "rewriteChars": "1732",
+      "lengthDelta": "468",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "396",
-      "substantiveParagraphs": "2",
+      "substantiveParagraphs": "3",
       "paragraphStatus": "PASS",
       "rewriteSection": "B2 #22",
       "effectiveTextSection": "B2 #22",
@@ -1599,7 +1715,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "сб, 26 дек., 14:30 ул. Руставели, 37 Купить билет - от 1 200 ₽ Электронный билет",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "2",
@@ -1612,9 +1730,9 @@
       "venue": "Art HaII",
       "sourceEventIds": "evt_6aa1402ec0123aef4addfca6",
       "sourceChars": "1423",
-      "sourceCharsExcludingPractical": "1423",
+      "sourceCharsExcludingPractical": "1370",
       "rewriteChars": "1548",
-      "lengthDelta": "125",
+      "lengthDelta": "178",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "125",
@@ -1626,7 +1744,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "пт, 25 дек., 13:00 Северная улица, 2а Купить билет - от 1 400 ₽ Электронный биле",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "3",
@@ -1639,13 +1759,13 @@
       "venue": "Теплоход \"ИМПЕРАТРИЦА\"  причал Южный \"Лужники\"",
       "sourceEventIds": "evt_6af0a042e87326d270c174a7",
       "sourceChars": "1619",
-      "sourceCharsExcludingPractical": "1332",
-      "rewriteChars": "1472",
-      "lengthDelta": "140",
+      "sourceCharsExcludingPractical": "1630",
+      "rewriteChars": "1809",
+      "lengthDelta": "179",
       "lengthStatus": "PASS",
       "rawLengthStatus": "RAW_INCLUDES_PRACTICAL_ORIGINAL",
       "rawLengthDelta": "-147",
-      "substantiveParagraphs": "4",
+      "substantiveParagraphs": "6",
       "paragraphStatus": "PASS",
       "rewriteSection": "B3 #1",
       "effectiveTextSection": "B3 #1",
@@ -1653,7 +1773,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "сб, 19 дек., 11:00 Лужнецкая наб., 8 Купить билет - от 4 800 ₽ Электронный билет",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "SKIPPED_NO_ACTIVE_SALE",
+      "appliedEventPages": 0,
+      "skippedNoSaleEventPages": 1
     },
     {
       "batch": "3",
@@ -1666,13 +1788,13 @@
       "venue": "Культурный центр на Арбате",
       "sourceEventIds": "evt_6ae67b05f80a026430518ab5",
       "sourceChars": "1097",
-      "sourceCharsExcludingPractical": "1025",
-      "rewriteChars": "1265",
-      "lengthDelta": "240",
+      "sourceCharsExcludingPractical": "1098",
+      "rewriteChars": "1361",
+      "lengthDelta": "263",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "168",
-      "substantiveParagraphs": "3",
+      "substantiveParagraphs": "4",
       "paragraphStatus": "PASS",
       "rewriteSection": "B3 #2",
       "effectiveTextSection": "B3 #2",
@@ -1680,7 +1802,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "сб, 5 дек., 20:00 ул. Арбат, 9 стр. 1 Купить билет - от 2 000 ₽ Электронный биле",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "3",
@@ -1693,13 +1817,13 @@
       "venue": "Музейно-выставочный центр \"Петербургский художник\"",
       "sourceEventIds": "evt_6ad0e8cd92a631f72eea962b",
       "sourceChars": "1077",
-      "sourceCharsExcludingPractical": "1077",
-      "rewriteChars": "1576",
-      "lengthDelta": "499",
+      "sourceCharsExcludingPractical": "1076",
+      "rewriteChars": "1613",
+      "lengthDelta": "537",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "499",
-      "substantiveParagraphs": "2",
+      "substantiveParagraphs": "3",
       "paragraphStatus": "PASS",
       "rewriteSection": "B3 #3",
       "effectiveTextSection": "B2 #21",
@@ -1707,7 +1831,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "сб, 26 дек., 18:00 наб. реки Мойки, 100 Купить билет - от 1 500 ₽ Электронный би",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "3",
@@ -1720,9 +1846,9 @@
       "venue": "Концертный зал Яани Кирик",
       "sourceEventIds": "evt_6a970ad20728e0e74ffa8703",
       "sourceChars": "816",
-      "sourceCharsExcludingPractical": "686",
+      "sourceCharsExcludingPractical": "744",
       "rewriteChars": "1010",
-      "lengthDelta": "324",
+      "lengthDelta": "266",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "194",
@@ -1734,7 +1860,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "ср, 30 дек., 19:00 ул. Декабристов, 54А Купить билет - от 1 500 ₽ Электронный би",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "3",
@@ -1747,13 +1875,13 @@
       "venue": "Культурный центр \"Вокзал Озерки\"",
       "sourceEventIds": "evt_6a7afa7cdd100af17b2c6bb2",
       "sourceChars": "1420",
-      "sourceCharsExcludingPractical": "1420",
-      "rewriteChars": "1652",
-      "lengthDelta": "232",
+      "sourceCharsExcludingPractical": "1422",
+      "rewriteChars": "1724",
+      "lengthDelta": "302",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "232",
-      "substantiveParagraphs": "4",
+      "substantiveParagraphs": "5",
       "paragraphStatus": "PASS",
       "rewriteSection": "B3 #5",
       "effectiveTextSection": "B3 #5",
@@ -1761,7 +1889,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "сб, 26 дек., 13:30 Выборгское ш.13 Купить билет - от 1 100 ₽ Электронный билет П",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "3",
@@ -1774,13 +1904,13 @@
       "venue": "Конькобежный центр \"Коломна\"",
       "sourceEventIds": "evt_6aa01da787087be8ea74b894",
       "sourceChars": "1190",
-      "sourceCharsExcludingPractical": "964",
-      "rewriteChars": "1998",
-      "lengthDelta": "1034",
+      "sourceCharsExcludingPractical": "1061",
+      "rewriteChars": "2219",
+      "lengthDelta": "1158",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "808",
-      "substantiveParagraphs": "5",
+      "substantiveParagraphs": "6",
       "paragraphStatus": "PASS",
       "rewriteSection": "B3 #6",
       "effectiveTextSection": "B2 #3",
@@ -1788,7 +1918,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 3 янв., 16:00 ул. Набережной реки Коломенки, 7 Купить билет - от 1 400 ₽ Эле",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "3",
@@ -1801,13 +1933,13 @@
       "venue": "Культурный центр \"Вокзал Озерки\"",
       "sourceEventIds": "evt_6a7af936f2417fa73c25133a",
       "sourceChars": "1406",
-      "sourceCharsExcludingPractical": "1406",
-      "rewriteChars": "1652",
-      "lengthDelta": "246",
+      "sourceCharsExcludingPractical": "1422",
+      "rewriteChars": "1724",
+      "lengthDelta": "302",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "246",
-      "substantiveParagraphs": "4",
+      "substantiveParagraphs": "5",
       "paragraphStatus": "PASS",
       "rewriteSection": "B3 #5",
       "effectiveTextSection": "B3 #5",
@@ -1815,7 +1947,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "сб, 26 дек., 12:00 Выборгское ш.13 Купить билет - от 1 100 ₽ Электронный билет П",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "3",
@@ -1842,7 +1976,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "ср, 6 янв., 13:00 Петроградская наб, дом 32. Купить билет - от 3 000 ₽ Электронн",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "3",
@@ -1856,12 +1992,12 @@
       "sourceEventIds": "evt_6aaa6db6af2f6265464c2dbf",
       "sourceChars": "1172",
       "sourceCharsExcludingPractical": "1111",
-      "rewriteChars": "1898",
-      "lengthDelta": "787",
+      "rewriteChars": "1952",
+      "lengthDelta": "841",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "726",
-      "substantiveParagraphs": "5",
+      "substantiveParagraphs": "6",
       "paragraphStatus": "PASS",
       "rewriteSection": "B3 #8",
       "effectiveTextSection": "B3 #8",
@@ -1869,7 +2005,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 13 дек., 19:30 Холодильный пер., 3 строение 2 Купить билет - от 1 500 ₽ Элек",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "3",
@@ -1882,13 +2020,13 @@
       "venue": "Дом ученых им. Горького",
       "sourceEventIds": "evt_6a8c629ef125a8d533456ab5",
       "sourceChars": "1114",
-      "sourceCharsExcludingPractical": "19",
-      "rewriteChars": "1387",
-      "lengthDelta": "1368",
+      "sourceCharsExcludingPractical": "1029",
+      "rewriteChars": "1441",
+      "lengthDelta": "412",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "273",
-      "substantiveParagraphs": "4",
+      "substantiveParagraphs": "5",
       "paragraphStatus": "PASS",
       "rewriteSection": "B3 #9",
       "effectiveTextSection": "B3 #9",
@@ -1896,7 +2034,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "пн, 14 дек., 18:45 Дворцовая набережная, 26 Купить билет - от 3 300 ₽ Электронны",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "3",
@@ -1909,13 +2049,13 @@
       "venue": "Дом Шрёдера",
       "sourceEventIds": "evt_6a9bee579c3692b28277caad",
       "sourceChars": "1383",
-      "sourceCharsExcludingPractical": "1383",
-      "rewriteChars": "1397",
-      "lengthDelta": "14",
+      "sourceCharsExcludingPractical": "1408",
+      "rewriteChars": "1464",
+      "lengthDelta": "56",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "14",
-      "substantiveParagraphs": "4",
+      "substantiveParagraphs": "5",
       "paragraphStatus": "PASS",
       "rewriteSection": "B3 #10",
       "effectiveTextSection": "B3 #10",
@@ -1923,7 +2063,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 3 янв., 15:00 Петроградская наб, дом 32. Купить билет - от 1 580 ₽ Электронн",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "3",
@@ -1936,13 +2078,13 @@
       "venue": "Дом Шрёдера",
       "sourceEventIds": "evt_6acfb3be96995858ca4f1ee2",
       "sourceChars": "1420",
-      "sourceCharsExcludingPractical": "1420",
-      "rewriteChars": "1955",
-      "lengthDelta": "535",
+      "sourceCharsExcludingPractical": "1428",
+      "rewriteChars": "2098",
+      "lengthDelta": "670",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "535",
-      "substantiveParagraphs": "4",
+      "substantiveParagraphs": "5",
       "paragraphStatus": "PASS",
       "rewriteSection": "B3 #11",
       "effectiveTextSection": "B3 #11",
@@ -1950,7 +2092,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "ср, 30 дек., 19:00 Петроградская наб, дом 32. Купить билет - от 3 290 ₽ Электрон",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "3",
@@ -1963,13 +2107,13 @@
       "venue": "Дом Шрёдера",
       "sourceEventIds": "evt_6a9bed3fa0749c33319b96b4",
       "sourceChars": "1355",
-      "sourceCharsExcludingPractical": "1355",
-      "rewriteChars": "1397",
-      "lengthDelta": "42",
+      "sourceCharsExcludingPractical": "1380",
+      "rewriteChars": "1464",
+      "lengthDelta": "84",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "42",
-      "substantiveParagraphs": "4",
+      "substantiveParagraphs": "5",
       "paragraphStatus": "PASS",
       "rewriteSection": "B3 #10",
       "effectiveTextSection": "B3 #10",
@@ -1977,7 +2121,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 3 янв., 15:00 Петроградская наб, дом 32. Купить билет - от 1 600 ₽ Электронн",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "3",
@@ -1990,13 +2136,13 @@
       "venue": "Дом Шрёдера",
       "sourceEventIds": "evt_6af34c61a0964a76b0397605",
       "sourceChars": "1187",
-      "sourceCharsExcludingPractical": "1078",
-      "rewriteChars": "1673",
-      "lengthDelta": "595",
+      "sourceCharsExcludingPractical": "1109",
+      "rewriteChars": "1832",
+      "lengthDelta": "723",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "486",
-      "substantiveParagraphs": "4",
+      "substantiveParagraphs": "5",
       "paragraphStatus": "PASS",
       "rewriteSection": "B3 #12",
       "effectiveTextSection": "B3 #12",
@@ -2004,7 +2150,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 20 дек., 19:00 Петроградская наб, дом 32. Купить билет - от 1 500 ₽ Электрон",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "3",
@@ -2017,13 +2165,13 @@
       "venue": "Дом Шрёдера",
       "sourceEventIds": "evt_6acfb55650a5e19175bfbc6a | evt_6acfb6f299696bc7a13f0f1f | evt_6acfb69167fa9aff1364d5d0",
       "sourceChars": "1404",
-      "sourceCharsExcludingPractical": "1404",
-      "rewriteChars": "1955",
-      "lengthDelta": "551",
+      "sourceCharsExcludingPractical": "1428",
+      "rewriteChars": "2098",
+      "lengthDelta": "670",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "551",
-      "substantiveParagraphs": "4",
+      "substantiveParagraphs": "5",
       "paragraphStatus": "PASS",
       "rewriteSection": "B3 #11",
       "effectiveTextSection": "B3 #11",
@@ -2031,7 +2179,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "ср, 30 дек., 19:00 Петроградская наб, дом 32. Купить билет - от 3 290 ₽ Электрон",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 3,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "3",
@@ -2044,13 +2194,13 @@
       "venue": "Кафедральный собор св. Петра и Павла (Петрикирхе)",
       "sourceEventIds": "evt_6a53fb2892d0aac5d2cca490 | evt_6ae7889d195d86b5a7519286",
       "sourceChars": "787",
-      "sourceCharsExcludingPractical": "740",
-      "rewriteChars": "990",
-      "lengthDelta": "250",
+      "sourceCharsExcludingPractical": "789",
+      "rewriteChars": "1047",
+      "lengthDelta": "258",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "203",
-      "substantiveParagraphs": "3",
+      "substantiveParagraphs": "4",
       "paragraphStatus": "PASS",
       "rewriteSection": "B3 #13",
       "effectiveTextSection": "B3 #13",
@@ -2058,7 +2208,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "пт, 25 дек., 19:00 Невский пр., 22-24 Купить билет - от 1 500 ₽ Электронный биле",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 2,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "3",
@@ -2071,9 +2223,9 @@
       "venue": "Кафедральный собор св. Петра и Павла (Петрикирхе)",
       "sourceEventIds": "evt_6aa7d0604ae3cd003551b6a0",
       "sourceChars": "787",
-      "sourceCharsExcludingPractical": "740",
+      "sourceCharsExcludingPractical": "789",
       "rewriteChars": "1386",
-      "lengthDelta": "646",
+      "lengthDelta": "597",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "599",
@@ -2085,7 +2237,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "чт, 31 дек., 20:00 Невский пр., 22-24 Купить билет - от 500 ₽ Электронный билет ",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "3",
@@ -2098,9 +2252,9 @@
       "venue": "Большой петергофский дворец",
       "sourceEventIds": "evt_6a96eea1ec517e86a79d8083",
       "sourceChars": "1385",
-      "sourceCharsExcludingPractical": "55",
+      "sourceCharsExcludingPractical": "1385",
       "rewriteChars": "1585",
-      "lengthDelta": "1530",
+      "lengthDelta": "200",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "200",
@@ -2112,7 +2266,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 31 янв., 16:00 Разводная улица, 2 Купить билет - от 5 000 ₽ Электронный биле",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "3",
@@ -2125,13 +2281,13 @@
       "venue": "Дом ученых им. Горького",
       "sourceEventIds": "evt_6a8ac8b7cc92c02cf19df6d9",
       "sourceChars": "1031",
-      "sourceCharsExcludingPractical": "19",
-      "rewriteChars": "1387",
-      "lengthDelta": "1368",
+      "sourceCharsExcludingPractical": "1029",
+      "rewriteChars": "1441",
+      "lengthDelta": "412",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "356",
-      "substantiveParagraphs": "4",
+      "substantiveParagraphs": "5",
       "paragraphStatus": "PASS",
       "rewriteSection": "B3 #9",
       "effectiveTextSection": "B3 #9",
@@ -2139,7 +2295,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "пн, 7 дек., 18:45 Дворцовая набережная, 26 Купить билет - от 3 300 ₽ Электронный",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "3",
@@ -2152,13 +2310,13 @@
       "venue": "Театр «Лунный слон»",
       "sourceEventIds": "evt_6af1a8445b80bc899a53903c | evt_6af1a8239b74209979d52413 | evt_6af1a8b3c80e72181fca85dc",
       "sourceChars": "1352",
-      "sourceCharsExcludingPractical": "1349",
-      "rewriteChars": "1589",
-      "lengthDelta": "240",
+      "sourceCharsExcludingPractical": "1352",
+      "rewriteChars": "1684",
+      "lengthDelta": "332",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "237",
-      "substantiveParagraphs": "4",
+      "substantiveParagraphs": "5",
       "paragraphStatus": "PASS",
       "rewriteSection": "B3 #16",
       "effectiveTextSection": "B3 #16",
@@ -2166,7 +2324,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "ср, 30 дек., 12:00 ул. Белинского, 9 Купить билет - от 1 200 ₽ Электронный билет",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 3,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "3",
@@ -2179,13 +2339,13 @@
       "venue": "Дом Шрёдера",
       "sourceEventIds": "evt_6a99bb010041a9d582185a6f | evt_6a99bbaeeb555248d090b45f",
       "sourceChars": "1113",
-      "sourceCharsExcludingPractical": "1056",
-      "rewriteChars": "1341",
-      "lengthDelta": "285",
+      "sourceCharsExcludingPractical": "960",
+      "rewriteChars": "1398",
+      "lengthDelta": "438",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "228",
-      "substantiveParagraphs": "4",
+      "substantiveParagraphs": "5",
       "paragraphStatus": "PASS",
       "rewriteSection": "B3 #17",
       "effectiveTextSection": "B3 #17",
@@ -2193,7 +2353,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "чт, 31 дек., 15:00 Петроградская наб, дом 32. Купить билет - от 800 ₽ Электронны",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 2,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "3",
@@ -2206,13 +2368,13 @@
       "venue": "СК МЕГА",
       "sourceEventIds": "evt_6aa913bcef7ba73604283690",
       "sourceChars": "1096",
-      "sourceCharsExcludingPractical": "955",
-      "rewriteChars": "1998",
-      "lengthDelta": "1043",
+      "sourceCharsExcludingPractical": "997",
+      "rewriteChars": "2219",
+      "lengthDelta": "1222",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "902",
-      "substantiveParagraphs": "5",
+      "substantiveParagraphs": "6",
       "paragraphStatus": "PASS",
       "rewriteSection": "B2 #3",
       "effectiveTextSection": "B2 #3",
@@ -2220,7 +2382,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вт, 5 янв., 15:00 ул. Дружбы 6А Купить билет - от 1 800 ₽ Электронный билет Посл",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "3",
@@ -2233,13 +2397,13 @@
       "venue": "Театр Нити",
       "sourceEventIds": "evt_6ae9b65859c78b23fd6a30a9 | evt_6ae9b6904bc9f9ef14a2f17a | evt_6ae9b5ed4bc9f9ef14a2f141 | evt_6ae9b6775289e7dabc04d7c4 | evt_6ae9b6bc5af89e676f4a75b8 | evt_6ae9b6aaa7d88e7be7beca96 | evt_6ae9b6315af89e676f4a7572",
       "sourceChars": "1370",
-      "sourceCharsExcludingPractical": "1370",
-      "rewriteChars": "1868",
-      "lengthDelta": "498",
+      "sourceCharsExcludingPractical": "1371",
+      "rewriteChars": "2135",
+      "lengthDelta": "764",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "498",
-      "substantiveParagraphs": "4",
+      "substantiveParagraphs": "5",
       "paragraphStatus": "PASS",
       "rewriteSection": "B3 #18",
       "effectiveTextSection": "B3 #18",
@@ -2247,7 +2411,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вт, 29 дек., 20:00 ул. Кадетская лин. ВО, 5 2д Купить билет - от 2 000 ₽ Электро",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 7,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "3",
@@ -2260,9 +2426,9 @@
       "venue": "Кафедральный собор св. Петра и Павла (Петрикирхе)",
       "sourceEventIds": "evt_6aa6a213b09ca464f09a7fcc",
       "sourceChars": "706",
-      "sourceCharsExcludingPractical": "706",
+      "sourceCharsExcludingPractical": "705",
       "rewriteChars": "992",
-      "lengthDelta": "286",
+      "lengthDelta": "287",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "286",
@@ -2274,7 +2440,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "пт, 25 дек., 21:00 Невский пр., 22-24 Купить билет - от 500 ₽ Электронный билет ",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "3",
@@ -2287,13 +2455,13 @@
       "venue": "Omega Tsvetnoy Rooftop",
       "sourceEventIds": "evt_6a9ace01a1e29103a6f66749",
       "sourceChars": "310",
-      "sourceCharsExcludingPractical": "297",
-      "rewriteChars": "1568",
-      "lengthDelta": "1271",
+      "sourceCharsExcludingPractical": "0",
+      "rewriteChars": "1605",
+      "lengthDelta": "1605",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "1258",
-      "substantiveParagraphs": "2",
+      "substantiveParagraphs": "3",
       "paragraphStatus": "PASS",
       "rewriteSection": "B3 #20",
       "effectiveTextSection": "B2 #5",
@@ -2301,7 +2469,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "пн, 4 янв., 17:00 Цветной бульвар, дом 15, строение 1 Купить билет - от 2 000 ₽ ",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "3",
@@ -2314,13 +2484,13 @@
       "venue": "Omega Tsvetnoy Rooftop",
       "sourceEventIds": "evt_6ac560fe9d58384a98a7b148",
       "sourceChars": "308",
-      "sourceCharsExcludingPractical": "308",
-      "rewriteChars": "1545",
-      "lengthDelta": "1237",
+      "sourceCharsExcludingPractical": "902",
+      "rewriteChars": "1582",
+      "lengthDelta": "680",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "1237",
-      "substantiveParagraphs": "2",
+      "substantiveParagraphs": "3",
       "paragraphStatus": "PASS",
       "rewriteSection": "B3 #21",
       "effectiveTextSection": "B2 #8",
@@ -2328,7 +2498,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 3 янв., 21:00 Цветной бульвар, дом 15, строение 1 Купить билет - от 2 800 ₽ ",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "3",
@@ -2341,13 +2513,13 @@
       "venue": "Smoke Dog",
       "sourceEventIds": "evt_6aaa6fbcf81f76620ee5f46e",
       "sourceChars": "988",
-      "sourceCharsExcludingPractical": "988",
-      "rewriteChars": "1898",
-      "lengthDelta": "910",
+      "sourceCharsExcludingPractical": "1111",
+      "rewriteChars": "1952",
+      "lengthDelta": "841",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "910",
-      "substantiveParagraphs": "5",
+      "substantiveParagraphs": "6",
       "paragraphStatus": "PASS",
       "rewriteSection": "B3 #8",
       "effectiveTextSection": "B3 #8",
@@ -2355,7 +2527,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 13 дек., 16:00 Холодильный пер., 3 строение 2 Купить билет - от 1 500 ₽ Элек",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "3",
@@ -2368,13 +2542,13 @@
       "venue": "Театр для детей \"Малышок\" (пр.Искровский пр.д22. кор.А)",
       "sourceEventIds": "evt_6ace791727dfc834a13d78e0 | evt_6ace797727dfc834a13d7909",
       "sourceChars": "1253",
-      "sourceCharsExcludingPractical": "749",
-      "rewriteChars": "1042",
-      "lengthDelta": "293",
+      "sourceCharsExcludingPractical": "1142",
+      "rewriteChars": "1597",
+      "lengthDelta": "455",
       "lengthStatus": "PASS",
       "rawLengthStatus": "RAW_INCLUDES_PRACTICAL_ORIGINAL",
       "rawLengthDelta": "-211",
-      "substantiveParagraphs": "3",
+      "substantiveParagraphs": "4",
       "paragraphStatus": "PASS",
       "rewriteSection": "B3 #22",
       "effectiveTextSection": "B3 #22",
@@ -2382,7 +2556,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "чт, 31 дек., 11:15 пр. Искровский д.22 кор.А (15 мин.пешком от м.Дыбенко) Купить",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "PARTIALLY_APPLIED_ACTIVE_PAGES_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 1
     },
     {
       "batch": "3",
@@ -2395,9 +2571,9 @@
       "venue": "Большой петергофский дворец",
       "sourceEventIds": "evt_6a96ed307beeae8a55afa41b",
       "sourceChars": "1246",
-      "sourceCharsExcludingPractical": "1246",
+      "sourceCharsExcludingPractical": "1252",
       "rewriteChars": "2286",
-      "lengthDelta": "1040",
+      "lengthDelta": "1034",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "1040",
@@ -2409,7 +2585,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 24 янв., 16:00 Разводная улица, 2 Купить билет - от 5 000 ₽ Электронный биле",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "3",
@@ -2422,13 +2600,13 @@
       "venue": "Кибердом",
       "sourceEventIds": "evt_6a7da8a83a3959f3b8fe663e | evt_6a7da8713a3959f3b8fe6626 | evt_6a7da8d12193a7a9db43be09",
       "sourceChars": "1105",
-      "sourceCharsExcludingPractical": "1046",
-      "rewriteChars": "1257",
-      "lengthDelta": "211",
+      "sourceCharsExcludingPractical": "1055",
+      "rewriteChars": "1427",
+      "lengthDelta": "372",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "152",
-      "substantiveParagraphs": "3",
+      "substantiveParagraphs": "4",
       "paragraphStatus": "PASS",
       "rewriteSection": "B3 #24",
       "effectiveTextSection": "B3 #24",
@@ -2436,7 +2614,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 27 дек., 12:00 2-я Звенигородская ул., 12, стр.18 Купить билет - от 3 500 ₽ ",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 3,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "4",
@@ -2449,13 +2629,13 @@
       "venue": "Omega Tsvetnoy Rooftop",
       "sourceEventIds": "evt_6a9aca5761eac99b2ab6ce64",
       "sourceChars": "218",
-      "sourceCharsExcludingPractical": "218",
-      "rewriteChars": "1568",
-      "lengthDelta": "1350",
+      "sourceCharsExcludingPractical": "0",
+      "rewriteChars": "1605",
+      "lengthDelta": "1605",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "1350",
-      "substantiveParagraphs": "2",
+      "substantiveParagraphs": "3",
       "paragraphStatus": "PASS",
       "rewriteSection": "B4 #26",
       "effectiveTextSection": "B2 #5",
@@ -2463,7 +2643,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 3 янв., 17:00 Цветной бульвар, дом 15, строение 1 Купить билет - от 2 000 ₽ ",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "4",
@@ -2476,9 +2658,9 @@
       "venue": "Корстон «Бальный зал»",
       "sourceEventIds": "evt_6abd2e9bc5665bcf505aead5 | evt_6abd2f7a1a2a46bf8df71da5 | evt_6abd2f4217588bb013acfff5",
       "sourceChars": "1198",
-      "sourceCharsExcludingPractical": "406",
+      "sourceCharsExcludingPractical": "1113",
       "rewriteChars": "1409",
-      "lengthDelta": "1003",
+      "lengthDelta": "296",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "211",
@@ -2490,7 +2672,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "сб, 2 янв., 13:00 ул. Николая Ершова, 1А Купить билет - от 799 ₽ Электронный бил",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 3,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "4",
@@ -2503,13 +2687,13 @@
       "venue": "Кибердом",
       "sourceEventIds": "evt_6a7da6d52a2b81921086f67e",
       "sourceChars": "1050",
-      "sourceCharsExcludingPractical": "1050",
-      "rewriteChars": "1257",
-      "lengthDelta": "207",
+      "sourceCharsExcludingPractical": "1055",
+      "rewriteChars": "1427",
+      "lengthDelta": "372",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "207",
-      "substantiveParagraphs": "3",
+      "substantiveParagraphs": "4",
       "paragraphStatus": "PASS",
       "rewriteSection": "B4 #27",
       "effectiveTextSection": "B3 #24",
@@ -2517,7 +2701,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "сб, 26 дек., 12:00 2-я Звенигородская ул., 12, стр.18 Купить билет - от 3 500 ₽ ",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "4",
@@ -2530,9 +2716,9 @@
       "venue": "Gamma More",
       "sourceEventIds": "evt_6ad7252d5c28832a472c73f9",
       "sourceChars": "1047",
-      "sourceCharsExcludingPractical": "1047",
+      "sourceCharsExcludingPractical": "1178",
       "rewriteChars": "1296",
-      "lengthDelta": "249",
+      "lengthDelta": "118",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "249",
@@ -2544,7 +2730,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "сб, 26 дек., 19:00 ул. Большая Сухаревская пл., 14/7 Купить билет - от 1 500 ₽ Э",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "4",
@@ -2557,9 +2745,9 @@
       "venue": "Gamma More",
       "sourceEventIds": "evt_6ae862a440e64b6ac36f9809 | evt_6ae861df491ac982f548e86f",
       "sourceChars": "1035",
-      "sourceCharsExcludingPractical": "1035",
+      "sourceCharsExcludingPractical": "1043",
       "rewriteChars": "1049",
-      "lengthDelta": "14",
+      "lengthDelta": "6",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "14",
@@ -2571,7 +2759,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "чт, 7 янв., 22:00 ул. Большая Сухаревская пл., 14/7 Купить билет - от 1 500 ₽ Эл",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 2,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "4",
@@ -2584,13 +2774,13 @@
       "venue": "Театр для детей \"Малышок\" (пр.Искровский пр.д22. кор.А)",
       "sourceEventIds": "evt_6ace77b8feff2d587e4745ce",
       "sourceChars": "1140",
-      "sourceCharsExcludingPractical": "747",
-      "rewriteChars": "1042",
-      "lengthDelta": "295",
+      "sourceCharsExcludingPractical": "1142",
+      "rewriteChars": "1597",
+      "lengthDelta": "455",
       "lengthStatus": "PASS",
       "rawLengthStatus": "RAW_INCLUDES_PRACTICAL_ORIGINAL",
       "rawLengthDelta": "-98",
-      "substantiveParagraphs": "3",
+      "substantiveParagraphs": "4",
       "paragraphStatus": "PASS",
       "rewriteSection": "B4 #4",
       "effectiveTextSection": "B3 #22",
@@ -2598,7 +2788,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "чт, 31 дек., 10:00 пр. Искровский д.22 кор.А (15 мин.пешком от м.Дыбенко) Купить",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "4",
@@ -2611,9 +2803,9 @@
       "venue": "Корстон «Бальный зал»",
       "sourceEventIds": "evt_6ad531616c917e2db359deb1",
       "sourceChars": "1110",
-      "sourceCharsExcludingPractical": "378",
+      "sourceCharsExcludingPractical": "1112",
       "rewriteChars": "1409",
-      "lengthDelta": "1031",
+      "lengthDelta": "297",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "299",
@@ -2625,7 +2817,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "SKIPPED_NO_ACTIVE_SALE",
+      "appliedEventPages": 0,
+      "skippedNoSaleEventPages": 1
     },
     {
       "batch": "4",
@@ -2638,9 +2832,9 @@
       "venue": "Корстон «Бальный зал»",
       "sourceEventIds": "evt_6abd2d7e1a2a46bf8df71d32",
       "sourceChars": "1106",
-      "sourceCharsExcludingPractical": "408",
+      "sourceCharsExcludingPractical": "1112",
       "rewriteChars": "1409",
-      "lengthDelta": "1001",
+      "lengthDelta": "297",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "303",
@@ -2652,7 +2846,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 27 дек., 10:00 ул. Николая Ершова, 1А Купить билет - от 799 ₽ Электронный би",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "SKIPPED_NO_ACTIVE_SALE",
+      "appliedEventPages": 0,
+      "skippedNoSaleEventPages": 1
     },
     {
       "batch": "4",
@@ -2665,9 +2861,9 @@
       "venue": "Кафедральный собор св. Петра и Павла (Петрикирхе)",
       "sourceEventIds": "evt_6ae795478bf998c419518d56",
       "sourceChars": "704",
-      "sourceCharsExcludingPractical": "647",
+      "sourceCharsExcludingPractical": "744",
       "rewriteChars": "1010",
-      "lengthDelta": "363",
+      "lengthDelta": "266",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "306",
@@ -2679,7 +2875,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "пт, 1 янв., 21:00 Невский пр., 22-24 Купить билет - от 2 500 ₽ Электронный билет",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "4",
@@ -2692,9 +2890,9 @@
       "venue": "Родня",
       "sourceEventIds": "evt_6ae72eade6ead336d5fffb0c",
       "sourceChars": "860",
-      "sourceCharsExcludingPractical": "859",
+      "sourceCharsExcludingPractical": "0",
       "rewriteChars": "920",
-      "lengthDelta": "61",
+      "lengthDelta": "920",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "60",
@@ -2706,7 +2904,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "сб, 9 янв., 19:00 ул. Грузинский Вал, 11, стр. 3 Купить билет - от 4 940 ₽ Элект",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "4",
@@ -2733,7 +2933,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 3 янв., 18:00 Невский пр., 39 Д Купить билет - от 2 300 ₽ Электронный билет ",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "4",
@@ -2746,9 +2948,9 @@
       "venue": "Корстон «Бальный зал»",
       "sourceEventIds": "evt_6ad8696cc03aecba973cfb8f",
       "sourceChars": "987",
-      "sourceCharsExcludingPractical": "364",
+      "sourceCharsExcludingPractical": "988",
       "rewriteChars": "1240",
-      "lengthDelta": "876",
+      "lengthDelta": "252",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "253",
@@ -2760,7 +2962,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 20 дек., 16:00 ул. Николая Ершова, 1А Купить билет - от 799 ₽ Электронный би",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "4",
@@ -2773,9 +2977,9 @@
       "venue": "Арт-пространство Люмьер Холл",
       "sourceEventIds": "evt_6abb8a9defab4d2e6095e2ce",
       "sourceChars": "913",
-      "sourceCharsExcludingPractical": "913",
+      "sourceCharsExcludingPractical": "916",
       "rewriteChars": "951",
-      "lengthDelta": "38",
+      "lengthDelta": "35",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "38",
@@ -2787,7 +2991,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "чт, 7 янв., 21:00 Берсеневский пер., д. 2, стр. 1 Купить билет - от 1 300 ₽ Элек",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "4",
@@ -2800,9 +3006,9 @@
       "venue": "Дом Шрёдера",
       "sourceEventIds": "evt_6abe92848577d3fec571c3e5 | evt_6abe93f38834b36ac4fba010",
       "sourceChars": "748",
-      "sourceCharsExcludingPractical": "748",
+      "sourceCharsExcludingPractical": "676",
       "rewriteChars": "892",
-      "lengthDelta": "144",
+      "lengthDelta": "216",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "144",
@@ -2814,7 +3020,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "пн, 14 дек., 19:00 Петроградская наб, дом 32. Купить билет - от 600 ₽ Электронны",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 2,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "4",
@@ -2827,9 +3035,9 @@
       "venue": "Корстон «Бальный зал»",
       "sourceEventIds": "evt_6abd3115bca4a074ce820f56",
       "sourceChars": "898",
-      "sourceCharsExcludingPractical": "367",
+      "sourceCharsExcludingPractical": "988",
       "rewriteChars": "1240",
-      "lengthDelta": "873",
+      "lengthDelta": "252",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "342",
@@ -2841,7 +3049,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 3 янв., 16:00 ул. Николая Ершова, 1А Купить билет - от 799 ₽ Электронный бил",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "4",
@@ -2854,9 +3064,9 @@
       "venue": "Дом Шрёдера",
       "sourceEventIds": "evt_6af0b04ea167c9868a7d1e72 | evt_6af0a1ca6993eb851038f8cd",
       "sourceChars": "792",
-      "sourceCharsExcludingPractical": "792",
+      "sourceCharsExcludingPractical": "793",
       "rewriteChars": "899",
-      "lengthDelta": "107",
+      "lengthDelta": "106",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "107",
@@ -2868,7 +3078,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "сб, 26 дек., 11:00 Петроградская наб, дом 32. Купить билет - от 250 ₽ Электронны",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 2,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "4",
@@ -2881,9 +3093,9 @@
       "venue": "Театрально-концертный комплекс \"Карнавал\"///CARNIVAL CONCERT HALL (Anichkov Palace)",
       "sourceEventIds": "evt_6a91b093a9049cc0a1861915",
       "sourceChars": "263",
-      "sourceCharsExcludingPractical": "263",
+      "sourceCharsExcludingPractical": "125",
       "rewriteChars": "997",
-      "lengthDelta": "734",
+      "lengthDelta": "872",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "734",
@@ -2895,7 +3107,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "ср, 6 янв., 18:00 Невский пр., 39 Д Купить билет - от 2 300 ₽ Электронный билет ",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "4",
@@ -2922,7 +3136,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 13 дек., 19:30 ул. Орджоникидзе, 1 Купить билет - от 1 000 ₽ Электронный бил",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "4",
@@ -2949,7 +3165,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "чт, 31 дек., 17:00 ул. Восстания, 45 Купить билет - от 3 500 ₽ Электронный билет",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 7,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "4",
@@ -2962,9 +3180,9 @@
       "venue": "Государственный Эрмитаж (Зимний дворец)",
       "sourceEventIds": "evt_6a8954f18736a0ef2ddcfc83",
       "sourceChars": "743",
-      "sourceCharsExcludingPractical": "743",
+      "sourceCharsExcludingPractical": "756",
       "rewriteChars": "1022",
-      "lengthDelta": "279",
+      "lengthDelta": "266",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "279",
@@ -2976,7 +3194,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "4",
@@ -3003,7 +3223,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 29 нояб., 12:00 Нижняя Красносельская улица, 35, стр. 2 Купить билет - от 2 ",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "4",
@@ -3016,9 +3238,9 @@
       "venue": "Дом Шрёдера",
       "sourceEventIds": "evt_6a9c396dd29c8747064d42ff | evt_6a9c32a153813fef6b58ef79",
       "sourceChars": "541",
-      "sourceCharsExcludingPractical": "541",
+      "sourceCharsExcludingPractical": "861",
       "rewriteChars": "875",
-      "lengthDelta": "334",
+      "lengthDelta": "14",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "334",
@@ -3030,7 +3252,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "пн, 4 янв., 15:00 Петроградская наб, дом 32. Купить билет - от 1 570 ₽ Электронн",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 2,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "4",
@@ -3043,9 +3267,9 @@
       "venue": "Арт-пространство Люмьер Холл",
       "sourceEventIds": "evt_6abe56a4613d44f0c7e10d47 | evt_6abb9207907982da560eeb41",
       "sourceChars": "644",
-      "sourceCharsExcludingPractical": "563",
+      "sourceCharsExcludingPractical": "565",
       "rewriteChars": "850",
-      "lengthDelta": "287",
+      "lengthDelta": "285",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "206",
@@ -3057,7 +3281,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "сб, 26 дек., 12:00 Берсеневский пер., д. 2, стр. 1 Купить билет - от 4 000 ₽ Эле",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 2,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "4",
@@ -3070,9 +3296,9 @@
       "venue": "Интерактивити Парк ГуголBoom, Масленникова 134",
       "sourceEventIds": "evt_6ad3448125a31c90fca3e00c | evt_6ad34360603bbb9776a5d492 | evt_6ad3436ea8c984c7b2a0df67 | evt_6ad34460599ce972d1b6ae10 | evt_6ad3433730f9194eda011005 | evt_6ad34383775c66a5a971302f | evt_6ad343e9f8e4a6afc6378ffe | evt_6ad343faf8e4a6afc6379004 | evt_6ad3448ff8e4a6afc637905b | evt_6ad343dcd92a96f6c48cdb0f | evt_6ad342f432df40e7cff71680 | evt_6ad344729f2b4e6801988974",
       "sourceChars": "628",
-      "sourceCharsExcludingPractical": "555",
+      "sourceCharsExcludingPractical": "631",
       "rewriteChars": "952",
-      "lengthDelta": "397",
+      "lengthDelta": "321",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "324",
@@ -3084,7 +3310,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вт, 5 янв., 11:00 Масленникова 134, 4 этаж, Интерактивити Парк Гугол_Boom Купить",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 12,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "4",
@@ -3097,9 +3325,9 @@
       "venue": "ТРК Маяк Молл, 3 этаж, Интерактивити Парк ГУГОЛ_BOOM",
       "sourceEventIds": "evt_6ad33f9f32df40e7cff71606 | evt_6ad33facd92a96f6c48cda52 | evt_6ad33fbe762dcee1b6166c56 | evt_6ad3407c085f87159ad0cf33 | evt_6ad33f0e085f87159ad0cf1c | evt_6ad33f4635fc71fe924269b5 | evt_6ad33f5acc4ddd4943c1b3fa | evt_6ad34065f8e4a6afc6378f3e | evt_6ad3403e9f3fe8a244ae3cd6 | evt_6ad33f85762dcee1b6166c4c | evt_6ad3408d775c66a5a9712f6d",
       "sourceChars": "624",
-      "sourceCharsExcludingPractical": "555",
+      "sourceCharsExcludingPractical": "627",
       "rewriteChars": "952",
-      "lengthDelta": "397",
+      "lengthDelta": "325",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "328",
@@ -3111,7 +3339,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "чт, 24 дек., 11:00 ул. Комарова, 6/1 Купить билет - от 1 900 ₽ Электронный билет",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 11,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "4",
@@ -3138,7 +3368,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 20 дек., 13:00 ул. Восстания, 45 Купить билет - от 8 000 ₽ Электронный билет",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "PARTIALLY_APPLIED_ACTIVE_PAGES_INDEXABLE",
+      "appliedEventPages": 3,
+      "skippedNoSaleEventPages": 1
     },
     {
       "batch": "4",
@@ -3165,7 +3397,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "пн, 28 дек., 19:00 ул. Карла Маркса, 48/1 Купить билет - от 2 100 ₽ Электронный ",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 6,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "4",
@@ -3192,7 +3426,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "сб, 26 дек., 12:00 набережная Обводного канала, дом 181 Купить билет - от 800 ₽ ",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "4",
@@ -3219,7 +3455,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вт, 5 янв., 19:00 Почаинская улица, 17С Купить билет - от 1 500 ₽ Электронный би",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "4",
@@ -3246,7 +3484,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "ср, 6 янв., 15:00 ул. Васильевский остров, 3-я линия, дом 20, кв. 8 Купить билет",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 6,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "5",
@@ -3259,9 +3499,9 @@
       "venue": "Арт-пространство Люмьер Холл",
       "sourceEventIds": "evt_6ad6fd63e913eddb59e3cd2b",
       "sourceChars": "513",
-      "sourceCharsExcludingPractical": "511",
-      "rewriteChars": "967",
-      "lengthDelta": "456",
+      "sourceCharsExcludingPractical": "513",
+      "rewriteChars": "819",
+      "lengthDelta": "306",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "454",
@@ -3273,7 +3513,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 27 дек., 12:00 Берсеневский пер., д. 2, стр. 1 Купить билет - от 4 000 ₽ Эле",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "5",
@@ -3286,9 +3528,9 @@
       "venue": "Музей Гарри Поттера - Хогвартс Холл",
       "sourceEventIds": "evt_6ac11431dbf568e3b6f958e4",
       "sourceChars": "452",
-      "sourceCharsExcludingPractical": "362",
-      "rewriteChars": "954",
-      "lengthDelta": "592",
+      "sourceCharsExcludingPractical": "1155",
+      "rewriteChars": "1183",
+      "lengthDelta": "28",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "502",
@@ -3300,7 +3542,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "сб, 26 дек., 11:00 ул. Орджоникидзе, 47 Купить билет - от 990 ₽ Электронный биле",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "5",
@@ -3313,9 +3557,9 @@
       "venue": "Агентство креативных индустрий",
       "sourceEventIds": "evt_6abf5f4d1641acab8e8ad46a",
       "sourceChars": "476",
-      "sourceCharsExcludingPractical": "476",
-      "rewriteChars": "931",
-      "lengthDelta": "455",
+      "sourceCharsExcludingPractical": "530",
+      "rewriteChars": "781",
+      "lengthDelta": "251",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "455",
@@ -3327,7 +3571,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вт, 8 дек., 19:00 Улица Большая Никитская, 17с2 Купить билет - от 6 250 ₽ Электр",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "5",
@@ -3341,8 +3587,8 @@
       "sourceEventIds": "evt_6af2f60134132f0b45358617",
       "sourceChars": "476",
       "sourceCharsExcludingPractical": "476",
-      "rewriteChars": "935",
-      "lengthDelta": "459",
+      "rewriteChars": "821",
+      "lengthDelta": "345",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "459",
@@ -3354,7 +3600,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "пт, 25 дек., 19:00 ул. Ленинградская, 77 Купить билет - от 800 ₽ Электронный бил",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "5",
@@ -3368,8 +3616,8 @@
       "sourceEventIds": "evt_6af2f82434132f0b453586da",
       "sourceChars": "476",
       "sourceCharsExcludingPractical": "476",
-      "rewriteChars": "937",
-      "lengthDelta": "461",
+      "rewriteChars": "818",
+      "lengthDelta": "342",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "461",
@@ -3381,7 +3629,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "ср, 30 дек., 19:00 Волжский проспект, 12 Купить билет - от 800 ₽ Электронный бил",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "5",
@@ -3395,8 +3645,8 @@
       "sourceEventIds": "evt_6af2f3fee02f9c37dc47f8d6",
       "sourceChars": "476",
       "sourceCharsExcludingPractical": "476",
-      "rewriteChars": "816",
-      "lengthDelta": "340",
+      "rewriteChars": "702",
+      "lengthDelta": "226",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "340",
@@ -3408,7 +3658,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "пт, 18 дек., 19:00 ул. Ленинградская, 77 Купить билет - от 800 ₽ Электронный бил",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "5",
@@ -3422,8 +3674,8 @@
       "sourceEventIds": "evt_6af2f5bd92e73173dfed623c",
       "sourceChars": "476",
       "sourceCharsExcludingPractical": "476",
-      "rewriteChars": "896",
-      "lengthDelta": "420",
+      "rewriteChars": "781",
+      "lengthDelta": "305",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "420",
@@ -3435,7 +3687,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "пт, 25 дек., 19:00 Лесная 23, корп 3 Купить билет - от 800 ₽ Электронный билет П",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "5",
@@ -3449,8 +3703,8 @@
       "sourceEventIds": "evt_6af2f79034132f0b453586d2",
       "sourceChars": "476",
       "sourceCharsExcludingPractical": "476",
-      "rewriteChars": "828",
-      "lengthDelta": "352",
+      "rewriteChars": "707",
+      "lengthDelta": "231",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "352",
@@ -3462,7 +3716,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "пн, 28 дек., 19:00 ул. Авроры 154 Купить билет - от 800 ₽ Электронный билет Посл",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "5",
@@ -3475,9 +3731,9 @@
       "venue": "Отель \"Националь\" / зал \"Московский\"",
       "sourceEventIds": "evt_6ae9f3f0e73656c718234d58",
       "sourceChars": "1161",
-      "sourceCharsExcludingPractical": "1078",
-      "rewriteChars": "1661",
-      "lengthDelta": "583",
+      "sourceCharsExcludingPractical": "1124",
+      "rewriteChars": "1431",
+      "lengthDelta": "307",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "500",
@@ -3489,7 +3745,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 29 нояб., 20:00 Моховая улица, 15/1 строение 1 Купить билет - от 5 500 ₽ Эле",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "5",
@@ -3503,12 +3761,12 @@
       "sourceEventIds": "evt_6ad9e811d6e589090cbc7457",
       "sourceChars": "303",
       "sourceCharsExcludingPractical": "303",
-      "rewriteChars": "918",
-      "lengthDelta": "615",
+      "rewriteChars": "807",
+      "lengthDelta": "504",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "615",
-      "substantiveParagraphs": "2",
+      "substantiveParagraphs": "3",
       "paragraphStatus": "PASS",
       "rewriteSection": "B5 #10",
       "effectiveTextSection": "B5 #10",
@@ -3516,7 +3774,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "сб, 19 дек., 11:00 ул. Букирева, 15 Купить билет - от 3 190 ₽ Электронный билет ",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "5",
@@ -3530,12 +3790,12 @@
       "sourceEventIds": "evt_6ad9e92ffaebe3c8820df584",
       "sourceChars": "303",
       "sourceCharsExcludingPractical": "303",
-      "rewriteChars": "918",
-      "lengthDelta": "615",
+      "rewriteChars": "807",
+      "lengthDelta": "504",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "615",
-      "substantiveParagraphs": "2",
+      "substantiveParagraphs": "3",
       "paragraphStatus": "PASS",
       "rewriteSection": "B5 #11",
       "effectiveTextSection": "B5 #10",
@@ -3543,7 +3803,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "сб, 19 дек., 14:00 ул. Букирева, 15 Купить билет - от 3 190 ₽ Электронный билет ",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "5",
@@ -3557,12 +3819,12 @@
       "sourceEventIds": "evt_6ad9ea143e73a5c5c5af6bfa",
       "sourceChars": "303",
       "sourceCharsExcludingPractical": "303",
-      "rewriteChars": "918",
-      "lengthDelta": "615",
+      "rewriteChars": "807",
+      "lengthDelta": "504",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "615",
-      "substantiveParagraphs": "2",
+      "substantiveParagraphs": "3",
       "paragraphStatus": "PASS",
       "rewriteSection": "B5 #12",
       "effectiveTextSection": "B5 #10",
@@ -3570,7 +3832,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "сб, 19 дек., 17:00 ул. Букирева, 15 Купить билет - от 3 190 ₽ Электронный билет ",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "5",
@@ -3584,12 +3848,12 @@
       "sourceEventIds": "evt_6ad9ea8c32d088bf69a99a37",
       "sourceChars": "303",
       "sourceCharsExcludingPractical": "303",
-      "rewriteChars": "918",
-      "lengthDelta": "615",
+      "rewriteChars": "807",
+      "lengthDelta": "504",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "615",
-      "substantiveParagraphs": "2",
+      "substantiveParagraphs": "3",
       "paragraphStatus": "PASS",
       "rewriteSection": "B5 #13",
       "effectiveTextSection": "B5 #10",
@@ -3597,7 +3861,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 20 дек., 11:00 ул. Букирева, 15 Купить билет - от 3 190 ₽ Электронный билет ",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "5",
@@ -3611,12 +3877,12 @@
       "sourceEventIds": "evt_6ad9eb1aabe8723d8e40cffc",
       "sourceChars": "303",
       "sourceCharsExcludingPractical": "303",
-      "rewriteChars": "918",
-      "lengthDelta": "615",
+      "rewriteChars": "807",
+      "lengthDelta": "504",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "615",
-      "substantiveParagraphs": "2",
+      "substantiveParagraphs": "3",
       "paragraphStatus": "PASS",
       "rewriteSection": "B5 #14",
       "effectiveTextSection": "B5 #10",
@@ -3624,7 +3890,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 20 дек., 14:00 ул. Букирева, 15 Купить билет - от 3 190 ₽ Электронный билет ",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "5",
@@ -3638,12 +3906,12 @@
       "sourceEventIds": "evt_6ad9eb94db844e1e04399795",
       "sourceChars": "303",
       "sourceCharsExcludingPractical": "303",
-      "rewriteChars": "918",
-      "lengthDelta": "615",
+      "rewriteChars": "807",
+      "lengthDelta": "504",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "615",
-      "substantiveParagraphs": "2",
+      "substantiveParagraphs": "3",
       "paragraphStatus": "PASS",
       "rewriteSection": "B5 #15",
       "effectiveTextSection": "B5 #10",
@@ -3651,7 +3919,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 20 дек., 17:00 ул. Букирева, 15 Купить билет - от 3 190 ₽ Электронный билет ",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "5",
@@ -3665,12 +3935,12 @@
       "sourceEventIds": "evt_6aeb36c75933667bf6d9b720 | evt_6aeb36ed7901ea9371c8bc9c | evt_6aeb1a0397c401084c7c8e27 | evt_6aeb372006c766010de5673e",
       "sourceChars": "196",
       "sourceCharsExcludingPractical": "196",
-      "rewriteChars": "857",
-      "lengthDelta": "661",
+      "rewriteChars": "731",
+      "lengthDelta": "535",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "661",
-      "substantiveParagraphs": "2",
+      "substantiveParagraphs": "3",
       "paragraphStatus": "PASS",
       "rewriteSection": "B5 #16",
       "effectiveTextSection": "B5 #16",
@@ -3678,7 +3948,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "ср, 30 дек., 11:00 ул. Глазунова, д. 9 (заезд с ул.Глазунова 22) Купить билет - ",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 4,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "5",
@@ -3691,13 +3963,13 @@
       "venue": "Театр Николая Захарова",
       "sourceEventIds": "evt_6aeb37868e5da406024a49ca | evt_6aeb37988e5da406024a4a23 | evt_6aeb376a6f7116506323dda9",
       "sourceChars": "177",
-      "sourceCharsExcludingPractical": "177",
-      "rewriteChars": "918",
-      "lengthDelta": "741",
+      "sourceCharsExcludingPractical": "210",
+      "rewriteChars": "772",
+      "lengthDelta": "562",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "741",
-      "substantiveParagraphs": "2",
+      "substantiveParagraphs": "3",
       "paragraphStatus": "PASS",
       "rewriteSection": "B5 #17",
       "effectiveTextSection": "B5 #17",
@@ -3705,7 +3977,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вт, 5 янв., 13:30 ул. Глазунова, д. 9 (заезд с ул.Глазунова 22) Купить билет - о",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 3,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "5",
@@ -3718,9 +3992,9 @@
       "venue": "Хогвартс Холл",
       "sourceEventIds": "evt_6ac8def43ee2b2dc815813e3",
       "sourceChars": "233",
-      "sourceCharsExcludingPractical": "233",
-      "rewriteChars": "791",
-      "lengthDelta": "558",
+      "sourceCharsExcludingPractical": "1155",
+      "rewriteChars": "1183",
+      "lengthDelta": "28",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "558",
@@ -3732,7 +4006,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "сб, 26 дек., 11:00 улица Белинского, 8 Купить билет - от 990 ₽ Электронный билет",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "5",
@@ -3746,12 +4022,12 @@
       "sourceEventIds": "evt_6af05101808ef8598cb832de | evt_6af04f051a5b1eb4d8965a5d | evt_6af052fb808ef8598cb83368",
       "sourceChars": "200",
       "sourceCharsExcludingPractical": "200",
-      "rewriteChars": "891",
-      "lengthDelta": "691",
+      "rewriteChars": "761",
+      "lengthDelta": "561",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "691",
-      "substantiveParagraphs": "2",
+      "substantiveParagraphs": "3",
       "paragraphStatus": "PASS",
       "rewriteSection": "B5 #19",
       "effectiveTextSection": "B5 #19",
@@ -3759,7 +4035,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "пн, 4 янв., 16:30 Альпийская улица, 7 Купить билет - от 1 500 ₽ Электронный биле",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 3,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "5",
@@ -3773,8 +4051,8 @@
       "sourceEventIds": "evt_6adfd300ca37d07d5ce3f971",
       "sourceChars": "217",
       "sourceCharsExcludingPractical": "217",
-      "rewriteChars": "807",
-      "lengthDelta": "590",
+      "rewriteChars": "638",
+      "lengthDelta": "421",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "590",
@@ -3786,7 +4064,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "сб, 21 нояб., 19:30 ул. Рождественская, 10 Купить билет - от 900 ₽ Электронный б",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "5",
@@ -3799,9 +4079,9 @@
       "venue": "Государственный Эрмитаж (Зимний дворец)",
       "sourceEventIds": "evt_6a9d39326c5c585c183d2a37",
       "sourceChars": "2450",
-      "sourceCharsExcludingPractical": "2450",
-      "rewriteChars": "2834",
-      "lengthDelta": "384",
+      "sourceCharsExcludingPractical": "2479",
+      "rewriteChars": "2602",
+      "lengthDelta": "123",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "384",
@@ -3813,7 +4093,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "пн, 8 февр., 19:00 Дворцовая наб., 34 Купить билет - от 5 000 ₽ Электронный биле",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "5",
@@ -3826,9 +4108,9 @@
       "venue": "Особняк Матильды Кшесинской",
       "sourceEventIds": "evt_6a45239780fe8d5f2b179445",
       "sourceChars": "1132",
-      "sourceCharsExcludingPractical": "1045",
-      "rewriteChars": "1475",
-      "lengthDelta": "430",
+      "sourceCharsExcludingPractical": "983",
+      "rewriteChars": "1288",
+      "lengthDelta": "305",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "343",
@@ -3840,7 +4122,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "сб, 28 нояб., 19:00 ул. Куйбышева, 2-4 Купить билет - от 2 500 ₽ Электронный бил",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "5",
@@ -3853,9 +4137,9 @@
       "venue": "Музыкальный салон «Классика без границ»",
       "sourceEventIds": "evt_6a6cc2ce767009278945762e",
       "sourceChars": "1872",
-      "sourceCharsExcludingPractical": "1872",
-      "rewriteChars": "2686",
-      "lengthDelta": "814",
+      "sourceCharsExcludingPractical": "1263",
+      "rewriteChars": "2397",
+      "lengthDelta": "1134",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "814",
@@ -3867,7 +4151,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "пн, 8 мар., 15:00 ул. Казанская ул, 7 литера В, оф. 208 Купить билет - от 1 800 ",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "5",
@@ -3880,13 +4166,13 @@
       "venue": "Дом Шрёдера",
       "sourceEventIds": "evt_6a846124a39acf0bbbfe1791",
       "sourceChars": "1556",
-      "sourceCharsExcludingPractical": "1375",
-      "rewriteChars": "1673",
-      "lengthDelta": "298",
+      "sourceCharsExcludingPractical": "1109",
+      "rewriteChars": "1832",
+      "lengthDelta": "723",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "117",
-      "substantiveParagraphs": "4",
+      "substantiveParagraphs": "5",
       "paragraphStatus": "PASS",
       "rewriteSection": "B5 #24",
       "effectiveTextSection": "B3 #12",
@@ -3894,7 +4180,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 29 нояб., 19:00 Петроградская наб, дом 32. Купить билет - от 1 500 ₽ Электро",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "5",
@@ -3907,13 +4195,13 @@
       "venue": "Культурный центр на Арбате",
       "sourceEventIds": "evt_6ad12dbe4e559cab1f2d12bc",
       "sourceChars": "1195",
-      "sourceCharsExcludingPractical": "1123",
-      "rewriteChars": "1265",
-      "lengthDelta": "142",
+      "sourceCharsExcludingPractical": "1098",
+      "rewriteChars": "1361",
+      "lengthDelta": "263",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "70",
-      "substantiveParagraphs": "3",
+      "substantiveParagraphs": "4",
       "paragraphStatus": "PASS",
       "rewriteSection": "B5 #25",
       "effectiveTextSection": "B3 #2",
@@ -3921,7 +4209,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "пт, 27 нояб., 20:00 ул. Арбат, 9 стр. 1 Купить билет - от 1 950 ₽ Электронный би",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "5",
@@ -3935,8 +4225,8 @@
       "sourceEventIds": "evt_6ae8a28bd708edc4a5d97641",
       "sourceChars": "1658",
       "sourceCharsExcludingPractical": "1658",
-      "rewriteChars": "2550",
-      "lengthDelta": "892",
+      "rewriteChars": "2320",
+      "lengthDelta": "662",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "892",
@@ -3948,7 +4238,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 29 нояб., 15:00 ул. Большая Морская, 39 Купить билет - от 3 000 ₽ Электронны",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "5",
@@ -3962,8 +4254,8 @@
       "sourceEventIds": "evt_6ae8a4508d3b3d4d043f3a6b",
       "sourceChars": "984",
       "sourceCharsExcludingPractical": "984",
-      "rewriteChars": "1460",
-      "lengthDelta": "476",
+      "rewriteChars": "1225",
+      "lengthDelta": "241",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "476",
@@ -3975,7 +4267,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 29 нояб., 14:30 ул. Большая Морская, 39 Купить билет - от 5 000 ₽ Электронны",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "5",
@@ -3988,13 +4282,13 @@
       "venue": "Государственный Эрмитаж (Зимний дворец)",
       "sourceEventIds": "evt_6a9beac79445140c266c342f",
       "sourceChars": "698",
-      "sourceCharsExcludingPractical": "698",
-      "rewriteChars": "997",
-      "lengthDelta": "299",
+      "sourceCharsExcludingPractical": "1307",
+      "rewriteChars": "1578",
+      "lengthDelta": "271",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "299",
-      "substantiveParagraphs": "2",
+      "substantiveParagraphs": "5",
       "paragraphStatus": "PASS",
       "rewriteSection": "B5 #28",
       "effectiveTextSection": "B5 #28",
@@ -4002,7 +4296,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "пн, 1 февр., 19:00 Дворцовая наб., 34 Купить билет - от 5 000 ₽ Электронный биле",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "5",
@@ -4016,8 +4312,8 @@
       "sourceEventIds": "evt_6ae45d340c4920ccb365422e",
       "sourceChars": "613",
       "sourceCharsExcludingPractical": "613",
-      "rewriteChars": "1212",
-      "lengthDelta": "599",
+      "rewriteChars": "989",
+      "lengthDelta": "376",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "599",
@@ -4029,7 +4325,9 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "сб, 28 нояб., 15:00 ул. Восстания, 45 Купить билет - от 2 000 ₽ Электронный биле",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": "5",
@@ -4042,9 +4340,9 @@
       "venue": "Арт-пространство Люмьер Холл",
       "sourceEventIds": "evt_6a82d7bc1fca3124cbd2ed5a",
       "sourceChars": "565",
-      "sourceCharsExcludingPractical": "563",
+      "sourceCharsExcludingPractical": "565",
       "rewriteChars": "850",
-      "lengthDelta": "287",
+      "lengthDelta": "285",
       "lengthStatus": "PASS",
       "rawLengthStatus": "PASS",
       "rawLengthDelta": "285",
@@ -4056,9 +4354,27 @@
       "availabilityChecked": "HTTP 200 + visible purchase control on 2026-11-17",
       "activeSlotSnapshot": "вс, 29 нояб., 12:00 Берсеневский пер., д. 2, стр. 1 Купить билет - от 4 000 ₽ Эл",
       "practicalInfoPresent": "True",
-      "applyStatus": "NOT_APPLIED"
+      "applyStatus": "APPLIED_INDEXABLE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     }
   ],
   "auditUpdatedAt": "2026-11-18T00:00:00+03:00",
-  "auditNotes": "Selected page rewrites are locally prepared. Shared masters are resolved to the referenced final copy; source length compares against archived raw description, excluding practical information only from the rewrite side. Shorter rows require editorial review before applying."
+  "auditNotes": "Selected page rewrites are locally prepared. Shared masters are resolved to the referenced final copy; source length compares against archived raw description, excluding practical information only from the rewrite side. Shorter rows require editorial review before applying.",
+  "appliedEventPages": 222,
+  "inactiveEventPages": 5,
+  "productionResultPath": "eventpage-newyear-next-150-production-result-2026-11-18.json",
+  "productionBeforePath": "eventpage-newyear-next-150-production-before-apply-2026-11-18.json",
+  "productionAppliedAt": "2026-11-18T16:08:39.235Z",
+  "productionCounts": {
+    "editorialPositions": 150,
+    "expandedEventPages": 227,
+    "appliedIndexablePages": 222,
+    "skippedNoSalePages": 5,
+    "indexableEventPagesBefore": 1330,
+    "indexableEventPagesAfter": 1552
+  },
+  "cacheRevalidated": true,
+  "indexNowQueuedUrls": 222,
+  "publicSmokePassed": true
 }

@@ -20,9 +20,11 @@
       "substantiveParagraphs": 2,
       "lengthAndParagraphRulePass": true,
       "availability": "HTTP 200 + visible purchase control on 2026-11-17",
-      "applyStatus": "NOT_APPLIED",
+      "applyStatus": "APPLIED_INDEXABLE",
       "effectiveTextSection": "B5 #1",
-      "contentMode": "MASTER_REUSE"
+      "contentMode": "MASTER_REUSE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": 5,
@@ -37,14 +39,16 @@
       "eventIds": [
         "evt_6ac11431dbf568e3b6f958e4"
       ],
-      "sourceChars": 452,
-      "rewriteChars": 783,
+      "sourceChars": 1155,
+      "rewriteChars": 1183,
       "substantiveParagraphs": 2,
       "lengthAndParagraphRulePass": true,
       "availability": "HTTP 200 + visible purchase control on 2026-11-17",
-      "applyStatus": "NOT_APPLIED",
+      "applyStatus": "APPLIED_INDEXABLE",
       "effectiveTextSection": "B5 #2",
-      "contentMode": "DIRECT"
+      "contentMode": "DIRECT",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": 5,
@@ -59,14 +63,16 @@
       "eventIds": [
         "evt_6abf5f4d1641acab8e8ad46a"
       ],
-      "sourceChars": 476,
+      "sourceChars": 530,
       "rewriteChars": 781,
       "substantiveParagraphs": 2,
       "lengthAndParagraphRulePass": true,
       "availability": "HTTP 200 + visible purchase control on 2026-11-17",
-      "applyStatus": "NOT_APPLIED",
+      "applyStatus": "APPLIED_INDEXABLE",
       "effectiveTextSection": "B5 #3",
-      "contentMode": "MASTER_REUSE"
+      "contentMode": "MASTER_REUSE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": 5,
@@ -86,9 +92,11 @@
       "substantiveParagraphs": 2,
       "lengthAndParagraphRulePass": true,
       "availability": "HTTP 200 + visible purchase control on 2026-11-17",
-      "applyStatus": "NOT_APPLIED",
+      "applyStatus": "APPLIED_INDEXABLE",
       "effectiveTextSection": "B5 #4",
-      "contentMode": "DIRECT"
+      "contentMode": "DIRECT",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": 5,
@@ -108,9 +116,11 @@
       "substantiveParagraphs": 2,
       "lengthAndParagraphRulePass": true,
       "availability": "HTTP 200 + visible purchase control on 2026-11-17",
-      "applyStatus": "NOT_APPLIED",
+      "applyStatus": "APPLIED_INDEXABLE",
       "effectiveTextSection": "B5 #5",
-      "contentMode": "DIRECT"
+      "contentMode": "DIRECT",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": 5,
@@ -130,9 +140,11 @@
       "substantiveParagraphs": 2,
       "lengthAndParagraphRulePass": true,
       "availability": "HTTP 200 + visible purchase control on 2026-11-17",
-      "applyStatus": "NOT_APPLIED",
+      "applyStatus": "APPLIED_INDEXABLE",
       "effectiveTextSection": "B5 #6",
-      "contentMode": "DIRECT"
+      "contentMode": "DIRECT",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": 5,
@@ -152,9 +164,11 @@
       "substantiveParagraphs": 2,
       "lengthAndParagraphRulePass": true,
       "availability": "HTTP 200 + visible purchase control on 2026-11-17",
-      "applyStatus": "NOT_APPLIED",
+      "applyStatus": "APPLIED_INDEXABLE",
       "effectiveTextSection": "B5 #7",
-      "contentMode": "DIRECT"
+      "contentMode": "DIRECT",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": 5,
@@ -174,9 +188,11 @@
       "substantiveParagraphs": 2,
       "lengthAndParagraphRulePass": true,
       "availability": "HTTP 200 + visible purchase control on 2026-11-17",
-      "applyStatus": "NOT_APPLIED",
+      "applyStatus": "APPLIED_INDEXABLE",
       "effectiveTextSection": "B5 #8",
-      "contentMode": "DIRECT"
+      "contentMode": "DIRECT",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": 5,
@@ -191,14 +207,16 @@
       "eventIds": [
         "evt_6ae9f3f0e73656c718234d58"
       ],
-      "sourceChars": 1161,
+      "sourceChars": 1124,
       "rewriteChars": 1431,
       "substantiveParagraphs": 3,
       "lengthAndParagraphRulePass": true,
       "availability": "HTTP 200 + visible purchase control on 2026-11-17",
-      "applyStatus": "NOT_APPLIED",
+      "applyStatus": "APPLIED_INDEXABLE",
       "effectiveTextSection": "B5 #9",
-      "contentMode": "DIRECT"
+      "contentMode": "DIRECT",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": 5,
@@ -214,13 +232,15 @@
         "evt_6ad9e811d6e589090cbc7457"
       ],
       "sourceChars": 303,
-      "rewriteChars": 657,
-      "substantiveParagraphs": 2,
+      "rewriteChars": 807,
+      "substantiveParagraphs": 3,
       "lengthAndParagraphRulePass": true,
       "availability": "HTTP 200 + visible purchase control on 2026-11-17",
-      "applyStatus": "NOT_APPLIED",
+      "applyStatus": "APPLIED_INDEXABLE",
       "effectiveTextSection": "B5 #10",
-      "contentMode": "DIRECT"
+      "contentMode": "DIRECT",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": 5,
@@ -236,13 +256,15 @@
         "evt_6ad9e92ffaebe3c8820df584"
       ],
       "sourceChars": 303,
-      "rewriteChars": 657,
-      "substantiveParagraphs": 2,
+      "rewriteChars": 807,
+      "substantiveParagraphs": 3,
       "lengthAndParagraphRulePass": true,
       "availability": "HTTP 200 + visible purchase control on 2026-11-17",
-      "applyStatus": "NOT_APPLIED",
+      "applyStatus": "APPLIED_INDEXABLE",
       "effectiveTextSection": "B5 #10",
-      "contentMode": "MASTER_REUSE"
+      "contentMode": "MASTER_REUSE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": 5,
@@ -258,13 +280,15 @@
         "evt_6ad9ea143e73a5c5c5af6bfa"
       ],
       "sourceChars": 303,
-      "rewriteChars": 657,
-      "substantiveParagraphs": 2,
+      "rewriteChars": 807,
+      "substantiveParagraphs": 3,
       "lengthAndParagraphRulePass": true,
       "availability": "HTTP 200 + visible purchase control on 2026-11-17",
-      "applyStatus": "NOT_APPLIED",
+      "applyStatus": "APPLIED_INDEXABLE",
       "effectiveTextSection": "B5 #10",
-      "contentMode": "MASTER_REUSE"
+      "contentMode": "MASTER_REUSE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": 5,
@@ -280,13 +304,15 @@
         "evt_6ad9ea8c32d088bf69a99a37"
       ],
       "sourceChars": 303,
-      "rewriteChars": 657,
-      "substantiveParagraphs": 2,
+      "rewriteChars": 807,
+      "substantiveParagraphs": 3,
       "lengthAndParagraphRulePass": true,
       "availability": "HTTP 200 + visible purchase control on 2026-11-17",
-      "applyStatus": "NOT_APPLIED",
+      "applyStatus": "APPLIED_INDEXABLE",
       "effectiveTextSection": "B5 #10",
-      "contentMode": "MASTER_REUSE"
+      "contentMode": "MASTER_REUSE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": 5,
@@ -302,13 +328,15 @@
         "evt_6ad9eb1aabe8723d8e40cffc"
       ],
       "sourceChars": 303,
-      "rewriteChars": 657,
-      "substantiveParagraphs": 2,
+      "rewriteChars": 807,
+      "substantiveParagraphs": 3,
       "lengthAndParagraphRulePass": true,
       "availability": "HTTP 200 + visible purchase control on 2026-11-17",
-      "applyStatus": "NOT_APPLIED",
+      "applyStatus": "APPLIED_INDEXABLE",
       "effectiveTextSection": "B5 #10",
-      "contentMode": "MASTER_REUSE"
+      "contentMode": "MASTER_REUSE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": 5,
@@ -324,13 +352,15 @@
         "evt_6ad9eb94db844e1e04399795"
       ],
       "sourceChars": 303,
-      "rewriteChars": 657,
-      "substantiveParagraphs": 2,
+      "rewriteChars": 807,
+      "substantiveParagraphs": 3,
       "lengthAndParagraphRulePass": true,
       "availability": "HTTP 200 + visible purchase control on 2026-11-17",
-      "applyStatus": "NOT_APPLIED",
+      "applyStatus": "APPLIED_INDEXABLE",
       "effectiveTextSection": "B5 #10",
-      "contentMode": "MASTER_REUSE"
+      "contentMode": "MASTER_REUSE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": 5,
@@ -352,13 +382,15 @@
         "evt_6aeb372006c766010de5673e"
       ],
       "sourceChars": 196,
-      "rewriteChars": 594,
-      "substantiveParagraphs": 2,
+      "rewriteChars": 731,
+      "substantiveParagraphs": 3,
       "lengthAndParagraphRulePass": true,
       "availability": "HTTP 200 + visible purchase control on 2026-11-17",
-      "applyStatus": "NOT_APPLIED",
+      "applyStatus": "APPLIED_INDEXABLE",
       "effectiveTextSection": "B5 #16",
-      "contentMode": "MASTER_REUSE"
+      "contentMode": "MASTER_REUSE",
+      "appliedEventPages": 4,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": 5,
@@ -377,14 +409,16 @@
         "evt_6aeb37988e5da406024a4a23",
         "evt_6aeb376a6f7116506323dda9"
       ],
-      "sourceChars": 177,
-      "rewriteChars": 673,
-      "substantiveParagraphs": 2,
+      "sourceChars": 210,
+      "rewriteChars": 772,
+      "substantiveParagraphs": 3,
       "lengthAndParagraphRulePass": true,
       "availability": "HTTP 200 + visible purchase control on 2026-11-17",
-      "applyStatus": "NOT_APPLIED",
+      "applyStatus": "APPLIED_INDEXABLE",
       "effectiveTextSection": "B5 #17",
-      "contentMode": "MASTER_REUSE"
+      "contentMode": "MASTER_REUSE",
+      "appliedEventPages": 3,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": 5,
@@ -399,14 +433,16 @@
       "eventIds": [
         "evt_6ac8def43ee2b2dc815813e3"
       ],
-      "sourceChars": 233,
-      "rewriteChars": 673,
+      "sourceChars": 1155,
+      "rewriteChars": 1183,
       "substantiveParagraphs": 2,
       "lengthAndParagraphRulePass": true,
       "availability": "HTTP 200 + visible purchase control on 2026-11-17",
-      "applyStatus": "NOT_APPLIED",
+      "applyStatus": "APPLIED_INDEXABLE",
       "effectiveTextSection": "B5 #18",
-      "contentMode": "DIRECT"
+      "contentMode": "DIRECT",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": 5,
@@ -426,13 +462,15 @@
         "evt_6af052fb808ef8598cb83368"
       ],
       "sourceChars": 200,
-      "rewriteChars": 662,
-      "substantiveParagraphs": 2,
+      "rewriteChars": 761,
+      "substantiveParagraphs": 3,
       "lengthAndParagraphRulePass": true,
       "availability": "HTTP 200 + visible purchase control on 2026-11-17",
-      "applyStatus": "NOT_APPLIED",
+      "applyStatus": "APPLIED_INDEXABLE",
       "effectiveTextSection": "B5 #19",
-      "contentMode": "MASTER_REUSE"
+      "contentMode": "MASTER_REUSE",
+      "appliedEventPages": 3,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": 5,
@@ -452,9 +490,11 @@
       "substantiveParagraphs": 2,
       "lengthAndParagraphRulePass": true,
       "availability": "HTTP 200 + visible purchase control on 2026-11-17",
-      "applyStatus": "NOT_APPLIED",
+      "applyStatus": "APPLIED_INDEXABLE",
       "effectiveTextSection": "B5 #20",
-      "contentMode": "DIRECT"
+      "contentMode": "DIRECT",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": 5,
@@ -469,14 +509,16 @@
       "eventIds": [
         "evt_6a9d39326c5c585c183d2a37"
       ],
-      "sourceChars": 2450,
+      "sourceChars": 2479,
       "rewriteChars": 2602,
       "substantiveParagraphs": 4,
       "lengthAndParagraphRulePass": true,
       "availability": "HTTP 200 + visible purchase control on 2026-11-17",
-      "applyStatus": "NOT_APPLIED",
+      "applyStatus": "APPLIED_INDEXABLE",
       "effectiveTextSection": "B5 #21",
-      "contentMode": "DIRECT"
+      "contentMode": "DIRECT",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": 5,
@@ -491,14 +533,16 @@
       "eventIds": [
         "evt_6a45239780fe8d5f2b179445"
       ],
-      "sourceChars": 1132,
+      "sourceChars": 983,
       "rewriteChars": 1288,
       "substantiveParagraphs": 3,
       "lengthAndParagraphRulePass": true,
       "availability": "HTTP 200 + visible purchase control on 2026-11-17",
-      "applyStatus": "NOT_APPLIED",
+      "applyStatus": "APPLIED_INDEXABLE",
       "effectiveTextSection": "B5 #22",
-      "contentMode": "DIRECT"
+      "contentMode": "DIRECT",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": 5,
@@ -513,14 +557,16 @@
       "eventIds": [
         "evt_6a6cc2ce767009278945762e"
       ],
-      "sourceChars": 1872,
+      "sourceChars": 1263,
       "rewriteChars": 2397,
       "substantiveParagraphs": 4,
       "lengthAndParagraphRulePass": true,
       "availability": "HTTP 200 + visible purchase control on 2026-11-17",
-      "applyStatus": "NOT_APPLIED",
+      "applyStatus": "APPLIED_INDEXABLE",
       "effectiveTextSection": "B5 #23",
-      "contentMode": "DIRECT"
+      "contentMode": "DIRECT",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": 5,
@@ -535,14 +581,16 @@
       "eventIds": [
         "evt_6a846124a39acf0bbbfe1791"
       ],
-      "sourceChars": 1556,
-      "rewriteChars": 1673,
-      "substantiveParagraphs": 4,
+      "sourceChars": 1109,
+      "rewriteChars": 1832,
+      "substantiveParagraphs": 5,
       "lengthAndParagraphRulePass": true,
       "availability": "HTTP 200 + visible purchase control on 2026-11-17",
-      "applyStatus": "NOT_APPLIED",
+      "applyStatus": "APPLIED_INDEXABLE",
       "effectiveTextSection": "B3 #12",
-      "contentMode": "MASTER_REUSE"
+      "contentMode": "MASTER_REUSE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": 5,
@@ -557,14 +605,16 @@
       "eventIds": [
         "evt_6ad12dbe4e559cab1f2d12bc"
       ],
-      "sourceChars": 1195,
-      "rewriteChars": 1265,
-      "substantiveParagraphs": 3,
+      "sourceChars": 1098,
+      "rewriteChars": 1361,
+      "substantiveParagraphs": 4,
       "lengthAndParagraphRulePass": true,
       "availability": "HTTP 200 + visible purchase control on 2026-11-17",
-      "applyStatus": "NOT_APPLIED",
+      "applyStatus": "APPLIED_INDEXABLE",
       "effectiveTextSection": "B3 #2",
-      "contentMode": "MASTER_REUSE"
+      "contentMode": "MASTER_REUSE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": 5,
@@ -584,9 +634,11 @@
       "substantiveParagraphs": 5,
       "lengthAndParagraphRulePass": true,
       "availability": "HTTP 200 + visible purchase control on 2026-11-17",
-      "applyStatus": "NOT_APPLIED",
+      "applyStatus": "APPLIED_INDEXABLE",
       "effectiveTextSection": "B5 #26",
-      "contentMode": "DIRECT"
+      "contentMode": "DIRECT",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": 5,
@@ -606,9 +658,11 @@
       "substantiveParagraphs": 3,
       "lengthAndParagraphRulePass": true,
       "availability": "HTTP 200 + visible purchase control on 2026-11-17",
-      "applyStatus": "NOT_APPLIED",
+      "applyStatus": "APPLIED_INDEXABLE",
       "effectiveTextSection": "B5 #27",
-      "contentMode": "MASTER_REUSE"
+      "contentMode": "MASTER_REUSE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": 5,
@@ -623,14 +677,16 @@
       "eventIds": [
         "evt_6a9beac79445140c266c342f"
       ],
-      "sourceChars": 698,
-      "rewriteChars": 784,
-      "substantiveParagraphs": 2,
+      "sourceChars": 1307,
+      "rewriteChars": 1578,
+      "substantiveParagraphs": 5,
       "lengthAndParagraphRulePass": true,
       "availability": "HTTP 200 + visible purchase control on 2026-11-17",
-      "applyStatus": "NOT_APPLIED",
+      "applyStatus": "APPLIED_INDEXABLE",
       "effectiveTextSection": "B5 #28",
-      "contentMode": "DIRECT"
+      "contentMode": "DIRECT",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": 5,
@@ -650,9 +706,11 @@
       "substantiveParagraphs": 2,
       "lengthAndParagraphRulePass": true,
       "availability": "HTTP 200 + visible purchase control on 2026-11-17",
-      "applyStatus": "NOT_APPLIED",
+      "applyStatus": "APPLIED_INDEXABLE",
       "effectiveTextSection": "B5 #29",
-      "contentMode": "DIRECT"
+      "contentMode": "DIRECT",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     },
     {
       "batch": 5,
@@ -672,9 +730,11 @@
       "substantiveParagraphs": 3,
       "lengthAndParagraphRulePass": true,
       "availability": "HTTP 200 + visible purchase control on 2026-11-17",
-      "applyStatus": "NOT_APPLIED",
+      "applyStatus": "APPLIED_INDEXABLE",
       "effectiveTextSection": "B4 #17",
-      "contentMode": "MASTER_REUSE"
+      "contentMode": "MASTER_REUSE",
+      "appliedEventPages": 1,
+      "skippedNoSaleEventPages": 0
     }
   ]
 }
