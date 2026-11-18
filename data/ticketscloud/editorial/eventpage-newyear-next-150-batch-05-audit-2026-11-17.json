@@ -1,0 +1,680 @@
+{
+  "generatedAt": "2026-11-17",
+  "batch": 5,
+  "items": [
+    {
+      "batch": 5,
+      "position": 1,
+      "eventPageId": "a3a11fdf-6641-4dd9-8291-4a57dc4970f4",
+      "eventPageIds": [
+        "a3a11fdf-6641-4dd9-8291-4a57dc4970f4"
+      ],
+      "url": "https://daibilet.ru/events/master-klass-zimnii-buket-moskva",
+      "title": "Мастер-класс «Зимний букет»",
+      "city": "Москва",
+      "eventIds": [
+        "evt_6ad6fd63e913eddb59e3cd2b"
+      ],
+      "sourceChars": 513,
+      "rewriteChars": 819,
+      "substantiveParagraphs": 2,
+      "lengthAndParagraphRulePass": true,
+      "availability": "HTTP 200 + visible purchase control on 2026-11-17",
+      "applyStatus": "NOT_APPLIED",
+      "effectiveTextSection": "B5 #1",
+      "contentMode": "MASTER_REUSE"
+    },
+    {
+      "batch": 5,
+      "position": 2,
+      "eventPageId": "e23b5311-43cf-46da-b3bd-3c4c0d2ae04b",
+      "eventPageIds": [
+        "e23b5311-43cf-46da-b3bd-3c4c0d2ae04b"
+      ],
+      "url": "https://daibilet.ru/events/novogodnyaya-kvest-shkola-volshebnikov-novosibirsk",
+      "title": "Новогодняя Квест-Школа волшебников",
+      "city": "Новосибирск",
+      "eventIds": [
+        "evt_6ac11431dbf568e3b6f958e4"
+      ],
+      "sourceChars": 452,
+      "rewriteChars": 783,
+      "substantiveParagraphs": 2,
+      "lengthAndParagraphRulePass": true,
+      "availability": "HTTP 200 + visible purchase control on 2026-11-17",
+      "applyStatus": "NOT_APPLIED",
+      "effectiveTextSection": "B5 #2",
+      "contentMode": "DIRECT"
+    },
+    {
+      "batch": 5,
+      "position": 3,
+      "eventPageId": "e9b7b3b0-6b5e-413c-9786-be26ae3b4d57",
+      "eventPageIds": [
+        "e9b7b3b0-6b5e-413c-9786-be26ae3b4d57"
+      ],
+      "url": "https://daibilet.ru/events/irina-hakamada-master-obscheniya-uspeh-bez-zatrat-moskva",
+      "title": "Ирина Хакамада. Мастер общения: успех без затрат. Предновогодняя встреча - с праздничными сюрпризами!",
+      "city": "Москва",
+      "eventIds": [
+        "evt_6abf5f4d1641acab8e8ad46a"
+      ],
+      "sourceChars": 476,
+      "rewriteChars": 781,
+      "substantiveParagraphs": 2,
+      "lengthAndParagraphRulePass": true,
+      "availability": "HTTP 200 + visible purchase control on 2026-11-17",
+      "applyStatus": "NOT_APPLIED",
+      "effectiveTextSection": "B5 #3",
+      "contentMode": "MASTER_REUSE"
+    },
+    {
+      "batch": 5,
+      "position": 4,
+      "eventPageId": "eeda1b6f-f5bd-4b8b-a488-5f282791a118",
+      "eventPageIds": [
+        "eeda1b6f-f5bd-4b8b-a488-5f282791a118"
+      ],
+      "url": "https://daibilet.ru/events/vau-muzykalnoe-loto-zimnyaya-vecherinka-russkie-hity-karaoke-samara",
+      "title": "Вау Музыкальное лото. Зимняя вечеринка. Русские хиты караоке",
+      "city": "Самара",
+      "eventIds": [
+        "evt_6af2f60134132f0b45358617"
+      ],
+      "sourceChars": 476,
+      "rewriteChars": 821,
+      "substantiveParagraphs": 2,
+      "lengthAndParagraphRulePass": true,
+      "availability": "HTTP 200 + visible purchase control on 2026-11-17",
+      "applyStatus": "NOT_APPLIED",
+      "effectiveTextSection": "B5 #4",
+      "contentMode": "DIRECT"
+    },
+    {
+      "batch": 5,
+      "position": 5,
+      "eventPageId": "08d9ca1c-4303-4b34-b3d3-23ce0146dffa",
+      "eventPageIds": [
+        "08d9ca1c-4303-4b34-b3d3-23ce0146dffa"
+      ],
+      "url": "https://daibilet.ru/events/vau-muzykalnoe-loto-novogodnee-zastole-russkie-hity-samara",
+      "title": "Вау Музыкальное лото. Новогоднее застолье. Русские хиты",
+      "city": "Самара",
+      "eventIds": [
+        "evt_6af2f82434132f0b453586da"
+      ],
+      "sourceChars": 476,
+      "rewriteChars": 818,
+      "substantiveParagraphs": 2,
+      "lengthAndParagraphRulePass": true,
+      "availability": "HTTP 200 + visible purchase control on 2026-11-17",
+      "applyStatus": "NOT_APPLIED",
+      "effectiveTextSection": "B5 #5",
+      "contentMode": "DIRECT"
+    },
+    {
+      "batch": 5,
+      "position": 6,
+      "eventPageId": "ccf2912b-1242-40ca-847c-1ea82de8dfff",
+      "eventPageIds": [
+        "ccf2912b-1242-40ca-847c-1ea82de8dfff"
+      ],
+      "url": "https://daibilet.ru/events/vau-muzykalnoe-loto-novogodnyaya-vecherinka-disko-miks-samara",
+      "title": "Вау Музыкальное лото. Новогодняя вечеринка. Диско - микс",
+      "city": "Самара",
+      "eventIds": [
+        "evt_6af2f3fee02f9c37dc47f8d6"
+      ],
+      "sourceChars": 476,
+      "rewriteChars": 702,
+      "substantiveParagraphs": 2,
+      "lengthAndParagraphRulePass": true,
+      "availability": "HTTP 200 + visible purchase control on 2026-11-17",
+      "applyStatus": "NOT_APPLIED",
+      "effectiveTextSection": "B5 #6",
+      "contentMode": "DIRECT"
+    },
+    {
+      "batch": 5,
+      "position": 7,
+      "eventPageId": "76fa43a7-5ae3-4e44-9de2-efd9b7ed8eab",
+      "eventPageIds": [
+        "76fa43a7-5ae3-4e44-9de2-efd9b7ed8eab"
+      ],
+      "url": "https://daibilet.ru/events/vau-muzykalnoe-loto-top-hity-miks-novyi-god-k-nam-mchitsya-samara",
+      "title": "Вау Музыкальное лото. ТОП-ХИТЫ. МИКС. Новый год к нам мчится!",
+      "city": "Самара",
+      "eventIds": [
+        "evt_6af2f5bd92e73173dfed623c"
+      ],
+      "sourceChars": 476,
+      "rewriteChars": 781,
+      "substantiveParagraphs": 2,
+      "lengthAndParagraphRulePass": true,
+      "availability": "HTTP 200 + visible purchase control on 2026-11-17",
+      "applyStatus": "NOT_APPLIED",
+      "effectiveTextSection": "B5 #7",
+      "contentMode": "DIRECT"
+    },
+    {
+      "batch": 5,
+      "position": 8,
+      "eventPageId": "c8b008dd-569b-4d25-8824-226ef68d59f9",
+      "eventPageIds": [
+        "c8b008dd-569b-4d25-8824-226ef68d59f9"
+      ],
+      "url": "https://daibilet.ru/events/vau-muzykalnoe-loto-hity-2010-h-i-2020-h-miks-novyi-god-vse-blizhe-samara",
+      "title": "Вау Музыкальное лото. Хиты 2010-х и 2020-х. Микс. Новый год всё ближе!",
+      "city": "Самара",
+      "eventIds": [
+        "evt_6af2f79034132f0b453586d2"
+      ],
+      "sourceChars": 476,
+      "rewriteChars": 707,
+      "substantiveParagraphs": 2,
+      "lengthAndParagraphRulePass": true,
+      "availability": "HTTP 200 + visible purchase control on 2026-11-17",
+      "applyStatus": "NOT_APPLIED",
+      "effectiveTextSection": "B5 #8",
+      "contentMode": "DIRECT"
+    },
+    {
+      "batch": 5,
+      "position": 9,
+      "eventPageId": "1f1bc5dd-496d-4042-ade0-c15991f5e25d",
+      "eventPageIds": [
+        "1f1bc5dd-496d-4042-ade0-c15991f5e25d"
+      ],
+      "url": "https://daibilet.ru/events/russkie-muzykalnye-sezony-v-otele-nacional-moskva",
+      "title": "Русские Музыкальные Сезоны в отеле «Националь»",
+      "city": "Москва",
+      "eventIds": [
+        "evt_6ae9f3f0e73656c718234d58"
+      ],
+      "sourceChars": 1161,
+      "rewriteChars": 1431,
+      "substantiveParagraphs": 3,
+      "lengthAndParagraphRulePass": true,
+      "availability": "HTTP 200 + visible purchase control on 2026-11-17",
+      "applyStatus": "NOT_APPLIED",
+      "effectiveTextSection": "B5 #9",
+      "contentMode": "DIRECT"
+    },
+    {
+      "batch": 5,
+      "position": 10,
+      "eventPageId": "3a97ba77-2baa-40c7-98d9-4e61a225e041",
+      "eventPageIds": [
+        "3a97ba77-2baa-40c7-98d9-4e61a225e041"
+      ],
+      "url": "https://daibilet.ru/events/nauchnyi-novyi-god-2026-19-dekabrya-11-00-perm",
+      "title": "Научный Новый год 2026, 19 декабря, 11:00",
+      "city": "Пермь",
+      "eventIds": [
+        "evt_6ad9e811d6e589090cbc7457"
+      ],
+      "sourceChars": 303,
+      "rewriteChars": 657,
+      "substantiveParagraphs": 2,
+      "lengthAndParagraphRulePass": true,
+      "availability": "HTTP 200 + visible purchase control on 2026-11-17",
+      "applyStatus": "NOT_APPLIED",
+      "effectiveTextSection": "B5 #10",
+      "contentMode": "DIRECT"
+    },
+    {
+      "batch": 5,
+      "position": 11,
+      "eventPageId": "7179c504-ca31-4f20-9c16-2673ff57a2ce",
+      "eventPageIds": [
+        "7179c504-ca31-4f20-9c16-2673ff57a2ce"
+      ],
+      "url": "https://daibilet.ru/events/nauchnyi-novyi-god-2026-19-dekabrya-14-00-perm",
+      "title": "Научный Новый год 2026, 19 декабря, 14:00",
+      "city": "Пермь",
+      "eventIds": [
+        "evt_6ad9e92ffaebe3c8820df584"
+      ],
+      "sourceChars": 303,
+      "rewriteChars": 657,
+      "substantiveParagraphs": 2,
+      "lengthAndParagraphRulePass": true,
+      "availability": "HTTP 200 + visible purchase control on 2026-11-17",
+      "applyStatus": "NOT_APPLIED",
+      "effectiveTextSection": "B5 #10",
+      "contentMode": "MASTER_REUSE"
+    },
+    {
+      "batch": 5,
+      "position": 12,
+      "eventPageId": "0ad97381-be29-42b3-9d94-9814b18d58cc",
+      "eventPageIds": [
+        "0ad97381-be29-42b3-9d94-9814b18d58cc"
+      ],
+      "url": "https://daibilet.ru/events/nauchnyi-novyi-god-2026-19-dekabrya-17-00-perm",
+      "title": "Научный Новый год 2026, 19 декабря, 17:00",
+      "city": "Пермь",
+      "eventIds": [
+        "evt_6ad9ea143e73a5c5c5af6bfa"
+      ],
+      "sourceChars": 303,
+      "rewriteChars": 657,
+      "substantiveParagraphs": 2,
+      "lengthAndParagraphRulePass": true,
+      "availability": "HTTP 200 + visible purchase control on 2026-11-17",
+      "applyStatus": "NOT_APPLIED",
+      "effectiveTextSection": "B5 #10",
+      "contentMode": "MASTER_REUSE"
+    },
+    {
+      "batch": 5,
+      "position": 13,
+      "eventPageId": "bf5e723e-542e-48c8-beee-be3a56ddd556",
+      "eventPageIds": [
+        "bf5e723e-542e-48c8-beee-be3a56ddd556"
+      ],
+      "url": "https://daibilet.ru/events/nauchnyi-novyi-god-2026-20-dekabrya-11-00-perm",
+      "title": "Научный Новый год 2026, 20 декабря, 11:00",
+      "city": "Пермь",
+      "eventIds": [
+        "evt_6ad9ea8c32d088bf69a99a37"
+      ],
+      "sourceChars": 303,
+      "rewriteChars": 657,
+      "substantiveParagraphs": 2,
+      "lengthAndParagraphRulePass": true,
+      "availability": "HTTP 200 + visible purchase control on 2026-11-17",
+      "applyStatus": "NOT_APPLIED",
+      "effectiveTextSection": "B5 #10",
+      "contentMode": "MASTER_REUSE"
+    },
+    {
+      "batch": 5,
+      "position": 14,
+      "eventPageId": "68994de1-65cf-4b8a-b9ff-3695ccc4e450",
+      "eventPageIds": [
+        "68994de1-65cf-4b8a-b9ff-3695ccc4e450"
+      ],
+      "url": "https://daibilet.ru/events/nauchnyi-novyi-god-2026-20-dekabrya-14-00-perm",
+      "title": "Научный Новый год 2026, 20 декабря, 14:00",
+      "city": "Пермь",
+      "eventIds": [
+        "evt_6ad9eb1aabe8723d8e40cffc"
+      ],
+      "sourceChars": 303,
+      "rewriteChars": 657,
+      "substantiveParagraphs": 2,
+      "lengthAndParagraphRulePass": true,
+      "availability": "HTTP 200 + visible purchase control on 2026-11-17",
+      "applyStatus": "NOT_APPLIED",
+      "effectiveTextSection": "B5 #10",
+      "contentMode": "MASTER_REUSE"
+    },
+    {
+      "batch": 5,
+      "position": 15,
+      "eventPageId": "f7cc3e4e-fcd7-4683-b59b-8aae9576cc5c",
+      "eventPageIds": [
+        "f7cc3e4e-fcd7-4683-b59b-8aae9576cc5c"
+      ],
+      "url": "https://daibilet.ru/events/nauchnyi-novyi-god-2026-20-dekabrya-17-00-perm",
+      "title": "Научный Новый год 2026, 20 декабря, 17:00",
+      "city": "Пермь",
+      "eventIds": [
+        "evt_6ad9eb94db844e1e04399795"
+      ],
+      "sourceChars": 303,
+      "rewriteChars": 657,
+      "substantiveParagraphs": 2,
+      "lengthAndParagraphRulePass": true,
+      "availability": "HTTP 200 + visible purchase control on 2026-11-17",
+      "applyStatus": "NOT_APPLIED",
+      "effectiveTextSection": "B5 #10",
+      "contentMode": "MASTER_REUSE"
+    },
+    {
+      "batch": 5,
+      "position": 16,
+      "eventPageId": "80e947ae-9929-428a-b970-2e63734df63f",
+      "eventPageIds": [
+        "80e947ae-9929-428a-b970-2e63734df63f",
+        "adc96637-c516-48b2-8c45-81d9d5d3276e",
+        "eeb35a0c-af10-4607-a288-a9491718b587",
+        "fca7524e-de2a-4e49-96e6-4fbebb183aee"
+      ],
+      "url": "https://daibilet.ru/events/novogodnyaya-elka-dlya-malyshei-3-kaliningrad-4",
+      "title": "Новогодняя елка для малышей, 3+",
+      "city": "Калининград",
+      "eventIds": [
+        "evt_6aeb36c75933667bf6d9b720",
+        "evt_6aeb36ed7901ea9371c8bc9c",
+        "evt_6aeb1a0397c401084c7c8e27",
+        "evt_6aeb372006c766010de5673e"
+      ],
+      "sourceChars": 196,
+      "rewriteChars": 594,
+      "substantiveParagraphs": 2,
+      "lengthAndParagraphRulePass": true,
+      "availability": "HTTP 200 + visible purchase control on 2026-11-17",
+      "applyStatus": "NOT_APPLIED",
+      "effectiveTextSection": "B5 #16",
+      "contentMode": "MASTER_REUSE"
+    },
+    {
+      "batch": 5,
+      "position": 17,
+      "eventPageId": "062c31fe-7a58-4a30-8841-75f00f56e7d3",
+      "eventPageIds": [
+        "062c31fe-7a58-4a30-8841-75f00f56e7d3",
+        "6632cb5c-9d85-4851-a8aa-8b08e7fb46d9",
+        "fa12238d-2d84-4993-9ac8-26701f445812"
+      ],
+      "url": "https://daibilet.ru/events/ded-moroz-i-ledi-bag-bitva-za-novyi-god-6-kaliningrad-3",
+      "title": "Дед Мороз и Леди Баг. Битва за новый год, 6+",
+      "city": "Калининград",
+      "eventIds": [
+        "evt_6aeb37868e5da406024a49ca",
+        "evt_6aeb37988e5da406024a4a23",
+        "evt_6aeb376a6f7116506323dda9"
+      ],
+      "sourceChars": 177,
+      "rewriteChars": 673,
+      "substantiveParagraphs": 2,
+      "lengthAndParagraphRulePass": true,
+      "availability": "HTTP 200 + visible purchase control on 2026-11-17",
+      "applyStatus": "NOT_APPLIED",
+      "effectiveTextSection": "B5 #17",
+      "contentMode": "MASTER_REUSE"
+    },
+    {
+      "batch": 5,
+      "position": 18,
+      "eventPageId": "8c92e918-5fa2-472e-a85c-572a7f61d9cd",
+      "eventPageIds": [
+        "8c92e918-5fa2-472e-a85c-572a7f61d9cd"
+      ],
+      "url": "https://daibilet.ru/events/novogodnyaya-kvest-shkola-yunogo-volshebnika-krasnoyarsk",
+      "title": "🎄 Новогодняя квест-школа волшебника в Хогвартсе 🎄",
+      "city": "Красноярск",
+      "eventIds": [
+        "evt_6ac8def43ee2b2dc815813e3"
+      ],
+      "sourceChars": 233,
+      "rewriteChars": 673,
+      "substantiveParagraphs": 2,
+      "lengthAndParagraphRulePass": true,
+      "availability": "HTTP 200 + visible purchase control on 2026-11-17",
+      "applyStatus": "NOT_APPLIED",
+      "effectiveTextSection": "B5 #18",
+      "contentMode": "DIRECT"
+    },
+    {
+      "batch": 5,
+      "position": 19,
+      "eventPageId": "54c63161-0bdc-4c86-ad2c-cf28c5632641",
+      "eventPageIds": [
+        "54c63161-0bdc-4c86-ad2c-cf28c5632641",
+        "7428ffb9-bbdd-4aa8-b042-f8da142ea453",
+        "f335f7c1-d0b4-49ea-8f2e-893c7436989c"
+      ],
+      "url": "https://daibilet.ru/events/saksofon-na-zakate-novogodnie-i-rozhdestvenskie-melodii-s-panoramnym-vidom-igraet-yurii-bedrak-sochi-2",
+      "title": "«Саксофон на закате». Новогодние и рождественские мелодии с панорамным видом. Играет Юрий Бедрак.",
+      "city": "Сочи",
+      "eventIds": [
+        "evt_6af05101808ef8598cb832de",
+        "evt_6af04f051a5b1eb4d8965a5d",
+        "evt_6af052fb808ef8598cb83368"
+      ],
+      "sourceChars": 200,
+      "rewriteChars": 662,
+      "substantiveParagraphs": 2,
+      "lengthAndParagraphRulePass": true,
+      "availability": "HTTP 200 + visible purchase control on 2026-11-17",
+      "applyStatus": "NOT_APPLIED",
+      "effectiveTextSection": "B5 #19",
+      "contentMode": "MASTER_REUSE"
+    },
+    {
+      "batch": 5,
+      "position": 20,
+      "eventPageId": "ba91f939-40c7-4618-953a-988c7bf6a0d4",
+      "eventPageIds": [
+        "ba91f939-40c7-4618-953a-988c7bf6a0d4"
+      ],
+      "url": "https://daibilet.ru/events/stand-up-na-rozhdestvenskoi-nizhniy-novgorod-2",
+      "title": "Stand Up на Рождественской",
+      "city": "Нижний Новгород",
+      "eventIds": [
+        "evt_6adfd300ca37d07d5ce3f971"
+      ],
+      "sourceChars": 217,
+      "rewriteChars": 638,
+      "substantiveParagraphs": 2,
+      "lengthAndParagraphRulePass": true,
+      "availability": "HTTP 200 + visible purchase control on 2026-11-17",
+      "applyStatus": "NOT_APPLIED",
+      "effectiveTextSection": "B5 #20",
+      "contentMode": "DIRECT"
+    },
+    {
+      "batch": 5,
+      "position": 21,
+      "eventPageId": "d3ec38c8-06e8-46d7-8983-0d6c2493f029",
+      "eventPageIds": [
+        "d3ec38c8-06e8-46d7-8983-0d6c2493f029"
+      ],
+      "url": "https://daibilet.ru/events/zimnii-festival-pianissimo-solnyi-koncert-filipp-rudenko-v-gosudarstvennom-ermitazhe-sankt-peterburg",
+      "title": "Зимний фестиваль Pianissimo. Сольный концерт Филипп Руденко в Государственном Эрмитаже",
+      "city": "Санкт-Петербург",
+      "eventIds": [
+        "evt_6a9d39326c5c585c183d2a37"
+      ],
+      "sourceChars": 2450,
+      "rewriteChars": 2602,
+      "substantiveParagraphs": 4,
+      "lengthAndParagraphRulePass": true,
+      "availability": "HTTP 200 + visible purchase control on 2026-11-17",
+      "applyStatus": "NOT_APPLIED",
+      "effectiveTextSection": "B5 #21",
+      "contentMode": "DIRECT"
+    },
+    {
+      "batch": 5,
+      "position": 22,
+      "eventPageId": "4fe5cc79-7f90-43a4-a362-dd2f05ec8dce",
+      "eventPageIds": [
+        "4fe5cc79-7f90-43a4-a362-dd2f05ec8dce"
+      ],
+      "url": "https://daibilet.ru/events/muzykalnyi-salon-v-osobnyake-kshesinskoi-sankt-peterburg",
+      "title": "Музыкальный салон в Особняке Кшесинской",
+      "city": "Санкт-Петербург",
+      "eventIds": [
+        "evt_6a45239780fe8d5f2b179445"
+      ],
+      "sourceChars": 1132,
+      "rewriteChars": 1288,
+      "substantiveParagraphs": 3,
+      "lengthAndParagraphRulePass": true,
+      "availability": "HTTP 200 + visible purchase control on 2026-11-17",
+      "applyStatus": "NOT_APPLIED",
+      "effectiveTextSection": "B5 #22",
+      "contentMode": "DIRECT"
+    },
+    {
+      "batch": 5,
+      "position": 23,
+      "eventPageId": "11ad3527-bc05-4220-9109-4968b529beec",
+      "eventPageIds": [
+        "11ad3527-bc05-4220-9109-4968b529beec"
+      ],
+      "url": "https://daibilet.ru/events/snegurochka-maslenichnoe-opernoe-immersivnoe-predstavlenie-sankt-peterburg",
+      "title": "\"СНЕГУРОЧКА\" Масленичное оперное иммерсивное представление",
+      "city": "Санкт-Петербург",
+      "eventIds": [
+        "evt_6a6cc2ce767009278945762e"
+      ],
+      "sourceChars": 1872,
+      "rewriteChars": 2397,
+      "substantiveParagraphs": 4,
+      "lengthAndParagraphRulePass": true,
+      "availability": "HTTP 200 + visible purchase control on 2026-11-17",
+      "applyStatus": "NOT_APPLIED",
+      "effectiveTextSection": "B5 #23",
+      "contentMode": "DIRECT"
+    },
+    {
+      "batch": 5,
+      "position": 24,
+      "eventPageId": "a392e496-8ae1-4966-832a-e015eb4bf94f",
+      "eventPageIds": [
+        "a392e496-8ae1-4966-832a-e015eb4bf94f"
+      ],
+      "url": "https://daibilet.ru/events/schelkunchik-spektakl-balet-sankt-peterburg",
+      "title": "«Щелкунчик — волшебные сны в доме Шрёдера» спектакль-балет",
+      "city": "Санкт-Петербург",
+      "eventIds": [
+        "evt_6a846124a39acf0bbbfe1791"
+      ],
+      "sourceChars": 1556,
+      "rewriteChars": 1673,
+      "substantiveParagraphs": 4,
+      "lengthAndParagraphRulePass": true,
+      "availability": "HTTP 200 + visible purchase control on 2026-11-17",
+      "applyStatus": "NOT_APPLIED",
+      "effectiveTextSection": "B3 #12",
+      "contentMode": "MASTER_REUSE"
+    },
+    {
+      "batch": 5,
+      "position": 25,
+      "eventPageId": "e32030ad-85e1-46a7-b38f-d2c19feef6f0",
+      "eventPageIds": [
+        "e32030ad-85e1-46a7-b38f-d2c19feef6f0"
+      ],
+      "url": "https://daibilet.ru/events/schelkunchik-balet-moskva",
+      "title": "Щелкунчик",
+      "city": "Москва",
+      "eventIds": [
+        "evt_6ad12dbe4e559cab1f2d12bc"
+      ],
+      "sourceChars": 1195,
+      "rewriteChars": 1265,
+      "substantiveParagraphs": 3,
+      "lengthAndParagraphRulePass": true,
+      "availability": "HTTP 200 + visible purchase control on 2026-11-17",
+      "applyStatus": "NOT_APPLIED",
+      "effectiveTextSection": "B3 #2",
+      "contentMode": "MASTER_REUSE"
+    },
+    {
+      "batch": 5,
+      "position": 26,
+      "eventPageId": "5373bf6b-999b-4034-be4c-1f05806f77ad",
+      "eventPageIds": [
+        "5373bf6b-999b-4034-be4c-1f05806f77ad"
+      ],
+      "url": "https://daibilet.ru/events/ot-rozhdestva-do-novogo-goda-kulturnaya-istoriya-peterburgskih-balov-sankt-peterburg",
+      "title": "От Рождества до Нового года: культурная история петербургских балов",
+      "city": "Санкт-Петербург",
+      "eventIds": [
+        "evt_6ae8a28bd708edc4a5d97641"
+      ],
+      "sourceChars": 1658,
+      "rewriteChars": 2320,
+      "substantiveParagraphs": 5,
+      "lengthAndParagraphRulePass": true,
+      "availability": "HTTP 200 + visible purchase control on 2026-11-17",
+      "applyStatus": "NOT_APPLIED",
+      "effectiveTextSection": "B5 #26",
+      "contentMode": "DIRECT"
+    },
+    {
+      "batch": 5,
+      "position": 27,
+      "eventPageId": "f535284c-acac-46e9-8e35-e7e781aec941",
+      "eventPageIds": [
+        "f535284c-acac-46e9-8e35-e7e781aec941"
+      ],
+      "url": "https://daibilet.ru/events/master-klass-po-novogodnim-kompoziciyam-i-venkam-vmeste-s-dekoratorom-polinoi-filippovoi-sankt-peterburg",
+      "title": "Мастер-класс по новогодним композициям и венкам вместе с декоратором Полиной Филипповой",
+      "city": "Санкт-Петербург",
+      "eventIds": [
+        "evt_6ae8a4508d3b3d4d043f3a6b"
+      ],
+      "sourceChars": 984,
+      "rewriteChars": 1225,
+      "substantiveParagraphs": 3,
+      "lengthAndParagraphRulePass": true,
+      "availability": "HTTP 200 + visible purchase control on 2026-11-17",
+      "applyStatus": "NOT_APPLIED",
+      "effectiveTextSection": "B5 #27",
+      "contentMode": "MASTER_REUSE"
+    },
+    {
+      "batch": 5,
+      "position": 28,
+      "eventPageId": "0f64ec3e-f39c-48ee-b498-f1589c002a2e",
+      "eventPageIds": [
+        "0f64ec3e-f39c-48ee-b498-f1589c002a2e"
+      ],
+      "url": "https://daibilet.ru/events/zimnii-festival-pianissimo-solnyi-koncert-chiho-chhve-v-gosudarstvennom-ermitazhe-sankt-peterburg",
+      "title": "Зимний фестиваль Pianissimo. Сольный концерт Чихо Чхве в Государственном Эрмитаже",
+      "city": "Санкт-Петербург",
+      "eventIds": [
+        "evt_6a9beac79445140c266c342f"
+      ],
+      "sourceChars": 698,
+      "rewriteChars": 784,
+      "substantiveParagraphs": 2,
+      "lengthAndParagraphRulePass": true,
+      "availability": "HTTP 200 + visible purchase control on 2026-11-17",
+      "applyStatus": "NOT_APPLIED",
+      "effectiveTextSection": "B5 #28",
+      "contentMode": "DIRECT"
+    },
+    {
+      "batch": 5,
+      "position": 29,
+      "eventPageId": "a264eda8-86ff-40db-8aca-dbfba12e7cf1",
+      "eventPageIds": [
+        "a264eda8-86ff-40db-8aca-dbfba12e7cf1"
+      ],
+      "url": "https://daibilet.ru/events/muzykalnyi-spektakl-schelkunchik-sankt-peterburg",
+      "title": "Музыкальный спектакль. «Щелкунчик»",
+      "city": "Санкт-Петербург",
+      "eventIds": [
+        "evt_6ae45d340c4920ccb365422e"
+      ],
+      "sourceChars": 613,
+      "rewriteChars": 989,
+      "substantiveParagraphs": 2,
+      "lengthAndParagraphRulePass": true,
+      "availability": "HTTP 200 + visible purchase control on 2026-11-17",
+      "applyStatus": "NOT_APPLIED",
+      "effectiveTextSection": "B5 #29",
+      "contentMode": "DIRECT"
+    },
+    {
+      "batch": 5,
+      "position": 30,
+      "eventPageId": "6be9cdff-427a-4ef9-b45d-5d6047a0c368",
+      "eventPageIds": [
+        "6be9cdff-427a-4ef9-b45d-5d6047a0c368"
+      ],
+      "url": "https://daibilet.ru/events/master-klass-rozhdestvenskii-venok-moskva",
+      "title": "Мастер-класс «Рождественский венок»",
+      "city": "Москва",
+      "eventIds": [
+        "evt_6a82d7bc1fca3124cbd2ed5a"
+      ],
+      "sourceChars": 565,
+      "rewriteChars": 850,
+      "substantiveParagraphs": 3,
+      "lengthAndParagraphRulePass": true,
+      "availability": "HTTP 200 + visible purchase control on 2026-11-17",
+      "applyStatus": "NOT_APPLIED",
+      "effectiveTextSection": "B4 #17",
+      "contentMode": "MASTER_REUSE"
+    }
+  ]
+}
