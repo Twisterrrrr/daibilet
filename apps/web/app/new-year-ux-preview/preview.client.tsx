@@ -70,12 +70,13 @@ function formatSlot(slot: NonNullable<PreviewEvent['upcomingSlots']>[number]): s
   return new Intl.DateTimeFormat('ru-RU', { timeZone: 'Europe/Moscow', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(date).replace(' г.', '');
 }
 
-function formatShortDate(slot: NonNullable<PreviewEvent['upcomingSlots']>[number]): { day: string; rest: string } {
+function formatShortDate(slot: NonNullable<PreviewEvent['upcomingSlots']>[number]): { day: string; rest: string; time: string } {
   const date = parseDate(slot.startsAt);
-  if (!date) return { day: slot.dateLabel || '—', rest: slot.timeLabel || '' };
+  if (!date) return { day: slot.dateLabel || '—', rest: '', time: slot.timeLabel || '' };
   return {
     day: new Intl.DateTimeFormat('ru-RU', { timeZone: 'Europe/Moscow', day: 'numeric' }).format(date),
-    rest: new Intl.DateTimeFormat('ru-RU', { timeZone: 'Europe/Moscow', weekday: 'short', month: 'short', hour: '2-digit', minute: '2-digit' }).format(date),
+    rest: new Intl.DateTimeFormat('ru-RU', { timeZone: 'Europe/Moscow', weekday: 'short', month: 'short' }).format(date),
+    time: new Intl.DateTimeFormat('ru-RU', { timeZone: 'Europe/Moscow', hour: '2-digit', minute: '2-digit' }).format(date),
   };
 }
 
@@ -154,7 +155,7 @@ function PreviewPurchaseButton({ event, className, label = 'Купить' }: { e
 
   const externalUrl = safeExternalUrl(purchaseUrl);
   return externalUrl
-    ? <a href={externalUrl} target="_blank" rel="noopener noreferrer" className={className}>{label}</a>
+    ? <a href={externalUrl} rel="noopener noreferrer" className={className}>{label}</a>
     : <span>Билеты уточняются</span>;
 }
 
@@ -401,7 +402,7 @@ export function NewYearUxPreview({ initialData, errorMessage }: { initialData: P
     <main className={`${styles.page} ${festive ? styles.festive : ''}`} data-newyear-preview>
       <section className={`${styles.band} ${festive ? styles.bandFestive : ''}`}>
           {festive ? <div className={styles.snowPattern} aria-hidden="true">
-            <div className={styles.snowflakes}>{Array.from({ length: 12 }, (_, index) => <svg key={index} viewBox="0 0 48 48" className={styles.snowflake}><g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7"><path d="M24 3v42M21 8l3 3 3-3M21 40l3-3 3 3M5.8 13.5l36.4 21M9 12.8l.7 4.2 4.2-.7M34.1 31.7l4.2-.7-.7 4.2M5.8 34.5l36.4-21M9 35.2l.7-4.2 4.2.7M34.1 16.3l4.2.7-.7-4.2" /></g><circle cx="24" cy="3" r="3.5" fill="#F5D977" /></svg>)}</div>
+            <div className={styles.snowflakes}>{Array.from({ length: 12 }, (_, index) => <span key={index} className={styles.snowflakeFall}><svg viewBox="0 0 48 48" className={styles.snowflake}><g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7"><path d="M24 3v42M21 8l3 3 3-3M21 40l3-3 3 3M5.8 13.5l36.4 21M9 12.8l.7 4.2 4.2-.7M34.1 31.7l4.2-.7-.7 4.2M5.8 34.5l36.4-21M9 35.2l.7-4.2 4.2.7M34.1 16.3l4.2.7-.7-4.2" /></g></svg></span>)}</div>
           </div> : null}
           <div className={`${styles.wrap} ${styles.bandContent}`}>
           <nav aria-label="Хлебные крошки" className={styles.bandCrumbs}>
@@ -424,12 +425,11 @@ export function NewYearUxPreview({ initialData, errorMessage }: { initialData: P
         </section>
 
       <div className={styles.wrap}>
-        <p className={styles.intro}>Выберите, как провести новогодние дни: сходить на ёлку или спектакль, отправиться на прогулку или праздничный концерт.</p>
+        <p className={styles.intro}>Новогодние праздники — отличный повод выбраться из дома, провести время с близкими или отправиться в небольшое путешествие. На этой странице собраны праздничные концерты, спектакли, детские ёлки, экскурсии и развлекательные программы. Выбирайте интересующие даты, сравнивайте мероприятия и находите подходящий вариант для всей семьи или компании друзей.</p>
         <div className={styles.layout}>
         <section className={styles.filters} aria-label="Фильтры мероприятий">
           <button type="button" className={styles.mobileFilterToggle} aria-expanded={filtersExpanded} aria-controls="new-year-filter-controls" onClick={() => setFiltersExpanded(!filtersExpanded)}>
             <span>Фильтры{activeFilterCount ? <b className={styles.mobileFilterCount}>{activeFilterCount}</b> : null}</span>
-            <span className={styles.mobileFilterHint}>{activeFilterCount ? 'Настроить выбор' : 'Город, дата, цена и формат'}</span>
             <span className={`${styles.mobileFilterChevron} ${filtersExpanded ? styles.mobileFilterChevronOpen : ''}`} aria-hidden="true" />
           </button>
           <div id="new-year-filter-controls" className={`${styles.wrap} ${styles.filtersContent} ${filtersExpanded ? '' : styles.filtersContentCollapsed}`}>
@@ -498,7 +498,6 @@ export function NewYearUxPreview({ initialData, errorMessage }: { initialData: P
             </div>
             <div className={styles.chipRows}>
               <div className={styles.chipRow} aria-label="Фильтр по городам и регионам">
-                <span className={`${styles.chipLabel} ${styles.chipLabelCity}`}>Город</span>
                 {visibleCityChips.map((item) => {
                   const isRegion = Boolean(item.region);
                   const selected = isRegion ? region === item.name : item.name === 'Вся Россия' ? city === 'Вся Россия' && !region : city === item.name;
@@ -507,25 +506,21 @@ export function NewYearUxPreview({ initialData, errorMessage }: { initialData: P
                     : item.name === 'Вся Россия'
                       ? selectAllGeography
                       : () => item.name && selectCity(item.name);
-                  return <button key={`${isRegion ? 'region' : 'city'}:${item.name}`} type="button" className={`${styles.chip} ${selected ? styles.chipActive : ''} ${item.count === 0 ? styles.chipDisabled : ''}`} onClick={onSelect} aria-pressed={selected} disabled={item.count === 0 && !selected}>{item.name}<b className={styles.chipCount}>{item.count}</b></button>;
+                  return <button key={`${isRegion ? 'region' : 'city'}:${item.name}`} type="button" className={`${styles.chip} ${item.name === 'Вся Россия' ? styles.chipPrimary : ''} ${selected ? styles.chipActive : ''} ${item.count === 0 ? styles.chipDisabled : ''}`} onClick={onSelect} aria-pressed={selected} disabled={item.count === 0 && !selected}>{item.name}<b className={styles.chipCount}>{item.count}</b></button>;
                 })}
                 {geoOptions.length > 8 ? <button type="button" className={`${styles.chip} ${styles.moreChip}`} onClick={() => setCitiesExpanded(!citiesExpanded)}>{citiesExpanded ? 'свернуть ↑' : `ещё ${geoOptions.length - 8} ↓`}</button> : null}
               </div>
               <div className={styles.chipRow} aria-label="Фильтр по дате">
-                <span className={styles.chipLabel}>Дата</span>
-                {DATE_OPTIONS.map((item) => { const count = getFacetCount(data?.facets.dates, item.value); return <button key={item.value} type="button" className={`${styles.chip} ${date === item.value ? styles.chipActive : ''} ${count === 0 && item.value !== 'all' ? styles.chipDisabled : ''}`} onClick={() => setDateFilter(item.value)} aria-pressed={date === item.value}>{item.label}<b className={styles.chipCount}>{count}</b></button>; })}
+                {DATE_OPTIONS.map((item) => { const count = getFacetCount(data?.facets.dates, item.value); return <button key={item.value} type="button" className={`${styles.chip} ${item.value === 'all' ? styles.chipPrimary : ''} ${date === item.value ? styles.chipActive : ''} ${count === 0 && item.value !== 'all' ? styles.chipDisabled : ''}`} onClick={() => setDateFilter(item.value)} aria-pressed={date === item.value}>{item.label}<b className={styles.chipCount}>{count}</b></button>; })}
                 <DatePickerChip date={date} customDate={customDate} onChange={setCustomDateFilter} />
               </div>
               <div className={styles.chipRow} aria-label="Фильтр по цене">
-                <span className={styles.chipLabel}>Цена</span>
-                {PRICE_OPTIONS.map((item) => { const count = getFacetCount(data?.facets.prices, item.value); return <button key={item.value} type="button" className={`${styles.chip} ${price === item.value ? styles.chipActive : ''} ${count === 0 && item.value !== 'all' ? styles.chipDisabled : ''}`} onClick={() => setPrice(item.value)} aria-pressed={price === item.value}>{item.label}<b className={styles.chipCount}>{count}</b></button>; })}
+                {PRICE_OPTIONS.map((item) => { const count = getFacetCount(data?.facets.prices, item.value); return <button key={item.value} type="button" className={`${styles.chip} ${item.value === 'all' ? styles.chipPrimary : ''} ${price === item.value ? styles.chipActive : ''} ${count === 0 && item.value !== 'all' ? styles.chipDisabled : ''}`} onClick={() => setPrice(item.value)} aria-pressed={price === item.value}>{item.label}<b className={styles.chipCount}>{count}</b></button>; })}
               </div>
               <div className={styles.chipRow} aria-label="Фильтр по формату">
-                <span className={styles.chipLabel}>Формат</span>
-                {formats.map((item) => { const value = item.name || 'Все форматы'; return <button key={value} type="button" className={`${styles.chip} ${format === value ? styles.chipActive : ''} ${item.count === 0 && value !== 'Все форматы' ? styles.chipDisabled : ''}`} onClick={() => setFormat(value)} aria-pressed={format === value}>{value}<b className={styles.chipCount}>{item.count}</b></button>; })}
+                {formats.map((item) => { const value = item.name || 'Все форматы'; return <button key={value} type="button" className={`${styles.chip} ${value === 'Все форматы' ? styles.chipPrimary : ''} ${format === value ? styles.chipActive : ''} ${item.count === 0 && value !== 'Все форматы' ? styles.chipDisabled : ''}`} onClick={() => setFormat(value)} aria-pressed={format === value}>{value}<b className={styles.chipCount}>{item.count}</b></button>; })}
               </div>
               <div className={styles.chipRow} aria-label="Фильтр по наличию мест">
-                <span className={styles.chipLabel}>Места</span>
                 <button type="button" className={`${styles.chip} ${lowStock ? styles.chipActive : ''} ${data?.facets.lowStock === 0 ? styles.chipDisabled : ''}`} onClick={() => setLowStock(!lowStock)} aria-pressed={lowStock} disabled={!data?.facets.lowStock && !lowStock}>Мало мест<b className={styles.chipCount}>{data?.facets.lowStock || 0}</b></button>
               </div>
             </div>
@@ -551,6 +546,7 @@ export function NewYearUxPreview({ initialData, errorMessage }: { initialData: P
               const href = event.eventPageSlug || event.slug;
               const priceLabel = typeof event.priceFrom === 'number' ? event.priceFrom === 0 ? 'Бесплатно' : `от ${new Intl.NumberFormat('ru-RU').format(event.priceFrom)} ₽` : 'Цена уточняется';
               const slots = event.upcomingSlots || [];
+              const slotDate = slot ? formatShortDate(slot) : null;
               return <article key={event.eventPageSlug || event.groupKey || event.id} className={`${styles.row} ${compact ? styles.rowCompact : ''}`} role="button" tabIndex={0} aria-haspopup="dialog" aria-label={`Подробнее: ${event.title}`} onClick={(clickEvent) => {
                 if ((clickEvent.target as HTMLElement).closest('a, button, details, summary')) return;
                 setSelectedEvent(event);
@@ -559,11 +555,11 @@ export function NewYearUxPreview({ initialData, errorMessage }: { initialData: P
                 keyEvent.preventDefault();
                 setSelectedEvent(event);
               }}>
-                <div className={styles.rowDate}>{slot ? <><strong>{formatShortDate(slot).day}</strong><small>{formatShortDate(slot).rest}</small></> : 'Дата уточняется'}</div>
+                <div className={styles.rowDate}>{slotDate ? <><strong>{slotDate.day}</strong>{slotDate.rest ? <small>{slotDate.rest}</small> : null}{slotDate.time ? <small>{slotDate.time}</small> : null}</> : 'Дата уточняется'}</div>
                 <div className={styles.rowMain}>
                   <div className={styles.rowTitle} title={event.title}>{event.title}</div>
                   <div className={styles.rowMeta}>{city === 'Вся Россия' && event.city ? <span className={styles.rowCity}>{event.city}</span> : null}{eventBadges(event).map((badge) => <span key={badge.id} className={`${styles.tag} ${badge.className}`}>{badge.label}</span>)}<span>{event.venue || 'Площадка уточняется'}</span></div>
-                  {slots.length > 1 ? <details className={styles.schedule}><summary>Расписание · {slots.length} {pluralRu(slots.length, PLURAL_SESSION_FORMS)}</summary><ul className={styles.scheduleList}>{slots.map((item, index) => { const itemUrls = [...new Set([item.purchaseUrl, ...(item.purchaseUrls || []), event.widgetUrl, event.purchaseUrl].map(safeExternalUrl).filter((url): url is string => Boolean(url)))]; return <li className={styles.scheduleItem} key={item.id || `${event.id}:${item.startsAt}:${index}`}><span>{formatSlot(item)}</span>{itemUrls.map((itemUrl, urlIndex) => <a key={`${itemUrl}:${urlIndex}`} href={itemUrl} target="_blank" rel="noopener noreferrer" className={styles.scheduleBuy}>{itemUrls.length > 1 ? `Билет на сеанс ${urlIndex + 1}` : 'Билет на этот сеанс'}</a>)}</li>; })}</ul></details> : null}
+                  {slots.length > 1 ? <details className={styles.schedule}><summary>Расписание · {slots.length} {pluralRu(slots.length, PLURAL_SESSION_FORMS)}</summary><ul className={styles.scheduleList}>{slots.map((item, index) => { const itemUrls = [...new Set([item.purchaseUrl, ...(item.purchaseUrls || []), event.widgetUrl, event.purchaseUrl].map(safeExternalUrl).filter((url): url is string => Boolean(url)))]; return <li className={styles.scheduleItem} key={item.id || `${event.id}:${item.startsAt}:${index}`}><span>{formatSlot(item)}</span>{itemUrls.map((itemUrl, urlIndex) => <PreviewPurchaseButton key={`${itemUrl}:${urlIndex}`} event={{ ...event, widgetUrl: null, purchaseUrl: itemUrl, upcomingSlots: [{ ...item, purchaseUrl: itemUrl, purchaseUrls: undefined }] }} className={styles.scheduleBuy} label={itemUrls.length > 1 ? `Билет на сеанс ${urlIndex + 1}` : 'Билет на этот сеанс'} />)}</li>; })}</ul></details> : null}
                 </div>
                 <div className={styles.rowPrice}>{priceLabel}{typeof event.priceFrom === 'number' && event.priceFrom === 0 ? <small className={styles.freePrice}>вход свободный</small> : <small>за билет</small>}</div>
                 <div className={`${styles.rowSeats} ${typeof event.vacant === 'number' && event.vacant <= 8 ? styles.rowSeatsLow : ''}`}>{typeof event.vacant === 'number' ? `${event.vacant} мест` : ''}</div>
@@ -611,7 +607,7 @@ export function NewYearUxPreview({ initialData, errorMessage }: { initialData: P
                     const urls = [...new Set([item.purchaseUrl, ...(item.purchaseUrls || [])].map(safeExternalUrl).filter((url): url is string => Boolean(url)))];
                     return <li key={item.id || `${selectedEvent.id}:${item.startsAt}:${index}`}>
                       <span>{formatSlot(item)}</span>
-                      {urls.map((url, urlIndex) => <a key={`${url}:${urlIndex}`} href={url} target="_blank" rel="noopener noreferrer">{urls.length > 1 ? `Билет на сеанс ${urlIndex + 1}` : 'Купить билет на этот сеанс'}</a>)}
+                      {urls.map((url, urlIndex) => <PreviewPurchaseButton key={`${url}:${urlIndex}`} event={{ ...selectedEvent, widgetUrl: null, purchaseUrl: url, upcomingSlots: [{ ...item, purchaseUrl: url, purchaseUrls: undefined }] }} className={styles.drawerScheduleBuy} label={urls.length > 1 ? `Билет на сеанс ${urlIndex + 1}` : 'Купить билет на этот сеанс'} />)}
                     </li>;
                   })}
                 </ul>
