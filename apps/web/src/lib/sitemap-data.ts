@@ -4,6 +4,7 @@ import { prisma } from '@daibilet/db';
 import { evaluateCityIndexability, evaluateRegionIndexability, evaluateVenueIndexability } from '@/lib/hub-indexability';
 import {
   CITY_LANDING_PATH_BY_SLUG,
+  CITY_SCOPED_LANDING_SLUGS,
   DEFAULT_CITY_BY_LANDING_SLUG,
   LANDING_CATEGORY_PATH_BY_SLUG,
   MULTI_CITY_LANDING_SLUGS,
@@ -11,14 +12,15 @@ import {
   cityPathSegment,
   isLandingCityAllowed,
   landingCategoryHref,
+  resolveLandingBoundCitySlug,
 } from '@/lib/landing-routes';
 import {
   catalogIntentFilterValues,
   catalogIntentPath,
   listCatalogIntents,
 } from '@/lib/catalog-intent-routes';
-import { hasSeoListingEditorial } from '@/data/seo-listing-texts';
 import { isEventsCatalogSitemapEligibleUrl } from '@/lib/events-catalog-indexing';
+import { isLandingRouteIndexable } from '@/lib/landing-indexability';
 import { evaluateListingIndexability, MIN_LISTING_OFFERS_FOR_INDEX } from '@/lib/seo-listing-meta';
 import { buildPodborkiCityCanonicalPath, isPodborkiSeoPilotCitySlug, PODBORKI_SEO_PILOT_CITY_SLUGS } from '@/lib/podborki-city-seo';
 import { venueCanonicalPath, cityCanonicalPath, cityEventsHref, cityHref, citySlug, isCityFirstUrlMode } from '@/lib/routes';
@@ -134,8 +136,6 @@ function listingSitemapCitySlugs(): string[] {
   }
   return out;
 }
-
-const YEAR_ROUND_SITEMAP_LANDINGS = new Set<string>(['salute-9-may']);
 
 export function getSiteUrl(): string {
   return (
@@ -548,12 +548,30 @@ export async function buildLandingsSitemapEntries(): Promise<SitemapEntry[]> {
   const cities = listingSitemapCitySlugs();
 
   for (const slug of Object.keys(LANDING_CATEGORY_PATH_BY_SLUG)) {
-    if (isLandingCityAllowed(slug, 'moscow') && isLandingCityAllowed(slug, 'saint-petersburg') && isLandingCityAllowed(slug, 'kazan')) {
-      paths.add(landingCategoryHref(slug));
-    }
-    // Year-round seasonal hubs stay in sitemap even with 0 offers (catalog may hide).
-    if (YEAR_ROUND_SITEMAP_LANDINGS.has(slug)) {
-      paths.add(landingCategoryHref(slug));
+    // City-bound landing routes are checked below using their default city's
+    // exact payload, just like the page metadata request.
+    if (
+      !CITY_SCOPED_LANDING_SLUGS.has(slug) &&
+      isLandingCityAllowed(slug, 'moscow') &&
+      isLandingCityAllowed(slug, 'saint-petersburg') &&
+      isLandingCityAllowed(slug, 'kazan')
+    ) {
+      try {
+        const payload = await fetchLandingPageDto(slug);
+        if (payload?.landing) {
+          const finalized = finalizeLandingPayload(payload, slug);
+          const seoCity = resolveLandingBoundCitySlug(slug);
+          if (isLandingRouteIndexable({
+            landingSlug: slug,
+            citySlugForSeo: seoCity,
+            offers: finalized.stats?.events ?? 0,
+          })) {
+            paths.add(landingCategoryHref(slug));
+          }
+        }
+      } catch {
+        // A failed catalog read must not add a URL that the page cannot validate.
+      }
     }
     if (!MULTI_CITY_LANDING_SLUGS.has(slug)) continue;
     for (const city of cities) {
@@ -565,16 +583,11 @@ export async function buildLandingsSitemapEntries(): Promise<SitemapEntry[]> {
         if (!payload?.landing) continue;
         const finalized = finalizeLandingPayload(payload, slug, city);
         const offers = finalized.stats?.events ?? 0;
-        const pilot = isPodborkiSeoPilotCitySlug(city);
-        if (
-          !evaluateListingIndexability({
-            offers,
-            minOffers: MIN_LISTING_OFFERS_FOR_INDEX,
-            hasEditorialSeoText: hasSeoListingEditorial(slug, city),
-            stablePilotIndex: pilot,
-            hasSeoSkeleton: YEAR_ROUND_SITEMAP_LANDINGS.has(slug),
-          }).indexable
-        ) {
+        if (!isLandingRouteIndexable({
+          landingSlug: slug,
+          citySlugForSeo: city,
+          offers,
+        })) {
           continue;
         }
         paths.add(landingCategoryHref(slug, city));
@@ -588,23 +601,19 @@ export async function buildLandingsSitemapEntries(): Promise<SitemapEntry[]> {
     const city = DEFAULT_CITY_BY_LANDING_SLUG[slug];
     if (!cityPathSegment(city)) continue;
     try {
-      const payload = await fetchLandingPageDto(slug);
-      if (!payload?.landing) {
-        paths.add(landingCategoryHref(slug, city));
-        continue;
-      }
+      const payload = await fetchLandingPageDto(slug, city);
+      if (!payload?.landing) continue;
       const finalized = finalizeLandingPayload(payload, slug, city);
       const offers = finalized.stats?.events ?? 0;
-      if (
-        evaluateListingIndexability({
-          offers,
-          hasEditorialSeoText: hasSeoListingEditorial(slug, city),
-        }).indexable
-      ) {
+      if (isLandingRouteIndexable({
+        landingSlug: slug,
+        citySlugForSeo: city,
+        offers,
+      })) {
         paths.add(landingCategoryHref(slug, city));
       }
     } catch {
-      paths.add(landingCategoryHref(slug, city));
+      // Do not emit a URL whose metadata/indexability could not be confirmed.
     }
   }
 

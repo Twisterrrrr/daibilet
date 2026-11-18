@@ -21,14 +21,12 @@ import {
   resolveLandingRouteFromLocation,
 } from '@/lib/landing-routes';
 import { resolveLandingSeo } from '@/lib/landing-seo';
-import { hasSeoListingEditorial } from '@/data/seo-listing-texts';
 import {
   appendRealPriceToDescription,
   buildCategoryCityListingMeta,
-  evaluateListingIndexability,
   robotsForListingIndexability,
 } from '@/lib/seo-listing-meta';
-import { shouldNoindexSeasonalLanding } from '@/lib/landing-season';
+import { isLandingRouteIndexable } from '@/lib/landing-indexability';
 import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
 import { getLandingSeo } from '@/lib/seo/get-landing-seo';
 import { isPodborkiSeoPilotCitySlug } from '@/lib/podborki-city-seo';
@@ -38,9 +36,6 @@ import { loadThinRelatedCardSessions } from '@/server/landing-thin-related';
 import { findSeoOverride } from '@/server/seo-override';
 
 export const revalidate = 3600;
-
-/** Year-round indexable seasonal hubs (catalog may hide off-season; URL stays 200 + index). */
-const YEAR_ROUND_SEO_SKELETON_LANDINGS = new Set<string>(['salute-9-may']);
 
 /** Профиль SEO/UI для лендинга - зеркало LandingPageView.getLandingProfile. */
 function resolveLandingProfileKind(slug: string): LandingProfileKind {
@@ -71,9 +66,6 @@ export async function buildLandingMetadata(pathname: string): Promise<Metadata> 
   const cityName = resolveLandingCityName(route.citySlug || seoCitySlug);
   const offers = finalized.stats?.events ?? 0;
   const priceFrom = finalized.stats?.priceFrom ?? null;
-  const hasEditorialSeoText = Boolean(
-    seoCitySlug && hasSeoListingEditorial(slug, seoCitySlug),
-  );
   const dbOverride =
     seoCitySlug && isPodborkiSeoPilotCitySlug(seoCitySlug)
       ? await findSeoOverride(seoCitySlug, slug)
@@ -85,11 +77,11 @@ export async function buildLandingMetadata(pathname: string): Promise<Metadata> 
   const hasOverrideSeo = Boolean(
     matrixSeo && (matrixSeo.source === 'override' || matrixSeo.source === 'template'),
   );
-  const indexDecision = evaluateListingIndexability({
+  const isIndexable = isLandingRouteIndexable({
+    landingSlug: slug,
+    citySlugForSeo: seoCitySlug,
     offers,
-    hasEditorialSeoText: hasEditorialSeoText || Boolean(dbOverride?.customText),
-    stablePilotIndex: Boolean(seoCitySlug && isPodborkiSeoPilotCitySlug(seoCitySlug)),
-    hasSeoSkeleton: YEAR_ROUND_SEO_SKELETON_LANDINGS.has(slug),
+    hasEditorialSeoText: Boolean(dbOverride?.customText),
   });
   const profile = resolveLandingProfileKind(slug);
 
@@ -154,9 +146,7 @@ export async function buildLandingMetadata(pathname: string): Promise<Metadata> 
     alternates: {
       canonical,
     },
-    robots: robotsForListingIndexability(
-      indexDecision.indexable && !shouldNoindexSeasonalLanding(slug, offers),
-    ),
+    robots: robotsForListingIndexability(isIndexable),
     ...buildShareMetadata({
       title: shareTitle,
       description,
