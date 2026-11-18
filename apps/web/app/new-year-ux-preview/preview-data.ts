@@ -169,8 +169,9 @@ function slotsForDate(event: PreviewEvent, date: string): PreviewSlot[] {
     const day = dayKey(slot.startsAt);
     if (!day) return false;
     if (date === 'dec31') return day === '2026-12-31';
+    if (date === 'dec24to31') return day >= '2026-12-24' && day <= '2026-12-31';
     if (date === 'jan1') return day === '2027-01-01';
-    if (date === 'jan1to8') return day >= '2027-01-01' && day <= '2027-01-08';
+    if (date === 'jan1to14') return day >= '2027-01-01' && day <= '2027-01-14';
     if (date === 'holidays') return day >= '2026-12-23' && day <= '2027-01-14';
     if (date === 'weekend') {
       const weekday = new Date(`${day}T00:00:00Z`).getUTCDay();
@@ -187,6 +188,8 @@ function matchesPrice(event: PreviewEvent, price: string): boolean {
   if (price === 'under1000') return event.priceFrom <= 1000;
   if (price === 'under2000') return event.priceFrom <= 2000;
   if (price === 'over2000') return event.priceFrom >= 2000;
+  if (price === 'over5000') return event.priceFrom >= 5000;
+  if (price === 'over10000') return event.priceFrom >= 10000;
   return true;
 }
 
@@ -252,8 +255,8 @@ export async function buildNewYearPreviewData(filters: PreviewFilters = {}) {
       filterable: !cityRegion(name) || REGION_CENTER_NAMES.has(name.replace(/\s*\([^)]*\)\s*$/u, '').trim()),
     }))],
     regions: regions.map((name) => ({ name, count: count('geo', (event) => cityRegion(event.city) === name) })).sort((a, b) => b.count - a.count || (a.name || '').localeCompare(b.name || '', 'ru')),
-    dates: ['all', 'dec31', 'jan1', 'jan1to8', 'weekend', 'holidays'].map((value) => ({ value, count: count('date', (event) => slotsForDate(event, value).length > 0) })),
-    prices: ['all', 'free', 'under1000', 'under2000', 'over2000'].map((value) => ({ value, count: count('price', (event) => matchesPrice(event, value)) })),
+    dates: ['all', 'dec24to31', 'dec31', 'jan1', 'jan1to14', 'weekend', 'holidays'].map((value) => ({ value, count: count('date', (event) => slotsForDate(event, value).length > 0) })),
+    prices: ['all', 'free', 'under1000', 'under2000', 'over2000', 'over5000', 'over10000'].map((value) => ({ value, count: count('price', (event) => matchesPrice(event, value)) })),
     formats: [{ name: 'Все форматы', count: count('format', () => true) }, ...formats.map((name) => ({ name, count: count('format', (event) => resolvePreviewFormat(event) === name) }))],
     lowStock: count('stock', lowStock),
   };

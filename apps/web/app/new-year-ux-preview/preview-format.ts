@@ -21,6 +21,10 @@ export function resolvePreviewFormat(event: PreviewFormatSource): string {
   const category = event.category || catalogCategory;
   const source = [subcategory, category, ...(event.subcategories || []), ...(event.tagLabels || []), ...(event.tags || [])].join(' ').toLocaleLowerCase('ru');
   const title = String(event.title || '').toLocaleLowerCase('ru');
+  const catalogSubcategorySlug = typeof event.catalogSubcategory === 'object' ? event.catalogSubcategory?.slug || '' : '';
+  const catalogCategorySlug = typeof event.catalogCategory === 'object' ? event.catalogCategory?.slug || '' : '';
+  if (/stand\s*[- ]?up|стендап/.test(`${source} ${title}`)) return 'Шоу';
+  if (/экскурс/.test(`${subcategory} ${category}`.toLocaleLowerCase('ru')) || catalogSubcategorySlug === 'excursions' || catalogCategorySlug === 'excursions') return 'Экскурсия';
   if (/ёлк|елк/.test(`${source} ${title}`)) return 'Ёлки';
   if (/детск|семь|реб[её]н/.test(`${source} ${title}`)) return 'Детская программа';
   if (/фейерверк|салют/.test(`${source} ${title}`)) return 'Фейерверк';
