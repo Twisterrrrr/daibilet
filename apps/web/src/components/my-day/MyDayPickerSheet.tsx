@@ -137,7 +137,7 @@ export function MyDayPickerSheet({
         </div>
       ) : null}
 
-      <div className={`grid min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)] sm:grid-cols-[220px_minmax(0,1fr)] sm:grid-rows-1 ${desktopOverlay || desktopAccordion ? 'lg:grid-cols-1' : ''}`}>
+      <div className={`grid min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)] sm:grid-cols-[220px_minmax(0,1fr)] sm:grid-rows-1 ${desktopOverlay || desktopAccordion ? 'lg:grid-cols-1 lg:grid-rows-[auto_minmax(0,1fr)]' : ''}`}>
         <div
           ref={listRef}
           role="tablist"
@@ -159,7 +159,7 @@ export function MyDayPickerSheet({
                 aria-controls="my-day-picker-panel"
                 tabIndex={on ? 0 : -1}
                 onClick={() => onSectionChange(t.value)}
-                className={`inline-flex min-h-10 shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-left text-sm font-semibold transition sm:w-full ${(desktopOverlay || desktopAccordion) ? 'lg:min-w-0 lg:px-2 lg:text-xs' : ''} ${desktopAccordion ? (on ? 'lg:justify-center lg:rounded-lg lg:bg-white lg:text-center lg:text-[#0F1B2D] lg:shadow-[0_1px_3px_rgba(15,27,45,.12)]' : 'lg:justify-center lg:rounded-lg lg:bg-transparent lg:text-center lg:text-slate-500 lg:hover:text-[#0F1B2D]') : on ? 'bg-primary-600 text-white' : 'text-slate-600 hover:bg-white/80'}`}
+                className={`inline-flex min-h-10 shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-left text-sm font-semibold transition sm:w-full ${(desktopOverlay || desktopAccordion) ? 'lg:min-w-0 lg:px-2 lg:text-xs' : ''} ${desktopAccordion ? (on ? 'lg:min-h-8 lg:justify-center lg:rounded-lg lg:bg-white lg:py-1.5 lg:text-center lg:text-[11px] lg:text-[#0F1B2D] lg:shadow-[0_1px_3px_rgba(15,27,45,.12)]' : 'lg:min-h-8 lg:justify-center lg:rounded-lg lg:bg-transparent lg:py-1.5 lg:text-center lg:text-[11px] lg:text-slate-500 lg:hover:text-[#0F1B2D]') : on ? 'bg-primary-600 text-white' : 'text-slate-600 hover:bg-white/80'}`}
               >
                 <Icon className={`h-4 w-4 shrink-0 ${desktopAccordion ? 'lg:hidden' : ''}`} aria-hidden />
                 <span className="min-w-0 sm:truncate lg:whitespace-normal">{t.label}</span>
@@ -187,7 +187,7 @@ export function MyDayPickerSheet({
         role="region"
         aria-labelledby={titleId}
         aria-describedby={!desktopAccordion ? descId : undefined}
-        className="sticky top-0 z-30 mb-4 flex max-h-[calc(100dvh-var(--site-header-height)-1rem)] min-h-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm motion-safe:animate-[my-day-picker-reveal_180ms_ease-out]"
+        className="sticky top-0 z-30 mb-4 flex h-[calc(100dvh_-_var(--site-header-height)_-_1rem)] min-h-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm motion-safe:animate-[my-day-picker-reveal_180ms_ease-out]"
         data-my-day-picker-accordion="1"
       >
         {panel}
