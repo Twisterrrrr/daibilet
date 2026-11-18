@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { CheckoutModalButton } from '@/components/CheckoutModal.client';
@@ -14,6 +14,7 @@ import { resolveSessionTimeZone } from '@/lib/city-timezone';
 import { parseSessionStartsAt } from '@/lib/datetime';
 import { PLURAL_EVENT_FORMS, pluralRu } from '@/lib/format';
 import { citySlug as cityToSlug } from '@/lib/routes';
+import { landingCategoryHref, normalizeKnownCitySlug } from '@/lib/landing-routes';
 import { resolveSeoListingText, splitSeoListingParagraphs } from '@/data/seo-listing-texts';
 import type { PreviewEvent } from './preview-data';
 import { resolvePreviewFormat } from './preview-format';
@@ -296,13 +297,47 @@ function DateFilterDropdown({
   </span>;
 }
 
-export function NewYearUxPreview({ initialData, errorMessage }: { initialData: PreviewData | null; errorMessage: string | null }) {
+function isCanonicalNewYearPath(pathname: string): boolean {
+  return pathname === '/novyj-god' || pathname.startsWith('/novyj-god/');
+}
+
+function resolveGeoPath(pathname: string, facets?: PreviewData['facets']): { city: string; region: string } {
+  const slug = normalizeKnownCitySlug(pathname.replace(/\/$/u, '').split('/').at(-1));
+  if (!slug || !facets || pathname === '/novyj-god') return { city: 'Вся Россия', region: '' };
+  const city = facets.cities.find((item) => item.name && item.name !== 'Вся Россия' && normalizeKnownCitySlug(cityToSlug({ name: item.name })) === slug);
+  if (city?.name) return { city: city.name, region: '' };
+  const region = facets.regions.find((item) => item.name && normalizeKnownCitySlug(cityToSlug({ name: item.name })) === slug);
+  return region?.name ? { city: 'Вся Россия', region: region.name } : { city: 'Вся Россия', region: '' };
+}
+
+function publicGeoPath(city: string, region: string): string {
+  if (city !== 'Вся Россия') return landingCategoryHref('new-year', cityToSlug({ name: city }));
+  if (region) return landingCategoryHref('new-year', cityToSlug({ name: region }));
+  return landingCategoryHref('new-year');
+}
+
+export function NewYearUxPreview({
+  initialData,
+  initialCity = null,
+  initialRegion = null,
+  errorMessage,
+}: {
+  initialData: PreviewData | null;
+  initialCity?: string | null;
+  initialRegion?: string | null;
+  errorMessage: string | null;
+}) {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const festive = searchParams.get('festive') !== '0';
   const [data, setData] = useState<PreviewData | null>(initialData);
-  const [loadedFilterQuery, setLoadedFilterQuery] = useState('');
-  const [region, setRegion] = useState(() => searchParams.get('region') || '');
-  const [city, setCity] = useState(() => searchParams.get('city') || 'Вся Россия');
+  const [loadedFilterQuery, setLoadedFilterQuery] = useState(() =>
+    initialCity || initialRegion
+      ? serializeFilters({ city: initialCity || 'Вся Россия', region: initialRegion || '', date: 'all', customDate: '', price: 'all', format: 'Все форматы', q: '', sort: 'date', lowStock: false })
+      : '',
+  );
+  const [region, setRegion] = useState(() => initialRegion || searchParams.get('region') || '');
+  const [city, setCity] = useState(() => initialCity || searchParams.get('city') || 'Вся Россия');
   const [customDate, setCustomDate] = useState(() => isCustomDate(searchParams.get('date')) ? searchParams.get('date')! : '');
   const [date, setDate] = useState<DateFilter>(() => {
     const value = searchParams.get('date');
@@ -336,9 +371,17 @@ export function NewYearUxPreview({ initialData, errorMessage }: { initialData: P
   const pageData = loadedFilterQuery === filterQuery ? data : null;
 
   useEffect(() => {
+    if (!initialCity && !initialRegion) return;
+    setCity(initialCity || 'Вся Россия');
+    setRegion(initialRegion || '');
+    setData(initialData);
+    setLoadedFilterQuery(serializeFilters({ city: initialCity || 'Вся Россия', region: initialRegion || '', date: 'all', customDate: '', price: 'all', format: 'Все форматы', q: '', sort: 'date', lowStock: false }));
+  }, [initialCity, initialRegion, initialData]);
+
+  useEffect(() => {
     if (firstFilterEffect.current) {
       firstFilterEffect.current = false;
-      if (!filterQuery) return;
+      if (filterQuery === loadedFilterQuery || !filterQuery) return;
     }
     const controller = new AbortController();
     setLoading(true);
@@ -356,7 +399,7 @@ export function NewYearUxPreview({ initialData, errorMessage }: { initialData: P
       }
     }, query ? 180 : 0);
     return () => { clearTimeout(timer); controller.abort(); };
-  }, [filterQuery, query]);
+  }, [filterQuery, query, loadedFilterQuery]);
 
   useEffect(() => {
     if (!selectedEvent) return;
@@ -379,9 +422,37 @@ export function NewYearUxPreview({ initialData, errorMessage }: { initialData: P
     if (firstUrlSync.current) { firstUrlSync.current = false; return; }
     const url = new URL(window.location.href);
     for (const key of ['city', 'region', 'date', 'price', 'format', 'q', 'sort', 'lowStock']) url.searchParams.delete(key);
-    new URLSearchParams(filterQuery).forEach((value, key) => url.searchParams.set(key, value));
+    const isLandingUrl = isCanonicalNewYearPath(url.pathname);
+    if (isLandingUrl) url.pathname = publicGeoPath(city, region);
+    new URLSearchParams(filterQuery).forEach((value, key) => {
+      if (isLandingUrl && (key === 'city' || key === 'region')) return;
+      url.searchParams.set(key, value);
+    });
     window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`);
-  }, [filterQuery]);
+  }, [filterQuery, city, region]);
+
+  useEffect(() => {
+    const syncLocation = () => {
+      const url = new URL(window.location.href);
+      const geo = isCanonicalNewYearPath(url.pathname)
+        ? resolveGeoPath(url.pathname, data?.facets)
+        : { city: url.searchParams.get('city') || 'Вся Россия', region: url.searchParams.get('region') || '' };
+      setCity(geo.city);
+      setRegion(geo.region);
+      const nextDate = url.searchParams.get('date') || 'all';
+      setDate(DATE_OPTIONS.some((item) => item.value === nextDate) ? nextDate as DateFilter : isCustomDate(nextDate) ? 'custom' : 'all');
+      setCustomDate(isCustomDate(nextDate) ? nextDate : '');
+      const nextPrice = url.searchParams.get('price') || 'all';
+      setPrice(PRICE_OPTIONS.some((item) => item.value === nextPrice) ? nextPrice as PriceFilter : 'all');
+      setFormat(url.searchParams.get('format') || 'Все форматы');
+      setQuery(url.searchParams.get('q') || '');
+      const nextSort = url.searchParams.get('sort');
+      setSort(nextSort === 'price' || nextSort === 'price-desc' ? nextSort : 'date');
+      setLowStock(url.searchParams.get('lowStock') === '1');
+    };
+    window.addEventListener('popstate', syncLocation);
+    return () => window.removeEventListener('popstate', syncLocation);
+  }, [data?.facets]);
 
   const loadMore = useCallback(async () => {
     if (!data?.hasMore || loadingMore || loading) return;
@@ -450,13 +521,25 @@ export function NewYearUxPreview({ initialData, errorMessage }: { initialData: P
   const regionGuideLinks = NEW_YEAR_NATIONAL_GUIDE.cities.filter((item) => regionCityNames.has(item.title));
   const guideLinks = cityGuide?.recommendations || (city === 'Вся Россия' ? region ? regionGuideLinks : NEW_YEAR_NATIONAL_GUIDE.cities : []);
   const faqItems = cityGuide?.faq || [];
+  const navigateGeo = (nextCity: string, nextRegion: string) => {
+    const current = new URL(window.location.href);
+    if (!isCanonicalNewYearPath(current.pathname)) return;
+    current.pathname = publicGeoPath(nextCity, nextRegion);
+    current.searchParams.delete('city');
+    current.searchParams.delete('region');
+    router.push(`${current.pathname}${current.search}${current.hash}`, { scroll: false });
+  };
   const selectCity = (value: string) => {
-    setCity((current) => value !== 'Вся Россия' && current === value && !region ? 'Вся Россия' : value);
+    const nextCity = value !== 'Вся Россия' && city === value && !region ? 'Вся Россия' : value;
+    navigateGeo(nextCity, '');
+    setCity(nextCity);
     setRegion('');
   };
-  const selectAllGeography = () => { setCity('Вся Россия'); setRegion(''); };
+  const selectAllGeography = () => { navigateGeo('Вся Россия', ''); setCity('Вся Россия'); setRegion(''); };
   const selectRegion = (value: string) => {
-    setRegion((current) => current === value ? '' : value);
+    const nextRegion = region === value ? '' : value;
+    navigateGeo('Вся Россия', nextRegion);
+    setRegion(nextRegion);
     setCity('Вся Россия');
   };
   const generatedLabel = pageData?.generatedAt ? new Intl.DateTimeFormat('ru-RU', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Europe/Moscow' }).format(new Date(pageData.generatedAt)) : 'не указано';
@@ -470,11 +553,16 @@ export function NewYearUxPreview({ initialData, errorMessage }: { initialData: P
     setCustomDate(value);
     setDate('custom');
   };
-  const resetFilters = () => { setCity('Вся Россия'); setRegion(''); setQuery(''); setDateFilter('all'); setPrice('all'); setFormat('Все форматы'); setLowStock(false); setSort('date'); setCompact(false); };
+  const resetFilters = () => { navigateGeo('Вся Россия', ''); setCity('Вся Россия'); setRegion(''); setQuery(''); setDateFilter('all'); setPrice('all'); setFormat('Все форматы'); setLowStock(false); setSort('date'); setCompact(false); };
   const copyFiltersLink = async () => {
     const url = new URL(window.location.href);
     for (const key of ['city', 'region', 'date', 'price', 'format', 'q', 'sort', 'lowStock']) url.searchParams.delete(key);
-    new URLSearchParams(filterQuery).forEach((value, key) => url.searchParams.set(key, value));
+    const isLandingUrl = isCanonicalNewYearPath(url.pathname);
+    if (isLandingUrl) url.pathname = publicGeoPath(city, region);
+    new URLSearchParams(filterQuery).forEach((value, key) => {
+      if (isLandingUrl && (key === 'city' || key === 'region')) return;
+      url.searchParams.set(key, value);
+    });
     if (!festive) url.searchParams.set('festive', '0');
     try {
       await navigator.clipboard.writeText(url.toString());
@@ -495,7 +583,7 @@ export function NewYearUxPreview({ initialData, errorMessage }: { initialData: P
           <nav aria-label="Хлебные крошки" className={styles.bandCrumbs}>
             <Link href="/">Главная</Link><span>/</span><Link href="/podborki">Подборки</Link><span>/</span><Link href="/novyj-god">Новый год</Link>{region || city !== 'Вся Россия' ? <><span>/</span><span className={styles.bandCrumbCurrent}>{region || city}</span></> : null}
           </nav>
-          <h1 className={styles.title}>Новый год 2027 в {cityPrepositional || 'России'}:<br className={styles.titleBreak} /> мероприятия, афиша и билеты</h1>
+          <h1 className={styles.title}>Новый год 2027 в {region ? resolveCityCases(region).prepositional || `регионе «${region}»` : cityPrepositional || 'России'}:<br className={styles.titleBreak} /> мероприятия, афиша и билеты</h1>
           <p className={`${styles.lead} ${styles.leadDesktop}`}>Новогодние праздники — отличный повод выбраться из дома, провести время с близкими или отправиться в небольшое путешествие. На этой странице собраны праздничные концерты, спектакли, детские ёлки, экскурсии и развлекательные программы в разных городах России. Выбирайте интересующие даты, сравнивайте мероприятия и находите подходящий вариант для всей семьи или компании друзей.</p>
           <p className={`${styles.lead} ${styles.leadMobile}`}>Новогодние концерты, спектакли, детские ёлки, экскурсии и праздничные программы по всей России. Выбирайте города, даты и подходящие мероприятия.</p>
           <div className={styles.bandMeta}>

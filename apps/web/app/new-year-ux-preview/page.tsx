@@ -1,9 +1,5 @@
 import type { Metadata } from 'next';
-import { Suspense } from 'react';
-
-import { SiteLayout } from '@/components/SiteLayout';
-import { NewYearUxPreview } from './preview.client';
-import { buildNewYearPreviewData } from './preview-data';
+import { NewYearLandingPage } from './landing-page';
 
 export const metadata: Metadata = {
   title: { absolute: 'Новый год 2027: мероприятия в России, афиша и билеты | Дайбилет' },
@@ -12,19 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default async function NewYearUxPreviewPage() {
-  let initialData: Awaited<ReturnType<typeof buildNewYearPreviewData>> | null = null;
-  let errorMessage: string | null = null;
-  try {
-    initialData = await buildNewYearPreviewData();
-  } catch {
-    errorMessage = 'Не удалось получить события из публичного каталога. Обновите страницу позже.';
-  }
-
-  return (
-    <SiteLayout>
-      <Suspense fallback={<div className="min-h-screen bg-[#F7F8F6] p-8 text-sm text-neutral-600">Загружаем предварительный просмотр…</div>}>
-        <NewYearUxPreview initialData={initialData} errorMessage={errorMessage} />
-      </Suspense>
-    </SiteLayout>
-  );
+  return <NewYearLandingPage />;
 }

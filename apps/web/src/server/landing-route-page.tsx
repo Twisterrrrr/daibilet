@@ -34,6 +34,7 @@ import { buildFaqPageJsonLd, buildLandingPageJsonLd } from '@/lib/structured-dat
 import { fetchLandingPageDto, finalizeLandingPayload } from '@/server/landing-page';
 import { loadThinRelatedCardSessions } from '@/server/landing-thin-related';
 import { findSeoOverride } from '@/server/seo-override';
+import { NewYearLandingPage } from '../../app/new-year-ux-preview/landing-page';
 
 export const revalidate = 3600;
 
@@ -161,6 +162,10 @@ export async function LandingRoutePage({ pathname }: { pathname: string }) {
   if (!route) notFound();
 
   const slug = canonicalLandingSlug(route.landingSlug);
+  if (slug === 'new-year') {
+    const newYearPage = await NewYearLandingPage({ geoSlug: route.citySlug || null });
+    if (newYearPage) return newYearPage;
+  }
   const seoCitySlug =
     route.citySlug || resolveLandingBoundCitySlug(slug) || null;
   const payload = await fetchLandingPageDto(slug, route.citySlug, { revalidateSeconds: 3600 });
