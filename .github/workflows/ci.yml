@@ -77,8 +77,9 @@ jobs:
       - name: Hub image map guard (scan cities)
         run: pnpm hub:check-image-map
 
-      - name: Hub image quality guard (scan cities)
-        run: pnpm hub:check-image-quality
+      # Venue images are persistent server assets excluded from Git. Their
+      # filesystem quality guard runs in the deploy scripts after the runtime
+      # image root is verified; clean CI builds intentionally have no payload.
 
       - name: Prisma validate and generate
         run: |

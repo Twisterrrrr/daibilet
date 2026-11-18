@@ -1,6 +1,7 @@
 import { cityToGenitive, cityToPrepositional } from './city-declension';
 import { LANDING_CITY_SLUGS, resolveLandingCityName } from './landing-city';
 import { normalizeKnownCitySlug } from './landing-routes';
+import { isCityFirstUrlMode } from './routes';
 
 /**
  * Active SEO pilot cities (owner 2026-09-03): KGD + SPB + PILOT-2 NN + Perm.
@@ -15,9 +16,9 @@ export const PODBORKI_SEO_PILOT_CITY_SLUGS = [
 ] as const;
 
 /**
- * Meta Title/Desc/H1 + self-canonical on marker CHPU `/podborki/c/{city}`.
+ * Meta Title/Desc/H1 + self-canonical on the active city-scoped route.
  * Includes legacy `moscow` as harmless leftover (не расширяем пилот; не ломаем уже залитый meta).
- * Soft `/podborki?city=` for these slugs 301 → marker CHPU.
+ * Soft `/podborki?city=` for these slugs 301 → canonical city-scoped route.
  */
 export const PODBORKI_CITY_META_PILOT_SLUGS = [
   ...PODBORKI_SEO_PILOT_CITY_SLUGS,
@@ -30,7 +31,7 @@ export type PodborkiCityMetaPilotSlug = (typeof PODBORKI_CITY_META_PILOT_SLUGS)[
 const SEO_PILOT_SET = new Set<string>(PODBORKI_SEO_PILOT_CITY_SLUGS);
 const PILOT_SET = new Set<string>(PODBORKI_CITY_META_PILOT_SLUGS);
 
-/** Marker segment for city-scoped podborki hub (`/podborki/c/{city}`). */
+/** Legacy marker segment for city-scoped podborki hub (`/podborki/c/{city}`). */
 export const PODBORKI_CITY_HUB_MARKER = 'c' as const;
 
 export function isPodborkiSeoPilotCitySlug(
@@ -95,12 +96,18 @@ export function resolvePodborkiCityMetaPilot(
 }
 
 export function buildPodborkiCityCanonicalPath(citySlug: PodborkiCityMetaPilotSlug): string {
+  if (isCityFirstUrlMode()) {
+    // The city-first route registry uses `sankt-peterburg` as the public path;
+    // `saint-petersburg` remains an SEO/API lookup alias only.
+    const cityPathSlug = citySlug === 'saint-petersburg' ? 'sankt-peterburg' : citySlug;
+    return `/${encodeURIComponent(cityPathSlug)}/podborki`;
+  }
   return `/podborki/${PODBORKI_CITY_HUB_MARKER}/${encodeURIComponent(citySlug)}`;
 }
 
 /**
  * Public href for city-scoped podborki hub.
- * Meta-pilot (incl. moscow leftover + future SEO pilot expansions) → marker CHPU;
+ * Meta-pilot (incl. moscow leftover + future SEO pilot expansions) → active city-first or legacy route;
  * other known cities stay on soft `?city=`; missing/all → hub root.
  */
 export function buildPodborkiCityHref(rawCity: string | null | undefined): string {
@@ -125,7 +132,7 @@ export function parsePodborkiCityHubPath(pathname: string | null | undefined): s
 }
 
 /**
- * Soft `/podborki?city=` → marker CHPU when city resolves to meta-pilot canon.
+ * Soft `/podborki?city=` → canonical city route when city resolves to meta-pilot.
  * Returns destination path or null (no redirect).
  */
 export function resolvePodborkiCityQueryRedirect(

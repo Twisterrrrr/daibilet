@@ -22,7 +22,6 @@ import { isEventsCatalogSitemapEligibleUrl } from '@/lib/events-catalog-indexing
 import { evaluateListingIndexability, MIN_LISTING_OFFERS_FOR_INDEX } from '@/lib/seo-listing-meta';
 import { buildPodborkiCityCanonicalPath, isPodborkiSeoPilotCitySlug, PODBORKI_SEO_PILOT_CITY_SLUGS } from '@/lib/podborki-city-seo';
 import { venueCanonicalPath, cityCanonicalPath, cityEventsHref, cityHref, citySlug, isCityFirstUrlMode } from '@/lib/routes';
-import { cityPlacesCatalogHref } from '@/lib/catalog-url';
 import { isCityFirstLegacyRouteSlug } from '@/lib/city-first-route-slugs';
 import { getCachedCatalog } from '@/server/cached-catalog-data';
 import { getCachedDestinations } from '@/server/cached-public-surfaces';
@@ -358,7 +357,7 @@ export async function buildCitiesSitemapEntries(): Promise<SitemapEntry[]> {
       prisma.city.findMany({
         where: { pdpDocument: { isNot: null } },
         select: {
-          title: true, slug: true, updatedAt: true,
+          title: true, slug: true,
           pdpDocument: { select: { status: true, isIndexable: true, canonicalPath: true, updatedAt: true } },
         },
       }),
@@ -372,7 +371,7 @@ export async function buildCitiesSitemapEntries(): Promise<SitemapEntry[]> {
     ]);
     for (const city of cities) {
       if (!city.pdpDocument) continue;
-      const record = { title: city.title, slug: city.slug, sourceSlug: null, type: 'city' as const, ...city.pdpDocument, updatedAt: city.pdpDocument.updatedAt || city.updatedAt };
+      const record = { title: city.title, slug: city.slug, sourceSlug: null, type: 'city' as const, ...city.pdpDocument, updatedAt: city.pdpDocument.updatedAt };
       editorialBySlug.set(record.slug.toLowerCase(), record);
     }
     for (const region of regions) {
@@ -386,46 +385,44 @@ export async function buildCitiesSitemapEntries(): Promise<SitemapEntry[]> {
     console.error('[sitemap] destination PDP indexability lookup failed', error);
   }
 
-  const entries = (destinationsPayload?.destinations || [])
-    .filter((destination) => {
-      if (!destination.slug) return false;
-      const editorial = editorialBySlug.get(String(destination.slug).toLowerCase()) ||
-        (destination.sourceSlug ? editorialBySlug.get(String(destination.sourceSlug).toLowerCase()) : undefined);
-      if (editorial) return editorial.status === 'PUBLISHED' && editorial.isIndexable;
-      if (destination.type === 'city') {
-        return evaluateCityIndexability({
-          events: destination.events,
-          slug: destination.slug,
-          sourceSlug: destination.sourceSlug,
-        }).indexable;
-      }
-      if (destination.type === 'region') {
-        // Tier C (<3 events): noindex + вне sitemap; A/B с ≥3 - в карту.
-        return evaluateRegionIndexability({
-          childEventTotal: destination.events,
-        }).indexable;
-      }
-      return false;
-    })
-    .flatMap((destination) => {
-      const editorial = destination.slug
-        ? editorialBySlug.get(String(destination.slug).toLowerCase()) ||
-          (destination.sourceSlug ? editorialBySlug.get(String(destination.sourceSlug).toLowerCase()) : undefined)
-        : undefined;
-      const href = editorial
-        ? destinationPdpSitemapPath({ ...editorial, type: editorial.type })
-        : cityHref(destination);
-      return [
-        ...(href ? [entry(href, 'daily', destination.type === 'region' ? 0.7 : 0.75, editorial?.updatedAt)] : []),
-        ...(destination.type === 'city' && isCityFirstUrlMode() && destination.events > 0
-          && isCityFirstLegacyRouteSlug(citySlug(destination))
-          ? [entry(cityEventsHref(destination), 'daily', 0.75, editorial?.updatedAt)]
-          : []),
-        ...(destination.type === 'city' && destination.venues > 0
-          ? [entry(cityPlacesCatalogHref(citySlug(destination)), 'daily', 0.65)]
-          : []),
-      ];
-    });
+  const entries = (destinationsPayload?.destinations || []).flatMap((destination) => {
+    if (!destination.slug) return [];
+    const editorial = editorialBySlug.get(String(destination.slug).toLowerCase()) ||
+      (destination.sourceSlug ? editorialBySlug.get(String(destination.sourceSlug).toLowerCase()) : undefined);
+    let destinationIndexable = false;
+    if (editorial) {
+      destinationIndexable = editorial.status === 'PUBLISHED' && editorial.isIndexable;
+    } else if (destination.type === 'city') {
+      destinationIndexable = evaluateCityIndexability({
+        events: destination.events,
+        slug: destination.slug,
+        sourceSlug: destination.sourceSlug,
+      }).indexable;
+    } else if (destination.type === 'region') {
+      // Tier C (<3 events): noindex + вне sitemap; A/B с ≥3 - в карту.
+      destinationIndexable = evaluateRegionIndexability({
+        childEventTotal: destination.events,
+      }).indexable;
+    }
+
+    const href = editorial
+      ? destinationPdpSitemapPath({ ...editorial, type: editorial.type })
+      : cityHref(destination);
+    const placesPath = destination.type === 'city' && destination.venues > 0
+      ? cityPlacesSitemapPath(citySlug(destination), isCityFirstUrlMode())
+      : null;
+
+    return [
+      ...(destinationIndexable && href
+        ? [entry(href, 'daily', destination.type === 'region' ? 0.7 : 0.75, editorial?.updatedAt)]
+        : []),
+      ...(destinationIndexable && destination.type === 'city' && isCityFirstUrlMode()
+        && destination.events > 0 && isCityFirstLegacyRouteSlug(citySlug(destination))
+        ? [entry(cityEventsHref(destination), 'daily', 0.75, editorial?.updatedAt)]
+        : []),
+      ...(placesPath ? [entry(placesPath, 'daily', 0.65)] : []),
+    ];
+  });
 
   const seen = new Set(entries.map((item) => new URL(item.url).pathname));
   for (const editorial of editorialBySlug.values()) {
@@ -467,6 +464,19 @@ export function destinationPdpSitemapPath(destination: {
   } catch {
     return null;
   }
+}
+
+/**
+ * The city places catalog is an independent indexable listing. It must not be
+ * hidden from the sitemap just because the city editorial PDP is noindex.
+ */
+export function cityPlacesSitemapPath(slug: string, cityFirst: boolean): string | null {
+  const canonicalSlug = citySlug({ slug, name: slug, type: 'city' });
+  if (cityFirst) {
+    if (!isCityFirstLegacyRouteSlug(canonicalSlug)) return null;
+    return `/${encodeURIComponent(canonicalSlug)}/places`;
+  }
+  return `/places/c/${encodeURIComponent(canonicalSlug)}`;
 }
 
 export async function buildVenuesSitemapEntries(): Promise<SitemapEntry[]> {
@@ -549,7 +559,9 @@ export async function buildLandingsSitemapEntries(): Promise<SitemapEntry[]> {
     for (const city of cities) {
       if (!isLandingCityAllowed(slug, city)) continue;
       try {
-        const payload = await fetchLandingPageDto(slug);
+        // Match the page metadata query: a national top-48 payload can undercount
+        // city-specific offers after filtering and omit indexable city URLs.
+        const payload = await fetchLandingPageDto(slug, city);
         if (!payload?.landing) continue;
         const finalized = finalizeLandingPayload(payload, slug, city);
         const offers = finalized.stats?.events ?? 0;

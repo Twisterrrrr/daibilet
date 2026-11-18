@@ -233,6 +233,7 @@ echo "web:build NODE_OPTIONS=${NODE_OPTIONS} EVENT_SSG_TOP_N=${EVENT_SSG_TOP_N}"
 # Generated public assets may be root-owned after maintenance jobs. Normalize the
 # destination before `web:build`, whose first step syncs those assets again.
 ensure_public_assets_deploy
+pnpm hub:check-image-quality
 
 # A running Next server may create root-owned cache files in .next. Never build
 # into that tree: it causes EACCES and can serve half-written manifests/chunks.

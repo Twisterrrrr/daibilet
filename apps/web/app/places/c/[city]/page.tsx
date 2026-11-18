@@ -58,6 +58,7 @@ export default async function CityPlacesPage({ params, searchParams }: PageProps
     page: pageNumber,
     limit: VENUE_CATALOG_PAGE_SIZE,
     counts: false,
+    retries: 1,
   });
   const page = mapVenueCatalogFeedPage(raw);
   const lastPage = Math.max(1, Math.ceil(page.total / page.limit));

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound, permanentRedirect } from 'next/navigation';
 
 import '@/lib/env';
+import { isCityFirstUrlMode } from '@/lib/routes';
 import { normalizeKnownCitySlug } from '@/lib/landing-routes';
 import {
   buildPodborkiCityCanonicalPath,
@@ -68,8 +69,16 @@ export default async function PodborkiCityHubPage({ params }: PageProps) {
   if (!resolved) notFound();
 
   // Alias / DB translit → SEO path canon on the marker URL.
-  if (resolved.meta && resolved.raw !== resolved.meta.citySlug) {
-    permanentRedirect(buildPodborkiCityCanonicalPath(resolved.meta.citySlug));
+  if (resolved.meta) {
+    // The public city-first spelling differs from the SEO/API alias for SPB.
+    const expectedCitySegment = isCityFirstUrlMode()
+      ? resolved.meta.citySlug === 'saint-petersburg'
+        ? 'sankt-peterburg'
+        : resolved.meta.citySlug
+      : resolved.meta.citySlug;
+    if (isCityFirstUrlMode() || resolved.raw !== expectedCitySegment) {
+      permanentRedirect(buildPodborkiCityCanonicalPath(resolved.meta.citySlug));
+    }
   }
 
   if (!resolved.meta) {

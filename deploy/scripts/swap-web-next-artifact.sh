@@ -71,6 +71,7 @@ echo "HEAD=$(git rev-parse --short HEAD) ($(git rev-parse HEAD))"
 # nginx serves /images/ from persistent apps/web/public/images (gitignored);
 # deployments swap only .next and require the existing image root to be present.
 ensure_public_assets_deploy
+pnpm hub:check-image-quality
 
 WEB_NEXT_DIR="apps/web/.next"
 WEB_NEXT_PREV="apps/web/.next.prev"
