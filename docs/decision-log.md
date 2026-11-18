@@ -503,7 +503,7 @@ otherwise.
 
 **Decision:** A thematic landing is the primary entry point; city is its geographic refinement (`/{theme}/{city}`, for example `/novyj-god/moscow`). Preserve existing public URLs and their search history. Do not create a parallel URL or redirect as part of a UI refresh. Publish city variants only when the route matrix allows the theme and the variant has a supported catalog route.
 
-**Internal links:** Each supported theme-city pair should have crawlable HTML links from the national theme page, the city's collections index, its city hub when editorially relevant, and matching editorial articles. City selection on a theme page must preserve the theme and navigate to the selected city's canonical URL. `/podborki/c/{city}` remains the city-level collections index; it does not replace the theme-city landing.
+**Internal links:** Each supported theme-city pair should have crawlable HTML links from the national theme page, the city's collections index, its city hub, and matching editorial articles. The city hub must link directly to current supported themes; routing only through `/podborki/c/{city}` does not replace the direct link. City selection on a theme page must preserve the theme and navigate to the selected city's canonical URL. `/podborki/c/{city}` remains the city-level collections index; it does not replace the theme-city landing.
 
 **Why:** The existing topic-first hierarchy scales across themes and cities while preserving URLs already exposed to search engines. Crawlers and users need ordinary links between the national page, city variants, city hubs, collections, and related articles.
 
