@@ -8,7 +8,16 @@ import {
   matchesPublicEventSlug,
   mapTepPublicSlugIds,
   publicSlug,
+  resolveTicketTariffEventIds,
 } from './public-event.dto.js';
+
+test('ticket tariff scope excludes dated EventPage slot membership', () => {
+  const datedSlots = Array.from({ length: 151 }, (_, index) => `slot-${index + 1}`);
+  const ids = resolveTicketTariffEventIds('product', 'representative', ['merge-peer', 'product']);
+
+  assert.deepEqual(ids, ['product', 'representative', 'merge-peer']);
+  assert.equal(ids.some((id) => datedSlots.includes(id)), false);
+});
 
 test('truncated Teplohod slugs without an ID tail resolve through the bounded map', () => {
   const rows = [

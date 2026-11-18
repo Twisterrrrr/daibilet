@@ -399,14 +399,14 @@ async function loadPublicEventDto(
     ...metaGroupMembers.map((member) => member.id),
   ])];
   const representative = eventsById.get(purchaseGroupEventIds[0] || '') || requestedEvent;
-  // Tariff/offer rows must come from the page event (and merge peers), not from
-  // hundreds of dated TC siblings. Ordering the whole meta-group by price ASC +
-  // take 32 keeps only the cheapest child tariffs and drops adult/other categories.
-  const tariffOfferEventIds = [...new Set([
+  // Tariff rows come from the opened product, its representative, and explicit
+  // editorial merge peers. EventPage membership can contain hundreds of dated
+  // TC slots; mixing those into this price-limited query hides product tariffs.
+  const tariffOfferEventIds = resolveTicketTariffEventIds(
     requestedEvent.id,
     representative.id,
-    ...stablePageEventIds,
-  ])];
+    mergeGroupMembers.map((member) => member.id),
+  );
 
   const now = new Date();
   // Prefer live sibling when the opened slug itself is STAND_BY/closed (meta TC children).
@@ -1151,6 +1151,14 @@ function primaryOfferMap(offers: MappedOffer[]): Map<string, MappedOffer> {
     if (!result.has(offer.eventId)) result.set(offer.eventId, offer);
   }
   return result;
+}
+
+export function resolveTicketTariffEventIds(
+  requestedEventId: string,
+  representativeEventId: string,
+  mergePeerEventIds: string[] = [],
+): string[] {
+  return [...new Set([requestedEventId, representativeEventId, ...mergePeerEventIds].filter(Boolean))];
 }
 
 function purchaseProviderForEvent(event: EventRecord): PurchaseProvider | null {
