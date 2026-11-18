@@ -112,12 +112,14 @@ export function MyDayPickerSheet({
 
   const panel = (
     <>
-      <header className="flex shrink-0 items-start justify-between gap-3 border-b border-slate-200 px-5 py-4">
+      <header className={`flex shrink-0 items-center justify-between gap-3 border-b border-slate-200 ${desktopAccordion ? 'px-4 py-2.5' : 'px-5 py-4'}`}>
         <div className="min-w-0">
-          <h2 id={titleId} className="text-base font-bold text-slate-900">Подбор точек</h2>
-          <p id={descId} className="mt-0.5 text-xs text-slate-500">
-            Один поиск по местам и событиям. Выбранное сразу в маршрут и на карту
-          </p>
+          <h2 id={titleId} className="text-sm font-bold text-slate-900">{desktopAccordion ? 'Добавить места' : 'Подбор точек'}</h2>
+          {!desktopAccordion ? (
+            <p id={descId} className="mt-0.5 text-xs text-slate-500">
+              Один поиск по местам и событиям. Выбранное сразу в маршрут и на карту
+            </p>
+          ) : null}
         </div>
         <button
           type="button"
@@ -129,7 +131,7 @@ export function MyDayPickerSheet({
         </button>
       </header>
 
-      {search ? (
+      {search && !desktopAccordion ? (
         <div className="relative z-20 shrink-0 border-b border-slate-200 px-5 py-3" data-my-day-picker-search>
           {search}
         </div>
@@ -142,7 +144,7 @@ export function MyDayPickerSheet({
           aria-orientation={desktopOverlay || desktopAccordion ? 'horizontal' : 'vertical'}
           aria-label="Разделы подбора"
           onKeyDown={onKeyNav}
-          className={`flex gap-1 overflow-x-auto border-b border-slate-200 p-2 [scrollbar-width:none] sm:flex-col sm:overflow-y-auto sm:border-b-0 sm:border-r sm:border-slate-200 [&::-webkit-scrollbar]:hidden ${(desktopOverlay || desktopAccordion) ? 'lg:grid lg:grid-cols-2 lg:gap-1 lg:border-b lg:border-r-0' : ''}`}
+          className={`flex gap-1 overflow-x-auto border-b border-slate-200 p-2 [scrollbar-width:none] sm:flex-col sm:overflow-y-auto sm:border-b-0 sm:border-r sm:border-slate-200 [&::-webkit-scrollbar]:hidden ${desktopAccordion ? 'lg:grid lg:grid-cols-2 lg:gap-1 lg:rounded-xl lg:border-0 lg:bg-[#F1F4F9] lg:p-1' : desktopOverlay ? 'lg:grid lg:grid-cols-2 lg:gap-1 lg:border-b lg:border-r-0' : ''}`}
         >
           {tabs.map((t) => {
             const on = t.value === current?.value;
@@ -157,10 +159,10 @@ export function MyDayPickerSheet({
                 aria-controls="my-day-picker-panel"
                 tabIndex={on ? 0 : -1}
                 onClick={() => onSectionChange(t.value)}
-                className={`inline-flex shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-left text-sm font-semibold transition sm:w-full ${(desktopOverlay || desktopAccordion) ? 'lg:min-w-0 lg:px-2 lg:text-xs' : ''} ${on ? 'bg-primary-600 text-white' : 'text-slate-500 hover:bg-slate-100'}`}
+                className={`inline-flex min-h-10 shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-left text-sm font-semibold transition sm:w-full ${(desktopOverlay || desktopAccordion) ? 'lg:min-w-0 lg:px-2 lg:text-xs' : ''} ${desktopAccordion ? (on ? 'lg:justify-center lg:rounded-lg lg:bg-white lg:text-center lg:text-[#0F1B2D] lg:shadow-[0_1px_3px_rgba(15,27,45,.12)]' : 'lg:justify-center lg:rounded-lg lg:bg-transparent lg:text-center lg:text-slate-500 lg:hover:text-[#0F1B2D]') : on ? 'bg-primary-600 text-white' : 'text-slate-600 hover:bg-white/80'}`}
               >
-                <Icon className="h-4 w-4 shrink-0" aria-hidden />
-                <span className="min-w-0 sm:truncate">{t.label}</span>
+                <Icon className={`h-4 w-4 shrink-0 ${desktopAccordion ? 'lg:hidden' : ''}`} aria-hidden />
+                <span className="min-w-0 sm:truncate lg:whitespace-normal">{t.label}</span>
               </button>
             );
           })}
@@ -170,7 +172,7 @@ export function MyDayPickerSheet({
           id="my-day-picker-panel"
           role="tabpanel"
           aria-labelledby={current ? `my-day-picker-tab-${current.value}` : undefined}
-          className={`min-w-0 overflow-y-auto p-4 [container-type:inline-size] ${(desktopOverlay || desktopAccordion) ? 'lg:border-t lg:border-slate-200' : ''}`}
+          className={`min-w-0 overflow-y-auto p-4 [container-type:inline-size] ${desktopAccordion ? 'lg:border-t lg:border-slate-200 lg:p-3' : desktopOverlay ? 'lg:border-t lg:border-slate-200' : ''}`}
         >
           {current ? <p className="mb-3 text-xs text-slate-500" data-my-day-picker-hint>{current.hint}</p> : null}
           {children}
@@ -184,8 +186,8 @@ export function MyDayPickerSheet({
       <section
         role="region"
         aria-labelledby={titleId}
-        aria-describedby={descId}
-        className="mb-4 flex max-h-[calc(100dvh_-_var(--site-header-height)_-_6rem)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md motion-safe:animate-[my-day-picker-reveal_180ms_ease-out]"
+        aria-describedby={!desktopAccordion ? descId : undefined}
+        className="sticky top-0 z-30 mb-4 flex max-h-[calc(100dvh-var(--site-header-height)-1rem)] min-h-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm motion-safe:animate-[my-day-picker-reveal_180ms_ease-out]"
         data-my-day-picker-accordion="1"
       >
         {panel}

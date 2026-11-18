@@ -7,7 +7,6 @@ import {
   ChevronUp,
   Clock,
   FileDown,
-  Filter,
   Footprints,
   MapPin,
   Navigation,
@@ -20,11 +19,6 @@ import {
 import { useMobileScrollCollapse } from '@/components/my-day/useMobileScrollCollapse';
 
 type TravelMode = 'walk' | 'auto';
-
-export type MyDayStopTypeCount = {
-  tag: string;
-  count: number;
-};
 
 type MyDayToolbarProps = {
   stopsCount: number;
@@ -57,11 +51,6 @@ type MyDayToolbarProps = {
   /** Optional; not in Lovable summary card (share lives in header). Kept for callers. */
   onShare?: () => void;
   shareLabel?: string;
-  typeCounts?: MyDayStopTypeCount[];
-  hiddenTags?: string[];
-  visibleStopsCount?: number;
-  onToggleTag?: (tag: string) => void;
-  onShowAllTags?: () => void;
   /** Hour-plan overflow / lunch banner slot under toolbar card. */
   scheduleSlot?: ReactNode;
   /** Itinerary list (and anything below). Must live inside this wrap so sticky can pin while the list scrolls. */
@@ -100,17 +89,10 @@ export function MyDayToolbar({
   printPdfBusy = false,
   onSaveScenario,
   saveScenarioBusy = false,
-  typeCounts = [],
-  hiddenTags = [],
-  visibleStopsCount,
-  onToggleTag,
-  onShowAllTags,
   scheduleSlot,
   children,
   className = '',
 }: MyDayToolbarProps) {
-  const showTypes = typeCounts.length > 1 && onToggleTag;
-  const shown = visibleStopsCount ?? stopsCount;
   const { collapsed, expand, collapse } = useMobileScrollCollapse();
 
   return (
@@ -389,45 +371,6 @@ export function MyDayToolbar({
 
         {scheduleSlot ? <div className="mt-3">{scheduleSlot}</div> : null}
         </div>
-        {showTypes ? (
-          <div className="mt-3 border-t border-slate-200 pt-3" data-my-day-type-filters>
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="inline-flex items-center gap-2 text-sm font-semibold text-slate-900">
-                <Filter className="h-4 w-4 text-primary-600" aria-hidden /> Типы точек
-              </p>
-              <p className="text-xs text-slate-500">Показано {shown} из {stopsCount}</p>
-            </div>
-            <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Фильтр точек по типу">
-              {typeCounts.map(({ tag, count }) => {
-                const on = !hiddenTags.includes(tag);
-                return (
-                  <button
-                    key={tag}
-                    type="button"
-                    onClick={() => onToggleTag(tag)}
-                    aria-pressed={on}
-                    className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
-                      on
-                        ? 'border-primary-300 bg-primary-50 text-primary-800'
-                        : 'border-slate-200 text-slate-500 hover:bg-slate-50'
-                    }`}
-                  >
-                    {tag} · {count}
-                  </button>
-                );
-              })}
-              {hiddenTags.length && onShowAllTags ? (
-                <button
-                  type="button"
-                  onClick={onShowAllTags}
-                  className="rounded-full border border-dashed border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-500 hover:bg-slate-50"
-                >
-                  Показать все
-                </button>
-              ) : null}
-            </div>
-          </div>
-        ) : null}
       </div>
 
       <p
