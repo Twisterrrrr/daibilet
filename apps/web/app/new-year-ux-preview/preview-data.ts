@@ -1,3 +1,4 @@
+import { unstable_cache } from 'next/cache';
 import { fetchPublicApiJson } from '@/server/public-api-client';
 import cityRouting from '../../../../data/geo/city-routing.ru.json';
 import regionHubs from '../../../../data/geo/region-hubs.ru.json';
@@ -64,6 +65,7 @@ const REGION_CENTER_NAMES = new Set(regionHubs.regionCenters.map((item) => item.
 const REGION_BY_CENTER = new Map(regionHubs.regionCenters
   .filter((item) => !['Москва', 'Санкт-Петербург', 'Севастополь'].includes(item.centerCity))
   .map((item) => [item.centerCity, item.regionName]));
+type PreviewCatalogSnapshot = { events: PreviewEvent[]; total: number; generatedAt: string | null };
 const NEW_YEAR_CITY_REGION_OVERRIDES: Record<string, string> = {
   Волхов: 'Ленинградская область',
   Истра: 'Московская область',
@@ -205,17 +207,24 @@ async function fetchCatalogPage(offset: number): Promise<EventsResponse> {
   });
 }
 
-export async function buildNewYearPreviewData(filters: PreviewFilters = {}) {
+const fetchCatalogSnapshot = unstable_cache(async (): Promise<PreviewCatalogSnapshot> => {
   const first = await fetchCatalogPage(0);
-  const rawEvents = first.items || [];
-  const sourceTotal = Number(first.total) || rawEvents.length;
-  const step = Number(first.limit) || 200;
+  const events = first.items || [];
+  const total = Number(first.total) || events.length;
+  const pageSize = Number(first.limit) || 200;
   const offsets = Array.from(
-    { length: Math.max(0, Math.ceil(sourceTotal / step) - 1) },
-    (_, index) => (index + 1) * step,
+    { length: Math.max(0, Math.ceil(total / pageSize) - 1) },
+    (_, index) => (index + 1) * pageSize,
   );
   const remainingPages = await Promise.all(offsets.map((offset) => fetchCatalogPage(offset)));
-  rawEvents.push(...remainingPages.flatMap((page) => page.items || []));
+  events.push(...remainingPages.flatMap((page) => page.items || []));
+  return { events, total, generatedAt: first.generatedAt || null };
+}, ['new-year-preview-catalog-v1'], { revalidate: 300, tags: ['new-year-preview-catalog'] });
+
+export async function buildNewYearPreviewData(filters: PreviewFilters = {}) {
+  const snapshot = await fetchCatalogSnapshot();
+  const rawEvents = snapshot.events;
+  const sourceTotal = snapshot.total;
 
   const grouped = groupEvents(rawEvents);
   const query = String(filters.q || '').trim().toLocaleLowerCase('ru');
@@ -270,7 +279,7 @@ export async function buildNewYearPreviewData(filters: PreviewFilters = {}) {
     offset,
     limit: PAGE_SIZE,
     hasMore: offset + PAGE_SIZE < filtered.length,
-    generatedAt: first.generatedAt || null,
+    generatedAt: snapshot.generatedAt,
     priceFrom: prices.length ? Math.min(...prices) : null,
     facets,
   };

@@ -73,13 +73,18 @@ function formatSlot(slot: NonNullable<PreviewEvent['upcomingSlots']>[number]): s
   return new Intl.DateTimeFormat('ru-RU', { timeZone: 'Europe/Moscow', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(date).replace(' г.', '');
 }
 
-function formatShortDate(slot: NonNullable<PreviewEvent['upcomingSlots']>[number]): { day: string; rest: string; time: string } {
+function formatShortDate(slot: NonNullable<PreviewEvent['upcomingSlots']>[number]): { day: string; rest: string; time: string; compact: string } {
   const date = parseDate(slot.startsAt);
-  if (!date) return { day: slot.dateLabel || '—', rest: '', time: slot.timeLabel || '' };
+  if (!date) return { day: slot.dateLabel || '—', rest: '', time: slot.timeLabel || '', compact: slot.dateLabel || 'Дата уточняется' };
+  const compact = new Intl.DateTimeFormat('ru-RU', { timeZone: 'Europe/Moscow', day: 'numeric', month: 'short' })
+    .format(date)
+    .replace(' г.', '')
+    .replace(/\.$/u, '');
   return {
     day: new Intl.DateTimeFormat('ru-RU', { timeZone: 'Europe/Moscow', day: 'numeric' }).format(date),
     rest: new Intl.DateTimeFormat('ru-RU', { timeZone: 'Europe/Moscow', weekday: 'short', month: 'short' }).format(date),
     time: new Intl.DateTimeFormat('ru-RU', { timeZone: 'Europe/Moscow', hour: '2-digit', minute: '2-digit' }).format(date),
+    compact,
   };
 }
 
@@ -308,7 +313,6 @@ export function NewYearUxPreview({ initialData, errorMessage }: { initialData: P
     const controller = new AbortController();
     setLoading(true);
     setLoadError(null);
-    setData(null);
     const timer = setTimeout(async () => {
       try {
         const response = await fetch(`/api/new-year-ux-preview${filterQuery ? `?${filterQuery}` : ''}`, { signal: controller.signal, cache: 'no-store' });
@@ -461,8 +465,9 @@ export function NewYearUxPreview({ initialData, errorMessage }: { initialData: P
           <nav aria-label="Хлебные крошки" className={styles.bandCrumbs}>
             <Link href="/">Главная</Link><span>/</span><Link href="/podborki">Подборки</Link><span>/</span><Link href="/novyj-god">Новый год</Link>{region || city !== 'Вся Россия' ? <><span>/</span><span className={styles.bandCrumbCurrent}>{region || city}</span></> : null}
           </nav>
-          <h1 className={styles.title}>Новый год 2027 в {cityPrepositional || 'России'}:<br />мероприятия, афиша и билеты</h1>
-          <p className={styles.lead}>Новогодние праздники — отличный повод выбраться из дома, провести время с близкими или отправиться в небольшое путешествие. На этой странице собраны праздничные концерты, спектакли, детские ёлки, экскурсии и развлекательные программы в разных городах России. Выбирайте интересующие даты, сравнивайте мероприятия и находите подходящий вариант для всей семьи или компании друзей.</p>
+          <h1 className={styles.title}>Новый год 2027 в {cityPrepositional || 'России'}:<br className={styles.titleBreak} /> мероприятия, афиша и билеты</h1>
+          <p className={`${styles.lead} ${styles.leadDesktop}`}>Новогодние праздники — отличный повод выбраться из дома, провести время с близкими или отправиться в небольшое путешествие. На этой странице собраны праздничные концерты, спектакли, детские ёлки, экскурсии и развлекательные программы в разных городах России. Выбирайте интересующие даты, сравнивайте мероприятия и находите подходящий вариант для всей семьи или компании друзей.</p>
+          <p className={`${styles.lead} ${styles.leadMobile}`}>Новогодние концерты, спектакли, детские ёлки, экскурсии и праздничные программы по всей России. Выбирайте города, даты и подходящие мероприятия.</p>
           <div className={styles.bandMeta}>
             <span><strong>{data?.total || 0}</strong> мероприятий</span>
             {city === 'Вся Россия' ? <span>{Math.max(0, cities.filter((item) => item.name !== 'Вся Россия' && item.count > 0).length)} городов с событиями</span> : null}
@@ -628,6 +633,7 @@ export function NewYearUxPreview({ initialData, errorMessage }: { initialData: P
             <span className={styles.activeCity}>{city === 'Вся Россия' ? 'Все города' : city}</span>
           </div> : null}
 
+          {loading ? <p className={styles.loading} role="status">Обновляем список…</p> : null}
           {errorMessage || loadError ? <div role="status" className={styles.empty}><div className={styles.emptyTitle}>Не удалось обновить список</div><div className={styles.emptyText}>{loadError || errorMessage}</div></div> : null}
           {data?.items.length ? <div className={styles.list} aria-busy={loading || loadingMore}>
             {data.items.map((event) => {
@@ -644,11 +650,11 @@ export function NewYearUxPreview({ initialData, errorMessage }: { initialData: P
                 keyEvent.preventDefault();
                 setSelectedEvent(event);
               }}>
-                <div className={styles.rowDate}>{slotDate ? <><strong>{slotDate.day}</strong>{slotDate.rest ? <small>{slotDate.rest}</small> : null}{slotDate.time ? <small>{slotDate.time}</small> : null}</> : 'Дата уточняется'}</div>
+                <div className={styles.rowDate}>{slotDate ? <><strong>{slotDate.day}</strong>{slotDate.rest ? <small>{slotDate.rest}</small> : null}{slotDate.time ? <small>{slotDate.time}</small> : null}<span className={styles.rowDateCompact}>{slotDate.compact}{slotDate.time ? <> <span aria-hidden="true">·</span> <time dateTime={slot?.startsAt || undefined}>{slotDate.time}</time></> : null}</span></> : 'Дата уточняется'}</div>
                 <div className={styles.rowMain}>
                   <div className={styles.rowTitle} title={event.title}>{event.title}</div>
-                  <div className={styles.rowMeta}>{city === 'Вся Россия' && event.city ? <span className={styles.rowCity}>{event.city}</span> : null}{eventBadges(event).map((badge) => <span key={badge.id} className={`${styles.tag} ${badge.className}`}>{badge.label}</span>)}<span>{event.venue || 'Площадка уточняется'}</span></div>
-                  {slots.length > 1 ? <details className={styles.schedule}><summary>Расписание · {slots.length} {pluralRu(slots.length, PLURAL_SESSION_FORMS)}</summary><ul className={styles.scheduleList}>{slots.map((item, index) => { const itemUrls = [...new Set([item.purchaseUrl, ...(item.purchaseUrls || []), event.widgetUrl, event.purchaseUrl].map(safeExternalUrl).filter((url): url is string => Boolean(url)))]; return <li className={styles.scheduleItem} key={item.id || `${event.id}:${item.startsAt}:${index}`}><span>{formatSlot(item)}</span>{itemUrls.map((itemUrl, urlIndex) => <PreviewPurchaseButton key={`${itemUrl}:${urlIndex}`} event={{ ...event, widgetUrl: null, purchaseUrl: itemUrl, upcomingSlots: [{ ...item, purchaseUrl: itemUrl, purchaseUrls: undefined }] }} className={styles.scheduleBuy} label={itemUrls.length > 1 ? `Билет на сеанс ${urlIndex + 1}` : 'Билет на этот сеанс'} />)}</li>; })}</ul></details> : null}
+                  <div className={styles.rowMeta}>{city === 'Вся Россия' && event.city ? <span className={styles.rowCity}>{event.city}</span> : null}{city !== 'Вся Россия' && event.city ? <span className={styles.rowCityMobile}>{event.city}</span> : null}{eventBadges(event).map((badge) => <span key={badge.id} className={`${styles.tag} ${badge.className}`}>{badge.label}</span>)}<span className={styles.rowVenue}>{event.venue || 'Площадка уточняется'}</span></div>
+                  {slots.length > 1 ? <details className={styles.schedule}><summary><span className={styles.scheduleDesktopLabel}>Расписание · </span><span className={styles.scheduleCompactLabel}>{slots.length} {pluralRu(slots.length, PLURAL_SESSION_FORMS)}</span></summary><ul className={styles.scheduleList}>{slots.map((item, index) => { const itemUrls = [...new Set([item.purchaseUrl, ...(item.purchaseUrls || []), event.widgetUrl, event.purchaseUrl].map(safeExternalUrl).filter((url): url is string => Boolean(url)))]; return <li className={styles.scheduleItem} key={item.id || `${event.id}:${item.startsAt}:${index}`}><span>{formatSlot(item)}</span>{itemUrls.map((itemUrl, urlIndex) => <PreviewPurchaseButton key={`${itemUrl}:${urlIndex}`} event={{ ...event, widgetUrl: null, purchaseUrl: itemUrl, upcomingSlots: [{ ...item, purchaseUrl: itemUrl, purchaseUrls: undefined }] }} className={styles.scheduleBuy} label={itemUrls.length > 1 ? `Билет на сеанс ${urlIndex + 1}` : 'Билет на этот сеанс'} />)}</li>; })}</ul></details> : null}
                 </div>
                 <div className={styles.rowPrice}>{priceLabel}{typeof event.priceFrom === 'number' && event.priceFrom === 0 ? <small className={styles.freePrice}>вход свободный</small> : <small>за билет</small>}</div>
                 <div className={`${styles.rowSeats} ${typeof event.vacant === 'number' && event.vacant <= 8 ? styles.rowSeatsLow : ''}`}>{typeof event.vacant === 'number' ? `${event.vacant} мест` : ''}</div>
