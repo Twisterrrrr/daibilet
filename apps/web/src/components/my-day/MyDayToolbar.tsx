@@ -390,14 +390,12 @@ export function MyDayToolbar({
         {scheduleSlot ? <div className="mt-3">{scheduleSlot}</div> : null}
         </div>
         {showTypes ? (
-          <div className="mt-3 border-t border-slate-200 pt-3" data-my-day-type-filters>
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="inline-flex items-center gap-2 text-sm font-semibold text-slate-900">
-                <Filter className="h-4 w-4 text-primary-600" aria-hidden /> Типы точек
-              </p>
-              <p className="text-xs text-slate-500">Показано {shown} из {stopsCount}</p>
-            </div>
-            <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Фильтр точек по типу">
+          <div className="mt-2 flex min-w-0 items-center gap-2 border-t border-slate-100 pt-2" data-my-day-type-filters>
+            <span className="inline-flex shrink-0 items-center gap-1.5 text-[11px] font-semibold text-slate-500" title={`Показано ${shown} из ${stopsCount}`}>
+              <Filter className="h-3.5 w-3.5 text-slate-400" aria-hidden />
+              Тип
+            </span>
+            <div className="flex min-w-0 flex-1 gap-1.5 overflow-x-auto py-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="group" aria-label="Фильтр точек по типу">
               {typeCounts.map(({ tag, count }) => {
                 const on = !hiddenTags.includes(tag);
                 return (
@@ -406,13 +404,13 @@ export function MyDayToolbar({
                     type="button"
                     onClick={() => onToggleTag(tag)}
                     aria-pressed={on}
-                    className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                    className={`inline-flex min-h-7 shrink-0 items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-medium leading-none transition ${
                       on
-                        ? 'border-primary-300 bg-primary-50 text-primary-800'
-                        : 'border-slate-200 text-slate-500 hover:bg-slate-50'
+                        ? 'border-slate-200 bg-white text-slate-700 shadow-[0_1px_1px_rgba(15,27,45,.03)]'
+                        : 'border-transparent bg-slate-100 text-slate-500 hover:bg-slate-200'
                     }`}
                   >
-                    {tag} · {count}
+                    {tag}<span className={on ? 'text-slate-400' : 'text-slate-400'}>{count}</span>
                   </button>
                 );
               })}
@@ -420,7 +418,7 @@ export function MyDayToolbar({
                 <button
                   type="button"
                   onClick={onShowAllTags}
-                  className="rounded-full border border-dashed border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-500 hover:bg-slate-50"
+                  className="inline-flex min-h-7 shrink-0 items-center rounded-full border border-dashed border-slate-200 px-2.5 py-1 text-[11px] font-medium text-slate-500 hover:bg-slate-50"
                 >
                   Показать все
                 </button>
