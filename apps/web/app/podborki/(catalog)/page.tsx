@@ -22,7 +22,7 @@ function firstQueryValue(value: string | string[] | undefined): string {
 
 /**
  * Hub `/podborki` and soft `?city=` for non-meta cities.
- * Meta-pilot soft query consolidates to `/podborki/c/{city}` (middleware 301 + page fallback).
+ * Meta-pilot soft query consolidates to the canonical city-scoped route (middleware 301 + page fallback).
  * Hub `/podborki` and `?city=all` stay indexable. Non-pilot city query → noindex.
  */
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {

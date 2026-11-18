@@ -42,8 +42,8 @@ function resolveLandingSlug(raw: string): string {
 }
 
 /**
- * Hub / soft `?city=` / marker CHPU city SEO for the podborki catalog surface.
- * Pilot meta uses SeoOverride → template → legacy package; canonical is marker CHPU.
+ * Hub / soft `?city=` / city-scoped SEO for the podborki catalog surface.
+ * Pilot meta uses SeoOverride → template → legacy package; canonical follows active URL mode.
  */
 export async function resolvePodborkiCatalogSurfaceSeo(input: {
   rawCity: string;

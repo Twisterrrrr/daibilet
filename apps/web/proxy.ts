@@ -183,7 +183,7 @@ function redirectLegacyCityFirstPath(request: NextRequest): NextResponse | null 
   return NextResponse.redirect(url, 308);
 }
 
-/** Soft `/podborki?city=` → marker CHPU `/podborki/c/{city}` for meta-pilot cities. */
+/** Soft `/podborki?city=` → canonical city-scoped route for meta-pilot cities. */
 function redirectPodborkiCityQueryToMarker(request: NextRequest): NextResponse | null {
   const { pathname } = request.nextUrl;
   if (pathname.replace(/\/+$/, '') !== '/podborki') return null;

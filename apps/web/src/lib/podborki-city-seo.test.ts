@@ -60,25 +60,56 @@ test('non-pilot and all stay null', () => {
 });
 
 test('canonical is marker CHPU on SEO slug, not soft query', () => {
-  assert.equal(buildPodborkiCityCanonicalPath('kaliningrad'), '/podborki/c/kaliningrad');
-  assert.equal(
-    buildPodborkiCityCanonicalPath('saint-petersburg'),
-    '/podborki/c/saint-petersburg',
-  );
-  assert.equal(buildPodborkiCityCanonicalPath('nizhny-novgorod'), '/podborki/c/nizhny-novgorod');
-  assert.equal(buildPodborkiCityCanonicalPath('perm'), '/podborki/c/perm');
-  assert.equal(buildPodborkiCityCanonicalPath('moscow'), '/podborki/c/moscow');
+  const previousMode = process.env.NEXT_PUBLIC_CITY_URL_MODE;
+  delete process.env.NEXT_PUBLIC_CITY_URL_MODE;
+  try {
+    assert.equal(buildPodborkiCityCanonicalPath('kaliningrad'), '/podborki/c/kaliningrad');
+    assert.equal(
+      buildPodborkiCityCanonicalPath('saint-petersburg'),
+      '/podborki/c/saint-petersburg',
+    );
+    assert.equal(buildPodborkiCityCanonicalPath('nizhny-novgorod'), '/podborki/c/nizhny-novgorod');
+    assert.equal(buildPodborkiCityCanonicalPath('perm'), '/podborki/c/perm');
+    assert.equal(buildPodborkiCityCanonicalPath('moscow'), '/podborki/c/moscow');
+  } finally {
+    if (previousMode === undefined) delete process.env.NEXT_PUBLIC_CITY_URL_MODE;
+    else process.env.NEXT_PUBLIC_CITY_URL_MODE = previousMode;
+  }
 });
 
-test('href helper: meta-pilot → CHPU; other cities soft query; all → hub', () => {
-  assert.equal(buildPodborkiCityHref('kaliningrad'), '/podborki/c/kaliningrad');
-  assert.equal(buildPodborkiCityHref('sankt-peterburg'), '/podborki/c/saint-petersburg');
-  assert.equal(buildPodborkiCityHref('moscow'), '/podborki/c/moscow');
-  assert.equal(buildPodborkiCityHref('nizhny-novgorod'), '/podborki/c/nizhny-novgorod');
-  assert.equal(buildPodborkiCityHref('perm'), '/podborki/c/perm');
-  assert.equal(buildPodborkiCityHref('kazan'), '/podborki?city=kazan');
-  assert.equal(buildPodborkiCityHref('all'), '/podborki');
-  assert.equal(buildPodborkiCityHref(null), '/podborki');
+test('city-first mode uses reviewed city route slugs for podborki canonicals', () => {
+  const previousMode = process.env.NEXT_PUBLIC_CITY_URL_MODE;
+  process.env.NEXT_PUBLIC_CITY_URL_MODE = 'city-first';
+  try {
+    assert.equal(buildPodborkiCityCanonicalPath('kaliningrad'), '/kaliningrad/podborki');
+    assert.equal(buildPodborkiCityCanonicalPath('saint-petersburg'), '/sankt-peterburg/podborki');
+    assert.equal(buildPodborkiCityCanonicalPath('nizhny-novgorod'), '/nizhny-novgorod/podborki');
+    assert.equal(buildPodborkiCityCanonicalPath('perm'), '/perm/podborki');
+    assert.equal(buildPodborkiCityCanonicalPath('moscow'), '/moscow/podborki');
+    assert.equal(buildPodborkiCityHref('saint-petersburg'), '/sankt-peterburg/podborki');
+    assert.equal(resolvePodborkiCityQueryRedirect('sankt-peterburg'), '/sankt-peterburg/podborki');
+  } finally {
+    if (previousMode === undefined) delete process.env.NEXT_PUBLIC_CITY_URL_MODE;
+    else process.env.NEXT_PUBLIC_CITY_URL_MODE = previousMode;
+  }
+});
+
+test('href helper: meta-pilot → city hub; other cities soft query; all → hub', () => {
+  const previousMode = process.env.NEXT_PUBLIC_CITY_URL_MODE;
+  delete process.env.NEXT_PUBLIC_CITY_URL_MODE;
+  try {
+    assert.equal(buildPodborkiCityHref('kaliningrad'), '/podborki/c/kaliningrad');
+    assert.equal(buildPodborkiCityHref('sankt-peterburg'), '/podborki/c/saint-petersburg');
+    assert.equal(buildPodborkiCityHref('moscow'), '/podborki/c/moscow');
+    assert.equal(buildPodborkiCityHref('nizhny-novgorod'), '/podborki/c/nizhny-novgorod');
+    assert.equal(buildPodborkiCityHref('perm'), '/podborki/c/perm');
+    assert.equal(buildPodborkiCityHref('kazan'), '/podborki?city=kazan');
+    assert.equal(buildPodborkiCityHref('all'), '/podborki');
+    assert.equal(buildPodborkiCityHref(null), '/podborki');
+  } finally {
+    if (previousMode === undefined) delete process.env.NEXT_PUBLIC_CITY_URL_MODE;
+    else process.env.NEXT_PUBLIC_CITY_URL_MODE = previousMode;
+  }
 });
 
 test('soft query redirect consolidates meta-pilot onto CHPU', () => {
