@@ -175,11 +175,7 @@ function seasonalSlots(event: PreviewEvent): PreviewSlot[] {
 function recurringProgramIdentity(event: PreviewEvent): { key: string; title: string } | null {
   const match = event.title.match(/^(.*?),\s*\d{1,2}\s+\p{L}+(?:\.)?,\s*\d{1,2}:\d{2}$/u);
   const title = (match?.[1] || event.title).trim();
-  const description = event.description?.replace(/\s+/g, ' ').trim().toLocaleLowerCase('ru');
   if (!title || !event.city || !event.venue || !event.purchaseProvider) return null;
-  const tags = [...new Set([...(event.tags || []), ...(event.subcategories || []), ...(event.tagLabels || [])]
-    .map((tag) => tag.trim().toLocaleLowerCase('ru')).filter(Boolean))].sort();
-  if (!description && tags.length === 0) return null;
   const taxonomy = [event.catalogCategory, event.catalogSubcategory].map((item) =>
     typeof item === 'string' ? item : item?.slug || item?.title || '',
   );
@@ -192,9 +188,6 @@ function recurringProgramIdentity(event: PreviewEvent): { key: string; title: st
       title.toLocaleLowerCase('ru'),
       event.category?.trim().toLocaleLowerCase('ru') || '',
       taxonomy.map((value) => value.trim().toLocaleLowerCase('ru')),
-      tags,
-      description,
-      event.imageUrl || '',
       event.ageLimit || '',
     ]),
   };
@@ -296,8 +289,8 @@ function groupEvents(events: PreviewEvent[]): PreviewEvent[] {
       eventPageSlug: pageSlugs.length === 1 ? pageSlugs[0] : null,
       eventPageIndexableSlug: pageSlugs.length === 1 ? first.eventPageIndexableSlug : null,
       slug: eventSlugs.length === 1 ? eventSlugs[0] : null,
-      purchaseUrl: upcomingSlots[0]?.purchaseUrl || first.purchaseUrl || null,
-      widgetUrl: upcomingSlots[0]?.purchaseUrl ? null : first.widgetUrl,
+      purchaseUrl: upcomingSlots[0]?.purchaseUrl || null,
+      widgetUrl: null,
       sessionCount: upcomingSlots.length,
       subcategories: [...new Set(rows.flatMap((row) => row.subcategories || []))],
       tagLabels: [...new Set(rows.flatMap((row) => row.tagLabels || []))],
