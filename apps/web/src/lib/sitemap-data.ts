@@ -559,7 +559,9 @@ export async function buildLandingsSitemapEntries(): Promise<SitemapEntry[]> {
     for (const city of cities) {
       if (!isLandingCityAllowed(slug, city)) continue;
       try {
-        const payload = await fetchLandingPageDto(slug);
+        // Match the page metadata query: a national top-48 payload can undercount
+        // city-specific offers after filtering and omit indexable city URLs.
+        const payload = await fetchLandingPageDto(slug, city);
         if (!payload?.landing) continue;
         const finalized = finalizeLandingPayload(payload, slug, city);
         const offers = finalized.stats?.events ?? 0;
