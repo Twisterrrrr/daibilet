@@ -10,6 +10,8 @@ import { getTeplohodWidgetIdsFromSession, resolveTeplohodCheckoutUrl } from '@/c
 import { extractTcEventIdFromSession } from '@/lib/event-purchase';
 import { trackSelectTickets } from '@/lib/catalog-analytics';
 import { resolveCityCases } from '@/lib/city-declension';
+import { resolveSessionTimeZone } from '@/lib/city-timezone';
+import { parseSessionStartsAt } from '@/lib/datetime';
 import { PLURAL_EVENT_FORMS, pluralRu } from '@/lib/format';
 import { citySlug as cityToSlug } from '@/lib/routes';
 import { resolveSeoListingText, splitSeoListingParagraphs } from '@/data/seo-listing-texts';
@@ -63,27 +65,45 @@ const PRICE_OPTIONS: Array<{ value: PriceFilter; label: string }> = [
 
 function parseDate(value?: string | null): Date | null {
   if (!value) return null;
-  const date = new Date(value);
+  const date = parseSessionStartsAt(value);
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
-function formatSlot(slot: NonNullable<PreviewEvent['upcomingSlots']>[number]): string {
-  const date = parseDate(slot.startsAt);
-  if (!date) return [slot.dateLabel, slot.timeLabel].filter(Boolean).join(' · ') || 'Дата уточняется';
-  return new Intl.DateTimeFormat('ru-RU', { timeZone: 'Europe/Moscow', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(date).replace(' г.', '');
+const slotFormatters = new Map<string, { compact: Intl.DateTimeFormat; day: Intl.DateTimeFormat; rest: Intl.DateTimeFormat; time: Intl.DateTimeFormat; full: Intl.DateTimeFormat }>();
+
+function getSlotFormatters(timeZone: string) {
+  let formatters = slotFormatters.get(timeZone);
+  if (!formatters) {
+    formatters = {
+      compact: new Intl.DateTimeFormat('ru-RU', { timeZone, day: 'numeric', month: 'short' }),
+      day: new Intl.DateTimeFormat('ru-RU', { timeZone, day: 'numeric' }),
+      rest: new Intl.DateTimeFormat('ru-RU', { timeZone, weekday: 'short', month: 'short' }),
+      time: new Intl.DateTimeFormat('ru-RU', { timeZone, hour: '2-digit', minute: '2-digit' }),
+      full: new Intl.DateTimeFormat('ru-RU', { timeZone, day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }),
+    };
+    slotFormatters.set(timeZone, formatters);
+  }
+  return formatters;
 }
 
-function formatShortDate(slot: NonNullable<PreviewEvent['upcomingSlots']>[number]): { day: string; rest: string; time: string; compact: string } {
+function formatSlot(slot: NonNullable<PreviewEvent['upcomingSlots']>[number], fallbackTimeZone = 'Europe/Moscow'): string {
+  const date = parseDate(slot.startsAt);
+  if (!date) return [slot.dateLabel, slot.timeLabel].filter(Boolean).join(' · ') || 'Дата уточняется';
+  return getSlotFormatters(slot.timeZone || fallbackTimeZone).full.format(date).replace(' г.', '');
+}
+
+function formatShortDate(slot: NonNullable<PreviewEvent['upcomingSlots']>[number], fallbackTimeZone = 'Europe/Moscow'): { day: string; rest: string; time: string; compact: string } {
   const date = parseDate(slot.startsAt);
   if (!date) return { day: slot.dateLabel || '—', rest: '', time: slot.timeLabel || '', compact: slot.dateLabel || 'Дата уточняется' };
-  const compact = new Intl.DateTimeFormat('ru-RU', { timeZone: 'Europe/Moscow', day: 'numeric', month: 'short' })
+  const formatters = getSlotFormatters(slot.timeZone || fallbackTimeZone);
+  const compact = formatters.compact
     .format(date)
     .replace(' г.', '')
     .replace(/\.$/u, '');
   return {
-    day: new Intl.DateTimeFormat('ru-RU', { timeZone: 'Europe/Moscow', day: 'numeric' }).format(date),
-    rest: new Intl.DateTimeFormat('ru-RU', { timeZone: 'Europe/Moscow', weekday: 'short', month: 'short' }).format(date),
-    time: new Intl.DateTimeFormat('ru-RU', { timeZone: 'Europe/Moscow', hour: '2-digit', minute: '2-digit' }).format(date),
+    day: formatters.day.format(date),
+    rest: formatters.rest.format(date),
+    time: formatters.time.format(date),
     compact,
   };
 }
@@ -140,6 +160,16 @@ function safeExternalUrl(value?: string | null): string | null {
   } catch {
     return null;
   }
+}
+
+function previewSlotPurchaseUrls(event: PreviewEvent, slot: NonNullable<PreviewEvent['upcomingSlots']>[number]): string[] {
+  const slotUrls = [slot.purchaseUrl, ...(slot.purchaseUrls || [])]
+    .map(safeExternalUrl)
+    .filter((url): url is string => Boolean(url));
+  const candidates = slotUrls.length ? slotUrls : [event.widgetUrl, event.purchaseUrl]
+    .map(safeExternalUrl)
+    .filter((url): url is string => Boolean(url));
+  return [...new Set(candidates)];
 }
 
 function PreviewPurchaseButton({ event, className, label = 'Купить' }: { event: PreviewEvent; className: string; label?: string }) {
@@ -375,7 +405,7 @@ export function NewYearUxPreview({ initialData, errorMessage }: { initialData: P
   const regions = data?.facets.regions || [];
   const formats = pageData?.facets.formats || [];
   const allCityOptions = cities
-    .filter((item) => item.name && item.name !== 'Вся Россия')
+    .filter((item) => item.name && item.name !== 'Вся Россия' && item.filterable !== false)
     .sort((a, b) => b.count - a.count || (a.name || '').localeCompare(b.name || '', 'ru'));
   const orderedCities = [cities.find((item) => item.name === 'Вся Россия'), ...allCityOptions]
     .filter((item, index, list) => item && list.findIndex((candidate) => candidate?.name === item.name) === index) as Facet[];
@@ -633,7 +663,6 @@ export function NewYearUxPreview({ initialData, errorMessage }: { initialData: P
             <span className={styles.activeCity}>{city === 'Вся Россия' ? 'Все города' : city}</span>
           </div> : null}
 
-          {loading ? <p className={styles.loading} role="status">Обновляем список…</p> : null}
           {errorMessage || loadError ? <div role="status" className={styles.empty}><div className={styles.emptyTitle}>Не удалось обновить список</div><div className={styles.emptyText}>{loadError || errorMessage}</div></div> : null}
           {data?.items.length ? <div className={styles.list} aria-busy={loading || loadingMore}>
             {data.items.map((event) => {
@@ -641,8 +670,9 @@ export function NewYearUxPreview({ initialData, errorMessage }: { initialData: P
               const href = event.eventPageSlug || event.slug;
               const priceLabel = typeof event.priceFrom === 'number' ? event.priceFrom === 0 ? 'Бесплатно' : `от ${new Intl.NumberFormat('ru-RU').format(event.priceFrom)} ₽` : 'Цена уточняется';
               const slots = event.upcomingSlots || [];
-              const slotDate = slot ? formatShortDate(slot) : null;
-              return <article key={event.eventPageSlug || event.groupKey || event.id} className={`${styles.row} ${compact ? styles.rowCompact : ''}`} role="button" tabIndex={0} aria-haspopup="dialog" aria-label={`Подробнее: ${event.title}`} onClick={(clickEvent) => {
+              const timeZone = resolveSessionTimeZone(event);
+              const slotDate = slot ? formatShortDate(slot, timeZone) : null;
+              return <article key={event.groupKey || event.eventPageSlug || event.id} className={`${styles.row} ${compact ? styles.rowCompact : ''}`} role="button" tabIndex={0} aria-haspopup="dialog" aria-label={`Подробнее: ${event.title}`} onClick={(clickEvent) => {
                 if ((clickEvent.target as HTMLElement).closest('a, button, details, summary')) return;
                 setSelectedEvent(event);
               }} onKeyDown={(keyEvent) => {
@@ -654,7 +684,7 @@ export function NewYearUxPreview({ initialData, errorMessage }: { initialData: P
                 <div className={styles.rowMain}>
                   <div className={styles.rowTitle} title={event.title}>{event.title}</div>
                   <div className={styles.rowMeta}>{city === 'Вся Россия' && event.city ? <span className={styles.rowCity}>{event.city}</span> : null}{city !== 'Вся Россия' && event.city ? <span className={styles.rowCityMobile}>{event.city}</span> : null}{eventBadges(event).map((badge) => <span key={badge.id} className={`${styles.tag} ${badge.className}`}>{badge.label}</span>)}<span className={styles.rowVenue}>{event.venue || 'Площадка уточняется'}</span></div>
-                  {slots.length > 1 ? <details className={styles.schedule}><summary><span className={styles.scheduleDesktopLabel}>Расписание · </span><span className={styles.scheduleCompactLabel}>{slots.length} {pluralRu(slots.length, PLURAL_SESSION_FORMS)}</span></summary><ul className={styles.scheduleList}>{slots.map((item, index) => { const itemUrls = [...new Set([item.purchaseUrl, ...(item.purchaseUrls || []), event.widgetUrl, event.purchaseUrl].map(safeExternalUrl).filter((url): url is string => Boolean(url)))]; return <li className={styles.scheduleItem} key={item.id || `${event.id}:${item.startsAt}:${index}`}><span>{formatSlot(item)}</span>{itemUrls.map((itemUrl, urlIndex) => <PreviewPurchaseButton key={`${itemUrl}:${urlIndex}`} event={{ ...event, widgetUrl: null, purchaseUrl: itemUrl, upcomingSlots: [{ ...item, purchaseUrl: itemUrl, purchaseUrls: undefined }] }} className={styles.scheduleBuy} label={itemUrls.length > 1 ? `Билет на сеанс ${urlIndex + 1}` : 'Билет на этот сеанс'} />)}</li>; })}</ul></details> : null}
+                  {slots.length > 1 ? <details className={styles.schedule}><summary><span className={styles.scheduleDesktopLabel}>Расписание · </span><span className={styles.scheduleCompactLabel}>{slots.length} {pluralRu(slots.length, PLURAL_SESSION_FORMS)}</span></summary><ul className={styles.scheduleList}>{slots.map((item, index) => { const itemUrls = previewSlotPurchaseUrls(event, item); return <li className={styles.scheduleItem} key={item.id || `${event.id}:${item.startsAt}:${index}`}><span>{formatSlot(item, timeZone)}</span>{itemUrls.map((itemUrl, urlIndex) => <PreviewPurchaseButton key={`${itemUrl}:${urlIndex}`} event={{ ...event, widgetUrl: null, purchaseUrl: itemUrl, upcomingSlots: [{ ...item, purchaseUrl: itemUrl, purchaseUrls: undefined }] }} className={styles.scheduleBuy} label={itemUrls.length > 1 ? `Билет на сеанс ${urlIndex + 1}` : 'Билет на этот сеанс'} />)}</li>; })}</ul></details> : null}
                 </div>
                 <div className={styles.rowPrice}>{priceLabel}{typeof event.priceFrom === 'number' && event.priceFrom === 0 ? <small className={styles.freePrice}>вход свободный</small> : <small>за билет</small>}</div>
                 <div className={`${styles.rowSeats} ${typeof event.vacant === 'number' && event.vacant <= 8 ? styles.rowSeatsLow : ''}`}>{typeof event.vacant === 'number' ? `${event.vacant} мест` : ''}</div>
@@ -692,7 +722,7 @@ export function NewYearUxPreview({ initialData, errorMessage }: { initialData: P
                 <dl className={styles.drawerFacts}>
                   <dt>Город</dt><dd>{selectedEvent.city || 'Уточняется'}</dd>
                   <dt>Площадка</dt><dd>{selectedEvent.venue || 'Уточняется'}</dd>
-                  <dt>Ближайший сеанс</dt><dd>{selectedSlots[0] ? formatSlot(selectedSlots[0]) : 'Дата уточняется'}</dd>
+                  <dt>Ближайший сеанс</dt><dd>{selectedSlots[0] ? formatSlot(selectedSlots[0], resolveSessionTimeZone(selectedEvent)) : 'Дата уточняется'}</dd>
                   <dt>Цена</dt><dd>{selectedPrice}</dd>
                   {typeof selectedEvent.vacant === 'number' ? <><dt>Доступность</dt><dd>{selectedEvent.vacant === 0 ? 'Наличие уточняется у оператора' : `${selectedEvent.vacant} мест по данным каталога`}</dd></> : null}
                 </dl>
@@ -701,7 +731,7 @@ export function NewYearUxPreview({ initialData, errorMessage }: { initialData: P
                   {selectedSlots.map((item, index) => {
                     const urls = [...new Set([item.purchaseUrl, ...(item.purchaseUrls || [])].map(safeExternalUrl).filter((url): url is string => Boolean(url)))];
                     return <li key={item.id || `${selectedEvent.id}:${item.startsAt}:${index}`}>
-                      <span>{formatSlot(item)}</span>
+                      <span>{formatSlot(item, resolveSessionTimeZone(selectedEvent))}</span>
                       {urls.map((url, urlIndex) => <PreviewPurchaseButton key={`${url}:${urlIndex}`} event={{ ...selectedEvent, widgetUrl: null, purchaseUrl: url, upcomingSlots: [{ ...item, purchaseUrl: url, purchaseUrls: undefined }] }} className={styles.drawerScheduleBuy} label={urls.length > 1 ? `Билет на сеанс ${urlIndex + 1}` : 'Купить билет на этот сеанс'} />)}
                     </li>;
                   })}

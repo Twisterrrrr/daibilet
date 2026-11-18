@@ -1,23 +1,29 @@
 import { unstable_cache } from 'next/cache';
 import { fetchPublicApiJson } from '@/server/public-api-client';
+import { resolveSessionTimeZone } from '@/lib/city-timezone';
+import { parseSessionStartsAt } from '@/lib/datetime';
 import cityRouting from '../../../../data/geo/city-routing.ru.json';
 import regionHubs from '../../../../data/geo/region-hubs.ru.json';
 import { resolvePreviewFormat } from './preview-format';
 
 export type PreviewSlot = {
   id?: string;
+  eventId?: string;
   startsAt?: string | null;
   dateLabel?: string;
   timeLabel?: string;
   purchaseUrl?: string | null;
   purchaseUrls?: string[];
   vacant?: number | null;
+  timeZone?: string | null;
 };
 
 export type PreviewEvent = {
   id: string;
   title: string;
   city?: string | null;
+  destination?: string | null;
+  timeZone?: string | null;
   venue?: string | null;
   category?: string | null;
   catalogCategory?: string | { title?: string; slug?: string } | null;
@@ -28,6 +34,7 @@ export type PreviewEvent = {
   sessionCount?: number;
   startsAt?: string | null;
   eventPageSlug?: string | null;
+  eventPageIndexableSlug?: string | null;
   slug?: string | null;
   groupKey?: string | null;
   priceFrom?: number | null;
@@ -41,6 +48,8 @@ export type PreviewEvent = {
   purchaseReady?: boolean;
   sourceStatus?: string | null;
   description?: string | null;
+  imageUrl?: string | null;
+  ageLimit?: string | null;
   upcomingSlots?: PreviewSlot[];
 };
 
@@ -62,15 +71,40 @@ const FIRST_SEASON_DATE = '2026-12-01';
 const LAST_SEASON_DATE = '2027-01-14';
 const CITY_TO_REGION = cityRouting.cityToRegion as Record<string, string>;
 const REGION_CENTER_NAMES = new Set(regionHubs.regionCenters.map((item) => item.centerCity));
+const NEW_YEAR_REGIONAL_CENTER_NAMES = new Set([
+  ...REGION_CENTER_NAMES,
+  'Великий Новгород',
+  'Владикавказ',
+  'Волгоград',
+  'Курск',
+  'Новосибирск',
+  'Петропавловск-Камчатский',
+  'Рязань',
+  'Смоленск',
+]);
 const REGION_BY_CENTER = new Map(regionHubs.regionCenters
   .filter((item) => !['Москва', 'Санкт-Петербург', 'Севастополь'].includes(item.centerCity))
   .map((item) => [item.centerCity, item.regionName]));
+const STANDALONE_CITY_NAMES = new Set([
+  ...cityRouting.standaloneCities.map((name) => name.replace(/\s*\([^)]*\)\s*$/u, '').trim()),
+  'Петропавловск-Камчатский',
+]);
+const DAY_FORMATTERS = new Map<string, Intl.DateTimeFormat>();
+const SLOT_DAY_KEYS = new WeakMap<PreviewSlot, Map<string, string | null>>();
 type PreviewCatalogSnapshot = { events: PreviewEvent[]; total: number; generatedAt: string | null };
 const NEW_YEAR_CITY_REGION_OVERRIDES: Record<string, string> = {
+  'Великий Новгород': 'Новгородская область',
+  Владикавказ: 'Республика Северная Осетия - Алания',
+  Волгоград: 'Волгоградская область',
   Волхов: 'Ленинградская область',
   Истра: 'Московская область',
+  Курск: 'Курская область',
   'Лосино-Петровский': 'Московская область',
+  Новосибирск: 'Новосибирская область',
   Одинцово: 'Московская область',
+  'Петропавловск-Камчатский': 'Камчатский край',
+  Рязань: 'Рязанская область',
+  Смоленск: 'Смоленская область',
   Сочи: 'Краснодарский край',
 };
 
@@ -82,47 +116,153 @@ function cityRegion(city?: string | null): string | null {
   return region === 'Москва' ? null : region;
 }
 
-function dayKey(value?: string | null): string | null {
+function isRegionalCenter(city?: string | null): boolean {
+  if (!city) return false;
+  return NEW_YEAR_REGIONAL_CENTER_NAMES.has(city.replace(/\s*\([^)]*\)\s*$/u, '').trim());
+}
+
+function dayKey(value?: string | null, timeZone = 'Europe/Moscow'): string | null {
   if (!value) return null;
-  const date = new Date(value);
+  const date = parseSessionStartsAt(value);
   if (Number.isNaN(date.getTime())) return null;
-  const parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Moscow', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(date);
+  let formatter = DAY_FORMATTERS.get(timeZone);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' });
+    DAY_FORMATTERS.set(timeZone, formatter);
+  }
+  const parts = formatter.formatToParts(date);
   const get = (part: string) => parts.find((item) => item.type === part)?.value || '';
   return `${get('year')}-${get('month')}-${get('day')}`;
 }
 
+function slotDayKey(slot: PreviewSlot, fallbackTimeZone = 'Europe/Moscow'): string | null {
+  const timeZone = slot.timeZone || fallbackTimeZone;
+  const cached = SLOT_DAY_KEYS.get(slot);
+  if (cached?.has(timeZone)) return cached.get(timeZone) ?? null;
+  const value = dayKey(slot.startsAt, timeZone);
+  const timezoneCache = cached || new Map<string, string | null>();
+  timezoneCache.set(timeZone, value);
+  SLOT_DAY_KEYS.set(slot, timezoneCache);
+  return value;
+}
+
 function seasonalSlots(event: PreviewEvent): PreviewSlot[] {
   if (!event.purchaseReady) return [];
-  const slots = [...(event.upcomingSlots || [])];
+  const eventTimeZone = resolveSessionTimeZone(event);
+  const eventPurchaseUrl = event.purchaseUrl || event.widgetUrl || null;
+  const sourceSlots = [...(event.upcomingSlots || [])];
+  const slots = sourceSlots.map((slot) => ({
+    ...slot,
+    id: slot.id || slot.eventId || `${event.id}:${slot.startsAt || ''}`,
+    timeZone: slot.timeZone || eventTimeZone,
+    purchaseUrl: slot.purchaseUrl || (sourceSlots.length === 1 || slot.startsAt === event.startsAt ? eventPurchaseUrl : null),
+  }));
   if (event.startsAt && !slots.some((slot) => slot.startsAt === event.startsAt)) {
     slots.push({
       id: event.id,
       startsAt: event.startsAt,
+      timeZone: eventTimeZone,
       purchaseUrl: event.purchaseUrl || event.widgetUrl || null,
       vacant: event.vacant ?? null,
     });
   }
   return slots.filter((slot) => {
-    const day = dayKey(slot.startsAt);
+    const day = slotDayKey(slot, eventTimeZone);
     return Boolean(day && day >= FIRST_SEASON_DATE && day <= LAST_SEASON_DATE);
   });
 }
 
+function recurringProgramIdentity(event: PreviewEvent): { key: string; title: string } | null {
+  const match = event.title.match(/^(.*?),\s*\d{1,2}\s+\p{L}+(?:\.)?,\s*\d{1,2}:\d{2}$/u);
+  const title = (match?.[1] || event.title).trim();
+  const description = event.description?.replace(/\s+/g, ' ').trim().toLocaleLowerCase('ru');
+  if (!title || !event.city || !event.venue || !event.purchaseProvider) return null;
+  const tags = [...new Set([...(event.tags || []), ...(event.subcategories || []), ...(event.tagLabels || [])]
+    .map((tag) => tag.trim().toLocaleLowerCase('ru')).filter(Boolean))].sort();
+  if (!description && tags.length === 0) return null;
+  const taxonomy = [event.catalogCategory, event.catalogSubcategory].map((item) =>
+    typeof item === 'string' ? item : item?.slug || item?.title || '',
+  );
+  return {
+    title,
+    key: JSON.stringify([
+      event.purchaseProvider,
+      event.city.trim().toLocaleLowerCase('ru'),
+      event.venue.trim().replace(/\s+/g, ' ').toLocaleLowerCase('ru'),
+      title.toLocaleLowerCase('ru'),
+      event.category?.trim().toLocaleLowerCase('ru') || '',
+      taxonomy.map((value) => value.trim().toLocaleLowerCase('ru')),
+      tags,
+      description,
+      event.imageUrl || '',
+      event.ageLimit || '',
+    ]),
+  };
+}
+
 function groupEvents(events: PreviewEvent[]): PreviewEvent[] {
-  const groups = new Map<string, PreviewEvent[]>();
-  for (const event of events) {
+  const candidateGroups = new Map<string, { identity: { key: string; title: string }; rows: PreviewEvent[] }>();
+  const directGroups = new Map<string, PreviewEvent[]>();
+  const slotsByEvent = new Map<PreviewEvent, PreviewSlot[]>();
+  const getSlots = (event: PreviewEvent) => {
+    let slots = slotsByEvent.get(event);
+    if (!slots) {
+      slots = seasonalSlots(event);
+      slotsByEvent.set(event, slots);
+    }
+    return slots;
+  };
+  const addDirect = (event: PreviewEvent) => {
     const key = event.eventPageSlug ? `page:${event.eventPageSlug}` : `catalog:${event.groupKey || event.id}`;
-    const group = groups.get(key) || [];
-    group.push(event);
-    groups.set(key, group);
+    const rows = directGroups.get(key) || [];
+    rows.push(event);
+    directGroups.set(key, rows);
+  };
+
+  for (const event of events) {
+    const identity = recurringProgramIdentity(event);
+    if (!identity) {
+      addDirect(event);
+      continue;
+    }
+    const group = candidateGroups.get(identity.key) || { identity, rows: [] };
+    group.rows.push(event);
+    candidateGroups.set(identity.key, group);
   }
-  return [...groups.values()].map((rows) => {
+
+  const datedGroups: Array<{ rows: PreviewEvent[]; identity: { key: string; title: string } | null; date: string }> = [];
+  const splitByLocalDate = (rows: PreviewEvent[], identity: { key: string; title: string } | null, groupKey: string) => {
+    const byDate = new Map<string, PreviewEvent[]>();
+    for (const row of rows) {
+      const slotsByDate = new Map<string, PreviewSlot[]>();
+      for (const slot of getSlots(row)) {
+        const date = slotDayKey(slot, resolveSessionTimeZone(row));
+        if (!date) continue;
+        const slots = slotsByDate.get(date) || [];
+        slots.push(slot);
+        slotsByDate.set(date, slots);
+      }
+      for (const [date, slots] of slotsByDate) {
+        const dailyRows = byDate.get(date) || [];
+        dailyRows.push({ ...row, groupKey, startsAt: slots[0]?.startsAt || row.startsAt, upcomingSlots: slots });
+        byDate.set(date, dailyRows);
+      }
+    }
+    for (const [date, dailyRows] of byDate) datedGroups.push({ rows: dailyRows, identity, date });
+  };
+
+  for (const group of candidateGroups.values()) {
+    splitByLocalDate(group.rows, group.identity, `program:${group.rows[0]?.id || group.identity.key}`);
+  }
+  for (const [key, rows] of directGroups) splitByLocalDate(rows, null, key);
+
+  return datedGroups.map(({ rows, identity, date }) => {
     const first = rows[0]!;
     const pageSlugs = [...new Set(rows.map((row) => row.eventPageSlug).filter((slug): slug is string => Boolean(slug)))];
     const eventSlugs = [...new Set(rows.map((row) => row.slug).filter((slug): slug is string => Boolean(slug)))];
     const slots = new Map<string, PreviewSlot>();
     for (const row of rows) {
-      for (const slot of seasonalSlots(row)) {
+      for (const slot of getSlots(row)) {
         const parsedStart = slot.startsAt ? new Date(slot.startsAt) : null;
         const slotKey = parsedStart && !Number.isNaN(parsedStart.getTime())
           ? `start:${parsedStart.toISOString()}`
@@ -148,11 +288,17 @@ function groupEvents(events: PreviewEvent[]): PreviewEvent[] {
     const prices = rows.map((row) => Number(row.priceFrom)).filter((price) => Number.isFinite(price) && price >= 0);
     const vacant = rows.map((row) => row.vacant).filter((value): value is number => typeof value === 'number');
     const upcomingSlots = [...slots.values()].sort((a, b) => new Date(a.startsAt || 0).getTime() - new Date(b.startsAt || 0).getTime());
+    const baseGroupKey = identity ? `program:${first.id}` : first.groupKey || first.id;
     return {
       ...first,
+      title: identity ? identity.title : first.title,
+      groupKey: `${baseGroupKey}:date:${date}`,
       eventPageSlug: pageSlugs.length === 1 ? pageSlugs[0] : null,
+      eventPageIndexableSlug: pageSlugs.length === 1 ? first.eventPageIndexableSlug : null,
       slug: eventSlugs.length === 1 ? eventSlugs[0] : null,
-      sessionCount: Math.max(upcomingSlots.length, ...rows.map((row) => row.sessionCount || 0)),
+      purchaseUrl: upcomingSlots[0]?.purchaseUrl || first.purchaseUrl || null,
+      widgetUrl: upcomingSlots[0]?.purchaseUrl ? null : first.widgetUrl,
+      sessionCount: upcomingSlots.length,
       subcategories: [...new Set(rows.flatMap((row) => row.subcategories || []))],
       tagLabels: [...new Set(rows.flatMap((row) => row.tagLabels || []))],
       tags: [...new Set(rows.flatMap((row) => row.tags || []))],
@@ -166,9 +312,10 @@ function groupEvents(events: PreviewEvent[]): PreviewEvent[] {
 function slotsForDate(event: PreviewEvent, date: string): PreviewSlot[] {
   const slots = event.upcomingSlots || [];
   if (!date || date === 'all') return slots;
-  if (/^\d{4}-\d{2}-\d{2}$/.test(date)) return slots.filter((slot) => dayKey(slot.startsAt) === date);
+  const eventTimeZone = resolveSessionTimeZone(event);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(date)) return slots.filter((slot) => slotDayKey(slot, eventTimeZone) === date);
   return slots.filter((slot) => {
-    const day = dayKey(slot.startsAt);
+    const day = slotDayKey(slot, eventTimeZone);
     if (!day) return false;
     if (date === 'dec31') return day === '2026-12-31';
     if (date === 'dec24to31') return day >= '2026-12-24' && day <= '2026-12-31';
@@ -228,46 +375,107 @@ export async function buildNewYearPreviewData(filters: PreviewFilters = {}) {
 
   const grouped = groupEvents(rawEvents);
   const query = String(filters.q || '').trim().toLocaleLowerCase('ru');
+  const dateFilter = filters.date || 'all';
+  const priceFilter = filters.price || 'all';
+  const formatFilter = filters.format || '';
   type Axis = 'geo' | 'date' | 'price' | 'format' | 'stock' | 'q';
-  const allFilters = (event: PreviewEvent, except?: Axis) => {
-    if (except !== 'geo' && filters.city && filters.city !== 'Вся Россия' && event.city !== filters.city) return false;
-    if (except !== 'geo' && filters.region && cityRegion(event.city) !== filters.region) return false;
-    if (except !== 'date' && !slotsForDate(event, filters.date || 'all').length) return false;
-    if (except !== 'price' && !matchesPrice(event, filters.price || 'all')) return false;
-    if (except !== 'format' && filters.format && filters.format !== 'Все форматы' && resolvePreviewFormat(event) !== filters.format) return false;
-    if (except !== 'stock' && filters.lowStock && !lowStock(event)) return false;
-    if (except !== 'q' && query) {
-      const haystack = [event.title, event.city, event.venue, event.category, event.catalogCategory, event.catalogSubcategory, ...(event.tagLabels || []), ...(event.tags || [])].map(String).join(' ').toLocaleLowerCase('ru');
-      if (!haystack.includes(query)) return false;
-    }
-    return true;
+  type IndexedEvent = {
+    event: PreviewEvent;
+    city: string;
+    region: string | null;
+    format: string;
+    upcomingSlots: PreviewSlot[];
+    matches: Record<Axis, boolean>;
   };
+  const indexed = grouped.map((event): IndexedEvent => {
+    const city = event.city || '';
+    const region = cityRegion(city);
+    const format = resolvePreviewFormat(event);
+    const upcomingSlots = slotsForDate(event, dateFilter);
+    const haystack = query
+      ? [event.title, event.city, event.venue, event.category, event.catalogCategory, event.catalogSubcategory, ...(event.tagLabels || []), ...(event.tags || [])]
+        .map(String).join(' ').toLocaleLowerCase('ru')
+      : '';
+    return {
+      event,
+      city,
+      region,
+      format,
+      upcomingSlots,
+      matches: {
+        geo: (!filters.city || filters.city === 'Вся Россия' || event.city === filters.city) &&
+          (!filters.region || (region === filters.region && !isRegionalCenter(city))),
+        date: upcomingSlots.length > 0,
+        price: matchesPrice(event, priceFilter),
+        format: !formatFilter || formatFilter === 'Все форматы' || format === formatFilter,
+        stock: !filters.lowStock || lowStock(event),
+        q: !query || haystack.includes(query),
+      },
+    };
+  });
+  const matchesExcept = (item: IndexedEvent, except?: Axis) =>
+    (except === 'geo' || item.matches.geo) &&
+    (except === 'date' || item.matches.date) &&
+    (except === 'price' || item.matches.price) &&
+    (except === 'format' || item.matches.format) &&
+    (except === 'stock' || item.matches.stock) &&
+    (except === 'q' || item.matches.q);
 
-  const filtered = grouped.filter((event) => allFilters(event)).map((event) => ({
+  const filtered = indexed.filter((item) => matchesExcept(item)).map(({ event, upcomingSlots }) => ({
     ...event,
-    upcomingSlots: slotsForDate(event, filters.date || 'all'),
+    upcomingSlots,
   }));
   if (filters.sort === 'price') filtered.sort((a, b) => (a.priceFrom ?? Number.MAX_SAFE_INTEGER) - (b.priceFrom ?? Number.MAX_SAFE_INTEGER));
   else if (filters.sort === 'price-desc') filtered.sort((a, b) => (b.priceFrom ?? -1) - (a.priceFrom ?? -1));
   else filtered.sort((a, b) => new Date(a.upcomingSlots?.[0]?.startsAt || 0).getTime() - new Date(b.upcomingSlots?.[0]?.startsAt || 0).getTime());
 
-  const count = (axis: Axis, predicate: (event: PreviewEvent) => boolean) =>
-    grouped.filter((event) => allFilters(event, axis) && predicate(event)).length;
-  const cities = [...new Set(grouped.map((event) => event.city).filter((city): city is string => Boolean(city)))].sort((a, b) => a.localeCompare(b, 'ru'));
-  const regions = [...new Set(cities.map(cityRegion).filter((region): region is string => Boolean(region)))];
-  const formats = [...new Set(grouped.map(resolvePreviewFormat))].sort((a, b) => a.localeCompare(b, 'ru'));
+  const dateValues = ['all', 'dec24to31', 'dec31', 'jan1', 'jan1to14', 'weekend', 'holidays'];
+  const priceValues = ['all', 'free', 'under1000', 'under2000', 'over2000', 'over5000', 'over10000'];
+  const cityCounts = new Map<string, number>();
+  const regionCounts = new Map<string, number>();
+  const dateCounts = new Map(dateValues.map((value) => [value, 0]));
+  const priceCounts = new Map(priceValues.map((value) => [value, 0]));
+  const formatCounts = new Map<string, number>();
+  let lowStockCount = 0;
+  let allGeoFacetCount = 0;
+  for (const item of indexed) {
+    if (matchesExcept(item, 'geo')) {
+      allGeoFacetCount++;
+      if (item.city) cityCounts.set(item.city, (cityCounts.get(item.city) || 0) + 1);
+      if (item.region && !isRegionalCenter(item.city)) regionCounts.set(item.region, (regionCounts.get(item.region) || 0) + 1);
+    }
+    if (matchesExcept(item, 'date')) {
+      for (const value of dateValues) {
+        if (slotsForDate(item.event, value).length) dateCounts.set(value, (dateCounts.get(value) || 0) + 1);
+      }
+    }
+    if (matchesExcept(item, 'price')) {
+      for (const value of priceValues) {
+        if (matchesPrice(item.event, value)) priceCounts.set(value, (priceCounts.get(value) || 0) + 1);
+      }
+    }
+    if (matchesExcept(item, 'format')) formatCounts.set(item.format, (formatCounts.get(item.format) || 0) + 1);
+    if (matchesExcept(item, 'stock') && lowStock(item.event)) lowStockCount++;
+  }
+  const cities = [...new Set(indexed.map((item) => item.city).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'ru'));
+  const regions = [...regionCounts.keys()];
+  const formats = [...new Set(indexed.map((item) => item.format))].sort((a, b) => a.localeCompare(b, 'ru'));
   const facets = {
-    cities: [{ name: 'Вся Россия', count: count('geo', () => true), filterable: true }, ...cities.map((name) => ({
-      name,
-      count: count('geo', (event) => event.city === name),
-      region: cityRegion(name) || undefined,
-      filterable: !cityRegion(name) || REGION_CENTER_NAMES.has(name.replace(/\s*\([^)]*\)\s*$/u, '').trim()),
-    }))],
-    regions: regions.map((name) => ({ name, count: count('geo', (event) => cityRegion(event.city) === name) })).sort((a, b) => b.count - a.count || (a.name || '').localeCompare(b.name || '', 'ru')),
-    dates: ['all', 'dec24to31', 'dec31', 'jan1', 'jan1to14', 'weekend', 'holidays'].map((value) => ({ value, count: count('date', (event) => slotsForDate(event, value).length > 0) })),
-    prices: ['all', 'free', 'under1000', 'under2000', 'over2000', 'over5000', 'over10000'].map((value) => ({ value, count: count('price', (event) => matchesPrice(event, value)) })),
-    formats: [{ name: 'Все форматы', count: count('format', () => true) }, ...formats.map((name) => ({ name, count: count('format', (event) => resolvePreviewFormat(event) === name) }))],
-    lowStock: count('stock', lowStock),
+    cities: [{ name: 'Вся Россия', count: allGeoFacetCount, filterable: true }, ...cities.map((name) => {
+      const normalizedName = name.replace(/\s*\([^)]*\)\s*$/u, '').trim();
+      const eventCount = cityCounts.get(name) || 0;
+      return {
+        name,
+        count: eventCount,
+        region: cityRegion(name) || undefined,
+        filterable: !cityRegion(name) || REGION_CENTER_NAMES.has(normalizedName) || STANDALONE_CITY_NAMES.has(normalizedName) || eventCount >= 6,
+      };
+    })],
+    regions: regions.map((name) => ({ name, count: regionCounts.get(name) || 0 })).filter((region) => region.count > 0).sort((a, b) => b.count - a.count || (a.name || '').localeCompare(b.name || '', 'ru')),
+    dates: dateValues.map((value) => ({ value, count: dateCounts.get(value) || 0 })),
+    prices: priceValues.map((value) => ({ value, count: priceCounts.get(value) || 0 })),
+    formats: [{ name: 'Все форматы', count: [...formatCounts.values()].reduce((sum, value) => sum + value, 0) }, ...formats.map((name) => ({ name, count: formatCounts.get(name) || 0 }))],
+    lowStock: lowStockCount,
   };
 
   const offset = Math.max(0, Number(filters.offset) || 0);
