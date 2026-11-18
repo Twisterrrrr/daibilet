@@ -7,6 +7,7 @@ import {
   Car,
   Check,
   ChevronDown,
+  ChevronRight,
   ChevronUp,
   Clock,
   Copy,
@@ -3850,18 +3851,14 @@ function DayRoutePanelInner() {
               {route.venues.length ? (
                 <button
                   type="button"
-                  onClick={() => {
-                    clearDayRoute();
-                    setRoute(readDayRoute());
-                    replaceMyDayUrl('/my-day');
-                    flashDayRouteFeedback('Маршрут очищен');
-                  }}
-                  aria-label="Очистить маршрут"
-                  title="Очистить маршрут"
-                  data-day-clear
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition hover:bg-white/20 hover:text-white"
+                  onClick={() => userAuth?.isLoggedIn ? void savePlanToAccount() : saveCurrentAsScenario()}
+                  disabled={accountPlanBusy || scenarioBusy}
+                  aria-label="Сохранить"
+                  title="Сохранить"
+                  data-day-save
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition hover:bg-white/20 disabled:opacity-50"
                 >
-                  <Trash2 className="h-4 w-4" aria-hidden />
+                  <Bookmark className="h-4 w-4" aria-hidden />
                 </button>
               ) : null}
               <button
@@ -3881,45 +3878,6 @@ function DayRoutePanelInner() {
             className="relative hidden shrink-0 flex-wrap items-center gap-2 lg:flex"
             data-day-desktop-actions
           >
-            {yandexUrl ? (
-              <a
-                href={yandexUrl}
-                target="_blank"
-                rel="noreferrer"
-                data-day-open-route
-                className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
-              >
-                <Navigation className="h-4 w-4" aria-hidden />
-                Открыть маршрут
-              </a>
-            ) : (
-              <button
-                type="button"
-                disabled
-                title="Нужны точки с координатами"
-                className="inline-flex cursor-not-allowed items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white/45"
-              >
-                <Navigation className="h-4 w-4" aria-hidden />
-                Открыть маршрут
-              </button>
-            )}
-            {route.venues.length ? (
-              <button
-                type="button"
-                onClick={() => {
-                  clearDayRoute();
-                  setRoute(readDayRoute());
-                  replaceMyDayUrl('/my-day');
-                  flashDayRouteFeedback('Маршрут очищен');
-                }}
-                aria-label="Очистить маршрут"
-                title="Очистить маршрут"
-                data-day-clear
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition hover:bg-white/20 hover:text-white"
-              >
-                <Trash2 className="h-4 w-4" aria-hidden />
-              </button>
-            ) : null}
             <button
               type="button"
               onClick={() => userAuth?.isLoggedIn ? void savePlanToAccount() : saveCurrentAsScenario()}
@@ -3928,13 +3886,7 @@ function DayRoutePanelInner() {
               className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <Bookmark className="h-4 w-4" aria-hidden />
-              {userAuth?.isLoggedIn
-                ? accountPlanBusy
-                  ? 'Сохраняем…'
-                  : accountPlanCode
-                    ? 'Обновить план'
-                    : 'Сохранить день'
-                : 'Сохранить сценарий'}
+              {accountPlanBusy || scenarioBusy ? 'Сохраняем…' : 'Сохранить'}
             </button>
             <button
               type="button"
@@ -4122,6 +4074,7 @@ function DayRoutePanelInner() {
             canOptimize={canOptimize}
             onOptimize={optimizeOrder}
             onOpenPicker={() => openPicker('places')}
+            yandexUrl={yandexUrl}
             hourPlanOn={hourPlanOn}
             canHourPlan={route.venues.length >= 1}
             onToggleHourPlan={() => {
@@ -4650,47 +4603,111 @@ function DayRoutePanelInner() {
           ) : null}
           {showEmptyDesktopShell ? (
             <>
-              <div className="mt-4 lg:hidden" data-my-day-empty-mobile>
+              <div className="mt-4 md:hidden" data-my-day-empty-mobile>
                 {renderEmptyStarter()}
               </div>
               <div
-                className="mt-5 hidden items-stretch gap-4 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(22rem,1fr)] lg:gap-5 xl:grid-cols-3"
+                className="mt-5 hidden items-stretch gap-4 md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:grid-cols-3 lg:gap-4 xl:gap-5"
                 data-my-day-empty-three-blocks
               >
-                <div className="contents lg:flex lg:min-w-0 lg:flex-col lg:gap-4 xl:contents" data-my-day-empty-steps>
-                  <div className="min-w-0" data-my-day-picker-host>
-                    {renderEmptyStarter({ hideMap: true })}
+                <div className="flex min-w-0 flex-col gap-4 lg:contents" data-my-day-empty-steps>
+                <section
+                  className="aspect-square min-h-96 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
+                  data-my-day-empty-scenarios
+                  aria-labelledby="day-empty-scenarios-title"
+                >
+                  <div className="flex min-h-14 items-center gap-3 border-b border-slate-200">
+                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary-50 text-primary-600">
+                      <Route className="h-5 w-5" aria-hidden />
+                    </span>
+                    <h2 id="day-empty-scenarios-title" className="font-display text-xl font-extrabold text-slate-900 sm:text-2xl">
+                      Выберите готовый сценарий
+                    </h2>
                   </div>
-                  <section
-                    className="flex min-h-[calc(100dvh_-_var(--site-header-height)_-_10rem)] flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
-                    data-my-day-empty-picker-categories
-                    aria-labelledby="day-empty-picker-title"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary-50 text-primary-600">
-                        <Sparkles className="h-5 w-5" aria-hidden />
-                      </span>
-                      <h2 id="day-empty-picker-title" className="font-display text-xl font-extrabold text-slate-900 sm:text-2xl">
-                        Соберите маршрут сами
-                      </h2>
-                    </div>
-                    <p className="mt-2 text-sm text-slate-600">
-                      Выберите места и события для своего маршрута.
-                    </p>
+                  <div className="mt-4 flex items-center justify-between gap-3">
+                    <p className="text-sm font-medium text-slate-900">Готовые маршруты</p>
                     <button
                       type="button"
-                      onClick={() => openPicker('places')}
-                      data-day-empty-open-picker
-                      className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary-600 px-4 text-sm font-semibold text-white transition hover:bg-primary-700"
+                      onClick={() => openPicker('scenarios')}
+                      className="shrink-0 text-sm font-medium text-primary-600 hover:text-primary-700"
+                      data-day-empty-see-all-scenarios
                     >
-                      <Plus className="h-4 w-4" aria-hidden />
-                      Добавить места
+                      Смотреть все
                     </button>
-                    <div ref={setPickerAccordionHost} className="mt-4" data-my-day-picker-accordion-host />
-                  </section>
+                  </div>
+                  <ul className="mt-3 divide-y divide-slate-100" data-day-empty-scenario-list>
+                    {dayRoutePresets
+                      .map((preset) => ({
+                        preset,
+                        items: buildCityDayRoutePreset(preset.stops, matchSources, dayPresetCityCtx),
+                      }))
+                      .filter(({ preset }) => cityDayRoutePresetAvailable(preset.stops, matchSources, dayPresetCityCtx))
+                      .slice(0, 5)
+                      .map(({ preset, items }) => (
+                        <li key={preset.id}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              replaceDayRouteFromVenues(items, pageCityId || null);
+                              setRoute(readDayRouteFresh());
+                              flashDayRouteFeedback(
+                                dayRouteAddSuccessMessage(items.length) || `Сценарий «${preset.title}» в маршруте`,
+                                { showClear: true },
+                              );
+                            }}
+                            className="flex min-h-11 w-full items-center justify-between gap-3 px-2 text-left text-sm text-primary-700 transition hover:bg-slate-50"
+                            data-day-empty-scenario={preset.id}
+                          >
+                            <span className="min-w-0 truncate">{preset.title}</span>
+                            <span className="shrink-0 text-xs text-slate-500">· {items.length} точек</span>
+                          </button>
+                        </li>
+                      ))}
+                  </ul>
+                </section>
+                <section
+                  className="aspect-square min-h-96 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
+                  data-my-day-empty-picker-categories
+                  aria-labelledby="day-empty-picker-title"
+                >
+                  <div className="flex min-h-14 items-center gap-3">
+                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary-50 text-primary-600">
+                      <Sparkles className="h-5 w-5" aria-hidden />
+                    </span>
+                    <h2 id="day-empty-picker-title" className="font-display text-xl font-extrabold text-slate-900 sm:text-2xl">
+                      Соберите маршрут сами
+                    </h2>
+                  </div>
+                  <div className="mt-4 flex flex-col gap-2.5">
+                    {[
+                      { value: 'places' as const, title: 'Главные места', icon: MapPin },
+                      { value: 'suburbs' as const, title: 'Пригороды', icon: Landmark },
+                      { value: 'picks' as const, title: 'Выбор Дайбилет', icon: Sparkles },
+                      { value: 'own' as const, title: 'Добавь свою точку', icon: PenLine },
+                    ].map((category) => {
+                      if (!pickerTabs.some((tab) => tab.value === category.value)) return null;
+                      const Icon = category.icon;
+                      return (
+                        <button
+                          key={category.value}
+                          type="button"
+                          onClick={() => openPicker(category.value)}
+                          className="inline-flex min-h-14 w-full items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-3 text-left text-sm font-semibold text-slate-900 transition hover:border-primary-200 hover:bg-primary-50/50"
+                          data-day-empty-picker-category={category.value}
+                        >
+                          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white text-primary-600 shadow-sm">
+                            <Icon className="h-4 w-4" aria-hidden />
+                          </span>
+                          <span className="min-w-0 flex-1">{category.title}</span>
+                          <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" aria-hidden />
+                        </button>
+                      );
+                    })}
+                  </div>
+                </section>
                 </div>
                 <div
-                  className="relative min-h-[calc(100dvh_-_var(--site-header-height)_-_10rem)] overflow-hidden rounded-2xl border border-slate-200 bg-slate-100"
+                  className="relative aspect-square min-h-96 overflow-hidden rounded-2xl border border-slate-200 bg-slate-100"
                   data-my-day-empty-map
                 >
                   <div className="pointer-events-none absolute left-3 top-3 z-[500] rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm">

@@ -10,6 +10,7 @@ import {
   Filter,
   Footprints,
   MapPin,
+  Navigation,
   Save,
   Sparkles,
   Trash2,
@@ -38,6 +39,7 @@ type MyDayToolbarProps = {
   canOptimize: boolean;
   onOptimize: () => void;
   onOpenPicker?: () => void;
+  yandexUrl?: string | null;
   hourPlanOn: boolean;
   canHourPlan: boolean;
   onToggleHourPlan: () => void;
@@ -83,6 +85,7 @@ export function MyDayToolbar({
   canOptimize,
   onOptimize,
   onOpenPicker,
+  yandexUrl,
   hourPlanOn,
   canHourPlan,
   onToggleHourPlan,
@@ -123,7 +126,7 @@ export function MyDayToolbar({
         aria-expanded={!collapsed}
         data-my-day-toolbar="1"
         data-my-day-toolbar-collapsed={collapsed ? '1' : '0'}
-        className={`sticky top-[calc(var(--site-header-height)+0.35rem)] z-20 [container-type:inline-size] rounded-2xl border border-slate-200/90 bg-white shadow-sm lg:top-[calc(var(--site-header-height)+0.5rem)] ${
+        className={`sticky top-[calc(var(--site-header-height)+0.35rem)] z-20 [container-type:inline-size] rounded-2xl border border-slate-200/90 bg-white shadow-sm lg:top-0 ${
           collapsed ? 'px-3 py-1.5' : 'p-4 sm:p-5'
         }`}
       >
@@ -246,6 +249,19 @@ export function MyDayToolbar({
               Добавить места
             </button>
           ) : null}
+          {yandexUrl ? (
+            <a
+              href={yandexUrl}
+              target="_blank"
+              rel="noreferrer"
+              data-day-open-route
+              title="В Яндекс.Карты"
+              className="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
+            >
+              <Navigation className="h-4 w-4" aria-hidden />
+              Открыть маршрут
+            </a>
+          ) : null}
           <div
             className="inline-flex shrink-0 rounded-full border border-slate-200 p-0.5"
             role="group"
@@ -365,7 +381,7 @@ export function MyDayToolbar({
                 className="inline-flex items-center gap-1.5 rounded-full border border-primary-300/70 bg-primary-50/60 px-3 py-1.5 text-xs font-semibold text-primary-700 transition hover:bg-primary-50 disabled:opacity-40"
               >
                 <Save className="h-3.5 w-3.5 shrink-0" aria-hidden />
-                <span>Сохранить сценарий</span>
+                <span>Сохранить</span>
               </button>
             ) : null}
           </div>
@@ -373,6 +389,45 @@ export function MyDayToolbar({
 
         {scheduleSlot ? <div className="mt-3">{scheduleSlot}</div> : null}
         </div>
+        {showTypes ? (
+          <div className="mt-3 border-t border-slate-200 pt-3" data-my-day-type-filters>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="inline-flex items-center gap-2 text-sm font-semibold text-slate-900">
+                <Filter className="h-4 w-4 text-primary-600" aria-hidden /> Типы точек
+              </p>
+              <p className="text-xs text-slate-500">Показано {shown} из {stopsCount}</p>
+            </div>
+            <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Фильтр точек по типу">
+              {typeCounts.map(({ tag, count }) => {
+                const on = !hiddenTags.includes(tag);
+                return (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => onToggleTag(tag)}
+                    aria-pressed={on}
+                    className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                      on
+                        ? 'border-primary-300 bg-primary-50 text-primary-800'
+                        : 'border-slate-200 text-slate-500 hover:bg-slate-50'
+                    }`}
+                  >
+                    {tag} · {count}
+                  </button>
+                );
+              })}
+              {hiddenTags.length && onShowAllTags ? (
+                <button
+                  type="button"
+                  onClick={onShowAllTags}
+                  className="rounded-full border border-dashed border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-500 hover:bg-slate-50"
+                >
+                  Показать все
+                </button>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
       </div>
 
       <p
@@ -385,55 +440,6 @@ export function MyDayToolbar({
       </p>
 
       {children}
-
-      {showTypes ? (
-        <div
-          className="mt-3 rounded-2xl border border-slate-200/80 bg-white p-3 shadow-sm sm:mt-4 sm:p-4"
-          data-my-day-type-filters
-        >
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="inline-flex items-center gap-2 text-sm font-semibold text-slate-900">
-              <Filter className="h-4 w-4 text-primary-600" aria-hidden /> Типы точек
-            </p>
-            <p className="text-xs text-slate-500">
-              Показано {shown} из {stopsCount}
-            </p>
-          </div>
-          <div
-            className="mt-3 flex flex-wrap gap-2"
-            role="group"
-            aria-label="Фильтр точек по типу"
-          >
-            {typeCounts.map(({ tag, count }) => {
-              const on = !hiddenTags.includes(tag);
-              return (
-                <button
-                  key={tag}
-                  type="button"
-                  onClick={() => onToggleTag(tag)}
-                  aria-pressed={on}
-                  className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
-                    on
-                      ? 'border-primary-300 bg-primary-50 text-primary-800'
-                      : 'border-slate-200 text-slate-500 hover:bg-slate-50'
-                  }`}
-                >
-                  {tag} · {count}
-                </button>
-              );
-            })}
-            {hiddenTags.length && onShowAllTags ? (
-              <button
-                type="button"
-                onClick={onShowAllTags}
-                className="rounded-full border border-dashed border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-500 hover:bg-slate-50"
-              >
-                Показать все
-              </button>
-            ) : null}
-          </div>
-        </div>
-      ) : null}
     </div>
   );
 }
