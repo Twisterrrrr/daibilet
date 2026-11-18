@@ -5,6 +5,7 @@ import test from 'node:test';
 
 import {
   collectVenueSitemapPages,
+  cityPlacesSitemapPath,
   renderSitemapIndexXml,
   renderUrlsetXml,
   resolveSitemapLastModified,
@@ -78,6 +79,13 @@ test('destination PDP sitemap path includes only the URL that remains canonical'
   assert.equal(destinationPdpSitemapPath({
     title: 'Внешний canonical', slug: 'external-canonical', sourceSlug: null, canonicalPath: 'https://example.com/cities/external-canonical',
   }), '/cities/external-canonical');
+});
+
+test('city places sitemap path is independent of the city PDP indexability', () => {
+  assert.equal(cityPlacesSitemapPath('moskva', true), '/moscow/places');
+  assert.equal(cityPlacesSitemapPath('perm', true), '/perm/places');
+  assert.equal(cityPlacesSitemapPath('unreviewed-city', true), null);
+  assert.equal(cityPlacesSitemapPath('moskva', false), '/places/c/moscow');
 });
 
 test('sitemap lastmod: uses a real updatedAt when present', () => {
