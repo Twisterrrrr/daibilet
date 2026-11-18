@@ -486,7 +486,7 @@ export function NewYearUxPreview({ initialData, errorMessage }: { initialData: P
   };
 
   return (
-    <main className={`${styles.page} ${festive ? styles.festive : ''}`} data-newyear-preview>
+    <div className={`${styles.page} ${festive ? styles.festive : ''}`} data-newyear-preview>
       <section className={`${styles.band} ${festive ? styles.bandFestive : ''}`}>
           {festive ? <div className={styles.snowPattern} aria-hidden="true">
             <div className={styles.snowflakes}>{Array.from({ length: 12 }, (_, index) => <span key={index} className={styles.snowflakeFall}><svg viewBox="0 0 48 48" className={styles.snowflake}><g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7"><path d="M24 3v42M21 8l3 3 3-3M21 40l3-3 3 3M5.8 13.5l36.4 21M9 12.8l.7 4.2 4.2-.7M34.1 31.7l4.2-.7-.7 4.2M5.8 34.5l36.4-21M9 35.2l.7-4.2 4.2.7M34.1 16.3l4.2.7-.7-4.2" /></g></svg></span>)}</div>
@@ -780,6 +780,6 @@ export function NewYearUxPreview({ initialData, errorMessage }: { initialData: P
           <span>В список входят новогодние программы с доступными сеансами начиная с 1 декабря 2026 года · праздничный период: 23 декабря - 14 января</span>
         </footer>
       </div>
-    </main>
+    </div>
   );
 }

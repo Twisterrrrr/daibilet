@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 
+import { SiteLayout } from '@/components/SiteLayout';
 import { NewYearUxPreview } from './preview.client';
 import { buildNewYearPreviewData } from './preview-data';
 
@@ -20,8 +21,10 @@ export default async function NewYearUxPreviewPage() {
   }
 
   return (
-    <Suspense fallback={<main className="min-h-screen bg-[#F7F8F6] p-8 text-sm text-neutral-600">Загружаем предварительный просмотр…</main>}>
-      <NewYearUxPreview initialData={initialData} errorMessage={errorMessage} />
-    </Suspense>
+    <SiteLayout>
+      <Suspense fallback={<div className="min-h-screen bg-[#F7F8F6] p-8 text-sm text-neutral-600">Загружаем предварительный просмотр…</div>}>
+        <NewYearUxPreview initialData={initialData} errorMessage={errorMessage} />
+      </Suspense>
+    </SiteLayout>
   );
 }
