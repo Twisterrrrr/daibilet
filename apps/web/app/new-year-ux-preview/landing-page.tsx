@@ -1,8 +1,11 @@
 import { Suspense } from 'react';
 
 import { SiteLayout } from '@/components/SiteLayout';
+import { LANDING_CITY_SLUGS } from '@/lib/landing-city';
 import { citySlug as cityToSlug } from '@/lib/routes';
 import { normalizeKnownCitySlug } from '@/lib/landing-routes';
+import cityRouting from '../../../../data/geo/city-routing.ru.json';
+import regionHubs from '../../../../data/geo/region-hubs.ru.json';
 import { NewYearUxPreview } from './preview.client';
 import { buildNewYearPreviewData } from './preview-data';
 
@@ -21,18 +24,28 @@ export async function NewYearLandingPage({ geoSlug }: { geoSlug?: string | null 
       const city = allData.facets.cities.find((item) =>
         item.name && item.name !== 'Вся Россия' && normalizeKnownCitySlug(cityToSlug({ name: item.name })) === normalizedGeoSlug,
       );
-      const region = allData.facets.regions.find((item) =>
+      const knownCityName = city?.name || Object.entries(LANDING_CITY_SLUGS).find(([slug]) =>
+        normalizeKnownCitySlug(slug) === normalizedGeoSlug,
+      )?.[1] || null;
+      const regionFacet = allData.facets.regions.find((item) =>
         item.name && normalizeKnownCitySlug(cityToSlug({ name: item.name })) === normalizedGeoSlug,
       );
+      const knownRegions = new Set([
+        ...Object.values(cityRouting.cityToRegion),
+        ...regionHubs.regionCenters.map((item) => item.regionName),
+      ]);
+      const knownRegionName = regionFacet?.name || [...knownRegions].find((name) =>
+        normalizeKnownCitySlug(cityToSlug({ name })) === normalizedGeoSlug,
+      ) || null;
 
-      if (city?.name) {
+      if (knownCityName) {
         geoMatched = true;
-        initialCity = city.name;
-        initialData = await buildNewYearPreviewData({ city: city.name });
-      } else if (region?.name) {
+        initialCity = knownCityName;
+        initialData = await buildNewYearPreviewData({ city: knownCityName });
+      } else if (knownRegionName) {
         geoMatched = true;
-        initialRegion = region.name;
-        initialData = await buildNewYearPreviewData({ region: region.name });
+        initialRegion = knownRegionName;
+        initialData = await buildNewYearPreviewData({ region: knownRegionName });
       }
     } else {
       initialData = allData;
