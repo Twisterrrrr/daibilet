@@ -399,13 +399,16 @@ async function loadPublicEventDto(
     ...metaGroupMembers.map((member) => member.id),
   ])];
   const representative = eventsById.get(purchaseGroupEventIds[0] || '') || requestedEvent;
-  // Tariff rows come from the opened product, its representative, and explicit
-  // editorial merge peers. EventPage membership can contain hundreds of dated
-  // TC slots; mixing those into this price-limited query hides product tariffs.
+  // Tariff rows come from the opened product, its representative, explicit
+  // editorial merge peers, and the first EventPage purchase option. EventPage
+  // membership can contain hundreds of dated TC slots; their tariff set is
+  // duplicated per slot, so one linked purchase option is enough to recover
+  // the named categories without letting those duplicates crowd out results.
   const tariffOfferEventIds = resolveTicketTariffEventIds(
     requestedEvent.id,
     representative.id,
     mergeGroupMembers.map((member) => member.id),
+    stablePageEventIds.slice(1, 2),
   );
 
   const now = new Date();
@@ -1157,8 +1160,14 @@ export function resolveTicketTariffEventIds(
   requestedEventId: string,
   representativeEventId: string,
   mergePeerEventIds: string[] = [],
+  stablePagePurchaseOptionEventIds: string[] = [],
 ): string[] {
-  return [...new Set([requestedEventId, representativeEventId, ...mergePeerEventIds].filter(Boolean))];
+  return [...new Set([
+    requestedEventId,
+    representativeEventId,
+    ...mergePeerEventIds,
+    ...stablePagePurchaseOptionEventIds,
+  ].filter(Boolean))];
 }
 
 function purchaseProviderForEvent(event: EventRecord): PurchaseProvider | null {
