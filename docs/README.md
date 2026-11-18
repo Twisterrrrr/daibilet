@@ -26,6 +26,7 @@
 [Place: карта городских и национальных типовых каталогов и API-фильтров - 17.11.2026](./place-city-type-filter-map-2026-11-17.md)
 [Архив изображений и переход на активную статику - 13.11.2026](./image-archive-runtime-migration-2026-11-13.md)
 [Карта рабочих копий и переносов - 10.11.2026](./local-workspace-inventory-2026-11-10.md)
+[Канон URL тематических посадок и незавершённая live-сверка - 18.11.2026](./landing-url-architecture-and-audit-2026-11-18.md)
 [Сверка tours с активной копией Daibilet - 10.11.2026](./tours-vs-daibilet-audit-2026-11-10.md)
 [Консервация локальной копии tours и сверка рабочего состояния - 16.11.2026](./tours-vs-daibilet-audit-2026-11-16.md)
 [Изоляция legacy apps/public](./legacy-public-isolation.md)

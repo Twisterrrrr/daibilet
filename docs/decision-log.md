@@ -498,3 +498,13 @@ otherwise.
 **Почему:** Web image root — persistent production data, а повторная копия из legacy может вернуть устаревшие версии поверх активных изображений. Путь Nginx не меняем, чтобы не ломать уже опубликованные адреса.
 
 **Implementation status:** Локально подготовлено: deploy helpers теперь проверяют persistent root без копирования и исправления владельца. Production delta из 18 URL проверена (18/18 HTTP 200; 4 файла добавлены, 14 уже были с совпадающим SHA-256). Изменения deploy scripts требуют отдельного релиза; CI `web:build` пока использует legacy-дерево как эфемерный источник проверки OG-файлов. Ничего в Git или на сервере из legacy-деревьев не удалялось.
+
+## 2026-11-18 — Theme-first URLs for city landings
+
+**Decision:** A thematic landing is the primary entry point; city is its geographic refinement (`/{theme}/{city}`, for example `/novyj-god/moscow`). Preserve existing public URLs and their search history. Do not create a parallel URL or redirect as part of a UI refresh. Publish city variants only when the route matrix allows the theme and the variant has a supported catalog route.
+
+**Internal links:** Each supported theme-city pair should have crawlable HTML links from the national theme page, the city's collections index, its city hub when editorially relevant, and matching editorial articles. City selection on a theme page must preserve the theme and navigate to the selected city's canonical URL. `/podborki/c/{city}` remains the city-level collections index; it does not replace the theme-city landing.
+
+**Why:** The existing topic-first hierarchy scales across themes and cities while preserving URLs already exposed to search engines. Crawlers and users need ordinary links between the national page, city variants, city hubs, collections, and related articles.
+
+**Status:** Architecture locked; live URL/SEO audit is incomplete. The 17.11 snapshot confirmed 4 sitemap/noindex conflicts and left 60 robots rows unchecked; it does not contain the complete reported list of 13. Live page checks show a count mismatch for New Year (catalog index 490 in Moscow versus 0 events in the national landing HTML); the exact seasonal inventory and live sitemap remain unverified. See [landing URL architecture and audit](./landing-url-architecture-and-audit-2026-11-18.md). Do not change indexability thresholds, seasonal rules, routes, redirects, or sitemap membership until the URL-by-URL audit is complete.
