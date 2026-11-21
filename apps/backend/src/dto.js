@@ -7211,10 +7211,40 @@ export function hydratePublicCatalogLegacyIndexes(sessions, serialized) {
   };
 }
 
-// Stat-gated mtime cache for the legacy catalog indexes (INC.504.5c): prevents the API
-// from re-reading + JSON.parse-ing the ~17MB public-catalog-dto.json on every SWR promote.
+// Stat-gated, single-flight cache for the legacy catalog indexes (INC.504.5c).
+// Holds only id-pointer indexes + session count - never the ~17MB sessions array - so V8
+// frees the parsed snapshot right after hydrate. The shared in-flight promise ensures
+// concurrent adopters parse the snapshot once, not once per caller.
 let legacyCatalogDiskIndexesMtimeMs = null;
+let legacyCatalogDiskIndexesSessionCount = null;
 let legacyCatalogDiskIndexes = null;
+let legacyCatalogDiskIndexesLoadPromise = null;
+
+async function loadLegacyCatalogDiskIndexes() {
+  if (legacyCatalogDiskIndexesLoadPromise) return legacyCatalogDiskIndexesLoadPromise;
+  legacyCatalogDiskIndexesLoadPromise = (async () => {
+    try {
+      const { loadPublicCatalogDiskCacheWithStat } = await import('./public-catalog-disk-cache.js');
+      const loaded = await loadPublicCatalogDiskCacheWithStat(legacyCatalogDiskIndexesMtimeMs);
+      if (loaded.status === 'loaded') {
+        legacyCatalogDiskIndexesMtimeMs = loaded.mtimeMs;
+        const disk = loaded.snapshot;
+        legacyCatalogDiskIndexesSessionCount =
+          typeof disk?.sessions?.length === 'number' ? disk.sessions.length : null;
+        legacyCatalogDiskIndexes = disk?.version === 2 && disk.indexes ? disk.indexes : null;
+        // `disk` / `loaded.snapshot` (incl. the ~17MB sessions) drops out of scope here.
+      } else if (loaded.status === 'missing') {
+        legacyCatalogDiskIndexesMtimeMs = null;
+        legacyCatalogDiskIndexesSessionCount = null;
+        legacyCatalogDiskIndexes = null;
+      }
+      return { sessionCount: legacyCatalogDiskIndexesSessionCount, indexes: legacyCatalogDiskIndexes };
+    } finally {
+      legacyCatalogDiskIndexesLoadPromise = null;
+    }
+  })();
+  return legacyCatalogDiskIndexesLoadPromise;
+}
 
 async function adoptCanonicalCatalogSessions(rows, _reason) {
   const now = Date.now();
@@ -7241,18 +7271,9 @@ async function adoptCanonicalCatalogSessions(rows, _reason) {
     // when the worker rewrote the snapshot since the last promote.
     let hydrated = null;
     try {
-      const { loadPublicCatalogDiskCacheWithStat } = await import('./public-catalog-disk-cache.js');
-      const loaded = await loadPublicCatalogDiskCacheWithStat(legacyCatalogDiskIndexesMtimeMs);
-      if (loaded.status === 'loaded') {
-        legacyCatalogDiskIndexesMtimeMs = loaded.mtimeMs;
-        const disk = loaded.snapshot;
-        legacyCatalogDiskIndexes =
-          disk?.version === 2 && disk.indexes && disk.sessions?.length === rows.length
-            ? disk.indexes
-            : null;
-      }
-      if (loaded.status !== 'missing' && legacyCatalogDiskIndexes) {
-        hydrated = hydratePublicCatalogLegacyIndexes(rows, legacyCatalogDiskIndexes);
+      const { sessionCount, indexes } = await loadLegacyCatalogDiskIndexes();
+      if (indexes && sessionCount === rows.length) {
+        hydrated = hydratePublicCatalogLegacyIndexes(rows, indexes);
       }
     } catch {
       hydrated = null;
