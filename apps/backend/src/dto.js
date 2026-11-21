@@ -7211,6 +7211,11 @@ export function hydratePublicCatalogLegacyIndexes(sessions, serialized) {
   };
 }
 
+// Stat-gated mtime cache for the legacy catalog indexes (INC.504.5c): prevents the API
+// from re-reading + JSON.parse-ing the ~17MB public-catalog-dto.json on every SWR promote.
+let legacyCatalogDiskIndexesMtimeMs = null;
+let legacyCatalogDiskIndexes = null;
+
 async function adoptCanonicalCatalogSessions(rows, _reason) {
   const now = Date.now();
   const prev = publicCatalogCache;
@@ -7230,12 +7235,24 @@ async function adoptCanonicalCatalogSessions(rows, _reason) {
     builtAt = prev.builtAt || now;
   } else {
     // Prefer prebuilt indexes from disk v2 (Catalog Worker) - no Map rebuild on API.
+    // Stat-gated mtime cache (INC.504.5c): the previous sync readFileSync + JSON.parse of
+    // the ~17MB snapshot blocked the API event loop every promote and, under MemoryHigh +
+    // GC pressure, stalled it for 5-15s (the "API hung / curl=28" incidents). Parse only
+    // when the worker rewrote the snapshot since the last promote.
     let hydrated = null;
     try {
-      const { loadPublicCatalogDiskCache } = await import('./public-catalog-disk-cache.js');
-      const disk = loadPublicCatalogDiskCache();
-      if (disk?.version === 2 && disk.indexes && (disk.sessions === rows || disk.sessions?.length === rows.length)) {
-        hydrated = hydratePublicCatalogLegacyIndexes(rows, disk.indexes);
+      const { loadPublicCatalogDiskCacheWithStat } = await import('./public-catalog-disk-cache.js');
+      const loaded = await loadPublicCatalogDiskCacheWithStat(legacyCatalogDiskIndexesMtimeMs);
+      if (loaded.status === 'loaded') {
+        legacyCatalogDiskIndexesMtimeMs = loaded.mtimeMs;
+        const disk = loaded.snapshot;
+        legacyCatalogDiskIndexes =
+          disk?.version === 2 && disk.indexes && disk.sessions?.length === rows.length
+            ? disk.indexes
+            : null;
+      }
+      if (loaded.status !== 'missing' && legacyCatalogDiskIndexes) {
+        hydrated = hydratePublicCatalogLegacyIndexes(rows, legacyCatalogDiskIndexes);
       }
     } catch {
       hydrated = null;
