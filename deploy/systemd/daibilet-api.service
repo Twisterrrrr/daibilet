@@ -6,7 +6,7 @@ After=network.target
 Type=simple
 WorkingDirectory=/opt/daibilet
 EnvironmentFile=/opt/daibilet/.env
-Environment=NODE_OPTIONS=--max-old-space-size=1024
+Environment="NODE_OPTIONS=--max-old-space-size=1024 --report-on-signal --report-signal=SIGUSR2 --report-directory=/var/log/daibilet/node-reports --report-exclude-env --report-exclude-network"
 MemoryHigh=1200M
 MemoryMax=1536M
 MemorySwapMax=512M

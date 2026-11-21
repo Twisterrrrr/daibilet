@@ -71,6 +71,50 @@ if [ "${DAIBILET_API_HEALTH_DRY_RUN:-0}" = "1" ]; then
   exit 0
 fi
 
+# Capture the blocked Node process's report BEFORE killing (mirrors ssr-healthcheck.sh).
+# SIGUSR2 only emits a report when the process started with --report-on-signal; a plain
+# SIGUSR2 to an unconfigured process could terminate it, so check the environment first
+# and only signal the real tsx-loaded server-entry node (not npm/sh, not the tsx CLI).
+REPORT_DIR="${DAIBILET_API_REPORT_DIR:-/var/log/daibilet/node-reports}"
+CONTROL_GROUP="$(systemctl show -p ControlGroup --value "$API_SERVICE" 2>/dev/null || true)"
+CGROUP_DIR="/sys/fs/cgroup${CONTROL_GROUP}"
+if [[ -n "$CONTROL_GROUP" && -d "$CGROUP_DIR" ]]; then
+  MEM_CURRENT="$(cat "$CGROUP_DIR/memory.current" 2>/dev/null || echo na)"
+  SWAP_CURRENT="$(cat "$CGROUP_DIR/memory.swap.current" 2>/dev/null || echo na)"
+  MEM_EVENTS="$(tr '\n' ',' <"$CGROUP_DIR/memory.events" 2>/dev/null || echo na)"
+  log_msg "HANG diagnostics: load=$(cut -d ' ' -f 1-3 /proc/loadavg) memory=${MEM_CURRENT} swap=${SWAP_CURRENT} events=${MEM_EVENTS}"
+
+  API_NODE_PID=""
+  while read -r PID; do
+    [[ "$PID" =~ ^[1-9][0-9]*$ ]] || continue
+    CMD="$(tr '\0' ' ' <"/proc/$PID/cmdline" 2>/dev/null || true)"
+    # Real API process = node with the tsx loader import; npm/sh and the tsx CLI differ.
+    if [[ "$CMD" == *"loader.mjs"* && "$CMD" == *"server-entry.ts"* ]]; then
+      API_NODE_PID="$PID"
+      break
+    fi
+  done <"$CGROUP_DIR/cgroup.procs"
+
+  if [[ -n "$API_NODE_PID" ]]; then
+    PSTATE="$(awk '/^State:/{print $2}' "/proc/$API_NODE_PID/status" 2>/dev/null || echo na)"
+    WCHAN="$(cat "/proc/$API_NODE_PID/wchan" 2>/dev/null || echo na)"
+    # State=R (running/CPU-bound, report will be written) vs State=D (uninterruptible
+    # kernel wait: disk/cgroup reclaim; V8 interrupts are NOT delivered, so report.*.json
+    # may be absent). wchan names the kernel-side wait channel either way.
+    log_msg "HANG process: $(ps -p "$API_NODE_PID" -o pid=,etime=,%cpu=,rss=,stat=,comm= 2>/dev/null | tr -s ' ' || echo unavailable) state=${PSTATE} wchan=${WCHAN}"
+    if [[ -r "/proc/$API_NODE_PID/environ" ]] && tr '\0' '\n' <"/proc/$API_NODE_PID/environ" | grep -Eq '^NODE_OPTIONS=.*--report-on-signal'; then
+      mkdir -p "$REPORT_DIR"
+      chmod 700 "$REPORT_DIR"
+      kill -USR2 "$API_NODE_PID" 2>/dev/null || true
+      sleep 2
+      log_msg "HANG report signal sent to API node pid=${API_NODE_PID}; reports=${REPORT_DIR}"
+      find "$REPORT_DIR" -maxdepth 1 -type f -name 'report.*.json' -mtime +14 -delete 2>/dev/null || true
+    else
+      log_msg "HANG report skipped: API node pid=${API_NODE_PID} lacks report-on-signal"
+    fi
+  fi
+fi
+
 systemctl kill -s SIGKILL "$API_SERVICE" 2>/dev/null || true
 sleep 1
 systemctl reset-failed "$API_SERVICE" 2>/dev/null || true
