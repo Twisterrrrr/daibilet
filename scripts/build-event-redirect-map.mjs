@@ -97,6 +97,31 @@ function normalizeEventPath(value) {
   return { sourcePath: `/events/${s}`, slug: s };
 }
 
+async function loadExistingEntries(outputPath) {
+  try {
+    const parsed = JSON.parse(await readFile(outputPath, 'utf8'));
+    return parsed && Array.isArray(parsed.entries) ? parsed.entries : [];
+  } catch {
+    return [];
+  }
+}
+
+function mergeEntries(existing, incoming) {
+  const map = new Map();
+  for (const e of existing) map.set(e.sourcePath, e);
+  for (const e of incoming) map.set(e.sourcePath, e);
+  return [...map.values()].sort((a, b) => a.sourcePath.localeCompare(b.sourcePath));
+}
+
+/** Union the new run into the existing map (incoming wins on conflict), then write both files. */
+async function writeMergedMap(nextMap, outputPath) {
+  const merged = mergeEntries(await loadExistingEntries(outputPath), nextMap.entries);
+  const mergedMap = { version: 1, generatedAt: new Date().toISOString(), entries: merged };
+  await writeFile(outputPath, `${JSON.stringify(mergedMap, null, 2)}\n`, 'utf8');
+  await writeFile(ENTRIES_TS_PATH, generateEventRedirectEntriesTs(mergedMap), 'utf8');
+  console.log(`Wrote redirect map (${mergedMap.entries.length} entries, merged) + ${ENTRIES_TS_PATH}`);
+}
+
 /**
  * Enumerate the complete 301 alias map from our own catalog (no GSC input):
  * 1. EventPageRoute (CANDIDATE/HISTORICAL/CURRENT) -> its published EventPage canonical.
@@ -168,9 +193,7 @@ async function runFromCatalog(connectionString, { apply, outputPath }) {
       return;
     }
     if (apply) {
-      await writeFile(outputPath, `${JSON.stringify(map, null, 2)}\n`, 'utf8');
-      await writeFile(ENTRIES_TS_PATH, generateEventRedirectEntriesTs(map), 'utf8');
-      console.log(`Wrote redirect map (${map.entries.length} entries) + ${ENTRIES_TS_PATH}`);
+      await writeMergedMap(map, outputPath);
     }
     console.log(JSON.stringify({ ...summary, preview: map.entries.slice(0, 5) }, null, 2));
     if (!apply) console.warn(`Dry-run: no write. Re-run with --apply to write ${outputPath}.`);
@@ -292,9 +315,7 @@ async function main() {
       return;
     }
     if (apply) {
-      await writeFile(outputPath, `${JSON.stringify(map, null, 2)}\n`, 'utf8');
-      await writeFile(ENTRIES_TS_PATH, generateEventRedirectEntriesTs(map), 'utf8');
-      console.log(`Wrote redirect map (${map.entries.length} entries) + ${ENTRIES_TS_PATH}`);
+      await writeMergedMap(map, outputPath);
     }
     console.log(JSON.stringify({ ...summary, preview: map.entries.slice(0, 5) }, null, 2));
     if (!apply) console.warn(`Dry-run: no write. Re-run with --apply to write ${outputPath}.`);
