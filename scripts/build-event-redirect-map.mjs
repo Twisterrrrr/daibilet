@@ -6,6 +6,7 @@
  * Usage: node apps/web/node_modules/tsx/dist/cli.mjs scripts/build-event-redirect-map.mjs --gsc=file [--apply]
  * DB: EVENT_MAP_DATABASE_URL or DATABASE_URL.
  */
+import { existsSync, readFileSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
@@ -16,6 +17,20 @@ import { validateEventRedirectMap } from '../apps/web/src/lib/event-redirect-map
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const { Pool } = createRequire(path.join(rootDir, 'packages', 'db', 'package.json'))('pg');
+
+function loadRootEnv(projectRoot) {
+  const envPath = path.join(projectRoot, '.env');
+  if (!existsSync(envPath)) return;
+  for (const line of readFileSync(envPath, 'utf8').split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const sep = trimmed.indexOf('=');
+    if (sep <= 0) continue;
+    const key = trimmed.slice(0, sep).trim();
+    const value = trimmed.slice(sep + 1).trim().replace(/^['"]|['"]$/g, '');
+    if (key && process.env[key] == null) process.env[key] = value;
+  }
+}
 
 /** Parse a GSC CSV/TSV dump into /events/ URLs (header and non-event rows dropped). */
 export function extractEventUrls(text) {
@@ -63,6 +78,7 @@ async function main() {
   }
   const apply = Boolean(args.apply);
   const outputPath = typeof args.output === 'string' ? args.output : path.join(rootDir, 'data', 'redirects', 'event-pdp-redirects.json');
+  loadRootEnv(rootDir);
   const connectionString = process.env.EVENT_MAP_DATABASE_URL || process.env.DATABASE_URL;
   if (!connectionString) {
     console.error('Set EVENT_MAP_DATABASE_URL or DATABASE_URL');
