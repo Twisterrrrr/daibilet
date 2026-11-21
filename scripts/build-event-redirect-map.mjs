@@ -89,18 +89,114 @@ function generateEventRedirectEntriesTs(map) {
   ].join('\n');
 }
 
+/** Normalize an EventPageRoute.path (bare slug or /events/slug) to a sourcePath + slug. */
+function normalizeEventPath(value) {
+  let s = String(value || '').trim().replace(/\/+$/, '');
+  if (s.startsWith('/events/')) return { sourcePath: s, slug: s.slice('/events/'.length) };
+  s = s.replace(/^\//, '');
+  return { sourcePath: `/events/${s}`, slug: s };
+}
+
+/**
+ * Enumerate the complete 301 alias map from our own catalog (no GSC input):
+ * 1. EventPageRoute (CANDIDATE/HISTORICAL/CURRENT) -> its published EventPage canonical.
+ * 2. Direct EventPageEvent links where the Event slug differs from the canonical.
+ * Read-only. 410 (dead slot URLs) remain GSC-driven because pre-merge slot slugs
+ * are not reliably retained in the DB.
+ */
+async function runFromCatalog(connectionString, { apply, outputPath }) {
+  const pool = new Pool({ connectionString, max: 1 });
+  try {
+    const client = await pool.connect();
+    const entries = [];
+    const seen = new Set();
+    try {
+      await client.query('BEGIN READ ONLY');
+
+      const routes = await client.query(
+        `SELECT route.path AS path, page.slug AS slug, route."eventPageId" AS "pageId"
+         FROM "EventPageRoute" route
+         JOIN "EventPage" page ON page.id = route."eventPageId"
+         WHERE page.status = 'READY' AND page."publishedAt" IS NOT NULL
+           AND route.kind IN ('CANDIDATE','HISTORICAL','CURRENT')`,
+      );
+      for (const row of routes.rows) {
+        const { sourcePath, slug } = normalizeEventPath(row.path);
+        const targetPath = `/events/${row.slug}`;
+        if (!slug || slug === row.slug || sourcePath === targetPath || seen.has(sourcePath)) continue;
+        seen.add(sourcePath);
+        entries.push({ sourcePath, eventId: row.pageId, kind: 'legacy_slug', status: 301, targetPath });
+      }
+
+      const direct = await client.query(
+        `SELECT lower(event.slug) AS slug, lower(page.slug) AS canonical, event.id AS "eventId"
+         FROM "EventPageEvent" link
+         JOIN "EventPage" page ON page.id = link."eventPageId"
+         JOIN "Event" event ON event.id = link."eventId"
+         WHERE page.status = 'READY' AND page."publishedAt" IS NOT NULL
+           AND lower(coalesce(event.slug, '')) <> lower(page.slug)`,
+      );
+      for (const row of direct.rows) {
+        const sourcePath = `/events/${row.slug}`;
+        const targetPath = `/events/${row.canonical}`;
+        if (!row.slug || sourcePath === targetPath || seen.has(sourcePath)) continue;
+        seen.add(sourcePath);
+        entries.push({ sourcePath, eventId: row.eventId, kind: 'legacy_slug', status: 301, targetPath });
+      }
+
+      await client.query('ROLLBACK');
+    } finally {
+      client.release();
+    }
+
+    const map = {
+      version: 1,
+      generatedAt: new Date().toISOString(),
+      entries: entries.sort((a, b) => a.sourcePath.localeCompare(b.sourcePath)),
+    };
+    const errors = validateEventRedirectMap(map);
+    const summary = {
+      mode: apply ? 'apply' : 'dry-run',
+      catalog301: map.entries.length,
+      validationErrors: errors,
+      outputPath,
+    };
+    if (errors.length) {
+      console.log(JSON.stringify(summary, null, 2));
+      console.error('Catalog map failed validation; nothing written.');
+      process.exitCode = 1;
+      return;
+    }
+    if (apply) {
+      await writeFile(outputPath, `${JSON.stringify(map, null, 2)}\n`, 'utf8');
+      await writeFile(ENTRIES_TS_PATH, generateEventRedirectEntriesTs(map), 'utf8');
+      console.log(`Wrote redirect map (${map.entries.length} entries) + ${ENTRIES_TS_PATH}`);
+    }
+    console.log(JSON.stringify({ ...summary, preview: map.entries.slice(0, 5) }, null, 2));
+    if (!apply) console.warn(`Dry-run: no write. Re-run with --apply to write ${outputPath}.`);
+  } finally {
+    await pool.end();
+  }
+}
+
 async function main() {
   const args = cliArgs();
-  if (typeof args.gsc !== 'string') {
-    console.error('Usage: node apps/web/node_modules/tsx/dist/cli.mjs scripts/build-event-redirect-map.mjs --gsc=file [--apply]');
-    process.exit(2);
-  }
   const apply = Boolean(args.apply);
   const outputPath = typeof args.output === 'string' ? args.output : path.join(rootDir, 'data', 'redirects', 'event-pdp-redirects.json');
   loadRootEnv(rootDir);
   const connectionString = process.env.EVENT_MAP_DATABASE_URL || process.env.DATABASE_URL;
   if (!connectionString) {
     console.error('Set EVENT_MAP_DATABASE_URL or DATABASE_URL');
+    process.exit(2);
+  }
+
+  if (args['from-catalog']) {
+    await runFromCatalog(connectionString, { apply, outputPath });
+    return;
+  }
+
+  if (typeof args.gsc !== 'string') {
+    console.error('Usage: node apps/web/node_modules/tsx/dist/cli.mjs scripts/build-event-redirect-map.mjs --gsc=file|--from-catalog [--apply]');
     process.exit(2);
   }
 
