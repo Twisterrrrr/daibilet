@@ -3,7 +3,7 @@ import test from 'node:test';
 
 import { resolveEventPageUrlPolicy } from './event-page-url-policy';
 
-test('legacy slot URL points to the linked stable EventPage and stays out of the index', () => {
+test('legacy slot URL canonicalizes to the stable EventPage (no noindex)', () => {
   assert.deepEqual(resolveEventPageUrlPolicy({
     requestedSlug: 'tc-slot-id-old-title',
     eventCanonicalPath: '/events/tc-slot-id-old-title',
@@ -14,7 +14,7 @@ test('legacy slot URL points to the linked stable EventPage and stays out of the
     canonicalPath: '/events/stable-event-page',
     hasPublishedStablePage: true,
     isLegacyAlias: true,
-    noindex: true,
+    noindex: false,
   });
 });
 

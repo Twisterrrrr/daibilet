@@ -33,8 +33,12 @@ export function resolveEventPageUrlPolicy(input: {
     canonicalPath: stablePath || input.eventCanonicalPath || input.fallbackPath,
     hasPublishedStablePage: Boolean(stableSlug),
     isLegacyAlias,
+    // A legacy/alias page must NOT emit noindex alongside a cross-canonical:
+    // noindex + canonical together confuses Google and produces the GSC
+    // "canonical version does not match" bucket. The canonical alone
+    // consolidates the alias into the stable page; noindex stays only for pages
+    // without a published canonical (draft / ended / explicit non-indexable).
     noindex:
-      isLegacyAlias ||
       Boolean(input.eventPageRoute?.published && !input.eventPageRoute.isIndexable) ||
       hasUnpublishedCandidate ||
       (!stableSlug && ended),
