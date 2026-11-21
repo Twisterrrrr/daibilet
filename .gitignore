@@ -72,3 +72,22 @@ __pycache__/
 # Runtime disk caches (INC.504.4 catalog DTO snapshot)
 var/cache/
 var/deploy-shadow/
+
+# Prod-only runtime and one-off agent scratch (lives on the MSK worktree, never in the repo)
+secrets/
+var/
+tmp/
+backups/
+data/backups/
+.pnpm-store/
+
+# Agent/tool one-off scripts, experimental drafts and backups
+tmp-*.mts
+tmp-*.ts
+*-tmp.ts
+scripts/.tmp-*
+scripts/_*
+packages/db/_*
+docs/drafts/_*
+*.bak-*
+*.bak.*

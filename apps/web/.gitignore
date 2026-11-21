@@ -1,3 +1,4 @@
 .next/
+.next.prev/
 out/
 tsconfig.tsbuildinfo
