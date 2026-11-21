@@ -319,3 +319,27 @@ sudo CONFIRM=restore-drill deploy/scripts/postgres-restore-drill.sh
 | Log | `/var/log/daibilet/postgres-backup.log`, drill: `postgres-restore-drill.log` |
 
 Runbook: [docs/postgres-backup.md](../../docs/postgres-backup.md).
+
+## Prod: Postgres liveness alert (every 5 min)
+
+Fast detection that the postgres container is down, so a host/kernel reboot or a
+manual stop cannot leave the DB silently down for hours (incident 2026-11-20: 16h
+outage because the container had no restart policy and no watch alerted - see
+[docs/postgres-outage-kernel-reboot-2026-11-20.md](../../docs/postgres-outage-kernel-reboot-2026-11-20.md)).
+
+```bash
+cd /opt/daibilet
+sudo bash deploy/scripts/install-postgres-health-watch.sh
+# test: emits the alert and exits 1 when down, exits 0 silently when up
+sudo deploy/cron/postgres-health-watch.sh; echo exit=$?
+```
+
+| Setting | Value |
+|---------|-------|
+| Schedule | every 5 min (`/etc/cron.d/daibilet-postgres-health-watch`) |
+| Script   | `deploy/cron/postgres-health-watch.sh` |
+| Alert    | `/var/log/daibilet/postgres-health-watch.log` + Telegram (if TELEGRAM_BOT_TOKEN/TELEGRAM_CHAT_ID set) |
+| Override | container name via `PROD_PG_CONTAINER` |
+
+A brief false positive at docker/containerd boot is acceptable; the 5-min cadence
+makes the persistent-down case loud and immediate.
