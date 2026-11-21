@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 
-import { resolveEventRedirect, validateEventRedirectMap, type EventRedirectMap } from './event-redirect-map';
+import { buildEventRedirectIndex, resolveEventRedirect, validateEventRedirectMap, type EventRedirectMap } from './event-redirect-map';
 
 const VALID: EventRedirectMap = {
   version: 1,
@@ -96,4 +96,13 @@ test('resolveEventRedirect returns the matching entry', () => {
     '/events/regular-show-moscow',
   );
   assert.equal(resolveEventRedirect(VALID.entries, '/events/unknown'), null);
+});
+
+test('buildEventRedirectIndex keeps the first entry per sourcePath and looks up by path', () => {
+  const index = buildEventRedirectIndex([
+    { sourcePath: '/events/a', eventId: 'evt_a', kind: 'slot', status: 301, targetPath: '/events/keep' },
+    { sourcePath: '/events/a', eventId: 'evt_a', kind: 'slot', status: 301, targetPath: '/events/keep2' },
+  ]);
+  assert.equal(index.get('/events/a')?.targetPath, '/events/keep');
+  assert.equal(index.get('/events/missing'), undefined);
 });

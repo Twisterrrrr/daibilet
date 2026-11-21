@@ -90,3 +90,12 @@ export function validateEventRedirectMap(map: unknown): string[] {
 export function resolveEventRedirect(entries: EventRedirectEntry[], pathname: string): EventRedirectEntry | null {
   return entries.find((entry) => entry.sourcePath === pathname) ?? null;
 }
+
+/** O(1) lookup index for the runtime proxy (the map can hold thousands of entries). */
+export function buildEventRedirectIndex(entries: EventRedirectEntry[]): Map<string, EventRedirectEntry> {
+  const index = new Map<string, EventRedirectEntry>();
+  for (const entry of entries) {
+    if (!index.has(entry.sourcePath)) index.set(entry.sourcePath, entry);
+  }
+  return index;
+}

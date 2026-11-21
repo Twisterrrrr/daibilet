@@ -19,6 +19,7 @@ import { resolveLegacyLandingRedirect } from '@/lib/landing-routes';
 import { resolvePodborkiCityQueryRedirect } from '@/lib/podborki-city-seo';
 import { resolveCityFirstRedirectPath } from '@/lib/city-first-route-slugs';
 import { isCityFirstUrlMode } from '@/lib/routes';
+import { lookupEventRedirect } from '@/server/event-redirect-index';
 import { canonicalizeRegionChildCitySearch } from '../backend/src/search-geo-match.ts';
 
 function unauthorizedAdminResponse(realm: string) {
@@ -99,6 +100,9 @@ export async function proxy(request: NextRequest) {
   const eventSlugRedirect = redirectCyrillicEventSlug(request);
   if (eventSlugRedirect) return eventSlugRedirect;
 
+  const eventMapRedirect = redirectEventRedirectMap(request);
+  if (eventMapRedirect) return eventMapRedirect;
+
   const citySlugRedirect = redirectCyrillicCitySlug(request);
   if (citySlugRedirect) return citySlugRedirect;
 
@@ -160,6 +164,33 @@ function redirectCyrillicEventSlug(request: NextRequest): NextResponse | null {
   const url = request.nextUrl.clone();
   url.pathname = targetPath;
   return NextResponse.redirect(url, 308);
+}
+
+/**
+ * Slot/legacy/Tc-code event URL → canonical (301) or permanent-removal (410),
+ * driven by the generated redirect map (`data/redirects/event-pdp-redirects.json`).
+ * Runs before the event page renders so a dead URL never reaches SSR.
+ */
+function redirectEventRedirectMap(request: NextRequest): NextResponse | null {
+  const pathname = request.nextUrl.pathname;
+  if (!pathname.startsWith('/events/')) return null;
+  const entry = lookupEventRedirect(pathname);
+  if (!entry) return null;
+
+  if (entry.status === 301 && entry.targetPath) {
+    const url = request.nextUrl.clone();
+    url.pathname = entry.targetPath;
+    url.search = '';
+    url.hash = '';
+    return NextResponse.redirect(url, 301);
+  }
+  if (entry.status === 410) {
+    return new NextResponse('Gone', {
+      status: 410,
+      headers: { 'Cache-Control': 'public, max-age=86400' },
+    });
+  }
+  return null;
 }
 
 function redirectCyrillicCitySlug(request: NextRequest): NextResponse | null {
